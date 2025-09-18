@@ -1,197 +1,381 @@
-Return-Path: <netdev+bounces-224600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F506B86BA5
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 21:41:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33B68B86BB3
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 21:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 188B31B2777F
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 19:42:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2ADF464835
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 19:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 408162E0B5F;
-	Thu, 18 Sep 2025 19:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082D42E1EE2;
+	Thu, 18 Sep 2025 19:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qVcWLcuU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IAOZGew6"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012048.outbound.protection.outlook.com [40.107.200.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53AD2DFF3F
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 19:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758224513; cv=fail; b=hJa4Xz1jbZebZRzvOe9Q0ra5/SUzx+eezJIepcwxIPPPFg8axGo2QwKHMsOiuoOLz5oL3sPHrmIXGeM2WnQVbT3GXXq45DUZLPU+U/pq68DyWK9c3REpfFCLqMQXxsJowRO+XlfrW3tZd2ZHfEQG7rfGyfk/N81grY+3ObK4hAw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758224513; c=relaxed/simple;
-	bh=BE5ViBErMLOej9IkEFo4hWHdt7hmYlq99hDTIBAZXAE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=fx6fuUZSRw9BUdjsICS3Z8FQsYVRIAeA+UNrCxnp3EoJro73+RLFvvaQbI+u7ogsBwU7Avf5wgovwJ8f6WzVCEN3bxJpcHXeP50zXs+GAd4qTx6cvvWH9U+V6OEh81Kx5fBTEBtaVoTdM/36+V3+3wfHA3Hqoza0s6rqBImEs5U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qVcWLcuU; arc=fail smtp.client-ip=40.107.200.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RxV3ikq9xSCCdkjSyDNoM0Cby9VqyVhnoE1V68wulvUlr4WHEX8ohWRS9FaaQTHmLb5QnVqQPkeNFfz1LMjMJU64JPV6wgs36fKd7jgQ3B+C3KE4E6sDy9XKKZVu8TDq3UO4Z5WLBYp5yBp71PJMuQiJG/iLqTyTe9c/S7mCI/I2pphgAdgBR0E6dihwkOEKGuzL0YUgN7fRY2ZR9/kRP/sQ+90O0b8dMVgOX16tP2q7TWCo9V8hAcTd4MnSXQrppfWxyAeoBed4f2iieX161KeTuKD/TG64/wKaLlEDZ5aIJujNscOkZ23wXeGT4bQMq/lslzVNug8wgkuQUfNWKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BE5ViBErMLOej9IkEFo4hWHdt7hmYlq99hDTIBAZXAE=;
- b=NWkNlsEO/diN81vpJ4/lwohu8d7igociae4NedK1dl7N8ExTZGl3hlkVYRdNz+rOA4JyQJjEO0HClOlwVsBecSPkni3N2h4dlXL6UIZ+gEynFklbMrOTlQ6Kt8PBliDzgaF8gxRvtx3G+45r0UbZZtQoSKua0Nu9MVo0GVbbwzlfPs9c29RlNFfWFJUFwqCFeANB9elfdehUx+UVqkZSaKjf9Li88ljq6XEqj9B8ELrK2npSjHgEBBWIYEtIxEQUcR8wZPu5A69xQyvXRzKTrKnUNNAk3Tx+/hy8vxLfov/p3OlmvH/viYaUkoNEIZNLZPkxc3eh2fuOyzaBICH0Kw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BE5ViBErMLOej9IkEFo4hWHdt7hmYlq99hDTIBAZXAE=;
- b=qVcWLcuUkSKnjlAFWI+xkc3uY1nq22NzbHDpksA8no1xpydvQaIROQDjF8ldrfcRcSn8KHzDPc49B8cvZPiAfIeNf/Ds28AabYI1Z0JvnLfPTyzgmrKBh8ZS2tcQJI0AAso+DFhZYg9TctXx5XToNf+XXcXAv5urXREarf1Ri/MCl7Mm/CEiyI6udeBoovCrEOjByXmjQJKR6rH+fjwKf95uFGf+yi4+dPSArdQhtXb6bfqf/R9Q2UR/6mdlivCYD9FfblMoiAf09GMY8/CQFOjtieHNEl1bZm4ESjrG2py10q7Zo1Y7AFtTNFlwZQZkwXn7ziX1rNwCFcs7koc9AA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20)
- by SJ0PR12MB7068.namprd12.prod.outlook.com (2603:10b6:a03:4ae::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.13; Thu, 18 Sep
- 2025 19:41:47 +0000
-Received: from MW4PR12MB7141.namprd12.prod.outlook.com
- ([fe80::932c:7607:9eaa:b1f2]) by MW4PR12MB7141.namprd12.prod.outlook.com
- ([fe80::932c:7607:9eaa:b1f2%5]) with mapi id 15.20.9137.012; Thu, 18 Sep 2025
- 19:41:46 +0000
-Message-ID: <f84efe86-098f-4783-85af-4289f62804e9@nvidia.com>
-Date: Thu, 18 Sep 2025 22:41:38 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/4] net/mlx5e: Add logic to read RS-FEC
- histogram bin ranges from PPHCR
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Andrew Lunn
- <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
- Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org,
- Donald Hunter <donald.hunter@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- Yael Chemla <ychemla@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
-References: <20250916191257.13343-1-vadim.fedorenko@linux.dev>
- <20250916191257.13343-4-vadim.fedorenko@linux.dev>
- <20250917174638.238fa5fc@kernel.org>
- <4d3a0a08-bda4-483f-a120-b1f905ec0761@nvidia.com>
- <20250918073551.782c5c25@kernel.org>
- <76611a9c-4c53-40a2-96c1-e1cf5b211611@nvidia.com>
- <20250918084000.1b4fb4f4@kernel.org>
-Content-Language: en-US
-From: Carolina Jubran <cjubran@nvidia.com>
-In-Reply-To: <20250918084000.1b4fb4f4@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL2P290CA0006.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:2::6)
- To MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC772E11CB
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 19:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758224609; cv=none; b=O2VyLdbUD0VJ4PTXrJIHZp5ghn6Dp63VLjijNSyRPnRDFA5+r4CTEoV0vfq5Oyjg4rgR8Mf/WTZcXq5l5pZNJpyjNoOQduUTkY2yG9+9EH4y5WBozSlvsVMEls5np+cIWSzQt+WaI1+26nHBGytMm5Lsm48B7ZcB/NEkQnXZ8x4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758224609; c=relaxed/simple;
+	bh=7oqERi05BDM41kYuRXU/Ce4ZHasAcEi/Km8+BK0j3os=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R99T0I+e9SNF/HRE8v1DzlGQuwxQUP3KP84cMrO8WLSIiIgOZ7fS0ZVeZj07K1/xt5ZyU0jLm+vyp1InOoAreS3KRLYMA3n5VjBGNG7bpa3EZbVQHxWjW2EEewNa1DIQQKHpGbXYNrm7O7tVFkHBxSAc0v4486n5gUKpNJUI2WI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IAOZGew6; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-71d5fb5e34cso14389097b3.0
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 12:43:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758224607; x=1758829407; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4GZVKPpOdFCbsWISOjzAzYr8joLlGjS++6os8dk7SJg=;
+        b=IAOZGew6i2oH3bjzAn1zMMjqAMf9T3FWW5OTyziLo+WAkB3F6m0f3fz/UC66nq5oi7
+         C8MWkWn1L3DVGmX5gzziLbXMUlKxOQg2XxPvzWIM9/K6YOca5cyh1dbjAE7fZSrdmESI
+         DPrAN2BhVvTu9L7pnUxgrYJYk0PmmwgPCLweEG0tZDMngcEBDWmJ+/SqgYtMUCSlxP6E
+         YckSyOPaCoCPPdIJE3rm0GR5pI4/gdAI2rxeXc/+b1o9IXP+RaOyrJeQrbsNGDZfwLPW
+         LDYMHktekdc525sHqjnO0OESgvnlJyE32CtndV+5DUc0y5I0c1KBQfoyyZABOwEdT0Ci
+         m9kA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758224607; x=1758829407;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4GZVKPpOdFCbsWISOjzAzYr8joLlGjS++6os8dk7SJg=;
+        b=QmocG9A9ZxII5NKKLryJJePTEPFprTFcAK4/cjBxFloNinTiUkOKx8bjnVFUZB51Kf
+         GKtbEgxQaiv8zFw6odW0zIQx6RwLQLmuOZpPiy4joQWoqJd/Ib2jXxDTzRwqh4R2gMkX
+         sw0TYDtLGI/1HdPOMeKD7yJvKukedvyigzvh8ec2rRV4z7VP5d4rRNF2PBezHp/pcBwJ
+         p1MEsLvAq966kOqtKBfzn+ujTC3cY7rNTrkzzJZxHQUFiWdmfRwEQ5jGM8juCB1k6l8G
+         4tDJ01yabV+xxLux4yFqfbsPhMTGJxrLOEBsa8vLKSrqP6QwhBh6oVjkrPtfKXEZr271
+         EXhA==
+X-Forwarded-Encrypted: i=1; AJvYcCUfshUy0ldzEQaMj4IdfHmV9V56sbP90ifGdEXSEBd3WOItmNuUwhW+MoEr6qd1NgC7/840BIg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDMi3SJ50p3dc1m07t7OOaodf9EKf7ilOu2WC9JRk46RCCjewD
+	FRiteqvRYTEEvIkoE8MlaZ9U5vYY3IRv6bIG4ik3GsXASre2L5QRO7x4SzuCJjgJVjxPGHLHT56
+	10kPdrqc0QOqV/xW6ckTDlo1EnzNQxl8=
+X-Gm-Gg: ASbGncsfKIgqeGbH1tZF+ezY0Zt3zdyC7egqpQdtPzMmXfQVbJtVO7rp0A/uaDe8L6j
+	7GAVb4Vre53mmxjBp/cnuTbPL6tDFZKvFSIylrZUxJQhhOmPcgRqNdGtArAcfQArf5kOmWaOzDr
+	b4T8MevC8Mb7izoyoCm36uR53lc+gqp5iBj4k0TpjR0kT5fL7U5eVp0FJ4+YAQpx7taJnqjbUSC
+	LH+S6kejDg/NMEGA5cSWa9QnOuV0sTq06V9Ngl4TA==
+X-Google-Smtp-Source: AGHT+IErZdK7Wo9oZcaphTc8DlzmrW27709aHRXoe/1ib/I7sJKpdI4x2TK+T8MXOn7iJ+yBVtOTRUNE8TcmbIjZCqY=
+X-Received: by 2002:a05:690c:6887:b0:720:8df:f7a9 with SMTP id
+ 00721157ae682-73cc45b4c49mr10492087b3.5.1758224606716; Thu, 18 Sep 2025
+ 12:43:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR12MB7141:EE_|SJ0PR12MB7068:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6936c452-d307-4750-f99a-08ddf6eb671f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aEM2UmZmZGlhUlJucEg3SjAzdGMwSENPcWN1M1lpUXZsKy9LWVkvUUJMUE40?=
- =?utf-8?B?THA4WEpZRGd3d1I2dGNOS1h4Q3lxeVFvUUlqZE9NQVV5ai9tZjZtRzY1U2VM?=
- =?utf-8?B?Znd6QVR2dmhvaEkvNDRmUXpEeFBST1ZIbDZabUJiVG1xOVpqUUFyNnFNbkxV?=
- =?utf-8?B?eE1EUVR5ZEgrSWE5aHA3MDE3TWM1aGxrTGVHL0hSWFNBZUx4K2JYOHVaWFdN?=
- =?utf-8?B?blAycGdoSkYyOG1rTFFaRFNsN204bmRMN2pVamVWRmtVTEJJdjRIbkNxbU92?=
- =?utf-8?B?enpKMDJJdk5wOC9hZytPYjB6cDRKYkwzWjlUYmNRampFMlJ6WDlERkdGWCtD?=
- =?utf-8?B?STJabTlsTXdjeGtiMWtDNk04YlpZNVBFeXdGV2RmZU12VXduNzBoeDdEOWE1?=
- =?utf-8?B?TE5Dd2VhOHRjNVJ0ajA0Y2xMeE1UcXlIU0Fhbzh1ekc5VkhxdVJUVlVnMDc4?=
- =?utf-8?B?OE1CK1JybUdGZ21Wb3ZuaHB2b1VodDZtWHpSVmp3T3p0eDZWelpMTEFBUDhD?=
- =?utf-8?B?cFVReG9LcFN5Tk5zZlpkeXJYZW9lSm5PRmlJMHAwbnRUY1RmU1ZuNUdVNHFX?=
- =?utf-8?B?RUZnd2t0bVBEMFAyT1B3QVBlemR4S2piVzhna2JGeEk1UDRvRHlSVXNTcDRL?=
- =?utf-8?B?Q3JrMUdDZWFFRmt4c1IxejlnZkYzUE5qdXgyKzQ1SXFEQVFQUmo4RjI3ckVy?=
- =?utf-8?B?VW9jcEZqR0hqemJSNjNYRE5GTFFUSXRTSnJXTG0rei9FWTNtamN6MC9LNHAv?=
- =?utf-8?B?QjVjdzJmVmhmV2cyUWVlZWtOQlBjS3VBaDNVdEszMFRZWVVyalkvdVQrcVBl?=
- =?utf-8?B?eCs5RWNJQ1NiYkx6SGlianJ1YzUzRlQ2bUdZdTU1RS9yb0NUMUhRMnYyNHRl?=
- =?utf-8?B?ZkVBQVFRNUlzdExDNGJYd0hTa1dSYXMzM0hqUVBZZXdvZVNiWXN5SGozV3pq?=
- =?utf-8?B?TUxiU3V1KzRMUFVvbHdBY3dsRHBtRjY3SEJDM1Jidk5hRG5la3UrbzhmQ3E1?=
- =?utf-8?B?cmhHZS80UnJMUkJXSU12VFM2c0dYVGFreENHSklmb2lmZEFiWTRaK2RZNnJ1?=
- =?utf-8?B?bEtEYUhhenlJU3BCWjcvWlEyRlVjRWdlV21La2dMVTk0N2I2NnRTQVl2dmU5?=
- =?utf-8?B?TGFMeHRaSVl5enF2V1hUU2IvOFhUQlZNWEh5N2M5RUIwcS9nOG0rcENOVzg1?=
- =?utf-8?B?ZjA2Tk0rZnRXSStlRERJUTJaZGF5QUdnRHN4VlVzK2RHZDhGREc3NVFaRjlk?=
- =?utf-8?B?ZVlWK0s1aVV1OGVLWlBYZHVCamlEMG5udWhMT1RQYVRmUHBRY0ducm5ud2NU?=
- =?utf-8?B?TDdOd2lmQmpzWkFXMi9PRlMxYkg5VWVIS25ob2IwUzhuT0xVZ0R5NVRDbEJG?=
- =?utf-8?B?eEltZ3J3MzdiQ2s1U1ZtdVNKTURxQ29sR2JIZWplYVNnaTlUTjFMclZLTm50?=
- =?utf-8?B?NjdjeFFrSmFZKzF2N2QzdVVXa0duYnU1RUJCbDBqdFdXT3hKZ1ZWRGpCT1R6?=
- =?utf-8?B?OGRrQWhPRThQNzhZVHk4RDV3ek5RQlJnWVFFWldGZUw2bjZDNm5tbmptT0V0?=
- =?utf-8?B?RUh4RDBHMmY3aHlpWWhiWVRZL3FsOWZ4b1NQQi9QZ0ZjS1JQN2J6dXJuMm1Q?=
- =?utf-8?B?emQ0di9YaFQ1dDJjczQraDNvNk5KVk9QV0lFN09aampGV1BVb1NETFQvamta?=
- =?utf-8?B?WndUQUQwQ1krQWxpQVVhNFlpa1g3ZWdZT28wT0ZXelZHV3cvQ2dZYWx1MVJK?=
- =?utf-8?B?S3lYZjNteDVYVTludjh4bHJ3OXZnaUlOUlc2V3huUjJObjYxNVR2RjBJYjBK?=
- =?utf-8?B?dnZqd0tGRkRkSjNaZkJsWWd6aEZadmp3T1BUNzQ1Qm9tQ3RRVDljRFFSbFMr?=
- =?utf-8?B?Y2MvWTZSVFd4a0VYWGVPTEdvbFg5NEd2cDdMTmxZbCtYUVFIWGdISnBlZ0Qz?=
- =?utf-8?Q?r88wMebMxGM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7141.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?M3orUDgyQ0cwWmlaNnM1L1NQcy80TEttZmZaM3FqcVA2OGNTampKNklRb25V?=
- =?utf-8?B?NWh4bkUzQmVIcUhacVNBY1U2cFZMRTVhd3BWbEhNK2JiVWRXK2pLUnh2d1hN?=
- =?utf-8?B?bmFuVE9DZG1PKzN2Z25nR1NRQ1VlekFyYlJMRFd0dVBkbDZJck1Rbk0xS3lV?=
- =?utf-8?B?eU9sanlzYlBKZzFWM25TbHlxUjdNckNQeG8zOVpMN2psRC9lUzByS2gwMmY2?=
- =?utf-8?B?RTF3UFJuUWxiQXpXc3JTbENGZnVuWjRwaENaUjRjTXFhSlZyYzhSNzhYbVZB?=
- =?utf-8?B?SGx1T3F0YlFPR2NPUGkwVDNzdDJrQlo0czhQcTU5amFnL1ZPc2VPQWJjczVB?=
- =?utf-8?B?Yk11YXFQaWVXWVl0eW15ekZZUWpsamFpNWFLbEd6V1JJWmZNNzVmTG1md1Ir?=
- =?utf-8?B?VEpEa05LMFkyK2JDSCtqbTRib3dBZjVRUTNEMWxBbWJ4aVZIYi80WWREV0g1?=
- =?utf-8?B?TExENlMwU2lxWndiY1JLVTNvMng5RVJiVklsVENETDdleWp1QWFFd2xHMUxV?=
- =?utf-8?B?eFNxR1ZJVFdwNFVIS3JnMnlneSttcUFNZVdOL0h4QUJmU3FkclhnbFpreVc2?=
- =?utf-8?B?Vnd5YzJxdnlYZkUrZys3SU4waHE5LzQ5RzR4M01MQ3dmU0ZPUTJCSEFXcFdv?=
- =?utf-8?B?RzlCcE0wcWZLM1lYSjFrcFBkWWg3YWttQlAzVmQwQ1VDc2RpOWVDVEdUNHo5?=
- =?utf-8?B?Vk9nU1dlUnltTGRWMkRTRk9XbGpRcHZLM0x2Tk52Z3I4T1BkaFpDR2V0V1Br?=
- =?utf-8?B?bTVESS9hQTY3cFRweFUxRXpZY0RaUWdIaUVneGhDNHJrTkpsd0tMVDlWdlhk?=
- =?utf-8?B?dkcvdmo3VUJHMGFQeERNSHlvSmxvc0RTeFczcFd1Um9xWDNHaDBLeVk4YktJ?=
- =?utf-8?B?RkgzQ2VvSzRhR1VCcS9maElzQ2FGT1RmQituUnRsV0g0K2tNOElHZ3I1MU5Q?=
- =?utf-8?B?RkpJbUMvd2EvNEFQQi9WZC9DUVJGTlZNWDVXbmRLaTZ0QUtVM3RYNUNZV1Nl?=
- =?utf-8?B?OGh2RUdZL1JjZCsvcEs1VFRldlBVUzJoa3EyQ2NOeUVBS3VSM0llbmNleWhO?=
- =?utf-8?B?QVJ6NGZ6MlRuUHBCMUpBcHdDemtMTGFhTGU4aEJHQ2NBckthQlpnc3JYTXAw?=
- =?utf-8?B?WkVuWHliWUhSRzdsQ0gxNzRHYmhMRWZPb2xiU3NqWHZPSjJodmRJczhDcXU2?=
- =?utf-8?B?NG5DWlorWm8zY0IzNkg4cURLdERhek9tdUpucVptU0QwZW9rVTBjNnZzb1Bj?=
- =?utf-8?B?TFZBU2F5RjVjMFdwcmwvMm13bkpiOW5ZWStCejdCSWJuUHJ0V21LRzJsUHVr?=
- =?utf-8?B?dWptL1VTUHczY0UrcGNtNlovSFlGRkE3aXk0K1JMYTd5aGdGbjFNeGVUTnJV?=
- =?utf-8?B?T0tXdDhRWlNrTFZ6ald2UmpzZlFsTk0weHJHU2dkdTRPTWN5NU1oZzFpS3Jp?=
- =?utf-8?B?T2g1Vm1PSkRsdGY2TGRIbFl0ZUgyOUs5b3ZxS1g5MWlsdGJ1Qk1XSm9EbzF3?=
- =?utf-8?B?MkVTODhYUitWVVdJQ3ZVWk41enc2NFg5Ym44d3h0bkxhTGhsNFZ1TFVkNVpv?=
- =?utf-8?B?Z1h1Z2FZL29Ub3U1Z2tVNXBGWW4xajRpSmZvaWV5TjdyVjAwc1QzdE56ejYx?=
- =?utf-8?B?cTRUSG15OE0vd241RGROSWVZNjRBdUVXK0hTQzBqTXVXbUllNGlPeXVFZ2cy?=
- =?utf-8?B?M3RuNklhUGIxOTMrQ1Z1TE40ZHlHZm5XellmNGNIL0hkN2drVC9rbm5PVlFE?=
- =?utf-8?B?NEFGcjg0aWc4Mm92cE5wSUhSb1lTTDVoYmgwNlIzeGQ0cE5zVHpvcGZNTEk5?=
- =?utf-8?B?UERNbkk5YWVMOWxyWXYxQXo2cTdWejlMV3pQTHQ0azlJcm95amUrUEFvc3Np?=
- =?utf-8?B?SXYwUXRXb3d6dEdWb1FUUURLWTRPRHg3c1dsMHJyUkVVREVudHdrT3hpV3FZ?=
- =?utf-8?B?UUZHK1ljNS9oZVRxbUNYdVJTUkFhRTBVdFp6bldaRVF6Ni9ON3hqZmJUZy9j?=
- =?utf-8?B?NUc3WFhvaU1GdlVGMjhhZHlxb2JwU2ozMXBKa2tWT3czSHc3aHlQdFUwcjZz?=
- =?utf-8?B?WFU2NDdzc1JUQml2d3FJWElXaFRDQU16VmJpb3JjM1hZK3p2Z3RoQnNDVUha?=
- =?utf-8?Q?Ww3HkI6vrUuXB4jtE0tR854He?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6936c452-d307-4750-f99a-08ddf6eb671f
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7141.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2025 19:41:46.8660
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +h1TGmN3QjDQO3FRBbzDEkONix0mBnZQVZGUWrMP+OHdcEkpkuFqezS8ZxolmfzcUj8OdAfYncWMKT0PQ5pcog==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7068
+References: <20250917225513.3388199-1-ameryhung@gmail.com> <20250917225513.3388199-6-ameryhung@gmail.com>
+ <aMvuHBb0+IIiXXuG@boxer>
+In-Reply-To: <aMvuHBb0+IIiXXuG@boxer>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Thu, 18 Sep 2025 12:43:13 -0700
+X-Gm-Features: AS18NWAmywcDsGBkYvYDOTx6VQJxG8PGAz3JxqwO5sgOSloCNddPr-kNmCnoJNY
+Message-ID: <CAMB2axNx_NDkC+nZdpOB5kPmq0Sf1=d2g4NjkPnxEURfuV2eKA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v4 5/6] selftests/bpf: Test bpf_xdp_pull_data
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, paul.chaignon@gmail.com, 
+	kuba@kernel.org, stfomichev@gmail.com, martin.lau@kernel.org, 
+	mohsin.bashr@gmail.com, noren@nvidia.com, dtatulea@nvidia.com, 
+	saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Sep 18, 2025 at 4:34=E2=80=AFAM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> On Wed, Sep 17, 2025 at 03:55:12PM -0700, Amery Hung wrote:
+> > Test bpf_xdp_pull_data() with xdp packets with different layouts. The
+> > xdp bpf program first checks if the layout is as expected. Then, it
+> > calls bpf_xdp_pull_data(). Finally, it checks the 0xbb marker at offset
+> > 1024 using directly packet access.
+> >
+> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > ---
+> >  .../selftests/bpf/prog_tests/xdp_pull_data.c  | 176 ++++++++++++++++++
+> >  .../selftests/bpf/progs/test_xdp_pull_data.c  |  48 +++++
+> >  2 files changed, 224 insertions(+)
+> >  create mode 100644 tools/testing/selftests/bpf/prog_tests/xdp_pull_dat=
+a.c
+> >  create mode 100644 tools/testing/selftests/bpf/progs/test_xdp_pull_dat=
+a.c
+> >
+> > diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_pull_data.c b/t=
+ools/testing/selftests/bpf/prog_tests/xdp_pull_data.c
+> > new file mode 100644
+> > index 000000000000..c16801b73fed
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/bpf/prog_tests/xdp_pull_data.c
+> > @@ -0,0 +1,176 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +
+> > +#include <test_progs.h>
+> > +#include <network_helpers.h>
+> > +#include "test_xdp_pull_data.skel.h"
+> > +
+> > +#define PULL_MAX     (1 << 31)
+> > +#define PULL_PLUS_ONE        (1 << 30)
+> > +
+> > +#define XDP_PACKET_HEADROOM 256
+> > +
+> > +/* Find sizes of struct skb_shared_info and struct xdp_frame so that
+> > + * we can calculate the maximum pull lengths for test cases
+>
+> do you really need this hack? Wouldn't it be possible to find these sizes
+> via BTF?
 
-On 18/09/2025 18:40, Jakub Kicinski wrote:
-> I understand that the modes should not be exposed.
-> I don't get why this has anything to do with the number of bins.
-> Does the FW hardcode that the non-Ethernet modes use bins >=16?
-> When you say "internal modes that can report more than 16 bins"
-> it sounds like it uses bins starting from 0, e.g. 0..31.
+It is possible. I will use kernel BTF to find the sizes.
 
-The FW hardcodes that Ethernet modes report up to 16 bins,
-while non-Ethernet modes may report up to 19.
-And yes, those modes use bins starting from 0, e.g. 0..18.
+>
+> > + */
+> > +static int find_xdp_sizes(struct test_xdp_pull_data *skel, int frame_s=
+z)
+> > +{
+> > +     LIBBPF_OPTS(bpf_test_run_opts, topts);
+> > +     struct xdp_md ctx =3D {};
+> > +     int prog_fd, err;
+> > +     __u8 *buf;
+> > +
+> > +     buf =3D calloc(frame_sz, sizeof(__u8));
+> > +     if (!ASSERT_OK_PTR(buf, "calloc buf"))
+> > +             return -ENOMEM;
+> > +
+> > +     topts.data_in =3D buf;
+> > +     topts.data_out =3D buf;
+> > +     topts.data_size_in =3D frame_sz;
+> > +     topts.data_size_out =3D frame_sz;
+> > +     /* Pass a data_end larger than the linear space available to make=
+ sure
+> > +      * bpf_prog_test_run_xdp() will fill the linear data area so that
+> > +      * xdp_find_data_hard_end can infer the size of struct skb_shared=
+_info
+>
+> what is xdp_find_data_hard_end ?
 
+It is supposed to be the XDP program, xdp_find_sizes. Will remove it
+as we use BTF to find sizes.
+
+>
+> > +      */
+> > +     ctx.data_end =3D frame_sz;
+> > +     topts.ctx_in =3D &ctx;
+> > +     topts.ctx_out =3D &ctx;
+> > +     topts.ctx_size_in =3D sizeof(ctx);
+> > +     topts.ctx_size_out =3D sizeof(ctx);
+> > +
+> > +     prog_fd =3D bpf_program__fd(skel->progs.xdp_find_sizes);
+> > +     err =3D bpf_prog_test_run_opts(prog_fd, &topts);
+> > +     ASSERT_OK(err, "bpf_prog_test_run_opts");
+> > +
+> > +     free(buf);
+> > +
+> > +     return err;
+> > +}
+> > +
+> > +/* xdp_pull_data_prog will directly read a marker 0xbb stored at buf[1=
+024]
+> > + * so caller expecting XDP_PASS should always pass pull_len no less th=
+an 1024
+> > + */
+> > +static void run_test(struct test_xdp_pull_data *skel, int retval,
+> > +                  int frame_sz, int buff_len, int meta_len, int data_l=
+en,
+> > +                  int pull_len)
+> > +{
+> > +     LIBBPF_OPTS(bpf_test_run_opts, topts);
+> > +     struct xdp_md ctx =3D {};
+> > +     int prog_fd, err;
+> > +     __u8 *buf;
+> > +
+> > +     buf =3D calloc(buff_len, sizeof(__u8));
+> > +     if (!ASSERT_OK_PTR(buf, "calloc buf"))
+> > +             return;
+> > +
+> > +     buf[meta_len + 1023] =3D 0xaa;
+> > +     buf[meta_len + 1024] =3D 0xbb;
+> > +     buf[meta_len + 1025] =3D 0xcc;
+> > +
+> > +     topts.data_in =3D buf;
+> > +     topts.data_out =3D buf;
+> > +     topts.data_size_in =3D buff_len;
+> > +     topts.data_size_out =3D buff_len;
+> > +     ctx.data =3D meta_len;
+> > +     ctx.data_end =3D meta_len + data_len;
+> > +     topts.ctx_in =3D &ctx;
+> > +     topts.ctx_out =3D &ctx;
+> > +     topts.ctx_size_in =3D sizeof(ctx);
+> > +     topts.ctx_size_out =3D sizeof(ctx);
+> > +
+> > +     skel->bss->data_len =3D data_len;
+> > +     if (pull_len & PULL_MAX) {
+> > +             int headroom =3D XDP_PACKET_HEADROOM - meta_len - skel->b=
+ss->xdpf_sz;
+> > +             int tailroom =3D frame_sz - XDP_PACKET_HEADROOM -
+> > +                            data_len - skel->bss->sinfo_sz;
+> > +
+> > +             pull_len =3D pull_len & PULL_PLUS_ONE ? 1 : 0;
+>
+> nit: pull_len =3D !!(pull_len & PULL_PLUS_ONE);
+>
+> > +             pull_len +=3D headroom + tailroom + data_len;
+> > +     }
+> > +     skel->bss->pull_len =3D pull_len;
+> > +
+> > +     prog_fd =3D bpf_program__fd(skel->progs.xdp_pull_data_prog);
+> > +     err =3D bpf_prog_test_run_opts(prog_fd, &topts);
+> > +     ASSERT_OK(err, "bpf_prog_test_run_opts");
+> > +     ASSERT_EQ(topts.retval, retval, "xdp_pull_data_prog retval");
+> > +
+> > +     if (retval =3D=3D XDP_DROP)
+> > +             goto out;
+> > +
+> > +     ASSERT_EQ(ctx.data_end, meta_len + pull_len, "linear data size");
+> > +     ASSERT_EQ(topts.data_size_out, buff_len, "linear + non-linear dat=
+a size");
+> > +     /* Make sure data around xdp->data_end was not messed up by
+> > +      * bpf_xdp_pull_data()
+> > +      */
+> > +     ASSERT_EQ(buf[meta_len + 1023], 0xaa, "data[1023]");
+> > +     ASSERT_EQ(buf[meta_len + 1024], 0xbb, "data[1024]");
+> > +     ASSERT_EQ(buf[meta_len + 1025], 0xcc, "data[1025]");
+> > +out:
+> > +     free(buf);
+> > +}
+> > +
+> > +static void test_xdp_pull_data_basic(void)
+> > +{
+> > +     u32 pg_sz, max_meta_len, max_data_len;
+> > +     struct test_xdp_pull_data *skel;
+> > +
+> > +     skel =3D test_xdp_pull_data__open_and_load();
+> > +     if (!ASSERT_OK_PTR(skel, "test_xdp_pull_data__open_and_load"))
+> > +             return;
+> > +
+> > +     pg_sz =3D sysconf(_SC_PAGE_SIZE);
+> > +
+> > +     if (find_xdp_sizes(skel, pg_sz))
+> > +             goto out;
+> > +
+> > +     max_meta_len =3D XDP_PACKET_HEADROOM - skel->bss->xdpf_sz;
+> > +     max_data_len =3D pg_sz - XDP_PACKET_HEADROOM - skel->bss->sinfo_s=
+z;
+> > +
+> > +     /* linear xdp pkt, pull 0 byte */
+> > +     run_test(skel, XDP_PASS, pg_sz, 2048, 0, 2048, 2048);
+>
+> you're passing pg_sz to avoid repeated syscalls I assume? Is it worth to =
+pass
+> prog_fd as well?
+
+The performance is not too much of a concern here as it is selftest. I
+would not add prog_fd to avoid confusion.
+
+>
+> > +
+> > +     /* multi-buf pkt, pull results in linear xdp pkt */
+> > +     run_test(skel, XDP_PASS, pg_sz, 2048, 0, 1024, 2048);
+> > +
+> > +     /* multi-buf pkt, pull 1 byte to linear data area */
+> > +     run_test(skel, XDP_PASS, pg_sz, 9000, 0, 1024, 1025);
+> > +
+> > +     /* multi-buf pkt, pull 0 byte to linear data area */
+> > +     run_test(skel, XDP_PASS, pg_sz, 9000, 0, 1025, 1025);
+> > +
+> > +     /* multi-buf pkt, empty linear data area, pull requires memmove *=
+/
+> > +     run_test(skel, XDP_PASS, pg_sz, 9000, 0, 0, PULL_MAX);
+> > +
+> > +     /* multi-buf pkt, no headroom */
+> > +     run_test(skel, XDP_PASS, pg_sz, 9000, max_meta_len, 1024, PULL_MA=
+X);
+> > +
+> > +     /* multi-buf pkt, no tailroom, pull requires memmove */
+> > +     run_test(skel, XDP_PASS, pg_sz, 9000, 0, max_data_len, PULL_MAX);
+> > +
+>
+> nit: double empty line
+
+Will add:
+
+/* Test cases with invalid pull length */
+
+>
+> > +
+> > +     /* linear xdp pkt, pull more than total data len */
+> > +     run_test(skel, XDP_DROP, pg_sz, 2048, 0, 2048, 2049);
+> > +
+> > +     /* multi-buf pkt with no space left in linear data area */
+> > +     run_test(skel, XDP_DROP, pg_sz, 9000, max_meta_len, max_data_len,
+> > +              PULL_MAX | PULL_PLUS_ONE);
+> > +
+> > +     /* multi-buf pkt, empty linear data area */
+> > +     run_test(skel, XDP_DROP, pg_sz, 9000, 0, 0, PULL_MAX | PULL_PLUS_=
+ONE);
+> > +
+> > +     /* multi-buf pkt, no headroom */
+> > +     run_test(skel, XDP_DROP, pg_sz, 9000, max_meta_len, 1024,
+> > +              PULL_MAX | PULL_PLUS_ONE);
+> > +
+> > +     /* multi-buf pkt, no tailroom */
+> > +     run_test(skel, XDP_DROP, pg_sz, 9000, 0, max_data_len,
+> > +              PULL_MAX | PULL_PLUS_ONE);
+> > +
+> > +out:
+> > +     test_xdp_pull_data__destroy(skel);
+> > +}
+> > +
+> > +void test_xdp_pull_data(void)
+> > +{
+> > +     if (test__start_subtest("xdp_pull_data"))
+> > +             test_xdp_pull_data_basic();
+> > +}
+> > diff --git a/tools/testing/selftests/bpf/progs/test_xdp_pull_data.c b/t=
+ools/testing/selftests/bpf/progs/test_xdp_pull_data.c
+> > new file mode 100644
+> > index 000000000000..dd901bb109b6
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/bpf/progs/test_xdp_pull_data.c
+> > @@ -0,0 +1,48 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +
+> > +#include  "vmlinux.h"
+> > +#include <bpf/bpf_helpers.h>
+> > +
+> > +int xdpf_sz;
+> > +int sinfo_sz;
+> > +int data_len;
+> > +int pull_len;
+> > +
+> > +#define XDP_PACKET_HEADROOM 256
+> > +
+> > +SEC("xdp.frags")
+> > +int xdp_find_sizes(struct xdp_md *ctx)
+> > +{
+> > +     xdpf_sz =3D sizeof(struct xdp_frame);
+> > +     sinfo_sz =3D __PAGE_SIZE - XDP_PACKET_HEADROOM -
+> > +                (ctx->data_end - ctx->data);
+> > +
+> > +     return XDP_PASS;
+> > +}
+
+Will remove this XDP program
+
+Thank you for your review!
+
+[...]
+
+> > --
+> > 2.47.3
+> >
 
