@@ -1,110 +1,151 @@
-Return-Path: <netdev+bounces-224554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBFB0B861F8
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 18:53:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 344CAB862E2
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 19:17:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8593C1C87F2C
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:53:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F312F1CC136A
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD98248F51;
-	Thu, 18 Sep 2025 16:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0233A25B31B;
+	Thu, 18 Sep 2025 17:16:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c0T4xEja"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="eCd8PvGi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AEEB248F75
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 16:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC661C3314;
+	Thu, 18 Sep 2025 17:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758214342; cv=none; b=Pg6Q/OIDGy5hHMCQFQwRxiUS4oxVO0XysrqmAMKdK/gfMQMo8VP7Fk+lcKWk6V4ZGq7SBLlC/8s0lQlFnZjN/yQWXZlbprvKmXVGkGll12h73Zsx0u0AN5FAXpStIU+zjGxVL62sNyen8T6MyH1VismZ4cbTNjUJtkWgjHuwy0Y=
+	t=1758215815; cv=none; b=S/21kpOFMh1tX/FtoqGYaOo0NnfXMSbYyfavDcZTBp1/vJ+S+9VR6qpeh7aFUYRH/XKOisa45MxWC+aaunW5DSplEF4BwhfLdSg9sXB5eL0TJ5vz7bNjDfzhVa1W3if8pKfxSisX0JcXargXc2PBOHlxljFYYPRIQe/KZCFHyaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758214342; c=relaxed/simple;
-	bh=g+mvzN6J31AfqxKTFRmGGmksy1PcEAtdFhY3hfNn26E=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PyChCrKtS297jEerI6BEEfI6f29EuyVjuiV6j3U9DZP2lS3LSFIXOPZ5Jyb8uHoKmiRmHoFr7e6mQwpeUdEmnKf7e5HcNxiRB70m3Ge3TJvrpxFV81fuyBdQW7UZdHLC004388vCGfnZX5glcPnAIc6GLki4LO7FGppWc2ucKPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c0T4xEja; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3304def7909so1205491a91.3
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 09:52:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758214341; x=1758819141; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TsOm7EtOKhXmScTczmTf6QtxSQ4DX78bGCwpxVq0Ey0=;
-        b=c0T4xEjagwMG50CIaqueHk0sCeB2lgAViBiIgpzCcmdGsxt0rcUBDPSRGSho+SQgJu
-         bZQhZOGxzILqrD8SpT8kdz3EyBhU4E3b9bRQmzEuYiXpOyArjjbtE8EhAFORUUSGvWSk
-         vJhG+hkyad5fu7QCqiG1KAACD44dxb332xzWw0gLXaxsSdWYe/39UvbnPnRFNoixlzjR
-         V7j0l/AzIusZH3cQlmyh6ensJJHomRUlC/oeIt3BINHokq82dyIWdQkXE/3W3A5awF2I
-         fVQStxtxU7gc1/tP7fcKkuWN607h172P5uSbSUoOWLJyUlv6tvZfh8wWVxVSmUIW4DJV
-         jYng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758214341; x=1758819141;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TsOm7EtOKhXmScTczmTf6QtxSQ4DX78bGCwpxVq0Ey0=;
-        b=czyR2WATAmyavIum3ldq5Oj8I6SnuDfszPPfTi2FyU3HtxlH6FVhHJN9ii02qldTnA
-         MnLY5mNhScr5AQJMdhXf3wzIvOFVwMKlWsgqYhbh7f6Cin9QEf/aIN7HV7LlFhpMtZrm
-         VEhFfbzrSxLQLgoB9p3QOCdK+nCn0h68ZnC6Onx0OtPNLFDvzd3Dq7wEC7wOtEjdbqLP
-         7vspMeboPBdyxc43vcvSELs3dyf216k7QPWEeXJlDkU4OH9cyFEDqqxVV39qdZMUo69S
-         9dEcxxsRhiDe3d6BrZNQJnRDOTPbnMTwyGXDbayCaqED4uvg7CdRAXWfQZQRgdnikSsB
-         CAug==
-X-Forwarded-Encrypted: i=1; AJvYcCViGYbuX+xJ1PdhuZ6cO73URDaIK79ml5h8JWi9deWvHuaTVRbiJLId6dD6ygOUPX6O7uHbzu0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyePosMkb0REn8W5W9yBlMkV3orZWRizKPm66j0yZb70xQFFk5U
-	KKCgfkQMMSzcav5roQ2j21AiXhF+CH3jsRGipd5P2gb0EWVX1ldUTkM7HwbY5+HwsZuBYNK2+js
-	qvgsKQA==
-X-Google-Smtp-Source: AGHT+IEZkwSUL2OHRLRPak5y7ADnxAbFSYdsmOIZcHrSCCNpbNhv66RerRTNz5VfhHWZmuNmvGLbT6SRYfY=
-X-Received: from pjl3.prod.google.com ([2002:a17:90b:2f83:b0:330:72b8:fcc0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:498e:b0:32e:2059:ee5a
- with SMTP id 98e67ed59e1d1-33097fce1b2mr65859a91.8.1758214340696; Thu, 18 Sep
- 2025 09:52:20 -0700 (PDT)
-Date: Thu, 18 Sep 2025 09:52:19 -0700
-In-Reply-To: <20250918120658-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1758215815; c=relaxed/simple;
+	bh=0+HS+1qpYkL2lUHeHkicL6gdDQ3Ypfdr3kGKZ1ZjVwk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FAVkjbAE3PJkUIYkMSIorLplaAvDdlb3t+6N7Zt+1XDJN6frTQPBWBE0g4DTFu6fcTvnc1taqB4JFHinCIuwL8CVL8OL4hN1vLeNYnoI4c8szZX/+1MBc8L/bnMwk3ruEl/xzFyFJDgF3C7ogIdkT7O5qem7mu9qP/qYFB3aI84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=eCd8PvGi; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=gy/Z85EpA6PtugEQo7tOjG3wD8Ws/VL623KxkN4uUxg=; b=eCd8PvGiIcC61VFrTKq+rfWTo4
+	gXilCPqrrdDWsaBvaiItkZCGj7Q1Za0o8TQFPU3zmt5Kt4H8rpVqqWNoU/LIZ8BeatYHkJI+w5DsC
+	IhX/tepsPjuCWaV5amxVMQX+HvAQZexJwq9qOAimbFI7GgaIQovNbXow32YnHE//WnlH67UPT9+4x
+	L4oyXn8ciroToLCc5xN8Gs648B02kcw759/Kr1ONF2jXe123CVwvTL44+O26XGC2rfrfMqrofk/AM
+	aIG3nx5MfhxEURDQ1stujVejjeWdTFVEdsHskp4QxNDPRsVd8WdCKAAGFOLFfqRJFq6r8plyJaERq
+	rNd8F/aQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51190)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uzIFS-000000001Vp-1DNL;
+	Thu, 18 Sep 2025 18:16:46 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uzIFL-000000001Lm-0Tdb;
+	Thu, 18 Sep 2025 18:16:39 +0100
+Date: Thu, 18 Sep 2025 18:16:38 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: weishangjuan@eswincomputing.com
+Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, vladimir.oltean@nxp.com,
+	yong.liang.choong@linux.intel.com, anthony.l.nguyen@intel.com,
+	prabhakar.mahadev-lad.rj@bp.renesas.com, jan.petrous@oss.nxp.com,
+	jszhang@kernel.org, inochiama@gmail.com, 0x1207@gmail.com,
+	boon.khai.ng@altera.com, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
+	linmin@eswincomputing.com, lizhi2@eswincomputing.com,
+	pinkesh.vaghela@einfochips.com
+Subject: Re: [PATCH v7 2/2] ethernet: eswin: Add eic7700 ethernet driver
+Message-ID: <aMw-dgNiXgPeqeSz@shell.armlinux.org.uk>
+References: <20250918085612.3176-1-weishangjuan@eswincomputing.com>
+ <20250918090026.3280-1-weishangjuan@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250827194107.4142164-1-seanjc@google.com> <20250827201059.EmmdDFB_@linutronix.de>
- <20250918110828-mutt-send-email-mst@kernel.org> <20250918154826.oUc0cW0Y@linutronix.de>
- <aMwtd40q44q5uqwr@google.com> <20250918120658-mutt-send-email-mst@kernel.org>
-Message-ID: <aMw4wx5ENt-odhYS@google.com>
-Subject: Re: [PATCH v2 0/3] vhost_task: Fix a bug where KVM wakes an exited task
-From: Sean Christopherson <seanjc@google.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250918090026.3280-1-weishangjuan@eswincomputing.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Sep 18, 2025, Michael S. Tsirkin wrote:
-> On Thu, Sep 18, 2025 at 09:04:07AM -0700, Sean Christopherson wrote:
-> > On Thu, Sep 18, 2025, Sebastian Andrzej Siewior wrote:
-> > > On 2025-09-18 11:09:05 [-0400], Michael S. Tsirkin wrote:
-> > > > So how about switching to this approach then?
-> > > > Instead of piling up fixes like we seem to do now ...
-> > 
-> > I don't have a strong preference for 6.17, beyond landing a fix of some kind.
-> > I think there are three options for 6.17, in order of "least like to break
-> > something":
-> > 
-> >  1. Sebastian's get_task_struct() fix
-> 
-> 
-> I am just a bit apprehensive that we don't create a situation
-> where we leak the task struct somehow, given the limited
-> testing time. Can you help me get convinced that risk is 0?
+On Thu, Sep 18, 2025 at 05:00:26PM +0800, weishangjuan@eswincomputing.com wrote:
+> +	plat_dat->clk_tx_i = stmmac_pltfr_find_clk(plat_dat, "tx");
+> +	plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
+> +	plat_dat->bsp_priv = dwc_priv;
+> +	plat_dat->clks_config = eic7700_clks_config;
+> +	dwc_priv->plat_dat = plat_dat;
+> +
+> +	ret = eic7700_clks_config(dwc_priv, true);
+> +	if (ret)
+> +		return dev_err_probe(&pdev->dev,
+> +				ret,
+> +				"error enable clock\n");
+> +
+> +	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
+> +	if (ret) {
+> +		eic7700_clks_config(dwc_priv, false);
+> +		return dev_err_probe(&pdev->dev,
+> +				ret,
+> +				"Failed to driver probe\n");
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static void eic7700_dwmac_remove(struct platform_device *pdev)
+> +{
+> +	struct eic7700_qos_priv *dwc_priv = get_stmmac_bsp_priv(&pdev->dev);
+> +
+> +	stmmac_pltfr_remove(pdev);
+> +	eic7700_clks_config(dwc_priv, false);
 
-I doubt it, I share same similar concerns about lack of testing.  So I guess
-thinking about this again, #2 is probably safer since it'd only impact KVM?
+It would be nice to see the above code cleaned up like I did for all
+the other stmmac glue drivers recently.
 
-> >  2. This series, without the KILLED sanity check in __vhost_task_wake()
-> >  3. This series, with my fixup (with which syzbot was happy)
+However, this is not to say this shouldn't be merged - but please
+consider this if you do another rework of these patches, if not as
+a follow-up patch.
+
+Essentially, you can use devm_stmmac_pltfm_probe(), populate the
+plat_dat->init() and plat_dat->exit() methods to call the
+clks_config function, but as you don't want these methods to be
+called during suspend/resume (because plat_dat->clks_config() is
+already called there), provide empty plat_dat->suspend() and
+plat_dat->resume() methods.
+
+Bonus points if you include a patch which provides this functionality
+as library functions in stmmac_platform.c which can be used to
+initialise ->init() and ->exit() for this behaviour, and check other
+stmmac platform glue drivers to see if they would benefit from using
+these.
+
+Of course, it would be nice not to have to go to the extent of
+adding empty functions for ->suspend() and ->resume(), but stmmac has
+a lot of weirdo history, and there was no easy way to maintain
+compatibility without doing that when I added these two new methods.
+
+Lastly, please consider using "net: stmmac: <shortened-glue-name>: blah"
+as the subject so there's a consistent style for stmmac patches.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
