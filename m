@@ -1,206 +1,118 @@
-Return-Path: <netdev+bounces-224314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15F87B83B61
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 11:13:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB016B83B82
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 11:13:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A48A31C07E97
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 09:13:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79E551C07F88
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 09:14:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CCBC2FF648;
-	Thu, 18 Sep 2025 09:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA9E2FE564;
+	Thu, 18 Sep 2025 09:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eJ6cs855";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="cHbQhpUq";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eJ6cs855";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="cHbQhpUq"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="VwC2kYCD";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="kRC17PKP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 900881401B
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 09:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECCD2FF16D;
+	Thu, 18 Sep 2025 09:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758186782; cv=none; b=lebFKG3E4g/KpccQgXSgqBEhBNl8iwU/8X+3TDXYG1w7z2UwcqmENrPaZ+8kvEC9dr4vJgg3SwN7+1ayDK8TYPPRbiirw9zl/cC5LvO9R4PveIXEkr8pTBDq3RHncp0Gc3S6OYEZaxLkluyZSKVeotY7YqFsqvYxOH9IyFInmtk=
+	t=1758186826; cv=none; b=Ve2cYQFW5ypKT8sZwxqVG/Oucw4COn3wXADCu1KK8evbE0Y0To1atUfEuGxYAbkbqe41q1WyqGFAXuEA53LbNgpfEiJ3DFMlqNCRk4sxmBm8obHmEnOg9s2ZL3go3VDA+92nuPDfhvK9NNrMCeFG6tgk1NDhcOi9q1q4X0m4eMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758186782; c=relaxed/simple;
-	bh=zbo++j/cLReirz87fkiC5qaaXMU8Kvz0iSgyAEvzIYw=;
+	s=arc-20240116; t=1758186826; c=relaxed/simple;
+	bh=v5M0KVbOs0+0BL/1Au1GWe2T0G2C337d/G6AKfJclMY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eyHzCjFQsu+VkvmF2lJgbwr6ihHr/csZOASDg5hooiKA2/voe1uqE79edjvmC9xE+Qtra6KGBLBnQGCmfTTzuU+7miag4Re4ZBcy+O66pguLFvKxUvEb6ER0TESeokm+PHL1EJdAK90x7s4FjiTbFg0eyRha90VRIWMvLSbn+TU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=eJ6cs855; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=cHbQhpUq; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=eJ6cs855; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=cHbQhpUq; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B60181F393;
-	Thu, 18 Sep 2025 09:12:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758186778; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DK2URKc6+0l2bV0MR/mbFpNYB0/VlOCl/9wmhV94drgOjxPMS5YR3Emzzun9Fg1/Pn4De9q36xMKS5KEvjRLdIYNs8uhGtjrieBQYgFeSh8rwjMXGKlAontDlVUj+wVCMOcNR3QMk9ldJpNGWbsENKukq7yyOgA4/cM8XXLKaeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=VwC2kYCD; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=kRC17PKP; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 18 Sep 2025 11:13:41 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1758186822;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nbuNQzh1zuOzpwosC6YopwsJkbLDORVpCcTBnZD0pgM=;
-	b=eJ6cs855rfNlLlnYxLi7hncmRUuip4vZhrbCXkWVUn/FRKPbSkFxudb1q8SdOHnUocRntK
-	SyjDgXgJ7kaGhkQb3mfYOsBxP5JSlIgk2rX4nNtbVVA3PStbNeoD4WWCWMuH9ebIxFFxSI
-	CJQrdJgyHjYw2vzwzUKRvfYNKeFx0C8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758186778;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	bh=4rI6MarwTjIECPHNDT6nYXfKNfdgGybieY2MAwuVSSU=;
+	b=VwC2kYCDnAmg7pqSUYgyWBaXT8jlTN+tC/5v2iKarJs6pN1KFhddN8J8PpMjDyfz3ooJpv
+	vZjzaSw7uW+bPNTipxB1bN3vnaF0hNbBwIF5jjNEM4Sp6pMRIoZ8umTBnSr4FiMaxZ7K9v
+	6NA+YTNS4rFP6sYbT4l9dhruFjVGmZsB1054tGZdqUA2cIlPa4tVAZtW+u0Rcqg7X7X+5M
+	j7ZGu5ZwvZY6LXfCV7+EsKAqjmj+12qjk+b1U933BgFwpHYkb3DpS92Ov/nrbKBR6mgltG
+	eofRjuOIXU0mBiVKNQTesPlEjeJkuB43yq9x1UKqOvY0CPCJ0cR8b6hSQsIY2w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1758186822;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nbuNQzh1zuOzpwosC6YopwsJkbLDORVpCcTBnZD0pgM=;
-	b=cHbQhpUqjhDOcWrq+kIcyjyNsM9A15RNC/0EjCr9pQnJpfHJ8hxBckEkkbvNOnw2EOm/Rt
-	HeW4/9CTLpOLkNAw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758186778; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nbuNQzh1zuOzpwosC6YopwsJkbLDORVpCcTBnZD0pgM=;
-	b=eJ6cs855rfNlLlnYxLi7hncmRUuip4vZhrbCXkWVUn/FRKPbSkFxudb1q8SdOHnUocRntK
-	SyjDgXgJ7kaGhkQb3mfYOsBxP5JSlIgk2rX4nNtbVVA3PStbNeoD4WWCWMuH9ebIxFFxSI
-	CJQrdJgyHjYw2vzwzUKRvfYNKeFx0C8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758186778;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nbuNQzh1zuOzpwosC6YopwsJkbLDORVpCcTBnZD0pgM=;
-	b=cHbQhpUqjhDOcWrq+kIcyjyNsM9A15RNC/0EjCr9pQnJpfHJ8hxBckEkkbvNOnw2EOm/Rt
-	HeW4/9CTLpOLkNAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A474513A39;
-	Thu, 18 Sep 2025 09:12:58 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id gakiKBrNy2hxVQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 18 Sep 2025 09:12:58 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 1697AA09B1; Thu, 18 Sep 2025 11:12:54 +0200 (CEST)
-Date: Thu, 18 Sep 2025 11:12:54 +0200
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
-	Amir Goldstein <amir73il@gmail.com>, Josef Bacik <josef@toxicpanda.com>, 
-	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Anna-Maria Behnsen <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 6/9] mnt: simplify ns_common_init() handling
-Message-ID: <rmf52dxd73wrsdtvqgjoa7i4am42k6i4eesd7nbxvdq7j22xy7@r7jkm4ahv6s7>
-References: <20250917-work-namespace-ns_common-v1-0-1b3bda8ef8f2@kernel.org>
- <20250917-work-namespace-ns_common-v1-6-1b3bda8ef8f2@kernel.org>
- <syskz2nr23sqc27swfxwbvlbnnf7tgglrbn52vjoxd2bn3ryyv@id7hurupxcuy>
- <20250918-quizfragen-deutung-82bd9d83c7ad@brauner>
+	bh=4rI6MarwTjIECPHNDT6nYXfKNfdgGybieY2MAwuVSSU=;
+	b=kRC17PKPNGrHDCN1JtgSeQoLHsDtQncZgecqJa9CX1g+vXf9/Nnh3VnRziDLfffITkhu9H
+	xkp6B6izdQGy/fAw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, linux-kernel@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev
+Subject: Re: [PATCH net-next] page_pool: add debug for release to cache from
+ wrong CPU
+Message-ID: <20250918091341.n6_OgbOW@linutronix.de>
+References: <20250918084823.372000-1-dtatulea@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250918-quizfragen-deutung-82bd9d83c7ad@brauner>
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TAGGED_RCPT(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[suse.cz,vger.kernel.org,gmail.com,toxicpanda.com,kernel.org,yhndnzj.com,in.waw.pl,0pointer.de,cyphar.com,zeniv.linux.org.uk,cmpxchg.org,suse.com,linutronix.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:helo,suse.cz:email]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -2.30
+In-Reply-To: <20250918084823.372000-1-dtatulea@nvidia.com>
 
-On Thu 18-09-25 10:15:01, Christian Brauner wrote:
-> On Wed, Sep 17, 2025 at 06:45:11PM +0200, Jan Kara wrote:
-> > On Wed 17-09-25 12:28:05, Christian Brauner wrote:
-> > > Assign the reserved MNT_NS_ANON_INO sentinel to anonymous mount
-> > > namespaces and cleanup the initial mount ns allocation. This is just a
-> > > preparatory patch and the ns->inum check in ns_common_init() will be
-> > > dropped in the next patch.
-> > > 
-> > > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> > 
-> > ...
-> > > ---
-> > >  fs/namespace.c    | 7 ++++---
-> > >  kernel/nscommon.c | 2 +-
-> > >  2 files changed, 5 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/fs/namespace.c b/fs/namespace.c
-> > > index c8251545d57e..09e4ecd44972 100644
-> > > --- a/fs/namespace.c
-> > > +++ b/fs/namespace.c
-> > > @@ -4104,6 +4104,8 @@ static struct mnt_namespace *alloc_mnt_ns(struct user_namespace *user_ns, bool a
-> > >  		return ERR_PTR(-ENOMEM);
-> > >  	}
-> > >  
-> > > +	if (anon)
-> > > +		new_ns->ns.inum = MNT_NS_ANON_INO;
-> > >  	ret = ns_common_init(&new_ns->ns, &mntns_operations, !anon);
-> > >  	if (ret) {
-> > >  		kfree(new_ns);
-> > > @@ -6020,10 +6022,9 @@ static void __init init_mount_tree(void)
-> > >  	if (IS_ERR(mnt))
-> > >  		panic("Can't create rootfs");
-> > >  
-> > > -	ns = alloc_mnt_ns(&init_user_ns, true);
-> > > +	ns = alloc_mnt_ns(&init_user_ns, false);
-> > >  	if (IS_ERR(ns))
-> > >  		panic("Can't allocate initial namespace");
-> > > -	ns->ns.inum = PROC_MNT_INIT_INO;
-> > >  	m = real_mount(mnt);
-> > >  	ns->root = m;
-> > >  	ns->nr_mounts = 1;
-> > > @@ -6037,7 +6038,7 @@ static void __init init_mount_tree(void)
-> > >  	set_fs_pwd(current->fs, &root);
-> > >  	set_fs_root(current->fs, &root);
-> > >  
-> > > -	ns_tree_add(ns);
-> > > +	ns_tree_add_raw(ns);
-> > 
-> > But we don't have ns->ns_id set by anything now? Or am I missing something?
-> 
-> It is set in alloc_mnt_ns() via ns_tree_gen_id(). :)
-> Unless I'm missing something.
+On 2025-09-18 11:48:21 [+0300], Dragos Tatulea wrote:
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index ba70569bd4b0..404064d893d6 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -768,6 +795,18 @@ static bool page_pool_recycle_in_cache(netmem_ref netmem,
+>  		return false;
+>  	}
+>  
+> +#ifdef CONFIG_DEBUG_PAGE_POOL_CACHE_RELEASE
+> +	if (unlikely(!page_pool_napi_local(pool))) {
 
-Ah, right. Feel free to add:
+if you do IS_ENABLED(CONFIG_DEBUG_PAGE_POOL_CACHE_RELEASE) you could
+avoid the ifdef.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+A quick question, where is this allow_direct argument supposed to come
+from? I just noticed that mlx5 does
+   page_pool_put_unrefed_netmem(, true);
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+which then does not consider page_pool_napi_local(). But your proposed
+change here will complain as it should.
+
+> +		u32 pp_cpuid = READ_ONCE(pool->cpuid);
+> +		u32 cpuid = smp_processor_id();
+> +
+> +		WARN_RATELIMIT(1, "page_pool %d: direct page release from wrong CPU %d, expected CPU %d",
+> +			       pool->user.id, cpuid, pp_cpuid);
+> +
+> +		return false;
+> +	}
+> +#endif
+> +
+>  	/* Caller MUST have verified/know (page_ref_count(page) == 1) */
+>  	pool->alloc.cache[pool->alloc.count++] = netmem;
+>  	recycle_stat_inc(pool, cached);
+
+Sebastian
 
