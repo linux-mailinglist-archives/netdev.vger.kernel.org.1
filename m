@@ -1,50 +1,68 @@
-Return-Path: <netdev+bounces-224232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE3E5B82A7E
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 04:30:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D373B82A87
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 04:35:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 293CD188CBC7
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 02:30:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 353F27B11A7
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 02:33:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C725F241CA2;
-	Thu, 18 Sep 2025 02:30:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9851C1FBEB9;
+	Thu, 18 Sep 2025 02:35:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qNAjsNKd"
+	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="l9Ov9PEJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19B123F42A
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 02:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC961F582A;
+	Thu, 18 Sep 2025 02:35:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758162616; cv=none; b=eQhL/onyikZH5ZDpyDXfvrJDaHC62OqA1Awtix0YqmgyOpiNEnF2tezvWMQuGr9T0SobaZogrcibxMAcLMCY84fXwTrKUh8hyZ2uJe/DIHGDR2+oO1V85oKXWNZmeEJofqcCyDLCMWh/fet6Kv2k0IDCVZKelf/ZJwFffFIn+uU=
+	t=1758162926; cv=none; b=kbmqG+A0R2nxWv2aPGGH2zuquIgaOU7OXZmK9MLrts+1BnqXr2D+hDkc2H5OoFFmv/J8bu5KufHl8LGNVt6BImbHJDrjzvF9s2vWy6V8zPs5md+ejH4oD26orekEXpYKLbVCuFQ0mRAL25KioEMfI5vUGNcOQqMUXrNZE2vdNBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758162616; c=relaxed/simple;
-	bh=0Dps7J/dHshrqTI9Xo/beNOvJBaeuVZm6ksfPFUEoTg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OLfErJcQfQfpmsI0ziUD4KG07BS5Cez1/jNuV5YQp5t3XU20A38PX+kc7W2YpOB2jpPwEnh7braVA8xOIGbqbjSE1E1Z00qmEEuk2nz08Baoe6Brgpp6jKJE06diQHkPKESW3DG84ePwuGMlpXDNkwxJLMFdggx7LBkfaLfuNl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qNAjsNKd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 235FDC4CEE7;
-	Thu, 18 Sep 2025 02:30:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758162616;
-	bh=0Dps7J/dHshrqTI9Xo/beNOvJBaeuVZm6ksfPFUEoTg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qNAjsNKdAVD4KNlG0mJ5y67/jqqBsTeG25sSndUy9WAvSW9LRUS9cZIlA05rCHmbI
-	 /435IkRscWFba8xXBTI+3+NvW1zaNKquwsvbYdhHp3e/qGiPaLb4Pltmy2RQNfeHKm
-	 eNQ/QodZvQavW6tCg4olw6uMISS6I+z/y1hhEkWW3QU8+7aaJfbHfR3EdCDL02WNip
-	 +6ORoBoYpp36+khTc1DTgAjqRslTufopjAwlYm46P3bEBmkgiNOIEJzGyAUNKf0Zvy
-	 dAphjzIIkzKbNgANhroUTTwkWEssFpSMSpzJVB5iR74gG80K2vVuJEuQIdFqsXNX8q
-	 GYdVBwSW5gZwQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD5839D0C28;
-	Thu, 18 Sep 2025 02:30:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1758162926; c=relaxed/simple;
+	bh=Ub+XbuCkb3TRROxtk/77YAYbPimsD6APSgrqgCixQBc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LbdK/So4mYl29g+ZWHh8jXYGrlqVIQ5ewuqg1+1UqOXdZxaQMfBpuCKTXcVloOnJGOJ0oN1Ut6R+H2MM47F1gUcQq5b2tanJrn0vsgVwvXPI8ZaJJeWMaXLM9k1XYdQSbM4GcEJKdHzZvFoU4JLMti22jitIs57r00k2Va3Qvd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=l9Ov9PEJ; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 58I2YrPzA1253472, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1758162893; bh=5GgfzCcsVBrBOyrzohjfkGGUZgibSyCdVHMRgrgGc/I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=l9Ov9PEJnkHhHfmIluFnwIP/311NycLwpah1Gv4GzxDEyX5TL25KPYe2XMqMe15I+
+	 26WS4V7W+XD1j+U53xg6qkDznGOJGIR+ckklH8yp4H6JkmWZLIAXSXp/16F4nvHehv
+	 geIyiOOx4+FTy2ME1ZgGUwDCBrKcP5sSVMsghlMJM+Hdz5PMU7NkQvU98DbuGYACEk
+	 eUJj4QxuY/EWUsQHFu7Bi8dJQNVaSPF2GcDsvJfothLeswdWRWlqIIah6FSku31Vu1
+	 hd4PGGNjo+sYspXJwVJuPtnyioMcjnwfbAc2TlApJaKGBAomiIUAZzoohF19WujOmj
+	 acEgUNACC28gA==
+Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
+	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 58I2YrPzA1253472
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 18 Sep 2025 10:34:53 +0800
+Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
+ RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.33; Thu, 18 Sep 2025 10:34:52 +0800
+Received: from 172.29.32.27 (172.29.32.27) by RS-EX-MBS1.realsil.com.cn
+ (172.29.17.101) with Microsoft SMTP Server id 15.2.1544.33 via Frontend
+ Transport; Thu, 18 Sep 2025 10:34:52 +0800
+From: ChunHao Lin <hau@realtek.com>
+To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        ChunHao Lin
+	<hau@realtek.com>
+Subject: [PATCH net-next v2] r8169: set EEE speed down ratio to 1
+Date: Thu, 18 Sep 2025 10:34:25 +0800
+Message-ID: <20250918023425.3463-1-hau@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,48 +70,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 0/4 iproute2-next] tc/police: Allow 64 bit burst size
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175816261648.2229542.5348982217548868366.git-patchwork-notify@kernel.org>
-Date: Thu, 18 Sep 2025 02:30:16 +0000
-References: <20250916215731.3431465-1-jay.vosburgh@canonical.com>
-In-Reply-To: <20250916215731.3431465-1-jay.vosburgh@canonical.com>
-To: Jay Vosburgh <jay.vosburgh@canonical.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, stephen@networkplumber.org,
- dsahern@gmail.com
+Content-Type: text/plain
 
-Hello:
+EEE speed down means speed down MAC MCU clock. It is not from spec.
+It is kind of Realtek specific power saving feature. But enable it
+may cause some issues, like packet drop or interrupt loss. Different
+hardware may have different issues.
 
-This series was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
+EEE speed down ratio (mac ocp 0xe056[7:4]) is used to set EEE speed
+down rate. The larger this value is, the more power can save. But it
+actually save less power then we expected. And, as mentioned above,
+will impact compatibility. So set it to 1 (mac ocp 0xe056[7:4] = 0)
+, which means not to speed down, to improve compatibility.
 
-On Tue, 16 Sep 2025 14:57:27 -0700 you wrote:
-> In summary, this patchset changes the user space handling of the
-> tc police burst parameter to permit burst sizes that exceed 4 GB when the
-> specified rate is high enough that the kernel API for burst can accomodate
-> such.
-> 
-> 	Additionally, if the burst exceeds the upper limit of the kernel
-> API, this is now flagged as an error.  The existing behavior silently
-> overflows, resulting in arbitrary values passed to the kernel.
-> 
-> [...]
+Signed-off-by: ChunHao Lin <hau@realtek.com>
+---
+v1 -> v2: update commit message
 
-Here is the summary with links:
-  - [v3,1/4,iproute2-next] lib: Update backend of print_size to accept 64 bit size
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=1ee417ac43ee
-  - [v2,2/4,iproute2-next] tc: Add get_size64 and get_size64_and_cell
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=8798ab4c4c02
-  - [v2,3/4,iproute2-next] tc: Expand tc_calc_xmittime, tc_calc_xmitsize to u64
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=13b999aa74c8
-  - [v2,4/4,iproute2-next] tc/police: enable use of 64 bit burst parameter
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=3b26e8abf404
+ drivers/net/ethernet/realtek/r8169_main.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 75272510f7e2..8903ae90afcb 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -3409,7 +3409,7 @@ static void rtl_hw_start_8168h_1(struct rtl8169_private *tp)
+ 		r8168_mac_ocp_modify(tp, 0xd412, 0x0fff, sw_cnt_1ms_ini);
+ 	}
+ 
+-	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0070);
++	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0000);
+ 	r8168_mac_ocp_modify(tp, 0xe052, 0x6000, 0x8008);
+ 	r8168_mac_ocp_modify(tp, 0xe0d6, 0x01ff, 0x017f);
+ 	r8168_mac_ocp_modify(tp, 0xd420, 0x0fff, 0x047f);
+@@ -3514,7 +3514,7 @@ static void rtl_hw_start_8117(struct rtl8169_private *tp)
+ 		r8168_mac_ocp_modify(tp, 0xd412, 0x0fff, sw_cnt_1ms_ini);
+ 	}
+ 
+-	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0070);
++	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0000);
+ 	r8168_mac_ocp_write(tp, 0xea80, 0x0003);
+ 	r8168_mac_ocp_modify(tp, 0xe052, 0x0000, 0x0009);
+ 	r8168_mac_ocp_modify(tp, 0xd420, 0x0fff, 0x047f);
+@@ -3715,7 +3715,7 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
+ 	r8168_mac_ocp_modify(tp, 0xc0b4, 0x0000, 0x000c);
+ 	r8168_mac_ocp_modify(tp, 0xeb6a, 0x00ff, 0x0033);
+ 	r8168_mac_ocp_modify(tp, 0xeb50, 0x03e0, 0x0040);
+-	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0030);
++	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0000);
+ 	r8168_mac_ocp_modify(tp, 0xe040, 0x1000, 0x0000);
+ 	r8168_mac_ocp_modify(tp, 0xea1c, 0x0003, 0x0001);
+ 	if (tp->mac_version == RTL_GIGA_MAC_VER_70 ||
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
