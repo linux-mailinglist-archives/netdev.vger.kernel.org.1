@@ -1,110 +1,214 @@
-Return-Path: <netdev+bounces-224296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75E58B83908
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:40:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9058CB83935
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:42:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 45C504E2874
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:40:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4969C4A2CF5
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:42:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D6E2FB973;
-	Thu, 18 Sep 2025 08:40:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D738B2F39C1;
+	Thu, 18 Sep 2025 08:42:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tWVDYOv5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ch3pWP6i"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBD12F5461
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 08:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587281A9FB8
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 08:42:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758184819; cv=none; b=UMFApX8/4a8GdWo0Epzney/7rNpqM1Hmf2AC3aOis4lOI/LO7N5PI326haF8ZdvdyAA08X2INuRzgadC47aW8dI00zE0vOVBVxb9vuIrIwXSKZlKuxyQKOsL1077/t8YmXRRZjz2zXY9Ql9zMH7LaJwmsKNxP4f/jdMYLwCxeQA=
+	t=1758184953; cv=none; b=E3vkLu38+1QycZh4ee9mwpecNzqOXlW/4ia2uxD/ZgIa+ptZ0PTcJ2iUQnqAxjDOq303GNY04Rubj8ve2P2K5Ss2SCdaF/A3OZUUSCT2omZS2NcrlJQKVXpIXRmQS/U2VRk42553cBLBaSQRPKNv2uD9yJ84v92LPYZaWsEMtTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758184819; c=relaxed/simple;
-	bh=Jd9287PjvPVaJPDGTGu1BO5hAK3Ccg03DTslvCmRaWU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=m5kZRYnWVKmUVj5UHDcFXJClbY8EfB968rTCBpa4HnrcUmCxxFgA/oQx7lBfN9zwWr/D37miTuWYd5+pOm6WGq9pRaRKnJrGc2tXNvpwOYYaNQr9gQ4Mxcq9ca8GhgZjDC81Hy87NNCdh2cIIutp+N4ixegNcEmOiLLEJa7/kIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tWVDYOv5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77E3DC4CEE7;
-	Thu, 18 Sep 2025 08:40:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758184817;
-	bh=Jd9287PjvPVaJPDGTGu1BO5hAK3Ccg03DTslvCmRaWU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tWVDYOv5disKHrCiEQvo3mfWPPmed42SzZ/MmYCM9GZhvf7BlHNw0KMorNv6hc8sU
-	 oeqHZr6mGb3bsyeg5Frb1sIT4jLSF8ZTAMgKm5gH07nEDcG+4Zt03BguM2pXO7eiw/
-	 guF96tnsh6kHx271JXMVHdeyKnMr5rbhtn0/r4MGH3KrH18Duf0KiYh9nFmkjvy+re
-	 Q9HSftRRFNnQBGf/pqYjamib0eUveUu99qH692SECkGT/O5uQl8uvxP1i9aKP1U8KR
-	 AbiFGIV+leMwBtFsBSvcQ6Le+Lh5gPd2vREKq057/V5jKOeLYBhOUeQGoT2R4TgmuJ
-	 HwtafSa2x3Yrw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADEF39D0C28;
-	Thu, 18 Sep 2025 08:40:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1758184953; c=relaxed/simple;
+	bh=+apsQO6QEjdzapAHpxbdsNcSCb9gL0RNQ2fDJKQk9oA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c9RAYbdoN2pjP77hQZSuEnxJVVWHXKf0R7Dq6g40+xU7I3/44W4VHRCYeVjia89lkrBgbjZm5lra7QA3sICqwhr9+pEISs8ycx1AFili3ZIe4DHUfRivUUO2BGb2SV8XZk2QDCneFL2Zl2RVio/OaWvSwpk7WIZ9AkyuTZ72leo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ch3pWP6i; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-329b760080fso540220a91.1
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 01:42:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758184952; x=1758789752; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dgpJuE6FSpEricZhRzRNffSw0PwjJk1HPEn6KVtJT7M=;
+        b=Ch3pWP6iv2HFT3p9w2dd+qVofCYfmWgR3beGFKICOr117JdMgXwQHeEkTOExTxiGj3
+         bmbIjZAMh0ajITnZ8DQV4kXGgzmfOd7sqTuAh2wXtRRD79JaoU8M2bj+EgZJpwywzcUz
+         B08IUCE/HLR+4U0LmF4dceSsAXHHa0anuuGQ7foufTnAb1bZ7TTL6cPbYdrkLe1UzI34
+         bHpgvXWrZgDlf4D1ZkRaIHjTZHrpJo6QysO4cKi5wA0cJoiqYTBYoNBM3h0cCO0mu4wS
+         yzFP12OuDzwtDVYw8xvrbuosCeTNbHpnQbrN3R2+5lFM0YddWeAakDXeIhPTrNeHqzV8
+         FTdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758184952; x=1758789752;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dgpJuE6FSpEricZhRzRNffSw0PwjJk1HPEn6KVtJT7M=;
+        b=wXw+qiBTA2ZE+T4QA/09774UmHlsM9v7YWNIynl3VttCarmh6GaTnlWH5tjVSbYiUv
+         dxV03CgCrhhyGq9t/e2+tcCrqW4pRyxGGewFzachUusRnXAKfN6a5qi21eL7kBvsg7gs
+         X7auvHz4eQfXqowVnFY+sAV9AExP/XaS09OyVSKjJrZYqXQdGkRiTZE9DN1Ah9InQWqZ
+         bUvGyL7//qaxgn39cc54dJA+57rK67UeZm9jZ1cz5mN9wiYm0wPPCl5i2c5TKpDOW1vx
+         naNCneelTHC2gezYRpMOQBR6eYTMrK1qfxd4VTEyxg0xEajraVqu7bboN6V7Baeq/KqV
+         1ZQg==
+X-Forwarded-Encrypted: i=1; AJvYcCVuWnKVBxsLU4581MEi3k+DLfO0mT3XCD5vdXurk/6BGRogCXj0IMsPTdIPoSoS3bhsUI88MDw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzt64VdJnvYJbBNnPI2Wan/HybsoLHwOeXgI8YVrJppjtVbWjCs
+	KNs95nN9wU9Eke6AtuP6K+UM0qe6UqnCqa82LZPp9ifeSOgzMfInmKgWXmfgMg==
+X-Gm-Gg: ASbGncu7THUQxMvpH0QTbJUO0c30y02xud5Qi20PNjLf9XnSsG+yw0tycABcZysKLVx
+	Z4KEDVCzXBEdQ6/FhjGrU5C0OO+lNVr+Z11C+dWxxv9Q4JpJabE87v1o7LATmAJO7q1mq/3813k
+	ahgv1r1MKqUJfL1FVEe98SI6fxlYFILO3MbTBaY9q8lYD4LtoJ2w+qyIJULDbF1auL3faYDWSkS
+	p0i/NxDvxK7eth9iI11ZLVCE1rb47cLwvozO2ytKODhjvwuPDNRQKjsmIxo6zHSL1zPJcbKZFQt
+	qorOy+Wr5u8QOTSDH4+rgrobKbzvvnmI9uglLOEFjCTBu58lK8CdC9MNE+zC79Pl4uCed319K9y
+	+yndthK8AZM6eYpGsTo+cVUxMuSK4MKcZUfaKazJwNqwxHLHOjCg=
+X-Google-Smtp-Source: AGHT+IF4rdzSBg32vZ0gOZ5A2EXINLPGUFMHUK7MiBcB7eEAbMtGfUaW+xnMSNLr9IaJ4SNTLIzT0g==
+X-Received: by 2002:a17:90b:35c6:b0:32b:d8af:b636 with SMTP id 98e67ed59e1d1-32ee3f619c7mr7502380a91.19.1758184951396;
+        Thu, 18 Sep 2025 01:42:31 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77cff229940sm1655100b3a.99.2025.09.18.01.42.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Sep 2025 01:42:30 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 0F8AF4207D19; Thu, 18 Sep 2025 15:42:27 +0700 (WIB)
+Date: Thu, 18 Sep 2025 15:42:27 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Lukasz Majewski <lukma@denx.de>, Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>
+Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+	Divya.Koppera@microchip.com, Sabrina Dubroca <sd@queasysnail.net>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH net-next v5 1/1] Documentation: net: add flow control
+ guide and document ethtool API
+Message-ID: <aMvF8yNJbPSqqypY@archie.me>
+References: <20250918051538.3651265-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/10] udp: increase RX performance under stress
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175818481765.2322785.5338690827475365235.git-patchwork-notify@kernel.org>
-Date: Thu, 18 Sep 2025 08:40:17 +0000
-References: <20250916160951.541279-1-edumazet@google.com>
-In-Reply-To: <20250916160951.541279-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- willemb@google.com, kuniyu@google.com, dsahern@kernel.org,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
-
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 16 Sep 2025 16:09:41 +0000 you wrote:
-> This series is the result of careful analysis of UDP stack,
-> to optimize the receive side, especially when under one or several
-> UDP sockets are receiving a DDOS attack.
-> 
-> I have measured a 47 % increase of throughput when using
-> IPv6 UDP packets with 120 bytes of payload, under DDOS.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,01/10] ipv6: make ipv6_pinfo.saddr_cache a boolean
-    https://git.kernel.org/netdev/net-next/c/3fbb2a6f3a70
-  - [net-next,02/10] ipv6: make ipv6_pinfo.daddr_cache a boolean
-    https://git.kernel.org/netdev/net-next/c/5489f333ef99
-  - [net-next,03/10] ipv6: np->rxpmtu race annotation
-    https://git.kernel.org/netdev/net-next/c/9fba1eb39e2f
-  - [net-next,04/10] ipv6: reorganise struct ipv6_pinfo
-    https://git.kernel.org/netdev/net-next/c/b76543b21fbc
-  - [net-next,05/10] udp: refine __udp_enqueue_schedule_skb() test
-    https://git.kernel.org/netdev/net-next/c/9aaec660b5be
-  - [net-next,06/10] udp: update sk_rmem_alloc before busylock acquisition
-    https://git.kernel.org/netdev/net-next/c/faf7b4aefd5b
-  - [net-next,07/10] net: group sk_backlog and sk_receive_queue
-    https://git.kernel.org/netdev/net-next/c/4effb335b5da
-  - [net-next,08/10] udp: add udp_drops_inc() helper
-    https://git.kernel.org/netdev/net-next/c/9db27c80622b
-  - [net-next,09/10] udp: make busylock per socket
-    https://git.kernel.org/netdev/net-next/c/3cd04c8f4afe
-  - [net-next,10/10] udp: use skb_attempt_defer_free()
-    https://git.kernel.org/netdev/net-next/c/6471658dc66c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="oV2pbrsk+dCJ8esC"
+Content-Disposition: inline
+In-Reply-To: <20250918051538.3651265-1-o.rempel@pengutronix.de>
 
 
+--oV2pbrsk+dCJ8esC
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Sep 18, 2025 at 07:15:38AM +0200, Oleksij Rempel wrote:
+> +* **How it works**: To inhibit incoming data, a receiving device can for=
+ce a
+> +    collision on the line. When the sending station detects this collisi=
+on, it
+> +    terminates its transmission, sends a "jam" signal, and then executes=
+ the
+> +    "Collision backoff and retransmission" procedure as defined in IEEE =
+802.3,
+> +    Section 4.2.3.2.5. This algorithm makes the sender wait for a random
+> +    period before attempting to retransmit. By repeatedly forcing collis=
+ions,
+> +    the receiver can effectively throttle the sender's transmission rate.
+
+Please align the bullet list text. I see hanging indent instead there in
+htmldocs output.
+
+> +* **What it is**: A standard Ethernet frame with a globally reserved
+> +    destination MAC address (``01-80-C2-00-00-01``). This address is in =
+a range
+> +    that standard IEEE 802.1D-compliant bridges do not forward. However,=
+ some
+> +    unmanaged or misconfigured bridges have been reported to forward the=
+se
+> +    frames, which can disrupt flow control across a network.
+> +
+> +* **How it works**: The frame contains a MAC Control opcode for PAUSE
+> +    (``0x0001``) and a ``pause_time`` value, telling the sender how long=
+ to
+> +    wait before sending more data frames. This time is specified in unit=
+s of
+> +    "pause quantum", where one quantum is the time it takes to transmit =
+512 bits.
+> +    For example, one pause quantum is 51.2 microseconds on a 10 Mbit/s l=
+ink,
+> +    and 512 nanoseconds on a 1 Gbit/s link. A ``pause_time`` of zero ind=
+icates
+> +    that the transmitter can resume transmission, even if a previous non=
+-zero
+> +    pause time has not yet elapsed.
+
+Same here.
+
+> +* **What it is**: PFC allows a receiver to pause traffic for one or more=
+ of the
+> +    8 standard priority levels without stopping traffic for other priori=
+ties.
+> +    This is critical in data center environments for protocols that cann=
+ot
+> +    tolerate packet loss due to congestion (e.g., Fibre Channel over Eth=
+ernet
+> +    or RoCE).
+> +
+> +* **How it works**: PFC uses a specific PAUSE frame format. It shares th=
+e same
+> +    globally reserved destination MAC address (``01-80-C2-00-00-01``) as=
+ legacy
+> +    PAUSE frames but uses a unique opcode (``0x0101``). The frame payload
+> +    contains two key fields:
+> +
+> +    - **``priority_enable_vector``**: An 8-bit mask where each bit corre=
+sponds to
+> +      one of the 8 priorities. If a bit is set to 1, it means the pause =
+time
+> +      for that priority is active.
+> +    - **``time_vector``**: A list of eight 2-octet fields, one for each =
+priority.
+> +      Each field specifies the ``pause_time`` for its corresponding prio=
+rity,
+> +      measured in units of ``pause_quanta`` (the time to transmit 512 bi=
+ts).
+
+Ditto.
+
+Thanks.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--oV2pbrsk+dCJ8esC
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaMvF7gAKCRD2uYlJVVFO
+o79lAQDH8IV49DcW+hwiMg+vNiZyA5vrPzmGSVHqpDc1ILyIHgD9Eh67ub4hbJGg
+Spts2kxJlXc/zM5nT0aVpERot9Sgjw0=
+=ajh1
+-----END PGP SIGNATURE-----
+
+--oV2pbrsk+dCJ8esC--
 
