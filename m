@@ -1,121 +1,91 @@
-Return-Path: <netdev+bounces-224595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50906B869E1
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 21:06:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30AB7B869F9
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 21:08:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 112161B25BB1
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 19:07:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 546886269B6
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 19:08:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E295727F4D5;
-	Thu, 18 Sep 2025 19:06:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0248227F4D5;
+	Thu, 18 Sep 2025 19:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O9WnJ5fk"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Q0vrB/TN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95534A2D;
-	Thu, 18 Sep 2025 19:06:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF049281375
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 19:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758222412; cv=none; b=in4RK4Kmt67soCWr9af6wnKu9D1wkxDNGmHmbF6Y+y8cc1/It5VRl1U8QlhyWLKoQshIUtsPhIAwmwy24hniIGVEc/TJO/g3ZRaTQf/5oe+nqcF/YLMRv/m+Vs8rqjytsYSkMrErEPztF6jHj8mVcfZ24XhZhBPL3WuXG6hii6o=
+	t=1758222504; cv=none; b=VZydlAwZ2n8lb/exN74mvcH/hvGSrioH8JGFNtZKfRVQlmRmN7MJAo5EtE5Q80kjN8pDptGBxlrNkpz5eEO2HEvXqFLXZMLftWiTAy3QC6Svxn71JVbUkys3uj8ARXqqjmEn6/I6rOaYYfgaUL9FSEkPjMf+7emogIjVE3EsotE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758222412; c=relaxed/simple;
-	bh=kNq2BBV7RX/0piN88LUKeCXvz59XV/A1jAaDcvjFWys=;
+	s=arc-20240116; t=1758222504; c=relaxed/simple;
+	bh=5Ily49FCamyxGmkH9L8kTBOuDKXCTRNUzK6Q6V8ZCCk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L3s62uLxvihvcDBkmk9B6IGbW8h9sOIdmjis9at+Ni3m8e0loCw44eipkWgkZceIWEWA360ideUGBvM9/KcmmbAgZQHeICAgMEPqq4MoEGFbOKhOBJAmA597zVitxAiJQP3QY0DV05iJ51xKgHvhj5woBZmYFmgSKcVUOi7DE58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O9WnJ5fk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1D31C4CEE7;
-	Thu, 18 Sep 2025 19:06:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758222412;
-	bh=kNq2BBV7RX/0piN88LUKeCXvz59XV/A1jAaDcvjFWys=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O9WnJ5fkhNYH3JTptjLK9oyXJgL9XM4u3NQMviefKGT0ACqwsosPKXEr6XR2CNFYv
-	 alm73Mmqcpnv5YJ1LormxgrLP745lglkCDYTggX+MFKOTCNfDdMJaNCuTIQpqHHZXI
-	 TmUyQ5vs9yK+tFXJ19BJtGFr0z5ws1a29MQYNOm6swKdGkTnzXIPCJ5gex95Ke3W4V
-	 loB+RN2zpZKVlhvd+rlFJfUQusiCQPeQAvo40hojXOyjMUAfncC8p1SpW5MhXdq/bK
-	 9TC8sHa/15nJ5ZZ00ksmEg/5FFMe4X0bdsDieCZ7RW+ZYaGjY2b/BrnahBe9kjYAJ1
-	 Jlth69CRQ/M6A==
-Date: Thu, 18 Sep 2025 20:06:47 +0100
-From: Simon Horman <horms@kernel.org>
-To: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
-	vikas.gupta@broadcom.com,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: Re: [v7, net-next 08/10] bng_en: Register rings with the firmware
-Message-ID: <20250918190647.GB589538@horms.kernel.org>
-References: <20250911193505.24068-1-bhargava.marreddy@broadcom.com>
- <20250911193505.24068-9-bhargava.marreddy@broadcom.com>
- <20250916155130.GK224143@horms.kernel.org>
- <CANXQDtYdxMq_EAPqu_WvnYqZ5SKW2k139Hwm+jW=kZpSQQgRtQ@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=L5NM1MhrXV0Gq4iTSWQe+uAlXtuyPS3sgxmWnozyG20W3OqOuOAy8hJ+/TlRFnPoqneCm06qzZPF8s7Orf8nO9za6MQ4T5RmPPOEtgh983iyojbY65cqeMYWuz6hYmvuDR5te2PnfgsV5ZDuIvXsPO/DVwbaG45oFdqQiI0XRvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Q0vrB/TN; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Fvalrn7IGNfQiqmB2yIvxqI8D5FVWvl4H9VnHfFrO94=; b=Q0vrB/TN7KMSJRV2SNPdYyaMtC
+	ohdBdwtIS8B1NyITqZt4p/bVuSReBdVLNd3bjjLhkNuR3WsT2AF8kYTRY68DIBeWcBjtmGXASWYF+
+	0iNppOA53joZPO+JicgdseP8h7zQHEL9ZitF99AyAX9KiCGe+yAITVlDLEHuCMovBsln8jwUAZ50r
+	GGXuH1O1GTXSyAUXbgazHwxSWFAKtGCFmuXucc43lTLFm1pS0Eg7vmqjoaeR/ueTgi8jmg+0BZDTy
+	RlT6i3zFqQt/4g7kH+nZ6rapUiH5SOl7JR7x0Quj09mZ5Cmo7HC4HNjg1vjvIGOdfOz2pxtoNDCpt
+	ShFFSLsg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42554)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uzJzO-000000001t1-2bHk;
+	Thu, 18 Sep 2025 20:08:18 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uzJzL-000000001RJ-2CE3;
+	Thu, 18 Sep 2025 20:08:15 +0100
+Date: Thu, 18 Sep 2025 20:08:15 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	andrew@lunn.ch, hkallweit1@gmail.com, richardcochran@gmail.com
+Subject: Re: [PATCH net-next] net: phy: micrel: use %pe in print format
+Message-ID: <aMxYn6NlhPybqAQn@shell.armlinux.org.uk>
+References: <20250918183119.2396019-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANXQDtYdxMq_EAPqu_WvnYqZ5SKW2k139Hwm+jW=kZpSQQgRtQ@mail.gmail.com>
+In-Reply-To: <20250918183119.2396019-1-kuba@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Sep 18, 2025 at 04:11:12PM +0530, Bhargava Chenna Marreddy wrote:
-> On Tue, Sep 16, 2025 at 9:21 PM Simon Horman <horms@kernel.org> wrote:
-> >
-> > On Fri, Sep 12, 2025 at 01:05:03AM +0530, Bhargava Marreddy wrote:
-> > > Enable ring functionality by registering RX, AGG, TX, CMPL, and
-> > > NQ rings with the firmware. Initialise the doorbells associated
-> > > with the rings.
-> > >
-> > > Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-> > > Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
-> > > Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-> >
-> > ...
-> >
-> > > diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_db.h b/drivers/net/ethernet/broadcom/bnge/bnge_db.h
-> > > new file mode 100644
-> > > index 00000000000..950ed582f1d
-> > > --- /dev/null
-> > > +++ b/drivers/net/ethernet/broadcom/bnge/bnge_db.h
-> > > @@ -0,0 +1,34 @@
-> > > +/* SPDX-License-Identifier: GPL-2.0 */
-> > > +/* Copyright (c) 2025 Broadcom */
-> > > +
-> > > +#ifndef _BNGE_DB_H_
-> > > +#define _BNGE_DB_H_
-> > > +
-> > > +/* 64-bit doorbell */
-> > > +#define DBR_EPOCH_SFT                                        24
-> > > +#define DBR_TOGGLE_SFT                                       25
-> > > +#define DBR_XID_SFT                                  32
-> > > +#define DBR_PATH_L2                                  (0x1ULL << 56)
-> > > +#define DBR_VALID                                    (0x1ULL << 58)
-> > > +#define DBR_TYPE_SQ                                  (0x0ULL << 60)
-> > > +#define DBR_TYPE_SRQ                                 (0x2ULL << 60)
-> > > +#define DBR_TYPE_CQ                                  (0x4ULL << 60)
-> > > +#define DBR_TYPE_CQ_ARMALL                           (0x6ULL << 60)
-> > > +#define DBR_TYPE_NQ                                  (0xaULL << 60)
-> > > +#define DBR_TYPE_NQ_ARM                                      (0xbULL << 60)
-> > > +#define DBR_TYPE_NQ_MASK                             (0xeULL << 60)
-> >
-> > Perhaps BIT_ULL() and GENMASK_ULL() can be used here?
+On Thu, Sep 18, 2025 at 11:31:19AM -0700, Jakub Kicinski wrote:
+> New cocci check complains:
 > 
-> Thanks for the suggestion, Simon. Some macros have non-contiguous
-> bits, requiring combinations with "|",
-> which would make the definitions longer and harder to follow. Since
-> these Doorbell Register (DBR) values
-> are hardware-specified, I believe it's better to keep them as they
-> are. Please let me know if you see any issues.
+>   drivers/net/phy/micrel.c:4308:6-13: WARNING: Consider using %pe to print PTR_ERR()
+>   drivers/net/phy/micrel.c:5742:6-13: WARNING: Consider using %pe to print PTR_ERR()
 
-Thanks, understood.
-If you prefer the current approach, that is fine by me.
+Yay, more human readable error output!
+
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+Thanks!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
