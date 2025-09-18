@@ -1,89 +1,50 @@
-Return-Path: <netdev+bounces-224361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 840ECB84074
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 12:20:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DED6B840A1
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 12:23:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3892754388C
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:20:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEB377BE4B6
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:20:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A669C2F7477;
-	Thu, 18 Sep 2025 10:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF39A2E040C;
+	Thu, 18 Sep 2025 10:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OmzJzaJ9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iof7L387"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012003.outbound.protection.outlook.com [40.107.200.3])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A722F6567
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 10:16:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.3
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758190612; cv=fail; b=MnKuKj4Q+nZu2pBYFizfN3Z7coDuggT/yH50mQvXnawCu3FS+B/3IRHIi+JepTjtdbmY3cb7//JcPKb4BOGc1Ugrt2bZLJ6sxHvd+U7JjDR3IUfgRNA59UULAkmf72N9TrLxFEVg3Ayi5Y9zRFXok1g76r/z8GDEr2C5IGwhdh8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758190612; c=relaxed/simple;
-	bh=KImkQ0ZkdEdz/3iLegl4QEkFK1mId0q5iLJnthUt6EU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lWfkvyfD5djAlWfCOiLlCjdfYcb7LNZZj2exX61/05bpIauQXHh03YQYJTAPrtxvY8z5bG5o9khDNPXkdhXQz9KvimNei+4kIOp6RMrZFCeW/0/w5ZelfjD+G3JBf+s6BZ+Z6pIrWUni7GDdnvUGt+K8OUVsO3dfEfcmIJ3WHss=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OmzJzaJ9; arc=fail smtp.client-ip=40.107.200.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RFmT2b30K/lA6p37hocvUz+LA7hT44R2T0LzB/JOYDE3EY3j/BMdfhcNmdJ2LS7TyBuorrcRssnfj9+fE+Yh1UCFkaAcW3idLt159cBQ7ByVsVw2l96FT7+0Y98jUnhNs1EMAfD3tq49La+RymLvsjcwuPfA5Oa/oz/RQmxNGmKsoHGyuOPfJBciioqZrEQNBr9SsHKFMs0IjDnZrSdIheigLUMMlW9yuPUIweyEpVirjdBTmQddA4aUKn/Bf8qIEJKeggRuvpjPGO4kVOthZztgAfEGtj7PfWkgSzu2hJPywO49P64yHZOzicK+t3deYMYiPFBHDS62fWN0N0Z7SQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0rItsmtE9rMgFeAdIl+w+MMKZuUbf0IAbvxhhRSWim4=;
- b=r7qXrxr6XVHMN5x7lw/E7UGuTEEyDhD4W2UX4eCwuxJE/lvOVXzTURLPOXopqKATTgLbskRxwEYDxInnif8xC6PPkHBkz5udI024+b4miCl242LDoKmbqpxaGz36eqLbKpIstO3KiyCriiE78Ugh2kPHvZ/6O7KgcqLVWr5qV+s9z09C9BAnRE/bye/jfWp9IgfPWc48Zgi8RCYzS6iZHaHQZmByep2EtT5UoBkftsXGZFZWSBJOofKsJtYPfYsVip6oUiUjXHXXEDjFXFoGQkx6bW3x5XMseA3zlKJ+n4t8yTXjUjA2mU2l/2nj75Ew7qHG6herCMpFBZZf7QQLoA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0rItsmtE9rMgFeAdIl+w+MMKZuUbf0IAbvxhhRSWim4=;
- b=OmzJzaJ93pWL4giZKlYJGCD7l5QfLpcr/FyLBGyVQsWuGRfNBhAnEsGNV/neqcQHi+5Cl5BL/yZgHzVVPpPdLZK9+4O/o/q9wSJ2dPnVPKAT9AjT1F/fRyHXp6CIc9+tfrGtp2SkRMi8/nFHXOUvGE5l3Ng69k22Eq5T40l5baxkfS/OEb4z0f7tI30MUGP4YWkJ/j6Tc+SeEcx0LjbLflYQyO4wZsMjqypuydFYkDofAB2bZ4cU0KCoqZ1QPahns3ajHCLs2+MouI7YL93iyoelYMKXYvNx30VvCxa98l/MVarXeD98mfd9XRVyeJlaaMaCmOpXzcpKTu4pncEOMQ==
-Received: from BYAPR02CA0069.namprd02.prod.outlook.com (2603:10b6:a03:54::46)
- by LV3PR12MB9141.namprd12.prod.outlook.com (2603:10b6:408:1a7::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.13; Thu, 18 Sep
- 2025 10:16:47 +0000
-Received: from BY1PEPF0001AE16.namprd04.prod.outlook.com
- (2603:10b6:a03:54:cafe::8e) by BYAPR02CA0069.outlook.office365.com
- (2603:10b6:a03:54::46) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.14 via Frontend Transport; Thu,
- 18 Sep 2025 10:16:46 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BY1PEPF0001AE16.mail.protection.outlook.com (10.167.242.104) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9137.12 via Frontend Transport; Thu, 18 Sep 2025 10:16:46 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.34; Thu, 18 Sep
- 2025 03:16:31 -0700
-Received: from c-237-113-240-247.mtl.labs.mlnx (10.126.231.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 18 Sep 2025 03:16:28 -0700
-From: Cosmin Ratiu <cratiu@nvidia.com>
-To: <netdev@vger.kernel.org>, <cratiu@nvidia.com>
-CC: Jiri Pirko <jiri@resnulli.us>, "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Vlad Buslov
-	<vladbu@nvidia.com>, Dmytro Linkin <dlinkin@nvidia.com>
-Subject: [PATCH net] devlink rate: Remove unnecessary 'static' from a couple places
-Date: Thu, 18 Sep 2025 13:15:06 +0300
-Message-ID: <20250918101506.3671052-1-cratiu@nvidia.com>
-X-Mailer: git-send-email 2.45.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78CD27E7FC
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 10:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758190818; cv=none; b=Muwn7LZ9G6qvPb6NtMviE3AKdxUjGUiPUgUU0vVJmdfAKrR1THlf1k1Jo5x71W5QinchxeHSdpZfVEwa8rEIqJii/S4H7I3EdP4CWW7PH4xiKlKtDSSOwQ0u5LJFLgLa4WQgiNs8SbUbxHNr/S+y4/KRR41fM32GLPW/Gk7erNs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758190818; c=relaxed/simple;
+	bh=pREYdj7nvkNdpges0cXDiqZPr8+LSXMzC4W3szojw50=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LivzoP0sT2IHhC5UT+w15ixUybYREd2Z2UbP32HaBYAHzMw+nr6uEOrBIYzUIl7rPH8EnKYhHTZutagacLcm7pdE9rdQrbIt+p6MT8hopQGlW0Ib839pxPpfAB7U3PtPrl1u7U9RdVyiD/8Adsh6od1OJARfo2bavBh+mivdWrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iof7L387; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D06ECC4CEE7;
+	Thu, 18 Sep 2025 10:20:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758190815;
+	bh=pREYdj7nvkNdpges0cXDiqZPr8+LSXMzC4W3szojw50=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=iof7L387+nbnpsTlZlwOkyD9E/8c9cqaOwPHZd62+deF5lu6yIHB9GxUZNhvU+0i6
+	 kqT7Bi3z8dWf4Nm+KAmg2MuSBr0KHDcqDddAZZJiN8d1BrJrr/9cKeJqafZ9/TpabJ
+	 H5HpVrrs4q2FURR7fBsqO1LvX/ZdnfoEbKz42CsYIfbPSJj3x6hKQ0D3UcZQWw5P6r
+	 6Tyn19z5Xj/oTlNBB7wB1Bk0TiO3nehEhFx/xUkkmVsBpPitt6I4aOL/0XlBP38FM7
+	 ioeZ/sscjQmcwF4DloPAv2hnj3pRspu738/Js3PnuKZwZQoBfaYuLHYiy19Bap6nQf
+	 wWwtwLWgcQtDA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFEB39D0C28;
+	Thu, 18 Sep 2025 10:20:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,98 +52,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY1PEPF0001AE16:EE_|LV3PR12MB9141:EE_
-X-MS-Office365-Filtering-Correlation-Id: b4ef34b4-bcae-4dd1-ab33-08ddf69c7939
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?eFXyVxlPiI0enCqKr6U17wYszLnhLtQKI++B4LyjSazzKDGl/bJacyHn21VH?=
- =?us-ascii?Q?ltxMxo9QeiNogn8YBwweM9wxVF2gk6NvqeFd0pghXi2r25HBcgqn2tLiVvcB?=
- =?us-ascii?Q?wx2d8v0I+kFdixE2MJGuhahZIy+rd/7+I5wsHOxa+bv8naeGDSu4soMD5/+z?=
- =?us-ascii?Q?RNO+rbg/S14QS87Q7UxvHAUPCVtsr4LPFhfR9q95U13XrPdDmC0rLMh2AvJB?=
- =?us-ascii?Q?s1hXZheqVIFFgc4swcFK1iaQPhq+4weNJgjs9iqkmy/8GjWWaEaiZNGsA66g?=
- =?us-ascii?Q?BB602Kye5JJjSZ60T1rgioNehzi6mZxrgnKmhU39ggUkkH4SCDTT/MggX9K7?=
- =?us-ascii?Q?a8ln1/jYo6AEB4WiJLHurVvDsci/T+RQkkaRhCXtPXHwe7aezaHeCVmPd5CC?=
- =?us-ascii?Q?ByYNhatqncKNKqPb/S0AYqubfq9gIWf46QeaezS8BS6KIAkyg/wHEXX0EK+X?=
- =?us-ascii?Q?STY3/vzzJdBmrP68BNA9LhQOMPsedyaXv/5juWqFvZ/MODgQ+o8hyYSxPWZx?=
- =?us-ascii?Q?QFizj2sN2wm/m4oVq2TEOZ/6sAlwExATzBaEdtIzBMlOyhNhc3NjjnLoRuBO?=
- =?us-ascii?Q?xYkulgo9FRctOh2/wGYBsKAumfwYkWcI++3PqQxaDrUlVOWAh2ySx68FYqR+?=
- =?us-ascii?Q?+Ak7Oek1xBtd/592mLZxyThV8Fi+iKjBpITYlr8e4HmcPN0SlEQxqvO41V19?=
- =?us-ascii?Q?GlyN3zJvs7DD0VIFDjXtENLggvvef1GBX+S04AdGLW1yaHSPA82+Wl3fEgJi?=
- =?us-ascii?Q?zb6uS/DGQh4uSCtffUR5ygw5YI2FefOKtcKvjN7A1ig2opuaGKBKDTYnhi2r?=
- =?us-ascii?Q?YZ9RkruJZBCogg/cMIZbIVfi6osu4t66crBQ++rYPiMb5omZmBVwy1VrIqZv?=
- =?us-ascii?Q?86RKIMfaK/AqhnHmSeZPzBP+sh0UiPNC3WWMC2/NeJP2lkyjqQAwFLnmAb8k?=
- =?us-ascii?Q?9HfAWAJw5bMSANGfkYlTWyespxZ7WVS5p7fZqGH392HhATHeBUMR75b6Hole?=
- =?us-ascii?Q?BoOsrGLUZqlmyUVENm1AOZbEO7FEk/KuUZavqziCuzTXSLhXi93CRh/JQU/e?=
- =?us-ascii?Q?byUkiKL01vFjXlPh7tjBgYmRYSfoLJnoNsNiR90wAHLLFEv2Pyvke9NNJPHW?=
- =?us-ascii?Q?By4ZPJQCOpXv+13mJKM5GPxAafzgqEJiFqy8DqMQ/mr8whuCL/smm1pI6C71?=
- =?us-ascii?Q?F1CJ6ujO2ofgF5hGOXw4biIjpG7hvhniLEL6PZuRuv7qd4rclxpMBtilP/od?=
- =?us-ascii?Q?odZNWmnU4sVL7IlVAeKXebPe1D5yEQxvFY6O3v6vr/HlLz6RV5wjL+nejkXd?=
- =?us-ascii?Q?SD/OHx8k4yGbTyJALODdeO/KKiIdtOP70nWlFM08ADfLdVZPsvqtxFCeRWqx?=
- =?us-ascii?Q?CI+XkaoHU8EY0Vxr8H1Ddi9WYOr1RHGD4B5X5zogdWRMNDcS1mwwWNzt/bua?=
- =?us-ascii?Q?B0ZXyMNZKWNOBgIZamFNkrn55ChXP6oD9lrBH6sl3ezvA96sZMhlsXz4eQ3b?=
- =?us-ascii?Q?BbagBxtJRYOYrmUBJ1NKvzgrVQOAHtM+THCR?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2025 10:16:46.4375
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b4ef34b4-bcae-4dd1-ab33-08ddf69c7939
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BY1PEPF0001AE16.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9141
+Subject: Re: [PATCH net-next v3 0/9] eth: fbnic: add devlink health support
+ for FW
+ crashes and OTP mem corruptions
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175819081475.2354627.7445984699761115470.git-patchwork-notify@kernel.org>
+Date: Thu, 18 Sep 2025 10:20:14 +0000
+References: <20250916231420.1693955-1-kuba@kernel.org>
+In-Reply-To: <20250916231420.1693955-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ alexanderduyck@fb.com, lee@trager.us
 
-devlink_rate_node_get_by_name() and devlink_rate_nodes_destroy() have a
-couple of unnecessary static variables for iterating over devlink rates.
+Hello:
 
-This could lead to races/corruption/unhappiness if two concurrent
-operations execute the same function.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Remove 'static' from both. It's amazing this was missed for 4+ years.
-While at it, I confirmed there are no more examples of this mistake in
-net/ with 1, 2 or 3 levels of indentation.
+On Tue, 16 Sep 2025 16:14:11 -0700 you wrote:
+> Add support for FW crash detection and a corresponding devlink health
+> reporter. Add a reporter for checking OTP memory health.
+> 
+> The output is not particularly exciting:
+> 
+>   # devlink  health show
+>   pci/0000:01:00.0:
+>     reporter fw
+>       state healthy error 0 recover 0 auto_dump true
+>     reporter otp
+>       state healthy error 0 recover 0 auto_dump true
+>   # devlink health diagnose pci/0000:01:00.0 reporter fw
+>    FW uptime: 0
+>   # devlink health dump show pci/0000:01:00.0 reporter fw
+>    FW coredump:
+>       5a 45 01 00 04 00 06 00 00 00 00 00 4d 01 00 d0
+>       .. lots of hex follows ..
+>   # devlink health dump show pci/0000:01:00.0 reporter otp
+>    OTP:
+>      Status: 0 Data: 0 ECC: 0
+> 
+> [...]
 
-Fixes: a8ecb93ef03d ("devlink: Introduce rate nodes")
-Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
----
- net/devlink/rate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Here is the summary with links:
+  - [net-next,v3,1/9] eth: fbnic: make fbnic_fw_log_write() parameter const
+    https://git.kernel.org/netdev/net-next/c/e6c8ab0a1129
+  - [net-next,v3,2/9] eth: fbnic: use fw uptime to detect fw crashes
+    https://git.kernel.org/netdev/net-next/c/7fd1f7bac2b8
+  - [net-next,v3,3/9] eth: fbnic: factor out clearing the action TCAM
+    https://git.kernel.org/netdev/net-next/c/504f8b7119eb
+  - [net-next,v3,4/9] eth: fbnic: reprogram TCAMs after FW crash
+    https://git.kernel.org/netdev/net-next/c/6ae7da8e9e06
+  - [net-next,v3,5/9] eth: fbnic: support allocating FW completions with extra space
+    https://git.kernel.org/netdev/net-next/c/a8896d14fc0c
+  - [net-next,v3,6/9] eth: fbnic: support FW communication for core dump
+    https://git.kernel.org/netdev/net-next/c/5df1d0a08483
+  - [net-next,v3,7/9] eth: fbnic: add FW health reporter
+    https://git.kernel.org/netdev/net-next/c/005a54722e9d
+  - [net-next,v3,8/9] eth: fbnic: report FW uptime in health diagnose
+    https://git.kernel.org/netdev/net-next/c/6da8344f92df
+  - [net-next,v3,9/9] eth: fbnic: add OTP health reporter
+    https://git.kernel.org/netdev/net-next/c/e6afcd60c26f
 
-diff --git a/net/devlink/rate.c b/net/devlink/rate.c
-index 110b3fa8a0b1..264fb82cba19 100644
---- a/net/devlink/rate.c
-+++ b/net/devlink/rate.c
-@@ -34,7 +34,7 @@ devlink_rate_leaf_get_from_info(struct devlink *devlink, struct genl_info *info)
- static struct devlink_rate *
- devlink_rate_node_get_by_name(struct devlink *devlink, const char *node_name)
- {
--	static struct devlink_rate *devlink_rate;
-+	struct devlink_rate *devlink_rate;
- 
- 	list_for_each_entry(devlink_rate, &devlink->rate_list, list) {
- 		if (devlink_rate_is_node(devlink_rate) &&
-@@ -819,8 +819,8 @@ EXPORT_SYMBOL_GPL(devl_rate_leaf_destroy);
-  */
- void devl_rate_nodes_destroy(struct devlink *devlink)
- {
--	static struct devlink_rate *devlink_rate, *tmp;
- 	const struct devlink_ops *ops = devlink->ops;
-+	struct devlink_rate *devlink_rate, *tmp;
- 
- 	devl_assert_locked(devlink);
- 
+You are awesome, thank you!
 -- 
-2.45.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
