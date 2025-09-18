@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-224453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2385B8542B
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:33:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 394EFB853FF
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:32:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21AA4563B06
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:26:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20E281C85F92
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:27:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8548330C62E;
-	Thu, 18 Sep 2025 14:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4294D30CD84;
+	Thu, 18 Sep 2025 14:25:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="eVkiIUBT"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="FQ37bTKB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E1C226CF7
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 14:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10883081C9
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 14:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758205528; cv=none; b=AjbBxA65dmXzu8vjG7RbtwnpuHmfQWD5TmnHDDATGVrhfATU/AJ2JlqRgi6IQ1Igya3D8M05Otc5ep1T2MtpjNmGdKHAHFWjNz1kMI565sbkyeJLnyJB2Hrv4Pk8rkB622a/p+rAMKdIh8ICZoNUXubXuQDQ7haMYdYIrbUWUlI=
+	t=1758205530; cv=none; b=GT3OOCTH4y+bqt4NIJHHMl1GexSQWmBGmUD5KYEciq7wvBiNEvBrHCq0rE6jA8UsNmj6gcIc0zcPoLJxzz/OQaTz+/2mK55SbVYMdXhIJH55XqRwW/8cjShuuLoldaI9zYTyWWKfwWqieYjlCJdWpRoqcWlir19tnR8dMKxwyr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758205528; c=relaxed/simple;
-	bh=aBRm/XwxIpa7dVLgAE2LsXwvOaMrrp+xrqYEgqGKLmE=;
+	s=arc-20240116; t=1758205530; c=relaxed/simple;
+	bh=FaiR8l9oCkqAi/uiFDiMmtemQQbDpIBNg6p2BtVk3lM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ojje4Sf/txtuBRJx/znn4g6J1vNSURM3Nr+Sy5ON6qSp+OuBRTR2QfH59Si+GAgYpwg/kPLNl5C5aCeSDyXFRdvFd9FnfQTUyxpgJrztPqBjzuXlaA11pkszu6UTTUpomFTsyx5iHks2sq0yEJTQq/fzu/mIaizLlWsp7tfSyOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=eVkiIUBT; arc=none smtp.client-ip=209.85.128.42
+	 MIME-Version:Content-Type; b=FcQ9K8Wwal5DE+FuyLbk3yEEWMAQTOoo14OycwSWDxj0sitYKZzABLaMhDRNQOvXkeF2yD0Fpfgq7a9yG6sZ533BjDqUKqQOSe+b909FafbQjUMiT3KYSa9cIiJ1l0EMIwUgO3g06HMXQ3ErYViaTWUQE9URstCWHYCREWvUMVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=FQ37bTKB; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-45f2c5ef00fso8578675e9.1
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 07:25:25 -0700 (PDT)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3ece0e4c5faso1193641f8f.1
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 07:25:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1758205524; x=1758810324; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1758205525; x=1758810325; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=z6LeW8LgrC+7IoQsPqWLjDrbYdl5hrv+bJnva256Q8c=;
-        b=eVkiIUBTt2Sdp9Ray80UNRhe6n0mH8Um+KkwgQzUkLihDqF9f3mxR15lUElO+BadYH
-         7TtV4eY026rxFfk4qcqNNCYrJYbH2IA4mII/lq28MT7UOsySD3DLKVMeLcCgLDAJ8FE5
-         QLahS9utmjDM5wNGNViMMIlAeWN3Z5ST3sFuxp8jUjYQSyYzosPUsJrIiHR4o89o7FrA
-         csvJ4cy/3fcmbKkhjHx7n4rEKIn9PLf+mUnRNoHMaB7cepqV7Ep8IehTon/LWsr6JtKP
-         rbE5SpMT8ekd3zcoB5fXy/ZSsTXQnVlP59OB2z84YU/rSyYewZOsCHTkhfTbaxyd42IO
-         Qf+w==
+        bh=7lBmPeK3AuNqBeSCK2HZQ76ad+uq7LonC1zVi1Y8g0c=;
+        b=FQ37bTKBCgx7pF83utzEu5/eEpnhR95B+sFqS2Klq/rCGj8CSgLyh1LDFoqR7jpzQ1
+         DOrFvdEOQICJB/hJ7+GrQjyrHgPctW0mlU+ZjvjEQBNdL2DzRjDLOBwjYYiORwaRs+18
+         uuuSvdq0z9d+QKmPNBwI8Cf9DOKpwtBHOzh/asxq2DTRThnRcUGugck+bvf51J+aj6Je
+         LYq7MSV9rdn1sGzoUREa6SwQd+KateEvqxEUWD7VBvKz/Ge7O5FYMZeURizL+I+IgtiK
+         CshgVxpH92FAipoZzlDpA2a/NOgEL+TqhKE4enJ9tc+TRkVTzCyopRjnthv2FQtrUMRD
+         Synw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758205524; x=1758810324;
+        d=1e100.net; s=20230601; t=1758205525; x=1758810325;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=z6LeW8LgrC+7IoQsPqWLjDrbYdl5hrv+bJnva256Q8c=;
-        b=JNiouRXgEjwhvl8DXwGg9D8elwQPD9HwWQdwpy9jAx8LwAPvmkRsSwPgJl/GqZrezy
-         Cmp0TQ3Lcu8eff4xH2HgoD0pKYg9zYsG1A1pPa4gxHxeYMbydBNUaleLG5BNO/+fhxz+
-         q2sfQCmccg6+d8BUUMpRNtf2KEvIJRu8XhDT/EZmZBAbU35Vg1edL/U82NdhLftmoczW
-         lgFwqJVV1BH1/+aB6UlSGtz1drz6al2/1o1Jawd/ZCOHnh/U32SiwFrdwfy/bP8ru6tN
-         +CznBKt6d12x3urJvK3FFH239+tAnv9JM6Wp+CxnJowRBrzqx9ocSXmq5VwhArizEhSz
-         dp3g==
-X-Forwarded-Encrypted: i=1; AJvYcCWxImUc2yRU2e8TX/2+bFcmKNu6ewfsOyyUg799zkJEHf9OHXusnPol2Y6iRsg704RogsXivDQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylivP7uwy/Fm5lUXtpCSMMHUZupfFiGBaIIHUx3JswnlePwI/i
-	zHcnBZ1G6wGymiM87OspYV81LZxYldmZ3bNZd4UtWtkFx1cBwpGVYWqcO4zpRr8EXMQ=
-X-Gm-Gg: ASbGncsBmMt3Ez5Pf5Ji9TTMToBmST38l9wZb4yRpqSIv4PNW9S+sQr28ROCvkb4wZf
-	dNC0WEsbaJz7JzafqrOJ1o7liChYQ/1sQUHOTGLLTnhBySVNP9FCt8DQjYe+jjZjqqKBV+GxC2k
-	aAo7VdTUXQXOuihH0ewPgtao26XXDf58rNAS3UYjdzMTtu1Ole56oodm6TfGm2X7iKqmfZFG36U
-	vY8GeKLu1he3Kn+BIi/C5W+MZ0t/Nq/qM32GCUP95fp604jLzYw6E8IXDr4UBy65QD/poFTZxwW
-	qHCoMcrzFxYbgiGNvxwOZukEBPEQIJQ9aATIi7OMZ19h0oCMbyCUy/OWH6zXzjpVye/Cya8KjA0
-	K3ArdWOV/vt/Qve+HPu7wd8hKVoG7ia//8VOhKFSdiUfdnVAUxY+AhnBCvbqF2kKg
-X-Google-Smtp-Source: AGHT+IGNAo7C+zMY83r5ou8kSpMfx66wb7cWrnyjxz0Myg35w7WZ/V3ybbJLqy5zIvKk9BO8efSDMg==
-X-Received: by 2002:a05:600c:1c82:b0:45d:d68c:2a43 with SMTP id 5b1f17b1804b1-46206f04ef8mr55880735e9.33.1758205523876;
-        Thu, 18 Sep 2025 07:25:23 -0700 (PDT)
+        bh=7lBmPeK3AuNqBeSCK2HZQ76ad+uq7LonC1zVi1Y8g0c=;
+        b=rKrkXaUoMHGjxLO9qZCNBw+EaP8xtOEr/NyvLkx332csopJbFn4rAPQ8FvuUGZwsFr
+         1VexfyFMgQQbhTCOzB3ykgSTr7sjusjmAjTG7G7RGFP9autndsVa8ku7jergp3231kAX
+         2AxqGRWJ2CRATwzIbO0zPn6OeeQSHFi82JLNTysQBU2Em+LrntOxlJmBtxwJ2wf/RBc/
+         G/UsJBsUz1KkoRVVyV4ydU4m+LL+4+MwsMWJsTMqjZCCuu52HAN5TsULjJow7sKFLYPJ
+         LjVvBHu+1Xv/sGP6yO7iS62ISydBMbrN6Z25wClaWsjWDeTX3X6eaYmAUkz7eLRZa/PR
+         269g==
+X-Forwarded-Encrypted: i=1; AJvYcCVxzQyqL5PYGpQxmMNCXeTlIWw4V3lSn1t+nUbMwDmZtAhnp8V2ZlkpAm+ARfGeCkrMxpHYycs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXU3WkOZQyCGJ79sF9/lJ4Z1fHX7RIvOAMQhyumE8gn7b0zrBO
+	oVC/KcTTNznxsuHEydssmae5vlQR6WmHjBUAowl/UID8L9F+HK2tbPximdLruYJG34M=
+X-Gm-Gg: ASbGncsqKYWtJ1WK57Ut+ZSmtwj3wbExbyNyQiYIeQ9ypClGBq5s3gKw1Omta8gw6sP
+	O111wtrz+YMNx8BFuk7MoVwrKAuwV6XHitl0PAX8HfczESPv8H2iCuS6bQaz/QzxHWetZQaqtyJ
+	IC1GBHn/7D516ObbgC04uTykoNpMd5tdoauL4ukHFlN137RyIVph/J4c2b1XH8DoWcrnNDZkvnW
+	kPTam2h2YLUNGSOkd1tCUpGYkI9M1LhCfN7PcS3x3o7yX8vxgFD7X6Js9u4xrliU4/7Mi9AOx/W
+	Pdtiz+vWyF+b9/NEdntYHsRtwQNAXeDqrJI/QqRxeWHhEnryv/NJ0MzlTIlluft4yQ2WRkpYbKK
+	LJRf4xkHAD6p8uZizrY9faxQb8P1F+nnbTgbs1wRXsk/3Ve+D02XXfInowH1RKK1n
+X-Google-Smtp-Source: AGHT+IFtq6r+1eGQt9fvdSrxPI4HC4RAZC4i6QCLHQh8bm9vebEfPQolxHaAnvao8EY0zqdiziG8tg==
+X-Received: by 2002:a5d:5f91:0:b0:3d3:1ad0:e8b7 with SMTP id ffacd0b85a97d-3ecdf9afcabmr5817016f8f.12.1758205524931;
+        Thu, 18 Sep 2025 07:25:24 -0700 (PDT)
 Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45f32085823sm63270675e9.0.2025.09.18.07.25.23
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45f32085823sm63270675e9.0.2025.09.18.07.25.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Sep 2025 07:25:23 -0700 (PDT)
+        Thu, 18 Sep 2025 07:25:24 -0700 (PDT)
 From: Marco Crivellari <marco.crivellari@suse.com>
 To: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -86,9 +86,9 @@ Cc: Tejun Heo <tj@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v2 2/3] net: replace use of system_wq with system_percpu_wq
-Date: Thu, 18 Sep 2025 16:24:26 +0200
-Message-ID: <20250918142427.309519-3-marco.crivellari@suse.com>
+Subject: [PATCH net-next v2 3/3] net: WQ_PERCPU added to alloc_workqueue users
+Date: Thu, 18 Sep 2025 16:24:27 +0200
+Message-ID: <20250918142427.309519-4-marco.crivellari@suse.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250918142427.309519-1-marco.crivellari@suse.com>
 References: <20250918142427.309519-1-marco.crivellari@suse.com>
@@ -98,6 +98,7 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 Currently if a user enqueue a work item using schedule_delayed_work() the
@@ -105,306 +106,591 @@ used wq is "system_wq" (per-cpu wq) while queue_delayed_work() use
 WORK_CPU_UNBOUND (used when a cpu is not specified). The same applies to
 schedule_work() that is using system_wq and queue_work(), that makes use
 again of WORK_CPU_UNBOUND.
-
 This lack of consistentcy cannot be addressed without refactoring the API.
 
-system_unbound_wq should be the default workqueue so as not to enforce
-locality constraints for random work whenever it's not required.
+alloc_workqueue() treats all queues as per-CPU by default, while unbound
+workqueues must opt-in via WQ_UNBOUND.
 
-Adding system_dfl_wq to encourage its use when unbound work should be used.
+This default is suboptimal: most workloads benefit from unbound queues,
+allowing the scheduler to place worker threads where they’re needed and
+reducing noise when CPUs are isolated.
 
-The old system_unbound_wq will be kept for a few release cycles.
+This change adds a new WQ_PERCPU flag at the network subsystem, to explicitly
+request the use of the per-CPU behavior. Both flags coexist for one release
+cycle to allow callers to transition their calls.
+
+Once migration is complete, WQ_UNBOUND can be removed and unbound will
+become the implicit default.
+
+With the introduction of the WQ_PERCPU flag (equivalent to !WQ_UNBOUND),
+any alloc_workqueue() caller that doesn’t explicitly specify WQ_UNBOUND
+must now use WQ_PERCPU.
+
+All existing users have been updated accordingly.
 
 Suggested-by: Tejun Heo <tj@kernel.org>
 Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
 ---
- drivers/net/ethernet/sfc/efx_channels.c       |  2 +-
- drivers/net/ethernet/sfc/siena/efx_channels.c |  2 +-
- drivers/net/phy/sfp.c                         | 12 ++++++------
- net/bridge/br_cfm.c                           |  6 +++---
- net/bridge/br_mrp.c                           |  8 ++++----
- net/ceph/mon_client.c                         |  2 +-
- net/core/skmsg.c                              |  2 +-
- net/devlink/core.c                            |  2 +-
- net/ipv4/inet_fragment.c                      |  2 +-
- net/netfilter/nf_conntrack_ecache.c           |  2 +-
- net/openvswitch/dp_notify.c                   |  2 +-
- net/rfkill/input.c                            |  2 +-
- net/smc/smc_core.c                            |  2 +-
- net/vmw_vsock/af_vsock.c                      |  2 +-
- 14 files changed, 24 insertions(+), 24 deletions(-)
+ drivers/net/can/spi/hi311x.c                             | 3 ++-
+ drivers/net/can/spi/mcp251x.c                            | 3 ++-
+ drivers/net/ethernet/cavium/liquidio/lio_core.c          | 2 +-
+ drivers/net/ethernet/cavium/liquidio/lio_main.c          | 8 +++++---
+ drivers/net/ethernet/cavium/liquidio/lio_vf_main.c       | 3 ++-
+ drivers/net/ethernet/cavium/liquidio/request_manager.c   | 2 +-
+ drivers/net/ethernet/cavium/liquidio/response_manager.c  | 3 ++-
+ drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c         | 2 +-
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c  | 3 ++-
+ drivers/net/ethernet/intel/fm10k/fm10k_main.c            | 2 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c              | 2 +-
+ drivers/net/ethernet/marvell/octeontx2/af/cgx.c          | 2 +-
+ drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c   | 2 +-
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c      | 2 +-
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c      | 2 +-
+ drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c | 3 ++-
+ drivers/net/ethernet/marvell/prestera/prestera_main.c    | 2 +-
+ drivers/net/ethernet/marvell/prestera/prestera_pci.c     | 2 +-
+ drivers/net/ethernet/mellanox/mlxsw/core.c               | 4 ++--
+ drivers/net/ethernet/netronome/nfp/nfp_main.c            | 2 +-
+ drivers/net/ethernet/qlogic/qed/qed_main.c               | 3 ++-
+ drivers/net/ethernet/wiznet/w5100.c                      | 2 +-
+ drivers/net/fjes/fjes_main.c                             | 5 +++--
+ drivers/net/wireguard/device.c                           | 6 ++++--
+ drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c               | 3 ++-
+ drivers/net/wwan/wwan_hwsim.c                            | 2 +-
+ net/ceph/messenger.c                                     | 3 ++-
+ net/core/sock_diag.c                                     | 2 +-
+ net/rds/ib_rdma.c                                        | 3 ++-
+ net/rxrpc/rxperf.c                                       | 2 +-
+ net/smc/af_smc.c                                         | 6 +++---
+ net/smc/smc_core.c                                       | 2 +-
+ net/tls/tls_device.c                                     | 2 +-
+ net/vmw_vsock/virtio_transport.c                         | 2 +-
+ net/vmw_vsock/vsock_loopback.c                           | 2 +-
+ 35 files changed, 57 insertions(+), 42 deletions(-)
 
-diff --git a/drivers/net/ethernet/sfc/efx_channels.c b/drivers/net/ethernet/sfc/efx_channels.c
-index 0f66324ed351..ed3a96ebc7f3 100644
---- a/drivers/net/ethernet/sfc/efx_channels.c
-+++ b/drivers/net/ethernet/sfc/efx_channels.c
-@@ -1281,7 +1281,7 @@ static int efx_poll(struct napi_struct *napi, int budget)
- 		time = jiffies - channel->rfs_last_expiry;
- 		/* Would our quota be >= 20? */
- 		if (channel->rfs_filter_count * time >= 600 * HZ)
--			mod_delayed_work(system_wq, &channel->filter_work, 0);
-+			mod_delayed_work(system_percpu_wq, &channel->filter_work, 0);
- #endif
+diff --git a/drivers/net/can/spi/hi311x.c b/drivers/net/can/spi/hi311x.c
+index 09ae218315d7..96f23311b4ee 100644
+--- a/drivers/net/can/spi/hi311x.c
++++ b/drivers/net/can/spi/hi311x.c
+@@ -770,7 +770,8 @@ static int hi3110_open(struct net_device *net)
+ 		goto out_close;
+ 	}
  
- 		/* There is no race here; although napi_disable() will
-diff --git a/drivers/net/ethernet/sfc/siena/efx_channels.c b/drivers/net/ethernet/sfc/siena/efx_channels.c
-index 703419866d18..fc075ab6b7b5 100644
---- a/drivers/net/ethernet/sfc/siena/efx_channels.c
-+++ b/drivers/net/ethernet/sfc/siena/efx_channels.c
-@@ -1300,7 +1300,7 @@ static int efx_poll(struct napi_struct *napi, int budget)
- 		time = jiffies - channel->rfs_last_expiry;
- 		/* Would our quota be >= 20? */
- 		if (channel->rfs_filter_count * time >= 600 * HZ)
--			mod_delayed_work(system_wq, &channel->filter_work, 0);
-+			mod_delayed_work(system_percpu_wq, &channel->filter_work, 0);
- #endif
+-	priv->wq = alloc_workqueue("hi3110_wq", WQ_FREEZABLE | WQ_MEM_RECLAIM,
++	priv->wq = alloc_workqueue("hi3110_wq",
++				   WQ_FREEZABLE | WQ_MEM_RECLAIM | WQ_PERCPU,
+ 				   0);
+ 	if (!priv->wq) {
+ 		ret = -ENOMEM;
+diff --git a/drivers/net/can/spi/mcp251x.c b/drivers/net/can/spi/mcp251x.c
+index 313e1d241f01..b797e08499d7 100644
+--- a/drivers/net/can/spi/mcp251x.c
++++ b/drivers/net/can/spi/mcp251x.c
+@@ -1378,7 +1378,8 @@ static int mcp251x_can_probe(struct spi_device *spi)
+ 	if (ret)
+ 		goto out_clk;
  
- 		/* There is no race here; although napi_disable() will
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index 4cd1d6c51dc2..eaccd92253a1 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -912,7 +912,7 @@ static void sfp_soft_start_poll(struct sfp *sfp)
+-	priv->wq = alloc_workqueue("mcp251x_wq", WQ_FREEZABLE | WQ_MEM_RECLAIM,
++	priv->wq = alloc_workqueue("mcp251x_wq",
++				   WQ_FREEZABLE | WQ_MEM_RECLAIM | WQ_PERCPU,
+ 				   0);
+ 	if (!priv->wq) {
+ 		ret = -ENOMEM;
+diff --git a/drivers/net/ethernet/cavium/liquidio/lio_core.c b/drivers/net/ethernet/cavium/liquidio/lio_core.c
+index 674c54831875..215dac201b4a 100644
+--- a/drivers/net/ethernet/cavium/liquidio/lio_core.c
++++ b/drivers/net/ethernet/cavium/liquidio/lio_core.c
+@@ -472,7 +472,7 @@ int setup_rx_oom_poll_fn(struct net_device *netdev)
+ 		q_no = lio->linfo.rxpciq[q].s.q_no;
+ 		wq = &lio->rxq_status_wq[q_no];
+ 		wq->wq = alloc_workqueue("rxq-oom-status",
+-					 WQ_MEM_RECLAIM, 0);
++					 WQ_MEM_RECLAIM | WQ_PERCPU, 0);
+ 		if (!wq->wq) {
+ 			dev_err(&oct->pci_dev->dev, "unable to create cavium rxq oom status wq\n");
+ 			return -ENOMEM;
+diff --git a/drivers/net/ethernet/cavium/liquidio/lio_main.c b/drivers/net/ethernet/cavium/liquidio/lio_main.c
+index 1d79f6eaa41f..8e2fcec26ea1 100644
+--- a/drivers/net/ethernet/cavium/liquidio/lio_main.c
++++ b/drivers/net/ethernet/cavium/liquidio/lio_main.c
+@@ -526,7 +526,8 @@ static inline int setup_link_status_change_wq(struct net_device *netdev)
+ 	struct octeon_device *oct = lio->oct_dev;
  
- 	if (sfp->state_soft_mask & (SFP_F_LOS | SFP_F_TX_FAULT) &&
- 	    !sfp->need_poll)
--		mod_delayed_work(system_wq, &sfp->poll, poll_jiffies);
-+		mod_delayed_work(system_percpu_wq, &sfp->poll, poll_jiffies);
- 	mutex_unlock(&sfp->st_mutex);
- }
+ 	lio->link_status_wq.wq = alloc_workqueue("link-status",
+-						 WQ_MEM_RECLAIM, 0);
++						 WQ_MEM_RECLAIM | WQ_PERCPU,
++						 0);
+ 	if (!lio->link_status_wq.wq) {
+ 		dev_err(&oct->pci_dev->dev, "unable to create cavium link status wq\n");
+ 		return -1;
+@@ -659,7 +660,8 @@ static inline int setup_sync_octeon_time_wq(struct net_device *netdev)
+ 	struct octeon_device *oct = lio->oct_dev;
  
-@@ -1683,7 +1683,7 @@ static void sfp_hwmon_probe(struct work_struct *work)
- 	err = sfp_read(sfp, true, 0, &sfp->diag, sizeof(sfp->diag));
- 	if (err < 0) {
- 		if (sfp->hwmon_tries--) {
--			mod_delayed_work(system_wq, &sfp->hwmon_probe,
-+			mod_delayed_work(system_percpu_wq, &sfp->hwmon_probe,
- 					 T_PROBE_RETRY_SLOW);
- 		} else {
- 			dev_warn(sfp->dev, "hwmon probe failed: %pe\n",
-@@ -1710,7 +1710,7 @@ static void sfp_hwmon_probe(struct work_struct *work)
- static int sfp_hwmon_insert(struct sfp *sfp)
+ 	lio->sync_octeon_time_wq.wq =
+-		alloc_workqueue("update-octeon-time", WQ_MEM_RECLAIM, 0);
++		alloc_workqueue("update-octeon-time",
++				WQ_MEM_RECLAIM | WQ_PERCPU, 0);
+ 	if (!lio->sync_octeon_time_wq.wq) {
+ 		dev_err(&oct->pci_dev->dev, "Unable to create wq to update octeon time\n");
+ 		return -1;
+@@ -1734,7 +1736,7 @@ static inline int setup_tx_poll_fn(struct net_device *netdev)
+ 	struct octeon_device *oct = lio->oct_dev;
+ 
+ 	lio->txq_status_wq.wq = alloc_workqueue("txq-status",
+-						WQ_MEM_RECLAIM, 0);
++						WQ_MEM_RECLAIM | WQ_PERCPU, 0);
+ 	if (!lio->txq_status_wq.wq) {
+ 		dev_err(&oct->pci_dev->dev, "unable to create cavium txq status wq\n");
+ 		return -1;
+diff --git a/drivers/net/ethernet/cavium/liquidio/lio_vf_main.c b/drivers/net/ethernet/cavium/liquidio/lio_vf_main.c
+index 62c2eadc33e3..3230dff5ba05 100644
+--- a/drivers/net/ethernet/cavium/liquidio/lio_vf_main.c
++++ b/drivers/net/ethernet/cavium/liquidio/lio_vf_main.c
+@@ -304,7 +304,8 @@ static int setup_link_status_change_wq(struct net_device *netdev)
+ 	struct octeon_device *oct = lio->oct_dev;
+ 
+ 	lio->link_status_wq.wq = alloc_workqueue("link-status",
+-						 WQ_MEM_RECLAIM, 0);
++						 WQ_MEM_RECLAIM | WQ_PERCPU,
++						 0);
+ 	if (!lio->link_status_wq.wq) {
+ 		dev_err(&oct->pci_dev->dev, "unable to create cavium link status wq\n");
+ 		return -1;
+diff --git a/drivers/net/ethernet/cavium/liquidio/request_manager.c b/drivers/net/ethernet/cavium/liquidio/request_manager.c
+index de8a6ce86ad7..8b8e9953c4ee 100644
+--- a/drivers/net/ethernet/cavium/liquidio/request_manager.c
++++ b/drivers/net/ethernet/cavium/liquidio/request_manager.c
+@@ -132,7 +132,7 @@ int octeon_init_instr_queue(struct octeon_device *oct,
+ 	oct->fn_list.setup_iq_regs(oct, iq_no);
+ 
+ 	oct->check_db_wq[iq_no].wq = alloc_workqueue("check_iq_db",
+-						     WQ_MEM_RECLAIM,
++						     WQ_MEM_RECLAIM | WQ_PERCPU,
+ 						     0);
+ 	if (!oct->check_db_wq[iq_no].wq) {
+ 		vfree(iq->request_list);
+diff --git a/drivers/net/ethernet/cavium/liquidio/response_manager.c b/drivers/net/ethernet/cavium/liquidio/response_manager.c
+index 861050966e18..de1a8335b545 100644
+--- a/drivers/net/ethernet/cavium/liquidio/response_manager.c
++++ b/drivers/net/ethernet/cavium/liquidio/response_manager.c
+@@ -39,7 +39,8 @@ int octeon_setup_response_list(struct octeon_device *oct)
+ 	}
+ 	spin_lock_init(&oct->cmd_resp_wqlock);
+ 
+-	oct->dma_comp_wq.wq = alloc_workqueue("dma-comp", WQ_MEM_RECLAIM, 0);
++	oct->dma_comp_wq.wq = alloc_workqueue("dma-comp",
++					      WQ_MEM_RECLAIM | WQ_PERCPU, 0);
+ 	if (!oct->dma_comp_wq.wq) {
+ 		dev_err(&oct->pci_dev->dev, "failed to create wq thread\n");
+ 		return -ENOMEM;
+diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
+index 0f4efd505332..c96d1d6ba8fe 100644
+--- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
++++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
+@@ -4884,7 +4884,7 @@ static int dpaa2_eth_probe(struct fsl_mc_device *dpni_dev)
+ 	priv->tx_tstamp_type = HWTSTAMP_TX_OFF;
+ 	priv->rx_tstamp = false;
+ 
+-	priv->dpaa2_ptp_wq = alloc_workqueue("dpaa2_ptp_wq", 0, 0);
++	priv->dpaa2_ptp_wq = alloc_workqueue("dpaa2_ptp_wq", WQ_PERCPU, 0);
+ 	if (!priv->dpaa2_ptp_wq) {
+ 		err = -ENOMEM;
+ 		goto err_wq_alloc;
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+index f5457ae0b64f..9d34d28ff168 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+@@ -12912,7 +12912,8 @@ static int __init hclge_init(void)
  {
- 	if (sfp->have_a2 && sfp->id.ext.diagmon & SFP_DIAGMON_DDM) {
--		mod_delayed_work(system_wq, &sfp->hwmon_probe, 1);
-+		mod_delayed_work(system_percpu_wq, &sfp->hwmon_probe, 1);
- 		sfp->hwmon_tries = R_PROBE_RETRY_SLOW;
- 	}
+ 	pr_debug("%s is initializing\n", HCLGE_NAME);
  
-@@ -2564,7 +2564,7 @@ static void sfp_sm_module(struct sfp *sfp, unsigned int event)
- 		/* Force a poll to re-read the hardware signal state after
- 		 * sfp_sm_mod_probe() changed state_hw_mask.
- 		 */
--		mod_delayed_work(system_wq, &sfp->poll, 1);
-+		mod_delayed_work(system_percpu_wq, &sfp->poll, 1);
+-	hclge_wq = alloc_workqueue("%s", WQ_UNBOUND, 0, HCLGE_NAME);
++	hclge_wq = alloc_workqueue("%s", WQ_UNBOUND, 0,
++				   HCLGE_NAME);
+ 	if (!hclge_wq) {
+ 		pr_err("%s: failed to create workqueue\n", HCLGE_NAME);
+ 		return -ENOMEM;
+diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_main.c b/drivers/net/ethernet/intel/fm10k/fm10k_main.c
+index 142f07ca8bc0..b8c15b837fda 100644
+--- a/drivers/net/ethernet/intel/fm10k/fm10k_main.c
++++ b/drivers/net/ethernet/intel/fm10k/fm10k_main.c
+@@ -37,7 +37,7 @@ static int __init fm10k_init_module(void)
+ 	pr_info("%s\n", fm10k_copyright);
  
- 		err = sfp_hwmon_insert(sfp);
- 		if (err)
-@@ -3009,7 +3009,7 @@ static void sfp_poll(struct work_struct *work)
- 	// it's unimportant if we race while reading this.
- 	if (sfp->state_soft_mask & (SFP_F_LOS | SFP_F_TX_FAULT) ||
- 	    sfp->need_poll)
--		mod_delayed_work(system_wq, &sfp->poll, poll_jiffies);
-+		mod_delayed_work(system_percpu_wq, &sfp->poll, poll_jiffies);
- }
- 
- static struct sfp *sfp_alloc(struct device *dev)
-@@ -3179,7 +3179,7 @@ static int sfp_probe(struct platform_device *pdev)
- 	}
- 
- 	if (sfp->need_poll)
--		mod_delayed_work(system_wq, &sfp->poll, poll_jiffies);
-+		mod_delayed_work(system_percpu_wq, &sfp->poll, poll_jiffies);
- 
- 	/* We could have an issue in cases no Tx disable pin is available or
- 	 * wired as modules using a laser as their light source will continue to
-diff --git a/net/bridge/br_cfm.c b/net/bridge/br_cfm.c
-index a3c755d0a09d..c2c1c7d44c61 100644
---- a/net/bridge/br_cfm.c
-+++ b/net/bridge/br_cfm.c
-@@ -134,7 +134,7 @@ static void ccm_rx_timer_start(struct br_cfm_peer_mep *peer_mep)
- 	 * of the configured CC 'expected_interval'
- 	 * in order to detect CCM defect after 3.25 interval.
+ 	/* create driver workqueue */
+-	fm10k_workqueue = alloc_workqueue("%s", WQ_MEM_RECLAIM, 0,
++	fm10k_workqueue = alloc_workqueue("%s", WQ_MEM_RECLAIM | WQ_PERCPU, 0,
+ 					  fm10k_driver_name);
+ 	if (!fm10k_workqueue)
+ 		return -ENOMEM;
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index b14019d44b58..02fccdbbc288 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -16617,7 +16617,7 @@ static int __init i40e_init_module(void)
+ 	 * since we need to be able to guarantee forward progress even under
+ 	 * memory pressure.
  	 */
--	queue_delayed_work(system_wq, &peer_mep->ccm_rx_dwork,
-+	queue_delayed_work(system_percpu_wq, &peer_mep->ccm_rx_dwork,
- 			   usecs_to_jiffies(interval_us / 4));
- }
+-	i40e_wq = alloc_workqueue("%s", 0, 0, i40e_driver_name);
++	i40e_wq = alloc_workqueue("%s", WQ_PERCPU, 0, i40e_driver_name);
+ 	if (!i40e_wq) {
+ 		pr_err("%s: Failed to create workqueue\n", i40e_driver_name);
+ 		return -ENOMEM;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+index 0c46ba8a5adc..ca1343f43379 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+@@ -2005,7 +2005,7 @@ static int cgx_probe(struct pci_dev *pdev, const struct pci_device_id *id)
  
-@@ -285,7 +285,7 @@ static void ccm_tx_work_expired(struct work_struct *work)
- 		ccm_frame_tx(skb);
+ 	/* init wq for processing linkup requests */
+ 	INIT_WORK(&cgx->cgx_cmd_work, cgx_lmac_linkup_work);
+-	cgx->cgx_cmd_workq = alloc_workqueue("cgx_cmd_workq", 0, 0);
++	cgx->cgx_cmd_workq = alloc_workqueue("cgx_cmd_workq", WQ_PERCPU, 0);
+ 	if (!cgx->cgx_cmd_workq) {
+ 		dev_err(dev, "alloc workqueue failed for cgx cmd");
+ 		err = -ENOMEM;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c b/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
+index d7030dfa5dad..a80c8e7c94f2 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
+@@ -913,7 +913,7 @@ int rvu_mcs_init(struct rvu *rvu)
+ 	/* Initialize the wq for handling mcs interrupts */
+ 	INIT_LIST_HEAD(&rvu->mcs_intrq_head);
+ 	INIT_WORK(&rvu->mcs_intr_work, mcs_intr_handler_task);
+-	rvu->mcs_intr_wq = alloc_workqueue("mcs_intr_wq", 0, 0);
++	rvu->mcs_intr_wq = alloc_workqueue("mcs_intr_wq", WQ_PERCPU, 0);
+ 	if (!rvu->mcs_intr_wq) {
+ 		dev_err(rvu->dev, "mcs alloc workqueue failed\n");
+ 		return -ENOMEM;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+index 3303c475414a..3abd750a4bd7 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+@@ -315,7 +315,7 @@ static int cgx_lmac_event_handler_init(struct rvu *rvu)
+ 	spin_lock_init(&rvu->cgx_evq_lock);
+ 	INIT_LIST_HEAD(&rvu->cgx_evq_head);
+ 	INIT_WORK(&rvu->cgx_evh_work, cgx_evhandler_task);
+-	rvu->cgx_evh_wq = alloc_workqueue("rvu_evh_wq", 0, 0);
++	rvu->cgx_evh_wq = alloc_workqueue("rvu_evh_wq", WQ_PERCPU, 0);
+ 	if (!rvu->cgx_evh_wq) {
+ 		dev_err(rvu->dev, "alloc workqueue failed");
+ 		return -ENOMEM;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
+index 03099bc570bd..4415d0ce9aef 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
+@@ -376,7 +376,7 @@ int rvu_rep_install_mcam_rules(struct rvu *rvu)
+ 	spin_lock_init(&rvu->rep_evtq_lock);
+ 	INIT_LIST_HEAD(&rvu->rep_evtq_head);
+ 	INIT_WORK(&rvu->rep_evt_work, rvu_rep_wq_handler);
+-	rvu->rep_evt_wq = alloc_workqueue("rep_evt_wq", 0, 0);
++	rvu->rep_evt_wq = alloc_workqueue("rep_evt_wq", WQ_PERCPU, 0);
+ 	if (!rvu->rep_evt_wq) {
+ 		dev_err(rvu->dev, "REP workqueue allocation failed\n");
+ 		return -ENOMEM;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+index c691f0722154..77543d472345 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+@@ -798,7 +798,8 @@ int cn10k_ipsec_init(struct net_device *netdev)
+ 	pf->ipsec.sa_size = sa_size;
  
- 	interval_us = interval_to_us(mep->cc_config.exp_interval);
--	queue_delayed_work(system_wq, &mep->ccm_tx_dwork,
-+	queue_delayed_work(system_percpu_wq, &mep->ccm_tx_dwork,
- 			   usecs_to_jiffies(interval_us));
- }
+ 	INIT_WORK(&pf->ipsec.sa_work, cn10k_ipsec_sa_wq_handler);
+-	pf->ipsec.sa_workq = alloc_workqueue("cn10k_ipsec_sa_workq", 0, 0);
++	pf->ipsec.sa_workq = alloc_workqueue("cn10k_ipsec_sa_workq",
++					     WQ_PERCPU, 0);
+ 	if (!pf->ipsec.sa_workq) {
+ 		netdev_err(pf->netdev, "SA alloc workqueue failed\n");
+ 		return -ENOMEM;
+diff --git a/drivers/net/ethernet/marvell/prestera/prestera_main.c b/drivers/net/ethernet/marvell/prestera/prestera_main.c
+index 71ffb55d1fc4..65e7ef033bde 100644
+--- a/drivers/net/ethernet/marvell/prestera/prestera_main.c
++++ b/drivers/net/ethernet/marvell/prestera/prestera_main.c
+@@ -1500,7 +1500,7 @@ EXPORT_SYMBOL(prestera_device_unregister);
  
-@@ -809,7 +809,7 @@ int br_cfm_cc_ccm_tx(struct net_bridge *br, const u32 instance,
- 	 * to send first frame immediately
- 	 */
- 	mep->ccm_tx_end = jiffies + usecs_to_jiffies(tx_info->period * 1000000);
--	queue_delayed_work(system_wq, &mep->ccm_tx_dwork, 0);
-+	queue_delayed_work(system_percpu_wq, &mep->ccm_tx_dwork, 0);
- 
- save:
- 	mep->cc_ccm_tx_info = *tx_info;
-diff --git a/net/bridge/br_mrp.c b/net/bridge/br_mrp.c
-index fd2de35ffb3c..3c36fa24bc05 100644
---- a/net/bridge/br_mrp.c
-+++ b/net/bridge/br_mrp.c
-@@ -341,7 +341,7 @@ static void br_mrp_test_work_expired(struct work_struct *work)
- out:
- 	rcu_read_unlock();
- 
--	queue_delayed_work(system_wq, &mrp->test_work,
-+	queue_delayed_work(system_percpu_wq, &mrp->test_work,
- 			   usecs_to_jiffies(mrp->test_interval));
- }
- 
-@@ -418,7 +418,7 @@ static void br_mrp_in_test_work_expired(struct work_struct *work)
- out:
- 	rcu_read_unlock();
- 
--	queue_delayed_work(system_wq, &mrp->in_test_work,
-+	queue_delayed_work(system_percpu_wq, &mrp->in_test_work,
- 			   usecs_to_jiffies(mrp->in_test_interval));
- }
- 
-@@ -725,7 +725,7 @@ int br_mrp_start_test(struct net_bridge *br,
- 	mrp->test_max_miss = test->max_miss;
- 	mrp->test_monitor = test->monitor;
- 	mrp->test_count_miss = 0;
--	queue_delayed_work(system_wq, &mrp->test_work,
-+	queue_delayed_work(system_percpu_wq, &mrp->test_work,
- 			   usecs_to_jiffies(test->interval));
- 
- 	return 0;
-@@ -865,7 +865,7 @@ int br_mrp_start_in_test(struct net_bridge *br,
- 	mrp->in_test_end = jiffies + usecs_to_jiffies(in_test->period);
- 	mrp->in_test_max_miss = in_test->max_miss;
- 	mrp->in_test_count_miss = 0;
--	queue_delayed_work(system_wq, &mrp->in_test_work,
-+	queue_delayed_work(system_percpu_wq, &mrp->in_test_work,
- 			   usecs_to_jiffies(in_test->interval));
- 
- 	return 0;
-diff --git a/net/ceph/mon_client.c b/net/ceph/mon_client.c
-index ab66b599ac47..c227ececa925 100644
---- a/net/ceph/mon_client.c
-+++ b/net/ceph/mon_client.c
-@@ -314,7 +314,7 @@ static void __schedule_delayed(struct ceph_mon_client *monc)
- 		delay = CEPH_MONC_PING_INTERVAL;
- 
- 	dout("__schedule_delayed after %lu\n", delay);
--	mod_delayed_work(system_wq, &monc->delayed_work,
-+	mod_delayed_work(system_percpu_wq, &monc->delayed_work,
- 			 round_jiffies_relative(delay));
- }
- 
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index 83c78379932e..2ac7731e1e0a 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -876,7 +876,7 @@ void sk_psock_drop(struct sock *sk, struct sk_psock *psock)
- 	sk_psock_stop(psock);
- 
- 	INIT_RCU_WORK(&psock->rwork, sk_psock_destroy);
--	queue_rcu_work(system_wq, &psock->rwork);
-+	queue_rcu_work(system_percpu_wq, &psock->rwork);
- }
- EXPORT_SYMBOL_GPL(sk_psock_drop);
- 
-diff --git a/net/devlink/core.c b/net/devlink/core.c
-index 7203c39532fc..58093f49c090 100644
---- a/net/devlink/core.c
-+++ b/net/devlink/core.c
-@@ -320,7 +320,7 @@ static void devlink_release(struct work_struct *work)
- void devlink_put(struct devlink *devlink)
+ static int __init prestera_module_init(void)
  {
- 	if (refcount_dec_and_test(&devlink->refcount))
--		queue_rcu_work(system_wq, &devlink->rwork);
-+		queue_rcu_work(system_percpu_wq, &devlink->rwork);
- }
+-	prestera_wq = alloc_workqueue("prestera", 0, 0);
++	prestera_wq = alloc_workqueue("prestera", WQ_PERCPU, 0);
+ 	if (!prestera_wq)
+ 		return -ENOMEM;
  
- struct devlink *devlinks_xa_find_get(struct net *net, unsigned long *indexp)
-diff --git a/net/ipv4/inet_fragment.c b/net/ipv4/inet_fragment.c
-index 470ab17ceb51..025895eb6ec5 100644
---- a/net/ipv4/inet_fragment.c
-+++ b/net/ipv4/inet_fragment.c
-@@ -183,7 +183,7 @@ static void fqdir_work_fn(struct work_struct *work)
- 	rhashtable_free_and_destroy(&fqdir->rhashtable, inet_frags_free_cb, NULL);
+diff --git a/drivers/net/ethernet/marvell/prestera/prestera_pci.c b/drivers/net/ethernet/marvell/prestera/prestera_pci.c
+index c45d108b2f6d..3e13322470da 100644
+--- a/drivers/net/ethernet/marvell/prestera/prestera_pci.c
++++ b/drivers/net/ethernet/marvell/prestera/prestera_pci.c
+@@ -898,7 +898,7 @@ static int prestera_pci_probe(struct pci_dev *pdev,
  
- 	if (llist_add(&fqdir->free_list, &fqdir_free_list))
--		queue_delayed_work(system_wq, &fqdir_free_work, HZ);
-+		queue_delayed_work(system_percpu_wq, &fqdir_free_work, HZ);
- }
+ 	dev_info(fw->dev.dev, "Prestera FW is ready\n");
  
- int fqdir_init(struct fqdir **fqdirp, struct inet_frags *f, struct net *net)
-diff --git a/net/netfilter/nf_conntrack_ecache.c b/net/netfilter/nf_conntrack_ecache.c
-index af68c64acaab..81baf2082604 100644
---- a/net/netfilter/nf_conntrack_ecache.c
-+++ b/net/netfilter/nf_conntrack_ecache.c
-@@ -301,7 +301,7 @@ void nf_conntrack_ecache_work(struct net *net, enum nf_ct_ecache_state state)
- 		net->ct.ecache_dwork_pending = true;
- 	} else if (state == NFCT_ECACHE_DESTROY_SENT) {
- 		if (!hlist_nulls_empty(&cnet->ecache.dying_list))
--			mod_delayed_work(system_wq, &cnet->ecache.dwork, 0);
-+			mod_delayed_work(system_percpu_wq, &cnet->ecache.dwork, 0);
- 		else
- 			net->ct.ecache_dwork_pending = false;
+-	fw->wq = alloc_workqueue("prestera_fw_wq", WQ_HIGHPRI, 1);
++	fw->wq = alloc_workqueue("prestera_fw_wq", WQ_HIGHPRI | WQ_PERCPU, 1);
+ 	if (!fw->wq) {
+ 		err = -ENOMEM;
+ 		goto err_wq_alloc;
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/core.c b/drivers/net/ethernet/mellanox/mlxsw/core.c
+index 980f3223f124..83c7cf3bbea3 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/core.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/core.c
+@@ -886,7 +886,7 @@ static int mlxsw_emad_init(struct mlxsw_core *mlxsw_core)
+ 	if (!(mlxsw_core->bus->features & MLXSW_BUS_F_TXRX))
+ 		return 0;
+ 
+-	emad_wq = alloc_workqueue("mlxsw_core_emad", 0, 0);
++	emad_wq = alloc_workqueue("mlxsw_core_emad", WQ_PERCPU, 0);
+ 	if (!emad_wq)
+ 		return -ENOMEM;
+ 	mlxsw_core->emad_wq = emad_wq;
+@@ -3381,7 +3381,7 @@ static int __init mlxsw_core_module_init(void)
+ 	if (err)
+ 		return err;
+ 
+-	mlxsw_wq = alloc_workqueue(mlxsw_core_driver_name, 0, 0);
++	mlxsw_wq = alloc_workqueue(mlxsw_core_driver_name, WQ_PERCPU, 0);
+ 	if (!mlxsw_wq) {
+ 		err = -ENOMEM;
+ 		goto err_alloc_workqueue;
+diff --git a/drivers/net/ethernet/netronome/nfp/nfp_main.c b/drivers/net/ethernet/netronome/nfp/nfp_main.c
+index 71301dbd8fb5..48390b2fd44d 100644
+--- a/drivers/net/ethernet/netronome/nfp/nfp_main.c
++++ b/drivers/net/ethernet/netronome/nfp/nfp_main.c
+@@ -797,7 +797,7 @@ static int nfp_pci_probe(struct pci_dev *pdev,
+ 	pf->pdev = pdev;
+ 	pf->dev_info = dev_info;
+ 
+-	pf->wq = alloc_workqueue("nfp-%s", 0, 2, pci_name(pdev));
++	pf->wq = alloc_workqueue("nfp-%s", WQ_PERCPU, 2, pci_name(pdev));
+ 	if (!pf->wq) {
+ 		err = -ENOMEM;
+ 		goto err_pci_priv_unset;
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_main.c b/drivers/net/ethernet/qlogic/qed/qed_main.c
+index 886061d7351a..d4685ad4b169 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_main.c
++++ b/drivers/net/ethernet/qlogic/qed/qed_main.c
+@@ -1214,7 +1214,8 @@ static int qed_slowpath_wq_start(struct qed_dev *cdev)
+ 		hwfn = &cdev->hwfns[i];
+ 
+ 		hwfn->slowpath_wq = alloc_workqueue("slowpath-%02x:%02x.%02x",
+-					 0, 0, cdev->pdev->bus->number,
++					 WQ_PERCPU, 0,
++					 cdev->pdev->bus->number,
+ 					 PCI_SLOT(cdev->pdev->devfn),
+ 					 hwfn->abs_pf_id);
+ 
+diff --git a/drivers/net/ethernet/wiznet/w5100.c b/drivers/net/ethernet/wiznet/w5100.c
+index b77f096eaf99..c5424d882135 100644
+--- a/drivers/net/ethernet/wiznet/w5100.c
++++ b/drivers/net/ethernet/wiznet/w5100.c
+@@ -1142,7 +1142,7 @@ int w5100_probe(struct device *dev, const struct w5100_ops *ops,
+ 	if (err < 0)
+ 		goto err_register;
+ 
+-	priv->xfer_wq = alloc_workqueue("%s", WQ_MEM_RECLAIM, 0,
++	priv->xfer_wq = alloc_workqueue("%s", WQ_MEM_RECLAIM | WQ_PERCPU, 0,
+ 					netdev_name(ndev));
+ 	if (!priv->xfer_wq) {
+ 		err = -ENOMEM;
+diff --git a/drivers/net/fjes/fjes_main.c b/drivers/net/fjes/fjes_main.c
+index 4a4ed2ccf72f..b63965d9a1ba 100644
+--- a/drivers/net/fjes/fjes_main.c
++++ b/drivers/net/fjes/fjes_main.c
+@@ -1364,14 +1364,15 @@ static int fjes_probe(struct platform_device *plat_dev)
+ 	adapter->force_reset = false;
+ 	adapter->open_guard = false;
+ 
+-	adapter->txrx_wq = alloc_workqueue(DRV_NAME "/txrx", WQ_MEM_RECLAIM, 0);
++	adapter->txrx_wq = alloc_workqueue(DRV_NAME "/txrx",
++					   WQ_MEM_RECLAIM | WQ_PERCPU, 0);
+ 	if (unlikely(!adapter->txrx_wq)) {
+ 		err = -ENOMEM;
+ 		goto err_free_netdev;
  	}
-diff --git a/net/openvswitch/dp_notify.c b/net/openvswitch/dp_notify.c
-index 7af0cde8b293..a2af90ee99af 100644
---- a/net/openvswitch/dp_notify.c
-+++ b/net/openvswitch/dp_notify.c
-@@ -75,7 +75,7 @@ static int dp_device_event(struct notifier_block *unused, unsigned long event,
  
- 		/* schedule vport destroy, dev_put and genl notification */
- 		ovs_net = net_generic(dev_net(dev), ovs_net_id);
--		queue_work(system_wq, &ovs_net->dp_notify_work);
-+		queue_work(system_percpu_wq, &ovs_net->dp_notify_work);
- 	}
+ 	adapter->control_wq = alloc_workqueue(DRV_NAME "/control",
+-					      WQ_MEM_RECLAIM, 0);
++					      WQ_MEM_RECLAIM | WQ_PERCPU, 0);
+ 	if (unlikely(!adapter->control_wq)) {
+ 		err = -ENOMEM;
+ 		goto err_free_txrx_wq;
+diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
+index 813bd10d3dc7..46a71ec36af8 100644
+--- a/drivers/net/wireguard/device.c
++++ b/drivers/net/wireguard/device.c
+@@ -333,7 +333,8 @@ static int wg_newlink(struct net_device *dev,
+ 		goto err_free_peer_hashtable;
  
- 	return NOTIFY_DONE;
-diff --git a/net/rfkill/input.c b/net/rfkill/input.c
-index 598d0a61bda7..53d286b10843 100644
---- a/net/rfkill/input.c
-+++ b/net/rfkill/input.c
-@@ -159,7 +159,7 @@ static void rfkill_schedule_global_op(enum rfkill_sched_op op)
- 	rfkill_op_pending = true;
- 	if (op == RFKILL_GLOBAL_OP_EPO && !rfkill_is_epo_lock_active()) {
- 		/* bypass the limiter for EPO */
--		mod_delayed_work(system_wq, &rfkill_op_work, 0);
-+		mod_delayed_work(system_percpu_wq, &rfkill_op_work, 0);
- 		rfkill_last_scheduled = jiffies;
- 	} else
- 		rfkill_schedule_ratelimited();
+ 	wg->handshake_receive_wq = alloc_workqueue("wg-kex-%s",
+-			WQ_CPU_INTENSIVE | WQ_FREEZABLE, 0, dev->name);
++			WQ_CPU_INTENSIVE | WQ_FREEZABLE | WQ_PERCPU, 0,
++			dev->name);
+ 	if (!wg->handshake_receive_wq)
+ 		goto err_free_index_hashtable;
+ 
+@@ -343,7 +344,8 @@ static int wg_newlink(struct net_device *dev,
+ 		goto err_destroy_handshake_receive;
+ 
+ 	wg->packet_crypt_wq = alloc_workqueue("wg-crypt-%s",
+-			WQ_CPU_INTENSIVE | WQ_MEM_RECLAIM, 0, dev->name);
++			WQ_CPU_INTENSIVE | WQ_MEM_RECLAIM | WQ_PERCPU, 0,
++			dev->name);
+ 	if (!wg->packet_crypt_wq)
+ 		goto err_destroy_handshake_send;
+ 
+diff --git a/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c b/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c
+index 6a7a26085fc7..2310493203d3 100644
+--- a/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c
++++ b/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c
+@@ -1085,7 +1085,8 @@ static void t7xx_dpmaif_bat_release_work(struct work_struct *work)
+ int t7xx_dpmaif_bat_rel_wq_alloc(struct dpmaif_ctrl *dpmaif_ctrl)
+ {
+ 	dpmaif_ctrl->bat_release_wq = alloc_workqueue("dpmaif_bat_release_work_queue",
+-						      WQ_MEM_RECLAIM, 1);
++						      WQ_MEM_RECLAIM | WQ_PERCPU,
++						      1);
+ 	if (!dpmaif_ctrl->bat_release_wq)
+ 		return -ENOMEM;
+ 
+diff --git a/drivers/net/wwan/wwan_hwsim.c b/drivers/net/wwan/wwan_hwsim.c
+index b02befd1b6fb..733688cd4607 100644
+--- a/drivers/net/wwan/wwan_hwsim.c
++++ b/drivers/net/wwan/wwan_hwsim.c
+@@ -509,7 +509,7 @@ static int __init wwan_hwsim_init(void)
+ 	if (wwan_hwsim_devsnum < 0 || wwan_hwsim_devsnum > 128)
+ 		return -EINVAL;
+ 
+-	wwan_wq = alloc_workqueue("wwan_wq", 0, 0);
++	wwan_wq = alloc_workqueue("wwan_wq", WQ_PERCPU, 0);
+ 	if (!wwan_wq)
+ 		return -ENOMEM;
+ 
+diff --git a/net/ceph/messenger.c b/net/ceph/messenger.c
+index d1b5705dc0c6..183c1e0b405a 100644
+--- a/net/ceph/messenger.c
++++ b/net/ceph/messenger.c
+@@ -252,7 +252,8 @@ int __init ceph_msgr_init(void)
+ 	 * The number of active work items is limited by the number of
+ 	 * connections, so leave @max_active at default.
+ 	 */
+-	ceph_msgr_wq = alloc_workqueue("ceph-msgr", WQ_MEM_RECLAIM, 0);
++	ceph_msgr_wq = alloc_workqueue("ceph-msgr",
++				       WQ_MEM_RECLAIM | WQ_PERCPU, 0);
+ 	if (ceph_msgr_wq)
+ 		return 0;
+ 
+diff --git a/net/core/sock_diag.c b/net/core/sock_diag.c
+index b23594c767f2..026ce9bd9e5e 100644
+--- a/net/core/sock_diag.c
++++ b/net/core/sock_diag.c
+@@ -348,7 +348,7 @@ static struct pernet_operations diag_net_ops = {
+ 
+ static int __init sock_diag_init(void)
+ {
+-	broadcast_wq = alloc_workqueue("sock_diag_events", 0, 0);
++	broadcast_wq = alloc_workqueue("sock_diag_events", WQ_PERCPU, 0);
+ 	BUG_ON(!broadcast_wq);
+ 	return register_pernet_subsys(&diag_net_ops);
+ }
+diff --git a/net/rds/ib_rdma.c b/net/rds/ib_rdma.c
+index d1cfceeff133..6585164c7059 100644
+--- a/net/rds/ib_rdma.c
++++ b/net/rds/ib_rdma.c
+@@ -672,7 +672,8 @@ struct rds_ib_mr_pool *rds_ib_create_mr_pool(struct rds_ib_device *rds_ibdev,
+ 
+ int rds_ib_mr_init(void)
+ {
+-	rds_ib_mr_wq = alloc_workqueue("rds_mr_flushd", WQ_MEM_RECLAIM, 0);
++	rds_ib_mr_wq = alloc_workqueue("rds_mr_flushd",
++				       WQ_MEM_RECLAIM | WQ_PERCPU, 0);
+ 	if (!rds_ib_mr_wq)
+ 		return -ENOMEM;
+ 	return 0;
+diff --git a/net/rxrpc/rxperf.c b/net/rxrpc/rxperf.c
+index 0377301156b0..2ea71e3831f7 100644
+--- a/net/rxrpc/rxperf.c
++++ b/net/rxrpc/rxperf.c
+@@ -630,7 +630,7 @@ static int __init rxperf_init(void)
+ 
+ 	pr_info("Server registering\n");
+ 
+-	rxperf_workqueue = alloc_workqueue("rxperf", 0, 0);
++	rxperf_workqueue = alloc_workqueue("rxperf", WQ_PERCPU, 0);
+ 	if (!rxperf_workqueue)
+ 		goto error_workqueue;
+ 
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index a7187e5873ec..9097e4f24d2b 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -3535,15 +3535,15 @@ static int __init smc_init(void)
+ 
+ 	rc = -ENOMEM;
+ 
+-	smc_tcp_ls_wq = alloc_workqueue("smc_tcp_ls_wq", 0, 0);
++	smc_tcp_ls_wq = alloc_workqueue("smc_tcp_ls_wq", WQ_PERCPU, 0);
+ 	if (!smc_tcp_ls_wq)
+ 		goto out_pnet;
+ 
+-	smc_hs_wq = alloc_workqueue("smc_hs_wq", 0, 0);
++	smc_hs_wq = alloc_workqueue("smc_hs_wq", WQ_PERCPU, 0);
+ 	if (!smc_hs_wq)
+ 		goto out_alloc_tcp_ls_wq;
+ 
+-	smc_close_wq = alloc_workqueue("smc_close_wq", 0, 0);
++	smc_close_wq = alloc_workqueue("smc_close_wq", WQ_PERCPU, 0);
+ 	if (!smc_close_wq)
+ 		goto out_alloc_hs_wq;
+ 
 diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-index 2a559a98541c..e216d237865b 100644
+index e216d237865b..a9e80f44307d 100644
 --- a/net/smc/smc_core.c
 +++ b/net/smc/smc_core.c
-@@ -85,7 +85,7 @@ static void smc_lgr_schedule_free_work(struct smc_link_group *lgr)
- 	 * otherwise there is a risk of out-of-sync link groups.
- 	 */
- 	if (!lgr->freeing) {
--		mod_delayed_work(system_wq, &lgr->free_work,
-+		mod_delayed_work(system_percpu_wq, &lgr->free_work,
- 				 (!lgr->is_smcd && lgr->role == SMC_CLNT) ?
- 						SMC_LGR_FREE_DELAY_CLNT :
- 						SMC_LGR_FREE_DELAY_SERV);
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 0538948d5fd9..4c2db6cca557 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -1649,7 +1649,7 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
- 			 * reschedule it, then ungrab the socket refcount to
- 			 * keep it balanced.
- 			 */
--			if (mod_delayed_work(system_wq, &vsk->connect_work,
-+			if (mod_delayed_work(system_percpu_wq, &vsk->connect_work,
- 					     timeout))
- 				sock_put(sk);
+@@ -896,7 +896,7 @@ static int smc_lgr_create(struct smc_sock *smc, struct smc_init_info *ini)
+ 		rc = SMC_CLC_DECL_MEM;
+ 		goto ism_put_vlan;
+ 	}
+-	lgr->tx_wq = alloc_workqueue("smc_tx_wq-%*phN", 0, 0,
++	lgr->tx_wq = alloc_workqueue("smc_tx_wq-%*phN", WQ_PERCPU, 0,
+ 				     SMC_LGR_ID_SIZE, &lgr->id);
+ 	if (!lgr->tx_wq) {
+ 		rc = -ENOMEM;
+diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
+index a82fdcf19969..a64ae15b1a60 100644
+--- a/net/tls/tls_device.c
++++ b/net/tls/tls_device.c
+@@ -1412,7 +1412,7 @@ int __init tls_device_init(void)
+ 	if (!dummy_page)
+ 		return -ENOMEM;
+ 
+-	destruct_wq = alloc_workqueue("ktls_device_destruct", 0, 0);
++	destruct_wq = alloc_workqueue("ktls_device_destruct", WQ_PERCPU, 0);
+ 	if (!destruct_wq) {
+ 		err = -ENOMEM;
+ 		goto err_free_dummy;
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index b6569b0ca2bb..8c867023a2e5 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -926,7 +926,7 @@ static int __init virtio_vsock_init(void)
+ {
+ 	int ret;
+ 
+-	virtio_vsock_workqueue = alloc_workqueue("virtio_vsock", 0, 0);
++	virtio_vsock_workqueue = alloc_workqueue("virtio_vsock", WQ_PERCPU, 0);
+ 	if (!virtio_vsock_workqueue)
+ 		return -ENOMEM;
+ 
+diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+index 6e78927a598e..bc2ff918b315 100644
+--- a/net/vmw_vsock/vsock_loopback.c
++++ b/net/vmw_vsock/vsock_loopback.c
+@@ -139,7 +139,7 @@ static int __init vsock_loopback_init(void)
+ 	struct vsock_loopback *vsock = &the_vsock_loopback;
+ 	int ret;
+ 
+-	vsock->workqueue = alloc_workqueue("vsock-loopback", 0, 0);
++	vsock->workqueue = alloc_workqueue("vsock-loopback", WQ_PERCPU, 0);
+ 	if (!vsock->workqueue)
+ 		return -ENOMEM;
  
 -- 
 2.51.0
