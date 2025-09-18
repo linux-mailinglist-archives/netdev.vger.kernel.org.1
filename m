@@ -1,94 +1,85 @@
-Return-Path: <netdev+bounces-224473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DEA8B8563B
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:57:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 211F0B8565C
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:58:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83B5D1885633
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:57:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEAC917D872
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:58:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACBF530DD39;
-	Thu, 18 Sep 2025 14:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h7+2GrJ5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6842C2FE05B;
+	Thu, 18 Sep 2025 14:58:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FEC9243371;
-	Thu, 18 Sep 2025 14:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B29A31;
+	Thu, 18 Sep 2025 14:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758207414; cv=none; b=Ot4IiVKP+Q3A9AEr07GMb74XLkqU2TWTed3hJ+r1wsXFW4UQuovX1gkPiYwbmI1Fe4HHixQNgsF/GL+brxnr6CTJA9vX3Aay5G9+SEpdmJ0GJTcLcf/tToa+6570RCqZ8nHIowDW07j7fI8Qf61gAzknaMBzirJnbKF7lL1CYFw=
+	t=1758207524; cv=none; b=XJZHrxxvJ1092s0YNOTOZ3PMaDJepkaHhqhdXcr+Ls5IPk5oE23AT5C+tD1NAd+uKdiL7+PmGWu6KbYyoYH3boYKv+nGoatqct4IvC2+omVlp2Wzk/OzEd6Ay+K9gpAzwUEP3I5D/8FzRML0sCq0MNrX79xguZSJVHId0Wt8mTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758207414; c=relaxed/simple;
-	bh=8z/tnlGfcj0sHQpOOZSE8H5bYHm1R8zUOzpIG2oOSfg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OFTTUcglpedj50a+9PUSy6KtpJnmC2VYfFUSTzwsWPy2eqkgO0t9zjRaSl34TYrHMS9OfZEBbnGVImYzAV2+aZtmjrYi+eqpSp6GsFhw/NjWYeKWNNYuYwItSxqguaiEkfIaKBh4s4fawuZJNJqNPtqxEYQzNggU6cNeuYrP0oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h7+2GrJ5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47BDEC4CEFB;
-	Thu, 18 Sep 2025 14:56:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758207413;
-	bh=8z/tnlGfcj0sHQpOOZSE8H5bYHm1R8zUOzpIG2oOSfg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h7+2GrJ5h0nqFlRgGXJwT26ITp3PxhHXrt3EGfeGOqP5YDX3SVSQh8PEB2qLOI5tJ
-	 JBIwLZgQU1DGIo1fwCTth+CbWPgZbpIJMfmGbMc2vQdbq+EjAF4u1miD0epVR7Nim7
-	 X0xePlTmXNuxHjExwOAWwTLN6+B9Z6rO4ELnD0LrEzJZV5HmtQT1z4EZAmkRfBdmOO
-	 QK2LdSFGjs9AyFaqvS/J9EDly4ZcMbiAVws363DKd8VrM9L0OlUjLDV0li80LpYeSg
-	 3W+pRt9P0Nb8Mv99ihsuKFX2wMHXUtptqm1VINoC4m3yfiheX0cFX31pQNH8+tQ/k5
-	 yQThWQhvXOwuw==
-Date: Thu, 18 Sep 2025 07:56:51 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: Michael Walle <mwalle@kernel.org>, Siddharth Vadapalli
- <s-vadapalli@ti.com>, Andrew Lunn <andrew@lunn.ch>, Nishanth Menon
- <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo
- <kristo@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Roger Quadros <rogerq@kernel.org>, Simon Horman
- <horms@kernel.org>, Maxime Chevallier <maxime.chevallier@bootlin.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux@ew.tq-group.com
-Subject: Re: [PATCH net-next] Revert "net: ethernet: ti: am65-cpsw: fixup
- PHY mode for fixed RGMII TX delay"
-Message-ID: <20250918075651.4676f808@kernel.org>
-In-Reply-To: <804f394db1151f1fb1f19739d5347b38a3930e8a.camel@ew.tq-group.com>
-References: <20250728064938.275304-1-mwalle@kernel.org>
-	<57823bd1-265c-4d01-92d9-9019a2635301@lunn.ch>
-	<DBOD5ICCVSL1.23R4QZPSFPVSM@kernel.org>
-	<d9b845498712e2372967e40e9e7b49ddb1f864c1.camel@ew.tq-group.com>
-	<DBOEPHG2V5WY.Q47MW1V5ZJZE@kernel.org>
-	<2269f445fb233a55e63460351ab983cf3a6a2ed6.camel@ew.tq-group.com>
-	<88972e3aa99d7b9f4dd1967fbb445892829a9b47.camel@ew.tq-group.com>
-	<84588371-ddae-453e-8de9-2527c5e15740@lunn.ch>
-	<47b0406f-7980-422e-b63b-cc0f37d86b18@ti.com>
-	<DBTGZGPLGJBX.32VALG3IRURBQ@kernel.org>
-	<804f394db1151f1fb1f19739d5347b38a3930e8a.camel@ew.tq-group.com>
+	s=arc-20240116; t=1758207524; c=relaxed/simple;
+	bh=bZ8fiZbd5UoLT7yBy00NqBituU2w3G2PjubQU4ki3LM=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UIZglW5uuEGTBFohY9FxlkhXYoSB8cP7nWF91ITGqeLj5DQQJePQCf140lM1q2wSDDyJpvcKJa5DNJKuM8lpRF2+nASlxTfZ+kRwTRGVQSjqIbM+HUTsbuQf0bDigIag3XoK67v7hUENYLClDMOBSz6vUIEzT+JqJmJwWxZn3E0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cSJdD75Cmz6GDDP;
+	Thu, 18 Sep 2025 22:57:04 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id F22D31402F7;
+	Thu, 18 Sep 2025 22:58:40 +0800 (CST)
+Received: from localhost (10.47.69.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 18 Sep
+ 2025 16:58:40 +0200
+Date: Thu, 18 Sep 2025 15:58:38 +0100
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: <alejandro.lucero-palau@amd.com>
+CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v18 16/20] cxl: Allow region creation by type2 drivers
+Message-ID: <20250918155838.00007ea6@huawei.com>
+In-Reply-To: <20250918091746.2034285-17-alejandro.lucero-palau@amd.com>
+References: <20250918091746.2034285-1-alejandro.lucero-palau@amd.com>
+	<20250918091746.2034285-17-alejandro.lucero-palau@amd.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Mon, 04 Aug 2025 15:45:08 +0200 Matthias Schiffer wrote:
-> > > Disabling the TX delay may or may not result in an operational system.
-> > > This holds true for all SoCs with various CPSW instances that are
-> > > programmed by the am65-cpsw-nuss.c driver along with the phy-gmii-sel.c
-> > > driver.  
-> > 
-> > In that case u-boot shall be fixed, soon. And to workaround older
-> > u-boot versions, linux shall always enable that delay, like Andrew
-> > proposed.  
+On Thu, 18 Sep 2025 10:17:42 +0100
+<alejandro.lucero-palau@amd.com> wrote:
+
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> I can submit my patch for U-Boot some time this week, probably tomorrow. Do you
-> also want me to take care of the Linux side for enabling the MAC delay?
-
-What's the conclusion with this regression?
-If we need a fix in Linux it'd be great to have it before v6.17 is cut.
+> Creating a CXL region requires userspace intervention through the cxl
+> sysfs files. Type2 support should allow accelerator drivers to create
+> such cxl region from kernel code.
+> 
+> Adding that functionality and integrating it with current support for
+> memory expanders.
+> 
+> Support an action by the type2 driver to be linked to the created region
+> for unwinding the resources allocated properly.
+> 
+> Based on https://lore.kernel.org/linux-cxl/168592159835.1948938.1647215579839222774.stgit@dwillia2-xfh.jf.intel.com/
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com
 
