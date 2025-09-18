@@ -1,94 +1,149 @@
-Return-Path: <netdev+bounces-224484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C2BFB8570D
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:06:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49AAAB856D8
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:04:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7781A7BC360
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:01:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A2591C84F5C
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A8E3101DD;
-	Thu, 18 Sep 2025 15:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13A430CDB0;
+	Thu, 18 Sep 2025 15:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xpv9dlsy"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36F530FC22
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D86830CB33
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758207687; cv=none; b=cTgXYp+M+71SwVZ1GtZamPOJsmSNDu8MJXPdlcDVGjzf3GCPRPy3UySApWFxmLJ7dNAJpdx3y5+Vb6N4j3dReSyc+dcX1Pvxk1Gm9/8GqOdVggRVRIu+qrxWhNhmqiQSOyoYRLghbpNNcfqUGjleSUvrlzDrehd5qjNddwDKwws=
+	t=1758207678; cv=none; b=NJ60oVGDm6xqxIvFcpJ9e8XkSdtojADI3hxyl71tDFupFfXftP8rldIhyOHeqPKamwdKGcViNyqOTaptHKaPBQZRrjpnnqNVJLTBG0NusipYZSTmScTQR9ZSs86SpqPnTYSMAnTYkoFASWgKeCKte90eWsPz2tX353DVE2texQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758207687; c=relaxed/simple;
-	bh=dMgnUT9SN0xWEnTD5CB7F2sIRMIdRNv8a528sPnHBx0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SFYWvtbEYQGX/1nZp4KQrW+XURwL2NSYy2FlIxjf/iIMig42sE3uKL9WbImtZ0JEazvncNkMk+awTYfYAwOXqG/SlJYMNVddxqb/TwzRsClMgH6Uwapy2SxFr/QhzI2gt0MDx47IKCeTVU3KM4w10fFYYm5v4PAkvNi/JXdMBhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <jre@pengutronix.de>)
-	id 1uzG88-0007Qj-74; Thu, 18 Sep 2025 17:01:04 +0200
-Message-ID: <09ffce72-e826-4126-8761-13efc689dee7@pengutronix.de>
-Date: Thu, 18 Sep 2025 17:01:00 +0200
+	s=arc-20240116; t=1758207678; c=relaxed/simple;
+	bh=hm0HQnFHDuepzpar3SZ/hafXRi94TxogLGocQLL+sSo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=onpaFi3tssSc9PqXWuABd8dj635bGBOF0v3IzPWH83tLgWQN/lxIhGmvXiSVIX1fUwAuWQDQldWNGhZAnWyoNzf+yxBQZE3plsCJLG7IbbeJiJCrV4PPf2WHgGAFQmkLlqlPohfjsMz7Jk/TYTCIPuyetj7qR7HK33IzjyEZnl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xpv9dlsy; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-25177b75e38so14378435ad.0
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 08:01:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758207676; x=1758812476; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3jaAVY6WwUqvQw+1OWwzrgyRuZwO/IzJmVcJETm6qRc=;
+        b=Xpv9dlsyarNgBCNc5vklsSRf2570IBW2zqcBCUNUTJ2NYOWOx8GJtwF49gZyn5xlxb
+         PiSdI67i+MUYY2XvxAWl17uOX6DmK0hka7gpbAjmt1ZT0sCvyDjbFwr7k0GCggAzLQpl
+         /zw6G7E61p6UcOFwnoW2A+0uGqDAcEonCSB7K9GTSoTRdXhfbo8lcpkOAbyBRZFV4iXV
+         twhoqGu3jP0sTZX+ia5M3nmOvtE1B2OfvYLu/ntco9YnrMeTZm94ISvwMG8AcJrNloKb
+         zUZqMHta6bGFgXyGEwop7BpeKm+dqBiDGD3sLZ2sDj9fjtZoRlyFSUzQV6N9PyGZNc3N
+         o1SA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758207676; x=1758812476;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3jaAVY6WwUqvQw+1OWwzrgyRuZwO/IzJmVcJETm6qRc=;
+        b=bmX/BFSLUzvteyQQoiFg0ttBxJLNdXIMxYPEyCbVA3NMmEWPDP14wcUPsrjuVTeIdc
+         b+1HMNbcUGnkldBlPKkU+2uNiAKjzxhGj3vjvoam5BxkucVkq/HP8QP4DxwvJXq4Pe/1
+         4SOCVOwqvRk+ia16Ucs7cvOAw5WxtrHNB8Hb/UC1SMkcP4G5HlzGtj6SziDBP1aLrdcI
+         qKPIBTxPZ74m+7jXaGfb4dB5dfAZcFl5JuSNAalHuHwr+o2eg8BWW9OCGTzOYVChys8w
+         IGo4ji18XGdeU+3kiNxPJcwtPdiJjzL9yKfmuT/XI3m8Mv6HuuQMr0QjWn+PZHIJn8OH
+         4ubw==
+X-Forwarded-Encrypted: i=1; AJvYcCUj3/BHHVXrFRjulZOVDfrY2u0c/gE9UhQwkqtebJkRy5tTqgAdO4WOZVCItD1gC3IfeGRbcBc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLt2fKAAWW59ipNpDQhlnnK4avZBqZEzIbNGSxj/z7od22a9qt
+	fcu41WefPP3tC5DaiGPq4no21Hhu1QR9AEe1eCS2iYVmfJnHQE5nZH/2XtT432GkcrdQD1SX6Ps
+	QMLoXRA==
+X-Google-Smtp-Source: AGHT+IFfK0oDh2ycr/Osr/E7Cn/yD1up1u2d31r7i+s3sYnsD2rX8bDF3WlsXIrIGTtuwXqE52kl8QvwPX0=
+X-Received: from pjs1.prod.google.com ([2002:a17:90a:c01:b0:32e:ca6a:7ca9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:da81:b0:269:a23e:9fd7
+ with SMTP id d9443c01a7336-269a23ea2c9mr19135195ad.26.1758207676208; Thu, 18
+ Sep 2025 08:01:16 -0700 (PDT)
+Date: Thu, 18 Sep 2025 08:01:14 -0700
+In-Reply-To: <20250918104144-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] arm64: dts: add Protonic PRT8ML board
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>, Shengjiu Wang <shengjiu.wang@nxp.com>,
- Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-sound@vger.kernel.org, imx@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, David Jander <david@protonic.nl>,
- Lucas Stach <l.stach@pengutronix.de>,
- Oleksij Rempel <o.rempel@pengutronix.de>
-References: <20250918-imx8mp-prt8ml-v2-0-3d84b4fe53de@pengutronix.de>
- <20250918-imx8mp-prt8ml-v2-3-3d84b4fe53de@pengutronix.de>
- <0f520191-7d9f-4800-a41e-a623b9335c9d@lunn.ch>
-From: Jonas Rebmann <jre@pengutronix.de>
-Content-Language: en-US
-In-Reply-To: <0f520191-7d9f-4800-a41e-a623b9335c9d@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: jre@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Mime-Version: 1.0
+References: <20250918104144-mutt-send-email-mst@kernel.org>
+Message-ID: <aMweun6GrCSn3lDD@google.com>
+Subject: Re: [GIT PULL] virtio,vhost: last minute fixes
+From: Sean Christopherson <seanjc@google.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, alok.a.tiwari@oracle.com, ashwini@wisig.com, 
+	filip.hejsek@gmail.com, hi@alyssa.is, leiyang@redhat.com, maxbr@linux.ibm.com, 
+	stable@vger.kernel.org, zhangjiao2@cmss.chinamobile.com
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Andrew,
-
-On 2025-09-18 16:18, Andrew Lunn wrote:
->>   - Onboard T1 ethernet (10BASE-T1L+PoDL, 100BASE-T1+PoDL, 1000BASE-T1)
+On Thu, Sep 18, 2025, Michael S. Tsirkin wrote:
+> The following changes since commit 76eeb9b8de9880ca38696b2fb56ac45ac0a25c6c:
 > 
-> Are these PHYs connected to the switch? It just seems odd you have a
-> switch with only one port connected to the outside world.
+>   Linux 6.17-rc5 (2025-09-07 14:22:57 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+> 
+> for you to fetch changes up to 549db78d951726646ae9468e86c92cbd1fe73595:
+> 
+>   virtio_config: clarify output parameters (2025-09-16 05:37:03 -0400)
+> 
+> ----------------------------------------------------------------
+> virtio,vhost: last minute fixes
+> 
+> More small fixes. Most notably this reverts a virtio console
+> change since we made it without considering compatibility
+> sufficiently.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> ----------------------------------------------------------------
+> Alok Tiwari (1):
+>       vhost-scsi: fix argument order in tport allocation error message
+> 
+> Alyssa Ross (1):
+>       virtio_config: clarify output parameters
+> 
+> Ashwini Sahu (1):
+>       uapi: vduse: fix typo in comment
+> 
+> Michael S. Tsirkin (1):
+>       Revert "virtio_console: fix order of fields cols and rows"
+> 
+> Sean Christopherson (3):
+>       vhost_task: Don't wake KVM x86's recovery thread if vhost task was killed
 
-yes, the 10BASE-T1L+PoDL and 100BASE-T1+PoDL are. We didn't get to test
-them, so I removed them from the devicetree.
+Gah!  I was too slow.  syzkaller found an issue with this patch.  I _think_ I
+know what's going.  If my analysis is correct (wasn't able to repro the issue,
+but found a bug through inspection), then I don't think we want to take this for
+6.17 as-is.
 
-Regards,
-Jonas
+https://lore.kernel.org/all/aMwdsFGkM-tMjHwc@google.com
 
--- 
-Pengutronix e.K.                           | Jonas Rebmann               |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-9    |
+>       vhost_task: Allow caller to omit handle_sigkill() callback
+>       KVM: x86/mmu: Don't register a sigkill callback for NX hugepage recovery tasks
+> 
+> zhang jiao (1):
+>       vhost: vringh: Modify the return value check
+> 
+>  arch/x86/kvm/mmu/mmu.c           |  7 +-----
+>  drivers/char/virtio_console.c    |  2 +-
+>  drivers/vhost/scsi.c             |  2 +-
+>  drivers/vhost/vhost.c            |  2 +-
+>  drivers/vhost/vringh.c           |  7 +++---
+>  include/linux/sched/vhost_task.h |  1 +
+>  include/linux/virtio_config.h    | 11 ++++----
+>  include/uapi/linux/vduse.h       |  2 +-
+>  kernel/vhost_task.c              | 54 ++++++++++++++++++++++++++++++++++++----
+>  9 files changed, 65 insertions(+), 23 deletions(-)
+> 
 
