@@ -1,129 +1,114 @@
-Return-Path: <netdev+bounces-224518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01CABB85D2F
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:58:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14A2FB85DCF
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 18:03:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A4A77C47D5
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:54:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9375176CBC
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:56:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3773314D13;
-	Thu, 18 Sep 2025 15:52:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1750E314D07;
+	Thu, 18 Sep 2025 15:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d6yOTz+p"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t4KMm7+K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228C4314B65
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81166314B8B
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758210732; cv=none; b=kNtjnbeZMXPY9BUPprO4rrYJ6xU6Bm1sDW6Vl8h6ISDZczjcYQooCgTk8kVOISo+YMIFLKI8hv3KuPAIuSLw3piibiRqonZZ8YDdujbWv24Br2QLDejjwvM9U2Bod34CZ+R72mLZhxe9KdgmGBjzzXhXKRtz9syOsUiODBiFoYg=
+	t=1758210936; cv=none; b=SqR+pBWCxB9Qba2VRaL5xtRT95XJF7bjXpLjwbxY90vz7HsJ4PDBgG0YMr6/6PUxgB47z1N8tg7BpAJl2ksEoSiY3qM2ArOA5X9M32CRJck1Uo3HFjZUrsBBXyGOxOKWdwvOy8BvoEjj/lZJQd79DRzG0iJYE5wAl9smd+sE9m4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758210732; c=relaxed/simple;
-	bh=a/vBsqZLt+ZHusWU89f6Obs/nNwsU9VusiS0xPR+usA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TtmxIFWQQIXDw9pXqz6CuEFlWIK3wDt7bBLNy/fLQq2igYdB+3wKyYnYDPnQoYBzeB9mUQqWGK5GQqlVJRVMGn2DT3Mf69p7SZkgoqIhv/S056JuqAzyidWe3zVeNil7tum+Wxc8LN4hoe5343TLzA/sTeeFE3PdUUNDqPAlLs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d6yOTz+p; arc=none smtp.client-ip=209.85.128.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-723ad237d1eso11287737b3.1
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 08:52:10 -0700 (PDT)
+	s=arc-20240116; t=1758210936; c=relaxed/simple;
+	bh=OnRZRgpG954owCLPiQsCxTClmeZW7SL9TWCE27A999A=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hpWkh80i4vhJtlY6e/motZIFqlxgH6yrHIxjelP0SXRY3lQcBeR/JEvcEz3fIbnLKOOuVjlxu9bGWCfmYNtJyMcVtmlwFXs8YjiGjrP6pO0Gsd9x5R3SxvDOlqAty8uUGB562DjVcVlr2exeh5dlJfrvVnG0q7OttkiXIcBe+TI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t4KMm7+K; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-ea5c811705eso1396454276.0
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 08:55:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758210730; x=1758815530; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZotaRmQ0zKU33/Ymopl3kyUns7cg+jMfoZ0yYXnZiK0=;
-        b=d6yOTz+pzJQIM1AAAZ/vtGdsMTF63KBvRqga9ibmEDe1gqt8d/GL1ADmJiiSoQvz5B
-         F0rQQR5r89q7fwlDPqrdOHaoVOhrUrOgcIDVaql+MH02BzhuJDv6zS+IC1XkvMK5Ze4L
-         0qSEP25OQoangYTVTiH+qlCFJ5XU1CQ6dOT4Z7AUMIMeQdgJRXCoBe/BsxwpY6rGpCNJ
-         0FTcx5uT07asBjsc6E0af0PaMk3thBjDx1pq6cJJ9g9zjsqpYNKlDxt7E1z1yKmW/4Nt
-         D/VsNvTX9vzxy+YFGl5f8NU/R0vyR9vJI4HuhW9A1f+djuzGcIII3jMjQ/ot3eM2KIW/
-         Pb5A==
+        d=google.com; s=20230601; t=1758210933; x=1758815733; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JKnDkPHYtZ1tHiuAgG+oCe3W4V+ayvmiQvwgC1kDgPw=;
+        b=t4KMm7+K4cGLJWB6NcYAdxDCSRtxaQU2lX5F27BrOMYY2GpteZn9/BV3Nu3/8aKQwB
+         ttvMLg1vcmJeCVt2kHPCdgw+65LrqJOKFzDomHLx1dtSDVN7a3oM2ocKlH2qS/ONdDN5
+         aZJboNWPt6lKk1kE3jTiELkYyRdg3t50+6iERBG40JeyP7Iu1ahyDDmHvv2KKhFp4Z/W
+         gpiQuAMEZd6iC7Ukhduvsbc9BsbRqjNIxwCF1NGol9yaKbC/hGeHD0GyieI7O3TRpgPz
+         Mwl3ivbQOp0O+iEhjzy04FPMy6AwJ0gqBOI22daNj+B5l5FPeIpT4rh8p2C7UcDudo4O
+         Pczw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758210730; x=1758815530;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZotaRmQ0zKU33/Ymopl3kyUns7cg+jMfoZ0yYXnZiK0=;
-        b=YI2NxvbL2QhNHL+I0Adm5+015cRZu5IqPtaqm06cxY+N3G8kaHIAU96Isqlpwfy4eD
-         gKySh9s556pUbXzOm6fCMdc9wjOwRfpsLXN01y3gkpfWRZrc3cFtljVG7K7Mm/gh8Gxa
-         uIEKF+h4jmwsWOoodb8Jr31djwWCS6n668ironvpdEDDXKX1qsR3e7r2jCFv/UddQosk
-         z6idqjU/zSltocP756tlchs1gemBp28eVDTI3lolkBFxZ8xt/H2o+mYy8y6Scr49LV8B
-         hQ6tiC1KB2D2/V5Ncli9g2xgQOrsDcdy8PtHpVXpLpLG+PUKt7TifZ50Rdhx/1xGM0PR
-         Ftrg==
-X-Forwarded-Encrypted: i=1; AJvYcCW7KaTEHhOmFZDVfh0TsEcZ3Dwbun3F7uRPt6mTNbdsYN0SZq4oVMBSvinizcabVmHMsr07cUM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKqwlahBXqloOTrvCmK4mdSeYTy1mHe2honhEQ2brH2o2PTnCe
-	FdZxrJtTKknZLdvOPAgxS8GIE58xFIO4L+jVYCRtn7kBP311pVKchaWX
-X-Gm-Gg: ASbGncvhKsCnbX3wHfmu+yhK+c8Hw0sUL2B9cT4ooWXSqkhj+xkdeEnOkYxksHez6yZ
-	F0+fKNwCYC9xe2M5H90AN07/y9Op08yaIF/gtue35xKm+wXZQkeDoZ3OQY9ktc4bubTcI+P99Bp
-	ZU1KPUAOOouzhL7C992iiK1BWX8tP04u1xHNx69eT7ImS49suLtq+Gq0Ac3rS+wT80gFYJ7/UG2
-	/Oraq5nPZV5xF5Ms7O7adpLKRTdZEd8di0eLyxsdgOFF82kCWaSBp6aL5vWeFnpZsRBcRSCRG9p
-	XiTrEB3fe9+qk/1kbo+dhNE6SFpbv7MwXdTmjCvQenJYje/7he+sD4xWWsazu7Z6Ud3bFOe94I2
-	iF9/6FrdHUOh5nuwrq8fqBR/AJt8lLdXyPYOTjcRg4gglmUV7rw==
-X-Google-Smtp-Source: AGHT+IEJBLMHxSKIsg0k3VjYho0dDab3dfFPfl2pW82sYt/MWYbRn+8u4SfwmPxZIWMaIJsbimp0uA==
-X-Received: by 2002:a05:690c:b97:b0:731:4497:f372 with SMTP id 00721157ae682-738909bc71dmr59661677b3.24.1758210729926;
-        Thu, 18 Sep 2025 08:52:09 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:54::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-633bcce7089sm910395d50.5.2025.09.18.08.52.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Sep 2025 08:52:09 -0700 (PDT)
-From: Daniel Zahka <daniel.zahka@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Willem de Bruijn <willemb@google.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next 3/3] psp: don't use flags for checking sk_state
-Date: Thu, 18 Sep 2025 08:52:04 -0700
-Message-ID: <20250918155205.2197603-4-daniel.zahka@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250918155205.2197603-1-daniel.zahka@gmail.com>
-References: <20250918155205.2197603-1-daniel.zahka@gmail.com>
+        d=1e100.net; s=20230601; t=1758210933; x=1758815733;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JKnDkPHYtZ1tHiuAgG+oCe3W4V+ayvmiQvwgC1kDgPw=;
+        b=qq/yb4SqXo/2ZEBdoGgCXHRI81+Rg3jn5gpetK7P/wQ4yoIpeFHhLn+XEjSY3RMzGG
+         LGyJUkNB4EdkpU8GDao4WvRWZ69Dt4LZ9vjmzMOR/hw5iF8lpzpJ+yAikf+0i8Y1VEpZ
+         tBm1v+bhYEVoKOc4kBGH3e1Cu+x28KWKy1vEItwDPffhOi5ehXttv+qFLSBJNCnsumDm
+         vHWujKSrfUSO0Bm3fwMVmsJcbNn7v28ALxWyrixvUuUQ8FlsZ8jy1mOlChOZJY+j3la2
+         iTE9sCTrKT2lSiNLBEG8ByiHokTn68PiwHdHWUW2/5LiAqbDIJeuztvDxxRKPed9yfYI
+         sWng==
+X-Forwarded-Encrypted: i=1; AJvYcCWg2FGseOF/uRaiUWAZDyIyhvWVBJQ8o/3cjcTVH6Oxe8iDuAgDfFo3x5+Mc6esSyLXHTs1kHc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsPH3jKXEMgV+dbKr12+l6ENpPnKQvsA/1ZqL8ZIMYizKYKj0I
+	RPCamYECDOw0i+koEHXI7nCgdBYfDZbzLtlNYjaBz8jatPaYjC4u707qN4H4swZY2GhLeDIOGF7
+	c36Y3Nah0dLUn3Q==
+X-Google-Smtp-Source: AGHT+IHOpIDPRdgWVS6se4amRV9bgq1LF+eKvR6XdBuKYtKbo+A0rZIgEk2zAOOQ7eMNUxM+Ii7CI5/mh9MBgA==
+X-Received: from ybbef17.prod.google.com ([2002:a05:6902:2891:b0:ea5:d888:309d])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6902:2a4a:b0:ea5:bdbe:1634 with SMTP id 3f1490d57ef6-ea5c056cc51mr4554761276.41.1758210933495;
+ Thu, 18 Sep 2025 08:55:33 -0700 (PDT)
+Date: Thu, 18 Sep 2025 15:55:25 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250918155532.751173-1-edumazet@google.com>
+Subject: [PATCH net-next 0/7] tcp: move few fields for data locality
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Using flags to check sk_state only makes sense to check for a subset
-of states in parallel e.g. sk_fullsock(). We are not doing that
-here. Compare for individual states directly.
+After recent additions (PSP and AccECN) I wanted to make another
+round on fields locations to increase data locality.
 
-Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
----
- include/net/psp/functions.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+This series manages to shrink TCP and TCPv6 objects by 128 bytes,
+but more importantly should reduce number of touched cache lines
+in TCP fast paths.
 
-diff --git a/include/net/psp/functions.h b/include/net/psp/functions.h
-index 980de7e58f8a..ef7743664da3 100644
---- a/include/net/psp/functions.h
-+++ b/include/net/psp/functions.h
-@@ -129,11 +129,11 @@ static inline struct psp_assoc *psp_sk_get_assoc_rcu(const struct sock *sk)
- 	struct psp_assoc *pas;
- 	int state;
- 
--	state = 1 << READ_ONCE(sk->sk_state);
--	if (!sk_is_inet(sk) || state & TCPF_NEW_SYN_RECV)
-+	state = READ_ONCE(sk->sk_state);
-+	if (!sk_is_inet(sk) || state == TCP_NEW_SYN_RECV)
- 		return NULL;
- 
--	pas = state & TCPF_TIME_WAIT ?
-+	pas = state == TCP_TIME_WAIT ?
- 		      rcu_dereference(inet_twsk(sk)->psp_assoc) :
- 		      rcu_dereference(sk->psp_assoc);
- 	return pas;
+There is more to come.
+
+Eric Dumazet (7):
+  net: move sk_uid and sk_protocol to sock_read_tx
+  net: move sk->sk_err_soft and sk->sk_sndbuf
+  tcp: move tcp->rcv_tstamp to tcp_sock_write_txrx group
+  tcp: move recvmsg_inq to tcp_sock_read_txrx
+  tcp: move tcp_clean_acked to tcp_sock_read_tx group
+  tcp: move mtu_info to remove two 32bit holes
+  tcp: reclaim 8 bytes in struct request_sock_queue
+
+ .../networking/net_cachelines/tcp_sock.rst    |  6 +++---
+ include/linux/tcp.h                           | 20 +++++++++----------
+ include/net/request_sock.h                    |  2 +-
+ include/net/sock.h                            | 10 +++++-----
+ net/core/sock.c                               |  5 ++++-
+ net/ipv4/tcp.c                                | 15 +++++++-------
+ net/ipv4/tcp_input.c                          |  7 ++++---
+ 7 files changed, 34 insertions(+), 31 deletions(-)
+
 -- 
-2.47.3
+2.51.0.384.g4c02a37b29-goog
 
 
