@@ -1,179 +1,124 @@
-Return-Path: <netdev+bounces-224437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F3C5B84C69
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:18:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF4E1B84C7B
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:20:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF38516A5B3
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 13:18:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 428E53AB77D
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 13:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A5BC30B51E;
-	Thu, 18 Sep 2025 13:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3A0A2FB62B;
+	Thu, 18 Sep 2025 13:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Sq0OZ9C7";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="3Xtdmabv";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Sq0OZ9C7";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="3Xtdmabv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lwq91pyk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B427305E09
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 13:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F6119E7F7
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 13:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758201486; cv=none; b=ri7Pjw6sdutobgDTwCG5IFrFFZ7Q8ZFzRwa8chbEjbnQrTC4D6fkL+99EWJn3+ICkrkjpUiDze+jlcRzUMc0efCn7FUOD4zSYQLR5lPbCiyAdi6GCuj80oYZS5bCPRqiNXc8lCqcEXOloxzVHMeGKqDxbu79yc7rEPU/vSijGyU=
+	t=1758201611; cv=none; b=r34/cvxudwaL6twJiOe8c5vh7X6rPM/gYw1UjljhjTmC1jpqy3yyN06OIg0L/BRQyXtIXUvkGLpy458WXVnDcRu/DMXSfCs+PgFF+tSqTv8LHwjOCThwwF1Wke0cxUIztQMcvRU2fnkHeG/xwiw+EPCgcFyjS7kuvuNPhk8P5Mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758201486; c=relaxed/simple;
-	bh=Ur3gRiy1j/DCQASrWQRFq7NUf3cAF+cMtkmd/6TnNCg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oBiwOgcgJ/HJQiFci7Nj7KLFpxIDnzfT0gUdmXMUsQW2+N4eXkqez3cSGXd1i0vvn4qjyPw4EHOAWdey2LRrqn1L5CKZJYtIBon2yJT/P5xq+h5v1d35Yu9o+ar7lW2OZGvjqTPHnve/nrv3MAu8p9QZOsBdBudCZmmI3Zuhvuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Sq0OZ9C7; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=3Xtdmabv; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Sq0OZ9C7; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=3Xtdmabv; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 058C01FB4E;
-	Thu, 18 Sep 2025 13:18:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758201483; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=81F1VhD1BCWbjrcHGBn6mjVM/rtHwBcVTNIVqbPn+9c=;
-	b=Sq0OZ9C7BfGy2gCccawpG99U1hWrAqWYGg/7R5ZWVqnAp6k9WMTW0/wEPoxpeRR/Gpi1Va
-	AhhiBLcO8BMsUsJCL5U4/Yrpv5FOmisSaSNOEaKrrw3OcCa0Sh0jEkf3E+9w5NK23BTXlf
-	9Q+kiaWdiuGy6TG5bjlIVvixTWF8wig=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758201483;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=81F1VhD1BCWbjrcHGBn6mjVM/rtHwBcVTNIVqbPn+9c=;
-	b=3Xtdmabv45CD1bZaaxb7uvoZSjJ7kWVA7J5rS+Fz9DGG3aTYho6itZACIzsKOO08Jt6Qtr
-	HVsPw3xdkc8nkjBw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=Sq0OZ9C7;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=3Xtdmabv
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758201483; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=81F1VhD1BCWbjrcHGBn6mjVM/rtHwBcVTNIVqbPn+9c=;
-	b=Sq0OZ9C7BfGy2gCccawpG99U1hWrAqWYGg/7R5ZWVqnAp6k9WMTW0/wEPoxpeRR/Gpi1Va
-	AhhiBLcO8BMsUsJCL5U4/Yrpv5FOmisSaSNOEaKrrw3OcCa0Sh0jEkf3E+9w5NK23BTXlf
-	9Q+kiaWdiuGy6TG5bjlIVvixTWF8wig=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758201483;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=81F1VhD1BCWbjrcHGBn6mjVM/rtHwBcVTNIVqbPn+9c=;
-	b=3Xtdmabv45CD1bZaaxb7uvoZSjJ7kWVA7J5rS+Fz9DGG3aTYho6itZACIzsKOO08Jt6Qtr
-	HVsPw3xdkc8nkjBw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E94CF13A39;
-	Thu, 18 Sep 2025 13:18:02 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id XuTwOIoGzGgWLAAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 18 Sep 2025 13:18:02 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 8DF1CA09B1; Thu, 18 Sep 2025 15:17:54 +0200 (CEST)
-Date: Thu, 18 Sep 2025 15:17:54 +0200
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Amir Goldstein <amir73il@gmail.com>, linux-fsdevel@vger.kernel.org, 
-	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
-	netdev@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH v2 04/33] block: use extensible_ioctl_valid()
-Message-ID: <dg5xugicejwym44ibxl24st3xgicga6dzryoxvklqoix3an6js@qkcpc5ig7n56>
-References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
- <20250912-work-namespace-v2-4-1a247645cef5@kernel.org>
- <02da33e3-6583-4344-892f-a9784b9c5b1b@sirena.org.uk>
- <aMlouk_55OXZv8w5@stanley.mountain>
+	s=arc-20240116; t=1758201611; c=relaxed/simple;
+	bh=VTblUJUbLun3X1WvbZdqfGgyMgvlowuldbVp7T4kJOY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Y4h2kRy3GWDTjhBS1etCz43meZNa15AOM/zx2PgFkeMAG77Eye+0GwOjHwYXjQpHNIMwtcFb04Ik5VHraU0Mgja6tAr4aqhgTlo3bA4L2zvD9tgaoYNsukezO9ZMBttPBzbNAn7W8PO5S4pBdtN49JR7RI42rNfFn9vsu+/fihE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lwq91pyk; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-804512c4373so188745985a.3
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 06:20:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758201609; x=1758806409; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=txXnyi8LvTmFUtT8dUwwZLSLufR0inm1maIv2kHZBN4=;
+        b=Lwq91pyk/byEa/HlKE5iNKulhr/tCMVv/F2ElE98RXQffx3BblGsQxdbMTATaD5YqM
+         /S303h2X4k3qA8HK0ruSTRHVZKTtVqCpe0vPqJPGg3I6MLwL0TvuF/Ka2XKqqWAejIXm
+         8vD7CkXgMlQdA6kqWERA+9vNGXh1GVFHgpETudqix4MnmMpRYusoZhX9Yp+rSZh1/mKY
+         st29XY1fbT8dlQ2oRi9qIh8ZciBHs3PrGooMZMJRIEmjpJ6qnb+0HqDBuknxjfDMLQsy
+         AyJCYCsAO1nrWiVAE7/r6lRXl55cW0uVeFsWpKCR1x42CRjTh+vJuqzgd3nkw0FFIp3X
+         xc9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758201609; x=1758806409;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=txXnyi8LvTmFUtT8dUwwZLSLufR0inm1maIv2kHZBN4=;
+        b=EAMBQiT4VCpvXyR2p8FgD7jt6pQz2UP/QimBlWkEqvyThq0CY4mO1Qq/6Y1ed/fYUy
+         6pZ6KyOwy+OA9BufNxFDl4pSoeQa4/c9EZ1Y/R/dqPE76j6IlGERIF2JZy9yKvEaETrD
+         wRcHBPGO2sG9yrrMofx8Z5QVZ/E+Xv+/zPLaT6GWwJ62N1Yzw63ZoH0N6uLBqT/ZvzwL
+         dpsOGMOr1i1JjddhfQTN+GcA12u1W7d5hs3CAx7B0q7qy+O2eE7bsy/XrcnJHct1Vw04
+         k8PhuamRSGBxZJ7vHkOhvV+8m5SfWvHAHM0LywFDRi30LCGUe5y7NmjYhucp2eKBSnkL
+         zixg==
+X-Forwarded-Encrypted: i=1; AJvYcCV/TpRgSuDhMHG28x1JYSyvtjw5cpRtT7pwIv8t2SwcI16tNdIFy2r6Le355EybQmGCqsAaWn4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAeJklJI5NTyFGjksKj6x4IL4L8byAeDWpj0H9/KFosIeLdyfW
+	bbbXC0mW2gQd+NGDhbIVq9/x+Rmt4nayE7pjzJ41yuhzm0xlA3Jd4qgORdaf/Q5DzW2+glEEBxD
+	74xPC7lTna8gA9Q==
+X-Google-Smtp-Source: AGHT+IGtkq1IbmRdA5HWNcPi6XKNjWn3GkalHE+30A10eIkKRuk4ltRnrxSyfVlFxxx4Xj46oyGCTa1WllyVrw==
+X-Received: from qkoz38.prod.google.com ([2002:a05:620a:2626:b0:7fb:99fd:1071])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:1a87:b0:801:a5f7:1645 with SMTP id af79cd13be357-831172ba4dcmr523494285a.85.1758201608824;
+ Thu, 18 Sep 2025 06:20:08 -0700 (PDT)
+Date: Thu, 18 Sep 2025 13:20:07 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aMlouk_55OXZv8w5@stanley.mountain>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 058C01FB4E
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-2.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,suse.cz,gmail.com,vger.kernel.org,toxicpanda.com,yhndnzj.com,in.waw.pl,0pointer.de,cyphar.com,zeniv.linux.org.uk,kernel.dk,cmpxchg.org,suse.com,google.com,redhat.com,oracle.com,linaro.org];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	R_RATELIMIT(0.00)[to_ip_from(RL9r1cnt7e4118fjryeg1c95sa)];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.cz:dkim]
-X-Spam-Score: -2.51
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250918132007.325299-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: prefer sk_skb_reason_drop()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	Daniel Zahka <daniel.zahka@gmail.com>, Dmitry Safonov <0x7f454c46@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Christian, this bug still seems to be present in your vfs.all branch. Can
-you please fix it up? Thanks!
+Replace two calls to kfree_skb_reason() with sk_skb_reason_drop().
 
-								Honza
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Daniel Zahka <daniel.zahka@gmail.com>
+Cc: Dmitry Safonov <0x7f454c46@gmail.com>
+---
+ net/ipv4/tcp_output.c | 2 +-
+ net/psp/psp_sock.c    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-On Tue 16-09-25 16:40:10, Dan Carpenter wrote:
-> Yeah, the:
-> 
-> 	if (extensible_ioctl_valid(cmd, FS_IOC_GETLBMD_CAP, LBMD_SIZE_VER0))
-> 		return -ENOIOCTLCMD;
-> 
-> test is inverted...  It should be if (!valid) return instead of if (valid)
-> return;
-> 
-> regards,
-> dan carpenter
-> 
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 223d7feeb19d4671fcbc9f21caf588c661b4bbe0..bb3576ac0ad7d7330ef272e1d9dc1f19bb8f86bb 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -1586,7 +1586,7 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
+ 		err = tcp_ao_transmit_skb(sk, skb, key.ao_key, th,
+ 					  opts.hash_location);
+ 		if (err) {
+-			kfree_skb_reason(skb, SKB_DROP_REASON_NOT_SPECIFIED);
++			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_NOT_SPECIFIED);
+ 			return -ENOMEM;
+ 		}
+ 	}
+diff --git a/net/psp/psp_sock.c b/net/psp/psp_sock.c
+index d19e37e939672c1f8fc0ebb62e50a3fb32cc8d25..5324a7603bed64d3f1f71b66dd44f622048519a6 100644
+--- a/net/psp/psp_sock.c
++++ b/net/psp/psp_sock.c
+@@ -37,7 +37,7 @@ psp_validate_xmit(struct sock *sk, struct net_device *dev, struct sk_buff *skb)
+ 	good = !pas || rcu_access_pointer(dev->psp_dev) == pas->psd;
+ 	rcu_read_unlock();
+ 	if (!good) {
+-		kfree_skb_reason(skb, SKB_DROP_REASON_PSP_OUTPUT);
++		sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PSP_OUTPUT);
+ 		return NULL;
+ 	}
+ 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.51.0.384.g4c02a37b29-goog
+
 
