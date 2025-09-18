@@ -1,180 +1,129 @@
-Return-Path: <netdev+bounces-224291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2026FB8386D
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:33:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C8C1B83875
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:34:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE39C7B566C
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:31:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8C4C178123
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:34:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52C022EAD0C;
-	Thu, 18 Sep 2025 08:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3FD02F362F;
+	Thu, 18 Sep 2025 08:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v4oQ9YGz"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Jflt6Kd0"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF5036B
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 08:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44762EBDF6
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 08:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758184397; cv=none; b=KvcKlow9rB9qt369XZ1lK6VNfEBE93J3ZNiprwgBo6JI8GxEDpUCQ9Cx1AWPj2xBsE+IZDdTF8Q3oUk9L7eXlrJ7fy3p4icoJa17vePp3MvtsyjLe4WYAR9QfcCvAVtHVe7T2AGEY+GDXcwMDdE1pZBj9s6Toi53PEv3lvM6lck=
+	t=1758184446; cv=none; b=fge+MOarNB/vLDugfHweNvOAqLWb0a7nFR98l28dTewrpzjlVK7nYD9Mm8pjUHONjOSX2l+HcUFgxzctAGcu1Xr4vhW7/qTAD3ToOm/v0ayQrflOrZUaT0npINEVplA+aYECSx8H7vqPUD4nM0crwZUsvHpPMBrKdBESlX7iaLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758184397; c=relaxed/simple;
-	bh=+fMm+b1szClNjFDv3rP2OIX4s4h74OjlpfgmyNkFFeY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=shlEvzkUt7xjHLJDiwv8V9C8xkP0/VytQ73z8F2t+5RtBBC1ifzjo7OgbRlbirSEZPADkPtkNjYewy8ehJUNfKG4N5VcGl64CME21Ead8xGLr5u2IE/707hj3TMJwVhBdU3CISX70wyIcPmq2oMdmEac9gZmSvk7Vaef47RupQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v4oQ9YGz; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c7a91e0c-b575-43b3-af5b-64fc35b46fac@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758184392;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y3rGXrDev5lwGXuSs5NQNRlAH8FiBLqN39SRoX0zdDM=;
-	b=v4oQ9YGzCExtNSqviyPuR3w4Pi7QnhhF0j35U+lmKC1i2jRN3ytg+X5QXK1TW1lZftJO05
-	Wf7wXMxHQuxyQxlaTe9AfBGQ5Mnd65/LzVyIsWiuI/+OSBzdm9MaF0VSNkDhXQxYfGalJy
-	XLXro4roRBvFxapHY84SqjAZsSKbxco=
-Date: Thu, 18 Sep 2025 16:32:32 +0800
+	s=arc-20240116; t=1758184446; c=relaxed/simple;
+	bh=W2UevpxpSm8SQYwKL2wt5+cdCkS3INsRoHsUPaaQfTQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Vdkg3drBbj11DnZl/ilx3WcNt2V4wlyam/P7+t0tfOTfgeZzMK1QTbzPsRRqK2vNUXDiqBiGqwliSZmt/A6jtpEJwUVxgLxIQPqFnolBv4DZkGdCUYZu6J7rX1LsUItvTefLTUNsNR5U/QVlWUEyygBWagpNNDgPX4/5vSuobT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Jflt6Kd0; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id EDF32C00084;
+	Thu, 18 Sep 2025 08:33:45 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 855B46062C;
+	Thu, 18 Sep 2025 08:34:02 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 20D00102F1CC8;
+	Thu, 18 Sep 2025 10:33:51 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1758184441; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=pdSz/jWDXq03u72i3CSr6i5FwEH77P2FJ0Myc7lY4mQ=;
+	b=Jflt6Kd0e3oo7s+dPAQYbh1zkjqELdunk/EQGrIBKX+UojCorfrNr/Bx0RxZlTM/A4Iqnj
+	A+a+HQaZnI7a4qIC36rNMSFwVCqUB3uO9fsNF3p+d7Y23dBERo5OqJalpsaBgh4FtoeUI5
+	BUNtP+5aejEcwRrpSu6hD1yz6o/Q7aGURSsv90VzKO9sFl1wGA+hZHo28idX/6LBcMpin4
+	yZOrm5CKQEzpQEDMhtAthNp+srNsRG97VgL1dNHPoeucMSrG+h9ePkdUSCIPBUG2eO7UIA
+	ZY0AC6XfLJwyPaTFAyQTkm3O34xZ0e2sXdF8jaPoqh41fRl/NA3oAvKo7yGbgA==
+From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
+Subject: [PATCH net-next v3 0/3] net: dsa: microchip: Add strap description
+ to set SPI as interface bus
+Date: Thu, 18 Sep 2025 10:33:49 +0200
+Message-Id: <20250918-ksz-strap-pins-v3-0-16662e881728@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3 3/3] inet: Avoid ehash lookup race in
- inet_twsk_hashdance_schedule()
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: edumazet@google.com, kerneljasonxing@gmail.com, davem@davemloft.net,
- kuba@kernel.org, netdev@vger.kernel.org,
- Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-References: <20250916103054.719584-1-xuanqiang.luo@linux.dev>
- <20250916103054.719584-4-xuanqiang.luo@linux.dev>
- <CAAVpQUAEBeTjHxT7nk7qgOL8qmVxqdnSDeg=TKt4GjwNXEPxUA@mail.gmail.com>
- <9d6b887f-c75c-468b-beaf-a3c7979bd132@linux.dev>
- <CAAVpQUBY=h3gDfaX=J9vbSuhYTn8cfCsBGhPLqoer0OSYdihDg@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: luoxuanqiang <xuanqiang.luo@linux.dev>
-In-Reply-To: <CAAVpQUBY=h3gDfaX=J9vbSuhYTn8cfCsBGhPLqoer0OSYdihDg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAO3Dy2gC/2XNyw7CIBQE0F8xrL0GLn2IK//DuOjjaokKDRBSb
+ frvIm58LCeTOTMzT06TZ7vVzBxF7bU1Kcj1inVDY84Euk+ZIceSK17AxT/AB9eMMGrjAXsheVk
+ UQmLJ0mh0dNJTBg/MUABDU2DH1AzaB+vu+SmK3L9RwX/RKIBDJfm2bZGEVLRvrQ1XbTadvWUs4
+ ieAfwC+gF7VWPOuUlh9A8uyPAFePjqk+QAAAA==
+X-Change-ID: 20250904-ksz-strap-pins-2d1305441325
+To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
+ Pascal Eberhard <pascal.eberhard@se.com>, 
+ Woojung Huh <Woojung.Huh@microchip.com>, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
+X-Mailer: b4 0.14.2
+X-Last-TLS-Session-Version: TLSv1.3
 
+Hi all,
 
-在 2025/9/17 12:36, Kuniyuki Iwashima 写道:
-> On Tue, Sep 16, 2025 at 8:27 PM luoxuanqiang <xuanqiang.luo@linux.dev> wrote:
->>
->> 在 2025/9/17 03:48, Kuniyuki Iwashima 写道:
->>> On Tue, Sep 16, 2025 at 3:31 AM <xuanqiang.luo@linux.dev> wrote:
->>>> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
->>>>
->>>> Since ehash lookups are lockless, if another CPU is converting sk to tw
->>>> concurrently, fetching the newly inserted tw with tw->tw_refcnt == 0 cause
->>>> lookup failure.
->>>>
->>>> The call trace map is drawn as follows:
->>>>      CPU 0                                CPU 1
->>>>      -----                                -----
->>>>                                        inet_twsk_hashdance_schedule()
->>>>                                        spin_lock()
->>>>                                        inet_twsk_add_node_rcu(tw, ...)
->>>> __inet_lookup_established()
->>>> (find tw, failure due to tw_refcnt = 0)
->>>>                                        __sk_nulls_del_node_init_rcu(sk)
->>>>                                        refcount_set(&tw->tw_refcnt, 3)
->>>>                                        spin_unlock()
->>>>
->>>> By replacing sk with tw atomically via hlist_nulls_replace_init_rcu() after
->>>> setting tw_refcnt, we ensure that tw is either fully initialized or not
->>>> visible to other CPUs, eliminating the race.
->>>>
->>>> Fixes: 3ab5aee7fe84 ("net: Convert TCP & DCCP hash tables to use RCU / hlist_nulls")
->>>> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
->>>> ---
->>>>    net/ipv4/inet_timewait_sock.c | 15 ++++++---------
->>>>    1 file changed, 6 insertions(+), 9 deletions(-)
->>>>
->>>> diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
->>>> index 5b5426b8ee92..1ba20c4cb73b 100644
->>>> --- a/net/ipv4/inet_timewait_sock.c
->>>> +++ b/net/ipv4/inet_timewait_sock.c
->>>> @@ -116,7 +116,7 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
->>>>           spinlock_t *lock = inet_ehash_lockp(hashinfo, sk->sk_hash);
->>>>           struct inet_bind_hashbucket *bhead, *bhead2;
->>>>
->>>> -       /* Step 1: Put TW into bind hash. Original socket stays there too.
->>>> +       /* Put TW into bind hash. Original socket stays there too.
->>>>              Note, that any socket with inet->num != 0 MUST be bound in
->>>>              binding cache, even if it is closed.
->>>>            */
->>>> @@ -140,14 +140,6 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
->>>>
->>>>           spin_lock(lock);
->>>>
->>>> -       /* Step 2: Hash TW into tcp ehash chain */
->>>> -       inet_twsk_add_node_rcu(tw, &ehead->chain);
->>>> -
->>>> -       /* Step 3: Remove SK from hash chain */
->>>> -       if (__sk_nulls_del_node_init_rcu(sk))
->>>> -               sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
->>>> -
->>>> -
->>>>           /* Ensure above writes are committed into memory before updating the
->>>>            * refcount.
->>>>            * Provides ordering vs later refcount_inc().
->>>> @@ -162,6 +154,11 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
->>>>            */
->>>>           refcount_set(&tw->tw_refcnt, 3);
->>>>
->>>> +       if (hlist_nulls_replace_init_rcu(&sk->sk_nulls_node, &tw->tw_node))
->>>> +               sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
->>>> +       else
->>>> +               inet_twsk_add_node_rcu(tw, &ehead->chain);
->>> When hlist_nulls_replace_init_rcu() returns false ?
->> When hlist_nulls_replace_init_rcu() returns false, it means
->> sk is unhashed,
-> and how does this happen ?
->
-> Here is under lock_sock() I think, for example, you can
-> find a lockdep annotation in the path:
->
-> tcp_time_wait_init
->    tp->af_specific->md5_lookup / tcp_v4_md5_lookup
->      tcp_md5_do_lookup
->        __tcp_md5_do_lookup
->          rcu_dereference_check(tp->md5sig_info, lockdep_sock_is_held(sk));
->
-> So, is there a path that unhashes socket without holding
-> lock_sock() ?
->
-I'm not entirely sure about this point yet, because
-inet_unhash() is called in too many places and uses
-__sk_nulls_del_node_init_rcu() to unhash sockets without
-explicitly requiring bh_lock_sock().
+At reset, the KSZ8463 uses a strap-based configuration to set SPI as
+interface bus. If the required pull-ups/pull-downs are missing (by
+mistake or by design to save power) the pins may float and the
+configuration can go wrong preventing any communication with the switch.
 
-Until I can verify this, I'll keep the original check
-for old socket unhashed state to ensure safety.
+This small series aims to allow to configure the KSZ8463 switch at
+reset when the hardware straps are missing.
 
-It would be great if you could confirm this behavior.
+PATCH 0 and 1 add a new property to the bindings that describes the GPIOs
+to be set during reset in order to configure the switch properly.
 
-Thanks
-Xuanqiang.
+PATCH 2 implements the use of these properties in the driver.
 
->> the replacement operation failed, we need
->> to insert tw, and this doesn't change the original logic.
->>
->>>> +
->>>>           inet_twsk_schedule(tw, timeo);
->>>>
->>>>           spin_unlock(lock);
->>>> --
->>>> 2.25.1
->>>>
+Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
+---
+Changes in v3:
+- Replace the 'strap-rxd0-gpios/strap-rxd1-gpios' properties with one
+  'straps-rxd-gpios' property that describes both GPIOs.
+- Add Rob's acked-by on PATCH 0 and Andrew's reviewed-by on PATCH 2
+- Link to v2: https://lore.kernel.org/r/20250912-ksz-strap-pins-v2-0-6d97270c6926@bootlin.com
+
+Changes in v2:
+- Make the changes specific to the KSZ8463 both in the bindings and in
+  the driver.
+- Link to v1: https://lore.kernel.org/r/20250910-ksz-strap-pins-v1-0-6308bb2e139e@bootlin.com
+
+---
+Bastien Curutchet (1):
+      net: dsa: microchip: Set SPI as bus interface during reset for KSZ8463
+
+Bastien Curutchet (Schneider Electric) (2):
+      dt-bindings: net: dsa: microchip: Group if clause under allOf tag
+      dt-bindings: net: dsa: microchip: Add strap description to set SPI mode
+
+ .../devicetree/bindings/net/dsa/microchip,ksz.yaml | 87 +++++++++++++---------
+ drivers/net/dsa/microchip/ksz_common.c             | 45 +++++++++++
+ 2 files changed, 98 insertions(+), 34 deletions(-)
+---
+base-commit: 270d4d5a6cf3f2d9eee48e9cb8c138a975ddae81
+change-id: 20250904-ksz-strap-pins-2d1305441325
+
+Best regards,
+-- 
+Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
+
 
