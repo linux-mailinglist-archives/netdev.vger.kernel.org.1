@@ -1,207 +1,253 @@
-Return-Path: <netdev+bounces-224450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65F07B853DE
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:30:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CCA9B853F9
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:31:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 076503B23B5
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:25:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C57F1884140
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:26:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 511122236E0;
-	Thu, 18 Sep 2025 14:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5949F23D2A1;
+	Thu, 18 Sep 2025 14:25:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RIEjBc34"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Itu0Pss4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE563217F24
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 14:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3BE3A31
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 14:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758205448; cv=none; b=T7oSVdHtyRIG6wt++/v3Q3Le/XRyPHdljEZcex7hUVhADfnaExeHRka/5/q6PhMTnGlIXOkAITDc7iT27rAQul/V47TnRVuoLCsTjfgx0aLcahN8qWXJZSbhhGW0LE4f0u/JJKqRGmlqjpildjzy6H+NcmyH+prrFtG0WM1dfDY=
+	t=1758205526; cv=none; b=goc79l8i9ar9L6iWnfTey1lxBE0F2GH+l+TuWlL8FBPPJ1GbhR0GvOadkKh00NnFt3PQsco+eh1xk87IASvAfPlg6nuRmcPh/ao4wNCzAZDvq/4qI94cRuo46AmCCApEPyUDG1FNiH6XEaYQ6CIudF4dIT/PHkAeepYHjtWk+to=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758205448; c=relaxed/simple;
-	bh=IDc6RQ3z8B8Ry/K9LKfQg3eL/rSFGyiNZ4wOOd5+bsk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nwPqmXjxznfSng33qOPViQUmWJ0yebj77HiIqAHrW5WcFLDw7gAc0ZMius5fWqsjN6cCVNLKUtry5epLkhIfCo65wu9gDOnc/BqWSaorYb33AcHhgsLYnQxK/3OivP4qtXFl/JNS+vkO7PSoZLOF8dDdXjGIixYjBUkhsXKW1m4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RIEjBc34; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-76e2ea933b7so1004641b3a.1
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 07:24:06 -0700 (PDT)
+	s=arc-20240116; t=1758205526; c=relaxed/simple;
+	bh=zd9oEvjbsFZEzkZKgyZXuavZDCPkhVV02+jKJxy8Q+o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=b3KUcNdxgy/JuBlsJzK8S6yUQQUTxEF3SLkV/0vppohDQHiSWkG64v03BRsvHmpX6cjqQOrT8GLxohrJGB5plffKLIjhpcGuxOJWHCr+L7FioOBhmDpAvYvU5nQLWY/XI4iRN5duNxmiU3QNyxamT2KVP0TqAodX8S39esUyFBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Itu0Pss4; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-45e03730f83so5276425e9.0
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 07:25:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758205446; x=1758810246; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VN6OUyLXfG28wohM8pGgYSaroM8kq146dlifB0TJ7X4=;
-        b=RIEjBc34s6VzMqJ3ErPcdVTEJstlYQJilyEPKqQwxJKWSjDl77WrafrS2uJ+XQeP9u
-         klEgThwMTkRy4FoooWn2T+jh6ecEh9yDlPzb+GjlBK8Losy+2EdMqesH32CF0wTTsY3t
-         SuKOqRfOm3J410tb5jmPArs5Gu0CxPCaeKPN4G8ONBBW87/iao84NJ5X1o0lGQHgsEew
-         egValb4BoX5PP3sTwn0EhQUYP91livNzsuc1ebwIZdUdncDdqVZ81DbjONrs/2RRPSBK
-         KzmFl+0PCvIBIQPv9ATWqCavAGU8vEV11B3Q2GUx2bUxBF10by+LSb0y8eT68zMiNeGi
-         zkEA==
+        d=suse.com; s=google; t=1758205522; x=1758810322; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WE2DEt9EGhRBg3yNiaAboEyKKuePq1ZiZ4txhpHF3hw=;
+        b=Itu0Pss4Gz+D9zvrBCqU+rcb7oo9aw4jqS0ZVoLbw9z1y84bZgpB2FG2dE8YkwUmHA
+         6WBixguEjaCh0UFp3zEdNWHEySWpmr+vB7y3q4BiND4SoMfHryYvYEkjwL2hYvsKWukM
+         HbDnjr/ROFFx6AFqp+Z3vmwLGZYwKgDgGaVsJBOwItIYrhaeExh37pKyogJqDuj7uFHQ
+         sv+6GHnu3PkjZMZcVNwhS/a5vz6cmOXxOmgjpJv1xKrcP3mvDhvTjiN4XuVutiYtG+vw
+         JCa0xMjx7A74l4CGwKXQjeM8ltMQQRVERhRR7bTe13shwzkfpyLd7nvloRJxck0EB0iA
+         nM7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758205446; x=1758810246;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VN6OUyLXfG28wohM8pGgYSaroM8kq146dlifB0TJ7X4=;
-        b=MHFGm6OlOAD4TQp6bCrz1jHjmBjOpw21jo/LIfDisKj/phD261ei5dG5dA/xuxU6YR
-         SLNK8T8DGKQgcfPaUXm1O2ECtGAajG/zcOX0Jl4LzxNjt2u5LNVUMSkkcOvjEMTZSzXM
-         RydIjbfkrAIhNw5qkpsc8oZBIQ9d/Hv3znESC7TLnRQS8B0UsuyxVdKGAZo0fyNkcdMr
-         GemZpm1FDL8qAJgDD7UdTL5b77ju82Jj2d2A4XZNVeSil9jswx7WcbixPN/t++1BIkwj
-         hHCcwyL8StVS/FeXMY5lTwqzKE8+uXBfUh5y2BZ9XeF5BUyHbND8BJUMiBHgq7k7516+
-         d01Q==
-X-Gm-Message-State: AOJu0YyZxt8lHL7mazm3P2SZ6ClpSyCq3Fe17OdbuvLllDySNbENGguu
-	meo+VxMxswdhtl05DAKkSapHg0V1LlMs6I98Th66qzGx60Yqfj8UEi6CfcdQt9ij2nOFS2/K3/4
-	HIXVmel3t/HJxZT2e9wduEaxdIj/RMwk=
-X-Gm-Gg: ASbGncuYhY7W9CTUBOesj0X7Nho45/pB/Zi8GzOLFFC9LhT5ZciU0bv9/Jq5aapfwXy
-	0f+zazFpWiE2mkS81VkdhZbdTKkvJsA+NeIHjocI+CMPAO7/5aQtSzDo5fs0mEU0dmFwRUR1P/B
-	ifaQY4zEligrkt3Mcesgo16zHGQ5Kw1QvYuYopo8EFb9s/dPutv5lfdWA4fW0xi99ckhGKBJKsT
-	ADAJ/BmvXAymFT2el7dxVz3DHJjLoJWUMBv+uZBJrxkiozsB3dnRHyZFCs=
-X-Google-Smtp-Source: AGHT+IFhZD7k5FRjyNJx+sSzVwaeNyL2q4qjPlMlcQFnqYx6LT/d960WLfFakjpmqfqXBsKQLRHj7RaAt6fk5YjM5fQ=
-X-Received: by 2002:a05:6a20:2450:b0:249:467e:ba70 with SMTP id
- adf61e73a8af0-2845641b90bmr4887486637.24.1758205445964; Thu, 18 Sep 2025
- 07:24:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758205522; x=1758810322;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WE2DEt9EGhRBg3yNiaAboEyKKuePq1ZiZ4txhpHF3hw=;
+        b=raNw4kf1qUWoZSZOaAOJUC/ZBiT1Sradp8LLpUAaUiUvcCs6onft3yJ9CoCrVkK+c2
+         eSwr6Iteia5sMxuFK1PvfNGuiHcljd8xMajXWmPe1aH/XmmXlmZgX8iziSF1PJbcDB3I
+         dCFPmmNdvuhzchb8mgHnNJc+pEge4ox6/T1LHVuG1rIsV372YNoExSKgXJ/dINYSgOnd
+         NF9RHx4rXqATgNZ/4I/99i4Tp4ynDghK3j9qFZyOFvx9eW8ulw/F/m8HhtSJmKUQHTV6
+         xsX1oAKxzaeos/GJczXb75bWTM2AD1sDTKnnFLRfVXQPdQ7Jnq44tfK3WuHWaIKG/Llg
+         2b0A==
+X-Forwarded-Encrypted: i=1; AJvYcCXzp1stVrbPn4SeugRGJY4gooK7xUHbBf2J1biaKUFLZZDH/SFaoWkQ0Pgpi73bBBunwdWxM+w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUiEtFGww9mjaeu+3f0cJUuvbA8OUkRkLpksXzSHA84cbl3zoY
+	vvhwJMkXTSPucqzErMIBKegQTM4E14YhvQHg4T/fRnC1/HW+7uyztZh+a0AT4ZqaYlo=
+X-Gm-Gg: ASbGnct10PBeca5VCWXVIvpLRPbAyXxcbQjAFGzjgxk1nNUhRpvW0lCsIxyE28txOOo
+	zReTIR9TeXt1G5mThoL/e+Ma02iEQkA8RBxCmXc7hyrqD4CcaIDbDlJTJQR3Gja+gsfeN/I8INV
+	WTPKt+cIHd2s/kBrnfSyG5g0Ghoem/sPuUSr/dxOY0gGyaRm9JniABr7wrU2g3AW5fA7d7vi6Ne
+	T7Zf9yWDQnzedLKCFaTf2NztbwcWyLaihOEVlNrdSZ+duYG6WZjAoVuZlBqZrGHEvl5dYr6AT/p
+	8ZoAPru6K5sF8ahKG2J+BvcF72Ce040TNkF37rklQTOJIEeeu0hY/9ktctMPiC1khatDCyZ9k+d
+	7EJf/5FlUzN0IAp530pSvG0DEnhwimwyitiCWMQhDeCZHsR3b0rIoqGwY6+HGDTesl7bBJi8J+q
+	I=
+X-Google-Smtp-Source: AGHT+IGLDgxfcD9R60EZMn+yc5KYVxRrO0BbIFeSAQdoqt6pcwUYiTojoIKVW54d2TJVYbzhCprckw==
+X-Received: by 2002:a05:600c:4e8c:b0:45b:47e1:ef71 with SMTP id 5b1f17b1804b1-462072d7939mr56704105e9.36.1758205521934;
+        Thu, 18 Sep 2025 07:25:21 -0700 (PDT)
+Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45f32085823sm63270675e9.0.2025.09.18.07.25.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Sep 2025 07:25:21 -0700 (PDT)
+From: Marco Crivellari <marco.crivellari@suse.com>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Tejun Heo <tj@kernel.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v2 0/3] net: replace wq users and add WQ_PERCPU to alloc_workqueue() users
+Date: Thu, 18 Sep 2025 16:24:24 +0200
+Message-ID: <20250918142427.309519-1-marco.crivellari@suse.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250913044404.63641-1-mmyangfl@gmail.com> <20250913044404.63641-4-mmyangfl@gmail.com>
- <20250916231714.7cg5zgpnxj6qmg3d@skbuf>
-In-Reply-To: <20250916231714.7cg5zgpnxj6qmg3d@skbuf>
-From: Yangfl <mmyangfl@gmail.com>
-Date: Thu, 18 Sep 2025 22:23:29 +0800
-X-Gm-Features: AS18NWB6aHnLtegCP0Qrw-Qf-BcoCYte67EfE_oUYhQeFIVJUf2eO5bV4mq7rlU
-Message-ID: <CAAXyoMOpj1iCd6KZH0dQ-riuDSH_KOkvzB=cz66rWgykChda9g@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 3/3] net: dsa: yt921x: Add support for
- Motorcomm YT921x
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 17, 2025 at 7:17=E2=80=AFAM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
-...
-> > +
-> > +     mutex_lock(&priv->reg_lock);
-> > +     res =3D yt921x_vlan_filtering(priv, port, vlan_filtering);
-> > +     mutex_unlock(&priv->reg_lock);
-> > +
-> > +     return res;
-> > +}
-> > +
-> > +static int
-> > +yt921x_dsa_port_vlan_add(struct dsa_switch *ds, int port,
-> > +                      const struct switchdev_obj_port_vlan *vlan,
-> > +                      struct netlink_ext_ack *extack)
-> > +{
-> > +     struct yt921x_priv *priv =3D to_yt921x_priv(ds);
-> > +     u16 vid =3D vlan->vid;
-> > +     u16 pvid;
-> > +     int res;
-> > +
-> > +     if ((priv->cpu_ports_mask & BIT(port)) !=3D 0)
-> > +             return 0;
->
-> The CPU port is VLAN-unaware by default and the driver leaves it that
-> way, correct?
->
+Hi!
 
-Yes. Actually flows via CPU port are entirely up to the tag, and we
-actively isolate it from any other ports (see port_setup()) so packets
-without tag are automatically dropped.
+Below is a summary of a discussion about the Workqueue API and cpu isolation
+considerations. Details and more information are available here:
 
-...
->
-> > +static int yt921x_chip_setup(struct yt921x_priv *priv)
-> > +{
-> > +     struct dsa_switch *ds =3D &priv->ds;
-> > +     unsigned long cpu_ports_mask;
-> > +     u64 ctrl64;
-> > +     u32 ctrl;
-> > +     int port;
-> > +     int res;
-> > +
-> > +     /* Enable DSA */
-> > +     priv->cpu_ports_mask =3D dsa_cpu_ports(ds);
-> > +
-> > +     ctrl =3D YT921X_EXT_CPU_PORT_TAG_EN | YT921X_EXT_CPU_PORT_PORT_EN=
- |
-> > +            YT921X_EXT_CPU_PORT_PORT(__ffs(priv->cpu_ports_mask));
-> > +     res =3D yt921x_reg_write(priv, YT921X_EXT_CPU_PORT, ctrl);
-> > +     if (res)
-> > +             return res;
-> > +
-> > +     /* Enable and clear MIB */
-> > +     res =3D yt921x_reg_set_bits(priv, YT921X_FUNC, YT921X_FUNC_MIB);
-> > +     if (res)
-> > +             return res;
-> > +
-> > +     ctrl =3D YT921X_MIB_CTRL_CLEAN | YT921X_MIB_CTRL_ALL_PORT;
-> > +     res =3D yt921x_reg_write(priv, YT921X_MIB_CTRL, ctrl);
-> > +     if (res)
-> > +             return res;
-> > +
-> > +     /* Setup software switch */
-> > +     ctrl =3D YT921X_CPU_COPY_TO_EXT_CPU;
-> > +     res =3D yt921x_reg_write(priv, YT921X_CPU_COPY, ctrl);
-> > +     if (res)
-> > +             return res;
-> > +
-> > +     ctrl =3D GENMASK(10, 0);
-> > +     res =3D yt921x_reg_write(priv, YT921X_FILTER_UNK_UCAST, ctrl);
-> > +     if (res)
-> > +             return res;
-> > +     res =3D yt921x_reg_write(priv, YT921X_FILTER_UNK_MCAST, ctrl);
-> > +     if (res)
-> > +             return res;
-> > +
-> > +     /* YT921x does not support native DSA port bridging, so we use po=
-rt
-> > +      * isolation to emulate it. However, be especially careful that p=
-ort
-> > +      * isolation takes _after_ FDB lookups, i.e. if an FDB entry (fro=
-m
-> > +      * another bridge) is matched and the destination port (in anothe=
-r
-> > +      * bridge) is blocked, the packet will be dropped instead of floo=
-ding to
-> > +      * the "bridged" ports, thus we need to handle those packets by
-> > +      * software.
-> > +      *
-> > +      * If there is no more than one bridge, we might be able to drop =
-them
-> > +      * directly given some conditions are met, but for now we trap th=
-em in
-> > +      * all cases.
-> > +      */
-> > +     ctrl =3D 0;
-> > +     for (int i =3D 0; i < YT921X_PORT_NUM; i++)
-> > +             ctrl |=3D YT921X_ACT_UNK_ACTn_TRAP(i);
->
-> YT921X_ACT_UNK_ACTn_TRAP traps packets with FDB misses to the CPU, correc=
-t?
+        "workqueue: Always use wq_select_unbound_cpu() for WORK_CPU_UNBOUND."
+        https://lore.kernel.org/all/20250221112003.1dSuoGyc@linutronix.de/
 
-Yes, and
+=== Current situation: problems ===
 
-> How does that address the described problem, where an FDB entry is
-> found, but the destination port is isolated from the source?
+Let's consider a nohz_full system with isolated CPUs: wq_unbound_cpumask is
+set to the housekeeping CPUs, for !WQ_UNBOUND the local CPU is selected.
 
-also in this case.
+This leads to different scenarios if a work item is scheduled on an isolated
+CPU where "delay" value is 0 or greater then 0:
+        schedule_delayed_work(, 0);
 
-...
+This will be handled by __queue_work() that will queue the work item on the
+current local (isolated) CPU, while:
+
+        schedule_delayed_work(, 1);
+
+Will move the timer on an housekeeping CPU, and schedule the work there.
+
+Currently if a user enqueue a work item using schedule_delayed_work() the
+used wq is "system_wq" (per-cpu wq) while queue_delayed_work() use
+WORK_CPU_UNBOUND (used when a cpu is not specified). The same applies to
+schedule_work() that is using system_wq and queue_work(), that makes use
+again of WORK_CPU_UNBOUND.
+
+This lack of consistentcy cannot be addressed without refactoring the API.
+
+=== Plan and future plans ===
+
+This patchset is the first stone on a refactoring needed in order to
+address the points aforementioned; it will have a positive impact also
+on the cpu isolation, in the long term, moving away percpu workqueue in
+favor to an unbound model.
+
+These are the main steps:
+1)  API refactoring (that this patch is introducing)
+    -   Make more clear and uniform the system wq names, both per-cpu and
+        unbound. This to avoid any possible confusion on what should be
+        used.
+
+    -   Introduction of WQ_PERCPU: this flag is the complement of WQ_UNBOUND,
+        introduced in this patchset and used on all the callers that are not
+        currently using WQ_UNBOUND.
+
+        WQ_UNBOUND will be removed in a future release cycle.
+
+        Most users don't need to be per-cpu, because they don't have
+        locality requirements, because of that, a next future step will be
+        make "unbound" the default behavior.
+
+2)  Check who really needs to be per-cpu
+    -   Remove the WQ_PERCPU flag when is not strictly required.
+
+3)  Add a new API (prefer local cpu)
+    -   There are users that don't require a local execution, like mentioned
+        above; despite that, local execution yeld to performance gain.
+
+        This new API will prefer the local execution, without requiring it.
+
+=== Introduced Changes by this series ===
+
+1) [P 1-2] Replace use of system_wq and system_unbound_wq
+
+        system_wq is a per-CPU workqueue, but his name is not clear.
+        system_unbound_wq is to be used when locality is not required.
+
+        Because of that, system_wq has been renamed in system_percpu_wq, and
+        system_unbound_wq has been renamed in system_dfl_wq.
+
+2) [P 3] add WQ_PERCPU to remaining alloc_workqueue() users
+
+        Every alloc_workqueue() caller should use one among WQ_PERCPU or
+        WQ_UNBOUND.
+
+        WQ_UNBOUND will be removed in a next release cycle.
+
+Thanks!
+
+
+---
+Changes in v2:
+- wireless removed from this series
+- work rebased on latest net-next changes
+
+
+Marco Crivellari (3):
+  net: replace use of system_unbound_wq with system_dfl_wq
+  net: replace use of system_wq with system_percpu_wq
+  net: WQ_PERCPU added to alloc_workqueue users
+
+ drivers/net/can/spi/hi311x.c                         |  3 ++-
+ drivers/net/can/spi/mcp251x.c                        |  3 ++-
+ drivers/net/ethernet/cavium/liquidio/lio_core.c      |  2 +-
+ drivers/net/ethernet/cavium/liquidio/lio_main.c      |  8 +++++---
+ drivers/net/ethernet/cavium/liquidio/lio_vf_main.c   |  3 ++-
+ .../net/ethernet/cavium/liquidio/request_manager.c   |  2 +-
+ .../net/ethernet/cavium/liquidio/response_manager.c  |  3 ++-
+ drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c     |  2 +-
+ .../net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c  |  3 ++-
+ drivers/net/ethernet/intel/fm10k/fm10k_main.c        |  2 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c          |  2 +-
+ drivers/net/ethernet/marvell/octeontx2/af/cgx.c      |  2 +-
+ .../net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c   |  2 +-
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c  |  2 +-
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c  |  2 +-
+ .../net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c |  3 ++-
+ .../net/ethernet/marvell/prestera/prestera_main.c    |  2 +-
+ drivers/net/ethernet/marvell/prestera/prestera_pci.c |  2 +-
+ drivers/net/ethernet/mellanox/mlxsw/core.c           |  4 ++--
+ drivers/net/ethernet/netronome/nfp/nfp_main.c        |  2 +-
+ drivers/net/ethernet/qlogic/qed/qed_main.c           |  3 ++-
+ drivers/net/ethernet/sfc/efx_channels.c              |  2 +-
+ drivers/net/ethernet/sfc/siena/efx_channels.c        |  2 +-
+ drivers/net/ethernet/wiznet/w5100.c                  |  2 +-
+ drivers/net/fjes/fjes_main.c                         |  5 +++--
+ drivers/net/macvlan.c                                |  2 +-
+ drivers/net/netdevsim/dev.c                          |  6 +++---
+ drivers/net/phy/sfp.c                                | 12 ++++++------
+ drivers/net/wireguard/device.c                       |  6 ++++--
+ drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c           |  3 ++-
+ drivers/net/wwan/wwan_hwsim.c                        |  2 +-
+ net/bridge/br_cfm.c                                  |  6 +++---
+ net/bridge/br_mrp.c                                  |  8 ++++----
+ net/ceph/messenger.c                                 |  3 ++-
+ net/ceph/mon_client.c                                |  2 +-
+ net/core/link_watch.c                                |  4 ++--
+ net/core/skmsg.c                                     |  2 +-
+ net/core/sock_diag.c                                 |  2 +-
+ net/devlink/core.c                                   |  2 +-
+ net/ipv4/inet_fragment.c                             |  2 +-
+ net/netfilter/nf_conntrack_ecache.c                  |  2 +-
+ net/openvswitch/dp_notify.c                          |  2 +-
+ net/rds/ib_rdma.c                                    |  3 ++-
+ net/rfkill/input.c                                   |  2 +-
+ net/rxrpc/rxperf.c                                   |  2 +-
+ net/smc/af_smc.c                                     |  6 +++---
+ net/smc/smc_core.c                                   |  4 ++--
+ net/tls/tls_device.c                                 |  2 +-
+ net/unix/garbage.c                                   |  2 +-
+ net/vmw_vsock/af_vsock.c                             |  2 +-
+ net/vmw_vsock/virtio_transport.c                     |  2 +-
+ net/vmw_vsock/vsock_loopback.c                       |  2 +-
+ 52 files changed, 88 insertions(+), 73 deletions(-)
+
+-- 
+2.51.0
+
 
