@@ -1,142 +1,126 @@
-Return-Path: <netdev+bounces-224585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00247B8662A
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 20:08:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5633AB86630
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 20:08:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67BEE7BDEDF
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 18:06:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2CAC3AD9A2
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 18:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D36A2D1308;
-	Thu, 18 Sep 2025 18:07:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B50B12C326F;
+	Thu, 18 Sep 2025 18:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PxclFLwb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bnZQlnCx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7872D0611;
-	Thu, 18 Sep 2025 18:07:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1DC2D1905
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 18:08:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758218875; cv=none; b=cq7eSaEdaeWY9cOFsm/eo1aMjSMPwTZFqCXwezfZ3MuYonoNneEIgpUIB0lU9TEslf9giA81XxNmb5wsKvQrxr0zTByiDDq04f8WBZcCf04tP4jbSksFOfzx8GPxrzGCmj9xFbtfl/xJziisheBz/UQlMNtNrVmJ6AJEOvtUJl0=
+	t=1758218915; cv=none; b=AEfUliiKTUv9KvIuWI+/TK6sysye1WwEPihr5pON5aYJ5AdLAdOHIljqorGLXejrOQLms65AggcD+TFojq2kBT+n4cOwy825lEeoJZzn/O7h1tty18/4zwC1zeynMmGS3GaGm9mQmpDhMPnN+Tt7lD37bnR6QjDh5RyFJBsdETE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758218875; c=relaxed/simple;
-	bh=YNevYmGrFg8ms4fHGj/XC+C4DFhAFFfn8I+VWFqP+KU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F0cqPhmB7r77CNTtGHyjJWNAhcgdl1FzGlt2G/a0R9yzb62rIpIvnardUwbcIyO7xg7kIFuTxhFFuCcGoH44xnuUly06XGogQneGLQ1qEcHmAP974ncUpeYg8CVKVmGeN3yrjHMcUPZKd98XeGwl9gGhzXWrzogr/+dVuybv9Bo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PxclFLwb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1800DC4CEFB;
-	Thu, 18 Sep 2025 18:07:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758218874;
-	bh=YNevYmGrFg8ms4fHGj/XC+C4DFhAFFfn8I+VWFqP+KU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PxclFLwb2uhaBdzRGwXa+VctRb8QOdwRB5UcCwBmlOfV+Te50DgMCykzJqAtrL4m6
-	 Le57iTfcMEnp649AGoZxo7xOeOvUsrqkWifVY6Z0p81/6cOyENppG4RlAYQFgKQP5M
-	 mZDXh8skyK+Z5/6nOBiKV/cWVoXD9wNnvi9kFzhvtcHzBzrRLHyuIF4K1CB8NW9OEp
-	 mTLmI5zXe8ZQ9CJVWGBDgpQM/1Zq40AyI+iLK7r0siiNkHOFqVckCiW+VKFxwQD9Oq
-	 Psf4uBgtqyApWfIuWqSqcRSEz4+6GtAomOK3dsPpi+XPeHyEw1Gnbu++jdm3APW3DT
-	 4qXmbOSzQNjaw==
-Date: Thu, 18 Sep 2025 21:07:50 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Abhijit Gangurde <abhijit.gangurde@amd.com>
-Cc: brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, jgg@ziepe.ca,
-	andrew+netdev@lunn.ch, sln@onemain.com, allen.hubbe@amd.com,
-	nikhil.agarwal@amd.com, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 00/14] Introduce AMD Pensando RDMA driver
-Message-ID: <20250918180750.GA135135@unreal>
-References: <20250903061606.4139957-1-abhijit.gangurde@amd.com>
+	s=arc-20240116; t=1758218915; c=relaxed/simple;
+	bh=twkRZh0sP74K05Hs6WFO+KHIolkAIDDxrFvsn8amyTw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XglZgYz+ffdmCoovp2L7UAvctZ7O6KNHZ87t+xhZTgnaSA8dKyYtV9AALIyPzhcZm3Fs0aLswt++nbPEX9f9bwuT7yxFZ4c7xFj4OYg0JhFFM1DEqefFFNF4Pp6nBSS15IdtELy8p0Moyhj/FEtqSSBT2s1i0c2vrXeAvh8Wp9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bnZQlnCx; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-25caef29325so11823305ad.2
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 11:08:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758218912; x=1758823712; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T0hV38YhCVzhQIg4KB2NIuKoe18ib0LXcZozxaagVwE=;
+        b=bnZQlnCxQkMLETfp5gIGZqcyTXkMhjnTs0VGUIaPyX7Pf+B6TdwHi6K+feobzaQaE6
+         VJBs8IAzZ5pUHworEB3pLjxsBZKRt9gsR/+BWV0Mma/i/PYbzLzofVK3I2gYTNdHxUhE
+         MC/B1x4eu/WddPlaYW/36qAFhA6vQQa/kJAlDPra79D51GP6sCZs2w/FIeZXyeEIVJlV
+         HrzaQpKFl2T9riws8tzRLhXU6bVWblAbpNokACSXOyMEJRhXS+wGFqFFRwbqS8srSQ6H
+         wQzd2QWsrXBRewwYTN8dQRppau4Pbi4SMblSLjFw7vU8cV7cVRoyPX5vouWI6q0MRjWc
+         hsEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758218912; x=1758823712;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=T0hV38YhCVzhQIg4KB2NIuKoe18ib0LXcZozxaagVwE=;
+        b=wlZOcr+ciq871676SF6QBA8MevoWl75B6XdZhTV2ap/YfwNQf6uw7Hl84W18DVFMle
+         3EWZ7bF7mLJbxoyg6P72icCwcROy5j1FCezFui1WEYdMU+FZE41LvZCUQlxFV+vISp2p
+         E3S5KuqKVnPdVfZNZ9iNXUZm+EVUdgWPmtgkpJj+YM1p52beTDgM2O+gYgdFfGtEm4yf
+         Rd+TuilAhnHB214s7DM8ZSLhK22taoZiF4eqDLqs9emRVQ32MebQJFOhRP3DAECULnjD
+         dSLXNCcJiJGas/GlwUBsfv+4agdG+dohodej7d8QX12wUGLJ+d/1AQqZYMgDTG4w1fyY
+         XSKg==
+X-Forwarded-Encrypted: i=1; AJvYcCVy54dsdnuemHU20b1d5ccKZOrXGyfdxDGP5uIsALyLJYhw2hNyOEOoWGgq1W3ZvQHPl8FpxgI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTo3+6hfI152b+6yJu6RPajDUWJWkU2Mgw2zMBM8Rj8rwBrKHC
+	in/nSdisLRM1r9nkJ8iAF7+44JA10l8DLL8qTN1jyGsFkeXE99vhztfKl2Eb2HDaDMEQeitCzgk
+	H8LmrHAagvPv347KIUSlsH4NjsMG1m+w=
+X-Gm-Gg: ASbGncvaT7MbWu77lVHbqjfGZw+Xvn8APDpqS6lPbKfuMfPbPrZGCT9XCvzi2MliWCj
+	aguOYPlK4hP526ZgTB7LunPSABt7712fCNUvRtFjL54llVkiAwcA1+uuTbFSz/MwZIycqefQ1V1
+	POZSaH9yQNGXjRWxTMZ4EsJEXF8Ncd3OJsXYL2twDEWRI9PYpYME7qB3JPD4Ydt+zY9pmWwM0cX
+	AHW39YmRFiGGBj6DR4ZQiTI1S2QJ328IZDe12x7F2zRrCd/WEqh4mS4nB87xa0X4hbc/0CUGvL9
+	ff2+P5E/ytr8ZGalERY0ScCxVuD9k95nZREVLH9anhI=
+X-Google-Smtp-Source: AGHT+IGxMvnzHxuxPQJ9tRzM5/1tY07DVRqxQVzJUPW+8yC2DsbwuRojuHZoEBkVMhb/Nbnfw1WEM0N41YdCeizJeUc=
+X-Received: by 2002:a17:903:f86:b0:267:16ec:390 with SMTP id
+ d9443c01a7336-269ba447e48mr8152795ad.17.1758218912364; Thu, 18 Sep 2025
+ 11:08:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250903061606.4139957-1-abhijit.gangurde@amd.com>
+References: <20250918132007.325299-1-edumazet@google.com> <CAJwJo6Z5+W2hDMOwPTnRWqLoGLqfwezZd_mOCmbMEnbvK-VBDg@mail.gmail.com>
+ <CANn89i+nAPNQ9pWjk6K7z+kH4dnP3YcmjvW_StT=0CdHoPR-+g@mail.gmail.com>
+In-Reply-To: <CANn89i+nAPNQ9pWjk6K7z+kH4dnP3YcmjvW_StT=0CdHoPR-+g@mail.gmail.com>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Thu, 18 Sep 2025 19:08:21 +0100
+X-Gm-Features: AS18NWDdRYXccn0hmfx7rgLKbslIxvWFQ92j2RUZVMIoamjr-CEQzNA9I3bJfnQ
+Message-ID: <CAJwJo6abp+GfM4taWhfNfDT3_VCovfGG2v8p9P_sk3ATn2KcBQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: prefer sk_skb_reason_drop()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Daniel Zahka <daniel.zahka@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 03, 2025 at 11:45:52AM +0530, Abhijit Gangurde wrote:
-> This patchset introduces an RDMA driver for the AMD Pensando adapter.
-> An AMD Pensando Ethernet device with RDMA capabilities extends its
-> functionality through an auxiliary device.
-> 
-> The first 6 patches of the series modify the ionic Ethernet driver
-> to support the RDMA driver. The ionic RDMA driver implementation is
-> split into the remaining 8 patches.
-> 
-> The user-mode of the driver is being reviewed at:
-> https://github.com/linux-rdma/rdma-core/pull/1620
+On Thu, 18 Sept 2025 at 19:02, Eric Dumazet <edumazet@google.com> wrote:
+>
+> On Thu, Sep 18, 2025 at 10:56=E2=80=AFAM Dmitry Safonov <0x7f454c46@gmail=
+.com> wrote:
+> >
+> > On Thu, 18 Sept 2025 at 14:20, Eric Dumazet <edumazet@google.com> wrote=
+:
+> > >
+> > > Replace two calls to kfree_skb_reason() with sk_skb_reason_drop().
+> > >
+> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > Cc: Daniel Zahka <daniel.zahka@gmail.com>
+> > > Cc: Dmitry Safonov <0x7f454c46@gmail.com>
+> >
+> > LGTM, thanks!
+> >
+> > Reviewed-by: Dmitry Safonov <0x7f454c46@gmail.com>
+> >
+> > Side-note: I see that tcp_ao_transmit_skb() can currently fail only
+> > due to ENOMEM, IIRC I haven't found more specific reason at that time
+> > than just SKB_DROP_REASON_NOT_SPECIFIED, unsure if worth changing
+> > that.
+>
+> We could then use SKB_DROP_REASON_NOMEM.
 
-<...>
+Yeah, I think I wasn't sure if it's worth just due to one place. But
+if it's generally useful, I'd say we could :-)
 
-> Abhijit Gangurde (14):
->   net: ionic: Create an auxiliary device for rdma driver
->   net: ionic: Update LIF identity with additional RDMA capabilities
->   net: ionic: Export the APIs from net driver to support device commands
->   net: ionic: Provide RDMA reset support for the RDMA driver
->   net: ionic: Provide interrupt allocation support for the RDMA driver
->   net: ionic: Provide doorbell and CMB region information
->   RDMA: Add IONIC to rdma_driver_id definition
->   RDMA/ionic: Register auxiliary module for ionic ethernet adapter
->   RDMA/ionic: Create device queues to support admin operations
->   RDMA/ionic: Register device ops for control path
->   RDMA/ionic: Register device ops for datapath
->   RDMA/ionic: Register device ops for miscellaneous functionality
->   RDMA/ionic: Implement device stats ops
->   RDMA/ionic: Add Makefile/Kconfig to kernel build environment
-
-This series generates CI warnings:
-1. In my local CI
-
-➜  kernel git:(rdma-next) yo ci
-e81ec02df1e47 (HEAD -> rdma-next) RDMA: Use %pe format specifier for error pointers
-In file included from ./include/linux/string.h:382,
-                 from ./include/linux/bitmap.h:13,
-                 from ./include/linux/cpumask.h:12,
-                 from ./arch/x86/include/asm/paravirt.h:21,
-                 from ./arch/x86/include/asm/cpuid/api.h:57,
-                 from ./arch/x86/include/asm/processor.h:19,
-                 from ./arch/x86/include/asm/timex.h:5,
-                 from ./include/linux/timex.h:67,
-                 from ./include/linux/time32.h:13,
-                 from ./include/linux/time.h:60,
-                 from ./include/linux/stat.h:19,
-                 from ./include/linux/module.h:13,
-                 from drivers/infiniband/hw/ionic/ionic_controlpath.c:4:
-In function ‘fortify_memcpy_chk’,
-    inlined from ‘ionic_set_ah_attr.isra’ at drivers/infiniband/hw/ionic/ionic_controlpath.c:609:3:
-./include/linux/fortify-string.h:580:25: error: call to ‘__read_overflow2_field’ declared with attribute warning: detected read beyond size of field (2nd parameter); maybe use struct_group()? [-Werror=attribute-warning]
-  580 |                         __read_overflow2_field(q_size_field, size);
-      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-make[6]: *** [scripts/Makefile.build:287: drivers/infiniband/hw/ionic/ionic_controlpath.o] Error 1
-make[5]: *** [scripts/Makefile.build:556: drivers/infiniband/hw/ionic] Error 2
-make[5]: *** Waiting for unfinished jobs....
-make[4]: *** [scripts/Makefile.build:556: drivers/infiniband/hw] Error 2
-make[3]: *** [scripts/Makefile.build:556: drivers/infiniband] Error 2
-make[2]: *** [scripts/Makefile.build:556: drivers] Error 2
-make[1]: *** [/tmp/tmp53nb1nwr/Makefile:2011: .] Error 2
-make: *** [Makefile:248: __sub-make] Error 2
-
-2. From kbuild
-
-Unverified Error/Warning (likely false positive, kindly check if interested):
-
-    ERROR: modpost: "__xchg_called_with_bad_pointer" [drivers/infiniband/hw/ionic/ionic_rdma.ko] undefined!
-
-Error/Warning ids grouped by kconfigs:
-
-recent_errors
-`-- sparc-allmodconfig
-    `-- ERROR:__xchg_called_with_bad_pointer-drivers-infiniband-hw-ionic-ionic_rdma.ko-undefined
-
+Thanks,
+             Dmitry
 
