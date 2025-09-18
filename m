@@ -1,216 +1,151 @@
-Return-Path: <netdev+bounces-224269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 136EDB834D3
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 09:22:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F91BB83551
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 09:35:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2A097A2A2A
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 07:20:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8D781B26136
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 07:35:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E7A2D9EF9;
-	Thu, 18 Sep 2025 07:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FFF42E5B04;
+	Thu, 18 Sep 2025 07:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="XLOudGNC"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oA5miBb0"
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012044.outbound.protection.outlook.com [52.101.66.44])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56E682E7F08
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 07:22:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758180129; cv=fail; b=gs/qY5tNVFkq400pkDUgZWGf8f1UJ7LT1AZHDGQK3Vdoq1c/SIfXAaz/tnoDNAOXdEyieBMVuu1FxPjt/+ECQ0CPeg6QalzTdL1l/5p/PF+hGq2xtVk18QeKmcPIDb1RdJG7sM8/zY5hc8aMHEKpuiSTpkH/fLGRbnO8Kcyyec4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758180129; c=relaxed/simple;
-	bh=H8bS8FfCtYJ0F0PE5kiG6wOCS4XBPrkfYDAbyGLTZfE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=CQ8Yfbet+Au0DmMSzr4cgC75tFHgrsOODz8sQtlYx4k7TJ0K83hMq01k6RdZHJDlSEW3kQOz/eeH9LIp74tE7VpaZ3iUGdqJabv8saJWuGdSeeYlrc3qCOsZ3JMQvgdPE0xV2nLG9jtJXRs6PVYBpQ9d2KqAgMNJqH8KEmi8Eh4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=XLOudGNC; arc=fail smtp.client-ip=52.101.66.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=f39jS82U0HQIFRiWB0jTve7DcRiYmzW0LL2UVkIYwpXP0t/vLPiFphjlL/0WR+UWDNXX+qhU0ctz4wh5hsPswZlX/1MXLjTESvwyAqB9qwi+mCmo4x7FZjrBXZcT72cw6omYtahXqxUFw0SIMnwuUEJ8yU1Ja7J6xWfEQpTGKyxiVh4MvktWWyWhhHIOp1xjvlTVfSiwlCfFKcZFghNfj4u04aN+FMCgEcf+w0vuDfpOMIKa0iZHizWLIcP5goDQL8htIqpxHxb3a41XKg158K94FEN9CZApcFc2Y16E0Y4BQLvB1EI0gccGGnPf1YeZA2FT5bN0jmkQTF2uHZzDxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uHOdT/CSAllKkosXSEDBG3RDeos3gLnXNK53iX7eolw=;
- b=wI3VZOgQYho5QXJUdLx6TABZY+OwBCEn4ZhcH0ysNQQ+W00Gafle0qc4K/7jCluYgYJC0gJhCKN787jx5Fo3yx9PN0oa9ZuhU3ylyLs+vpEb8yJBm/aVP3JgkTYLmce2o5HYW5asGI4e8hkNjlEWXIE8aW2oxiTQ6980mIhwbiZCLpWtpJAlGOQdcXdnXakPS3U5pmSnlOJNIYNJMKL4NuF5g8SkA1RdXBhJMQH9wulff6fMC1i10h0Q9ocek8yqh0LXUj9HKXMhVhrDV0hZlurE/xOgR4RhyxV2LuEfNSpQfme+VdKZ2WdNRmhBfAGOgpVxB1u20iiAwK7yfK1UOQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uHOdT/CSAllKkosXSEDBG3RDeos3gLnXNK53iX7eolw=;
- b=XLOudGNCPctgO3XqRyxzfD1kn/7RvHdyxn9SG5Kt3J56RepbwfPMPrzLoYkzqeQoiGg85Yo18zSOrV1dYBKWfCxsG0r5AIgr6CQ29l4tUuKWSbQyRACNA2fmO3t4CPcdTGAr+hBZiJwELCoXPFK6lar5eB7ZEYD06JxBobzzyEzUIFE4+zoU3wFSDS/3PwEGQQhgj+pwOC1iMlBA3QVkYY25kOyd5eSdejVy28kVJ/U3qpJuIMzb+Josab4/ep757rFoQo4j13h/bpGY8Xt8OF904R+07B7HiSmItA9Czda8lepEg8KycIIzcSpQ51oXbHodbwdqtR96+/sg+m/boA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by GVXPR04MB10045.eurprd04.prod.outlook.com (2603:10a6:150:11a::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.14; Thu, 18 Sep
- 2025 07:22:01 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::b067:7ceb:e3d7:6f93]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::b067:7ceb:e3d7:6f93%5]) with mapi id 15.20.9137.012; Thu, 18 Sep 2025
- 07:22:01 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: Daniel Golle <daniel@makrotopia.org>,
-	Hauke Mehrtens <hauke@hauke-m.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net 2/2] net: dsa: lantiq_gswip: suppress -EINVAL errors for bridge FDB entries added to the CPU port
-Date: Thu, 18 Sep 2025 10:21:42 +0300
-Message-ID: <20250918072142.894692-3-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250918072142.894692-1-vladimir.oltean@nxp.com>
-References: <20250918072142.894692-1-vladimir.oltean@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: VI1P189CA0022.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:802:2a::35) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068AA275AF6
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 07:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758180918; cv=none; b=FAajYGrrVUPpz6MY6ls5vyha/rmGzVadFeoMH2gPFaD/h7n5cFw8ge5SzMRqRqWzLfWygm82L/VnBYQAzBIWDg1xtlrbJQCjdEhcI3+lj+krSuFrHKv9C2OTk4ZC+gmHP8YPpEIoW+QNf9ZEDY/1ukHXfXh85AaQnrI90PRefE8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758180918; c=relaxed/simple;
+	bh=3W6xoEEHHHy/Y1lDfePO7sM2QC15d51YZwVuwNiywUI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hHnvkiscgbGyaQDpGohtSFvA4CmDJudPv4UtWGUbclTAJt+8MjdkqzFRQVfX0tEtEPPE4ks94YAZvLBnYkwV1onW90beIKjeCSWXaaDprnhQS7qbxf1RiR+zSUqE5Qa33gw1n6YYm7X6TCL+GV0Y1M9Tig+QR/1XU86KCxsWL2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oA5miBb0; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58I4NJBe028838;
+	Thu, 18 Sep 2025 07:35:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=lPJENc
+	BFLUp4ILGVwI8nnb2tbNEICVZdszTh04QRZVM=; b=oA5miBb0eNGIh8WSXAAV2w
+	s/OEWEIWGk3tM9gsL7qOcrc8TAHmw7WF/guddpmjr9gUldH92C5Mdysm6hSd6aAY
+	8tcktULUaNGuCokt8fhumWPbW+jl4EE7sbRtCDa6THJ0kcLUOZQMMRqjpr4fX4ez
+	zFv128w8yJODHcFkdc7lGA9j40TKmEuiCOXg3jRcHTApSmf9bYB3bd6lOIp47aj1
+	xUTlozeTnigTwmgWIaDlfm8eYRr25Rf4VH47+F4Ph2tiYlxrGpd/rG30wz1k2e8Q
+	RUFhRmsMdZeeEwv8Zp3lXzBzgTRq3w7vqlchIR9BCnC/5p0NzbToIrYRr6QAR3IQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 497g4p8qjn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Sep 2025 07:35:04 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58I7HqE9017750;
+	Thu, 18 Sep 2025 07:35:03 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 497g4p8qje-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Sep 2025 07:35:03 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58I7A8Ax009367;
+	Thu, 18 Sep 2025 07:35:02 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 495nn3n65v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Sep 2025 07:35:02 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58I7Z1Xp32965144
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 18 Sep 2025 07:35:01 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BD1FA5805E;
+	Thu, 18 Sep 2025 07:35:01 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C3C6458059;
+	Thu, 18 Sep 2025 07:34:56 +0000 (GMT)
+Received: from [9.39.24.159] (unknown [9.39.24.159])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 18 Sep 2025 07:34:56 +0000 (GMT)
+Message-ID: <a721adb9-caf1-48eb-b02e-8e5d1ce5f203@linux.ibm.com>
+Date: Thu, 18 Sep 2025 13:04:54 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|GVXPR04MB10045:EE_
-X-MS-Office365-Filtering-Correlation-Id: c2950ae5-ffbc-4185-a458-08ddf6840e9b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|19092799006|52116014|366016|10070799003;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0Zt2lgFkLrUPkXzPuZV1AJkIJ9BXzw1arwppjK2MggW81a/vOqDvHQRN1jNb?=
- =?us-ascii?Q?9j8c9rWdKDYYtcRBUCCL4zbpHjA/RwbbGRt+HYQ4Z31V2RWGZne/4eZ9nAB3?=
- =?us-ascii?Q?CiEhcPn3G0Kct+7mbGNVDYFY4lUcPCezD809UWIgGQG1BeokZSmp32HPK5zZ?=
- =?us-ascii?Q?d/5Qj9EwUnFisSAIWkVRAlPkSf4duKGeG5kDuyKrErNJMfndGN7okglKMfKA?=
- =?us-ascii?Q?kKSHzZf/Hkf4UHGNCCQOXlVPC3lAw3pIouDDA0b66VnWqS7Fxw/IhMmoh2jR?=
- =?us-ascii?Q?dlOHf2YDTR3RNU49ov4aM6ajN9TJp/kFXwKGGacdtlixRf9yoaU+ALVdI1ME?=
- =?us-ascii?Q?dg4LlSvz1549P6QmIaejRgQDf8LO0hR9HiUO34hj4N28/4ze8WiQuur9dfjl?=
- =?us-ascii?Q?KNWz7h38/kXWFjA7e0l2EoNktpUEY1ZGdznmcck7crS1WpeRmZj1LCpu5Sg0?=
- =?us-ascii?Q?+ScMbz1WVZHBoX6aA8LAhqQs3E4FtovHW+ocnRWaAzZOLMR8oCdK8OOWh/8u?=
- =?us-ascii?Q?6vcZXnHi5KCpDhdGChyG8XROA0Ut5o/ceVvCjf90kImZG5qLvKkrgisbdZKM?=
- =?us-ascii?Q?GN5ygcLljLJSfShruHOutiApvR32vNEO6yPMNN1TcgXFNKRIgXTDpJ56ewN/?=
- =?us-ascii?Q?/BaNxbYGdKAGcgVpHXuTRFlXcjnzFwr4hJ/r7ErApM7fdVwFzEarCc0MEeiy?=
- =?us-ascii?Q?IvDJMXqU9hLF27XNJbS/g+Zx8bx1fVxAnOaocJIBtu7fuyVYv76JiTR6mO4t?=
- =?us-ascii?Q?XnqZVVlWsDZm+jjiZZcAmFQOHt2n1KNLhE7o0tUC4kI3A/opSwhZ/tikHG7u?=
- =?us-ascii?Q?d6+Wubl7wHNu20aAHNMW9inCIu90UTqzSH1cYS6CMoNifl+MNtxDgqsoKDe7?=
- =?us-ascii?Q?lza6WdQSGhUkt5FettVg23T4kfMPbgMgj1KoCkKMJi0b9zO7O/GRk5DXPrzw?=
- =?us-ascii?Q?UYJeHUwxPml2fHKNpsWv6NZ51Dsl5VUL6FlsymbcTSwPS5nPUVz454b5YUv3?=
- =?us-ascii?Q?tW13+trI7Uhce8nFFUE5YJXWxmD/y4vJvbWQ6N2JXcYn7nb9wXQxikBxMydw?=
- =?us-ascii?Q?WRRbj4lyJpkNwH67BhKq4CseTUnE7u2IRIgpkFRcBnhyJm5A2vmr9YBKTD/y?=
- =?us-ascii?Q?PSr7TlVLgpkWS1IQ8jS9yuhMt2ywV8iN2sOiQNeqYfRqns0+dy4iSeThlD7O?=
- =?us-ascii?Q?lmEDQoTchdiRGNhm26vRORWaen7fNjqKY3JmPgbDJNXmYP3oHc7wyZ04+MZU?=
- =?us-ascii?Q?xJQRAmi9P2AiReWJLVcEZCg7oUUVNdZLlhHD7RO9XgTALhXJfuVweCPCUdUX?=
- =?us-ascii?Q?/LnPJxx2Gn6+UAuOlIQyksjupJvDNw05OWLkognJzkrzrXGALtcnAoNFfTHH?=
- =?us-ascii?Q?FfV2eCM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(19092799006)(52116014)(366016)(10070799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?KX8wkot7F6bj4QqQIKi53Mm8EVQWMseszullidnXEJfk/0gC+RtMkJftacq0?=
- =?us-ascii?Q?H+YS4il37IVKH60U65RhAMFNXicBTKoBmFr6DBhSoKHtrnsGREUSl81/lnmo?=
- =?us-ascii?Q?75GWRAANDebP1G/WyzdjEr53v1RM48RqSgD2gOoIn17YWf2ZuiPqhvYrSSdn?=
- =?us-ascii?Q?URJP2lY8HDjTU6mctWGMA5zRJhucLpa8C64mHg/YP2v+Pyq2y8m/w9TAbpq5?=
- =?us-ascii?Q?mjYHPJdMRxB6VzRAHC5rKi693Ju6jjF6upCpvEktRkIvcD7xShrnHnh/TI07?=
- =?us-ascii?Q?062LQBs3PIMTiaPDT2yRpefXNsUS0ZrLgfiy4OyyP/mxCV+35lF9hvjs5/Vz?=
- =?us-ascii?Q?KJDaLBqC8SFku99jNX0o+0iB9/LavkKG2mNWyQOOXWBEbkWXjE9PSfeUmd13?=
- =?us-ascii?Q?OkzXMPP64BucSQcA8W/OpYhqk/ILW1ZXrgJIi2K2urPmlLQR7P4mZGG/lptU?=
- =?us-ascii?Q?YgNCXI3Q8TSPVZ3A2AGVjlDYPItMCzBtLPmCz+sFHVceD2dUeugHF5avwi5r?=
- =?us-ascii?Q?d/yQpd3Qt9C5wB17rlnO+bsZlWe5PW01lfXkbtA59rwl2iqi4wHcIys1DFdk?=
- =?us-ascii?Q?uhtrE5HSgYRCr71HTnFlSFTUeeeDfnjlfQCpmCvTe8VnqXnWFFqI2t4IDfDf?=
- =?us-ascii?Q?3VyZuw19rVFiDag2m3YT1Ywq8ycdn9sKmgedAyMdeup4fBncxjqyDMeYLdnf?=
- =?us-ascii?Q?HkjQfTZxqoqnHq72Dk4oaYvtrY/yJSE3z4xl4K8iEjnhWPePTmPIxZulnvzy?=
- =?us-ascii?Q?KNj7knmd2DLCckADhnaQreFM/Up6yyWfXBdtyqm3pJEmLZjP70CXRJMD5dl+?=
- =?us-ascii?Q?wAyzdUbHnyqhkiK8xMSeQ2R5wZjPjlp3GfGDiZ4HaJVa+yRmqNUBEOZguzWk?=
- =?us-ascii?Q?/fKiq2XerGX4oHxtF35CxCk38Wb2ozvL+BioWyoMgO9ct8FCuDzz6Df8xCTE?=
- =?us-ascii?Q?qhwFCpGp4d507S057ORrsbNcABQLnoo3uw2DHBYXP6AdFF0i6zx+VSEtv2tZ?=
- =?us-ascii?Q?k9Q9U3OiRee29jqo4fCb4Nxk+eJeh5FrBnbaZepMKXQS6+YfnQ6JGuT8Z5IW?=
- =?us-ascii?Q?Mx2TUzRQJNvImWb3ISYUu+PwO9r2ajtxnfY/qiWusdeoJaIV3ijIeHWXsBlJ?=
- =?us-ascii?Q?eeXKdbWSfgsFjmdAlM+5n/0hsjwoUhDRLgoz5H+SGJaYDS0fjdWcmVk+/9xb?=
- =?us-ascii?Q?VuqiDyDHk3hidoCe1xN1cJbP79daV1DrdHqPS3IX6RWClkR67VF22h45w1kv?=
- =?us-ascii?Q?kOoy3KRoK3heIEMjHtjIqEls+uloWlOSUcbP9zq2fIZoGos4PC9cS/PqwvEB?=
- =?us-ascii?Q?W8b9wrQ6IhMiAPF4jCUellmf6bNkWPArq9Cbq9Z31pBsx0fVcGn4y/Bht48X?=
- =?us-ascii?Q?vR4m06fyGGB+G7LfwX1Kgk1aEp8EbGVwnKnbXOcR+9QItwaAfpaZwWo8u/fP?=
- =?us-ascii?Q?MidERSVtS5LDd1BIreftqcZELuY3vUp43Kp+LvFOpxG9V0fvBx0tVY52ePuX?=
- =?us-ascii?Q?APireHMztiTztYrNOf5aq2q+wrm03e02GnlVcb2+sUIwFZm3+l0HaBMEswWw?=
- =?us-ascii?Q?6AC9bzPKmbiaLMnlszBzKEs1FocqLWfEkRwJyF4myqaOC7ewXi0zTK+mbM7y?=
- =?us-ascii?Q?y9boSEGEx04i2U2CUtG2MnRNr+KMDO9ODCGPif/YLrCnKp95CQiG/6CW+vT/?=
- =?us-ascii?Q?33bwQw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c2950ae5-ffbc-4185-a458-08ddf6840e9b
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2025 07:21:59.9461
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fYwoBXYZE1oXF9JFxE9/kVJzfDm4LYJleoB3fdtgpyS6Iq519LnSyIQfCrDBkQ4UEuoVBF+uLkjIPU6VI9IS0A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB10045
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 4/7] smc: Use __sk_dst_get() and dst_dev_rcu()
+ in smc_vlan_by_tcpsk().
+To: Kuniyuki Iwashima <kuniyu@google.com>, Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Dust Li <dust.li@linux.alibaba.com>,
+        Sidraya Jayagond
+ <sidraya@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Ursula Braun <ubraun@linux.vnet.ibm.com>
+References: <20250916214758.650211-1-kuniyu@google.com>
+ <20250916214758.650211-5-kuniyu@google.com>
+ <e1bae4d7-98f7-4fe6-96ba-c237330c5a64@linux.ibm.com>
+ <CANn89iL39xRi1Fw0N4Wu6fbNjbbNjnYS4Q8BD3q+8HrY2XB_4A@mail.gmail.com>
+ <CAAVpQUBJFpcBUgez6Pni0H2uQbeqLodDcOzvy+fPfGj6jgxh4Q@mail.gmail.com>
+Content-Language: en-US
+From: Mahanta Jambigi <mjambigi@linux.ibm.com>
+In-Reply-To: <CAAVpQUBJFpcBUgez6Pni0H2uQbeqLodDcOzvy+fPfGj6jgxh4Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE2MDIwNCBTYWx0ZWRfX3WAu5tq6itr9
+ 756rf2u1/DHIQQMFu8327QtEuPAyZyQfVzsHs3fKm84fGgT7nCULr3PsANoYzk89ERlfUlqz7g8
+ EagsNYR7uiVqnaiqCkXZxPAhYlKuS2Le+f/m2hS560sqJipZ3rGrRD+rdSy3TAI9JYLRLFX+ouo
+ EEL4gP6NdFJThE8hxMz7VLqiMaynprBGQ1RTIhxLThcusiU8DaWs/VrV4j52lwMduX1sJcLwK1N
+ DzsQ43MYzgxNoQj9pp27EPxBJmj812VDbTmsXQF8SUNm5wX/JsJyRChc3P7uxwjRshWwl1iZSxM
+ RwDmhT0ChX2+ZC5tc7WZt/WG9piiNH/HTzbcc68djdgOmqZ99Qbl3qnLCDOV0HnhCFsHdkuBSOA
+ DQ5NH/DL
+X-Proofpoint-ORIG-GUID: ne217kPjwbdS2meIKmRk8NN8lmxsEBVE
+X-Proofpoint-GUID: ALVZ3PkIwX8sQ_a_J304-1cRF4FF0LuL
+X-Authority-Analysis: v=2.4 cv=cNzgskeN c=1 sm=1 tr=0 ts=68cbb628 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=QTLmH3499XkOAwBMc_kA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-17_01,2025-09-18_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 clxscore=1015 spamscore=0 bulkscore=0 malwarescore=0
+ adultscore=0 priorityscore=1501 impostorscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509160204
 
-The blamed commit and others in that patch set started the trend
-of reusing existing DSA driver API for a new purpose: calling
-ds->ops->port_fdb_add() on the CPU port.
+On 17/09/25 11:11 pm, Kuniyuki Iwashima wrote:
+>>> On 17/09/25 3:17 am, Kuniyuki Iwashima wrote:
+>>>> Note that the returned value of smc_vlan_by_tcpsk() is not used
+>>>> in the caller.
+>>>
+>>> I see that smc_vlan_by_tcpsk() is called in net/smc/af_smc.c file & the
+>>> return value is used in if block to decide whether the ini->vlan_id is
+>>> set or not. In failure case, the return value has an impact on the CLC
+>>> handshake.
+>>
+>> I guess Kuniyuki wanted to say the precise error (-ENODEV or
+>> -ENOTCONN) was not used,
+>> because his patch is now only returning -ENODEV
+> 
+> Yes, that was my intention.
 
-The lantiq_gswip driver was not prepared to handle that, as can be seen
-from the many errors that Daniel presents in the logs:
-
-[  174.050000] gswip 1e108000.switch: port 2 failed to add fa:aa:72:f4:8b:1e vid 1 to fdb: -22
-[  174.060000] gswip 1e108000.switch lan2: entered promiscuous mode
-[  174.070000] gswip 1e108000.switch: port 2 failed to add 00:01:02:03:04:02 vid 0 to fdb: -22
-[  174.090000] gswip 1e108000.switch: port 2 failed to add 00:01:02:03:04:02 vid 1 to fdb: -22
-[  174.090000] gswip 1e108000.switch: port 2 failed to delete fa:aa:72:f4:8b:1e vid 1 from fdb: -2
-
-The errors are because gswip_port_fdb() wants to get a handle to the
-bridge that originated these FDB events, to associate it with a FID.
-Absolutely honourable purpose, however this only works for user ports.
-
-To get the bridge that generated an FDB entry for the CPU port, one
-would need to look at the db.bridge.dev argument. But this was
-introduced in commit c26933639b54 ("net: dsa: request drivers to perform
-FDB isolation"), first appeared in v5.18, and when the blamed commit was
-introduced in v5.14, no such API existed.
-
-So the core DSA feature was introduced way too soon for lantiq_gswip.
-Not acting on these host FDB entries and suppressing any errors has no
-other negative effect, and practically returns us to not supporting the
-host filtering feature at all - peacefully, this time.
-
-Fixes: 10fae4ac89ce ("net: dsa: include bridge addresses which are local in the host fdb list")
-Reported-by: Daniel Golle <daniel@makrotopia.org>
-Closes: https://lore.kernel.org/netdev/aJfNMLNoi1VOsPrN@pidgin.makrotopia.org/
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- drivers/net/dsa/lantiq_gswip.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/dsa/lantiq_gswip.c b/drivers/net/dsa/lantiq_gswip.c
-index d416c072dd28..84dc6e517acf 100644
---- a/drivers/net/dsa/lantiq_gswip.c
-+++ b/drivers/net/dsa/lantiq_gswip.c
-@@ -1368,8 +1368,9 @@ static int gswip_port_fdb(struct dsa_switch *ds, int port,
- 	int i;
- 	int err;
- 
-+	/* Operation not supported on the CPU port, don't throw errors */
- 	if (!bridge)
--		return -EINVAL;
-+		return 0;
- 
- 	for (i = max_ports; i < ARRAY_SIZE(priv->vlans); i++) {
- 		if (priv->vlans[i].bridge == bridge) {
--- 
-2.43.0
-
+Understood. We treat both errors as a single error here.
 
