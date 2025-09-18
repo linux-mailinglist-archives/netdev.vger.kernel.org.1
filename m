@@ -1,166 +1,216 @@
-Return-Path: <netdev+bounces-224366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8556B8430D
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 12:44:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FB9DB842E6
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 12:42:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED8211C8347D
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:43:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8EFB7A3DB2
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:41:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C06BA2FAC1C;
-	Thu, 18 Sep 2025 10:41:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2842F657F;
+	Thu, 18 Sep 2025 10:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="BNhcXiXQ"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="f2C7C41y";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ivPVFIeS";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="J9ZXhpJt";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="UGXuXfB1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f100.google.com (mail-oa1-f100.google.com [209.85.160.100])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758742F99A5
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 10:41:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D000B2DA757
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 10:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758192089; cv=none; b=L4THQpMgg+e0AoWLoxe9IjzoFc6fmNdZTEYVLR+D6wquoHtirRXeymWqRX8Ctxe4PepuKCpGxCEdkPre0UIMh1XziTeeY69YYN+zyZWjiTgyHb9nWu9w0uO8brrBfvuWZnpsaBTlyYj+aj6lwVBpZtmJRmhZWvY5RXH9ysS5X14=
+	t=1758192084; cv=none; b=eD6w1V41Thy1hsWHkEK16k7ITYNT6qShJImgDxSbPzUIDSgxZzk5YC5TgI8O1qx9jadv9sOUfSYqixcmu9+PqISf/YTtNB/u0d9wHEyDFDXF/x+LYupnU5wa+dG5NpBDgY8sZHN+1TxAUDkV1kK6odrmsLkPGZOaZs8nz1cVND4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758192089; c=relaxed/simple;
-	bh=CbE49JSJ+LMRaHZriOstDzk9yUxo35FaLPw3pqofbVs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E0F70P/Cm++Aww63gpAIlfWM2tbQgc7Gr2AsYDBUarkW1et/bO0X4zcFFNSIMJK6bIW7QwfinvhaGqLQeBkNNzyArDz5BN13kszJoYKiyIEdPyypPKTQeODpn4Eedv4m+2v9wj9x0sEt17uzIVrdWoY9WqCZFQN896f/rxXjEhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=BNhcXiXQ; arc=none smtp.client-ip=209.85.160.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oa1-f100.google.com with SMTP id 586e51a60fabf-322f0a39794so194682fac.2
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 03:41:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758192086; x=1758796886;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QQCJx6p5vPHKg/pDposcY1SdIZSMhxTSp8O6tFxrHXM=;
-        b=W6I3HPp0RBBeq4ccXJ8f75ffOE3bgI5Jh1gzuydEDkMt0Caq8hFZWmks8iuJVZt929
-         HDmRIM5vMVpKsapUxe/6JsJCd2G7uZnQeNf4/kKA6Q7hNEldx0CA6p/QAaSL0ulPD6K0
-         slH2VzEAckkfmKwl5Dw3MQ2oO3OylmZfZ/1qHdvHrNPZiXlTiMgMVZ8MDd2YI2JjivxQ
-         jzf8GrT5rAVZa1HZC97QN7+DwOj0fkqgi7QDU9JymAflOt4MDRbWpi5JIrD0pqGGYAG8
-         QOcNWdaBFxdGZPxcbgQZEI5eSXIgnmI1PzpEw80PJNV5ls13binS5Bak0u1Myyjbkqjx
-         nQOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCURoWbrCfNRumUFzipEFcnrLuLRLwA8txkukaVaB+ySFgJja/VT6KqPPlz9LALApLiqhbgH9BY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywrv2XWyEYPx/hNtocIrPDGFdnr9HYyf+X/OFIKytkJDQbMOaXr
-	Q48F2WTJEgcDXgQGwzlJYfekDeEd4Jhb/fpbKFM4CpZenxG5lAQlUBL0770XGX8KGpbAniHcz/b
-	DWcB/7OPE85EFwdUnMydCg22BtEkHOrM59/P9SZ1CYMw4NNp1g+rR+7yH1e/FN1ui63/H5eUwqy
-	G5/ykLPATO3CNCN7vOjgnY1nJPZnmJ729v0O1M/qm7zv9hThsVKx2OoP14zzBraz/CQAYuk4O7E
-	Qi+L/60dW04pr/SzQ==
-X-Gm-Gg: ASbGncviX+DFcD2FAMdtpUjyyZ0LtHyIZHgUYTnaJ8mY1TeS+uZKsG2fDjhOC/BPVMC
-	69ig5P1AkPXjtZ4TSZIaPLUxwOpdgx6LK9DV/Kxhdd6u7d5bVstm5V7eLqQA9gjXIPr9tab1oti
-	cW3bZNPfmcDTxWkrhONlNgGzB/UUD8iXqlPRxLKMiTRBXo5ynsIARh17Yg75+3UeN1RUVFbKpUt
-	PjLgsknf5apIQvye7VqSh3nP9rB9j29w/Vz0+JYq7GSl1PVB7TjAJGz7Wv5OqIHFOtA4NpHiwEm
-	DXeILroY9xs0PG3M9DmkfRIbASE638+UGFgbnkCL410GpAq2e3amlcEdT/0gg6RgiJyeIG37mpv
-	bX+UPBDf/VGxCC7hAuCS8r2Xw+PhT3qnJTQVuEwGewroFlxLC4qPN8Mv3rISPIgi8sEhrCRTE1l
-	qnQiVkC5kv
-X-Google-Smtp-Source: AGHT+IHeZJ7Nn7uAoeI9He1XORqk2Vn/1Bc5li7Mtl+c7QW/BWRONQ9vz/OgmwI74q93rD5jSbajJwwCi8PU
-X-Received: by 2002:a05:6870:9a26:b0:332:7373:523f with SMTP id 586e51a60fabf-335be0b5da3mr2799622fac.13.1758192086385;
-        Thu, 18 Sep 2025 03:41:26 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-119.dlp.protect.broadcom.com. [144.49.247.119])
-        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-336e6aa02ffsm239637fac.22.2025.09.18.03.41.25
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 18 Sep 2025 03:41:26 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2665df2e24aso15163365ad.2
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 03:41:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1758192085; x=1758796885; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QQCJx6p5vPHKg/pDposcY1SdIZSMhxTSp8O6tFxrHXM=;
-        b=BNhcXiXQGqm9CM8zSPgnlcJB7SOKNBfda2nDknRva5BeAb5O17COUPsoL4VksisPn8
-         l7KIVKwxeEujPgq3butIBOUcbsN1MEBLhGqa1ic5INoAeLoyovEWSJOM34cUIk3pLT5Y
-         cIHmSZMG8aF07Rur9yQjG8zjEcKNPZtvBg8Cs=
-X-Forwarded-Encrypted: i=1; AJvYcCU/xe09AilmgobvgYD9ynBQf9jrYscQZWqoB+++pz4HwRy3oRd5v560/MgGU1rOauvDmrUe+WE=@vger.kernel.org
-X-Received: by 2002:a17:903:4b07:b0:25c:101e:8f04 with SMTP id d9443c01a7336-26813bf16aamr68403885ad.50.1758192084733;
-        Thu, 18 Sep 2025 03:41:24 -0700 (PDT)
-X-Received: by 2002:a17:903:4b07:b0:25c:101e:8f04 with SMTP id
- d9443c01a7336-26813bf16aamr68403675ad.50.1758192084392; Thu, 18 Sep 2025
- 03:41:24 -0700 (PDT)
+	s=arc-20240116; t=1758192084; c=relaxed/simple;
+	bh=/ryAaRu1zsK2hhBXqXw6qylc208FGP4UEyznFLamZc4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gp7tt4+J1uynzW9Pxc/XKVZCBBcWSQcFK9Enk1mURVuuIYJF/VvItYiW0xuGxyv5doW0KzH6cvWb8fa00hldGdMmRiDwuTwVatJYzwRZBgbOzRYPnjxWV2yo44lTvSiiJjwV6+rm2cSup4w9xJSSFYmj7xGYvS8iUxzoHj+TEuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=f2C7C41y; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ivPVFIeS; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=J9ZXhpJt; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=UGXuXfB1; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B477B336E7;
+	Thu, 18 Sep 2025 10:41:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1758192080; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MLqw+cTYuI4KQmK1iyTFyxZRmHV3Ig++tUCoQTHRt6I=;
+	b=f2C7C41yDGwl0u4IEePcheDl8kBxth97QhE2fCXUrvf6V4+5RfdmKfTHdbydnXiQce5G/9
+	MrzrAqpExp18kNJzsnByNS95VEgtgZMJMsrSe96lIr7RKe7rnj5wzlwvu5zCFco8nfcHRR
+	j9RvcBNjT2A7/9mvGK+8tUuzbC/qvVU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1758192080;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MLqw+cTYuI4KQmK1iyTFyxZRmHV3Ig++tUCoQTHRt6I=;
+	b=ivPVFIeS2PvlTAsxQSywtKZJM2M5w6H+EfILPJzj25swmaCqQ+UJnJoIEGN8V8DI8ekjq1
+	qinAK+GQSo5ISnAg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=J9ZXhpJt;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=UGXuXfB1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1758192079; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MLqw+cTYuI4KQmK1iyTFyxZRmHV3Ig++tUCoQTHRt6I=;
+	b=J9ZXhpJtLzLFglt6jHPsvjOzfFJsQUG1jDCRUh6bgOt3ZzMlxON5ehiSTlOiZg73NZcGsT
+	QGK/fbwAaSMkl6yJVea3poD3B81oU+hCp03Rfg1RfXWB9hm6ItzX7ruqz4KQA/hBsHrA5k
+	+f2PbAZTGVK7LSX+yxWejvjRhXH04PI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1758192079;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MLqw+cTYuI4KQmK1iyTFyxZRmHV3Ig++tUCoQTHRt6I=;
+	b=UGXuXfB1mHDGlwI8bDeqpqea/yjcfrtmgUDHe1RGGLwa/6a4KzE1GhPERdSg4eTwXwUUif
+	d+MezK01asNKyYBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8DB1013A39;
+	Thu, 18 Sep 2025 10:41:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id v2lPIs/hy2gxcgAAD6G6ig
+	(envelope-from <jack@suse.cz>); Thu, 18 Sep 2025 10:41:19 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 08891A09B1; Thu, 18 Sep 2025 12:41:19 +0200 (CEST)
+Date: Thu, 18 Sep 2025 12:41:18 +0200
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>, 
+	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	Frederic Weisbecker <frederic@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 00/14] ns: rework reference counting
+Message-ID: <mngabd3ala2dsrps5iviihl4ijpjlwea4lnzrqzoihcydinweo@bu6ewudaqksi>
+References: <20250918-work-namespace-ns_ref-v1-0-1b0a98ee041e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250911193505.24068-1-bhargava.marreddy@broadcom.com>
- <20250911193505.24068-9-bhargava.marreddy@broadcom.com> <20250916155130.GK224143@horms.kernel.org>
-In-Reply-To: <20250916155130.GK224143@horms.kernel.org>
-From: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
-Date: Thu, 18 Sep 2025 16:11:12 +0530
-X-Gm-Features: AS18NWBXxQ-XRVIz_9_yMEp0dLlt_TczR64kZc3knMwWoDDMOSdrut_aSwS6y_M
-Message-ID: <CANXQDtYdxMq_EAPqu_WvnYqZ5SKW2k139Hwm+jW=kZpSQQgRtQ@mail.gmail.com>
-Subject: Re: [v7, net-next 08/10] bng_en: Register rings with the firmware
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, michael.chan@broadcom.com, 
-	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com, 
-	vikas.gupta@broadcom.com, 
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250918-work-namespace-ns_ref-v1-0-1b0a98ee041e@kernel.org>
+X-Spamd-Result: default: False [-2.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	URIBL_BLOCKED(0.00)[suse.cz:email,suse.cz:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:email];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,toxicpanda.com,kernel.org,yhndnzj.com,in.waw.pl,0pointer.de,cyphar.com,zeniv.linux.org.uk,suse.cz,cmpxchg.org,suse.com,linutronix.de];
+	TAGGED_RCPT(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.cz:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Rspamd-Queue-Id: B477B336E7
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -2.51
 
-On Tue, Sep 16, 2025 at 9:21=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
-te:
->
-> On Fri, Sep 12, 2025 at 01:05:03AM +0530, Bhargava Marreddy wrote:
-> > Enable ring functionality by registering RX, AGG, TX, CMPL, and
-> > NQ rings with the firmware. Initialise the doorbells associated
-> > with the rings.
-> >
-> > Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-> > Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
-> > Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
->
-> ...
->
-> > diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_db.h b/drivers/net=
-/ethernet/broadcom/bnge/bnge_db.h
-> > new file mode 100644
-> > index 00000000000..950ed582f1d
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/broadcom/bnge/bnge_db.h
-> > @@ -0,0 +1,34 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +/* Copyright (c) 2025 Broadcom */
-> > +
-> > +#ifndef _BNGE_DB_H_
-> > +#define _BNGE_DB_H_
-> > +
-> > +/* 64-bit doorbell */
-> > +#define DBR_EPOCH_SFT                                        24
-> > +#define DBR_TOGGLE_SFT                                       25
-> > +#define DBR_XID_SFT                                  32
-> > +#define DBR_PATH_L2                                  (0x1ULL << 56)
-> > +#define DBR_VALID                                    (0x1ULL << 58)
-> > +#define DBR_TYPE_SQ                                  (0x0ULL << 60)
-> > +#define DBR_TYPE_SRQ                                 (0x2ULL << 60)
-> > +#define DBR_TYPE_CQ                                  (0x4ULL << 60)
-> > +#define DBR_TYPE_CQ_ARMALL                           (0x6ULL << 60)
-> > +#define DBR_TYPE_NQ                                  (0xaULL << 60)
-> > +#define DBR_TYPE_NQ_ARM                                      (0xbULL <=
-< 60)
-> > +#define DBR_TYPE_NQ_MASK                             (0xeULL << 60)
->
-> Perhaps BIT_ULL() and GENMASK_ULL() can be used here?
+On Thu 18-09-25 12:11:45, Christian Brauner wrote:
+> Stop open accesses to the reference counts and cargo-culting the same
+> code in all namespace. Use a set of dedicated helpers and make the
+> actual count private.
+> 
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
 
-Thanks for the suggestion, Simon. Some macros have non-contiguous
-bits, requiring combinations with "|",
-which would make the definitions longer and harder to follow. Since
-these Doorbell Register (DBR) values
-are hardware-specified, I believe it's better to keep them as they
-are. Please let me know if you see any issues.
+Looks good. Feel free to add:
 
->
-> ...
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+> Christian Brauner (14):
+>       ns: add reference count helpers
+>       mnt: port to ns_ref_*() helpers
+>       cgroup: port to ns_ref_*() helpers
+>       ipc: port to ns_ref_*() helpers
+>       pid: port to ns_ref_*() helpers
+>       time: port to ns_ref_*() helpers
+>       user: port to ns_ref_*() helpers
+>       net-sysfs: use check_net()
+>       net: use check_net()
+>       ipv4: use check_net()
+>       uts: port to ns_ref_*() helpers
+>       net: port to ns_ref_*() helpers
+>       nsfs: port to ns_ref_*() helpers
+>       ns: rename to __ns_ref
+> 
+>  fs/mount.h                       |  2 +-
+>  fs/namespace.c                   |  4 ++--
+>  fs/nsfs.c                        |  2 +-
+>  include/linux/cgroup_namespace.h |  4 ++--
+>  include/linux/ipc_namespace.h    |  4 ++--
+>  include/linux/ns_common.h        | 47 ++++++++++++++++++++++++++++++----------
+>  include/linux/pid_namespace.h    |  2 +-
+>  include/linux/time_namespace.h   |  4 ++--
+>  include/linux/user_namespace.h   |  4 ++--
+>  include/linux/uts_namespace.h    |  4 ++--
+>  include/net/net_namespace.h      |  8 +++----
+>  init/version-timestamp.c         |  2 +-
+>  ipc/msgutil.c                    |  2 +-
+>  ipc/namespace.c                  |  2 +-
+>  kernel/cgroup/cgroup.c           |  2 +-
+>  kernel/nscommon.c                |  2 +-
+>  kernel/pid.c                     |  2 +-
+>  kernel/pid_namespace.c           |  4 ++--
+>  kernel/time/namespace.c          |  2 +-
+>  kernel/user.c                    |  2 +-
+>  kernel/user_namespace.c          |  2 +-
+>  net/core/net-sysfs.c             |  6 ++---
+>  net/core/net_namespace.c         |  2 +-
+>  net/ipv4/inet_timewait_sock.c    |  4 ++--
+>  net/ipv4/tcp_metrics.c           |  2 +-
+>  25 files changed, 73 insertions(+), 48 deletions(-)
+> ---
+> base-commit: 3f9cc273c16f63b5d584ec4e767918765c44316b
+> change-id: 20250917-work-namespace-ns_ref-357162ca7aa8
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
 
