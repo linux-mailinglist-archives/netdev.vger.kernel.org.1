@@ -1,109 +1,119 @@
-Return-Path: <netdev+bounces-224444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C909CB85315
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:23:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8401AB852CD
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:20:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C0B1560CAC
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:18:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D240A7BF9AD
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D2230C355;
-	Thu, 18 Sep 2025 14:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3581430CB3F;
+	Thu, 18 Sep 2025 14:14:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="skKv/2mO"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xLtYIaKI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4833F31FEFC
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 14:08:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32847212566;
+	Thu, 18 Sep 2025 14:14:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758204535; cv=none; b=cdAwNPBhmuBz0c50rOsEh80a2x6F/Caeb02vf7Ci3rvNXlINpidufbxB7PnZ64DHchLKunRQ3ugvU6sDj8C9EDyvqAM8GN8KgR6PYQMR87j7Xp2ZbFs/eXm3/FoepdD/n4p4DQ2up7I6OYzxMcVPCTKFIOxqRRVAb8NeJrOXNXY=
+	t=1758204880; cv=none; b=epJ++TNt32XrxQdcTveAWh9pZB2bs8lNz0ADLTEPw8iD6lMBF44TGjRndYqv8WhwtmugrxlGbAFH71G1QnNE7+tEH8Txzj/+NT5VpLmYUmP/VwNr8vWlwbSYQKpfdvv6lyqY5vw+q978qmJizCRS/lR2iZmM6AEe4rR1TsqvSZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758204535; c=relaxed/simple;
-	bh=W5SB0N2oROFg1DqgZ0lvtzpvfFKhAyK7+1FnSfG9dB4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JCrKCBGTZ3/7fu6UKgUhHvA1hb/XI56rmCK0ankWueo5mXYAqWF4X3wSyrTZOVKn9BcXVYBjwBhdo26vw2070KsQapIEnPupe20m3diTLTuRdLqzgc6QDMqos89fTUqr+r3vsTTAPKo8Q7UsK4azzuMNmVYyLratTAL0oVHgICM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=skKv/2mO; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 450D74E40D20;
-	Thu, 18 Sep 2025 14:08:48 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 0A2A96062C;
-	Thu, 18 Sep 2025 14:08:48 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 058BB102F1964;
-	Thu, 18 Sep 2025 16:08:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1758204527; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=g2IM1wPL02xKgY8BOdX4g5cIV5ISYT5+mA1HDuflN4w=;
-	b=skKv/2mO9/fjmaeKJecBdYZyVtdbaFQU1yASjzQaTI5xMIVAAdezEA00v3OI6b3fkE1kon
-	OPlk3/ZL2YZkRmW2+dwIdLeVLx8Y19MceEUrB+0HUt9bBEdf2uhwF4d+JVcZnMwzay4uKh
-	GNC3c/rKOhui4SqMtjeMBOVHTaG0+PYHXoLnCLnCaI3uE3RhdzXDNXvTFXNBsPfycPU12G
-	zNXHb9rEv68NDmp+e/WdU8qNcvyIvFoyQpyMYuRD0laGg60W/Yn9404/IaLfJUiaibwQGO
-	rZ+6mUOHsQ3j5GowntWodgZ3jbgQtf0xOEZ9ggB2mENAsmXWUsot/2Nq25LvsA==
-Date: Thu, 18 Sep 2025 16:08:34 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
-Subject: Re: [PATCH net-next] wan: framer: pef2256: use %pe in print format
-Message-ID: <20250918160834.47f746b9@bootlin.com>
-In-Reply-To: <20250918134637.2226614-1-kuba@kernel.org>
-References: <20250918134637.2226614-1-kuba@kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1758204880; c=relaxed/simple;
+	bh=ltzBq0tO28nPTffMbWoonVTdsbfTivoYy/S7lL7ZEF4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SL6fMyg8+T6W+A+RscQqDIi4GNyx+TwLmkosKsvImgxVWUCSRG0HOMQv86JTSbAxeyfojwmWEQklfcsBGiCwWfTPh6YIVLF9Peo71H4LvA9QwCfI74oxHB7whicTRQF0GJ4cC3DnGDcT7wbkjcUghoZdt3WxMXEnEb2iA2HSc0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xLtYIaKI; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=08YXLdcE/jW5FZxN5yg4w5BQuPpc21LjIlXkGV/CKro=; b=xLtYIaKI7UYAtBnjxE1ZmPMGLl
+	hx8KJYqySbsN4YuR3ovcEtgEUguzNlmeLL5fX+9tMRDd42vsLPZhICqG2Np5YXDvVnhS915SltDWh
+	fFd2CB+kualtme2lN5RIoIikrgqVO4ZSwQ6UNTudHbG+tKxHnYmn0raPY194wsr3TVsY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uzFP2-008pfC-8P; Thu, 18 Sep 2025 16:14:28 +0200
+Date: Thu, 18 Sep 2025 16:14:28 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jonas Rebmann <jre@pengutronix.de>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Shengjiu Wang <shengjiu.wang@nxp.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-sound@vger.kernel.org, imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	David Jander <david@protonic.nl>,
+	Lucas Stach <l.stach@pengutronix.de>,
+	Oleksij Rempel <o.rempel@pengutronix.de>
+Subject: Re: [PATCH v2 3/3] arm64: dts: add Protonic PRT8ML board
+Message-ID: <af554442-aeec-40d2-a35a-c7ee5bfcb99a@lunn.ch>
+References: <20250918-imx8mp-prt8ml-v2-0-3d84b4fe53de@pengutronix.de>
+ <20250918-imx8mp-prt8ml-v2-3-3d84b4fe53de@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250918-imx8mp-prt8ml-v2-3-3d84b4fe53de@pengutronix.de>
 
-Hi Jakub,
+> +			port@4 {
+> +				reg = <4>;
+> +				ethernet = <&fec>;
+> +				label = "cpu";
+> +				phy-mode = "rgmii-id";
+> +				rx-internal-delay-ps = <2000>;
+> +				tx-internal-delay-ps = <2000>;
+> +
+> +				fixed-link {
+> +					full-duplex;
+> +					speed = <100>;
+> +				};
+> +			};
+> +		};
+> +	};
+> +};
+> +
+> +&fec {
+> +	pinctrl-names = "default";
+> +	pinctrl-0 = <&pinctrl_fec>;
+> +	phy-mode = "rgmii"; /* switch inserts delay */
+> +	rx-internal-delay-ps = <0>;
+> +	tx-internal-delay-ps = <0>;
+> +	status = "okay";
+> +
+> +	fixed-link {
+> +		full-duplex;
+> +		speed = <100>;
+> +	};
 
-On Thu, 18 Sep 2025 06:46:37 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+You have an RGMII interface, but you run it at 100Mbps? That might be
+worth a comment somewhere to explain why.
 
-> New cocci check complains:
-> 
->   drivers/net/wan/framer/pef2256/pef2256.c:733:3-10: WARNING: Consider using %pe to print PTR_ERR()
-> 
-> Link: https://lore.kernel.org/1758192227-701925-1-git-send-email-tariqt@nvidia.com
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: herve.codina@bootlin.com
-> ---
->  drivers/net/wan/framer/pef2256/pef2256.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/wan/framer/pef2256/pef2256.c b/drivers/net/wan/framer/pef2256/pef2256.c
-> index 1e4c8e85d598..2a25cbd3f13b 100644
-> --- a/drivers/net/wan/framer/pef2256/pef2256.c
-> +++ b/drivers/net/wan/framer/pef2256/pef2256.c
-> @@ -719,8 +719,8 @@ static int pef2256_probe(struct platform_device *pdev)
->  	pef2256->regmap = devm_regmap_init_mmio(&pdev->dev, iomem,
->  						&pef2256_regmap_config);
->  	if (IS_ERR(pef2256->regmap)) {
-> -		dev_err(&pdev->dev, "Failed to initialise Regmap (%ld)\n",
-> -			PTR_ERR(pef2256->regmap));
-> +		dev_err(&pdev->dev, "Failed to initialise Regmap (%pe)\n",
-> +			pef2256->regmap);
->  		return PTR_ERR(pef2256->regmap);
->  	}
->  
+	Andrew
 
-Acked-by: Herve Codina <herve.codina@bootlin.com>
-
-Best regards,
-Hervé
+	
 
