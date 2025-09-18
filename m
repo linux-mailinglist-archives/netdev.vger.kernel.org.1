@@ -1,92 +1,59 @@
-Return-Path: <netdev+bounces-224489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3E98B85740
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:08:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D317DB857CD
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:13:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66ED42A4833
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:08:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22BA518993A0
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:09:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32E6307AEB;
-	Thu, 18 Sep 2025 15:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98BD523AB81;
+	Thu, 18 Sep 2025 15:08:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kwZnl0bg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iTYcExKb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8089E1607AC;
-	Thu, 18 Sep 2025 15:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C12231A21
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:08:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758208058; cv=none; b=vC/fq12ScbsdzSJ9sLs0vIzguqZsjsZ8jJERLzhV+uP3I950VSWRLkfq90kjAtO2IbcEq3u+JTP8ZxwIo/2D/iaxJLyswab9mFoFfYgDQdfjgviVKXe+jq/LdZEGP/mllUoyxMjNT8bR7T/skq9jMAoG06WW6Km4Ldm7AwGHC2I=
+	t=1758208097; cv=none; b=bfo56bDYFniDLRRhaLxJcz+OOmY+kjgaW0Kb77Dt8huLavztJjHqiCLqr/htym84y8aMQ+ryhwiqmoKZJACQvvh0T/auWz7IF1qhhtzIw7taK84/7PURp0NjjZWPq0iJZdKya8nim+ULM+dDLiqAzRzQjzW8Q0pOKHyOgYh0OVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758208058; c=relaxed/simple;
-	bh=sW/npsoqVvH2jZ1iYFeywDG41QnbgIzfrJf90iHIx94=;
+	s=arc-20240116; t=1758208097; c=relaxed/simple;
+	bh=y4r1E6ftEBebSjqdI6igg664AKLnPqmGRtERP5t5AIQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eYNuEjCN9+jJskTHbs4XDGmPeKXXXaiW5hh2KJ8LgwellK4VtkyC+P96X+4e8gA4bH0Dja1NqyfhvBApY4kvVMCw69FXZ9n/BP3//g0EPlBvILyyQ8lkp/bnQY+AI1FmOJ3YxlZ0gwRTeAHecT4o1J1HNjqSdz+7Qkn/ktQ0z08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kwZnl0bg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AD3CC4CEEB;
-	Thu, 18 Sep 2025 15:07:29 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=EqV9pK7mIxefG51MiYWkdxyCHcKwyUoLVTVC0RMWHacTXTMBnM3OMkXyzebFrwiNZDFpO6QxePYPXSo8pDyC6yUzZ97w0FhOxMRnUDvgmG59bFrXQwerixTcAJNvGsaSc2Ab4PilGAMXHwquwabg5bad41ZUZDZ6WaDoVwV7Z0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iTYcExKb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47A7FC4CEE7;
+	Thu, 18 Sep 2025 15:08:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758208057;
-	bh=sW/npsoqVvH2jZ1iYFeywDG41QnbgIzfrJf90iHIx94=;
+	s=k20201202; t=1758208097;
+	bh=y4r1E6ftEBebSjqdI6igg664AKLnPqmGRtERP5t5AIQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kwZnl0bgzIv5G9GpaNIDQbuvO9HddfBAxifrvDjM5Ugs42X76RrBv51TpbdZm5Y1L
-	 mHQv8IAwm4Xd7QqDtWeChSyd0hXizLPuB2fIG09/9z0/ttqtVToJnG0xDvM7xZQN0y
-	 m2pRwIJx1HdEaHaPQRUPdlZi+AeKJfLhgt5uRqabPJ95o3Ib7FYa3KR/mz++sX1Lka
-	 ouGGsFcEH95nRzAxLtCilfOwp6ls1KG4xphq5ucvhDweyDOeUjwEszovJaqSF1pTVe
-	 1JVb1CKf7Cti5yxGTvJENeZRlV2K3Kjermk5ncw0x/qepBF3oLDwfHUQsk+YORmcjv
-	 fkxEbB7s/6Ojg==
-Date: Thu, 18 Sep 2025 16:07:27 +0100
+	b=iTYcExKbouzZ9464iyzH8crdU51WIskA38446lCfn7YtaaHWRFZV90PP8vBWfCzx6
+	 YwBViTfjnVfze7t4eAl8pAFBkVnCj+RJ8DYaw6pfoytSV4Yf4mYaHV1+UbE59SBl8J
+	 nM/Clzhit16Tds7Xu+TWx0uHtd3ZqAhjDhV/wRMC2dUOT/ISatRglzGYFknbAOHqC2
+	 hcYk0fkU7LcuJiKQw3QDqNOTpqlO/Dy3kFy9o/ImO7q/QzCx+T84Ieie8vW61DQss5
+	 H9yJ+2MVZE+iwcDhTSe/uare6GkDgvP4IAfZdKHNal+ECcXF86/rUxR2hK/erTHcQ4
+	 3zAqCt7l+FqBA==
+Date: Thu, 18 Sep 2025 16:08:13 +0100
 From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Michael Guralnik <michaelgur@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>, Will Deacon <will@kernel.org>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Justin Stitt <justinstitt@google.com>, linux-s390@vger.kernel.org,
-	llvm@lists.linux.dev, Ingo Molnar <mingo@redhat.com>,
-	Bill Wendling <morbo@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Leon Romanovsky <leonro@mellanox.com>, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Jijie Shao <shaojijie@huawei.com>,
-	Patrisious Haddad <phaddad@nvidia.com>
-Subject: Re: [PATCH net-next V3] net/mlx5: Improve write-combining test
- reliability for ARM64 Grace CPUs
-Message-ID: <20250918150727.GX394836@horms.kernel.org>
-References: <1758178883-648295-1-git-send-email-tariqt@nvidia.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	David Miller <davem@davemloft.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: dsa: dsa_loop: remove duplicated
+ definition of NUM_FIXED_PHYS
+Message-ID: <20250918150813.GY394836@horms.kernel.org>
+References: <67a3b7df-c967-4431-86b6-a836dc46a4ef@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,48 +62,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1758178883-648295-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <67a3b7df-c967-4431-86b6-a836dc46a4ef@gmail.com>
 
-On Thu, Sep 18, 2025 at 10:01:23AM +0300, Tariq Toukan wrote:
-> From: Patrisious Haddad <phaddad@nvidia.com>
+On Thu, Sep 18, 2025 at 07:54:00AM +0200, Heiner Kallweit wrote:
+> Remove duplicated definition of NUM_FIXED_PHYS. This was a leftover from
+> 41357bc7b94b ("net: dsa: dsa_loop: remove usage of mdio_board_info").
 > 
-> Write combining is an optimization feature in CPUs that is frequently
-> used by modern devices to generate 32 or 64 byte TLPs at the PCIe level.
-> These large TLPs allow certain optimizations in the driver to HW
-> communication that improve performance. As WC is unpredictable and
-> optional the HW designs all tolerate cases where combining doesn't
-> happen and simply experience a performance degradation.
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-...
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
-> Reviewed-by: Michael Guralnik <michaelgur@nvidia.com>
-> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/wc.c | 28 ++++++++++++++++++--
->  1 file changed, 26 insertions(+), 2 deletions(-)
-> 
-> Find V2 here:
-> https://lore.kernel.org/all/1757925308-614943-1-git-send-email-tariqt@nvidia.com/
-> 
-> V3:
-> - Move the new copy assembly code to be inline, within the same file it
->   is used.
-> - Use ".arch_extension simd;\n\t" to avoid the need for separate file
->   and special compilation flags.
-
-Hi Tariq, Patrisious, all,
-
-This is not a full review - although I've been following this patch with
-much interest, I don't feel qualified to provide one.
-
-But what I can do is be the poor soul to report that unfortunately
-the patch doesn't compile against net-next. So at some point it will
-need to be rebased and reposted.
-
-Thanks for your persistence on working on this, it is indeed a nettlesome issue.
-
--- 
-pw-bot: changes-requested
 
