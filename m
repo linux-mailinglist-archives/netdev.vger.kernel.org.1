@@ -1,369 +1,328 @@
-Return-Path: <netdev+bounces-224311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A60BB83B28
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 11:11:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 890F9B83B34
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 11:11:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1A531C07E2E
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 09:11:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43B8A52281A
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 09:11:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBE452FF17C;
-	Thu, 18 Sep 2025 09:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FBA2FE58C;
+	Thu, 18 Sep 2025 09:11:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="E0dD+TP3";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="m4trHJRY";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="HqCcH+2O";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="mvJYBXJP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TO/jIQ04"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C852FD1B6
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 09:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758186672; cv=none; b=cDxTP1Gir0YXcKCvf6yxQ5N6Of9CfgMKEyOIOM77Q6jPJ2na3mjOmlBpanyh1BLOOL6HfjW9pSvz6i+rMfAagI0ngm3ksHG60kpOCef0OEhxTRPFRdpNPt+AMOnyqwlljrBWkfLcDW11AvSaeZOmarlO1k1R11eF6PERLLtpo/I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758186672; c=relaxed/simple;
-	bh=ROzj7x8f2E0Pg2YMtmuABkw2czH9kN4rhCy5VhmuH3s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m5Tmbkx/qbNGKTx7tRqvhDQQqYZJYGL4q92mq20r8miCTyId+m92zO6NaRmj3fGMXsK8wsaEkaGmbcF7ZpgjG/dTCu/WeJB0TR3VlKzZN5cAZ5GjpfxNsZc+NAcYPp3GXPEdnyBpK6DlU4hXLpvDzU759RYJcqHm8u+ekRfPkv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=E0dD+TP3; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=m4trHJRY; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=HqCcH+2O; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=mvJYBXJP; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id D86F01F393;
-	Thu, 18 Sep 2025 09:11:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758186663; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xL+TtOqmZ5Gag6pbcfCwROUJiWuODRMG1zK+9kl5tPY=;
-	b=E0dD+TP3vQjrBnQ/oelOtpFV41KQhpQc2W8SlXqeVXLtihY3dz/7Ag6tJJ26L1p9uQ2Wa/
-	nCUiK1Z0eJZ8YaCl/IJOE9S2xvO9DiAg2Ly/elhfut40j8YEwmAde/JGV+XnAlURcXGpCx
-	3GNJy1ahikrMvXyNfosJQ/6ceML+G8E=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758186663;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xL+TtOqmZ5Gag6pbcfCwROUJiWuODRMG1zK+9kl5tPY=;
-	b=m4trHJRY5zHvAEZwA0ZpBIRKHZqZdX5q+cC85KTn2wvebD4U5FXL6/2k7i8DSGs05jwf0F
-	VcO/xFIHxtk/8MCA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758186662; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xL+TtOqmZ5Gag6pbcfCwROUJiWuODRMG1zK+9kl5tPY=;
-	b=HqCcH+2Okzs3AWdSW93O8xOP/EblM0I/5A82okuPugcNAFwdTGE1bf5Fw+x/Tw4Xhx7uMb
-	F/FoQlOaEEZ7omcEakAbb9OVdgrpWS650dOMkbp4inSIAqbVYJvNrzjdDt27086nb37MvJ
-	i6JdP139bopILs6Mfh50i1GrXb8YQf8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758186662;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xL+TtOqmZ5Gag6pbcfCwROUJiWuODRMG1zK+9kl5tPY=;
-	b=mvJYBXJPwG2sugGeTBbyqr9ePhgDyROO6CWRmvwTL5VVnYvsGlhatcLadmIw+zMJgRw60J
-	rfSM4S54fWggVeBg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BEDA213A39;
-	Thu, 18 Sep 2025 09:11:02 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ieSSLqbMy2jLVAAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 18 Sep 2025 09:11:02 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 1D2F7A09B1; Thu, 18 Sep 2025 11:11:02 +0200 (CEST)
-Date: Thu, 18 Sep 2025 11:11:02 +0200
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>, 
-	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Tejun Heo <tj@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
-	Frederic Weisbecker <frederic@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 9/9] ns: add ns_common_free()
-Message-ID: <nn7h3bjzz5ckd5mjhqs5jci4fl4ndjc6uabos54242x2ck7mph@fbobo4nydu7p>
-References: <20250917-work-namespace-ns_common-v1-0-1b3bda8ef8f2@kernel.org>
- <20250917-work-namespace-ns_common-v1-9-1b3bda8ef8f2@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0F21E3DE5;
+	Thu, 18 Sep 2025 09:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758186715; cv=fail; b=AAa+7O+Y+EcL52rM7D6nD9vs7l9uD27GSyy+pLLLAEDWVMNKp16NX3CaipWUYzuYx4NtIRIjWGzisvU1KtWpJl72TqVdtRWY5ueZ1e27hSemQ8Z2Sa0BSma62FUievABNh1xc29yiqjTq42dLLzdfVJyTY0Q5Nl02gLmCjBKUMU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758186715; c=relaxed/simple;
+	bh=mhgcl/XstsZvMGxonTe3xmY8GFGSBj7mezXe57UrNBU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ZQei5YINGcnMegO4owV3b/xFEFbYe50c7X3JZ6mFQzuUy9v+fOGrxps4kuoBGP2QWeDqxXKfnkw46/i8t70aEeptd83QZ1wQee1XEhePuUp4csIU7PJtSdZAeeb9yVJvY87pmq8eX4tVvuS51eytq7d+NFls7gD6beYLvOp8xgk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TO/jIQ04; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758186713; x=1789722713;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=mhgcl/XstsZvMGxonTe3xmY8GFGSBj7mezXe57UrNBU=;
+  b=TO/jIQ04564leaXvMC5vFnTOxB/YFYaRbtTnSh+XPx+NvVp7ppftdAG5
+   V6xqCGRvZCsak3309MozkF6UgRocrl2XhYmP4Hb1/+PeHG7EZx2D56bUV
+   UTA84LTd2xAkGznaIiN4XrHWN+kQnnhcfemkQsdw8HS6sN+B+Mpbm7Fth
+   ewlsZJ+1lMY0ZjEqA9F4WnBjv32aT8xFW31a7nfzzW/gOMVZuYuz4FETL
+   55LrYkULNpAbdC/LKEuByXee/K384NLVTIknUB7+wHZnGo8YuT9iXwsUG
+   vpvybWRtZPeAxTkj0gPPp4Go1XCi0F9fRoKT34rBCKFUyqRyHRdXVQgbP
+   Q==;
+X-CSE-ConnectionGUID: 9aGlTj+MSA22EaR34UIkzg==
+X-CSE-MsgGUID: l6ZoVlJJTDq7iO+qFc7tXA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11556"; a="60398360"
+X-IronPort-AV: E=Sophos;i="6.18,274,1751266800"; 
+   d="scan'208";a="60398360"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2025 02:11:52 -0700
+X-CSE-ConnectionGUID: whm+xoB5Qo6RlQCM0HFUeQ==
+X-CSE-MsgGUID: z+IhZ2RpSGWc3SgPNX9MpA==
+X-ExtLoop1: 1
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2025 02:11:51 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Thu, 18 Sep 2025 02:11:51 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Thu, 18 Sep 2025 02:11:51 -0700
+Received: from CO1PR03CU002.outbound.protection.outlook.com (52.101.46.51) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Thu, 18 Sep 2025 02:11:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=F1PRkL5bmp1NZjCf1YuUG4Fiweh7cYeFV4pumjNpiSvn4BTS6DDImrfRhPkrx0nwWsfRKvyhNy5Io/t2pKPKMYD/igSBgqHzd6jQN6U7mAtea50L3w6CwrxWr6bLD83PfOKAqioOUj8DIhReu+DkeR373LIf7zFmBjovOtEFM3b1nKNQ4ymsUmMvkdj8I2ITlP4oPzMUXHLvri1oCMi/6QHLZ9mkJDxuKT8TjiCnfE2cS1alSMPk9sJQsruADjueTP95IrI9plSQJSrJGqOZCysYJwzTrY82BKhknra18XVahTdWaHTO88vOwrue5b2JbbOjXrLjYIBW0k3dsOlJdA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=F1FBICQOlcZFyVa1RIXpL6cnkd2pduOERYPBsZmuj+8=;
+ b=yuz42vYpBKG1j97UbRJUvkqdwa2H/Q6zzDKvn+uVUiWGfN7SrDyKySjeVm175mc9CodCC9JIgPbk5rpQwZS5UuhYyaoKGWJBm4l9jy+HzKl4w22DJo9aa9xXz0bFPDMo7gtvpzSVpSI3/GpYbhrzU6501xG1ZZ5iOSrrOvmGmDMITYYYDKbET/RRRK6aT/txfMZeYzQraAXnn2Iyg6L778EA/5E2f6EhdKKnlj0aXH138oNsFx6iPgzSgxHcWyVuFF7l1d5Xev+t+15cg1Pax6+5Bqzw85kb8Y00MQk88XCu7b/8qhXFovvXj6bPmXiQWEYJT308oWStFw5TGBfCTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ SJ0PR11MB5085.namprd11.prod.outlook.com (2603:10b6:a03:2db::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.13; Thu, 18 Sep
+ 2025 09:11:49 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9137.012; Thu, 18 Sep 2025
+ 09:11:48 +0000
+Date: Thu, 18 Sep 2025 11:11:34 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Amery Hung <ameryhung@gmail.com>
+CC: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<alexei.starovoitov@gmail.com>, <andrii@kernel.org>, <daniel@iogearbox.net>,
+	<paul.chaignon@gmail.com>, <kuba@kernel.org>, <stfomichev@gmail.com>,
+	<martin.lau@kernel.org>, <mohsin.bashr@gmail.com>, <noren@nvidia.com>,
+	<dtatulea@nvidia.com>, <saeedm@nvidia.com>, <tariqt@nvidia.com>,
+	<mbloch@nvidia.com>, <kernel-team@meta.com>
+Subject: Re: [PATCH bpf-next v4 2/6] bpf: Support pulling non-linear xdp data
+Message-ID: <aMvMxrPsNXbTuF3c@boxer>
+References: <20250917225513.3388199-1-ameryhung@gmail.com>
+ <20250917225513.3388199-3-ameryhung@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250917225513.3388199-3-ameryhung@gmail.com>
+X-ClientProxiedBy: TL2P290CA0004.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::13) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250917-work-namespace-ns_common-v1-9-1b3bda8ef8f2@kernel.org>
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TAGGED_RCPT(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,toxicpanda.com,kernel.org,yhndnzj.com,in.waw.pl,0pointer.de,cyphar.com,zeniv.linux.org.uk,suse.cz,cmpxchg.org,suse.com,linutronix.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,imap1.dmz-prg2.suse.org:helo,suse.com:email]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -2.30
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|SJ0PR11MB5085:EE_
+X-MS-Office365-Filtering-Correlation-Id: 66e57c8c-3981-4328-2c12-08ddf69365ea
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?kKp8LaRv85jweaTjrBjZTZ5s5G4H4KKG9Ty2yOjqwib6gDeErPn4oEWbn+YN?=
+ =?us-ascii?Q?mR4t8dg1GG4ebBfuaXHIHMOyHAIkmZm/UAxBD9YYYv+kdLhO4Rw8CYDBeJzx?=
+ =?us-ascii?Q?IPfcEy75dbsD3P2JZ1HSonuBKCjl3MWvlkLI3TTdS7HrXUrMESZ7cz+J6nDT?=
+ =?us-ascii?Q?vgdbB+Oxp+M81F0gZ2pfbSq/mEB2vqXpF7JeO0nVAi1b7whcUpHFloNNUxzz?=
+ =?us-ascii?Q?7fV7NAC0a8Fzj+5R4FmIqck0uGtJOq8I0aYSIjy6m3C7JyNyNwVsncUfj8Fq?=
+ =?us-ascii?Q?T87utl2NwVSUx+HTW0smPsbrgIg8LBTT5bFas4JPBFwnnIEd7iBz3sK9LpIq?=
+ =?us-ascii?Q?GVxt7+8gS2OllPKLW3rgIqhiqXW2SaaVjcp4g+UTwEHlDemB5Ezt+Ld7nQs4?=
+ =?us-ascii?Q?LosNszJEOhbd22MjHw35iIoIBF0vuHqbVKF09ilIkLlWFKKMB+/g2fpMPxnb?=
+ =?us-ascii?Q?+HFqSOpdDPR4wEz8s8DoLvJjVwqlE/H2sQMkgUoqpYzxgpyM5Oku/RHdWcF5?=
+ =?us-ascii?Q?KDAztU4WZHocEhIfBwMQVOUPu1iNAX/AVlKUZfvBK1rOk4rSrVmY5CTDjCS8?=
+ =?us-ascii?Q?NRc4QApr6Cjnflf5hZ4gJ6PivdxSO+NGyZd0KFdaZ0G2QipW8w0cxW1AhI+3?=
+ =?us-ascii?Q?HmsV5IRaiElQ0AlvwQYvev54ZvJ2klsBP9QJog3ZQqkm9b2SsoD2trO+IK6C?=
+ =?us-ascii?Q?uSkb5GJ4sP9zELnPSRZPr5DvDndlPFprsIf7dYArmNaHxbsUQVeOabXM+tfT?=
+ =?us-ascii?Q?igszhEWTVphGANhDL26DLLHlZlk6LIzk1mSi3QodecIYWEuO8a7En9TjBPdN?=
+ =?us-ascii?Q?0mV6ZV+iW/q+chHGKvmPzZiDxU9MKAKNB5XXl4EzUxE5suXFgQ9faC/7cTaS?=
+ =?us-ascii?Q?W/4EJAKxybgMk4ty94nQu90ZCeF/XnBsaWU7y3tgoq17gK/kfEjOw0HOWJxA?=
+ =?us-ascii?Q?fMSoHfZeCBAdx+Hu2sqq8GRYsHp8Kr/Hs2BPefl3GAxh9fS/3O3XlSg3g83Y?=
+ =?us-ascii?Q?TTiyewTpvTPdJdHJXnGweQQmvn2qizt8nrm4hslLU39b5L7KKC1dhkOMtsb+?=
+ =?us-ascii?Q?1PEAe3lyWD6auzV5zle6bMJ48NMQQcm5QpJSO1/uqfEWXB4g3vvKht/xU65/?=
+ =?us-ascii?Q?D4n/cCJKC8mM8thtLb3OMQWDc6rbN+IZBDKj3to2KBLZB1oEcW9sPYDqd4T5?=
+ =?us-ascii?Q?APcXLXyhpTMFWbLKBjMyMp59st+PqzyKYjG7BYrlhUnljV2KSIL/lcPc1x2x?=
+ =?us-ascii?Q?J8ktcB5tqC/2E4VjGxgrAGkq3leNfOwyWKkIH5htO9RyGXGTZlvBp2d/oX8Y?=
+ =?us-ascii?Q?BZt5pqt4eGk8XDzRIvKlKjzjBCHaS43PYARNKCwEcXPzkVD+6tVeohInOip+?=
+ =?us-ascii?Q?T16u0Z0e+XJWt5tCGbbsrV4rkKdb+wF6/FlrbX1YPv4RC9yooyYtzOhcNt4J?=
+ =?us-ascii?Q?aWtnXrRe2P8=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?CYLcyPNAmBiEJII0EglwbnPosKbd3sDflrKEdRkUz0Aaha4uFEGfYu3Xhg0H?=
+ =?us-ascii?Q?cc2COV7aCNt+YcUGjWx53L9PRUt30+rgkGXrLHLSMSY4D2KjaJ6RqgqGQAUM?=
+ =?us-ascii?Q?Cz7FUdVwp4zL45w14wiHgsVwZYXxR9V6HYZE5Q+yQH8RUbw/E2XMem/kCCvA?=
+ =?us-ascii?Q?Iu18UuXrglFxA4O2wcTi6k8T9erRzs/tdY2AqaQ4z23SmghT4JaN31TsurnL?=
+ =?us-ascii?Q?GQDd2fmBrIwONDRZzDdGNareP79tYnS/lR6r3+PGA5iqOJQ5LrahZooNF8MP?=
+ =?us-ascii?Q?gp26uGYtwn+A/2aFOxizwFPZRXEG7O0DvIwdNT9NdLjgCcAsXbe13BZ1p+5V?=
+ =?us-ascii?Q?rv13sRjxiD8trIWiRd2ccipbHXT4WaWG0GSWRViZ5j23iZSQC9idaOqcbL9g?=
+ =?us-ascii?Q?EC7PCFBkhesiE+nDtKsjBiZVh35kwlnwQjVmMhni1OMk46G/vQrTywOFPosK?=
+ =?us-ascii?Q?jHH4CPPZmqevlndwyhGR/sqKQ/m/Onz3XcJeqj/r++zQqINl4L1QNGSB/Hdh?=
+ =?us-ascii?Q?qxuQQ/L1TX4B3p9AwMEQm5GahesKr8gdGPbDyT85pFXEf2KkPQGOZZs5wsGo?=
+ =?us-ascii?Q?Ia/79HAryCtWp47Y4i07ehfV6bHwmPr11WZg9rezT4TrleMl6bs24JpCRPgk?=
+ =?us-ascii?Q?PSZqfmerCRjlOAnSjTYKmhX2FC4RNIKUM+KV4HV2vTut0w3nPTTcVV/6d2pi?=
+ =?us-ascii?Q?nNdIWSVNNLqm4/wgYL1x8dTIsXrtWxaJ6mwMcKC7me7R+uorcqJeZKWIR8Vr?=
+ =?us-ascii?Q?NLurcPIn0J1vEFtfVbFRYWhvM1YO9A6rXW+3PrHU92OGfI2y8iDGEeIf9dXt?=
+ =?us-ascii?Q?fjj6b0uwDE6/vwlMV2GJeIrfivR8fur96Gm/WinHakvjIF/EF0KGX1vKAz3g?=
+ =?us-ascii?Q?Z4coAZnrThVvNs+jdwbUpp6TK6F9MwVXBchc5an2pQS3yFR4BzsWN4DXpVJm?=
+ =?us-ascii?Q?d1i+MoCXvP/o+WBwjUTwrsiSfyZaJdXf3TsIlhOad1CVF74rlDoCu/1Om665?=
+ =?us-ascii?Q?8Vlgc6Z6YfGC9wypxo54AwLT6PRrxpDwuB+7foBbW7yo4+kQBj5bljzXq5Qg?=
+ =?us-ascii?Q?DbMPiIMVusUItXKELSjn8Cn3DmUjhFbDZUXnUyzRbnTwh2fRoKO7WVwMJKR0?=
+ =?us-ascii?Q?WenKmWj+HAxmSgUb1ZPeoSuPMGXFm+Clu7nB62DE1DTdQONNFtTWMmspG9GV?=
+ =?us-ascii?Q?0Y7Ql+IJePTLsdSyMV0ESObcza1XcpAprTq2KiQ4GzyYXoIxiAg0x3r03dwE?=
+ =?us-ascii?Q?0mNo+Ez/pFCUl8UXj7q8BYhpD+uERZ7LuDhxkpTuh6f0yUSVCNGYRRXGTdOE?=
+ =?us-ascii?Q?DyEnRqiFEciFB5pYBPKwSBUzYqlDGx6J3LqUdDarQYKn2cTtliEHG4Jhn9Fw?=
+ =?us-ascii?Q?kD8ZtXfOMEgZNTwhLVlbOYR33VVlSxlb4nMKBBRGdSjpFBAVrFvjOghY2u4E?=
+ =?us-ascii?Q?BxUO9zhoiWjHHNrTjujoaA2D+k1xE9uQWL/uytIH3Gh23QBbi6ZpXePXz5ZJ?=
+ =?us-ascii?Q?uB8S/54N2fVD4OlzOMoa4oAlkpkuUJpQ1iJLBJG+RBesMxrO8aX2HsFFX1/O?=
+ =?us-ascii?Q?klAr8g6EaLuJBsOU+TIH9PUU8oANy6XQEdXMGL4MSBzpuV8ShEQOUXRmQ6kZ?=
+ =?us-ascii?Q?dA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 66e57c8c-3981-4328-2c12-08ddf69365ea
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2025 09:11:48.8208
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6t9fy4WlVFOrdhyJjld9UnLYBScQqmjYbbQU2khHdQGyqaqnJi6wpblCDbcw2IgmvP6ia9DJfh30RjxLv9Lau6zOgMF2AHlG3bb70VlNYmA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5085
+X-OriginatorOrg: intel.com
 
-On Wed 17-09-25 12:28:08, Christian Brauner wrote:
-> And drop ns_free_inum(). Anything common that can be wasted centrally
-> should be wasted in the new common helper.
+On Wed, Sep 17, 2025 at 03:55:09PM -0700, Amery Hung wrote:
+> Add kfunc, bpf_xdp_pull_data(), to support pulling data from xdp
+> fragments. Similar to bpf_skb_pull_data(), bpf_xdp_pull_data() makes
+> the first len bytes of data directly readable and writable in bpf
+> programs. If the "len" argument is larger than the linear data size,
+> data in fragments will be copied to the linear data area when there
+> is enough room. Specifically, the kfunc will try to use the tailroom
+> first. When the tailroom is not enough, metadata and data will be
+> shifted down to make room for pulling data.
 > 
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
-
-Nice. Feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
+> A use case of the kfunc is to decapsulate headers residing in xdp
+> fragments. It is possible for a NIC driver to place headers in xdp
+> fragments. To keep using direct packet access for parsing and
+> decapsulating headers, users can pull headers into the linear data
+> area by calling bpf_xdp_pull_data() and then pop the header with
+> bpf_xdp_adjust_head().
+> 
+> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
 > ---
->  fs/namespace.c            | 4 ++--
->  include/linux/ns_common.h | 3 +++
->  include/linux/proc_ns.h   | 2 --
->  ipc/namespace.c           | 4 ++--
->  kernel/cgroup/namespace.c | 2 +-
->  kernel/nscommon.c         | 5 +++++
->  kernel/pid_namespace.c    | 4 ++--
->  kernel/time/namespace.c   | 2 +-
->  kernel/user_namespace.c   | 4 ++--
->  kernel/utsname.c          | 2 +-
->  net/core/net_namespace.c  | 4 ++--
->  11 files changed, 21 insertions(+), 15 deletions(-)
+>  net/core/filter.c | 91 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 91 insertions(+)
 > 
-> diff --git a/fs/namespace.c b/fs/namespace.c
-> index 31eb0e8f21eb..03bd04559e69 100644
-> --- a/fs/namespace.c
-> +++ b/fs/namespace.c
-> @@ -4083,7 +4083,7 @@ static void dec_mnt_namespaces(struct ucounts *ucounts)
->  static void free_mnt_ns(struct mnt_namespace *ns)
->  {
->  	if (!is_anon_ns(ns))
-> -		ns_free_inum(&ns->ns);
-> +		ns_common_free(ns);
->  	dec_mnt_namespaces(ns->ucounts);
->  	mnt_ns_tree_remove(ns);
->  }
-> @@ -4155,7 +4155,7 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
->  	new = copy_tree(old, old->mnt.mnt_root, copy_flags);
->  	if (IS_ERR(new)) {
->  		namespace_unlock();
-> -		ns_free_inum(&new_ns->ns);
-> +		ns_common_free(ns);
->  		dec_mnt_namespaces(new_ns->ucounts);
->  		mnt_ns_release(new_ns);
->  		return ERR_CAST(new);
-> diff --git a/include/linux/ns_common.h b/include/linux/ns_common.h
-> index 284bba2b7c43..5094c0147b54 100644
-> --- a/include/linux/ns_common.h
-> +++ b/include/linux/ns_common.h
-> @@ -41,6 +41,7 @@ struct ns_common {
->  };
->  
->  int __ns_common_init(struct ns_common *ns, const struct proc_ns_operations *ops, int inum);
-> +void __ns_common_free(struct ns_common *ns);
->  
->  #define to_ns_common(__ns)                              \
->  	_Generic((__ns),                                \
-> @@ -82,4 +83,6 @@ int __ns_common_init(struct ns_common *ns, const struct proc_ns_operations *ops,
->  #define ns_common_init_inum(__ns, __ops, __inum) \
->  	__ns_common_init(&(__ns)->ns, __ops, __inum)
->  
-> +#define ns_common_free(__ns) __ns_common_free(to_ns_common((__ns)))
-> +
->  #endif
-> diff --git a/include/linux/proc_ns.h b/include/linux/proc_ns.h
-> index 9f21670b5824..08016f6e0e6f 100644
-> --- a/include/linux/proc_ns.h
-> +++ b/include/linux/proc_ns.h
-> @@ -66,8 +66,6 @@ static inline void proc_free_inum(unsigned int inum) {}
->  
->  #endif /* CONFIG_PROC_FS */
->  
-> -#define ns_free_inum(ns) proc_free_inum((ns)->inum)
-> -
->  #define get_proc_ns(inode) ((struct ns_common *)(inode)->i_private)
->  
->  #endif /* _LINUX_PROC_NS_H */
-> diff --git a/ipc/namespace.c b/ipc/namespace.c
-> index 0f8bbd18a475..09d261a1a2aa 100644
-> --- a/ipc/namespace.c
-> +++ b/ipc/namespace.c
-> @@ -97,7 +97,7 @@ static struct ipc_namespace *create_ipc_ns(struct user_namespace *user_ns,
->  
->  fail_put:
->  	put_user_ns(ns->user_ns);
-> -	ns_free_inum(&ns->ns);
-> +	ns_common_free(ns);
->  fail_free:
->  	kfree(ns);
->  fail_dec:
-> @@ -161,7 +161,7 @@ static void free_ipc_ns(struct ipc_namespace *ns)
->  
->  	dec_ipc_namespaces(ns->ucounts);
->  	put_user_ns(ns->user_ns);
-> -	ns_free_inum(&ns->ns);
-> +	ns_common_free(ns);
->  	kfree(ns);
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 0b82cb348ce0..0e8d63bf1d30 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -12212,6 +12212,96 @@ __bpf_kfunc int bpf_sock_ops_enable_tx_tstamp(struct bpf_sock_ops_kern *skops,
+>  	return 0;
 >  }
 >  
-> diff --git a/kernel/cgroup/namespace.c b/kernel/cgroup/namespace.c
-> index d928c557e28b..16ead7508371 100644
-> --- a/kernel/cgroup/namespace.c
-> +++ b/kernel/cgroup/namespace.c
-> @@ -40,7 +40,7 @@ void free_cgroup_ns(struct cgroup_namespace *ns)
->  	put_css_set(ns->root_cset);
->  	dec_cgroup_namespaces(ns->ucounts);
->  	put_user_ns(ns->user_ns);
-> -	ns_free_inum(&ns->ns);
-> +	ns_common_free(ns);
->  	/* Concurrent nstree traversal depends on a grace period. */
->  	kfree_rcu(ns, ns.ns_rcu);
->  }
-> diff --git a/kernel/nscommon.c b/kernel/nscommon.c
-> index c3a90bb665ad..7c1b07e2a6c9 100644
-> --- a/kernel/nscommon.c
-> +++ b/kernel/nscommon.c
-> @@ -18,3 +18,8 @@ int __ns_common_init(struct ns_common *ns, const struct proc_ns_operations *ops,
->  	}
->  	return proc_alloc_inum(&ns->inum);
->  }
-> +
-> +void __ns_common_free(struct ns_common *ns)
+> +/**
+> + * bpf_xdp_pull_data() - Pull in non-linear xdp data.
+> + * @x: &xdp_md associated with the XDP buffer
+> + * @len: length of data to be made directly accessible in the linear part
+> + *
+> + * Pull in data in case the XDP buffer associated with @x is non-linear and
+> + * not all @len are in the linear data area.
+> + *
+> + * Direct packet access allows reading and writing linear XDP data through
+> + * packet pointers (i.e., &xdp_md->data + offsets). The amount of data which
+> + * ends up in the linear part of the xdp_buff depends on the NIC and its
+> + * configuration. When a frag-capable XDP program wants to directly access
+> + * headers that may be in the non-linear area, call this kfunc to make sure
+> + * the data is available in the linear area. Alternatively, use dynptr or
+> + * bpf_xdp_{load,store}_bytes() to access data without pulling.
+> + *
+> + * This kfunc can also be used with bpf_xdp_adjust_head() to decapsulate
+> + * headers in the non-linear data area.
+> + *
+> + * A call to this kfunc may reduce headroom. If there is not enough tailroom
+> + * in the linear data area, metadata and data will be shifted down.
+> + *
+> + * A call to this kfunc is susceptible to change the buffer geometry.
+> + * Therefore, at load time, all checks on pointers previously done by the
+> + * verifier are invalidated and must be performed again, if the kfunc is used
+> + * in combination with direct packet access.
+> + *
+> + * Return:
+> + * * %0         - success
+> + * * %-EINVAL   - invalid len
+> + */
+> +__bpf_kfunc int bpf_xdp_pull_data(struct xdp_md *x, u32 len)
 > +{
-> +	proc_free_inum(ns->inum);
+> +	struct xdp_buff *xdp = (struct xdp_buff *)x;
+> +	struct skb_shared_info *sinfo = xdp_get_shared_info_from_buff(xdp);
+> +	int i, delta, shift, headroom, tailroom, n_frags_free = 0;
+> +	void *data_hard_end = xdp_data_hard_end(xdp);
+> +	int data_len = xdp->data_end - xdp->data;
+> +	void *start;
+> +
+> +	if (len <= data_len)
+> +		return 0;
+> +
+> +	if (unlikely(len > xdp_get_buff_len(xdp)))
+> +		return -EINVAL;
+> +
+> +	start = xdp_data_meta_unsupported(xdp) ? xdp->data : xdp->data_meta;
+> +
+> +	headroom = start - xdp->data_hard_start - sizeof(struct xdp_frame);
+> +	tailroom = data_hard_end - xdp->data_end;
+> +
+> +	delta = len - data_len;
+> +	if (unlikely(delta > tailroom + headroom))
+> +		return -EINVAL;
+> +
+> +	shift = delta - tailroom;
+> +	if (shift > 0) {
+> +		memmove(start - shift, start, xdp->data_end - start);
+> +
+> +		xdp->data_meta -= shift;
+> +		xdp->data -= shift;
+> +		xdp->data_end -= shift;
+> +	}
+> +
+> +	for (i = 0; i < sinfo->nr_frags && delta; i++) {
+> +		skb_frag_t *frag = &sinfo->frags[i];
+> +		u32 shrink = min_t(u32, delta, skb_frag_size(frag));
+> +
+> +		memcpy(xdp->data_end, skb_frag_address(frag), shrink);
+> +
+> +		xdp->data_end += shrink;
+> +		sinfo->xdp_frags_size -= shrink;
+> +		delta -= shrink;
+> +		if (bpf_xdp_shrink_data(xdp, frag, shrink, false))
+> +			n_frags_free++;
+> +	}
+> +
+> +	if (unlikely(n_frags_free)) {
+> +		memmove(sinfo->frags, sinfo->frags + n_frags_free,
+> +			(sinfo->nr_frags - n_frags_free) * sizeof(skb_frag_t));
+> +
+> +		sinfo->nr_frags -= n_frags_free;
+> +
+> +		if (!sinfo->nr_frags)
+> +			xdp_buff_clear_frags_flag(xdp);
+
+Nit: should we take care of pfmemalloc flag as well?
+
+> +	}
+> +
+> +	return 0;
 > +}
-> diff --git a/kernel/pid_namespace.c b/kernel/pid_namespace.c
-> index 170757c265c2..27e2dd9ee051 100644
-> --- a/kernel/pid_namespace.c
-> +++ b/kernel/pid_namespace.c
-> @@ -127,7 +127,7 @@ static struct pid_namespace *create_pid_namespace(struct user_namespace *user_ns
->  	return ns;
+> +
+>  __bpf_kfunc_end_defs();
 >  
->  out_free_inum:
-> -	ns_free_inum(&ns->ns);
-> +	ns_common_free(ns);
->  out_free_idr:
->  	idr_destroy(&ns->idr);
->  	kmem_cache_free(pid_ns_cachep, ns);
-> @@ -152,7 +152,7 @@ static void destroy_pid_namespace(struct pid_namespace *ns)
->  	ns_tree_remove(ns);
->  	unregister_pidns_sysctls(ns);
+>  int bpf_dynptr_from_skb_rdonly(struct __sk_buff *skb, u64 flags,
+> @@ -12239,6 +12329,7 @@ BTF_KFUNCS_END(bpf_kfunc_check_set_skb_meta)
 >  
-> -	ns_free_inum(&ns->ns);
-> +	ns_common_free(ns);
+>  BTF_KFUNCS_START(bpf_kfunc_check_set_xdp)
+>  BTF_ID_FLAGS(func, bpf_dynptr_from_xdp)
+> +BTF_ID_FLAGS(func, bpf_xdp_pull_data)
+>  BTF_KFUNCS_END(bpf_kfunc_check_set_xdp)
 >  
->  	idr_destroy(&ns->idr);
->  	call_rcu(&ns->rcu, delayed_free_pidns);
-> diff --git a/kernel/time/namespace.c b/kernel/time/namespace.c
-> index ce8e952104a7..d49c73015d6e 100644
-> --- a/kernel/time/namespace.c
-> +++ b/kernel/time/namespace.c
-> @@ -255,7 +255,7 @@ void free_time_ns(struct time_namespace *ns)
->  	ns_tree_remove(ns);
->  	dec_time_namespaces(ns->ucounts);
->  	put_user_ns(ns->user_ns);
-> -	ns_free_inum(&ns->ns);
-> +	ns_common_free(ns);
->  	__free_page(ns->vvar_page);
->  	/* Concurrent nstree traversal depends on a grace period. */
->  	kfree_rcu(ns, ns.ns_rcu);
-> diff --git a/kernel/user_namespace.c b/kernel/user_namespace.c
-> index db9f0463219c..32406bcab526 100644
-> --- a/kernel/user_namespace.c
-> +++ b/kernel/user_namespace.c
-> @@ -165,7 +165,7 @@ int create_user_ns(struct cred *new)
->  #ifdef CONFIG_PERSISTENT_KEYRINGS
->  	key_put(ns->persistent_keyring_register);
->  #endif
-> -	ns_free_inum(&ns->ns);
-> +	ns_common_free(ns);
->  fail_free:
->  	kmem_cache_free(user_ns_cachep, ns);
->  fail_dec:
-> @@ -220,7 +220,7 @@ static void free_user_ns(struct work_struct *work)
->  #endif
->  		retire_userns_sysctls(ns);
->  		key_free_user_ns(ns);
-> -		ns_free_inum(&ns->ns);
-> +		ns_common_free(ns);
->  		/* Concurrent nstree traversal depends on a grace period. */
->  		kfree_rcu(ns, ns.ns_rcu);
->  		dec_user_namespaces(ucounts);
-> diff --git a/kernel/utsname.c b/kernel/utsname.c
-> index 399888be66bd..95d733eb2c98 100644
-> --- a/kernel/utsname.c
-> +++ b/kernel/utsname.c
-> @@ -98,7 +98,7 @@ void free_uts_ns(struct uts_namespace *ns)
->  	ns_tree_remove(ns);
->  	dec_uts_namespaces(ns->ucounts);
->  	put_user_ns(ns->user_ns);
-> -	ns_free_inum(&ns->ns);
-> +	ns_common_free(ns);
->  	/* Concurrent nstree traversal depends on a grace period. */
->  	kfree_rcu(ns, ns.ns_rcu);
->  }
-> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> index fdb266bbdf93..fdbaf5f8ac78 100644
-> --- a/net/core/net_namespace.c
-> +++ b/net/core/net_namespace.c
-> @@ -597,7 +597,7 @@ struct net *copy_net_ns(unsigned long flags,
->  		net_passive_dec(net);
->  dec_ucounts:
->  		dec_net_namespaces(ucounts);
-> -		ns_free_inum(&net->ns);
-> +		ns_common_free(net);
->  		return ERR_PTR(rv);
->  	}
->  	return net;
-> @@ -719,7 +719,7 @@ static void cleanup_net(struct work_struct *work)
->  #endif
->  		put_user_ns(net->user_ns);
->  		net_passive_dec(net);
-> -		ns_free_inum(&net->ns);
-> +		ns_common_free(net);
->  	}
->  	WRITE_ONCE(cleanup_net_task, NULL);
->  }
-> 
+>  BTF_KFUNCS_START(bpf_kfunc_check_set_sock_addr)
 > -- 
 > 2.47.3
 > 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
 
