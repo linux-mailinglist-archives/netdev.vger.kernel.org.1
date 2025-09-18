@@ -1,259 +1,111 @@
-Return-Path: <netdev+bounces-224455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E41CB8540E
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:32:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D45ACB85423
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:33:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F3DC3A5079
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:27:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E0403AF67A
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:30:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 829A22236E0;
-	Thu, 18 Sep 2025 14:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DF41306B34;
+	Thu, 18 Sep 2025 14:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FuSnlzpQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XI3MPnrv"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013032.outbound.protection.outlook.com [40.93.201.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F73224B1B
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 14:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758205553; cv=fail; b=HxV8JUs0bS8PQyfqvQnbe7dBc4GHGnh9xlhTAtxBuEfIJui/2SBu0r1mr6IRyGTl3ETQE0XM7fK3kkEFii/Q/V0Nhm1rH8sV7Q7LqcM3bkLh0a0VtbE7sICfXeudwDMxgtn+ajtTqutwJZnpIGtdTk/Fc7tkBs8kSnqkgEUysOQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758205553; c=relaxed/simple;
-	bh=Rn/ylxvIodaAB8phaBnTCHl/r3gi9y80aEQbQhKGbek=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=K2qF1Tv3ahir0xgRztDCMrxdh/I6okEmchLDSWIXvFfX5HuNhPiWtz61kF9fh4G/ELlaOxaxW0xuXONrwuntw2VbL57dfe5zWx6IEu12po72Re0Ou6cYm8Jqdiivp+nZJmj6Vx1uDpyum/JeV+piuYSPtCN0QSxkSI6bXHlS3sA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FuSnlzpQ; arc=fail smtp.client-ip=40.93.201.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=r7aWVqd43ah5U2yYqvZ73Hc1qTuCvbx3o26vP+ZwGQ3iclmThJ8GCNqEJu4K0jtXgSQGah45krRxw1JQwOpY8cRJ+P1p5fxcfjzAQfxcLOPMqBa0yQOoOEywsE2cyOMTr6XBRccTeTaGJfcA+DwH2XzNQw/6EFDtDg/oSfgXYoMQ023dpFL+5qm6VcAdKETxxBTyd+/USvQvtlXjMfNWTxJuAKJ7l3XHncQ3GWL7WChCiRYxWEVna5WhHBQS04AwVDkmz+WZa4/+kji5RSgl9j1vskPqpqjQtwclpl2oBksp2ijKVa461KqZM8/cavTP0AVXJKlhjheVsPe6RUvh4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=I0GDAJ35drEndHH6uRHTgEjA4aGLuX5TRnO/MuuBY+Y=;
- b=DvaySMiYOSyzi5Hxo9uUJzc64YcUNtxqdOEitfHFeX0BC1gXMJN/uz3N9mbb0sUfMKtvMPSJEReaze0bx9Nk9BedBpG5Cg1KD1CpRAGkW5f6/l6sQFnAAcaSWrRxPljDeN5y09XAhyd2Z4Auv01JaHn7Bei6yx4WaKaTLxcieGFmuKE0wr133FwiDe0SazSuE+hA3jPtnuVXzQrVAljZ6x7lhBMcgopGp+BVP/VLwPaY1132SVNePiTX6bVRWKrr8LVr5hIYsxTuM56pQZdeAqBxax3ksWx/dY8L+cQ7fe+0pSzILsMA1pRyOqbdpg6uhXQoJY9D3PvHLTRfsLDxXQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I0GDAJ35drEndHH6uRHTgEjA4aGLuX5TRnO/MuuBY+Y=;
- b=FuSnlzpQe1JLF/ovlGui1IEJwyuOiULdl/V+66/e7ql+DhW4YtoYGjKh1oJYeJWw5JtBEhNqucMt+fN64/nhvgt7xRFWmXOk8WkXbUc8exwJugfbPHd1d3StRUGFY/trGLfGb1zozaDRNBUTvvKwCqrrdPF97UwXB7u8bUbP6NSHO3f8cyvHc2l8A81uR1ngczi7El5RVM1YyjHtZ8fl7UTRId5nPWoNsHBlSU57IRbDs6INhxpl8M5e+GOQoHwIYhld+G2auPNPjLa3bst4PSunJ5FwFLfeoF+KPPTq6Pxh8n455oMS3kS1gfl3qsykvFUpyyTWCzQKPEk1XkdB9A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20)
- by DS7PR12MB6168.namprd12.prod.outlook.com (2603:10b6:8:97::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9137.13; Thu, 18 Sep 2025 14:25:48 +0000
-Received: from MW4PR12MB7141.namprd12.prod.outlook.com
- ([fe80::932c:7607:9eaa:b1f2]) by MW4PR12MB7141.namprd12.prod.outlook.com
- ([fe80::932c:7607:9eaa:b1f2%5]) with mapi id 15.20.9137.012; Thu, 18 Sep 2025
- 14:25:48 +0000
-Message-ID: <4d3a0a08-bda4-483f-a120-b1f905ec0761@nvidia.com>
-Date: Thu, 18 Sep 2025 17:25:40 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/4] net/mlx5e: Add logic to read RS-FEC
- histogram bin ranges from PPHCR
-To: Jakub Kicinski <kuba@kernel.org>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Andrew Lunn <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
- Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org,
- Donald Hunter <donald.hunter@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- Yael Chemla <ychemla@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
-References: <20250916191257.13343-1-vadim.fedorenko@linux.dev>
- <20250916191257.13343-4-vadim.fedorenko@linux.dev>
- <20250917174638.238fa5fc@kernel.org>
-Content-Language: en-US
-From: Carolina Jubran <cjubran@nvidia.com>
-In-Reply-To: <20250917174638.238fa5fc@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: TL2P290CA0012.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:2::16) To MW4PR12MB7141.namprd12.prod.outlook.com
- (2603:10b6:303:213::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA7B30103C;
+	Thu, 18 Sep 2025 14:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758205818; cv=none; b=By9r5gqNQNYo32haniDV12zLfYKwxndqfRrbwBFrq8Zk0fiFH/kq+drjHA8AhHHx84BdhiyY756KgDWeOBqee9CeZ1UHLcpn1LBwjxymDy70/vo2Ojmvu7wmH2cqBv62d1DkvjKneFK+2ofCwZNU4AsxdCw5v20Ght1KKco1KPg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758205818; c=relaxed/simple;
+	bh=ckFgxz34aBgFRsnyA+st0b8BuvozjIy3Ct1WtrnIsOE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=GHdJ8XmtDwvlTlC+BXm1KAJjVIxVzZiKfPfm/F7tDeIsViFQ3Sgw7FXHnwI7bzLHgmUpeYtPxiCj0LoOoo7oRu036o/Y+0JY/V3/SRb08pqENVtkidrnFHHYBK6UcXxDAD7WdA1KJp0B/+D9WOQm+jlx56OzCXWeuNthl2haso0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XI3MPnrv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0915C4CEE7;
+	Thu, 18 Sep 2025 14:30:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758205817;
+	bh=ckFgxz34aBgFRsnyA+st0b8BuvozjIy3Ct1WtrnIsOE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XI3MPnrvwSOvjIORhNl0CrAwO3wTZ3miA447J2yxQPdma/lFpfx2SCQjQ1VY0BYn1
+	 z01FtNeOvBc+eGe3RGIwLsSquD7mMqNNf/s9CWIvWUTpc2dEG5wU2+ttjv3tpkzt9+
+	 QjfLUM+HgP7SrVThQYaCAT1kBE0p6xW56GhPMZdWpE2WDNvJfX/XIIKhlLAegwDOe4
+	 sAwTfseoZ7vPYd9lHI/XzJ8L78zqZXJB0YdmXNZCUA96YzquaK6qBN0z5vtCageKxu
+	 1437vU8uRuSiuSkmb9w2YKdDi8G+4ejKzw9hcpvFNj7gqhkhk3t6SHaNuzMgzRuXXE
+	 tqG0vmOmBPd6A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D7239D0C28;
+	Thu, 18 Sep 2025 14:30:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR12MB7141:EE_|DS7PR12MB6168:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2894085a-8dc2-4779-ed4e-08ddf6bf42d2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?M0UwK081ZEJJcTJaSWRJaVRvb2c4UjF0dFF6d1djcWN0aHNkU013eGZEeUww?=
- =?utf-8?B?TlhDSzJCVnFYTzNXcVpocXp6eXBoMDVrWlBJRzluK2dsZnRuT3BRa2dhY0g0?=
- =?utf-8?B?MHlSdStTRGRsK2tHRFZ2NGRPZGk3WHlJWmNaY1IrdFZsTjRKb0RiN2ljR013?=
- =?utf-8?B?aEUyVVlEN3Y3YlhjUXNjd3VCSzJWUXZQOWx0RDA0a2pFYVlsNjF1TmRaQ3pM?=
- =?utf-8?B?YUJrenNzekpwdnNqSXRWTjllekZ0dGxpV21zR2U2RWMwWXlDTkxESWlSVGpk?=
- =?utf-8?B?TjdyanpPbzJLQllmYUltOHFRbm5uNXZ1N1dnTlJVQzUwVUxZVjJvd1Y0R0lB?=
- =?utf-8?B?ZUpnT1RDUDA0Ty81alNqUlFuREpndlY2Q0h2YTBuRDdPa2tQT25QR1VQMnN2?=
- =?utf-8?B?bytZNFBaUTU3bmRCYzh6cGp6K2VUc29nS1FYZTN3WDRZT0k1UjBsbEtIcWo0?=
- =?utf-8?B?Si9SOE1DZlplRzVGRkdMbTBWZ2NTV1JjR1dCYUZmWnY2SUdqaXF3YkMvT2Ju?=
- =?utf-8?B?M3F6SCt3b2RDZDlGVEVXbjZaNTJ5bTIxWVZ3MWw1SWVPN09WanVUenNUWHlj?=
- =?utf-8?B?NDM4Z0hsaFF5dHNTVCtzZTFLbjJnSCtyN1Baekx2c2RZRHltYWQ4b3M4SmZB?=
- =?utf-8?B?U0xVMkJtTUlkLzVwTHF2UVVmUGQxc05XZjFaWVk5aHUvMmxDS2NBNjNrNmtL?=
- =?utf-8?B?VzlGSkhZNktUZ0FPSmhYSE4wejB2NSsyY3FhODBQQXVGdFJ2ZDd5cHNKYVJJ?=
- =?utf-8?B?S2tmN0p6N0FkU3RJWXoxdFNreUpGdThDUFVXZS9QZFRFbzZFN3NxbzhpUTZ6?=
- =?utf-8?B?N0xtUlFnc29NL05FQWVyR093M1N0YklPRFA2SGpaU09OOGVaMzlDazI5SU9j?=
- =?utf-8?B?MzdNeXd3OXFTVTlWM0J3N0tpS1RUWVFnbUZsRGU5ZGhma3lkSUtyV2JCNXA4?=
- =?utf-8?B?MCsvZnJBbkpDci8wNFU2Ymwrd29kK2hORnFxTWNMa0NxYUpSRVU5VEFrQVdo?=
- =?utf-8?B?K1ZONytOd3RIaDV2a0lzM3RpY25lbFRuRk9UVk5tM3ZFS0tHb2hmQmtTT1Bh?=
- =?utf-8?B?Vjd5VVJzOWdtMGNuNGc3UWZxUnZTQk5HL3pVUUlrb0J6S1E4ZnlrSDNVY0dr?=
- =?utf-8?B?cTd6ZE9DUlFpZWtrYkljSWFtcnhwVVRicnlxMWlxdDR2dCtoRDRqdFJyZDQ4?=
- =?utf-8?B?ZUVKOHdnczJBaWlrQ0dNRldmbXMzSE00dUZ1Tm1SNEY4blVrMEpaV2oycVVV?=
- =?utf-8?B?Rm1PVnJUMVJpVDVHR2JaN1VlWm1RL2xpNmowKyt6aHZzTlR3LzNuS1EvN1cr?=
- =?utf-8?B?ZTJHUE5iNC8wZE9EdURqTnlMcVg0aUFZUk1uSWhGOUFBVTVScEh6clZaUzNv?=
- =?utf-8?B?MklNUVp2eVVxOE8rbEZZaSs0cU5USm5XQi9uWitIN0lROExES1dzaHk3WjVy?=
- =?utf-8?B?RytJbms2b0crMmg2M3NaNVBFbENlcEJvaU9Vd2UyY3B5TThUajRIaW5qQldB?=
- =?utf-8?B?N0VuaEk2RzAyUEh2WEZaNGlENEJ2elRDcVNTcWU4TUlNR09oQ21hUUhkdXFy?=
- =?utf-8?B?NlUycmxWcjRWbmN0MC96VG5YSFZmQkZGVHNwWmVVWUJETFBzUm9QUVQ3Y01t?=
- =?utf-8?B?ckNaLzlMQVEvK0FlNCt1dllWUEV1Y3g0S1cvVk81VzFzcGphcnVCdHR3aTdx?=
- =?utf-8?B?b0c4N3lwR2NjcTFSZWovMXhVL2M4WTk4VkpSWE15OVBXV0tKcmlqUnZLb1Ja?=
- =?utf-8?B?Zlh4eEQ2eHpSVjFrbFRZcWcxSEZXTXVVcG1oOExIRVJQOXdUM1BlVmJsTHUw?=
- =?utf-8?B?OTlHWmJoTmsyRjRtWlFvblpWMjZIaFRNUGlBekxrQkp2RFV0cm0vdVA2ZENt?=
- =?utf-8?B?enU3TjFIclViVldOd1NyalMxVDMxdGd1K2ZGbmZtVDd3azFkbUFtSDFNYkZX?=
- =?utf-8?Q?0LcCEV2fINs=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7141.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?V2c0UHlOL0toQzZOUEsydDZKMTROQkppMTFkUVlaYUtjUnRzTG0rUnI1OFEx?=
- =?utf-8?B?WDJjYmtXanZLYndwRHFEWldZcTBQVHl4VkZmZFlOUkxYU0lKeE1ESW84dTBj?=
- =?utf-8?B?Q1JGN1ZzOFBrVjUvWE1lVGJNb2hwclhReDVTMDNhVGRMNGhoRXp5T0YzNlN6?=
- =?utf-8?B?b2tMUXdpVGVRVFBQdFJZeExMUEhDREJSbkJ3OUlKa24zeWoyelFQaENtOUVP?=
- =?utf-8?B?S3pkRTlDbldWSmFWZDhMRm5uamY4clE0NjhNcTNjYzRGSzFidDJhZTFnK09Z?=
- =?utf-8?B?dHEyOWRVV3RvOVpmQTNNVHg5Tmg3NU52YjFKbjkrcUdkNkY1UVpTZEV2WWha?=
- =?utf-8?B?blpOTHJpR0ZWOXpQVk1Ec1F6UHNSZE41NXlDcERYSVFpVk9UUkpxTEpPbVFM?=
- =?utf-8?B?OG13SnJYNEtmMHV6aE5WR3BRZk9nRnlJOG5nNUF6eTFtT3V2L0Zsb3FjOVZy?=
- =?utf-8?B?SFNWYm1CT3FhdzlFMTM1c2lzRVNROExZSkNKRWxPNnJHWDZpSmhHam8zcElq?=
- =?utf-8?B?Z0VmRENiekdzUUlMVWhqNUx1dHFVTjJNbXZIUnBJd3Z1L1NXSXVOZ0JxYXJo?=
- =?utf-8?B?SFI4UzN2U2VMR0pLUmFXSkxMTzdSNjNhOWU1NmRTOUhveUFvdmFwL0VEVHNE?=
- =?utf-8?B?NmxySGgvMWlUd0hMRVEzUkhVaytqQTlEaG9XS0M3U0lhbks1VWFTOW9yTjlt?=
- =?utf-8?B?VDRpeVpPcVBqSGRqdWVPTGJFNmpNQ2l0MmRUOWFPclNCOEZvdXRjeFNEckNu?=
- =?utf-8?B?MkZLcjZwS3R3aGltNENVNGQyMmhsQTFLcFJvRHdGOUcyT3hMa3Z0WEIwcHdU?=
- =?utf-8?B?UHQ4N1FzajNyN1I1bks2S3JCOHlmVVBjYjZOYW84eHBpVHpTbjFESHB6Rys3?=
- =?utf-8?B?TVJLQWQvZGFPSlNoMVFFcUFSekhONyt4eUhCVGNLV2lic0Y1d01UWVFhZVkz?=
- =?utf-8?B?NHIxK2Z3Myt4K3lwcmpIaEEvcTdxVjdLWjZsVjJ5aHFoNUxDY09scTVuMFdn?=
- =?utf-8?B?ZHRkYUNtdi96eXVHMzBmdzVZLzdrckh3R1ZLWHRYTUZ0UkgwcXEybGNpQi83?=
- =?utf-8?B?clg0Mkx4WklHa0cwT1g5bU1ZRFUrTWdTNHJQTGdnWk9GQzVLMk5NcFpYZzNJ?=
- =?utf-8?B?Z2xEWUtDa0VCWWI3NkEzZlhnMU5tTC9EbUdEVGVZbDJNdUJFaDBNZTNkQWtt?=
- =?utf-8?B?QW4xajRxVzFXZUhRSFppaVY4ZWFiL0VkQVhtRWM0eURRYURVT1ZRMDRsbVR4?=
- =?utf-8?B?bkloRXVxMFpRbXQ5dGd5MllSdVNNaUNPN1JzQ3Mvd29QMlo3U3k0dXl0bkto?=
- =?utf-8?B?UTJ2cmZUSFhoM0NrdzBtVDNLZDdaQkMwL29YOFVTckwzMmp5QmFVS08xRVdC?=
- =?utf-8?B?ZFROdnVMeDE2V1ZjbkF5VGN0QTNoS1lmelZrWGJDSE1jMlpiS1Bxd0xLRDUr?=
- =?utf-8?B?M2h0YXg1TnZmZDQrSmFGMVlrUS9ncDlOcERhb1ZYOGUzQ3hYMXNKejNvSmVC?=
- =?utf-8?B?ODRNZTZ6VFl1akU4aE1NVlNhREFMaU0yVnVpdklVb0dwM2NEc1Y0b1h3VlR2?=
- =?utf-8?B?c21mMEo3YlRQOXBLdjduUGhJVkoxVWhyNUxSR1k4ci9ocGRNR3QwUE5sSmpI?=
- =?utf-8?B?ZHlZT1FhTE1iWDNXM0t3c1ZHRlB1VUNhdWhSQjNzQkdOMDM4ckNva1l3K3c3?=
- =?utf-8?B?bnU2ZlNVMzNIY09zeXJRajFVMXpvMGtpOUcyY3JaOXhkNk1uVnEwb0xoNjhr?=
- =?utf-8?B?NUo1SWxwSkY3Mm9qNjQrZDlxd2Y3TnJYZVEvUWFkNnp5eUpoNGM4TmgrYlNG?=
- =?utf-8?B?aWFtSE15MGIxVkNBTSt2Z2l6MnE5RWcvaEI0akVkSWRrL0p0c0FBT05iVktu?=
- =?utf-8?B?SE9nQjRyaWxhaTUvZlJHNjRFdy9ldlFVZmUwKyt4bkRnRUtrSVhUNGV5Sk1q?=
- =?utf-8?B?b3VKVzhRRkhaM3M5elJzNjVMK25zWFpIM0ZnSGJJWnd5ZEQyRGpOdi9icThK?=
- =?utf-8?B?L1RuaCtscXQ5Tkk5dW1VQkQydmZDMkNRMTVpWG96eFdydlBPdjdIYUQxWGp6?=
- =?utf-8?B?bkNhcytvaEhNdDdybUw3cFpzeElhYzJBcnZiQmd3MXFHZXdaSmFUK3hsemE1?=
- =?utf-8?Q?MQq2C/5auh23hg5LZpjdhgF5F?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2894085a-8dc2-4779-ed4e-08ddf6bf42d2
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7141.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2025 14:25:48.0170
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pfWFByYyEJUbuGee3DG2ZeB0EJ/4j3EhVMqFRALIIjfWNozTVsbO2XLn1iYcWNfM6JO9mxBBVeyFX80Q1XPPKg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6168
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v4 0/8] net: ethtool: add dedicated GRXRINGS
+ driver callbacks
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175820581800.2438890.5576765054312020810.git-patchwork-notify@kernel.org>
+Date: Thu, 18 Sep 2025 14:30:18 +0000
+References: <20250917-gxrings-v4-0-dae520e2e1cb@debian.org>
+In-Reply-To: <20250917-gxrings-v4-0-dae520e2e1cb@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, kuba@kernel.org, horms@kernel.org, mst@redhat.com,
+ jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+ andrew+netdev@lunn.ch, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, leiyang@redhat.com, kernel-team@meta.com
 
+Hello:
 
-On 18/09/2025 3:46, Jakub Kicinski wrote:
-> On Tue, 16 Sep 2025 19:12:56 +0000 Vadim Fedorenko wrote:
->> From: Carolina Jubran <cjubran@nvidia.com>
->>
->> Introduce support for querying the Ports Phy Histogram Configuration
->> Register (PPHCR) to retrieve RS-FEC histogram bin ranges. The ranges
->> are stored in a static array and will be used to map histogram counters
->> to error levels.
->>
->> The actual RS-FEC histogram statistics are not yet reported in this
->> commit and will be handled in a downstream patch.
->> @@ -6246,8 +6246,17 @@ int mlx5e_priv_init(struct mlx5e_priv *priv,
->>   	if (!priv->channel_stats)
->>   		goto err_free_tx_rates;
->>   
->> +	priv->fec_ranges = kcalloc_node(ETHTOOL_FEC_HIST_MAX,
->> +					sizeof(*priv->fec_ranges),
->> +					GFP_KERNEL,
->> +					node);
-> Why bother allocating his on the device node? We have no reason to
-> believe user will pin eth process that reads these stats to the node
-> where the device is :\
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
+On Wed, 17 Sep 2025 02:58:07 -0700 you wrote:
+> This patchset introduces a new dedicated ethtool_ops callback,
+> .get_rx_ring_count, which enables drivers to provide the number of RX
+> rings directly, improving efficiency and clarity in RX ring queries and
+> RSS configuration.
+> 
+> Number of drivers implements .get_rxnfc callback just to report the ring
+> count, so, having a proper callback makes sense and simplify .get_rxnfc
+> (in some cases remove it completely).
+> 
+> [...]
 
-You are right. will change.
+Here is the summary with links:
+  - [net-next,v4,1/8] net: ethtool: pass the num of RX rings directly to ethtool_copy_validate_indir
+    https://git.kernel.org/netdev/net-next/c/3efaede2e13b
+  - [net-next,v4,2/8] net: ethtool: add support for ETHTOOL_GRXRINGS ioctl
+    https://git.kernel.org/netdev/net-next/c/06fad5a4aeb2
+  - [net-next,v4,3/8] net: ethtool: remove the duplicated handling from ethtool_get_rxrings
+    https://git.kernel.org/netdev/net-next/c/87c76c2db002
+  - [net-next,v4,4/8] net: ethtool: add get_rx_ring_count callback to optimize RX ring queries
+    https://git.kernel.org/netdev/net-next/c/84eaf4359c36
+  - [net-next,v4,5/8] net: ethtool: update set_rxfh to use ethtool_get_rx_ring_count helper
+    https://git.kernel.org/netdev/net-next/c/d5544688d421
+  - [net-next,v4,6/8] net: ethtool: update set_rxfh_indir to use ethtool_get_rx_ring_count helper
+    https://git.kernel.org/netdev/net-next/c/dce08107f1f3
+  - [net-next,v4,7/8] net: ethtool: use the new helper in rss_set_prep_indir()
+    https://git.kernel.org/netdev/net-next/c/8b7c4b612dec
+  - [net-next,v4,8/8] net: virtio_net: add get_rxrings ethtool callback for RX ring queries
+    https://git.kernel.org/netdev/net-next/c/483446690a62
 
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
->> index aae0022e8736..476689cb0c1f 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
->> @@ -1490,8 +1490,63 @@ static void fec_set_corrected_bits_total(struct mlx5e_priv *priv,
->>   				      phy_corrected_bits);
->>   }
->>   
->> +#define MLX5E_FEC_RS_HIST_MAX 16
->> +
->> +static u8
->> +fec_rs_histogram_fill_ranges(struct mlx5e_priv *priv,
->> +			     const struct ethtool_fec_hist_range **ranges)
->> +{
->> +	struct mlx5_core_dev *mdev = priv->mdev;
->> +	u32 out[MLX5_ST_SZ_DW(pphcr_reg)] = {0};
->> +	u32 in[MLX5_ST_SZ_DW(pphcr_reg)] = {0};
->> +	int sz = MLX5_ST_SZ_BYTES(pphcr_reg);
->> +	u8 active_hist_type, num_of_bins;
->> +
->> +	memset(priv->fec_ranges, 0,
->> +	       ETHTOOL_FEC_HIST_MAX * sizeof(*priv->fec_ranges));
->> +	MLX5_SET(pphcr_reg, in, local_port, 1);
->> +	if (mlx5_core_access_reg(mdev, in, sz, out, sz, MLX5_REG_PPHCR, 0, 0))
->> +		return 0;
->> +
->> +	active_hist_type = MLX5_GET(pphcr_reg, out, active_hist_type);
->> +	if (!active_hist_type)
->> +		return 0;
->> +
->> +	num_of_bins = MLX5_GET(pphcr_reg, out, num_of_bins);
->> +	if (WARN_ON_ONCE(num_of_bins > MLX5E_FEC_RS_HIST_MAX))
-> why does MLX5E_FEC_RS_HIST_MAX exist?
-> We care that bins_cnt <= ETHTOOL_FEC_HIST_MAX - 1
-> or is there something in the interface that hardcodes 16?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-My intention was to keep mlx5 capped at 16 even if ethtool raises its max.
-We’ll only increase this once we know the device should expose more than 16.
-Since our HW has internal modes that can report more than 16 bins, this 
-ensures
-we don’t accidentally expose them if ethtool increases its max.
-
->> @@ -2619,3 +2675,4 @@ unsigned int mlx5e_nic_stats_grps_num(struct mlx5e_priv *priv)
->>   {
->>   	return ARRAY_SIZE(mlx5e_nic_stats_grps);
->>   }
->> +
-> spurious change
-
-Ack! Thanks! Carolina
 
 
