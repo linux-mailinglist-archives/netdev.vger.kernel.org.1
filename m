@@ -1,293 +1,206 @@
-Return-Path: <netdev+bounces-224281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE78BB836FA
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:06:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C030B83661
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 09:56:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 973BA623E41
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:06:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0819541BC6
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 07:56:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 496552EFDB7;
-	Thu, 18 Sep 2025 08:06:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F110F2DF717;
+	Thu, 18 Sep 2025 07:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="QLLqUrbW"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="CDraqIwb"
 X-Original-To: netdev@vger.kernel.org
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011034.outbound.protection.outlook.com [40.107.130.34])
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90C72C0263;
-	Thu, 18 Sep 2025 08:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.34
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758182796; cv=fail; b=q/I53IRQbWGlCjMSQ7nAupZwWiBGpbh8d9Ki2yvr6n4zz35OM5KX3n7XUAQIVST3EdjPhP5kPt+tBHBGh678VzaDj67uQU1JdHrrBqc65HhHGJ/TVylsKXjGkoheEOoDIpvThQeUiVabYFYXpMZJpPTme3HwUxCDNkT8wwb2FPA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758182796; c=relaxed/simple;
-	bh=DzYqxJd+N/6RIAaifseHPVTl1gvxFMHBWAzQvlNnMFQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=llnIQzldAesr+py9nDuyVCDrZzpRnGZAwQZaeBP/knadT/AJfVlvqzG+zpzYDjE5t2FDZcme2JwZAqOAeMXrvC2xnLwrQoSwuz6WORpw1EUk1AOFb4EMtJ2wS236IbCAGXGym/RactJVMrH4a/xPgq19VVgpUmzP3jMsZINSm6U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=QLLqUrbW; arc=fail smtp.client-ip=40.107.130.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=m0QGOKMcm737mLGjXjoRClI2Gt2DF3WUG/xS31oMeAqpzJ+8QYZYXlNimnKuUuVKRPooBEBex8jon0wANuXEu8ekeW7PGWkxoC/vshVcA5U0ObGrmCuZYR2hkbQovWLl2xc3lCH/7GNd9enQE/0enzGcgG2v3BwQFBq+4PW5Iw8ZmiskHiUqyysR3IFnasDGjB8nhplbEIr9rZHW+xF9VymDib3nC4p0KUzej/Eqzsy9QffACkdLGE/xciUNDWqGu1otROkbwFZdhRSXh1V1LrITBvppgCOwDjFmP/Vx1AFDpPn0TJvKONiTLAt//j7eL0V+Cvod5883oZeXOBRWXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cvz9vdIuAkckdoa2rZEl/rEePEfdFMAW/gFGOZa4Vak=;
- b=IQq8uuoyOu6QL4sTfwIwythawb98mlvbGlEbPlyV9/S54ZqDoeNLJMjxAFEIBiba1sqvBoXIm94NOMCfZHIx/iHmr1e6PBzBVRlL11U7v/qCb45Jl94MBDiCzQY28spwgtyv+ShEifUl+U8c9qtdT4OS7hHRV1N1PWp8P4vby3Vb7SLChQm0iMZz8u2VZpASHavvo1PpXt7oXio6ukzvNdXC/tfb3luXXQ9s8ae4yFfSZmeyPYpZ+OjOsRBQUHM+sbLrlCtP1a8due/5ypyc9gHJlxKFtUn+xIgVwU4motk3Ws1kCg+72baPtyn4888nQUoTB9OwKgOuv1EeldAIpw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cvz9vdIuAkckdoa2rZEl/rEePEfdFMAW/gFGOZa4Vak=;
- b=QLLqUrbWrGgels88Ygu6Uz99BGcRtPyFpp7Qt9guTkA/2/vyR5A1yS28pPJizqV+f4uoey4i9KKjtm5ZDrXbelf1/yH6xSAIcCjwH3GKdEYZsDudsbWChQHZ4aSH71NOuiq5TLU7S/GZcMaeLPK4gztvBoG1rm2klplCVbfxfVSQzxEfMKv2Jj82NP6wNpGN+AsN/4P/cPBVH2vxv2xxbvrMOT+s3hEgX6p8z8GxCTjmmRtJEL2AeP2jQHfYbDF/ewyrQRQ9BGB8jt5WHzYUPKH0s/I0nzROHK/k089QShxIGTLoKfKZp6N4PdPxPeZqvuhQnLxblxuN3n5QrKSsBw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by AM9PR04MB7617.eurprd04.prod.outlook.com (2603:10a6:20b:286::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.14; Thu, 18 Sep
- 2025 08:06:31 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.9137.012; Thu, 18 Sep 2025
- 08:06:31 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	yangbo.lu@nxp.com,
-	richardcochran@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Frank.Li@nxp.com
-Cc: imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: enetc: use generic interfaces to get phc_index for ENETC v1
-Date: Thu, 18 Sep 2025 15:44:54 +0800
-Message-Id: <20250918074454.1742328-1-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR02CA0104.apcprd02.prod.outlook.com
- (2603:1096:4:92::20) To PAXPR04MB8510.eurprd04.prod.outlook.com
- (2603:10a6:102:211::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36CA257839;
+	Thu, 18 Sep 2025 07:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758182181; cv=none; b=JapED/Fg4c1LDcuT0vFrE8yrB/J87AK1AZ38EXhuIZiW6oEmJrYd1g8BlND94u5iZkvDP5470FIa2T3/gvQO8yx2DXq8Qv3kaqraaz19qMG4ZHTxpquXDx2LVp7QvMW1c+DcamBEPZy0E7hrMhhMuJocL58LMwumpfyfFyvSMDk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758182181; c=relaxed/simple;
+	bh=uSAoYEa5vURTdDpkdObQtAd9aCWTnzJfGsYg6n+H7Lc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZvTbC2EZQbM3S1gjB3s9IXb5GG0vP1NxeqeCRq2xIykoOjMMmmLciEsouSEbE0Y6gz3omYbFK6q4N8QBN5onxOM0smuwi3rPkzhdhr5BN1GgW7C/A67jxBtHqrEBNqx06KOJ/3GLC5Hl7lhVmiYo7bKYchwtVekqq5iSBxFCHJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=CDraqIwb; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.phl.internal (Postfix) with ESMTP id 9F00EEC021B;
+	Thu, 18 Sep 2025 03:56:18 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Thu, 18 Sep 2025 03:56:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1758182178; x=1758268578; bh=G82LiYudmKV8yMFIaNNf+OsFpW+izJcMRlW
+	h8GNT/cw=; b=CDraqIwb2L0d3S+MRIGhDMUdBDxnG49DNVYwZqk4AbyXv537p9y
+	YNHvlKAlzVdcpMq6z2f2WJHJb/mrGHGDnnAzTnJBgaEgd0GHBCMA4cZBoxb3YTmL
+	8XSIaeivcHoIMdkn1unD7dOiUNFMYif5XSQR/4CBGz8bli2kXSRn5mBDomdPmG1L
+	UBPnuj8WdZ3eNYyyHZ1npgrW/PicTnj4KLD4w9hSfyz1VUZrUMKZOZ8X/IJUfuef
+	iVTHAC1ELMabQ4nE0lSy6E14aoJKmeSPK36aPMwyerxmhfBoRZzPabJybBC002lC
+	h5W48ZhpGvuBF9xh52h9djoA5X5N5Ikk0WQ==
+X-ME-Sender: <xms:IrvLaKF4iYE9tVnX3v1FC8UX6N85Sm0DrpvfpxYLvQVh1asZG62q4A>
+    <xme:IrvLaItrFRBbLW0H1PO6ApSUjBWnkkl6oMtemIp_S4rukLYApjkqKR6vRns-Am2mu
+    5if9NEfIbcWE6c>
+X-ME-Received: <xmr:IrvLaNq8U4im9hXrZO0PyjzrlrsyGvGatFkyEx4pvuqbw0sgfsttxEjFB719SPnovxuga46hkENgaV8LU1438xrIFO0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdegheejkecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecuogfuuhhsphgvtghtffhomhgrihhnucdlgeelmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfutghh
+    ihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtthgvrh
+    hnpeejgedtjedttdelvdffteeuleekkeejheduheeuffeukefhkeevjeeuheeiueetuden
+    ucffohhmrghinhepshihiihkrghllhgvrhdrrghpphhsphhothdrtghomhdpghhoohhglh
+    gvrghpihhsrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghi
+    lhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtghpthhtohepud
+    dtpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehshiiisghothdoieehleeihedu
+    ieguugdvsgeifeehsggrvdefhedtsehshiiikhgrlhhlvghrrdgrphhpshhpohhtmhgrih
+    hlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgt
+    phhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumh
+    griigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghl
+    rdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    hlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
+    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvg
+    hnihesrhgvughhrghtrdgtohhm
+X-ME-Proxy: <xmx:IrvLaPUGxvW11A0m2C19j3bPwhMBJjJLo-1DlyA3dgatQiH4FjW_aw>
+    <xmx:IrvLaF2a5dE153Y_QT5egk4oHUGpPGXRxHgkJpFyU3cVxbL0aZxUXQ>
+    <xmx:IrvLaEuLfJIv1OoculLU3Co6OdGbaWKMVTE9mqkQ_M9O_IC-5m7N_Q>
+    <xmx:IrvLaNWDNa4YhRl0PEhQl3BibLfyBGLpxzcAgWosX9O_k1ZrB7E8Rw>
+    <xmx:IrvLaK2MwrsoqqpNmEcRebjpUurvNp4Mb3oVen5NYihWcGv9wJuJF8uC>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 18 Sep 2025 03:56:17 -0400 (EDT)
+Date: Thu, 18 Sep 2025 10:56:15 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: syzbot <syzbot+6596516dd2b635ba2350@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] general protection fault in find_match (6)
+Message-ID: <aMu7Hw-lJeFPEEUI@shredder>
+References: <68c9a4d2.050a0220.3c6139.0e63.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|AM9PR04MB7617:EE_
-X-MS-Office365-Filtering-Correlation-Id: 321fc26a-319a-4415-1ddd-08ddf68a4697
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|19092799006|52116014|376014|1800799024|366016|38350700014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?4cMT++56SWF+L7VRq/YJVCsa4lYQJjieS3SBJQ2cppePAmI6IccyM5lqtV4r?=
- =?us-ascii?Q?5NzlErSfVlkWOC1t9tmiHsYdTgdPHb6tclEcXjNA8f9bXFP5qEs5rT73wv0l?=
- =?us-ascii?Q?NLk62AYiPz8WljT1+JO5T7Cuxd6mFj8nRnhfHnta9u/dpk9ou0SLURpjABGw?=
- =?us-ascii?Q?GmGiIEddFq/JQGTODCTSdVfgW1v+Zt19Z/83hQGGw3z40Fz25Yat1ysOFtOH?=
- =?us-ascii?Q?Vq77//iOid0uPXHKqtW8Q2CbMAfUBOCQrXbkCHruJg3MtdFrBxVSVXfRDVWe?=
- =?us-ascii?Q?O5HcL0jibV+FCtF/auxMMZlLiT7RaUyTsz9t8U7A1thaW5dMRoWgFfbDnp5K?=
- =?us-ascii?Q?radoM7FmGxDZX+ksY5oJAAsWvvcLUN1JYDApPpAlmRdNBBTbZ5FUp9IMsvq6?=
- =?us-ascii?Q?lhUXyU56atAr1TuGuyS7CE7znMTBw8HElYFa0sk1gMrts6c65JRjN/zFZDik?=
- =?us-ascii?Q?8/djKUg6tCJx8XR2G/0cBiWdx7XWJtbG27ds6+xRSL0qVWsUx02LG2b6Hw4k?=
- =?us-ascii?Q?JVE3tbf7DI+aRSCKNeX7edxLepeKXMBS4e0b/n0lcm42h2jtLthePDvVinoR?=
- =?us-ascii?Q?wbAHB+IWLDRgcXsGzcoK38Tn1ZCTgjFPDzXVC7zJOhrB7DIg3b0L+cv2pqfu?=
- =?us-ascii?Q?/+A04v89zf6vSgNP4KEQHvYzTAYxekKZvFOzVb26QDe/AJ5GzOvEwXA/4Psh?=
- =?us-ascii?Q?97zd0BAWtsW+F2U/c0UYntBrfuYcRVuGB/+/Jo3iDCIxRx4mhhGg2BBTPKul?=
- =?us-ascii?Q?EU20t3UwqdrmWTgDH3qOOvYnEH7w3gyDGvwsPm0Ysw/cvLN3HIQl4gGT7kZ2?=
- =?us-ascii?Q?N0yJOff4TorVvWNtebeIO26q+iGkOtxGa4jqZzXMhFQ0VBvg6eswX9rSK+6E?=
- =?us-ascii?Q?TLeSWLBtKMEL0IF9Yt43gdVoS+V2A/wWqJrS2FZ2kB/kETthgbfG0VinB6BF?=
- =?us-ascii?Q?BKBFqV7e7QrV6XA9bZXAarEUIMh0WximDtmLjupRMrso6JnyDwEzSI/O48aC?=
- =?us-ascii?Q?+yAhRS4F9k3jt3RLAyaFVU4vOu5eRtUxx+31RgoGc7DWPrDxzjegoDqiF7Us?=
- =?us-ascii?Q?FWi7r03b2WGqxMPdA04abWs17K/ugP9aBD96hNZYyI71KgzTnBlQs7wb6VJn?=
- =?us-ascii?Q?cg3OsWHOxZQVN0KGNZs1tEJ03WJn0bp70dPKMrFC5DnGKbVqglsGVoHtVOZf?=
- =?us-ascii?Q?J1GRR7/bQjGld9iOEj7/AfobKVRkjucPwbz/NEL6Z83NSsfz4CypZ51i/ojJ?=
- =?us-ascii?Q?GRHn/pRsWfKVqnYlASfQ5qdJ5yljfladW0y6+5956SSwgWK3ywL1ALP30x2s?=
- =?us-ascii?Q?V3L/gEUuTDCjNPn/OBSSiKoFzD8XlqexnDDoQwLKu4xof2G7C1P3ZWHjiDZi?=
- =?us-ascii?Q?BeotF45oAUf5vGpLTW67kSu57Wl4Js3VnOLaWV0xPTPW3NxX0qXGRWPnZ5Mw?=
- =?us-ascii?Q?owrUf9mhG5+xt7jR0paXHzhXz1M5lCUWxevAbOmiWNVKW5an6O8RCQtzL5GH?=
- =?us-ascii?Q?21kAMwREqxj137Y=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(52116014)(376014)(1800799024)(366016)(38350700014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?sRZfXng5WBgvJo+rCsQnB9uElW3Tcwwa2Ter2OlWPWqIuTew1j4MTZDCBVgM?=
- =?us-ascii?Q?5hQW4N/O0JNfGXa2VztTHfcls58DlH24yl5zMlBLYoxSMXDF0LfoKh1KjIEk?=
- =?us-ascii?Q?smxXwEBYuo0UDsgJLufOyA8MYfsf4p5+fjOZgLdVXzBmOSKO/52W23MJsz48?=
- =?us-ascii?Q?gnR2zA6LIcooTHfXCl8t83PDXapwDE1OwY3lwe3BM4d5mFtx7eIZqOUs/YEN?=
- =?us-ascii?Q?9gG1aRiuTSlY9sqV+tMLVqZQid1noIND4il1cDgk6x+VALHdlIKmC1om3GOi?=
- =?us-ascii?Q?X/LC6NplH76tqXgNhYWYszGuVAkHamhX9NIPGU6y1KYGsjJ5jAnNifQw/3aN?=
- =?us-ascii?Q?IXhDpXhEhxr94PXBFgW+XYuuwmL2oZD3k3lJ3AfujwM4LQkTrFzqtb0jUZvo?=
- =?us-ascii?Q?BmjogCAUmsnAnkdhX019xWHKiof0EhTvFUEfa3Kt6kCiZ28H72AH1ljw/2P/?=
- =?us-ascii?Q?VvKkl61VpoE5mPWSkZlt6y9eA1T4LVpRySAAObAVcS+wuXOaPq4gMXKv0fkY?=
- =?us-ascii?Q?GeNtWpufIurf3EEX0PiOljBFGgAGw0sSRymzz6wtyY/UAlvr1OtSmJ205Fk1?=
- =?us-ascii?Q?P/G+62iWi1gY+p6VDa/VE+RZ2dYFTdnop3CR6WJOtxAKu+y+9LZXefDljewR?=
- =?us-ascii?Q?pi/wjyPydZm2xqpd61eu0tg4sspQydPh47xZsOij9BxW1DZEgV/OTKAXYDpX?=
- =?us-ascii?Q?+K3mhX570mOgGC7/JVMga6Rvw+kFW0HSXYxBy36RwBlV/fLmRtVt+33sbLhH?=
- =?us-ascii?Q?MWb0Zqw1D51ne/JBpsLL9mai/xLmMVIRzfCOJkHSEAuXbSOiENEsjbyW5ukS?=
- =?us-ascii?Q?TjH1Hdwi/jfJcF+XzFDB54l2tgfeKYYyAfJeW6pK7glCuteidwp7sSFtQlFr?=
- =?us-ascii?Q?oaZWe3NYOg5/548jWsDiPbdAFroSyqHV0r1qtd1S8DREp/WmcAoMy0VBh1FV?=
- =?us-ascii?Q?gWj4kqWqIPztHlHvMwArz0QwE1QjlfZbTCciqrDugD3/PNE2U1m56E9t4KVw?=
- =?us-ascii?Q?B6db0SHwHjcXb7LX9r7OdRuOz/vv5svVCQCnnv/SddVUML5ULEdbEMbqB5qQ?=
- =?us-ascii?Q?ISt+FauvXq2WCGRwV3JOgHGR28SjBKeV+vBqsgdW304ptfP/z8/Hyrf4utVl?=
- =?us-ascii?Q?EuPgVA8qujaeppLdzB8BdHClDeiX2OH/Ay9eSxB9LAs6V9BPzkXGeqXXO0vI?=
- =?us-ascii?Q?NCn+Nr4do1F3kVmQM/fQ2u+qMXzwtq+BHAuh3UvOBs0th98sh92fJkvRrKYP?=
- =?us-ascii?Q?M50m9cWOqgnvYBDUkh4r8/2S34xp1xESAB6ZWqe/l3eReVnZVer6PH4NjEEk?=
- =?us-ascii?Q?Ih/8vRT2WbtUkbAc5UCCIjnT5X+zQvdtfG7sd/GolEjluRXRY++Nhy7ouy8r?=
- =?us-ascii?Q?5h/mJBcaXNZRvxV22oGsACQLi0204ZkVdcBpSqguAbf3WJBftWiPbp4MuiiY?=
- =?us-ascii?Q?AM/OYKHiVHXYlok3ChhfhDgBq2xCr8+HWfcOmR0veJAlPCJWLO6OuYarIX3p?=
- =?us-ascii?Q?viBIrqIKzGvsQXtmktflH4wPUDim/9I4LRA8G7UvWuwFLtpYne3PDzOQojg1?=
- =?us-ascii?Q?yk9VEV/zYPWdgUEeUS3IsJH2Os7ObZPpfvvrftFX?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 321fc26a-319a-4415-1ddd-08ddf68a4697
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2025 08:06:30.9375
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iSsSS9gtv/yAuYE4nmJE/k1Og2irX9yzN+R603WDWzamsiXvEdcxEfb1gpZ7swElUn5Gje8HRQ/SuLP6Nl75WQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7617
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <68c9a4d2.050a0220.3c6139.0e63.GAE@google.com>
 
-The commit 61f132ca8c46 ("ptp: add helpers to get the phc_index by
-of_node or dev") has added two generic interfaces to get the phc_index
-of the PTP clock. This eliminates the need for PTP device drivers to
-provide custom APIs for consumers to retrieve the phc_index. This has
-already been implemented for ENETC v4 and is also applicable to ENETC
-v1. Therefore, the global variable enetc_phc_index is removed from the
-driver. ENETC v1 now uses the same interface as v4 to get phc_index.
+On Tue, Sep 16, 2025 at 10:56:34AM -0700, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    e2291551827f Merge tag 'probes-fixes-v6.16-rc6' of git://g..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=126aad8c580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=f62a2ef17395702a
+> dashboard link: https://syzkaller.appspot.com/bug?extid=6596516dd2b635ba2350
+> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1091958c580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13c89382580000
+> 
+> Downloadable assets:
+> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-e2291551.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/8873881d7728/vmlinux-e2291551.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/c85b06341ad0/bzImage-e2291551.xz
+> mounted in repro: https://storage.googleapis.com/syzbot-assets/6dce6e633409/mount_8.gz
+>   fsck result: failed (log: https://syzkaller.appspot.com/x/fsck.log?x=17c3e7d4580000)
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+6596516dd2b635ba2350@syzkaller.appspotmail.com
+> 
+> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000018: 0000 [#1] SMP KASAN NOPTI
+> KASAN: null-ptr-deref in range [0x00000000000000c0-0x00000000000000c7]
+> CPU: 0 UID: 0 PID: 3043 Comm: kworker/u4:11 Not tainted 6.16.0-rc6-syzkaller-00037-ge2291551827f #0 PREEMPT(full) 
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+> Workqueue: ipv6_addrconf addrconf_dad_work
+> RIP: 0010:__in6_dev_get include/net/addrconf.h:347 [inline]
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
----
- drivers/net/ethernet/freescale/enetc/enetc.h  |  3 ---
- .../ethernet/freescale/enetc/enetc_ethtool.c  | 25 ++++++++-----------
- .../net/ethernet/freescale/enetc/enetc_ptp.c  |  5 ----
- 3 files changed, 10 insertions(+), 23 deletions(-)
+Problem is that FDB nexthops can end up in non-FDB nexthop groups and
+FDB nexthops are not associated with a nexthop device.
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc.h b/drivers/net/ethernet/freescale/enetc/enetc.h
-index 815afdc2ec23..0ec010a7d640 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.h
-@@ -493,9 +493,6 @@ struct enetc_msg_cmd_set_primary_mac {
- 
- #define ENETC_CBDR_TIMEOUT	1000 /* usecs */
- 
--/* PTP driver exports */
--extern int enetc_phc_index;
--
- /* SI common */
- u32 enetc_port_mac_rd(struct enetc_si *si, u32 reg);
- void enetc_port_mac_wr(struct enetc_si *si, u32 reg, u32 val);
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c b/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-index 6215e9c68fc5..5f17ff150fd5 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-@@ -880,7 +880,7 @@ static int enetc_set_coalesce(struct net_device *ndev,
- 	return 0;
- }
- 
--static int enetc4_get_phc_index_by_pdev(struct enetc_si *si)
-+static int enetc_get_phc_index_by_pdev(struct enetc_si *si)
- {
- 	struct pci_bus *bus = si->pdev->bus;
- 	struct pci_dev *timer_pdev;
-@@ -888,6 +888,9 @@ static int enetc4_get_phc_index_by_pdev(struct enetc_si *si)
- 	int phc_index;
- 
- 	switch (si->revision) {
-+	case ENETC_REV_1_0:
-+		devfn = PCI_DEVFN(0, 4);
-+		break;
- 	case ENETC_REV_4_1:
- 		devfn = PCI_DEVFN(24, 0);
- 		break;
-@@ -905,18 +908,18 @@ static int enetc4_get_phc_index_by_pdev(struct enetc_si *si)
- 	return phc_index;
- }
- 
--static int enetc4_get_phc_index(struct enetc_si *si)
-+static int enetc_get_phc_index(struct enetc_si *si)
- {
- 	struct device_node *np = si->pdev->dev.of_node;
- 	struct device_node *timer_np;
- 	int phc_index;
- 
- 	if (!np)
--		return enetc4_get_phc_index_by_pdev(si);
-+		return enetc_get_phc_index_by_pdev(si);
- 
- 	timer_np = of_parse_phandle(np, "ptp-timer", 0);
- 	if (!timer_np)
--		return enetc4_get_phc_index_by_pdev(si);
-+		return enetc_get_phc_index_by_pdev(si);
- 
- 	phc_index = ptp_clock_index_by_of_node(timer_np);
- 	of_node_put(timer_np);
-@@ -954,17 +957,9 @@ static int enetc_get_ts_info(struct net_device *ndev,
- 	if (!enetc_ptp_clock_is_enabled(si))
- 		goto timestamp_tx_sw;
- 
--	if (is_enetc_rev1(si)) {
--		phc_idx = symbol_get(enetc_phc_index);
--		if (phc_idx) {
--			info->phc_index = *phc_idx;
--			symbol_put(enetc_phc_index);
--		}
--	} else {
--		info->phc_index = enetc4_get_phc_index(si);
--		if (info->phc_index < 0)
--			goto timestamp_tx_sw;
--	}
-+	info->phc_index = enetc_get_phc_index(si);
-+	if (info->phc_index < 0)
-+		goto timestamp_tx_sw;
- 
- 	enetc_get_ts_generic_info(ndev, info);
- 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_ptp.c b/drivers/net/ethernet/freescale/enetc/enetc_ptp.c
-index 5243fc031058..b8413d3b4f16 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_ptp.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_ptp.c
-@@ -7,9 +7,6 @@
- 
- #include "enetc.h"
- 
--int enetc_phc_index = -1;
--EXPORT_SYMBOL_GPL(enetc_phc_index);
--
- static struct ptp_clock_info enetc_ptp_caps = {
- 	.owner		= THIS_MODULE,
- 	.name		= "ENETC PTP clock",
-@@ -92,7 +89,6 @@ static int enetc_ptp_probe(struct pci_dev *pdev,
- 	if (err)
- 		goto err_no_clock;
- 
--	enetc_phc_index = ptp_qoriq->phc_index;
- 	pci_set_drvdata(pdev, ptp_qoriq);
- 
- 	return 0;
-@@ -118,7 +114,6 @@ static void enetc_ptp_remove(struct pci_dev *pdev)
- {
- 	struct ptp_qoriq *ptp_qoriq = pci_get_drvdata(pdev);
- 
--	enetc_phc_index = -1;
- 	ptp_qoriq_free(ptp_qoriq);
- 	pci_free_irq_vectors(pdev);
- 	kfree(ptp_qoriq);
--- 
-2.34.1
+The kernel rejects such configurations upon addition:
 
+# ip nexthop add id 1 via 192.0.2.1 fdb
+# ip nexthop add id 2 group 1
+Error: Non FDB nexthop group cannot have fdb nexthops.
+
+But not upon replacement:
+
+# ip nexthop add id 1 blackhole
+# ip nexthop add id 2 group 1
+# ip nexthop replace id 1 via 192.0.2.1 fdb
+# ip nexthop
+id 1 via 192.0.2.1 scope link fdb
+id 2 group 1
+
+I will try to send a fix later today.
+
+> RIP: 0010:ip6_ignore_linkdown include/net/addrconf.h:443 [inline]
+> RIP: 0010:find_match+0xa3/0xc90 net/ipv6/route.c:781
+> Code: 00 00 00 00 00 fc ff df 42 80 7c 25 00 00 74 08 48 89 df e8 cf c4 fc f7 48 89 d8 bb c0 00 00 00 48 03 18 48 89 d8 48 c1 e8 03 <42> 80 3c 20 00 74 08 48 89 df e8 ae c4 fc f7 48 8b 1b e8 f6 60 48
+> RSP: 0018:ffffc9000d5ce430 EFLAGS: 00010206
+> RAX: 0000000000000018 RBX: 00000000000000c0 RCX: 0000000000000000
+> RDX: ffff88803f90c880 RSI: 0000000000000000 RDI: 0000000000000000
+> RBP: 1ffff1100b37b324 R08: ffffc9000d5ce7c0 R09: ffffc9000d5ce7d0
+> R10: ffffc9000d5ce620 R11: ffffffff8a26ecd0 R12: dffffc0000000000
+> R13: 0000000000000002 R14: 1ffff1100b37b326 R15: ffff888059bd9937
+> FS:  0000000000000000(0000) GS:ffff88808d21b000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007ffd76fadfd8 CR3: 000000000df38000 CR4: 0000000000352ef0
+> Call Trace:
+>  <TASK>
+>  rt6_nh_find_match+0xd9/0x150 net/ipv6/route.c:821
+>  nexthop_for_each_fib6_nh+0x1cd/0x400 net/ipv4/nexthop.c:1516
+>  __find_rr_leaf+0x461/0x6d0 net/ipv6/route.c:862
+>  find_rr_leaf net/ipv6/route.c:890 [inline]
+>  rt6_select net/ipv6/route.c:934 [inline]
+>  fib6_table_lookup+0x39f/0xa80 net/ipv6/route.c:2232
+>  ip6_pol_route+0x222/0x1180 net/ipv6/route.c:2268
+>  pol_lookup_func include/net/ip6_fib.h:617 [inline]
+>  fib6_rule_lookup+0x348/0x6f0 net/ipv6/fib6_rules.c:125
+>  ip6_route_output_flags_noref net/ipv6/route.c:2683 [inline]
+>  ip6_route_output_flags+0x364/0x5d0 net/ipv6/route.c:2695
+>  ip6_route_output include/net/ip6_route.h:93 [inline]
+>  ip6_dst_lookup_tail+0x1ae/0x1510 net/ipv6/ip6_output.c:1128
+>  ip6_dst_lookup_flow+0x47/0xe0 net/ipv6/ip6_output.c:1259
+>  udp_tunnel6_dst_lookup+0x231/0x3c0 net/ipv6/ip6_udp_tunnel.c:165
+>  geneve6_xmit_skb drivers/net/geneve.c:957 [inline]
+>  geneve_xmit+0xd2e/0x2b70 drivers/net/geneve.c:1043
+>  __netdev_start_xmit include/linux/netdevice.h:5215 [inline]
+>  netdev_start_xmit include/linux/netdevice.h:5224 [inline]
+>  xmit_one net/core/dev.c:3830 [inline]
+>  dev_hard_start_xmit+0x2d4/0x830 net/core/dev.c:3846
+>  __dev_queue_xmit+0x1adf/0x3a70 net/core/dev.c:4713
+>  dev_queue_xmit include/linux/netdevice.h:3355 [inline]
+>  neigh_hh_output include/net/neighbour.h:523 [inline]
+>  neigh_output include/net/neighbour.h:537 [inline]
+>  ip6_finish_output2+0x11bc/0x16a0 net/ipv6/ip6_output.c:141
+>  __ip6_finish_output net/ipv6/ip6_output.c:-1 [inline]
+>  ip6_finish_output+0x234/0x7d0 net/ipv6/ip6_output.c:226
+>  NF_HOOK+0x9e/0x380 include/linux/netfilter.h:317
+>  mld_sendpack+0x800/0xd80 net/ipv6/mcast.c:1868
+>  ipv6_mc_dad_complete+0x88/0x4b0 net/ipv6/mcast.c:2293
+>  addrconf_dad_completed+0x6d5/0xd60 net/ipv6/addrconf.c:4339
+>  addrconf_dad_work+0xc36/0x14b0 net/ipv6/addrconf.c:-1
+>  process_one_work kernel/workqueue.c:3238 [inline]
+>  process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
+>  worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
+>  kthread+0x70e/0x8a0 kernel/kthread.c:464
+>  ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+>  </TASK>
 
