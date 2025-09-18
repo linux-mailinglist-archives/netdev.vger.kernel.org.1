@@ -1,120 +1,201 @@
-Return-Path: <netdev+bounces-224239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35D4DB82C56
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 05:38:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18709B82C6B
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 05:41:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E88B0164245
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 03:38:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B389A3B163A
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 03:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C8C4690;
-	Thu, 18 Sep 2025 03:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87C923C4F4;
+	Thu, 18 Sep 2025 03:40:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CbXGxzkN"
+	dkim=pass (2048-bit key) header.d=cyphar.com header.i=@cyphar.com header.b="big4Eoc6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A762582
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 03:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF6D14B06C;
+	Thu, 18 Sep 2025 03:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758166707; cv=none; b=XKAO5fEB3qnFsuMr6UUu+ZuMC+n+V6ZR4fA+JqdLOkUivr6Cva3oqhVScifiG+U1eCGjXqhuiw4YQfVW4ytHFbzDSl9EuJ4d4pc2YVXsyUF1/7RYBBrwyTw3WIr7hvsBDvudPnv63x4Q7S2VozCw5E7jxEJKNhEG1NKA8R9VsK4=
+	t=1758166853; cv=none; b=uCgAExDAX9vpLT3+miNlZz5xqFPooFFnt2a77YtT8slrBZr9yY2bpauZ9TfVI/F6T045pYEKNikYA2yNEQadTkK25k6k5QNaWEV+ZFD+OC7mTOIBDM1XjdUQGwfgPZXky7ICgZytQOsnpnLAUsdyKmAy+dGuKOhiNy3S29eHp/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758166707; c=relaxed/simple;
-	bh=CtmJwnJu8N1ck7hE2ozZRsNG2IyusRlVhIzOEMCYUxs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C3m3cUqEUlijwsKWZAQvxOmcpB+VGduCRddaYrpRTy63KzBzw3z5Rk0y7FJlwRSmNld/WkCcckBq8WNva6xlxLWMCurcqutZM4mDReAuCbllzs6tGrt8PEZ35HtqqtUjsKbyugPNIoBN6JR52L8F4/TtbHZC14EFzjWrfmVZQ0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CbXGxzkN; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4b58b1b17d7so5332381cf.1
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 20:38:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758166704; x=1758771504; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CtmJwnJu8N1ck7hE2ozZRsNG2IyusRlVhIzOEMCYUxs=;
-        b=CbXGxzkN1vyZx1Tx7udVqHaQl3zYvFbdVpGkihezL+QE5BBLgIoFwQfvpK/7iCCisL
-         /e/Met77PtcWF1/stP5fLt1hlVG6wotgKdZ+DUpxTobAfQvM0xu5x9/TnsHAgNh2gX1p
-         45nO4f6WrJn6jsqkYcJIyU4O0xbX39Ilzac/1OaIYd67ZyBAYm43IRy4+srQcSoDxppj
-         DaDk7MQpi3nMeDD4MexuefggM4E7TLoFqZxruGT+39ge1VrUUJ9SoCImorXDHIq9hy9e
-         uqe2MQyTruBtxUtFd+QKZn7Rbr2yf8nDTcdptKGu7+VkXlzsuKZ0FBJ2VxecLb5vr5zJ
-         3fdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758166704; x=1758771504;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CtmJwnJu8N1ck7hE2ozZRsNG2IyusRlVhIzOEMCYUxs=;
-        b=E62fYRqZT+ZIoMdUTwBvCErq3l36MALIYnLcCEkyebWRCEJuT9sku98jpHFvDU+sim
-         wqfH0Cr5lauZb/bySJZOwRiVaLiiiIHTkBK98k7kxlzQNw414iwYnz3V++V54M3NQNZN
-         V+xsMv20VDtfLLY7TgL8POAaRcBmPFVL+7hy3CYDELTMPIqYeqHRWRYQSY9ZXOYxsCfU
-         AxqMp/UJl+4A7pY6khIxtN9oLECD2ljLJA0Ohy+Zsc0bnHf+glE/1bZJWPTfUVyrC6OU
-         wxx85Y/9ksDFI0WizZwzsCa6QvCpIe6MrFRBFTiQ4AVXFNaehz3xtLZaA9fVfiggDBUV
-         IyHA==
-X-Forwarded-Encrypted: i=1; AJvYcCU2AgeoXkPlUQDcD4k8C666Wfutoe447YrqOonQKf/5r70vMuu2fAZUpGyk6HfhdjTFCw0c0f0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmErDz+bGmRIo+qfZXhxHwGS7tVWEfOd3GTPWxbu5MIYYoIPI3
-	QSyLCRITLqkzI/zNPQJGMzSEEojo+fVUP5X06PNg+XdFfD/WJvs4zFV5+/Dfz+H57pCRbEBaTi9
-	ac3WICDnyBWDqp7ASAMQDJoYLVf+VgJo0u1bqNsyr
-X-Gm-Gg: ASbGnctC8s3k8gbyE56y1nUcZUMgIJii6Dpjc34YHwpPNtmbUmHrsk8B6u46JvEbD4G
-	KYLE+Mlgu19hCfFQOfLeaAPvTxNODrgJgu/Oe6/WLAdkvJPVB0bFB2qgUPystGohZ2GJ0NjyDkO
-	DdTZTYt8iWCiwfftQgyZsIgtJ9TggEtog8M28t9Sw7yBDGgyZdm+fIFLrQKCxu3/GZfG+bgrsvW
-	sLBxZRViNVU0hRl34AvjaM9nsdGYZXMq/nsgUiLjcI=
-X-Google-Smtp-Source: AGHT+IHQ/vI3m62oc3lTGmMRquOrCf9ZNSwaX02jvWxKgFAebN5mwLp7yfa+/ssRjlqgibT6xnoUJ6polTr8YZzjzRY=
-X-Received: by 2002:ac8:7f04:0:b0:4b3:4e8e:9e32 with SMTP id
- d75a77b69052e-4bda7bf3cd3mr23704301cf.3.1758166704267; Wed, 17 Sep 2025
- 20:38:24 -0700 (PDT)
+	s=arc-20240116; t=1758166853; c=relaxed/simple;
+	bh=yT3K8uBlaTZ4oRUfArIJX6RgDQSVHzMNclhTow/TmcE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AKYHvAaaWn7oaIhitT7y6Uor4Icp/GYYmJibIkfA64qXXcPRno5aE6RMe/i4jQe9aBlLuPNujtdgp3TA63kXIDjGJLY26+3Rg5HeM6REjPpkztvqguwZDP+qSnXsNP5spj07E1Sos5UAbt6roWaUULikQB8TMSn7VyulgzQ3Cyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cyphar.com; spf=pass smtp.mailfrom=cyphar.com; dkim=pass (2048-bit key) header.d=cyphar.com header.i=@cyphar.com header.b=big4Eoc6; arc=none smtp.client-ip=80.241.56.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cyphar.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cyphar.com
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4cS1cm4XT6z9slX;
+	Thu, 18 Sep 2025 05:40:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cyphar.com; s=MBO0001;
+	t=1758166840;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yT3K8uBlaTZ4oRUfArIJX6RgDQSVHzMNclhTow/TmcE=;
+	b=big4Eoc6bqe9q6T1qfJlYA+OdrIwGvvsbDSKl3AuavBpgBdtZE80XTg558Tgu7XEEM8GOu
+	4HUYEXX3fg4YSlTHkbhSzBpl4q+It3vCwD8MPvGv+yvT3h/qqjzlnM6zyF0rYqbmgws1wp
+	izbsOl3m35zhbv9k5i+H5sufoIWJ5Zx22JTz5VfKjy2MPYp0thT/hpGB6m5bKMiCSc4vxo
+	fup1hwDmgk7OLk1BJPCqqYzVpItRsxz5QsfkOyTs5OQi0OIBGdsZDEkui+UTHKBiwFi8J2
+	7Jl+u7/uXJro9unpSw3pyztLb2ULxy77hNAqJxuLy2ZwfGguHTyBWmYb5gA+oA==
+Date: Thu, 18 Sep 2025 13:40:20 +1000
+From: Aleksa Sarai <cyphar@cyphar.com>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Amir Goldstein <amir73il@gmail.com>, Jan Kara <jack@suse.cz>, 
+	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
+	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 27/32] nsfs: support file handles
+Message-ID: <2025-09-18-onyx-sunny-pleats-turbans-lW2ejZ@cyphar.com>
+References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+ <20250910-work-namespace-v1-27-4dd56e7359d8@kernel.org>
+ <CAOQ4uxgtQQa-jzsnTBxgUTPzgtCiAaH8X6ffMqd+1Y5Jjy0dmQ@mail.gmail.com>
+ <20250911-werken-raubzug-64735473739c@brauner>
+ <CAOQ4uxgMgzOjz4E-4kJFJAz3Dpd=Q6vXoGrhz9F0=mb=4XKZqA@mail.gmail.com>
+ <20250912-wirsing-karibus-7f6a98621dd1@brauner>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250917000954.859376-1-daniel.zahka@gmail.com> <20250917000954.859376-4-daniel.zahka@gmail.com>
-In-Reply-To: <20250917000954.859376-4-daniel.zahka@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 17 Sep 2025 20:38:12 -0700
-X-Gm-Features: AS18NWCKzGTw_2kJKMKy6W6qhulrBNk3LTgmJ1NdFzjvaaGc8fOnCA9Hjr9IW8k
-Message-ID: <CANn89iLLtSoGrMNjSY5-wETVQJmsNcUVgQe5shY5Eqt7kdsaZA@mail.gmail.com>
-Subject: Re: [PATCH net-next v13 03/19] net: modify core data structures for
- PSP datapath support
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
-	Boris Pismenny <borisp@nvidia.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Patrisious Haddad <phaddad@nvidia.com>, Raed Salem <raeds@nvidia.com>, 
-	Jianbo Liu <jianbol@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, 
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Kiran Kella <kiran.kella@broadcom.com>, 
-	Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="d2xgw3mufvo5akdl"
+Content-Disposition: inline
+In-Reply-To: <20250912-wirsing-karibus-7f6a98621dd1@brauner>
+
+
+--d2xgw3mufvo5akdl
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 27/32] nsfs: support file handles
+MIME-Version: 1.0
 
-On Tue, Sep 16, 2025 at 5:10=E2=80=AFPM Daniel Zahka <daniel.zahka@gmail.co=
-m> wrote:
->
-> From: Jakub Kicinski <kuba@kernel.org>
->
-> Add pointers to psp data structures to core networking structs,
-> and an SKB extension to carry the PSP information from the drivers
-> to the socket layer.
->
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Co-developed-by: Daniel Zahka <daniel.zahka@gmail.com>
-> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
-> ---
+On 2025-09-12, Christian Brauner <brauner@kernel.org> wrote:
+> On Thu, Sep 11, 2025 at 01:36:28PM +0200, Amir Goldstein wrote:
+> > On Thu, Sep 11, 2025 at 11:31=E2=80=AFAM Christian Brauner <brauner@ker=
+nel.org> wrote:
+> > >
+> > > On Wed, Sep 10, 2025 at 07:21:22PM +0200, Amir Goldstein wrote:
+> > > > On Wed, Sep 10, 2025 at 4:39=E2=80=AFPM Christian Brauner <brauner@=
+kernel.org> wrote:
+> > > > >
+> > > > > A while ago we added support for file handles to pidfs so pidfds =
+can be
+> > > > > encoded and decoded as file handles. Userspace has adopted this q=
+uickly
+> > > > > and it's proven very useful.
+> > > >
+> > > > > Pidfd file handles are exhaustive meaning
+> > > > > they don't require a handle on another pidfd to pass to
+> > > > > open_by_handle_at() so it can derive the filesystem to decode in.
+> > > > >
+> > > > > Implement the exhaustive file handles for namespaces as well.
+> > > >
+> > > > I think you decide to split the "exhaustive" part to another patch,
+> > > > so better drop this paragraph?
+> > >
+> > > Yes, good point. I've dont that.
+> > >
+> > > > I am missing an explanation about the permissions for
+> > > > opening these file handles.
+> > > >
+> > > > My understanding of the code is that the opener needs to meet one of
+> > > > the conditions:
+> > > > 1. user has CAP_SYS_ADMIN in the userns owning the opened namespace
+> > > > 2. current task is in the opened namespace
+> > >
+> > > Yes.
+> > >
+> > > >
+> > > > But I do not fully understand the rationale behind the 2nd conditio=
+n,
+> > > > that is, when is it useful?
+> > >
+> > > A caller is always able to open a file descriptor to it's own set of
+> > > namespaces. File handles will behave the same way.
+> > >
+> >=20
+> > I understand why it's safe, and I do not object to it at all,
+> > I just feel that I do not fully understand the use case of how ns file =
+handles
+> > are expected to be used.
+> > A process can always open /proc/self/ns/mnt
+> > What's the use case where a process may need to open its own ns by hand=
+le?
+> >=20
+> > I will explain. For CAP_SYS_ADMIN I can see why keeping handles that
+> > do not keep an elevated refcount of ns object could be useful in the sa=
+me
+> > way that an NFS client keeps file handles without keeping the file obje=
+ct alive.
+> >=20
+> > But if you do not have CAP_SYS_ADMIN and can only open your own ns
+> > by handle, what is the application that could make use of this?
+> > and what's the benefit of such application keeping a file handle instea=
+d of
+> > ns fd?
+>=20
+> A process is not always able to open /proc/self/ns/. That requires
+> procfs to be mounted and for /proc/self/ or /proc/self/ns/ to not be
+> overmounted. However, they can derive a namespace fd from their own
+> pidfd. And that also always works if it's their own namespace.
 
-Sorry for the sk_drop_counters intrusion ;)
+It's also important to note that if /proc/self and /proc/thread-self are
+overmounted, you can get into scenarios where /proc/$pid will refer to
+the wrong process (container runtimes run into this scenario a lot --
+when configuring a container there is a point where we are in a new
+pidns but still see the host /proc, which leads to lots of fun bugs).
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+> There's no need to introduce unnecessary behavioral differences between
+> /proc/self/ns/, pidfd-derived namespace fs, and file-handle-derived
+> namespace fds. That's just going to be confusing.
+>=20
+> The other thing is that there are legitimate use-case for encoding your
+> own namespace. For example, you might store file handles to your set of
+> namespaces in a file on-disk so you can verify when you get rexeced that
+> they're still valid and so on. This is akin to the pidfd use-case.
+>=20
+> Or just plainly for namespace comparison reasons where you keep a file
+> handle to your own namespaces and can then easily check against others.
+
+I agree wholeheartedly.
+
+--=20
+Aleksa Sarai
+Senior Software Engineer (Containers)
+SUSE Linux GmbH
+https://www.cyphar.com/
+
+--d2xgw3mufvo5akdl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iJEEABYKADkWIQS2TklVsp+j1GPyqQYol/rSt+lEbwUCaMt/JBsUgAAAAAAEAA5t
+YW51MiwyLjUrMS4xMSwyLDIACgkQKJf60rfpRG+0QwEAy14crLGqBanw8F+iJGyg
+Ufib+dDPLnlaRH2JgIDOdJgBANhW3e6kOOLSuP7Zb/NhMzS6y+B/qnF8mUByEN7m
+bhII
+=NYA2
+-----END PGP SIGNATURE-----
+
+--d2xgw3mufvo5akdl--
 
