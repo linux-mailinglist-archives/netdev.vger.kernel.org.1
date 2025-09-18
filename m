@@ -1,363 +1,205 @@
-Return-Path: <netdev+bounces-224301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8B0DB83998
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:52:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD5ECB83A13
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:57:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EC343B891B
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:52:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C55AF721363
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58BE42FDC31;
-	Thu, 18 Sep 2025 08:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BiQ9DS9j"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4E52F9D82;
+	Thu, 18 Sep 2025 08:57:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA96E2F2918;
-	Thu, 18 Sep 2025 08:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758185550; cv=fail; b=ptD/NicGoeyR91odCcMSmOcTtFeToW1bkqYM6jFOZibeYn2O7gKkpAo+xrQzozJT3cXynS1BwrAzP5ULVsjzw/A920M4ZvsIWbVFaMiH/fGLUnwCVuJYuryM3vwKo3HLZtZHZKeDY4p/9dWqto/+Rrf0UG7GQndojQDF3XL00vQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758185550; c=relaxed/simple;
-	bh=RUng57FEIfxez8tkSlsgUNizIRNwwkdrmvoamV5M1wY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=XLBZ9Y0M17Pp290DBBdGGAm0WXUvc2zkwvdb/m1G7WAIrOHjnDUwLL0jEuR7DZ3cZyayUlToq7j6Z06ADPMYmQH0pEE0RCiy/9lpJS62u1K2bPSFxb0dxuVd2xAsDbW1XWQS2QFZtPnzhtP8vBgAgbFZOWF6tb6CZyU9E7OymxM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BiQ9DS9j; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758185548; x=1789721548;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=RUng57FEIfxez8tkSlsgUNizIRNwwkdrmvoamV5M1wY=;
-  b=BiQ9DS9j8t2Ec6dO4bwAIbXE7tcCw9KK5WCNEQ3hDC2Nn84Q08u++3P0
-   JfehaBvuduADSAW1K7RKBg6KddYwgU8CrvhQKaEIwTdnklgpJ67xAAWQO
-   yjZ+8OUqg4+UuZUB1Snl0MKMO/FfyVhhUMmacx760jil4FffXxSAP5DYx
-   sLai+Ahgplz8JJrokj4hbX0r7atTCYgcrc5W+WvUipdYFcSv7+myL3VKD
-   dapoU8NY+jQ7LYXMUb1dZ6QW1J9+u97JX8J5Bg6f6b1hH6q/5q6rkBKdC
-   Mru08WrEo32IsCuLJO65g6b/UtZetlXfArtbqSkoEiMZWmVaLGqsiSde1
-   Q==;
-X-CSE-ConnectionGUID: sNoerLNATpOdTKhxcsJVZA==
-X-CSE-MsgGUID: b+Nqci5ASxmzTGoaee9hGQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11556"; a="71933995"
-X-IronPort-AV: E=Sophos;i="6.18,274,1751266800"; 
-   d="scan'208";a="71933995"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2025 01:52:28 -0700
-X-CSE-ConnectionGUID: QncvlS4FTuW8q1jJbbdLkQ==
-X-CSE-MsgGUID: HjjiLtNzQCGqB9Y/RqK5GA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,274,1751266800"; 
-   d="scan'208";a="174763292"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2025 01:52:28 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 18 Sep 2025 01:52:26 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Thu, 18 Sep 2025 01:52:26 -0700
-Received: from BN8PR05CU002.outbound.protection.outlook.com (52.101.57.40) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 18 Sep 2025 01:52:26 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=W2tDnrVYiW39d1sba6539UvoSJ0QILvaX6vNV/4vyfzHOOfYrW6MnR3HokVUglEXTBT2Apvw4NV1Xm2Co1lHDPDZTX/EG0YGf3rOo49gW/YR8h1pO9GPP7aJ4O7i4xHmofbXOaq9AYp8E3wUXSEivEElz3oRPSc3BizAh9BWvyZZfK6ZQ/AfpOdeN+9Wv53XkKCyapdQ/nUU/xc0z+qvHUdA9RVl+E0fQUAQJkupzItw+gFCQJkQNhRuG9AS/MuHCfNqddkaH/ovuwckgSN0Kx5ruFmFETOrAMB3GGYA67O9N/cryWEghe1RDwLdW23+ONtg1rV7OgDobr/Gtsivmw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2YGoz5bJP//vRhbLKCorCL9cm/zCPKy1dX3tYsDS3FY=;
- b=WrwOixzlPUZDNq1iNOF1jFgLkCNBSx0pFakUpJS9ecxoUmf059COPHhZ4F+3FGAvfpi9RLF+YEHixt3PBxPlYmw7k3U0Nz3Ylqo4kSvbAyPl3vrhJoCkHnkZympYdQ2SYj6tN5gM/3O7rLOOIRkQISHrbZfOMQSjyqjom5PYq9R3RiTzxawaqEjVd6rsnJm/aNZBpeL7tOPOzolipH0zKsJBfv5jGIPTKm6HFZCh5o7iPfNzL0mRaNadkjOTmnzVk2buVAi1xk2Ewkw6FQwDiNS7LgbjUUvQl0Nt6A7QWB77P2E6/T+AxytJEzT1b8p6Zq7OLNSrgzh1qAeDeFfJVQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- PH0PR11MB5077.namprd11.prod.outlook.com (2603:10b6:510:3b::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9137.14; Thu, 18 Sep 2025 08:52:23 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9137.012; Thu, 18 Sep 2025
- 08:52:23 +0000
-Date: Thu, 18 Sep 2025 10:52:08 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Amery Hung <ameryhung@gmail.com>
-CC: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<alexei.starovoitov@gmail.com>, <andrii@kernel.org>, <daniel@iogearbox.net>,
-	<paul.chaignon@gmail.com>, <kuba@kernel.org>, <stfomichev@gmail.com>,
-	<martin.lau@kernel.org>, <mohsin.bashr@gmail.com>, <noren@nvidia.com>,
-	<dtatulea@nvidia.com>, <saeedm@nvidia.com>, <tariqt@nvidia.com>,
-	<mbloch@nvidia.com>, <kernel-team@meta.com>
-Subject: Re: [PATCH bpf-next v4 1/6] bpf: Allow bpf_xdp_shrink_data to shrink
- a frag from head and tail
-Message-ID: <aMvIONMZ9CFqyNnM@boxer>
-References: <20250917225513.3388199-1-ameryhung@gmail.com>
- <20250917225513.3388199-2-ameryhung@gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250917225513.3388199-2-ameryhung@gmail.com>
-X-ClientProxiedBy: TLZP290CA0008.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:9::20) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+Received: from azure-sdnproxy.icoremail.net (l-sdnproxy.icoremail.net [20.188.111.126])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 228B12FCC1A;
+	Thu, 18 Sep 2025 08:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=20.188.111.126
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758185822; cv=none; b=XzS1p9+yezBBSke5wcKGE/DiyLelQQfWKgSowWIucqYCCvz9JyrT0TmtZI7isEpSBdDN+q6TQKd+iTKjmKaospvD+falhvx0mrJ8y7fPQoGZHfkGUHoOkB81nRsM7yrGKJH5d9zDcdoVIRiaDXbSU38Vql9L1d/YJ3oUy+hLitQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758185822; c=relaxed/simple;
+	bh=ZrXE2DNPDc8etlYt3MuMV4uFP1sBHOK5yVjFrZB2/Uc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cQ7BqmSeG3gdcFKY360M0HMsGVowKL7xWJDVpGNIvPWYKtl+Zo4SsBoFK7W523CrXBrNof5MR67aPHrlIubg1m2swcQujUteZsmluC089FFLZOTVuHJ1GziFi1Ew692ikJUQjOTpuAivvB1C3euyrfhBF7yP/XABMP3vmkLGQPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=20.188.111.126
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
+Received: from E0005182LT.eswin.cn (unknown [10.12.96.155])
+	by app2 (Coremail) with SMTP id TQJkCgA315Uwycto0YrUAA--.28924S2;
+	Thu, 18 Sep 2025 16:56:19 +0800 (CST)
+From: weishangjuan@eswincomputing.com
+To: devicetree@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	vladimir.oltean@nxp.com,
+	rmk+kernel@armlinux.org.uk,
+	yong.liang.choong@linux.intel.com,
+	anthony.l.nguyen@intel.com,
+	prabhakar.mahadev-lad.rj@bp.renesas.com,
+	jan.petrous@oss.nxp.com,
+	jszhang@kernel.org,
+	inochiama@gmail.com,
+	0x1207@gmail.com,
+	boon.khai.ng@altera.com,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Cc: ningyu@eswincomputing.com,
+	linmin@eswincomputing.com,
+	lizhi2@eswincomputing.com,
+	pinkesh.vaghela@einfochips.com,
+	Shangjuan Wei <weishangjuan@eswincomputing.com>
+Subject: [PATCH v7 0/2] Add driver support for Eswin eic7700 SoC ethernet controller
+Date: Thu, 18 Sep 2025 16:56:12 +0800
+Message-Id: <20250918085612.3176-1-weishangjuan@eswincomputing.com>
+X-Mailer: git-send-email 2.31.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|PH0PR11MB5077:EE_
-X-MS-Office365-Filtering-Correlation-Id: b2cf8efb-dc4a-46ec-8dea-08ddf690af43
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?IE+D49G9JNRlrkWASDJnbcAQVXsXAczYRjzGgMgdK8cQbiNZwNS8wD+cUDZA?=
- =?us-ascii?Q?gNAMvUWGE2ELE6zG6bTJEvHcJ6IFlvsjubYMsEbxvED2NL2v1LXZPRMfx3Ie?=
- =?us-ascii?Q?0mbgcH2sw5+m3aIxasF0kLrteW4ZLKaBF74wG05ROpHvaQUVkB8Cbas07349?=
- =?us-ascii?Q?PO0hvZMGGKEA6hywlG/uU0RMSPOGLYwKU5WKGywAO0l1XLMhE00Teckwm+mX?=
- =?us-ascii?Q?vevtgm2j7B5HKBp1vgyqvAjfIIw9HGGNjjCP8j7JyG4hNDONWandt4OrdPKm?=
- =?us-ascii?Q?azlG8HNzuHj8a8713/LRPqw6rTjE7tikzNWjFy/BrPucZ4TzlzI21fZswP06?=
- =?us-ascii?Q?8am7R7S7U4WRg5XvoBEA1yGki25s2VJJ7EUk7vcKbJ6rRLjv8hyMPLyWBmFn?=
- =?us-ascii?Q?eSwJSvSxdQtv2xVY89/A7ghiDU99EdLTDEczpXOq+VgtYfBPg3j6YI0jqwNW?=
- =?us-ascii?Q?FaSKwdIM1w7YwFe2fIIgsLUD6f+U2yIzkekZdetUGiPuMhW+osdfBZXDhpoE?=
- =?us-ascii?Q?XeAvgZX4A2CKBStqfslCC5WPv/NVStpGjzNDSApYcD/8rX1g7nUufGagn8Ac?=
- =?us-ascii?Q?8eA792pfXSHewptGgpzvPtpmW0hCgJ8OeIjCcuy+0r7fOX+hxT4eHThl5of2?=
- =?us-ascii?Q?33KJpIwD5AuT7mNaImdRruzxZC04HCgkXq2mvo8pxy/SrxF8ng0Ya98zUai4?=
- =?us-ascii?Q?8GJ4EozqlsbM/DZqX9YQlqyIsL5lAHHt+ycHSCtb3yXm5EeqZEZ7+w04Lf+y?=
- =?us-ascii?Q?fx/c+eH5tH9/rblf/P8aM52GfkUSNvovZN48tPAQtyp6/8SoAcpHFISUSTEr?=
- =?us-ascii?Q?nQRCuWLu/ONatxIj9CjnqgBh9j3D31dvAiaJPqWEQ6nzj5LwbijGTbKCy47o?=
- =?us-ascii?Q?DWvDboeujfDJbwyYBIrZ9oE0HR/jiWMwo4LL4o+10E+4mOabzCxcEJCkLZAJ?=
- =?us-ascii?Q?qFNyFjd62yu7hTg5dSwsyCWOnWGdcm9s+Gmd+sm3tVFt+gc7znxUh4fqca11?=
- =?us-ascii?Q?R8gCq2d+ub58Ty44ykq1xUH6u635Q4ZZm2+RLI2WdnlI6ptYSOEY06sfB0aS?=
- =?us-ascii?Q?rLrac0FWHQjGXhKuLKdZPMT5jy210HujGznGmB/1Kz1oN6Sn5zSMWIyrfWpF?=
- =?us-ascii?Q?0PjpApAeSD3yPVOWXDoJ3RmNGTIO5m9HlCR/XPOa7jkUeMDo99eCEf/pZx1K?=
- =?us-ascii?Q?MPUMtNUNI66Abawsoy7RFUM4U0QHnn7lthrvVEnYwfiOkHHxERlHtw+NS2pk?=
- =?us-ascii?Q?3AduPJSQB55wl62SgYsNo/jLEUWt9sUw9ECzbHveUoUxVEk7q3xI01B8uQ65?=
- =?us-ascii?Q?5KYgUtUoYqQgk7D2rZQsJuzcC3U2aGjMHlWW/lMHpyTlIDdG/mbYJ+a/EV11?=
- =?us-ascii?Q?7N7tfrnofnFIqohXdt0WVVB+OcMFCb7AwndfByWEUniq1sNNhGAXjCY3RwvH?=
- =?us-ascii?Q?T1a4drWLyoY=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?atrtga0V1NZLHfcPGlRmoCrDVS/OYk1W0L3DirNbCn/k0fiBK79BvurUTbjF?=
- =?us-ascii?Q?S0IkwPRJ1QsC2ZNwj2yrxvqzsAQSG80BF5nJiMKkXcWG78EwVqc09QY+eDao?=
- =?us-ascii?Q?WnMPu1/RTp6zIADetUoqHLMqN8FuOB0dDTNaDhiKvg0KclIzNfkLO/nC4C6a?=
- =?us-ascii?Q?P5flJsyD/bZwPKWy2VrzG3IaZ5BM3ZscyeC5F1T4VKAEOoTJIs2k+OcKjL4M?=
- =?us-ascii?Q?L+ZPEejCzG7V5fApQipwoPxtVbRYxTwCmjWF36QQeizB1T1z2TJ+LOdl6rUW?=
- =?us-ascii?Q?v1EztKPdRQeOELCkUmhVB88v4m1Mxk8be/m0SKZMH2HaFgxE1OxbBc0Co/yi?=
- =?us-ascii?Q?qxIaKgXKqZ1b2qCe+0JQeEgW4UObnrzjq8ZEfY0dRcD0YaIEWcCEVSf9A/rU?=
- =?us-ascii?Q?4XhZWbCalaEgh+2NrcZr8f7UdT17e4VpQihCMCP0WE5FIkQFHhHtPZRpUXdp?=
- =?us-ascii?Q?XsOvwdh3SnLBcAoAXLBJi1rNpJ/SCCN5E+D2yg7d6B0VuByW1RTPys73knMi?=
- =?us-ascii?Q?hY1Pv1Fk+g1wxtug/1FyVNulfO7lAZ+GX94p/sr0QPxM2QR4WZ4iXxY2oVmY?=
- =?us-ascii?Q?KnqbTAa43NAFrCtvV5/HfiBABHAcGq87ngLtu9O7/2OqMHsmTe2z/s238xrZ?=
- =?us-ascii?Q?8b1fM9fycGpdBfwzkfpgwYKfBJF1HDVoCfawKV7+6kIy12QHk0dNYvv76Bgj?=
- =?us-ascii?Q?j7vGlfSRHS0K8s5w2BptgO/ZxJEb2jn97dccDLgopmHHbRDR7yhNACdk/5uc?=
- =?us-ascii?Q?ZMsdNXqwgTtr4ZL7X2F4lltIBXD4tVtyHTi8lub8GvH7dnlhtphW94tJzhSB?=
- =?us-ascii?Q?x1wRNoD+MEUlbKTGH3I8QfXp14PZaLr41gPpAe3/5M7r26YyP3eIZn7CLle8?=
- =?us-ascii?Q?agqScGhbC1pex7d7/x5dIVAuY7QLk7qFoznYbhtAFoUS+RCkSW/i0AjvOsuy?=
- =?us-ascii?Q?gyOApV7CVoySufFMwEREUOGEfHd5gwMGxIGkayUovCCBW7PCqSDNzQV02WGr?=
- =?us-ascii?Q?rlwd5Hri1ctq9Dn28vz/z29Vr0X1IDCzmdPAj67cYy50I6MFByCHkeWTsf0T?=
- =?us-ascii?Q?/BVE0/ojviQ/BPJh9LQEzmV97eWJx9q2O7EWuqX8ISFdBN0V1DcEQh9MMQYr?=
- =?us-ascii?Q?clDvjOYxJ8UoMxJWTncTSTygqmVm5uhBY4spd8/qTj1jTqwf//ahlLHFSAJf?=
- =?us-ascii?Q?fPc9pojwicndgp+7mQBZJlxDMczGJdgBGj2Z82rRlAPWHNU5vyKEc1n7gU5k?=
- =?us-ascii?Q?GnwiBbO8TJbty0KT4kFrlAwAyD0sYKIK4GZvKGh0bufCfJoxZfs+GjUsrQV0?=
- =?us-ascii?Q?CJhUw9NXqFh4LGZ7yunonp3hAtpYpVvlJPmZmM+0AdC5Fv9axh82QbXrWMUZ?=
- =?us-ascii?Q?KufIdfCNQIJDC3jQQqXXiGGGbvffHLRtM2fMDww1ZDZOB6VUzu/6xB2CP/ly?=
- =?us-ascii?Q?J/oa2sJzMT/avGx2mnTjc6GTBxjeg5fNJyRSfWgCCbMTkRZkb06GoJfIbhJu?=
- =?us-ascii?Q?47SJ41wl0qcS2w6wEGZot8yFtFB+hxB3O/iMSyDuw0u8nsXDlvXX1jv8ccv4?=
- =?us-ascii?Q?IQf/d46aFd/cHstj2LM53kaB6Zf61YCuxXJh6DIspzJIeoYjw7KXnqGP3wQX?=
- =?us-ascii?Q?cw=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b2cf8efb-dc4a-46ec-8dea-08ddf690af43
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2025 08:52:23.4218
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: y/lXNeTgEKRv//mM4JB84kWxYsTHSzaXugzsk1gKAv6mDOXPdof7NA7nrxbbcPbbyUyY+O2o+T1MsY0SmcrLEysHyakEq9e+WKf0xe8viqc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5077
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:TQJkCgA315Uwycto0YrUAA--.28924S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3ArW5tw4UWr4DGryftFy3twb_yoW7GF1rpF
+	W0k345Ww15JryxX392yw10kFyfJan7Xr1akr1Iqw1fXws0vas0vr4ak3WYga47Ar4DZ34Y
+	9ay3ZF47Aa4Yy3DanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBv14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v26r4a6rW5MxkIecxEwVCm-wCF04
+	k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18
+	MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr4
+	1lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1l
+	IxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4
+	A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRdWrXUUUUU=
+X-CM-SenderInfo: pzhl2xxdqjy31dq6v25zlqu0xpsx3x1qjou0bp/
 
-On Wed, Sep 17, 2025 at 03:55:08PM -0700, Amery Hung wrote:
-> Move skb_frag_t adjustment into bpf_xdp_shrink_data() and extend its
-> functionality to be able to shrink an xdp fragment from both head and
-> tail. In a later patch, bpf_xdp_pull_data() will reuse it to shrink an
-> xdp fragment from head.
-> 
-> Additionally, in bpf_xdp_frags_shrink_tail(), breaking the loop when
-> bpf_xdp_shrink_data() returns false (i.e., not releasing the current
-> fragment) is not necessary as the loop condition, offset > 0, has the
-> same effect. Remove the else branch to simplify the code.
-> 
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
->  include/net/xdp_sock_drv.h | 21 ++++++++++++++++++---
->  net/core/filter.c          | 28 +++++++++++++++++-----------
->  2 files changed, 35 insertions(+), 14 deletions(-)
-> 
-> diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
-> index 513c8e9704f6..4f2d3268a676 100644
-> --- a/include/net/xdp_sock_drv.h
-> +++ b/include/net/xdp_sock_drv.h
-> @@ -160,13 +160,23 @@ static inline struct xdp_buff *xsk_buff_get_frag(const struct xdp_buff *first)
->  	return ret;
->  }
->  
-> -static inline void xsk_buff_del_tail(struct xdp_buff *tail)
-> +static inline void xsk_buff_del_frag(struct xdp_buff *xdp)
->  {
-> -	struct xdp_buff_xsk *xskb = container_of(tail, struct xdp_buff_xsk, xdp);
-> +	struct xdp_buff_xsk *xskb = container_of(xdp, struct xdp_buff_xsk, xdp);
->  
->  	list_del(&xskb->list_node);
->  }
->  
-> +static inline struct xdp_buff *xsk_buff_get_head(struct xdp_buff *first)
-> +{
-> +	struct xdp_buff_xsk *xskb = container_of(first, struct xdp_buff_xsk, xdp);
-> +	struct xdp_buff_xsk *frag;
-> +
-> +	frag = list_first_entry(&xskb->pool->xskb_list, struct xdp_buff_xsk,
-> +				list_node);
-> +	return &frag->xdp;
-> +}
-> +
->  static inline struct xdp_buff *xsk_buff_get_tail(struct xdp_buff *first)
->  {
->  	struct xdp_buff_xsk *xskb = container_of(first, struct xdp_buff_xsk, xdp);
-> @@ -389,8 +399,13 @@ static inline struct xdp_buff *xsk_buff_get_frag(const struct xdp_buff *first)
->  	return NULL;
->  }
->  
-> -static inline void xsk_buff_del_tail(struct xdp_buff *tail)
-> +static inline void xsk_buff_del_frag(struct xdp_buff *xdp)
-> +{
-> +}
-> +
-> +static inline struct xdp_buff *xsk_buff_get_head(struct xdp_buff *first)
->  {
-> +	return NULL;
->  }
->  
->  static inline struct xdp_buff *xsk_buff_get_tail(struct xdp_buff *first)
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 63f3baee2daf..0b82cb348ce0 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -4153,27 +4153,31 @@ static int bpf_xdp_frags_increase_tail(struct xdp_buff *xdp, int offset)
->  	return 0;
->  }
->  
-> -static void bpf_xdp_shrink_data_zc(struct xdp_buff *xdp, int shrink,
-> +static void bpf_xdp_shrink_data_zc(struct xdp_buff *xdp, int shrink, bool tail,
->  				   enum xdp_mem_type mem_type, bool release)
->  {
-> -	struct xdp_buff *zc_frag = xsk_buff_get_tail(xdp);
-> +	struct xdp_buff *zc_frag = tail ? xsk_buff_get_tail(xdp) :
-> +					  xsk_buff_get_head(xdp);
->  
->  	if (release) {
-> -		xsk_buff_del_tail(zc_frag);
-> +		xsk_buff_del_frag(zc_frag);
->  		__xdp_return(0, mem_type, false, zc_frag);
->  	} else {
-> -		zc_frag->data_end -= shrink;
-> +		if (tail)
-> +			zc_frag->data_end -= shrink;
-> +		else
-> +			zc_frag->data += shrink;
->  	}
->  }
->  
->  static bool bpf_xdp_shrink_data(struct xdp_buff *xdp, skb_frag_t *frag,
-> -				int shrink)
-> +				int shrink, bool tail)
->  {
->  	enum xdp_mem_type mem_type = xdp->rxq->mem.type;
->  	bool release = skb_frag_size(frag) == shrink;
->  
->  	if (mem_type == MEM_TYPE_XSK_BUFF_POOL) {
-> -		bpf_xdp_shrink_data_zc(xdp, shrink, mem_type, release);
-> +		bpf_xdp_shrink_data_zc(xdp, shrink, tail, mem_type, release);
->  		goto out;
->  	}
->  
-> @@ -4181,6 +4185,12 @@ static bool bpf_xdp_shrink_data(struct xdp_buff *xdp, skb_frag_t *frag,
->  		__xdp_return(skb_frag_netmem(frag), mem_type, false, NULL);
->  
->  out:
-> +	if (!release) {
-> +		if (!tail)
-> +			skb_frag_off_add(frag, shrink);
-> +		skb_frag_size_sub(frag, shrink);
-> +	}
+From: Shangjuan Wei <weishangjuan@eswincomputing.com>
 
-Hi Amery,
+This series depends on the config option patch [1].
 
-it feels a bit off to have separate conditions around @release. How about
-something below?
+[1] https://lore.kernel.org/all/20250825132427.1618089-3-pinkesh.vaghela@einfochips.com/
 
+Modified YAML description content and removed Reviewed by tag in v6.
+Considering that this change does not affect the minor revisions to
+the document that you have reviewed, I have restored the tag in V7 series.
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 0b82cb348ce0..b1fca279c1de 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -4175,20 +4175,17 @@ static bool bpf_xdp_shrink_data(struct xdp_buff *xdp, skb_frag_t *frag,
- {
- 	enum xdp_mem_type mem_type = xdp->rxq->mem.type;
- 	bool release = skb_frag_size(frag) == shrink;
-+	bool zc = mem_type == MEM_TYPE_XSK_BUFF_POOL;
- 
--	if (mem_type == MEM_TYPE_XSK_BUFF_POOL) {
-+	if (zc)
- 		bpf_xdp_shrink_data_zc(xdp, shrink, tail, mem_type, release);
--		goto out;
--	}
--
--	if (release)
--		__xdp_return(skb_frag_netmem(frag), mem_type, false, NULL);
- 
--out:
- 	if (!release) {
- 		if (!tail)
- 			skb_frag_off_add(frag, shrink);
- 		skb_frag_size_sub(frag, shrink);
-+	} else if (!zc) {
-+		__xdp_return(skb_frag_netmem(frag), mem_type, false, NULL);
- 	}
- 
- 	return release;
+Updates:
 
-> +
->  	return release;
->  }
->  
-> @@ -4198,12 +4208,8 @@ static int bpf_xdp_frags_shrink_tail(struct xdp_buff *xdp, int offset)
->  
->  		len_free += shrink;
->  		offset -= shrink;
-> -		if (bpf_xdp_shrink_data(xdp, frag, shrink)) {
-> +		if (bpf_xdp_shrink_data(xdp, frag, shrink, true))
->  			n_frags_free++;
-> -		} else {
-> -			skb_frag_size_sub(frag, shrink);
-> -			break;
-> -		}
->  	}
->  	sinfo->nr_frags -= n_frags_free;
->  	sinfo->xdp_frags_size -= len_free;
-> -- 
-> 2.47.3
-> 
+  Changes in v7:
+  - Add "Reviewed-by" tag of "Krzysztof Kozlowski" for Patch 1.
+  - Update dwmac-eic7700.c
+    - Align the processing logic of required attributes in binding
+  - Link to v6: https://lore.kernel.org/all/20250912055352.2832-1-weishangjuan@eswincomputing.com/
+
+  Changes in v6:
+  - Update driver patch's commit message
+  - Update eswin,eic7700-eth.yaml
+    - Modify the description content
+  - Update dwmac-eic7700.c
+    - Move three variables from priv to local scope
+    - Inline eic7700_apply_delay logic directly into the probe function
+  - Link to v5: https://lore.kernel.org/all/20250904085913.2494-1-weishangjuan@eswincomputing.com/
+
+  Changes in v5:
+  - Updated eswin,eic7700-eth.yaml
+    - Use "items" instead "enum" for clock-names
+    - Arrange clocks description in correct order
+    - Delete redundant descriptions for eswin,hsp-sp-csr property
+  - Updated dwmac-eic7700.c
+    - Optimize the implementation of eic7700_ appy_delay
+    - Update comments and remove reg checking
+    - Use FIELD_PREP in eic7700_apply_delay function
+    - Use clk_bulk related APIs to manage clks
+  - Link to v4: https://lore.kernel.org/all/20250827081135.2243-1-weishangjuan@eswincomputing.com/
+
+  Changes in v4:
+  - Updated eswin,eic7700-eth.yaml
+    - Modify reg:minItems:1 to reg:maxItems: 1
+    - Delete minItems and maxItems of clock and clock-names
+    - Delete phy-mode and phy-handle properties
+    - Add description for clock
+    - Add types of clock-names
+    - Delete descriptions for rx-internal-delay-ps and tx-internal-delay-ps
+    - Add enum value for rx-internal-delay-ps and tx-internal-delay-ps
+    - Modify description for eswin,hsp-sp-csr property
+    - Delete eswin,syscrg-csr and eswin,dly-hsp-reg properties
+    - Modify phy-mode="rgmii" to phy-mode="rgmii-id"
+  - Updated dwmac-eic7700.c
+    - Remove fix_mac_speed and configure different delays for different rates
+    - Merge the offset of the dly register into the eswin, hsp sp csr attributes
+      for unified management
+    - Add missing Author and optimize the number of characters per
+      line to within 80
+    - Support default delay configuration and add the handling of vendor delay
+      configuration
+    - Add clks_config for pm_runtime
+    - Modify the attribute format, such as eswin,hsp_sp_csr to eswin,hsp-sp-csr
+  - Link to v3: https://lore.kernel.org/all/20250703091808.1092-1-weishangjuan@eswincomputing.com/
+
+  Changes in v3:
+  - Updated eswin,eic7700-eth.yaml
+    - Modify snps,dwmac to snps,dwmac-5.20
+    - Remove the description of reg
+    - Modify the value of clock minItems and maxItems
+    - Modify the value of clock-names minItems and maxItems
+    - Add descriptions of snps,write-questions, snps,read-questions
+    - Add rx-internal-delay-ps and tx-internal-delay-ps properties
+    - Modify descriptions for custom properties, such as eswin,hsp-sp-csr
+    - Delete snps,axi-config property
+    - Add snps,fixed-burst snps,aal snps,tso properties
+    - Delete snps,lpi_en property
+    - Modify format of custom properties
+  - Updated dwmac-eic7700.c
+    - Simplify drivers and remove unnecessary API and DTS attribute configurations
+    - Increase the mapping from tx/rx_delay_ps to private dly
+  - Link to v2: https://lore.kernel.org/all/aDad+8YHEFdOIs38@mev-dev.igk.intel.com/
+
+  Changes in v2:
+  - Updated eswin,eic7700-eth.yaml
+    - Add snps,dwmac in binding file
+    - Modify the description of reg
+    - Modify the number of clock-names
+    - Changed the names of reset-names and phy-mode
+    - Add description for custom properties, such as eswin,hsp_sp_csr
+    - Delete snps,blen snps,rd_osr_lmt snps,wr_osr_lmt properties
+  - Updated dwmac-eic7700.c
+    - Remove the code related to PHY LED configuration from the MAC driver
+    - Adjust the code format and driver interfaces, such as replacing kzalloc
+      with devm_kzalloc, etc.
+    - Use phylib instead of the GPIO API in the driver to implement the PHY
+      reset function
+  - Link to v1: https://lore.kernel.org/all/20250516010849.784-1-weishangjuan@eswincomputing.com/
+
+Shangjuan Wei (2):
+  dt-bindings: ethernet: eswin: Document for EIC7700 SoC
+  ethernet: eswin: Add eic7700 ethernet driver
+
+ .../bindings/net/eswin,eic7700-eth.yaml       | 127 ++++++++++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-eic7700.c   | 230 ++++++++++++++++++
+ 4 files changed, 369 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
+
+--
+2.17.1
+
 
