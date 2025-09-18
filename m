@@ -1,104 +1,102 @@
-Return-Path: <netdev+bounces-224260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28E36B8336D
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:52:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 398B4B833D0
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 09:00:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF0F22A29BE
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 06:51:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C79BC625DF3
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 07:00:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2DDC2E543B;
-	Thu, 18 Sep 2025 06:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 859492DE6EE;
+	Thu, 18 Sep 2025 07:00:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d8grMfXR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m155101.qiye.163.com (mail-m155101.qiye.163.com [101.71.155.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181AC1C2DB2;
-	Thu, 18 Sep 2025 06:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.71.155.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600F7208A7
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 07:00:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758178228; cv=none; b=Vr/IX2ffce8BNOhM+FkzPnTFFbjOLt8Q++kazP9vmIyqkYSw3PowcI3GPccPDJ/bb8LnPlXHSBuW0wVuKOdHtYgPIRo3M9lYUeh9BQIAxAOAldk2QcO4YiBAxC9M8kMXAjqvlJcPXkTo6PTOkXmm/7keH6focans6xKCIt4Kweo=
+	t=1758178801; cv=none; b=THgj/i4E7jIf8FC2dbnSnfboIiWErK8/ozvlnEgF1e9xF3nlX/PX3ldRwI87kDJwcJiXP33T2z7wKBrGpJdXlWi880I3WwiRxp4KktDVmP3JTC/i45NVaOoD7aLgVdPSpkiP/cPFTOkRASHi7GuG/bf9TDTqHLffKxlTB2BVf6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758178228; c=relaxed/simple;
-	bh=E61AklOCat9VCLqMef8JiiENaQpUakUCY+88tvDoJDg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=L2lUm4+kcz7XUXCmVniR6WhpyUnL77W8PvknLqAfZ/5lMOJ9UN5TyJMEvqWtiaSpwpkOcvKFWeCSw5fh8bGTRcxWKqgWOMtLO8TcXRbs51UuINMm6nry8P6JqmcqnuIUhcHcfFZEwWSe4XVjGjgESuuHmsfFC8Hl51M+CQWvnJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jmu.edu.cn; spf=pass smtp.mailfrom=jmu.edu.cn; arc=none smtp.client-ip=101.71.155.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jmu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jmu.edu.cn
-Received: from localhost.localdomain (unknown [119.122.213.2])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 233a88a56;
-	Thu, 18 Sep 2025 14:50:15 +0800 (GMT+08:00)
-From: Chukun Pan <amadeus@jmu.edu.cn>
-To: wens@kernel.org
-Cc: amadeus@jmu.edu.cn,
-	andre.przywara@arm.com,
-	andrew+netdev@lunn.ch,
-	conor+dt@kernel.org,
-	davem@davemloft.net,
-	devicetree@vger.kernel.org,
-	edumazet@google.com,
-	jernej@kernel.org,
-	krzk+dt@kernel.org,
-	kuba@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-sunxi@lists.linux.dev,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	samuel@sholland.org
-Subject: Re: [PATCH net-next v6 2/6] net: stmmac: Add support for Allwinner A523 GMAC200
-Date: Thu, 18 Sep 2025 14:50:06 +0800
-Message-Id: <20250918065006.476860-1-amadeus@jmu.edu.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CAGb2v640r+TwB7O+UAB9PehZ2FaXDjhVerK6j_CZ2+caJoJ9zA@mail.gmail.com>
-References: <CAGb2v640r+TwB7O+UAB9PehZ2FaXDjhVerK6j_CZ2+caJoJ9zA@mail.gmail.com>
+	s=arc-20240116; t=1758178801; c=relaxed/simple;
+	bh=GYQQZBRFtvo1wyXj5F3TK1koEo9eY7xeSRvG8LEDgI0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ri9eBHUlgm5zUyzNQxr91AUzjJS9KbboZOo5W6EiuTKjWVb+XMMSy8ykcsKU5TZvlzgO+6MAuoMbxTxSsJO4v4L4Dw3oTsTwWnX3E3oabWNe/ohbd8a4plmpIfaAeQ1aVINGmOzQczOA60jct9lZuiSuhdRozzQoKKuR/dcwM7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d8grMfXR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E1EDC4CEE7;
+	Thu, 18 Sep 2025 07:00:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758178801;
+	bh=GYQQZBRFtvo1wyXj5F3TK1koEo9eY7xeSRvG8LEDgI0=;
+	h=From:Date:Subject:To:Cc:From;
+	b=d8grMfXRdRd3M9C9BtlejCL9yVW52ikV/pMYn+LBjuSxIFfD2fzW2IwFp57BMXb6y
+	 iCAGvdkM16oYI+dPYoIdEmUa6KBm3fNkvTrFQzrlteahCjfaWMXWKFonXhNfQuYFve
+	 p1ExhG2VOMbGyzYQaf+ltk6DzUsfHsS/2WNSCKC/1YnFdhh6Ajc2ezlZYrWjdnh8yo
+	 jrCzHi9wNGtcA/KHM+zk+GvbtuvSQBq+/9ZDS4LKKAJRCvHTim11/8arP4IEbd9GVi
+	 4peqAa/yJQxK7XbxhUoQPayr9L9xG6b5QBgx4VC6FkSZ0gq3f0uubq2DKyuCF/v8Th
+	 K3iNBia4v2Qwg==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Thu, 18 Sep 2025 08:59:41 +0200
+Subject: [PATCH net-next] net: airoha: Fix PPE_IP_PROTO_CHK register
+ definitions
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a995b96860203a2kunmec52b10073125
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkZGktDVh4dGEJPThlOThkYTlYeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlKSkJVSklJVUlKSFVJWVdZFhoPEhUdFFlBWU9LSFVKS0lIQkhCVUpLS1VKQk
-	tLWQY+
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250918-ppe_ip_proto_chk_ipv4_mask-fix-v1-1-df36da1b954c@kernel.org>
+X-B4-Tracking: v=1; b=H4sIANyty2gC/x3N2wqDMBCE4VeRvTbgsU19FZEQ7bQuUrMkIoL47
+ l28/P6LmZMSIiNRl50UsXPisCrKPKNp9usXht9qqoqqLV6lNSJwLE5i2IKb5kWxN+7n02I+fBg
+ Az3pE6+3Dko5IhOb7oB+u6w9dDuLXcAAAAA==
+X-Change-ID: 20250918-ppe_ip_proto_chk_ipv4_mask-fix-eee73be5a868
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-Hi,
+Fix typo in PPE_IP_PROTO_CHK_IPV4_MASK and PPE_IP_PROTO_CHK_IPV6_MASK
+register mask definitions. This is not a real problem since this
+register is not actually used in the current codebase.
 
-> I don't have 802.1q enabled so I didn't see this.
->
-> Can you provide the base commit you applied the patches to?
+Fixes: 00a7678310fe3 ("net: airoha: Introduce flowtable offload support")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/airoha/airoha_regs.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Based on the latest linux-next, 20250917
-with these enabled configurations:
+diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
+index 150c85995cc1a71d2d7eac58b75f27c19d26e2b5..e1c15c20be8e13197de743d9b590dc80058560a5 100644
+--- a/drivers/net/ethernet/airoha/airoha_regs.h
++++ b/drivers/net/ethernet/airoha/airoha_regs.h
+@@ -237,8 +237,8 @@
+ #define PPE_FLOW_CFG_IP4_TCP_FRAG_MASK		BIT(6)
+ 
+ #define REG_PPE_IP_PROTO_CHK(_n)		(((_n) ? PPE2_BASE : PPE1_BASE) + 0x208)
+-#define PPE_IP_PROTO_CHK_IPV4_MASK		GENMASK(15, 0)
+-#define PPE_IP_PROTO_CHK_IPV6_MASK		GENMASK(31, 16)
++#define PPE_IP_PROTO_CHK_IPV4_MASK		GENMASK(31, 16)
++#define PPE_IP_PROTO_CHK_IPV6_MASK		GENMASK(15, 0)
+ 
+ #define REG_PPE_TB_CFG(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x21c)
+ #define PPE_SRAM_TB_NUM_ENTRY_MASK		GENMASK(26, 24)
 
-CONFIG_IPV6=y
-CONFIG_STP=y
-CONFIG_GARP=y
-CONFIG_MRP=y
-CONFIG_BRIDGE=y
-CONFIG_VLAN_8021Q=y
-CONFIG_STMMAC_ETH=y
-CONFIG_STMMAC_PLATFORM=y
-CONFIG_DWMAC_SUN8I=y
-CONFIG_DWMAC_SUN55I=y
-CONFIG_PCS_XPCS=y
+---
+base-commit: 11bbcfb7668c6f4d97260f7caaefea22678bc31e
+change-id: 20250918-ppe_ip_proto_chk_ipv4_mask-fix-eee73be5a868
 
-[   38.818801] 8021q: adding VLAN 0 to HW filter on device eth1
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
-When the interface is down:
-~ # ifconfig eth1 down
-[   69.181869] dwmac-sun55i 4510000.ethernet eth1: Timeout accessing MAC_VLAN_Tag_Filter
-[   69.189827] dwmac-sun55i 4510000.ethernet eth1: failed to kill vid 0081/0
-
-Thanks,
-Chukun
 
