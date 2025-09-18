@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-224478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4204FB8568C
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:01:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3559B8569E
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:01:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 309A04E22F0
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:01:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 643467B6F2B
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A75930F93B;
-	Thu, 18 Sep 2025 15:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B71DC30FF27;
+	Thu, 18 Sep 2025 15:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KBJcwxCQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJbiwCTR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F62130E843;
-	Thu, 18 Sep 2025 15:00:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9289F30FC35
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758207618; cv=none; b=eXr2nM451ieFTqj3uaW6LwZePvdj9O8f0+0PJG9kml8VWZEI0NXcwvse65hwKh0wMkAvT3vJ/5Hos/nAZpfOuz9gQpmMFu4IBumGpXp0FHnK+Pb+1TAei7cuAJOjj9S+mD6RBU9bWeiEIwvEOPa1yAgsTDMXDxnKYxq2VpOwFyM=
+	t=1758207619; cv=none; b=baN24WDnb1HYptly8MqhAnL5Utjx/J5XtWtOejp/c21QnhOlaxBXh101AOCdYg91H7V80LaGdlFVYAiiF+0cuIjSCaGeVpAkEPffdp90rTBvBRI5ndlh6tXNTlNy3Zy4euNMJ/pP/0s7ihACSxVS14cMCwCS7d4POsvPNdZWOuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758207618; c=relaxed/simple;
-	bh=1yE3K/gFGSr2+CqHRxA2dW3tN70Sq5/qQtXHtQf+Z18=;
+	s=arc-20240116; t=1758207619; c=relaxed/simple;
+	bh=XSe4qL04EKcEFh2WeaBDGLaJzlB5IrgJJOOAs9vzvLE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fxiSMBvLBiKOUq/bDFnO7cHNDAkBilitpu4t2598S3SXtKxXvD3Wi3W/QfvQ/4LhbSyfsid6ZJItmB/QtIX9HcyAAET5Shzg+FAKU4xOInr11dy26sZU61YJugzoCFYGHtPnx4u350UVk/fk6jRQ7Y53rm2NApAXziaih3LECLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KBJcwxCQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB744C4CEEB;
-	Thu, 18 Sep 2025 15:00:17 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hN7owS+pduPiuezmFthv9G/zXv/kXYusRPGT098RKtmApxPqr0F54aZ9gMyiXGl1aY1qQS9kcG4YKkveHt/SDausYfmMIV3Ax2rm5BpIJV+FWELRb/Hscvv38lrs28I/wBY4KuNZOmsLkuEyh5nzJFtfbv8+2mKQJrplZR00yMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJbiwCTR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BAD5C4CEFB;
+	Thu, 18 Sep 2025 15:00:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758207617;
-	bh=1yE3K/gFGSr2+CqHRxA2dW3tN70Sq5/qQtXHtQf+Z18=;
+	s=k20201202; t=1758207619;
+	bh=XSe4qL04EKcEFh2WeaBDGLaJzlB5IrgJJOOAs9vzvLE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KBJcwxCQidNzYvGqwfCNY0NWrvRANGNQaouZXHlYMEiwcpHv4xPzz0AJGOlHlSaCK
-	 2BKxNAgOGqWk0Yh7cBMbp1T1h/6mCTRSazn1G9gKj7Bi3cxoSYxAH2QO37ceJFi0oa
-	 M3SAw5jta2RycFDyTc70NnL+WjHdHMzumrORQBGcrwwWt35HWKcIAq1FXdH4BYgQYx
-	 rU4z+SRp42M7dFv3IuTbnKQSh/hWCaa78cKhmA0zHCIRlaJN5SSWcL00TGaaSo5D9A
-	 GAz+5PcZX1iz3bPMaxlRk5yQJWL053rOGYWyyXN7PcGNny8nshWymWma9n9GAsUhx9
-	 h47P5pTpBILtA==
+	b=cJbiwCTRfGTDFduHJv2uJzSE427h++UzJxuf/xDaayrEzLOg6Ka+MbRl4Wn4R6Zr8
+	 PEUMTDdC37TnVYSk3/5/HC7m8owYCilvpA7fbpzEN9wTX54xIDDLJ7zOws0ipiEFoa
+	 qD64dR5JM9qqSbdXW+2FSJOTsCJEUHxsUi8oweC0Gr2TOrc0Rc8txYAWhbWvwzdeRs
+	 pXlztZknnfyGli5G5GqWAu43v6T3wYfK70Kh7idHIXwKfHBrPY5huu0yAnhMsZEU9x
+	 4Tfd9C7zYUxQU0d/IWSfJdtDAyUlNlVqPlHWB+sxo7ZG7tNLvrfNYHGcQes0Xb/dH6
+	 nr13RkB+5aEOw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEF039D0C28;
-	Thu, 18 Sep 2025 15:00:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7140439D0C28;
+	Thu, 18 Sep 2025 15:00:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,30 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] Revert "net/mlx5e: Update and set Xon/Xoff upon port
- speed set"
+Subject: Re: [PATCH] MAINTAINERS: update sundance entry
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175820761749.2450229.177550446664906635.git-patchwork-notify@kernel.org>
-Date: Thu, 18 Sep 2025 15:00:17 +0000
-References: <1758116934-644173-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1758116934-644173-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
- alazar@nvidia.com, daniel.zahka@gmail.com
+ <175820761899.2450229.16093608382045318401.git-patchwork-notify@kernel.org>
+Date: Thu, 18 Sep 2025 15:00:18 +0000
+References: <20250918091556.11800-1-kirjanov@gmail.com>
+In-Reply-To: <20250918091556.11800-1-kirjanov@gmail.com>
+To: Denis Kirjanov <kirjanov@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, dsterba@suse.cz
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 17 Sep 2025 16:48:54 +0300 you wrote:
-> This reverts commit d24341740fe48add8a227a753e68b6eedf4b385a.
-> It caused a degradation, reported by Jakub here:
-> https://lore.kernel.org/all/20250910170011.70528106@kernel.org/
-> 
-> Fixes: d24341740fe4 ("net/mlx5e: Update and set Xon/Xoff upon port speed set")
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> 
-> [...]
+On Thu, 18 Sep 2025 12:15:56 +0300 you wrote:
+> Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
+> ---
+>  MAINTAINERS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [net] Revert "net/mlx5e: Update and set Xon/Xoff upon port speed set"
-    https://git.kernel.org/netdev/net/c/3fbfe251cc9f
+  - MAINTAINERS: update sundance entry
+    https://git.kernel.org/netdev/net/c/7736aff47041
 
 You are awesome, thank you!
 -- 
