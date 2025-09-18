@@ -1,119 +1,100 @@
-Return-Path: <netdev+bounces-224445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8401AB852CD
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:20:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD687B852DC
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:21:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D240A7BF9AD
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:19:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A12237BFF43
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3581430CB3F;
-	Thu, 18 Sep 2025 14:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8242930C0F7;
+	Thu, 18 Sep 2025 14:15:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xLtYIaKI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="omiy0wMo"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32847212566;
-	Thu, 18 Sep 2025 14:14:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53860315D43;
+	Thu, 18 Sep 2025 14:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758204880; cv=none; b=epJ++TNt32XrxQdcTveAWh9pZB2bs8lNz0ADLTEPw8iD6lMBF44TGjRndYqv8WhwtmugrxlGbAFH71G1QnNE7+tEH8Txzj/+NT5VpLmYUmP/VwNr8vWlwbSYQKpfdvv6lyqY5vw+q978qmJizCRS/lR2iZmM6AEe4rR1TsqvSZo=
+	t=1758204918; cv=none; b=R9NL7j8k9GPzWd9SGrUO5wvCK+we5gZKNcOChL1i6YuNAg4xu0i2a+diNwpuiPUkadktzVs7SnKBSj7nh8WosdD5EZDz4YUcXk3Q7/qPwoG0LaKZnBmgG/iBKZr6DFDEgJGXlHi0xgL13DAA3PTIjjAWEKQjTcY36fecIXFB2Tg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758204880; c=relaxed/simple;
-	bh=ltzBq0tO28nPTffMbWoonVTdsbfTivoYy/S7lL7ZEF4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SL6fMyg8+T6W+A+RscQqDIi4GNyx+TwLmkosKsvImgxVWUCSRG0HOMQv86JTSbAxeyfojwmWEQklfcsBGiCwWfTPh6YIVLF9Peo71H4LvA9QwCfI74oxHB7whicTRQF0GJ4cC3DnGDcT7wbkjcUghoZdt3WxMXEnEb2iA2HSc0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xLtYIaKI; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=08YXLdcE/jW5FZxN5yg4w5BQuPpc21LjIlXkGV/CKro=; b=xLtYIaKI7UYAtBnjxE1ZmPMGLl
-	hx8KJYqySbsN4YuR3ovcEtgEUguzNlmeLL5fX+9tMRDd42vsLPZhICqG2Np5YXDvVnhS915SltDWh
-	fFd2CB+kualtme2lN5RIoIikrgqVO4ZSwQ6UNTudHbG+tKxHnYmn0raPY194wsr3TVsY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uzFP2-008pfC-8P; Thu, 18 Sep 2025 16:14:28 +0200
-Date: Thu, 18 Sep 2025 16:14:28 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jonas Rebmann <jre@pengutronix.de>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Shengjiu Wang <shengjiu.wang@nxp.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-sound@vger.kernel.org, imx@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	David Jander <david@protonic.nl>,
-	Lucas Stach <l.stach@pengutronix.de>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: Re: [PATCH v2 3/3] arm64: dts: add Protonic PRT8ML board
-Message-ID: <af554442-aeec-40d2-a35a-c7ee5bfcb99a@lunn.ch>
-References: <20250918-imx8mp-prt8ml-v2-0-3d84b4fe53de@pengutronix.de>
- <20250918-imx8mp-prt8ml-v2-3-3d84b4fe53de@pengutronix.de>
+	s=arc-20240116; t=1758204918; c=relaxed/simple;
+	bh=gWiH50s9H+3QCpy8Kdrf0c6cYqdlCgBeb7X+5UHAGoI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f+xu3Clm4rj4+aUhNRPS7sdd+XXS+uzHQuBQo7VGxcaKywk9bJU6JBa+P0xrm5k9eHc6DEuFF3oqTt9IVmLRcR3+uK3sHLpfDZ3dB2PD1pu0qVg1pM9wdeZxWEgop0WT99l7UMDavgYt/pq79YnR9/Fxi/diNz/hURap2lsffiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=omiy0wMo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D56AC4CEE7;
+	Thu, 18 Sep 2025 14:15:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758204917;
+	bh=gWiH50s9H+3QCpy8Kdrf0c6cYqdlCgBeb7X+5UHAGoI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=omiy0wMoSXyYLTe/4zOJcqwtzcAPeEWcnCWNoU5Qrqd2AMoDon4wjy9pbcDRI0dMl
+	 YSkOUNEC1lO7PzfI7wL64JLySfrwI4dSX6fz6tz3jqByfNv90r1kVPTLbtDvW+Vg2p
+	 XZpFSXFQwvWui6rYBDaBTqlogMt1fiTiGxADYwTotvYkf2LF7oBOcRbtRBIJN6opax
+	 Xd5Q4amuPx/iYGm9XTkvGxaa9okcaH86Ku0TPyrOE1LYZlCuILzWMYfbOeJd2iCQWw
+	 zeXnp3I49s1TgB2O+7go/BPo3HC1dzkTe29JIRD+Ll1anf4GgW7LMTK6l2hUcuGUDh
+	 w70C7uZ9NvYjQ==
+Date: Thu, 18 Sep 2025 07:15:16 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Guangshuo Li <lgs201920130244@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?=
+ <u.kleine-koenig@baylibre.com>, Jeff Garzik <jeff@garzik.org>, "Maciej W.
+ Rozycki" <macro@orcam.me.uk>, Mariusz Kozlowski <m.kozlowski@tuxland.pl>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH] net: ethernet: broadcom: sb1250-mac: Add checks for
+ kcalloc() in sbdma_initctx()
+Message-ID: <20250918071516.4ca7f752@kernel.org>
+In-Reply-To: <20250918121051.3504490-1-lgs201920130244@gmail.com>
+References: <20250918121051.3504490-1-lgs201920130244@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250918-imx8mp-prt8ml-v2-3-3d84b4fe53de@pengutronix.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> +			port@4 {
-> +				reg = <4>;
-> +				ethernet = <&fec>;
-> +				label = "cpu";
-> +				phy-mode = "rgmii-id";
-> +				rx-internal-delay-ps = <2000>;
-> +				tx-internal-delay-ps = <2000>;
-> +
-> +				fixed-link {
-> +					full-duplex;
-> +					speed = <100>;
-> +				};
-> +			};
-> +		};
-> +	};
-> +};
-> +
-> +&fec {
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&pinctrl_fec>;
-> +	phy-mode = "rgmii"; /* switch inserts delay */
-> +	rx-internal-delay-ps = <0>;
-> +	tx-internal-delay-ps = <0>;
-> +	status = "okay";
-> +
-> +	fixed-link {
-> +		full-duplex;
-> +		speed = <100>;
-> +	};
+On Thu, 18 Sep 2025 20:10:51 +0800 Guangshuo Li wrote:
+> Fixes: 73d739698017 ("sb1250-mac.c: De-typedef, de-volatile, de-etc...")
+> Fixes: c477f3348abb ("drivers/net/sb1250-mac.c: kmalloc + memset conversion to kcalloc")
 
-You have an RGMII interface, but you run it at 100Mbps? That might be
-worth a comment somewhere to explain why.
+neither of these tags is correct, the bug existed before them
+The Fixes tag should point to the commit that added the bug,
+not the last commit that touched the line
 
-	Andrew
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
+> ---
+>  drivers/net/ethernet/broadcom/sb1250-mac.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/sb1250-mac.c b/drivers/net/ethernet/broadcom/sb1250-mac.c
+> index 30865fe03eeb..e16a49e22488 100644
+> --- a/drivers/net/ethernet/broadcom/sb1250-mac.c
+> +++ b/drivers/net/ethernet/broadcom/sb1250-mac.c
+> @@ -625,6 +625,8 @@ static void sbdma_initctx(struct sbmacdma *d, struct sbmac_softc *s, int chan,
+>  	d->sbdma_dscrtable_unaligned = kcalloc(d->sbdma_maxdescr + 1,
+>  					       sizeof(*d->sbdma_dscrtable),
+>  					       GFP_KERNEL);
+> +	if (!d->sbdma_dscrtable_unaligned)
+> +		return;		/* avoid NULL deref in ALIGN/phys conversion */
 
-	
+This comment is completely unnecessary
+
+Please make sure to read:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+before proceeding
+-- 
+pw-bot: cr
 
