@@ -1,196 +1,170 @@
-Return-Path: <netdev+bounces-224383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E520CB84416
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 13:02:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B30C1B8441C
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 13:03:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98890463184
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 11:02:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E2273AEF85
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 11:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534A3296BDA;
-	Thu, 18 Sep 2025 11:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c5fBOJtR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE402C21C5;
+	Thu, 18 Sep 2025 11:03:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B5323ABA0
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 11:02:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B7123ABA0;
+	Thu, 18 Sep 2025 11:03:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758193342; cv=none; b=ldYOMUHlTtcC+ElVThLRhVCbHInENdZPQZzi7+DKJ4kPX8JIrQLVMoaSFgf5oA3gjNdv/jfR2mDfgDUrwzdCvTREkWqthz8oGXWeU3m3O5TXYACJz6CVvpUGRWiItGMv7nS6fUWpDidEEu6NPkEMnOSeStQ2dKdDvYnNwHrKBgc=
+	t=1758193434; cv=none; b=KUdWaJrTYztmVC2M/WGbnA4EqYoXimE1YXOQzO2CW5detJdiU1eEee10KoQmpwX1BOme2Ii4Bui8YtHwq+mA/8iGD+9P1t8BoK/6calYKpDBFgvBPQGNJSYyfX6uSgjCfluwNt8JlzpDy8gVKNVFNzE2cTcO4T/jRYRFG0EY5J8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758193342; c=relaxed/simple;
-	bh=2J9wkLAKPk5bnXZKa+EPEwIG+I5djdFiPdhgf7wh6v0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dB6qHSYV4TNFbevseXlGBTLFRNTFVxLaSicO4+F/dnHMeMJtWbTOLPIaouK9Vj+wIK7LJEeV9uuhfQ5aUsoMg0E1afunTBNDXqALCw6OCrgStWp7+wKc3540e41bco+fJR5DK10ya1uM3iVyynln1K8Ch0HUscdEPU4TPsM10DQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c5fBOJtR; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-829243c1164so89121785a.1
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 04:02:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758193339; x=1758798139; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=banPVEPj+ErhquWiTwSEXNtO6pB+JsLciaPDTlNTKDc=;
-        b=c5fBOJtR0x0yiZk7b9Ez/JYFCrqqdCEcvytvzsf+jF0uAbax+abnEF0QRIynJfKz38
-         0EQnp5NQT4uJ3eH6bI+4wPlF30HrkWM/ZBfjx4bevto0L1bAv2nKsn39D+uhXDbfNSEJ
-         sY3kde0S0yJ89oJsAzFddij0+NDJVH1KqiBEkBGCeE9EJbrOAV/YQoAs3tDuds8z86OA
-         rU9zXM5yjDdrbSp6b1+DR+NPMnTs03qN32ZhUIwHJE9bj3s4rQClsBuGSQtYeWpX3gWn
-         P3LNZy+L8udTJI7Of0PU3yhUUGZQRJKsBiKcs3HlADSk3S7DfJYCDnSPMhguA4aGhoiS
-         ofkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758193339; x=1758798139;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=banPVEPj+ErhquWiTwSEXNtO6pB+JsLciaPDTlNTKDc=;
-        b=usZ+qx7ZWs2SmQPMUiMQo/c/LSifg4TQwotCOv2u8BxsAzte0Ksthge4zmVYodpXKi
-         FojX6ogXdQJJLAnQiFEfL03Oh+haLjRHXQ5amvIzV28DK3e9OmtbrG8Hbt6PKyI2xy8u
-         gPwk3Le5SwBBM3s0vmoePfuSzabkiRWPAxju8qoW9zaYmcolYVDjsW3XLFxeu3rpBPxQ
-         QHLdRcOEqmgXAtM2dPQ4QEwJSjzQZXpKLI6JFrxENOBCIMVADoNIj+wZp3hxU38OMZIY
-         9+jVRabqenixKKcawoH55/HRX6Zj7XXjTYney1PRMVE4ptdXiUdEqe+5exNqGW9Kaczl
-         z2Lg==
-X-Forwarded-Encrypted: i=1; AJvYcCV4Y4XT9tC9kD/GVfEUBCrbXre4PpVHhJ2vU08+NSdjZfprwLxithVVNKAUBHRB9GZDuGANeu4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1JKE+iU71Q86ITipZt0b8+GU/ifW+edCA9TaQ6Y4ZRI55yvmd
-	BIPFgrKbm3ZZkKrTlUnLPmGliNfPQal29NgVMsrartfXzUwFAXo+GjxMYp1CLvJ+DChAw0dbr99
-	9vy1E0cMvglZNZGon6w5QoMVihou20QjxqWXXWXUs
-X-Gm-Gg: ASbGncuQSPBxytfFcPVMcqZjqL7jsPjSQ20lyEj+anyFpI6RlrP8Kc7YHCqx06uEQFa
-	fUWqQVg5NwPHkL+8GmicZhm5/C2OxviLN73V0BAuqv0MQxmBeQKX7PHhBJw8aq6ywEPTphloI3C
-	xMN56KrHwYeticXcMPZ5eI8cT2z7LRaWE2r7gY0Jzu0IvheVvbm2c03oF7/s6VNK6HdQzyKxhrM
-	vZw4CgnrtwcNcJo/96SIicltodOIn9J
-X-Google-Smtp-Source: AGHT+IGKC9qDTtnoJHTT6+sJNUgDVNv1pEEMgPe1/NsDE14IfEUNPt1mDu4A6PXeEReyt6HChzJp+ngnvYQx0kb9dFg=
-X-Received: by 2002:a05:620a:172b:b0:82a:5c45:c5ef with SMTP id
- af79cd13be357-830fded0290mr545455885a.0.1758193338768; Thu, 18 Sep 2025
- 04:02:18 -0700 (PDT)
+	s=arc-20240116; t=1758193434; c=relaxed/simple;
+	bh=vZ27UZSOdjZFV9ZhpwWDMn+XX4Te/OeGtMFC7KZh1qE=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uPR4uEO5Ne81+sWy1Hw9BWC8JGAhfmTZo/48z8fFWMWyNdFCV8v+1kLyifHqCysYBekkHNGYRPHcNkxCt34UcTMG+/ep2SgOpXzVlBGa+ID5tyOQ8/UwSYxuzQAbogDrR4ntp8OzcjGjTa9MgJpEkLuSSfwd+qxQ5RtTqaIvNUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cSCNr0qR3z6M56b;
+	Thu, 18 Sep 2025 19:01:00 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1E78A140114;
+	Thu, 18 Sep 2025 19:03:50 +0800 (CST)
+Received: from localhost (10.47.69.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 18 Sep
+ 2025 13:03:49 +0200
+Date: Thu, 18 Sep 2025 12:03:48 +0100
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: <alejandro.lucero-palau@amd.com>
+CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v18 04/20] cxl: allow Type2 drivers to map cxl component
+ regs
+Message-ID: <20250918120348.000028a5@huawei.com>
+In-Reply-To: <20250918091746.2034285-5-alejandro.lucero-palau@amd.com>
+References: <20250918091746.2034285-1-alejandro.lucero-palau@amd.com>
+	<20250918091746.2034285-5-alejandro.lucero-palau@amd.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250917000954.859376-1-daniel.zahka@gmail.com>
- <175819262850.2365733.8295832390159298825.git-patchwork-notify@kernel.org> <CANn89i+ZdBDEV6TE=Nw5gn9ycTzWw4mZOpPuCswgwEsrgOyNnw@mail.gmail.com>
-In-Reply-To: <CANn89i+ZdBDEV6TE=Nw5gn9ycTzWw4mZOpPuCswgwEsrgOyNnw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 18 Sep 2025 04:02:07 -0700
-X-Gm-Features: AS18NWDWxaAiYTEwrnyw4t1w4-Wz6R3anmvrufYxwAbA1zCcdXnmW7MFNdlDLoA
-Message-ID: <CANn89iJ5+y2PzyMzvRnEqTBW8NgBVDCHA6C7O7VB-pPwqZQS=g@mail.gmail.com>
-Subject: Re: [PATCH net-next v13 00/19] add basic PSP encryption for TCP connections
-To: patchwork-bot+netdevbpf@kernel.org
-Cc: Daniel Zahka <daniel.zahka@gmail.com>, donald.hunter@gmail.com, kuba@kernel.org, 
-	davem@davemloft.net, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, 
-	andrew+netdev@lunn.ch, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, 
-	borisp@nvidia.com, kuniyu@google.com, willemb@google.com, dsahern@kernel.org, 
-	ncardwell@google.com, phaddad@nvidia.com, raeds@nvidia.com, 
-	jianbol@nvidia.com, dtatulea@nvidia.com, rrameshbabu@nvidia.com, 
-	sdf@fomichev.me, toke@redhat.com, aleksander.lobakin@intel.com, 
-	kiran.kella@broadcom.com, jacob.e.keller@intel.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Thu, Sep 18, 2025 at 4:00=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Thu, Sep 18, 2025 at 3:50=E2=80=AFAM <patchwork-bot+netdevbpf@kernel.o=
-rg> wrote:
-> >
-> > Hello:
-> >
-> > This series was applied to netdev/net-next.git (main)
-> > by Paolo Abeni <pabeni@redhat.com>:
-> >
-> > On Tue, 16 Sep 2025 17:09:27 -0700 you wrote:
-> > > This is v13 of the PSP RFC [1] posted by Jakub Kicinski one year
-> > > ago. General developments since v1 include a fork of packetdrill [2]
-> > > with support for PSP added, as well as some test cases, and an
-> > > implementation of PSP key exchange and connection upgrade [3]
-> > > integrated into the fbthrift RPC library. Both [2] and [3] have been
-> > > tested on server platforms with PSP-capable CX7 NICs. Below is the
-> > > cover letter from the original RFC:
-> > >
-> > > [...]
-> >
-> > Here is the summary with links:
-> >   - [net-next,v13,01/19] psp: add documentation
-> >     https://git.kernel.org/netdev/net-next/c/a9266275fd7b
-> >   - [net-next,v13,02/19] psp: base PSP device support
-> >     https://git.kernel.org/netdev/net-next/c/00c94ca2b99e
-> >   - [net-next,v13,03/19] net: modify core data structures for PSP datap=
-ath support
-> >     https://git.kernel.org/netdev/net-next/c/ed8a507b7483
-> >   - [net-next,v13,04/19] tcp: add datapath logic for PSP with inline ke=
-y exchange
-> >     https://git.kernel.org/netdev/net-next/c/659a2899a57d
-> >   - [net-next,v13,05/19] psp: add op for rotation of device key
-> >     https://git.kernel.org/netdev/net-next/c/117f02a49b77
-> >   - [net-next,v13,06/19] net: move sk_validate_xmit_skb() to net/core/d=
-ev.c
-> >     https://git.kernel.org/netdev/net-next/c/8c511c1df380
-> >   - [net-next,v13,07/19] net: tcp: allow tcp_timewait_sock to validate =
-skbs before handing to device
-> >     https://git.kernel.org/netdev/net-next/c/0917bb139eed
-> >   - [net-next,v13,08/19] net: psp: add socket security association code
-> >     https://git.kernel.org/netdev/net-next/c/6b46ca260e22
-> >   - [net-next,v13,09/19] net: psp: update the TCP MSS to reflect PSP pa=
-cket overhead
-> >     https://git.kernel.org/netdev/net-next/c/e97269257fe4
-> >   - [net-next,v13,10/19] psp: track generations of device key
-> >     https://git.kernel.org/netdev/net-next/c/e78851058b35
-> >   - [net-next,v13,11/19] net/mlx5e: Support PSP offload functionality
-> >     https://git.kernel.org/netdev/net-next/c/89ee2d92f66c
-> >   - [net-next,v13,12/19] net/mlx5e: Implement PSP operations .assoc_add=
- and .assoc_del
-> >     https://git.kernel.org/netdev/net-next/c/af2196f49480
-> >   - [net-next,v13,13/19] psp: provide encapsulation helper for drivers
-> >     https://git.kernel.org/netdev/net-next/c/fc724515741a
-> >   - [net-next,v13,14/19] net/mlx5e: Implement PSP Tx data path
-> >     https://git.kernel.org/netdev/net-next/c/e5a1861a298e
-> >   - [net-next,v13,15/19] net/mlx5e: Add PSP steering in local NIC RX
-> >     https://git.kernel.org/netdev/net-next/c/9536fbe10c9d
-> >   - [net-next,v13,16/19] net/mlx5e: Configure PSP Rx flow steering rule=
-s
-> >     https://git.kernel.org/netdev/net-next/c/2b6e450bfde7
-> >   - [net-next,v13,17/19] psp: provide decapsulation and receive helper =
-for drivers
-> >     https://git.kernel.org/netdev/net-next/c/0eddb8023cee
-> >   - [net-next,v13,18/19] net/mlx5e: Add Rx data path offload
-> >     https://git.kernel.org/netdev/net-next/c/29d7f433fcec
-> >   - [net-next,v13,19/19] net/mlx5e: Implement PSP key_rotate operation
-> >     https://git.kernel.org/netdev/net-next/c/411d9d33c8a2
-> >
-> > You are awesome, thank you!
-> > --
-> > Deet-doot-dot, I am a bot.
-> > https://korg.docs.kernel.org/patchwork/pwbot.html
->
-> I just saw a name conflict on psp_dev_destroy(), not sure why it was
-> not caught earlier.
->
-> drivers/crypto/ccp/psp-dev.c:294:void psp_dev_destroy(struct sp_device *s=
-p)
-> drivers/crypto/ccp/sp-dev.c:210:                psp_dev_destroy(sp);
-> drivers/crypto/ccp/sp-dev.h:175:void psp_dev_destroy(struct sp_device *sp=
-);
-> drivers/crypto/ccp/sp-dev.h:182:static inline void
-> psp_dev_destroy(struct sp_device *sp) { }
-> net/psp/psp.h:16:void psp_dev_destroy(struct psp_dev *psd);
-> net/psp/psp.h:45:               psp_dev_destroy(psd);
-> net/psp/psp_main.c:102:void psp_dev_destroy(struct psp_dev *psd)
-> net/psp/psp_main.c:125: /* Wait until psp_dev_destroy() to call
-> xa_erase() to prevent a
+On Thu, 18 Sep 2025 10:17:30 +0100
+alejandro.lucero-palau@amd.com wrote:
 
-Indeed :
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> Export cxl core functions for a Type2 driver being able to discover and
+> map the device component registers.
+> 
+> Use it in sfc driver cxl initialization.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-ld: net/psp/psp_main.o: in function `psp_dev_destroy':
-git/net-next/net/psp/psp_main.c:103: multiple definition of
-`psp_dev_destroy';
-drivers/crypto/ccp/psp-dev.o:git/net-next/drivers/crypto/ccp/psp-dev.c:295:
-first defined here
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+> index 56d148318636..cdfbe546d8d8 100644
+> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> @@ -5,6 +5,7 @@
+>   * Copyright (C) 2025, Advanced Micro Devices, Inc.
+>   */
+>  
+> +#include <cxl/cxl.h>
+>  #include <cxl/pci.h>
+>  #include <linux/pci.h>
+>  
+> @@ -19,6 +20,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  	struct pci_dev *pci_dev = efx->pci_dev;
+>  	struct efx_cxl *cxl;
+>  	u16 dvsec;
+> +	int rc;
+>  
+>  	probe_data->cxl_pio_initialised = false;
+>  
+> @@ -45,6 +47,37 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  	if (!cxl)
+>  		return -ENOMEM;
+>  
+> +	rc = cxl_pci_setup_regs(pci_dev, CXL_REGLOC_RBI_COMPONENT,
+> +				&cxl->cxlds.reg_map);
+> +	if (rc) {
+> +		dev_err(&pci_dev->dev, "No component registers (err=%d)\n", rc);
+> +		return rc;
+> +	}
+> +
+> +	if (!cxl->cxlds.reg_map.component_map.hdm_decoder.valid) {
+> +		dev_err(&pci_dev->dev, "Expected HDM component register not found\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	if (!cxl->cxlds.reg_map.component_map.ras.valid)
+> +		return dev_err_probe(&pci_dev->dev, -ENODEV,
+> +				     "Expected RAS component register not found\n");
+
+Why the mix of dev_err() and dev_err_probe()?
+I'd prefer dev_err_probe() for all these, but we definitely don't
+want a mix.
+
+> +
+> +	rc = cxl_map_component_regs(&cxl->cxlds.reg_map,
+> +				    &cxl->cxlds.regs.component,
+> +				    BIT(CXL_CM_CAP_CAP_ID_RAS));
+> +	if (rc) {
+> +		dev_err(&pci_dev->dev, "Failed to map RAS capability.\n");
+> +		return rc;
+> +	}
+> +
+> +	/*
+> +	 * Set media ready explicitly as there are neither mailbox for checking
+> +	 * this state nor the CXL register involved, both not mandatory for
+> +	 * type2.
+> +	 */
+> +	cxl->cxlds.media_ready = true;
+> +
+>  	probe_data->cxl = cxl;
+>  
+>  	return 0;
+> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+> index 13d448686189..3b9c8cb187a3 100644
+> --- a/include/cxl/cxl.h
+> +++ b/include/cxl/cxl.h
+
+> +/**
+> + * cxl_map_component_regs - map cxl component registers
+> + *
+
+Why 2 blank lines?
+
+> + *
+> + * @map: cxl register map to update with the mappings
+> + * @regs: cxl component registers to work with
+> + * @map_mask: cxl component regs to map
+> + *
+> + * Returns integer: success (0) or error (-ENOMEM)
+> + *
+> + * Made public for Type2 driver support.
+> + */
+> +int cxl_map_component_regs(const struct cxl_register_map *map,
+> +			   struct cxl_component_regs *regs,
+> +			   unsigned long map_mask);
+>  #endif /* __CXL_CXL_H__ */
+		       struct cxl_register_map *map);
+
 
