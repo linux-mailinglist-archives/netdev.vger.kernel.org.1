@@ -1,286 +1,263 @@
-Return-Path: <netdev+bounces-224217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48B73B825EF
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 02:29:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7851B8265D
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 02:41:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFB971C21048
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 00:29:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68B48587A9E
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 00:41:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C07751A23AC;
-	Thu, 18 Sep 2025 00:29:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3CF11DE8BF;
+	Thu, 18 Sep 2025 00:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oazycJrL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eGCTo23z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D211922FD
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 00:29:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFAC4315A
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 00:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758155346; cv=none; b=Vwpv8YC5qgFKt4GiAVUePYbIn2/kCGLFYElRCdFzMhIVf4PRD6xaisja9yXuPtAKFN70MS00LJyBLF8gbVmcYNRLz/sCQpGj8B8aQu0/jlUkPeXEbCny2Z0Wwu/L0S+PKNlI3lmW77gMLIIrBLk48OzGv/DiBfAysQTTHdl4MxM=
+	t=1758156110; cv=none; b=Q2j9r3A9BNTi6z3qaJteMEhpkO5s4Py5yy2M1Kfh4FI7g44ZOSln9txsqU1YNbV8KLEesySh62yWs+uK4SIe3BqeDLfYUKM+uHyaAGDR69rXssyyEQyCPfMIalJ4MovFXwyx7wpiHEcXi0+/Sm5u45y4Ek072v+e/laf1iaJb4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758155346; c=relaxed/simple;
-	bh=iKVleLXPMdTEUOCAdPUfZCXVuL2WYzcult73kEnoxlA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a4cZtkqNwDCUu9XwqytQPulYsoc5fYhrqipvpHH4x83cfEVbLxb46bWq46FL5FRC8ClALHHjWbvXU4IlIR675j5abqoFVtcPNPyu6qVGmnKk5797bU/4gdir4IyGuYFO/GdwHEN7klrgafhNGz7coMWfWEvZ9VNV4VOBIPNsbp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oazycJrL; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-560885b40e2so4436e87.0
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 17:29:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758155343; x=1758760143; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=otTjDvMKcuz7B7FSDzuZ9ONktzk3szEQfjJL8I6CUh4=;
-        b=oazycJrLdu7PleYCqBHgRrl2FEBJDQSaRuGEVusN0ifIvtpj9p4draGM+tOo5p93p1
-         gEEJolDSGsAlyAVS3tP7qgKpgecPRgfUqfFnJfT+NzlWPaphslu1ejHmq+shhQopo3N5
-         v6mpotg55exuAVWr7YliLXQdpPmmfKdA0tvZmJPt2GVHA/Kiv7WGvKyzzxG01+MchUlN
-         gSe5CZdYDp8Zo0Xn8dfoKH65u4nfkzR1/FIa4PdmEkuBp5qALhOdwaSApKmIxRqxsAip
-         zjPtJ2aNTuMWi0kSox6PBVOTHOqUciAkDTlELWBqXhXWeCcDBb+TDIv33jRLR7LYTAaj
-         BnHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758155343; x=1758760143;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=otTjDvMKcuz7B7FSDzuZ9ONktzk3szEQfjJL8I6CUh4=;
-        b=mAAMLDTuW3+SMRAmM4fafszBbLkYFEmp3trORe9fCeIyE9cCCOOcY1cgwltD7BAnqh
-         U++0un9E4GHINJoaG8+5hIzKtdP4RuaITvHz+zivrSzNfLi+SJG4oqm6Iw/15gYMdikV
-         E2Q3dFwOGrRg/98VYO6PxZAAtTDTLNrRVcWrGMciC33G0j88de0O8610PHIMvdwq3vOW
-         gRC7zoIbTVSlQBS6I5ORoQRy9/5/emYmYdZNcOp1C9rK5sag2oPbZCIhyCP6twKCAnMf
-         cwpKq3i7z5bcBeA5TeCAU3uvT9TNdIz4AEWLvHroh15pvO6wlBMkn7oeYuhnO0BgpfNI
-         OiCg==
-X-Forwarded-Encrypted: i=1; AJvYcCWNZengYIg4ey5IoEVTSy8auJutInZRNWodspDcLe/rNbaQVxZoeVCrs4ika265Rso1tJ+LEUM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9QtchRSiyLhgRrMZlbN6SkD1gQnaBO69eAwPZ4F3zIPVIJlnX
-	1YednNe9ysLBbw73Elrirwu4tSnhmjn8EHbzWJdJ1QYckiHJ0zqwxl6LGATuzZJS7kyV3CxktY3
-	WGS9xtlGceNEjRXWwVfgc+3N0D4JnZKNylcpscxHe
-X-Gm-Gg: ASbGncut+5BYaHdultUvt1nwWu067ZxIYIRaSaUI7AYop0O5LOOBCjiM0sBjkkql/rr
-	uFLxI4h//ha06eYusriYZzgju0d4Q0h2HSISboiMdYph4AhMNvx+EC2ZJ/JSRNRPI3kMOac9Xzc
-	wMgLkkz4N6Qgfv7D0hy36NdQ9odTbWDRAREd9F7lsuI7for4bA9cfca3z3V075GtqR8FYxuVQKO
-	mRXy90BO20b8KnZ7zYZMmQMPdhowHKlcMM9meGPuL0nxRDahZTU5EywSKZ1uNk=
-X-Google-Smtp-Source: AGHT+IHBOQjrzCEaZsycseI/wvvGjPucCWK4u9AySoDeQE47ePlR8NeAKnDsZf2mX/C9kzOariJXaqbjhJoYXdHQF1g=
-X-Received: by 2002:a05:6512:2086:b0:55f:6aa7:c20 with SMTP id
- 2adb3069b0e04-577502fde9dmr430214e87.2.1758155342586; Wed, 17 Sep 2025
- 17:29:02 -0700 (PDT)
+	s=arc-20240116; t=1758156110; c=relaxed/simple;
+	bh=SKSm9QwVf25v16NYpqpomgrgFTSL2lDCp6R788YSyvA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PiWuT8t5uoYVMXIdnNK0fRku+NhtL/87+O9CmLxrpf8Rw8mBoHOpembttTfbdSkSlACDgYgeUxEBZ7hhz3E5lq8w/0NZr2jgycNAWjr1IQRutv1wG6FSI88Du3KqDRq+HS6khh0VP9XyNDtkYeHrR77pOHeGIKClocONhnvRUCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eGCTo23z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88EECC4CEE7;
+	Thu, 18 Sep 2025 00:41:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758156110;
+	bh=SKSm9QwVf25v16NYpqpomgrgFTSL2lDCp6R788YSyvA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eGCTo23z7YO+rA5ArYwaSo0h15bg18cZQqLPiT7cmDbu+0H1i0+mFQom1njtbw64P
+	 fKou2oiV8rjChCTsXuQ/U3NPOFlGKUXpYHJbSk60cpvuT5IKx6adsTCCF+Pb4iVDoa
+	 mCBaN9Z4k7aIrwoJBrihRM1c1Eug8EuAA2fg+5dY3ueuclkmOyH83clLoqU2LP30Ii
+	 y+ul7ckvE+kNsbhV5jYV8bZSnLcLn1mX+Dj6AQygeEmakgKx6XHPVYwdXe/aRYL1Ib
+	 RwqyuyMsYoSJ1npsOycgqK6LJdMMroMuifgeddpR/NKgmF+4ZYakjn3Njcive+SY/V
+	 mDFjIBnDqF6dQ==
+Date: Wed, 17 Sep 2025 17:41:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Andrew Lunn <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org, Donald
+ Hunter <donald.hunter@gmail.com>, Carolina Jubran <cjubran@nvidia.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/4] ethtool: add FEC bins histogram report
+Message-ID: <20250917174148.0c909f92@kernel.org>
+In-Reply-To: <20250916191257.13343-2-vadim.fedorenko@linux.dev>
+References: <20250916191257.13343-1-vadim.fedorenko@linux.dev>
+	<20250916191257.13343-2-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aMSni79s6vCCVCFO@p100> <87zfawvt2f.fsf@toke.dk>
- <f64372ec-c127-457f-b8e2-0f48223bd147@gmx.de> <CAHS8izMjKub2cPa9Qqiga96XQ7piq3h0Vb_p+9RzNbBXXeGQrw@mail.gmail.com>
- <87y0qerbld.fsf@toke.dk> <CAHS8izOY3aSe96aUQBV76ZRpqj5mXwkPenNvmN6yN0cJmceLUA@mail.gmail.com>
- <87tt11qtl8.fsf@toke.dk>
-In-Reply-To: <87tt11qtl8.fsf@toke.dk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 17 Sep 2025 17:28:49 -0700
-X-Gm-Features: AS18NWDUfv05rf0NZaG4uxGpfp0qugFcIQfECemqL0cSXbjzvnAAJACWkN9nrA8
-Message-ID: <CAHS8izNMHYuRk9w0BUEbXBob38NVkMOVMmvvcq30TstGFpob6A@mail.gmail.com>
-Subject: Re: [PATCH][RESEND][RFC] Fix 32-bit boot failure due inaccurate page_pool_page_is_pp()
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: Helge Deller <deller@gmx.de>, Helge Deller <deller@kernel.org>, 
-	David Hildenbrand <david@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
-	Linux Memory Management List <linux-mm@kvack.org>, netdev@vger.kernel.org, 
-	Linux parisc List <linux-parisc@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 17, 2025 at 3:09=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <t=
-oke@redhat.com> wrote:
->
-> Mina Almasry <almasrymina@google.com> writes:
->
-> > On Tue, Sep 16, 2025 at 2:27=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgense=
-n <toke@redhat.com> wrote:
-> >>
-> >> Mina Almasry <almasrymina@google.com> writes:
-> >>
-> >> > On Mon, Sep 15, 2025 at 6:08=E2=80=AFAM Helge Deller <deller@gmx.de>=
- wrote:
-> >> >>
-> >> >> On 9/15/25 13:44, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> >> >> > Helge Deller <deller@kernel.org> writes:
-> >> >> >
-> >> >> >> Commit ee62ce7a1d90 ("page_pool: Track DMA-mapped pages and unma=
-p them when
-> >> >> >> destroying the pool") changed PP_MAGIC_MASK from 0xFFFFFFFC to 0=
-xc000007c on
-> >> >> >> 32-bit platforms.
-> >> >> >>
-> >> >> >> The function page_pool_page_is_pp() uses PP_MAGIC_MASK to identi=
-fy page pool
-> >> >> >> pages, but the remaining bits are not sufficient to unambiguousl=
-y identify
-> >> >> >> such pages any longer.
-> >> >> >
-> >> >> > Why not? What values end up in pp_magic that are mistaken for the
-> >> >> > pp_signature?
-> >> >>
-> >> >> As I wrote, PP_MAGIC_MASK changed from 0xFFFFFFFC to 0xc000007c.
-> >> >> And we have PP_SIGNATURE =3D=3D 0x40  (since POISON_POINTER_DELTA i=
-s zero on 32-bit platforms).
-> >> >> That means, that before page_pool_page_is_pp() could clearly identi=
-fy such pages,
-> >> >> as the (value & 0xFFFFFFFC) =3D=3D 0x40.
-> >> >> So, basically only the 0x40 value indicated a PP page.
-> >> >>
-> >> >> Now with the mask a whole bunch of pointers suddenly qualify as bei=
-ng a pp page,
-> >> >> just showing a few examples:
-> >> >> 0x01111040
-> >> >> 0x082330C0
-> >> >> 0x03264040
-> >> >> 0x0ad686c0 ....
-> >> >>
-> >> >> For me it crashes immediately at bootup when memblocked pages are h=
-anded
-> >> >> over to become normal pages.
-> >> >>
-> >> >
-> >> > I tried to take a look to double check here and AFAICT Helge is corr=
-ect.
-> >> >
-> >> > Before the breaking patch with PP_MAGIC_MASK=3D=3D0xFFFFFFFC, basica=
-lly
-> >> > 0x40 is the only pointer that may be mistaken as a valid pp_magic.
-> >> > AFAICT each bit we 0 in the PP_MAGIC_MASK (aside from the 3 least
-> >> > significant bits), doubles the number of pointers that can be mistak=
-en
-> >> > for pp_magic. So with 0xFFFFFFFC, only one value (0x40) can be
-> >> > mistaken as a valid pp_magic, with  0xc000007c AFAICT 2^22 values ca=
-n
-> >> > be mistaken as pp_magic?
-> >> >
-> >> > I don't know that there is any bits we can take away from
-> >> > PP_MAGIC_MASK I think? As each bit doubles the probablity :(
-> >> >
-> >> > I would usually say we can check the 3 least significant bits to tel=
-l
-> >> > if pp_magic is a pointer or not, but pp_magic is unioned with
-> >> > page->lru I believe which will use those bits.
-> >>
-> >> So if the pointers stored in the same field can be any arbitrary value=
-,
-> >> you are quite right, there is no safe value. The critical assumption i=
-n
-> >> the bit stuffing scheme is that the pointers stored in the field will
-> >> always be above PAGE_OFFSET, and that PAGE_OFFSET has one (or both) of
-> >> the two top-most bits set (that is what the VMSPLIT reference in the
-> >> comment above the PP_DMA_INDEX_SHIFT definition is alluding to).
-> >>
-> >
-> > I see... but where does the 'PAGE_OFFSET has one (or both) of the two
-> > top-most bits set)' assumption come from? Is it from this code?
->
-> Well, from me grepping through the code and trying to make sense of all
-> the different cases of the preprocessor and config directives across
-> architectures. Seems I did not quite succeed :/
->
-> > /*
-> >  * PAGE_OFFSET -- the first address of the first page of memory.
-> >  * When not using MMU this corresponds to the first free page in
-> >  * physical memory (aligned on a page boundary).
-> >  */
-> > #ifdef CONFIG_MMU
-> > #ifdef CONFIG_64BIT
-> > ....
-> > #else
-> > #define PAGE_OFFSET _AC(0xc0000000, UL)
-> > #endif /* CONFIG_64BIT */
-> > #else
-> > #define PAGE_OFFSET ((unsigned long)phys_ram_base)
-> > #endif /* CONFIG_MMU */
-> >
-> > It looks like with !CONFIG_MMU we use phys_ram_base and I'm unable to
-> > confirm that all the values of this have the first 2 bits set. I
-> > wonder if his setup is !CONFIG_MMU indeed.
->
-> Right, that's certainly one thing I missed. As was the parisc arch
-> thing, as Helge followed up with. Ugh :/
->
-> > It also looks like pp_magic is also union'd with __folio_index in
-> > struct page, and it looks like the data there is sometimes used as a
-> > pointer and sometimes not.
->
-> Not according to my pahole:
->
-> [...]
->                         union {
->                                 long unsigned int __folio_index; /*    32=
-     8 */
-> [...]
->         struct {
->                         long unsigned int pp_magic;      /*     8     8 *=
-/
->
-> So I think we're good with this, no?
->
-> So given the above, we could do something equivalent to this, I think?
->
-> diff --git i/include/linux/mm.h w/include/linux/mm.h
-> index 1ae97a0b8ec7..615aaa19c60c 100644
-> --- i/include/linux/mm.h
-> +++ w/include/linux/mm.h
-> @@ -4175,8 +4175,12 @@ int arch_lock_shadow_stack_status(struct task_stru=
-ct *t, unsigned long status);
->   */
->  #define PP_DMA_INDEX_BITS MIN(32, __ffs(POISON_POINTER_DELTA) - PP_DMA_I=
-NDEX_SHIFT)
->  #else
-> +#if PAGE_OFFSET > PP_SIGNATURE
->  /* Always leave out the topmost two; see above. */
-> -#define PP_DMA_INDEX_BITS MIN(32, BITS_PER_LONG - PP_DMA_INDEX_SHIFT - 2=
-)
-> +#define PP_DMA_INDEX_BITS MIN(32, __fls(PAGE_OFFSET) - PP_DMA_INDEX_SHIF=
-T - 1)
+On Tue, 16 Sep 2025 19:12:54 +0000 Vadim Fedorenko wrote:
+> IEEE 802.3ck-2022 defines counters for FEC bins and 802.3df-2024
+> clarifies it a bit further. Implement reporting interface through as
+> addition to FEC stats available in ethtool.
+> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+> index 7a7594713f1f..de5008266884 100644
+> --- a/Documentation/netlink/specs/ethtool.yaml
+> +++ b/Documentation/netlink/specs/ethtool.yaml
+> @@ -1219,6 +1219,23 @@ attribute-sets:
+>          name: udp-ports
+>          type: nest
+>          nested-attributes: tunnel-udp
+> +  -
+> +    name: fec-hist
+> +    attr-cnt-name: __ethtool-a-fec-hist-cnt
 
-Shouldn't have this been:
+s/__/--/
 
-#define PP_DMA_INDEX_BITS MIN(32, __ffs(PAGE_OFFSET) - PP_DMA_INDEX_SHIFT)
+> +    attributes:
+> +      -
+> +        name: bin-low
+> +        type: u32
+> +      -
+> +        name: bin-high
+> +        type: u32
 
-I.e. you're trying to use the space between the least significant bit
-set in PAGE_OFFSET and the most significant bit set in PP_SIGNATURE.
-Hmm. I'm not sure I understand this, I may be reading wrong.
+We should add some doc: strings here so that the important info like
+which one is inclusive is rendered right in the API reference
 
-> +#else
-> +#define PP_DMA_INDEX_BITS 0
-> +#endif /* PAGE_OFFSET > PP_SIGNATURE */
->  #endif
->
->  #define PP_DMA_INDEX_MASK GENMASK(PP_DMA_INDEX_BITS +  PP_DMA_INDEX_SHIF=
-T - 1, \
->
->
-> Except that it won't work in this form as-is because PAGE_OFFSET is not
-> always a constant (see the #define PAGE_OFFSET ((unsigned
-> long)phys_ram_base) that your quoted above), so we'll have to turn it
-> into an inline function or something.
->
-> I'm not sure adding this extra complexity is really worth it, or if we
-> should just go with the '#define PP_DMA_INDEX_BITS 0' when
-> POISON_POINTER_DELTA is unset and leave it at that for the temporary
-> workaround. WDYT?
->
+> +      -
+> +        name: bin-val
+> +        type: uint
+> +      -
+> +        name: bin-val-per-lane
+> +        type: binary
 
-I think this would work. It still wouldn't handle cases where the data
-in pp_magic ends up used as a non-pointer at all or a pointer to some
-static variable in the code like `.mp_ops =3D &dmabuf_devmem_ops,`
-right? Because these were never allocated from memory so are unrelated
-to PAGE_OFFSET.
+probably good to doc this too
 
-But I guess things like that would have been a problem with the old
-code anwyway, so should be of no concern?
+> +        sub-type: u64
+>    -
+>      name: fec-stat
+>      attr-cnt-name: __ethtool-a-fec-stat-cnt
+> @@ -1242,6 +1259,11 @@ attribute-sets:
+>          name: corr-bits
+>          type: binary
+>          sub-type: u64
+> +      -
+> +        name: hist
+> +        type: nest
+> +        multi-attr: True
+> +        nested-attributes: fec-hist
+>    -
+>      name: fec
+>      attr-cnt-name: __ethtool-a-fec-cnt
+> diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+> index ab20c644af24..b270886c5f5d 100644
+> --- a/Documentation/networking/ethtool-netlink.rst
+> +++ b/Documentation/networking/ethtool-netlink.rst
+> @@ -1541,6 +1541,11 @@ Drivers fill in the statistics in the following structure:
+>  .. kernel-doc:: include/linux/ethtool.h
+>      :identifiers: ethtool_fec_stats
+>  
+> +Statistics may have FEC bins histogram attribute ``ETHTOOL_A_FEC_STAT_HIST``
+> +as defined in IEEE 802.3ck-2022 and 802.3df-2024. Nested attributes will have
+> +the range of FEC errors in the bin (inclusive) and the amount of error events
+> +in the bin.
 
---=20
-Thanks,
-Mina
+Does this sound better?
+
+  Optional ``ETHTOOL_A_FEC_STAT_HIST`` attributes form a FEC error
+  histogram, as defined in IEEE 802.3ck-2022 and 802.3df-2024
+  (histogram of number of errors within a single FEC block). 
+  Each ``ETHTOOL_A_FEC_STAT_HIST`` entry contains error count
+  (optionally also broken down by SerDes lane) as well as metadata
+  about the bin. Bin range (low, high) is inclusive.
+
+>  static void
+> -nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats *fec_stats)
+> +nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats *fec_stats,
+> +		   struct ethtool_fec_hist *hist)
+>  {
+> +	struct ethtool_fec_hist_value *values = hist->values;
+> +
+> +	hist->ranges = netdevsim_fec_ranges;
+> +
+>  	fec_stats->corrected_blocks.total = 123;
+>  	fec_stats->uncorrectable_blocks.total = 4;
+> +
+> +	values[0].bin_value = 445;
+
+Bin 0 had per lane breakdown, can't core add up the lanes for the
+driver?
+
+> +	values[1].bin_value = 12;
+> +	values[2].bin_value = 2;
+> +	values[0].bin_value_per_lane[0] = 125;
+> +	values[0].bin_value_per_lane[1] = 120;
+> +	values[0].bin_value_per_lane[2] = 100;
+> +	values[0].bin_value_per_lane[3] = 100;
+>  }
+
+> +/**
+> + * struct ethtool_fec_hist_range - error bits range for FEC bins histogram
+
+Don't say "FEC bin histogram" I think the word histogram implies that
+the data is bin'ed up.
+
+> + * statistics
+> + * @low: low bound of the bin (inclusive)
+> + * @high: high bound of the bin (inclusive)
+> + */
+
+> @@ -113,7 +114,11 @@ static int fec_prepare_data(const struct ethnl_req_info *req_base,
+>  		struct ethtool_fec_stats stats;
+>  
+>  		ethtool_stats_init((u64 *)&stats, sizeof(stats) / 8);
+> -		dev->ethtool_ops->get_fec_stats(dev, &stats);
+> +		ethtool_stats_init((u64 *)data->fec_stat_hist.values,
+> +				   ETHTOOL_FEC_HIST_MAX *
+> +				   sizeof(struct ethtool_fec_hist_value) / 8);
+
+sizeof(data->fec_stat_hist.values) / 8
+
+would save you the multiplication?
+
+> +		dev->ethtool_ops->get_fec_stats(dev, &stats,
+> +						&data->fec_stat_hist);
+>  
+>  		fec_stats_recalc(&data->corr, &stats.corrected_blocks);
+>  		fec_stats_recalc(&data->uncorr, &stats.uncorrectable_blocks);
+
+> +static int fec_put_hist(struct sk_buff *skb, const struct ethtool_fec_hist *hist)
+
+over 80 chars, please wrap (checkpatch --max-line-length=80)
+
+> +{
+> +	const struct ethtool_fec_hist_range *ranges = hist->ranges;
+> +	const struct ethtool_fec_hist_value *values = hist->values;
+> +	struct nlattr *nest;
+> +	int i, j;
+> +
+> +	if (!ranges)
+> +		return 0;
+> +
+> +	for (i = 0; i < ETHTOOL_FEC_HIST_MAX; i++) {
+> +		if (i && !ranges[i].low && !ranges[i].high)
+
+low and high should probably be unsigned now
+
+> +			break;
+> +
+> +		if (WARN_ON_ONCE(values[i].bin_value == ETHTOOL_STAT_NOT_SET))
+> +			break;
+> +
+> +		nest = nla_nest_start(skb, ETHTOOL_A_FEC_STAT_HIST);
+> +		if (!nest)
+> +			return -EMSGSIZE;
+> +
+> +		if (nla_put_u32(skb, ETHTOOL_A_FEC_HIST_BIN_LOW,
+> +				ranges[i].low) ||
+> +		    nla_put_u32(skb, ETHTOOL_A_FEC_HIST_BIN_HIGH,
+> +				ranges[i].high) ||
+> +		    nla_put_uint(skb, ETHTOOL_A_FEC_HIST_BIN_VAL,
+> +				 values[i].bin_value))
+> +			goto err_cancel_hist;
+> +		for (j = 0; j < ETHTOOL_MAX_LANES; j++) {
+> +			if (values[i].bin_value_per_lane[j] == ETHTOOL_STAT_NOT_SET)
+
+You know, bin_value could be 'sum', and bin_value_per_lane could be
+simply 'per_lane'.
+
+> +				break;
+> +		}
+
+{} brackets unnecessary
+
+> +		if (j && nla_put_64bit(skb, ETHTOOL_A_FEC_HIST_BIN_VAL_PER_LANE,
+> +				       sizeof(u64) * j,
+> +				       values[i].bin_value_per_lane,
+> +				       ETHTOOL_A_FEC_STAT_PAD))
+> +			goto err_cancel_hist;
+> +
+> +		nla_nest_end(skb, nest);
+> +	}
+> +
+> +	return 0;
+> +
+> +err_cancel_hist:
+> +	nla_nest_cancel(skb, nest);
+> +	return -EMSGSIZE;
+> +}
+
+We need a selftest. Add a case to stats.py and do basic sanity checking
+on what the kernel spits out? Maybe 2 test cases - one for overall and
+one for per-lane, cause mlx5 doesn't have per lane and we'd like the
+test to pass there.
 
