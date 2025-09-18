@@ -1,106 +1,77 @@
-Return-Path: <netdev+bounces-224598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A6C5B86AB7
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 21:25:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F223B86B29
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 21:34:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8DD15668E6
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 19:25:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE26C7C6C86
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 19:34:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BD302D3EF5;
-	Thu, 18 Sep 2025 19:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6532D640A;
+	Thu, 18 Sep 2025 19:34:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gx2B8PRz"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sZoliRZB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205F7291C1F
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 19:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4546326B74A
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 19:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758223544; cv=none; b=QPbhA6MIDtO79OAOmtpCAXNb8rhFneW0JfE3BM7bsrWvB2TP/HXm+sXOPFA0Sa6tJIoctlkfOPhntWb5LTrcoAEmLhDVjTQtEdx4xCDlu+n8cdMqhFgGYYm/1Fh2WNyLBMChai1kYSij2InoP3e0rciTl9vNdhrnJOdEm0LITaY=
+	t=1758224053; cv=none; b=BglyWlQn7L5vwcrTTDoLICgMa/QysgjKDBX6K63+dtj7AWB68p/WHxN/hjb6zd3KA7vDMFTtbHdjrmC64SJYS56aWo/3w23KzT1LCR955xr+5gNarJOKM5lCm5XfBT+Bx9DhVnp4sDa2htYsSner0nIIjtG2fRuNqCqL3/ZD2es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758223544; c=relaxed/simple;
-	bh=x7bf+1ts/ziZ+5YJ23geD4Z3AhU/qaxLpTGasxWhr6w=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=dAhTpbKL2d0akIJsFB+8QGWwHzuDIxNYE90PeK+anJhJkuWkQ70l5kSG/CWDs0ouNYQD4Ei2DZWLRpyb7dVo6U2EtVsthylZoPxuDyYI6LkTI+Wvo2wTVJSCF6h82u3rYAJLNl/rT5WhTBqWet7DrXYa7zSY4SKCm/hPzRnWWcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gx2B8PRz; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32ee4998c4aso1230366a91.1
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 12:25:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758223542; x=1758828342; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MAVB4a9j47f42XzXNjUiGhx9jwX/Qdw9E8LR/fZNG74=;
-        b=Gx2B8PRzYCIklaiDZWsHAnmUJNeJe5S8xPMuBFUwfBu17t3dzHOHtFDoa5pXWebXxg
-         TWMAXGbUMsny7jNMPm2SA3q5S7Hc0r+KmmPmPA65febp+w8NXdHi9FQSIAQ2prdpsi+c
-         bnPq62HUexfOeGAN9E51UfqaT6HFg16wLQd/GZErxRWduxyqpeS0kdi6uUpn8dGPOaI+
-         qDT4eIqYfcXIsYj0R3BphEaTv2n4NV/ec/AoE2Kv/2w3Pc5YutPMLyvWza7ej5hy7l5j
-         I9owqeRBC+pRvYKp1OO07rJuZhDM5/j4M1OfoP9Vyf3waaZWwnrCNFNZF/kLVpyhj78U
-         eaGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758223542; x=1758828342;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MAVB4a9j47f42XzXNjUiGhx9jwX/Qdw9E8LR/fZNG74=;
-        b=NspjqHECMDJDMUPLBAUKATdzMe1kCTSrtrplb2q6OiO4AaVz5vgn0piWAMtID0OJeQ
-         E8R5S4QKL1hosVgM6c68CvwEC9uMsQ9MZ3kDDK4LOsdfRW62QC6QepDbEb9LfsZcor9U
-         UdCFzdwD3P78zWAa04JnQ9d2cKKW6fv6sELeoExd0l5SBgG4XdsyurOGFM7KcjDQbM+Y
-         KaI5cQw4TrDccEoClSv3W+mvhZ8dwFHp2ayLZXFEdPtqsLY7bfcjlgaI7PDxSddlqGi+
-         MMV6UhRJeQvSDNfdG03GCnX2om2pJgKS2ZFM97AOoCsn8lyzvBTbPL/kz/oPAMhhRTHR
-         oe5w==
-X-Forwarded-Encrypted: i=1; AJvYcCVC5oOSoE9ZSD/30sF13IekdUCHnS8Yx7J4+Jxgyz/0q1kLxphg2o1FUHlrx+eAr4EMkJZnNLw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXsjnvZAPnu6/kK1XcRDlqLBrayj+ULsiS+UO1rM7Cru28v9z1
-	1S+9gd5a7CUCnFxwkZKvctv4HqkLglt3VdnNyP0evUmNauJ5QBNLAz1Po/ekWIF9MvowRZy140I
-	sbeSHUg==
-X-Google-Smtp-Source: AGHT+IElXdvd5v50K8W97DLSHukOitZRlAYQZqGf74AKv/O6f4TEJiBmu9KzBMiB5KsTWqZBs3DK5PDO8/A=
-X-Received: from pjbsd12.prod.google.com ([2002:a17:90b:514c:b0:32e:b34b:92eb])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3f48:b0:32e:2059:ee88
- with SMTP id 98e67ed59e1d1-33097fd0ec5mr694422a91.6.1758223542300; Thu, 18
- Sep 2025 12:25:42 -0700 (PDT)
-Date: Thu, 18 Sep 2025 19:25:35 +0000
+	s=arc-20240116; t=1758224053; c=relaxed/simple;
+	bh=GdlgwqMGHAkqFM4s3sgrWCC1UZEL1jLlf1IDKSom7/Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=McZSToBQ+C0PLtVonF3ql+nKR56xnJu1fZmx9ENFySXrkcDRfav8QRDL6n6AcbxDKJkVJ0eESWxeCbScGSeoiAFL0hMnGahCggs0TA/qPvv29MwH6XbgIia0Yy8cE3sQVfEAk+1rhMUmHqPupxv9OWjH1sQKWybI9zdkFzOExBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sZoliRZB; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=+blSQ3udHbrBwj5PqMH0rUrFZg2Jh4P15llci0SunOo=; b=sZoliRZBx4GSzmRtzekulSFA2/
+	3zIc3FUGV29wpZv9lz0vKM0A94ik1o4EkWpFt/s0vTYdt0Gj+IJwGQZ51Ab+kqifs83Rq40PLi2gf
+	Sk8lHJVliyxu9MNOd4G6kWjJyru2/YL5vntuWnu1m3QxOV4L/XFU1uvyOzoZJ0f9YvuI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uzKOM-008s1D-Hb; Thu, 18 Sep 2025 21:34:06 +0200
+Date: Thu, 18 Sep 2025 21:34:06 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	hkallweit1@gmail.com, linux@armlinux.org.uk,
+	richardcochran@gmail.com
+Subject: Re: [PATCH net-next] net: phy: micrel: use %pe in print format
+Message-ID: <47644026-ef7c-490e-be85-07a4063c846b@lunn.ch>
+References: <20250918183119.2396019-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250918192539.1587586-1-kuniyu@google.com>
-Subject: [PATCH v1 net-next] psp: Fix typo in kdoc for struct psp_dev_caps.assoc_drv_spc.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Daniel Zahka <daniel.zahka@gmail.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250918183119.2396019-1-kuba@kernel.org>
 
-assoc_drv_spc is the size of psp_assoc.drv_data[].
+On Thu, Sep 18, 2025 at 11:31:19AM -0700, Jakub Kicinski wrote:
+> New cocci check complains:
+> 
+>   drivers/net/phy/micrel.c:4308:6-13: WARNING: Consider using %pe to print PTR_ERR()
+>   drivers/net/phy/micrel.c:5742:6-13: WARNING: Consider using %pe to print PTR_ERR()
+> 
+> Link: https://lore.kernel.org/1758192227-701925-1-git-send-email-tariqt@nvidia.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- include/net/psp/types.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-diff --git a/include/net/psp/types.h b/include/net/psp/types.h
-index d9688e66cf09..31cee64b7c86 100644
---- a/include/net/psp/types.h
-+++ b/include/net/psp/types.h
-@@ -98,7 +98,7 @@ struct psp_dev_caps {
- 
- 	/**
- 	 * @assoc_drv_spc: size of driver-specific state in Tx assoc
--	 * Determines the size of struct psp_assoc::drv_spc
-+	 * Determines the size of struct psp_assoc::drv_data
- 	 */
- 	u32 assoc_drv_spc;
- };
--- 
-2.51.0.470.ga7dc726c21-goog
-
+    Andrew
 
