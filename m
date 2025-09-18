@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-224636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4A06B87449
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 00:40:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2749B87455
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 00:41:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 233783B17A6
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 22:40:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBF371CC2545
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 22:40:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE07431D376;
-	Thu, 18 Sep 2025 22:39:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB9B308F1C;
+	Thu, 18 Sep 2025 22:39:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HC7idQOU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R+KJJGoB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE2E2BEC42
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 22:39:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 102EF31CA74
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 22:39:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758235165; cv=none; b=JFkl37xaMu4IcOaZmLYJW5mNpgNhvVLJI0VzHTI9wjx65o/SDD28qNcTjfhIyPtQIMLDvt0vn5xmq/5s7cXftXTxdfhfpZdu7ez4vxW3OISV8AOZt5vmx1naAs9wCIGXuik9AgRpY9bfDg70zkunEevlrgO3MjmkV8QlO7DPjnw=
+	t=1758235168; cv=none; b=QLIWcFMccIWlMj+3tyzxS6INwG+nI1pxQNpiyjTDVFFa+vnNMxaTGuJ8bISa2ar0dh+DnbQndeOQL53EKypfgVLRYH0G1W5VjGdk6Awt8SF++9H/+nVZNOV1PkXXby44d49W06cVfO7xtLTTrmpLxknBaavS8EULIojVZWTrLws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758235165; c=relaxed/simple;
-	bh=QXD+Z3oagFhgZdrxIjODIwU+9GQQ7VKHwCKIIg3M0L8=;
+	s=arc-20240116; t=1758235168; c=relaxed/simple;
+	bh=rehLpC1LZo+kOqNc5IMSDlllIO6wxnt9LmURFVVFhK0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u7i42b0Svjd7SPBXTp2exFoHLjj04SK/ccqyXfODHuAYs18vqWjpkemfnncL+Fe2AMpMyayNm9k552IkBZtTDgv99R1AJEJLVuO0L6/YnMcClpICRWyhV9AqqboTi+aDkn5DJgCJqHGAl2NLtwOT2v/zWADvU0yVgf6NiAYApaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HC7idQOU; arc=none smtp.client-ip=209.85.160.177
+	 MIME-Version; b=dcV763PmwR41puYvy0EsT2jUzeSaYTNFohcr2vP/hsJWLLkTGC6MBNSufzeSICvKROcaUN5swmvAqrbXSENLiPhJjOt6mGxvURU3p/bhBSk6I3LDmdPF3/7A3Su5dc3ViqEB4pFLj/I/kyykDGUVESAJkAEm6ifUxpAZ9YZpzZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R+KJJGoB; arc=none smtp.client-ip=209.85.160.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4b79773a389so15425601cf.1
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:39:22 -0700 (PDT)
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4b7a8c428c3so11679181cf.0
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:39:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758235162; x=1758839962; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758235163; x=1758839963; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1fTolllx6dzE4NoDPhgw0evF3wnfTfqKUFIra9tsOyg=;
-        b=HC7idQOUOtEUhREH8WxlCGQkzq6xXqK+aFTm/kyrCXjBlQASnFsS59bCfO8iS74hk1
-         s141DK1uDGlqV5Oo9We4FughWDpSqKaBJPARNr7dnWukBmPecm02LUA6exb2dzZOmSjd
-         P8hUpBmvw2Eh9nDcUG7B7FEIVCFT7M0I/chM7T8Cpc2LREVYd/WBw64WPSPUVlkJMy08
-         9P7IwUNVMNSeXCsa7I9JAzdSO9KhFUBRk1sAZPht5FCDUEyIPuMiXWZq7vw585kvQcqt
-         /1vdzYB90w6M6syy/NtCNJjhcPVhdtV8oGO5Xs5oRsDbjQ5octrYoC9ZGX7T+dTPYg9q
-         /zpQ==
+        bh=Tl9GaDg4cHNsEiY19tlgGQjbUJsOL/JYFaCl6O1rVu4=;
+        b=R+KJJGoB3hZgPxjkM14/+SAjq7ZSVHVg44/9GykVkEWDe4S3fl8TzGCm41ul1T+9BB
+         /GrBg3CwmWoPaE2fhR0gkQ0Iv25BRQjtn+Mfw/VscU/ECWlp2PaHs00SQhW0DIzkQaUY
+         XhYNGM5V4o+5TaGXDaU2WqQfdIiZCpKgC88kP89goMiyS5w67xwuO3PBR8X3WxyGSGQ7
+         OYhBuDUI9SCmf1y8MiqwgtMXrVjlCy/P8FAvKMxfazrX6CwjuI6wB5XozLh+86gLMoFa
+         QpNLuq4B52YYCabgIoJrC5JiHqosQhFooQTy8+4aV+OHp5lOOK8lfANlsTofFEaw7++y
+         P7Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758235162; x=1758839962;
+        d=1e100.net; s=20230601; t=1758235163; x=1758839963;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1fTolllx6dzE4NoDPhgw0evF3wnfTfqKUFIra9tsOyg=;
-        b=Y+i3RGsvCxczunx9vQrJ4Qk3m86P7N+1uQRBJ1A3aVSkneGmBn1ySYKKehV7i1b36o
-         PF+OEVB/GSA31E3EIh1JUA422fh30iXfcMuUGhudh14XruUnDuWeVacsvuHRL/9ZzoVR
-         Acaq6foYaqi2M+W5hN/K7FeCcRTX+RQ0tHnUlY922KWuHr+NuLQ1BINJmNedB3jr42au
-         iI2twCpckux25lkWsCGkClIYAaOyehPkZ1332u3stPDLztUyrQt+XK4Zb/eNhBTiyLqM
-         g5LHmnLiieBZt2dBsP+2+Lz6OVN16MDJCNLrSfyg/8gzhvpTfidLPsVSzsHdNpPBz/Nw
-         G7aA==
-X-Gm-Message-State: AOJu0Yz+KYSAzMl5yznvucSYDbh777z3tH4VnZm+Kmjsvxx3+DiqPbdF
-	mpHxtmatEu0GU4b/3qD+ypr+ZXGX3hK1ttfvXJ7c0MpZmjyvBi/xiG4KIZUGD/ky0uQ=
-X-Gm-Gg: ASbGncsQEUemLEIuT677gkeoYzaxreD0lWVQBMb41dS0e2QYOu0iRX/yHQYy/KkrJ0j
-	Wj9CyhVv4uDnLn4x1hiR8e2yqS0cPmj+UYLclgfMMrJHhaX/zH/I645IP+r4fV0LVXOF2kGlp9b
-	6YSmbMRDYnuDndtPNlrU46txpuPuIxTvW31FNJXCqQUjYJmqoWfNUr2WqrRDQUXse3qmlVqj6Et
-	wlUilEeypKJzDWwF+wKQ+khhlS8xMiTIM5BHiR4eji2zhZQYMoRbac1DkL1Djw7aJE0x572zyM+
-	10nA86MSXDyoyTDmNqejfLLhZOR5ejzQgknzZQc7cJBX1qTDSMzgyo2PjollTd2Xd3QmJTI2Xmt
-	RJUjGN8RPKTbwhCiiKwrg9ec9jghjMl67U4dAjITkfw10Otpe9jQvUU9I9wi8fPXsUCPEXVKX+s
-	vp1syC1rqkGK9wXTGB
-X-Google-Smtp-Source: AGHT+IF3JA0bM79V1Y2bkheswqJozEqF0UvHtiPJHwUbtRg51abEfCjHpnTSVzKTJPwtuNf3FCROQw==
-X-Received: by 2002:a05:622a:429a:b0:4b7:9ce0:43c4 with SMTP id d75a77b69052e-4c06d962df5mr11431941cf.5.1758235161408;
-        Thu, 18 Sep 2025 15:39:21 -0700 (PDT)
+        bh=Tl9GaDg4cHNsEiY19tlgGQjbUJsOL/JYFaCl6O1rVu4=;
+        b=U/aG3UcsHTkpWQTBxx8ezyVsMsEvXeSQN3ceGSQRfkHsIzdiJNanxGiH7yITdgnSil
+         mOTJgr5mJ+BBsuuRXlNaBLva40j2c85vWVcCj9Cizk/DlhIKLRl/jw96dDTE9w/T9lSJ
+         hwft5f5y6rTApTevEJlThsqgqeWCYNNqHezaklfbivS0Y+Pu9/ENi9pagf1OWnkvmuGk
+         jhkYXqnfX78bF9p8VVuBQ+r5qKs9PYJyvAzLxCnLKxvDxd2UCKf+E+BmvKFDslSe1WT0
+         4LtfyYCLKhzpPm3lqbB5jcZcva/OivuuZQvf/qCh8kBIwEhWTaz6AJxW7gCIs9/E8oIp
+         7HBQ==
+X-Gm-Message-State: AOJu0YyyEKc9AfHOuxL4Xu8hScd9wIYqtdHlIbC+knnZSkolkJ4PTKg8
+	QCYEg300wrerUfuMxWWlIFqpqiFD+mNsZ0qhpfxCL+oqJSb5Myoc4OqmbjKVFXBLMd4=
+X-Gm-Gg: ASbGncvBz5U/NKu3lbrLgHV7+IvaZ24dg/FSba7NPM8mhJxD+VWhlAArSgHTGMcHEaj
+	+bpy/Rk7vj+rfA9Rcvsqlp4l6nV4LfrSVHLYiT/KbzjPBBXgXU2WI3lFCK3PB8eLeUNeaH3iuT8
+	O8Emj7OzdFyh7ldJ5l/6WVqVASAOR2gNMrPCIhKHNQ3DYab97Iob7tb6x8s3Y0fsNcib5YHMT9w
+	k3M9qvtD3cx8IdfNXR6sBOlyKLEYUiMmqUDOfF+mOzOQINBM8SdBvwRO93h5PZ02MbO/Wl6dOdw
+	9McoIDyHdC0a+MXgibNn6pXb3p7JV/1+4D0W6j0ajaOrij4T6p+AIWz87C/BkKhNfm+PqlT/LQd
+	w2IT7ftBl2UJ5VIJqIuaSBjRb+KcJ8sVNAkso6UMnHkn8dL8QRFHcgKZrYO0Hluke32PnSQO0h2
+	tzDldDCA==
+X-Google-Smtp-Source: AGHT+IFeqlTPlyW6le13CXpaItcY1EksIeIzEYUogDn1OjwFShzMS+0HTjaczucqYabKqIAYHhKRgw==
+X-Received: by 2002:a05:622a:1f0e:b0:4b4:94e7:7307 with SMTP id d75a77b69052e-4c072956690mr11708551cf.66.1758235163267;
+        Thu, 18 Sep 2025 15:39:23 -0700 (PDT)
 Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-83630481fc7sm244631185a.43.2025.09.18.15.39.20
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-83630481fc7sm244631185a.43.2025.09.18.15.39.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Sep 2025 15:39:20 -0700 (PDT)
+        Thu, 18 Sep 2025 15:39:22 -0700 (PDT)
 From: Xin Long <lucien.xin@gmail.com>
 To: network dev <netdev@vger.kernel.org>,
 	quic@lists.linux.dev
@@ -108,9 +108,9 @@ Cc: davem@davemloft.net,
 	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
 	Daniel Stenberg <daniel@haxx.se>,
 	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: [PATCH net-next v3 10/15] quic: add packet number space
-Date: Thu, 18 Sep 2025 18:34:59 -0400
-Message-ID: <6ef9850aec24138444cbb8c1fe53eacbdea2f757.1758234904.git.lucien.xin@gmail.com>
+Subject: [PATCH net-next v3 11/15] quic: add crypto key derivation and installation
+Date: Thu, 18 Sep 2025 18:35:00 -0400
+Message-ID: <c466d240d66b31da54a755eea02d62c9feb1f895.1758234904.git.lucien.xin@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <cover.1758234904.git.lucien.xin@gmail.com>
 References: <cover.1758234904.git.lucien.xin@gmail.com>
@@ -122,61 +122,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch introduces 'quic_pnspace', which manages per packet number
-space members.
+This patch introduces 'quic_crypto', a component responsible for QUIC
+encryption key derivation and installation across the various key
+levels: Initial, Handshake, 0-RTT (Early), and 1-RTT (Application).
 
-It maintains the next packet number to assign, tracks the total length of
-frames currently in flight, and records the time when the next packet may
-be considered lost. It also keeps track of the largest acknowledged packet
-number, the time it was acknowledged, and when the most recent ack
-eliciting packet was sent. These fields are useful for loss detection,
-RTT estimation, and congestion control.
+It provides helpers to derive and install initial secrets, set traffic
+secrets and install the corresponding keys, and perform key updates to
+enable forward secrecy. Additionally, it implements stateless reset
+token generation, used to support connection reset without state.
 
-To support ACK frame generation, quic_pnspace includes a packet number
-acknowledgment map (pn_ack_map) that tracks received packet numbers.
-Supporting functions are provided to validate and mark received packet
-numbers and compute the number of gap blocks needed during ACK frame
-construction.
+- quic_crypto_initial_keys_install(): Derive and install initial keys.
 
-- quic_pnspace_check(): Validates a received packet number.
+- quic_crypto_set_cipher(): Allocate all transforms based on the cipher
+  type provided.
 
-- quic_pnspace_mark(): Marks a received packet number in the ACK map.
+- quic_crypto_set_secret(): Set the traffic secret and install derived
+  keys.
 
-- quic_pnspace_num_gabs(): Returns the gap ACK blocks for constructing
-  ACK frames.
+- quic_crypto_key_update(): Rekey and install new keys to the !phase
+  side.
 
-Note QUIC uses separate packet number spaces for each encryption level
-(APP, INITIAL, HANDSHAKE, EARLY) except EARLY and all generations of
-APP keys use the same packet number space, as describe in
-rfc9002#section-4.1.
+- quic_crypto_generate_stateless_reset_token(): Generate token for
+  stateless reset.
 
+These mechanisms are essential for establishing and maintaining secure
+communication throughout the QUIC connection lifecycle.
+
+Signed-off-by: Pengtao He <hepengtao@xiaomi.com>
+Signed-off-by: Moritz Buhl <mbuhl@openbsd.org>
 Signed-off-by: Xin Long <lucien.xin@gmail.com>
 ---
- net/quic/Makefile  |   2 +-
- net/quic/pnspace.c | 224 +++++++++++++++++++++++++++++++++++++++++++++
- net/quic/pnspace.h | 150 ++++++++++++++++++++++++++++++
- net/quic/socket.c  |  12 +++
- net/quic/socket.h  |   7 ++
- 5 files changed, 394 insertions(+), 1 deletion(-)
- create mode 100644 net/quic/pnspace.c
- create mode 100644 net/quic/pnspace.h
+v3:
+  - Remove lock from quic_net, since Initial packet decryption for ALPN
+    will be handled serially in a workqueue when ALPN demux is enabled.
+---
+ net/quic/Makefile   |   2 +-
+ net/quic/crypto.c   | 542 ++++++++++++++++++++++++++++++++++++++++++++
+ net/quic/crypto.h   |  73 ++++++
+ net/quic/protocol.c |  11 +
+ net/quic/protocol.h |   1 +
+ net/quic/socket.c   |   2 +
+ net/quic/socket.h   |   7 +
+ 7 files changed, 637 insertions(+), 1 deletion(-)
+ create mode 100644 net/quic/crypto.c
+ create mode 100644 net/quic/crypto.h
 
 diff --git a/net/quic/Makefile b/net/quic/Makefile
-index 4d4a42c6d565..9d8e18297911 100644
+index 9d8e18297911..58bb18f7926d 100644
 --- a/net/quic/Makefile
 +++ b/net/quic/Makefile
 @@ -6,4 +6,4 @@
  obj-$(CONFIG_IP_QUIC) += quic.o
  
  quic-y := common.o family.o protocol.o socket.o stream.o connid.o path.o \
--	  cong.o
-+	  cong.o pnspace.o
-diff --git a/net/quic/pnspace.c b/net/quic/pnspace.c
+-	  cong.o pnspace.o
++	  cong.o pnspace.o crypto.o
+diff --git a/net/quic/crypto.c b/net/quic/crypto.c
 new file mode 100644
-index 000000000000..3f61b0bc6fc6
+index 000000000000..860e3dfd4a28
 --- /dev/null
-+++ b/net/quic/pnspace.c
-@@ -0,0 +1,224 @@
++++ b/net/quic/crypto.c
+@@ -0,0 +1,542 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/* QUIC kernel implementation
 + * (C) Copyright Red Hat Corp. 2023
@@ -189,224 +195,542 @@ index 000000000000..3f61b0bc6fc6
 + *    Xin Long <lucien.xin@gmail.com>
 + */
 +
-+#include <linux/slab.h>
++#include <crypto/skcipher.h>
++#include <linux/skbuff.h>
++#include <crypto/aead.h>
++#include <crypto/hkdf.h>
++#include <linux/quic.h>
++#include <net/tls.h>
 +
-+#include "pnspace.h"
++#include "common.h"
++#include "crypto.h"
 +
-+int quic_pnspace_init(struct quic_pnspace *space)
++#define QUIC_RANDOM_DATA_LEN	32
++
++static u8 quic_random_data[QUIC_RANDOM_DATA_LEN] __read_mostly;
++
++/* HKDF-Extract. */
++static int quic_crypto_hkdf_extract(struct crypto_shash *tfm, struct quic_data *srt,
++				    struct quic_data *hash, struct quic_data *key)
 +{
-+	if (!space->pn_map) {
-+		space->pn_map = kzalloc(BITS_TO_BYTES(QUIC_PN_MAP_INITIAL), GFP_KERNEL);
-+		if (!space->pn_map)
-+			return -ENOMEM;
-+		space->pn_map_len = QUIC_PN_MAP_INITIAL;
++	return hkdf_extract(tfm, hash->data, hash->len, srt->data, srt->len, key->data);
++}
++
++#define QUIC_MAX_INFO_LEN	256
++
++/* HKDF-Expand-Label. */
++static int quic_crypto_hkdf_expand(struct crypto_shash *tfm, struct quic_data *srt,
++				   struct quic_data *label, struct quic_data *hash,
++				   struct quic_data *key)
++{
++	u8 info[QUIC_MAX_INFO_LEN], *p = info;
++	u8 LABEL[] = "tls13 ";
++	u32 infolen;
++	int err;
++
++	/* rfc8446#section-7.1:
++	 *
++	 *  HKDF-Expand-Label(Secret, Label, Context, Length) =
++	 *       HKDF-Expand(Secret, HkdfLabel, Length)
++	 *
++	 *  Where HkdfLabel is specified as:
++	 *
++	 *  struct {
++	 *      uint16 length = Length;
++	 *      opaque label<7..255> = "tls13 " + Label;
++	 *      opaque context<0..255> = Context;
++	 *  } HkdfLabel;
++	 */
++	*p++ = (u8)(key->len / QUIC_MAX_INFO_LEN);
++	*p++ = (u8)(key->len % QUIC_MAX_INFO_LEN);
++	*p++ = (u8)(sizeof(LABEL) - 1 + label->len);
++	p = quic_put_data(p, LABEL, sizeof(LABEL) - 1);
++	p = quic_put_data(p, label->data, label->len);
++	if (hash) {
++		*p++ = (u8)hash->len;
++		p = quic_put_data(p, hash->data, hash->len);
 +	} else {
-+		bitmap_zero(space->pn_map, space->pn_map_len);
++		*p++ = 0;
 +	}
++	infolen = (u32)(p - info);
 +
-+	space->max_time_limit = QUIC_PNSPACE_TIME_LIMIT;
-+	space->next_pn = QUIC_PNSPACE_NEXT_PN;
-+	space->base_pn = -1;
-+	return 0;
++	err = crypto_shash_setkey(tfm, srt->data, srt->len);
++	if (err)
++		return err;
++
++	return hkdf_expand(tfm, info, infolen, key->data, key->len);
 +}
 +
-+void quic_pnspace_free(struct quic_pnspace *space)
-+{
-+	space->pn_map_len = 0;
-+	kfree(space->pn_map);
-+}
++#define KEY_LABEL_V1		"quic key"
++#define IV_LABEL_V1		"quic iv"
++#define HP_KEY_LABEL_V1		"quic hp"
 +
-+/* Expand the bitmap tracking received packet numbers.  Ensures the pn_map bitmap can
-+ * cover at least @size packet numbers.  Allocates a larger bitmap, copies existing
-+ * data, and updates metadata.
++#define KU_LABEL_V1		"quic ku"
++
++/* rfc9369#section-3.3.2:
 + *
-+ * Returns: 1 if the bitmap was successfully grown, 0 on failure or if the requested
-+ * size exceeds QUIC_PN_MAP_SIZE.
++ * The labels used in rfc9001 to derive packet protection keys, header protection keys, Retry
++ * Integrity Tag keys, and key updates change from "quic key" to "quicv2 key", from "quic iv"
++ * to "quicv2 iv", from "quic hp" to "quicv2 hp", and from "quic ku" to "quicv2 ku".
 + */
-+static int quic_pnspace_grow(struct quic_pnspace *space, u16 size)
++#define KEY_LABEL_V2		"quicv2 key"
++#define IV_LABEL_V2		"quicv2 iv"
++#define HP_KEY_LABEL_V2		"quicv2 hp"
++
++#define KU_LABEL_V2		"quicv2 ku"
++
++/* Packet Protection Keys. */
++static int quic_crypto_keys_derive(struct crypto_shash *tfm, struct quic_data *s,
++				   struct quic_data *k, struct quic_data *i,
++				   struct quic_data *hp_k, u32 version)
 +{
-+	u16 len, inc, offset;
-+	unsigned long *new;
++	struct quic_data hp_k_l = {HP_KEY_LABEL_V1, strlen(HP_KEY_LABEL_V1)};
++	struct quic_data k_l = {KEY_LABEL_V1, strlen(KEY_LABEL_V1)};
++	struct quic_data i_l = {IV_LABEL_V1, strlen(IV_LABEL_V1)};
++	struct quic_data z = {};
++	int err;
 +
-+	if (size > QUIC_PN_MAP_SIZE)
-+		return 0;
-+
-+	inc = ALIGN((size - space->pn_map_len), BITS_PER_LONG) + QUIC_PN_MAP_INCREMENT;
-+	len = (u16)min(space->pn_map_len + inc, QUIC_PN_MAP_SIZE);
-+
-+	new = kzalloc(BITS_TO_BYTES(len), GFP_ATOMIC);
-+	if (!new)
-+		return 0;
-+
-+	offset = (u16)(space->max_pn_seen + 1 - space->base_pn);
-+	bitmap_copy(new, space->pn_map, offset);
-+	kfree(space->pn_map);
-+	space->pn_map = new;
-+	space->pn_map_len = len;
-+
-+	return 1;
-+}
-+
-+/* Check if a packet number has been received.
-+ *
-+ * Returns: 0 if the packet number has not been received.  1 if it has already
-+ * been received.  -1 if the packet number is too old or too far in the future
-+ * to track.
-+ */
-+int quic_pnspace_check(struct quic_pnspace *space, s64 pn)
-+{
-+	if (space->base_pn == -1) /* No any packet number received yet. */
-+		return 0;
-+
-+	if (pn < space->min_pn_seen || pn >= space->base_pn + QUIC_PN_MAP_SIZE)
-+		return -1;
-+
-+	if (pn < space->base_pn || (pn - space->base_pn < space->pn_map_len &&
-+				    test_bit(pn - space->base_pn, space->pn_map)))
-+		return 1;
-+
-+	return 0;
-+}
-+
-+/* Advance base_pn past contiguous received packet numbers.  Finds the next gap
-+ * (unreceived packet) beyond @pn, shifts the bitmap, and updates base_pn
-+ * accordingly.
-+ */
-+static void quic_pnspace_move(struct quic_pnspace *space, s64 pn)
-+{
-+	u16 offset;
-+
-+	offset = (u16)(pn + 1 - space->base_pn);
-+	offset = (u16)find_next_zero_bit(space->pn_map, space->pn_map_len, offset);
-+	space->base_pn += offset;
-+	bitmap_shift_right(space->pn_map, space->pn_map, offset, space->pn_map_len);
-+}
-+
-+/* Mark a packet number as received. Updates the packet number map to record
-+ * reception of @pn.  Advances base_pn if possible, and updates max/min/last seen
-+ * fields as needed.
-+ *
-+ * Returns: 0 on success or if the packet was already marked.  -ENOMEM if bitmap
-+ * allocation failed during growth.
-+ */
-+int quic_pnspace_mark(struct quic_pnspace *space, s64 pn)
-+{
-+	s64 last_max_pn_seen;
-+	u16 gap;
-+
-+	if (space->base_pn == -1) {
-+		/* Initialize base_pn based on the peer's first packet number since peer's
-+		 * packet numbers may start at a non-zero value.
-+		 */
-+		quic_pnspace_set_base_pn(space, pn + 1);
-+		return 0;
-+	}
-+
-+	/* Ignore packets with number less than current base (already processed). */
-+	if (pn < space->base_pn)
-+		return 0;
-+
-+	/* If gap is beyond current map length, try to grow the bitmap to accommodate. */
-+	gap = (u16)(pn - space->base_pn);
-+	if (gap >= space->pn_map_len && !quic_pnspace_grow(space, gap + 1))
-+		return -ENOMEM;
-+
-+	if (space->max_pn_seen < pn) {
-+		space->max_pn_seen = pn;
-+		space->max_pn_time = space->time;
-+	}
-+
-+	if (space->base_pn == pn) { /* If packet is exactly at base_pn (next expected packet). */
-+		if (quic_pnspace_has_gap(space)) /* Advance base_pn to next unacked packet. */
-+			quic_pnspace_move(space, pn);
-+		else /* Fast path: increment base_pn if no gaps. */
-+			space->base_pn++;
-+	} else { /* Mark this packet as received in the bitmap. */
-+		set_bit(gap, space->pn_map);
-+	}
-+
-+	/* Only update min and last_max_pn_seen if this packet is the current max_pn. */
-+	if (space->max_pn_seen != pn)
-+		return 0;
-+
-+	/* Check if enough time has elapsed or enough packets have been received to
-+	 * update tracking.
++	/* rfc9001#section-5.1:
++	 *
++	 * The current encryption level secret and the label "quic key" are input to the
++	 * KDF to produce the AEAD key; the label "quic iv" is used to derive the
++	 * Initialization Vector (IV). The header protection key uses the "quic hp" label.
++	 * Using these labels provides key separation between QUIC and TLS.
 +	 */
-+	last_max_pn_seen = min_t(s64, space->last_max_pn_seen, space->base_pn);
-+	if (space->max_pn_time < space->last_max_pn_time + space->max_time_limit &&
-+	    space->max_pn_seen <= last_max_pn_seen + QUIC_PN_MAP_LIMIT)
++	if (version == QUIC_VERSION_V2) {
++		quic_data(&hp_k_l, HP_KEY_LABEL_V2, strlen(HP_KEY_LABEL_V2));
++		quic_data(&k_l, KEY_LABEL_V2, strlen(KEY_LABEL_V2));
++		quic_data(&i_l, IV_LABEL_V2, strlen(IV_LABEL_V2));
++	}
++
++	err = quic_crypto_hkdf_expand(tfm, s, &k_l, &z, k);
++	if (err)
++		return err;
++	err = quic_crypto_hkdf_expand(tfm, s, &i_l, &z, i);
++	if (err)
++		return err;
++	/* Don't change hp key for key update. */
++	if (!hp_k)
 +		return 0;
 +
-+	/* Advance base_pn if last_max_pn_seen is ahead of current base_pn. This is
-+	 * needed because QUIC doesn't retransmit packets; retransmitted frames are
-+	 * carried in new packets, so we move forward.
-+	 */
-+	if (space->last_max_pn_seen + 1 > space->base_pn)
-+		quic_pnspace_move(space, space->last_max_pn_seen);
++	return quic_crypto_hkdf_expand(tfm, s, &hp_k_l, &z, hp_k);
++}
 +
-+	space->min_pn_seen = space->last_max_pn_seen;
-+	space->last_max_pn_seen = space->max_pn_seen;
-+	space->last_max_pn_time = space->max_pn_time;
++/* Derive and install transmission (TX) packet protection keys for the current key phase.
++ * This involves generating AEAD encryption key, IV, and optionally header protection key.
++ */
++static int quic_crypto_tx_keys_derive_and_install(struct quic_crypto *crypto)
++{
++	struct quic_data srt = {}, k, iv, hp_k = {}, *hp = NULL;
++	u8 tx_key[QUIC_KEY_LEN], tx_hp_key[QUIC_KEY_LEN];
++	int err, phase = crypto->key_phase;
++	u32 keylen, ivlen = QUIC_IV_LEN;
++
++	keylen = crypto->cipher->keylen;
++	quic_data(&srt, crypto->tx_secret, crypto->cipher->secretlen);
++	quic_data(&k, tx_key, keylen);
++	quic_data(&iv, crypto->tx_iv[phase], ivlen);
++	/* Only derive header protection key when not in key update. */
++	if (!crypto->key_pending)
++		hp = quic_data(&hp_k, tx_hp_key, keylen);
++	err = quic_crypto_keys_derive(crypto->secret_tfm, &srt, &k, &iv, hp, crypto->version);
++	if (err)
++		return err;
++	err = crypto_aead_setauthsize(crypto->tx_tfm[phase], QUIC_TAG_LEN);
++	if (err)
++		return err;
++	err = crypto_aead_setkey(crypto->tx_tfm[phase], tx_key, keylen);
++	if (err)
++		return err;
++	if (hp) {
++		err = crypto_skcipher_setkey(crypto->tx_hp_tfm, tx_hp_key, keylen);
++		if (err)
++			return err;
++	}
++	pr_debug("%s: k: %16phN, iv: %12phN, hp_k:%16phN\n", __func__, k.data, iv.data, hp_k.data);
 +	return 0;
 +}
 +
-+/* Find the next gap in received packet numbers. Scans pn_map for a gap starting from
-+ * *@iter. A gap is a contiguous block of unreceived packets between received ones.
-+ *
-+ * Returns: 1 if a gap was found, 0 if no more gaps exist or are relevant.
++/* Derive and install reception (RX) packet protection keys for the current key phase.
++ * This installs AEAD decryption key, IV, and optionally header protection key.
 + */
-+static int quic_pnspace_next_gap_ack(const struct quic_pnspace *space,
-+				     s64 *iter, u16 *start, u16 *end)
++static int quic_crypto_rx_keys_derive_and_install(struct quic_crypto *crypto)
 +{
-+	u16 start_ = 0, end_ = 0, offset = (u16)(*iter - space->base_pn);
++	struct quic_data srt = {}, k, iv, hp_k = {}, *hp = NULL;
++	u8 rx_key[QUIC_KEY_LEN], rx_hp_key[QUIC_KEY_LEN];
++	int err, phase = crypto->key_phase;
++	u32 keylen, ivlen = QUIC_IV_LEN;
 +
-+	start_ = (u16)find_next_zero_bit(space->pn_map, space->pn_map_len, offset);
-+	if (space->max_pn_seen <= space->base_pn + start_)
-+		return 0;
-+
-+	end_ = (u16)find_next_bit(space->pn_map, space->pn_map_len, start_);
-+	if (space->max_pn_seen <= space->base_pn + end_ - 1)
-+		return 0;
-+
-+	*start = start_ + 1;
-+	*end = end_;
-+	*iter = space->base_pn + *end;
-+	return 1;
-+}
-+
-+/* Generate gap acknowledgment blocks (GABs).  GABs describe ranges of unacknowledged
-+ * packets between received ones, and are used in ACK frames.
-+ *
-+ * Returns: Number of generated GABs (up to QUIC_PN_MAX_GABS).
-+ */
-+u16 quic_pnspace_num_gabs(struct quic_pnspace *space, struct quic_gap_ack_block *gabs)
-+{
-+	u16 start, end, ngaps = 0;
-+	s64 iter;
-+
-+	if (!quic_pnspace_has_gap(space))
-+		return 0;
-+
-+	iter = space->base_pn;
-+	/* Loop through all gaps until the end of the window or max allowed gaps. */
-+	while (quic_pnspace_next_gap_ack(space, &iter, &start, &end)) {
-+		gabs[ngaps].start = start;
-+		if (ngaps == QUIC_PN_MAX_GABS - 1) {
-+			gabs[ngaps].end = (u16)(space->max_pn_seen - space->base_pn);
-+			ngaps++;
-+			break;
-+		}
-+		gabs[ngaps].end = end;
-+		ngaps++;
++	keylen = crypto->cipher->keylen;
++	quic_data(&srt, crypto->rx_secret, crypto->cipher->secretlen);
++	quic_data(&k, rx_key, keylen);
++	quic_data(&iv, crypto->rx_iv[phase], ivlen);
++	/* Only derive header protection key when not in key update. */
++	if (!crypto->key_pending)
++		hp = quic_data(&hp_k, rx_hp_key, keylen);
++	err = quic_crypto_keys_derive(crypto->secret_tfm, &srt, &k, &iv, hp, crypto->version);
++	if (err)
++		return err;
++	err = crypto_aead_setauthsize(crypto->rx_tfm[phase], QUIC_TAG_LEN);
++	if (err)
++		return err;
++	err = crypto_aead_setkey(crypto->rx_tfm[phase], rx_key, keylen);
++	if (err)
++		return err;
++	if (hp) {
++		err = crypto_skcipher_setkey(crypto->rx_hp_tfm, rx_hp_key, keylen);
++		if (err)
++			return err;
 +	}
-+	return ngaps;
++	pr_debug("%s: k: %16phN, iv: %12phN, hp_k:%16phN\n", __func__, k.data, iv.data, hp_k.data);
++	return 0;
 +}
-diff --git a/net/quic/pnspace.h b/net/quic/pnspace.h
++
++#define QUIC_CIPHER_MIN TLS_CIPHER_AES_GCM_128
++#define QUIC_CIPHER_MAX TLS_CIPHER_CHACHA20_POLY1305
++
++#define TLS_CIPHER_AES_GCM_128_SECRET_SIZE		32
++#define TLS_CIPHER_AES_GCM_256_SECRET_SIZE		48
++#define TLS_CIPHER_AES_CCM_128_SECRET_SIZE		32
++#define TLS_CIPHER_CHACHA20_POLY1305_SECRET_SIZE	32
++
++#define CIPHER_DESC(type, aead_name, skc_name, sha_name)[type - QUIC_CIPHER_MIN] = { \
++	.secretlen = type ## _SECRET_SIZE, \
++	.keylen = type ## _KEY_SIZE, \
++	.aead = aead_name, \
++	.skc = skc_name, \
++	.shash = sha_name, \
++}
++
++static struct quic_cipher ciphers[QUIC_CIPHER_MAX + 1 - QUIC_CIPHER_MIN] = {
++	CIPHER_DESC(TLS_CIPHER_AES_GCM_128, "gcm(aes)", "ecb(aes)", "hmac(sha256)"),
++	CIPHER_DESC(TLS_CIPHER_AES_GCM_256, "gcm(aes)", "ecb(aes)", "hmac(sha384)"),
++	CIPHER_DESC(TLS_CIPHER_AES_CCM_128, "ccm(aes)", "ecb(aes)", "hmac(sha256)"),
++	CIPHER_DESC(TLS_CIPHER_CHACHA20_POLY1305,
++		    "rfc7539(chacha20,poly1305)", "chacha20", "hmac(sha256)"),
++};
++
++int quic_crypto_set_cipher(struct quic_crypto *crypto, u32 type, u8 flag)
++{
++	struct quic_cipher *cipher;
++	int err = -EINVAL;
++	void *tfm;
++
++	if (type < QUIC_CIPHER_MIN || type > QUIC_CIPHER_MAX)
++		return -EINVAL;
++
++	cipher = &ciphers[type - QUIC_CIPHER_MIN];
++	tfm = crypto_alloc_shash(cipher->shash, 0, 0);
++	if (IS_ERR(tfm))
++		return PTR_ERR(tfm);
++	crypto->secret_tfm = tfm;
++
++	/* Request only synchronous crypto by specifying CRYPTO_ALG_ASYNC.  This
++	 * ensures tag generation does not rely on async callbacks.
++	 */
++	tfm = crypto_alloc_aead(cipher->aead, 0, CRYPTO_ALG_ASYNC);
++	if (IS_ERR(tfm)) {
++		err = PTR_ERR(tfm);
++		goto err;
++	}
++	crypto->tag_tfm = tfm;
++
++	/* Allocate AEAD and HP transform for each RX key phase. */
++	tfm = crypto_alloc_aead(cipher->aead, 0, flag);
++	if (IS_ERR(tfm)) {
++		err = PTR_ERR(tfm);
++		goto err;
++	}
++	crypto->rx_tfm[0] = tfm;
++	tfm = crypto_alloc_aead(cipher->aead, 0, flag);
++	if (IS_ERR(tfm)) {
++		err = PTR_ERR(tfm);
++		goto err;
++	}
++	crypto->rx_tfm[1] = tfm;
++	tfm = crypto_alloc_sync_skcipher(cipher->skc, 0, 0);
++	if (IS_ERR(tfm)) {
++		err = PTR_ERR(tfm);
++		goto err;
++	}
++	crypto->rx_hp_tfm = tfm;
++
++	/* Allocate AEAD and HP transform for each TX key phase. */
++	tfm = crypto_alloc_aead(cipher->aead, 0, flag);
++	if (IS_ERR(tfm)) {
++		err = PTR_ERR(tfm);
++		goto err;
++	}
++	crypto->tx_tfm[0] = tfm;
++	tfm = crypto_alloc_aead(cipher->aead, 0, flag);
++	if (IS_ERR(tfm)) {
++		err = PTR_ERR(tfm);
++		goto err;
++	}
++	crypto->tx_tfm[1] = tfm;
++	tfm = crypto_alloc_sync_skcipher(cipher->skc, 0, 0);
++	if (IS_ERR(tfm)) {
++		err = PTR_ERR(tfm);
++		goto err;
++	}
++	crypto->tx_hp_tfm = tfm;
++
++	crypto->cipher = cipher;
++	crypto->cipher_type = type;
++	return 0;
++err:
++	quic_crypto_free(crypto);
++	return err;
++}
++
++int quic_crypto_set_secret(struct quic_crypto *crypto, struct quic_crypto_secret *srt,
++			   u32 version, u8 flag)
++{
++	int err;
++
++	/* If no cipher has been initialized yet, set it up. */
++	if (!crypto->cipher) {
++		err = quic_crypto_set_cipher(crypto, srt->type, flag);
++		if (err)
++			return err;
++	}
++
++	/* Handle RX path setup. */
++	if (!srt->send) {
++		crypto->version = version;
++		memcpy(crypto->rx_secret, srt->secret, crypto->cipher->secretlen);
++		err = quic_crypto_rx_keys_derive_and_install(crypto);
++		if (err)
++			return err;
++		crypto->recv_ready = 1;
++		return 0;
++	}
++
++	/* Handle TX path setup. */
++	crypto->version = version;
++	memcpy(crypto->tx_secret, srt->secret, crypto->cipher->secretlen);
++	err = quic_crypto_tx_keys_derive_and_install(crypto);
++	if (err)
++		return err;
++	crypto->send_ready = 1;
++	return 0;
++}
++
++int quic_crypto_get_secret(struct quic_crypto *crypto, struct quic_crypto_secret *srt)
++{
++	u8 *secret;
++
++	if (!crypto->cipher)
++		return -EINVAL;
++	srt->type = crypto->cipher_type;
++	secret = srt->send ? crypto->tx_secret : crypto->rx_secret;
++	memcpy(srt->secret, secret, crypto->cipher->secretlen);
++	return 0;
++}
++
++/* Initiating a Key Update. */
++int quic_crypto_key_update(struct quic_crypto *crypto)
++{
++	u8 tx_secret[QUIC_SECRET_LEN], rx_secret[QUIC_SECRET_LEN];
++	struct quic_data l = {KU_LABEL_V1, strlen(KU_LABEL_V1)};
++	struct quic_data z = {}, k, srt;
++	u32 secret_len;
++	int err;
++
++	if (crypto->key_pending || !crypto->recv_ready)
++		return -EINVAL;
++
++	/* rfc9001#section-6.1:
++	 *
++	 * Endpoints maintain separate read and write secrets for packet protection. An
++	 * endpoint initiates a key update by updating its packet protection write secret
++	 * and using that to protect new packets. The endpoint creates a new write secret
++	 * from the existing write secret. This uses the KDF function provided by TLS with
++	 * a label of "quic ku". The corresponding key and IV are created from that
++	 * secret. The header protection key is not updated.
++	 *
++	 * For example,to update write keys with TLS 1.3, HKDF-Expand-Label is used as:
++	 *   secret_<n+1> = HKDF-Expand-Label(secret_<n>, "quic ku",
++	 *                                    "", Hash.length)
++	 */
++	secret_len = crypto->cipher->secretlen;
++	if (crypto->version == QUIC_VERSION_V2)
++		quic_data(&l, KU_LABEL_V2, strlen(KU_LABEL_V2));
++
++	crypto->key_pending = 1;
++	memcpy(tx_secret, crypto->tx_secret, secret_len);
++	memcpy(rx_secret, crypto->rx_secret, secret_len);
++	crypto->key_phase = !crypto->key_phase;
++
++	quic_data(&srt, tx_secret, secret_len);
++	quic_data(&k, crypto->tx_secret, secret_len);
++	err = quic_crypto_hkdf_expand(crypto->secret_tfm, &srt, &l, &z, &k);
++	if (err)
++		goto err;
++	err = quic_crypto_tx_keys_derive_and_install(crypto);
++	if (err)
++		goto err;
++
++	quic_data(&srt, rx_secret, secret_len);
++	quic_data(&k, crypto->rx_secret, secret_len);
++	err = quic_crypto_hkdf_expand(crypto->secret_tfm, &srt, &l, &z, &k);
++	if (err)
++		goto err;
++	err = quic_crypto_rx_keys_derive_and_install(crypto);
++	if (err)
++		goto err;
++	return 0;
++err:
++	crypto->key_pending = 0;
++	memcpy(crypto->tx_secret, tx_secret, secret_len);
++	memcpy(crypto->rx_secret, rx_secret, secret_len);
++	crypto->key_phase = !crypto->key_phase;
++	return err;
++}
++
++void quic_crypto_free(struct quic_crypto *crypto)
++{
++	if (crypto->tag_tfm)
++		crypto_free_aead(crypto->tag_tfm);
++	if (crypto->rx_tfm[0])
++		crypto_free_aead(crypto->rx_tfm[0]);
++	if (crypto->rx_tfm[1])
++		crypto_free_aead(crypto->rx_tfm[1]);
++	if (crypto->tx_tfm[0])
++		crypto_free_aead(crypto->tx_tfm[0]);
++	if (crypto->tx_tfm[1])
++		crypto_free_aead(crypto->tx_tfm[1]);
++	if (crypto->secret_tfm)
++		crypto_free_shash(crypto->secret_tfm);
++	if (crypto->rx_hp_tfm)
++		crypto_free_skcipher(crypto->rx_hp_tfm);
++	if (crypto->tx_hp_tfm)
++		crypto_free_skcipher(crypto->tx_hp_tfm);
++
++	memset(crypto, 0, offsetof(struct quic_crypto, send_offset));
++}
++
++#define QUIC_INITIAL_SALT_V1    \
++	"\x38\x76\x2c\xf7\xf5\x59\x34\xb3\x4d\x17\x9a\xe6\xa4\xc8\x0c\xad\xcc\xbb\x7f\x0a"
++#define QUIC_INITIAL_SALT_V2    \
++	"\x0d\xed\xe3\xde\xf7\x00\xa6\xdb\x81\x93\x81\xbe\x6e\x26\x9d\xcb\xf9\xbd\x2e\xd9"
++
++#define QUIC_INITIAL_SALT_LEN	20
++
++/* Initial Secrets. */
++int quic_crypto_initial_keys_install(struct quic_crypto *crypto, struct quic_conn_id *conn_id,
++				     u32 version, bool is_serv)
++{
++	u8 secret[TLS_CIPHER_AES_GCM_128_SECRET_SIZE];
++	struct quic_data salt, s, k, l, dcid, z = {};
++	struct quic_crypto_secret srt = {};
++	char *tl, *rl, *sal;
++	int err;
++
++	/* rfc9001#section-5.2:
++	 *
++	 * The secret used by clients to construct Initial packets uses the PRK and the
++	 * label "client in" as input to the HKDF-Expand-Label function from TLS [TLS13]
++	 * to produce a 32-byte secret. Packets constructed by the server use the same
++	 * process with the label "server in". The hash function for HKDF when deriving
++	 * initial secrets and keys is SHA-256 [SHA].
++	 *
++	 * This process in pseudocode is:
++	 *
++	 *   initial_salt = 0x38762cf7f55934b34d179ae6a4c80cadccbb7f0a
++	 *   initial_secret = HKDF-Extract(initial_salt,
++	 *                                 client_dst_connection_id)
++	 *
++	 *   client_initial_secret = HKDF-Expand-Label(initial_secret,
++	 *                                             "client in", "",
++	 *                                             Hash.length)
++	 *   server_initial_secret = HKDF-Expand-Label(initial_secret,
++	 *                                             "server in", "",
++	 *                                             Hash.length)
++	 */
++	if (is_serv) {
++		rl = "client in";
++		tl = "server in";
++	} else {
++		tl = "client in";
++		rl = "server in";
++	}
++	sal = QUIC_INITIAL_SALT_V1;
++	if (version == QUIC_VERSION_V2)
++		sal = QUIC_INITIAL_SALT_V2;
++	quic_data(&salt, sal, QUIC_INITIAL_SALT_LEN);
++	quic_data(&dcid, conn_id->data, conn_id->len);
++	quic_data(&s, secret, TLS_CIPHER_AES_GCM_128_SECRET_SIZE);
++	err = quic_crypto_hkdf_extract(crypto->secret_tfm, &salt, &dcid, &s);
++	if (err)
++		return err;
++
++	quic_data(&l, tl, strlen(tl));
++	quic_data(&k, srt.secret, TLS_CIPHER_AES_GCM_128_SECRET_SIZE);
++	srt.type = TLS_CIPHER_AES_GCM_128;
++	srt.send = 1;
++	err = quic_crypto_hkdf_expand(crypto->secret_tfm, &s, &l, &z, &k);
++	if (err)
++		return err;
++	err = quic_crypto_set_secret(crypto, &srt, version, 0);
++	if (err)
++		return err;
++
++	quic_data(&l, rl, strlen(rl));
++	quic_data(&k, srt.secret, TLS_CIPHER_AES_GCM_128_SECRET_SIZE);
++	srt.type = TLS_CIPHER_AES_GCM_128;
++	srt.send = 0;
++	err = quic_crypto_hkdf_expand(crypto->secret_tfm, &s, &l, &z, &k);
++	if (err)
++		return err;
++	return quic_crypto_set_secret(crypto, &srt, version, 0);
++}
++
++/* Generate a derived key using HKDF-Extract and HKDF-Expand with a given label. */
++static int quic_crypto_generate_key(struct quic_crypto *crypto, void *data, u32 len,
++				    char *label, u8 *token, u32 key_len)
++{
++	struct crypto_shash *tfm = crypto->secret_tfm;
++	u8 secret[TLS_CIPHER_AES_GCM_128_SECRET_SIZE];
++	struct quic_data salt, s, l, k, z = {};
++	int err;
++
++	quic_data(&salt, data, len);
++	quic_data(&k, quic_random_data, QUIC_RANDOM_DATA_LEN);
++	quic_data(&s, secret, TLS_CIPHER_AES_GCM_128_SECRET_SIZE);
++	err = quic_crypto_hkdf_extract(tfm, &salt, &k, &s);
++	if (err)
++		return err;
++
++	quic_data(&l, label, strlen(label));
++	quic_data(&k, token, key_len);
++	return quic_crypto_hkdf_expand(tfm, &s, &l, &z, &k);
++}
++
++/* Derive a stateless reset token from connection-specific input. */
++int quic_crypto_generate_stateless_reset_token(struct quic_crypto *crypto, void *data,
++					       u32 len, u8 *key, u32 key_len)
++{
++	return quic_crypto_generate_key(crypto, data, len, "stateless_reset", key, key_len);
++}
++
++/* Derive a session ticket key using HKDF from connection-specific input. */
++int quic_crypto_generate_session_ticket_key(struct quic_crypto *crypto, void *data,
++					    u32 len, u8 *key, u32 key_len)
++{
++	return quic_crypto_generate_key(crypto, data, len, "session_ticket", key, key_len);
++}
++
++void quic_crypto_init(void)
++{
++	get_random_bytes(quic_random_data, QUIC_RANDOM_DATA_LEN);
++}
+diff --git a/net/quic/crypto.h b/net/quic/crypto.h
 new file mode 100644
-index 000000000000..ff700c2cd2ef
+index 000000000000..942a460cf749
 --- /dev/null
-+++ b/net/quic/pnspace.h
-@@ -0,0 +1,150 @@
++++ b/net/quic/crypto.h
+@@ -0,0 +1,73 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +/* QUIC kernel implementation
 + * (C) Copyright Red Hat Corp. 2023
@@ -417,210 +741,160 @@ index 000000000000..ff700c2cd2ef
 + *    Xin Long <lucien.xin@gmail.com>
 + */
 +
-+#define QUIC_PN_MAX_GABS	32
-+#define QUIC_PN_MAP_MAX_PN	(BIT_ULL(62) - 1)
++#define QUIC_TAG_LEN	16
++#define QUIC_IV_LEN	12
++#define QUIC_KEY_LEN	32
++#define QUIC_SECRET_LEN	48
 +
-+#define QUIC_PN_MAP_INITIAL	64
-+#define QUIC_PN_MAP_INCREMENT	QUIC_PN_MAP_INITIAL
-+#define QUIC_PN_MAP_SIZE	4096
-+#define QUIC_PN_MAP_LIMIT	(QUIC_PN_MAP_SIZE * 3 / 4)
++#define QUIC_TOKEN_FLAG_REGULAR		0
++#define QUIC_TOKEN_FLAG_RETRY		1
++#define QUIC_TOKEN_TIMEOUT_RETRY	3000000
++#define QUIC_TOKEN_TIMEOUT_REGULAR	600000000
 +
-+#define QUIC_PNSPACE_MAX	(QUIC_CRYPTO_MAX - 1)
-+#define QUIC_PNSPACE_NEXT_PN	0
-+#define QUIC_PNSPACE_TIME_LIMIT	(333000 * 3)
++struct quic_cipher {
++	u32 secretlen;			/* Length of the traffic secret */
++	u32 keylen;			/* Length of the AEAD key */
 +
-+enum {
-+	QUIC_ECN_ECT1,
-+	QUIC_ECN_ECT0,
-+	QUIC_ECN_CE,
-+	QUIC_ECN_MAX
++	char *shash;			/* Name of hash algorithm used for key derivation */
++	char *aead;			/* Name of AEAD algorithm used for payload en/decryption */
++	char *skc;			/* Name of cipher algorithm used for header protection */
 +};
 +
-+enum {
-+	QUIC_ECN_LOCAL,		/* ECN bits from incoming IP headers */
-+	QUIC_ECN_PEER,		/* ECN bits reported by peer in ACK frames */
-+	QUIC_ECN_DIR_MAX
++struct quic_crypto {
++	struct crypto_skcipher *tx_hp_tfm;	/* Transform for TX header protection */
++	struct crypto_skcipher *rx_hp_tfm;	/* Transform for RX header protection */
++	struct crypto_shash *secret_tfm;	/* Transform for key derivation (HKDF) */
++	struct crypto_aead *tx_tfm[2];		/* AEAD transform for TX (key phase 0 and 1) */
++	struct crypto_aead *rx_tfm[2];		/* AEAD transform for RX (key phase 0 and 1) */
++	struct crypto_aead *tag_tfm;		/* AEAD transform used for Retry token validation */
++	struct quic_cipher *cipher;		/* Cipher information (selected cipher suite) */
++	u32 cipher_type;			/* Cipher suite (e.g., AES_GCM_128, etc.) */
++
++	u8 tx_secret[QUIC_SECRET_LEN];		/* TX secret derived or provided by user space */
++	u8 rx_secret[QUIC_SECRET_LEN];		/* RX secret derived or provided by user space */
++	u8 tx_iv[2][QUIC_IV_LEN];		/* IVs for TX (key phase 0 and 1) */
++	u8 rx_iv[2][QUIC_IV_LEN];		/* IVs for RX (key phase 0 and 1) */
++
++	u32 key_update_send_time;		/* Time when 1st packet was sent after key update */
++	u32 key_update_time;			/* Time to retain old keys after key update */
++	u32 version;				/* QUIC version in use */
++
++	u8 ticket_ready:1;			/* True if a session ticket is ready to read */
++	u8 key_pending:1;			/* A key update is in progress */
++	u8 send_ready:1;			/* TX encryption context is initialized */
++	u8 recv_ready:1;			/* RX decryption context is initialized */
++	u8 key_phase:1;				/* Current key phase being used (0 or 1) */
++
++	u64 send_offset;	/* Number of handshake bytes sent by user at this level */
++	u64 recv_offset;	/* Number of handshake bytes read by user at this level */
 +};
 +
-+/* Represents a gap (range of missing packets) in the ACK map.  The values are offsets from
-+ * base_pn, with both 'start' and 'end' being +1.
-+ */
-+struct quic_gap_ack_block {
-+	u16 start;
-+	u16 end;
-+};
++int quic_crypto_set_secret(struct quic_crypto *crypto, struct quic_crypto_secret *srt,
++			   u32 version, u8 flag);
++int quic_crypto_get_secret(struct quic_crypto *crypto, struct quic_crypto_secret *srt);
++int quic_crypto_set_cipher(struct quic_crypto *crypto, u32 type, u8 flag);
++int quic_crypto_key_update(struct quic_crypto *crypto);
 +
-+/* Packet Number Map (pn_map) Layout:
-+ *
-+ *     min_pn_seen -->++-----------------------+---------------------+---
-+ *         base_pn -----^   last_max_pn_seen --^       max_pn_seen --^
-+ *
-+ * Map Advancement Logic:
-+ *   - min_pn_seen = last_max_pn_seen;
-+ *   - base_pn = first zero bit after last_max_pn_seen;
-+ *   - last_max_pn_seen = max_pn_seen;
-+ *   - last_max_pn_time = current time;
-+ *
-+ * Conditions to Advance pn_map:
-+ *   - (max_pn_time - last_max_pn_time) >= max_time_limit, or
-+ *   - (max_pn_seen - last_max_pn_seen) > QUIC_PN_MAP_LIMIT
-+ *
-+ * Gap Search Range:
-+ *   - From (base_pn - 1) to max_pn_seen
-+ */
-+struct quic_pnspace {
-+	/* ECN counters indexed by direction (TX/RX) and ECN codepoint (ECT1, ECT0, CE) */
-+	u64 ecn_count[QUIC_ECN_DIR_MAX][QUIC_ECN_MAX];
-+	unsigned long *pn_map;	/* Bit map tracking received packet numbers for ACK generation */
-+	u16 pn_map_len;		/* Length of the packet number bit map (in bits) */
-+	u8  need_sack:1;	/* Flag indicating a SACK frame should be sent for this space */
-+	u8  sack_path:1;	/* Path used for sending the SACK frame */
++int quic_crypto_initial_keys_install(struct quic_crypto *crypto, struct quic_conn_id *conn_id,
++				     u32 version, bool is_serv);
++int quic_crypto_generate_session_ticket_key(struct quic_crypto *crypto, void *data,
++					    u32 len, u8 *key, u32 key_len);
++int quic_crypto_generate_stateless_reset_token(struct quic_crypto *crypto, void *data,
++					       u32 len, u8 *key, u32 key_len);
 +
-+	s64 last_max_pn_seen;	/* Highest packet number seen before pn_map advanced */
-+	u32 last_max_pn_time;	/* Timestamp when last_max_pn_seen was received */
-+	u32 max_time_limit;	/* Time threshold to trigger pn_map advancement on packet receipt */
-+	s64 min_pn_seen;	/* Smallest packet number received in this space */
-+	s64 max_pn_seen;	/* Largest packet number received in this space */
-+	u32 max_pn_time;	/* Time at which max_pn_seen was received */
-+	s64 base_pn;		/* Packet number corresponding to the start of the pn_map */
-+	u32 time;		/* Cached current time, or time accept a socket (listen socket) */
-+
-+	s64 max_pn_acked_seen;	/* Largest packet number acknowledged by the peer */
-+	u32 max_pn_acked_time;	/* Time at which max_pn_acked_seen was acknowledged */
-+	u32 last_sent_time;	/* Time when the last ack-eliciting packet was sent */
-+	u32 loss_time;		/* Time after which the next packet can be declared lost */
-+	u32 inflight;		/* Bytes of all ack-eliciting frames in flight in this space */
-+	s64 next_pn;		/* Next packet number to send in this space */
-+};
-+
-+static inline void quic_pnspace_set_max_pn_acked_seen(struct quic_pnspace *space,
-+						      s64 max_pn_acked_seen)
-+{
-+	if (space->max_pn_acked_seen >= max_pn_acked_seen)
-+		return;
-+	space->max_pn_acked_seen = max_pn_acked_seen;
-+	space->max_pn_acked_time = jiffies_to_usecs(jiffies);
-+}
-+
-+static inline void quic_pnspace_set_base_pn(struct quic_pnspace *space, s64 pn)
-+{
-+	space->base_pn = pn;
-+	space->max_pn_seen = space->base_pn - 1;
-+	space->last_max_pn_seen = space->max_pn_seen;
-+	space->min_pn_seen = space->max_pn_seen;
-+
-+	space->max_pn_time = space->time;
-+	space->last_max_pn_time = space->max_pn_time;
-+}
-+
-+static inline bool quic_pnspace_has_gap(const struct quic_pnspace *space)
-+{
-+	return space->base_pn != space->max_pn_seen + 1;
-+}
-+
-+static inline void quic_pnspace_inc_ecn_count(struct quic_pnspace *space, u8 ecn)
-+{
-+	if (!ecn)
-+		return;
-+	space->ecn_count[QUIC_ECN_LOCAL][ecn - 1]++;
-+}
-+
-+/* Check if any ECN-marked packets were received. */
-+static inline bool quic_pnspace_has_ecn_count(struct quic_pnspace *space)
-+{
-+	return space->ecn_count[QUIC_ECN_LOCAL][QUIC_ECN_ECT0] ||
-+	       space->ecn_count[QUIC_ECN_LOCAL][QUIC_ECN_ECT1] ||
-+	       space->ecn_count[QUIC_ECN_LOCAL][QUIC_ECN_CE];
-+}
-+
-+/* Updates the stored ECN counters based on values received in the peer's ACK
-+ * frame. Each counter is updated only if the new value is higher.
-+ *
-+ * Returns: 1 if CE count was increased (congestion indicated), 0 otherwise.
-+ */
-+static inline int quic_pnspace_set_ecn_count(struct quic_pnspace *space, u64 *ecn_count)
-+{
-+	if (space->ecn_count[QUIC_ECN_PEER][QUIC_ECN_ECT0] < ecn_count[QUIC_ECN_ECT0])
-+		space->ecn_count[QUIC_ECN_PEER][QUIC_ECN_ECT0] = ecn_count[QUIC_ECN_ECT0];
-+	if (space->ecn_count[QUIC_ECN_PEER][QUIC_ECN_ECT1] < ecn_count[QUIC_ECN_ECT1])
-+		space->ecn_count[QUIC_ECN_PEER][QUIC_ECN_ECT1] = ecn_count[QUIC_ECN_ECT1];
-+	if (space->ecn_count[QUIC_ECN_PEER][QUIC_ECN_CE] < ecn_count[QUIC_ECN_CE]) {
-+		space->ecn_count[QUIC_ECN_PEER][QUIC_ECN_CE] = ecn_count[QUIC_ECN_CE];
-+		return 1;
-+	}
-+	return 0;
-+}
-+
-+u16 quic_pnspace_num_gabs(struct quic_pnspace *space, struct quic_gap_ack_block *gabs);
-+int quic_pnspace_check(struct quic_pnspace *space, s64 pn);
-+int quic_pnspace_mark(struct quic_pnspace *space, s64 pn);
-+
-+void quic_pnspace_free(struct quic_pnspace *space);
-+int quic_pnspace_init(struct quic_pnspace *space);
-diff --git a/net/quic/socket.c b/net/quic/socket.c
-index fb4fc53e5716..28a3d45449c0 100644
---- a/net/quic/socket.c
-+++ b/net/quic/socket.c
-@@ -37,6 +37,8 @@ static void quic_write_space(struct sock *sk)
- 
- static int quic_init_sock(struct sock *sk)
- {
-+	u8 i;
-+
- 	sk->sk_destruct = inet_sock_destruct;
- 	sk->sk_write_space = quic_write_space;
- 	sock_set_flag(sk, SOCK_USE_WRITE_QUEUE);
-@@ -48,6 +50,11 @@ static int quic_init_sock(struct sock *sk)
- 	if (quic_stream_init(quic_streams(sk)))
++void quic_crypto_free(struct quic_crypto *crypto);
++void quic_crypto_init(void);
+diff --git a/net/quic/protocol.c b/net/quic/protocol.c
+index 74553ca072bc..c12ef11c7947 100644
+--- a/net/quic/protocol.c
++++ b/net/quic/protocol.c
+@@ -267,9 +267,17 @@ static int __net_init quic_net_init(struct net *net)
+ 	if (!qn->stat)
  		return -ENOMEM;
  
-+	for (i = 0; i < QUIC_PNSPACE_MAX; i++) {
-+		if (quic_pnspace_init(quic_pnspace(sk, i)))
-+			return -ENOMEM;
++	err = quic_crypto_set_cipher(&qn->crypto, TLS_CIPHER_AES_GCM_128, CRYPTO_ALG_ASYNC);
++	if (err) {
++		free_percpu(qn->stat);
++		qn->stat = NULL;
++		return err;
 +	}
 +
- 	WRITE_ONCE(sk->sk_sndbuf, READ_ONCE(sysctl_quic_wmem[1]));
- 	WRITE_ONCE(sk->sk_rcvbuf, READ_ONCE(sysctl_quic_rmem[1]));
+ #ifdef CONFIG_PROC_FS
+ 	err = quic_net_proc_init(net);
+ 	if (err) {
++		quic_crypto_free(&qn->crypto);
+ 		free_percpu(qn->stat);
+ 		qn->stat = NULL;
+ 	}
+@@ -284,6 +292,7 @@ static void __net_exit quic_net_exit(struct net *net)
+ #ifdef CONFIG_PROC_FS
+ 	quic_net_proc_exit(net);
+ #endif
++	quic_crypto_free(&qn->crypto);
+ 	free_percpu(qn->stat);
+ 	qn->stat = NULL;
+ }
+@@ -332,6 +341,8 @@ static __init int quic_init(void)
+ 	sysctl_quic_wmem[1] = 16 * 1024;
+ 	sysctl_quic_wmem[2] = max(64 * 1024, max_share);
  
-@@ -59,6 +66,11 @@ static int quic_init_sock(struct sock *sk)
++	quic_crypto_init();
++
+ 	err = percpu_counter_init(&quic_sockets_allocated, 0, GFP_KERNEL);
+ 	if (err)
+ 		goto err_percpu_counter;
+diff --git a/net/quic/protocol.h b/net/quic/protocol.h
+index bd9464c0ed04..9f86176205c4 100644
+--- a/net/quic/protocol.h
++++ b/net/quic/protocol.h
+@@ -48,6 +48,7 @@ struct quic_net {
+ #ifdef CONFIG_PROC_FS
+ 	struct proc_dir_entry *proc_net;	/* procfs entry for dumping QUIC socket stats */
+ #endif
++	struct quic_crypto crypto;	/* Context for decrypting Initial packets for ALPN */
+ };
  
- static void quic_destroy_sock(struct sock *sk)
- {
-+	u8 i;
-+
-+	for (i = 0; i < QUIC_PNSPACE_MAX; i++)
-+		quic_pnspace_free(quic_pnspace(sk, i));
-+
+ struct quic_net *quic_net(struct net *net);
+diff --git a/net/quic/socket.c b/net/quic/socket.c
+index 28a3d45449c0..2eba13fcda10 100644
+--- a/net/quic/socket.c
++++ b/net/quic/socket.c
+@@ -70,6 +70,8 @@ static void quic_destroy_sock(struct sock *sk)
+ 
+ 	for (i = 0; i < QUIC_PNSPACE_MAX; i++)
+ 		quic_pnspace_free(quic_pnspace(sk, i));
++	for (i = 0; i < QUIC_CRYPTO_MAX; i++)
++		quic_crypto_free(quic_crypto(sk, i));
+ 
  	quic_path_free(sk, quic_paths(sk), 0);
  	quic_path_free(sk, quic_paths(sk), 1);
- 
 diff --git a/net/quic/socket.h b/net/quic/socket.h
-index 019f8752fc87..7e87de319c40 100644
+index 7e87de319c40..c8df98351c6b 100644
 --- a/net/quic/socket.h
 +++ b/net/quic/socket.h
-@@ -11,6 +11,7 @@
- #include <net/udp_tunnel.h>
- #include <linux/quic.h>
- 
-+#include "pnspace.h"
- #include "common.h"
+@@ -16,6 +16,7 @@
  #include "family.h"
  #include "stream.h"
-@@ -44,6 +45,7 @@ struct quic_sock {
- 	struct quic_conn_id_set		dest;
+ #include "connid.h"
++#include "crypto.h"
+ #include "path.h"
+ #include "cong.h"
+ 
+@@ -46,6 +47,7 @@ struct quic_sock {
  	struct quic_path_group		paths;
  	struct quic_cong		cong;
-+	struct quic_pnspace		space[QUIC_PNSPACE_MAX];
+ 	struct quic_pnspace		space[QUIC_PNSPACE_MAX];
++	struct quic_crypto		crypto[QUIC_CRYPTO_MAX];
  };
  
  struct quic6_sock {
-@@ -111,6 +113,11 @@ static inline struct quic_cong *quic_cong(const struct sock *sk)
- 	return &quic_sk(sk)->cong;
+@@ -118,6 +120,11 @@ static inline struct quic_pnspace *quic_pnspace(const struct sock *sk, u8 level)
+ 	return &quic_sk(sk)->space[level % QUIC_CRYPTO_EARLY];
  }
  
-+static inline struct quic_pnspace *quic_pnspace(const struct sock *sk, u8 level)
++static inline struct quic_crypto *quic_crypto(const struct sock *sk, u8 level)
 +{
-+	return &quic_sk(sk)->space[level % QUIC_CRYPTO_EARLY];
++	return &quic_sk(sk)->crypto[level];
 +}
 +
  static inline bool quic_is_establishing(struct sock *sk)
