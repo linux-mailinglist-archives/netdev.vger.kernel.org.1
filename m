@@ -1,169 +1,249 @@
-Return-Path: <netdev+bounces-224506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A907EB85B6D
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:44:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61794B85B3A
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:42:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCB2F1895548
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:39:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34C2B7A0F74
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70922311954;
-	Thu, 18 Sep 2025 15:37:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FDD130F7ED;
+	Thu, 18 Sep 2025 15:41:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="F7JJb73T"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="j1VMWq2j"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011071.outbound.protection.outlook.com [40.93.194.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5C630EF94;
-	Thu, 18 Sep 2025 15:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758209829; cv=none; b=A8Ryp5RKZYB4sJfTfJsZIe23WfROmKt/Qaodz0a8K2tkcdkyvPWBJeF4mqyeXBrYYCV3e6q6DbdgNu6d46AY/69ypUuNsTwRqDlrw54cs9DONE7O3iJxAr3FJgP3799D5GAFOOg+Es/AKjKnIvmAHDX7eShntqlLvAPuTpzgEKk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758209829; c=relaxed/simple;
-	bh=AjBGs66bwYcRT0DYbNaapwReZ4uUeTrPz4K6vm2LwC8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KSNv7AZb3STm8W4vgNoEDF3gTJyv83062FBDlSFq+ZsVyV2+2UEixvAKZMPX7UKY6OUe8P1K2b/lkXYg27/xSEkYHtivKU5Neyq+FUsCRSeQnsKIGT3T23IAB93fPbG3kRVDZy9W7CFtRf2To3qNbZzF3u1jnHIziHRIb8UVbHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=F7JJb73T; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=aM9defDUbxftG1qhQP/TtclfqCxbcheJJLtqcFMRzU4=; b=F7JJb73THAOqRK1K8GFdiT/8Ej
-	gj9W1dfgE4nWfaTkdI63AdaKD9zzZMlzAxOzu/aVmbYNPPczfMsbitvrzmw7CZnzqz/C9q3imUOni
-	DrjmmEfLd4yPeTmSp8UTMZiFZhZVOCF/DbW5nbpr95AdhrtzhSqzme+mDJkXUlfUxPsOgtLSizXEI
-	aKmM1UInF0ZFJyDXT4Q/TiHrZbxO+8cSKNzxhzXu4mZcNN4QEbc2pAfsUEqW1Dfh8v32Pv/wPfA9I
-	6e+qoV4lDUliCYjwrwt3A8JGGBM4o8WYYgFiQYMG0kH0PY/hQ7LWOjWw3XYtpBs06bmGxtzkqmwLx
-	q1UygtCQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43486)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uzGgg-000000001BG-1j6Y;
-	Thu, 18 Sep 2025 16:36:46 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uzGgc-000000001Hk-0d9w;
-	Thu, 18 Sep 2025 16:36:42 +0100
-Date: Thu, 18 Sep 2025 16:36:41 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Christophe Roullier <christophe.roullier@foss.st.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Tristram Ha <Tristram.Ha@microchip.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/4] net: stmmac: stm32: add WoL from PHY
- support
-Message-ID: <aMwnCWT5JFY4jstm@shell.armlinux.org.uk>
-References: <20250917-wol-smsc-phy-v2-0-105f5eb89b7f@foss.st.com>
- <20250917-wol-smsc-phy-v2-2-105f5eb89b7f@foss.st.com>
- <aMriVDAgZkL8DAdH@shell.armlinux.org.uk>
- <72ad4e2d-42fa-41c2-960d-c0e7ea80c6ff@foss.st.com>
- <aMwQKERA1p29BeKF@shell.armlinux.org.uk>
- <64b32996-9862-4716-8d14-16c80c4a2b10@foss.st.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB23430EF99
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:41:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758210076; cv=fail; b=rWvupslJOBH3Rv//eSfiQt4hUZxpSYHP4FUeroCsdcuClQ/kfvuxiwwBi8eCaCGhzlIImdmFmiroJY0buFFiSJaqlTyUIa4c0yoDqCP/7hwGpHlPfc989dMxOcxn3p0Kny86HUz199UtJjVz+RL8DsfrfJliCcGadVDQFwErvek=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758210076; c=relaxed/simple;
+	bh=kBeFSYoLhn1Mgp+gAjXvhRarspANNOukUqVmxhJNWCA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MDzj0OV19qOSu1rgQze5qXaBg0YFqMy2zjXFfMo7j+a+he4Y+ZDlfCRKl+1DWSo5J2CM97SjXgXNkj6un3Osxgt0XWi+P9Ow13ovSPx1rNCibtSsjKyj4x++seFduOL6g7r+AeZHwfS1AqOGJN0EaEqI3sF7lu/DcArYy1tl0wc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=j1VMWq2j; arc=fail smtp.client-ip=40.93.194.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kkT8OcykOtzCgNl4JNYF0+uEg1JdR5EiY0GT8XcAzzmRM4CwB/qSZEsXjZ0c6E+j23rtJ/C4KyBXBMyPRN3M8dy7MBMbP8jbdkX6bSHHSj47vJ2A1s+UKtNcDIJgpKoD/ZKpWPdmI5GYBgCeGYYgL1ZHwk1ggpt5zLpYdfKzSk9p6bsNxcqZoGCseHJHU30NfaVEZB9d9F/kMSmc7iRl0V02BdelwBwg4j9wMYSTruSg7+VEzdgLoZwOQzbbHYr/7nCzKPCJUVOLF72jKEnl2KX8fdorJmWLlyVLR7gQtWTNdoqPhZXKgNNf5cCnVHuIFibG32eCZd7Uzc5TJ/sOeg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mNH/8Cgic2a5pbPXzdR4t8faiZhyrh5cVlpkvYsg1VM=;
+ b=cd6ZEKbGVKW/d+F5Plh9PZ3w1tzxrrKITG2NY1Eb3QmXTf4mSBMtNyDZFF/QBfTy1pb1ZiEyai4eC/ScfovbD9BwnCMt8KZ30C2s4/JlhariCQFP/aL5TnFrn0fFhdmiQlh+D4GKm6PwlLkZbwshrWGMQxZjBMdLNPxg44Nz9t8RdoEBKJBdaG9b0q4qT4QPfW4iVUAmVD7KBlkpaUvjUj9d7w3paz0OIm0cBr7lUxzYBngLhM6s6FSaMkCD6GKLHEiuMgA2TAGy99q6YYeN/mnk1DclwHKaA5DaxHlUguEMQ/+8hW33ZBZ4Y9uSpmB2A8TNGW8JnLbr/+eLG02KXw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=blackwall.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mNH/8Cgic2a5pbPXzdR4t8faiZhyrh5cVlpkvYsg1VM=;
+ b=j1VMWq2j93nP9iQk+Qqxz6MCVKir6FNmEZPsdIRX9KdRTzlLMKJNz92MpFBxtM3dbXIyqrs8MPV5zpaVji9byWm/E+PLnLBA01JxeWYzlCVYVTE1A/amZ/q9qwS5EF/AbNtc8j+XQoa4xe4NqBxvxOpnbXDYWTqb6RJt+NmLlruA4UScl9c2ec+b48pUZ3T3uNi/vebZ9lFmdcnLYDOn4ttcuMOBDeiWGwhLZhwnCkVEgQdam67xDV8gJpils4NgQVuE55qRdQZk7He06T62b9qXhI2a1KdinyUqrouIqoF/Xh762AM8tb6+OGMelVdFzaFWc/qJG0BBKPXAR5SHPQ==
+Received: from SA1P222CA0171.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:3c3::8)
+ by CYXPR12MB9277.namprd12.prod.outlook.com (2603:10b6:930:d8::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.14; Thu, 18 Sep
+ 2025 15:41:11 +0000
+Received: from SN1PEPF00026369.namprd02.prod.outlook.com
+ (2603:10b6:806:3c3:cafe::fb) by SA1P222CA0171.outlook.office365.com
+ (2603:10b6:806:3c3::8) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.15 via Frontend Transport; Thu,
+ 18 Sep 2025 15:41:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SN1PEPF00026369.mail.protection.outlook.com (10.167.241.134) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9137.12 via Frontend Transport; Thu, 18 Sep 2025 15:41:11 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.34; Thu, 18 Sep
+ 2025 08:40:46 -0700
+Received: from fedora.docsis.vodafone.cz (10.126.231.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Thu, 18 Sep 2025 08:40:42 -0700
+From: Petr Machata <petrm@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>, Nikolay Aleksandrov
+	<razor@blackwall.org>, David Ahern <dsahern@kernel.org>,
+	<netdev@vger.kernel.org>
+CC: Petr Machata <petrm@nvidia.com>, <bridge@lists.linux-foundation.org>
+Subject: [PATCH iproute2-next v3] ip: iplink_bridge: Support fdb_local_vlan_0
+Date: Thu, 18 Sep 2025 17:39:26 +0200
+Message-ID: <d23fb4f116e5540afbd564e0e3a31d91eae42c60.1758209325.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <64b32996-9862-4716-8d14-16c80c4a2b10@foss.st.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF00026369:EE_|CYXPR12MB9277:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2f8c2380-7bd5-4ff8-8988-08ddf6c9cb1a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?GkZR9T/TUXdvHELQFcPU5KPDKgnKG/Y0O51Vm9KdkUqEAioWhdRu7SbxHHoP?=
+ =?us-ascii?Q?4jgpCzy86cLcUZbyeAL2r2wU5qlFhVMxtfHo7T8mr5p4Sm/WzFVLVOw4tfnK?=
+ =?us-ascii?Q?a8hpi84DQenkzYrtfQy5wVWMkfPzM/qnpsVmcYxh3Q1/Y0wOEjg4G6P1hS35?=
+ =?us-ascii?Q?Gtnz5i1cjX68PXoRbcqFViTl0J+d/Uwe0t7zfB9htm4zDUE8FlukmYvvXzjH?=
+ =?us-ascii?Q?mNNj9hVAru2gRj4nX04K+WQS29WFWU709qNvAC/aKbJpMwwm5D9x700I/88m?=
+ =?us-ascii?Q?Z6TFlxXhsVgJewhdh5YP4DHxbEO+EPY6egZnJNevcylNjaZkt/udrE/1tQ3/?=
+ =?us-ascii?Q?TG8qIMIQdJJNrb1q3l6GQ4QFOc31KumBn+S4vFONyllVT1o6o+YlOPjtiIPp?=
+ =?us-ascii?Q?nWDZ1scIEy7YfZtKg4mEljgWVNgcFpOeuRoL8ZEQhQeXO0jZjptXuQdupyAZ?=
+ =?us-ascii?Q?qrNsVUjH5I1Xg1cc7FyG7wORPb3nNek9LSD8nyKVp4DOBhgTeTxNQmtcO71L?=
+ =?us-ascii?Q?2pMAYMHLrTL8GPOvc2H/ruhJnUS22kyG4W8HsDeUrc3vQON2x8f+lw8iW+dd?=
+ =?us-ascii?Q?w1vcbepDQr8H/wA6aq1k1nQJrs8QuX2hQjiRMg4OxlwBhIi/lARvzxsUoCGF?=
+ =?us-ascii?Q?/tXocOobaJvHElOvlW4Hn/6HJARyFGajtEPY0CJ8l0zo8MZkDa0omn85NWzi?=
+ =?us-ascii?Q?tyP/DaBpYHUyiMRFuPHqGeZStiWu/EVYfu2agnrCbtX1NlRo/ZUlq5SPuoR4?=
+ =?us-ascii?Q?gyDmeNHYDqU6Ucz33P0VKaw3rHGUNSWz4Z7dc5jnRG7qwyVPcBN30DdDiIOS?=
+ =?us-ascii?Q?oIrCgZph8ft3gu+GHRhJt7rKvQjzv8Zuv6QEeucf9WyK1XPGB0BKIQQ6tn4K?=
+ =?us-ascii?Q?R4pKCSRPAt9eA3zNc7TBXTfFZCKUEL/8tsfoBe5SspfiocgD/vGmpkjT02hw?=
+ =?us-ascii?Q?8cxj1rTiQNicNCtKvm46lQKbUs8DTaOCjHlWu6A/6c/al7vMUMPUW3FKyd5Z?=
+ =?us-ascii?Q?nWJqzt2EJUzJVxRVcNsfP1QaX+UYtmQ6wCTFn0lcLPPDJ/nt3JI7qhNR8xGx?=
+ =?us-ascii?Q?kcCUL1ZtQq6Crm9vfmyDmSXV9x8kqSGnAoY2sCIKHvHy0NcMjgXiyURg1Bfn?=
+ =?us-ascii?Q?4giuOc8aIkKJU4BWjJHLZlhB+bezCEj/ct1Qv/jYawcC2d89i4QpEMtpYS8I?=
+ =?us-ascii?Q?sqczBaOY9AdINFMEP/jQPCTRBZ8Yj87NAtLQY7V/CzKgIWksF/5qYNreUoqa?=
+ =?us-ascii?Q?mq2Htg+GP0rPXsfKC4KZCfIZiMFU6jJM+bsV5KMPQSFjbEKGvvMsZHy4w6QT?=
+ =?us-ascii?Q?KtOVOI4TRw27sFQ5N+ISDKc/BjMkzdC0zy+7sJFDqWQDd2SO+sQuyq94801f?=
+ =?us-ascii?Q?QxIFTMXiWy+KczKaSieGa2ZSphD+QJv3dl6RzRn6GpqKA2FZOjjGnowaS27F?=
+ =?us-ascii?Q?xNpZLEwcDfXZUXHxZ+GWOx60sIMaHLxx7+TOL3UZ/7PkBkF4FJ7zDnkPtQRz?=
+ =?us-ascii?Q?TMovamGl9HM8jto75jMdaPj5WBg7678cGw7p?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2025 15:41:11.1511
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2f8c2380-7bd5-4ff8-8988-08ddf6c9cb1a
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF00026369.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9277
 
-On Thu, Sep 18, 2025 at 05:07:00PM +0200, Gatien CHEVALLIER wrote:
-> On 9/18/25 15:59, Russell King (Oracle) wrote:
-> >  > So no. In a situation like this, either we want to be in interrupt
-> > mode (in which case we have an interrupt), or the pin is wired to
-> > a power management controller and needs to be in PME mode, or it isn't
-> > wired.
-> > 
-> 
-> If you are in interrupt mode, plugging a cable would trigger a
-> system wakeup in low-power mode if the INTB/PMEB line is wired to a
-> power management controller and the WoL is enabled because we're no
-> longer in polling mode, wouldn't it?
+Add support for the new bridge option BR_BOOLOPT_FDB_LOCAL_VLAN_0.
 
-What Andrew suggested, which is what I implemented for Realtek, other
-interrupts get disabled when we enter suspend:
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+---
 
-static int rtl8211f_suspend(struct phy_device *phydev)
-{
-...
-        /* If a PME event is enabled, then configure the interrupt for
-         * PME events only, disabling link interrupt. We avoid switching
-         * to PMEB mode as we don't have a status bit for that.
-         */
-        if (device_may_wakeup(&phydev->mdio.dev)) {
-                ret = phy_write_paged(phydev, 0xa42, RTL821x_INER,
-                                      RTL8211F_INER_PME);
+Notes:
+    v3:
+    - When printing the option, test optmask, not optval
+    
+    v2:
+    - Maintain RXT in bridge_print_opt()
+    - Mention what the default is in the man page.
 
-This disables all other interrupts when entering suspend _if_ WoL
-is enabled and only if WoL is enabled.
+ ip/iplink_bridge.c    | 19 +++++++++++++++++++
+ man/man8/ip-link.8.in | 15 +++++++++++++++
+ 2 files changed, 34 insertions(+)
 
-If you're getting woken up when you unplug/replug the ethernet cable
-when WoL is disabled, that suggests you have something wrong in your
-interrupt controller - the wake-up state of the interrupt is managed
-by core driver-model code. I tested this on nVidia Jetson Xavier NX
-and if WoL wasn't enabled at the PHY, no wakeup occurred.
-
-> You can argue that as per the Realtek 8211F datasheet:
-> "The interrupts can be individually enabled or disabled by setting or
-> clearing bits in the interrupt enable register INER". That requires
-> PHY registers handling when going to low-power mode.
-
-... which is what my patch does.
-
-> There are PHYs like the LAN8742 on which 3 pins can be configured
-> as nINT(equivalent to INTB), and 2 as nPME(equivalent to PMEB). The
-> smsc driver, as is, contains hardcoded nPME mode on the
-> LED2/nINT/nPME/nINTSEL pin. What if a manufacturer wired the power
-> management controller to the LED1/nINT/nPME/nINTSEL?
-> This is where the pinctrl would help even if I do agree it might be a
-> bit tedious at first. The pinctrl would be optional though.
-
-I'm not opposing the idea of pinctrl on PHYs. I'm opposing the idea
-of tying it into the WoL code in a way that makes it mandatory.
-Of course, if it makes sense for a PHY driver to do pinctrl stuff
-then go ahead - and if from that, the driver can work out that
-the PHY is wake-up capable, even better.
-
-What I was trying to say is that in such a case as the Realtek
-driver, I don't want to see pinctrl forced upon it unless there is
-a real reason and benefit, especially when there are simpler ways
-to do this.
-
-I also think that it would be helpful to add the wakeup-source
-property where PHYs are so capable even if the PHY driver doesn't
-need it for two reasons. 1. OS independence. 2. it's useful docs.
-3. just because our driver as it stands at whatever moment in time
-doesn't make use of it doesn't mean that will always be the case.
-(e.g., we may want to have e.g. phylib looking at that property.)
-
+diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
+index 76e69086..df3264c3 100644
+--- a/ip/iplink_bridge.c
++++ b/ip/iplink_bridge.c
+@@ -36,6 +36,7 @@ static void print_explain(FILE *f)
+ 		"		  [ group_fwd_mask MASK ]\n"
+ 		"		  [ group_address ADDRESS ]\n"
+ 		"		  [ no_linklocal_learn NO_LINKLOCAL_LEARN ]\n"
++		"		  [ fdb_local_vlan_0 FDB_LOCAL_VLAN_0 ]\n"
+ 		"		  [ fdb_max_learned FDB_MAX_LEARNED ]\n"
+ 		"		  [ vlan_filtering VLAN_FILTERING ]\n"
+ 		"		  [ vlan_protocol VLAN_PROTOCOL ]\n"
+@@ -427,6 +428,18 @@ static int bridge_parse_opt(struct link_util *lu, int argc, char **argv,
+ 				bm.optval |= mofn_bit;
+ 			else
+ 				bm.optval &= ~mofn_bit;
++		} else if (strcmp(*argv, "fdb_local_vlan_0") == 0) {
++			__u32 bit = 1 << BR_BOOLOPT_FDB_LOCAL_VLAN_0;
++			__u8 value;
++
++			NEXT_ARG();
++			if (get_u8(&value, *argv, 0))
++				invarg("invalid fdb_local_vlan_0", *argv);
++			bm.optmask |= bit;
++			if (value)
++				bm.optval |= bit;
++			else
++				bm.optval &= ~bit;
+ 		} else if (matches(*argv, "help") == 0) {
+ 			explain();
+ 			return -1;
+@@ -635,6 +648,7 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+ 
+ 	if (tb[IFLA_BR_MULTI_BOOLOPT]) {
+ 		__u32 mofn_bit = 1 << BR_BOOLOPT_MDB_OFFLOAD_FAIL_NOTIFICATION;
++		__u32 fdb_vlan_0_bit = 1 << BR_BOOLOPT_FDB_LOCAL_VLAN_0;
+ 		__u32 mcvl_bit = 1 << BR_BOOLOPT_MCAST_VLAN_SNOOPING;
+ 		__u32 no_ll_learn_bit = 1 << BR_BOOLOPT_NO_LL_LEARN;
+ 		__u32 mst_bit = 1 << BR_BOOLOPT_MST_ENABLE;
+@@ -661,6 +675,11 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+ 				   "mdb_offload_fail_notification",
+ 				   "mdb_offload_fail_notification %u ",
+ 				   !!(bm->optval & mofn_bit));
++		if (bm->optmask & fdb_vlan_0_bit)
++			print_uint(PRINT_ANY,
++				   "fdb_local_vlan_0",
++				   "fdb_local_vlan_0 %u ",
++				   !!(bm->optval & fdb_vlan_0_bit));
+ 	}
+ 
+ 	if (tb[IFLA_BR_MCAST_ROUTER])
+diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
+index e3297c57..9bdb5563 100644
+--- a/man/man8/ip-link.8.in
++++ b/man/man8/ip-link.8.in
+@@ -1725,6 +1725,8 @@ the following additional arguments are supported:
+ ] [
+ .BI no_linklocal_learn " NO_LINKLOCAL_LEARN "
+ ] [
++.BI fdb_local_vlan_0 " FDB_LOCAL_VLAN_0 "
++] [
+ .BI fdb_max_learned " FDB_MAX_LEARNED "
+ ] [
+ .BI vlan_filtering " VLAN_FILTERING "
+@@ -1852,6 +1854,19 @@ or off
+ When disabled, the bridge will not learn from link-local frames (default:
+ enabled).
+ 
++.BI fdb_local_vlan_0 " FDB_LOCAL_VLAN_0 "
++When disabled, local FDB entries (i.e. those for member port addresses and
++address of the bridge itself) are kept at VLAN 0 as well as any member VLANs.
++When the option is enabled, they are only kept at VLAN 0. By default the
++option is disabled.
++
++When this option is enabled, when making a forwarding decision, the bridge looks
++at VLAN 0 for a matching entry that is permanent, but not added by user. However
++in all other ways the entry only exists on VLAN 0. This affects dumping, where
++the entries are not shown on non-0 VLANs, and FDB get and flush do not find the
++entry on non-0 VLANs. When the entry is deleted, it affects forwarding on all
++VLANs.
++
+ .BI fdb_max_learned " FDB_MAX_LEARNED "
+ - set the maximum number of learned FDB entries. If
+ .RI ( FDB_MAX_LEARNED " == 0) "
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.49.0
+
 
