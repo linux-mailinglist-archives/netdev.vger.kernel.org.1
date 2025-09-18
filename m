@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-224226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BF3FB827EC
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 03:30:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0785AB82876
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 03:40:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3BE237A9C5E
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 01:28:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B89C11C20F52
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 01:40:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECAFF2264AD;
-	Thu, 18 Sep 2025 01:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 434B122E406;
+	Thu, 18 Sep 2025 01:40:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UTanifd8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JLwy2+s8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A8E2264D5
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 01:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF681922FD;
+	Thu, 18 Sep 2025 01:40:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758159011; cv=none; b=OR9QXHfxy27ncvTEFlNf5RA2ZgwTDyjcTeWcT2TkJwmrfHjSnPkbIEYv9HcIGDGf7jxIjD5iEtLdXuEtz21EhebCkNxfSILv0iGosaX9XhUONYlvwD6Ehn5iVB5SIflD3hGFKxGHo8ciuKPnEhyQsIILdQtcopNMeVmc2rSClaQ=
+	t=1758159618; cv=none; b=j/lIBzgIDzMTljwKTzZYB7rwm0cTocU29kZAPWIz4MiT9OI4Rtf7DFq4sNJflhDbU/q3ZwzkKJ/ykz2VhvIgohZkRC5ZGVmv3JX+zlA6A+7vhMh4r7BEFOS3DvdqIEYEFd4g7wwK6viIH/7pR/DEmFD14EMlVI6dzU0chS4B44c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758159011; c=relaxed/simple;
-	bh=OuT4LW924L6O3nHVMVMZpTuxwz+uaW0JcFWhVgxOoog=;
+	s=arc-20240116; t=1758159618; c=relaxed/simple;
+	bh=TrU7RfUYr9JD6ui4vjRDy4Ys0CVm0kceHpIIercU4QY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eGFDYYQ0wjbDIWeZHjCY6O6vGuN6w4LQ38YCaDnXy7QJPbeJbX78FX0cAi3jq6cAboj42o/9YUx/sgHCsdR/y2Djnr7x2CbLD/ke28xjmmNFgy0WY27q1RxjhkHzBBtNi4aou8wFiBaD8FtlE/PscRvf0rzAQk1TTSrk+vzdPeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UTanifd8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B6A9C4CEE7;
-	Thu, 18 Sep 2025 01:30:11 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Os+IU2vPBlEGvYn74fRb1g9S5AEZrf0/o2RjwB6H5jSwcXopvY3V+Wl2e5WKQDmGMuDvA+Q8N+1pDnMkLM4lWJqZ0zvJvth3QeR/maSZ389TVYMklKq0oMSNE7pM2no4FDUnvmJAuRPVvyFbyLz03bc48cFA0m2E7xLeaQ7lH7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JLwy2+s8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B9BBC4CEE7;
+	Thu, 18 Sep 2025 01:40:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758159011;
-	bh=OuT4LW924L6O3nHVMVMZpTuxwz+uaW0JcFWhVgxOoog=;
+	s=k20201202; t=1758159617;
+	bh=TrU7RfUYr9JD6ui4vjRDy4Ys0CVm0kceHpIIercU4QY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UTanifd8NxfH2ZmbUXD6slNsA0efwpEKFXYPA77uaO132nDNa6sHydPYWTXGGJ6wq
-	 A5+3E7AqP0oupqikvOri1Q1NqPYAlugRhCtbOZ7YD4QoOfJAieX/dFOxRdN1f/Uqr1
-	 f2qEdQUw4so74rE+3qx8/BqIh945YLJa/nyj6NwDNrBxvMAP7w4fC4S2RXOPmDheen
-	 gkZROtPDDDZsy5uhm1Q/d6cADUGa9jV4R2m/znu3GI1Z4CTiLDyjs4s6FKRimWtIzu
-	 3sb6Y/yQDkAkNEI1/i6S4zLULP6FRmFcaVVXfs+7U4IPs+Cd8KtVz0i2PSBzscyJwK
-	 0TyeLSOlbkPvg==
+	b=JLwy2+s82zqjN4ShMOXEvugvHpejzous9IQjb+0WKIR3iC+KkrKWR7wvJD4FaooJn
+	 ln780t1Yt9GQIs5o+aAiR0aWbEz2b3lQ9c7Qe5BIQGIQ4h1BN85tBP6FHF5QLTaKPN
+	 EMoMvp05r0U7Wsc7maXxfIvRlc1TdrlhIu3TTOezES394SBJo7guBUCmFbDbvR+i0N
+	 OrIQCvsyqRrXol0dGu1HX5EVoNsj5IGsp9cT46zDIFnQNyOVXFOnNNMvTVa75Oz91Q
+	 7lPCsA2TJReRu7K5l/pM0ooqPBq0ZbP6imD/jjuN2hzg7S79fOqFuHjaTPqKhyjoA/
+	 0N7iN2Kv75XEw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE4E39D0C28;
-	Thu, 18 Sep 2025 01:30:12 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C5739D0C28;
+	Thu, 18 Sep 2025 01:40:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,47 +52,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/5] net: dsa: mv88e6xxx: further PTP-related
- cleanups
+Subject: Re: [PATCH net-next V2 00/10] net/mlx5e: Use multiple doorbells
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175815901175.2214107.13072874715906575656.git-patchwork-notify@kernel.org>
-Date: Thu, 18 Sep 2025 01:30:11 +0000
-References: <aMnJ1uRPvw82_aCT@shell.armlinux.org.uk>
-In-Reply-To: <aMnJ1uRPvw82_aCT@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
- olteanv@gmail.com
+ <175815961800.2217978.13039702853348998554.git-patchwork-notify@kernel.org>
+Date: Thu, 18 Sep 2025 01:40:18 +0000
+References: <1758031904-634231-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1758031904-634231-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, jiri@resnulli.us, corbet@lwn.net,
+ leon@kernel.org, jgg@ziepe.ca, saeedm@nvidia.com, mbloch@nvidia.com,
+ ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ bpf@vger.kernel.org, gal@nvidia.com, cratiu@nvidia.com, dtatulea@nvidia.com,
+ jiri@nvidia.com, jgg@nvidia.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 16 Sep 2025 21:34:30 +0100 you wrote:
+On Tue, 16 Sep 2025 17:11:34 +0300 you wrote:
 > Hi,
 > 
-> Further mv88e6xxx PTP-related cleanups, mostly centred around the
-> register definitions, but also moving one function prototype to a
-> more logical header.
+> This series by Cosmin adds multiple doorbells usage in mlx5e driver.
+> See detailed description by Cosmin below [1].
 > 
-> These do not conflict with "net: dsa: mv88e6xxx: clean up PTP clock
-> during setup failure" sent earlier today.
+> Find V1 here:
+> https://lore.kernel.org/all/1757499891-596641-1-git-send-email-tariqt@nvidia.com/
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/5] net: dsa: mv88e6xxx: rename TAI definitions according to core
-    https://git.kernel.org/netdev/net-next/c/a12372ac5946
-  - [net-next,v2,2/5] net: dsa: mv88e6xxx: remove unused TAI definitions
-    https://git.kernel.org/netdev/net-next/c/946fc083fcb5
-  - [net-next,v2,3/5] net: dsa: mv88e6xxx: remove duplicated register definition
-    https://git.kernel.org/netdev/net-next/c/30cf6a875e29
-  - [net-next,v2,4/5] net: dsa: mv88e6xxx: remove unused 88E6165 register definitions
-    https://git.kernel.org/netdev/net-next/c/a295b33b0faf
-  - [net-next,v2,5/5] net: dsa: mv88e6xxx: move mv88e6xxx_hwtstamp_work() prototype
-    https://git.kernel.org/netdev/net-next/c/e866e5118bb6
+  - [net-next,V2,01/10] net/mlx5: Fix typo of MLX5_EQ_DOORBEL_OFFSET
+    https://git.kernel.org/netdev/net-next/c/917449e7c3cd
+  - [net-next,V2,02/10] net/mlx5: Remove unused 'offset' field from mlx5_sq_bfreg
+    https://git.kernel.org/netdev/net-next/c/05dfe654b593
+  - [net-next,V2,03/10] net/mlx5e: Remove unused 'xsk' param of mlx5e_build_xdpsq_param
+    https://git.kernel.org/netdev/net-next/c/913d28f8a71c
+  - [net-next,V2,04/10] net/mlx5: Store the global doorbell in mlx5_priv
+    https://git.kernel.org/netdev/net-next/c/aa4595d0ada6
+  - [net-next,V2,05/10] net/mlx5e: Prepare for using multiple TX doorbells
+    https://git.kernel.org/netdev/net-next/c/673d7ab7563e
+  - [net-next,V2,06/10] net/mlx5e: Prepare for using different CQ doorbells
+    https://git.kernel.org/netdev/net-next/c/a315b723e87b
+  - [net-next,V2,07/10] net/mlx5e: Use multiple TX doorbells
+    https://git.kernel.org/netdev/net-next/c/71fb4832d50b
+  - [net-next,V2,08/10] net/mlx5e: Use multiple CQ doorbells
+    https://git.kernel.org/netdev/net-next/c/325db9c6f69b
+  - [net-next,V2,09/10] devlink: Add a 'num_doorbells' driverinit param
+    https://git.kernel.org/netdev/net-next/c/6bdcb735fec6
+  - [net-next,V2,10/10] net/mlx5e: Use the 'num_doorbells' devlink param
+    https://git.kernel.org/netdev/net-next/c/11bbcfb7668c
 
 You are awesome, thank you!
 -- 
