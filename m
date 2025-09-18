@@ -1,175 +1,110 @@
-Return-Path: <netdev+bounces-224295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82764B83896
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:35:11 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75E58B83908
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6733F7219C9
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:34:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 45C504E2874
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 432492FAC15;
-	Thu, 18 Sep 2025 08:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D6E2FB973;
+	Thu, 18 Sep 2025 08:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ACt1tF6s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tWVDYOv5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C452F9DA7
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 08:34:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBD12F5461
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 08:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758184452; cv=none; b=fWdvyLyF2DyVjL+N/isidmhdC7ftWkSVNzrmjTJKbIceWq73RcO31AAbjhyAgCZi1c2CBADpcvoe2RR770vmdd4ch+PpZhd7YVB4iw2QRV5E0Ttk+ouZZa2pPaC0AfjUBz4yicyhaGJJHrMwy6O4TnoMHIeF39Lbm8Ry9QrnpXI=
+	t=1758184819; cv=none; b=UMFApX8/4a8GdWo0Epzney/7rNpqM1Hmf2AC3aOis4lOI/LO7N5PI326haF8ZdvdyAA08X2INuRzgadC47aW8dI00zE0vOVBVxb9vuIrIwXSKZlKuxyQKOsL1077/t8YmXRRZjz2zXY9Ql9zMH7LaJwmsKNxP4f/jdMYLwCxeQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758184452; c=relaxed/simple;
-	bh=+Ahr5oNqxXsasI3EQWXo7mCLrNIvdckTiHF6ZxjDajA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=I4YjsgS4LVrXMJRFm4E1Bpd+4q/xeYkXE8cUVN3D/2SchlCTTyu5qFknLxM7xmeyc9wVhfNE1DuqC/1AOM/7IGPAl02XPPmUjASveAt4TTRs9yhmYhGCSQS3Q1F1hWoYdoMmg8EZuDN7H+ESQxqJLWOy78BnYqL+S9hYhK4+Hfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ACt1tF6s; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id BF67E1A0E03;
-	Thu, 18 Sep 2025 08:34:08 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 969506062C;
-	Thu, 18 Sep 2025 08:34:08 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A9F17102F1CBF;
-	Thu, 18 Sep 2025 10:34:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1758184447; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=EY6yVymLZMeFS52uP2yzPDRoqRTf9+mNLzBhVGM2Bzs=;
-	b=ACt1tF6s5DtutmaB8W/6DxpovK/rpF/26Te+HqVmJULQzZ2S7K3LWQDMeQ+NJpSrVucIZG
-	5fOVi9vjbsBuoqIYvWUnBZCO5j1JFQlUqTSW+0D5ZngqmWGctN11H3YqWoeWSQohv1zuLj
-	7Z/qEeNIMwkmqD+QwLYdEdekFcAsKHY78adlEjwg8+Wrx2Dw0OUTAeOY2wRdcqKJx5uVTV
-	8XBS0Q8xglxsnSp6/t2FsWc41SYs7NlY53o3DopcUV8SXI4q4YP+MiJb7PXQBvaBre6IRd
-	nQnrCZ8KxrBIONpaMbvurn/yUd1iFZTaPtPlyu/B53HxmAQn0HKRZKLT3J71Kg==
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-Date: Thu, 18 Sep 2025 10:33:52 +0200
-Subject: [PATCH net-next v3 3/3] net: dsa: microchip: Set SPI as bus
- interface during reset for KSZ8463
+	s=arc-20240116; t=1758184819; c=relaxed/simple;
+	bh=Jd9287PjvPVaJPDGTGu1BO5hAK3Ccg03DTslvCmRaWU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=m5kZRYnWVKmUVj5UHDcFXJClbY8EfB968rTCBpa4HnrcUmCxxFgA/oQx7lBfN9zwWr/D37miTuWYd5+pOm6WGq9pRaRKnJrGc2tXNvpwOYYaNQr9gQ4Mxcq9ca8GhgZjDC81Hy87NNCdh2cIIutp+N4ixegNcEmOiLLEJa7/kIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tWVDYOv5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77E3DC4CEE7;
+	Thu, 18 Sep 2025 08:40:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758184817;
+	bh=Jd9287PjvPVaJPDGTGu1BO5hAK3Ccg03DTslvCmRaWU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tWVDYOv5disKHrCiEQvo3mfWPPmed42SzZ/MmYCM9GZhvf7BlHNw0KMorNv6hc8sU
+	 oeqHZr6mGb3bsyeg5Frb1sIT4jLSF8ZTAMgKm5gH07nEDcG+4Zt03BguM2pXO7eiw/
+	 guF96tnsh6kHx271JXMVHdeyKnMr5rbhtn0/r4MGH3KrH18Duf0KiYh9nFmkjvy+re
+	 Q9HSftRRFNnQBGf/pqYjamib0eUveUu99qH692SECkGT/O5uQl8uvxP1i9aKP1U8KR
+	 AbiFGIV+leMwBtFsBSvcQ6Le+Lh5gPd2vREKq057/V5jKOeLYBhOUeQGoT2R4TgmuJ
+	 HwtafSa2x3Yrw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADEF39D0C28;
+	Thu, 18 Sep 2025 08:40:18 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250918-ksz-strap-pins-v3-3-16662e881728@bootlin.com>
-References: <20250918-ksz-strap-pins-v3-0-16662e881728@bootlin.com>
-In-Reply-To: <20250918-ksz-strap-pins-v3-0-16662e881728@bootlin.com>
-To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
- Pascal Eberhard <pascal.eberhard@se.com>, 
- Woojung Huh <Woojung.Huh@microchip.com>, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-X-Mailer: b4 0.14.2
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/10] udp: increase RX performance under stress
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175818481765.2322785.5338690827475365235.git-patchwork-notify@kernel.org>
+Date: Thu, 18 Sep 2025 08:40:17 +0000
+References: <20250916160951.541279-1-edumazet@google.com>
+In-Reply-To: <20250916160951.541279-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ willemb@google.com, kuniyu@google.com, dsahern@kernel.org,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
-At reset, the KSZ8463 uses a strap-based configuration to set SPI as
-bus interface. SPI is the only bus supported by the driver. If the
-required pull-ups/pull-downs are missing (by mistake or by design to
-save power) the pins may float and the configuration can go wrong
-preventing any communication with the switch.
+Hello:
 
-Introduce a ksz8463_configure_straps_spi() function called during the
-device reset. It relies on the 'straps-rxd-gpios' OF property and the
-'reset' pinmux configuration to enforce SPI as bus interface.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
----
- drivers/net/dsa/microchip/ksz_common.c | 45 ++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+On Tue, 16 Sep 2025 16:09:41 +0000 you wrote:
+> This series is the result of careful analysis of UDP stack,
+> to optimize the receive side, especially when under one or several
+> UDP sockets are receiving a DDOS attack.
+> 
+> I have measured a 47 % increase of throughput when using
+> IPv6 UDP packets with 120 bytes of payload, under DDOS.
+> 
+> [...]
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 7292bfe2f7cac3a0d88bb51339cc287f56ca1d1f..3bfa894d62eecc08dc45b25225e1122fe30b8f99 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -23,6 +23,7 @@
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
- #include <linux/micrel_phy.h>
-+#include <linux/pinctrl/consumer.h>
- #include <net/dsa.h>
- #include <net/ieee8021q.h>
- #include <net/pkt_cls.h>
-@@ -5338,6 +5339,38 @@ static int ksz_parse_drive_strength(struct ksz_device *dev)
- 	return 0;
- }
- 
-+static int ksz8463_configure_straps_spi(struct ksz_device *dev)
-+{
-+	struct pinctrl *pinctrl;
-+	struct gpio_desc *rxd0;
-+	struct gpio_desc *rxd1;
-+
-+	rxd0 = devm_gpiod_get_index_optional(dev->dev, "straps-rxd", 0, GPIOD_OUT_LOW);
-+	if (IS_ERR(rxd0))
-+		return PTR_ERR(rxd0);
-+
-+	rxd1 = devm_gpiod_get_index_optional(dev->dev, "straps-rxd", 1, GPIOD_OUT_HIGH);
-+	if (IS_ERR(rxd1))
-+		return PTR_ERR(rxd1);
-+
-+	if (!rxd0 && !rxd1)
-+		return 0;
-+
-+	if ((rxd0 && !rxd1) || (rxd1 && !rxd0))
-+		return -EINVAL;
-+
-+	pinctrl = devm_pinctrl_get_select(dev->dev, "reset");
-+	if (IS_ERR(pinctrl))
-+		return PTR_ERR(pinctrl);
-+
-+	return 0;
-+}
-+
-+static int ksz8463_release_straps_spi(struct ksz_device *dev)
-+{
-+	return pinctrl_select_default_state(dev->dev);
-+}
-+
- int ksz_switch_register(struct ksz_device *dev)
- {
- 	const struct ksz_chip_data *info;
-@@ -5353,10 +5386,22 @@ int ksz_switch_register(struct ksz_device *dev)
- 		return PTR_ERR(dev->reset_gpio);
- 
- 	if (dev->reset_gpio) {
-+		if (of_device_is_compatible(dev->dev->of_node, "microchip,ksz8463")) {
-+			ret = ksz8463_configure_straps_spi(dev);
-+			if (ret)
-+				return ret;
-+		}
-+
- 		gpiod_set_value_cansleep(dev->reset_gpio, 1);
- 		usleep_range(10000, 12000);
- 		gpiod_set_value_cansleep(dev->reset_gpio, 0);
- 		msleep(100);
-+
-+		if (of_device_is_compatible(dev->dev->of_node, "microchip,ksz8463")) {
-+			ret = ksz8463_release_straps_spi(dev);
-+			if (ret)
-+				return ret;
-+		}
- 	}
- 
- 	mutex_init(&dev->dev_mutex);
+Here is the summary with links:
+  - [net-next,01/10] ipv6: make ipv6_pinfo.saddr_cache a boolean
+    https://git.kernel.org/netdev/net-next/c/3fbb2a6f3a70
+  - [net-next,02/10] ipv6: make ipv6_pinfo.daddr_cache a boolean
+    https://git.kernel.org/netdev/net-next/c/5489f333ef99
+  - [net-next,03/10] ipv6: np->rxpmtu race annotation
+    https://git.kernel.org/netdev/net-next/c/9fba1eb39e2f
+  - [net-next,04/10] ipv6: reorganise struct ipv6_pinfo
+    https://git.kernel.org/netdev/net-next/c/b76543b21fbc
+  - [net-next,05/10] udp: refine __udp_enqueue_schedule_skb() test
+    https://git.kernel.org/netdev/net-next/c/9aaec660b5be
+  - [net-next,06/10] udp: update sk_rmem_alloc before busylock acquisition
+    https://git.kernel.org/netdev/net-next/c/faf7b4aefd5b
+  - [net-next,07/10] net: group sk_backlog and sk_receive_queue
+    https://git.kernel.org/netdev/net-next/c/4effb335b5da
+  - [net-next,08/10] udp: add udp_drops_inc() helper
+    https://git.kernel.org/netdev/net-next/c/9db27c80622b
+  - [net-next,09/10] udp: make busylock per socket
+    https://git.kernel.org/netdev/net-next/c/3cd04c8f4afe
+  - [net-next,10/10] udp: use skb_attempt_defer_free()
+    https://git.kernel.org/netdev/net-next/c/6471658dc66c
 
+You are awesome, thank you!
 -- 
-2.51.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
