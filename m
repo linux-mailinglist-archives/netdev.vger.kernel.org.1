@@ -1,115 +1,142 @@
-Return-Path: <netdev+bounces-224584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2980EB8659A
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 20:02:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00247B8662A
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 20:08:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D500456573D
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 18:02:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67BEE7BDEDF
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 18:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14AC288C35;
-	Thu, 18 Sep 2025 18:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D36A2D1308;
+	Thu, 18 Sep 2025 18:07:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tsTetEGM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PxclFLwb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8D634BA25
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 18:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7872D0611;
+	Thu, 18 Sep 2025 18:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758218571; cv=none; b=pBfueWWfCg+OTgH41nxpFdqWYwggPcHVpZS4GaL2klsvDNx4WkgdVfSXAcxh20EfmPBl3uKhkglSO2wtIusOLus5wGonWohuU+hr5rUenlgXQTZN95bkvwqIaoUwAKvZOStz6VAN8gvNYV5YwGRoO8FhDVgjMxaxplhGjwcgflc=
+	t=1758218875; cv=none; b=cq7eSaEdaeWY9cOFsm/eo1aMjSMPwTZFqCXwezfZ3MuYonoNneEIgpUIB0lU9TEslf9giA81XxNmb5wsKvQrxr0zTByiDDq04f8WBZcCf04tP4jbSksFOfzx8GPxrzGCmj9xFbtfl/xJziisheBz/UQlMNtNrVmJ6AJEOvtUJl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758218571; c=relaxed/simple;
-	bh=6QxVnUw4wzEueSJAKwxPM7TMxP0+k06YCDun+1cr6/g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DASMTd7dbmMxrVrfFy7KxsCG+ft+WS+M6Wvg4LwDnPOjGQD5rQ/ggjGbb+mGKUcABMTfqRfLWrqXmDzy/RztHluwZhiTjgCha/nTHjlA62F3zoblI6BWjXoUPGUJXGjkARTGye1LNrNOtZQgKkmLvroUWxXpxorLzu3ELv7ic44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tsTetEGM; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4b60144fc74so15943671cf.2
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 11:02:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758218569; x=1758823369; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6QxVnUw4wzEueSJAKwxPM7TMxP0+k06YCDun+1cr6/g=;
-        b=tsTetEGMCe5W8D4hk/sVx3Ot9PWa7wgDIoQuCm8yr0O2UjPnBxc52XCOvax4i3tU3f
-         bW/aKBLelLt481sczY6uZpm2KyYu2Qdlszf2JwqJY9zRUaT6sSMrhUjVFYcT35O7cXy5
-         mdeli5YU15D/vve+HuK56/7OElMP/MTLA+3+zC112rggVWKU+qIqfiYTQ2zPTqL48hp1
-         dg00kB0KsdV0XUszGz1Q/o5IN9zckG77Jtrro7ODlYqSrJf6I/YZOPqr7wjiSaOqTkqR
-         EMsq9rRafddvoW9HI97BMDUWPil0fyBHMRPFfvIDx9SPgrFneUJyi2Z9o7wu8QYJr163
-         y3lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758218569; x=1758823369;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6QxVnUw4wzEueSJAKwxPM7TMxP0+k06YCDun+1cr6/g=;
-        b=uzumEPyhDy4nuwqCgm14GIR73Jkp4X9JiZCuM9BfzjLnT9Y1pNmBzkJSQG/+Gk5x0O
-         nMtmqZ/Y6U2ZTU3RHElSJXiB7EeomEOOY21OkxthvW2AUORJCxkgGRTMxFjTacCJdwka
-         Cjp0b9rayMaLENYHphD28t9yXOvWBU3QhjHLfBUvMYOZjCoSyidK7MQzz9hd37rC0UFl
-         nEk+qEG/xT2HNQllRbbeBmM2TujvDEM1Zv7Ycr6/tmFoJm1++qacPjFCD4JNAktO0aak
-         Io7iEoabNvC+PuhePEgnwN90vhsbWVSFAbdtgCzAfl8/Kq+KOjQZKR82v5cH5WAmSzTz
-         q8aQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVa7A4VUCb7quteO4UgPmwCmE6Gx1c8VlEwBQeruYHYGSuJffI8lerYs8bgTQTUVYJOlw+gRoo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTf0txDesKW8fLt4WI90u8V2WdVi/hv9z3IIN/801jifgIPe6m
-	JmKA75Ss0cMiAi0aJmgE3DY3Dty+EccpXhcwelqqangq57lj9GQoEqlpoKD4/cGnxkKMi/uhv2l
-	wry9xgtpd4MDPSqmSvDFLqx/nW6n10X7TKwmcWGj/
-X-Gm-Gg: ASbGncvytb9H2IEu6LvnSWBMHLinm8P1u7biXmfkVWHOorSX9cXCJ0LhkP0JIbdO5Gm
-	DA6DV9b66Zzh4fQB7JFBZBME5VETROzr2xgT5Clwf97biicNXCuevpcwco35MZjZ2xZmSqW/ev+
-	vLnXVRIP/A0jAKT+CPKsMSSVAyQV6UvRnHoGwyVgyRylRdzg/rJlpAwCLp1jOuvpxLMae+alN6m
-	WLcGGmcHo0FHmG4JN8qRK6D+oljVfAs
-X-Google-Smtp-Source: AGHT+IFS1dBplz8pVcb/mD/pF+XO0D6mfcu0KXBAm8HS0tv6eJvKqXpKx4eeVo9x6x9AYqjhXhvgi+R1r1NS9rdTa9Q=
-X-Received: by 2002:ac8:5a10:0:b0:4b7:8028:ff1d with SMTP id
- d75a77b69052e-4c072d2e152mr2701381cf.74.1758218568442; Thu, 18 Sep 2025
- 11:02:48 -0700 (PDT)
+	s=arc-20240116; t=1758218875; c=relaxed/simple;
+	bh=YNevYmGrFg8ms4fHGj/XC+C4DFhAFFfn8I+VWFqP+KU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F0cqPhmB7r77CNTtGHyjJWNAhcgdl1FzGlt2G/a0R9yzb62rIpIvnardUwbcIyO7xg7kIFuTxhFFuCcGoH44xnuUly06XGogQneGLQ1qEcHmAP974ncUpeYg8CVKVmGeN3yrjHMcUPZKd98XeGwl9gGhzXWrzogr/+dVuybv9Bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PxclFLwb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1800DC4CEFB;
+	Thu, 18 Sep 2025 18:07:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758218874;
+	bh=YNevYmGrFg8ms4fHGj/XC+C4DFhAFFfn8I+VWFqP+KU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PxclFLwb2uhaBdzRGwXa+VctRb8QOdwRB5UcCwBmlOfV+Te50DgMCykzJqAtrL4m6
+	 Le57iTfcMEnp649AGoZxo7xOeOvUsrqkWifVY6Z0p81/6cOyENppG4RlAYQFgKQP5M
+	 mZDXh8skyK+Z5/6nOBiKV/cWVoXD9wNnvi9kFzhvtcHzBzrRLHyuIF4K1CB8NW9OEp
+	 mTLmI5zXe8ZQ9CJVWGBDgpQM/1Zq40AyI+iLK7r0siiNkHOFqVckCiW+VKFxwQD9Oq
+	 Psf4uBgtqyApWfIuWqSqcRSEz4+6GtAomOK3dsPpi+XPeHyEw1Gnbu++jdm3APW3DT
+	 4qXmbOSzQNjaw==
+Date: Thu, 18 Sep 2025 21:07:50 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Abhijit Gangurde <abhijit.gangurde@amd.com>
+Cc: brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, jgg@ziepe.ca,
+	andrew+netdev@lunn.ch, sln@onemain.com, allen.hubbe@amd.com,
+	nikhil.agarwal@amd.com, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 00/14] Introduce AMD Pensando RDMA driver
+Message-ID: <20250918180750.GA135135@unreal>
+References: <20250903061606.4139957-1-abhijit.gangurde@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250918132007.325299-1-edumazet@google.com> <CAJwJo6Z5+W2hDMOwPTnRWqLoGLqfwezZd_mOCmbMEnbvK-VBDg@mail.gmail.com>
-In-Reply-To: <CAJwJo6Z5+W2hDMOwPTnRWqLoGLqfwezZd_mOCmbMEnbvK-VBDg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 18 Sep 2025 11:02:37 -0700
-X-Gm-Features: AS18NWCdacnt9l3q98jEJHNFfPbK4MwUg_OY1vnkkBQ55hGVaZi8fYlX5bTWMBs
-Message-ID: <CANn89i+nAPNQ9pWjk6K7z+kH4dnP3YcmjvW_StT=0CdHoPR-+g@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: prefer sk_skb_reason_drop()
-To: Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Daniel Zahka <daniel.zahka@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250903061606.4139957-1-abhijit.gangurde@amd.com>
 
-On Thu, Sep 18, 2025 at 10:56=E2=80=AFAM Dmitry Safonov <0x7f454c46@gmail.c=
-om> wrote:
->
-> On Thu, 18 Sept 2025 at 14:20, Eric Dumazet <edumazet@google.com> wrote:
-> >
-> > Replace two calls to kfree_skb_reason() with sk_skb_reason_drop().
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > Cc: Daniel Zahka <daniel.zahka@gmail.com>
-> > Cc: Dmitry Safonov <0x7f454c46@gmail.com>
->
-> LGTM, thanks!
->
-> Reviewed-by: Dmitry Safonov <0x7f454c46@gmail.com>
->
-> Side-note: I see that tcp_ao_transmit_skb() can currently fail only
-> due to ENOMEM, IIRC I haven't found more specific reason at that time
-> than just SKB_DROP_REASON_NOT_SPECIFIED, unsure if worth changing
-> that.
+On Wed, Sep 03, 2025 at 11:45:52AM +0530, Abhijit Gangurde wrote:
+> This patchset introduces an RDMA driver for the AMD Pensando adapter.
+> An AMD Pensando Ethernet device with RDMA capabilities extends its
+> functionality through an auxiliary device.
+> 
+> The first 6 patches of the series modify the ionic Ethernet driver
+> to support the RDMA driver. The ionic RDMA driver implementation is
+> split into the remaining 8 patches.
+> 
+> The user-mode of the driver is being reviewed at:
+> https://github.com/linux-rdma/rdma-core/pull/1620
 
-We could then use SKB_DROP_REASON_NOMEM.
+<...>
+
+> Abhijit Gangurde (14):
+>   net: ionic: Create an auxiliary device for rdma driver
+>   net: ionic: Update LIF identity with additional RDMA capabilities
+>   net: ionic: Export the APIs from net driver to support device commands
+>   net: ionic: Provide RDMA reset support for the RDMA driver
+>   net: ionic: Provide interrupt allocation support for the RDMA driver
+>   net: ionic: Provide doorbell and CMB region information
+>   RDMA: Add IONIC to rdma_driver_id definition
+>   RDMA/ionic: Register auxiliary module for ionic ethernet adapter
+>   RDMA/ionic: Create device queues to support admin operations
+>   RDMA/ionic: Register device ops for control path
+>   RDMA/ionic: Register device ops for datapath
+>   RDMA/ionic: Register device ops for miscellaneous functionality
+>   RDMA/ionic: Implement device stats ops
+>   RDMA/ionic: Add Makefile/Kconfig to kernel build environment
+
+This series generates CI warnings:
+1. In my local CI
+
+➜  kernel git:(rdma-next) yo ci
+e81ec02df1e47 (HEAD -> rdma-next) RDMA: Use %pe format specifier for error pointers
+In file included from ./include/linux/string.h:382,
+                 from ./include/linux/bitmap.h:13,
+                 from ./include/linux/cpumask.h:12,
+                 from ./arch/x86/include/asm/paravirt.h:21,
+                 from ./arch/x86/include/asm/cpuid/api.h:57,
+                 from ./arch/x86/include/asm/processor.h:19,
+                 from ./arch/x86/include/asm/timex.h:5,
+                 from ./include/linux/timex.h:67,
+                 from ./include/linux/time32.h:13,
+                 from ./include/linux/time.h:60,
+                 from ./include/linux/stat.h:19,
+                 from ./include/linux/module.h:13,
+                 from drivers/infiniband/hw/ionic/ionic_controlpath.c:4:
+In function ‘fortify_memcpy_chk’,
+    inlined from ‘ionic_set_ah_attr.isra’ at drivers/infiniband/hw/ionic/ionic_controlpath.c:609:3:
+./include/linux/fortify-string.h:580:25: error: call to ‘__read_overflow2_field’ declared with attribute warning: detected read beyond size of field (2nd parameter); maybe use struct_group()? [-Werror=attribute-warning]
+  580 |                         __read_overflow2_field(q_size_field, size);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+make[6]: *** [scripts/Makefile.build:287: drivers/infiniband/hw/ionic/ionic_controlpath.o] Error 1
+make[5]: *** [scripts/Makefile.build:556: drivers/infiniband/hw/ionic] Error 2
+make[5]: *** Waiting for unfinished jobs....
+make[4]: *** [scripts/Makefile.build:556: drivers/infiniband/hw] Error 2
+make[3]: *** [scripts/Makefile.build:556: drivers/infiniband] Error 2
+make[2]: *** [scripts/Makefile.build:556: drivers] Error 2
+make[1]: *** [/tmp/tmp53nb1nwr/Makefile:2011: .] Error 2
+make: *** [Makefile:248: __sub-make] Error 2
+
+2. From kbuild
+
+Unverified Error/Warning (likely false positive, kindly check if interested):
+
+    ERROR: modpost: "__xchg_called_with_bad_pointer" [drivers/infiniband/hw/ionic/ionic_rdma.ko] undefined!
+
+Error/Warning ids grouped by kconfigs:
+
+recent_errors
+`-- sparc-allmodconfig
+    `-- ERROR:__xchg_called_with_bad_pointer-drivers-infiniband-hw-ionic-ionic_rdma.ko-undefined
+
 
