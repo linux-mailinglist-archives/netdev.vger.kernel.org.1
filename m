@@ -1,153 +1,100 @@
-Return-Path: <netdev+bounces-224464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D12DB854E1
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:43:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A601EB855A5
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:51:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42FDE166B32
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:41:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCD29545475
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:49:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA013263F4A;
-	Thu, 18 Sep 2025 14:41:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33ED22DFA2D;
+	Thu, 18 Sep 2025 14:49:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jBZy6d8W"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="d/eBPYQj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7931F9F70
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 14:41:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53AA2D322C;
+	Thu, 18 Sep 2025 14:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758206512; cv=none; b=QPUYw00lbz/WxyJwDFQ8BQ0fOf2VOahP5pNoZDl7Fn9r4g1F7zPg70Ctkk5Iq137zDqySHl6cHdIjuc+VqKQ90zMaaA9LH402NNTHEK8N8HjHogmUo0qrrI+1/mPRiwdq8s7vOro/i+0vo2wCERhXLO23+R5Dwt2fcyTqG496sM=
+	t=1758206964; cv=none; b=VMKoIEtY/U+wY0XPwtlLzfpNYhUnNabWOt00tHsdTa87bo2UHJgTJD5Pf05Kb5BNCZJkVYgZD23AVTh0m8pSaKgIK2igIuGT6omFeMHnTV1ogFnZ7oe0NC0oll2OexrUjLdBhM947wEPpQgvKxj/2Tdni+jUAUuKDViGQmgIfW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758206512; c=relaxed/simple;
-	bh=52mzwF50ZysPik2mfGb84bky8NEzJW1dDbmZc78Gl3o=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=QcbHgjLm4GpeLXT6/nx619GsuJ1dBg9SMYFuyx1BoEGSYzf3h/2aUUgQXfoRtuOqNnU1YA2sC9Dfxag62F5m5sgukUcZD8asE0lJuxmT37UldG4T5jv8fdHV5yYG528QE8ehTLq5uYtus9ct5PLq7j/ssIId0rBMjGs0zNn43x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jBZy6d8W; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758206510;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=XGS8iYxGjjgCtPNfLtzzgPnXWY2Ig3ulBcoQ+vUpdX4=;
-	b=jBZy6d8W3ydjMg2N5kOOKhaF+EDpSX3+9jH4nYUa0Ew/q1lKn5MrskSWICmWfWAu9Ik+M9
-	XBC41ZfgxU0S8igzBJzLm3ME72j8wiCngt2wsQCkZxhzHDy6UExkskhPprBGupDmXf+urh
-	zDD2FppRgnVeAROkiXIH2dS2GTgqaVA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-587-e9yHRz7eOHevbniv419K3w-1; Thu, 18 Sep 2025 10:41:48 -0400
-X-MC-Unique: e9yHRz7eOHevbniv419K3w-1
-X-Mimecast-MFC-AGG-ID: e9yHRz7eOHevbniv419K3w_1758206508
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45f2b0eba08so6321335e9.3
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 07:41:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758206507; x=1758811307;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XGS8iYxGjjgCtPNfLtzzgPnXWY2Ig3ulBcoQ+vUpdX4=;
-        b=iuqLMvyjWKIM6GTSNUhTaXvFjPG+MHiUPDd0puG/OXZg8mkdFL8Bw6HIznhn64rQja
-         0T0py5esz5r/YYon8cQQZQhajq6586Sf1mUJcxbxBqd3ELcGOSfycJUoHwTuyZU8Wv0Z
-         KLK8f2lFqcsXNVg+YR5MA0OI/OBRuGKLyg5JD9iWrWfKDhqqXs71vkPLLpC2vDW+s5Nl
-         9iPvVRKcwUCaeB4UFRIElavn7QbwMZkEEAXnLJYlUBvuGA72vUbzuM3hVJn15L3d6BtZ
-         6Tz55oT9wkmFU+A/Woswzz7onqZ2JG14DbQBCO031zqr42TKa3SJXLpUWJ3aF0fbFz/f
-         iMiw==
-X-Forwarded-Encrypted: i=1; AJvYcCXz8NwjRGVhcGHZ1tLr7P5Atai8sEqnK6OdUEmFnVxTTwRcGZ+0OysSh1sna7wWf82oQPtn8As=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzyi6qDjl1tCha4Fdru+2/AWnyJ+um4Ev+LU0Q/7pv0ioQrSU7L
-	LrMdjS0G1Z/zVci9rQalWbQTrlWrs1isWONqS4fxfVCq7Lyhwop/t2jIEJ2tvoiaYIzIE2Pr4qS
-	P2U8bO0kFK6RQ92bJST6aBo7yPfy10IReUu2xIt8z/i6O9IANIP4daUF+2A==
-X-Gm-Gg: ASbGncumwmi0rd6WmuXR5dHMsuTyy0a5Mx8cCOxbVs54Of8NjEGqDmCER6pBpvj6MJJ
-	b2pSp84ZuAlbP4dnuGDhYgvmKqpKx/d/pYMExnnxpys752KWjLW9g5EktQya9dewxcZ72r6HN5q
-	+fYzvwZj6MOQTGI7Tb/2YNmev9fexx0gTPwGdJf+ongw0+/A92aiARZBtl+L9o7D55wzU1LI0Sa
-	lD8Km9bh8VGeJvLefjSkTpHv5yd35EqdVLqEMjYDsbC8J7re3fgyqaTLuUFQlRc4T3Aj6NkMMuq
-	tHWAUz8XwUz9cKQY0mKNEilParIhlLO2tjQ=
-X-Received: by 2002:a05:600c:3b05:b0:461:8b9d:db1d with SMTP id 5b1f17b1804b1-46201f8aa61mr51947625e9.7.1758206507306;
-        Thu, 18 Sep 2025 07:41:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6KtyNG51lUBBb+796Ksha+xJ3k91Ah4nN79uv8tPH32cwmgf4CIFGIqg2jBve/wowaCq5Rg==
-X-Received: by 2002:a05:600c:3b05:b0:461:8b9d:db1d with SMTP id 5b1f17b1804b1-46201f8aa61mr51947335e9.7.1758206506772;
-        Thu, 18 Sep 2025 07:41:46 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:73e7:4d00:2294:2331:c6cf:2fde])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-464f0aac3fdsm42562565e9.1.2025.09.18.07.41.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Sep 2025 07:41:46 -0700 (PDT)
-Date: Thu, 18 Sep 2025 10:41:44 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	alok.a.tiwari@oracle.com, ashwini@wisig.com, filip.hejsek@gmail.com,
-	hi@alyssa.is, leiyang@redhat.com, maxbr@linux.ibm.com,
-	mst@redhat.com, seanjc@google.com, stable@vger.kernel.org,
-	zhangjiao2@cmss.chinamobile.com
-Subject: [GIT PULL] virtio,vhost: last minute fixes
-Message-ID: <20250918104144-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1758206964; c=relaxed/simple;
+	bh=23ktBBop4u/x7zNZgLlZ9TKFaiNhHwD9+DMajpKh+NY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nlHCMbzXJscDTPmPwd+zrOHT8UtAQWp7AwclmG+O9IlCPYc7JTOdMK8YuR0p5rJVs3VbLC5k0bWphkJxSOM84mLoFvl0fnoPskNRdreuRqDzWIZFeBDSjri2Uid5TiaXbaqa4iM9OeL9otyZ8zmFa8sfUtyxSo6L3JELepZR4/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=d/eBPYQj; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58I9JcEX016305;
+	Thu, 18 Sep 2025 07:49:02 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=JdMj8B8nXgt0VBenxcRLktJ
+	uo4S96i7ypAqb9pDdydU=; b=d/eBPYQjMHf7poCQ0UdJsW5XJsykuWj6VjiLM+P
+	/K+AyM/cL0HRgAuA0OlCc0K5d5SW1meJX7I2yaB7mvmatf9OyNm9IFgRf1Uns4CV
+	oFVl/zoYa2MREAnIoK/lw2kbvmUoikSTJjvgp4AJPaBQhUvBWN/uEP7yLeMMTYcl
+	fb+bWIRY4vgCuMW9V4H4vZ3zVPzC66lkJRrd9QTC6NzOgwIuGl84tNTgwWc/Ab0A
+	TywbSXvZtxtIv9jE/VprJjGgn5RbtCait6zoZJkF6k8IvvxO0XDmIn+9vaZQPbRb
+	8aAni++k1OSqGVBuCLZzyF4r3uTO69CxLDaAwC4ZWgzyx2g==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 498fbngs3w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Sep 2025 07:49:02 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 18 Sep 2025 07:49:09 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Thu, 18 Sep 2025 07:49:09 -0700
+Received: from sburla-PowerEdge-T630.sclab.marvell.com (unknown [10.106.27.217])
+	by maili.marvell.com (Postfix) with ESMTP id 951355C68E7;
+	Thu, 18 Sep 2025 07:49:01 -0700 (PDT)
+From: Sathesh B Edara <sedara@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <sburla@marvell.com>, <vburru@marvell.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>, <hgani@marvell.com>,
+        <andrew@lunn.ch>, <srasheed@marvell.com>
+CC: <sedara@marvell.com>
+Subject: [net-next PATCH v1 0/2] Add support to retrieve hardware channel information
+Date: Thu, 18 Sep 2025 07:48:56 -0700
+Message-ID: <20250918144858.29960-1-sedara@marvell.com>
+X-Mailer: git-send-email 2.36.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: VDocRr0QENXIGds8MxRRUiNdod3OBNeJ
+X-Authority-Analysis: v=2.4 cv=Pa7/hjhd c=1 sm=1 tr=0 ts=68cc1bde cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=yJojWOMRYYMA:10 a=PlYhftpBkXA4JvsghnwA:9
+X-Proofpoint-GUID: VDocRr0QENXIGds8MxRRUiNdod3OBNeJ
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE4MDA4NSBTYWx0ZWRfXwCq4n301Gre0 ufclvzlf9A/1EI2HpScBxtl4XYDVonA7rQ/pMvxtK+5LEKq1hwfMYQ/gA6vVrRheplnIHVdA7Ov MG4vxNm7gNg8zTR24fbNa2laM7QP2Ktdhj4ZjFwg5dgKRp61lwwCtkum3upIrNfzz2lanWGFZZa
+ Xx8ErwDY0UH1L0uo3YE58MQxN/mCU6mCS7d5AXkaPkYga0Omc2f2PDmHHxCIQjRmpSF5y3sIoPu aROr5Yj7wqIA1NPXttshHS72+itAU7ZuL3oWAMDvQP75ARtr+zjO3QxFG6LqXpQejQYxqCh+i0E epQ9aL93yXwchvFEMy/s7TS1E9jk9jXoDNEG7ayVeZD5tz69ExbTnw1w4lLFQDAGabSFIDNQCYh P5bhNS8G
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-18_01,2025-09-18_02,2025-03-28_01
 
-The following changes since commit 76eeb9b8de9880ca38696b2fb56ac45ac0a25c6c:
+This patch series introduces support for retrieving hardware channel
+configuration through the ethtool interface for both PF and VF.
 
-  Linux 6.17-rc5 (2025-09-07 14:22:57 -0700)
+Sathesh B Edara (2):
+  octeon_ep: Add support to retrieve hardware channel information
+  octeon_ep_vf: Add support to retrieve hardware channel information
 
-are available in the Git repository at:
+ .../net/ethernet/marvell/octeon_ep/octep_ethtool.c   | 12 ++++++++++++
+ .../ethernet/marvell/octeon_ep_vf/octep_vf_ethtool.c | 12 ++++++++++++
+ 2 files changed, 24 insertions(+)
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-
-for you to fetch changes up to 549db78d951726646ae9468e86c92cbd1fe73595:
-
-  virtio_config: clarify output parameters (2025-09-16 05:37:03 -0400)
-
-----------------------------------------------------------------
-virtio,vhost: last minute fixes
-
-More small fixes. Most notably this reverts a virtio console
-change since we made it without considering compatibility
-sufficiently.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Alok Tiwari (1):
-      vhost-scsi: fix argument order in tport allocation error message
-
-Alyssa Ross (1):
-      virtio_config: clarify output parameters
-
-Ashwini Sahu (1):
-      uapi: vduse: fix typo in comment
-
-Michael S. Tsirkin (1):
-      Revert "virtio_console: fix order of fields cols and rows"
-
-Sean Christopherson (3):
-      vhost_task: Don't wake KVM x86's recovery thread if vhost task was killed
-      vhost_task: Allow caller to omit handle_sigkill() callback
-      KVM: x86/mmu: Don't register a sigkill callback for NX hugepage recovery tasks
-
-zhang jiao (1):
-      vhost: vringh: Modify the return value check
-
- arch/x86/kvm/mmu/mmu.c           |  7 +-----
- drivers/char/virtio_console.c    |  2 +-
- drivers/vhost/scsi.c             |  2 +-
- drivers/vhost/vhost.c            |  2 +-
- drivers/vhost/vringh.c           |  7 +++---
- include/linux/sched/vhost_task.h |  1 +
- include/linux/virtio_config.h    | 11 ++++----
- include/uapi/linux/vduse.h       |  2 +-
- kernel/vhost_task.c              | 54 ++++++++++++++++++++++++++++++++++++----
- 9 files changed, 65 insertions(+), 23 deletions(-)
+-- 
+2.36.0
 
 
