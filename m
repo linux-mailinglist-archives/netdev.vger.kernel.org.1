@@ -1,148 +1,256 @@
-Return-Path: <netdev+bounces-224581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D14E5B8655D
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 19:57:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C74DB86566
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 19:57:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E482F566053
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:57:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CC54566838
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:57:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20853284888;
-	Thu, 18 Sep 2025 17:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEEC528689B;
+	Thu, 18 Sep 2025 17:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dnq4B7rO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LVWiG7Px"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EDF283124
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 17:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE35F285073
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 17:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758218218; cv=none; b=kONv1/Zn0Le9ez+hbeBYd4ss6TpAJM8tfBNZdaSA/bSD0R4uluefpMkbSAvSBIb2PO/WpXM87kAWc0p3XyHqjl30NzUsANxqbpjfZDdc31A3iI4Qs0pHwaBFkkHQjX4L/ijaW+U/XEww8aGiWjvA5mgx3pqiHu3qsiIqk5dUDTU=
+	t=1758218220; cv=none; b=GBUikVt9jumIKrDq9ruzr8xCjJ+W7WRa3FdM3mz26KpvgY+kk8MDYWaHqJiFtaHr0NtfZrhR18kWiG5H4vEsbzTzFTL6lZczae4S41AYTpM7zrY00PPuRbDA/4Ncp10nk4qfJDRMJnTDkMMYbQsjb1mfdk1AQCbW/e61gi6MyCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758218218; c=relaxed/simple;
-	bh=nvt1N+FfJ8oCTeJ8U8dYalDQG1N6tXfbrPHZYCDYP+g=;
+	s=arc-20240116; t=1758218220; c=relaxed/simple;
+	bh=MMwfYV8IBOMlbTI8PkZDmsqu1i7TUfdE88p04BfIMzE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oepfo+dA2ZA1YzuwVD1vcnWz5+if/o5EBGQrH0wxftcddpeSjjEFsAm6vHZedry8O/Cs/5VQB4qoLnsjmBGD0cW3UzvmNjFodmxUW128QPWyaUZkndHli8qTA1HaqNOkg5Fy3QCGkTIP5DUSZCMdN94JPFH6F8X65OWh2Hytdd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dnq4B7rO; arc=none smtp.client-ip=209.85.215.177
+	 To:Cc:Content-Type; b=EJhmCBZJFNnNh9wOIGcA7c78M4P1I03HLYA+HmG+xKEdTrSwaXmLB7MbSgys7mgSA2i++gISrtrEPI9UHhGgdmeC6pWo5+idDWZ4UZIDekO9p9/1neWb3Z/CjlPhZMkGOJsFChe1Ga5p+Tv9H0ueXR+B859Eo1wy6zPuYmJuIsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LVWiG7Px; arc=none smtp.client-ip=209.85.128.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b54b3cafdcaso897638a12.0
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 10:56:56 -0700 (PDT)
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-71d603a269cso8876057b3.1
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 10:56:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758218216; x=1758823016; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=w/9PvTdoGLy1Z6oVI4h1Hm25FtASw/ANcmPy9rvAMw0=;
-        b=dnq4B7rOLWvTqRvjhFRIHxBBm/TNY+6L/Ol809yFwJU568xtCxF5+mtQneQJAuWYwL
-         oVuw5t85x1ee6hZV+vH0tiwD1/dh9LExbg1lI1GU4WGd9s8b44CLBRc/s+WDQXWdqNBs
-         ZC3eXl/+mV8AV1ekl0VzK3t2ZNzmCMyTHfLkc9jcEDhsFT68Vykt5w60ZxvIFaR7/diD
-         wc9prLV4mXU7ABub4s/MUYuvFavIsWRwJXwxWNDsdXgv6krzKxRGbKXLp8iz4ELvEUVz
-         fhJ1W5i8HdNRVxeM8wKNFDzyPrjX21jlMA2aF/0bdEsWgmAK4XnxBqdzXsC9E4apXM8J
-         zFBA==
+        d=gmail.com; s=20230601; t=1758218218; x=1758823018; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JI0ytwNsiNctSeqBGOIrCT7jeAkBboaje0nOE5Ad0nk=;
+        b=LVWiG7Px6fA9PjA5/nSs7pvLjJF06nkFgBgQ1koHt+QrIcn0m9KB28ppeOQ4SsbrLD
+         dANn6FILuxeM96pxPPd4mxqUBmSOpaWWFsnO8OXgdrJpFI52WDMUxyWLU3a18+6Plw53
+         YAh+EoQ+xOcZveXUiwQ7KfBs/Ww4r6TB606hCV5Z4vsVymbVAuYYQUaXZGM5Lmp07OkJ
+         AULfW2aq+9LogFLNaSTmqj1QdZUmQXhsYfH3x95Qr+Gx1AhgDpjFTo6Rjuudn1g+Su8s
+         xQznnWM8xhnxd18fMeyUkDw3U8xmEytc0E5EfFT3k4REiKOZgeaaj3uVfZu92uNTDLeR
+         PhOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758218216; x=1758823016;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w/9PvTdoGLy1Z6oVI4h1Hm25FtASw/ANcmPy9rvAMw0=;
-        b=Z++eWxr809F7g96bWQDKwxXxGiczaqIKFv2Mm9lEZYodFMjPYrL8emfVdEZ60Jp76Q
-         hs8OsJX4j6OdlR1BFSXSGhQFDf1avB2kznZlER8kQJfZCmZ+aWe5SLYvX1ZHPOlyqNoU
-         NpkOS56rPlZFNX7TE1fHXCiwO8XQRAdcadvNbJbfYtWO49jYUeIeJwyHs5GpVXd9Rb8T
-         QS7HoAC7WGFbbaY03SePLzZegOXLuOnAGUCiGYzS39bQfA8x3+JK7grlhvD2zJCpu9sk
-         LAqErE41E6UiPyBomE07fCaN2HRcE0Sn5UhLm0smIch/iw0CK/C91JwO/rzaLyNy00TF
-         2rrA==
-X-Forwarded-Encrypted: i=1; AJvYcCVp1fog6EJTWNOVPUQNHcXTMOkmhwkCRIO++rhVhZrtcyitR/l4Yhdr7RPOzsj7o91xbt6FR7A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXtg5J9XlQREkw6pvm/o4ILCVbATSBjy3GF9NccJBN94Gci3no
-	er7mA9iAKSrbK6XIobsKCm9Q2jWJxadq9ToWmBPTGcUfYA9f4dN+ig+Ft7at2/7bdr/fBjTP3Op
-	mTBXLaRGANPkzw8pfqV1oTeMCZkFoduM=
-X-Gm-Gg: ASbGncs/+7Kvfz5WUcUtKy/j5W2seZLmbSExw+pW7kUOFuGAIgxswTcizd6XLYkEO1T
-	rZJ1d8uD2P37YNVpO0j1g9781NG4qjDXkZ+HlgaiGKnxaaIBhm58ltrD0Mi3KJ6Pk5DBNITd23y
-	98Tqeas3OSuW4Yw5by/IaZ6eceXt410ZwS/oB3qVvekRJHyPWyfHdBKRMXhAP7PUTUlfdmKXtGv
-	0POtH6MMjlhQ2uMDoRI4x0V0fzKx4stqgJFQV/nVu7aHFbNLrPmX44parNvoh5g84mdGxB3eW2S
-	BE7zwok+lcOOde4YtvBQYAuom8O9+rW13kkNBKGXFlQ=
-X-Google-Smtp-Source: AGHT+IFrdV9xtNvQ00qw8ejVimn0SAJnKLs2YQ/ftQEUZgyyC+GdEa5vG+miTDdMCErkwE6XbvwteWaIWbFoeg34tRo=
-X-Received: by 2002:a17:903:1ace:b0:269:8fa3:c227 with SMTP id
- d9443c01a7336-269ba3f5f6bmr5885115ad.8.1758218215833; Thu, 18 Sep 2025
- 10:56:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758218218; x=1758823018;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JI0ytwNsiNctSeqBGOIrCT7jeAkBboaje0nOE5Ad0nk=;
+        b=h/+ayDJoIvU6AO0jDeugxEWIRhM6A/crEGHpy3tAX/fLlXF/1Y0zUJ8BiwabmhHTIA
+         gEaQqB8I77+5BwGE33EQk1kdvosD1UkxQNWYKM/vM1F4+x4PXBCzMWjrjuWQbMZ2HmeD
+         bAKbhYEgr0rzT/BT/iwGXkOMmVNbD7VFNk7T3Wo71W77s8xvwZ4T6u5CDz7Ws6qbuJrG
+         +Qm/8UDkUXcxhFmWmSbiy5+PiSamNDpHxiLOkTLWTfDtFWS2owNyoF8feX4WUGpKKjHQ
+         wXSaqBFnvDyia1chHsUOIZ8eNInX38XaLqhxNRDhfLN/s9mdoHReq2akBCcQqUlGFM8M
+         5g8w==
+X-Forwarded-Encrypted: i=1; AJvYcCUZSP98YchnL5FrK3hNLx2Fhd0C7nRT5gQO2ir/vc/5D8yeJt7zKatcOloqgiZF4LcVPNHfFYs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+990rGk29n+wV8hkMWhJdt7ZoYmiugBdZ6UwYKlMRhl0+26bs
+	0uXWdPQbHUXRHsQg0u4aRKlc6XPPxALyP/PZEhzaF7SdxTcaLFiIcJj1g5nfLExm63aMnKjPdGz
+	YSRJTFep3wDJSMtNGmmZtf4RgabeKjp2HkQ==
+X-Gm-Gg: ASbGncvpDPnyUmkUFcDc1nE7fmUJMSALJ6UikijpToXwtYdRemwAC7f+TX0hpMJAhFF
+	81bHsXq5mmmiH4JDl7awU1km/YZTTRFWXCJbBMnKVJSwx7gfvbh0wLqBIPVMoWEQIz4UbXlUgaL
+	Qmztoab1Y5j+2ZfWFlbiK++wueiB8Vr9a43nz2sZcUYKlWcj/NTn7d8fu7+R5MSNf4RaTyVwfbC
+	t+bpD4pjU5AtV1y5V9W+O/+Sr7QMwfz72FPWvE5Zg==
+X-Google-Smtp-Source: AGHT+IE+8cBTRYJzRPs3+7tJhep8jqUtXCLSGs0FbvnGToRJnguWGZ5Aab8qHeptaWqqfVDrIM5VaKIdIw5SwSgIw38=
+X-Received: by 2002:a05:690c:d19:b0:731:1bc7:7830 with SMTP id
+ 00721157ae682-73d32a41e01mr3892487b3.23.1758218217685; Thu, 18 Sep 2025
+ 10:56:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250918132007.325299-1-edumazet@google.com>
-In-Reply-To: <20250918132007.325299-1-edumazet@google.com>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Thu, 18 Sep 2025 18:56:44 +0100
-X-Gm-Features: AS18NWAE1sBJzaGrZNdoWdR5ryp-4-kWsJptwJ-bAg8nu5OpKPCF52RZGu7-yy4
-Message-ID: <CAJwJo6Z5+W2hDMOwPTnRWqLoGLqfwezZd_mOCmbMEnbvK-VBDg@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: prefer sk_skb_reason_drop()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Daniel Zahka <daniel.zahka@gmail.com>
+References: <20250917225513.3388199-1-ameryhung@gmail.com> <20250917225513.3388199-3-ameryhung@gmail.com>
+ <aMvMxrPsNXbTuF3c@boxer>
+In-Reply-To: <aMvMxrPsNXbTuF3c@boxer>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Thu, 18 Sep 2025 10:56:46 -0700
+X-Gm-Features: AS18NWA_T3MwfeYWVpB3zq7u66T9v5I9hJ0hjLahAY1YXy-Fb3NX4oDmLBXdasc
+Message-ID: <CAMB2axMg6unuuO-Reu3qU3cU_u+sDjkpwd5srW+9RyJW9coqig@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v4 2/6] bpf: Support pulling non-linear xdp data
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, paul.chaignon@gmail.com, 
+	kuba@kernel.org, stfomichev@gmail.com, martin.lau@kernel.org, 
+	mohsin.bashr@gmail.com, noren@nvidia.com, dtatulea@nvidia.com, 
+	saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, kernel-team@meta.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 18 Sept 2025 at 14:20, Eric Dumazet <edumazet@google.com> wrote:
+On Thu, Sep 18, 2025 at 2:11=E2=80=AFAM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
 >
-> Replace two calls to kfree_skb_reason() with sk_skb_reason_drop().
+> On Wed, Sep 17, 2025 at 03:55:09PM -0700, Amery Hung wrote:
+> > Add kfunc, bpf_xdp_pull_data(), to support pulling data from xdp
+> > fragments. Similar to bpf_skb_pull_data(), bpf_xdp_pull_data() makes
+> > the first len bytes of data directly readable and writable in bpf
+> > programs. If the "len" argument is larger than the linear data size,
+> > data in fragments will be copied to the linear data area when there
+> > is enough room. Specifically, the kfunc will try to use the tailroom
+> > first. When the tailroom is not enough, metadata and data will be
+> > shifted down to make room for pulling data.
+> >
+> > A use case of the kfunc is to decapsulate headers residing in xdp
+> > fragments. It is possible for a NIC driver to place headers in xdp
+> > fragments. To keep using direct packet access for parsing and
+> > decapsulating headers, users can pull headers into the linear data
+> > area by calling bpf_xdp_pull_data() and then pop the header with
+> > bpf_xdp_adjust_head().
+> >
+> > Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > ---
+> >  net/core/filter.c | 91 +++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 91 insertions(+)
+> >
+> > diff --git a/net/core/filter.c b/net/core/filter.c
+> > index 0b82cb348ce0..0e8d63bf1d30 100644
+> > --- a/net/core/filter.c
+> > +++ b/net/core/filter.c
+> > @@ -12212,6 +12212,96 @@ __bpf_kfunc int bpf_sock_ops_enable_tx_tstamp(=
+struct bpf_sock_ops_kern *skops,
+> >       return 0;
+> >  }
+> >
+> > +/**
+> > + * bpf_xdp_pull_data() - Pull in non-linear xdp data.
+> > + * @x: &xdp_md associated with the XDP buffer
+> > + * @len: length of data to be made directly accessible in the linear p=
+art
+> > + *
+> > + * Pull in data in case the XDP buffer associated with @x is non-linea=
+r and
+> > + * not all @len are in the linear data area.
+> > + *
+> > + * Direct packet access allows reading and writing linear XDP data thr=
+ough
+> > + * packet pointers (i.e., &xdp_md->data + offsets). The amount of data=
+ which
+> > + * ends up in the linear part of the xdp_buff depends on the NIC and i=
+ts
+> > + * configuration. When a frag-capable XDP program wants to directly ac=
+cess
+> > + * headers that may be in the non-linear area, call this kfunc to make=
+ sure
+> > + * the data is available in the linear area. Alternatively, use dynptr=
+ or
+> > + * bpf_xdp_{load,store}_bytes() to access data without pulling.
+> > + *
+> > + * This kfunc can also be used with bpf_xdp_adjust_head() to decapsula=
+te
+> > + * headers in the non-linear data area.
+> > + *
+> > + * A call to this kfunc may reduce headroom. If there is not enough ta=
+ilroom
+> > + * in the linear data area, metadata and data will be shifted down.
+> > + *
+> > + * A call to this kfunc is susceptible to change the buffer geometry.
+> > + * Therefore, at load time, all checks on pointers previously done by =
+the
+> > + * verifier are invalidated and must be performed again, if the kfunc =
+is used
+> > + * in combination with direct packet access.
+> > + *
+> > + * Return:
+> > + * * %0         - success
+> > + * * %-EINVAL   - invalid len
+> > + */
+> > +__bpf_kfunc int bpf_xdp_pull_data(struct xdp_md *x, u32 len)
+> > +{
+> > +     struct xdp_buff *xdp =3D (struct xdp_buff *)x;
+> > +     struct skb_shared_info *sinfo =3D xdp_get_shared_info_from_buff(x=
+dp);
+> > +     int i, delta, shift, headroom, tailroom, n_frags_free =3D 0;
+> > +     void *data_hard_end =3D xdp_data_hard_end(xdp);
+> > +     int data_len =3D xdp->data_end - xdp->data;
+> > +     void *start;
+> > +
+> > +     if (len <=3D data_len)
+> > +             return 0;
+> > +
+> > +     if (unlikely(len > xdp_get_buff_len(xdp)))
+> > +             return -EINVAL;
+> > +
+> > +     start =3D xdp_data_meta_unsupported(xdp) ? xdp->data : xdp->data_=
+meta;
+> > +
+> > +     headroom =3D start - xdp->data_hard_start - sizeof(struct xdp_fra=
+me);
+> > +     tailroom =3D data_hard_end - xdp->data_end;
+> > +
+> > +     delta =3D len - data_len;
+> > +     if (unlikely(delta > tailroom + headroom))
+> > +             return -EINVAL;
+> > +
+> > +     shift =3D delta - tailroom;
+> > +     if (shift > 0) {
+> > +             memmove(start - shift, start, xdp->data_end - start);
+> > +
+> > +             xdp->data_meta -=3D shift;
+> > +             xdp->data -=3D shift;
+> > +             xdp->data_end -=3D shift;
+> > +     }
+> > +
+> > +     for (i =3D 0; i < sinfo->nr_frags && delta; i++) {
+> > +             skb_frag_t *frag =3D &sinfo->frags[i];
+> > +             u32 shrink =3D min_t(u32, delta, skb_frag_size(frag));
+> > +
+> > +             memcpy(xdp->data_end, skb_frag_address(frag), shrink);
+> > +
+> > +             xdp->data_end +=3D shrink;
+> > +             sinfo->xdp_frags_size -=3D shrink;
+> > +             delta -=3D shrink;
+> > +             if (bpf_xdp_shrink_data(xdp, frag, shrink, false))
+> > +                     n_frags_free++;
+> > +     }
+> > +
+> > +     if (unlikely(n_frags_free)) {
+> > +             memmove(sinfo->frags, sinfo->frags + n_frags_free,
+> > +                     (sinfo->nr_frags - n_frags_free) * sizeof(skb_fra=
+g_t));
+> > +
+> > +             sinfo->nr_frags -=3D n_frags_free;
+> > +
+> > +             if (!sinfo->nr_frags)
+> > +                     xdp_buff_clear_frags_flag(xdp);
 >
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Daniel Zahka <daniel.zahka@gmail.com>
-> Cc: Dmitry Safonov <0x7f454c46@gmail.com>
-
-LGTM, thanks!
-
-Reviewed-by: Dmitry Safonov <0x7f454c46@gmail.com>
-
-Side-note: I see that tcp_ao_transmit_skb() can currently fail only
-due to ENOMEM, IIRC I haven't found more specific reason at that time
-than just SKB_DROP_REASON_NOT_SPECIFIED, unsure if worth changing
-that.
-
-> ---
->  net/ipv4/tcp_output.c | 2 +-
->  net/psp/psp_sock.c    | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index 223d7feeb19d4671fcbc9f21caf588c661b4bbe0..bb3576ac0ad7d7330ef272e1d9dc1f19bb8f86bb 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -1586,7 +1586,7 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
->                 err = tcp_ao_transmit_skb(sk, skb, key.ao_key, th,
->                                           opts.hash_location);
->                 if (err) {
-> -                       kfree_skb_reason(skb, SKB_DROP_REASON_NOT_SPECIFIED);
-> +                       sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_NOT_SPECIFIED);
->                         return -ENOMEM;
->                 }
->         }
-> diff --git a/net/psp/psp_sock.c b/net/psp/psp_sock.c
-> index d19e37e939672c1f8fc0ebb62e50a3fb32cc8d25..5324a7603bed64d3f1f71b66dd44f622048519a6 100644
-> --- a/net/psp/psp_sock.c
-> +++ b/net/psp/psp_sock.c
-> @@ -37,7 +37,7 @@ psp_validate_xmit(struct sock *sk, struct net_device *dev, struct sk_buff *skb)
->         good = !pas || rcu_access_pointer(dev->psp_dev) == pas->psd;
->         rcu_read_unlock();
->         if (!good) {
-> -               kfree_skb_reason(skb, SKB_DROP_REASON_PSP_OUTPUT);
-> +               sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PSP_OUTPUT);
->                 return NULL;
->         }
->
-> --
-> 2.51.0.384.g4c02a37b29-goog
+> Nit: should we take care of pfmemalloc flag as well?
 >
 
+Does it mean we should also clear this bit in bpf_xdp_adjsut_tail()?
 
---
-             Dmitry
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+> >  __bpf_kfunc_end_defs();
+> >
+> >  int bpf_dynptr_from_skb_rdonly(struct __sk_buff *skb, u64 flags,
+> > @@ -12239,6 +12329,7 @@ BTF_KFUNCS_END(bpf_kfunc_check_set_skb_meta)
+> >
+> >  BTF_KFUNCS_START(bpf_kfunc_check_set_xdp)
+> >  BTF_ID_FLAGS(func, bpf_dynptr_from_xdp)
+> > +BTF_ID_FLAGS(func, bpf_xdp_pull_data)
+> >  BTF_KFUNCS_END(bpf_kfunc_check_set_xdp)
+> >
+> >  BTF_KFUNCS_START(bpf_kfunc_check_set_sock_addr)
+> > --
+> > 2.47.3
+> >
 
