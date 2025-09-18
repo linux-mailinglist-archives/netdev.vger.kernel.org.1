@@ -1,114 +1,195 @@
-Return-Path: <netdev+bounces-224504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44F9CB85A77
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:35:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2EEBB85ADB
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:38:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D0977B6F64
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:33:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B20033B09A4
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113273112A9;
-	Thu, 18 Sep 2025 15:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonic.nl header.i=@protonic.nl header.b="QQemO7m4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70BC630CDB0;
+	Thu, 18 Sep 2025 15:34:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp16.bhosted.nl (smtp16.bhosted.nl [94.124.121.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48C8F3101D1
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:35:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.124.121.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85ADF30E0FF
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758209701; cv=none; b=JQEsZlqtBG/nw7ghi6BKD7uTfEMEAJr0mbQvPekl8i3tmBWlnGzfX3DVKfF0LOMLP2azOfsewlOq2G7Rm8PmNl/TsP7xnD4QgLz4GWSlQLk/HjQ1Lb+yzzxQRprom957ewocS+Jv0iqLD8yPL1qiHfr0eEWgW+vOT+1zBfqeF2g=
+	t=1758209674; cv=none; b=IrzIYHF3Ll/LhAf6rp2+eQzDqbp5AdSw332VRXGVBWEmWVsxRQwRpwbmJp5SlRAj55OWsxRt+XF2vyjUuchVc/5LbhQC/1COziIwmbyClmdrAR2hBDwqPxTpypzaU+SxquuF7Taw9aP7gUqN338HUFVQK8GiV5ije3a6Y2Fek6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758209701; c=relaxed/simple;
-	bh=1L4ztzZI21TGZatF3aNWfrnQCTgXQdveVEOhyL3fA0g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cbf1oF0LhgiQvFnOWEVu0LKYbU29UN7oZzdu14DQNcw0gJtn6XCRCRxq+XHptM85zgD9cVrc0+iQVGIvv9it07VVvT11w/PAmTHOc0qc+BF1AooPPqxle+TycPdfsNnlxZsumY752pxWftjpougO0g/EckNv2q3xRlg/BooKD+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=protonic.nl; spf=pass smtp.mailfrom=protonic.nl; dkim=pass (2048-bit key) header.d=protonic.nl header.i=@protonic.nl header.b=QQemO7m4; arc=none smtp.client-ip=94.124.121.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=protonic.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonic.nl
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=protonic.nl; s=202111;
-	h=content-transfer-encoding:content-type:mime-version:references:in-reply-to:
-	 message-id:subject:cc:to:from:date:from;
-	bh=SqjdATjfjZTk7QANAggTs1mW/P13EV6a+Izt0r+agQ0=;
-	b=QQemO7m4x6zCxk4M9laZ90eCIBZvlHRq/VuixCptBB7zzwo7W14mF7GpiYLDE2KravDs5mWr5Fe32
-	 YI5vbPnjY8XchNI9DA2VxwqrhGOoXIMDArJfiLqW1D+YRL2YnyHQ4WHp2jj+Z3dwdLVow44GMCxb0b
-	 S6ozX0oObc8Pf1HBbvovaxNrs8/iL/hnZAJYohUXXEqDuxD0E+wq2MS2PgcGQeAqkHwHgbtE3szPdO
-	 LY51aW6TvUu1QOAIlIzGxXruryI8IjrqSj/QbUYXHmCSZMbUySBHPD6UI6terkJcLsOTJupcY0AuoB
-	 JpIpBWXwmgF0fXl9CqpcwJtEM9ZcoKQ==
-X-MSG-ID: df093cf2-94a4-11f0-858c-005056817704
-Date: Thu, 18 Sep 2025 17:33:47 +0200
-From: David Jander <david@protonic.nl>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jonas Rebmann <jre@pengutronix.de>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Liam Girdwood
- <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Shengjiu Wang
- <shengjiu.wang@nxp.com>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, Pengutronix
- Kernel Team <kernel@pengutronix.de>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-sound@vger.kernel.org, imx@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, Lucas Stach <l.stach@pengutronix.de>,
- Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: Re: [PATCH v2 3/3] arm64: dts: add Protonic PRT8ML board
-Message-ID: <20250918173347.28db5569@erd003.prtnl>
-In-Reply-To: <7f1d9289-4102-4db9-a2bb-ff270e8871b7@lunn.ch>
-References: <20250918-imx8mp-prt8ml-v2-0-3d84b4fe53de@pengutronix.de>
-	<20250918-imx8mp-prt8ml-v2-3-3d84b4fe53de@pengutronix.de>
-	<af554442-aeec-40d2-a35a-c7ee5bfcb99a@lunn.ch>
-	<20250918165156.10e55b85@erd003.prtnl>
-	<7f1d9289-4102-4db9-a2bb-ff270e8871b7@lunn.ch>
-Organization: Protonic Holland
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1758209674; c=relaxed/simple;
+	bh=ExErPFUcQ4a8T+RxsqEky4yXipaiLcZSok6s4LPISVE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=LtUe9bmiMqtDeaX8UL2VlMRqOHfNRc+GGDpP489ubyGlFah1I6iaLH51KZwWmhSaPuz6l3y/h2J3u1gcyL1rU0G4Mkb8ymxtZxcr+UMUot5z5sYQXZbfPwK2E9tPTmvVXmVjlCRg7MriOyU4g0MKPZ+lNM7eeur0fgychi8GPp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-424122b50aeso11198655ab.0
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 08:34:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758209672; x=1758814472;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0sduD65NO8lJm33fZ2TP23ShQk8DTdU3PV6L6EWySPQ=;
+        b=J03tpElQF+dHzNSURSNsB/noMocgD+A/xIaTmV5y5YWKY2O7I8I7gdeVYES+jNOEgs
+         9I1HF+tBXuekOeNxe+s+0YRksVNmiypmtN3DaoUfl/0GoRElIMJKqqimGPYlev9lMwCy
+         iuXgIhRLCjubyjGhZRUnzZFI1ZUD5ShldL7gA9W5bQknpWIDQ4m9dYw/a+8mjaG1op7e
+         iBa9HZedxnC+Yi3pkYmgHUN+SpoDYqNLIQ6l+7o7knI1Y2aQ2TV6yK7KO0uV7rJbSrgy
+         rQe71FfKVLxV/ZFopzlOWzTqDOC2xX8o0wMn0sD1labIY1l+kYk2xjsCi6Oq5rmq10BW
+         lz3w==
+X-Forwarded-Encrypted: i=1; AJvYcCVSfIvPQVhroMXEYV02+mKAWJP0TJxASL4CLBShdIkVU7GKjZPLqgJJh4duDjPT+K7AP7pPJZ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyr6TH+l2lEFoAbEchsbqx5JWdGUO9WbUZ8CPJU9vx7EUTDGnuT
+	D1vaAfSCd+VF1H88IyGjECJj2Ug3kCik+/ZZ2g6R6el5RIa6xoAnJyGX0SncLxD4/pSAHifFIlH
+	L3ZlZw7PlwzyetJg1w6X/djjajTbSgwcJTz0gLDkD6xoM3Xb9EUy/J8yGMS8=
+X-Google-Smtp-Source: AGHT+IGzmonCIrGacu/t403kscfOxmaNaHB2fXBBLB7Otoq57cCCrMcGqXwCUewG4xqYr0tv5+DoZVvHaXYaOYrGW1GTz9zgoEW5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:380b:b0:424:8061:dec0 with SMTP id
+ e9e14a558f8ab-42481922c60mr64725ab.7.1758209671557; Thu, 18 Sep 2025 08:34:31
+ -0700 (PDT)
+Date: Thu, 18 Sep 2025 08:34:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68cc2687.050a0220.139b6.0004.GAE@google.com>
+Subject: [syzbot] [netfilter?] general protection fault in nft_fib6_eval (2)
+From: syzbot <syzbot+109521837481c8e96ea5@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 18 Sep 2025 17:04:55 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
+Hello,
 
-> > Yes, unfortunately the SJA1105Q does not support PAUSE frames, and the i.MX8MP
-> > FEC isn't able to sustain 1000Mbps (only about 400ish) due to insufficient
-> > internal bus bandwidth. It will generate PAUSE frames, but the SJA1105Q
-> > ignores these, leading to packet loss, which is obviously worse than
-> > restricting this link to 100Mbps. Ironically both chips are from the same
-> > manufacturer, yet are incompatible in this regard.  
-> 
-> Thanks for the explanation. Maybe add a comment that the bandwidth is
-> limited due to the lack of flow control resulting in packet loss in
-> the FEC.
->
-> Anything which looks odd deserves a comment, otherwise somebody will
-> question it....
+syzbot found the following issue on:
 
-Yes! This is a golden tip. Ironically what I said above is incorrect. Sorry
-for the noise.
+HEAD commit:    01792bc3e5bd net: ti: icssg-prueth: Fix HSR and switch off..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=108ec3bc580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c321f33e4545e2a1
+dashboard link: https://syzkaller.appspot.com/bug?extid=109521837481c8e96ea5
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
 
-Ftr: I wrote this DT about 4 years ago, so my memory failed me, and a comment
-in the code would have saved me this embarrassment ;-)
+Unfortunately, I don't have any reproducer for this issue yet.
 
-The comment above applies to the i.MX6 SoC's which had this limitation. On the
-i.MX8MP we had a different problem that also caused the SJA1105Q not to work
-reliably at 1000Mbps either. We haven't been able to find the issue, but so far
-this switch hasn't been able to work at 1000Mbps reliable on any platform,
-possibly for different reasons in each case.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/deae9487bd6c/disk-01792bc3.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1bb0140fd491/vmlinux-01792bc3.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/bd9ec803c379/bzImage-01792bc3.xz
 
-Best regards,
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+109521837481c8e96ea5@syzkaller.appspotmail.com
 
--- 
-David Jander
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 0 UID: 0 PID: 8151 Comm: syz.2.634 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+RIP: 0010:nft_fib6_eval+0x7cd/0xc20 net/ipv6/netfilter/nft_fib_ipv6.c:-1
+Code: 4c 89 f3 48 81 c3 d8 00 00 00 48 89 d8 48 c1 e8 03 42 80 3c 20 00 74 08 48 89 df e8 8d df dd f7 48 8b 1b 48 89 d8 48 c1 e8 03 <42> 80 3c 20 00 74 08 48 89 df e8 74 df dd f7 48 8b 3b 48 8b 5c 24
+RSP: 0018:ffffc9001c59f000 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000002
+RDX: ffff88802fcabc00 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc9001c59f1d0 R08: ffffffff8fa37e37 R09: 1ffffffff1f46fc6
+R10: dffffc0000000000 R11: fffffbfff1f46fc7 R12: dffffc0000000000
+R13: ffffc9001c59f0f0 R14: ffff88807f6db500 R15: ffff88807f6db560
+FS:  00007faeb51596c0(0000) GS:ffff888125c1b000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f7baea82f98 CR3: 000000007e12a000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ expr_call_ops_eval net/netfilter/nf_tables_core.c:237 [inline]
+ nft_do_chain+0x409/0x1920 net/netfilter/nf_tables_core.c:285
+ nft_do_chain_inet+0x25d/0x340 net/netfilter/nft_chain_filter.c:161
+ nf_hook_entry_hookfn include/linux/netfilter.h:158 [inline]
+ nf_hook_slow+0xc2/0x220 net/netfilter/core.c:623
+ nf_hook include/linux/netfilter.h:273 [inline]
+ NF_HOOK+0x206/0x3a0 include/linux/netfilter.h:316
+ __netif_receive_skb_one_core net/core/dev.c:5991 [inline]
+ __netif_receive_skb+0xd3/0x380 net/core/dev.c:6104
+ netif_receive_skb_internal net/core/dev.c:6190 [inline]
+ netif_receive_skb+0x1cb/0x790 net/core/dev.c:6249
+ tun_rx_batched+0x1b9/0x730 drivers/net/tun.c:1485
+ tun_get_user+0x2aa2/0x3e20 drivers/net/tun.c:1950
+ tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1996
+ new_sync_write fs/read_write.c:593 [inline]
+ vfs_write+0x5c9/0xb30 fs/read_write.c:686
+ ksys_write+0x145/0x250 fs/read_write.c:738
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7faeb438d69f
+Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 f9 92 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 4c 93 02 00 48
+RSP: 002b:00007faeb5159000 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007faeb45b5fa0 RCX: 00007faeb438d69f
+RDX: 0000000000000046 RSI: 0000200000000b00 RDI: 00000000000000c8
+RBP: 00007faeb4411e19 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000046 R11: 0000000000000293 R12: 0000000000000000
+R13: 00007faeb45b6038 R14: 00007faeb45b5fa0 R15: 00007ffcdc4d36a8
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:nft_fib6_eval+0x7cd/0xc20 net/ipv6/netfilter/nft_fib_ipv6.c:-1
+Code: 4c 89 f3 48 81 c3 d8 00 00 00 48 89 d8 48 c1 e8 03 42 80 3c 20 00 74 08 48 89 df e8 8d df dd f7 48 8b 1b 48 89 d8 48 c1 e8 03 <42> 80 3c 20 00 74 08 48 89 df e8 74 df dd f7 48 8b 3b 48 8b 5c 24
+RSP: 0018:ffffc9001c59f000 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000002
+RDX: ffff88802fcabc00 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc9001c59f1d0 R08: ffffffff8fa37e37 R09: 1ffffffff1f46fc6
+R10: dffffc0000000000 R11: fffffbfff1f46fc7 R12: dffffc0000000000
+R13: ffffc9001c59f0f0 R14: ffff88807f6db500 R15: ffff88807f6db560
+FS:  00007faeb51596c0(0000) GS:ffff888125c1b000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f7baea82f98 CR3: 000000007e12a000 CR4: 00000000003526f0
+----------------
+Code disassembly (best guess):
+   0:	4c 89 f3             	mov    %r14,%rbx
+   3:	48 81 c3 d8 00 00 00 	add    $0xd8,%rbx
+   a:	48 89 d8             	mov    %rbx,%rax
+   d:	48 c1 e8 03          	shr    $0x3,%rax
+  11:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1)
+  16:	74 08                	je     0x20
+  18:	48 89 df             	mov    %rbx,%rdi
+  1b:	e8 8d df dd f7       	call   0xf7dddfad
+  20:	48 8b 1b             	mov    (%rbx),%rbx
+  23:	48 89 d8             	mov    %rbx,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1) <-- trapping instruction
+  2f:	74 08                	je     0x39
+  31:	48 89 df             	mov    %rbx,%rdi
+  34:	e8 74 df dd f7       	call   0xf7dddfad
+  39:	48 8b 3b             	mov    (%rbx),%rdi
+  3c:	48                   	rex.W
+  3d:	8b                   	.byte 0x8b
+  3e:	5c                   	pop    %rsp
+  3f:	24                   	.byte 0x24
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
