@@ -1,120 +1,119 @@
-Return-Path: <netdev+bounces-224605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2F70B86D5D
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 22:08:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23EC9B86E1B
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 22:20:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A696D3AD337
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 20:08:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B99E03B4795
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 20:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE14307AD8;
-	Thu, 18 Sep 2025 20:08:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422C32D63FF;
+	Thu, 18 Sep 2025 20:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="eQW9TtDw"
+	dkim=pass (2048-bit key) header.d=mleia.com header.i=@mleia.com header.b="idkAdHuL";
+	dkim=pass (2048-bit key) header.d=mleia.com header.i=@mleia.com header.b="idkAdHuL"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mail.mleia.com (mleia.com [178.79.152.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4BA15442C;
-	Thu, 18 Sep 2025 20:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D80D3090EF
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 20:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.79.152.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758226113; cv=none; b=Gwlvi4hAQxK38fhNKIb7uqZaOE3uihy7NM1KeitHMJOuVW5Y9cQx3JNcfd28V2XU/K5lbbMRkboBr1q3qXgZdOz+l9z1458jZ1ChgmEliFdIt8OhewkA7impnA/GRv7MtBQU1iRvyA8ucGf4FHYW5A5qBNvt0BazGQTYvSdSl4o=
+	t=1758226832; cv=none; b=LshlxGdBhdbGTP93Cs2vWYWcE36j02fmIL8HkuaI9pHkikH3tkJu9miTvzdpY1rU1fZBtI09EZ/AEXOL6OfpejmsqsPL75Q6lh0jc1Aaztcj8P41i7R6TCYj6d4sUmsdY35mjhBwVr/1NlsCNkKwc7CUYCt/BEJ2rczucGGosWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758226113; c=relaxed/simple;
-	bh=/xURkBEfhrP61DoKhLS8ai19KyG8Yjda32gGq/Q1IbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bft/q2wAEt10zgK5uLH0OMO3OZdqZ8IiTiZ7NpcSHldosgSuhFFTlKKnd3whNcWPLNsNKYm7tf09nxqlkTjyS7xdBq5LLcOkubEsKtcBkEdFuaCCr4kp5smIY0CtSaKZd/PGWzdkanjppAQGJUeeWMOUh3SL0G7sv2B0/SZ7Tj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=eQW9TtDw; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jT4S+lSLA3Y+AUajY/seHKGckePfxG1gceQ7KGrgVkc=; b=eQW9TtDw+1Ls7yx8EPz+nWzEin
-	QxsQcwqpxrt+dYwLttywOXbRUoP+wEwsVgM4Gde/eyq7X1duA+bq4Rk59C91coMzwXDHvhDOlR7NL
-	HSuZzYyv0IqrmM6nVQCsZ3k2KOMgGRhF15abncZN/f7xJIgQlgspcuOxQkiyyl4ugcTUrQDdefZh/
-	SKN7Rbsk4kteWetKTNNXgMY0E//tna4bQrxQfwW2FDd+1e+OclQfBtSIplTryq897UcCDiitHQ2iv
-	lAbuKpFehN7SQdBJXPCy2MtafF9j85aOkvb/TOHnS78z3sYYSD3PBBlzw6O/hMBWJ/p85dXI0/7Ql
-	lPr+eVzA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60456)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uzKvS-0000000024E-3bbf;
-	Thu, 18 Sep 2025 21:08:18 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uzKvP-000000001Tc-06qP;
-	Thu, 18 Sep 2025 21:08:15 +0100
-Date: Thu, 18 Sep 2025 21:08:14 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Andre Edich <andre.edich@microchip.com>,
-	Lukas Wunner <lukas@wunner.de>
-Subject: Re: [PATCH net v4 0/3] net: phy: smsc: use IRQ + relaxed polling to
- fix missed link-up
-Message-ID: <aMxmrnmDEqn0Nvx1@shell.armlinux.org.uk>
-References: <20250714095240.2807202-1-o.rempel@pengutronix.de>
- <657997b5-1c20-4008-8b70-dc7a7f56c352@lunn.ch>
- <aMqw4LuoTTRspqfA@pengutronix.de>
- <a873e8e3-e1c9-4e82-b3e8-4b1cc8052a73@lunn.ch>
+	s=arc-20240116; t=1758226832; c=relaxed/simple;
+	bh=Iz1O6jfjq1q9VqakNVUVO7uZ4sHU1u3uu4IY4c2AODg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ep5wmJ00VxN0MdrIVpCjbb7OjSMABPFyEbD41snCtCnFnAGez6IfO3rsK29y6F+MtdgmaOsQHnPgZPIfPHI1cOHjmfMwbRlHy01hkZuTW2P8Gxd8D30SlY4W8rTsUuDB3IlG+qWWgSBxeNrqB6ayvpBcWeQpFlKupUOH8h/mL0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mleia.com; spf=none smtp.mailfrom=mleia.com; dkim=pass (2048-bit key) header.d=mleia.com header.i=@mleia.com header.b=idkAdHuL; dkim=pass (2048-bit key) header.d=mleia.com header.i=@mleia.com header.b=idkAdHuL; arc=none smtp.client-ip=178.79.152.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mleia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mleia.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mleia.com; s=mail;
+	t=1758226287; bh=Iz1O6jfjq1q9VqakNVUVO7uZ4sHU1u3uu4IY4c2AODg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=idkAdHuL3LERu69pldFSTewZEkM2ke2QlZR8x3wLMExFHvq3v28C00mmuWZtn+QUn
+	 eiTw4pD2Od7CeYDMMY7vXIPAw4MFLnzMkpIhAjgCNiCsxwH3SPv4NSgYOvS6Q/Hr6v
+	 N08Xf1Nc8bcps8ZPB1eq+PKJC8WOnA+j+ztxd4GZFj94zHDwE9VAY4Ra4B4GJ7eemL
+	 fYs8OfYQ53jk3W64OD8//weQjsy47BKG4k4YxDN1Wz4lr7iKZqIL57hF3XU89wyI/8
+	 yhcPYwZ3ibt0CiwmEzBEcTmatzqkJvTXZ7c6y+2Jd+WIsSOInaj66atOwHNfi9bJ3y
+	 vU1qIJ0k/wCWw==
+Received: from mail.mleia.com (localhost [127.0.0.1])
+	by mail.mleia.com (Postfix) with ESMTP id 762393D55C1;
+	Thu, 18 Sep 2025 20:11:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mleia.com; s=mail;
+	t=1758226287; bh=Iz1O6jfjq1q9VqakNVUVO7uZ4sHU1u3uu4IY4c2AODg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=idkAdHuL3LERu69pldFSTewZEkM2ke2QlZR8x3wLMExFHvq3v28C00mmuWZtn+QUn
+	 eiTw4pD2Od7CeYDMMY7vXIPAw4MFLnzMkpIhAjgCNiCsxwH3SPv4NSgYOvS6Q/Hr6v
+	 N08Xf1Nc8bcps8ZPB1eq+PKJC8WOnA+j+ztxd4GZFj94zHDwE9VAY4Ra4B4GJ7eemL
+	 fYs8OfYQ53jk3W64OD8//weQjsy47BKG4k4YxDN1Wz4lr7iKZqIL57hF3XU89wyI/8
+	 yhcPYwZ3ibt0CiwmEzBEcTmatzqkJvTXZ7c6y+2Jd+WIsSOInaj66atOwHNfi9bJ3y
+	 vU1qIJ0k/wCWw==
+Received: from [192.168.1.100] (91-159-24-186.elisa-laajakaista.fi [91.159.24.186])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.mleia.com (Postfix) with ESMTPSA id F04BE3D4D3E;
+	Thu, 18 Sep 2025 20:11:25 +0000 (UTC)
+Message-ID: <64ea0259-30a2-4264-8c05-8fd7df113bb5@mleia.com>
+Date: Thu, 18 Sep 2025 23:11:20 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a873e8e3-e1c9-4e82-b3e8-4b1cc8052a73@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 10/10] net: stmmac: remove mac_interface
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Chen-Yu Tsai <wens@csie.org>,
+ "David S. Miller" <davem@davemloft.net>, Drew Fustini <fustini@kernel.org>,
+ Emil Renner Berthing <kernel@esmil.dk>, Eric Dumazet <edumazet@google.com>,
+ Fabio Estevam <festevam@gmail.com>, Fu Wei <wefu@redhat.com>,
+ Guo Ren <guoren@kernel.org>, imx@lists.linux.dev,
+ Jakub Kicinski <kuba@kernel.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
+ linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-sunxi@lists.linux.dev,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Minda Chen <minda.chen@starfivetech.com>,
+ Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Samuel Holland <samuel@sholland.org>, Sascha Hauer <s.hauer@pengutronix.de>,
+ Shawn Guo <shawnguo@kernel.org>
+References: <aMrPpc8oRxqGtVPJ@shell.armlinux.org.uk>
+ <E1uytpv-00000006H2x-196h@rmk-PC.armlinux.org.uk>
+From: Vladimir Zapolskiy <vz@mleia.com>
+In-Reply-To: <E1uytpv-00000006H2x-196h@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-49551924 
+X-CRM114-CacheID: sfid-20250918_201127_506365_0BB65E3C 
+X-CRM114-Status: GOOD (  11.00  )
 
-On Thu, Sep 18, 2025 at 09:48:33PM +0200, Andrew Lunn wrote:
-> > How about a minimal change instead: conditionally call
-> > phy_queue_state_machine() from lan87xx_config_aneg()? That would trigger
-> > a poll in the broken mode without touching phydev->irq or core teardown
-> > paths. Seems less intrusive than rewriting IRQ handling.
+On 9/17/25 18:12, Russell King (Oracle) wrote:
+> mac_interface has served little purpose, and has only caused confusion.
+> Now that we have cleaned up all platform glue drivers which should not
+> have been using mac_interface, there are no users remaining. Remove
+> mac_interface.
 > 
-> It is currently a static function, so that would have to change.
+> This results in the special dwmac specific "mac-mode" DT property
+> becoming redundant, and an in case, no DTS files in the kernel make use
+> of this property. Add a warning if the property is set, and it is
+> different from the "phy-mode".
 > 
-> Or it might be better to add phy_trigger_machine_soon(), using the
-> default 1 second delay? And i would document it as only to be used by
-> broken PHYs, to try to stop it being abused. Anybody using it needs to
-> acknowledge their PHY is broken.
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Couldn't this be even simpler? If the problem is the interrupt
-isn't raised, then how about the following.
-
-(This assumes there is no issue with calling phy_trigger_machine()
-from IRQ context.)
-
-When lan87xx_config_aneg() detects that we're configuring into the
-broken mode, start a timer (which has been pre-initialised at probe
-time.) When the timer fires, call phy_trigger_machine(), and modify
-the timer for the next poll interval.
-
-When lan87xx_config_aneg() detects that we aren't in the broken
-mode, delete the timer synchronously. Also delete the timer when
-the PHY is suspended or unbound.
-
-This requires no changes necessary to the core phylib code, and no
-fiddling with fragile state either. Does it matter if the
-interrupt does fire? Not really.
+Acked-by: Vladimir Zapolskiy <vz@mleia.com>
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Best wishes,
+Vladimir
 
