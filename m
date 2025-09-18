@@ -1,77 +1,94 @@
-Return-Path: <netdev+bounces-224482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCF80B856BC
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:03:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C2BFB8570D
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:06:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA3B21C83303
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:02:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7781A7BC360
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEDF1F09A5;
-	Thu, 18 Sep 2025 15:00:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QnoPnP/w"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A8E3101DD;
+	Thu, 18 Sep 2025 15:01:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF09F1C4A2D
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36F530FC22
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758207644; cv=none; b=ka4AXGxsNKIFMKrEqgg0RokBfuHL2tmxcYA0fWuYPvMnk3RJ458FSgmiKQye+u+ihg5A+L1YiRLxSlnNWHBRLMuxYLHe5+thqax9aIn7JTdeyjaMvfWgFw92ffF+dVrMz0S76qQh7QmtLtC5vLG+0YK1gSyV4Oxreg7jWdgoeek=
+	t=1758207687; cv=none; b=cTgXYp+M+71SwVZ1GtZamPOJsmSNDu8MJXPdlcDVGjzf3GCPRPy3UySApWFxmLJ7dNAJpdx3y5+Vb6N4j3dReSyc+dcX1Pvxk1Gm9/8GqOdVggRVRIu+qrxWhNhmqiQSOyoYRLghbpNNcfqUGjleSUvrlzDrehd5qjNddwDKwws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758207644; c=relaxed/simple;
-	bh=UQJx9wcC3Y5/RVnetstb3CtyPqehRBaZAkfGjE1g9q0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QEMfBHaukXtlihph6I3ZmJKBbpiR458f8UbHjDzJPqIxEDIsmf/2oKtjgJ3U0qpdImWajxY+ZikGNMTDvQn49lE2E5VmISq0bjAovVAmbR8hL3VPBktuTKWiIEIoZlqZ4Yo8cil8DjTxdgmIPBKBEhhsJj3uUuZ5tuJ9tBBO1TE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QnoPnP/w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7478C4CEE7;
-	Thu, 18 Sep 2025 15:00:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758207643;
-	bh=UQJx9wcC3Y5/RVnetstb3CtyPqehRBaZAkfGjE1g9q0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QnoPnP/woT7o9942piukwLLP+g/cYYfsmmqlQvljTgFvEBJ2vX9RsDBKgRRTyBOww
-	 5XCy7Lryd3KlSPKFYnhhT9s7aPrmBrYX5MM/F/MbIceaFUx8oi4ssesUgt9E02WzKq
-	 5WWKXz9PK8PGMmqNfvKx50rthdgA9ETgeeOalqhdkMnzfAz7YettyFAcZm4sGIGbMQ
-	 1L7YGT/6zCZEh7ypxAtEeHVnMgYAjAUfN/PEO2wRgEGMzg7DIh3ex0CfYs04HoJ5Z/
-	 b5zbON5cfzZC4TsUr3IBuDbqXOEeRFFcPNhxTB9Ql8QYk4KDnA0uSxr1oBbDHNsQEX
-	 uXtL1c5wX7tUA==
-Date: Thu, 18 Sep 2025 16:00:39 +0100
-From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: airoha: Fix PPE_IP_PROTO_CHK register
- definitions
-Message-ID: <20250918150039.GW394836@horms.kernel.org>
-References: <20250918-ppe_ip_proto_chk_ipv4_mask-fix-v1-1-df36da1b954c@kernel.org>
+	s=arc-20240116; t=1758207687; c=relaxed/simple;
+	bh=dMgnUT9SN0xWEnTD5CB7F2sIRMIdRNv8a528sPnHBx0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SFYWvtbEYQGX/1nZp4KQrW+XURwL2NSYy2FlIxjf/iIMig42sE3uKL9WbImtZ0JEazvncNkMk+awTYfYAwOXqG/SlJYMNVddxqb/TwzRsClMgH6Uwapy2SxFr/QhzI2gt0MDx47IKCeTVU3KM4w10fFYYm5v4PAkvNi/JXdMBhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <jre@pengutronix.de>)
+	id 1uzG88-0007Qj-74; Thu, 18 Sep 2025 17:01:04 +0200
+Message-ID: <09ffce72-e826-4126-8761-13efc689dee7@pengutronix.de>
+Date: Thu, 18 Sep 2025 17:01:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250918-ppe_ip_proto_chk_ipv4_mask-fix-v1-1-df36da1b954c@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/3] arm64: dts: add Protonic PRT8ML board
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>, Shengjiu Wang <shengjiu.wang@nxp.com>,
+ Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-sound@vger.kernel.org, imx@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, David Jander <david@protonic.nl>,
+ Lucas Stach <l.stach@pengutronix.de>,
+ Oleksij Rempel <o.rempel@pengutronix.de>
+References: <20250918-imx8mp-prt8ml-v2-0-3d84b4fe53de@pengutronix.de>
+ <20250918-imx8mp-prt8ml-v2-3-3d84b4fe53de@pengutronix.de>
+ <0f520191-7d9f-4800-a41e-a623b9335c9d@lunn.ch>
+From: Jonas Rebmann <jre@pengutronix.de>
+Content-Language: en-US
+In-Reply-To: <0f520191-7d9f-4800-a41e-a623b9335c9d@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: jre@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, Sep 18, 2025 at 08:59:41AM +0200, Lorenzo Bianconi wrote:
-> Fix typo in PPE_IP_PROTO_CHK_IPV4_MASK and PPE_IP_PROTO_CHK_IPV6_MASK
-> register mask definitions. This is not a real problem since this
-> register is not actually used in the current codebase.
+Hi Andrew,
+
+On 2025-09-18 16:18, Andrew Lunn wrote:
+>>   - Onboard T1 ethernet (10BASE-T1L+PoDL, 100BASE-T1+PoDL, 1000BASE-T1)
 > 
-> Fixes: 00a7678310fe3 ("net: airoha: Introduce flowtable offload support")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> Are these PHYs connected to the switch? It just seems odd you have a
+> switch with only one port connected to the outside world.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+yes, the 10BASE-T1L+PoDL and 100BASE-T1+PoDL are. We didn't get to test
+them, so I removed them from the devicetree.
 
+Regards,
+Jonas
+
+-- 
+Pengutronix e.K.                           | Jonas Rebmann               |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-9    |
 
