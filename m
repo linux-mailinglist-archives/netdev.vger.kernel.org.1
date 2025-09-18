@@ -1,230 +1,188 @@
-Return-Path: <netdev+bounces-224360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F974B84032
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 12:17:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 840ECB84074
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 12:20:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE2EA463600
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:17:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3892754388C
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:20:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC11306D58;
-	Thu, 18 Sep 2025 10:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A669C2F7477;
+	Thu, 18 Sep 2025 10:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOFLOrWv"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OmzJzaJ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012003.outbound.protection.outlook.com [40.107.200.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B41E2F83CF;
-	Thu, 18 Sep 2025 10:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758190381; cv=none; b=eIAsIEurK/RBeFtZGTx4gX0tZ3Jf5Fx4RKZAY0HIsTgLPX8vCyDNV/nw5O0s2LZRn5o6gIRY1b6Q6DcTo58nPoiOGOst6d6J7Irc8W0NBrocHaDwIaBy/j+z3soqT3+a9T3MFrwrKqymHqL0Z37blz9E+8yH+fccKjhIHwuUaPk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758190381; c=relaxed/simple;
-	bh=OfQjKy/Zp2oThhXDYDXNlv99L2kJ15thP22bLFaBmOo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RWk9Xu2a6hywbPYMM/JTbVixg2g0hg88PUPsuMCkQSZTvBvPxJDnF49nRVaLLwzlWAwocJ4SmXQTUYMteUob4gFf0i1+SHmq6byOaTF15wRxLu4O9P+nA7OpYMinJCMvM669thPwn49lObqJzuwNLPtMzOOxk8+XK2wxc5Ras+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOFLOrWv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05201C4CEF0;
-	Thu, 18 Sep 2025 10:12:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758190381;
-	bh=OfQjKy/Zp2oThhXDYDXNlv99L2kJ15thP22bLFaBmOo=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=oOFLOrWvcdU7ANEGYkH6htNM4dZCxw+DskXxE6xIZAnXhjHlMLGmYprKZEIXPf/fa
-	 sEEIaCd6ui6C1nTNJHxko+ip7GLjRDWbyxotBH8eVDWrX4dTgC7abLkxusuwMx58NN
-	 o0OjkJ8MLDz28TGPjagQ7EltmgPV28OsEfvgxNq6iJBYpRD/4Zf0/aVgMhvLk5UrSP
-	 mpsjKswUKEY7EGsgi6hGr8tpxBzB+bCxUTwMJAuxaKmlM4SM7CxSdkau7L2ao7qQr2
-	 fhcrY/0NDsofn05aeiixLKQXPhfxw686dq3gU/dL3Zz2F1e2+wFLR02LlTZXotUnjD
-	 knA1RsG5qXD2w==
-From: Christian Brauner <brauner@kernel.org>
-Date: Thu, 18 Sep 2025 12:11:59 +0200
-Subject: [PATCH 14/14] ns: rename to __ns_ref
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A722F6567
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 10:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.3
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758190612; cv=fail; b=MnKuKj4Q+nZu2pBYFizfN3Z7coDuggT/yH50mQvXnawCu3FS+B/3IRHIi+JepTjtdbmY3cb7//JcPKb4BOGc1Ugrt2bZLJ6sxHvd+U7JjDR3IUfgRNA59UULAkmf72N9TrLxFEVg3Ayi5Y9zRFXok1g76r/z8GDEr2C5IGwhdh8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758190612; c=relaxed/simple;
+	bh=KImkQ0ZkdEdz/3iLegl4QEkFK1mId0q5iLJnthUt6EU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lWfkvyfD5djAlWfCOiLlCjdfYcb7LNZZj2exX61/05bpIauQXHh03YQYJTAPrtxvY8z5bG5o9khDNPXkdhXQz9KvimNei+4kIOp6RMrZFCeW/0/w5ZelfjD+G3JBf+s6BZ+Z6pIrWUni7GDdnvUGt+K8OUVsO3dfEfcmIJ3WHss=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OmzJzaJ9; arc=fail smtp.client-ip=40.107.200.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RFmT2b30K/lA6p37hocvUz+LA7hT44R2T0LzB/JOYDE3EY3j/BMdfhcNmdJ2LS7TyBuorrcRssnfj9+fE+Yh1UCFkaAcW3idLt159cBQ7ByVsVw2l96FT7+0Y98jUnhNs1EMAfD3tq49La+RymLvsjcwuPfA5Oa/oz/RQmxNGmKsoHGyuOPfJBciioqZrEQNBr9SsHKFMs0IjDnZrSdIheigLUMMlW9yuPUIweyEpVirjdBTmQddA4aUKn/Bf8qIEJKeggRuvpjPGO4kVOthZztgAfEGtj7PfWkgSzu2hJPywO49P64yHZOzicK+t3deYMYiPFBHDS62fWN0N0Z7SQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0rItsmtE9rMgFeAdIl+w+MMKZuUbf0IAbvxhhRSWim4=;
+ b=r7qXrxr6XVHMN5x7lw/E7UGuTEEyDhD4W2UX4eCwuxJE/lvOVXzTURLPOXopqKATTgLbskRxwEYDxInnif8xC6PPkHBkz5udI024+b4miCl242LDoKmbqpxaGz36eqLbKpIstO3KiyCriiE78Ugh2kPHvZ/6O7KgcqLVWr5qV+s9z09C9BAnRE/bye/jfWp9IgfPWc48Zgi8RCYzS6iZHaHQZmByep2EtT5UoBkftsXGZFZWSBJOofKsJtYPfYsVip6oUiUjXHXXEDjFXFoGQkx6bW3x5XMseA3zlKJ+n4t8yTXjUjA2mU2l/2nj75Ew7qHG6herCMpFBZZf7QQLoA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0rItsmtE9rMgFeAdIl+w+MMKZuUbf0IAbvxhhRSWim4=;
+ b=OmzJzaJ93pWL4giZKlYJGCD7l5QfLpcr/FyLBGyVQsWuGRfNBhAnEsGNV/neqcQHi+5Cl5BL/yZgHzVVPpPdLZK9+4O/o/q9wSJ2dPnVPKAT9AjT1F/fRyHXp6CIc9+tfrGtp2SkRMi8/nFHXOUvGE5l3Ng69k22Eq5T40l5baxkfS/OEb4z0f7tI30MUGP4YWkJ/j6Tc+SeEcx0LjbLflYQyO4wZsMjqypuydFYkDofAB2bZ4cU0KCoqZ1QPahns3ajHCLs2+MouI7YL93iyoelYMKXYvNx30VvCxa98l/MVarXeD98mfd9XRVyeJlaaMaCmOpXzcpKTu4pncEOMQ==
+Received: from BYAPR02CA0069.namprd02.prod.outlook.com (2603:10b6:a03:54::46)
+ by LV3PR12MB9141.namprd12.prod.outlook.com (2603:10b6:408:1a7::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.13; Thu, 18 Sep
+ 2025 10:16:47 +0000
+Received: from BY1PEPF0001AE16.namprd04.prod.outlook.com
+ (2603:10b6:a03:54:cafe::8e) by BYAPR02CA0069.outlook.office365.com
+ (2603:10b6:a03:54::46) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.14 via Frontend Transport; Thu,
+ 18 Sep 2025 10:16:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BY1PEPF0001AE16.mail.protection.outlook.com (10.167.242.104) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9137.12 via Frontend Transport; Thu, 18 Sep 2025 10:16:46 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.34; Thu, 18 Sep
+ 2025 03:16:31 -0700
+Received: from c-237-113-240-247.mtl.labs.mlnx (10.126.231.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Thu, 18 Sep 2025 03:16:28 -0700
+From: Cosmin Ratiu <cratiu@nvidia.com>
+To: <netdev@vger.kernel.org>, <cratiu@nvidia.com>
+CC: Jiri Pirko <jiri@resnulli.us>, "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Vlad Buslov
+	<vladbu@nvidia.com>, Dmytro Linkin <dlinkin@nvidia.com>
+Subject: [PATCH net] devlink rate: Remove unnecessary 'static' from a couple places
+Date: Thu, 18 Sep 2025 13:15:06 +0300
+Message-ID: <20250918101506.3671052-1-cratiu@nvidia.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250918-work-namespace-ns_ref-v1-14-1b0a98ee041e@kernel.org>
-References: <20250918-work-namespace-ns_ref-v1-0-1b0a98ee041e@kernel.org>
-In-Reply-To: <20250918-work-namespace-ns_ref-v1-0-1b0a98ee041e@kernel.org>
-To: linux-fsdevel@vger.kernel.org
-Cc: Amir Goldstein <amir73il@gmail.com>, Josef Bacik <josef@toxicpanda.com>, 
- Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
- =?utf-8?q?Zbigniew_J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, 
- Lennart Poettering <mzxreary@0pointer.de>, 
- Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
- Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
- =?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Anna-Maria Behnsen <anna-maria@linutronix.de>, 
- Frederic Weisbecker <frederic@kernel.org>, 
- Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Christian Brauner <brauner@kernel.org>
-X-Mailer: b4 0.15-dev-56183
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4926; i=brauner@kernel.org;
- h=from:subject:message-id; bh=OfQjKy/Zp2oThhXDYDXNlv99L2kJ15thP22bLFaBmOo=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWScvvXM/ot1cOoPNcnGhxz/Vor+D/tpkyl+gWUNt31Lz
- p+XMuHvO0pZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACbymZvhv+e8UNdLgXukN/8I
- e8Ybqh8brL2rq+f5g4c7H3/KTnU+48vwi+lI4K98/6KJxT5fj+U+Zw9sue22+cOXf0fY7x670cJ
- 1kRkA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BY1PEPF0001AE16:EE_|LV3PR12MB9141:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4ef34b4-bcae-4dd1-ab33-08ddf69c7939
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?eFXyVxlPiI0enCqKr6U17wYszLnhLtQKI++B4LyjSazzKDGl/bJacyHn21VH?=
+ =?us-ascii?Q?ltxMxo9QeiNogn8YBwweM9wxVF2gk6NvqeFd0pghXi2r25HBcgqn2tLiVvcB?=
+ =?us-ascii?Q?wx2d8v0I+kFdixE2MJGuhahZIy+rd/7+I5wsHOxa+bv8naeGDSu4soMD5/+z?=
+ =?us-ascii?Q?RNO+rbg/S14QS87Q7UxvHAUPCVtsr4LPFhfR9q95U13XrPdDmC0rLMh2AvJB?=
+ =?us-ascii?Q?s1hXZheqVIFFgc4swcFK1iaQPhq+4weNJgjs9iqkmy/8GjWWaEaiZNGsA66g?=
+ =?us-ascii?Q?BB602Kye5JJjSZ60T1rgioNehzi6mZxrgnKmhU39ggUkkH4SCDTT/MggX9K7?=
+ =?us-ascii?Q?a8ln1/jYo6AEB4WiJLHurVvDsci/T+RQkkaRhCXtPXHwe7aezaHeCVmPd5CC?=
+ =?us-ascii?Q?ByYNhatqncKNKqPb/S0AYqubfq9gIWf46QeaezS8BS6KIAkyg/wHEXX0EK+X?=
+ =?us-ascii?Q?STY3/vzzJdBmrP68BNA9LhQOMPsedyaXv/5juWqFvZ/MODgQ+o8hyYSxPWZx?=
+ =?us-ascii?Q?QFizj2sN2wm/m4oVq2TEOZ/6sAlwExATzBaEdtIzBMlOyhNhc3NjjnLoRuBO?=
+ =?us-ascii?Q?xYkulgo9FRctOh2/wGYBsKAumfwYkWcI++3PqQxaDrUlVOWAh2ySx68FYqR+?=
+ =?us-ascii?Q?+Ak7Oek1xBtd/592mLZxyThV8Fi+iKjBpITYlr8e4HmcPN0SlEQxqvO41V19?=
+ =?us-ascii?Q?GlyN3zJvs7DD0VIFDjXtENLggvvef1GBX+S04AdGLW1yaHSPA82+Wl3fEgJi?=
+ =?us-ascii?Q?zb6uS/DGQh4uSCtffUR5ygw5YI2FefOKtcKvjN7A1ig2opuaGKBKDTYnhi2r?=
+ =?us-ascii?Q?YZ9RkruJZBCogg/cMIZbIVfi6osu4t66crBQ++rYPiMb5omZmBVwy1VrIqZv?=
+ =?us-ascii?Q?86RKIMfaK/AqhnHmSeZPzBP+sh0UiPNC3WWMC2/NeJP2lkyjqQAwFLnmAb8k?=
+ =?us-ascii?Q?9HfAWAJw5bMSANGfkYlTWyespxZ7WVS5p7fZqGH392HhATHeBUMR75b6Hole?=
+ =?us-ascii?Q?BoOsrGLUZqlmyUVENm1AOZbEO7FEk/KuUZavqziCuzTXSLhXi93CRh/JQU/e?=
+ =?us-ascii?Q?byUkiKL01vFjXlPh7tjBgYmRYSfoLJnoNsNiR90wAHLLFEv2Pyvke9NNJPHW?=
+ =?us-ascii?Q?By4ZPJQCOpXv+13mJKM5GPxAafzgqEJiFqy8DqMQ/mr8whuCL/smm1pI6C71?=
+ =?us-ascii?Q?F1CJ6ujO2ofgF5hGOXw4biIjpG7hvhniLEL6PZuRuv7qd4rclxpMBtilP/od?=
+ =?us-ascii?Q?odZNWmnU4sVL7IlVAeKXebPe1D5yEQxvFY6O3v6vr/HlLz6RV5wjL+nejkXd?=
+ =?us-ascii?Q?SD/OHx8k4yGbTyJALODdeO/KKiIdtOP70nWlFM08ADfLdVZPsvqtxFCeRWqx?=
+ =?us-ascii?Q?CI+XkaoHU8EY0Vxr8H1Ddi9WYOr1RHGD4B5X5zogdWRMNDcS1mwwWNzt/bua?=
+ =?us-ascii?Q?B0ZXyMNZKWNOBgIZamFNkrn55ChXP6oD9lrBH6sl3ezvA96sZMhlsXz4eQ3b?=
+ =?us-ascii?Q?BbagBxtJRYOYrmUBJ1NKvzgrVQOAHtM+THCR?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2025 10:16:46.4375
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4ef34b4-bcae-4dd1-ab33-08ddf69c7939
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BY1PEPF0001AE16.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9141
 
-Make it easier to grep and rename to ns_count.
+devlink_rate_node_get_by_name() and devlink_rate_nodes_destroy() have a
+couple of unnecessary static variables for iterating over devlink rates.
 
-Signed-off-by: Christian Brauner <brauner@kernel.org>
+This could lead to races/corruption/unhappiness if two concurrent
+operations execute the same function.
+
+Remove 'static' from both. It's amazing this was missed for 4+ years.
+While at it, I confirmed there are no more examples of this mistake in
+net/ with 1, 2 or 3 levels of indentation.
+
+Fixes: a8ecb93ef03d ("devlink: Introduce rate nodes")
+Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
 ---
- include/linux/ns_common.h | 12 ++++++------
- init/version-timestamp.c  |  2 +-
- ipc/msgutil.c             |  2 +-
- kernel/cgroup/cgroup.c    |  2 +-
- kernel/nscommon.c         |  2 +-
- kernel/pid.c              |  2 +-
- kernel/time/namespace.c   |  2 +-
- kernel/user.c             |  2 +-
- 8 files changed, 13 insertions(+), 13 deletions(-)
+ net/devlink/rate.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/ns_common.h b/include/linux/ns_common.h
-index a65da646aef7..24bbeb5161a5 100644
---- a/include/linux/ns_common.h
-+++ b/include/linux/ns_common.h
-@@ -29,7 +29,7 @@ struct ns_common {
- 	struct dentry *stashed;
- 	const struct proc_ns_operations *ops;
- 	unsigned int inum;
--	refcount_t count;
-+	refcount_t __ns_ref; /* do not use directly */
- 	union {
- 		struct {
- 			u64 ns_id;
-@@ -95,19 +95,19 @@ void __ns_common_free(struct ns_common *ns);
- 
- static __always_inline __must_check bool __ns_ref_put(struct ns_common *ns)
+diff --git a/net/devlink/rate.c b/net/devlink/rate.c
+index 110b3fa8a0b1..264fb82cba19 100644
+--- a/net/devlink/rate.c
++++ b/net/devlink/rate.c
+@@ -34,7 +34,7 @@ devlink_rate_leaf_get_from_info(struct devlink *devlink, struct genl_info *info)
+ static struct devlink_rate *
+ devlink_rate_node_get_by_name(struct devlink *devlink, const char *node_name)
  {
--	return refcount_dec_and_test(&ns->count);
-+	return refcount_dec_and_test(&ns->__ns_ref);
- }
+-	static struct devlink_rate *devlink_rate;
++	struct devlink_rate *devlink_rate;
  
- static __always_inline __must_check bool __ns_ref_get(struct ns_common *ns)
- {
--	return refcount_inc_not_zero(&ns->count);
-+	return refcount_inc_not_zero(&ns->__ns_ref);
- }
- 
--#define ns_ref_read(__ns) refcount_read(&to_ns_common((__ns))->count)
--#define ns_ref_inc(__ns) refcount_inc(&to_ns_common((__ns))->count)
-+#define ns_ref_read(__ns) refcount_read(&to_ns_common((__ns))->__ns_ref)
-+#define ns_ref_inc(__ns) refcount_inc(&to_ns_common((__ns))->__ns_ref)
- #define ns_ref_get(__ns) __ns_ref_get(to_ns_common((__ns)))
- #define ns_ref_put(__ns) __ns_ref_put(to_ns_common((__ns)))
- #define ns_ref_put_and_lock(__ns, __lock) \
--	refcount_dec_and_lock(&to_ns_common((__ns))->count, (__lock))
-+	refcount_dec_and_lock(&to_ns_common((__ns))->__ns_ref, (__lock))
- 
- #endif
-diff --git a/init/version-timestamp.c b/init/version-timestamp.c
-index 043cbf80a766..547e522e6016 100644
---- a/init/version-timestamp.c
-+++ b/init/version-timestamp.c
-@@ -8,7 +8,7 @@
- #include <linux/utsname.h>
- 
- struct uts_namespace init_uts_ns = {
--	.ns.count = REFCOUNT_INIT(2),
-+	.ns.__ns_ref = REFCOUNT_INIT(2),
- 	.name = {
- 		.sysname	= UTS_SYSNAME,
- 		.nodename	= UTS_NODENAME,
-diff --git a/ipc/msgutil.c b/ipc/msgutil.c
-index bbf61275df41..d0f7dcf4c208 100644
---- a/ipc/msgutil.c
-+++ b/ipc/msgutil.c
-@@ -27,7 +27,7 @@ DEFINE_SPINLOCK(mq_lock);
-  * and not CONFIG_IPC_NS.
+ 	list_for_each_entry(devlink_rate, &devlink->rate_list, list) {
+ 		if (devlink_rate_is_node(devlink_rate) &&
+@@ -819,8 +819,8 @@ EXPORT_SYMBOL_GPL(devl_rate_leaf_destroy);
   */
- struct ipc_namespace init_ipc_ns = {
--	.ns.count = REFCOUNT_INIT(1),
-+	.ns.__ns_ref = REFCOUNT_INIT(1),
- 	.user_ns = &init_user_ns,
- 	.ns.inum = PROC_IPC_INIT_INO,
- #ifdef CONFIG_IPC_NS
-diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-index 092e6bf081ed..a0e24adceef0 100644
---- a/kernel/cgroup/cgroup.c
-+++ b/kernel/cgroup/cgroup.c
-@@ -219,7 +219,7 @@ static bool have_favordynmods __ro_after_init = IS_ENABLED(CONFIG_CGROUP_FAVOR_D
- 
- /* cgroup namespace for init task */
- struct cgroup_namespace init_cgroup_ns = {
--	.ns.count	= REFCOUNT_INIT(2),
-+	.ns.__ns_ref	= REFCOUNT_INIT(2),
- 	.user_ns	= &init_user_ns,
- 	.ns.ops		= &cgroupns_operations,
- 	.ns.inum	= PROC_CGROUP_INIT_INO,
-diff --git a/kernel/nscommon.c b/kernel/nscommon.c
-index 7c1b07e2a6c9..7aa2be6a0c32 100644
---- a/kernel/nscommon.c
-+++ b/kernel/nscommon.c
-@@ -5,7 +5,7 @@
- 
- int __ns_common_init(struct ns_common *ns, const struct proc_ns_operations *ops, int inum)
+ void devl_rate_nodes_destroy(struct devlink *devlink)
  {
--	refcount_set(&ns->count, 1);
-+	refcount_set(&ns->__ns_ref, 1);
- 	ns->stashed = NULL;
- 	ns->ops = ops;
- 	ns->ns_id = 0;
-diff --git a/kernel/pid.c b/kernel/pid.c
-index c45a28c16cd2..e222426f745d 100644
---- a/kernel/pid.c
-+++ b/kernel/pid.c
-@@ -71,7 +71,7 @@ static int pid_max_max = PID_MAX_LIMIT;
-  * the scheme scales to up to 4 million PIDs, runtime.
-  */
- struct pid_namespace init_pid_ns = {
--	.ns.count = REFCOUNT_INIT(2),
-+	.ns.__ns_ref = REFCOUNT_INIT(2),
- 	.idr = IDR_INIT(init_pid_ns.idr),
- 	.pid_allocated = PIDNS_ADDING,
- 	.level = 0,
-diff --git a/kernel/time/namespace.c b/kernel/time/namespace.c
-index d49c73015d6e..d70bdfb7b001 100644
---- a/kernel/time/namespace.c
-+++ b/kernel/time/namespace.c
-@@ -480,7 +480,7 @@ const struct proc_ns_operations timens_for_children_operations = {
- };
+-	static struct devlink_rate *devlink_rate, *tmp;
+ 	const struct devlink_ops *ops = devlink->ops;
++	struct devlink_rate *devlink_rate, *tmp;
  
- struct time_namespace init_time_ns = {
--	.ns.count	= REFCOUNT_INIT(3),
-+	.ns.__ns_ref	= REFCOUNT_INIT(3),
- 	.user_ns	= &init_user_ns,
- 	.ns.inum	= PROC_TIME_INIT_INO,
- 	.ns.ops		= &timens_operations,
-diff --git a/kernel/user.c b/kernel/user.c
-index f46b1d41163b..17a742fb4e10 100644
---- a/kernel/user.c
-+++ b/kernel/user.c
-@@ -65,7 +65,7 @@ struct user_namespace init_user_ns = {
- 			.nr_extents = 1,
- 		},
- 	},
--	.ns.count = REFCOUNT_INIT(3),
-+	.ns.__ns_ref = REFCOUNT_INIT(3),
- 	.owner = GLOBAL_ROOT_UID,
- 	.group = GLOBAL_ROOT_GID,
- 	.ns.inum = PROC_USER_INIT_INO,
-
+ 	devl_assert_locked(devlink);
+ 
 -- 
-2.47.3
+2.45.0
 
 
