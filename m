@@ -1,192 +1,139 @@
-Return-Path: <netdev+bounces-224343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73573B83E5B
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 11:48:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87EADB83E8B
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 11:50:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D229463B64
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 09:48:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 736AB482CC7
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 09:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D61235345;
-	Thu, 18 Sep 2025 09:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63FEA220F29;
+	Thu, 18 Sep 2025 09:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r+arTYz0"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KM21fzvV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-pl1-f225.google.com (mail-pl1-f225.google.com [209.85.214.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565461F4717
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 09:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3B81F09BF
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 09:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758188914; cv=none; b=uMYRTwc1b5GgE4wpLewV1VGSuVpvieDrv8oUf5dZzJ417JKMMAgqiMk2ZlLv+lLQ/MNs11LuZnONuR35AdzfrsduK3iCQsKcsW9DC+KZ1VpsBBe3qCMsk3EhbFyqFMbLWkpAiW48AjcHctMRk+Hb4LocLcCVu+GAKYQA7t1p4ts=
+	t=1758189025; cv=none; b=otCkXLlGxk0jSHPSoBvP10WPXKP1gLFoxKQ+PRk2ka/KhzGf6BRIaVWEdqPJOTb5pn0hCXVSGizpIWEnsz+N72S1/bW+YB/bQJWOyn+FkYOBMVGKWkClrVTgYQQnnHX2zYbcTAmbmHHfUPDu9EyF5CjuDsRZGHqhZBNtWf/yFiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758188914; c=relaxed/simple;
-	bh=iUOnXzAnIbz12WMKiHCmVwMEY+TGpgiWwPuQO/o7Ofc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=NdG2LdISe18G91dmng236fKyCLPYb5BT0PLOFNHuzT8y7lO9qPTlCiTdughz+c+UFflDJvbn+rCfvcmI/gr4Ka6L/VlOpdUN8Y/nOf++EoTsTYT3zQGPp8hS0KwuPCRzhMZZmvk35YCGr50grJDD+fNWlayxTDY+hSYof092ZLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=r+arTYz0; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-45f2acb5f42so5374415e9.1
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 02:48:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1758188911; x=1758793711; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FRKX/a9t7ARzNjcgVwY27xm/KGPFcrC2ZLWzVexu+GA=;
-        b=r+arTYz0c+clTxfqZjOXw1/NTcn/y+hfsNFHTGQC1Kq17gZkb/R12l2fW4+3DhbVd2
-         h2wxTEsHKs7jtPWRARPpP86AT8S/MF7eH1g1pOcbSuuS7luMcWWA5grRuyfNgxC2/3lm
-         On99ALYgJfokFIbbyVbXPpSnRPcuhJV3A+eGJXLnxf6pWMms5fKR3FIthwfp/m19+wdT
-         +lPJupqSaLbJV2dkTgjOW0s208Geygsm2/tMXyhnpxN/aIUBi7CZjHfMfIKxa52AHdy/
-         nTBu34evmIg8MrNMb8yWtO0XFZf6NK8i7WUnVxt/vbBHbnDb4yDjgzI8gSVQOtDnmr8V
-         VW2w==
+	s=arc-20240116; t=1758189025; c=relaxed/simple;
+	bh=sb+/Rw8sIjYpdBKb6sxmFtn4/XkCevzzUuk49q+M4u8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hKBJGHGxvw9GVddfIG1mD0voT8whEJKoX/pDuVpvgzMmQBsxfvZA9AY58yBnrwBg/LlbLMt/quERVYkqBxaazNF+I8bf8g/mLMAHp8EvrIaQ4nCm9C/TDnFYaIjeLxqnkVkEmRC6zP7f20BT+OuXIqyWJugTAywXjglSpKSHQ7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KM21fzvV; arc=none smtp.client-ip=209.85.214.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f225.google.com with SMTP id d9443c01a7336-261682fdfceso20439095ad.1
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 02:50:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758188911; x=1758793711;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1758189023; x=1758793823;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FRKX/a9t7ARzNjcgVwY27xm/KGPFcrC2ZLWzVexu+GA=;
-        b=JdlHHmlGuayZEe9Ffi7wpoy54dFTIwWsRn3lQ6kunqFLlCT/3xafj4QKKbWDwPJdV5
-         fiFImXT5wSImO/cZmNvcty+mXoA0TtZkcbj8AemW6sohCAuvo+uUQaNY9rR4x8fJQZJw
-         fRd6idKhg+bsvzXMO2vwI+eZUmk1tq9mrXQWwdJd2rG0q4NuOkOBjgldSXmq/67Gxc04
-         LUmbJz8A4jk/9mBVo9MafKJtmiY0qG+pjiYdY9jauO29J2uUQZdKZeRqQKNLD9O6gJ92
-         mvCevyU0PCaDH3AGICHlSvs9uLksYE7Qv7glG0dN2qHCz6N4DtcNKLlCremnXjmHNKii
-         1nfA==
-X-Forwarded-Encrypted: i=1; AJvYcCWjt/0qryXPou+H9jTc6cNeh2qEJ9ZxBu7AQI7aPEwFXgsWiDJLv+1gJgR77/HgTU16ip5t/QA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZjp8jmjZiMDAArn3RbiB244pEWvABMebMtgAEU/0ovnV/XE38
-	BShJzoP91kNZkYri2cz2UrJQWcnYjhucK/xgvxrUJpReyOIDQwWgQXTp3rNVvecVEx8=
-X-Gm-Gg: ASbGncvodi18QkPBNGo5Jhg/ORpTlsGwKSVi2RPU0eRdbiWY9r9WJdOjFq/ieOOqdLi
-	0ucilbLYu0w8XWtcuFFVk5kN5BSPLffiZG3QyOCX1pAXK2e7It7E8l+/UDn+Q9YpDDpyHFzvawk
-	pOeQO96UD7xDeB7KMcxk0QQ7qWB4VfynDxuS0U5mgVguwBfPJiLHAkEXR7Q5/ua1ZliGfwO6PHc
-	m9cGSWRCCSalEzvsOZb+IfZV8uoNxdTLb0C7c0F3TrKcZQAyrUmDTEDvJenKG8FfED35/7QeBCF
-	QNIORPpnzXM1RhrBGShBULQgBA5Xyj8Fk+Kh+0dQD833qLkn1eIhoDDnfaq9/Sa8qH58A/VfI34
-	LWRsK7GrJysI0f7GX3OvZDX1CSKlE0HmY+6EH8vcVJKXs7w==
-X-Google-Smtp-Source: AGHT+IHXja+pZTgNTOTckYTv2vp7ew+2RtTFibAkrz6i7j2uNLlasmLdSudrmUnD6HjK82+q28mc+Q==
-X-Received: by 2002:a05:600c:43c5:b0:45d:d295:fddc with SMTP id 5b1f17b1804b1-464f7027ee6mr16687145e9.4.1758188910448;
-        Thu, 18 Sep 2025 02:48:30 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-461391232e7sm72907635e9.6.2025.09.18.02.48.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Sep 2025 02:48:30 -0700 (PDT)
-Date: Thu, 18 Sep 2025 12:48:26 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Roger Quadros <rogerq@ti.com>
-Cc: MD Danish Anwar <danishanwar@ti.com>,
-	Parvathi Pudi <parvathi@couthit.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	Mohan Reddy Putluru <pmohan@couthit.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Basharath Hussain Khaja <basharath@couthit.com>,
-	"Andrew F. Davis" <afd@ti.com>,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH net-next] net: ti: icssm-prueth: unwind cleanly in probe()
-Message-ID: <aMvVagz8aBRxMvFn@stanley.mountain>
+        bh=sb+/Rw8sIjYpdBKb6sxmFtn4/XkCevzzUuk49q+M4u8=;
+        b=JSALsx1kRz3dSHoUWgNQw82RPjzDmhxOy8qMlpujp9GavDqSpV1sU5m7IsVY/eC4ql
+         nBLegJwOQzEVCh3LqVc7K3URqClI+D4mPYx3uzwSHw7r7SWDAxf5JYH6wyONzK+sc+WV
+         GjIGBuaChSJXsFZtIdzw6L0BUwhl5NNU7zPfHVPVTAPFyvgqz+EHq7E9pkN1kl0bWk4P
+         3L/uYPe+D2zxatNuRBtb1xyugzJouem7fqUlUn/A8U4jy5oVuJSGm9SpbFZQj9LpCmlM
+         JImuB7fLbPVVCDHylIvtstsDym/QJANAeDfAaqfftv0paazA5JxyNcb7ODh0q2cz1lvx
+         C92g==
+X-Forwarded-Encrypted: i=1; AJvYcCUUT3h+FrHu1j++5dgTZ6ko7+ygtPf59UkGdovI1HTdLuom0s8joVBzxh19RhlvI/HI9f4U6ZU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzzqr3IOWCwdLk5nekitQ/IHEptACcBZhSLb0NCUHcSIe4SgNWi
+	2n/rsot3U6EzUcft3MYqu3FWhKohY2CuAULJ4xJ+rKprBv3+FasnX+pA7jWdTgrr0SIxemhcR90
+	bR6XhRK+ZRC1olcC2k6XFzk1kMZdBHce1iIOlFSTd40WmgE/4vpd8CNhQB/RoI5WTMPrniPvQ8u
+	ZLwX1kQt/WK28gDfEnLCDt9hP/bfF5GEcqtvOzSp+KB2b/EnmDZXuAZOmwbqK00dB68+OGFXQg5
+	cBcUE2fY60uUJdeag==
+X-Gm-Gg: ASbGncv+oaDOfbBTm81hPO+wmUeHpa7MLdC3AEDcm+Fu5X7WVdthmPEq3ZJmqHGiM3j
+	COyNo45NxApxEyEYDIblqOHnRpC+S32LUR+wtrpD/Tpfh8felTGqjiKtTUhok8wLXBUfv6nSclK
+	YvgcIkyxP7fX6OBaSgxcqQoC6h1l79mU59i0LHhDoygSTR1VBtzg20FRwGGNC4jVZq6XoSc8Xkb
+	K5J9rfqYOvgeMLwEvCt0md1FIII4r/xHLyV3MWoYr6wuciNqPXRG/9LxQT5yKBycOSZt/NXU2KO
+	5A15nrf1zC5WPjmocWmLS7+XWdEEy8COjF+GRd3QtlLhJatotjnhPdvuqwC51+rYy5zfzKkX+bg
+	lebUKnu3pd6U3mm/VTNTmd6lkr+r7IltVjmRdMG9uBvKUGq2853Xks/X8e1RlP2IpUuu2wZhAiW
+	4Ll/qerfhs
+X-Google-Smtp-Source: AGHT+IExv/hLBnDJ9oCtdXNKnmkgsKhMq7rdQMd6U2jozWxQb3qqejwfG3Igd6lt9rGn0hnUPB8wsO3xJULx
+X-Received: by 2002:a17:902:eed6:b0:269:4752:e21f with SMTP id d9443c01a7336-2697d1bb308mr23548205ad.22.1758189023164;
+        Thu, 18 Sep 2025 02:50:23 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-119.dlp.protect.broadcom.com. [144.49.247.119])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-269802bd7e9sm1706435ad.68.2025.09.18.02.50.22
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 18 Sep 2025 02:50:23 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-244570600a1so9912855ad.1
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 02:50:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1758189022; x=1758793822; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sb+/Rw8sIjYpdBKb6sxmFtn4/XkCevzzUuk49q+M4u8=;
+        b=KM21fzvVVwHg2duGzac7XDvOFaAxLbGjNPwMu6V+M4hFrrK6T9FgdHrJ1k1hymYQnx
+         q7W3KCGRvqv9xN4R7FIZpweJIJPbnNNiCl4QtfKKq7JLvoQOm/vp7zkcxoF5jASdf2qp
+         4ebLoHs7xfWoeCi2ipK22+3FI32+sZuefb/Xk=
+X-Forwarded-Encrypted: i=1; AJvYcCXEPiYEz2QbP8ET0WBDDiMZ52TGggZ/ac2xg6ZWy34VTkB3jcSmSrf0jCD34foJLeP0hHPAtsQ=@vger.kernel.org
+X-Received: by 2002:a17:903:1211:b0:267:8049:7c87 with SMTP id d9443c01a7336-2697c854cafmr35711815ad.14.1758189021687;
+        Thu, 18 Sep 2025 02:50:21 -0700 (PDT)
+X-Received: by 2002:a17:903:1211:b0:267:8049:7c87 with SMTP id
+ d9443c01a7336-2697c854cafmr35711605ad.14.1758189021293; Thu, 18 Sep 2025
+ 02:50:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+References: <20250911193505.24068-1-bhargava.marreddy@broadcom.com>
+ <20250911193505.24068-2-bhargava.marreddy@broadcom.com> <20250916151257.GI224143@horms.kernel.org>
+In-Reply-To: <20250916151257.GI224143@horms.kernel.org>
+From: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
+Date: Thu, 18 Sep 2025 15:20:09 +0530
+X-Gm-Features: AS18NWAGZjI9AOoElZ1PqbtOBjTR_Wkcn8OAuWFBln13azhgXSnyquR6Rl4ZLWk
+Message-ID: <CANXQDtbXG2XjBa2ja1LY7gdALg-PnEyvQBWPAiXQqD0hvtwp=g@mail.gmail.com>
+Subject: Re: [v7, net-next 01/10] bng_en: make bnge_alloc_ring() self-unwind
+ on failure
+To: Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, michael.chan@broadcom.com, 
+	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com, 
+	vikas.gupta@broadcom.com, 
+	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-This error handling triggers a Smatch warning:
+On Tue, Sep 16, 2025 at 8:43=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
+te:
+>
+> On Fri, Sep 12, 2025 at 01:04:56AM +0530, Bhargava Marreddy wrote:
+> > Ensure bnge_alloc_ring() frees any intermediate allocations
+> > when it fails. This enables later patches to rely on this
+> > self-unwinding behavior.
+> >
+> > Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+> > Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
+> > Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+>
+> Without this patch(set), does the code correctly release resources on err=
+or?
+>
+> If not, I think this should be considered a fix for net with appropriate
+> Fixes tag(s).
 
-    drivers/net/ethernet/ti/icssm/icssm_prueth.c:1574 icssm_prueth_probe()
-    warn: 'prueth->pru1' is an error pointer or valid
+Thanks for your feedback, Simon. This patch doesn't introduce a fix;
+the code already frees resources correctly.
+Instead, it modifies error handling by changing from caller-unwind to
+self-unwind within this function
 
-The warning is harmless because the pru_rproc_put() function has an
-IS_ERR_OR_NULL() check built in.  However, there is a small bug if
-syscon_regmap_lookup_by_phandle() fails.  In that case we should call
-of_node_put() on eth0_node and eth1_node.
-
-It's a little bit easier to re-write this code to only free things which
-we know have been allocated successfully.
-
-Fixes: 511f6c1ae093 ("net: ti: icssm-prueth: Adds ICSSM Ethernet driver")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- drivers/net/ethernet/ti/icssm/icssm_prueth.c | 30 +++++++++-----------
- 1 file changed, 14 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.c b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-index 65d0b792132d..293b7af04263 100644
---- a/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-+++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-@@ -1390,7 +1390,8 @@ static int icssm_prueth_probe(struct platform_device *pdev)
- 	prueth->mii_rt = syscon_regmap_lookup_by_phandle(np, "ti,mii-rt");
- 	if (IS_ERR(prueth->mii_rt)) {
- 		dev_err(dev, "couldn't get mii-rt syscon regmap\n");
--		return -ENODEV;
-+		ret = PTR_ERR(prueth->mii_rt);
-+		goto put_eth;
- 	}
- 
- 	if (eth0_node) {
-@@ -1398,7 +1399,7 @@ static int icssm_prueth_probe(struct platform_device *pdev)
- 		if (IS_ERR(prueth->pru0)) {
- 			ret = PTR_ERR(prueth->pru0);
- 			dev_err_probe(dev, ret, "unable to get PRU0");
--			goto put_pru;
-+			goto put_eth;
- 		}
- 	}
- 
-@@ -1407,7 +1408,7 @@ static int icssm_prueth_probe(struct platform_device *pdev)
- 		if (IS_ERR(prueth->pru1)) {
- 			ret = PTR_ERR(prueth->pru1);
- 			dev_err_probe(dev, ret, "unable to get PRU1");
--			goto put_pru;
-+			goto put_pru0;
- 		}
- 	}
- 
-@@ -1415,7 +1416,7 @@ static int icssm_prueth_probe(struct platform_device *pdev)
- 	if (IS_ERR(pruss)) {
- 		ret = PTR_ERR(pruss);
- 		dev_err(dev, "unable to get pruss handle\n");
--		goto put_pru;
-+		goto put_pru1;
- 	}
- 	prueth->pruss = pruss;
- 
-@@ -1569,18 +1570,15 @@ static int icssm_prueth_probe(struct platform_device *pdev)
- 	}
- 	pruss_put(prueth->pruss);
- 
--put_pru:
--	if (eth1_node) {
--		if (prueth->pru1)
--			pru_rproc_put(prueth->pru1);
--		of_node_put(eth1_node);
--	}
--
--	if (eth0_node) {
--		if (prueth->pru0)
--			pru_rproc_put(prueth->pru0);
--		of_node_put(eth0_node);
--	}
-+put_pru1:
-+	if (eth1_node)
-+		pru_rproc_put(prueth->pru1);
-+put_pru0:
-+	if (eth0_node)
-+		pru_rproc_put(prueth->pru0);
-+put_eth:
-+	of_node_put(eth1_node);
-+	of_node_put(eth0_node);
- 
- 	return ret;
- }
--- 
-2.51.0
-
+>
+> ...
 
