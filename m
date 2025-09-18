@@ -1,85 +1,98 @@
-Return-Path: <netdev+bounces-224474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 211F0B8565C
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:58:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43F7DB8567A
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:00:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEAC917D872
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:58:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 216A93A6FA7
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:00:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6842C2FE05B;
-	Thu, 18 Sep 2025 14:58:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E2023182D;
+	Thu, 18 Sep 2025 15:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mb2pIjnL"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B29A31;
-	Thu, 18 Sep 2025 14:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5F01CAA7D;
+	Thu, 18 Sep 2025 15:00:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758207524; cv=none; b=XJZHrxxvJ1092s0YNOTOZ3PMaDJepkaHhqhdXcr+Ls5IPk5oE23AT5C+tD1NAd+uKdiL7+PmGWu6KbYyoYH3boYKv+nGoatqct4IvC2+omVlp2Wzk/OzEd6Ay+K9gpAzwUEP3I5D/8FzRML0sCq0MNrX79xguZSJVHId0Wt8mTg=
+	t=1758207614; cv=none; b=rxLT4IVkgiuCDe31wJzqOCGRmhb7kzkEvYWKVS5aE7dAB7K/bv94zx6U6d0zemedwiCsa8gLx14vEi1LND/jfHBvCpBjiHfZGRAOka8HWXLDLnk3IFREx3/hCCKTGpgMvd7vm6Kv7Of13fIdDx/bvDqmb1BunVOTTnAZUHoaJmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758207524; c=relaxed/simple;
-	bh=bZ8fiZbd5UoLT7yBy00NqBituU2w3G2PjubQU4ki3LM=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UIZglW5uuEGTBFohY9FxlkhXYoSB8cP7nWF91ITGqeLj5DQQJePQCf140lM1q2wSDDyJpvcKJa5DNJKuM8lpRF2+nASlxTfZ+kRwTRGVQSjqIbM+HUTsbuQf0bDigIag3XoK67v7hUENYLClDMOBSz6vUIEzT+JqJmJwWxZn3E0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cSJdD75Cmz6GDDP;
-	Thu, 18 Sep 2025 22:57:04 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id F22D31402F7;
-	Thu, 18 Sep 2025 22:58:40 +0800 (CST)
-Received: from localhost (10.47.69.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 18 Sep
- 2025 16:58:40 +0200
-Date: Thu, 18 Sep 2025 15:58:38 +0100
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: <alejandro.lucero-palau@amd.com>
-CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v18 16/20] cxl: Allow region creation by type2 drivers
-Message-ID: <20250918155838.00007ea6@huawei.com>
-In-Reply-To: <20250918091746.2034285-17-alejandro.lucero-palau@amd.com>
-References: <20250918091746.2034285-1-alejandro.lucero-palau@amd.com>
-	<20250918091746.2034285-17-alejandro.lucero-palau@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1758207614; c=relaxed/simple;
+	bh=G+h/bFhRE3Ywkt/pPjHSXcrMue/DE7K8aAgXSM/YxEk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=WFMVCrPse/kXBhJ9kBM88g039vYPYxr+mj9KiFD+sSrqyRcxmGSI6rtT2U0zQBji3sXG3qgzGWjo/MHxhBa8+iPWD29vK0i5B7j/Jlmd4EI1KIVvC2NAo9oIS47qwExfNnqtKgXy2c0IEQ/dlXzDPGW1w0tbOfU4FICnyiTjj/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mb2pIjnL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72209C4CEE7;
+	Thu, 18 Sep 2025 15:00:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758207613;
+	bh=G+h/bFhRE3Ywkt/pPjHSXcrMue/DE7K8aAgXSM/YxEk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Mb2pIjnLVhdeSMjqc8S4L92XZtWlZcyxOv7E/pprI0v94MN9qzkeCf4u3wAPyprrO
+	 tNXr09OXRSQPd/eLYHMzkhaeS3ZcpVjPogMkBOSpQC5FokIwHYBEDtp9tHr/IxQuh6
+	 mbnGgYQglCGJ2nAzgZg9XdxXE7rxqGQEnwTam795yoVo/qIQNoIt0RR7NNdw6ogYVC
+	 JPo9V5Tn82zuxq669FlDIfMg/tVGGO8MYPkhGVQufatOtK9UfnDBbwsIhsDGHdBeSx
+	 p4tEdJmmSPXAkyO+U8EoD28q/YoKYq18FZDS8e4roi144DuvkTNsmx6i7r6dXpFQ64
+	 KfIKta2d8Qkkg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AED6339D0C28;
+	Thu, 18 Sep 2025 15:00:14 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 net] cnic: Fix use-after-free bugs in cnic_delete_task
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175820761326.2450229.3063488196557086048.git-patchwork-notify@kernel.org>
+Date: Thu, 18 Sep 2025 15:00:13 +0000
+References: <20250917054602.16457-1-duoming@zju.edu.cn>
+In-Reply-To: <20250917054602.16457-1-duoming@zju.edu.cn>
+To: Duoming Zhou <duoming@zju.edu.cn>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ andrew+netdev@lunn.ch
 
-On Thu, 18 Sep 2025 10:17:42 +0100
-<alejandro.lucero-palau@amd.com> wrote:
+Hello:
 
-> From: Alejandro Lucero <alucerop@amd.com>
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 17 Sep 2025 13:46:02 +0800 you wrote:
+> The original code uses cancel_delayed_work() in cnic_cm_stop_bnx2x_hw(),
+> which does not guarantee that the delayed work item 'delete_task' has
+> fully completed if it was already running. Additionally, the delayed work
+> item is cyclic, the flush_workqueue() in cnic_cm_stop_bnx2x_hw() only
+> blocks and waits for work items that were already queued to the
+> workqueue prior to its invocation. Any work items submitted after
+> flush_workqueue() is called are not included in the set of tasks that the
+> flush operation awaits. This means that after the cyclic work items have
+> finished executing, a delayed work item may still exist in the workqueue.
+> This leads to use-after-free scenarios where the cnic_dev is deallocated
+> by cnic_free_dev(), while delete_task remains active and attempt to
+> dereference cnic_dev in cnic_delete_task().
 > 
-> Creating a CXL region requires userspace intervention through the cxl
-> sysfs files. Type2 support should allow accelerator drivers to create
-> such cxl region from kernel code.
-> 
-> Adding that functionality and integrating it with current support for
-> memory expanders.
-> 
-> Support an action by the type2 driver to be linked to the created region
-> for unwinding the resources allocated properly.
-> 
-> Based on https://lore.kernel.org/linux-cxl/168592159835.1948938.1647215579839222774.stgit@dwillia2-xfh.jf.intel.com/
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com
+> [...]
+
+Here is the summary with links:
+  - [v3,net] cnic: Fix use-after-free bugs in cnic_delete_task
+    https://git.kernel.org/netdev/net/c/cfa7d9b1e3a8
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
