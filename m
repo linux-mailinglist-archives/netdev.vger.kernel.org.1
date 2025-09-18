@@ -1,129 +1,135 @@
-Return-Path: <netdev+bounces-224236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1020AB82BEB
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 05:24:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD7B4B82BF7
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 05:26:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAD351C22F12
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 03:24:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F5CD173D0D
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 03:26:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BD5225416;
-	Thu, 18 Sep 2025 03:24:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62AF022756A;
+	Thu, 18 Sep 2025 03:26:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UqQSzHav"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IM7RdEta"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52891FECBA
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 03:24:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B842582
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 03:26:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758165858; cv=none; b=PfXmM07NMHy8Xfl2dqINsr63ai9QzDfpLzcP8f4vM14oiooVSGnKC8HJ/tCHINCK7vL+nykDw+UR/uzhZgfPvME5IXT8IusYfwA72IX8RkzXpZSR0bCwfChc8Ui9hIe0avFCEBWa7ylhRxLdXhoiDwa6jVkl4Vr2UP2oUOJj/1M=
+	t=1758166001; cv=none; b=hFxbX29yQjPnksQ4wQmo0OSJSANRzub2Ew4qY8lPp+qzrGWJ/Ok/nFvt7Sp+lZJBWci+Q0UYJ8TUGqS27CS3EfJuILQwNHyECwk60kTpmldaOSqsEas/ERffELNOwNdt5DZJEheROpgPg4TEZkeGZzKOshI1ECQNZfyUg/VD+Pg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758165858; c=relaxed/simple;
-	bh=DvWUuw32eTmD0TBOxqoUtKRjTwAHv8x8+456fT8H83A=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=JUuZJiPrBsxYO0P5OSpDI2GnhHbU9p7Lyd5AiRWfPLpJyL3PmsNImIoIJ2JsJ0lYqqgmzeUnkDPZpbXuTb0u048xMwgr7v4BwVCSZlQxCnFCr5yP3N5yr+356DFUWDB+2zKdat2tGYxwX2/3cunPBR41hyCL6RzWnPC5rLaR8qY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UqQSzHav; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3fe48646d40so7903285ab.0
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 20:24:16 -0700 (PDT)
+	s=arc-20240116; t=1758166001; c=relaxed/simple;
+	bh=Pmt1aYLfi/OSES6dc7p4aW5PTLjPxl+/tbS4nE2iIkw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lDhzVjGb+VBdrbQeOd1crrWTH9tXhhqIRzS2UBRetUA0P8eDCDJEHdLvnRTA9BCJhKT6bAkkvHmkyAgpIyrEhYEPm9Gdk2SHdjLvUmLBZXDANNQHwKQak+FzHIrZkFTQKsF5Dmaa4KIpB1vhIdAfkTqxnPUN47BKeC8ptbxzLNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IM7RdEta; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8287fedae95so70265685a.3
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 20:26:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758165856; x=1758770656; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DvWUuw32eTmD0TBOxqoUtKRjTwAHv8x8+456fT8H83A=;
-        b=UqQSzHavKO8bNoOS5GJuJjjmFKpG2Vt9+mSlxKqbXd8ndtw2oEq+XUeATQOSQQoErP
-         Usn9+iBzREgMsPLeDmwnwfIMB42uIT56LWuTSMswHR6VvR0uvEoIAOG77ITEDql2TWz6
-         F7eW7PqUCBCXwPz/pJOD24JJBi1mubUj0lRCCpKlyycufgyXSLpJyR4JvF850JXFUHWG
-         k2YR4e4qqSnSQqZGBrwKs1R4ZReD5v5dULh1b+uR7aSTKZqYj4pMjkewxFmZ4uytKGZP
-         6YxxsPLIsL/ynYGJM+ZKiXEEKsn6tCOP1GQ5zl2lZjVDoMuX5tq6MSbdC0evEgPmc+Z3
-         3XXQ==
+        d=google.com; s=20230601; t=1758165998; x=1758770798; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6We32+dqJ5hUptpTPuBfjJhgS04xVDaxSc7/QMKPbGg=;
+        b=IM7RdEtaHRfWSPvmlgl/4QB21qVU10YkTo3a0f4QJao6hsouO/CcP/wd2nlu1vuSpY
+         gWL3iJ4zolgAFDYfIn2YNBK8rQAlVHsUoclt3pZIlC9V7tMjDsCr2i9/3CuB47XtQkU0
+         NKjPk11XgArtmeHGYfbdInaUEoNED9EeWwpv0NaB1X9usZ5aBLeSkSGEBBx2MtX53SuD
+         UWep27TMRAkrjknNDYoAoBFl5iurvPJmKOvJ23LPzux/Fx9jAOxqK99YBeMdl7Apm84+
+         I3CiO3sfAXvhstYIw174WzrjAdVaDaBBPwvCr++tlEi+hfeYy81IB7NOZ+sbMA3bm9Cm
+         XSpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758165856; x=1758770656;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DvWUuw32eTmD0TBOxqoUtKRjTwAHv8x8+456fT8H83A=;
-        b=dH3WOfUHap6jCqcDHY4YXeeWrbof6aPDJNdq4QDLWqssjdRzI2palFY4s8N4q1VMM4
-         WgMZupaPgvCcxZ88y0bN/Nhq+AyIjWFpYgL1DnixGNqqH7VfTuEWmLJ5wPlXsJHCkEBo
-         dHuDI2g2/pkg23knNHnGGVNqAeEmlpxD9sxAKTMtA+ftctPRwspeEtdHkrtxUzx2U5GD
-         ibZKrNg1z2PU20B2v52lV0C6cDUqOYN5HrpEwMkyriM3Q8m32uG2BCxFvfIDiwDfc1sl
-         pKjHT6VtW1x4CHzEsh9vUjfjKIi/kmu20Ope74O2OmJrHYjNqhJ+6lx5Hb4M3WPvALtt
-         w4NQ==
-X-Gm-Message-State: AOJu0YwfV9waFQeylNWHWfN4CDuFccuF85cfPwabcnDz1NFU7GlvcA/n
-	DokEdcu/pszbrv7OE7rDhh9WeHRrHO2UYEyGn7YN6GD38gD7OB0ixFYYzhK7q+lZQjqvD483ZfP
-	NdHrBJGS3+WxyLlMkv+/R3n9go+7llGvFQ5si
-X-Gm-Gg: ASbGnctlkDwOCFDy0s9EZSTgjjrC5Zu4SfK9eWCzBarN45qXCV709flMw6w90UJJ/0X
-	wvdyXDFS+mq7776NLvYyZrG9OgXEaKCQYZFm3PI+Fu5YLejF80Cc+PQcinggQ9MD9Acf4f3Xzsd
-	GaxQBB1TJ/Yb9G5CsL1H39nQ2RgPc+NOLlXOjMLy2xeFxnm2aRl2Z2PmsOLa1pdz5YCeW/H8ePT
-	XwBwpulkMLjC2Aqlt2UEuPTEVZsdgUbg10EJ86UNaMjEl6V1IF6Rwg/6VE=
-X-Google-Smtp-Source: AGHT+IHfDggKv5QOJ/N9XWK5VNhvBo2x601ZNaTZuASjaVHdh6hja61z3hw04catZiFTV9IVWU2JHH32rSqA68zyY2A=
-X-Received: by 2002:a05:6e02:3787:b0:423:fd65:fefa with SMTP id
- e9e14a558f8ab-424444e68c1mr26363375ab.6.1758165855748; Wed, 17 Sep 2025
- 20:24:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758165999; x=1758770799;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6We32+dqJ5hUptpTPuBfjJhgS04xVDaxSc7/QMKPbGg=;
+        b=AImBI4gYVAowdzaKkpjkK25SD0p/2OjorNGenYUmfTg9W6amJgr9Sz7kY4kuVgK7vt
+         mKw8XGnUSLO8bJ17WLhWpSgZvF/YgYW2ANdeFieOiDEhE3Sf1C5ENfT2d4PVDb+Sksjc
+         CWBulvknZhyKx9949NIxz2CYI31aKCRpCnFgmiLFUtG9Ul5f1E930jvPhsW2F5V5VXmS
+         3hYYVw3SvJbVqLuX83+M5BMYDtD6kOa95JWayBIvjIbogXRfgnomwQBJajaYI5EYzNvy
+         oU0cdjrzIEvw6nNFEStFh4DPBlFOqU5/2Tct94ZHjOEtqUPKg0KptivmY9LDV36u8/It
+         8Q/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXhhk9sDxj2rYbiTgyn2P046gsF+AKeK+Is6xptvG9asueJ9Zn1oumTYd1vCXZJibNVclvMwKo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypDAlqzDjcAM4fr1iY9brrMNj/ADwD3V5jdXJNgtnuSRNsfrp0
+	5bKh7nn6WFHVfy50xsJo/jZyumUKuEIAKD20jRpEp3BKujMkSBMtLY0HvRPsclr/ZpZSYQJ+Aai
+	6QlFmB7aH9iSsqMgA37drX7cjZosyQI3yC5hqAVh3
+X-Gm-Gg: ASbGncs/3PvDrrIQIvWy1T9L5wTwNWU3xyKiXDhXBQpyv/gxrBbI0s40wfAxMi9GluV
+	9EgqWoVCt1+TriboaIBFKC5yoM3K+881nin3oiG8IhMNYIq8cfhFPp1aTbyzaLArakiKIbetIsk
+	awWIrPc7Ql/AQrWJ4qlkUbG2bjNUIDOJRRJTsoOSghBAQmcITxYhii228GtO/mH2q8jMNBFjmF0
+	ctvAce7nYikAOCNOHYz+APBz6DZGCKC
+X-Google-Smtp-Source: AGHT+IFYH7+PsUOPNt92CziPHhSVune1yNyU9F8dB6ZrvSBkt9EQnXyPXJSXQ0V6LnAIlLztV5aHWXHBoG+dArqoFfY=
+X-Received: by 2002:a05:620a:4727:b0:80a:cd77:be3f with SMTP id
+ af79cd13be357-8310e4aa2eamr510659285a.48.1758165998170; Wed, 17 Sep 2025
+ 20:26:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: CHANDRA SEKHAR REDDY <ccsr007@gmail.com>
-Date: Thu, 18 Sep 2025 08:54:49 +0530
-X-Gm-Features: AS18NWAP7q_fkSyvuwb8OByZDBUBkGuLAC104wFC2wov2kFHWMzA9WOBzEoAGSk
-Message-ID: <CAHD5p1U5vrrcT1QpqPDwEgQJANdX67N-j0Hy4sh2ED+6BPMstQ@mail.gmail.com>
-Subject: [REGRESSION] v5.15: UDP packets not fragmented after receiving ICMP
- "Fragmentation Needed" (works in v5.10)
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, "arun85.m@gmail.com" <arun85.m@gmail.com>
+References: <20250917000954.859376-1-daniel.zahka@gmail.com> <20250917000954.859376-2-daniel.zahka@gmail.com>
+In-Reply-To: <20250917000954.859376-2-daniel.zahka@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 17 Sep 2025 20:26:27 -0700
+X-Gm-Features: AS18NWBe32ItUFqqHAlD7WKnej7DeQeOdwSaGy6sU9r1Bg6LsIvw9AvQFKIcVFs
+Message-ID: <CANn89i+FeSDiRkE7ZXZGJ2bTwYX0=745sPkkvr67x0rqW=fM5Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v13 01/19] psp: add documentation
+To: Daniel Zahka <daniel.zahka@gmail.com>
+Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
+	Boris Pismenny <borisp@nvidia.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Patrisious Haddad <phaddad@nvidia.com>, Raed Salem <raeds@nvidia.com>, 
+	Jianbo Liu <jianbol@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, 
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Kiran Kella <kiran.kella@broadcom.com>, 
+	Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Team,
+On Tue, Sep 16, 2025 at 5:09=E2=80=AFPM Daniel Zahka <daniel.zahka@gmail.co=
+m> wrote:
+>
+> From: Jakub Kicinski <kuba@kernel.org>
+>
+> Add documentation of things which belong in the docs rather
+> than commit messages.
+>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
+> ---
 
-We are observing an intermittent regression in UDP fragmentation
-handling between Linux kernel versions v5.10.35 and v5.15.71.
 
-Problem description:
-Our application sends UDP packets that exceed the path MTU. An
-intermediate hop returns an ICMP Type 3, Code 4 (Fragmentation Needed)
-message.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-On v5.10.35, the kernel correctly updates the Path MTU cache, and
-subsequent packets are fragmented as expected.
+> +Key rotation
+> +------------
+> +
+> +The device key known only to the receiver is fundamental to the design.
+> +Per specification this state cannot be directly accessible (it must be
+> +impossible to read it out of the hardware of the receiver NIC).
+> +Moreover, it has to be "rotated" periodically (usually daily). Rotation
+> +means that new device key gets generated (by a random number generator
+> +of the device), and used for all new connections. To avoid disrupting
+> +old connections the old device key remains in the NIC. A phase bit
+> +carried in the packet headers indicates which generation of device key
+> +the packet has been encrypted with.
 
-On v5.15.71, although the ICMP message is received by the kernel,
-subsequent UDP packets are sometimes not fragmented and continue to be
-dropped.
+'phase big carried in the packet headers' here refers to a bit
+provided by the receiver NIC,
+part of the RX descriptor I suppose ?
 
-System details:
-
-Egress interface MTU: 9192 bytes
-
-Path MTU at intermediate hop: 1500 bytes
-
-Kernel parameter: ip_no_pmtu_disc=0 (default)
-
-Questions / request for feedback:
-
-Is this a known regression in the 5.15 kernel series?
-
-We have verified that the Path MTU cache is usually updated correctly.
-
-Is there a way to detect or log cases where the cache is not updated?
-
-If this issue has already been addressed, could you please point us to
-the relevant fix commit so we can backport and test it?
-
-We have reviewed several patches between v5.10.35 and v5.15.71 related
-to PMTU and ICMP handling and examined the code flow,
- but have not been able to pinpoint the root cause.
-
-Any guidance, insights, or pointers would be greatly appreciated.
-
-Best regards,
-Chandrasekharreddy C
+'packet headers'  is usually applied to Ethernet + network + TCP headers.
 
