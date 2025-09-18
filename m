@@ -1,86 +1,87 @@
-Return-Path: <netdev+bounces-224512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 333EFB85C75
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:52:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EA8DB85CD8
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:55:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACF7D587C69
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:48:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7974178D90
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9247C313D57;
-	Thu, 18 Sep 2025 15:48:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA5F313296;
+	Thu, 18 Sep 2025 15:51:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="YSn6dRHQ";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="kJ55i08D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KZvZSrDz"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E490D313D43;
-	Thu, 18 Sep 2025 15:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A72E30FC3A;
+	Thu, 18 Sep 2025 15:51:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758210511; cv=none; b=gzNGLdsV4hLW/cLOL9dj3oZpOy2KisnNaCdDIcBAmLqc3hUT2ekgGF30spcHlDFYI/2GBrKzFvveCyWupHNYQe08NrvFBEWFuwgpLcGUus8D2widXxOdFBbKVnlSFIYdseOHUo+nqOJoxCj+0tN98kWvpvOvSU5IQp95/5Vkwe8=
+	t=1758210668; cv=none; b=k/VrtlFq771ysUmxq65RaYHCRPyMAWtO0iA/7KlAaBKmuUHncF/NBO+Rpv3WFzoZmid97bdh4huKqD/VSaGLgU63HrMiL9VwUklS9947Q166jXvgpgyVWh+cs03O3yIoRT26x4S4nhWBRhQXs23UgWtkyuhyI4gCn1PDnSWzLls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758210511; c=relaxed/simple;
-	bh=YgBNR6Vxlftl1RN2hSfit2dxOkVAxDFkoZ3/7oCA18o=;
+	s=arc-20240116; t=1758210668; c=relaxed/simple;
+	bh=PerYjtPj0PNRwhq5JdCQoYaEhEmyo+RY4FkRjuvzbfU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H40qU0GktOAocSDxjFWThnfL/eBTLVQhA1LbIwaH3jkDsAEkGw98Q1CfjBqkxJhpti0rVeTl8L02n0j1AXE3Qya7pSISQYDXXs3o/onUJNFe7oo3EAYwfDSXvhAIc1BWoUc9Orzk/x+GSztDgNL827yY327iQTj10ilsixAHjdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=YSn6dRHQ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=kJ55i08D; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 18 Sep 2025 17:48:26 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1758210507;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YgBNR6Vxlftl1RN2hSfit2dxOkVAxDFkoZ3/7oCA18o=;
-	b=YSn6dRHQnZevXJaqhbqYbjuVda7CJgcl3dect5etouquUECjSS8ppQwfNnMI3H+EBqv0M6
-	0mClkw5ATV6+izHyir+7OZvceWW2HKMVkXOQ814NDwbeMBwQsjVStpIBYaUGzaJJbWealf
-	W80MpS0ihubRP+WYtEs1vJmIZW1aruy2RVTuj8+AVVrAWVOF+zKtwjSrHxg+t5sSdvcSeq
-	L2GPnbj8qFIN6L62Pq/NsOXLwpUxN6Gsdq4DomKjSN1dswi6gcel1b9ln2hjIER/mafSWG
-	VaEiIDLxAebOc3CgRuSaUR6Eu3kat7O58y9cyFW22QCRFOn/1LJebrjfMc2c4g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1758210507;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YgBNR6Vxlftl1RN2hSfit2dxOkVAxDFkoZ3/7oCA18o=;
-	b=kJ55i08D5AVx1RtbPHbOmckzP5yOYzMbd3KVWTiteiBocYNiCYSh8BrJIxIBkdJ+DbeQah
-	IgNaJJUktCluTGAA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] vhost_task: Fix a bug where KVM wakes an exited
- task
-Message-ID: <20250918154826.oUc0cW0Y@linutronix.de>
-References: <20250827194107.4142164-1-seanjc@google.com>
- <20250827201059.EmmdDFB_@linutronix.de>
- <20250918110828-mutt-send-email-mst@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hu1iH3gReuVPox+2Zmo3nqCY40vg4jvYcnfyQg0FT5WlKLKxk/ssGPYt+FfiRCwksSu2sJFvIkJvUnP+Utiaumbs2FB2zeZZcVI/cfNYYvcNyi5qNrVN+CdXh3CUG9X+MKYOmAUINmwByaAtCDeYOiwfagx2sKI2pBsHFVitB3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KZvZSrDz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0270FC4CEE7;
+	Thu, 18 Sep 2025 15:51:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758210668;
+	bh=PerYjtPj0PNRwhq5JdCQoYaEhEmyo+RY4FkRjuvzbfU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KZvZSrDzYcN+9wjKtVuOfqyN7dr5xWVjXg243irOw1rUX7nZXwP5SCpp/IDb8bX6c
+	 uIpFC92GXlYgM6H6qKJClOTtcGE7P57AFxsieanOg2FxAo0vhykexIwd3mIzLQ5szF
+	 4dzyyOZnHF8+LlbmcFbiS3soubDkqttKxYnWQFefIwuS1HSWCi3A2+8+ZI0W2eGk1+
+	 0HAlDUaGL9I7q2HUczg3NFr9SqrVBnqGEFqOEKdlIP0Wcr7eiUgr+1W5lHNuZ2C0ja
+	 k/9pKGJIpMIYJ3m6ucA1X2eJJaNj9SMV/eyMuy6h9NEZCSzgEShab/P4+IsgUaXPcL
+	 IS+6pXtfgrk7g==
+Date: Thu, 18 Sep 2025 05:51:07 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>,
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
+	Lennart Poettering <mzxreary@0pointer.de>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>,
+	Aleksa Sarai <cyphar@cyphar.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 03/14] cgroup: port to ns_ref_*() helpers
+Message-ID: <aMwqaxFUTFh6knNV@slm.duckdns.org>
+References: <20250918-work-namespace-ns_ref-v1-0-1b0a98ee041e@kernel.org>
+ <20250918-work-namespace-ns_ref-v1-3-1b0a98ee041e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250918110828-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20250918-work-namespace-ns_ref-v1-3-1b0a98ee041e@kernel.org>
 
-On 2025-09-18 11:09:05 [-0400], Michael S. Tsirkin wrote:
-> So how about switching to this approach then?
-> Instead of piling up fixes like we seem to do now ...
-> Sean?
+On Thu, Sep 18, 2025 at 12:11:48PM +0200, Christian Brauner wrote:
+> Stop accessing ns.count directly.
+> 
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
 
-Since I am in To: here. You want me to resent my diff as a proper patch?
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Sebastian
+Thanks.
+
+-- 
+tejun
 
