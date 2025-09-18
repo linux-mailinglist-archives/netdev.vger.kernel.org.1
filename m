@@ -1,114 +1,129 @@
-Return-Path: <netdev+bounces-224235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B637B82ACF
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 04:45:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1020AB82BEB
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 05:24:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D31F91C07388
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 02:45:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAD351C22F12
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 03:24:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7AF2264B6;
-	Thu, 18 Sep 2025 02:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BD5225416;
+	Thu, 18 Sep 2025 03:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="clyQyUL6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UqQSzHav"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 971EA23958C
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 02:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52891FECBA
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 03:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758163509; cv=none; b=fmJR5py6kXe5kE3GZkrAvsXG0kczXrm8BprOSE6V8dTAY/tdguVPbkYAXWFau1UP/qQJcKYcNWpNzSzRh8fbBNN1hZNSPR5Q86OeKKj2a9Xo50kBJHTBzLljZj/UYCyz8QFf1MK/tl0bdT1DuhzcqWik6whrF9SiitvSVnYD2Lg=
+	t=1758165858; cv=none; b=PfXmM07NMHy8Xfl2dqINsr63ai9QzDfpLzcP8f4vM14oiooVSGnKC8HJ/tCHINCK7vL+nykDw+UR/uzhZgfPvME5IXT8IusYfwA72IX8RkzXpZSR0bCwfChc8Ui9hIe0avFCEBWa7ylhRxLdXhoiDwa6jVkl4Vr2UP2oUOJj/1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758163509; c=relaxed/simple;
-	bh=u36eOn2Sk4m7nqh1JUSmjhiKmc25S+UJGskBcZXSj7k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tpWc4QmRWlLNWsZDxnq3Dk3ZctZMtFNN7q+BJ/XAJtN42MtRHFbTpj2WP//gaGv02xJhj9gTFf8WoHJjrcZEGVjmejZv87rRBSdBPVZ8JabwDUz3zfJsDhoulDzfoMV+RidFwYjfSzVIQvtLQWtWr9X/lg0MgLFZmZ3EWHBdQgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=clyQyUL6; arc=none smtp.client-ip=209.85.166.169
+	s=arc-20240116; t=1758165858; c=relaxed/simple;
+	bh=DvWUuw32eTmD0TBOxqoUtKRjTwAHv8x8+456fT8H83A=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=JUuZJiPrBsxYO0P5OSpDI2GnhHbU9p7Lyd5AiRWfPLpJyL3PmsNImIoIJ2JsJ0lYqqgmzeUnkDPZpbXuTb0u048xMwgr7v4BwVCSZlQxCnFCr5yP3N5yr+356DFUWDB+2zKdat2tGYxwX2/3cunPBR41hyCL6RzWnPC5rLaR8qY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UqQSzHav; arc=none smtp.client-ip=209.85.166.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-424144fb09cso2429765ab.1
-        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 19:45:07 -0700 (PDT)
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3fe48646d40so7903285ab.0
+        for <netdev@vger.kernel.org>; Wed, 17 Sep 2025 20:24:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758163506; x=1758768306; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tn1IQOhKemkK5wNJBb6Rec4gvENvC25HHxI5G0VtWNM=;
-        b=clyQyUL6UjZqBhXfcXlwSAE8Xz9TidtG0gqyR3ieDcsA5CeZd9J82reRchlmfMSOWj
-         yrgo35RQDJdeubC13XJgsNzelYBesxQQg4JBT9a+GX8e5zDnqms0iAlJi29snxxhgaF1
-         sfJ+xNaTBPkWrdmba2RiFxX9SQ0XXrQYCbtNMcNXgdyHhxIm7OvTObsxz2T3pDmdZIUg
-         9wMf3MHp/Mldhi6ULEaK+kVwNLpCwW0RjuJ/p07QaKOB+jBIcLHfiTDy2XTQQtnYH4hl
-         MMi1AZ0+GJr9DUP25RFMirFBoAxQmni/rVIV6JgymnvuJafVu2WPvf2YxhZ2Vhpmt75r
-         qoDg==
+        d=gmail.com; s=20230601; t=1758165856; x=1758770656; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DvWUuw32eTmD0TBOxqoUtKRjTwAHv8x8+456fT8H83A=;
+        b=UqQSzHavKO8bNoOS5GJuJjjmFKpG2Vt9+mSlxKqbXd8ndtw2oEq+XUeATQOSQQoErP
+         Usn9+iBzREgMsPLeDmwnwfIMB42uIT56LWuTSMswHR6VvR0uvEoIAOG77ITEDql2TWz6
+         F7eW7PqUCBCXwPz/pJOD24JJBi1mubUj0lRCCpKlyycufgyXSLpJyR4JvF850JXFUHWG
+         k2YR4e4qqSnSQqZGBrwKs1R4ZReD5v5dULh1b+uR7aSTKZqYj4pMjkewxFmZ4uytKGZP
+         6YxxsPLIsL/ynYGJM+ZKiXEEKsn6tCOP1GQ5zl2lZjVDoMuX5tq6MSbdC0evEgPmc+Z3
+         3XXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758163506; x=1758768306;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tn1IQOhKemkK5wNJBb6Rec4gvENvC25HHxI5G0VtWNM=;
-        b=nbnLXQP0TZ5AFO955u+dAPjixdkr1sAIfzQhoh8TKjV/2esooq7sAivTuSiMkbatSZ
-         hA/zUeETaDU0AWu02k65K9bj22aLVV6PL5vFrk72AIdjppKHDwYzNSBLd5gdSmXKVK8w
-         coYuKHhuf+11m9aqzUXoQdWNcJdHDIIZmrm6k2Q7J02nBhj6pgzCzXEah73Joic+qPtM
-         t0/TbI5Jo2IDg8Xpt/rOKF6kNnGTzRJAueVbkdoRBUL6l0vpJkdgx4cTnyHDyl71HyXq
-         7IpXazg33U2lquLl49I+9wnZMG/fKxicCsEVrZ0hAA8RHJWh/X+jDWF0KmKFHSbUcgBf
-         Nqlg==
-X-Forwarded-Encrypted: i=1; AJvYcCVZDSY4l2WDfIpqSHLPLX9G7qx0roZpMLL6cC9YjVxioZTZmlCW3tQ2dhRJ+ptmiHnUFY2P2Gg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwF5ni3qPFQuw+10FwV93yiwKzqJfYxweirCTc/PxqNAmw259Pj
-	Ozt1vc5amuGrL+oOoabJhSH98Kfcbe2LtEzOQ6+rZBsC85fFZX6Ua42oqFr/dw==
-X-Gm-Gg: ASbGncv8C/CxKCUJmg2NOIAOBDZH6Hi8DiH3zmd0dCW0Ij3UrZ0B5vqs2d4HW0eRzGO
-	F3jdxtddZtYdM/K/fGU7SHUpQ3uUw9jXr0Yaxz0FOXRzvS0r+hSS+2w0p+2lSq0X6ZVFml6OCA3
-	tMdbt71bFMuNuSWUpo6q5fXPCHytQd2sR8McFz4mh//JPzMWLjBiJmqyZuJAOZOpMjBShzvZGug
-	Kpckj+rrBNyTtE6ENN9TDXMX3vWleGFifp6B9VHi+dugOdE3P+OOh7Zs1ds9Aer/oJUcULta8Qm
-	8ffY26xn35nn3j63v0I26fYBg3m4csJRTTWzEJH+59rX7PU8SMwGmTUR7prJChZrajXPnGX4edx
-	s7F/bIztGKlhW2B0PgOWTIAac8aaeA+9IpjDlf5hFzHAgj/ooZWGuHc/gmoMnrLE9MToj6jb41x
-	x5ot9oApSBOLMbAzG38WLxDKlLUic=
-X-Google-Smtp-Source: AGHT+IEJ0xQuRJbtSZMnKRq+mA+vvMi44DO1azKypYmbCssqOBfLNZFoucSTtKwIbQWtz9aSzSt7nw==
-X-Received: by 2002:a05:6e02:184e:b0:41d:5ef3:e06 with SMTP id e9e14a558f8ab-4241a4d008emr64296005ab.12.1758163506467;
-        Wed, 17 Sep 2025 19:45:06 -0700 (PDT)
-Received: from ?IPV6:2601:282:1e02:1040:a8ae:235a:67f1:4523? ([2601:282:1e02:1040:a8ae:235a:67f1:4523])
-        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-53d3a590fecsm426953173.1.2025.09.17.19.45.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Sep 2025 19:45:05 -0700 (PDT)
-Message-ID: <8eba0896-3156-474e-8521-c345d6d2e11c@gmail.com>
-Date: Wed, 17 Sep 2025 20:45:04 -0600
+        d=1e100.net; s=20230601; t=1758165856; x=1758770656;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DvWUuw32eTmD0TBOxqoUtKRjTwAHv8x8+456fT8H83A=;
+        b=dH3WOfUHap6jCqcDHY4YXeeWrbof6aPDJNdq4QDLWqssjdRzI2palFY4s8N4q1VMM4
+         WgMZupaPgvCcxZ88y0bN/Nhq+AyIjWFpYgL1DnixGNqqH7VfTuEWmLJ5wPlXsJHCkEBo
+         dHuDI2g2/pkg23knNHnGGVNqAeEmlpxD9sxAKTMtA+ftctPRwspeEtdHkrtxUzx2U5GD
+         ibZKrNg1z2PU20B2v52lV0C6cDUqOYN5HrpEwMkyriM3Q8m32uG2BCxFvfIDiwDfc1sl
+         pKjHT6VtW1x4CHzEsh9vUjfjKIi/kmu20Ope74O2OmJrHYjNqhJ+6lx5Hb4M3WPvALtt
+         w4NQ==
+X-Gm-Message-State: AOJu0YwfV9waFQeylNWHWfN4CDuFccuF85cfPwabcnDz1NFU7GlvcA/n
+	DokEdcu/pszbrv7OE7rDhh9WeHRrHO2UYEyGn7YN6GD38gD7OB0ixFYYzhK7q+lZQjqvD483ZfP
+	NdHrBJGS3+WxyLlMkv+/R3n9go+7llGvFQ5si
+X-Gm-Gg: ASbGnctlkDwOCFDy0s9EZSTgjjrC5Zu4SfK9eWCzBarN45qXCV709flMw6w90UJJ/0X
+	wvdyXDFS+mq7776NLvYyZrG9OgXEaKCQYZFm3PI+Fu5YLejF80Cc+PQcinggQ9MD9Acf4f3Xzsd
+	GaxQBB1TJ/Yb9G5CsL1H39nQ2RgPc+NOLlXOjMLy2xeFxnm2aRl2Z2PmsOLa1pdz5YCeW/H8ePT
+	XwBwpulkMLjC2Aqlt2UEuPTEVZsdgUbg10EJ86UNaMjEl6V1IF6Rwg/6VE=
+X-Google-Smtp-Source: AGHT+IHfDggKv5QOJ/N9XWK5VNhvBo2x601ZNaTZuASjaVHdh6hja61z3hw04catZiFTV9IVWU2JHH32rSqA68zyY2A=
+X-Received: by 2002:a05:6e02:3787:b0:423:fd65:fefa with SMTP id
+ e9e14a558f8ab-424444e68c1mr26363375ab.6.1758165855748; Wed, 17 Sep 2025
+ 20:24:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND iproute2-next] ip/bond: add broadcast_neighbor
- support
-Content-Language: en-US
-To: Tonghao Zhang <tonghao@bamaicloud.com>, netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-References: <20250914070609.37292-1-tonghao@bamaicloud.com>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <20250914070609.37292-1-tonghao@bamaicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: CHANDRA SEKHAR REDDY <ccsr007@gmail.com>
+Date: Thu, 18 Sep 2025 08:54:49 +0530
+X-Gm-Features: AS18NWAP7q_fkSyvuwb8OByZDBUBkGuLAC104wFC2wov2kFHWMzA9WOBzEoAGSk
+Message-ID: <CAHD5p1U5vrrcT1QpqPDwEgQJANdX67N-j0Hy4sh2ED+6BPMstQ@mail.gmail.com>
+Subject: [REGRESSION] v5.15: UDP packets not fragmented after receiving ICMP
+ "Fragmentation Needed" (works in v5.10)
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, "arun85.m@gmail.com" <arun85.m@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 9/14/25 1:06 AM, Tonghao Zhang wrote:
-> This option has no effect in modes other than 802.3ad mode.
-> When this option enabled, the bond device will broadcast ARP/ND
-> packets to all active slaves.
-> 
-> Cc: Stephen Hemminger <stephen@networkplumber.org>
-> Cc: David Ahern <dsahern@gmail.com>
-> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
-> ---
-> 1. no update uapi header. https://marc.info/?l=linux-netdev&m=170614774224160&w=3
-> 2. the kernel patch is accpted, https://patchwork.kernel.org/project/netdevbpf/patch/84d0a044514157bb856a10b6d03a1028c4883561.1751031306.git.tonghao@bamaicloud.com/
-> ---
->  ip/iplink_bond.c | 16 ++++++++++++++++
+Hi Team,
 
-you need to update man/man8/ip-link.8.in under the bond section.
+We are observing an intermittent regression in UDP fragmentation
+handling between Linux kernel versions v5.10.35 and v5.15.71.
 
+Problem description:
+Our application sends UDP packets that exceed the path MTU. An
+intermediate hop returns an ICMP Type 3, Code 4 (Fragmentation Needed)
+message.
 
+On v5.10.35, the kernel correctly updates the Path MTU cache, and
+subsequent packets are fragmented as expected.
+
+On v5.15.71, although the ICMP message is received by the kernel,
+subsequent UDP packets are sometimes not fragmented and continue to be
+dropped.
+
+System details:
+
+Egress interface MTU: 9192 bytes
+
+Path MTU at intermediate hop: 1500 bytes
+
+Kernel parameter: ip_no_pmtu_disc=0 (default)
+
+Questions / request for feedback:
+
+Is this a known regression in the 5.15 kernel series?
+
+We have verified that the Path MTU cache is usually updated correctly.
+
+Is there a way to detect or log cases where the cache is not updated?
+
+If this issue has already been addressed, could you please point us to
+the relevant fix commit so we can backport and test it?
+
+We have reviewed several patches between v5.10.35 and v5.15.71 related
+to PMTU and ICMP handling and examined the code flow,
+ but have not been able to pinpoint the root cause.
+
+Any guidance, insights, or pointers would be greatly appreciated.
+
+Best regards,
+Chandrasekharreddy C
 
