@@ -1,96 +1,91 @@
-Return-Path: <netdev+bounces-224457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 679B0B8545F
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:36:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1AB9B8540F
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:32:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79F2016B7FA
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:30:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A058B60E46
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:31:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143E530C115;
-	Thu, 18 Sep 2025 14:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B23CC2D3752;
+	Thu, 18 Sep 2025 14:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oB8/eMHz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ouruKKqc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E396C30C10D
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 14:30:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83C1F1898E9;
+	Thu, 18 Sep 2025 14:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758205820; cv=none; b=rkn96vew21hVwpx1PraGQ9g2CpTsMlukYBuyCKcXBpwoHDFL+zcZHmrbp5NQ0fqcnA6iJfGYsFCh5rMIwMMdgcEEvnTt3JaCmb0TElxkqkc/WrtsKDas4XI95wYU/BcKpTAHmtvZfTCOc7ttr+UbQl29jhCNRpjDmW1yyM84gys=
+	t=1758205954; cv=none; b=Q1XK6zMWpR1uqJn4o2huU/+qHXu35ATM0hwIsYbNE63FYyM5H5rfO+PlpYXBFf2yX9kV0WCql4SpdFs8Hjw9Y6+rOQ8HYF78YmdISBKYN4ANfbZX2dMgCMzk6b9+BQi5D824C1C5rtORuvTC0Y3RuagwuLkO8p9AYVSzp2ochdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758205820; c=relaxed/simple;
-	bh=FKe7vzazVCUY2TlUqN/aTil1n/r2GxrskeIPvcMPnQI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=K6d3+Nqsq/O/ZRz6oaqjhWCitmVVi/l3xD4MxJhRsirPp5N+FPCy0qSiEKJww55C5GReWjfoUAxkfnEaVhNB2Brxf7kb+RVFKLe4NySeXkHpIOlS2/zjqJeNXiDJ7fuLlcdQuwZBXrosM4mTdwOswJg44Uc8mLXKbWMjvuuPTog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oB8/eMHz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60453C4CEF7;
-	Thu, 18 Sep 2025 14:30:19 +0000 (UTC)
+	s=arc-20240116; t=1758205954; c=relaxed/simple;
+	bh=iaW1UOTqyyrP6yyR6u+Tx9vOZm6cbBQdMx5S77Us3dc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=s6D7STsSQKA5o28ilY36eMwSU0XjJQEzdPJMlDqzqoM8sTIEqyVrSZpvxz4KR6DRDiNdTrHHhONOWwFg3dpkC5xGcpQhP6bM/QBgnJuGLVEaV0Fz6ik1UyFXfq/o/hFb8pjkI73Y/ST1Xc0M/yw/0AdEzuEXu5wAf0NIOgfquAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ouruKKqc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF111C4CEE7;
+	Thu, 18 Sep 2025 14:32:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758205819;
-	bh=FKe7vzazVCUY2TlUqN/aTil1n/r2GxrskeIPvcMPnQI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oB8/eMHzPjrLVmjRuHsFF+RwigWr7eQDhugbwrOd5xPeoj36/YLJaweulyErF3qe2
-	 caYFAfjmxWbKYiNOdj//6W4BAAvW37ack6SviF6ms3lbYSHsD9gVwAtbYlPN45isp3
-	 PbPq3Q0Eas0swYROZAH+uF0CdnMj4Ejm6qE+kWPg60HpVk7IxyGoJMIXki3kUbU10x
-	 oNET6tpi8UFedCpaTTrapIdhdlPOPlHe/UTkK5car0OXGBJzje0tCnvEbgjDCbGr3h
-	 fiwAZ7h0fdpSpFv+Ex23aLh6zpWqippvRPf1jUU2QbKvI2THaocnyVtq2fxpMpAHRq
-	 pALmZO1noIiYQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADBB739D0C28;
-	Thu, 18 Sep 2025 14:30:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1758205954;
+	bh=iaW1UOTqyyrP6yyR6u+Tx9vOZm6cbBQdMx5S77Us3dc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ouruKKqctMnxgh4y95bBYlhCSFfhrBEBYErPJT0a1q8ArrbYX/ptH0AvuPW5l5YpQ
+	 LyCp5Q3Q9171Vzd8wRx2ECZpWzpi5LkkogHVRa43Vsk8QZXZRthD8lGhbfBTTczrMr
+	 2P5pZPadY9d/7hQfH8+PRdHESSkuqZuATMpxTqEDH3ubIK/o9hcsM0epH9aAldIvJ/
+	 kC0By+T8AMP21X1F43gOBismc+nykfXcON9CF36ab4sz7XHOrWnWllQJAMJ6pCh3jH
+	 bLIeqh3vpHYAc8bZIuXwSp/UpY5hkPV2JvJaMoDekjJi9on22eYdZezalhhFyOZi1a
+	 qQ4GJe85uLYyQ==
+Date: Thu, 18 Sep 2025 07:32:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexey Nepomnyashih <sdl@nppct.ru>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org, stable@vger.kernel.org
+Subject: Re: [PATCH] net: liquidio: fix overflow in
+ octeon_init_instr_queue()
+Message-ID: <20250918073232.6137a819@kernel.org>
+In-Reply-To: <20250917153105.562563-1-sdl@nppct.ru>
+References: <20250917153105.562563-1-sdl@nppct.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] psp: rename our psp_dev_destroy()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175820581925.2438890.3462400880104466202.git-patchwork-notify@kernel.org>
-Date: Thu, 18 Sep 2025 14:30:19 +0000
-References: <20250918113546.177946-1-edumazet@google.com>
-In-Reply-To: <20250918113546.177946-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, daniel.zahka@gmail.com,
- willemb@google.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 17 Sep 2025 15:30:58 +0000 Alexey Nepomnyashih wrote:
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+No ads in the commit messages, please. Put the company / project in 
+the From line in the future. Quoting documentation:
 
-On Thu, 18 Sep 2025 11:35:46 +0000 you wrote:
-> psp_dev_destroy() was already used in drivers/crypto/ccp/psp-dev.c
-> 
-> Use psp_dev_free() instead, to avoid a link error when
-> CRYPTO_DEV_SP_CCP=y
-> 
-> Fixes: 00c94ca2b99e ("psp: base PSP device support")
-> Closes: https://lore.kernel.org/netdev/CANn89i+ZdBDEV6TE=Nw5gn9ycTzWw4mZOpPuCswgwEsrgOyNnw@mail.gmail.com/
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Daniel Zahka <daniel.zahka@gmail.com>
-> Cc: Willem de Bruijn <willemb@google.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] psp: rename our psp_dev_destroy()
-    https://git.kernel.org/netdev/net-next/c/672beab06656
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+  From Line
+  ^^^^^^^^^
+  
+  The ``from`` line must be the very first line in the message body,
+  and has the form:
+  
+          From: Patch Author <author@example.com>
+  
+  The ``from`` line specifies who will be credited as the author of the
+  patch in the permanent changelog.  If the ``from`` line is missing,
+  then the ``From:`` line from the email header will be used to determine
+  the patch author in the changelog.
+  
+  The author may indicate their affiliation or the sponsor of the work
+  by adding the name of an organization to the ``from`` and ``SoB`` lines,
+  e.g.:
+  
+  	From: Patch Author (Company) <author@example.com>
+ 
+See: https://www.kernel.org/doc/html/next/process/submitting-patches.html#the-canonical-patch-format
 
