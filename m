@@ -1,55 +1,87 @@
-Return-Path: <netdev+bounces-224282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5C8DB837AE
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:12:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D5CC4B837C0
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:13:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D85F542DC8
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:11:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D401D16A1FB
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 08:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C4A2F3C39;
-	Thu, 18 Sep 2025 08:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE0F92F0688;
+	Thu, 18 Sep 2025 08:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hFIUlkbm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aWLBBIdj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14852F3C2B;
-	Thu, 18 Sep 2025 08:08:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275B02EFDBA
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 08:10:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758182886; cv=none; b=RTP26Mda1BXwM9fktHuLrQ/Mvj9g+ZYauoZ1T14/8KbMGbaJuEPe75XPztPaKxBoGvrdoio/t7Z20Ek1Q6QBDG58RdSThrozeQrhntU9LTjdis1vCo1DLfvp9g9NQ5r2Uq6uw4GXmFvaKIARvgui0mBUciGorCFAkZzGXfBJjrk=
+	t=1758183026; cv=none; b=kG0REUTnroj5H8hOwf2aPvu1g/DoxOeiMID6VkWxyFuP4ceUqJnRmGbc/KpsjCNRo9ywqZnjwB4xU6CtS5MfwMAGGHV4RN/858kUNOrfr3ocCu3qIF25iT778UMLMuvTXNdo48gXpIsE6hJO6FO/cY/m/v4gVxzAVEtIatFdvbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758182886; c=relaxed/simple;
-	bh=1yC27wxXhKzjbkzZpZR3Ai96oSEiCjx7Z+SO0xTeWt0=;
+	s=arc-20240116; t=1758183026; c=relaxed/simple;
+	bh=ivIZEsXoqTF/6RC+0opLvNAFtOiJGTDP4BJSazhqGSc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J47W+a2LHYHIbWwyYDuR9bB3JK+vtH+znE0f/HpOlbSnm3Mkp8wlFFNBVU4ptwEQQmUPQvf2B89jWcU2OchiZLh6l4BpL74GZKj2lIsVIZEeI8pcqE/PEr9g7KLfjENV4DQrBTOYuTNS5x9Y+s58YlNzY2NukCM4WbH09v5MPdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hFIUlkbm; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 49CBDC007BB;
-	Thu, 18 Sep 2025 08:07:46 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D27D56062C;
-	Thu, 18 Sep 2025 08:08:02 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 13040102F1818;
-	Thu, 18 Sep 2025 10:07:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1758182881; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=NUIQ6q5npgVP/axVpG0xCOPzetUw8W0RvK8A/nQzlw0=;
-	b=hFIUlkbmI55oIwEzk9k1G/kcOFNdJO/vkCWLWKCMLFiTXTvDSAFaicR8XxupBDsn/bSqgJ
-	foA0BdU1dlIzw2iUVOvM9GQvOuatXUEpWQNNVm0IILlA7dOpMcLPBkJ4RgEEvE6t8k+xH9
-	rT2wzVKuFajqOh+Fsb2nmUjogZhljUxwrHfcQbrxW0f/FXFEaovDHgP38HRsmCTnGPzHwr
-	fCaljv1gxc9UEMHoAK/KDxR9SDlUee+9nPRbIf88tzAnIaBR0HV8k+RNLvMc5laHI/0fK+
-	Wxlmnujl93gKe+jwBuViXKTn/oHsIy0cCnHGb9XEvkCvjytsoqPc3NU1nfOnOA==
-Message-ID: <9c96720e-091c-434e-9060-c47ea59ad91e@bootlin.com>
-Date: Thu, 18 Sep 2025 10:07:47 +0200
+	 In-Reply-To:Content-Type; b=rvMoetJ4TqKrWSztHVc8o2H2LszyFSvgtXVLrtCKVFvyTzjbp9D/dIZhVQQII41NNQ5FYDENsA//uSytYywRrCCoMRWWe2cC8pMHPsGzDgluN3PNY5J6oRXHQ8/CBH783yasoDFTQOowCFAZw1L/DDJhwYzzQqtISDWHNhrPOmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aWLBBIdj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758183024;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AIK6PrdsNp4wCeKnNrX+jPRHc/pTUR7rE/WtO0oG9eQ=;
+	b=aWLBBIdjRVBoUXHr13EcgyUSLLdMerMjbRG4Dv2SoXKj8y78QkSEPIXSlysPcHZJygNycW
+	KX1aEKGX4OCFYK6Mwy0M6bstOxPv6BsH0qee0TS2WBi4cY86hMrLAIhd+59VAJHvXJWwIZ
+	dZnjnCX6m91cjm3U5c/n9P0QqEqY+3Q=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-313-s1nxeMHeNjeHZjZtGLC2KA-1; Thu, 18 Sep 2025 04:10:22 -0400
+X-MC-Unique: s1nxeMHeNjeHZjZtGLC2KA-1
+X-Mimecast-MFC-AGG-ID: s1nxeMHeNjeHZjZtGLC2KA_1758183022
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3e40057d90aso319201f8f.0
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 01:10:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758183021; x=1758787821;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AIK6PrdsNp4wCeKnNrX+jPRHc/pTUR7rE/WtO0oG9eQ=;
+        b=iDvJz0zQy3aoQMEHzuo2k5wliw21MqQ99OgrU5w7OhQofBXN7vwLJPMfK4PwGkzWrt
+         DYw4HM1lQurJ5YucqtCAwLeUsJbnquF4LRe2DaUn3zh7+zSjOs3FKw+LgUAG4HMr5SJO
+         tQC2ffJUSh0pbjF7uJ8Z2I468Uqju/8pyyxix+n/HbTqU5+ffEAMBWTImn2Gjg4D61KZ
+         6pQrV3YzZKjgIUZjy8Ao2+PF8wkEOuZmHoCtd0vN/tD5/9dSYmXx3hj9qsr1GDJPTwi1
+         CWMGfnzuhS+3Tw0wr/u74Cee1HXxT6Sqx+7bEZ4ojQCou75Dkdm9EsVeiUvQHplatUKY
+         b7yw==
+X-Forwarded-Encrypted: i=1; AJvYcCUU62CzQHI08KlOwnmJpbDlA7zdpxz++fxAGrbpOXZtEnHC9YxA7g+sXOGG/Ca99/2gQjmtg00=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3rHaW/B4zgiM7O2lwPbP1OabLZCrvOeUDYuRGz+nRNxk/veHj
+	UBgE08g+iqNkPjYWekUuMMyNF7cYoQaBE6hV7tfulvy5Puw1NVKyTZCSIFq4vCvom8GdOyEIMgR
+	+98wAXXIiz9yLp5UJzrY+2hM+9KHqlX5zfCjtHRf86FiGGHOGlNsSnHG84g==
+X-Gm-Gg: ASbGncvGZfTliiPfHOrp4S8PwKqfhjIswgWAVmOQgF4ZRHdnE2cvJDXgX4OJNw2M2D9
+	yYgC6chL78rylS/P5X/CGdjIGwkV8LuP13bYZgY54MqfTXoLDNvYClR8dgT8nAijlNahNaCTO2K
+	2/wp9h0SfqFwRSO4C96lOwW0iqIhGxnQfnMovSXPAeR85oZPdW5+ce5kDTWE0QyBISl//HKtmmi
+	DB/3KQFVNEwylDYSKLKqZmILcbwP/YlKnp+p9x3DnwBGK6OfUoU1RIicNFbXOoihWRonB0ENa1X
+	OmIH8G7Wlko+AGUuh788iXo7aNuQf3A69wOYVwujSLMHx1Oemv19eFk4bsFwK1jgt7lZrSqiJEF
+	lyw5FmJdWcioL
+X-Received: by 2002:a05:6000:40c9:b0:3e7:451f:3a6e with SMTP id ffacd0b85a97d-3ecdfa44ce8mr4457758f8f.51.1758183021502;
+        Thu, 18 Sep 2025 01:10:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGlQmokUFxowAtKuYqHFe28f5t7HKRGU+H7wCLUK/xtNvxaEAZb80ygLNuVNrDWbmZGJZghMQ==
+X-Received: by 2002:a05:6000:40c9:b0:3e7:451f:3a6e with SMTP id ffacd0b85a97d-3ecdfa44ce8mr4457718f8f.51.1758183021037;
+        Thu, 18 Sep 2025 01:10:21 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46139123102sm69364125e9.9.2025.09.18.01.10.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Sep 2025 01:10:20 -0700 (PDT)
+Message-ID: <c557acda-ad4e-4f07-a210-99c3de5960e2@redhat.com>
+Date: Thu, 18 Sep 2025 10:10:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,86 +89,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v3 03/14] selftests/bpf: test_xsk: Fix memory
- leaks
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Magnus Karlsson <magnus.karlsson@intel.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Alexis Lothore <alexis.lothore@bootlin.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250904-xsk-v3-0-ce382e331485@bootlin.com>
- <20250904-xsk-v3-3-ce382e331485@bootlin.com> <aMmlNc1z5ULnOjJY@boxer>
- <6ac21f07-45ef-4e80-bedf-c0470df47bc7@bootlin.com> <aMr+/NDFQsGChdI4@boxer>
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Subject: Re: [PATCH net-next v6 4/5] net: gro: remove unnecessary df checks
+To: Richard Gobert <richardbgobert@gmail.com>, netdev@vger.kernel.org,
+ ecree.xilinx@gmail.com, willemdebruijn.kernel@gmail.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ horms@kernel.org, corbet@lwn.net, saeedm@nvidia.com, tariqt@nvidia.com,
+ mbloch@nvidia.com, leon@kernel.org, dsahern@kernel.org,
+ ncardwell@google.com, kuniyu@google.com, shuah@kernel.org, sdf@fomichev.me,
+ aleksander.lobakin@intel.com, florian.fainelli@broadcom.com,
+ alexander.duyck@gmail.com, linux-kernel@vger.kernel.org,
+ linux-net-drivers@amd.com
+References: <20250916144841.4884-1-richardbgobert@gmail.com>
+ <20250916144841.4884-5-richardbgobert@gmail.com>
 Content-Language: en-US
-In-Reply-To: <aMr+/NDFQsGChdI4@boxer>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250916144841.4884-5-richardbgobert@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
 
-On 9/17/25 8:33 PM, Maciej Fijalkowski wrote:
-> On Wed, Sep 17, 2025 at 05:32:55PM +0200, Bastien Curutchet wrote:
->> Hi Maciej
->>
->> On 9/16/25 7:58 PM, Maciej Fijalkowski wrote:
->>> On Thu, Sep 04, 2025 at 12:10:18PM +0200, Bastien Curutchet (eBPF Foundation) wrote:
->>>> Some tests introduce memory leaks by not freeing all the pkt_stream
->>>> objects they're creating.
->>>>
->>>> Fix these memory leaks.
->>>
->>> I would appreciate being more explicit here as I've been scratching my
->>> head here.
->>>
->>
->> Indeed it lacks details sorry. IIRC I spotted these with valgrind, maybe I
->> can add valgrind's output to the commit log in next iteration.
->>
->>>   From what I see the problem is with testapp_stats_rx_dropped() as it's the
->>> one case that uses replace and receive half of pkt streams, both of which
->>> overwrite the default pkt stream. So we lose a pointer to one of pkt
->>> streams and leak it eventually.
->>>
->>
->> Exactly, we lose pointers in some cases when xsk->pkt_stream gets replaced
->> by a new stream. testapp_stats_rx_dropped() is the most convoluted of these
->> cases.
+On 9/16/25 4:48 PM, Richard Gobert wrote:
+> Currently, packets with fixed IDs will be merged only if their
+> don't-fragment bit is set. This restriction is unnecessary since
+> packets without the don't-fragment bit will be forwarded as-is even
+> if they were merged together. The merged packets will be segmented
+> into their original forms before being forwarded, either by GSO or
+> by TSO. The IDs will also remain identical unless NETIF_F_TSO_MANGLEID
+> is set, in which case the IDs can become incrementing, which is also fine.
 > 
-> pkt_stream_restore_default() is supposed to delete overwritten pkt_stream
-> and set ::pkt_stream to default one, explicit pkt_stream_delete() in bunch
-> of tests is redundant IMHO.
-> 
-> Per my understanding testapp_stats_rx_dropped() and
-> testapp_xdp_shared_umem() need fixing. First generate pkt_stream twice and
-> second generates pkt_stream on each xsk from xsk_arr, where normally
-> xsk_arr[0] gets pkt_streams and xsk_arr[1] have them NULLed.
-> 
+> Note that IP fragmentation is not an issue here, since packets are
+> segmented before being further fragmented. Fragmentation happens the
+> same way regardless of whether the packets were first merged together.
 
-I took another look at it, and I agree with you: the pkt_stream_delete() 
-calls I added in testapp_stats_rx_full() and testapp_stats_fill_empty() 
-don't seem necessary.
-It still feels a bit strange to overwrite a pointer without freeing it 
-right away, but I don't have a strong opinion on this. I'm fine with 
-only fixing testapp_stats_rx_dropped() and testapp_xdp_shared_umem() in 
-the next iteration.
+I agree with Willem, that an explicit assertion somewhere (in
+ip_do_fragmentation?!?) could be useful.
 
+Also I'm not sure that "packets are segmented before being further
+fragmented" is always true for the OVS forwarding scenario.
 
-Best regards,
--- 
-Bastien Curutchet, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+/P
 
 
