@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-224590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E07E2B86704
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 20:43:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED6CCB86713
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 20:43:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC0A41C25036
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 18:43:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4A5F1C253C9
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 18:44:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B182D29C8;
-	Thu, 18 Sep 2025 18:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BC62D3A93;
+	Thu, 18 Sep 2025 18:43:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K5A2LmHN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h9X/2U8W"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8112F34BA47
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 18:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DDF1643B
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 18:43:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758220977; cv=none; b=Ox/tfD8cPV3fx3vgk8qbCoUJPYAywpLyQxQBN0ekM+ZDN6gp6uOTaAlZWjyy6bjie+pddxqB2M7rctGSTAUjqUmzAVIFjI95+44C6aTh6/5OH3WcpcXO835iMYdA0F1zDHNWLkvr77vhfR6MAD993uk1M2dTKE3bIFlty7Doyi4=
+	t=1758221026; cv=none; b=UIQc28MxICAQIhUacTnEHol/RbvRRfcXUeD6TCxFrh/1VdUcJdca6feX/NMtfvUknKAPAEMUKoWU6kPCdXnkUgPHjqJkUIjEJuncbm3JZXydzOC5FofVzELDhiRDefAkFuXzg6mOyv5yfxs1PwlLY9wboEdwQWoseempzIShEtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758220977; c=relaxed/simple;
-	bh=Vr7NrQQZ6NHYMVOIxFwt3JMOI+Vf4YhPCmGmZXvIgaY=;
+	s=arc-20240116; t=1758221026; c=relaxed/simple;
+	bh=swO4djFg4sEzypuyf5cwmvSomRbMUKnl9Mf54hVaKjQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X0gX/Hk4/gYjjo1tQBHwqnoy/FV4sLRwf4+0nXwzxl/ltLCCwfdLQNtHUqwFNLHrIWgqaaV3FNMZ1ZsD83KtXbW+p7QmwQ65kZ9cFQ1TnPL3y+bsA5X2+ewIXNY3TIlijdPJYQow3BIW4DV+8rSV3IWLJoEU+lLrkV63crNlIHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K5A2LmHN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD0CBC4CEE7;
-	Thu, 18 Sep 2025 18:42:56 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=sYtz/8nL4ggGuTLQE+q5ngnvW7sQCAf7zqRcUNaNUvGKmbLik4WrPmWaHmKMdeAGnryANE89OxkGq4t/MC/VCjvQFgRp7O3cefyWyzmDAydhkwGtjYPyivqbqMePSEvEAQOsWoIgaRb7yButsbTv5NXQ4CqEkEBIQjdZg0QBe8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h9X/2U8W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F24C6C4CEE7;
+	Thu, 18 Sep 2025 18:43:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758220977;
-	bh=Vr7NrQQZ6NHYMVOIxFwt3JMOI+Vf4YhPCmGmZXvIgaY=;
+	s=k20201202; t=1758221026;
+	bh=swO4djFg4sEzypuyf5cwmvSomRbMUKnl9Mf54hVaKjQ=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=K5A2LmHNMRPzzoWdI+PlKsdKtCzZJBwGnyya5wDzJ0AE7B6GzxNNFuUrxCE3krVuf
-	 jAB49PMxcEHmz5+1l4zsxL9Wog6eNLcGceyeRSz4iTLI//jU6aksmL0EVzdAeGwI99
-	 nEBjiAl1rB4tGqyNPq8/ZUVZ9mZ0yz7nyYbaE4jVfr1H5vs0v3bpu3m6Ig9V3Kkk78
-	 YgZNLMOJtR88tfzY3WPVLMtcP5WPV4tiMuRGu594xcepz7zahLm0XM4ZWlUev5E65T
-	 O/KTzo3i09PctheLvvewY2MxBuBhJkvAL4/v+gdpkre6R9xlmBtExKiGIr4eObvphd
-	 Qp26HR1BET6Ng==
-Message-ID: <ec2332ad-4af5-4762-a446-779a6b38ac1b@kernel.org>
-Date: Thu, 18 Sep 2025 12:42:55 -0600
+	b=h9X/2U8WkjUGNeLbegsgdYkWWdH/1HpVF+n0c+TUZyAq6cueqnATB8ZYK7Qa0PzHh
+	 jzHb9jAxG9npKJTdzpryzBg131dnij9YPhHuorKSXvggoceYXgP5p0USdxxc6fPqcT
+	 WGarPI4noR12DMTDRbDHFWtJOGfLl8RauxJJbCnHSou2Wv9+6h0m1YsGJcWHdGsXDA
+	 MKEql/tz6O3cni5ZOK77BYzO4ApcS1Ia2sIuvVDg3m5/cf9sJBt9ZDx3vKSF2NGruo
+	 C906JC4tHRc57wqCq0qTvDjQGuddxyxuqs86sY8FF+KXT13aByDhOvgK3nPt48jS2/
+	 s8baPnXDEvgyA==
+Message-ID: <316dbb0f-cb41-40d7-bf20-4d0e4ef40dbc@kernel.org>
+Date: Thu, 18 Sep 2025 12:43:45 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,32 +50,30 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/4] net: ipv4: simplify drop reason handling
- in ip_rcv_finish_core
+Subject: Re: [PATCH net-next v2 3/4] net: ipv4: use the right type for drop
+ reasons in ip_rcv_finish_core
 Content-Language: en-US
 To: Antoine Tenart <atenart@kernel.org>, davem@davemloft.net,
  kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
 Cc: netdev@vger.kernel.org
 References: <20250918083127.41147-1-atenart@kernel.org>
- <20250918083127.41147-3-atenart@kernel.org>
+ <20250918083127.41147-4-atenart@kernel.org>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20250918083127.41147-3-atenart@kernel.org>
+In-Reply-To: <20250918083127.41147-4-atenart@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 9/18/25 2:31 AM, Antoine Tenart wrote:
-> Instead of setting the drop reason to SKB_DROP_REASON_NOT_SPECIFIED
-> early and having to reset it each time it is overridden by a function
-> returned value, just set the drop reason to the expected value before
-> returning from ip_rcv_finish_core.
+> Make drop reasons be `enum skb_drop_reason` instead of `int`. While at
+> it make the SKB_NOT_DROPPED_YET checks explicit.
 > 
+> Suggested-by: David Ahern <dsahern@kernel.org>
 > Signed-off-by: Antoine Tenart <atenart@kernel.org>
 > ---
->  net/ipv4/ip_input.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+>  net/ipv4/ip_input.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 > 
 
 Reviewed-by: David Ahern <dsahern@kernel.org>
-
 
 
