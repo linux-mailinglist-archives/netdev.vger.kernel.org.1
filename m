@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-224516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CCD4B85D3E
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:58:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23184B85D2C
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 17:58:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 361F12A4D4D
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:53:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C30D8626982
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 15:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296D53148C9;
-	Thu, 18 Sep 2025 15:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B14314B63;
+	Thu, 18 Sep 2025 15:52:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f7MMJYkQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VnshcCct"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD163128A5
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:52:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F6D3148A0
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 15:52:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758210730; cv=none; b=p32rE4aAlyU5l3SgxHZLvWZv3Lf1peRJvAmH9JFmvAuSKmW9MCMbIox9AGrrMZdZ1Ka0YVHId/Q4Y64Zfeouo6xLurkmlZ1JevS9P0D03KSlr7MPtNS69jbzK5l+HmcVzjRr+rYCzdSBUKbxpJIvkKiHFCsVkT9sTzthpHYvxas=
+	t=1758210731; cv=none; b=k42LI+nhbK++vLPsM9eCmLSbNdtMHnSaQyfa7V+TcfMTBDOBZyhVFWG0SI3V4jB4i+xiwUVGPwdjB/p6Qk06OSsELpkwotipQ5UR4K2XX6+7g60djmD5WodDucVk1gtXIMYHX16HjIe+PvHN7b8o/tLFcgoGGO51dScJaVi+1AE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758210730; c=relaxed/simple;
-	bh=9dS+A1MCpTUWoZwN3jkGjfj07XOHejZcQs9lzfmozos=;
+	s=arc-20240116; t=1758210731; c=relaxed/simple;
+	bh=u2k1Rr9QBw8xX9iYyL/KWDz57X3niKHiwCDWpq4SBAU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q4XabcbQP8wRNB0xpEOKutWn4771PqcFCyXsZT35NDAPYg2JgjSG41PL9ln1g7nlMTnsYZ+F30lr5D5bURoguN9nkwJ6W3v+IiT77j8tcGpGzq0Ujy5TsbqxnoKMMdMeRXCxB58A9c6hc1epb1Zmxjkke1EfQPREYwo3vf3OAnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f7MMJYkQ; arc=none smtp.client-ip=74.125.224.52
+	 MIME-Version; b=bWAfAiGOkE5Qg6K3+oilEcxvoNBRc06ko16C2Hpyr2TGN4L6lSo+HAQDhbZNbkhw8QYEXXWitLGtfBRvCtuFEx0eWKF3owFU3o/0HEHOJwk/40csj/hqfGraPdT2ozb4+bccKHcXDl+MLLOHou2Y2sUtZCmZETc9IBppcNZ/ShE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VnshcCct; arc=none smtp.client-ip=209.85.219.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-63289cc1785so490705d50.3
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 08:52:08 -0700 (PDT)
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-ea5bc345eddso995803276.1
+        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 08:52:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758210727; x=1758815527; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758210729; x=1758815529; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yvZZ9x23sqD5CkCnQWGks1ZNqju3pXW8WxGRh83DWmM=;
-        b=f7MMJYkQ5kqC5h9o0cM1E0YUL8m5sgkSE/sJuh13I2Hts1tXI0dIcO1BVxARyj2JnH
-         sYGbR/ruiSxhgLjpeMQLavUh3wWoOpDdJgpPRZDIzQUiYKjpGIV89XRzuj8PE7dg/NsM
-         7E25o/s1yUJ3TVv3tqqkBom1k6PHtXE0tzQO8SMHimVqDQb+Bsl2laBdeunYbVi81n4M
-         oEjOBCUsHD63zkJ7IHqR7qkkVmoe9dAHWX4Jc1N6cdFUJoD9beDwoQYRAFDbnFxpUICy
-         tOb59sXVSAoCGtt0vhpXDb5t8jFMMWAnZbX5JRNyc1SJmRiRCdi7zViQn2B8XQp/watk
-         Bfeg==
+        bh=T63cMN2bpLMBXbmgHnjsoj/q6IuKsI3obGUosBDYGxc=;
+        b=VnshcCctex56M6F+fP1NNDznWK5fcg7OpeQG/WRG6qdTq3cxc9i6xT0R1ojAKlcwQ0
+         hyhk/LaRG0TfxST2qdreNnKRQJD5L2r4kuyrwcmUS6w+MZf7fmDaK9bG9LO5l+pT9xoe
+         1K1oiM4FcpRQ/65h0lHTsSKlH+LC0NOhunPv2lVMKe7jChoYXjB/ITh/OqcE/UtnyAoE
+         kTBOyAAEEqQo01ZgaaXshzZ5TqkP0WV6ZyhjD+gK7sX75pqWLEFxwF+epHRzoV4OfBSF
+         ScvI7NmTm6sKIBToEYGZ8vuuK5Ih7khShGACuI4Rv+3VvYmXTeLuhmuGAmdwe85AEcGt
+         9blg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758210727; x=1758815527;
+        d=1e100.net; s=20230601; t=1758210729; x=1758815529;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yvZZ9x23sqD5CkCnQWGks1ZNqju3pXW8WxGRh83DWmM=;
-        b=ParfcuplmdmEKHoA8hRKDIGNs9EcKHYF4FhxYHAWgdp0YAM97uFVTdMDlx4/FepygD
-         mau6GUwcaU3KTq0/xJlNLIMPKjsCMu59YQEnnzcSH0J+LzZ66RUqbXjr8q8MLG+/ymPe
-         YZ5NATlIsdq9DVFI/RreM1c7300qL1OEzrPlQKqFWlVcVlwuWGUX9YioGAxcuZ+eqVkN
-         VWJAbS1om3ErdwHRHtL9SfXR3GxLxl79vBF7cNjU2/EzvruyB9QU0OVqtW13QEqKqZPb
-         T9mS7xKXpk+rfjh2g2mBfQcTiVGfhWzJZsw5wY4F2u/8LnQmw7mgTXHPubQkfIgBNMU3
-         SSqw==
-X-Forwarded-Encrypted: i=1; AJvYcCVKb8BsIxE22NY4662vkECxE8N+K9DycrMtycBSeOkxZ7x5tFE+diMIBJiPoQI0bB0iRxhdLS4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNEzrifeMi0FTho12QtRBRRsWTcLG+sXGN9GyX+5quXIPqqrUh
-	zHa4Bghpzv+Nrmhy2/SqW3na9TYUb4Nu4jH42AAz1p7OxmZHeL5Gcm8A
-X-Gm-Gg: ASbGnctk0hqw+0Ify6LsZl+yCK63He0wISihRkf/FTEowECHLAoZ1XIhZ+cYEaTdhSV
-	75pmrvQo0K328omMmWI/D2i3m1V7VSy8nEwIdmFcnywwez1Y4g9JzeyLjs8YIqySrhhSGxgVf3S
-	TlK1ugvUdEiy5wBzA2+TL+xKMghJTuRq9Zr35XPJz4ztK1nWYyaAWTnmThzqd3RMWv5NWgb7Atz
-	YjAgCya8Ku2/9+To1hHC+fi6z3wrv8KT5XlUJIhq4b/zsBf6rt7gH5C7H0Ig5uLnMEw9jVd4/pp
-	Qu4oRiA8zL7A2CXjNCHPP/AoVu3BbfrIbYo2A6zbwPIxAueNody2NlazT2a5fwbGzWZ5nYhO+0I
-	KxqZv3pdZJfzZerxEaBsnfdGmxCPAzsSF8V4nTQ8=
-X-Google-Smtp-Source: AGHT+IGB6Oe9W9U/ioFX3P/cSEj5MSGdLzEzNXqDKHBmAIfnA7brCK8YSwsSTbI73kOnso8VU039PQ==
-X-Received: by 2002:a05:690e:164e:b0:634:776e:feab with SMTP id 956f58d0204a3-6347f5a2a73mr7350d50.32.1758210727579;
-        Thu, 18 Sep 2025 08:52:07 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:11::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-739718adaadsm7337397b3.57.2025.09.18.08.52.06
+        bh=T63cMN2bpLMBXbmgHnjsoj/q6IuKsI3obGUosBDYGxc=;
+        b=Kw4KEAgry+H1dc1qUvdAdCH2zFTF5baOlK9MlFTqyB5BBuL+KFPChhJxVs/f4W7Xdq
+         /XomQeBsyP9ZW7L4lv826Co2n+PPtqrVX9s4nGDNz0PoAtM7tzv9C5CJKdhdpx56yaGN
+         CStLvaebhDxgGlLNSsbmoBpBrdQBXNSDrX1EP5d77jpuvyCOy0cr2mvF0PZ7+aTt1kQz
+         UiJgD+p5abE4G2eQ9Kk7NzWy/zi238NhA8GFPsWP70eAay5vB2fT7Vyfd716nN2gYhN0
+         jqAHURTiBF76q0B5wQNnFljuxw4LjWh9MlHp3KR3xIPioy/InhA5lJ0BSc6MOpI8EQeH
+         wz+w==
+X-Forwarded-Encrypted: i=1; AJvYcCX+Lw9eqcIPtmERAaA/nuRkQo02vr7bn8PKm8Ra2AbMlF7CSoRB71QLyCnT1G975WV5L94mEhk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhCm0y0fPt381W+EZR3D12HbCgQmVY8ZpJMgDQoHTiUtcLvt7J
+	Rsye/6HmF9hSMw3NarEHSoyIKclM57SvS3DCrNcBm/fBURqwaxnEJIm5
+X-Gm-Gg: ASbGncuUpBBW+R0/0gc1rEleFhpG/7nQcSuOZGXGp+WgljYWYbTy7ZPLXqaVNVa8DDU
+	4DQMP8NemOhPrtO8GTVkrzoRVseu6yEl4iCpmec5YOVzCXdoc3d3TO34qPauxTwiT8jQ0bjUXH+
+	gd2PoX8QfiOvpXFOUc0pOFBbcOkgv3s19wxDDyU79Djk0ON9Zfh/CLpMeY03PXIHf1du388xVM1
+	2VwrLP3YyBi1zJbtwfqCQUOlgfbm2Oo9eMo97gosv7iLWafEq6H1s7fUgdNvclK0dAZ7yDzyDa+
+	ynFuqRZfcj3UI9T46/UIKv6nwJe5CJ6xE+Lr5ttyqIkbk3xJ5dvRqbkwKoFixa8kATwQPfFN2rf
+	ntdQTI4gRqN4sIk/M++yVjG3nByC5Xn0N0sx6Fyd8riv9f73l+g==
+X-Google-Smtp-Source: AGHT+IFasLJf4lljiuoLwmAUal9bwTtz+HdxBRw2GK+55MQ2GCzRLkGseEqjjhwo4IHBq2ctytywiw==
+X-Received: by 2002:a05:6902:300b:b0:ea5:a9c6:1d98 with SMTP id 3f1490d57ef6-ea5c03adeadmr5826490276.2.1758210728723;
+        Thu, 18 Sep 2025 08:52:08 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:56::])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-ea5ce709697sm930705276.6.2025.09.18.08.52.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Sep 2025 08:52:07 -0700 (PDT)
+        Thu, 18 Sep 2025 08:52:08 -0700 (PDT)
 From: Daniel Zahka <daniel.zahka@gmail.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -81,9 +81,9 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Simon Horman <horms@kernel.org>
 Cc: Willem de Bruijn <willemb@google.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next 1/3] psp: make struct sock argument const in psp_sk_get_assoc_rcu()
-Date: Thu, 18 Sep 2025 08:52:02 -0700
-Message-ID: <20250918155205.2197603-2-daniel.zahka@gmail.com>
+Subject: [PATCH net-next 2/3] psp: fix preemptive inet_twsk() cast in psp_sk_get_assoc_rcu()
+Date: Thu, 18 Sep 2025 08:52:03 -0700
+Message-ID: <20250918155205.2197603-3-daniel.zahka@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250918155205.2197603-1-daniel.zahka@gmail.com>
 References: <20250918155205.2197603-1-daniel.zahka@gmail.com>
@@ -95,26 +95,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This function does not need a mutable reference to its argument.
+It is weird to cast to a timewait_sock before checking sk_state, even
+if the use is after such a check. Remove the tw local variable, and
+use inet_twsk() directly in the timewait branch.
 
 Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 ---
- include/net/psp/functions.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/net/psp/functions.h | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/include/net/psp/functions.h b/include/net/psp/functions.h
-index 91ba06733321..fb3cbe8427ea 100644
+index fb3cbe8427ea..980de7e58f8a 100644
 --- a/include/net/psp/functions.h
 +++ b/include/net/psp/functions.h
-@@ -124,7 +124,7 @@ psp_twsk_rx_policy_check(struct inet_timewait_sock *tw, struct sk_buff *skb)
- 	return __psp_sk_rx_policy_check(skb, rcu_dereference(tw->psp_assoc));
+@@ -126,7 +126,6 @@ psp_twsk_rx_policy_check(struct inet_timewait_sock *tw, struct sk_buff *skb)
+ 
+ static inline struct psp_assoc *psp_sk_get_assoc_rcu(const struct sock *sk)
+ {
+-	struct inet_timewait_sock *tw;
+ 	struct psp_assoc *pas;
+ 	int state;
+ 
+@@ -134,9 +133,9 @@ static inline struct psp_assoc *psp_sk_get_assoc_rcu(const struct sock *sk)
+ 	if (!sk_is_inet(sk) || state & TCPF_NEW_SYN_RECV)
+ 		return NULL;
+ 
+-	tw = inet_twsk(sk);
+-	pas = state & TCPF_TIME_WAIT ? rcu_dereference(tw->psp_assoc) :
+-				       rcu_dereference(sk->psp_assoc);
++	pas = state & TCPF_TIME_WAIT ?
++		      rcu_dereference(inet_twsk(sk)->psp_assoc) :
++		      rcu_dereference(sk->psp_assoc);
+ 	return pas;
  }
  
--static inline struct psp_assoc *psp_sk_get_assoc_rcu(struct sock *sk)
-+static inline struct psp_assoc *psp_sk_get_assoc_rcu(const struct sock *sk)
- {
- 	struct inet_timewait_sock *tw;
- 	struct psp_assoc *pas;
 -- 
 2.47.3
 
