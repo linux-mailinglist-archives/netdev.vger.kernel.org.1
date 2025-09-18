@@ -1,146 +1,115 @@
-Return-Path: <netdev+bounces-224381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DC9EB84413
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 13:00:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 388ACB848DE
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 14:21:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A373C7B3A02
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:58:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF1921C8380A
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 12:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B127B2FFF8C;
-	Thu, 18 Sep 2025 10:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Aos9blcv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89D62D0C68;
+	Thu, 18 Sep 2025 12:20:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA15C18A6DB;
-	Thu, 18 Sep 2025 10:59:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B06F1A9F93
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 12:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758193187; cv=none; b=jDhW0rTj7PaCXdg6noTyRpxU+ehbYBxbKbcVCUCCM0VWer8HO9PzDkjeQG907cqSxRxUjSVvo+tiaEwYJMXfgyKylYx0X1izkgIvcC/FyrOY446lbnEqeT2NXkPzQRShE3mX63fr4uW6jiv9eF75xbX8TardZzzofD+zQ53o84Q=
+	t=1758198017; cv=none; b=PU8TFb8GAt9VA9fm0FmCz+y5yrMK9W1fyq834Ep2A0OGLkhdU0duhkghkoLnp4enci4Rqgc8uYsvOHbWOfAJeyJaYtE8AuoKczY3LVy/qlJNkI0fzHA3iDjHuS0aTQ4TRCMa3M3IPSy8ok8s7uzjdqnrsXn7KBID5bq8kYZrAR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758193187; c=relaxed/simple;
-	bh=k7WjdxD1akUFMFsnjD+igZOq30uLF23C9JuX5ROO/Wk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aXuWS+8z6uU4RyDOTKgtP3hPEoKgoEn8UH+wh2K9PMxqVIkxRtp2q9chqzde6aHm42+5XsOIFDQazotMO40d/WxFNF/d+jRO06P1p0SC1PrqDT13hUpz0uO0YMfWLUoKKRpiv3JwPz5vW5VjlLbs5d+ciNHkFXRSR7BkjjxUeiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Aos9blcv; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758193186; x=1789729186;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=k7WjdxD1akUFMFsnjD+igZOq30uLF23C9JuX5ROO/Wk=;
-  b=Aos9blcvkrt9eop+nKgdyLCxd9Yd0+/NoT2gWYrKdTZ7C2/snZM32qY2
-   1oiJT5nx77MJqkiqnPDncmDlB+g9KQ8qmaEEwNBxcOVICPD+hY7+t3rUv
-   fmd0rYmCPv7/znvKASeknMpXwD7vSyKCN6Pca6GTXWBubbpyRy6Gf9TTZ
-   3/AyBXgOI37an1t9xgH0Tln6tn5IjqQjCpbrv9I761eFKmwMKciX3BdSi
-   9ut7GAon0GeDNpPK6K+4Skby1y3r2Y8pFZegaCEmZuQoUgqL8VL+579TA
-   pkw/9F58KAkfYZfqSrvT36h+R/Of6QC/z79EA+01VPRFvQmERi/d/E1jH
-   A==;
-X-CSE-ConnectionGUID: q+Jmw2+kSUC45AaKVqZlsw==
-X-CSE-MsgGUID: QejdNk/gQqeNz3yxS6Kd1g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11556"; a="64336083"
-X-IronPort-AV: E=Sophos;i="6.18,274,1751266800"; 
-   d="scan'208";a="64336083"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2025 03:59:45 -0700
-X-CSE-ConnectionGUID: TW+Q+WYtS32lblmpHmpoQw==
-X-CSE-MsgGUID: ZVBunwrSQee44Q89CHxReQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,274,1751266800"; 
-   d="scan'208";a="180627016"
-Received: from p2dy149cchoong.png.intel.com ([10.107.243.50])
-  by orviesa005.jf.intel.com with ESMTP; 18 Sep 2025 03:59:41 -0700
-From: Chwee-Lin Choong <chwee.lin.choong@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Avi Shalev <avi.shalev@intel.com>,
-	Song Yoong Siang <yoong.siang.song@intel.com>
-Subject: [PATCH iwl-net v1] igc: fix race condition in TX timestamp read for register 0
-Date: Fri, 19 Sep 2025 02:38:11 +0800
-Message-ID: <20250918183811.31270-1-chwee.lin.choong@intel.com>
-X-Mailer: git-send-email 2.42.0
+	s=arc-20240116; t=1758198017; c=relaxed/simple;
+	bh=FsXTDizrH/4gfOwdWNseCJsGuPazREdG9eV/96rDM88=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=UbktS/cLlCujo2ifMC0YwKLKMgH8Rym1aBRutChfq0yCY+G6pyikX84fZRThlfk4x2R0sfvE6/ngdMJFNizyH7ENY8VSlqm+UO1fme1p9BFPlCCZQJJfulWRe4OEEvy8QoWmMYyTiJtBa/p/j/cR/hddLRMWQPPe2RwYGiSPE4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <jre@pengutronix.de>)
+	id 1uzDc7-0006mw-9i; Thu, 18 Sep 2025 14:19:51 +0200
+From: Jonas Rebmann <jre@pengutronix.de>
+Subject: [PATCH v2 0/3] Mainline Protonic PRT8ML board
+Date: Thu, 18 Sep 2025 14:19:43 +0200
+Message-Id: <20250918-imx8mp-prt8ml-v2-0-3d84b4fe53de@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAN/4y2gC/13Myw6CMBCF4Vchs7ZmiuW68j0MC7QDTCKlabHBk
+ L67FXcu/5OcbwdPjslDm+3gKLDnxaTITxk8pt6MJFinhhzzAiuUguetnq2wbq3np0B5p4sqa1U
+ WDaSPdTTwdni3LvXEfl3c++CD/K4/qZH4JwUpUAwaVU9aFmWFV0tmfK1uMbydNUEXY/wAhrRJo
+ a8AAAA=
+X-Change-ID: 20250701-imx8mp-prt8ml-01be34684659
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, 
+ Mark Brown <broonie@kernel.org>, Shengjiu Wang <shengjiu.wang@nxp.com>, 
+ Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
+ Fabio Estevam <festevam@gmail.com>, 
+ Pengutronix Kernel Team <kernel@pengutronix.de>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-sound@vger.kernel.org, imx@lists.linux.dev, 
+ linux-arm-kernel@lists.infradead.org, Jonas Rebmann <jre@pengutronix.de>, 
+ David Jander <david@protonic.nl>, Lucas Stach <l.stach@pengutronix.de>, 
+ Oleksij Rempel <o.rempel@pengutronix.de>
+X-Mailer: b4 0.15-dev-7abec
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1358; i=jre@pengutronix.de;
+ h=from:subject:message-id; bh=FsXTDizrH/4gfOwdWNseCJsGuPazREdG9eV/96rDM88=;
+ b=owGbwMvMwCV2ZcYT3onnbjcwnlZLYsg4/ePJl6u3r7nvYpst9cU93nbZa5ffJtw/uvyt7Nh36
+ BY3X3AK6ihlYRDjYpAVU2SJVZNTEDL2v25WaRcLM4eVCWQIAxenAEwk5Tsjw/r7Lp/mLmf7tWZP
+ ZMrkzXf8ZI6bZe1b+Pi6Bktm3uaipbwM/0zyi2/dZIx5e6Xqa+Oi4tdTiyqde4LFl2t/z2DWO66
+ 3lhkA
+X-Developer-Key: i=jre@pengutronix.de; a=openpgp;
+ fpr=0B7B750D5D3CD21B3B130DE8B61515E135CD49B5
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:1101:1d::ac
+X-SA-Exim-Mail-From: jre@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-The current HW bug workaround checks the TXTT_0 ready bit first,
-then reads LOW -> HIGH -> LOW from register 0 to detect if a
-timestamp was captured.
+This series adds the Protonic PRT8ML device tree as well as some minor
+corrections to the devicetree bindings used.
 
-This sequence has a race: if a new timestamp is latched after
-reading the TXTT mask but before the first LOW read, both old
-and new timestamp match, causing the driver to drop a valid
-timestamp.
-
-Fix by reading the LOW register first, then the TXTT mask,
-so a newly latched timestamp will always be detected.
-
-This fix also prevents TX unit hangs observed under heavy
-timestamping load.
-
-Fixes: c789ad7cbebc ("igc: Work around HW bug causing missing timestamps")
-Suggested-by: Avi Shalev <avi.shalev@intel.com>
-Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
-Signed-off-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
+Signed-off-by: Jonas Rebmann <jre@pengutronix.de>
 ---
- drivers/net/ethernet/intel/igc/igc_ptp.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Changes in v2:
+- Dropped "ASoC: dt-bindings: asahi-kasei,ak4458: Reference common DAI
+  properties", applied to broonie/sound for-next (Thanks, Mark)
+- Updated description of the reset-gpios property in sja1105 binding to
+  address the issues of connecting this pin to GPIO (Thanks, Vladimir)
+- Added the fec, switch and phy for RJ45 onboard ethernet after
+  successful testing
+- Consistently use interrupts-extended
+- Link to v1: https://lore.kernel.org/r/20250910-imx8mp-prt8ml-v1-0-fd04aed15670@pengutronix.de
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c b/drivers/net/ethernet/intel/igc/igc_ptp.c
-index b7b46d863bee..930486b02fc1 100644
---- a/drivers/net/ethernet/intel/igc/igc_ptp.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
-@@ -774,10 +774,17 @@ static void igc_ptp_tx_reg_to_stamp(struct igc_adapter *adapter,
- static void igc_ptp_tx_hwtstamp(struct igc_adapter *adapter)
- {
- 	struct igc_hw *hw = &adapter->hw;
-+	u32 txstmpl_old;
- 	u64 regval;
- 	u32 mask;
- 	int i;
- 
-+	/* Read the "low" register 0 first to establish a baseline value.
-+	 * This avoids a race where a new timestamp could be latched
-+	 * after checking the TXTT mask.
-+	 */
-+	txstmpl_old = rd32(IGC_TXSTMPL);
-+
- 	mask = rd32(IGC_TSYNCTXCTL) & IGC_TSYNCTXCTL_TXTT_ANY;
- 	if (mask & IGC_TSYNCTXCTL_TXTT_0) {
- 		regval = rd32(IGC_TXSTMPL);
-@@ -801,9 +808,8 @@ static void igc_ptp_tx_hwtstamp(struct igc_adapter *adapter)
- 		 * timestamp was captured, we can read the "high"
- 		 * register again.
- 		 */
--		u32 txstmpl_old, txstmpl_new;
-+		u32 txstmpl_new;
- 
--		txstmpl_old = rd32(IGC_TXSTMPL);
- 		rd32(IGC_TXSTMPH);
- 		txstmpl_new = rd32(IGC_TXSTMPL);
- 
--- 
-2.42.0
+---
+Jonas Rebmann (3):
+      dt-bindings: net: dsa: nxp,sja1105: Add reset-gpios property
+      dt-bindings: arm: fsl: Add Protonic PRT8ML
+      arm64: dts: add Protonic PRT8ML board
+
+ Documentation/devicetree/bindings/arm/fsl.yaml     |   1 +
+ .../devicetree/bindings/net/dsa/nxp,sja1105.yaml   |   9 +
+ arch/arm64/boot/dts/freescale/Makefile             |   1 +
+ arch/arm64/boot/dts/freescale/imx8mp-prt8ml.dts    | 500 +++++++++++++++++++++
+ 4 files changed, 511 insertions(+)
+---
+base-commit: ea21fa34164c9ea0a2a5b8714c7e36f54c7fb46e
+change-id: 20250701-imx8mp-prt8ml-01be34684659
+
+Best regards,
+--  
+Jonas Rebmann <jre@pengutronix.de>
 
 
