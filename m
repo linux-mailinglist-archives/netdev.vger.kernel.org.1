@@ -1,215 +1,90 @@
-Return-Path: <netdev+bounces-224549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8000FB86008
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 18:25:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ADFE6B86047
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 18:27:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 584297E0A1F
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:24:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FBAE3AE58F
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 16:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA65831BC93;
-	Thu, 18 Sep 2025 16:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724863112DD;
+	Thu, 18 Sep 2025 16:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="OnI0LYyZ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gC3GzEZp"
 X-Original-To: netdev@vger.kernel.org
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011067.outbound.protection.outlook.com [52.101.65.67])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD1431BC80;
-	Thu, 18 Sep 2025 16:22:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758212529; cv=fail; b=LE75rCeovPY9mA18Fk/hpJzB8fI4KzucYrW1ltgceVu6/kMRuSls2PjqaO988pnoNArJrOmP1JAr/FPuBsbZSy33D5fUg2pIeKLpFlXCjuILb3EW2cVishMX6ovex+0fxQuT/3QQbbr6niNEM+M3BtwbYmDzb481Szn+mZ8vYtk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758212529; c=relaxed/simple;
-	bh=KTBsrRS6D/43oWkxJJXk7PDL01xGj6ILj/9SxXVFdBY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=APpQ/Ge8mdEIT0SLW/tKqC8qw0KJrwYuRXdviCSBHaM/vMuhH80iWrVzJZ1u3O0ZNT37YIKUtMzMuz5IDSg5diLbaEXnqavfB1WwellMQHoIoPVmpFRtCCMUvyQSH6ZLHc/i97ReWnTkBkK5MSRPrejOkqjS5qsQIpHIoqn9bEI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=OnI0LYyZ; arc=fail smtp.client-ip=52.101.65.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LS/FmMOmK7+XBjXNzqa6MHsHmEB18/19yoy/E6SfgZvhZZY3VOp6C1xxq7qu3YjRQWdI3Wg2Hzcba5p2ALPQZGmPaopd6fpChT/anyMvfGcWxgeagTYh9xxy5DyohXEfEcWinCuozlJLjTlS9J5O0i93YEwTBqFsfsX+jmmXcegRpVWUn06yWk9Slui1hOq+bYRW3jhlkC8eYi1kR2Lk44eqtutltOwbE2v1qR1GqEPIeqymsDZpYYONY6lQlOidBHOkFfnKg7TtETYtvKLc5sV7ccqjgpqqjFlLdAZ+8qvRoKRlqHHWM3edbpTIde3SQzozttoph81NFz4p1QcQ0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JsoIhmFoB+0bvj05Al5hGf7EtssXfY7zXNkjoPQM4JM=;
- b=Ec6sDh+vvMwJ1DL1bUOmTX0vhjRfRnB5Eb66HbvHvRH+ojQeKbOO/tiDnRQ02oXr/HmD5nVeMDjza3dpPZdcqaSKgM67UkJ+9lRx+WSCh/8w4dUSm60iXu7HOlgIztu9NM46KGYTnJiR0k3gPHPR2Uax65cLKxWppcKyOA11oQEHzVakKWZ4Ok9SjntD8lTtH230pi0RQZBjw/GPYcDhho50CCIv1G6pcZzhZzrigR8q1Joe2cu7TKu8Li19yrkTiFuUmulEco6/Vice6mvLdowtB2HfCEf0eQJO0djrtYu0Hefafyj+YpvYpZI5sO4FeVX8jyyxC78QGgn5UvJtPA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 131.228.2.240) smtp.rcpttodomain=amazon.com
- smtp.mailfrom=nokia-bell-labs.com; dmarc=pass (p=reject sp=reject pct=100)
- action=none header.from=nokia-bell-labs.com; dkim=none (message not signed);
- arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JsoIhmFoB+0bvj05Al5hGf7EtssXfY7zXNkjoPQM4JM=;
- b=OnI0LYyZXw25LdZzGoHDlespBbO73Xp1dF13EJ2l9CHjQviNzW/4RQ6cnDdjza8PPM+8O91hjqCY4TLxGWt/545NE3QqA3dcY4+3TKlOqMWHRUQmMT3YWiCATTkXXSHyHlKEAIT0U2OJDBrVWTOhqE5D+gsR8Tf2JyKguLmTsUA7ZqA0jZuEkoj97fnTJpRJk010THMD3HpqXKiS9L1oQ62pX4OeBni1R8I8Pv5/9IGl4hSsc8hNdi1vN9S4ZUijp0p3z2GxdjbM76i0zVzMdiT8C0lP+RJC06WDOF5Qb0ssTEQxZsOHhaUgwu2BP/+iKNIaKA5j3BO7MK7XbVMPNg==
-Received: from DUZPR01CA0240.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b5::8) by AS5PR07MB10306.eurprd07.prod.outlook.com
- (2603:10a6:20b:6c8::5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.14; Thu, 18 Sep
- 2025 16:22:03 +0000
-Received: from DU6PEPF00009529.eurprd02.prod.outlook.com
- (2603:10a6:10:4b5:cafe::79) by DUZPR01CA0240.outlook.office365.com
- (2603:10a6:10:4b5::8) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.14 via Frontend Transport; Thu,
- 18 Sep 2025 16:22:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.2.240)
- smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nokia-bell-labs.com;
-Received-SPF: Pass (protection.outlook.com: domain of nokia-bell-labs.com
- designates 131.228.2.240 as permitted sender)
- receiver=protection.outlook.com; client-ip=131.228.2.240;
- helo=fihe3nok0735.emea.nsn-net.net; pr=C
-Received: from fihe3nok0735.emea.nsn-net.net (131.228.2.240) by
- DU6PEPF00009529.mail.protection.outlook.com (10.167.8.10) with Microsoft SMTP
- Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.12 via
- Frontend Transport; Thu, 18 Sep 2025 16:22:03 +0000
-Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
-	by fihe3nok0735.emea.nsn-net.net (Postfix) with ESMTP id 9FA5A20833;
-	Thu, 18 Sep 2025 19:22:01 +0300 (EEST)
-From: chia-yu.chang@nokia-bell-labs.com
-To: pabeni@redhat.com,
-	edumazet@google.com,
-	linux-doc@vger.kernel.org,
-	corbet@lwn.net,
-	horms@kernel.org,
-	dsahern@kernel.org,
-	kuniyu@amazon.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	dave.taht@gmail.com,
-	jhs@mojatatu.com,
-	kuba@kernel.org,
-	stephen@networkplumber.org,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	donald.hunter@gmail.com,
-	ast@fiberby.net,
-	liuhangbin@gmail.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	ij@kernel.org,
-	ncardwell@google.com,
-	koen.de_schepper@nokia-bell-labs.com,
-	g.white@cablelabs.com,
-	ingemar.s.johansson@ericsson.com,
-	mirja.kuehlewind@ericsson.com,
-	cheshire@apple.com,
-	rs.ietf@gmx.at,
-	Jason_Livingood@comcast.com,
-	vidhi_goel@apple.com
-Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Subject: [PATCH v2 net-next 14/14] tcp: accecn: enable AccECN
-Date: Thu, 18 Sep 2025 18:21:33 +0200
-Message-Id: <20250918162133.111922-15-chia-yu.chang@nokia-bell-labs.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250918162133.111922-1-chia-yu.chang@nokia-bell-labs.com>
-References: <20250918162133.111922-1-chia-yu.chang@nokia-bell-labs.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8254D307AFE;
+	Thu, 18 Sep 2025 16:23:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758212600; cv=none; b=TSo46fvSU7A8S6oPb6xo+9DA153wvflj1KOvELI8ay6u6AuEAZWqcil+Bt9t98DS7V2dMEUtL1FyfN7Yd8GwWux6n4yd3iIhWBRb8Nuj6BHD2D+p2sBPA8K31kSN0L446gir9YSoVZTJWih/GzFqZDqTYW0CaRY7JDSawIzBn08=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758212600; c=relaxed/simple;
+	bh=n/hd5t6CHABWdzF41a1SUfYrY33AjbVj4GD6gVVNiwo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TnpyDxQNGIXHd72r/jF6ONaM9Fr6oSG2WCn9H3w+C7iZRGrnr7is8wlhI2KdtCm70RvG2vPUuXk/nV5kCX1l2VtWl8k/qarGlrLDisp+8LpT6Z7Wf4DGABz7GqfWfiDSRqUT9kSxTCcQlGauRdtlk3yRu0KkzjTSlnjgnZaYNn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gC3GzEZp; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=auJypmeJ+OauCPuHoVkkb7kVeyHnCM7wOf2csNOyrVY=; b=gC3GzEZpYgzgaODE8Qx09xGxd5
+	aKmaCrfkx6RvRQi5dtsT6j6wCHLtcxDGkrAWRmeyif2AuS15ZLiOHDkw19LuQPA/tUPgqAyj81VBA
+	y/ODtYc1TLaYdO8IvF8nF24U9CTIWGwrv92jSCr/g8N8c4KlN1lH8J0Y4kBFbBHye7jU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uzHPN-008qth-Hn; Thu, 18 Sep 2025 18:22:57 +0200
+Date: Thu, 18 Sep 2025 18:22:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: weishangjuan@eswincomputing.com
+Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, vladimir.oltean@nxp.com,
+	rmk+kernel@armlinux.org.uk, yong.liang.choong@linux.intel.com,
+	anthony.l.nguyen@intel.com, prabhakar.mahadev-lad.rj@bp.renesas.com,
+	jan.petrous@oss.nxp.com, jszhang@kernel.org, inochiama@gmail.com,
+	0x1207@gmail.com, boon.khai.ng@altera.com,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
+	linmin@eswincomputing.com, lizhi2@eswincomputing.com,
+	pinkesh.vaghela@einfochips.com
+Subject: Re: [PATCH v7 2/2] ethernet: eswin: Add eic7700 ethernet driver
+Message-ID: <28e282d0-ca3d-43ce-8c10-3517ca963a3b@lunn.ch>
+References: <20250918085612.3176-1-weishangjuan@eswincomputing.com>
+ <20250918090026.3280-1-weishangjuan@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU6PEPF00009529:EE_|AS5PR07MB10306:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: e109e35a-5380-489c-d2c8-08ddf6cf808e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|1800799024|36860700013|82310400026|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?HmQu9nMJHrsp4BksM5aPmxCnKVywaICf+P7Pjf7cpw74eTtXxGnDaN1jtmsx?=
- =?us-ascii?Q?I1RicGYDx2eRqxQcvbGCDte1/t6THCDZ8F7HDREThiRGtostaoKIwwtRN2Co?=
- =?us-ascii?Q?K/u8nrm2TFy9mWWHC9Bcp0YfdW53WjiP9u2PRXkEMUMhWtL1qujoYVflhjcM?=
- =?us-ascii?Q?a+qWPax4BqdFS1P7BBPb47YTiRUy5XWkxP2ImOR8c1Rt8icVEhSd2IhcFujB?=
- =?us-ascii?Q?ZKQV5RAcK3cMCGx0QgbNBDmPMlJFpZOYfaRc/RXMzRwyGlO7mbVyKcy9Oe9/?=
- =?us-ascii?Q?ZcqHWKOui1htxumHR+B3BztXpuR7I1JoQiZIgEzxRUcRcj0axADjYZFfO7CB?=
- =?us-ascii?Q?EHeK8dRxpQfanW1ZPuGn/2AlBegqxmxKCiWLh6KsVvI3mBrPZEocXfQPn00z?=
- =?us-ascii?Q?ZFfnmqOyPbqnPvS27ZXtUHj3cI8kHFwckUGD4QIhJaTQc5aKh6BnIbQtOAkl?=
- =?us-ascii?Q?yoCrQd5gzJZgfClMSfg+9vOvCMb3fWbf1Wxnj2BKCBWCwcWN7/q+HwNjbOOM?=
- =?us-ascii?Q?1GAw9bBVvznlrXI1vbqPqPVIXcnPJYuLsKKaJayK9CfNpyw/ytDkUWPcEni2?=
- =?us-ascii?Q?BOopV/m2m2mlyFS4xR4h0zn7HSFYMWnCP4LPU13grkY9lZmQr2pkQAi+saBw?=
- =?us-ascii?Q?RM7oCP2sbEHM4Zv2wfj93IfAxqlu3oNGyfPnYsbDqLV+wnoxyZXDUKKkgQjq?=
- =?us-ascii?Q?2G7kRg4OgcEjW1blgTP+RkfPThS+K7AkgBdW4hFngRZ+7qUshyYMwKOl8635?=
- =?us-ascii?Q?XQXgHPgDhJglxYY+nuZVVOtC9Niwwd6Mx9rexgapzxIcUA/+d/r4pdPCJ00t?=
- =?us-ascii?Q?lKEnlq5b2q2tZt3Polh1ySEDr2RFfsZ48uFN0ohI9h8A657VAAheR0jMZi2Z?=
- =?us-ascii?Q?qXKoyb76doaOzViE8xK8Jnj4jlEGBV23Q3vqLiVeiY95ODcSCVxFnc1NFkZs?=
- =?us-ascii?Q?DBOwQLrRaN9BBf4MEHFGhQl/HuRtWqyGqBK7AJcdVzCH8+B4w39tPZh07dEK?=
- =?us-ascii?Q?57oILvwVEx+HRSs0gp7v1DOyVUJoXMwLJS9aBtp1xAK5d5WpVlhK7OPeEABV?=
- =?us-ascii?Q?q8kWNY7AmlfUp5ToV5h9MDwkqyhVJJt5pXJNksg/P136TJZmBOsuWnFBUPZg?=
- =?us-ascii?Q?mwTz/jbkq6O61/BkzgxkFgcbG+joSEOSaMI9UosP8LgGTNM96rmGuughJSzT?=
- =?us-ascii?Q?OaHQ/BbupWNgbyS0Zzt/B8zuOXNveOLfjcksYbCAm/FrZPN5efqmStwtm4Rf?=
- =?us-ascii?Q?+2f5ARzReEG0i4upJXvYd+S3OWcAlQwg1H8QlOsYNEk2Z2CylDp7nAiceYhO?=
- =?us-ascii?Q?KZX9Ytdns1SmHiXi5p+66XyKsmdU46/CBGcen1/kw5F0SN0OE1JqH2lS31MR?=
- =?us-ascii?Q?x6KwJBbZVseYUfoCXAtJwaDPHSPPV9eJf/uigkOvxNeoDny8oTd68NxN6nIn?=
- =?us-ascii?Q?0LYL3Eha1IlnD5rCQjD7T53iHxdtAS3NPcwrZKL/5arPSKwehpQTY9iuziO5?=
- =?us-ascii?Q?OaKcaO4Kvag9xyyDRze0Z8IoNRZSw7waowWoYVFXRz51QSE+9w/mVgM/dw?=
- =?us-ascii?Q?=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:131.228.2.240;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fihe3nok0735.emea.nsn-net.net;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(36860700013)(82310400026)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2025 16:22:03.1185
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e109e35a-5380-489c-d2c8-08ddf6cf808e
-X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.2.240];Helo=[fihe3nok0735.emea.nsn-net.net]
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TreatMessagesAsInternal-DU6PEPF00009529.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR07MB10306
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250918090026.3280-1-weishangjuan@eswincomputing.com>
 
-From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+On Thu, Sep 18, 2025 at 05:00:26PM +0800, weishangjuan@eswincomputing.com wrote:
+> From: Shangjuan Wei <weishangjuan@eswincomputing.com>
+> 
+> Add Ethernet controller support for Eswin's eic7700 SoC. The driver
+> implements hardware initialization, clock configuration, delay
+> adjustment functions based on DWC Ethernet controller, and supports
+> device tree configuration and platform driver integration.
+> 
+> Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
+> Signed-off-by: Shangjuan Wei <weishangjuan@eswincomputing.com>
 
-Enable Accurate ECN negotiation and request for incoming and
-outgoing connection by setting sysctl_tcp_ecn:
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-+==============+===========================================+
-|              |  Highest ECN variant (Accurate ECN, ECN,  |
-|   tcp_ecn    |  or no ECN) to be negotiated & requested  |
-|              +---------------------+---------------------+
-|              | Incoming connection | Outgoing connection |
-+==============+=====================+=====================+
-|      0       |        No ECN       |        No ECN       |
-|      1       |         ECN         |         ECN         |
-|      2       |         ECN         |        No ECN       |
-+--------------+---------------------+---------------------+
-|      3       |     Accurate ECN    |     Accurate ECN    |
-|      4       |     Accurate ECN    |         ECN         |
-|      5       |     Accurate ECN    |        No ECN       |
-+==============+=====================+=====================+
-
-Refer Documentation/networking/ip-sysctl.rst for more details.
-
-Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
----
- net/ipv4/sysctl_net_ipv4.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-index 24dbc603cc44..169a393374b3 100644
---- a/net/ipv4/sysctl_net_ipv4.c
-+++ b/net/ipv4/sysctl_net_ipv4.c
-@@ -47,7 +47,7 @@ static unsigned int udp_child_hash_entries_max = UDP_HTABLE_SIZE_MAX;
- static int tcp_plb_max_rounds = 31;
- static int tcp_plb_max_cong_thresh = 256;
- static unsigned int tcp_tw_reuse_delay_max = TCP_PAWS_MSL * MSEC_PER_SEC;
--static int tcp_ecn_mode_max = 2;
-+static int tcp_ecn_mode_max = 5;
- 
- /* obsolete */
- static int sysctl_tcp_low_latency __read_mostly;
--- 
-2.34.1
-
+    Andrew
 
