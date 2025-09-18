@@ -1,135 +1,311 @@
-Return-Path: <netdev+bounces-224376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44A5DB843A1
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 12:50:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93B16B843B9
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 12:54:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2BE9188A46F
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:50:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40138173594
+	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 10:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1D0122256F;
-	Thu, 18 Sep 2025 10:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0B228643D;
+	Thu, 18 Sep 2025 10:54:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jtapozoj"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ApqCQqNJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD78D18A6DB
-	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 10:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3E427F16A
+	for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 10:54:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758192628; cv=none; b=EMOn5G0M7dA5ykPJAfW2AZjlBHXlltW8qUmrnsiKF7uALLM2Y0jjeAxQn0rd/bbT36244tGeEqY1Nc50oNzgCzW2fG4u363Qu0Zvl4oDvr5D+g0O50xu1eTN6cTH+XZIP+xB/AU2Hb0An6jFFNitaup2uGZbwzuBBCl2Jbm4Q58=
+	t=1758192844; cv=none; b=DsJpaw6A5AkPpIXQRwQPAdO6eJpZyL0JfKRwCbI5Nam04WSkbyyMqmSifCx3tbbBWEqcmkyoFIvYlzGS1qsX+kHl18zoYyqsqLIdeIm5DIVffHp0LA/pfwr8M7G1oOWTa4QBkk1KJoGLYI0/pXo1yKZ03E6LtvYcMMHnl3qI4/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758192628; c=relaxed/simple;
-	bh=LoeZVzw/EXTCA8W4YzMrdoY6JwmoREE2/YLWojCoED8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sMoJV7Xew6NiHfd2N2VD5ShVW4QkxPPKE4+MOORrOJvrHNAotIFMHulGA7GAXQkO2a3PoawdvlYGAirKXS4vMgxYZ/mde0BikZn+bNaRj7V9V9i+aYIh2ZQM8+Y9rPPrrhOnRJvfdZwNo3lz12LANoyt4C3XBWusW5lPhWU1RUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jtapozoj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5159BC4CEE7;
-	Thu, 18 Sep 2025 10:50:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758192628;
-	bh=LoeZVzw/EXTCA8W4YzMrdoY6JwmoREE2/YLWojCoED8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jtapozojXdVWzA56LUCuMPiD6zE4lbrFDLJX+iA2i3lK/WsZPGEEzYaAFis5EyZz/
-	 2SyopKW+wOST4MmfOGqNkoUPAepC1og4+fY6EVvHMkXRWPfgwM5r4N70Xr2II+5MNt
-	 VT5iGZktt2XvdsMV158s+23wfeoHOq5AM2zqFAPegeLEsfieWaDC37k6OuDQZZ/7FQ
-	 lCEN23WuOuEiLKaQ5BfOCVluThqcuBMBKVUEkZ1mjHMJMqTvd/cVDHH4cnUbyOHaT6
-	 pbKfuegzqRm9SivWePNPqqBrqY+twPaYHxa+VfmK22QpfRBPopH5Df27at2fxP/kze
-	 p7WhU/f+QYq9A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE3D39D0C28;
-	Thu, 18 Sep 2025 10:50:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1758192844; c=relaxed/simple;
+	bh=EBigqMLKQcJf3yyGjvlxCEGGdlVi2CIBLcoRQ46RJsw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QgAGNNfJ50e1qjdhk/ysKPd41xgqoVfejLBaGqeLUOlzv70ZsYHWF8xDZAvGiTdTbTl9vgF00x784BEgAHq4ttv0pCPe6sfSjWPd/jTs/UWKdMHRPxWVb1bqkPw8ljsxk/YOeH8vbEg1sje04s5y5ZWVTLWX0eKOiTt33cfSe+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ApqCQqNJ; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <3091c796-acad-4c87-9782-3b67210147c2@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758192838;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xsDP46X6fdA2u1G9s7qo7CSnBAFcuoriQweXOrgAGIw=;
+	b=ApqCQqNJDO++mHt1LnGEJWA8arGHVsC9zfb3M8bICGy4orbt6bKbtqRv2+JeOnCjCDUyY2
+	W4RQxNrn+sjIRwN8zInaCDNEiItPcQtjHY+8H0UUZonfyo/G4/niu2Hf6dT0qQamsymVKC
+	M9NmnF0Qa0mhKKijJQuKBXcuqNcodwY=
+Date: Thu, 18 Sep 2025 11:53:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v13 00/19] add basic PSP encryption for TCP
- connections
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175819262850.2365733.8295832390159298825.git-patchwork-notify@kernel.org>
-Date: Thu, 18 Sep 2025 10:50:28 +0000
-References: <20250917000954.859376-1-daniel.zahka@gmail.com>
-In-Reply-To: <20250917000954.859376-1-daniel.zahka@gmail.com>
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: donald.hunter@gmail.com, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
- andrew+netdev@lunn.ch, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- borisp@nvidia.com, kuniyu@google.com, willemb@google.com, dsahern@kernel.org,
- ncardwell@google.com, phaddad@nvidia.com, raeds@nvidia.com,
- jianbol@nvidia.com, dtatulea@nvidia.com, rrameshbabu@nvidia.com,
- sdf@fomichev.me, toke@redhat.com, aleksander.lobakin@intel.com,
- kiran.kella@broadcom.com, jacob.e.keller@intel.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/4] ethtool: add FEC bins histogram report
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org,
+ Donald Hunter <donald.hunter@gmail.com>, Carolina Jubran
+ <cjubran@nvidia.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+References: <20250916191257.13343-1-vadim.fedorenko@linux.dev>
+ <20250916191257.13343-2-vadim.fedorenko@linux.dev>
+ <20250917174148.0c909f92@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250917174148.0c909f92@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 16 Sep 2025 17:09:27 -0700 you wrote:
-> This is v13 of the PSP RFC [1] posted by Jakub Kicinski one year
-> ago. General developments since v1 include a fork of packetdrill [2]
-> with support for PSP added, as well as some test cases, and an
-> implementation of PSP key exchange and connection upgrade [3]
-> integrated into the fbthrift RPC library. Both [2] and [3] have been
-> tested on server platforms with PSP-capable CX7 NICs. Below is the
-> cover letter from the original RFC:
+On 18/09/2025 01:41, Jakub Kicinski wrote:
+> On Tue, 16 Sep 2025 19:12:54 +0000 Vadim Fedorenko wrote:
+>> IEEE 802.3ck-2022 defines counters for FEC bins and 802.3df-2024
+>> clarifies it a bit further. Implement reporting interface through as
+>> addition to FEC stats available in ethtool.
+>> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+>> index 7a7594713f1f..de5008266884 100644
+>> --- a/Documentation/netlink/specs/ethtool.yaml
+>> +++ b/Documentation/netlink/specs/ethtool.yaml
+>> @@ -1219,6 +1219,23 @@ attribute-sets:
+>>           name: udp-ports
+>>           type: nest
+>>           nested-attributes: tunnel-udp
+>> +  -
+>> +    name: fec-hist
+>> +    attr-cnt-name: __ethtool-a-fec-hist-cnt
 > 
-> [...]
+> s/__/--/
 
-Here is the summary with links:
-  - [net-next,v13,01/19] psp: add documentation
-    https://git.kernel.org/netdev/net-next/c/a9266275fd7b
-  - [net-next,v13,02/19] psp: base PSP device support
-    https://git.kernel.org/netdev/net-next/c/00c94ca2b99e
-  - [net-next,v13,03/19] net: modify core data structures for PSP datapath support
-    https://git.kernel.org/netdev/net-next/c/ed8a507b7483
-  - [net-next,v13,04/19] tcp: add datapath logic for PSP with inline key exchange
-    https://git.kernel.org/netdev/net-next/c/659a2899a57d
-  - [net-next,v13,05/19] psp: add op for rotation of device key
-    https://git.kernel.org/netdev/net-next/c/117f02a49b77
-  - [net-next,v13,06/19] net: move sk_validate_xmit_skb() to net/core/dev.c
-    https://git.kernel.org/netdev/net-next/c/8c511c1df380
-  - [net-next,v13,07/19] net: tcp: allow tcp_timewait_sock to validate skbs before handing to device
-    https://git.kernel.org/netdev/net-next/c/0917bb139eed
-  - [net-next,v13,08/19] net: psp: add socket security association code
-    https://git.kernel.org/netdev/net-next/c/6b46ca260e22
-  - [net-next,v13,09/19] net: psp: update the TCP MSS to reflect PSP packet overhead
-    https://git.kernel.org/netdev/net-next/c/e97269257fe4
-  - [net-next,v13,10/19] psp: track generations of device key
-    https://git.kernel.org/netdev/net-next/c/e78851058b35
-  - [net-next,v13,11/19] net/mlx5e: Support PSP offload functionality
-    https://git.kernel.org/netdev/net-next/c/89ee2d92f66c
-  - [net-next,v13,12/19] net/mlx5e: Implement PSP operations .assoc_add and .assoc_del
-    https://git.kernel.org/netdev/net-next/c/af2196f49480
-  - [net-next,v13,13/19] psp: provide encapsulation helper for drivers
-    https://git.kernel.org/netdev/net-next/c/fc724515741a
-  - [net-next,v13,14/19] net/mlx5e: Implement PSP Tx data path
-    https://git.kernel.org/netdev/net-next/c/e5a1861a298e
-  - [net-next,v13,15/19] net/mlx5e: Add PSP steering in local NIC RX
-    https://git.kernel.org/netdev/net-next/c/9536fbe10c9d
-  - [net-next,v13,16/19] net/mlx5e: Configure PSP Rx flow steering rules
-    https://git.kernel.org/netdev/net-next/c/2b6e450bfde7
-  - [net-next,v13,17/19] psp: provide decapsulation and receive helper for drivers
-    https://git.kernel.org/netdev/net-next/c/0eddb8023cee
-  - [net-next,v13,18/19] net/mlx5e: Add Rx data path offload
-    https://git.kernel.org/netdev/net-next/c/29d7f433fcec
-  - [net-next,v13,19/19] net/mlx5e: Implement PSP key_rotate operation
-    https://git.kernel.org/netdev/net-next/c/411d9d33c8a2
+That will bring strong inconsistency in schema. All other attributes
+have counter attribute with __ in the beginning:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+     name: fec-stat
+     attr-cnt-name: __ethtool-a-fec-stat-cnt
 
+     name: stats-grp
+     attr-cnt-name: __ethtool-a-stats-grp-cnt
+
+     name: stats
+     attr-cnt-name: __ethtool-a-stats-cnt
+
+> 
+>> +    attributes:
+>> +      -
+>> +        name: bin-low
+>> +        type: u32
+>> +      -
+>> +        name: bin-high
+>> +        type: u32
+> 
+> We should add some doc: strings here so that the important info like
+> which one is inclusive is rendered right in the API reference
+
+Yep, will add some doc
+
+> 
+>> +      -
+>> +        name: bin-val
+>> +        type: uint
+>> +      -
+>> +        name: bin-val-per-lane
+>> +        type: binary
+> 
+> probably good to doc this too
+
+ack
+
+> 
+>> +        sub-type: u64
+>>     -
+>>       name: fec-stat
+>>       attr-cnt-name: __ethtool-a-fec-stat-cnt
+>> @@ -1242,6 +1259,11 @@ attribute-sets:
+>>           name: corr-bits
+>>           type: binary
+>>           sub-type: u64
+>> +      -
+>> +        name: hist
+>> +        type: nest
+>> +        multi-attr: True
+>> +        nested-attributes: fec-hist
+>>     -
+>>       name: fec
+>>       attr-cnt-name: __ethtool-a-fec-cnt
+>> diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+>> index ab20c644af24..b270886c5f5d 100644
+>> --- a/Documentation/networking/ethtool-netlink.rst
+>> +++ b/Documentation/networking/ethtool-netlink.rst
+>> @@ -1541,6 +1541,11 @@ Drivers fill in the statistics in the following structure:
+>>   .. kernel-doc:: include/linux/ethtool.h
+>>       :identifiers: ethtool_fec_stats
+>>   
+>> +Statistics may have FEC bins histogram attribute ``ETHTOOL_A_FEC_STAT_HIST``
+>> +as defined in IEEE 802.3ck-2022 and 802.3df-2024. Nested attributes will have
+>> +the range of FEC errors in the bin (inclusive) and the amount of error events
+>> +in the bin.
+> 
+> Does this sound better?
+> 
+>    Optional ``ETHTOOL_A_FEC_STAT_HIST`` attributes form a FEC error
+>    histogram, as defined in IEEE 802.3ck-2022 and 802.3df-2024
+>    (histogram of number of errors within a single FEC block).
+>    Each ``ETHTOOL_A_FEC_STAT_HIST`` entry contains error count
+>    (optionally also broken down by SerDes lane) as well as metadata
+>    about the bin. Bin range (low, high) is inclusive.
+
+Ack
+
+> 
+>>   static void
+>> -nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats *fec_stats)
+>> +nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats *fec_stats,
+>> +		   struct ethtool_fec_hist *hist)
+>>   {
+>> +	struct ethtool_fec_hist_value *values = hist->values;
+>> +
+>> +	hist->ranges = netdevsim_fec_ranges;
+>> +
+>>   	fec_stats->corrected_blocks.total = 123;
+>>   	fec_stats->uncorrectable_blocks.total = 4;
+>> +
+>> +	values[0].bin_value = 445;
+> 
+> Bin 0 had per lane breakdown, can't core add up the lanes for the
+> driver?
+
+Like it's done for blocks counter? Should we force drivers to keep 'sum'
+value equal to ETHTOOL_STAT_NOT_SET when they provide per-lane values?
+
+> 
+>> +	values[1].bin_value = 12;
+>> +	values[2].bin_value = 2;
+>> +	values[0].bin_value_per_lane[0] = 125;
+>> +	values[0].bin_value_per_lane[1] = 120;
+>> +	values[0].bin_value_per_lane[2] = 100;
+>> +	values[0].bin_value_per_lane[3] = 100;
+>>   }
+> 
+>> +/**
+>> + * struct ethtool_fec_hist_range - error bits range for FEC bins histogram
+> 
+> Don't say "FEC bin histogram" I think the word histogram implies that
+> the data is bin'ed up.
+
+Ack
+
+> 
+>> + * statistics
+>> + * @low: low bound of the bin (inclusive)
+>> + * @high: high bound of the bin (inclusive)
+>> + */
+> 
+>> @@ -113,7 +114,11 @@ static int fec_prepare_data(const struct ethnl_req_info *req_base,
+>>   		struct ethtool_fec_stats stats;
+>>   
+>>   		ethtool_stats_init((u64 *)&stats, sizeof(stats) / 8);
+>> -		dev->ethtool_ops->get_fec_stats(dev, &stats);
+>> +		ethtool_stats_init((u64 *)data->fec_stat_hist.values,
+>> +				   ETHTOOL_FEC_HIST_MAX *
+>> +				   sizeof(struct ethtool_fec_hist_value) / 8);
+> 
+> sizeof(data->fec_stat_hist.values) / 8
+> 
+> would save you the multiplication?
+
+yeah...
+
+> 
+>> +		dev->ethtool_ops->get_fec_stats(dev, &stats,
+>> +						&data->fec_stat_hist);
+>>   
+>>   		fec_stats_recalc(&data->corr, &stats.corrected_blocks);
+>>   		fec_stats_recalc(&data->uncorr, &stats.uncorrectable_blocks);
+> 
+>> +static int fec_put_hist(struct sk_buff *skb, const struct ethtool_fec_hist *hist)
+> 
+> over 80 chars, please wrap (checkpatch --max-line-length=80)
+
+ouch, that's proper strict check! :)
+
+> 
+>> +{
+>> +	const struct ethtool_fec_hist_range *ranges = hist->ranges;
+>> +	const struct ethtool_fec_hist_value *values = hist->values;
+>> +	struct nlattr *nest;
+>> +	int i, j;
+>> +
+>> +	if (!ranges)
+>> +		return 0;
+>> +
+>> +	for (i = 0; i < ETHTOOL_FEC_HIST_MAX; i++) {
+>> +		if (i && !ranges[i].low && !ranges[i].high)
+> 
+> low and high should probably be unsigned now
+
+ack
+
+> 
+>> +			break;
+>> +
+>> +		if (WARN_ON_ONCE(values[i].bin_value == ETHTOOL_STAT_NOT_SET))
+>> +			break;
+>> +
+>> +		nest = nla_nest_start(skb, ETHTOOL_A_FEC_STAT_HIST);
+>> +		if (!nest)
+>> +			return -EMSGSIZE;
+>> +
+>> +		if (nla_put_u32(skb, ETHTOOL_A_FEC_HIST_BIN_LOW,
+>> +				ranges[i].low) ||
+>> +		    nla_put_u32(skb, ETHTOOL_A_FEC_HIST_BIN_HIGH,
+>> +				ranges[i].high) ||
+>> +		    nla_put_uint(skb, ETHTOOL_A_FEC_HIST_BIN_VAL,
+>> +				 values[i].bin_value))
+>> +			goto err_cancel_hist;
+>> +		for (j = 0; j < ETHTOOL_MAX_LANES; j++) {
+>> +			if (values[i].bin_value_per_lane[j] == ETHTOOL_STAT_NOT_SET)
+> 
+> You know, bin_value could be 'sum', and bin_value_per_lane could be
+> simply 'per_lane'.
+
+SG, I'll change it
+
+> 
+>> +				break;
+>> +		}
+> 
+> {} brackets unnecessary
+> 
+>> +		if (j && nla_put_64bit(skb, ETHTOOL_A_FEC_HIST_BIN_VAL_PER_LANE,
+>> +				       sizeof(u64) * j,
+>> +				       values[i].bin_value_per_lane,
+>> +				       ETHTOOL_A_FEC_STAT_PAD))
+>> +			goto err_cancel_hist;
+>> +
+>> +		nla_nest_end(skb, nest);
+>> +	}
+>> +
+>> +	return 0;
+>> +
+>> +err_cancel_hist:
+>> +	nla_nest_cancel(skb, nest);
+>> +	return -EMSGSIZE;
+>> +}
+> 
+> We need a selftest. Add a case to stats.py and do basic sanity checking
+> on what the kernel spits out? Maybe 2 test cases - one for overall and
+> one for per-lane, cause mlx5 doesn't have per lane and we'd like the
+> test to pass there.
+Yeah, sure, I'll add them as another patch to this series
 
 
