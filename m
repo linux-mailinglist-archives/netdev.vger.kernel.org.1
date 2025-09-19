@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-224782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 203D2B89FD7
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 16:33:56 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08CEEB89F86
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 16:31:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26B623BFEB5
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 14:30:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D32974E20FB
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 14:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 907A53168FE;
-	Fri, 19 Sep 2025 14:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17802317706;
+	Fri, 19 Sep 2025 14:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M4zkv2tF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uKYidIdo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C62D314D15
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 14:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED0A3164DA;
+	Fri, 19 Sep 2025 14:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758292225; cv=none; b=hnTGJH3LKFabJgl5/jFVp/jf/iRsYJ4B+WkbKJwKVNGzKtSUjLr4bAciqu5ng445Jt/kRX9hUfcjVjwSul4NHZ45UM+z/9jutZWYjpKV5G15aFKvWIhWVic/LrSfUTa251CWe3ZtT33U+9f+2mSjaC0zm6DN2VQe2s3O77zXUDU=
+	t=1758292227; cv=none; b=LXtJXOp97/rYF6Vh0mpkoQwjvGHMxunAD+qGvN9W+YCml0Jenm/73nxcidq0sM76HkmJ9ei8yGoJvGNNUxgWvXvaRt4Uqh3gH808EEjpc8TVzW2tFgMc7w1ZMxyWHnnU2+buu1DLa9qtATKE0fCNwGI+TsHwCzNFc4XDzxMiLu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758292225; c=relaxed/simple;
-	bh=fOvNkRQRh5gUnDHeugADt8bDk5JJAJ9aGYkmWTmR/ks=;
+	s=arc-20240116; t=1758292227; c=relaxed/simple;
+	bh=om7IHFxUqBk57l+hzSxJYXmlW0dohVfqH7wx9gm7LsQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DvaEMSxGnQ1ntdrbSUuf7dVE6dlz0h9n8+W40JhkZc023+Iu9mcFhtZgUOayOH2XYCxV9/426UaIA3i5GecQ7EWrOb8hGLfCeYljYJGUJ8a1M+ogQKytTGNfJDR67XJ8FsTDYuLTO0b2AFObXzOpzuyHm3vI4vcTViW8RErPVuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M4zkv2tF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1AF5C4CEF5;
-	Fri, 19 Sep 2025 14:30:24 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=cbYjHR5nFRq35J/xUqMqbm8uVfBBDNV1B85GXpqOTm1JZSHSJBmUPW6sDf0qTnGZaq1RRVGXyRQA5Ovysjstn3nYEzLmD6/Os9wpyfQDOPIVAzbTCmTrmxLVAGW9Rlh7lLXWQkAIVNsm5vV+TSvzsIPeZHFepYyv5JZsiSrIoCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uKYidIdo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 744CAC4CEF0;
+	Fri, 19 Sep 2025 14:30:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758292225;
-	bh=fOvNkRQRh5gUnDHeugADt8bDk5JJAJ9aGYkmWTmR/ks=;
+	s=k20201202; t=1758292226;
+	bh=om7IHFxUqBk57l+hzSxJYXmlW0dohVfqH7wx9gm7LsQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=M4zkv2tFXhUyTJE5tBGTiGmuAYyuPtLYJD0w3lKFPEcVHx/RcgZJcIMG88Iy4aqkL
-	 N+uhbsBwTEMdxi1Gec+p6NS8x0p3+FYpbsGIeHUQw04onDaPlVzAG6S92HBk0TC7iz
-	 R4NVT2VfkwJU/lJdG3eC7r4h7GSpq6AsO6eNW/QnQzMb++VcDBnxlvnCcxaB+H8oEm
-	 GbhlPaTZBhzIqN8Ua4DDyQ7HIs3n2DRf9sd2Wn+H7j5daXf7R6KETQ66uuz3isLO6Q
-	 GfMtq9rP+fshDJXIM58NiiISCVWhcECPIlO4YE9GAeb/+7LA1csoWKV1JjiN8uJn0o
-	 iR7Iyi/It9lJg==
+	b=uKYidIdoOAgpzhd2SpMHR61DatOztYePJmLjsZz71t2b+GYrakR3GDj8Dklln8YDf
+	 5qKtMF35YuwHED5dRGmZJtBoh+9e5u329FdSyIRoZqP1frv79l97ToV7uhyd9apCZA
+	 D20R0nO63su5vqCTqaFLmRViyQ4mIVgN2/lM0MZCN2qC/rwE858PUF5K7tknHc9UJv
+	 9wC96543Bs+GPr1jsazQUQNVivEytVengW4REBZ5bRHycTiV5vhprQjMdJYq3WA+XK
+	 Le8zadwSLkw+HYeSWpGunPgbaks849jnO2NQgj/IKkd519+l3h5uGzLw+Dwn0Y5Qbx
+	 UtDCpn3FtcRFw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADB6D39D0C20;
-	Fri, 19 Sep 2025 14:30:25 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B3439D0C20;
+	Fri, 19 Sep 2025 14:30:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] psp: do not use sk_dst_get() in
- psp_dev_get_for_sock()
+Subject: Re: [PATCH net-next] hinic3: Fix NULL vs IS_ERR() check in
+ hinic3_alloc_rxqs_res()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175829222449.3219626.14565857704292807612.git-patchwork-notify@kernel.org>
-Date: Fri, 19 Sep 2025 14:30:24 +0000
-References: <20250918115238.237475-1-edumazet@google.com>
-In-Reply-To: <20250918115238.237475-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, daniel.zahka@gmail.com,
- kuniyu@google.com, willemb@google.com
+ <175829222574.3219626.8716643732005745835.git-patchwork-notify@kernel.org>
+Date: Fri, 19 Sep 2025 14:30:25 +0000
+References: <aMvUywhgbmO1kH3Z@stanley.mountain>
+In-Reply-To: <aMvUywhgbmO1kH3Z@stanley.mountain>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: gongfan1@huawei.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ zhuyikai1@h-partners.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 18 Sep 2025 11:52:38 +0000 you wrote:
-> Use __sk_dst_get() and dst_dev_rcu(), because dst->dev could
-> be changed under us.
+On Thu, 18 Sep 2025 12:45:47 +0300 you wrote:
+> The page_pool_create() function never returns NULL, it returns
+> error pointers.  Update the check to match.
 > 
-> Fixes: 6b46ca260e22 ("net: psp: add socket security association code")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Daniel Zahka <daniel.zahka@gmail.com>
-> Cc: Kuniyuki Iwashima <kuniyu@google.com>
-> Cc: Willem de Bruijn <willemb@google.com>
-> 
-> [...]
+> Fixes: 73f37a7e1993 ("hinic3: Queue pair resource initialization")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  drivers/net/ethernet/huawei/hinic3/hinic3_rx.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [net-next] psp: do not use sk_dst_get() in psp_dev_get_for_sock()
-    https://git.kernel.org/netdev/net-next/c/17f1b7711e81
+  - [net-next] hinic3: Fix NULL vs IS_ERR() check in hinic3_alloc_rxqs_res()
+    https://git.kernel.org/netdev/net-next/c/c4bdef8b3d2a
 
 You are awesome, thank you!
 -- 
