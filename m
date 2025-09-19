@@ -1,296 +1,131 @@
-Return-Path: <netdev+bounces-224652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF57B87649
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 01:38:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A0BCB877F1
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 02:35:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A9D23B954C
-	for <lists+netdev@lfdr.de>; Thu, 18 Sep 2025 23:38:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DD0756503E
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 00:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F46D217F27;
-	Thu, 18 Sep 2025 23:38:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A276246327;
+	Fri, 19 Sep 2025 00:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EkBNIf0j"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QNhZO+GP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A97C61B394F;
-	Thu, 18 Sep 2025 23:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FD31E5B63;
+	Fri, 19 Sep 2025 00:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758238710; cv=none; b=o3iiIAId9PBZR4fdqFY+pJuvWnLFpA8P/l34Q1JgOW+BTNLJztNZZ1R51mG7OyzapsQYJ5atHw9G3Lsc3HTTsrYaCcauiQl810k23zB4rvK56V618gaP6XbNBmspoQ4bIQDyg1gT7poWrHOEtW7PNAQUI2HS98cECbYWy91tPEY=
+	t=1758242061; cv=none; b=DDgRGghwuaBBZ9kcMCk3ys0mrjBxHFbykKAbBgc1WDijpEYWF3jMFUc8Gsr/gyaXxobHiWnut/uIsKZTSniGsrMnRRH1BOrN+kNmBBwu2Xk7iSGt7vFBTmPOqfNc7PuaY4oR8JzUcG8/9McZLIIKsZvgicRh61VVEI1jD2SsUCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758238710; c=relaxed/simple;
-	bh=BIJ50VI/cn7czLTh92iouJIZCAg/NKy/WN2v3DfkezU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fEHjRpJlPHgDS4zzpY3/owgwwISYS8igKYNgRPuKGhCN9Pe+UyGq8T4O9zN8z/Zz2l7Cl8Yvw0LE+SSrPTWTwRfYKXNZ049l01/gbcNkTd2lpjMPH7PBQVSk6VDw3EL2ybwWFG1zQPA3+R3pm7FZN4r/wK6f0ntkZNKcE/9UZWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EkBNIf0j; arc=none smtp.client-ip=198.175.65.15
+	s=arc-20240116; t=1758242061; c=relaxed/simple;
+	bh=HX7DsyxBGaMFL1ZTU9HD2GcaEcXEcL5erdg7R3pOBHA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=gWov1zPOvzEx4W58SGNywsEcPR2BQDphbqcAgRtrsZE4Mvwy++gC1Vo1gUUIQSsqa59dkoKfVeS3uORzh/+Suc5xyxzItBVKKg6KEyRWNztLPw7g8u/3Hx/sx4OwMYQ0XbUClyY5fZVb7yo3hTwEowe9KZ1+S4hsIU80Y8X5E84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QNhZO+GP; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758238707; x=1789774707;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=BIJ50VI/cn7czLTh92iouJIZCAg/NKy/WN2v3DfkezU=;
-  b=EkBNIf0jprJDqGIx09pl08xJcIvDac9aHduDnNYjNjrrdMbsiwZobSmr
-   JU5ATHc97K1R9EItAxnaDYfUOOigq2CVWwrDlp9YtZD3GAvY6MjmaaRb0
-   uf8zg5IVF2KVbFZ6F4egoso3Hu4RfElrTPBUcS6iG1gKWrcgqOAYexZ7+
-   4jgZqa4LzjSqqncD1fnCIRVFJHk3gVobso60eu+qj5sUIGxf226gjrCo6
-   55ZQHcwSbwaD/6zbUoYW+SsYcMD/ifjoktZAe/57KGH9De6jm7wWUwOKs
-   VmdT+z+8Kjz7+onleLKzEV3AHPtByHDybGt77Iptz8auNLsvJgon/WTpf
-   w==;
-X-CSE-ConnectionGUID: dFhHvo8+QHu810rCsBwy4w==
-X-CSE-MsgGUID: vkiLgRPyQy6GJav4etQrvw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11557"; a="64220707"
+  t=1758242059; x=1789778059;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=HX7DsyxBGaMFL1ZTU9HD2GcaEcXEcL5erdg7R3pOBHA=;
+  b=QNhZO+GPfp19N8y0hFXEzyIwyNm1T9RfE++aoXEiHMi8Z72UjrRELpv1
+   QWAgmrLdZDeBF1N/UPogBIOVujczXP/Ly9XZMhPmhYGSOHZGk5AEAQIse
+   hU7R8ZQdf8fBF826epOLwwL/1fYv5a0e/Z9zzFqAo597pPdXhcefCPyp7
+   sh2zJ3l0qC2nK0qRUkj5Adki3bHm3Bz9fIiU1WZglHL5cvf09rkRuo6Jj
+   b2uCIdo3VQGmyD8p42G9Y2WiuNU49pUSGtwoRLIq4PjjFo1tmGJ/GCNjk
+   xC+1unTNm59gRbROpGe4SZKY/doIUfUrruPtJAAoQhedUsS3kdcqYNEO4
+   A==;
+X-CSE-ConnectionGUID: WrqNRzsuTley5L4lHkfvxg==
+X-CSE-MsgGUID: 0i45RCJTQ16GWfjmZwRy6Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11557"; a="60517624"
 X-IronPort-AV: E=Sophos;i="6.18,276,1751266800"; 
-   d="scan'208";a="64220707"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2025 16:38:27 -0700
-X-CSE-ConnectionGUID: ku8j8IvwTFOTJCD2Vl7tGg==
-X-CSE-MsgGUID: kya63OCoQIadcfLEGQFbEA==
+   d="scan'208";a="60517624"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2025 17:34:18 -0700
+X-CSE-ConnectionGUID: ikanVsL1SMW3I66cSsFLqw==
+X-CSE-MsgGUID: xHoTpK5cTAGKLaleYZn0TA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,276,1751266800"; 
-   d="scan'208";a="180965590"
-Received: from rchatre-mobl4.amr.corp.intel.com (HELO [10.125.108.28]) ([10.125.108.28])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2025 16:38:25 -0700
-Message-ID: <b6b145e5-d3be-4eb1-b280-c2b7f2274c7d@intel.com>
-Date: Thu, 18 Sep 2025 16:38:24 -0700
+   d="scan'208";a="180119985"
+Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2025 17:34:18 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net 0/3] broadcom: report the supported flags for ancillary
+ features
+Date: Thu, 18 Sep 2025 17:33:15 -0700
+Message-Id: <20250918-jk-fix-bcm-phy-supported-flags-v1-0-747b60407c9c@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 05/20] cxl: Support dpa initialization without a
- mailbox
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: Alejandro Lucero <alucerop@amd.com>
-References: <20250918091746.2034285-1-alejandro.lucero-palau@amd.com>
- <20250918091746.2034285-6-alejandro.lucero-palau@amd.com>
-Content-Language: en-US
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <20250918091746.2034285-6-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMykzGgC/x2NywqDMBAAf0X23IUotRp/pfRg3Y2ujxiyKi3iv
+ zf0ODDMnKAchRWa7ITIh6isPkF+y6AbWt8zCiWGwhSlsXmN44ROPvjuFgzDF3UPYY0bE7q57RV
+ NZR9E5Cpb3iFFQuSk/wdP8LzB67p+ZagF0HUAAAA=
+X-Change-ID: 20250918-jk-fix-bcm-phy-supported-flags-0796dddf7954
+To: Florian Fainelli <florian.fainelli@broadcom.com>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ Kory Maincent <kory.maincent@bootlin.com>
+Cc: Richard Cochran <richardcochran@gmail.com>, 
+ Yaroslav Kolomiiets <yrk@meta.com>, James Clark <jjc@jclark.com>, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Jacob Keller <jacob.e.keller@intel.com>, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>
+X-Mailer: b4 0.15-dev-cbe0e
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1173;
+ i=jacob.e.keller@intel.com; h=from:subject:message-id;
+ bh=HX7DsyxBGaMFL1ZTU9HD2GcaEcXEcL5erdg7R3pOBHA=;
+ b=kA0DAAoWapZdPm8PKOgByyZiAGjMpQShhk66SBlyQFxzNLyw6cIN2+gwNdFlAIN64Pn1kagVW
+ oh1BAAWCgAdFiEEIEBUqdczkFYq7EMeapZdPm8PKOgFAmjMpQQACgkQapZdPm8PKOhf7QEA72SG
+ R3mwTliaNgT/zeGwho0x2BH1lXd8S25jMdTHeCEA/R1Q5QCD/uI6eEaP6dG+3BmKioxxYCXRta3
+ khLQz4xAF
+X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
+ fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 
+James Clark reported off list that the broadcom PHY PTP driver was
+incorrectly handling PTP_EXTTS_REQUEST and PTP_PEROUT_REQUEST ioctls since
+the conversion to the .supported_*_flags fields. This series fixes the
+driver to correctly report its flags through the .supported_perout_flags
+and .supported_extts_flags fields. It also contains an update to comment
+the behavior of the PTP_STRICT_FLAGS being always enabled for
+PTP_EXTTS_REQUEST2.
 
+I plan to follow up this series with some improvements to the PTP
+documentation better explaining each flag and the expectation of the driver
+APIs.
 
-On 9/18/25 2:17 AM, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Type3 relies on mailbox CXL_MBOX_OP_IDENTIFY command for initializing
-> memdev state params which end up being used for DPA initialization.
-> 
-> Allow a Type2 driver to initialize DPA simply by giving the size of its
-> volatile hardware partition.
-> 
-> Move related functions to memdev.
-> 
-> Add sfc driver as the client.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+Jacob Keller (3):
+      broadcom: fix support for PTP_PEROUT_DUTY_CYCLE
+      broadcom: fix support for PTP_EXTTS_REQUEST2 ioctl
+      ptp: document behavior of PTP_STRICT_FLAGS
 
-Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-> ---
->  drivers/cxl/core/core.h            |  2 +
->  drivers/cxl/core/mbox.c            | 51 +----------------------
->  drivers/cxl/core/memdev.c          | 66 ++++++++++++++++++++++++++++++
->  drivers/net/ethernet/sfc/efx_cxl.c |  4 ++
->  include/cxl/cxl.h                  |  1 +
->  5 files changed, 74 insertions(+), 50 deletions(-)
-> 
-> diff --git a/drivers/cxl/core/core.h b/drivers/cxl/core/core.h
-> index d96213c02fd6..c4dddbec5d6e 100644
-> --- a/drivers/cxl/core/core.h
-> +++ b/drivers/cxl/core/core.h
-> @@ -90,6 +90,8 @@ void __iomem *devm_cxl_iomap_block(struct device *dev, resource_size_t addr,
->  struct dentry *cxl_debugfs_create_dir(const char *dir);
->  int cxl_dpa_set_part(struct cxl_endpoint_decoder *cxled,
->  		     enum cxl_partition_mode mode);
-> +struct cxl_memdev_state;
-> +int cxl_mem_get_partition_info(struct cxl_memdev_state *mds);
->  int cxl_dpa_alloc(struct cxl_endpoint_decoder *cxled, u64 size);
->  int cxl_dpa_free(struct cxl_endpoint_decoder *cxled);
->  resource_size_t cxl_dpa_size(struct cxl_endpoint_decoder *cxled);
-> diff --git a/drivers/cxl/core/mbox.c b/drivers/cxl/core/mbox.c
-> index bee84d0101d1..d57a0c2d39fb 100644
-> --- a/drivers/cxl/core/mbox.c
-> +++ b/drivers/cxl/core/mbox.c
-> @@ -1144,7 +1144,7 @@ EXPORT_SYMBOL_NS_GPL(cxl_mem_get_event_records, "CXL");
->   *
->   * See CXL @8.2.9.5.2.1 Get Partition Info
->   */
-> -static int cxl_mem_get_partition_info(struct cxl_memdev_state *mds)
-> +int cxl_mem_get_partition_info(struct cxl_memdev_state *mds)
->  {
->  	struct cxl_mailbox *cxl_mbox = &mds->cxlds.cxl_mbox;
->  	struct cxl_mbox_get_partition_info pi;
-> @@ -1300,55 +1300,6 @@ int cxl_mem_sanitize(struct cxl_memdev *cxlmd, u16 cmd)
->  	return -EBUSY;
->  }
->  
-> -static void add_part(struct cxl_dpa_info *info, u64 start, u64 size, enum cxl_partition_mode mode)
-> -{
-> -	int i = info->nr_partitions;
-> -
-> -	if (size == 0)
-> -		return;
-> -
-> -	info->part[i].range = (struct range) {
-> -		.start = start,
-> -		.end = start + size - 1,
-> -	};
-> -	info->part[i].mode = mode;
-> -	info->nr_partitions++;
-> -}
-> -
-> -int cxl_mem_dpa_fetch(struct cxl_memdev_state *mds, struct cxl_dpa_info *info)
-> -{
-> -	struct cxl_dev_state *cxlds = &mds->cxlds;
-> -	struct device *dev = cxlds->dev;
-> -	int rc;
-> -
-> -	if (!cxlds->media_ready) {
-> -		info->size = 0;
-> -		return 0;
-> -	}
-> -
-> -	info->size = mds->total_bytes;
-> -
-> -	if (mds->partition_align_bytes == 0) {
-> -		add_part(info, 0, mds->volatile_only_bytes, CXL_PARTMODE_RAM);
-> -		add_part(info, mds->volatile_only_bytes,
-> -			 mds->persistent_only_bytes, CXL_PARTMODE_PMEM);
-> -		return 0;
-> -	}
-> -
-> -	rc = cxl_mem_get_partition_info(mds);
-> -	if (rc) {
-> -		dev_err(dev, "Failed to query partition information\n");
-> -		return rc;
-> -	}
-> -
-> -	add_part(info, 0, mds->active_volatile_bytes, CXL_PARTMODE_RAM);
-> -	add_part(info, mds->active_volatile_bytes, mds->active_persistent_bytes,
-> -		 CXL_PARTMODE_PMEM);
-> -
-> -	return 0;
-> -}
-> -EXPORT_SYMBOL_NS_GPL(cxl_mem_dpa_fetch, "CXL");
-> -
->  int cxl_get_dirty_count(struct cxl_memdev_state *mds, u32 *count)
->  {
->  	struct cxl_mailbox *cxl_mbox = &mds->cxlds.cxl_mbox;
-> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
-> index 97127d6067c4..d148a0c942aa 100644
-> --- a/drivers/cxl/core/memdev.c
-> +++ b/drivers/cxl/core/memdev.c
-> @@ -556,6 +556,72 @@ bool is_cxl_memdev(const struct device *dev)
->  }
->  EXPORT_SYMBOL_NS_GPL(is_cxl_memdev, "CXL");
->  
-> +static void add_part(struct cxl_dpa_info *info, u64 start, u64 size, enum cxl_partition_mode mode)
-> +{
-> +	int i = info->nr_partitions;
-> +
-> +	if (size == 0)
-> +		return;
-> +
-> +	info->part[i].range = (struct range) {
-> +		.start = start,
-> +		.end = start + size - 1,
-> +	};
-> +	info->part[i].mode = mode;
-> +	info->nr_partitions++;
-> +}
-> +
-> +int cxl_mem_dpa_fetch(struct cxl_memdev_state *mds, struct cxl_dpa_info *info)
-> +{
-> +	struct cxl_dev_state *cxlds = &mds->cxlds;
-> +	struct device *dev = cxlds->dev;
-> +	int rc;
-> +
-> +	if (!cxlds->media_ready) {
-> +		info->size = 0;
-> +		return 0;
-> +	}
-> +
-> +	info->size = mds->total_bytes;
-> +
-> +	if (mds->partition_align_bytes == 0) {
-> +		add_part(info, 0, mds->volatile_only_bytes, CXL_PARTMODE_RAM);
-> +		add_part(info, mds->volatile_only_bytes,
-> +			 mds->persistent_only_bytes, CXL_PARTMODE_PMEM);
-> +		return 0;
-> +	}
-> +
-> +	rc = cxl_mem_get_partition_info(mds);
-> +	if (rc) {
-> +		dev_err(dev, "Failed to query partition information\n");
-> +		return rc;
-> +	}
-> +
-> +	add_part(info, 0, mds->active_volatile_bytes, CXL_PARTMODE_RAM);
-> +	add_part(info, mds->active_volatile_bytes, mds->active_persistent_bytes,
-> +		 CXL_PARTMODE_PMEM);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_NS_GPL(cxl_mem_dpa_fetch, "CXL");
-> +
-> +/**
-> + * cxl_set_capacity: initialize dpa by a driver without a mailbox.
-> + *
-> + * @cxlds: pointer to cxl_dev_state
-> + * @capacity: device volatile memory size
-> + */
-> +int cxl_set_capacity(struct cxl_dev_state *cxlds, u64 capacity)
-> +{
-> +	struct cxl_dpa_info range_info = {
-> +		.size = capacity,
-> +	};
-> +
-> +	add_part(&range_info, 0, capacity, CXL_PARTMODE_RAM);
-> +	return cxl_dpa_setup(cxlds, &range_info);
-> +}
-> +EXPORT_SYMBOL_NS_GPL(cxl_set_capacity, "CXL");
-> +
->  /**
->   * set_exclusive_cxl_commands() - atomically disable user cxl commands
->   * @mds: The device state to operate on
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> index cdfbe546d8d8..651d26aa68dc 100644
-> --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> @@ -78,6 +78,10 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  	 */
->  	cxl->cxlds.media_ready = true;
->  
-> +	if (cxl_set_capacity(&cxl->cxlds, EFX_CTPIO_BUFFER_SIZE))
-> +		return dev_err_probe(&pci_dev->dev, -ENODEV,
-> +				     "dpa capacity setup failed\n");
-> +
->  	probe_data->cxl = cxl;
->  
->  	return 0;
-> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
-> index 3b9c8cb187a3..88dea6ac3769 100644
-> --- a/include/cxl/cxl.h
-> +++ b/include/cxl/cxl.h
-> @@ -243,4 +243,5 @@ struct cxl_dev_state *_devm_cxl_dev_state_create(struct device *dev,
->  int cxl_map_component_regs(const struct cxl_register_map *map,
->  			   struct cxl_component_regs *regs,
->  			   unsigned long map_mask);
-> +int cxl_set_capacity(struct cxl_dev_state *cxlds, u64 capacity);
->  #endif /* __CXL_CXL_H__ */
+ include/uapi/linux/ptp_clock.h | 3 +++
+ drivers/net/phy/bcm-phy-ptp.c  | 6 ++----
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+---
+base-commit: cbf658dd09419f1ef9de11b9604e950bdd5c170b
+change-id: 20250918-jk-fix-bcm-phy-supported-flags-0796dddf7954
+
+Best regards,
+--  
+Jacob Keller <jacob.e.keller@intel.com>
 
 
