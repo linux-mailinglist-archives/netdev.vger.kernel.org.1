@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-224784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58A67B89FE6
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 16:34:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0368EB89FEC
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 16:34:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EB43A061EB
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 14:31:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9778EA076E6
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 14:31:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B75B3191AE;
-	Fri, 19 Sep 2025 14:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B94C3191DF;
+	Fri, 19 Sep 2025 14:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ql93Z7cT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eZJss6da"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7700E3191A7
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 14:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17C93164A7;
+	Fri, 19 Sep 2025 14:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758292228; cv=none; b=c50onvbsjoYtyAWCMyzfboQAuos0nmxl3dYafhqQDCjrJSqwpekWxzUWe3as6iR8xvXTjOUqoppPKBDsgoBqH0NmtmImZ/UVdTJgJNYG+y09AKHEbsNP68nAHxLdwd2ZyApiO2Er0w0SNWb+hRqmP6G5iqg5lNfQyMJu5ZIfB8w=
+	t=1758292229; cv=none; b=Ltjzyw3ARImxxN9ju/U6i2YX7I+WTQf/vKqKp7JgVokpM5Duzsl1FH9KpfOeiVEU1ll28tUzB8Qj1f72tDINca+gOrt9FQU4AwEbk4wxvLTYha2JzkIZPRycBBBH1WxI6QfPugLx9gCSevA4gjh5VdDABV1gSHLNRdoctXtG6tE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758292228; c=relaxed/simple;
-	bh=c9/5HoVo1O1NAvSb/lFEeZzzDDmksUU6EjQYusrC/Mo=;
+	s=arc-20240116; t=1758292229; c=relaxed/simple;
+	bh=vA9guvcgL927U5ffFZqiyBwAArQQdF916BNKlifkJAs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=INH6koCxx1hmW/zwzPZ7ApW/sz2YVsihzr6+8F4bcVNsA/dCB+lp3lGR0MwjVBlgcWXoEK2puoAd0A+e6qBx58XHuB0x8WqjIXlb31Vtt3E/SLwaMyXVk8Ip44/2D3rC35Plsf7b+AUWbfK439LDIqt5XWTTVAMFHRL2yMJzuSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ql93Z7cT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05BB4C4CEF9;
-	Fri, 19 Sep 2025 14:30:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=LS5R/4cJkO4oxdD41SUA0hGqEtrmz+l3swcsHm26j2iaGtnRj/XDTgoRJrp1jgEUfJvTTCof4uBj8fjSpoSA6g59XktKtE/aPm6TaVi7Yew2gdeF7wkC5eQd76jMPlIfEDPvYE6tFRGZ0PgTwyqCSSHXXgBZ7ImPOE0OkDWFdxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eZJss6da; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D65FC4CEF9;
+	Fri, 19 Sep 2025 14:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758292228;
-	bh=c9/5HoVo1O1NAvSb/lFEeZzzDDmksUU6EjQYusrC/Mo=;
+	s=k20201202; t=1758292229;
+	bh=vA9guvcgL927U5ffFZqiyBwAArQQdF916BNKlifkJAs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Ql93Z7cTwJE2w8DGh8GkDSywRgg1JLf6KQcP9PVGR8xhN8kx3mki4Cw65ZFSQwErQ
-	 QHZeERLlEuRw+7X8mPlQw71GaYDPuqojzElFU1ufPYxyzfjdyxxt2x/0CnvRI3piSP
-	 RK5bV7Z1lkx7+7xfg8LVS2cEb0n4hdO1//amLHG3DJCbRk3/ZbYbWVRV/a2Y24gFs2
-	 dUA7eDEsR89FHA0f1+uvOm9N5+gnHdzIFMn/9tRe65m/zD5T/l8MT2xkPiW8aTkqgq
-	 SNXOm/ZJG1PdDu+VL+BD2dUxEyOKvZa40XlO/AyKZWQab5CfHSc7KjhvAbxR8CQ3Jg
-	 jWQRwVDDM8dYQ==
+	b=eZJss6danaiwJMxxUfWVD4rBvhbrRPRLbPeS+4QZ61D+l1/zN3sWcYt/QZ9Hf+KRK
+	 BP49Zn/yZOeCvLSVivthHkRXXbCDiOA1XlE8ImPSGVBNHH2Xjr9Nn+ZcYBATF8fBLx
+	 dSwT73XomEFgVed2RT+JRkBgIRs7vDg1CB67V9v+sMK3nH2ZJviwwrrJljzNB42k9L
+	 fvQRiD9wN0zCDzxA/B0qn+HPg83J4vELrKo/vyGgxZNVoMVAC0uUXk6+nIf/XuPYoa
+	 NhShXVw6o2GEJfRm9otDUOHvkIrHLsuXnnPBU3Gras4kHAO1lE2zfs9H/AN/RBC8If
+	 aiTaRGG64VYTA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD1339D0C20;
-	Fri, 19 Sep 2025 14:30:28 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB16B39D0C20;
+	Fri, 19 Sep 2025 14:30:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: airoha: Fix PPE_IP_PROTO_CHK register
- definitions
+Subject: Re: [PATCH net-next] mptcp: reset blackhole on success with
+ non-loopback ifaces
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175829222724.3219626.11285913383137248734.git-patchwork-notify@kernel.org>
-Date: Fri, 19 Sep 2025 14:30:27 +0000
+ <175829222874.3219626.13984058147860089030.git-patchwork-notify@kernel.org>
+Date: Fri, 19 Sep 2025 14:30:28 +0000
 References: 
- <20250918-ppe_ip_proto_chk_ipv4_mask-fix-v1-1-df36da1b954c@kernel.org>
+ <20250918-net-next-mptcp-blackhole-reset-loopback-v1-1-bf5818326639@kernel.org>
 In-Reply-To: 
- <20250918-ppe_ip_proto_chk_ipv4_mask-fix-v1-1-df36da1b954c@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+ <20250918-net-next-mptcp-blackhole-reset-loopback-v1-1-bf5818326639@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: martineau@kernel.org, geliang@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org, kuniyu@google.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 18 Sep 2025 08:59:41 +0200 you wrote:
-> Fix typo in PPE_IP_PROTO_CHK_IPV4_MASK and PPE_IP_PROTO_CHK_IPV6_MASK
-> register mask definitions. This is not a real problem since this
-> register is not actually used in the current codebase.
+On Thu, 18 Sep 2025 10:50:18 +0200 you wrote:
+> When a first MPTCP connection gets successfully established after a
+> blackhole period, 'active_disable_times' was supposed to be reset when
+> this connection was done via any non-loopback interfaces.
 > 
-> Fixes: 00a7678310fe3 ("net: airoha: Introduce flowtable offload support")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> Unfortunately, the opposite condition was checked: only reset when the
+> connection was established via a loopback interface. Fixing this by
+> simply looking at the opposite.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: airoha: Fix PPE_IP_PROTO_CHK register definitions
-    https://git.kernel.org/netdev/net-next/c/e156dd6b856f
+  - [net-next] mptcp: reset blackhole on success with non-loopback ifaces
+    https://git.kernel.org/netdev/net-next/c/833d4313bc1e
 
 You are awesome, thank you!
 -- 
