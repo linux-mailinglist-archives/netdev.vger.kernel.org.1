@@ -1,170 +1,127 @@
-Return-Path: <netdev+bounces-224830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46D50B8AD5C
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 19:55:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B09F3B8AD81
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 20:02:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43F307B6EFD
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 17:53:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 899641CC2B46
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 18:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3139323400;
-	Fri, 19 Sep 2025 17:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bE+iWNLK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA0C1F462C;
+	Fri, 19 Sep 2025 18:02:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12139322DA7
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 17:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE851D8DE1
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 18:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758304466; cv=none; b=dRLqXt9prnV+3/N71LBtHdFuAbiW4EJucqkZw5psHIV8qgEEjwXFpjLK4iCRCa3xSSwYw5wxEUz9Ustp6PJRqUSRheDXqqVMlqlGNbivobq0fOfjth6RlhhYjZ4IoM83/vivVA3dkQ2RFau6Ut0tpU0CDJCB1DVLldpISt3sdIU=
+	t=1758304972; cv=none; b=MDyl1rVuQa5jm7OMKgVeid8dhbdoCV4PchuOdJoBiIBiEaCukFEgvRyhzbrpxlfCeeGtF2MqPQH0F53yYDFvov9u6jC5YPeHIxdMdkzlHMXPdQ6qM2ckEXumoTk2jm9TQWjidTsjL7WGXjGCt7uXsYl2yHdHQmZBQpMjwxY1Fso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758304466; c=relaxed/simple;
-	bh=2vtuV5io0Ekp+g31gG37Ume5llfD1JOkQF3MSMqkeGo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T2aQ/qhRrwjAaZ66dwq6WVssJ+rJ5Ljq/1hCy62+nH9r0cfi7Nun4wgZtyHN2mUxtDE1BKXiP0P+ySzGwaixE8PbkpT3XY5j5H2RamVJw06g60S4e1YbOyZEHWyW0zxaIixyIJtvHimpSHuVYyIK5hpQ/o5nzMaLzwzqsEISC4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bE+iWNLK; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758304466; x=1789840466;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2vtuV5io0Ekp+g31gG37Ume5llfD1JOkQF3MSMqkeGo=;
-  b=bE+iWNLKA0j3r/nmh8QeDaO5e+lBYcpGyMI492c46q+UzJbte08twI0y
-   9UfxxV0vw+eCSsP4OWzoyeVjyeq0FrIgwtYBnPDQZtsE+VsNcj+D6uB5R
-   139nTp1yY5frQmWrLqC2EwtPGJjJz4X6b5B+lgL03B7SSZGMxtLEX0Yci
-   4zBwmo+MmY6+GL7oM9DIT9eigmaaiDbzd5OUperWmBHPjtYMYlp21h8m4
-   jnn5K+rGtfPRPvez39b24xAwBejQ/yBymJ6+S2BPYuINIXQf8ATbofrOi
-   Pgi7B0s76a5IVhfliHfRAH8VliDktu2Um2l0/cowv9NTPqQ+8WT7ehSDj
-   Q==;
-X-CSE-ConnectionGUID: HmFq43G2SjiI28Saut3reQ==
-X-CSE-MsgGUID: X1faZPgtSwKAzvdu8KFJYQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11558"; a="78097105"
-X-IronPort-AV: E=Sophos;i="6.18,278,1751266800"; 
-   d="scan'208";a="78097105"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 10:54:22 -0700
-X-CSE-ConnectionGUID: hxqE+BIpQ5qpWqCcNjrsuA==
-X-CSE-MsgGUID: tHhI2HCXS6Gs7UdAGHwSaA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,278,1751266800"; 
-   d="scan'208";a="176709501"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa010.fm.intel.com with ESMTP; 19 Sep 2025 10:54:21 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Brahmajit Das <listout@listout.xyz>,
-	anthony.l.nguyen@intel.com,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH net-next 7/7] net: intel: fm10k: Fix parameter idx set but not used
-Date: Fri, 19 Sep 2025 10:54:10 -0700
-Message-ID: <20250919175412.653707-8-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250919175412.653707-1-anthony.l.nguyen@intel.com>
-References: <20250919175412.653707-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1758304972; c=relaxed/simple;
+	bh=EWCrKBfF2Qf9kf0iSlYXoPXjHwaQ4trX/gTL334AUF8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QDVMpl1GYrDpBybuf4VA9TlsW8ywN54hiBnZaGDDvsloIhH48j2wVRMEuvbQ/wmTtE9RiLsHnW8NgG5NIQOkese1tJ9bMTt689pLFcv8caApFQNePP4gSCwiN2Uw0j2G8Qczj8A8mhsgta+/uNcDCaKKJZblKxYIc76CAXvuvHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uzfRS-0001HO-Fh; Fri, 19 Sep 2025 20:02:42 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uzfRR-0028xk-2S;
+	Fri, 19 Sep 2025 20:02:41 +0200
+Received: from pengutronix.de (ip-185-104-138-125.ptr.icomera.net [185.104.138.125])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 6496747514B;
+	Fri, 19 Sep 2025 18:02:40 +0000 (UTC)
+Date: Fri, 19 Sep 2025 20:02:36 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Stefan =?utf-8?B?TcOkdGpl?= <stefan.maetje@esd.eu>
+Cc: Vincent Mailhol <mailhol@kernel.org>, 
+	Frank Jungclaus <frank.jungclaus@esd.eu>, linux-can@vger.kernel.org, socketcan@esd.eu, 
+	Simon Horman <horms@kernel.org>, Oliver Hartkopp <socketcan@hartkopp.net>, 
+	Wolfgang Grandegger <wg@grandegger.com>, "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 4/5] can: esd_usb: Rework display of error messages
+Message-ID: <20250919-dugong-of-pleasurable-courtesy-c4abeb-mkl@pengutronix.de>
+References: <20250821143422.3567029-1-stefan.maetje@esd.eu>
+ <20250821143422.3567029-5-stefan.maetje@esd.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="5z3yj2scionqtwbn"
+Content-Disposition: inline
+In-Reply-To: <20250821143422.3567029-5-stefan.maetje@esd.eu>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Brahmajit Das <listout@listout.xyz>
 
-Variable idx is set in the loop, but is never used resulting in dead
-code. Building with GCC 16, which enables
--Werror=unused-but-set-parameter= by default results in build error.
-This patch removes the idx parameter, since all the callers of the
-fm10k_unbind_hw_stats_q as 0 as idx anyways.
+--5z3yj2scionqtwbn
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v2 4/5] can: esd_usb: Rework display of error messages
+MIME-Version: 1.0
 
-Suggested-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Signed-off-by: Brahmajit Das <listout@listout.xyz>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/fm10k/fm10k_common.c | 5 ++---
- drivers/net/ethernet/intel/fm10k/fm10k_common.h | 2 +-
- drivers/net/ethernet/intel/fm10k/fm10k_pf.c     | 2 +-
- drivers/net/ethernet/intel/fm10k/fm10k_vf.c     | 2 +-
- 4 files changed, 5 insertions(+), 6 deletions(-)
+On 21.08.2025 16:34:21, Stefan M=C3=A4tje wrote:
+> - esd_usb_open(): Get rid of duplicate "couldn't start device: %d\n"
+>   message already printed from esd_usb_start().
+> - Fix duplicate printout of network device name when network device
+>   is registered. Add an unregister message for the network device
+>   as counterpart to the register message.
+> - Added the printout of error codes together with the error messages
+>   in esd_usb_close() and some in esd_usb_probe(). The additional error
+>   codes should lead to a better understanding what is really going
+>   wrong.
+> - Convert all occurrences of error status prints to use "ERR_PTR(err)"
+>   instead of printing the decimal value of "err".
+> - Rename retval to err in esd_usb_read_bulk_callback() to make the
+>   naming of error status variables consistent with all other functions.
+>=20
+> Signed-off-by: Stefan M=C3=A4tje <stefan.maetje@esd.eu>
 
-diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_common.c b/drivers/net/ethernet/intel/fm10k/fm10k_common.c
-index f51a63fca513..1f919a50c765 100644
---- a/drivers/net/ethernet/intel/fm10k/fm10k_common.c
-+++ b/drivers/net/ethernet/intel/fm10k/fm10k_common.c
-@@ -447,17 +447,16 @@ void fm10k_update_hw_stats_q(struct fm10k_hw *hw, struct fm10k_hw_stats_q *q,
- /**
-  *  fm10k_unbind_hw_stats_q - Unbind the queue counters from their queues
-  *  @q: pointer to the ring of hardware statistics queue
-- *  @idx: index pointing to the start of the ring iteration
-  *  @count: number of queues to iterate over
-  *
-  *  Function invalidates the index values for the queues so any updates that
-  *  may have happened are ignored and the base for the queue stats is reset.
-  **/
--void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 idx, u32 count)
-+void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 count)
- {
- 	u32 i;
- 
--	for (i = 0; i < count; i++, idx++, q++) {
-+	for (i = 0; i < count; i++, q++) {
- 		q->rx_stats_idx = 0;
- 		q->tx_stats_idx = 0;
- 	}
-diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_common.h b/drivers/net/ethernet/intel/fm10k/fm10k_common.h
-index 4c48fb73b3e7..13fca6a91a01 100644
---- a/drivers/net/ethernet/intel/fm10k/fm10k_common.h
-+++ b/drivers/net/ethernet/intel/fm10k/fm10k_common.h
-@@ -43,6 +43,6 @@ u32 fm10k_read_hw_stats_32b(struct fm10k_hw *hw, u32 addr,
- void fm10k_update_hw_stats_q(struct fm10k_hw *hw, struct fm10k_hw_stats_q *q,
- 			     u32 idx, u32 count);
- #define fm10k_unbind_hw_stats_32b(s) ((s)->base_h = 0)
--void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 idx, u32 count);
-+void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 count);
- s32 fm10k_get_host_state_generic(struct fm10k_hw *hw, bool *host_ready);
- #endif /* _FM10K_COMMON_H_ */
-diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_pf.c b/drivers/net/ethernet/intel/fm10k/fm10k_pf.c
-index b9dd7b719832..3394645a18fe 100644
---- a/drivers/net/ethernet/intel/fm10k/fm10k_pf.c
-+++ b/drivers/net/ethernet/intel/fm10k/fm10k_pf.c
-@@ -1389,7 +1389,7 @@ static void fm10k_rebind_hw_stats_pf(struct fm10k_hw *hw,
- 	fm10k_unbind_hw_stats_32b(&stats->nodesc_drop);
- 
- 	/* Unbind Queue Statistics */
--	fm10k_unbind_hw_stats_q(stats->q, 0, hw->mac.max_queues);
-+	fm10k_unbind_hw_stats_q(stats->q, hw->mac.max_queues);
- 
- 	/* Reinitialize bases for all stats */
- 	fm10k_update_hw_stats_pf(hw, stats);
-diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_vf.c b/drivers/net/ethernet/intel/fm10k/fm10k_vf.c
-index 7fb1961f2921..6861a0bdc14e 100644
---- a/drivers/net/ethernet/intel/fm10k/fm10k_vf.c
-+++ b/drivers/net/ethernet/intel/fm10k/fm10k_vf.c
-@@ -465,7 +465,7 @@ static void fm10k_rebind_hw_stats_vf(struct fm10k_hw *hw,
- 				     struct fm10k_hw_stats *stats)
- {
- 	/* Unbind Queue Statistics */
--	fm10k_unbind_hw_stats_q(stats->q, 0, hw->mac.max_queues);
-+	fm10k_unbind_hw_stats_q(stats->q, hw->mac.max_queues);
- 
- 	/* Reinitialize bases for all stats */
- 	fm10k_update_hw_stats_vf(hw, stats);
--- 
-2.47.1
+I've squashed the changes in the probe function into patch 1.
 
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--5z3yj2scionqtwbn
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmjNmrkACgkQDHRl3/mQ
+kZwkrwf/SW7PyEEtldAVJOF7U0NFHpYPfu14JbQFCcA8CxtCgpDutOmJyhecNnn9
+kJUO8I2kr3olTc35IjpQnPCZQV1wH2OOzRwGcNMaXPQHV6Vrijm35Zr2NiUPF/ZG
+0NH8JUphsPqrupwx18MWZjayXdeN/fHE3OgOojOtDLnzaVFMFT/WQp0SMYcx7frL
+4L9Y5jUAt6M8iYmkt74+T+FEDIiOWDVeF2Vv7RJ5PAE5aLHOdWX93gTZXNRzIOxE
+hyGOKsJI3r5+jdkWQApLEvCSntGNkgoAyaE1LoQXXiYxGddSvQXJUB1JIvR+n3uL
+OQFiaqNImOJixz3W8JasRfnSDfYxVw==
+=WYNa
+-----END PGP SIGNATURE-----
+
+--5z3yj2scionqtwbn--
 
