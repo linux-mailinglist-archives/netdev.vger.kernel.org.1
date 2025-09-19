@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-224881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D625FB8B3B7
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 22:49:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41963B8B3BA
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 22:49:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D9DE564CB7
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 20:49:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20ADA1CC31E6
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 20:49:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0370D2C2376;
-	Fri, 19 Sep 2025 20:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B5B12C327E;
+	Fri, 19 Sep 2025 20:49:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NX3Gl4MC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Tlp/PM5Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567562C0F95
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 20:49:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C382729B78D
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 20:49:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758314944; cv=none; b=kjSxeeVojzsB9aR0WMQVNHe1YvhZFIyUjDz7/JjbMj2VtdhwgZTO8W1hLv66MWTbCzaYWrUeb9G6bVvyhabhBPbwoHn19sFm+9tHN0l2f+G1PeG/XLoOeF7ejvoHucwbLD3R7JKWDh30FlP7tBWNHZVaAGTDkJ+5vq7LyxghdLI=
+	t=1758314946; cv=none; b=kaT6Z8P58bPOcLmKMmsJKB3QmDEbMYgMLy24GTfls8tBjLalj3uKdF75njvus72GgymrxFHVwPpFT3y429/cKItEmtg5951DkLGJJkBZoAlWMy9ok1rqA2QBOpSOCkoFzSzl9IiBdDr3+g8lx/MN7TXzwKWXLW8Pg6qsTelCKWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758314944; c=relaxed/simple;
-	bh=P1tfNZmVWEs+LrB1Wv8mMxfqgYcg37wAZJEhhfjRBww=;
+	s=arc-20240116; t=1758314946; c=relaxed/simple;
+	bh=t+X5CMxa/vOdIIztxMLETAG2QuE8iDANY6RyJJhgLnQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=B6nsw3WMGJI2CIhNkkRcpwcRV2/SZeoZ6iLY6U9h3QdMoBgXCOfZ5y1wMXlNmsRb6S97/sO6gn8MFUYEPxCoKvtxMBYvV3nEAFlle9Silu9orv/VGvX7cwk3ZtKbV4ZGgUMYwo419wHDVYzhRKROZAwo8VEsTl96isfyykuXL/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NX3Gl4MC; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=uKXjjf3BZeFgIkAsaQ+HWo5EePBhEggc5S8dw39Br6DTSy4CujT4JrpqmOpvBnAA53t9xtO8GzOsK9/GYIy5MgEuQIGMnzNWVIM8nKNDu+IoThFvzdWJdpgTNNMGotINS16tEAzpnBzQjqphNBD9/CKhvJJiDOFzajTGZDklfkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Tlp/PM5Z; arc=none smtp.client-ip=209.85.222.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8286b42f46bso506622885a.1
-        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 13:49:03 -0700 (PDT)
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8286b42f46bso506628785a.1
+        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 13:49:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758314942; x=1758919742; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758314944; x=1758919744; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2PTVgQFKU5e49oJ3iISMgA9/cNvvPi9PBKL/+pE9HEk=;
-        b=NX3Gl4MCjCbVOCqzMjB3YhdL9j1kSmxYbQJsmYjpE/P7FWyuUYPoS9jPBlU0CSGGio
-         Yvr16TRgRTeM7oV6Cp+M2HkZO9Tsyznea2GrpN3F36+Ox88DGt5aTBods+tJyjTAI00F
-         8iPDCYPByXm2mEVbcZ+fywpUpgry/wm2/tSr9W9nj5n9OYXX1aTRhQbFPBsNxK3MbTIL
-         Nw81BPTqTlSZviFlznawcaLf78aDOng5fHDr/H820bfO+IIBLu5AIOgDj2nCmsSfhWRv
-         YSMWoYiIZv/fFI2SL0LA2t1W+xvMKIWAJTucYl8ain2y62ObPeU5koG37gKrMPfMeqY5
-         ptlg==
+        bh=EquBz1cdZVbHQrHM782lLsKRU2kCX36ApvHo83LUFGc=;
+        b=Tlp/PM5Z2COdVLq4fwT6eteFYnguCEFawX3qR3zxtzU/QNFkytT9zNivtZ/r/YaZYA
+         HsfeH0rN90qNnj6p0CQO6aSXdxN47kKJbYAvFvaEdQ1uxNF1hD+qbE78xIjy/+nVQmQJ
+         fS7Lcb/4OUcdVzt1IXzA9XqwHkrQECM+jNF5iCNes/R7E2UbykzMAbXYTKcVk0b19sKd
+         VXTU5LNaE8/q2FzcHZRQDFKUKPr5dGIglERAFubefSeEUdiucG+6FkWtedXgn4hluox3
+         IP3Eu3TcW06O3rykCINiz/LrWtUSRlpfATeFiXD+dzSU/VGY7CyJzUGPXhlKRFmNuRDO
+         uNbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758314942; x=1758919742;
+        d=1e100.net; s=20230601; t=1758314944; x=1758919744;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2PTVgQFKU5e49oJ3iISMgA9/cNvvPi9PBKL/+pE9HEk=;
-        b=Au1orRKLqW/hGlVgywoDuokzkEpCkCjVfHLdRtTusWVYeWQoNje/3L1euR5jEkwynN
-         +hwbod8SeVNJnqsoaK/XnUQrlTR6kCKWtOqmVS5xqh4AmaBT2FtryPaDJgS2nkyuV8+o
-         nuLVDx32SFMXqPBxRCLbtlYyJKb8TTt/AJs42LMkpEvUlOr+jFUbpo087wmFeJWyxTbP
-         JkqtL5EpDWhogxOXDw1nDcGAxfw9qO73pK8SKvU5QDePZKgEh6DDnH8gcYzcSoz7AWxp
-         FXkr7SWPBlV9oEf0uVfac5Kngwb2HfW/CFOvjiC+zuPsDyXMz/EEl7X1BcSWVI3Fsjhl
-         oatQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUtWsjH7TTlBqi/It5H4V2frpsZ+m7Ufimy68kqtiZBNsHqNl7oCqTVTqjayda/jD+Lj77oWN8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAnMdIifmm+B2aTuaXUJI4p0FOrIr2yt9vVACgbwqb7Z7rRhkd
-	zfkP9OeG0vCdof1nfd2WNaqXcvQOeGVqj/rFMp8sdvlRu4UTAYBCL8g2KMxfdwZHPcEeJ7d9l3T
-	tfjCFj6j8rPE2dA==
-X-Google-Smtp-Source: AGHT+IEHt8BIqYV2AOG+6UxqCmWTffqgXYlgS8Hu9CRJ5xqgg358jMqS3y+6mS6swW60Y+uv3SdPLDPoN5rMvA==
-X-Received: from qkntz12.prod.google.com ([2002:a05:620a:690c:b0:827:6d60:7d4e])
+        bh=EquBz1cdZVbHQrHM782lLsKRU2kCX36ApvHo83LUFGc=;
+        b=YVQmce3JeZSTePs13RT5+9kmZHMP5JVx9LfFf1U3DoMizXom/p9+Voo5/jHoJDN3ZH
+         FqYtHUmP/ji0UN88G7NPIuSrwRJP8CjRfCyEI+x3fvElxYKGylYq9IomJACnZTKbJ4Fr
+         XrPUp8JhrPUNZTIeNPkVtAOiaRWcfcvAOk/S7WpHBBMsfxg9WuZVH2s9/NoWqTCQBqL6
+         od2zeeJmfKOe0xGUlfXpU4Ptr/FerxRdIQrtCVAyAczs4tBfP/4XJ2bbwJ7sg0usnC2I
+         FqLqJ8Ve/SXFzFl5NrAzP7oxGQ4/esBXfqZT/le6JlKhCTtWQRYmgxxeSI873oocoXCG
+         +GoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX9nkG47XAS3ofmsa/PHN38BvsRogqttt2aVIXmDsKa9PiNjqhXL6xVlDC44TqZqYb9+RVu7AE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyekdVOlWJWtTmd8X04E3lLJdBeGRZk7zk8GuKbSYpTpashFwdR
+	A67ZdU3jGoVZcUvDE9z0CYjARe26uz7EjIA8pnlWz/nKqJIP+/5BXsf//s9NcJbtzuvIIvqE6Fi
+	J5KkpjcSQqFNZjA==
+X-Google-Smtp-Source: AGHT+IGGDQFxhCPTzADqPjK2XXdKoCXt6CJaVwNGfrazxEobQ93H56K5SdOWI+KdrzwGfIuN4/Q7NeEoR4jzLw==
+X-Received: from qkpb17.prod.google.com ([2002:a05:620a:2711:b0:81d:accc:1ff0])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:2ef:b0:827:ecc1:819d with SMTP id af79cd13be357-83ba40addd2mr401996285a.21.1758314942230;
- Fri, 19 Sep 2025 13:49:02 -0700 (PDT)
-Date: Fri, 19 Sep 2025 20:48:50 +0000
+ 2002:a05:620a:100e:b0:813:116e:9fc8 with SMTP id af79cd13be357-83ba29b6ab1mr516181685a.17.1758314943643;
+ Fri, 19 Sep 2025 13:49:03 -0700 (PDT)
+Date: Fri, 19 Sep 2025 20:48:51 +0000
 In-Reply-To: <20250919204856.2977245-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250919204856.2977245-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250919204856.2977245-3-edumazet@google.com>
-Subject: [PATCH v2 net-next 2/8] net: move sk->sk_err_soft and sk->sk_sndbuf
+Message-ID: <20250919204856.2977245-4-edumazet@google.com>
+Subject: [PATCH v2 net-next 3/8] tcp: remove CACHELINE_ASSERT_GROUP_SIZE() uses
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -84,87 +84,74 @@ Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>,
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-sk->sk_sndbuf is read-mostly in tx path, so move it from
-sock_write_tx group to more appropriate sock_read_tx.
+Maintaining the CACHELINE_ASSERT_GROUP_SIZE() uses
+for struct tcp_sock has been painful.
 
-sk->sk_err_soft was not identified previously, but
-is used from tcp_ack().
-
-Move it to sock_write_tx group for better cache locality.
-
-Also change tcp_ack() to clear sk->sk_err_soft only if needed.
+This had little benefit, so remove them.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/sock.h   | 4 ++--
- net/core/sock.c      | 3 ++-
- net/ipv4/tcp_input.c | 3 ++-
- 3 files changed, 6 insertions(+), 4 deletions(-)
+ net/ipv4/tcp.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 66c2f396b57de5a0048b4ae1e6181c4473be15c5..b4fefeea0213a548a1c3601b95f902a5fa499bc6 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -467,7 +467,7 @@ struct sock {
- 	__cacheline_group_begin(sock_write_tx);
- 	int			sk_write_pending;
- 	atomic_t		sk_omem_alloc;
--	int			sk_sndbuf;
-+	int			sk_err_soft;
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 9b327b6807fc694db249b4bf3521e154db84d11c..5932dba3bd717b59e730630d7390b65f329b03c2 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -5101,7 +5101,6 @@ static void __init tcp_struct_check(void)
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, notsent_lowat);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, gso_segs);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, retransmit_skb_hint);
+-	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_tx, 32);
  
- 	int			sk_wmem_queued;
- 	refcount_t		sk_wmem_alloc;
-@@ -507,6 +507,7 @@ struct sock {
- 	unsigned int		sk_gso_max_size;
- 	gfp_t			sk_allocation;
- 	u32			sk_txhash;
-+	int			sk_sndbuf;
- 	u8			sk_pacing_shift;
- 	bool			sk_use_task_frag;
- 	__cacheline_group_end(sock_read_tx);
-@@ -523,7 +524,6 @@ struct sock {
- 	unsigned long	        sk_lingertime;
- 	struct proto		*sk_prot_creator;
- 	rwlock_t		sk_callback_lock;
--	int			sk_err_soft;
- 	u32			sk_ack_backlog;
- 	u32			sk_max_ack_backlog;
- 	unsigned long		sk_ino;
-diff --git a/net/core/sock.c b/net/core/sock.c
-index ad79efde447675c8a8a3aafe204e2bbb1a5efe7c..dc03d4b5909a2a68aee84eb9a153b2c3970f6b32 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -4452,7 +4452,7 @@ static int __init sock_struct_check(void)
+ 	/* TXRX read-mostly hotpath cache lines */
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, tsoffset);
+@@ -5112,7 +5111,6 @@ static void __init tcp_struct_check(void)
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, lost_out);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, sacked_out);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, scaling_ratio);
+-	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_txrx, 32);
  
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_tx, sk_omem_alloc);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_tx, sk_omem_alloc);
--	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_tx, sk_sndbuf);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_tx, sk_err_soft);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_tx, sk_wmem_queued);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_tx, sk_wmem_alloc);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_tx, sk_tsq_flags);
-@@ -4479,6 +4479,7 @@ static int __init sock_struct_check(void)
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_read_tx, sk_gso_max_size);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_read_tx, sk_allocation);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_read_tx, sk_txhash);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_read_tx, sk_sndbuf);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_read_tx, sk_gso_max_segs);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_read_tx, sk_pacing_shift);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_read_tx, sk_use_task_frag);
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 9fdc6ce25eb1035a88ff2640601cc665187a78b2..f93d48d98d5dacf2ee868cd6b2d65a396443d106 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -4085,7 +4085,8 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
- 	/* We passed data and got it acked, remove any soft error
- 	 * log. Something worked...
- 	 */
--	WRITE_ONCE(sk->sk_err_soft, 0);
-+	if (READ_ONCE(sk->sk_err_soft))
-+		WRITE_ONCE(sk->sk_err_soft, 0);
- 	WRITE_ONCE(icsk->icsk_probes_out, 0);
- 	tp->rcv_tstamp = tcp_jiffies32;
- 	if (!prior_packets)
+ 	/* RX read-mostly hotpath cache lines */
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, copied_seq);
+@@ -5129,9 +5127,6 @@ static void __init tcp_struct_check(void)
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, snd_ssthresh);
+ #if IS_ENABLED(CONFIG_TLS_DEVICE)
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, tcp_clean_acked);
+-	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_rx, 77);
+-#else
+-	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_rx, 69);
+ #endif
+ 
+ 	/* TX read-write hotpath cache lines */
+@@ -5151,7 +5146,6 @@ static void __init tcp_struct_check(void)
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tsorted_sent_queue);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, highest_sack);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, ecn_flags);
+-	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_tx, 97);
+ 
+ 	/* TXRX read-write hotpath cache lines */
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, pred_flags);
+@@ -5172,11 +5166,6 @@ static void __init tcp_struct_check(void)
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rcv_wnd);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rx_opt);
+ 
+-	/* 32bit arches with 8byte alignment on u64 fields might need padding
+-	 * before tcp_clock_cache.
+-	 */
+-	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 107 + 4);
+-
+ 	/* RX read-write hotpath cache lines */
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, bytes_received);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, segs_in);
+@@ -5193,7 +5182,6 @@ static void __init tcp_struct_check(void)
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, bytes_acked);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcv_rtt_est);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcvq_space);
+-	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_rx, 112);
+ }
+ 
+ void __init tcp_init(void)
 -- 
 2.51.0.470.ga7dc726c21-goog
 
