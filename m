@@ -1,178 +1,195 @@
-Return-Path: <netdev+bounces-224787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7645B8A0B2
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 16:42:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 644E4B8A0FD
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 16:47:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78CEA3B2740
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 14:42:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7ECD07ACC31
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 14:45:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299CA31062E;
-	Fri, 19 Sep 2025 14:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6240235360;
+	Fri, 19 Sep 2025 14:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PD9xCNea"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A4nXpIPa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFA424DCEB
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 14:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1CA273F9
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 14:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758292934; cv=none; b=Tq48ORvL3p+h2DFSjptk1JO7I5g51H29OHAVElNAVBhkzFnCfFhtWVTgVHpBruFKjO8wcMn7PO+jRPjVC1pEKnIesgoNRS7q5ZUkC5tim8AnvTBcha8QjXv7Wjt5BMV07UNcibprQy6rHKfMbeuNr2aD7asljUSBY35lI8+6WD8=
+	t=1758293218; cv=none; b=t1mfJntAqHLD2h+2uCMbntVfLpHwlaRMoJaMeAfJbo8uYORt3db79wbpUWISyiWQ8cuY6uUsBfmZtdWY+TLtZdXgdt9ZWQBy1J2x/ijxMeGVv0ddKGgFjlQItx+IfRQ1TuB8RZppxSu9Q4RwVEspWKJML4bj9pEEQsfqnCcdABk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758292934; c=relaxed/simple;
-	bh=HZlHpTpdK3mBVkCcSAL9bV9vZzv/zqfoBlqlG5Frizc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gU43flXWpivA/7jzDrGREgYTOWJUfUTmTq/eJnr89AqvRxA9u5DYy9r22rby/JNR5gF1DsrCxpH1gBThEuukAP25mayXrraQKwgj53JEsoI5TRxtclPjm175Hvgfb/VVhv5Pev4nrcCWd0m7f0rmejisHAvUGUCckzf3Ld6H1Zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PD9xCNea; arc=none smtp.client-ip=209.85.215.170
+	s=arc-20240116; t=1758293218; c=relaxed/simple;
+	bh=rMzpqLEOEhteINqvc5dyan4rtMP3A9UTuyesjbI13LA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=eDVzfG76JkwdyNC5IFGj+vlJjzRlsdweKg9m3arbTYm8p63wXZP2P0HnBoaYxbsfc/xvPu70Yh12lLHv5E9O3OTrlq6A+BNIB1ppcEnxp0e3uat8zqXHxHyRR7DP8B8IY4U4RqlWUqzrCZo5ztTI3+UX5V8wuqdRs6uhBoLkrVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A4nXpIPa; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b54a74f9150so1738383a12.0
-        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 07:42:12 -0700 (PDT)
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4b79773a389so22771501cf.1
+        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 07:46:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758292932; x=1758897732; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1758293216; x=1758898016; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HZlHpTpdK3mBVkCcSAL9bV9vZzv/zqfoBlqlG5Frizc=;
-        b=PD9xCNeaVUUeDQrcnuf00PCvNREtBKCP9IGxxAAnHkhHUjJ0PW6ttEA+36mxM41RPE
-         8vYa+2rAh9YvFkkbLClTEh8nzQgOnDrrRwL6i+nWrxMgFy32osvPZ5yv+UhGr0TSlWbL
-         /5smMhSTyS6AOwQeevDETegO47hjs/2MulsZX7QBi5YfHqV8raQ+BVfrqTDhYwXDvFWZ
-         m49yzY/KQsrt+lZCI1EwBWnSSv2PUmBEFaQRIz3OD78DD3oSy8k8Nvs7PBUo3JhdlbRk
-         S//OMvH5e5mCJ1ytn9TKJRkzDgXdChUzq9Sc5i4hKbVZtMYOM+LlCPk7wjHKSAXIPkRm
-         lhow==
+        bh=BTCj+e/VtZ/D02X1h15E6NfB/hO2pboJylbEQXWpz8E=;
+        b=A4nXpIPa+2BhjVsulZSLhLIPr3E+ZFHQUuJRXnK3toMeDpl/tIJlbRWgTKMiRShSu2
+         wcSH2+RapQp3ncIktiuybEZ9Nd99ZyBKhUaqw9wrt8zq/woRd5GRzwkukmR7t0Lz3e02
+         eItFjH3S0UmGQltEJH4/lg14WuxXQMfzicM/FysACFU1VzYzcGy4Tvy81wv7XbqcGen/
+         OQKgF9Yyrfvdl9YhVTub/urvZM12PjLLND/k1napHlkkLWnjYuYFlGyeMXKxnmooxdro
+         KYxQFg36h3oqwaABM4TdY73aYeSXG1qARFfVZDZHymcn5P90PYs3bB7cJ91MWjahe0nb
+         ykBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758292932; x=1758897732;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HZlHpTpdK3mBVkCcSAL9bV9vZzv/zqfoBlqlG5Frizc=;
-        b=hx8xW3rhqtqlGw4rfrKM5G5WLzE/cG8mXKbRDTsvAyC960FsQxZ0DRdlk6SUYInfuL
-         l6v8nzahQlAoh2YvELcZFnJuh6EIMfpsEYxtsBcUccm9ZotEWV4bNttRVfhAwNnRGF6T
-         jg6hjrXXuicCSFKDBdiiEvyUClBnhGcaYpAUMfgA7NK0sKAYhsq7yli7Ib1CNcavROY3
-         dPbo1XZ/g/IgNWDSP4UhsK7QxQ7PiEF9QjjWhqfChspXEsX7WrA+OvOIVTd4RV8dK0tm
-         d5n90R+JQadOWIPDhFEuHgTqXXU/auytK1yO77cN1LPu9f2o/M+rPUtNPorieLIFyInw
-         RhFQ==
-X-Gm-Message-State: AOJu0YzxiZP6TBjA8mYvkdIBJm7RM0l3AdZ7tpAcFxtz+b6ngmjO91PH
-	buwHMq2dNK8nnLI5Ab5Uo+85fcbGIv6AIlp2dMfEF7GLqLVxBAPQ9v+6Hj1+99mfZlZW/S0F82g
-	I4zqcIXmjeII6eX0jybayE8K35kbewSo=
-X-Gm-Gg: ASbGnct+sfZbIzeZj1Zx8f/QvkJRuUn0E1PYN5oC2GGx4Og1mPdo3i3+qTx8rq1S3Lr
-	IszSclum5yKLqjo8VtNsdZCkW9T5CU1Yi1i8SfKyEPbMpPUv1Z4ZwtOHkMLVfFoPgQxNIU2ra2z
-	3Sy0F6jcvKZQ+51EjQ3RAdOxnWNAPYeKkqaOFr8dRkn7N4RUcrwXiKl8EaOYucDT+aE6JYHa4ch
-	YSCV1Q=
-X-Google-Smtp-Source: AGHT+IGo9OakPjgwrSXJF/qJMVUBdi/e7cF1r+aV53PwjCNFN9R0QdCmHkVhEX7Lqj+jz4p4vZqIYSn6l+tyCyIEnog=
-X-Received: by 2002:a17:90b:1a8c:b0:32b:d8bf:c785 with SMTP id
- 98e67ed59e1d1-3309834a0c4mr5086454a91.20.1758292931548; Fri, 19 Sep 2025
- 07:42:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758293216; x=1758898016;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=BTCj+e/VtZ/D02X1h15E6NfB/hO2pboJylbEQXWpz8E=;
+        b=F9yKcvuvM/WbIyQC7iyurXdF1FeMxT/fFvwwPcr8SIoGqmow+MP1HGMJVfvXTgkGeQ
+         k4qwIcwrGow0HplWirqk/DHqQzSicAL6X/SKBNsZKTrSILllkIPSq/fja71YzTUD6MJP
+         cTGCm+QpLRy3sJTEPYfzYVgRSfUVbYq3D4RqzYDjZUUC/vmjd1RZlGX3uGAqDHtyKj+S
+         /3xUp4SrOEZsZAxOFLt/sNWeTU13g4kmahJsy/NS5HtNlWf2+6M41X8/I9VxOCMTsQHe
+         8bu3yozPtRkz5ytt8kuUGAyXj1ieqLl76ZpUcc7hO9gblxW5GqAF+hZRsGMAFZldiWOp
+         95Og==
+X-Forwarded-Encrypted: i=1; AJvYcCVuWKuo20FaIOWNdLiMNLGz28LZFzySVFZM+9tRee18E9iNWHQ88L5eCkMtsitb0Bl0+AmJRfA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsTNzeBeT9YMu9p2HXR6PUfaUgjJVjDAlSghBC9FPRs9N07MXi
+	Q0vNZ4Uk5UiaEWM1GKwdyvScs5zbpsz71dPM1UAM+cDa5iHkymMu4Gze
+X-Gm-Gg: ASbGncs2cZJHufTvNOeKfi9Rm9Jpyi/rKZRhbAVuBvRfHGKBoSAULRO9DsQWmtSw1ao
+	Tp8MqSH6+fI0bgSteol8UAtVOWkheROt/kX6P4lEtM7K7cXn7rWIIGQwGumpcY02NFH2q807zSX
+	cxk0LyGXGkR3/Rnj9pGYZAQy0tEwfESBs/7rZKwWAWOihIOwW4zzWutQU2aJhLq8vcpXEXG+fdR
+	IyiuMQI4gqAzlCN7GMAq+Nq19amXA/X8RmhLX9e1WFk7zgVKUeIsn+nPaAVIEmBDmrfskuAsPl6
+	8Ax4KWQWUg9AJrk/PeoXpbGwyKyPpcFhpAqkqkvo8/u8gd8bz9gev9Gso/6xrLPupu2Xbb7Mtg/
+	sab+vHejU/1YwfgGs9TbT4ToMgQSZ5KXGeOV5TImBliy6FAdcTwU0rn78QwNIs0PVr6V3sPuzmD
+	6WpQ==
+X-Google-Smtp-Source: AGHT+IEFvwYYDWYJDrNKDVvsS0tm4PJF42EUcN3g1p4ngNtR8j2nRJk0TdRdJI0JYwklpBYJ2GKC1A==
+X-Received: by 2002:a05:622a:5444:b0:4c0:cab7:978 with SMTP id d75a77b69052e-4c0cab70addmr15501021cf.29.1758293215746;
+        Fri, 19 Sep 2025 07:46:55 -0700 (PDT)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-4bda279ad7esm30915921cf.19.2025.09.19.07.46.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Sep 2025 07:46:55 -0700 (PDT)
+Date: Fri, 19 Sep 2025 10:46:54 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Wang Liang <wangliang74@huawei.com>, 
+ willemdebruijn.kernel@gmail.com, 
+ jasowang@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ hawk@kernel.org, 
+ john.fastabend@gmail.com, 
+ sdf@fomichev.me, 
+ lorenzo@kernel.org, 
+ toke@redhat.com
+Cc: yuehaibing@huawei.com, 
+ zhangchangzhong@huawei.com, 
+ wangliang74@huawei.com, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.2ecd010c7b725@gmail.com>
+In-Reply-To: <20250917113919.3991267-1-wangliang74@huawei.com>
+References: <20250917113919.3991267-1-wangliang74@huawei.com>
+Subject: Re: [PATCH net] net: tun: Update napi->skb after XDP process
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1758234904.git.lucien.xin@gmail.com> <c64e0dde-ce6a-4528-ad11-bfe3a90c2623@suse.de>
-In-Reply-To: <c64e0dde-ce6a-4528-ad11-bfe3a90c2623@suse.de>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 19 Sep 2025 10:41:58 -0400
-X-Gm-Features: AS18NWCO3T47VA_L1EGQq0v2eLMYVU-h3utg8wzRNRsnOhBYSQghROeeV9IDBfk
-Message-ID: <CADvbK_d1fuyoG_F8jXNSyuicFqDxmbwSp06mkE1GvgTFkYRm5A@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 00/15] net: introduce QUIC infrastructure and
- core subcomponents
-To: Hannes Reinecke <hare@suse.de>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, 
-	Tyler Fanelli <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, 
-	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
-	Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
-	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-T24gRnJpLCBTZXAgMTksIDIwMjUgYXQgMjo0NOKAr0FNIEhhbm5lcyBSZWluZWNrZSA8aGFyZUBz
-dXNlLmRlPiB3cm90ZToNCj4NCj4gT24gOS8xOS8yNSAwMDozNCwgWGluIExvbmcgd3JvdGU6DQo+
-ID4gSW50cm9kdWN0aW9uDQo+ID4gPT09PT09PT09PT09DQo+ID4NCj4gPiBUaGUgUVVJQyBwcm90
-b2NvbCwgZGVmaW5lZCBpbiBSRkMgOTAwMCwgaXMgYSBzZWN1cmUsIG11bHRpcGxleGVkIHRyYW5z
-cG9ydA0KPiA+IGJ1aWx0IG9uIHRvcCBvZiBVRFAuIEl0IGVuYWJsZXMgbG93LWxhdGVuY3kgY29u
-bmVjdGlvbiBlc3RhYmxpc2htZW50LA0KPiA+IHN0cmVhbS1iYXNlZCBjb21tdW5pY2F0aW9uIHdp
-dGggZmxvdyBjb250cm9sLCBhbmQgc3VwcG9ydHMgY29ubmVjdGlvbg0KPiA+IG1pZ3JhdGlvbiBh
-Y3Jvc3MgbmV0d29yayBwYXRocywgd2hpbGUgZW5zdXJpbmcgY29uZmlkZW50aWFsaXR5LCBpbnRl
-Z3JpdHksDQo+ID4gYW5kIGF2YWlsYWJpbGl0eS4NCj4gPg0KPiBbIC4uIF0+DQo+ID4gLSBQZXJm
-b3JtYW5jZSBUZXN0aW5nDQo+ID4NCj4gPiAgICBQZXJmb3JtYW5jZSB3YXMgYmVuY2htYXJrZWQg
-dXNpbmcgaXBlcmYgWzhdIG92ZXIgYSAxMDBHIE5JQyB3aXRoDQo+ID4gICAgdXNpbmcgdmFyaW91
-cyBNVFVzIGFuZCBwYWNrZXQgc2l6ZXM6DQo+ID4NCj4gPiAgICAtIFFVSUMgdnMuIGtUTFM6DQo+
-ID4NCj4gPiAgICAgIFVOSVQgICAgICAgIHNpemU6MTAyNCAgICAgIHNpemU6NDA5NiAgICAgIHNp
-emU6MTYzODQgICAgIHNpemU6NjU1MzYNCj4gPiAgICAgIEdiaXRzL3NlYyAgIFFVSUMgfCBrVExT
-ICAgIFFVSUMgfCBrVExTICAgIFFVSUMgfCBrVExTICAgIFFVSUMgfCBrVExTDQo+ID4gICAgICDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIANCj4gPiAgICAgIG10dToxNTAwICAgIDIu
-MjcgfCAzLjI2ICAgIDMuMDIgfCA2Ljk3ICAgIDMuMzYgfCA5Ljc0ICAgIDMuNDggfCAxMC44DQo+
-ID4gICAgICDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIANCj4gPiAgICAgIG10dTo5
-MDAwICAgIDMuNjYgfCAzLjcyICAgIDUuODcgfCA4LjkyICAgIDcuMDMgfCAxMS4yICAgIDguMDQg
-fCAxMS40DQo+ID4NCj4gPiAgICAtIFFVSUMoZGlzYWJsZV8xcnR0X2VuY3J5cHRpb24pIHZzLiBU
-Q1A6DQo+ID4NCj4gPiAgICAgIFVOSVQgICAgICAgIHNpemU6MTAyNCAgICAgIHNpemU6NDA5NiAg
-ICAgIHNpemU6MTYzODQgICAgIHNpemU6NjU1MzYNCj4gPiAgICAgIEdiaXRzL3NlYyAgIFFVSUMg
-fCBUQ1AgICAgIFFVSUMgfCBUQ1AgICAgIFFVSUMgfCBUQ1AgICAgIFFVSUMgfCBUQ1ANCj4gPiAg
-ICAgIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgA0KPiA+ICAgICAgbXR1OjE1MDAg
-ICAgMy4wOSB8IDQuNTkgICAgNC40NiB8IDE0LjIgICAgNS4wNyB8IDIxLjMgICAgNS4xOCB8IDIz
-LjkNCj4gPiAgICAgIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgA0KPiA+ICAgICAg
-bXR1OjkwMDAgICAgNC42MCB8IDQuNjUgICAgOC40MSB8IDE0LjAgICAgMTEuMyB8IDI4LjkgICAg
-MTMuNSB8IDM5LjINCj4gPg0KPiA+DQo+IEkgaGF2ZSBiZWVuIGZvbGxvd2luZyB0aGUgUVVJQyBp
-bXBsZW1lbnRhdGlvbiBwcm9ncmVzcyBmb3IgcXVpdGUgc29tZQ0KPiB3aGlsZSwgYW5kIGFsd2F5
-cyBmb3VuZCB0aGUgcGVyZm9ybWFuY2UgaW1wYWN0IHJhdGhlciBmcnVzdHJhdGluZy4NCj4gQXQg
-dGhlIG9uc2V0IGl0IGxvb2tzIGFzIGlmIHlvdSB3b3VsZCBzdWZmZXIgaGVhdmlseSBmcm9tIHRo
-ZSBhZGRpdGlvbmFsDQo+IGNvbXBsZXhpdHkgdGhlIFFVSUMgcHJvdG9jb2wgaW1wb3NlcyB1cCB5
-b3UuDQo+IEJ1dCB0aGF0IHdvdWxkIG1ha2UgdGhlIHVzZSBvZiBRVUlDIHJhdGhlciBwb2ludGxl
-c3MgZm9yIG1vc3QgdXNlLWNhc2VzLg0KPiBTbyBvbmUgd29uZGVycyBpZiB0aGlzIGlzIG5vdCBy
-YXRoZXIgYSBwcm9ibGVtIG9mIGFuIHVuc3VpdGFibGUgdGVzdA0KRm9yIGZhc3QgbmV0d29ya3Ms
-IGxpa2UgdGhlIG9uZXMgSSB1c2VkIGluIG15IGlwZXJmIHRlc3RzLCBpdOKAmXMgZXhwZWN0ZWQN
-CnRoYXQgUVVJQyBkb2VzIG5vdCBvdXRwZXJmb3JtIFRDUCtUTFMgYXQgdGhlIHRpbWUsIFRoZSBt
-YWluIHJlYXNvbiBpcyB0aGF0DQpUQ1AgaGFzIGRlY2FkZXMgb2Yga2VybmVsLWxldmVsIG9wdGlt
-aXphdGlvbnMsIGluY2x1ZGluZyBmZWF0dXJlcyBsaWtlDQpHU08vR1JPIGFuZCBldmVuIGhhcmR3
-YXJlIG9mZmxvYWQgc3VwcG9ydCwgd2hpY2ggSSBkb24ndCB0aGluayBRVUlDIGNhbg0KY2F0Y2gg
-dXAgZHVlIHRvIGl0cyBjb21wbGV4aXR5Lg0KDQpUaGF0IHNhaWQsIFFVSUMgc2hvd3MgYWR2YW50
-YWdlcyBpbiBvdGhlciBzY2VuYXJpb3Mgd2ViIGJyb3dzaW5nIG9yDQpzaW1pbGFyIHdvcmtsb2Fk
-cy4gUVVJQyBjYW4gb3V0cGVyZm9ybSBUQ1ArVExTIGJlY2F1c2Ugb2Y6DQoNCi0gRmFzdGVyIGNv
-bm5lY3Rpb24gc2V0dXA6IFFVSUMgY29tYmluZXMgdGhlIHRyYW5zcG9ydCBhbmQgVExTIGhhbmRz
-aGFrZXMsDQogIGF2b2lkaW5nIHRoZSBleHRyYSByb3VuZCB0cmlwcyBvZiBUQ1DigJlzIHRocmVl
-LXdheSBoYW5kc2hha2UgcGx1cyBUTFMNCiAgbmVnb3RpYXRpb24uDQoNCi0gTm8gaGVhZC1vZi1s
-aW5lIGJsb2NraW5nIGFjcm9zcyBzdHJlYW1zOiBRVUlDIG11bHRpcGxleGVzIG11bHRpcGxlDQog
-IHN0cmVhbXMgb3ZlciBhIHNpbmdsZSBjb25uZWN0aW9uLCBzbyBhIHNpbmdsZSBsb3N0IHBhY2tl
-dCBkb2VzbuKAmXQgc3RhbGwNCiAgdW5yZWxhdGVkIHN0cmVhbXMsIHVubGlrZSBUQ1AuDQoNCj4g
-Y2FzZS4gRnJvbSBteSB1bmRlcnN0YW5kaW5nIFFVSUMgaXMgZ2VhcmVkIHVwIGZvciBoYW5kbGlu
-ZyBhDQo+IG11bHRpLXN0cmVhbSBjb25uZWN0aW9uIHdvcmtsb2FkLCBzbyBvbmUgc2hvdWxkIHVz
-ZSBhbiBhZGVxdWF0ZSB0ZXN0IHRvDQo+IHNpbXVsYXRlIGEgbXVsdGktc3RyZWFtIGNvbm5lY3Rp
-b24uIERpZCB5b3UgdXNlIHRoZSAnLVAnIG9wdGlvbiBmb3INCj4gaXBlcmYgd2hlbiBydW5uaW5n
-IHRoZSB0ZXN0cz8NCj4NCj4gQW5kIGl0IG1pZ2h0IGFsc28gYmUgYW4gaWRlYSB0byBhZGQgUVVJ
-QyBzdXBwb3J0IHRvIGlwZXJmIGl0c2VsZiwNCj4gZXNwZWNpYWxseSB0cmFuc2Zvcm1pbmcgdGhl
-ICctUCcgb3B0aW9uIG9udG8gUVVJQyBzdHJlYW1zIGxvb2tzDQo+IHByb21pc2luZy4NCj4NClll
-cywgd2UgY291bGQgYWRkIFFVSUMgdG8gaXBlcmYsIGJ1dCB0aGVuIHRlc3Rpbmcgd291bGQgbmVl
-ZCB0byBpbmNsdWRlDQpwYWNrZXQgbG9zcyBhbmQgZW5zdXJlIHRoZSBDUFUgaXNu4oCZdCB0aGUg
-Ym90dGxlbmVjaywgd2hpY2ggbW92ZXMgYXdheQ0KZnJvbSBhIGZhc3QtbmV0d29yayBlbnZpcm9u
-bWVudC4NCg0KVGhhbmtzIEhhbm5lcyBmb3IgeW91ciBjb21tZW50LiBJ4oCZZCBiZSBnbGFkIHRv
-IGhlYXIgYW55IGZ1cnRoZXIgaWRlYXMgb24NClFVSUMgcGVyZm9ybWFuY2UgdGVzdGluZy4gU28g
-ZmFyLCBJIGhhdmVu4oCZdCBzZWVuIGEgY29tbW9uIG1ldGhvZCBvciB0b29sDQphZG9wdGVkIGZv
-ciBpdCBmcm9tIHRoZSBjb21tdW5pdHkuDQo=
+Wang Liang wrote:
+> The syzbot report a UAF issue:
+> 
+>   BUG: KASAN: slab-use-after-free in skb_reset_mac_header include/linux/skbuff.h:3150 [inline]
+>   BUG: KASAN: slab-use-after-free in napi_frags_skb net/core/gro.c:723 [inline]
+>   BUG: KASAN: slab-use-after-free in napi_gro_frags+0x6e/0x1030 net/core/gro.c:758
+>   Read of size 8 at addr ffff88802ef22c18 by task syz.0.17/6079
+>   CPU: 0 UID: 0 PID: 6079 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full)
+>   Call Trace:
+>    <TASK>
+>    dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+>    print_address_description mm/kasan/report.c:378 [inline]
+>    print_report+0xca/0x240 mm/kasan/report.c:482
+>    kasan_report+0x118/0x150 mm/kasan/report.c:595
+>    skb_reset_mac_header include/linux/skbuff.h:3150 [inline]
+>    napi_frags_skb net/core/gro.c:723 [inline]
+>    napi_gro_frags+0x6e/0x1030 net/core/gro.c:758
+>    tun_get_user+0x28cb/0x3e20 drivers/net/tun.c:1920
+>    tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1996
+>    new_sync_write fs/read_write.c:593 [inline]
+>    vfs_write+0x5c9/0xb30 fs/read_write.c:686
+>    ksys_write+0x145/0x250 fs/read_write.c:738
+>    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>    do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>    </TASK>
+> 
+>   Allocated by task 6079:
+>    kasan_save_stack mm/kasan/common.c:47 [inline]
+>    kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
+>    unpoison_slab_object mm/kasan/common.c:330 [inline]
+>    __kasan_mempool_unpoison_object+0xa0/0x170 mm/kasan/common.c:558
+>    kasan_mempool_unpoison_object include/linux/kasan.h:388 [inline]
+>    napi_skb_cache_get+0x37b/0x6d0 net/core/skbuff.c:295
+>    __alloc_skb+0x11e/0x2d0 net/core/skbuff.c:657
+>    napi_alloc_skb+0x84/0x7d0 net/core/skbuff.c:811
+>    napi_get_frags+0x69/0x140 net/core/gro.c:673
+>    tun_napi_alloc_frags drivers/net/tun.c:1404 [inline]
+>    tun_get_user+0x77c/0x3e20 drivers/net/tun.c:1784
+>    tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1996
+>    new_sync_write fs/read_write.c:593 [inline]
+>    vfs_write+0x5c9/0xb30 fs/read_write.c:686
+>    ksys_write+0x145/0x250 fs/read_write.c:738
+>    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>    do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+>   Freed by task 6079:
+>    kasan_save_stack mm/kasan/common.c:47 [inline]
+>    kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
+>    kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:576
+>    poison_slab_object mm/kasan/common.c:243 [inline]
+>    __kasan_slab_free+0x5b/0x80 mm/kasan/common.c:275
+>    kasan_slab_free include/linux/kasan.h:233 [inline]
+>    slab_free_hook mm/slub.c:2422 [inline]
+>    slab_free mm/slub.c:4695 [inline]
+>    kmem_cache_free+0x18f/0x400 mm/slub.c:4797
+>    skb_pp_cow_data+0xdd8/0x13e0 net/core/skbuff.c:969
+>    netif_skb_check_for_xdp net/core/dev.c:5390 [inline]
+>    netif_receive_generic_xdp net/core/dev.c:5431 [inline]
+>    do_xdp_generic+0x699/0x11a0 net/core/dev.c:5499
+>    tun_get_user+0x2523/0x3e20 drivers/net/tun.c:1872
+>    tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1996
+>    new_sync_write fs/read_write.c:593 [inline]
+>    vfs_write+0x5c9/0xb30 fs/read_write.c:686
+>    ksys_write+0x145/0x250 fs/read_write.c:738
+>    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>    do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> After commit e6d5dbdd20aa ("xdp: add multi-buff support for xdp running in
+> generic mode"), the original skb may be freed in skb_pp_cow_data() when
+> XDP program was attached, which was allocated in tun_napi_alloc_frags().
+> However, the napi->skb still point to the original skb, update it after
+> XDP process.
+> 
+> Reported-by: syzbot+64e24275ad95a915a313@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=64e24275ad95a915a313
+> Fixes: e6d5dbdd20aa ("xdp: add multi-buff support for xdp running in generic mode")
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
