@@ -1,113 +1,128 @@
-Return-Path: <netdev+bounces-224659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DB1FB879D5
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 03:35:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF298B87A2E
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 03:48:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A5AC7E340C
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 01:35:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A43981C2455C
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 01:48:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86E2215789;
-	Fri, 19 Sep 2025 01:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F112309B9;
+	Fri, 19 Sep 2025 01:48:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Ep1TzzB7"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="q5BYpI2e"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277CD34BA29
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 01:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAC47E0E8
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 01:48:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758245702; cv=none; b=cUWasaLh93vWfhHI11KArMoZLIRffdjQ5L4mSO5M1MWy92nUvcR2+egFNeZjEezw5OL1H5WJ6LZJms0312WzzMGEzkZrc+TW6PIwBMXm4IHdXnB5QLp9rvUYNs0+IyoGLmMbrh8EkC4N26iiGNOi8ZUXG/W+QNNEEV9Z5aWsIQ0=
+	t=1758246486; cv=none; b=pTUmpPM3wUMWFQ2rTBP4h049F1ErnKiF3D0677YxalInxXzYW2oa09K92prVgVNbHIekgC8wB6meH8IoSd4w36Iwow7iyF2Log5s+I1EWDxOo4RHwYPVTwuRJo2nqhnb+yVtLmauuSrpN7v6hF39gi+2K66JPQdtsXJy6soGoqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758245702; c=relaxed/simple;
-	bh=lJYEuAf6VDWdCErnVrRsVKPl4GfmP3hnp2qqY2A30ps=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GbhywEFZkUw6+j6PESTqRMZAPcwW3VibDrQbIbdxnO0KAPK7YYJZ4DQg7vMX4nyX0EAMz9Xr9ZaOwyU+hXYr9GtsLXWI9RRx5pd6wv7F/Ft9YTWCKPUmLhXrYZL5bAWwZdVwkWmOk5T6U7nDbDU63HGjXl7T1P4zd/h0r+i0GPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Ep1TzzB7; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1758245691; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=NsFGh+9mw+WdnZ/caHT4763xAMzma/QFNrbt/6FOTkk=;
-	b=Ep1TzzB7F3N843z5e40jcDkVKnw4QDdsGBe3PyjTOkHCO43JBT0GvHL1FgbYPYfa2EWEodAPoyr0JR1u3mBiYXQhpfX5Pw1Rvj2oX/MOY6mdQKN7Z6RhIGmloBsJbzYjrmRHKamLQWqzRijGg8nZpGnXpmwyL9p50kcxgRaMRMw=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WoHsaiy_1758245691 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 19 Sep 2025 09:34:51 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1758246486; c=relaxed/simple;
+	bh=ds22ARy3uyRqu7PZvmoQoXuSUNg0vdWhnMMRyOdNfzQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c0oTH08r0zAmxSXS92g/mKax1sIH/kkei2IRNiwBulJyXfG6uErNv+vnuXUMkdJExQ93XZsRu+YQTEWd1QjAiXo46kGEH14rT2GwehGLJHUdrN/a1IPIA2dmpP8/ezoJwMEMNSsYiZnny+115Cbemd5g3dJRmc1e/Hd28l8+iEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=q5BYpI2e; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=sqC1rj8snhkg/JVn891BD7odaY900ySqHfjbkr8siEw=; b=q5BYpI2eO4qivudttSrcwYIg2z
+	Zb3pKsAIhPTlvWe/lyRy7gjtf5erRlWkeVNp9iFs6nwrfuwmcsjDBJxsoNtUTlB3JMqc9WXdyEouN
+	7PhuYkYbreBosXAUMQIS7Lkea6BOm2l9Od3tPFlPjXgzUiX0MrRyCnr5aEA3DiZvxFHc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uzQEB-008tRU-Q7; Fri, 19 Sep 2025 03:47:59 +0200
+Date: Fri, 19 Sep 2025 03:47:59 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heng Qi <hengqi@linux.alibaba.com>,
-	virtualization@lists.linux.dev
-Subject: [PATCH net] virtio-net: fix incorrect flags recording in big mode
-Date: Fri, 19 Sep 2025 09:34:50 +0800
-Message-Id: <20250919013450.111424-1-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Subject: Re: [PATCH RFC net-next 03/20] net: phy: marvell: add PHY PTP support
+Message-ID: <5132d023-2308-490b-a867-07445ae4ddbe@lunn.ch>
+References: <aMxDh17knIDhJany@shell.armlinux.org.uk>
+ <E1uzIb5-00000006mzK-0aob@rmk-PC.armlinux.org.uk>
+ <299f61cc-b5a7-48a6-b16d-f1f5d639af85@lunn.ch>
+ <aMxsl4v-Aio6R20R@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: 7426b57cb775
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aMxsl4v-Aio6R20R@shell.armlinux.org.uk>
 
-The purpose of commit 703eec1b2422 ("virtio_net: fixing XDP for fully
-checksummed packets handling") is to record the flags in advance, as
-their value may be overwritten in the XDP case. However, the flags
-recorded under big mode are incorrect, because in big mode, the passed
-buf does not point to the rx buffer, but rather to the page of the
-submitted buffer. This commit fixes this issue.
+On Thu, Sep 18, 2025 at 09:33:27PM +0100, Russell King (Oracle) wrote:
+> On Thu, Sep 18, 2025 at 10:12:02PM +0200, Andrew Lunn wrote:
+> > > +static u64 marvell_phy_tai_clock_read(struct device *dev,
+> > > +				      struct ptp_system_timestamp *sts)
+> > > +{
+> > > +	struct phy_device *phydev = to_phy_device(dev);
+> > > +	int err, oldpage, lo, hi;
+> > > +
+> > > +	oldpage = phy_select_page(phydev, MARVELL_PAGE_PTP_GLOBAL);
+> > > +	if (oldpage >= 0) {
+> > > +		/* 88e151x says to write 0x8e0e */
+> > > +		ptp_read_system_prets(sts);
+> > > +		err = __phy_write(phydev, PTPG_READPLUS_COMMAND, 0x8e0e);
+> > > +		ptp_read_system_postts(sts);
+> > > +		lo = __phy_read(phydev, PTPG_READPLUS_DATA);
+> > > +		hi = __phy_read(phydev, PTPG_READPLUS_DATA);
+> > > +	}
+> > > +	err = phy_restore_page(phydev, oldpage, err);
+> > > +
+> > > +	if (err || lo < 0 || hi < 0)
+> > > +		return 0;
+> > > +
+> > > +	return lo | hi << 16;
+> > 
+> > What happens when hi is >= 0x8000? Doesn't that result in undefined
+> > behaviour for 32 bit machines? The u64 result we are trying to return
+> > is big enough to hold the value. Does the hi need promoting to u64
+> > before doing the shift?
+> 
+> Good point - looking at the generated code, it gets sign-extended
+> to a 64 bit value. So, hi=0x8000 results in 0xffffffff8000XXXX
+> being returned.
+> 
+> Does it matter? There are two functions that call the cyclecounter
+> ->read() method. timecounter_init() sets ->cycle_last from the
+> value, and timecounter_read_delta() does this:
+> 
+> 	cycle_delta = (cycle_now - tc->cycle_last) & tc->cc->mask;
+> 
+> before updating ->cycle_last with the returned value. As the
+> mask is initialised thusly:
+> 
+> 	tai->cyclecounter.mask = CYCLECOUNTER_MASK(32);
+> 
+> this masks off the sign-extended high 32-bits, giving us back
+> a value of 0x8000XXXX.
+> 
+> So, while the sign extension is undesirable, it has no effect on
+> the operation. Is it worth throwing casts in the code? I suspect
+> that's a matter of personal opinion.
 
-For the small mode, the commit c11a49d58ad2 ("virtio_net: Fix mismatched
-buf address when unmapping for small packets") fixed it.
+I doubt the static analysers can do such a detailed analysis. So at
+some point we are going to get patches adding a cast. You could maybe
+change hi to a signed 64. That would avoid adding a cast, while still
+being O.K. to hold a negative error code from __phy_read().
 
-Fixes: 703eec1b2422 ("virtio_net: fixing XDP for fully checksummed packets handling")
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
- drivers/net/virtio_net.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 975bdc5dab84..6e6e74390955 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -2630,13 +2630,19 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
- 	 */
- 	flags = ((struct virtio_net_common_hdr *)buf)->hdr.flags;
- 
--	if (vi->mergeable_rx_bufs)
-+	if (vi->mergeable_rx_bufs) {
- 		skb = receive_mergeable(dev, vi, rq, buf, ctx, len, xdp_xmit,
- 					stats);
--	else if (vi->big_packets)
-+	} else if (vi->big_packets) {
-+		void *p;
-+
-+		p = page_address((struct page *)buf);
-+		flags = ((struct virtio_net_common_hdr *)p)->hdr.flags;
-+
- 		skb = receive_big(dev, vi, rq, buf, len, stats);
--	else
-+	} else {
- 		skb = receive_small(dev, vi, rq, buf, ctx, len, xdp_xmit, stats);
-+	}
- 
- 	if (unlikely(!skb))
- 		return;
--- 
-2.32.0.3.g01195cf9f
-
+	Andrew
 
