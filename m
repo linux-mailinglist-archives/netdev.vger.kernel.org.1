@@ -1,166 +1,113 @@
-Return-Path: <netdev+bounces-224658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6E4AB8794A
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 03:18:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DB1FB879D5
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 03:35:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6949D7C615F
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 01:18:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A5AC7E340C
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 01:35:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3241DB92A;
-	Fri, 19 Sep 2025 01:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86E2215789;
+	Fri, 19 Sep 2025 01:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Ep1TzzB7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7E9635;
-	Fri, 19 Sep 2025 01:18:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277CD34BA29
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 01:34:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758244691; cv=none; b=sEc6qpHza6Su8J/shrRwI7iJfWy3go7lK+G7H4u2bNuTv5LUVjm+jMYpeUaWCt0U/WSRkHlml/ZB/Yk4IymnlxLCX0NoXfYmyZqtqsZYFB8CHNvySvt6Nhp3vzi9y3dGGt7QGRhyNldWvS+i9YkZq5YSnLlJIQan9Xx3nyeX8GQ=
+	t=1758245702; cv=none; b=cUWasaLh93vWfhHI11KArMoZLIRffdjQ5L4mSO5M1MWy92nUvcR2+egFNeZjEezw5OL1H5WJ6LZJms0312WzzMGEzkZrc+TW6PIwBMXm4IHdXnB5QLp9rvUYNs0+IyoGLmMbrh8EkC4N26iiGNOi8ZUXG/W+QNNEEV9Z5aWsIQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758244691; c=relaxed/simple;
-	bh=KfIMDG1uhk7mdManaKAb7Xl0e41w4jmdmNJOvYjMtmk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vhff6p4+0A1JgOm7jVvlRjvtjHUrmDid/5u1PBNQX4KU0wdd9t626LuWEeZEkr1p7cOuvEWC+iBN5P2anxlxEJZqE7YHG/yUVdYxaf9oM2uSV7Ex+ZDLhu5vWQeS4D14OXM+bMNIE8jKkIG97Gqc66xCD5z214ZV2XKhcrg4bmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.169.211.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpgz14t1758244656t34bd8618
-X-QQ-Originating-IP: 98o6iFAarl7VbsuD0/5ogEYv6yQqe2Fnbu8FQliCn4s=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 19 Sep 2025 09:17:33 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 11517621768531048136
-Date: Fri, 19 Sep 2025 09:17:33 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
-	gustavoars@kernel.org, rdunlap@infradead.org, joerg@jo-so.de,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v12 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <3E609187B0C91716+20250919011733.GA174153@nic-Precision-5820-Tower>
-References: <20250916112952.26032-1-dong100@mucse.com>
- <20250916112952.26032-5-dong100@mucse.com>
- <3058c061-3a17-4077-8d4e-c91ad72b3831@linux.dev>
- <D7EC5E8B6F6E685E+20250917110540.GA91482@nic-Precision-5820-Tower>
- <fb8f876a-c2e5-49b0-bc64-bdf18ecd1ce4@linux.dev>
+	s=arc-20240116; t=1758245702; c=relaxed/simple;
+	bh=lJYEuAf6VDWdCErnVrRsVKPl4GfmP3hnp2qqY2A30ps=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GbhywEFZkUw6+j6PESTqRMZAPcwW3VibDrQbIbdxnO0KAPK7YYJZ4DQg7vMX4nyX0EAMz9Xr9ZaOwyU+hXYr9GtsLXWI9RRx5pd6wv7F/Ft9YTWCKPUmLhXrYZL5bAWwZdVwkWmOk5T6U7nDbDU63HGjXl7T1P4zd/h0r+i0GPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Ep1TzzB7; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1758245691; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=NsFGh+9mw+WdnZ/caHT4763xAMzma/QFNrbt/6FOTkk=;
+	b=Ep1TzzB7F3N843z5e40jcDkVKnw4QDdsGBe3PyjTOkHCO43JBT0GvHL1FgbYPYfa2EWEodAPoyr0JR1u3mBiYXQhpfX5Pw1Rvj2oX/MOY6mdQKN7Z6RhIGmloBsJbzYjrmRHKamLQWqzRijGg8nZpGnXpmwyL9p50kcxgRaMRMw=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WoHsaiy_1758245691 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 19 Sep 2025 09:34:51 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Heng Qi <hengqi@linux.alibaba.com>,
+	virtualization@lists.linux.dev
+Subject: [PATCH net] virtio-net: fix incorrect flags recording in big mode
+Date: Fri, 19 Sep 2025 09:34:50 +0800
+Message-Id: <20250919013450.111424-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fb8f876a-c2e5-49b0-bc64-bdf18ecd1ce4@linux.dev>
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: OF6/1i2Al/nJzNgnnrzdpHialpMuzFFg1E0Mt0PxzLZcwzoBP3UhvWtC
-	aDGBwL72GcWN1OtQkNmsua+D6kYeO1g4ZXxaR5ZFniJVSGjOCR7/HQnfqZeDQH4VcLzBGx8
-	eWMv6HkK2hox7eBurez0ZkBlhtIWNSmORd1gblgjkGGMMsEhrqtgTTL/Wt751ZkgvN+mGf4
-	StKhZ9fNs//IwuzCnk3H8Nf3AmZGOrxD0zplZ6Nlc5WCUASXSEHPxm+ohKyoqiwr+PN0rnG
-	J0KdTdWdJ2E7yQ42KK05uW0OsbamrnJapigbJ6lcSpNHY3FbqxdsakmDgq58kC/WeN0Lrwj
-	zTshZpbZRe8/E04zBkJVW5j8kYDiSaNERUVDXJfHxMi//Pn/ivBdUZKlJD9kOOV548E/9Td
-	1V+xlCiq+uZsfIM4iejRPbDmuQ1x9ABCkGPefz9uGXN4KNJqZ9rfKXgiBDNzU0zSf6jiRTk
-	sRIL7x9rr6TKa+lzPHnb47LQ+SaN1E8zjdhsQo7BJDsLmPWkfhMw+f3WEIEoRop6kbW+9Hp
-	thzZFKy0BM7UIiR9irk6vnwKlUrnwwjqBIosVPEtG0HXpMqKMV/0Vwl7D9FfGsbwa2zkYkO
-	IZkjEWmvyMhujj1cshNFub7wgXnQl0vLwkrXuQYYHX2qm3+3dG7gcRu6szUbzJzmxJ9cuOC
-	ajp/8nG3PIblhYIpSvxHN9y2lsnxdnbkLPNRuNdY0rxrxM++Fyl8r9lCxQdWmUdcqvd91NY
-	KW/Aay6ML60I5nzRylq7y6qH0wML9MlR/FuYcObG2EIaMS9IOnjJJe9T4KzGnObDhlB9TsU
-	kdlJ1bIttAnNQdDAJNY2KWnTaZ/kMtWxNlNZ51sBznN77km/R+B2Au6MrBQh8JsNXd6ZdVI
-	yXdj8QbwwbAazLkkdIBZEm2O9wmO28l8TDNGL80Odnt0U2eCbbNrVrkXWvGcKM3v80A+FUF
-	tR0E2Rhgc7y8nmtzT07vteSgST3WYGwM7iCszN54Mq70Y9/+v61/nwVvt
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-X-QQ-RECHKSPAM: 0
+X-Git-Hash: 7426b57cb775
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 17, 2025 at 03:02:13PM +0100, Vadim Fedorenko wrote:
-> On 17/09/2025 12:05, Yibo Dong wrote:
-> > On Wed, Sep 17, 2025 at 11:45:31AM +0100, Vadim Fedorenko wrote:
-> > > On 16/09/2025 12:29, Dong Yibo wrote:
-> > > > Add fundamental firmware (FW) communication operations via PF-FW
-> > > > mailbox, including:
-> > > > - FW sync (via HW info query with retries)
-> > > > - HW reset (post FW command to reset hardware)
-> > > > - MAC address retrieval (request FW for port-specific MAC)
-> > > > - Power management (powerup/powerdown notification to FW)
-> > > > 
-> > > > Signed-off-by: Dong Yibo <dong100@mucse.com>
-> > > 
-> > > Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> > > 
-> > > small nits below
-> > > 
-> > > 
-> > > > +static void build_get_hw_info_req(struct mbx_fw_cmd_req *req)
-> > > > +{
-> > > > +	req->flags = 0;
-> > > > +	req->opcode = cpu_to_le16(GET_HW_INFO);
-> > > > +	req->datalen = cpu_to_le16(MUCSE_MBX_REQ_HDR_LEN);
-> > > > +	req->reply_lo = 0;
-> > > > +	req->reply_hi = 0;
-> > > > +}
-> > > 
-> > > All these build*() functions re-init flags and reply to 0, but all
-> > > mbx_fw_cmd_req are zero-inited on the stack. Might be better clean
-> > > things assignments, but no strong opinion because the code is explicit
-> > > 
-> > > If you will think of refactoring this part, it might be a good idea to
-> > > avoid build*() functions at all and do proper initialization of
-> > > mbx_fw_cmd_req in callers?
-> > > 
-> > > > +
-> > > > +/**
-> > > > + * mucse_mbx_get_info - Get hw info from fw
-> > > > + * @hw: pointer to the HW structure
-> > > > + *
-> > > > + * mucse_mbx_get_info tries to get hw info from hw.
-> > > > + *
-> > > > + * Return: 0 on success, negative errno on failure
-> > > > + **/
-> > > > +static int mucse_mbx_get_info(struct mucse_hw *hw)
-> > > > +{
-> > > > +	struct mbx_fw_cmd_reply reply = {};
-> > > > +	struct mbx_fw_cmd_req req = {};
-> > > 
-> > > something like:
-> > > 
-> > > struct mbx_fw_cmd_req req =
-> > > 	{
-> > > 	  .opcode = cpu_to_le16(GET_HW_INFO),
-> > > 	  .datalen = cpu_to_le16(MUCSE_MBX_REQ_HDR_LEN),
-> > > 	}
-> > > 
-> > > 
-> > > 
-> > 
-> > That's a good idea! That makes the code more compact.
-> > I think I should update this as your suggestion.
-> > 
-> > Regarding adding your "Reviewed-by" tag in the next version:
-> > Would it be acceptable to include it when I submit the updated patch (with
-> > the initialization logic adjusted), or should I wait for your further
-> > review of the modified code first?
-> 
-> If you will submit another version with this refactoring, I'll better do
-> another review.
-> 
+The purpose of commit 703eec1b2422 ("virtio_net: fixing XDP for fully
+checksummed packets handling") is to record the flags in advance, as
+their value may be overwritten in the XDP case. However, the flags
+recorded under big mode are incorrect, because in big mode, the passed
+buf does not point to the rx buffer, but rather to the page of the
+submitted buffer. This commit fixes this issue.
 
-I see, I will submit another version later, with this refactoring.
-Looking forward to your next review.
+For the small mode, the commit c11a49d58ad2 ("virtio_net: Fix mismatched
+buf address when unmapping for small packets") fixed it.
 
-Thanks for your feedback.
+Fixes: 703eec1b2422 ("virtio_net: fixing XDP for fully checksummed packets handling")
+Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+---
+ drivers/net/virtio_net.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 975bdc5dab84..6e6e74390955 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -2630,13 +2630,19 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
+ 	 */
+ 	flags = ((struct virtio_net_common_hdr *)buf)->hdr.flags;
+ 
+-	if (vi->mergeable_rx_bufs)
++	if (vi->mergeable_rx_bufs) {
+ 		skb = receive_mergeable(dev, vi, rq, buf, ctx, len, xdp_xmit,
+ 					stats);
+-	else if (vi->big_packets)
++	} else if (vi->big_packets) {
++		void *p;
++
++		p = page_address((struct page *)buf);
++		flags = ((struct virtio_net_common_hdr *)p)->hdr.flags;
++
+ 		skb = receive_big(dev, vi, rq, buf, len, stats);
+-	else
++	} else {
+ 		skb = receive_small(dev, vi, rq, buf, ctx, len, xdp_xmit, stats);
++	}
+ 
+ 	if (unlikely(!skb))
+ 		return;
+-- 
+2.32.0.3.g01195cf9f
 
 
