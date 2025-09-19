@@ -1,453 +1,276 @@
-Return-Path: <netdev+bounces-224678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1A47B8807C
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 08:48:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0145AB8821B
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 09:17:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDA2B7BD094
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 06:46:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B377E520195
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 07:17:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7E12C08BA;
-	Fri, 19 Sep 2025 06:47:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F25825522B;
+	Fri, 19 Sep 2025 07:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YdWCIcTQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IVVtWp0a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1B5274FEF
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 06:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758264467; cv=none; b=t9JShgqG87kd6zwTDQYhNWajnXwPPAmjrykVBDWqTmyIR2nHDnWo2XvqR0fteQgN9MqpsvUwVAWFukppV0iDiioC44yMTrPF1ozkEhaltTQa61BR2+oyrcoucN9jf7MLdHHfm+D4er7RwVZXnPsb86lxeZKQ+HrVlsDlQ2qyka4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758264467; c=relaxed/simple;
-	bh=8Yog+/Ps8miaSyy+L2Uqg/H6UWiu0bz43haxSkmUmKc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iodGDD3byPgkyVNcYgBtsujfNEExEZ42A2ipBb8RWnOPAWXWzj8i02V4J4qFZgPTwej2KIPPseskpgVCwDmztMOs0SeRjY4M559zPdS/zrR8RvYAdaDJ1XDBwJmdSfHnMicTqwvnNSrmW4OH2tAfH6/3mdlI5SxYJGogXnIg2sQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YdWCIcTQ; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-32dc4faa0d7so1339698a91.1
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 23:47:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758264465; x=1758869265; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Rk0FtUPyMZMHcSPcxo141iI4er0nDZ3cTT6KvZSd5I=;
-        b=YdWCIcTQVZmTerH1zBztN8smpu7S2qfv0wXtfVeOIoh0fHw+H9EWqi3aScFKMJNc64
-         dP8cwUIfAkeiT9/AoKgLyXwfHU6k1lnGESFGKhlmDAnbNsjTrTJwLc8QFLt/TcAiUSdS
-         3U/75yXYQl3EvDSiJURYPNH747D68YOasEvDKdmeNFYR6NRNrgY4Ac0iTvAgCGq9JbZD
-         fBnx48fKckeJezzW+8LLvCX4lQ+C8ysfuyWdwr1QmW+kOBFrD0kVfii4NKmeuOxBFcTh
-         XXGGaQpu7TnOmVpBtc1avrO+t8vNFZksU0+/obn4aXxAYfjCbBoxx4YoOE0YSfZDAvSt
-         1MtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758264465; x=1758869265;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4Rk0FtUPyMZMHcSPcxo141iI4er0nDZ3cTT6KvZSd5I=;
-        b=bVgSMRvrKbhu0dA38tfmhF2PzafkupGp84CHJzBCBHS7y8rthsTTvijDwczYP+h2L3
-         FRLDp0F7zEoDK+quNCLDpDoUX9WIK22lebjYl+cznTcc7toKVwwWIL5DveSV9mu3hCTZ
-         5Vw39xuqTLv1ZqXW9P/BSEqAa3hUi2kvAhetQ5pUsByZTuQ/ivyUMXuEboPVnWr22HOi
-         8zAdywKFuvQXzL0QzwmeoXlKn7TZ8FZf+fYdYDB/bBRzPgljBqlVa5A4WlMaGB4uGFO9
-         3KyXNW4i/wPnlLvFn0nV6wlId6twb+vSEmt4gt6uAa9v/9ywyVFZyPZQzAq73p8EY6JD
-         6D1g==
-X-Gm-Message-State: AOJu0YypQcOBsdAPfGBRyMMbOf4Mb4ReO2izL7kf+rlgDdkv1heeu3ib
-	TSw/hny5W9LJtZRJcj8BL5FVO21WDn3vDmqUOV3BbttjdiaNeNz7eHCt
-X-Gm-Gg: ASbGncvs7wvZprZ5wDKC9LQEPFi0NP3p1ccALfnTjssWKnYE53ODsteWvbrx1Nwv5l7
-	qwchqS6c38xTPOVmfgpJ9mZUp6lJAhWbah/Ikibi6ZCTDhMBNzU2FyHVCmttwWydOw3qf4ci4FJ
-	owrO7LHgY4HHa/CxrK76d/c+dtyK88+IkqtXRXvClRAyp+mGWuCFWrxIMu5ONMrHRo513gO6cyX
-	DFrvZieiPpuOHOALx3pg+EN9qDjHmUDekFANzLHmC1TsFP0x0HSvIqaxRmoK4ODQ/P/4m4Tm1Ez
-	xSYi3ZmIkpXnCYtqfYbJUC28CjuFvERNnWqF1FS07bqIuB0vy4etU6D7qmoK2HAOp7rcy2WYl6b
-	OjtGz8TEAbIAUsI28FfhU+yCkRzTBdWsox7EHfHF+mQ==
-X-Google-Smtp-Source: AGHT+IEONXPXwTXLW4O6vfjecoXO93QrdqpGDn7u7EgAlcvrMMqPuD7PsnMYQ+XMLiCSv0GoFy74nQ==
-X-Received: by 2002:a17:90b:1d49:b0:32e:7c34:70cf with SMTP id 98e67ed59e1d1-330983886cdmr2544602a91.36.1758264464763;
-        Thu, 18 Sep 2025 23:47:44 -0700 (PDT)
-Received: from cortexauth ([2401:4900:4bb1:905c:8563:7696:c957:69ac])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b551380444asm2182695a12.27.2025.09.18.23.47.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Sep 2025 23:47:44 -0700 (PDT)
-From: Deepak Sharma <deepak.sharma.472935@gmail.com>
-To: krzk@kernel.org,
-	vadim.fedorenko@linux.dev
-Cc: netdev@vger.kernel.org,
-	stable@vger.kernel.org,
-	linux-kernel-mentees@lists.linux.dev,
-	Deepak Sharma <deepak.sharma.472935@gmail.com>,
-	syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-Subject: [PATCH net v3] net: nfc: nci: Add parameter validation for packet data
-Date: Fri, 19 Sep 2025 12:15:44 +0530
-Message-ID: <20250919064545.4252-1-deepak.sharma.472935@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3D31862A;
+	Fri, 19 Sep 2025 07:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758266255; cv=fail; b=JB0DFvogyBPGg6a8kZgFHaNdqvM/2I8iQpQMZn6wpz+Bbj2ko2+h4B8eEX9mGbXK1aEIBzB+vaQbgmLaZf+vxA9Zty+MWd7jXZh9gzoMKn11RlQNXd0J3AJH56MtBlUVQpryMYgOTjN0Sy1lsNrnLI1+VDCkkk1+Uj7xd7/uyCo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758266255; c=relaxed/simple;
+	bh=aZiOV2PbIgYEmqLEemtiAswqvcqwylEuyaFqhrRtHV4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=S/EL264bHCbhcmpI2BNIjK1Vb4apUG54a2imjjSrQDpdhem8B06KO/K853VQh9j8Sfz2XhKFpVRoJt20rL6UJXe8bjq7PFJHjcKjFkxcNGHgqZyvlZjggaHKq/RTI8mFJexRUcd5ezsGvlVtB/YNVoXGdAmwUPnUxfToFRIkzvc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IVVtWp0a; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758266253; x=1789802253;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=aZiOV2PbIgYEmqLEemtiAswqvcqwylEuyaFqhrRtHV4=;
+  b=IVVtWp0aCUNkhzd7SAW/CMZ1Wau0q0sMdwdHjkSFzv7rbR2SReP8zRY/
+   QpWrlzton+7cGWbj7H2D+B4LyZwBj9FPC0piznicHs5HVjXTlWfXDmSTF
+   stwgJCEtnuJFXB7+CTgCWt9q9lmlOdu2KOVwmZCcpzKqRzj7eVc5fwPax
+   JmRlS0EnmWy9Ho8cdepB4bjJauQuOvN4IRFg+sHNRm6HOq9Mam/jWbNOs
+   j2GV3pw6JcSJQdZXntWrC+/HaKL60/7maVhl2BDCEEEZ/sv7QxR21ptYh
+   tukP4v7shl1Tsao1jC2VwEPQQNIXsNZwqWPU6OIK29B8l8s1HHU+0SB4s
+   Q==;
+X-CSE-ConnectionGUID: +vVj7RlGQUKOTW3EgokVUg==
+X-CSE-MsgGUID: 3UfZug/YSSesos/gXP7IPw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11557"; a="48185426"
+X-IronPort-AV: E=Sophos;i="6.18,277,1751266800"; 
+   d="scan'208";a="48185426"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 00:17:32 -0700
+X-CSE-ConnectionGUID: iqSMUEtnRo6mMvF301yGqQ==
+X-CSE-MsgGUID: I0maeyiqQ/GBvnO6y2mn3w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,277,1751266800"; 
+   d="scan'208";a="212919069"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 00:17:32 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Fri, 19 Sep 2025 00:17:31 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Fri, 19 Sep 2025 00:17:31 -0700
+Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.5) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Fri, 19 Sep 2025 00:17:30 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qCtvm1vWopVMPqOxXJNFoPn5A42E5bzZEKqrkV7y7FUg5PfMkZ1uV9lTTUHfMShxMKySbJJYPFiKUXE3KcEYdOb0GUKrZ6xp53/sakxqEyuKLpz2U9z4CBoMkk9nndhnOl3I6p+7mMg3LTaOUnfHQx22/bNPXpCxIusrzTHU/TmJPQw6x+FkAwmivnZgwNixXxBvEg6qgF7YZk59NcKd8K0+c+6CUXb+IVplmzM+G8QbE3HA+Dsjbp4FRTO/Q7q6hiCK7JxDFOWBNaBO3bwfsR2js6uQx23XNeTby4BVi70FrXI848QDlm3uBf1u9VmM6cdcw4gsdz44wc3loWA5wg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aZiOV2PbIgYEmqLEemtiAswqvcqwylEuyaFqhrRtHV4=;
+ b=MBxqm+EgK7ssmo+Lliq7BCLdtPsY09RtqqJ3ezBKrE1xR21KTpi2TzChI/eXBfjrRH/4eSmFzhD01xqDiSIQHp2oAA6raY7VBxdVDAfR5MCUr5FHTmbfzfIm4nxuC42cmrjkK80OQxZtafgtt6yKlEycrfLdYYWm3uLOcwNu0In0qPZE2w4pXmFfZm//fi+tZ5fRyCyjljqaJOwkoOJ2XypQv/Ai+L0++0e/33Au2/1UmwxcKj5tkaioNfFp4IdaLXXAyIqpt0oS2Dl9fe7+fSEe9Ixm86Psr7qlboiVYfka9CmK2hvxfP5E8A9N6DR5E8VUeHA6uM528XI+mBz8gQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ5PPF4422C5374.namprd11.prod.outlook.com
+ (2603:10b6:a0f:fc02::824) by DM4PR11MB6527.namprd11.prod.outlook.com
+ (2603:10b6:8:8e::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.14; Fri, 19 Sep
+ 2025 07:17:28 +0000
+Received: from SJ5PPF4422C5374.namprd11.prod.outlook.com
+ ([fe80::8eb9:c184:2364:c523]) by SJ5PPF4422C5374.namprd11.prod.outlook.com
+ ([fe80::8eb9:c184:2364:c523%8]) with mapi id 15.20.9137.012; Fri, 19 Sep 2025
+ 07:17:28 +0000
+From: "Choong, Chwee Lin" <chwee.lin.choong@intel.com>
+To: "Keller, Jacob E" <jacob.e.keller@intel.com>, Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S
+ . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
+	<richardcochran@gmail.com>, "Gomes, Vinicius" <vinicius.gomes@intel.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Shalev, Avi"
+	<avi.shalev@intel.com>, "Song, Yoong Siang" <yoong.siang.song@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net v1] igc: fix race condition in
+ TX timestamp read for register 0
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v1] igc: fix race condition in
+ TX timestamp read for register 0
+Thread-Index: AQHcKN2AX7talWX280OAOmYpHztuYLSZgF+AgACKy6A=
+Date: Fri, 19 Sep 2025 07:17:28 +0000
+Message-ID: <SJ5PPF4422C53747941CD81779E97F26C34DA11A@SJ5PPF4422C5374.namprd11.prod.outlook.com>
+References: <20250918183811.31270-1-chwee.lin.choong@intel.com>
+ <0fc877a5-4b35-4802-9cda-e4eca561c5d1@linux.dev>
+ <d30d7a43-ca17-445e-b7ae-641be2fcc165@intel.com>
+In-Reply-To: <d30d7a43-ca17-445e-b7ae-641be2fcc165@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ5PPF4422C5374:EE_|DM4PR11MB6527:EE_
+x-ms-office365-filtering-correlation-id: e5bdbb50-6e7f-4335-be97-08ddf74c9758
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|921020|38070700021;
+x-microsoft-antispam-message-info: =?utf-8?B?QkJ3Zm5oY0Q3STRXN1N2V1lNMFcyNWdXZUVIeVVnVldremNFdjRyYlA3dTJ6?=
+ =?utf-8?B?WktUMmZNeTZHOWhiYU1GTzkxeG4zbzhydVF1cms1S0hXNTc3SWVUUzk2TGg4?=
+ =?utf-8?B?NVhXT3FsdnRONld1UXFIOFBUTWEyNWJKY3k1aGllcEk5OURocG1YQ1BTbVBG?=
+ =?utf-8?B?cUYvSlBhZ0VTSTBHV2F2cHA2NW9xOUFodGJHVnc3V3JTcGNXd0t3TE92YmxO?=
+ =?utf-8?B?MVNBcjZLQTNOL01WYUU5TUQxYlU1Umg2cFM2MFVGYTMzOGxMZ01Yak9yM05q?=
+ =?utf-8?B?bTUrZWpDQ3RqTUVLakRnQ0FoYmEvQTEwVyt5NlJNeFBLdzlUUFRiSDl4T0ts?=
+ =?utf-8?B?Sm5NNjR0YTlUaDFZbkRqMzU0S3VkTitCc3BEcEM0ZFkwQTRBR1I0dVIwa0s2?=
+ =?utf-8?B?bUViazF3Z2kybnNEZmFjODdvSWZKeDJmYWprV1R3dGRYVDRia2ZYb3JFMjEr?=
+ =?utf-8?B?bjg5Q3UyQmRKZjY2NlMvbHNhMGM2M0c2ZW85QlRmS3NwVTZua1RRcFlRQ0Fw?=
+ =?utf-8?B?V0dQWEphQmtJcC9kTlN6WU51VzQ1VnhHOGdvaTZDd09JQVJPa3hTeFIrbDky?=
+ =?utf-8?B?c25GYmFMMkpPV3ZhSXZJdGxqNUkzS3NjSmZ6M0dZUmhzQjJRQis2cU9lVzNu?=
+ =?utf-8?B?VnRkKzBETWtQN0g1Vjlsc0NzejBtS2RxNmJLNURnZlE3NjY4RW1KcFMzVU1R?=
+ =?utf-8?B?OFBXQ1BvN010T3h3Z3IwNFVydnI3blVXa2dGQ3d0Z0Vyd3NZRXp3Z0xuZTBQ?=
+ =?utf-8?B?Um5mUXhQU3p2RHdTSDMvOEhFK3Y2bFR0NzBVcldXM0lhTzc4Q2NsYnJiOE5r?=
+ =?utf-8?B?cEt0NzBjc0s4YThHVjZ6ajhraHlGaFVER0tzanloMXo3QzRiL21CWmIxS1hR?=
+ =?utf-8?B?emZsbUNXVmYvZjM3YlFZekdLNXlPakg0Q2VNNUowV2haQTViZkk1bnpMY1FF?=
+ =?utf-8?B?WmUzYUNWRTdrT3d0Z0F2VTJOajNvSllMb09KblZTS3UvQXBFMFovSFMxWUtT?=
+ =?utf-8?B?NTZsaHBFVVJ5VllmZVloaWZZYnRRTmJlNTJQd01nN2JoaHhnWDJuTE9jaXAr?=
+ =?utf-8?B?VnBvb0ErdlNUVXdSSEVoSGxtZjZSUFVoYWQrN09GdmNFNlAzVkdyVGVJSUxS?=
+ =?utf-8?B?alNPMGJ5R0ZZT3B2Z1RYWG5YNWR0UGxRbnJncHdWTU4xdGMzSmdqODUvc1dL?=
+ =?utf-8?B?Y09ualI1UjE5dGhkOFJRc1d0M0w0eFN2SWNoV2FNc3EvMmhvSDJ0QThuZXYw?=
+ =?utf-8?B?bHMwUHpaUXY3eUs4S0dIWUdndXY5WlhvU3ZsZllaWCsvK25mVC9lTytDeVRr?=
+ =?utf-8?B?eEdpZjNCNVNkaDRnUkRWRzk0RktGanhqVHloc0M2M29qQUpDaGtKWTIyWUJ2?=
+ =?utf-8?B?c09VQit2Z2tOOUNJa2ZvN0FXblVYSS9iMlpPbHUxckNtZjN3K2hrMDBHMFdy?=
+ =?utf-8?B?UFNhdk5MdTdjQ2oxbUtVaDlWQVd2VnhBTFpRcHRoZjlpMXJMdmVoR2dISGpv?=
+ =?utf-8?B?UCtGWm5zd1c4Mkk4YVJtQnFNUzF5WEl0cnBzWmRvdnNYcDRpVzcydWdZUUV6?=
+ =?utf-8?B?R1pKaWJFb0hpSk53N3JrN3BZRTFaZ0hXTVVBYW0xYUt1UjBjUUE2azBoMlVz?=
+ =?utf-8?B?VGJYMUZQUGlHc3lZMDZ2eUIwNjdUQ2ZLT3VqL2VXZkI3emdQYmtUMk9KWFlr?=
+ =?utf-8?B?Q3ZqM0dJUGMxaVFnR2w5Y1Jnc3ZlUk1vNm9SVGVKYlUyTi9RN3pWT0ZMd2JW?=
+ =?utf-8?B?MFduZWV3Q24xeEJPYXVObEFVdDlMamtncDg0eUFRU0hkTTc1ajBOTncyR0Vw?=
+ =?utf-8?B?WGpCQkxqWUhaam9hQ3Z0ZGhOOUxadWJRUkR6d3VKS2czUjZWN1NwTlVKQ3NL?=
+ =?utf-8?B?Q3E0RkZRdzJUQ09ab0U2RlFRcDVuaWNKY0VBNUxyTllqdXZXZ0FjeGF3YXBk?=
+ =?utf-8?B?WC9FZnREaVRiVjNRQjZxc21GVlJiczM4ZU1pelZxaXE0R215QThKUFAxVm41?=
+ =?utf-8?Q?rALTRn33zDgjdMl0jIKMMaiXg0GpbY=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ5PPF4422C5374.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(921020)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NUVUVUJVUkRFcUFqY0QwbDAweWVPb1k2Q2lDTGw3SUt6alhFdk1GWnJYc241?=
+ =?utf-8?B?Sm1GRW01TTNrbXdJUjYzZ0FOQTVZYnZjQzQ3Y3JhKzkrRFFlYlptckZvbDdY?=
+ =?utf-8?B?cHRwS2wrL2RNUkZwTGoxUWgrNHlXeXlBQ0hvdzdTczU2VnR4VXE3aVlPNUVp?=
+ =?utf-8?B?U3M4enc5Nm0wcDdacldhc0g1cjBWbm05V0kwUUhKNlZRN2dvREpNcXAvUnRl?=
+ =?utf-8?B?dHRDNDB0SXZBZXpYLzZvTDlnUEhaR24yTHMzMDFPYStvay9nVWdoYURBbWVw?=
+ =?utf-8?B?TTBzMXVEakNEVVhGUGZxS2h6OFIzRGlMZXRJOHBmVGh2Nm00ckJRNVBHdGpo?=
+ =?utf-8?B?VklCYnlYL3E0WW5Xb0NQNnQ0MEVVdjRDM1JacXo1S2xkU3RTei9EV0RJK2pr?=
+ =?utf-8?B?Wmh5Y2YyVS8vUXM3bVVFd1o1emc5c0JlQjdwRC9BVlVmMk4zMDVpU1J4SlJo?=
+ =?utf-8?B?MHVsR3gxZG90NEVMMlRqMktaU0lOM05nZFFLQ1lvdStSZzRrRldlS3l4R1hz?=
+ =?utf-8?B?bG1LYTMwRDlmRUNtMXhqcmhCWW9SYzJFcE9YTUpQVGNSOEN0NWllNEhoVU82?=
+ =?utf-8?B?c2pHVWZTMEYyZm5hSnRTT1RVTWV3SmpBVmtockR1czRCeHh3RTJHVEtIRUhN?=
+ =?utf-8?B?RWRPMUhmZUhqOGxJNU1vYkJlbWtWVVZWRlB5WmZwN1ByZmVINGRJVEpDcDNP?=
+ =?utf-8?B?cFBnd1AyZHBscHMyMWhIdWUzYTkweE9mSnR3ZEpWUGFzc1A5SjBQbGdSK0FY?=
+ =?utf-8?B?U3BjSlRlbG8ralVXL2NpaUNtU1Z0K0ZLWG1mOGp3REdxVVBWVzRyRHRJYVVr?=
+ =?utf-8?B?YURCbDNFQTkyTzNxN0dKalJ2b1VYazQ0QzczdmhBSndRa0ZtelpqaXppTkty?=
+ =?utf-8?B?VmRwenpldXllNStwZGwrUmRQdGUwaCt0TjNnRVE4cVNWVDhwbDd2blZxVWhi?=
+ =?utf-8?B?NWxWdzBIZ2o2b0Z4eW5YSTJsdUpUOTNxNGFrL2lyNmN2QVRIY3h0TktHUm1z?=
+ =?utf-8?B?WW8wV2FURWk2L2llanpER3AvWlNEMW5IcGtwMlVySmZVRThjMy9sV291MGNC?=
+ =?utf-8?B?TzJIMnhBaVZPNU91SStzRks2TWFvUTVGQ2RnZm8vbGpWTnVkWTJjK1pkN1RM?=
+ =?utf-8?B?bDQ5b1pTbldWaGVhSnNualorTVF5ZzhMNGRtZ1VFY3RjTkhpbE1SaEx2Y1E0?=
+ =?utf-8?B?LzZ1M0lHclNJclBoQVd1bWV4ZVQwVFpLcXFnQWRZRFhpTkZZbGM2WkZaZ04y?=
+ =?utf-8?B?UjZ1ZzU5aUphWHNSaG8rMFJKdnRvSzhITUZiUUJIRDYzemxza0tvTUk2STZ4?=
+ =?utf-8?B?aW1qWXRpamFMRzVoREtzc0JvdWQ1MVNMUjdmcUZyZDg3aXRWeW5zMmh5Q2Nm?=
+ =?utf-8?B?amdlaTRaU3FlYjNldDA3TjgxOEZmSzkwMnN5WklqeE9UejRsRzJmMnhvTmxF?=
+ =?utf-8?B?ZDI4enNvMTNvSEpJMU9JaGxLdXpNODdRQ0pkVjNZTkxZWWVnUVRidXdRQkxo?=
+ =?utf-8?B?ci9LTklBLzM3aGxrZnk1NzZjR1ViS0pWaVZ4cjhEKytxMVk4amFUYm1EM2Va?=
+ =?utf-8?B?TlJicXNrTmpTeTRrNjljRFV3Y0ZzQjFrZzBKb0Npb0t5c3Q5ZWYxVnNydjBs?=
+ =?utf-8?B?UUJYa25Oc2t5N256czlMUFl0SWZtN2RNMzdiNVJCR096eFJiSzhuakdoM2RS?=
+ =?utf-8?B?TjY5cHZWczhCU3J4eTBLeUwvRWZTTjR5T0NnRDJzekxkVmxSRVdvRnRXamQw?=
+ =?utf-8?B?KzBhazg1S1NQaVRGZ1l6S2I5T2ZPdzg2dXJDaUUrQWR2RzNHTVpQd3ByMHBI?=
+ =?utf-8?B?YzByZHRoZ01NN25YVndMWW5uby9La0grVEFMcjFubkNDaHRKSGVzNnMrMEZt?=
+ =?utf-8?B?M3ZTckZUUElCUEJPdHF3ZER0RUFvYjk3YThXK0VZeUdPaW5DKzdXNGNLbnBu?=
+ =?utf-8?B?bVhlYWJ1LzQ5RXF0aldVZW55NkpQUm9NT3lTalB4Vi9TTzF1NUdQYjRzMGJY?=
+ =?utf-8?B?bk1zUG9hNWpMTzVpRjdFU0w2a25iWWljd2Ribnk0bkRqMStuUHk2TUFheFU0?=
+ =?utf-8?B?Z1pyZVpOV0JreG1DK1ZLZTlnN0ZOdVg5eG44TDZ4NllQUEdmZVVBVmZmV21F?=
+ =?utf-8?B?bC90S2ZFOFFWV2VhZWE3T1UremZRemNqMHF6MEZudHRYUkNmYjcyRlJwZXFh?=
+ =?utf-8?B?YVE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ5PPF4422C5374.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e5bdbb50-6e7f-4335-be97-08ddf74c9758
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2025 07:17:28.4771
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 3rYwJGKGlc1E9iGjusfN76bP05VvQlAKU7piU3rUo4EFUroBElX5FGIGi1RXF/um1CZQWhfN/FzmtLaDJuXo30IweBjAxRJ3I68tyB0NpHE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6527
+X-OriginatorOrg: intel.com
 
-Syzbot reported an uninit-value bug at nci_init_req for commit
-5aca7966d2a7 ("Merge tag 'perf-tools-fixes-for-v6.17-2025-09-16'..).
-
-This bug arises due to very limited and poor input validation
-that was done at nic_valid_size(). This validation only
-validates the skb->len (directly reflects size provided at the
-userspace interface) with the length provided in the buffer
-itself (interpreted as NCI_HEADER). This leads to the processing
-of memory content at the address assuming the correct layout
-per what opcode requires there. This leads to the accesses to
-buffer of `skb_buff->data` which is not assigned anything yet.
-
-Following the same silent drop of packets of invalid sizes at
-`nic_valid_size()`, add validation of the data in the respective
-handlers and return error values in case of failure. Release
-the skb if error values are returned from handlers in 
-`nci_nft_packet` and effectively do a silent drop
-
-Possible TODO: because we silently drop the packets, the
-call to `nci_request` will be waiting for completion of request
-and will face timeouts. These timeouts can get excessively logged
-in the dmesg. A proper handling of them may require to export
-`nci_request_cancel` (or propagate error handling from the
-nft packets handlers).
-
-Reported-by: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=740e04c2a93467a0f8c8
-Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation)
-Tested-by: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-Signed-off-by: Deepak Sharma <deepak.sharma.472935@gmail.com>
----
-v3:
- - Move the checks inside the packet data handlers
- - Improvements to the commit message
-
-v2:
- - Fix the release of skb in case of the early return
-
-v1:
- - Add checks in `nci_ntf_packet` on the skb->len and do early return
-   on failure
-
- net/nfc/nci/ntf.c | 139 +++++++++++++++++++++++++++++++++-------------
- 1 file changed, 101 insertions(+), 38 deletions(-)
-
-diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
-index a818eff27e6b..c0edf8242e22 100644
---- a/net/nfc/nci/ntf.c
-+++ b/net/nfc/nci/ntf.c
-@@ -27,11 +27,16 @@
- 
- /* Handle NCI Notification packets */
- 
--static void nci_core_reset_ntf_packet(struct nci_dev *ndev,
--				      const struct sk_buff *skb)
-+static int nci_core_reset_ntf_packet(struct nci_dev *ndev,
-+				     const struct sk_buff *skb)
- {
- 	/* Handle NCI 2.x core reset notification */
--	const struct nci_core_reset_ntf *ntf = (void *)skb->data;
-+	const struct nci_core_reset_ntf *ntf;
-+
-+	if (skb->len < sizeof(struct nci_core_reset_ntf))
-+		return -EINVAL;
-+
-+	ntf = (struct nci_core_reset_ntf *)skb->data;
- 
- 	ndev->nci_ver = ntf->nci_ver;
- 	pr_debug("nci_ver 0x%x, config_status 0x%x\n",
-@@ -42,15 +47,22 @@ static void nci_core_reset_ntf_packet(struct nci_dev *ndev,
- 		__le32_to_cpu(ntf->manufact_specific_info);
- 
- 	nci_req_complete(ndev, NCI_STATUS_OK);
-+
-+	return 0;
- }
- 
--static void nci_core_conn_credits_ntf_packet(struct nci_dev *ndev,
--					     struct sk_buff *skb)
-+static int nci_core_conn_credits_ntf_packet(struct nci_dev *ndev,
-+					    struct sk_buff *skb)
- {
--	struct nci_core_conn_credit_ntf *ntf = (void *) skb->data;
-+	struct nci_core_conn_credit_ntf *ntf;
- 	struct nci_conn_info *conn_info;
- 	int i;
- 
-+	if (skb->len < sizeof(struct nci_core_conn_credit_ntf))
-+		return -EINVAL;
-+
-+	ntf = (struct nci_core_conn_credit_ntf *)skb->data;
-+
- 	pr_debug("num_entries %d\n", ntf->num_entries);
- 
- 	if (ntf->num_entries > NCI_MAX_NUM_CONN)
-@@ -68,7 +80,7 @@ static void nci_core_conn_credits_ntf_packet(struct nci_dev *ndev,
- 		conn_info = nci_get_conn_info_by_conn_id(ndev,
- 							 ntf->conn_entries[i].conn_id);
- 		if (!conn_info)
--			return;
-+			return 0;
- 
- 		atomic_add(ntf->conn_entries[i].credits,
- 			   &conn_info->credits_cnt);
-@@ -77,12 +89,19 @@ static void nci_core_conn_credits_ntf_packet(struct nci_dev *ndev,
- 	/* trigger the next tx */
- 	if (!skb_queue_empty(&ndev->tx_q))
- 		queue_work(ndev->tx_wq, &ndev->tx_work);
-+
-+	return 0;
- }
- 
--static void nci_core_generic_error_ntf_packet(struct nci_dev *ndev,
--					      const struct sk_buff *skb)
-+static int nci_core_generic_error_ntf_packet(struct nci_dev *ndev,
-+					     const struct sk_buff *skb)
- {
--	__u8 status = skb->data[0];
-+	__u8 status;
-+
-+	if (skb->len < 1)
-+		return -EINVAL;
-+
-+	status = skb->data[0];
- 
- 	pr_debug("status 0x%x\n", status);
- 
-@@ -91,12 +110,19 @@ static void nci_core_generic_error_ntf_packet(struct nci_dev *ndev,
- 		   (the state remains the same) */
- 		nci_req_complete(ndev, status);
- 	}
-+
-+	return 0;
- }
- 
--static void nci_core_conn_intf_error_ntf_packet(struct nci_dev *ndev,
--						struct sk_buff *skb)
-+static int nci_core_conn_intf_error_ntf_packet(struct nci_dev *ndev,
-+					       struct sk_buff *skb)
- {
--	struct nci_core_intf_error_ntf *ntf = (void *) skb->data;
-+	struct nci_core_intf_error_ntf *ntf;
-+
-+	if (skb->len < sizeof(struct nci_core_intf_error_ntf))
-+		return -EINVAL;
-+
-+	ntf = (struct nci_core_intf_error_ntf *)skb->data;
- 
- 	ntf->conn_id = nci_conn_id(&ntf->conn_id);
- 
-@@ -105,6 +131,8 @@ static void nci_core_conn_intf_error_ntf_packet(struct nci_dev *ndev,
- 	/* complete the data exchange transaction, if exists */
- 	if (test_bit(NCI_DATA_EXCHANGE, &ndev->flags))
- 		nci_data_exchange_complete(ndev, NULL, ntf->conn_id, -EIO);
-+
-+	return 0;
- }
- 
- static const __u8 *
-@@ -329,13 +357,18 @@ void nci_clear_target_list(struct nci_dev *ndev)
- 	ndev->n_targets = 0;
- }
- 
--static void nci_rf_discover_ntf_packet(struct nci_dev *ndev,
--				       const struct sk_buff *skb)
-+static int nci_rf_discover_ntf_packet(struct nci_dev *ndev,
-+				      const struct sk_buff *skb)
- {
- 	struct nci_rf_discover_ntf ntf;
--	const __u8 *data = skb->data;
-+	const __u8 *data;
- 	bool add_target = true;
- 
-+	if (skb->len < sizeof(struct nci_rf_discover_ntf))
-+		return -EINVAL;
-+
-+	data = skb->data;
-+
- 	ntf.rf_discovery_id = *data++;
- 	ntf.rf_protocol = *data++;
- 	ntf.rf_tech_and_mode = *data++;
-@@ -390,6 +423,8 @@ static void nci_rf_discover_ntf_packet(struct nci_dev *ndev,
- 		nfc_targets_found(ndev->nfc_dev, ndev->targets,
- 				  ndev->n_targets);
- 	}
-+
-+	return 0;
- }
- 
- static int nci_extract_activation_params_iso_dep(struct nci_dev *ndev,
-@@ -501,7 +536,7 @@ static int nci_store_general_bytes_nfc_dep(struct nci_dev *ndev,
- 	case NCI_NFC_A_PASSIVE_POLL_MODE:
- 	case NCI_NFC_F_PASSIVE_POLL_MODE:
- 		ndev->remote_gb_len = min_t(__u8,
--			(ntf->activation_params.poll_nfc_dep.atr_res_len
-+					    (ntf->activation_params.poll_nfc_dep.atr_res_len
- 						- NFC_ATR_RES_GT_OFFSET),
- 			NFC_ATR_RES_GB_MAXSIZE);
- 		memcpy(ndev->remote_gb,
-@@ -513,7 +548,7 @@ static int nci_store_general_bytes_nfc_dep(struct nci_dev *ndev,
- 	case NCI_NFC_A_PASSIVE_LISTEN_MODE:
- 	case NCI_NFC_F_PASSIVE_LISTEN_MODE:
- 		ndev->remote_gb_len = min_t(__u8,
--			(ntf->activation_params.listen_nfc_dep.atr_req_len
-+					    (ntf->activation_params.listen_nfc_dep.atr_req_len
- 						- NFC_ATR_REQ_GT_OFFSET),
- 			NFC_ATR_REQ_GB_MAXSIZE);
- 		memcpy(ndev->remote_gb,
-@@ -553,14 +588,19 @@ static int nci_store_ats_nfc_iso_dep(struct nci_dev *ndev,
- 	return NCI_STATUS_OK;
- }
- 
--static void nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
--					     const struct sk_buff *skb)
-+static int nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
-+					    const struct sk_buff *skb)
- {
- 	struct nci_conn_info *conn_info;
- 	struct nci_rf_intf_activated_ntf ntf;
--	const __u8 *data = skb->data;
-+	const __u8 *data;
- 	int err = NCI_STATUS_OK;
- 
-+	if (skb->len < sizeof(struct nci_rf_intf_activated_ntf))
-+		return -EINVAL;
-+
-+	data = skb->data;
-+
- 	ntf.rf_discovery_id = *data++;
- 	ntf.rf_interface = *data++;
- 	ntf.rf_protocol = *data++;
-@@ -667,7 +707,7 @@ static void nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
- 	if (err == NCI_STATUS_OK) {
- 		conn_info = ndev->rf_conn_info;
- 		if (!conn_info)
--			return;
-+			return 0;
- 
- 		conn_info->max_pkt_payload_len = ntf.max_data_pkt_payload_size;
- 		conn_info->initial_num_credits = ntf.initial_num_credits;
-@@ -721,19 +761,26 @@ static void nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
- 				pr_err("error when signaling tm activation\n");
- 		}
- 	}
-+
-+	return 0;
- }
- 
--static void nci_rf_deactivate_ntf_packet(struct nci_dev *ndev,
--					 const struct sk_buff *skb)
-+static int nci_rf_deactivate_ntf_packet(struct nci_dev *ndev,
-+					const struct sk_buff *skb)
- {
- 	const struct nci_conn_info *conn_info;
--	const struct nci_rf_deactivate_ntf *ntf = (void *)skb->data;
-+	const struct nci_rf_deactivate_ntf *ntf;
-+
-+	if (skb->len < sizeof(struct nci_rf_deactivate_ntf))
-+		return -EINVAL;
-+
-+	ntf = (struct nci_rf_deactivate_ntf *)skb->data;
- 
- 	pr_debug("entry, type 0x%x, reason 0x%x\n", ntf->type, ntf->reason);
- 
- 	conn_info = ndev->rf_conn_info;
- 	if (!conn_info)
--		return;
-+		return 0;
- 
- 	/* drop tx data queue */
- 	skb_queue_purge(&ndev->tx_q);
-@@ -765,14 +812,20 @@ static void nci_rf_deactivate_ntf_packet(struct nci_dev *ndev,
- 	}
- 
- 	nci_req_complete(ndev, NCI_STATUS_OK);
-+
-+	return 0;
- }
- 
--static void nci_nfcee_discover_ntf_packet(struct nci_dev *ndev,
--					  const struct sk_buff *skb)
-+static int nci_nfcee_discover_ntf_packet(struct nci_dev *ndev,
-+					 const struct sk_buff *skb)
- {
- 	u8 status = NCI_STATUS_OK;
--	const struct nci_nfcee_discover_ntf *nfcee_ntf =
--				(struct nci_nfcee_discover_ntf *)skb->data;
-+	const struct nci_nfcee_discover_ntf *nfcee_ntf;
-+
-+	if (skb->len < sizeof(struct nci_nfcee_discover_ntf))
-+		return -EINVAL;
-+
-+	nfcee_ntf = (struct nci_nfcee_discover_ntf *)skb->data;
- 
- 	/* NFCForum NCI 9.2.1 HCI Network Specific Handling
- 	 * If the NFCC supports the HCI Network, it SHALL return one,
-@@ -783,6 +836,8 @@ static void nci_nfcee_discover_ntf_packet(struct nci_dev *ndev,
- 	ndev->cur_params.id = nfcee_ntf->nfcee_id;
- 
- 	nci_req_complete(ndev, status);
-+
-+	return 0;
- }
- 
- void nci_ntf_packet(struct nci_dev *ndev, struct sk_buff *skb)
-@@ -809,35 +864,43 @@ void nci_ntf_packet(struct nci_dev *ndev, struct sk_buff *skb)
- 
- 	switch (ntf_opcode) {
- 	case NCI_OP_CORE_RESET_NTF:
--		nci_core_reset_ntf_packet(ndev, skb);
-+		if (nci_core_reset_ntf_packet(ndev, skb))
-+			goto end;
- 		break;
- 
- 	case NCI_OP_CORE_CONN_CREDITS_NTF:
--		nci_core_conn_credits_ntf_packet(ndev, skb);
-+		if (nci_core_conn_credits_ntf_packet(ndev, skb))
-+			goto end;
- 		break;
- 
- 	case NCI_OP_CORE_GENERIC_ERROR_NTF:
--		nci_core_generic_error_ntf_packet(ndev, skb);
-+		if (nci_core_generic_error_ntf_packet(ndev, skb))
-+			goto end;
- 		break;
- 
- 	case NCI_OP_CORE_INTF_ERROR_NTF:
--		nci_core_conn_intf_error_ntf_packet(ndev, skb);
-+		if (nci_core_conn_intf_error_ntf_packet(ndev, skb))
-+			goto end;
- 		break;
- 
- 	case NCI_OP_RF_DISCOVER_NTF:
--		nci_rf_discover_ntf_packet(ndev, skb);
-+		if (nci_rf_discover_ntf_packet(ndev, skb))
-+			goto end;
- 		break;
- 
- 	case NCI_OP_RF_INTF_ACTIVATED_NTF:
--		nci_rf_intf_activated_ntf_packet(ndev, skb);
-+		if (nci_rf_intf_activated_ntf_packet(ndev, skb))
-+			goto end;
- 		break;
- 
- 	case NCI_OP_RF_DEACTIVATE_NTF:
--		nci_rf_deactivate_ntf_packet(ndev, skb);
-+		if (nci_rf_deactivate_ntf_packet(ndev, skb))
-+			goto end;
- 		break;
- 
- 	case NCI_OP_NFCEE_DISCOVER_NTF:
--		nci_nfcee_discover_ntf_packet(ndev, skb);
-+		if (nci_nfcee_discover_ntf_packet(ndev, skb))
-+			goto end;
- 		break;
- 
- 	case NCI_OP_RF_NFCEE_ACTION_NTF:
--- 
-2.51.0
-
+DQpPbiBGcmlkYXksIFNlcHRlbWJlciAxOSwgMjAyNSA2OjExIEFNLCBLZWxsZXIsIEphY29iIEUg
+PGphY29iLmUua2VsbGVyQGludGVsLmNvbT4gd3JvdGU6DQo+T24gOS8xOC8yMDI1IDE6NDcgUE0s
+IFZhZGltIEZlZG9yZW5rbyB3cm90ZToNCj4+IE9uIDE4LzA5LzIwMjUgMTk6MzgsIENod2VlLUxp
+biBDaG9vbmcgd3JvdGU6DQo+Pj4gVGhlIGN1cnJlbnQgSFcgYnVnIHdvcmthcm91bmQgY2hlY2tz
+IHRoZSBUWFRUXzAgcmVhZHkgYml0IGZpcnN0LCB0aGVuDQo+Pj4gcmVhZHMgTE9XIC0+IEhJR0gg
+LT4gTE9XIGZyb20gcmVnaXN0ZXIgMCB0byBkZXRlY3QgaWYgYSB0aW1lc3RhbXAgd2FzDQo+Pj4g
+Y2FwdHVyZWQuDQo+Pj4NCj4+PiBUaGlzIHNlcXVlbmNlIGhhcyBhIHJhY2U6IGlmIGEgbmV3IHRp
+bWVzdGFtcCBpcyBsYXRjaGVkIGFmdGVyIHJlYWRpbmcNCj4+PiB0aGUgVFhUVCBtYXNrIGJ1dCBi
+ZWZvcmUgdGhlIGZpcnN0IExPVyByZWFkLCBib3RoIG9sZCBhbmQgbmV3DQo+Pj4gdGltZXN0YW1w
+IG1hdGNoLCBjYXVzaW5nIHRoZSBkcml2ZXIgdG8gZHJvcCBhIHZhbGlkIHRpbWVzdGFtcC4NCj4+
+Pg0KPj4+IEZpeCBieSByZWFkaW5nIHRoZSBMT1cgcmVnaXN0ZXIgZmlyc3QsIHRoZW4gdGhlIFRY
+VFQgbWFzaywgc28gYSBuZXdseQ0KPj4+IGxhdGNoZWQgdGltZXN0YW1wIHdpbGwgYWx3YXlzIGJl
+IGRldGVjdGVkLg0KPj4+DQo+Pj4gVGhpcyBmaXggYWxzbyBwcmV2ZW50cyBUWCB1bml0IGhhbmdz
+IG9ic2VydmVkIHVuZGVyIGhlYXZ5DQo+Pj4gdGltZXN0YW1waW5nIGxvYWQuDQo+Pj4NCj4+PiBG
+aXhlczogYzc4OWFkN2NiZWJjICgiaWdjOiBXb3JrIGFyb3VuZCBIVyBidWcgY2F1c2luZyBtaXNz
+aW5nDQo+Pj4gdGltZXN0YW1wcyIpDQo+Pj4gU3VnZ2VzdGVkLWJ5OiBBdmkgU2hhbGV2IDxhdmku
+c2hhbGV2QGludGVsLmNvbT4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBTb25nIFlvb25nIFNpYW5nIDx5
+b29uZy5zaWFuZy5zb25nQGludGVsLmNvbT4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBDaHdlZS1MaW4g
+Q2hvb25nIDxjaHdlZS5saW4uY2hvb25nQGludGVsLmNvbT4NCj4+PiAtLS0NCj4+PiAgIGRyaXZl
+cnMvbmV0L2V0aGVybmV0L2ludGVsL2lnYy9pZ2NfcHRwLmMgfCAxMCArKysrKysrKy0tDQo+Pj4g
+ICAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPj4+DQo+
+Pg0KPj4gWy4uLl0NCj4+DQo+Pj4gICAJCSAqIHRpbWVzdGFtcCB3YXMgY2FwdHVyZWQsIHdlIGNh
+biByZWFkIHRoZSAiaGlnaCINCj4+PiAgIAkJICogcmVnaXN0ZXIgYWdhaW4uDQo+Pj4gICAJCSAq
+Lw0KPj4NCj4+IFRoaXMgY29tbWVudCBiZWdpbnMgd2l0aCAncmVhZCB0aGUgImhpZ2giIHJlZ2lz
+dGVyICh0byBsYXRjaCBhIG5ldw0KPj4gdGltZXN0YW1wKScgLi4uDQo+Pg0KPj4+IC0JCXUzMiB0
+eHN0bXBsX29sZCwgdHhzdG1wbF9uZXc7DQo+Pj4gKwkJdTMyIHR4c3RtcGxfbmV3Ow0KPj4+DQo+
+Pj4gLQkJdHhzdG1wbF9vbGQgPSByZDMyKElHQ19UWFNUTVBMKTsNCj4+PiAgIAkJcmQzMihJR0Nf
+VFhTVE1QSCk7DQo+Pj4gICAJCXR4c3RtcGxfbmV3ID0gcmQzMihJR0NfVFhTVE1QTCk7DQo+Pg0K
+Pj4gYW5kIGEgY291cGxlIG9mIGxpbmVzIGxhdGVyIGluIHRoaXMgZnVuY3Rpb24geW91IGhhdmUN
+Cj4+DQo+PiAJCXJlZ3ZhbCA9IHR4c3RtcGxfbmV3Ow0KPj4gCQlyZWd2YWwgfD0gKHU2NClyZDMy
+KElHQ19UWFNUTVBIKSA8PCAzMjsNCj4+DQo+PiBBY2NvcmRpbmcgdG8gdGhlIGNvbW1lbnQgYWJv
+dmUsIHRoZSB2YWx1ZSBpbiB0aGUgcmVnaXN0ZXIgd2lsbCBiZQ0KPj4gbGF0Y2hlZCBhZnRlciBy
+ZWFkaW5nIElHQ19UWFNUTVBILiBBcyB0aGVyZSB3aWxsIGJlIG5vIHJlYWQgb2YgImxvdyINCj4+
+IHBhcnQgb2YgdGhlIHJlZ2lzdGVyLCBpdCB3aWxsIHN0YXkgbGF0Y2hlZCB3aXRoIG9sZCB2YWx1
+ZSB1bnRpbCB0aGUNCj4+IG5leHQgY2FsbCB0byB0aGUgc2FtZSBmdW5jdGlvbi4gQ291bGQgaXQg
+YmUgdGhlIHJlYXNvbiBvZiB1bml0IGhhbmdzPw0KPj4NCj4+IEl0IGxvb2tzIGxpa2UgdGhlIHZh
+bHVlIG9mIHByZXZpb3VzIHJlYWQgb2YgSUdDX1RYU1RNUEggc2hvdWxkIGJlDQo+PiBzdG9yZWQg
+YW5kIHVzZWQgdG8gY29uc3RydWN0IG5ldyB0aW1lc3RhbXAsIHJpZ2h0Pw0KPj4NCj4NCj5JIHdv
+dWxkbid0IHRydXN0IHRoZSBjb21tZW50LCBidXQgaW5zdGVhZCBkb3VibGUgY2hlY2sgdGhlIGRh
+dGEgc2hlZXRzLg0KPlVuZm9ydHVuYXRlbHksIEkgZG9uJ3Qgc2VlbSB0byBoYXZlIGEgY29weSBv
+ZiB0aGUgaWdjIGhhcmR3YXJlIGRhdGEgc2hlZXQgaGFuZHkgOigNCj4NCj5UaGFua3MsDQo+SmFr
+ZQ0KDQpGbG93IGJlZm9yZSB0aGlzIHBhdGNoOg0KCTEuIFJlYWQgdGhlIFRYVFQgYml0cyBpbnRv
+IG1hc2sNCgkyLiBpZiBUWFRUXzAgPT0gMCwgZ28gdG8gd29ya2Fyb3VuZCAtPklmIGF0IHRoaXMg
+cG9pbnQgcmVnaXN0ZXIgMCBjYXB0dXJlcyBUWCB0aW1lc3RhbXAsIGFuZCBUWFRUXzAgaXMgc2V0
+IGJ1dCB3ZSB0aGluayBpdCBpcyAwLg0KCTMuIFJlYWQgTE9XIHRvIE9MRA0KCTQuIFJlYWQgSElH
+SCDigJMgdGhpcyBjbGVhcnMgdGhlIFRYVFRfMA0KCTUuIFJlYWQgTE9XIGFnYWluICwgbm93IHRv
+IE5FVy4NCgk2LiBORVc9PU9MRCwgc28gdGhlIHRpbWVzdGFtcCBpcyBkaXNjYXJkZWQgLT4gY2F1
+c2luZyB0aW1lc3RhbXAgdGltZW91dA0KIA0KRmxvdyBhZnRlciB0aGlzIHBhdGNoOg0KCTEuIFJl
+YWQgTE9XIHRvIE9MRA0KCTIuIFJlYWQgdGhlIFRYVFQgYml0cyBpbnRvIG1hc2sNCgkzLiBpZiBU
+WFRUXzAgPT0gMCwgZ28gdG8gd29ya2Fyb3VuZCAtPiBJZiBhdCB0aGlzIHBvaW50IHJlZ2lzdGVy
+IDAgY2FwdHVyZXMgVFggdGltZXN0YW1wLCBhbmQgVFhUVF8wIGlzIHNldCBidXQgd2UgdGhpbmsg
+aXQgaXMgMC4NCgk0LiBSZWFkIEhJR0gg4oCTIHRoaXMgY2xlYXJzIHRoZSBUWFRUXzANCgk1LiBS
+ZWFkIExPVyBhZ2FpbiAsIG5vdyB0byBORVcuDQoJNi4gTkVXIT1PTEQsIHNvIHdlIGRldGVjdCB0
+aGlzIGlzIGEgdmFsaWQgdGltZXN0YW1wDQogICAgICAgICAgICAgIDcuIFJlYWQgSElHSCBhZ2Fp
+biBhbmQgdXNlIHRoZSB0aW1lc3RhbXANCg0KTGV0IG1lIGtub3cgaWYgdGhpcyBhZGRyZXNzIHlv
+dXIgcXVlc3Rpb25zPw0KDQpSZWdhcmRzLA0KQ0wNCg0K
 
