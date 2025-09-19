@@ -1,262 +1,100 @@
-Return-Path: <netdev+bounces-224670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D6F3B87EBC
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 07:36:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8694B87EE3
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 07:43:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5930168873
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 05:36:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EC8B1C8515D
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 05:43:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E89324BC0A;
-	Fri, 19 Sep 2025 05:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175BF2627F9;
+	Fri, 19 Sep 2025 05:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A3LuL2so"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="E0IEQt4T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFEEE1D6DB6
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 05:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06222258ECE
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 05:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758260190; cv=none; b=n+ibYnGe7MVuhYwdW4v8rwSekx7JxBw1MBbik+8tysZM9G0bK8+KmstUJ5/HI7w6xKF3Hc/lN9mLV8bRldtokIuZwH/5GnHJzkZd+M1YfBR49odI93JQv4USLiqqYly64/s2eAbf9PSuhpcGQnl7/0suASgXFk1S7SyxITkn0B8=
+	t=1758260579; cv=none; b=cFZLCW7AHqbMRlSi6OJFBlv64A2HEr/irGtgoFdNeIpXVS+aM41mQH5VDCd7XouSxMAxkCoNmllpdUPN4+AQ05rgoaFD1om/cvbyywEbgK95vxejQDCmen9YbTwWATubGXJanZLHvxOYMz527Crn2HmlZdM3jWgQ9yA/BMq0zf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758260190; c=relaxed/simple;
-	bh=bur78PqNFJfhzmMKFQIz35smWwxMkCCTkooN4tN23do=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uWOdGa/Hp157TADHKg4trVFrlHUtefsTFOARvzYZpyzQ6pajXgI7Wiy3dJVdICgWg48XnAl+tPvN0EOchJs8wMQx1PB0IUcSbJwpPDKwGYafQrlbkJu/PkC1jOhaJL5lWzcfhQXivK9I4X2ZP1yEaWSirJsY1AjqMdkgY3JKgy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A3LuL2so; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-77716518125so985684b3a.3
-        for <netdev@vger.kernel.org>; Thu, 18 Sep 2025 22:36:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758260188; x=1758864988; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BfckRLT7OJTCgxiIi4g65qOHRrFeyMOObMvj0q6CVWA=;
-        b=A3LuL2soa27JVebTCnYkepaymwkKlwcgolLhFVsWHhbM1Y/dNBpSzQKU8BbpC/JkzZ
-         2JzHRdyqNXGc2ekJGa1+74S6MZlcwj9BoToUOwtC/hWRP8WOtEd2YID6dvHnVzGorGJx
-         4ccy5PjJOh5Ex4ePTUQgZBV0Nb3EILqBN+5uHQklyKTMa3QyzLuhBPuNfILi/+FyZCYx
-         elAByrjz5vZlgNZupc0GmhvnzFiTVfV0LZiTInvHJexIEeOu0laFv9E9uyqAx3eiwzgD
-         CLBIT6R55+qXEgI70z+audJL5sQyyiQ+PhQj8rxmOEql+Xs25nfspqny88BRyUS4GKG6
-         Ln+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758260188; x=1758864988;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BfckRLT7OJTCgxiIi4g65qOHRrFeyMOObMvj0q6CVWA=;
-        b=KSyegP2JCeOb+W2HSXC14Vaz7o/P6581EN7gpjl3AZz0SzRrw6HKCnapWMZUt8Y1nX
-         sY+sIyZftYp16sQ3W1r/5gtY+3JV4ExtDr2V8z1oBOu1Y9J0FiL8bBXooQYQqvdJwvq5
-         lK/zgneQdHp6nX4hctB3xlvhg+gWAwXn3yRvG79GEbJob48UNrrPwoVRCKI6k5BeXeln
-         Nw5An3TgooZTTWfHAciJGM8zemE0xLi+tGD1+qZTUfkEzQEIKX+wsIZW5BCE/it3Dl7u
-         vIBdOdI/RUzE3ntcu0xbtC8su6GYGjN41v6MhZcJ9LZth1KG4SgPLeH6JstPwoeyUmEN
-         dOAQ==
-X-Gm-Message-State: AOJu0Yw3VaOz27/MtpUWJkSz4CvhBajSZW+rMBo7EV57jSH1sozl5sxI
-	jJZHI3J0MnxXL/TM9nbd/NdHTAMKjg7hHNLidqNuIoePzu6Jb04t0qTB3e+7D2Asmk0=
-X-Gm-Gg: ASbGncsz9fDWXxeZ9TTnqPZ1fbqm1Zr083HmQFOvkLv0OsaUokw8oTZmGJ8Q3HO9AIr
-	lu2xR9lwh550FqWxupC8+irwQSBjRAlXPBsr3ZZq4Xg0dskdJDvZRYz0fRl4Jc3Qnt9+JZeVvWe
-	T7oZ768JKRfGJvLwd0WVVY5s7nU7Po03H0jEgLf997mp78C9lvWFEVt1lfap49AZ5Um2cLm4av2
-	pao3WXW2EH415M7+b4PMDjRMmth7fnBd222cPy6+SLlGoZ5zsubeptORvfVl24gRVKUt7LaVAmH
-	KMxi1VpBQfBMogaJwy2GC18JRtgltMYrh9fB5+evl01VJ0GIh9kUO4SocPo4dIJrWIgOvAxPkPR
-	1tYhsoyipwnY+fWoqtwBqdP2vuMuyIQ==
-X-Google-Smtp-Source: AGHT+IGSExWPEskcHizTltx0J7f1VjJMC3eQFrCPOKE9XGBBWgTB8/tmB+T7Xtpt+C+wG/6b6xS5bQ==
-X-Received: by 2002:a05:6a00:13a1:b0:772:3f03:f3f4 with SMTP id d2e1a72fcca58-77e4dbf2d98mr2699895b3a.14.1758260187504;
-        Thu, 18 Sep 2025 22:36:27 -0700 (PDT)
-Received: from d.home.yangfl.dn42 ([45.32.227.231])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77cfbb79c05sm4050429b3a.4.2025.09.18.22.36.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Sep 2025 22:36:25 -0700 (PDT)
-From: David Yang <mmyangfl@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Petr Machata <petrm@nvidia.com>,
-	Amit Cohen <amcohen@nvidia.com>,
-	Li Shuang <shuali@redhat.com>,
-	Alessandro Zanni <alessandro.zanni87@gmail.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3] selftests: forwarding: Reorder (ar)ping arguments to obey POSIX getopt
-Date: Fri, 19 Sep 2025 13:35:33 +0800
-Message-ID: <20250919053538.1106753-1-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1758260579; c=relaxed/simple;
+	bh=5ireFOLza4n+CYFr5LY6rKuquQUmlnwwbFA/iusmRT4=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=Zp1HbyAYhV2TgC/HmixAccRUKkr1tYau9Yd+3N/qtgqAvI+jGXTuEBLl1EeJqS22q84/0MeRGSy6LPNkGEM+BZ1TI4kSGTM9oYnAUEx7MZEUxY++sCMs6gwJwlzzEAT65NdT+pQVxvV9NwCKUVFXVj2EMm2YmACerQZ38uyYTYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=E0IEQt4T; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1758260571; h=Message-ID:Subject:Date:From:To;
+	bh=31i16PeWzKZy9H0XtrxI0I0C7x07sy/XgpoUTU+m3Vg=;
+	b=E0IEQt4T0m/NyB0k1ZVFVvJKXilhUVXgVi+Amv8sI8fpAuCKjurupzjTk+veG34HpphDc6MbjRFJhTgtZ5GIhXbid6hyKwdFHAvqpRbtIv8+CEc98RT1pTb7yapslW09Ik98LLI5ceKXmtqIFWCkrUaKwr55E7rOiwFNObORAgQ=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WoIgy.m_1758260568 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 19 Sep 2025 13:42:49 +0800
+Message-ID: <1758260547.6875136-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v3] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
+Date: Fri, 19 Sep 2025 13:42:27 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Troy Mitchell <troy.mitchell@linux.spacemit.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Wen Gu <guwen@linux.alibaba.com>,
+ Philo Lu <lulie@linux.alibaba.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Vivian Wang <wangruikang@iscas.ac.cn>,
+ Troy Mitchell <troy.mitchell@linux.spacemit.com>,
+ Dust Li <dust.li@linux.alibaba.com>,
+ netdev@vger.kernel.org
+References: <20250919014856.20267-1-xuanzhuo@linux.alibaba.com>
+ <DC717B917DF04BF3+aMy3tTTi0NZc-lIg@LT-Guozexi>
+In-Reply-To: <DC717B917DF04BF3+aMy3tTTi0NZc-lIg@LT-Guozexi>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Quoted from musl wiki:
+On Fri, 19 Sep 2025 09:53:57 +0800, Troy Mitchell <troy.mitchell@linux.spacemit.com> wrote:
+> On Fri, Sep 19, 2025 at 09:48:56AM +0800, Xuan Zhuo wrote:
+> > Add a driver framework for EEA that will be available in the future.
+> >
+> > This driver is currently quite minimal, implementing only fundamental
+> > core functionalities. Key features include: I/O queue management via
+> > adminq, basic PCI-layer operations, and essential RX/TX data
+> > communication capabilities. It also supports the creation,
+> > initialization, and management of network devices (netdev). Furthermore,
+> > the ring structures for both I/O queues and adminq have been abstracted
+> > into a simple, unified, and reusable library implementation,
+> > facilitating future extension and maintenance.
+> >
+> > This commit is indeed quite large, but further splitting it would not be
+> > meaningful. Historically, many similar drivers have been introduced with
+> > commits of similar size and scope, so we chose not to invest excessive
+> > effort into finer-grained splitting.
+> Maybe this note should go below the `---`
+>                 - Troy
 
-  GNU getopt permutes argv to pull options to the front, ahead of
-  non-option arguments. musl and the POSIX standard getopt stop
-  processing options at the first non-option argument with no
-  permutation.
+Yes, will fix.
 
-Thus these scripts stop working on musl since non-option arguments for
-tools using getopt() (in this case, (ar)ping) do not always come last.
-Fix it by reordering arguments.
+Thanks
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
-v2: https://lore.kernel.org/r/20250906170440.3513399-1-mmyangfl@gmail.com
-  - fix (ar)ping only
-v1: https://lore.kernel.org/r/20250905173947.3164807-1-mmyangfl@gmail.com
-  - fix CI errors
 
- .../selftests/net/forwarding/custom_multipath_hash.sh     | 2 +-
- .../selftests/net/forwarding/gre_custom_multipath_hash.sh | 2 +-
- .../selftests/net/forwarding/ip6_forward_instats_vrf.sh   | 6 +++---
- .../net/forwarding/ip6gre_custom_multipath_hash.sh        | 2 +-
- tools/testing/selftests/net/forwarding/lib.sh             | 8 ++++----
- .../selftests/net/forwarding/mirror_gre_bridge_1q_lag.sh  | 2 +-
- .../selftests/net/forwarding/mirror_gre_vlan_bridge_1q.sh | 4 ++--
- 7 files changed, 13 insertions(+), 13 deletions(-)
-
-diff --git a/tools/testing/selftests/net/forwarding/custom_multipath_hash.sh b/tools/testing/selftests/net/forwarding/custom_multipath_hash.sh
-index 7d531f7091e6..5dbfab0e23e3 100755
---- a/tools/testing/selftests/net/forwarding/custom_multipath_hash.sh
-+++ b/tools/testing/selftests/net/forwarding/custom_multipath_hash.sh
-@@ -226,7 +226,7 @@ send_flowlabel()
- 	# Generate 16384 echo requests, each with a random flow label.
- 	ip vrf exec v$h1 sh -c \
- 		"for _ in {1..16384}; do \
--			$PING6 2001:db8:4::2 -F 0 -c 1 -q >/dev/null 2>&1; \
-+			$PING6 -F 0 -c 1 -q 2001:db8:4::2 >/dev/null 2>&1; \
- 		done"
- }
- 
-diff --git a/tools/testing/selftests/net/forwarding/gre_custom_multipath_hash.sh b/tools/testing/selftests/net/forwarding/gre_custom_multipath_hash.sh
-index dda11a4a9450..b4f17a5bbc61 100755
---- a/tools/testing/selftests/net/forwarding/gre_custom_multipath_hash.sh
-+++ b/tools/testing/selftests/net/forwarding/gre_custom_multipath_hash.sh
-@@ -321,7 +321,7 @@ send_flowlabel()
- 	# Generate 16384 echo requests, each with a random flow label.
- 	ip vrf exec v$h1 sh -c \
- 		"for _ in {1..16384}; do \
--			$PING6 2001:db8:2::2 -F 0 -c 1 -q >/dev/null 2>&1; \
-+			$PING6 -F 0 -c 1 -q 2001:db8:2::2 >/dev/null 2>&1; \
- 		done"
- }
- 
-diff --git a/tools/testing/selftests/net/forwarding/ip6_forward_instats_vrf.sh b/tools/testing/selftests/net/forwarding/ip6_forward_instats_vrf.sh
-index 49fa94b53a1c..25036e38043c 100755
---- a/tools/testing/selftests/net/forwarding/ip6_forward_instats_vrf.sh
-+++ b/tools/testing/selftests/net/forwarding/ip6_forward_instats_vrf.sh
-@@ -95,7 +95,7 @@ ipv6_in_too_big_err()
- 
- 	# Send too big packets
- 	ip vrf exec $vrf_name \
--		$PING6 -s 1300 2001:1:2::2 -c 1 -w $PING_TIMEOUT &> /dev/null
-+		$PING6 -s 1300 -c 1 -w $PING_TIMEOUT 2001:1:2::2 &> /dev/null
- 
- 	local t1=$(ipv6_stats_get $rtr1 Ip6InTooBigErrors)
- 	test "$((t1 - t0))" -ne 0
-@@ -131,7 +131,7 @@ ipv6_in_addr_err()
- 	# Disable forwarding temporary while sending the packet
- 	sysctl -qw net.ipv6.conf.all.forwarding=0
- 	ip vrf exec $vrf_name \
--		$PING6 2001:1:2::2 -c 1 -w $PING_TIMEOUT &> /dev/null
-+		$PING6 -c 1 -w $PING_TIMEOUT 2001:1:2::2 &> /dev/null
- 	sysctl -qw net.ipv6.conf.all.forwarding=1
- 
- 	local t1=$(ipv6_stats_get $rtr1 Ip6InAddrErrors)
-@@ -150,7 +150,7 @@ ipv6_in_discard()
- 	# Add a policy to discard
- 	ip xfrm policy add dst 2001:1:2::2/128 dir fwd action block
- 	ip vrf exec $vrf_name \
--		$PING6 2001:1:2::2 -c 1 -w $PING_TIMEOUT &> /dev/null
-+		$PING6 -c 1 -w $PING_TIMEOUT 2001:1:2::2 &> /dev/null
- 	ip xfrm policy del dst 2001:1:2::2/128 dir fwd
- 
- 	local t1=$(ipv6_stats_get $rtr1 Ip6InDiscards)
-diff --git a/tools/testing/selftests/net/forwarding/ip6gre_custom_multipath_hash.sh b/tools/testing/selftests/net/forwarding/ip6gre_custom_multipath_hash.sh
-index e28b4a079e52..b24acfa52a3a 100755
---- a/tools/testing/selftests/net/forwarding/ip6gre_custom_multipath_hash.sh
-+++ b/tools/testing/selftests/net/forwarding/ip6gre_custom_multipath_hash.sh
-@@ -323,7 +323,7 @@ send_flowlabel()
- 	# Generate 16384 echo requests, each with a random flow label.
- 	ip vrf exec v$h1 sh -c \
- 		"for _ in {1..16384}; do \
--			$PING6 2001:db8:2::2 -F 0 -c 1 -q >/dev/null 2>&1; \
-+			$PING6 -F 0 -c 1 -q 2001:db8:2::2 >/dev/null 2>&1; \
- 		done"
- }
- 
-diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-index 08121cb9dc26..2c252423b326 100644
---- a/tools/testing/selftests/net/forwarding/lib.sh
-+++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -1267,8 +1267,8 @@ ping_do()
- 
- 	vrf_name=$(master_name_get $if_name)
- 	ip vrf exec $vrf_name \
--		$PING $args $dip -c $PING_COUNT -i 0.1 \
--		-w $PING_TIMEOUT &> /dev/null
-+		$PING $args -c $PING_COUNT -i 0.1 \
-+		-w $PING_TIMEOUT $dip &> /dev/null
- }
- 
- ping_test()
-@@ -1298,8 +1298,8 @@ ping6_do()
- 
- 	vrf_name=$(master_name_get $if_name)
- 	ip vrf exec $vrf_name \
--		$PING6 $args $dip -c $PING_COUNT -i 0.1 \
--		-w $PING_TIMEOUT &> /dev/null
-+		$PING6 $args -c $PING_COUNT -i 0.1 \
-+		-w $PING_TIMEOUT $dip &> /dev/null
- }
- 
- ping6_test()
-diff --git a/tools/testing/selftests/net/forwarding/mirror_gre_bridge_1q_lag.sh b/tools/testing/selftests/net/forwarding/mirror_gre_bridge_1q_lag.sh
-index a20d22d1df36..8d4ae6c952a1 100755
---- a/tools/testing/selftests/net/forwarding/mirror_gre_bridge_1q_lag.sh
-+++ b/tools/testing/selftests/net/forwarding/mirror_gre_bridge_1q_lag.sh
-@@ -238,7 +238,7 @@ test_lag_slave()
- 	ip neigh flush dev br1
- 	setup_wait_dev $up_dev
- 	setup_wait_dev $host_dev
--	$ARPING -I br1 192.0.2.130 -qfc 1
-+	$ARPING -I br1 -qfc 1 192.0.2.130
- 	sleep 2
- 	mirror_test vrf-h1 192.0.2.1 192.0.2.18 $host_dev 1 ">= 10"
- 
-diff --git a/tools/testing/selftests/net/forwarding/mirror_gre_vlan_bridge_1q.sh b/tools/testing/selftests/net/forwarding/mirror_gre_vlan_bridge_1q.sh
-index 1b902cc579f6..a21c771908b3 100755
---- a/tools/testing/selftests/net/forwarding/mirror_gre_vlan_bridge_1q.sh
-+++ b/tools/testing/selftests/net/forwarding/mirror_gre_vlan_bridge_1q.sh
-@@ -196,7 +196,7 @@ test_span_gre_forbidden_egress()
- 
- 	bridge vlan add dev $swp3 vid 555
- 	# Re-prime FDB
--	$ARPING -I br1.555 192.0.2.130 -fqc 1
-+	$ARPING -I br1.555 -fqc 1 192.0.2.130
- 	sleep 1
- 	quick_test_span_gre_dir $tundev
- 
-@@ -290,7 +290,7 @@ test_span_gre_fdb_roaming()
- 
- 	bridge fdb del dev $swp2 $h3mac vlan 555 master 2>/dev/null
- 	# Re-prime FDB
--	$ARPING -I br1.555 192.0.2.130 -fqc 1
-+	$ARPING -I br1.555 -fqc 1 192.0.2.130
- 	sleep 1
- 	quick_test_span_gre_dir $tundev
- 
--- 
-2.51.0
-
+> >
+> > Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+> > Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
+> > Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
