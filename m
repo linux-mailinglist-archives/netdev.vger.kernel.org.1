@@ -1,119 +1,80 @@
-Return-Path: <netdev+bounces-224755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09E2DB893F2
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 13:21:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F27F3B89470
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 13:29:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A69B17C3F84
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 11:21:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6C23587F8A
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 11:29:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8D8730ACF5;
-	Fri, 19 Sep 2025 11:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F38F2D94BD;
+	Fri, 19 Sep 2025 11:29:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="V7a53qq+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AQaqFMRp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9AE3093B8
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 11:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8FB2264D5
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 11:29:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758280896; cv=none; b=AGR4DMbTUA5VaT8RStAbVfkwDIsLB5ZDGuhLhy3OTbbuphg95sbnP4GTmxqPM/ExgIsT+u3YBICexpSv2aXPJanNRfmlq8rBMtpthwE1MMgxeCKi2KRBr1NnEPfQmvnb3KdLGLGkXhR3fgcz0LDUPCvZ6UUygpS3KtRy6BTmWZI=
+	t=1758281389; cv=none; b=eXmfn0Xo+5pQMx1MMYucZt85L94chtwj7m+UkSJ4gfbsdaH7KAh4z8AKYeG5oySu3mvKV5RGckmBRSA1WzffklUArasaFn6sRlCqD/ejhtOYCvfIX2c+ZG/GJ7430RiuDrafwSPkPKkW6wkTtkgQD0xawfNgrvis/aPB/J2/Ihg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758280896; c=relaxed/simple;
-	bh=A4xG/hhI5H20xjSK3ATLZhg7mH6LCnkDNDxdK8t8kEk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p6PxMwIyI4VWCv3klReZWGvl8v1z69hXxE8wAblQMm1vjVMDIIvs6M0p04ju+sSizkoAsTr4vKpcZo7wv1PWjswe7YXtaO4RW8XvjxroRZ2xYYxsoHdzeyFzgD67AvjRSiCFJ66gcWrJtrJqKNQJkPx3VrSAv+2CptBcdPhXXXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=V7a53qq+; arc=none smtp.client-ip=91.218.175.171
+	s=arc-20240116; t=1758281389; c=relaxed/simple;
+	bh=RbLyeXp4tCg2b+21ZTvoUe7KGecGgi9aM3+Ar0F19iA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R3TNncEY68x120USeCGjPBYfKawRUJucilF0JCJVUbwiY3xKpaMEj8eLP+hSa1w9/r6wZ41QnG7TBmIuzw42E82y0dmGgW5hT3vBUf8hQwhbRmBhmpczAQIuChTTqw3rimjjDa36vmz1ZeE1M/MOVkzKaXn6J7WlkkaYC6nB5+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AQaqFMRp; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+Message-ID: <0a3c0715-73be-472c-8a6a-1940c75f9d53@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758280881;
+	t=1758281385;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=1RTqmv+1E+QFMuOy+5mQ8UkGVboO7NXJZS9ix522hHQ=;
-	b=V7a53qq+yTQMa5IzHR4f9+NvU9KCOuXDiGJR8s5Wd5SK8nAmqVT0JdlJZX2oLWyeycOORD
-	ZHDl9GwKZN8UVSjF1Bhg8VQ4WWgfspa9jbNH2ath3vpEalhG5TPcj9HCsigRwk7vdV1gWy
-	ZtsXEAC/N1ipmDsl3Nc/1MMv8pHl6yg=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Danilo Krummrich <dakr@kernel.org>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] rust: net::phy inline if expressions to improve read_status
-Date: Fri, 19 Sep 2025 13:20:08 +0200
-Message-ID: <20250919112007.940061-2-thorsten.blum@linux.dev>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RbLyeXp4tCg2b+21ZTvoUe7KGecGgi9aM3+Ar0F19iA=;
+	b=AQaqFMRppprXMXolPq8A+SO9bYn/GxpokfGw6zS0yX5O2ATwTkat2ncSAc1gdkv64GZG0E
+	EioVP9cPrtSiBVykcvBdkqOdv0wOVO6t8I9pNJ5T3ortCgp0Enc9z5C8KYP8tYwoAW7Qsa
+	JjwpFIzxsv/qsnCArOrT3Kx52UdP2pg=
+Date: Fri, 19 Sep 2025 12:29:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH RFC net-next 10/20] net: dsa: mv88e6xxx: only support
+ EXTTS for pins
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>
+References: <aMxDh17knIDhJany@shell.armlinux.org.uk>
+ <E1uzIbf-00000006n00-06XG@rmk-PC.armlinux.org.uk>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <E1uzIbf-00000006n00-06XG@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
-Inline the if expressions for dev.set_speed() and dev.set_duplex() to
-improve read_status(). This ensures dev.set_speed() is called only once
-and allows us to remove the local variable 'duplex'.
+On 18/09/2025 18:39, Russell King (Oracle) wrote:
+> The sole implementation for the PTP verify/enable methods only supports
+> the EXTTS function. Move these checks into mv88e6xxx_ptp_verify() and
+> mv88e6xxx_ptp_enable(), renaming the ptp_enable() method to
+> ptp_enable_extts().
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/net/phy/ax88796b_rust.rs | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796b_rust.rs
-index bc73ebccc2aa..2dfd37936689 100644
---- a/drivers/net/phy/ax88796b_rust.rs
-+++ b/drivers/net/phy/ax88796b_rust.rs
-@@ -56,18 +56,17 @@ fn read_status(dev: &mut phy::Device) -> Result<u16> {
-         // linkmode so use MII_BMCR as default values.
-         let ret = dev.read(C22::BMCR)?;
- 
--        if ret & BMCR_SPEED100 != 0 {
--            dev.set_speed(uapi::SPEED_100);
-+        dev.set_speed(if ret & BMCR_SPEED100 != 0 {
-+            uapi::SPEED_100
-         } else {
--            dev.set_speed(uapi::SPEED_10);
--        }
-+            uapi::SPEED_10
-+        });
- 
--        let duplex = if ret & BMCR_FULLDPLX != 0 {
-+        dev.set_duplex(if ret & BMCR_FULLDPLX != 0 {
-             phy::DuplexMode::Full
-         } else {
-             phy::DuplexMode::Half
--        };
--        dev.set_duplex(duplex);
-+        });
- 
-         dev.genphy_read_lpa()?;
- 
--- 
-2.51.0
-
+It would be great to add .supported_extts_flags as well to allow
+PTP_EXTTS_REQUEST2, take a look at changes in:
+https://lore.kernel.org/netdev/20250919103928.3ab57aa2@kmaincent-XPS-13-7390/T/#m579d718f36b2368e476eb400e235fe28f0bd03ff
 
