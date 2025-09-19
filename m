@@ -1,81 +1,97 @@
-Return-Path: <netdev+bounces-224927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 399A7B8BA4C
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 01:50:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8900B8BA52
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 01:50:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EDA43ACA26
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 23:50:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEBCB1BC0393
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 23:50:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 918042D540B;
-	Fri, 19 Sep 2025 23:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20E82D8795;
+	Fri, 19 Sep 2025 23:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mbwqs7Be"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GfwkLyLX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9C12D3ED1
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 23:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A272D876C;
+	Fri, 19 Sep 2025 23:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758325809; cv=none; b=o7PfKpnCjx11GryadyuiuTrJ+S/F9Pp1FSzbH3wKf9ZgIOsVoag/dRQVGgNDZcGlbKlnR38PY4yiWYaMnvtlFaNj1ZorEfsMpshvTOJaZU6Lk8j8ZczP0ZM20lCI2+G/BzwFPR5Zt7O9SOF2ZRM8lWtXiRHI691snoldYK+qi+8=
+	t=1758325811; cv=none; b=QSMtor2qJDhnMDgbiosAgW2Nvol2dZfZzzQjSINpKU1nJ7AsgzMAIhsakG5oS0sNvAczjT5vUC6DZGNzv6dBmlw034pQ+OraBdQHPjH2OO9rtwO5EQ4wSa0JPDQ7z1Yxvn6+V2WooVDooV2l85gcWeZd84OcdaQZFuUcI4vdttk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758325809; c=relaxed/simple;
-	bh=I83TfBf/tW4mCHvDXGsKp2aciMMKl7qZ2dgeSmZkp3g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d0cuE2PjouAwFNkI+RzmuD/nBM/aITO/s/yQGeScvTplsEZg8hick+1GQ5JzPVKzTy63gM8UfQPjE6/Ftvbqy1aKNEODIgDiMoord4YQaQdid6XIX3Kiz0e+qjhahb8bcAW6m+AyAfZb9XgYVpL90mS+5ezcuTTNp4utJ6BTHN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mbwqs7Be; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB951C4CEF5;
-	Fri, 19 Sep 2025 23:50:08 +0000 (UTC)
+	s=arc-20240116; t=1758325811; c=relaxed/simple;
+	bh=Mven0v1f4pqNZ/CroJLqThdc+h3oIN6ufsVFBvnrOqo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=oKBRQltUMhwWZs3OjDmL+cp2QquATQ1hp7mKO2OMVRDxX2ihbYOo+lPzVhcjYkY4MebyIdG9wYZVZ9j3czLVsTSIPaQzL/OeMz2gM9Z5lWgz6oIY3kF3kOvni5r7kWKyDEEhwC0zlW/3ng0ThkYJQH0wGGzs1ybvT2EUI1lU6+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GfwkLyLX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1E29C4CEFD;
+	Fri, 19 Sep 2025 23:50:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758325809;
-	bh=I83TfBf/tW4mCHvDXGsKp2aciMMKl7qZ2dgeSmZkp3g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mbwqs7BesJsC7igYkY882RlXmmK7AnAApI3D9Vii771nNe1RKheHtr1YYIJKl8Ash
-	 T0Vr6ecEk299zHol/wRNgCknYAqEZCBweCPuKLimna0Q1ok0SYagF5OMA3Q7FZC6zi
-	 2bnOqm4QfqcHMscdTCEkHxKj89lWhUonQYyVA9V4djJQaxypnUFxU2JzJf12gdVI6U
-	 rJSFrQ61pPvZCpQ2Hlr76t1Ig9AbtN88JIeAec9pcuQZvcXX1DEy44kjB/0YcddZmf
-	 ZGjULw7taKik+bFebnxKnN2ktQ3/WsfQfLMZ7yqhx2vgaay3i5UF3V20Ez7e3Bbs0Y
-	 2PplEHRFSMKvA==
-Date: Fri, 19 Sep 2025 16:50:08 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, Hauke
- Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net 0/2] lantiq_gswip fixes
-Message-ID: <20250919165008.247549ab@kernel.org>
-In-Reply-To: <20250918072142.894692-1-vladimir.oltean@nxp.com>
-References: <20250918072142.894692-1-vladimir.oltean@nxp.com>
+	s=k20201202; t=1758325810;
+	bh=Mven0v1f4pqNZ/CroJLqThdc+h3oIN6ufsVFBvnrOqo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GfwkLyLX1sLqcUxYe5LgkkVJhYty7aj10jdAurO9uWfVxLpZsijgHFSAcqcNuq73s
+	 9wPmWFd4cPaXgfX1ihG9pO35czSGMIPAYFiMLZtBDHJLsUmKeddW/7Eq8x2pO5b0cA
+	 i+cF2dtBFQVOqO2GucCc047e1eAaDBPzaezkksB7Jgi/JIOXWTOOVbIO80hDAZID+n
+	 qSHDUFQARAXHPZl3iaXEv5mBp64jqiMXXl0ou7OGaNsYgXj9iWzShuztPsVzf/IcT0
+	 mD6fCvZ3YgTNci3ciOyBFs/KfO2xCSLWRi1va43YTrP2t6UfhH1bv/PaKMzS9QGA06
+	 24yB3A29fqLJQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D7739D0C20;
+	Fri, 19 Sep 2025 23:50:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net/smc: fix warning in smc_rx_splice() when calling
+ get_page()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175832580899.3740319.9945359805753300205.git-patchwork-notify@kernel.org>
+Date: Fri, 19 Sep 2025 23:50:08 +0000
+References: <20250917184220.801066-1-sidraya@linux.ibm.com>
+In-Reply-To: <20250917184220.801066-1-sidraya@linux.ibm.com>
+To: Sidraya Jayagond <sidraya@linux.ibm.com>
+Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ pabeni@redhat.com, horms@kernel.org, alibuda@linux.alibaba.com,
+ dust.li@linux.alibaba.com, wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
+ tonylu@linux.alibaba.com, guwen@linux.alibaba.com, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
 
-On Thu, 18 Sep 2025 10:21:40 +0300 Vladimir Oltean wrote:
-> This is a small set of fixes which I believe should be backported for
-> the lantiq_gswip driver. Daniel Golle asked me to submit them here:
-> https://lore.kernel.org/netdev/aLiDfrXUbw1O5Vdi@pidgin.makrotopia.org/
-> 
-> As mentioned there, a merge conflict with net-next is expected, due to
-> the movement of the driver to the 'drivers/net/dsa/lantiq' folder there.
-> Good luck :-/
-> 
-> Patch 2/2 fixes an old regression and is the minimal fix for that, as
-> discussed here:
-> https://lore.kernel.org/netdev/aJfNMLNoi1VOsPrN@pidgin.makrotopia.org/
-> 
-> Patch 1/2 was identified by me through static analysis, and I consider
-> it to be a serious deficiency. It needs a test tag.
+Hello:
 
-Daniel, can we count on your for that?
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 17 Sep 2025 20:42:20 +0200 you wrote:
+> smc_lo_register_dmb() allocates DMB buffers with kzalloc(), which are
+> later passed to get_page() in smc_rx_splice(). Since kmalloc memory is
+> not page-backed, this triggers WARN_ON_ONCE() in get_page() and prevents
+> holding a refcount on the buffer. This can lead to use-after-free if
+> the memory is released before splice_to_pipe() completes.
+> 
+> Use folio_alloc() instead, ensuring DMBs are page-backed and safe for
+> get_page().
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net/smc: fix warning in smc_rx_splice() when calling get_page()
+    https://git.kernel.org/netdev/net/c/a35c04de2565
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
