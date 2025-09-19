@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-224847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8078FB8AE5F
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 20:21:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC4B4B8AE65
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 20:22:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 330711CC4B56
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 18:22:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 491CA1CC4AE2
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 18:22:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD16277C9F;
-	Fri, 19 Sep 2025 18:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DCB27978C;
+	Fri, 19 Sep 2025 18:21:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7oba5H9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PZ+mG5oW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B7627466A
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 18:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D5D2773F0
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 18:21:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758306068; cv=none; b=VXVb8MCTSzErgO8N4u6Id8W1toiltG/1Me8MkjZUPJMcXVtCp8PNcqcwtbJJyfBpjvaQIIo21f58KuRDjQtOBNaFNmB1IzrkHu4/61DDiMPPBm44mDfJif0DkpSCXY7m8Cntrclsdt2Ydjg1uFGWx5ZTISQMqWHxeeoWH/P5DV0=
+	t=1758306070; cv=none; b=OHEVTYoez0g6vkQeySpLqqgjsrkNeMX/M2crgE+Oayr+nGQZul1CA4ducQ5US+sq7bF2n3lgcJRbxjLs9/VB+cxkv41t4G6NbyaTWnRTfUupbfz8kChqtr/y4MXRvSS2WhCs9je38kQRVllKhgVhQ9FyiSAXasVGqgVB+gxd3x8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758306068; c=relaxed/simple;
-	bh=mnhFefxXBFpAxTuPQC7oZZaXYOasqtRHyRYWS3i67S4=;
+	s=arc-20240116; t=1758306070; c=relaxed/simple;
+	bh=q0OkuA0NK7HLo5PXGKkp08gcjikyPtmDwGS1vllW7e4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bjpnWtoGjCBmxNcYPG+qR7KWoffy34LOtT9LyOf6mrREV2TOaZnil6sMvCbPYLeet02HFEHvqSibME3YvorEyjDLXcB13FpRp24PCZLe1cXZ6VL6O1m9WxNzyQ9hR7JiEvwqwyILk9AE/ECWLewgoC+zWCUZmT3cudu4MBC/Re0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X7oba5H9; arc=none smtp.client-ip=209.85.210.181
+	 MIME-Version; b=kgpbt0itpGO9twhGR+1ufP/KZALqHlExrsHYklOtz1yrO5Vp1T+BD5jfWTR8oN3/0DeTDVzdrcb2dYMo4TFUvpQhAsbzQpKEW7fITwmNXkpQ4QYlDoAm81N76beXTr5JOzCt6qpcZWAb+joDinfxWP73jgOxHnCOpmJ4r80YT7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PZ+mG5oW; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-77f198bd8eeso46879b3a.3
-        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 11:21:07 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2445824dc27so26117855ad.3
+        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 11:21:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758306066; x=1758910866; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758306068; x=1758910868; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9r1RUUuGz0HNQTWTUVyljerk1TXvTpK2To+3rwkm5Mw=;
-        b=X7oba5H9dCMd3fJv2P/F+YfyYaMFZS9fx5Cem54/ih/KXtLX+f5ItusvStttjXLD2G
-         YrYu2/771k38xTCO2WXZbSIVhTw5NmkP7e8brVD4idCjeb0BhisRgodTF0viqiQi95kr
-         BCwMrB0I+u9MKBHzGIftC6IM6OuWtKlzMpI2mZDmPwNmoV8VNEjqrJsw5sekTs8HsjwE
-         6vRKVGFcLJwojFIKZsPYZpaEpbt3Y5j1UINee6kLiAHPnR8FAvNejBh6bWzb07e2gUh3
-         b6vd3IjIioNnqscu/6EwpKDMqp6NFV8sNxGPyyhdUKllzqJU4rGhWeGFKYXEv6fxXakV
-         QQtQ==
+        bh=WZQ5TAtVA2wqs2y4l5KGdKWRj04tq3DInsgDkddzZKc=;
+        b=PZ+mG5oW6zb/wrkk74dSMci6TtSPnq7EmRU2gj92/pCszLn5/pDXw3sZEbHnxSiYnz
+         hX286MlA0PeZWo2V/OabE+To4VgNKj/O8lONxxQ7Rx1yb8VwEhjMTcelZ2oM/AxvH0Y9
+         Tb2pfoAyMwSE5BHmb5X3ssqGgw0YI5v5ZYxs+2fn9clLooRlFNOFLMuqaFC90rJXb5fQ
+         2ZDaRcFQ+5F0IDY6Q+r6S8zRzdgM8NlAPME/3R4iIMjkh9pAF0BPxJuerHMZX2GF142o
+         N2dIVtiFFOr+IYEXiCnS3KrGlKqFXgtUU+FGPtaHDVywN+Npj8+s+sCKhJg392eN9APm
+         qxTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758306066; x=1758910866;
+        d=1e100.net; s=20230601; t=1758306068; x=1758910868;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9r1RUUuGz0HNQTWTUVyljerk1TXvTpK2To+3rwkm5Mw=;
-        b=Jm71MslFYEr3wWwkv+7dz1HpSnm8Ia766ESEFjFQwmWg+XbB5pB9s3ZfyRQfC5vZq0
-         GwZAV6u3pMdXG95Ag87lydQ1LU68sY3aZFX/uwaSDSXzVRpIB+SoC/AvvmTA8uwzny8h
-         eG4VZISXlfb7vLTqj0OCHF9NKB1EB1D4kJxya0MxlxddY/SrWJ1m3jjy0WjdjqYU+oqi
-         Ee3lQAtshkMsZtARU1rxXIsCDHjIgP3X3c8s90hiYqxr2gCkE5KN4hjHHKmFyiSDoW2v
-         qX5bKnQVuJO0kKsPiMMK1QlVnjKM9sQq+JtvLKr8VYjiuEXMCgGNhbU+1DqHuZKVVAF6
-         QLhg==
-X-Gm-Message-State: AOJu0YyvNxo8gF0xf8yhJpSQ/6kmWxwNxNBT2/pBA9/vCDyeLrUmW2RI
-	MXBeX66asU/EihBz0i7pCWTvx06TD5sKIlzZ/yRH4+u9TeuCy/Rx3rdP
-X-Gm-Gg: ASbGncvCa7qowo1xdw/bFZl99KIi9MPjCJ+6IN+S/BSoqMJHJS0V1B/VbrfJNyxAFcG
-	+sF9lOqujPvQvYtEiBfHkHenJDqsKusZJ0La4mTeRO4ybcFmCR3Wrrz+4nLhGho1dXtefllpkYo
-	XewtO0kWRS4hQLNJaR8A/3b2dTdV8l8Xz2BLuSAA+qsHtBtRrKfUGfyBt2BP/i34XrzVW7j7KSl
-	PhSkRFTAbuSm7ZBABami0ANA5swZhCCLh2xsMLi2RK0sOih6hRh1mj8z7On7IDsefqMF8j38nll
-	tlaIi4U8FGhTV0IYKlPcH5+/2d0RXuUkzvC+ut+ENU5IIRiW2bBDO/BavOQ2H/EmDGkiqn951aj
-	K1S2mE7KVfE4QazRk0z5LsHgU
-X-Google-Smtp-Source: AGHT+IEL2q1zK8GhmmRCXb9psH+uPSYX4ed6O7jKtZUypz4D8Yn1UwrbNe6vFQbOxam/8IMT48LBDg==
-X-Received: by 2002:a05:6a20:a10b:b0:24a:a45d:7a26 with SMTP id adf61e73a8af0-2927277a9abmr6160006637.48.1758306066557;
-        Fri, 19 Sep 2025 11:21:06 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:71::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77cfbb79c05sm5863283b3a.4.2025.09.19.11.21.05
+        bh=WZQ5TAtVA2wqs2y4l5KGdKWRj04tq3DInsgDkddzZKc=;
+        b=pLpjb8T2qOrXexNKogD4Yqwwf+VCWye4jbMdaOmytQiIwCpGPf2/oebS6KiJRmAb5k
+         qieOdQSDsT1TGxRnkFbwYcqhp9/c8xCmkq+IjJ9bzJF3nkHZfa41jaAEqXWscsyDxVNZ
+         wxelUuTudi5V2+Rw5vQcisudHgozVsXTHehogYEnFoN/+7deljA8FZrrW5wLzKVw3p8E
+         VSIPViwg0rYhxLAg3/PUZ/eiTiK2sYu2xjkvBPtlu7rFpxfitlDMAoOzWwMpCQT6RDHp
+         AlmIUwocg1oz+t3CK5ioAMeLH70jYW/8UsHvYuo3UZdNrkBkqAqLGTr3fMLW7wFSYV/O
+         ZW4Q==
+X-Gm-Message-State: AOJu0Yw4HG7PY9zJz4vRg1ul6OtJ4GCNiOu76ljsGOyje5qEJJyCGxNh
+	OYHIK+p5AG47RrVnKT2NqPGrNqu5MwwCvhCWa2FcS9WY2x5/ZNwlwX4j
+X-Gm-Gg: ASbGncsmFVzFxunRZGTcZQhLM7TICwNRyIYqlCa734/45Ny1vDlG8qaS79rKIWtbqDA
+	DWLWjXzapaA2eheTNxbcASdnpC2/SEHGVrW2A5jCzzqcGd3MJpQRwzjWeMuOETIlOOCM2Oh0ejt
+	chFgQ+6dAuDUAQ+brhiebx+PDV9tDDDDhdzbjHVVliXNgoLfEI+nfDGZt6/pIMRZ+yEEnqSefdv
+	gmu1/eN/SmS/bCc7idyRrfrC7DYuYw2CoOrdi39QMbKzqrTFebDRCkhC+Cg3IrXMNe1WAp5PFMk
+	ZmXY8AeXPpfoxHuFe/sAHp33YzXR7XC+voYuwutlU99f+mxMz2KlVVv4H5eF+PdfcFIOVIeJnMZ
+	EcEsWKL9ubbF03A==
+X-Google-Smtp-Source: AGHT+IE5k7pWtq0k1XttvbcOD90GYuN2kjs0Zdi3qjbwEVjI7JT9Ecdd9fpwJaJId5NIMsMQMdh5Jg==
+X-Received: by 2002:a17:902:ea11:b0:260:3c5d:9c2 with SMTP id d9443c01a7336-269ba53e4d5mr58708725ad.48.1758306067698;
+        Fri, 19 Sep 2025 11:21:07 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:4f::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-330607eac4esm6063539a91.21.2025.09.19.11.21.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Sep 2025 11:21:06 -0700 (PDT)
+        Fri, 19 Sep 2025 11:21:07 -0700 (PDT)
 From: Amery Hung <ameryhung@gmail.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
@@ -90,9 +90,9 @@ Cc: netdev@vger.kernel.org,
 	mbloch@nvidia.com,
 	maciej.fijalkowski@intel.com,
 	kernel-team@meta.com
-Subject: [PATCH bpf-next v5 5/7] bpf: Support specifying linear xdp packet data size for BPF_PROG_TEST_RUN
-Date: Fri, 19 Sep 2025 11:20:58 -0700
-Message-ID: <20250919182100.1925352-6-ameryhung@gmail.com>
+Subject: [PATCH bpf-next v5 6/7] selftests/bpf: Test bpf_xdp_pull_data
+Date: Fri, 19 Sep 2025 11:20:59 -0700
+Message-ID: <20250919182100.1925352-7-ameryhung@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250919182100.1925352-1-ameryhung@gmail.com>
 References: <20250919182100.1925352-1-ameryhung@gmail.com>
@@ -104,97 +104,236 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To test bpf_xdp_pull_data(), an xdp packet containing fragments as well
-as free linear data area after xdp->data_end needs to be created.
-However, bpf_prog_test_run_xdp() always fills the linear area with
-data_in before creating fragments, leaving no space to pull data. This
-patch will allow users to specify the linear data size through
-ctx->data_end.
-
-Currently, ctx_in->data_end must match data_size_in and will not be the
-final ctx->data_end seen by xdp programs. This is because ctx->data_end
-is populated according to the xdp_buff passed to test_run. The linear
-data area available in an xdp_buff, max_data_sz, is alawys filled up
-before copying data_in into fragments.
-
-This patch will allow users to specify the size of data that goes into
-the linear area. When ctx_in->data_end is different from data_size_in,
-only ctx_in->data_end bytes of data will be put into the linear area when
-creating the xdp_buff.
-
-While ctx_in->data_end will be allowed to be different from data_size_in,
-it cannot be larger than the data_size_in as there will be no data to
-copy from user space. If it is larger than the maximum linear data area
-size, the layout suggested by the user will not be honored. Data beyond
-max_data_sz bytes will still be copied into fragments.
-
-Finally, since it is possible for a NIC to produce a xdp_buff with empty
-linear data area, allow it when calling bpf_test_init() from
-bpf_prog_test_run_xdp() so that we can test XDP kfuncs with such
-xdp_buff. This is done by moving lower-bound check to callers as most of
-them already do except bpf_prog_test_run_skb().
+Test bpf_xdp_pull_data() with xdp packets with different layouts. The
+xdp bpf program first checks if the layout is as expected. Then, it
+calls bpf_xdp_pull_data(). Finally, it checks the 0xbb marker at offset
+1024 using directly packet access.
 
 Signed-off-by: Amery Hung <ameryhung@gmail.com>
 ---
- net/bpf/test_run.c                                       | 9 +++++++--
- .../selftests/bpf/prog_tests/xdp_context_test_run.c      | 4 +---
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ .../selftests/bpf/prog_tests/xdp_pull_data.c  | 169 ++++++++++++++++++
+ .../selftests/bpf/progs/test_xdp_pull_data.c  |  36 ++++
+ 2 files changed, 205 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/xdp_pull_data.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_xdp_pull_data.c
 
-diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-index 4a862d605386..0cbd3b898c45 100644
---- a/net/bpf/test_run.c
-+++ b/net/bpf/test_run.c
-@@ -665,7 +665,7 @@ static void *bpf_test_init(const union bpf_attr *kattr, u32 user_size,
- 	void __user *data_in = u64_to_user_ptr(kattr->test.data_in);
- 	void *data;
- 
--	if (user_size < ETH_HLEN || user_size > PAGE_SIZE - headroom - tailroom)
-+	if (user_size > PAGE_SIZE - headroom - tailroom)
- 		return ERR_PTR(-EINVAL);
- 
- 	size = SKB_DATA_ALIGN(size);
-@@ -1001,6 +1001,9 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
- 	    kattr->test.cpu || kattr->test.batch_size)
- 		return -EINVAL;
- 
-+	if (size < ETH_HLEN)
-+		return -EINVAL;
+diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_pull_data.c b/tools/testing/selftests/bpf/prog_tests/xdp_pull_data.c
+new file mode 100644
+index 000000000000..ca514fa3761c
+--- /dev/null
++++ b/tools/testing/selftests/bpf/prog_tests/xdp_pull_data.c
+@@ -0,0 +1,169 @@
++// SPDX-License-Identifier: GPL-2.0
 +
- 	data = bpf_test_init(kattr, kattr->test.data_size_in,
- 			     size, NET_SKB_PAD + NET_IP_ALIGN,
- 			     SKB_DATA_ALIGN(sizeof(struct skb_shared_info)));
-@@ -1246,13 +1249,15 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog, const union bpf_attr *kattr,
- 
- 	if (ctx) {
- 		/* There can't be user provided data before the meta data */
--		if (ctx->data_meta || ctx->data_end != size ||
-+		if (ctx->data_meta || ctx->data_end > size ||
- 		    ctx->data > ctx->data_end ||
- 		    unlikely(xdp_metalen_invalid(ctx->data)) ||
- 		    (do_live && (kattr->test.data_out || kattr->test.ctx_out)))
- 			goto free_ctx;
- 		/* Meta data is allocated from the headroom */
- 		headroom -= ctx->data;
++#include <bpf/btf.h>
++#include <test_progs.h>
++#include <network_helpers.h>
++#include "test_xdp_pull_data.skel.h"
 +
-+		size = ctx->data_end;
- 	}
- 
- 	max_data_sz = PAGE_SIZE - headroom - tailroom;
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-index 46e0730174ed..178292d1251a 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-@@ -97,9 +97,7 @@ void test_xdp_context_test_run(void)
- 	/* Meta data must be 255 bytes or smaller */
- 	test_xdp_context_error(prog_fd, opts, 0, 256, sizeof(data), 0, 0, 0);
- 
--	/* Total size of data must match data_end - data_meta */
--	test_xdp_context_error(prog_fd, opts, 0, sizeof(__u32),
--			       sizeof(data) - 1, 0, 0, 0);
-+	/* Total size of data must be data_end - data_meta or larger */
- 	test_xdp_context_error(prog_fd, opts, 0, sizeof(__u32),
- 			       sizeof(data) + 1, 0, 0, 0);
- 
++#define PULL_MAX	(1 << 31)
++#define PULL_PLUS_ONE	(1 << 30)
++
++#define XDP_PACKET_HEADROOM 256
++
++int xdpf_sz, sinfo_sz, page_sz;
++
++static bool find_xdp_sizes(void)
++{
++	struct btf *btf = NULL;
++	bool ret = false;
++	int id;
++
++	btf = btf__load_vmlinux_btf();
++	if (!ASSERT_OK_PTR(btf, "btf__load_vmlinux_btf"))
++		return false;
++
++	id = btf__find_by_name_kind(btf, "xdp_frame", BTF_KIND_STRUCT);
++	if (!ASSERT_GT(id, 0, "btf__find_by_name_kind"))
++		goto out;
++
++	xdpf_sz = btf__resolve_size(btf, id);
++
++	id = btf__find_by_name_kind(btf, "skb_shared_info", BTF_KIND_STRUCT);
++	if (!ASSERT_GT(id, 0, "btf__find_by_name_kind"))
++		goto out;
++
++	sinfo_sz = btf__resolve_size(btf, id);
++	ret = true;
++out:
++	btf__free(btf);
++	return ret;
++}
++
++/* xdp_pull_data_prog will directly read a marker 0xbb stored at buf[1024]
++ * so caller expecting XDP_PASS should always pass pull_len no less than 1024
++ */
++static void run_test(struct test_xdp_pull_data *skel, int retval,
++		     int buff_len, int meta_len, int data_len, int pull_len)
++{
++	LIBBPF_OPTS(bpf_test_run_opts, topts);
++	struct xdp_md ctx = {};
++	int prog_fd, err;
++	__u8 *buf;
++
++	buf = calloc(buff_len, sizeof(__u8));
++	if (!ASSERT_OK_PTR(buf, "calloc buf"))
++		return;
++
++	buf[meta_len + 1023] = 0xaa;
++	buf[meta_len + 1024] = 0xbb;
++	buf[meta_len + 1025] = 0xcc;
++
++	topts.data_in = buf;
++	topts.data_out = buf;
++	topts.data_size_in = buff_len;
++	topts.data_size_out = buff_len;
++	ctx.data = meta_len;
++	ctx.data_end = meta_len + data_len;
++	topts.ctx_in = &ctx;
++	topts.ctx_out = &ctx;
++	topts.ctx_size_in = sizeof(ctx);
++	topts.ctx_size_out = sizeof(ctx);
++
++	skel->bss->data_len = data_len;
++	if (pull_len & PULL_MAX) {
++		int headroom = XDP_PACKET_HEADROOM - meta_len - xdpf_sz;
++		int tailroom = page_sz - XDP_PACKET_HEADROOM -
++			       data_len - sinfo_sz;
++
++		pull_len = !!(pull_len & PULL_PLUS_ONE);
++		pull_len += headroom + tailroom + data_len;
++	}
++	skel->bss->pull_len = pull_len;
++
++	prog_fd = bpf_program__fd(skel->progs.xdp_pull_data_prog);
++	err = bpf_prog_test_run_opts(prog_fd, &topts);
++	ASSERT_OK(err, "bpf_prog_test_run_opts");
++	ASSERT_EQ(topts.retval, retval, "xdp_pull_data_prog retval");
++
++	if (retval == XDP_DROP)
++		goto out;
++
++	ASSERT_EQ(ctx.data_end, meta_len + pull_len, "linear data size");
++	ASSERT_EQ(topts.data_size_out, buff_len, "linear + non-linear data size");
++	/* Make sure data around xdp->data_end was not messed up by
++	 * bpf_xdp_pull_data()
++	 */
++	ASSERT_EQ(buf[meta_len + 1023], 0xaa, "data[1023]");
++	ASSERT_EQ(buf[meta_len + 1024], 0xbb, "data[1024]");
++	ASSERT_EQ(buf[meta_len + 1025], 0xcc, "data[1025]");
++out:
++	free(buf);
++}
++
++static void test_xdp_pull_data_basic(void)
++{
++	struct test_xdp_pull_data *skel;
++	u32 max_meta_len, max_data_len;
++
++	skel = test_xdp_pull_data__open_and_load();
++	if (!ASSERT_OK_PTR(skel, "test_xdp_pull_data__open_and_load"))
++		return;
++
++	page_sz = sysconf(_SC_PAGE_SIZE);
++
++	if (!find_xdp_sizes())
++		goto out;
++
++	max_meta_len = XDP_PACKET_HEADROOM - xdpf_sz;
++	max_data_len = page_sz - XDP_PACKET_HEADROOM - sinfo_sz;
++
++	/* linear xdp pkt, pull 0 byte */
++	run_test(skel, XDP_PASS, 2048, 0, 2048, 2048);
++
++	/* multi-buf pkt, pull results in linear xdp pkt */
++	run_test(skel, XDP_PASS, 2048, 0, 1024, 2048);
++
++	/* multi-buf pkt, pull 1 byte to linear data area */
++	run_test(skel, XDP_PASS, 9000, 0, 1024, 1025);
++
++	/* multi-buf pkt, pull 0 byte to linear data area */
++	run_test(skel, XDP_PASS, 9000, 0, 1025, 1025);
++
++	/* multi-buf pkt, empty linear data area, pull requires memmove */
++	run_test(skel, XDP_PASS, 9000, 0, 0, PULL_MAX);
++
++	/* multi-buf pkt, no headroom */
++	run_test(skel, XDP_PASS, 9000, max_meta_len, 1024, PULL_MAX);
++
++	/* multi-buf pkt, no tailroom, pull requires memmove */
++	run_test(skel, XDP_PASS, 9000, 0, max_data_len, PULL_MAX);
++
++	/* Test cases with invalid pull length */
++
++	/* linear xdp pkt, pull more than total data len */
++	run_test(skel, XDP_DROP, 2048, 0, 2048, 2049);
++
++	/* multi-buf pkt with no space left in linear data area */
++	run_test(skel, XDP_DROP, 9000, max_meta_len, max_data_len,
++		 PULL_MAX | PULL_PLUS_ONE);
++
++	/* multi-buf pkt, empty linear data area */
++	run_test(skel, XDP_DROP, 9000, 0, 0, PULL_MAX | PULL_PLUS_ONE);
++
++	/* multi-buf pkt, no headroom */
++	run_test(skel, XDP_DROP, 9000, max_meta_len, 1024,
++		 PULL_MAX | PULL_PLUS_ONE);
++
++	/* multi-buf pkt, no tailroom */
++	run_test(skel, XDP_DROP, 9000, 0, max_data_len,
++		 PULL_MAX | PULL_PLUS_ONE);
++
++out:
++	test_xdp_pull_data__destroy(skel);
++}
++
++void test_xdp_pull_data(void)
++{
++	if (test__start_subtest("xdp_pull_data"))
++		test_xdp_pull_data_basic();
++}
+diff --git a/tools/testing/selftests/bpf/progs/test_xdp_pull_data.c b/tools/testing/selftests/bpf/progs/test_xdp_pull_data.c
+new file mode 100644
+index 000000000000..cffb1a342f6a
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/test_xdp_pull_data.c
+@@ -0,0 +1,36 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include "vmlinux.h"
++#include <bpf/bpf_helpers.h>
++
++int data_len;
++int pull_len;
++
++#define XDP_PACKET_HEADROOM 256
++
++SEC("xdp.frags")
++int xdp_pull_data_prog(struct xdp_md *ctx)
++{
++	__u8 *data_end = (void *)(long)ctx->data_end;
++	__u8 *data = (void *)(long)ctx->data;
++	__u8 *val_p;
++	int err;
++
++	if (data_len != data_end - data)
++		return XDP_DROP;
++
++	err = bpf_xdp_pull_data(ctx, pull_len);
++	if (err)
++		return XDP_DROP;
++
++	val_p = (void *)(long)ctx->data + 1024;
++	if (val_p + 1 > (void *)(long)ctx->data_end)
++		return XDP_DROP;
++
++	if (*val_p != 0xbb)
++		return XDP_DROP;
++
++	return XDP_PASS;
++}
++
++char _license[] SEC("license") = "GPL";
 -- 
 2.47.3
 
