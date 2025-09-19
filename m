@@ -1,245 +1,225 @@
-Return-Path: <netdev+bounces-224917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A121DB8B772
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 00:23:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34ABAB8B9A6
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 01:09:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CF315A76E3
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 22:23:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8F2E1894E6C
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 23:10:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F26CA2D2497;
-	Fri, 19 Sep 2025 22:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76E06256C6F;
+	Fri, 19 Sep 2025 23:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fjuE7i6c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ekGm6keo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529FF2857D2
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 22:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3092AD24
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 23:09:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758320577; cv=none; b=LKqwczdNLjj6yPK1V/s8IKHJew3SN5BJlYDlDCJBBf0KAbkxP4gyWCGo6o+NGENyQFCyjuxacw8AyMjdgGLE9s9qn9GBhxb+hRYzshl7iPFkI/WdXYcZCK9b3sBYQhlZTcjpcaowdHSX4z8r9+0NjVHgki7mIytx15RijCdnBPI=
+	t=1758323395; cv=none; b=b8lRXHwt8UKYAdW8nnsnY8Ga9Ra+69I5NQpSmwmWNGDJ8fcXZlP9IXteKDT6xEslxB7jKaem4wLXOU73EB8FUf1EANPc02Ui/O4X8Ey9N801LGcsggbDpCQuko8rXFWMfIhlgBLRCJO/sEgGXA/KRDpUIMTA1lszNGSFL0kJuuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758320577; c=relaxed/simple;
-	bh=IIFhRI+TsAvfZeudshXo/wh+vjAohK8Azb1V5DPNy1g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rt3MsCs6DAl+CE/4wtixjvLaalHgwIqydzapMIy70XKAaW4YO3vjES6WdaziVSb4emdGeD3crK94Xpc9bM7kTLRtTJfkBWFZeMz/PhrZ+I7h9IV7YB1azIZS81Hmnh0Zepfwkeq8aCYxaXy6sV7KJuST88hsvmalptqpqswxIPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fjuE7i6c; arc=none smtp.client-ip=209.85.216.49
+	s=arc-20240116; t=1758323395; c=relaxed/simple;
+	bh=HY9tKDOUJ7QjRHaaoRji1oijbaIozebjreGllM14yTU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ouxnsiklvdlobnBcDkZNv1+vjKU6ruMMghtjeF+kBQov1xC4qGwIH1bne7Xn8lvLJBFL06m6iaq7qVuWYzSK4MpYlAIwOPFV0PRreXQTxWl3E9pHo2MwZJqxB3S/wbJi941Bf5z2laNVLbVREJd4bMsww/sMr0MpDyGS2/Jlwfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ekGm6keo; arc=none smtp.client-ip=209.85.215.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-32eb45ab7a0so2470824a91.0
-        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 15:22:56 -0700 (PDT)
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b550a522a49so1951912a12.2
+        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 16:09:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758320576; x=1758925376; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NVttn2DL6ng5pXY1yjZwV7ysZJbj/h4XmkfTp1L7SEY=;
-        b=fjuE7i6cq82w5A2FP1tYBkDoCPnfg/eHw14jY1pUMVxStk+Fd027yGDAYhcZx9O+A0
-         foeL5IQi7v8bWuzxXO97smPqN5oUGrC0pEtbnYVSidpJvxRW7hzMK7q6cZH45YLihJXv
-         KvE8C6kw5kW5LcHMmIvLy9TcK45+NRae3k/LyfTl67ncAb4COUYw4KLO/p1OKZHuS1m4
-         Z3apRnLo7tm9iwaq7Np+a01d/tjudplw96pcWLtXO5a3B6NmiLDiXEi9bzFgDa+c9WAj
-         tKyw0LJmhCzjc7O8DEwGm2zzIjUMNlqANyAPJyuzO5zXJUluh37H5OZmPND5+us1DXPs
-         dlBQ==
+        d=gmail.com; s=20230601; t=1758323393; x=1758928193; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/L7k1EaQS0ZD0+t3qmhtzo/Q2KAQtQIeCgBHKEa6ORk=;
+        b=ekGm6keo99H3fOSY1H8Ls+gyC2Om+SMR8daEx3Hyxk+BB1oWYlglHDTnsLR0mJJHKN
+         IdG4HMVdZg3RMzWe+/jgRf4NiJKkZ2CE5rKDvhxow20wPPbwVOi1+35toWFnn8JmoE6h
+         Gb8wpPcFd1AW2FPr7rfS4Wcq1SrLbiJtKTbPzO7qC/Ue8h3QsMR1MLRuCW+4ZMThWOQ7
+         X8NqP4WT0qw2DCPhw6xA2ahlg1q3IFBaYv/zwDd3vT9wehZ4Ll3vDWeAgktGjm1Ii/ZK
+         a69dN7WNWYfFNLOZ5lniBq01CvNAQ62lohav8+bjNxG7CcPo3EZc2HN7KzmCOZI5W5sU
+         wONA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758320576; x=1758925376;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NVttn2DL6ng5pXY1yjZwV7ysZJbj/h4XmkfTp1L7SEY=;
-        b=sba5JG2uGctyp6uFg+c4n9gQj65T6agO/ZkAYFF2ct8pWuufEvtzolQ91pa2DS+WJK
-         uc+MNLixBKBxLZfi72bqeaNUihp8PcX+m05oPgrmk7imSckPxU7ve/s1NQEQ0/44xbxv
-         r2mXvMev92I0kC5hWvJmKY3aNEMU3U+JYLHMdMbi7w/Emse4TQOr1EZlMZv8zcVNzK0w
-         t1fz1VfOOLT2Q28QVro96aN+EOT2+p5T1fFsotN1tE3ZMbFx9i6zhSYNph3yi1BknOyV
-         MzU7RvGwbGBBPYfEY3VLfWSB3h6oPdYt0HXo4p1LmOwFVpaL1v/Efcj5dMEdFvmokoG7
-         DhoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXmst5c4BMdzOagyS0qsvhD2ayfekjYdRyu7Y/qjaQsklMuPvMksRuOBossicQcnXVSiPCrJn4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/e5y4BDyR26F3y2HGY5ItarYyFUNwkHjtuYsn2J2RCrS3c92Y
-	bcsIDi2q/t8OktxRiuvJ/tpqULrefySHFMdE9pHa9mDYs/5YxRreC3CP9KzxYTZ8fXpQfu/6lsp
-	9T4LL1K84RA3sGwK0pU0UcTigmKaDjPM=
-X-Gm-Gg: ASbGnct3OC2A447G0FKP6aHNpypmMh7DrqDc3+NOv0wYoX+p8DtOTy1n9sDEVe6a/bp
-	M6cC51W8tc32NYChAj979uLQY454cZsbQQwEonysh0gAFdA7lS0Wh1L0P3WJM5imo2Zb0UW2z4n
-	P4w/btODs2QGK16lmxdbf5yGuO/XxvHf2yfXBBQXGHoBIKVWYJgPchunFxRbGeRCW6rIVBlycXX
-	OL97N7DIsTZi7VbbY2r/0E=
-X-Google-Smtp-Source: AGHT+IFTIxD0jJKO5G+pCCu1K6n7tVBYK28In98bQte8IZQWbsnwJnU5AjMBK6qo5Bs//UE/GcpJn8fuw07r+SjjOXU=
-X-Received: by 2002:a17:90b:5623:b0:32e:ca03:3ba with SMTP id
- 98e67ed59e1d1-3309834c0afmr5496340a91.22.1758320575534; Fri, 19 Sep 2025
- 15:22:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758323393; x=1758928193;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/L7k1EaQS0ZD0+t3qmhtzo/Q2KAQtQIeCgBHKEa6ORk=;
+        b=CTbGvQtf/cWYEoFUaXZeD2eyQAdXsKZcJabgxtDtbDkRkE/jgrfgYlekFe+dT2g/fb
+         P9J/1KeiWuXR/CdxWWB8Pt/6cRXDyZo8BBlROWN4hzECHElD7/OCPscDeZ0E6P/+OQ0F
+         KMwTf23ZfPJ1b6/MctWfaz4Zz+iO2VHvApSTG9Qed+PKPMir0z3+2X9KDu0gvjMF7uYo
+         subvgf6mjQocd3h9baRS3Dah76sXrj8+ofUvECWFDH1ohTzNSHdg9enTgoD8B6xKHldp
+         yU3FqiFn5oKQV/cfZj72sTenMOhIQEVwORyVkXw0cIQEH8tqBdJraOjety+dg7ZFJbr6
+         oawQ==
+X-Gm-Message-State: AOJu0YzX/J0dHnLpZ/6+bZQn4z70MK8795RaBSeh8cm7Q4C395xM4eVf
+	Grr5qyr6vcvGQ5kdkpTn7FFm8/LIb0Le4AXKJ5Ng9BED3JHJ3I5GyxbU
+X-Gm-Gg: ASbGncvan/WX9Vp4FThpN1SYYZNaks7Zdjnjwm4d+VwGbOdueWf5WJKLpkC1KBBeKzs
+	uNn7dQhhcaDPz3M9k8F1sygvG/GG5UcAgqXrddEqRB/2hTKaaxK5Uou9LZse7pIp3lcpans+mEL
+	s7w/7du92gAPVJRtUtjXAqHgIa+I+f6grLicSdUhVG4Mi8ipzkDu66NTb6SNdiI7DTsaJaGQhd9
+	8/ClJz2D5OmzYd/38M6z0Aojyyv/BdhaE99iQkll/LAVh+lehrIGfF6LNQ0++xZ8mh/yaZtin3e
+	VewVY96gQTa4g2M30pyKclFr07MfkJodX2v2ppJqPmMJ1/tlJ+4fcJ1er9fhkYaPMpcRVCrPLQh
+	xNUgDMRmCKZwftrDLmtlOd+Y=
+X-Google-Smtp-Source: AGHT+IFLpeOrj/nM+g1tMb8cPBc/YjoloBZYqdtW8eereIYIr/KyYHj23arg+PRGEX534VD6XTHt5A==
+X-Received: by 2002:a17:902:db10:b0:266:272b:7277 with SMTP id d9443c01a7336-269ba58f44bmr78810725ad.59.1758323393062;
+        Fri, 19 Sep 2025 16:09:53 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:1::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2698016bf8bsm66067135ad.44.2025.09.19.16.09.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Sep 2025 16:09:52 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	paul.chaignon@gmail.com,
+	kuba@kernel.org,
+	stfomichev@gmail.com,
+	martin.lau@kernel.org,
+	mohsin.bashr@gmail.com,
+	noren@nvidia.com,
+	dtatulea@nvidia.com,
+	saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	maciej.fijalkowski@intel.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next v6 0/7] Add kfunc bpf_xdp_pull_data
+Date: Fri, 19 Sep 2025 16:09:45 -0700
+Message-ID: <20250919230952.3628709-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250918080342.25041-1-alibuda@linux.alibaba.com> <20250918080342.25041-4-alibuda@linux.alibaba.com>
-In-Reply-To: <20250918080342.25041-4-alibuda@linux.alibaba.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Fri, 19 Sep 2025 15:22:41 -0700
-X-Gm-Features: AS18NWAZO1oRArFwgyo_d1_MJyN-C4gXYDi5ATwBewZOaAmKd2Jx5fB2DEmP76o
-Message-ID: <CAEf4BzY5oowUpq2x3Uz+TNi=8GJgc1FDzS-u5UqZwNXvkWtSEw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 3/4] libbpf: fix error when st-prefix_ops and
- ops from differ btf
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	martin.lau@linux.dev, pabeni@redhat.com, song@kernel.org, sdf@google.com, 
-	haoluo@google.com, yhs@fb.com, edumazet@google.com, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, jolsa@kernel.org, mjambigi@linux.ibm.com, 
-	wenjia@linux.ibm.com, wintera@linux.ibm.com, dust.li@linux.alibaba.com, 
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com, bpf@vger.kernel.org, 
-	davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org, 
-	sidraya@linux.ibm.com, jaka@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 18, 2025 at 1:03=E2=80=AFAM D. Wythe <alibuda@linux.alibaba.com=
-> wrote:
->
-> When a struct_ops named xxx_ops was registered by a module, and
-> it will be used in both built-in modules and the module itself,
-> so that the btf_type of xxx_ops will be present in btf_vmlinux
-> instead of in btf_mod, which means that the btf_type of
-> bpf_struct_ops_xxx_ops and xxx_ops will not be in the same btf.
->
-> Here are four possible case:
->
-> +--------+---------------+-------------+---------------------------------=
-+
-> |        | st_ops_xxx_ops| xxx_ops     |                                 =
-|
-> +--------+---------------+-------------+---------------------------------=
-+
-> | case 0 | btf_vmlinux   | bft_vmlinux | be used and reg only in vmlinux =
-|
-> +--------+---------------+-------------+---------------------------------=
-+
-> | case 1 | btf_vmlinux   | bpf_mod     | INVALID                         =
-|
-> +--------+---------------+-------------+---------------------------------=
-+
-> | case 2 | btf_mod       | btf_vmlinux | reg in mod but be used both in  =
-|
-> |        |               |             | vmlinux and mod.                =
-|
-> +--------+---------------+-------------+---------------------------------=
-+
-> | case 3 | btf_mod       | btf_mod     | be used and reg only in mod     =
-|
-> +--------+---------------+-------------+---------------------------------=
-+
->
-> At present, cases 0, 1, and 3 can be correctly identified, because
-> st_ops_xxx_ops is searched from the same btf with xxx_ops. In order to
-> handle case 2 correctly without affecting other cases, we cannot simply
-> change the search method for st_ops_xxx_ops from find_btf_by_prefix_kind(=
-)
-> to find_ksym_btf_id(), because in this way, case 1 will not be
-> recognized anymore.
->
-> To address the issue, we always look for st_ops_xxx_ops first,
-> figure out the btf, and then look for xxx_ops with the very btf to avoid
+v6 -> v5
+  patch 6
+  - v5 selftest failed on S390 when changing how tailroom occupied by
+    skb_shared_info is calculated. Revert selftest to v4, where we get
+    SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) by running an XDP
+    program
 
-What's "very btf"? Commit message would benefit from a little bit of
-proof-reading, if you can. It's a bit hard to follow, even if it's
-more or less clear at the end what problem you are trying to solve.
+v5 -> v4
+  patch 1
+  - Add a new patch clearing pfmemalloc bit in xdp->frags when all frags
+    are freed in bpf_xdp_adjust_tail() (Maciej)
 
-Also, I'd suggest to send this fix as a separate patch and not block
-it on the overall patch set, which probably will take longer. This fix
-is independent, so we can land it much faster.
+  patch 2
+  - Refactor bpf_xdp_shrink_data() (Maciej)
 
-> such issue.
->
-> Fixes: 590a00888250 ("bpf: libbpf: Add STRUCT_OPS support")
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> Acked-by: Andrii Nakryiko <andrii@kernel.org>
-> ---
->  tools/lib/bpf/libbpf.c | 37 ++++++++++++++++++-------------------
->  1 file changed, 18 insertions(+), 19 deletions(-)
->
-> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
-> index fe4fc5438678..50ca13833511 100644
-> --- a/tools/lib/bpf/libbpf.c
-> +++ b/tools/lib/bpf/libbpf.c
-> @@ -1013,35 +1013,34 @@ find_struct_ops_kern_types(struct bpf_object *obj=
-, const char *tname_raw,
->         const struct btf_member *kern_data_member;
->         struct btf *btf =3D NULL;
->         __s32 kern_vtype_id, kern_type_id;
-> -       char tname[256];
-> +       char tname[256], stname[256];
->         __u32 i;
->
->         snprintf(tname, sizeof(tname), "%.*s",
->                  (int)bpf_core_essential_name_len(tname_raw), tname_raw);
->
-> -       kern_type_id =3D find_ksym_btf_id(obj, tname, BTF_KIND_STRUCT,
-> -                                       &btf, mod_btf);
-> -       if (kern_type_id < 0) {
-> -               pr_warn("struct_ops init_kern: struct %s is not found in =
-kernel BTF\n",
-> -                       tname);
-> -               return kern_type_id;
-> -       }
-> -       kern_type =3D btf__type_by_id(btf, kern_type_id);
-> +       snprintf(stname, sizeof(stname), "%s%.*s", STRUCT_OPS_VALUE_PREFI=
-X,
-> +                (int)strlen(tname), tname);
->
-> -       /* Find the corresponding "map_value" type that will be used
-> -        * in map_update(BPF_MAP_TYPE_STRUCT_OPS).  For example,
-> -        * find "struct bpf_struct_ops_tcp_congestion_ops" from the
-> -        * btf_vmlinux.
-> +       /* Look for the corresponding "map_value" type that will be used
-> +        * in map_update(BPF_MAP_TYPE_STRUCT_OPS) first, figure out the b=
-tf
-> +        * and the mod_btf.
-> +        * For example, find "struct bpf_struct_ops_tcp_congestion_ops".
->          */
-> -       kern_vtype_id =3D find_btf_by_prefix_kind(btf, STRUCT_OPS_VALUE_P=
-REFIX,
-> -                                               tname, BTF_KIND_STRUCT);
-> +       kern_vtype_id =3D find_ksym_btf_id(obj, stname, BTF_KIND_STRUCT, =
-&btf, mod_btf);
->         if (kern_vtype_id < 0) {
-> -               pr_warn("struct_ops init_kern: struct %s%s is not found i=
-n kernel BTF\n",
-> -                       STRUCT_OPS_VALUE_PREFIX, tname);
-> +               pr_warn("struct_ops init_kern: struct %s is not found in =
-kernel BTF\n", stname);
->                 return kern_vtype_id;
->         }
->         kern_vtype =3D btf__type_by_id(btf, kern_vtype_id);
->
-> +       kern_type_id =3D btf__find_by_name_kind(btf, tname, BTF_KIND_STRU=
-CT);
-> +       if (kern_type_id < 0) {
-> +               pr_warn("struct_ops init_kern: struct %s is not found in =
-kernel BTF\n", tname);
-> +               return kern_type_id;
-> +       }
-> +       kern_type =3D btf__type_by_id(btf, kern_type_id);
-> +
->         /* Find "struct tcp_congestion_ops" from
->          * struct bpf_struct_ops_tcp_congestion_ops {
->          *      [ ... ]
-> @@ -1054,8 +1053,8 @@ find_struct_ops_kern_types(struct bpf_object *obj, =
-const char *tname_raw,
->                         break;
->         }
->         if (i =3D=3D btf_vlen(kern_vtype)) {
-> -               pr_warn("struct_ops init_kern: struct %s data is not foun=
-d in struct %s%s\n",
-> -                       tname, STRUCT_OPS_VALUE_PREFIX, tname);
-> +               pr_warn("struct_ops init_kern: struct %s data is not foun=
-d in struct %s\n",
-> +                       tname, stname);
->                 return -EINVAL;
->         }
->
-> --
-> 2.45.0
->
+  patch 3
+  - Clear pfmemalloc when all frags are freed in bpf_xdp_pull_data()
+    (Maciej)
+
+  patch 6
+  - Use BTF to get sizes of skb_shared_info and xdp_frame (Maciej)
+
+  Link: https://lore.kernel.org/bpf/20250919182100.1925352-1-ameryhung@gmail.com/
+
+v3 -> v4
+  patch 2
+  - Improve comments (Jakub)
+  - Drop new_end and len_free to simplify code (Jakub)
+
+  patch 4
+  - Instead of adding is_xdp to bpf_test_init, move lower-bound check
+    of user_size to callers (Martin)
+  - Simplify linear data size calculation (Martin)
+
+  patch 5
+  - Add static function identifier (Martin)
+  - Free calloc-ed buf (Martin)
+
+  Link: https://lore.kernel.org/bpf/20250917225513.3388199-1-ameryhung@gmail.com/
+
+v2 -> v3
+  Separate mlx5 fixes from the patchset
+
+  patch 2
+  - Use headroom for pulling data by shifting metadata and data down
+    (Jakub)
+  - Drop the flags argument (Martin)
+
+  patch 4 
+  - Support empty linear xdp data for BPF_PROG_TEST_RUN
+
+  Link: https://lore.kernel.org/bpf/20250915224801.2961360-1-ameryhung@gmail.com/
+
+v1 -> v2
+  Rebase onto bpf-next
+
+  Try to build on top of the mlx5 patchset that avoids copying payload
+  to linear part by Christoph but got a kernel panic. Will rebase on
+  that patchset if it got merged first, or separate the mlx5 fix
+  from this set.
+
+  patch 1
+  - Remove the unnecessary head frag search (Dragos)
+  - Rewind the end frag pointer to simplify the change (Dragos)
+  - Rewind the end frag pointer and recalculate truesize only when the
+    number of frags changed (Dragos)
+
+  patch 3
+  - Fix len == zero behavior. To mirror bpf_skb_pull_data() correctly,
+    the kfunc should do nothing (Stanislav)
+  - Fix a pointer wrap around bug (Jakub)
+  - Use memmove() when moving sinfo->frags (Jakub)
+
+  Link: https://lore.kernel.org/bpf/20250905173352.3759457-1-ameryhung@gmail.com/
+  
+---
+
+Hi all,
+
+This patchset introduces a new kfunc bpf_xdp_pull_data() to allow
+pulling nonlinear xdp data. This may be useful when a driver places
+headers in fragments. When an xdp program would like to keep parsing
+packet headers using direct packet access, it can call
+bpf_xdp_pull_data() to make the header available in the linear data
+area. The kfunc can also be used to decapsulate the header in the
+nonlinear data, as currently there is no easy way to do this.
+
+Tested with the added bpf selftest using bpf test_run and also on
+mlx5 with the tools/testing/selftests/drivers/net/{xdp.py, ping.py}.
+mlx5 with striding RQ enabled always passse xdp_buff with empty linear
+data to xdp programs. xdp.test_xdp_native_pass_mb would fail to parse
+the header before this patchset.
+
+Thanks!
+Amery
+
+Amery Hung (7):
+  bpf: Clear pfmemalloc flag when freeing all fragments
+  bpf: Allow bpf_xdp_shrink_data to shrink a frag from head and tail
+  bpf: Support pulling non-linear xdp data
+  bpf: Clear packet pointers after changing packet data in kfuncs
+  bpf: Support specifying linear xdp packet data size for
+    BPF_PROG_TEST_RUN
+  selftests/bpf: Test bpf_xdp_pull_data
+  selftests: drv-net: Pull data before parsing headers
+
+ include/net/xdp.h                             |   5 +
+ include/net/xdp_sock_drv.h                    |  21 +-
+ kernel/bpf/verifier.c                         |  13 ++
+ net/bpf/test_run.c                            |   9 +-
+ net/core/filter.c                             | 135 +++++++++++--
+ .../bpf/prog_tests/xdp_context_test_run.c     |   4 +-
+ .../selftests/bpf/prog_tests/xdp_pull_data.c  | 179 ++++++++++++++++++
+ .../selftests/bpf/progs/test_xdp_pull_data.c  |  48 +++++
+ .../selftests/net/lib/xdp_native.bpf.c        |  89 +++++++--
+ 9 files changed, 463 insertions(+), 40 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/xdp_pull_data.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_xdp_pull_data.c
+
+-- 
+2.47.3
+
 
