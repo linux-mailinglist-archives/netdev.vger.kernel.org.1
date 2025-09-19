@@ -1,169 +1,130 @@
-Return-Path: <netdev+bounces-224789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FB84B8A1D3
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 16:56:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 842E6B8A289
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 17:04:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB53B3B67FE
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 14:56:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCDAE4E702A
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 15:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5B226E6F7;
-	Fri, 19 Sep 2025 14:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FE50311597;
+	Fri, 19 Sep 2025 15:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mJxYt1bO"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="skK3Wdm1";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="fp1dkayW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A028A1F3FEC;
-	Fri, 19 Sep 2025 14:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 514293148C3
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 15:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758293764; cv=none; b=ne6q2m1qKVxHEnSJeSnPA4Grv9dxbJNLLP6fihSjdVQ2bNujQnk7D99OpZrxBXbjQnBVD5Tpf4Ryer9Zyo/aJ8tJVfz9fh2ipU2+gKPukOyHuQpfmALJ5YOFrYmkDjjUODocz0qiIwHceaOeYyy259xncYNjlcEHV0oCw082+VU=
+	t=1758294188; cv=none; b=kKJjnBbMJ7fIQPD1JC30iV2swyby3eW6YZo3x85AKcf/GzT3WNq6hlPGHl++EyqFoY1y9YGLqBgoF/nP6rD413YjUVPsa6ysICkDiKx+AUP9vfieOLLfaGDeXzlqb9JRKNOus3av954h1cWzaDphGs4qTCNjVwCOD5Q6gmkmt/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758293764; c=relaxed/simple;
-	bh=8uIFhtK2IJ/B47NJpWMNwnQqZrSj51H4Icha31JBO1I=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K3I84clbQc3RwnzR7jJhmFticfAOAJIca5ZcBrKQILDruMS+/1LkwfmMd5M6V7oY+WgPcQl3SbAYH+fKj/Em9OifAieYlup4VfNI6Awp+d6ZdFAoo3oZW7UIXnSA0aJwOxtdAJWEdTIM8apDnBs7mPzd5F3qrPUkf+02KqgogEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=mJxYt1bO; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58J54pgL027133;
-	Fri, 19 Sep 2025 14:55:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=aU/IL1
-	yNGjUFzjuYRWTqCY8LpnItOiXO9jDsErM/ZSw=; b=mJxYt1bO9ZlAJGOriKukNR
-	6DRTT67kcYHIqst30BRLtnh1SMyV+iw+RyyHy1d/pgGo776owZC0aTcq259/Y4PV
-	EtCjbjz9ddjqDVfW/ji/d6eUueeEGNv+e7TJzWKs7S/eQv9i+6Lp6d6yAHZ8YI/r
-	IrN8HV0TfIgPS+/iHqzcCnm8ijIxGoSQ4s2cQggDj9bByZkqTTkP8FLnWYuEp/aR
-	2PBDN2EU2NRR9Aa+T5QlRhVUAWuRZ+ds4Gp4GqkzDg8FxZj9d904SJ15dd3SQMbc
-	Rew2+rgPJd4hk24k6NYLq0ktzrv470p+fO5USmfSUuTgRP/HRH+I6WXsbPWl8HkQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 497g4phff2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Sep 2025 14:55:58 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58JEkpni015466;
-	Fri, 19 Sep 2025 14:55:57 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 497g4phfeq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Sep 2025 14:55:57 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58JE6KCl027308;
-	Fri, 19 Sep 2025 14:55:56 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 495menm9bn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Sep 2025 14:55:56 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58JEtqm030998972
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 19 Sep 2025 14:55:52 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2D1202004D;
-	Fri, 19 Sep 2025 14:55:52 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4663920040;
-	Fri, 19 Sep 2025 14:55:51 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.111.70.35])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Fri, 19 Sep 2025 14:55:51 +0000 (GMT)
-Date: Fri, 19 Sep 2025 16:55:49 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Dust Li <dust.li@linux.alibaba.com>,
-        Guangguan Wang
- <guangguan.wang@linux.alibaba.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Simon
- Horman <horms@kernel.org>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Sidraya
- Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu
- <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH net-next v2 1/2] net/smc: make wr buffer count
- configurable
-Message-ID: <20250919165549.7bebfbc3.pasic@linux.ibm.com>
-In-Reply-To: <20250909121850.2635894a.pasic@linux.ibm.com>
-References: <20250908220150.3329433-1-pasic@linux.ibm.com>
-	<20250908220150.3329433-2-pasic@linux.ibm.com>
-	<aL-YYoYRsFiajiPW@linux.alibaba.com>
-	<20250909121850.2635894a.pasic@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1758294188; c=relaxed/simple;
+	bh=+n/iblNGj7Y18B6Y1Ew5oSCPFMViAjMlu1qCnod5KLI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UKlOL89TNH+FkSYX3wmZ6TlSyzCsW3P7eQ+wyNdT3aCe4ldEqPD/YIP1CXYjHf5MtmoPc8j8g3CkD/M8gh5vZGzOUQtkg3nXM+/yxgvfNxdMwgkpQ4ngG/Vc/xYLWHy6yRC3cOw084+YOFiVC3AWjnkKPDm9FzxXU+c4L9etEqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=skK3Wdm1; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=fp1dkayW; arc=none smtp.client-ip=103.168.172.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 3669B14000D8;
+	Fri, 19 Sep 2025 11:03:04 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Fri, 19 Sep 2025 11:03:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
+	 t=1758294184; x=1758380584; bh=hfNLlqj1sWO8mO3nDoYG41w3rzr/iqt1
+	jxuqP6W0nHI=; b=skK3Wdm1eap8+niowJ+Z7UKz8Os+xzY+gwF0LqbGjEbUH7pD
+	drftn+90M+aPY5h+b5W2dwNuqt4Vd4ar1SCk5ZzBMmuIZv8Kd8aOJsXlAe6rDuZX
+	b3XCLB2B8dTUBXPXJVW01HvYgIC5ZvHHCo/aTpn6BJNQKb0OQ67Cdzddc43b3/ME
+	GW3y7xPvnoFp/8hn3txbhnNQigGCoaXi3f93uBhlt0a//1g/fzHKksevgkMuABS5
+	mguhar6tfGBPy+pZdP1WRCBrcC+lAApAchKPrP9xwS4rOQkYOcZiCsOMVxNP7Wqb
+	hQUJrgoXEX72iDM/fyrfSjaZnsro8uwMgSOcpQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1758294184; x=
+	1758380584; bh=hfNLlqj1sWO8mO3nDoYG41w3rzr/iqt1jxuqP6W0nHI=; b=f
+	p1dkayWxnclMCi/rdxBVxcc7wwij6HnFD3YeOsPZOisgYsgdP1coMFZJJ1/29bbm
+	KqH7G18apkOPvkxWR9Cr7hUNePvHU/1AsjKl9vqRe273Nej6JMS4NF2fBmFx03+n
+	ZB6zHSZHWEWCYSxLaLrhmn54MTusnADA1vExqqSXUSTVhCa5pkOdk0morvsHRJgu
+	bz7GURSTWTi57pX01SVTxFJ3dWKVTWBndQmDvhZUdYGoHxwOJadKIAL9cVSrZdEg
+	EUKc5FOCkujTf3K53hCbphY3dRj5J/Bpa4Yxv/lZuRnUC2/D38zv3VZRs4P3zB0+
+	6mc5gxbdKUKRYDIHN8qhA==
+X-ME-Sender: <xms:p3DNaNKfrxSVLUZGEDQGLmJNRn58grhJaqoLFlodZjAiged1iG58gg>
+    <xme:p3DNaGR1Cz_0-Dw5rpp87XCLiG3j0DVDAn-bTzcqOeuOFYkX2fZEpVpOjuaWjTecK
+    3jB7LHgrFzkdPrStLo>
+X-ME-Received: <xmr:p3DNaEsthRfC_dXAjbShNoQ5RfvaF7igZBFy5Bu9HJUKtivExHOx80Ysmy8G>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdegleehvdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepgfdvgeeitefffedvgfdutdelgeeihfegueehteevveegveejudelfeff
+    ieehledvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeehpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehmmhhivghtuhhsleejseihrghhohhordgtoh
+    hmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtoheprghnthhonhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehkuhgsrg
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohhpvghnvhhpnhdquggvvhgvlheslhhi
+    shhtshdrshhouhhrtggvfhhorhhgvgdrnhgvth
+X-ME-Proxy: <xmx:p3DNaPbywsvKhHNL1asEHbkscQKpdne8aIJcSk4H4Rrk5pMtLYWqsQ>
+    <xmx:p3DNaCG4gy5OGU3k-XMr7aQn-WQfRW3quW7tpxkUWIRAtONdU7QSmw>
+    <xmx:p3DNaLxmssrXWhfoshTT0io2MuTAUtIVMpV5oPETe8MSemNevnxNvA>
+    <xmx:p3DNaMkVgDdkn44MVgMOfNXzl4rkf_Z17kIW77Ud_V76VDcd_IG0-w>
+    <xmx:qHDNaID2z28D9vAOlGcnILxYcenlqQKpTciJvqqZ5IRVYUoJ8cNE16fL>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 19 Sep 2025 11:03:03 -0400 (EDT)
+Date: Fri, 19 Sep 2025 17:03:01 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Marek Mietus <mmietus97@yahoo.com>
+Cc: netdev@vger.kernel.org, antonio@openvpn.net, kuba@kernel.org,
+	openvpn-devel@lists.sourceforge.net
+Subject: Re: [PATCH net-next v2 3/3] net: ovpn: use new noref xmit flow in
+ ovpn_udp4_output
+Message-ID: <aM1wpYP5LYhM3jcz@krikkit>
+References: <20250912112420.4394-1-mmietus97@yahoo.com>
+ <20250912112420.4394-4-mmietus97@yahoo.com>
+ <aMlApjuzBJsHVMjN@krikkit>
+ <cd8193c9-1af8-4182-8e6a-a769acfde340@yahoo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE2MDIwNCBTYWx0ZWRfX7O7GttvqFagT
- Cdun3QY+uzZBQMr3Un9NEUfVHdWnZ89ljb2eIA+Z180TJxat8rpwzQRJkEPXhPv1dwLpcdnbfrA
- idK0almy44vfEFXQVDYad9se7l4qKhdVK2eshyDNuctlc4iMua3jHv+SK7LkRzt5RTA/X9YJj+G
- 1nO1Mi8BVzIkNpOY8xPoPnLCCCb8kdkP3eVICBc7rfp/utcePt7ZZrEBCk8Sa5R2pe8JDMm4fng
- +KyvkxlYLiuVZDDHSliv+cfO3pOxnidDbxJq2Jb2x68NXI09dkJ1rEsGCDh6SUzv6AOlYbJRI6G
- t2PvjRxgQEVFepk4Emyj5t0Wt9GvkfazRUxtz6FNIv3+IkVBzVDRf95DuqTXfWHf28BlkY55+jh
- WB5FYOr/
-X-Proofpoint-ORIG-GUID: LvQE9PCL4m0Y2ALvOcZbGvygtvYCo3uo
-X-Proofpoint-GUID: 1ej1yVyvFNjiPyIa0glrzXpwWEFApiLH
-X-Authority-Analysis: v=2.4 cv=cNzgskeN c=1 sm=1 tr=0 ts=68cd6efe cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=3-ZsZ1Rs_CeAYfPLFTEA:9
- a=CjuIK1q_8ugA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-19_01,2025-09-19_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 clxscore=1015 spamscore=0 bulkscore=0 malwarescore=0
- adultscore=0 priorityscore=1501 impostorscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509160204
+In-Reply-To: <cd8193c9-1af8-4182-8e6a-a769acfde340@yahoo.com>
 
-On Tue, 9 Sep 2025 12:18:50 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
-
-> > >-	link->wr_rx_bufs = kcalloc(SMC_WR_BUF_CNT * 3, link->wr_rx_buflen,
-> > >+	link->wr_rx_bufs = kcalloc(link->lgr->pref_recv_wr, SMC_WR_BUF_SIZE,
-> > > 				   GFP_KERNEL);    
+2025-09-18, 18:29:08 +0200, Marek Mietus wrote:
+> W dniu 9/16/25 o 12:49, Sabrina Dubroca pisze:
+> > 2025-09-12, 13:24:20 +0200, Marek Mietus wrote:
+> > Why are you changing only ipv4? Is there something in the ipv6 code
+> > that prevents this?
+> > 
 > 
-> 
-> I will have to do some digging, let's assume for now that it is my
-> mistake. Unfortunately I won't be able to revisit this before next
-> Wednesday.
+> I'm not sure. I'm not as acquainted with IPv6 as I am with IPv4. (and thought I'd hold off
+> until I got a positive response about the series)
 
-Can maybe Wen Gu and  Guangguan Wang chime in. From what I read
-link->wr_rx_buflen can be either SMC_WR_BUF_SIZE that is 48 in which
-case it does not matter, or SMC_WR_BUF_V2_SIZE that is 8192, if
-!smc_link_shared_v2_rxbuf(lnk) i.e. max_recv_sge == 1. So we talk
-about roughly a factor of 170 here. For a large pref_recv_wr the
-back of logic is still there to save us but I really would not say that
-this is how this is intended to work.
+Ok, understood.
 
-Maybe not supporting V2 on devices with max_recv_sge is a better choice,
-assuming that a maximal V2 LLC msg needs to fit each and every receive
-WR buffer. Which seems to be the case based on 27ef6a9981fe ("net/smc:
-support SMC-R V2 for rdma devices with max_recv_sge equals to 1").
+> IPv4 already has some noref xmit optimizations, so it just felt like the right place to start.
 
-For me the best course of action seems to be to send a V3 using
-link->wr_rx_buflen. I'm really not that knowledgeable about RDMA or
-the SMC-R protocol, but I'm happy to be part of the discussion on this
-matter.
+There's also some in IPv6, see d14730b8e911 ("ipv6: use RCU in inet6_csk_xmit()").
 
-Regards,
-Halil
+-- 
+Sabrina
 
