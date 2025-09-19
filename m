@@ -1,108 +1,122 @@
-Return-Path: <netdev+bounces-224893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E9C0B8B4E6
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 23:16:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C38C5B8B4EF
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 23:16:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BF723B8F87
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 21:16:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C35E7BB13C
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 21:15:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1122D3757;
-	Fri, 19 Sep 2025 21:15:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D3A35942;
+	Fri, 19 Sep 2025 21:16:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V5N+wFrq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MLvVR17O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19A02D2385
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 21:15:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E235F29BDAD;
+	Fri, 19 Sep 2025 21:16:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758316549; cv=none; b=MUH9Gf6Y5PmgRxXWYHCUAQfXTtMfLXlKraVnMCZlPqv1tPX9YZXFG4DhHeygVHQcJ6Mfw3cZ0HXpIM0T8s+lnAdfNCqE0x+BtULo0cvY3pRmuHP17lEzLOb4f1KYyZFF3XTDeZ2g5rYO4WV/WZ0LKmBLRqiVRTVAx/Z56R3D88Q=
+	t=1758316609; cv=none; b=f7Csve47lE/Sgnuf9OJG4ALfvGZu2Z+bCf8olD8QTIJ8frEbrXkrbqPnp3O1twUhVoCuwg57j2ZtdjSECUFZ3WDv7kg+xxV6v6uzWjt8MVxUIAL8oanTrxzt2OBXWi420eMvS+agHcngwe3HfyEj8zDDyJuTQIs66Y0axMjc/AI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758316549; c=relaxed/simple;
-	bh=75+xMcEBZ4CCJG3zy2Fp8An358EsjOFKAwpWo1duVAk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NxVeVpurf/s4Sv0JIbLR5iek3jh0/OxUNZOUAJpqmwfcegV5DGet3TQzPJxT9tJkgkkBkTDhACSlm7LlPUXLB9R1B3OTW69HX+05DjR1vB4u3ZzvGCthjHzrI5e9uylVl5thIc3/pgmDYFroDVDIr9EBgHmswmMejwFujOgY/rY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V5N+wFrq; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-26983c4d708so25040455ad.3
-        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 14:15:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758316547; x=1758921347; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V0+Liys18anQK6gRZATENTJbkZzHDkR1/8jEpmQV1kk=;
-        b=V5N+wFrq6fqFRTC7AmC26PUcdxAZ8h9bG+e3cZ21ID4LzXmZfij2HTgMAGmOQc0rhC
-         Ar+nVd4C5vdVvBX72hAvTyoBACMM7MjTNYUolzviG/e2E+cHlIs2iJRiOgbDCcAm+D40
-         P3mwCkKBKS9IFUW464zmiarb5QrJEBcvN30aMgL6X6BrzFv5S6EBDZgzR82f7zKZ2tid
-         RSO7h4XwwMRP4h+uHWA0QyXvtc+liL3LDpwl1GAJtCG+TNIrt8RES0FkSsoqRCSNhQdR
-         Tpz6uTgQv6uN1VO0eqx7vpZDygwXapnfhuT+cMKG3L0mZ/GKZstsZUAmo/PzpS+drzah
-         HTgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758316547; x=1758921347;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V0+Liys18anQK6gRZATENTJbkZzHDkR1/8jEpmQV1kk=;
-        b=doCSTgQnRYsYawm2u3UC++cIMuAu3wakSW7j5VZlsk/TkFOFJHB5VAsel/rOdz8vWG
-         XZTKvJzkOVoD6R1xnApoelEaY+hTEQTE9DzRVVF0McKraXTnaQhjf93FmmDVL/6gVAkc
-         8dwHzmMcPvLORezPA6ySgpmJKqpVl1Z4r0SAvJU8zMs8lPnMlSX+m8op9loGShAasjpe
-         PbpDhzNqEAZ7str0tr3nENK1mZdXPI2R7mXdrdF3zws+8bgng41DOXz1B/c2JQMDv/Ey
-         d81rNWr7WdlLKp7fhqvYM+yXvv5GUk+dvqC61Q49UKSKHIu4XWdpnAotvK4mPrO0pNzH
-         /9dQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJw9ouP0HBS7WrqCa/QZpCd7q6cEBK3MkPX73jLKCz/ve5zRqqp1liu5/sYow0lWlpuVbr8Wg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyw1rAw51AKM81DePWO4aejZhdZP3MbGe3SZktVu4E65aZPn2WZ
-	W9hF9zaYzNc3PJn7YrpcEfTe9SptNIK4pI+igRnR6Wx+dxF+MGfyRy1YW/q/jn1hBsKqXtDKuoG
-	KWC+eqw==
-X-Google-Smtp-Source: AGHT+IFdtQnkscwGqsgriF6C5QkossH14ZthE8OI9NmQ2k9LQwcIhxPc2sZV4JW/RFjatX5u3z54HnLVEKs=
-X-Received: from plbjh12.prod.google.com ([2002:a17:903:328c:b0:269:96fe:32ad])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:dac2:b0:25c:e895:6a75
- with SMTP id d9443c01a7336-269ba4f020amr59534475ad.28.1758316546890; Fri, 19
- Sep 2025 14:15:46 -0700 (PDT)
-Date: Fri, 19 Sep 2025 14:15:45 -0700
-In-Reply-To: <20250918181144.Ygo8BZ-R@linutronix.de>
+	s=arc-20240116; t=1758316609; c=relaxed/simple;
+	bh=wfxAEXzxYSVB6JGbbLrjBWCv+3t+tDPd3Mud0rEiZ9k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KMn0z5HR6SctKEQSXDl6duXf8nRYMDYgt/kMyAy3scoF363Tm2GjyIkDqwHBd7G1LCzhJqRW6PZv073+1CQIwpbo7FqqOx09u1fE0QcMVX8fftvLKktlReETt1CtLgTNiyWnI2f4cRrBqag/viza2AWdlXD/VpfH06vZ1P2Kqfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MLvVR17O; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758316607; x=1789852607;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=wfxAEXzxYSVB6JGbbLrjBWCv+3t+tDPd3Mud0rEiZ9k=;
+  b=MLvVR17Olhu5v2/imKFLsrRqUdD+vib5Meg3Dp8SbN6f/6PTlrpcBAh2
+   n1ossrcidEguqRbmGXa/Q7XjIShAk+JDnMqU/1OSL4L/gpFoyiFLf34ei
+   NQgDOlgUi7NEemmHla8I+/yq17o2i1cSbuHfgvv9wfoWMqreZYt22W6Ly
+   IbZqFhPU1V+d0Knj9qi8Ciq2Z2w33IVgZ48vcsyf79bJs+WVESxvQ8CKz
+   hQ63rgWUOEdq7mWsID31VOru5DfKDc3NsBFCTDUCWtG3Iq5LRCuYoTgEE
+   7Ku5cG/dLmQ0uYxvWbcPotW/gM3lsUJeZVm2wwP06SmbgGfrVUfMO4xbQ
+   A==;
+X-CSE-ConnectionGUID: f8HlL5kPQ9ijHKRtqgD43Q==
+X-CSE-MsgGUID: hDvSiBrXS3+PxQGbyZg8cQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11558"; a="60729664"
+X-IronPort-AV: E=Sophos;i="6.18,279,1751266800"; 
+   d="scan'208";a="60729664"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 14:16:46 -0700
+X-CSE-ConnectionGUID: ynLwOApYQ6mbTLuwinQ3QA==
+X-CSE-MsgGUID: mTPbd37dTNmacQvDocUAeQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,279,1751266800"; 
+   d="scan'208";a="213080912"
+Received: from dnelso2-mobl.amr.corp.intel.com (HELO [10.125.108.58]) ([10.125.108.58])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 14:16:45 -0700
+Message-ID: <437d1457-8d75-4797-8cba-9489bf97cc5d@intel.com>
+Date: Fri, 19 Sep 2025 14:16:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250827194107.4142164-1-seanjc@google.com> <20250827201059.EmmdDFB_@linutronix.de>
- <20250918110828-mutt-send-email-mst@kernel.org> <20250918154826.oUc0cW0Y@linutronix.de>
- <20250918120607-mutt-send-email-mst@kernel.org> <20250918181144.Ygo8BZ-R@linutronix.de>
-Message-ID: <aM3IAaCVx-PDeDsi@google.com>
-Subject: Re: [PATCH] vhost: Take a reference on the task that is reference in
- struct vhost_task.
-From: Sean Christopherson <seanjc@google.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 17/20] cxl: Avoid dax creation for accelerators
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Cc: Alejandro Lucero <alucerop@amd.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Davidlohr Bueso <daves@stgolabs.net>
+References: <20250918091746.2034285-1-alejandro.lucero-palau@amd.com>
+ <20250918091746.2034285-18-alejandro.lucero-palau@amd.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20250918091746.2034285-18-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 18, 2025, Sebastian Andrzej Siewior wrote:
-> vhost_task_create() creates a task and keeps a reference to its
-> task_struct. That task may exit early via a signal and its task_struct
-> will be released.
-> A pending vhost_task_wake() will then attempt to wake the task and
-> access a task_struct which is no longer there.
+
+
+On 9/18/25 2:17 AM, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> Acquire a reference on the task_struct while creating the thread and
-> release the reference while the struct vhost_task itself is removed.
-> If the task exits early due to a signal, then the vhost_task_wake() will
-> still access a valid task_struct. The wake is safe and will be skipped
-> in this case.
+> By definition a type2 cxl device will use the host managed memory for
+> specific functionality, therefore it should not be available to other
+> uses.
 > 
-> Fixes: f9010dbdce911 ("fork, vhost: Use CLONE_THREAD to fix freezer/ps regression")
-> Reported-by: Sean Christopherson <seanjc@google.com>
-> Closes: https://lore.kernel.org/all/aKkLEtoDXKxAAWju@google.com/
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Reviewed-by: Davidlohr Bueso <daves@stgolabs.net>
+
+Reviewed-by: Dave Jiang <dave.jiang@intel.com>
 > ---
+>  drivers/cxl/core/region.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> index 20bd0c82806c..e39f272dd445 100644
+> --- a/drivers/cxl/core/region.c
+> +++ b/drivers/cxl/core/region.c
+> @@ -3922,6 +3922,13 @@ static int cxl_region_probe(struct device *dev)
+>  	if (rc)
+>  		return rc;
+>  
+> +	/*
+> +	 * HDM-D[B] (device-memory) regions have accelerator specific usage.
+> +	 * Skip device-dax registration.
+> +	 */
+> +	if (cxlr->type == CXL_DECODER_DEVMEM)
+> +		return 0;
+> +
+>  	switch (cxlr->mode) {
+>  	case CXL_PARTMODE_PMEM:
+>  		rc = devm_cxl_region_edac_register(cxlr);
 
-Tested-by: Sean Christopherson <seanjc@google.com>
 
