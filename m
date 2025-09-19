@@ -1,113 +1,128 @@
-Return-Path: <netdev+bounces-224750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9020FB892B2
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 12:59:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59449B892C7
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 13:00:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C9FB1BC7F72
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 11:00:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 106171885C67
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 11:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0218530BF65;
-	Fri, 19 Sep 2025 10:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40CD2FBE0D;
+	Fri, 19 Sep 2025 11:00:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Gqjhmq5q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AWbv32QH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E891030BB93
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 10:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F602F8BEE
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 11:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758279562; cv=none; b=ONxlQI5bnZkWdcBjqykmjjvQGUJ3MaQBdLtq/2Q+FVZnCMvkJmlmpDpkv98Y13OrhotQFcBUw9bwckfw18hLar1HHxx3OSlYzBUCQKXqCrOZIsaiXLbRyjP09jLgv+aq3hc0JrDiQUf+gKiyV6WzPFcH1h/w2dGvY8f2516d9Rw=
+	t=1758279647; cv=none; b=G8xbvdOgFwyL5q1MjgL6qRGR/dsShogVY8Hx+iWC5I8jEmc0IIuqsdegpeE9aUMCeN4WSm8XV/4cwFb09TAlfjxs/7YgFYwPwWkTD9mC+f3Asnc4uw802QvksLTfxJ2QrhChMJpAgNW2iJAkiO1idWsoWPrWZugQuWI8A9OyX0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758279562; c=relaxed/simple;
-	bh=CEmWUjF/TcCalxhAWDKk5hHQFMQ5iziper/nDpqO7EE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=shjx0w8oT133FNxOhlQ48OCGCbtgW5d+05ezXf8MqWOmaAI5T4+neK6PL6EVio+90sx0HlcrQOcJ1YZHOCbBIEzVFlo/u0w8/1Uu1R1wDRG6hc2u7b5D9ADHo6hhRGRqTueHba6ey6VN8NHD/UU4o+5SP59YCvm6rqVoF6mk5ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Gqjhmq5q; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <61e38165-fa9f-4078-8499-a9c12449ae95@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758279558;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B5S5/N031pPAmIyQyocHUR2GyX0QYA4EnllETjaaSvE=;
-	b=Gqjhmq5q6xtIVttmXVuKaqlsz6rOWtQpQcV2nlsvHunmqsR9J05wQQeV1zEq6dLWqZD0V+
-	zJ6pILm4IZ7fdiXfj0jpi4DXZfBAjGiFGgCOjFpBhJAZIvLmIBwGAa7ia8+clXmsUlZx2W
-	qRAX1sFNAhKqyFQ1fFqGK/GNUzVobSY=
-Date: Fri, 19 Sep 2025 11:59:16 +0100
+	s=arc-20240116; t=1758279647; c=relaxed/simple;
+	bh=803O1q3nJmNwEnJ0eVOOfvB5A5ny0SBSloh+zkYI6Js=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UYmWbGxMpmGzhMhVvL6KDUNMcLFvVjtPhOfJewY6OF1RL5cKu5rIhNft0FQ1yFK/hIF+NYGQlgvuAB0pRnKaNaGqei8eC4d1E3YZCY9ldpisS3k5PlAnqD5VNpqt15+aYQQ/p+F0pp1YhhvPxWpAXtfR1VA7sy6fQFxQlX/XRaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AWbv32QH; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4b79773a389so20600801cf.1
+        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 04:00:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758279645; x=1758884445; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qxSNVg4jPXGA+Rdup/zzB+BaOlzldW8RsQCH8Thuqv0=;
+        b=AWbv32QHREzVeF97v9N0i9aUuwwa7lFOK0tmAfluvauWuLMtuuAmeBJMD+ltzbDjUC
+         cYWcIqLUBseEypFwuOj3CAf93wYFSMsblrKqI/oRq+JkeFfCPn03hbXQJajusn3E3hb2
+         JC0vIjHxqcy3ElUSuqZ5tjdMlGA0mlmrb92aQnrZOOFp/MZueJeWc3+c/UPZTt52sVcu
+         MkgDIMtrgoHy39YK0tKT+Ilkj1pDuhJRgNrGxXPxyidrF3BpcXTsFPuEos4ocAMBgITQ
+         K+CYk2Cw6Ixzx07fIThcAd2SXB9KYAzYQMZW+8Go1jNGGlHUml0m1cnnC/PkQhrZ0/td
+         cE/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758279645; x=1758884445;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qxSNVg4jPXGA+Rdup/zzB+BaOlzldW8RsQCH8Thuqv0=;
+        b=FjhyOUmV8CO0amW3YJgk8KPBjYf/WtVFSxd1e5XhqK3OwPbY87YKSNS3rWxYlmqMCd
+         fnZQO3VVjqNb88J+EwWznuOn86EucBttIJQGz900ArdBaMzdKMCYVSRXUdUPLgIVFlrN
+         SiKTk+loyFw7kx8UpwNDHRJ3MGc3gzfX1Rtcnflh85KR9vkTjdUgeyUkuxpjABaaBj8U
+         jx8TgRWtS83OHRTa7udntFP+tlif1/zinApAcdSQ/8OIueBrLCjl3+PxMZjNBPXJOqOA
+         ojX6h+vxXRl9f0xDzp3a2mdvLsxuGeCdznTAZwIEgqw020Q48W3bPk1aBSFJaKOMlgDR
+         AQxA==
+X-Forwarded-Encrypted: i=1; AJvYcCUazj0ZNHBU8WV0xIiV3Sn9Afav07F1N4eEb+z10rWtKFPRbQt+/SF5P/2NnGoAMW+mLK3IvsI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwolEbHGHGKwKv/PIQkcUk/YM6NGppOVo9jDfmxjFzxPHY6Kl3k
+	yby+oGqKjxPrUOzM/z+xSZP3umUpWzAyGYR0ZAHopq1X+t6Cf9yLdAGCjp7+Qsdqk2YbseiwlqF
+	DDhmZz4cKuSzKop6c/PiIsw6dOblo2x/2JR6rYRoT
+X-Gm-Gg: ASbGncslO7juSP9ILXX4F5VmjtsOEMMjlBPMFObmaegUBZSy9MwXa2JXrimFRmYlha6
+	CYs53f4K7L/tAh3tYXsT/7Bt74/Q4uudFpd7UgcqfWzCvT/P0fFTHa2NuqCPRuCnf/VJkN9LEVA
+	HnABgAo55NdrHY85RG9NWZKNpbExHqP8b7kvFjp8gfFRZtt9VGAohbUnmMPQB1EZ/xs1cMu7WJV
+	kl8pQ==
+X-Google-Smtp-Source: AGHT+IF2reMFk++hNVQtYtc0bIdPcfWiXwD0EU0fwgyj3cejB40NBcLz41GyRKMkii9zzss3WeJEtKrOQx2MX/Cji4k=
+X-Received: by 2002:ac8:570f:0:b0:4b5:e6a7:304a with SMTP id
+ d75a77b69052e-4c06e7cde40mr29850201cf.22.1758279640369; Fri, 19 Sep 2025
+ 04:00:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v3] net: nfc: nci: Add parameter validation for packet
- data
-To: Deepak Sharma <deepak.sharma.472935@gmail.com>, krzk@kernel.org
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
- linux-kernel-mentees@lists.linux.dev,
- syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-References: <20250919064545.4252-1-deepak.sharma.472935@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250919064545.4252-1-deepak.sharma.472935@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20250918155532.751173-4-edumazet@google.com> <202509191711.gDaSokkJ-lkp@intel.com>
+In-Reply-To: <202509191711.gDaSokkJ-lkp@intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 19 Sep 2025 04:00:29 -0700
+X-Gm-Features: AS18NWCWjUkb5moSf9QpEIxwAisqsl5A0nzCKgyJNySSI2fgU4h2hVLwa-WEP4A
+Message-ID: <CANn89iLGOppxi1JqVXdjpXpMB44akvVU7fj-CTP5e4RPABzt0Q@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/7] tcp: move tcp->rcv_tstamp to
+ tcp_sock_write_txrx group
+To: kernel test robot <lkp@intel.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, oe-kbuild-all@lists.linux.dev, 
+	Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 19/09/2025 07:45, Deepak Sharma wrote:
-> Syzbot reported an uninit-value bug at nci_init_req for commit
-> 5aca7966d2a7 ("Merge tag 'perf-tools-fixes-for-v6.17-2025-09-16'..).
-> 
-> This bug arises due to very limited and poor input validation
-> that was done at nic_valid_size(). This validation only
-> validates the skb->len (directly reflects size provided at the
-> userspace interface) with the length provided in the buffer
-> itself (interpreted as NCI_HEADER). This leads to the processing
-> of memory content at the address assuming the correct layout
-> per what opcode requires there. This leads to the accesses to
-> buffer of `skb_buff->data` which is not assigned anything yet.
-> 
-> Following the same silent drop of packets of invalid sizes at
-> `nic_valid_size()`, add validation of the data in the respective
-> handlers and return error values in case of failure. Release
-> the skb if error values are returned from handlers in
-> `nci_nft_packet` and effectively do a silent drop
-> 
-> Possible TODO: because we silently drop the packets, the
-> call to `nci_request` will be waiting for completion of request
-> and will face timeouts. These timeouts can get excessively logged
-> in the dmesg. A proper handling of them may require to export
-> `nci_request_cancel` (or propagate error handling from the
-> nft packets handlers).
-> 
-> Reported-by: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=740e04c2a93467a0f8c8
-> Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation)
-> Tested-by: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-> Signed-off-by: Deepak Sharma <deepak.sharma.472935@gmail.com>
-> ---
-> v3:
->   - Move the checks inside the packet data handlers
->   - Improvements to the commit message
-> 
-> v2:
->   - Fix the release of skb in case of the early return
-> 
-> v1:
->   - Add checks in `nci_ntf_packet` on the skb->len and do early return
->     on failure
-> 
+On Fri, Sep 19, 2025 at 3:10=E2=80=AFAM kernel test robot <lkp@intel.com> w=
+rote:
+>
+> Hi Eric,
+>
+> kernel test robot noticed the following build errors:
+>
+> [auto build test ERROR on net-next/main]
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-m=
+ove-sk_uid-and-sk_protocol-to-sock_read_tx/20250919-000602
+> base:   net-next/main
+> patch link:    https://lore.kernel.org/r/20250918155532.751173-4-edumazet=
+%40google.com
+> patch subject: [PATCH net-next 3/7] tcp: move tcp->rcv_tstamp to tcp_sock=
+_write_txrx group
+> config: powerpc-ge_imp3a_defconfig (https://download.01.org/0day-ci/archi=
+ve/20250919/202509191711.gDaSokkJ-lkp@intel.com/config)
+> compiler: powerpc-linux-gcc (GCC) 15.1.0
+> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
+ve/20250919/202509191711.gDaSokkJ-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202509191711.gDaSokkJ-lkp=
+@intel.com/
+>
+> All errors (new ones prefixed by >>):
 
-LGTM,
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Yeah, I think I will remove these CACHELINE_ASSERT_GROUP_SIZE() which
+are hard to maintain and bring little value.
 
