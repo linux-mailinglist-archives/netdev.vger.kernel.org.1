@@ -1,442 +1,226 @@
-Return-Path: <netdev+bounces-224691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E450B886A1
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 10:27:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 646A7B886E9
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 10:33:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAD7F1C860D5
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 08:28:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AEAC3BD604
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 08:33:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B13A03064A6;
-	Fri, 19 Sep 2025 08:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA7F2E62D8;
+	Fri, 19 Sep 2025 08:32:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="gIW7uz8B"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nClz5dy3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8B6305E2F
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 08:27:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5092BD01B
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 08:32:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758270431; cv=none; b=TBdGib6NkOLKhGCD2S4W2nAabSx/XuCDlmbdCowJ8BDpZDbha8uVoR2j5R4Q1kHHQEs6qDGPPloAdJi2Bv1UTKseBi1J2daXze18hXEIgqHtwuZcha3EPvg1+XZpJ4+8HBnvf2F1J6Kljoic2C+Pf1dDTHSwbezMwh6zH0Otbi4=
+	t=1758270779; cv=none; b=utwvgf0C+bzBq1rEl5syeYchhXNrRApc+/kok5y+4344JL6ITZEbbcWoAaBKMCdq8f0xhI82X3on+lUwlUmRxG2q6wN2m4pRvz+ichbOlRuqNDwH+7kDUSGxIWR7r41RU1pqwcqS+KzolTZ8gfQVvzOA4deEj5UPo/G8XbK4vTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758270431; c=relaxed/simple;
-	bh=qsS439hI5wV39QcrqI00cTF4BaxSZ5e0Rj1zD1rl3i0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=PUEj0JdNE9zpBADWuw8FAQKI44M3k/YrQDyJXzmWEKfMO09racnrCd1kXa8GuRPsL25KWHvlH7bX58PZ6rQ5E0mdK8Li4QMAhbJvvNDtizx2BlNd/wE5GueyAQgux+8s+WrBavz5/wWjpVFT+tTzkQA+iQxAowWAnaZfVYck+X0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=gIW7uz8B; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20250919082707euoutp0143e8dea2b866d062a645bdfd00632302~moaNBIs4X2189921899euoutp01T
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 08:27:07 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20250919082707euoutp0143e8dea2b866d062a645bdfd00632302~moaNBIs4X2189921899euoutp01T
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1758270427;
-	bh=6eNfMlTZqUrUupq60aFj0xlkMp9zYwxbsjfbrARp2Co=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=gIW7uz8BH+aDYKJo62e6QfJfG1Oj5GHyDkh9UUQAmUvKLTnicYGA5eblb1I9GWJEp
-	 WK5fPfeYSw9HjagcgzPiYe6E78AhBKUUej8Xt2av0FBFkgJP6OrL6j+hZwnzPz2//v
-	 jXQCEfnrOBC7aJeNlp9pQYAWNoz2+MZ1u2yjM9/E=
-Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250919082706eucas1p1fa29f9e90e1afdf3894b5effd734cf3f~moaMa9DNT1105511055eucas1p1v;
-	Fri, 19 Sep 2025 08:27:06 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20250919082704eusmtip1adb06790aee1726353acc54069d07301~moaLAf9lE2569525695eusmtip1P;
-	Fri, 19 Sep 2025 08:27:04 +0000 (GMT)
-Message-ID: <a52c0cf5-0444-41aa-b061-a0a1d72b02fe@samsung.com>
-Date: Fri, 19 Sep 2025 10:27:04 +0200
+	s=arc-20240116; t=1758270779; c=relaxed/simple;
+	bh=a0jGbuINXDYYLHXrX6+Ip5hZUOHKxpyoBXTqd81umCk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MLa13PzRTfJwVN7r0EeJyv7bpEEusuoMHu0h3lj2GC6bxu3vfV9Hs82fkLiUGjY+4FweTwtG/Ew6kTUaOted5+O8sVc0ZILLZ0AsVErp1ah9TnOczc0rc+yPfpn1uE9S7K8uSR8v1Z0OPSTRDHtEyUcOjqGHPC3jVKHb/grX0i4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nClz5dy3; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 2B0FEC8EC77;
+	Fri, 19 Sep 2025 08:32:32 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id CEAAB606A8;
+	Fri, 19 Sep 2025 08:32:48 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C3354102F1D07;
+	Fri, 19 Sep 2025 10:32:34 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1758270768; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=aYSdvv1PGdJwPuRoTj/5x3ILygoqiHtqkDX7UP6C+Dk=;
+	b=nClz5dy3UJ39xi0U6noITgt5NHEUm6oO1ha0PnBdfDaOwm8+x0bhPbBb3KSQm94KHGcl2t
+	u+HQ/9nB3Rf5bzRM9ydQe1uyFDTOaokNI0Kn4YZlfgkOKWiaM/Z+UPc8A2b6ieCIF13moG
+	corSAPx3GLssAcX79ej3TV+uNKdC8W5KtN7aqrP+x6VNIXj/Og3MfzwuGw5wLMjgb61ua5
+	E/WdwxkoX4ICiMotZhMMJl3wGeV5bL4gaosK2ihAmiNI2rO4f4SWv/yu1HMn52g3GGImbz
+	gCyGfH/VokpSWoFEGA9f/A7SqKgkKAza3mGoKxO+YZ7zgbUN+4UEmNfJkvS4Ug==
+Date: Fri, 19 Sep 2025 10:32:32 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Wei Fang <wei.fang@nxp.com>, claudiu.manoil@nxp.com,
+ xiaoning.wang@nxp.com, yangbo.lu@nxp.com, richardcochran@gmail.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, Frank.Li@nxp.com, imx@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: enetc: use generic interfaces to get
+ phc_index for ENETC v1
+Message-ID: <20250919103232.6d668441@kmaincent-XPS-13-7390>
+In-Reply-To: <20250918124823.t3xlzn7w2glzkhnx@skbuf>
+References: <20250918074454.1742328-1-wei.fang@nxp.com>
+	<20250918124823.t3xlzn7w2glzkhnx@skbuf>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Betterbird (Windows)
-Subject: Re: [PATCH net-next v12 0/5] Add Ethernet MAC support for SpacemiT
- K1
-To: Vivian Wang <wangruikang@iscas.ac.cn>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>, Paul Walmsley
-	<paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
-	<aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>
-Cc: Vivian Wang <uwu@dram.page>, Vadim Fedorenko
-	<vadim.fedorenko@linux.dev>, Junhui Liu <junhui.liu@pigmoral.tech>, Simon
-	Horman <horms@kernel.org>, Maxime Chevallier
-	<maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-riscv@lists.infradead.org,
-	spacemit@lists.linux.dev, linux-kernel@vger.kernel.org, Conor Dooley
-	<conor.dooley@microchip.com>, Troy Mitchell
-	<troy.mitchell@linux.spacemit.com>, Hendrik Hamerlinck
-	<hendrik.hamerlinck@hammernet.be>, Andrew Lunn <andrew@lunn.ch>
-Content-Language: en-US
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <20250914-net-k1-emac-v12-0-65b31b398f44@iscas.ac.cn>
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20250919082706eucas1p1fa29f9e90e1afdf3894b5effd734cf3f
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20250919082706eucas1p1fa29f9e90e1afdf3894b5effd734cf3f
-X-EPHeader: CA
-X-CMS-RootMailID: 20250919082706eucas1p1fa29f9e90e1afdf3894b5effd734cf3f
-References: <20250914-net-k1-emac-v12-0-65b31b398f44@iscas.ac.cn>
-	<CGME20250919082706eucas1p1fa29f9e90e1afdf3894b5effd734cf3f@eucas1p1.samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hi All,
+On Thu, 18 Sep 2025 15:48:23 +0300
+Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
 
-On 14.09.2025 06:23, Vivian Wang wrote:
-> SpacemiT K1 has two gigabit Ethernet MACs with RGMII and RMII support.
-> Add devicetree bindings, driver, and DTS for it.
->
-> Tested primarily on BananaPi BPI-F3. Basic TX/RX functionality also
-> tested on Milk-V Jupiter.
->
-> I would like to note that even though some bit field names superficially
-> resemble that of DesignWare MAC, all other differences point to it in
-> fact being a custom design.
->
-> Based on SpacemiT drivers [1]. These patches are also available at:
->
-> https://github.com/dramforever/linux/tree/k1/ethernet/v12
->
-> [1]: https://github.com/spacemit-com/linux-k1x
+> On Thu, Sep 18, 2025 at 03:44:54PM +0800, Wei Fang wrote:
+> > @@ -954,17 +957,9 @@ static int enetc_get_ts_info(struct net_device *nd=
+ev,
+> >  	if (!enetc_ptp_clock_is_enabled(si))
+> >  		goto timestamp_tx_sw;
+> > =20
+> > -	if (is_enetc_rev1(si)) {
+> > -		phc_idx =3D symbol_get(enetc_phc_index);
+> > -		if (phc_idx) {
+> > -			info->phc_index =3D *phc_idx; =20
+>=20
+> phc_idx remains unused in enetc_get_ts_info() after this change, and it
+> produces a build warning.
+>=20
+> > -			symbol_put(enetc_phc_index);
+> > -		}
+> > -	} else {
+> > -		info->phc_index =3D enetc4_get_phc_index(si);
+> > -		if (info->phc_index < 0)
+> > -			goto timestamp_tx_sw;
+> > -	}
+> > +	info->phc_index =3D enetc_get_phc_index(si);
+> > +	if (info->phc_index < 0)
+> > +		goto timestamp_tx_sw;
+> > =20
+> >  	enetc_get_ts_generic_info(ndev, info);
+> >   =20
+>=20
+> Also, testing reveals:
+>=20
+> root@fii:~# ethtool -T eno2
+> [   43.374227] BUG: sleeping function called from invalid context at
+> kernel/locking/rwsem.c:1536 [   43.383268] in_atomic(): 0, irqs_disabled(=
+):
+> 0, non_block: 0, pid: 460, name: ethtool [   43.392076] preempt_count: 0,
+> expected: 0 [   43.396454] RCU nest depth: 1, expected: 0
+> [   43.400908] 3 locks held by ethtool/460:
+> [   43.405206]  #0: ffffcb976c5fb608 (cb_lock){++++}-{4:4}, at:
+> genl_rcv+0x30/0x60 [   43.412886]  #1: ffffcb976c5e9f88
+> (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x28/0x40 [   43.420931]  #2:
+> ffffcb976c0b32d0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x4/0x=
+48 [
+>   43.429785] CPU: 1 UID: 0 PID: 460 Comm: ethtool Not tainted 6.17.0-rc5+
+> #2920 PREEMPT [   43.429796] Call trace: [   43.429799]  show_stack+0x24/=
+0x38
+> (C) [   43.429814]  dump_stack_lvl+0x40/0xa0
+> [   43.429822]  dump_stack+0x18/0x24
+> [   43.429828]  __might_resched+0x200/0x218
+> [   43.429837]  __might_sleep+0x54/0x90
+> [   43.429844]  down_read+0x3c/0x1f0
+> [   43.429852]  pci_get_slot+0x30/0x88
+> [   43.429860]  enetc_get_ts_info+0x108/0x1a0
+> [   43.429867]  __ethtool_get_ts_info+0x140/0x218
+> [   43.429875]  tsinfo_prepare_data+0x9c/0xc8
+> [   43.429881]  ethnl_default_doit+0x1cc/0x410
+> [   43.429888]  genl_rcv_msg+0x2d8/0x358
+> [   43.429896]  netlink_rcv_skb+0x124/0x148
+> [   43.429903]  genl_rcv+0x40/0x60
+> [   43.429910]  netlink_unicast+0x198/0x358
+> [   43.429916]  netlink_sendmsg+0x22c/0x348
+> [   43.429923]  __sys_sendto+0x138/0x1d8
+> [   43.429928]  __arm64_sys_sendto+0x34/0x50
+> [   43.429933]  invoke_syscall+0x4c/0x110
+> [   43.429940]  el0_svc_common+0xb8/0xf0
+> [   43.429946]  do_el0_svc+0x28/0x40
+> [   43.429953]  el0_svc+0x4c/0xe0
+> [   43.429960]  el0t_64_sync_handler+0x78/0x130
+> [   43.429967]  el0t_64_sync+0x198/0x1a0
+> [   43.429974]
+> [   43.537263] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> [   43.541282] [ BUG: Invalid wait context ]
+> [   43.545301] 6.17.0-rc5+ #2920 Tainted: G        W
+> [   43.550891] -----------------------------
+> [   43.554909] ethtool/460 is trying to lock:
+> [   43.559016] ffffcb976c26ab80 (pci_bus_sem){++++}-{4:4}, at:
+> pci_get_slot+0x30/0x88 [   43.566628] other info that might help us debug
+> this: [   43.571694] context-{5:5}
+> [   43.574317] 3 locks held by ethtool/460:
+> [   43.578251]  #0: ffffcb976c5fb608 (cb_lock){++++}-{4:4}, at:
+> genl_rcv+0x30/0x60 [   43.585603]  #1: ffffcb976c5e9f88
+> (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x28/0x40 [   43.593301]  #2:
+> ffffcb976c0b32d0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x4/0x=
+48 [
+>   43.601786] stack backtrace: [   43.604672] CPU: 1 UID: 0 PID: 460 Comm:
+> ethtool Tainted: G        W           6.17.0-rc5+ #2920 PREEMPT [
+> 43.604679] Tainted: [W]=3DWARN [   43.604683] Call trace:
+> [   43.604685]  show_stack+0x24/0x38 (C)
+> [   43.604692]  dump_stack_lvl+0x40/0xa0
+> [   43.604699]  dump_stack+0x18/0x24
+> [   43.604706]  __lock_acquire+0xab4/0x31f8
+> [   43.604713]  lock_acquire+0x11c/0x278
+> [   43.604720]  down_read+0x6c/0x1f0
+> [   43.604726]  pci_get_slot+0x30/0x88
+> [   43.604732]  enetc_get_ts_info+0x108/0x1a0
+> [   43.604738]  __ethtool_get_ts_info+0x140/0x218
+> [   43.604745]  tsinfo_prepare_data+0x9c/0xc8
+> [   43.604750]  ethnl_default_doit+0x1cc/0x410
+> [   43.604757]  genl_rcv_msg+0x2d8/0x358
+> [   43.604765]  netlink_rcv_skb+0x124/0x148
+> [   43.604771]  genl_rcv+0x40/0x60
+> [   43.604778]  netlink_unicast+0x198/0x358
+> [   43.604784]  netlink_sendmsg+0x22c/0x348
+> [   43.604790]  __sys_sendto+0x138/0x1d8
+> [   43.604795]  __arm64_sys_sendto+0x34/0x50
+> [   43.604799]  invoke_syscall+0x4c/0x110
+> [   43.604806]  el0_svc_common+0xb8/0xf0
+> [   43.604812]  do_el0_svc+0x28/0x40
+> [   43.604818]  el0_svc+0x4c/0xe0
+> [   43.604825]  el0t_64_sync_handler+0x78/0x130
+> [   43.604832]  el0t_64_sync+0x198/0x1a0
+> Time stamping parameters for eno2:
+> Capabilities:
+>         hardware-transmit
+>         software-transmit
+>         hardware-receive
+>         software-receive
+>         software-system-clock
+>         hardware-raw-clock
+> PTP Hardware Clock: 0
+> Hardware Transmit Timestamp Modes:
+>         off
+>         on
+>         onestep-sync
+> Hardware Receive Filter Modes:
+>         none
+>         all
+>=20
+> It looks like we have a problem and can't call pci_get_slot(), which
+> sleeps on down_read(&pci_bus_sem), from ethtool_ops :: get_ts_info(),
+> which can't sleep, as of commit 4c61d809cf60 ("net: ethtool: Fix
+> suspicious rcu_dereference usage").
+>=20
+> K=C3=B6ry, do you have any comments or suggestions? Patch is here:
+> https://lore.kernel.org/netdev/20250918074454.1742328-1-wei.fang@nxp.com/
 
-This driver recently landed in linux-next as commit bfec6d7f2001 ("net: 
-spacemit: Add K1 Ethernet MAC"). In my tests I found that it 
-triggers lock dep warnings related to stats_lock acquisition. In the 
-current code it is being acquired with spin_lock(). For tests I've 
-changed that to spin_lock_irqsave() and the warnings went away, but I'm 
-not sure that this is the proper fix. I've also checked the driver 
-history and 'irqsave' locking was used in pre-v7 version, but it was 
-removed later on Jakub's request and described a bit misleading as 
-"Removed scoped_guard usage".
+This is annoying indeed. I don't know how this enetc drivers works but why
+ts_info needs this pci_get_slot() call? It seems this call seems to not be
+used in ndo_hwtstamp_get/set while ts_info which does not need any hardware
+communication report only a list of capabilities.
 
-Here are the lock dep warnings I got on my BananaPiF3 board:
-
-================================
-WARNING: inconsistent lock state
-6.17.0-rc6-next-20250918 #11165 Not tainted
---------------------------------
-inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
-swapper/0/0 [HC0[0]:SC1[1]:HE1:SE0] takes:
-ffffffd60b1412a0 (&priv->stats_lock){+.?.}-{3:3}, at: 
-emac_stats_timer+0x1c/0x3e [k1_emac]
-{SOFTIRQ-ON-W} state was registered at:
-   __lock_acquire+0x7f6/0x1f7c
-   lock_acquire+0xe8/0x2b6
-   _raw_spin_lock+0x2c/0x40
-   emac_get_stats64+0xbc/0x188 [k1_emac]
-   dev_get_stats+0x3e/0x292
-   rtnl_fill_stats+0x32/0xec
-   rtnl_fill_ifinfo.constprop.0+0x6d0/0x1448
-   rtmsg_ifinfo_build_skb+0x92/0xea
-   rtmsg_ifinfo+0x36/0x78
-   register_netdevice+0x7a6/0x7d4
-   register_netdev+0x20/0x36
-   devm_register_netdev+0x58/0xb0
-   emac_probe+0x3bc/0x5ce [k1_emac]
-   platform_probe+0x46/0x84
-   really_probe+0x108/0x2e0
-   __driver_probe_device.part.0+0xaa/0xe0
-   driver_probe_device+0x78/0xc4
-   __driver_attach+0x54/0x162
-   bus_for_each_dev+0x58/0xa4
-   driver_attach+0x1a/0x22
-   bus_add_driver+0xec/0x1ce
-   driver_register+0x3e/0xd8
-   __platform_driver_register+0x1c/0x24
-   0xffffffff025bb020
-   do_one_initcall+0x56/0x290
-   do_init_module+0x52/0x1da
-   load_module+0x1590/0x19d8
-   init_module_from_file+0x76/0xae
-   idempotent_init_module+0x186/0x1fc
-   __riscv_sys_finit_module+0x54/0x84
-   do_trap_ecall_u+0x2a0/0x4d0
-   handle_exception+0x146/0x152
-irq event stamp: 76398
-hardirqs last  enabled at (76398): [<ffffffff80b8809c>] 
-_raw_spin_unlock_irq+0x2a/0x42
-hardirqs last disabled at (76397): [<ffffffff80b87e52>] 
-_raw_spin_lock_irq+0x5a/0x60
-softirqs last  enabled at (76376): [<ffffffff8002e8ca>] 
-handle_softirqs+0x3ca/0x462
-softirqs last disabled at (76389): [<ffffffff8002eaca>] 
-__irq_exit_rcu+0xe2/0x10c
-
-other info that might help us debug this:
-  Possible unsafe locking scenario:
-
-        CPU0
-        ----
-   lock(&priv->stats_lock);
-   <Interrupt>
-     lock(&priv->stats_lock);
-
-  *** DEADLOCK ***
-
-1 lock held by swapper/0/0:
-  #0: ffffffc600003c30 ((&priv->stats_timer)){+.-.}-{0:0}, at: 
-call_timer_fn+0x0/0x24e
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 
-6.17.0-rc6-next-20250918 #11165 NONE
-Hardware name: Banana Pi BPI-F3 (DT)
-Call Trace:
-[<ffffffff800163a6>] dump_backtrace+0x1c/0x24
-[<ffffffff80001482>] show_stack+0x28/0x34
-[<ffffffff8000f7ca>] dump_stack_lvl+0x5e/0x86
-[<ffffffff8000f806>] dump_stack+0x14/0x1c
-[<ffffffff80090a80>] print_usage_bug.part.0+0x29a/0x302
-[<ffffffff80091152>] mark_lock+0x66a/0x7ee
-[<ffffffff80091cfe>] __lock_acquire+0x7cc/0x1f7c
-[<ffffffff80093d0c>] lock_acquire+0xe8/0x2b6
-[<ffffffff80b87d18>] _raw_spin_lock+0x2c/0x40
-[<ffffffff025c61da>] emac_stats_timer+0x1c/0x3e [k1_emac]
-[<ffffffff800d8de4>] call_timer_fn+0x90/0x24e
-[<ffffffff800d91b0>] __run_timers+0x20e/0x2e8
-[<ffffffff800d98ea>] timer_expire_remote+0x4a/0x5e
-[<ffffffff800efe52>] tmigr_handle_remote_up+0x174/0x34a
-[<ffffffff800ee5e0>] __walk_groups.isra.0+0x28/0x66
-[<ffffffff800f0128>] tmigr_handle_remote+0x9e/0xc2
-[<ffffffff800d931c>] run_timer_softirq+0x2a/0x32
-[<ffffffff8002e662>] handle_softirqs+0x162/0x462
-[<ffffffff8002eaca>] __irq_exit_rcu+0xe2/0x10c
-[<ffffffff8002efac>] irq_exit_rcu+0xc/0x36
-[<ffffffff80b7b248>] handle_riscv_irq+0x64/0x74
-[<ffffffff80b898aa>] call_on_irq_stack+0x32/0x40
-
-
-
-================================
-WARNING: inconsistent lock state
-6.17.0-rc6-next-20250918-dirty #11166 Not tainted
---------------------------------
-inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
-swapper/4/0 [HC0[0]:SC1[1]:HE1:SE0] takes:
-ffffffd606ca92a0 (&priv->stats_lock){+.?.}-{3:3}, at: 
-emac_stats_timer+0x1c/0x3e [k1_emac]
-{SOFTIRQ-ON-W} state was registered at:
-   __lock_acquire+0x7f6/0x1f7c
-   lock_acquire+0xe8/0x2b6
-   _raw_spin_lock+0x2c/0x40
-   emac_open+0x820/0x9b0 [k1_emac]
-   __dev_open+0xca/0x21c
-   __dev_change_flags+0x18a/0x204
-   netif_change_flags+0x1e/0x56
-   do_setlink.constprop.0+0x268/0xb88
-   rtnl_newlink+0x57a/0x788
-   rtnetlink_rcv_msg+0x3ea/0x54c
-   netlink_rcv_skb+0x44/0xec
-   rtnetlink_rcv+0x14/0x1c
-   netlink_unicast+0x1b6/0x218
-   netlink_sendmsg+0x174/0x34e
-   __sock_sendmsg+0x40/0x7c
-   ____sys_sendmsg+0x19c/0x1ba
-   ___sys_sendmsg+0x5c/0xa0
-   __sys_sendmsg+0x5a/0xa2
-   __riscv_sys_sendmsg+0x16/0x1e
-   do_trap_ecall_u+0x2a0/0x4d0
-   handle_exception+0x146/0x152
-irq event stamp: 36278
-hardirqs last  enabled at (36278): [<ffffffff80b8809c>] 
-_raw_spin_unlock_irq+0x2a/0x42
-hardirqs last disabled at (36277): [<ffffffff80b87e52>] 
-_raw_spin_lock_irq+0x5a/0x60
-softirqs last  enabled at (36256): [<ffffffff8002e8ca>] 
-handle_softirqs+0x3ca/0x462
-softirqs last disabled at (36269): [<ffffffff8002eaca>] 
-__irq_exit_rcu+0xe2/0x10c
-
-other info that might help us debug this:
-  Possible unsafe locking scenario:
-
-        CPU0
-        ----
-   lock(&priv->stats_lock);
-   <Interrupt>
-     lock(&priv->stats_lock);
-
-  *** DEADLOCK ***
-
-1 lock held by swapper/4/0:
-  #0: ffffffc600023c30 ((&priv->stats_timer)){+.-.}-{0:0}, at: 
-call_timer_fn+0x0/0x24e
-
-stack backtrace:
-CPU: 4 UID: 0 PID: 0 Comm: swapper/4 Not tainted 
-6.17.0-rc6-next-20250918-dirty #11166 NONE
-Hardware name: Banana Pi BPI-F3 (DT)
-Call Trace:
-[<ffffffff800163a6>] dump_backtrace+0x1c/0x24
-[<ffffffff80001482>] show_stack+0x28/0x34
-[<ffffffff8000f7ca>] dump_stack_lvl+0x5e/0x86
-[<ffffffff8000f806>] dump_stack+0x14/0x1c
-[<ffffffff80090a80>] print_usage_bug.part.0+0x29a/0x302
-[<ffffffff80091152>] mark_lock+0x66a/0x7ee
-[<ffffffff80091cfe>] __lock_acquire+0x7cc/0x1f7c
-[<ffffffff80093d0c>] lock_acquire+0xe8/0x2b6
-[<ffffffff80b87d18>] _raw_spin_lock+0x2c/0x40
-[<ffffffff025b41da>] emac_stats_timer+0x1c/0x3e [k1_emac]
-[<ffffffff800d8de4>] call_timer_fn+0x90/0x24e
-[<ffffffff800d91b0>] __run_timers+0x20e/0x2e8
-[<ffffffff800d98ea>] timer_expire_remote+0x4a/0x5e
-[<ffffffff800efe52>] tmigr_handle_remote_up+0x174/0x34a
-[<ffffffff800ee5e0>] __walk_groups.isra.0+0x28/0x66
-[<ffffffff800f0128>] tmigr_handle_remote+0x9e/0xc2
-[<ffffffff800d931c>] run_timer_softirq+0x2a/0x32
-[<ffffffff8002e662>] handle_softirqs+0x162/0x462
-[<ffffffff8002eaca>] __irq_exit_rcu+0xe2/0x10c
-[<ffffffff8002efac>] irq_exit_rcu+0xc/0x36
-[<ffffffff80b7b248>] handle_riscv_irq+0x64/0x74
-[<ffffffff80b898aa>] call_on_irq_stack+0x32/0x40
-
-
-> ---
-> Changes in v12:
-> - Add aliases ethernet{0,1} to DTS
-> - Minor changes
->    - Use FIELD_MODIFY to set duplex mode in HW based on phydev->duplex
->    - Use FIELD_GET in emac_mii_read() to extract bits from MAC_MDIO_DATA
-> - Link to v11: https://lore.kernel.org/r/20250912-net-k1-emac-v11-0-aa3e84f8043b@iscas.ac.cn
->
-> Changes in v11:
-> - Use NETDEV_PCPU_STAT_DSTATS for tx_dropped
-> - Use DECLARE_FLEX_ARRAY for emac_hw_{tx,rx}_stats instead of cast
-> - More bitfields stuff to simplify code:
->    - Define EMAC_MAX_DELAY_UNIT with FIELD_MAX
->    - Use FIELD_{PREP,GET} in emac_mii_{read,write}()
->    - Use FIELD_MODIFY in emac_set_{tx,rx}_fc()
-> - Minor changes:
->    - Use lower_32_bits and such instead of casts and shifts
->    - Extract emac_ether_addr_hash() helper
->    - In emac_mdio_init(), 0xffffffff -> ~0
->    - Minor comment changes
-> - Link to v10: https://lore.kernel.org/r/20250908-net-k1-emac-v10-0-90d807ccd469@iscas.ac.cn
->
-> Changes in v10:
-> - Use FIELD_GET and FIELD_PREP, remove some unused constants
-> - Remove redundant software statistics
->    - In particular, rx_dropped should have been and is already tracked in
->      rx_errors.
-> - Track tx_dropped with a percpu field
-> - Minor changes
->    - Simplified int emac_rx_frame_status() -> bool emac_rx_frame_good()
-> - Link to v9: https://lore.kernel.org/r/20250905-net-k1-emac-v9-0-f1649b98a19c@iscas.ac.cn
->
-> Changes in v9:
-> - Refactor to use phy_interface_mode_is_rgmii
-> - Minor changes
->    - Use netdev_err in more places
->    - Print phy-mode by name on unsupported phy-mode
-> - Link to v8: https://lore.kernel.org/r/20250828-net-k1-emac-v8-0-e9075dd2ca90@iscas.ac.cn
->
-> Changes in v8:
-> - Use devres to do of_phy_deregister_fixed_link on probe failure or
->    remove
-> - Simplified control flow in a few places with early return or continue
-> - Minor changes
->    - Removed some unneeded parens in emac_configure_{tx,rx}
-> - Link to v7: https://lore.kernel.org/r/20250826-net-k1-emac-v7-0-5bc158d086ae@iscas.ac.cn
->
-> Changes in v7:
-> - Removed scoped_guard usage
-> - Renamed error handling path labels after destinations
-> - Fix skb free error handling path in emac_start_xmit and emac_tx_mem_map
-> - Cancel tx_timeout_task to prevent schedule_work lifetime problems
-> - Minor changes:
->    - Remove unnecessary timer_delete_sync in emac_down
->    - Use dev_err_ratelimited in a few more places
->    - Cosmetic fixes in error messages
-> - Link to v6: https://lore.kernel.org/r/20250820-net-k1-emac-v6-0-c1e28f2b8be5@iscas.ac.cn
->
-> Changes in v6:
-> - Implement pause frame support
-> - Minor changes:
->    - Convert comment for emac_stats_update() into assert_spin_locked()
->    - Cosmetic fixes for some comments and whitespace
->    - emac_set_mac_addr() is now refactored
-> - Link to v5: https://lore.kernel.org/r/20250812-net-k1-emac-v5-0-dd17c4905f49@iscas.ac.cn
->
-> Changes in v5:
-> - Rebased on v6.17-rc1, add back DTS now that they apply cleanly
-> - Use standard statistics interface, handle 32-bit statistics overflow
-> - Minor changes:
->    - Fix clock resource handling in emac_resume
->    - Ratelimit the message in emac_rx_frame_status
->    - Add ndo_validate_addr = eth_validate_addr
->    - Remove unnecessary parens in emac_set_mac_addr
->    - Change some functions that never fail to return void instead of int
->    - Minor rewording
-> - Link to v4: https://lore.kernel.org/r/20250703-net-k1-emac-v4-0-686d09c4cfa8@iscas.ac.cn
->
-> Changes in v4:
-> - Resource handling on probe and remove: timer_delete_sync and
->    of_phy_deregister_fixed_link
-> - Drop DTS changes and dependencies (will send through SpacemiT tree)
-> - Minor changes:
->    - Remove redundant phy_stop() and setting of ndev->phydev
->    - Fix error checking for emac_open in emac_resume
->    - Fix one missed dev_err -> dev_err_probe
->    - Fix type of emac_start_xmit
->    - Fix one missed reverse xmas tree formatting
->    - Rename some functions for consistency between emac_* and ndo_*
-> - Link to v3: https://lore.kernel.org/r/20250702-net-k1-emac-v3-0-882dc55404f3@iscas.ac.cn
->
-> Changes in v3:
-> - Refactored and simplified emac_tx_mem_map
-> - Addressed other minor v2 review comments
-> - Removed what was patch 3 in v2, depend on DMA buses instead
-> - DT nodes in alphabetical order where appropriate
-> - Link to v2: https://lore.kernel.org/r/20250618-net-k1-emac-v2-0-94f5f07227a8@iscas.ac.cn
->
-> Changes in v2:
-> - dts: Put eth0 and eth1 nodes under a bus with dma-ranges
-> - dts: Added Milk-V Jupiter
-> - Fix typo in emac_init_hw() that broke the driver (Oops!)
-> - Reformatted line lengths to under 80
-> - Addressed other v1 review comments
-> - Link to v1: https://lore.kernel.org/r/20250613-net-k1-emac-v1-0-cc6f9e510667@iscas.ac.cn
->
-> ---
-> Vivian Wang (5):
->        dt-bindings: net: Add support for SpacemiT K1
->        net: spacemit: Add K1 Ethernet MAC
->        riscv: dts: spacemit: Add Ethernet support for K1
->        riscv: dts: spacemit: Add Ethernet support for BPI-F3
->        riscv: dts: spacemit: Add Ethernet support for Jupiter
->
->   .../devicetree/bindings/net/spacemit,k1-emac.yaml  |   81 +
->   arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts    |   48 +
->   arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts  |   48 +
->   arch/riscv/boot/dts/spacemit/k1-pinctrl.dtsi       |   48 +
->   arch/riscv/boot/dts/spacemit/k1.dtsi               |   22 +
->   drivers/net/ethernet/Kconfig                       |    1 +
->   drivers/net/ethernet/Makefile                      |    1 +
->   drivers/net/ethernet/spacemit/Kconfig              |   29 +
->   drivers/net/ethernet/spacemit/Makefile             |    6 +
->   drivers/net/ethernet/spacemit/k1_emac.c            | 2159 ++++++++++++++++++++
->   drivers/net/ethernet/spacemit/k1_emac.h            |  416 ++++
->   11 files changed, 2859 insertions(+)
-> ---
-> base-commit: 062b3e4a1f880f104a8d4b90b767788786aa7b78
-> change-id: 20250606-net-k1-emac-3e181508ea64
->
-> Best regards,
-
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
