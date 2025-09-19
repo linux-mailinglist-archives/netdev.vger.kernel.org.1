@@ -1,135 +1,200 @@
-Return-Path: <netdev+bounces-224809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAF11B8ACCF
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 19:45:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1D0BB8ACDB
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 19:48:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9D28C4E066B
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 17:45:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A62E3A01ECC
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 17:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0AFE31FEE7;
-	Fri, 19 Sep 2025 17:45:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2881526D4DE;
+	Fri, 19 Sep 2025 17:48:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cb0B4LaA"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f226.google.com (mail-yw1-f226.google.com [209.85.128.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20E9221544
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 17:45:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85BAE22F74F
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 17:48:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758303955; cv=none; b=mEy259SuIQxUUpj4Brg0CWczKwpWEoUK0Zx7h1oWlI5Mmhs1r3UvCgf5pLwLDK7BXWmBj5VFYGne1l1t5WQOUgIKSSdLdKtny+RgL7nFmmkvATWVF9HFwqLNuqf1WOzVdrkDoffFVoyitFWwfFf7j81sFiUOxn5R2pYlOJAfkE8=
+	t=1758304095; cv=none; b=Pfbg+11EdLqgfUedB7Zu952qnXb/BFI9wz1uG1YvRjWOw/jXLn7faNXv5XjmBnjDAKxKLc8oIk1BQYg+hFvbEAQi2oMSsp3H5Jdt1v2W4K2WGIzWrmfdQNH5Elsotdi0JVLc3ThosUrERN+zbV9Jd83R+7kImHmFpbqt23jvYB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758303955; c=relaxed/simple;
-	bh=/JudEsI7b2OQK8tF56WIc51qIDfXRiKNt5v/maHEzYo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u3n3A5SjdlM6t5cFqazCnjpXjYeHQtvyFk9sNZRH8PWeknK4ZzgCrdaUmWxYo2RFd3FOv55ydoHhgdJyRS6sTmDcJTUD/2C7lX0iB1IyeSmL3cl3rYjKOw6wf2pxj9IqMY3EMMjzYII3bttu19IWCtTxQUizYR18Ga10fMk3R6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uzfAz-0006Ql-Ch; Fri, 19 Sep 2025 19:45:41 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uzfAy-0028w5-0V;
-	Fri, 19 Sep 2025 19:45:40 +0200
-Received: from pengutronix.de (ip-185-104-138-125.ptr.icomera.net [185.104.138.125])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id E42414750FF;
-	Fri, 19 Sep 2025 17:45:38 +0000 (UTC)
-Date: Fri, 19 Sep 2025 19:45:37 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Stefan =?utf-8?B?TcOkdGpl?= <stefan.maetje@esd.eu>
-Cc: Vincent Mailhol <mailhol@kernel.org>, 
-	Frank Jungclaus <frank.jungclaus@esd.eu>, linux-can@vger.kernel.org, socketcan@esd.eu, 
-	Simon Horman <horms@kernel.org>, Oliver Hartkopp <socketcan@hartkopp.net>, 
-	Wolfgang Grandegger <wg@grandegger.com>, "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 0/5] can: esd_usb: Fixes and improvements
-Message-ID: <20250919-esoteric-zebra-of-glamour-c6807f-mkl@pengutronix.de>
-References: <20250821143422.3567029-1-stefan.maetje@esd.eu>
+	s=arc-20240116; t=1758304095; c=relaxed/simple;
+	bh=V6jKT+38G+cM94b40t9dw1NuZtwzytsckMLg4WY1PwM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DNoF/32HvoVDxh9JTcp6Mk5FPb3hyoFDVlOyik9BuNdyIxXDv8tgFLuLyBPDuy+0l4GtOw1YbWqwJKEq/cRpbNRNzr5p0r++tCRCann0klDOph0WVpZ6bpQl8BlYlDL8a33baDimMIKiK2SDjU+F+IC+7sJJPI5EVG6BBo9e1hI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cb0B4LaA; arc=none smtp.client-ip=209.85.128.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-yw1-f226.google.com with SMTP id 00721157ae682-71d605c6501so16930707b3.3
+        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 10:48:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758304092; x=1758908892;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SQdBnzkJ6XZr3h+JOYCkE5AzdDxHuHzROOLjBhUEp78=;
+        b=wDRh8kIwA2SEVXL1y0E2nZf8oEBn2VAbaEQvCfZhia9BkM0R2XFbAJgrOfE0FrIPF2
+         tF6spVu6Zke0biG10voBylQb9tBi2noJOo8oogM38mP4m6uHS1Me0tqMJdAgx+h94xwu
+         rpP49Pxr2ptlkvN0jUGMa26J7jabYDGcsz95rL3Y3/0KDelWc4hajr286UMx7dszKIvV
+         OW1NrJApoUJCS0K/C6bq6oLNTx72l3iWgxw6zDDdlXCYv/BtwTBmNnN/cf1hyC7gXhJR
+         XDJAHIWFD/Pn4nx3t8xSR5VwJ2PNPaWJxyHNJG7+Jgn0euEAZ+Kfa7JFFfmXE0wRgrcB
+         m2yg==
+X-Gm-Message-State: AOJu0YzoBagOV+IW/GmYBVne9kqCcO44mjB7SPVj4fDwG90yj2whobOx
+	YhjkHLLHfYrF/p9M7XHvkO6DxzwqbHigCWOO5fuqH/5mRWbJP+q8vdGr9HxEmq5nvCw8SHbD2pX
+	fknKaPUe0X8S/9maAm1AK6WHmD2jy9x3LTPB0A6JWpABAY9z16XC9EJtMOBawVIMLWUe4+7be8W
+	22/iotPZemI5rBhhEsx+5etz2O3rOG6nbxH8AUSiPagwCGyc/HNkNODVgW2OP/3arQF+RDmCQbq
+	rIueL/dfnyavxBnJSfP
+X-Gm-Gg: ASbGnctCT9U8k1lhvcxzinuzT2Pl5BqH3zw0NJ1+MnRcBKVij5JRysDmMmW4Gou+DaK
+	sgeYZKsnUWhv4usyndbX9erV3GlzLBAkJuZ2s7NIWmLhJOLIVAM+Kbj95MojAtGcslR2KLKF9zT
+	llhuFYjHZlnpD57Q3iMrVAEdDvlYYcbcVDni3sOpPCoBGzhkN3KzAfXACuS88ojIo8MZijsXiUd
+	Wn2/Mip/Katu5AgB/0pSpC9RrNFpHnuc9DRvvpmA+0NwIPPXElSLcB2di2GdNuAeTwhUK3QK0Op
+	CMVJDgSMdWkOjt6GYlPPuAlI31ot72jwhnWPsCuLe3XPT1ZlV2wOI9YmFti/R89tGWV5dxKL23p
+	bGdCRTmoWLWLbJKJQ0tEOU6EbfLmiQh2ZCpa8PNqPZtktT0IDXvN2SWOMHFpd7qOHiXmxG99uba
+	oX82oYlzUl
+X-Google-Smtp-Source: AGHT+IFCMueA696C7dlUaKtfhn1KAXxZNY7KiB5C7+K++9K1fOfGmv8pdhKr53J+Bc2UGwFxC/ed/jYcn4uK
+X-Received: by 2002:a05:690c:23c4:b0:722:6ab7:f657 with SMTP id 00721157ae682-73d3daf5c54mr33895597b3.38.1758304092059;
+        Fri, 19 Sep 2025 10:48:12 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-121.dlp.protect.broadcom.com. [144.49.247.121])
+        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-739717a841fsm2639737b3.16.2025.09.19.10.48.11
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 19 Sep 2025 10:48:12 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-77e13772b37so1042895b3a.0
+        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 10:48:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1758304091; x=1758908891; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SQdBnzkJ6XZr3h+JOYCkE5AzdDxHuHzROOLjBhUEp78=;
+        b=cb0B4LaAJSnCsVHbCE5kEb4oPxkghDKbn83sQyBfJdnqOUdOroZcIqDrfnpodrT+CV
+         aDFjT8rQF3EmxQFIySEKlGLfIkzBfz4xUgc7GyY9NoJEhWZ0bazRdrj64HvlaLIDIcP9
+         YSiJIbIc4nOvBli9YZBg97KpAlSFJAU6IdvCU=
+X-Received: by 2002:a05:6a21:6d89:b0:249:824c:c61d with SMTP id adf61e73a8af0-2925b42019amr6693388637.17.1758304090754;
+        Fri, 19 Sep 2025 10:48:10 -0700 (PDT)
+X-Received: by 2002:a05:6a21:6d89:b0:249:824c:c61d with SMTP id adf61e73a8af0-2925b42019amr6693367637.17.1758304090319;
+        Fri, 19 Sep 2025 10:48:10 -0700 (PDT)
+Received: from hyd-csg-thor2-h1-server2.dhcp.broadcom.net ([192.19.203.250])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b55138043b6sm3513119a12.26.2025.09.19.10.48.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Sep 2025 10:48:09 -0700 (PDT)
+From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	vsrama-krishna.nemani@broadcom.com,
+	vikas.gupta@broadcom.com,
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+Subject: [v8, net-next 00/10] Add more functionality to BNGE 
+Date: Fri, 19 Sep 2025 23:17:31 +0530
+Message-ID: <20250919174742.24969-1-bhargava.marreddy@broadcom.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="gppkr56zu5ek666e"
-Content-Disposition: inline
-In-Reply-To: <20250821143422.3567029-1-stefan.maetje@esd.eu>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
+Hi,
 
---gppkr56zu5ek666e
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v2 0/5] can: esd_usb: Fixes and improvements
-MIME-Version: 1.0
+This patch series adds the infrastructure to make the netdevice
+functional. It allocates data structures for core resources,
+followed by their initialisation and registration with the firmware.
+The core resources include the RX, TX, AGG, CMPL, and NQ rings,
+as well as the VNIC. RX/TX functionality will be introduced in the
+next patch series to keep this one at a reviewable size.
 
-On 21.08.2025 16:34:17, Stefan M=C3=A4tje wrote:
-> The first patch fixes a condition where the esd_usb CAN driver
-> may not detect connected CAN-USB devices correctly after a
-> reboot. This patch was already presented on the list before
-> starting this series and changes due to that feedback are
-> integrated.
->=20
-> References:
-> https://lore.kernel.org/linux-can/d7fd564775351ea8a60a6ada83a0368a99ea6b1=
-9.camel@esd.eu/
->=20
-> The second patch fixes situations where the the handling of TX
-> context objects for each sent CAN frame could go out of sync
-> with the acknowledged or erroneous TX jobs and then lose free
-> TX context objects. This could lead to the driver incapable of
-> sending frames.
->=20
-> The third patch adds TX FIFO watermark to eliminate occasional
-> error messages and significantly reduce the number of calls to
-> netif_start_queue() and netif_stop_queue().
+Changes from:
 
-Applied patches 1...3 to linux-can as these are fixes.
+v7->v8
+Addressed comments from Jakub Kicinski
+    - Ensured buffer post fails when minimum fill level isn't met. 
+      Few functions related to buffer posting got impacted and 
+      their return type for error handling.
 
-Thank you for the very detailed description of the patches, I really
-appreciate this! While applying I've changed some sentences to more
-imperative wording, e.g. "Moved the code" -> "Move the code".
+Addressed comments from Simon Horman:
+    - Fixed lack of error return when memory allocation fails.
+    - Fixed max_t(int, ...) usage by switching to max() for unsigned data.
 
-regards,
-Marc
+Addressed comments from Alok Tiwari
+    - Fixed type of the variable ring_type.
+    - Made the netdev pointer access more direct.
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+v6->v7
+Addressed comments from Jakub Kicinski:
+    - Removed NULL checks that are not applicable to the current patches but
+      will be required when additional features are introduced in future.
+    - Handled unwinding at a higher level rather than in the deep call stac
 
---gppkr56zu5ek666e
-Content-Type: application/pgp-signature; name="signature.asc"
+v5->v6
+Addressed comments from Jakub Kicinski:
+    - Add appropriate error handling in several functions
+    - Enable device lock for bnge netdev ops
 
------BEGIN PGP SIGNATURE-----
+v4->v5
+Addressed comments from Alok Tiwari
+    - Remove the redundant `size` assignment
 
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmjNlr4ACgkQDHRl3/mQ
-kZyFVwf/T9GnKtYPTwhsVoFyU3dxOtS2DMVEp6KBUxwuko7knSpB7zKJu6bdUUvm
-uIXbFiNMq5z/Adw8794Tmty7AbWXkWH/joCnPtlXQo2AMzyMJQxE9a1kM5MeSCd4
-H2wURfuXqrrL6OCFMzCEJxa5m7xPU7GVoGDnar3QTXCw5kERU3e9yQNFrKpnf3V6
-pMUudHB+ESUxv/0Pi89BY47j7pWD//ScVPZkzADdbItxpOYVNrftyN5TGYNMcToC
-v14tbCkI3DMjHLQ3ecY2zOGV5AqWQ2218+gjKunNZv0idD/+j1bo3jocswPeHFnn
-lWzueKEtHY+felfnJNtZode6X1lZ3w==
-=Kwdz
------END PGP SIGNATURE-----
+v3->v4
+Addressed a comment from Jakub Kicinski:
+    - To handle the page pool for both RX and AGG rings
+    - Use the appropriate page allocation mechanism for the AGG ring
+      when PAGE_SIZE is larger
 
---gppkr56zu5ek666e--
+v2->v3
+Addressed a comment from Jakub Kicinski: 
+    - Changed uses of atomic_t to refcount_t
+
+v1->v2
+
+Addressed warnings and errors in the patch series.
+
+Thanks,
+
+Bhargava Marreddy (10):
+  bng_en: make bnge_alloc_ring() self-unwind on failure
+  bng_en: Add initial support for RX and TX rings
+  bng_en: Add initial support for CP and NQ rings
+  bng_en: Introduce VNIC
+  bng_en: Initialise core resources
+  bng_en: Allocate packet buffers
+  bng_en: Allocate stat contexts
+  bng_en: Register rings with the firmware
+  bng_en: Register default VNIC
+  bng_en: Configure default VNIC
+
+ drivers/net/ethernet/broadcom/Kconfig         |    1 +
+ drivers/net/ethernet/broadcom/bnge/bnge.h     |   27 +
+ .../net/ethernet/broadcom/bnge/bnge_core.c    |   16 +
+ drivers/net/ethernet/broadcom/bnge/bnge_db.h  |   34 +
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    |  482 ++++
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.h    |   31 +
+ .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 2217 +++++++++++++++++
+ .../net/ethernet/broadcom/bnge/bnge_netdev.h  |  250 +-
+ .../net/ethernet/broadcom/bnge/bnge_resc.c    |    6 +-
+ .../net/ethernet/broadcom/bnge/bnge_resc.h    |    2 +
+ .../net/ethernet/broadcom/bnge/bnge_rmem.c    |   67 +-
+ .../net/ethernet/broadcom/bnge/bnge_rmem.h    |   14 +
+ 12 files changed, 3140 insertions(+), 7 deletions(-)
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_db.h
+
+-- 
+2.47.3
+
 
