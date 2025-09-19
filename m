@@ -1,97 +1,94 @@
-Return-Path: <netdev+bounces-224766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D428FB8964D
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 14:15:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53626B896C3
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 14:20:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6909B173B9C
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 12:15:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09AE918858F9
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 12:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1989230F922;
-	Fri, 19 Sep 2025 12:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B12C530FF3A;
+	Fri, 19 Sep 2025 12:20:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mkKPuCmj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C1630F938
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 12:15:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45045270EBC;
+	Fri, 19 Sep 2025 12:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758284108; cv=none; b=UlRa0uBTwDlkxjFdEz4f2ajGK1K5NMHrRB/xV/1XGEa4ly0uhD9puUOUQzm4ieWn17k7MOAZUQDRPvWBbV63pksTZ0WNcyosZhlqBTsIup8D6eRS+mgbTGGDSW4dwOw9WXCIBvmHg1VnsXvPzvme7G4ygBG5BSH1dkx/jTI//+0=
+	t=1758284446; cv=none; b=m4iUpeNXcpOsloNOX1PbBJol7MF4JZjSQiNn8EqcXDiHANRLWPiFNcnZjZC3OvrzgxFGlOPHyeYm/7/B5FxV8sz8XiN4YGPO42snd0g+QULhyqPWaLp7Uou3wd62rNN+vwMj8Xa6EAu4KlSFSaqM5lsEPP2mPs/oytWy9shflns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758284108; c=relaxed/simple;
-	bh=F52Pe6ZzrWg2xOB535H6naWI5/xjhi+X85EvgHGfIVM=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=IYYaWmX3//m3CdfzaRRdTMq0PzrcnLg9jqdZGRBED2yJT44euohjUbdAK21WQoepH0T+ee+pqSb0vmwPRC1QgEpS/dsx8wr/Sxtr9LQMjiX/EDy7MfMmRhhRTLHJ78i57ZXL2zTGXEXKHlvV9PR0YehW7pjPI6E3Pl39/cpsxAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-888acb964c8so400108639f.1
-        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 05:15:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758284105; x=1758888905;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AaASq3nSPIcvtUoCKBtRJSEolffSQ27wcU7lwN8Kr/k=;
-        b=rFqTVvojbxiS/IjeMBQHLV9rcWM+tHX46kiCAqvdjt6JEyRF+sY2CCeWT/raipl0Z9
-         qx71DQZKP9o1BJcnzEunus2aTF9b1g5/aqqWfe0JKH3JRNealrkED2mUp/vY2LoYs3D9
-         j5+VII1mkSgAXGrh3OL1D6akHzvxfPyIIsQKTVQcolgjrPs2cdYgY3e1X9T23iEVA3+n
-         iElu2QVO7QQ285qZ52F6iNxSuLCN6/0kWE3n891UcVVa3ump/ebT422tIfQ1mIYANi+h
-         DbsELdVMHcYnR3xGSTTJdUUALMqy4Bkrt2wdi1g+ezvgh/1cyag2VjaCaKcSu14Jzjpv
-         z90w==
-X-Forwarded-Encrypted: i=1; AJvYcCVqi9qpbD5T1VI2hcu9aB7cN2Xph0Nbp32mlAB8uueoEDVCyuHPjSvi8OiK7Zt1P1tdZeBDf4o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyh7KGSgDi5/l1TykGku4ykAMDE1luaCFJrcHow2Pxzhp8OmdGM
-	XR+mKtOeBIZA5WOzlVn2JljBDhFS8lmdLhUWGZKsWeDgKj5ylvKUl+uaS6kOwGKpZ6hAnQFzHpd
-	NYAWpaiei3ibPVHrJ3fN2ZvBCwmbiuJKag422c1EF9AOSqC8CxKBbpQz3WgI=
-X-Google-Smtp-Source: AGHT+IE1O8Xc6f8LrpO8boudUphXtvq/ClhpDSJmNM3SJDFi102WGVqC7B7iyKEup+Yu/ybdPLc+8ujPyZ6BW73fph6w1dGTVKQY
+	s=arc-20240116; t=1758284446; c=relaxed/simple;
+	bh=U2vAZU5qyR8n6Sg+IjocQID7zfyrYA2NzI16U5IRGgc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OQdD3+/aTDkWojC+/6BDJdxXZiawLdrbqy/B5JgahncV4UrEu0i7Ql7CggEDUHkavRp3/ca7M3FnxTsJKjOp0qSM6iXSl3PTmRTCrzLFYS5a2LU2IejLnOGb49fTFu7iB26JbHD3QCzBrMtVj48BMQfxAzcj/21ffikjIjgjTIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mkKPuCmj; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Gyhc5JpmuafQ1hv3mATi4//QrUF7MvrRrvt3Qg8U5rA=; b=mkKPuCmjDEUdGxT1Vj5V54mZSY
+	q5RCKzvwPmp2on7S4N/gUOeEHuE/AYlDt4s1Ou2pzCAPyNEzDQfAuEeTKYSBT+Q6w8lDPMOvk/N1F
+	ezGMLicml16VbZSd4WRGSgWYokiheCfzCN2CmbXtgdr+LFZlLkgFV7XHmse9IrxX2vt4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uza67-008vz9-OO; Fri, 19 Sep 2025 14:20:19 +0200
+Date: Fri, 19 Sep 2025 14:20:19 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	shenjian15@huawei.com, liuyonglong@huawei.com,
+	chenhao418@huawei.com, lantao5@huawei.com,
+	huangdonghua3@h-partners.com, yangshuaisong@h-partners.com,
+	huangdengdui@h-partners.com, jonathan.cameron@huawei.com,
+	salil.mehta@huawei.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 3/3] net: hns3: use user configure after hardware
+ reset when using kernel PHY
+Message-ID: <c0c20c46-a4c5-4838-a0c0-f2d5932c2ae8@lunn.ch>
+References: <20250917122954.1265844-1-shaojijie@huawei.com>
+ <20250917122954.1265844-4-shaojijie@huawei.com>
+ <5188066d-fcd2-41e7-bd8a-ae1dfbdd7731@lunn.ch>
+ <59d9add5-a4f5-4ee2-9fd8-a2ced4cbe0d4@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:378f:b0:414:3168:b9fe with SMTP id
- e9e14a558f8ab-42481991ea9mr59920315ab.29.1758284105478; Fri, 19 Sep 2025
- 05:15:05 -0700 (PDT)
-Date: Fri, 19 Sep 2025 05:15:05 -0700
-In-Reply-To: <68caf6c7.050a0220.2ff435.0597.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68cd4949.050a0220.ba58e.045c.GAE@google.com>
-Subject: Re: [syzbot] [smc?] general protection fault in __smc_diag_dump (4)
-From: syzbot <syzbot+f775be4458668f7d220e@syzkaller.appspotmail.com>
-To: aha310510@gmail.com, alibuda@linux.alibaba.com, davem@davemloft.net, 
-	dust.li@linux.alibaba.com, edumazet@google.com, guwen@linux.alibaba.com, 
-	horms@kernel.org, jaka@linux.ibm.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-s390@vger.kernel.org, mjambigi@linux.ibm.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sidraya@linux.ibm.com, syzkaller-bugs@googlegroups.com, 
-	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <59d9add5-a4f5-4ee2-9fd8-a2ced4cbe0d4@huawei.com>
 
-syzbot has bisected this issue to:
+On Fri, Sep 19, 2025 at 02:07:34PM +0800, Jijie Shao wrote:
+> 
+> on 2025/9/18 1:11, Andrew Lunn wrote:
+> > On Wed, Sep 17, 2025 at 08:29:54PM +0800, Jijie Shao wrote:
+> > > When a reset occurring
+> > Why would a reset occur? Is it the firmware crashing?
+> > 
+> > > Consider the case that reset was happened consecutively.
+> > Does that mean the firmware crashed twice in quick succession?
+> > 
+> >       Andrew
+> 
+> Actually, We can trigger a reset by ethtool:
+> ethtool --reset ethx...
+ 
+For that, RTNL should be held. So the configuration cannot change
+while the reset is happening. Two resets in quick success should not
+be an issue, because they will be complete sequential, one finished
+before the next one started.
 
-commit 98d4435efcbf37801a3246fb53856c4b934a2613
-Author: Jeongjun Park <aha310510@gmail.com>
-Date:   Thu Aug 29 03:56:48 2024 +0000
-
-    net/smc: prevent NULL pointer dereference in txopt_get
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=131dc712580000
-start commit:   5aca7966d2a7 Merge tag 'perf-tools-fixes-for-v6.17-2025-09..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=109dc712580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=171dc712580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8f01d8629880e620
-dashboard link: https://syzkaller.appspot.com/bug?extid=f775be4458668f7d220e
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17aec534580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=115a9f62580000
-
-Reported-by: syzbot+f775be4458668f7d220e@syzkaller.appspotmail.com
-Fixes: 98d4435efcbf ("net/smc: prevent NULL pointer dereference in txopt_get")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+	Andrew
 
