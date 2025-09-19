@@ -1,130 +1,92 @@
-Return-Path: <netdev+bounces-224790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 842E6B8A289
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 17:04:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85225B8A36A
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 17:13:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCDAE4E702A
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 15:03:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15A8F620ECF
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 15:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FE50311597;
-	Fri, 19 Sep 2025 15:03:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDFD1314A7A;
+	Fri, 19 Sep 2025 15:10:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="skK3Wdm1";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="fp1dkayW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RF/1/Jdj"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 514293148C3
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 15:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92D73148B5
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 15:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758294188; cv=none; b=kKJjnBbMJ7fIQPD1JC30iV2swyby3eW6YZo3x85AKcf/GzT3WNq6hlPGHl++EyqFoY1y9YGLqBgoF/nP6rD413YjUVPsa6ysICkDiKx+AUP9vfieOLLfaGDeXzlqb9JRKNOus3av954h1cWzaDphGs4qTCNjVwCOD5Q6gmkmt/Y=
+	t=1758294623; cv=none; b=uw7WwhCi44CFnimUaUyiHIIIFj4tFHDL5h5moz8xmILa9KDv2cKoML96eT7YIUYXZIVZNWgpvJSOiLhUlgv9OlBrZbFcTkN5e6yviqzCvijwCHS1xeCPRtl++U1Tp//jG/KhoPymAyDk04oudLDMzaXvgF7mxrv3Iy3ylxqdSn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758294188; c=relaxed/simple;
-	bh=+n/iblNGj7Y18B6Y1Ew5oSCPFMViAjMlu1qCnod5KLI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UKlOL89TNH+FkSYX3wmZ6TlSyzCsW3P7eQ+wyNdT3aCe4ldEqPD/YIP1CXYjHf5MtmoPc8j8g3CkD/M8gh5vZGzOUQtkg3nXM+/yxgvfNxdMwgkpQ4ngG/Vc/xYLWHy6yRC3cOw084+YOFiVC3AWjnkKPDm9FzxXU+c4L9etEqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=skK3Wdm1; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=fp1dkayW; arc=none smtp.client-ip=103.168.172.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 3669B14000D8;
-	Fri, 19 Sep 2025 11:03:04 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Fri, 19 Sep 2025 11:03:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
-	 t=1758294184; x=1758380584; bh=hfNLlqj1sWO8mO3nDoYG41w3rzr/iqt1
-	jxuqP6W0nHI=; b=skK3Wdm1eap8+niowJ+Z7UKz8Os+xzY+gwF0LqbGjEbUH7pD
-	drftn+90M+aPY5h+b5W2dwNuqt4Vd4ar1SCk5ZzBMmuIZv8Kd8aOJsXlAe6rDuZX
-	b3XCLB2B8dTUBXPXJVW01HvYgIC5ZvHHCo/aTpn6BJNQKb0OQ67Cdzddc43b3/ME
-	GW3y7xPvnoFp/8hn3txbhnNQigGCoaXi3f93uBhlt0a//1g/fzHKksevgkMuABS5
-	mguhar6tfGBPy+pZdP1WRCBrcC+lAApAchKPrP9xwS4rOQkYOcZiCsOMVxNP7Wqb
-	hQUJrgoXEX72iDM/fyrfSjaZnsro8uwMgSOcpQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1758294184; x=
-	1758380584; bh=hfNLlqj1sWO8mO3nDoYG41w3rzr/iqt1jxuqP6W0nHI=; b=f
-	p1dkayWxnclMCi/rdxBVxcc7wwij6HnFD3YeOsPZOisgYsgdP1coMFZJJ1/29bbm
-	KqH7G18apkOPvkxWR9Cr7hUNePvHU/1AsjKl9vqRe273Nej6JMS4NF2fBmFx03+n
-	ZB6zHSZHWEWCYSxLaLrhmn54MTusnADA1vExqqSXUSTVhCa5pkOdk0morvsHRJgu
-	bz7GURSTWTi57pX01SVTxFJ3dWKVTWBndQmDvhZUdYGoHxwOJadKIAL9cVSrZdEg
-	EUKc5FOCkujTf3K53hCbphY3dRj5J/Bpa4Yxv/lZuRnUC2/D38zv3VZRs4P3zB0+
-	6mc5gxbdKUKRYDIHN8qhA==
-X-ME-Sender: <xms:p3DNaNKfrxSVLUZGEDQGLmJNRn58grhJaqoLFlodZjAiged1iG58gg>
-    <xme:p3DNaGR1Cz_0-Dw5rpp87XCLiG3j0DVDAn-bTzcqOeuOFYkX2fZEpVpOjuaWjTecK
-    3jB7LHgrFzkdPrStLo>
-X-ME-Received: <xmr:p3DNaEsthRfC_dXAjbShNoQ5RfvaF7igZBFy5Bu9HJUKtivExHOx80Ysmy8G>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdegleehvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepgfdvgeeitefffedvgfdutdelgeeihfegueehteevveegveejudelfeff
-    ieehledvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeehpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopehmmhhivghtuhhsleejseihrghhohhordgtoh
-    hmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
-    thhtoheprghnthhonhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehkuhgsrg
-    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohhpvghnvhhpnhdquggvvhgvlheslhhi
-    shhtshdrshhouhhrtggvfhhorhhgvgdrnhgvth
-X-ME-Proxy: <xmx:p3DNaPbywsvKhHNL1asEHbkscQKpdne8aIJcSk4H4Rrk5pMtLYWqsQ>
-    <xmx:p3DNaCG4gy5OGU3k-XMr7aQn-WQfRW3quW7tpxkUWIRAtONdU7QSmw>
-    <xmx:p3DNaLxmssrXWhfoshTT0io2MuTAUtIVMpV5oPETe8MSemNevnxNvA>
-    <xmx:p3DNaMkVgDdkn44MVgMOfNXzl4rkf_Z17kIW77Ud_V76VDcd_IG0-w>
-    <xmx:qHDNaID2z28D9vAOlGcnILxYcenlqQKpTciJvqqZ5IRVYUoJ8cNE16fL>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 19 Sep 2025 11:03:03 -0400 (EDT)
-Date: Fri, 19 Sep 2025 17:03:01 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Marek Mietus <mmietus97@yahoo.com>
-Cc: netdev@vger.kernel.org, antonio@openvpn.net, kuba@kernel.org,
-	openvpn-devel@lists.sourceforge.net
-Subject: Re: [PATCH net-next v2 3/3] net: ovpn: use new noref xmit flow in
- ovpn_udp4_output
-Message-ID: <aM1wpYP5LYhM3jcz@krikkit>
-References: <20250912112420.4394-1-mmietus97@yahoo.com>
- <20250912112420.4394-4-mmietus97@yahoo.com>
- <aMlApjuzBJsHVMjN@krikkit>
- <cd8193c9-1af8-4182-8e6a-a769acfde340@yahoo.com>
+	s=arc-20240116; t=1758294623; c=relaxed/simple;
+	bh=CXdGM4YEwwMisgM1/je7dFBgxqsJWrbd8vdeGKr78Dc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Y9sc2Ie0gjdAagZzxD6HoggTsuok3U7vPkT5UUHbJJa9QXrs1Yo+iE83HFdiqxWaK09KPhJEQnGIf82CCXalOAIzg+MtjJymG3fl8FaGZLX0bj1D0t47M+nk7sBfak0r83bPdiZZVCvwGLey2WY3clPyQ42v8ReCHPlfZFiX9DI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RF/1/Jdj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42EC3C4CEF0;
+	Fri, 19 Sep 2025 15:10:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758294623;
+	bh=CXdGM4YEwwMisgM1/je7dFBgxqsJWrbd8vdeGKr78Dc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=RF/1/Jdji8jf5NY/Jx5LgM7MLKap7/zMYQ4fsPWYlTOTY/f5eYCTYF44fKltMGpr3
+	 ZwToElaDtDgrPGSF7/lKXOJXN5YhnvGLzh3mC/0NUL8RELJwgRqdWWwiMhMKj5oW3/
+	 lFzMjqqAZ4AXKHHfvpwfDO8Mp4WkuvgmeKXZXANhSChzqtJWaDs5b49CyoEyhyxnhE
+	 NmTBhEphhYOdsyM74k3NKD54GWkZj6/Rw3BtN+Ga6efDUf38Q230Van8uUimKLIS4p
+	 zY4YdGi9POeHKnw9LdKZ0Ai6GbzFDPw9uhUYS2lB+DiyxzpAh3BXSBbgAu41qvP/no
+	 dbsqMHLGqDWYQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACC839D0C20;
+	Fri, 19 Sep 2025 15:10:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <cd8193c9-1af8-4182-8e6a-a769acfde340@yahoo.com>
+Subject: Re: [PATCH net-next] wan: framer: pef2256: use %pe in print format
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175829462276.3344139.5613932929773168713.git-patchwork-notify@kernel.org>
+Date: Fri, 19 Sep 2025 15:10:22 +0000
+References: <20250918134637.2226614-1-kuba@kernel.org>
+In-Reply-To: <20250918134637.2226614-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ herve.codina@bootlin.com
 
-2025-09-18, 18:29:08 +0200, Marek Mietus wrote:
-> W dniu 9/16/25 o 12:49, Sabrina Dubroca pisze:
-> > 2025-09-12, 13:24:20 +0200, Marek Mietus wrote:
-> > Why are you changing only ipv4? Is there something in the ipv6 code
-> > that prevents this?
-> > 
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 18 Sep 2025 06:46:37 -0700 you wrote:
+> New cocci check complains:
 > 
-> I'm not sure. I'm not as acquainted with IPv6 as I am with IPv4. (and thought I'd hold off
-> until I got a positive response about the series)
+>   drivers/net/wan/framer/pef2256/pef2256.c:733:3-10: WARNING: Consider using %pe to print PTR_ERR()
+> 
+> Link: https://lore.kernel.org/1758192227-701925-1-git-send-email-tariqt@nvidia.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
 
-Ok, understood.
+Here is the summary with links:
+  - [net-next] wan: framer: pef2256: use %pe in print format
+    https://git.kernel.org/netdev/net-next/c/3fb4f35a75e8
 
-> IPv4 already has some noref xmit optimizations, so it just felt like the right place to start.
-
-There's also some in IPv6, see d14730b8e911 ("ipv6: use RCU in inet6_csk_xmit()").
-
+You are awesome, thank you!
 -- 
-Sabrina
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
