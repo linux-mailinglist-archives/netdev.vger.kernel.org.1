@@ -1,122 +1,145 @@
-Return-Path: <netdev+bounces-224894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C38C5B8B4EF
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 23:16:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A707B8B569
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 23:32:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C35E7BB13C
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 21:15:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C28C35A432B
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 21:32:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D3A35942;
-	Fri, 19 Sep 2025 21:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C9212D29C6;
+	Fri, 19 Sep 2025 21:32:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MLvVR17O"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="JUZ/vuyz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E235F29BDAD;
-	Fri, 19 Sep 2025 21:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E1529BDAD;
+	Fri, 19 Sep 2025 21:32:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758316609; cv=none; b=f7Csve47lE/Sgnuf9OJG4ALfvGZu2Z+bCf8olD8QTIJ8frEbrXkrbqPnp3O1twUhVoCuwg57j2ZtdjSECUFZ3WDv7kg+xxV6v6uzWjt8MVxUIAL8oanTrxzt2OBXWi420eMvS+agHcngwe3HfyEj8zDDyJuTQIs66Y0axMjc/AI=
+	t=1758317530; cv=none; b=Gcvic9Oc0HOPg8Ldy0R8ZUsxHt2sOxzQXv8yVy+jiIYY7NsUyiW/i/Mf+1x+yly6JhEuQLq3T2q6RH6Cgu2CYwMyse3BLEn9H+HZ3F5oucYt5OT6TABwZEw7MCV4o+s69SJRDJwmQSQDgBRsbkbiOhLGBm7UdOYP2MFJL8nBxXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758316609; c=relaxed/simple;
-	bh=wfxAEXzxYSVB6JGbbLrjBWCv+3t+tDPd3Mud0rEiZ9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KMn0z5HR6SctKEQSXDl6duXf8nRYMDYgt/kMyAy3scoF363Tm2GjyIkDqwHBd7G1LCzhJqRW6PZv073+1CQIwpbo7FqqOx09u1fE0QcMVX8fftvLKktlReETt1CtLgTNiyWnI2f4cRrBqag/viza2AWdlXD/VpfH06vZ1P2Kqfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MLvVR17O; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758316607; x=1789852607;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=wfxAEXzxYSVB6JGbbLrjBWCv+3t+tDPd3Mud0rEiZ9k=;
-  b=MLvVR17Olhu5v2/imKFLsrRqUdD+vib5Meg3Dp8SbN6f/6PTlrpcBAh2
-   n1ossrcidEguqRbmGXa/Q7XjIShAk+JDnMqU/1OSL4L/gpFoyiFLf34ei
-   NQgDOlgUi7NEemmHla8I+/yq17o2i1cSbuHfgvv9wfoWMqreZYt22W6Ly
-   IbZqFhPU1V+d0Knj9qi8Ciq2Z2w33IVgZ48vcsyf79bJs+WVESxvQ8CKz
-   hQ63rgWUOEdq7mWsID31VOru5DfKDc3NsBFCTDUCWtG3Iq5LRCuYoTgEE
-   7Ku5cG/dLmQ0uYxvWbcPotW/gM3lsUJeZVm2wwP06SmbgGfrVUfMO4xbQ
-   A==;
-X-CSE-ConnectionGUID: f8HlL5kPQ9ijHKRtqgD43Q==
-X-CSE-MsgGUID: hDvSiBrXS3+PxQGbyZg8cQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11558"; a="60729664"
-X-IronPort-AV: E=Sophos;i="6.18,279,1751266800"; 
-   d="scan'208";a="60729664"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 14:16:46 -0700
-X-CSE-ConnectionGUID: ynLwOApYQ6mbTLuwinQ3QA==
-X-CSE-MsgGUID: mTPbd37dTNmacQvDocUAeQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,279,1751266800"; 
-   d="scan'208";a="213080912"
-Received: from dnelso2-mobl.amr.corp.intel.com (HELO [10.125.108.58]) ([10.125.108.58])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 14:16:45 -0700
-Message-ID: <437d1457-8d75-4797-8cba-9489bf97cc5d@intel.com>
-Date: Fri, 19 Sep 2025 14:16:44 -0700
+	s=arc-20240116; t=1758317530; c=relaxed/simple;
+	bh=1zLJrqegpzA8usYuymvT/Lt9C1d4kpC+uKnAo9UESAo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pUT4AgFOtovXrroO12JkevrD1k9FyqO0T90Wf832KAfJWv87J80gGnCUsWaoG9BvvOJ6hHi53/h1YSCT/7LehAaGs0shm5sZUc0CP6xxqz5Gw7oL+37s35/BZynNBA2eCckEB6ZxAXfOtSLrpkFQNrUOwwldjH2azxe/ZisR90I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=JUZ/vuyz; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=ofVTDNaeXlFfj4t9Mgc6jAqO2rL3ttz6rKTuuSKot3g=; b=JUZ/vuyzVIIEfN6UvA2WD7cijd
+	Hp7aoLJWqXyOWjnwXiDD9As8Dw5nPQUwo0N7krYWvVc5p/mQOwt4roKbMYePQ0P8/khn2g5GTo4sm
+	AfQkRW73295G11eXwnhj2jk+COT9W6m4Ilkhe3Sh1Kag2xPhpjT7WH1gwkNz9Zx6HkT5yxp8sk5pe
+	WU6FgIhywt1K20vu5cOOzQmr5gQzDeIz6gvmNZqlnVDANEHTK/2jI/N3GeUlHNcv2EdOWXzrip5ot
+	BuAGu3xuslG6gHv5cL6dHFhvRWPTekGEpMs0DYCadnnAi5jyagcNbb/ttv07T8FbrQCKk5P67/F4h
+	n88/J3Sg==;
+Received: from localhost ([127.0.0.1])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1uzihu-000NpU-0a;
+	Fri, 19 Sep 2025 23:31:54 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	razor@blackwall.org,
+	pabeni@redhat.com,
+	willemb@google.com,
+	sdf@fomichev.me,
+	john.fastabend@gmail.com,
+	martin.lau@kernel.org,
+	jordan@jrife.io,
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com
+Subject: [PATCH net-next 00/20] netkit: Support for io_uring zero-copy and AF_XDP
+Date: Fri, 19 Sep 2025 23:31:33 +0200
+Message-ID: <20250919213153.103606-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 17/20] cxl: Avoid dax creation for accelerators
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: Alejandro Lucero <alucerop@amd.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Davidlohr Bueso <daves@stgolabs.net>
-References: <20250918091746.2034285-1-alejandro.lucero-palau@amd.com>
- <20250918091746.2034285-18-alejandro.lucero-palau@amd.com>
-Content-Language: en-US
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <20250918091746.2034285-18-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.0.9/27767/Fri Sep 19 10:26:55 2025)
 
+Containers use virtual netdevs to route traffic from a physical netdev
+in the host namespace. They do not have access to the physical netdev
+in the host and thus can't use memory providers or AF_XDP that require
+reconfiguring/restarting queues in the physical netdev.
 
+This patchset adds the concept of queue peering to virtual netdevs that
+allow containers to use memory providers and AF_XDP at _native speed_!
+These mapped queues are bound to a real queue in a physical netdev and
+act as a proxy.
 
-On 9/18/25 2:17 AM, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> By definition a type2 cxl device will use the host managed memory for
-> specific functionality, therefore it should not be available to other
-> uses.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Reviewed-by: Davidlohr Bueso <daves@stgolabs.net>
+Memory providers and AF_XDP operations takes an ifindex and queue id,
+so containers would pass in an ifindex for a virtual netdev and a queue
+id of a mapped queue, which then gets proxied to the underlying real
+queue. Peered queues are created and bound to a real queue atomically
+through a generic ynl netdev operation.
 
-Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-> ---
->  drivers/cxl/core/region.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-> index 20bd0c82806c..e39f272dd445 100644
-> --- a/drivers/cxl/core/region.c
-> +++ b/drivers/cxl/core/region.c
-> @@ -3922,6 +3922,13 @@ static int cxl_region_probe(struct device *dev)
->  	if (rc)
->  		return rc;
->  
-> +	/*
-> +	 * HDM-D[B] (device-memory) regions have accelerator specific usage.
-> +	 * Skip device-dax registration.
-> +	 */
-> +	if (cxlr->type == CXL_DECODER_DEVMEM)
-> +		return 0;
-> +
->  	switch (cxlr->mode) {
->  	case CXL_PARTMODE_PMEM:
->  		rc = devm_cxl_region_edac_register(cxlr);
+We have implemented support for this concept in netkit and tested the
+latter against Nvidia ConnectX-6 (mlx5) as well as Broadcom BCM957504
+(bnxt_en) 100G NICs. For more details see the individual patches.
+
+Daniel Borkmann (10):
+  net: Add ndo_{peer,unpeer}_queues callback
+  net, ethtool: Disallow mapped real rxqs to be resized
+  xsk: Move NETDEV_XDP_ACT_ZC into generic header
+  xsk: Move pool registration into single function
+  xsk: Add small helper xp_pool_bindable
+  xsk: Change xsk_rcv_check to check netdev/queue_id from pool
+  xsk: Proxy pool management for mapped queues
+  netkit: Add single device mode for netkit
+  netkit: Document fast vs slowpath members via macros
+  netkit: Add xsk support for af_xdp applications
+
+David Wei (10):
+  net, ynl: Add bind-queue operation
+  net: Add peer to netdev_rx_queue
+  net: Add ndo_queue_create callback
+  net, ynl: Implement netdev_nl_bind_queue_doit
+  net, ynl: Add peer info to queue-get response
+  net: Proxy net_mp_{open,close}_rxq for mapped queues
+  netkit: Implement rtnl_link_ops->alloc
+  netkit: Implement ndo_queue_create
+  netkit: Add io_uring zero-copy support for TCP
+  tools, ynl: Add queue binding ynl sample application
+
+ Documentation/netlink/specs/netdev.yaml |  54 ++++
+ drivers/net/netkit.c                    | 362 ++++++++++++++++++++----
+ include/linux/netdevice.h               |  15 +-
+ include/net/netdev_queues.h             |   1 +
+ include/net/netdev_rx_queue.h           |  55 ++++
+ include/net/xdp_sock_drv.h              |   8 +-
+ include/uapi/linux/if_link.h            |   6 +
+ include/uapi/linux/netdev.h             |  20 ++
+ net/core/netdev-genl-gen.c              |  14 +
+ net/core/netdev-genl-gen.h              |   1 +
+ net/core/netdev-genl.c                  | 144 +++++++++-
+ net/core/netdev_rx_queue.c              |  15 +-
+ net/ethtool/channels.c                  |  10 +-
+ net/xdp/xsk.c                           |  27 +-
+ net/xdp/xsk.h                           |   5 +-
+ net/xdp/xsk_buff_pool.c                 |  29 +-
+ tools/include/uapi/linux/netdev.h       |  20 ++
+ tools/net/ynl/samples/bind.c            |  56 ++++
+ 18 files changed, 750 insertions(+), 92 deletions(-)
+ create mode 100644 tools/net/ynl/samples/bind.c
+
+-- 
+2.43.0
 
 
