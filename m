@@ -1,107 +1,118 @@
-Return-Path: <netdev+bounces-224878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7804B8B2EE
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 22:22:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 343B9B8B3B1
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 22:49:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B11DD1C84FFD
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 20:22:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDFC3563B8A
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 20:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3E12853F7;
-	Fri, 19 Sep 2025 20:22:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655CC28314D;
+	Fri, 19 Sep 2025 20:49:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HVWP0/yk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4dhBxTW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8168B25DAF0
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 20:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB629274FFD
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 20:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758313341; cv=none; b=XxvApXn9OnhBi6hvTjl1cbZBbQXzzdYOwRqv80Dbls5++ctpxTG2SNXP45E1wQu+kkRobcCdSXSGpa3gM/nHOh2U/7gs+SxBHi22fiAIDd1N0leFhcf9jFXPLM5bKG9C+AEgOobYfNEK+8C4rb3Tsmc7ZyiGwjXqorJlFmDxKHM=
+	t=1758314941; cv=none; b=MaiAiO81igN8iVM7omC4uT5jaLUb3BzBoO1Ju1n6LTTCsXvUwQLK/uhmBREePvhriWpJTbIxBGyNNUY+NOWuLllcsEy2wFJ0yXCtaJEtGeZCivZNWeTt4DBPha0wfoNWJnd05kStMtRosUl0baCWs2ERkpicagW5mqdDfY5cZck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758313341; c=relaxed/simple;
-	bh=RgwiuY3gWTZmdM2pnAr6zFGdZRnLuqav1wWVEBWZFUg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p7/Woy+H1xBxb1vQfSiRoyHSAfwP6djP9XV5U8uPjQ8J4ZNDOZTooo/nuWmS7CxBDyElU/Aq+/6yuTPxJ4vp9+PE7YjYfRnEf9xFEx6Q/UhYkC5+dWL9Bd24GCX6SYFdpSjmUx0amWuznc01o274Jj8thfaFFl8boL6c4RImHWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HVWP0/yk; arc=none smtp.client-ip=209.85.219.48
+	s=arc-20240116; t=1758314941; c=relaxed/simple;
+	bh=i0K7Xc+twn6JhVq36n7SPj7f/F1K7y9G+4rUGu7y87w=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nRdHz7xHoxE0Hq6eg8enSSBOBLKbkuS+i6J0cCOrsx6O4XlhKzn1Ltq7CtaJhw7E1SOmttPV24U/SzTkEegc0NjWls91VVifEgvUr5cn768m1Y1JP72n9u8jZ1UDY9lRzwjBTAR8pma0RWAfUjda5V/GIWkA7bjFi1VMg+xWGB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4dhBxTW/; arc=none smtp.client-ip=209.85.222.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-70ba7aa131fso25100926d6.2
-        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 13:22:19 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-817ecd47971so711612785a.0
+        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 13:48:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758313338; x=1758918138; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U3SLabrwkBWh6hxuZMDgN2pULSHyTTHVs+weWx2op5w=;
-        b=HVWP0/ykWLA3PYX9Xn3fMw86bSL4axu6j93cjFi+0Ln9adYJhhRhFvoM4sKHfJTX4+
-         mCP/21Fj55PQs42cseYc1ElLKZeRXr0Z27I/uP+pDTPQSCC9AzoW9kRyufNdiFmIO9Fe
-         fX/vowpXUdlYtcXyXuuBhxAuGS3nrQVwXnqLOT/GozP3Ib24rI2g0SW0LsTC63mxNM2o
-         9jWSdyNPGVXjryvHOtgCtT91Z0J3J/5g/RZRS7kkdPa1zYuywjNgbDLurzSJz+og3hYV
-         BtDofG0YLM5R+cUgJimRnshnVR5VaWpLlmAMCpSgAho+/ankRH7D7msGQcc8L17k+Tm1
-         jz7w==
+        d=google.com; s=20230601; t=1758314939; x=1758919739; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Fxd1o4+hhpqtwZsEtysLCBzzqm8maE2Ldt6r5tFtMRs=;
+        b=4dhBxTW/cBiBPbuczr0SZmzAZbU54WYMomPwcUrjCeQWOYD5PykulkeoIxdplh5k6a
+         5l6EntS6/vkCmok/TDs1dcZ8ZOHHGSGKUriOxZeXz1VmlvwzMF7hRaEXtt2RNCTFuSE5
+         HtyR0Drys2Ukdsq+BYXUVSbfmZ987SHlQjamd6MKCDVKBA04hIPGxU0brwGIsBwG88XY
+         W09xY1R6Tm4yi8sXy2lGmHAD/QkcqfCs5zvpRr02WE7RCnIWQxpJQgSUee8RRG074174
+         UJXMGEDRSMCWOoGcHUpJMx5UvkC2C7NMHIFBfCepiG5o1tVYtq7DrwRWQiZvZJS+q9Ag
+         4llw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758313338; x=1758918138;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U3SLabrwkBWh6hxuZMDgN2pULSHyTTHVs+weWx2op5w=;
-        b=hYMJEppveWcK6AXMYRM/EaBtkSFtvyjDMZpgeWC/l1nZfZD9e9EDqUMAGNPe0o4SN+
-         dPyX3MR0KnQBPo3N5t7B8F+MBkfY9geKZTBPhWNu++yY3/Q1/bdRPCipVCrwsegqPMTH
-         W6lQtkvMhum666k3SIDqMdRAtxfBJ0ES5aGBSXetuv9LwLKMQKRQbmcwD+hrEmYntuqD
-         AVhLdCE/q6CSMjro6WKoT0j341+i5SuYl7eLG4KrOD8sCOrwZVkZgTSRj3i12r8D5njB
-         3J4JhrjAk7KKeuVVhiUfPMcakWW/3zbnowvoV8cQ6mDnPwMjYsQTIQxdSrreKtPkmWq0
-         cP0w==
-X-Forwarded-Encrypted: i=1; AJvYcCXH+6YfEZhaIH0zAoNCNgVKiwhcpZNbV1iXrkg7nyRKUEzTM0BYwl98+PQU0LI4Z4E6Z1ya+FU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoteNVmFByY+qc3G/itLT5N3RWN2oF5Dm1ZxlOxzBDb2gmheAG
-	ODfUfDBbneaY72Lg0f1UDFH5x45TO/qY25s2zp2fUMmpe9orzdiX1RPMYv8MhnJkjLwwW1q73/z
-	dXOKQbK6bKHInPIKAi1yTaFxpM7pCE2GsTQyjm3HK
-X-Gm-Gg: ASbGncsXkHYv9xgvL/L+3yWFMcrkvXlBYSzDzxPYJxlbLif8Ac/g3Kbj6gsJvYFwRnb
-	tcRHtx9tY5KvrXa7vLtgAmQcAnMHuANJzU1keT+K6RQVlzANQ7aavQKYWM5RZ1v6WaOZB/azHgZ
-	MyX3qwD0hBW+FeTurV/0H5tAC09YmUbIg49TauiAkszNB72LmcyHShV8beUlCsXulW8eydfxIHt
-	VXnSQ==
-X-Google-Smtp-Source: AGHT+IFQCqn+0aT4L8isR/AOEauzkR4hiPWxIetKDyypaeDv1QDq5i8E6kyyOmaVnIRCuZF0LfMe4D7n2gflCBd7/7I=
-X-Received: by 2002:a05:620a:4e89:b0:829:716c:4f61 with SMTP id
- af79cd13be357-83ba50f5720mr450335185a.29.1758313338028; Fri, 19 Sep 2025
- 13:22:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758314939; x=1758919739;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Fxd1o4+hhpqtwZsEtysLCBzzqm8maE2Ldt6r5tFtMRs=;
+        b=DqxOZ+UubBWUll44Fba5bhfoRrDde2thAm1mlCBvb0Njt0GbZhWvc1sKFNymgpelJA
+         yv98KIZe+a/GSFm5jIPkTiPV/9Ug3NSudoCRcmVk1UDREOE3k6xFBjbBE5CyBV5/4MpZ
+         VLOyswXaXLmWls4wsvSqHMUSGupnjz8J5M75y3ejvoyAzaprE4CEiqKVfI3JcKdoVv4o
+         WFyxrawGrrNJQ3PaeIxbo53fUVzZ6qeVFg5RDVbSVPlwmP0g6/IvRc7MsKq+2z6UHfGS
+         CFUqjMD8Uy6ChEw5zcWECebq7AoudPywjQORbAqNzrd4UmqhXPrLBX7/S06W8YIyHq+6
+         7AWg==
+X-Forwarded-Encrypted: i=1; AJvYcCVwM5GU3cPJlnmDZSOOvVI10vA+ww6XGMWgY71I2qTDCrG88Z6tENuw+9lhtSRiqZgS3sIOD4w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiiOvHUVHVIVX/6ORjseAM29+pU8uBhGgW9kn7iil21WSwdDsF
+	AA3KPiqh2xqowb6Zy7hr+kn+BaGnWksvvb7GW3sCk0nj3lo6bj1zTKms+q4JZbnT469DGXV/r9I
+	Bra9j16e48DPWLQ==
+X-Google-Smtp-Source: AGHT+IE6Cpana8GBWfDQvzjMALWxdtaAU/gEJY21UluoJMRuPAwz6LxPpDZWQhtW6Aempz0ByMODd7PxEhrGaA==
+X-Received: from qkoz16.prod.google.com ([2002:a05:620a:2610:b0:828:baba:187a])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:4543:b0:81a:bbce:6d39 with SMTP id af79cd13be357-8363c8bf97cmr999934385a.40.1758314938615;
+ Fri, 19 Sep 2025 13:48:58 -0700 (PDT)
+Date: Fri, 19 Sep 2025 20:48:48 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250919164308.2455564-1-edumazet@google.com> <20250919131607.66e74a10@kernel.org>
-In-Reply-To: <20250919131607.66e74a10@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
+Message-ID: <20250919204856.2977245-1-edumazet@google.com>
+Subject: [PATCH v2 net-next 0/8] tcp: move few fields for data locality
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 19 Sep 2025 13:22:07 -0700
-X-Gm-Features: AS18NWC-zs_t6-UFDWEc1QTnIAjl-ScDHqIrNnUdYP_6IiA7pOCH3deG2OGVRoI
-Message-ID: <CANn89iLwOEibFLrkO33OkyhLc+NaMaMWkTzvBrB7gaWMY-a7Qg@mail.gmail.com>
-Subject: Re: [PATCH net-next] udp: remove busylock and add per NUMA queues
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 19, 2025 at 1:16=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Fri, 19 Sep 2025 16:43:08 +0000 Eric Dumazet wrote:
-> > @@ -2906,6 +2912,7 @@ void udp_destroy_sock(struct sock *sk)
-> >                       udp_tunnel_cleanup_gro(sk);
-> >               }
-> >       }
-> > +     kfree(up->udp_prod_queue);
-> >  }
->
-> CI lit up with memory leaks. Looks like IPv6 destroy needs a copy of
-> the kfree()?
+After recent additions (PSP and AccECN) I wanted to make another
+round on fields locations to increase data locality.
 
-Oops... quite possibly, thanks for letting me know.
+This series manages to shrink TCP and TCPv6 objects by 128 bytes,
+but more importantly should reduce number of touched cache lines
+in TCP fast paths.
+
+There is more to come.
+
+v2: removed tcp CACHELINE_ASSERT_GROUP_SIZE after a kernel build bot
+reported an error.
+
+Eric Dumazet (8):
+  net: move sk_uid and sk_protocol to sock_read_tx
+  net: move sk->sk_err_soft and sk->sk_sndbuf
+  tcp: remove CACHELINE_ASSERT_GROUP_SIZE() uses
+  tcp: move tcp->rcv_tstamp to tcp_sock_write_txrx group
+  tcp: move recvmsg_inq to tcp_sock_read_txrx
+  tcp: move tcp_clean_acked to tcp_sock_read_tx group
+  tcp: move mtu_info to remove two 32bit holes
+  tcp: reclaim 8 bytes in struct request_sock_queue
+
+ .../networking/net_cachelines/tcp_sock.rst    |  6 +++---
+ include/linux/tcp.h                           | 20 +++++++++----------
+ include/net/request_sock.h                    |  2 +-
+ include/net/sock.h                            | 10 +++++-----
+ net/core/sock.c                               |  5 ++++-
+ net/ipv4/tcp.c                                | 20 ++++---------------
+ net/ipv4/tcp_input.c                          |  7 ++++---
+ 7 files changed, 31 insertions(+), 39 deletions(-)
+
+-- 
+2.51.0.470.ga7dc726c21-goog
+
 
