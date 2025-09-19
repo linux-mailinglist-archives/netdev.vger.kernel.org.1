@@ -1,195 +1,169 @@
-Return-Path: <netdev+bounces-224788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 644E4B8A0FD
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 16:47:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FB84B8A1D3
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 16:56:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7ECD07ACC31
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 14:45:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB53B3B67FE
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 14:56:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6240235360;
-	Fri, 19 Sep 2025 14:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5B226E6F7;
+	Fri, 19 Sep 2025 14:56:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A4nXpIPa"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mJxYt1bO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1CA273F9
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 14:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A028A1F3FEC;
+	Fri, 19 Sep 2025 14:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758293218; cv=none; b=t1mfJntAqHLD2h+2uCMbntVfLpHwlaRMoJaMeAfJbo8uYORt3db79wbpUWISyiWQ8cuY6uUsBfmZtdWY+TLtZdXgdt9ZWQBy1J2x/ijxMeGVv0ddKGgFjlQItx+IfRQ1TuB8RZppxSu9Q4RwVEspWKJML4bj9pEEQsfqnCcdABk=
+	t=1758293764; cv=none; b=ne6q2m1qKVxHEnSJeSnPA4Grv9dxbJNLLP6fihSjdVQ2bNujQnk7D99OpZrxBXbjQnBVD5Tpf4Ryer9Zyo/aJ8tJVfz9fh2ipU2+gKPukOyHuQpfmALJ5YOFrYmkDjjUODocz0qiIwHceaOeYyy259xncYNjlcEHV0oCw082+VU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758293218; c=relaxed/simple;
-	bh=rMzpqLEOEhteINqvc5dyan4rtMP3A9UTuyesjbI13LA=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=eDVzfG76JkwdyNC5IFGj+vlJjzRlsdweKg9m3arbTYm8p63wXZP2P0HnBoaYxbsfc/xvPu70Yh12lLHv5E9O3OTrlq6A+BNIB1ppcEnxp0e3uat8zqXHxHyRR7DP8B8IY4U4RqlWUqzrCZo5ztTI3+UX5V8wuqdRs6uhBoLkrVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A4nXpIPa; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4b79773a389so22771501cf.1
-        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 07:46:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758293216; x=1758898016; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BTCj+e/VtZ/D02X1h15E6NfB/hO2pboJylbEQXWpz8E=;
-        b=A4nXpIPa+2BhjVsulZSLhLIPr3E+ZFHQUuJRXnK3toMeDpl/tIJlbRWgTKMiRShSu2
-         wcSH2+RapQp3ncIktiuybEZ9Nd99ZyBKhUaqw9wrt8zq/woRd5GRzwkukmR7t0Lz3e02
-         eItFjH3S0UmGQltEJH4/lg14WuxXQMfzicM/FysACFU1VzYzcGy4Tvy81wv7XbqcGen/
-         OQKgF9Yyrfvdl9YhVTub/urvZM12PjLLND/k1napHlkkLWnjYuYFlGyeMXKxnmooxdro
-         KYxQFg36h3oqwaABM4TdY73aYeSXG1qARFfVZDZHymcn5P90PYs3bB7cJ91MWjahe0nb
-         ykBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758293216; x=1758898016;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=BTCj+e/VtZ/D02X1h15E6NfB/hO2pboJylbEQXWpz8E=;
-        b=F9yKcvuvM/WbIyQC7iyurXdF1FeMxT/fFvwwPcr8SIoGqmow+MP1HGMJVfvXTgkGeQ
-         k4qwIcwrGow0HplWirqk/DHqQzSicAL6X/SKBNsZKTrSILllkIPSq/fja71YzTUD6MJP
-         cTGCm+QpLRy3sJTEPYfzYVgRSfUVbYq3D4RqzYDjZUUC/vmjd1RZlGX3uGAqDHtyKj+S
-         /3xUp4SrOEZsZAxOFLt/sNWeTU13g4kmahJsy/NS5HtNlWf2+6M41X8/I9VxOCMTsQHe
-         8bu3yozPtRkz5ytt8kuUGAyXj1ieqLl76ZpUcc7hO9gblxW5GqAF+hZRsGMAFZldiWOp
-         95Og==
-X-Forwarded-Encrypted: i=1; AJvYcCVuWKuo20FaIOWNdLiMNLGz28LZFzySVFZM+9tRee18E9iNWHQ88L5eCkMtsitb0Bl0+AmJRfA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsTNzeBeT9YMu9p2HXR6PUfaUgjJVjDAlSghBC9FPRs9N07MXi
-	Q0vNZ4Uk5UiaEWM1GKwdyvScs5zbpsz71dPM1UAM+cDa5iHkymMu4Gze
-X-Gm-Gg: ASbGncs2cZJHufTvNOeKfi9Rm9Jpyi/rKZRhbAVuBvRfHGKBoSAULRO9DsQWmtSw1ao
-	Tp8MqSH6+fI0bgSteol8UAtVOWkheROt/kX6P4lEtM7K7cXn7rWIIGQwGumpcY02NFH2q807zSX
-	cxk0LyGXGkR3/Rnj9pGYZAQy0tEwfESBs/7rZKwWAWOihIOwW4zzWutQU2aJhLq8vcpXEXG+fdR
-	IyiuMQI4gqAzlCN7GMAq+Nq19amXA/X8RmhLX9e1WFk7zgVKUeIsn+nPaAVIEmBDmrfskuAsPl6
-	8Ax4KWQWUg9AJrk/PeoXpbGwyKyPpcFhpAqkqkvo8/u8gd8bz9gev9Gso/6xrLPupu2Xbb7Mtg/
-	sab+vHejU/1YwfgGs9TbT4ToMgQSZ5KXGeOV5TImBliy6FAdcTwU0rn78QwNIs0PVr6V3sPuzmD
-	6WpQ==
-X-Google-Smtp-Source: AGHT+IEFvwYYDWYJDrNKDVvsS0tm4PJF42EUcN3g1p4ngNtR8j2nRJk0TdRdJI0JYwklpBYJ2GKC1A==
-X-Received: by 2002:a05:622a:5444:b0:4c0:cab7:978 with SMTP id d75a77b69052e-4c0cab70addmr15501021cf.29.1758293215746;
-        Fri, 19 Sep 2025 07:46:55 -0700 (PDT)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-4bda279ad7esm30915921cf.19.2025.09.19.07.46.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Sep 2025 07:46:55 -0700 (PDT)
-Date: Fri, 19 Sep 2025 10:46:54 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Wang Liang <wangliang74@huawei.com>, 
- willemdebruijn.kernel@gmail.com, 
- jasowang@redhat.com, 
- andrew+netdev@lunn.ch, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- hawk@kernel.org, 
- john.fastabend@gmail.com, 
- sdf@fomichev.me, 
- lorenzo@kernel.org, 
- toke@redhat.com
-Cc: yuehaibing@huawei.com, 
- zhangchangzhong@huawei.com, 
- wangliang74@huawei.com, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.2ecd010c7b725@gmail.com>
-In-Reply-To: <20250917113919.3991267-1-wangliang74@huawei.com>
-References: <20250917113919.3991267-1-wangliang74@huawei.com>
-Subject: Re: [PATCH net] net: tun: Update napi->skb after XDP process
+	s=arc-20240116; t=1758293764; c=relaxed/simple;
+	bh=8uIFhtK2IJ/B47NJpWMNwnQqZrSj51H4Icha31JBO1I=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K3I84clbQc3RwnzR7jJhmFticfAOAJIca5ZcBrKQILDruMS+/1LkwfmMd5M6V7oY+WgPcQl3SbAYH+fKj/Em9OifAieYlup4VfNI6Awp+d6ZdFAoo3oZW7UIXnSA0aJwOxtdAJWEdTIM8apDnBs7mPzd5F3qrPUkf+02KqgogEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=mJxYt1bO; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58J54pgL027133;
+	Fri, 19 Sep 2025 14:55:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=aU/IL1
+	yNGjUFzjuYRWTqCY8LpnItOiXO9jDsErM/ZSw=; b=mJxYt1bO9ZlAJGOriKukNR
+	6DRTT67kcYHIqst30BRLtnh1SMyV+iw+RyyHy1d/pgGo776owZC0aTcq259/Y4PV
+	EtCjbjz9ddjqDVfW/ji/d6eUueeEGNv+e7TJzWKs7S/eQv9i+6Lp6d6yAHZ8YI/r
+	IrN8HV0TfIgPS+/iHqzcCnm8ijIxGoSQ4s2cQggDj9bByZkqTTkP8FLnWYuEp/aR
+	2PBDN2EU2NRR9Aa+T5QlRhVUAWuRZ+ds4Gp4GqkzDg8FxZj9d904SJ15dd3SQMbc
+	Rew2+rgPJd4hk24k6NYLq0ktzrv470p+fO5USmfSUuTgRP/HRH+I6WXsbPWl8HkQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 497g4phff2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 19 Sep 2025 14:55:58 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58JEkpni015466;
+	Fri, 19 Sep 2025 14:55:57 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 497g4phfeq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 19 Sep 2025 14:55:57 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58JE6KCl027308;
+	Fri, 19 Sep 2025 14:55:56 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 495menm9bn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 19 Sep 2025 14:55:56 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58JEtqm030998972
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 19 Sep 2025 14:55:52 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2D1202004D;
+	Fri, 19 Sep 2025 14:55:52 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4663920040;
+	Fri, 19 Sep 2025 14:55:51 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.111.70.35])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Fri, 19 Sep 2025 14:55:51 +0000 (GMT)
+Date: Fri, 19 Sep 2025 16:55:49 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Dust Li <dust.li@linux.alibaba.com>,
+        Guangguan Wang
+ <guangguan.wang@linux.alibaba.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Simon
+ Horman <horms@kernel.org>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Sidraya
+ Jayagond <sidraya@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        Mahanta Jambigi <mjambigi@linux.ibm.com>,
+        Tony Lu
+ <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH net-next v2 1/2] net/smc: make wr buffer count
+ configurable
+Message-ID: <20250919165549.7bebfbc3.pasic@linux.ibm.com>
+In-Reply-To: <20250909121850.2635894a.pasic@linux.ibm.com>
+References: <20250908220150.3329433-1-pasic@linux.ibm.com>
+	<20250908220150.3329433-2-pasic@linux.ibm.com>
+	<aL-YYoYRsFiajiPW@linux.alibaba.com>
+	<20250909121850.2635894a.pasic@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE2MDIwNCBTYWx0ZWRfX7O7GttvqFagT
+ Cdun3QY+uzZBQMr3Un9NEUfVHdWnZ89ljb2eIA+Z180TJxat8rpwzQRJkEPXhPv1dwLpcdnbfrA
+ idK0almy44vfEFXQVDYad9se7l4qKhdVK2eshyDNuctlc4iMua3jHv+SK7LkRzt5RTA/X9YJj+G
+ 1nO1Mi8BVzIkNpOY8xPoPnLCCCb8kdkP3eVICBc7rfp/utcePt7ZZrEBCk8Sa5R2pe8JDMm4fng
+ +KyvkxlYLiuVZDDHSliv+cfO3pOxnidDbxJq2Jb2x68NXI09dkJ1rEsGCDh6SUzv6AOlYbJRI6G
+ t2PvjRxgQEVFepk4Emyj5t0Wt9GvkfazRUxtz6FNIv3+IkVBzVDRf95DuqTXfWHf28BlkY55+jh
+ WB5FYOr/
+X-Proofpoint-ORIG-GUID: LvQE9PCL4m0Y2ALvOcZbGvygtvYCo3uo
+X-Proofpoint-GUID: 1ej1yVyvFNjiPyIa0glrzXpwWEFApiLH
+X-Authority-Analysis: v=2.4 cv=cNzgskeN c=1 sm=1 tr=0 ts=68cd6efe cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=3-ZsZ1Rs_CeAYfPLFTEA:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-19_01,2025-09-19_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 clxscore=1015 spamscore=0 bulkscore=0 malwarescore=0
+ adultscore=0 priorityscore=1501 impostorscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509160204
 
-Wang Liang wrote:
-> The syzbot report a UAF issue:
-> 
->   BUG: KASAN: slab-use-after-free in skb_reset_mac_header include/linux/skbuff.h:3150 [inline]
->   BUG: KASAN: slab-use-after-free in napi_frags_skb net/core/gro.c:723 [inline]
->   BUG: KASAN: slab-use-after-free in napi_gro_frags+0x6e/0x1030 net/core/gro.c:758
->   Read of size 8 at addr ffff88802ef22c18 by task syz.0.17/6079
->   CPU: 0 UID: 0 PID: 6079 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full)
->   Call Trace:
->    <TASK>
->    dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
->    print_address_description mm/kasan/report.c:378 [inline]
->    print_report+0xca/0x240 mm/kasan/report.c:482
->    kasan_report+0x118/0x150 mm/kasan/report.c:595
->    skb_reset_mac_header include/linux/skbuff.h:3150 [inline]
->    napi_frags_skb net/core/gro.c:723 [inline]
->    napi_gro_frags+0x6e/0x1030 net/core/gro.c:758
->    tun_get_user+0x28cb/0x3e20 drivers/net/tun.c:1920
->    tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1996
->    new_sync_write fs/read_write.c:593 [inline]
->    vfs_write+0x5c9/0xb30 fs/read_write.c:686
->    ksys_write+0x145/0x250 fs/read_write.c:738
->    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->    do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
->    entry_SYSCALL_64_after_hwframe+0x77/0x7f
->    </TASK>
-> 
->   Allocated by task 6079:
->    kasan_save_stack mm/kasan/common.c:47 [inline]
->    kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
->    unpoison_slab_object mm/kasan/common.c:330 [inline]
->    __kasan_mempool_unpoison_object+0xa0/0x170 mm/kasan/common.c:558
->    kasan_mempool_unpoison_object include/linux/kasan.h:388 [inline]
->    napi_skb_cache_get+0x37b/0x6d0 net/core/skbuff.c:295
->    __alloc_skb+0x11e/0x2d0 net/core/skbuff.c:657
->    napi_alloc_skb+0x84/0x7d0 net/core/skbuff.c:811
->    napi_get_frags+0x69/0x140 net/core/gro.c:673
->    tun_napi_alloc_frags drivers/net/tun.c:1404 [inline]
->    tun_get_user+0x77c/0x3e20 drivers/net/tun.c:1784
->    tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1996
->    new_sync_write fs/read_write.c:593 [inline]
->    vfs_write+0x5c9/0xb30 fs/read_write.c:686
->    ksys_write+0x145/0x250 fs/read_write.c:738
->    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->    do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
->    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
->   Freed by task 6079:
->    kasan_save_stack mm/kasan/common.c:47 [inline]
->    kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
->    kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:576
->    poison_slab_object mm/kasan/common.c:243 [inline]
->    __kasan_slab_free+0x5b/0x80 mm/kasan/common.c:275
->    kasan_slab_free include/linux/kasan.h:233 [inline]
->    slab_free_hook mm/slub.c:2422 [inline]
->    slab_free mm/slub.c:4695 [inline]
->    kmem_cache_free+0x18f/0x400 mm/slub.c:4797
->    skb_pp_cow_data+0xdd8/0x13e0 net/core/skbuff.c:969
->    netif_skb_check_for_xdp net/core/dev.c:5390 [inline]
->    netif_receive_generic_xdp net/core/dev.c:5431 [inline]
->    do_xdp_generic+0x699/0x11a0 net/core/dev.c:5499
->    tun_get_user+0x2523/0x3e20 drivers/net/tun.c:1872
->    tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1996
->    new_sync_write fs/read_write.c:593 [inline]
->    vfs_write+0x5c9/0xb30 fs/read_write.c:686
->    ksys_write+0x145/0x250 fs/read_write.c:738
->    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->    do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
->    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> After commit e6d5dbdd20aa ("xdp: add multi-buff support for xdp running in
-> generic mode"), the original skb may be freed in skb_pp_cow_data() when
-> XDP program was attached, which was allocated in tun_napi_alloc_frags().
-> However, the napi->skb still point to the original skb, update it after
-> XDP process.
-> 
-> Reported-by: syzbot+64e24275ad95a915a313@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=64e24275ad95a915a313
-> Fixes: e6d5dbdd20aa ("xdp: add multi-buff support for xdp running in generic mode")
-> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+On Tue, 9 Sep 2025 12:18:50 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+> > >-	link->wr_rx_bufs = kcalloc(SMC_WR_BUF_CNT * 3, link->wr_rx_buflen,
+> > >+	link->wr_rx_bufs = kcalloc(link->lgr->pref_recv_wr, SMC_WR_BUF_SIZE,
+> > > 				   GFP_KERNEL);    
+> 
+> 
+> I will have to do some digging, let's assume for now that it is my
+> mistake. Unfortunately I won't be able to revisit this before next
+> Wednesday.
+
+Can maybe Wen Gu and  Guangguan Wang chime in. From what I read
+link->wr_rx_buflen can be either SMC_WR_BUF_SIZE that is 48 in which
+case it does not matter, or SMC_WR_BUF_V2_SIZE that is 8192, if
+!smc_link_shared_v2_rxbuf(lnk) i.e. max_recv_sge == 1. So we talk
+about roughly a factor of 170 here. For a large pref_recv_wr the
+back of logic is still there to save us but I really would not say that
+this is how this is intended to work.
+
+Maybe not supporting V2 on devices with max_recv_sge is a better choice,
+assuming that a maximal V2 LLC msg needs to fit each and every receive
+WR buffer. Which seems to be the case based on 27ef6a9981fe ("net/smc:
+support SMC-R V2 for rdma devices with max_recv_sge equals to 1").
+
+For me the best course of action seems to be to send a V3 using
+link->wr_rx_buflen. I'm really not that knowledgeable about RDMA or
+the SMC-R protocol, but I'm happy to be part of the discussion on this
+matter.
+
+Regards,
+Halil
 
