@@ -1,178 +1,144 @@
-Return-Path: <netdev+bounces-224680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99646B88268
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 09:26:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1A74B882AA
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 09:33:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDA481B22F23
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 07:26:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E0C1524C4D
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 07:33:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237CB2D0626;
-	Fri, 19 Sep 2025 07:25:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139BA2D592C;
+	Fri, 19 Sep 2025 07:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SLqTpl8P"
+	dkim=pass (2048-bit key) header.d=protonic.nl header.i=@protonic.nl header.b="pZW+VN/z"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp28.bhosted.nl (smtp28.bhosted.nl [94.124.121.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 366DF2C234F
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 07:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A949B2D47FE
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 07:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.124.121.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758266750; cv=none; b=sV8jqY1Hh1BfhW/47oPYevPciDr/c/6W5/jCeFV3VImi54ZM9Ns/x+wWcmDLCilRpH/19FC+/Qc9++dMR82nfubtW7CPT+uQVhUHE7CxtRc3j04fNjG/dN33o5CnKmrKjbsgjPsWesfrENgcfHUKyMSq4aiJ42SBw4C/l7vHHuU=
+	t=1758267153; cv=none; b=OJ/IUam4unEHZ4uPCYsLSwHgHccWCsQJVh2inIOg1dFpb7XVQL5W6kIVTn2PBrJ0SMIZNuYb+DVH762K5II1+6c/j90SzaGqzsQwMNNXsjbUiDEFtOj+Z1HJREmu/V+B9hm032MwH1Q5FS/oCSLdrzkr8gP+eC10dc/GJi0wF0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758266750; c=relaxed/simple;
-	bh=zkVkIoUOl03T+4kpYux31FAUF2pWUEphOE/XLbf//wU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Xc2Dszzj7lplzvkqdYUoqvYy8ZMBNj/ruLBJFRz+/fuOP/7pBOb1YH7/oXVg3Bd86iMt2huw5UsmkG6B15xZ91Ol5Mtx5b5NpqvT5q3mAPy4GH9WUbEE5WgTV2DOAKe/PkfNAxSwNcca92VIv7njc4q05eDu+gepELXrmypD7SA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SLqTpl8P; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758266747;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6bM94/nnEI8nwvokemjQlvg6Nu4kwWN6AkIyeAjLPwg=;
-	b=SLqTpl8PZ5Obw38PQe4Roo5NfFT7ET+y5FMAOIjQr9qAqgLz2DJsnHG4L3m7ZAWGw1qzpf
-	UHwEOdq8J7o56OIkMN0LBZ+CqthE2kJnvr9ZMqiIU78iqUW4GHXoHMkkmk0W+4uGhhUI6t
-	KOwObpwdxrcKEFEndUmThJbIE8W9zKM=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-CyAosApPNii7K2H9jvsLxg-1; Fri, 19 Sep 2025 03:25:45 -0400
-X-MC-Unique: CyAosApPNii7K2H9jvsLxg-1
-X-Mimecast-MFC-AGG-ID: CyAosApPNii7K2H9jvsLxg_1758266744
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-32ee4998c4aso1769191a91.1
-        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 00:25:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758266744; x=1758871544;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6bM94/nnEI8nwvokemjQlvg6Nu4kwWN6AkIyeAjLPwg=;
-        b=AzUHZ0yDS/SGAaOWaTywRrLHVSQEEPvcyOtEdmu4HjXr05LKGcjD9UUA7u/YcMnbnA
-         ACPgm026qe7foecgWJzP51nRXTKODul/96ff7KoQbW+oGqcsa1qwxI7mT5Jk9suLGiuJ
-         Pwa2y/saAcvB/Te7zEOhdXxFLRUtF5pMdMANRC9USwvToxSjC+S/obyepBbiii17UU7y
-         xWAIlED0qj29M8BUckw7hwRmWTELCkYg9UoO/EPvtHv+41PEm+CP+ZGM5MLnzIi9XOzr
-         7EWpqNqrPIX2zX17UgiNC3aa+mjcl597wu82ZWPR5RiW5pKUe7PM75i6/f3OWCTAje5a
-         OXOw==
-X-Forwarded-Encrypted: i=1; AJvYcCVNflPdlHG4S0I4Wfdl7J/TCwEMiPt4jiKZFueAsUv2mBmBOWK/TM2VkQIlaOFVeIu+V/se+M4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxr9L+96A82W95cxhaIuNbXcU/DO2cjNTePv/0jBPSqs9+x/ybM
-	vnDBy30GliWgMwpAfWo8Pwy99kaLD+7i7VAQ/lvtCmmuBYaSFSAMjLQB6xKBouhfUqjAZ7i6Bp/
-	PclwTZfJCWm6c/GW+xiyqdTehfcPLFtwRYrfMPB+etQsAl2aMbxDEKgelYYipSRjZT8PEyub7ri
-	0NyJwCxPbND6qM1tMOjfnyLUctH7r2872d9k4Ps97PCgE=
-X-Gm-Gg: ASbGncuhU+mXLX08RZEtLqLyrxPB+BII8H50DCenRDkr7Jx6i4y0118FAgPuP4d6pfR
-	1i4AvGDiu6plxCzeVKWcRo38Oy+J9yfrL30yv6GTZJ/InpVNGr6cv1TZKrSItv/wAOFwPF6RVqu
-	gBrxRjWIxFNqiPFhUGjWx2UA==
-X-Received: by 2002:a17:90b:4d:b0:321:9366:5865 with SMTP id 98e67ed59e1d1-3309838e07dmr3146554a91.33.1758266744222;
-        Fri, 19 Sep 2025 00:25:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHioX/aUb/kf3X7YbtUfx1ZTiAhYMo4GyJt6XgUNBRLxjMQjBMLN0ziU1pYTAvo5cwkJNciXxXsSL6B3HEhWEE=
-X-Received: by 2002:a17:90b:4d:b0:321:9366:5865 with SMTP id
- 98e67ed59e1d1-3309838e07dmr3146523a91.33.1758266743790; Fri, 19 Sep 2025
- 00:25:43 -0700 (PDT)
+	s=arc-20240116; t=1758267153; c=relaxed/simple;
+	bh=QDBKRYM86Xj8SvcY0SO2armSTunx77RSYXQE6GhjxRQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X7c2ew2kElnYums1WQcjrJkWpSUrwuGUxJwhChITy2akXoKFV+JPHFpBUTAc9mMXd8TUkW/gOgLNDQcyp8FD4BycvulmOQ8SKF8/7QcN8F2FMtkQMJrb+1DN1w2FdyKLClyLnvPnS8VT1Z7qfwMsAVdKGC1zO8V3ZNS0x6Zi8X4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=protonic.nl; spf=pass smtp.mailfrom=protonic.nl; dkim=pass (2048-bit key) header.d=protonic.nl header.i=@protonic.nl header.b=pZW+VN/z; arc=none smtp.client-ip=94.124.121.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=protonic.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonic.nl
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=protonic.nl; s=202111;
+	h=content-transfer-encoding:content-type:mime-version:references:in-reply-to:
+	 message-id:subject:cc:to:from:date:from;
+	bh=hb4JA4fTwI5S97+qQFy6E++mwXzjCgpI2x6Kz7sl75c=;
+	b=pZW+VN/zunUr8uqIHPr8ZaMHKz5+wpBS9g8mkldWI1GlhOZ01lslSu5UYQzFFEQjJGU6szmDdCNKa
+	 ySq3Dw2xuCzKeSw0pwSskYbqCuz5OEfnY7UVSvHFYKJCvZo6jQszXDWFPZ9S0lHA5mO4bq7UxDJs1q
+	 xBBj42CcHzqdnv8cwgal4DV4B9DJtas2zLBBc+SXtplp2DWYC4MvM8ZMDPG+mJQw0QhmfFYwq5zgRO
+	 jhAfBFwCAQrZ41fpzXDmJErIh4nugZek44vJMRmcedZPGs7MtWD1uwQ/GB2R2Bj0uLtVXBoG70fM67
+	 tPnUN4xs3iJtqwqVRpwzZVXsJ+2N6Yg==
+X-MSG-ID: a2929316-952a-11f0-8678-0050568164d1
+Date: Fri, 19 Sep 2025 09:31:19 +0200
+From: David Jander <david@protonic.nl>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Jonas Rebmann <jre@pengutronix.de>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown
+ <broonie@kernel.org>, Shengjiu Wang <shengjiu.wang@nxp.com>, Shawn Guo
+ <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Fabio Estevam
+ <festevam@gmail.com>, Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-sound@vger.kernel.org, imx@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, Lucas Stach <l.stach@pengutronix.de>
+Subject: Re: [PATCH v2 3/3] arm64: dts: add Protonic PRT8ML board
+Message-ID: <20250919093119.24d2711a@erd003.prtnl>
+In-Reply-To: <aMzlXerFpsfdHnwB@pengutronix.de>
+References: <20250918-imx8mp-prt8ml-v2-0-3d84b4fe53de@pengutronix.de>
+	<20250918-imx8mp-prt8ml-v2-3-3d84b4fe53de@pengutronix.de>
+	<af554442-aeec-40d2-a35a-c7ee5bfcb99a@lunn.ch>
+	<20250918165156.10e55b85@erd003.prtnl>
+	<7f1d9289-4102-4db9-a2bb-ff270e8871b7@lunn.ch>
+	<20250918173347.28db5569@erd003.prtnl>
+	<aMzlXerFpsfdHnwB@pengutronix.de>
+Organization: Protonic Holland
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250917063045.2042-1-jasowang@redhat.com> <20250918105037-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20250918105037-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 19 Sep 2025 15:25:32 +0800
-X-Gm-Features: AS18NWCuouHf_lzYXemPvsvzosa6Qbb26dhl00LIb1AvW_Yc0kDUxptSh5xarsQ
-Message-ID: <CACGkMEsUb0sXqt8yRwnNfhgmqWKm1nkMNYfgxSgz-5CtE3CSUA@mail.gmail.com>
-Subject: Re: [PATCH vhost 1/3] vhost-net: unbreak busy polling
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: eperezma@redhat.com, jonah.palmer@oracle.com, kuba@kernel.org, 
-	jon@nutanix.com, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 18, 2025 at 10:52=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com=
-> wrote:
->
-> On Wed, Sep 17, 2025 at 02:30:43PM +0800, Jason Wang wrote:
-> > Commit 67a873df0c41 ("vhost: basic in order support") pass the number
-> > of used elem to vhost_net_rx_peek_head_len() to make sure it can
-> > signal the used correctly before trying to do busy polling. But it
-> > forgets to clear the count, this would cause the count run out of sync
-> > with handle_rx() and break the busy polling.
-> >
-> > Fixing this by passing the pointer of the count and clearing it after
-> > the signaling the used.
-> >
-> > Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: stable@vger.kernel.org
-> > Fixes: 67a873df0c41 ("vhost: basic in order support")
-> > Signed-off-by: Jason Wang <jasowang@redhat.com>
->
-> I queued this but no promises this gets into this release - depending
-> on whether there is another rc or no. I had the console revert which
-> I wanted in this release and don't want it to be held up.
->
+On Fri, 19 Sep 2025 07:08:45 +0200
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
-I see.
+> On Thu, Sep 18, 2025 at 05:33:47PM +0200, David Jander wrote:
+> > On Thu, 18 Sep 2025 17:04:55 +0200
+> > Andrew Lunn <andrew@lunn.ch> wrote:
+> >   
+> > > > Yes, unfortunately the SJA1105Q does not support PAUSE frames, and the i.MX8MP
+> > > > FEC isn't able to sustain 1000Mbps (only about 400ish) due to insufficient
+> > > > internal bus bandwidth. It will generate PAUSE frames, but the SJA1105Q
+> > > > ignores these, leading to packet loss, which is obviously worse than
+> > > > restricting this link to 100Mbps. Ironically both chips are from the same
+> > > > manufacturer, yet are incompatible in this regard.    
+> > > 
+> > > Thanks for the explanation. Maybe add a comment that the bandwidth is
+> > > limited due to the lack of flow control resulting in packet loss in
+> > > the FEC.
+> > >
+> > > Anything which looks odd deserves a comment, otherwise somebody will
+> > > question it....  
+> > 
+> > Yes! This is a golden tip. Ironically what I said above is incorrect. Sorry
+> > for the noise.
+> > 
+> > Ftr: I wrote this DT about 4 years ago, so my memory failed me, and a comment
+> > in the code would have saved me this embarrassment ;-)
+> > 
+> > The comment above applies to the i.MX6 SoC's which had this limitation. On the
+> > i.MX8MP we had a different problem that also caused the SJA1105Q not to work
+> > reliably at 1000Mbps either. We haven't been able to find the issue, but so far
+> > this switch hasn't been able to work at 1000Mbps reliable on any platform,
+> > possibly for different reasons in each case.  
+> 
+> May be it is doe to RGMII clock switching issue and the requirement to
+> have specific silence time for proper clock frequency detection on the
+> switch side?
 
-> for the future, I expect either a cover letter explaining
-> what unites the patchset, or just separate patches.
+I doubt it is that, because it works well at 100Mbps still in RGMII mode, and
+according to the documentation the delay line is active for all rates.
 
-Ok.
+OTOH, this switch probably has some other issues related to the RXC delay
+line. It is always the RX path (RX at the switch, TX at the MAC) that
+randomly does not work.
 
-Thanks
+OT (but still posting in case someone here knows something):
+Coincidentally I am currently working on a different design with a SJA1105Q
+switch connected to a LAN743X MAC. The complication is that this MAC cannot
+disable the TXC (RXC at the switch) at all. Still working on this, but right
+now it looks like not even with the RX delay line deactivated (doing the delay
+at the MAC) is the switch working reliably (at 1000Mbps). Investigation still
+on-going so take with grain of salt.
 
->
-> > ---
-> >  drivers/vhost/net.c | 7 ++++---
-> >  1 file changed, 4 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > index c6508fe0d5c8..16e39f3ab956 100644
-> > --- a/drivers/vhost/net.c
-> > +++ b/drivers/vhost/net.c
-> > @@ -1014,7 +1014,7 @@ static int peek_head_len(struct vhost_net_virtque=
-ue *rvq, struct sock *sk)
-> >  }
-> >
-> >  static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct so=
-ck *sk,
-> > -                                   bool *busyloop_intr, unsigned int c=
-ount)
-> > +                                   bool *busyloop_intr, unsigned int *=
-count)
-> >  {
-> >       struct vhost_net_virtqueue *rnvq =3D &net->vqs[VHOST_NET_VQ_RX];
-> >       struct vhost_net_virtqueue *tnvq =3D &net->vqs[VHOST_NET_VQ_TX];
-> > @@ -1024,7 +1024,8 @@ static int vhost_net_rx_peek_head_len(struct vhos=
-t_net *net, struct sock *sk,
-> >
-> >       if (!len && rvq->busyloop_timeout) {
-> >               /* Flush batched heads first */
-> > -             vhost_net_signal_used(rnvq, count);
-> > +             vhost_net_signal_used(rnvq, *count);
-> > +             *count =3D 0;
-> >               /* Both tx vq and rx socket were polled here */
-> >               vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, true);
-> >
-> > @@ -1180,7 +1181,7 @@ static void handle_rx(struct vhost_net *net)
-> >
-> >       do {
-> >               sock_len =3D vhost_net_rx_peek_head_len(net, sock->sk,
-> > -                                                   &busyloop_intr, cou=
-nt);
-> > +                                                   &busyloop_intr, &co=
-unt);
-> >               if (!sock_len)
-> >                       break;
-> >               sock_len +=3D sock_hlen;
-> > --
-> > 2.34.1
->
+> Or it is just artifact from iMX6 platform and it should be retested?
+
+I remember having tested it and it not working reliably, but that was 4 years
+ago or so. Drivers have evolved since, so maybe it is worth testing again?
+
+Best regards,
+
+-- 
+David Jander
 
 
