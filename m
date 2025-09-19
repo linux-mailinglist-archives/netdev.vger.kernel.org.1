@@ -1,133 +1,142 @@
-Return-Path: <netdev+bounces-224700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D170B887BE
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 10:55:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0567B88803
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 11:01:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5F571898880
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 08:55:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A6D95A05D0
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 09:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63A62EB5C4;
-	Fri, 19 Sep 2025 08:55:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D35AA2BE638;
+	Fri, 19 Sep 2025 09:01:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53959219A7E;
-	Fri, 19 Sep 2025 08:55:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB8C1CEACB
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 09:01:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758272122; cv=none; b=i6/djmCb1vJddXMxtbSG0iozVn4RwdjRrfpp8ROv46Lf1/x7hwm9X75lScn1EaL5JsOqiLFqZ2HQmIINFrJ/PbPjQyhz/vkkq6wetc/W6oHsJuQBMWE/t/1rkbB/xmf9e/NTHq7m7tSxu04XsWCOYnF76+v2jU1PnZmYJJ5g1hI=
+	t=1758272512; cv=none; b=aTrMRyxZor7bIf56k4JdXtZb9XowE8jehhFOzCm4h3BmNGu4bjIZvloP0yYi1JoMRXoVx8Z2JWBYWyM1eKCvc9DlD5B/HgzfeR1ZVERyqd5xOxvbcKkE0nUsHAmEbsKKWr3qLu3gtibM5YQdeQCUa0VI7p6zldBT2RpweJ3sph4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758272122; c=relaxed/simple;
-	bh=MxZDacxNXOiKS5PN5/vgRiUlqrC/te+ID8PxAHyhgYI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ksQxUBykV681xl+m0dbY3u39yzSX7RByRrl2iARj2ch+k2yxA5la8aECA+K1PmXwa7ZDlwVv7fuKAP6m52UwJeS3bsaHU6pTnNH0tJyhJs4mMJvn+SSHg7p5WYUMfZZC2dUN5+NjpuYzxkwfS/6Ho6vhIGEVbpYtLhvmg7gaOlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [192.168.3.223] (unknown [124.16.136.211])
-	by APP-03 (Coremail) with SMTP id rQCowAD3PnkUGs1oZXWwAw--.135S2;
-	Fri, 19 Sep 2025 16:53:41 +0800 (CST)
-Message-ID: <c3f2bc47-b7d3-4054-ae09-3265470c2306@iscas.ac.cn>
-Date: Fri, 19 Sep 2025 16:53:40 +0800
+	s=arc-20240116; t=1758272512; c=relaxed/simple;
+	bh=MQfLE7RaPJT/JClthmUYPQ+x05fhr6/BNuiKRhWUfII=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=eEZHRdUclnYprShS4hkPzboXmjU3hnCGgpkbzevOvaLKH+FRm5b5EFNwgGWVwIS7AW7SHxcngJS2txLRojNG/zjXOUHj913J5ZXX70LwwTdUXosoA3nyi8TZlAxn0amtWc5xk2sEvslEchPtDzwdvtgFzv9wuK9RJLDMPXN/bpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.92.39.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
+X-QQ-mid: zesmtpgz6t1758272479t66a0470a
+X-QQ-Originating-IP: nYVQsPafpZCe8iH2VJZM0C2GEUBe1md+Ilx8KVdGPH4=
+Received: from smtpclient.apple ( [111.204.182.99])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 19 Sep 2025 17:01:17 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 12964140934289989908
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 0/5] Add Ethernet MAC support for SpacemiT K1
-To: Marek Szyprowski <m.szyprowski@samsung.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alex@ghiti.fr>
-Cc: Vivian Wang <uwu@dram.page>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Junhui Liu <junhui.liu@pigmoral.tech>, Simon Horman <horms@kernel.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-riscv@lists.infradead.org,
- spacemit@lists.linux.dev, linux-kernel@vger.kernel.org,
- Conor Dooley <conor.dooley@microchip.com>,
- Troy Mitchell <troy.mitchell@linux.spacemit.com>,
- Hendrik Hamerlinck <hendrik.hamerlinck@hammernet.be>,
- Andrew Lunn <andrew@lunn.ch>
-References: <20250914-net-k1-emac-v12-0-65b31b398f44@iscas.ac.cn>
- <CGME20250919082706eucas1p1fa29f9e90e1afdf3894b5effd734cf3f@eucas1p1.samsung.com>
- <a52c0cf5-0444-41aa-b061-a0a1d72b02fe@samsung.com>
-Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <a52c0cf5-0444-41aa-b061-a0a1d72b02fe@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowAD3PnkUGs1oZXWwAw--.135S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Aw4rtFW3Xr4kXF1fXFWDJwb_yoW8WFW3pa
-	ykAas0kr1Dtr42kr4jgr4vyayIva1kKF1Durn5Kry09a98AFn7tr9Ygw45A34jvrZ7Zr4Y
-	yayUX395JFyDCaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Sb7Iv0xC_KF4lb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwV
-	C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
-	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7
-	MxkF7I0En4kS14v26r4a6rW5MxkIecxEwVAFwVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxV
-	CFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r10
-	6r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxV
-	WUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG
-	6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr
-	1UYxBIdaVFxhVjvjDU0xZFpf9x07jBYLkUUUUU=
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH RESEND iproute2-next] ip/bond: add broadcast_neighbor
+ support
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+In-Reply-To: <8eba0896-3156-474e-8521-c345d6d2e11c@gmail.com>
+Date: Fri, 19 Sep 2025 17:01:07 +0800
+Cc: netdev@vger.kernel.org,
+ Stephen Hemminger <stephen@networkplumber.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <9DB0492E-33D8-4478-B228-CAE5AEAC2D2C@bamaicloud.com>
+References: <20250914070609.37292-1-tonghao@bamaicloud.com>
+ <8eba0896-3156-474e-8521-c345d6d2e11c@gmail.com>
+To: David Ahern <dsahern@gmail.com>
+X-Mailer: Apple Mail (2.3826.700.81)
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: M8JnMGwRo1mQZH/4EN3UqMl20QDE7oKN/WK4VCFUGlwABEvzMQFH6lVW
+	zv6fQntGwkch/3RAXdM8e0LAsPr5Qy1rbkBQbqSXbrokq5t1u3o5eQqNxCx1ZJo3FoxF6Zt
+	FtWWJ/rVifXpTe6MYOs5VNbqb8n5uimpLg13k+t6Z6xTeIeega5wIuVKjJkcnSASHex2ItF
+	9qqKesYPRPqgOeCvfJb2Po9nF+aO+RaZbu5+YlP0hE0pvArRh+nlcxzdIUaAtEUyvARd0Ui
+	6lG8MiIFynOascW/xPGqp1A1gPlgEXhf3yBuWFEFhbacz2sGy38p9zcD/D6SmEkumuXZYSL
+	Yux6vyDjQEp3WlMA6FajpArPxq81EHMWrRnrbY4IGX96sn9az4Mhg3/M+3gjYwbvVsBCVI4
+	mUx7GXAkCEaXhG7ZelqWxZSxdw95ASJwiISe0deoUnW0ACWnaEXF5+WHL8vKXKsj4JV8mLb
+	UJa0X33mUpEO6WKq+EnSMyfkP1jwePsQIMumC3GfTCVuENpHMeS9qqAgXmfQ5wk9tRD6DGs
+	PUVAXoam7Ke9TIV7/MEBdZMNCBbGHtzYNs6m+64pekIk827ehGIXkb6+c1PmIuFRNenZ9zV
+	cXe2F+HhRtGMkXalXeAdHLcQf/6ZCasdEW1uypKh9FpW09ouFCNPyzzsAXCUEIydSjKFPWe
+	W3LLbARfqBip+PvcGgSNeT40gr2U/94a+NpAF78dYK0QiE941ZWMlfNHLwh3VtRIFDpqYCX
+	Deln+M/y6DeCImGCR8KG+tG/uR9of9T0aKiYd6D092ceBtggF1BRg7taQt9dayLIXT98Gmy
+	hFKfK34s8ZZoW0jT3YCi1h4h3YJBCWiMhwb4PsoRiXNqbCxgddAmZDSJtvzuUl3CEpXY5cg
+	b8Y8cK381KIU7er3b1X2EES2Mg5LsmqDUz5A9cX5DlJdUjqsLUa7MhvESX2JPOmJkVC+FvY
+	WePyzZA+7dVdgP2WnwaxEi9v7+srgZrqbAd4Gk56hgcOwNzRH5G0ifrpN
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+X-QQ-RECHKSPAM: 0
 
-Hi Marek,
 
-Thanks for the testing.
 
-On 9/19/25 16:27, Marek Szyprowski wrote:
-> Hi All,
->
-> On 14.09.2025 06:23, Vivian Wang wrote:
->> SpacemiT K1 has two gigabit Ethernet MACs with RGMII and RMII support.
->> Add devicetree bindings, driver, and DTS for it.
->>
->> Tested primarily on BananaPi BPI-F3. Basic TX/RX functionality also
->> tested on Milk-V Jupiter.
->>
->> I would like to note that even though some bit field names superficially
->> resemble that of DesignWare MAC, all other differences point to it in
->> fact being a custom design.
->>
->> Based on SpacemiT drivers [1]. These patches are also available at:
->>
->> https://github.com/dramforever/linux/tree/k1/ethernet/v12
->>
->> [1]: https://github.com/spacemit-com/linux-k1x
-> This driver recently landed in linux-next as commit bfec6d7f2001 ("net: 
-> spacemit: Add K1 Ethernet MAC"). In my tests I found that it 
-> triggers lock dep warnings related to stats_lock acquisition. In the 
-> current code it is being acquired with spin_lock(). For tests I've 
-> changed that to spin_lock_irqsave() and the warnings went away, but I'm 
-> not sure that this is the proper fix. I've also checked the driver 
-> history and 'irqsave' locking was used in pre-v7 version, but it was 
-> removed later on Jakub's request and described a bit misleading as 
-> "Removed scoped_guard usage".
+> 2025=E5=B9=B49=E6=9C=8818=E6=97=A5 10:45=EF=BC=8CDavid Ahern =
+<dsahern@gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On 9/14/25 1:06 AM, Tonghao Zhang wrote:
+>> This option has no effect in modes other than 802.3ad mode.
+>> When this option enabled, the bond device will broadcast ARP/ND
+>> packets to all active slaves.
+>>=20
+>> Cc: Stephen Hemminger <stephen@networkplumber.org>
+>> Cc: David Ahern <dsahern@gmail.com>
+>> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+>> ---
+>> 1. no update uapi header. =
+https://marc.info/?l=3Dlinux-netdev&m=3D170614774224160&w=3D3
+>> 2. the kernel patch is accpted, =
+https://patchwork.kernel.org/project/netdevbpf/patch/84d0a044514157bb856a1=
+0b6d03a1028c4883561.1751031306.git.tonghao@bamaicloud.com/
+>> ---
+>> ip/iplink_bond.c | 16 ++++++++++++++++
+>=20
+> you need to update man/man8/ip-link.8.in under the bond section.
+>=20
+No option descriptions as follows were found in manpage. There is only a =
+description of bond_slave. I don=E2=80=99t know where to update.=20
 
-Oops, I had assumed that irqsave was unnecessary and missed that the
-statistics functions are called with softirq enabled during
-register_netdev. The ones called at probe time should be changed to
-_irqsave or some other variant.
+Usage: ... bond [ mode BONDMODE ] [ active_slave SLAVE_DEV ]
+                [ clear_active_slave ] [ miimon MIIMON ]
+                [ updelay UPDELAY ] [ downdelay DOWNDELAY ]
+                [ peer_notify_delay DELAY ]
+                [ use_carrier USE_CARRIER ]
+                [ arp_interval ARP_INTERVAL ]
+                [ arp_validate ARP_VALIDATE ]
+                [ arp_all_targets ARP_ALL_TARGETS ]
+                [ arp_ip_target [ ARP_IP_TARGET, ... ] ]
+                [ ns_ip6_target [ NS_IP6_TARGET, ... ] ]
+                [ primary SLAVE_DEV ]
+                [ primary_reselect PRIMARY_RESELECT ]
+                [ fail_over_mac FAIL_OVER_MAC ]
+                [ xmit_hash_policy XMIT_HASH_POLICY ]
+                [ resend_igmp RESEND_IGMP ]
+                [ num_grat_arp|num_unsol_na NUM_GRAT_ARP|NUM_UNSOL_NA ]
+                [ all_slaves_active ALL_SLAVES_ACTIVE ]
+                [ min_links MIN_LINKS ]
+                [ lp_interval LP_INTERVAL ]
+                [ packets_per_slave PACKETS_PER_SLAVE ]
+                [ tlb_dynamic_lb TLB_DYNAMIC_LB ]
+                [ lacp_rate LACP_RATE ]
+                [ lacp_active LACP_ACTIVE]
+                [ coupled_control COUPLED_CONTROL ]
+                [ broadcast_neighbor BROADCAST_NEIGHBOR ]
+                [ ad_select AD_SELECT ]
+                [ ad_user_port_key PORTKEY ]
+                [ ad_actor_sys_prio SYSPRIO ]
+                [ ad_actor_system LLADDR ]
+                [ arp_missed_max MISSED_MAX ]
 
-I'll take a look at the details myself and send a fix.
-
-Thanks,
-Vivian "dramforever" Wang
+>=20
+>=20
 
 
