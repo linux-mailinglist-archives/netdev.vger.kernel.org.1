@@ -1,134 +1,234 @@
-Return-Path: <netdev+bounces-224821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A895B8AD2A
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 19:51:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7D11B8AD44
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 19:53:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D62F616124F
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 17:51:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 728EF7E0E52
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 17:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B999F323F46;
-	Fri, 19 Sep 2025 17:49:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6132B31D371;
+	Fri, 19 Sep 2025 17:53:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IBK0MRZG"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2F0323406
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 17:49:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823E824677D;
+	Fri, 19 Sep 2025 17:53:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758304190; cv=none; b=jZbl9SLHnhl2BP0ilsFuP1s4b1U8xM2jQgH/r04JAERFn6OabdxmrZlL5T5mfRWCi2VypIlcplXFmfpA00PLhcnnkSSP3HDk+Z4bXUlP30Xg0EEs0S7Few7+E3g/8rANY2aTzi7vNQEB7BCdSTkkT/RFHahNrwqX0Y03jkUQUTE=
+	t=1758304426; cv=none; b=afWjUBsQI//WK7S3v2VcvgWGm6hCCjQ/9TgtEoQZ/o6Ktm2zGSWC6fVSk1pT1sOl2GFsxb38DqCAM3EwNcXUDftJG/TV313uQSDhKkTQKZQEqPSjL+fvFRKeV/SCwuVFK1jdwqf0COksS4m7IaNOn/1D0YmnRUf5E6oCAY+2UrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758304190; c=relaxed/simple;
-	bh=hCR7eP9ezRJaQrPQcekYxdjqG5MgpkMcReCaiOWsMgc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bLmL+V2X7TWrRoXkYZBY9gU2+bFSwdl/vzZ3mugPoo5uiaoZS/aX1PjdWWVkeHhdxutocwe1EkjhfHUq2uDhzkN3AWH3SKML7hy4yhEBlLrOSL42sraCqlDUSAC/iw2gYq9mjFR42+K67nhduJhc3lvf4f2o5VXX8u0s4IqQ6ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uzfEp-0006yt-5R; Fri, 19 Sep 2025 19:49:39 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uzfEo-0028wP-2W;
-	Fri, 19 Sep 2025 19:49:38 +0200
-Received: from pengutronix.de (ip-185-104-138-125.ptr.icomera.net [185.104.138.125])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 4BF3947510E;
-	Fri, 19 Sep 2025 17:49:37 +0000 (UTC)
-Date: Fri, 19 Sep 2025 19:49:35 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Stefan =?utf-8?B?TcOkdGpl?= <stefan.maetje@esd.eu>
-Cc: Vincent Mailhol <mailhol@kernel.org>, 
-	Frank Jungclaus <frank.jungclaus@esd.eu>, linux-can@vger.kernel.org, socketcan@esd.eu, 
-	Simon Horman <horms@kernel.org>, Oliver Hartkopp <socketcan@hartkopp.net>, 
-	Wolfgang Grandegger <wg@grandegger.com>, "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 3/5] can: esd_usb: Add watermark handling for TX jobs
-Message-ID: <20250919-impressive-pillbug-of-diversity-832227-mkl@pengutronix.de>
-References: <20250821143422.3567029-1-stefan.maetje@esd.eu>
- <20250821143422.3567029-4-stefan.maetje@esd.eu>
+	s=arc-20240116; t=1758304426; c=relaxed/simple;
+	bh=OUZGsR/nW/uvMnmU4KgfXbnuSMYBK0R/M0EkaxR8So4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HouNQVFqjjJZL5JsBjnn7LLDgJ6T2k/jjGYERum5ZukumiuQdKtCpt+FuAykvMusfRIuSo08RtN3IKeh8yZp6ExUF9IxSVXe8Qe7e9jMlIYf09+bBKPMHxKyR+KCDyn70ZqWCM6dKBajPe4ytwhKdBb7gnZgLOOCc+zF0P8gy70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IBK0MRZG; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758304425; x=1789840425;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=OUZGsR/nW/uvMnmU4KgfXbnuSMYBK0R/M0EkaxR8So4=;
+  b=IBK0MRZGXFrIGwGp+hL6mTM2HR81Ae13dOkSuALRnGLpQXEUwG2TMe8J
+   w0qzqzjnPfJOJg+qzpwOD8a1FwhUVuKiev/b/DVcUChHx50YzxYqJNDKq
+   WFHL0u/4rVHQpAeYQWG9IHCSkYRmdvG9PjhWkqbPhds7gd2R+9Y2xeugS
+   GHs9HYpKjdRPHETeY7DtFvXllfdAiulim0B3OP379jwvdIJrQUZvEW88N
+   fdzNrwOLshVLx/kxxbbXqGDTLdOeAjVu6u8TEYHeGDvayhtJmNdJD/OO4
+   ngigej6O4TQxkoPQGe4S6t6jtiRDOalQenoK8ueGrUKTiOMs0ZV5Rt4VL
+   A==;
+X-CSE-ConnectionGUID: iIbLVS61Rp+5T2G7dykn3Q==
+X-CSE-MsgGUID: S0sOpEH4S1+FPXc9QddWew==
+X-IronPort-AV: E=McAfee;i="6800,10657,11558"; a="60771055"
+X-IronPort-AV: E=Sophos;i="6.18,278,1751266800"; 
+   d="scan'208";a="60771055"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 10:53:44 -0700
+X-CSE-ConnectionGUID: pVJyDmRCSyiJmHEoN/qGIA==
+X-CSE-MsgGUID: Jhb8B9hhS4y9BiXWouH3qA==
+X-ExtLoop1: 1
+Received: from dnelso2-mobl.amr.corp.intel.com (HELO [10.125.108.58]) ([10.125.108.58])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 10:53:42 -0700
+Message-ID: <c3c29108-d8a8-459b-bcc1-d33f148f6dce@intel.com>
+Date: Fri, 19 Sep 2025 10:53:41 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="gmsrfzgoebxzsekn"
-Content-Disposition: inline
-In-Reply-To: <20250821143422.3567029-4-stefan.maetje@esd.eu>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 08/20] cx/memdev: Indicate probe deferral
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Cc: Alejandro Lucero <alucerop@amd.com>
+References: <20250918091746.2034285-1-alejandro.lucero-palau@amd.com>
+ <20250918091746.2034285-9-alejandro.lucero-palau@amd.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20250918091746.2034285-9-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
---gmsrfzgoebxzsekn
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v2 3/5] can: esd_usb: Add watermark handling for TX jobs
-MIME-Version: 1.0
 
-On 21.08.2025 16:34:20, Stefan M=C3=A4tje wrote:
-> The driver tried to keep as much CAN frames as possible submitted to the
-> USB device (ESD_USB_MAX_TX_URBS). This has led to occasional "No free
-> context" error messages in high load situations like with
-> "cangen -g 0 -p 10 canX".
->=20
-> This patch now calls netif_stop_queue() already if the number of active
-> jobs reaches ESD_USB_TX_URBS_HI_WM which is < ESD_USB_MAX_TX_URBS.
-> The netif_start_queue() is called in esd_usb_tx_done_msg() only if
-> the number of active jobs is <=3D ESD_USB_TX_URBS_LO_WM.
->=20
-> This change eliminates the occasional error messages and significantly
-> reduces the number of calls to netif_start_queue() and
-> netif_stop_queue().
->=20
-> The watermark limits have been chosen with the CAN-USB/Micro in mind to
-> not to compromise its TX throughput. This device is running on USB 1.1
-> only with its 1ms USB polling cycle where a ESD_USB_TX_URBS_LO_WM
-> value below 9 decreases the TX throughput.
+On 9/18/25 2:17 AM, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> The first step for a CXL accelerator driver that wants to establish new
+> CXL.mem regions is to register a 'struct cxl_memdev'. That kicks off
+> cxl_mem_probe() to enumerate all 'struct cxl_port' instances in the
+> topology up to the root.
+> 
+> If the port driver has not attached yet the expectation is that the
+> driver waits until that link is established. The common cxl_pci driver
+> has reason to keep the 'struct cxl_memdev' device attached to the bus
+> until the root driver attaches. An accelerator may want to instead defer
+> probing until CXL resources can be acquired.
+> 
+> Use the @endpoint attribute of a 'struct cxl_memdev' to convey when a
+> accelerator driver probing should be deferred vs failed. Provide that
+> indication via a new cxl_acquire_endpoint() API that can retrieve the
+> probe status of the memdev.
 
-Just came into my mind:
+So the -EPROBE_DEFER actually goes to the caller (accelerator driver) in this instance right? In the situation where the CXL resources never show up, does this particular accelerator driver never completes probe successfully or does it just punt CXL and completes probe without CXL support? This question is just for my understanding.
 
-In a future patch you can make the watermark dependent on the actual USB
-device and or the USB connection type.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> ---
+>  drivers/cxl/core/memdev.c | 42 +++++++++++++++++++++++++++++++++++++++
+>  drivers/cxl/core/port.c   |  2 +-
+>  drivers/cxl/mem.c         |  7 +++++--
+>  include/cxl/cxl.h         |  2 ++
+>  4 files changed, 50 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
+> index 3228287bf3f0..10d21996598a 100644
+> --- a/drivers/cxl/core/memdev.c
+> +++ b/drivers/cxl/core/memdev.c
+> @@ -1164,6 +1164,48 @@ struct cxl_memdev *cxl_memdev_alloc(struct cxl_dev_state *cxlds,
+>  }
+>  EXPORT_SYMBOL_NS_GPL(cxl_memdev_alloc, "CXL");
+>  
+> +/*
+> + * Try to get a locked reference on a memdev's CXL port topology
+> + * connection. Be careful to observe when cxl_mem_probe() has deposited
+> + * a probe deferral awaiting the arrival of the CXL root driver.
+> + */
+> +struct cxl_port *cxl_acquire_endpoint(struct cxl_memdev *cxlmd)
+> +{
+> +	struct cxl_port *endpoint;
+> +	int rc = -ENXIO;
+> +
+> +	device_lock(&cxlmd->dev);
+> +
+> +	endpoint = cxlmd->endpoint;
+> +	if (!endpoint)
+> +		goto err;
+> +
+> +	if (IS_ERR(endpoint)) {
+> +		rc = PTR_ERR(endpoint);
+> +		goto err;
+> +	}
+> +
+> +	device_lock(&endpoint->dev);
+> +	if (!endpoint->dev.driver)
+> +		goto err_endpoint;
+> +
+> +	return endpoint;
+> +
+> +err_endpoint:
+> +	device_unlock(&endpoint->dev);
+> +err:
+> +	device_unlock(&cxlmd->dev);
+> +	return ERR_PTR(rc);
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_acquire_endpoint, "CXL");
+> +
+> +void cxl_release_endpoint(struct cxl_memdev *cxlmd, struct cxl_port *endpoint)
+> +{
+> +	device_unlock(&endpoint->dev);
+> +	device_unlock(&cxlmd->dev);
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_release_endpoint, "CXL");
 
-regards,
-Marc
+We may want to annotate the locking to help out lockdep debug
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+static struct cxl_port *cxl_acquire_endpoint(struct cxl_memdev *cxlmd)
+        __acquires(&cxlmd->dev.mutex)
+        __acquires(&cxlmd->endpoint->dev.mutex)
+{
+	...
+}
 
---gmsrfzgoebxzsekn
-Content-Type: application/pgp-signature; name="signature.asc"
+static void cxl_release_endpoint(struct cxl_memdev *cxlmd, struct cxl_port *endpoint)
+        __releases(&endpoint->dev.mutex)
+        __releases(&cxlmd->dev.mutex)
+{
+	...
+}
 
------BEGIN PGP SIGNATURE-----
+DJ
 
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmjNl6gACgkQDHRl3/mQ
-kZw4rAf+KiQng7pbXiTtPMvaM1SJvljSJOMJVxfxyHaYfFDKqhlHcnRTBidj/kWa
-PBF5o8N/41ITTYZ3fr2a5TpfKdwc8+VqVyGz8Xf9P79jFeaJSeQ6ylAOrHcoO6mV
-OfRfVe+DR7z3iWsnu9LTA/HF2jx7o2PYeXnyWsJAFG2reCA9qB+TgZg9qW3fT+KJ
-4v2xEDj8QJ+mVpkb7BU0ZP5/887OhIslUVi4vwbIYHxbrRljUfTsx0Am+uUN6cLJ
-VyU3YPHbOQ7TP4viDj8AUsIqq9u5sMP9f8AvUQ/Rl3exq12oWcXt/rDLCgvudOcg
-JZ7PeonAQbB1MmeRDTMDQKvZv9aGpw==
-=Grva
------END PGP SIGNATURE-----
+> +
+>  static void sanitize_teardown_notifier(void *data)
+>  {
+>  	struct cxl_memdev_state *mds = data;
+> diff --git a/drivers/cxl/core/port.c b/drivers/cxl/core/port.c
+> index 240c3c5bcdc8..4c3fecd4c8ea 100644
+> --- a/drivers/cxl/core/port.c
+> +++ b/drivers/cxl/core/port.c
+> @@ -1557,7 +1557,7 @@ static int add_port_attach_ep(struct cxl_memdev *cxlmd,
+>  		 */
+>  		dev_dbg(&cxlmd->dev, "%s is a root dport\n",
+>  			dev_name(dport_dev));
+> -		return -ENXIO;
+> +		return -EPROBE_DEFER;
+>  	}
+>  
+>  	struct cxl_port *parent_port __free(put_cxl_port) =
+> diff --git a/drivers/cxl/mem.c b/drivers/cxl/mem.c
+> index 9ffee09fcb50..f103e2003add 100644
+> --- a/drivers/cxl/mem.c
+> +++ b/drivers/cxl/mem.c
+> @@ -122,14 +122,17 @@ static int cxl_mem_probe(struct device *dev)
+>  		return rc;
+>  
+>  	rc = devm_cxl_enumerate_ports(cxlmd);
+> -	if (rc)
+> +	if (rc) {
+> +		cxlmd->endpoint = ERR_PTR(rc);
+>  		return rc;
+> +	}
+>  
+>  	struct cxl_port *parent_port __free(put_cxl_port) =
+>  		cxl_mem_find_port(cxlmd, &dport);
+>  	if (!parent_port) {
+>  		dev_err(dev, "CXL port topology not found\n");
+> -		return -ENXIO;
+> +		cxlmd->endpoint = ERR_PTR(-EPROBE_DEFER);
+> +		return -EPROBE_DEFER;
+>  	}
+>  
+>  	if (cxl_pmem_size(cxlds) && IS_ENABLED(CONFIG_CXL_PMEM)) {
+> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+> index 401a59185608..64946e698f5f 100644
+> --- a/include/cxl/cxl.h
+> +++ b/include/cxl/cxl.h
+> @@ -251,4 +251,6 @@ int cxl_set_capacity(struct cxl_dev_state *cxlds, u64 capacity);
+>  struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+>  				       struct cxl_dev_state *cxlds,
+>  				       const struct cxl_memdev_ops *ops);
+> +struct cxl_port *cxl_acquire_endpoint(struct cxl_memdev *cxlmd);
+> +void cxl_release_endpoint(struct cxl_memdev *cxlmd, struct cxl_port *endpoint);
+>  #endif /* __CXL_CXL_H__ */
 
---gmsrfzgoebxzsekn--
 
