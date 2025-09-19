@@ -1,242 +1,442 @@
-Return-Path: <netdev+bounces-224690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E40CB885F6
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 10:16:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E450B886A1
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 10:27:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21F9E1BC7B3B
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 08:17:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAD7F1C860D5
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 08:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25E73286D40;
-	Fri, 19 Sep 2025 08:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B13A03064A6;
+	Fri, 19 Sep 2025 08:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WWw4XQQ/"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="gIW7uz8B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840D81D799D;
-	Fri, 19 Sep 2025 08:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758269799; cv=fail; b=tyOhN0ZJnRKH8RmI1qZqgRGuexrddvRXU2iUNNhf732nbnPJRCRRgjqSzqFUJrm8DUsAtg9oBeEDp/3L6/HRW5E/6r7RXzgDoEt4VZVevy7J0xDeVauu28eIwg+AWxI5paUR62umrm4nabZ4sUpJD8w1GIBq2j4CvazAc08JaHQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758269799; c=relaxed/simple;
-	bh=ty8XL09sZsEL5bOS6RjkmPDNq1C6rInzMeAPTgCGpZI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=n5bOTwTacp+S4sUFtyLJ2C6UqBfuYcLOYtZUNFj4excUQan7KEqKQlRecCXdg20HYVD53B13bwdat945RTf32zDz5Ml0YZbtP1SRQT8Pqwmrk2qmRS45970GUdv5SkpfUcesXFggatTHq622+jucusTMn4ZD/9C70tEYbp3ksR8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WWw4XQQ/; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758269797; x=1789805797;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ty8XL09sZsEL5bOS6RjkmPDNq1C6rInzMeAPTgCGpZI=;
-  b=WWw4XQQ/rON5A1oOdigqFYnV12l+yMoItT+wqzSHmqdkjdRBRjdI/QwG
-   fzPSRYPZqN/DsymZW2GMKJnDc3T/UWdG2wIpChb/E69M1wSy8SemJwWa8
-   Yy9cCmPrb86+XOt5Df5b/VXQvbap1Sh1ZLoF9o7wrnFeve6cF31+HIC3x
-   dmWLXQbX31kHxfAmH8hbkRkTTJtbRtA0orvsPHUo4OSGmF5S9GEV//6wL
-   YrA6FZ4Kp6XWys191KUvqA6DAZeYI8NgQR0PKO3c7xiknuXoHx3sHVBaU
-   9PWYMKgTECm8mLlBKh/tMAbLLQ4amty8qhTTFLw4Ej35MGZGAEEFwF84i
-   A==;
-X-CSE-ConnectionGUID: 5P5WSe6nQgWyS3/hIFPb3A==
-X-CSE-MsgGUID: 17UoOIS5QUqaHkGPIVI7IQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11557"; a="59653556"
-X-IronPort-AV: E=Sophos;i="6.18,277,1751266800"; 
-   d="scan'208";a="59653556"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 01:16:37 -0700
-X-CSE-ConnectionGUID: emVbIKbCT8+Sx14hAv8Ygw==
-X-CSE-MsgGUID: Za4wheXRSXWCbpQMPDfzkA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,277,1751266800"; 
-   d="scan'208";a="180194416"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 01:16:37 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 19 Sep 2025 01:16:36 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Fri, 19 Sep 2025 01:16:36 -0700
-Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.47) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 19 Sep 2025 01:16:36 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=a9hI9YO8pUX/gwHT9Cg0aoTrWm3Mb2h1K5GCG2PubjvWQkSDW7u29J0pyyNYEY5sOZOQiwJcA49n7Dt1b47hwsN1sF6EppRuK4ja3+oqfLCOAm/n6iz17rHrhnr8DCYbzEAERYmb+VjXTVmx4hcVC52wWEoOAMFKvlMfPiLaUQMsxV0ISXmukKSHG9d8Ej62AFGXJW0ofdla02ZKZEjQHUQHvJGrIZ7rMFqxxJOebXAXpb1jztOF2Fha02nt6LFSgChRnfMQnjgXkh53finLlcYL/ahOZkgVuhx5ZzXCheEVFffV+jwqv0exE+ltWbqGBjb2vQDesrhCvbGykX0buw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=joD811mRMoQxr0Cp6LZd8ZzaNWtxY/bpWvAJry/ZG54=;
- b=Q9rR8J3AQbs+toUb2JkbDSvxx5ijYKQgsv6Ct3eOVijDxKES56vBGI3RVVIyjIkGilajmXTx505zc6UVk8BhaRM+loSLJqiaC0TQkipYOJSK0+acx0645b2CwPiIa1NT/YcukJch5lYSX+55v/VxDHpjRHsecu7yOEtMFUR064+O88JE1NApUmLypZk0DEsbxrRaALTngA2jmA1JOeKGyaIlsdZN7Yf++yEmatfWw/Hvv15TRW+m+RCzQluq7slbHVD0QSCxQIRoqdMBAJH2cTzSMJW/H1UY0HcHaK9+RM3ai9Dt/9llpWzoTAcgzhD/0ZrTI5DRZ23yXFnf5tB3nA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8985.namprd11.prod.outlook.com (2603:10b6:208:575::17)
- by SA0PR11MB4638.namprd11.prod.outlook.com (2603:10b6:806:73::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.14; Fri, 19 Sep
- 2025 08:16:34 +0000
-Received: from IA3PR11MB8985.namprd11.prod.outlook.com
- ([fe80::4955:174:d3ce:10e6]) by IA3PR11MB8985.namprd11.prod.outlook.com
- ([fe80::4955:174:d3ce:10e6%3]) with mapi id 15.20.9115.022; Fri, 19 Sep 2025
- 08:16:34 +0000
-From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
-To: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Loktionov, Aleksandr"
-	<aleksandr.loktionov@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net v1 4/4] ixgbe: handle
- IXGBE_VF_FEATURES_NEGOTIATE mbox cmd
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v1 4/4] ixgbe: handle
- IXGBE_VF_FEATURES_NEGOTIATE mbox cmd
-Thread-Index: AQHcGATifTJonM386kG/5cC9eqg3xLSaS1Hw
-Date: Fri, 19 Sep 2025 08:16:34 +0000
-Message-ID: <IA3PR11MB8985120D7C4A167E3172738C8F11A@IA3PR11MB8985.namprd11.prod.outlook.com>
-References: <20250828095227.1857066-1-jedrzej.jagielski@intel.com>
- <20250828095227.1857066-5-jedrzej.jagielski@intel.com>
-In-Reply-To: <20250828095227.1857066-5-jedrzej.jagielski@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8985:EE_|SA0PR11MB4638:EE_
-x-ms-office365-filtering-correlation-id: 232beccf-47a6-40a5-9251-08ddf754d91f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?hIyTvbllyHjRRbau3ClF949N99bEeZ/RMb9Ysh2OX3IPlUYc+mboTLQB7FqX?=
- =?us-ascii?Q?rFKgObwAcZtYivH+KTpc8MYwrVDO+W6WYPqK3OQDcdRsr347gsAww6DOpR2M?=
- =?us-ascii?Q?wnNauIWfWNBIGPaaszZxzLIGQFlYeOOa+iE+ut2bvcQtk9Cnhz6uGRL9NipY?=
- =?us-ascii?Q?2fEImusF1xMrT0cn29UXTm+a4Q6lLnhXfe3q/qMdm3QTBFoxlPqZZYoIIF/3?=
- =?us-ascii?Q?8vIA1M5wFiY1py4bftPtsEGW892e9L79PQrkhJvQYcEQWIBAm6yGqSkgeVeq?=
- =?us-ascii?Q?cl4IQBe1CzejzEJcr8sKqidhJTDOSoMbypBDIidC0CMf9RyZgF6tnRi2vv2B?=
- =?us-ascii?Q?6C8b4cN9H2I4JHnaYjDx0Zd+RNhHq/6c+IcqaOVqXLD0659e5eCHjIJm205+?=
- =?us-ascii?Q?8xupbLZ2MkcRDvyUdv9fgALG/NG9UehOsujtN3Xiob3icjqFOCXZoCHOe4TQ?=
- =?us-ascii?Q?NHIttnr9QN2u8bK4l5w+cvy2UPFThp4cDBC5TPoDg9pnBXmjkxKaoScYt7UU?=
- =?us-ascii?Q?52aa3jKRCbOlA3YNkzwitNuUhrvTZ/gp+6jceg7Hb8yAOPALsgh7Iz+lEIM+?=
- =?us-ascii?Q?2W1Q6NhONV/x/HtQ8oNEfNA4gT1cxfqTm3860hgQLFqF3aFInYFffOjzd01W?=
- =?us-ascii?Q?iOgEbmF5GXKYdkaxn+3+SfFLDa7VjxMLjjKIjxBQsySKsLtwJDB/WvLqh3f0?=
- =?us-ascii?Q?KdtmQXTm2V/8OsVF/NieMkyXQrJW2bwBSJl2LsJsNRTfbi8qIySH9API+7UK?=
- =?us-ascii?Q?coJWBHZz/b0IkKo6q5ybJRTU5zjZ+QQt/Qc5s3OBe9PSYWR4yuF15vDqbY0K?=
- =?us-ascii?Q?/bGtuTnE7a2+l0CZfy4uhKYhOYioQliWHY8b9ykzQwNim1dBYdGULXlWifJo?=
- =?us-ascii?Q?6dDvLL1G4mm75I+us/24JxHNATTUIOp062jQ0E76EXthlOhCNoNAh26g2tB9?=
- =?us-ascii?Q?RJh0gQ1mqL9JXbMVNpSA4qFG61XUL/HvE6BiRifkXHDE0/bNacAoDAkrW5OB?=
- =?us-ascii?Q?Xnq0MSJ/I6vLMBJQhbcxr4hrQexTN2HKfYQ9tWh+RdAze2Vg4LQ+iwP2ATpi?=
- =?us-ascii?Q?fFEhsMlthHzBcUBdB84VuhArLEarOF36Tnml5HsN364t+GJQW87+ZmEJKFyk?=
- =?us-ascii?Q?o+Q+urcRBeeT/g9sNzJuoYh/A3P+Z4Ux8+cj1wO+fuE2/esUhPoM84yIE20S?=
- =?us-ascii?Q?pdgSPyBD9Tlqz2kpxA7WVY20/SPl/Qn/+NccZhKa7tIbCQwzOg2tFujaYID2?=
- =?us-ascii?Q?PVSGV3SZxLSxnTuGaqdw36qd09hH7M1yIFLkLWMSzw1gMyejnGVlkECeQ7wV?=
- =?us-ascii?Q?2iI+4C7BZ2RCJmjamBLu6ZY/MelXjStjrBj+NzDxd9v82voO5ZIc6czVup/V?=
- =?us-ascii?Q?UnjhpGzQCnzqd29hHmpKfNze7ka5jS1Sin1Kr5c7FvT+fZ7D1jaWgOmjv1vl?=
- =?us-ascii?Q?McAP+Iz4FXpK5z9hOY0RJrrizP4yyd2vZvz56Zy3iZ8X/y0QXyhs7A=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8985.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?OS4Kw8JSGirPYCGb2DfRPoACf/lLn+v8jMIhkvMNU0W/xyC2WLmnhN1cKKLO?=
- =?us-ascii?Q?34IAz8gtQPQ/fiaMbKl7Hrru4PcKVZZ2BqaHv1/EaPliwtXFHVN0kJOl4iBZ?=
- =?us-ascii?Q?Q+RNEf4ACDWRKdVIhJ9T1oCGDQfBmpk6JtHiVH4QeMHguSKHkoX5B8kTIEaY?=
- =?us-ascii?Q?9job/qtzoRU1uX36vScvR/en4Xtvmshjtz4qeKnN2kLr4d1266ShUMeo+dTN?=
- =?us-ascii?Q?UTKAHuVJY0gGJDW7UYLFOViddFEYzjtCNIZ5+7u+gR2GbzRXgwqd7x4r1lRl?=
- =?us-ascii?Q?QqLV0loDVZ74rfmr/A2TtDD14dRqwjp4Qkyjn12tGVOVMfDw31DVVkiK8KE+?=
- =?us-ascii?Q?DGS1ANgGFQWKRUyYyyvbyzKS5xbLthIBGSdGWajw+7LfKUDGCbL/N23QawHW?=
- =?us-ascii?Q?EoRU3kt9zWgnF3Jb7K2IWzRyBoDEX7w6XBdcmWbpn7wS+uDr2ZoK3BMdYqw9?=
- =?us-ascii?Q?A7wpsOhsoGc5ioKPSOvhDgGBKzaP70i1WVMymQk5VsmlYOLoPldfmIEsTONa?=
- =?us-ascii?Q?Qd8Z3Q6gYMjy6wJFw7SgQ/x/325OSWnO5VLyg19FjQKX7O1ezyxhyHxczoJ3?=
- =?us-ascii?Q?FVG+VKHpL+1/13sx9yEKsviocKwdjsb3gLnQPvJXh6qoeRUIfZGrRL7kmHH8?=
- =?us-ascii?Q?eN55krGe4m2JL9Eih0Mx/MQpQb0EJhcmPiMjrOU/LtK5i/DQKsjpRnvAYeFS?=
- =?us-ascii?Q?+Uwe9Pc9Xi0NPRFZQDuSLZ0E3lT98rbOcF6g8pl56e5iZrEtCzQTZ1f6Sad/?=
- =?us-ascii?Q?OXZGshDWmNfvprqTX4jlHmS5yY/V+HLmpK/PMo84pzuuYglSw0DBFKIC8Uw2?=
- =?us-ascii?Q?hFFHDUG5XCCMblPpBK6n6gPb7xV/1IYyn6/Puo7opHYcd3PS6blzFpQ0tLPT?=
- =?us-ascii?Q?cRmL/Wlm50y387TfIp3V0Ur+/rKMK8yQLgDY5VMwVhYLNGTM163EOzfwWMio?=
- =?us-ascii?Q?XZIvo1qlREyznWdISfj3Q7ZuvzoDFs7lzgaXmmo2CjiNyEbA+VoskuDXSuu8?=
- =?us-ascii?Q?KYy6lvoTJXOJPnXDIVdonaterDY/3ds+inKqGzvMkXhpvyCvuNEOpjcdeM3b?=
- =?us-ascii?Q?x4L0Qym7PY3Dn8xRS0bGMvUD6gJN4oUV+V2bexAdu8JM9b+4MJd9GaC14iYz?=
- =?us-ascii?Q?jhIfpkX1IXbRYRpH9iEDb9Vj/CUSiSj2D8N1OLFnoZOal83xfrs31UDe3G1Q?=
- =?us-ascii?Q?ssfgRHswHnSeAFUNuL8orEzd/yZHBbDvvr3YGE/GP/yfEK23/N/DoA8PwQD9?=
- =?us-ascii?Q?KDvYSV7/WyWP4ouSbC1TLcdCFKyf10T79GGKnoEu33oX+68odhtYCG0ySlUc?=
- =?us-ascii?Q?d0++q8ExgpnbhFWeNqfbFvue3lrLVp+a37SWYZq3D1XhJ+9i8XXqty+nYYRs?=
- =?us-ascii?Q?zU8Q31LnzdporA8btrK3DXffsABsGQ76cMIUqRNX/dZSIYbJicgqPj+aR345?=
- =?us-ascii?Q?2+7gyJoR+9poAJrjvEKD2VFCwk4o/C+lpBcEIJCWaHnbpnVx3gynyJjKB/Lg?=
- =?us-ascii?Q?7HAyCSyIiLkZtTWmbAp0qiEJZh1GQnWPFyE0ETzPj/PZtfQgKzt3jqBLjXEq?=
- =?us-ascii?Q?lcxl23WE34vIjW/VKJ3/zhjMmJHVoveXr8mN5XCHzC/3PdCrr2pG8CaCsYiS?=
- =?us-ascii?Q?JA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8B6305E2F
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 08:27:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758270431; cv=none; b=TBdGib6NkOLKhGCD2S4W2nAabSx/XuCDlmbdCowJ8BDpZDbha8uVoR2j5R4Q1kHHQEs6qDGPPloAdJi2Bv1UTKseBi1J2daXze18hXEIgqHtwuZcha3EPvg1+XZpJ4+8HBnvf2F1J6Kljoic2C+Pf1dDTHSwbezMwh6zH0Otbi4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758270431; c=relaxed/simple;
+	bh=qsS439hI5wV39QcrqI00cTF4BaxSZ5e0Rj1zD1rl3i0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=PUEj0JdNE9zpBADWuw8FAQKI44M3k/YrQDyJXzmWEKfMO09racnrCd1kXa8GuRPsL25KWHvlH7bX58PZ6rQ5E0mdK8Li4QMAhbJvvNDtizx2BlNd/wE5GueyAQgux+8s+WrBavz5/wWjpVFT+tTzkQA+iQxAowWAnaZfVYck+X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=gIW7uz8B; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20250919082707euoutp0143e8dea2b866d062a645bdfd00632302~moaNBIs4X2189921899euoutp01T
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 08:27:07 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20250919082707euoutp0143e8dea2b866d062a645bdfd00632302~moaNBIs4X2189921899euoutp01T
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1758270427;
+	bh=6eNfMlTZqUrUupq60aFj0xlkMp9zYwxbsjfbrARp2Co=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=gIW7uz8BH+aDYKJo62e6QfJfG1Oj5GHyDkh9UUQAmUvKLTnicYGA5eblb1I9GWJEp
+	 WK5fPfeYSw9HjagcgzPiYe6E78AhBKUUej8Xt2av0FBFkgJP6OrL6j+hZwnzPz2//v
+	 jXQCEfnrOBC7aJeNlp9pQYAWNoz2+MZ1u2yjM9/E=
+Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20250919082706eucas1p1fa29f9e90e1afdf3894b5effd734cf3f~moaMa9DNT1105511055eucas1p1v;
+	Fri, 19 Sep 2025 08:27:06 +0000 (GMT)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20250919082704eusmtip1adb06790aee1726353acc54069d07301~moaLAf9lE2569525695eusmtip1P;
+	Fri, 19 Sep 2025 08:27:04 +0000 (GMT)
+Message-ID: <a52c0cf5-0444-41aa-b061-a0a1d72b02fe@samsung.com>
+Date: Fri, 19 Sep 2025 10:27:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8985.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 232beccf-47a6-40a5-9251-08ddf754d91f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2025 08:16:34.8471
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: O/q8n3ON0ntHwivqr3i7LWmfkaZCy+FFMse/Q1cKNFlZvaEd7P15r493mqdYzcdQgJJvFycZ7NfeZN1aUd9W7bxRG4htyX/+nbnJpb0xKBs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4638
-X-OriginatorOrg: intel.com
+User-Agent: Betterbird (Windows)
+Subject: Re: [PATCH net-next v12 0/5] Add Ethernet MAC support for SpacemiT
+ K1
+To: Vivian Wang <wangruikang@iscas.ac.cn>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>, Paul Walmsley
+	<paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+	<aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>
+Cc: Vivian Wang <uwu@dram.page>, Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>, Junhui Liu <junhui.liu@pigmoral.tech>, Simon
+	Horman <horms@kernel.org>, Maxime Chevallier
+	<maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-riscv@lists.infradead.org,
+	spacemit@lists.linux.dev, linux-kernel@vger.kernel.org, Conor Dooley
+	<conor.dooley@microchip.com>, Troy Mitchell
+	<troy.mitchell@linux.spacemit.com>, Hendrik Hamerlinck
+	<hendrik.hamerlinck@hammernet.be>, Andrew Lunn <andrew@lunn.ch>
+Content-Language: en-US
+From: Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <20250914-net-k1-emac-v12-0-65b31b398f44@iscas.ac.cn>
+Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20250919082706eucas1p1fa29f9e90e1afdf3894b5effd734cf3f
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20250919082706eucas1p1fa29f9e90e1afdf3894b5effd734cf3f
+X-EPHeader: CA
+X-CMS-RootMailID: 20250919082706eucas1p1fa29f9e90e1afdf3894b5effd734cf3f
+References: <20250914-net-k1-emac-v12-0-65b31b398f44@iscas.ac.cn>
+	<CGME20250919082706eucas1p1fa29f9e90e1afdf3894b5effd734cf3f@eucas1p1.samsung.com>
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Jedrzej Jagielski
-> Sent: Thursday, August 28, 2025 11:52 AM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>;
-> netdev@vger.kernel.org; stable@vger.kernel.org; Jagielski, Jedrzej
-> <jedrzej.jagielski@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Loktionov, Aleksandr
-> <aleksandr.loktionov@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-net v1 4/4] ixgbe: handle
-> IXGBE_VF_FEATURES_NEGOTIATE mbox cmd
->=20
-> Send to VF information about features supported by the PF driver.
->=20
-> Increase API version to 1.7.
->=20
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Hi All,
+
+On 14.09.2025 06:23, Vivian Wang wrote:
+> SpacemiT K1 has two gigabit Ethernet MACs with RGMII and RMII support.
+> Add devicetree bindings, driver, and DTS for it.
+>
+> Tested primarily on BananaPi BPI-F3. Basic TX/RX functionality also
+> tested on Milk-V Jupiter.
+>
+> I would like to note that even though some bit field names superficially
+> resemble that of DesignWare MAC, all other differences point to it in
+> fact being a custom design.
+>
+> Based on SpacemiT drivers [1]. These patches are also available at:
+>
+> https://github.com/dramforever/linux/tree/k1/ethernet/v12
+>
+> [1]: https://github.com/spacemit-com/linux-k1x
+
+This driver recently landed in linux-next as commit bfec6d7f2001 ("net: 
+spacemit: Add K1 Ethernet MAC"). In my tests I found that it 
+triggers lock dep warnings related to stats_lock acquisition. In the 
+current code it is being acquired with spin_lock(). For tests I've 
+changed that to spin_lock_irqsave() and the warnings went away, but I'm 
+not sure that this is the proper fix. I've also checked the driver 
+history and 'irqsave' locking was used in pre-v7 version, but it was 
+removed later on Jakub's request and described a bit misleading as 
+"Removed scoped_guard usage".
+
+Here are the lock dep warnings I got on my BananaPiF3 board:
+
+================================
+WARNING: inconsistent lock state
+6.17.0-rc6-next-20250918 #11165 Not tainted
+--------------------------------
+inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
+swapper/0/0 [HC0[0]:SC1[1]:HE1:SE0] takes:
+ffffffd60b1412a0 (&priv->stats_lock){+.?.}-{3:3}, at: 
+emac_stats_timer+0x1c/0x3e [k1_emac]
+{SOFTIRQ-ON-W} state was registered at:
+   __lock_acquire+0x7f6/0x1f7c
+   lock_acquire+0xe8/0x2b6
+   _raw_spin_lock+0x2c/0x40
+   emac_get_stats64+0xbc/0x188 [k1_emac]
+   dev_get_stats+0x3e/0x292
+   rtnl_fill_stats+0x32/0xec
+   rtnl_fill_ifinfo.constprop.0+0x6d0/0x1448
+   rtmsg_ifinfo_build_skb+0x92/0xea
+   rtmsg_ifinfo+0x36/0x78
+   register_netdevice+0x7a6/0x7d4
+   register_netdev+0x20/0x36
+   devm_register_netdev+0x58/0xb0
+   emac_probe+0x3bc/0x5ce [k1_emac]
+   platform_probe+0x46/0x84
+   really_probe+0x108/0x2e0
+   __driver_probe_device.part.0+0xaa/0xe0
+   driver_probe_device+0x78/0xc4
+   __driver_attach+0x54/0x162
+   bus_for_each_dev+0x58/0xa4
+   driver_attach+0x1a/0x22
+   bus_add_driver+0xec/0x1ce
+   driver_register+0x3e/0xd8
+   __platform_driver_register+0x1c/0x24
+   0xffffffff025bb020
+   do_one_initcall+0x56/0x290
+   do_init_module+0x52/0x1da
+   load_module+0x1590/0x19d8
+   init_module_from_file+0x76/0xae
+   idempotent_init_module+0x186/0x1fc
+   __riscv_sys_finit_module+0x54/0x84
+   do_trap_ecall_u+0x2a0/0x4d0
+   handle_exception+0x146/0x152
+irq event stamp: 76398
+hardirqs last  enabled at (76398): [<ffffffff80b8809c>] 
+_raw_spin_unlock_irq+0x2a/0x42
+hardirqs last disabled at (76397): [<ffffffff80b87e52>] 
+_raw_spin_lock_irq+0x5a/0x60
+softirqs last  enabled at (76376): [<ffffffff8002e8ca>] 
+handle_softirqs+0x3ca/0x462
+softirqs last disabled at (76389): [<ffffffff8002eaca>] 
+__irq_exit_rcu+0xe2/0x10c
+
+other info that might help us debug this:
+  Possible unsafe locking scenario:
+
+        CPU0
+        ----
+   lock(&priv->stats_lock);
+   <Interrupt>
+     lock(&priv->stats_lock);
+
+  *** DEADLOCK ***
+
+1 lock held by swapper/0/0:
+  #0: ffffffc600003c30 ((&priv->stats_timer)){+.-.}-{0:0}, at: 
+call_timer_fn+0x0/0x24e
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 
+6.17.0-rc6-next-20250918 #11165 NONE
+Hardware name: Banana Pi BPI-F3 (DT)
+Call Trace:
+[<ffffffff800163a6>] dump_backtrace+0x1c/0x24
+[<ffffffff80001482>] show_stack+0x28/0x34
+[<ffffffff8000f7ca>] dump_stack_lvl+0x5e/0x86
+[<ffffffff8000f806>] dump_stack+0x14/0x1c
+[<ffffffff80090a80>] print_usage_bug.part.0+0x29a/0x302
+[<ffffffff80091152>] mark_lock+0x66a/0x7ee
+[<ffffffff80091cfe>] __lock_acquire+0x7cc/0x1f7c
+[<ffffffff80093d0c>] lock_acquire+0xe8/0x2b6
+[<ffffffff80b87d18>] _raw_spin_lock+0x2c/0x40
+[<ffffffff025c61da>] emac_stats_timer+0x1c/0x3e [k1_emac]
+[<ffffffff800d8de4>] call_timer_fn+0x90/0x24e
+[<ffffffff800d91b0>] __run_timers+0x20e/0x2e8
+[<ffffffff800d98ea>] timer_expire_remote+0x4a/0x5e
+[<ffffffff800efe52>] tmigr_handle_remote_up+0x174/0x34a
+[<ffffffff800ee5e0>] __walk_groups.isra.0+0x28/0x66
+[<ffffffff800f0128>] tmigr_handle_remote+0x9e/0xc2
+[<ffffffff800d931c>] run_timer_softirq+0x2a/0x32
+[<ffffffff8002e662>] handle_softirqs+0x162/0x462
+[<ffffffff8002eaca>] __irq_exit_rcu+0xe2/0x10c
+[<ffffffff8002efac>] irq_exit_rcu+0xc/0x36
+[<ffffffff80b7b248>] handle_riscv_irq+0x64/0x74
+[<ffffffff80b898aa>] call_on_irq_stack+0x32/0x40
+
+
+
+================================
+WARNING: inconsistent lock state
+6.17.0-rc6-next-20250918-dirty #11166 Not tainted
+--------------------------------
+inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
+swapper/4/0 [HC0[0]:SC1[1]:HE1:SE0] takes:
+ffffffd606ca92a0 (&priv->stats_lock){+.?.}-{3:3}, at: 
+emac_stats_timer+0x1c/0x3e [k1_emac]
+{SOFTIRQ-ON-W} state was registered at:
+   __lock_acquire+0x7f6/0x1f7c
+   lock_acquire+0xe8/0x2b6
+   _raw_spin_lock+0x2c/0x40
+   emac_open+0x820/0x9b0 [k1_emac]
+   __dev_open+0xca/0x21c
+   __dev_change_flags+0x18a/0x204
+   netif_change_flags+0x1e/0x56
+   do_setlink.constprop.0+0x268/0xb88
+   rtnl_newlink+0x57a/0x788
+   rtnetlink_rcv_msg+0x3ea/0x54c
+   netlink_rcv_skb+0x44/0xec
+   rtnetlink_rcv+0x14/0x1c
+   netlink_unicast+0x1b6/0x218
+   netlink_sendmsg+0x174/0x34e
+   __sock_sendmsg+0x40/0x7c
+   ____sys_sendmsg+0x19c/0x1ba
+   ___sys_sendmsg+0x5c/0xa0
+   __sys_sendmsg+0x5a/0xa2
+   __riscv_sys_sendmsg+0x16/0x1e
+   do_trap_ecall_u+0x2a0/0x4d0
+   handle_exception+0x146/0x152
+irq event stamp: 36278
+hardirqs last  enabled at (36278): [<ffffffff80b8809c>] 
+_raw_spin_unlock_irq+0x2a/0x42
+hardirqs last disabled at (36277): [<ffffffff80b87e52>] 
+_raw_spin_lock_irq+0x5a/0x60
+softirqs last  enabled at (36256): [<ffffffff8002e8ca>] 
+handle_softirqs+0x3ca/0x462
+softirqs last disabled at (36269): [<ffffffff8002eaca>] 
+__irq_exit_rcu+0xe2/0x10c
+
+other info that might help us debug this:
+  Possible unsafe locking scenario:
+
+        CPU0
+        ----
+   lock(&priv->stats_lock);
+   <Interrupt>
+     lock(&priv->stats_lock);
+
+  *** DEADLOCK ***
+
+1 lock held by swapper/4/0:
+  #0: ffffffc600023c30 ((&priv->stats_timer)){+.-.}-{0:0}, at: 
+call_timer_fn+0x0/0x24e
+
+stack backtrace:
+CPU: 4 UID: 0 PID: 0 Comm: swapper/4 Not tainted 
+6.17.0-rc6-next-20250918-dirty #11166 NONE
+Hardware name: Banana Pi BPI-F3 (DT)
+Call Trace:
+[<ffffffff800163a6>] dump_backtrace+0x1c/0x24
+[<ffffffff80001482>] show_stack+0x28/0x34
+[<ffffffff8000f7ca>] dump_stack_lvl+0x5e/0x86
+[<ffffffff8000f806>] dump_stack+0x14/0x1c
+[<ffffffff80090a80>] print_usage_bug.part.0+0x29a/0x302
+[<ffffffff80091152>] mark_lock+0x66a/0x7ee
+[<ffffffff80091cfe>] __lock_acquire+0x7cc/0x1f7c
+[<ffffffff80093d0c>] lock_acquire+0xe8/0x2b6
+[<ffffffff80b87d18>] _raw_spin_lock+0x2c/0x40
+[<ffffffff025b41da>] emac_stats_timer+0x1c/0x3e [k1_emac]
+[<ffffffff800d8de4>] call_timer_fn+0x90/0x24e
+[<ffffffff800d91b0>] __run_timers+0x20e/0x2e8
+[<ffffffff800d98ea>] timer_expire_remote+0x4a/0x5e
+[<ffffffff800efe52>] tmigr_handle_remote_up+0x174/0x34a
+[<ffffffff800ee5e0>] __walk_groups.isra.0+0x28/0x66
+[<ffffffff800f0128>] tmigr_handle_remote+0x9e/0xc2
+[<ffffffff800d931c>] run_timer_softirq+0x2a/0x32
+[<ffffffff8002e662>] handle_softirqs+0x162/0x462
+[<ffffffff8002eaca>] __irq_exit_rcu+0xe2/0x10c
+[<ffffffff8002efac>] irq_exit_rcu+0xc/0x36
+[<ffffffff80b7b248>] handle_riscv_irq+0x64/0x74
+[<ffffffff80b898aa>] call_on_irq_stack+0x32/0x40
+
+
 > ---
->  drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.h  | 10 +++++
->  .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    | 37 +++++++++++++++++++
->  2 files changed, 47 insertions(+)
->=20
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.h
-> b/drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.h
-> index be452856531a..8a2ba77d1493 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.h
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.h
-> @@ -52,6 +52,7 @@ enum ixgbe_pfvf_api_rev {
->  	ixgbe_mbox_api_14,	/* API version 1.4, linux/freebsd VF driver */
->  	ixgbe_mbox_api_15,	/* API version 1.5, linux/freebsd VF driver */
->  	ixgbe_mbox_api_16,	/* API version 1.6, linux/freebsd VF driver */
-> +	ixgbe_mbox_api_17,	/* API version 1.7, linux/freebsd VF driver */
->  	/* This value should always be last */
->  	ixgbe_mbox_api_unknown,	/* indicates that API version is not
-> known */
->  };
-> @@ -91,6 +92,9 @@ enum ixgbe_pfvf_api_rev {
+> Changes in v12:
+> - Add aliases ethernet{0,1} to DTS
+> - Minor changes
+>    - Use FIELD_MODIFY to set duplex mode in HW based on phydev->duplex
+>    - Use FIELD_GET in emac_mii_read() to extract bits from MAC_MDIO_DATA
+> - Link to v11: https://lore.kernel.org/r/20250912-net-k1-emac-v11-0-aa3e84f8043b@iscas.ac.cn
+>
+> Changes in v11:
+> - Use NETDEV_PCPU_STAT_DSTATS for tx_dropped
+> - Use DECLARE_FLEX_ARRAY for emac_hw_{tx,rx}_stats instead of cast
+> - More bitfields stuff to simplify code:
+>    - Define EMAC_MAX_DELAY_UNIT with FIELD_MAX
+>    - Use FIELD_{PREP,GET} in emac_mii_{read,write}()
+>    - Use FIELD_MODIFY in emac_set_{tx,rx}_fc()
+> - Minor changes:
+>    - Use lower_32_bits and such instead of casts and shifts
+>    - Extract emac_ether_addr_hash() helper
+>    - In emac_mdio_init(), 0xffffffff -> ~0
+>    - Minor comment changes
+> - Link to v10: https://lore.kernel.org/r/20250908-net-k1-emac-v10-0-90d807ccd469@iscas.ac.cn
+>
+> Changes in v10:
+> - Use FIELD_GET and FIELD_PREP, remove some unused constants
+> - Remove redundant software statistics
+>    - In particular, rx_dropped should have been and is already tracked in
+>      rx_errors.
+> - Track tx_dropped with a percpu field
+> - Minor changes
+>    - Simplified int emac_rx_frame_status() -> bool emac_rx_frame_good()
+> - Link to v9: https://lore.kernel.org/r/20250905-net-k1-emac-v9-0-f1649b98a19c@iscas.ac.cn
+>
+> Changes in v9:
+> - Refactor to use phy_interface_mode_is_rgmii
+> - Minor changes
+>    - Use netdev_err in more places
+>    - Print phy-mode by name on unsupported phy-mode
+> - Link to v8: https://lore.kernel.org/r/20250828-net-k1-emac-v8-0-e9075dd2ca90@iscas.ac.cn
+>
+> Changes in v8:
+> - Use devres to do of_phy_deregister_fixed_link on probe failure or
+>    remove
+> - Simplified control flow in a few places with early return or continue
+> - Minor changes
+>    - Removed some unneeded parens in emac_configure_{tx,rx}
+> - Link to v7: https://lore.kernel.org/r/20250826-net-k1-emac-v7-0-5bc158d086ae@iscas.ac.cn
+>
+> Changes in v7:
+> - Removed scoped_guard usage
+> - Renamed error handling path labels after destinations
+> - Fix skb free error handling path in emac_start_xmit and emac_tx_mem_map
+> - Cancel tx_timeout_task to prevent schedule_work lifetime problems
+> - Minor changes:
+>    - Remove unnecessary timer_delete_sync in emac_down
+>    - Use dev_err_ratelimited in a few more places
+>    - Cosmetic fixes in error messages
+> - Link to v6: https://lore.kernel.org/r/20250820-net-k1-emac-v6-0-c1e28f2b8be5@iscas.ac.cn
+>
+> Changes in v6:
+> - Implement pause frame support
+> - Minor changes:
+>    - Convert comment for emac_stats_update() into assert_spin_locked()
+>    - Cosmetic fixes for some comments and whitespace
+>    - emac_set_mac_addr() is now refactored
+> - Link to v5: https://lore.kernel.org/r/20250812-net-k1-emac-v5-0-dd17c4905f49@iscas.ac.cn
+>
+> Changes in v5:
+> - Rebased on v6.17-rc1, add back DTS now that they apply cleanly
+> - Use standard statistics interface, handle 32-bit statistics overflow
+> - Minor changes:
+>    - Fix clock resource handling in emac_resume
+>    - Ratelimit the message in emac_rx_frame_status
+>    - Add ndo_validate_addr = eth_validate_addr
+>    - Remove unnecessary parens in emac_set_mac_addr
+>    - Change some functions that never fail to return void instead of int
+>    - Minor rewording
+> - Link to v4: https://lore.kernel.org/r/20250703-net-k1-emac-v4-0-686d09c4cfa8@iscas.ac.cn
+>
+> Changes in v4:
+> - Resource handling on probe and remove: timer_delete_sync and
+>    of_phy_deregister_fixed_link
+> - Drop DTS changes and dependencies (will send through SpacemiT tree)
+> - Minor changes:
+>    - Remove redundant phy_stop() and setting of ndev->phydev
+>    - Fix error checking for emac_open in emac_resume
+>    - Fix one missed dev_err -> dev_err_probe
+>    - Fix type of emac_start_xmit
+>    - Fix one missed reverse xmas tree formatting
+>    - Rename some functions for consistency between emac_* and ndo_*
+> - Link to v3: https://lore.kernel.org/r/20250702-net-k1-emac-v3-0-882dc55404f3@iscas.ac.cn
+>
+> Changes in v3:
+> - Refactored and simplified emac_tx_mem_map
+> - Addressed other minor v2 review comments
+> - Removed what was patch 3 in v2, depend on DMA buses instead
+> - DT nodes in alphabetical order where appropriate
+> - Link to v2: https://lore.kernel.org/r/20250618-net-k1-emac-v2-0-94f5f07227a8@iscas.ac.cn
+>
+> Changes in v2:
+> - dts: Put eth0 and eth1 nodes under a bus with dma-ranges
+> - dts: Added Milk-V Jupiter
+> - Fix typo in emac_init_hw() that broke the driver (Oops!)
+> - Reformatted line lengths to under 80
+> - Addressed other v1 review comments
+> - Link to v1: https://lore.kernel.org/r/20250613-net-k1-emac-v1-0-cc6f9e510667@iscas.ac.cn
+>
+> ---
+> Vivian Wang (5):
+>        dt-bindings: net: Add support for SpacemiT K1
+>        net: spacemit: Add K1 Ethernet MAC
+>        riscv: dts: spacemit: Add Ethernet support for K1
+>        riscv: dts: spacemit: Add Ethernet support for BPI-F3
+>        riscv: dts: spacemit: Add Ethernet support for Jupiter
+>
+>   .../devicetree/bindings/net/spacemit,k1-emac.yaml  |   81 +
+>   arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts    |   48 +
+>   arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts  |   48 +
+>   arch/riscv/boot/dts/spacemit/k1-pinctrl.dtsi       |   48 +
+>   arch/riscv/boot/dts/spacemit/k1.dtsi               |   22 +
+>   drivers/net/ethernet/Kconfig                       |    1 +
+>   drivers/net/ethernet/Makefile                      |    1 +
+>   drivers/net/ethernet/spacemit/Kconfig              |   29 +
+>   drivers/net/ethernet/spacemit/Makefile             |    6 +
+>   drivers/net/ethernet/spacemit/k1_emac.c            | 2159 ++++++++++++++++++++
+>   drivers/net/ethernet/spacemit/k1_emac.h            |  416 ++++
+>   11 files changed, 2859 insertions(+)
+> ---
+> base-commit: 062b3e4a1f880f104a8d4b90b767788786aa7b78
+> change-id: 20250606-net-k1-emac-3e181508ea64
+>
+> Best regards,
 
-
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-
+Best regards
+-- 
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
 
 
