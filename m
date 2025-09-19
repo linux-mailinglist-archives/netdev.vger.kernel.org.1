@@ -1,364 +1,1490 @@
-Return-Path: <netdev+bounces-224774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B901CB898EF
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 14:57:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25470B89907
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 15:01:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FB56189CAC1
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 12:57:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3C515A4480
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 13:00:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E850022D7B9;
-	Fri, 19 Sep 2025 12:57:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9696D30ACFC;
+	Fri, 19 Sep 2025 13:00:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZZ7qXpUb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="baVflcet"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1701236A8B;
-	Fri, 19 Sep 2025 12:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851FE2F83D4
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 13:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758286645; cv=fail; b=U4HAaO//Ps3vj1QaAmMnCh3S4DYpkhOgq5vK+1o1+nEvUBx1UbVYeSNYyF6Q2OUqrPrwE+QBhDG41yLzBc6nmxgASNhFCVlqQaP8MHXpMyh3ssbFyDKWKBGwvwU0/O0OVHlUwHi+GWWGUxoaVIuVZvx5gzko3E3KQWY5ynSZ4JQ=
+	t=1758286844; cv=fail; b=fibBvJdcmPP3qTcjOMNKM5cImkJ7OhOxxppZ3lynthXw55KjxZMbWJF5RpH5RsroaEpM+DPy3ROxtEJN5e0SqWTycJitDk+fEOl7xRB0B1Z88YCT4Mbxg87KE7xYy5DF9z4QG2Z6MbkaeidbQvi/XxqSh7k41z3r6NMzKrWsNBw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758286645; c=relaxed/simple;
-	bh=XVBZigEoapltOC564Skp9COTwdJYvFPAGdmf97/l9hA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=glvsTBrjKdFyOkvdHZAnfjP4eFwPXqllCmKCqjOYARTbE35duKmLH/seCWUvxmA3WMfUR9+NgnF+n5/3QIDLITFlJgPb/kcweYOGP/Bo8oIeP2bk0PNUFXyut+A1FFRcnrA4NuxHRiAdIRcZbD/fDJso9Iv5MsoV9fX8KP3v4Uo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZZ7qXpUb; arc=fail smtp.client-ip=198.175.65.12
+	s=arc-20240116; t=1758286844; c=relaxed/simple;
+	bh=cb67/maXfAB/M2OkM4b7wtiAktO71kDNnAllTkZl0XM=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=pIv78dX5nSJ45P3Wn4oRgvxgsQHtOgvwFTcWcJKLB0F8jsyTXl6uEcDpZIhHGcVS8N4qYxr+YtsLVP+MCWys6ln4idjITJIfCcHxOYeLgP5/IfXVODJ6TkqW0SHU4RvqRUDJNtUWzNsMvTiLL2jpdDZV4THpEm4/sToDR6bTjt4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=baVflcet; arc=fail smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758286643; x=1789822643;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:mime-version:content-transfer-encoding;
-  bh=XVBZigEoapltOC564Skp9COTwdJYvFPAGdmf97/l9hA=;
-  b=ZZ7qXpUbktQJx5cLaufAJNot0cBSbhIaW7sLl6YbGJO5OEaRukyCVbTi
-   iK9yZt4t4kI6eaqPzp3rcr58YEmT1WKTEpzHG5/APXCiMR1nU5BI8eIcL
-   MIZ1aJD1pen5KxnFegq1P+Te4Lb0Mu8lpmfrE0z1gpJ1ml1e90b8pMDlH
-   rWpjWW2/4PzSvjQwLBM4k5cgI2Av/qTxY1Nci6GppBovj4Wntc5ZnDP9D
-   IVSaYp+hMRNV3TCC3CNnCGr2gu5/9JHw2q3C4Dcj0jXlCBEMVhzGl1qhc
-   SxjIWZNOJGcIIfwOLFcqKxljrRslCzbgMY1DC5hYlje8+n/8NXTwkNH6g
+  t=1758286841; x=1789822841;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=cb67/maXfAB/M2OkM4b7wtiAktO71kDNnAllTkZl0XM=;
+  b=baVflcetDsmLcF8vDclE24vDU3XqOUPU1/ugAiJuwBHYDvPQkqm2iMzo
+   ABZpbByqmLQ9sXYw7/Rf1re37UvfBnbadstF2oxa6bphUPwwQ9tfRbTHr
+   OmccZr0mzQJgqfIlvVa8GKK1sEweemde7dZkMYCAMNWUMTup741YZ9ijy
+   2Iibd3NfEABVdSvU0loo03c0uf7xP6dg3uVwcPb8g4ydKBJZdh5RrHnVl
+   NvbLhcE2Vws/R1pCqivAViR/gJDpFyvlesCnIrlQVXHj+nMMiDsdbsYV9
+   Xv4CkT1dxd72cFipeK1rK8F5s54X6VvQJJCjzm/0roWSI3fgHi4TujXrQ
    A==;
-X-CSE-ConnectionGUID: YtvHOaEDTt+vaU+rZ7baBg==
-X-CSE-MsgGUID: qug4JGXTQKq2vIaoksf7nQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11557"; a="72061042"
+X-CSE-ConnectionGUID: w9K3bdiySiq2Wmob7fK0HA==
+X-CSE-MsgGUID: royb3JPMQPOmbVjYQHlEYA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11557"; a="48209962"
 X-IronPort-AV: E=Sophos;i="6.18,278,1751266800"; 
-   d="scan'208";a="72061042"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 05:57:23 -0700
-X-CSE-ConnectionGUID: rwO44vOwQHKaVysIKEBGww==
-X-CSE-MsgGUID: yQ/picagTySfn3Ih98tT2A==
+   d="scan'208";a="48209962"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 06:00:40 -0700
+X-CSE-ConnectionGUID: 1NaoRz9zQlyHrxQm8XGJ8w==
+X-CSE-MsgGUID: +X9Pt76ITNKnIxE+4Od7OQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,278,1751266800"; 
-   d="scan'208";a="176637265"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 05:57:23 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+   d="scan'208";a="175447503"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 06:00:40 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 19 Sep 2025 05:57:22 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ 15.2.2562.17; Fri, 19 Sep 2025 06:00:39 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Fri, 19 Sep 2025 05:57:22 -0700
-Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.29) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ 15.2.2562.17 via Frontend Transport; Fri, 19 Sep 2025 06:00:39 -0700
+Received: from BL0PR03CU003.outbound.protection.outlook.com (52.101.53.20) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 19 Sep 2025 05:57:21 -0700
+ 15.2.2562.17; Fri, 19 Sep 2025 06:00:38 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jRMjMsOIyam2iT8MjxzVK/KDnnVVd5DDiZ3GuC8GQDNfAWvCM/iyt94PKjC6cYzTNdmhLaDVfwQCtX/SFYnN+A/jXmFXqziOCN7C66xJajxg0bFRJfQRJF4Mwb5aD3ES5eM2pewSH8z+/6QZXawkstDbIFjaMSZ9n6qi/AWW3b7xz+q9M+dXPdo3noXCJ+S90eTznmyGlUfvL9DmIWNJuI4gDx1y52vlhyxZWvLuyq9zacNISBjvvDcuKWj5aiqovCj3CDa6MufyXbVweL/N6FmOdh/OXPrq0gQD3hhlNpSddGrfSLnJ/fHy+Vq69rNzcVi9l+PN8xKErZx1+NIw+w==
+ b=pMAk+c+hdgETBcUzzKRuKSpoNBpAYU0sGhl+12VNoSS6YMjQPny2TubjRNmuNa6m3/l1VtsNnvasdtrJPQQd+WRdjya7Qw9mKdI22HyMFqThEZklZYiGWaerBeKlWLr7vup+VoDn87HCCanCIZNdogDRIYuH9EJzX5dosqITWS1XEDBb8HIPBbcF8RMLyAxUU17+N3/IUy6iW87u92GOMl+7FVHVv0FEWFwObGjOJzIv/INmyPKVKVnUecc+GhD8wANjozElAGB/dSa9MHd+QDbYEbRGkgSBrEVLogsIp/dU3PPNxq2WctX99R4hhIYTSaYIYx9m0xVJykxBH/385A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XSS/wR2W1SD6MDKMLraVXrNi/SK0dOU4Fz7EJmFg0yY=;
- b=Axm2HAo0JwpdYpmGFwNChiaEYR1PGjl1jMastq6opzhWmOpENip68XQYfKtfmiMLDlkUph67jGtu5nY4nOCwzoveIgB8fUpkiiJnVW7L6aD0a+DkpXTbyPAUUvQZCE+89FCMs1rtjmOdHuC3Xp0Ax4E2Fmotsjeifu46HD5PrnpY+vroEoGIBj92N/tXcjU5TXFWGpJQ2oRIap+3fgvM5FHy6LvajKSVUp4qQguurm7T1zBZ5ECR3fEhjG0D7XGwrbVLtXNcSUqePcFByq4iKBe5pCLHHhcuwlkFWhOtyi9sUjID3qxUMG1fA1IHacMp6cOVKxgAshTLR7Uiv1S6ww==
+ bh=giIeGmBq5TeLQSAroZH5ZlmGOIkjrb1ObxxNdwYt/10=;
+ b=JxLAmIw5fYx77mo69MZmJ/UFku3oCKT5ErAuRSwGMOem3mErUFuyyLLYXNoDT+TmFs8IM7qHGgVE4PFqmzLgA2eDKSg15GhTHUro1XlClGZtynveUWOKgGouORhF7ICIVdn1vADXfTExSY25+EPR20D8sD19jlPj8y97zyfs+swCiWh57BeMTCKtMC71+ofObJW8srTgPiXeDfIv4l/AxoY4vQOcBxu88KA/9Ui0P35ZdGZNGJqK9yMW/Lt9osMf2xaIjT7lhAnF2BqEkMiaG6TPxKAPeiMh49Deo2BuVdoYaigkZVz7lcFRCixcik3DBM0iies9yZo3QjPoRo6UkA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6537.namprd11.prod.outlook.com (2603:10b6:208:3a3::14)
- by CO1PR11MB5044.namprd11.prod.outlook.com (2603:10b6:303:92::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.16; Fri, 19 Sep
- 2025 12:57:19 +0000
-Received: from IA1PR11MB6537.namprd11.prod.outlook.com
- ([fe80::20f7:6d09:bff:7d0b]) by IA1PR11MB6537.namprd11.prod.outlook.com
- ([fe80::20f7:6d09:bff:7d0b%3]) with mapi id 15.20.9137.012; Fri, 19 Sep 2025
- 12:57:18 +0000
-From: "Shalev, Avi" <avi.shalev@intel.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "Choong, Chwee Lin"
-	<chwee.lin.choong@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S
- . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
-	<richardcochran@gmail.com>, "Gomes, Vinicius" <vinicius.gomes@intel.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Song, Yoong
- Siang" <yoong.siang.song@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net v1] igc: fix race condition in
- TX timestamp read for register 0
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v1] igc: fix race condition in
- TX timestamp read for register 0
-Thread-Index: AQHcKItdyDuhhQTvsE6tDcxg2bQ92LSZadOAgAAXMICAAJjPAIAAPQoAgAAWfGA=
-Date: Fri, 19 Sep 2025 12:57:18 +0000
-Message-ID: <IA1PR11MB653723B4B25B0EFDA02C6D8A9A11A@IA1PR11MB6537.namprd11.prod.outlook.com>
-References: <20250918183811.31270-1-chwee.lin.choong@intel.com>
- <0fc877a5-4b35-4802-9cda-e4eca561c5d1@linux.dev>
- <d30d7a43-ca17-445e-b7ae-641be2fcc165@intel.com>
- <SJ5PPF4422C53747941CD81779E97F26C34DA11A@SJ5PPF4422C5374.namprd11.prod.outlook.com>
- <9bf5066a-a006-4f93-93fd-38e4c063e59e@linux.dev>
-In-Reply-To: <9bf5066a-a006-4f93-93fd-38e4c063e59e@linux.dev>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
+Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6537:EE_|CO1PR11MB5044:EE_
-x-ms-office365-filtering-correlation-id: ef9dc595-e7ea-47b7-5ee1-08ddf77c10e6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|38070700021|921020;
-x-microsoft-antispam-message-info: =?utf-8?B?cStNWFprNlNRZEdsTXA5NU9hdU1UVWNIZ2hWNHhhMUR0MkVuMHNhT001NjNi?=
- =?utf-8?B?VEN4SnQ0bjB4ejROK3d4L2IremJVK3o4N1lUSnlycFhqUXAyRHV1UzJZL2Jj?=
- =?utf-8?B?R3dxZ1J1WUFLMDUzMlc2SWt2OFV2aCs1azB3YjVLd1lTQkhmNzRZN1VTcU1T?=
- =?utf-8?B?YVcyeUtvUmFxem9rKzlTK0ViM0UvMWY2OTgrcXZuSDNodjJDR05xNWN1STFM?=
- =?utf-8?B?bjlnT0NyelQ0S1ZGa2ltL21IcTd5eVdoMWJESDZCNWlKVVErMVdxR2JmbzN6?=
- =?utf-8?B?cnphZGR1cloyRy9vZlhWK1AwbG9QVUVicTl6ci8veUtDZlF3Q29pc2tkTTZB?=
- =?utf-8?B?b00rRmNuWGdxaXNkYWJIQ3RuNVVvTXhRRzlHZkx1dWJpUytTN0Y0dFJUcloy?=
- =?utf-8?B?c2NYMnpDaG5xbG1PbTV5Z1BtRkE4MDE5TnRMUkczN2hhNWppa0xJcEZ3R2hp?=
- =?utf-8?B?TGphckt2bitzU1JWR2VFNkV1Y3hLdFpOQmpwK2JvMWRGR3czeDdZS2hHcys1?=
- =?utf-8?B?ZGxhVnhka2JZRkREUFVHS090QjFVNUQ0UFNxVElQaG5tVHhBWXVYTTZhejAx?=
- =?utf-8?B?TU53bnY2T2ltajJrVG5NL2tkZ0RhcGRDUExqUE9XRURTN2hTRXpBVStubFhD?=
- =?utf-8?B?WCtFRlJFSVVVNzIzaDFPL1BuNDArS00rSW9zR1IrNlNwWnlqemE4Ui9OcEJ1?=
- =?utf-8?B?S2l4YVYvMGRRNkFGWmNBSGEyM0RFR1g1dlVXRFdTblVJSW5LRTJLVzBwTjB3?=
- =?utf-8?B?Y1J6bExmRkpDMUlWVk5oUWRTcGxDZUE3akFXODN4a1dKc2lQeTlsZEd5WlBP?=
- =?utf-8?B?cG5wZVhSaHJlS0VNMno1aWZ1aGRoem9WSFVNWTFyNTgwenFBQjFvdFRxVThh?=
- =?utf-8?B?VDc4UEdMV1MvWGVMRk54UUZDN0tHSjN1NHlXcUNVWkdzcDVSZFJqNU9sZWsx?=
- =?utf-8?B?ZHRPWE11VjlFMFZKMERtWlJSM2pNZ0xrWFI1Z0pxb0NVRlI1aVcyOWJKZXNh?=
- =?utf-8?B?ZjdaREhpUFo2cHk1MHZaU0RIS0ZGMWE3TEY0cWN0MmswbFV5Y3l2UDJHbGNU?=
- =?utf-8?B?TTZpdkNZNHdCRHNhWTV3NjEzQm5TSnhkblFFeC9keXFONTVBMHRZOTVVS3Z0?=
- =?utf-8?B?RS9TWE9iN1MvemhSQm1YM2d0NC9ZK0VFTk1sM0RTeGJnVlJOaVFoSTAxKzVj?=
- =?utf-8?B?d0hHbmR5bXUyVzR6SkRkUXBOTmxZYmV6MmFWbGtwUkV5QkxCaHFMclNBZXNZ?=
- =?utf-8?B?eDhGdjI3aUVhV1ZsSVQxaVBrTjc3T2ltbVVIcmpTZHFFOEFGcHYyWi80RDZq?=
- =?utf-8?B?b0lVandrdjJZazlodHdUNkNrNnVPb0MzeGFSbGx5UW44RTk0Vm56b0tjV3Uz?=
- =?utf-8?B?czBVcDM3L1huZlJUaWJTbjdGaDhQNXdEQmwxUGk2b3ZSRzYwUnFyQTJSUVBC?=
- =?utf-8?B?cnRTT3pROWsrQmhPZFpBY3AxYWNzaGlNSHFDdmcvcnh0OTRLYk5BVmlYdExT?=
- =?utf-8?B?V2d1eHBxM3A3Zmh2YlFyL2NJcElqYmR3VHd5Umw1WEJPeGZLUmpTdFlJeWdQ?=
- =?utf-8?B?RkZNc0RaL1d1ZmxGcnBETHZKMHdHNHRmUGZnaXlXaWJOSkR2SXQvSWpjYjNY?=
- =?utf-8?B?U1Q3TDRsdFJaeVNyY25KeUtzVDhVV3dNbmtSaTlLQWxmdkcxWmVYQlg4STE2?=
- =?utf-8?B?LzFuZ0h2L1hSbE1DTnIrUHo4d2l5S1BDQXRlZDRIYVkvdm9FZVBsVmw1QTlJ?=
- =?utf-8?B?S1pHWWo2QjdNQnh4ZzVpejIzZHVjWUZjelQzUmdaNk5IRjZ2ZUVmb2g4TFJq?=
- =?utf-8?B?U2IyVm5IQzY5bVlwYlRpNDRhVXJqVkFaNWJWclQrcStJNHVnRW12Qy8zcFdZ?=
- =?utf-8?B?WDc0Q2tRcWFBck1MTUJKS0EyblR6RnZadTZXQUxjQldBUUdFNnZWMkllbWky?=
- =?utf-8?B?WllEVStlUmZSVlFHR0VRTWNVeEFiSk1hdUxlVVJPWjVCVUFCb05rL1lQMmwv?=
- =?utf-8?Q?4+RNajVMHdCStprRjL1UfTKJ4I/C0c=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6537.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(38070700021)(921020);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UmYvbGpTZDcxeEo3YWM2cnU4b3FUREZRbmdlSFRsYitBVmorMGtVOHE3cjVv?=
- =?utf-8?B?T3dDTkJ4ZUM2aTBFWEUyeHJZQm4wWDZ1ZmFnQlpzYmdVNG1CT3c0UjJGczQ1?=
- =?utf-8?B?dE1ocFhtTlNXdkozZWtOR0FJOEp4ZG44R3RtV1lYSTZXMzRSQnZCQ1VQNFdu?=
- =?utf-8?B?SnphMUVHSkx2djR2RG13WVFXelpjWkhQK0xKWnZVSkowR2JvaHlMVE9QVDJh?=
- =?utf-8?B?dlpndFovU2I1eUZKRUNHdFl1QWU5WGZqZXlIQ2NGdndHeEUvSTJ3RWR5bVNw?=
- =?utf-8?B?a0R4U1g4cE96NEY0TmFwUjJ0RERPUm4vYWF5enhjYWFZNzZ2bW9yVUxrODFG?=
- =?utf-8?B?bHZ4dnU1SFBCeGRmREUvOU5iQ294dXd3NnNuQlZVUW15VFAxTU51aDBFdEpn?=
- =?utf-8?B?SG5xOGhxZGhFK3B3ZTFFMEt3R0FTNmNVTG0wc0FOUm9EYlBORWZGZHBkbXp4?=
- =?utf-8?B?UnpIYWxtT3VZV2NISG14cCt6RGg5ZzNJZ3FDNXU2VTZkYlBHc0JodS9UMzl1?=
- =?utf-8?B?Q2VZd1M1bG93cGhGUFpLdnJWUE5BQm5zdWY0d3prWGwxaTV1NGo2TENsNEh1?=
- =?utf-8?B?RXRSbmlwWGdyVnNoYmFaOTV1OVJsSjY5ODVGcmNrQjI3UG1QZVJnUFV2MTJi?=
- =?utf-8?B?ZTBadnB2OVRDdS8xL1N0cXBoZ2s0QVRhM0ZLd3Y1OHZsUWhkQS8ycWVEMllU?=
- =?utf-8?B?MjJBaC9XY3B6SkN6MkRtWEZUd0FHQm1iMFNoMzN4N1pocTE4dlFyWFFmVnc0?=
- =?utf-8?B?bS9rOVRqN2ZWL1dwWFdNL3luUm1FL012cVVuMVpjRldVQmxsTlFGcC9FQ3JV?=
- =?utf-8?B?aUlNUFVod0xlSjU2VHpqdm1XUjJkbXI2d1o2ckNIY0U2UVpuZHdEbS9FQ1RY?=
- =?utf-8?B?Tno4VVBjY2FQVS9OZHdoZE9xUHpzVUdSRHFhT0JFNlZJaWxMUWJmVE5TSExQ?=
- =?utf-8?B?ZUhJNEsyVFdnWVRVNWRtazNhZnZMUzdNS2hEOWQ1RWlHaFBuZzU1NDhNUGRX?=
- =?utf-8?B?M2xNaTRQRXl1MWVCeGRLbytwM1RqeXFzenYxdXpQYWN6ZjR5MFlPeXgrM1lQ?=
- =?utf-8?B?ZTNqUmhtQ3F6VkFUNTc2eUJNN29uMURHZWRNMDZpRnJSM0lGaHNZaG5JZitz?=
- =?utf-8?B?eitiOGN3cW5UOFY5NUZzNnhSVllHcXMyRnJLbm9iek53dzQ0VGUxTWJRRzhI?=
- =?utf-8?B?VUFONjZ4RkdKWGR3UjVrclhKN3puT2RBYUtxWGV6bkZCclBJSWNMajIzT0ZT?=
- =?utf-8?B?YVVRbXQrSUUzVE5XbTBnVHJqVDAyaTJBS0tyZ055UVUyQWp0bGo4OC9kMVBK?=
- =?utf-8?B?QjN1em5PakhQSzRmVEVXd0MxU1BZQkQzZG1kY2I5ZnVFYm8vZ2xWbVdpNk81?=
- =?utf-8?B?T3pvQU03dVlsS08wUkw4cjR5R1Q4ekZUZUNTeERjL0U2RTVFSUtpWE5UbDFT?=
- =?utf-8?B?Q3lyYWd4Y1JnRDFTa0RDcllsUUw0c2M5U293a1Q5TkFrOGN2WXdzRVlaWFpl?=
- =?utf-8?B?K3Eza25YMmgvaXUydlVObEQ4MXRzTmx4d0ZwOTVWeUZtWEVnWGo0eUpWVmQz?=
- =?utf-8?B?KzNWbEFPcys0OTg1dHh5Nlk2bkxWU2daNEd4U2d1R0ZnSnhvTVdpR3VCUkNv?=
- =?utf-8?B?OWdJckkwK3MvSFZUYnN2SEJJWXpVTWVFY05rZmdjd0ZYUThYd0ZZU0xwMVk5?=
- =?utf-8?B?eHVnLzF0Ri9PVmVNYXZaa24zMXEweFpONEtEVHVqUVpyRHNsME9FdVIwQ1Ro?=
- =?utf-8?B?bE9aSE1SdzJJTjMwM3gzOHBHMStDbkJBN083aHBVdlRqWlpmOU5ORlR4dVhV?=
- =?utf-8?B?V3ErZDhydFoxOXlicisxMUF5R1BVMlN0bStCNThkVzNwOWxkcWtyd1BGeTFF?=
- =?utf-8?B?Ulg3RG9lZ1pRajJjN2hiYnRnQzVJTEJNUFJsRHpxdFVjang1V1h1WlIvOExJ?=
- =?utf-8?B?QVBJUnJqV1BuVXlLYUxFRFhrSGpVV2pxS2dzejlxOXIxc29OUS8xK2tkejV3?=
- =?utf-8?B?elJkbE16UUxmQVlFeURGdWFSMG84UWRUdmQ0aWRDQ1BBWjR0UW9pVko4cDcw?=
- =?utf-8?B?ZkFlbzhlY1U2M3ZCa1ZOTG5kS3BMeFdNcXROUjcvWWcrUlJycktna2JlVW1i?=
- =?utf-8?Q?OgnhAFfJCw/XzWmwZ5eHpwgU1?=
-Content-Type: text/plain; charset="utf-8"
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by DM4PR11MB6549.namprd11.prod.outlook.com (2603:10b6:8:8e::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9137.17; Fri, 19 Sep 2025 13:00:34 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.9137.012; Fri, 19 Sep 2025
+ 13:00:34 +0000
+Message-ID: <cfae046e-106d-4963-88be-8ca116859538@intel.com>
+Date: Fri, 19 Sep 2025 15:00:29 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3] eea: Add basic driver framework for Alibaba
+ Elastic Ethernet Adaptor
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Wen Gu <guwen@linux.alibaba.com>, Philo Lu <lulie@linux.alibaba.com>,
+	"Lorenzo Bianconi" <lorenzo@kernel.org>, Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>, Lukas Bulwahn <lukas.bulwahn@redhat.com>, Geert
+ Uytterhoeven <geert+renesas@glider.be>, Vivian Wang
+	<wangruikang@iscas.ac.cn>, "Troy Mitchell"
+	<troy.mitchell@linux.spacemit.com>, Dust Li <dust.li@linux.alibaba.com>
+References: <20250919014856.20267-1-xuanzhuo@linux.alibaba.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20250919014856.20267-1-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DUZPR01CA0109.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4bb::28) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|DM4PR11MB6549:EE_
+X-MS-Office365-Filtering-Correlation-Id: e9249b03-2eca-49fe-27a0-08ddf77c854d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?REpmSk43SGpLL0hVazhUNzZnb0lpVWFCUlphQ1ltcEo2Z1c5OWE3aHArUkM2?=
+ =?utf-8?B?cDhadzlUMndROFo3b1RIeVFNUExYMzF4VlF0SUxSbmFOeXJFMFEyQlBEM3o1?=
+ =?utf-8?B?dUw1QXExcjRKM1l5SE9QUlRXRmRwbm5UbFdaNU1ESDh5bTNoRG5UVm9lbWM4?=
+ =?utf-8?B?ekNaaUtjNUNOQzErUmV6TG1OR1VzZ3RQd2tjMVVtRmFrcU9QSk13aXQ3TEh0?=
+ =?utf-8?B?NVFLVEpncFZJd3lHM1F4OTFqcm1WWVh3R3ZOeUY0RE1EeHd4MnhZZUVTRUh1?=
+ =?utf-8?B?UmwreFVDZlBYRnhDUDdCNXhONzBDdzRxSHFWejBOWTNvcGFSUFpEVUF0NVAr?=
+ =?utf-8?B?N25acUJIUWNYbDg4aW1OYnNuOGZYVlJxSGxmWjd0dk5tOEJvSit3bmhtRTVK?=
+ =?utf-8?B?VnhlYVBvelFiN2FUSFY2YUkvblZDUGtTTnBJNFNqU3hOVTJtdkd3Q1Ezc0Z2?=
+ =?utf-8?B?ZnVQMjdoOFVsRU9taE5rUXl5a3hNVmlmMGxKRDQ1SWVweVF5aDhCTjNDMFlh?=
+ =?utf-8?B?ZFA2cUZUNDZOenNKKy9nZEtFM013UGJpM3VvdVNzM0lkMkM0MVNCYVN2bm5u?=
+ =?utf-8?B?TStLSEpvbCt1YjhZMjBCWG9PSU9YL1Y1QUJ2YmtRRUh0eU8wbUFJNHh0MENN?=
+ =?utf-8?B?VlF4ZTZ1djVmQ0hVengyWUR1SjFEZmJUbGN6c3loYW9LNTlSQW1lRFBySkx0?=
+ =?utf-8?B?RU0rbXhhSW5KMTFSZjQ1bXd2WUJMOE8rT1FxaU5Tc2NnQ3Zxem5RQzRlQkJw?=
+ =?utf-8?B?QmdiODZpL0RuUnlDaFJJYVZqUndvZEw3MTgybmNWT3QwbysxQWNYRWlmT0I2?=
+ =?utf-8?B?aExqaVR0RmNrVVhNOHVZbWFBb0x3WUQzTjNReTZwRnJ0eklpanpFc3E3K2ZD?=
+ =?utf-8?B?MnoyKzN5WHFZWGJUSHlCWmYvU05qcUp1cHBVMGJwUzRXZkhCZ0lrVWkrVEJC?=
+ =?utf-8?B?dFBYM0drUjNEaXl4L3FqMlBGNS9rUzlKdDIyenE4eCs4SGVyUnBoOEhGVEkz?=
+ =?utf-8?B?Vm93SjIwazRURHp2TEtaVzNDT1BWNktsMEJWdzcxdlhBSnhqTUVtUEVHVExE?=
+ =?utf-8?B?Q2ZScjBMQVhCR3M1M3VTMExZQklMb2VqN3VVNmpLcHp4V1F0cFo2K29yVHhN?=
+ =?utf-8?B?ZmZ3c01xS05jc1NZc3dzdjYrcVJxeTJFZXlzYlJQd01kMVNVSStzVGRLdWJ3?=
+ =?utf-8?B?VUJ4eWZwMkVLVW5XOE1jVjRqNG16WGZ3NGlySitrZXpJejlCZ3R2eVdkRUlW?=
+ =?utf-8?B?Z3pLM0loc0N5UFdmOG1CaUFmVytiRDRZbU5pSFFOY3BMckdQM0RPeXZoamor?=
+ =?utf-8?B?M1hOQ3RrT3VMYzA2c1dVYjJBYVFLQmpQaEp2bHRMcjlCSnVyV1I2YUhma2JH?=
+ =?utf-8?B?Q2IzNFJWbHBrWWdIRTlPMjJreSs0VzdrWkh3NzZNODBjcFVHVzhHUURkQ2xo?=
+ =?utf-8?B?eE9KTTVocWwzSHRmbVlvby9IQW1oZ2FmMElBQUZZaVI0UXZVU3k0ZHFMSnp3?=
+ =?utf-8?B?bXloTnlPY1hXelpNUnloRGhGTDF2VHIrZmRPZElrWEdsdGEraFlBeExkTW5x?=
+ =?utf-8?B?VGpITWtPdlRON2Q5MGwvK2N0QWg0YTlrRGtDd1dlcjlBNGFLYmFQdEhWVERw?=
+ =?utf-8?B?OGxLWkk0RXFMM241akkra3kwcnJyeldiN0ErSVpIMWVtelZFa2FacWV5c1Rw?=
+ =?utf-8?B?TjNHZ0M0WW92dnRpWFh4SitkZ3FLclhOSHFNMlh4cDZyc2FaMVpBYzNvY0sz?=
+ =?utf-8?B?NlZjdXZDbkV2ZllzdkxLaHBxbmVaMFd1TXJYbndFY1BiUUtPc2ZMNkRzT1Vw?=
+ =?utf-8?B?UlI0SUErYU4wSWgxTW9xS2tmOXM3ZW5YTTc5V01FL05XeWpOSms1c3R6US9Q?=
+ =?utf-8?B?blFkVVpEeHVKaDNKOHBteDlHZGZFdTJPaGswVXB2akZvUjFNbjl5NEhJZG54?=
+ =?utf-8?Q?EQBxgNETajM=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Uko2MmxFOGFKT01oQkNFa3o2ZFRkY3Zob3FJbHhoUDRjUmhwZFc5eFNIYk9q?=
+ =?utf-8?B?dUZvakMvT1M3OHFMaitZbGgyOEtZRVQxekxjT25heGNXbVdrS3Q4TU1NN3ow?=
+ =?utf-8?B?S1FkR1hDZ2UzWG1OYTY4SGEwcmdrUVY4Tnk3YkFqM3FMaXVkNmZuS082Nk1I?=
+ =?utf-8?B?ZUVabXdVQUZPbTFmWUhKdDdaeTc2aXRRNmt0ai8xeUd6dVdIVTAwcmpRd0NQ?=
+ =?utf-8?B?RVVDczJZZzV0M1dGM3k5V29wa212NGhGMkFVcDQ3ZFdNRFVvUE9HN3ZTV1gr?=
+ =?utf-8?B?dWJoai9ObTRZbE50Q3lrMGZYeEZNMzU3Nmh4L010dkFmYytwYzZiZFp1a1hM?=
+ =?utf-8?B?VnJ0Q3k5NUVwNjd0Z1NzY2cxck5XTHdtVDhlKzBNZmM3ZmFDbHNEWWcwcS9q?=
+ =?utf-8?B?SFh3Q2Fwck9hTDlhcUdMRlBSa3htdUxjU1doLzlZbFg2a1BES05NQlJsTTNl?=
+ =?utf-8?B?QUlJSnRqTHhLdHV0UGh6R1h6YmQ3c1ZzVU5aWWlLQlBMbFlqdEFvVm1oZ3BK?=
+ =?utf-8?B?SjdTZ051UlVQalJ0ajhYbHFLclZWemJkbkZOTXk2aXdkT1NxSDN5TmJadC9i?=
+ =?utf-8?B?Nm0yQWY1aGhybkJYbG5CWlNpam41RWRVQ3FUUnhSUFUyeks2Y25vcnFsbFpN?=
+ =?utf-8?B?MWFaTW5nei9BZWNuY0Z4NHlxeDFrRVBOaEZSQ2g2d1JDZ0lRVXUzUGVzOEFD?=
+ =?utf-8?B?bVZPdmFQOUxCOEJvNU1BUWdUSHYvVkFyT3NBYmVMU1lhZWVWQTR0bUNhdFZh?=
+ =?utf-8?B?enFYYlZCekhpMkU0NXJrTkI1UjhkQVZJU0ZwYVpJOGp2ZFZZbUpYNG9GQVZS?=
+ =?utf-8?B?YmxhbXA2TmNWa3hPR09vTzNvcjZOZ2NWWnNlQTdNQjVmZCt6Um1lTW9tUGh1?=
+ =?utf-8?B?MFlTWlF6M2VmczlBY3d0L0JYb0ZxWnBnWUlOd1FaaHhEWHBYUGZSVWZuUno4?=
+ =?utf-8?B?Z2NGVkZJeStOS2hhbUphcDAyVldDUDRQcnlQSnJDS2YweXp0VmVzRzkwcXgr?=
+ =?utf-8?B?ZmpwamV6NGNSZVVacFA2aXU0eHdtN2RUTkRBSFUrUnVMbk1mcTVnMkNKa0lW?=
+ =?utf-8?B?bGQzb1ZURWNYUUtIVTF0RlZzNkZnWlAzRzgyNitaZVVrekF0eG5xLzlyT3lp?=
+ =?utf-8?B?aTByekJheFNYdThhRHVtclhMcys4QVc0UUx2SlU3SGdGNlpwWTJ3UkpXalRV?=
+ =?utf-8?B?V0g1bWx3aFBCYlpralZjZ0VYWllnaTRsVTg0c0tBME4rYWVYcUpDVFRiVjJG?=
+ =?utf-8?B?TE15eGkyeXBhcmFVUWRzSitEb1dCbjcydFB1WnB0czg3Z1l2RGlBclBrZE9S?=
+ =?utf-8?B?RnRQKzFzRGt6cnVmYmhaZ2ZKOENlVUU2MndhaU9CVlo2dFJPRGk4L0lkWUdN?=
+ =?utf-8?B?MzcxcFhicWZLMTlTc3BvVFdTVk1PQU9zV21NdzZ2T0RBbmk4ZjhId2c0cU90?=
+ =?utf-8?B?YmtvVW13cnFCSy9kcmRCYjN1RFBFRzgwWkh5TzJFa0lxTEpnZnhJZjF4cm52?=
+ =?utf-8?B?Q250bThzeWVjaWhWRUJCaWg0Z0pka2s4MkNpd3dORUMzVmdnTkZsSTlYeTRB?=
+ =?utf-8?B?SFE1Tko0NGpzMDdTQXFFYkZnODA2QlVqcW43TEltYmpXUUxIbU1lMlFGSy9D?=
+ =?utf-8?B?V3JxMDFhWURkTEkxMUVZQXRQWFVtK1dZZjJVWlg5dktwZ3FnU282Y2YxZ1Fm?=
+ =?utf-8?B?ZTlmNjMrVVUwcEVVVDdzYmlRaDdXWjJKaVlrWWhvUFRRQUIwVWJNaXlnbjZL?=
+ =?utf-8?B?R2cycXh0eHVPaTdwYklrK3lLby9DMXI3Nmp5d2Rkb3lUZVA0TGJzTTk3dFNV?=
+ =?utf-8?B?V3JrZXZpWjdBMEJ2U3ZrQXd0MncxOVlqNERiTmxxOXFUQzNHVWNpankrZVFE?=
+ =?utf-8?B?WkErbzRiZ3Z6M1UrVUloOHNKN1V2WDlMWWZROUhEQTBVZDZpc2hTMzE3b3pI?=
+ =?utf-8?B?OC93UzV1VnF2ZUVvajhRdnRLN3BFVFlCMnBFK0VHZ1BuUjlBeG9LOTJ2RlZO?=
+ =?utf-8?B?UUp0MXZ6V0hYc3I0NTg0RXBvQXZmYUtLa05NSGN0YytBS05aZTczaVRxdDVw?=
+ =?utf-8?B?ODNpdXJCMzV2dEZGdFlZYnZZNGhRVGFvM0JHcFdvY09oblYzT1hCbW0rY29x?=
+ =?utf-8?B?UDM3RlV3SHRXZWdJQVdNLzJlRyt1S2hCTjdKdjM5SmV2MkQ1aHlwT04vZHZB?=
+ =?utf-8?B?S2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9249b03-2eca-49fe-27a0-08ddf77c854d
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6537.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ef9dc595-e7ea-47b7-5ee1-08ddf77c10e6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2025 12:57:18.7717
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2025 13:00:34.3249
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: P2wiBau1n00bp5LIpcrIuvJVWeUl6UViZmRvrMG1iNPeHoyQ62+VhGxP5+ZvPIUBzSf8SzJLitKJjB+Skdpysg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5044
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CH5aTc1zpvsd08EF62DL3mA9kH3hZjVPuGtkAaf91R3snaQ3aHibVxz9ZhDcYuul+QOD9ijkCUsv4QtxtOUWZSAz8eKTi2WOEw3U5IHyw6c=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6549
 X-OriginatorOrg: intel.com
-Content-Transfer-Encoding: base64
 
-SGVsbG8NClBsZWFzZSBzZWUgbXkgY29tbWVudCBhdCB0aGUgZW5kIG9mIHRoaXMgdGhyZWFkLg0K
-DQpBdmkgU2hhbGV2DQppMjI2IGRlc2lnbiB0ZWFtDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0t
-LS0tDQpGcm9tOiBWYWRpbSBGZWRvcmVua28gPHZhZGltLmZlZG9yZW5rb0BsaW51eC5kZXY+IA0K
-U2VudDogRnJpZGF5LCBTZXB0ZW1iZXIgMTksIDIwMjUgMTo1NiBQTQ0KVG86IENob29uZywgQ2h3
-ZWUgTGluIDxjaHdlZS5saW4uY2hvb25nQGludGVsLmNvbT47IEtlbGxlciwgSmFjb2IgRSA8amFj
-b2IuZS5rZWxsZXJAaW50ZWwuY29tPjsgTmd1eWVuLCBBbnRob255IEwgPGFudGhvbnkubC5uZ3V5
-ZW5AaW50ZWwuY29tPjsgS2l0c3plbCwgUHJ6ZW15c2xhdyA8cHJ6ZW15c2xhdy5raXRzemVsQGlu
-dGVsLmNvbT47IEFuZHJldyBMdW5uIDxhbmRyZXcrbmV0ZGV2QGx1bm4uY2g+OyBEYXZpZCBTIC4g
-TWlsbGVyIDxkYXZlbUBkYXZlbWxvZnQubmV0PjsgRXJpYyBEdW1hemV0IDxlZHVtYXpldEBnb29n
-bGUuY29tPjsgSmFrdWIgS2ljaW5za2kgPGt1YmFAa2VybmVsLm9yZz47IFBhb2xvIEFiZW5pIDxw
-YWJlbmlAcmVkaGF0LmNvbT47IFJpY2hhcmQgQ29jaHJhbiA8cmljaGFyZGNvY2hyYW5AZ21haWwu
-Y29tPjsgR29tZXMsIFZpbmljaXVzIDx2aW5pY2l1cy5nb21lc0BpbnRlbC5jb20+DQpDYzogaW50
-ZWwtd2lyZWQtbGFuQGxpc3RzLm9zdW9zbC5vcmc7IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7IGxp
-bnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IFNoYWxldiwgQXZpIDxhdmkuc2hhbGV2QGludGVs
-LmNvbT47IFNvbmcsIFlvb25nIFNpYW5nIDx5b29uZy5zaWFuZy5zb25nQGludGVsLmNvbT4NClN1
-YmplY3Q6IFJlOiBbSW50ZWwtd2lyZWQtbGFuXSBbUEFUQ0ggaXdsLW5ldCB2MV0gaWdjOiBmaXgg
-cmFjZSBjb25kaXRpb24gaW4gVFggdGltZXN0YW1wIHJlYWQgZm9yIHJlZ2lzdGVyIDANCg0KT24g
-MTkvMDkvMjAyNSAwODoxNywgQ2hvb25nLCBDaHdlZSBMaW4gd3JvdGU6DQo+IA0KPiBPbiBGcmlk
-YXksIFNlcHRlbWJlciAxOSwgMjAyNSA2OjExIEFNLCBLZWxsZXIsIEphY29iIEUgPGphY29iLmUu
-a2VsbGVyQGludGVsLmNvbT4gd3JvdGU6DQo+PiBPbiA5LzE4LzIwMjUgMTo0NyBQTSwgVmFkaW0g
-RmVkb3JlbmtvIHdyb3RlOg0KPj4+IE9uIDE4LzA5LzIwMjUgMTk6MzgsIENod2VlLUxpbiBDaG9v
-bmcgd3JvdGU6DQo+Pj4+IFRoZSBjdXJyZW50IEhXIGJ1ZyB3b3JrYXJvdW5kIGNoZWNrcyB0aGUg
-VFhUVF8wIHJlYWR5IGJpdCBmaXJzdCwgDQo+Pj4+IHRoZW4gcmVhZHMgTE9XIC0+IEhJR0ggLT4g
-TE9XIGZyb20gcmVnaXN0ZXIgMCB0byBkZXRlY3QgaWYgYSANCj4+Pj4gdGltZXN0YW1wIHdhcyBj
-YXB0dXJlZC4NCj4+Pj4NCj4+Pj4gVGhpcyBzZXF1ZW5jZSBoYXMgYSByYWNlOiBpZiBhIG5ldyB0
-aW1lc3RhbXAgaXMgbGF0Y2hlZCBhZnRlciANCj4+Pj4gcmVhZGluZyB0aGUgVFhUVCBtYXNrIGJ1
-dCBiZWZvcmUgdGhlIGZpcnN0IExPVyByZWFkLCBib3RoIG9sZCBhbmQgDQo+Pj4+IG5ldyB0aW1l
-c3RhbXAgbWF0Y2gsIGNhdXNpbmcgdGhlIGRyaXZlciB0byBkcm9wIGEgdmFsaWQgdGltZXN0YW1w
-Lg0KPj4+Pg0KPj4+PiBGaXggYnkgcmVhZGluZyB0aGUgTE9XIHJlZ2lzdGVyIGZpcnN0LCB0aGVu
-IHRoZSBUWFRUIG1hc2ssIHNvIGEgDQo+Pj4+IG5ld2x5IGxhdGNoZWQgdGltZXN0YW1wIHdpbGwg
-YWx3YXlzIGJlIGRldGVjdGVkLg0KPj4+Pg0KPj4+PiBUaGlzIGZpeCBhbHNvIHByZXZlbnRzIFRY
-IHVuaXQgaGFuZ3Mgb2JzZXJ2ZWQgdW5kZXIgaGVhdnkgDQo+Pj4+IHRpbWVzdGFtcGluZyBsb2Fk
-Lg0KPj4+Pg0KPj4+PiBGaXhlczogYzc4OWFkN2NiZWJjICgiaWdjOiBXb3JrIGFyb3VuZCBIVyBi
-dWcgY2F1c2luZyBtaXNzaW5nDQo+Pj4+IHRpbWVzdGFtcHMiKQ0KPj4+PiBTdWdnZXN0ZWQtYnk6
-IEF2aSBTaGFsZXYgPGF2aS5zaGFsZXZAaW50ZWwuY29tPg0KPj4+PiBTaWduZWQtb2ZmLWJ5OiBT
-b25nIFlvb25nIFNpYW5nIDx5b29uZy5zaWFuZy5zb25nQGludGVsLmNvbT4NCj4+Pj4gU2lnbmVk
-LW9mZi1ieTogQ2h3ZWUtTGluIENob29uZyA8Y2h3ZWUubGluLmNob29uZ0BpbnRlbC5jb20+DQo+
-Pj4+IC0tLQ0KPj4+PiAgICBkcml2ZXJzL25ldC9ldGhlcm5ldC9pbnRlbC9pZ2MvaWdjX3B0cC5j
-IHwgMTAgKysrKysrKystLQ0KPj4+PiAgICAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCsp
-LCAyIGRlbGV0aW9ucygtKQ0KPj4+Pg0KPj4+DQo+Pj4gWy4uLl0NCj4+Pg0KPj4+PiAgICAJCSAq
-IHRpbWVzdGFtcCB3YXMgY2FwdHVyZWQsIHdlIGNhbiByZWFkIHRoZSAiaGlnaCINCj4+Pj4gICAg
-CQkgKiByZWdpc3RlciBhZ2Fpbi4NCj4+Pj4gICAgCQkgKi8NCj4+Pg0KPj4+IFRoaXMgY29tbWVu
-dCBiZWdpbnMgd2l0aCAncmVhZCB0aGUgImhpZ2giIHJlZ2lzdGVyICh0byBsYXRjaCBhIG5ldyAN
-Cj4+PiB0aW1lc3RhbXApJyAuLi4NCj4+Pg0KPj4+PiAtCQl1MzIgdHhzdG1wbF9vbGQsIHR4c3Rt
-cGxfbmV3Ow0KPj4+PiArCQl1MzIgdHhzdG1wbF9uZXc7DQo+Pj4+DQo+Pj4+IC0JCXR4c3RtcGxf
-b2xkID0gcmQzMihJR0NfVFhTVE1QTCk7DQo+Pj4+ICAgIAkJcmQzMihJR0NfVFhTVE1QSCk7DQo+
-Pj4+ICAgIAkJdHhzdG1wbF9uZXcgPSByZDMyKElHQ19UWFNUTVBMKTsNCj4+Pg0KPj4+IGFuZCBh
-IGNvdXBsZSBvZiBsaW5lcyBsYXRlciBpbiB0aGlzIGZ1bmN0aW9uIHlvdSBoYXZlDQo+Pj4NCj4+
-PiAJCXJlZ3ZhbCA9IHR4c3RtcGxfbmV3Ow0KPj4+IAkJcmVndmFsIHw9ICh1NjQpcmQzMihJR0Nf
-VFhTVE1QSCkgPDwgMzI7DQo+Pj4NCj4+PiBBY2NvcmRpbmcgdG8gdGhlIGNvbW1lbnQgYWJvdmUs
-IHRoZSB2YWx1ZSBpbiB0aGUgcmVnaXN0ZXIgd2lsbCBiZSANCj4+PiBsYXRjaGVkIGFmdGVyIHJl
-YWRpbmcgSUdDX1RYU1RNUEguIEFzIHRoZXJlIHdpbGwgYmUgbm8gcmVhZCBvZiAibG93Ig0KPj4+
-IHBhcnQgb2YgdGhlIHJlZ2lzdGVyLCBpdCB3aWxsIHN0YXkgbGF0Y2hlZCB3aXRoIG9sZCB2YWx1
-ZSB1bnRpbCB0aGUgDQo+Pj4gbmV4dCBjYWxsIHRvIHRoZSBzYW1lIGZ1bmN0aW9uLiBDb3VsZCBp
-dCBiZSB0aGUgcmVhc29uIG9mIHVuaXQgaGFuZ3M/DQo+Pj4NCj4+PiBJdCBsb29rcyBsaWtlIHRo
-ZSB2YWx1ZSBvZiBwcmV2aW91cyByZWFkIG9mIElHQ19UWFNUTVBIIHNob3VsZCBiZSANCj4+PiBz
-dG9yZWQgYW5kIHVzZWQgdG8gY29uc3RydWN0IG5ldyB0aW1lc3RhbXAsIHJpZ2h0Pw0KPj4+DQo+
-Pg0KPj4gSSB3b3VsZG4ndCB0cnVzdCB0aGUgY29tbWVudCwgYnV0IGluc3RlYWQgZG91YmxlIGNo
-ZWNrIHRoZSBkYXRhIHNoZWV0cy4NCj4+IFVuZm9ydHVuYXRlbHksIEkgZG9uJ3Qgc2VlbSB0byBo
-YXZlIGEgY29weSBvZiB0aGUgaWdjIGhhcmR3YXJlIGRhdGEgDQo+PiBzaGVldCBoYW5keSA6KA0K
-Pj4NCj4+IFRoYW5rcywNCj4+IEpha2UNCj4gDQo+IEZsb3cgYmVmb3JlIHRoaXMgcGF0Y2g6DQo+
-IAkxLiBSZWFkIHRoZSBUWFRUIGJpdHMgaW50byBtYXNrDQo+IAkyLiBpZiBUWFRUXzAgPT0gMCwg
-Z28gdG8gd29ya2Fyb3VuZCAtPklmIGF0IHRoaXMgcG9pbnQgcmVnaXN0ZXIgMCBjYXB0dXJlcyBU
-WCB0aW1lc3RhbXAsIGFuZCBUWFRUXzAgaXMgc2V0IGJ1dCB3ZSB0aGluayBpdCBpcyAwLg0KPiAJ
-My4gUmVhZCBMT1cgdG8gT0xEDQo+IAk0LiBSZWFkIEhJR0gg4oCTIHRoaXMgY2xlYXJzIHRoZSBU
-WFRUXzANCj4gCTUuIFJlYWQgTE9XIGFnYWluICwgbm93IHRvIE5FVy4NCj4gCTYuIE5FVz09T0xE
-LCBzbyB0aGUgdGltZXN0YW1wIGlzIGRpc2NhcmRlZCAtPiBjYXVzaW5nIHRpbWVzdGFtcCANCj4g
-dGltZW91dA0KPiAgIA0KPiBGbG93IGFmdGVyIHRoaXMgcGF0Y2g6DQo+IAkxLiBSZWFkIExPVyB0
-byBPTEQNCj4gCTIuIFJlYWQgdGhlIFRYVFQgYml0cyBpbnRvIG1hc2sNCj4gCTMuIGlmIFRYVFRf
-MCA9PSAwLCBnbyB0byB3b3JrYXJvdW5kIC0+IElmIGF0IHRoaXMgcG9pbnQgcmVnaXN0ZXIgMCBj
-YXB0dXJlcyBUWCB0aW1lc3RhbXAsIGFuZCBUWFRUXzAgaXMgc2V0IGJ1dCB3ZSB0aGluayBpdCBp
-cyAwLg0KPiAJNC4gUmVhZCBISUdIIOKAkyB0aGlzIGNsZWFycyB0aGUgVFhUVF8wDQo+IAk1LiBS
-ZWFkIExPVyBhZ2FpbiAsIG5vdyB0byBORVcuDQo+IAk2LiBORVchPU9MRCwgc28gd2UgZGV0ZWN0
-IHRoaXMgaXMgYSB2YWxpZCB0aW1lc3RhbXANCj4gICAgICAgICAgICAgICAgNy4gUmVhZCBISUdI
-IGFnYWluIGFuZCB1c2UgdGhlIHRpbWVzdGFtcA0KPiANCj4gTGV0IG1lIGtub3cgaWYgdGhpcyBh
-ZGRyZXNzIHlvdXIgcXVlc3Rpb25zPw0KDQo+IFVuZm9ydHVuYXRlbHksIGl0IGRvZXNuJ3QuIFRo
-ZSBxdWVzdGlvbiBpcyAid2hhdCB3aWxsIGhhcHBlbiB0byByZWdpc3RlciBhZnRlciBzdGVwIDc/
-IiBUaGUgY29tbWVudCBhYm92ZSBzYXlzIGl0IHdpbGwgc3RheSBsYXRjaGVkIHVudGlsIExPVyBp
-cyByZWFkLCB3aWxsIGl0IGFmZmVjdCBwZXJmb3JtYW5jZS9zdGFiaWxpdHk/DQoNCltBdmldIFRo
-ZSBsb3cgYW5kIGhpZ2ggYXJlIGxhdGNoZWQgd2hlbiBhIHBhY2tldCAod2l0aCBhIHRpbWUgc3Rh
-bXAgYml0IHNldCBpbiB0aGUgZGVzY3JpcHRvciApIHdhcyB0cmFuc21pdHRlZC4gDQpUaGV5IHdp
-bGwgbm90IGNoYW5nZSB1bnRpbCBuZXh0IHRpbWUgU1cgd2lsbCBzZW5kIGEgbmV3IHBhY2tldCB3
-aXRoIGEgdGltZSBzdGFtcCBiaXQgc2V0IGluIHRoZSBkZXNjcmlwdG9yIGZvciB0aGlzIHRpbWVz
-dGFtcCByZWdpc3RlciAoMSBvZiA0KS4NCldoZW4gYSB0aW1lc3RhbXAgaXMgbGF0Y2hlZCwgdGhl
-IGFzc29jaWF0ZWQgVFhUVF8qIGJpdCBpcyBzZXQgYW5kIGludGVycnVwdCBldmVudCBiaXQgaXMg
-c2V0IChUU0lDUi5UWFRTKSAuDQpSZWFkaW5nIHRoZSBoaWdoIHBhcnQgb2YgYSB0aW1lc3RhbXAg
-cmVnaXN0ZXIgY2xlYXJzIHRoZSBhc3NvY2lhdGVkIFRYVFRfKiBiaXQuDQpUaGUgSFcgYnVnIGlz
-IHRoYXQgVFhTVE1QSF8wIChzcGVjaWZpY2FsbHkpIG11c3QgYmUgcmVhZCBhcyBwYXJ0IG9mIHRo
-ZSBpbnRlcnJ1cHQgcm91dGluZSwgb3RoZXJ3aXNlIHRoZSBpbnRlcnJ1cHQgZXZlbnQgYml0IChU
-U0lDUi5UWFRTKSB3aWxsIG5vdCBiZSBzZXQgYWdhaW4uDQoNClRoZSBwcm9ibGVtIGlzIGhvdyB0
-byBrbm93IGlmIFRYU1RNUEgvTF8wIGNvbnRhaW4gYSBuZXcgdmFsaWQgdGltZXN0YW1wIG9yIGl0
-IGlzIGFuIG9sZCB2YWx1ZSB0aGF0IHdhcyBhbHJlYWR5IHJlYWQuDQpJZiAgVFhUVF8wIGlzIDEs
-IFRYU1RNUEgvTF8wIGNvbnRhaW4gYSBuZXcgdmFsaWQgdGltZXN0YW1wLiBUaGlzIHBhcnQgaXMg
-c2ltcGxlLg0KSWYgIFRYVFRfMCBpcyAwLCBhbmQgdGhlbiB3ZSByZWFkIFRYU1RNUEhfMCwgd2Ug
-Y2FuJ3QgYXNzdW1lIHRoYXQgaXQgaXMgb2xkIGJlY2F1c2UgaXQgaXMgcG9zc2libGUgdGhhdCBh
-IG5ldyB0aW1lc3RhbXAgd2FzIGxhdGNoZWQgYmV0d2VlbiByZWFkaW5nIFRYVFRfMCBhbmQgcmVh
-ZGluZyBUWFNUTVBIXzAuDQoNClRoZSAiYmVmb3JlIiBjb2RlIGlzIGEgd29ya2Fyb3VuZCBmb3Ig
-dGhpcyBIVyBidWcuIFRoZSBXL0Egd2FzIG5vdCBwZXJmZWN0IGhlbmNlIHRoZSBuZXcgcGF0Y2gg
-aXMgaW50ZW5kZWQgdG8gZml4IGl0Lg0KVGhlIG9yaWdpbmFsIFcvQSB3YXMgc29sdmluZyB0aGUg
-Y2FzZSB3aGVyZSBhIG5ldyB0aW1lc3RhbXAgd2FzIGNhcHR1cmVkIGJldHdlZW4gc3RlcHMgMyBh
-bmQgNC4NClRoZSBwcm9ibGVtIHdpdGggdGhlIG9yaWdpbmFsIFcvQSBpcyBpbiBjYXNlIHRoZSBu
-ZXcgdGltZXN0YW1wIGlzIGNhcHR1cmVkIGJldHdlZW4gc3RlcHMgMiBhbmQgMy4NCg0KVGhlIHBh
-dGNoIGNvbWVzIHRvIHNvbHZlIHRoaXMgbmV3IHJhY2UgY29uZGl0aW9uLg0KDQpUaGUgZXJyYXRh
-IHdvcmRpbmcgYW5kIFcvQSBhcmUgZ2l2ZW4gYmVsb3cuDQpUaGUgbmV3IHBhdGNoIGlzIGp1c3Qg
-YXNraW5nIHRvIGNoYW5nZSB0aGUgb3JkZXIgYW5kIHJlYWQgVFhTVE1QTF8wIGJlZm9yZSBSZWFk
-IFRYVFRfMC0zIChpbiBUU1lOQ1RYQ1RMKSwgdG8gc29sdmUgdGhlIG5ldyBjb3JuZXIgY2FzZS4N
-Cg0KSTIyNiBlcnJhdGEgKG5lZWQgdG8gdXBkYXRlIHdpdGggdGhpcyBjaGFuZ2UpOg0KMTU4OCBQ
-VFA6IFRyYW5zbWl0IHRpbWVzdGFtcCBpbnRlcnJ1cHQgY2FuIGJlIG1pc3NlZA0KUHJvYmxlbTog
-V2hlbiB0cmFuc21pdCB0aW1lc3RhbXAgaXMgY2FwdHVyZWQgaW4gb25lIG9mIHRoZSB0cmFuc21p
-dCB0aW1lc3RhbXAgcmVnaXN0ZXJzIFRYU1RNUEgvTDAtMyAob2Zmc2V0cyAweEI2MTgg4oCTIDB4
-QjZEQyksIGFuIGludGVycnVwdCBpcyByYWlzZWQgKFRTSUNSLlRYVFMpLiBPbmNlIFNXIHJlYWRz
-IHRoZSB1cGRhdGVkIHRpbWVzdGFtcCBhY2NvcmRpbmcgdG8gb25lIChvciBtb3JlKSBvZiBUWFRU
-XzAtMyBhc3NlcnRlZCBpbiBUU1lOQ1RYQ1RMIChvZmZzZXQgMHhCNjE0LCBiaXRzIDM6MCksIGFu
-ZCBjbGVhcnMgdGhlIGludGVycnVwdCwgaXQgaXMgZXhwZWN0ZWQgdGhhdCBhIG5ldyB0aW1lc3Rh
-bXAgY2FwdHVyZSB3aWxsIGFzc2VydCB0aGUgaW50ZXJydXB0IGJpdCBhZ2Fpbi4gSG93ZXZlciwg
-dGhlIG5ldyBpbnRlcnJ1cHQgd2lsbCBhc3NlcnQgb25seSBpZiBTVyByZWFkcyBUWFNUTVBIXzAg
-c3BlY2lmaWNhbGx5LCBhcyBwYXJ0IG9mIHRoZSBpbnRlcnJ1cHQgaGFuZGxlciAoZXZlbiBpZiBU
-WFRUXzAgaXMgbm90IHNldCkuDQpJbXBsaWNhdGlvbnM6DQpUaW1lc3RhbXAgaW50ZXJydXB0cyBt
-YXkgYmUgbWlzc2VkDQpXb3JrYXJvdW5kOg0KQSBzaW1wbGUgVy9BIHRvIGFsd2F5cyByZWFkIFRY
-U1RNUEhfMCAob2Zmc2V0IDB4QjYxQykgaW4gdGhlIGludGVycnVwdCBoYW5kbGVyIGlzIG5vdCBn
-b29kIGVub3VnaCBkdWUgdG8gcG9zc2libGUgcmFjZSBjb25kaXRpb24gc2luY2UgaXQgYWxzbyBj
-bGVhcnMgVFhUVF8wLCBhbmQgcG90ZW50aWFsbHkgbWlzc2luZyBhIHRpbWVzdGFtcCB0aGF0IHdh
-cyBqdXN0IGNhcHR1cmVkIGluIFRYU1RNUEgvTF8wLiBUaGlzIHNpbXBsZSBXL0EgY2FuIHdvcmsg
-aWYgVFhTVE1QSC9MXzAgaXMgbmV2ZXIgdXNlZCwgYW5kIG9ubHkgVFhTVE1QSC9MXzEtMyBhcmUg
-dXNlZC4NCklmIGFsbCBmb3VyIHRpbWVzdGFtcCByZWdpc3RlcnMgYXJlIHJlcXVpcmVkLCBTVyBj
-YW4gZGV0ZWN0IHRoZSByYWNlIGNvbmRpdGlvbiBtZW50aW9uZWQgYWJvdmUgYnkga2VlcGluZyBh
-IHJlY29yZCBvZiBUWFNUTVBMXzAgKG9mZnNldCAweEI2MTgpIGJlZm9yZSByZWFkaW5nIFRYU1RN
-UEhfMC4gU28gdGhlIGludGVycnVwdCBoYW5kbGVyIHNob3VsZCBkbyB0aGUgZm9sbG93aW5nOg0K
-UmVhZCBUWFRUXzAtMyAoaW4gVFNZTkNUWENUTCkgdG8gc2VlIHdoaWNoIHRpbWVzdGFtcCByZWdp
-c3RlcnMgd2VyZSB1cGRhdGVkLg0KUmVhZCB0aGUgdGltZXN0YW1wIHJlZ2lzdGVycyBhY2NvcmRp
-bmcgdG8gVFhUVF8wLTMuDQpJZiBUWFRUXzAgd2FzIG5vdCBzZXQ6DQotIFJlYWQgVFhTVE1QTF8w
-IChzdWItc2Vjb25kIHBhcnQgb2YgdGltZXN0YW1wIDApLCBhbmQga2VlcCBhIHJlY29yZCBvZiBp
-dC4NCi0gUmVhZCBUWFNUTVBIXzAgdG8gVy9BIHRoaXMgaXNzdWUtDQotIFJlYWQgVFhTVE1QTF8w
-IGFnYWluLiBJZiBpdCBpcyBkaWZmZXJlbnQgZnJvbSBiZWZvcmUsIGl0IGluZGljYXRlcyB0aGF0
-IGEgbmV3IHRpbWVzdGFtcCB3YXMganVzdCBjYXB0dXJlZCBpbiBUWFNUTVBIL0xfMC4gUmVhZCBU
-WFNUTVBIXzAgYXMgd2VsbCBhbmQgdXNlIGl0Lg0KDQoNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpJbnRlbCBJc3Jh
-ZWwgKDc0KSBMaW1pdGVkCgpUaGlzIGUtbWFpbCBhbmQgYW55IGF0dGFjaG1lbnRzIG1heSBjb250
-YWluIGNvbmZpZGVudGlhbCBtYXRlcmlhbCBmb3IKdGhlIHNvbGUgdXNlIG9mIHRoZSBpbnRlbmRl
-ZCByZWNpcGllbnQocykuIEFueSByZXZpZXcgb3IgZGlzdHJpYnV0aW9uCmJ5IG90aGVycyBpcyBz
-dHJpY3RseSBwcm9oaWJpdGVkLiBJZiB5b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQKcmVjaXBpZW50
-LCBwbGVhc2UgY29udGFjdCB0aGUgc2VuZGVyIGFuZCBkZWxldGUgYWxsIGNvcGllcy4K
+On 9/19/25 03:48, Xuan Zhuo wrote:
+> Add a driver framework for EEA that will be available in the future.
+> 
+> This driver is currently quite minimal, implementing only fundamental
+> core functionalities. Key features include: I/O queue management via
+> adminq, basic PCI-layer operations, and essential RX/TX data
+> communication capabilities. It also supports the creation,
+> initialization, and management of network devices (netdev). Furthermore,
+> the ring structures for both I/O queues and adminq have been abstracted
+> into a simple, unified, and reusable library implementation,
+> facilitating future extension and maintenance.
+> 
+> This commit is indeed quite large, but further splitting it would not be
+> meaningful. Historically, many similar drivers have been introduced with
+> commits of similar size and scope, so we chose not to invest excessive
+> effort into finer-grained splitting.
+> 
+> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+> Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
+if, by any chance, there were more than you developing this
+driver, it is the best moment to give some credit via Co-developed-by
+tags to major contributors
+
+please find my feedback inline, sorry for it being in random places,
+otherwise it would take a whole day
+(but please apply fix for each type of issue per whole series)
+
+> ---
+> 
+> v3: Thanks for the comments from Paolo Abenchi
+> v2: Thanks for the comments from Simon Horman and Andrew Lunn
+> v1: Thanks for the comments from Simon Horman and Andrew Lunn
+> 
+>   MAINTAINERS                                   |   8 +
+>   drivers/net/ethernet/Kconfig                  |   1 +
+>   drivers/net/ethernet/Makefile                 |   1 +
+>   drivers/net/ethernet/alibaba/Kconfig          |  29 +
+>   drivers/net/ethernet/alibaba/Makefile         |   5 +
+>   drivers/net/ethernet/alibaba/eea/Makefile     |   9 +
+>   drivers/net/ethernet/alibaba/eea/eea_adminq.c | 452 ++++++++++
+>   drivers/net/ethernet/alibaba/eea/eea_adminq.h |  70 ++
+>   drivers/net/ethernet/alibaba/eea/eea_desc.h   | 155 ++++
+>   .../net/ethernet/alibaba/eea/eea_ethtool.c    | 310 +++++++
+>   .../net/ethernet/alibaba/eea/eea_ethtool.h    |  51 ++
+>   drivers/net/ethernet/alibaba/eea/eea_net.c    | 575 +++++++++++++
+>   drivers/net/ethernet/alibaba/eea/eea_net.h    | 196 +++++
+>   drivers/net/ethernet/alibaba/eea/eea_pci.c    | 574 +++++++++++++
+>   drivers/net/ethernet/alibaba/eea/eea_pci.h    |  67 ++
+>   drivers/net/ethernet/alibaba/eea/eea_ring.c   | 267 ++++++
+>   drivers/net/ethernet/alibaba/eea/eea_ring.h   |  89 ++
+>   drivers/net/ethernet/alibaba/eea/eea_rx.c     | 784 ++++++++++++++++++
+>   drivers/net/ethernet/alibaba/eea/eea_tx.c     | 405 +++++++++
+>   19 files changed, 4048 insertions(+)
+>   create mode 100644 drivers/net/ethernet/alibaba/Kconfig
+>   create mode 100644 drivers/net/ethernet/alibaba/Makefile
+>   create mode 100644 drivers/net/ethernet/alibaba/eea/Makefile
+>   create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.c
+>   create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.h
+>   create mode 100644 drivers/net/ethernet/alibaba/eea/eea_desc.h
+>   create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.c
+>   create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.h
+>   create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.c
+>   create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.h
+>   create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.c
+>   create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.h
+>   create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.c
+>   create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.h
+>   create mode 100644 drivers/net/ethernet/alibaba/eea/eea_rx.c
+>   create mode 100644 drivers/net/ethernet/alibaba/eea/eea_tx.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index a8a770714101..9ffc6a753842 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -789,6 +789,14 @@ S:	Maintained
+>   F:	Documentation/i2c/busses/i2c-ali1563.rst
+>   F:	drivers/i2c/busses/i2c-ali1563.c
+> 
+> +ALIBABA ELASTIC ETHERNET ADAPTOR DRIVER
+> +M:	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> +M:	Wen Gu <guwen@linux.alibaba.com>
+> +R:	Philo Lu <lulie@linux.alibaba.com>
+> +L:	netdev@vger.kernel.org
+> +S:	Supported
+
+this is reserved for companies that run netdev-ci tests on their HW
+
+> +F:	drivers/net/ethernet/alibaba/eea
+> +
+>   ALIBABA ELASTIC RDMA DRIVER
+>   M:	Cheng Xu <chengyou@linux.alibaba.com>
+>   M:	Kai Shen <kaishen@linux.alibaba.com>
+> diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+> index aead145dd91d..307c68a4fd53 100644
+> --- a/drivers/net/ethernet/Kconfig
+> +++ b/drivers/net/ethernet/Kconfig
+> @@ -22,6 +22,7 @@ source "drivers/net/ethernet/aeroflex/Kconfig"
+>   source "drivers/net/ethernet/agere/Kconfig"
+>   source "drivers/net/ethernet/airoha/Kconfig"
+>   source "drivers/net/ethernet/alacritech/Kconfig"
+> +source "drivers/net/ethernet/alibaba/Kconfig"
+>   source "drivers/net/ethernet/allwinner/Kconfig"
+>   source "drivers/net/ethernet/alteon/Kconfig"
+>   source "drivers/net/ethernet/altera/Kconfig"
+> diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
+> index 998dd628b202..358d88613cf4 100644
+> --- a/drivers/net/ethernet/Makefile
+> +++ b/drivers/net/ethernet/Makefile
+> @@ -12,6 +12,7 @@ obj-$(CONFIG_NET_VENDOR_ADI) += adi/
+>   obj-$(CONFIG_NET_VENDOR_AGERE) += agere/
+>   obj-$(CONFIG_NET_VENDOR_AIROHA) += airoha/
+>   obj-$(CONFIG_NET_VENDOR_ALACRITECH) += alacritech/
+> +obj-$(CONFIG_NET_VENDOR_ALIBABA) += alibaba/
+>   obj-$(CONFIG_NET_VENDOR_ALLWINNER) += allwinner/
+>   obj-$(CONFIG_NET_VENDOR_ALTEON) += alteon/
+>   obj-$(CONFIG_ALTERA_TSE) += altera/
+> diff --git a/drivers/net/ethernet/alibaba/Kconfig b/drivers/net/ethernet/alibaba/Kconfig
+> new file mode 100644
+> index 000000000000..4040666ce129
+> --- /dev/null
+> +++ b/drivers/net/ethernet/alibaba/Kconfig
+> @@ -0,0 +1,29 @@
+> +#
+> +# Alibaba network device configuration
+> +#
+> +
+> +config NET_VENDOR_ALIBABA
+> +	bool "Alibaba Devices"
+> +	default y
+> +	help
+> +	  If you have a network (Ethernet) device belonging to this class, say Y.
+> +
+> +	  Note that the answer to this question doesn't directly affect the
+
+I would say it does (at least with your proposed `default m` below)
+
+> +	  kernel: saying N will just cause the configurator to skip all
+> +	  the questions about Alibaba devices. If you say Y, you will be asked
+> +	  for your specific device in the following questions.
+> +
+> +if NET_VENDOR_ALIBABA
+> +
+> +config EEA
+> +	tristate "Alibaba Elastic Ethernet Adaptor support"
+> +	depends on PCI_MSI
+> +	depends on 64BIT
+> +	select PAGE_POOL
+> +	default m
+> +	help
+> +	  This driver supports Alibaba Elastic Ethernet Adaptor"
+> +
+> +	  To compile this driver as a module, choose M here.
+> +
+> +endif #NET_VENDOR_ALIBABA
+> diff --git a/drivers/net/ethernet/alibaba/Makefile b/drivers/net/ethernet/alibaba/Makefile
+> new file mode 100644
+> index 000000000000..7980525cb086
+> --- /dev/null
+> +++ b/drivers/net/ethernet/alibaba/Makefile
+> @@ -0,0 +1,5 @@
+> +#
+> +# Makefile for the Alibaba network device drivers.
+> +#
+> +
+> +obj-$(CONFIG_EEA) += eea/
+> diff --git a/drivers/net/ethernet/alibaba/eea/Makefile b/drivers/net/ethernet/alibaba/eea/Makefile
+> new file mode 100644
+> index 000000000000..bf2dad05e09a
+> --- /dev/null
+> +++ b/drivers/net/ethernet/alibaba/eea/Makefile
+> @@ -0,0 +1,9 @@
+> +
+> +obj-$(CONFIG_EEA) += eea.o
+> +eea-objs := eea_ring.o \
+
+eea-y := ...
+as *-objs suffix is reserved rather for (user-space) host programs while
+     usually *-y suffix is used for kernel drivers (although *-objs works
+     for that purpose for now).
+
+would be also good to start with this (and other, like #includes) lists
+sorted
+
+> +	eea_net.o \
+> +	eea_pci.o \
+> +	eea_adminq.o \
+> +	eea_ethtool.o \
+> +	eea_tx.o \
+> +	eea_rx.o
+> diff --git a/drivers/net/ethernet/alibaba/eea/eea_adminq.c b/drivers/net/ethernet/alibaba/eea/eea_adminq.c
+> new file mode 100644
+> index 000000000000..625dd27bfb5d
+> --- /dev/null
+> +++ b/drivers/net/ethernet/alibaba/eea/eea_adminq.c
+> @@ -0,0 +1,452 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * Driver for Alibaba Elastic Ethernet Adaptor.
+> + *
+> + * Copyright (C) 2025 Alibaba Inc.
+> + */
+> +
+> +#include <linux/etherdevice.h>
+> +#include <linux/utsname.h>
+> +#include <linux/iopoll.h>
+> +#include <linux/version.h>
+
+would be great to sort includes
+BTW, do you need version.h? (IWYU, but not more)
+
+> +
+> +#include "eea_net.h"
+> +#include "eea_ring.h"
+> +#include "eea_adminq.h"
+> +#include "eea_pci.h"
+> +
+> +#define EEA_AQ_CMD_CFG_QUERY         ((0 << 8) | 0)
+> +
+> +#define EEA_AQ_CMD_QUEUE_CREATE      ((1 << 8) | 0)
+> +#define EEA_AQ_CMD_QUEUE_DESTROY_ALL ((1 << 8) | 1)
+> +#define EEA_AQ_CMD_QUEUE_DESTROY_Q   ((1 << 8) | 2)
+> +
+> +#define EEA_AQ_CMD_HOST_INFO         ((2 << 8) | 0)
+> +
+> +#define EEA_AQ_CMD_DEV_STATUS        ((3 << 8) | 0)
+> +
+> +#define ERING_DESC_F_AQ_PHASE	     (BIT(15) | BIT(7))
+
+EEA_ prefix
+
+> +
+> +struct eea_aq_create {
+> +#define EEA_QUEUE_FLAGS_HW_SPLIT_HDR BIT(0)
+> +#define EEA_QUEUE_FLAGS_SQCQ         BIT(1)
+> +#define EEA_QUEUE_FLAGS_HWTS         BIT(2)
+
+move #defines out ouf struct definitions
+
+> +	__le32 flags;
+> +	/* queue index.
+> +	 * rx: 0 == qidx % 2
+> +	 * tx: 1 == qidx % 2
+> +	 */
+> +	__le16 qidx;
+> +	/* the depth of the queue */
+> +	__le16 depth;
+> +	/*  0: without SPLIT HDR
+> +	 *  1: 128B
+> +	 *  2: 256B
+> +	 *  3: 512B
+> +	 */
+> +	u8 hdr_buf_size;
+> +	u8 sq_desc_size;
+> +	u8 cq_desc_size;
+> +	u8 reserve0;
+> +	/* The vector for the irq. rx,tx share the same vector */
+> +	__le16 msix_vector;
+> +	__le16 reserve;
+> +	/* sq ring cfg. */
+> +	__le32 sq_addr_low;
+> +	__le32 sq_addr_high;
+> +	/* cq ring cfg. Just valid when flags include EEA_QUEUE_FLAGS_SQCQ. */
+> +	__le32 cq_addr_low;
+> +	__le32 cq_addr_high;
+> +};
+> +
+> +struct aq_queue_drv_status {
+
+add eea_ prefix to all your structs, fuctions, and defines
+
+> +	__le16 qidx;
+> +
+> +	__le16 sq_head;
+> +	__le16 cq_head;
+> +	__le16 reserved;
+> +};
+> +
+> +struct eea_aq_host_info_cfg {
+> +#define EEA_OS_DISTRO		0
+> +#define EEA_DRV_TYPE		0
+> +#define EEA_OS_LINUX		1
+> +#define EEA_SPEC_VER_MAJOR	1
+> +#define EEA_SPEC_VER_MINOR	0
+> +	__le16	os_type;        /* Linux, Win.. */
+
+really?
+
+> +	__le16	os_dist;
+> +	__le16	drv_type;
+> +
+> +	__le16	kern_ver_major;
+> +	__le16	kern_ver_minor;
+> +	__le16	kern_ver_sub_minor;
+> +
+> +	__le16	drv_ver_major;
+> +	__le16	drv_ver_minor;
+> +	__le16	drv_ver_sub_minor;
+> +
+> +	__le16	spec_ver_major;
+> +	__le16	spec_ver_minor;
+> +	__le16	pci_bdf;
+> +	__le32	pci_domain;
+> +
+> +	u8      os_ver_str[64];
+> +	u8      isa_str[64];
+> +};
+> +
+> +struct eea_aq_host_info_rep {
+> +#define EEA_HINFO_MAX_REP_LEN	1024
+> +#define EEA_HINFO_REP_PASS	1
+> +#define EEA_HINFO_REP_REJECT	2
+> +	u8	op_code;
+> +	u8	has_reply;
+> +	u8	reply_str[EEA_HINFO_MAX_REP_LEN];
+> +};
+> +
+> +static struct ering *qid_to_ering(struct eea_net *enet, u32 qid)
+> +{
+> +	struct ering *ering;
+> +
+> +	if (qid % 2 == 0)
+> +		ering = enet->rx[qid / 2]->ering;
+> +	else
+> +		ering = enet->tx[qid / 2].ering;
+> +
+> +	return ering;
+> +}
+> +
+> +#define EEA_AQ_TIMEOUT_US (60 * 1000 * 1000)
+> +
+> +static int eea_adminq_submit(struct eea_net *enet, u16 cmd,
+> +			     dma_addr_t req_addr, dma_addr_t res_addr,
+> +			     u32 req_size, u32 res_size)
+> +{
+> +	struct eea_aq_cdesc *cdesc;
+> +	struct eea_aq_desc *desc;
+> +	int ret;
+> +
+> +	desc = ering_aq_alloc_desc(enet->adminq.ring);
+> +
+> +	desc->classid = cmd >> 8;
+> +	desc->command = cmd & 0xff;
+> +
+> +	desc->data_addr = cpu_to_le64(req_addr);
+> +	desc->data_len = cpu_to_le32(req_size);
+> +
+> +	desc->reply_addr = cpu_to_le64(res_addr);
+> +	desc->reply_len = cpu_to_le32(res_size);
+> +
+> +	/* for update flags */
+> +	wmb();
+> +
+> +	desc->flags = cpu_to_le16(enet->adminq.phase);
+> +
+> +	ering_sq_commit_desc(enet->adminq.ring);
+> +
+> +	ering_kick(enet->adminq.ring);
+> +
+> +	++enet->adminq.num;
+> +
+> +	if ((enet->adminq.num % enet->adminq.ring->num) == 0)
+> +		enet->adminq.phase ^= ERING_DESC_F_AQ_PHASE;
+> +
+> +	ret = read_poll_timeout(ering_cq_get_desc, cdesc, cdesc, 0,
+> +				EEA_AQ_TIMEOUT_US, false, enet->adminq.ring);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = le32_to_cpu(cdesc->status);
+> +
+> +	ering_cq_ack_desc(enet->adminq.ring, 1);
+> +
+> +	if (ret)
+> +		netdev_err(enet->netdev,
+> +			   "adminq exec failed. cmd: %d ret %d\n", cmd, ret);
+> +
+> +	return ret;
+> +}
+> +
+> +static int eea_adminq_exec(struct eea_net *enet, u16 cmd,
+> +			   void *req, u32 req_size, void *res, u32 res_size)
+> +{
+> +	dma_addr_t req_addr, res_addr;
+> +	struct device *dma;
+> +	int ret;
+> +
+> +	dma = enet->edev->dma_dev;
+> +
+> +	req_addr = 0;
+> +	res_addr = 0;
+> +
+> +	if (req) {
+> +		req_addr = dma_map_single(dma, req, req_size, DMA_TO_DEVICE);
+
+no idea how much adminq you need to send, but it feels wrong to do dma
+mapping each time
+
+> +		if (unlikely(dma_mapping_error(dma, req_addr)))
+> +			return -ENOMEM;
+> +	}
+> +
+> +	if (res) {
+> +		res_addr = dma_map_single(dma, res, res_size, DMA_FROM_DEVICE);
+> +		if (unlikely(dma_mapping_error(dma, res_addr))) {
+> +			ret = -ENOMEM;
+> +			goto err_map_res;
+> +		}
+> +	}
+> +
+> +	ret = eea_adminq_submit(enet, cmd, req_addr, res_addr,
+> +				req_size, res_size);
+> +
+> +	if (res)
+> +		dma_unmap_single(dma, res_addr, res_size, DMA_FROM_DEVICE);
+> +
+> +err_map_res:
+> +	if (req)
+> +		dma_unmap_single(dma, req_addr, req_size, DMA_TO_DEVICE);
+> +
+> +	return ret;
+> +}
+> +
+> +void eea_destroy_adminq(struct eea_net *enet)
+> +{
+> +	/* Unactive adminq by device reset. So the device reset should be called
+
+s/Unactive/Deactivate/
+but this comment does not belong here, rather to the caller/s
+
+> +	 * before this.
+> +	 */
+> +	if (enet->adminq.ring) {
+> +		ering_free(enet->adminq.ring);
+> +		enet->adminq.ring = NULL;
+> +		enet->adminq.phase = 0;
+> +	}
+> +}
+> +
+> +int eea_create_adminq(struct eea_net *enet, u32 qid)
+> +{
+> +	struct ering *ering;
+> +	int err;
+> +
+> +	ering = ering_alloc(qid, 64, enet->edev, sizeof(struct eea_aq_desc),
+> +			    sizeof(struct eea_aq_desc), "adminq");
+> +	if (!ering)
+> +		return -ENOMEM;
+> +
+> +	err = eea_pci_active_aq(ering);
+> +	if (err) {
+> +		ering_free(ering);
+> +		return -EBUSY;
+> +	}
+> +
+> +	enet->adminq.ring = ering;
+> +	enet->adminq.phase = BIT(7);
+> +	enet->adminq.num = 0;
+> +
+> +	/* set device ready to active adminq */
+> +	eea_device_ready(enet->edev);
+> +
+> +	return 0;
+> +}
+> +
+> +int eea_adminq_query_cfg(struct eea_net *enet, struct eea_aq_cfg *cfg)
+> +{
+> +	return eea_adminq_exec(enet, EEA_AQ_CMD_CFG_QUERY, NULL, 0, cfg,
+> +			       sizeof(*cfg));
+> +}
+> +
+> +static void qcfg_fill(struct eea_aq_create *qcfg, struct ering *ering,
+> +		      u32 flags)
+> +{
+> +	qcfg->flags = cpu_to_le32(flags);
+> +	qcfg->qidx = cpu_to_le16(ering->index);
+> +	qcfg->depth = cpu_to_le16(ering->num);
+> +
+> +	qcfg->hdr_buf_size = flags & EEA_QUEUE_FLAGS_HW_SPLIT_HDR ? 1 : 0;
+
+x = !!y instead of x = y ? 1 : 0
+(when needed to map to 0/1)
+
+> +	qcfg->sq_desc_size = ering->sq.desc_size;
+> +	qcfg->cq_desc_size = ering->cq.desc_size;
+> +	qcfg->msix_vector = cpu_to_le16(ering->msix_vec);
+> +
+> +	qcfg->sq_addr_low = cpu_to_le32(ering->sq.dma_addr);
+> +	qcfg->sq_addr_high = cpu_to_le32(ering->sq.dma_addr >> 32);
+> +
+> +	qcfg->cq_addr_low = cpu_to_le32(ering->cq.dma_addr);
+> +	qcfg->cq_addr_high = cpu_to_le32(ering->cq.dma_addr >> 32);
+> +}
+> +
+> +int eea_adminq_create_q(struct eea_net *enet, u32 qidx, u32 num, u32 flags)
+> +{
+> +	struct device *dev = enet->edev->dma_dev;
+> +	int i, err, db_size, q_size, qid;
+> +	struct eea_aq_create *q_buf;
+> +	dma_addr_t db_dma, q_dma;
+> +	struct eea_net_cfg *cfg;
+> +	struct ering *ering;
+> +	__le32 *db_buf;
+> +
+> +	err = -ENOMEM;
+> +
+> +	cfg = &enet->cfg;
+> +
+> +	if (cfg->split_hdr)
+> +		flags |= EEA_QUEUE_FLAGS_HW_SPLIT_HDR;
+> +
+> +	flags |= EEA_QUEUE_FLAGS_SQCQ;
+> +	flags |= EEA_QUEUE_FLAGS_HWTS;
+> +
+> +	db_size = sizeof(int) * num;
+> +	q_size = sizeof(struct eea_aq_create) * num;
+
+would be best to use struct_size()
+
+> +
+> +	db_buf = dma_alloc_coherent(dev, db_size, &db_dma, GFP_KERNEL);
+> +	if (!db_buf)
+> +		return err;
+> +
+> +	q_buf = dma_alloc_coherent(dev, q_size, &q_dma, GFP_KERNEL);
+> +	if (!q_buf)
+> +		goto err_db;
+> +
+> +	qid = qidx;
+> +	for (i = 0; i < num; i++, qid++)
+> +		qcfg_fill(q_buf + i, qid_to_ering(enet, qid), flags);
+> +
+> +	err = eea_adminq_exec(enet, EEA_AQ_CMD_QUEUE_CREATE,
+> +			      q_buf, q_size, db_buf, db_size);
+> +	if (err)
+> +		goto err;
+> +	err = 0;
+
+this assignement makes no sense (please check if there is something
+missing in your source)
+
+> +
+> +	qid = qidx;
+> +	for (i = 0; i < num; i++, qid++) {
+> +		ering = qid_to_ering(enet, qid);
+> +		ering->db = eea_pci_db_addr(ering->edev,
+> +					    le32_to_cpu(db_buf[i]));
+> +	}
+> +
+> +err:
+> +	dma_free_coherent(dev, q_size, q_buf, q_dma);
+> +err_db:
+> +	dma_free_coherent(dev, db_size, db_buf, db_dma);
+> +	return err;
+> +}
+> +
+> +int eea_adminq_destroy_q(struct eea_net *enet, u32 qidx, int num)
+> +{
+> +	struct device *dev = enet->edev->dma_dev;
+> +	dma_addr_t dma_addr;
+> +	__le16 *buf;
+> +	u32 size;
+> +	int i;
+> +
+> +	if (qidx == 0 && num == -1)
+> +		return eea_adminq_exec(enet, EEA_AQ_CMD_QUEUE_DESTROY_ALL,
+> +				       NULL, 0, NULL, 0);
+> +
+> +	size = sizeof(__le16) * num;
+> +	buf = dma_alloc_coherent(dev, size, &dma_addr, GFP_KERNEL);
+> +	if (!buf)
+> +		return -ENOMEM;
+> +
+> +	for (i = 0; i < num; ++i)
+> +		buf[i] = cpu_to_le16(qidx++);
+> +
+> +	return eea_adminq_exec(enet, EEA_AQ_CMD_QUEUE_DESTROY_Q,
+> +			       buf, size, NULL, 0);
+> +}
+> +
+> +struct aq_dev_status *eea_adminq_dev_status(struct eea_net *enet)
+> +{
+> +	struct aq_queue_drv_status *drv_status;
+> +	struct aq_dev_status *dev_status;
+> +	int err, i, num, size;
+> +	struct ering *ering;
+> +	void *rep, *req;
+> +
+> +	num = enet->cfg.tx_ring_num * 2 + 1;
+> +
+> +	req = kcalloc(num, sizeof(struct aq_queue_drv_status), GFP_KERNEL);
+
+sizeof(*ptr) instead of sizeof(type) when possible
+
+> +	if (!req)
+> +		return NULL;
+> +
+> +	size = struct_size(dev_status, q_status, num);
+> +
+> +	rep = kmalloc(size, GFP_KERNEL);
+> +	if (!rep) {
+> +		kfree(req);
+> +		return NULL;
+> +	}
+> +
+> +	drv_status = req;
+> +	for (i = 0; i < enet->cfg.rx_ring_num * 2; ++i, ++drv_status) {
+> +		ering = qid_to_ering(enet, i);
+> +		drv_status->qidx = cpu_to_le16(i);
+> +		drv_status->cq_head = cpu_to_le16(ering->cq.head);
+> +		drv_status->sq_head = cpu_to_le16(ering->sq.head);
+> +	}
+> +
+> +	drv_status->qidx = cpu_to_le16(i);
+> +	drv_status->cq_head = cpu_to_le16(enet->adminq.ring->cq.head);
+> +	drv_status->sq_head = cpu_to_le16(enet->adminq.ring->sq.head);
+> +
+> +	err = eea_adminq_exec(enet, EEA_AQ_CMD_DEV_STATUS,
+> +			      req, num * sizeof(struct aq_queue_drv_status),
+> +			      rep, size);
+> +	kfree(req);
+> +	if (err) {
+> +		kfree(rep);
+> +		return NULL;
+> +	}
+> +
+> +	return rep;
+> +}
+> +
+> +int eea_adminq_config_host_info(struct eea_net *enet)
+> +{
+> +	struct device *dev = enet->edev->dma_dev;
+> +	struct eea_aq_host_info_cfg *cfg;
+> +	struct eea_aq_host_info_rep *rep;
+> +	int rc = -ENOMEM;
+> +
+> +	cfg = kzalloc(sizeof(*cfg), GFP_KERNEL);
+> +	if (!cfg)
+> +		return rc;
+> +
+> +	rep = kzalloc(sizeof(*rep), GFP_KERNEL);
+> +	if (!rep)
+> +		goto free_cfg;
+> +
+> +	cfg->os_type            = cpu_to_le16(EEA_OS_LINUX);
+> +	cfg->os_dist            = cpu_to_le16(EEA_OS_DISTRO);
+> +	cfg->drv_type           = cpu_to_le16(EEA_DRV_TYPE);
+> +
+> +	cfg->kern_ver_major     = cpu_to_le16(LINUX_VERSION_MAJOR);
+> +	cfg->kern_ver_minor     = cpu_to_le16(LINUX_VERSION_PATCHLEVEL);
+> +	cfg->kern_ver_sub_minor = cpu_to_le16(LINUX_VERSION_SUBLEVEL);
+> +
+> +	cfg->drv_ver_major      = cpu_to_le16(EEA_VER_MAJOR);
+> +	cfg->drv_ver_minor      = cpu_to_le16(EEA_VER_MINOR);
+> +	cfg->drv_ver_sub_minor  = cpu_to_le16(EEA_VER_SUB_MINOR);
+> +
+> +	cfg->spec_ver_major     = cpu_to_le16(EEA_SPEC_VER_MAJOR);
+> +	cfg->spec_ver_minor     = cpu_to_le16(EEA_SPEC_VER_MINOR);
+> +
+> +	cfg->pci_bdf            = cpu_to_le16(eea_pci_dev_id(enet->edev));
+> +	cfg->pci_domain         = cpu_to_le32(eea_pci_domain_nr(enet->edev));
+> +
+> +	strscpy(cfg->os_ver_str, utsname()->release, sizeof(cfg->os_ver_str));
+> +	strscpy(cfg->isa_str, utsname()->machine, sizeof(cfg->isa_str));
+
+what is the benefit of this?
+
+> +
+> +	rc = eea_adminq_exec(enet, EEA_AQ_CMD_HOST_INFO,
+> +			     cfg, sizeof(*cfg), rep, sizeof(*rep));
+> +
+> +	if (!rc) {
+> +		if (rep->op_code == EEA_HINFO_REP_REJECT) {
+> +			dev_err(dev, "Device has refused the initialization "
+> +				"due to provided host information\n");
+
+do not break strings that users are supposed to grep for
+
+> +			rc = -ENODEV;
+> +		}
+> +		if (rep->has_reply) {
+> +			rep->reply_str[EEA_HINFO_MAX_REP_LEN - 1] = '\0';
+> +			dev_warn(dev, "Device replied in host_info config: %s",
+> +				 rep->reply_str);
+> +		}
+> +	}
+> +
+> +	kfree(rep);
+> +free_cfg:
+> +	kfree(cfg);
+> +	return rc;
+> +}
+
+
+
+> +static void eea_stats_fill_for_q(struct u64_stats_sync *syncp, u32 num,
+> +				 const struct eea_stat_desc *desc,
+> +				 u64 *data, u32 idx)
+> +{
+> +	void *stats_base = (void *)syncp;
+
+needles cast
+
+> +	u32 start, i;
+> +
+> +	do {
+> +		start = u64_stats_fetch_begin(syncp);
+> +		for (i = 0; i < num; i++)
+> +			data[idx + i] =
+> +				u64_stats_read(stats_base + desc[i].offset);
+
+nice trick
+
+> +
+> +	} while (u64_stats_fetch_retry(syncp, start));
+> +}
+> +
+
+
+
+> +static int eea_netdev_init_features(struct net_device *netdev,
+> +				    struct eea_net *enet,
+> +				    struct eea_device *edev)
+> +{
+> +	struct eea_aq_cfg *cfg __free(kfree) = NULL;
+> +	int err;
+> +	u32 mtu;
+> +
+> +	cfg = kmalloc(sizeof(*cfg), GFP_KERNEL);
+> +
+> +	err = eea_adminq_query_cfg(enet, cfg);
+> +
+
+no blank line between value assignement and error check
+
+> +	if (err)
+> +		return err;
+> +
+> +	eea_update_cfg(enet, edev, cfg);
+> +
+> +	netdev->priv_flags |= IFF_UNICAST_FLT;
+> +	netdev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
+> +
+> +	netdev->hw_features |= NETIF_F_HW_CSUM;
+> +	netdev->hw_features |= NETIF_F_GRO_HW;
+> +	netdev->hw_features |= NETIF_F_SG;
+> +	netdev->hw_features |= NETIF_F_TSO;
+> +	netdev->hw_features |= NETIF_F_TSO_ECN;
+> +	netdev->hw_features |= NETIF_F_TSO6;
+> +	netdev->hw_features |= NETIF_F_GSO_UDP_L4;
+> +
+> +	netdev->features |= NETIF_F_HIGHDMA;
+> +	netdev->features |= NETIF_F_HW_CSUM;
+> +	netdev->features |= NETIF_F_SG;
+> +	netdev->features |= NETIF_F_GSO_ROBUST;
+> +	netdev->features |= netdev->hw_features & NETIF_F_ALL_TSO;
+> +	netdev->features |= NETIF_F_RXCSUM;
+> +	netdev->features |= NETIF_F_GRO_HW;
+> +
+> +	netdev->vlan_features = netdev->features;
+> +
+> +	eth_hw_addr_set(netdev, cfg->mac);
+> +
+> +	enet->speed = SPEED_UNKNOWN;
+> +	enet->duplex = DUPLEX_UNKNOWN;
+> +
+> +	netdev->min_mtu = ETH_MIN_MTU;
+> +
+> +	mtu = le16_to_cpu(cfg->mtu);
+> +	if (mtu < netdev->min_mtu) {
+> +		dev_err(edev->dma_dev, "The device gave us an invalid MTU. "
+> +			"Here we can only exit the initialization. %d < %d",
+> +			mtu, netdev->min_mtu);
+> +		return -EINVAL;
+> +	}
+> +
+> +	netdev->mtu = mtu;
+> +
+> +	/* If jumbo frames are already enabled, then the returned MTU will be a
+> +	 * jumbo MTU, and the driver will automatically enable jumbo frame
+> +	 * support by default.
+> +	 */
+> +	netdev->max_mtu = mtu;
+> +
+> +	netif_carrier_on(netdev);
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct net_device_ops eea_netdev = {
+> +	.ndo_open           = eea_netdev_open,
+> +	.ndo_stop           = eea_netdev_stop,
+> +	.ndo_start_xmit     = eea_tx_xmit,
+> +	.ndo_validate_addr  = eth_validate_addr,
+> +	.ndo_get_stats64    = eea_stats,
+> +	.ndo_features_check = passthru_features_check,
+> +	.ndo_tx_timeout     = eea_tx_timeout,
+> +};
+> +
+> +static struct eea_net *eea_netdev_alloc(struct eea_device *edev, u32 pairs)
+> +{
+> +	struct net_device *netdev;
+> +	struct eea_net *enet;
+> +
+> +	netdev = alloc_etherdev_mq(sizeof(struct eea_net), pairs);
+> +	if (!netdev) {
+> +		dev_err(edev->dma_dev,
+> +			"alloc_etherdev_mq failed with pairs %d\n", pairs);
+> +		return NULL;
+> +	}
+> +
+> +	netdev->netdev_ops = &eea_netdev;
+> +	netdev->ethtool_ops = &eea_ethtool_ops;
+> +	SET_NETDEV_DEV(netdev, edev->dma_dev);
+> +
+> +	enet = netdev_priv(netdev);
+> +	enet->netdev = netdev;
+> +	enet->edev = edev;
+> +	edev->enet = enet;
+> +
+> +	return enet;
+> +}
+> +
+> +static void eea_update_ts_off(struct eea_device *edev, struct eea_net *enet)
+> +{
+> +	u64 ts;
+> +
+> +	ts = eea_pci_device_ts(edev);
+> +
+> +	enet->hw_ts_offset = ktime_get_real() - ts;
+> +}
+> +
+> +static int eea_net_reprobe(struct eea_device *edev)
+> +{
+> +	struct eea_net *enet = edev->enet;
+> +	int err = 0;
+> +
+> +	enet->edev = edev;
+> +
+> +	if (!enet->adminq.ring) {
+> +		err = eea_create_adminq(enet, edev->rx_num + edev->tx_num);
+> +		if (err)
+> +			return err;
+> +	}
+> +
+> +	eea_update_ts_off(edev, enet);
+> +
+> +	if (edev->ha_reset_netdev_running) {
+> +		rtnl_lock();
+> +		enet->link_err = 0;
+> +		err = eea_netdev_open(enet->netdev);
+> +		rtnl_unlock();
+> +	}
+> +
+> +	return err;
+> +}
+> +
+> +int eea_net_probe(struct eea_device *edev)
+> +{
+> +	struct eea_net *enet;
+> +	int err = -ENOMEM;
+> +
+> +	if (edev->ha_reset)
+> +		return eea_net_reprobe(edev);
+> +
+> +	enet = eea_netdev_alloc(edev, edev->rx_num);
+> +	if (!enet)
+> +		return -ENOMEM;
+> +
+> +	err = eea_create_adminq(enet, edev->rx_num + edev->tx_num);
+> +	if (err)
+> +		goto err_adminq;
+
+would be best to name goto labels after what they do instead of
+from-where-you-jump-there
+
+> +
+> +	err = eea_adminq_config_host_info(enet);
+> +	if (err)
+> +		goto err_hinfo;
+> +
+> +	err = eea_netdev_init_features(enet->netdev, enet, edev);
+> +	if (err)
+> +		goto err_feature;
+> +
+> +	err = register_netdev(enet->netdev);
+> +	if (err)
+> +		goto err_ready;
+> +
+> +	eea_update_ts_off(edev, enet);
+> +	netif_carrier_off(enet->netdev);
+> +
+> +	netdev_dbg(enet->netdev, "eea probe success.\n");
+> +
+> +	return 0;
+> +
+> +err_ready:
+> +err_feature:
+> +err_hinfo:
+> +	eea_device_reset(edev);
+> +	eea_destroy_adminq(enet);
+> +
+> +err_adminq:
+> +	free_netdev(enet->netdev);
+> +	return err;
+> +}
+> +
+> +void eea_net_remove(struct eea_device *edev)
+> +{
+> +	struct net_device *netdev;
+> +	struct eea_net *enet;
+> +
+> +	enet = edev->enet;
+> +	netdev = enet->netdev;
+> +
+> +	if (edev->ha_reset) {
+> +		edev->ha_reset_netdev_running = false;
+> +		if (netif_running(enet->netdev)) {
+> +			rtnl_lock();
+> +			eea_netdev_stop(enet->netdev);
+> +			enet->link_err = EEA_LINK_ERR_HA_RESET_DEV;
+> +			enet->edev = NULL;
+> +			rtnl_unlock();
+> +			edev->ha_reset_netdev_running = true;
+> +		}
+> +	} else {
+> +		unregister_netdev(netdev);
+> +		netdev_dbg(enet->netdev, "eea removed.\n");
+> +	}
+> +
+> +	eea_device_reset(edev);
+> +
+> +	/* free adminq */
+
+please remove comments that say nothing more that code around
+
+> +	eea_destroy_adminq(enet);
+> +
+> +	if (!edev->ha_reset)
+> +		free_netdev(netdev);
+> +}
+> diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.h b/drivers/net/ethernet/alibaba/eea/eea_net.h
+> new file mode 100644
+> index 000000000000..74e6a76c1f7f
+> --- /dev/null
+> +++ b/drivers/net/ethernet/alibaba/eea/eea_net.h
+> @@ -0,0 +1,196 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + * Driver for Alibaba Elastic Ethernet Adaptor.
+> + *
+> + * Copyright (C) 2025 Alibaba Inc.
+> + */
+> +
+> +#ifndef __EEA_NET_H__
+> +#define __EEA_NET_H__
+> +
+> +#include <linux/netdevice.h>
+> +#include <linux/ethtool.h>
+> +
+> +#include "eea_ring.h"
+> +#include "eea_ethtool.h"
+> +#include "eea_adminq.h"
+> +
+> +#define EEA_VER_MAJOR		1
+> +#define EEA_VER_MINOR		0
+> +#define EEA_VER_SUB_MINOR	0
+> +
+> +struct eea_tx_meta;
+> +
+> +struct eea_reprobe {
+
+would be best to name structs as nouns, and reserve verbs for functions
+
+> +	struct eea_net *enet;
+> +	bool running_before_reprobe;
+> +};
+> +
+> +struct enet_tx {
+> +	struct eea_net *enet;
+> +
+> +	struct ering *ering;
+> +
+> +	struct eea_tx_meta *meta;
+> +	struct eea_tx_meta *free;
+> +
+> +	struct device *dma_dev;
+> +
+> +	u32 index;
+> +
+> +	char name[16];
+> +
+> +	struct eea_tx_stats stats;
+> +};
+> +
+> +struct eea_rx_meta {
+> +	struct eea_rx_meta *next;
+> +
+> +	struct page *page;
+> +	dma_addr_t dma;
+> +	u32 offset;
+> +	u32 frags;
+> +
+> +	struct page *hdr_page;
+> +	void *hdr_addr;
+> +	dma_addr_t hdr_dma;
+> +
+> +	u32 id;
+> +
+> +	u32 truesize;
+> +	u32 headroom;
+> +	u32 tailroom;
+> +	u32 room;
+> +
+> +	u32 len;
+> +};
+> +
+> +struct enet_rx_pkt_ctx {
+> +	u16 idx;
+> +
+> +	bool data_valid;
+> +	bool do_drop;
+> +
+> +	struct sk_buff *head_skb;
+> +	struct sk_buff *curr_skb;
+> +};
+> +
+> +struct enet_rx {
+> +	struct eea_net *enet;
+> +
+> +	struct ering *ering;
+> +
+> +	struct eea_rx_meta *meta;
+> +	struct eea_rx_meta *free;
+> +
+> +	struct device *dma_dev;
+> +
+> +	u32 index;
+> +
+> +	u32 flags;
+> +
+> +	u32 headroom;
+> +
+> +	struct napi_struct napi;
+> +
+> +	struct eea_rx_stats stats;
+> +
+> +	u16 irq_n;
+> +
+> +	char name[16];
+
+IFNAMSIZ?
+
+> +
+> +	struct enet_rx_pkt_ctx pkt;
+> +
+> +	struct page_pool *pp;
+> +};
+> +
+> +struct eea_net_cfg {
+> +	u32 rx_ring_depth;
+> +	u32 tx_ring_depth;
+> +	u32 rx_ring_num;
+> +	u32 tx_ring_num;
+> +
+> +	u8 rx_sq_desc_size;
+> +	u8 rx_cq_desc_size;
+> +	u8 tx_sq_desc_size;
+> +	u8 tx_cq_desc_size;
+> +
+> +	u32 split_hdr;
+> +
+> +	struct hwtstamp_config ts_cfg;
+> +};
+> +
+> +struct eea_net_tmp {
+> +	struct eea_net_cfg   cfg;
+> +
+> +	struct enet_tx      *tx;
+> +	struct enet_rx     **rx;
+> +
+> +	struct net_device   *netdev;
+> +	struct eea_device   *edev;
+> +};
+> +
+> +enum {
+> +	EEA_LINK_ERR_NONE,
+> +	EEA_LINK_ERR_HA_RESET_DEV,
+> +	EEA_LINK_ERR_LINK_DOWN,
+> +};
+> +
+> +struct eea_net {
+> +	struct eea_device *edev;
+> +	struct net_device *netdev;
+> +
+> +	struct eea_aq adminq;
+> +
+> +	struct enet_tx *tx;
+> +	struct enet_rx **rx;
+> +
+> +	struct eea_net_cfg cfg;
+> +	struct eea_net_cfg cfg_hw;
+> +
+> +	u32 link_err;
+> +
+> +	bool started;
+> +	bool cpu_aff_set;
+> +
+> +	u8 duplex;
+> +	u32 speed;
+> +
+> +	u64 hw_ts_offset;
+> +};
+> +
+> +int eea_tx_resize(struct eea_net *enet, struct enet_tx *tx, u32 ring_num);
+> +
+> +int eea_net_probe(struct eea_device *edev);
+> +void eea_net_remove(struct eea_device *edev);
+> +int eea_net_freeze(struct eea_device *edev);
+> +int eea_net_restore(struct eea_device *edev);
+> +
+> +int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_tmp *tmp);
+> +void enet_mk_tmp_cfg(struct eea_net *enet, struct eea_net_tmp *tmp);
+> +int eea_queues_check_and_reset(struct eea_device *edev);
+> +
+> +/* rx apis */
+> +int eea_poll(struct napi_struct *napi, int budget);
+> +
+> +void enet_rx_stop(struct enet_rx *rx);
+> +int enet_rx_start(struct enet_rx *rx);
+> +
+> +void eea_free_rx(struct enet_rx *rx);
+> +struct enet_rx *eea_alloc_rx(struct eea_net_tmp *tmp, u32 idx);
+> +
+> +int eea_irq_free(struct enet_rx *rx);
+> +
+> +int enet_rxtx_irq_setup(struct eea_net *enet, u32 qid, u32 num);
+> +
+> +/* tx apis */
+> +int eea_poll_tx(struct enet_tx *tx, int budget);
+> +void eea_poll_cleantx(struct enet_rx *rx);
+> +netdev_tx_t eea_tx_xmit(struct sk_buff *skb, struct net_device *netdev);
+> +
+> +void eea_tx_timeout(struct net_device *netdev, u32 txqueue);
+> +
+> +void eea_free_tx(struct enet_tx *tx);
+> +int eea_alloc_tx(struct eea_net_tmp *tmp, struct enet_tx *tx, u32 idx);
+> +
+> +#endif
+> diff --git a/drivers/net/ethernet/alibaba/eea/eea_pci.c b/drivers/net/ethernet/alibaba/eea/eea_pci.c
+> new file mode 100644
+> index 000000000000..df84f9a9c543
+> --- /dev/null
+> +++ b/drivers/net/ethernet/alibaba/eea/eea_pci.c
+> @@ -0,0 +1,574 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * Driver for Alibaba Elastic Ethernet Adaptor.
+> + *
+> + * Copyright (C) 2025 Alibaba Inc.
+> + */
+> +
+> +#include <linux/iopoll.h>
+> +#include <linux/io-64-nonatomic-lo-hi.h>
+> +
+> +#include "eea_pci.h"
+> +#include "eea_net.h"
+> +
+> +#define EEA_PCI_DB_OFFSET 4096
+> +
+> +#define EEA_PCI_CAP_RESET_DEVICE 0xFA
+> +#define EEA_PCI_CAP_RESET_FLAG BIT(1)
+> +
+> +struct eea_pci_cfg {
+> +	__le32 reserve0;
+> +	__le32 reserve1;
+> +	__le32 drv_f_idx;
+> +	__le32 drv_f;
+> +
+> +#define EEA_S_OK           BIT(2)
+> +#define EEA_S_FEATURE_DONE BIT(3)
+> +#define EEA_S_FAILED       BIT(7)
+> +	u8   device_status;
+> +	u8   reserved[7];
+> +
+> +	__le32 rx_num_max;
+> +	__le32 tx_num_max;
+> +	__le32 db_blk_size;
+> +
+> +	/* admin queue cfg */
+> +	__le16 aq_size;
+> +	__le16 aq_msix_vector;
+> +	__le32 aq_db_off;
+> +
+> +	__le32 aq_sq_addr;
+> +	__le32 aq_sq_addr_hi;
+> +	__le32 aq_cq_addr;
+> +	__le32 aq_cq_addr_hi;
+> +
+> +	__le64 hw_ts;
+> +};
+> +
+> +struct eea_pci_device {
+> +	struct eea_device edev;
+> +	struct pci_dev *pci_dev;
+> +
+> +	u32 msix_vec_n;
+> +
+> +	void __iomem *reg;
+> +	void __iomem *db_base;
+> +
+> +	struct work_struct ha_handle_work;
+> +	char ha_irq_name[32];
+> +	u8 reset_pos;
+> +};
+> +
+> +#define cfg_pointer(reg, item) \
+> +	((void __iomem *)((reg) + offsetof(struct eea_pci_cfg, item)))
+> +
+> +#define cfg_write8(reg, item, val) iowrite8(val, cfg_pointer(reg, item))
+> +#define cfg_write16(reg, item, val) iowrite16(val, cfg_pointer(reg, item))
+> +#define cfg_write32(reg, item, val) iowrite32(val, cfg_pointer(reg, item))
+> +#define cfg_write64(reg, item, val) iowrite64_lo_hi(val, cfg_pointer(reg, item))
+> +
+> +#define cfg_read8(reg, item) ioread8(cfg_pointer(reg, item))
+> +#define cfg_read32(reg, item) ioread32(cfg_pointer(reg, item))
+> +#define cfg_readq(reg, item) readq(cfg_pointer(reg, item))
+> +
+> +/* Due to circular references, we have to add function definitions here. */
+> +static int __eea_pci_probe(struct pci_dev *pci_dev,
+> +			   struct eea_pci_device *ep_dev);
+> +static void __eea_pci_remove(struct pci_dev *pci_dev, bool flush_ha_work);
+> +
+> +const char *eea_pci_name(struct eea_device *edev)
+
+generally such a thin wrappers for kernel API are discouraged
+(this driver would be part of the kernel, if someone will change
+function that you call in a way that requires change of caller, they
+will also change your driver;
+it is also easier for reviewers and maintainers to see something
+common to them instead of eea_pci_dev_id())
+
+> +{
+> +	return pci_name(edev->ep_dev->pci_dev);
+> +}
+> +
+> +int eea_pci_domain_nr(struct eea_device *edev)
+> +{
+> +	return pci_domain_nr(edev->ep_dev->pci_dev->bus);
+> +}
+> +
+> +u16 eea_pci_dev_id(struct eea_device *edev)
+> +{
+> +	return pci_dev_id(edev->ep_dev->pci_dev);
+> +}
+> +
+> +static void eea_pci_io_set_status(struct eea_device *edev, u8 status)
+> +{
+> +	struct eea_pci_device *ep_dev = edev->ep_dev;
+> +
+> +	cfg_write8(ep_dev->reg, device_status, status);
+> +}
+> +
+> +static u8 eea_pci_io_get_status(struct eea_device *edev)
+> +{
+> +	struct eea_pci_device *ep_dev = edev->ep_dev;
+> +
+> +	return cfg_read8(ep_dev->reg, device_status);
+> +}
+> +
+> +static void eea_add_status(struct eea_device *dev, u32 status)
+> +{
+> +	eea_pci_io_set_status(dev, eea_pci_io_get_status(dev) | status);
+> +}
+> +
 
