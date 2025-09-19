@@ -1,92 +1,99 @@
-Return-Path: <netdev+bounces-224791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85225B8A36A
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 17:13:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B437B8A3C8
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 17:19:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15A8F620ECF
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 15:10:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF9A817AE0F
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 15:17:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDFD1314A7A;
-	Fri, 19 Sep 2025 15:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956993168ED;
+	Fri, 19 Sep 2025 15:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RF/1/Jdj"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="N+Q4DP9K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92D73148B5
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 15:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7A0268690;
+	Fri, 19 Sep 2025 15:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758294623; cv=none; b=uw7WwhCi44CFnimUaUyiHIIIFj4tFHDL5h5moz8xmILa9KDv2cKoML96eT7YIUYXZIVZNWgpvJSOiLhUlgv9OlBrZbFcTkN5e6yviqzCvijwCHS1xeCPRtl++U1Tp//jG/KhoPymAyDk04oudLDMzaXvgF7mxrv3Iy3ylxqdSn8=
+	t=1758295031; cv=none; b=bPeQWtpgD89shT1l6Y5IPhe7FIH9He8ioy5c6DUHdXY384aQwhOIniXHw6/Hbq68D3DvHYFpA9yilWIff7YgpPOxzL9kb0JTMDJIs+CWKOzeSvpmkaQz+6d2H9jq9pzfsHdxMNnFOXNNiZ/jqb1lxokmLNw5iQhvm3Bll+uEMqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758294623; c=relaxed/simple;
-	bh=CXdGM4YEwwMisgM1/je7dFBgxqsJWrbd8vdeGKr78Dc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Y9sc2Ie0gjdAagZzxD6HoggTsuok3U7vPkT5UUHbJJa9QXrs1Yo+iE83HFdiqxWaK09KPhJEQnGIf82CCXalOAIzg+MtjJymG3fl8FaGZLX0bj1D0t47M+nk7sBfak0r83bPdiZZVCvwGLey2WY3clPyQ42v8ReCHPlfZFiX9DI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RF/1/Jdj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42EC3C4CEF0;
-	Fri, 19 Sep 2025 15:10:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758294623;
-	bh=CXdGM4YEwwMisgM1/je7dFBgxqsJWrbd8vdeGKr78Dc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RF/1/Jdji8jf5NY/Jx5LgM7MLKap7/zMYQ4fsPWYlTOTY/f5eYCTYF44fKltMGpr3
-	 ZwToElaDtDgrPGSF7/lKXOJXN5YhnvGLzh3mC/0NUL8RELJwgRqdWWwiMhMKj5oW3/
-	 lFzMjqqAZ4AXKHHfvpwfDO8Mp4WkuvgmeKXZXANhSChzqtJWaDs5b49CyoEyhyxnhE
-	 NmTBhEphhYOdsyM74k3NKD54GWkZj6/Rw3BtN+Ga6efDUf38Q230Van8uUimKLIS4p
-	 zY4YdGi9POeHKnw9LdKZ0Ai6GbzFDPw9uhUYS2lB+DiyxzpAh3BXSBbgAu41qvP/no
-	 dbsqMHLGqDWYQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACC839D0C20;
-	Fri, 19 Sep 2025 15:10:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1758295031; c=relaxed/simple;
+	bh=V70liMTgOdsh8fqty3trsRiujCQNSlKtuaCgmoPdBPc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hh/2y0pZn79M1cmTonrGQXSlJf+QvfJymuO1jJXsNmvsuAjnqtxz7cYuaP5X2Ow7TtOp+pFd41s9RHRbG8/rreX0konpwY5MiwJqOQWDfQFNB2SS8XoF8/hmk7xSB7uabSDff8xkdRkGb+kO0B2RZbrnuxE4ttP3+RmmJwZk5zY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=N+Q4DP9K; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=FdEf0qKVbU2EtYYZhow9HnPU9m8Q/ulmCXNvCbPV8TI=; b=N+Q4DP9KKnlBLdN3il02HnpReX
+	NJhzqDPKpAL1+uTMM1A8r1m4bzmmz3TYqv+JECYGX50qWCUIK0eRaPr7dqjdDCFk1U0AbVKyo9gLP
+	h/62mQV4mwW7nK2bVEGAd97SqeHuJKlzpxms/iwX57c0W68lOIqcSxUxuz0HCyLVobGQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uzcqP-008wm9-Np; Fri, 19 Sep 2025 17:16:17 +0200
+Date: Fri, 19 Sep 2025 17:16:17 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Danilo Krummrich <dakr@kernel.org>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] rust: net::phy inline if expressions to improve
+ read_status
+Message-ID: <43490b38-5d8c-4dfc-a37a-8f34f99e2d3c@lunn.ch>
+References: <20250919112007.940061-2-thorsten.blum@linux.dev>
+ <d1fe6fa4-da50-4899-8e2c-0721851c4e0d@lunn.ch>
+ <A17B492B-0EAD-4CCE-9889-6D559401D3D3@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] wan: framer: pef2256: use %pe in print format
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175829462276.3344139.5613932929773168713.git-patchwork-notify@kernel.org>
-Date: Fri, 19 Sep 2025 15:10:22 +0000
-References: <20250918134637.2226614-1-kuba@kernel.org>
-In-Reply-To: <20250918134637.2226614-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- herve.codina@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <A17B492B-0EAD-4CCE-9889-6D559401D3D3@linux.dev>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 18 Sep 2025 06:46:37 -0700 you wrote:
-> New cocci check complains:
+> There's obviously nothing wrong with local variables. This patch is not
+> about performance improvements, but writing consistent and idiomatic
+> Rust code.
 > 
->   drivers/net/wan/framer/pef2256/pef2256.c:733:3-10: WARNING: Consider using %pe to print PTR_ERR()
-> 
-> Link: https://lore.kernel.org/1758192227-701925-1-git-send-email-tariqt@nvidia.com
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> 
-> [...]
+> Currently, dev.set_duplex() uses a local variable and is called once,
+> whereas dev.set_speed() doesn't use a local variable and is called
+> twice.
 
-Here is the summary with links:
-  - [net-next] wan: framer: pef2256: use %pe in print format
-    https://git.kernel.org/netdev/net-next/c/3fb4f35a75e8
+I would suggest the opposite change if you want to make the code
+consistent:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+	let speed = if ret & BMCR_SPEED100 != 0 {
+		uapi::SPEED_100
+	} else {
+		uapi::SPEED_10
+	}
+	dev.set_speed(speed)
 
-
+	Andrew
 
