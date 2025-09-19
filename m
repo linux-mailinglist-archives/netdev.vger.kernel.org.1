@@ -1,154 +1,252 @@
-Return-Path: <netdev+bounces-224686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F178B8855A
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 10:08:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0472EB885C9
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 10:15:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07F57567389
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 08:08:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B3D21BC795A
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 08:15:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877A730499D;
-	Fri, 19 Sep 2025 08:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7A630597D;
+	Fri, 19 Sep 2025 08:15:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XfJmdpWV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BQxDAsQi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545C8303CB6;
-	Fri, 19 Sep 2025 08:08:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758269320; cv=none; b=jBfu4uSjPAbLXxx6aenjUc4yrjVU34x9GotrDKa6GGHiFhg4gshZgV1WXdKmdvLMCl51TkKAsKBMkoBT88ydEmZ0nPDLQZlC9P2gP1zhOyTJ77wyNWaxQwcDlViXph63C1tIb22dEcoLDl3pTzWDV6u/htVyEObvvBG5thCG3MA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758269320; c=relaxed/simple;
-	bh=309VdB/dlRAmKQDRXcKVomPzNz0G9kwLcBfQswZ/fLg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p5tYByDbRyU0D9C8P5CbyCLbfH2UOqT11Wgv1cKinEzvoERDY8y4VBpR+NZQ3DsCB9M085zE8EEFxiA+Oyc2rBGud1Pt/r2ji3JslnkLlskG3S1RmmHSBAIjl5yGcygyknzgowcsZocE7xJ79akFxrUoqvJV8JkME3QqpnhPHtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XfJmdpWV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F83BC4CEF0;
-	Fri, 19 Sep 2025 08:08:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758269319;
-	bh=309VdB/dlRAmKQDRXcKVomPzNz0G9kwLcBfQswZ/fLg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XfJmdpWVO/i0Klh9wFxFYR26vN7harEo2PL1CzpfY0MW/QOYu5TNtHj4fHUGrdiXm
-	 NXHUCIGrpYQUbzh36uDRRDfGBoAO6v7Y7gLfk7XRir14+4ff0o58YVgw2kAhncAGn7
-	 8lTH15Q0++/IDz7hrMqcEcrVdhZhSKee0u3nPztEXLxh/HehBe+HsKalu8PZ46692p
-	 1HV6Pi/tYlil/uhxU07QgNVX+ns8ojOFM2QEHeB9qvx5UogRprwMKoQ4ZKbNW2Few9
-	 Se0nHjZJpLDzTfRPl6ywDbryPtqzzPYq9VWvu+69wfLgbkZVC0NAzMWwNHJd531HLW
-	 7mlv/BnmXX0nA==
-Date: Fri, 19 Sep 2025 10:08:33 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: linux-fsdevel@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>, 
-	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Anna-Maria Behnsen <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 7/9] net: centralize ns_common initialization
-Message-ID: <20250919-fanatiker-ethik-7a9bb32ee334@brauner>
-References: <20250917-work-namespace-ns_common-v1-0-1b3bda8ef8f2@kernel.org>
- <20250917-work-namespace-ns_common-v1-7-1b3bda8ef8f2@kernel.org>
- <kiyr4pnrw2a2oeoc3lavj73glvdg5llsfz2txfnn56bxmytfgw@o6weansm3iyi>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8457630596B;
+	Fri, 19 Sep 2025 08:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758269720; cv=fail; b=NBiQSeqxs/DeKef+HrerWpJP29+/O1NfBSON62wWErQFG1N1gsrqURch+EO34i26/j1FzgvObIdB4IsRErWGVFgdENk0YatTVEA4koSMr9p7H/4aB4wwWiBCKuQ5Bp416XbNn4MdCBDCOShvOuSntME8ROa3fBiA9lNlpdOcWO8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758269720; c=relaxed/simple;
+	bh=CBeQJ8Zgg51ndVdJThmFwMQh6oTy8yIFjZWGRaNACwo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gh+hR0zO7xOrJrtrUD6cl2jupWuuDZ0O2wEntuFdcOCChBQ9O82wbNq4+mP2JWApZ0vi7c6riL9nvQ6QE1SwfGQ+C7ohalpTLy0SAwJNDCAZx9wxrIlAQCIWCnuDVEBK8iOJbjbZ10YHNzeCzGjyWKXdC6sAJVLR/bNZO6uQ0P0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BQxDAsQi; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758269717; x=1789805717;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=CBeQJ8Zgg51ndVdJThmFwMQh6oTy8yIFjZWGRaNACwo=;
+  b=BQxDAsQix6yescCPAePNgTC/TNzklUArHPYpasNd1cCvw2swa438zxDf
+   bIM3NROWjpkTSzwyk60WZT5R2HO86phGIXmQnhn94pVA2y/ri0hgGtaBG
+   nXl0tDLCj5hdg7sgBHTuUxH5K/a78xGHZELbcnDro5rCjZHN4E4Sb7dm3
+   gQngChCILUInXC7U5S4+85y7PqkQJ44WEhLXKtYINFWWsWqaeTcQxqAMb
+   PwkAztb/QBAjuZXh9LNvH/jS6594Pi0WS9KSH57NYPcSkOReOJ6gmCKvt
+   m70eqf9AjTuN0HSHnOSefsgMOdyd8J2KHJZHMvxGK3/503IqXPakRHVMZ
+   A==;
+X-CSE-ConnectionGUID: +V3Ll5hkQEasg9aXU7HujA==
+X-CSE-MsgGUID: k+wnG7mQQDOb+BzZDuQPqA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11557"; a="59653445"
+X-IronPort-AV: E=Sophos;i="6.18,277,1751266800"; 
+   d="scan'208";a="59653445"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 01:15:17 -0700
+X-CSE-ConnectionGUID: V1jJMH7RSbWq8t1szVwevA==
+X-CSE-MsgGUID: QnTjfvEtQD+r60TdDcun6A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,277,1751266800"; 
+   d="scan'208";a="180194176"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 01:15:17 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Fri, 19 Sep 2025 01:15:16 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Fri, 19 Sep 2025 01:15:16 -0700
+Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.17) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Fri, 19 Sep 2025 01:15:16 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=w9ORRVPu8qsE8fE5RrmWrLHFBuN1RS0Jyn2VirHxxzFXzfF1YV1gC2BSRhIGXeUKKOzIOlgZFjL8gYJ91ve0R+9iyS1Rs8xvckn87MqN0xouE5yO7l3oD3YfEfbCJNB1ZUZLh351lNnd3kbnoAQyAe71q/LiuDNOC5PZImnIxfMSjpiOMknlGO8OPRt8MlWeGzr/D92Mu/a8IdKDfKB9sqRaru7ID1ytN5pV9ux2YW8QqTi79p8aDGF1+YsLbyrUmeS0yEDFHAaxu/dsbJt294FUJrHvl9MMML+8PvKSY0gRoetkiHnTt+nHkF6f/XwogNiHxAF87KHCZc/AxuIrbQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=My4kX2s7eTIiYzEjQ/kukVm/VRd1N3Izl+8pYl6hX4I=;
+ b=Jo109qtuLhOEs+Cl+tJZo0IcyAGZHpgfZOf8FTGh6YvR7xZl5Ks9ZJzOimHwCN+S3cMJfml0ohEWyijdFnsWBQ7CSpv57H2zDyHLbyXKsA+eNNPdSXdVvhgIbf23+bGXfeIGTY2XlXUaDy2vqMBX9ycnn8PeMUKaS9f6Z9ED/naJQg3RTcIRT2EUOuW9OWHfPpMvae8GScGkvarYrL+66rZ+TkSwHwZH0sMAC9dDCjYqpPDtzndKa5Tdj96KYYG6J7w1Hr7TH8mhtvsGml7QEWg/ZQljFTp8czbdaW9mQtZzklA2MKLXuDoK0YNTClLiDqi5t3sek1zJA6BbEIkVsQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8985.namprd11.prod.outlook.com (2603:10b6:208:575::17)
+ by SA0PR11MB4638.namprd11.prod.outlook.com (2603:10b6:806:73::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.14; Fri, 19 Sep
+ 2025 08:15:06 +0000
+Received: from IA3PR11MB8985.namprd11.prod.outlook.com
+ ([fe80::4955:174:d3ce:10e6]) by IA3PR11MB8985.namprd11.prod.outlook.com
+ ([fe80::4955:174:d3ce:10e6%3]) with mapi id 15.20.9115.022; Fri, 19 Sep 2025
+ 08:15:06 +0000
+From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
+To: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Loktionov, Aleksandr"
+	<aleksandr.loktionov@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net v1 1/4] ixgbevf: fix getting
+ link speed data for E610 devices
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v1 1/4] ixgbevf: fix getting
+ link speed data for E610 devices
+Thread-Index: AQHcGATe1qX06oP4XUeUlZfA7LMv4rSaStwg
+Date: Fri, 19 Sep 2025 08:15:06 +0000
+Message-ID: <IA3PR11MB8985D1684444D046266572DE8F11A@IA3PR11MB8985.namprd11.prod.outlook.com>
+References: <20250828095227.1857066-1-jedrzej.jagielski@intel.com>
+ <20250828095227.1857066-2-jedrzej.jagielski@intel.com>
+In-Reply-To: <20250828095227.1857066-2-jedrzej.jagielski@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8985:EE_|SA0PR11MB4638:EE_
+x-ms-office365-filtering-correlation-id: ad2c8b1d-9cfe-4f56-99a4-08ddf754a49a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007|38070700021;
+x-microsoft-antispam-message-info: =?us-ascii?Q?PhB7vwFOYRVPzQzk3WmsRsljCWA+zSnU0Qsygi36UxVsHg4Q0QwjjrScuza1?=
+ =?us-ascii?Q?Dr4T41lePKyuwWzF4nSbBPN/hUCrX2IBlwmrAz41UxVIIHD9VWf6OKfYbg0G?=
+ =?us-ascii?Q?5voW6kzEETM/i4rt72MPytd7/klJF90EpB3Xnxq1h6ARkoL1hnYE0J3E3ne9?=
+ =?us-ascii?Q?B4m7MImrgaAXXHSE5/yIDdZgt+JTCZCpe6hqdSzWICa/uO07Jby/QlPNzsiZ?=
+ =?us-ascii?Q?BFu1CWqDhxckOz0N3zYvQeUluK6++jNj3Ux4Lob6+6u4/w8mhtznFHfcdDsP?=
+ =?us-ascii?Q?Ioth9766xc/Pf881leJikqicerZFnjMxDIBxa2q70LFzy00Tvrd1zAyOHl+r?=
+ =?us-ascii?Q?Xx7Ry1XIrM2wCWYdfdriS29sFWF0LbuXxphDECCQmdcbnQAkZt4G8Tsiq0sd?=
+ =?us-ascii?Q?JFBmx+REQ+upDGQRpwdcBiSjOFZaxfj4ufJucfMH5AWLgU78YEoZxcuSQn2T?=
+ =?us-ascii?Q?V/eah9ixu9Z4TS+J+eYW9ynPOWs1gHsLbOkrxmiBhIIJOA4ObCHpGVVAKk4k?=
+ =?us-ascii?Q?bdi8vqU+gDfZgXa7FRu6yhQq4w6wZjzPhLKgZdufT3GkOQjAhYc/uW3INTiA?=
+ =?us-ascii?Q?Ps3rqm1ejbNh7evk/mT5tJ/G8T0ugqjLQutv6HG0rghi8l8QiXflNzJfPbLX?=
+ =?us-ascii?Q?N5aXTO15+Ygap/83itufe3LS4KoSzV/947Kma4yzgzY084Zpn47VNjYz4lao?=
+ =?us-ascii?Q?8/3x9ySIlP9rfORX8OY2kXi2xF2bMzRsxGSaKWKSXL5+n/du4fL3tDDQOinG?=
+ =?us-ascii?Q?AWmErK5e8TgK5IQCeO13uGOGpwuwB/khYjbZF4jLKjVIcVojE6wIiBBlmqMe?=
+ =?us-ascii?Q?kqNpNzMz0Cz9EHrr5TIRXMNH77wTY0nMGe/Ez0ytSZDNTBiWiO4RdikI/SQq?=
+ =?us-ascii?Q?2DssnikIrLAo5cR1AcIHq2AFEsvHn+IHCm0kAtpSYd6cnoqDKtLpfd6Sj+xn?=
+ =?us-ascii?Q?p4ZFQTiJK5OoNpQW27FuEIYWoxHuWAcuWf37tTl5un+2PlTog43VOiDgvJlU?=
+ =?us-ascii?Q?keC0oqLt7RqX8qXSLHDdq9RwNltwtWKyKR8CcexWosmtS73wvh+1Yhx6DFfV?=
+ =?us-ascii?Q?HHGJHIVwLrtOJEH/BUBY5vgscXczaGEVLzPJq7o7TINf1v0Ac+3X1TgtTqgH?=
+ =?us-ascii?Q?ZBObK7K89YjUgL190CY5g41MGrpskGGcOobIVsa8EKCy1ERItXl/SryKIx+i?=
+ =?us-ascii?Q?bhvamxlfFMHodIuU/rNJ42jCbi+sinSO9O2X+ildDLkBbeDqAsDd4qzix8qt?=
+ =?us-ascii?Q?vsUJBjXlKXF8V9psmNZ1n9g2NtKgVqvG40TzutcOA00jMERvJfQOQpO085Tq?=
+ =?us-ascii?Q?943xyLyD68JY2RecxIm2QQz2lzgl91NwYpXgXij0++efv1rLSN1gNohj7a63?=
+ =?us-ascii?Q?sTOl9/xZ8eClIQ8nZg3dfc8UgIhv4zeIzucxS051+AHLwSGxRz1zhyB39DRM?=
+ =?us-ascii?Q?nzTFeuLGDtf1qk/yL6GaIys9fmUyPpohykWLTEbWSwSYvglSOeshdw=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8985.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?GZvPHZKIDkUlLBgYk0Ekfai+L4SdiYsRtczPXToQt9eds/FiomVNjogS3qZg?=
+ =?us-ascii?Q?dmpUc0DtK9IYWa9SMixNLR3IvFh7Q5UN8shfxMTR3A+sjUT4TOajlMuHCFsK?=
+ =?us-ascii?Q?AxVfx9/5W4PvnTzHkuk7xWS3Ur2VoAHQKUdm7H14qGf2LGF3Z0TKOylq22vF?=
+ =?us-ascii?Q?qsEpBUjS//wFeHm8/c9ELZ6XQfAtrYGLMhcxcVnrfkNcngHuWyzwbghpV2t6?=
+ =?us-ascii?Q?stQ6AD1Q8XSpsEySp/aqMrjmKAs3GATcWaQiq+fCuyvuhNheakssP37ELkyd?=
+ =?us-ascii?Q?TrKcDlumrJuvNwwRYiOXpRKUimi+DBIcJDvuLN0l7P57fCrtiMiyIOe9QD8O?=
+ =?us-ascii?Q?4t7oaPyKT6CgLMX/hxnVmM391NxQIIiTfgbesxW9vaum8+dkFtswxgDRkHgS?=
+ =?us-ascii?Q?q5Bx1a0LUk6TJdtOkERbqHDzULKyNXERaKcrf4tSAXxq2rl+aUjk24rOAMgm?=
+ =?us-ascii?Q?UYiMgQJ/Qbdc2sUeEVZ7DGyjZIBySFbfkvvTf67FIR6JOzy8vyNBob4Oj1kK?=
+ =?us-ascii?Q?bxFCXRqDG74uGwYMiQ7C9V7Qw1/FXDDEauO/boneU58RsML44CfrQlu0V6gm?=
+ =?us-ascii?Q?gEmD0AuKeK6DVp4NGcRaUL8vFJK+xCQekfsTJGej7WNXdufwDnFlHMfD70xm?=
+ =?us-ascii?Q?fEz0Mw8aASbSv+QVI0DFrnmEHbvt4JB6R2l3cPYNN8/E7nfxiP1l/YRTJBdH?=
+ =?us-ascii?Q?i84mnXI3hhq+0oK0Kqgbi4mAn3KZjWSefi3ZO1g4iOB4QwbrxSXrTHXtW23C?=
+ =?us-ascii?Q?w/SL72geXFua9/LEMmbtIqmknNBdK8nSc/IHjK2DSvP1dmypS9k5SV7uathP?=
+ =?us-ascii?Q?xn/CHl4Z2QadJ5+scaci5hIOSXpFh7I+FNfoJKcyKwyT/gkv5+Sh+8x5FmP0?=
+ =?us-ascii?Q?/gx8J5Heq87r2ayyhvEHEEQ0Fq9S957B/YQA4tPzgZDRCLiEA3EsSl6yUGmO?=
+ =?us-ascii?Q?EHEiODkORg66P/thWvX3CJC8QS3kQiquKF25N0DVRDDQ6j7okp+U1BH+72tO?=
+ =?us-ascii?Q?/fyvEY2ypjqIISzluMOfq4/INx/+7lWcJXCVlEBmtdUzlyvGfahLgiug3OUv?=
+ =?us-ascii?Q?zbjsLCeXdxy1YWCzAf4hV4pkPe0aGbaG+rO5sF6IfSbZOFJVDfKylhlRltdJ?=
+ =?us-ascii?Q?nAfHEWzdXiWyDN6TXerBEWGTKhoNpN/UtF2AGPyMmkxFMhjGt/G1hqWyer9f?=
+ =?us-ascii?Q?jOj+qIO0ti9Z0DiPgxU4Nh0uUQlvh+o3DDYtejb/k3n77y+HiqA3nmA5ZEF4?=
+ =?us-ascii?Q?LpQwTinne1GrYBdvrkDlq/KZzv3gIk2q4XkRvZYP2BupPOhZBl3PwK3mezx0?=
+ =?us-ascii?Q?Q3lPYG7NobAcWYhxdjzeSSKolckEpBy1IzRTEpk6aimSmSLO0V11q551OU1K?=
+ =?us-ascii?Q?dzqXh+VMWndEgqwSBDdQuSYDSbbufKEbLo1+sIU78A/gLaR4dJaAGBXgY+3O?=
+ =?us-ascii?Q?OA5rw6yioHmUB8PeUXDersYUIKCJ9f7I1/+AhAl1KHQglWmBFA4p1j0WOcFJ?=
+ =?us-ascii?Q?/FSkdlhN8pM0Ni+QedyT8kChfoNUnraGGRnFQvLOwdsEZFkLOhZ3PO1GPjc+?=
+ =?us-ascii?Q?RSRUApKcDWGX1STTYq+8U8wcC3ZdeSIJTyB3wu/5HUuSEsnLqrWvAnZcYoHx?=
+ =?us-ascii?Q?vA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <kiyr4pnrw2a2oeoc3lavj73glvdg5llsfz2txfnn56bxmytfgw@o6weansm3iyi>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8985.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ad2c8b1d-9cfe-4f56-99a4-08ddf754a49a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2025 08:15:06.6876
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: MjxRqfczkMu9f36PXv8npBz06vuhx2x2C97WpxOgMQoZlapcAc9LRpvQ+UII1KW3POSVFiS1KAfxiS60laULrFQHSGgwytq3Mz9dBTMo8v8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4638
+X-OriginatorOrg: intel.com
 
-On Thu, Sep 18, 2025 at 11:42:38AM +0200, Jan Kara wrote:
-> On Wed 17-09-25 12:28:06, Christian Brauner wrote:
-> > Centralize ns_common initialization.
-> > 
-> > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> > ---
-> >  net/core/net_namespace.c | 23 +++--------------------
-> >  1 file changed, 3 insertions(+), 20 deletions(-)
-> > 
-> > diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> > index a57b3cda8dbc..897f4927df9e 100644
-> > --- a/net/core/net_namespace.c
-> > +++ b/net/core/net_namespace.c
-> > @@ -409,7 +409,7 @@ static __net_init int preinit_net(struct net *net, struct user_namespace *user_n
-> >  	ns_ops = NULL;
-> >  #endif
-> >  
-> > -	ret = ns_common_init(&net->ns, ns_ops, false);
-> > +	ret = ns_common_init(&net->ns, ns_ops, true);
-> >  	if (ret)
-> >  		return ret;
-> >  
-> > @@ -597,6 +597,7 @@ struct net *copy_net_ns(unsigned long flags,
-> >  		net_passive_dec(net);
-> >  dec_ucounts:
-> >  		dec_net_namespaces(ucounts);
-> > +		ns_free_inum(&net->ns);
-> 
-> This looks like a wrong place to put it? dec_ucounts also gets called when we
-> failed to create 'net' and thus net == NULL. 
-> 
-> >  		return ERR_PTR(rv);
-> >  	}
-> >  	return net;
-> > @@ -718,6 +719,7 @@ static void cleanup_net(struct work_struct *work)
-> >  #endif
-> >  		put_user_ns(net->user_ns);
-> >  		net_passive_dec(net);
-> > +		ns_free_inum(&net->ns);
-> 
-> The calling of ns_free_inum() after we've dropped our reference
-> (net_passive_dec()) looks suspicious. Given how 'net' freeing works I don't
-> think this can lead to actual UAF issues but it is in my opinion a bad
-> coding pattern and for no good reason AFAICT.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Jedrzej Jagielski
+> Sent: Thursday, August 28, 2025 11:52 AM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>;
+> netdev@vger.kernel.org; stable@vger.kernel.org; Jagielski, Jedrzej
+> <jedrzej.jagielski@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Loktionov, Aleksandr
+> <aleksandr.loktionov@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-net v1 1/4] ixgbevf: fix getting li=
+nk speed
+> data for E610 devices
+>=20
+> E610 adapters no longer use the VFLINKS register to read PF's link speed =
+and
+> linkup state. As a result VF driver cannot get actual link state and it i=
+ncorrectly
+> reports 10G which is the default option.
+> It leads to a situation where even 1G adapters print 10G as actual link s=
+peed.
+> The same happens when PF driver set speed different than 10G.
+>=20
+> Add new mailbox operation to let the VF driver request a PF driver to pro=
+vide
+> actual link data. Update the mailbox api to v1.6.
+>=20
+> Incorporate both ways of getting link status within the legacy
+> ixgbe_check_mac_link_vf() function.
+>=20
+> Fixes: 4c44b450c69b ("ixgbevf: Add support for Intel(R) E610 device")
+> Co-developed-by: Andrzej Wilczynski <andrzejx.wilczynski@intel.com>
+> Signed-off-by: Andrzej Wilczynski <andrzejx.wilczynski@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ixgbevf/defines.h  |   1 +
+>  .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |   6 +-
+>  drivers/net/ethernet/intel/ixgbevf/mbx.h      |   4 +
+>  drivers/net/ethernet/intel/ixgbevf/vf.c       | 137 ++++++++++++++----
+>  4 files changed, 116 insertions(+), 32 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/ixgbevf/defines.h
+> b/drivers/net/ethernet/intel/ixgbevf/defines.h
+> index a9bc96f6399d..e177d1d58696 100644
+> --- a/drivers/net/ethernet/intel/ixgbevf/defines.h
+> +++ b/drivers/net/ethernet/intel/ixgbevf/defines.h
+> @@ -28,6 +28,7 @@
 
-All good points. I can't say I'm fond of the complexity in this specific
-instance in general.
 
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 897f4927df9e..9df236811454 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -590,6 +590,7 @@ struct net *copy_net_ns(unsigned long flags,
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 
-        if (rv < 0) {
- put_userns:
-+               ns_free_inum(&net->ns);
- #ifdef CONFIG_KEYS
-                key_remove_domain(net->key_domain);
- #endif
-@@ -597,7 +598,6 @@ struct net *copy_net_ns(unsigned long flags,
-                net_passive_dec(net);
- dec_ucounts:
-                dec_net_namespaces(ucounts);
--               ns_free_inum(&net->ns);
-                return ERR_PTR(rv);
-        }
-        return net;
-@@ -713,13 +713,13 @@ static void cleanup_net(struct work_struct *work)
-        /* Finally it is safe to free my network namespace structure */
-        list_for_each_entry_safe(net, tmp, &net_exit_list, exit_list) {
-                list_del_init(&net->exit_list);
-+               ns_free_inum(&net->ns);
-                dec_net_namespaces(net->ucounts);
- #ifdef CONFIG_KEYS
-                key_remove_domain(net->key_domain);
- #endif
-                put_user_ns(net->user_ns);
-                net_passive_dec(net);
--               ns_free_inum(&net->ns);
-        }
-        WRITE_ONCE(cleanup_net_task, NULL);
- }
+
 
