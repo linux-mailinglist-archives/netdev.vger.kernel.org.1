@@ -1,140 +1,158 @@
-Return-Path: <netdev+bounces-224875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFA6CB8B283
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 21:58:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE88CB8B28D
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 22:00:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A19B93BC7DF
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 19:58:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0A413BBF32
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 20:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6037F2C237D;
-	Fri, 19 Sep 2025 19:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 809E5264627;
+	Fri, 19 Sep 2025 20:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hl4hZP7L"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J6kV3lHX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB831E5B63;
-	Fri, 19 Sep 2025 19:58:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFE834BA3C
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 20:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758311894; cv=none; b=rOEtMPmsEntiwVNXQE6h+dhMzXOQhd/NxlZLQl9yrijjSDjBObvsBAGkf+Oq9HuSY2LwmOrcBuxzWfz8XiLa1DQeK82pb2oBRuqtqVRqvhyG3VMm775WbiBVqgfashig3lTUsq4HK+tYnPPuqtDER+eFj9EO71k0MFTIaSpq2zo=
+	t=1758312046; cv=none; b=G2ljjWnG9JMjdWlJXTUOjIy8UZViZ3w6d+3BbcFd+EqH59lTOUqc2Eqk6riwTa9kmwOewcW0jVIMUC+/QChVFSLEUlrNjI8QHoDnYe67Hq1dkKixtD47XoQ3iAKyBPHQwhOOGPHOzrMof2Qt9c42KdunIWBvbPK905hVBiEFa6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758311894; c=relaxed/simple;
-	bh=0O0MahJ+NiK3QdJLSSJEqa2OFc+vnA8WlR02GHdRTgk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Q6sIGAvp9DUr4pZecbM26D8nQrv7nbhpKbpGrLwijslEsomP1WO4capJIrlU4tXZCfmehWDy2OOcFJGA7FuBOz7ihKTHoYiR5Jn9C/NyN3zgyQWZ798gpJ0to9th2b57QrfJQST3tyCyBTSL+yBbhtQjEVdAl43Ylp0knNRIDr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hl4hZP7L; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758311893; x=1789847893;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=0O0MahJ+NiK3QdJLSSJEqa2OFc+vnA8WlR02GHdRTgk=;
-  b=Hl4hZP7Lp/9UN6G0eqVFtFQEn6vTUPxxs+HruNhv5NxzYP5hgzIa0nT3
-   ds6DGSnMnNqUl8UmnQAAMdklUPZpT2N6Ym9d80OokrBj/GwbdJW+LWOOi
-   A/37HQ+5mHtSED2up4IYtZ5z6cQl75PzT9IKmynmZJi2P5yf/riH3cqqW
-   eRbJ/3m6xl2PpRCnj/uQ7p88CufFdSzfl+y0jWDKdnOtnk3Vzj7T6u+Eu
-   y4bFgVPnEatbEh70F8k7yb/YlDJwprPORM5eKCX9unk4c+MuGA7tANENw
-   /e86XJsiaUQBYnMsdvuasoMpPTV5eMkK6nk7Iap4aq6xt63piiGu3lzbG
-   g==;
-X-CSE-ConnectionGUID: vf1P6JCKQ9+a9gS3GuWLvA==
-X-CSE-MsgGUID: RZn7dwQGQHq0IQ8kCNGQUg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11558"; a="60356804"
-X-IronPort-AV: E=Sophos;i="6.18,278,1751266800"; 
-   d="scan'208";a="60356804"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 12:58:11 -0700
-X-CSE-ConnectionGUID: ++Rm/+bLQ5S3XzcYy8lhkw==
-X-CSE-MsgGUID: ydSCiQyiQgSc7XmY0M6GKQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,278,1751266800"; 
-   d="scan'208";a="181037540"
-Received: from dnelso2-mobl.amr.corp.intel.com (HELO [10.125.108.58]) ([10.125.108.58])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 12:58:10 -0700
-Message-ID: <1b86bfc3-61da-421f-ba3d-bd738232996b@intel.com>
-Date: Fri, 19 Sep 2025 12:58:09 -0700
+	s=arc-20240116; t=1758312046; c=relaxed/simple;
+	bh=mUyhu5Ib1FnKppXOvrrqiSnIjb16ncn2O1iIgAZRVsk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rSrqJg/Lr2jJIYO/4rd5l1PA8MNFh7PY+MEPjv4I+AyCvP2nFSBY+32fUbGMbl4SfrI2ccUGEu3PRgzPaW9LW/5e42Ymt7WyalQpY5CdR4SOFH7FIbl1706jS1H3HvpVY9/rg3EMQVPdAu+A//4Kk9i8gb6Gx/YqrVrsLLUfByE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J6kV3lHX; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b38d4de61aso33137191cf.0
+        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 13:00:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758312044; x=1758916844; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xp/m6uTz9B3XRHACC+VVqzRN8m54e23vlXvsETQm1ho=;
+        b=J6kV3lHXqPAS8KQw0cJ/CCMdgkPrwFpprw2cT0uhgVsdorLC/6VG7//InWwSDPDu18
+         hjT4bqKJtgjT+e7u+qTkdPm8xDAoUwJl7PaBteyrSleRiL4FjR+OsDxJnlALKslNokIM
+         ZD97FUWEwy8khomI1th2DK5JpGQaPtZoML7Lfv3V0ch8iP2iSjYgfsp5cjr+PHufDlq5
+         mSAac7Ql3V2TseUFHm0W9jQO6JLAG6vm8MVfcnFddj6k/rQUR+MzE6I9OKinNMWc9YFp
+         uBYDH1XAuLFkDMzhnr8JA2uihuOE6I0Y4MIySEetQWr0fzzEWqKExfiSquqrZYXInV7n
+         nj9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758312044; x=1758916844;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xp/m6uTz9B3XRHACC+VVqzRN8m54e23vlXvsETQm1ho=;
+        b=nbX8LeecXu9a9f/WMt1KrmEkq9NQNWZl4amvYpHpz4nHlyVNDS3m7mXHRFv3yiHShV
+         pBW5CpntoDxxnTdZni8iJnMY2JpC5usPSxh6uIYkaMxHx4dcyBNFmcVCYjBzY7bfFh63
+         81DgxfKWewQU8jrRlKkbsHB1sin4vvDUM9rjAyfrPZUlJETuCL3DStSL5NEGLREUgaxE
+         1y+ht+D57AaaRNPJhy78SE8PAjCUufZojbi7BUZ/jXCe6GMk3M3zpi0p8uhmtQ5TcnL1
+         7NjhSekljwo7ROA5pX3zUuQzyeaZYuxfut4eP56aJEdnQkc28nCEBfAt4g9R6UjaX3iR
+         V4EA==
+X-Forwarded-Encrypted: i=1; AJvYcCWq+mz1BnRouCghA0igBM1TCzls4DpsSlQDkzPJeVUdXa3+O3abqK84rVuvEYDluJKU/TvcYtQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcEwiQd8v6oi/bcvCT0pS1mVMbYpXPpAAQoK4HP+vYjrnUc8PB
+	Pdfi1lJQ2m9QRI4aAE60p5jYClFQtkONih05iYr+Krgq61X27f8M7NOw23Z4zCSbrBzGGOUsZOL
+	+42aHzdzixLOdJdHMuD546olx8b6tSNrXg2C2tP84
+X-Gm-Gg: ASbGncuUO6XYQx7kGnkETrR3ywFYCiC387GjDGhkU/ZTzTEDAD7piC287W7g+HltGwI
+	ovuSRRa5ITuJjS9UYNYJSWL4e9GBrg6Ox2rPo6FTJ9sbhBHUC6e6WMb8nhBGd4DgSgvHdV0InV7
+	03h8aXL1zqbvGv637LNFWtIWT8GEIRRfMHuJWQltO9ife+Wdbxm99T1Gnt7vxrHI5+drBBGUDZS
+	7ePlw==
+X-Google-Smtp-Source: AGHT+IF3ZI2PakK5vfRLTA9vbrVBSGGqN8qKvTGqG6nCslabpr86PGk/bBecwCjRguQygRFK4vQJnSEe79LLY7h/VLc=
+X-Received: by 2002:a05:622a:54a:b0:4b7:a7b6:eafc with SMTP id
+ d75a77b69052e-4c06d67e991mr65850331cf.13.1758312043211; Fri, 19 Sep 2025
+ 13:00:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 07/20] sfc: create type2 cxl memdev
-From: Dave Jiang <dave.jiang@intel.com>
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: Alejandro Lucero <alucerop@amd.com>,
- Martin Habets <habetsm.xilinx@gmail.com>, Fan Ni <fan.ni@samsung.com>,
- Edward Cree <ecree.xilinx@gmail.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>
-References: <20250918091746.2034285-1-alejandro.lucero-palau@amd.com>
- <20250918091746.2034285-8-alejandro.lucero-palau@amd.com>
- <58917e54-5631-4e68-8e0e-bcff94c41516@intel.com>
-Content-Language: en-US
-In-Reply-To: <58917e54-5631-4e68-8e0e-bcff94c41516@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250919173016.3454395-1-wokezhong@tencent.com>
+In-Reply-To: <20250919173016.3454395-1-wokezhong@tencent.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 19 Sep 2025 13:00:31 -0700
+X-Gm-Features: AS18NWCOYkxk_9vEU9rqYC-HLCcGEi5xhsjCte00EyRLLFSQcndBSvS9Zql3p08
+Message-ID: <CANn89i+0bmXUz=T+cGPexiMpS-epfhbz+Ds84A+Lewrj880TBg@mail.gmail.com>
+Subject: Re: [RFC net v1] net/tcp: fix permanent FIN-WAIT-1 state with
+ continuous zero window packets
+To: HaiYang Zhong <wokezhong@gmail.com>
+Cc: ncardwell@google.com, kuniyu@google.com, davem@davemloft.net, 
+	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, wokezhong@tencent.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Sep 19, 2025 at 10:30=E2=80=AFAM HaiYang Zhong <wokezhong@gmail.com=
+> wrote:
+>
+> When a TCP connection is in FIN-WAIT-1 state with the FIN packet blocked =
+in
+> the send buffer, and the peer continuously sends zero-window advertisemen=
+ts,
+> the current implementation reset the zero-window probe timer while mainta=
+ining
+> the current `icsk->icsk_backoff`, causing the connection to remain perman=
+ently
+> in FIN-WAIT-1 state.
+>
+> Reproduce conditions:
+> 1. Peer's receive window is full and actively sending continuous zero win=
+dow
+>    advertisements.
+> 2. Local FIN packet is blocked in send buffer due to peer's zero-window.
+> 3. Local socket has been closed (entered orphan state).
+>
+> The root cause lies in the tcp_ack_probe() function: when receiving a zer=
+o-window ACK,
+> - It reset the probe timer while keeping the current `icsk->icsk_backoff`=
+.
+> - This would result in the condition `icsk->icsk_backoff >=3D max_probes`=
+ false.
+> - Orphaned socket cannot be set to close.
+>
+> This patch modifies the tcp_ack_probe() logic: when the socket is dead,
+> upon receiving a zero-window packet, instead of resetting the probe timer=
+,
+> we maintain the current timer, ensuring the probe interval grows accordin=
+g
+> to 'icsk->icsk_backoff', thus causing the zero-window probe timer to even=
+tually
+> timeout and close the socket.
+>
+> Signed-off-by: HaiYang Zhong <wokezhong@tencent.com>
+> ---
+>  net/ipv4/tcp_input.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 71b76e98371a..22fc82cb6b73 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -3440,6 +3440,8 @@ static void tcp_ack_probe(struct sock *sk)
+>         } else {
+>                 unsigned long when =3D tcp_probe0_when(sk, tcp_rto_max(sk=
+));
+>
+> +               if (sock_flag(sk, SOCK_DEAD) && icsk->icsk_backoff !=3D 0=
+)
+> +                       return;
+>                 when =3D tcp_clamp_probe0_to_user_timeout(sk, when);
+>                 tcp_reset_xmit_timer(sk, ICSK_TIME_PROBE0, when, true);
+>         }
+> --
+> 2.43.7
 
+Hi there. Seems reasonable, but could you provide a packetdrill test ?
 
-On 9/19/25 8:59 AM, Dave Jiang wrote:
-> 
-> 
-> On 9/18/25 2:17 AM, alejandro.lucero-palau@amd.com wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> Use cxl API for creating a cxl memory device using the type2
->> cxl_dev_state struct.
->>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
->> Reviewed-by: Fan Ni <fan.ni@samsung.com>
->> Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> 
-> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-> 
-> with a nit below.
-> 
->> ---
->>  drivers/net/ethernet/sfc/efx_cxl.c | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
->> index 651d26aa68dc..177c60b269d6 100644
->> --- a/drivers/net/ethernet/sfc/efx_cxl.c
->> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
->> @@ -82,6 +82,12 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->>  		return dev_err_probe(&pci_dev->dev, -ENODEV,
->>  				     "dpa capacity setup failed\n");
->>  
->> +	cxl->cxlmd = devm_cxl_add_memdev(&pci_dev->dev, &cxl->cxlds, NULL);
->> +	if (IS_ERR(cxl->cxlmd)) {
->> +		pci_err(pci_dev, "CXL accel memdev creation failed");
-> 
-> As Jonathan mentioned. Maybe dev_err() to keep it consistent.
+Also, what if the FIN was already sent, but the peer retracted its RWIN ?
 
-Hmm....looking at the rest of the driver files the pci_*() calls are used instead. So ignore my comment. Although typically device drivers use dev_*() calls and pci_*() calls are reserved for PCI core devices.
-
-DJ
-  
-> 
->> +		return PTR_ERR(cxl->cxlmd);
->> +	}
->> +
->>  	probe_data->cxl = cxl;
->>  
->>  	return 0;
-> 
-> 
-
+tcp_ack_probe() would return early (if (!head) return;)
 
