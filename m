@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-224829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEB22B8AD59
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 19:54:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46D50B8AD5C
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 19:55:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 282E07B81D4
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 17:53:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43F307B6EFD
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 17:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ADFF3233E1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3139323400;
 	Fri, 19 Sep 2025 17:54:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n6jW3CLd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bE+iWNLK"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3D1322C90
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 17:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12139322DA7
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 17:54:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758304466; cv=none; b=NlyDPsU6eVyvkgi5bV7WQfdLawQDWKuuRorHD2R1qPvsRPu7xMM2SWeIKX9X3PGNy7u9rdie+hK9J/qDZ4qN3Ivm/+xR0BNLsEkd4o0HOHKbZtmNxL0vpn2gHvlvUTtA+MnQJnzWaLvUvgZqWbRt2R5gVOQxRI7OUD3nsubyhQU=
+	t=1758304466; cv=none; b=dRLqXt9prnV+3/N71LBtHdFuAbiW4EJucqkZw5psHIV8qgEEjwXFpjLK4iCRCa3xSSwYw5wxEUz9Ustp6PJRqUSRheDXqqVMlqlGNbivobq0fOfjth6RlhhYjZ4IoM83/vivVA3dkQ2RFau6Ut0tpU0CDJCB1DVLldpISt3sdIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1758304466; c=relaxed/simple;
-	bh=rWj3Go506wx8XTPijqCRUIpgOBztnJAX4RbsbLiNCVM=;
+	bh=2vtuV5io0Ekp+g31gG37Ume5llfD1JOkQF3MSMqkeGo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RHCKJqnW6fl8J+w1XBC4yQaytYwyy5em1jYyHzIjrD3Vlr+VRnvWPM2NJB514isCcdV/qwUcARMQIRPPfNRubs5E0lFNjb2McEno7NettVBI2NWPAV+wphLAufRquRbNvVJG2Hnq5Gty8bv/hllkDpCsynxOkOYy4XlLxNS6rG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n6jW3CLd; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=T2aQ/qhRrwjAaZ66dwq6WVssJ+rJ5Ljq/1hCy62+nH9r0cfi7Nun4wgZtyHN2mUxtDE1BKXiP0P+ySzGwaixE8PbkpT3XY5j5H2RamVJw06g60S4e1YbOyZEHWyW0zxaIixyIJtvHimpSHuVYyIK5hpQ/o5nzMaLzwzqsEISC4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bE+iWNLK; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758304465; x=1789840465;
+  t=1758304466; x=1789840466;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=rWj3Go506wx8XTPijqCRUIpgOBztnJAX4RbsbLiNCVM=;
-  b=n6jW3CLdrrp6lM+5GmuUE7gaQeMUkkUTZDACyk0Ouf7BmKjeMTxbVHAj
-   q/I6Hsqi01gdvnrbHibhOQLaWMy9YTv63edPjAiTlknqabKomY5kKUg8D
-   ZUpg+cUan+0QmAziEWcO34cefdtl+HAO2vJ3NvKKaVK9WNOE1Q53MP8EZ
-   97+msQ6ccF67R1myptV1omTD7B7l8yQ3GZznFv0h1VnMGySFKuq5ZK5Uf
-   71e1ydJLR9CL4Nka2A0x9S7K+QKfFDhP2LSLzYrNFGjSX5dSO6fT6XbXk
-   s6jNIkJjlE4CNA9Mwrv1nBPxyIFhwEASBKkTZv9Ydevh4SCXXNdFURMAh
-   w==;
-X-CSE-ConnectionGUID: TqQD3qFKTpim8JgTa/pXmg==
-X-CSE-MsgGUID: dhJC1glJTeW/lq/4XcRKxA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11558"; a="78097098"
+  bh=2vtuV5io0Ekp+g31gG37Ume5llfD1JOkQF3MSMqkeGo=;
+  b=bE+iWNLKA0j3r/nmh8QeDaO5e+lBYcpGyMI492c46q+UzJbte08twI0y
+   9UfxxV0vw+eCSsP4OWzoyeVjyeq0FrIgwtYBnPDQZtsE+VsNcj+D6uB5R
+   139nTp1yY5frQmWrLqC2EwtPGJjJz4X6b5B+lgL03B7SSZGMxtLEX0Yci
+   4zBwmo+MmY6+GL7oM9DIT9eigmaaiDbzd5OUperWmBHPjtYMYlp21h8m4
+   jnn5K+rGtfPRPvez39b24xAwBejQ/yBymJ6+S2BPYuINIXQf8ATbofrOi
+   Pgi7B0s76a5IVhfliHfRAH8VliDktu2Um2l0/cowv9NTPqQ+8WT7ehSDj
+   Q==;
+X-CSE-ConnectionGUID: HmFq43G2SjiI28Saut3reQ==
+X-CSE-MsgGUID: X1faZPgtSwKAzvdu8KFJYQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11558"; a="78097105"
 X-IronPort-AV: E=Sophos;i="6.18,278,1751266800"; 
-   d="scan'208";a="78097098"
+   d="scan'208";a="78097105"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
   by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 10:54:22 -0700
-X-CSE-ConnectionGUID: Zl7yzj4pQCCofFmYQPFBaQ==
-X-CSE-MsgGUID: Gs+3OWS7TF+fCUta7HpE5Q==
+X-CSE-ConnectionGUID: hxqE+BIpQ5qpWqCcNjrsuA==
+X-CSE-MsgGUID: tHhI2HCXS6Gs7UdAGHwSaA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,278,1751266800"; 
-   d="scan'208";a="176709497"
+   d="scan'208";a="176709501"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa010.fm.intel.com with ESMTP; 19 Sep 2025 10:54:21 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,13 +65,13 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+Cc: Brahmajit Das <listout@listout.xyz>,
 	anthony.l.nguyen@intel.com,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 6/7] ixgbevf: fix proper type for error code in ixgbevf_resume()
-Date: Fri, 19 Sep 2025 10:54:09 -0700
-Message-ID: <20250919175412.653707-7-anthony.l.nguyen@intel.com>
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH net-next 7/7] net: intel: fm10k: Fix parameter idx set but not used
+Date: Fri, 19 Sep 2025 10:54:10 -0700
+Message-ID: <20250919175412.653707-8-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250919175412.653707-1-anthony.l.nguyen@intel.com>
 References: <20250919175412.653707-1-anthony.l.nguyen@intel.com>
@@ -83,43 +83,87 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+From: Brahmajit Das <listout@listout.xyz>
 
-The variable 'err' in ixgbevf_resume() is used to store the return value
-of different functions, which return an int. Currently, 'err' is
-declared as u32, which is semantically incorrect and misleading.
+Variable idx is set in the loop, but is never used resulting in dead
+code. Building with GCC 16, which enables
+-Werror=unused-but-set-parameter= by default results in build error.
+This patch removes the idx parameter, since all the callers of the
+fm10k_unbind_hw_stats_q as 0 as idx anyways.
 
-In the Linux kernel, u32 is typically reserved for fixed-width data
-used in hardware interfaces or protocol structures. Using it for a
-generic error code may confuse reviewers or developers into thinking
-the value is hardware-related or size-constrained.
-
-Replace u32 with int to reflect the actual usage and improve code
-clarity and semantic correctness.
-
-No functional change.
-
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Suggested-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Signed-off-by: Brahmajit Das <listout@listout.xyz>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/intel/fm10k/fm10k_common.c | 5 ++---
+ drivers/net/ethernet/intel/fm10k/fm10k_common.h | 2 +-
+ drivers/net/ethernet/intel/fm10k/fm10k_pf.c     | 2 +-
+ drivers/net/ethernet/intel/fm10k/fm10k_vf.c     | 2 +-
+ 4 files changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-index 535d0f71f521..28e25641b167 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-@@ -4323,7 +4323,7 @@ static int ixgbevf_resume(struct device *dev_d)
- 	struct pci_dev *pdev = to_pci_dev(dev_d);
- 	struct net_device *netdev = pci_get_drvdata(pdev);
- 	struct ixgbevf_adapter *adapter = netdev_priv(netdev);
--	u32 err;
-+	int err;
+diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_common.c b/drivers/net/ethernet/intel/fm10k/fm10k_common.c
+index f51a63fca513..1f919a50c765 100644
+--- a/drivers/net/ethernet/intel/fm10k/fm10k_common.c
++++ b/drivers/net/ethernet/intel/fm10k/fm10k_common.c
+@@ -447,17 +447,16 @@ void fm10k_update_hw_stats_q(struct fm10k_hw *hw, struct fm10k_hw_stats_q *q,
+ /**
+  *  fm10k_unbind_hw_stats_q - Unbind the queue counters from their queues
+  *  @q: pointer to the ring of hardware statistics queue
+- *  @idx: index pointing to the start of the ring iteration
+  *  @count: number of queues to iterate over
+  *
+  *  Function invalidates the index values for the queues so any updates that
+  *  may have happened are ignored and the base for the queue stats is reset.
+  **/
+-void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 idx, u32 count)
++void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 count)
+ {
+ 	u32 i;
  
- 	adapter->hw.hw_addr = adapter->io_addr;
- 	smp_mb__before_atomic();
+-	for (i = 0; i < count; i++, idx++, q++) {
++	for (i = 0; i < count; i++, q++) {
+ 		q->rx_stats_idx = 0;
+ 		q->tx_stats_idx = 0;
+ 	}
+diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_common.h b/drivers/net/ethernet/intel/fm10k/fm10k_common.h
+index 4c48fb73b3e7..13fca6a91a01 100644
+--- a/drivers/net/ethernet/intel/fm10k/fm10k_common.h
++++ b/drivers/net/ethernet/intel/fm10k/fm10k_common.h
+@@ -43,6 +43,6 @@ u32 fm10k_read_hw_stats_32b(struct fm10k_hw *hw, u32 addr,
+ void fm10k_update_hw_stats_q(struct fm10k_hw *hw, struct fm10k_hw_stats_q *q,
+ 			     u32 idx, u32 count);
+ #define fm10k_unbind_hw_stats_32b(s) ((s)->base_h = 0)
+-void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 idx, u32 count);
++void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 count);
+ s32 fm10k_get_host_state_generic(struct fm10k_hw *hw, bool *host_ready);
+ #endif /* _FM10K_COMMON_H_ */
+diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_pf.c b/drivers/net/ethernet/intel/fm10k/fm10k_pf.c
+index b9dd7b719832..3394645a18fe 100644
+--- a/drivers/net/ethernet/intel/fm10k/fm10k_pf.c
++++ b/drivers/net/ethernet/intel/fm10k/fm10k_pf.c
+@@ -1389,7 +1389,7 @@ static void fm10k_rebind_hw_stats_pf(struct fm10k_hw *hw,
+ 	fm10k_unbind_hw_stats_32b(&stats->nodesc_drop);
+ 
+ 	/* Unbind Queue Statistics */
+-	fm10k_unbind_hw_stats_q(stats->q, 0, hw->mac.max_queues);
++	fm10k_unbind_hw_stats_q(stats->q, hw->mac.max_queues);
+ 
+ 	/* Reinitialize bases for all stats */
+ 	fm10k_update_hw_stats_pf(hw, stats);
+diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_vf.c b/drivers/net/ethernet/intel/fm10k/fm10k_vf.c
+index 7fb1961f2921..6861a0bdc14e 100644
+--- a/drivers/net/ethernet/intel/fm10k/fm10k_vf.c
++++ b/drivers/net/ethernet/intel/fm10k/fm10k_vf.c
+@@ -465,7 +465,7 @@ static void fm10k_rebind_hw_stats_vf(struct fm10k_hw *hw,
+ 				     struct fm10k_hw_stats *stats)
+ {
+ 	/* Unbind Queue Statistics */
+-	fm10k_unbind_hw_stats_q(stats->q, 0, hw->mac.max_queues);
++	fm10k_unbind_hw_stats_q(stats->q, hw->mac.max_queues);
+ 
+ 	/* Reinitialize bases for all stats */
+ 	fm10k_update_hw_stats_vf(hw, stats);
 -- 
 2.47.1
 
