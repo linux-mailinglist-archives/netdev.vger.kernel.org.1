@@ -1,104 +1,145 @@
-Return-Path: <netdev+bounces-224862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10341B8B007
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 20:52:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0A3DB8B093
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 21:04:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF11A3A680E
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 18:52:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AFD15A3364
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 19:04:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D1625F780;
-	Fri, 19 Sep 2025 18:52:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NYKXeHdp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182C6264A77;
+	Fri, 19 Sep 2025 19:04:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149EF1E1E16;
-	Fri, 19 Sep 2025 18:52:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C8E2765C9
+	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 19:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758307957; cv=none; b=N3CAkNpUSqycWQXTdHOVWmssBpKUzHnJ6NkKJ3BHRmeClOVACbMIJCdImTWXQ/89AStBgkcYN/lb+tfqOTa3ghsccB2Ye/gLrkgGl/y5qpnl4eM9ykV9y1MDtJIypjKATX6vdK+giLL6Ep1zenN/okhiIrn95mPT5A+AU641d9U=
+	t=1758308654; cv=none; b=YXVJhab7gsAs/7woNahmdAaFst0+PjSjH2SMPWoxKWBQScJWkO0nTFR2N+n8ckvveqpPm/3PjogoyyIEGmzOfDprY1aW5iKUOLnUAzD9p0Cgksz2o9XkIrQrSQhy0xMTUKjt88I0fGHXP6yClMvkmnPoimCOqYwgo7Es1lu8BYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758307957; c=relaxed/simple;
-	bh=+sZY14sW8tr9IVa9GH1fBB0VscnTuhTsxV2CfzO6pdE=;
+	s=arc-20240116; t=1758308654; c=relaxed/simple;
+	bh=NW8nGzciBK2UY5TvnjgoXCb2Hp+6NHK9jXn07Tf3dio=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PsWLWzitgj5e2HeyuJD6oEeIrr4IUtIoOOonbvJTwy0lRHGuoE22gij75zxSBGuv1vx6ENc3nft2qNxsA8UIAT2ZoKXdd3/xMidALwd6RGNpNQ0DFSo21yvNyi9p9VE1wgH42Lgkm6Yc9ZVEJKzdRokL7veUo9VrJbZuetD0EfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NYKXeHdp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D9E1C4CEF0;
-	Fri, 19 Sep 2025 18:52:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758307956;
-	bh=+sZY14sW8tr9IVa9GH1fBB0VscnTuhTsxV2CfzO6pdE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NYKXeHdpOD1QbneH7XyTm8yziyDnhWbFad7CxaSZwm9o5f/2Ad2/EPvyMurh9fl6r
-	 XpwDHZmNvLYX3IiWaTOOvp28390iGIKQ7CAkbWP55QLE2rf5FeKzRrfYiqFdWAoY2v
-	 Bi6Du/7yz6eQ6/WckJumn+j/htMTZCIImITFILh14CNCnv60JTK1LRDTS26tO+HlQo
-	 r8rqN3taiY9u3mcMjto5zndQ5hbS3IB7OKk7O9c1hJsuDaF5l8DSXd0HaSofQs3kuC
-	 qBKtzpm2fn6dh80hQWZOwqsSoR3f96c3quFJIv08G/xgWPvCOoKa7fuXH2HQKEiOnz
-	 jcnvqf/qIqeRA==
-Date: Fri, 19 Sep 2025 19:52:32 +0100
-From: Simon Horman <horms@kernel.org>
-To: Deepak Sharma <deepak.sharma.472935@gmail.com>
-Cc: krzk@kernel.org, vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
-	stable@vger.kernel.org, linux-kernel-mentees@lists.linux.dev,
-	syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v3] net: nfc: nci: Add parameter validation for
- packet data
-Message-ID: <20250919185232.GF589507@horms.kernel.org>
-References: <20250919064545.4252-1-deepak.sharma.472935@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GJFdpLvRjLxatxQS6+djEdfi9LoLJy/QbkgTxFDSGVenBwZ+gSS0ZxD+TzZwA0pkoz+3mwREIbCSFilJOOaZG7S6K9eW/eaJdmKebtbmyQopgaaFQnmSqma7SfwFDCTGTJpSy2knnnmumUnHdjzHW7nLVHDHUZrOR0MixL1Dz9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uzgOp-00026Z-CN; Fri, 19 Sep 2025 21:04:03 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uzgOn-0029YZ-1s;
+	Fri, 19 Sep 2025 21:04:01 +0200
+Received: from pengutronix.de (ip-185-104-138-125.ptr.icomera.net [185.104.138.125])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id A27B74751DB;
+	Fri, 19 Sep 2025 19:04:00 +0000 (UTC)
+Date: Fri, 19 Sep 2025 21:03:59 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Andrea Daoud <andreadaoud6@gmail.com>
+Cc: Heiko Stuebner <heiko@sntech.de>, 
+	Elaine Zhang <zhangqing@rock-chips.com>, kernel@pengutronix.de, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: Possible race condition of the rockchip_canfd driver
+Message-ID: <20250919-lurking-agama-of-genius-96b832-mkl@pengutronix.de>
+References: <CAOprWosSvBmORh9NKk-uxoWZpD6zdnF=dODS-uxVnTDjmofL6g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gge37mtwq6wtzjdu"
 Content-Disposition: inline
-In-Reply-To: <20250919064545.4252-1-deepak.sharma.472935@gmail.com>
+In-Reply-To: <CAOprWosSvBmORh9NKk-uxoWZpD6zdnF=dODS-uxVnTDjmofL6g@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Fri, Sep 19, 2025 at 12:15:44PM +0530, Deepak Sharma wrote:
-> Syzbot reported an uninit-value bug at nci_init_req for commit
-> 5aca7966d2a7 ("Merge tag 'perf-tools-fixes-for-v6.17-2025-09-16'..).
-> 
-> This bug arises due to very limited and poor input validation
-> that was done at nic_valid_size(). This validation only
-> validates the skb->len (directly reflects size provided at the
-> userspace interface) with the length provided in the buffer
-> itself (interpreted as NCI_HEADER). This leads to the processing
-> of memory content at the address assuming the correct layout
-> per what opcode requires there. This leads to the accesses to
-> buffer of `skb_buff->data` which is not assigned anything yet.
-> 
-> Following the same silent drop of packets of invalid sizes at
-> `nic_valid_size()`, add validation of the data in the respective
-> handlers and return error values in case of failure. Release
-> the skb if error values are returned from handlers in 
-> `nci_nft_packet` and effectively do a silent drop
-> 
-> Possible TODO: because we silently drop the packets, the
-> call to `nci_request` will be waiting for completion of request
-> and will face timeouts. These timeouts can get excessively logged
-> in the dmesg. A proper handling of them may require to export
-> `nci_request_cancel` (or propagate error handling from the
-> nft packets handlers).
-> 
-> Reported-by: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=740e04c2a93467a0f8c8
-> Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation)
 
-There is a typo in the fixes tag. It should be:
+--gge37mtwq6wtzjdu
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: Possible race condition of the rockchip_canfd driver
+MIME-Version: 1.0
 
-Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation")
-                                                           ^^^
-I expect there is no need to repost to address this.
+Hello,
 
-> Tested-by: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
-> Signed-off-by: Deepak Sharma <deepak.sharma.472935@gmail.com>
+On 18.09.2025 20:58:33, Andrea Daoud wrote:
+> I'm using the rockchip_canfd driver on an RK3568. When under high bus
+> load, I get
+> the following logs [1] in rkcanfd_tx_tail_is_eff, and the CAN bus is unab=
+le to
+> communicate properly under this condition. The exact cause is currently n=
+ot
+> entirely clear, and it's not reliably reproducible.
 
-...
+Our customer is using a v3 silicon revision of the chip, which doesn't
+this workaround.
+
+> In the logs we can spot some strange points:
+>=20
+> 1. Line 24, tx_head =3D=3D tx_tail. This should have been rejected by the=
+ if
+> (!rkcanfd_get_tx_pending) clause.
+>=20
+> 2. Line 26, the last bit of priv->tx_tail (0x0185dbb3) is 1. This means t=
+hat the
+> tx_tail should be 1, because rkcanfd_get_tx_tail is essentially mod the
+> priv->tx_tail by two. But the printed tx_tail is 0.
+>=20
+> I believe these problems could mean that the code is suffering from some =
+race
+> condition. It seems that, in the whole IRQ processing chain of the driver,
+> there's no lock protection. Maybe some IRQ happens within the execution of
+> rkcanfd_tx_tail_is_eff, and touches the state of the tx_head and tx_tail?
+>=20
+> Could you please have a look at the code, and check if some locking is ne=
+eded?
+
+My time for community support is currently a bit limited. I think this
+has to wait a bit, apologies :/
+
+regards,
+Marc=20
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--gge37mtwq6wtzjdu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmjNqRoACgkQDHRl3/mQ
+kZyo+Qf/T3m3vtjMMPeAzZSo9sBY5Ua+T7LYK3oU4OfY2FXjMwtwj7KG1YlMzZfB
+EnKx8YEiYzxOsDhgPPMATwByRfx4MDXOTmpP/VkU6+bQJsNbJ5uox/LR56/Ss8wU
+kiB1pcPpvnqaxLiVGStJ1Hy/LyKACHaKsXsFiBiUDCCovrz6Ogk1NTp9s5sa5HZC
+piCOg4cdZqaNlC7P2tBa1hU9HrkdUn/bP+VYqdzzk85Z0DFsCi3WpdMkN/Dhymf+
+eOoJ7pRSoKbUAiO+OMoGtxYgjtNKHW1GYhg3Q6BuLn+OFoNhigDhoeF62IJpGofO
+lJKKMXeaO9WXM4ryfvXl6ra4MYxvSg==
+=R78M
+-----END PGP SIGNATURE-----
+
+--gge37mtwq6wtzjdu--
 
