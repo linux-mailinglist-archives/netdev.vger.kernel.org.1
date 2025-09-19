@@ -1,158 +1,286 @@
-Return-Path: <netdev+bounces-224715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE30FB88C3F
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 12:10:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91DC7B88CAA
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 12:18:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EAC25A0094
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 10:10:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D1581C26E85
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 10:18:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C80B2F49EB;
-	Fri, 19 Sep 2025 10:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 539BA304973;
+	Fri, 19 Sep 2025 10:18:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lY9hX4dS"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="rwwzqWKh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com [35.158.23.94])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A514C2EC08A
-	for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 10:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E585E2F9D92;
+	Fri, 19 Sep 2025 10:18:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.158.23.94
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758276623; cv=none; b=bxIPQBrst796nRi58+BaZ9rmEZMIuQ1hxMXh1Jy8LgQBmFs/y3muSEp4vYYojfyZjJUmhDcslE8mtEcy5w7fKOnRgPFjrqdqUT3PNFiKOHhBWybffRlk6CaVSIbDEy8Lqdk/Pla/0qSEch0tPqY3S9brQY4QQ8OK0SL2xm0oz0o=
+	t=1758277097; cv=none; b=bJLy4CScG7POYyXc4jEFc/AcXh5uTQm+v9tmgZ3uZmVSY48djaXgTIjz7Z/z5yj/G8dhHfP7CQCVJs/q2OgxlqJceVQE3gLABFl98s/LskGals93iZm5qAaPfFJ2+4PJlkGAtkd56k8zlO5ujiBE/6/jEPkCWI1KPvrB2wz7o2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758276623; c=relaxed/simple;
-	bh=T81hpHtClbzCSMopKan4eUgA2AWFd4Jyyhy1ER8FvsM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZwqEpQiLTUaxr+dqE23liapAmF78UEu/ooMqQKs2/SuTzAxTvNRNWb1PCRgF7KGFEM4RrYiFw4SfR+8c2sFj2hpx6DHCjjBeqbu7TEZstuZZyqG4QIoRFh/wYowpBAhL9Oloxsv5kDTloFOoujIuAWGL42W7Y2wg3Djsp/UJguQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lY9hX4dS; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758276621; x=1789812621;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=T81hpHtClbzCSMopKan4eUgA2AWFd4Jyyhy1ER8FvsM=;
-  b=lY9hX4dStTC5/1gJ57nXNzHOr/QdklpEGISSBFRZNbZm7871v76laPBC
-   JqP5aUoTDRoetiE233PJLI0PF8E9+BGQ07mHofZ3i3M2kroh8aUWWricT
-   gfUBSlfQ3VXPvax9RcR5QA7WlIsVvp0hVbs+w6cfC3IzkXtW4kc5HH3cl
-   a2L4Ol/6NMKg4YZd9n2P6CIbkxCpWNBIRrl4sNG2qbA1lO32a6QfmWKol
-   qZccxziKF419tAxBn3qJWd+tRnwXOtV4rhUWutv9yZ3skGy/ZMOdWSRHn
-   wmB8tG+Va3gIziOECyM4UGDDyeiOYPqaYzn1Fb/19JTGsxurLIlvBWazC
-   g==;
-X-CSE-ConnectionGUID: 5ESUkd86QbWSg8qEqK2Wmw==
-X-CSE-MsgGUID: M32cvS1PQRm8a2U2lCl7xA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11557"; a="78227621"
-X-IronPort-AV: E=Sophos;i="6.18,277,1751266800"; 
-   d="scan'208";a="78227621"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 03:10:21 -0700
-X-CSE-ConnectionGUID: 5W+6XjD1QLiw7Gfi0jG/aQ==
-X-CSE-MsgGUID: oraggle/RhuHby0ZNcdpGA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,277,1751266800"; 
-   d="scan'208";a="175348230"
-Received: from lkp-server01.sh.intel.com (HELO 84a20bd60769) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 19 Sep 2025 03:10:18 -0700
-Received: from kbuild by 84a20bd60769 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uzY4F-0004Br-19;
-	Fri, 19 Sep 2025 10:10:15 +0000
-Date: Fri, 19 Sep 2025 18:09:52 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next 3/7] tcp: move tcp->rcv_tstamp to
- tcp_sock_write_txrx group
-Message-ID: <202509191711.gDaSokkJ-lkp@intel.com>
-References: <20250918155532.751173-4-edumazet@google.com>
+	s=arc-20240116; t=1758277097; c=relaxed/simple;
+	bh=YJdsYm70lqmrjZhD7jBaV8cdfUCAbDW2tpB1Od6r91s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Rfusbx47aIUmLFcGr5FlFXMRAqoIPohepypI/ifHBLJwrVC8UL2ZrbzzhtH+izcjKNnFRDm8tEdqRw9C1/Xa83TT28buQVaNxOWVtHlgqwHwW3sRLzPYM6JPV9ms1Osn8OW47igbPJkVlkI9LW7MF0pATRWXeKRxSQX+KF6D26Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=rwwzqWKh; arc=none smtp.client-ip=35.158.23.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1758277095; x=1789813095;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=BxXd7aLvDai7evuJPWIvJpLyCQkjko3tn6jQCrrWhJk=;
+  b=rwwzqWKh6WYopnwgVXDtgH4CB1YKNPIN2CKQ2pI1rK3+ZNCFWLuq6XfQ
+   XUlb94TVuLV3RemJnDkAFODREwXdMc/QGF61UxXm2Qu3+PoTbw5eRw4Qr
+   QwupOaSSlgfDh/0mEfXZ9NqHyuYu2mcS4Q2CfBX10ckEBpBBNDfEwHgo/
+   OSQFJ3cQcVlM6TgG7L6KLoz0k6UInx8geQnrwvD7pGENxaADL10M7lUoo
+   HSYPKMTng97MaD69v1ynEfFptlPT8P9N09cDbMMo8WzmtQ7daJs2IWiZp
+   vDEMALpM/1BciPbQAyCEiVQvL0bggUq2Fq8maieI7mQjCezxF7dOWL2Td
+   w==;
+X-CSE-ConnectionGUID: kpLok2gGQZaUNR51qNOOOA==
+X-CSE-MsgGUID: O1O53yWdRsCFciLE9oPAkQ==
+X-IronPort-AV: E=Sophos;i="6.18,277,1751241600"; 
+   d="scan'208";a="2371468"
+Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
+  by internal-fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 10:18:03 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:23074]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.8.212:2525] with esmtp (Farcaster)
+ id 2cb163fe-6002-4c0e-9495-7cf46795baf7; Fri, 19 Sep 2025 10:18:03 +0000 (UTC)
+X-Farcaster-Flow-ID: 2cb163fe-6002-4c0e-9495-7cf46795baf7
+Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.192) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Fri, 19 Sep 2025 10:18:02 +0000
+Received: from dev-dsk-farbere-1a-46ecabed.eu-west-1.amazon.com
+ (172.19.116.181) by EX19D018EUA004.ant.amazon.com (10.252.50.85) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20; Fri, 19 Sep 2025
+ 10:17:34 +0000
+From: Eliav Farber <farbere@amazon.com>
+To: <linux@armlinux.org.uk>, <jdike@addtoit.com>, <richard@nod.at>,
+	<anton.ivanov@cambridgegreys.com>, <dave.hansen@linux.intel.com>,
+	<luto@kernel.org>, <peterz@infradead.org>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <x86@kernel.org>, <hpa@zytor.com>,
+	<tony.luck@intel.com>, <qiuxu.zhuo@intel.com>, <mchehab@kernel.org>,
+	<james.morse@arm.com>, <rric@kernel.org>, <harry.wentland@amd.com>,
+	<sunpeng.li@amd.com>, <alexander.deucher@amd.com>,
+	<christian.koenig@amd.com>, <airlied@linux.ie>, <daniel@ffwll.ch>,
+	<evan.quan@amd.com>, <james.qian.wang@arm.com>, <liviu.dudau@arm.com>,
+	<mihail.atanassov@arm.com>, <brian.starkey@arm.com>,
+	<maarten.lankhorst@linux.intel.com>, <mripard@kernel.org>,
+	<tzimmermann@suse.de>, <robdclark@gmail.com>, <sean@poorly.run>,
+	<jdelvare@suse.com>, <linux@roeck-us.net>, <fery@cypress.com>,
+	<dmitry.torokhov@gmail.com>, <agk@redhat.com>, <snitzer@redhat.com>,
+	<dm-devel@redhat.com>, <rajur@chelsio.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <peppe.cavallaro@st.com>, <alexandre.torgue@st.com>,
+	<joabreu@synopsys.com>, <mcoquelin.stm32@gmail.com>, <malattia@linux.it>,
+	<hdegoede@redhat.com>, <mgross@linux.intel.com>, <intel-linux-scu@intel.com>,
+	<artur.paszkiewicz@intel.com>, <jejb@linux.ibm.com>,
+	<martin.petersen@oracle.com>, <sakari.ailus@linux.intel.com>,
+	<gregkh@linuxfoundation.org>, <clm@fb.com>, <josef@toxicpanda.com>,
+	<dsterba@suse.com>, <jack@suse.com>, <tytso@mit.edu>,
+	<adilger.kernel@dilger.ca>, <dushistov@mail.ru>,
+	<luc.vanoostenryck@gmail.com>, <rostedt@goodmis.org>, <pmladek@suse.com>,
+	<sergey.senozhatsky@gmail.com>, <andriy.shevchenko@linux.intel.com>,
+	<linux@rasmusvillemoes.dk>, <minchan@kernel.org>, <ngupta@vflare.org>,
+	<akpm@linux-foundation.org>, <kuznet@ms2.inr.ac.ru>,
+	<yoshfuji@linux-ipv6.org>, <pablo@netfilter.org>, <kadlec@netfilter.org>,
+	<fw@strlen.de>, <jmaloy@redhat.com>, <ying.xue@windriver.com>,
+	<willy@infradead.org>, <farbere@amazon.com>, <sashal@kernel.org>,
+	<ruanjinjie@huawei.com>, <David.Laight@ACULAB.COM>,
+	<herve.codina@bootlin.com>, <Jason@zx2c4.com>, <bvanassche@acm.org>,
+	<keescook@chromium.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <linux-um@lists.infradead.org>,
+	<linux-edac@vger.kernel.org>, <amd-gfx@lists.freedesktop.org>,
+	<dri-devel@lists.freedesktop.org>, <linux-arm-msm@vger.kernel.org>,
+	<freedreno@lists.freedesktop.org>, <linux-hwmon@vger.kernel.org>,
+	<linux-input@vger.kernel.org>, <linux-media@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+	<platform-driver-x86@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+	<linux-staging@lists.linux.dev>, <linux-btrfs@vger.kernel.org>,
+	<linux-ext4@vger.kernel.org>, <linux-sparse@vger.kernel.org>,
+	<linux-mm@kvack.org>, <netfilter-devel@vger.kernel.org>,
+	<coreteam@netfilter.org>, <tipc-discussion@lists.sourceforge.net>,
+	<stable@vger.kernel.org>
+CC: <jonnyc@amazon.com>
+Subject: [PATCH 00/27 5.10.y] Backport minmax.h updates from v6.17-rc6
+Date: Fri, 19 Sep 2025 10:17:00 +0000
+Message-ID: <20250919101727.16152-1-farbere@amazon.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250918155532.751173-4-edumazet@google.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWC001.ant.amazon.com (10.13.139.202) To
+ EX19D018EUA004.ant.amazon.com (10.252.50.85)
 
-Hi Eric,
+This series includes a total of 27 patches, to align minmax.h of
+v5.15.y with v6.17-rc6.
 
-kernel test robot noticed the following build errors:
+The set consists of 24 commits that directly update minmax.h:
+1) 92d23c6e9415 ("overflow, tracing: Define the is_signed_type() macro
+   once")
+2) 5efcecd9a3b1 ("minmax: sanity check constant bounds when clamping")
+3) 2122e2a4efc2 ("minmax: clamp more efficiently by avoiding extra
+   comparison")
+4) f9bff0e31881 ("minmax: add in_range() macro")
+5) c952c748c7a9 ("minmax: Introduce {min,max}_array()")
+6) 5e57418a2031 ("minmax: deduplicate __unconst_integer_typeof()")
+7) f6e9d38f8eb0 ("minmax: fix header inclusions")
+8) d03eba99f5bf ("minmax: allow min()/max()/clamp() if the arguments
+   have the same signedness.")
+9) f4b84b2ff851 ("minmax: fix indentation of __cmp_once() and
+   __clamp_once()")
+10) 4ead534fba42 ("minmax: allow comparisons of 'int' against 'unsigned
+    char/short'")
+11) 867046cc7027 ("minmax: relax check to allow comparison between
+    unsigned arguments and signed constants")
+12) 3a7e02c040b1 ("minmax: avoid overly complicated constant
+    expressions in VM code")
+14) 017fa3e89187 ("minmax: simplify and clarify min_t()/max_t()
+    implementation")
+15) 1a251f52cfdc ("minmax: make generic MIN() and MAX() macros
+    available everywhere")
+18) dc1c8034e31b ("minmax: simplify min()/max()/clamp()
+    implementation")
+19) 22f546873149 ("minmax: improve macro expansion and type
+    checking")
+20) 21b136cc63d2 ("minmax: fix up min3() and max3() too")
+21) 71ee9b16251e ("minmax.h: add whitespace around operators and after
+    commas")
+22) 10666e992048 ("minmax.h: update some comments")
+23) b280bb27a9f7 ("minmax.h: reduce the #define expansion of min(),
+    max() and clamp()")
+24) a5743f32baec ("minmax.h: use BUILD_BUG_ON_MSG() for the lo < hi
+    test in clamp()")
+25) c3939872ee4a ("minmax.h: move all the clamp() definitions after the
+    min/max() ones")
+26) 495bba17cdf9 ("minmax.h: simplify the variants of clamp()")
+27) 2b97aaf74ed5 ("minmax.h: remove some #defines that are only
+    expanded once")
 
-[auto build test ERROR on net-next/main]
+2 prerequisite commits that adjust users of MIN and MAX macros (to
+prevent compilation issues):
+13) 4477b39c32fd ("minmax: add a few more MIN_T/MAX_T users")
+17) cb04e8b1d2f2 ("minmax: don't use max() in situations that want a C
+    constant expression")
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-move-sk_uid-and-sk_protocol-to-sock_read_tx/20250919-000602
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250918155532.751173-4-edumazet%40google.com
-patch subject: [PATCH net-next 3/7] tcp: move tcp->rcv_tstamp to tcp_sock_write_txrx group
-config: powerpc-ge_imp3a_defconfig (https://download.01.org/0day-ci/archive/20250919/202509191711.gDaSokkJ-lkp@intel.com/config)
-compiler: powerpc-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250919/202509191711.gDaSokkJ-lkp@intel.com/reproduce)
+1 additional commit introduced to resolve a build failures during the
+backport:
+16) lib: zstd: drop local MIN/MAX macros in favor of generic ones
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509191711.gDaSokkJ-lkp@intel.com/
+The primary motivation is to bring in commit (8).
+In mainline, this change allows min()/max()/clamp() to accept mixed
+argument types when both share the same signedness.
+Backported patches to v5.10.y that use such forms trigger compiler
+warnings, which in turn cause build failures when -Werror is enabled.
 
-All errors (new ones prefixed by >>):
+Originaly I aligned 5.10.y to 5.15.y, but David Laight commented that I
+need to pick up the later changes (from Linus) as well.
 
-   In file included from <command-line>:
-   In function 'tcp_struct_check',
-       inlined from 'tcp_init' at net/ipv4/tcp.c:5204:2:
->> include/linux/compiler_types.h:572:45: error: call to '__compiletime_assert_1129' declared with attribute error: BUILD_BUG_ON failed: offsetof(struct tcp_sock, __cacheline_group_end__tcp_sock_write_txrx) - offsetofend(struct tcp_sock, __cacheline_group_begin__tcp_sock_write_txrx) > 107 + 4
-     572 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |                                             ^
-   include/linux/compiler_types.h:553:25: note: in definition of macro '__compiletime_assert'
-     553 |                         prefix ## suffix();                             \
-         |                         ^~~~~~
-   include/linux/compiler_types.h:572:9: note: in expansion of macro '_compiletime_assert'
-     572 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
-      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-         |                                     ^~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
-      50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
-         |         ^~~~~~~~~~~~~~~~
-   include/linux/cache.h:160:9: note: in expansion of macro 'BUILD_BUG_ON'
-     160 |         BUILD_BUG_ON(offsetof(TYPE, __cacheline_group_end__##GROUP) - \
-         |         ^~~~~~~~~~~~
-   net/ipv4/tcp.c:5173:9: note: in expansion of macro 'CACHELINE_ASSERT_GROUP_SIZE'
-    5173 |         CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 107 + 4);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+Andy Shevchenko (2):
+  minmax: deduplicate __unconst_integer_typeof()
+  minmax: fix header inclusions
 
+Bart Van Assche (1):
+  overflow, tracing: Define the is_signed_type() macro once
 
-vim +/__compiletime_assert_1129 +572 include/linux/compiler_types.h
+David Laight (11):
+  minmax: allow min()/max()/clamp() if the arguments have the same
+    signedness.
+  minmax: fix indentation of __cmp_once() and __clamp_once()
+  minmax: allow comparisons of 'int' against 'unsigned char/short'
+  minmax: relax check to allow comparison between unsigned arguments and
+    signed constants
+  minmax.h: add whitespace around operators and after commas
+  minmax.h: update some comments
+  minmax.h: reduce the #define expansion of min(), max() and clamp()
+  minmax.h: use BUILD_BUG_ON_MSG() for the lo < hi test in clamp()
+  minmax.h: move all the clamp() definitions after the min/max() ones
+  minmax.h: simplify the variants of clamp()
+  minmax.h: remove some #defines that are only expanded once
 
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  558  
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  559  #define _compiletime_assert(condition, msg, prefix, suffix) \
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  560  	__compiletime_assert(condition, msg, prefix, suffix)
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  561  
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  562  /**
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  563   * compiletime_assert - break build and emit msg if condition is false
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  564   * @condition: a compile-time constant condition to check
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  565   * @msg:       a message to emit if condition is false
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  566   *
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  567   * In tradition of POSIX assert, this macro will break the build if the
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  568   * supplied condition is *false*, emitting the supplied error message if the
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  569   * compiler has support to do so.
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  570   */
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  571  #define compiletime_assert(condition, msg) \
-eb5c2d4b45e3d2 Will Deacon 2020-07-21 @572  	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  573  
+Eliav Farber (1):
+  lib: zstd: drop local MIN/MAX macros in favor of generic ones
+
+Herve Codina (1):
+  minmax: Introduce {min,max}_array()
+
+Jason A. Donenfeld (2):
+  minmax: sanity check constant bounds when clamping
+  minmax: clamp more efficiently by avoiding extra comparison
+
+Linus Torvalds (8):
+  minmax: avoid overly complicated constant expressions in VM code
+  minmax: add a few more MIN_T/MAX_T users
+  minmax: simplify and clarify min_t()/max_t() implementation
+  minmax: make generic MIN() and MAX() macros available everywhere
+  minmax: don't use max() in situations that want a C constant
+    expression
+  minmax: simplify min()/max()/clamp() implementation
+  minmax: improve macro expansion and type checking
+  minmax: fix up min3() and max3() too
+
+Matthew Wilcox (Oracle) (1):
+  minmax: add in_range() macro
+
+ arch/arm/mm/pageattr.c                        |   6 +-
+ arch/um/drivers/mconsole_user.c               |   2 +
+ arch/x86/mm/pgtable.c                         |   2 +-
+ drivers/edac/sb_edac.c                        |   4 +-
+ drivers/edac/skx_common.h                     |   1 -
+ .../drm/amd/display/modules/hdcp/hdcp_ddc.c   |   2 +
+ .../drm/amd/pm/powerplay/hwmgr/ppevvmath.h    |  14 +-
+ .../drm/arm/display/include/malidp_utils.h    |   2 +-
+ .../display/komeda/komeda_pipeline_state.c    |  24 +-
+ drivers/gpu/drm/drm_color_mgmt.c              |   2 +-
+ drivers/gpu/drm/msm/adreno/a6xx_gmu.c         |   6 -
+ drivers/gpu/drm/radeon/evergreen_cs.c         |   2 +
+ drivers/hwmon/adt7475.c                       |  24 +-
+ drivers/input/touchscreen/cyttsp4_core.c      |   2 +-
+ drivers/md/dm-integrity.c                     |   2 +-
+ drivers/media/dvb-frontends/stv0367_priv.h    |   3 +
+ .../net/ethernet/chelsio/cxgb3/cxgb3_main.c   |  18 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |   2 +-
+ drivers/net/fjes/fjes_main.c                  |   4 +-
+ drivers/nfc/pn544/i2c.c                       |   2 -
+ drivers/platform/x86/sony-laptop.c            |   1 -
+ drivers/scsi/isci/init.c                      |   6 +-
+ .../pci/hive_isp_css_include/math_support.h   |   5 -
+ fs/btrfs/misc.h                               |   2 -
+ fs/btrfs/tree-checker.c                       |   2 +-
+ fs/ext2/balloc.c                              |   2 -
+ fs/ext4/ext4.h                                |   2 -
+ fs/ufs/util.h                                 |   6 -
+ include/linux/compiler.h                      |  15 +
+ include/linux/minmax.h                        | 267 ++++++++++++++----
+ include/linux/overflow.h                      |   1 -
+ include/linux/trace_events.h                  |   2 -
+ kernel/trace/preemptirq_delay_test.c          |   2 -
+ lib/btree.c                                   |   1 -
+ lib/decompress_unlzma.c                       |   2 +
+ lib/logic_pio.c                               |   3 -
+ lib/vsprintf.c                                |   2 +-
+ lib/zstd/zstd_internal.h                      |   2 -
+ mm/zsmalloc.c                                 |   1 -
+ net/ipv4/proc.c                               |   2 +-
+ net/ipv6/proc.c                               |   2 +-
+ net/netfilter/nf_nat_core.c                   |   6 +-
+ net/tipc/core.h                               |   2 +-
+ net/tipc/link.c                               |  10 +-
+ 44 files changed, 306 insertions(+), 164 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.47.3
+
 
