@@ -1,39 +1,49 @@
-Return-Path: <netdev+bounces-224757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E71FB89587
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 14:05:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BD08B8959C
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 14:09:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C63897BAA1A
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 12:03:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D7AA189C415
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 12:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F16630BB9A;
-	Fri, 19 Sep 2025 12:05:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1313B30DD3D;
+	Fri, 19 Sep 2025 12:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tx5sT9GH"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E836C303A31;
-	Fri, 19 Sep 2025 12:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71212F291B;
+	Fri, 19 Sep 2025 12:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758283527; cv=none; b=OH2tlEAUZgzE/QlAWvCFXB+YxYawU1Vkv1tjvf3g44W687MbeOxgAJrTehJrEIEHEvOSbKaO4TDXLwjZ0bJrNx0Z0K1jK4XxXM1WmV+pNdMQ4XRzSUKACc4vDEJdETPFZxKDEng0Kz3m5JtrkJEKOUF09oIcv4nJnTfCwSeBnhs=
+	t=1758283758; cv=none; b=MtKyGJSmXyqwozwWycFQnpGpZAn8NgSIH6w/Y/WyCg71mZjfjyfJQg4uaiKjmWeEjLFtNTYn9Hv8IqLLrCW5QeeKaoYlw2AAAVAHkd35zlRURMP34V2os8PfyJROPwYXtTmyJnbyMhR5mTI3/RvS5hjjw6UcJLcVmMd4cRheSoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758283527; c=relaxed/simple;
-	bh=ovOgPAA5C+GaIni2KNtKo1RtUiRe1rqB2DEy1M7lRuA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=IdjKtbY7F/s1xt5TD6bC3mfFXpINyH4kMJSLMVlEqEatx2hOlz3P2MJ0AtRLzqiGN8WNmcRlb+ODz45DyB41zhR7PRGp3RBfmcsqk2lYPPAnJhIEvq5SlOslG7pPwE9iNZB9fR4aeg9SmmHO3gvBHYHgmom1LAc3KebiCSIpJSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [127.0.0.2] (unknown [114.241.87.235])
-	by APP-05 (Coremail) with SMTP id zQCowADXeBLSRs1oR9y_Aw--.22941S2;
-	Fri, 19 Sep 2025 20:04:37 +0800 (CST)
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-Date: Fri, 19 Sep 2025 20:04:33 +0800
-Subject: [PATCH net-next] net: spacemit: Make stats_lock softirq-safe
+	s=arc-20240116; t=1758283758; c=relaxed/simple;
+	bh=1vul3IVIA/c9vDvm4EZdDOWTmAcYvFJnpooh0+LKVUM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Z34Os+Sqtpzsisw5D0DY31SQ7Na1FdPG42UVEXbs/mPFGu+VRHb52YaQDaG4qXP+AQe9AbjA5mJK8uMKEXmgvGLF+rJQ10XCQsBR7X2b2PwroG8/ws6SoG7Al/IDi7/VXxqWWnleyz14CEhcd4wAyBpGTIhn9L9bo2qomRrKjQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tx5sT9GH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D25DFC4CEF0;
+	Fri, 19 Sep 2025 12:09:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758283757;
+	bh=1vul3IVIA/c9vDvm4EZdDOWTmAcYvFJnpooh0+LKVUM=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Tx5sT9GHMsXSrqbfsObfuyjSmnHv4/qOrVEh0wiALYzZne8hDDXrrdz6i3jORDBjP
+	 lUEzk6J7jC3WytA+ht2T1k8B6EJQLCuFrhqhs7FtdY4TlOu80rFci7XeBTpLHE2LS+
+	 OlZpdvmkcbJp4T2+DlRCjrUffI9OF43+zBzyp0veJWdXm/l/xpt1J0SSuhBCqrmIS/
+	 4fidhyhPSjQTqR78wFyprgCFJn4l46AMBojyvyw5nCzvP67iaKatT36VvUWed7QbDw
+	 m/mdF//fgjtBX5apFERlYyo8KccX7R5C8EVQQ+Rh/FIyhSxBg/U6xWZ1ANZQp6m6yV
+	 +8raGRLllucvw==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next 0/6] mptcp: pm: netlink: announce server-side flag
+Date: Fri, 19 Sep 2025 14:08:57 +0200
+Message-Id: <20250919-net-next-mptcp-server-side-flag-v1-0-a97a5d561a8b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -42,212 +52,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250919-k1-ethernet-fix-lock-v1-1-c8b700aa4954@iscas.ac.cn>
-X-B4-Tracking: v=1; b=H4sIANBGzWgC/y2NyQ6DIBRFf8W8dUkEhIK/0rhgeFZixRZoY2L89
- 9JheXLusEPGFDBD3+yQ8BVyWGMFemrATSZekQRfGVjLRKupJjMlWCZMEQsZw0Zuq5uJ01oqarQ
- xwkOt3hNW9529wCcZcSsw/EzCx7P+lL+2JiNx67KE0jecirFj3GLrKVo8s9ar0XejkRa9VEJJS
- 7nnHQzH8QaKUMOZvAAAAA==
-X-Change-ID: 20250919-k1-ethernet-fix-lock-c99681a9aa5d
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+X-B4-Tracking: v=1; b=H4sIANlHzWgC/zWNQQqDMBBFryKzdmASrNRepbgQM0kHagxJECF4d
+ 4dCF3/xFu/9BoWzcIFX1yDzIUX2qGD6DtbPEgOjOGWwZB80mREjV91ZcUt1Taj6wRmLOEb/XQK
+ SJ7KDeU7D6EArKbOX8/fwhr8M83Xdrpyme3sAAAA=
+X-Change-ID: 20250916-net-next-mptcp-server-side-flag-0f002418946d
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+ Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Yixun Lan <dlan@gentoo.org>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Troy Mitchell <troy.mitchell@linux.spacemit.com>, 
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
- Vivian Wang <wangruikang@iscas.ac.cn>
-Cc: netdev@vger.kernel.org, linux-riscv@lists.infradead.org, 
- spacemit@lists.linux.dev, linux-kernel@vger.kernel.org, 
- Vivian Wang <uwu@dram.page>, Marek Szyprowski <m.szyprowski@samsung.com>
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 X-Mailer: b4 0.14.2
-X-CM-TRANSID:zQCowADXeBLSRs1oR9y_Aw--.22941S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3XF1DKF18Cr4rGw18JryUGFg_yoW7Zw1Dp3
-	yj9a93AFW8Xa10qF4DGrWqv34UAw4Sgry7ZFn7A3yxC3ZIyryfua48KrW2vr1jvFW5urZI
-	g3yUAryDCayDt3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9j14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
-	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
-	C2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1616; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=1vul3IVIA/c9vDvm4EZdDOWTmAcYvFJnpooh0+LKVUM=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDLOuj8qZ034LX/mtlSi+vVj6mu/tNfPPG29KFr2xkEpy
+ XhfER2njlIWBjEuBlkxRRbptsj8mc+reEu8/Cxg5rAygQxh4OIUgInEsTIyzOLYv75DVrKwsLN7
+ lS2jTRnPn2mt7y7xCu4WlvrWeaePmZHhy5Gsn4VXNnnPU7Bs/nxf7Zwh90HZ255KzK3CTvlWwqE
+ sAA==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-While most of the statistics functions (emac_get_stats64() and such) are
-called with softirqs enabled, emac_stats_timer() is, as its name
-suggests, also called from a timer, i.e. called in softirq context.
+Now that the 'flags' attribute is used, it seems interesting to add one
+flag for 'server-side', a boolean value.
 
-All of these take stats_lock. Therefore, make stats_lock softirq-safe by
-changing spin_lock() into spin_lock_bh() for the functions that get
-statistics.
+Here are a few patches related to the 'server-side' attribute:
 
-Also, instead of directly calling emac_stats_timer() in emac_up() and
-emac_resume(), set the timer to trigger instead, so that
-emac_stats_timer() is only called from the timer. It will keep using
-spin_lock().
+- Patch 1: only announce this attribute on the server side.
 
-This fixes a lockdep warning, and potential deadlock when stats_timer is
-triggered in the middle of getting statistics.
+- Patch 2: announce the 'server-side' flag when this is the case.
 
-Fixes: bfec6d7f2001 ("net: spacemit: Add K1 Ethernet MAC")
-Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
-Closes: https://lore.kernel.org/all/a52c0cf5-0444-41aa-b061-a0a1d72b02fe@samsung.com/
-Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+- Patch 3: deprecate the 'server-side' attribute.
+
+- Patch 4: use the 'server-side' flag in the selftests.
+
+- Patches 5, 6: small cleanups when working on code around.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
-Thanks a lot for catching this, Marek!
----
- drivers/net/ethernet/spacemit/k1_emac.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+Matthieu Baerts (NGI0) (6):
+      mptcp: pm: netlink: only add server-side attr when true
+      mptcp: pm: netlink: announce server-side flag
+      mptcp: pm: netlink: deprecate server-side attribute
+      selftests: mptcp: pm: get server-side flag
+      mptcp: use _BITUL() instead of (1 << x)
+      mptcp: remove unused returned value of check_data_fin
 
-diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
-index 928fea02198c3754f63a7b33fc25c5dd8c2b59f9..e1c5faff3b71c7d4ceba2ea194d9c888f0e71b70 100644
---- a/drivers/net/ethernet/spacemit/k1_emac.c
-+++ b/drivers/net/ethernet/spacemit/k1_emac.c
-@@ -135,7 +135,7 @@ struct emac_priv {
- 	bool flow_control_autoneg;
- 	u8 flow_control;
- 
--	/* Hold while touching hardware statistics */
-+	/* Softirq-safe, hold while touching hardware statistics */
- 	spinlock_t stats_lock;
- };
- 
-@@ -1239,7 +1239,7 @@ static void emac_get_stats64(struct net_device *dev,
- 	/* This is the only software counter */
- 	storage->tx_dropped = emac_get_stat_tx_drops(priv);
- 
--	spin_lock(&priv->stats_lock);
-+	spin_lock_bh(&priv->stats_lock);
- 
- 	emac_stats_update(priv);
- 
-@@ -1261,7 +1261,7 @@ static void emac_get_stats64(struct net_device *dev,
- 	storage->rx_missed_errors = rx_stats->stats.rx_drp_fifo_full_pkts;
- 	storage->rx_missed_errors += rx_stats->stats.rx_truncate_fifo_full_pkts;
- 
--	spin_unlock(&priv->stats_lock);
-+	spin_unlock_bh(&priv->stats_lock);
- }
- 
- static void emac_get_rmon_stats(struct net_device *dev,
-@@ -1275,7 +1275,7 @@ static void emac_get_rmon_stats(struct net_device *dev,
- 
- 	*ranges = emac_rmon_hist_ranges;
- 
--	spin_lock(&priv->stats_lock);
-+	spin_lock_bh(&priv->stats_lock);
- 
- 	emac_stats_update(priv);
- 
-@@ -1294,7 +1294,7 @@ static void emac_get_rmon_stats(struct net_device *dev,
- 	rmon_stats->hist[5] = rx_stats->stats.rx_1024_1518_pkts;
- 	rmon_stats->hist[6] = rx_stats->stats.rx_1519_plus_pkts;
- 
--	spin_unlock(&priv->stats_lock);
-+	spin_unlock_bh(&priv->stats_lock);
- }
- 
- static void emac_get_eth_mac_stats(struct net_device *dev,
-@@ -1307,7 +1307,7 @@ static void emac_get_eth_mac_stats(struct net_device *dev,
- 	tx_stats = &priv->tx_stats;
- 	rx_stats = &priv->rx_stats;
- 
--	spin_lock(&priv->stats_lock);
-+	spin_lock_bh(&priv->stats_lock);
- 
- 	emac_stats_update(priv);
- 
-@@ -1325,7 +1325,7 @@ static void emac_get_eth_mac_stats(struct net_device *dev,
- 	mac_stats->FramesAbortedDueToXSColls =
- 		tx_stats->stats.tx_excessclsn_pkts;
- 
--	spin_unlock(&priv->stats_lock);
-+	spin_unlock_bh(&priv->stats_lock);
- }
- 
- static void emac_get_pause_stats(struct net_device *dev,
-@@ -1338,14 +1338,14 @@ static void emac_get_pause_stats(struct net_device *dev,
- 	tx_stats = &priv->tx_stats;
- 	rx_stats = &priv->rx_stats;
- 
--	spin_lock(&priv->stats_lock);
-+	spin_lock_bh(&priv->stats_lock);
- 
- 	emac_stats_update(priv);
- 
- 	pause_stats->tx_pause_frames = tx_stats->stats.tx_pause_pkts;
- 	pause_stats->rx_pause_frames = rx_stats->stats.rx_pause_pkts;
- 
--	spin_unlock(&priv->stats_lock);
-+	spin_unlock_bh(&priv->stats_lock);
- }
- 
- /* Other statistics that are not derivable from standard statistics */
-@@ -1393,14 +1393,14 @@ static void emac_get_ethtool_stats(struct net_device *dev,
- 	u64 *rx_stats = (u64 *)&priv->rx_stats;
- 	int i;
- 
--	spin_lock(&priv->stats_lock);
-+	spin_lock_bh(&priv->stats_lock);
- 
- 	emac_stats_update(priv);
- 
- 	for (i = 0; i < ARRAY_SIZE(emac_ethtool_rx_stats); i++)
- 		data[i] = rx_stats[emac_ethtool_rx_stats[i].offset];
- 
--	spin_unlock(&priv->stats_lock);
-+	spin_unlock_bh(&priv->stats_lock);
- }
- 
- static int emac_ethtool_get_regs_len(struct net_device *dev)
-@@ -1769,7 +1769,7 @@ static int emac_up(struct emac_priv *priv)
- 
- 	netif_start_queue(ndev);
- 
--	emac_stats_timer(&priv->stats_timer);
-+	mod_timer(&priv->stats_timer, jiffies);
- 
- 	return 0;
- 
-@@ -1807,14 +1807,14 @@ static int emac_down(struct emac_priv *priv)
- 
- 	/* Update and save current stats, see emac_stats_update() for usage */
- 
--	spin_lock(&priv->stats_lock);
-+	spin_lock_bh(&priv->stats_lock);
- 
- 	emac_stats_update(priv);
- 
- 	priv->tx_stats_off = priv->tx_stats;
- 	priv->rx_stats_off = priv->rx_stats;
- 
--	spin_unlock(&priv->stats_lock);
-+	spin_unlock_bh(&priv->stats_lock);
- 
- 	pm_runtime_put_sync(&pdev->dev);
- 	return 0;
-@@ -2111,7 +2111,7 @@ static int emac_resume(struct device *dev)
- 
- 	netif_device_attach(ndev);
- 
--	emac_stats_timer(&priv->stats_timer);
-+	mod_timer(&priv->stats_timer, jiffies);
- 
- 	return 0;
- }
-
+ Documentation/netlink/specs/mptcp_pm.yaml         |  5 +++--
+ include/uapi/linux/mptcp.h                        | 11 ++++++-----
+ include/uapi/linux/mptcp_pm.h                     |  4 ++--
+ net/mptcp/pm_netlink.c                            |  9 +++++++--
+ net/mptcp/protocol.c                              |  5 +----
+ tools/testing/selftests/net/mptcp/pm_nl_ctl.c     |  9 ++++++++-
+ tools/testing/selftests/net/mptcp/userspace_pm.sh |  2 +-
+ 7 files changed, 28 insertions(+), 17 deletions(-)
 ---
 base-commit: 315f423be0d1ebe720d8fd4fa6bed68586b13d34
-change-id: 20250919-k1-ethernet-fix-lock-c99681a9aa5d
+change-id: 20250916-net-next-mptcp-server-side-flag-0f002418946d
 
 Best regards,
 -- 
-Vivian "dramforever" Wang
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
