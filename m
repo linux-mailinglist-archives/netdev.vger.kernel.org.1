@@ -1,62 +1,84 @@
-Return-Path: <netdev+bounces-224705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ABEEB888A6
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 11:25:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B5298B888B2
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 11:26:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60B851C80BCC
-	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 09:25:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BACF1C80103
+	for <lists+netdev@lfdr.de>; Fri, 19 Sep 2025 09:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 798FB2F0C4F;
-	Fri, 19 Sep 2025 09:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F2942F25EF;
+	Fri, 19 Sep 2025 09:26:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AfSWwwmy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C452D239F;
-	Fri, 19 Sep 2025 09:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD2D2BEFE3;
+	Fri, 19 Sep 2025 09:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758273915; cv=none; b=XdPQfJYxzPEq7bF1S4Aa4Rw15z4PRUEor6g+p1KgbkjDYA0bJgdehqXfSk4UiLHl5qLFiGV5XtUJ/bkWaYk1by/0ty3ob9Tmv5WzE2J1nV2wO7M8zN4BM0IhRotn1o9bFR/s0zC7ra60ipeE1fGkiVJwGDl+b6ZpxfnBI0ThXxY=
+	t=1758273981; cv=none; b=i7kar3pcS7qXkvo09eNpDasHvi/eL0LBmWCejAM5mkt8ILOr4rnstmJHpkjbkDcqwKyDIU/orBYfQZW/t98Ln3mkTnB8d918jo5kPCz4lW1GwkLof7otwQV2CqAwe6yKBbnbnhw9itcxAVHfbPbGU6DZLpDb3dw0FoA2IzGIXM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758273915; c=relaxed/simple;
-	bh=+hQV36ermCg3GTswyjokH750Usr+sQ7Ds8u5SZvEtEg=;
+	s=arc-20240116; t=1758273981; c=relaxed/simple;
+	bh=zgXZIJagpXiZ3iWlFQfUgyi+88NHsoZv+XH2Gsx0/4Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OrbclEgFztPEFPAvZDQOohUZr3HDSkk81LXNF/d4kEBv5XK02/Gzf5GJjSgON9PNINtL12s6j9i+pu9QlRDQFTQG1rq0i3dv1aKQPrff6fDVsSMZcc/K/ULwW0Zs6/XIt0NJ2ljRl2Ly3uiBNzQi2ZcGI9UmkjXaZUgUHbsUXVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-Received: from localhost (unknown [180.158.240.90])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: dlan)
-	by smtp.gentoo.org (Postfix) with ESMTPSA id 649F03420AB;
-	Fri, 19 Sep 2025 09:25:12 +0000 (UTC)
-Date: Fri, 19 Sep 2025 17:25:07 +0800
-From: Yixun Lan <dlan@gentoo.org>
-To: Mark Brown <broonie@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>
-Cc: Vivian Wang <wangruikang@iscas.ac.cn>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alex Elder <elder@riscstar.com>,
-	Networking <netdev@vger.kernel.org>,
-	Guodong Xu <guodong@riscstar.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	soc@kernel.org
-Subject: Re: linux-next: manual merge of the net-next tree with the spacemit
- tree
-Message-ID: <20250919092507-GYA1279412@gentoo.org>
-References: <aMqby4Cz8hn6lZgv@sirena.org.uk>
- <597466da-643d-4a75-b2e8-00cf7cf3fcd0@iscas.ac.cn>
- <76970eed-cb88-4a42-864a-8c2290624b72@sirena.org.uk>
- <20250917123045-GYA1265885@gentoo.org>
- <20250917125947-GYA1266976@gentoo.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lh3DosPM6C1FEroTQAyWP5XRULtYnwwjpRey3Cr4KAenRr6M21pjldQfw8IFgMXBfpLQxFE6MH//rO5LpVjX1lpoobkghdfBPJFxB9YnIboVxd7OyqQ/CAezfRSXRhcCLBuXfobFO6B2fP5YCnPfLKIbTblIz7Ke1t/s5t9Ig+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AfSWwwmy; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758273979; x=1789809979;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zgXZIJagpXiZ3iWlFQfUgyi+88NHsoZv+XH2Gsx0/4Y=;
+  b=AfSWwwmyk6Z6ED4GOMftfjwBcPTjVAdqDZsBlA98CgSNK9COOBQ1GBja
+   x5qyJEiuOXK/j23JyEKFuswcTIH8vpFCxN+g9xL9SDJLM7NwUqjLeZy+R
+   KpsevlA8DrvUMMPr7a1kZJJALXY8ut1eT/lfSf/XDga6klG9qQ1TJXH7G
+   KBpASr7vBEj8pue+zLMvgZeWUk5h8mBtHOMtbgCRffx6dt7peYWmcBiau
+   xPk143VSPD96kjMefgWZXG4SWlZzxKQFzFaVp02Je9tmukRXa7iacmZSg
+   q0pT40e1E4N31gNiZ7Nq8DSzZwoechbkoo0iiQhezaVvfUUUMIvtD7wIJ
+   Q==;
+X-CSE-ConnectionGUID: t54w6ivISMuoF9yW5FwNIg==
+X-CSE-MsgGUID: 2V+qsLciToG7U905h61eRA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11557"; a="59838574"
+X-IronPort-AV: E=Sophos;i="6.18,277,1751266800"; 
+   d="scan'208";a="59838574"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 02:26:18 -0700
+X-CSE-ConnectionGUID: Qf+m+2HWSpOrHpu9RX/wUA==
+X-CSE-MsgGUID: 62U0HtHTQImBVz3xoHrz0g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,277,1751266800"; 
+   d="scan'208";a="176192176"
+Received: from lkp-server01.sh.intel.com (HELO 84a20bd60769) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 19 Sep 2025 02:26:13 -0700
+Received: from kbuild by 84a20bd60769 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uzXNb-0004AB-0B;
+	Fri, 19 Sep 2025 09:26:11 +0000
+Date: Fri, 19 Sep 2025 17:25:28 +0800
+From: kernel test robot <lkp@intel.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+	pabeni@redhat.com, song@kernel.org, sdf@google.com,
+	haoluo@google.com, yhs@fb.com, edumazet@google.com,
+	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
+	mjambigi@linux.ibm.com, wenjia@linux.ibm.com, wintera@linux.ibm.com,
+	dust.li@linux.alibaba.com, tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com
+Cc: oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org, davem@davemloft.net,
+	kuba@kernel.org, netdev@vger.kernel.org, sidraya@linux.ibm.com,
+	jaka@linux.ibm.com
+Subject: Re: [PATCH bpf-next v2 2/4] net/smc: bpf: Introduce generic hook for
+ handshake flow
+Message-ID: <202509191742.19csfvEU-lkp@intel.com>
+References: <20250918080342.25041-3-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,69 +87,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250917125947-GYA1266976@gentoo.org>
+In-Reply-To: <20250918080342.25041-3-alibuda@linux.alibaba.com>
 
-Hi Paolo, Mark, Arnd
+Hi Wythe,
 
-I'd like to have your attentions, see below
+kernel test robot noticed the following build warnings:
 
-On 20:59 Wed 17 Sep     , Yixun Lan wrote:
-> Hi Mark,
-> 
-> On 20:30 Wed 17 Sep     , Yixun Lan wrote:
-> > Hi Mark,
-> > 
-> > On 13:03 Wed 17 Sep     , Mark Brown wrote:
-> > > On Wed, Sep 17, 2025 at 07:48:34PM +0800, Vivian Wang wrote:
-> > > 
-> > > > Just FYI, Yixun has proposed for net-next to back out of the DTS changes
-> > > > and taking them up through the spacemit tree instead [1], resolving the
-> > > > conflicts in the spacemit tree. This would certainly mean less headaches
-> > > > while managing pull requests, as well as allowing Yixun to take care of
-> > > > code style concerns like node order. However, I do not know what the
-> > > > norms here are.
-> > > 
-> > > Thanks.  They're pretty trivial conflicts so I'm not sure it's critical,
-> > > though like you say node order might easily end up the wrong way round
-> > > depending on how the conflict resolution gets done.
-> > 
-> > Thanks for the help and fixing this, but ..
-> > 
-> > If it's possible to revert the DT patch 3-5, then I'd be happy to take,
-> > but if this is too much job, e.g. the net-next's main branch is imuutable
-> > and reverting it will cause too much trouble, then I'm fine with current
-> > solution - carry the fix via net-next tree..
-> > 
-> > But please use commit: 0f084b221e2c5ba16eca85b3d2497f9486bd0329 of
-> > https://github.com/spacemit-com/linux/tree/k1/dt-for-next as the merge
-> > parent, which I'm about to send to Arnd (the SoC tree)
-> > 
-> No matter which way choose to go, I've created an immutable tag here,
-> 
-> https://github.com/spacemit-com/linux/ spacemit-dt-for-6.18-1
-> 
+[auto build test WARNING on bpf-next/master]
 
-I've sent out the PR of DT changes to SoC tree for inclusion, see 
-https://lore.kernel.org/all/20250919055525-GYC5766558@gentoo.org/
+url:    https://github.com/intel-lab-lkp/linux/commits/D-Wythe/bpf-export-necessary-symbols-for-modules-with-struct_ops/20250918-160530
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20250918080342.25041-3-alibuda%40linux.alibaba.com
+patch subject: [PATCH bpf-next v2 2/4] net/smc: bpf: Introduce generic hook for handshake flow
+config: i386-randconfig-063-20250919 (https://download.01.org/0day-ci/archive/20250919/202509191742.19csfvEU-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250919/202509191742.19csfvEU-lkp@intel.com/reproduce)
 
-There is a potential conflict with commit from net-next:
- e32dc7a936b11e437298bcc4601476befcbcb88f ("riscv: dts: spacemit: Add Ethernet support for Jupiter")
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509191742.19csfvEU-lkp@intel.com/
 
-the conflict itself is quite trivial, and should be easy to fix, and I'm also
-personally fine to have it solved in net-next tree if Arnd has no objection
+sparse warnings: (new ones prefixed by >>)
+>> net/ipv4/tcp_output.c:776:33: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct smc_hs_ctrl *ctrl @@     got struct smc_hs_ctrl [noderef] __rcu * @@
+   net/ipv4/tcp_output.c:776:33: sparse:     expected struct smc_hs_ctrl *ctrl
+   net/ipv4/tcp_output.c:776:33: sparse:     got struct smc_hs_ctrl [noderef] __rcu *
+   net/ipv4/tcp_output.c:796:34: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct smc_hs_ctrl *ctrl @@     got struct smc_hs_ctrl [noderef] __rcu * @@
+   net/ipv4/tcp_output.c:796:34: sparse:     expected struct smc_hs_ctrl *ctrl
+   net/ipv4/tcp_output.c:796:34: sparse:     got struct smc_hs_ctrl [noderef] __rcu *
+--
+>> net/smc/smc_sysctl.c:59:16: sparse: sparse: incorrect type in initializer (different address spaces) @@     expected struct smc_hs_ctrl [noderef] __rcu *__ret @@     got struct smc_hs_ctrl *[assigned] ctrl @@
+   net/smc/smc_sysctl.c:59:16: sparse:     expected struct smc_hs_ctrl [noderef] __rcu *__ret
+   net/smc/smc_sysctl.c:59:16: sparse:     got struct smc_hs_ctrl *[assigned] ctrl
+>> net/smc/smc_sysctl.c:59:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct smc_hs_ctrl *[assigned] ctrl @@     got struct smc_hs_ctrl [noderef] __rcu *[assigned] __ret @@
+   net/smc/smc_sysctl.c:59:14: sparse:     expected struct smc_hs_ctrl *[assigned] ctrl
+   net/smc/smc_sysctl.c:59:14: sparse:     got struct smc_hs_ctrl [noderef] __rcu *[assigned] __ret
 
-But if need assistance from my side, just let me know - I can handle it
-- if the ethernet DT patches can be reverted from net-next
-- I can apply them at SpacemiT SoC tree
-- send a incremental v2 PR to the SoC tree
+vim +776 net/ipv4/tcp_output.c
 
-> > BTW, The 'for-next' branch is a merged branch contains clock and DT patches
-> > for SpacemiT SoC tree's which isn't immutable..
-> > 
-> > Let me know what I should proceed, thank you
-> > 
-> 
+   767	
+   768	static void smc_set_option(struct tcp_sock *tp,
+   769				   struct tcp_out_options *opts,
+   770				   unsigned int *remaining)
+   771	{
+   772	#if IS_ENABLED(CONFIG_SMC)
+   773		struct sock *sk = &tp->inet_conn.icsk_inet.sk;
+   774	
+   775		if (static_branch_unlikely(&tcp_have_smc) && tp->syn_smc) {
+ > 776			tp->syn_smc = !!smc_call_hsbpf(1, sk, syn_option, tp);
+   777			/* re-check syn_smc */
+   778			if (tp->syn_smc &&
+   779			    *remaining >= TCPOLEN_EXP_SMC_BASE_ALIGNED) {
+   780				opts->options |= OPTION_SMC;
+   781				*remaining -= TCPOLEN_EXP_SMC_BASE_ALIGNED;
+   782			}
+   783		}
+   784	#endif
+   785	}
+   786	
 
 -- 
-Yixun Lan (dlan)
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
