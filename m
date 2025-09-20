@@ -1,423 +1,288 @@
-Return-Path: <netdev+bounces-224954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57488B8BCAF
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 03:18:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DA98B8BDDC
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 05:14:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DDCF3A7AC1
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 01:18:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 325D77E77A9
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 03:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64617154BE2;
-	Sat, 20 Sep 2025 01:18:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NH+VC4yk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 343D9212556;
+	Sat, 20 Sep 2025 03:14:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7DA156F45
-	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 01:18:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A203286A9;
+	Sat, 20 Sep 2025 03:14:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758331100; cv=none; b=P63Vyu4KUqrLMGcOdxb0e/0eqwzYw0liSI2vM6kMK+Dbi/WVUSMvLiX35y+BIZk79fojYvhj+dyhz8YBBKr9td9OprjOtS9hKFWSU2Rh7HZoM0kjnj0R24I+5ShffrgPnC5lIl6GeW1Ju8uGkoqJw8aE2y3U5jh/iMDTv9RgyPM=
+	t=1758338055; cv=none; b=UF3/Q/9j5yJV6y5VLcw/6FOm0mlkXPMstpWQKz1DuY7idA8G9PG5zftgj5hexY9h+KysdM4ziYzuiG2KhoK/XWgVRh6P4vZ+lHJ15GcFusSQG6HC6KcMP7JMUEygivK8Bi5R5le75wyehsa9lCGO4UArv5yu6IdU0POuxsjHpm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758331100; c=relaxed/simple;
-	bh=Mrkvi5i+KJrUDOvl47cqKS4Kg122r5NcZzsTLurqwCg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yr26qtZLdO4niRnVTr3XE+70mNAzCDqnu9UtNdxHnWeq6Yj/AUEhUpvZdbrZmRAXl+3Q6Fov1F7katIuDBVTKX7iolajLei/ns04dgVP0cCXELLkpCaLThjkTJjs41dPCK82Kj+33SDj9IDgpdwDbtQjMmo97Xbkz/bYRWr7xcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NH+VC4yk; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-330b4739538so964127a91.3
-        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 18:18:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758331098; x=1758935898; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h81wbkWSgPTY7ChRrflzhd8CQh6ilQCuoD+lEC52yGo=;
-        b=NH+VC4ykkjx+PsHTycZfSqupQ565SfzIKN1eOI7waPgZWPrLA6X46teSGwKlzGT8bT
-         ZAPsqQgr3ItJcDPCVaD88LK1DHTPntaCK5948jPpuGcfA6Fr/QC7CR0Cl9HhIPxfK1Of
-         75q6RYaFnJn6JvM0fMCZJOSUtevrmcUEWI/4wRiT3wlKtXZoTl3XoiSXuB6zGyK3+M3H
-         BA7wTh4s3/MtPFZnJTnK6OP+s4rImSr4Oq6Cf4YHne/dhmhEXKpHFq3Yx4aCvcnyNfsA
-         Qjevgs3TiWlKo9dzUDotAl7NL3OVQBUTXRm+UaINmko+tYsXf5rhrVIaAzLwhESUN1tY
-         K/Og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758331098; x=1758935898;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h81wbkWSgPTY7ChRrflzhd8CQh6ilQCuoD+lEC52yGo=;
-        b=XA51saUSuA4ZlzkTdDeXsIKNtmrDv2X649GfKOz/zj43Snbz/c09I/hpqcbZCT6MIX
-         xwY9uZ1mTtMUWxYBgoaEt3vQ1jMfRlGi7qIy1+HXH63ebLi16YzOTsthnsSYtcvuuiR9
-         utEVFCRQxvbwwTcZMRb9/Up0TyWUxLk2kuROmvj/jCGH/GkibjGlUjPR27PgYcww1hGB
-         VVBopZDqJV0aQE0ZVNKnEvHxqenRhRzJcaPhK3RM9i/C0KaCEA1IzIobO0c/D44Aa/A5
-         GNbUn1XJymPsRddZ0HhI/xU6Zu3ZUtSsBMKUTAY8vbt/sy5B4icKAfcnIsfEGdRIBs06
-         jxdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXF3thJpAbX28fmPgCNpFA2yi15R1pHE5pVtxoUNq7A33t9e0i1Gk8sExyqeIaRyci+IrH9fSc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0MNfTlux9ly/GCPxZTfEglRG24+Od6qOQpYMZIBLT3yNG0iNN
-	uuhuZA/dcGuSLkiJhTMaX3Lmge3cPyj6Z8ZyuaW2GPUQciWlUm0HPWTbB0lmjHJPEWdJOAkSXRd
-	dpjDFdGw5sd+xHHVhibCZcFY+bp3iLPl8t05I1K0sKooFR/b7hdRAmCWan2s=
-X-Gm-Gg: ASbGnctd8v1hS2sk1cR/NTHgyJAE53PLNSdj7CC9arcELRRH/cAiCUhchKHueeJHYA1
-	e4KASpu9CSZguK1hGpR78asofynsOJgMPIYoL1MDaCDso/IUB5SggNnT3Pwil54/290haq70TTR
-	WASrxDRPrj/pjPUuG6e96wTNQoU1B+JzEhic7X5zuYMMVcdWDv8RSX5TCkT5sd6q6NBtC0d4lO5
-	5ebQH4b67BirtWHZSFQFzbiB1KhX7ro3DtUsohgsYER1mSASoI=
-X-Google-Smtp-Source: AGHT+IHNAUEqaPE35UgIwFYPsdxTqsoN2XFvRkrmmbqhYkuRmpdFtrBork7Cr2UvxdbYcbjCEaidDuGyNHC0uGMlp5A=
-X-Received: by 2002:a17:90b:33c8:b0:32e:64ca:e84a with SMTP id
- 98e67ed59e1d1-33097ff7032mr6918592a91.12.1758331097298; Fri, 19 Sep 2025
- 18:18:17 -0700 (PDT)
+	s=arc-20240116; t=1758338055; c=relaxed/simple;
+	bh=42Q1yqeXj9JxOAIn0H5mMd4LavLanRycmbxv9/wrDmA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=QnMwj1JJa+mVXeaJslwwt6Lb+GY6/sZcmX61eU/9oR4mdfzMHBRyLPaRyZ9yCnVbLRhB1queaVuANM27Ws4mw9kzWVFdwsfDbe1SQrvura+3fiYnM91i5EtOlVIgE6/Ct6Ru6AZRptAmGSFFDcAGz+6qCoR9VCPXgG9zk7JLLt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4cTDws673wz14MPh;
+	Sat, 20 Sep 2025 11:13:49 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 804DC1402C1;
+	Sat, 20 Sep 2025 11:14:07 +0800 (CST)
+Received: from [10.174.176.70] (10.174.176.70) by
+ dggpemf500016.china.huawei.com (7.185.36.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 20 Sep 2025 11:14:05 +0800
+Message-ID: <0ca2c567-b311-4f0b-bb29-2b860b75f85e@huawei.com>
+Date: Sat, 20 Sep 2025 11:14:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250919164308.2455564-1-edumazet@google.com>
-In-Reply-To: <20250919164308.2455564-1-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Fri, 19 Sep 2025 18:18:06 -0700
-X-Gm-Features: AS18NWCEVRkkqvaHAAOPnuvZFWdMsugbnnHBaE-V0KtSo1nD6PJ0DNX1pIMkXVQ
-Message-ID: <CAAVpQUDz7PQHK68bMt2FVt2Zo473L7d-XHnAgpFNP6VwApSL-w@mail.gmail.com>
-Subject: Re: [PATCH net-next] udp: remove busylock and add per NUMA queues
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [smc?] general protection fault in __smc_diag_dump (4)
+To: syzbot <syzbot+f775be4458668f7d220e@syzkaller.appspotmail.com>,
+	<alibuda@linux.alibaba.com>, <davem@davemloft.net>,
+	<dust.li@linux.alibaba.com>, <edumazet@google.com>,
+	<guwen@linux.alibaba.com>, <horms@kernel.org>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-s390@vger.kernel.org>, <mjambigi@linux.ibm.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sidraya@linux.ibm.com>,
+	<syzkaller-bugs@googlegroups.com>, <tonylu@linux.alibaba.com>,
+	<wenjia@linux.ibm.com>, zhangchangzhong <zhangchangzhong@huawei.com>,
+	yuehaibing <yuehaibing@huawei.com>
+References: <68caf6c7.050a0220.2ff435.0597.GAE@google.com>
+From: Wang Liang <wangliang74@huawei.com>
+In-Reply-To: <68caf6c7.050a0220.2ff435.0597.GAE@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-On Fri, Sep 19, 2025 at 9:43=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
+This issue is similar to:
+https://lore.kernel.org/netdev/20250331081003.1503211-1-wangliang74@huawei.com/
+
+The process like this:
+(CPU1)                           | (CPU2)
+---------------------------------|-------------------------------
+inet_create()                    |
+   sk = sk_alloc()                |
+                                  |
+   inet_init_csk_locks()          |
+     modify smc->clcsock          |
+                                  |
+   sk->sk_prot->init              |
+     smc_inet_init_sock()         |
+       smc_sk_init()              |
+         smc_hash_sk()            |
+           head = &smc_hash->ht;  |
+           sk_add_node(sk, head); |
+                                  | smc_diag_dump_proto
+                                  |   head = &smc_hash->ht;
+                                  |     sk_for_each(sk, head)
+                                  |       __smc_diag_dump()
+                                  |         visit smc->clcsock
+
+
+The 'smc->clcsock' is modified in inet_init_csk_locks():
+__sock_create(family=2, type=1, protocol=256)
+     inet_create
+         sk = sk_alloc(...); // smc->clcsock = 0
+         inet_init_csk_locks(sk);
+             icsk = inet_csk(sk);
+spin_lock_init(&icsk->icsk_accept_queue.rskq_lock); // smc->clcsock = 
+0xdead4ead00000000
+
+The relevant structure is 'struct smc_sock' and 'struct 
+inet_connection_sock':
+struct smc_sock {
+     union {
+         struct sock      sk;
+         struct inet_sock icsk_inet;
+     };
+     struct socket        *clcsock;
+     ...
+};
+struct inet_connection_sock {
+     struct inet_sock          icsk_inet;
+     struct request_sock_queue icsk_accept_queue;
+     ...
+};
+
+Commit 60ada4fe644e ("smc: Fix various oops due to inet_sock type 
+confusion.")
+add inet_sock as the first member of smc_sock. Maybe add 
+inet_connection_sock
+instead of inet_sock is more appropriate.
+
+#syz test
+
+ From 782467e7f55f2f1487744252060ffbaa992ee47a Mon Sep 17 00:00:00 2001
+From: Wang Liang <wangliang74@huawei.com>
+Date: Sat, 20 Sep 2025 11:29:52 +0800
+Subject: [PATCH net] net/smc: fix general protection fault in 
+__smc_diag_dump
+
+Use inet_connection_sock instead of inet_sock in struct smc_sock.
+
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
+---
+  net/smc/smc.h | 2 +-
+  1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/smc/smc.h b/net/smc/smc.h
+index 2c9084963739..1b20f0c927d3 100644
+--- a/net/smc/smc.h
++++ b/net/smc/smc.h
+@@ -285,7 +285,7 @@ struct smc_connection {
+  struct smc_sock {                              /* smc sock container */
+         union {
+                 struct sock             sk;
+-               struct inet_sock        icsk_inet;
++               struct inet_connection_sock     inet_conn;
+         };
+         struct socket           *clcsock;       /* internal tcp socket */
+         void                    (*clcsk_state_change)(struct sock *sk);
+--
+2.34.1
+
+
+
+
+在 2025/9/18 1:58, syzbot 写道:
+> Hello,
 >
-> busylock was protecting UDP sockets against packet floods,
-> but unfortunately was not protecting the host itself.
+> syzbot found the following issue on:
 >
-> Under stress, many cpus could spin while acquiring the busylock,
-> and NIC had to drop packets. Or packets would be dropped
-> in cpu backlog if RPS/RFS were in place.
+> HEAD commit:    5aca7966d2a7 Merge tag 'perf-tools-fixes-for-v6.17-2025-09..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=147e2e42580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=8f01d8629880e620
+> dashboard link: https://syzkaller.appspot.com/bug?extid=f775be4458668f7d220e
+> compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17aec534580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=115a9f62580000
 >
-> This patch replaces the busylock by intermediate
-> lockless queues. (One queue per NUMA node).
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/f191b2524020/disk-5aca7966.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/5aa02ba0cba2/vmlinux-5aca7966.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/b9b04ddba61b/bzImage-5aca7966.xz
 >
-> This means that fewer number of cpus have to acquire
-> the UDP receive queue lock.
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+f775be4458668f7d220e@syzkaller.appspotmail.com
 >
-> Most of the cpus can either:
-> - immediately drop the packet.
-> - or queue it in their NUMA aware lockless queue.
+> Oops: general protection fault, probably for non-canonical address 0xfbd5a5d5a0000003: 0000 [#1] SMP KASAN NOPTI
+> KASAN: maybe wild-memory-access in range [0xdead4ead00000018-0xdead4ead0000001f]
+> CPU: 1 UID: 0 PID: 6949 Comm: syz.0.335 Not tainted syzkaller #0 PREEMPT(full)
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+> RIP: 0010:smc_diag_msg_common_fill net/smc/smc_diag.c:44 [inline]
+> RIP: 0010:__smc_diag_dump.constprop.0+0x3ca/0x2550 net/smc/smc_diag.c:89
+> Code: 4c 8b b3 40 06 00 00 4d 85 f6 0f 84 f6 02 00 00 e8 6b 4f 78 f6 49 8d 7e 18 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 f6 1e 00 00 48 b8 00 00 00 00 00 fc ff df 4d 8b
+> RSP: 0018:ffffc90003f2f1a8 EFLAGS: 00010a06
+> RAX: dffffc0000000000 RBX: ffff88802a33bd40 RCX: ffffffff897ee8a4
+> RDX: 1bd5a9d5a0000003 RSI: ffffffff8b434dd5 RDI: dead4ead00000018
+> RBP: ffff888032418000 R08: 0000000000000005 R09: 0000000000000000
+> R10: 0000000080000001 R11: 0000000000000000 R12: ffff8880754915f0
+> R13: ffff88805d823780 R14: dead4ead00000000 R15: ffff88802a33c380
+> FS:  00007fec5f7dd6c0(0000) GS:ffff8881247b2000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007fec5f7dcf98 CR3: 000000007d646000 CR4: 00000000003526f0
+> Call Trace:
+>   <TASK>
+>   smc_diag_dump_proto+0x26d/0x420 net/smc/smc_diag.c:217
+>   smc_diag_dump+0x27/0x90 net/smc/smc_diag.c:234
+>   netlink_dump+0x539/0xd30 net/netlink/af_netlink.c:2327
+>   __netlink_dump_start+0x6d6/0x990 net/netlink/af_netlink.c:2442
+>   netlink_dump_start include/linux/netlink.h:341 [inline]
+>   smc_diag_handler_dump+0x1f9/0x240 net/smc/smc_diag.c:251
+>   __sock_diag_cmd net/core/sock_diag.c:249 [inline]
+>   sock_diag_rcv_msg+0x438/0x790 net/core/sock_diag.c:285
+>   netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2552
+>   netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+>   netlink_unicast+0x5a7/0x870 net/netlink/af_netlink.c:1346
+>   netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1896
+>   sock_sendmsg_nosec net/socket.c:714 [inline]
+>   __sock_sendmsg net/socket.c:729 [inline]
+>   ____sys_sendmsg+0xa95/0xc70 net/socket.c:2614
+>   ___sys_sendmsg+0x134/0x1d0 net/socket.c:2668
+>   __sys_sendmsg+0x16d/0x220 net/socket.c:2700
+>   do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>   do_syscall_64+0xcd/0x4e0 arch/x86/entry/syscall_64.c:94
+>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7fec6018eba9
+> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fec5f7dd038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 00007fec603d6090 RCX: 00007fec6018eba9
+> RDX: 0000000000000000 RSI: 0000200000000140 RDI: 0000000000000003
+> RBP: 00007fec60211e19 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 00007fec603d6128 R14: 00007fec603d6090 R15: 00007ffcb0713c08
+>   </TASK>
+> Modules linked in:
+> ---[ end trace 0000000000000000 ]---
+> RIP: 0010:smc_diag_msg_common_fill net/smc/smc_diag.c:44 [inline]
+> RIP: 0010:__smc_diag_dump.constprop.0+0x3ca/0x2550 net/smc/smc_diag.c:89
+> Code: 4c 8b b3 40 06 00 00 4d 85 f6 0f 84 f6 02 00 00 e8 6b 4f 78 f6 49 8d 7e 18 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 f6 1e 00 00 48 b8 00 00 00 00 00 fc ff df 4d 8b
+> RSP: 0018:ffffc90003f2f1a8 EFLAGS: 00010a06
+> RAX: dffffc0000000000 RBX: ffff88802a33bd40 RCX: ffffffff897ee8a4
+> RDX: 1bd5a9d5a0000003 RSI: ffffffff8b434dd5 RDI: dead4ead00000018
+> RBP: ffff888032418000 R08: 0000000000000005 R09: 0000000000000000
+> R10: 0000000080000001 R11: 0000000000000000 R12: ffff8880754915f0
+> R13: ffff88805d823780 R14: dead4ead00000000 R15: ffff88802a33c380
+> FS:  00007fec5f7dd6c0(0000) GS:ffff8881247b2000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007fec5f7dcf98 CR3: 000000007d646000 CR4: 00000000003526f0
+> ----------------
+> Code disassembly (best guess):
+>     0:	4c 8b b3 40 06 00 00 	mov    0x640(%rbx),%r14
+>     7:	4d 85 f6             	test   %r14,%r14
+>     a:	0f 84 f6 02 00 00    	je     0x306
+>    10:	e8 6b 4f 78 f6       	call   0xf6784f80
+>    15:	49 8d 7e 18          	lea    0x18(%r14),%rdi
+>    19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+>    20:	fc ff df
+>    23:	48 89 fa             	mov    %rdi,%rdx
+>    26:	48 c1 ea 03          	shr    $0x3,%rdx
+> * 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+>    2e:	0f 85 f6 1e 00 00    	jne    0x1f2a
+>    34:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+>    3b:	fc ff df
+>    3e:	4d                   	rex.WRB
+>    3f:	8b                   	.byte 0x8b
 >
-> Then one of the cpu is chosen to process this lockless queue
-> in a batch.
 >
-> The batch only contains packets that were cooked on the same
-> NUMA node, thus with very limited latency impact.
->
-> Tested:
->
-> DDOS targeting a victim UDP socket, on a platform with 6 NUMA nodes
-> (Intel(R) Xeon(R) 6985P-C)
->
-> Before:
->
-> nstat -n ; sleep 1 ; nstat | grep Udp
-> Udp6InDatagrams                 1004179            0.0
-> Udp6InErrors                    3117               0.0
-> Udp6RcvbufErrors                3117               0.0
->
-> After:
-> nstat -n ; sleep 1 ; nstat | grep Udp
-> Udp6InDatagrams                 1116633            0.0
-> Udp6InErrors                    14197275           0.0
-> Udp6RcvbufErrors                14197275           0.0
->
-> We can see this host can now proces 14.2 M more packets per second
-> while under attack, and the victim socket can receive 11 % more
-> packets.
->
-> Note that the remaining bottleneck for this platform is in
-> udp_drops_inc() because we limited struct numa_drop_counters
-> to only two nodes so far.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
 > ---
->  include/linux/udp.h |  9 ++++-
->  include/net/udp.h   | 11 ++++-
->  net/ipv4/udp.c      | 99 ++++++++++++++++++++++++---------------------
->  net/ipv6/udp.c      |  5 ++-
->  4 files changed, 73 insertions(+), 51 deletions(-)
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
 >
-> diff --git a/include/linux/udp.h b/include/linux/udp.h
-> index e554890c4415b411f35007d3ece9e6042db7a544..58795688a18636ea79aa1f5d0=
-6eacc676a2e7849 100644
-> --- a/include/linux/udp.h
-> +++ b/include/linux/udp.h
-> @@ -44,6 +44,12 @@ enum {
->         UDP_FLAGS_UDPLITE_RECV_CC, /* set via udplite setsockopt */
->  };
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 >
-> +/* per NUMA structure for lockless producer usage. */
-> +struct udp_prod_queue {
-> +       struct llist_head       ll_root ____cacheline_aligned_in_smp;
-> +       atomic_t                rmem_alloc;
-> +};
-> +
->  struct udp_sock {
->         /* inet_sock has to be the first member */
->         struct inet_sock inet;
-> @@ -90,6 +96,8 @@ struct udp_sock {
->                                                 struct sk_buff *skb,
->                                                 int nhoff);
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
 >
-> +       struct udp_prod_queue *udp_prod_queue;
-> +
->         /* udp_recvmsg try to use this before splicing sk_receive_queue *=
-/
->         struct sk_buff_head     reader_queue ____cacheline_aligned_in_smp=
-;
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
 >
-> @@ -109,7 +117,6 @@ struct udp_sock {
->          */
->         struct hlist_node       tunnel_list;
->         struct numa_drop_counters drop_counters;
-> -       spinlock_t              busylock ____cacheline_aligned_in_smp;
->  };
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
 >
->  #define udp_test_bit(nr, sk)                   \
-> diff --git a/include/net/udp.h b/include/net/udp.h
-> index eecd64097f91196897f45530540b9c9b68c5ba4e..ae750324bc87a79d0e9182c55=
-89371d82be3e3ee 100644
-> --- a/include/net/udp.h
-> +++ b/include/net/udp.h
-> @@ -284,16 +284,23 @@ INDIRECT_CALLABLE_DECLARE(int udpv6_rcv(struct sk_b=
-uff *));
->  struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
->                                   netdev_features_t features, bool is_ipv=
-6);
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
 >
-> -static inline void udp_lib_init_sock(struct sock *sk)
-> +static inline int udp_lib_init_sock(struct sock *sk)
->  {
->         struct udp_sock *up =3D udp_sk(sk);
+> If you want to undo deduplication, reply with:
+> #syz undup
 >
->         sk->sk_drop_counters =3D &up->drop_counters;
-> -       spin_lock_init(&up->busylock);
->         skb_queue_head_init(&up->reader_queue);
->         INIT_HLIST_NODE(&up->tunnel_list);
->         up->forward_threshold =3D sk->sk_rcvbuf >> 2;
->         set_bit(SOCK_CUSTOM_SOCKOPT, &sk->sk_socket->flags);
-> +
-> +       up->udp_prod_queue =3D kcalloc(nr_node_ids, sizeof(*up->udp_prod_=
-queue),
-> +                                    GFP_KERNEL);
-> +       if (!up->udp_prod_queue)
-> +               return -ENOMEM;
-> +       for (int i =3D 0; i < nr_node_ids; i++)
-> +               init_llist_head(&up->udp_prod_queue[i].ll_root);
-> +       return 0;
->  }
->
->  static inline void udp_drops_inc(struct sock *sk)
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index 0c40426628eb2306b609881341a51307c4993871..f2d95fe18aec8f317ab33b4ed=
-3306149fce6690b 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -1685,25 +1685,6 @@ static void udp_skb_dtor_locked(struct sock *sk, s=
-truct sk_buff *skb)
->         udp_rmem_release(sk, udp_skb_truesize(skb), 1, true);
->  }
->
-> -/* Idea of busylocks is to let producers grab an extra spinlock
-> - * to relieve pressure on the receive_queue spinlock shared by consumer.
-> - * Under flood, this means that only one producer can be in line
-> - * trying to acquire the receive_queue spinlock.
-> - */
-> -static spinlock_t *busylock_acquire(struct sock *sk)
-> -{
-> -       spinlock_t *busy =3D &udp_sk(sk)->busylock;
-> -
-> -       spin_lock(busy);
-> -       return busy;
-> -}
-> -
-> -static void busylock_release(spinlock_t *busy)
-> -{
-> -       if (busy)
-> -               spin_unlock(busy);
-> -}
-> -
->  static int udp_rmem_schedule(struct sock *sk, int size)
->  {
->         int delta;
-> @@ -1718,14 +1699,23 @@ static int udp_rmem_schedule(struct sock *sk, int=
- size)
->  int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
->  {
->         struct sk_buff_head *list =3D &sk->sk_receive_queue;
-> +       struct udp_prod_queue *udp_prod_queue;
-> +       struct llist_node *ll_list;
->         unsigned int rmem, rcvbuf;
-> -       spinlock_t *busy =3D NULL;
->         int size, err =3D -ENOMEM;
-> +       struct sk_buff *next;
-> +       int total_size =3D 0;
-> +       int q_size =3D 0;
-> +       int nb =3D 0;
->
->         rmem =3D atomic_read(&sk->sk_rmem_alloc);
->         rcvbuf =3D READ_ONCE(sk->sk_rcvbuf);
->         size =3D skb->truesize;
->
-> +       udp_prod_queue =3D &udp_sk(sk)->udp_prod_queue[numa_node_id()];
-> +
-> +       rmem +=3D atomic_read(&udp_prod_queue->rmem_alloc);
-> +
->         /* Immediately drop when the receive queue is full.
->          * Cast to unsigned int performs the boundary check for INT_MAX.
->          */
-> @@ -1747,45 +1737,60 @@ int __udp_enqueue_schedule_skb(struct sock *sk, s=
-truct sk_buff *skb)
->         if (rmem > (rcvbuf >> 1)) {
->                 skb_condense(skb);
->                 size =3D skb->truesize;
-> -               rmem =3D atomic_add_return(size, &sk->sk_rmem_alloc);
-> -               if (rmem > rcvbuf)
-> -                       goto uncharge_drop;
-> -               busy =3D busylock_acquire(sk);
-> -       } else {
-> -               atomic_add(size, &sk->sk_rmem_alloc);
->         }
->
->         udp_set_dev_scratch(skb);
->
-> +       atomic_add(size, &udp_prod_queue->rmem_alloc);
-> +
-> +       if (!llist_add(&skb->ll_node, &udp_prod_queue->ll_root))
-> +               return 0;
-> +
->         spin_lock(&list->lock);
-> -       err =3D udp_rmem_schedule(sk, size);
-> -       if (err) {
-> -               spin_unlock(&list->lock);
-> -               goto uncharge_drop;
-> -       }
->
-> -       sk_forward_alloc_add(sk, -size);
-> +       ll_list =3D llist_del_all(&udp_prod_queue->ll_root);
->
-> -       /* no need to setup a destructor, we will explicitly release the
-> -        * forward allocated memory on dequeue
-> -        */
-> -       sock_skb_set_dropcount(sk, skb);
-> +       ll_list =3D llist_reverse_order(ll_list);
-> +
-> +       llist_for_each_entry_safe(skb, next, ll_list, ll_node) {
-> +               size =3D udp_skb_truesize(skb);
-> +               total_size +=3D size;
-> +               err =3D udp_rmem_schedule(sk, size);
-> +               if (err) {
-> +                       udp_drops_inc(sk);
-> +                       // TODO update SNMP values.
-> +                       sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO=
-_MEM);
-
-Could using skb_attempt_defer_free() here and
-cpu_to_node(skb->alloc_cpu) for prod_queue selection help further ?
-
-Or cache miss of alloc_cpu and defer_lock & IPI could be
-rather expensive under DDoS ?
-
-
-> +                       continue;
-> +               }
-> +
-> +               q_size +=3D size;
-> +               sk_forward_alloc_add(sk, -size);
-> +
-> +               /* no need to setup a destructor, we will explicitly rele=
-ase the
-> +                * forward allocated memory on dequeue
-> +                */
-> +               sock_skb_set_dropcount(sk, skb);
-> +               nb++;
-> +               __skb_queue_tail(list, skb);
-> +       }
-> +
-> +       atomic_add(q_size, &sk->sk_rmem_alloc);
->
-> -       __skb_queue_tail(list, skb);
->         spin_unlock(&list->lock);
->
-> -       if (!sock_flag(sk, SOCK_DEAD))
-> -               INDIRECT_CALL_1(sk->sk_data_ready, sock_def_readable, sk)=
-;
-> +       atomic_sub(total_size, &udp_prod_queue->rmem_alloc);
->
-> -       busylock_release(busy);
-> -       return 0;
-> +       if (!sock_flag(sk, SOCK_DEAD)) {
-> +               while (nb) {
-> +                       INDIRECT_CALL_1(sk->sk_data_ready, sock_def_reada=
-ble, sk);
-> +                       nb--;
-> +               }
-> +       }
->
-> -uncharge_drop:
-> -       atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
-> +       return 0;
->
->  drop:
->         udp_drops_inc(sk);
-> -       busylock_release(busy);
->         return err;
->  }
->  EXPORT_IPV6_MOD_GPL(__udp_enqueue_schedule_skb);
-> @@ -1814,10 +1819,11 @@ static void udp_destruct_sock(struct sock *sk)
->
->  int udp_init_sock(struct sock *sk)
->  {
-> -       udp_lib_init_sock(sk);
-> +       int res =3D udp_lib_init_sock(sk);
-> +
->         sk->sk_destruct =3D udp_destruct_sock;
->         set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
-> -       return 0;
-> +       return res;
->  }
->
->  void skb_consume_udp(struct sock *sk, struct sk_buff *skb, int len)
-> @@ -2906,6 +2912,7 @@ void udp_destroy_sock(struct sock *sk)
->                         udp_tunnel_cleanup_gro(sk);
->                 }
->         }
-> +       kfree(up->udp_prod_queue);
->  }
->
->  typedef struct sk_buff *(*udp_gro_receive_t)(struct sock *sk,
-> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-> index 9f4d340d1e3a63d38f80138ef9f6aac4a33afa05..813a2ba75824d14631642bf69=
-73f65063b2825cb 100644
-> --- a/net/ipv6/udp.c
-> +++ b/net/ipv6/udp.c
-> @@ -67,10 +67,11 @@ static void udpv6_destruct_sock(struct sock *sk)
->
->  int udpv6_init_sock(struct sock *sk)
->  {
-> -       udp_lib_init_sock(sk);
-> +       int res =3D udp_lib_init_sock(sk);
-> +
->         sk->sk_destruct =3D udpv6_destruct_sock;
->         set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
-> -       return 0;
-> +       return res;
->  }
->
->  INDIRECT_CALLABLE_SCOPE
-> --
-> 2.51.0.470.ga7dc726c21-goog
 >
 
