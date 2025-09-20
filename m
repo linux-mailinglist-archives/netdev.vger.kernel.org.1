@@ -1,131 +1,93 @@
-Return-Path: <netdev+bounces-224995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC304B8CB18
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 17:05:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB198B8CB70
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 17:31:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4EC61B241D9
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 15:05:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94E48189B648
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 15:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5A12F6189;
-	Sat, 20 Sep 2025 15:05:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2AB51EB5C2;
+	Sat, 20 Sep 2025 15:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ui81TneB"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oeHi3YvS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A7918BBAE
-	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 15:05:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869C0219301;
+	Sat, 20 Sep 2025 15:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758380706; cv=none; b=EfXWOVqHLdyFZQgspYUmVQrtSxoNQi75VHVrRAy1OdNYvFTvGIYmxiR0vmqXPxFTHznXAMokW69zg/jblwdgauM7x5B96rxpcLyCkEL0xp7EkMOPqel+6XS2GWWvuDnwZV3ac3RAyjq5AOg68M3a8KuAhzxXuRAjBCtdvWHnoVA=
+	t=1758382268; cv=none; b=UEY57LssJgkBXpSkRGJQI/ve3wdUqzBsW9KUVlB+pCO5+BRQLr7EHziqIMg2vQKVyI7S9sTgN9SNHYY/cBumQqwBgYwoIdYHjK4NxDjfRFpJ2KLTCM21LHqABSPYXcER1KxBkujjE+hvInH9Ojcpmksw5emAlg8YK8fqn2JVVyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758380706; c=relaxed/simple;
-	bh=E/YB7d+c8dmbLmch6sh9Xq3SGjrruR5SExr7kvL2zCM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FIfc5088dint2uXDUpQylbwrytra0nYfHYEaD/CcKIBlr/B+H2VxRY5L3HeSi4ZYuXiOWEDvTGRNf3sQETAIiXUPHxA3S2+ok0xbiylKj6u9T7MohIqCE3HXIhpx92WCWCfD/iBlc+IC9AE4r8gB6fECpTv6Cird9Kfc4MX2i/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ui81TneB; arc=none smtp.client-ip=209.85.222.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-8e286a1afc6so2012329241.1
-        for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 08:05:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758380704; x=1758985504; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/3dBRgSHKupbJFLCFsbsGrY5tLDAt1cXE35m3k1egDc=;
-        b=Ui81TneBGYDeuyFwtjGDoH6dt5l7WG3K8Hh48djeJWeXtPAfwWTp2wb8oUqd8Chkw3
-         LBBsuv7MAnKGSsyVgq1So1fBAd5wqZv+pL+nYftGhbEcCVtMvEFacOx0VO4D1aeE0IVc
-         XUucK8LFvPAl8OKwtDZsq6H9XsSH2POsp68tR5L1asMNhOOCBzi3iesHBcO211PuxdgT
-         Al/X8Uvav2kWhkMZuTUx5AzhSIDoj4j1ojPc2/QzTvMHeSrVzWsYUXFwdQvVeuZsCasS
-         QxDvfjaF+hmrUHO/pC+a57Wv6tXe5pobVs7VUKDtER5upef1goi1yDvoC0Qi/eOkLMBJ
-         /PyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758380704; x=1758985504;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/3dBRgSHKupbJFLCFsbsGrY5tLDAt1cXE35m3k1egDc=;
-        b=k9HkWFRxw4uGpHl887IO9HPgxnQq6oqjyo2ULR/02cUzICHZPKsl7481dboB051etY
-         shW8jpHq7Pn+RCCjCLuJxV7WNAk9JZN6Wn1s5zAlan58hqM7865IztFXof+mExYqOSdJ
-         vNF9llmiJc+x+ZjZ3DiRXzKAz1bccKPEL4d78Wo4h43BAG8OFQyrBzNOPGwl3Dy6trqU
-         qOcU3xVa+rmYKiaE1Xse8T6oZNYDa0TyOg5fAxxnwKzxgkfGB0yd9/HjTOddpnZbq1lg
-         onmVW2IhgrTskj+fokg68rRkKwyTRu4Va2mscl4/Qj8YxGbqdcOMNZDWmFtrgARUa7AR
-         KMkw==
-X-Forwarded-Encrypted: i=1; AJvYcCU5pIqT9Ov7IO2y0wL6biAx6elGV+L8pPDwktRg5f3osk3PbanSe8Q13fUuqoBYTKKRKzOrqGU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHL6i0U3Uftz1L0+TupD3zif5xyGDtzirjSnhSeWguXcODp522
-	HBsJUkspAYNS2EMubM8vOX2gl5FlXZ3kt8tabGmyOGTBtLYzxJ867cARyfRlQw==
-X-Gm-Gg: ASbGnctwyjETfcjtxWfFDNOlpPR4tL2B6vQ4MFZOP1MrJeMfd2IgyjWkg7DvUsM3PZM
-	6ePCopp9xPumtu0yOx7cTeye7ARgq8mkl1geYH2pESq2Wt6igPVhF/uO3xlGeuw6gdT057E/huv
-	dVFs1nGymMvBBy2iuC/2l9vUmNR6hNIpkYuyf+jo3GWXb1r7A2bxrbFxU4a21UtGlli60u7aFmw
-	6WbHusxJ3fkz0r9DQ6JF6vIyuy+doFf7p6nni/XBbqUBz9XB7hxpTfpbdQ7xae5fsnspOI5nbog
-	PlZxB3HhqCVFDj+Ge5pDIM9I6m13cAEXYllrfo0E4ZRCOkH1/DGbjHTis8EwI2XxlFll7Hresrk
-	GbBNMhVdWXjyZcuw90mZiDCZCb4CFK3//19Wi5rL0ID3Cap7i+SJ75aMl8Fn2aD3e6Q==
-X-Google-Smtp-Source: AGHT+IHMMVJvSgtodzJ6WmmM7Kc+LV5Dq1bi4xHDem2aWXRjp7TwS8Jpusd8EkZWKe4gbIoODXqysg==
-X-Received: by 2002:a05:6102:6050:b0:57b:bb59:4dd9 with SMTP id ada2fe7eead31-57bbb597465mr3888675137.17.1758380703928;
-        Sat, 20 Sep 2025 08:05:03 -0700 (PDT)
-Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8e3e75254casm1266947241.11.2025.09.20.08.05.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Sep 2025 08:05:03 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2025-09-20
-Date: Sat, 20 Sep 2025 11:04:53 -0400
-Message-ID: <20250920150453.2605653-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1758382268; c=relaxed/simple;
+	bh=VmpXs+T5FJFMh9uMlfY1zO0F1J8+Bi53OUp0N4Q+6Y8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RC8dO5PrXiQrx0U5tEQxQWHV0Gp0MacnnD7iEEgpociJ52IjpFa+sFhhHcBAhs9/v1bbEOyOeTlzdwCwLqf1ycCDa4WcV32R0ueGCgtYypPcE5i5a7WbltTD2fSC7mo0o4jyeLoVc3fcG/+AbtlS4HjyjXk5wNp9TnuZpWCscZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oeHi3YvS; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=l3P7xbNm51dRG4YbNP1VYdE4uOUg89upg8bJchvamQY=; b=oeHi3YvSJt50OQWpfvMD3AnU28
+	IBiODy924lqyKQsQ74HLH6chjOVrcyJIGZ7Lj2lk9xcLEQFW5wk2WqNdrJwWHW4+boq8lmbuUqACa
+	4qqSk1nGV8gMO/iuq9+R7fvIpBslDj0JnT26ZrOQP3V1OaUHpgcsDt/PtQQoicW5+YWY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uzzXo-0091G0-9s; Sat, 20 Sep 2025 17:30:36 +0200
+Date: Sat, 20 Sep 2025 17:30:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: I Viswanath <viswanathiyyappan@gmail.com>
+Cc: petkan@nucleusys.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com,
+	syzbot+78cae3f37c62ad092caa@syzkaller.appspotmail.com
+Subject: Re: [PATCH] net: usb: Remove disruptive netif_wake_queue in
+ rtl8150_set_multicast
+Message-ID: <5b51d80e-e67c-437d-a2fc-bebdf5e9a958@lunn.ch>
+References: <20250920045059.48400-1-viswanathiyyappan@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250920045059.48400-1-viswanathiyyappan@gmail.com>
 
-The following changes since commit b65678cacc030efd53c38c089fb9b741a2ee34c8:
+On Sat, Sep 20, 2025 at 10:20:59AM +0530, I Viswanath wrote:
+> syzbot reported WARNING in rtl8150_start_xmit/usb_submit_urb.
+> This is a possible sequence of events:
+> 
+>     CPU0 (in rtl8150_start_xmit)   CPU1 (in rtl8150_start_xmit)    CPU2 (in rtl8150_set_multicast)
+>     netif_stop_queue();
+>                                                                     netif_stop_queue();
+>     usb_submit_urb();
+>                                                                     netif_wake_queue();  <-- Wakes up TX queue before it's ready
+>                                     netif_stop_queue();
+>                                     usb_submit_urb();                                    <-- Warning
+> 	freeing urb
+> 	
+> Remove netif_wake_queue and corresponding netif_stop_queue in rtl8150_set_multicast to
+> prevent this sequence of events
 
-  ethernet: rvu-af: Remove slash from the driver name (2025-09-19 17:00:53 -0700)
+Please expand this sentence with an explanation of why this is
+safe. Why are these two calls not needed? The original author of this
+code thought they where needed, so you need to explain why they are
+not needed.
 
-are available in the Git repository at:
+    Andrew
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-09-20
-
-for you to fetch changes up to b683725c679a2a30852fa40fa1196d5f7bb4998c:
-
-  Bluetooth: MGMT: Fix possible UAFs (2025-09-20 11:01:42 -0400)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - Fix build after header cleanup
- - hci_sync: Fix hci_resume_advertising_sync
- - hci_event: Fix UAF in hci_conn_tx_dequeue
- - hci_event: Fix UAF in hci_acl_create_conn_sync
- - MGMT: Fix possible UAFs
-
-----------------------------------------------------------------
-Calvin Owens (1):
-      Bluetooth: Fix build after header cleanup
-
-Luiz Augusto von Dentz (4):
-      Bluetooth: hci_sync: Fix hci_resume_advertising_sync
-      Bluetooth: hci_event: Fix UAF in hci_conn_tx_dequeue
-      Bluetooth: hci_event: Fix UAF in hci_acl_create_conn_sync
-      Bluetooth: MGMT: Fix possible UAFs
-
- drivers/bluetooth/Kconfig        |   6 +
- drivers/bluetooth/hci_uart.h     |   8 +-
- include/net/bluetooth/hci_core.h |  21 ++++
- net/bluetooth/hci_event.c        |  30 ++++-
- net/bluetooth/hci_sync.c         |   7 ++
- net/bluetooth/mgmt.c             | 244 +++++++++++++++++++++++++++------------
- net/bluetooth/mgmt_util.c        |  24 ++++
- net/bluetooth/mgmt_util.h        |   2 +
- 8 files changed, 259 insertions(+), 83 deletions(-)
+---
+pw-bot: cr
 
