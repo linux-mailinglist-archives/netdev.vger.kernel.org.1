@@ -1,166 +1,95 @@
-Return-Path: <netdev+bounces-224956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44CBBB8BE6B
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 05:51:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65605B8BF39
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 06:37:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2597A06E1D
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 03:51:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC6ED7AD504
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 04:35:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F24214A97;
-	Sat, 20 Sep 2025 03:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cSkPCHnj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91692264B2;
+	Sat, 20 Sep 2025 04:37:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FBF97081A
-	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 03:51:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 267ED1DD525
+	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 04:37:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758340309; cv=none; b=st+S6Gz0noLTR7actNyGdXAqSxu4pLZizZmOS+X+69iVNkXlMWDhszi+eVLwIW13r3tmnGYo06F0g6OcFSumKYJqZdZS4/VlEb2PweKK3DKFyStJxs9IKaMqUOJx5DRaDqb4saHTPg1U7zLCGM9TG3vRwUh0EChUs7idhXBFyow=
+	t=1758343028; cv=none; b=Cj7L3talTmGigm8tPdUeKTn7duz/SXTFWdriaSAwtZyfTiVo9munhzaDTO0wEeiqp1c8VzEYK/mXoqiEkzlpiugVCfzrWJ7g1aSHNzHysfg1bOvI401yiwvLfzqwrYJbtEPZL7j6npUry12I7qowD1nUjBYtQJmm7KFkJxE0t+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758340309; c=relaxed/simple;
-	bh=4nyax13VUWR5a5t0mPW0ffDF7ObllscDnqllciX7WU0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SG13yXiWde3kyr8Pd5EosDadAfzLWH9IN5hsiJtOZD6gtewlQ2CDdOCAsVLPYooo5mrA/FIfIaZOFwgAwYLZRWinZvPCI4QdMpgypdLDmG9zOFoBHtiltL6qpqwrr6Po/Pn2TiQ8eenSLsw+8R9qffu7heR8XLDVVhUyg4H7PDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cSkPCHnj; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32ee4998c50so2566808a91.3
-        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 20:51:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758340308; x=1758945108; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HpEOj5LSM2D4OpUTxa8SKWTebNuWvFU+5fQLpVHxJlM=;
-        b=cSkPCHnjl24X4A4YLQJG4lU8WmWhITSpFUiWyWGqVPmR5352NiMa/3r32lN5fyLMcy
-         rijwqkTFuFmhTB555IeY5QJMwc90rY0b1GC6ZP9Di692OUqYXqIlR8ryz3CPnJ/bEnv0
-         HMiXwIQqPCdxLaJ8lLxCSOr3lR7H7MdDGOcKQLD25JlRfO4p9puHyVg1Ncy51QLl4cAF
-         CXwx5RgHADOMlSuZjRyjVnJk2EjKLWp8TDbrtNwBV/n1xTjqzaT+NQtfI34Kfse0LklO
-         mGgFZeo527G520gzPYak5MM1UZ0qc6v86Vs5PL1qEIlBcp4rfMpXsO+8srLFCzw1Alk4
-         wCHw==
+	s=arc-20240116; t=1758343028; c=relaxed/simple;
+	bh=eLZJJ4b5Hv13WnuF/je/2Gc/GJOLCP6cLSLyncvNLdA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=H7BjjeyxdmsP7H2oJhnGh5ab0F/7/rO4DJaHemkwKfDBa/DV4a0J0Coa3Jb0wtd1lTZDSLOTCJhcsMcRaQ/MgvAvKt7j3g1fRkPDy/x1EjXNXyqy5br5K/nUgVXntpzqFr8iJoHe3ana0atmZK/kulFkqoHJhds3hbhfHXFun60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-42404bb4284so37161715ab.0
+        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 21:37:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758340308; x=1758945108;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HpEOj5LSM2D4OpUTxa8SKWTebNuWvFU+5fQLpVHxJlM=;
-        b=FIicWsx4UWXnWQGwfwXy58EO0nXptyWTFXLosCmvkioJoVE4fT2X4AVyZLOa4dta7E
-         BHdMyVKuEGUkY2U9L/6J640Qy+DwGCU1jvOz9PYjiEhGLO9mH5DRJ3fec5QOqkjFvPAf
-         DKYqZLUL5PAGBf/FSqFWWzx8n951/2rhfzdSg29IM48CPx3C3UKS8gBDaoJfMabs1zOP
-         WtJKRmdtRn9tQELS+xR0e5QZ6kMoEknBYWzID+iDghQVOchXFsDPa5pUIdSHumWLNhLu
-         4Nu7NM97/E6uh1BvuuayzwHfAEjTRR7pp3tpwEDgY7fAKIfFr4ALZP4CNlT+jjtoJO8s
-         HXMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV2Lf2w2ySvNIzYRJu76oKD2b0SFokoZuGHL/zyTY0raUe7ud3F5GeDWbsmoPOPypg7eHfGyD4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMSAl1VeTMFhWsB1whtkGbOTO70c7SHQfTu0vC1R2wzIZgdsh8
-	Cww01kA/1gynxUMRQpZlBE7SbDj27xiKBgLMzUTmJniT1TPQpn5ILe++HYe4M+KqBeK/oy7QYvP
-	Skh0I2w==
-X-Google-Smtp-Source: AGHT+IGDEsmJS0RWHAZl4i+dA/zrRM6jZJwlfPLgPe6OetInXPKDxFrf8pBdb+Fr9jhrRctW5rKl2lRcuTw=
-X-Received: from pjbta12.prod.google.com ([2002:a17:90b:4ecc:b0:329:ccdd:e725])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3146:b0:330:604a:1009
- with SMTP id 98e67ed59e1d1-3309834c31fmr7114857a91.23.1758340307754; Fri, 19
- Sep 2025 20:51:47 -0700 (PDT)
-Date: Sat, 20 Sep 2025 03:50:43 +0000
-In-Reply-To: <caa08e5b15bc35b9f3c24f679c62ded1e8e58925.camel@gmail.com>
+        d=1e100.net; s=20230601; t=1758343026; x=1758947826;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gja0G+YNMT4nfkxekGzUizab20nltKnqLeo3HZHwrLU=;
+        b=DWa6nbL7TmNswXTiZrOwMOp3fEwDbUz5B14DylLheuI07up+2HUlZX0xxXCqkWb58i
+         Pa/g5Ko6Lbk86m2ujaoX4CuZ51o41ZuUwKiVePeW0/YndQNIRAKXy3tqaqTC4MT4WJts
+         jEIegU2P4ugaLgcskrbZrhw9rgkl1smewTzaTu9zCH84kkRfoSSOIO+BbRZjAqiLM7Zx
+         C028fOQLaLHZ8bNxT+7igFEunWRdt3PNz/0M8PEPEinqRwsFGfb78pB8guyj0AAyrOrT
+         leo4JzEqyyMW01FwX5SNe3BtTSZpegq3qxwX8DIQr8Zq9IWdUdm3TzoCBzzDdXNPvtb2
+         SCZA==
+X-Forwarded-Encrypted: i=1; AJvYcCW43f1Qr0NVGnUEwH/xmTqnnn6PKUbYpxIcBxoOjWgBbXXDPzVn5K1wUsMYExAMFKqz/ACmsYY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNwAB+0gfZ3fn0whJnDMeuHVhxIl1KsENVjCd9jY3MHZgAFnJ5
+	24HbIsGh87rZKWyCiiq7hGMkekwqbbpkfoeOtKLRiYkLx/LxBI2tnSZI1sI1IYdOdsskCRopRc7
+	cPr2N2E4+hZ/ib+36N0gpI0QEvl5n4NrAs+oUS8JZOk8A9e00gum1LAIJKCI=
+X-Google-Smtp-Source: AGHT+IEboJPHmu/GmGIV1HX2yNQ77XkVwCngjKU9vicDDz+MZ7u0oRXuv26/XZA4q8RUdEr6/vmWleC4YNydH6JYZXyh1b78jOd3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <caa08e5b15bc35b9f3c24f679c62ded1e8e58925.camel@gmail.com>
-X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250920035146.2149127-1-kuniyu@google.com>
-Subject: Re: [REGRESSION] af_unix: Introduce SO_PASSRIGHTS - break OpenGL
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: brian.scott.sampson@gmail.com
-Cc: christian@heusel.eu, davem@davemloft.net, difrost.kernel@gmail.com, 
-	dnaim@cachyos.org, edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
-	kuni1840@gmail.com, kuniyu@google.com, linux-kernel@vger.kernel.org, 
-	mario.limonciello@amd.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	regressions@lists.linux.dev
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:1885:b0:424:2d4:585e with SMTP id
+ e9e14a558f8ab-424818f920bmr87191575ab.1.1758343026440; Fri, 19 Sep 2025
+ 21:37:06 -0700 (PDT)
+Date: Fri, 19 Sep 2025 21:37:06 -0700
+In-Reply-To: <0ca2c567-b311-4f0b-bb29-2b860b75f85e@huawei.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68ce2f72.050a0220.13cd81.000f.GAE@google.com>
+Subject: Re: [syzbot] [smc?] general protection fault in __smc_diag_dump (4)
+From: syzbot <syzbot+f775be4458668f7d220e@syzkaller.appspotmail.com>
+To: alibuda@linux.alibaba.com, davem@davemloft.net, dust.li@linux.alibaba.com, 
+	edumazet@google.com, guwen@linux.alibaba.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-s390@vger.kernel.org, mjambigi@linux.ibm.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, sidraya@linux.ibm.com, syzkaller-bugs@googlegroups.com, 
+	tonylu@linux.alibaba.com, wangliang74@huawei.com, wenjia@linux.ibm.com, 
+	yuehaibing@huawei.com, zhangchangzhong@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 
-From: brian.scott.sampson@gmail.com
-Date: Wed, 17 Sep 2025 15:25:07 -0500
-> > Thanks for testing the painful scenario.
-> > 
-> > Could you apply this on top of the previous diff and give it
-> > another shot ?
-> > 
-> > I think the application hit a race similar to one in 43fb2b30eea7.
-> Just tested again with latest mainline, but no change. Once suspended,
-> keyboard becomes inactive and no longer accepts any input, so no way to
-> switch to tty to view dmesg. The only way to move forward after
-> suspending is holding down power to hard shutdown, then power back on.
-> I tried enabling persistence in the systemd journal, then checking
-> journalctl -k -b -1, but nothing is recorded from dmesg after the
-> suspend.
+Hello,
 
-Thank you for your patience.
+syzbot tried to test the proposed patch but the build/boot failed:
 
-I assumed SO_PASSCRED was the problem, but I missed
-SO_PASSCRED was also inherited durint accept().
+failed to apply patch:
+checking file net/smc/smc.h
+Hunk #1 FAILED at 285.
+1 out of 1 hunk FAILED
 
-Could you apply this on top of the previous changes ?
 
-Also, could you tell what desktop manager and distro
-you are using ?  If this attempt fails, I'll try to
-reproduce with the same version on my desktop.
 
----8<---
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 211084602e01..b61d4fdb7fc4 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -541,7 +541,8 @@ struct sock {
- 				sk_scm_rights : 1,
- 				sk_scm_embryo_cred: 1,
- 				sk_scm_parent_cred: 1,
--				sk_scm_unused : 2;
-+				sk_scm_parent_sec: 1,
-+				sk_scm_unused : 1;
- 		};
- 	};
- 	u8			sk_clockid;
-diff --git a/net/core/scm.c b/net/core/scm.c
-index e603bf5400e0..359d56d454b4 100644
---- a/net/core/scm.c
-+++ b/net/core/scm.c
-@@ -435,7 +435,8 @@ static void scm_passec(struct sock *sk, struct msghdr *msg, struct scm_cookie *s
- 	struct lsm_context ctx;
- 	int err;
- 
--	if (sk->sk_scm_security) {
-+	if (sk->sk_scm_security || sk->sk_scm_parent_sec) {
-+		WARN_ON_ONCE(!sk->sk_scm_security);
- 		err = security_secid_to_secctx(scm->secid, &ctx);
- 
- 		if (err >= 0) {
-@@ -449,7 +450,7 @@ static void scm_passec(struct sock *sk, struct msghdr *msg, struct scm_cookie *s
- 
- static bool scm_has_secdata(struct sock *sk)
- {
--	return sk->sk_scm_security;
-+	return sk->sk_scm_security || sk->sk_scm_parent_sec;
- }
- #else
- static void scm_passec(struct sock *sk, struct msghdr *msg, struct scm_cookie *scm)
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index b6ff7ad0443a..a35082269990 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1899,6 +1899,7 @@ static int unix_accept(struct socket *sock, struct socket *newsock,
- 	unix_update_edges(unix_sk(tsk));
- 	newsock->state = SS_CONNECTED;
- 	tsk->sk_scm_parent_cred = sk->sk_scm_credentials;
-+	tsk->sk_scm_parent_sec = sk->sk_scm_security;
- 	sock_graft(tsk, newsock);
- 	unix_state_unlock(tsk);
- 	return 0;
----8<---
+Tested on:
+
+commit:         cd89d487 Merge tag '6.17-rc6-smb3-client-fixes' of git..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8f01d8629880e620
+dashboard link: https://syzkaller.appspot.com/bug?extid=f775be4458668f7d220e
+compiler:       
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=1381a0e2580000
+
 
