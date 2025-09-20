@@ -1,140 +1,123 @@
-Return-Path: <netdev+bounces-224978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36046B8C664
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 13:01:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7EC7B8C69F
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 13:18:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 280A11B27A0B
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 11:01:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5909562CF1
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 11:18:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6782A2FBDF7;
-	Sat, 20 Sep 2025 11:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46B9F2D640A;
+	Sat, 20 Sep 2025 11:18:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lHeFpJNp"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1Y81j9AE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7CC2FB632
-	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 11:00:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A2829BDB3
+	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 11:18:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758366042; cv=none; b=lQeyvuTnzVtFLAkgyBTGQadVBEP8VjMveKZPCTX4nA4Th/tpgFj1xHig40kKIiW2ANoAucUG9UAHRCv0d3vJ4mYSOKI1JFy+5I5IrUVe+B5V+jlUrhV9xAh/A4hk+1Rk120F0h4wEulLaTmXWo74ZyJ33F6W9YWyxTD1nOtzMEE=
+	t=1758367116; cv=none; b=TE0FYfNFBBo1L3K/lLyNltTTWC70FaG65MYx9x4oYALCNSnLD8Bj6TZEk9pYzl0/mfF6pG3zOCWS7SXrc/frsbEZ0dhHubKVGFQhPlEHxbHhd+6V3mRuRj1501C58JtEIh8F+R4M/50kTxJC7bb/Pgp3fK8KyYUqb09GRFikwY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758366042; c=relaxed/simple;
-	bh=F4B/fmz5pAi8yhrFAC/dTM+Chnrnp+ZwLdcj4Uw+s8s=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NRXo5i5p/tYMwZIpp5OqDqvhlKfrHkGz56sUYcnfLdcMPIa7xfyahtP3aUawdZKy2Xvh3eqgs7T1kDmFncSsqgIJ8BbbnhoYDJZQJ6PSfoalVAs6sdOSSShjXCGW0LczLuaOLtTX+jZKXR0xcXxRMnZQLsNeaaesYNtXj3SWSQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lHeFpJNp; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758366038;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BTadG7tRVSRC4eZ6MXNGan5qZuO9d9HWPQWAXzUU+/4=;
-	b=lHeFpJNp/5yYCucNRBu4cttEOSeGX+MsjnONeMxawpbK2WoBrI3S98OZam3rMVW+GGi3HB
-	xZV8ar9EjSBAuANhLJBEQvjybpLkqpRWhG9NkPWTbIYmGFGlCVXIAWFhKnpFfWdQ5+2nKG
-	8xT3uLtIf+mWoGfQgmRZR2A5XdYkDvE=
-From: xuanqiang.luo@linux.dev
-To: edumazet@google.com,
-	kuniyu@google.com
-Cc: kerneljasonxing@gmail.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-Subject: [PATCH net-next v4 3/3] inet: Avoid ehash lookup race in inet_twsk_hashdance_schedule()
-Date: Sat, 20 Sep 2025 18:59:45 +0800
-Message-Id: <20250920105945.538042-4-xuanqiang.luo@linux.dev>
-In-Reply-To: <20250920105945.538042-1-xuanqiang.luo@linux.dev>
-References: <20250920105945.538042-1-xuanqiang.luo@linux.dev>
+	s=arc-20240116; t=1758367116; c=relaxed/simple;
+	bh=aigZPeNf3sifh493XXNkxFvOYEKd0OBOWnVZiKKjV/8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UAJkPkKK6WL8pQQw5Bk1uBO261iZwoWiJcQC6WHBPre/X5Ogwvt+rldm8u9d+XngsDWy6ZVqUc+jBt/gc8Z2f8knosJ3Hz6Owgm6lmkxvLY8KoV9Lhb5m+TW0JeqEJereTzSjmmRYYNlCrYOPwRTrqA6pJjLvB+EkYWrl9kDrKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1Y81j9AE; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=tCEeW85kaGzH1qr1kRp+zRPUSwpshCIjL2JqDbKueGk=; b=1Y81j9AE7BnfPyMs/l4w70hhVP
+	VqEwHJuIocAzeJVsZPeSPzVaXM5PQG63W5Ypd9Z83dYbXkRblh7FByaBTxg/3a/tW5rvV6rBST93U
+	SIPj31F60bpqyY9KJHz4LhDod51itglKFlc9U04gMbsZ8XOEcwJ3JgZNSdq0JCAA4o5/0hD9ngXKw
+	3Cd4SX/1zEUb8AhZw/DbIwtzjGUN5jSb4u73hKY5ahJ8ZGkvTdP58loM6YZeCqIHStykdykTHCg6J
+	NSC5sAp1ZpubbwckEGyceMyXZq2kGx1d/FlUbBlTzvVB4ygA6ajnuq/heyeqW+/8ij1TfI5migq0K
+	6dVVdUpw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60442)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uzvbq-0000000007I-14pz;
+	Sat, 20 Sep 2025 12:18:30 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uzvbn-0000000034s-1zH5;
+	Sat, 20 Sep 2025 12:18:27 +0100
+Date: Sat, 20 Sep 2025 12:18:27 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Janpieter Sollie <janpieter.sollie@kabelmail.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [RFC] increase MDIO i2c poll timeout gradually (including patch)
+Message-ID: <aM6Ng7tnEYdWmI1F@shell.armlinux.org.uk>
+References: <971aaa4c-ee1d-4ca1-ba38-d65db776d869@kabelmail.de>
+ <cbc4a620-36d3-409b-a248-a2b4add0016a@lunn.ch>
+ <f86737b0-a0fe-49a6-aeca-9e51fbdf0f0d@kabelmail.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f86737b0-a0fe-49a6-aeca-9e51fbdf0f0d@kabelmail.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+On Sat, Sep 20, 2025 at 12:00:50PM +0200, Janpieter Sollie wrote:
+> Op 19/09/2025 om 19:04 schreef Andrew Lunn:
+> > On Fri, Sep 19, 2025 at 03:52:55PM +0200, Janpieter Sollie wrote:
+> > > Hello everyone,
+> > Please ensure you Cc: the correct Maintainers.
+> > 
+> > ./scripts/get_maintainer.pl drivers/net/phy/sfp.c
+> > Russell King <linux@armlinux.org.uk> (maintainer:SFF/SFP/SFP+ MODULE SUPPORT)
+> > Andrew Lunn <andrew@lunn.ch> (maintainer:ETHERNET PHY LIBRARY)
+> > Heiner Kallweit <hkallweit1@gmail.com> (maintainer:ETHERNET PHY LIBRARY)
+> > "David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING DRIVERS)
+> > Eric Dumazet <edumazet@google.com> (maintainer:NETWORKING DRIVERS)
+> > Jakub Kicinski <kuba@kernel.org> (maintainer:NETWORKING DRIVERS)
+> > Paolo Abeni <pabeni@redhat.com> (maintainer:NETWORKING DRIVERS)
+> > netdev@vger.kernel.org (open list:SFF/SFP/SFP+ MODULE SUPPORT)
+> > linux-kernel@vger.kernel.org (open list)
+> Done, sorry, this is my first post here
+> > 
+> > > I tested a SFP module where the i2c bus is "unstable" at best.
+> > Please tell us more about the hardware.
+> > 
+> > Also, what speed do you have the I2C bus running at? Have you tried
+> > different clock-frequency values to slow down the I2C bus? Have you
+> > checked the pull-up resistors? I2C problems are sometimes due to too
+> > strong pull-ups.
+> The hardware is a bananapi R4 2xSFP using a MT7988a SoC.
+> The SFP+ module is a RJ45 rollball module using a AQR113C phy, but needs a
+> quirk in sfp.c (added below)
+> I'm not a i2c expert at all,
+> but about the i2c bus speed, the SFP cage seems to be behind a muxer, not a i2c root.
+> I could not find anything about i2c bus speed in /proc or /sys, maybe it's impossible to tell?
+> 
+> The dtsi or dtso files do not mention anything about bus speeds, so I honestly do not know.
 
-Since ehash lookups are lockless, if another CPU is converting sk to tw
-concurrently, fetching the newly inserted tw with tw->tw_refcnt == 0 cause
-lookup failure.
+As you have not include the author of the SFP support (me) in your
+initial email, and have not provided a repeat of the description,
+I'm afraid I have no idea what the issue is that you're encountering.
 
-The call trace map is drawn as follows:
-   CPU 0                                CPU 1
-   -----                                -----
-				     inet_twsk_hashdance_schedule()
-				     spin_lock()
-				     inet_twsk_add_node_rcu(tw, ...)
-__inet_lookup_established()
-(find tw, failure due to tw_refcnt = 0)
-				     __sk_nulls_del_node_init_rcu(sk)
-				     refcount_set(&tw->tw_refcnt, 3)
-				     spin_unlock()
+Thanks.
 
-By replacing sk with tw atomically via hlist_nulls_replace_init_rcu() after
-setting tw_refcnt, we ensure that tw is either fully initialized or not
-visible to other CPUs, eliminating the race.
-
-It's worth noting that we replace under lock_sock(), so no need to check if sk
-is hashed. Thanks to Kuniyuki Iwashima!
-
-Fixes: 3ab5aee7fe84 ("net: Convert TCP & DCCP hash tables to use RCU / hlist_nulls")
-Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
-Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
----
- net/ipv4/inet_timewait_sock.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
-
-diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
-index 5b5426b8ee92..bb98888584a8 100644
---- a/net/ipv4/inet_timewait_sock.c
-+++ b/net/ipv4/inet_timewait_sock.c
-@@ -116,7 +116,7 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
- 	spinlock_t *lock = inet_ehash_lockp(hashinfo, sk->sk_hash);
- 	struct inet_bind_hashbucket *bhead, *bhead2;
- 
--	/* Step 1: Put TW into bind hash. Original socket stays there too.
-+	/* Put TW into bind hash. Original socket stays there too.
- 	   Note, that any socket with inet->num != 0 MUST be bound in
- 	   binding cache, even if it is closed.
- 	 */
-@@ -140,14 +140,6 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
- 
- 	spin_lock(lock);
- 
--	/* Step 2: Hash TW into tcp ehash chain */
--	inet_twsk_add_node_rcu(tw, &ehead->chain);
--
--	/* Step 3: Remove SK from hash chain */
--	if (__sk_nulls_del_node_init_rcu(sk))
--		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
--
--
- 	/* Ensure above writes are committed into memory before updating the
- 	 * refcount.
- 	 * Provides ordering vs later refcount_inc().
-@@ -162,6 +154,9 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
- 	 */
- 	refcount_set(&tw->tw_refcnt, 3);
- 
-+	hlist_nulls_replace_init_rcu(&sk->sk_nulls_node, &tw->tw_node);
-+	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
-+
- 	inet_twsk_schedule(tw, timeo);
- 
- 	spin_unlock(lock);
 -- 
-2.25.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
