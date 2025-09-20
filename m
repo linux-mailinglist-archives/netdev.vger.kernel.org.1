@@ -1,73 +1,77 @@
-Return-Path: <netdev+bounces-224992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24655B8C99F
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 15:53:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 733CBB8CA74
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 16:42:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E96FB1B241C0
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 13:53:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 301415649E6
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 14:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DFD1F5437;
-	Sat, 20 Sep 2025 13:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29CDB2F4A14;
+	Sat, 20 Sep 2025 14:42:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="qtBesZHB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TTLnSCxM"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D5D14C5B0
-	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 13:53:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683272BEC2E;
+	Sat, 20 Sep 2025 14:42:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758376399; cv=none; b=hU/DkHyzt6jWui2eFFrBqDsrAS2344qRBx/50zP0HyFJ0CgMzqftM+4Lmp9aJOqoAyTwLnlW5qlhhqesZVFp9MY0sGQtfb/WmHVHEhjzu+bh4Jz8+sxmTXf0NYYq6KlbgKSCT+E7of28dFVvK/ULI+Rx3q2fptwuDTCJ0kIQ2HE=
+	t=1758379331; cv=none; b=oLP70aMh9HN7ZoXZvMeOZ5LH9duzzDOaM/Y/0XfqGqvHZgQPdrxeewfgyUgTnIHOo6DsNYtXCy4shtUDNPeXW0PgU0VzncX0382kzOmfqHq5JOahKfhTUP1u+12r5Pwv+HjmlGOTTGcW9Bt3DzBlNnbR0FvYK5viGWzvlCg4xyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758376399; c=relaxed/simple;
-	bh=IQb0eCPdG86z1gnNvh+Sy3ldt/rjhl6tn3LlY7T6yT4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MFjVE9F3i+iwgm1kqHiH6h2vtkdyXdRw1B3xIhm0iJNiDql/9/Es+O3wdIeZ5NRF1lt16pYA70/uQ7q0FtaCo//YWyzg9A2nwFx/QRPeMS+dhJsIOms9BfZrGSU2KuhuDWGL4uRreLW+/FgOFb4uw6dzDk6uS8VuTuqWleE9j1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=qtBesZHB; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=arY5XeOi24cwNMORuXgpgmuYDtDttdo/JJskh5liCCI=; b=qtBesZHBAUdtGjs303BkSzzRN9
-	08rR66RNn4RLjGJlydb2fkWKyn/RLug/XqjWQA3jkv6pQIaIFexsJi/obOPVsl6uUWq6/7NQUoaoU
-	9B4T08DY03D4tG4FnftSivy7BvOqktIgEoASYzjDrkNtjUdFk6QcivKagRHuw5A8yg2drwrDXWD0H
-	nbROvhpKZRJPR/SRI0Yq4JxF/AVtBbsQXYHndY+IvYCjcMpNFh6bLA45miANy9BCrXbfbs0Z/UALr
-	1uqriGEM19ToGAkSnnz8Sp7RDDeI2MN+wXQcHKEJCuQvNYlFYeqvpcK3PcDcpryTCnUpmNhHQTcf4
-	GIByD0KA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36770)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uzy1W-000000000V0-0tnx;
-	Sat, 20 Sep 2025 14:53:10 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uzy1T-000000003Ax-0wXd;
-	Sat, 20 Sep 2025 14:53:07 +0100
-Date: Sat, 20 Sep 2025 14:53:06 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Janpieter Sollie <janpieter.sollie@kabelmail.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [RFC] increase MDIO i2c poll timeout gradually (including patch)
-Message-ID: <aM6xwq6Ns_LGxl4o@shell.armlinux.org.uk>
-References: <971aaa4c-ee1d-4ca1-ba38-d65db776d869@kabelmail.de>
- <cbc4a620-36d3-409b-a248-a2b4add0016a@lunn.ch>
- <f86737b0-a0fe-49a6-aeca-9e51fbdf0f0d@kabelmail.de>
- <aM6Ng7tnEYdWmI1F@shell.armlinux.org.uk>
- <6d444507-1c97-4904-8edb-e8cc1aa4399e@kabelmail.de>
+	s=arc-20240116; t=1758379331; c=relaxed/simple;
+	bh=8ESeYby+VBnGxoL4sKU6AzMNuckA9rBZYz1Tl2yfc9U=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=L8wwzDF41Vh53V32KQ/2TWfvNcggCwz2xxgcOAtkdumn6hpu5Ziez9XuZ54LXnqyZsKIkzQjuzWIqZf4mJNOw7UCj3VBMh+NI65RKxhGINphdie+FKSMbFbshCezUoPRdNvDIG5mQFoZz5pyHEKYtWL2BNOvh/ryI1b3VTfPrAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TTLnSCxM; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758379330; x=1789915330;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=8ESeYby+VBnGxoL4sKU6AzMNuckA9rBZYz1Tl2yfc9U=;
+  b=TTLnSCxM84vn0/65jAmAefENm3MqBtw8as1BhaF1W2VW8vPu4SMMvBrd
+   4U8g9rheW/FI8TDk01aYHrbpFZiO0uBM/Z+ZjKn3GRcirv0LYVjy+aqT7
+   CPjiyA86tysxl8oaftxjG8KUibnenfU+VURPFl9dVhInK9A/Ki+SIADMr
+   DpzYaqSYOZuyP014nKS0fsGsTRdqZVa+SUqaoVzkK0cStXIDft5U0Ec0w
+   Cr9FYedTX4jJ1zlK/fgTI58dTTxympKN+DgdIS4aip52z4jPPUp6CyxQF
+   o4pwcKKxRIAIxR9JcCyLyvDzU+zvn697t7WX6de6/s9QAzHb5BvlGpjMw
+   w==;
+X-CSE-ConnectionGUID: YoUvWdWSRROE6EWEENRJVA==
+X-CSE-MsgGUID: ePGH1wlcRYuxBIyP9dVoMw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="60645899"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="60645899"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2025 07:42:10 -0700
+X-CSE-ConnectionGUID: oLTEyd53SQGIys1VP2VHIA==
+X-CSE-MsgGUID: 8S919d3NRSSML7Z5SxHNpw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,281,1751266800"; 
+   d="scan'208";a="206832999"
+Received: from lkp-server01.sh.intel.com (HELO 84a20bd60769) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 20 Sep 2025 07:42:08 -0700
+Received: from kbuild by 84a20bd60769 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uzymq-0005O7-15;
+	Sat, 20 Sep 2025 14:42:04 +0000
+Date: Sat, 20 Sep 2025 22:41:40 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
+Subject: [mst-vhost:vhost 41/44] drivers/vdpa/pds/vdpa_dev.c:590:19: error:
+ incompatible function pointer types initializing 's64 (*)(struct vdpa_device
+ *, u16)' (aka 'long long (*)(struct vdpa_device *, unsigned short)') with an
+ expression of type 'u32 (struct vdpa_device *, u16)' (aka ...
+Message-ID: <202509202256.zVt4MifB-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,74 +80,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6d444507-1c97-4904-8edb-e8cc1aa4399e@kabelmail.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Sat, Sep 20, 2025 at 02:09:47PM +0200, Janpieter Sollie wrote:
-> I tested a SFP module where the i2c bus is "unstable" at best.
-> different i2c timeouts occured, resulting in a "phy not detected" error message.
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
+head:   877102ca14b3ee9b5343d71f6420f036baf8a9fc
+commit: 2951c77700c3944ecd991ede7ee77e31f47f24ab [41/44] vduse: add vq group support
+config: loongarch-randconfig-001-20250920 (https://download.01.org/0day-ci/archive/20250920/202509202256.zVt4MifB-lkp@intel.com/config)
+compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 7c861bcedf61607b6c087380ac711eb7ff918ca6)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250920/202509202256.zVt4MifB-lkp@intel.com/reproduce)
 
-If the I2C bus is so unstable that attempting to read a register from
-the PHY, which should take no more than 70ms, takes in excess of 200ms
-(which is what it takes for the loop to time out) for just one
-register, it seems to me that you're chasing a dead horse.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509202256.zVt4MifB-lkp@intel.com/
 
-However, looking at the rest of your message, I don't think you have
-a problem with the I2C bus at all.
+All errors (new ones prefixed by >>):
 
-> I noticed a few hard-coded numbers in i2c_rollball_mii_pol(), which is always suspicious.
+>> drivers/vdpa/pds/vdpa_dev.c:590:19: error: incompatible function pointer types initializing 's64 (*)(struct vdpa_device *, u16)' (aka 'long long (*)(struct vdpa_device *, unsigned short)') with an expression of type 'u32 (struct vdpa_device *, u16)' (aka 'unsigned int (struct vdpa_device *, unsigned short)') [-Wincompatible-function-pointer-types]
+     590 |         .get_vq_group           = pds_vdpa_get_vq_group,
+         |                                   ^~~~~~~~~~~~~~~~~~~~~
+   1 error generated.
 
-Sorry, but I don't follow the same reasoning. If they aren't hard-coded,
-but are "knobs" in e.g. sysfs, then how do we teach people how to "tune"
-them? When should they "tune" them? No, the less knobs there are, the
-better for the user, provided timeouts are sensible - and I think
-waiting 200ms for a register to be read is already an excessively long
-timeout.
 
-In any case, if we have a module that takes longer, that's new, and the
-timeouts need to be adjusted - not on a per-module basis, and not by
-users having to tinker with stuff in sysfs.
+vim +590 drivers/vdpa/pds/vdpa_dev.c
 
-> In order to lower the stress on the i2c bus, I made the following patch.
-> is it the best way to "not-stress-sensitive-devices"?
-> Will it cause a performance regression on some other SFP cages?
-> 
-> Eric Woudstra told me another option was to add a few tries, increasing i = 10,
-> If the issue isn't the device itself, but the stress on the i2c bus is too
-> high, it may not be a real solution.
+151cc834f3ddafe Shannon Nelson 2023-05-19  577  
+151cc834f3ddafe Shannon Nelson 2023-05-19  578  static const struct vdpa_config_ops pds_vdpa_ops = {
+151cc834f3ddafe Shannon Nelson 2023-05-19  579  	.set_vq_address		= pds_vdpa_set_vq_address,
+151cc834f3ddafe Shannon Nelson 2023-05-19  580  	.set_vq_num		= pds_vdpa_set_vq_num,
+151cc834f3ddafe Shannon Nelson 2023-05-19  581  	.kick_vq		= pds_vdpa_kick_vq,
+151cc834f3ddafe Shannon Nelson 2023-05-19  582  	.set_vq_cb		= pds_vdpa_set_vq_cb,
+151cc834f3ddafe Shannon Nelson 2023-05-19  583  	.set_vq_ready		= pds_vdpa_set_vq_ready,
+151cc834f3ddafe Shannon Nelson 2023-05-19  584  	.get_vq_ready		= pds_vdpa_get_vq_ready,
+151cc834f3ddafe Shannon Nelson 2023-05-19  585  	.set_vq_state		= pds_vdpa_set_vq_state,
+151cc834f3ddafe Shannon Nelson 2023-05-19  586  	.get_vq_state		= pds_vdpa_get_vq_state,
+151cc834f3ddafe Shannon Nelson 2023-05-19  587  	.get_vq_notification	= pds_vdpa_get_vq_notification,
+151cc834f3ddafe Shannon Nelson 2023-05-19  588  	.get_vq_irq		= pds_vdpa_get_vq_irq,
+151cc834f3ddafe Shannon Nelson 2023-05-19  589  	.get_vq_align		= pds_vdpa_get_vq_align,
+151cc834f3ddafe Shannon Nelson 2023-05-19 @590  	.get_vq_group		= pds_vdpa_get_vq_group,
+151cc834f3ddafe Shannon Nelson 2023-05-19  591  
+151cc834f3ddafe Shannon Nelson 2023-05-19  592  	.get_device_features	= pds_vdpa_get_device_features,
+151cc834f3ddafe Shannon Nelson 2023-05-19  593  	.set_driver_features	= pds_vdpa_set_driver_features,
+151cc834f3ddafe Shannon Nelson 2023-05-19  594  	.get_driver_features	= pds_vdpa_get_driver_features,
+151cc834f3ddafe Shannon Nelson 2023-05-19  595  	.set_config_cb		= pds_vdpa_set_config_cb,
+151cc834f3ddafe Shannon Nelson 2023-05-19  596  	.get_vq_num_max		= pds_vdpa_get_vq_num_max,
+151cc834f3ddafe Shannon Nelson 2023-05-19  597  	.get_device_id		= pds_vdpa_get_device_id,
+151cc834f3ddafe Shannon Nelson 2023-05-19  598  	.get_vendor_id		= pds_vdpa_get_vendor_id,
+151cc834f3ddafe Shannon Nelson 2023-05-19  599  	.get_status		= pds_vdpa_get_status,
+151cc834f3ddafe Shannon Nelson 2023-05-19  600  	.set_status		= pds_vdpa_set_status,
+151cc834f3ddafe Shannon Nelson 2023-05-19  601  	.reset			= pds_vdpa_reset,
+151cc834f3ddafe Shannon Nelson 2023-05-19  602  	.get_config_size	= pds_vdpa_get_config_size,
+151cc834f3ddafe Shannon Nelson 2023-05-19  603  	.get_config		= pds_vdpa_get_config,
+151cc834f3ddafe Shannon Nelson 2023-05-19  604  	.set_config		= pds_vdpa_set_config,
+151cc834f3ddafe Shannon Nelson 2023-05-19  605  };
+25d1270b6e9ea89 Shannon Nelson 2023-05-19  606  static struct virtio_device_id pds_vdpa_id_table[] = {
+25d1270b6e9ea89 Shannon Nelson 2023-05-19  607  	{VIRTIO_ID_NET, VIRTIO_DEV_ANY_ID},
+25d1270b6e9ea89 Shannon Nelson 2023-05-19  608  	{0},
+25d1270b6e9ea89 Shannon Nelson 2023-05-19  609  };
+25d1270b6e9ea89 Shannon Nelson 2023-05-19  610  
 
-Why are you concerned about "stress" on the I2C bus? What kind of
-stress? The bus is 5V or 3.3V signalling, running at 100kHz (so slow)
-with resistive pull-ups. Apart from the bus transitions (which cause
-CMOS to take a pulse of power) the energy from that will be nothing
-compared to the energy required to run the CPU, which is operating
-much faster with many more CMOS transistors switching.
+:::::: The code at line 590 was first introduced by commit
+:::::: 151cc834f3ddafec869269fe48036460d920d08a pds_vdpa: add support for vdpa and vdpamgmt interfaces
 
-> A good question may be: is this approach sufficient to close the gap between
-> "high performance" equipment having a stable i2c bus and they do not want to wait,
-
-None of this has been written for "high performance" equipment. It was
-developed on a SolidRun clearfog platform (Armada 388 based) which is
-hardly "high performance". It's been used with bit-banged I2C as well
-on Macchiatobin platforms.
-
-I'm guessing that the problem is not an I2C bus problem (which would
-cause i2c_transfer_rollball() to return an error, and the loop to quit),
-but yet another cheap and nasty SFP module that takes much longer
-than 70ms to respond under the "Rollball" protocol.
-
-So, what we need you to do is to work out how long it takes this module
-to respond, and whether it always takes a long time to respond. Please
-add some debugging to i2c_rollball_mii_poll() to measure the amount of
-time it takes for the module to respond - and please measure it for
-several transactions.
-
-You can use jiffies, and convert to msecs using jiffies_to_msecs(),
-or you could use ktime_get_ns().
-
-Thanks.
+:::::: TO: Shannon Nelson <shannon.nelson@amd.com>
+:::::: CC: Michael S. Tsirkin <mst@redhat.com>
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
