@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-224939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 161C0B8BACD
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 02:10:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA67EB8BAEF
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 02:20:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDE2C1C02F53
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 00:10:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D9B37BBB98
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 00:18:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 246554A32;
-	Sat, 20 Sep 2025 00:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57635140E5F;
+	Sat, 20 Sep 2025 00:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O6o/BW0f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D0+QczVJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E827533D8;
-	Sat, 20 Sep 2025 00:10:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335EE137C52
+	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 00:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758327007; cv=none; b=jJfiTWhKB0ZLoVNFowvGpCBcgN9TB2SUAwOQP2Q5DJ39IQJ5qm8sClqHR85VTjI0yGwjXowWf7A/WVlrTuYTF+Es9qnUuQJSh4ZfgxzA1GLvibKPRgNXrRFiqfLa5xnApuFNhWgln0q5lwKi8kOS6umuqDklP9IkN9IXp8WxW6Q=
+	t=1758327607; cv=none; b=SeIgl0T+wULXziZ40pu68ejaUwzVJfKdiGbVNMbSFd8GJCZSEoydCFK13QpPjgXnqtro+tBecR/Yp8o+rfV36i1wK1z1dNhgJ2dBtZHd38UC6ESdvgPG+SJAp7sk83/RoD7AC6CormDpl8yw5oQgHjRugsO8IFhdRAjkzjvWnLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758327007; c=relaxed/simple;
-	bh=JkPWbXg69iqhHJ900MWi2o+UGPJDKtEJ6OfUOR2VnvU=;
+	s=arc-20240116; t=1758327607; c=relaxed/simple;
+	bh=BRG2Z91Haz+s09/vYqoaui2QIwvhRQOIoFTz+AheApU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kNrIVM+1SRetFDtTZY62ovV/iYc6Djx1jUVB/966/1HYM/EwxUD5DIp2483Bk4fBHF2KNj2ciDvr51CFol2eILoHp1lUvIKWh7HD9Ri2Y1gPQ8pKzTRrCOLKmTHEU5qFuW2QSNtqhqN9t+20kOgEpWwXxGz8fU84Xo7HG8LuJaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O6o/BW0f; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76931C4CEF0;
-	Sat, 20 Sep 2025 00:10:06 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=V9ieiShvBUjL8zh80Uzgao8B7E+NCjCHhKxZtRoE/PFMG+6GUt4HWPt5H2q312G/5y98/x1KIPcHTDUQN0IavMoB4Hl/aokCsb/EXb4q11w4k8lpCAbHOdTaNDRN07KFcihn3imHaK93TRnTzneajl3lSC3BonHhbtG6+3TNt8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D0+QczVJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB83FC4CEF0;
+	Sat, 20 Sep 2025 00:20:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758327006;
-	bh=JkPWbXg69iqhHJ900MWi2o+UGPJDKtEJ6OfUOR2VnvU=;
+	s=k20201202; t=1758327606;
+	bh=BRG2Z91Haz+s09/vYqoaui2QIwvhRQOIoFTz+AheApU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=O6o/BW0f+45gy85lsSLjU/GGU1Ffl/8HM1Hzm3G6DtcQnrAitBE5cylJWjovMWmd2
-	 wodY0mkQFvBGjUNoXLW1szKmFA7pRRGitzepybn++o8eggPDz610EuRWH/wLDM2xHL
-	 9e24r09owmVp4Y+4zq2ZzETxFMxerIMWbyP6ORsbPndLvZMpiCXim7AnGYyLglEDZF
-	 dw7iDFdcFXT8BKiNelca1APnGtfdKQk8DMW5tXuulsMMw3bSq9wJ7jFK21DWkJZMz1
-	 97ijZXCoES4sZBqRc7NBtVUcMeqg5PD4W4KhC60gv0M502895rRuGZTC6wPklKvEC3
-	 jR8F4T1xEkRVQ==
+	b=D0+QczVJUwXBKxDVWMmqoHalpRNTfCK3j3WyV8HQT0pAiTQJN3tM44ce8TMMCtQ6f
+	 6ckL0YgY2kGhr9ukDkOoEkL7d13+DPVi5ADlL/log5KXWU4sV/Tje8YALiLIFp1r0V
+	 WLZ69doO1ItHgzYjU7Ajn4WtP47PyvVchNKMFEuQDN70nC3RxhXxduETPhMDWyCksd
+	 F355lx2W8DVrt/uNV+jQqVQZXVLbOA53JChKlDv7UXDwtATjnvNTNJeXmCGHacd7Uz
+	 bVTDfhqOS8MzZl90xLm+x1VlM3WeRCQ4uKyTSVn3gM/ObZdpz0DvxE4bCOs3cHAPql
+	 HgrOMPQ0h1yEQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB07F39D0C20;
-	Sat, 20 Sep 2025 00:10:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D5639D0C20;
+	Sat, 20 Sep 2025 00:20:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ti: icssm-prueth: unwind cleanly in probe()
+Subject: Re: [PATCH net v2] ethernet: rvu-af: Remove slash from the driver
+ name
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175832700584.3744610.12963791321568877888.git-patchwork-notify@kernel.org>
-Date: Sat, 20 Sep 2025 00:10:05 +0000
-References: <aMvVagz8aBRxMvFn@stanley.mountain>
-In-Reply-To: <aMvVagz8aBRxMvFn@stanley.mountain>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: rogerq@ti.com, danishanwar@ti.com, parvathi@couthit.com,
- rogerq@kernel.org, pmohan@couthit.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- basharath@couthit.com, afd@ti.com, linux-arm-kernel@lists.infradead.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-janitors@vger.kernel.org
+ <175832760601.3747217.6562192836256690746.git-patchwork-notify@kernel.org>
+Date: Sat, 20 Sep 2025 00:20:06 +0000
+References: <20250918152106.1798299-1-oss@malat.biz>
+In-Reply-To: <20250918152106.1798299-1-oss@malat.biz>
+To: Petr Malat <oss@malat.biz>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org, sgoutham@marvell.com,
+ lcherian@marvell.com, gakula@marvell.com, jerinj@marvell.com,
+ sbhatta@marvell.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 18 Sep 2025 12:48:26 +0300 you wrote:
-> This error handling triggers a Smatch warning:
+On Thu, 18 Sep 2025 17:21:07 +0200 you wrote:
+> Having a slash in the driver name leads to EIO being returned while
+> reading /sys/module/rvu_af/drivers content.
 > 
->     drivers/net/ethernet/ti/icssm/icssm_prueth.c:1574 icssm_prueth_probe()
->     warn: 'prueth->pru1' is an error pointer or valid
+> Remove DRV_STRING as it's not used anywhere.
 > 
-> The warning is harmless because the pru_rproc_put() function has an
-> IS_ERR_OR_NULL() check built in.  However, there is a small bug if
-> syscon_regmap_lookup_by_phandle() fails.  In that case we should call
-> of_node_put() on eth0_node and eth1_node.
+> Fixes: 91c6945ea1f9 ("octeontx2-af: cn10k: Add RPM MAC support")
+> Signed-off-by: Petr Malat <oss@malat.biz>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: ti: icssm-prueth: unwind cleanly in probe()
-    https://git.kernel.org/netdev/net-next/c/5fc7fa743dbf
+  - [net,v2] ethernet: rvu-af: Remove slash from the driver name
+    https://git.kernel.org/netdev/net/c/b65678cacc03
 
 You are awesome, thank you!
 -- 
