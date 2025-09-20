@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-224996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB198B8CB70
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 17:31:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED919B8CBC4
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 17:38:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94E48189B648
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 15:31:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D466B1B23762
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 15:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2AB51EB5C2;
-	Sat, 20 Sep 2025 15:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C453221FC4;
+	Sat, 20 Sep 2025 15:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oeHi3YvS"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="euKpAvoa"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869C0219301;
-	Sat, 20 Sep 2025 15:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC7746B5;
+	Sat, 20 Sep 2025 15:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758382268; cv=none; b=UEY57LssJgkBXpSkRGJQI/ve3wdUqzBsW9KUVlB+pCO5+BRQLr7EHziqIMg2vQKVyI7S9sTgN9SNHYY/cBumQqwBgYwoIdYHjK4NxDjfRFpJ2KLTCM21LHqABSPYXcER1KxBkujjE+hvInH9Ojcpmksw5emAlg8YK8fqn2JVVyc=
+	t=1758382733; cv=none; b=hjlZImPHFEFaPbBhkMzesOamud325nKq+NxcJV/oJJvbb8Yi2dEZJMyssSFPDmkVK5s9r8A1UOiqySQrXcQkTj3sTsBknSyzhVrrpxTs8q1j0VniM5fATK7BYExI/IIAzRoQhux/pvZRI5ck4iDbffLXue2DsoF//XnHGJfiUso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758382268; c=relaxed/simple;
-	bh=VmpXs+T5FJFMh9uMlfY1zO0F1J8+Bi53OUp0N4Q+6Y8=;
+	s=arc-20240116; t=1758382733; c=relaxed/simple;
+	bh=aoyucU21XYvw23LjbsacMXWhMuUF0s6WiAs6Pyn26Oo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RC8dO5PrXiQrx0U5tEQxQWHV0Gp0MacnnD7iEEgpociJ52IjpFa+sFhhHcBAhs9/v1bbEOyOeTlzdwCwLqf1ycCDa4WcV32R0ueGCgtYypPcE5i5a7WbltTD2fSC7mo0o4jyeLoVc3fcG/+AbtlS4HjyjXk5wNp9TnuZpWCscZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oeHi3YvS; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=DYGEuPRaE0Zc/BVC8uwmlfe1RCMdut59mqopRrkro1NSHV1HH0yQMlCp8xs9Kbo0lC5ZM2q/Vfn2H+/22eFa7E+9nz+8uI7iFsacq/mWFhDTzUEfjFdjwJxqM/1EAmNnlmAj/SV6hykpOd4OhSXDvK46Q6+EzLTkarebluZznv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=euKpAvoa; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,25 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=l3P7xbNm51dRG4YbNP1VYdE4uOUg89upg8bJchvamQY=; b=oeHi3YvSJt50OQWpfvMD3AnU28
-	IBiODy924lqyKQsQ74HLH6chjOVrcyJIGZ7Lj2lk9xcLEQFW5wk2WqNdrJwWHW4+boq8lmbuUqACa
-	4qqSk1nGV8gMO/iuq9+R7fvIpBslDj0JnT26ZrOQP3V1OaUHpgcsDt/PtQQoicW5+YWY=;
+	bh=BuNCCt9KtSw9j9PEamLhH1YTxXmkI6ZRhCi5Hi/fgl0=; b=euKpAvoairSvf0rtviwhdk5PlE
+	xnl3pen22yIiXQw263kcsw8rRilgXZ/lx72+o61iKaG0v4mqO2vIK7e+fsNfwmrEtsxFFwrp4G82O
+	XUDDfcuIxfnmM6lCejDdYTFIqjJjyfUyz5rdv9q6zrz0f/hmJ7Z+K8hE+sGBbE+2ivbw=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1uzzXo-0091G0-9s; Sat, 20 Sep 2025 17:30:36 +0200
-Date: Sat, 20 Sep 2025 17:30:36 +0200
+	id 1uzzfZ-0091Ir-67; Sat, 20 Sep 2025 17:38:37 +0200
+Date: Sat, 20 Sep 2025 17:38:37 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: I Viswanath <viswanathiyyappan@gmail.com>
-Cc: petkan@nucleusys.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+To: Kriish Sharma <kriish.sharma2006@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, willemb@google.com,
+	kerneljasonxing@gmail.com, martin.lau@kernel.org, mhal@rbox.co,
+	almasrymina@google.com, ebiggers@google.com,
+	aleksander.lobakin@intel.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com,
-	syzbot+78cae3f37c62ad092caa@syzkaller.appspotmail.com
-Subject: Re: [PATCH] net: usb: Remove disruptive netif_wake_queue in
- rtl8150_set_multicast
-Message-ID: <5b51d80e-e67c-437d-a2fc-bebdf5e9a958@lunn.ch>
-References: <20250920045059.48400-1-viswanathiyyappan@gmail.com>
+	syzbot+5a2250fd91b28106c37b@syzkaller.appspotmail.com
+Subject: Re: [PATCH] net: skb: guard kmalloc_reserve() against oversized
+ allocations
+Message-ID: <34a4e8db-b0b8-4ad8-b8a2-bdfd69cc8b00@lunn.ch>
+References: <20250920113723.380498-1-kriish.sharma2006@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,31 +64,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250920045059.48400-1-viswanathiyyappan@gmail.com>
+In-Reply-To: <20250920113723.380498-1-kriish.sharma2006@gmail.com>
 
-On Sat, Sep 20, 2025 at 10:20:59AM +0530, I Viswanath wrote:
-> syzbot reported WARNING in rtl8150_start_xmit/usb_submit_urb.
-> This is a possible sequence of events:
+On Sat, Sep 20, 2025 at 11:37:23AM +0000, Kriish Sharma wrote:
+> Add an explicit size check in kmalloc_reserve() to reject requests
+> larger than KMALLOC_MAX_SIZE before they reach the allocator.
 > 
->     CPU0 (in rtl8150_start_xmit)   CPU1 (in rtl8150_start_xmit)    CPU2 (in rtl8150_set_multicast)
->     netif_stop_queue();
->                                                                     netif_stop_queue();
->     usb_submit_urb();
->                                                                     netif_wake_queue();  <-- Wakes up TX queue before it's ready
->                                     netif_stop_queue();
->                                     usb_submit_urb();                                    <-- Warning
-> 	freeing urb
-> 	
-> Remove netif_wake_queue and corresponding netif_stop_queue in rtl8150_set_multicast to
-> prevent this sequence of events
+> syzbot reported warnings triggered by attempts to allocate buffers
+> with an object size exceeding KMALLOC_MAX_SIZE. While the existing
+> code relies on kmalloc() failure and a comment states that truncation
+> is "harmless", in practice this causes high-order allocation warnings
+> and noisy kernel logs that interfere with testing.
+> 
+> This patch introduces an early guard in kmalloc_reserve() that returns
+> NULL if obj_size exceeds KMALLOC_MAX_SIZE. This ensures impossible
+> requests fail fast and silently, avoiding allocator warnings while
+> keeping the intended semantics unchanged.
 
-Please expand this sentence with an explanation of why this is
-safe. Why are these two calls not needed? The original author of this
-code thought they where needed, so you need to explain why they are
-not needed.
+What is the value of KMALLOC_MAX_SIZE? Do we actually want a
+warn_once() here because it indicates a driver bug, or missing
+validation of user space parameters?
 
-    Andrew
-
----
-pw-bot: cr
+	   Andrew
 
