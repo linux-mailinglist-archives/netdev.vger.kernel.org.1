@@ -1,186 +1,117 @@
-Return-Path: <netdev+bounces-224989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C122B8C7F5
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 14:22:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB97BB8C828
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 14:27:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13D14A00D41
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 12:22:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84A803A61FF
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 12:27:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A69C7303A3B;
-	Sat, 20 Sep 2025 12:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416AE2FFF8B;
+	Sat, 20 Sep 2025 12:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LG+h6s1R"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ThWImpI1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA3C3016FA;
-	Sat, 20 Sep 2025 12:21:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC8C2F8BDC
+	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 12:26:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758370892; cv=none; b=l15leEMf+QYH5+/ccOFJJ606keKf+U4ZAFxc4CxqgY7uMMSpIRPAIkoz1t8z1Sq6lcL3tiwYJI0JcJN74hFhwdBX6o9rWT5RvxMMB71bQ0Od5eX2z2s+qwJ2wmMO7Vpj0vdH9+dYsJNon6xpAcMcsK4nAe22IPiCweTkh0Vjyc4=
+	t=1758371218; cv=none; b=aE1vAdO/ZitH4ki1n4HkT9XBFC35+CDM4x2fmLoQMkWpqgvaXA5TcaiJKlK86pJ0X+FAqSWqkZtkR6Z701ZB7AATIwdqMbDipPP/Ol1k0GY5JZVVmNDT/cR2Sa69HfJjXWxW1yNK7bk9HP26nxf92cRUatCZeE/iLAWvW2PduqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758370892; c=relaxed/simple;
-	bh=/3PcZtglAS6v94LhLUzpf56x/49epFwaN6NzshGiP3Q=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QBMzJKU772tYTgSb2piafA6fKjbUI7+0f2mstmhWZJWmASFBN+WpcZA0GbbzLlSHWKuA74h/SmlXOsbSoVLTkyCz4AT4k5CTzNiswRqdhNLmsLCtTRYrjjKB73IPggkh9fIRMAA21wuKEWiDA3zTalpytvLjKsD0fkBfISaM+04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LG+h6s1R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B2CCC4CEEB;
-	Sat, 20 Sep 2025 12:21:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758370892;
-	bh=/3PcZtglAS6v94LhLUzpf56x/49epFwaN6NzshGiP3Q=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=LG+h6s1RMLe9Z2PLjFs9JrlGsLSc2PglV0gA+YuH2zbbTGKRUtIEiBB9J3I6+EiXr
-	 h6x/Cg8HvCRZ08VYSPCaTvkV7U4UjhpBVqWnX6jBieLcgipJEqgkVTM3woTgrZalUv
-	 wN0RFMhQ/ryRjsQLnI/k7j4EDt4Azx34rI8WJTQw4R6n9HbWfpwR8XiCQfnrCoxWmx
-	 vV7H8AU13/RCtcdNbwVGK9saivT3eO/0o9w85dLZsjQtiSsQuYy0Wc8c8QBFeuBbfM
-	 0jNt0TAsXrI8TBAEKK2KWLq7G9tUA+eUGJScflbC/jH0yb3F5bTKn16xbos5oO1+ip
-	 7mHVOqN3D1D+A==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Sat, 20 Sep 2025 14:20:32 +0200
-Subject: [PATCH RFC bpf-next 6/6] selftests/bpf: Add
- bpf_xdp_metadata_rx_checksum support to xdp_hw_metadat prog
+	s=arc-20240116; t=1758371218; c=relaxed/simple;
+	bh=0uCuJCa0DIvL7b1TzTkyiorVUTTZkJJNmHbnezsu2Pg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oK5SsyBu9OzfHEnR2hznfcntP4uXPEnCe3WVfnwiIWeuOxKVXylopYLebfIfdWYz5v+GoaZfiEH7jtcrTvjBiw/ONd1MIL/N5UVdubo4JR1laNyErFs1/Loof5VC8jBGnrwoVEvFzDRK297pdD+aV0UKJQKOdzL26MJRjQYfSf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ThWImpI1; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758371216; x=1789907216;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0uCuJCa0DIvL7b1TzTkyiorVUTTZkJJNmHbnezsu2Pg=;
+  b=ThWImpI1JcYfbGO4u0MAdRV6LWS0tmeJYDduEHilzu3tJeo+MrIL8sEu
+   iJO9DONO0Fq/5yDc1Po241YA4JbmOgNXY/+4mxoN/L3wOvGVkLbHuXzpB
+   hFI7B9EADZzFWpqfJtp7kjDoTFEHgDtzcTh0rNUiPcPMhFd++ztOcDbNv
+   DljSR2wsz70lRQdBlU0htSlrU9AxUBA6EtC8VZ349xdCnyCeB8nkmr24f
+   qYjSjndVFF3nbVOljzhOoUhfEZkkq6IdePB6o8V+wofA4xpZZ45YjxlHh
+   3JJa5Vj7arq44ckyGeJs+BCRvwK6yhnqFzK4qdCa7H0coS9DPuiyRlLY+
+   Q==;
+X-CSE-ConnectionGUID: neuU+dWdQKOTb2H5PtshLg==
+X-CSE-MsgGUID: H6TV7pQYRNiEXaGhBNTY3A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11558"; a="71325394"
+X-IronPort-AV: E=Sophos;i="6.18,280,1751266800"; 
+   d="scan'208";a="71325394"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2025 05:26:55 -0700
+X-CSE-ConnectionGUID: oeUwm1cUSmatUCtaLXJsLA==
+X-CSE-MsgGUID: m5Ydmo0IRZetgs2TRDPCTw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,280,1751266800"; 
+   d="scan'208";a="175977382"
+Received: from lkp-server01.sh.intel.com (HELO 84a20bd60769) ([10.239.97.150])
+  by fmviesa006.fm.intel.com with ESMTP; 20 Sep 2025 05:26:54 -0700
+Received: from kbuild by 84a20bd60769 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uzwg0-0005K7-18;
+	Sat, 20 Sep 2025 12:26:52 +0000
+Date: Sat, 20 Sep 2025 20:26:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	intel-wired-lan@lists.osuosl.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	arkadiusz.kubalewski@intel.com
+Subject: Re: [Intel-wired-lan] [RESEND PATCH v2 iwl-next] ice: add TS PLL
+ control for E825 devices
+Message-ID: <202509202023.HY9L56JJ-lkp@intel.com>
+References: <20250919165925.1685446-1-grzegorz.nitka@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250920-xdp-meta-rxcksum-v1-6-35e76a8a84e7@kernel.org>
-References: <20250920-xdp-meta-rxcksum-v1-0-35e76a8a84e7@kernel.org>
-In-Reply-To: <20250920-xdp-meta-rxcksum-v1-0-35e76a8a84e7@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
- intel-wired-lan@lists.osuosl.org, linux-kselftest@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250919165925.1685446-1-grzegorz.nitka@intel.com>
 
-Introduce the capability to dump HW rx checksum in xdp_hw_metadat
-program via bpf_xdp_metadata_rx_checksum() kfunc.
+Hi Grzegorz,
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- .../testing/selftests/bpf/progs/xdp_hw_metadata.c  |  7 ++++++
- tools/testing/selftests/bpf/xdp_hw_metadata.c      | 27 ++++++++++++++++++++++
- tools/testing/selftests/bpf/xdp_metadata.h         | 10 +++++---
- 3 files changed, 41 insertions(+), 3 deletions(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c b/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-index 330ece2eabdb454da2bb2cbd297d2b2dd6efddc0..dc62d572e3ac6e2ef173b330da515757ea543415 100644
---- a/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-@@ -110,6 +110,13 @@ int rx(struct xdp_md *ctx)
- 	else
- 		meta->hint_valid |= XDP_META_FIELD_VLAN_TAG;
- 
-+	err = bpf_xdp_metadata_rx_checksum(ctx, &meta->ip_summed,
-+					   &meta->cksum_meta);
-+	if (err)
-+		meta->rx_cksum_err = err;
-+	else
-+		meta->hint_valid |= XDP_META_FIELD_CHECKSUM;
-+
- 	__sync_add_and_fetch(&pkts_redir, 1);
- 	return bpf_redirect_map(&xsk, ctx->rx_queue_index, XDP_PASS);
- }
-diff --git a/tools/testing/selftests/bpf/xdp_hw_metadata.c b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-index 3d8de0d4c96a7afdf5f60b2fdff73c22b876ce54..5e38aa1b565735c2e55fcf2f7b9e672db1348233 100644
---- a/tools/testing/selftests/bpf/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-@@ -219,6 +219,28 @@ static void print_vlan_tci(__u16 tag)
- 	printf("PCP=%u, DEI=%d, VID=0x%X\n", pcp, dei, vlan_id);
- }
- 
-+static void print_rx_cksum(__u8 ip_summed, __u32 cksum_meta)
-+{
-+	const char *cksum = "CHECKSUM_NONE";
-+
-+	switch (ip_summed) {
-+	case CHECKSUM_UNNECESSARY:
-+		cksum = "CHECKSUM_UNNECESSARY";
-+		break;
-+	case CHECKSUM_COMPLETE:
-+		cksum = "CHECKSUM_COMPLETE";
-+		break;
-+	case CHECKSUM_PARTIAL:
-+		cksum = "CHECKSUM_PARTIAL";
-+		break;
-+	case CHECKSUM_NONE:
-+	default:
-+		break;
-+	}
-+
-+	printf("rx-cksum: %s, csum_meta=0x%x\n", cksum, cksum_meta);
-+}
-+
- static void verify_xdp_metadata(void *data, clockid_t clock_id)
- {
- 	struct xdp_meta *meta;
-@@ -254,6 +276,11 @@ static void verify_xdp_metadata(void *data, clockid_t clock_id)
- 		printf("No rx_vlan_tci or rx_vlan_proto, err=%d\n",
- 		       meta->rx_vlan_tag_err);
- 	}
-+
-+	if (meta->hint_valid & XDP_META_FIELD_CHECKSUM)
-+		print_rx_cksum(meta->ip_summed, meta->cksum_meta);
-+	else
-+		printf("No rx_chsum, err=%d\n", meta->rx_cksum_err);
- }
- 
- static void verify_skb_metadata(int fd)
-diff --git a/tools/testing/selftests/bpf/xdp_metadata.h b/tools/testing/selftests/bpf/xdp_metadata.h
-index f0ef17b328866206b1e63f7d751abeaa78e90932..0fd5e7172fe891275b3b1eb69c51a93a60ae353e 100644
---- a/tools/testing/selftests/bpf/xdp_metadata.h
-+++ b/tools/testing/selftests/bpf/xdp_metadata.h
-@@ -28,6 +28,7 @@ enum xdp_meta_field {
- 	XDP_META_FIELD_TS	= BIT(0),
- 	XDP_META_FIELD_RSS	= BIT(1),
- 	XDP_META_FIELD_VLAN_TAG	= BIT(2),
-+	XDP_META_FIELD_CHECKSUM = BIT(3),
- };
- 
- #define CHECKSUM_NONE		0
-@@ -53,9 +54,12 @@ struct xdp_meta {
- 		};
- 		__s32 rx_vlan_tag_err;
- 	};
--	struct {
--		__u8 ip_summed;
--		__u32 cksum_meta;
-+	union {
-+		struct {
-+			__u8 ip_summed;
-+			__u32 cksum_meta;
-+		};
-+		__s32 rx_cksum_err;
- 	};
- 	enum xdp_meta_field hint_valid;
- };
+[auto build test WARNING on ff9f8329f189c17549f3fbb5058505fb3e46dd99]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Grzegorz-Nitka/ice-add-TS-PLL-control-for-E825-devices/20250920-010351
+base:   ff9f8329f189c17549f3fbb5058505fb3e46dd99
+patch link:    https://lore.kernel.org/r/20250919165925.1685446-1-grzegorz.nitka%40intel.com
+patch subject: [Intel-wired-lan] [RESEND PATCH v2 iwl-next] ice: add TS PLL control for E825 devices
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20250920/202509202023.HY9L56JJ-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250920/202509202023.HY9L56JJ-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509202023.HY9L56JJ-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> Warning: drivers/net/ethernet/intel/ice/ice_tspll.c:688 function parameter 'pf' not described in 'ice_tspll_set_cfg'
+--
+>> Warning: drivers/net/ethernet/intel/ice/ice_dpll.c:73 Enum value 'ICE_DPLL_PIN_TYPE_INPUT_E825' not described in enum 'ice_dpll_pin_type'
+>> Warning: drivers/net/ethernet/intel/ice/ice_dpll.c:73 Enum value 'ICE_DPLL_PIN_TYPE_OUTPUT_E825' not described in enum 'ice_dpll_pin_type'
+>> Warning: drivers/net/ethernet/intel/ice/ice_dpll.c:73 Enum value 'ICE_DPLL_PIN_TYPE_INPUT_TSPLL_E825' not described in enum 'ice_dpll_pin_type'
+>> Warning: drivers/net/ethernet/intel/ice/ice_dpll.c:73 Enum value 'ICE_DPLL_PIN_TYPE_OUTPUT_TSPLL_E825' not described in enum 'ice_dpll_pin_type'
+>> Warning: drivers/net/ethernet/intel/ice/ice_dpll.c:694 function parameter 'pf' not described in 'ice_dpll_input_tspll_update_e825c'
 
 -- 
-2.51.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
