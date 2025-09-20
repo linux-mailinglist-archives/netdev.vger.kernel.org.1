@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-224937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46F93B8BABF
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 02:08:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 466EFB8BAC5
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 02:08:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B39867E6E1A
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 00:08:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C3047E6E33
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 00:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1888248C;
-	Sat, 20 Sep 2025 00:08:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D06241A8F;
+	Sat, 20 Sep 2025 00:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VOd6jAsR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vWsh1iYY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA2341A8F
-	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 00:08:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E22E78F3E
+	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 00:08:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758326885; cv=none; b=adsYv+ONrLkl/L9m5H4OiIBhb1AUqtpep9ATIGO5ZxLIfrqZssYP9LW594gfECBGDaAgNjV09D5zQaRPoqG6mWGU1kuPAwAd/AC7ZuR9j1eDGRWfcmLttEKEu3ljWrlCqsMXTjD8jFooTavDW3mkJ5KixSFZSoJT1MwS5h5V7ds=
+	t=1758326887; cv=none; b=a7svasEn4VQyFP9nTJJvSYMPRH2yQ2rPc2ZCdY013PsDzL5QTJhuKBaOLFvI5Y1UWItlJ0EGnvdYGzvYi70ZnpNNpUAn7pb7Wr66jo/DoAm/9eJqWzka2qtVFQ+2wUM56xYs7ujID0jg+CnCn1TQskhszNq5HIOtbflhzwBuyT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758326885; c=relaxed/simple;
-	bh=4jP4OC8EVegazx5AzODqJ5ulFjhYCVTsKrt2Pc+garQ=;
+	s=arc-20240116; t=1758326887; c=relaxed/simple;
+	bh=dePfMyGmSkx6t6WXYwxyDfB2BE0vzHOqQS7534SA+6A=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PuyXIuj5gY6Hb4gLIPOiZ71O2ngMPzzKI73IgmFlBzXp9IFszPGjJzklON/yeWToozmRkFTYhifCdiTj8VvIeF+v+Y0wcATMTi+LNru1UbEUWz6X8z/HrbhP0sBMxxEqYDja9p9D0YrD5XqPgENn6HkDb7cYsHBxkHLwqsKfbX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VOd6jAsR; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=VqIwGBEv7cRwDK/BdFqROAn5H+rASIrh0OeVftypUXek0srM+W+KsEmgcMd1/zeydOGz6/AmnAZvyIx+VpA+5nMXKkJdo3MirQDLcfeP1VYRYrMEHNVI8syR2UO575WdyPLjTzVOYti6gtrWXLWhrowttBpAdBCIiGemZkvWCQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vWsh1iYY; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b549a25ade1so3540160a12.3
-        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 17:08:03 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24458345f5dso34301225ad.3
+        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 17:08:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758326883; x=1758931683; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758326885; x=1758931685; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vBsFBXp3xNxFEEA+gIAMAMl0zG0ZkQ0sPQwciagzxSE=;
-        b=VOd6jAsRnthS6NxAPwGxqD268s+zNBSkQ9C413mymlzbkXzKEUJBcVt2RSeLoRz4Xg
-         36+Ev9DaeZzNpFjv402/4nuRm1XSKeIENDDKv5UITp8f4UcxzpYhlmq44N/kz9RktRXB
-         uvxq8g933qW1vIbWxMEqTIKVFEVVEPhLkZQap1bUKv4VaiLf7MCA+6Rk+PP166Iu7l7P
-         hduzSDYj/lJHh7Ejhhgg2oTqIkyvaAmmC8xhfwn0opBL+kBvzieV4V7op6psl11gnNYX
-         hq4MGvElhFQ084Mc4PBvqm1Wr1A7RRC4UO/U2ZMYzLH5Ory+YkstnDZK+A8SBq77Bri1
-         Piqw==
+        bh=c/ccEl1zaBY/ZABE36aIiHm3JwGfH4bBFJgJn4j4oaE=;
+        b=vWsh1iYYqpePpAw5hzYkQI5/DNEl4DtpFjxtQX/uqy82+WG5xe6vog+I3rQXk5c+Ok
+         1aTU0dod5+9XtJg0EKTgQ+hvOx+WvJxHa5EVm9v7dXpP2pd9Y2cUsA8MA+C9hkxnf+xY
+         YLC/vGV79vZMm+0aMoR3bdxgapEis6UmiKXOu+awTzVYEDhJHjC/LxKobSa31Roa0wfQ
+         IXNKyxYd/gwapGT643k9to+fYjXC9boFN1ef40ki+oeb1Nt8dTiJojriazhbzlzG/SPC
+         +5v6KlCmEqISmis8bK2XmEdzO8WBuRg8aC9AsZnW4QXF64zIRCNaNYKdJcfSVWJzxmSM
+         MMWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758326883; x=1758931683;
+        d=1e100.net; s=20230601; t=1758326885; x=1758931685;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vBsFBXp3xNxFEEA+gIAMAMl0zG0ZkQ0sPQwciagzxSE=;
-        b=d6g1RwjY/2EFfRLE9HALF4B7CbYeDRQzsojx6Umh4np93i0jyMlY6eUKTZDnGLTYUL
-         KBKjOHU0oekxx1Dqr47dhPyxxiMu6i7eiItojKbwReCK365m+yewlapDSTDNQ3RDJqdI
-         uv7IgKeiZdM8dWI98dmLW9AsATk7oeRFzsQnGiIgUx/LObfKwGRpY0wb5bHpowyiJ4WD
-         +ISFHYc9LVj7hYb6IVZY1KrcCFcRRP+MRQ/dS+dQRyk4m6aJB3If5u/A7h6qaFAm+zT5
-         9inh/9xGWwc0Q78y/CbSdtl5DoC4uTb16Ll4hpwnQdskC+ZmmjQCJgug1I1sLodchPky
-         tcnA==
-X-Forwarded-Encrypted: i=1; AJvYcCVAYSFvoXMXgGsgp0BNq2Kyepg9WFAUJql0mZoFnTgTMfsWu4Yzv99LGlmL1KmYby2cxqAChW4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKjtSEV/c4YIS7LhTlxG0Lw6M7bF8hXFrnpEiTWSPkceh4mrOk
-	vduICc6XqZpCojuWP3czIxsMoO0CVkhHt7Vw92gcmSclvanCHO/1M1VHmAEz7eyt9IULo4GZDbf
-	lvFhd3Q==
-X-Google-Smtp-Source: AGHT+IH7yuSw0EzJYNbM8354EGtZ+pVR1qQZsNJWXk3dWGkcza1vL+W1SKiDoS3XWRBqwJgJs0XKZCLtqqg=
-X-Received: from pgbcy9.prod.google.com ([2002:a05:6a02:2289:b0:b55:117c:84a3])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3393:b0:243:ff76:eada
- with SMTP id adf61e73a8af0-29257e11217mr8009378637.6.1758326883294; Fri, 19
- Sep 2025 17:08:03 -0700 (PDT)
-Date: Sat, 20 Sep 2025 00:07:19 +0000
+        bh=c/ccEl1zaBY/ZABE36aIiHm3JwGfH4bBFJgJn4j4oaE=;
+        b=ktqMjLJ8y4cliJwB8r5gRzyVLiH/vxOkizKvapI0cqox792baeXxTn32cRzmnSUscf
+         Zh/4NeQ4MpA5dkh4FBN1y+wkDK9iHhF40AxBkzFJV1ZpZp/jYHBALsBzElcYhZMJ+7/B
+         ET+YmmHmTtLdg5pI3ut1bB/nLCtxJ95UTxJAHClfNZH54KUkJPbb3/qm2nSmya6Cw871
+         KY1ybaeDPqpWCDYguVqpVB/qKgyXKllikLq+jNCCf/bi8gO/r5Nz+X1UaWIo+6A4lhv1
+         P+KtxOyP1eHXAe9D5FXNl/W5nqZ2vzOPWPxKsp6J88yxlYDI09GEJnNNHscKEZOj1wlf
+         42zw==
+X-Forwarded-Encrypted: i=1; AJvYcCWu8uMtb5b6BhKE2GIrMzx6YnpmaN3yfSExi3dGP/czY4pVP1VibbVdv/Nz/p/4G3ZVbv7g2tk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZU0mmdWE3Ma9lfbNvdFpTBpdSAzeKhNUkcuz7s9o6IevfEFnc
+	irmpKLU87UuM3fScaDB0F0CRnl3cY4gk2GQL91rm6IEshLyYgSpg2Ccf52iSoAIo5i5L0s4C1S3
+	Fk+Z4Xg==
+X-Google-Smtp-Source: AGHT+IGyZiuYqz0ZUpvtxcj1y3NPozXSZFAerRM1DVo9S9a0H5NuLchdXTjjFR6BadqRSTvHYC1QGz6ePzQ=
+X-Received: from pliy12.prod.google.com ([2002:a17:903:3d0c:b0:267:f916:ba14])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1aa5:b0:25c:d4b6:f111
+ with SMTP id d9443c01a7336-269ba544020mr75342285ad.47.1758326884839; Fri, 19
+ Sep 2025 17:08:04 -0700 (PDT)
+Date: Sat, 20 Sep 2025 00:07:20 +0000
 In-Reply-To: <20250920000751.2091731-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250920000751.2091731-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250920000751.2091731-6-kuniyu@google.com>
-Subject: [PATCH v10 bpf-next/net 5/6] bpf: Introduce SK_BPF_MEMCG_FLAGS and SK_BPF_MEMCG_EXCLUSIVE.
+Message-ID: <20250920000751.2091731-7-kuniyu@google.com>
+Subject: [PATCH v10 bpf-next/net 6/6] selftest: bpf: Add test for SK_MEMCG_EXCLUSIVE.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
 	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>
@@ -89,211 +89,495 @@ Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.
 	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-If a socket has sk->sk_memcg with SK_MEMCG_EXCLUSIVE, it is decoupled
-from the global protocol memory accounting.
+The test does the following for IPv4/IPv6 x TCP/UDP sockets
+with/without SK_MEMCG_EXCLUSIVE, which can be turned on by
+net.core.memcg_exclusive or bpf_setsockopt(SK_BPF_MEMCG_EXCLUSIVE).
 
-This is controlled by net.core.memcg_exclusive sysctl, but it lacks
-flexibility.
+  1. Create socket pairs
+  2. Send NR_PAGES (32) of data (TCP consumes around 35 pages,
+     and UDP consuems 66 pages due to skb overhead)
+  3. Read memory_allocated from sk->sk_prot->memory_allocated and
+     sk->sk_prot->memory_per_cpu_fw_alloc
+  4. Check if unread data is charged to memory_allocated
 
-Let's support flagging (and clearing) SK_MEMCG_EXCLUSIVE via
-bpf_setsockopt() at the BPF_CGROUP_INET_SOCK_CREATE hook.
+If SK_MEMCG_EXCLUSIVE is set, memory_allocated should not be
+changed, but we allow a small error (up to 10 pages) in case
+other processes on the host use some amounts of TCP/UDP memory.
 
-  u32 flags = SK_BPF_MEMCG_EXCLUSIVE;
+The amount of allocated pages are buffered to per-cpu variable
+{tcp,udp}_memory_per_cpu_fw_alloc up to +/- net.core.mem_pcpu_rsv
+before reported to {tcp,udp}_memory_allocated.
 
-  bpf_setsockopt(ctx, SOL_SOCKET, SK_BPF_MEMCG_FLAGS,
-                 &flags, sizeof(flags));
+At 3., memory_allocated is calculated from the 2 variables at
+fentry of socket create function.
 
-As with net.core.memcg_exclusive, this is inherited to child sockets,
-and BPF always takes precedence over sysctl at socket(2) and accept(2).
+We drain the receive queue only for UDP before close() because UDP
+recv queue is destroyed after RCU grace period.  When I printed
+memory_allocated, UDP exclusive cases sometimes saw the non-exclusive
+case's leftover, but it's still in the small error range (<10 pages).
 
-SK_BPF_MEMCG_FLAGS is only supported at BPF_CGROUP_INET_SOCK_CREATE
-and not supported on other hooks for some reasons:
+  bpf_trace_printk: memory_allocated: 0   <-- TCP non-exclusive
+  bpf_trace_printk: memory_allocated: 35
+  bpf_trace_printk: memory_allocated: 0   <-- TCP w/ sysctl
+  bpf_trace_printk: memory_allocated: 0
+  bpf_trace_printk: memory_allocated: 0   <-- TCP w/ bpf
+  bpf_trace_printk: memory_allocated: 0
+  bpf_trace_printk: memory_allocated: 0   <-- UDP non-exclusive
+  bpf_trace_printk: memory_allocated: 66
+  bpf_trace_printk: memory_allocated: 2   <-- UDP w/ sysctl (2 pages leftover)
+  bpf_trace_printk: memory_allocated: 2
+  bpf_trace_printk: memory_allocated: 2   <-- UDP w/ bpf (2 pages leftover)
+  bpf_trace_printk: memory_allocated: 2
 
-  1. UDP charges memory under sk->sk_receive_queue.lock instead
-     of lock_sock()
+We prefer finishing tests faster than oversleeping for call_rcu()
+ + sk_destruct().
 
-  2. For TCP child sockets, memory accounting is adjusted only in
-     __inet_accept() which sk->sk_memcg allocation is deferred to
+The test completes within 2s on QEMU (64 CPUs) w/ KVM.
 
-  3. Modifying the flag after skb is charged to sk requires such
-     adjustment during bpf_setsockopt() and complicates the logic
-     unnecessarily
+  # time ./test_progs -t sk_memcg
+  #370/1   sk_memcg/TCP  :OK
+  #370/2   sk_memcg/UDP  :OK
+  #370/3   sk_memcg/TCPv6:OK
+  #370/4   sk_memcg/UDPv6:OK
+  #370     sk_memcg:OK
+  Summary: 1/4 PASSED, 0 SKIPPED, 0 FAILED
 
-We can support other hooks later if a real use case justifies that.
-
-Most changes are inline and hard to trace, but a microbenchmark on
-__sk_mem_raise_allocated() during neper/tcp_stream showed that more
-samples completed faster with SK_MEMCG_EXCLUSIVE.  This will be more
-visible under tcp_mem pressure.
-
-  # bpftrace -e 'kprobe:__sk_mem_raise_allocated { @start[tid] = nsecs; }
-    kretprobe:__sk_mem_raise_allocated /@start[tid]/
-    { @end[tid] = nsecs - @start[tid]; @times = hist(@end[tid]); delete(@start[tid]); }'
-  # tcp_stream -6 -F 1000 -N -T 256
-
-Without bpf prog:
-
-  [128, 256)          3846 |                                                    |
-  [256, 512)       1505326 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-  [512, 1K)        1371006 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     |
-  [1K, 2K)          198207 |@@@@@@                                              |
-  [2K, 4K)           31199 |@                                                   |
-
-With bpf prog in the next patch:
-  (must be attached before tcp_stream)
-  # bpftool prog load sk_memcg.bpf.o /sys/fs/bpf/sk_memcg type cgroup/sock_create
-  # bpftool cgroup attach /sys/fs/cgroup/test cgroup_inet_sock_create pinned /sys/fs/bpf/sk_memcg
-
-  [128, 256)          6413 |                                                    |
-  [256, 512)       1868425 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-  [512, 1K)        1101697 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                      |
-  [1K, 2K)          117031 |@@@@                                                |
-  [2K, 4K)           11773 |                                                    |
+  real	0m1.609s
+  user	0m0.167s
+  sys	0m0.461s
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
+v10:
+  * Clean up iterations in ->create_sockets()
+  * Move ASSERT inside if to avoid noisy log in ->create_sockets()
+  * Make run_test() static
+  * Remove fexit progs & possible infinite loop in get_memory_allocated()
+  * Use test__start_subtest() with if
+  * Speed up test by reducing NR_PAGES to 32 and draing UDP queue
+    instead of oversleeping for call_rcu()+sk_destruct()
+
 v7:
-  * Update commit message.
+  * Add test for sysctl
+
+v6:
+  * Trace sk_prot->memory_allocated + sk_prot->memory_per_cpu_fw_alloc
 
 v5:
-  * Limit getsockopt() to BPF_CGROUP_INET_SOCK_CREATE
+  * Use kern_sync_rcu()
+  * Double NR_SEND to 128
 
 v4:
-  * Only allow inet_create() to set flags
-  * Inherit flags from listener to child in sk_clone_lock()
-  * Support clearing flags
-
-v3:
-  * Allow setting flags without sk->sk_memcg in sk_bpf_set_get_memcg_flags()
-  * Preserve flags in __inet_accept()
-
-v2:
-  * s/mem_cgroup_sk_set_flag/mem_cgroup_sk_set_flags/ when CONFIG_MEMCG=n
-  * Use CONFIG_CGROUP_BPF instead of CONFIG_BPF_SYSCALL for ifdef
+  * Only use inet_create() hook
+  * Test bpf_getsockopt()
+  * Add serial_ prefix
+  * Reduce sleep() and the amount of sent data
 ---
- include/uapi/linux/bpf.h       |  6 ++++++
- mm/memcontrol.c                |  3 +++
- net/core/filter.c              | 34 ++++++++++++++++++++++++++++++++++
- tools/include/uapi/linux/bpf.h |  6 ++++++
- 4 files changed, 49 insertions(+)
+ .../selftests/bpf/prog_tests/sk_memcg.c       | 282 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/sk_memcg.c  | 105 +++++++
+ 2 files changed, 387 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sk_memcg.c
+ create mode 100644 tools/testing/selftests/bpf/progs/sk_memcg.c
 
-diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-index 233de8677382..35e3ce40ac90 100644
---- a/include/uapi/linux/bpf.h
-+++ b/include/uapi/linux/bpf.h
-@@ -7182,6 +7182,7 @@ enum {
- 	TCP_BPF_SYN_MAC         = 1007, /* Copy the MAC, IP[46], and TCP header */
- 	TCP_BPF_SOCK_OPS_CB_FLAGS = 1008, /* Get or Set TCP sock ops flags */
- 	SK_BPF_CB_FLAGS		= 1009, /* Get or set sock ops flags in socket */
-+	SK_BPF_MEMCG_FLAGS	= 1010, /* Get or Set flags saved in sk->sk_memcg */
- };
- 
- enum {
-@@ -7204,6 +7205,11 @@ enum {
- 						 */
- };
- 
-+enum {
-+	SK_BPF_MEMCG_EXCLUSIVE	= (1UL << 0),
-+	SK_BPF_MEMCG_FLAG_MAX	= (1UL << 1),
+diff --git a/tools/testing/selftests/bpf/prog_tests/sk_memcg.c b/tools/testing/selftests/bpf/prog_tests/sk_memcg.c
+new file mode 100644
+index 000000000000..9e0aa7e7df27
+--- /dev/null
++++ b/tools/testing/selftests/bpf/prog_tests/sk_memcg.c
+@@ -0,0 +1,282 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2025 Google LLC */
++
++#include <test_progs.h>
++#include "sk_memcg.skel.h"
++#include "network_helpers.h"
++
++#define NR_PAGES	32
++#define NR_SOCKETS	2
++#define BUF_TOTAL	(NR_PAGES * 4096 / NR_SOCKETS)
++#define BUF_SINGLE	1024
++#define NR_SEND		(BUF_TOTAL / BUF_SINGLE)
++
++struct test_case {
++	char name[8];
++	int family;
++	int type;
++	int (*create_sockets)(struct test_case *test_case, int sk[], int len);
++	long (*get_memory_allocated)(struct test_case *test_case, struct sk_memcg *skel);
 +};
 +
- struct bpf_perf_event_value {
- 	__u64 counter;
- 	__u64 enabled;
-diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index 88028af8ac28..b7d405b57e23 100644
---- a/mm/memcontrol.c
-+++ b/mm/memcontrol.c
-@@ -4997,6 +4997,9 @@ EXPORT_SYMBOL(memcg_sockets_enabled_key);
- 
- static void mem_cgroup_sk_set(struct sock *sk, struct mem_cgroup *memcg)
- {
-+	BUILD_BUG_ON((unsigned short)SK_MEMCG_EXCLUSIVE != SK_BPF_MEMCG_EXCLUSIVE);
-+	BUILD_BUG_ON((unsigned short)SK_MEMCG_FLAG_MAX != SK_BPF_MEMCG_FLAG_MAX);
-+
- 	sk->sk_memcg = memcg;
- 
- #ifdef CONFIG_NET
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 31b259f02ee9..df2496120076 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -5723,9 +5723,39 @@ static const struct bpf_func_proto bpf_sock_addr_getsockopt_proto = {
- 	.arg5_type	= ARG_CONST_SIZE,
- };
- 
-+static int sk_bpf_set_get_memcg_flags(struct sock *sk,
-+				      char *optval, int optlen,
-+				      bool getopt)
++static int tcp_create_sockets(struct test_case *test_case, int sk[], int len)
 +{
-+	u32 flags;
++	int server, i;
 +
-+	if (optlen != sizeof(u32))
-+		return -EINVAL;
++	server = start_server(test_case->family, test_case->type, NULL, 0, 0);
++	ASSERT_GE(server, 0, "start_server_str");
 +
-+	if (!sk_has_account(sk))
-+		return -EOPNOTSUPP;
++	/* Keep for-loop so we can change NR_SOCKETS easily. */
++	for (i = 0; i < len; i += 2) {
++		sk[i] = connect_to_fd(server, 0);
++		if (sk[i] < 0) {
++			ASSERT_GE(sk[i], 0, "connect_to_fd");
++			return sk[i];
++		}
 +
-+	if (getopt) {
-+		*(u32 *)optval = mem_cgroup_sk_get_flags(sk);
-+		return 0;
++		sk[i + 1] = accept(server, NULL, NULL);
++		if (sk[i + 1] < 0) {
++			ASSERT_GE(sk[i + 1], 0, "accept");
++			return sk[i + 1];
++		}
 +	}
 +
-+	flags = *(u32 *)optval;
-+	if (flags >= SK_BPF_MEMCG_FLAG_MAX)
-+		return -EINVAL;
-+
-+	mem_cgroup_sk_set_flags(sk, flags);
++	close(server);
 +
 +	return 0;
 +}
 +
- BPF_CALL_5(bpf_sock_create_setsockopt, struct sock *, sk, int, level,
- 	   int, optname, char *, optval, int, optlen)
- {
-+	if (IS_ENABLED(CONFIG_MEMCG) &&
-+	    level == SOL_SOCKET && optname == SK_BPF_MEMCG_FLAGS)
-+		return sk_bpf_set_get_memcg_flags(sk, optval, optlen, false);
++static int udp_create_sockets(struct test_case *test_case, int sk[], int len)
++{
++	int i, j, err, rcvbuf = BUF_TOTAL;
 +
- 	return __bpf_setsockopt(sk, level, optname, optval, optlen);
- }
- 
-@@ -5743,6 +5773,10 @@ static const struct bpf_func_proto bpf_sock_create_setsockopt_proto = {
- BPF_CALL_5(bpf_sock_create_getsockopt, struct sock *, sk, int, level,
- 	   int, optname, char *, optval, int, optlen)
- {
-+	if (IS_ENABLED(CONFIG_MEMCG) &&
-+	    level == SOL_SOCKET && optname == SK_BPF_MEMCG_FLAGS)
-+		return sk_bpf_set_get_memcg_flags(sk, optval, optlen, true);
++	/* Keep for-loop so we can change NR_SOCKETS easily. */
++	for (i = 0; i < len; i += 2) {
++		sk[i] = start_server(test_case->family, test_case->type, NULL, 0, 0);
++		if (sk[i] < 0) {
++			ASSERT_GE(sk[i], 0, "start_server");
++			return sk[i];
++		}
 +
- 	return __bpf_getsockopt(sk, level, optname, optval, optlen);
- }
- 
-diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-index 233de8677382..35e3ce40ac90 100644
---- a/tools/include/uapi/linux/bpf.h
-+++ b/tools/include/uapi/linux/bpf.h
-@@ -7182,6 +7182,7 @@ enum {
- 	TCP_BPF_SYN_MAC         = 1007, /* Copy the MAC, IP[46], and TCP header */
- 	TCP_BPF_SOCK_OPS_CB_FLAGS = 1008, /* Get or Set TCP sock ops flags */
- 	SK_BPF_CB_FLAGS		= 1009, /* Get or set sock ops flags in socket */
-+	SK_BPF_MEMCG_FLAGS	= 1010, /* Get or Set flags saved in sk->sk_memcg */
- };
- 
- enum {
-@@ -7204,6 +7205,11 @@ enum {
- 						 */
- };
- 
-+enum {
-+	SK_BPF_MEMCG_EXCLUSIVE	= (1UL << 0),
-+	SK_BPF_MEMCG_FLAG_MAX	= (1UL << 1),
++		sk[i + 1] = connect_to_fd(sk[i], 0);
++		if (sk[i + 1] < 0) {
++			ASSERT_GE(sk[i + 1], 0, "connect_to_fd");
++			return sk[i + 1];
++		}
++
++		err = connect_fd_to_fd(sk[i], sk[i + 1], 0);
++		if (err) {
++			ASSERT_EQ(err, 0, "connect_fd_to_fd");
++			return err;
++		}
++
++		for (j = 0; j < 2; j++) {
++			err = setsockopt(sk[i + j], SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int));
++			if (err) {
++				ASSERT_EQ(err, 0, "setsockopt(SO_RCVBUF)");
++				return err;
++			}
++		}
++	}
++
++	return 0;
++}
++
++static long get_memory_allocated(struct test_case *test_case,
++				 bool *activated, long *memory_allocated)
++{
++	int sk;
++
++	*activated = true;
++
++	/* AF_INET and AF_INET6 share the same memory_allocated.
++	 * tcp_init_sock() is called by AF_INET and AF_INET6,
++	 * but udp_lib_init_sock() is inline.
++	 */
++	sk = socket(AF_INET, test_case->type, 0);
++	if (!ASSERT_GE(sk, 0, "get_memory_allocated"))
++		return -1;
++
++	close(sk);
++
++	return *memory_allocated;
++}
++
++static long tcp_get_memory_allocated(struct test_case *test_case, struct sk_memcg *skel)
++{
++	return get_memory_allocated(test_case,
++				    &skel->bss->tcp_activated,
++				    &skel->bss->tcp_memory_allocated);
++}
++
++static long udp_get_memory_allocated(struct test_case *test_case, struct sk_memcg *skel)
++{
++	return get_memory_allocated(test_case,
++				    &skel->bss->udp_activated,
++				    &skel->bss->udp_memory_allocated);
++}
++
++static int check_exclusive(struct test_case *test_case,
++			   struct sk_memcg *skel, bool exclusive)
++{
++	char buf[BUF_SINGLE] = {};
++	long memory_allocated[2];
++	int sk[NR_SOCKETS] = {};
++	int err, i, j;
++
++	err = test_case->create_sockets(test_case, sk, ARRAY_SIZE(sk));
++	if (err)
++		goto close;
++
++	memory_allocated[0] = test_case->get_memory_allocated(test_case, skel);
++
++	/* allocate pages >= NR_PAGES */
++	for (i = 0; i < ARRAY_SIZE(sk); i++) {
++		for (j = 0; j < NR_SEND; j++) {
++			int bytes = send(sk[i], buf, sizeof(buf), 0);
++
++			/* Avoid too noisy logs when something failed. */
++			if (bytes != sizeof(buf)) {
++				ASSERT_EQ(bytes, sizeof(buf), "send");
++				if (bytes < 0) {
++					err = bytes;
++					goto drain;
++				}
++			}
++		}
++	}
++
++	memory_allocated[1] = test_case->get_memory_allocated(test_case, skel);
++
++	if (exclusive)
++		ASSERT_LE(memory_allocated[1], memory_allocated[0] + 10, "exclusive");
++	else
++		ASSERT_GT(memory_allocated[1], memory_allocated[0] + NR_PAGES, "not exclusive");
++
++drain:
++	if (test_case->type == SOCK_DGRAM) {
++		/* UDP starts purging sk->sk_receive_queue after one RCU
++		 * grace period, then udp_memory_allocated goes down,
++		 * so drain the queue before close().
++		 */
++		for (i = 0; i < ARRAY_SIZE(sk); i++) {
++			for (j = 0; j < NR_SEND; j++) {
++				int bytes = recv(sk[i], buf, 1, MSG_DONTWAIT | MSG_TRUNC);
++
++				if (bytes == sizeof(buf))
++					continue;
++				if (bytes != -1 || errno != EAGAIN)
++					PRINT_FAIL("bytes: %d, errno: %s\n", bytes, strerror(errno));
++				break;
++			}
++		}
++	}
++
++close:
++	for (i = 0; i < ARRAY_SIZE(sk); i++)
++		close(sk[i]);
++
++	return err;
++}
++
++static void run_test(struct test_case *test_case)
++{
++	struct nstoken *nstoken;
++	struct sk_memcg *skel;
++	int cgroup, err;
++
++	skel = sk_memcg__open_and_load();
++	if (!ASSERT_OK_PTR(skel, "open_and_load"))
++		return;
++
++	skel->bss->nr_cpus = libbpf_num_possible_cpus();
++
++	err = sk_memcg__attach(skel);
++	if (!ASSERT_OK(err, "attach"))
++		goto destroy_skel;
++
++	cgroup = test__join_cgroup("/sk_memcg");
++	if (!ASSERT_GE(cgroup, 0, "join_cgroup"))
++		goto destroy_skel;
++
++	err = make_netns("sk_memcg");
++	if (!ASSERT_EQ(err, 0, "make_netns"))
++		goto close_cgroup;
++
++	nstoken = open_netns("sk_memcg");
++	if (!ASSERT_OK_PTR(nstoken, "open_netns"))
++		goto remove_netns;
++
++	err = check_exclusive(test_case, skel, false);
++	if (!ASSERT_EQ(err, 0, "test_exclusive(false)"))
++		goto close_netns;
++
++	err = write_sysctl("/proc/sys/net/core/memcg_exclusive", "1");
++	if (!ASSERT_EQ(err, 0, "write_sysctl(1)"))
++		goto close_netns;
++
++	err = check_exclusive(test_case, skel, true);
++	if (!ASSERT_EQ(err, 0, "test_exclusive(true by sysctl)"))
++		goto close_netns;
++
++	err = write_sysctl("/proc/sys/net/core/memcg_exclusive", "0");
++	if (!ASSERT_EQ(err, 0, "write_sysctl(0)"))
++		goto close_netns;
++
++	skel->links.sock_create = bpf_program__attach_cgroup(skel->progs.sock_create, cgroup);
++	if (!ASSERT_OK_PTR(skel->links.sock_create, "attach_cgroup(sock_create)"))
++		goto close_netns;
++
++	err = check_exclusive(test_case, skel, true);
++	ASSERT_EQ(err, 0, "test_exclusive(true by bpf)");
++
++close_netns:
++	close_netns(nstoken);
++remove_netns:
++	remove_netns("sk_memcg");
++close_cgroup:
++	close(cgroup);
++destroy_skel:
++	sk_memcg__destroy(skel);
++}
++
++struct test_case test_cases[] = {
++	{
++		.name = "TCP  ",
++		.family = AF_INET,
++		.type = SOCK_STREAM,
++		.create_sockets = tcp_create_sockets,
++		.get_memory_allocated = tcp_get_memory_allocated,
++	},
++	{
++		.name = "UDP  ",
++		.family = AF_INET,
++		.type = SOCK_DGRAM,
++		.create_sockets = udp_create_sockets,
++		.get_memory_allocated = udp_get_memory_allocated,
++	},
++	{
++		.name = "TCPv6",
++		.family = AF_INET6,
++		.type = SOCK_STREAM,
++		.create_sockets = tcp_create_sockets,
++		.get_memory_allocated = tcp_get_memory_allocated,
++	},
++	{
++		.name = "UDPv6",
++		.family = AF_INET6,
++		.type = SOCK_DGRAM,
++		.create_sockets = udp_create_sockets,
++		.get_memory_allocated = udp_get_memory_allocated,
++	},
 +};
 +
- struct bpf_perf_event_value {
- 	__u64 counter;
- 	__u64 enabled;
++void serial_test_sk_memcg(void)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
++		if (test__start_subtest(test_cases[i].name))
++			run_test(&test_cases[i]);
++	}
++}
+diff --git a/tools/testing/selftests/bpf/progs/sk_memcg.c b/tools/testing/selftests/bpf/progs/sk_memcg.c
+new file mode 100644
+index 000000000000..8430ad920224
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/sk_memcg.c
+@@ -0,0 +1,105 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2025 Google LLC */
++
++#include "bpf_tracing_net.h"
++#include <bpf/bpf_helpers.h>
++#include <bpf/bpf_tracing.h>
++#include <errno.h>
++
++extern int tcp_memory_per_cpu_fw_alloc __ksym;
++extern int udp_memory_per_cpu_fw_alloc __ksym;
++
++int nr_cpus;
++bool tcp_activated, udp_activated;
++long tcp_memory_allocated, udp_memory_allocated;
++
++struct sk_prot {
++	long *memory_allocated;
++	int *memory_per_cpu_fw_alloc;
++};
++
++static int drain_memory_per_cpu_fw_alloc(__u32 i, struct sk_prot *sk_prot_ctx)
++{
++	int *memory_per_cpu_fw_alloc;
++
++	memory_per_cpu_fw_alloc = bpf_per_cpu_ptr(sk_prot_ctx->memory_per_cpu_fw_alloc, i);
++	if (memory_per_cpu_fw_alloc)
++		*sk_prot_ctx->memory_allocated += *memory_per_cpu_fw_alloc;
++
++	return 0;
++}
++
++static long get_memory_allocated(struct sock *_sk, int *memory_per_cpu_fw_alloc)
++{
++	struct sock *sk = bpf_core_cast(_sk, struct sock);
++	struct sk_prot sk_prot_ctx;
++	long memory_allocated;
++
++	/* net_aligned_data.{tcp,udp}_memory_allocated was not available. */
++	memory_allocated = sk->__sk_common.skc_prot->memory_allocated->counter;
++
++	sk_prot_ctx.memory_allocated = &memory_allocated;
++	sk_prot_ctx.memory_per_cpu_fw_alloc = memory_per_cpu_fw_alloc;
++
++	bpf_loop(nr_cpus, drain_memory_per_cpu_fw_alloc, &sk_prot_ctx, 0);
++
++	return memory_allocated;
++}
++
++static void fentry_init_sock(struct sock *sk, bool *activated,
++			     long *memory_allocated, int *memory_per_cpu_fw_alloc)
++{
++	if (!*activated)
++		return;
++
++	*memory_allocated = get_memory_allocated(sk, memory_per_cpu_fw_alloc);
++	*activated = false;
++}
++
++SEC("fentry/tcp_init_sock")
++int BPF_PROG(fentry_tcp_init_sock, struct sock *sk)
++{
++	fentry_init_sock(sk, &tcp_activated,
++			 &tcp_memory_allocated, &tcp_memory_per_cpu_fw_alloc);
++	return 0;
++}
++
++SEC("fentry/udp_init_sock")
++int BPF_PROG(fentry_udp_init_sock, struct sock *sk)
++{
++	fentry_init_sock(sk, &udp_activated,
++			 &udp_memory_allocated, &udp_memory_per_cpu_fw_alloc);
++	return 0;
++}
++
++SEC("cgroup/sock_create")
++int sock_create(struct bpf_sock *ctx)
++{
++	u32 flags = SK_BPF_MEMCG_EXCLUSIVE;
++	int err;
++
++	err = bpf_setsockopt(ctx, SOL_SOCKET, SK_BPF_MEMCG_FLAGS,
++			     &flags, sizeof(flags));
++	if (err)
++		goto err;
++
++	flags = 0;
++
++	err = bpf_getsockopt(ctx, SOL_SOCKET, SK_BPF_MEMCG_FLAGS,
++			     &flags, sizeof(flags));
++	if (err)
++		goto err;
++
++	if (flags != SK_BPF_MEMCG_EXCLUSIVE) {
++		err = -EINVAL;
++		goto err;
++	}
++
++	return 1;
++
++err:
++	bpf_set_retval(err);
++	return 0;
++}
++
++char LICENSE[] SEC("license") = "GPL";
 -- 
 2.51.0.470.ga7dc726c21-goog
 
