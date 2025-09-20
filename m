@@ -1,172 +1,152 @@
-Return-Path: <netdev+bounces-225006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29FD5B8CF31
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 21:38:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58F04B8D08F
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 22:12:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3B05179509
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 19:38:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A5AB7C7F20
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 20:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A06A23D7E4;
-	Sat, 20 Sep 2025 19:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A44274B46;
+	Sat, 20 Sep 2025 20:12:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zenAKCwp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hx2fa9ZS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1AB41DB122
-	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 19:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A212144D7
+	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 20:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758397129; cv=none; b=C3t1yWlqpY54SgQDwH6xkJRDpnXuPRorHPjWR/fxXz34TCUYqNptXBK33puhkCCGucs7Ukj6aPaplSE0nOj0gR7sr9fyuJZQ3P5YLyrvPFMELBdtyR4NVoENA3Qw7RufDujzLlPak7MA4dMF1saQiRA4NWHRH4hXsi9/SAnzbXY=
+	t=1758399136; cv=none; b=eToVsuu2OLrC4O5XtTecG4Ui58Ll0BTuQBVUuiLDbfRc1seioyGD/8507vhgHdtuMiyYcp7nppJHWXDU23PVW8d/OHBDGS2RUfo37dzas3T0cOjY9+bBWWwBcOvI1a8JkIIq1ozBfieKPa2Z1/lmhvv7d7LOEY9n033a3MsgjaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758397129; c=relaxed/simple;
-	bh=KgUnkQgEryI4+i+0SZ1ZrvjpVtNKG5/O91vj5h2fcbY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PKXZAcFe2TSDdyJwWV1PROpkVotFwLK+BHg9wurBoARdu8cXsbX5vLm72DEOZ70ZXbj57GvQVM99OKh7TceuOVObpaPCTK2YtatRt6UlQL25okWvV1km1EkRNwTwn/e/fMgpOXXCkmPG/cmRpHOABaIuwwOYyzhJ37ZSlOZOGLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zenAKCwp; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4b38d4de6d9so20923661cf.1
-        for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 12:38:47 -0700 (PDT)
+	s=arc-20240116; t=1758399136; c=relaxed/simple;
+	bh=feKc9PJGPZqt/uE+zM0sTjLZY7BjOt/apiF8YLIoW0Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kb4p+/EO8zpSEG326BhKksP6VX0w2wEnmx19pTgV9FQODo4wzkemCAt4gWoLja3b8X2ImLpt/qr9BbSTXbDzRgzQzJ49BlW3VgCXaiIFzOgN/kmdA+u2uzNTFuypelftdguIOlO4p9cODrfnNyged/wlRSyNcY30mDw3yNW8A40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hx2fa9ZS; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-77e69f69281so1708812b3a.1
+        for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 13:12:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758397127; x=1759001927; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gtnRcilC6eNsvcK5BHkv1krIV/OTznTLAfwyrPbpEyM=;
-        b=zenAKCwpk7BLkcvlg9M1tjUp0Yl2lsI2VaKha36F2CMo4c9TU60k5jb+62OALup7DK
-         xAF1xt54BL/6NWxqvTubc/ovX/ZXug+0SfsoFQboMN34rpn8iMCUVjV5aE/yD5HwEy31
-         J3uw5R8W69T3V/Q4tQAn7scyxKcEDrnswLfSkwwjS8q6EWMFMyRMP1KP1vPSiY74ZNl8
-         5S3jnzkt3DOSwMXcR0ZABGb1C3uxT3At8dTKtZzzzjPpqeAbX+rsIIhUdeEG07hQlzJr
-         snJlpMR9P9ySMBB/m2m40Xwut2KZonf4ydlPaTAbDOyREHFBmav6QSPoaYbST9VaTS9B
-         qoVw==
+        d=gmail.com; s=20230601; t=1758399133; x=1759003933; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NfxhpuR4uEPQTXMkMfbx8NFTCu/dYBMS+9D8zFtE8M8=;
+        b=Hx2fa9ZSigpYUBKxFgnFo4s1MOstHJ4uA+8Yaf+dKydK1P222s8OLnMQTUvGngFxWQ
+         bRz+YKgya2x3ZJpXqkRCZc8toK3riiR7OF99r9cRLvwyJKPMPtO/s1MeAMxYMlCQteql
+         F+DaibwN0/hgW6tdxPWfxSV2TZfvlgNp0Ztjmz4JymSc2dca3Yexh9egXExSaTXyrurJ
+         /dLOAxGb0oGT8lPXZ70PTxtdwqEiIlkB8pQvJRg+eTWua7SBnzorNkhPZyl8Nw3w+bwd
+         /hReW2qe6qjJVPPAz1+QQwgPflAIcDh34YAjx0Aikz941TJ/iGvcCbInNBG/6KNy9UDn
+         iVzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758397127; x=1759001927;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gtnRcilC6eNsvcK5BHkv1krIV/OTznTLAfwyrPbpEyM=;
-        b=tMdcFIkDAq+bocmJUqx2pmbzvL9f+4/bvn/8qHscSYo9bi1rb0w9CJG5mzs7xByjFN
-         RTnHbw+jKWBExlzXMbh/RxNAMHkZ2B47LV2rnjDpYVL0hTPpUTNr/9k4IGBRTtcWyd7M
-         lGN4qY2eC0l4/SJLDZY1iWBPt4HCFdyN5Z7mnydcfp44fuGLmM97Z1tHX3QJhhpaN2Gq
-         DYXbRIHN427x/Ao1qSPs5Fzq6fR/qphSUefzdbRe3Yz2pZYOlZBB0UCuaioarjG7XllZ
-         T7xxcX+5FN/IqVpWSpo+n4NdfeeEhPXhdz4U6KjJHv1wKjC2yMuHps/ixL4xA/PRlRjL
-         L/CA==
-X-Forwarded-Encrypted: i=1; AJvYcCVkNM+UzON+koEUPts3L+VTMifnQvznmzCKVXp8+YQxfvsRkcuy6wcegfdIHFTqcRLbwJ+cJ1M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjgdehX83Z53fpQ455uacTSR5SiI0Ke4/EChHoiOoEdUfG/Gkm
-	DSQqeGeuoRFiSyu5C5VnluFtYGXr8Za2QYAAy841/gvps+j76Y4smAha3p5O91W2XHzeKQkKNN0
-	0k7eBj+0TgvEuSY6xh5ZEjqln7csAB4ITwwltZ78a
-X-Gm-Gg: ASbGncuBgoUO99FkkVPgmnxfA6JZX/YXpKIe6+G6NZV08IqbXmL0YQIYom8QGBiom6n
-	K0Pc51M2LuBVQkHan5XkhkDKakIbniEyWVZbQGuDJksJBvSr43Jx4o24wo+wJ397lcHM0BnwhmN
-	3LW3f+IJhA6gyCf/L8yRDJheMaFnrVbqN2j0Dxucgj/Z5p6OE/MpyETkZPt7sUgqpRP/IT8JXwo
-	Bov+YuD
-X-Google-Smtp-Source: AGHT+IHwKdxFb50aeHCu0zfA/eqBOuKP9fXGGxh1a1SVNT98cIAk9GdqMdo7cjvqn6ADUGsNxNVHlHhWsiPZD+rwR14=
-X-Received: by 2002:a05:622a:90a:b0:4b5:e12b:9e1 with SMTP id
- d75a77b69052e-4c073c9a3ddmr71857371cf.60.1758397126469; Sat, 20 Sep 2025
- 12:38:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758399133; x=1759003933;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NfxhpuR4uEPQTXMkMfbx8NFTCu/dYBMS+9D8zFtE8M8=;
+        b=hbudRxeqkRV8StFu/krJEFQsIME23t79+lnRhVPLdibyqB49eJgSNcZXbunUhW1o1v
+         5j6GzRw5MRwSxNDNzNBQ7Hnn8VFapQ1UMTecCAeXrNIwuKDoIhj+BnknLiWTiGqfbgtq
+         IH5haR0J3FnurirNg9HgRs88WYSEIqqasgskPoNdkg7o4hSJ9Nha93VTKnGHB59ZTwZj
+         rySG++d5gPjPD7Q7ojzqsW1TU6a/+jhslonStU9qejWU2quMvUArmBKId1oK2L3rzqx8
+         HNlhuEsQXvy8syD5tD82E97HIWLBDAP7MEqSPjm2P83cJqkHEcrw1UBZChCLb36PD6VF
+         B6OA==
+X-Gm-Message-State: AOJu0YwhEoCBxZ/WwmgW0MmQKkuXp2U7IkIpD70S0x9nS7q8gAozOj/R
+	3vF32KdQ4k8x5OFXITHD97p0BU/vFVMzWfcKgoa231bYiXi1rjCERWrh
+X-Gm-Gg: ASbGnctBql5cC1Vl1lls8oDWmy6zcrxyHjrPfSBMSSVF1rKYNmqCOpKEkXBeYVrHVtp
+	UpFJTX85lgKz8EM1jRzfqBVIUpkqYpKekmeJtDfl+FJ4GrLpi6Gms0IdvlC/MqD97uC+e1Ijuh2
+	oKM13OaFKNAtUEAFM9Jz+dgEW3KAHFvWS2tZP3djb1GAfiRrlZKuvsyzQiyaCCQk9Il1PdE4Dq8
+	wOahvylwkWIiuV2mQVUsfE/nSIGou5yXnBluhHscLsMQ6h3+nAWSleRqdhH/Ax559ervq821aEz
+	cxxl1IREHUV8KPcA9ETV4fUVgVWJ0+4y2WTLUcm8EOXFXc68R6T8IZECc2xUWZuyka0eRbiShHq
+	igliasVfepvBBi+Y/N5QBysQ7CnGUKdIf4MLKDGnW4O23Ddnjrun21IwHdRGpN2ElgRorHI8xaT
+	87pxdl6Hpy76wXpW8iQT/iCMR2JQ==
+X-Google-Smtp-Source: AGHT+IG2y+MxKod/XzAN+M1gu7tYhwj5v+CW7f8oWw+t8RRRrPcsei0GeMMgdnDja1lZ4nyAdg49Ig==
+X-Received: by 2002:a05:6a21:329b:b0:263:57a:bb46 with SMTP id adf61e73a8af0-2920875282bmr11094636637.13.1758399133055;
+        Sat, 20 Sep 2025 13:12:13 -0700 (PDT)
+Received: from crl-3.node2.local ([125.63.65.162])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77e2b7d8078sm5919446b3a.81.2025.09.20.13.12.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 20 Sep 2025 13:12:12 -0700 (PDT)
+From: Kriish Sharma <kriish.sharma2006@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	willemb@google.com,
+	kerneljasonxing@gmail.com,
+	martin.lau@kernel.org,
+	mhal@rbox.co,
+	almasrymina@google.com,
+	ebiggers@google.com,
+	aleksander.lobakin@intel.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	Kriish Sharma <kriish.sharma2006@gmail.com>,
+	syzbot+5a2250fd91b28106c37b@syzkaller.appspotmail.com
+Subject: [PATCH] [PATCH v2] net: skb: guard kmalloc_reserve() against oversized allocations
+Date: Sat, 20 Sep 2025 20:11:38 +0000
+Message-Id: <20250920201138.402247-1-kriish.sharma2006@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250920080227.3674860-1-edumazet@google.com> <20250920111059.500c2b8f@kernel.org>
-In-Reply-To: <20250920111059.500c2b8f@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 20 Sep 2025 12:38:35 -0700
-X-Gm-Features: AS18NWBouUVISk9xgqXbvVI8vUYL4uUqxpwbjqEtWuLVTpuozezmJNjM11iWkPk
-Message-ID: <CANn89iLATYmTgvxxLjv9nQ1opGVqDZpYfxc64qsk0H0sUQvEWw@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] udp: remove busylock and add per NUMA queues
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Sep 20, 2025 at 11:11=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Sat, 20 Sep 2025 08:02:27 +0000 Eric Dumazet wrote:
-> > busylock was protecting UDP sockets against packet floods,
-> > but unfortunately was not protecting the host itself.
-> >
-> > Under stress, many cpus could spin while acquiring the busylock,
-> > and NIC had to drop packets. Or packets would be dropped
-> > in cpu backlog if RPS/RFS were in place.
-> >
-> > This patch replaces the busylock by intermediate
-> > lockless queues. (One queue per NUMA node).
-> >
-> > This means that fewer number of cpus have to acquire
-> > the UDP receive queue lock.
-> >
-> > Most of the cpus can either:
-> > - immediately drop the packet.
-> > - or queue it in their NUMA aware lockless queue.
-> >
-> > Then one of the cpu is chosen to process this lockless queue
-> > in a batch.
-> >
-> > The batch only contains packets that were cooked on the same
-> > NUMA node, thus with very limited latency impact.
->
-> Occasionally hitting a UaF like this:
-> https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/306342/3-fcnal-ipv=
-6-sh/stderr
-> decoded:
-> https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/306342/vm-crash-th=
-r2-0
-> --
-> pw-bot: cr
+Add an explicit size check in kmalloc_reserve() to reject requests
+larger than KMALLOC_MAX_SIZE before they reach the allocator.
 
-Yeah, destroy is called while there are packets in flight, from inet_releas=
-e()
+syzbot reported warnings triggered by attempts to allocate buffers
+with an object size exceeding KMALLOC_MAX_SIZE. While the existing
+code relies on kmalloc() failure and a comment states that truncation
+is "harmless", in practice this causes high-order allocation warnings
+and noisy kernel logs that interfere with testing.
 
-I have to hook the  kfree(up->udp_prod_queue) calls in udp_destruct_common(=
-)
+This patch introduces an early guard in kmalloc_reserve() that returns
+NULL if obj_size exceeds KMALLOC_MAX_SIZE. This ensures impossible
+requests fail fast and silently, avoiding allocator warnings while
+keeping the intended semantics unchanged.
 
-I will test:
+Fixes: 7fa4d8dc380f ("Add linux-next specific files for 20250821")
+Reported-by: syzbot+5a2250fd91b28106c37b@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=5a2250fd91b28106c37b
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index fedc939342f3d1ab580548e2b4dd39b5e3a1c397..59bf422151171330b7190523e0f=
-287947409b6b5
-100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1808,6 +1808,7 @@ void udp_destruct_common(struct sock *sk)
-                kfree_skb(skb);
-        }
-        udp_rmem_release(sk, total, 0, true);
-+       kfree(up->udp_prod_queue);
- }
- EXPORT_IPV6_MOD_GPL(udp_destruct_common);
+---
+v2:
+ - Add WARN_ONCE() to make oversized allocations visible
 
-@@ -2912,7 +2913,6 @@ void udp_destroy_sock(struct sock *sk)
-                        udp_tunnel_cleanup_gro(sk);
-                }
-        }
--       kfree(up->udp_prod_queue);
- }
+Signed-off-by: Kriish Sharma <kriish.sharma2006@gmail.com>
+---
+ net/core/skbuff.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
- typedef struct sk_buff *(*udp_gro_receive_t)(struct sock *sk,
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 90e2945e6cf9066bc36c57cbb29b8aa68e7afe4e..813a2ba75824d14631642bf6973=
-f65063b2825cb
-100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -1829,7 +1829,6 @@ void udpv6_destroy_sock(struct sock *sk)
-                        udp_tunnel_cleanup_gro(sk);
-                }
-        }
--       kfree(up->udp_prod_queue);
- }
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index ee0274417948..70588f98c07e 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -591,6 +591,13 @@ static void *kmalloc_reserve(unsigned int *size, gfp_t flags, int node,
+ 	/* The following cast might truncate high-order bits of obj_size, this
+ 	 * is harmless because kmalloc(obj_size >= 2^32) will fail anyway.
+ 	 */
++	if (unlikely(obj_size > KMALLOC_MAX_SIZE)) {
++		WARN_ONCE(1,
++			  "%s: request size %zu exceeds KMALLOC_MAX_SIZE (%lu)\n",
++			  __func__, obj_size, KMALLOC_MAX_SIZE);
++		return NULL;
++	}
++
+ 	*size = (unsigned int)obj_size;
+ 
+ 	/*
+-- 
+2.34.1
 
- /*
 
