@@ -1,130 +1,116 @@
-Return-Path: <netdev+bounces-224982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 679E0B8C7B8
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 14:12:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECDC8B8C7BF
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 14:21:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1823B7C80AC
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 12:12:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B04A4564A54
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 12:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F39F62D6E78;
-	Sat, 20 Sep 2025 12:12:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15042301024;
+	Sat, 20 Sep 2025 12:21:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KUdG9z8D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q/JB0FbB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F6E1FC104
-	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 12:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0891E32B9;
+	Sat, 20 Sep 2025 12:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758370331; cv=none; b=h9YuoJwxpaowM9otrkIvWfVyPG3iDcedYBcTl4BUIgfQPZ8IqtaI+ClNoBrtYgljfslWLDxK5LuE7AdRwsr508dEBozORwu/h9v9pk7usrKSiUzc9a63qYIgY+nRuqzIe3hnWjJmLM2SAmcXoaEgz59kS2uBIjAx17nMEOvPmuA=
+	t=1758370878; cv=none; b=Z9bBud8o8JIm+IdVQf06TKhrQp5WcsYRtEkYVApW5xwbNRha/6D9dmXQsMEgyr/nDbD/6WswFjEwoLKKJzc8TvIwPrT9lXY2vPH6e1AXVlUKTXknFguo1VtZsw0gwlhbEhwpDS5Bn5gUjEHSvZTnd2ehjLo7gfU3PJpY39xpIsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758370331; c=relaxed/simple;
-	bh=9CWj0NL37rcS3J4GxeEKF45AY8LhEp6gl7JMEkEGM3o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VZxLwbP2Tcf8lh/yD+T2rjoP/KFMkJb1PpRDzCO9Qfbbyc6mUY21DvQjrHVHQV8XfEHuK0igZifluciWy+0iZsZpgxHEASIFJ9Zq0gjoGS5tMVVLzgI4k6F3eo5wBVgt2JxmCXMwSpX7g1JQ63YMk/l8P5Zl1WTMshRx2p2eo78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=KUdG9z8D; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58K7cPLe015910;
-	Sat, 20 Sep 2025 12:12:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=YU+Cuo49Kj2z7eF1uxRR59Lo4rF81
-	C0DnNKyffBtliM=; b=KUdG9z8DXR7+HXFq/6r68aQ3EL3OfW0tn0rGTvbgwDk3n
-	JlAXOuUXa9Pr/GnZOLFgpHvsjNvesMi0wq8Ov+b4TQ4fKbOwqcmwYOcA1de40f4G
-	W17YOmchkQemUYXdXpKkRzc+ANgSbfP7wyzBzcqZhCEKcuN2L6aoFNdJx7rk3aWw
-	UXdO5XVVn0kY60OFKRlf/S/Z/NCKSBBC1gf6nobvSZrPeXageJ+ENWzG72vVDtgO
-	MzIWOvVqsnXn5G9DGtIvsVmrfhMtfQjei6Blje85dVpkLxoTo2hjTkVFxfwsKaPM
-	pY1mIqgO/IaYJftUUOATfufGRIPM4nVEnclLzqGng==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 499mad09ec-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 20 Sep 2025 12:12:01 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 58K70PkZ019773;
-	Sat, 20 Sep 2025 12:12:01 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 499jq59ecw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 20 Sep 2025 12:12:01 +0000
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 58KCC0Z4029301;
-	Sat, 20 Sep 2025 12:12:00 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 499jq59ece-1;
-	Sat, 20 Sep 2025 12:12:00 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: netdev@vger.kernel.org, somnath.kotur@broadcom.com,
-        michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: alok.a.tiwari@oracle.com
-Subject: [PATCH net] bnxt_en: correct offset handling for IPv6 destination address
-Date: Sat, 20 Sep 2025 05:11:17 -0700
-Message-ID: <20250920121157.351921-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1758370878; c=relaxed/simple;
+	bh=NVkdqho2RdfTtEnWss8fjPZFDr1k2Eqt+Ul7r1LYIuk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=BQ8aa5ML8XW8VEB+WCy/tRF2Y7oOoDoA2E3IvI5f4rF+wrLZq0h35FTwp36RyW59aFkolxdaB+lFTOUWXpQosJops5HgCSr5KQe2I/DQqUmAJvseAOesVHB5Eu0TAzEmgyeN3KyNkMivK8Mam4gBymnTibbZiKJCS55NMGwFy6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q/JB0FbB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB0FFC4CEEB;
+	Sat, 20 Sep 2025 12:21:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758370876;
+	bh=NVkdqho2RdfTtEnWss8fjPZFDr1k2Eqt+Ul7r1LYIuk=;
+	h=From:Subject:Date:To:Cc:From;
+	b=q/JB0FbBMl4rB04+QGbeN8J4+rpknWk6BuHkq9rFseP8jSMo/5S1Od2sjkKni4dL4
+	 KUopOuyc7VpDlvBZkBUeJZREtGeMzsYCIxUQ8a0IaLiiLhw1g64PQV5/vDHlvZBetJ
+	 VC0fi0HFghH3uzqVmZwnreqeNdElcvH4+kseI1zBNnUwBpjb24NIo2hY98Pq9YQJ7f
+	 uKsj4eRAWfd5iQmcV+DqMcKqvB5tBrQnfuXYQiDznLyL50q5QlJPsTU664c1dEiB7n
+	 yqQe/lK01oiNl+c0+l88NAyMKK+adcDfaxpqhwKuYP3vUiMy529F5Zp7S1oO3o0fZV
+	 dfAfalQxKCstQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH RFC bpf-next 0/6] Add the the capability to load HW RX
+ checsum in eBPF programs
+Date: Sat, 20 Sep 2025 14:20:26 +0200
+Message-Id: <20250920-xdp-meta-rxcksum-v1-0-35e76a8a84e7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-20_04,2025-09-19_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0
- mlxlogscore=999 suspectscore=0 phishscore=0 adultscore=0 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2508110000 definitions=main-2509200117
-X-Proofpoint-ORIG-GUID: WVrKJcqwdDKwp1qrGhGaU-Yc8EGlMqOI
-X-Proofpoint-GUID: WVrKJcqwdDKwp1qrGhGaU-Yc8EGlMqOI
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDAyOSBTYWx0ZWRfX8qF/K+KaBp0n
- PHQ+G9U96iHvvaVS3Ss6ewx4s/h03Xz49TbUYqBB8ScjJFvbAcP3wAMEF/Gf3To5lkNkewxMIi3
- gRH5C/61gvlYGPO3fnwZyG919MirTCAtm2ub9XVsBsKvPPQKfn1w6N/zf+OfaGMjzFG3xS+666x
- zAFZvpEprro2wb0qU9BdGJ7ANj0mUVTKYEbWYVAVfFRyCSjx6ya4JrIiuIe7Evk3iMt+jusaSpN
- wQQXT/NJXsQkbtxiKLz1L1Whm/thxIYa4htg8glAYJdSlRa1qvbW+YbMLa1yWMuWzHuXyO/jsLS
- qmqwRXRwFImXVvNiDt0hSqP6qlRUiW5zuCNFWwFH1wqq7UFgKchszEypZTJydWRq2VTQ2xYmSnF
- y4xzWdgph8HVR4Zflx24ORimYMI1Tw==
-X-Authority-Analysis: v=2.4 cv=Vfv3PEp9 c=1 sm=1 tr=0 ts=68ce9a11 b=1 cx=c_pps
- a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=IWR3VieDtcVXowqGW5gA:9 cc=ntf
- awl=host:13614
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAqczmgC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDS0NT3YqUAt3c1JJE3aKK5Ozi0lxdSzPj5CTjRHNL41RzJaC2gqLUtMw
+ KsJHRSkFuzgpJBWm6eakVJUqxtbUAj3v4u3AAAAA=
+X-Change-ID: 20250915-xdp-meta-rxcksum-963cb3a793e7
+To: Donald Hunter <donald.hunter@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+ intel-wired-lan@lists.osuosl.org, linux-kselftest@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-In bnxt_tc_parse_pedit(), the code incorrectly writes IPv6
-destination values to the source address field (saddr) when
-processing pedit offsets within the destination address range.
+Introduce bpf_xdp_metadata_rx_checksum() kfunc in order to load the HW
+RX cheksum results in the eBPF program binded to the NIC.
+Implement xmo_rx_checksum callback for veth and ice drivers.
 
-This patch corrects the assignment to use daddr instead of saddr,
-ensuring that pedit operations on IPv6 destination addresses are
-applied correctly.
-
-Fixes: 9b9eb518e338 ("bnxt_en: Add support for NAT(L3/L4 rewrite)")
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Lorenzo Bianconi (6):
+      netlink: specs: Add XDP RX checksum capability to XDP metadata specs
+      net: xdp: Add xmo_rx_checksum callback
+      veth: Add xmo_rx_checksum callback to veth driver
+      net: ice: Add xmo_rx_checksum callback
+      selftests/bpf: Add selftest support for bpf_xdp_metadata_rx_checksum
+      selftests/bpf: Add bpf_xdp_metadata_rx_checksum support to xdp_hw_metadat prog
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
-index d72fd248f3aa..2d66bf59cd64 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
-@@ -244,7 +244,7 @@ bnxt_tc_parse_pedit(struct bnxt *bp, struct bnxt_tc_actions *actions,
- 			   offset < offset_of_ip6_daddr + 16) {
- 			actions->nat.src_xlate = false;
- 			idx = (offset - offset_of_ip6_daddr) / 4;
--			actions->nat.l3.ipv6.saddr.s6_addr32[idx] = htonl(val);
-+			actions->nat.l3.ipv6.daddr.s6_addr32[idx] = htonl(val);
- 		} else {
- 			netdev_err(bp->dev,
- 				   "%s: IPv6_hdr: Invalid pedit field\n",
+ Documentation/netlink/specs/netdev.yaml            |  5 ++
+ drivers/net/ethernet/intel/ice/ice_base.c          |  1 +
+ drivers/net/ethernet/intel/ice/ice_txrx.h          |  1 +
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c      | 82 ++++++++++++++++++++++
+ drivers/net/veth.c                                 | 19 +++++
+ include/net/xdp.h                                  |  6 ++
+ net/core/xdp.c                                     | 29 ++++++++
+ .../selftests/bpf/prog_tests/xdp_metadata.c        |  7 ++
+ .../testing/selftests/bpf/progs/xdp_hw_metadata.c  |  7 ++
+ tools/testing/selftests/bpf/progs/xdp_metadata.c   |  1 +
+ tools/testing/selftests/bpf/xdp_hw_metadata.c      | 27 +++++++
+ tools/testing/selftests/bpf/xdp_metadata.h         | 13 ++++
+ 12 files changed, 198 insertions(+)
+---
+base-commit: 315f423be0d1ebe720d8fd4fa6bed68586b13d34
+change-id: 20250915-xdp-meta-rxcksum-963cb3a793e7
+
+Best regards,
 -- 
-2.50.1
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
