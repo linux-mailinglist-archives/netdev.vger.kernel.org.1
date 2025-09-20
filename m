@@ -1,95 +1,161 @@
-Return-Path: <netdev+bounces-224957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65605B8BF39
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 06:37:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7CBBB8BF69
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 06:52:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC6ED7AD504
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 04:35:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F045C5859DC
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 04:52:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91692264B2;
-	Sat, 20 Sep 2025 04:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5473922A7E6;
+	Sat, 20 Sep 2025 04:52:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZlqidWoJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 267ED1DD525
-	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 04:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96ED4A21
+	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 04:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758343028; cv=none; b=Cj7L3talTmGigm8tPdUeKTn7duz/SXTFWdriaSAwtZyfTiVo9munhzaDTO0wEeiqp1c8VzEYK/mXoqiEkzlpiugVCfzrWJ7g1aSHNzHysfg1bOvI401yiwvLfzqwrYJbtEPZL7j6npUry12I7qowD1nUjBYtQJmm7KFkJxE0t+A=
+	t=1758343925; cv=none; b=VtiRN3G5Fhq0wWkKHMT1PRsSXWj6UcY4oDmwONkmj2YP5VmpFzg1jOh4AKshlAK6+wuCt5MV391rq9lq8hLzhqlstATZ3AJePQZUaSrW1ajK1iaRFJozVLqpIOvHR7dB1iR4FFswZu9LfmwqovtHo0E7h8zjmI0ClahYLoe3YPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758343028; c=relaxed/simple;
-	bh=eLZJJ4b5Hv13WnuF/je/2Gc/GJOLCP6cLSLyncvNLdA=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=H7BjjeyxdmsP7H2oJhnGh5ab0F/7/rO4DJaHemkwKfDBa/DV4a0J0Coa3Jb0wtd1lTZDSLOTCJhcsMcRaQ/MgvAvKt7j3g1fRkPDy/x1EjXNXyqy5br5K/nUgVXntpzqFr8iJoHe3ana0atmZK/kulFkqoHJhds3hbhfHXFun60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-42404bb4284so37161715ab.0
-        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 21:37:07 -0700 (PDT)
+	s=arc-20240116; t=1758343925; c=relaxed/simple;
+	bh=WN7syAcJjhlULwaP/4Xo2Ytf7vzgMmwSdXXWwuslg+0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=agF3GEjNOzhzmPY+OxVLHVzPoZouA1F7T5YAhnEiZHZXFiAYDOnJCvdp1suhK4bf8LmtHXewhDzkKGpN5Ts5w+SVQyaS/fI/nHo/vA37b025uJhSVv/MjltGwL0DXCjUS8LbvNQsPebzJZM1xvK3F7Px15NC/Y4wVmDyqch6qdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZlqidWoJ; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-26f0c5455e2so4021055ad.3
+        for <netdev@vger.kernel.org>; Fri, 19 Sep 2025 21:52:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758343922; x=1758948722; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Scl7/ytKRP3iThro/p3ZtlDfxCKkscpWY86iDRO/ZlI=;
+        b=ZlqidWoJxcuGcXuL+gL3esrYW5tFo0na9AOpSXNtgWfb0Yg25iqsEb5Jq8piV6ETFl
+         knxi66pdlQemc/VjpAd3oGfllBjxluoQ4Jt9Tm3UW6J4zV1ca3vxs8RLR9WPVvbAISw2
+         ALJZ+7rhchg7gsH+iS5Rcd15JvwCWtFjqLiqBc8MwdKNAy+9r/utQCPP9qMmqgQQ0DFN
+         FZiQqs6c/OCB89jpAgwHHdSw9al3/7v8Ul2pWHSsQGQMwzhIzrl48yk9mdE6NP7m/2Pw
+         t+w98GteU2EQyblAd7QzeH8lr4F3xhelYpITYPPZv2gO1A3iWHGQ7Yp5bzJ1k2oisO6o
+         xc7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758343026; x=1758947826;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gja0G+YNMT4nfkxekGzUizab20nltKnqLeo3HZHwrLU=;
-        b=DWa6nbL7TmNswXTiZrOwMOp3fEwDbUz5B14DylLheuI07up+2HUlZX0xxXCqkWb58i
-         Pa/g5Ko6Lbk86m2ujaoX4CuZ51o41ZuUwKiVePeW0/YndQNIRAKXy3tqaqTC4MT4WJts
-         jEIegU2P4ugaLgcskrbZrhw9rgkl1smewTzaTu9zCH84kkRfoSSOIO+BbRZjAqiLM7Zx
-         C028fOQLaLHZ8bNxT+7igFEunWRdt3PNz/0M8PEPEinqRwsFGfb78pB8guyj0AAyrOrT
-         leo4JzEqyyMW01FwX5SNe3BtTSZpegq3qxwX8DIQr8Zq9IWdUdm3TzoCBzzDdXNPvtb2
-         SCZA==
-X-Forwarded-Encrypted: i=1; AJvYcCW43f1Qr0NVGnUEwH/xmTqnnn6PKUbYpxIcBxoOjWgBbXXDPzVn5K1wUsMYExAMFKqz/ACmsYY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNwAB+0gfZ3fn0whJnDMeuHVhxIl1KsENVjCd9jY3MHZgAFnJ5
-	24HbIsGh87rZKWyCiiq7hGMkekwqbbpkfoeOtKLRiYkLx/LxBI2tnSZI1sI1IYdOdsskCRopRc7
-	cPr2N2E4+hZ/ib+36N0gpI0QEvl5n4NrAs+oUS8JZOk8A9e00gum1LAIJKCI=
-X-Google-Smtp-Source: AGHT+IEboJPHmu/GmGIV1HX2yNQ77XkVwCngjKU9vicDDz+MZ7u0oRXuv26/XZA4q8RUdEr6/vmWleC4YNydH6JYZXyh1b78jOd3
+        d=1e100.net; s=20230601; t=1758343922; x=1758948722;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Scl7/ytKRP3iThro/p3ZtlDfxCKkscpWY86iDRO/ZlI=;
+        b=lNOrbccpWjWJtcknkmnm7W9qeUgvXK7ISL9kMf+GvqxWEbTGx+ozTU2W6rKVHHadf2
+         pdaxD6WM+E6FuPj4Z1lQjUfvChqXIXrs+EMXDvq7LRYiFW9cGs08HItEYT9TJixkcVR5
+         spvnMqwiZ9z1H2zmFsvcio41gnaaVZhl5SKAs7oyV5yVxACdCC3uP+sYjPwkCJn9O4up
+         2s0Nmh88UQrHLfq3Dl9D1QpS3QFuK58PhNvsntz6pznT/nFsYbu8xXwgIvtbHqyh/ypn
+         oRawvl2Zl4+ChcJzTHXj7dEnStkDpFfvnWr7TrMQun8/TEgM7bCjtI2U5WYqM0tik8we
+         x21A==
+X-Forwarded-Encrypted: i=1; AJvYcCUcRG90MqHh8fv4HKWhka7uwFx/5tLav71G6EdbRKPud/8fYURgyOQePCCpQutvfr7rGB5wSUU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4iFzel25GdzjvxREl5qUBN+VUXOEQs1oJeNolzH7ilM+51tSL
+	B5exCHyArG/gRHCso7tSwcES36l2tTc36UVV0bo4vNRGUvrLw9O/DFUI
+X-Gm-Gg: ASbGncvwaoZh3V+nR6DG1GSgQvEvNDhTxGjAZsoGohqaoJ5jX8ijt/nzcV1C8GoHR75
+	7lNzlz3w5Xe+ay+Wx/KPr5hjiH0/OZTUKUT5aswYm1TKBfrLeKOpxUMIbWz5ewl9IJMr9A64BrR
+	d8gByRkYMGIdaA4ig6xlbZLlxemTcc1SnIHQ5FiR45+fYxL+hyic1SAJSr0oERjktWwwlsh1tRo
+	tcWGAGNwAoFGeohWDwHL3BeHEcGfsqEAcQ8oBhwiF3F2FdQx6RAsCDb7cMOyVFly2Ed61SwgbG/
+	aWqJ+xhubS1VskSiwXmd2NDsWncH1D4EE+/HvAKXsNWErjKFZ/OZRJZamw/RT0NDz8DiIQz6jRA
+	xJPImNBIKMzJDKPXJUZPQOQxa/hJQ5ohy398/3jZIWmfG1QkPz7Uy5YQTyIiXIyj1mnEuiN/ES3
+	aJQBdNAe+FFleSJg==
+X-Google-Smtp-Source: AGHT+IGlDL3meUrjWPh8XY00Z7lI+5NCXfWA95NkUgQ/36jV2EnYS75qSm19Zq3LWRDvSpHOtmoG2A==
+X-Received: by 2002:a17:902:ec8b:b0:266:3813:27c3 with SMTP id d9443c01a7336-269ba441c40mr84447675ad.13.1758343921975;
+        Fri, 19 Sep 2025 21:52:01 -0700 (PDT)
+Received: from debian.domain.name ([223.185.130.103])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-26980368fe3sm69258125ad.151.2025.09.19.21.51.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Sep 2025 21:52:01 -0700 (PDT)
+From: I Viswanath <viswanathiyyappan@gmail.com>
+To: petkan@nucleusys.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linux.dev,
+	david.hunter.linux@gmail.com,
+	I Viswanath <viswanathiyyappan@gmail.com>,
+	syzbot+78cae3f37c62ad092caa@syzkaller.appspotmail.com
+Subject: [PATCH] net: usb: Remove disruptive netif_wake_queue in rtl8150_set_multicast
+Date: Sat, 20 Sep 2025 10:20:59 +0530
+Message-ID: <20250920045059.48400-1-viswanathiyyappan@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1885:b0:424:2d4:585e with SMTP id
- e9e14a558f8ab-424818f920bmr87191575ab.1.1758343026440; Fri, 19 Sep 2025
- 21:37:06 -0700 (PDT)
-Date: Fri, 19 Sep 2025 21:37:06 -0700
-In-Reply-To: <0ca2c567-b311-4f0b-bb29-2b860b75f85e@huawei.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68ce2f72.050a0220.13cd81.000f.GAE@google.com>
-Subject: Re: [syzbot] [smc?] general protection fault in __smc_diag_dump (4)
-From: syzbot <syzbot+f775be4458668f7d220e@syzkaller.appspotmail.com>
-To: alibuda@linux.alibaba.com, davem@davemloft.net, dust.li@linux.alibaba.com, 
-	edumazet@google.com, guwen@linux.alibaba.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-s390@vger.kernel.org, mjambigi@linux.ibm.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sidraya@linux.ibm.com, syzkaller-bugs@googlegroups.com, 
-	tonylu@linux.alibaba.com, wangliang74@huawei.com, wenjia@linux.ibm.com, 
-	yuehaibing@huawei.com, zhangchangzhong@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+syzbot reported WARNING in rtl8150_start_xmit/usb_submit_urb.
+This is a possible sequence of events:
 
-syzbot tried to test the proposed patch but the build/boot failed:
+    CPU0 (in rtl8150_start_xmit)   CPU1 (in rtl8150_start_xmit)    CPU2 (in rtl8150_set_multicast)
+    netif_stop_queue();
+                                                                    netif_stop_queue();
+    usb_submit_urb();
+                                                                    netif_wake_queue();  <-- Wakes up TX queue before it's ready
+                                    netif_stop_queue();
+                                    usb_submit_urb();                                    <-- Warning
+	freeing urb
+	
+Remove netif_wake_queue and corresponding netif_stop_queue in rtl8150_set_multicast to
+prevent this sequence of events
 
-failed to apply patch:
-checking file net/smc/smc.h
-Hunk #1 FAILED at 285.
-1 out of 1 hunk FAILED
+Reported-and-tested-by: syzbot+78cae3f37c62ad092caa@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=78cae3f37c62ad092caa
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: I Viswanath <viswanathiyyappan@gmail.com>
+---
+Relevant logs:
+[   65.779651][ T5648] About to enter stop queue ffff88805061e000, eth4
+[   65.779664][ T5648] After stop queue ffff88805061e000, eth4
+[   65.780296][ T5648] net eth4: eth name:eth4 SUBMIT: tx_urb=ffff888023219000, status=0, transfer_buffer_length=60, dev=ffff88805061ed80, netdev=ffff88805061e000, skb=ffff88804f907b80
+[   65.790962][  T760] About to enter stop queue ffff88805061e000, eth4
+[   65.790978][  T760] After stop queue ffff88805061e000, eth4
+[   65.791874][  T760] net eth4: We are inside Multicast dev:ffff88805061ed80, netdev:ffff88805061e000
+[   65.793259][  T760] About to enter netif_wake_queue ffff88805061e000, eth4
+[   65.793264][  T760] After netif_wake_queue ffff88805061e000, eth4
+[   65.822319][ T5829] About to enter stop queue ffff88805061e000, eth4
+[   65.823135][ T5829] After stop queue ffff88805061e000, eth4
+[   65.823739][ T5829] net eth4: eth name:eth4 SUBMIT: tx_urb=ffff888023219000, status=-115, transfer_buffer_length=90, dev=ffff88805061ed80, netdev=ffff88805061e000, skb=ffff88804b5363c0
 
+ drivers/net/usb/rtl8150.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-
-Tested on:
-
-commit:         cd89d487 Merge tag '6.17-rc6-smb3-client-fixes' of git..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8f01d8629880e620
-dashboard link: https://syzkaller.appspot.com/bug?extid=f775be4458668f7d220e
-compiler:       
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=1381a0e2580000
+diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
+index ddff6f19ff98..92add3daadbb 100644
+--- a/drivers/net/usb/rtl8150.c
++++ b/drivers/net/usb/rtl8150.c
+@@ -664,7 +664,6 @@ static void rtl8150_set_multicast(struct net_device *netdev)
+ 	rtl8150_t *dev = netdev_priv(netdev);
+ 	u16 rx_creg = 0x9e;
+ 
+-	netif_stop_queue(netdev);
+ 	if (netdev->flags & IFF_PROMISC) {
+ 		rx_creg |= 0x0001;
+ 		dev_info(&netdev->dev, "%s: promiscuous mode\n", netdev->name);
+@@ -678,7 +677,6 @@ static void rtl8150_set_multicast(struct net_device *netdev)
+ 		rx_creg &= 0x00fc;
+ 	}
+ 	async_set_registers(dev, RCR, sizeof(rx_creg), rx_creg);
+-	netif_wake_queue(netdev);
+ }
+ 
+ static netdev_tx_t rtl8150_start_xmit(struct sk_buff *skb,
+-- 
+2.47.3
 
 
