@@ -1,317 +1,248 @@
-Return-Path: <netdev+bounces-224973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-224974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 497CBB8C571
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 12:22:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 220CFB8C58F
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 12:26:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62CE217FD7C
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 10:21:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5B7C7E310D
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 10:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB722F7AAD;
-	Sat, 20 Sep 2025 10:21:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B6192C0F7C;
+	Sat, 20 Sep 2025 10:26:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R/7euhNL"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="hy7mnaYW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com [50.112.246.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD542D5C89
-	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 10:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9C11C01
+	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 10:26:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=50.112.246.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758363691; cv=none; b=oXM11hr9YFwBPpQeQDYfhp/+A5wuJFdG9ByLTsPAAUpwM1+f1aT1tIFvEK3zCVZNvZ+yNI8tH48aueUqQHZuM69RBlP8s8hktgSR+qEWqEp8fY7HB8EMNfOx1Ye/3Ci8fLDR0Lcg8WBXmPnppsTsWyv0w1mIWa69/oi9tXUaNjw=
+	t=1758363973; cv=none; b=qZDRBiE5ipyx8ghkGIIL5v1qJ7MUIMnSfkNyRmefLnj/HYetxjn6BTWbpfYOuZBska45QQq+DsVyvqe3Rjn05q89Y8sgNlNjBMH2UuERdmIWgwFR0zVcCPmy9dqRHkXAVyfJSGQ8dvULBJ1ZCRBWKqb7cR5Ht8yk3N1sqfbkWuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758363691; c=relaxed/simple;
-	bh=NeUWLUvwC6kW9VyfKYx42FFXe0IA1wZCOhU/BXYAKwI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oVXwIOiDxC3HjsfhV0Ve68mGullLdlPpyj1hIhgkB+9/BO6hRoTZqnNOYRlv4HMNUYPg7uKEsmHSyyavgWh2BhFdLLW81bjf7cPwtVk5gvtm5DCE/eLWCFmDTS2TCtU9auWVQuLiURMdxkPoy9Xe5QX2KIOC8BSi+UYXP0Ujh0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R/7euhNL; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-45cb6428c46so26826815e9.1
-        for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 03:21:27 -0700 (PDT)
+	s=arc-20240116; t=1758363973; c=relaxed/simple;
+	bh=mijdi/mF8oLWkmvIsW+NzkUJ7lzLj2F9FPiaPcfysns=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fiM8RObJttIo3fAbHj+fO1M1O5vXdBzZs3w9xuZv8tKYjPc+se+mqQcQEWl7MvaC5dnFy9AHj3N3DB1+dW0fzVh7mQ/1JV1ypozepOG7ObRJUFpSVllFJeyEmm4NjW8TqMnA/Hs7C/26+j0xjSvm3usxjIB2v9TLxXQEncBrkYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=hy7mnaYW; arc=none smtp.client-ip=50.112.246.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758363686; x=1758968486; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P0vYXtUQVOuP2mhoWd4ropfz+61/nK8dVG+VKmZf9qg=;
-        b=R/7euhNLFeNlzmaUZ+Phoi0Q88Um1/yPfSkGC3G2sFF8md/oqJcr43+2FV+9UmZ2Dk
-         SUnKvAzbGiMrGaYgJR97ThDsbv3pKQfcEILZgylruuHbwAgK1ibJB3U9tn1aPxbYXcK1
-         MyRhovHH6tj9EMTzJqrblnvCmVfWpPYmKtlRwrM4k2sJZEX5nejonCqSjRQvEZ+qH5zA
-         DZ8wgDnOm8GaSljL3BUhgkod1l54KOPFjRhr/NVlywP8mhfKqtfasB/gPB/yUR4l9gOU
-         cdSyKg0V831oaRBDwypFkfc9dJHAFm8Nx1QoZlRSq09uBR4nwN02T4sdmyv+CMFSoURH
-         KYog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758363686; x=1758968486;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P0vYXtUQVOuP2mhoWd4ropfz+61/nK8dVG+VKmZf9qg=;
-        b=fVdONEV/owgoBBFyeAvXJWCEke2dE9eO5tWjXjnlrjDEcBQN+ZHD40F8GGdW6SipPm
-         hoHuLr67gXzR9/doiIL3Gy4E4Fq1tmr7/3aB08W9r7d567dlNzdyaWVfdxDHy8RtqUJp
-         AKlv14OGBLnym3TiMrJiBQK7+m8bPqbrFrw4Ds+QpkhhEbtP5I9Xg2x8SxCC/dK1dLS7
-         Ro8as0Rh4HLo5wYshpWK032dkI7T3xK5KSMvXN0uZwGIHY0jFZtzW/qQI8GaR4Sp+G29
-         XOA/4m6rGsSPdBQo1DlstWXFFbpzQo0sFK3IzB9cBxvJD6MQpUr5Sb9aE/jvRy7faZwA
-         2+Qw==
-X-Forwarded-Encrypted: i=1; AJvYcCVrL9nSaUI675DxfJh3kfgwL34XebOkbz2tolkZQgrpu0uxYivS1rP6tjxf6DyOrUugIqd7Chk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrW2tGwTAigdMCX+u0L0r339RMMK0nfAPTzEaVsVCf7Sw8wKQu
-	zwQEqlda9Sv/hVekPRwu32BqlLwaV7R6HP8CCBipb+eExDz3l5pZKrkn
-X-Gm-Gg: ASbGncuzy0y3c4DS7kIHW+Tnd05PLp5psT8aH8SQXX+MnrTaSbgk7i39hRCIdRnBNyy
-	MitnwWj8aEp8KZLcbxL0UJEqJ+XJ7tIC4VKQVTfPW0Jv2E+YGxJiSXFG0SNmecy++pau/S/4zR0
-	qMZwyNQTnx+jv7iBPOrDvlLw07eqnyy7TfqB9QZlosXh3iUlnhAfmBKPHvXMHXoHL8eiurtxo6Y
-	MImdH47+/WZ40Tjaxf+pcMV0+B0NQlwyDHzbOLKHIemhTLbQwR+GF/KZRDrfSOjDVaAezFmBiRO
-	lPgtWgQPL1BO67gWUj0imNhkVBFqX8osa1/0CkCM5VrtKpofdVpCwk6oGD1ye0OVJYwzM0vurbN
-	WLH3tpouDH9uz4WowabBbTkDpXo1HehbJr/9hJ4SjfPeV2BT0rmzsPrjgebl5
-X-Google-Smtp-Source: AGHT+IFiz+7GSgFF/mIUUp0ndfipkNQ39jr+2XK+PXUAveDTslyL1Wu67txaLfdop4/qCEdAg/m1vQ==
-X-Received: by 2002:a05:600c:c8f:b0:45f:2919:5e6c with SMTP id 5b1f17b1804b1-467e6f37d8dmr76782405e9.16.1758363685327;
-        Sat, 20 Sep 2025 03:21:25 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3f0e28c83d6sm5624389f8f.56.2025.09.20.03.21.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Sep 2025 03:21:25 -0700 (PDT)
-Date: Sat, 20 Sep 2025 11:21:22 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>
-Cc: linux@armlinux.org.uk, jdike@addtoit.com,
- anton.ivanov@cambridgegreys.com, dave.hansen@linux.intel.com,
- peterz@infradead.org, tglx@linutronix.de, x86@kernel.org, hpa@zytor.com,
- tony.luck@intel.com, qiuxu.zhuo@intel.com, mchehab@kernel.org,
- james.morse@arm.com, rric@kernel.org, harry.wentland@amd.com,
- sunpeng.li@amd.com, alexander.deucher@amd.com, airlied@linux.ie,
- daniel@ffwll.ch, evan.quan@amd.com, james.qian.wang@arm.com,
- liviu.dudau@arm.com, mihail.atanassov@arm.com, brian.starkey@arm.com,
- maarten.lankhorst@linux.intel.com, mripard@kernel.org, tzimmermann@suse.de,
- robdclark@gmail.com, sean@poorly.run, dmitry.torokhov@gmail.com,
- agk@redhat.com, snitzer@redhat.com, dm-devel@redhat.com, rajur@chelsio.com,
- davem@davemloft.net, kuba@kernel.org, peppe.cavallaro@st.com,
- alexandre.torgue@st.com, joabreu@synopsys.com, mcoquelin.stm32@gmail.com,
- malattia@linux.it, hdegoede@redhat.com, mgross@linux.intel.com,
- intel-linux-scu@intel.com, artur.paszkiewicz@intel.com, jejb@linux.ibm.com,
- martin.petersen@oracle.com, sakari.ailus@linux.intel.com,
- gregkh@linuxfoundation.org, dushistov@mail.ru, luc.vanoostenryck@gmail.com,
- rostedt@goodmis.org, pmladek@suse.com, sergey.senozhatsky@gmail.com,
- andriy.shevchenko@linux.intel.com, linux@rasmusvillemoes.dk,
- akpm@linux-foundation.org, kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org,
- pablo@netfilter.org, kadlec@netfilter.org, jmaloy@redhat.com,
- ying.xue@windriver.com, willy@infradead.org, sashal@kernel.org,
- ruanjinjie@huawei.com, David.Laight@ACULAB.COM, herve.codina@bootlin.com,
- Jason@zx2c4.com, bvanassche@acm.org, keescook@chromium.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-um@lists.infradead.org, linux-edac@vger.kernel.org,
- amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
- linux-hwmon@vger.kernel.org, linux-input@vger.kernel.org,
- linux-media@vger.kernel.org, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- platform-driver-x86@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-staging@lists.linux.dev, linux-btrfs@vger.kernel.org,
- linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org,
- linux-mm@kvack.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, tipc-discussion@lists.sourceforge.net,
- stable@vger.kernel.org, jonnyc@amazon.com
-Subject: Re: [PATCH 00/27 5.10.y] Backport minmax.h updates from v6.17-rc6
-Message-ID: <20250920111904.6d9ecb17@pumpkin>
-In-Reply-To: <184ce83f-0063-43a0-a1c8-da23c5d03cf7@amd.com>
-References: <20250919101727.16152-1-farbere@amazon.com>
-	<184ce83f-0063-43a0-a1c8-da23c5d03cf7@amd.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1758363971; x=1789899971;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=knD2vTAhYXA0DHubOn/ynefHYQCzxEdsDy0wiqwzcDg=;
+  b=hy7mnaYWOepuZ2L8sV4AUkdaOY4cEWVEoJxM7RjGonMCrvGjgFs27ZYL
+   teqCYIMS1O7P6NLpr+rjOrmLj6/1uYRgaC5Krc35/T/8p8+iT+hGmw0Fn
+   +5Sxwv4Cq2IPPplmNOt3OrDCG5h362ltfInZx34O6suZ2UyfNVpxZSxwz
+   1FjXtyzETa2wXQMJ852gsOZA5OXupYAwIu8N4qOShXdmmKIVSfhcdKEHx
+   69exENzT/QrhB4ACeSndgfR+Ccy5D+ZRhwwWWazFL1jelQ/uLll68v4Si
+   LUkoM3rN4juqAAUqNM9Tq2rwcZ7dgtjzFZAi6Kq4TPtlTnKeSeSVNud/e
+   g==;
+X-CSE-ConnectionGUID: fJsWJPI0S5qGRcsNQ2BoNQ==
+X-CSE-MsgGUID: DK/7IMlVTPSeXUZruKOygg==
+X-IronPort-AV: E=Sophos;i="6.18,280,1751241600"; 
+   d="scan'208";a="3219376"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2025 10:26:08 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:49812]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.48.21:2525] with esmtp (Farcaster)
+ id fe22b937-d4df-40f1-843b-8e3886047745; Sat, 20 Sep 2025 10:26:08 +0000 (UTC)
+X-Farcaster-Flow-ID: fe22b937-d4df-40f1-843b-8e3886047745
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Sat, 20 Sep 2025 10:26:08 +0000
+Received: from b0be8375a521.amazon.com (10.37.245.10) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Sat, 20 Sep 2025 10:26:05 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<aleksandr.loktionov@intel.com>, <kohei.enju@gmail.com>, Kohei Enju
+	<enjuk@amazon.com>
+Subject: [PATCH iwl-next v4] ixgbe: preserve RSS indirection table across admin down/up
+Date: Sat, 20 Sep 2025 19:25:45 +0900
+Message-ID: <20250920102546.78338-1-enjuk@amazon.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWC002.ant.amazon.com (10.13.139.212) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On Fri, 19 Sep 2025 14:11:37 +0200
-Christian K=C3=B6nig <christian.koenig@amd.com> wrote:
+Currently, the RSS indirection table configured by user via ethtool is
+reinitialized to default values during interface resets (e.g., admin
+down/up, MTU change). As for RSS hash key, commit 3dfbfc7ebb95 ("ixgbe:
+Check for RSS key before setting value") made it persistent across
+interface resets.
 
-> On 19.09.25 12:17, Eliav Farber wrote:
-> > This series includes a total of 27 patches, to align minmax.h of
-> > v5.15.y with v6.17-rc6.
-> >=20
-> > The set consists of 24 commits that directly update minmax.h:
-> > 1) 92d23c6e9415 ("overflow, tracing: Define the is_signed_type() macro
-> >    once")
-> > 2) 5efcecd9a3b1 ("minmax: sanity check constant bounds when clamping")
-> > 3) 2122e2a4efc2 ("minmax: clamp more efficiently by avoiding extra
-> >    comparison")
-> > 4) f9bff0e31881 ("minmax: add in_range() macro")
-> > 5) c952c748c7a9 ("minmax: Introduce {min,max}_array()")
-> > 6) 5e57418a2031 ("minmax: deduplicate __unconst_integer_typeof()")
-> > 7) f6e9d38f8eb0 ("minmax: fix header inclusions")
-> > 8) d03eba99f5bf ("minmax: allow min()/max()/clamp() if the arguments
-> >    have the same signedness.")
-> > 9) f4b84b2ff851 ("minmax: fix indentation of __cmp_once() and
-> >    __clamp_once()")
-> > 10) 4ead534fba42 ("minmax: allow comparisons of 'int' against 'unsigned
-> >     char/short'")
-> > 11) 867046cc7027 ("minmax: relax check to allow comparison between
-> >     unsigned arguments and signed constants")
-> > 12) 3a7e02c040b1 ("minmax: avoid overly complicated constant
-> >     expressions in VM code")
-> > 14) 017fa3e89187 ("minmax: simplify and clarify min_t()/max_t()
-> >     implementation")
-> > 15) 1a251f52cfdc ("minmax: make generic MIN() and MAX() macros
-> >     available everywhere")
-> > 18) dc1c8034e31b ("minmax: simplify min()/max()/clamp()
-> >     implementation")
-> > 19) 22f546873149 ("minmax: improve macro expansion and type
-> >     checking")
-> > 20) 21b136cc63d2 ("minmax: fix up min3() and max3() too")
-> > 21) 71ee9b16251e ("minmax.h: add whitespace around operators and after
-> >     commas")
-> > 22) 10666e992048 ("minmax.h: update some comments")
-> > 23) b280bb27a9f7 ("minmax.h: reduce the #define expansion of min(),
-> >     max() and clamp()")
-> > 24) a5743f32baec ("minmax.h: use BUILD_BUG_ON_MSG() for the lo < hi
-> >     test in clamp()")
-> > 25) c3939872ee4a ("minmax.h: move all the clamp() definitions after the
-> >     min/max() ones")
-> > 26) 495bba17cdf9 ("minmax.h: simplify the variants of clamp()")
-> > 27) 2b97aaf74ed5 ("minmax.h: remove some #defines that are only
-> >     expanded once")
-> >=20
-> > 2 prerequisite commits that adjust users of MIN and MAX macros (to
-> > prevent compilation issues):
-> > 13) 4477b39c32fd ("minmax: add a few more MIN_T/MAX_T users")
-> > 17) cb04e8b1d2f2 ("minmax: don't use max() in situations that want a C
-> >     constant expression")
-> >=20
-> > 1 additional commit introduced to resolve a build failures during the
-> > backport:
-> > 16) lib: zstd: drop local MIN/MAX macros in favor of generic ones
-> >=20
-> > The primary motivation is to bring in commit (8).
-> > In mainline, this change allows min()/max()/clamp() to accept mixed
-> > argument types when both share the same signedness.
-> > Backported patches to v5.10.y that use such forms trigger compiler
-> > warnings, which in turn cause build failures when -Werror is enabled.
-> >=20
-> > Originaly I aligned 5.10.y to 5.15.y, but David Laight commented that I
-> > need to pick up the later changes (from Linus) as well.
-> >=20
-> > Andy Shevchenko (2):
-> >   minmax: deduplicate __unconst_integer_typeof()
-> >   minmax: fix header inclusions
-> >=20
-> > Bart Van Assche (1):
-> >   overflow, tracing: Define the is_signed_type() macro once
-> >=20
-> > David Laight (11):
-> >   minmax: allow min()/max()/clamp() if the arguments have the same
-> >     signedness.
-> >   minmax: fix indentation of __cmp_once() and __clamp_once()
-> >   minmax: allow comparisons of 'int' against 'unsigned char/short'
-> >   minmax: relax check to allow comparison between unsigned arguments and
-> >     signed constants
-> >   minmax.h: add whitespace around operators and after commas
-> >   minmax.h: update some comments
-> >   minmax.h: reduce the #define expansion of min(), max() and clamp()
-> >   minmax.h: use BUILD_BUG_ON_MSG() for the lo < hi test in clamp()
-> >   minmax.h: move all the clamp() definitions after the min/max() ones
-> >   minmax.h: simplify the variants of clamp()
-> >   minmax.h: remove some #defines that are only expanded once
-> >=20
-> > Eliav Farber (1):
-> >   lib: zstd: drop local MIN/MAX macros in favor of generic ones
-> >=20
-> > Herve Codina (1):
-> >   minmax: Introduce {min,max}_array()
-> >=20
-> > Jason A. Donenfeld (2):
-> >   minmax: sanity check constant bounds when clamping
-> >   minmax: clamp more efficiently by avoiding extra comparison
-> >=20
-> > Linus Torvalds (8):
-> >   minmax: avoid overly complicated constant expressions in VM code
-> >   minmax: add a few more MIN_T/MAX_T users
-> >   minmax: simplify and clarify min_t()/max_t() implementation
-> >   minmax: make generic MIN() and MAX() macros available everywhere
-> >   minmax: don't use max() in situations that want a C constant
-> >     expression
-> >   minmax: simplify min()/max()/clamp() implementation
-> >   minmax: improve macro expansion and type checking
-> >   minmax: fix up min3() and max3() too
-> >=20
-> > Matthew Wilcox (Oracle) (1):
-> >   minmax: add in_range() macro
-> >=20
-> >  arch/arm/mm/pageattr.c                        |   6 +-
-> >  arch/um/drivers/mconsole_user.c               |   2 +
-> >  arch/x86/mm/pgtable.c                         |   2 +- =20
->=20
-> >  drivers/edac/sb_edac.c                        |   4 +-
-> >  drivers/edac/skx_common.h                     |   1 -
-> >  .../drm/amd/display/modules/hdcp/hdcp_ddc.c   |   2 +
-> >  .../drm/amd/pm/powerplay/hwmgr/ppevvmath.h    |  14 +-
-> >  .../drm/arm/display/include/malidp_utils.h    |   2 +-
-> >  .../display/komeda/komeda_pipeline_state.c    |  24 +-
-> >  drivers/gpu/drm/drm_color_mgmt.c              |   2 +-
-> >  drivers/gpu/drm/msm/adreno/a6xx_gmu.c         |   6 -
-> >  drivers/gpu/drm/radeon/evergreen_cs.c         |   2 +
-> >  drivers/hwmon/adt7475.c                       |  24 +-
-> >  drivers/input/touchscreen/cyttsp4_core.c      |   2 +-
-> >  drivers/md/dm-integrity.c                     |   2 +-
-> >  drivers/media/dvb-frontends/stv0367_priv.h    |   3 +
-> >  .../net/ethernet/chelsio/cxgb3/cxgb3_main.c   |  18 +-
-> >  .../net/ethernet/stmicro/stmmac/stmmac_main.c |   2 +-
-> >  drivers/net/fjes/fjes_main.c                  |   4 +-
-> >  drivers/nfc/pn544/i2c.c                       |   2 -
-> >  drivers/platform/x86/sony-laptop.c            |   1 -
-> >  drivers/scsi/isci/init.c                      |   6 +- =20
->=20
-> I do see the value to backport the infrastructure, but why are driver spe=
-cific changes backported as well?
+Adopt the same approach used in igc and igb drivers which reinitializes
+the RSS indirection table only when the queue count changes. Since the
+number of RETA entries can also change in ixgbe, let's make user
+configuration persistent as long as both queue count and the number of
+RETA entries remain unchanged.
 
-They will be about removing local definitions of MIN() and MAX() freeing
-them up for simple implementations (usable as constant initialisers) and th=
-en
-using them in places where the compound statements in min() and max() can't
-be used.
+Tested on Intel Corporation 82599ES 10-Gigabit SFI/SFP+ Network
+Connection.
 
-Linus did all those changes - so he didn't have to wait for the maintainers
-to apply the changes (etc).
+Test:
+Set custom indirection table and check the value after interface down/up
 
-	David
-=20
->=20
-> I mean the changes are most likely correct but also not valuable in anywa=
-y as bug fix.
->=20
-> Regards,
-> Christian.
->=20
-> >  .../pci/hive_isp_css_include/math_support.h   |   5 -
-> >  fs/btrfs/misc.h                               |   2 -
-> >  fs/btrfs/tree-checker.c                       |   2 +-
-> >  fs/ext2/balloc.c                              |   2 -
-> >  fs/ext4/ext4.h                                |   2 -
-> >  fs/ufs/util.h                                 |   6 -
-> >  include/linux/compiler.h                      |  15 +
-> >  include/linux/minmax.h                        | 267 ++++++++++++++----
-> >  include/linux/overflow.h                      |   1 -
-> >  include/linux/trace_events.h                  |   2 -
-> >  kernel/trace/preemptirq_delay_test.c          |   2 -
-> >  lib/btree.c                                   |   1 -
-> >  lib/decompress_unlzma.c                       |   2 +
-> >  lib/logic_pio.c                               |   3 -
-> >  lib/vsprintf.c                                |   2 +-
-> >  lib/zstd/zstd_internal.h                      |   2 -
-> >  mm/zsmalloc.c                                 |   1 -
-> >  net/ipv4/proc.c                               |   2 +-
-> >  net/ipv6/proc.c                               |   2 +-
-> >  net/netfilter/nf_nat_core.c                   |   6 +-
-> >  net/tipc/core.h                               |   2 +-
-> >  net/tipc/link.c                               |  10 +-
-> >  44 files changed, 306 insertions(+), 164 deletions(-)
-> >  =20
->=20
->=20
+  # ethtool --set-rxfh-indir ens5 equal 2
+  # ethtool --show-rxfh-indir ens5 | head -5
+
+  RX flow hash indirection table for ens5 with 12 RX ring(s):
+      0:      0     1     0     1     0     1     0     1
+      8:      0     1     0     1     0     1     0     1
+     16:      0     1     0     1     0     1     0     1
+  # ip link set dev ens5 down && ip link set dev ens5 up
+
+Without patch:
+  # ethtool --show-rxfh-indir ens5 | head -5
+
+  RX flow hash indirection table for ens5 with 12 RX ring(s):
+      0:      0     1     2     3     4     5     6     7
+      8:      8     9    10    11     0     1     2     3
+     16:      4     5     6     7     8     9    10    11
+
+With patch:
+  # ethtool --show-rxfh-indir ens5 | head -5
+
+  RX flow hash indirection table for ens5 with 12 RX ring(s):
+      0:      0     1     0     1     0     1     0     1
+      8:      0     1     0     1     0     1     0     1
+     16:      0     1     0     1     0     1     0     1
+
+Signed-off-by: Kohei Enju <enjuk@amazon.com>
+---
+Changes:
+v3->v4:
+  - ensure rss_i is non-zero to avoid zero-division
+v2->v3: https://lore.kernel.org/intel-wired-lan/20250902121203.12454-1-enjuk@amazon.com/
+  - s/last_rss_i/last_rss_indices/ for clarity
+  - use modulo instead of top-of-loop equality test
+  - use ixgbe_rss_indir_tbl_entries() instead of magic number
+v1->v2: https://lore.kernel.org/intel-wired-lan/20250828160134.81286-1-enjuk@amazon.com/
+  - remove pointless memset() in  ixgbe_setup_reta()
+  - add check for reta_entries in addition to rss_i
+  - update the commit message to reflect the additional check
+v1: https://lore.kernel.org/intel-wired-lan/20250824112037.32692-1-enjuk@amazon.com/
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  2 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 45 +++++++++++++------
+ 2 files changed, 33 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+index 14d275270123..3553bf659d42 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+@@ -838,6 +838,8 @@ struct ixgbe_adapter {
+  */
+ #define IXGBE_MAX_RETA_ENTRIES 512
+ 	u8 rss_indir_tbl[IXGBE_MAX_RETA_ENTRIES];
++	u32 last_reta_entries;
++	u16 last_rss_indices;
+ 
+ #define IXGBE_RSS_KEY_SIZE     40  /* size of RSS Hash Key in bytes */
+ 	u32 *rss_key;
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index 3190ce7e44c7..90d1979e3c36 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -4309,9 +4309,9 @@ static void ixgbe_store_vfreta(struct ixgbe_adapter *adapter)
+ 
+ static void ixgbe_setup_reta(struct ixgbe_adapter *adapter)
+ {
+-	u32 i, j;
+ 	u32 reta_entries = ixgbe_rss_indir_tbl_entries(adapter);
+ 	u16 rss_i = adapter->ring_feature[RING_F_RSS].indices;
++	u32 i;
+ 
+ 	/* Program table for at least 4 queues w/ SR-IOV so that VFs can
+ 	 * make full use of any rings they may have.  We will use the
+@@ -4323,14 +4323,21 @@ static void ixgbe_setup_reta(struct ixgbe_adapter *adapter)
+ 	/* Fill out hash function seeds */
+ 	ixgbe_store_key(adapter);
+ 
+-	/* Fill out redirection table */
+-	memset(adapter->rss_indir_tbl, 0, sizeof(adapter->rss_indir_tbl));
++	/* Ensure rss_i is non-zero to avoid division by zero */
++	if (!rss_i)
++		rss_i = 1;
+ 
+-	for (i = 0, j = 0; i < reta_entries; i++, j++) {
+-		if (j == rss_i)
+-			j = 0;
++	/* Update redirection table in memory on first init, queue count change,
++	 * or reta entries change, otherwise preserve user configurations. Then
++	 * always write to hardware.
++	 */
++	if (adapter->last_rss_indices != rss_i ||
++	    adapter->last_reta_entries != reta_entries) {
++		for (i = 0; i < reta_entries; i++)
++			adapter->rss_indir_tbl[i] = i % rss_i;
+ 
+-		adapter->rss_indir_tbl[i] = j;
++		adapter->last_rss_indices = rss_i;
++		adapter->last_reta_entries = reta_entries;
+ 	}
+ 
+ 	ixgbe_store_reta(adapter);
+@@ -4338,9 +4345,10 @@ static void ixgbe_setup_reta(struct ixgbe_adapter *adapter)
+ 
+ static void ixgbe_setup_vfreta(struct ixgbe_adapter *adapter)
+ {
+-	struct ixgbe_hw *hw = &adapter->hw;
++	u32 reta_entries = ixgbe_rss_indir_tbl_entries(adapter);
+ 	u16 rss_i = adapter->ring_feature[RING_F_RSS].indices;
+-	int i, j;
++	struct ixgbe_hw *hw = &adapter->hw;
++	int i;
+ 
+ 	/* Fill out hash function seeds */
+ 	for (i = 0; i < 10; i++) {
+@@ -4352,12 +4360,21 @@ static void ixgbe_setup_vfreta(struct ixgbe_adapter *adapter)
+ 					*(adapter->rss_key + i));
+ 	}
+ 
+-	/* Fill out the redirection table */
+-	for (i = 0, j = 0; i < 64; i++, j++) {
+-		if (j == rss_i)
+-			j = 0;
++	/* Ensure rss_i is non-zero to avoid division by zero */
++	if (!rss_i)
++		rss_i = 1;
++
++	/* Update redirection table in memory on first init, queue count change,
++	 * or reta entries change, otherwise preserve user configurations. Then
++	 * always write to hardware.
++	 */
++	if (adapter->last_rss_indices != rss_i ||
++	    adapter->last_reta_entries != reta_entries) {
++		for (i = 0; i < reta_entries; i++)
++			adapter->rss_indir_tbl[i] = i % rss_i;
+ 
+-		adapter->rss_indir_tbl[i] = j;
++		adapter->last_rss_indices = rss_i;
++		adapter->last_reta_entries = reta_entries;
+ 	}
+ 
+ 	ixgbe_store_vfreta(adapter);
+-- 
+2.51.0
 
 
