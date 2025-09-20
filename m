@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-225012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B752B8D19C
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 23:33:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3737BB8D19F
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 23:34:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAEB97C1FA8
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 21:33:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E06B37C1F75
+	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 21:34:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66310285069;
-	Sat, 20 Sep 2025 21:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0636D27B320;
+	Sat, 20 Sep 2025 21:34:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hn+2pUEk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f7AawVBv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869A328313A
-	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 21:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3B92749C7
+	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 21:34:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758404002; cv=none; b=Z1yVMJbcmkwQSE/EYNMgfF/DQzpfO5tEIiKsBKRtrNbDOMxZ7fLRo4JFG0vezCf9WR+WflYfL4G+fq1hEA/FxWUdzaFvdUkgARR+awQ+Y39nhLDbdBbnoP2TsxMH3MMPIDSF+NQjfKNbZOiNljZZGz+Il+ag4EaQ/pp/Z/xL1FQ=
+	t=1758404053; cv=none; b=S/41WYUPji1wC+GWRuXi37hgmpWaThUP8gNljtZC9HPXX5phq/xEaNJyDJ3nfgKIc4vCYU685kMXJd6E0pRPgce8Pa8KTV1tuJs8NVlPuGKzRAmgIVVjE6u5XHu8Zyi9ezBixlOWIBnZTmcW1SDIQ97Ugvk3TdFEkz5rfwWcwhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758404002; c=relaxed/simple;
-	bh=ivzawLq+7cBUcJerwkS2Y1R9E4Y0QGQK/JI8cNgvv8k=;
+	s=arc-20240116; t=1758404053; c=relaxed/simple;
+	bh=XYj9MZfsulWE92LraNOhmKOKvv43pfo7IEftxw4of5c=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=fqObdrl1Nc2HNsO6vsRpD8rKdC70Q8QH76I6liuvDoUf37gtpEdg13QIRFHP8pGtwyxMEE2y9VZgVZYIZaFbanJ0TpZ/dzmFhxJ/sgGxht5oHDFj7E4ac0j3bDT8WCCEFKE2u9g2Jra1jYWrhNuH7UzJ4dRl6QV8wvJvZPyGrSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hn+2pUEk; arc=none smtp.client-ip=209.85.221.44
+	 In-Reply-To:Content-Type; b=UgzH9kjmB9n2c1+rNL/TZRKUIsMcuLSRoUHOaR27cLT4hqPG+6DoEovuv3j4zEAh8epDbUP7FeLAJBgGYBn/Fu05kW7nIXGgb+XKzW8d3vpGMdyKl9zpQb9N4pxbMRpRjJw6vXQ0H4lxPqHPoSLj7sXRdwk19cXSqGRI2wq2KSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f7AawVBv; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3f2ae6fadb4so1138905f8f.1
-        for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 14:33:20 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-45dd513f4ecso22810945e9.3
+        for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 14:34:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758403999; x=1759008799; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758404050; x=1759008850; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8j4WWqPkFCt4STe5Jmiax3LsKU17rjweqCuHOsE8gLg=;
-        b=Hn+2pUEkICyIiFS9eZSKT+qFq6/u3C5LUfcDyPDCm/u6aE2j5k59d1dckhmiuJWyjq
-         Sn+qzrYhPjy/4MS3KyysEMIiwW9MC0rUgfCWkgjKf2AZnhtqFbMZQjNhIVRSsg+Q40Cq
-         HD7kavisJ286yHdIVgvYQ8jOEvDAWrYPvPVHKWanK5GSpSn/n2ZktThSyHC+o45d2cIa
-         ILYDhAfRwqqzPO9FvqjeG3bkqMR/zZC6OyiCEz5AagUdOa4XCtlzKvpjO+6vwmFqAhzo
-         avKIDSDAY5hgEkbd5WwcdCD0qWGYtydtvIGRpZgJDRsaA7GQBUQ2oKjA3pNBVzNVg/TC
-         J5xg==
+        bh=f98FfYQXYU5KM1aMGGSGJSxB2TL9+Nka7u8U+SiTAlc=;
+        b=f7AawVBvVQOhZ6mTAzbTtWzdMMna9Ylw5OBLSAxuhad9syTkR7CDfHPQJYZHrL5FDu
+         oNfGZGJXwm8ruZRk/6Gms1DQR7rTKXGYLMKhoONCeIDrz3eWLEnN1Snl65r0NyHIUfUU
+         3GDUVCuPBE77w6B8PMBU/01aw3+W3Mw6vKNaP9jpFRb6Z/FRQrQT12MBiZRiFYBZf50+
+         cRf/le1aa0ogSTj/IJAber6mTm5/vgrXaMNmDZJezgyEK+17pM9AZNh/ICtRPs4TCDsB
+         Qeoo9cvqvUMqBQhvbFKrJzS/wPMuvuYq1wkHrbNBEsbCP2v3vKtffdGXnR/nVQVvzeL5
+         mKSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758403999; x=1759008799;
+        d=1e100.net; s=20230601; t=1758404050; x=1759008850;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8j4WWqPkFCt4STe5Jmiax3LsKU17rjweqCuHOsE8gLg=;
-        b=u6xWjcK+wxXFezpk2GDf2aj3Cin5yuoI+s5rSfufMEoly0FqEdeoMSj7I1gtgVtx93
-         C01fzBHg8DZrC6TcLBepvURQjZeWJUkiXHVwdPGtxR0tHfrc/Z/ClUHXIU+jpV2PSCYt
-         RiCsUNlM7mATmKS02/vRtYgnOeoO83PoNGQb7kiyAWeNnXpG2aj57eO4PwXu3Oj+lyCp
-         6mpyeghdikbO9UgmM5BNFF4CmEdCXGJlXGzbdBRPi6ICMBrIIBoz3+cL8d6w0GJANhKe
-         6y1Qv6KfRG8ew5nSEnVomdvdWZfHEXeqrQHPPeHqAHsEJew+2PgFfUCPSJkKdPZXz7wd
-         Z+Yg==
-X-Gm-Message-State: AOJu0Yy+qXfHuk0ob1Ee+YJMdpKGLbjODe+d/dCwwQm2Vjg93e8E5Akk
-	xGaFptaUNSktNjcLUPHpCzIahhZJl+7W4jpm4xiYE0wT68qsFDdGukL1
-X-Gm-Gg: ASbGncuazahxd7q/IGOT8koWNBCpDP9EJQ4cr5Njh7odqcguH2hGnovGdiT9O+vN0KH
-	E+K5GfriAAnu4t6DeXg1ltYxebV+P4RmONgUIdldzqd0iBGFgr4bnV1GsBf2fOhSPCEQZ8QPyrD
-	UNx0vZeyYTrxN5uW1RER4rHg3tiaFlZc92rvjKPF8XL8c+mw0RGjYpX1OiIJyHLNm/NdoqSyv0/
-	l1mIDuFz62zy3HuNRz7ryYtcX9/gtS6HDl6hQ8VaG+HiVDIdu0PXgR7DlN0EVlwB7/tvxf3MwR1
-	suxitU0zZ48IPd8Qqhyd2LMKFSeKzbTXOfeVmVpTzh3LTxuqSwHGoeu4PMGqz5OEMYWNgFItSp3
-	jOi/6UTvnI42NwXV8t/Y+lJ+sSzvxkNbFYIC3t7Z0fUGDtMlOThNNHMI/a7Z4u+cvNZ0L5xLT/O
-	3KfHqaoMmObKvt1ce2QFRHOwK6e/Ejr3+MFaKVnLwQabswLm7uxHW+cA7TRBs=
-X-Google-Smtp-Source: AGHT+IG0/82UqetD7ybHkYl5eW2u0RG5al+Vd2/FSRQKBSJDyiRqrfqhHHtx3eBEUxxxPhthI9Ewig==
-X-Received: by 2002:a05:6000:288e:b0:3e9:ee54:af71 with SMTP id ffacd0b85a97d-3ee7bad15fbmr6922002f8f.12.1758403998720;
-        Sat, 20 Sep 2025 14:33:18 -0700 (PDT)
+        bh=f98FfYQXYU5KM1aMGGSGJSxB2TL9+Nka7u8U+SiTAlc=;
+        b=jBiege+hfIQ/rp6cNuiBDuF1VyMR6FKAXHmAJqD8+S0cHi56useTMtk/KybTItUkHj
+         qeBIFXqRWyTCkXFl1nALTKE1ZKiahmm94NTS+TeAqehlcrsCyg+jaUWQqSGynhTlPtvc
+         /5h3EF23uc/9Bw5gNYdCcphNa9SztmUJnVwqeRnaxgeq5T3VK2Khz7W4NpywSOC2sDt7
+         P/Z2aFLYGifO2ciTK31jyGMVv3isSeNpDoKjPXtUxCdeShbanHY5JgiQptXLVqc/hdT/
+         FK1YVDsh5OJJHrsJ96nYyt2Vj0WrPir8rsp/az+FO3CT4+MIrGmKcnBtLSLxjbrQfbLi
+         gBwQ==
+X-Gm-Message-State: AOJu0Yy4H8/qQykQBZXKfxfT5G2NyoZN7WSgnR1qU1QsKLJZ3Snxz1sP
+	wutE14ReFM2IZ74FbObKXGfTF8IH50fSL/IptHDSyizhBz83hfLWN8HW
+X-Gm-Gg: ASbGncu+le9bgdC/Zi02gvfE6AXv61C5mSQKAYnFBVrKJHMa3rWkpPEakQI8E6YR8GH
+	xLU5JbaOF1P5BG85KuP/NprS/soMiPOqLnInWEsmhGMG0MlblvGKzjnFMOLLemaU8do7Ps4pmFB
+	VJzmAVWqzHCQrWnOYhFYLwdVuZctk3skwTXFe3vEVgtqUvhxifjzdYEdPVcgpF1sJRc+JHZRqmr
+	MmjSs5Ojl1r9t2KsId6OHoIbqYe4vLYhHNgzm00WPmVNXdbDHUsv8Lnqq8bSoD43cO0ojOlbGqk
+	UDfLe8Nl8tee+bcwKRjwR7yfChokjSFOyyoZNaLAX2iHFJKJnSBBYSHAdOhOkH/AEKHAYk3xaDZ
+	MxQm9vdebafrUJPH4zoOl2Wqp5W0gX5RPWhP2KTC5AsP3EaZoUCvQpirVT4mRaE/YdwbnqVx4h0
+	gFTVMJSqUx9ZEpvg6gemWy4A1nEUmzNbkOxY3SfXRE81hUUa6PAG1luF8IO9I=
+X-Google-Smtp-Source: AGHT+IEjLVVdSRiHF8r0wPgbdIw4pCekzL6rLTJrbzihdiXhEmgK/bU6g8OibKorMOBzzm7Om+12bw==
+X-Received: by 2002:a05:600c:a4c:b0:45f:2cd5:5086 with SMTP id 5b1f17b1804b1-467ebe9d9ffmr78902325e9.3.1758404050524;
+        Sat, 20 Sep 2025 14:34:10 -0700 (PDT)
 Received: from ?IPV6:2003:ea:8f30:a300:65ae:147:ed4c:62d8? (p200300ea8f30a30065ae0147ed4c62d8.dip0.t-ipconnect.de. [2003:ea:8f30:a300:65ae:147:ed4c:62d8])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3ee0fbd5d65sm12963179f8f.46.2025.09.20.14.33.16
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3ef166e62e5sm8470574f8f.40.2025.09.20.14.34.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 20 Sep 2025 14:33:17 -0700 (PDT)
-Message-ID: <6d4e80e7-c684-4d95-abbd-ea62b79a9a8a@gmail.com>
-Date: Sat, 20 Sep 2025 23:33:16 +0200
+        Sat, 20 Sep 2025 14:34:09 -0700 (PDT)
+Message-ID: <dff44b83-4a85-4fff-bf6b-f12efd97b56e@gmail.com>
+Date: Sat, 20 Sep 2025 23:34:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,14 +83,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 1/2] net: phy: dp83640: improve phydev and driver
- removal handling
+Subject: [PATCH net-next 2/2] net: phy: stop exporting phy_driver_register
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
  Russell King - ARM Linux <linux@armlinux.org.uk>,
  Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Richard Cochran <richardcochran@gmail.com>
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>
 Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 References: <b86c2ecc-41f6-4f7f-85db-b7fa684d1fb7@gmail.com>
 Content-Language: en-US
@@ -141,119 +139,49 @@ In-Reply-To: <b86c2ecc-41f6-4f7f-85db-b7fa684d1fb7@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Once the last user of a clock has been removed, the clock should be
-removed. So far orphaned clocks are cleaned up in dp83640_free_clocks()
-only. Add the logic to remove orphaned clocks in dp83640_remove().
-This allows to simplify the code, and use standard macro
-module_phy_driver(). dp83640 was the last external user of
-phy_driver_register(), so we can stop exporting this function afterwards.
+phy_driver_register() isn't used outside phy_device.c any longer,
+so we can stop exporting it.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/dp83640.c | 58 ++++++++++++++-------------------------
- 1 file changed, 20 insertions(+), 38 deletions(-)
+ drivers/net/phy/phy_device.c | 4 ++--
+ include/linux/phy.h          | 1 -
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/phy/dp83640.c b/drivers/net/phy/dp83640.c
-index daab55572..74396453f 100644
---- a/drivers/net/phy/dp83640.c
-+++ b/drivers/net/phy/dp83640.c
-@@ -953,30 +953,6 @@ static void decode_status_frame(struct dp83640_private *dp83640,
- 	}
- }
- 
--static void dp83640_free_clocks(void)
--{
--	struct dp83640_clock *clock;
--	struct list_head *this, *next;
--
--	mutex_lock(&phyter_clocks_lock);
--
--	list_for_each_safe(this, next, &phyter_clocks) {
--		clock = list_entry(this, struct dp83640_clock, list);
--		if (!list_empty(&clock->phylist)) {
--			pr_warn("phy list non-empty while unloading\n");
--			BUG();
--		}
--		list_del(&clock->list);
--		mutex_destroy(&clock->extreg_lock);
--		mutex_destroy(&clock->clock_lock);
--		put_device(&clock->bus->dev);
--		kfree(clock->caps.pin_config);
--		kfree(clock);
--	}
--
--	mutex_unlock(&phyter_clocks_lock);
--}
--
- static void dp83640_clock_init(struct dp83640_clock *clock, struct mii_bus *bus)
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index c82c19971..01269b865 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -3544,7 +3544,8 @@ static int phy_remove(struct device *dev)
+  * @new_driver: new phy_driver to register
+  * @owner: module owning this PHY
+  */
+-int phy_driver_register(struct phy_driver *new_driver, struct module *owner)
++static int phy_driver_register(struct phy_driver *new_driver,
++			       struct module *owner)
  {
- 	INIT_LIST_HEAD(&clock->list);
-@@ -1479,6 +1455,7 @@ static void dp83640_remove(struct phy_device *phydev)
- 	struct dp83640_clock *clock;
- 	struct list_head *this, *next;
- 	struct dp83640_private *tmp, *dp83640 = phydev->priv;
-+	bool remove_clock = false;
+ 	int retval;
  
- 	if (phydev->mdio.addr == BROADCAST_ADDR)
- 		return;
-@@ -1506,11 +1483,27 @@ static void dp83640_remove(struct phy_device *phydev)
- 		}
- 	}
+@@ -3587,7 +3588,6 @@ int phy_driver_register(struct phy_driver *new_driver, struct module *owner)
  
-+	if (!clock->chosen && list_empty(&clock->phylist))
-+		remove_clock = true;
-+
- 	dp83640_clock_put(clock);
- 	kfree(dp83640);
-+
-+	if (remove_clock) {
-+		mutex_lock(&phyter_clocks_lock);
-+		list_del(&clock->list);
-+		mutex_unlock(&phyter_clocks_lock);
-+
-+		mutex_destroy(&clock->extreg_lock);
-+		mutex_destroy(&clock->clock_lock);
-+		put_device(&clock->bus->dev);
-+		kfree(clock->caps.pin_config);
-+		kfree(clock);
-+	}
+ 	return 0;
  }
+-EXPORT_SYMBOL(phy_driver_register);
  
--static struct phy_driver dp83640_driver = {
-+static struct phy_driver dp83640_driver[] = {
-+{
- 	.phy_id		= DP83640_PHY_ID,
- 	.phy_id_mask	= 0xfffffff0,
- 	.name		= "NatSemi DP83640",
-@@ -1521,26 +1514,15 @@ static struct phy_driver dp83640_driver = {
- 	.config_init	= dp83640_config_init,
- 	.config_intr    = dp83640_config_intr,
- 	.handle_interrupt = dp83640_handle_interrupt,
-+},
- };
+ int phy_drivers_register(struct phy_driver *new_driver, int n,
+ 			 struct module *owner)
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 7da9e1947..bae34e7c6 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -2027,7 +2027,6 @@ static inline int phy_read_status(struct phy_device *phydev)
  
--static int __init dp83640_init(void)
--{
--	return phy_driver_register(&dp83640_driver, THIS_MODULE);
--}
--
--static void __exit dp83640_exit(void)
--{
--	dp83640_free_clocks();
--	phy_driver_unregister(&dp83640_driver);
--}
-+module_phy_driver(dp83640_driver);
- 
- MODULE_DESCRIPTION("National Semiconductor DP83640 PHY driver");
- MODULE_AUTHOR("Richard Cochran <richardcochran@gmail.com>");
- MODULE_LICENSE("GPL");
- 
--module_init(dp83640_init);
--module_exit(dp83640_exit);
--
- static const struct mdio_device_id __maybe_unused dp83640_tbl[] = {
- 	{ DP83640_PHY_ID, 0xfffffff0 },
- 	{ }
+ void phy_driver_unregister(struct phy_driver *drv);
+ void phy_drivers_unregister(struct phy_driver *drv, int n);
+-int phy_driver_register(struct phy_driver *new_driver, struct module *owner);
+ int phy_drivers_register(struct phy_driver *new_driver, int n,
+ 			 struct module *owner);
+ void phy_error(struct phy_device *phydev);
 -- 
 2.51.0
 
