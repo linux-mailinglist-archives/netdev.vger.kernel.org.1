@@ -1,444 +1,168 @@
-Return-Path: <netdev+bounces-225034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82202B8D8F9
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 11:58:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E954B8D961
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 12:22:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E5DD441912
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 09:58:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 258467B0522
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 10:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F27255F22;
-	Sun, 21 Sep 2025 09:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48BD257853;
+	Sun, 21 Sep 2025 10:22:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EIomCFDW"
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="suPlKyrD";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GeQRDIo/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A063534BA52
-	for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 09:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEC424A066;
+	Sun, 21 Sep 2025 10:22:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758448691; cv=none; b=T2FPLAogAcHZr/1vtIuId8B6FpXGLIXfcEHeizTC5+QmjGmuZuBt6CtlHF80GGdehpL6pyJ3DRHJF0p8lNoKmvTlHtRz8in2o0lZioyPZsZaD8lMATcnggw8ss2wt4YZ2ng+zxlcWhgBl//+VHAKM/HKs0SIcGSJGTiPVmTm548=
+	t=1758450150; cv=none; b=jht46VBY4r6rwJpxnaWGCEjGw7P/YhXLmP+6hg66p6vTTYwqlPfY+eJPD4cXTB3OyWZgdcxuWMUsy8yFIpGqbKPgIv9ECv4UND2vRj+100VGFL1qvn8MC763u6TApXZUUpYN9K29876zM5b9VfYJWOd3ofn4w/4NMg23e6mzPAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758448691; c=relaxed/simple;
-	bh=kk9QZtXUJ/OJQpW5WfObRMQzUeyMBWMQQacPBIEVGwc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=l/jjw5l9wIGfLPc9OIZwV+dx+KGr4D+xEH7V3JuxrBfvP/LG0Yi8ZGqBHggaMEWmF5KAIvVdvhJk6JfA/0XYv6hwHSp/nvjDUPsxPhUFBbIkVkBYfoiSZiWik3LtdK3JWvFWFopv4HwS5RW1KsXxAaOs03Tzl9U98hu2ysZsyfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EIomCFDW; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8178135137fso794468185a.2
-        for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 02:58:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758448688; x=1759053488; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=S03So920SH9K7EIefj5sVupIqjZAeRgCY4ZYDeEFcCQ=;
-        b=EIomCFDWvPaptMMBmLMH6MHO53rWIgYkyiAlGoU9pXB4BZIlzlYasayV+g0GfkzZ1N
-         6ozvCxuKCay2CDT21WKeCHbShFP+0a0pwEV5rqp/dtfNkNTLGT9ODLYLL4RW1jDYT+/8
-         PLTjmNpxL2VP+Q5h3Ol27BNbOOtt8kQ72rIQheD6hUBjOpXGqhgh8A0RRWU31T8emTsU
-         tR0Qn8tCvRs2uE6d43wTEN54vDQDBWYyh+BLIiPttj7wA4dxhECLgw2uIpTSIKc6t9Ns
-         3qCakF5vWfGe6LDgOiVcJJDqh8ZjHP4kNjO/h2aPvTyJdzLXDWU0foiXs65O/qRrDEMm
-         mxqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758448688; x=1759053488;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S03So920SH9K7EIefj5sVupIqjZAeRgCY4ZYDeEFcCQ=;
-        b=nkdr6OToOh4DjwdG0MnHW4UQzmn8Zb8ZKuyTv0NSmFubxeEsS97JMQ9VY93eHCkEOT
-         kAlNBWB5vcvrGaHDMLMbWbMqKb/k/uVMCf5CIFOeT4yLYhA0a9FTjbyxErXbmYwp0gwQ
-         eFTzT8f5EoTlHKkOhJjhNFdozor3F1SBthUDmg4NhV+QjFMDb/g7FbRYDOgHjE9sLUb1
-         IUvAGp09BAkOaRZ23/2Q2KfySg6YyIW4OtTPdboy8XixhYi+VP0Gnm85pP5307X/HOQS
-         cQvxgXSCoS9ruqpCZgB/wyhFdMKgoqJzAGO1yc4MEt6MkudnMUSJiBVg1mwEkgW6FTQr
-         L3fg==
-X-Forwarded-Encrypted: i=1; AJvYcCVciaLumnKHs3dJfNQwLeRP2jJ+rQI6T2WloeIT/rq34o+5w1ZyZcTtpw1bqy3/54NQuHISiL4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5DNzQg7A9N90e3l1NM7UqRSrYDqx1DEmWK4QRo9t8idf2KdgY
-	he91sA+Xcit2g6cdt8T3vn+J6usgr5L23RgZtXs4tT1jKRtp7BWpjU9ynLjfmyU1iG9BJQyBdPT
-	3lfDntEAJe2hYew==
-X-Google-Smtp-Source: AGHT+IH7EtNYL1uMjdsc3w5wynykTNu2ZhXiUVsoc8i4okihAxepfc55edc7wjx0smg8aehOZ9F5fRofeEAMvg==
-X-Received: from qkph18.prod.google.com ([2002:a05:620a:2852:b0:828:c67e:7859])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:bd3:b0:7e9:f81f:ce80 with SMTP id af79cd13be357-83bad6dd061mr872222785a.86.1758448688379;
- Sun, 21 Sep 2025 02:58:08 -0700 (PDT)
-Date: Sun, 21 Sep 2025 09:58:02 +0000
+	s=arc-20240116; t=1758450150; c=relaxed/simple;
+	bh=EuaMo6D/BJKLE6f/Qu2pbLWx6rfoIYSR/NXFNH+/L3U=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=iXigrRaS+OmOAx4XRexOSOGeoV3HJ923aeR5q43WRG+tlXjHO06b41ZinYjIP92FV1ZLFMl27FMPL4F/nnYuTlW7BeDJUFGab3ioxu/bEl7AHtoCTwgL9MLVmENGDx1PVVEIgSM+PM6sfPGCNW7hMvNyvGjDFFfbWY270DZuj50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=suPlKyrD; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GeQRDIo/; arc=none smtp.client-ip=103.168.172.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 562C314000FC;
+	Sun, 21 Sep 2025 06:22:27 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Sun, 21 Sep 2025 06:22:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to; s=fm1; t=
+	1758450147; x=1758536547; bh=z4dTzHicOmu0ud13rOeQ61ccyjqJXmSHMtb
+	dd650m2s=; b=suPlKyrDIIb3+IwNlbntYUFM9a0CpPFkrFNA265367EGvWcyL6g
+	Ai3GxZx0x+4ArraDgo85aSSM6UQ4zzFGVA5VIEciOlSm3NNSWX25P5Y03QWE28I3
+	CLe6f2VtSTdh4JJKb+G/1iqdVfzX0vAmv0rw3WzjY6AV5y90Gk3IeMMfARA36sOH
+	HpJc25LV040BNWMua/br1P4ozNIqmfIxCFvLkngByr/O5d1WPsGJ3KRF4kkGQuB9
+	S9eEzNsKbEG3NxPAg9XaP00LN2cp8jxFXUVLY3emc7MIrrwwoRA8u81v7iQcDmwB
+	y1i85q2UsOjLlxCKTdi3KzV5btBgy0j8lkw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1758450147; x=
+	1758536547; bh=z4dTzHicOmu0ud13rOeQ61ccyjqJXmSHMtbdd650m2s=; b=G
+	eQRDIo/bVDytypOm19Nj87vmudllOQ9j3VlOHWvohikkIUe1MVoAnRfTnb6vhZG5
+	p/cfn+Y69hQFq+LVxWZ+cDO0PRm78tF1WIHNftcRqY4jWKzNPYz/PYCASiN4T7dQ
+	Ff0byzGrYNOTxv9a00wLEgh7Gxodwbti8lnoGpLU6lf/v6i1l7z0vb1Vww21tC7U
+	K5yuRQ00OCVFDsDfZsOmzfTDSHTacSs4GGwG3NyiQgJvWadUrnUBAu+OrOJ+aYl6
+	6m6TGOIv9j/d9/dL6Ak7LlYiyTg58SG9j90U7kwqG7mGOfPxJlTcpdXt+6/6EDcN
+	eM/eiPVRXLdSFxgbW1jzg==
+X-ME-Sender: <xms:4tHPaNn-6gqhyy2fn228rdPkVbYp_Ug6kGDDGg2DHA_UQqBKha9eUw>
+    <xme:4tHPaOnAXRg9ewbcwMnOihWBSq0CcdpuYvlOUopk6I_0inPF1phzlafTbq6JWqCIc
+    p6hDERGz-ekLA>
+X-ME-Received: <xmr:4tHPaBvIC1wTbzMyk6Z6_pupiyb2-fdrDwS3wmltW5QQior3XvDjrxQFy5SPe20vXimLdad3qAUTV9KiHeJdEVBVTaKfgGCxDkhwN4vsSbQB>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdehgeejvdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpegtgfgghffvvefujghffffkrhesthhqredttddtjeenucfhrhhomheppfgvihhluehr
+    ohifnhcuoehnvghilhgssehofihnmhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpe
+    ffveejleejheeujeegheelleeuveduheejkeegveeuffetvefhfeevtdeuuefgjeenucff
+    ohhmrghinhepghhithhhuhgsrdgtohhmpdhkvghrnhgvlhdrohhrghenucevlhhushhtvg
+    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnvghilhgssehofihnmhgr
+    ihhlrdhnvghtpdhnsggprhgtphhtthhopedujedpmhhouggvpehsmhhtphhouhhtpdhrtg
+    hpthhtohepvhhirhhoseiivghnihhvrdhlihhnuhigrdhorhhgrdhukhdprhgtphhtthho
+    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuh
+    igqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhn
+    uhigqdhfshguvghvvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplh
+    hinhhugidqughotgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhn
+    uhigqdgtihhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuh
+    igqdgstggrtghhvghfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegs
+    phhfsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhgrtghksehsuhhsvg
+    drtgii
+X-ME-Proxy: <xmx:4tHPaIJcxLI3mylMD65vcVWusoP2ANC-YLZj18LljgYs_YDW3iCO8g>
+    <xmx:4tHPaGgZA-AHazPVIA52TncFHJ17tXzJ_qghKTM5oUTHW75gg4Kr9g>
+    <xmx:4tHPaEv6cEE7Fyvgf5R_3YeXxs9nKDVZb4dA2WqlhHve4Jshif9Q_w>
+    <xmx:4tHPaIiKeeX1mmr-u8fMPJqBpiX9lJy-gb8Y3tvRhBYBzbFC7qYN4A>
+    <xmx:49HPaJOA2ecx8oezZruDJjk7UiOe6Ag1tYRGEkvQOih3emkbW4M3hGxH>
+Feedback-ID: iab3e480c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 21 Sep 2025 06:22:22 -0400 (EDT)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250921095802.875191-1-edumazet@google.com>
-Subject: [PATCH v3 net-next] udp: remove busylock and add per NUMA queues
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+From: NeilBrown <neilb@ownmail.net>
+To: "kernel test robot" <oliver.sang@intel.com>
+Cc: oe-lkp@lists.linux.dev, lkp@intel.com,
+ "Amir Goldstein" <amir73il@gmail.com>, linux-doc@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+ linux-bcachefs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ "Christian Brauner" <brauner@kernel.org>, "Jeff Layton" <jlayton@kernel.org>,
+ "Jan Kara" <jack@suse.cz>, oliver.sang@intel.com
+Subject:
+ Re: [PATCH v3 5/6] VFS: rename kern_path_locked() and related functions.
+In-reply-to: <202509211121.ebd9f4b0-lkp@intel.com>
+References: <20250915021504.2632889-6-neilb@ownmail.net>,
+ <202509211121.ebd9f4b0-lkp@intel.com>
+Date: Sun, 21 Sep 2025 20:22:13 +1000
+Message-id: <175845013376.1696783.14389036029721020068@noble.neil.brown.name>
+Reply-To: NeilBrown <neil@brown.name>
 
-busylock was protecting UDP sockets against packet floods,
-but unfortunately was not protecting the host itself.
+On Sun, 21 Sep 2025, kernel test robot wrote:
+>=20
+> Hello,
+>=20
+> kernel test robot noticed "BUG:unable_to_handle_page_fault_for_address" on:
+>=20
+> commit: 747e356babd8bdd569320c29916470345afd3cf7 ("[PATCH v3 5/6] VFS: rena=
+me kern_path_locked() and related functions.")
+> url: https://github.com/intel-lab-lkp/linux/commits/NeilBrown/VFS-ovl-add-l=
+ookup_one_positive_killable/20250915-101929
+> base: https://git.kernel.org/cgit/linux/kernel/git/vfs/vfs.git vfs.all
+> patch link: https://lore.kernel.org/all/20250915021504.2632889-6-neilb@ownm=
+ail.net/
+> patch subject: [PATCH v3 5/6] VFS: rename kern_path_locked() and related fu=
+nctions.
 
-Under stress, many cpus could spin while acquiring the busylock,
-and NIC had to drop packets. Or packets would be dropped
-in cpu backlog if RPS/RFS were in place.
+This incremental fix should be sufficient.
 
-This patch replaces the busylock by intermediate
-lockless queues. (One queue per NUMA node).
+Thanks,
+NeilBrown
 
-This means that fewer number of cpus have to acquire
-the UDP receive queue lock.
 
-Most of the cpus can either:
-- immediately drop the packet.
-- or queue it in their NUMA aware lockless queue.
-
-Then one of the cpu is chosen to process this lockless queue
-in a batch.
-
-The batch only contains packets that were cooked on the same
-NUMA node, thus with very limited latency impact.
-
-Tested:
-
-DDOS targeting a victim UDP socket, on a platform with 6 NUMA nodes
-(Intel(R) Xeon(R) 6985P-C)
-
-Before:
-
-nstat -n ; sleep 1 ; nstat | grep Udp
-Udp6InDatagrams                 1004179            0.0
-Udp6InErrors                    3117               0.0
-Udp6RcvbufErrors                3117               0.0
-
-After:
-nstat -n ; sleep 1 ; nstat | grep Udp
-Udp6InDatagrams                 1116633            0.0
-Udp6InErrors                    14197275           0.0
-Udp6RcvbufErrors                14197275           0.0
-
-We can see this host can now proces 14.2 M more packets per second
-while under attack, and the victim socket can receive 11 % more
-packets.
-
-I used a small bpftrace program measuring time (in us) spent in
-__udp_enqueue_schedule_skb().
-
-Before:
-
-@udp_enqueue_us[398]:
-[0]                24901 |@@@                                                 |
-[1]                63512 |@@@@@@@@@                                           |
-[2, 4)            344827 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[4, 8)            244673 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                |
-[8, 16)            54022 |@@@@@@@@                                            |
-[16, 32)          222134 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                   |
-[32, 64)          232042 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                  |
-[64, 128)           4219 |                                                    |
-[128, 256)           188 |                                                    |
-
-After:
-
-@udp_enqueue_us[398]:
-[0]              5608855 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[1]              1111277 |@@@@@@@@@@                                          |
-[2, 4)            501439 |@@@@                                                |
-[4, 8)            102921 |                                                    |
-[8, 16)            29895 |                                                    |
-[16, 32)           43500 |                                                    |
-[32, 64)           31552 |                                                    |
-[64, 128)            979 |                                                    |
-[128, 256)            13 |                                                    |
-
-Note that the remaining bottleneck for this platform is in
-udp_drops_inc() because we limited struct numa_drop_counters
-to only two nodes so far.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
-v3: - Moved kfree(up->udp_prod_queue) to udp_destruct_common(),
-      addressing reports from Jakub and syzbot.
-
-    - Perform SKB_DROP_REASON_PROTO_MEM drops after the queue
-      spinlock is released.
-
-v2: https://lore.kernel.org/netdev/20250920080227.3674860-1-edumazet@google.com/
-    - Added a kfree(up->udp_prod_queue) in udpv6_destroy_sock() (Jakub feedback on v1)
-    - Added bpftrace histograms in changelog.
-
-v1: https://lore.kernel.org/netdev/20250919164308.2455564-1-edumazet@google.com/
-
- include/linux/udp.h |   9 +++-
- include/net/udp.h   |  11 ++++-
- net/ipv4/udp.c      | 114 ++++++++++++++++++++++++++------------------
- net/ipv6/udp.c      |   5 +-
- 4 files changed, 88 insertions(+), 51 deletions(-)
-
-diff --git a/include/linux/udp.h b/include/linux/udp.h
-index e554890c4415b411f35007d3ece9e6042db7a544..58795688a18636ea79aa1f5d06eacc676a2e7849 100644
---- a/include/linux/udp.h
-+++ b/include/linux/udp.h
-@@ -44,6 +44,12 @@ enum {
- 	UDP_FLAGS_UDPLITE_RECV_CC, /* set via udplite setsockopt */
- };
- 
-+/* per NUMA structure for lockless producer usage. */
-+struct udp_prod_queue {
-+	struct llist_head	ll_root ____cacheline_aligned_in_smp;
-+	atomic_t		rmem_alloc;
-+};
-+
- struct udp_sock {
- 	/* inet_sock has to be the first member */
- 	struct inet_sock inet;
-@@ -90,6 +96,8 @@ struct udp_sock {
- 						struct sk_buff *skb,
- 						int nhoff);
- 
-+	struct udp_prod_queue *udp_prod_queue;
-+
- 	/* udp_recvmsg try to use this before splicing sk_receive_queue */
- 	struct sk_buff_head	reader_queue ____cacheline_aligned_in_smp;
- 
-@@ -109,7 +117,6 @@ struct udp_sock {
- 	 */
- 	struct hlist_node	tunnel_list;
- 	struct numa_drop_counters drop_counters;
--	spinlock_t		busylock ____cacheline_aligned_in_smp;
- };
- 
- #define udp_test_bit(nr, sk)			\
-diff --git a/include/net/udp.h b/include/net/udp.h
-index 059a0cee5f559b8d75e71031a00d0aa2769e257f..cffedb3e40f24513e44fb7598c0ad917fd15b616 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -284,16 +284,23 @@ INDIRECT_CALLABLE_DECLARE(int udpv6_rcv(struct sk_buff *));
- struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
- 				  netdev_features_t features, bool is_ipv6);
- 
--static inline void udp_lib_init_sock(struct sock *sk)
-+static inline int udp_lib_init_sock(struct sock *sk)
- {
- 	struct udp_sock *up = udp_sk(sk);
- 
- 	sk->sk_drop_counters = &up->drop_counters;
--	spin_lock_init(&up->busylock);
- 	skb_queue_head_init(&up->reader_queue);
- 	INIT_HLIST_NODE(&up->tunnel_list);
- 	up->forward_threshold = sk->sk_rcvbuf >> 2;
- 	set_bit(SOCK_CUSTOM_SOCKOPT, &sk->sk_socket->flags);
-+
-+	up->udp_prod_queue = kcalloc(nr_node_ids, sizeof(*up->udp_prod_queue),
-+				     GFP_KERNEL);
-+	if (!up->udp_prod_queue)
-+		return -ENOMEM;
-+	for (int i = 0; i < nr_node_ids; i++)
-+		init_llist_head(&up->udp_prod_queue[i].ll_root);
-+	return 0;
+diff --git a/fs/namei.c b/fs/namei.c
+index 5ceb971632fe..92973a7a8091 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -2772,7 +2772,7 @@ static struct dentry *__start_removing_path(int dfd, st=
+ruct filename *name,
+ 	if (unlikely(type !=3D LAST_NORM))
+ 		return ERR_PTR(-EINVAL);
+ 	/* don't fail immediately if it's r/o, at least try to report other errors =
+*/
+-	error =3D mnt_want_write(path->mnt);
++	error =3D mnt_want_write(parent_path.mnt);
+ 	inode_lock_nested(parent_path.dentry->d_inode, I_MUTEX_PARENT);
+ 	d =3D lookup_one_qstr_excl(&last, parent_path.dentry, 0);
+ 	if (IS_ERR(d))
+@@ -2789,7 +2789,7 @@ static struct dentry *__start_removing_path(int dfd, st=
+ruct filename *name,
+ unlock:
+ 	inode_unlock(parent_path.dentry->d_inode);
+ 	if (!error)
+-		mnt_drop_write(path->mnt);
++		mnt_drop_write(parent_path.mnt);
+ 	return d;
  }
- 
- static inline void udp_drops_inc(struct sock *sk)
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 85cfc32eb2ccb3e229177fb37910fefde0254ffe..fce1d0ffd6361d271ae3528fea026a8d6c07ac6e 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1685,25 +1685,6 @@ static void udp_skb_dtor_locked(struct sock *sk, struct sk_buff *skb)
- 	udp_rmem_release(sk, udp_skb_truesize(skb), 1, true);
- }
- 
--/* Idea of busylocks is to let producers grab an extra spinlock
-- * to relieve pressure on the receive_queue spinlock shared by consumer.
-- * Under flood, this means that only one producer can be in line
-- * trying to acquire the receive_queue spinlock.
-- */
--static spinlock_t *busylock_acquire(struct sock *sk)
--{
--	spinlock_t *busy = &udp_sk(sk)->busylock;
--
--	spin_lock(busy);
--	return busy;
--}
--
--static void busylock_release(spinlock_t *busy)
--{
--	if (busy)
--		spin_unlock(busy);
--}
--
- static int udp_rmem_schedule(struct sock *sk, int size)
- {
- 	int delta;
-@@ -1718,14 +1699,23 @@ static int udp_rmem_schedule(struct sock *sk, int size)
- int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- {
- 	struct sk_buff_head *list = &sk->sk_receive_queue;
-+	struct udp_prod_queue *udp_prod_queue;
-+	struct sk_buff *next, *to_drop = NULL;
-+	struct llist_node *ll_list;
- 	unsigned int rmem, rcvbuf;
--	spinlock_t *busy = NULL;
- 	int size, err = -ENOMEM;
-+	int total_size = 0;
-+	int q_size = 0;
-+	int nb = 0;
- 
- 	rmem = atomic_read(&sk->sk_rmem_alloc);
- 	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
- 	size = skb->truesize;
- 
-+	udp_prod_queue = &udp_sk(sk)->udp_prod_queue[numa_node_id()];
-+
-+	rmem += atomic_read(&udp_prod_queue->rmem_alloc);
-+
- 	/* Immediately drop when the receive queue is full.
- 	 * Cast to unsigned int performs the boundary check for INT_MAX.
- 	 */
-@@ -1747,45 +1737,75 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 	if (rmem > (rcvbuf >> 1)) {
- 		skb_condense(skb);
- 		size = skb->truesize;
--		rmem = atomic_add_return(size, &sk->sk_rmem_alloc);
--		if (rmem > rcvbuf)
--			goto uncharge_drop;
--		busy = busylock_acquire(sk);
--	} else {
--		atomic_add(size, &sk->sk_rmem_alloc);
- 	}
- 
- 	udp_set_dev_scratch(skb);
- 
-+	atomic_add(size, &udp_prod_queue->rmem_alloc);
-+
-+	if (!llist_add(&skb->ll_node, &udp_prod_queue->ll_root))
-+		return 0;
-+
- 	spin_lock(&list->lock);
--	err = udp_rmem_schedule(sk, size);
--	if (err) {
--		spin_unlock(&list->lock);
--		goto uncharge_drop;
--	}
- 
--	sk_forward_alloc_add(sk, -size);
-+	ll_list = llist_del_all(&udp_prod_queue->ll_root);
- 
--	/* no need to setup a destructor, we will explicitly release the
--	 * forward allocated memory on dequeue
--	 */
--	sock_skb_set_dropcount(sk, skb);
-+	ll_list = llist_reverse_order(ll_list);
-+
-+	llist_for_each_entry_safe(skb, next, ll_list, ll_node) {
-+		size = udp_skb_truesize(skb);
-+		total_size += size;
-+		err = udp_rmem_schedule(sk, size);
-+		if (unlikely(err)) {
-+			/*  Free the skbs outside of locked section. */
-+			skb->next = to_drop;
-+			to_drop = skb;
-+			continue;
-+		}
-+
-+		q_size += size;
-+		sk_forward_alloc_add(sk, -size);
-+
-+		/* no need to setup a destructor, we will explicitly release the
-+		 * forward allocated memory on dequeue
-+		 */
-+		sock_skb_set_dropcount(sk, skb);
-+		nb++;
-+		__skb_queue_tail(list, skb);
-+	}
-+
-+	atomic_add(q_size, &sk->sk_rmem_alloc);
- 
--	__skb_queue_tail(list, skb);
- 	spin_unlock(&list->lock);
- 
--	if (!sock_flag(sk, SOCK_DEAD))
--		INDIRECT_CALL_1(sk->sk_data_ready, sock_def_readable, sk);
-+	if (!sock_flag(sk, SOCK_DEAD)) {
-+		/* Multiple threads might be blocked in recvmsg(),
-+		 * using prepare_to_wait_exclusive().
-+		 */
-+		while (nb) {
-+			INDIRECT_CALL_1(sk->sk_data_ready,
-+					sock_def_readable, sk);
-+			nb--;
-+		}
-+	}
-+
-+	if (unlikely(to_drop)) {
-+		for (nb = 0; to_drop != NULL; nb++) {
-+			skb = to_drop;
-+			to_drop = skb->next;
-+			skb_mark_not_on_list(skb);
-+			/* TODO: update SNMP values. */
-+			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO_MEM);
-+		}
-+		numa_drop_add(&udp_sk(sk)->drop_counters, nb);
-+	}
- 
--	busylock_release(busy);
--	return 0;
-+	atomic_sub(total_size, &udp_prod_queue->rmem_alloc);
- 
--uncharge_drop:
--	atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
-+	return 0;
- 
- drop:
- 	udp_drops_inc(sk);
--	busylock_release(busy);
- 	return err;
- }
- EXPORT_IPV6_MOD_GPL(__udp_enqueue_schedule_skb);
-@@ -1803,6 +1823,7 @@ void udp_destruct_common(struct sock *sk)
- 		kfree_skb(skb);
- 	}
- 	udp_rmem_release(sk, total, 0, true);
-+	kfree(up->udp_prod_queue);
- }
- EXPORT_IPV6_MOD_GPL(udp_destruct_common);
- 
-@@ -1814,10 +1835,11 @@ static void udp_destruct_sock(struct sock *sk)
- 
- int udp_init_sock(struct sock *sk)
- {
--	udp_lib_init_sock(sk);
-+	int res = udp_lib_init_sock(sk);
-+
- 	sk->sk_destruct = udp_destruct_sock;
- 	set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
--	return 0;
-+	return res;
- }
- 
- void skb_consume_udp(struct sock *sk, struct sk_buff *skb, int len)
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 9f4d340d1e3a63d38f80138ef9f6aac4a33afa05..813a2ba75824d14631642bf6973f65063b2825cb 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -67,10 +67,11 @@ static void udpv6_destruct_sock(struct sock *sk)
- 
- int udpv6_init_sock(struct sock *sk)
- {
--	udp_lib_init_sock(sk);
-+	int res = udp_lib_init_sock(sk);
-+
- 	sk->sk_destruct = udpv6_destruct_sock;
- 	set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
--	return 0;
-+	return res;
- }
- 
- INDIRECT_CALLABLE_SCOPE
--- 
-2.51.0.470.ga7dc726c21-goog
-
+=20
 
