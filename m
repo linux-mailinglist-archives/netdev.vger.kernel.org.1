@@ -1,121 +1,124 @@
-Return-Path: <netdev+bounces-225095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0908B8E36F
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 20:43:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AEB0B8E403
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 21:21:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D24C0189C5FA
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 18:43:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D252D3B9A76
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 19:21:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62EAF1F4289;
-	Sun, 21 Sep 2025 18:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B5E8223DF1;
+	Sun, 21 Sep 2025 19:21:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qaU7NRve"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dl+B59qB"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A6D8F54;
-	Sun, 21 Sep 2025 18:43:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0225D20E6;
+	Sun, 21 Sep 2025 19:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758480189; cv=none; b=qM0FdvRDAnKyIAZVmcx8IfgDHp+onWcgYahKApzfZr0J5FjLgsaC5bqYkPly5swXNwSPGRCI6oIw5qiw6pjQe0uLs51aChq1JcK0XJEnxdVsIxbbMz4jvX36Rmh7n/6zxNA9wWO4b15/vC2cveV0k/wX9i/vvEe7lX5OkvswJXU=
+	t=1758482488; cv=none; b=ewKPAFHF4Edh+iRHGEVKCd0p4XxzmnkdQJWcxVdj8aiAj4bieRyfBeIKAeX0vyat3ahwPXml3Npu4R+HxChBf6+Va//J/fWoS2vQcdS/ZwgEQzVikdbhfLaoBjzmdt0NvWIMgziDZ8kOfbNQ+uEBxMM5LxmWAzz8VADfguZHk8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758480189; c=relaxed/simple;
-	bh=kz8+rJ3OwRE88qi+eE8kRDASDAeDA8L3yK0pRJpy4Rk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sGa9R5+fpGnHNO+vc3tneVc6DPfupaLG8RY35KA8+VRjt2cHiWXa1tHSTKyHOnsf8CKOER48T9131xd/tItrbPD/jMX6L/7fE+G3BHWdbY4UeFdOsuPqaPwfxmyv5kk/7/smMT4kHJ3dGDXshsAUMYJtK2/V6BpXAxZtWWb4A0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qaU7NRve; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mwIooN8k13SoYRJ7KEz/xkVOkWcWn7ux3nhsoOLZo9o=; b=qaU7NRvejjiEjJmEY8pUOQ/AVk
-	ykrJ2rANOXWvNjd99dglSOASAKFgiqjyCTtDXZ2ndhSRx4lw/fVdOg8hVzMpm/cmDc9sF/FAgS5Bj
-	BZr5Ez/LQaJlUYbNzwomFxLCoktJNMv6j+hcP3xYeTcxTUBx9GERViiz3m5x1jjgCC9s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1v0P1T-00962g-3H; Sun, 21 Sep 2025 20:42:55 +0200
-Date: Sun, 21 Sep 2025 20:42:55 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Hariprasad Kelam <hkelam@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, sgoutham@marvell.com, gakula@marvell.com,
-	sbhatta@marvell.com, naveenm@marvell.com, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, bbhushan2@marvell.com
-Subject: Re: Query regarding Phy loopback support
-Message-ID: <defa4c07-0f8f-43cc-ba8d-0450998a8598@lunn.ch>
-References: <aMlHoBWqe8YOwnv8@test-OptiPlex-Tower-Plus-7010>
- <3b76cc60-f0c5-478b-b26c-e951a71d3d0b@lunn.ch>
- <aNA5l3JEl5JMHfZM@test-OptiPlex-Tower-Plus-7010>
+	s=arc-20240116; t=1758482488; c=relaxed/simple;
+	bh=Xg1jliQYEaUH53KBwKBHmy3PLJfCReIPYK/DANUWEQs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bMPfrn7JhPThWeqXHCsCG3PzT5fIAaR2T1sHc8kVVB5DjiWTJoZckxye139cAJCgEjJMNkGiqmhzncZMjYyl0Aa9p8Zt3ssNmCN0Ddlgv9S6wUcTniPx44Yt+gKTZfu9JtMLV1heusFcC0uD6zA0vSS47T0Kgm/g2jFBSC+pUCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=dl+B59qB; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58LImK70030300;
+	Sun, 21 Sep 2025 19:21:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=lsO1CXeJnP7kQM2ZlLIqD0xF5EaaK
+	vSHlbYBicl2Sn8=; b=dl+B59qBCVohsnIcKlofiOKbgs0JrNEmhQ8F7Izk7lZk9
+	GG7L6e0sPzLr8XfoWxi+EJX4M9cdQifDbD5PVZYqiGmeLcc0jZwWLwJkYM9kuP2h
+	MreOolSuZRjRH2UCGE61SGuTrmfGOjIp46JV8Dsg6ftYindXEi6h1u/U31qKnNtR
+	XZkPbIy7ox8WpXk/FrOKMDP8EPsBJXA8AYt9fPYubelEYxrzA2uCg05tTC82Kq6M
+	tn4gbqF/Iu+uPFvX5lkQXfFq05jUJA2bV5wIjGT1wLXdRwe4cPpK027K6SmKsuVc
+	QXdtY+AVhXxUmUxNwvG/6+wdjJoy1FWIYg0OAv/Kw==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 499jv117d8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 21 Sep 2025 19:21:17 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 58LJ4BNh034253;
+	Sun, 21 Sep 2025 19:21:16 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 49a6nggeuf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 21 Sep 2025 19:21:15 +0000
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 58LJLFWO003840;
+	Sun, 21 Sep 2025 19:21:15 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 49a6ngget6-1;
+	Sun, 21 Sep 2025 19:21:15 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+        netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com
+Subject: [PATCH net-next] selftests: rtnetlink: correct error message in rtnetlink.sh fou test
+Date: Sun, 21 Sep 2025 12:21:08 -0700
+Message-ID: <20250921192111.1567498-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aNA5l3JEl5JMHfZM@test-OptiPlex-Tower-Plus-7010>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-21_04,2025-09-19_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0 mlxscore=0
+ spamscore=0 malwarescore=0 phishscore=0 bulkscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
+ definitions=main-2509210198
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDAxMyBTYWx0ZWRfXzBFfsEnnUL44
+ dy2FG3EX6DQyM4V9ICOT0z1ZpZRDoEnlj1qMKRchdKxDXdqqGsa35xtyigKTTq8nhf9ubMD9nyV
+ kBuGrpX9342LxMx1w0q/HB4gh85rzB8j98klsxIuNyqfbkihD/LBPPcs8fud3EY8ueZUBR//1v9
+ +rqYYrQZ01XA3cXwulwsoyzMXbQbXlnJ3l06LZaxfbaUsCEpjb7Hx/MG3oanSglopgZrNAJsvqF
+ vnzjw7oE/WHdRhqJoyri4oFb6QjAp2ASwfrPuysHm1lpWoBQUuVJqd429vHVgPg+XhxgDyf2abU
+ wSktG/GlkDtjNn9IxPpCb2nRhiC+Pxqor+i4zKcrbaPEp3CXpmZ4aOGSy44SF+e8rX2EAdBcc1X
+ uulYP1vFpmxfR9/cygJ1exEm7JiSIw==
+X-Proofpoint-GUID: SnX9wH9PwbvDZffEaUSQfQiqG2lK4SPR
+X-Authority-Analysis: v=2.4 cv=YrMPR5YX c=1 sm=1 tr=0 ts=68d0502d b=1 cx=c_pps
+ a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
+ a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=-I1CY_1zln-DOjhblCEA:9 cc=ntf
+ awl=host:13614
+X-Proofpoint-ORIG-GUID: SnX9wH9PwbvDZffEaUSQfQiqG2lK4SPR
 
-On Sun, Sep 21, 2025 at 11:14:55PM +0530, Hariprasad Kelam wrote:
-> On 2025-09-16 at 22:13:20, Andrew Lunn (andrew@lunn.ch) wrote:
-> > On Tue, Sep 16, 2025 at 04:48:56PM +0530, Hariprasad Kelam wrote:
-> > > We're looking for a standard way to configure PHY loopback on a network 
-> > > interface using common Linux tools like ethtool, ip, or devlink.
-> > > 
-> > > Currently, ethtool -k eth0 loopback on enables a generic loopback, but it 
-> > > doesn't specify if it's an internal, external, or PHY loopback. 
-> > > Need suggestions to implement this feature in a standard way.
-> > 
-> > What actually do you mean by PHY loopback?
-> 
-> The Octeon silicon series supports both MAC (RPM) and PHY (GSERM) loopback 
-> modes for testing.
-> 
-> We are seeking a solution to support the following loopback types:
-> 
-> MAC Level
-> 
-> Far-end loopback: Ingress data is routed back to egress data (MAC-to-MAC).
-> 
-> Near-end external loopback: Egress traffic is routed back to ingress traffic at the PCS layer.
-> 
-> PHY Level
-> 
-> Near-end digital loopback
-> 
-> Near-end analog loopback
-> 
-> Far-end digital loopback
-> 
-> Far-end analog loopback
-> 
-> We need suggestions on how to enable and manage these specific modes.
+The rtnetlink FOU selftest prints an incorrect string:
+"FAIL: fou"s. Change it to the intended "FAIL: fou" by
+removing a stray character in the end_test string of the test.
 
-Whatever you put in place, it needs to be generic to support other
-modes. So you need some sort of enum which can be extended. When
-describing the different modes, please try to reference 802.3, so it
-is clear what each actually means. And if it is a vendor mode, please
-describe it well, so other vendors know what it is, and can match
-their vendor names to it.
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ tools/testing/selftests/net/rtnetlink.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Frames received on the Media loopback vs host transmitted frames
-should be another property.
-
-Are you wanting to use this with ethtool --test? That operation is
-still using IOCTL. So you will want to add netlink support, both in
-ethtool(1) and net/ethtool/netlink.c, so you can add the extra
-optional parameters to indicate where loopback should be
-performed. And them plumb this through the MAC ethtool to phylink and
-phylib, and maybe the PCS layer, if you have a linux PCS involved.
-
-	Andrew
+diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
+index d6c00efeb664..24bba74c77ee 100755
+--- a/tools/testing/selftests/net/rtnetlink.sh
++++ b/tools/testing/selftests/net/rtnetlink.sh
+@@ -519,7 +519,7 @@ kci_test_encap_fou()
+ 	run_cmd_fail ip -netns "$testns" fou del port 9999
+ 	run_cmd ip -netns "$testns" fou del port 7777
+ 	if [ $ret -ne 0 ]; then
+-		end_test "FAIL: fou"s
++		end_test "FAIL: fou"
+ 		return 1
+ 	fi
+ 
+-- 
+2.50.1
 
 
