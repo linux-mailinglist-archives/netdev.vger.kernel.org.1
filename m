@@ -1,168 +1,162 @@
-Return-Path: <netdev+bounces-225035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E954B8D961
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 12:22:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDFFEB8D9F0
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 13:25:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 258467B0522
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 10:20:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B76D33BE565
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 11:25:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48BD257853;
-	Sun, 21 Sep 2025 10:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22C7259C93;
+	Sun, 21 Sep 2025 11:24:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="suPlKyrD";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GeQRDIo/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O+BHYOAj"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEC424A066;
-	Sun, 21 Sep 2025 10:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315908F5B
+	for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 11:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758450150; cv=none; b=jht46VBY4r6rwJpxnaWGCEjGw7P/YhXLmP+6hg66p6vTTYwqlPfY+eJPD4cXTB3OyWZgdcxuWMUsy8yFIpGqbKPgIv9ECv4UND2vRj+100VGFL1qvn8MC763u6TApXZUUpYN9K29876zM5b9VfYJWOd3ofn4w/4NMg23e6mzPAw=
+	t=1758453898; cv=none; b=VT9fraEw9gvGPbvQDU7zBDfbnuMScxBkdGdoBbwEoT3aIguR6MMj0gxOzRmsokZePv6rG8arWam9EhX+I9iUE01WkDbfqXoN9rxMT1emcJ5opGp+71MJFuyPNMarxEiKuiOvG1UclnA2svGcWJFDq6FxWTGkXTylqAX53Gf6hNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758450150; c=relaxed/simple;
-	bh=EuaMo6D/BJKLE6f/Qu2pbLWx6rfoIYSR/NXFNH+/L3U=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=iXigrRaS+OmOAx4XRexOSOGeoV3HJ923aeR5q43WRG+tlXjHO06b41ZinYjIP92FV1ZLFMl27FMPL4F/nnYuTlW7BeDJUFGab3ioxu/bEl7AHtoCTwgL9MLVmENGDx1PVVEIgSM+PM6sfPGCNW7hMvNyvGjDFFfbWY270DZuj50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=suPlKyrD; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GeQRDIo/; arc=none smtp.client-ip=103.168.172.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 562C314000FC;
-	Sun, 21 Sep 2025 06:22:27 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Sun, 21 Sep 2025 06:22:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm1; t=
-	1758450147; x=1758536547; bh=z4dTzHicOmu0ud13rOeQ61ccyjqJXmSHMtb
-	dd650m2s=; b=suPlKyrDIIb3+IwNlbntYUFM9a0CpPFkrFNA265367EGvWcyL6g
-	Ai3GxZx0x+4ArraDgo85aSSM6UQ4zzFGVA5VIEciOlSm3NNSWX25P5Y03QWE28I3
-	CLe6f2VtSTdh4JJKb+G/1iqdVfzX0vAmv0rw3WzjY6AV5y90Gk3IeMMfARA36sOH
-	HpJc25LV040BNWMua/br1P4ozNIqmfIxCFvLkngByr/O5d1WPsGJ3KRF4kkGQuB9
-	S9eEzNsKbEG3NxPAg9XaP00LN2cp8jxFXUVLY3emc7MIrrwwoRA8u81v7iQcDmwB
-	y1i85q2UsOjLlxCKTdi3KzV5btBgy0j8lkw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1758450147; x=
-	1758536547; bh=z4dTzHicOmu0ud13rOeQ61ccyjqJXmSHMtbdd650m2s=; b=G
-	eQRDIo/bVDytypOm19Nj87vmudllOQ9j3VlOHWvohikkIUe1MVoAnRfTnb6vhZG5
-	p/cfn+Y69hQFq+LVxWZ+cDO0PRm78tF1WIHNftcRqY4jWKzNPYz/PYCASiN4T7dQ
-	Ff0byzGrYNOTxv9a00wLEgh7Gxodwbti8lnoGpLU6lf/v6i1l7z0vb1Vww21tC7U
-	K5yuRQ00OCVFDsDfZsOmzfTDSHTacSs4GGwG3NyiQgJvWadUrnUBAu+OrOJ+aYl6
-	6m6TGOIv9j/d9/dL6Ak7LlYiyTg58SG9j90U7kwqG7mGOfPxJlTcpdXt+6/6EDcN
-	eM/eiPVRXLdSFxgbW1jzg==
-X-ME-Sender: <xms:4tHPaNn-6gqhyy2fn228rdPkVbYp_Ug6kGDDGg2DHA_UQqBKha9eUw>
-    <xme:4tHPaOnAXRg9ewbcwMnOihWBSq0CcdpuYvlOUopk6I_0inPF1phzlafTbq6JWqCIc
-    p6hDERGz-ekLA>
-X-ME-Received: <xmr:4tHPaBvIC1wTbzMyk6Z6_pupiyb2-fdrDwS3wmltW5QQior3XvDjrxQFy5SPe20vXimLdad3qAUTV9KiHeJdEVBVTaKfgGCxDkhwN4vsSbQB>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdehgeejvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpegtgfgghffvvefujghffffkrhesthhqredttddtjeenucfhrhhomheppfgvihhluehr
-    ohifnhcuoehnvghilhgssehofihnmhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpe
-    ffveejleejheeujeegheelleeuveduheejkeegveeuffetvefhfeevtdeuuefgjeenucff
-    ohhmrghinhepghhithhhuhgsrdgtohhmpdhkvghrnhgvlhdrohhrghenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnvghilhgssehofihnmhgr
-    ihhlrdhnvghtpdhnsggprhgtphhtthhopedujedpmhhouggvpehsmhhtphhouhhtpdhrtg
-    hpthhtohepvhhirhhoseiivghnihhvrdhlihhnuhigrdhorhhgrdhukhdprhgtphhtthho
-    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuh
-    igqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhn
-    uhigqdhfshguvghvvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplh
-    hinhhugidqughotgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhn
-    uhigqdgtihhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuh
-    igqdgstggrtghhvghfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegs
-    phhfsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhgrtghksehsuhhsvg
-    drtgii
-X-ME-Proxy: <xmx:4tHPaIJcxLI3mylMD65vcVWusoP2ANC-YLZj18LljgYs_YDW3iCO8g>
-    <xmx:4tHPaGgZA-AHazPVIA52TncFHJ17tXzJ_qghKTM5oUTHW75gg4Kr9g>
-    <xmx:4tHPaEv6cEE7Fyvgf5R_3YeXxs9nKDVZb4dA2WqlhHve4Jshif9Q_w>
-    <xmx:4tHPaIiKeeX1mmr-u8fMPJqBpiX9lJy-gb8Y3tvRhBYBzbFC7qYN4A>
-    <xmx:49HPaJOA2ecx8oezZruDJjk7UiOe6Ag1tYRGEkvQOih3emkbW4M3hGxH>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 21 Sep 2025 06:22:22 -0400 (EDT)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1758453898; c=relaxed/simple;
+	bh=P2khDDn/G+6oVOugbUsDXxGtt+CufsbX6kA4FmUk7g0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=cioZJIsvTMP8pp9PG0BNQOdfDETvL+uP0gnDfLiBFModBIj/G9BBpVECz70y68VS4Ttjrha5k8/NliNl6F10zPHIjZP85P0/uD+Jh1iqxZHGdZZIA6AToHRrh/zpGddSvVTqq1ja0tGgs3rnV02BWmG37nxlcRLebSgm9uvJEQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O+BHYOAj; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3ed20bdfdffso3749651f8f.2
+        for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 04:24:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758453895; x=1759058695; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=LpqXVMdBPXLDB8/wzui/VoVUAw42bntrHFhuBKSPIgQ=;
+        b=O+BHYOAjfd0COWp47RYgNSsnsSuwDXyR9KY2rBvjH/W+ypgiYku+RT56XfiAuRVpnw
+         v+W47X7cLzkPOyfUgcLIxV+6y4PnYC47fJEsncuu8Qcu0mCtLtj4ibUHBR7TbnoZNGa7
+         c9tn6jnLQWkT/tqljs3On8SAAGtGc5lj39mRvheAjw9U39+Y9IYO9Vw+vxcYvynVwXqg
+         xmoYj3al/Kfm7hb/sFRWXG1P7oCf6AmR7Yvb8uabmf04YD67eOcEc9APTqJNKEsdB15P
+         7jN5IbX9oeLYC15kj2AMwwJQPn//ZKzEdcFXcoI7K/FQ45oeS7GAYd658M/spX846IG/
+         NwbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758453895; x=1759058695;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LpqXVMdBPXLDB8/wzui/VoVUAw42bntrHFhuBKSPIgQ=;
+        b=mR4eoezpTW4AAjY4TepIkQCo4B7BOuDU6dXElVchAzQaiKwuL7uyAtehyDvZb6uqQC
+         F2oiQ0H5CceEMyNiTrpVxbpqmAydHwb0H9QTGMpemX1uoPjkoax0uJIb2DWUFzLwGBdP
+         dS8wUnqf7oQChWrKHDFoziJs45Ov/VU6Lneyo3ShD+qEKxoY5/YT2EWh079PJc4Y1g0p
+         w2UoHCheLbmtKkrQo6umRdtXoKxtFnVU3HIGd4454xZ3n5JR56Q9oUwvIVv2YfN+f7kS
+         IHWWBTDtUzo5LA5/CvQ1WDPCXq2uTsvVFivue/QBY6Mp5W9caESf4udVMIlojS3wQF3x
+         QueQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVmvHXGqbDDkarZyLUKIT2ELmu/Wrd4DfDBSSLAvKzSWn2y2kIa7UpNpMTpWQfhRnyLFeNhSa8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgDPx54WsPH9z4VvosMWpCf6FOCV7xAT+OtZ9/rk8wNc7iaSS/
+	yNFCVF1T8gLPQY/G6GM4LfAHuDAulxMKmU9oQeUBD7k3ngpt/srIKAbZ
+X-Gm-Gg: ASbGncufPCf6fjwXB7+godr4rzixzzrZyvxod3ItdlUA1SCSACty4i1atPBL06gkhYy
+	nCnnHfQAbgp8mNAQVueAZMaBe1BhjW8e9jpKc35fvoPU3mHDe8u1Xm3AcqLEGeVs8JMZLWAmu6B
+	tlcAUslUaea+eJdqn9BRwmynJDQfAJ4a+aJLaMrAFtDKfBvrE847gYmuJE1V2XWt8M2GfbRTqmo
+	I4CSrsL+ywX8xIl6Zp+chwG+zRIy49fo4RAW/saHIIIuAC723gFQaIPjrmGkVnTzPksj+MRbOoV
+	De+p+GtS4rJMINfyHfF4RZNZtckP4AWaWqYYG8L5rNlyxTr8k/0yWTa4pdjJSFGIxQgBHCsoqLs
+	AlTj/ih91e7kzoVviC+vKVENXxaKvokiY4qjB6w8w2u0pjnc=
+X-Google-Smtp-Source: AGHT+IH0ZuZXXPjniEqaRqXv4QdY/ExU554pUIFqdmbqSw1xbaLHEJm2846zI5N46LR7fz3DTPaVRQ==
+X-Received: by 2002:a5d:5c84:0:b0:3ec:db18:1695 with SMTP id ffacd0b85a97d-3ee85769a18mr9563158f8f.45.1758453895193;
+        Sun, 21 Sep 2025 04:24:55 -0700 (PDT)
+Received: from [10.221.198.215] ([165.85.126.96])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-464f527d6cdsm180429735e9.12.2025.09.21.04.24.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 21 Sep 2025 04:24:54 -0700 (PDT)
+Message-ID: <0eb722b9-bad9-43b4-a8a7-6f91f926e9f5@gmail.com>
+Date: Sun, 21 Sep 2025 14:24:53 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "kernel test robot" <oliver.sang@intel.com>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com,
- "Amir Goldstein" <amir73il@gmail.com>, linux-doc@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
- linux-bcachefs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Christian Brauner" <brauner@kernel.org>, "Jeff Layton" <jlayton@kernel.org>,
- "Jan Kara" <jack@suse.cz>, oliver.sang@intel.com
-Subject:
- Re: [PATCH v3 5/6] VFS: rename kern_path_locked() and related functions.
-In-reply-to: <202509211121.ebd9f4b0-lkp@intel.com>
-References: <20250915021504.2632889-6-neilb@ownmail.net>,
- <202509211121.ebd9f4b0-lkp@intel.com>
-Date: Sun, 21 Sep 2025 20:22:13 +1000
-Message-id: <175845013376.1696783.14389036029721020068@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
-
-On Sun, 21 Sep 2025, kernel test robot wrote:
->=20
-> Hello,
->=20
-> kernel test robot noticed "BUG:unable_to_handle_page_fault_for_address" on:
->=20
-> commit: 747e356babd8bdd569320c29916470345afd3cf7 ("[PATCH v3 5/6] VFS: rena=
-me kern_path_locked() and related functions.")
-> url: https://github.com/intel-lab-lkp/linux/commits/NeilBrown/VFS-ovl-add-l=
-ookup_one_positive_killable/20250915-101929
-> base: https://git.kernel.org/cgit/linux/kernel/git/vfs/vfs.git vfs.all
-> patch link: https://lore.kernel.org/all/20250915021504.2632889-6-neilb@ownm=
-ail.net/
-> patch subject: [PATCH v3 5/6] VFS: rename kern_path_locked() and related fu=
-nctions.
-
-This incremental fix should be sufficient.
-
-Thanks,
-NeilBrown
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 0/2] Fix generating skb from non-linear xdp_buff
+ for mlx5
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+To: Amery Hung <ameryhung@gmail.com>, netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, kuba@kernel.org,
+ martin.lau@kernel.org, noren@nvidia.com, dtatulea@nvidia.com,
+ saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, cpaasch@openai.com,
+ kernel-team@meta.com
+References: <20250915225857.3024997-1-ameryhung@gmail.com>
+ <b67f9d89-72e0-4c6d-b89b-87ac5443ba2e@gmail.com>
+Content-Language: en-US
+In-Reply-To: <b67f9d89-72e0-4c6d-b89b-87ac5443ba2e@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-diff --git a/fs/namei.c b/fs/namei.c
-index 5ceb971632fe..92973a7a8091 100644
---- a/fs/namei.c
-+++ b/fs/namei.c
-@@ -2772,7 +2772,7 @@ static struct dentry *__start_removing_path(int dfd, st=
-ruct filename *name,
- 	if (unlikely(type !=3D LAST_NORM))
- 		return ERR_PTR(-EINVAL);
- 	/* don't fail immediately if it's r/o, at least try to report other errors =
-*/
--	error =3D mnt_want_write(path->mnt);
-+	error =3D mnt_want_write(parent_path.mnt);
- 	inode_lock_nested(parent_path.dentry->d_inode, I_MUTEX_PARENT);
- 	d =3D lookup_one_qstr_excl(&last, parent_path.dentry, 0);
- 	if (IS_ERR(d))
-@@ -2789,7 +2789,7 @@ static struct dentry *__start_removing_path(int dfd, st=
-ruct filename *name,
- unlock:
- 	inode_unlock(parent_path.dentry->d_inode);
- 	if (!error)
--		mnt_drop_write(path->mnt);
-+		mnt_drop_write(parent_path.mnt);
- 	return d;
- }
-=20
+
+On 16/09/2025 16:52, Tariq Toukan wrote:
+> 
+> 
+> On 16/09/2025 1:58, Amery Hung wrote:
+>> v1 -> v2
+>>    - Simplify truesize calculation (Tariq)
+>>    - Narrow the scope of local variables (Tariq)
+>>    - Make truesize adjustment conditional (Tariq)
+>>
+>> v1
+>>    - Separate the set from [0] (Dragos)
+>>    - Split legacy RQ and striding RQ fixes (Dragos)
+>>    - Drop conditional truesize and end frag ptr update (Dragos)
+>>    - Fix truesize calculation in striding RQ (Dragos)
+>>    - Fix the always zero headlen passed to __pskb_pull_tail() that
+>>      causes kernel panic (Nimrod)
+>>
+>>    Link: https://lore.kernel.org/bpf/20250910034103.650342-1- 
+>> ameryhung@gmail.com/
+>>
+>> ---
+>>
+>> Hi all,
+>>
+>> This patchset, separated from [0], contains fixes to mlx5 when handling
+>> non-linear xdp_buff. The driver currently generates skb based on
+>> information obtained before the XDP program runs, such as the number of
+>> fragments and the size of the linear data. However, the XDP program can
+>> actually change them through bpf_adjust_{head,tail}(). Fix the bugs
+>> bygenerating skb according to xdp_buff after the XDP program runs.
+>>
+>> [0] https://lore.kernel.org/bpf/20250905173352.3759457-1- 
+>> ameryhung@gmail.com/
+>>
+>> ---
+>>
+>> Amery Hung (2):
+>>    net/mlx5e: RX, Fix generating skb from non-linear xdp_buff for legacy
+>>      RQ
+>>    net/mlx5e: RX, Fix generating skb from non-linear xdp_buff for
+>>      striding RQ
+>>
+>>   .../net/ethernet/mellanox/mlx5/core/en_rx.c   | 47 +++++++++++++++----
+>>   1 file changed, 38 insertions(+), 9 deletions(-)
+>>
+> 
+> Thanks for your patches.
+> They LGTM.
+> 
+> As these are touching a sensitive area, I am taking them into internal 
+> functional and perf testing.
+> I'll update with results once completed.
+> 
+
+Initial testing passed.
+Thanks for your patches.
+
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+
 
