@@ -1,185 +1,311 @@
-Return-Path: <netdev+bounces-225044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97BC8B8DDF9
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 18:03:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E73AB8DE02
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 18:05:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D0733BAF60
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 16:03:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 307B37A6F53
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 16:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA171D88A6;
-	Sun, 21 Sep 2025 16:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 001051EB195;
+	Sun, 21 Sep 2025 16:05:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="LTPyEKun"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="eRKp65PN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814D521348
-	for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 16:03:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD881E5B7A;
+	Sun, 21 Sep 2025 16:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758470621; cv=none; b=F/LBA+FXqGc1FaiKBUV1KXbS28aLhPQZT0tr+ZdsRwNoQF5gvI/rJOHnmL41mMnUvai7XprcrbACIJ+yvMYurfQPb/Cms8XdYYCElR/PzPrGSYOExEP1bh7IQIE0V0PPfsXSdN35vGDaYmG0QBeiiJFlPr7PsdzhakuOEiyQx5E=
+	t=1758470716; cv=none; b=CJGkRGaLYFIfOaKoJmzsQQP8c2qHKfHUJ8WfGmVzNKOv7qQ3UmaNb/4FlZ7/PuvDkTKHu377FXfmT9lK+JOJG2/ULOyfycmkz1kOc94z09cynxan8mwVnhigZW12T6q91SxnNdkUjsfQ9qb2Ve0jlCjitLPyoIsMQ9xmg88ydmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758470621; c=relaxed/simple;
-	bh=Nyv3nu9ra+VnkLcWi4fYDcC/tqIyFF5rY8/59rRkprI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mu+oSDqL5QQk+gb153anMnWB0iK3ZYH5cp2UzoL1fyTJjhcbI+Tn5rZq2Eemfv9KEDK1talH5pYONPv+kj/LMrko+KpJ3oCsvkg/QKFPu8/11qL18vKZkHR/HJ3WCtxIp8BqedZa2T2TcbKJkMP+2yd9cVMnSrcKc9VTvjNk8u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=LTPyEKun; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b552e730f4aso36958a12.2
-        for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 09:03:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1758470619; x=1759075419; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m8vv2Le2VJrRxnfPklYATsMJpEaKnulCkTyhGkgWhWU=;
-        b=LTPyEKunRJqMGjbdXUgzNLIalrK30rf3VEL3LynfI9XTB2cEmjQf30UY94NFyWnNvl
-         0Y0ef+iVnf+l1ml08mVHXVL9N8lz+R8UqyE59xWs6my/uMYLmoQyhFxy8dQHKHvhne2V
-         D0GLg9VX2J8MzPm4DFW2fO6Ltb/bkYvqy5jjbGYRPSeKkWH1jWxHrp1RFo6r3ZoL5jkq
-         KKvsbSNcmUM5TokDct86vRi/Mqf0vvmwBc+Ucn05fTZ8Jhb7fuv4+pJDKoMn6K/qDwfS
-         lJzfLRyZqAilwnCXn3pAwHIudKOw6jkZXHdyUg6/pT0YzsjHTDvg3RbM+OMxRAkYW/uA
-         9c9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758470619; x=1759075419;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m8vv2Le2VJrRxnfPklYATsMJpEaKnulCkTyhGkgWhWU=;
-        b=RgJX92UluvxAbVTUsO91ubyNCzXkYEDBFtAPBHwyccxGTYTI5uH5aATjouCidW9Zkv
-         f6jYmXgJI2EpZHQgR5YJUMpP6AgKuuNWMV2fExC+rdyOcM7KIUDaDWj0vq/JJmB0kvkr
-         gItxP8gfjd1FdxVD0tFa+j17nITryG3B8f3WYdWPiWWGbE/nHej1j7iafTxkb4WWL5Y8
-         kVfe+HOIpQSJQE4joybczwBG2s+oCxUV8mHb8qYCX7IEtR1/jt/ygFPIAOH6CRoiunXx
-         cgXyuz1BJhtXFhrmil87FNSYltKU1h3nbso8L7XUy1coujHu/UW4XDKqVrBe4b62yGuR
-         L6Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCUcDWwfTIYwzpHEODAwQH2P0UZ8AMtFp5VD0/ge8jdp9hbCcO5kfRjoCsfIGgrgkJiTYHyhNZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyz+wrkkW50MiRGVWwzO7hW1MpcSVUw8Bt3WlQ+XwlP159Fn44s
-	Z4EAAh8dg5AVfLbOo/B8F2eipjRYh7194IXbtf49lPyFehcZISzqCCDQYDD4XwbVzxA=
-X-Gm-Gg: ASbGncu8+IxX3adVOPlHq8xSpfKgXgZcYxvGRpeqg8APkwrbtMwkNb+scpmqb1/4YYw
-	nSUmGsC01rYo7o+amj8lUXfdeqiMcvBITFpwlPC9ArrFpcPA5mVSdwhhcJu09evjE11n9iBYVgw
-	DUdsEFItg+ffnFnaTmfPaiDZMjXjW+ulKkGO5+TfP+bvdG+xF6vEKbepUBWAHfFi24Y/CAV7Gkt
-	vowQ67qO5moiRFeC/YYewQpql0uPMo3mglr/dtqptghEkyYIC4co0O6hkvq9kyJUKX9gYrNC9Cy
-	xfoBc1HM34Hxynn/ku0OZAEZRMK+tkGwb4Bo/5+dv5S5jj7ZqA98dZIpWW4Dc5p52/awjnBdMEx
-	KPLL0JtWd
-X-Google-Smtp-Source: AGHT+IGO1cuQkOPmn4UyOI5kFKI36eTSHeG8iJchXXEH6ggKPqiEmnDaBeCZE+RPDXwV2gVC+zSVyA==
-X-Received: by 2002:a05:6a00:c96:b0:776:6e9e:3ccd with SMTP id d2e1a72fcca58-77e4f48e9a9mr6592843b3a.7.1758470618633;
-        Sun, 21 Sep 2025 09:03:38 -0700 (PDT)
-Received: from t14 ([2001:5a8:4519:2200:4345:519b:ccab:7b30])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77cfbb79c05sm10322652b3a.4.2025.09.21.09.03.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Sep 2025 09:03:38 -0700 (PDT)
-Date: Sun, 21 Sep 2025 09:03:35 -0700
-From: Jordan Rife <jordan@jrife.io>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Aditi Ghag <aditi.ghag@isovalent.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH bpf-next 00/14] bpf: Efficient socket destruction
-Message-ID: <ilrnfpmoawkbsz2qnyne7haznfjxek4oqeyl7x5cmtds5sdvxe@dy6fs3ej4rbr>
-References: <20250909170011.239356-1-jordan@jrife.io>
- <80b309fe-6ba0-4ca5-a0b7-b04485964f5d@linux.dev>
+	s=arc-20240116; t=1758470716; c=relaxed/simple;
+	bh=fc2UqPZc6j5Vy2OfU9oD/ag/8me6jPVqNvMutLFZ7bk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VPEvnI2/7E97Yl8Lm+cOrQb7ULLn2apZnHjzyF6w3ELx2XboF4rgZ03fRMgW6rjhwrrcZuGMsSS7vbuQSqSc8D7LnXLcHUSEjmWplKTSVImRc4zmousAjHWd4eKq48rCdfoXZUTE5w/A3vVmCp47UjWiuH75+bWI07TYb/9RDk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=eRKp65PN; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id E9DDFC8F46A;
+	Sun, 21 Sep 2025 16:04:49 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id C310D60634;
+	Sun, 21 Sep 2025 16:05:06 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 36EED102F17C0;
+	Sun, 21 Sep 2025 18:04:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1758470705; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=euasved84VdGoOAQI6Er+jjc1kHqNhUOpn8GJ+e1NzI=;
+	b=eRKp65PNirMu4V9Qqla6x0m67CBo/LXR5szvqXPtYzME+vKNcZw2zZVWUg9YsQXXFkmaCD
+	GfjwJqqbOqPqDzE0WePC/Kl3WCysarqGrhvxRSvJc1Cncddg6SKLAstK1qn10ACX7XiYuj
+	Ks6+EtR4E7PwafetlX4lYV9Hf8cdAEJ+kVhp34ouzryYxA3+w4tdvzl5qNdWtwM375VTtB
+	YAvrGeS6MJM0r9c7DsdWasc/ZBEa+ILL/fnvAoIPAQ5KDGRmOPJa49BNCyi3FHYymREQDR
+	g/BpmlGz61B3J8RbsB7KhyKjaMwGyCzTIM+uxaMqIzeSn1E4iW8VJlJzylQ4Ng==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>,
+	devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: [PATCH net-next v13 00/18] net: phy: Introduce PHY ports representation
+Date: Sun, 21 Sep 2025 21:33:58 +0530
+Message-ID: <20250921160419.333427-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <80b309fe-6ba0-4ca5-a0b7-b04485964f5d@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Martin,
+Hi everyone,
 
-Thanks for taking a look.
+Here is a V13 for the phy_port work, aiming at representing the
+connectors and outputs of PHY devices.
 
-> How many sockets were destroyed?
+This V13 adds a missing EXPORT_SYMBOL_GPL() and aggregates all the
+reviews and tested-by from Christophe, Florian and Oleksij. Thanks a lot
+for these tests and reviews !
 
-Between 1 and 5 per trial IIRC during this test. Generally, there would
-be a small set of sockets to destroy for a given backend relative to the
-total number UDP/TCP sockets on a system.
+This series is 18 patches, but hopefully given the amount of reviews
+that were made on this work as a whole, it can stay that way.
 
-> For TCP, is it possible to abort the connection in BPF_SOCK_OPS_RTO_CB to
-> stop the retry? RTO is not a per packet event.
+I know this is a lot to digest, but if any PHY maintainer would like to take
+a look though I'd be very happy about that :)
 
-To clarify, are you suggesting bpf_sock_destroy() from that context or
-something else? If the former, bpf_sock_destroy() only works from socket
-iterator contexts today, so that's one adjustment that would have to be
-made. It seems like this could work, but I'd have to think more about
-how to mark certain sockets for destruction (possibly using socket
-storage or some auxiliary map).
+As a remainder, a few important notes :
 
-> Does it have a lot of UDP connected sockets left to iterate in production?
+ - This is only a first phase. It instantiates the port, and leverage
+   that to make the MAC <-> PHY <-> SFP usecase simpler.
 
-It's hard to say for certain (my perspective is as a cloud provider,
-but I've seen customers do strange things). It seems unlikely anyone is
-creating, e.g., 1M UDP sockets on the same host. In practice, TCP would
-be more of a concern. Still, it would be nice to have a more efficient
-means to destroy a small set of sockets vs doing full UDP/TCP hash
-traversals.
+ - Next phase will deal with controlling the port state, as well as the
+   netlink uAPI for that.
 
-> I assume the sockets that need to be destroyed could be in different child
-> hashtables (i.e. in different netns) even child_[e]hash is used?
+ - The end-goal is to enable support for complex port MUX. This
+   preliminary work focuses on PHY-driven ports, but this will be
+   extended to support muxing at the MII level (Multi-phy, or compo PHY
+   + SFP as found on Turris Omnia for example).
 
-Correct. You would have to do a hash traversal in all namespaces that
-contain at least one connection to a given backend. This might hurt or
-help depending on the use case and depending on how sparse the hashes
-are, but might cut down on visiting / filtering out sockets from other
-namespaces.
+ - The naming is definitely not set in stone. I named that "phy_port",
+   but this may convey the false sense that this is phylib-specific.
+   Even the word "port" is not that great, as it already has several
+   different meanings in the net world (switch port, devlink port,
+   etc.). I used the term "connector" in the binding.
 
-> Before diving into the discussion whether it is a good idea to add another
-> key to a bpf hashmap, it seems that a hashmap does not actually fit your use
-> case. A different data structure (or at least a different way of grouping
-> sk) is needed. Have you considered using the
+A bit of history on that work :
 
-If I were to design my ideal data structure for grouping sockets
-(ignoring current BPF limitations), it would look quite similar to the
-modified SOCK_HASH in this series. Really what would be ideal is
-something more like a multihash where a single key maps to a set of
-sockets, but that felt much too specific to this use case and doesn't
-fit well within the BPF map paradigm. The modification to SOCK_HASH with
-the key prefix stuff kind of achieves and felt like a good starting
-point.
+The end goal that I personnaly want to achieve is :
 
-> bpf_list_head/bpf_rb_root/bpf_arena? Potentially, the sk could be stored as
-> a __kptr but I don't think it is supported yet, aside from considerations
-> when sk is closed, etc. However, it can store the numeric ip/port and then
-> use the bpf_sk_lookup helper, which can take netns_id. Iteration could
-> potentially be done in a sleepable SEC("syscall") program in test_prog_run,
-> where lock_sock is allowed. TCP sockops has a state change callback (i.e.
+            + PHY - RJ45
+            | 
+ MAC - MUX -+ PHY - RJ45
 
-You could create a data structure tailored for efficient iteration over
-a group of ip/port pairs, although I'm not sure how you would acquire
-the socket lock unless, e.g., bpf_sock_destroy or a sleepable variant
-thereof acquires the lock itself in that context after the sk lookup?
-E.g. (pseudocode):
+After many discussions here on netdev@, but also at netdevconf[1] and
+LPC[2], there appears to be several analoguous designs that exist out
+there.
 
-...
-for each (ip,port,ns) in my custom data structure:
-    sk = bpf_sk_lookup_tcp(ip, port, ns)
-    if (sk)
-    	bpf_sock_destroy_sleepable(sk) // acquires socket lock?
-...
+[1] : https://netdevconf.info/0x17/sessions/talk/improving-multi-phy-and-multi-port-interfaces.html
+[2] : https://lpc.events/event/18/contributions/1964/ (video isn't the
+right one)
 
-Or maybe just mark the socket for destruction in the test_prog_run
-program (sock storage?) and later call bpf_sock_destroy in a sockops
-context next time the socket is used.
+Take the MAchiatobin, it has 2 interfaces that looks like this :
 
-Either way, I think the constraints around which contexts
-bpf_sock_destroy supports might need to be relaxed.
+ MAC - PHY -+ RJ45
+            |
+	    + SFP - Whatever the module does
 
-> for tracking TCP_CLOSE) but connected udp does not have it now.
+Now, looking at the Turris Omnia, we have :
 
-Overall, the SOCK_HASH changes felt like a natural starting point, but
-I'm happy to discuss some alternatives. I like the idea of being able to
-combine bpf_rb_root/bpf_arena + bpf_sk_lookup + bpf_sock_destroy, and it
-seems like an interesting direction to explore.
 
-Thanks again, I really appreciate the input.
+ MAC - MUX -+ PHY - RJ45
+            |
+	    + SFP - Whatever the module does
 
-Jordan
+We can find more example of this kind of designs, the common part is
+that we expose multiple front-facing media ports. This is what this
+current work aims at supporting. As of right now, it does'nt add any
+support for muxing, but this will come later on.
+
+This first phase focuses on phy-driven ports only, but there are already
+quite some challenges already. For one, we can't really autodetect how
+many ports are sitting behind a PHY. That's why this series introduces a
+new binding. Describing ports in DT should however be a last-resort
+thing when we need to clear some ambiguity about the PHY media-side.
+
+The only use-cases that we have today for multi-port PHYs are combo PHYs
+that drive both a Copper port and an SFP (the Macchiatobin case). This
+in itself is challenging and this series only addresses part of this
+support, by registering a phy_port for the PHY <-> SFP connection. The
+SFP module should in the end be considered as a port as well, but that's
+not yet the case.
+
+However, because now PHYs can register phy_ports for every media-side
+interface they have, they can register the capabilities of their ports,
+which allows making the PHY-driver SFP case much more generic.
+
+Let me know what you think, I'm all in for discussions :)
+
+Regards,
+
+Changes in V12:
+ - Moved some of phylink's internal helpers to phy_caps for reuse in
+   phylib
+ - Fixed SFP interface selection
+ - Added Rob's review and changes in patch 6
+
+Changes in V11:
+ - The ti,fiber-mode property was deprecated in favor of the
+   ethernet-connector binding
+ - The .attach_port was split into an MDI and an MII version
+ - I added the warning back in the AR8031 PHY driver
+ - There is now an init-time check on the number of lanes associated to
+   every linkmode, making sure the number of lanes is above or equal to
+   the minimum required
+ - Various typos were fixed all around
+ - We no longer use sfp_select_interface() for SFP interface validation
+
+Changes in V10:
+ - Rebase on net-next
+ - Fix a typo reported by Köry
+ - Aggregate all reviews
+ - Fix the conflict on the qcom driver
+
+Changes in V9:
+ - Removed maxItems and items from the connector binding
+ - Fixed a typo in the binding
+
+Changes in V8:
+ - Added maxItems on the connector media binding
+ - Made sure we parse a single medium
+ - Added a missing bitwise macro
+
+Changes in V7:
+ - Move ethtool_medium_get_supported to phy_caps
+ - support combo-ports, each with a given set of supported modes
+ - Introduce the notion of 'not-described' ports
+
+Changes in V6:
+
+ - Fixed kdoc on patch 3
+ - Addressed a missing port-ops registration for the Marvell 88x2222
+   driver
+ - Addressed a warning reported by Simon on the DP83822 when building
+   without CONFIG_OF_MDIO
+
+Changes in V5 :
+
+ - renamed the bindings to use the term "connector" instead of "port"
+ - Rebased, and fixed some issues reported on the 83822 driver
+ - Use phy_caps
+
+Changes in V4 :
+
+ - Introduced a kernel doc
+ - Reworked the mediums definitions in patch 2
+ - QCA807x now uses the generic SFP support
+ - Fixed some implementation bugs to build the support list based on the
+   interfaces supported on a port
+
+V12: https://lore.kernel.org/netdev/20250909152617.119554-1-maxime.chevallier@bootlin.com/
+V11: https://lore.kernel.org/netdev/20250814135832.174911-1-maxime.chevallier@bootlin.com/
+V10: https://lore.kernel.org/netdev/20250722121623.609732-1-maxime.chevallier@bootlin.com/
+V9: https://lore.kernel.org/netdev/20250717073020.154010-1-maxime.chevallier@bootlin.com/
+V8: https://lore.kernel.org/netdev/20250710134533.596123-1-maxime.chevallier@bootlin.com/
+v7: https://lore.kernel.org/netdev/20250630143315.250879-1-maxime.chevallier@bootlin.com/
+V6: https://lore.kernel.org/netdev/20250507135331.76021-1-maxime.chevallier@bootlin.com/
+V5: https://lore.kernel.org/netdev/20250425141511.182537-1-maxime.chevallier@bootlin.com/
+V4: https://lore.kernel.org/netdev/20250213101606.1154014-1-maxime.chevallier@bootlin.com/
+V3: https://lore.kernel.org/netdev/20250207223634.600218-1-maxime.chevallier@bootlin.com/
+RFC V2: https://lore.kernel.org/netdev/20250122174252.82730-1-maxime.chevallier@bootlin.com/
+RFC V1: https://lore.kernel.org/netdev/20241220201506.2791940-1-maxime.chevallier@bootlin.com/
+
+Maxime
+
+Maxime Chevallier (18):
+  dt-bindings: net: Introduce the ethernet-connector description
+  net: ethtool: common: Indicate that BaseT works on up to 4 lanes
+  net: ethtool: Introduce ETHTOOL_LINK_MEDIUM_* values
+  net: phy: Introduce PHY ports representation
+  net: phy: dp83822: Add support for phy_port representation
+  dt-bindings: net: dp83822: Deprecate ti,fiber-mode
+  net: phy: Create a phy_port for PHY-driven SFPs
+  net: phylink: Move phylink_interface_max_speed to phy_caps
+  net: phylink: Move sfp interface selection and filtering to phy_caps
+  net: phy: Introduce generic SFP handling for PHY drivers
+  net: phy: marvell-88x2222: Support SFP through phy_port interface
+  net: phy: marvell: Support SFP through phy_port interface
+  net: phy: marvell10g: Support SFP through phy_port
+  net: phy: at803x: Support SFP through phy_port interface
+  net: phy: qca807x: Support SFP through phy_port interface
+  net: phy: Only rely on phy_port for PHY-driven SFP
+  net: phy: dp83822: Add SFP support through the phy_port interface
+  Documentation: networking: Document the phy_port infrastructure
+
+ .../bindings/net/ethernet-connector.yaml      |  45 +++
+ .../devicetree/bindings/net/ethernet-phy.yaml |  18 +
+ .../devicetree/bindings/net/ti,dp83822.yaml   |  10 +-
+ Documentation/networking/index.rst            |   1 +
+ Documentation/networking/phy-port.rst         | 111 ++++++
+ MAINTAINERS                                   |   3 +
+ drivers/net/phy/Makefile                      |   2 +-
+ drivers/net/phy/dp83822.c                     |  79 +++--
+ drivers/net/phy/marvell-88x2222.c             |  95 ++---
+ drivers/net/phy/marvell.c                     |  94 ++---
+ drivers/net/phy/marvell10g.c                  |  54 +--
+ drivers/net/phy/phy-caps.h                    |  12 +
+ drivers/net/phy/phy-core.c                    |   6 +
+ drivers/net/phy/phy_caps.c                    | 217 ++++++++++++
+ drivers/net/phy/phy_device.c                  | 334 +++++++++++++++++-
+ drivers/net/phy/phy_port.c                    | 194 ++++++++++
+ drivers/net/phy/phylink.c                     | 157 +-------
+ drivers/net/phy/qcom/at803x.c                 |  78 ++--
+ drivers/net/phy/qcom/qca807x.c                |  73 ++--
+ include/linux/ethtool.h                       |  44 ++-
+ include/linux/phy.h                           |  63 +++-
+ include/linux/phy_port.h                      |  99 ++++++
+ include/uapi/linux/ethtool.h                  |  20 ++
+ net/ethtool/common.c                          | 267 ++++++++------
+ 24 files changed, 1542 insertions(+), 534 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/ethernet-connector.yaml
+ create mode 100644 Documentation/networking/phy-port.rst
+ create mode 100644 drivers/net/phy/phy_port.c
+ create mode 100644 include/linux/phy_port.h
+
+-- 
+2.49.0
+
 
