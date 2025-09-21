@@ -1,287 +1,198 @@
-Return-Path: <netdev+bounces-225114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4F35B8E7DE
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 23:58:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 10B29B8E99B
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 01:37:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1ADC3B9905
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 21:57:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C05973B40F0
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 23:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783A22DCC1B;
-	Sun, 21 Sep 2025 21:56:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C38226CFC;
+	Sun, 21 Sep 2025 23:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b0zEYnZW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qthkb1n1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786A42DA755
-	for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 21:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E7D1805E
+	for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 23:37:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758491790; cv=none; b=B2bc6ppFk5h3CWGlJ4xsyKwSzjdgMqkWF5TgJaLlxC3Lx9PdepJ+8ATeYZmC4/mKROZzsahD9lTGUUwFgvXqEljy6Y1yzsA4tKwvu6hQIi/CilaMYn7nEz6f3eTIvoHi6dAW30R/adbv0LrWuh8vq4sueoLjxiawLd6+saQnf2A=
+	t=1758497822; cv=none; b=BpXuuOM39OXE/ANVcQhxVQlolniPn5LKLbZoOKmg3kL0WhkmAayVQ8NObtuvmAOYpDGfBRgLzsZUZyYK4Fs52k9QG6bQl3GrOMQj/P7Az/R1JxeyUeRfY52wPxLwYk8iQH0W1FCJd0Rcv+dxDUrrkxuSxR1qr4g451c3ofs6VTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758491790; c=relaxed/simple;
-	bh=R3yengxGAdZ6SfJjU1VD10z3t2Uj/t+EUXjBtn9XPhs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=OgBMO7WQrcRqiVxsa1XM3xP9OL/pfQwSlJOk1Jlz18tpBMyJLhaSaIMfkHH5wMJ6BrwYBK5cAyphB6xwNms/HAtmm2SCuGcPcc8TINcXA0BlM1k+/gl39b7UXGJ1PWVx8p5ankmTA2y53xGWIX9iAzMdsrM/vUaLdj8AkTbwzT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b0zEYnZW; arc=none smtp.client-ip=209.85.221.51
+	s=arc-20240116; t=1758497822; c=relaxed/simple;
+	bh=Jy9iv8eXgUW2eurblj4t+Dk2wGWK/qdeBVQkkUS/1Qo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=allHelABkj6+K51YcBYzEBeyc/YrpaQgzGYYDcLjUvTdwGBfYFWY+0YfpICbb3hso/6ybx3gUXjnmES6Ej34O4J6EsPii1TfPUwhywLs21Y/V3uONMd6dHdMphxtmAg/QDClM0T3A2MRVGJf86ZZYYbks2tjzWnVnUkbNexkVlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qthkb1n1; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3ee1221ceaaso1910053f8f.3
-        for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 14:56:27 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-271d1305ad7so13952725ad.2
+        for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 16:37:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758491786; x=1759096586; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FzkTk9ZGVrUO/YmVyv5ISDrea/09V1eF2f8GeR25nUE=;
-        b=b0zEYnZWKWRkQOO0VYuUu0sfFnADqfeuXWFwzMLtTQZem6AChdmJoivcMwnlFUqmS4
-         ekz1ituRA96vRKJfNv0TfWoBx06LQkyupoppEBn4kFdi5mS67sqi9urqSDnDVAqpAsCQ
-         qpJLYK853Gt9RJAvKAdCe1tHvRlOt6T2mVcCntCyREwPq68XeTcWVH4z7f44HxpUPrWw
-         7KHnsPYH5BoPi28Lj393LLXv8mZGn9GmzGJEYA0vtwETGwdLMDoXsNTBMWbFnyTVMnVy
-         Yrxg5r47Y5CxUgQxiwlpJR1FS2KUfwpW3QeplsKR+bYsn5U68cgejrKA58Fc+SjqCW53
-         N4MA==
+        d=gmail.com; s=20230601; t=1758497820; x=1759102620; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zbD+yBPEBHUU9GO+LWfLJSUyCDLhOgWee8hHgUPQCIA=;
+        b=Qthkb1n12ci599H6XqPaakhnoCtOlhtVs6wmnLQks8wJQGjtS1J5XgPSWihn0/D0Iu
+         nHOFiQHUC5paWPhIws5tPWkyt8G1Mu0qRC9zYHi2IugiVLR75+rDrbmwQpMq/R8jKQ0m
+         N59/lrR9cr4MWboNZyALz5dRLsyrLNL3QuqOtTZYnAyhvuLdNGZMOL24MtJNzlhMXWci
+         3CtgTmsG9H/3g1TBwv89hUqUPfNg0bMsROzan3D6DdmKM9iQUbL2u5nqHoX64zjkq5/H
+         jz+aPRN/27oy22cM1vcOchkukl7K7qSfW0By9yrSs+U2Qr1uuxWIq9r/45lIVYj3czXG
+         a86w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758491786; x=1759096586;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FzkTk9ZGVrUO/YmVyv5ISDrea/09V1eF2f8GeR25nUE=;
-        b=tNLWceh+PMgjky8YcwKT3vpi/pK3buRmtKKO9834iUR1gqVZm+F5MnkLDJd7B1CvTE
-         RW7PvYURWpL1dPpw0hmN4yZ3CZchMsekFATb/4bO71ZqAjNmydTr7c/FgKvf/xiVWAub
-         TlHi8761Gin7i46ha+pZQ/eyEtcfOajZgtqPU4JwiqG7JGjhFUSG+kMByvuua8DoCQaH
-         2V66pTjIUWommmGARwxlRcrlxQOFreL6FvJ/MKGaI806NZXEbbAZT1t0aNpmoZeWfFLv
-         lIQRWMv/XmJESchH6fP/cFmJS8QijZnK3ol3znSUnc5vlTLnQ9KT6wjqNjcz1docRs3V
-         TEPQ==
-X-Gm-Message-State: AOJu0YxF2nMvbVBXOg+Eg9sNjX8PVMQlkOwMhhtAFJ7sTzMyyGmVfkkX
-	y3BRH9SJ2D/ol20inobsgXt0lftvhamOl2EFaDyHpmUFjLvcLq+gEA7v
-X-Gm-Gg: ASbGncvHHvjuULgomikvXHjVvWRjVQIjWGinDetHIFsRLib9nMs2G2QWtL2Zu41jYpD
-	fxLU+5TCP0AFbinUGKvnsZEgqKQdQaJnLqzKeicTD+LUSPRrCCQarhQl/WqLhnw9otpRypHhFfH
-	JhpPj3l4ygwydJAdEwOWND7M/Yo8ex/CwMm2BAFpnE+hjgkA4NX3DrMuBh9LNT2/Fz2mJL48YCb
-	aV88UaFVvjgteHyN6kf46LYRIgpEgLrF/ffeifXavb5m/5bMBWZzDyqKU51gt2Qs9ihYatv2RBs
-	x8wyS2aTFvfY/EpdhAcarJa/Ue8B9xDv/v2RA25bW9NLuMw6KJFqewm3UHyhkFkYn4rgta1Fqk7
-	RGnR/NNsYZrJByHTLy0KGsAjPkjM=
-X-Google-Smtp-Source: AGHT+IHEVkHeQQ75LjAl5tNj6JF2glhGPryv/AOyhtjgb89bmwUVUWqWMyYTbYI571pla3OfRIwgCA==
-X-Received: by 2002:a05:6000:18a9:b0:3e9:ee54:af54 with SMTP id ffacd0b85a97d-3ee7d0c8beamr8120070f8f.21.1758491785512;
-        Sun, 21 Sep 2025 14:56:25 -0700 (PDT)
-Received: from [192.168.1.243] ([143.58.192.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3f829e01a15sm5873427f8f.57.2025.09.21.14.56.24
+        d=1e100.net; s=20230601; t=1758497820; x=1759102620;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zbD+yBPEBHUU9GO+LWfLJSUyCDLhOgWee8hHgUPQCIA=;
+        b=ECYfdzETozrc0ELBzjEFr5H9162nKs5Rsj+hu2p2PT+hYzjMlmwfGrYLZWzDRlUR0p
+         N5eFFfNul2+mnD/BJUYciR4G0sCPdXEzrkWqw0LwI4bvFXIZX6BdvBXvD1TJso+JLATl
+         KG0jjBeRQQzQWNjAO68o0UCShpT2olHlq26wSlfWVCIADg0/82u8lYBd04BzAadxiLDl
+         m4LKsrl/NhZXC8H8P1upNWnofLCzs8D1mDTjm99Ybc2LuPxlCJ/eF3vCdropPDiLJC0F
+         6GmWmokCWCJ5BUBqSFC8z+HFF7ojIvQgwezz9oEPyGiQ/80cssM1+anPbG0tPfnHmlRa
+         Ps5A==
+X-Gm-Message-State: AOJu0YwHst/EXOn0M8gft8GiVUzd9UJh1gmn0v941GLZWZH7tepJ68uV
+	lJ6iu4qirmZQYbaVF+5Q/LoeoINPkyDrIg+hlVZsrKnr/RUvC4EuBuUEvLpzog==
+X-Gm-Gg: ASbGncu+1OoUK6Bf+lbHIWbNKKJKX5yZA6stnD+4HfpbfHhYd2vp9gF7ODMevg0uzE+
+	Punlxy+nseD5Qdh3A8gAoO+MqbmFCzRLzdRPzrabwtCS8LjEYicDClHS27rfbcC5z1NRPMREpAp
+	TEMliVRZCpjBMWmlLnB/HEb8k06VafR/TeZj93AxOlAINGtlvrHSySN1dxtzlvY8epxmuu4CUuI
+	dJbBfrY/1AKctqPQQxtycbxhm82dMKddRrInd/gpHT3KGkFwgj/w+nLfNwGE1MJR1vI7cXRAKvF
+	VE65zHqlKv7DI1g2t5PQwmlb2gqC6O1LrAGoatM6ad5dZ4mMhXSCSyEzlBfsHtTvFCV4lgBM0Pl
+	IwDBBUOhmr26LKNZqyuJY5SZ7ThXv9rHz38IzZ/w0EevK+2kWzKudDWeo5tn0P1hKpQSnuW8136
+	8iyQ==
+X-Google-Smtp-Source: AGHT+IEebYweczID6I9J4d+ZTcxjA3h0z80MLejK7SErUsWbrjT6OYnp+rm8FaxJ3OLg0zwLUs9I6w==
+X-Received: by 2002:a17:903:384b:b0:269:8f2e:e38 with SMTP id d9443c01a7336-269ba4028d8mr160016895ad.6.1758497820258;
+        Sun, 21 Sep 2025 16:37:00 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2698030ecc1sm110937565ad.112.2025.09.21.16.36.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Sep 2025 14:56:24 -0700 (PDT)
-From: Andre Carvalho <asantostc@gmail.com>
-Date: Sun, 21 Sep 2025 22:55:46 +0100
-Subject: [PATCH net-next v2 6/6] selftests: netconsole: validate target
- reactivation
+        Sun, 21 Sep 2025 16:36:59 -0700 (PDT)
+Message-ID: <fe7eb1335c11ae91cf6b28d37d1f24daccb2c65d.camel@gmail.com>
+Subject: Re: [PATCH net-next] eth: fbnic: Read module EEPROM
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>, Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	gustavoars@kernel.org, horms@kernel.org, jacob.e.keller@intel.com,
+ kees@kernel.org, 	kernel-team@meta.com, lee@trager.us,
+ linux@armlinux.org.uk, pabeni@redhat.com, 	sanman.p211993@gmail.com,
+ suhui@nfschina.com, vadim.fedorenko@linux.dev
+Date: Sun, 21 Sep 2025 16:36:58 -0700
+In-Reply-To: <a7184bd2-2203-465b-b544-4dbea0b9645b@lunn.ch>
+References: <20250919191624.1239810-1-mohsin.bashr@gmail.com>
+	 <a7184bd2-2203-465b-b544-4dbea0b9645b@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250921-netcons-retrigger-v2-6-a0e84006237f@gmail.com>
-References: <20250921-netcons-retrigger-v2-0-a0e84006237f@gmail.com>
-In-Reply-To: <20250921-netcons-retrigger-v2-0-a0e84006237f@gmail.com>
-To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Andre Carvalho <asantostc@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1758491774; l=6229;
- i=asantostc@gmail.com; s=20250807; h=from:subject:message-id;
- bh=R3yengxGAdZ6SfJjU1VD10z3t2Uj/t+EUXjBtn9XPhs=;
- b=al6+LfV3Wlpo5KSptSKWJZhAtKi1BpcVuCY06ZSn8isevIQwvKwFczYQb13AWK+IPIlFZMmtW
- /heGcq1URIjCxvgBtq+/Cf/fPihGb4Kl5yZ4g5f43E4vg3oN+57AMMt
-X-Developer-Key: i=asantostc@gmail.com; a=ed25519;
- pk=eWre+RwFHCxkiaQrZLsjC67mZ/pZnzSM/f7/+yFXY4Q=
 
-Introduce a new netconsole selftest to validate that netconsole is able
-to resume a deactivated target when the low level interface comes back.
+On Fri, 2025-09-19 at 21:25 +0200, Andrew Lunn wrote:
+> On Fri, Sep 19, 2025 at 12:16:24PM -0700, Mohsin Bashir wrote:
+> > Add support to read module EEPROM for fbnic. Towards this, add required
+> > support to issue a new command to the firmware and to receive the respo=
+nse
+> > to the corresponding command.
+> >=20
+> > Create a local copy of the data in the completion struct before writing=
+ to
+> > ethtool_module_eeprom to avoid writing to data in case it is freed. Giv=
+en
+> > that EEPROM pages are small, the overhead of additional copy is
+> > negligible.
+> >=20
+> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> > Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+> > ---
+> >  .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |  66 +++++++++
+> >  drivers/net/ethernet/meta/fbnic/fbnic_fw.c    | 135 ++++++++++++++++++
+> >  drivers/net/ethernet/meta/fbnic/fbnic_fw.h    |  22 +++
+> >  3 files changed, 223 insertions(+)
+> >=20
+> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/=
+net/ethernet/meta/fbnic/fbnic_ethtool.c
+> > index b4ff98ee2051..f6069cddffa5 100644
+> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+> > @@ -1635,6 +1635,71 @@ static void fbnic_get_ts_stats(struct net_device=
+ *netdev,
+> >  	}
+> >  }
+> > =20
+> > +static int
+> > +fbnic_get_module_eeprom_by_page(struct net_device *netdev,
+> > +				const struct ethtool_module_eeprom *page_data,
+> > +				struct netlink_ext_ack *extack)
+> > +{
+> > +	struct fbnic_net *fbn =3D netdev_priv(netdev);
+> > +	struct fbnic_fw_completion *fw_cmpl;
+> > +	struct fbnic_dev *fbd =3D fbn->fbd;
+> > +	int err;
+> > +
+> > +	if (page_data->i2c_address !=3D 0x50) {
+> > +		NL_SET_ERR_MSG_MOD(extack,
+> > +				   "Invalid i2c address. Only 0x50 is supported");
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	if (page_data->bank !=3D 0) {
+> > +		NL_SET_ERR_MSG_MOD(extack,
+> > +				   "Invalid bank. Only 0 is supported");
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	fw_cmpl =3D __fbnic_fw_alloc_cmpl(FBNIC_TLV_MSG_ID_QSFP_READ_RESP,
+> > +					page_data->length);
+> > +	if (!fw_cmpl)
+> > +		return -ENOMEM;
+> > +
+> > +	/* Initialize completion and queue it for FW to process */
+> > +	fw_cmpl->u.qsfp.length =3D page_data->length;
+> > +	fw_cmpl->u.qsfp.offset =3D page_data->offset;
+> > +	fw_cmpl->u.qsfp.page =3D page_data->page;
+> > +	fw_cmpl->u.qsfp.bank =3D page_data->bank;
+> > +
+> > +	err =3D fbnic_fw_xmit_qsfp_read_msg(fbd, fw_cmpl, page_data->page,
+> > +					  page_data->bank, page_data->offset,
+> > +					  page_data->length);
+> > +	if (err) {
+> > +		NL_SET_ERR_MSG_MOD(extack,
+> > +				   "Failed to transmit EEPROM read request");
+> > +		goto exit_free;
+> > +	}
+>=20
+> At some point, you are going to hand off control of the I2C bus to
+> phylink, so it can drive the SFP. I know Alex at least had a plan how
+> that will work. At that point, will you just throw this away, and let
+> sfp_get_module_eeprom_by_page() implement this?
+>=20
+> 	Andrew
 
-The test setups the network using netdevsim, creates a netconsole target
-and then remove/add netdevsim in order to bring the same interfaces
-back. Afterwards, the test validates that the target works as expected.
+That would be the general idea. The fbnic_fw_xmit_qsfp_read_msg will
+still have to exist as it is essentially the firmware provided front
+end to issue a I2C read request to the QSFP module.
 
-Targets are created via cmdline parameters to the module to ensure that
-resuming works for targets bound by interface name and mac address.
+I have code that essentially does that somewhere in one of my patch
+sets as I had coded it up as proof-of-concept. I am hoping to wrap up
+the phydev/phylink code this half. Unfortunately I haven't had a ton of
+time as I have been getting pulled in several different directions
+lately.
 
-Signed-off-by: Andre Carvalho <asantostc@gmail.com>
----
- tools/testing/selftests/drivers/net/Makefile       |  1 +
- .../selftests/drivers/net/lib/sh/lib_netcons.sh    | 30 ++++++-
- .../selftests/drivers/net/netcons_resume.sh        | 92 ++++++++++++++++++++++
- 3 files changed, 120 insertions(+), 3 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index 984ece05f7f92e836592107ba4c692da6d8ce1b3..a40b50c66d530b3fcbeaf93ca46f79380b3a1949 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -16,6 +16,7 @@ TEST_PROGS := \
- 	netcons_cmdline.sh \
- 	netcons_fragmented_msg.sh \
- 	netcons_overflow.sh \
-+	netcons_resume.sh \
- 	netcons_sysdata.sh \
- 	netpoll_basic.py \
- 	ping.py \
-diff --git a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-index 8e1085e896472d5c87ec8b236240878a5b2d00d2..88b4bdfa84cf4ab67ff0e04c3ed88e5ae9df49d2 100644
---- a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-+++ b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-@@ -186,12 +186,13 @@ function do_cleanup() {
- }
- 
- function cleanup() {
-+	local TARGETPATH=${1:-${NETCONS_PATH}}
- 	# delete netconsole dynamic reconfiguration
--	echo 0 > "${NETCONS_PATH}"/enabled
-+	echo 0 > "${TARGETPATH}"/enabled
- 	# Remove all the keys that got created during the selftest
--	find "${NETCONS_PATH}/userdata/" -mindepth 1 -type d -delete
-+	find "${TARGETPATH}/userdata/" -mindepth 1 -type d -delete
- 	# Remove the configfs entry
--	rmdir "${NETCONS_PATH}"
-+	rmdir "${TARGETPATH}"
- 
- 	do_cleanup
- }
-@@ -350,6 +351,29 @@ function check_netconsole_module() {
- 	fi
- }
- 
-+function wait_target_state() {
-+	local TARGET=${1}
-+	local STATE=${2}
-+	local FILE="${NETCONS_CONFIGFS}"/"${TARGET}"/"enabled"
-+
-+	if [ "${STATE}" == "enabled" ]
-+	then
-+		ENABLED=1
-+	else
-+		ENABLED=0
-+	fi
-+
-+	if [ ! -f "$FILE" ]; then
-+		echo "FAIL: Target does not exist." >&2
-+		exit "${ksft_fail}"
-+	fi
-+
-+	slowwait 2 sh -c "test -n \"\$(grep \"${ENABLED}\" \"${FILE}\")\"" || {
-+		echo "FAIL: ${TARGET} is not ${STATE}." >&2
-+		exit "${ksft_fail}"
-+	}
-+}
-+
- # A wrapper to translate protocol version to udp version
- function wait_for_port() {
- 	local NAMESPACE=${1}
-diff --git a/tools/testing/selftests/drivers/net/netcons_resume.sh b/tools/testing/selftests/drivers/net/netcons_resume.sh
-new file mode 100755
-index 0000000000000000000000000000000000000000..404df7abef1bcdbd29a128c304ac9b39f19fc82d
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/netcons_resume.sh
-@@ -0,0 +1,92 @@
-+#!/usr/bin/env bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This test validates that netconsole is able to resume a target that was
-+# deactivated when its interface was removed when the interface is brought
-+# back up.
-+#
-+# The test configures a netconsole target and then removes netdevsim module to
-+# cause the interface to disappear. Targets are configured via cmdline to ensure
-+# targets bound by interface name and mac address can be resumed.
-+# The test verifies that the target moved to disabled state before adding
-+# netdevsim and the interface back.
-+#
-+# Finally, the test verifies that the target is re-enabled automatically and
-+# the message is received on the destination interface.
-+#
-+# Author: Andre Carvalho <asantostc@gmail.com>
-+
-+set -euo pipefail
-+
-+SCRIPTDIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
-+
-+source "${SCRIPTDIR}"/lib/sh/lib_netcons.sh
-+
-+modprobe netdevsim 2> /dev/null || true
-+rmmod netconsole 2> /dev/null || true
-+
-+check_netconsole_module
-+
-+# Run the test twice, with different cmdline parameters
-+for BINDMODE in "ifname" "mac"
-+do
-+	echo "Running with bind mode: ${BINDMODE}" >&2
-+	# Set current loglevel to KERN_INFO(6), and default to KERN_NOTICE(5)
-+	echo "6 5" > /proc/sys/kernel/printk
-+
-+	# Create one namespace and two interfaces
-+	set_network
-+	trap do_cleanup EXIT
-+
-+	# Create the command line for netconsole, with the configuration from
-+	# the function above
-+	CMDLINE=$(create_cmdline_str "${BINDMODE}")
-+
-+	# The content of kmsg will be save to the following file
-+	OUTPUT_FILE="/tmp/${TARGET}-${BINDMODE}"
-+
-+	# Load the module, with the cmdline set
-+	modprobe netconsole "${CMDLINE}"
-+	# Expose cmdline target in configfs
-+	mkdir ${NETCONS_CONFIGFS}"/cmdline0"
-+	trap 'cleanup "${NETCONS_CONFIGFS}"/cmdline0' EXIT
-+
-+	# Target should be enabled
-+	wait_target_state "cmdline0" "enabled"
-+
-+	# Remove low level module
-+	rmmod netdevsim
-+	# Target should be disabled
-+	wait_target_state "cmdline0" "disabled"
-+
-+	# Add back low level module
-+	modprobe netdevsim
-+	# Recreate namespace and two interfaces
-+	set_network
-+	# Target should be enabled again
-+	wait_target_state "cmdline0" "enabled"
-+
-+	# Listen for netconsole port inside the namespace and destination
-+	# interface
-+	listen_port_and_save_to "${OUTPUT_FILE}" &
-+	# Wait for socat to start and listen to the port.
-+	wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
-+	# Send the message
-+	echo "${MSG}: ${TARGET}" > /dev/kmsg
-+	# Wait until socat saves the file to disk
-+	busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
-+	# Make sure the message was received in the dst part
-+	# and exit
-+	validate_msg "${OUTPUT_FILE}"
-+
-+	# kill socat in case it is still running
-+	pkill_socat
-+	# Cleanup & unload the module
-+	cleanup "${NETCONS_CONFIGFS}/cmdline0"
-+	rmmod netconsole
-+	trap - EXIT
-+
-+	echo "${BINDMODE} : Test passed" >&2
-+done
-+
-+exit "${ksft_pass}"
-
--- 
-2.51.0
-
+The larger hurdles I am still trying to sort out are adding support for
+25/50/100G to a generic clause 45 phydev support in order to support
+the fact that we need to deal with a 4s delay due to the PMD needing
+time for link training, and then I have to go through and sort out the
+PCS/PMA code which may be a bit messy as it looks like XPCS was already
+added, but it only seems to support 40G so I will have to sort that
+out.
 
