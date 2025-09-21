@@ -1,199 +1,124 @@
-Return-Path: <netdev+bounces-225014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 498AFB8D1CE
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 00:28:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26511B8D30E
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 03:27:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 003D056053E
-	for <lists+netdev@lfdr.de>; Sat, 20 Sep 2025 22:28:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D8E07B1076
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 01:25:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 022C02727EE;
-	Sat, 20 Sep 2025 22:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CAD11494C3;
+	Sun, 21 Sep 2025 01:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QyrSitGX"
+	dkim=pass (2048-bit key) header.d=jclark-com.20230601.gappssmtp.com header.i=@jclark-com.20230601.gappssmtp.com header.b="p7iK9M6E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD5F25FA0E
-	for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 22:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87FCB29405
+	for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 01:27:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758407324; cv=none; b=XNyILmgEP99Y52kGKZbaq4tvSJO0RiNe75C9kL5ErZqzRABxfGRWX/cI2tuk9zUkijwpqInV3kUi8uffQQ5n5seaoVsXJ0zBMgPgTRTlGj2PPCsq5jSg0xH1Pd7Aa31sVutS2PwxsUMBzTxZyh5BCuK0LF6v9fWhTYFkgVTc1PU=
+	t=1758418029; cv=none; b=Oydbtdrbw5ZVlQ/JYiCgIWWk7bpjRtbHwjh1k5R5jXjHkknVNmUk/0oypaomcPqSmB2ZkgyFwZoioP14PCBD3yZQlLMZ/jOlF1hSuNLj4NQZyA/qcjaGjWm+qga/ZzMvATBpWH9ROgeM/Jgp11jkwFF4MiSGvINbkZVqm2JpKVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758407324; c=relaxed/simple;
-	bh=9gu6hJVAnIfRTHtgnZ0zrWIon8dUaef830KhxqL6EZs=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BGSOekyD2LbgicSvS6BZAPKYTgLL27hCAOPZRsliMAgXQoHLU0gfr+/J0IwDKtnqKypwk8oerUF82cxLsMf/CQfYtw35lacIZld87U8zWZx5WsZGaO6tdNHPMJydDot3TxMBCAjWILKBP9zDVtWSEuxSdsqXLLK+kmBCaIcDfTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QyrSitGX; arc=none smtp.client-ip=209.85.210.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-75763558ae1so1123303a34.3
-        for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 15:28:43 -0700 (PDT)
+	s=arc-20240116; t=1758418029; c=relaxed/simple;
+	bh=jOYRiNRH+mKFdeAGMt4fYw1emnX7ze4EEppuKHTVDXw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZXTT42V4yBRAfTkFcVlzedsIjiXJ8ICzlAqEwTMPImMe6eoA0qmpE7i3Sfm7wGIAGziZ/Pw3Woey4z3ekc861VGjRC6ggfUp6LYPodeVkb2sVAjOoiAKx/DoGaOTYkmSj09GGiOMQPhKukv+WnKixW7MOqlP0YQ+fqkiVOfXMA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jclark.com; spf=pass smtp.mailfrom=jclark.com; dkim=pass (2048-bit key) header.d=jclark-com.20230601.gappssmtp.com header.i=@jclark-com.20230601.gappssmtp.com header.b=p7iK9M6E; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jclark.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jclark.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-267facf9b58so24333555ad.2
+        for <netdev@vger.kernel.org>; Sat, 20 Sep 2025 18:27:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758407322; x=1759012122; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=nA0qvsHjha/KfwIagmo7Q/qF5pnKgf1p52tDDCS5guk=;
-        b=QyrSitGXTosZASyCS9VIljhApcWUNZYI5RDkYr9+mAnoVat8SW3s67eWFjpkSlkPag
-         0Akfp8Ie30mHRYlW0K3n3nFl0vu9khxnqcSJaAAcPCRO2x27gkwM4Kbpr9m/phrC7JfL
-         aEEmXt2U1ew6ajnnMrAQAhOunNL5jaQ/NnMeGvKGr8AKYtX1ZZGAmrz/hLwMzKvh3jk2
-         Smv4Bi1FbnjRNHa8tk0AFnus4O7SIN+dQMbIY4U025B3nJ2NpeiOOwZyJxh4InSRVnZ0
-         5uQ7PDg8QE0M+2Y4S09fvywHkFD+ZfgIe0mkVY3CyPlsW4YGiAtmyiolhQFGm2gSvQh+
-         V33Q==
+        d=jclark-com.20230601.gappssmtp.com; s=20230601; t=1758418027; x=1759022827; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jOYRiNRH+mKFdeAGMt4fYw1emnX7ze4EEppuKHTVDXw=;
+        b=p7iK9M6EvoXrq696zkfQwy4VGp3r4UTX+B5IahaGY0ju0GSAUvmHVCwamb9Adg+OZD
+         YE8OH+JxxFI+nN+ZZdOTlooQGQdWDv36lFZiAHZWXdY//a8Fh392EH2fS+vciO4y99ha
+         4Yqa4ABW9e4oSx3ZhCw90YAiaLyvVRkzv2hBeq9U8gbnod9VcCUR92qVmuO+NN0cC6W4
+         FFNQTTf3JFEXzSCVWBg5w7MY4llSq8CDkmkC1Eusy8TvBbn+yu/cEY6IbswZ5qWJz9hd
+         DKXuRf/btjzSK2LO8qs25ttecgAaHYNv2IMG0ajShiIwbKRInmzkKmGMDAoTvSSdGv00
+         HR3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758407322; x=1759012122;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nA0qvsHjha/KfwIagmo7Q/qF5pnKgf1p52tDDCS5guk=;
-        b=QxsCDfjITEWnxr2zb65oc8IhICvsvFDoyfR3yjN8gnvcf+PCRF/GR8RSvL4kkLrqyB
-         zAQhXePtxdON4I6ukfwVLCjMMfjWE/JmXt15aevru1pVM9p3NRa7GqX9KFBfsSXS7pl/
-         GVODSAnHBRxwaXfLFsPvgBxGkTg8/llEivMPxZj117Qwq5vT/prtDDDU04z8DKZuyI8T
-         S7ecLdf6CohwRHJcYZqztFezIan7vIv0FoBGEEAneIPOL2/mc4fdixBIH+mk9/9Cdj6H
-         ru0QQqjqeEUpktjOShBtpl88JIf16veqcOeq0HxaZRl8Ql2lhNoTSwop5R8twFeQIV7H
-         NPlw==
-X-Forwarded-Encrypted: i=1; AJvYcCVTrVXklbV3EiB/cgak4d28ZMPMbg3W345bC97cG3QQYKzr9ez3UeR6jxXun62B1i5pIO8tuek=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwA4JVx/NcpG/eZFw7PlkOFJ0XTphHFK/40hxBm7z6uCgkHrMKG
-	asiPlJ4XpK3snxlk3ZCFaJQ3S2kmYIhkmc6OvUU/4Wtp7RYnvF/jTOme
-X-Gm-Gg: ASbGncsubcIW6Kg0I9J8i+eWczro0n1kX0aP2OrKy+4Ij6LqYIMu3qkLVIXswJKA2I/
-	ntJiXrG1wZ7nb4GAJ51JHwj3uoIVr04PJM0ROCPWe27NAvgvqu6BlBSoUniHdQnSl1QtWMlgJu2
-	TJ2O3+RkegsLF3Ctym4duOCAxbCnQBb6xHo2yNKPjvTudsB5TFNk6kzgh4W+6nb/OPtjXeNVwpK
-	+ygfqAR1FDuOfDvKb1jFVeuQa5EtEbLApdKanuLE+KskAqQiJKWHmbbtaFWRFjcxupjhLq0GXmn
-	+MR9rcLcH4h5vGwEb0BYft0AY2T2+hKHWnRI20d4U9r+5ERCbGaf5HcCYPcE1PE3TfQNncgjklM
-	bMkzaoVSOVUKc5VbfYNmpycAs4eVhnhANRkQ4swlvyDDS0e37lbXfFpchD3ESTc3Yfj5lgLWq9x
-	Suzv8o3n+xTjU60exl4tXNeeSS1HaCv2yLwMA=
-X-Google-Smtp-Source: AGHT+IEQ4dNngj00vQnCTq2dGbkr6X6Uyiu6Awm/G2AhyR9r9uQMYSQ+ael8GKCRVsJEaC3eNEb/cQ==
-X-Received: by 2002:a05:6830:398a:b0:74a:ed47:a2fd with SMTP id 46e09a7af769-76f70bfd509mr4198600a34.9.1758407322247;
-        Sat, 20 Sep 2025 15:28:42 -0700 (PDT)
-Received: from [10.0.11.20] (57-132-132-155.dyn.grandenetworks.net. [57.132.132.155])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7692c72528esm4150535a34.42.2025.09.20.15.28.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Sep 2025 15:28:41 -0700 (PDT)
-Message-ID: <6980dba4ac0be1d6bbed8cb595d38114d89a14f5.camel@gmail.com>
-Subject: Re: [REGRESSION] af_unix: Introduce SO_PASSRIGHTS - break OpenGL
-From: brian.scott.sampson@gmail.com
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: christian@heusel.eu, davem@davemloft.net, difrost.kernel@gmail.com, 
-	dnaim@cachyos.org, edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
-	kuni1840@gmail.com, linux-kernel@vger.kernel.org,
- mario.limonciello@amd.com, 	netdev@vger.kernel.org, pabeni@redhat.com,
- regressions@lists.linux.dev
-Date: Sat, 20 Sep 2025 17:28:40 -0500
-In-Reply-To: <20250920035146.2149127-1-kuniyu@google.com>
-References: <caa08e5b15bc35b9f3c24f679c62ded1e8e58925.camel@gmail.com>
-		 <20250920035146.2149127-1-kuniyu@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.0 (flatpak git) 
+        d=1e100.net; s=20230601; t=1758418027; x=1759022827;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jOYRiNRH+mKFdeAGMt4fYw1emnX7ze4EEppuKHTVDXw=;
+        b=rLlUf0o3E823V9SFNOpnGF2sL/LqpjyYqSuAzGFGp1gmBhU0k4EhXHLhkgWDDVoaRe
+         RqHSK/WpCHZ0fXcnRMvRnXUj63DCFvdkK152zugoH6Ayu6Gk8PLiP92TphB/Eh42z9cB
+         kLgwync5zfnzu2zWD+gX5rCvjXKVMaAUVUtB33WAD1VdsAKF1kBAcpqTs2H1RMgc+yPB
+         MbSaTsst6rcuwhEN6dYD3jB27Pk8U8LYTjJwXWwH2jFAcKLiUaxHnnf91OEM3RK41jMj
+         rasprtj+9O97CTuU+FG/dxLN2qs1JgbCHrQuHxnxQlfqDnqa45Fh+A+FBoy4lCyO+fTR
+         j3lw==
+X-Forwarded-Encrypted: i=1; AJvYcCUphhyUjS/i+KN0a3GxYZ9c4uKqUmOD9cYT7r+wBTN6kuFiETv0GPCPUxf5ISyz/rltMu9jheY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1WTbs4RI9VTAWlkc84zUuzvOpzDr9Mi66D+QcOEjs4cIQPpjJ
+	xUs+3BMLP1FLdyr3LCmK+7rngXgyKnNBpiihiPh1IhApOmveeun+BhX1pyrOPCrpuWxGl5IDmkE
+	L6bBGMp8tDV6eYKZukTn5Nk92wffvT06HvGabjAr5
+X-Gm-Gg: ASbGncv1ys/uC2I8Q9SF1Hlg4HHTrPo6KjrYLqQm1Kdch7wiiQivihv0P+kPf5pClbj
+	IZmuFSlrt5JK786pbkNS2rGNPOpIVSe+PWe9XSheS/HkMbRIvQre15Nma8XeAMWmHIughtYUnCM
+	46fl7hxeilyIloyn3Jk2l1UwjxShxIzP7gRVXEGa0e8sHxfO11ftilqTKMsw/vd4L4lqRcz10wS
+	ScAyA==
+X-Google-Smtp-Source: AGHT+IHwOY9FzfFflpPvV32W3cCjKIQ/BIIsK/b8i+3x+5D8+1bzG0I/BLH1Mr/TzhiTDy+Bq31WR6MFh48QX7IwYw4=
+X-Received: by 2002:a17:902:d50c:b0:26e:49e3:55f0 with SMTP id
+ d9443c01a7336-26e49e38a46mr76143345ad.16.1758418026757; Sat, 20 Sep 2025
+ 18:27:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250918-jk-fix-bcm-phy-supported-flags-v1-0-747b60407c9c@intel.com>
+ <20250919170445.45803d42@kernel.org>
+In-Reply-To: <20250919170445.45803d42@kernel.org>
+From: James Clark <jjc@jclark.com>
+Date: Sun, 21 Sep 2025 08:26:55 +0700
+X-Gm-Features: AS18NWA7MDIuQcCMY0KZGmS_ycTr5aATrXA1LnuYqmcgKelJdnynAr31FmXdKgc
+Message-ID: <CANz3_EZO_UJc4DodMRA721Ns523x-wJeUiTuOTiNu2SrhwcgEg@mail.gmail.com>
+Subject: Re: [PATCH net 0/3] broadcom: report the supported flags for
+ ancillary features
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jacob Keller <jacob.e.keller@intel.com>, 
+	Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Kory Maincent <kory.maincent@bootlin.com>, Richard Cochran <richardcochran@gmail.com>, 
+	Yaroslav Kolomiiets <yrk@meta.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Thank you for your patience.
->=20
-> I assumed SO_PASSCRED was the problem, but I missed
-> SO_PASSCRED was also inherited durint accept().
->=20
-> Could you apply this on top of the previous changes ?
->=20
-> Also, could you tell what desktop manager and distro
-> you are using ?=C2=A0 If this attempt fails, I'll try to
-> reproduce with the same version on my desktop.
+On Sat, Sep 20, 2025 at 7:04=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 18 Sep 2025 17:33:15 -0700 Jacob Keller wrote:
+> > James Clark reported off list that the broadcom PHY PTP driver was
+> > incorrectly handling PTP_EXTTS_REQUEST and PTP_PEROUT_REQUEST ioctls si=
+nce
+> > the conversion to the .supported_*_flags fields. This series fixes the
+> > driver to correctly report its flags through the .supported_perout_flag=
+s
+> > and .supported_extts_flags fields. It also contains an update to commen=
+t
+> > the behavior of the PTP_STRICT_FLAGS being always enabled for
+> > PTP_EXTTS_REQUEST2.
+>
+> James, would you be willing to test and send an official Tested-by tag?
 
-No worries! I just applied this patch as well(on top of the other two
-in the order you originally provided), and still seeing the black
-screen upon resume. I am seeing a stack trace now when I check
-systemd's journal, which wasn't there before(not sure if its related).
-I do have the System.map as well for this build, but not sure why
-everything seemed to end up so cryptic. I'll paste it below as well as
-my desktop:=C2=A0
+I have tested this on a Raspberry Pi CM4: PTP_EXTTS_REQUEST2 and
+PTP_PEROUT_REQUEST2 both work. Thanks!
 
-Desktop Environment:=C2=A0Gnome 48.5=C2=A0
-Window Manager: Mutter (Wayland)=C2=A0
-Distribution: CachyOS
+Going forward, I have got myself setup to be able to build and install
+a vanilla kernel on a CM4, so if there is stuff that needs testing on
+bcm-phy-ptp, just Cc me.
 
-
-Trace:
-
-=E2=9D=AF sudo journalctl -k -b -1 | grep "cut here" -A52 | awk -F 'kernel:=
- '
-'{print $2}'
-------------[ cut here ]------------
-WARNING: CPU: 3 PID: 545 at net/core/sock.c:1548
-sk_setsockopt+0x1709/0x1b50
-Modules linked in: dm_mod crypto_user loop nfnetlink lz4 zram
-842_decompress lz4hc_compress 842_compress lz4_compress amdgpu amdxcp
-i2c_algo_bit drm_ttm_helper ttm drm_exec gpu_sched drm_suballoc_helper
-video rtsx_pci_sdmmc mmc_core drm_panel_backlight_quirks nvme drm_buddy
-nvme_core drm_display_helper serio_raw rtsx_pci nvme_keyring cec
-nvme_auth wmi
-CPU: 3 UID: 0 PID: 545 Comm: systemd-journal Not tainted 6.17.0-rc6-
-local-00268-g3b08f56fbbb9-dirty #1 PREEMPT(full)=20
-c74d467c5c838be6e0491dc375b7e67fc07dfcf3
-Hardware name: Alienware Alienware m18 R1 AMD/0HR91K, BIOS 1.19.0
-07/01/2025
-RIP: 0010:sk_setsockopt+0x1709/0x1b50
-Code: 00 e9 30 eb ff ff ba a1 ff ff ff e9 64 eb ff ff 0f b6 43 12 3c 0a
-0f 85 d0 f3 ff ff 8b 83 b8 00 00 00 85 c0 0f 84 c2 f3 ff ff <0f> 0b e9
-bb f3 ff ff 48 8d 7c 24 38 b9 08 00 00 00 4c 89 de 4c 89
-RSP: 0018:ffffccbfc3e8bbf8 EFLAGS: 00010202
-RAX: 0000000000000010 RBX: ffff8a3598268cc0 RCX: ffff8a35805db400
-RDX: 0000000000000001 RSI: 0000000000000001 RDI: ffffffffadc442f3
-RBP: ffffccbfc3e8bc98 R08: ffff8a35c4ed8000 R09: 0000000000000004
-R10: 0000000000000010 R11: 00007ffeb08dc62c R12: 0000000000000000
-R13: 0000000000000001 R14: 0000000000000001 R15: ffffccbfc3e8bd30
-FS:  00007f47de2c7880(0000) GS:ffff8a3d0dc30000(0000)
-knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f47de0bb910 CR3: 000000011431b000 CR4: 0000000000f50ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? __x64_sys_fcntl+0x80/0x110
- unix_setsockopt+0x42/0xd0
- ? security_socket_setsockopt+0x52/0x160
- do_sock_setsockopt+0xb2/0x190
- ? __seccomp_filter+0x41/0x4e0
- __sys_setsockopt+0x7b/0xc0
- __x64_sys_setsockopt+0x1f/0x30
- do_syscall_64+0x81/0x970
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? do_syscall_64+0x81/0x970
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? do_sock_getsockopt+0x1cc/0x210
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? __sys_getsockopt+0x77/0xc0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? do_syscall_64+0x81/0x970
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? do_syscall_64+0x81/0x970
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? exc_page_fault+0x7e/0x1a0
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-RIP: 0033:0x7f47ddb42b4e
-Code: 48 83 ec 10 48 63 c9 48 63 ff 45 89 c9 6a 2c e8 48 39 f6 ff 48 83
-c4 18 c3 0f 1f 00 f3 0f 1e fa 49 89 ca b8 36 00 00 00 0f 05 <48> 3d 00
-f0 ff ff 77 0a c3 66 0f 1f 84 00 00 00 00 00 48 8b 15 81
-RSP: 002b:00007ffeb08dc618 EFLAGS: 00000202 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 000055798b740c40 RCX: 00007f47ddb42b4e
-RDX: 0000000000000010 RSI: 0000000000000001 RDI: 0000000000000005
-RBP: 00007ffeb08dc630 R08: 0000000000000004 R09: 0000000000000000
-R10: 00007ffeb08dc62c R11: 0000000000000202 R12: 0000000000000005
-R13: 00007ffeb08dc6d0 R14: 0000000000000006 R15: 0000000000000000
- </TASK>
----[ end trace 0000000000000000 ]---
-
-
-
-
+Tested-by: James Clark <jjc@jclark.com>
 
