@@ -1,166 +1,130 @@
-Return-Path: <netdev+bounces-225091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28A57B8E1DA
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 19:28:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4AF5B8E27B
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 19:45:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D92543B0582
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 17:28:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE81917CE28
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 17:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E5A26E6F5;
-	Sun, 21 Sep 2025 17:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2DB01E3762;
+	Sun, 21 Sep 2025 17:45:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="oNji14LK"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="gyvhGWpx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AB918EB0;
-	Sun, 21 Sep 2025 17:28:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B1CDF72;
+	Sun, 21 Sep 2025 17:45:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758475727; cv=none; b=sOJy37ZvvJF/rleRS3I9lBsWgsAGi53Q3oecgGwlPpWKNDLb5yHMuzKhG/TjnU7nrN6PDBmu96r/NQmb/MCI1BaDmdKaaN1K2VGoeapNHb0Nhj92zm2Ybtoe32gaVf9U9Ynse7RykB0RwTEDQKQ+x0tNivJ6qVIuHb4Hir4mlsc=
+	t=1758476726; cv=none; b=XVCJZVZJPSg8SowKPO6C0gsrk+W8Bxz84A4N2sfjH6zVnOyuHJlITtZM6w31O2L3J6eCZXUcjYJMSJXcfEBW4HZvSg2q18PnbStzMxXA71ucik8wL3Dyo1zpJecKc5erCOdbJGmP2nXuEVzomuBv8omxPBk+YAxUZPWP2d/96UU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758475727; c=relaxed/simple;
-	bh=OhAKhAi+AnzI3Qc3qjl3chOvflGQ1Z6G7nQKCQgIA6k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JuPr5dIW1ixZuyWe44ZzOdSr41wfxfYgGXFy7a7pxwkDbkKRnRPNgsnZ0o4s8njNs/JgwyQiuLityq6PZVdZVBpcf9DMX1bw9BJr6PThPXIjlJcYu3m+6BryRzjSPCuFGL9MI2ZqDmdbwG97mDa9bsddGcdpuCbPDxCOgxre/mM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=oNji14LK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22692C4CEE7;
-	Sun, 21 Sep 2025 17:28:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1758475727;
-	bh=OhAKhAi+AnzI3Qc3qjl3chOvflGQ1Z6G7nQKCQgIA6k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oNji14LKsaN74d6/6VxXQLAaEWqiMK1odhhlWG54PmdesR086HbzOQPsvLp4l8W8h
-	 erd/geKCs7blyB1imhKlNfDZtIHl2vwbNw8z3TSYAfWxPI4STRspwkbfLQuyq+0pRc
-	 wfxpVS7OtRaNl868jtRKMkgfZDW20Ck1f7t2BQsw=
-Date: Sun, 21 Sep 2025 19:28:44 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Eliav Farber <farbere@amazon.com>
-Cc: linux@armlinux.org.uk, jdike@addtoit.com, richard@nod.at,
-	anton.ivanov@cambridgegreys.com, dave.hansen@linux.intel.com,
-	luto@kernel.org, peterz@infradead.org, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
-	tony.luck@intel.com, qiuxu.zhuo@intel.com, mchehab@kernel.org,
-	james.morse@arm.com, rric@kernel.org, harry.wentland@amd.com,
-	sunpeng.li@amd.com, alexander.deucher@amd.com,
-	christian.koenig@amd.com, airlied@linux.ie, daniel@ffwll.ch,
-	evan.quan@amd.com, james.qian.wang@arm.com, liviu.dudau@arm.com,
-	mihail.atanassov@arm.com, brian.starkey@arm.com,
-	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-	tzimmermann@suse.de, robdclark@gmail.com, sean@poorly.run,
-	jdelvare@suse.com, linux@roeck-us.net, fery@cypress.com,
-	dmitry.torokhov@gmail.com, agk@redhat.com, snitzer@redhat.com,
-	dm-devel@redhat.com, rajur@chelsio.com, davem@davemloft.net,
-	kuba@kernel.org, peppe.cavallaro@st.com, alexandre.torgue@st.com,
-	joabreu@synopsys.com, mcoquelin.stm32@gmail.com, malattia@linux.it,
-	hdegoede@redhat.com, mgross@linux.intel.com,
-	intel-linux-scu@intel.com, artur.paszkiewicz@intel.com,
-	jejb@linux.ibm.com, martin.petersen@oracle.com,
-	sakari.ailus@linux.intel.com, clm@fb.com, josef@toxicpanda.com,
-	dsterba@suse.com, jack@suse.com, tytso@mit.edu,
-	adilger.kernel@dilger.ca, dushistov@mail.ru,
-	luc.vanoostenryck@gmail.com, rostedt@goodmis.org, pmladek@suse.com,
-	sergey.senozhatsky@gmail.com, andriy.shevchenko@linux.intel.com,
-	linux@rasmusvillemoes.dk, minchan@kernel.org, ngupta@vflare.org,
-	akpm@linux-foundation.org, kuznet@ms2.inr.ac.ru,
-	yoshfuji@linux-ipv6.org, pablo@netfilter.org, kadlec@netfilter.org,
-	fw@strlen.de, jmaloy@redhat.com, ying.xue@windriver.com,
-	willy@infradead.org, sashal@kernel.org, ruanjinjie@huawei.com,
-	David.Laight@aculab.com, herve.codina@bootlin.com, Jason@zx2c4.com,
-	bvanassche@acm.org, keescook@chromium.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-um@lists.infradead.org, linux-edac@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
-	linux-hwmon@vger.kernel.org, linux-input@vger.kernel.org,
-	linux-media@vger.kernel.org, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	platform-driver-x86@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-staging@lists.linux.dev, linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-sparse@vger.kernel.org,
-	linux-mm@kvack.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, tipc-discussion@lists.sourceforge.net,
-	stable@vger.kernel.org, jonnyc@amazon.com
-Subject: Re: [PATCH 00/27 5.10.y] Backport minmax.h updates from v6.17-rc6
-Message-ID: <2025092136-unelected-skirt-d91d@gregkh>
-References: <20250919101727.16152-1-farbere@amazon.com>
+	s=arc-20240116; t=1758476726; c=relaxed/simple;
+	bh=k75h3vyn+toM45sEOSU6f34YilzE5L6BQlA1fqCp7xY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X54rc5puJDA05RoslQFp7AWhftcxrjZAAY+naizSOgzJ9bJn4o+ovHM0TN68uq7chRAktHKD6zjA2BIjuiRheXIPIu7c25+K8gtLV1OjLY6VacMczKlVXQk/5pwxtWl496Ly9mqHCeEPdyKqg8WLiBAiT2YZgZ1RlyqIq6LMhzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=gyvhGWpx; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58LHCdpB005257;
+	Sun, 21 Sep 2025 10:45:02 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=aonWGXZwnqaYZaf+BiWo7j+Tw
+	TEIN8skrepV3igixHQ=; b=gyvhGWpxt959FXJSxKfrxxeS0Z0t+Jb4WZvmuqBnZ
+	Zk4kl4gdeyN99H0r9RiI8+5yrVIvrHduwoCCD75QAlqttgYhik0Jx2e5swoOGY2Y
+	8u4xoSRIUdoQgxv5YriNYW4T2Bwq1dg+vUM0I4OSjZTx8tm0IJsdffuHD7Vs3xj5
+	55ChVBcWrKC+/dnKokR4rUGgPpRbxoK3ee4jFG4qPZ+9AtD2YrG8PYrIAOpC+Jyv
+	ddqDs79vUcqy3Vx6RTxE91d6rlGmrkm0TWWBOlCG9zpzmGewXglDnt2m2KhG5D9v
+	9ONasHoQkXdVdrP43eLd4jPlljgWWj5ooEV6e2yTOvzEA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 499ushspwt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 21 Sep 2025 10:45:02 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Sun, 21 Sep 2025 10:45:01 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Sun, 21 Sep 2025 10:45:01 -0700
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id 2D2A23F7054;
+	Sun, 21 Sep 2025 10:44:56 -0700 (PDT)
+Date: Sun, 21 Sep 2025 23:14:55 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <sbhatta@marvell.com>, <naveenm@marvell.com>,
+        <edumazet@google.com>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+        <bbhushan2@marvell.com>
+Subject: Re: Query regarding Phy loopback support
+Message-ID: <aNA5l3JEl5JMHfZM@test-OptiPlex-Tower-Plus-7010>
+References: <aMlHoBWqe8YOwnv8@test-OptiPlex-Tower-Plus-7010>
+ <3b76cc60-f0c5-478b-b26c-e951a71d3d0b@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20250919101727.16152-1-farbere@amazon.com>
+In-Reply-To: <3b76cc60-f0c5-478b-b26c-e951a71d3d0b@lunn.ch>
+X-Proofpoint-GUID: Fb52pkH_ZKHVdVK0Y7YK0n4kew_kvhEH
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDExNCBTYWx0ZWRfX2Eqsu/uK1nE5 bhgwDNlhF/rfQs7ciGnj4Cpp21JTClZp/s76FcJ1mQyjbh7SAJe/6sA67dbkBXRRZzrRs2i+q9i XtC14nXt71AAZ1Zxfa7v3HagQsASSjBlD5RFL8Lkh6sWlLbjyiySiRaOYDxUFOla+U+n6bBf6Jt
+ 2gImYntzv4ZUDA7pU9FOHHiLPcJBdcAlr1lo9MGBvxup3gTDs0RVUPVb5kXbsAFhGURG8MRAZIi iKLJS+lCL42mlDhp7zSzqaeLxfs8QCZfEwjTsDEZhE9XR4n6ZXmdc01lhVeI9g/0I46QV5y0m3v XyP0eKtEsYKNEcc1Ni4IaZV40aTWvjyIWafms2DV8aaiajh6SbzMhwUkbz73NKlfjwcyxvIVehg WYgC8ysa
+X-Authority-Analysis: v=2.4 cv=auayCTZV c=1 sm=1 tr=0 ts=68d0399e cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=hxte4uG_x_hChuEVWo0A:9 a=CjuIK1q_8ugA:10 a=quENcT-jsP8hFS3YNsuE:22
+X-Proofpoint-ORIG-GUID: Fb52pkH_ZKHVdVK0Y7YK0n4kew_kvhEH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-21_04,2025-09-19_01,2025-03-28_01
 
-On Fri, Sep 19, 2025 at 10:17:00AM +0000, Eliav Farber wrote:
-> This series includes a total of 27 patches, to align minmax.h of
-> v5.15.y with v6.17-rc6.
+On 2025-09-16 at 22:13:20, Andrew Lunn (andrew@lunn.ch) wrote:
+> On Tue, Sep 16, 2025 at 04:48:56PM +0530, Hariprasad Kelam wrote:
+> > We're looking for a standard way to configure PHY loopback on a network 
+> > interface using common Linux tools like ethtool, ip, or devlink.
+> > 
+> > Currently, ethtool -k eth0 loopback on enables a generic loopback, but it 
+> > doesn't specify if it's an internal, external, or PHY loopback. 
+> > Need suggestions to implement this feature in a standard way.
 > 
-> The set consists of 24 commits that directly update minmax.h:
-> 1) 92d23c6e9415 ("overflow, tracing: Define the is_signed_type() macro
->    once")
+> What actually do you mean by PHY loopback?
 
-But this isn't in 5.15.y, so how is this syncing things up?
+The Octeon silicon series supports both MAC (RPM) and PHY (GSERM) loopback 
+modes for testing.
 
-I'm all for this, but I got confused here, at the first commit :)
+We are seeking a solution to support the following loopback types:
 
-> 2) 5efcecd9a3b1 ("minmax: sanity check constant bounds when clamping")
+MAC Level
+
+Far-end loopback: Ingress data is routed back to egress data (MAC-to-MAC).
+
+Near-end external loopback: Egress traffic is routed back to ingress traffic at the PCS layer.
+
+PHY Level
+
+Near-end digital loopback
+
+Near-end analog loopback
+
+Far-end digital loopback
+
+Far-end analog loopback
+
+We need suggestions on how to enable and manage these specific modes.
+
+Thanks,
+Hariprasad k
 
 
 
-> 3) 2122e2a4efc2 ("minmax: clamp more efficiently by avoiding extra
->    comparison")
-> 4) f9bff0e31881 ("minmax: add in_range() macro")
-> 5) c952c748c7a9 ("minmax: Introduce {min,max}_array()")
-> 6) 5e57418a2031 ("minmax: deduplicate __unconst_integer_typeof()")
-> 7) f6e9d38f8eb0 ("minmax: fix header inclusions")
-> 8) d03eba99f5bf ("minmax: allow min()/max()/clamp() if the arguments
->    have the same signedness.")
-> 9) f4b84b2ff851 ("minmax: fix indentation of __cmp_once() and
->    __clamp_once()")
-> 10) 4ead534fba42 ("minmax: allow comparisons of 'int' against 'unsigned
->     char/short'")
-> 11) 867046cc7027 ("minmax: relax check to allow comparison between
->     unsigned arguments and signed constants")
-> 12) 3a7e02c040b1 ("minmax: avoid overly complicated constant
->     expressions in VM code")
-> 14) 017fa3e89187 ("minmax: simplify and clarify min_t()/max_t()
->     implementation")
-> 15) 1a251f52cfdc ("minmax: make generic MIN() and MAX() macros
->     available everywhere")
-> 18) dc1c8034e31b ("minmax: simplify min()/max()/clamp()
->     implementation")
-> 19) 22f546873149 ("minmax: improve macro expansion and type
->     checking")
-> 20) 21b136cc63d2 ("minmax: fix up min3() and max3() too")
-> 21) 71ee9b16251e ("minmax.h: add whitespace around operators and after
->     commas")
-> 22) 10666e992048 ("minmax.h: update some comments")
-> 23) b280bb27a9f7 ("minmax.h: reduce the #define expansion of min(),
->     max() and clamp()")
-> 24) a5743f32baec ("minmax.h: use BUILD_BUG_ON_MSG() for the lo < hi
->     test in clamp()")
-> 25) c3939872ee4a ("minmax.h: move all the clamp() definitions after the
->     min/max() ones")
-> 26) 495bba17cdf9 ("minmax.h: simplify the variants of clamp()")
-> 27) 2b97aaf74ed5 ("minmax.h: remove some #defines that are only
->     expanded once")
 
-Some of these are also only in newer kernels, which, as you know, is
-generally a bad thing (i.e. I can't take patches only for older
-kernels.)
-
-I want these changes, as they are great, but can you perhaps provide
-patch series for newer kernels first so that I can then take these?
-
-thanks,
-
-greg k-h
 
