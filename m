@@ -1,157 +1,184 @@
-Return-Path: <netdev+bounces-225104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18B98B8E6A0
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 23:41:23 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67CEBB8E6CD
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 23:45:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 302A47AB122
-	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 21:39:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 23EF54E196B
+	for <lists+netdev@lfdr.de>; Sun, 21 Sep 2025 21:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB0B2C234B;
-	Sun, 21 Sep 2025 21:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B0B2D0607;
+	Sun, 21 Sep 2025 21:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rqz96YZX"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TmXe8I2S"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82E81798F
-	for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 21:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109452C11FC;
+	Sun, 21 Sep 2025 21:45:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758490874; cv=none; b=tSYpc1v2TYhekIxe04rHi4D8g/Dkv3Vp+DtA3c6tfWh2z8+WU4fAIE170ih0i2tUR2YMDzdMev4GPZHyed3XjbeVEquQX3uDt5QLHEyAFk7D7oE7j87cKvjxD7lsi1XY/ryTvW5pZ78EYoVeV/+VfeLQM8TEXIprbbBB/91brvU=
+	t=1758491103; cv=none; b=kIE04SRmuqrpNmTJfAWul9ctiS+QPGmEN2nXTs5SUFmVwB0Er1Oqs6aRKq1ROlM0j6ZdaySMxSrAq83qtnU9Pdl+kfx2sXuKedAZMdTH/TofQWgHAfupyC05t4LyahPrsKE04+VrWtavsm4+gTMQmT3/8UIraw6C4r+iR+w+xG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758490874; c=relaxed/simple;
-	bh=2eRQFz6lTYzuVrxi3sraTdoTI5Gov5pFUQwZMiCSUHw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gU/aiaMIwJ2k5eViFFucG7p6dad9TQjU/+SKkx/t+943qlJZ+BCJ3TRzYhtGscIe7Nzd/MTRy55De82HumVzfh3U20G5pH9YAvT3gd6jsF+Px+/CyTUONFdT12UuFKUgWUJNJ4zeGoxpvxMerf0AzyrWuxvci471X/EfJuLtDfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rqz96YZX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758490871;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8KqMplkScTYjn/2difwf3vbnDC8sEidYGpK87XWS4RY=;
-	b=Rqz96YZXUPJ1csNq31jUX5dHbnPEf+aXuJnDqjZnBfnzp46pbUoOD+npyNjN6pkH3IaZA+
-	ybjfXok1WLEb7s/nM6gLjdMngYtkyQhCOmsWFnotsf2Ds11Oxrb3DK+R6l5tNnu9G221mU
-	TnV2i60UzwtE+zNxyD1ucHru48Vy0k0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-127-OhDEtP2wPCWF-rMkYakQ9w-1; Sun, 21 Sep 2025 17:41:10 -0400
-X-MC-Unique: OhDEtP2wPCWF-rMkYakQ9w-1
-X-Mimecast-MFC-AGG-ID: OhDEtP2wPCWF-rMkYakQ9w_1758490869
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-45b986a7b8aso21884305e9.0
-        for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 14:41:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758490869; x=1759095669;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8KqMplkScTYjn/2difwf3vbnDC8sEidYGpK87XWS4RY=;
-        b=k6euHxML6agrlMR5ufY186d5G3Rxk07r+gT7/bSZTnIX6ipg1IGfHUMhAb8ePTd0oF
-         QUIeUU2inuh80YrhSLbW71wP2g82VzSRnZ+EHuSHkogiIM11hdJCDu+TxrPmwch5yyhb
-         65hrhNxrHy1r8qSjT7dujZ5rXQAZIbEwpwSvjaAzbyDHzFJ24l0Q16FbTE0B3CLl39rW
-         EwwtR2y0RdtNrcAVumZ6PbBQ8qiby0GBA13c2oKL6YBk1fSeUbE4flOG1l9ckrxgb/Fx
-         K7CUMUoK7Dpc6Cr84YPmMzSUuAPEMbbLdKuwkdnPX81vwenQxWiJW4LTeGXvZX5gJj22
-         TttA==
-X-Forwarded-Encrypted: i=1; AJvYcCUd580lyEB+S4voaLZQbSyRX3PcD4oEHOVG9TUvpSboysOm9hYsTcPD5Zg3nBwBlCCJs7ltME0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEiSnnTklN6uq81i6qI2UvDFbj+OGz9sq+ZC2nGx1eZ8oSDMm3
-	2/Oy/TfN/LaKUuzhqQXTldPRPAbVbs2v9N3QgUPqRYCUxUZBJg5Ne1cMXahDjk9fpcRjsWOXTRZ
-	nnhJx6RpEbT3cvoP3Fonk5M2bhuf0Cmz3Qw22X/q1i6Ef469LJmeasZW21A==
-X-Gm-Gg: ASbGnctHoCWKCXvwiFj+n8sQtsUyolAaAztn+JhtweP7oPhBhvu9QL0Ls95xZl5LJ5n
-	blaswLPXNJ1zY+OE40xqN/WhyRcQLe5rToMkNFHnNEohWu9OcGI4AhUPzlOfj+SovM1fJ+7/K6L
-	1mrMHCcx0lidC8LKqoxRthC79abj995wQ0Ltf9vdUeD7eCM1KN43km9WLcnlNWcezHgPJ+blkj5
-	1YiboeRb1uSQKhE8tvEsTK+c0u93xwFfPIyC1uckeQeHeyegDtYr1ccXYxk3hfujBg0WCo8kX0Q
-	b7dgZPeDoBe1g9Bri2NGNUZofOxM725o2IU=
-X-Received: by 2002:a05:600c:4fc3:b0:45d:ddc6:74a9 with SMTP id 5b1f17b1804b1-467eed8f915mr93974055e9.12.1758490869185;
-        Sun, 21 Sep 2025 14:41:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHE3ONLO0TqDIpbwZ8tdp1Uhm0ZVS1N782aV32rBmMI81RJxSBnbtQKfoquKrW3T2JV+taGEw==
-X-Received: by 2002:a05:600c:4fc3:b0:45d:ddc6:74a9 with SMTP id 5b1f17b1804b1-467eed8f915mr93973945e9.12.1758490868782;
-        Sun, 21 Sep 2025 14:41:08 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4613d42bee6sm221283755e9.15.2025.09.21.14.41.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Sep 2025 14:41:08 -0700 (PDT)
-Date: Sun, 21 Sep 2025 17:41:05 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: zhangjiao2 <zhangjiao2@cmss.chinamobile.com>
-Cc: jasowang@redhat.com, eperezma@redhat.com, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost: vringh: Modify the return value check
-Message-ID: <20250921174041-mutt-send-email-mst@kernel.org>
-References: <20250910091739.2999-1-zhangjiao2@cmss.chinamobile.com>
- <20250921165746-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1758491103; c=relaxed/simple;
+	bh=zTX5DV/aiTvoh1j+UpnxrPzly+mHdoqCnjqcwsVay8g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gfx0QEsDVGwPb1KPqCBJqchAqO7iD+O5RYFx+cEjipFD988sBzAkZTLC01ycIli4gXpc3Y2oG1RUG/5BbLFx4P9bVyEfRdS9rKVsddrsSR+4226VbI95K53QKxZ44pcSiWpD6u/I/vNIg5ps0sgVYcJVlg5y7URD/FpAMgykf2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=TmXe8I2S; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58L8dJ3P022391;
+	Sun, 21 Sep 2025 21:44:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=h+/IkVWn//lNrkR3o1eZul4QL3mj8/Ds3ViOjtvU+
+	Ds=; b=TmXe8I2SI59Vg88mkCKLslaiooAw7XIIoxQOdrZeMMlxi4qmgfwqy15QT
+	VBafheu9UCxpb0BQ42Fo9llcFv/N4fe+qSE5AbsQoMkvnVaI7XYf0Lb3E+G8cMER
+	LLThRX4bdZGODcBsDpIa01i1K3Y5zKjwpeZ2q/L7OlW4iAJf49LUApkXb/E8tFTV
+	EVXQXbwRmxflmZkpb5PMCwW7aRglFunHDdWWI2MCZiWWrIkOVj3cEbx0oD/AbRg0
+	BK1pW3Zr5AKVJbj1pOw1pG3/ZHshTJ27R5zRoJ/T4rKLr7catLJio+++2edNvGJu
+	Qcxird7Yljb4bmTfl0Q552YxrlRcg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 499jpjy08n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 21 Sep 2025 21:44:51 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58LLiotK006760;
+	Sun, 21 Sep 2025 21:44:50 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 499jpjy08k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 21 Sep 2025 21:44:50 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58LIwPWL019727;
+	Sun, 21 Sep 2025 21:44:49 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49a83ju3bd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 21 Sep 2025 21:44:49 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58LLijxW36962608
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 21 Sep 2025 21:44:45 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 99B8E20043;
+	Sun, 21 Sep 2025 21:44:45 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6AFD120040;
+	Sun, 21 Sep 2025 21:44:45 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Sun, 21 Sep 2025 21:44:45 +0000 (GMT)
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Simon Horman <horms@kernel.org>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Dust Li <dust.li@linux.alibaba.com>,
+        Sidraya Jayagond <sidraya@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        Mahanta Jambigi <mjambigi@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc: Halil Pasic <pasic@linux.ibm.com>
+Subject: [PATCH net-next v3 0/2] net/smc: make wr buffer count configurable 
+Date: Sun, 21 Sep 2025 23:44:38 +0200
+Message-ID: <20250921214440.325325-1-pasic@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250921165746-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=L50dQ/T8 c=1 sm=1 tr=0 ts=68d071d3 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=yJojWOMRYYMA:10 a=OPAOpny1AAAA:8 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8
+ a=piJGGMyLFvZckxoXyWEA:9 a=Vt4qOV5uLRUYeah0QK8L:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDAxMCBTYWx0ZWRfX6LammChpIlK5
+ Rl0FjGdl0A2sObnLpkmMkBUaN09iJ5ktrIN/uY56pYaKw1Jb/yzsmZ8wkviepQ9/tdnWk++xR4V
+ hhMIwB26l1ZT0fAldIlgexlmkQ7qLtI1wigD2Oa0kN3fucC7wLELEJOKNoo8K1cmmkhEdvXDG5W
+ D9O2ta2sAW/O9vjCKDaUejGNVDU09G+ebVzUuPCx1vaqqb5x5eIaV+voix6RwAcB1itbk9NyqIZ
+ 03/cTDndqW8wvkmUwHKI7kobD+d8BZmgFtDfcpt5NNW2C6Cvi+FOHF2F5J4Fj15tk/qQdGf47ZH
+ ib0WPpDm6krZ7QgDlLXOC9jciHZMJM29pj6Q+ZMBiEuJvNdsdXjxdhLdYtsF19sCfRbRRpi5UmN
+ /YdQqO8j
+X-Proofpoint-ORIG-GUID: EWxjh1-D48bpdiSDUXaGRtF_ZEl7_IHf
+X-Proofpoint-GUID: vY-nyu1wOHBr6kuyQP9uTiUeEQFl5TS4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-21_08,2025-09-19_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 adultscore=0 phishscore=0 impostorscore=0 spamscore=0
+ priorityscore=1501 suspectscore=0 clxscore=1015 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509200010
 
-On Sun, Sep 21, 2025 at 04:59:36PM -0400, Michael S. Tsirkin wrote:
-> On Wed, Sep 10, 2025 at 05:17:38PM +0800, zhangjiao2 wrote:
-> > From: zhang jiao <zhangjiao2@cmss.chinamobile.com>
-> > 
-> > The return value of copy_from_iter and copy_to_iter can't be negative,
-> > check whether the copied lengths are equal.
-> > 
-> > Signed-off-by: zhang jiao <zhangjiao2@cmss.chinamobile.com>
-> 
-> Well I don't see a fix for copy_to_iter here.
-> 
-> 
->                 ret = copy_to_iter(src, translated, &iter);
->                 if (ret < 0)
->                         return ret;
-> 
+The current value of SMC_WR_BUF_CNT is 16 which leads to heavy
+contention on the wr_tx_wait workqueue of the SMC-R linkgroup and its
+spinlock when many connections are competing for the work request
+buffers. Currently up to 256 connections per linkgroup are supported.
 
-to clarify, pls send an additional patch to copy that one.
+To make things worse when finally a buffer becomes available and
+smc_wr_tx_put_slot() signals the linkgroup's wr_tx_wait wq, because
+WQ_FLAG_EXCLUSIVE is not used all the waiters get woken up, most of the
+time a single one can proceed, and the rest is contending on the
+spinlock of the wq to go to sleep again.
 
-> 
-> 
-> 
-> > ---
-> >  drivers/vhost/vringh.c | 7 ++++---
-> >  1 file changed, 4 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> > index 9f27c3f6091b..0c8a17cbb22e 100644
-> > --- a/drivers/vhost/vringh.c
-> > +++ b/drivers/vhost/vringh.c
-> > @@ -1115,6 +1115,7 @@ static inline int copy_from_iotlb(const struct vringh *vrh, void *dst,
-> >  		struct iov_iter iter;
-> >  		u64 translated;
-> >  		int ret;
-> > +		size_t size;
-> >  
-> >  		ret = iotlb_translate(vrh, (u64)(uintptr_t)src,
-> >  				      len - total_translated, &translated,
-> > @@ -1132,9 +1133,9 @@ static inline int copy_from_iotlb(const struct vringh *vrh, void *dst,
-> >  				      translated);
-> >  		}
-> >  
-> > -		ret = copy_from_iter(dst, translated, &iter);
-> > -		if (ret < 0)
-> > -			return ret;
-> > +		size = copy_from_iter(dst, translated, &iter);
-> > +		if (size != translated)
-> > +			return -EFAULT;
-> >  
-> >  		src += translated;
-> >  		dst += translated;
-> > -- 
-> > 2.33.0
-> > 
-> > 
+Addressing this by simply bumping SMC_WR_BUF_CNT to 256 was deemed
+risky, because the large-ish physically continuous allocation could fail
+and lead to TCP fall-backs. For reference see this discussion thread on
+"[PATCH net-next] net/smc: increase SMC_WR_BUF_CNT" (in archive
+https://lists.openwall.net/netdev/2024/11/05/186), which concludes with
+the agreement to try to come up with something smarter, which is what
+this series aims for.
+
+Additionally if for some reason it is known that heavy contention is not
+to be expected going with something like 256 work request buffers is
+wasteful. To address these concerns make the number of work requests
+configurable, and introduce a back-off logic with handles -ENOMEM form
+smc_wr_alloc_link_mem() gracefully.
+---
+
+Changelog:
+---------
+v3:
+ 1) Renamed back sysctls from smcr_pref_*_wr to smcr_max_*_wr (Dust Li)
+ 2) Using link->wr_rx_buflen instead of SMC_WR_BUF_SIZE when allocating
+    wr_rx_bufs to not break what was fixed with 
+    commit 27ef6a9981fe ("net/smc: support SMC-R V2 for rdma devices
+    with max_recv_sge equals to 1") (Dust Li)
+ 3) Removed unwanted 'this control' in the documentation in #1
+    (Dust Li)
+v2: https://lore.kernel.org/netdev/20250908220150.3329433-1-pasic@linux.ibm.com/
+v1: https://lore.kernel.org/all/20250904211254.1057445-1-pasic@linux.ibm.com/
+
+
+Halil Pasic (2):
+  net/smc: make wr buffer count configurable
+  net/smc: handle -ENOMEM from smc_wr_alloc_link_mem gracefully
+
+ Documentation/networking/smc-sysctl.rst | 40 +++++++++++++++++++++++++
+ include/net/netns/smc.h                 |  2 ++
+ net/smc/smc_core.c                      | 34 ++++++++++++++-------
+ net/smc/smc_core.h                      |  8 +++++
+ net/smc/smc_ib.c                        |  7 ++---
+ net/smc/smc_llc.c                       |  2 ++
+ net/smc/smc_sysctl.c                    | 22 ++++++++++++++
+ net/smc/smc_sysctl.h                    |  2 ++
+ net/smc/smc_wr.c                        | 32 ++++++++++----------
+ net/smc/smc_wr.h                        |  2 --
+ 10 files changed, 119 insertions(+), 32 deletions(-)
+
+
+base-commit: 312e6f7676e63bbb9b81e5c68e580a9f776cc6f0
+-- 
+2.48.1
 
 
