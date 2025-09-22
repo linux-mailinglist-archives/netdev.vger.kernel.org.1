@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-225316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45767B921E8
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 18:04:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A4D7B921F1
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 18:04:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07C3E7A2C21
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 16:02:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCED63AA6EE
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 16:04:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB2A53101DB;
-	Mon, 22 Sep 2025 16:04:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8909631064A;
+	Mon, 22 Sep 2025 16:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CT4wUjgZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eh8V+6NY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8A92FE566
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 16:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7A4215198
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 16:04:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758557056; cv=none; b=QLYpL1y09FGYzGH1JA367AiKDZtxOM9uPOQm29ymBVWd8ztmE7hquQZtqlxQWkWbsG6nyaVPFmw5ugPxwuD7koZDXeg+acneWh+nJxRtsOHBXr3HOD6ICHsU4qKKibVyRX88ZhnKYP6Pi+2cVvH6UvgwH7mYKRGXH13v49leRpo=
+	t=1758557080; cv=none; b=VVM1uXRmD8KNgdiJBQoqDJ+jkTsBug8FR7mSev2sNU7ar+BV3bhXi3Uj3WlTbYuSAOXv5+liYGlhM3dagG2oP1BLGJxtWttuqWa1LGgudvMD/cdnCix+FiRkaxLG5LoKeYtkmg8vxNkzhqtdP4qrBf1vT8AnTg1bymY5CE1f4qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758557056; c=relaxed/simple;
-	bh=nePZdJQEdMGUmKC8gBR3fRA0GVeZWURrR0NM9HeSVYQ=;
+	s=arc-20240116; t=1758557080; c=relaxed/simple;
+	bh=Ljl7ScAxZk2dO+3HqKN3rFODorYsVJJH+Gqu5QhG1gI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UQm+s/v93lonQS7nWxnc277MsZ29aTKkC3zFAGWa0PYJug0HFBv5lmf4v54GC4hka8ZdMo3jkxjVY7vKNZJRf8vrScQ3AAFdK6MhUuIzfklzVdKUnsLdUbk10bv3a8k1vuSXZHQ8Sd5O7nkNpPdNZamynd293a80+ZFp0UKrDhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CT4wUjgZ; arc=none smtp.client-ip=209.85.215.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZqHS5YjVKpfFkU4z8Qd+sxwFrd6TT7UEEi5e5hJit6pzqmtdc9iXgPpl+KSCtb0yH/9NXcUBVX0grQBuuTyJ33Fz1O4TsD19TLOiI8QqX/FsZ+f4UZVxDagfytEhCgEn8BztZdeGY0fN35V6aylNXVvPW1m9JIZ18Nk1+75mIbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eh8V+6NY; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-b555b0fb839so347681a12.3
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 09:04:14 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-77716518125so2343590b3a.3
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 09:04:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758557054; x=1759161854; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758557078; x=1759161878; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jfndncaynqr5cPm/dhwenv1OsDSwnszaccEfIEf8Fz8=;
-        b=CT4wUjgZU3FI2a2P3/7W2XvsrG/DxFM38UTUCiUkHGPixpC/Hg5apeO/W0Aln9VfVP
-         e05HFwNVWan8ZivhMQYZ1zTL1kmfaBUvvMcIom21rHJq4d7ZJitDmgy6UnyqYwIk3guz
-         eYvF3HDvfIXTImdPbftyYsr5tLYrSaJUUbOq391YK+anz0qO/hCqInyFv33HY4EQ13xb
-         92znrLHYmgTdFHeD1b5tiyieFwtqCUWqypZw3vgZYcZrGrH3lnKtcbp9pyF37SSxjpx/
-         ynXJCHALFIcTIAlNL8IAtCAKOmLGsgI/A2qFIq5ABHOcOER0ob5uHN2bDLfj+2HuQK6I
-         HwTQ==
+        bh=bn105Zf1c9vstVchIVF2tlN/PNR2fCVJTATnppqTOaU=;
+        b=eh8V+6NYcKqnWrRtpVUW+up9FeqORw8WTE6EufHqAQiDYI0TaS5Jtt/Tg+A4k8xnDX
+         8ExBdrBCwgdiRwOd812H+I/MG8+t1fqpSVfxQyBH2MmR/+scbBi+uxhpN+L+lBFW2J6U
+         5+Bvbb4PsfEgI6d0Nev1t25PW8WY1bsso3Bf1r0RG/QUx/ZfHxNi6nj1zMRU6YM3xRYc
+         D59qw83RlfIwdhxf3bhUp4jjZQFHCEtg5J7P0x8y+yVEKqitkkftLzBjFMZu6A0n6mAU
+         DThK63dXvm7cJ4EWL7yJbC/pVrUmVEHTRzINQrmQ043NCLP1++YNScIpqqdH3WeenWHs
+         3HpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758557054; x=1759161854;
+        d=1e100.net; s=20230601; t=1758557078; x=1759161878;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Jfndncaynqr5cPm/dhwenv1OsDSwnszaccEfIEf8Fz8=;
-        b=CdpSkOzkj2x4DSbD0p7mBvvblvgthaZazEfBDmIggRWNfNbHYwRrnw3qp9obkqwMYc
-         uMjfLuqgAd2QCHfjzaP8/+v6OGU+b+87nDaBVvlxy+sIGVvN3C4/BfEV5ruCcP2nAYQW
-         0VNSPwE3UsqXtcAG9KnJsy93UeAH8vrHZtY0IuZA4Ut2oGw8LCPZH/joYJzgGKAIL697
-         unARmwMpE3oDpyIbl30CkMpgmJAEclW3uJ/ydLK5J1rdn1QeA8RMcsEfBKuovGQGArVz
-         aMV2E28BNp9tj9V5eqCEKATQ2riB9fJDwf3Yq5tYgObx63jmYbZevjOl+meStLM2ByFB
-         yyaA==
-X-Gm-Message-State: AOJu0YwafSNjjjqRjEkytRqCTNIvY7Nc8hOWMc8Hf/2+cDQ2sN5IKkJw
-	6ZxlP6/vGdIy1JnwppijwZE8HS7T8OHdpePA/OU54Sqsy0djdr8sdVI=
-X-Gm-Gg: ASbGnct5f46MXn1jKItzNsFk/4uTIMXMQ8bet4IYdGa34C7ewJG+HWKRn1L2pEhTCpb
-	hmlUGNEo4YzrU8c07v/sik/0fXeLcHIBMFYNkngXstpou/Z+xeGL7i7d2uA4Svx9lA5T9O9wTnV
-	iHkjx6fvAvF7gioG7YEOSbQewwix8M6LV5928oWy0GENzmMNFWl6fiHWBznPnQVe7K6WcFMfOUL
-	Wdw93QEHI5DdoPO32JBWXm50vQaLc4tKWtAKMqmFpw6iNQoxXwgxDuIrIaclofj+MXwYpxjHUEk
-	hxQAy6crQF8ES5Jzd6e8wXFsqzF4pNezgQ/X/6tkIs5Iao7A3Zl77Ir3xrmX8NN/+PN0Fv5up2/
-	iB5oP+fJUmhP2T9rAP5NULRVdZZU8j7MP6x2s1TNApiOt7POZRv3Uc0+fpTW7T6WhdgsQ6lGUzC
-	3EikIAk+ieJ9dSJG+I2CMcwF8bawmnE549sKHazKOTpp+qVVmFOCTBBy9cVdy3itQh9wK32dBuG
-	7lFxwzi7RdQBbc=
-X-Google-Smtp-Source: AGHT+IHthF9UCrCMuFfFgoDWVFLDnbsUIS9LX9WdPXoFUpRRiYxWpe5bnA1lKHjS2SyUSLmZsrvunQ==
-X-Received: by 2002:a17:902:ccd2:b0:252:50ad:4e6f with SMTP id d9443c01a7336-269ba566603mr194252475ad.54.1758557054025;
-        Mon, 22 Sep 2025 09:04:14 -0700 (PDT)
+        bh=bn105Zf1c9vstVchIVF2tlN/PNR2fCVJTATnppqTOaU=;
+        b=s/rEiyzqD/gHTMxVeqYCj5vTSS+oNDXm2Rz6IctZ4Qh1SlWC6iFTi3ch2+1QUdtZ2w
+         zK87yljE2zSjry+xPSi72Q0lyPHM5TgRrd52K4jO+zaaUDItRKy8f/urYsfoNHTqbWOV
+         9qDQ2PC9suGCTIP5Cme/G7mOYb52BsInazEQagfRXGHGVDBXQOxD5AJJEJS/11LU5pRZ
+         BhSAdI2MnTw2I1dFPSnW65nRZTi9QkMBBAvTte6RU3T2cFB2Kc2Oz4sMTD1LwVWzbXwI
+         DaY2aH5qOUuLpXhx/OGtVYTFsUFK0IZANXI57qFvOdW4NULmqZuQNKYMHjWegi8KGB05
+         Dk0g==
+X-Gm-Message-State: AOJu0YwZjP3PeE5fomz2mjFaMVc2I1bazhnbBP0+deAayNMTxjtDeJeT
+	TG4pk3Zuw/T+3jP9xtys4VNddVRXHq+Dyu/CNneqO1dYtBGD95z/kHM=
+X-Gm-Gg: ASbGnctIlYTRNstP9YMC2lHzEWoAbJkMSIurpaZ83RrpPvqtN+8ZD/8735SIgIDnnHC
+	U5SLgAZnDvdwBLlSKErJEdJSKecEtNagqQAyW0/me4GtStTZLchCY67LE7925Sj9uJdkjb2FD75
+	zUnQCVV45mVZB7HbxwSCiDu67fA8ETz4oLo223lRbJs3YG+e5NCdoX7Ki58AVQXfAcExKB67U7g
+	KUvrddqDMxK72dUpo7nM6+TbXjxioRyvoX/NpVNR4Y0WPwfrYytUMvXiQB3ENEGGCG71HBLRJAw
+	S+seG6SIoh5if5fEokCWTBW8J+MeSijG6Z5Db4Rp6rDmKLMc3uESIXEaKGLYie8PDt+vaFefqYc
+	MotSxtCHGZvvOCaefFzn/bgUK3jbuVDnmrsj2i13eZNXdoObdT7FHO0xihpjEhQU93pMbiM0dBR
+	+5uXdF+ADlU3icPHi6oQ8AULGQkolkpgSV8AbNlQnSBIbmVSLUmSMz96onLSPg3ubn2GkzGNI1p
+	cwk
+X-Google-Smtp-Source: AGHT+IFgNGiQkq6SDsfPdO8uo78KCpKKl1zg7NUJDeqgoOltS1XlWewrJE98ZUxgli6mEi4XPuM/6w==
+X-Received: by 2002:a05:6a21:3391:b0:252:2bfe:b65a with SMTP id adf61e73a8af0-2925b41e6c9mr18528562637.7.1758557077400;
+        Mon, 22 Sep 2025 09:04:37 -0700 (PDT)
 Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-269a7dcafb6sm117270915ad.83.2025.09.22.09.04.13
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-77cfbb7ab8bsm13345159b3a.11.2025.09.22.09.04.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Sep 2025 09:04:13 -0700 (PDT)
-Date: Mon, 22 Sep 2025 09:04:13 -0700
+        Mon, 22 Sep 2025 09:04:37 -0700 (PDT)
+Date: Mon, 22 Sep 2025 09:04:36 -0700
 From: Stanislav Fomichev <stfomichev@gmail.com>
 To: Daniel Borkmann <daniel@iogearbox.net>
 Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, kuba@kernel.org,
@@ -82,10 +82,10 @@ Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, kuba@kernel.org,
 	martin.lau@kernel.org, jordan@jrife.io,
 	maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
 	David Wei <dw@davidwei.uk>
-Subject: Re: [PATCH net-next 01/20] net, ynl: Add bind-queue operation
-Message-ID: <aNFzfbIFkOY1f2bL@mini-arch>
+Subject: Re: [PATCH net-next 03/20] net: Add ndo_queue_create callback
+Message-ID: <aNFzlHafjUFOvkG3@mini-arch>
 References: <20250919213153.103606-1-daniel@iogearbox.net>
- <20250919213153.103606-2-daniel@iogearbox.net>
+ <20250919213153.103606-4-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,179 +94,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250919213153.103606-2-daniel@iogearbox.net>
+In-Reply-To: <20250919213153.103606-4-daniel@iogearbox.net>
 
 On 09/19, Daniel Borkmann wrote:
 > From: David Wei <dw@davidwei.uk>
 > 
-> Add a ynl netdev family operation called bind-queue that _binds_ an
-> rxq from a real netdev to a virtual netdev i.e. netkit or veth. This
-> bound or _mapped_ rxq in the virtual netdev acts as a proxy for the
-> parent real rxq, and can be used by processes running in a container
-> to use memory providers (io_uring zero-copy rx or devmem) or AF_XDP.
-> An early implementation had only driver-specific integration [0],
-> but in order for other virtual devices to reuse, it makes sense to
-> have this as a generic API.
-> 
-> src-ifindex and src-queue-id is the real netdev and rxq respectively.
-> dst-ifindex is the virtual netdev. Note that this op doesn't take
-> dst-queue-id, because the expectation is that the op will _create_ a
-> new rxq in the virtual netdev. The virtual netdev must have
-> real_num_rx_queues less than num_rx_queues at the time of calling
-> bind-queue.
+> Add ndo_queue_create() to netdev_queue_mgmt_ops that will create a new
+> rxq specifically for mapping to a real rxq. The intent is for only
+> virtual netdevs i.e. netkit and veth to implement this ndo. This will
+> be called from ynl netdev fam bind-queue op to atomically create a
+> mapped rxq and bind it to a real rxq.
 > 
 > Signed-off-by: David Wei <dw@davidwei.uk>
 > Co-developed-by: Daniel Borkmann <daniel@iogearbox.net>
 > Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> Link: https://bpfconf.ebpf.io/bpfconf2025/bpfconf2025_material/lsfmmbpf_2025_netkit_borkmann.pdf [0]
 > ---
->  Documentation/netlink/specs/netdev.yaml | 37 +++++++++++++++++++++++++
->  include/uapi/linux/netdev.h             | 11 ++++++++
->  net/core/netdev-genl-gen.c              | 14 ++++++++++
->  net/core/netdev-genl-gen.h              |  1 +
->  net/core/netdev-genl.c                  |  4 +++
->  tools/include/uapi/linux/netdev.h       | 11 ++++++++
->  6 files changed, 78 insertions(+)
+>  include/net/netdev_queues.h | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-> index e00d3fa1c152..99a430ea8a9a 100644
-> --- a/Documentation/netlink/specs/netdev.yaml
-> +++ b/Documentation/netlink/specs/netdev.yaml
-> @@ -561,6 +561,29 @@ attribute-sets:
->          type: u32
->          checks:
->            min: 1
-> +  -
-> +    name: queue-pair
-> +    attributes:
-> +      -
-> +        name: src-ifindex
-> +        doc: netdev ifindex of the physical device
-> +        type: u32
-> +        checks:
-> +          min: 1
-> +      -
-> +        name: src-queue-id
-> +        doc: netdev queue id of the physical device
-> +        type: u32
-> +      -
-> +        name: dst-ifindex
-> +        doc: netdev ifindex of the virtual device
-> +        type: u32
-> +        checks:
-> +          min: 1
-> +      -
-> +        name: dst-queue-id
-> +        doc: netdev queue id of the virtual device
-> +        type: u32
->  
->  operations:
->    list:
-> @@ -772,6 +795,20 @@ operations:
->            attributes:
->              - id
->  
-> +    -
-> +      name: bind-queue
-> +      doc: Bind a physical netdev queue to a virtual one
-> +      attribute-set: queue-pair
-> +      do:
-> +        request:
-> +          attributes:
-> +            - src-ifindex
-> +            - src-queue-id
-> +            - dst-ifindex
-> +        reply:
-> +          attributes:
-> +            - dst-queue-id
-> +
->  kernel-family:
->    headers: ["net/netdev_netlink.h"]
->    sock-priv: struct netdev_nl_sock
-> diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-> index 48eb49aa03d4..05e17765a39d 100644
-> --- a/include/uapi/linux/netdev.h
-> +++ b/include/uapi/linux/netdev.h
-> @@ -210,6 +210,16 @@ enum {
->  	NETDEV_A_DMABUF_MAX = (__NETDEV_A_DMABUF_MAX - 1)
->  };
->  
-> +enum {
-> +	NETDEV_A_QUEUE_PAIR_SRC_IFINDEX = 1,
-> +	NETDEV_A_QUEUE_PAIR_SRC_QUEUE_ID,
-> +	NETDEV_A_QUEUE_PAIR_DST_IFINDEX,
-> +	NETDEV_A_QUEUE_PAIR_DST_QUEUE_ID,
-> +
-> +	__NETDEV_A_QUEUE_PAIR_MAX,
-> +	NETDEV_A_QUEUE_PAIR_MAX = (__NETDEV_A_QUEUE_PAIR_MAX - 1)
-> +};
-> +
->  enum {
->  	NETDEV_CMD_DEV_GET = 1,
->  	NETDEV_CMD_DEV_ADD_NTF,
-> @@ -226,6 +236,7 @@ enum {
->  	NETDEV_CMD_BIND_RX,
->  	NETDEV_CMD_NAPI_SET,
->  	NETDEV_CMD_BIND_TX,
-> +	NETDEV_CMD_BIND_QUEUE,
->  
->  	__NETDEV_CMD_MAX,
->  	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
-> diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-> index e9a2a6f26cb7..10b2ab4dd500 100644
-> --- a/net/core/netdev-genl-gen.c
-> +++ b/net/core/netdev-genl-gen.c
-> @@ -106,6 +106,13 @@ static const struct nla_policy netdev_bind_tx_nl_policy[NETDEV_A_DMABUF_FD + 1]
->  	[NETDEV_A_DMABUF_FD] = { .type = NLA_U32, },
->  };
->  
-> +/* NETDEV_CMD_BIND_QUEUE - do */
-> +static const struct nla_policy netdev_bind_queue_nl_policy[NETDEV_A_QUEUE_PAIR_DST_IFINDEX + 1] = {
-> +	[NETDEV_A_QUEUE_PAIR_SRC_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
-> +	[NETDEV_A_QUEUE_PAIR_SRC_QUEUE_ID] = { .type = NLA_U32, },
-> +	[NETDEV_A_QUEUE_PAIR_DST_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
-> +};
-> +
->  /* Ops table for netdev */
->  static const struct genl_split_ops netdev_nl_ops[] = {
->  	{
-> @@ -204,6 +211,13 @@ static const struct genl_split_ops netdev_nl_ops[] = {
->  		.maxattr	= NETDEV_A_DMABUF_FD,
->  		.flags		= GENL_CMD_CAP_DO,
->  	},
-> +	{
-> +		.cmd		= NETDEV_CMD_BIND_QUEUE,
-> +		.doit		= netdev_nl_bind_queue_doit,
-> +		.policy		= netdev_bind_queue_nl_policy,
-> +		.maxattr	= NETDEV_A_QUEUE_PAIR_DST_IFINDEX,
-> +		.flags		= GENL_CMD_CAP_DO,
-> +	},
->  };
->  
->  static const struct genl_multicast_group netdev_nl_mcgrps[] = {
-> diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
-> index cf3fad74511f..309248fe2b9e 100644
-> --- a/net/core/netdev-genl-gen.h
-> +++ b/net/core/netdev-genl-gen.h
-> @@ -35,6 +35,7 @@ int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
->  int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info);
->  int netdev_nl_napi_set_doit(struct sk_buff *skb, struct genl_info *info);
->  int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info);
-> +int netdev_nl_bind_queue_doit(struct sk_buff *skb, struct genl_info *info);
->  
->  enum {
->  	NETDEV_NLGRP_MGMT,
-> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> index 470fabbeacd9..b0aea27bf84e 100644
-> --- a/net/core/netdev-genl.c
-> +++ b/net/core/netdev-genl.c
-> @@ -1120,6 +1120,10 @@ int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
->  	return err;
->  }
->  
-> +int netdev_nl_bind_queue_doit(struct sk_buff *skb, struct genl_info *info)
-> +{
+> diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
+> index cd00e0406cf4..6b0d2416728d 100644
+> --- a/include/net/netdev_queues.h
+> +++ b/include/net/netdev_queues.h
+> @@ -149,6 +149,7 @@ struct netdev_queue_mgmt_ops {
+>  						  int idx);
+>  	struct device *		(*ndo_queue_get_dma_dev)(struct net_device *dev,
+>  							 int idx);
+> +	int			(*ndo_queue_create)(struct net_device *dev);
 
-nit: return 'not supported' for now or something similar?
-
+kdoc is missing
 
