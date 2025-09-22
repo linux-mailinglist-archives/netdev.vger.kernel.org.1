@@ -1,63 +1,73 @@
-Return-Path: <netdev+bounces-225207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FBCFB8FF33
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 12:16:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE7BBB8FED4
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 12:09:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBC492A144E
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 10:16:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1A1C169DCE
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 10:09:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6FCA267AF2;
-	Mon, 22 Sep 2025 10:16:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YtAawqQe"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A3622FF66B;
+	Mon, 22 Sep 2025 10:09:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A95942AE99
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 10:15:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8042FB09F
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 10:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758536160; cv=none; b=ccOmpi/fHQLKtFRUGjxIzBqkBQd9YBNmx1aJqhEicSNApuy0Ujptaz2C3NyEPDpWDNePADu0X5K7L5+2MJqkCkO9Di77fJFFFoVgtOoqJKzQla4nEsVYiKbqU8+D7zvqCfIWegbEBxlTIDpwT3SqinhniMdtI5viLF0dHQNR9M8=
+	t=1758535765; cv=none; b=BfD+AIIrqBD4ZxeG/VbIFSQ4nH3yP4nO1cclihBdpB4ZvH3E3iFwttPzJhIwnWJtHWY7VP3JGcORCIqxOCKOK4FqfIf2BDlCOWEwusXxYg0r6WXPCx4VaHJ5+3bJwXYJpJXFJ6pa9CpiMGqr4kZsjvvA+RuATQLrYcfAK7yHzR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758536160; c=relaxed/simple;
-	bh=ibyQSwbCJeMp5Snb2pJn2vU/VLBAJVYOPeqonV8LakE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qeE8Y9uy0hdEMcGxsSCOvmE7uQ9Q4L0bal7HBxRrjk/OxKRhFlCqmjuiySt27vFlQfPGhAQutOkNwC0dTdcYwI3hlXVbnmYbyLdlm4+1pDr4bBUW/qnPtrmBcDyDV8roM2BiKvdMb7mej4jZe0MIdK/W+AP2ZpSuuG/i9S1zjIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YtAawqQe; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758536156;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=njBC5DIvqafHdOXMlLvIiK8lFeUIL7rYAYVvWpWwwvQ=;
-	b=YtAawqQecrl/XEd1SNw+tvkRv6xvFPsEfdQlV+HxrMTGXpU6mxwe6hNjWTiEc9oyi0xxYZ
-	0gepBhuJRwRJta2KConbtytVJxNgonBiW2pTl3zLERP7l5tdxYKP5BP4tC1NSS9LF261W3
-	g1P7VW79vvcDnHVVxRXsDc5GKda51tU=
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-To: Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	intel-wired-lan@lists.osuosl.org,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Carolina Jubran <cjubran@nvidia.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v5 0/5] add FEC bins histogram report via ethtool
-Date: Mon, 22 Sep 2025 10:07:36 +0000
-Message-ID: <20250922100741.2167024-1-vadim.fedorenko@linux.dev>
+	s=arc-20240116; t=1758535765; c=relaxed/simple;
+	bh=3m9eC7t0D0zlyp+Qb62ggaSqoqeHcwSN8r6+vJRKhAI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=u0iJw0zOBcbyO4rIVmGwA8xTddDtuk8P0XZUfuPr9FdEPDgHA9wEqWObTwWP5mUXlWZJmUCk/5kb/6ZJtuqLdYUWOCoOWDmANLYEYkXG7fW3Z9jTGK5NF3A2XeyVxJ9LGofAlwwVmfKyZyaosZmPZf6xm79oLYKwNZ+Iu97ZdjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1v0dU1-0006xe-EI
+	for netdev@vger.kernel.org; Mon, 22 Sep 2025 12:09:21 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1v0dU0-002ZWN-0T
+	for netdev@vger.kernel.org;
+	Mon, 22 Sep 2025 12:09:20 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id D2A20476D21
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 10:09:19 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 5F25A476CE6;
+	Mon, 22 Sep 2025 10:09:17 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id da8dc72b;
+	Mon, 22 Sep 2025 10:09:16 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de,
+	Vincent Mailhol <mailhol@kernel.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: [PATCH net 06/10] can: mcba_usb: populate ndo_change_mtu() to prevent buffer overflow
+Date: Mon, 22 Sep 2025 12:07:36 +0200
+Message-ID: <20250922100913.392916-7-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20250922100913.392916-1-mkl@pengutronix.de>
+References: <20250922100913.392916-1-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,90 +75,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-IEEE 802.3ck-2022 defines counters for FEC bins and 802.3df-2024
-clarifies it a bit further. Implement reporting interface through as
-addition to FEC stats available in ethtool. NetDevSim driver has simple
-implementation as an example while mlx5 has much more complex solution.
+From: Vincent Mailhol <mailhol@kernel.org>
 
-The example query is the same as usual FEC statistics while the answer
-is a bit more verbose:
+Sending an PF_PACKET allows to bypass the CAN framework logic and to
+directly reach the xmit() function of a CAN driver. The only check
+which is performed by the PF_PACKET framework is to make sure that
+skb->len fits the interface's MTU.
 
-[vmuser@archvm9 linux]$ ./tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/ethtool.yaml --do fec-get --json '{"header":{"dev-index": 10, "flags": 4}}'
-{'auto': 0,
- 'header': {'dev-index': 10, 'dev-name': 'eni10np1'},
- 'modes': {'bits': {}, 'nomask': True, 'size': 121},
- 'stats': {'corr-bits': [],
-           'corrected': [123],
-           'hist': [{'bin-high': 0,
-                     'bin-low': 0,
-                     'bin-val': 445,
-                     'bin-val-per-lane': [125, 120, 100, 100]},
-                    {'bin-high': 3, 'bin-low': 1, 'bin-val': 12},
-                    {'bin-high': 7,
-                     'bin-low': 4,
-                     'bin-val': 2,
-                     'bin-val-per-lane': [2, 0, 0, 0]}],
-           'uncorr': [4]}}
+Unfortunately, because the mcba_usb driver does not populate its
+net_device_ops->ndo_change_mtu(), it is possible for an attacker to
+configure an invalid MTU by doing, for example:
 
-v4 -> v5:
-* fix selftests error path
-v3 -> v4:
-* update spec to avoid using underscores
-* make core accumulate per-lane errors into bin error counter
-* adjust wording in Documentation
-* improve FEC type check in mlx5
-* add selftest to do sanity check of reported histogram
-* partially carry-over Rb tags from Aleksandr because of logical changes
-v3 Link - https://lore.kernel.org/netdev/20250916191257.13343-1-vadim.fedorenko@linux.dev/
-v2 -> v3:
-* fix yaml spec to use binary array for histogram per-lane values
-* fix spelling
-v1 -> v2:
-* fix memset size of FEC histogram bins in mlx5
-* adjust fbnic driver FEC stats callback
+  $ ip link set can0 mtu 9999
 
-Links to RFC discussions:
-v1 - https://lore.kernel.org/netdev/20250729102354.771859-1-vadfed@meta.com/
-v2 - https://lore.kernel.org/netdev/20250731231019.1809172-1-vadfed@meta.com/
-v3 - https://lore.kernel.org/netdev/20250802063024.2423022-1-vadfed@meta.com/
-v4 - https://lore.kernel.org/netdev/20250807155924.2272507-1-vadfed@meta.com/
-v5 - https://lore.kernel.org/netdev/20250815132729.2251597-1-vadfed@meta.com/
+After doing so, the attacker could open a PF_PACKET socket using the
+ETH_P_CANXL protocol:
 
+	socket(PF_PACKET, SOCK_RAW, htons(ETH_P_CANXL))
 
-Carolina Jubran (3):
-  net/mlx5e: Don't query FEC statistics when FEC is disabled
-  net/mlx5e: Add logic to read RS-FEC histogram bin ranges from PPHCR
-  net/mlx5e: Report RS-FEC histogram statistics via ethtool
+to inject a malicious CAN XL frames. For example:
 
-Vadim Fedorenko (2):
-  ethtool: add FEC bins histogram report
-  selftests: net-drv: stats: sanity check FEC histogram
+	struct canxl_frame frame = {
+		.flags = 0xff,
+		.len = 2048,
+	};
 
- Documentation/netlink/specs/ethtool.yaml      |  26 ++++
- Documentation/networking/ethtool-netlink.rst  |   5 +
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   3 +-
- .../ethernet/fungible/funeth/funeth_ethtool.c |   3 +-
- .../ethernet/hisilicon/hns3/hns3_ethtool.c    |   3 +-
- drivers/net/ethernet/intel/ice/ice_ethtool.c  |   4 +-
- .../marvell/octeontx2/nic/otx2_ethtool.c      |   3 +-
- drivers/net/ethernet/mellanox/mlx5/core/en.h  |   1 +
- .../ethernet/mellanox/mlx5/core/en_ethtool.c  |   5 +-
- .../net/ethernet/mellanox/mlx5/core/en_main.c |   8 ++
- .../ethernet/mellanox/mlx5/core/en_stats.c    | 125 +++++++++++++++++-
- .../ethernet/mellanox/mlx5/core/en_stats.h    |   3 +-
- .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |   3 +-
- drivers/net/ethernet/sfc/ethtool.c            |   3 +-
- drivers/net/ethernet/sfc/siena/ethtool.c      |   3 +-
- drivers/net/netdevsim/ethtool.c               |  25 +++-
- include/linux/ethtool.h                       |  25 +++-
- .../uapi/linux/ethtool_netlink_generated.h    |  11 ++
- net/ethtool/fec.c                             |  75 ++++++++++-
- tools/testing/selftests/drivers/net/stats.py  |  35 ++++-
- 20 files changed, 345 insertions(+), 24 deletions(-)
+The CAN drivers' xmit() function are calling can_dev_dropped_skb() to
+check that the skb is valid, unfortunately under above conditions, the
+malicious packet is able to go through can_dev_dropped_skb() checks:
 
+  1. the skb->protocol is set to ETH_P_CANXL which is valid (the
+     function does not check the actual device capabilities).
+
+  2. the length is a valid CAN XL length.
+
+And so, mcba_usb_start_xmit() receives a CAN XL frame which it is not
+able to correctly handle and will thus misinterpret it as a CAN frame.
+
+This can result in a buffer overflow. The driver will consume cf->len
+as-is with no further checks on these lines:
+
+	usb_msg.dlc = cf->len;
+
+	memcpy(usb_msg.data, cf->data, usb_msg.dlc);
+
+Here, cf->len corresponds to the flags field of the CAN XL frame. In
+our previous example, we set canxl_frame->flags to 0xff. Because the
+maximum expected length is 8, a buffer overflow of 247 bytes occurs!
+
+Populate net_device_ops->ndo_change_mtu() to ensure that the
+interface's MTU can not be set to anything bigger than CAN_MTU. By
+fixing the root cause, this prevents the buffer overflow.
+
+Fixes: 51f3baad7de9 ("can: mcba_usb: Add support for Microchip CAN BUS Analyzer")
+Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
+Link: https://patch.msgid.link/20250918-can-fix-mtu-v1-4-0d1cada9393b@kernel.org
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+---
+ drivers/net/can/usb/mcba_usb.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/can/usb/mcba_usb.c b/drivers/net/can/usb/mcba_usb.c
+index 41c0a1c399bf..1f9b915094e6 100644
+--- a/drivers/net/can/usb/mcba_usb.c
++++ b/drivers/net/can/usb/mcba_usb.c
+@@ -761,6 +761,7 @@ static const struct net_device_ops mcba_netdev_ops = {
+ 	.ndo_open = mcba_usb_open,
+ 	.ndo_stop = mcba_usb_close,
+ 	.ndo_start_xmit = mcba_usb_start_xmit,
++	.ndo_change_mtu = can_change_mtu,
+ };
+ 
+ static const struct ethtool_ops mcba_ethtool_ops = {
 -- 
-2.47.3
+2.51.0
+
 
 
