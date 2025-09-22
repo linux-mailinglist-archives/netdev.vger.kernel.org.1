@@ -1,134 +1,235 @@
-Return-Path: <netdev+bounces-225424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 516F5B9396B
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 01:34:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E505B93956
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 01:34:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 149CC2A08A3
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 23:34:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 959AE19C12FD
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 23:34:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0E92FF650;
-	Mon, 22 Sep 2025 23:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4491B265296;
+	Mon, 22 Sep 2025 23:34:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="2y+TLRap"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gQpujcvL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B4E253F07
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 23:33:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C54626B769
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 23:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758584042; cv=none; b=E5w/MzVO94xth+Sc9sJjK/ZqMgFL3NJxLfPn60Q9Jr07RIS+mPYiegagArSkx9txtW4MPlJcwmGbMyRQYsnBX9QFLOVay3LRw3J308AQf/ON/AjFzJPQJWO7liZz0TNSSk+EPMOgb25n0U33LOLofxKgKHGC0scoIeK2gVPvLus=
+	t=1758584040; cv=none; b=ExwlaZhsZ4DAjkdL5xcYkqFKW1RYX7P1ZkJi/IwHFakj5aXwcENZ34WpXqmNP8tJ8LlYiTyeWLROPze2MU0v/tjlI4aT3VNdvoNMeHDu0r4IRd8ggvzj7OrykGEvI5hvuSXkcWzjaicXRgkXMTHYQzEeMpsoFhO7whpxOUSBy9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758584042; c=relaxed/simple;
-	bh=LhPuL9sG3C8zlI8IcIwj4dNxj3q1GjMeZApYiKxUmOo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lfFefVPUfQMzvlpG9AHIYTAfZo3hvGHpqr9sLuTRlUkqxghiNKKb+XAc6Th3EU1jgU9w2PR6zUO0E3O6JlCQhQb7OrUltPzoCwgNABW8upb3RdgFD/HJY29JgAOnMQtM52elIRi2rjFzuxflZ57xqDSX2DN5au/HtopzceyW/Cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=2y+TLRap; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 221B1C01FAE;
-	Mon, 22 Sep 2025 23:33:41 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id EDE2560635;
-	Mon, 22 Sep 2025 23:33:57 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C406A102F1877;
-	Tue, 23 Sep 2025 01:33:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1758584036; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=LhPuL9sG3C8zlI8IcIwj4dNxj3q1GjMeZApYiKxUmOo=;
-	b=2y+TLRap1pN3HRdoKgD6Zk4og08A79Jne/wlePbE2xwEZ63s2OK2TBJ1q/GuzMb5XynQSv
-	0fJTNL1FTuC8cSk+UrP9ndtsQl9gxHn1cWvIPlISQrPiBmOMc+qtgdsrpKSIVh9XB1v4xl
-	lbyFPybQ+rdU8nmlG6P7QMucJzaPiZiMzWORdK7oh4v8RSA3Kat6X+LvIYOOgStylihgNS
-	p5Q9wdGSoK8qs6Gqyb35TpwVDGtbx/z6V/RsDG5BvyXTujLR4cSdBweBQnwiz4fm9EYgDH
-	CV0WAQXfXqeZEJtsu9LuiZlfTt8139tAGLEvbNOINYHs9fcfqkigIJ71s8sElg==
-Date: Tue, 23 Sep 2025 01:33:48 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Claudiu Manoil
- <claudiu.manoil@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, "Y.B. Lu"
- <yangbo.lu@nxp.com>, "richardcochran@gmail.com" <richardcochran@gmail.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
- <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, Frank Li <frank.li@nxp.com>, "imx@lists.linux.dev"
- <imx@lists.linux.dev>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: enetc: use generic interfaces to get
- phc_index for ENETC v1
-Message-ID: <20250923013348.62f44bba@kmaincent-XPS-13-7390>
-In-Reply-To: <PAXPR04MB8510ABEC85E704D1289A0E098811A@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20250918074454.1742328-1-wei.fang@nxp.com>
-	<20250918124823.t3xlzn7w2glzkhnx@skbuf>
-	<20250919103232.6d668441@kmaincent-XPS-13-7390>
-	<PAXPR04MB8510ABEC85E704D1289A0E098811A@PAXPR04MB8510.eurprd04.prod.outlook.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1758584040; c=relaxed/simple;
+	bh=7L0b8xVcWKGl2Um96G9TEeLLcPaAZLg//CEHJzPw1vY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uH64hVwaMh+Rrf3QLCl4xwxzhOSBl1rU0YHs/AotX9hvkzLVCHqvAkO1QjQoIXu2xrHrZHfl+c52Ax1b8VjDSUuE/8F46+FbG0sAo1DrM4YqFLvBh2Nw3V7Lh1YpPkeeoK29OyYHlreZzV6/7rir2L1i/WeHHrJ0HjjY8DVNkrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gQpujcvL; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-26f0c5455e2so19934415ad.3
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 16:33:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758584038; x=1759188838; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bNuyT4UIadhF83LQiFA1J7XTqOmNSKvnywAckACKVBw=;
+        b=gQpujcvLXCskSaMnAGo6srcLwlaHjthv5ZMZiTFg2e/6eKJJXZDK5w40zo4ZvoN+W0
+         Nll58W0Ri36t4lYwVVg62hBrWPjzJ3iu9gL+8P48hq2B8WhrxsqqGhCx6STlccAA/rvA
+         SdZUPYyYxHiom3NS2a6Z5K+ze1ADzAvbLrAZTndKaqG8vB/do00q9N6sUp0+Dd3aWFZd
+         Cbt9b8cX+sM48LKwOJ6nIv0WXrH3d9MvxnxWur/KM+WHSyiozrZi0l/fX8RXlAE8+zqY
+         Ve2JhQhuVgle4FoscCyhUrHUOYJnsia2+uOW9IfsxcUYnGLqO3/PRHNd9ytderA0lsfJ
+         39hQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758584038; x=1759188838;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bNuyT4UIadhF83LQiFA1J7XTqOmNSKvnywAckACKVBw=;
+        b=fRlcKcGLS/ItCcqEmvX7tkyo3p+YVj00XKOdvVFLsiqiANpassXadANWUHrIW6HuH0
+         gnjB2AQaO8kEDfhtdYJBHQmKL8WbpMyoAPcTVBWeUyNHxeSBYhCABLRUHyUCXHOeDKtO
+         Fq0MuC0dSXvA9wEls0hTZThvV+8FmVYdtJy7c+e2Sb/96dNn3/eROrF+CXecvv0Z/U9Z
+         eEA5Hlv1lgL1LfijV0gC6KqzQTOznseZtoSCuvWgjEcezRKZVAGpklYGVl+ufzTiiTnZ
+         J7sZOjB0bJ5edc5hfwMCRhnrGIwBMOH2wK3o70RviBxIGQpZxmO84LYyoexN0p6qQNou
+         HDQg==
+X-Gm-Message-State: AOJu0YzGUZL8biOtBU3RxPq/YJQceNT4ARxvvoWcHDb8SpfYSmox8iZK
+	lrco+JNivwytES3oBpADg94XSsQ5ay3s9i0dt7kx0v7YHPb2CmAUUWQE
+X-Gm-Gg: ASbGncu6f82kET6TKTHkQU1VEuF4Df5vpXXfwDWHdfCvIHPVmfK9BZBcaZ+7fg/NJbN
+	rjaoAkVyfyWhAC7yVoVVZf68wWrvjESJQHjTicPlKnEOKlKNHunO+elyCsrS/xwlGfFrvF50NC7
+	LWWYy+tCoQkvutCZ/QG/aZiOVlBQWQ37t0MxtPMWZUu2Rfc2AZ/e2Deit28H6vfXSE95X56C8AP
+	Qv9zbEq5HwPRT+c8YzTPKk4Ev636x01JyomERb0efA3DWbClWQ3lSDjCo5GK16k5ykxHV/9c90f
+	L4Ba0U7pKYKf0yia355GUH3VkLNXFFsKIpBiL0R9Au+5P462Gf8H3fnfyqBaiPm6GRQQONTgloJ
+	DxU9kjF12HRsY7w==
+X-Google-Smtp-Source: AGHT+IHhQ89LwsOFfsaS/aRK00/dCrokkNfeWSP99FUsxwIhdesxbkrNbiw0MU1Ga5/z28uybnAB7Q==
+X-Received: by 2002:a17:902:e945:b0:246:80b1:8c87 with SMTP id d9443c01a7336-27cc61b8d7bmr6664055ad.43.1758584037621;
+        Mon, 22 Sep 2025 16:33:57 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:74::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-269803587absm140655065ad.137.2025.09.22.16.33.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Sep 2025 16:33:57 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	paul.chaignon@gmail.com,
+	kuba@kernel.org,
+	stfomichev@gmail.com,
+	martin.lau@kernel.org,
+	mohsin.bashr@gmail.com,
+	noren@nvidia.com,
+	dtatulea@nvidia.com,
+	saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	maciej.fijalkowski@intel.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next v7 0/8] Add kfunc bpf_xdp_pull_data
+Date: Mon, 22 Sep 2025 16:33:48 -0700
+Message-ID: <20250922233356.3356453-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 
-On Fri, 19 Sep 2025 08:48:57 +0000
-Wei Fang <wei.fang@nxp.com> wrote:
+v7 -> v6
+  patch 5 (new patch)
+  - Rename variables in bpf_prog_test_run_xdp()
 
-> > > It looks like we have a problem and can't call pci_get_slot(), which
-> > > sleeps on down_read(&pci_bus_sem), from ethtool_ops :: get_ts_info(),
-> > > which can't sleep, as of commit 4c61d809cf60 ("net: ethtool: Fix
-> > > suspicious rcu_dereference usage").
-> > >
-> > > K=C3=B6ry, do you have any comments or suggestions? Patch is here:
-> > > =20
-> > https://lore.kern/
-> > el.org%2Fnetdev%2F20250918074454.1742328-1-wei.fang%40nxp.com%2F&d
-> > ata=3D05%7C02%7Cwei.fang%40nxp.com%7Cca70608eb6c9487d98e108ddf7571
-> > de6%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C63893867571474
-> > 2481%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjA
-> > uMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7
-> > C%7C&sdata=3Dh6rMPPxArsYdoPOz95UZRU88Oz9IJ3sD6lRjqC5SHMU%3D&reser
-> > ved=3D0
-> >
-> > This is annoying indeed. I don't know how this enetc drivers works but =
-why
-> > ts_info needs this pci_get_slot() call? It seems this call seems to not=
- be
-> > used in ndo_hwtstamp_get/set while ts_info which does not need any hard=
-ware
-> > communication report only a list of capabilities.
-> > =20
->=20
-> The ENETC (MAC controller) and the PTP timer are separate devices, they
-> are both PCIe devices, the PTP timer provides the PHC for ENETC to use, so
-> enetc_get_ts_info() needs to get the phc_index of the PTP timer, so
-> pci_get_slot() is called to get the pci_dev pointer of the PTP timer. I c=
-an
-> use pci_get_domain_bus_and_slot() to instead to fix this issue.
->=20
-> I do not know whether it is a good idea to place the get_ts_info() callba=
-ck
-> within an atomic lock context. I also noticed that idpf driver also has t=
-he
-> same potential issue (idpf_get_ts_info()).
+  patch 6
+  - Fix bugs (Martin)
 
-We can change the device providing the PTP (currently between MAC or PHY),
-that's why we need to acquire the rcu lock to avoid any pointer change duri=
-ng
-the get_ts_info callback which could cause an use after free issue.
+v6 -> v5
+  patch 6
+  - v5 selftest failed on S390 when changing how tailroom occupied by
+    skb_shared_info is calculated. Revert selftest to v4, where we get
+    SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) by running an XDP
+    program
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+  Link: https://lore.kernel.org/bpf/20250919230952.3628709-1-ameryhung@gmail.com/
+
+v5 -> v4
+  patch 1
+  - Add a new patch clearing pfmemalloc bit in xdp->frags when all frags
+    are freed in bpf_xdp_adjust_tail() (Maciej)
+
+  patch 2
+  - Refactor bpf_xdp_shrink_data() (Maciej)
+
+  patch 3
+  - Clear pfmemalloc when all frags are freed in bpf_xdp_pull_data()
+    (Maciej)
+
+  patch 6
+  - Use BTF to get sizes of skb_shared_info and xdp_frame (Maciej)
+
+  Link: https://lore.kernel.org/bpf/20250919182100.1925352-1-ameryhung@gmail.com/
+
+v3 -> v4
+  patch 2
+  - Improve comments (Jakub)
+  - Drop new_end and len_free to simplify code (Jakub)
+
+  patch 4
+  - Instead of adding is_xdp to bpf_test_init, move lower-bound check
+    of user_size to callers (Martin)
+  - Simplify linear data size calculation (Martin)
+
+  patch 5
+  - Add static function identifier (Martin)
+  - Free calloc-ed buf (Martin)
+
+  Link: https://lore.kernel.org/bpf/20250917225513.3388199-1-ameryhung@gmail.com/
+
+v2 -> v3
+  Separate mlx5 fixes from the patchset
+
+  patch 2
+  - Use headroom for pulling data by shifting metadata and data down
+    (Jakub)
+  - Drop the flags argument (Martin)
+
+  patch 4 
+  - Support empty linear xdp data for BPF_PROG_TEST_RUN
+
+  Link: https://lore.kernel.org/bpf/20250915224801.2961360-1-ameryhung@gmail.com/
+
+v1 -> v2
+  Rebase onto bpf-next
+
+  Try to build on top of the mlx5 patchset that avoids copying payload
+  to linear part by Christoph but got a kernel panic. Will rebase on
+  that patchset if it got merged first, or separate the mlx5 fix
+  from this set.
+
+  patch 1
+  - Remove the unnecessary head frag search (Dragos)
+  - Rewind the end frag pointer to simplify the change (Dragos)
+  - Rewind the end frag pointer and recalculate truesize only when the
+    number of frags changed (Dragos)
+
+  patch 3
+  - Fix len == zero behavior. To mirror bpf_skb_pull_data() correctly,
+    the kfunc should do nothing (Stanislav)
+  - Fix a pointer wrap around bug (Jakub)
+  - Use memmove() when moving sinfo->frags (Jakub)
+
+  Link: https://lore.kernel.org/bpf/20250905173352.3759457-1-ameryhung@gmail.com/
+  
+---
+
+Hi all,
+
+This patchset introduces a new kfunc bpf_xdp_pull_data() to allow
+pulling nonlinear xdp data. This may be useful when a driver places
+headers in fragments. When an xdp program would like to keep parsing
+packet headers using direct packet access, it can call
+bpf_xdp_pull_data() to make the header available in the linear data
+area. The kfunc can also be used to decapsulate the header in the
+nonlinear data, as currently there is no easy way to do this.
+
+Tested with the added bpf selftest using bpf test_run and also on
+mlx5 with the tools/testing/selftests/drivers/net/{xdp.py, ping.py}.
+mlx5 with striding RQ enabled always passse xdp_buff with empty linear
+data to xdp programs. xdp.test_xdp_native_pass_mb would fail to parse
+the header before this patchset.
+
+Thanks!
+Amery
+
+Amery Hung (8):
+  bpf: Clear pfmemalloc flag when freeing all fragments
+  bpf: Allow bpf_xdp_shrink_data to shrink a frag from head and tail
+  bpf: Support pulling non-linear xdp data
+  bpf: Clear packet pointers after changing packet data in kfuncs
+  bpf: Make variables in bpf_prog_test_run_xdp less confusing
+  bpf: Support specifying linear xdp packet data size for
+    BPF_PROG_TEST_RUN
+  selftests/bpf: Test bpf_xdp_pull_data
+  selftests: drv-net: Pull data before parsing headers
+
+ include/net/xdp.h                             |   5 +
+ include/net/xdp_sock_drv.h                    |  21 +-
+ kernel/bpf/verifier.c                         |  13 ++
+ net/bpf/test_run.c                            |  37 ++--
+ net/core/filter.c                             | 135 +++++++++++--
+ .../bpf/prog_tests/xdp_context_test_run.c     |   4 +-
+ .../selftests/bpf/prog_tests/xdp_pull_data.c  | 179 ++++++++++++++++++
+ .../selftests/bpf/progs/test_xdp_pull_data.c  |  48 +++++
+ .../selftests/net/lib/xdp_native.bpf.c        |  89 +++++++--
+ 9 files changed, 479 insertions(+), 52 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/xdp_pull_data.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_xdp_pull_data.c
+
+-- 
+2.47.3
+
 
