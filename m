@@ -1,98 +1,80 @@
-Return-Path: <netdev+bounces-225355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B110FB92A5F
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 20:50:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EA09B92A89
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 20:52:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96CC51901BE5
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 18:50:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67FD07A94BA
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 18:51:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6656D318138;
-	Mon, 22 Sep 2025 18:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 167AE31A560;
+	Mon, 22 Sep 2025 18:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MU6u3Nxf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UFCjiWvF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404B831771B
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 18:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C1531A553;
+	Mon, 22 Sep 2025 18:52:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758567012; cv=none; b=LfDjp5M4ur+kc9ZxQ2ttUPO5PqEomHcbGR3qIqwxYCjbpKhQclklIe20T2DUYiarYXZKI7H3s1d4LVmilaQZ/5tsXCac45cf/SjJ5MWMV6cpgtfjzHw+Od4NVrBoo4SQJQnDx6z9J9tT/l/dBQI5hrbHT9BR3gsrenNdI1fHyKk=
+	t=1758567161; cv=none; b=NxdLoG+56fJkMYMZzp2rzzuqlyvb77g8VzY4vPg/sr7tkGAWzruEAs19A9wYOKhZv2xJdCWDxQqaYP4Ru4CH57m96o5beUcw3DdYDc89bLKw3mBm2Qe2DxaAetUiuNcRx6FhKCU8acLmTfls/Id8bPKsX23sNQlWb9vJ4x9Ipkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758567012; c=relaxed/simple;
-	bh=O/gw1t9pM9h5RIdRGaF49XozCbi1EyH5mJUl07nHa1A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=b/bTTWOSqdJK/JU7IsXwCkJPVl2ZUDfRFHQOVEOD7/ojRCT4DOxhnCoSSo70EFK7bEdg1bDmv7ya09LioSEMvuyrzqy7c3J5w6qTgANQAx7S2spB0h24awRIlgAJkCnpGQRtdL3F3emn6Y42k0M4zSFB0+5fN8BPYNOX6XQhF+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MU6u3Nxf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CECDEC4CEF0;
-	Mon, 22 Sep 2025 18:50:11 +0000 (UTC)
+	s=arc-20240116; t=1758567161; c=relaxed/simple;
+	bh=zzPDjUd3ZXXbtwbaeNu8cGUP2U9NzJAtLzJgqUtgzkk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BkG6T5uDqHVfB+VauWKI6+b59i/QH02mg87SomNaA8YFE4wj3XjyjcYgyS+k7q09kHPZqq2dKr2PRmlFH9KKx5k86HRFU+x9C/2Q2U7d3XarL8Om6nuPT+YXz0K2kARs4tTyQ+osJJgRqKSJDw2BXEwU4J0oHN3iWzPd91J5MHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UFCjiWvF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30EA8C4CEF0;
+	Mon, 22 Sep 2025 18:52:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758567011;
-	bh=O/gw1t9pM9h5RIdRGaF49XozCbi1EyH5mJUl07nHa1A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MU6u3NxffhGMILBIG8XymGk4LMpSxubLDCN5m8wM2nOFQ/ANsZbzVUhupgwFATIEZ
-	 0f1k59xfHNFFznGwxqfhbYfCGmSp0Wbf0CnhSBlPC3eT1CIiDRu2PjVZBO+o9gbpdN
-	 Auhqu+3ox1tnxNyzUzJPBsYIzPnjdCSKb/gd1qT5evVOM//pdi4qsj+PnmZkUlkh1c
-	 pmVkx/VPeaJTPnz19Lux6+ZExc+9qs1HxuybFAtwgb/0LCC4HGrr+lexIVXhGnLwQS
-	 EhHwBxV5R0u4ng9sK8K5l7X6jrnFYpKy5zw8mVF0vPyze8CUq12MB2VNEObkJZdSvy
-	 3wySTkWemtmXw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9CC9D39D0C20;
-	Mon, 22 Sep 2025 18:50:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1758567160;
+	bh=zzPDjUd3ZXXbtwbaeNu8cGUP2U9NzJAtLzJgqUtgzkk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UFCjiWvFdiUb0wZzf+2dUrxNH2q/9TmWe8mLqxDj852L09tSlE5NGMVPG0e/Uy5zh
+	 N4enV7X6tpaTfmBlazdRrmJqUgJmqFkeLTR9P65OtGjiLpqhNaHVvWwX0s9Guuwbbl
+	 GVOwpADhclbuZVWJX3Yic2USLVVHLgU2Ns7+/J7dQHl/H1zCV1Oemo1zX7ESbbDvRI
+	 KyP22d1BoOCE1hyo75YZdqpyxikyvNEyDpOM9IEqhggbfjzBKoeHUlXO19xyx+JkxG
+	 8UklWFXYgwIwr1TmyARoRILE5VieYGqcJvghWWMTgDck8LMFjEN3WZncJKBq4tT2YM
+	 w7YQ4PrX7iZig==
+Date: Mon, 22 Sep 2025 11:52:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ Donald Hunter <donald.hunter@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan
+ <shuah@kernel.org>, netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 1/6] mptcp: pm: netlink: only add server-side
+ attr when true
+Message-ID: <20250922115239.21e4afaa@kernel.org>
+In-Reply-To: <20250919-net-next-mptcp-server-side-flag-v1-1-a97a5d561a8b@kernel.org>
+References: <20250919-net-next-mptcp-server-side-flag-v1-0-a97a5d561a8b@kernel.org>
+	<20250919-net-next-mptcp-server-side-flag-v1-1-a97a5d561a8b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net-next 0/3] tcp: Clean up inet_hash() and
- inet_unhash().
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175856700950.1118970.11081370522271920576.git-patchwork-notify@kernel.org>
-Date: Mon, 22 Sep 2025 18:50:09 +0000
-References: <20250919083706.1863217-1-kuniyu@google.com>
-In-Reply-To: <20250919083706.1863217-1-kuniyu@google.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: edumazet@google.com, ncardwell@google.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- xuanqiang.luo@linux.dev, kuni1840@gmail.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 19 Sep 2025 08:35:27 +0000 you wrote:
-> While reviewing the ehash fix series from Xuanqiang Luo [0],
-> I noticed that inet_twsk_hashdance_schedule() checks the
-> retval of __sk_nulls_del_node_init_rcu(), which looks confusing.
+On Fri, 19 Sep 2025 14:08:58 +0200 Matthieu Baerts (NGI0) wrote:
+> This attribute is a boolean. No need to add it to set it to 'false'.
 > 
-> The test exists from the pre-git era:
+> Indeed, the default value when this attribute is not set is naturally
+> 'false'. A few bytes can then be saved by not adding this attribute if
+> the connection is not on the server side.
 > 
->   $ git blame -L:tcp_tw_hashdance net/ipv4/tcp_minisocks.c e48c414ee61f4~
-> 
-> [...]
+> This prepares the future deprecation of its attribute, in favour of a
+> new flag.
 
-Here is the summary with links:
-  - [v1,net-next,1/3] tcp: Remove osk from __inet_hash() arg.
-    https://git.kernel.org/netdev/net-next/c/6445bb832dc0
-  - [v1,net-next,2/3] tcp: Remove inet6_hash().
-    https://git.kernel.org/netdev/net-next/c/0ac44301e3bf
-  - [v1,net-next,3/3] tcp: Remove redundant sk_unhashed() in inet_unhash().
-    https://git.kernel.org/netdev/net-next/c/bb6f9445666e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Removing attrs from netlink messages is a bit of a gray zone.
+If anyone complains we'll have to revert..
 
