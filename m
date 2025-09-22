@@ -1,211 +1,133 @@
-Return-Path: <netdev+bounces-225292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E845B91E5A
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:26:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEC2DB91F83
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:35:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE8107A55F9
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 15:25:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 822502A41E8
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 15:35:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4EB2E2845;
-	Mon, 22 Sep 2025 15:26:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74342E88BB;
+	Mon, 22 Sep 2025 15:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N7Y2j3Tq"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="W2Fqf7K0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-28.smtpout.orange.fr [80.12.242.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB352E3360;
-	Mon, 22 Sep 2025 15:26:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC122E7BAA;
+	Mon, 22 Sep 2025 15:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758554795; cv=none; b=dvlyfTdTVF8lyH1QwP7oluVAs2ogIpT1vD7JtoKVDF/NHZ5IxzNVkb3fEe93KBNhOfx2xSb3gKgmz1sVJwzw0COxJdgihvAUkl1HpzXtetbdboLn7oHkbp9vZp+IDuOkVfU0oTrl0U05PsMScSunxM1c97jDV7ev1YSnWajrvVI=
+	t=1758555305; cv=none; b=QevMgnBaVBnZzSQdEKwhENtyJkGwsi66iRHdeZo0eiPMHzFylIsJ+ALMK3SEd8FIxi/hL7YgujGfmOz0hzK1zkU2qJBMva+AJ45qzFjGVRhTsFtemXE1+6stmdlC0A3m1ICYzI6ghtoHXneZamJp5SvvI/gabwMmo8Tg6Ov0kbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758554795; c=relaxed/simple;
-	bh=r+U+Xow8gQkcWwszhPh0pl4kZjueOXormgmuZ9qI7MM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=d5EAjKL9f+QcVqxeTSkNoRtIc3dy3dG841Pk9iXBGBhA+NzfHakRhagkBW15fo0EgjdfouUHyT2RSgH3bcdKa9CzSBYQHhq1l16HvjFSt4TatCKR0vm4aklE1G/9WU5mi9i7fqletFF69ikbIfda0wnJnjXVSgl4ERLqntM2Q+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N7Y2j3Tq; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758554794; x=1790090794;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=r+U+Xow8gQkcWwszhPh0pl4kZjueOXormgmuZ9qI7MM=;
-  b=N7Y2j3Tq42iGEaELk+Uy3Asw4ekszsKbvlRyTKUfLSUanqXBiUBJky1O
-   JUPKZ2DXwCepSj/hv+g5sa7EfnL9s/ImpTA/2YfvFLu1Vq7W0DuGrE0Sp
-   I4FIOyOraLrA1Fo25aFpn25FIZxZ0om1EE5XpiGeGMYiLoL0FqNq7KXXK
-   tzay2MYcauRFP1XAjZGC959r28hNVvHXNH1Zx3DsBQ4TMOTtfpSE5UMSL
-   HCfdoj7q/zFlUjZV3CDBTQrQBrWflnCn++E7QyoQgbG8CcSUsfVdafdNK
-   0C4YHcPVtPsXEcDi1LgAT/bHEcLSHpKJgQE+WSwwvenc9S9hVq6luOoTw
-   A==;
-X-CSE-ConnectionGUID: DEZsFGMmSXybQMU99jngiw==
-X-CSE-MsgGUID: BdtFtX0RR7mkfhY8vMMpzA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="63449220"
-X-IronPort-AV: E=Sophos;i="6.18,285,1751266800"; 
-   d="scan'208";a="63449220"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 08:26:34 -0700
-X-CSE-ConnectionGUID: ZVGq9DsAQhyU7FDbflIfxA==
-X-CSE-MsgGUID: qmT8uUzUSv+qk607w/r+ug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,285,1751266800"; 
-   d="scan'208";a="207242248"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by orviesa002.jf.intel.com with ESMTP; 22 Sep 2025 08:26:32 -0700
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: bpf@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org
-Cc: netdev@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	stfomichev@gmail.com,
-	kerneljasonxing@gmail.com,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH bpf-next 3/3] xsk: wrap generic metadata handling onto separate function
-Date: Mon, 22 Sep 2025 17:26:00 +0200
-Message-Id: <20250922152600.2455136-4-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20250922152600.2455136-1-maciej.fijalkowski@intel.com>
-References: <20250922152600.2455136-1-maciej.fijalkowski@intel.com>
+	s=arc-20240116; t=1758555305; c=relaxed/simple;
+	bh=S3nR08scvOYxQPr9SDbE350r0bvaB769ACMZhiLksS8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HpJymOuRYrlfKGLeiX6JU8tOw4fmTlN5UUwl+hRhnLWjVXdrSv618i8bX5e7fGyuzJP5uvLU4L9aI2NRSOKOmTOpPmao3eoN0xOwDdgSWpI4qyXcKmTgK2r0Yg4Cr1yg0nZXWzijzwNV3NCiX/cmJm/WdUyq0lMeB/k1V7YQVBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=W2Fqf7K0; arc=none smtp.client-ip=80.12.242.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [IPV6:2a01:cb10:785:b00:8347:f260:7456:7662]
+ ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
+	by smtp.orange.fr with ESMTPA
+	id 0iZ2vqcWnFsG90iZ2vKGzC; Mon, 22 Sep 2025 17:34:55 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1758555295;
+	bh=3FaNLmFmhfEak/yzdIxKjy3ePRlrUJpce254WrXdU+E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=W2Fqf7K0VzK9c4pK612dHLabrgEz35aD6e8QOKUy64xfSjBRQT/YLhKICZ2Zgh1Q2
+	 SGx9BYA9o48DMqQbVGenaPHjHTWG+PoPdGb+HzNWY2DgMX1blgK9CSgOeKkZ+OEjH2
+	 ZhaSlqOq/Wl7QzDPdDQkURFfgH3VJTvyKc5OzmJ59IcI/UH6pieB3TlzVlyT88ETLU
+	 sWz1qLy3vtso87yexg2chFDGromRpfjYtoAJGmuKBeB/aIsPY30vCueG0rGYvsIcDM
+	 6VijCYYYHNNu3WKwbqWiSKL2Ls6UAS0Kt7X33gB8ewtcu2OGwqG0fM61ncPJ0tE40v
+	 fE4kPVEZqjvmA==
+X-ME-Helo: [IPV6:2a01:cb10:785:b00:8347:f260:7456:7662]
+X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
+X-ME-Date: Mon, 22 Sep 2025 17:34:55 +0200
+X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
+Message-ID: <233f751e-b7f3-452f-a9ac-9c88621badb4@wanadoo.fr>
+Date: Mon, 22 Sep 2025 17:34:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v1] net: mv643xx_eth: Fix an error handling path in
+ mv643xx_eth_probe()
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Lennert Buytenhek <buytenh@wantstofly.org>,
+ Andy Fleming <afleming@freescale.com>, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, netdev@vger.kernel.org
+References: <f1175ee9c7ff738474585e2e08bd78f93623216f.1758528456.git.christophe.jaillet@wanadoo.fr>
+ <efff779e-96e1-473a-8b9c-114b090ff02c@lunn.ch>
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Content-Language: en-US, fr-FR
+In-Reply-To: <efff779e-96e1-473a-8b9c-114b090ff02c@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-xsk_build_skb() has gone wild with its size and one of the things we can
-do about it is to pull out a branch that takes care of metadata handling
-and make it a separate function. Consider this as a good start of
-cleanup.
+Le 22/09/2025 à 14:53, Andrew Lunn a écrit :
+> On Mon, Sep 22, 2025 at 10:08:28AM +0200, Christophe JAILLET wrote:
+>> If an error occurs after calling phy_connect_direct(), phy_disconnect()
+>> should be called, as already done in the remove function.
+>>
+>> Fixes: ed94493fb38a ("mv643xx_eth: convert to phylib")
+>> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+>> ---
+>> This patch is speculative and compile tested only.
+>> Review with care.
+>> ---
+>>   drivers/net/ethernet/marvell/mv643xx_eth.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/marvell/mv643xx_eth.c b/drivers/net/ethernet/marvell/mv643xx_eth.c
+>> index 0ab52c57c648..de6a683d7afc 100644
+>> --- a/drivers/net/ethernet/marvell/mv643xx_eth.c
+>> +++ b/drivers/net/ethernet/marvell/mv643xx_eth.c
+>> @@ -3263,6 +3263,8 @@ static int mv643xx_eth_probe(struct platform_device *pdev)
+>>   	return 0;
+>>   
+>>   out:
+>> +	if (dev->phydev)
+>> +		phy_disconnect(dev->phydev);
+> 
+> This is correct, but it is a little bit less obviously correct than it
+> could be. Nothing in mv643xx_eth_probe sets dev->phydev. It happens
+> deep down in the call chain of of_phy_connect(). Just using:
+> 
+> 	if (phydev)
+> 		phy_disconnect(phydev);
+> 
+> would be more obvious for this probe function.
+> 
+> But since it is correct, Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> and i will leave you to decide if you want to change it.
+> 
+>      Andrew
+> 
+> 
 
-No functional changes here.
+In the (pd->phy_addr != MV643XX_ETH_PHY_NONE) case, phydev could be an 
+error code.
 
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
----
- net/xdp/xsk.c | 83 ++++++++++++++++++++++++++++-----------------------
- 1 file changed, 46 insertions(+), 37 deletions(-)
+So, we should do something like:
+	if (!IS_ERR_OR_NULL(phydev))
+		phy_disconnect(phydev);
 
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 064238400036..7121d4f99915 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -723,10 +723,48 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
- 	return skb;
- }
- 
-+static int xsk_skb_metadata(struct sk_buff *skb, void *buffer,
-+			    struct xdp_desc *desc, struct xsk_buff_pool *pool,
-+			    u32 hr)
-+{
-+	struct xsk_tx_metadata *meta = NULL;
-+
-+	if (unlikely(pool->tx_metadata_len == 0))
-+		return -EINVAL;
-+
-+	meta = buffer - pool->tx_metadata_len;
-+	if (unlikely(!xsk_buff_valid_tx_metadata(meta)))
-+		return -EINVAL;
-+
-+	if (meta->flags & XDP_TXMD_FLAGS_CHECKSUM) {
-+		if (unlikely(meta->request.csum_start +
-+			     meta->request.csum_offset +
-+			     sizeof(__sum16) > desc->len))
-+			return -EINVAL;
-+
-+		skb->csum_start = hr + meta->request.csum_start;
-+		skb->csum_offset = meta->request.csum_offset;
-+		skb->ip_summed = CHECKSUM_PARTIAL;
-+
-+		if (unlikely(pool->tx_sw_csum)) {
-+			int err;
-+
-+			err = skb_checksum_help(skb);
-+			if (err)
-+				return err;
-+		}
-+	}
-+
-+	if (meta->flags & XDP_TXMD_FLAGS_LAUNCH_TIME)
-+		skb->skb_mstamp_ns = meta->request.launch_time;
-+	xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta);
-+
-+	return 0;
-+}
-+
- static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 				     struct xdp_desc *desc)
- {
--	struct xsk_tx_metadata *meta = NULL;
- 	struct net_device *dev = xs->dev;
- 	struct sk_buff *skb = xs->skb;
- 	int err;
-@@ -764,6 +802,13 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 			skb->priority = READ_ONCE(xs->sk.sk_priority);
- 			skb->mark = READ_ONCE(xs->sk.sk_mark);
- 			skb->destructor = xsk_destruct_skb;
-+
-+			if (desc->options & XDP_TX_METADATA) {
-+				err = xsk_skb_metadata(skb, buffer, desc,
-+						       xs->pool, hr);
-+				if (unlikely(err))
-+					goto free_err;
-+			}
- 		} else {
- 			int nr_frags = skb_shinfo(skb)->nr_frags;
- 			struct xsk_addr_node *xsk_addr;
-@@ -798,42 +843,6 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 			xsk_addr->addr = desc->addr;
- 			list_add_tail(&xsk_addr->addr_node, &XSKCB(skb)->addrs_list);
- 		}
--
--		if (!xsk_get_num_desc(skb) && desc->options & XDP_TX_METADATA) {
--			if (unlikely(xs->pool->tx_metadata_len == 0)) {
--				err = -EINVAL;
--				goto free_err;
--			}
--
--			meta = buffer - xs->pool->tx_metadata_len;
--			if (unlikely(!xsk_buff_valid_tx_metadata(meta))) {
--				err = -EINVAL;
--				goto free_err;
--			}
--
--			if (meta->flags & XDP_TXMD_FLAGS_CHECKSUM) {
--				if (unlikely(meta->request.csum_start +
--					     meta->request.csum_offset +
--					     sizeof(__sum16) > len)) {
--					err = -EINVAL;
--					goto free_err;
--				}
--
--				skb->csum_start = hr + meta->request.csum_start;
--				skb->csum_offset = meta->request.csum_offset;
--				skb->ip_summed = CHECKSUM_PARTIAL;
--
--				if (unlikely(xs->pool->tx_sw_csum)) {
--					err = skb_checksum_help(skb);
--					if (err)
--						goto free_err;
--				}
--			}
--
--			if (meta->flags & XDP_TXMD_FLAGS_LAUNCH_TIME)
--				skb->skb_mstamp_ns = meta->request.launch_time;
--			xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta);
--		}
- 	}
- 
- 	xsk_inc_num_desc(skb);
--- 
-2.43.0
+Agree?
+
+CJ
+
+
 
 
