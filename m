@@ -1,280 +1,109 @@
-Return-Path: <netdev+bounces-225430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 370F4B93995
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 01:35:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42EE2B939A7
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 01:36:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 869CB19C17EA
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 23:35:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A4BF18857DC
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 23:36:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0275931AF1A;
-	Mon, 22 Sep 2025 23:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CADB277C8F;
+	Mon, 22 Sep 2025 23:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f8k/Ld7D"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DohfEkMG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C80631770B
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 23:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE2AD25A642
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 23:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758584047; cv=none; b=n2BMhscaACyrQkky8Oaxlg0xGW3t++qt4mBzF77cJc2SZWUAAY5a131J4Fd139OLWWmn83ojiNbhBHqfEgFbu9jFlmF33JF8pGVC9+UY3GJ6G0+gkRno9YbG+tXiKOQvDGJC4aL+d8Vv3IIlLHs9wz2Qqdvps8KVG5TEMHORuCk=
+	t=1758584181; cv=none; b=kUJjCz7+uHyQVuHy9RQNi/yMskMk41NWjP13stTmNbWc2swv9mOMeVXQGaiv29Ea81yGVaV4YZznmIJuHo/Web/+mu5py/T9d4ZUHo7+NbLBkYm582ujfod8bXi0KuiSPRJznLOKR9TGvYq1OpOAxa1reA+8j/1Ldi3BrTLbqFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758584047; c=relaxed/simple;
-	bh=nDmjbXMAaaARovoem/jblg2PIL/t10TLTSxc9dzhj3Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R3P+OfTrnz8zejbVATz3wLDmBsM08w9LaoEM+K20KsD0T3NjapSwj4s4LpXiHqaZ3/oo0hbCM99Q56hxHBUzXE5f4+lHTNbozvFHxvToUpBpw4MuAYUPEYcGV+FlKn8GHhcMQhte83zCcDqwB38gJNDMHfLHZdXgiQs8Qlfcl9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f8k/Ld7D; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-244580523a0so59113005ad.1
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 16:34:06 -0700 (PDT)
+	s=arc-20240116; t=1758584181; c=relaxed/simple;
+	bh=eQmNjNFXvG01rea8MnysvA0/424nxxb3t7fR9Ohh28I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oPQuwgqp8nS8cB3wfsbho+Vw8Q/iHL1ZYoNe+nu7bWYBB4yi1ULlqGrJqT49Pi5gxPqdgQqaqBD1msxFYorq0aE53kqKFHXFJ+TiCkpIcZltrbHPeZWDpX9VHxH8A0qoBrjxcJZwbwBtieBhJAIlFgHuH/+nhKIrdyd4W6yZ1Yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DohfEkMG; arc=none smtp.client-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b555ab7fabaso763168a12.0
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 16:36:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758584045; x=1759188845; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1758584179; x=1759188979; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OETsLPmcZGNpLSshaaiLeOj8LUgrE6er4wP4vFEBZK0=;
-        b=f8k/Ld7De/BCCr4UMqMQvheIWP3VgLCRxZAIe2gEOyA80yt1qMqdyp/BzwsfaJ/nka
-         JMgRU9Ett4guyTrxEAlx/zmSntZOt2mI24LwQQHyUV4cTZaZluqksPk6SPBdVBSGcpMX
-         B1Gh10GXmwx0aU27qkn4KNd7cJ9WIpS7MyQVOnFi+EF68TKnaD/SWNGmA9KM9eKOLkmU
-         nvMwnbfAtuvL/ujifkwxlaQEkuRExSEDPXzd2PwxmltOFfxxg76WnT03F/RFs3kdvWT2
-         FVy6HgQb5St1sfMreRrAVUiWPzV8RSE/vxjPzRyMuUfmdW1CXWz4Qua/fE13kJJLxgjO
-         4p8g==
+        bh=eQmNjNFXvG01rea8MnysvA0/424nxxb3t7fR9Ohh28I=;
+        b=DohfEkMGuMuZyB3oR2roYR41VojpLLDLqiRkVlxhDJRwO6fwvu4IbzfPs3dwl5GLSZ
+         /h8DAH9+j3PFJuLOUnjQ3QjYjWoXK1ugoBDsB6eS7EIcCsqzxBMSy4lvk3U1mp/3XXXS
+         skKJZe+LykjxjFw7+pt0YKQ9LXA20h17m+ybW8yi1XnPw+cStT1O5VdeXA2xMRwn8I38
+         O6TSp5s6QFpuU1d0OjOAaAGRnhcHzCpSRtBZ23qTT8M3Kfz7d1cbmNjFEUpQM4xceGSc
+         D7B/hVv6uHRif9hlgWzudP1X18c83PUmplUWAokQHmDhx/ceICcknnWAQw5Krk3VfX63
+         V+1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758584045; x=1759188845;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1758584179; x=1759188979;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OETsLPmcZGNpLSshaaiLeOj8LUgrE6er4wP4vFEBZK0=;
-        b=b/MINCUJCQC7b/M1tfJBO993aE2wucf9DF7HDf7IKkCBNQxC/9dxgZ6b2dha8VyPFa
-         Dyff8zlirTTd+GSQ1D/GJ76lZRscb3ptWIwU4uuuQP4sbwtj+sJOt50j+prB4Pz5fdhu
-         emN19NjHuTyjQSVaAMV+sKjErjWTMhCsjMCQQeWN6vSzETsHoPnzP2zSpPCwiElZnEAS
-         OkJBWaHp4aI7WTWHbAc+zGkf2g9/wnTofT/ldoMR/zVUxf/pe4/hqWQ40IR+FSpaouYX
-         ckzQCs5BO1jNtnkE/7G9VhzzFj2TGmLBJyTJdVPpzg5Q93hwQmxXA5qV00x2+SgfcIQz
-         eXrA==
-X-Gm-Message-State: AOJu0Ywa+S+8xAdcTH5rp+DF6NQLovqviXwHnTWAghPkuGJuDUC/dlCR
-	WYW0LkJs9/GC9DyLq0AI7xeZEpm420VxVia11cluBz4FQxLCfs3xKZmo
-X-Gm-Gg: ASbGnct/Ak6WAgjVG8Cg9B6LvpPNkgs4r1h7mNxwj9P39xOfCJWzB+f5+622Iq6rmJD
-	6/N7c6XN7+hpgosYUwaw2artu7dinQr0RHl3utZv9DZbxhpXsGcsR8Cx3UfcvNaS54s76hiJ0WD
-	9x3AZfR28doOyUo5BTAx2dY9MDUPe5XBBOh3u07t+gnh1+yJiD8sKq/U+z/zAVzSlXkw6MEetTr
-	HGWuFSKdaL7hCEUzeM4jv3eMfPKkvxfvmVtuUbMsv2qxvbBCIOMIUg/dMYGkWAT6bnMfLW2cVnr
-	uySinqgniBLVhx6b91TdkOFa5MVHzZQE6z4Mf3sXRrbKNrGLkbogWjg91VJHP7KJF0qVUZh8JLx
-	Z58qTWo/kYO8O0iQCPiVM3pA=
-X-Google-Smtp-Source: AGHT+IHEp9s7BtYi5HjuFwhfu5erFkhZhA5XnxXXJBqXXpGibVuYXFgudGaUdlTZUVaWuYgD27m3ag==
-X-Received: by 2002:a17:903:1212:b0:262:2ae8:2517 with SMTP id d9443c01a7336-27cc0fa8ebbmr7003675ad.5.1758584045546;
-        Mon, 22 Sep 2025 16:34:05 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:1::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77ef3aab68esm9852972b3a.85.2025.09.22.16.34.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Sep 2025 16:34:05 -0700 (PDT)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	paul.chaignon@gmail.com,
-	kuba@kernel.org,
-	stfomichev@gmail.com,
-	martin.lau@kernel.org,
-	mohsin.bashr@gmail.com,
-	noren@nvidia.com,
-	dtatulea@nvidia.com,
-	saeedm@nvidia.com,
-	tariqt@nvidia.com,
-	mbloch@nvidia.com,
-	maciej.fijalkowski@intel.com,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next v7 8/8] selftests: drv-net: Pull data before parsing headers
-Date: Mon, 22 Sep 2025 16:33:56 -0700
-Message-ID: <20250922233356.3356453-9-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250922233356.3356453-1-ameryhung@gmail.com>
-References: <20250922233356.3356453-1-ameryhung@gmail.com>
+        bh=eQmNjNFXvG01rea8MnysvA0/424nxxb3t7fR9Ohh28I=;
+        b=uN4dbpUbgJ5I8CHc6fRmVJJxH9g1LCsYiBJwmNSGvlqbjlNB0odrPICYIB/a3kNDxH
+         +DL5yntRwk+TR9K649jY7U4uF2xN7678cLC89+MMR8qNjFjk/RZHR46vKJMtQC4S1fbi
+         XIFETcytI5ucrys1QDFSjoh7Gm66d2ZFxDW6Dc/w0kYf9GQcR73SySgJ5zulDm0a6PDE
+         4VT7Vp8Mq2FhCXpDLtIah3Gqsq3DnLAKQPaINtfXSZh++HIJpCwmKYV0ykhjssN/T0qb
+         dBhaassTHE1ZusmIepMIrZIhWG1EWh57yOS/zFIfxr8te8PM7fNrT1A67LInTSrZOfaM
+         I5Fg==
+X-Forwarded-Encrypted: i=1; AJvYcCXGqkRz6xEMYrHgRUGij+8ay9/H2jMXxZGrpJEHDkjYvpKP4Pm7SeVOBAU1P6rJMl8hgaDcpxw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyD+tKCgy3qpuVuXVRB75o6lIk1QiktOOWP+w+9WNT21C5RMOG6
+	jKpsOFcpDx4sqGJQ/9bma7uBq4O8Ely2/oROCr5V/4DktMWeLNoiGOK4tfAAwhPeCV2ExXZ46wY
+	vU1U6Fo0xvW1m2O2Mm5IBE5sWlQIxjHsg4EQzTiAahVzc2/Vb1N/X7SaDM64=
+X-Gm-Gg: ASbGncuVehIn8s50sYY1GjaZqly7WHjzyRegNYbz03skzJTw56fbfym3i+x7JUnj2pe
+	BOajyFmixIPe71GehF8FL8QHs4eELnCrxxcr2VNqPBIU5f785+asVv0ZXzbby1HcF3vep9oXPvy
+	2oeO1LzKUizLBzYV0NZrE6b+YrwrYRSZw1kOzgTFPqlZgxo9lJJ8bXDXwnPV358lcyPRd22RUwU
+	isbQ8cNyhFXEn+7mRb5w/0+U3ER0qUXReTClA==
+X-Google-Smtp-Source: AGHT+IFPW7lOMgzyQPp046NtljFqsNUoWqpI9Zpa5IRxMXYc7kiK/riWlNY9mVr/JdK1vWc63b8oUvHUDRve65XJmEM=
+X-Received: by 2002:a17:90b:48d1:b0:32e:c649:e583 with SMTP id
+ 98e67ed59e1d1-332a95e9184mr641035a91.22.1758584178659; Mon, 22 Sep 2025
+ 16:36:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250919204856.2977245-1-edumazet@google.com> <20250919204856.2977245-3-edumazet@google.com>
+In-Reply-To: <20250919204856.2977245-3-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 22 Sep 2025 16:36:07 -0700
+X-Gm-Features: AS18NWAukwzMXWayBAjfxEgcQEiipowjOGE_eCbdIkdRbJiJ_3TVx3jnJb8O8OU
+Message-ID: <CAAVpQUBvKFLNc9DHMikByVzFVc9bp_AHw5rpEnZre5-69sL_4w@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 2/8] net: move sk->sk_err_soft and sk->sk_sndbuf
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-It is possible for drivers to generate xdp packets with data residing
-entirely in fragments. To keep parsing headers using direcy packet
-access, call bpf_xdp_pull_data() to pull headers into the linear data
-area.
+On Fri, Sep 19, 2025 at 1:49=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> sk->sk_sndbuf is read-mostly in tx path, so move it from
+> sock_write_tx group to more appropriate sock_read_tx.
+>
+> sk->sk_err_soft was not identified previously, but
+> is used from tcp_ack().
+>
+> Move it to sock_write_tx group for better cache locality.
+>
+> Also change tcp_ack() to clear sk->sk_err_soft only if needed.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
----
- .../selftests/net/lib/xdp_native.bpf.c        | 89 +++++++++++++++----
- 1 file changed, 74 insertions(+), 15 deletions(-)
-
-diff --git a/tools/testing/selftests/net/lib/xdp_native.bpf.c b/tools/testing/selftests/net/lib/xdp_native.bpf.c
-index 521ba38f2ddd..df4eea5c192b 100644
---- a/tools/testing/selftests/net/lib/xdp_native.bpf.c
-+++ b/tools/testing/selftests/net/lib/xdp_native.bpf.c
-@@ -14,6 +14,8 @@
- #define MAX_PAYLOAD_LEN 5000
- #define MAX_HDR_LEN 64
- 
-+extern int bpf_xdp_pull_data(struct xdp_md *xdp, __u32 len) __ksym __weak;
-+
- enum {
- 	XDP_MODE = 0,
- 	XDP_PORT = 1,
-@@ -68,30 +70,57 @@ static void record_stats(struct xdp_md *ctx, __u32 stat_type)
- 
- static struct udphdr *filter_udphdr(struct xdp_md *ctx, __u16 port)
- {
--	void *data_end = (void *)(long)ctx->data_end;
--	void *data = (void *)(long)ctx->data;
- 	struct udphdr *udph = NULL;
--	struct ethhdr *eth = data;
-+	void *data, *data_end;
-+	struct ethhdr *eth;
-+	int err;
-+
-+	err = bpf_xdp_pull_data(ctx, sizeof(*eth));
-+	if (err)
-+		return NULL;
-+
-+	data_end = (void *)(long)ctx->data_end;
-+	data = eth = (void *)(long)ctx->data;
- 
- 	if (data + sizeof(*eth) > data_end)
- 		return NULL;
- 
- 	if (eth->h_proto == bpf_htons(ETH_P_IP)) {
--		struct iphdr *iph = data + sizeof(*eth);
-+		struct iphdr *iph;
-+
-+		err = bpf_xdp_pull_data(ctx, sizeof(*eth) + sizeof(*iph) +
-+					     sizeof(*udph));
-+		if (err)
-+			return NULL;
-+
-+		data_end = (void *)(long)ctx->data_end;
-+		data = (void *)(long)ctx->data;
-+
-+		iph = data + sizeof(*eth);
- 
- 		if (iph + 1 > (struct iphdr *)data_end ||
- 		    iph->protocol != IPPROTO_UDP)
- 			return NULL;
- 
--		udph = (void *)eth + sizeof(*iph) + sizeof(*eth);
--	} else if (eth->h_proto  == bpf_htons(ETH_P_IPV6)) {
--		struct ipv6hdr *ipv6h = data + sizeof(*eth);
-+		udph = data + sizeof(*iph) + sizeof(*eth);
-+	} else if (eth->h_proto == bpf_htons(ETH_P_IPV6)) {
-+		struct ipv6hdr *ipv6h;
-+
-+		err = bpf_xdp_pull_data(ctx, sizeof(*eth) + sizeof(*ipv6h) +
-+					     sizeof(*udph));
-+		if (err)
-+			return NULL;
-+
-+		data_end = (void *)(long)ctx->data_end;
-+		data = (void *)(long)ctx->data;
-+
-+		ipv6h = data + sizeof(*eth);
- 
- 		if (ipv6h + 1 > (struct ipv6hdr *)data_end ||
- 		    ipv6h->nexthdr != IPPROTO_UDP)
- 			return NULL;
- 
--		udph = (void *)eth + sizeof(*ipv6h) + sizeof(*eth);
-+		udph = data + sizeof(*ipv6h) + sizeof(*eth);
- 	} else {
- 		return NULL;
- 	}
-@@ -145,17 +174,34 @@ static void swap_machdr(void *data)
- 
- static int xdp_mode_tx_handler(struct xdp_md *ctx, __u16 port)
- {
--	void *data_end = (void *)(long)ctx->data_end;
--	void *data = (void *)(long)ctx->data;
- 	struct udphdr *udph = NULL;
--	struct ethhdr *eth = data;
-+	void *data, *data_end;
-+	struct ethhdr *eth;
-+	int err;
-+
-+	err = bpf_xdp_pull_data(ctx, sizeof(*eth));
-+	if (err)
-+		return XDP_PASS;
-+
-+	data_end = (void *)(long)ctx->data_end;
-+	data = eth = (void *)(long)ctx->data;
- 
- 	if (data + sizeof(*eth) > data_end)
- 		return XDP_PASS;
- 
- 	if (eth->h_proto == bpf_htons(ETH_P_IP)) {
--		struct iphdr *iph = data + sizeof(*eth);
--		__be32 tmp_ip = iph->saddr;
-+		struct iphdr *iph;
-+		__be32 tmp_ip;
-+
-+		err = bpf_xdp_pull_data(ctx, sizeof(*eth) + sizeof(*iph) +
-+					     sizeof(*udph));
-+		if (err)
-+			return XDP_PASS;
-+
-+		data_end = (void *)(long)ctx->data_end;
-+		data = (void *)(long)ctx->data;
-+
-+		iph = data + sizeof(*eth);
- 
- 		if (iph + 1 > (struct iphdr *)data_end ||
- 		    iph->protocol != IPPROTO_UDP)
-@@ -169,8 +215,10 @@ static int xdp_mode_tx_handler(struct xdp_md *ctx, __u16 port)
- 			return XDP_PASS;
- 
- 		record_stats(ctx, STATS_RX);
-+		eth = data;
- 		swap_machdr((void *)eth);
- 
-+		tmp_ip = iph->saddr;
- 		iph->saddr = iph->daddr;
- 		iph->daddr = tmp_ip;
- 
-@@ -178,9 +226,19 @@ static int xdp_mode_tx_handler(struct xdp_md *ctx, __u16 port)
- 
- 		return XDP_TX;
- 
--	} else if (eth->h_proto  == bpf_htons(ETH_P_IPV6)) {
--		struct ipv6hdr *ipv6h = data + sizeof(*eth);
-+	} else if (eth->h_proto == bpf_htons(ETH_P_IPV6)) {
- 		struct in6_addr tmp_ipv6;
-+		struct ipv6hdr *ipv6h;
-+
-+		err = bpf_xdp_pull_data(ctx, sizeof(*eth) + sizeof(*ipv6h) +
-+					     sizeof(*udph));
-+		if (err)
-+			return XDP_PASS;
-+
-+		data_end = (void *)(long)ctx->data_end;
-+		data = (void *)(long)ctx->data;
-+
-+		ipv6h = data + sizeof(*eth);
- 
- 		if (ipv6h + 1 > (struct ipv6hdr *)data_end ||
- 		    ipv6h->nexthdr != IPPROTO_UDP)
-@@ -194,6 +252,7 @@ static int xdp_mode_tx_handler(struct xdp_md *ctx, __u16 port)
- 			return XDP_PASS;
- 
- 		record_stats(ctx, STATS_RX);
-+		eth = data;
- 		swap_machdr((void *)eth);
- 
- 		__builtin_memcpy(&tmp_ipv6, &ipv6h->saddr, sizeof(tmp_ipv6));
--- 
-2.47.3
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
