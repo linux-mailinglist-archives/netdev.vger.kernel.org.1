@@ -1,133 +1,153 @@
-Return-Path: <netdev+bounces-225189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC162B8FDF5
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 11:57:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8FF7B8FE57
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 12:03:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B20F3B10AA
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 09:57:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECBA718A1164
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 10:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D97372FCBFD;
-	Mon, 22 Sep 2025 09:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00587275B03;
+	Mon, 22 Sep 2025 10:03:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cSjQRYgR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FEnRLZPO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66EE92F5306
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 09:57:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836E623D7E0
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 10:03:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758535041; cv=none; b=Qd5VYO7dJ4l4zGSEm1fjQVIAcOshLiSzaTrxFR7JM3Ggi514B81zEaCxoMpgb+2+0CWwi57MwRP3ZBn2NOsHUsfzYMtQ3cPNgc/aQgQ49uCDlxdNPEQgOXVLpLORbjzlmaGMNyrMLChcQvgShMNzEsSs2zPcwOdtbZLI6wmdSLI=
+	t=1758535389; cv=none; b=Zb+WzULpKNALRoh6uV7mq7woHRfTcY4dC1enUCdMFBDf+H59HZhAQyFit503xJD4GtSIERsBtmBocazjU+uNvt4eD7stxWDvDpLktZfiUDmqzeJHxjCfEqN/m+T6o9VUaALl/xr8C9+usFB4l3uTTdkbXJRLi9uoexYbYWLO2FU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758535041; c=relaxed/simple;
-	bh=S+Q0UlqD/yOrRSJIGfb5u6uGZIqc3pdLh2BJ3iR7hxU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AgQmntNeAXU7Z8pIuVPG8D67qf1eXHb2ldVKQtK1DhxcjjZQEEkIWVuoj/LMWQwedPMM4bPEEcHxtld0OjB2BVrgQ9uiZ3jDU8Wogm6yRhHq6qbwjQFTkEbf2HSlB7xfeRA19KJiNjAB+nxUaagRFiQKagDqv4TaLvPNZ8GJu6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cSjQRYgR; arc=none smtp.client-ip=209.85.210.180
+	s=arc-20240116; t=1758535389; c=relaxed/simple;
+	bh=1Z/FIrvKbz7+7KzkAOkAw8QtjVUi2Kn58A3/jKJj3TA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kJi8qRrT60cdBcS2Hy4MWrwQzxCTkHL/LGlJkxVZsPAR5t3anG2xCtfBglHaBM1yULMUb9DKOsP5R/OQEJzk08Wb718l/m/kDTNkKFSKPg+IObd9dwTQ5X/yQbJR4RvPijX7bAVx/dktMtvd3z7kKz5O0s6oFUqkr6Y7/XFTEHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FEnRLZPO; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-77f32d99a97so725741b3a.1
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 02:57:20 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-268107d8662so44956595ad.2
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 03:03:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758535040; x=1759139840; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aYcexrjT9oMNQ2zTTba9iviJV+dM9Fm3AQ2HPGb9wg4=;
-        b=cSjQRYgRizXbzLyuXqAl3VBXHACBcG86ASnw0cvEtbNOa4x0hurPkWHo1XHx8DN+x4
-         reeCf534XNSEzAbstpOjqkCsYQOpWMvc7TOE46N5FTlr4mMNci4c6Hi7QrVS/ClHo9lt
-         gE9l0/ERvIo1839scbOhfBWfug9T/5eOriY/pOMl/Y7jw+hMRCPEaEpnIDoBn1gS/CLJ
-         T6+6zbNlZO8gDFepTPQmdDeMbwt8F66lSlSYI3Pmt0aujNiZoURYPY477jBEZVFbk2QW
-         QHj2mGd07YboFRWA5HtWxh7ahb7dLfHKmoJEXwL05gXmGv+9qPDDbzkaqH6ZbBf8ocpL
-         lX8Q==
+        d=gmail.com; s=20230601; t=1758535388; x=1759140188; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gLN+Eh1NQwEjC26VvFwkCS0AGaveETF0mZj2seOGw3U=;
+        b=FEnRLZPO3ZttIlJA5PIRijJIUesqOeqtyAcSbd/uRMbgs5VecyOJnreLC/ioKfQyg8
+         okfMpOrm7QUmdNHvDpv8G6V9j+k1Tj19NtWBcgEDspapWxUahUthiRpCWukGgNkwo/lU
+         jWaKGB74meRoEI7bnHpWpJ3x4ozlONWYbC8vmSQY4bIUlV7MYS48+CghpzLjSaZBIDAS
+         xLERbMghCnG2w9QVn2ZelArOV/upBLhBed8XakyMfa05GN4OQMOwCDEJphYqKtMNt2+x
+         kVOd8K0w10x/HYTAoyrJ6yajCI0M4XCzSQdh39TIFMoPgl0f1rR2qfIyYJNR+tRAcCo2
+         gBdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758535040; x=1759139840;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aYcexrjT9oMNQ2zTTba9iviJV+dM9Fm3AQ2HPGb9wg4=;
-        b=gM8nbfkrb/GOBtVIAMMhZdcWv5sOsgPXI1U+y54HTvgbpXZ7I8pi/2YKjgUFMx4KcA
-         qK4aGN74e2dblVGGaOEo4rwE1mCgTecRG256fZ4yH5cmFrpLuiXtOXb3QB0lCBoqcKou
-         PrPDHuWL2PzYtwVTEremIrb1iP+URuCnJTbbdltFfo3VxpP63ldFSdbYyRYqmqMnSC+l
-         W+uAOO+FqG91AZi8+xfcfX3dVcqCNR/3IAQA6ralqObTyAkkTvSOT6NLtSYslakV4ewf
-         lYhlYQXCH7aDYOhGsLVXd2ojzBV704OQhmj264Jz5+MgcA2pCRWGZJMkZhzG4AFNmIQp
-         j5mg==
-X-Forwarded-Encrypted: i=1; AJvYcCUTQ2RXVBc8jIN0MpNxhi+fw5xm925lH+Cm8GiqEQaSJ+6o7NifAQW8Orf5LmeTp+hBDoPbLAU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJQQrE2eeb9uIB+CtPDdGD1rxWMDdBatA3o2d+v1O7qdyGyALm
-	AKLn8+f+AEnx+AtNvTfWKcLv6HjvJqbNZ7Kx0CpIjaef56iCYwHlI3L1
-X-Gm-Gg: ASbGncvKdo9z4qxzpfByr6eT9hz4zc/fuehoxqbzF/oF7mqyn7hIX4GmOlnLQ/puaVH
-	7+nHgjmUOajwFk/QOgemLx4bvwq3IRbcgxEubrh0/VrFNErKVQCMhaU0gs2uCTpGybokR5Cq70F
-	mz53emIfKSPtUS1Nxu60Z6a/b1L6v33EGe9dXhF82vbZrq1CEESWJL9QeRmqzjAyyurAjQ3cvyZ
-	o7pYvwvBhyN3b8FQBR6Dy93no7jWqxFC0wfqTXMiZPswY/AyZ4BR6hNn4kiiFfAm7j+bqb2OsLI
-	6WL85mrMCJ1+6d1i+5W7jT+6PL/4j6sL28boyFtYPWJtD6rNKe+GL7tZ39vMF0rlDGEPurUKw/t
-	4MxQj+3vDVSM8gHGhvmNwrA==
-X-Google-Smtp-Source: AGHT+IGt6VdD/zJs3dt3onXnNRO7yJcnwYHosBGX9WJgGC7ll5N69AWCopn4UpTK3hDtx6RI9iclCw==
-X-Received: by 2002:a05:6a00:1797:b0:77f:4a83:8fe with SMTP id d2e1a72fcca58-77f4a8310dfmr249943b3a.13.1758535039573;
-        Mon, 22 Sep 2025 02:57:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758535388; x=1759140188;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gLN+Eh1NQwEjC26VvFwkCS0AGaveETF0mZj2seOGw3U=;
+        b=iinzuB98RF2kn0WkiMFHgFrsqkanE3sj+Ds6RsRXIqCIrNCs+IWcqEaxcSeElw1x2T
+         vlJnU1NStkWiIJsdFPAwlKQ581PlXTRQEa+X0NYtUiAd/ZmRRuHJEXs2YsukKl45VIX/
+         LOlmt3EydUp35i8de2/B8P1SkKEXBZH2vWscgrP/RtnrD8/1GFZZxMboMKZZIbE3FMFi
+         x8oUBPsPI7OAhgIgj44ZsjGKBrBS3XhsG4HLtM2MPZ5fHTJ40TZal/Cj8AYN7905NmaL
+         Rp3lH7R7RQYcUnUkmIvguTuX0m77tCXkAYkVMcrI7SJfIZkS2yNL/riXKR2X3dNzeq3k
+         5u+A==
+X-Forwarded-Encrypted: i=1; AJvYcCUHU7zK/PfrsOxcwo6Og60HURnP5rbWhhuESD4AJPGKt7CXsAqKoWhaH+1e8TCrWfHzmOPbjr8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCcrE/Xyb6KLUNXOhnmKH9xDuf5eK6oxxGvcUvAn1rR5T0FkHa
+	urXzh8Rw+d4xqc3DtFzeSBl3Vc7oic2s0+e+clJ2QezsfV2aj8CIePEZ
+X-Gm-Gg: ASbGnctOOq6ZmwaivW5/B59I3K4rFwflve83weoVBcVFGziKupO0HlowWfk+xkCblYk
+	WMJ1FW4ka2BkI/hI5Ko/C6qaiSEIFrjbmqeybpoSSYz27/zUTU11nrLYDTf+5xKeTDrkf2139/s
+	FGyxp0WhyMfg435aWP8FZy0yIjJ/JeQaZyFVa0xir/OmWhz8Xxe7UjqRat5h2W4adl8TgnxQdlN
+	3OXJZ5JABdhpXSCMfAt+qZwm3ZNOO4j1hlD8HBPhWSrRjkkdrgStelIh2irzOjlJIOoXvJ8fhZz
+	cL0TlK6R2S2ORtB9CKl9Gj8wdlAa5ZntVGa8vajQF77PgkhQby2Ncwnm0AVgqhNPRcng+0mby5a
+	cfOsRXRcTMhdoW2A2FmloCQ==
+X-Google-Smtp-Source: AGHT+IGtm0n1I4e8NG5ZtmJGclD2BCxq19uF73e1qqljRkz9OTvu4KTJehS7N7z6k+2ok3CFb7xF+w==
+X-Received: by 2002:a17:903:3d0b:b0:270:ea84:324a with SMTP id d9443c01a7336-270ea843533mr122257575ad.38.1758535387676;
+        Mon, 22 Sep 2025 03:03:07 -0700 (PDT)
 Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77f097b60e7sm7961552b3a.1.2025.09.22.02.57.18
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2699ae52db1sm116728775ad.43.2025.09.22.03.03.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Sep 2025 02:57:18 -0700 (PDT)
+        Mon, 22 Sep 2025 03:03:07 -0700 (PDT)
 Received: by archie.me (Postfix, from userid 1000)
-	id ECA2841A2EE0; Mon, 22 Sep 2025 16:57:15 +0700 (WIB)
+	id 599B14220596; Mon, 22 Sep 2025 17:03:02 +0700 (WIB)
 From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.og>,
 	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux AFS <linux-afs@lists.infradead.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	Jonathan Corbet <corbet@lwn.net>,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	Kees Cook <kees@kernel.org>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
 	Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH net-next 3/3] net: dns_resolver: Fix request-key cross-reference
-Date: Mon, 22 Sep 2025 16:56:48 +0700
-Message-ID: <20250922095647.38390-5-bagasdotme@gmail.com>
+Subject: [PATCH net-next] Documentation: rxrpc: Demote three sections
+Date: Mon, 22 Sep 2025 17:02:53 +0700
+Message-ID: <20250922100253.39130-1-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250922095647.38390-2-bagasdotme@gmail.com>
-References: <20250922095647.38390-2-bagasdotme@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1097; i=bagasdotme@gmail.com; h=from:subject; bh=S+Q0UlqD/yOrRSJIGfb5u6uGZIqc3pdLh2BJ3iR7hxU=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDBkXZbZeXsnslR+33fJX9cebXYVqiotOqD5alrU3TOfN0 UnPtT9odpSyMIhxMciKKbJMSuRrOr3LSORC+1pHmDmsTCBDGLg4BWAi61wYGW4k89W1Sx6rb1qb /1bN/VPei3PPZX+5hqzOvm7cUh2oeZeRYUXD4/onB5trd/ZE8+idU3+bffDL3xnKTHtNLi5nDVp bygsA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1523; i=bagasdotme@gmail.com; h=from:subject; bh=1Z/FIrvKbz7+7KzkAOkAw8QtjVUi2Kn58A3/jKJj3TA=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDBkX5XSSnAoPBt0yTZtl8i6/RWrZ///5h41qeM04jjjUG al+/yDRUcrCIMbFICumyDIpka/p9C4jkQvtax1h5rAygQxh4OIUgImYMDL8FWDcVHxIw2Ltxley dzby/pHQUZ/xLHbZnOBlRgYKu/TmpjEyLPK+qX45y6dB2Xn9waX3/5i4Wt49pT9fXjR72f6Oc5Y PWAE=
 X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
 
-Link to "Key Request Service" docs uses file:// scheme instead due to
-angled brackets markup. Fix it to proper cross-reference.
+Three sections ("Socket Options", "Security", and "Example Client Usage")
+use title headings, which increase number of entries in the networking
+docs toctree by three, and also make the rest of sections headed under
+"Example Client Usage".
 
-Fixes: 3db38ed76890 ("doc: ReSTify keys-request-key.txt")
+Demote these sections back to section headings.
+
 Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- Documentation/networking/dns_resolver.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ Documentation/networking/rxrpc.rst | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/networking/dns_resolver.rst b/Documentation/networking/dns_resolver.rst
-index 329fb21d005ccd..18c2af83d5129c 100644
---- a/Documentation/networking/dns_resolver.rst
-+++ b/Documentation/networking/dns_resolver.rst
-@@ -141,8 +141,8 @@ the key will be discarded and recreated when the data it holds has expired.
- dns_query() returns a copy of the value attached to the key, or an error if
- that is indicated instead.
- 
--See <file:Documentation/security/keys/request-key.rst> for further
--information about request-key function.
-+See Documentation/security/keys/request-key.rst for further information about
-+request-key function.
+diff --git a/Documentation/networking/rxrpc.rst b/Documentation/networking/rxrpc.rst
+index d63e3e27dd06be..8926dab8e2e60d 100644
+--- a/Documentation/networking/rxrpc.rst
++++ b/Documentation/networking/rxrpc.rst
+@@ -437,8 +437,7 @@ message type supported.  At run time this can be queried by means of the
+ RXRPC_SUPPORTED_CMSG socket option (see below).
  
  
- Debugging
+-==============
+-SOCKET OPTIONS
++Socket Options
+ ==============
+ 
+ AF_RXRPC sockets support a few socket options at the SOL_RXRPC level:
+@@ -495,8 +494,7 @@ AF_RXRPC sockets support a few socket options at the SOL_RXRPC level:
+      the highest control message type supported.
+ 
+ 
+-========
+-SECURITY
++Security
+ ========
+ 
+ Currently, only the kerberos 4 equivalent protocol has been implemented
+@@ -540,8 +538,7 @@ be found at:
+ 	http://people.redhat.com/~dhowells/rxrpc/listen.c
+ 
+ 
+-====================
+-EXAMPLE CLIENT USAGE
++Example Client Usage
+ ====================
+ 
+ A client would issue an operation by:
 -- 
 An old man doll... just what I always wanted! - Clara
 
