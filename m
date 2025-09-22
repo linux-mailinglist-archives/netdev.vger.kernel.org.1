@@ -1,40 +1,63 @@
-Return-Path: <netdev+bounces-225236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C85B5B9049B
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 12:56:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E5DB6B904AA
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 13:00:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80B513A6B26
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 10:56:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A06D63AA6FD
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 11:00:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A1C02FE58F;
-	Mon, 22 Sep 2025 10:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453E72FC03D;
+	Mon, 22 Sep 2025 11:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="F46rgG33"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay-b02.edpnet.be (relay-b02.edpnet.be [212.71.1.222])
+Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A793E42AA9
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 10:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.71.1.222
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC7E2FC008;
+	Mon, 22 Sep 2025 11:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758538568; cv=none; b=ASYfytxoJ74eGw3yjWijhuYefc7/CAaZfW3CShY1QhaEibvvwz24yb726+EydNH9/OJeQCeSZ0nPpO/k9P70pOj2DckO2Y5hWQd+3yhT5Ea09Gk3i11+w+6dzdSy0kEboWkB2We0sA23BBeGBUzZj3kIzS6BeN/5HkXMuf5fnQs=
+	t=1758538805; cv=none; b=d639zfflEgvHIk6dn3SpSthOXW3z1agLvsoC1e7sPOhlsjfzkk6CGl0jEdd+9BHv1QfdR50loaa7lWbPJXqwuLGBRe8PlIighFjg0G4wTLqRbJSs4EhSkgUmQKT3U3mwTvuY+WsBK2DCvhGLyOIXtkKWj3xwyg9UXNINVZOTg5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758538568; c=relaxed/simple;
-	bh=dwdNahWurzMEEwtjWhGhKcmZUKWkGcK/KvD4niw2IQA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=GZsmyrxgKiMxQLSH0mTCjDV6v6HwEGZqYHqN1Nc7EZ3Gh2qao1aVlth3UKO97PdU3elxygb/8awPpzKziVS/kOC7TGmSgQkYF6Kn2JHehhSHw3Mpbjds7Us37oaU1nuonxX4hHqNheNcb8QST4SP5l67jehTz596ClbeSd8fnSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=kabelmail.de; spf=fail smtp.mailfrom=kabelmail.de; arc=none smtp.client-ip=212.71.1.222
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=kabelmail.de
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kabelmail.de
-Received: from [192.168.177.65] (94.105.126.5.dyn.edpnet.net [94.105.126.5]) by relay-b02.edpnet.be with ESMTP id Wgk06BKhwAZLxdeb; Mon, 22 Sep 2025 12:55:54 +0200 (CEST)
-X-Barracuda-Envelope-From: janpieter.sollie@kabelmail.de
-X-Barracuda-Effective-Source-IP: 94.105.126.5.dyn.edpnet.net[94.105.126.5]
-X-Barracuda-Apparent-Source-IP: 94.105.126.5
-Message-ID: <3fab95da-95c8-4cf5-af16-4b576095a1d9@kabelmail.de>
-Date: Mon, 22 Sep 2025 12:54:20 +0200
+	s=arc-20240116; t=1758538805; c=relaxed/simple;
+	bh=3o+03UvtuKo6XVZQs/hIKg2h5/JAcBwZytDhnqiwhVk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=dhXwJyGGlsDLVoAWn8ICAkJKQCQPF7LLhltDCKz4q8bnykI0U2qe7BFVS7Ep5r0I2Cf3GXZTsGIO93Br2SVI0dM6ZGm8yKxfGIoyuPdHgKQO5zlPHSY/xkLecNbjupG1e8RXjH3gEtV1kbkpDK+pouqXCIIIgDn7U93sj4uFHBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=F46rgG33; arc=none smtp.client-ip=198.47.19.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
+	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58MAxEfY1220947;
+	Mon, 22 Sep 2025 05:59:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1758538754;
+	bh=a07Jje9wgJS411V9TAYdRp6D/A+/X9TQdr2317tN+Jw=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=F46rgG33jswHneyWPfRr/B1Vx1kkSi1ndlwOdFNTX32Yo1+g/s5Ajpx5MLqsODlr0
+	 xODnXVWbWqk1mH6HqDUaRJIsdtR7jIhu4CjeMGjgK5kjcwRLQUhBGbZ1pyHqTY/lMa
+	 5SnfW3adXlc+VhXuLyozljYOsgJuLtdkllo6Qyls=
+Received: from DLEE100.ent.ti.com (dlee100.ent.ti.com [157.170.170.30])
+	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58MAxE2B251090
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Mon, 22 Sep 2025 05:59:14 -0500
+Received: from DLEE210.ent.ti.com (157.170.170.112) by DLEE100.ent.ti.com
+ (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Mon, 22
+ Sep 2025 05:59:13 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE210.ent.ti.com
+ (157.170.170.112) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Mon, 22 Sep 2025 05:59:13 -0500
+Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58MAx5q52656697;
+	Mon, 22 Sep 2025 05:59:06 -0500
+Message-ID: <4f6af874-ca9c-48d5-a812-9fd42226ac5c@ti.com>
+Date: Mon, 22 Sep 2025 16:29:05 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -42,140 +65,133 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] increase MDIO i2c poll timeout gradually (including patch)
-From: Janpieter Sollie <janpieter.sollie@kabelmail.de>
-X-ASG-Orig-Subj: Re: [RFC] increase MDIO i2c poll timeout gradually (including patch)
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <971aaa4c-ee1d-4ca1-ba38-d65db776d869@kabelmail.de>
- <cbc4a620-36d3-409b-a248-a2b4add0016a@lunn.ch>
- <f86737b0-a0fe-49a6-aeca-9e51fbdf0f0d@kabelmail.de>
- <aM6Ng7tnEYdWmI1F@shell.armlinux.org.uk>
- <6d444507-1c97-4904-8edb-e8cc1aa4399e@kabelmail.de>
- <aM6xwq6Ns_LGxl4o@shell.armlinux.org.uk>
- <4683e9ea-f795-4dab-8a0a-bd0b0f4fbd99@kabelmail.de>
-Content-Language: nl
-Autocrypt: addr=janpieter.sollie@kabelmail.de; keydata=
- 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
-In-Reply-To: <4683e9ea-f795-4dab-8a0a-bd0b0f4fbd99@kabelmail.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-Barracuda-Connect: 94.105.126.5.dyn.edpnet.net[94.105.126.5]
-X-Barracuda-Start-Time: 1758538554
-X-Barracuda-URL: https://212.71.1.222:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at edpnet.be
-X-Barracuda-Scan-Msg-Size: 2325
-X-Barracuda-BRTS-Status: 1
-Content-Transfer-Encoding: quoted-printable
-X-ASG-Debug-ID: 1758538554-214fdf1df67bc6a0001-BZBGGp
-X-Barracuda-Spam-Score: 0.00
-X-Barracuda-Spam-Status: No, SCORE=0.00 using global scores of TAG_LEVEL=10.0 QUARANTINE_LEVEL=10.0 KILL_LEVEL=7.0 test= 
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.125474
-	Rule breakdown below
-	  pts rule name              description
-	 ---- ---------------------- --------------------------------------------------
-	
+Subject: Re: [PATCH net-next v4 0/7] Add RPMSG Ethernet Driver
+To: Andrew Davis <afd@ti.com>, "David S. Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Jonathan Corbet
+	<corbet@lwn.net>, Nishanth Menon <nm@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Tero Kristo <kristo@kernel.org>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Mengyuan Lou
+	<mengyuanlou@net-swift.com>,
+        Lei Wei <quic_leiwei@quicinc.com>, Xin Guo
+	<guoxin09@huawei.com>,
+        Michael Ellerman <mpe@ellerman.id.au>, Fan Gong
+	<gongfan1@huawei.com>,
+        Lorenzo Bianconi <lorenzo@kernel.org>,
+        Parthiban
+ Veerasooran <Parthiban.Veerasooran@microchip.com>,
+        Lukas Bulwahn
+	<lukas.bulwahn@redhat.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <devicetree@vger.kernel.org>
+References: <20250911113612.2598643-1-danishanwar@ti.com>
+ <8a20160e-1528-4d0e-9347-0561fc3426b4@ti.com>
+ <7cd06f8f-bd74-429d-bf2c-71858178950a@ti.com>
+ <65a98655-68a1-4bf9-b139-c4172f48dad4@ti.com>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <65a98655-68a1-4bf9-b139-c4172f48dad4@ti.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Op 22/09/2025 om 10:04 schreef Janpieter Sollie:
-> Op 20/09/2025 om 15:53 schreef Russell King (Oracle):
->> So, what we need you to do is to work out how long it takes this modul=
-e
->> to respond, and whether it always takes a long time to respond. Please
->> add some debugging to i2c_rollball_mii_poll() to measure the amount of
->> time it takes for the module to respond - and please measure it for
->> several transactions.
+Hi Andrew
+
+On 17/09/25 10:07 pm, Andrew Davis wrote:
+> On 9/17/25 6:44 AM, MD Danish Anwar wrote:
+>> Hi Andrew,
 >>
->> You can use jiffies, and convert to msecs using jiffies_to_msecs(),
->> or you could use ktime_get_ns().
+>> On 11/09/25 9:34 pm, Andrew Davis wrote:
+>>> On 9/11/25 6:36 AM, MD Danish Anwar wrote:
+>>>> This patch series introduces the RPMSG Ethernet driver, which
+>>>> provides a
+>>>> virtual Ethernet interface for communication between a host
+>>>> processor and
+>>>> a remote processor using the RPMSG framework. The driver enables
+>>>> Ethernet-like packet transmission and reception over shared memory,
+>>>> facilitating inter-core communication in systems with heterogeneous
+>>>> processors.
+>>>>
+>>>
+>>> This is neat and all but I have to ask: why? What does this provide
+>>> that couldn't be done with normal RPMSG messages? Or from a userspace
+>>> TAP/TUN driver on top of RPMSG?
+>>>
 >>
->> Thanks.
+>> This is different from RPMSG because here I am not using RPMSG to do the
+>> actual TX / RX. RPMSG is only used to share information (tx / rx
+>> offsets, buffer size, etc) between driver and firmware. The TX / RX
+>> happens in the shared memory. This implementation uses a shared memory
+> 
+> This is how RPMSG is supposed to be used, it is meant for small messages
+> and signaling, bulk data should be send out-of-band. We have examples
+> specifically showing how this should be done when using RPMSG[0], and our
+> RPMSG backed frameworks do the same (like DSP audio[1] and OpenVX[2]).
+> 
+>> circular buffer with head/tail pointers for efficient data passing
+>> without copies between cores.
 >>
->
-> All right, so I changed the modification to a more debug-friendly funct=
-ion (view below).
-> I also changed the incremental wait() function from (20+10*(10-i)) to (=
-20+5*(10-i)) to be more=20
-> accurate.
->
-> [156732.241897] i2c_rollball_mii_poll:267: mdio_bus i2c:sfp2: poll cmd =
-success after 398065122=20
-> ns in iteration 3
-> [156732.581982] i2c_rollball_mii_poll:267: mdio_bus i2c:sfp2: poll cmd =
-success after 328157082=20
-> ns in iteration 4
-> [156732.921978] i2c_rollball_mii_poll:267: mdio_bus i2c:sfp2: poll cmd =
-success after 327986467=20
-> ns in iteration 4
->
-> ...
->
+>>> This also feels like some odd layering, as RPMSG sits on virtio, and
+>>> we have virtio-net, couldn't we have a firmware just expose that (or
+>>> would the firmware be vhost-net..)?
+>>>
+>>
+>> PMSG sits on virtio, and we do have virtio-net but I am not trying to do
+>> ethernet communication over RPMSG. RPMSG is only used to exchange
+>> information between cores regarding the shared memory where the actual
+>> ethernet communication happens.
+>>
+> 
+> Again nothing new here, virtio-net does control plane work though a
+> message channel but the data plane is done using fast shared memory
+> vqueues with vhost-net[3]. Using RPMSG would just be an extra unneeded
+> middle layer and cause you to re-implement what is already done with
+> virtio-net/vhost-net.
+> 
 
-Something I noticed when going through a lot more iterations:
+virtio-net provides a solution for virtual ethernet interface in a
+virtualized environment. Our use-case here is traffic tunneling between
+heterogeneous processors in a non virtualized environment such as TI's
+AM64x that has Cortex A53 and Cortex R5 where Linux runs on A53 and a
+flavour of RTOS on R5(FreeRTOS) and the ethernet controller is managed
+by R5 and needs to pass some low priority data to A53. The data plane is
+over the shared memory while the control plane is over RPMsg end point
+channel.
 
-FYI: The kernel has been compiled with a 100hz timer, tickless idle and n=
-o kernel preemption.
-I wanted to count how much the system actually runs those i2c calls, subs=
-tracting msleep,
-which is 20, 245 and 300, respectively.
+We had aligned with Andrew L [1] and the ask was to create a generic
+Linux Ethernet driver that can be used for heterogeneous system. Similar
+to rpmsg_tty.c. It was suggested to create a new rpmsg_eth.c driver that
+can be used for this purpose.
 
-So, I separated i =3D 10, i =3D 4 and i =3D 3 a bit.
- > 192 numbers for i =3D 10
- > 2309 numbers for i =3D 4
- > 1129 numbers for i =3D 3
+Here I have implemented what was suggested in [1]
 
-and calculating max and min, substracting the msleep:
+[1]
+https://lore.kernel.org/all/8f5d2448-bfd7-48a5-be12-fb16cdc4de79@lunn.ch/
 
- > 1 function call max: 20131327
- > 1 function call min: 9990574
- > diff at iteration 10: 10140753
- > avg at iteration 10:=C2=A0 10723993
+> Andrew
+> 
+> [0] https://git.ti.com/cgit/rpmsg/rpmsg_char_zerocopy
+> [1] https://github.com/TexasInstruments/rpmsg-dma
+> [2] https://github.com/TexasInstruments/tiovx
+> [3] https://www.redhat.com/en/blog/deep-dive-virtio-networking-and-
+> vhost-net
+> 
 
- > 7 function calls min: 82868351
- > 7 function calls max:=C2=A0 123074939
- > diff at iteration 4: 40206588
- > avg at iteration 4: 86375811
 
- > 8 function calls min: 97889217
- > 8 function calls max: 128086531
- > diff at iteration 3: 30197314
- > avg at iteration 3: 99901858
+-- 
+Thanks and Regards,
+Danish
 
-this is a diff of 10usecs (i=3D10), 40usecs (i=3D4) and 30usecs (i=3D3) m=
-y device is running the=20
-i2c_transfer_rollball().
-seems a lot to me when an i2c call takes 11-12 usecs avg per call
-are you sure these numbers point to a stable i2c bus?
-
-thanks,
-
-Janpieter Sollie
 
