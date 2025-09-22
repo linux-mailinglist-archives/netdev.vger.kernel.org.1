@@ -1,314 +1,171 @@
-Return-Path: <netdev+bounces-225306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0B51B920C7
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:49:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64A79B920F1
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:51:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B689178C15
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 15:49:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 552E9190321C
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 15:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2608330BB8F;
-	Mon, 22 Sep 2025 15:49:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920C12D7DDE;
+	Mon, 22 Sep 2025 15:51:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jJeOGrLG"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="O8Mj+zY6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C29430B50C
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 15:49:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D0823815D
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 15:51:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758556182; cv=none; b=IzEDZjCSCq8K4hStJehDwwCiUgzGlNCGUqfwSCTEfJ2tvuOQv7kjjB9Ig9V6FyL2nGhr0Ti/MUDyZPkxfgl9TD5uXSrIA2H1RLIMx+eYqTneI50eVsXpCqwPY6/0kmFUKUYC7pr86Dil3bH2p88HNO70LPqFSXinyZKizXWbiP4=
+	t=1758556282; cv=none; b=XQrWNi9G+vGTuT8tVU55TaSf+IDGnv1w2QUVtvG76qZSjB/XVGPOrQSzn1myBFsVJLrHHA5g/CUNm5gAwMB4Q92dQGYFkx2vOjXazC94FArsoz7fi1p5nkOIfDqpdWL+CKsUww7otu/wkZSIpdjy3AtdELi+3pWzYGuMp+jYf4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758556182; c=relaxed/simple;
-	bh=pnY7yIXTpkGY3uS9XymIrzISP7ZJeyapBkly5cHR7tQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=YShYhXfl8Z5y5cygHyp0EbcOZTVf7yCttnNSg+1tBHaXu6pkivvbNsumvwBaPRi1BeCXY6kUiOLAOUzCAClPddT7/dmURO26mxr0rErGUsQXi9W0HJ/I2AXBP0VdBrJLxeH9RPOCLIXIBILj/lGMbnHtHANCAMpvZDc4cfqhxPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jJeOGrLG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758556179;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WywYXktQLEVHQCnoOhp4jbR+ceLDEmxLbtgIxFgQwIk=;
-	b=jJeOGrLGKGKcnD6NReFX8XT9IRgiiw3U7aVl/PkHgjVkzgete3ALIPnee4gtLEz+xbBN1l
-	qIVRKW7505kIXkixedlnN1eDPEJPpWXA84yP8n5MFMnrx9OhFNGn1+pNuvPfrOzxlPgKak
-	IM01wcnsMy8SRy1zilLR0HXTjJBtwpw=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-470-S5X9gEmGOI25sFXuyyn9lw-1; Mon, 22 Sep 2025 11:49:36 -0400
-X-MC-Unique: S5X9gEmGOI25sFXuyyn9lw-1
-X-Mimecast-MFC-AGG-ID: S5X9gEmGOI25sFXuyyn9lw_1758556174
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-aff0df4c4abso348923866b.1
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 08:49:35 -0700 (PDT)
+	s=arc-20240116; t=1758556282; c=relaxed/simple;
+	bh=z7rS/yxJoUim+mzpgAuctY4+g4cEAbyz7OeFTKQCvw4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UOJax566xv8LXuS5CmtSEy0vQVhWWRgVb9PQjwMMoh7mZOQmb66G4dsNNscdR4f9Qp+g1KybJdQauWeql86ve+f8bV0sJf3BrGz3lvJVftoybAdjKkSNXCy0mDrDvCQ5GrL4xem+2Wp/Yg88XoH6JNmw+inNvlm6yKxCEXepsY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=O8Mj+zY6; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-57e03279bfeso1814184e87.0
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 08:51:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1758556279; x=1759161079; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KI0wiNUU9HxQFHxRzFr4Ntsm60rPJwqbW3BoojwKVFg=;
+        b=O8Mj+zY67IzZ8sHcq2WpE/mZXJvzCM+E+n1gXnc5KJu35tr8s8X7mRxI/qOG2oAqc/
+         SQFaQJ57K13aF6X63eGrkA+byDGjFv2H1PrOOcNvStSZawLsC4IdbwO9nixh+Shq1JZj
+         UYzKIXYS54kX6RGeieRp7G6C27f9qCWSAwofXYq9uVD+lrWjwuvs9W3eCIUgKidgJoms
+         7FlMDTomVIZGLRUl7Kbno2txuMpZ3hIjZrM6VYHNBhu5RuYVr7NPFT4YggHrvZ4XJMj5
+         MtERvK6ZfNvcO2XM73FO9HCGjnd5M8desfIoBUD8cDlk5KANOdnIPUOLRpHPQbNvG4YY
+         15QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758556174; x=1759160974;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WywYXktQLEVHQCnoOhp4jbR+ceLDEmxLbtgIxFgQwIk=;
-        b=j2FVStW6nLbD5iK/ZTbYFcD78agp8+HUdrvIN2TfbzH145jeG71GJo5EKwlTbLaFEH
-         K91qD6KR+U+8PCtUwnkfktqadK51P7RcuPU+y6tI3JOHCeQ2V3fcLZpQ6+GsT2BZwvlQ
-         YsAFyjHz6V9+7ljXMuX+avwExPpWvaF0byfc/GvIJ6UTA0+VarysPGK94/V35hYKWfRk
-         MupL6lFR83ciyVnJUFRZT+3Y2wQT0T8wyjJC7cDojHpHj+Lx8wKvQntQfOsE2scH9B79
-         xQAbki0NBE+MXTWEegipEJIC9c+zMAsx8r/dqRQjpjVDKUGyU0yR3HaPBILy2uwsyN9N
-         I1MA==
-X-Forwarded-Encrypted: i=1; AJvYcCVE794NgszFVKddIpaAd/d41Oo+ZM3JluSFBGLRpz3vfuOrYVYoApmunzxQ0c73UoyP9lWArRo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKt7oYT4SQm8G+50hqELjM/UF/m7Zf9ugrsxrMn6m+PqJTSXkh
-	NRxhjxNfgfmsxmYOvtO0ZdBSEdu9ZzC1QEz9vwG+QZX1gEevgauJGthzqMOER2G3RmJoNwZcQ8I
-	cfsKb3L4CPJNTUYMAEe8LigEXc8+mXsC+VlGgOcNISbs9Y4BdGVJOzMydzA==
-X-Gm-Gg: ASbGncv4zG5zGMxRW6PhcPpNGMcriTpzfJUPu1YlKmhNVDAnXhYe2W0mHbe1X8tn28Q
-	P10D/7HKC0Qsz+VAAVqwAMzuDV5H7w9yvhogV9go+pQaTnovTh3T1aTFXidCNmck0GC1fOPL/lq
-	hzEy61lQKIGGu1jdLmQPgFRwVakgqVcr7bxY3+hioUndPqcOfzBKN0JCuTsCdO91lDkf/5b+qWt
-	hd1jpZK0Q/OXNsNl43ESqzW16Tk9hcZPK/pATpscGYcrepRarM9H1k4zksYRPbleFtAyJJ66MIQ
-	AXbYSAhtKfbG2Bxfhghkvla4QXDlp3HxnnLYsqbr8fTXeqES8q1ECaAldg1p4uezFHk=
-X-Received: by 2002:a17:907:1df2:b0:b2d:b5d3:9623 with SMTP id a640c23a62f3a-b2db5d398c8mr186933766b.54.1758556174286;
-        Mon, 22 Sep 2025 08:49:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF9PXzNI7iuT6NoL+4FC5uVdHnMWrw8Q4gLh9w8pt9x5WwEnqsqHm/CAfVJFEadke+VixQp6w==
-X-Received: by 2002:a17:907:1df2:b0:b2d:b5d3:9623 with SMTP id a640c23a62f3a-b2db5d398c8mr186931566b.54.1758556173806;
-        Mon, 22 Sep 2025 08:49:33 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b288062c045sm590259966b.45.2025.09.22.08.49.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Sep 2025 08:49:33 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id AA3F1276A38; Mon, 22 Sep 2025 17:49:31 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Helge Deller <deller@gmx.de>, Helge Deller <deller@kernel.org>, David
- Hildenbrand <david@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S. Miller"
- <davem@davemloft.net>, Linux Memory Management List <linux-mm@kvack.org>,
- netdev@vger.kernel.org, Linux parisc List <linux-parisc@vger.kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH][RESEND][RFC] Fix 32-bit boot failure due inaccurate
- page_pool_page_is_pp()
-In-Reply-To: <CAHS8izNMHYuRk9w0BUEbXBob38NVkMOVMmvvcq30TstGFpob6A@mail.gmail.com>
-References: <aMSni79s6vCCVCFO@p100> <87zfawvt2f.fsf@toke.dk>
- <f64372ec-c127-457f-b8e2-0f48223bd147@gmx.de>
- <CAHS8izMjKub2cPa9Qqiga96XQ7piq3h0Vb_p+9RzNbBXXeGQrw@mail.gmail.com>
- <87y0qerbld.fsf@toke.dk>
- <CAHS8izOY3aSe96aUQBV76ZRpqj5mXwkPenNvmN6yN0cJmceLUA@mail.gmail.com>
- <87tt11qtl8.fsf@toke.dk>
- <CAHS8izNMHYuRk9w0BUEbXBob38NVkMOVMmvvcq30TstGFpob6A@mail.gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 22 Sep 2025 17:49:31 +0200
-Message-ID: <87cy7iv65w.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1758556279; x=1759161079;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KI0wiNUU9HxQFHxRzFr4Ntsm60rPJwqbW3BoojwKVFg=;
+        b=MUZl2gaQ7QTTWNovQebq0la9s2Nn8uetpKLDTWpEllK82GPLm9PShQIV7Tj3zJlveA
+         oApKE3pBwZMLtGmep0j6JSy1MjRgFa43pHboIQf5EuatqKctMG9CMzlX8Gpc0QJ/0uEh
+         gq4gGYCKQQq5rItSFX2C9GIcobGHfYs6rmidWBVYVzDEAJkLfgylJcEJBa5nymR+US0q
+         tSPGD6PBe3C8OPb3HW3NLTWfeLBwe9M0AA29c8u5H1PJ1dY/26vw6wiqu/rrZDczJ6T3
+         3bUMG6i9xTLkHLxGXOug3COmfQrpnbVdI5nRsmFXVsJAmboiNMdcUEqHCWZHp/Icv18a
+         zPfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVjFc0r9i4h1W5oPuVo8vOfol0ltaHB8VcTyZiJNpA5cPGuoEzpxs5U2QpWFeC8uw34eSppMo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDvaPQbeu5rvkrEfS1RW9GusKXkHwIaDFVGMy6eibwAomJkPlP
+	UIN0s0zoo1c/AuLsZSnnyJlkcCsEL7HlgUibvSozGGNLShbpUQACNN48csx1rP5JohyAiLSpQUX
+	0v8PAm08=
+X-Gm-Gg: ASbGncuJyXDZt3vmgXCuw+5d+V/OaPE19mATF1Ivg7ErAhZ+YjAiWmYmX5f7GIAqk6S
+	NUl93S/+WNa+Q7nc11BNo/xOuqpQlvH8csvul7hATYeH8Cy+vFL4wLiWOpJrYjOJWnfRIQoJBZm
+	pDx/000HTdAz7aMVZ5j/AT/HjPd7UJ0EhrG89GeSOkdePyd0VPwDTChlMWvYDAPsKK2NOMS5/Om
+	nWzXsK1vauzL+n91WgHrvLpl8Wl1p80VD7S47XY5wMq7sQjU4UXgMnaQ+6QpCMxqa6SGfejN/1/
+	ulsB+XMdqUeJRZEwgm4EROYG1qCRCLy9COFp2Mwu/6umL8zIDofDvNuLkXwQclfeuzZZwKQsgF6
+	Wzj4xMT+lculYz3g4GFZGnofptdwJTfyphu1IbbuLueTUkI+Ohu1me2EoWYaK/butRw4=
+X-Google-Smtp-Source: AGHT+IFbn6UAGD/yYipR4ScnqHgSY4Xy5Snk4YVDAIMeIpi4wrTyL2u+7jItUvxJiL3bukK5bqgVQg==
+X-Received: by 2002:a05:6512:3a84:b0:55f:5c1d:6cd8 with SMTP id 2adb3069b0e04-579e1b690a2mr4729095e87.2.1758556278396;
+        Mon, 22 Sep 2025 08:51:18 -0700 (PDT)
+Received: from [100.115.92.205] (176.111.185.210.kyiv.nat.volia.net. [176.111.185.210])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-578a5f44a8bsm3412268e87.18.2025.09.22.08.51.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Sep 2025 08:51:17 -0700 (PDT)
+Message-ID: <2e27010e-5a7b-4dc2-a7dd-703a94d2c4b1@blackwall.org>
+Date: Mon, 22 Sep 2025 18:50:36 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net: bridge: Install FDB for bridge MAC on
+ VLAN 0
+To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
+ netdev@vger.kernel.org
+Cc: Simon Horman <horms@kernel.org>, bridge@lists.linux-foundation.org,
+ mlxsw@nvidia.com
+References: <415202b2d1b9b0899479a502bbe2ba188678f192.1758550408.git.petrm@nvidia.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <415202b2d1b9b0899479a502bbe2ba188678f192.1758550408.git.petrm@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Mina Almasry <almasrymina@google.com> writes:
+On 9/22/25 17:14, Petr Machata wrote:
+> Currently, after the bridge is created, the FDB does not hold an FDB entry
+> for the bridge MAC on VLAN 0:
+> 
+>   # ip link add name br up type bridge
+>   # ip -br link show dev br
+>   br               UNKNOWN        92:19:8c:4e:01:ed <BROADCAST,MULTICAST,UP,LOWER_UP>
+>   # bridge fdb show | grep 92:19:8c:4e:01:ed
+>   92:19:8c:4e:01:ed dev br vlan 1 master br permanent
+> 
+> Later when the bridge MAC is changed, or in fact when the address is given
+> during netdevice creation, the entry appears:
+> 
+>   # ip link add name br up address 00:11:22:33:44:55 type bridge
+>   # bridge fdb show | grep 00:11:22:33:44:55
+>   00:11:22:33:44:55 dev br vlan 1 master br permanent
+>   00:11:22:33:44:55 dev br master br permanent
+> 
+> However when the bridge address is set by the user to the current bridge
+> address before the first port is enslaved, none of the address handlers
+> gets invoked, because the address is not actually changed. The address is
+> however marked as NET_ADDR_SET. Then when a port is enslaved, the address
+> is not changed, because it is NET_ADDR_SET. Thus the VLAN 0 entry is not
+> added, and it has not been added previously either:
+> 
+>   # ip link add name br up type bridge
+>   # ip -br link show dev br
+>   br               UNKNOWN        7e:f0:a8:1a:be:c2 <BROADCAST,MULTICAST,UP,LOWER_UP>
+>   # ip link set dev br addr 7e:f0:a8:1a:be:c2
+>   # ip link add name v up type veth
+>   # ip link set dev v master br
+>   # ip -br link show dev br
+>   br               UNKNOWN        7e:f0:a8:1a:be:c2 <BROADCAST,MULTICAST,UP,LOWER_UP>
+>   # bridge fdb | grep 7e:f0:a8:1a:be:c2
+>   7e:f0:a8:1a:be:c2 dev br vlan 1 master br permanent
+> 
+> Then when the bridge MAC is used as DMAC, and br_handle_frame_finish()
+> looks up an FDB entry with VLAN=0, it doesn't find any, and floods the
+> traffic instead of passing it up.
+> 
+> Fix this by simply adding the VLAN 0 FDB entry for the bridge itself always
+> on netdevice creation. This also makes the behavior consistent with how
+> ports are treated: ports always have an FDB entry for each member VLAN as
+> well as VLAN 0.
+> 
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+>   net/bridge/br.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/net/bridge/br.c b/net/bridge/br.c
+> index 512872a2ef81..c37e52e2f29a 100644
+> --- a/net/bridge/br.c
+> +++ b/net/bridge/br.c
+> @@ -37,6 +37,11 @@ static int br_device_event(struct notifier_block *unused, unsigned long event, v
+>   	int err;
+>   
+>   	if (netif_is_bridge_master(dev)) {
+> +		struct net_bridge *br = netdev_priv(dev);
+> +
+> +		if (event == NETDEV_REGISTER)
+> +			br_fdb_change_mac_address(br, dev->dev_addr);
+> +
+>   		err = br_vlan_bridge_event(dev, event, ptr);
+>   		if (err)
+>   			return notifier_from_errno(err);
 
-> On Wed, Sep 17, 2025 at 3:09=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen =
-<toke@redhat.com> wrote:
->>
->> Mina Almasry <almasrymina@google.com> writes:
->>
->> > On Tue, Sep 16, 2025 at 2:27=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgens=
-en <toke@redhat.com> wrote:
->> >>
->> >> Mina Almasry <almasrymina@google.com> writes:
->> >>
->> >> > On Mon, Sep 15, 2025 at 6:08=E2=80=AFAM Helge Deller <deller@gmx.de=
-> wrote:
->> >> >>
->> >> >> On 9/15/25 13:44, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> >> >> > Helge Deller <deller@kernel.org> writes:
->> >> >> >
->> >> >> >> Commit ee62ce7a1d90 ("page_pool: Track DMA-mapped pages and unm=
-ap them when
->> >> >> >> destroying the pool") changed PP_MAGIC_MASK from 0xFFFFFFFC to =
-0xc000007c on
->> >> >> >> 32-bit platforms.
->> >> >> >>
->> >> >> >> The function page_pool_page_is_pp() uses PP_MAGIC_MASK to ident=
-ify page pool
->> >> >> >> pages, but the remaining bits are not sufficient to unambiguous=
-ly identify
->> >> >> >> such pages any longer.
->> >> >> >
->> >> >> > Why not? What values end up in pp_magic that are mistaken for the
->> >> >> > pp_signature?
->> >> >>
->> >> >> As I wrote, PP_MAGIC_MASK changed from 0xFFFFFFFC to 0xc000007c.
->> >> >> And we have PP_SIGNATURE =3D=3D 0x40  (since POISON_POINTER_DELTA =
-is zero on 32-bit platforms).
->> >> >> That means, that before page_pool_page_is_pp() could clearly ident=
-ify such pages,
->> >> >> as the (value & 0xFFFFFFFC) =3D=3D 0x40.
->> >> >> So, basically only the 0x40 value indicated a PP page.
->> >> >>
->> >> >> Now with the mask a whole bunch of pointers suddenly qualify as be=
-ing a pp page,
->> >> >> just showing a few examples:
->> >> >> 0x01111040
->> >> >> 0x082330C0
->> >> >> 0x03264040
->> >> >> 0x0ad686c0 ....
->> >> >>
->> >> >> For me it crashes immediately at bootup when memblocked pages are =
-handed
->> >> >> over to become normal pages.
->> >> >>
->> >> >
->> >> > I tried to take a look to double check here and AFAICT Helge is cor=
-rect.
->> >> >
->> >> > Before the breaking patch with PP_MAGIC_MASK=3D=3D0xFFFFFFFC, basic=
-ally
->> >> > 0x40 is the only pointer that may be mistaken as a valid pp_magic.
->> >> > AFAICT each bit we 0 in the PP_MAGIC_MASK (aside from the 3 least
->> >> > significant bits), doubles the number of pointers that can be mista=
-ken
->> >> > for pp_magic. So with 0xFFFFFFFC, only one value (0x40) can be
->> >> > mistaken as a valid pp_magic, with  0xc000007c AFAICT 2^22 values c=
-an
->> >> > be mistaken as pp_magic?
->> >> >
->> >> > I don't know that there is any bits we can take away from
->> >> > PP_MAGIC_MASK I think? As each bit doubles the probablity :(
->> >> >
->> >> > I would usually say we can check the 3 least significant bits to te=
-ll
->> >> > if pp_magic is a pointer or not, but pp_magic is unioned with
->> >> > page->lru I believe which will use those bits.
->> >>
->> >> So if the pointers stored in the same field can be any arbitrary valu=
-e,
->> >> you are quite right, there is no safe value. The critical assumption =
-in
->> >> the bit stuffing scheme is that the pointers stored in the field will
->> >> always be above PAGE_OFFSET, and that PAGE_OFFSET has one (or both) of
->> >> the two top-most bits set (that is what the VMSPLIT reference in the
->> >> comment above the PP_DMA_INDEX_SHIFT definition is alluding to).
->> >>
->> >
->> > I see... but where does the 'PAGE_OFFSET has one (or both) of the two
->> > top-most bits set)' assumption come from? Is it from this code?
->>
->> Well, from me grepping through the code and trying to make sense of all
->> the different cases of the preprocessor and config directives across
->> architectures. Seems I did not quite succeed :/
->>
->> > /*
->> >  * PAGE_OFFSET -- the first address of the first page of memory.
->> >  * When not using MMU this corresponds to the first free page in
->> >  * physical memory (aligned on a page boundary).
->> >  */
->> > #ifdef CONFIG_MMU
->> > #ifdef CONFIG_64BIT
->> > ....
->> > #else
->> > #define PAGE_OFFSET _AC(0xc0000000, UL)
->> > #endif /* CONFIG_64BIT */
->> > #else
->> > #define PAGE_OFFSET ((unsigned long)phys_ram_base)
->> > #endif /* CONFIG_MMU */
->> >
->> > It looks like with !CONFIG_MMU we use phys_ram_base and I'm unable to
->> > confirm that all the values of this have the first 2 bits set. I
->> > wonder if his setup is !CONFIG_MMU indeed.
->>
->> Right, that's certainly one thing I missed. As was the parisc arch
->> thing, as Helge followed up with. Ugh :/
->>
->> > It also looks like pp_magic is also union'd with __folio_index in
->> > struct page, and it looks like the data there is sometimes used as a
->> > pointer and sometimes not.
->>
->> Not according to my pahole:
->>
->> [...]
->>                         union {
->>                                 long unsigned int __folio_index; /*    3=
-2     8 */
->> [...]
->>         struct {
->>                         long unsigned int pp_magic;      /*     8     8 =
-*/
->>
->> So I think we're good with this, no?
->>
->> So given the above, we could do something equivalent to this, I think?
->>
->> diff --git i/include/linux/mm.h w/include/linux/mm.h
->> index 1ae97a0b8ec7..615aaa19c60c 100644
->> --- i/include/linux/mm.h
->> +++ w/include/linux/mm.h
->> @@ -4175,8 +4175,12 @@ int arch_lock_shadow_stack_status(struct task_str=
-uct *t, unsigned long status);
->>   */
->>  #define PP_DMA_INDEX_BITS MIN(32, __ffs(POISON_POINTER_DELTA) - PP_DMA_=
-INDEX_SHIFT)
->>  #else
->> +#if PAGE_OFFSET > PP_SIGNATURE
->>  /* Always leave out the topmost two; see above. */
->> -#define PP_DMA_INDEX_BITS MIN(32, BITS_PER_LONG - PP_DMA_INDEX_SHIFT - =
-2)
->> +#define PP_DMA_INDEX_BITS MIN(32, __fls(PAGE_OFFSET) - PP_DMA_INDEX_SHI=
-FT - 1)
->
-> Shouldn't have this been:
->
-> #define PP_DMA_INDEX_BITS MIN(32, __ffs(PAGE_OFFSET) - PP_DMA_INDEX_SHIFT)
->
-> I.e. you're trying to use the space between the least significant bit
-> set in PAGE_OFFSET and the most significant bit set in PP_SIGNATURE.
-> Hmm. I'm not sure I understand this, I may be reading wrong.
-
-No, you're right, that was me getting things mixed up; but looks like
-you got the gist of it so that's good :)
-
->> +#else
->> +#define PP_DMA_INDEX_BITS 0
->> +#endif /* PAGE_OFFSET > PP_SIGNATURE */
->>  #endif
->>
->>  #define PP_DMA_INDEX_MASK GENMASK(PP_DMA_INDEX_BITS +  PP_DMA_INDEX_SHI=
-FT - 1, \
->>
->>
->> Except that it won't work in this form as-is because PAGE_OFFSET is not
->> always a constant (see the #define PAGE_OFFSET ((unsigned
->> long)phys_ram_base) that your quoted above), so we'll have to turn it
->> into an inline function or something.
->>
->> I'm not sure adding this extra complexity is really worth it, or if we
->> should just go with the '#define PP_DMA_INDEX_BITS 0' when
->> POISON_POINTER_DELTA is unset and leave it at that for the temporary
->> workaround. WDYT?
->>
->
-> I think this would work. It still wouldn't handle cases where the data
-> in pp_magic ends up used as a non-pointer at all or a pointer to some
-> static variable in the code like `.mp_ops =3D &dmabuf_devmem_ops,`
-> right? Because these were never allocated from memory so are unrelated
-> to PAGE_OFFSET.
->
-> But I guess things like that would have been a problem with the old
-> code anwyway, so should be of no concern?
-
-Yeah, this relies on the overlapping field only ever being used for
-kernel-space pointers; which I believe is the case with page->lru (since
-it's a list_head).
-
-I'll see if I can find a way around the "PAGE_OFFSET may be a variable
-reference" issue and post a proper patch, hopefully tomorrow.
-
--Toke
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
