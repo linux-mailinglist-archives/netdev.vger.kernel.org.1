@@ -1,171 +1,171 @@
-Return-Path: <netdev+bounces-225307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64A79B920F1
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:51:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DDF4B92139
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:54:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 552E9190321C
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 15:51:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2141B2A2E47
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 15:54:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920C12D7DDE;
-	Mon, 22 Sep 2025 15:51:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ED0130E82A;
+	Mon, 22 Sep 2025 15:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="O8Mj+zY6"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="mtG2rvuJ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="nsWjqxXY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D0823815D
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 15:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A14F30DEDA;
+	Mon, 22 Sep 2025 15:54:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758556282; cv=none; b=XQrWNi9G+vGTuT8tVU55TaSf+IDGnv1w2QUVtvG76qZSjB/XVGPOrQSzn1myBFsVJLrHHA5g/CUNm5gAwMB4Q92dQGYFkx2vOjXazC94FArsoz7fi1p5nkOIfDqpdWL+CKsUww7otu/wkZSIpdjy3AtdELi+3pWzYGuMp+jYf4k=
+	t=1758556456; cv=none; b=CihG7d6LJhnMGUNy3kAxJZ7xIoGZKUt/j/XtE1sbWhnOeVbEqz5wrOPerBMtrxKMAPZNAtleWO+xZ6WPFJQf29OghQHAuGyvAzc/YPqldFQsXWc1LKoZL4YKWwReHWk2c+JnJWfOOIMRbVdBGazNYedrPPl1Ier2jktVLLNDeRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758556282; c=relaxed/simple;
-	bh=z7rS/yxJoUim+mzpgAuctY4+g4cEAbyz7OeFTKQCvw4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UOJax566xv8LXuS5CmtSEy0vQVhWWRgVb9PQjwMMoh7mZOQmb66G4dsNNscdR4f9Qp+g1KybJdQauWeql86ve+f8bV0sJf3BrGz3lvJVftoybAdjKkSNXCy0mDrDvCQ5GrL4xem+2Wp/Yg88XoH6JNmw+inNvlm6yKxCEXepsY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=O8Mj+zY6; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-57e03279bfeso1814184e87.0
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 08:51:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1758556279; x=1759161079; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KI0wiNUU9HxQFHxRzFr4Ntsm60rPJwqbW3BoojwKVFg=;
-        b=O8Mj+zY67IzZ8sHcq2WpE/mZXJvzCM+E+n1gXnc5KJu35tr8s8X7mRxI/qOG2oAqc/
-         SQFaQJ57K13aF6X63eGrkA+byDGjFv2H1PrOOcNvStSZawLsC4IdbwO9nixh+Shq1JZj
-         UYzKIXYS54kX6RGeieRp7G6C27f9qCWSAwofXYq9uVD+lrWjwuvs9W3eCIUgKidgJoms
-         7FlMDTomVIZGLRUl7Kbno2txuMpZ3hIjZrM6VYHNBhu5RuYVr7NPFT4YggHrvZ4XJMj5
-         MtERvK6ZfNvcO2XM73FO9HCGjnd5M8desfIoBUD8cDlk5KANOdnIPUOLRpHPQbNvG4YY
-         15QA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758556279; x=1759161079;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KI0wiNUU9HxQFHxRzFr4Ntsm60rPJwqbW3BoojwKVFg=;
-        b=MUZl2gaQ7QTTWNovQebq0la9s2Nn8uetpKLDTWpEllK82GPLm9PShQIV7Tj3zJlveA
-         oApKE3pBwZMLtGmep0j6JSy1MjRgFa43pHboIQf5EuatqKctMG9CMzlX8Gpc0QJ/0uEh
-         gq4gGYCKQQq5rItSFX2C9GIcobGHfYs6rmidWBVYVzDEAJkLfgylJcEJBa5nymR+US0q
-         tSPGD6PBe3C8OPb3HW3NLTWfeLBwe9M0AA29c8u5H1PJ1dY/26vw6wiqu/rrZDczJ6T3
-         3bUMG6i9xTLkHLxGXOug3COmfQrpnbVdI5nRsmFXVsJAmboiNMdcUEqHCWZHp/Icv18a
-         zPfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVVjFc0r9i4h1W5oPuVo8vOfol0ltaHB8VcTyZiJNpA5cPGuoEzpxs5U2QpWFeC8uw34eSppMo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDvaPQbeu5rvkrEfS1RW9GusKXkHwIaDFVGMy6eibwAomJkPlP
-	UIN0s0zoo1c/AuLsZSnnyJlkcCsEL7HlgUibvSozGGNLShbpUQACNN48csx1rP5JohyAiLSpQUX
-	0v8PAm08=
-X-Gm-Gg: ASbGncuJyXDZt3vmgXCuw+5d+V/OaPE19mATF1Ivg7ErAhZ+YjAiWmYmX5f7GIAqk6S
-	NUl93S/+WNa+Q7nc11BNo/xOuqpQlvH8csvul7hATYeH8Cy+vFL4wLiWOpJrYjOJWnfRIQoJBZm
-	pDx/000HTdAz7aMVZ5j/AT/HjPd7UJ0EhrG89GeSOkdePyd0VPwDTChlMWvYDAPsKK2NOMS5/Om
-	nWzXsK1vauzL+n91WgHrvLpl8Wl1p80VD7S47XY5wMq7sQjU4UXgMnaQ+6QpCMxqa6SGfejN/1/
-	ulsB+XMdqUeJRZEwgm4EROYG1qCRCLy9COFp2Mwu/6umL8zIDofDvNuLkXwQclfeuzZZwKQsgF6
-	Wzj4xMT+lculYz3g4GFZGnofptdwJTfyphu1IbbuLueTUkI+Ohu1me2EoWYaK/butRw4=
-X-Google-Smtp-Source: AGHT+IFbn6UAGD/yYipR4ScnqHgSY4Xy5Snk4YVDAIMeIpi4wrTyL2u+7jItUvxJiL3bukK5bqgVQg==
-X-Received: by 2002:a05:6512:3a84:b0:55f:5c1d:6cd8 with SMTP id 2adb3069b0e04-579e1b690a2mr4729095e87.2.1758556278396;
-        Mon, 22 Sep 2025 08:51:18 -0700 (PDT)
-Received: from [100.115.92.205] (176.111.185.210.kyiv.nat.volia.net. [176.111.185.210])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-578a5f44a8bsm3412268e87.18.2025.09.22.08.51.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Sep 2025 08:51:17 -0700 (PDT)
-Message-ID: <2e27010e-5a7b-4dc2-a7dd-703a94d2c4b1@blackwall.org>
-Date: Mon, 22 Sep 2025 18:50:36 +0300
+	s=arc-20240116; t=1758556456; c=relaxed/simple;
+	bh=WLw30Tf1j8Cie++dYGQQJq3f5lkPiJO5JJxaGR8TD1s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m5dB4CLgQAHxuOz45srT8ukrYfl3ZY8g50VzhbDlwu34PlhzEcctrCYEnoVI5+T44LvjIFPzkABHL/L6OxseK33XGUrKX1gMGBByloOROEXPfaeHWhOdwDZIhZtZ/7YEaAEaqew4ujFbLvuhg6zYoaKNHBNToV8h9vImFE4uhGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=mtG2rvuJ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=nsWjqxXY; arc=none smtp.client-ip=103.168.172.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 2E9AB1400179;
+	Mon, 22 Sep 2025 11:54:12 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Mon, 22 Sep 2025 11:54:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1758556452; x=
+	1758642852; bh=oxbmvxOBKYdNbgHBaFZ5AkGpkPFUn4QrzOZOzIFtxQc=; b=m
+	tG2rvuJrmZJwzsd4ms8sxHMlalW9irIC9aqq38BYtH+JvRS29uRY+tvCc01904Gl
+	zn3JrrDSMlvzcm9IBGSmdC/LyYATIaDFyPt3lZGdR5maGRxhoff86RNZLzaoBDWX
+	Wg1U4ievoHJCsVFdrLk6NPWs2WhlV+dMLOTEAyoppW1qNuYpahca5WrR1QJlrcnZ
+	kvcUY8TjD+4CS2+t0swMDr89+YymjNp/zoLduqJ6MqLqs9bS1vv6cIrkIoMQ8Gfm
+	tvrInQSsmB+bzZA8Q+eijWijVmlHXgJki4BViNnsQYc7qz7e3rJyFQLVBKb9trsT
+	osMoyQytBqf/m6Zta8uZA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1758556452; x=1758642852; bh=oxbmvxOBKYdNbgHBaFZ5AkGpkPFUn4QrzOZ
+	OzIFtxQc=; b=nsWjqxXY9cvdN+uve8bK4dzPewRJsaKNO4Av5SRaL76IJX7TdWS
+	2A//+VkfLWnpJXWU67ezPAEjgpFpBXathURgGMCxHW3Y5en0VbSf3GE+K76FUcmR
+	Srjggy6w7VTXdhGYb+mKD6t5ziuTLinUyMFtEWpXNNKqXDX70yOSbUTosn84jqsN
+	3S2hnVw+Tl1CWCwD9GAFDi6w4IgoHC9NoO2r8k0MtMM7rUY33Hq72lPZuExmk1kC
+	KPCVIzTNQYvOB7F4epn4RtDJVvN0N+YQ6odFISkcLEyH4ouiLhbxOzOC/LQr+jZk
+	RIY6bXXSyNE42B0qpjO5ToX4W9p4nHLd/Aw==
+X-ME-Sender: <xms:I3HRaBoeDfoXoIhoSSigbJ4yl5HK_xoZaiWyvylMmsxX7ctuEDp29A>
+    <xme:I3HRaJOMTEDgIy11TXEehDqItHa-psWkd1vnKRFFBK9tzLtIptgBR8wxB8nQI3dLK
+    qSLS75XnDAq1eOa-pgCnTOT6Ix_shQRXQNewjj9akY4S22Pikj0dBc>
+X-ME-Received: <xmr:I3HRaHx0uUyOp3onyZIwZOY1U2Ol0YliEPY5IaAmNwvgv59E8O3k5Q6xBcXD>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdehkedviecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
+    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
+    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudeipdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehshhhshhhithhrihhtsehnvhhiughirgdrtg
+    homhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthgr
+    rhhiqhhtsehnvhhiughirgdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhooh
+    hglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgt
+    phhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepug
+    grvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehsrggvvggumhesnhhv
+    ihguihgrrdgtohhmpdhrtghpthhtoheplhgvohhnsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:I3HRaNw-dBO5K5QWiLRW1Rk5vRE2VFwoi5qak_soktcvSQjDFQyT-A>
+    <xmx:I3HRaIKHxOm_xxH6sF1eCVYGo7IHMBZOetdW0fEmteKXD9YfDhjS7w>
+    <xmx:I3HRaBjKqpPwCuaW34C51niT3KLihWZB1hzSBivZ2k4uJMgGQff9Og>
+    <xmx:I3HRaBPaaD_gkLNgqCEgBbYn-f7-4Mon8OCvn1hY3SLG2ndzsw3ybA>
+    <xmx:JHHRaCwxVADe0SYbhCCw0pNqgUuUvkDG89ucmi1MRg0GK4JLhAUVEBn0>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 22 Sep 2025 11:54:10 -0400 (EDT)
+Date: Mon, 22 Sep 2025 17:54:09 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Shahar Shitrit <shshitrit@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Gal Pressman <gal@nvidia.com>, Boris Pismenny <borisp@nvidia.com>
+Subject: Re: [PATCH net 2/3] net: tls: Cancel RX async resync request on
+ rdc_delta overflow
+Message-ID: <aNFxIfD2aPpB11dC@krikkit>
+References: <1757486861-542133-1-git-send-email-tariqt@nvidia.com>
+ <1757486861-542133-3-git-send-email-tariqt@nvidia.com>
+ <20250914115308.6e991f7d@kernel.org>
+ <0b7a83ec-d505-40c3-afa4-8f6474cd78d9@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net: bridge: Install FDB for bridge MAC on
- VLAN 0
-To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
- netdev@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>, bridge@lists.linux-foundation.org,
- mlxsw@nvidia.com
-References: <415202b2d1b9b0899479a502bbe2ba188678f192.1758550408.git.petrm@nvidia.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <415202b2d1b9b0899479a502bbe2ba188678f192.1758550408.git.petrm@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <0b7a83ec-d505-40c3-afa4-8f6474cd78d9@nvidia.com>
 
-On 9/22/25 17:14, Petr Machata wrote:
-> Currently, after the bridge is created, the FDB does not hold an FDB entry
-> for the bridge MAC on VLAN 0:
+2025-09-22, 10:18:52 +0300, Shahar Shitrit wrote:
 > 
->   # ip link add name br up type bridge
->   # ip -br link show dev br
->   br               UNKNOWN        92:19:8c:4e:01:ed <BROADCAST,MULTICAST,UP,LOWER_UP>
->   # bridge fdb show | grep 92:19:8c:4e:01:ed
->   92:19:8c:4e:01:ed dev br vlan 1 master br permanent
 > 
-> Later when the bridge MAC is changed, or in fact when the address is given
-> during netdevice creation, the entry appears:
-> 
->   # ip link add name br up address 00:11:22:33:44:55 type bridge
->   # bridge fdb show | grep 00:11:22:33:44:55
->   00:11:22:33:44:55 dev br vlan 1 master br permanent
->   00:11:22:33:44:55 dev br master br permanent
-> 
-> However when the bridge address is set by the user to the current bridge
-> address before the first port is enslaved, none of the address handlers
-> gets invoked, because the address is not actually changed. The address is
-> however marked as NET_ADDR_SET. Then when a port is enslaved, the address
-> is not changed, because it is NET_ADDR_SET. Thus the VLAN 0 entry is not
-> added, and it has not been added previously either:
-> 
->   # ip link add name br up type bridge
->   # ip -br link show dev br
->   br               UNKNOWN        7e:f0:a8:1a:be:c2 <BROADCAST,MULTICAST,UP,LOWER_UP>
->   # ip link set dev br addr 7e:f0:a8:1a:be:c2
->   # ip link add name v up type veth
->   # ip link set dev v master br
->   # ip -br link show dev br
->   br               UNKNOWN        7e:f0:a8:1a:be:c2 <BROADCAST,MULTICAST,UP,LOWER_UP>
->   # bridge fdb | grep 7e:f0:a8:1a:be:c2
->   7e:f0:a8:1a:be:c2 dev br vlan 1 master br permanent
-> 
-> Then when the bridge MAC is used as DMAC, and br_handle_frame_finish()
-> looks up an FDB entry with VLAN=0, it doesn't find any, and floods the
-> traffic instead of passing it up.
-> 
-> Fix this by simply adding the VLAN 0 FDB entry for the bridge itself always
-> on netdevice creation. This also makes the behavior consistent with how
-> ports are treated: ports always have an FDB entry for each member VLAN as
-> well as VLAN 0.
-> 
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> ---
->   net/bridge/br.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/net/bridge/br.c b/net/bridge/br.c
-> index 512872a2ef81..c37e52e2f29a 100644
-> --- a/net/bridge/br.c
-> +++ b/net/bridge/br.c
-> @@ -37,6 +37,11 @@ static int br_device_event(struct notifier_block *unused, unsigned long event, v
->   	int err;
->   
->   	if (netif_is_bridge_master(dev)) {
-> +		struct net_bridge *br = netdev_priv(dev);
-> +
-> +		if (event == NETDEV_REGISTER)
-> +			br_fdb_change_mac_address(br, dev->dev_addr);
-> +
->   		err = br_vlan_bridge_event(dev, event, ptr);
->   		if (err)
->   			return notifier_from_errno(err);
+> On 14/09/2025 21:53, Jakub Kicinski wrote:
+> > On Wed, 10 Sep 2025 09:47:40 +0300 Tariq Toukan wrote:
+> >> When a netdev issues an RX async resync request, the TLS module
+> >> increments rcd_delta for each new record that arrives. This tracks
+> >> how far the current record is from the point where synchronization
+> >> was lost.
+> >>
+> >> When rcd_delta reaches its threshold, it indicates that the device
+> >> response is either excessively delayed or unlikely to arrive at all
+> >> (at that point, tcp_sn may have wrapped around, so a match would no
+> >> longer be valid anyway).
+> >>
+> >> Previous patch introduced tls_offload_rx_resync_async_request_cancel()
+> >> to explicitly cancel resync requests when a device response failure
+> >> is detected.
+> >>
+> >> This patch adds a final safeguard: cancel the async resync request when
+> >> rcd_delta crosses its threshold, as reaching this point implies that
+> >> earlier cancellation did not occur.
+> > 
+> > Missing a Fixes tag
+> Will add
+> > 
+> >> diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
+> >> index f672a62a9a52..56c14f1647a4 100644
+> >> --- a/net/tls/tls_device.c
+> >> +++ b/net/tls/tls_device.c
+> >> @@ -721,8 +721,11 @@ tls_device_rx_resync_async(struct tls_offload_resync_async *resync_async,
+> >>  		/* shouldn't get to wraparound:
+> >>  		 * too long in async stage, something bad happened
+> >>  		 */
+> >> -		if (WARN_ON_ONCE(resync_async->rcd_delta == USHRT_MAX))
+> >> +		if (WARN_ON_ONCE(resync_async->rcd_delta == USHRT_MAX)) {
+> >> +			/* cancel resync request */
+> >> +			atomic64_set(&resync_async->req, 0);
+> > 
+> > we should probably use the helper added by the previous patch (I'd
+> > probably squash them TBH)
+>
+> It's not trivial to use the helper here, since we don't have the socket.
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+tls_device_rx_resync_async doesn't currently get the socket, but it
+has only one caller, tls_device_rx_resync_new_rec, which does. So
+tls_device_rx_resync_async could easily get the socket. Or just pass
+resync_async to tls_offload_rx_resync_async_request_cancel, since
+that's what it really needs?
 
+-- 
+Sabrina
 
