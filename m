@@ -1,157 +1,117 @@
-Return-Path: <netdev+bounces-225249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E85D8B9123C
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 14:37:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FCC4B9122A
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 14:34:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF6F41663E8
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 12:37:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01A7217AC51
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 12:34:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329342F1FE5;
-	Mon, 22 Sep 2025 12:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D131D3081A8;
+	Mon, 22 Sep 2025 12:34:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="oje7S2F/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nkq+RnKT"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707E7632;
-	Mon, 22 Sep 2025 12:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69581305056
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 12:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758544668; cv=none; b=HqG+34hKi3naExy9r9JBk+eoUYc62seEWHYLGaezlPmNAtOY+ic+HkMzJRimUeMFEAT27wvIMf2L+eLNpo2YU7nVG3DnU4O8iCZHW5HSjJdOXAO9tlu63BIbgCE4eIb20WrNZYfT9i7MO72uXrV14+ho4K1X8bUCL4oYHy8CSOI=
+	t=1758544459; cv=none; b=qlBiLWyczNGEXMKQ0lyMQQBnfzQcGt0GK/To7tgdLWqctOzMcRAMc/u6wqWZo63GaSCuIyULM4dOp2zcZE27pMTA1/2M/QORkI4Z+cuNCtKK/X2KJeztuWV3cVMCt6YL2vTCgpS8mZpqMuAawjM8gaSMIg3pTWIzFc0ladWv0dY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758544668; c=relaxed/simple;
-	bh=8YypPf0aiPKuOwo+g5HDRj8EAxKrVBf8pOov84amq8A=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HdLQNxL5ID10bomjcKvQOzNEFpdiL4CntcdDs6k16tp248/yRFvmRfUc7sLR7LENEvV62ER+wCbi4ADZY4dtqV2ODry7HF/45VkSBaAfEtwPEt0Ac2kkumFsByUOqAQd7lLflpNw0M5kMVUqIhaKvbAVemr6dunaA7s8U/2LXJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=oje7S2F/; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1758544666; x=1790080666;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8YypPf0aiPKuOwo+g5HDRj8EAxKrVBf8pOov84amq8A=;
-  b=oje7S2F/vmbHLTKGhEGuB5lIwdjTI4bqYH83NM9foWgoiPXx75WN28xT
-   8kROn3wNgb6n5ngOo3n6QvOpaOhreaiRWD+pXDTxSeD0A73l8i9S2iyqV
-   eSCHueUeEaFfUilmVaKVkufelabxC/GMGuYAUC3vJ4YiG7PrD0mPlO4lE
-   N92M2RpD4Gt0zl1cZjwmoWj8zD5l4r+ZI3ivRGjo+fzAs+nOYwA3DwDqu
-   F3R2lgVOVfnsDYlNpaF/zi70kdekbCHM97tLOApsGyxydUvBoI+g8Nf7c
-   +RWP8gPjcCYPJToz40WWqnpZi8SOywzL8vdTBu3k6XviHYmR8wQKyWCuP
-   Q==;
-X-CSE-ConnectionGUID: lBfTSD/JRDC5cyyuOb8Rqg==
-X-CSE-MsgGUID: WaGxFZAVTR6h9GyLGG3I9w==
-X-IronPort-AV: E=Sophos;i="6.18,285,1751266800"; 
-   d="scan'208";a="214199220"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Sep 2025 05:37:44 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Mon, 22 Sep 2025 05:37:04 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Mon, 22 Sep 2025 05:37:04 -0700
-Date: Mon, 22 Sep 2025 14:33:01 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: Jakub Kicinski <kuba@kernel.org>, <andrew@lunn.ch>,
-	<hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <richardcochran@gmail.com>,
-	<vadim.fedorenko@linux.dev>, <rmk+kernel@armlinux.org.uk>,
-	<christophe.jaillet@wanadoo.fr>, <rosenp@gmail.com>,
-	<steen.hegelund@microchip.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v2] phy: mscc: Fix PTP for vsc8574 and VSC8572
-Message-ID: <20250922123301.y7qjguatajhci67o@DEN-DL-M31836.microchip.com>
-References: <20250917113316.3973777-1-horatiu.vultur@microchip.com>
- <20250918160942.3dc54e9a@kernel.org>
- <20250922121524.3baplkjgw2xnwizr@skbuf>
+	s=arc-20240116; t=1758544459; c=relaxed/simple;
+	bh=vbd/dIVFJeMuDWZGTwJ4IGGTJIynPy2T9UsNctLcg+8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BXNuWVBx6HmdYzIMCbRrnk6uvyFrKiiARsGSOQ7p97bs2bncMABRs6uX/jaS0SVpWorgPH7RKBG9xWFsQ73eEYXixcGdhMy5XtYQE9XF8w8vkGlrIz2yEe7bw9hDrWFTPqMr5HNDQc5iF1vOy7NiVuTyoujeE7lyIjdI9xztO9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nkq+RnKT; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-77e87003967so1386876b3a.1
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 05:34:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758544458; x=1759149258; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=V7N/A/nDdO81iETqklo4zlY9UTRGuYMbbXYZaKO6LOQ=;
+        b=nkq+RnKTOX1QmxxtADvxvCnTCHZgGC3811KoxN9P+SI4O3VqEoFXndehbJLEysxtsW
+         0sRGXlCprFdcJNLLqZb2vDlw9S7q6SJcrBMugM+oCINdELZYG/yUYG5KZ2hY4h2JniVL
+         ZLloidt+MuZI4y9xHQkiNG+kl+RshIS8MMORc+ZWMzW1JaQW0WrEDlfUgB3p4O+zhwjZ
+         0i6GMnwUwRW39of/TGxzNa7y8SmqQq/zvc2jdQ21Y/VDFdHxXOLYgVTWRpRQzVtC7/91
+         pgXkukd9RtKJcHRiI53qnTmig13KuKBRlx50gTcWh+dgDI7P2rfqRDgS0R+k2li+yjS6
+         56Zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758544458; x=1759149258;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V7N/A/nDdO81iETqklo4zlY9UTRGuYMbbXYZaKO6LOQ=;
+        b=i7OtwxGxK4RWbaF6uWeX+hk8aII7cyxDwgth+wuCk7LtjZJMVRkhvP1jpTpzuAheYJ
+         vIdv+U+YYn31q9UMXokuzEqpZTDBr1BifdhTKknU4PeXSlQAZv+wyX4stRgWqtM//TGd
+         4hjNIDKZTFBkhW0LbKASqK8pOtNZdsBozgveK20GaBjut7eyp1NF3hIMqtrBXXnPSTRn
+         BgMq3BItt0liZ4D/9DWdxwrBqQpXbrTCmc3YUcjCi+iMhZXgLo6m/IwFYGl2wu1BHrh8
+         wvBM7KJSeCfqmpdLLg9+bze/z5ij0OCoArhdM6cM3fwERn3+1IaRmjlC1JZbnskr8Ukq
+         H/Pw==
+X-Forwarded-Encrypted: i=1; AJvYcCVp3UbJ5UMQo78hZzQp8t3tB+rdmRef1klcYvg9DWZgsa9WHevH0Wwzua5U0Nvj+wbjWqG/DFk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXQhmz6UJ5E3MTV4coq4dbGc5r0thzBTx6qVEOdUmQIGe1wBJJ
+	0E0Nq3xQAcq/DuiU+otGadeltoKogA+YT3g4v8lLxYsvBn5x6Mz5ykXc
+X-Gm-Gg: ASbGncueS6BIasCX9r4nIybBaHffIZJEqAOvf9QlPTQA0+krVSMLRIZPInGGtnHvnS2
+	g2/FGrwuok2I5XzLw1lxtAZlvMQxbohMohNJGd5wlZvwij6wUssQFqcgKULTkspckEH13n1HjN8
+	q+UMVauELb/ItV26MqjGgVLLTA0BOQuJ9erW2ArMrAgpgQpLUtnj0EDW9/x5WIprJhU1MsyfvTA
+	X0vRAjpnKbQwfH9kjw+t8R9jjW6UBxwN6UPJWLDzeU/AOhlqKVkqnLNfbH+2BNuz0+e2PgToxVk
+	xre6N6FQZyHg/5f38mo0hZKLT1fMXn/OZJS39X/1EqWGplQJqXCYl+VuK/7IIVdzdANKp+bJH+G
+	gZUch0fPyjC4KJkm0/H/ITA==
+X-Google-Smtp-Source: AGHT+IHdWuuU//PjNYXcYLakegZtFFcQb6zpKh1LJyLgmx6iYUCqAqcadaDUiwNWxci1/ojb7D6lFg==
+X-Received: by 2002:a05:6a00:3c91:b0:776:1f45:9044 with SMTP id d2e1a72fcca58-77e49f0742fmr14342835b3a.0.1758544457581;
+        Mon, 22 Sep 2025 05:34:17 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77f363ed5a0sm3251366b3a.41.2025.09.22.05.34.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Sep 2025 05:34:16 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 606834220596; Mon, 22 Sep 2025 19:34:13 +0700 (WIB)
+Date: Mon, 22 Sep 2025 19:34:13 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.og>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux AFS <linux-afs@lists.infradead.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: Re: [PATCH net-next] Documentation: rxrpc: Demote three sections
+Message-ID: <aNFCRVGajxlZjjxa@archie.me>
+References: <20250922100253.39130-1-bagasdotme@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250922121524.3baplkjgw2xnwizr@skbuf>
+In-Reply-To: <20250922100253.39130-1-bagasdotme@gmail.com>
 
-The 09/22/2025 15:15, Vladimir Oltean wrote:
+On Mon, Sep 22, 2025 at 05:02:53PM +0700, Bagas Sanjaya wrote:
+> Three sections ("Socket Options", "Security", and "Example Client Usage")
+> use title headings, which increase number of entries in the networking
+> docs toctree by three, and also make the rest of sections headed under
+> "Example Client Usage".
+> 
+> Demote these sections back to section headings.
 
-Hi,
+Oops, I misspelled LKML address. I'll resend shortly.
 
-> 
-> On Thu, Sep 18, 2025 at 04:09:42PM -0700, Jakub Kicinski wrote:
-> > On Wed, 17 Sep 2025 13:33:16 +0200 Horatiu Vultur wrote:
-> > > When trying to enable PTP on vsc8574 and vsc8572 it is not working even
-> > > if the function vsc8584_ptp_init it says that it has support for PHY
-> > > timestamping. It is not working because there is no PTP device.
-> > > So, to fix this make sure to create a PTP device also for this PHYs as
-> > > they have the same PTP IP as the other vsc PHYs.
-> >
-> > May be useful to proof read your commit message, or run it thru
-> > a grammar checker. Copy & paste into a Google Doc would be enough..
-> 
-> I agree, and I did not understand the problem from the commit message.
-> 
-> I would suggest something like below (maybe not identical).
-> 
-> The PTP initialization is two-step: first we have vsc8584_ptp_probe_once() /
-> vsc8584_ptp_probe() at probe() time, then we have vsc8584_ptp_init() at
-> config_init() time.
-> 
-> For VSC8574 and VSC8572, the PTP initialization is incomplete. We are
-> making the second step without having previously made the first one.
-> This means, for example, that ptp_clock_register() is never called.
-> 
-> Nothing crashes as a result of this, but it is unexpected that some PHY
-> generations have PTP functionality exposed by the driver and some do
-> not, even though they share the same PTP clock IP.
-
-I agree, I need to be more carefull and more clear in the commit
-messages. Thanks for the great example.
-
-> 
-> > Regarding the patch the new function looks like a spitting image
-> > of vsc8584_probe(), minus the revision check.
-> > --
-> > pw-bot: cr
-> 
-> Also, even without this patch, vsc8574_probe() and vsc8584_probe() are
-> structurally very similar and could use some consolidation.
-> 
-> Would it make sense to create a static int vsc8531_probe_common(struct
-> phy_device *phydev, bool ptp) and call it from multiple wrappers? The
-> VSC8584_REVB check can go in the vsc8584_probe() wrapper. The "size_t
-> priv_size" argument of devm_phy_package_join() can be set based on the
-> "bool ptp" argument, because struct vsc85xx_shared_private is used only
-> in PTP code.
-> 
-> You can make a preparatory change in 'net' patch sets, even without
-> a Fixes: tag, if you clearly explain what it's for.
-
-Thanks for the advice.
-What about to make the PHY_ID_VSC8572 and PHY_ID_VSC8574 to use
-vsc8584_probe() and then in this function just have this check:
-
----
-if ((phydev->phy_id & 0xfffffff0) != PHY_ID_VSC8572 &&
-    (phydev->phy_id & 0xfffffff0) != PHY_ID_VSC8574) {
-	if ((phydev->phy_id & MSCC_DEV_REV_MASK) != VSC8584_REVB) {
-		dev_err(&phydev->mdio.dev, "Only VSC8584 revB is supported.\n");
-		return -ENOTSUPP;
-	}
-}
----
-
+Thanks.
 
 -- 
-/Horatiu
+pw-bot: changes-requested
 
