@@ -1,150 +1,145 @@
-Return-Path: <netdev+bounces-225323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BCA0B92333
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 18:20:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 891BCB92363
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 18:24:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1848A1896FE3
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 16:21:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BD1D16BFF0
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 16:24:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BF02D94B3;
-	Mon, 22 Sep 2025 16:20:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85C583112B6;
+	Mon, 22 Sep 2025 16:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KdLt3BPy"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="mKOzgg0V"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1076930DD37;
-	Mon, 22 Sep 2025 16:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057F21400E;
+	Mon, 22 Sep 2025 16:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758558033; cv=none; b=L6v27tSTgsYAozCGtXnZq9fxOXXJ6K8Nz3fxI0SHSxqcfhAjA+hXW+vDXt9fmd4sIIw8sjwgKfDOGldjkHe5wtvnVq2GsAKsIswI2IKw5H2ad4g88wLysKwVeGTWRpoelEIk9GYNnCqkXP9FkZP/xjtIgdPhE9xKzvWmA0WYz/w=
+	t=1758558245; cv=none; b=muboZtqPwdgfQXaXpzwXcM5F6iiMb3q32WP4fbOjzCGtIPC7Sb+VcnTfMRvHFaBZT1ja4hWNPmaQnyxRBwQe4zlX51zF7Ia+CRSwgTpYhCTwwgd6UQQaEfdUg+/Ql6qP+mEvS7zhD55Cy6EkIya8ZvHlaQk2o6//4AKUmyT+A3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758558033; c=relaxed/simple;
-	bh=Be4GevQkmF/nFmdQN6+ONfubwu/F5kbrYP4ewlUZlXg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YHUoIfapOnyX8QKcyUScrTbbjR73UgkkBi9ItODpibURoe6FeK96z+I6XO129tt+GCkmWM/MUY2qxaalEYGXExW91fKV98lTSkc9eb8DGnPlR13CJq/dfSzfUFjMN7odSbsgp0Swq0Hu4t8VUwiXVl/cp0SfT/HRcPRRbOgWgbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KdLt3BPy; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 3DF8F1A0F08;
-	Mon, 22 Sep 2025 16:20:29 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 111CE60635;
-	Mon, 22 Sep 2025 16:20:29 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 66EEE102F193E;
-	Mon, 22 Sep 2025 18:20:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1758558027; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=u/5Oa4oSVwwK58CYuiN5FtTp13SFKt17H/vR6qsflCQ=;
-	b=KdLt3BPy4PPPNqmCpLPibifuqjV5FPeD0cBX2voEwmizA1QmtL20rgI0pk8JotVuVlC9ip
-	Ov53SUeg1HnoEY4Zp1pKqGWgFGCv5UxLS0rxM8x2UWxBtnslr+GvHYBkih5UMcWzlN6wbD
-	4vC3qpwJYPg95RR1lFzM07GJHyDt9tggZV+sIpglXNoN8SVO0/pvskRiq1utZ9EGAWFmeD
-	KOfBKRP/eh2KL6LfojppLod1KjszwKsEZYLRcdVuYtAVy2V5PWeDmbiBwK+exRRhQxuVwe
-	voRsEmabOC9vWIVqJUGKNgfFpiNd+llXGcqklnQju+nakoNXPz736re0eUmx1Q==
-Date: Mon, 22 Sep 2025 18:20:02 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
- <jiri@resnulli.us>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>,
- kernel@pengutronix.de, Dent Project <dentproject@linuxfoundation.org>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, linux-doc@vger.kernel.org, Kyle Swenson
- <kyle.swenson@est.tech>, Luka Perkov <luka.perkov@sartura.hr>, Robert Marko
- <robert.marko@sartura.hr>, Sridhar Rao <srao@linuxfoundation.org>
-Subject: Re: [PATCH net-next v3 0/5] net: pse-pd: pd692x0: Add permanent
- configuration management support
-Message-ID: <20250922182002.6948586f@kmaincent-XPS-13-7390>
-In-Reply-To: <20250917141912.314ea89b@kernel.org>
-References: <20250915-feature_poe_permanent_conf-v3-0-78871151088b@bootlin.com>
-	<20250916165440.3d4e498a@kernel.org>
-	<20250917114655.6ed579eb@kmaincent-XPS-13-7390>
-	<20250917141912.314ea89b@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1758558245; c=relaxed/simple;
+	bh=iPuBC0q/YbK0jU2JihzOnmtN3XlxacmqRGdAA3IcZBA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JrAavslQkm3IlaMs8/iacu5bxX17GLr3fgEot9pWD9J0lR64s6G8KSVwiaYE/zozR0Ew7iyPc7OYJNdVmlpfeKwzf3bphhmPMUag1x2rAUWIdhMm4K/JkJnaXXi4NnYvTZCzw6B7qf92A9dPn/JXXmv+IDI0iui6vzVHMbdXhC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=mKOzgg0V; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=SKJ7Xy/NbPPg1Hxlk+H+BKoiWUOuu5iLIMeaGY4D96M=; b=mKOzgg0Vfe8gTsyD0pCchqxXED
+	rueoohbNLgi0lUghGyTEXhuNE8YlnzH8o6iKQzTZYNKkibyfMVsAuy1cU6H8qWvksOr0Jli0yR/MC
+	8zHrTRakEVXHHYrjUqxFa6I+ILtmhuPlohRekiL6TxCdrMZYqNlM4OMJoqzfkot+RAbmQ58GRPyGP
+	2N05Eh3vdmswjyksJ1g/EUSp/MxOCPEBrq4uvVrIdpTB8+lhLMC57Ht2NjMvZ/CH+OlakPoQcTPBL
+	AE4VM1xl9KC3Rp/cot72t9vnur5xR+3Z00Nk/V3ZS7j5qrpfw1LeHim8OB3eB37KG1V2rY3aaQtSU
+	9+K4RlOQ==;
+Received: from sslproxy01.your-server.de ([78.46.139.224])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1v0jKM-000F4M-1I;
+	Mon, 22 Sep 2025 18:23:46 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1v0jKK-000I50-2o;
+	Mon, 22 Sep 2025 18:23:45 +0200
+Message-ID: <0984a479-9615-4580-86fb-d173252908d5@iogearbox.net>
+Date: Mon, 22 Sep 2025 18:23:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 18/20] netkit: Add io_uring zero-copy support for
+ TCP
+To: zf <zf15750701@gmail.com>, netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+ razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
+ john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
+ David Wei <dw@davidwei.uk>, yangzhenze@bytedance.com,
+ Dongdong Wang <wangdongdong.6@bytedance.com>
+References: <20250919213153.103606-1-daniel@iogearbox.net>
+ <20250919213153.103606-19-daniel@iogearbox.net>
+ <e9c6903c-e440-46b3-860e-8782bfe4efb2@gmail.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <e9c6903c-e440-46b3-860e-8782bfe4efb2@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.0.9/27770/Mon Sep 22 10:26:19 2025)
 
-Hello Jakub,
-
-On Wed, 17 Sep 2025 14:19:12 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
-
-> On Wed, 17 Sep 2025 11:46:55 +0200 Kory Maincent wrote:
-> > > On Mon, 15 Sep 2025 19:06:25 +0200 Kory Maincent wrote:   =20
->  [...] =20
-> > >=20
-> > > I'm still unclear on the technical justification for this.
-> > > "There's a tool in another project which does it this way"
-> > > is not usually sufficient upstream. For better or worse we
-> > > like to re-implement things from first principles.
-> > >=20
-> > > Could you succinctly explain why "saving config" can't be implemented
-> > > by some user space dumping out ethtool configuration, saving it under
-> > > /etc, and using that config after reboot. A'la iptables-save /
-> > > iptables-restore?   =20
-> >=20
-> > I think the only reason to save the config in the NVM instead of the
-> > userspace is to improve boot time. As Oleksij described: =20
-> > > I can confirm a field case from industrial/medical gear. Closed syste=
-m,
-> > > several modules on SPE, PoDL for power. Requirement: power the PDs as
-> > > early as possible, even before Linux. The box boots faster if power-up
-> > > and Linux init run in parallel. In this setup the power-on state is
-> > > pre-designed by the product team and should not be changed by Linux at
-> > > runtime.   =20
-> >=20
-> > He told me that he also had added support for switches in Barebox for t=
-he
-> > same reason, the boot time. I don't know if it is a reasonable reason to
-> > add it in Linux. =20
->=20
-> Right, subjectively I focused on the last sentence of Oleksij's reply.
-> I vote we leave it out for now.
-
-I would like to restart the discussion as I have one more argument besides =
-the
-boot time optimization coming from Luka Perkov in CC.
-
-According to him, not having this feature supported also brings an issue ac=
-ross
-reboot:
-"When a network switch reboots, any devices receiving Power over
-Ethernet (PoE) from that switch will lose power unless the PoE
-configuration is persisted across the reboot cycle. This creates a
-significant operational impact: WiFi access points and other
-PoE-powered devices will experience an unplanned hard power loss,
-forcing them offline without any opportunity for graceful shutdown.
-
-The critical issue is not the impact on the switch itself, but rather
-the cascading effect on all dependent infrastructure. Without
-kernel-level persistence of PoE settings, a simple switch reboot
-(whether for maintenance, updates, or recovery) forces all connected
-PoE devices into an abrupt power cycle. This results in extended
-downtime as these devices must complete their full boot sequence once
-power is restored, rather than remaining operational throughout the
-switch's reboot process."
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+On 9/22/25 5:17 AM, zf wrote:
+> 在 2025/9/20 05:31, Daniel Borkmann 写道:
+[...]
+>> Remote io_uring client:
+>>
+>>    # ./iou-zcrx -c -h 1.2.3.4 -p 5000 -l 12840 -z 65536
+>>
+>> We have tested the above against a dual-port Nvidia ConnectX-6 (mlx5)
+>> 100G NIC as well as Broadcom BCM957504 (bnxt_en) 100G NIC, both
+>> supporting TCP header/data split. For Cilium, the plan is to open
+>> up support for io_uring in zero-copy mode for regular Kubernetes Pods
+>> when Cilium is configured with netkit datapath mode.
+> 
+>  From what we have learned, mlx supports TCP header/data split starting from CX7, relying on the hw rx gro. I would like to ask, can CX6 use TCP header/data split? Can you share your CX6's mlx driver information and FW information? I will test it. If CX6 can support, this one is even better for me. Thanks.
+I'll double check with David, but this is a typo here and needs to say CX7,
+the af-xdp work was done on CX6. So we'll correct in v2, thanks (& sorry for
+the confusion)!
 
