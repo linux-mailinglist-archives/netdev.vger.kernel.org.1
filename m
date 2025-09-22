@@ -1,264 +1,119 @@
-Return-Path: <netdev+bounces-225405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A873B9375E
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 00:18:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3924CB9378B
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 00:20:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B41A2E1075
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 22:18:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC0A13BD97D
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 22:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 247EA31D379;
-	Mon, 22 Sep 2025 22:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F9BE314B66;
+	Mon, 22 Sep 2025 22:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="E/J15dFW"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cpUd4xVH"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f226.google.com (mail-yb1-f226.google.com [209.85.219.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81C028725A;
-	Mon, 22 Sep 2025 22:17:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D6B12F7ACA
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 22:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758579433; cv=none; b=j1kqb5+COdeUliU6+DtZ5FG0uB/+akI1goC1mahu504zR+c1Vvavxoia/7JFRszeDACK8zL0nk9CVmmHPkSGJiJ9M5K7unQtaMmbrX7va9XzIdVrlaSAg3C4z0smgV4qzSVmgxaxCcrYclj1e6JFhkvscWyj5ojo7TppU4FpjAY=
+	t=1758579483; cv=none; b=AZ8dyVKsxC7bAw8XRu2o7GcFqji2nO7S59eHYg2sce6OCXkjing9oyVBRy5Usq2TShuStvuDNHyLl0wUOQvJAWnwCG5E9O3HEXp5ck9pEpGQTgRAYZF8eyfYV2tVo8i8sdaPsvd/wxLuEZC6mF8jevA1dTbnhD12w1SDO88Yiu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758579433; c=relaxed/simple;
-	bh=aRqxQBtjU6+rvyZVBu/BLGv3XNOiqN63EK6zK9acjS0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rBaQix8ihIQArSdvYqui2BJx16TQ/WZZ2xsH0UsW0td4Ks9wVLfGsnDpzr7YUBM1AyoHz5b1mN/hlUBbSb0dpavRFYqZBAJjY9dbSLcezmo5GqOhPoK7AaiX925+fChUCWLbKZhrYkTCSvhk2O2Z00Pzd10hZZ+es+0gtbOBiFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=E/J15dFW; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from simon-Latitude-5450.fritz.box (p5dc88066.dip0.t-ipconnect.de [93.200.128.102])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 58MMH4en003919
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 23 Sep 2025 00:17:07 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1758579428;
-	bh=aRqxQBtjU6+rvyZVBu/BLGv3XNOiqN63EK6zK9acjS0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=E/J15dFWROga6n6cRlsCwaio02tipl9T9AO72hyiym+6rD/r5r/8GSfOgNGuW6ELT
-	 AgKtZOskiEA60dIKWuJbLWQXKLmxDoNWzYZOd/g7pOb4z5qAMm6KzJez933H95/Omu
-	 lB6pA6lnN4xHhrHLuz5BiOhVFHhflQYpehDH8c/A=
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-To: willemdebruijn.kernel@gmail.com, jasowang@redhat.com, mst@redhat.com,
-        eperezma@redhat.com, stephen@networkplumber.org, leiyang@redhat.com,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux.dev, kvm@vger.kernel.org
-Cc: Simon Schippers <simon.schippers@tu-dortmund.de>,
-        Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Subject: [PATCH net-next v5 8/8] vhost_net: Replace rx_ring with calls of TUN/TAP wrappers
-Date: Tue, 23 Sep 2025 00:15:53 +0200
-Message-ID: <20250922221553.47802-9-simon.schippers@tu-dortmund.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
-References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+	s=arc-20240116; t=1758579483; c=relaxed/simple;
+	bh=nIxPcTWKpYFMQ0DKFJV1uZUhaHCYkbbN3+FEmJpwJVY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r4mQa5K/Q7/hRlMyv366LjM9Rp3deTvUI5qFCGI8C74GNiqLbb7rIzkpPgODLqPuT86qbLbsyoHmrDPSTosWMf7HLcfskcaoH/H5bDiQUN7Ogku0AWLOquEuV4+81Q63yk+qgrCXnarEICX7Ffmh7A5/M0OLYVoFbyIEudAKjDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cpUd4xVH; arc=none smtp.client-ip=209.85.219.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-yb1-f226.google.com with SMTP id 3f1490d57ef6-ea63e86b79aso3673862276.2
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 15:18:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758579480; x=1759184280;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nIxPcTWKpYFMQ0DKFJV1uZUhaHCYkbbN3+FEmJpwJVY=;
+        b=bkRpZyK8ocGoz6EMJPnkCY55T/2UDY5ij5eKMNtkiuhDyWuNrXW9zloIXa5ogZPyq5
+         vhCFJj1ttxP24/gnXw61PCw67grTpgBCf4k0WDzymACVSNvAcPrDfcqvgRFa8N2puhcE
+         6qoEKJLu98/vslCJyAZG/ffDjEUmkgG8XbSAbYJ1wVN1mOFpoOLASfc9Oxa0LKt3ICxa
+         0xv0qtP+jLaOtrBt5cUwF0YrRuUpA1mARWkQtCiI900/TtuSXhgXERx36dfjDe4NACFP
+         1VbLSTuPsO8BroYm19m7v4yPHH4B1zAqnlHxBzMG/KTajTRJQltjnEPOjNKcmajweMFC
+         s+Ow==
+X-Forwarded-Encrypted: i=1; AJvYcCXQ4fiEM5VZdRnae63SgcZmsRSyJvFGMxgagd5N4+OU6/9k8SZS/V6nb6DhhxBKqvnYobKLeig=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwlWvblaY7P466fJRlsPusuRa46rUOydM5+vDGsqYug9/PH7tA
+	NRXUvorRD35mr3fFFjdLelGQnFUWXYma/xeIBgXeVDA87fMKLC/5LrAWE7Pj4AJMuFCdaldPET6
+	9/HYhDYp9GgnLF8YuVsZU2IFTHSCLTQbkRq9hIm/Ex6nCZMdv1UZA6WMvEiHEaVcweOSraklDs7
+	yMNK5aFBtkZxmaoGxtI0E7ZRVO8GSEAIpBO56HpuKYSO79RHvgeLO5L72tV5U19besxAjZCxjS4
+	nREl5w3jG8=
+X-Gm-Gg: ASbGncu3Ubl+HHk4WEjn0gysYe0XZJzO024EOW+JN69MXj4dzTj1cE1VnXPBBHlKtA9
+	+A2H3v5GcfP0Zh/BTpERb8WhGcrcV1RLBDbdsgSKiLkWVsePO0S2rD7udiBu02zpZ9fywQ9WTr1
+	s6L2V7Y1n1zJnQbAlwEJnJmcR8yUwf/2NuIe9WXsYW7vB46F0q077qWtArsQ6XwQiPTgg/qALu8
+	THuB77e8IUxZoxwojI5dl/rnnhhFdLzZFvdix4W2lBbfNpAjk0fBfehOipXfkEVygizJkUCSibD
+	AyOMByCdyib+6qYXh9ZkQXGy3ZbD7/gjXei9cvIKfQe3Fi3sMoDxnV8hjYofCHWeAKmJ7AejUoA
+	tz+NqNMtIAmX3rheoDzNAz1cot/fCqhhNr9I7AeuEuKbUq3BZMzeCliBoPM8pdEs3qCXbIWmUx6
+	ZskA==
+X-Google-Smtp-Source: AGHT+IHZ3ZHAH8JEORetromlhX4SIbV6ZO0t5q1PdKFMV/+P+o60kPnG07SodTZgauyMMrvelUv+nNEN3Wcz
+X-Received: by 2002:a05:6902:18d4:b0:eb0:2379:5416 with SMTP id 3f1490d57ef6-eb32e4421d2mr545795276.12.1758579480132;
+        Mon, 22 Sep 2025 15:18:00 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-121.dlp.protect.broadcom.com. [144.49.247.121])
+        by smtp-relay.gmail.com with ESMTPS id 3f1490d57ef6-ea5ce864154sm599758276.19.2025.09.22.15.17.59
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 22 Sep 2025 15:18:00 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b28ae2e8ad9so179021266b.0
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 15:17:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1758579478; x=1759184278; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nIxPcTWKpYFMQ0DKFJV1uZUhaHCYkbbN3+FEmJpwJVY=;
+        b=cpUd4xVHqDk1OQqRGLHz6TzuuZFdCMDQ/W2S5u5dzymRUEfHjG6OdoLfQNfbRsL/ow
+         AW3pJ6sNQgKy+ig6h5uZkJ6R7QJLrhm/HOlT4l1mrxiX6pciv4hWLe4YFFmuQ7AhEA+6
+         FKQ3US2EV1UTzkykRaBcyP3B/yYqi7nL6nyMA=
+X-Forwarded-Encrypted: i=1; AJvYcCVbhgCYWEbLe70uh4jmJIgOpzaNYTjzk3S1z1PB693wIIXH+lKSGEZn972wxAzjcLYk4/HBvPU=@vger.kernel.org
+X-Received: by 2002:a17:907:1c10:b0:b17:ec4a:4f2f with SMTP id a640c23a62f3a-b302832a11emr23161066b.27.1758579478530;
+        Mon, 22 Sep 2025 15:17:58 -0700 (PDT)
+X-Received: by 2002:a17:907:1c10:b0:b17:ec4a:4f2f with SMTP id
+ a640c23a62f3a-b302832a11emr23159066b.27.1758579478204; Mon, 22 Sep 2025
+ 15:17:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250922165118.10057-1-vadim.fedorenko@linux.dev> <20250922165118.10057-3-vadim.fedorenko@linux.dev>
+In-Reply-To: <20250922165118.10057-3-vadim.fedorenko@linux.dev>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Mon, 22 Sep 2025 15:17:47 -0700
+X-Gm-Features: AS18NWBwoY3nZK5IVkqdDHZdTHN6e9YYz3W5Nh8dY4PG-rItMg3EnRakIzFCeG4
+Message-ID: <CACKFLik_Ti6msHDfstakA+j4xBX7gC4BwaT-MfxYXdKQx67K+g@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/4] bnxt_en: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-Instead of the rx_ring, the virtqueue saves the interface type TUN, TAP
-(or IF_NONE) to call TUN/TAP wrappers.
+On Mon, Sep 22, 2025 at 10:00=E2=80=AFAM Vadim Fedorenko
+<vadim.fedorenko@linux.dev> wrote:
+>
+> Convert bnxt dirver to use new timestamping configuration API.
+>
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
-Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
----
- drivers/vhost/net.c | 90 +++++++++++++++++++++++++++++----------------
- 1 file changed, 58 insertions(+), 32 deletions(-)
-
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index c6508fe0d5c8..6be17b53cc6c 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -127,10 +127,10 @@ struct vhost_net_virtqueue {
- 	/* Reference counting for outstanding ubufs.
- 	 * Protected by vq mutex. Writers must also take device mutex. */
- 	struct vhost_net_ubuf_ref *ubufs;
--	struct ptr_ring *rx_ring;
- 	struct vhost_net_buf rxq;
- 	/* Batched XDP buffs */
- 	struct xdp_buff *xdp;
-+	enum if_type {IF_NONE = 0, TUN, TAP} type;
- };
- 
- struct vhost_net {
-@@ -176,24 +176,54 @@ static void *vhost_net_buf_consume(struct vhost_net_buf *rxq)
- 	return ret;
- }
- 
--static int vhost_net_buf_produce(struct vhost_net_virtqueue *nvq)
-+static int vhost_net_buf_produce(struct vhost_net_virtqueue *nvq,
-+		struct sock *sk)
- {
-+	struct file *file = sk->sk_socket->file;
- 	struct vhost_net_buf *rxq = &nvq->rxq;
- 
- 	rxq->head = 0;
--	rxq->tail = ptr_ring_consume_batched(nvq->rx_ring, rxq->queue,
--					      VHOST_NET_BATCH);
-+
-+	switch (nvq->type) {
-+	case TUN:
-+		rxq->tail = tun_ring_consume_batched(file,
-+				rxq->queue, VHOST_NET_BATCH);
-+		break;
-+	case TAP:
-+		rxq->tail = tap_ring_consume_batched(file,
-+				rxq->queue, VHOST_NET_BATCH);
-+		break;
-+	case IF_NONE:
-+		WARN_ON_ONCE();
-+	}
-+
- 	return rxq->tail;
- }
- 
--static void vhost_net_buf_unproduce(struct vhost_net_virtqueue *nvq)
-+static void vhost_net_buf_unproduce(struct vhost_net_virtqueue *nvq,
-+				struct socket *sk)
- {
- 	struct vhost_net_buf *rxq = &nvq->rxq;
--
--	if (nvq->rx_ring && !vhost_net_buf_is_empty(rxq)) {
--		ptr_ring_unconsume(nvq->rx_ring, rxq->queue + rxq->head,
--				   vhost_net_buf_get_size(rxq),
--				   tun_ptr_free);
-+	struct file *file;
-+
-+	if (sk && !vhost_net_buf_is_empty(rxq)) {
-+		file = sk->file;
-+		switch (nvq->type) {
-+		case TUN:
-+			tun_ring_unconsume(file,
-+					   rxq->queue + rxq->head,
-+					   vhost_net_buf_get_size(rxq),
-+					   tun_ptr_free);
-+			break;
-+		case TAP:
-+			tap_ring_unconsume(file,
-+					   rxq->queue + rxq->head,
-+					   vhost_net_buf_get_size(rxq),
-+					   tun_ptr_free);
-+			break;
-+		case IF_NONE:
-+			return;
-+		}
- 		rxq->head = rxq->tail = 0;
- 	}
- }
-@@ -209,14 +239,15 @@ static int vhost_net_buf_peek_len(void *ptr)
- 	return __skb_array_len_with_tag(ptr);
- }
- 
--static int vhost_net_buf_peek(struct vhost_net_virtqueue *nvq)
-+static int vhost_net_buf_peek(struct vhost_net_virtqueue *nvq,
-+							  struct sock *sk)
- {
- 	struct vhost_net_buf *rxq = &nvq->rxq;
- 
- 	if (!vhost_net_buf_is_empty(rxq))
- 		goto out;
- 
--	if (!vhost_net_buf_produce(nvq))
-+	if (!vhost_net_buf_produce(nvq, sk))
- 		return 0;
- 
- out:
-@@ -998,8 +1029,8 @@ static int peek_head_len(struct vhost_net_virtqueue *rvq, struct sock *sk)
- 	int len = 0;
- 	unsigned long flags;
- 
--	if (rvq->rx_ring)
--		return vhost_net_buf_peek(rvq);
-+	if (rvq->type)
-+		return vhost_net_buf_peek(rvq, sk);
- 
- 	spin_lock_irqsave(&sk->sk_receive_queue.lock, flags);
- 	head = skb_peek(&sk->sk_receive_queue);
-@@ -1207,7 +1238,7 @@ static void handle_rx(struct vhost_net *net)
- 			goto out;
- 		}
- 		busyloop_intr = false;
--		if (nvq->rx_ring)
-+		if (nvq->type)
- 			msg.msg_control = vhost_net_buf_consume(&nvq->rxq);
- 		/* On overrun, truncate and discard */
- 		if (unlikely(headcount > UIO_MAXIOV)) {
-@@ -1363,7 +1394,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
- 		n->vqs[i].batched_xdp = 0;
- 		n->vqs[i].vhost_hlen = 0;
- 		n->vqs[i].sock_hlen = 0;
--		n->vqs[i].rx_ring = NULL;
-+		n->vqs[i].type = IF_NONE;
- 		vhost_net_buf_init(&n->vqs[i].rxq);
- 	}
- 	vhost_dev_init(dev, vqs, VHOST_NET_VQ_MAX,
-@@ -1393,8 +1424,8 @@ static struct socket *vhost_net_stop_vq(struct vhost_net *n,
- 	sock = vhost_vq_get_backend(vq);
- 	vhost_net_disable_vq(n, vq);
- 	vhost_vq_set_backend(vq, NULL);
--	vhost_net_buf_unproduce(nvq);
--	nvq->rx_ring = NULL;
-+	vhost_net_buf_unproduce(nvq, sock);
-+	nvq->type = IF_NONE;
- 	mutex_unlock(&vq->mutex);
- 	return sock;
- }
-@@ -1474,18 +1505,13 @@ static struct socket *get_raw_socket(int fd)
- 	return ERR_PTR(r);
- }
- 
--static struct ptr_ring *get_tap_ptr_ring(struct file *file)
-+static enum if_type get_if_type(struct file *file)
- {
--	struct ptr_ring *ring;
--	ring = tun_get_tx_ring(file);
--	if (!IS_ERR(ring))
--		goto out;
--	ring = tap_get_ptr_ring(file);
--	if (!IS_ERR(ring))
--		goto out;
--	ring = NULL;
--out:
--	return ring;
-+	if (is_tap_file(file))
-+		return TAP;
-+	if (is_tun_file(file))
-+		return TUN;
-+	return IF_NONE;
- }
- 
- static struct socket *get_tap_socket(int fd)
-@@ -1567,7 +1593,7 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
- 
- 		vhost_net_disable_vq(n, vq);
- 		vhost_vq_set_backend(vq, sock);
--		vhost_net_buf_unproduce(nvq);
-+		vhost_net_buf_unproduce(nvq, sock);
- 		r = vhost_vq_init_access(vq);
- 		if (r)
- 			goto err_used;
-@@ -1576,9 +1602,9 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
- 			goto err_used;
- 		if (index == VHOST_NET_VQ_RX) {
- 			if (sock)
--				nvq->rx_ring = get_tap_ptr_ring(sock->file);
-+				nvq->type = get_if_type(sock->file);
- 			else
--				nvq->rx_ring = NULL;
-+				nvq->type = IF_NONE;
- 		}
- 
- 		oldubufs = nvq->ubufs;
--- 
-2.43.0
-
+Thanks.
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
