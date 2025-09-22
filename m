@@ -1,133 +1,175 @@
-Return-Path: <netdev+bounces-225363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C05E0B92C68
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 21:28:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0166AB92D10
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 21:33:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D019C1903DB8
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 19:29:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB8001906520
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 19:33:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A717531A556;
-	Mon, 22 Sep 2025 19:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54312DF714;
+	Mon, 22 Sep 2025 19:33:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AUQQxhfy"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="19wjZ0P3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1234B1DE3AC
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 19:28:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8FDC8E6;
+	Mon, 22 Sep 2025 19:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758569329; cv=none; b=D5H1LZ1RJB2SzoLAHzJTbG4TdDkdLDE97dtYBeC2ug8uvkcUEID1UsZaNG4Zw306TdNTHtLTI3F+TeNlfdildXsayrATv+XLQ9cSCJEa21irXRHfIuevDYuuc13ZPuPdVCS8RBipLWy84+vXtvVbGNWPD2TYztMoPOM44kN7gao=
+	t=1758569596; cv=none; b=OSowsJXo3idLWjieZmGm+XemvmR3WH8Mi8vTdwtOhxqKtE3ufu/wPezr7jc4A6Mc1AOX/k7gghc3edWKV2RQxWDyUr8y24nrgoSskZRVk9PdKBm4IOG5D74Q5ZF0t/qMMtsKJlSKbzZpL8e337gV1TgjLGjAlRWU9/QkVuGDs10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758569329; c=relaxed/simple;
-	bh=zSkwFxdawuhzp1rpRWhOyjFp/r0ht9I8B+KlJS0Nahs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=cYyL6F8Xs+3HayU9XjeyQTKdbzvKScG1Sj+O1pY3KvYoAtExSRj41zrc/0ssd09A7KvE/80WLYwvJukDXNwIQn9w6WNSLaHK5h/ntgRelxmUCXMPuw7UNYJQxRVltpxld7QaaJUxGJd0rE3mq3Of1dDQV4LAmeLIoxKbISdo6cE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AUQQxhfy; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-799572d92b0so38052646d6.3
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 12:28:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758569327; x=1759174127; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fxb0la0Xz6K3HZRfHiufAhiCg3Bf0VK65WFpq6/jGV4=;
-        b=AUQQxhfyEGIQJiv/zp4tpSpnjN9kcWbkpfMo46nL2wkEc1fFdwaay3HXYkNW11oKE2
-         cyDLHglZ1dgKvzmQh6i6JERPQPXCu34zPRv2r27PwruDVkK7T65gtSYnyjZfKZHqWtrv
-         F6P0WZ9OPSUTht2UOYIyr8WF0pkl2mPaCAxBwbtVMSrvCJ0LvjrPOC+1v6HJRt1PGw0i
-         eOMNOTn9XjnMwHO5DqnmmGcKmv61s3iZOTYPyNHV+NTq+2WkAc5kJJzaJfj7pf236nGx
-         YiOQ+WufyqiEswo+s0+NVc7t5RaBW0+MfDn7nQUrS8f5aRbEWrYv/eJejljOMYWLJG2B
-         iMyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758569327; x=1759174127;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fxb0la0Xz6K3HZRfHiufAhiCg3Bf0VK65WFpq6/jGV4=;
-        b=WpqB6DiMmPmtQ+XWL+Je7Oh6kdD34+dXUTMmKBHCwTMi72+Votaw/hRH2MrsHmKH0Q
-         jngFDMV5uBndjinBM5GJKrNhCZvR+dnZ6WXUcgYRJ/WeV2IPG/+SYR3z3zaEdR9bY+Gk
-         aNau5sa5O04fxYQLzxG8YIFIHGul0lwxlIzkKLE6uXxxrZaKlV4HNc6sLmzQq0L5aatQ
-         Gkx4+UFm91i8j4DRItF1haw3xS3QxTrKSpyyH/1y/HwIhAMc6M1qXS/K3TvLpZN4Lh4U
-         pAeWSpAbK27iO7Acl9nRwHJMfYxlqAbjsp8+zE87ReGeTQIGhe5+Ffip81oNoQJM5M/n
-         DRUA==
-X-Forwarded-Encrypted: i=1; AJvYcCXUcIL2IhKGQXVtIXZQvhdg7V5im2hDD8Xp7turb72GOkr7UtGGp8tiMJASMLAgKdeEppkBjj4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGa4nMQfppRVWg1pY3vthPFk3xZzDkjz0YVYj+DkuZGf8e7uyW
-	jYF11ht/4T+kb4WAxyOMBAatKoKA4yzCWjxkd8W2KjLcA31s26Nqu/KF
-X-Gm-Gg: ASbGncvKpnoTZOcAUUJhjOWEUzhpinLcmyKFKNOyGNLsxOvoQMbKeW797rZ7wwxRBn6
-	jTqsnJjjRrdsK3j8fHgAt9cpam0/6hoP9YCZZeOqbYSebksimM6KdjuY1CBmcy0110IRD8M5Vo9
-	/2uNsNlj1XtmkuXS3q2qxtBCfQBAszyLO2dkLYIorUtn6A9JS4lRdd7g5CEvDY+Se1DZIqWEuQw
-	4wKYajq1gW+EATQELAt7cDFpvfwwwE5vWRsTzl7VzMztz697jy+gxSmOPYQsaQm8WJUPHyhXiD7
-	uWELRXXAUUww9VK9BECL6Xdr2mg2HL3cF1fah6qH/yOYU7ZmfkWh3z1IAtaX3CSxSqMZUkAqBXN
-	TwlqRfIW+LQZcFijwjB2RKIg6oP9zAmuF5IP1iDlzdmC+lIY9NUnBXv60Zf0dZeOCU9ikYA==
-X-Google-Smtp-Source: AGHT+IEZ7ogsjwn/ejt4gpuz+nTAp6KlpElnbRIi//vPnug23cysGIqoyTYI3LYBuPZHPV+abeZSlw==
-X-Received: by 2002:ad4:5c6d:0:b0:783:cc80:1770 with SMTP id 6a1803df08f44-7e707658d4cmr902906d6.25.1758569326786;
-        Mon, 22 Sep 2025 12:28:46 -0700 (PDT)
-Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-793516d7c7dsm76243486d6.35.2025.09.22.12.28.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Sep 2025 12:28:46 -0700 (PDT)
-Date: Mon, 22 Sep 2025 15:28:45 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Richard Gobert <richardbgobert@gmail.com>, 
- netdev@vger.kernel.org, 
- pabeni@redhat.com, 
- ecree.xilinx@gmail.com, 
- willemdebruijn.kernel@gmail.com
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- horms@kernel.org, 
- corbet@lwn.net, 
- saeedm@nvidia.com, 
- tariqt@nvidia.com, 
- mbloch@nvidia.com, 
- leon@kernel.org, 
- dsahern@kernel.org, 
- ncardwell@google.com, 
- kuniyu@google.com, 
- shuah@kernel.org, 
- sdf@fomichev.me, 
- aleksander.lobakin@intel.com, 
- florian.fainelli@broadcom.com, 
- alexander.duyck@gmail.com, 
- linux-kernel@vger.kernel.org, 
- linux-net-drivers@amd.com, 
- Richard Gobert <richardbgobert@gmail.com>
-Message-ID: <willemdebruijn.kernel.259fe4b84bba8@gmail.com>
-In-Reply-To: <20250916144841.4884-3-richardbgobert@gmail.com>
-References: <20250916144841.4884-1-richardbgobert@gmail.com>
- <20250916144841.4884-3-richardbgobert@gmail.com>
-Subject: Re: [PATCH net-next v6 2/5] net: gro: only merge packets with
- incrementing or fixed outer ids
+	s=arc-20240116; t=1758569596; c=relaxed/simple;
+	bh=sfT+IJse1FrSPI1QrtOhgBawGx7fENamNyLEGl6DQCQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=W/5TjzfWY7tpa+111WVzKw1KYafN7ECGcIreVKRYu66yEpslT5qHWR0QwoQ2tM7YcpNZIfmstaEN331j5Y1hi6VLgNQQZ9yVCyYCJUcvr3fJ4fK1M8UQshHdhD8Ihl9x6h7GCjHxS3Gfpy65HKJNeO1fR1/IZUIG2DivDso4g9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=19wjZ0P3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E4CCC4CEF0;
+	Mon, 22 Sep 2025 19:33:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1758569596;
+	bh=sfT+IJse1FrSPI1QrtOhgBawGx7fENamNyLEGl6DQCQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=19wjZ0P3zj2FO9YarwEjb0Q51ScXiGZlJJLakxhYFNt7mrax7hxbZcwbeHjElOiK0
+	 XqIg7jqWZi3Mu/cS4Ar2pMEvHa2VTuBXCOS5vNlvkA7du0M2eXnUfHs2Woo5trFvdN
+	 rbcKQ7CCeiRQnJLz8ZdCx40ZLigpIPZryHTqr2Kk=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	David Howells <dhowells@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Matthew Wilcox <willy@infradead.org>,
+	linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.1 43/61] crypto: af_alg: Indent the loop in af_alg_sendmsg()
+Date: Mon, 22 Sep 2025 21:29:36 +0200
+Message-ID: <20250922192404.764714238@linuxfoundation.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20250922192403.524848428@linuxfoundation.org>
+References: <20250922192403.524848428@linuxfoundation.org>
+User-Agent: quilt/0.68
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Richard Gobert wrote:
-> Only merge encapsulated packets if their outer IDs are either
-> incrementing or fixed, just like for inner IDs and IDs of non-encapsulated
-> packets.
-> 
-> Add another ip_fixedid bit for a total of two bits: one for outer IDs (and
-> for unencapsulated packets) and one for inner IDs.
-> 
-> This commit preserves the current behavior of GSO where only the IDs of the
-> inner-most headers are restored correctly.
-> 
-> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+6.1-stable review patch.  If anyone has any objections, please let me know.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+------------------
+
+From: David Howells <dhowells@redhat.com>
+
+[ Upstream commit 73d7409cfdad7fd08a9203eb2912c1c77e527776 ]
+
+Put the loop in af_alg_sendmsg() into an if-statement to indent it to make
+the next patch easier to review as that will add another branch to handle
+MSG_SPLICE_PAGES to the if-statement.
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Herbert Xu <herbert@gondor.apana.org.au>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: linux-crypto@vger.kernel.org
+cc: netdev@vger.kernel.org
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Stable-dep-of: 9574b2330dbd ("crypto: af_alg - Set merge to zero early in af_alg_sendmsg")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ crypto/af_alg.c | 51 ++++++++++++++++++++++++++-----------------------
+ 1 file changed, 27 insertions(+), 24 deletions(-)
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index fef69d2a6b183..d5a8368a47c5c 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -927,35 +927,38 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 		if (sgl->cur)
+ 			sg_unmark_end(sg + sgl->cur - 1);
+ 
+-		do {
+-			struct page *pg;
+-			unsigned int i = sgl->cur;
++		if (1 /* TODO check MSG_SPLICE_PAGES */) {
++			do {
++				struct page *pg;
++				unsigned int i = sgl->cur;
+ 
+-			plen = min_t(size_t, len, PAGE_SIZE);
++				plen = min_t(size_t, len, PAGE_SIZE);
+ 
+-			pg = alloc_page(GFP_KERNEL);
+-			if (!pg) {
+-				err = -ENOMEM;
+-				goto unlock;
+-			}
++				pg = alloc_page(GFP_KERNEL);
++				if (!pg) {
++					err = -ENOMEM;
++					goto unlock;
++				}
+ 
+-			sg_assign_page(sg + i, pg);
++				sg_assign_page(sg + i, pg);
+ 
+-			err = memcpy_from_msg(page_address(sg_page(sg + i)),
+-					      msg, plen);
+-			if (err) {
+-				__free_page(sg_page(sg + i));
+-				sg_assign_page(sg + i, NULL);
+-				goto unlock;
+-			}
++				err = memcpy_from_msg(
++					page_address(sg_page(sg + i)),
++					msg, plen);
++				if (err) {
++					__free_page(sg_page(sg + i));
++					sg_assign_page(sg + i, NULL);
++					goto unlock;
++				}
+ 
+-			sg[i].length = plen;
+-			len -= plen;
+-			ctx->used += plen;
+-			copied += plen;
+-			size -= plen;
+-			sgl->cur++;
+-		} while (len && sgl->cur < MAX_SGL_ENTS);
++				sg[i].length = plen;
++				len -= plen;
++				ctx->used += plen;
++				copied += plen;
++				size -= plen;
++				sgl->cur++;
++			} while (len && sgl->cur < MAX_SGL_ENTS);
++		}
+ 
+ 		if (!size)
+ 			sg_mark_end(sg + sgl->cur - 1);
+-- 
+2.51.0
+
+
+
 
