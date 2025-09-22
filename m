@@ -1,384 +1,216 @@
-Return-Path: <netdev+bounces-225276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA3E7B91990
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 16:09:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 466E2B919CC
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 16:16:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6769D42496F
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 14:09:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE4FB168011
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 14:16:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E59501917FB;
-	Mon, 22 Sep 2025 14:09:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8971819E96D;
+	Mon, 22 Sep 2025 14:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KPtue6rG"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010006.outbound.protection.outlook.com [52.101.46.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B341A10F1
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 14:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758550174; cv=none; b=jD3fTekF9CobKOTJgoPSnk9Dpj0JW8EpFEaGuqdX7gVrih7DF4VlRvMCXtTBWDKgA+GKi9EhOwG1ZEqx7WSKrmzxyNKApxNsmjBK1PUFUkKgnvtW4BvBjGm0m7LgNecCBTCpLhRO9MyMuK0eSkREzBv6+CJhMN55zfcYU7d7y6A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758550174; c=relaxed/simple;
-	bh=CnkH8C1vDXop/61ZLqzDeMvXqRPhuO/3cOONbIQphKs=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=bLgrndcvwABGiAUSYBKvnijZAUCFDsx+zJr8GuHSIV3fNJre2nLKrfC5Y1jjg+fmCKXnfddAXjgh3ikLMA/2MuaAWMW7PvPSCLIgvChBUtrpntTnso+iQ4nuVZfMxRT6neamobiBF56x1xG8+xlkj/iqkVhcVV1jZST/cyYteko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 58ME9NOS079864;
-	Mon, 22 Sep 2025 23:09:24 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 58ME9DxM079809
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Mon, 22 Sep 2025 23:09:23 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <e50546d9-f86f-426b-9cd3-d56a368d56a8@I-love.SAKURA.ne.jp>
-Date: Mon, 22 Sep 2025 23:09:09 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF8A1A9FA4
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 14:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.6
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758550597; cv=fail; b=QIs0hvT7lM2EA0LkzpwcOG3JRZcZAfkVLKPMlhOdcUiXz/BwKL4RV9jfRCGm4zZoFvWHttXOsJtcDaDMp6cLMScwZ3zeB5eJbcZ3TOjBUEvqZ39KmtjLutPFJzT3JoT29kWCQO1WoNsp29fkV/2VKb46WaL6jDEOjzyJ5yW3oaY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758550597; c=relaxed/simple;
+	bh=BnzUkSgIUHsqkmCF1fNiz4QaIdZwBtVdt1+/wBhQokQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gNvTpkEEKkpzNYNcUNRX/dsSBu9cbv+OXSiUG00monVCqk8egVtG7jOx+WKq3FRGlh+BXMiso7QH9VccYH4NLzI/6OoDawnZf08cSJDsHfE/wYS0Cqu1MOXYUIYUsRZF7W8HHzjMUW19O1luQFN2WBo2LIHE8d+DKLWjojPBtF8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KPtue6rG; arc=fail smtp.client-ip=52.101.46.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=EX5IJMwIdd1wHvvcTCX/psUFRqUpXkLOSRSBgYA3VnqB0zjoeSx230iF512nWbi67OoLMB1FWnJpNbMUov72Kn8WtS7do3nwvKMXUd+F3BjtSZvY1lWzRsIYG7jEPN49KTFk48T1dxg9CzlkhUW2urtnq5p5P8FDTcemy+RN1tDNSm7rPirjEd8SJKoyq2DNy6foHHF3/h95GGlzF+ZeH/BK2fqhtYtHAJOQwOo3229snO8DmZvuhp7WW+9h+ey/kQ8KdiFOvtbPkmBk//iCngII9AOE2xZSAt7vWfq39BNAs5tRo6OSZfqAR+ScT3NhP1PBIwbcpGcp82nvOlI5GA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uTnw4EgjBCKHdGBXZFlPj8uFhIruG4EICb8+aO+hyeU=;
+ b=g/2bJ/GyDGq/yPigEvtDIFdoeZFg40JGFywGRu+VqPSYroVeYYuTN97Z2XP/cBovahUZj3QAfCIzX5r4jTcAi+BIFXSfGsgPxI+9Hto1MYB5Rs+e2q51mGmyizeVz6ApkxDz2PDt3MetgJrCNRS8/RB/HYhD+MFXAl0c7dKKG5RMfDTwuBex0ysphpb2AawJ7MKAvx+lhkDHJNtIDiyNAL/fAiXCW5y9yboW71w1E2LBb7RxVZqc4WMYGKyd37L7YrmboGN3zsozTK9SXRtUqcw9pLkvCEHQk++LsjUq5uClI1c79Nl62ZlKALqYy61LJSOKVo+lqPI6/4NLtP1U0w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uTnw4EgjBCKHdGBXZFlPj8uFhIruG4EICb8+aO+hyeU=;
+ b=KPtue6rG4ep0FXQlC/q2U0bwI0mqyPQaHiyR6ICGhoQnB8mpLaqfTBrb3ip5zlmZpBEukPUPUAjLkAMykPTRe7cNIx+sPQlwYDV2+YvGOp8ysRc8CX8LIxCsQ6DBI/HDp5vnqMV7v0/qPOBp2iMi20SmkBSAJKURXBSatp95s6/D7NlroE+coXBoNFGqnsd+vYfQe77GlD+51936qJw/eOQGPa7GfJbmsAObDv3sJCtk0oGUYwLTyIiD9vwY0HVLp39T6pTT45wdRTnTOdlW7lnDSINFSi0LXkbhZIQmeSGk6Rt2qCGRaiVGhZWL/Dc//FV4orEeV5Rq6nn56tqf9g==
+Received: from SJ0PR13CA0076.namprd13.prod.outlook.com (2603:10b6:a03:2c4::21)
+ by DM3PR12MB9390.namprd12.prod.outlook.com (2603:10b6:0:42::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.19; Mon, 22 Sep
+ 2025 14:16:30 +0000
+Received: from SJ5PEPF000001CD.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c4:cafe::a8) by SJ0PR13CA0076.outlook.office365.com
+ (2603:10b6:a03:2c4::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.20 via Frontend Transport; Mon,
+ 22 Sep 2025 14:16:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ5PEPF000001CD.mail.protection.outlook.com (10.167.242.42) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9137.12 via Frontend Transport; Mon, 22 Sep 2025 14:16:29 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.34; Mon, 22 Sep
+ 2025 07:16:10 -0700
+Received: from fedora.docsis.vodafone.cz (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.34; Mon, 22 Sep 2025 07:16:05 -0700
+From: Petr Machata <petrm@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>, Nikolay Aleksandrov
+	<razor@blackwall.org>, <netdev@vger.kernel.org>
+CC: Simon Horman <horms@kernel.org>, Petr Machata <petrm@nvidia.com>,
+	<bridge@lists.linux-foundation.org>, <mlxsw@nvidia.com>
+Subject: [PATCH net-next 1/2] net: bridge: Install FDB for bridge MAC on VLAN 0
+Date: Mon, 22 Sep 2025 16:14:48 +0200
+Message-ID: <415202b2d1b9b0899479a502bbe2ba188678f192.1758550408.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Marek Lindner <marek.lindner@mailbox.org>,
-        Simon Wunderlich <sw@simonwunderlich.de>,
-        Antonio Quartulli <antonio@mandelbit.com>,
-        Sven Eckelmann <sven@narfation.org>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        b.a.t.m.a.n@lists.open-mesh.org,
-        Network Development <netdev@vger.kernel.org>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: unregister_netdevice: waiting for batadv_slave_0 to become free.
- Usage count = 2
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Anti-Virus-Server: fsav305.rs.sakura.ne.jp
-X-Virus-Status: clean
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CD:EE_|DM3PR12MB9390:EE_
+X-MS-Office365-Filtering-Correlation-Id: 96581c60-eb6c-4c46-6dee-08ddf9e29fe2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?7oSLf9OE1oKJRw3ufGJ6fo9eJBagCFrD4FsizH+M+ntYnKeFgqVOjsHKGzrg?=
+ =?us-ascii?Q?CsbnlgjhUtR5OhYaCMdTb5B+MCC1jdEc2nM+v78+wDM6ALDD8Kf+w3YpG3ki?=
+ =?us-ascii?Q?Mm+pWeG9OyTjTrD5QO1n/gPWvooRbxtkKk0ZWvVGDnqF//9T66pT72/TCpSp?=
+ =?us-ascii?Q?X5+8fVr+ubrlu7KNW8jFNb4PGk8qtpOQxSZYbZchWfS7qS3jTWwsLA/UG2JB?=
+ =?us-ascii?Q?PrwZic0yhb2XJSM7t7X0AxBkzK6FFFLBswE0qBD1h+XD3MD607/V6AJXMnps?=
+ =?us-ascii?Q?RzhCNQCFjBN/vxTl+o9Kb7uiePxF7ZOIcGmHAFKrpshElkgsz7nJUDRCFXFW?=
+ =?us-ascii?Q?eQ52NB6xSgsiGa9vgy9fOasuug9x4JKYn89mWLpXLPWN2r2ozhQf5+qsha3j?=
+ =?us-ascii?Q?hmR8NXU8VmW5L63wDk48h8WSCQCsN67BcI9Ao0ExxN40IrktIg73PDL1QmO0?=
+ =?us-ascii?Q?jFVxjTPxSvUS5GNG5bnUntjNLqg9OI5lbauwDvE1mt/qPuEy7genJtT5YTdB?=
+ =?us-ascii?Q?7iBKgYekml+9gxdvwqwye3Ol2NTgYacxK2u/qHqNOGAsocAxh7L2HAEOCCLU?=
+ =?us-ascii?Q?gZM+Rh+TsLS6oCrMJ7XZLKIHn/grN8f3aCvzXsrw4MCTgt0lJrN/RaxZGDUe?=
+ =?us-ascii?Q?Shc5dkAB8QZ5rc74nBbBnTH+CYE2fI5OEoMJaLYAgBhQheBc1mWR4cAcAWAh?=
+ =?us-ascii?Q?T5UmROioMX7ou0XSKTOLXeJMoCy/SGoQuG1trMaNpJXpzbXeggjo5BO583bf?=
+ =?us-ascii?Q?BoBpxj7iuqD4zR9O5uBQDQ/7uluHGToBk2Uz6rpBFSowfFk/Xu/snBzgroA5?=
+ =?us-ascii?Q?AdcuI6dRctA6XXHnrTs/iOyEQ00nQS7aSYR1rXCbueeGoacv3O/Zr7yaDdvq?=
+ =?us-ascii?Q?lYqj29d1ZuaVxbJWcvHMcdufStwGQlC2OU4w2Zi+zItZCgqXpf3LF1Q/KOoh?=
+ =?us-ascii?Q?e464W4kS1yfyumVdSyWQ9Amf7FEprb6ZpnmftEAbCoqVxLbaOI2NbR24kDrz?=
+ =?us-ascii?Q?G/TMJINFZUKRMLD9I5Og+Tw2/wRsKZKSNp0jvnGGnSfL7dFu7OPKMJDobPL2?=
+ =?us-ascii?Q?KBf1JNXQMU/FSRC3ODPnVY2UEYekkT4VRE1nisaeRFyaNLQYE8QUcxcBpUqg?=
+ =?us-ascii?Q?rTPTCGR6Mp2WeZLeCmOSQkMSVrIPIVdp6Rew4CXiGXHEKF2k9CJqnuJF4+ng?=
+ =?us-ascii?Q?U+BiM34opoxhuJvrHHRlsAxucIwvOzMcUBrjAU/nEOjMBr+mqNqyxwjJcxvK?=
+ =?us-ascii?Q?18B46gDZosp2fjrJzemBizj3TdCM55JFLAmiioA5EANHdBnFWsRiIEwQ91mZ?=
+ =?us-ascii?Q?CIg8+RSdrUsahDrynS/qX3OT/+umGbbSyZSj9l4EX7+2SNfFHsq55XlR8UKk?=
+ =?us-ascii?Q?kfUtfx9TS9ep9NW55reQ2Hu9utNo4B1QFlKea0zgLP/TtjtCVrtmukk0blOF?=
+ =?us-ascii?Q?bREM2YMcz95wgPKHBWkBRLMjxkxgzf0TuttqTcxETaMbxC1qKgqne0+1gFmo?=
+ =?us-ascii?Q?cBdAURzWRMe55J5TmuWQmUxmZQAw5hRh271i?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2025 14:16:29.5641
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 96581c60-eb6c-4c46-6dee-08ddf9e29fe2
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001CD.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9390
 
-Hello.
+Currently, after the bridge is created, the FDB does not hold an FDB entry
+for the bridge MAC on VLAN 0:
 
-I made a minimized C reproducer (shown bottom) for
+ # ip link add name br up type bridge
+ # ip -br link show dev br
+ br               UNKNOWN        92:19:8c:4e:01:ed <BROADCAST,MULTICAST,UP,LOWER_UP>
+ # bridge fdb show | grep 92:19:8c:4e:01:ed
+ 92:19:8c:4e:01:ed dev br vlan 1 master br permanent
 
-  unregister_netdevice: waiting for batadv_slave_0 to become free. Usage count = 2
-  ref_tracker: netdev@ffff88807bb4c620 has 1/1 users at
-       __netdev_tracker_alloc include/linux/netdevice.h:4390 [inline]
-       netdev_hold include/linux/netdevice.h:4419 [inline]
-       batadv_hardif_add_interface net/batman-adv/hard-interface.c:878 [inline]
-       batadv_hard_if_event+0xbd1/0x1280 net/batman-adv/hard-interface.c:958
-       notifier_call_chain+0x1b6/0x3e0 kernel/notifier.c:85
-       call_netdevice_notifiers_extack net/core/dev.c:2267 [inline]
-       call_netdevice_notifiers net/core/dev.c:2281 [inline]
-       register_netdevice+0x1608/0x1ae0 net/core/dev.c:11325
-       veth_newlink+0x5cc/0xa50 drivers/net/veth.c:1884
-       rtnl_newlink_create+0x310/0xb00 net/core/rtnetlink.c:3825
-       __rtnl_newlink net/core/rtnetlink.c:3942 [inline]
-       rtnl_newlink+0x16d6/0x1c70 net/core/rtnetlink.c:4057
-       rtnetlink_rcv_msg+0x7cf/0xb70 net/core/rtnetlink.c:6946
-       netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
-       netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
-       netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
-       netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
-       sock_sendmsg_nosec net/socket.c:714 [inline]
-       __sock_sendmsg+0x21c/0x270 net/socket.c:729
-       __sys_sendto+0x3bd/0x520 net/socket.c:2231
-       __do_sys_sendto net/socket.c:2238 [inline]
-       __se_sys_sendto net/socket.c:2234 [inline]
-       __x64_sys_sendto+0xde/0x100 net/socket.c:2234
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Later when the bridge MAC is changed, or in fact when the address is given
+during netdevice creation, the entry appears:
 
-problem at https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84 .
+ # ip link add name br up address 00:11:22:33:44:55 type bridge
+ # bridge fdb show | grep 00:11:22:33:44:55
+ 00:11:22:33:44:55 dev br vlan 1 master br permanent
+ 00:11:22:33:44:55 dev br master br permanent
 
-When this problem happens, the
+However when the bridge address is set by the user to the current bridge
+address before the first port is enslaved, none of the address handlers
+gets invoked, because the address is not actually changed. The address is
+however marked as NET_ADDR_SET. Then when a port is enslaved, the address
+is not changed, because it is NET_ADDR_SET. Thus the VLAN 0 entry is not
+added, and it has not been added previously either:
 
-  batman_adv: batadv0: Adding interface: batadv_slave_0
-  batman_adv: batadv0: The MTU of interface batadv_slave_0 is too small (1500) to handle the transport of batman-adv packets. Packets going over this interface will be fragmented on layer2 which could impact the performance. Setting the MTU to 1560 would solve the problem.
-  batman_adv: batadv0: Not using interface batadv_slave_0 (retrying later): interface not active
-  batman_adv: batadv0: Interface activated: batadv_slave_0
-  batman_adv: batadv0: Interface deactivated: batadv_slave_0
-  batman_adv: batadv0: Removing interface: batadv_slave_0
-  batman_adv: batadv0: adding TT local entry 33:33:00:00:00:01 to non-existent VLAN -1
+ # ip link add name br up type bridge
+ # ip -br link show dev br
+ br               UNKNOWN        7e:f0:a8:1a:be:c2 <BROADCAST,MULTICAST,UP,LOWER_UP>
+ # ip link set dev br addr 7e:f0:a8:1a:be:c2
+ # ip link add name v up type veth
+ # ip link set dev v master br
+ # ip -br link show dev br
+ br               UNKNOWN        7e:f0:a8:1a:be:c2 <BROADCAST,MULTICAST,UP,LOWER_UP>
+ # bridge fdb | grep 7e:f0:a8:1a:be:c2
+ 7e:f0:a8:1a:be:c2 dev br vlan 1 master br permanent
 
-messages are printed but the
+Then when the bridge MAC is used as DMAC, and br_handle_frame_finish()
+looks up an FDB entry with VLAN=0, it doesn't find any, and floods the
+traffic instead of passing it up.
 
-  batadv_hardif_release+0x44/0xb0
-  batadv_hard_if_event+0x349/0x410
-  notifier_call_chain+0x41/0x100
-  unregister_netdevice_many_notify+0x43a/0xac0
-  default_device_exit_batch+0xed/0x120
-  ops_undo_list+0x10d/0x3b0
-  cleanup_net+0x1f8/0x370
-  process_one_work+0x223/0x590
-  worker_thread+0x1cb/0x3a0
-  kthread+0xff/0x240
-  ret_from_fork+0x17f/0x1e0
-  ret_from_fork_asm+0x1a/0x30
+Fix this by simply adding the VLAN 0 FDB entry for the bridge itself always
+on netdevice creation. This also makes the behavior consistent with how
+ports are treated: ports always have an FDB entry for each member VLAN as
+well as VLAN 0.
 
-trace is not called (compared to when this problem does not happen).
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+---
+ net/bridge/br.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-I suspect that batadv_hard_if_event_meshif() has something to do upon
-NETDEV_UNREGISTER event because batadv_hard_if_event_meshif() receives
-NETDEV_POST_INIT / NETDEV_REGISTER / NETDEV_UNREGISTER / NETDEV_PRE_UNINIT
-events when this reproducer is executed, but I don't know what to do...
+diff --git a/net/bridge/br.c b/net/bridge/br.c
+index 512872a2ef81..c37e52e2f29a 100644
+--- a/net/bridge/br.c
++++ b/net/bridge/br.c
+@@ -37,6 +37,11 @@ static int br_device_event(struct notifier_block *unused, unsigned long event, v
+ 	int err;
+ 
+ 	if (netif_is_bridge_master(dev)) {
++		struct net_bridge *br = netdev_priv(dev);
++
++		if (event == NETDEV_REGISTER)
++			br_fdb_change_mac_address(br, dev->dev_addr);
++
+ 		err = br_vlan_bridge_event(dev, event, ptr);
+ 		if (err)
+ 			return notifier_from_errno(err);
+-- 
+2.49.0
 
----------- minimized C reproducer start ----------
-#define _GNU_SOURCE
-#include <arpa/inet.h>
-#include <errno.h>
-#include <net/if.h>
-#include <sched.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#include <linux/genetlink.h>
-#include <linux/if_ether.h>
-#include <linux/ip.h>
-#include <linux/netlink.h>
-#include <linux/rtnetlink.h>
-#include <linux/veth.h>
-#include <linux/batman_adv.h>
-
-struct nlmsg {
-	char* pos;
-	int nesting;
-	struct nlattr* nested[8];
-	char buf[4096];
-};
-
-static void netlink_init(struct nlmsg* nlmsg, int typ, int flags,
-                         const void* data, int size)
-{
-	memset(nlmsg, 0, sizeof(*nlmsg));
-	struct nlmsghdr* hdr = (struct nlmsghdr*)nlmsg->buf;
-	hdr->nlmsg_type = typ;
-	hdr->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK | flags;
-	memcpy(hdr + 1, data, size);
-	nlmsg->pos = (char*)(hdr + 1) + NLMSG_ALIGN(size);
-}
-
-static void netlink_attr(struct nlmsg* nlmsg, int typ, const void* data,
-                         int size)
-{
-	struct nlattr* attr = (struct nlattr*)nlmsg->pos;
-	attr->nla_len = sizeof(*attr) + size;
-	attr->nla_type = typ;
-	if (size > 0)
-		memcpy(attr + 1, data, size);
-	nlmsg->pos += NLMSG_ALIGN(attr->nla_len);
-}
-
-static void netlink_nest(struct nlmsg* nlmsg, int typ)
-{
-	struct nlattr* attr = (struct nlattr*)nlmsg->pos;
-	attr->nla_type = typ;
-	nlmsg->pos += sizeof(*attr);
-	nlmsg->nested[nlmsg->nesting++] = attr;
-}
-
-static void netlink_done(struct nlmsg* nlmsg)
-{
-	struct nlattr* attr = nlmsg->nested[--nlmsg->nesting];
-	attr->nla_len = nlmsg->pos - (char*)attr;
-}
-
-static int netlink_send_ext(struct nlmsg* nlmsg, int sock, uint16_t reply_type,
-                            int* reply_len, bool dofail)
-{
-	if (nlmsg->pos > nlmsg->buf + sizeof(nlmsg->buf) || nlmsg->nesting)
-		exit(1);
-	struct nlmsghdr* hdr = (struct nlmsghdr*)nlmsg->buf;
-	hdr->nlmsg_len = nlmsg->pos - nlmsg->buf;
-	struct sockaddr_nl addr;
-	memset(&addr, 0, sizeof(addr));
-	addr.nl_family = AF_NETLINK;
-	ssize_t n = sendto(sock, nlmsg->buf, hdr->nlmsg_len, 0,
-			   (struct sockaddr*)&addr, sizeof(addr));
-	if (n != (ssize_t)hdr->nlmsg_len) {
-		if (dofail)
-			exit(1);
-		return -1;
-	}
-	n = recv(sock, nlmsg->buf, sizeof(nlmsg->buf), 0);
-	if (reply_len)
-		*reply_len = 0;
-	if (n < 0) {
-		if (dofail)
-			exit(1);
-		return -1;
-	}
-	if (n < (ssize_t)sizeof(struct nlmsghdr)) {
-		errno = EINVAL;
-		if (dofail)
-			exit(1);
-		return -1;
-	}
-	if (hdr->nlmsg_type == NLMSG_DONE)
-		return 0;
-	if (reply_len && hdr->nlmsg_type == reply_type) {
-		*reply_len = n;
-		return 0;
-	}
-	if (n < (ssize_t)(sizeof(struct nlmsghdr) + sizeof(struct nlmsgerr))) {
-		errno = EINVAL;
-		if (dofail)
-			exit(1);
-		return -1;
-	}
-	if (hdr->nlmsg_type != NLMSG_ERROR) {
-		errno = EINVAL;
-		if (dofail)
-			exit(1);
-		return -1;
-	}
-	errno = -((struct nlmsgerr*)(hdr + 1))->error;
-	return -errno;
-}
-
-static int netlink_send(struct nlmsg* nlmsg, int sock)
-{
-	return netlink_send_ext(nlmsg, sock, 0, NULL, true);
-}
-
-static int netlink_query_family_id(struct nlmsg* nlmsg, int sock,
-                                   const char* family_name, bool dofail)
-{
-	struct genlmsghdr genlhdr;
-	memset(&genlhdr, 0, sizeof(genlhdr));
-	genlhdr.cmd = CTRL_CMD_GETFAMILY;
-	netlink_init(nlmsg, GENL_ID_CTRL, 0, &genlhdr, sizeof(genlhdr));
-	netlink_attr(nlmsg, CTRL_ATTR_FAMILY_NAME, family_name,
-		     strnlen(family_name, GENL_NAMSIZ - 1) + 1);
-	int n = 0;
-	int err = netlink_send_ext(nlmsg, sock, GENL_ID_CTRL, &n, dofail);
-	if (err < 0) {
-		return -1;
-	}
-	uint16_t id = 0;
-	struct nlattr* attr = (struct nlattr*)(nlmsg->buf + NLMSG_HDRLEN +
-					       NLMSG_ALIGN(sizeof(genlhdr)));
-	for (; (char*)attr < nlmsg->buf + n;
-	     attr = (struct nlattr*)((char*)attr + NLMSG_ALIGN(attr->nla_len))) {
-		if (attr->nla_type == CTRL_ATTR_FAMILY_ID) {
-			id = *(uint16_t*)(attr + 1);
-			break;
-		}
-	}
-	if (!id) {
-		errno = EINVAL;
-		return -1;
-	}
-	recv(sock, nlmsg->buf, sizeof(nlmsg->buf), 0);
-	return id;
-}
-
-static void netlink_add_device_impl(struct nlmsg* nlmsg, const char* type,
-                                    const char* name, bool up)
-{
-	struct ifinfomsg hdr;
-	memset(&hdr, 0, sizeof(hdr));
-	if (up)
-		hdr.ifi_flags = hdr.ifi_change = IFF_UP;
-	netlink_init(nlmsg, RTM_NEWLINK, NLM_F_EXCL | NLM_F_CREATE, &hdr,
-		     sizeof(hdr));
-	if (name)
-		netlink_attr(nlmsg, IFLA_IFNAME, name, strlen(name));
-	netlink_nest(nlmsg, IFLA_LINKINFO);
-	netlink_attr(nlmsg, IFLA_INFO_KIND, type, strlen(type));
-}
-
-static void netlink_add_device(struct nlmsg* nlmsg, int sock, const char* type,
-                               const char* name)
-{
-	netlink_add_device_impl(nlmsg, type, name, false);
-	netlink_done(nlmsg);
-	int err = netlink_send(nlmsg, sock);
-	if (err < 0) {
-	}
-}
-
-static void netlink_add_veth(struct nlmsg* nlmsg, int sock, const char* name,
-                             const char* peer)
-{
-	netlink_add_device_impl(nlmsg, "veth", name, false);
-	netlink_nest(nlmsg, IFLA_INFO_DATA);
-	netlink_nest(nlmsg, VETH_INFO_PEER);
-	nlmsg->pos += sizeof(struct ifinfomsg);
-	netlink_attr(nlmsg, IFLA_IFNAME, peer, strlen(peer));
-	netlink_done(nlmsg);
-	netlink_done(nlmsg);
-	netlink_done(nlmsg);
-	int err = netlink_send(nlmsg, sock);
-	if (err < 0) {
-	}
-}
-
-static void netlink_device_change(struct nlmsg* nlmsg, int sock,
-                                  const char* name, bool up, const char* master,
-                                  const void* mac, int macsize)
-{
-	struct ifinfomsg hdr;
-	memset(&hdr, 0, sizeof(hdr));
-	if (up)
-		hdr.ifi_flags = hdr.ifi_change = IFF_UP;
-	hdr.ifi_index = if_nametoindex(name);
-	netlink_init(nlmsg, RTM_NEWLINK, 0, &hdr, sizeof(hdr));
-	if (master) {
-		int ifindex = if_nametoindex(master);
-		netlink_attr(nlmsg, IFLA_MASTER, &ifindex, sizeof(ifindex));
-	}
-	if (macsize)
-		netlink_attr(nlmsg, IFLA_ADDRESS, mac, macsize);
-	int err = netlink_send(nlmsg, sock);
-	if (err < 0) {
-	}
-}
-
-int main(void)
-{
-	static struct nlmsg nlmsg = { };
-	const uint64_t macaddr = 0x00aaaaaaaaaa + ((10ull) << 40);
-	unshare(CLONE_NEWNET);
-	// initialize netdevices
-	const int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
-	netlink_add_device(&nlmsg, sock, "batadv", "batadv0");
-	netlink_add_veth(&nlmsg, sock, "batadv_slave_0", "veth0_to_batadv");
-	netlink_device_change(&nlmsg, sock, "batadv_slave_0", false, "batadv0", 0, 0);
-	netlink_device_change(&nlmsg, sock, "batadv_slave_0", true, 0, &macaddr, ETH_ALEN);
-	close(sock);
-	// execute
-	int r[3];
-	char buf[64] = "batadv0";
-	r[0] = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
-	r[1] = netlink_query_family_id(&nlmsg, r[0], "batadv", false);
-	ioctl(r[0], SIOCGIFINDEX, buf);
-	r[2] = *(uint32_t*) (buf + 0x10);
-	*(uint32_t*)buf = 0x1c; // len
-	*(uint16_t*)(buf + 4) = r[1]; // type
-	*(uint16_t*)(buf + 6) = NLM_F_REQUEST|NLM_F_ROOT|NLM_F_MATCH; // flags
-	*(uint32_t*)(buf + 8) = 0; // seq
-	*(uint32_t*)(buf + 12) = 0; // pid
-	*(uint8_t*)(buf + 16) = BATADV_CMD_GET_NEIGHBORS; // cmd
-	*(uint8_t*)(buf + 17) = 0; // version
-	*(uint16_t*)(buf + 18) = 0; // reserved
-	*(uint16_t*)(buf + 20) = 8; // nla_len
-	*(uint16_t*)(buf + 22) = BATADV_ATTR_MESH_IFINDEX; // nla_type
-	*(uint32_t*)(buf + 24) = r[2]; // payload
-	send(r[0], buf, 28, 0);
-	return 0;
-}
----------- minimized C reproducer end ----------
 
