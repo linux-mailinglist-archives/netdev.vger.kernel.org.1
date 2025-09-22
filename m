@@ -1,165 +1,185 @@
-Return-Path: <netdev+bounces-225256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A567CB912CA
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 14:43:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF8D3B913F6
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 14:52:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6A6D94E20F5
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 12:43:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84BBB7B01C2
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 12:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1FF730B500;
-	Mon, 22 Sep 2025 12:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 493CA267AF2;
+	Mon, 22 Sep 2025 12:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pvGOWEvv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dkTsFMn9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982BD308F38;
-	Mon, 22 Sep 2025 12:43:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B4518024
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 12:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758544982; cv=none; b=eYFUNQbe46eedhUWe3ZdKmWDjeHv/3gjgnKsoXcn8Aw1wzXGtow/nLmInxiBvXV2AEaxTd+3p7uuNkJeTRtJX/TpPQ4VPteVjp3PvM4+jErepB42TZkIjgdCYfL9fJo8EM4scu3dx0Fobra29vyjlxjIo8YAZZ17PKvGB2hstoA=
+	t=1758545556; cv=none; b=uJb87mwjeDvwcOfHTCCBqO3eMbQq9pPa6eEik0q6KOaF9fbReOvTVBGGUoEDLWlfKvBpLRSLEikuZkcZLtKRv07gKr4xuyIYOIMFIjoyT26Kr6rFP2f27G7rGL3rLFHZmR/ONxe6eTVQjc13mgq6id9QU6GIDJfDU1ZGEYDXu5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758544982; c=relaxed/simple;
-	bh=eXegoR9+/J66AI1dQB6rfx5+3Y1FvmBpnCRJJsJbBZU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=FuZZDUtTVOhzLHwc6j/gvzAcTjTiBaJ1Rh9vg/CF6ZI5aw4SHLLtpJUkJ7yl238Y+oXf0lSmUQYW4Lk00SqqpCw2q+JtLrMBuEHPuIrKv33MxkaHXAMN2JmAr/5BQUZEiMEWr0xY9DN5sNZLSBH662wXa2g1OIbJyROC0MNeHu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pvGOWEvv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47C15C4CEF7;
-	Mon, 22 Sep 2025 12:42:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758544981;
-	bh=eXegoR9+/J66AI1dQB6rfx5+3Y1FvmBpnCRJJsJbBZU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=pvGOWEvvz9AYqq4lFnEth96LOGzcnJfCvhzo3JO+7VDH3zywlRPE4G561r4ydtIRg
-	 2cBYkO3Gs4Zk56Wk6UMJ35mPXPkQ/p9d5Fos+dNfJ+AKDPzvTWbNp2nXxTxIWMwh4Y
-	 TCl3GP96z3RGcIzv33KlcYc+1ahL3Gpni2UgtWP4NLkf+OyWiphO30UPTyUX+cs+ms
-	 EASnO9rl303Mdrv21Oqe4TnhJVioMpXzF+FKe4/duPOuuHibokFL7vZMBqBeLaIMM8
-	 Bs+cvH94gQrzHZ+oNDQ5Bl0n+zkZGFRrR6+AdVkoHL1WvDv3ihQCTGvQObjdRn0CiW
-	 Jkemgng632A4g==
-From: Christian Brauner <brauner@kernel.org>
-Date: Mon, 22 Sep 2025 14:42:37 +0200
-Subject: [PATCH 3/3] ns: add ns_debug()
+	s=arc-20240116; t=1758545556; c=relaxed/simple;
+	bh=qBSzcKSuf4xAyWW34UCvNRoxEkfTayXuCCAxt1N+/G4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=e4LYL2KTJdSUEoU7p23sRjei4MPbfl6EM19sRqpXzUZZg+6r7D1Hw6c79m2WiqxlS7W68menc3uPJyz6wX67nZVKXiGxEIXQrasz6u8UZncrsz8D76szlM0JVefAtCzJR97F9hpnEolNJMYqYoSGMqPsfHGbwzx71k1zut2+I/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dkTsFMn9; arc=none smtp.client-ip=209.85.221.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-54aa0792200so1087364e0c.3
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 05:52:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758545553; x=1759150353; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q9PNOBbvYQj8vLx1kUxDpT+tNA9I5A6dkvqQJci66vA=;
+        b=dkTsFMn98iCyAUgyAyrGXbmeUlU2N5yM0NdJ0sq3KWJMUHtraIB739s+KCId1uvtDx
+         wFTR6wcVjx2no3pfEFvoniZjUVcjM52P1HP5OpUfqU04/Ai8y5L25RRwGfzvUzlAYQQv
+         uzXBI0br4cYK6I6PeXFlrXlOikfMqgHDFj1IyplLthDm/froZGj3Y9Lb8VdDI9IKhtLL
+         Ys9xcsfpe8nQLykGXjUjT+RbfYxA0BYd08dpHS7WCnxdvnigC7tlo1FslhlBHVOvcpIZ
+         zmmB7mL8Wj94uEi9xY5PLLyjFbuOLMMX4fVB/1/UJBbYx9Hehk5BWfJfE2jbt4dLUoBL
+         BWjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758545553; x=1759150353;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Q9PNOBbvYQj8vLx1kUxDpT+tNA9I5A6dkvqQJci66vA=;
+        b=LVvhxaHQFNYLGSekb5aIvqfeES6UkBdAligkPGu7jsNrFN6Oe6o4g/DLzMW+BIS1co
+         tc+BsNHxbo2OgXnoDwEhumz2syj5CVAXoLvS6+6eiMgHi4k61Xxz0S4gM0Pkn6nRdcKs
+         3PD55yJ/sfeSOs1VTa4i5qj3+yp6Ap62Kxe+aBA9XGL9rPXZTWzKVLJzonESSMAHTIKe
+         YAfO2pIXNPRJi1ZJRY+a8xymF/ZpZl7ODeV40xO30iC1kHOhu7j9A0rOcPw9sO+p1jAw
+         F0V8lujtyXbpVeOqF9PdFslwX1iSEi7gzYoE50ZmA5OIts2VGCxkUwFL+xlLGoegnJjG
+         ExRA==
+X-Forwarded-Encrypted: i=1; AJvYcCX5gict8Ape23xnGUbOIOkHdxzHpk/QHxyaXnFBsWfdnJVMdG9y3jBXvAu5Rgypiapqo+yJ50g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvjR+Azl4+nF15csIgrDdMyAvijaSBB2dhmXaFd364yXqLa37W
+	oY5F7uUJ6u3k1y+f4jRzW0n07tYSBEjC91hd8qrEhevFzH405I5jOJuT
+X-Gm-Gg: ASbGncvLmmSkZsdkOzcaptBmZQjIg0YNS58mfMJvbH/2O9KAZHuHzakCVRf4Q5jjAnS
+	/aidNH6L5iWxFLB4Fl1mTnUy8AkNqSiXPMhBwE4cBcpbcATgQpi3XmCex1vfkwuAyvprZfEcfHf
+	+0noIcLPL9GWzsqHS0LXU4PRaq2V+4UrO0geTyI/k8srSyNSRLiNgqcydsvgp64s5vYfYTtTbnF
+	Zo9LExeBI3tspdCAB/t5NkOhGs8xPqS1dkO4gLjQ5AmAf4CbEcZYsB9lgehlIJ5GHk7bGx1fmNE
+	TcqfvwFTJCN/mGgqa/IIWeHzi0MuVsIW1KihhmVnlxh0TVM7NVLsFYXJLsshnss15jYkuHsKU+K
+	ICjZUDT56ZurNaZY5TmOVz+zJBqemW2olrn7WELRHQwQHqo/VgABvKCRHfhkNE3soLro1BQ==
+X-Google-Smtp-Source: AGHT+IFw+3gWwgrgzz3NQ9AfPCg9RVncWypkjyVm3Z7H5lZuekceNnoCK3+veQMIN+mQ7345mlOzLQ==
+X-Received: by 2002:a05:6122:30ab:b0:539:44bc:7904 with SMTP id 71dfb90a1353d-54a837847b3mr3763944e0c.5.1758545553365;
+        Mon, 22 Sep 2025 05:52:33 -0700 (PDT)
+Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
+        by smtp.gmail.com with UTF8SMTPSA id 71dfb90a1353d-54a88d5efbbsm1754249e0c.27.2025.09.22.05.52.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Sep 2025 05:52:32 -0700 (PDT)
+Date: Mon, 22 Sep 2025 08:52:32 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com, 
+ Eric Dumazet <edumazet@google.com>
+Message-ID: <willemdebruijn.kernel.af97f0e88745@gmail.com>
+In-Reply-To: <20250922104240.2182559-1-edumazet@google.com>
+References: <20250922104240.2182559-1-edumazet@google.com>
+Subject: Re: [PATCH v4 net-next] udp: remove busylock and add per NUMA queues
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250922-work-namespace-ns_common-fixes-v1-3-3c26aeb30831@kernel.org>
-References: <20250922-work-namespace-ns_common-fixes-v1-0-3c26aeb30831@kernel.org>
-In-Reply-To: <20250922-work-namespace-ns_common-fixes-v1-0-3c26aeb30831@kernel.org>
-To: linux-fsdevel@vger.kernel.org
-Cc: Amir Goldstein <amir73il@gmail.com>, Josef Bacik <josef@toxicpanda.com>, 
- Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
- =?utf-8?q?Zbigniew_J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, 
- Lennart Poettering <mzxreary@0pointer.de>, Aleksa Sarai <cyphar@cyphar.com>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
- Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
- =?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Anna-Maria Behnsen <anna-maria@linutronix.de>, 
- Frederic Weisbecker <frederic@kernel.org>, 
- Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Christian Brauner <brauner@kernel.org>
-X-Mailer: b4 0.15-dev-56183
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2013; i=brauner@kernel.org;
- h=from:subject:message-id; bh=eXegoR9+/J66AI1dQB6rfx5+3Y1FvmBpnCRJJsJbBZU=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWRcdHGufLdqp3vlk4Q1Dk/fn3ohZJy/jeVH4POoLO7nA
- tcESutyOkpZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACYi38vwP7dtrWyCt61CzoL3
- X1Mq/MoZhadP8lScKVY6/aeGl/y+EIb/LgILxT4EsL3ecm/N0gQHx44va5Q9L5owT5GfJucvfdm
- QBwA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-Add ns_debug() that asserts that the correct operations are used for the
-namespace type.
+Eric Dumazet wrote:
+> busylock was protecting UDP sockets against packet floods,
+> but unfortunately was not protecting the host itself.
+> 
+> Under stress, many cpus could spin while acquiring the busylock,
+> and NIC had to drop packets. Or packets would be dropped
+> in cpu backlog if RPS/RFS were in place.
+> 
+> This patch replaces the busylock by intermediate
+> lockless queues. (One queue per NUMA node).
+> 
+> This means that fewer number of cpus have to acquire
+> the UDP receive queue lock.
+> 
+> Most of the cpus can either:
+> - immediately drop the packet.
+> - or queue it in their NUMA aware lockless queue.
+> 
+> Then one of the cpu is chosen to process this lockless queue
+> in a batch.
+> 
+> The batch only contains packets that were cooked on the same
+> NUMA node, thus with very limited latency impact.
+> 
+> Tested:
+> 
+> DDOS targeting a victim UDP socket, on a platform with 6 NUMA nodes
+> (Intel(R) Xeon(R) 6985P-C)
+> 
+> Before:
+> 
+> nstat -n ; sleep 1 ; nstat | grep Udp
+> Udp6InDatagrams                 1004179            0.0
+> Udp6InErrors                    3117               0.0
+> Udp6RcvbufErrors                3117               0.0
+> 
+> After:
+> nstat -n ; sleep 1 ; nstat | grep Udp
+> Udp6InDatagrams                 1116633            0.0
+> Udp6InErrors                    14197275           0.0
+> Udp6RcvbufErrors                14197275           0.0
+> 
+> We can see this host can now proces 14.2 M more packets per second
+> while under attack, and the victim socket can receive 11 % more
+> packets.
+> 
+> I used a small bpftrace program measuring time (in us) spent in
+> __udp_enqueue_schedule_skb().
+> 
+> Before:
+> 
+> @udp_enqueue_us[398]:
+> [0]                24901 |@@@                                                 |
+> [1]                63512 |@@@@@@@@@                                           |
+> [2, 4)            344827 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> [4, 8)            244673 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                |
+> [8, 16)            54022 |@@@@@@@@                                            |
+> [16, 32)          222134 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                   |
+> [32, 64)          232042 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                  |
+> [64, 128)           4219 |                                                    |
+> [128, 256)           188 |                                                    |
+> 
+> After:
+> 
+> @udp_enqueue_us[398]:
+> [0]              5608855 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> [1]              1111277 |@@@@@@@@@@                                          |
+> [2, 4)            501439 |@@@@                                                |
+> [4, 8)            102921 |                                                    |
+> [8, 16)            29895 |                                                    |
+> [16, 32)           43500 |                                                    |
+> [32, 64)           31552 |                                                    |
+> [64, 128)            979 |                                                    |
+> [128, 256)            13 |                                                    |
+> 
+> Note that the remaining bottleneck for this platform is in
+> udp_drops_inc() because we limited struct numa_drop_counters
+> to only two nodes so far.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Acked-by: Paolo Abeni <pabeni@redhat.com>
 
-Signed-off-by: Christian Brauner <brauner@kernel.org>
----
- kernel/nscommon.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
-
-diff --git a/kernel/nscommon.c b/kernel/nscommon.c
-index 7aa2be6a0c32..3cef89ddef41 100644
---- a/kernel/nscommon.c
-+++ b/kernel/nscommon.c
-@@ -2,6 +2,55 @@
- 
- #include <linux/ns_common.h>
- #include <linux/proc_ns.h>
-+#include <linux/vfsdebug.h>
-+
-+#ifdef CONFIG_DEBUG_VFS
-+static void ns_debug(struct ns_common *ns, const struct proc_ns_operations *ops)
-+{
-+	switch (ns->ops->type) {
-+#ifdef CONFIG_CGROUPS
-+	case CLONE_NEWCGROUP:
-+		VFS_WARN_ON_ONCE(ops != &cgroupns_operations);
-+		break;
-+#endif
-+#ifdef CONFIG_IPC_NS
-+	case CLONE_NEWIPC:
-+		VFS_WARN_ON_ONCE(ops != &ipcns_operations);
-+		break;
-+#endif
-+	case CLONE_NEWNS:
-+		VFS_WARN_ON_ONCE(ops != &mntns_operations);
-+		break;
-+#ifdef CONFIG_NET_NS
-+	case CLONE_NEWNET:
-+		VFS_WARN_ON_ONCE(ops != &netns_operations);
-+		break;
-+#endif
-+#ifdef CONFIG_PID_NS
-+	case CLONE_NEWPID:
-+		VFS_WARN_ON_ONCE(ops != &pidns_operations);
-+		break;
-+#endif
-+#ifdef CONFIG_TIME_NS
-+	case CLONE_NEWTIME:
-+		VFS_WARN_ON_ONCE(ops != &timens_operations);
-+		break;
-+#endif
-+#ifdef CONFIG_USER_NS
-+	case CLONE_NEWUSER:
-+		VFS_WARN_ON_ONCE(ops != &userns_operations);
-+		break;
-+#endif
-+#ifdef CONFIG_UTS_NS
-+	case CLONE_NEWUTS:
-+		VFS_WARN_ON_ONCE(ops != &utsns_operations);
-+		break;
-+#endif
-+	default:
-+		VFS_WARN_ON_ONCE(true);
-+	}
-+}
-+#endif
- 
- int __ns_common_init(struct ns_common *ns, const struct proc_ns_operations *ops, int inum)
- {
-@@ -12,6 +61,10 @@ int __ns_common_init(struct ns_common *ns, const struct proc_ns_operations *ops,
- 	RB_CLEAR_NODE(&ns->ns_tree_node);
- 	INIT_LIST_HEAD(&ns->ns_list_node);
- 
-+#ifdef CONFIG_DEBUG_VFS
-+	ns_debug(ns, ops);
-+#endif
-+
- 	if (inum) {
- 		ns->inum = inum;
- 		return 0;
-
--- 
-2.47.3
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
