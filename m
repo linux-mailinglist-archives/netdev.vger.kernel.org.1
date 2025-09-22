@@ -1,450 +1,176 @@
-Return-Path: <netdev+bounces-225303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7E62B92085
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:44:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08739B92080
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:44:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BC311902BD6
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 15:44:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CE62169E7D
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 15:43:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B572EC09B;
-	Mon, 22 Sep 2025 15:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A16FA2EB86A;
+	Mon, 22 Sep 2025 15:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KAdunHte"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ceYVxTI2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f225.google.com (mail-yw1-f225.google.com [209.85.128.225])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D342EBB87
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 15:43:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B70E2EB849
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 15:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758555840; cv=none; b=YUiYAq6qQOP9RFbNjB/eTQQXQ8labRyqRoIN/8ijnj86N12rG5SPx8nwGj6C/TDM0vUZc5H782kCYYvru9KTk0iwfh0/FP0pcU37rqRhGh5pclj/QG6tcdk6phaVDqC91xYEu7NKuEx8/ybJPtu6tFj4taiRIAqP6g3kfx0oMkE=
+	t=1758555815; cv=none; b=VFKbI1oTPLUNqXFChs5g9sNOQz+ENokk1aSLhouWhN6A0nm8rwxYtKZIxlub4IUKjtPFQQIShWbGn050/uiymsp7r3KbNdBLA/uGGaEl7spgl+1vITHnS0qldiBu4Jz5FtS7xMJKL30++J4Kag1EvKwmw60AN1DxOr4A7U367As=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758555840; c=relaxed/simple;
-	bh=ADyQtDqeSX3vm0miMniLBWJRhlxlTWZLuTgm3Yh9dT8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NgFmq9PVkSmv1EiQbiWMJ3Rz7CkQlk4xvTENqKPybJjrK5H3wPoML62geWc1zUuzDNqTFx1VEcRxpFDfkc2vf+8LR8FKVKOoN7KD0IBWz4hVZc1wWaE5gsBLbk5RTHcI5ubwtLh5jBb1NXdWrEkmgXdPgeo17WlEltW1oVU86EY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KAdunHte; arc=none smtp.client-ip=209.85.128.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yw1-f225.google.com with SMTP id 00721157ae682-71d60157747so32784197b3.0
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 08:43:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758555837; x=1759160637;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/sh6YpmI8HxCXYs8yoX77P5Lzlf7xIKcdT1HmVqEbYk=;
-        b=tpY3Pb3EKMMnI4KBUejhkFKL5XZLpmoJh09cIwma+byb4LwoWUsGse8n509gZBKoXl
-         zcYst3FKg2qinZISQCcgut1Tj6R5vB9o+fl6dIsn6KkUnu+cFbrRTZ0JNdbc1aLKWiZ7
-         7EInLYvbnM/79neBKw/KkqRGxme40vbRYcAq843Z5NmOqZPfMpKpd9M+kJ6xvfnSB5iU
-         J3jhcNg7g0yFQsEKXINptn5R4lY47IwY2w6WQLae44RGTqpwrg+XsjpbjjtUSLmNqGfn
-         Khk5jyxFeK+eiYYD3OgPfFedIEzaLW4XTVaY4vSPTF8vwxcMeAaOAys9LIGnmwAE85Vi
-         Hk3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV9CodAKvubBJJeXADpW8VjLrBdtuwFTglOB42R22sD40Z3adsiQZWatK3HDob/MSgTXnErybM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXJBD3mY2uxYm081R+EevvMT/LPLMjcw6ReSOJ0S0lzNr6bejO
-	50cD7HA3onzBYjYQDUm6asF867o/QazfrV9bBgkvAnOE2G3w16hzoQb2dM7cXABjY87qbQ++EKO
-	C0qhvysSSo2ukSnnoNg1wT6JzpJIIhnN6teZj2iMGkOIEILK7OHsiMHCuuZqZ+qPsfPG8120bRw
-	jCXO0w3Cv1On7F+YXBs0EM7L6e7v8Bch4GbCrzaEnQp5HUNQJujgQeWBxbellYrcDjWr1eYwht0
-	HOw00fqN8Ml
-X-Gm-Gg: ASbGnct1gYx6pswb+5cXgACltZ+1A8cMHn+VvIfROInFdpitr32/GLMyb6iRlx08lIB
-	McY6uMSzU/uFBnGrcSanFdCW29Wjij7feFpCN1pU5SEJx+XnEeSSLIVEiXbggoJiuhwWVzJoRzw
-	HurUF0wzw1Kk3z5i/druAIYRwxu/pgLDRPziwhLUgXDgQsV7r3NucsqWCDC0SfBN635DJNWeo8o
-	zYw9s9RfeU7mW2v4QlRcOrT7XArRnOzS1gLvN1OJyYHBAZfNUoAx6QKUNa0SDOsVi9+lPs5bIFa
-	lgc4sYF+W6DY8wMLSYsvzX38Yp8ZtAhBC2VJlUedLW1GklO6OngwTDpJmr9EJM362StmB3DFFXm
-	jlhGReBwxODx4tC194aGCYjKpzrWdMlkY5Ce6lchvoYLRjnABPDf+sKMB/42dNRMpFkWs0lCP83
-	YR
-X-Google-Smtp-Source: AGHT+IE7ngdchi51EGzqKZoo7QCMQLaPdv1wdUJwKklEXqxmPoCWHU60litXGXclH7XYuOMsXF4WOh141/hd
-X-Received: by 2002:a05:690c:338f:b0:737:abf0:28b with SMTP id 00721157ae682-73d248d659fmr133848587b3.10.1758555837114;
-        Mon, 22 Sep 2025 08:43:57 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-121.dlp.protect.broadcom.com. [144.49.247.121])
-        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-633bcc7c5a3sm442777d50.2.2025.09.22.08.43.56
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Sep 2025 08:43:57 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4b5ee6cd9a3so90531531cf.2
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 08:43:56 -0700 (PDT)
+	s=arc-20240116; t=1758555815; c=relaxed/simple;
+	bh=yCDUfdybv2cpDR/gPmCqxuctyEFKTb4U4CQgebqSDuw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Of6SIH7bD+kHpwUZ5xMgjMRR3JBcsQxGcJkidw88JjtfzZiebNxTlA/ajIIxX5HgVjQkbqQXIAsGeMUURLulbWB95tcdvT+/BVZpG5+wCZMjtLLj0Ew6aZzcMl5H6iAtdjk86NMeHXGiSVUnb8G3wme2UIWaKXJhOFLWAJwE+WA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ceYVxTI2; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-77f1f29a551so1999535b3a.3
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 08:43:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1758555836; x=1759160636; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1758555813; x=1759160613; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=v3V9jfcj4c/C9kF8Vt1ZcO3ulHKzrInrkcLPZRC1Na4=;
+        b=ceYVxTI2PNUI+uUN7FLEKniyiBLsQt515iUa68iit8Gi/9wchaff/s1LapemZIloSX
+         9KPvEwCtQVfZp1w+G/p2x1LmjDzz063Cz2r4Hx0wusI/sOV7OAFU2k8+9W/7a7XPNjyi
+         glV3mUivfruxnYLmlaEkwZ3AJsrjzaS7C5RSRvIsRvVlZbhiIa5EATfLYAbeDm9+Q85+
+         1hiE+yl5v2uTa3TzaTIIpFDbbe0ryCbFo+tY/ZyBI+UD7YN7ebokVrVKl/GL86bEEVuV
+         XBB1NZgRziDMG38WRbPbs8A8eKHH6vLag+NZA3yLOMudcPPb0i2pZmh72XFW//kll4oc
+         OAjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758555813; x=1759160613;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/sh6YpmI8HxCXYs8yoX77P5Lzlf7xIKcdT1HmVqEbYk=;
-        b=KAdunHteekluJJlkHvqjna1VPQ+bvyaSvFU7VeoZYUTEOXdF5GqHUyoBLJalElFijx
-         a9DbQmI0gD0rImbXI5v0CZUmdOpYSp+mxB3omaF1zFQUmmEvZn85LjHCQ1URkIn3MQj/
-         H+0LLBL6EJFq/6VYwleS5mc5tj/XdSTzf0/MA=
-X-Forwarded-Encrypted: i=1; AJvYcCUwGPS8kWjbRDE6aC0Wy6wB7biSAAN7SV040njo6C4lPlwYaiVdE/oUqJhoshVtCLr3FlEFcyA=@vger.kernel.org
-X-Received: by 2002:ac8:5f46:0:b0:4d2:2d8b:4e47 with SMTP id d75a77b69052e-4d22d8b5228mr6034341cf.21.1758555836185;
-        Mon, 22 Sep 2025 08:43:56 -0700 (PDT)
-X-Received: by 2002:ac8:5f46:0:b0:4d2:2d8b:4e47 with SMTP id d75a77b69052e-4d22d8b5228mr6033831cf.21.1758555835574;
-        Mon, 22 Sep 2025 08:43:55 -0700 (PDT)
-Received: from sjs-csg-thor3-swe-29.lvn.broadcom.net044broadcom.net ([192.19.224.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-84ada77bb17sm179496785a.30.2025.09.22.08.43.54
+        bh=v3V9jfcj4c/C9kF8Vt1ZcO3ulHKzrInrkcLPZRC1Na4=;
+        b=ixYeBgXSPdW0voWSKvCxmLa7BnXxi3df6blMlcfr21KF0IytJnKDsvikSNn97XMfmB
+         xkgTGRqg4Vi6YXhni3f2l6iNQcuIl24knorcAoRQqY8suzv4AwVp+a+Rs0GX5jnAM6Pk
+         kIshixwSWBwLj8KuQOZVg0FLC2eJTXXugLQUeRInEo2mb3iUYAQoe6MB/hyAMREPjLtk
+         ZiJn81EkGKPFo41dKprImxCVSdVUX90hC9OmjZS9YtXWIvqkmpulYVlyDiUXucK2fsV7
+         ZSCGubez/B5hqgdHtUquFFxqaPqtW8IO91QEgQyV5Kjdjmf0S2e7Gu6yTvRE7S1ls3km
+         bC4A==
+X-Forwarded-Encrypted: i=1; AJvYcCW8wM+8xyVYWGbz/oKc+yW/nhKKoHQZjeZgK1bTeWL1JN4kGeozCC7b4ZsK2QtCPEwzEY8DUUw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzB3zEl1RIQ532jc0re/HCP4xNFlqY6/1ayRzuTiguyOVEVdpAc
+	zh+FPq30QBtLcBqsMdhn8oFOSbisXiXVqsin6mI0xb3iJ5iV6fcQRUg=
+X-Gm-Gg: ASbGnctJN5GPHvbOW1k5TYxCLEdfBU80fISX1ODlUY1H6Y0MXgSAka18L5c98wXk5t4
+	uYWG6oqgfTeyJBn4cdxQXT7PuPWRN3LuBxQM3fkOn1c6Tag2kdxnWOcKwFSlA4hNYgoQ1PxSEfp
+	XIPzeB0hoOesVMu/c4ZMJNnsoGEdPRDUkv6AbXpxLL2EDgOFmquEdYza8j60STjVw/ZBs9D/kBV
+	KBkQvXjDgDQymuEZbWckV5rPBJv2Aty8QeTTUABW4Dr2hw1tKu987fsTI4Gmm84kHV2lr3flNbO
+	SF58+EGTIgr+040/azi3eENWN5un72W+A/qlCDzuY/HZjmLNNq2QRb4STqHPjZrfrEuqpB5TnLY
+	ckOldRpxsNNJ4LJSMBwXn+BtPwrCe2Qy7WcOHIIrzoBU9uszFE82gqC2QlSmX9WgS/3IXm3Vn6q
+	GdMtp/9f0lj5dAjNiFdYlCgD5UiX/CBabOeIaZQuQB8RKtGxXB7+Lv7R8osslEI0rgcnvoUxmHQ
+	4uT
+X-Google-Smtp-Source: AGHT+IETBbukUvkAuvQVb1Skx6MlL0Qne0xJdc/u3lmyMRgaNlL6QuTtewx92TllrETSMx2zMBvRAA==
+X-Received: by 2002:a05:6a20:7d8a:b0:251:c33d:2783 with SMTP id adf61e73a8af0-2925bace118mr16480567637.23.1758555813010;
+        Mon, 22 Sep 2025 08:43:33 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-330607eac4esm13558095a91.21.2025.09.22.08.43.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Sep 2025 08:43:55 -0700 (PDT)
-From: Siva Reddy Kallam <siva.kallam@broadcom.com>
-To: leonro@nvidia.com,
-	jgg@nvidia.com
-Cc: linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	vikas.gupta@broadcom.com,
-	selvin.xavier@broadcom.com,
-	anand.subramanian@broadcom.com,
-	usman.ansari@broadcom.com,
-	Siva Reddy Kallam <siva.kallam@broadcom.com>
-Subject: [PATCH v2 8/8] RDMA/bng_re: Initialize the Firmware and Hardware
-Date: Mon, 22 Sep 2025 15:43:03 +0000
-Message-Id: <20250922154303.246809-9-siva.kallam@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250922154303.246809-1-siva.kallam@broadcom.com>
-References: <20250922154303.246809-1-siva.kallam@broadcom.com>
+        Mon, 22 Sep 2025 08:43:32 -0700 (PDT)
+Date: Mon, 22 Sep 2025 08:43:32 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH RFC bpf-next 2/6] net: xdp: Add xmo_rx_checksum callback
+Message-ID: <aNFupGy1QxlhRSUE@mini-arch>
+References: <20250920-xdp-meta-rxcksum-v1-0-35e76a8a84e7@kernel.org>
+ <20250920-xdp-meta-rxcksum-v1-2-35e76a8a84e7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250920-xdp-meta-rxcksum-v1-2-35e76a8a84e7@kernel.org>
 
-Initialize the firmware and hardware with HWRM command.
+On 09/20, Lorenzo Bianconi wrote:
+> Introduce xmo_rx_checksum netdev callback in order allow the eBPF
+> program bounded to the device to retrieve the RX checksum result computed
+> by the hw NIC.
+> 
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  include/net/xdp.h |  6 ++++++
+>  net/core/xdp.c    | 29 +++++++++++++++++++++++++++++
+>  2 files changed, 35 insertions(+)
+> 
+> diff --git a/include/net/xdp.h b/include/net/xdp.h
+> index 6fd294fa6841d59c3d7dc4475e09e731996566b0..481b39976ac8c8d4db2de39055c72ba8d0d511c3 100644
+> --- a/include/net/xdp.h
+> +++ b/include/net/xdp.h
+> @@ -581,6 +581,10 @@ void xdp_attachment_setup(struct xdp_attachment_info *info,
+>  			   NETDEV_XDP_RX_METADATA_VLAN_TAG, \
+>  			   bpf_xdp_metadata_rx_vlan_tag, \
+>  			   xmo_rx_vlan_tag) \
+> +	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_CHECKSUM, \
+> +			   NETDEV_XDP_RX_METADATA_CHECKSUM, \
+> +			   bpf_xdp_metadata_rx_checksum, \
+> +			   xmo_rx_checksum)
+>  
+>  enum xdp_rx_metadata {
+>  #define XDP_METADATA_KFUNC(name, _, __, ___) name,
+> @@ -644,6 +648,8 @@ struct xdp_metadata_ops {
+>  			       enum xdp_rss_hash_type *rss_type);
+>  	int	(*xmo_rx_vlan_tag)(const struct xdp_md *ctx, __be16 *vlan_proto,
+>  				   u16 *vlan_tci);
+> +	int	(*xmo_rx_checksum)(const struct xdp_md *ctx, u8 *ip_summed,
+> +				   u32 *cksum_meta);
+>  };
+>  
+>  #ifdef CONFIG_NET
+> diff --git a/net/core/xdp.c b/net/core/xdp.c
+> index 9100e160113a9a1e2cb88e7602e85c5f36a9f3b9..3edab2d5e5c7c2013b1ef98c949a83655eb94349 100644
+> --- a/net/core/xdp.c
+> +++ b/net/core/xdp.c
+> @@ -961,6 +961,35 @@ __bpf_kfunc int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx,
+>  	return -EOPNOTSUPP;
+>  }
+>  
+> +/**
+> + * bpf_xdp_metadata_rx_checksum - Read XDP frame RX checksum.
+> + * @ctx: XDP context pointer.
+> + * @ip_summed: Return value pointer indicating checksum result.
+> + * @cksum_meta: Return value pointer indicating checksum result metadata.
+> + *
+> + * In case of success, ``ip_summed`` is set to the RX checksum result. Possible
+> + * values are:
+> + * ``CHECKSUM_NONE``
+> + * ``CHECKSUM_UNNECESSARY``
+> + * ``CHECKSUM_COMPLETE``
+> + * ``CHECKSUM_PARTIAL``
 
-Signed-off-by: Siva Reddy Kallam <siva.kallam@broadcom.com>
-Reviewed-by: Usman Ansari <usman.ansari@broadcom.com>
----
- drivers/infiniband/hw/bng_re/bng_dev.c | 92 +++++++++++++++++++++++++-
- drivers/infiniband/hw/bng_re/bng_fw.c  | 65 ++++++++++++++++++
- drivers/infiniband/hw/bng_re/bng_fw.h  |  4 ++
- drivers/infiniband/hw/bng_re/bng_re.h  |  4 ++
- drivers/infiniband/hw/bng_re/bng_res.c | 27 ++++++++
- drivers/infiniband/hw/bng_re/bng_res.h | 14 ++++
- 6 files changed, 203 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/infiniband/hw/bng_re/bng_dev.c b/drivers/infiniband/hw/bng_re/bng_dev.c
-index 9dbd8837457d..454789432178 100644
---- a/drivers/infiniband/hw/bng_re/bng_dev.c
-+++ b/drivers/infiniband/hw/bng_re/bng_dev.c
-@@ -182,6 +182,56 @@ static int bng_re_net_ring_alloc(struct bng_re_dev *rdev,
- 	return rc;
- }
- 
-+static int bng_re_stats_ctx_free(struct bng_re_dev *rdev)
-+{
-+	struct bnge_auxr_dev *aux_dev = rdev->aux_dev;
-+	struct hwrm_stat_ctx_free_input req = {};
-+	struct hwrm_stat_ctx_free_output resp = {};
-+	struct bnge_fw_msg fw_msg = {};
-+	int rc = -EINVAL;
-+
-+	if (!aux_dev)
-+		return rc;
-+
-+	bng_re_init_hwrm_hdr((void *)&req, HWRM_STAT_CTX_FREE);
-+	req.stat_ctx_id = cpu_to_le32(rdev->stats_ctx.fw_id);
-+	bng_re_fill_fw_msg(&fw_msg, (void *)&req, sizeof(req), (void *)&resp,
-+			   sizeof(resp), BNGE_DFLT_HWRM_CMD_TIMEOUT);
-+	rc = bnge_send_msg(aux_dev, &fw_msg);
-+	if (rc)
-+		ibdev_err(&rdev->ibdev, "Failed to free HW stats context %#x",
-+			  rc);
-+
-+	return rc;
-+}
-+
-+static int bng_re_stats_ctx_alloc(struct bng_re_dev *rdev)
-+{
-+	struct bnge_auxr_dev *aux_dev = rdev->aux_dev;
-+	struct bng_re_stats *stats = &rdev->stats_ctx;
-+	struct hwrm_stat_ctx_alloc_output resp = {};
-+	struct hwrm_stat_ctx_alloc_input req = {};
-+	struct bnge_fw_msg fw_msg = {};
-+	int rc = -EINVAL;
-+
-+	stats->fw_id = BNGE_INVALID_STATS_CTX_ID;
-+
-+	if (!aux_dev)
-+		return rc;
-+
-+	bng_re_init_hwrm_hdr((void *)&req, HWRM_STAT_CTX_ALLOC);
-+	req.update_period_ms = cpu_to_le32(1000);
-+	req.stats_dma_addr = cpu_to_le64(stats->dma_map);
-+	req.stats_dma_length = cpu_to_le16(rdev->chip_ctx->hw_stats_size);
-+	req.stat_ctx_flags = STAT_CTX_ALLOC_REQ_STAT_CTX_FLAGS_ROCE;
-+	bng_re_fill_fw_msg(&fw_msg, (void *)&req, sizeof(req), (void *)&resp,
-+			   sizeof(resp), BNGE_DFLT_HWRM_CMD_TIMEOUT);
-+	rc = bnge_send_msg(aux_dev, &fw_msg);
-+	if (!rc)
-+		stats->fw_id = le32_to_cpu(resp.stat_ctx_id);
-+	return rc;
-+}
-+
- static void bng_re_query_hwrm_version(struct bng_re_dev *rdev)
- {
- 	struct bnge_auxr_dev *aux_dev = rdev->aux_dev;
-@@ -220,11 +270,21 @@ static void bng_re_query_hwrm_version(struct bng_re_dev *rdev)
- 
- static void bng_re_dev_uninit(struct bng_re_dev *rdev)
- {
-+	int rc;
- 	bng_re_debugfs_rem_pdev(rdev);
--	bng_re_disable_rcfw_channel(&rdev->rcfw);
--	bng_re_net_ring_free(rdev, rdev->rcfw.creq.ring_id,
-+
-+	if (test_and_clear_bit(BNG_RE_FLAG_RCFW_CHANNEL_EN, &rdev->flags)) {
-+		rc = bng_re_deinit_rcfw(&rdev->rcfw);
-+		if (rc)
-+			ibdev_warn(&rdev->ibdev,
-+				   "Failed to deinitialize RCFW: %#x", rc);
-+		bng_re_stats_ctx_free(rdev);
-+		bng_re_free_stats_ctx_mem(rdev->bng_res.pdev, &rdev->stats_ctx);
-+		bng_re_disable_rcfw_channel(&rdev->rcfw);
-+		bng_re_net_ring_free(rdev, rdev->rcfw.creq.ring_id,
- 			     RING_ALLOC_REQ_RING_TYPE_NQ);
--	bng_re_free_rcfw_channel(&rdev->rcfw);
-+		bng_re_free_rcfw_channel(&rdev->rcfw);
-+	}
- 
- 	kfree(rdev->nqr);
- 	rdev->nqr = NULL;
-@@ -322,8 +382,34 @@ static int bng_re_dev_init(struct bng_re_dev *rdev)
- 		goto disable_rcfw;
- 
- 	bng_re_debugfs_add_pdev(rdev);
-+	rc = bng_re_alloc_stats_ctx_mem(rdev->bng_res.pdev, rdev->chip_ctx,
-+					&rdev->stats_ctx);
-+	if (rc) {
-+		ibdev_err(&rdev->ibdev,
-+			  "Failed to allocate stats context: %#x\n", rc);
-+		goto disable_rcfw;
-+	}
-+
-+	rc = bng_re_stats_ctx_alloc(rdev);
-+	if (rc) {
-+		ibdev_err(&rdev->ibdev,
-+			  "Failed to allocate QPLIB context: %#x\n", rc);
-+		goto free_stats_ctx;
-+	}
-+
-+	rc = bng_re_init_rcfw(&rdev->rcfw, &rdev->stats_ctx);
-+	if (rc) {
-+		ibdev_err(&rdev->ibdev,
-+			  "Failed to initialize RCFW: %#x\n", rc);
-+		goto free_sctx;
-+	}
-+	set_bit(BNG_RE_FLAG_RCFW_CHANNEL_EN, &rdev->flags);
- 
- 	return 0;
-+free_sctx:
-+	bng_re_stats_ctx_free(rdev);
-+free_stats_ctx:
-+	bng_re_free_stats_ctx_mem(rdev->bng_res.pdev, &rdev->stats_ctx);
- disable_rcfw:
- 	bng_re_disable_rcfw_channel(&rdev->rcfw);
- free_ring:
-diff --git a/drivers/infiniband/hw/bng_re/bng_fw.c b/drivers/infiniband/hw/bng_re/bng_fw.c
-index f16fd21dfbce..803610fb9c58 100644
---- a/drivers/infiniband/hw/bng_re/bng_fw.c
-+++ b/drivers/infiniband/hw/bng_re/bng_fw.c
-@@ -5,6 +5,7 @@
- #include "roce_hsi.h"
- #include "bng_res.h"
- #include "bng_fw.h"
-+#include "bng_sp.h"
- 
- /**
-  * bng_re_map_rc  -  map return type based on opcode
-@@ -700,3 +701,67 @@ int bng_re_enable_fw_channel(struct bng_re_rcfw *rcfw,
- 	bng_re_start_rcfw(rcfw);
- 	return 0;
- }
-+
-+int bng_re_deinit_rcfw(struct bng_re_rcfw *rcfw)
-+{
-+	struct creq_deinitialize_fw_resp resp = {};
-+	struct cmdq_deinitialize_fw req = {};
-+	struct bng_re_cmdqmsg msg = {};
-+	int rc;
-+
-+	bng_re_rcfw_cmd_prep((struct cmdq_base *)&req,
-+			     CMDQ_BASE_OPCODE_DEINITIALIZE_FW,
-+			     sizeof(req));
-+	bng_re_fill_cmdqmsg(&msg, &req, &resp, NULL,
-+			    sizeof(req), sizeof(resp), 0);
-+	rc = bng_re_rcfw_send_message(rcfw, &msg);
-+	if (rc)
-+		return rc;
-+
-+	clear_bit(FIRMWARE_INITIALIZED_FLAG, &rcfw->cmdq.flags);
-+	return 0;
-+}
-+static inline bool _is_hw_retx_supported(u16 dev_cap_flags)
-+{
-+	return dev_cap_flags &
-+		(CREQ_QUERY_FUNC_RESP_SB_HW_REQUESTER_RETX_ENABLED |
-+		 CREQ_QUERY_FUNC_RESP_SB_HW_RESPONDER_RETX_ENABLED);
-+}
-+
-+#define BNG_RE_HW_RETX(a) _is_hw_retx_supported((a))
-+static inline bool _is_optimize_modify_qp_supported(u16 dev_cap_ext_flags2)
-+{
-+	return dev_cap_ext_flags2 &
-+	       CREQ_QUERY_FUNC_RESP_SB_OPTIMIZE_MODIFY_QP_SUPPORTED;
-+}
-+
-+int bng_re_init_rcfw(struct bng_re_rcfw *rcfw,
-+		     struct bng_re_stats *stats_ctx)
-+{
-+	struct creq_initialize_fw_resp resp = {};
-+	struct cmdq_initialize_fw req = {};
-+	struct bng_re_cmdqmsg msg = {};
-+	int rc;
-+	u16 flags = 0;
-+
-+	bng_re_rcfw_cmd_prep((struct cmdq_base *)&req,
-+			     CMDQ_BASE_OPCODE_INITIALIZE_FW,
-+			     sizeof(req));
-+	/* Supply (log-base-2-of-host-page-size - base-page-shift)
-+	 * to bono to adjust the doorbell page sizes.
-+	 */
-+	req.log2_dbr_pg_size = cpu_to_le16(PAGE_SHIFT -
-+					   BNG_FW_DBR_BASE_PAGE_SHIFT);
-+	if (BNG_RE_HW_RETX(rcfw->res->dattr->dev_cap_flags))
-+		flags |= CMDQ_INITIALIZE_FW_FLAGS_HW_REQUESTER_RETX_SUPPORTED;
-+	if (_is_optimize_modify_qp_supported(rcfw->res->dattr->dev_cap_flags2))
-+		flags |= CMDQ_INITIALIZE_FW_FLAGS_OPTIMIZE_MODIFY_QP_SUPPORTED;
-+	req.flags |= cpu_to_le16(flags);
-+	req.stat_ctx_id = cpu_to_le32(stats_ctx->fw_id);
-+	bng_re_fill_cmdqmsg(&msg, &req, &resp, NULL, sizeof(req), sizeof(resp), 0);
-+	rc = bng_re_rcfw_send_message(rcfw, &msg);
-+	if (rc)
-+		return rc;
-+	set_bit(FIRMWARE_INITIALIZED_FLAG, &rcfw->cmdq.flags);
-+	return 0;
-+}
-diff --git a/drivers/infiniband/hw/bng_re/bng_fw.h b/drivers/infiniband/hw/bng_re/bng_fw.h
-index 88476d6c1d07..c89c926ec2fc 100644
---- a/drivers/infiniband/hw/bng_re/bng_fw.h
-+++ b/drivers/infiniband/hw/bng_re/bng_fw.h
-@@ -10,6 +10,7 @@
- #define BNG_FW_CMDQ_TRIG_VAL		1
- #define BNG_FW_COMM_PCI_BAR_REGION	0
- #define BNG_FW_COMM_CONS_PCI_BAR_REGION	2
-+#define BNG_FW_DBR_BASE_PAGE_SHIFT	12
- #define BNG_FW_COMM_SIZE		0x104
- #define BNG_FW_COMM_BASE_OFFSET		0x600
- #define BNG_FW_COMM_TRIG_OFFSET		0x100
-@@ -204,4 +205,7 @@ int bng_re_rcfw_start_irq(struct bng_re_rcfw *rcfw, int msix_vector,
- void bng_re_rcfw_stop_irq(struct bng_re_rcfw *rcfw, bool kill);
- int bng_re_rcfw_send_message(struct bng_re_rcfw *rcfw,
- 			     struct bng_re_cmdqmsg *msg);
-+int bng_re_init_rcfw(struct bng_re_rcfw *rcfw,
-+		     struct bng_re_stats *stats_ctx);
-+int bng_re_deinit_rcfw(struct bng_re_rcfw *rcfw);
- #endif
-diff --git a/drivers/infiniband/hw/bng_re/bng_re.h b/drivers/infiniband/hw/bng_re/bng_re.h
-index 76837f17f12d..f63791d716b7 100644
---- a/drivers/infiniband/hw/bng_re/bng_re.h
-+++ b/drivers/infiniband/hw/bng_re/bng_re.h
-@@ -17,6 +17,8 @@
- #define BNG_RE_MAX_MSIX		BNGE_MAX_ROCE_MSIX
- 
- #define BNG_RE_CREQ_NQ_IDX	0
-+
-+#define BNGE_INVALID_STATS_CTX_ID	-1
- /* NQ specific structures  */
- struct bng_re_nq_db {
- 	struct bng_re_reg_desc	reg;
-@@ -66,6 +68,7 @@ struct bng_re_dev {
- 	struct ib_device		ibdev;
- 	unsigned long			flags;
- #define BNG_RE_FLAG_NETDEV_REGISTERED		0
-+#define BNG_RE_FLAG_RCFW_CHANNEL_EN		1
- 	struct net_device		*netdev;
- 	struct auxiliary_device         *adev;
- 	struct bnge_auxr_dev		*aux_dev;
-@@ -77,6 +80,7 @@ struct bng_re_dev {
- 	/* Device Resources */
- 	struct bng_re_dev_attr		*dev_attr;
- 	struct dentry			*dbg_root;
-+	struct bng_re_stats		stats_ctx;
- };
- 
- #endif
-diff --git a/drivers/infiniband/hw/bng_re/bng_res.c b/drivers/infiniband/hw/bng_re/bng_res.c
-index cb42c0fd2cdf..c50823758b53 100644
---- a/drivers/infiniband/hw/bng_re/bng_res.c
-+++ b/drivers/infiniband/hw/bng_re/bng_res.c
-@@ -9,6 +9,33 @@
- #include "bng_res.h"
- #include "roce_hsi.h"
- 
-+/* Stats */
-+void bng_re_free_stats_ctx_mem(struct pci_dev *pdev,
-+			       struct bng_re_stats *stats)
-+{
-+	if (stats->dma) {
-+		dma_free_coherent(&pdev->dev, stats->size,
-+				  stats->dma, stats->dma_map);
-+	}
-+	memset(stats, 0, sizeof(*stats));
-+	stats->fw_id = -1;
-+}
-+
-+int bng_re_alloc_stats_ctx_mem(struct pci_dev *pdev,
-+			       struct bng_re_chip_ctx *cctx,
-+			       struct bng_re_stats *stats)
-+{
-+	memset(stats, 0, sizeof(*stats));
-+	stats->fw_id = -1;
-+	stats->size = cctx->hw_stats_size;
-+	stats->dma = dma_alloc_coherent(&pdev->dev, stats->size,
-+					&stats->dma_map, GFP_KERNEL);
-+	if (!stats->dma)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
- static void bng_free_pbl(struct bng_re_res  *res, struct bng_re_pbl *pbl)
- {
- 	struct pci_dev *pdev = res->pdev;
-diff --git a/drivers/infiniband/hw/bng_re/bng_res.h b/drivers/infiniband/hw/bng_re/bng_res.h
-index 7315db347aa6..9997f86d6a0e 100644
---- a/drivers/infiniband/hw/bng_re/bng_res.h
-+++ b/drivers/infiniband/hw/bng_re/bng_res.h
-@@ -125,6 +125,13 @@ struct bng_re_hwq {
- 	u16				qe_ppg;
- };
- 
-+struct bng_re_stats {
-+	dma_addr_t			dma_map;
-+	void				*dma;
-+	u32				size;
-+	u32				fw_id;
-+};
-+
- struct bng_re_res {
- 	struct pci_dev			*pdev;
- 	struct bng_re_chip_ctx		*cctx;
-@@ -198,4 +205,11 @@ void bng_re_free_hwq(struct bng_re_res *res,
- 
- int bng_re_alloc_init_hwq(struct bng_re_hwq *hwq,
- 			  struct bng_re_hwq_attr *hwq_attr);
-+
-+void bng_re_free_stats_ctx_mem(struct pci_dev *pdev,
-+			       struct bng_re_stats *stats);
-+
-+int bng_re_alloc_stats_ctx_mem(struct pci_dev *pdev,
-+			       struct bng_re_chip_ctx *cctx,
-+			       struct bng_re_stats *stats);
- #endif
--- 
-2.34.1
-
+What do you think about adding new UAPI enum here? Similar to
+xdp_rss_hash_type for the hash. The values can match the internal
+CHECKSUM_XXX ones with (BUILD_BUG_ONs to enforce the relationship).
+Will be a bit nicer api-wise to have an enum than an opaque u8.
 
