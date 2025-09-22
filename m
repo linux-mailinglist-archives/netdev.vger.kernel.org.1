@@ -1,117 +1,156 @@
-Return-Path: <netdev+bounces-225248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FCC4B9122A
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 14:34:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 746D6B91245
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 14:38:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01A7217AC51
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 12:34:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 378191660C8
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 12:38:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D131D3081A8;
-	Mon, 22 Sep 2025 12:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1895D28D83D;
+	Mon, 22 Sep 2025 12:38:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nkq+RnKT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="c6+IwH97"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69581305056
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 12:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC58305E3B
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 12:38:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758544459; cv=none; b=qlBiLWyczNGEXMKQ0lyMQQBnfzQcGt0GK/To7tgdLWqctOzMcRAMc/u6wqWZo63GaSCuIyULM4dOp2zcZE27pMTA1/2M/QORkI4Z+cuNCtKK/X2KJeztuWV3cVMCt6YL2vTCgpS8mZpqMuAawjM8gaSMIg3pTWIzFc0ladWv0dY=
+	t=1758544692; cv=none; b=YSEVQmmMSFsNAL1WMXBPlef0qZAmz0vx3LLHp1vwTYEwIxsdQEl3kLO7FMn4+CK4FqeYdVGNsCqzTYJk/Xt7XXuOTEGkIYfhXeoWw4HenKSGv1AuGb/yu07tFA2zIvWT7d18IBW6Zq8HiEVTbYCuTc6eXyUYSwxcjVTThD8Drwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758544459; c=relaxed/simple;
-	bh=vbd/dIVFJeMuDWZGTwJ4IGGTJIynPy2T9UsNctLcg+8=;
+	s=arc-20240116; t=1758544692; c=relaxed/simple;
+	bh=XGhoOgJmqDt8u+WPyGufWLd32mB43qLxiWnV4nGqL5w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BXNuWVBx6HmdYzIMCbRrnk6uvyFrKiiARsGSOQ7p97bs2bncMABRs6uX/jaS0SVpWorgPH7RKBG9xWFsQ73eEYXixcGdhMy5XtYQE9XF8w8vkGlrIz2yEe7bw9hDrWFTPqMr5HNDQc5iF1vOy7NiVuTyoujeE7lyIjdI9xztO9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nkq+RnKT; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-77e87003967so1386876b3a.1
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 05:34:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758544458; x=1759149258; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V7N/A/nDdO81iETqklo4zlY9UTRGuYMbbXYZaKO6LOQ=;
-        b=nkq+RnKTOX1QmxxtADvxvCnTCHZgGC3811KoxN9P+SI4O3VqEoFXndehbJLEysxtsW
-         0sRGXlCprFdcJNLLqZb2vDlw9S7q6SJcrBMugM+oCINdELZYG/yUYG5KZ2hY4h2JniVL
-         ZLloidt+MuZI4y9xHQkiNG+kl+RshIS8MMORc+ZWMzW1JaQW0WrEDlfUgB3p4O+zhwjZ
-         0i6GMnwUwRW39of/TGxzNa7y8SmqQq/zvc2jdQ21Y/VDFdHxXOLYgVTWRpRQzVtC7/91
-         pgXkukd9RtKJcHRiI53qnTmig13KuKBRlx50gTcWh+dgDI7P2rfqRDgS0R+k2li+yjS6
-         56Zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758544458; x=1759149258;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V7N/A/nDdO81iETqklo4zlY9UTRGuYMbbXYZaKO6LOQ=;
-        b=i7OtwxGxK4RWbaF6uWeX+hk8aII7cyxDwgth+wuCk7LtjZJMVRkhvP1jpTpzuAheYJ
-         vIdv+U+YYn31q9UMXokuzEqpZTDBr1BifdhTKknU4PeXSlQAZv+wyX4stRgWqtM//TGd
-         4hjNIDKZTFBkhW0LbKASqK8pOtNZdsBozgveK20GaBjut7eyp1NF3hIMqtrBXXnPSTRn
-         BgMq3BItt0liZ4D/9DWdxwrBqQpXbrTCmc3YUcjCi+iMhZXgLo6m/IwFYGl2wu1BHrh8
-         wvBM7KJSeCfqmpdLLg9+bze/z5ij0OCoArhdM6cM3fwERn3+1IaRmjlC1JZbnskr8Ukq
-         H/Pw==
-X-Forwarded-Encrypted: i=1; AJvYcCVp3UbJ5UMQo78hZzQp8t3tB+rdmRef1klcYvg9DWZgsa9WHevH0Wwzua5U0Nvj+wbjWqG/DFk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXQhmz6UJ5E3MTV4coq4dbGc5r0thzBTx6qVEOdUmQIGe1wBJJ
-	0E0Nq3xQAcq/DuiU+otGadeltoKogA+YT3g4v8lLxYsvBn5x6Mz5ykXc
-X-Gm-Gg: ASbGncueS6BIasCX9r4nIybBaHffIZJEqAOvf9QlPTQA0+krVSMLRIZPInGGtnHvnS2
-	g2/FGrwuok2I5XzLw1lxtAZlvMQxbohMohNJGd5wlZvwij6wUssQFqcgKULTkspckEH13n1HjN8
-	q+UMVauELb/ItV26MqjGgVLLTA0BOQuJ9erW2ArMrAgpgQpLUtnj0EDW9/x5WIprJhU1MsyfvTA
-	X0vRAjpnKbQwfH9kjw+t8R9jjW6UBxwN6UPJWLDzeU/AOhlqKVkqnLNfbH+2BNuz0+e2PgToxVk
-	xre6N6FQZyHg/5f38mo0hZKLT1fMXn/OZJS39X/1EqWGplQJqXCYl+VuK/7IIVdzdANKp+bJH+G
-	gZUch0fPyjC4KJkm0/H/ITA==
-X-Google-Smtp-Source: AGHT+IHdWuuU//PjNYXcYLakegZtFFcQb6zpKh1LJyLgmx6iYUCqAqcadaDUiwNWxci1/ojb7D6lFg==
-X-Received: by 2002:a05:6a00:3c91:b0:776:1f45:9044 with SMTP id d2e1a72fcca58-77e49f0742fmr14342835b3a.0.1758544457581;
-        Mon, 22 Sep 2025 05:34:17 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77f363ed5a0sm3251366b3a.41.2025.09.22.05.34.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Sep 2025 05:34:16 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 606834220596; Mon, 22 Sep 2025 19:34:13 +0700 (WIB)
-Date: Mon, 22 Sep 2025 19:34:13 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.og>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux AFS <linux-afs@lists.infradead.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=RTnSSkXN6K3JBDdM+unTA7BdNyCkDRWx/StvqMk7TZxJnI9orL0s6Up42f6W25GNVNCEUt6scGFAxXid8fI30mWrKfjeFQpXC4eIFi4BC7JCwoqrZBEj/yE+FXt2wDdn6SDCCIsCV9xKEjuAOjhOxCvodptzybIWCeJCFmb2rUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=c6+IwH97; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Cptg2XPcazefnww5fnawVEk1Q8wBmu4jZtFflDymxJc=; b=c6+IwH97Mk52JPQMgCrX1FuGOk
+	VNOEwOkqs3kH8y4Xgkli6LkqRcZJ7Z/DhbzDUxqzKKGAHcoKojdOFYtguwGYYMTf+89etzMA7eke5
+	C0lKvkTu+yxsp5td6Npge7+OQLjCRn4TClBXsQFZADFF6yaA0hAgGwU3pVEpLYJ5a5mpiAPtvnYV5
+	QR+sZH9Zgt9aoka0MUlX/BTILvTA/hIm6P00dsoAlxMzKcLQb+QSD1razh6BGY77bPtgld5pB2oLv
+	ev3R4WtfIG2IL5LPPKeIHq/qhC++DzBOXdtPUzkyFsLwmJuVuh8L0plAwLXvj2ueGH0C38pQLW1RD
+	NOUtf6ow==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51032)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v0fnw-000000004lg-2yKL;
+	Mon, 22 Sep 2025 13:38:04 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v0fnt-0000000056f-35aw;
+	Mon, 22 Sep 2025 13:38:01 +0100
+Date: Mon, 22 Sep 2025 13:38:01 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Janpieter Sollie <janpieter.sollie@kabelmail.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: Re: [PATCH net-next] Documentation: rxrpc: Demote three sections
-Message-ID: <aNFCRVGajxlZjjxa@archie.me>
-References: <20250922100253.39130-1-bagasdotme@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [RFC] increase MDIO i2c poll timeout gradually (including patch)
+Message-ID: <aNFDKaIh6RNqLcBM@shell.armlinux.org.uk>
+References: <971aaa4c-ee1d-4ca1-ba38-d65db776d869@kabelmail.de>
+ <cbc4a620-36d3-409b-a248-a2b4add0016a@lunn.ch>
+ <f86737b0-a0fe-49a6-aeca-9e51fbdf0f0d@kabelmail.de>
+ <aM6Ng7tnEYdWmI1F@shell.armlinux.org.uk>
+ <6d444507-1c97-4904-8edb-e8cc1aa4399e@kabelmail.de>
+ <aM6xwq6Ns_LGxl4o@shell.armlinux.org.uk>
+ <4683e9ea-f795-4dab-8a0a-bd0b0f4fbd99@kabelmail.de>
+ <3fab95da-95c8-4cf5-af16-4b576095a1d9@kabelmail.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250922100253.39130-1-bagasdotme@gmail.com>
+In-Reply-To: <3fab95da-95c8-4cf5-af16-4b576095a1d9@kabelmail.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Sep 22, 2025 at 05:02:53PM +0700, Bagas Sanjaya wrote:
-> Three sections ("Socket Options", "Security", and "Example Client Usage")
-> use title headings, which increase number of entries in the networking
-> docs toctree by three, and also make the rest of sections headed under
-> "Example Client Usage".
-> 
-> Demote these sections back to section headings.
+On Mon, Sep 22, 2025 at 12:54:20PM +0200, Janpieter Sollie wrote:
+> this is a diff of 10usecs (i=10), 40usecs (i=4) and 30usecs (i=3) my device
+> is running the i2c_transfer_rollball().
+> seems a lot to me when an i2c call takes 11-12 usecs avg per call
+> are you sure these numbers point to a stable i2c bus?
 
-Oops, I misspelled LKML address. I'll resend shortly.
+I guess you've never dealt with I2C buses before. As has already been
+stated, the clock rate for I2C used with SFP modules (which is, if you
+like, I2C v1) is 100kHz. that's 10us per bit.
 
-Thanks.
+An I2C transaction consists of one start bit, 8 bits for the address
+and r/w bit, one bit for the ack, 8 bits for the each byte of data
+and their individual ACK bits, and finally a stop bit. If a restart
+condition is used, the stop and start between the messages can be
+combined into a restart condition, saving one bit.
+
+That works out at 1 + 8 + 1 + N*(8 + 1) + 1 bits, or 11 + 9 * N bits
+or clocks.
+
+The polling consists of two transactions on the bus:
+
+- a write of one byte - giving 20 clock cycles.
+- a read of six bytes - giving 65 clock cycles.
+
+So that's 85 clock cycles, or 84 if using restart. At 10us per cycle,
+that's 840us _minimum_.
+
+If i2c_transfer() for that write and read are taking on the order of
+12us, that suggest the bus is being clocked at around 7MHz, which is
+certainly way too fast, a bug in the I2C driver, an issue with the
+I2C hardware, or maybe an error in calculating how long a call takes.
+
+And... it's your interpretation of your results.
+
+Remember, these are nanoseconds (ns), nanoseconds are 1000 microseconds
+(us) and there are 1000000 nanoseconds in a millisecond (ms). Sorry
+to teach you to suck eggs, but based on your reply it seems necessary
+to point this out.
+
+You quoted an average of 99901858ns - 99.9ms for the i=3 case.
+You quoted an average of 86375811ns - 86.4ms for the i=4 case.
+
+Given that the difference in msleep() delay is 5ms, and we're
+talking about 50 or 55ms here, for the i=3 case that's 45ms
+for i2c_transfer(). For the i=4 case, that's 36.4ms.
+
+However, msleep() is not accurate - and may even be bucket-based so I
+wouldn't rely on the requested msleep() interval being what you end
+up with - which seems to be suggested by the difference of almost 10ms
+in the apparent time that i2c_transfer() takes. 10ms, not 10us. So,
+unless you actually obtain timestamps before and after the
+i2c_transfer() call and calculate their difference, I would not read
+too much into that.
+
+In any case, figures in the realms of milliseconds are certainly in the
+realm of possibility for a 100kHz bus - as I say, one instance of a
+transaction _should_ be no less than 840 microseconds, so if your
+calculations come out less than that, you should not be claiming
+"bad bus" or something like that, but at first revalidating your
+analysis or interpretation of the figures.
+
+Also, because of scheduling delays, and some I2C drivers will sleep
+waiting for the transaction to finish, even that measurement I
+suggest can not be said to relate to the actual time it takes for
+the transactions on the bus, unless you're running a hard-realtime OS.
+
+However, it seems you're very keen to blame the I2C bus hardware...
 
 -- 
-pw-bot: changes-requested
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
