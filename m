@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-225175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E774B8FB30
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 11:09:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95D6AB8FAC7
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 11:02:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F6291883CE8
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 09:09:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C44318A1803
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 09:02:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD00E283FE4;
-	Mon, 22 Sep 2025 09:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68CDB26E715;
+	Mon, 22 Sep 2025 09:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cWTyIjn5"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="SmkiQXda"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f225.google.com (mail-qk1-f225.google.com [209.85.222.225])
+Received: from mail-pl1-f227.google.com (mail-pl1-f227.google.com [209.85.214.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB99F277C9A
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 09:09:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FBA0271443
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 09:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758532159; cv=none; b=kG+igEx6J/XjbCwzi4xPdWyn74SGqKFjnSFhl7uvs+JdVgDw8NXL0eGgbN+wQ114hPrHjdao+JGd2cCX9Wynej7E2wFTh85kIQZ/Cc6Dtb+frgqzedTCXYG9SHaG/9c5tMyIRyAHIX8p/hbTq6cPiQwnhxhbXhMjaS+cH2BpR88=
+	t=1758531690; cv=none; b=lDFpkyhes6j5L0ayBapDt3sktAbWf8jxCn0ngIH1fTzTRo+g6Dn/ml8Pd8hTOi9iTNf6BIkvoMr/Pu66jvbfTHwyeLxlorAjTXg4NuiKaoMWrUcVSDaDTO3tqzirdLm+XONEw3AQySXMbQnY9fDLh083KmRLMXKSg9udbsoO+7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758532159; c=relaxed/simple;
-	bh=P+xbXXENIRr59C9H8dmSx7rvC10vfBao+7CkpfUO3bM=;
+	s=arc-20240116; t=1758531690; c=relaxed/simple;
+	bh=Qy8hYffP3sPiIpsuUpUG1Z3+dVX26Kd+av/R9Ub7Ruc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cyLfosQG5Owh4H+Ej14z5Hu7Fzy2A6H91P7OzoXhSq5dcz/JXeuzVZ8HvrfvLRDtgoNv6K30W1XUfRAR/Fj/77IIA4e5z4pPNdYwNFy09iRJFGe1SwqTZVDZQM9U5SVvzadgWWQA5ucEEPf5/fz9Cyn9o9x/Mc5uiVNFUtONlFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cWTyIjn5; arc=none smtp.client-ip=209.85.222.225
+	 MIME-Version; b=KGwXpMTH3oqU8zjfSwiH1uOx4dr6ymzLiPUhiFQbs1IDTxyP+AAGfLzvh+gVB5U/S1KvQEM1daasnjYqtDAG/PeL9JzwXYAN0DjSPnwPjq3upX3q7zps0xDZRNCQ9NCXdS9VeaqK7z+Qga0gsHQ36eJpkoxVsgIMmR6PdPfSrSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=SmkiQXda; arc=none smtp.client-ip=209.85.214.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f225.google.com with SMTP id af79cd13be357-84a7e1650fdso100483585a.2
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 02:09:17 -0700 (PDT)
+Received: by mail-pl1-f227.google.com with SMTP id d9443c01a7336-26e68904f0eso20166915ad.0
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 02:01:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758532157; x=1759136957;
+        d=1e100.net; s=20230601; t=1758531688; x=1759136488;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sTZFfTvToc3eSrZtaGP9vkY5xr5lWepCbD04a99pHno=;
-        b=c4N+abZmL95Nge1bccvVjGg06vJEL0TnpjuQ/0GNuX8+GZvjAX9osvsP9FIBHNCUgZ
-         7HcRsLvfloIdXvfvq+4sfuDHpmT36ydK+8fnBKsAd32F1UvFYBrxhWyQ+Y22wu6yusO1
-         9E0y8tIDLBWjy9+F8gAs/7gfBAOM08zV1igWYoH6JYkNZlJQTKM5APPTN45pc7effIH0
-         T9Y7aCSH55hqLzuE/AqMd3relv8FnXnqJRVdYYpqoeJHcrb3oRMBTDslsQ4OTqDLlGWY
-         nZ6N7iJptt+Wx8jwoFjJK0tDej9qexghjKDbllYrJZ2bqVmIWXglSay3Rz5oqrSSuX81
-         8Mpg==
-X-Forwarded-Encrypted: i=1; AJvYcCWAd2W1QSTMbztVFWIk85sVmdMb7T2JunIpEzoPn3KSgwCCGZEzsXy8/Jg8xbrNl++dfumEEDw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxpW7K5/pJrjLTuU/2W7UEbhMDdQues31NwqZ+pPnig60Iy9cp
-	tuDdNjgauTSm0jFfNJM0qAO1l8CFQNKjMNzn3TtyvnFhkYSyUybScOYi+DhxwJQCyfn4XrCaGwS
-	SHJGWM1mkBX+oBI7kUmZENwA33F5Ryzm2KKFhAs1pcFZhxMIsHmtHwHNPkReE+H6ALOQguQP40E
-	8M6PQLcTb70BhkVwmohe+k6wazVHV0cFh9IkMK89IxWO9glB1S8v+Y/ePfKWyXuzMBptDDlw4am
-	JqS2YR8Sf8=
-X-Gm-Gg: ASbGncvkNiRDlwsVOozmqixQWiKPPV5n0Dndt7T/Rc/mJk1QSNyJnsa6dicEbdIDctO
-	QQxYNgySW7EsGSDe9xvN2fZIbAaIi+nr+4AVmODe/HXlqUY16faehebiyJBNnKgJ+3m60Kpin5r
-	rEF75fFVDThPiAVCMf+oB8hGkspokQvoyLynMMCn30gfUhuYd/4JAtzKbG3o8OSUrIfQI1Eh0TG
-	CT84vuPO6dhHUsB2eaXzdMha+uM6gxARJEyrS7/J2cfyJ9bU9FE+Wy8fl7B8J0uVdnfypF0KjS6
-	ELCmRmUDaXSO+PcyzPAsTFP9Dfi4Kev00lOq9vcXkVWpvQVl3cRBEqzlM1NyQNg/Y56Ck12iKt4
-	NPB4w/UHn9P0qxEfBf09kEJPinUO1fFaohQp1n5u+UKwPZ90eB/Jla9+yTisFtuX9znAUZqcXCU
-	Xz5A==
-X-Google-Smtp-Source: AGHT+IHSCrOalwDC1+Kmsa0vOHX5Q+aWhDqJcoT5li0RB2jKffsxojzwowIwbYO/pB5KnE3zLShsk/vNH9L8
-X-Received: by 2002:a17:903:1b0b:b0:267:a942:788c with SMTP id d9443c01a7336-269ba3fa0afmr180378595ad.1.1758531681045;
-        Mon, 22 Sep 2025 02:01:21 -0700 (PDT)
+        bh=mYf3FocDtOVLVHe6E+jTO0pX05QZI2dTdjoc/EqrX18=;
+        b=ODjnXq/WB70arlpuQN+GT6f1P+GJUepjhlpOnbD3Ij1isI6r7CAIYvj4G5OQ7sjvld
+         8CnPF4wgnNQpjq9ChUGusrwgjmgHO9Ih0UYEJklonmpxhs61uvNOikc2YT3gqpm77Dbo
+         MClzQ5NWxUNrEFncurW0lZLHKlO+kYsdJBRa+VfCG7Q5F7PAkllx7uKSlafVhUr1Q+pc
+         Prs2pib8uNzTD5aupEXUnDpBQLP1kJEb/qHiRJS/wcU2JWVTRZcqVklPC9JYDZGsXxHa
+         QTNf/XX43Hfe0mB32nZ5zoB6msp5CDDt5yUOJwE/aqNV8wg7Bh7STXJEE9aJJvVIwl2G
+         ogTA==
+X-Forwarded-Encrypted: i=1; AJvYcCXEI1km4uNW/Bp4X8J0DBPYYLDYn+xf9RQGFIIQ8M8DGv7jWOTmkDD1pnx7a3Nc9DsDQfHOeyE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeQyws821lgfpYzw78Dw4Cfw8m3WTm+8UaPtvNvM6EFLtNio+D
+	6z56PLqzqPh4xCybRO2avaWlPwKRJEcRRIsP/+cRIR7+Q50d4Z/YqRDpYvaBiXijvPSE9V/W+Jt
+	IR3HnwOjmYF3HyTN/JeNU1rG+FrJhTtnoxt3NFL9hTAZ7EN6D6aCsfsxC400njQIN57+5f5uMlh
+	21d0OkTmmVtwP8VmcWksCXFqYSDCx+Ywmgs/KYrJoodeYVMNvoRG/DbCVpU5bAwwLckZ1jAuAtR
+	lpik05NX6Q=
+X-Gm-Gg: ASbGnctuwsO7xO7G03nLmhC8SkQigOEujrStp3U6B+GRYcAy0iDys+XbiVX5SHVRiAA
+	cg1oj7Vg3J9nSESiBNpokZZBDxEX8QhV5QWB068lk3wkLoor4LTuXxo/H0vCpRGTTZ1NRggHV8C
+	hiPgHs8WF/KvOBEkReA7p88F1txJ5Qjsi+nZwnMlLNMkIs+9ZimAgf+Lp4Z1nJRRbqxcqR54Dti
+	qy8eTAZl+1OBetj2gzHPPz25mZ8pTkJQa71ueGN3F90nKhSIYJmHd7OdjUztM6Z1c7zuFhJSkVr
+	thYHYWMf93tab718TODZnMA4S1Bm4wyMJd1r8eVr6KA6xoYQ5aFTxzOpS7KEPWuglGCLceE3dee
+	ewRAS8TDuPmCPd7V1gzbRJ3oTI1J0RQQTiBDXLDlpH7bDpVEDPSp+mb1k63830gT/aX0uwEIkzE
+	CLOQ==
+X-Google-Smtp-Source: AGHT+IFExsAUnISWJTm0+z3bowXozNa589Iy7PlqOU7BkoDSN2CqcgWs7KfPtiRPKOUTFkLmtUXFzgA+DrHY
+X-Received: by 2002:a17:903:120b:b0:265:47:a7b0 with SMTP id d9443c01a7336-269ba3f7155mr128318835ad.10.1758531687676;
+        Mon, 22 Sep 2025 02:01:27 -0700 (PDT)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2775258bec1sm1384295ad.65.2025.09.22.02.01.20
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2698016d0cdsm7337245ad.29.2025.09.22.02.01.27
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Sep 2025 02:01:21 -0700 (PDT)
+        Mon, 22 Sep 2025 02:01:27 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-24458345f5dso60403915ad.3
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 02:01:20 -0700 (PDT)
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2681623f927so40886475ad.0
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 02:01:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1758531679; x=1759136479; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1758531686; x=1759136486; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sTZFfTvToc3eSrZtaGP9vkY5xr5lWepCbD04a99pHno=;
-        b=cWTyIjn57qiY8V8OwOs5lsrHzKzbk6EvDuk62WG4bhipMqMqWjoMaTbSW+EdVZZKxN
-         JLVOtgYPsheUdd8Hb5FyS6xDnhC5hk6UYoZaYdGnCPDviKUbbXmqI7qIxIFiREkE0axk
-         h1faAx9dB3hudPJnF/MapwNBlAlVxozcuje+M=
-X-Forwarded-Encrypted: i=1; AJvYcCXyg06BS4U9FvSkCpFzvs/Mdr63j8r8oj0jzEDInuc3P9VyNF2yAZLV9Qwc7ezH65tkGP0+tPk=@vger.kernel.org
-X-Received: by 2002:a17:903:110c:b0:240:9dd8:219b with SMTP id d9443c01a7336-269ba53e4bfmr168216275ad.49.1758531678976;
-        Mon, 22 Sep 2025 02:01:18 -0700 (PDT)
-X-Received: by 2002:a17:903:110c:b0:240:9dd8:219b with SMTP id d9443c01a7336-269ba53e4bfmr168215405ad.49.1758531678205;
-        Mon, 22 Sep 2025 02:01:18 -0700 (PDT)
+        bh=mYf3FocDtOVLVHe6E+jTO0pX05QZI2dTdjoc/EqrX18=;
+        b=SmkiQXdaRkHa97BCH5oFdHZB7VIMZAbNUbTWZCOaxA2ZX2okftwzPY6qzBtGZ5z+aX
+         kHCt4zekUM38fPbnizIzvDxNCuODVuV/95w5b57tsmE8vlOURc/kLdsarU7KE3pRwYu0
+         bajqnYpnaA0WB9tYCtYNZDY+anQSdvWdrezfQ=
+X-Forwarded-Encrypted: i=1; AJvYcCVC3g6u7HOawFZW6Ni3sHvN6AdzS7gE7w6Qs5hC9yPsWTaHDQ/fe2QF64iW0m0gqJV0SV6vZBY=@vger.kernel.org
+X-Received: by 2002:a17:902:e94c:b0:269:8edf:67f8 with SMTP id d9443c01a7336-269ba585077mr171746445ad.52.1758531685657;
+        Mon, 22 Sep 2025 02:01:25 -0700 (PDT)
+X-Received: by 2002:a17:902:e94c:b0:269:8edf:67f8 with SMTP id d9443c01a7336-269ba585077mr171746015ad.52.1758531685174;
+        Mon, 22 Sep 2025 02:01:25 -0700 (PDT)
 Received: from PC-MID-R740.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-269803416a2sm123309615ad.134.2025.09.22.02.01.14
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-269803416a2sm123309615ad.134.2025.09.22.02.01.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Sep 2025 02:01:17 -0700 (PDT)
+        Mon, 22 Sep 2025 02:01:24 -0700 (PDT)
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 To: jgg@ziepe.ca,
 	michael.chan@broadcom.com
@@ -105,9 +105,9 @@ Cc: dave.jiang@intel.com,
 	selvin.xavier@broadcom.com,
 	leon@kernel.org,
 	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: [PATCH net-next 4/6] bnxt_en: Create an aux device for fwctl
-Date: Mon, 22 Sep 2025 02:08:49 -0700
-Message-Id: <20250922090851.719913-5-pavan.chebbi@broadcom.com>
+Subject: [PATCH net-next 5/6] bnxt_fwctl: Add bnxt fwctl device
+Date: Mon, 22 Sep 2025 02:08:50 -0700
+Message-Id: <20250922090851.719913-6-pavan.chebbi@broadcom.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20250922090851.719913-1-pavan.chebbi@broadcom.com>
 References: <20250922090851.719913-1-pavan.chebbi@broadcom.com>
@@ -120,232 +120,466 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-Create an additional auxiliary device to support fwctl.
-The next patch will create bnxt_fwctl and bind to this
-device.
+Create bnxt_fwctl device. This will bind to bnxt's aux device.
+On the upper edge, it will register with the fwctl subsystem.
+It will make use of bnxt's ULP functions to send FW commands.
 
 Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
 Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  5 ++
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  2 +
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 79 +++++++++++++++++--
- include/linux/bnxt/ulp.h                      |  1 +
- 4 files changed, 82 insertions(+), 5 deletions(-)
+ MAINTAINERS                 |   6 +
+ drivers/fwctl/Kconfig       |  11 ++
+ drivers/fwctl/Makefile      |   1 +
+ drivers/fwctl/bnxt/Makefile |   4 +
+ drivers/fwctl/bnxt/main.c   | 297 ++++++++++++++++++++++++++++++++++++
+ include/uapi/fwctl/bnxt.h   |  63 ++++++++
+ include/uapi/fwctl/fwctl.h  |   1 +
+ 7 files changed, 383 insertions(+)
+ create mode 100644 drivers/fwctl/bnxt/Makefile
+ create mode 100644 drivers/fwctl/bnxt/main.c
+ create mode 100644 include/uapi/fwctl/bnxt.h
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index feb11b9ea4dd..58a7c0af89a7 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -16189,11 +16189,13 @@ static void bnxt_remove_one(struct pci_dev *pdev)
- 		__bnxt_sriov_disable(bp);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a8a770714101..8954da3e9203 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10115,6 +10115,12 @@ L:	linux-kernel@vger.kernel.org
+ S:	Maintained
+ F:	drivers/fwctl/pds/
  
- 	bnxt_aux_device_del(bp, BNXT_AUXDEV_RDMA);
-+	bnxt_aux_device_del(bp, BNXT_AUXDEV_FWCTL);
++FWCTL BNXT DRIVER
++M:	Pavan Chebbi <pavan.chebbi@broadcom.com>
++L:	linux-kernel@vger.kernel.org
++S:	Maintained
++F:	drivers/fwctl/bnxt/
++
+ GALAXYCORE GC0308 CAMERA SENSOR DRIVER
+ M:	Sebastian Reichel <sre@kernel.org>
+ L:	linux-media@vger.kernel.org
+diff --git a/drivers/fwctl/Kconfig b/drivers/fwctl/Kconfig
+index b5583b12a011..203b6ebb06fc 100644
+--- a/drivers/fwctl/Kconfig
++++ b/drivers/fwctl/Kconfig
+@@ -29,5 +29,16 @@ config FWCTL_PDS
+ 	  to access the debug and configuration information of the AMD/Pensando
+ 	  DSC hardware family.
  
- 	unregister_netdev(dev);
- 	bnxt_ptp_clear(bp);
++	  If you don't know what to do here, say N.
++
++config FWCTL_BNXT
++	tristate "bnxt control fwctl driver"
++	depends on BNXT
++	help
++	  BNXT provides interface for the user process to access the debug and
++	  configuration registers of the Broadcom NIC hardware family
++	  This will allow configuration and debug tools to work out of the box on
++	  mainstream kernel.
++
+ 	  If you don't know what to do here, say N.
+ endif
+diff --git a/drivers/fwctl/Makefile b/drivers/fwctl/Makefile
+index c093b5f661d6..fdd46f3a0e4e 100644
+--- a/drivers/fwctl/Makefile
++++ b/drivers/fwctl/Makefile
+@@ -2,5 +2,6 @@
+ obj-$(CONFIG_FWCTL) += fwctl.o
+ obj-$(CONFIG_FWCTL_MLX5) += mlx5/
+ obj-$(CONFIG_FWCTL_PDS) += pds/
++obj-$(CONFIG_FWCTL_BNXT) += bnxt/
  
- 	bnxt_aux_device_uninit(bp, BNXT_AUXDEV_RDMA);
-+	bnxt_aux_device_uninit(bp, BNXT_AUXDEV_FWCTL);
- 
- 	bnxt_free_l2_filters(bp, true);
- 	bnxt_free_ntp_fltrs(bp, true);
-@@ -16780,6 +16782,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	bnxt_init_ring_params(bp);
- 	bnxt_set_ring_params(bp);
- 	bnxt_aux_device_init(bp, BNXT_AUXDEV_RDMA);
-+	bnxt_aux_device_init(bp, BNXT_AUXDEV_FWCTL);
- 	rc = bnxt_set_dflt_rings(bp, true);
- 	if (rc) {
- 		if (BNXT_VF(bp) && rc == -ENODEV) {
-@@ -16844,6 +16847,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	bnxt_dl_fw_reporters_create(bp);
- 
- 	bnxt_aux_device_add(bp, BNXT_AUXDEV_RDMA);
-+	bnxt_aux_device_add(bp, BNXT_AUXDEV_FWCTL);
- 
- 	bnxt_print_device_info(bp);
- 
-@@ -16852,6 +16856,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	return 0;
- init_err_cleanup:
- 	bnxt_aux_device_uninit(bp, BNXT_AUXDEV_RDMA);
-+	bnxt_aux_device_uninit(bp, BNXT_AUXDEV_FWCTL);
- 	bnxt_dl_unregister(bp);
- init_err_dl:
- 	bnxt_shutdown_tc(bp);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index b2f139eddfec..1eeea0884e09 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2340,6 +2340,8 @@ struct bnxt {
- 
- 	struct bnxt_napi	**bnapi;
- 
-+	struct bnxt_en_dev	*edev_fwctl;
-+	struct bnxt_aux_priv	*aux_priv_fwctl;
- 	struct bnxt_rx_ring_info	*rx_ring;
- 	struct bnxt_tx_ring_info	*tx_ring;
- 	u16			*tx_ring_map;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-index ecad1947ccb5..c06a9503b551 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-@@ -28,6 +28,7 @@
- #include "bnxt_hwrm.h"
- 
- static DEFINE_IDA(bnxt_rdma_aux_dev_ids);
-+static DEFINE_IDA(bnxt_fwctl_aux_dev_ids);
- 
- struct bnxt_aux_device {
- 	const char *name;
-@@ -43,6 +44,7 @@ struct bnxt_aux_device {
- };
- 
- static void bnxt_rdma_aux_dev_release(struct device *dev);
-+static void bnxt_fwctl_aux_dev_release(struct device *dev);
- 
- static void bnxt_rdma_aux_dev_set_priv(struct bnxt *bp,
- 				       struct bnxt_aux_priv *priv)
-@@ -81,6 +83,43 @@ static void bnxt_rdma_aux_dev_free_ida(struct bnxt_aux_priv *aux_priv)
- 	ida_free(&bnxt_rdma_aux_dev_ids, aux_priv->id);
- }
- 
-+static void bnxt_fwctl_aux_dev_set_priv(struct bnxt *bp,
-+					struct bnxt_aux_priv *priv)
+ fwctl-y += main.o
+diff --git a/drivers/fwctl/bnxt/Makefile b/drivers/fwctl/bnxt/Makefile
+new file mode 100644
+index 000000000000..b47172761f1e
+--- /dev/null
++++ b/drivers/fwctl/bnxt/Makefile
+@@ -0,0 +1,4 @@
++# SPDX-License-Identifier: GPL-2.0
++obj-$(CONFIG_FWCTL_BNXT) += bnxt_fwctl.o
++
++bnxt_fwctl-y += main.o
+diff --git a/drivers/fwctl/bnxt/main.c b/drivers/fwctl/bnxt/main.c
+new file mode 100644
+index 000000000000..b23245029a3d
+--- /dev/null
++++ b/drivers/fwctl/bnxt/main.c
+@@ -0,0 +1,297 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (c) 2025, Broadcom Corporation
++ *
++ */
++
++#include <linux/kernel.h>
++#include <linux/auxiliary_bus.h>
++#include <linux/slab.h>
++#include <linux/pci.h>
++#include <linux/fwctl.h>
++#include <uapi/fwctl/fwctl.h>
++#include <uapi/fwctl/bnxt.h>
++#include <linux/bnxt/common.h>
++#include <linux/bnxt/ulp.h>
++
++struct bnxtctl_uctx {
++	struct fwctl_uctx uctx;
++	u32 uctx_caps;
++};
++
++struct bnxtctl_dev {
++	struct fwctl_device fwctl;
++	struct bnxt_aux_priv *aux_priv;
++	void *dma_virt_addr[MAX_NUM_DMA_INDICATIONS];
++	dma_addr_t dma_addr[MAX_NUM_DMA_INDICATIONS];
++};
++
++DEFINE_FREE(bnxtctl, struct bnxtctl_dev *, if (_T) fwctl_put(&_T->fwctl))
++
++static int bnxtctl_open_uctx(struct fwctl_uctx *uctx)
 +{
-+	bp->aux_priv_fwctl = priv;
++	struct bnxtctl_uctx *bnxtctl_uctx =
++		container_of(uctx, struct bnxtctl_uctx, uctx);
++
++	bnxtctl_uctx->uctx_caps = BIT(FWCTL_BNXT_QUERY_COMMANDS) |
++				  BIT(FWCTL_BNXT_SEND_COMMAND);
++	return 0;
 +}
 +
-+static struct bnxt_aux_priv *bnxt_fwctl_aux_dev_get_priv(struct bnxt *bp)
++static void bnxtctl_close_uctx(struct fwctl_uctx *uctx)
 +{
-+	return bp->aux_priv_fwctl;
 +}
 +
-+static struct auxiliary_device *bnxt_fwctl_aux_dev_get_auxdev(struct bnxt *bp)
++static void *bnxtctl_info(struct fwctl_uctx *uctx, size_t *length)
 +{
-+	return &bp->aux_priv_fwctl->aux_dev;
++	struct bnxtctl_uctx *bnxtctl_uctx =
++		container_of(uctx, struct bnxtctl_uctx, uctx);
++	struct fwctl_info_bnxt *info;
++
++	info = kzalloc(sizeof(*info), GFP_KERNEL);
++	if (!info)
++		return ERR_PTR(-ENOMEM);
++
++	info->uctx_caps = bnxtctl_uctx->uctx_caps;
++
++	*length = sizeof(*info);
++	return info;
 +}
 +
-+static void bnxt_fwctl_aux_dev_set_edev(struct bnxt *bp,
-+					struct bnxt_en_dev *edev)
++static bool bnxtctl_validate_rpc(struct bnxt_en_dev *edev,
++				 struct bnxt_fw_msg *hwrm_in)
 +{
-+	bp->edev_fwctl = edev;
++	struct input *req = (struct input *)hwrm_in->msg;
++
++	mutex_lock(&edev->en_dev_lock);
++	if (edev->flags & BNXT_EN_FLAG_ULP_STOPPED) {
++		mutex_unlock(&edev->en_dev_lock);
++		return false;
++	}
++	mutex_unlock(&edev->en_dev_lock);
++
++	if (req->req_type <= HWRM_LAST)
++		return true;
++
++	return false;
 +}
 +
-+static struct bnxt_en_dev *bnxt_fwctl_aux_dev_get_edev(struct bnxt *bp)
++static int bnxt_fw_setup_input_dma(struct bnxtctl_dev *bnxt_dev,
++				   struct device *dev,
++				   int num_dma,
++				   struct fwctl_dma_info_bnxt *msg,
++				   struct bnxt_fw_msg *fw_msg)
 +{
-+	return bp->edev_fwctl;
++	u8 i, num_allocated = 0;
++	void *dma_ptr;
++	int rc = 0;
++
++	for (i = 0; i < num_dma; i++) {
++		if (msg->len == 0 || msg->len > MAX_DMA_MEM_SIZE) {
++			rc = -EINVAL;
++			goto err;
++		}
++		bnxt_dev->dma_virt_addr[i] = dma_alloc_coherent(dev->parent,
++								msg->len,
++								&bnxt_dev->dma_addr[i],
++								GFP_KERNEL);
++		if (!bnxt_dev->dma_virt_addr[i]) {
++			rc = -ENOMEM;
++			goto err;
++		}
++		num_allocated++;
++		if (!(msg->read_from_device)) {
++			if (copy_from_user(bnxt_dev->dma_virt_addr[i],
++					   u64_to_user_ptr(msg->data),
++					   msg->len)) {
++				rc = -EFAULT;
++				goto err;
++			}
++		}
++		dma_ptr = fw_msg->msg + msg->offset;
++
++		if ((PTR_ALIGN(dma_ptr, 8) == dma_ptr) &&
++		    msg->offset < fw_msg->msg_len) {
++			__le64 *dmap = dma_ptr;
++
++			*dmap = cpu_to_le64(bnxt_dev->dma_addr[i]);
++		} else {
++			rc = -EINVAL;
++			goto err;
++		}
++		msg += 1;
++	}
++
++	return rc;
++err:
++	for (i = 0; i < num_allocated; i++)
++		dma_free_coherent(dev->parent,
++				  msg->len,
++				  bnxt_dev->dma_virt_addr[i],
++				  bnxt_dev->dma_addr[i]);
++
++	return rc;
 +}
 +
-+static u32 bnxt_fwctl_aux_dev_alloc_ida(void)
++static void *bnxtctl_fw_rpc(struct fwctl_uctx *uctx,
++			    enum fwctl_rpc_scope scope,
++			    void *in, size_t in_len, size_t *out_len)
 +{
-+	return ida_alloc(&bnxt_fwctl_aux_dev_ids, GFP_KERNEL);
++	struct bnxtctl_dev *bnxtctl =
++		container_of(uctx->fwctl, struct bnxtctl_dev, fwctl);
++	struct bnxt_aux_priv *bnxt_aux_priv = bnxtctl->aux_priv;
++	struct fwctl_dma_info_bnxt *dma_buf = NULL;
++	struct device *dev = &uctx->fwctl->dev;
++	struct fwctl_rpc_bnxt *msg = in;
++	struct bnxt_fw_msg rpc_in;
++	int i, rc, err = 0;
++	int dma_buf_size;
++
++	rpc_in.msg = kzalloc(msg->req_len, GFP_KERNEL);
++	if (!rpc_in.msg) {
++		err = -ENOMEM;
++		goto err_out;
++	}
++	if (copy_from_user(rpc_in.msg, u64_to_user_ptr(msg->req),
++			   msg->req_len)) {
++		dev_dbg(dev, "Failed to copy in_payload from user\n");
++		err = -EFAULT;
++		goto err_out;
++	}
++
++	if (!bnxtctl_validate_rpc(bnxt_aux_priv->edev, &rpc_in))
++		return ERR_PTR(-EPERM);
++
++	rpc_in.msg_len = msg->req_len;
++	rpc_in.resp = kzalloc(*out_len, GFP_KERNEL);
++	if (!rpc_in.resp) {
++		err = -ENOMEM;
++		goto err_out;
++	}
++
++	rpc_in.resp_max_len = *out_len;
++	if (!msg->timeout)
++		rpc_in.timeout = DFLT_HWRM_CMD_TIMEOUT;
++	else
++		rpc_in.timeout = msg->timeout;
++
++	if (msg->num_dma) {
++		if (msg->num_dma > MAX_NUM_DMA_INDICATIONS) {
++			dev_err(dev, "DMA buffers exceed the number supported\n");
++			err = -EINVAL;
++			goto err_out;
++		}
++		dma_buf_size = msg->num_dma * sizeof(*dma_buf);
++		dma_buf = kzalloc(dma_buf_size, GFP_KERNEL);
++		if (!dma_buf) {
++			dev_err(dev, "Failed to allocate dma buffers\n");
++			err = -ENOMEM;
++			goto err_out;
++		}
++
++		if (copy_from_user(dma_buf, u64_to_user_ptr(msg->payload),
++				   dma_buf_size)) {
++			dev_dbg(dev, "Failed to copy payload from user\n");
++			err = -EFAULT;
++			goto err_out;
++		}
++
++		rc = bnxt_fw_setup_input_dma(bnxtctl, dev, msg->num_dma,
++					     dma_buf, &rpc_in);
++		if (rc) {
++			err = -EIO;
++			goto err_out;
++		}
++	}
++
++	rc = bnxt_send_msg(bnxt_aux_priv->edev, &rpc_in);
++	if (rc) {
++		err = -EIO;
++		goto err_out;
++	}
++
++	for (i = 0; i < msg->num_dma; i++) {
++		if (dma_buf[i].read_from_device) {
++			if (copy_to_user(u64_to_user_ptr(dma_buf[i].data),
++					 bnxtctl->dma_virt_addr[i],
++					 dma_buf[i].len)) {
++				dev_dbg(dev, "Failed to copy resp to user\n");
++				err = -EFAULT;
++			}
++		}
++	}
++	for (i = 0; i < msg->num_dma; i++)
++		dma_free_coherent(dev->parent, dma_buf[i].len,
++				  bnxtctl->dma_virt_addr[i],
++				  bnxtctl->dma_addr[i]);
++
++err_out:
++	kfree(dma_buf);
++	kfree(rpc_in.msg);
++
++	if (err)
++		return ERR_PTR(err);
++
++	return rpc_in.resp;
 +}
 +
-+static void bnxt_fwctl_aux_dev_free_ida(struct bnxt_aux_priv *aux_priv)
-+{
-+	ida_free(&bnxt_fwctl_aux_dev_ids, aux_priv->id);
-+}
++static const struct fwctl_ops bnxtctl_ops = {
++	.device_type = FWCTL_DEVICE_TYPE_BNXT,
++	.uctx_size = sizeof(struct bnxtctl_uctx),
++	.open_uctx = bnxtctl_open_uctx,
++	.close_uctx = bnxtctl_close_uctx,
++	.info = bnxtctl_info,
++	.fw_rpc = bnxtctl_fw_rpc,
++};
 +
- static struct bnxt_aux_device bnxt_aux_devices[__BNXT_AUXDEV_MAX] = {{
- 	.name		= "rdma",
- 	.alloc_ida	= bnxt_rdma_aux_dev_alloc_ida,
-@@ -91,6 +130,16 @@ static struct bnxt_aux_device bnxt_aux_devices[__BNXT_AUXDEV_MAX] = {{
- 	.set_edev       = bnxt_rdma_aux_dev_set_edev,
- 	.get_edev	= bnxt_rdma_aux_dev_get_edev,
- 	.get_auxdev	= bnxt_rdma_aux_dev_get_auxdev,
-+}, {
-+	.name		= "fwctl",
-+	.alloc_ida	= bnxt_fwctl_aux_dev_alloc_ida,
-+	.free_ida	= bnxt_fwctl_aux_dev_free_ida,
-+	.release	= bnxt_fwctl_aux_dev_release,
-+	.set_priv       = bnxt_fwctl_aux_dev_set_priv,
-+	.get_priv	= bnxt_fwctl_aux_dev_get_priv,
-+	.set_edev       = bnxt_fwctl_aux_dev_set_edev,
-+	.get_edev	= bnxt_fwctl_aux_dev_get_edev,
-+	.get_auxdev	= bnxt_fwctl_aux_dev_get_auxdev,
- }};
- 
- static void bnxt_fill_msix_vecs(struct bnxt *bp, struct bnxt_msix_entry *ent)
-@@ -314,6 +363,8 @@ void bnxt_ulp_stop(struct bnxt *bp)
- 		}
- 	}
- ulp_stop_exit:
-+	if (bp->edev_fwctl)
-+		bp->edev_fwctl->flags |= BNXT_EN_FLAG_ULP_STOPPED;
- 	mutex_unlock(&edev->en_dev_lock);
- }
- 
-@@ -347,6 +398,8 @@ void bnxt_ulp_start(struct bnxt *bp, int err)
- 	}
- ulp_start_exit:
- 	edev->flags &= ~BNXT_EN_FLAG_ULP_STOPPED;
-+	if (bp->edev_fwctl)
-+		bp->edev_fwctl->flags &= ~BNXT_EN_FLAG_ULP_STOPPED;
- 	mutex_unlock(&edev->en_dev_lock);
- }
- 
-@@ -536,12 +589,27 @@ void bnxt_aux_device_add(struct bnxt *bp, enum bnxt_ulp_auxdev_type auxdev_type)
- 	aux_dev = bnxt_aux_devices[auxdev_type].get_auxdev(bp);
- 	rc = auxiliary_device_add(aux_dev);
- 	if (rc) {
--		netdev_warn(bp->dev, "Failed to add auxiliary device for ROCE\n");
-+		netdev_warn(bp->dev, "Failed to add auxiliary device for auxdev type %d\n",
-+			    auxdev_type);
- 		auxiliary_device_uninit(aux_dev);
--		bp->flags &= ~BNXT_FLAG_ROCE_CAP;
-+		if (auxdev_type == BNXT_AUXDEV_RDMA)
-+			bp->flags &= ~BNXT_FLAG_ROCE_CAP;
- 	}
- }
- 
-+static void bnxt_fwctl_aux_dev_release(struct device *dev)
++static int bnxtctl_probe(struct auxiliary_device *adev,
++			 const struct auxiliary_device_id *id)
 +{
 +	struct bnxt_aux_priv *aux_priv =
-+		container_of(dev, struct bnxt_aux_priv, aux_dev.dev);
-+	struct bnxt *bp = netdev_priv(aux_priv->edev->net);
++		container_of(adev, struct bnxt_aux_priv, aux_dev);
++	struct bnxtctl_dev *bnxtctl __free(bnxtctl) =
++		fwctl_alloc_device(&aux_priv->edev->pdev->dev, &bnxtctl_ops,
++				   struct bnxtctl_dev, fwctl);
++	int rc;
 +
-+	ida_free(&bnxt_fwctl_aux_dev_ids, aux_priv->id);
-+	kfree(aux_priv->edev);
-+	bp->edev_fwctl = NULL;
-+	kfree(bp->aux_priv_fwctl);
-+	bp->aux_priv_fwctl = NULL;
++	if (!bnxtctl)
++		return -ENOMEM;
++
++	bnxtctl->aux_priv = aux_priv;
++
++	rc = fwctl_register(&bnxtctl->fwctl);
++	if (rc)
++		return rc;
++
++	auxiliary_set_drvdata(adev, no_free_ptr(bnxtctl));
++	return 0;
 +}
 +
- void bnxt_aux_device_init(struct bnxt *bp,
- 			  enum bnxt_ulp_auxdev_type auxdev_type)
- {
-@@ -566,8 +634,8 @@ void bnxt_aux_device_init(struct bnxt *bp,
- 
- 	aux_priv->id = bnxt_aux_devices[auxdev_type].alloc_ida();
- 	if (aux_priv->id < 0) {
--		netdev_warn(bp->dev,
--			    "ida alloc failed for ROCE auxiliary device\n");
-+		netdev_warn(bp->dev, "ida alloc failed for %d auxiliary device\n",
-+			    auxdev_type);
- 		kfree(aux_priv);
- 		goto exit;
- 	}
-@@ -611,5 +679,6 @@ void bnxt_aux_device_init(struct bnxt *bp,
- aux_dev_uninit:
- 	auxiliary_device_uninit(aux_dev);
- exit:
--	bp->flags &= ~BNXT_FLAG_ROCE_CAP;
-+	if (auxdev_type == BNXT_AUXDEV_RDMA)
-+		bp->flags &= ~BNXT_FLAG_ROCE_CAP;
- }
-diff --git a/include/linux/bnxt/ulp.h b/include/linux/bnxt/ulp.h
-index baac0dd44078..5a580bc37a06 100644
---- a/include/linux/bnxt/ulp.h
-+++ b/include/linux/bnxt/ulp.h
-@@ -22,6 +22,7 @@ struct bnxt;
- 
- enum bnxt_ulp_auxdev_type {
- 	BNXT_AUXDEV_RDMA = 0,
-+	BNXT_AUXDEV_FWCTL,
- 	__BNXT_AUXDEV_MAX,
++static void bnxtctl_remove(struct auxiliary_device *adev)
++{
++	struct bnxtctl_dev *ctldev = auxiliary_get_drvdata(adev);
++
++	fwctl_unregister(&ctldev->fwctl);
++	fwctl_put(&ctldev->fwctl);
++}
++
++static const struct auxiliary_device_id bnxtctl_id_table[] = {
++	{ .name = "bnxt_en.fwctl", },
++	{},
++};
++MODULE_DEVICE_TABLE(auxiliary, bnxtctl_id_table);
++
++static struct auxiliary_driver bnxtctl_driver = {
++	.name = "bnxt_fwctl",
++	.probe = bnxtctl_probe,
++	.remove = bnxtctl_remove,
++	.id_table = bnxtctl_id_table,
++};
++
++module_auxiliary_driver(bnxtctl_driver);
++
++MODULE_IMPORT_NS("FWCTL");
++MODULE_DESCRIPTION("BNXT fwctl driver");
++MODULE_AUTHOR("Pavan Chebbi <pavan.chebbi@broadcom.com>");
++MODULE_AUTHOR("Andy Gospodarek <gospo@broadcom.com>");
++MODULE_LICENSE("GPL");
+diff --git a/include/uapi/fwctl/bnxt.h b/include/uapi/fwctl/bnxt.h
+new file mode 100644
+index 000000000000..212499826b02
+--- /dev/null
++++ b/include/uapi/fwctl/bnxt.h
+@@ -0,0 +1,63 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++/*
++ * Copyright (c) 2025, Broadcom Corporation
++ *
++ */
++
++#ifndef _UAPI_FWCTL_BNXT_H_
++#define _UAPI_FWCTL_BNXT_H_
++
++#include <linux/types.h>
++
++#define MAX_DMA_MEM_SIZE		0x10000 /*64K*/
++#define DFLT_HWRM_CMD_TIMEOUT		500
++
++enum fwctl_bnxt_commands {
++	FWCTL_BNXT_QUERY_COMMANDS = 0,
++	FWCTL_BNXT_SEND_COMMAND,
++};
++
++/**
++ * struct fwctl_info_bnxt - ioctl(FWCTL_INFO) out_device_data
++ * @uctx_caps: The command capabilities driver accepts.
++ *
++ * Return basic information about the FW interface available.
++ */
++struct fwctl_info_bnxt {
++	__u32 uctx_caps;
++	__u32 reserved;
++};
++
++#define MAX_NUM_DMA_INDICATIONS 10
++
++/**
++ * struct fwctl_dma_info_bnxt - describe the buffer that should be DMAed
++ * @data: DMA-intended buffer
++ * @len: length of the @data
++ * @offset: offset at which FW (HWRM) input structure needs DMA address
++ * @read_from_device: DMA direction, 0 or 1
++ */
++struct fwctl_dma_info_bnxt {
++	__aligned_u64 data;
++	__u32 len;
++	__u16 offset;
++	__u8 read_from_device;
++	__u8 unused;
++};
++
++/**
++ * struct fwctl_rpc_bnxt - describe the fwctl message for bnxt
++ * @req: FW (HWRM) command input structure
++ * @req_len: length of @req
++ * @timeout: if the user wants to override the driver's default, 0 otherwise
++ * @num_dma: number of DMA buffers to be added to @req
++ * @payload: DMA buffer details in struct fwctl_dma_info_bnxt format
++ */
++struct fwctl_rpc_bnxt {
++	__aligned_u64 req;
++	__u32 req_len;
++	__u32 timeout;
++	__u32 num_dma;
++	__aligned_u64 payload;
++};
++#endif
+diff --git a/include/uapi/fwctl/fwctl.h b/include/uapi/fwctl/fwctl.h
+index 716ac0eee42d..2d6d4049c205 100644
+--- a/include/uapi/fwctl/fwctl.h
++++ b/include/uapi/fwctl/fwctl.h
+@@ -44,6 +44,7 @@ enum fwctl_device_type {
+ 	FWCTL_DEVICE_TYPE_ERROR = 0,
+ 	FWCTL_DEVICE_TYPE_MLX5 = 1,
+ 	FWCTL_DEVICE_TYPE_CXL = 2,
++	FWCTL_DEVICE_TYPE_BNXT = 3,
+ 	FWCTL_DEVICE_TYPE_PDS = 4,
  };
  
 -- 
