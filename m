@@ -1,145 +1,196 @@
-Return-Path: <netdev+bounces-225125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67FC9B8ED3E
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 04:55:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C56AB8ED87
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 05:18:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 177E516A4E1
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 02:55:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3FB0172F72
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 03:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D98242065;
-	Mon, 22 Sep 2025 02:55:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E13B8248C;
+	Mon, 22 Sep 2025 03:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hJrCxlSH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kmXD75D9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f99.google.com (mail-ot1-f99.google.com [209.85.210.99])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CB324886A
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 02:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16E5111A8
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 03:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758509702; cv=none; b=o0R0d4Ylj746VWq3yD76TT3tIfNcTeYrEJJndTz6iFNXKe5GJqTa/jaHIaLpKqMmT+tHdxo0nBiEXPABdy8tnms5BiiAmgORRbgYJRgIqWcPm7wFohT7dUgwGKBK1T3cegZQ1vSg0BSLzr8ZjPob6VggmqWloiuN54gOn2Eyey4=
+	t=1758511092; cv=none; b=D8AvSX3w6IfyZ7ojne8Lu1vULvcvtZY3//p8FWXRBvm0NRQksGWfNH+lcEw+m7mK0J3SugbEgFYbrdTR7pCqRq1NYsOaGRueOfoZLXNgbm0r+svVtROTAiRSMaLcqknoDKOaX4v//FS5I4aYsgz8bBf1943raEjPw4si/pkWWQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758509702; c=relaxed/simple;
-	bh=JVIQzRisQAp3cTooyT2EUtim4UfQe5O9H3p9SPQ8GA8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u/Y3RVDAheLDop80tBQP5Freil2YTy0Bnv8MDBsBNdxs+eTGTlF7TfqlbXBP3caajuLbdRqYuz1vMVCU10bdejC8f7ezthSjrMJMbzRZW8lkxmrOJDlxStPUTSh7Yeaqy21lFj/+kekfC7IQz2iJrgkD+AiTYzZrv6GtOTt6jjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hJrCxlSH; arc=none smtp.client-ip=209.85.210.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ot1-f99.google.com with SMTP id 46e09a7af769-751415c488cso3895087a34.1
-        for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 19:55:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758509700; x=1759114500;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4JpiZfkMWRh5AmWc3quqQaIe+CofHHpzeuqv/crQ8sU=;
-        b=X98VFw5GJIwmhCi/eLKmcR78/dDGzRpaxUwo2h8tAartEHOhbcOrI3SkSazaE/hx8U
-         IslRDhc4hlSzX3RuDv2Og+a2lfaz68rAY5irsW6DZjehml5UnsH84NYjCuJFuGOPw3Ov
-         Ns1PanMkrN6rV7c6fUlLyB74Ff5e3duANo0oM0gjJ9+5b7aEPSclStJRszQSR/VQFi6F
-         CDruRpwUTyVV5I/1Q8zMhnkwyxLp2a41vrk7VihrPlpDNhcVjCx0nxu0RbmG1AOOj2m1
-         d6uvDL7TEJWMKbhsl2stIBoJ7bQMZxb2sUw0t/Vaz8ePEdu5DKlqXT4EdB1bI3eYrnX9
-         ocRg==
-X-Gm-Message-State: AOJu0YxQhgzqX/KmIeh0s5nA/dem7OIROF3Ko67Qr4YkzW0XYh4BdBm3
-	LeqsN7dI+AJgBTNPJG3vQpOyivrSk/Z2GwgdBkhhdENw3To3Zh7GJAAXU15ZRNGqbsyjIi0o0Yl
-	UU8B77tH6oIl6NeoD8Lk0T/20TQPtyOq1pofgs4dykOGHMeSQKn+Wik9DOX318awribOlSQNSmA
-	GuDcbXA9JjBC1iiq1KgyMsrroMlbKXwam2tFFQrmcBj/fycoct+kJ1AudjnTDbKAtsMf8mNMihS
-	S61dONqz6kJ
-X-Gm-Gg: ASbGncve1mRTonzE5dp6Y+HWXrIjiMUDQYMuCJ39Be7Erj6FhKIgS6hN1W5mDADTJ7w
-	99nuWEnwxm6Se7vKFHLiToQBGarGrWa7sseyTUarc+7T7GsL4ixzg25HskiAhBfX0IKuSKtiWlM
-	6lsWIu7cKwgsl6HbW6RiVhOXArJsp406umcJIVdr5DqFKVSOR2tq2cRegt8fAefBQ7T27Z+sdTk
-	N1dbW0/ir+mlnyEz6e3r0pzPoFfT+okiVccrWkF92jcSYmmY98AcSVHRCBEbPjx+5Lz+bFed7ha
-	wkfUQu8Z8aaSAtYjUV4FpA44RJGOLmVUoBN0miQNF9Xt/v2VEtW6delne5loM3qGmUEfHEhyeEU
-	XBg2yTaTv3Yny38pBK+TwESlBXFyVDhUjW8KAGvRpKy94vQp+6ez1kfbDyNs6PQE+L9xXLFD3Bw
-	U5waU=
-X-Google-Smtp-Source: AGHT+IEPOpaIhtIGB+s5cjAWfOrjvkjyJk9Qd8ccypA86NuWzn8UWKjoZ5oOMs/Zo+HFKZInG2T6qBO5cE2R
-X-Received: by 2002:a05:6830:700f:b0:746:123e:d96c with SMTP id 46e09a7af769-76f6eb4de0cmr5766687a34.1.1758509700556;
-        Sun, 21 Sep 2025 19:55:00 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-121.dlp.protect.broadcom.com. [144.49.247.121])
-        by smtp-relay.gmail.com with ESMTPS id 006d021491bc7-63030d245dfsm5870eaf.11.2025.09.21.19.55.00
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 21 Sep 2025 19:55:00 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-52f77af4240so841065137.0
-        for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 19:54:59 -0700 (PDT)
+	s=arc-20240116; t=1758511092; c=relaxed/simple;
+	bh=Ph+uWLCGKD1bmbxe+LAztGIQgFBCw27dZmlB5mwFZEQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lmuIxDGXOJetTvUMcTD8i9S/TbR00v0gPRDso0mU8ktxcFkmCt5or7zjwfdNLuibYdny3XtRziTvdlP+vv9LyXnVCA5pVP6rbXtJcQyMkl8NxGOwc77dSaLtcXiMQB9sT3TNrPbKKCIVgHr9/Opfm7qtCKPMh+VQeBcfvEuWsmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kmXD75D9; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-77f41f819ebso143885b3a.2
+        for <netdev@vger.kernel.org>; Sun, 21 Sep 2025 20:18:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1758509699; x=1759114499; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1758511090; x=1759115890; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4JpiZfkMWRh5AmWc3quqQaIe+CofHHpzeuqv/crQ8sU=;
-        b=hJrCxlSH2fe2MJWhnArMieNqBeN4ojjpfo4fIpzs+jkROJuOXgjLW0rTKDChKYHJYP
-         aZuH+hXB/7cRkpIuaRYxIcqrpaQy43Fex9XyQROiXTAQSLQ4GRCH10YFt6M9AK5Ond1Y
-         VBCwCxe3YlY/glvFqsLdgLwGu7xtvdixTVAYM=
-X-Received: by 2002:a05:6102:390d:b0:598:dff4:6fa6 with SMTP id ada2fe7eead31-598e013072emr1819427137.17.1758509699369;
-        Sun, 21 Sep 2025 19:54:59 -0700 (PDT)
-X-Received: by 2002:a05:6102:390d:b0:598:dff4:6fa6 with SMTP id
- ada2fe7eead31-598e013072emr1819423137.17.1758509698964; Sun, 21 Sep 2025
- 19:54:58 -0700 (PDT)
+        bh=9iUHvODxkooLDweHKcKr09A7x667bzyJgI9c4VZRR8c=;
+        b=kmXD75D9h7NMwdYw2Ki473o8cvnseFC82uhYIabkQw9tEpMRU+eJdhOiGBU5wFfnxX
+         HaYpdlgAG0aFYkcZJO/zskpn8VN+re3GwAp5oZuCv9Jn5RgaL9lxJnc6gr7TkaA1abC7
+         eUVXG3k/tb3TVbCkZjS30l9c/6BObztGZCfeMtjT2LFS+9PV7mFJ8FCNnUwHOqCezmqB
+         1yleWjEOVg9nYCha9qO5Vp+bwkMpOO3oKNHS3LIkY3TJ3Rr1pr1wqZCUcIa7GCu+j8P+
+         Q/I9fpUDsYYcqpwDl/ANWgjTlIx/mi6UEyUJEj9Op9SpColIJwGNPCxlGRNLpYmXWCnk
+         zQPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758511090; x=1759115890;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9iUHvODxkooLDweHKcKr09A7x667bzyJgI9c4VZRR8c=;
+        b=MLAjZuW+inEj7zmV6LZ+FJmVNglJc+GEG2sPorvsg7dfSjJE1cPh+nfuIbooOPKYSY
+         Nw/matpyq0lzxX+yRxe0jxR32Rot8JqMYeXLwKgLclILxeESkrlLyfi1EoILGo/aX0w7
+         re94yXmDwfpIJtWxhhk7cI49SDjGWMScFK0VkdxD4QRnoNEHhv4lc1XTN8CgCKPR7hnO
+         2hvIkEWCtg2QrcTJD652BNCg/VQtCxHlf+ZiGBoXAIXY02a6d4md68RiGAw/1EdhdOw0
+         IWchN4S2OjBgPm60V8F7thogQhLI16uEU7xVNpXOrvSOXq6hHNGNBk15OPrqP/vBmnS3
+         oCow==
+X-Forwarded-Encrypted: i=1; AJvYcCUob98eUNOX312bTySzwgr81dQe91Z/z2W2oKF9akI4+n1zvFzYtBqwRcT/JRvSsEUIhCD/dAA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIkxgoK45XMWH2lCnQLSM4xlFF2cd5ZfXNyKOMK3y5Y6RsuHjO
+	b4Sd/BqcWdZ3iKDvr9BfFL+RGr/Ow7JqB4+pjO40DS8+BsqfIBG2S8L9
+X-Gm-Gg: ASbGncv/Ylwn5/3o+sIvlEA7gtC7EwdfeXOA4pv63R7qoXJpgVyFugFibPB2IMKOJnd
+	6yzbanl5euqtPoHcZur71jHjRfbeugeDF8itAqKsLaXgNfCyk0LCb5eaIvOhAUPLnqe6BhR74Kd
+	XYFO0mpof8o4wJccfTEm/H2sMqm1gJZYYnBOVLJkRNIAgySeI1TZlG1L/7N0nONyEMcdRrWxDSH
+	3FV5JiKiw9XOMdh2cMnH1+WW5ISFXtsWQUMQaORR0GbAd6uDPQfAo9ntT94RsQoY4xAGmOHh2tz
+	kwG1CnzkLdzJt+mhzXBRzST6a5Rk7HuFGASnRSpzeejgng3ElCC/2AuHn4cB8Bw3oId+Bkz0t6d
+	5zJcGRftMRZQmmX3orXpfWYOMRngDyeB/QVHrDpk=
+X-Google-Smtp-Source: AGHT+IGUnMuLX3CNPC3ftc8Zb06YGwLfjdbggPZFbtgpkuBBMPjAa4g7U8vjDP3D7ofMhRCkhG/1uQ==
+X-Received: by 2002:a05:6a00:1143:b0:772:a5c:6eea with SMTP id d2e1a72fcca58-77e4e5c36ccmr15525849b3a.17.1758511090059;
+        Sun, 21 Sep 2025 20:18:10 -0700 (PDT)
+Received: from [100.82.110.62] ([63.216.146.178])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77cfc24739fsm11010663b3a.28.2025.09.21.20.18.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 21 Sep 2025 20:18:09 -0700 (PDT)
+Message-ID: <e9c6903c-e440-46b3-860e-8782bfe4efb2@gmail.com>
+Date: Mon, 22 Sep 2025 11:17:58 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250920121157.351921-1-alok.a.tiwari@oracle.com>
-In-Reply-To: <20250920121157.351921-1-alok.a.tiwari@oracle.com>
-From: Somnath Kotur <somnath.kotur@broadcom.com>
-Date: Mon, 22 Sep 2025 08:24:52 +0530
-X-Gm-Features: AS18NWDvyTxdIGtdzNO3Wm6VbGHZqlfQdGWGihz6FTgEukuM-cNJzwCFlEAssJ8
-Message-ID: <CAOBf=ms2MMk7dMiEH+V04QR_F=YusDOw6K_BH2htLODziRUKcg@mail.gmail.com>
-Subject: Re: [PATCH net] bnxt_en: correct offset handling for IPv6 destination address
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: netdev@vger.kernel.org, michael.chan@broadcom.com, 
-	pavan.chebbi@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 18/20] netkit: Add io_uring zero-copy support for
+ TCP
+To: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+ razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
+ john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
+ David Wei <dw@davidwei.uk>, yangzhenze@bytedance.com,
+ Dongdong Wang <wangdongdong.6@bytedance.com>
+References: <20250919213153.103606-1-daniel@iogearbox.net>
+ <20250919213153.103606-19-daniel@iogearbox.net>
+From: zf <zf15750701@gmail.com>
+In-Reply-To: <20250919213153.103606-19-daniel@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sat, Sep 20, 2025 at 5:42=E2=80=AFPM Alok Tiwari <alok.a.tiwari@oracle.c=
-om> wrote:
->
-> In bnxt_tc_parse_pedit(), the code incorrectly writes IPv6
-> destination values to the source address field (saddr) when
-> processing pedit offsets within the destination address range.
->
-> This patch corrects the assignment to use daddr instead of saddr,
-> ensuring that pedit operations on IPv6 destination addresses are
-> applied correctly.
->
-> Fixes: 9b9eb518e338 ("bnxt_en: Add support for NAT(L3/L4 rewrite)")
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+在 2025/9/20 05:31, Daniel Borkmann 写道:
+> From: David Wei <dw@davidwei.uk>
+> 
+> This adds the last missing bit to netkit for supporting io_uring with
+> zero-copy mode [0]. Up until this point it was not possible to consume
+> the latter out of containers or Kubernetes Pods where applications are
+> in their own network namespace.
+> 
+> Thus, as a last missing bit, implement ndo_queue_get_dma_dev() in netkit
+> to return the physical device of the real rxq for DMA. This allows memory
+> providers like io_uring zero-copy or devmem to bind to the physically
+> mapped rxq in netkit.
+> 
+> io_uring example with eth0 being a physical device with 16 queues where
+> netkit is bound to the last queue, iou-zcrx.c is binary from selftests.
+> Flow steering to that queue is based on the service VIP:port of the
+> server utilizing io_uring:
+> 
+>    # ethtool -X eth0 start 0 equal 15
+>    # ethtool -X eth0 start 15 equal 1 context new
+>    # ethtool --config-ntuple eth0 flow-type tcp4 dst-ip 1.2.3.4 dst-port 5000 action 15
+>    # ip netns add foo
+>    # ip link add numrxqueues 2 type netkit
+>    # ynl-bind eth0 15 nk0
+>    # ip link set nk0 netns foo
+>    # ip link set nk1 up
+>    # ip netns exec foo ip link set lo up
+>    # ip netns exec foo ip link set nk0 up
+>    # ip netns exec foo ip addr add 1.2.3.4/32 dev nk0
+>    [ ... setup routing etc to get external traffic into the netns ... ]
+>    # ip netns exec foo ./iou-zcrx -s -p 5000 -i nk0 -q 1
+> 
+> Remote io_uring client:
+> 
+>    # ./iou-zcrx -c -h 1.2.3.4 -p 5000 -l 12840 -z 65536
+> 
+> We have tested the above against a dual-port Nvidia ConnectX-6 (mlx5)
+> 100G NIC as well as Broadcom BCM957504 (bnxt_en) 100G NIC, both
+> supporting TCP header/data split. For Cilium, the plan is to open
+> up support for io_uring in zero-copy mode for regular Kubernetes Pods
+> when Cilium is configured with netkit datapath mode.
+> 
+
+ From what we have learned, mlx supports TCP header/data split starting 
+from CX7, relying on the hw rx gro. I would like to ask, can CX6 use TCP 
+header/data split? Can you share your CX6's mlx driver information and 
+FW information? I will test it. If CX6 can support, this one is even 
+better for me. Thanks.
+
+
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> Co-developed-by: Daniel Borkmann <daniel@iogearbox.net>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Link: https://kernel-recipes.org/en/2024/schedule/efficient-zero-copy-networking-using-io_uring [0]
 > ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c b/drivers/net/e=
-thernet/broadcom/bnxt/bnxt_tc.c
-> index d72fd248f3aa..2d66bf59cd64 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
-> @@ -244,7 +244,7 @@ bnxt_tc_parse_pedit(struct bnxt *bp, struct bnxt_tc_a=
-ctions *actions,
->                            offset < offset_of_ip6_daddr + 16) {
->                         actions->nat.src_xlate =3D false;
->                         idx =3D (offset - offset_of_ip6_daddr) / 4;
-> -                       actions->nat.l3.ipv6.saddr.s6_addr32[idx] =3D hto=
-nl(val);
-> +                       actions->nat.l3.ipv6.daddr.s6_addr32[idx] =3D hto=
-nl(val);
->                 } else {
->                         netdev_err(bp->dev,
->                                    "%s: IPv6_hdr: Invalid pedit field\n",
-> --
-> 2.50.1
->
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+>   drivers/net/netkit.c | 18 +++++++++++++++++-
+>   1 file changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
+> index 27ff84833f28..5129b27a7c3c 100644
+> --- a/drivers/net/netkit.c
+> +++ b/drivers/net/netkit.c
+> @@ -274,6 +274,21 @@ static const struct ethtool_ops netkit_ethtool_ops = {
+>   	.get_channels		= netkit_get_channels,
+>   };
+>   
+> +static struct device *netkit_queue_get_dma_dev(struct net_device *dev, int idx)
+> +{
+> +	struct netdev_rx_queue *rxq, *peer_rxq;
+> +	unsigned int peer_idx;
+> +
+> +	rxq = __netif_get_rx_queue(dev, idx);
+> +	if (!rxq->peer)
+> +		return NULL;
+> +
+> +	peer_rxq = rxq->peer;
+> +	peer_idx = get_netdev_rx_queue_index(peer_rxq);
+> +
+> +	return netdev_queue_get_dma_dev(peer_rxq->dev, peer_idx);
+> +}
+> +
+>   static int netkit_queue_create(struct net_device *dev)
+>   {
+>   	struct netkit *nk = netkit_priv(dev);
+> @@ -299,7 +314,8 @@ static int netkit_queue_create(struct net_device *dev)
+>   }
+>   
+>   static const struct netdev_queue_mgmt_ops netkit_queue_mgmt_ops = {
+> -	.ndo_queue_create = netkit_queue_create,
+> +	.ndo_queue_get_dma_dev		= netkit_queue_get_dma_dev,
+> +	.ndo_queue_create		= netkit_queue_create,
+>   };
+>   
+>   static struct net_device *netkit_alloc(struct nlattr *tb[],
+
 
