@@ -1,152 +1,191 @@
-Return-Path: <netdev+bounces-225149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2516B8F931
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 10:38:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9797B8F988
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 10:41:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59ACD3A3A7A
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 08:38:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D89A9189ADE1
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 08:41:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2519223B616;
-	Mon, 22 Sep 2025 08:37:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C7825B687;
+	Mon, 22 Sep 2025 08:41:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZigvFC6y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SBTCA/yH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798CE9463
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 08:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B947D26FDAC
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 08:41:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758530278; cv=none; b=Pfge7DH01nIG0hjVEm07jvtBcumJKCVMxh2KbfFXx0z+A2YKo7nuYILz/GuNK93rdtqh7IuxF1ujyOCB6kfNVpNtSm56ECryoUC/gXrvliS6djopWmLqq1AlVmWNc4jJiUgivXqwKJc4CyrZqmFjU9kEHFC9oXMzZE2Y7P9hQm0=
+	t=1758530477; cv=none; b=Yn1eG9URxnGoQAYpeFNQ1b/mYtZxBgofpIq/u4VfJd43q5WI5uPR+UzPZKHvaHXzyjjnkMTp9fAVxtSDUlGN1n9XpQFZBmVoZjmH6JeGNGzms6c+usisoujzUyaSNb0+wn4hrPnvSLf+LA81wJBOBfxskd20sH3X5RhDYRCOlW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758530278; c=relaxed/simple;
-	bh=ANuIRDa/oBvcBLBrhPrywckoT+/jTCxOg2GGK3LyltM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CyLhz0OkGL6yHEiFIcDKjIvp2qq8C3v0uX96DJxHU1eR/6/og1IqjTaqdW1vanyQPcQsdStnqaNUqssowBOtgc64eTKhsiFN71nIHDJqceiAmnCedW5YTUK/LXo5QQGp6LQNkQL0MVrABHCSO/YuVaaJ1fxH9xhMys+VWhDqP7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZigvFC6y; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758530275;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=g5q2GXRJ54oLFi7klNa5d/CvCPn9FGbasths4DAcw64=;
-	b=ZigvFC6y96pdea49QHUHQLyR0Gl68cDZ05OCxJ8irVgJAhge1130G5siX18gegapqw7l4J
-	Rv6h2wCjz5DaKvg/zmIw5txg/JHp3HAiN08AflfRaUEi/FMCwQFdi3wHeKw2Ij2cCZKqV6
-	gAE3Uk9yyfpeapsxKPh/74st/wThLB4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-53-BKswhZf_OQKu6VYjHdhctw-1; Mon, 22 Sep 2025 04:37:53 -0400
-X-MC-Unique: BKswhZf_OQKu6VYjHdhctw-1
-X-Mimecast-MFC-AGG-ID: BKswhZf_OQKu6VYjHdhctw_1758530272
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3ee12ab7f33so1753502f8f.2
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 01:37:53 -0700 (PDT)
+	s=arc-20240116; t=1758530477; c=relaxed/simple;
+	bh=IgDmUWmAz3k3xMYGbslmykc44jrCG/h+cJ2EcZIzq7k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hzQIIPHtUhUbR7+Ipv+bI9bmBhZaPfGUk2YH36kZvElkCtI8lc2TdG6yVflkJCvy9wu1HIYTWgU+IorNdtxib1ngmPlundHyREjNLQGA4buiBjg6iFHO7JsIc6TSAZxHwqEh1U2N0OB8YC3xXqCdosMJKAFikLiqE61rcmXfJFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SBTCA/yH; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-46b7bf21fceso12889915e9.3
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 01:41:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758530474; x=1759135274; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hBlTOa/JIIU4AN6VgsnPXOfeNO8zUmXwwSI0iEAF4tE=;
+        b=SBTCA/yH+ejLjouKu0YUJTzyh0BZOCqC94BTGFvG+yyQOQ4an/cWrqaqREHnVpiYTZ
+         kc/0Fkf9sHNzwIeLyntKoSYMe2bNdHC2eBW+IbSs7I8MKDX8FIm8mMZmyDwourixnRch
+         +OAOVlyzLRqt8+A3FerLWVMOekcG/GG9sPAd2/qrB7bHdlS2/ylhzXborBwbpwbtirXy
+         R+XH+tqwHViS3LTi9ckE2HNSPPjB1BWA+4/igwt6C99yMF2L1GDgFncI3giiBElRG4+d
+         +rm10+QMraVncE/QRB8DjF4X1Pp0QtiPHMQ2trGfcK14nWhVoF+4hvwMF6GIi2xhp2Xw
+         Gccw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758530272; x=1759135072;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g5q2GXRJ54oLFi7klNa5d/CvCPn9FGbasths4DAcw64=;
-        b=jePN0CVDBy73V1hsry8bp3Fdiz3Nf6A94py84ttqViPyt8pQlseWglR0wy3Er+96xq
-         oWVQRX/zNoSwQDZQjPwqivPkVcPXFLLkO4mCv2d7OmjOqTVPLgw4Q2xcrKEcMFabFeFY
-         0N9E/fEiflbelKc80DDrPMXShdUGxghcrLc9LKwTf8hOMsusPMORUkr1f2t8+0XeGfKv
-         lhG2YCKoVdLrj+UPrLjT9UGNenVP1qdjz9G4a0VsgkLf+1KW9M4R7KSR9KEcGMIyG6Y7
-         CUyY/VWWfCkke//7GS4nOqJYNs2VQK4ohreOBrC8QAJ7TpvxvGs7IfXOp3O4kQL/lEer
-         qTjg==
-X-Forwarded-Encrypted: i=1; AJvYcCU6+zRJ3YzzIh8/XDCST9cz+ZgRpaqgJQ0/hL4DHO9lUiIEP0V67oOjXNn1e9W+is4bWNBIPxk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsZK1YRbjcneAKmhAEK5mgkMRzwNfrgwiZcAZIX7oQco1VniL3
-	Wf0mbfyvTqTQp6LMy9CjpMPGL5d3XNUGJTeftRduwLu5xKH9VPr3qMhklKPJGd+jhJ8EuzkLF6Y
-	GK1NtLGT0q/q8riC6vK+1C3BaPEtyDmSBSt6U1GaeMIM95h5ZQD3DIQym+A==
-X-Gm-Gg: ASbGncsECKD8FWE18K85vxFBaXlnGJUgLNLhjm41woeFPcLe9lo0CMR/+GSPpEzX6xf
-	FZCXwLFGxcZhIVPCr20HHU4vQX9oDGxsiy4Eu3DJD6h10bOK7AE2i9DIPlgUiGoPEaovVU3YlR6
-	BY8GLFS6oBBd5CAFqshtBccYwS0Bg3OrEm2USwW35PxxFkwCTvda2ahWEVBp2T4B6zco7H7aJMu
-	l+16DuGeb7FykfmzyYR3zBRMibDPU86iCrWa7UTx5kBAjz6GDf0j+JucCSJO/DHiGI1PaFhxNgI
-	FEYCoVUcaAZY8lB/4ub1ksBMn7FDbau+zW4iTXyoRTQX2VssUK3gGixgWQfdoUEe5533x/xHZkP
-	SzY8PkWXYFxeQ
-X-Received: by 2002:a05:6000:268a:b0:3ec:42ad:597 with SMTP id ffacd0b85a97d-3ee83cabcdemr7304613f8f.37.1758530272313;
-        Mon, 22 Sep 2025 01:37:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFH9nMHmXt1YsZmsaIC9UY/PMJvQS5NHSJoz7nNI/11G2EItqSlzg0PNSyD7483fm2PcPhqqQ==
-X-Received: by 2002:a05:6000:268a:b0:3ec:42ad:597 with SMTP id ffacd0b85a97d-3ee83cabcdemr7304589f8f.37.1758530271841;
-        Mon, 22 Sep 2025 01:37:51 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46138695223sm235220205e9.5.2025.09.22.01.37.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Sep 2025 01:37:51 -0700 (PDT)
-Message-ID: <3fbe9533-72e9-4667-9cf4-57dd2acf375c@redhat.com>
-Date: Mon, 22 Sep 2025 10:37:49 +0200
+        d=1e100.net; s=20230601; t=1758530474; x=1759135274;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hBlTOa/JIIU4AN6VgsnPXOfeNO8zUmXwwSI0iEAF4tE=;
+        b=oFxz2Xn3Qv1mLHsHw32wTHfMreGbU4okLLxvv55qBDZlkzEMBYUjZQWqD8O1J5mYYv
+         lEz6T7CjHqdnox/plCRs0peOIoYxf6AzHjXOhPB0I8dgyCCr6dGMW7Wm08xrexm4rZq9
+         7KNc28yNodrNhL+rBkUhITP1MnXh86kFtyf3dp85dW9zsbSRGxjUhCVqEpeA4R3yV3N4
+         k3ME4fGT2dFj+nt0Wzuc0XtU5IoLej7O9WN61ta90a07XIQsaVQYgAdb/tqpAIPbzklR
+         EPmAdi3/YNpuWCTDvvm5boaAFqzj+m8g5I8cziGWxEt1+1wuFBG5nUfJK272cYHcoKSN
+         GmXA==
+X-Gm-Message-State: AOJu0YxgPTMClzOgmcSLhpt9m5xkBrUvHPfudFebaG1d5EZwC3hK9nlb
+	QxfeRyd/XhF193H5bTSaF6Bnc1KeOR+dTS5l2gG4/BmRmkgiJ7iynMrazSZL4g==
+X-Gm-Gg: ASbGnct/qrDzWU6qzNhG0yWRaQM4czmrWE7dOY8+qsfhG3fRiIwagrkNqFojz/Fksgp
+	l5wwWRESWYFZgNFCzFVrKdYP7cUMBPI2hFo/fiG7H1m33ai/ebETbbRh0FhEsbBWG/QYrSJ7nGy
+	hkQZCfClQJ1cM4rNSagnH922yiLhMtl/vHFMFFkHCbedRYgW3pkeMIacmg3mzEP3TpAt+Glc7lL
+	SMrwFNIkfLM80XowpsddxIGG92q3QDBmCesBWI06RDYG8X4b58uyJ8jrLChO0toSe4Kjw3SSDOo
+	wCcx7lUEEMbj30cEu972RCDIlT7KwYu1jffMNwU2SWf1FjebE7sdKJa75y6uXyc37P/e0Dr1+PO
+	Wqj56x6s0fsskNuhX18oNktk=
+X-Google-Smtp-Source: AGHT+IEEpjDF7/jDbuuZ9uvE77K7VPyrIf8uLU6V10I88hb6CbUenR9CJX5qSU2VbLrTHzh5Qt1MHw==
+X-Received: by 2002:a05:600c:1511:b0:46e:19f8:88d3 with SMTP id 5b1f17b1804b1-46e19f88a15mr3866775e9.22.1758530473602;
+        Mon, 22 Sep 2025 01:41:13 -0700 (PDT)
+Received: from localhost ([45.10.155.17])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4613e09f879sm232005265e9.19.2025.09.22.01.41.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Sep 2025 01:41:13 -0700 (PDT)
+From: Richard Gobert <richardbgobert@gmail.com>
+To: netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	ecree.xilinx@gmail.com,
+	willemdebruijn.kernel@gmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	horms@kernel.org,
+	corbet@lwn.net,
+	saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	leon@kernel.org,
+	dsahern@kernel.org,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	shuah@kernel.org,
+	sdf@fomichev.me,
+	aleksander.lobakin@intel.com,
+	florian.fainelli@broadcom.com,
+	alexander.duyck@gmail.com,
+	linux-kernel@vger.kernel.org,
+	linux-net-drivers@amd.com,
+	Richard Gobert <richardbgobert@gmail.com>
+Subject: [PATCH net-next v7 0/5] net: gso: restore outer ip ids correctly
+Date: Mon, 22 Sep 2025 10:40:58 +0200
+Message-Id: <20250922084103.4764-1-richardbgobert@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net-next] udp: remove busylock and add per NUMA queues
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-References: <20250921095802.875191-1-edumazet@google.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250921095802.875191-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi,
+GRO currently ignores outer IPv4 header IDs for encapsulated packets
+that have their don't-fragment flag set. GSO, however, always assumes
+that outer IP IDs are incrementing. This results in GSO mangling the
+outer IDs when they aren't incrementing. For example, GSO mangles the
+outer IDs of IPv6 packets that were converted to IPv4, which must
+have an ID of 0 according to RFC 6145, sect. 5.1.
 
-On 9/21/25 11:58 AM, Eric Dumazet wrote:
-> @@ -1718,14 +1699,23 @@ static int udp_rmem_schedule(struct sock *sk, int size)
->  int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
->  {
->  	struct sk_buff_head *list = &sk->sk_receive_queue;
-> +	struct udp_prod_queue *udp_prod_queue;
-> +	struct sk_buff *next, *to_drop = NULL;
-> +	struct llist_node *ll_list;
->  	unsigned int rmem, rcvbuf;
-> -	spinlock_t *busy = NULL;
->  	int size, err = -ENOMEM;
-> +	int total_size = 0;
-> +	int q_size = 0;
-> +	int nb = 0;
->  
->  	rmem = atomic_read(&sk->sk_rmem_alloc);
->  	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
->  	size = skb->truesize;
->  
-> +	udp_prod_queue = &udp_sk(sk)->udp_prod_queue[numa_node_id()];
-> +
-> +	rmem += atomic_read(&udp_prod_queue->rmem_alloc);
-> +
->  	/* Immediately drop when the receive queue is full.
->  	 * Cast to unsigned int performs the boundary check for INT_MAX.
->  	 */
+GRO+GSO is supposed to be entirely transparent by default. GSO already
+correctly restores inner IDs and IDs of non-encapsulated packets. The
+tx-tcp-mangleid-segmentation feature can be enabled to allow the
+mangling of such IDs so that TSO can be used.
 
-Double checking I'm reading the code correctly... AFAICS the rcvbuf size
-check is now only per NUMA node, that means that each node can now add
-at most sk_rcvbuf bytes to the socket receive queue simultaneously, am I
-correct?
+This series fixes outer ID restoration for encapsulated packets when
+tx-tcp-mangleid-segmentation is disabled. It also allows GRO to merge
+packets with fixed IDs that don't have their don't-fragment flag set.
 
-What if the user-space process never reads the packets (or is very
-slow)? I'm under the impression the max rcvbuf occupation will be
-limited only by the memory accounting?!? (and not by sk_rcvbuf)
+v6 -> v7:
+ - Update comment and commit message
+ - Add BUILD_BUG_ON in tcp4_gro_complete
 
-Side note: I'm wondering if we could avoid the numa queue for connected
-sockets? With early demux, and no nft/bridge in between the path from
-NIC to socket should be pretty fast and possibly the additional queuing
-visible?
+v5 -> v6:
+ - Fix typo
+ - Fix formatting
+ - Update comment and commit message
 
-Thanks,
+v4 -> v5:
+ - Updated documentation and comments
+ - Remove explicit inline keyword in fou_core.c
+ - Fix reverse xmas tree formatting in ef100_tx.c
+ - Remove added KSFT_MACHINE_SLOW check in selftest
 
-Paolo
+v3 -> v4:
+ - Specify that mangleid for outer ids cannot turn incrementing ids to fixed if DF is unset
+ - Update segmentation-offload documentation
+ - Fix setting fixed ids in ef100 TSO
+ - Reformat gro_receive_network_flush again
+
+v2 -> v3:
+ - Make argument const in fou_gro_ops helper
+ - Rename SKB_GSO_TCP_FIXEDID_OUTER to SKB_GSO_TCP_FIXEDID
+ - Fix formatting in selftest, gro_receive_network_flush and tcp4_gro_complete
+
+v1 -> v2:
+ - Add fou_gro_ops helper
+ - Clarify why sk_family check works
+ - Fix ipip packet generation in selftest
+
+Links:
+ - v1: https://lore.kernel.org/netdev/20250814114030.7683-1-richardbgobert@gmail.com/
+ - v2: https://lore.kernel.org/netdev/20250819063223.5239-1-richardbgobert@gmail.com/
+ - v3: https://lore.kernel.org/netdev/20250821073047.2091-1-richardbgobert@gmail.com/
+ - v4: https://lore.kernel.org/netdev/20250901113826.6508-1-richardbgobert@gmail.com/
+ - v5: https://lore.kernel.org/netdev/20250915113933.3293-1-richardbgobert@gmail.com/
+ - v6: https://lore.kernel.org/netdev/20250916144841.4884-1-richardbgobert@gmail.com/
+
+Richard Gobert (5):
+  net: gro: remove is_ipv6 from napi_gro_cb
+  net: gro: only merge packets with incrementing or fixed outer ids
+  net: gso: restore ids of outer ip headers correctly
+  net: gro: remove unnecessary df checks
+  selftests/net: test ipip packets in gro.sh
+
+ .../networking/segmentation-offloads.rst      | 22 ++++---
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  8 ++-
+ drivers/net/ethernet/sfc/ef100_tx.c           | 17 ++++--
+ include/linux/netdevice.h                     |  9 ++-
+ include/linux/skbuff.h                        |  8 ++-
+ include/net/gro.h                             | 32 ++++------
+ net/core/dev.c                                |  8 ++-
+ net/ipv4/af_inet.c                            | 10 +---
+ net/ipv4/fou_core.c                           | 32 +++++-----
+ net/ipv4/tcp_offload.c                        |  1 +
+ net/ipv4/udp_offload.c                        |  2 -
+ net/ipv6/udp_offload.c                        |  2 -
+ tools/testing/selftests/net/gro.c             | 58 ++++++++++++++-----
+ tools/testing/selftests/net/gro.sh            |  2 +-
+ 14 files changed, 127 insertions(+), 84 deletions(-)
+
+-- 
+2.36.1
 
 
