@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-225435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8827DB939EF
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 01:40:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99BFEB939F2
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 01:40:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B963189EA34
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 23:41:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C21B2E091E
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 23:40:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1DEC302CB2;
-	Mon, 22 Sep 2025 23:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DBC13115A5;
+	Mon, 22 Sep 2025 23:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uVvWcj/d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OcGnzvT1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C75C42EA46F;
-	Mon, 22 Sep 2025 23:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 203AF307AF2;
+	Mon, 22 Sep 2025 23:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758584420; cv=none; b=U9uWLA73Kiv7DBxd1Xj+bcBxICJfsRg/wj1pHTZlQIfPtAigBNGC04PdHHiUyh60p0opeM6TI6KpKmbciBiofM+1/UgveFyTatl68ClOMSYEpb5LKXsqBxHo36U6+95muElCbvckXQ+sePC0+1iHQcaWPJJWtm34iUZvA+trEpo=
+	t=1758584423; cv=none; b=A7OrgN3HkNNzruRlicLcV9bRS4+7qi6XpQ0bVwl9L1OsjAeBZS0cBq4CO+voElUt+EBIsIx//V2gCh+yDKLFvbHASZ16ytYg7zP4W0eB9kxnrUoCkBo73E1SSiu4vn1WfWpd0Mw/2peYTuWkWL5w9pP3CzlESlFTFanCokJZQtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758584420; c=relaxed/simple;
-	bh=nOnerZmRV0c5WJjU8VhwkEjiAKaD2K/BYYOQhijJfIE=;
+	s=arc-20240116; t=1758584423; c=relaxed/simple;
+	bh=+jZWFLWHv69TbZUVIwzSdXjCI51nQ3r7VN1Hzi5otJ0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Edo5fqUCdW0+qPmRxQHfMgtIq/8knvl2L4zcXfkKZCvtJjKAVo40O5v68UO05MRtuRa30aYnAUpkzTsHpf4/yk/zvb12WyfhxYVNQlK/zEbjZGhwsMM16vOLSfaJ3l74vGJKSPzmCvJeViASXH1UHIhtyIiVVkOodBirEpWCFy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uVvWcj/d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33106C4CEF0;
-	Mon, 22 Sep 2025 23:40:20 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=jC/I7IHNKjJ2gG0grTJuU/RMZ5Nwx4IVt9lcvsSLNCLmQnpdWGp4D+d6dIs43ugEul+QvaLxIS97IciN3T7hGynJgpYAYCahwzZwxDJgIWhTk1NE0WWOmn12KVtn/f9FkmJFX3BUUGkIah8n0TKLaVn5EYMgHhxfCQ11C7g+QF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OcGnzvT1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0D9DC113D0;
+	Mon, 22 Sep 2025 23:40:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758584420;
-	bh=nOnerZmRV0c5WJjU8VhwkEjiAKaD2K/BYYOQhijJfIE=;
+	s=k20201202; t=1758584421;
+	bh=+jZWFLWHv69TbZUVIwzSdXjCI51nQ3r7VN1Hzi5otJ0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uVvWcj/d0yvTzBZDzbmzaCkaA+HwY1/+ztqjUkAPwBGkQmYWD+afeV2VTWk2Biz5j
-	 +qIEF9I91+EB1NyPSdpNe5GLcdzoHp38Qj9LplT1G72W0b3pZBlVnHlKRqbxcE/fth
-	 5EVClVWy/KfwgO0Ac/O/UACM9gj/pAEnOR+XVC8kEqkYj8/QUW6WDqeg5ybc00eoHP
-	 rfS4Tgx4UO/+7SN8skCnM7YKQSYoYhJfpxecdumcjp8bUY07dpwwjOkYOXjDSn0GfH
-	 QILHSOhqh0WxXsZ4zL/6p0eVB2v5vIZyhOcTv2yC5CAhV+EYlwDUnHwpjEWCM4pMWy
-	 v9tN3L08gSDxw==
+	b=OcGnzvT1rOPepEHATb9vwbMc6u3MdZhkNoPwKbFNiCj4flXe8Af7h4F8TZKhRymOt
+	 3GtmpTl8AWiXh/sRM0mz6TZVRCWOL9rVXlS9Axrqf6r3aPkU8DwxMKH3FnP3k5lYeU
+	 LQx+ClbCsmC0Q/vghFy6/TmLvNr57pWnkMbd8UhR3kveG9AP4P2bqzA6/gN3odAtto
+	 ImY1QX3ZF6U8yYY+RMbYs3lhLlPRFzZGXGVcoATL2zFj5Tyn24o33frq8s+p0NJkGK
+	 D3PFk1O70rxHazBMz4T7IvZDsoTimQ96XAodLmb1o+FnA3fOQJZSFmSljmvjT6QGxm
+	 iBbi+4kwLDYhw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE1A39D0C20;
-	Mon, 22 Sep 2025 23:40:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DCA39D0C20;
+	Mon, 22 Sep 2025 23:40:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V3] net: xilinx: axienet: Fix kernel-doc warnings
- for
- missing return descriptions
+Subject: Re: [pull-request] mlx5-next updates 2025-09-21
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175858441749.1195312.3629295031958677070.git-patchwork-notify@kernel.org>
-Date: Mon, 22 Sep 2025 23:40:17 +0000
-References: <20250919103754.434711-1-suraj.gupta2@amd.com>
-In-Reply-To: <20250919103754.434711-1-suraj.gupta2@amd.com>
-To: Suraj Gupta <suraj.gupta2@amd.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, michal.simek@amd.com,
- sean.anderson@linux.dev, radhey.shyam.pandey@amd.com, horms@kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, harini.katakam@amd.com
+ <175858441899.1195312.8354463671118218585.git-patchwork-notify@kernel.org>
+Date: Mon, 22 Sep 2025 23:40:18 +0000
+References: <1758443940-708689-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1758443940-708689-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, moshe@nvidia.com,
+ agoldberger@nvidia.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This pull request was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 19 Sep 2025 16:07:54 +0530 you wrote:
-> Add missing "Return:" sections to kernel-doc comments for four functions:
-> - axienet_calc_cr()
-> - axienet_device_reset()
-> - axienet_free_tx_chain()
-> - axienet_dim_coalesce_count_rx()
+On Sun, 21 Sep 2025 11:39:00 +0300 you wrote:
+> Hi,
 > 
-> Also standardize the return documentation format by replacing inline
-> "Returns" text with proper "Return:" tags as per kernel documentation
-> guidelines.
+> The following pull-request contains a common mlx5 update
+> patch for your *net-next* tree.
+> Please pull and let me know of any problem.
+> 
+> Regards,
+> Tariq
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,V3] net: xilinx: axienet: Fix kernel-doc warnings for missing return descriptions
-    https://git.kernel.org/netdev/net-next/c/312e6a58f764
+  - [pull-request] mlx5-next updates 2025-09-21
+    https://git.kernel.org/netdev/net-next/c/1bcce9ec189b
 
 You are awesome, thank you!
 -- 
