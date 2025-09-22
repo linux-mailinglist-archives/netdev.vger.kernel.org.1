@@ -1,234 +1,318 @@
-Return-Path: <netdev+bounces-225282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDB05B91CAA
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 16:48:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61AC1B91D7F
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:05:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A39263AA598
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 14:48:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB1201900937
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 15:05:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7336C1F0E26;
-	Mon, 22 Sep 2025 14:48:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E930327E05E;
+	Mon, 22 Sep 2025 15:05:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mx0TTPkj"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay-b03.edpnet.be (relay-b03.edpnet.be [212.71.1.220])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3FD0288D0
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 14:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.71.1.220
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758552492; cv=none; b=XLNe86b9ItoPM3QZQJyDIP3Ky8yyMewNzBgaOlGlyDNJjsC6BAsek9gCeVkcazyHAJW82h06VvQht6YB46e2G979bkPQ+d1VcDJiKSvIxAzkAflMspsQRt1eSK5Pl+JO5TSh3ozuksjQLmGsCvrneL221Y+yRUBw+4EXjQo6WVw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758552492; c=relaxed/simple;
-	bh=vybatINoA4+DxRY/Ffg7D9ko1To+XHwujiVcXToQqs8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dir1MjsQNKAWT3stmKe1LyrpLMX4Si1EJ7xHYtp+ytDDNHC8gcLvn2wigE20xpDtfG/npOOPrGCHmmt/1il2glLRr120NkhkYseqz5oj3jEEoJsqaVaNau7YEAkmn77pC/S/G075OdTMzlvk1tefxJMR4zyQFNASmGB2UOsJXVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=kabelmail.de; spf=fail smtp.mailfrom=kabelmail.de; arc=none smtp.client-ip=212.71.1.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=kabelmail.de
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kabelmail.de
-Received: from [192.168.177.65] (94.105.126.5.dyn.edpnet.net [94.105.126.5]) by relay-b03.edpnet.be with ESMTP id CGlXv6Fb0UCBJ6HA; Mon, 22 Sep 2025 16:48:05 +0200 (CEST)
-X-Barracuda-Envelope-From: janpieter.sollie@kabelmail.de
-X-Barracuda-Effective-Source-IP: 94.105.126.5.dyn.edpnet.net[94.105.126.5]
-X-Barracuda-Apparent-Source-IP: 94.105.126.5
-Message-ID: <2c3644ae-960d-42c7-816d-180acba0e289@kabelmail.de>
-Date: Mon, 22 Sep 2025 16:46:31 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0BF265620;
+	Mon, 22 Sep 2025 15:05:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758553525; cv=fail; b=jBsjGtlbnDdvZ/x2Z3TZDZKlkxMSu9SSmM8MFFgkIujh0gMg7Yf1HB46fw5MI4chTSjO6ffaRW+fK6dELC5m4FoIz6xUSPg/BwGz+QJbK320w48ED437X2MumufoKIXQpgmm/TChbd9Aj6GaZt9HQcpOra9rWLPN47js2z0usbg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758553525; c=relaxed/simple;
+	bh=ORozxLKBNfVzlernHL/sjF2VEKsc3ICF6Fyo6yqfHD8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Ma8ZobH/u3YG/1fDgw7tRxYprDePEC8jH1pHVNmNUueEpF8KkuMKddL96SYPL4p05mpY3anQgeqJPQR8fs7wYr9XeUk1snqP7J8/HrL+mHx2mG+RV2SfXVaJ47JK5RFHRo0MyOmi9DDtl2zYXjMPcJNmi4X18ToRM5dkvTlrCpo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mx0TTPkj; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758553524; x=1790089524;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=ORozxLKBNfVzlernHL/sjF2VEKsc3ICF6Fyo6yqfHD8=;
+  b=mx0TTPkjpaX1b+cxrx0axfntlgVQtdO8eRj05OORUofNViOD85Ef3i+s
+   fMSnlsS1rzNj0kJpEfdkjhLy7/S3BJuYzwUUptHMfvyOaoJA4XK6uzi8V
+   QbbFuGzau7JtJkLV62i0nAoRUnGSP40vzzXVF+GNiVFvUZGNB9v5kRbxR
+   QwigZjMhEID+7CdUo+udERPI+7j14zimRsZ3HqNLd/EINIuSuAifISCPM
+   6zi9MhvheFnS8yFm7cNcZEJ+aESOpArMrlrEWxM04InMCJpOwUfrkOLxr
+   gMLmLAuudSNqviVU+hpX8mZu1Y/mGtoUehDrUDg5pws052ep8ijwRB2Qs
+   Q==;
+X-CSE-ConnectionGUID: br5GmSxmSs2RupVVQTf+yQ==
+X-CSE-MsgGUID: +V2B7JdiTfKpbazO1isQbA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="71922594"
+X-IronPort-AV: E=Sophos;i="6.18,285,1751266800"; 
+   d="scan'208";a="71922594"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 08:05:23 -0700
+X-CSE-ConnectionGUID: /eSR1QpxRX+CvqAiOjGnlg==
+X-CSE-MsgGUID: auxZnjaxSVGxxOCcGMKqyA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,285,1751266800"; 
+   d="scan'208";a="180512738"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 08:05:23 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 22 Sep 2025 08:05:22 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Mon, 22 Sep 2025 08:05:22 -0700
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.14)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 22 Sep 2025 08:05:20 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wwach10gDosCKUnkJMoMdMJWMdUCQ6txM6BVVXTjdnA7hrtXz3odV1o3fbOuKgbXVJSlU9A4huQ7Gv1RughU2wUHF/iGdjc3g4l9O8N8RF1H2xva3wao46AhtwHpHXRsr63pAbDxM7YCspuXuk2l4x4N1Wb65mYQI107btAlmVBgdEQSt5nCgWkPgWSYKe1fIjiIUM0+Pxi/K/6boh1PRpXoI83h95WBb0pB6Tn2rzsb0Uyx3rHUGtOT4mlZlGcZl4tWfaY6P2XsOypt3nkqLEAstVE1uM+Zf5dLer0Q6CvExKL0QVB7KIpmNIW2x7LoeKZvsUCK4Oq6RnzUz5PSwA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FxVkOA/+VPR7Uz2EB+ommZAwJ32gnJU218knTKwETEQ=;
+ b=CeW2xwgw9TOsiG9mXku9o112nZwqywfA7V9V3Bm0KOXnWViXJqDJqgaFp9EgDEjRMf7Wr343sknT/Rhgd5cV1tXUGZGSIydFIodhQVpXWXot8DVFTI68IxXuwdp8REOgJQ4twPlsp/Z/6PsPMCceqH9laTrPjUJsAK+d2K9kCE06IUgn3KucAD2CO78ERVp96EEOxyUBuFZGDQu5JgyNCLSTMmB06n7gB2MfkhyRHKNif1dIIvY26i98X+o8sijGRRyuG4D/YSoaPmMDmF92EpKjHWwa4nzEi/GNHL+DgOjx8FIStImlwggKL9fCaYL7K0d5nWD0RtXfLEQYHa+eBA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ MN6PR11MB8103.namprd11.prod.outlook.com (2603:10b6:208:473::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.19; Mon, 22 Sep
+ 2025 15:05:18 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9137.018; Mon, 22 Sep 2025
+ 15:05:18 +0000
+Date: Mon, 22 Sep 2025 17:05:09 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Amery Hung <ameryhung@gmail.com>
+CC: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<alexei.starovoitov@gmail.com>, <andrii@kernel.org>, <daniel@iogearbox.net>,
+	<paul.chaignon@gmail.com>, <kuba@kernel.org>, <stfomichev@gmail.com>,
+	<martin.lau@kernel.org>, <mohsin.bashr@gmail.com>, <noren@nvidia.com>,
+	<dtatulea@nvidia.com>, <saeedm@nvidia.com>, <tariqt@nvidia.com>,
+	<mbloch@nvidia.com>, <kernel-team@meta.com>
+Subject: Re: [PATCH bpf-next v6 0/7] Add kfunc bpf_xdp_pull_data
+Message-ID: <aNFlpcGxd9yI6qLJ@boxer>
+References: <20250919230952.3628709-1-ameryhung@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250919230952.3628709-1-ameryhung@gmail.com>
+X-ClientProxiedBy: TL2P290CA0028.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:3::10) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] increase MDIO i2c poll timeout gradually (including patch)
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-X-ASG-Orig-Subj: Re: [RFC] increase MDIO i2c poll timeout gradually (including patch)
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <971aaa4c-ee1d-4ca1-ba38-d65db776d869@kabelmail.de>
- <cbc4a620-36d3-409b-a248-a2b4add0016a@lunn.ch>
- <f86737b0-a0fe-49a6-aeca-9e51fbdf0f0d@kabelmail.de>
- <aM6Ng7tnEYdWmI1F@shell.armlinux.org.uk>
- <6d444507-1c97-4904-8edb-e8cc1aa4399e@kabelmail.de>
- <aM6xwq6Ns_LGxl4o@shell.armlinux.org.uk>
- <4683e9ea-f795-4dab-8a0a-bd0b0f4fbd99@kabelmail.de>
- <3fab95da-95c8-4cf5-af16-4b576095a1d9@kabelmail.de>
- <aNFDKaIh6RNqLcBM@shell.armlinux.org.uk>
-Content-Language: nl
-From: Janpieter Sollie <janpieter.sollie@kabelmail.de>
-Autocrypt: addr=janpieter.sollie@kabelmail.de; keydata=
- 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
-In-Reply-To: <aNFDKaIh6RNqLcBM@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-Barracuda-Connect: 94.105.126.5.dyn.edpnet.net[94.105.126.5]
-X-Barracuda-Start-Time: 1758552485
-X-Barracuda-URL: https://212.71.1.220:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at edpnet.be
-X-Barracuda-Scan-Msg-Size: 5788
-X-Barracuda-BRTS-Status: 1
-Content-Transfer-Encoding: quoted-printable
-X-ASG-Debug-ID: 1758552485-24639c1e2f80f9d0001-BZBGGp
-X-Barracuda-Spam-Score: 0.00
-X-Barracuda-Spam-Status: No, SCORE=0.00 using global scores of TAG_LEVEL=10.0 QUARANTINE_LEVEL=10.0 KILL_LEVEL=7.0 test= 
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.125474
-	Rule breakdown below
-	  pts rule name              description
-	 ---- ---------------------- --------------------------------------------------
-	
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|MN6PR11MB8103:EE_
+X-MS-Office365-Filtering-Correlation-Id: 90f3a64b-148c-46dd-a070-08ddf9e9715d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Sg/C84mD2TaqZCUtIsZwpbH7WaxHA5JsM3CfoIOU3vCJCHEQ1k8rIKD99DZ8?=
+ =?us-ascii?Q?HRGpeIS4CyfbK8E/Tx1hKQKv6v/wT/riu3BHzFCg027PxQGrgfXSxOj3qcWH?=
+ =?us-ascii?Q?+zlXHQrfGQMHmaqy3nS2z1HCxSFlkPM2G0q/NOCIClpt9bPwMWMRpoFOaDMD?=
+ =?us-ascii?Q?kdYuf3O9g9M/fWVP2O7OSAM7COyjB/pb1bJ4DEZ2WsLDN6tOejcCshn/AMXm?=
+ =?us-ascii?Q?7qBXqv4Z0yBnaZPHYrCK7f924UeWUjW9Xjkp1Rn3UwS7gS862E75utsf2Z2z?=
+ =?us-ascii?Q?0ifIfARQmtPcTyzhUOBsbeIJLS/uj5NxrcylkBgcymM7dT3aokB0bgUUSzCw?=
+ =?us-ascii?Q?y9GazUVEVuoOJkPv/ETkn6BKH34dhztpCr0PDVHys6bS2gNjkZjn8kc4ZZ/R?=
+ =?us-ascii?Q?Z47TzKwQF1t++QaXk2AuHhZdWPeXZbT4uuGIp67Cqr+ps5Oz8sId1Hdp6vrC?=
+ =?us-ascii?Q?AwegjYq1Q4sIZ+TtCs8MlFRTP2MMnDT1KhONPvvcBmfqotmZOI8GfOfDnTRy?=
+ =?us-ascii?Q?G6VbSHhD9zym1Nfmr1hGqcZJH7fD3SqdFg6AC7L54LeCcKo88Mz0nhiE2zXZ?=
+ =?us-ascii?Q?D9daPyofmZITlId86eoZ6l607IpFNo+8i4rGEtcoLQfVN908jS5pZ6XQmimo?=
+ =?us-ascii?Q?othg0JbmtGsQPCeLR86Es/XVMCgkS8uaklNziNd0dr2bHvrHUSQIPCWeJJEs?=
+ =?us-ascii?Q?sVxmNfY3tsmXJx3/D24THSnk37u074jBe8LA1wOP1DTecO6K1XJO6xxfD032?=
+ =?us-ascii?Q?5+pE7rwPm9BLGOKJ67YPOdMp/iW7u9w3ortlb/tzrtyMJ2RDiXuUhD3IIj0e?=
+ =?us-ascii?Q?RZttWT/zXmkIRpUZmkyMMlUMO4k740//UJMEwO2PfA/CHiVaquidQireO8TA?=
+ =?us-ascii?Q?fQqqY3bLu10C9IBFHaRBQYDrox7kqJlE88tQ4dUYHYZ6uPycXbIXLuZ8MYEi?=
+ =?us-ascii?Q?1fSSujzh+ZZfIDJtTo/ARvvbjvnjNoXRIe4qMuE7YD8/SJoM3Ie9851s94s3?=
+ =?us-ascii?Q?TZkes7zK3grPTB8/mM1HXkNzFefFP66+u4sotdsBRej28Vg5prjnqMDbj5pq?=
+ =?us-ascii?Q?KULBbdcfM/Ip7kzM/zKKZ3kF6QIZCb/D6tuaRvCyo91eYbgXRMagi//7NivO?=
+ =?us-ascii?Q?K5sJuYu7ZAOeDb8/ZLOEDZOb8JD3yGSNGVMnS+vDa3pNOm0eGyhBJe3C/Qe4?=
+ =?us-ascii?Q?7Uo+ruzRNkgIORjYAdiyvWHXQS9OiXykDyLGmawPGAqRFnVlNko3pYwHHQrO?=
+ =?us-ascii?Q?BuS1wULgnFyoAZD7tBHnwosedQSKUUptcWSAF67rJzZ5dTOLwpFTwBlp+E7W?=
+ =?us-ascii?Q?h335OROt3IlxmNwXRBp36ib8D/ve61ytFLhrFCJ5IvJWfxEciwxGWgTGQKeg?=
+ =?us-ascii?Q?edT2i8v5MttLfq3uecFp4UwaVGME?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?iIqcdR4RcjGx5Xm+fqOpDi3oH2HJt0Dsib8XYKdiELmrW/2xzfjScMBTsIKl?=
+ =?us-ascii?Q?v5JIv4CcrG3GT20EWMW6U4iPbVvQTWPC8Bcy7NZOMoUALD5LJBA/ejI4OZHX?=
+ =?us-ascii?Q?CSD1fFwXWad/nx2sOCUTJe65dMI0OL1YGoBCSiAiwhjxUHc3dpTGI1THlTuJ?=
+ =?us-ascii?Q?hAQTjY18yyCkZwlFSy2MMzRMPpooINXB3w7M6HJwX19klya0zfAlCX/88IP0?=
+ =?us-ascii?Q?slidvsqVQSMIX5yWInez0H1mq/qKNZkOeNbvwHS026Ky8TiJbOvug7pjmeOH?=
+ =?us-ascii?Q?cUmMQG6tuanE1qc4ChrxgpMlhXG+Pub/kPlpkAUj/XVQN8lP3SnkN2Tk2HCX?=
+ =?us-ascii?Q?aMehOTVYRLkZRuz7fq6odvecHnsubXRMi3U8ei9wy5+UNoTWg6Jl2Lzes/zM?=
+ =?us-ascii?Q?k3VFNFpjVxJ+5ys43pgO81haQwSq2ituO34FHJZ9QS9tu9W2djIxFi/GnW7r?=
+ =?us-ascii?Q?ooIw8vKbYNXjbAo+V62tjAII5ev5mhiXfqtIVoUEDuqYABBiXKFnMzNpm3Rx?=
+ =?us-ascii?Q?VtYo5VPPoRq6uHRY8aqErdIg4GY0VFkGNPOhkhZ2jMXISB25ddIzHCzH6LSF?=
+ =?us-ascii?Q?REeOAqpvUwimKx/IW8jRZwZmo+4kc17c71SNrRRsnVLJ8i8DqcJISUYP2OVC?=
+ =?us-ascii?Q?jlodGm9FUdPVGPY+sXunqzXSjhqsqSWHEvX9jigdbK0qcuhksErdvlE5O+2i?=
+ =?us-ascii?Q?vaSG3T2JPCMX50b5hgGvU/f+ksJ5TgJ3qtu6YRpbvf4eMzWz2WlsXOQisZjF?=
+ =?us-ascii?Q?/JaA937v9Qos9/dgwNOyigiy3XxuP7DHP3KVvW+IhjPNx1/zUe9C0a1ZoSjW?=
+ =?us-ascii?Q?hUvuSo/HyTWTtm6NfqgTh2+xtCwL45N6UUWh/zLlOmeEiA2VgU1mKY4a0LO5?=
+ =?us-ascii?Q?9DP7h26uQYMu1dP9tRvrUnWLV4po7tYmtdZ3tvvfg/bF3ppcUzEQeJIn5/tq?=
+ =?us-ascii?Q?mI6Zz2FOfpScbQuc2fBtpb2h4ljQsYuyGoA9TCRFlpAJ5ta0SZtF/7pBNqB8?=
+ =?us-ascii?Q?pz1fIjjFx5FsDbGz6JqSesQ2T8sjb3aH96CCFSYV3fVYWgpbH3J+VXF90PSg?=
+ =?us-ascii?Q?t4IujILC9GSMODLUp/q3gZJIgiNVM7hWaeY3K59kzhJjhHnoJnww1ido1e9f?=
+ =?us-ascii?Q?877658QRlW5Pqb/EHiKaGdoUNui6AjW2wG1G7zDhubFNLvBIgTyW4QHl4+VS?=
+ =?us-ascii?Q?U6wMSS58fLbI2GVS3OqPRIU1wvwXAMyWD6x7NFYYfqvWG3hjAmRd9VjEUBY6?=
+ =?us-ascii?Q?849ShmwCrcGVhbvlhe1Ru9Mh8q3ko3jcQqg6brf8rRZ4/k7n3ndCyUsCFvqv?=
+ =?us-ascii?Q?dp4pjzWaCuApW+0SU40pc9RWj9D1xI1yEnWIMjwHhYeJF9OEYCMJglMw22MW?=
+ =?us-ascii?Q?sC25vL6s/4loQj0sn6kGmYvehCp8tYtkOsXIVR99G4+jkksk951PxIL6p53N?=
+ =?us-ascii?Q?NlFBLVhzbHPlSJTvW6tJpiZgkycjF0eV96QhtP0EqCYW7n0CbE8kiPIpOJeY?=
+ =?us-ascii?Q?ravtKePN49+ssfXk6XE9V0Ew/3UnMWfCQkBcbAmtSb1EDWR0+Jq3FmyYTeqS?=
+ =?us-ascii?Q?zRXzq0/2J9SkKywf989c3s1kuP70hCY8Jh9p+TzTKMnJnb4R5+WU0YOTU8Ht?=
+ =?us-ascii?Q?gQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90f3a64b-148c-46dd-a070-08ddf9e9715d
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2025 15:05:18.2570
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UcvqFdOAOUC3u2Mej5uyuyxHm3FPKoEpVJHyYpaI8ok7kPWpMSWpn0Os0CIdSTd2+xZmjpWBdM42knNqXNBMW5E8clcvnEj1KxOPgAg+1lk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR11MB8103
+X-OriginatorOrg: intel.com
 
-(rewriting as plain text, mail client accidentally converted to html)
-Op 22/09/2025 om 14:38 schreef Russell King (Oracle):
-> On Mon, Sep 22, 2025 at 12:54:20PM +0200, Janpieter Sollie wrote:
->> this is a diff of 10usecs (i=3D10), 40usecs (i=3D4) and 30usecs (i=3D3=
-) my device
->> is running the i2c_transfer_rollball().
->> seems a lot to me when an i2c call takes 11-12 usecs avg per call
->> are you sure these numbers point to a stable i2c bus?
-> I guess you've never dealt with I2C buses before.
-No, but I've read many kernel code dealing with it, desperately trying to=
- figure out the error.
-But yes, this is only the software part.
-> As has already been
-> stated, the clock rate for I2C used with SFP modules (which is, if you
-> like, I2C v1) is 100kHz. that's 10us per bit.
->
-> An I2C transaction consists of one start bit, 8 bits for the address
-> and r/w bit, one bit for the ack, 8 bits for the each byte of data
-> and their individual ACK bits, and finally a stop bit. If a restart
-> condition is used, the stop and start between the messages can be
-> combined into a restart condition, saving one bit.
->
-> That works out at 1 + 8 + 1 + N*(8 + 1) + 1 bits, or 11 + 9 * N bits
-> or clocks.
->
-> The polling consists of two transactions on the bus:
->
-> - a write of one byte - giving 20 clock cycles.
-> - a read of six bytes - giving 65 clock cycles.
->
-> So that's 85 clock cycles, or 84 if using restart. At 10us per cycle,
-> that's 840us _minimum_.
-and here's my first error:
- > this is a diff of 10usecs (i=3D10), 40usecs (i=3D4) and 30usecs (i=3D3=
-) my device is running the=20
-i2c_transfer_rollball().
- > seems a lot to me when an i2c call takes 11-12 usecs avg per call
-I wrote usecs, but was obviously in a wrong universe, it should have been=
- msecs.=C2=A0 Sorry
->
-> If i2c_transfer() for that write and read are taking on the order of
-> 12us, that suggest the bus is being clocked at around 7MHz, which is
-> certainly way too fast, a bug in the I2C driver, an issue with the
-> I2C hardware, or maybe an error in calculating how long a call takes.
-Yes, I'm afraid of the last one as well ...
-Honestly, even after re-reading it (twice),
-I'm still not sure if / when I made an error, so my calculations are belo=
-w
->
-> And... it's your interpretation of your results.
->
-> Remember, these are nanoseconds (ns), nanoseconds are 1000 microseconds
-> (us) and there are 1000000 nanoseconds in a millisecond (ms). Sorry
-> to teach you to suck eggs, but based on your reply it seems necessary
-> to point this out.
-you're welcome, It's always useful to get corrected no mather what.
-I'm simply trying to find a solution for hardware I built myself,
-which is more or less "problem I created myself".
-And I _WILL_ make dumb errors. I'm sorry for that.
-but hey, at least I'm not crying like a little kid 'please help me to fix=
- my internet' ....
-Yes, I know the definition of ns -> us -> ms -> sec,
-the commands used (example for i =3D 4 here, a total msleep of 245):
+On Fri, Sep 19, 2025 at 04:09:45PM -0700, Amery Hung wrote:
+> v6 -> v5
+>   patch 6
+>   - v5 selftest failed on S390 when changing how tailroom occupied by
+>     skb_shared_info is calculated. Revert selftest to v4, where we get
+>     SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) by running an XDP
+>     program
 
-$ echo $(($(sed -n 's/.*\ \([0-9]\+\)\ ns\ in\ iteration\ 4/\1/p' < tempo=
-utput.txt | sort -n |=20
-head -n 1) - 245000000)) -> for min
-$ echo $(($(sed -n 's/.*\ \([0-9]\+\)\ ns\ in\ iteration\ 4/\1/p' < tempo=
-utput.txt | sort -n |=20
-tail -n 1) - 245000000)) -> for max
-$ echo diff at iteration 4: $((123074939 - 82868351)) -> for diff
-$ echo $(($(sed -n 's/.*\ \([0-9]\+\)\ ns\ in\ iteration\ 4/\1/p' < tempo=
-utput.txt | sort -n |=20
-awk '{x+=3D$0}END{print int(x/NR)}' -) - 245000000)) -> for average
-avg: 86375811
-so that's 86375811ns, 86375us, and 86ms, or ~12ms for each iteration
->
-> You quoted an average of 99901858ns - 99.9ms for the i=3D3 case.
-> You quoted an average of 86375811ns - 86.4ms for the i=3D4 case.
->
-> Given that the difference in msleep() delay is 5ms, and we're
-> talking about 50 or 55ms here, for the i=3D3 case that's 45ms
-> for i2c_transfer(). For the i=3D4 case, that's 36.4ms.
-Ouch ... that's a _LOT_ more than I thought.That explains the difference.=
-=C2=A0 Sorry.
->
-> However, msleep() is not accurate - and may even be bucket-based so I
-> wouldn't rely on the requested msleep() interval being what you end
-> up with - which seems to be suggested by the difference of almost 10ms
-> in the apparent time that i2c_transfer() takes. 10ms, not 10us. So,
-> unless you actually obtain timestamps before and after the
-> i2c_transfer() call and calculate their difference, I would not read
-> too much into that.
->
-> In any case, figures in the realms of milliseconds are certainly in the
-> realm of possibility for a 100kHz bus - as I say, one instance of a
-> transaction _should_ be no less than 840 microseconds, so if your
-> calculations come out less than that, you should not be claiming
-> "bad bus" or something like that, but at first revalidating your
-> analysis or interpretation of the figures.
->
-> Also, because of scheduling delays, and some I2C drivers will sleep
-> waiting for the transaction to finish, even that measurement I
-> suggest can not be said to relate to the actual time it takes for
-> the transactions on the bus, unless you're running a hard-realtime OS.
-you are giving a lot of reasons why it's unreliable ...
-and I certainly won't dare to calculate useless statistics anymore.
->
-> However, it seems you're very keen to blame the I2C bus hardware...
->
-Based on my mails, I can certainly see why you're thinking this way.
-I have no idea what goes wrong anywhere between me making a modification =
-in the mdio.c file ->=20
-i2c code -> ... -> SFP phy.
-I'm curious what goes wrong, notice the 3 dots in between,
-I know there's a pca9545 muxer in in there further complicating it, but t=
-hat's about it.
+Hi Amery, could you shed more light on this? Would be nice to stick with
+BTF approach as it looked clean to me. Was this due to SMP_CACHE_BYTES
+being different between archs?
 
-Long story short: should I somehow try to test the reliability of somethi=
-ng else?
-
-Thanks,
-
-Janpieter Sollie
+> 
+> v5 -> v4
+>   patch 1
+>   - Add a new patch clearing pfmemalloc bit in xdp->frags when all frags
+>     are freed in bpf_xdp_adjust_tail() (Maciej)
+> 
+>   patch 2
+>   - Refactor bpf_xdp_shrink_data() (Maciej)
+> 
+>   patch 3
+>   - Clear pfmemalloc when all frags are freed in bpf_xdp_pull_data()
+>     (Maciej)
+> 
+>   patch 6
+>   - Use BTF to get sizes of skb_shared_info and xdp_frame (Maciej)
+> 
+>   Link: https://lore.kernel.org/bpf/20250919182100.1925352-1-ameryhung@gmail.com/
+> 
+> v3 -> v4
+>   patch 2
+>   - Improve comments (Jakub)
+>   - Drop new_end and len_free to simplify code (Jakub)
+> 
+>   patch 4
+>   - Instead of adding is_xdp to bpf_test_init, move lower-bound check
+>     of user_size to callers (Martin)
+>   - Simplify linear data size calculation (Martin)
+> 
+>   patch 5
+>   - Add static function identifier (Martin)
+>   - Free calloc-ed buf (Martin)
+> 
+>   Link: https://lore.kernel.org/bpf/20250917225513.3388199-1-ameryhung@gmail.com/
+> 
+> v2 -> v3
+>   Separate mlx5 fixes from the patchset
+> 
+>   patch 2
+>   - Use headroom for pulling data by shifting metadata and data down
+>     (Jakub)
+>   - Drop the flags argument (Martin)
+> 
+>   patch 4 
+>   - Support empty linear xdp data for BPF_PROG_TEST_RUN
+> 
+>   Link: https://lore.kernel.org/bpf/20250915224801.2961360-1-ameryhung@gmail.com/
+> 
+> v1 -> v2
+>   Rebase onto bpf-next
+> 
+>   Try to build on top of the mlx5 patchset that avoids copying payload
+>   to linear part by Christoph but got a kernel panic. Will rebase on
+>   that patchset if it got merged first, or separate the mlx5 fix
+>   from this set.
+> 
+>   patch 1
+>   - Remove the unnecessary head frag search (Dragos)
+>   - Rewind the end frag pointer to simplify the change (Dragos)
+>   - Rewind the end frag pointer and recalculate truesize only when the
+>     number of frags changed (Dragos)
+> 
+>   patch 3
+>   - Fix len == zero behavior. To mirror bpf_skb_pull_data() correctly,
+>     the kfunc should do nothing (Stanislav)
+>   - Fix a pointer wrap around bug (Jakub)
+>   - Use memmove() when moving sinfo->frags (Jakub)
+> 
+>   Link: https://lore.kernel.org/bpf/20250905173352.3759457-1-ameryhung@gmail.com/
+>   
+> ---
+> 
+> Hi all,
+> 
+> This patchset introduces a new kfunc bpf_xdp_pull_data() to allow
+> pulling nonlinear xdp data. This may be useful when a driver places
+> headers in fragments. When an xdp program would like to keep parsing
+> packet headers using direct packet access, it can call
+> bpf_xdp_pull_data() to make the header available in the linear data
+> area. The kfunc can also be used to decapsulate the header in the
+> nonlinear data, as currently there is no easy way to do this.
+> 
+> Tested with the added bpf selftest using bpf test_run and also on
+> mlx5 with the tools/testing/selftests/drivers/net/{xdp.py, ping.py}.
+> mlx5 with striding RQ enabled always passse xdp_buff with empty linear
+> data to xdp programs. xdp.test_xdp_native_pass_mb would fail to parse
+> the header before this patchset.
+> 
+> Thanks!
+> Amery
+> 
+> Amery Hung (7):
+>   bpf: Clear pfmemalloc flag when freeing all fragments
+>   bpf: Allow bpf_xdp_shrink_data to shrink a frag from head and tail
+>   bpf: Support pulling non-linear xdp data
+>   bpf: Clear packet pointers after changing packet data in kfuncs
+>   bpf: Support specifying linear xdp packet data size for
+>     BPF_PROG_TEST_RUN
+>   selftests/bpf: Test bpf_xdp_pull_data
+>   selftests: drv-net: Pull data before parsing headers
+> 
+>  include/net/xdp.h                             |   5 +
+>  include/net/xdp_sock_drv.h                    |  21 +-
+>  kernel/bpf/verifier.c                         |  13 ++
+>  net/bpf/test_run.c                            |   9 +-
+>  net/core/filter.c                             | 135 +++++++++++--
+>  .../bpf/prog_tests/xdp_context_test_run.c     |   4 +-
+>  .../selftests/bpf/prog_tests/xdp_pull_data.c  | 179 ++++++++++++++++++
+>  .../selftests/bpf/progs/test_xdp_pull_data.c  |  48 +++++
+>  .../selftests/net/lib/xdp_native.bpf.c        |  89 +++++++--
+>  9 files changed, 463 insertions(+), 40 deletions(-)
+>  create mode 100644 tools/testing/selftests/bpf/prog_tests/xdp_pull_data.c
+>  create mode 100644 tools/testing/selftests/bpf/progs/test_xdp_pull_data.c
+> 
+> -- 
+> 2.47.3
+> 
 
