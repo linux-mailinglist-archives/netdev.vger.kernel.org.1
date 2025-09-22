@@ -1,139 +1,183 @@
-Return-Path: <netdev+bounces-225361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C448B92C36
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 21:20:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84744B92C39
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 21:21:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 329CC2A5379
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 19:20:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D6092A53C7
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 19:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F9530CB5C;
-	Mon, 22 Sep 2025 19:20:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A3231A04E;
+	Mon, 22 Sep 2025 19:21:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="ggS8N9Q1"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lofOSRSU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00190b01.pphosted.com (mx0a-00190b01.pphosted.com [67.231.149.131])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC89C1991CA
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 19:20:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.149.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529E11991CA
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 19:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758568842; cv=none; b=h/+yPR0ChpaH2gQMOf3jOZlkfsX/qaD+HNaC5gUX7VRYQ797eIH6F8VZsrF/1RC4GrTPICwY/gnQxtITSL8JOatjT9Qeg1jJInc4irhQLPAjrev+ZONd22g/FZmJsfp5u7RtP479dpABMm4lUQTHttYoZV/iqYF+btQnymWGUzI=
+	t=1758568867; cv=none; b=W48Np0hVcQ6L8yieuaN3Q5cnaodqYVi5il8/IYAqzR6h2flSdj1cfbZ1Nf+c4DZXKiTNikLVc02hTQJzj6feyG1qoS1ERvQAAoa0mOAia6n1gnkBP4dPg2LSe5WvrNFbxoZA6F8hTEs3tdpQBUBKw5lXsRu8SjhiS3jsaXGT1iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758568842; c=relaxed/simple;
-	bh=YYBexm4SSplS2W9/plZ8oVPARquSisHTLQzXxVJlxA0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AkYXxvMYsNe02hKIDiJat6vWNCWlmx0oAl8dQqVdiKvC+wJA3PUXlicZV36otet8qIWlN0IMa1XE4+kyLg/0RUoJPNMFqPj+Pb5Q/ZtDDS4NopSyLSSHKhJL6owk81VzLnlR8SgijgSG3A6th/Ye//jYvHbEBrjoNfw0v8GIKto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=ggS8N9Q1; arc=none smtp.client-ip=67.231.149.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
-Received: from pps.filterd (m0050093.ppops.net [127.0.0.1])
-	by m0050093.ppops.net-00190b01. (8.18.1.2/8.18.1.2) with ESMTP id 58MJ4A7f027202;
-	Mon, 22 Sep 2025 20:20:18 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=jan2016.eng; bh=uKglcS+ldoXj7YshNP6tenjxTT8uvWLsi
-	Fcditnih5Q=; b=ggS8N9Q12WXwH1Vql98ftyGHRwdndm56n7F0rG5Pbh2KQmnVS
-	HjLd96QXwCbVCgZITHDSgCDMv51sDU45u8uphG+43pWfU0Sxtjv2bc/Y6seoZEQL
-	oaOGOkauVvU1YPJlg8SPwO/wZcw7o2RHzhpapS4leTloFON+VSWRUPjhml6/ru0J
-	lqqlkNwK58yeb4KYo87NI0imPThWEtQBM/CEysbQw6va3W/HHwUyI+StGe9Zds7A
-	SUxA2pmmbY06a5As9TsDJRKQHhJ30IW+3i7jYnGDkF+W+w8mLAQlFsxAflXsFv/C
-	Z4R4pvs48S1mE1fgeQaZ6n1nt+ujyUBES1w/w==
-Received: from prod-mail-ppoint2 (prod-mail-ppoint2.akamai.com [184.51.33.19])
-	by m0050093.ppops.net-00190b01. (PPS) with ESMTPS id 49bc9gg6rm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Sep 2025 20:20:18 +0100 (BST)
-Received: from pps.filterd (prod-mail-ppoint2.akamai.com [127.0.0.1])
-	by prod-mail-ppoint2.akamai.com (8.18.1.2/8.18.1.2) with ESMTP id 58MJISUJ009908;
-	Mon, 22 Sep 2025 15:20:17 -0400
-Received: from prod-mail-relay01.akamai.com ([172.27.118.31])
-	by prod-mail-ppoint2.akamai.com (PPS) with ESMTP id 49bcg1r04q-1;
-	Mon, 22 Sep 2025 15:20:16 -0400
-Received: from bos-lhv9ol.bos01.corp.akamai.com (bos-lhv9ol.bos01.corp.akamai.com [172.28.41.79])
-	by prod-mail-relay01.akamai.com (Postfix) with ESMTP id 10FDE87;
-	Mon, 22 Sep 2025 19:20:16 +0000 (UTC)
-From: Jason Baron <jbaron@akamai.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com
-Cc: netdev@vger.kernel.org
-Subject: [PATCH v2 net] net: allow alloc_skb_with_frags() to use MAX_SKB_FRAGS
-Date: Mon, 22 Sep 2025 15:19:57 -0400
-Message-Id: <20250922191957.2855612-1-jbaron@akamai.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1758568867; c=relaxed/simple;
+	bh=SpL/uf++UHe5WDMUpJYCJVLQO/aSX2Z3xHfA+ranpok=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MFIxuMau1ljyWzMA9Dl3OnjpdAYTDUN3qcbIO0OCUa0wh5lecPT7qxbov7vgdWbr79/lhulB/yoC8/BXQ0QKlcjgUpBND7LZJzNkQQF3flN/OQ7WwQIbs++kq7GTrCnTbPxlPrK0CmPQQfe8zTymxKBtkrpwCDNLOpnVunWqpD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lofOSRSU; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <10e5dd51-701d-498b-b1eb-68b23df191d9@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758568862;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n/z9s/O02Aw+bHocCKmsc2CUboSX1ulbDMtafBZOvbI=;
+	b=lofOSRSUsEQxfGJYbETwlFItBkuRmJYQJJSqNhbmv/W+1hIJ4Dz0Os5ARdW/5jHxQRtSDv
+	rqdx/3pMHLZfpsSw6rOPkf1A+HAhVB1GH27ElUZcBtIUT7lUkAFDFW6xCGZ31jUA+MemuG
+	JOnELSiWY2p15KdbaUoZKGhHNd576xg=
+Date: Mon, 22 Sep 2025 12:20:52 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-22_01,2025-09-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 adultscore=0
- suspectscore=0 bulkscore=0 mlxlogscore=723 spamscore=0 phishscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2508110000 definitions=main-2509220188
-X-Proofpoint-GUID: CCnnNDFcKwpsmFFUVCUUBEojLEFTAUth
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIyMDE4NSBTYWx0ZWRfX/IVEwsb7f1FT
- i8JGJN2O/YGzvSro93wT3tsoTkH8aTqHCI1m0KNEfmWYBOT2Wi2wyMB1tSyxFA5p0DFM8yQHsYv
- LeOv35IqukgbAQbyJKafVNG+QktKoZ4T17Dlfn8dDChWmpNdHE1UXBxrELO2Ap3MvTnaOjo0nYC
- RhMSygblHEPUuUJegGbt7Q2SAdIXt9+YBw4R0r+PxG60fjM8nmkBuZvGiNkKhUoXU/NGHfZyR0+
- Mn5YV5nypPFQ26jYw/a+JniyTL0nq3XLvPk5AOsfYhhHUJDVYys3LFWomx7etZXDWzJQ7lx8trX
- ZJ4ACigJ01Wg18ndd0n9NfNHByVmEYs5+akoAsM2bJD0Z2+L206S/ndWgx/+JH0g1ZDC/5srAaV
- rTgW96erZf/NbAXpMCVIKO8+bF/KqQ==
-X-Authority-Analysis: v=2.4 cv=DNuCIiNb c=1 sm=1 tr=0 ts=68d1a172 cx=c_pps
- a=BpD+HMUBsFIkYY1OQe22Yw==:117 a=BpD+HMUBsFIkYY1OQe22Yw==:17
- a=yJojWOMRYYMA:10 a=X7Ea-ya5AAAA:8 a=c_KhuYDr2bewFB5Ap5EA:9
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-ORIG-GUID: CCnnNDFcKwpsmFFUVCUUBEojLEFTAUth
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-22_01,2025-09-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- suspectscore=0 lowpriorityscore=0 adultscore=0 impostorscore=0 clxscore=1015
- priorityscore=1501 phishscore=0 spamscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2509150000 definitions=main-2509220185
+Subject: Re: [PATCH bpf-next v6 5/7] bpf: Support specifying linear xdp packet
+ data size for BPF_PROG_TEST_RUN
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
+ paul.chaignon@gmail.com, kuba@kernel.org, stfomichev@gmail.com,
+ martin.lau@kernel.org, mohsin.bashr@gmail.com, noren@nvidia.com,
+ dtatulea@nvidia.com, saeedm@nvidia.com, tariqt@nvidia.com,
+ mbloch@nvidia.com, maciej.fijalkowski@intel.com, kernel-team@meta.com
+References: <20250919230952.3628709-1-ameryhung@gmail.com>
+ <20250919230952.3628709-6-ameryhung@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20250919230952.3628709-6-ameryhung@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Currently, alloc_skb_with_frags() will only fill (MAX_SKB_FRAGS - 1)
-slots. I think it should use all MAX_SKB_FRAGS slots, as callers of
-alloc_skb_with_frags() will size their allocation of frags based
-on MAX_SKB_FRAGS.
+On 9/19/25 4:09 PM, Amery Hung wrote:
+> To test bpf_xdp_pull_data(), an xdp packet containing fragments as well
+> as free linear data area after xdp->data_end needs to be created.
+> However, bpf_prog_test_run_xdp() always fills the linear area with
+> data_in before creating fragments, leaving no space to pull data. This
+> patch will allow users to specify the linear data size through
+> ctx->data_end.
+> 
+> Currently, ctx_in->data_end must match data_size_in and will not be the
+> final ctx->data_end seen by xdp programs. This is because ctx->data_end
+> is populated according to the xdp_buff passed to test_run. The linear
+> data area available in an xdp_buff, max_data_sz, is alawys filled up
+> before copying data_in into fragments.
+> 
+> This patch will allow users to specify the size of data that goes into
+> the linear area. When ctx_in->data_end is different from data_size_in,
+> only ctx_in->data_end bytes of data will be put into the linear area when
+> creating the xdp_buff.
+> 
+> While ctx_in->data_end will be allowed to be different from data_size_in,
+> it cannot be larger than the data_size_in as there will be no data to
+> copy from user space. If it is larger than the maximum linear data area
+> size, the layout suggested by the user will not be honored. Data beyond
+> max_data_sz bytes will still be copied into fragments.
+> 
+> Finally, since it is possible for a NIC to produce a xdp_buff with empty
+> linear data area, allow it when calling bpf_test_init() from
+> bpf_prog_test_run_xdp() so that we can test XDP kfuncs with such
+> xdp_buff. This is done by moving lower-bound check to callers as most of
+> them already do except bpf_prog_test_run_skb().
+> 
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> ---
+>   net/bpf/test_run.c                                       | 9 +++++++--
+>   .../selftests/bpf/prog_tests/xdp_context_test_run.c      | 4 +---
+>   2 files changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+> index 4a862d605386..0cbd3b898c45 100644
+> --- a/net/bpf/test_run.c
+> +++ b/net/bpf/test_run.c
+> @@ -665,7 +665,7 @@ static void *bpf_test_init(const union bpf_attr *kattr, u32 user_size,
+>   	void __user *data_in = u64_to_user_ptr(kattr->test.data_in);
+>   	void *data;
+>   
+> -	if (user_size < ETH_HLEN || user_size > PAGE_SIZE - headroom - tailroom)
+> +	if (user_size > PAGE_SIZE - headroom - tailroom)
+>   		return ERR_PTR(-EINVAL);
+>   
+>   	size = SKB_DATA_ALIGN(size);
+> @@ -1001,6 +1001,9 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
+>   	    kattr->test.cpu || kattr->test.batch_size)
+>   		return -EINVAL;
+>   
+> +	if (size < ETH_HLEN)
+> +		return -EINVAL;
+> +
+>   	data = bpf_test_init(kattr, kattr->test.data_size_in,
+>   			     size, NET_SKB_PAD + NET_IP_ALIGN,
+>   			     SKB_DATA_ALIGN(sizeof(struct skb_shared_info)));
+> @@ -1246,13 +1249,15 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog, const union bpf_attr *kattr,
 
-This issue was discovered via a test patch that sets 'order' to 0
-in alloc_skb_with_frags(), which effectively tests/simulates high
-fragmentation. In this case sendmsg() on unix sockets will fail every
-time for large allocations. If the PAGE_SIZE is 4K, then data_len will
-request 68K or 17 pages, but alloc_skb_with_frags() can only allocate
-64K in this case or 16 pages.
+I just noticed it. It still needs a "size < ETH_HLEN" test at the beginning of 
+test_run_xdp. At least the do_live mode should still needs to have ETH_HLEN bytes.
 
-Fixes: 09c2c90705bb ("net: allow alloc_skb_with_frags() to allocate bigger packets")
-Signed-off-by: Jason Baron <jbaron@akamai.com>
----
-Changes:
-v2: Add Fixes: tag
----
- net/core/skbuff.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>   
+>   	if (ctx) {
+>   		/* There can't be user provided data before the meta data */
+> -		if (ctx->data_meta || ctx->data_end != size ||
+> +		if (ctx->data_meta || ctx->data_end > size ||
+>   		    ctx->data > ctx->data_end ||
+>   		    unlikely(xdp_metalen_invalid(ctx->data)) ||
+>   		    (do_live && (kattr->test.data_out || kattr->test.ctx_out)))
+>   			goto free_ctx;
+>   		/* Meta data is allocated from the headroom */
+>   		headroom -= ctx->data;
+> +
+> +		size = ctx->data_end;
+>   	}
+>   
+>   	max_data_sz = PAGE_SIZE - headroom - tailroom;
+It still needs to avoid multi-frags/bufs in do_live and the "if (size > 
+max_data_sz)" needs some adjustments. I think it is cleaner to specifically test 
+"kattr->test.data_size_in". Something like this (untested) ?
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 23b776cd9879..df942aca0617 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -6669,7 +6669,7 @@ struct sk_buff *alloc_skb_with_frags(unsigned long header_len,
- 		return NULL;
- 
- 	while (data_len) {
--		if (nr_frags == MAX_SKB_FRAGS - 1)
-+		if (nr_frags == MAX_SKB_FRAGS)
- 			goto failure;
- 		while (order && PAGE_ALIGN(data_len) < (PAGE_SIZE << order))
- 			order--;
--- 
-2.25.1
+-	if (size > max_data_sz) {
+-		/* disallow live data mode for jumbo frames */
+-		if (do_live)
+-			goto free_ctx;
+-		size = max_data_sz;
+-	}
++	size = min_t(u32, size, max_data_sz);
++
++	if (kattr->test.data_size_in > size && do_live)
++		goto free_ctx;
+
+> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
+> index 46e0730174ed..178292d1251a 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
+> @@ -97,9 +97,7 @@ void test_xdp_context_test_run(void)
+>   	/* Meta data must be 255 bytes or smaller */
+>   	test_xdp_context_error(prog_fd, opts, 0, 256, sizeof(data), 0, 0, 0);
+>   
+> -	/* Total size of data must match data_end - data_meta */
+> -	test_xdp_context_error(prog_fd, opts, 0, sizeof(__u32),
+> -			       sizeof(data) - 1, 0, 0, 0);
+> +	/* Total size of data must be data_end - data_meta or larger */
+>   	test_xdp_context_error(prog_fd, opts, 0, sizeof(__u32),
+>   			       sizeof(data) + 1, 0, 0, 0);
+>   
 
 
