@@ -1,88 +1,97 @@
-Return-Path: <netdev+bounces-225304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F57CB92091
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:44:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60842B920AF
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:48:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3ABEB1902C4D
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 15:45:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 050CF7A5928
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 15:46:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 497512EBDC8;
-	Mon, 22 Sep 2025 15:44:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7D0302149;
+	Mon, 22 Sep 2025 15:47:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKSLLI0v"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="peEGMHQ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BE62EBBB5;
-	Mon, 22 Sep 2025 15:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5C424DCEF
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 15:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758555844; cv=none; b=XrK3kAq+/FtRvXGCrvPky7pvhY7Y0x8yOp+XL93PKcnThR9r0xXoLlgYcGr/+iltnzvX2b2HGRn7QSgpXHPyYNspOfqV2KdW58fFa9of/kxA+NRx+1hAyXslB7dECDVDf8JcFA9L0MOg5V2x66e6lUc4bnQ2+YGe4jjeeT8aF/c=
+	t=1758556076; cv=none; b=B8aLkY1TS4pm/oOaEuf0gnZ3V+pZDgAjYgnt3gJtvYDGEJL/vT7MIR+uFXw77njCW/QnDhjZz2m/+z9/dgWD62XjmQZxvIpu+ksdJHK3lPx/uwivOvuM2RgkUr9Lg5qtVm1cVYarzTcgYzNIxx7jOhfxilOes0oEBWPsxyEjdWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758555844; c=relaxed/simple;
-	bh=YYy92DBFXAjPJjQxoG+rR9CxNqtyxPa7ykh5/jX/CHk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F8pn3lR15aU0nBsq+rob+XAPtfcROKjx9x/NgKWWnCzL0p9AfuCFIbhY1khjUSKOqsM7SmqJ9zc6OM8d+6A18JjbHL0+c7dNyXwlLX6vvyiuK4BAY0v0lAtj0zTVUckp17uoOhmYviNob73McYqyqN0yhSeMdqlfEAa7qK0HY/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKSLLI0v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 878F5C4CEF0;
-	Mon, 22 Sep 2025 15:44:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758555843;
-	bh=YYy92DBFXAjPJjQxoG+rR9CxNqtyxPa7ykh5/jX/CHk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FKSLLI0vlOJKjixkDCq21K5VVPeIBQBQlufQDBpYBYt90nFBgp+KB2Sj4vqPidWfr
-	 ZOVrk+NIhSunzJTd1orDqDMssbUvUE46P9Xb9CVi+621jr9e8K5Z2dKCxeG914i1Ck
-	 FtY1+s5D77KoecELR0CEn92lezaWenMAVcdgkqvDPOuebk1y7LXelFQ3cBzMOth4dw
-	 7kgrrJVRqZ3WoPGK4oj3eRzR1ixDlonJPHKT6jJPRotbynj4CoUIbIqd7UrZzMxF8K
-	 8zOnYTPsADcAhb+4P4M/E8rESQJarMIQuQylCHO+gRaJXeD08OSLM/+0TYr0BrOMMm
-	 kI8ZsB5abMF8A==
-Date: Mon, 22 Sep 2025 05:44:02 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>,
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
-	Lennart Poettering <mzxreary@0pointer.de>,
-	Aleksa Sarai <cyphar@cyphar.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 1/3] cgroup: add missing ns_common include
-Message-ID: <aNFuwtu7pclqF19E@slm.duckdns.org>
-References: <20250922-work-namespace-ns_common-fixes-v1-0-3c26aeb30831@kernel.org>
- <20250922-work-namespace-ns_common-fixes-v1-1-3c26aeb30831@kernel.org>
+	s=arc-20240116; t=1758556076; c=relaxed/simple;
+	bh=p8dGjIvELLqUwSneKb4V0JgYa4NvVZ5jWq+twYWX8M8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qVbOWqRqVfTAtV78KI8nf0ZPRx8vlAduuV/ZP56P30rSh/OhkTAX/A/XISWUnJoDcP+FMEjgwtEBSxq136TAx3ETP1NYlTvb2MHxbMEG0HZNfu4oaSJsZ9tjWtVJHiixBKONYHnNPOugjh5FaPRSSWZF2UaA3C6bbGQPVnKhum4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=peEGMHQ/; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 8A5341A0F30;
+	Mon, 22 Sep 2025 15:47:52 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 5E24160635;
+	Mon, 22 Sep 2025 15:47:52 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9DAB8102F1942;
+	Mon, 22 Sep 2025 17:47:36 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1758556071; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=5rWLXBJqsnecYedgGyIBaJrE9fWl5bXsub6l1YvDXgk=;
+	b=peEGMHQ/mVcW/QinnHqxenxLVxtYomQrZVeCAC2FBZAFmKNfP58hnOU6d3V8+YhhkqhcHA
+	OPhBGuzRnskaFGM8dVI4NrNqzjFQv0ixKhbg0FDJz7ZDxm30WY+fjbmBYZqNt1NK48ja/c
+	+VfADwq08c0KFgUpVO511WaMKnR0O/MqX7b4QVxWd0PgrdaFQho7/8AWUm2MKTC2llrvkE
+	ziHP1+EvNU6dU0/sZrJZWZHbqxeqp9yk5JCJJ3a1rgKbbDcwiD0NRb2IqlkTmyBLqumnnb
+	ZaQX9cSw1gf7gtoFcpSQdj815hozDNMsqdl+B2uMwzsTBSb/QdM1CY1bPTU68g==
+Message-ID: <c07c2263-3276-4c9c-a0c0-7a8c9580a4cf@bootlin.com>
+Date: Mon, 22 Sep 2025 21:17:32 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250922-work-namespace-ns_common-fixes-v1-1-3c26aeb30831@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net: phy: dp83640: improve phydev and driver
+ removal handling
+To: Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Richard Cochran <richardcochran@gmail.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <b86c2ecc-41f6-4f7f-85db-b7fa684d1fb7@gmail.com>
+ <6d4e80e7-c684-4d95-abbd-ea62b79a9a8a@gmail.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <6d4e80e7-c684-4d95-abbd-ea62b79a9a8a@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Mon, Sep 22, 2025 at 02:42:35PM +0200, Christian Brauner wrote:
-> Add the missing include of the ns_common header.
+Hi Heiner,
+
+On 21/09/2025 03:03, Heiner Kallweit wrote:
+> Once the last user of a clock has been removed, the clock should be
+> removed. So far orphaned clocks are cleaned up in dp83640_free_clocks()
+> only. Add the logic to remove orphaned clocks in dp83640_remove().
+> This allows to simplify the code, and use standard macro
+> module_phy_driver(). dp83640 was the last external user of
+> phy_driver_register(), so we can stop exporting this function afterwards.
 > 
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Nice simplification ! I've scratched away the small amount of hair left 
+on my head reading this, and your changes look correct to me :)
 
-Please let me know if you want this to go through the cgroup tree.
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Thanks.
+Maxime
 
--- 
-tejun
 
