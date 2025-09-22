@@ -1,226 +1,233 @@
-Return-Path: <netdev+bounces-225278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D361EB919D2
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 16:16:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACFE6B91BCC
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 16:32:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B7D77A46FE
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 14:15:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 810847B1F6B
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 14:31:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC3C61A9F8F;
-	Mon, 22 Sep 2025 14:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="upiqdRAx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E4B242D92;
+	Mon, 22 Sep 2025 14:32:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010071.outbound.protection.outlook.com [52.101.85.71])
+Received: from relay-b03.edpnet.be (relay-b03.edpnet.be [212.71.1.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 497791482E8
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 14:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758550605; cv=fail; b=Wmb/cJTyMY4rRXZJaXExUxgVDApfybMhRVZZNcMYWT57DpGGSd/IbrQvyJHDUK5q+1jr4oeMqPjD+/HMkHjWNTkO/DgxbCez7wRxhuCdPf3yUtNGZTI055JC1T4HMW5PbaY8CEUJc06H0ltWDtTdYUWWCZrUBR5bO5EjFr01hjo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758550605; c=relaxed/simple;
-	bh=Gim7PN5yK1iwqQxRMIhgwo/neaXtq4CqNFyj45vLhGs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G+kcA2C4u6ObinU7GG2PvndgwZ/CxcswkN4ovpos69VRQLfwcb9ScQNZTWAVqeE2nW9VQKFKbaEog+qoP2nyrPUAarP24W+wLCfpFpQsRdhfrOrGmkCOr50c9I5KFHTxCZjsEMI/lHoM+qDEWLhodZsB6b3ro1XkFp4OizMAFfs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=upiqdRAx; arc=fail smtp.client-ip=52.101.85.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PAzhw5rFdF3Oax4dwoMykGyeq6KTPghA1lg3x8Ua4S3ZznkmtBhIBsZ9y4O7+CxeXIClo095O8njY5ujZVraiuQHsd+EUHJo0nFFrR3Az9fMn6kElJUPlNcNOG6zTYr8hfxMFsXxE5qFsh7HjvqF13zwpOHhMnYhV5jv2OLz2AhJEyocb1J/CSbGMcguRNSNHz/u06RfmMFY+/I066zCvkbXc/9g/tSBkRQLKHpV+SdZ8YqXcEKktkqCwS/fcUA+aSjyrBe19bnsOI4iXWt4doox24Y1l16NztS7xC7gcIbGnnQkWDvOpJ6j+1VaTplziQVCLkHj7Rwpuw61uIxG0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LofBqMpfl18Q/HbCit14JoiP6OJQFguN8RYF1Fr0UjE=;
- b=hEo2xQtQV45aFIugI1vGqsvh+/O+o8FEwYyH/JTHTPzrQWgdsz5z3fhHArmbLJO4zlNldOkY9ijrbD8BuRDVrToGAbKD6nZtbaBd0WNzV9QwkuX/qVbjz0vDx4OP9dEyZaGTpnixtzq6htnCgyNInUA+RFvzrBqESn+9+BDJVnyR9V2eNAkr5rF9TtFa0+thDYWs/LdyBOkODDDRmpKB5t9Qg9hi8JOBu94UhPp10j2BFFJIjF+pdGpXUxgjipd6DUzQo01PWdqbmcTSwRvTTIewRTFlu+9kZMT1BCn+t8C1xYtmj08iKCEbJM7Uwy9qQ1sKIlVk4OJwi/buAheLYA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LofBqMpfl18Q/HbCit14JoiP6OJQFguN8RYF1Fr0UjE=;
- b=upiqdRAxiNKAw84unQQVT0YkDDPz6oB0tYspkY2GhjBh5c447wUCR0eAGXYzavxPdwuXf8NGfyRZd0p+BMeG2gKr/CLSM9Jufu/Yl0FmYWmUzT/SjUZ1qQzlN2jC4JhYg9faxn82LzlXikFHxaOEZ+JkgrP4XjlreMLBxYjGxrKYmeKfVExGCtnZ/ylfrEP/Syvfg0X/CzAHGp3t/uht2Eh0ublAbmzXE7BAPeAgba9sjfvSbAIWA1MCEopGTaaMATF92LVCS30uA8PdBzcAHuEsrOh1dSUcmk0D9bpqlu2amYcSTc7bwJfNhrBhdYdIDXeEQbw+Ni+/mB2V9EHBEA==
-Received: from BN9PR03CA0654.namprd03.prod.outlook.com (2603:10b6:408:13b::29)
- by MW4PR12MB7288.namprd12.prod.outlook.com (2603:10b6:303:223::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.20; Mon, 22 Sep
- 2025 14:16:38 +0000
-Received: from BL02EPF00029927.namprd02.prod.outlook.com
- (2603:10b6:408:13b:cafe::46) by BN9PR03CA0654.outlook.office365.com
- (2603:10b6:408:13b::29) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.20 via Frontend Transport; Mon,
- 22 Sep 2025 14:16:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BL02EPF00029927.mail.protection.outlook.com (10.167.249.52) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9137.12 via Frontend Transport; Mon, 22 Sep 2025 14:16:37 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.34; Mon, 22 Sep
- 2025 07:16:16 -0700
-Received: from fedora.docsis.vodafone.cz (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.34; Mon, 22 Sep 2025 07:16:11 -0700
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>, Nikolay Aleksandrov
-	<razor@blackwall.org>, <netdev@vger.kernel.org>
-CC: Simon Horman <horms@kernel.org>, Petr Machata <petrm@nvidia.com>,
-	<bridge@lists.linux-foundation.org>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next 2/2] selftests: bridge_fdb_local_vlan_0: Test FDB vs. NET_ADDR_SET behavior
-Date: Mon, 22 Sep 2025 16:14:49 +0200
-Message-ID: <137cc25396f5a4f407267af895a14bc45552ba5f.1758550408.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <415202b2d1b9b0899479a502bbe2ba188678f192.1758550408.git.petrm@nvidia.com>
-References: <415202b2d1b9b0899479a502bbe2ba188678f192.1758550408.git.petrm@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D395163CF
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 14:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.71.1.220
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758551560; cv=none; b=RXJ+Rs10HXBuBEFMtkwt+5BT0hls4mbdfVLNmT+vFveEsPWVoF+8kxAeC6boxCMy4gxod6ZxcPDof1hU+ckfUMoNKq8PFGSXmaeJevE+6Yln4FPfeIYbGkp2WoAhj126KHnqrbyv1YW6ya5IzSiHw3JFoain4DDrC3gG5LJdNUk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758551560; c=relaxed/simple;
+	bh=v9u8kR/L4tjbhGCUd4EgqFwR2tzU3dt6U1O2iA4DW6M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gq1tRZ47M9Gho+Gtn74JXHF7c7wj8E8zQt2mQ+bTTxAPlh9RaabpVy66r+gkmTzjsmuK0dCm7cK2SIkiMSK5XCVyyfT8a71wQ7Xo9k9XJcPKiX0U9/NvwZOMFbj7GoL5EKIsouAEq0AL3D9HAWXlATVsWzwux2ZW6RgS09Rmq4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=kabelmail.de; spf=fail smtp.mailfrom=kabelmail.de; arc=none smtp.client-ip=212.71.1.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=kabelmail.de
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kabelmail.de
+Received: from [192.168.177.65] (94.105.126.5.dyn.edpnet.net [94.105.126.5]) by relay-b03.edpnet.be with ESMTP id VXx4EfUHXbL1PuVC; Mon, 22 Sep 2025 16:32:30 +0200 (CEST)
+X-Barracuda-Envelope-From: janpieter.sollie@kabelmail.de
+X-Barracuda-Effective-Source-IP: 94.105.126.5.dyn.edpnet.net[94.105.126.5]
+X-Barracuda-Apparent-Source-IP: 94.105.126.5
+Message-ID: <6ea48bbb-972e-41f7-8c73-5ddffd9d0384@kabelmail.de>
+Date: Mon, 22 Sep 2025 16:30:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF00029927:EE_|MW4PR12MB7288:EE_
-X-MS-Office365-Filtering-Correlation-Id: 26cedb8b-a55f-4df9-7ca6-08ddf9e2a4ce
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?yXmG8C4eeQVtvxxLcXwJ/nN3QMj6XBInjD4d/o8Bcan1/qcrIuLHq3wo2LAo?=
- =?us-ascii?Q?h3/8hWz9fZWjJkl2onlWsOBVnFnPsniLHKEHLMPUthKfuYf6QMRx3tj664pQ?=
- =?us-ascii?Q?sqBXZnjAkvn122Wencoz227ycdR8AppH+EreQZkwLZdMXG9bO2KUBXgHItjr?=
- =?us-ascii?Q?oXB34bLo1IOZTzgfjW6HXa9HTwSACGrSFuVaGLdPrwo9CsfiK0oedufgGNFb?=
- =?us-ascii?Q?T1fsc7yKKFiRRsG6CS39AoG6DsAzYIXvDPzcndzVxhc9EjQ1vAlt53Kk3V3i?=
- =?us-ascii?Q?MLPQu8KJLA7u4R8QaJyIRBZAom9Efpxeh8i4CpePpvNLk+nroMy3zI4Etpi0?=
- =?us-ascii?Q?PDJnMft9p9AwYHg0keNbWIcslNagw8tG7WnACsBttOT+jRkUE4gJxpsWSUUI?=
- =?us-ascii?Q?XDGrCPxwTEjYzQPPFMbRcj3g9Xu1XlSf2ul41ij23hLdkDATCC24x93R/9fE?=
- =?us-ascii?Q?a1SH3SK42SzM1OwZlKcQFS46Ac6dvScG+GrF6q9EstWeWfEs05ibUzDH4H1Y?=
- =?us-ascii?Q?01Y2oSiYiBfYcbYWlPZpXMdtuSqcRRLm8s2Qzq5mloxPOtctOmHsh+UZQv4b?=
- =?us-ascii?Q?dXvAxywq7bX5/G0QZSi6NPZV8d9rPfgWQdziW0Y6X6Dwfs46rkbfYi3/RFEj?=
- =?us-ascii?Q?lxbD91X7BrmhY1Yf40scOccIAZ0Qr4EmppYFrVDu9qvN6wQfTKL3vMRu0wey?=
- =?us-ascii?Q?rdXNIDgzlqcuaaRQeG4M1m0dnWeO6HXVoncLmc0Gsp26H22kIEUM3P1yx2Qy?=
- =?us-ascii?Q?RSX+c9+s9d+up2peQQkj5RkusA+CDNgzYzxZyvOZ2l2FJvKKGoP+1ioEkpeD?=
- =?us-ascii?Q?ZzPpTww6PT1LR7sUxP0ntuLZkSrICpCRjX7a0lABi41rajUXEr5tnj7CYvea?=
- =?us-ascii?Q?SMUvGIpjrGTralYOiQDpwqTejZddztwNW6R78SHBQEYUxNT4OasMo1hb1mJc?=
- =?us-ascii?Q?evj5bVqEUJ7ZZRlhp9ngjx2Dl9FNCUHm8b2SWiE7PDN5XObw5QuMH1QNhp30?=
- =?us-ascii?Q?xlcT36zLJLprdoF/16YgRDeXBRUa9BFso1bLmHK7tXurXmtqLDV5j8DgHvp/?=
- =?us-ascii?Q?KGJlEfjZzi+QIPgp253AR+NBjCksJnH56bbQKScF181KHFVr3t6yGeqTv+7m?=
- =?us-ascii?Q?+1vEBl+ms23IU7qlM38AesDa7nxLNBw4DygVhq+VD8SDsvt/y36kMC3T7MYY?=
- =?us-ascii?Q?sSHxoFQYXdL7oFeRAFUKxqEqrLFPN0rS9o9Pw//mj6KlJJ81rF8yoAkzPrfI?=
- =?us-ascii?Q?OKToOFMhDib0AOkGf6l209DkXG5tzuwl9pOWp7dMPW3RAZ946fdSApMcBH/C?=
- =?us-ascii?Q?JGl0XfnavVRgmiuwuldSyDsQAM/+czLpChps7EX4oH/fUQoKl5VEaKuwNeiU?=
- =?us-ascii?Q?Y1YAhhIqtUNO+zHVdkPpG+8WiNXOIjUl/hSKh3r5xz7+wAsYoXXgkGftCUL8?=
- =?us-ascii?Q?8wYVuOu8NmWxzlrMybRc0H/6f4xvcyui29O1XurQWpOlKqT/8aUc0+T6WIX8?=
- =?us-ascii?Q?Kaa4M5ASEOpRW31U/KmRW654VEeSsUQx2Mda?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2025 14:16:37.7556
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 26cedb8b-a55f-4df9-7ca6-08ddf9e2a4ce
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF00029927.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7288
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] increase MDIO i2c poll timeout gradually (including patch)
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+X-ASG-Orig-Subj: Re: [RFC] increase MDIO i2c poll timeout gradually (including patch)
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <971aaa4c-ee1d-4ca1-ba38-d65db776d869@kabelmail.de>
+ <cbc4a620-36d3-409b-a248-a2b4add0016a@lunn.ch>
+ <f86737b0-a0fe-49a6-aeca-9e51fbdf0f0d@kabelmail.de>
+ <aM6Ng7tnEYdWmI1F@shell.armlinux.org.uk>
+ <6d444507-1c97-4904-8edb-e8cc1aa4399e@kabelmail.de>
+ <aM6xwq6Ns_LGxl4o@shell.armlinux.org.uk>
+ <4683e9ea-f795-4dab-8a0a-bd0b0f4fbd99@kabelmail.de>
+ <3fab95da-95c8-4cf5-af16-4b576095a1d9@kabelmail.de>
+ <aNFDKaIh6RNqLcBM@shell.armlinux.org.uk>
+Content-Language: nl
+From: Janpieter Sollie <janpieter.sollie@kabelmail.de>
+Autocrypt: addr=janpieter.sollie@kabelmail.de; keydata=
+ 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
+In-Reply-To: <aNFDKaIh6RNqLcBM@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-Barracuda-Connect: 94.105.126.5.dyn.edpnet.net[94.105.126.5]
+X-Barracuda-Start-Time: 1758551550
+X-Barracuda-URL: https://212.71.1.220:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at edpnet.be
+X-Barracuda-Scan-Msg-Size: 5716
+X-Barracuda-BRTS-Status: 1
+Content-Transfer-Encoding: quoted-printable
+X-ASG-Debug-ID: 1758551550-24639c1e3080c7e0001-BZBGGp
+X-Barracuda-Spam-Score: 0.00
+X-Barracuda-Spam-Status: No, SCORE=0.00 using global scores of TAG_LEVEL=10.0 QUARANTINE_LEVEL=10.0 KILL_LEVEL=7.0 test= 
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.125474
+	Rule breakdown below
+	  pts rule name              description
+	 ---- ---------------------- --------------------------------------------------
+	
 
-The previous patch fixed an issue whereby no FDB entry would be created for
-the bridge itself on VLAN 0 under some circumstances. This could break
-forwarding. Add a test for the fix.
+Op 22/09/2025 om 14:38 schreef Russell King (Oracle):
+> On Mon, Sep 22, 2025 at 12:54:20PM +0200, Janpieter Sollie wrote:
+>> this is a diff of 10usecs (i=3D10), 40usecs (i=3D4) and 30usecs (i=3D3=
+) my device
+>> is running the i2c_transfer_rollball().
+>> seems a lot to me when an i2c call takes 11-12 usecs avg per call
+>> are you sure these numbers point to a stable i2c bus?
+> I guess you've never dealt with I2C buses before.
+No, but I've read many kernel code dealing with it, desperately trying to=
+ figure out the error.
+But yes, this is only the software part.
+> As has already been
+> stated, the clock rate for I2C used with SFP modules (which is, if you
+> like, I2C v1) is 100kHz. that's 10us per bit.
+>
+> An I2C transaction consists of one start bit, 8 bits for the address
+> and r/w bit, one bit for the ack, 8 bits for the each byte of data
+> and their individual ACK bits, and finally a stop bit. If a restart
+> condition is used, the stop and start between the messages can be
+> combined into a restart condition, saving one bit.
+>
+> That works out at 1 + 8 + 1 + N*(8 + 1) + 1 bits, or 11 + 9 * N bits
+> or clocks.
+>
+> The polling consists of two transactions on the bus:
+>
+> - a write of one byte - giving 20 clock cycles.
+> - a read of six bytes - giving 65 clock cycles.
+>
+> So that's 85 clock cycles, or 84 if using restart. At 10us per cycle,
+> that's 840us _minimum_.
+and here's my first error:
+ > this is a diff of 10usecs (i=3D10), 40usecs (i=3D4) and 30usecs (i=3D3=
+) my device is running the=20
+i2c_transfer_rollball().
+ > seems a lot to me when an i2c call takes 11-12 usecs avg per call
+I wrote usecs, but was obviously in a wrong universe, it should have been=
+ msecs.=C2=A0 Sorry
+>
+> If i2c_transfer() for that write and read are taking on the order of
+> 12us, that suggest the bus is being clocked at around 7MHz, which is
+> certainly way too fast, a bug in the I2C driver, an issue with the
+> I2C hardware, or maybe an error in calculating how long a call takes.
+Yes, I'm afraid of the last one as well ...
+Honestly, even after re-reading it (twice),
+I'm still not sure if / when I made an error, so my calculations are belo=
+w
+>
+> And... it's your interpretation of your results.
+>
+> Remember, these are nanoseconds (ns), nanoseconds are 1000 microseconds
+> (us) and there are 1000000 nanoseconds in a millisecond (ms). Sorry
+> to teach you to suck eggs, but based on your reply it seems necessary
+> to point this out.
+you're welcome, It's always useful to get corrected no mather what.
+I'm simply trying to find a solution for hardware I built myself,
+which is more or less "problem I created myself".
+And I _WILL_ make dumb errors. I'm sorry for that.
+but hey, at least I'm not crying like a little kid 'please help me to fix=
+ my internet' ....
+Yes, I know the definition of ns -> us -> ms -> sec,
+the commands used (example for i =3D 4 here, a total msleep of 245):
 
-Signed-off-by: Petr Machata <petrm@nvidia.com>
----
- .../net/forwarding/bridge_fdb_local_vlan_0.sh | 28 ++++++++++++++++---
- 1 file changed, 24 insertions(+), 4 deletions(-)
+$ echo $(($(sed -n 's/.*\ \([0-9]\+\)\ ns\ in\ iteration\ 4/\1/p' < tempo=
+utput.txt | sort -n |=20
+head -n 1) - 245000000)) -> for min
+$ echo $(($(sed -n 's/.*\ \([0-9]\+\)\ ns\ in\ iteration\ 4/\1/p' < tempo=
+utput.txt | sort -n |=20
+tail -n 1) - 245000000)) -> for max
+$ echo diff at iteration 4: $((123074939 - 82868351)) -> for diff
+$ echo $(($(sed -n 's/.*\ \([0-9]\+\)\ ns\ in\ iteration\ 4/\1/p' < tempo=
+utput.txt | sort -n |=20
+awk '{x+=3D$0}END{print int(x/NR)}' -) - 245000000)) -> for average
+avg: 86375811
+so that's 86375811ns, 86375us, and 86ms, or ~12ms for each iteration
 
-diff --git a/tools/testing/selftests/net/forwarding/bridge_fdb_local_vlan_0.sh b/tools/testing/selftests/net/forwarding/bridge_fdb_local_vlan_0.sh
-index 5a0b43aff5aa..65f74c46c2f3 100755
---- a/tools/testing/selftests/net/forwarding/bridge_fdb_local_vlan_0.sh
-+++ b/tools/testing/selftests/net/forwarding/bridge_fdb_local_vlan_0.sh
-@@ -27,6 +27,7 @@ ALL_TESTS="
- 	test_d_sharing
- 	test_q_no_sharing
- 	test_q_sharing
-+	test_addr_set
- "
- 
- NUM_NETIFS=6
-@@ -110,13 +111,10 @@ setup_prepare()
- 	switch_create
- }
- 
--adf_bridge_create()
-+adf_bridge_configure()
- {
- 	local dev
--	local mac
- 
--	ip_link_add br up type bridge vlan_default_pvid 0 "$@"
--	mac=$(mac_get br)
- 	ip_addr_add br 192.0.2.3/28
- 	ip_addr_add br 2001:db8:1::3/64
- 
-@@ -130,7 +128,15 @@ adf_bridge_create()
- 		bridge_vlan_add dev "$dev" vid 2
- 		bridge_vlan_add dev "$dev" vid 3
- 	done
-+}
- 
-+adf_bridge_create()
-+{
-+	local mac
-+
-+	ip_link_add br up type bridge vlan_default_pvid 0 "$@"
-+	mac=$(mac_get br)
-+	adf_bridge_configure
- 	ip_link_set_addr br "$mac"
- }
- 
-@@ -367,6 +373,20 @@ test_q_sharing()
- 	do_test_sharing 1
- }
- 
-+adf_addr_set_bridge_create()
-+{
-+	ip_link_add br up type bridge vlan_filtering 0
-+	ip_link_set_addr br "$(mac_get br)"
-+	adf_bridge_configure
-+}
-+
-+test_addr_set()
-+{
-+	adf_addr_set_bridge_create
-+	setup_wait
-+
-+	do_end_to_end_test "$(mac_get br)" "NET_ADDR_SET: end to end, br MAC"
-+}
- 
- trap cleanup EXIT
- 
--- 
-2.49.0
+>
+> You quoted an average of 99901858ns - 99.9ms for the i=3D3 case.
+> You quoted an average of 86375811ns - 86.4ms for the i=3D4 case.
+>
+> Given that the difference in msleep() delay is 5ms, and we're
+> talking about 50 or 55ms here, for the i=3D3 case that's 45ms
+> for i2c_transfer(). For the i=3D4 case, that's 36.4ms.
+Ouch ... that's a _LOT_ more than I thought.That explains the difference.=
+=C2=A0 Sorry.
+>
+> However, msleep() is not accurate - and may even be bucket-based so I
+> wouldn't rely on the requested msleep() interval being what you end
+> up with - which seems to be suggested by the difference of almost 10ms
+> in the apparent time that i2c_transfer() takes. 10ms, not 10us. So,
+> unless you actually obtain timestamps before and after the
+> i2c_transfer() call and calculate their difference, I would not read
+> too much into that.
+>
+> In any case, figures in the realms of milliseconds are certainly in the
+> realm of possibility for a 100kHz bus - as I say, one instance of a
+> transaction _should_ be no less than 840 microseconds, so if your
+> calculations come out less than that, you should not be claiming
+> "bad bus" or something like that, but at first revalidating your
+> analysis or interpretation of the figures.
+>
+> Also, because of scheduling delays, and some I2C drivers will sleep
+> waiting for the transaction to finish, even that measurement I
+> suggest can not be said to relate to the actual time it takes for
+> the transactions on the bus, unless you're running a hard-realtime OS.
+you are giving a lot of reasons why it's unreliable ...
+and I certainly won't dare to calculate useless statistics anymore.
+> However, it seems you're very keen to blame the I2C bus hardware...
+>
+Based on my mails, I can certainly see why you're thinking this way.
+I have no idea what goes wrong anywhere between me making a modification =
+in the mdio.c file ->=20
+i2c code -> ... -> SFP phy.
+I'm curious what goes wrong, notice the 3 dots in between,
+I know there's a pca9545 muxer in in there further complicating it, but t=
+hat's about it.
 
+Long story short: should I somehow try to test the reliability of somethi=
+ng else?
+
+Thanks,
+
+Janpieter Sollie
 
