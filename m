@@ -1,142 +1,133 @@
-Return-Path: <netdev+bounces-225286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35C3BB91DFC
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:15:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BD37B91E2A
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:21:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F3C984E261F
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 15:14:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CED02A2D64
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 15:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B242737E1;
-	Mon, 22 Sep 2025 15:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0680E2E03F3;
+	Mon, 22 Sep 2025 15:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QX+wc9+i"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="R2tPGMv8";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="L78zsXHV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2229C2DEA86;
-	Mon, 22 Sep 2025 15:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EAF2DFF04;
+	Mon, 22 Sep 2025 15:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758554096; cv=none; b=fSdo/BPQk087H331WlcFtSpyX2nhr91W9rvypMFZEVapnj2wkQk/IfUivTmrW5652yZyoEY+tIZO1VgUEPLKD3+20W57lt3rH0LUevb7F4udX3CktnMuodUOgEtF9gMct4tMi9FO96TLNi5qi9RZo9dDLPREyZmEYpzQU2DXsas=
+	t=1758554478; cv=none; b=BLOWSftAorFSG1fqVj4efQOaIfQyQJ1n6lG1rJpaCYYhKjJp4lvviT51QJP1EXnT0aFih5BCp7DuQ+iu5Bj8UKmsC1FvLsuHY75XAMxyTmp1sQwxg9iumUoNWmdQVNeverUWuh7bqp5GokURREasltnKxptA9/5EvqqUvxSj9PE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758554096; c=relaxed/simple;
-	bh=NI6tgrq7jUD35wmlWYWGHy5ZECpqLzlj09aKDBV68Ok=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qhKtit3D5YECxUgsdvVdBbUh5WMLNkyFWgI0eiL+qol1qo+8PZhEjPaxdL63KOjT8jlpivQMto0MF5/tEIsX+Lwg+5Se6oPiXQzuVH8m8orQvWCWtp5LknBME+DkdKtQlV5Dte2z+JZFoh2FLdvleR9kEdnGbwFHvP78rXqRvKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QX+wc9+i; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 47C98C8EC47;
-	Mon, 22 Sep 2025 15:14:34 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 48C8E60634;
-	Mon, 22 Sep 2025 15:14:51 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BA571102F195F;
-	Mon, 22 Sep 2025 17:14:37 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1758554090; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=IWw6WEs28jtdBhuDjcTAkgMv/86GZN35XTiWwpcVsXc=;
-	b=QX+wc9+iamsIK8+Z2ZaY9/GovDdyZdChbJhrHaRNhDvTXXFGFd0o+jtVedf28cidP1WUit
-	UruHONm5VjhsqokIwKkWkOxMa0TkTEQ6Qsd77E/FBfF/pLSuh48kmHIUNx7IfD2UO0fGFQ
-	mVIb3iehxtHdefxoxkJdw5mOvE2drO8p1qEERawkkvLzMMjVIRcQ1h47SIZQWrvpA3xDxI
-	4wa0hs4rg3Rkow3RN23+NlEL/lshetn8uJrK03uO8Xet0sACMZTatsoFpnyPI0SptpP7t1
-	eccflNBeYaiISJECh4ZJDjukcEs7Tia8E3S2MoLZpDlgsub0QyWnktWb+6ubiQ==
-Message-ID: <9e837217-3f93-402d-a6e6-02c419618ca5@bootlin.com>
-Date: Mon, 22 Sep 2025 20:44:27 +0530
+	s=arc-20240116; t=1758554478; c=relaxed/simple;
+	bh=YLRGMaKJEGRBu417qctrK+7kZvPXslGrB5nA02ql9jc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DuZecap+U+FuoErdw0oH76q53hpnQ6yQVeDfYFpVq71yQyZfkTSPO+rWLgqQrNMSUq0gVLlT5H7hiUnTmw1CRTPcI0URnRHYXlLO7rGR53gGFlZ9jS+A+B1Tl1WfqOdPNYTb6myR38HvZABAz0kzrTJg96pL8hjsZ47dS6umYwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=R2tPGMv8; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=L78zsXHV; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 33FDE1400029;
+	Mon, 22 Sep 2025 11:21:14 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Mon, 22 Sep 2025 11:21:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1758554474; x=
+	1758640874; bh=LOCqdFL4WWIYlFONxqeTYa9PGa7VDH7WRH97rsSp3cU=; b=R
+	2tPGMv8gzsZRntDTz11bl1fbCr4LDLsmzghIXFMx3Hn1K71J+FmDW8L6tetaVn2w
+	0AV0ZmyUUWQtuKnrWhnFQj7yjSeuZrWYtCd2s2chhnx02S5o3wRuWXRmlpaYRbNs
+	wAHcKYVtXBNciAke67nJwMr+3GMX7jK+92SuPH/UAOuqD0WuSAfJ1ZOfuUnHYjbz
+	OZeyZkDrDoVPiWvyyhsZobMcczCOfunljQV4uc2P5RgqzVgVZaZQUsjXk2nK8kuu
+	UpJzyT2eWZ4vxqa26C5qnPQMixp2tqkd7VgwWh63jAO2edI+IcIZ65Y274HK2ZZW
+	WfNqrW/yCc4vLys6GP2Eg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1758554474; x=1758640874; bh=LOCqdFL4WWIYlFONxqeTYa9PGa7VDH7WRH9
+	7rsSp3cU=; b=L78zsXHVo26Ryl5UDQk+DYkTnAguTXFkoKz0GRCvH7qtSolG8bn
+	v0TBy+xncQqtie2/Ey5E4OWEw33A0NEn6eHDos/CVEBNIfQtBCBQ8cJQ7oQyhKi8
+	/i6m9iUfk9qfsRiIq4f+QBMfg2cqqnsvZ9mR55nm7u6+KSe7j62puCis/Ogw71rQ
+	0WCuvOkF9pUPJVQYOBs0g2JnbsjUawJfRgk9FN0CRbaMflUIke91qELXbXGracyV
+	v9DwVYCfoDRrd/D7xw5FlIC91BwtGVOic5u7yv+ey0qOCGqfdJPd0HjFUa59FipU
+	QOLCsoSh4FCBea7Si66ONt4V7VoryvX04zA==
+X-ME-Sender: <xms:aWnRaMqL-a8_ePWNPvc75Lp8Agd4nCwI8q_jcG4rigzRtiWPs1MXEw>
+    <xme:aWnRaIp4EgThwIEgQngxeuPBr_CDqlgyVjk6zpxLI2p2YjsIx5Uw-RY5mKNxdmu5Z
+    J3uNOwAkaEOrU10_tq8arhn7rZp2O0FHBxXqgvxYBTxz1-b3NlnhXxv>
+X-ME-Received: <xmr:aWnRaMC3IbNnOK9cQ_8IvvQyRNrnwfYgEYWkGFcfF8Upaw-VR93VBYlmrr5E>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdehkedvtdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
+    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
+    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepuddtpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehguhhsthgrvhhorghrsheskhgvrhhnvghlrd
+    horhhgpdhrtghpthhtohepjhhohhhnrdhfrghsthgrsggvnhgusehgmhgrihhlrdgtohhm
+    pdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvg
+    hmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohho
+    ghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtg
+    hpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghv
+    sehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvg
+    hlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:aWnRaGvN4zeWXQN3OE2B8jqXQl8mTbmmwGZkQ17ngP327ejf4rxA3g>
+    <xmx:aWnRaLJaqyiyPMX7M0RqsyJ5Q8jI2DlJcPg2d4spRy3p2-Ac8GZN9w>
+    <xmx:aWnRaNYPAp-VgeuiSRytKizrw_vj-1oGYyACgbdTFP_iMDoWR3Dgxw>
+    <xmx:aWnRaNBFsbIG4VV_UIA2WqR-kNAcwydRREiHrhqpKqKuB9L0kF2s8w>
+    <xmx:amnRaJkan2ubi54gS-FgsbxmSBAIeBgTPwgDfdFdOARz3QRex7QNBZea>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 22 Sep 2025 11:21:13 -0400 (EDT)
+Date: Mon, 22 Sep 2025 17:21:11 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH][next] tls: Avoid -Wflex-array-member-not-at-end warning
+Message-ID: <aNFpZ4zg5WIG6Rl6@krikkit>
+References: <aNFfmBLEoDSBSLJe@kspp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Query regarding Phy loopback support
-To: Andrew Lunn <andrew@lunn.ch>, Hariprasad Kelam <hkelam@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
- davem@davemloft.net, sgoutham@marvell.com, gakula@marvell.com,
- sbhatta@marvell.com, naveenm@marvell.com, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, bbhushan2@marvell.com
-References: <aMlHoBWqe8YOwnv8@test-OptiPlex-Tower-Plus-7010>
- <3b76cc60-f0c5-478b-b26c-e951a71d3d0b@lunn.ch>
- <aNA5l3JEl5JMHfZM@test-OptiPlex-Tower-Plus-7010>
- <defa4c07-0f8f-43cc-ba8d-0450998a8598@lunn.ch>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <defa4c07-0f8f-43cc-ba8d-0450998a8598@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aNFfmBLEoDSBSLJe@kspp>
 
-Hi,
-
-On 22/09/2025 00:12, Andrew Lunn wrote:
-> On Sun, Sep 21, 2025 at 11:14:55PM +0530, Hariprasad Kelam wrote:
->> On 2025-09-16 at 22:13:20, Andrew Lunn (andrew@lunn.ch) wrote:
->>> On Tue, Sep 16, 2025 at 04:48:56PM +0530, Hariprasad Kelam wrote:
->>>> We're looking for a standard way to configure PHY loopback on a network
->>>> interface using common Linux tools like ethtool, ip, or devlink.
->>>>
->>>> Currently, ethtool -k eth0 loopback on enables a generic loopback, but it
->>>> doesn't specify if it's an internal, external, or PHY loopback.
->>>> Need suggestions to implement this feature in a standard way.
->>>
->>> What actually do you mean by PHY loopback?
->>
->> The Octeon silicon series supports both MAC (RPM) and PHY (GSERM) loopback
->> modes for testing.
->>
->> We are seeking a solution to support the following loopback types:
->>
->> MAC Level
->>
->> Far-end loopback: Ingress data is routed back to egress data (MAC-to-MAC).
->>
->> Near-end external loopback: Egress traffic is routed back to ingress traffic at the PCS layer.
->>
->> PHY Level
->>
->> Near-end digital loopback
->>
->> Near-end analog loopback
->>
->> Far-end digital loopback
->>
->> Far-end analog loopback
->>
->> We need suggestions on how to enable and manage these specific modes.
+2025-09-22, 16:39:20 +0200, Gustavo A. R. Silva wrote:
+> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+> getting ready to enable it, globally.
 > 
-> Whatever you put in place, it needs to be generic to support other
-> modes. So you need some sort of enum which can be extended. When
-> describing the different modes, please try to reference 802.3, so it
-> is clear what each actually means. And if it is a vendor mode, please
-> describe it well, so other vendors know what it is, and can match
-> their vendor names to it.
+> Use the new TRAILING_OVERLAP() helper to fix the following warning:
 > 
-> Frames received on the Media loopback vs host transmitted frames
-> should be another property.
+> net/tls/tls.h:131:29: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
 > 
-> Are you wanting to use this with ethtool --test? That operation is
-> still using IOCTL. So you will want to add netlink support, both in
-> ethtool(1) and net/ethtool/netlink.c, so you can add the extra
-> optional parameters to indicate where loopback should be
-> performed. And them plumb this through the MAC ethtool to phylink and
-> phylib, and maybe the PCS layer, if you have a linux PCS involved.
+> This helper creates a union between a flexible-array member (FAM)
+> and a set of members that would otherwise follow it. This overlays
+> the trailing members onto the FAM while preserving the original
+> memory layout.
 
-There were some previous discussions here [1] and [2] for more pointers 
-on what to support with such a loopback feature. I'd be happy to help 
-testing that work should you send any series.
+Do we need to keep aead_req_ctx in tls_rec? It doesn't seem to be
+used, and I don't see it ever being used since it was introduced in
+commit a42055e8d2c3 ("net/tls: Add support for async encryption of
+records for performance").
 
-[1]: https://lore.kernel.org/netdev/20240913093453.30811cb3@fedora.home/
-[2]: https://lore.kernel.org/netdev/ZuJyJT-HgXJFe5ul@pengutronix.de/
-
-Thanks,
-
-Maxime
+-- 
+Sabrina
 
