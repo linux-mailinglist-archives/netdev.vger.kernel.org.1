@@ -1,232 +1,123 @@
-Return-Path: <netdev+bounces-225185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48891B8FD2D
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 11:45:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A732BB8FE04
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 11:57:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32CC8189F165
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 09:45:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D970A177522
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 09:57:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA47B2F0C6E;
-	Mon, 22 Sep 2025 09:45:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E938A2FE077;
+	Mon, 22 Sep 2025 09:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tmu1dtDt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84AE728850E
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 09:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576B72FCBE1
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 09:57:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758534305; cv=none; b=fGvLjLKq8B2xI7Cvt2M2wiDnYtYf1hPAlAx7aLEA7q7sWIJyev9z1u/CnumxTH1HxT6RxyCZzi/sF1sMI8HtL1g/d4Dt+c0yuJ09baLl4BMAn2ehHqv0nPVgWBPMsQHxWGecENt1OlF1xJK25cJTSrX9dgEWi3/oyPSDZfFIp70=
+	t=1758535042; cv=none; b=UjNW0iYY/ZI24Xyw/x7Nbj0/rTtGwvBObEQ7W3fz0WduOtjX0zeVQyjTBLw8sWC9zm1QAF8bJyd4JqltJ3tyM7P7NBP7OrqGLU6FIthrC1Mq1mRANJznGr5DYFWh+5Y1W7QwT0eKxnkJnEmZZWbtAw4Gw9AJ9QWWTYziQcKc4vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758534305; c=relaxed/simple;
-	bh=mdNH/qy0tUBFc9ajrxwCtFXa5yUQ/XkOzg1+kCv03yQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Mp3LoO6DziO07zdE+wvXRBmLY3p/c/eYIXQgrCDHwoWNKQq7iFUO4jmo+tQ45i54giIBXxKOR/x7rjAPvnNWpdtlGwj0gK3cf6JYSSM22RtTl5EPPqjPs13erxH2oVxURTa69ljW/tySt6cAqGFHXJxuMvgmqQd/lmVrKdlZis8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.92.39.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: zesmtpsz3t1758534232t254a044c
-X-QQ-Originating-IP: toX+XvKWXMPmKSGvkU4vEpk1ROR74tH4p5Xy3APZUWk=
-Received: from lap-jiawenwu.trustnetic.com ( [122.231.221.166])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 22 Sep 2025 17:43:51 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 15487375844222575637
-EX-QQ-RecipientCnt: 10
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1758535042; c=relaxed/simple;
+	bh=j+SwZchskS+hgocwMFiIRa8Uxuzs2JM1eZi5LFBUCrA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a2GkHsTWQ/Dkeak63NPvkQZqyHP8Y/P1FgfS4y9G2AIJBdoQtvQaP6cQuAiVTiZgIgbhp/Q/8zSJhkAqi0QIRFq9xw4DP4ienOz7E0VNQIw9S4kCUyzIE6QcoLiWgnzZtLXxqfX1aLtxYqUsxdwT5hF1elF3+MXp8gqV9RgEd5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tmu1dtDt; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b55197907d1so1960470a12.0
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 02:57:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758535040; x=1759139840; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5IkhyO4d7SmeNeYV0oRf0k44lMRfG/ikZaQ44KxKsTA=;
+        b=Tmu1dtDtiWTlG0mIkf4/SJo0hm7L4R/iW1WJwcHBOq2eCy9e/L5HS+QV7LvFcfDwFh
+         JUAdxrTmRpwmbQhyey3is0CfODlgZ8dHVYh/WdMMHdNp0LwCKex07eSD9XxEfYF9lkGt
+         hAeUs7ErAgcoPMdPU0qcyg/0m/2IjW2rGYKd5X1K4yLbq9vN0vw+SGKVebaH5HYbrVOy
+         QRxGUOLQQItZ56bsjD/ZftIoGffo8uaY3oi8UbsmJzEAqg2mNAV9xFdPeWqISue89TXL
+         1+bF/NntDGo2Kx1jKJ/bnIEZrvOAkqljjp7Cq+6XU9g0kqiLK5uuydW+phLA+cGFAgUH
+         J62g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758535040; x=1759139840;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5IkhyO4d7SmeNeYV0oRf0k44lMRfG/ikZaQ44KxKsTA=;
+        b=qxCvdFv+yNmPsFuOehGU7Pdp9mYZr0Mth1Biz2XqCy/eGhVcWXkh4rCR7SWpBxnb18
+         VDghPEzb7XxmQHLo1Rp/IPRW6WwBDL1hhQMQC4xTEQ0WZ4XC6y/zSjhgRuwKUMw52ATH
+         TVNpMCwTPX13gEhdqqqRXkG6Mm7oVzCabpLJR3uv4ICyL93Fk0bLMmkc3WzIlFOdx10G
+         ue1ggYf5wniQnG9M+m1DhFu8pC3g3ZIMaXq5uKAP+ZBT97u4ZH/5kkrcAly9tlezmyVq
+         d9GQtfqyKbYv7KRyGewq5j3VB8aw0ghgPqOVJiQv88qQYv7nUTmgm5S8vAY9BIJQ61cy
+         +jdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUXbK2CKqvwrRBo5ef9ElabeywAJ0GCG71ibsk3epOwXYWB8R60cGO5ZoxnN1JjBhCYRqbZMm0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhN3gM3TTiOGvmbZys5gw4A5TuvEqyLDB4WJcE0FULbHMBNLeJ
+	JzOUNhoOsAqIc6hrdWASREk2jwEZ4xE3q9Jsh5LRh06hoQ1f36VWIsHm
+X-Gm-Gg: ASbGnctZQeWaGSgIsQV9eTaKm4O9CyjJYmJXc0rrdT/YoIcO25W1pncSlHx/u+4K+UI
+	6ILmPJdSmV7FaCy4BmitKxBI06qRMIzzNpiX0oXTDaQVSErOP1cNn92BayA4OwSEklGpB9X1Kwh
+	zwpOKggHM0lcYIVDTCepqoXRX0hnHOXkiN65EJ9Ub/qbgqkviI/7qAyiOP0vEZLPyKdOjXdr5V9
+	KF3hWvoB9vANooV2/6EVEEf1bCbxjIe56qHStOiz9MN/DWoMPzsA5dGzxc69knozDoCgzqJwL8L
+	IM+AfgzSi9/k64kMuu0b73pHHacS6QV342EC+sPEN4tANxaGI22cUwI8P5WZvIjRC1M4ItBeHX9
+	iT9w/N4nP+uIe5Bhp1L/o4A==
+X-Google-Smtp-Source: AGHT+IE0L4SYOwQ/uM3LnAmOPCX9ygYee8Po6u3FqQ5+SV8o4TZTjmsp+YGsJEqc2WdyRLMWJne3sA==
+X-Received: by 2002:a17:903:3d10:b0:269:4759:904b with SMTP id d9443c01a7336-269ba57eeecmr157896775ad.58.1758535040355;
+        Mon, 22 Sep 2025 02:57:20 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2698016bf96sm125292965ad.38.2025.09.22.02.57.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Sep 2025 02:57:19 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 8F7E14220596; Mon, 22 Sep 2025 16:57:15 +0700 (WIB)
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v5 4/4] net: libwx: restrict change user-set RSS configuration
-Date: Mon, 22 Sep 2025 17:43:27 +0800
-Message-Id: <20250922094327.26092-5-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20250922094327.26092-1-jiawenwu@trustnetic.com>
-References: <20250922094327.26092-1-jiawenwu@trustnetic.com>
+	Jonathan Corbet <corbet@lwn.net>,
+	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: [PATCH net-next 0/3] dns_resolver docs formatting cleanup
+Date: Mon, 22 Sep 2025 16:56:45 +0700
+Message-ID: <20250922095647.38390-2-bagasdotme@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=580; i=bagasdotme@gmail.com; h=from:subject; bh=j+SwZchskS+hgocwMFiIRa8Uxuzs2JM1eZi5LFBUCrA=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDBkXZdan7t05UVlVevWN9WlrEldqvZDpXhGh/1X6ea3vZ NY9zN0dHaUsDGJcDLJiiiyTEvmaTu8yErnQvtYRZg4rE8gQBi5OAZjIozeMDLuKDj3YpXowoPzW 1ScGoVL33lR+VWfjX/M/szb1nImL41eGf5o7f7qFlb+Jbt/ooxlwSV8ln+2T+mxlJbG6hRcYnlY acwEA
+X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: Nzc98Th+6mOzojEpB87YkcsJo/6V6pKzd9gtIk7Ge+Zd3/Mspzu4D2z8
-	BHto6d3D8LjYolw25WGn8Y9LqjvwTJzYsqNGgDBO7XHK7nmmhWUofmjYO7kPe0TaEnkM+MX
-	o6fzxVJIGlc/7ph1zcoOXSLtt3gg5F0MjxfiK2SmeO7gXamzOP5O6cVSS/+CNZ3jzBP+NZN
-	54ZOYiDuOt3wcBI71hmsjEL/yV8HeW59q74Pgu1z1JvxYNs4BUi1UcGdaphX96e5bOkbqdp
-	0Bbce5Ou00XgGkDA7gBovTsEqNUMWqXVwyY0ZT9UkesamASYioEzucVDvFLSQHW17voBxYc
-	duryXqGTjBeYKZyOr6MyEY2Y+xhottRKNymecmjxNjzO3798sd4viUC+euxzKbB8f5uiINl
-	1RmgCy0VdeRfcSJZ4XDpCW+rayexGbxTmIMGRLnaMlwbvI2PbUA3baHzlCeEtk6s4mp4l7a
-	Ukz6LGb6X8aV0un5y+VVOvQgnY7dl0QQCjX7nDNbI05KZ0lkyWLlF4SD8A0vk4zc6k3NBMb
-	FvIfg1FoNASTHeueIVC19k1w0hiGx5E2Czqm602q/OLpQ5p764QbcDRjqbf37jAAassiqwY
-	oM4wdivP95+EI5PyWtKrMmFG0dOOyyWca5rq+KXq+VCgveg2IO8vYXmganmSGi3qOgiIXo1
-	UAInDPId7SCe6Mz1IkKa8qXTIqtKx0Y+hfNNUtUsRUjnJ46cE4ctZlPdGBk8WMguYsa7bVO
-	Ex7wJJ+BmCfk7oNOXCKIPaUDmSpmwEDrmFctmo1Q4Li5/wLI7ciW9TCNZqpYegtWMNCDRzv
-	wdH5TubqWJXEK4lqi+J+txJ+EI8VJDKWMwHiz9MUrw6e3Vm8m3NncWFAgueY7exseXceE08
-	N3ijd7HWrtM1pOLwRpRrp5myxyuVltGcY3t2R2rsHF5fb7PL3YCKbIRZcRmCL/IoG1C8iK3
-	c9Mwlmv9UqtSWYD8E92r0meBYoeoZsMNOTXvVF8vOY8LeuwRvKKdQ+8ZCT5v+/pB/4UQei4
-	WgfDWu4k0M6vVvSWpKcIcqVAv9Em9RAuo/iCMI17Is85OX+7lTPyaeaU8V7gY=
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-X-QQ-RECHKSPAM: 0
 
-Enable/disable SR-IOV and use ethtool to set channels will change the
-number of rings, thereby changing the RSS configuration that the user has
-set.
+Hi,
 
-So reject these attempts if netif_is_rxfh_configured() returns true. And
-remind the user to reset the RSS configuration.
+Here are reST cleanups for DNS Resolver Module documentation. The shortlog
+below should be self-explanatory.
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   |  6 ++++
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    | 36 +++++++++----------
- drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 22 +++++++++---
- 3 files changed, 41 insertions(+), 23 deletions(-)
+Enjoy!
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index fd826857af4a..d11245231d24 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -472,6 +472,12 @@ int wx_set_channels(struct net_device *dev,
- 	if (count > wx_max_channels(wx))
- 		return -EINVAL;
- 
-+	if (netif_is_rxfh_configured(wx->netdev)) {
-+		wx_err(wx, "Cannot change channels while RXFH is configured\n");
-+		wx_err(wx, "Run 'ethtool -X <if> default' to reset RSS table\n");
-+		return -EBUSY;
-+	}
-+
- 	if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags))
- 		wx->ring_feature[RING_F_FDIR].limit = count;
- 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index 73d5a2a7c4f6..1e2713f0c921 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -2047,28 +2047,30 @@ void wx_store_rsskey(struct wx *wx)
- 
- static void wx_setup_reta(struct wx *wx)
- {
--	u16 rss_i = wx->ring_feature[RING_F_RSS].indices;
--	u32 reta_entries = wx_rss_indir_tbl_entries(wx);
--	u32 i, j;
--
--	if (test_bit(WX_FLAG_SRIOV_ENABLED, wx->flags)) {
--		if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags))
--			rss_i = rss_i < 2 ? 2 : rss_i;
--		else
--			rss_i = 1;
--	}
--
- 	/* Fill out hash function seeds */
- 	wx_store_rsskey(wx);
- 
- 	/* Fill out redirection table */
--	memset(wx->rss_indir_tbl, 0, sizeof(wx->rss_indir_tbl));
-+	if (!netif_is_rxfh_configured(wx->netdev)) {
-+		u16 rss_i = wx->ring_feature[RING_F_RSS].indices;
-+		u32 reta_entries = wx_rss_indir_tbl_entries(wx);
-+		u32 i, j;
- 
--	for (i = 0, j = 0; i < reta_entries; i++, j++) {
--		if (j == rss_i)
--			j = 0;
-+		memset(wx->rss_indir_tbl, 0, sizeof(wx->rss_indir_tbl));
- 
--		wx->rss_indir_tbl[i] = j;
-+		if (test_bit(WX_FLAG_SRIOV_ENABLED, wx->flags)) {
-+			if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags))
-+				rss_i = rss_i < 2 ? 2 : rss_i;
-+			else
-+				rss_i = 1;
-+		}
-+
-+		for (i = 0, j = 0; i < reta_entries; i++, j++) {
-+			if (j == rss_i)
-+				j = 0;
-+
-+			wx->rss_indir_tbl[i] = j;
-+		}
- 	}
- 
- 	wx_store_reta(wx);
-@@ -2151,8 +2153,6 @@ static void wx_setup_mrqc(struct wx *wx)
- 	/* Disable indicating checksum in descriptor, enables RSS hash */
- 	wr32m(wx, WX_PSR_CTL, WX_PSR_CTL_PCSD, WX_PSR_CTL_PCSD);
- 
--	netdev_rss_key_fill(wx->rss_key, sizeof(wx->rss_key));
--
- 	wx_config_rss_field(wx);
- 	wx_enable_rss(wx, wx->rss_enabled);
- 	wx_setup_reta(wx);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-index c82ae137756c..c6d158cd70da 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-@@ -150,6 +150,12 @@ static int wx_pci_sriov_enable(struct pci_dev *dev,
- 	struct wx *wx = pci_get_drvdata(dev);
- 	int err = 0, i;
- 
-+	if (netif_is_rxfh_configured(wx->netdev)) {
-+		wx_err(wx, "Cannot enable SR-IOV while RXFH is configured\n");
-+		wx_err(wx, "Run 'ethtool -X <if> default' to reset RSS table\n");
-+		return -EBUSY;
-+	}
-+
- 	err = __wx_enable_sriov(wx, num_vfs);
- 	if (err)
- 		return err;
-@@ -173,12 +179,20 @@ static int wx_pci_sriov_enable(struct pci_dev *dev,
- 	return err;
- }
- 
--static void wx_pci_sriov_disable(struct pci_dev *dev)
-+static int wx_pci_sriov_disable(struct pci_dev *dev)
- {
- 	struct wx *wx = pci_get_drvdata(dev);
- 
-+	if (netif_is_rxfh_configured(wx->netdev)) {
-+		wx_err(wx, "Cannot disable SR-IOV while RXFH is configured\n");
-+		wx_err(wx, "Run 'ethtool -X <if> default' to reset RSS table\n");
-+		return -EBUSY;
-+	}
-+
- 	wx_disable_sriov(wx);
- 	wx_sriov_reinit(wx);
-+
-+	return 0;
- }
- 
- int wx_pci_sriov_configure(struct pci_dev *pdev, int num_vfs)
-@@ -187,10 +201,8 @@ int wx_pci_sriov_configure(struct pci_dev *pdev, int num_vfs)
- 	int err;
- 
- 	if (!num_vfs) {
--		if (!pci_vfs_assigned(pdev)) {
--			wx_pci_sriov_disable(pdev);
--			return 0;
--		}
-+		if (!pci_vfs_assigned(pdev))
-+			return wx_pci_sriov_disable(pdev);
- 
- 		wx_err(wx, "can't free VFs because some are assigned to VMs.\n");
- 		return -EBUSY;
+Bagas Sanjaya (3):
+  net: dns_resolver: Use reST bullet list for features list
+  net: dns_resolver: Move dns_query() explanation out of code block
+  net: dns_resolver: Fix request-key cross-reference
+
+ Documentation/networking/dns_resolver.rst | 53 +++++++++++------------
+ 1 file changed, 26 insertions(+), 27 deletions(-)
+
+
+base-commit: 312e6f7676e63bbb9b81e5c68e580a9f776cc6f0
 -- 
-2.48.1
+An old man doll... just what I always wanted! - Clara
 
 
