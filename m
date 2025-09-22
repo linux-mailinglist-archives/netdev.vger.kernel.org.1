@@ -1,109 +1,167 @@
-Return-Path: <netdev+bounces-225347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFEFFB927AB
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 19:51:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 85333B927B7
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 19:51:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AF574440C9
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:51:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F29744478B
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 17:51:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8707A3164D0;
-	Mon, 22 Sep 2025 17:51:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B08643168F2;
+	Mon, 22 Sep 2025 17:51:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXtxJQr3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZqsapKxD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1204A3168E5
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 17:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EDF43128CD
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 17:51:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758563467; cv=none; b=EhFy4hv4MIEp6Xb5RWSlQKvHxTUODKX4L3ZHADcreM7+0kEK02dK9lrKr3bH9HOnCl+a9A+oyD7FlVG3m2siuHfwXgUJ0A6tBYCqZSy1uz/U4EYvLp7UshYBXytymZXXCelgRBgx+/xZygmWR9OzUPOwlPd6yAjKlV1i/7x+MW8=
+	t=1758563503; cv=none; b=NBh6fI6UkMTNCSBZprwZRLkovACIJvt9IuImzZGo5B0KKgmGF1AKD1yPUY2miHxXjJjlXpdycBOi5boUK48X0YC+l4r8ShzjBToD5s+yUEi0abXTybuC7b7YIAD380VgaH+PU6SaAT8puIA9QDuK1sipI5dNsHCnCtRh4BNMsk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758563467; c=relaxed/simple;
-	bh=c0a6RFSFL244AZExUgaFK/XTq3j9EgV6tyBZrfjl6Bo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ftwlt/SwmyoIqMYqXirBvRqhO7t5cpEXmvhwtkDQhxkql8qFHNMHEkPxsBvoIXqHnctHLSzOkGRSL2HwUM/cmMZeUevEwJTP6d4ohCLhbEcuSurdBJHH/VOMns7iRVfLJPPl+8aUfcw5qcN+9+gGdzm3VYwZmX92NDumhQ4MUOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXtxJQr3; arc=none smtp.client-ip=209.85.210.181
+	s=arc-20240116; t=1758563503; c=relaxed/simple;
+	bh=SQbJ63UiXKfvQf2cDgzKOD2MadvCiE5SXr0RWoDxNiM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VartnW1abMtCy+HrUHq//dXxpwLMvhgrTn92AhF/M1necfWvG5NYhrYZF6yvvk6LKoS2yRQutHpfpWKg+kdoT2JLKuHBIRz7CwtnfN4Ajh2c6GReeLtySuuGWUkmkO+0GoIfoy3IKPOSobSF8wdBt0q8XEWVkI1datiOmowfo/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZqsapKxD; arc=none smtp.client-ip=209.85.219.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7761578340dso5500408b3a.3
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 10:51:05 -0700 (PDT)
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-ea5bafdfea3so4679824276.0
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 10:51:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758563465; x=1759168265; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Kpp8y4+/qufo5dJZYCrIeeCLKzv+9CNWvBYi7Kz/e8=;
-        b=KXtxJQr3DtfVL98Tzr4btcEGluda+xk3qAIu6ot+3TzncFqirkqzOZLjEPznEEc2M8
-         2p+JrxZUv6gYubh7SeabOZb9N0AOmG4b/tNeztJ6BtIYNKxGIVY9dLdRn8QAig7Pz8Xu
-         vGqkNCuODRSDF9Z27ikN+0tDmLnzyoRJEiQ5ivxd3WgJWzseBX8Hs66Pl+nyefpES0j6
-         v0Rz/0VUOa0Hxp4doLXrbLCTEQX0uq4xUI/bEUJnoWWVdZiyOdSOq8wP4uOHEyEFX7x7
-         LZ9TwWLzx7a4ThTzrwAedTjhidWny/fJEjgRpBB9JglAgdoJu5DeD11s6lIq4D3oFWFh
-         BuNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758563465; x=1759168265;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1758563501; x=1759168301; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6Kpp8y4+/qufo5dJZYCrIeeCLKzv+9CNWvBYi7Kz/e8=;
-        b=onk2Yk36gZu7VrsWu8pt80OARiC6CE6PVSYm0tu4BLYIkMlRIsfWAIx5JD72BKyxLN
-         N601E4MXMqu+N+wNaTj0785/D0vTBYFYKFSsy68qwZ6x0HGeevxRyHWz3l0Pw/ifXewe
-         1kFTR7++0uBUlEbtXEYCqXEIdizjlmflvzCII7HQnNJr7QjshFG12Oc/1qie67YD4tN2
-         AK2BU8YC4AtGlQJLq6sA6UyZOIRWxXkc1+b/Rw6KkTEMl8Q7PXT2KB37cAzJ5Gn4DNPo
-         VGk6do31AU6W7ndboDnoS/UgB+ezFW/tQpXsLjLlOJmWufR2tJVK3I/lkzjh6bEvRBGE
-         9C4w==
-X-Forwarded-Encrypted: i=1; AJvYcCXeoPCoOT4iPCOLO2SvM0dZCDtKYKcTSSeCoJcfy1NDdxciUjLBP1EffkfTkSSONw+XBwFEhOg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyy+5/Y5ZyUrgph2Ys7LCfIbgGaOFH7w+9SEDCiSZp53bspjRkJ
-	wS3i55WV0j3OBiuihhBXwlaZzBPbRaQluMW+kcxzlHfQ5d6RhIHlYBI=
-X-Gm-Gg: ASbGncsfLW7P64t6G9QU6d3JPJSrPqGaN+cmI4XjLmagroCoIEAWavEfKaXhvj8MHm8
-	rhAlczSGduRwMS8QQfjf1mh+3BzDeBb+GTMapSoDOzM8LgVvLXK6dA6pyYvk1vo9FF5ZyLq7MsS
-	dWBVAW0aQ6AP9WkAKHQRMiDrrHU2ohlodrSxcPD6OXIgQrR4tUJEaT+KoYakPved+xrAvCYGM2s
-	0NK98JmKmL+jQ/es+X8UXgFCd8fomNbyTzEbzXCwhMm1PjvSSEyMknN69xqqGDXIZj42AgI/w4P
-	Up+b+G58wJXnykSwQmUVslbRayqQpLLDal6tgRgkvmGPL9bUpPeKQeUuJiO+VENEbRWyqKTTvZY
-	Jol8Mbv9yUj8alS6v2xny6ITFWtik+wXIfYDWAgZVbAcinmXb9OfdODX4iJWSTRzJSh0nR70rQc
-	7iZ9FC83QFpYRXpxybynpDqFf42MjYKdOC8vJN1jYbsZ/1jML4ewa0URSQBbFKaqR2FOC6IwfLW
-	tYB
-X-Google-Smtp-Source: AGHT+IFpzkffBGVdyl3FepoZ59EN9XZi2pZw2cC261Hr4BtGiCIH//T8bpBiwA3kypUTCERHjE/DDg==
-X-Received: by 2002:a05:6a21:99aa:b0:243:f86b:3865 with SMTP id adf61e73a8af0-29270319fc8mr20827440637.36.1758563465349;
-        Mon, 22 Sep 2025 10:51:05 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-b5516b997b3sm9855293a12.0.2025.09.22.10.51.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Sep 2025 10:51:04 -0700 (PDT)
-Date: Mon, 22 Sep 2025 10:51:04 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, netdev@vger.kernel.org,
-	magnus.karlsson@intel.com, kerneljasonxing@gmail.com
-Subject: Re: [PATCH bpf-next 3/3] xsk: wrap generic metadata handling onto
- separate function
-Message-ID: <aNGMiNMmNRf1N3e3@mini-arch>
-References: <20250922152600.2455136-1-maciej.fijalkowski@intel.com>
- <20250922152600.2455136-4-maciej.fijalkowski@intel.com>
+        bh=qNhbDqEZemd4OEZbaMDZZJn1QcvJOY3gKIH2LA1yh9Y=;
+        b=ZqsapKxDirpEDzg3UkDBzmwVhKHEyOb1M+Kt1VzJ/rjc/FJM4DuvjVeOGnCbMVicCs
+         1itxH+e5WhovPe6wdglsiGpHiF+KN7bb3LlJdc09E+7w4OnPLP7Cm8py1FGyNwJ2sTGQ
+         28kOObXS2Dy54G5+drOHenO/JPz1DoVpR6kLbIYHsfOXnPD5dTIAC4AcJ/K1V1vR+CLM
+         826r57NDolDNZLMycPpxI5JZKfBj0xriOElijmal5oTpq0RirPJE4RuYNj/ZN1OdERDq
+         1UETBlzH9aNme0lkBj6TqKjfQ3ozePN53ZCGtP+PRfwbNQFB5kLPH/4hmz0GQXzQKotb
+         jzRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758563501; x=1759168301;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qNhbDqEZemd4OEZbaMDZZJn1QcvJOY3gKIH2LA1yh9Y=;
+        b=pa3IhlWz+PPm0M1YcUo6T74R5a4OcEuGQqn38SgvTX7N1ucOR4cJ0rU2WMFyITtNl/
+         jFU353fAEZIRhThnpK1qVe5S2rH1nyPUKpL8BZucJxRPXI77c0fK99CLJ6NVBqkAxMKY
+         ArbcNDc67zPD6F3iho1W20sKzzvmCKK1qDbZdNtxjxtCVfLTtUe7Zs/85U64fTC/s/t6
+         MyR8yF86QhQCIRk84JQs/5e1f6p/oOXySviHwzP/8MJU2zOWLgpknDMaNDYIWd/kVRb8
+         GyqF18TdFCHMrrXhFLSdOKKasxxtSia2/onSvzZ2DcIvtj4z3mNk054HcZ80RVxvDW5b
+         aDxw==
+X-Gm-Message-State: AOJu0YxACptOap+iNt6/LE5sbEo+OsY8goBdDkUSkh68maJ5CU650hmk
+	pXCeLoM7kgl6h8xqqSLUDNzRVDBsMD2Rs2Bcje/ueBMDObPBNbkWK+T2H9VXo2kdPTjQycr2sKU
+	eEglw2wsachLY5NClIG0bvXh3YG/Wcr4=
+X-Gm-Gg: ASbGncuVsidAZa6Z0tUFDczFmRpVXGf+D3pz09araLj0ka6tvd6SK3+5EsQqIA8Q9Cp
+	DZcAAZ0QqnKdIAPzXmd1M7Pb0xacribdD0gAqvQJUJXXM5JdRVUizLbPxJEjmRhp7TfQ1MUOZZh
+	tcXF6s69VwWVTTXH6Jve2SUTsGB+dIkn948JIwoQsC0mV8V5kJSbnacv4nw37CR9ndnMD5GWcmK
+	17A8aQY/Jkvtr5SOA+2Cdc=
+X-Google-Smtp-Source: AGHT+IGHOhrpN1lUQpQk5kWDkZH8pO7att2cpJSy4rXbSanAz6B+3hAZpVyAd2nNq/tj/BHBNtrrqT7ew/6hng0N/Ak=
+X-Received: by 2002:a05:690e:2416:b0:635:35a0:c5a0 with SMTP id
+ 956f58d0204a3-63535a0c7f1mr4487259d50.0.1758563500999; Mon, 22 Sep 2025
+ 10:51:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250922152600.2455136-4-maciej.fijalkowski@intel.com>
+References: <20250915225857.3024997-1-ameryhung@gmail.com> <b67f9d89-72e0-4c6d-b89b-87ac5443ba2e@gmail.com>
+ <0eb722b9-bad9-43b4-a8a7-6f91f926e9f5@gmail.com>
+In-Reply-To: <0eb722b9-bad9-43b4-a8a7-6f91f926e9f5@gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Mon, 22 Sep 2025 10:51:29 -0700
+X-Gm-Features: AS18NWBn9ZM3J7rAcYprmeTu6gzX3lsSh8_IXEZf-X_nUypiwWXdzxCDhVMlKqg
+Message-ID: <CAMB2axMCmf9qFp4mRoeQZC2VQQmA4zLQtsBgCpXkXKaAQQNgSw@mail.gmail.com>
+Subject: Re: [PATCH net v2 0/2] Fix generating skb from non-linear xdp_buff
+ for mlx5
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, kuba@kernel.org, 
+	martin.lau@kernel.org, noren@nvidia.com, dtatulea@nvidia.com, 
+	saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, cpaasch@openai.com, 
+	kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 09/22, Maciej Fijalkowski wrote:
-> xsk_build_skb() has gone wild with its size and one of the things we can
-> do about it is to pull out a branch that takes care of metadata handling
-> and make it a separate function. Consider this as a good start of
-> cleanup.
-> 
-> No functional changes here.
-> 
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+On Sun, Sep 21, 2025 at 4:24=E2=80=AFAM Tariq Toukan <ttoukan.linux@gmail.c=
+om> wrote:
+>
+>
+>
+> On 16/09/2025 16:52, Tariq Toukan wrote:
+> >
+> >
+> > On 16/09/2025 1:58, Amery Hung wrote:
+> >> v1 -> v2
+> >>    - Simplify truesize calculation (Tariq)
+> >>    - Narrow the scope of local variables (Tariq)
+> >>    - Make truesize adjustment conditional (Tariq)
+> >>
+> >> v1
+> >>    - Separate the set from [0] (Dragos)
+> >>    - Split legacy RQ and striding RQ fixes (Dragos)
+> >>    - Drop conditional truesize and end frag ptr update (Dragos)
+> >>    - Fix truesize calculation in striding RQ (Dragos)
+> >>    - Fix the always zero headlen passed to __pskb_pull_tail() that
+> >>      causes kernel panic (Nimrod)
+> >>
+> >>    Link: https://lore.kernel.org/bpf/20250910034103.650342-1-
+> >> ameryhung@gmail.com/
+> >>
+> >> ---
+> >>
+> >> Hi all,
+> >>
+> >> This patchset, separated from [0], contains fixes to mlx5 when handlin=
+g
+> >> non-linear xdp_buff. The driver currently generates skb based on
+> >> information obtained before the XDP program runs, such as the number o=
+f
+> >> fragments and the size of the linear data. However, the XDP program ca=
+n
+> >> actually change them through bpf_adjust_{head,tail}(). Fix the bugs
+> >> bygenerating skb according to xdp_buff after the XDP program runs.
+> >>
+> >> [0] https://lore.kernel.org/bpf/20250905173352.3759457-1-
+> >> ameryhung@gmail.com/
+> >>
+> >> ---
+> >>
+> >> Amery Hung (2):
+> >>    net/mlx5e: RX, Fix generating skb from non-linear xdp_buff for lega=
+cy
+> >>      RQ
+> >>    net/mlx5e: RX, Fix generating skb from non-linear xdp_buff for
+> >>      striding RQ
+> >>
+> >>   .../net/ethernet/mellanox/mlx5/core/en_rx.c   | 47 +++++++++++++++--=
+--
+> >>   1 file changed, 38 insertions(+), 9 deletions(-)
+> >>
+> >
+> > Thanks for your patches.
+> > They LGTM.
+> >
+> > As these are touching a sensitive area, I am taking them into internal
+> > functional and perf testing.
+> > I'll update with results once completed.
+> >
+>
+> Initial testing passed.
+> Thanks for your patches.
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Thanks for testing and the review!
+
+>
+> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+>
 
