@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-225381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5581DB93558
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 23:08:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA415B9355B
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 23:09:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D78219C00AB
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 21:09:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 812AA19C015B
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 21:09:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A322083A14;
-	Mon, 22 Sep 2025 21:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3858883A14;
+	Mon, 22 Sep 2025 21:09:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YCpBxBxW"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="FVrg4MYT"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012063.outbound.protection.outlook.com [40.93.195.63])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013053.outbound.protection.outlook.com [40.93.201.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0B034BA39;
-	Mon, 22 Sep 2025 21:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5993234BA39;
+	Mon, 22 Sep 2025 21:08:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758575333; cv=fail; b=gU+IRVF6lSVWIsgaN+nD4XAljurLMS9wJkHWYqoMKQWTZCc5ugD7v1m7EzgR/S5pJ/2cBUjFOLLJpTdLfkNbyhHG2+l9qrxvZFlmLEoDzgdxeGeo/XrhAiAWDB+kOE1XJCXx8RoPiVMINh1KyLBbZcIpQLLzumNLmZMhlxhGTag=
+	t=1758575340; cv=fail; b=GRs5nAS7ZZfyWwoZ0MXK/hvWDEj8WrKzgDC5at7R9F96g/oBLsFLhPsZEDdYRBDhXGAQcW13wGUjTlLMRB3d7xqR9BLcUMn4Ml4SVkLYXhwYLc6plCl6CaKlFYjf8e+l27+jH0uOh1kUVWGuoAeTkoVJAydStiK0Ir5GaTPsphY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758575333; c=relaxed/simple;
-	bh=n4zk7GinlTSMzjMsBSD/bu04NlRetGInC4T2JXWsWhw=;
+	s=arc-20240116; t=1758575340; c=relaxed/simple;
+	bh=xhPnUSldtzdHGB7NuvtrbuPJOiPwkUyetdg3JmYY7+w=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=X1OwbVnIJpc7M/apberwW95KCVrT7MJZ45O5ZqX2eS1N9j7HS+Ra1K+QobNkNyuY7f8DDgDwhHHg91UIh9wpGjw9MPYDACcUwR+fCFHrKZSZ9uHgml/Lp6bu5oGSXd3PaMzeaQLxDABHlkrmQjzxpgaZX2vPL/HTvBH5ByYcegI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YCpBxBxW; arc=fail smtp.client-ip=40.93.195.63
+	 In-Reply-To:Content-Type; b=ZxyR5xvgQoG34TereI+eCuQ65C1+n4KalMCMgSi2uX8UsRqXHav/moB6emUMajW7oN4ewLCQptfyji7m5Hv6wUJtkWOBP2MlgVxVc+eIRGfgw6bbYwCbgiwL7m5WbnC6jIN/JquAEaHj8Ug2ToKL6WZ9tmGrARLRkej6nnEfRuA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=FVrg4MYT; arc=fail smtp.client-ip=40.93.201.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tJTjnEr35au4iwwxn3G2fmzW1PVBGEn2T++o0r7fFpnSTiVcutnPo06X+D98GxyPvotS60LiCdcgZAV7WCTVTKdve5jACwqRZsDqdJvMDeOCr0t5U1Ss2Z2bYAMMmCMopK/Z4zqkmpFJIrwv/hn+1+3APjbZIK+ZAbZa8yC/xA3LD/FlOdYnLI7s17vNUTS8pWXwvHygCZlxqtMC03PrI0MJ54UnFlf0T2M3M4zBRjicpxBEfYgPQ5ATi8tZjhN3jYqxnUy5EExkI9OEAgK5QdBMcjmErTCrYwCr+NOE2cPvH+oC10XVtHXmrCOokfXOXNX9Q+KnOACMBh3+vzoh8w==
+ b=p+QsTnfE6Ycdt+EREyzTi1Ph+7ergr7sp9wooLehktGmqYeJHIenn64OiGd1yNGcXhouCwvHan9s07KoDpN4mglTUtEeIHJw4r7ZBuegDzSkVhrQxtxuBBQbcFhZhHgk5OnrL+do85VFzAwwD1CfjJlkQ6OC3MmxeffDl4YUm15CUcOa+3DIHX5mje5fZWbtL6xaHXifIeuPC4aj3GXl7voi1W55DsI9ItKomfsfDu3XSr+TUCWsyHd2xqQLOmg75J3ZWiH5xLCQo2nR8/g2x0wwieDkN9Uh9vnbralDL2AZ+PfgCCx1LWBQ1iOqxRHW40stiAAWWoKfa8yrwdse8Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cklk823tIudNWyfc7rcj0pL3Xa8AZFcjx+zBGCB9oJg=;
- b=gM1odIoZBUR5JL56DraEdkpxEQVJ6DhbIC2oKJsl6IM/t+OwPWu6rMIq4qzpxu81AoNGHNbT8j9z3xLXzl6E+4Jrgi+CwyxcHPlxLwkxQVT4NMFEX2MbqIvaQveHWPgUwrmYi0lWkKriOtpJJppfrvl+VxPAiGPedqzcAHz61mFAMPyCVfGYMzaaDrGUjSPS+5N5AxplII+yWi9IEnHUTSAWPTxOYzS2Bz9RTnvn1C3QOG/mPz6/3/YgcF2ie4GH8VIOr0h9CEE5qpdX/Sm0sZAVpkoA+fHy1tkGq7fuHXHHkQApw+0SzB5jdGAwy1tvuXRCIvZoERVUUn/k3ONjbQ==
+ bh=/rSrwuwNaNpmlyGP2HIiph1HfooQ1oFFlWNYLwzZNhg=;
+ b=vIHkpiIW7IfkhENdKjEF9KPmgEl0wi8Kk+Xs74i+vIQMX+DJhKc6L9GsJHk8ttUvd+cbBI/jxkgo/JFzLfA26SDRfzRv6Cbhpj90/zrl/zAo0SRUCe9kChvAVmYKpXyHxbRV2iKXN8Qy6RWZ64ZrjqdE7mQaJRnOK4u7yetHXuUcXCdzbw1ZawqH12jFOZnlSus03Ql/qBin/RxGgQ6c+OQxdCFWjp5b76113w2K7wYAC47wVSbzi7YJjvAWsZHQeU4ib1Qbi3tbmkiZxjKQg8jjPuftgLPVx79i5sE7AbwQtCvY7xAunqV21trKFUE42N6Nyv8C1M1C2bK8R2q9fg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=huawei.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cklk823tIudNWyfc7rcj0pL3Xa8AZFcjx+zBGCB9oJg=;
- b=YCpBxBxWG+S2jbmHRFqnei6oQOn8Rifg4tD9YrAzzhD9jb9FTue1LRavPqcEJdqezWjuVSnu3bSfc4CHnLPYp3NTiC8DYtVJWj47AfGDiaXzXbe/3DKOGNYU87YIm8OuEVzCduIdNlGXwZTp28wRtXpIIPSlP04MyiktPtiv7Xg=
-Received: from DS7PR06CA0003.namprd06.prod.outlook.com (2603:10b6:8:2a::27) by
- DS0PR12MB9345.namprd12.prod.outlook.com (2603:10b6:8:1a9::10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9137.19; Mon, 22 Sep 2025 21:08:47 +0000
-Received: from DS1PEPF00017097.namprd05.prod.outlook.com
- (2603:10b6:8:2a:cafe::6c) by DS7PR06CA0003.outlook.office365.com
- (2603:10b6:8:2a::27) with Microsoft SMTP Server (version=TLS1_3,
+ bh=/rSrwuwNaNpmlyGP2HIiph1HfooQ1oFFlWNYLwzZNhg=;
+ b=FVrg4MYT9Fv9PwT39MJeGjbd46otDPrltpYRjDMlEmR9W71klqSFccYu+UZBGdKEmJWdIynRqlc9f3zFds/BHxBtHBVVB2TuTCuPpLufDbmV6Ej29f4+Uv9aIK+CinthB8FSbJfA1GK49Tti7RHIzYnfdj/Y2xVNPEM4j7PeVVM=
+Received: from DS7P220CA0069.NAMP220.PROD.OUTLOOK.COM (2603:10b6:8:224::35) by
+ SJ2PR12MB9116.namprd12.prod.outlook.com (2603:10b6:a03:557::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.19; Mon, 22 Sep
+ 2025 21:08:56 +0000
+Received: from DS1PEPF0001709A.namprd05.prod.outlook.com
+ (2603:10b6:8:224:cafe::4c) by DS7P220CA0069.outlook.office365.com
+ (2603:10b6:8:224::35) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.20 via Frontend Transport; Mon,
- 22 Sep 2025 21:08:47 +0000
+ 22 Sep 2025 21:08:55 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -62,15 +63,15 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- DS1PEPF00017097.mail.protection.outlook.com (10.167.18.101) with Microsoft
+ DS1PEPF0001709A.mail.protection.outlook.com (10.167.18.104) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9137.12 via Frontend Transport; Mon, 22 Sep 2025 21:08:46 +0000
+ 15.20.9137.12 via Frontend Transport; Mon, 22 Sep 2025 21:08:55 +0000
 Received: from [172.31.131.67] (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 22 Sep
- 2025 14:08:45 -0700
-Message-ID: <bead66ee-b4ef-48b6-9164-d9086b6de3ae@amd.com>
-Date: Mon, 22 Sep 2025 16:08:44 -0500
+ 2025 14:08:53 -0700
+Message-ID: <1b3fdf9f-079c-41e1-92f0-65ac2944ac00@amd.com>
+Date: Mon, 22 Sep 2025 16:08:52 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,130 +80,133 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: "Cheatham, Benjamin" <benjamin.cheatham@amd.com>
-Subject: Re: [PATCH v18 01/20] cxl: Add type2 device basic support
+Subject: Re: [PATCH v18 04/20] cxl: allow Type2 drivers to map cxl component
+ regs
 To: <alejandro.lucero-palau@amd.com>
-CC: Jonathan Cameron <Jonathan.Cameron@huawei.com>, Alison Schofield
-	<alison.schofield@intel.com>, <linux-cxl@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>, <edward.cree@amd.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <dave.jiang@intel.com>
+CC: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	<linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>
 References: <20250918091746.2034285-1-alejandro.lucero-palau@amd.com>
- <20250918091746.2034285-2-alejandro.lucero-palau@amd.com>
+ <20250918091746.2034285-5-alejandro.lucero-palau@amd.com>
 Content-Language: en-US
-In-Reply-To: <20250918091746.2034285-2-alejandro.lucero-palau@amd.com>
+In-Reply-To: <20250918091746.2034285-5-alejandro.lucero-palau@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017097:EE_|DS0PR12MB9345:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3f790337-024a-494e-05d1-08ddfa1c3853
+X-MS-TrafficTypeDiagnostic: DS1PEPF0001709A:EE_|SJ2PR12MB9116:EE_
+X-MS-Office365-Filtering-Correlation-Id: 84f78ec9-0e74-4ee7-6d3b-08ddfa1c3d52
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|82310400026|36860700013|7053199007;
+	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aEk4SU9NSTJwRVlqTFRFOG9iVTN0UVZrMUhiVFJqaWUwOUFjNW5VQmVZcmpM?=
- =?utf-8?B?V3RjelJPY1dlbWxyUDQveGJSNGJEdWVCMmZDS2hLNUZQOGtzOFE4amk3eG5j?=
- =?utf-8?B?M0RZWFZnckY1UGsxTysrWmVUOFFGUFNTVksraHBwOHRvK1NpbWY3a1dzRzFr?=
- =?utf-8?B?OG9JRGtoSnQrcWJ4N2JvTUppOUVjUWZ4a3pxM2pQVGJXNGxhTTR5Z24yRG9u?=
- =?utf-8?B?dDFXMDJoeHQrY05xdWJ2VHVhSzU5WG9NMHhTd1VyM2ljVnRBNko1N0F0dGpa?=
- =?utf-8?B?a1JsZGN4Y0kzbk1YMGZsbjZiUlRWR2tNTUV2ajNldG9aR1FMbkFiUDBaR1F6?=
- =?utf-8?B?eXUxWlRmWGd6cHBnaWtWYnRaWkRmbzRWenUxVWF5QU9ndWhoeVJNbDErdzEz?=
- =?utf-8?B?SXZjMkR1MTlwUFNPWlpzS0VudU5obGw5dnVZSFBBT2tlRWpXazNkSjlqaDFZ?=
- =?utf-8?B?V3hxcDVBdzFGdEE1VDV0L3JNTVpWWUtycmt2QUhCTTJDbTJwTGxrbm5oc3gz?=
- =?utf-8?B?RXB3WlpPNEdRQ0Rua1Y4MVJRSXlERmNITlo2M1FTN1JZbW5zd0wzWVdncU5I?=
- =?utf-8?B?L05POUsyWHpJSHhTWW9lZ09vdy9GbUVyWUhQME1wK3c2UXdkc0c2ek9pbEps?=
- =?utf-8?B?Y1dMRE1JMDd1VVo3ellxYnpESjJRdXZHUk9pYjNybFFYNUJnYkxUQkhEMTNS?=
- =?utf-8?B?RVRuVlFCSEozODVhOGZKdFB1YlVEVUJpT2ZkYXRPSjlMdzVDaXpkVS9VdVN3?=
- =?utf-8?B?aWpPNytsQjVqRDJ5UDVNYyt4TDhia3BVRFRTMWhERG1VQ0lLcEZKK0VZbW5x?=
- =?utf-8?B?cVd3UEozS2c5c2ZzVUFKaHhPajhEUU5reS9lTTRMVitxZHkzNGNxYjlZSDNX?=
- =?utf-8?B?OGdkWVJKbWFEbWQ2WHdMTHlyME0rZks3SkpmMFdoK0Rqb0tudUZVeVdCam80?=
- =?utf-8?B?Z0V2NCtrODRXTFFDai8rZkRoMWlLTmxvWFlnMTI0Qk02WWNiVzV0bVZ1MHFX?=
- =?utf-8?B?eHZiS3Y0eU5FNXpUaXBtVmhOem1ETk9rRGQ2TjZFd0IxWlZ5bkVpek0wTjh0?=
- =?utf-8?B?bThyZ0QxQWVvRU9XZS83M00zWFViZUlOcEdwaFh6L2p6YWtMS1UrZDMrREEr?=
- =?utf-8?B?NlUzSnRBS3ByMFpLS2VvNVlyQVV0NUNndHhwcFZPTVNzbnBPM0ppSDEzTDgr?=
- =?utf-8?B?QWU2Z3plaGN1YlpsOFFVZ0ptUGkvdnBwM2RQbWJLZTFTcElaM3dOUld6VkFY?=
- =?utf-8?B?MG95U2ZqbUxYVkphZ0dQdlhrcGI5MHlobWxKMXlmUU1uUndIZjFWMUVGSzR1?=
- =?utf-8?B?TFcvNS9Ra0xsRURxZ2l3dnRSZTVHMjFQdEk3clVtN2RtNzNEN3drUzRDRkhO?=
- =?utf-8?B?WXN6eHpVSWtpOFk3SXlmMlQzeEFLL28vbE5ndUxRT3pDdVMzTTY1d2xaSFgv?=
- =?utf-8?B?THBTQ1hTQlpBSDVxRmVKUGIyRGtzR0prZ3VwdFBBQ2lNbjJPRW44cnhqUGF0?=
- =?utf-8?B?NjdUVUM3NWFMY1htT2dmbXErd09JMEpvUEc1MThaTFJQR2NnRkQrZ2lCblpI?=
- =?utf-8?B?MHYzdmZQMEdCaHRERGtGdHdhSHQ5SE1EalBFUlZvTStaMHU2R1d1WjFabnk3?=
- =?utf-8?B?SjJqMXl5bVZwbk9KblBRRlorbUNhOFExM3RWYmZuTGdndGk5T2VNd0tDZjFn?=
- =?utf-8?B?blYwVVMweXp6UXJrc0o1OFFFR08vbGJVL1lSRENvN3QrTno3L0tGdjZqdXpN?=
- =?utf-8?B?REc5d0JiK3lOUk4zRS9jVnZPYlFnMWlsMHlCRVJFdjFmZW4rOHA0bUF1NHp6?=
- =?utf-8?B?aW9GRFJwSWM0Tmp0R0lhY2tUSG44dXJKR0t4V3NiNUVnQTBHREtYZjM1bzFs?=
- =?utf-8?B?Nld0WVdLYjRGU083dkF5aExGaG5zZVo5VnVvckttQWFSYkdIRXVGZ2dzUnNm?=
- =?utf-8?B?dmQ4bDJWajFZUXU0TXVLUE1iZTkybmZDYmNTc3NoU2s5VjF3bGZjVzBsWWhR?=
- =?utf-8?B?WGd5dFJ5QTc1UGVkL2UvYnVYbUR6aFlXL3ZhMjYrTzZETFo0d1Y3aDZQY3VV?=
- =?utf-8?Q?amR+ON?=
+	=?utf-8?B?bVdtQzRnWExXM3I3a3I5czByRVZVTHppaU9UejFIcUk4WGlqQWdySytxUUg2?=
+ =?utf-8?B?emZUbHFkdWZKL0s4NWJlY0dHNjRyZml5V3NaeStxNUE3Z1ZiZU01R2xZeUor?=
+ =?utf-8?B?WFM2dEs0d3Niczk1ZEI5cDVkbDlKVzFDQXRudjFCUzNPbHhpNjlrQmJJR09F?=
+ =?utf-8?B?eHVpcmlrMWZ4WTBreGNld2pFVzBEVzR5T2tVcU5xUlBPZEs5Nk1GcEdYU2Rw?=
+ =?utf-8?B?aGFrcEt0NFprQzhLelA2YWpoZFJ6Yk1WVksyMDY0RzVXU1JBZ2ZoYmJtditj?=
+ =?utf-8?B?d0k1Z0JjSWkrNXMvclVMeEEvb1h3Z0dhOXZ3b0FCWW9YOTc3aFJQdlhVR0JS?=
+ =?utf-8?B?VXQ0bkt0RWExZ2VRUzFKdTE4REdZMmxqRVN3T0NKeVFpb054NDJCd05pSWVr?=
+ =?utf-8?B?TWJyYVRCblp4NEZzUXVucWhhWXNnT0N2RlNYZk5obGsybnpIWlB5VVB5bnNK?=
+ =?utf-8?B?SEszTU9MM1ZlUnFZVzVETEdGclZ0TC9VSC9MWFMwS3loaDdpeUt1UUcxNDg0?=
+ =?utf-8?B?bGEwVVEyeDRrOXFmcUY2aXAxcktTcXhNUUhSRXkvMDlqTUkvcjJMR2cwSndB?=
+ =?utf-8?B?S2lGQVpsNzNVaklMakM4L0JIejQ1bXJ5anAybkUxVmhicmNmMGRCL1FjdWpy?=
+ =?utf-8?B?R0lmSDhrWlFpS1hVdVI2dEV0cmpOYlBEMzlsbGZ4OTE0eEQ2ZlRzZEtENUND?=
+ =?utf-8?B?YXRiRTM1NXlWMEFrZWczZllNalBqM1lZS1BDcTJqZERMZmNxU1c3Zk1wVk1D?=
+ =?utf-8?B?ZFBEa0x5bWNobEQ5LzhIejU5UXNzN2VGbGI2NndFMXhtUjdhZnhSM1BoY2th?=
+ =?utf-8?B?cWFBMFkzeHVNYTNXYUM4cHFZL21rSjhhRU1pTEU4SkptWkZHajdKQUhHUDgr?=
+ =?utf-8?B?SVllc2NVd3ZlQndaRHF5NDA4K2pXbXl2REZDbWRXeWg0ZlU1OWh1UWFRVWoz?=
+ =?utf-8?B?QjZ0c091N1llcHRlQmM0U3RHUGZNZUl2UFNkUkxkL0JkZ0dKVXpMb0s0TitK?=
+ =?utf-8?B?bXZPRGhCbXdxaHZiWHE0bkxTOTR3bnJ2b1c0eHc0bW5rOFNXcmFxb2VhdTQx?=
+ =?utf-8?B?YmtGV29kaExNZnFVU2JiaUFPTU9wSmNlblgraVNiLzE3NWVPM1dNdlZjQmps?=
+ =?utf-8?B?MHE0SFI0a0Ivb1dCRUFJb2VYV3RKWGp5c0dPYTV4dWIwalkwM3dCY2s5QVlz?=
+ =?utf-8?B?Y2ZXaE5GSWJZejlnZWc1Qi9sVUp5SEhMZmtEZ2g3eDRORExJQ3RwRnBpWUZp?=
+ =?utf-8?B?anhPTTNUSE95a1NSdXU2SUg5Z2QzMnhxYXZkcVk0WGdCT0xzNlIva1V5SHVi?=
+ =?utf-8?B?bnlzbEhIbnpuZmxHOEdKNUNTMlpmZHBJcGZpQTZJZWNiL2ZtYlU1WGhiS2tt?=
+ =?utf-8?B?RjhXNC9CemdPTngxd2dmYmUvbmtET0tJZU9MRzZUMkhZRldaM2hCRktoMlp4?=
+ =?utf-8?B?QndBV2NnSzNoNC9XRkZZWGNJZlFRamNtN2p5d01HRHFWM2FBdmlZQWR0NFVy?=
+ =?utf-8?B?WFpTU2o5VWsyVFN2ZjZPbHZqVncyd3JNWndjamtIcEhmeTk4b3l5TG9ZdXB3?=
+ =?utf-8?B?MTZFU3Y2dXVuemhKbnFTbm82UUwwL3JZc2ViTS9ENTdSVnZQZ0VrU1lFUzRu?=
+ =?utf-8?B?bURnM25Ed3ZtbGVMdGo0TmxwMUthMkRTT2NSTUVCK1RUeGRyVWVnUThrSnJi?=
+ =?utf-8?B?cnVWNFp1c1hGYWJGRTVmOUlVbkM4MndTbzI1bU9jd1gzaUFlRmd2d2M4aXJV?=
+ =?utf-8?B?WVZ5bVNsR2lzQ0ZNZlI0Z3dHcjRGbTlnMXpqZ0lUT05NbUNGTDJXOElQa3hK?=
+ =?utf-8?B?WllwOW5aS1JwTDRFZk1TTllYaHdSL0lhZzlOSldWcXFmY3lBRFZ5UzZDak9U?=
+ =?utf-8?B?L3JvcFNYUklFRFNocWxFWmphbU9QUXBJZFIxTWFFQU5xNkF3aUdlaElNeklX?=
+ =?utf-8?B?OERSZzNOc1F3WVpUT3dXSTVzUDlHNlVFMzJBYTluOHVlQ1FBVEh0aEJiQWpS?=
+ =?utf-8?B?R2VjUFFhUHJ3SnUyc2UzQVFnYmc5c2ZnTDdIdGJLVy9FRlVlUEdpSnNnQlZ0?=
+ =?utf-8?Q?LOydkH?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(82310400026)(36860700013)(7053199007);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2025 21:08:46.6660
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2025 21:08:55.0508
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f790337-024a-494e-05d1-08ddfa1c3853
+X-MS-Exchange-CrossTenant-Network-Message-Id: 84f78ec9-0e74-4ee7-6d3b-08ddfa1c3d52
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF00017097.namprd05.prod.outlook.com
+	DS1PEPF0001709A.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB9345
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9116
 
 On 9/18/2025 4:17 AM, alejandro.lucero-palau@amd.com wrote:
 > From: Alejandro Lucero <alucerop@amd.com>
 > 
-> Differentiate CXL memory expanders (type 3) from CXL device accelerators
-> (type 2) with a new function for initializing cxl_dev_state and a macro
-> for helping accel drivers to embed cxl_dev_state inside a private
-> struct.
+> Export cxl core functions for a Type2 driver being able to discover and
+> map the device component registers.
 > 
-> Move structs to include/cxl as the size of the accel driver private
-> struct embedding cxl_dev_state needs to know the size of this struct.
-> 
-> Use same new initialization with the type3 pci driver.
+> Use it in sfc driver cxl initialization.
 > 
 > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
 > Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-> Reviewed-by: Alison Schofield <alison.schofield@intel.com>
+> ---
 
 [snip]
 
-> diff --git a/include/cxl/pci.h b/include/cxl/pci.h
-> new file mode 100644
-> index 000000000000..5729a93b252a
-> --- /dev/null
-> +++ b/include/cxl/pci.h
-> @@ -0,0 +1,23 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/* Copyright(c) 2020 Intel Corporation. All rights reserved. */
+> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+> index 13d448686189..3b9c8cb187a3 100644
+> --- a/include/cxl/cxl.h
+> +++ b/include/cxl/cxl.h
+> @@ -70,6 +70,10 @@ struct cxl_regs {
+>  	);
+>  };
+>  
+> +#define   CXL_CM_CAP_CAP_ID_RAS 0x2
+> +#define   CXL_CM_CAP_CAP_ID_HDM 0x5
+> +#define   CXL_CM_CAP_CAP_HDM_VERSION 1
 > +
-> +#ifndef __CXL_CXL_PCI_H__
-> +#define __CXL_CXL_PCI_H__
+>  struct cxl_reg_map {
+>  	bool valid;
+>  	int id;
+> @@ -223,4 +227,20 @@ struct cxl_dev_state *_devm_cxl_dev_state_create(struct device *dev,
+>  		(drv_struct *)_devm_cxl_dev_state_create(parent, type, serial, dvsec,	\
+>  						      sizeof(drv_struct), mbox);	\
+>  	})
 > +
-> +/* CXL 2.0 8.1.3: PCIe DVSEC for CXL Device */
-> +#define CXL_DVSEC_PCIE_DEVICE					0
-> +#define   CXL_DVSEC_CAP_OFFSET		0xA
-> +#define     CXL_DVSEC_MEM_CAPABLE	BIT(2)
-> +#define     CXL_DVSEC_HDM_COUNT_MASK	GENMASK(5, 4)
-> +#define   CXL_DVSEC_CTRL_OFFSET		0xC
-> +#define     CXL_DVSEC_MEM_ENABLE	BIT(2)
-> +#define   CXL_DVSEC_RANGE_SIZE_HIGH(i)	(0x18 + ((i) * 0x10))
-> +#define   CXL_DVSEC_RANGE_SIZE_LOW(i)	(0x1C + ((i) * 0x10))
-> +#define     CXL_DVSEC_MEM_INFO_VALID	BIT(0)
-> +#define     CXL_DVSEC_MEM_ACTIVE	BIT(1)
-> +#define     CXL_DVSEC_MEM_SIZE_LOW_MASK	GENMASK(31, 28)
-> +#define   CXL_DVSEC_RANGE_BASE_HIGH(i)	(0x20 + ((i) * 0x10))
-> +#define   CXL_DVSEC_RANGE_BASE_LOW(i)	(0x24 + ((i) * 0x10))
-> +#define     CXL_DVSEC_MEM_BASE_LOW_MASK	GENMASK(31, 28)
+> +/**
+> + * cxl_map_component_regs - map cxl component registers
+> + *
+> + *
+> + * @map: cxl register map to update with the mappings
+> + * @regs: cxl component registers to work with
+> + * @map_mask: cxl component regs to map
+> + *
+> + * Returns integer: success (0) or error (-ENOMEM)
+> + *
+> + * Made public for Type2 driver support.
+> + */
 
-Terry added definitions for all of these (I think?) under include/uapi/linux/pci_regs.h (patch 7/23 as of v11).
-Since that series is a pre-requisite for this one, I'd go replace these definitions with the uapi ones.
+Nits: Probably don't need the return code description and I'd prefer
+"Public for Type2 driver support" instead (don't need to know that
+it used to be private imo).
 
-With that (and Jonathan's suggestion):
+Either way:
 Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
+
 
