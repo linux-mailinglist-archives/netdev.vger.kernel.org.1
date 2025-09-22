@@ -1,194 +1,156 @@
-Return-Path: <netdev+bounces-225244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B630B9073C
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 13:41:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5941B90EFD
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 13:57:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20728189ED7F
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 11:41:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75C2E16EBC6
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 11:57:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B0C304BC5;
-	Mon, 22 Sep 2025 11:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="euXm1ZmW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2E2305042;
+	Mon, 22 Sep 2025 11:57:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013047.outbound.protection.outlook.com [40.107.159.47])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D294D262A6;
-	Mon, 22 Sep 2025 11:41:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758541289; cv=fail; b=RSgw2qVLtNl5OxxRbvKkW8oFFoCkaitAKGkvJLUNY4iAL360DIfMsRW3l7k7MOqC0Ag5oIApX2ptq6jGNGtQEXxzYfpjEa6JsuQOsTZTt2xb4d6NM4I6gG4TPH4rgRx6ohXV4qZ/afR/hdMFPjhs4WnA4Pl4MHfq5yndg3+2zTA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758541289; c=relaxed/simple;
-	bh=sD2E5K+7MtPoiHJodEyLj80zYChh9XlIIpXtuC1UEE4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=qc/dSdLJH5PjPAv3X+jrmWsBSKT++oAe95p1jEUuyGCRpmDtAVRa0+Jt8meSa9rrTzqe68P0/PKnA/q/a2m7eWtH/6DTqxF8IRNeElhU58GziH8856X7FgqzQL4GsGRl1a/BjcH/4lIZHQjy/HuxRDhIWl4XuwKGsjC9UCyEddY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=euXm1ZmW; arc=fail smtp.client-ip=40.107.159.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ngwGSd8kRb37vMwkVAYFhtjm8iYg7eusorVeZqxqt/B5wBq/jPzwIrzY9mx++SHIZ1845mUWUVJZgOkIgorVFMK+K9X9mF3if8sbui9wQSUY1dI490CFjs3fb6U2LUkc4Ta0bl8/Ti/IUCdGPKBDEk3HmPWJpVRQOBKxCEfjoc9vgUX0W4CaiQB+Kk7SZ4sfPvm+dnXfyaXcORtliEkhn015OwKbNVu0foA8czoq0mprF1aogr9AQzL3IBqaL/c7aLN6kl8uCkbejcOQwV3yo6e5iDJUeFPvQpPdYMMvBhDSjLkgOpirklxBZcdeTNKl2R4maSh5hyTh6IBI+D23Ww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=b6RPzWM77W/cCSvkWojL9kEwVMdUiG+q0lAe9GXVzm0=;
- b=MuDtU/KiQuFsku5lK8EwIQtWYmPl+TdkML0dP34G3BKdGhUjVlBw27/4U6ow9ESw55x9ypvdBeojfIs0HPBUe/EZWNY+08KWBwga//t8YJXMXKlP8EhSl1HsBH7+gqnMV2O7nNyPij2AM23js9Xz1KZIVTcNhdbYz7SeE7i6p0lF8E2LudiFnZdFDybGjRP4uAHT/Un54jZtroebIix2pJdq0JnH8ww2V5KBlqUvoeDxwP/m185lza57hmk9lyels4L7dLxSSQxIo871Xh6+hLRy42Pnljo2xBO7XmmDvhruNiZdKfPFO1ZU+o9HVTD1AgaxDgf0oYsdZPg2ZgMrrw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b6RPzWM77W/cCSvkWojL9kEwVMdUiG+q0lAe9GXVzm0=;
- b=euXm1ZmWYlmAh1m0bFCdFkLb0m7q9BAHdvIUeRm8OpAoRjUse1oopn+ciD0jrjQUKpxomzYiCUS26eo9hw61PggmqO7pIrQBDM2K2QGtF7f6U6EVaIjXqdeC3WW77LGDAQ/7i2sKwbcdgh1/OMXTCx+LGNr0rDsXjkiyznKbrtGVtjwdVeE7ttZquoTuWdP0cqJCjuyRi2IxBn1f/eK02jdhEo9czIkA7273Q6R0YCh0gtsSSFRVRRqww6I2zpZAORDRlrW6H0Cx93FV/xuHQkd6z9ZtaSBQdAHbZivJUQgGALhvf0Jw25lJirb14HuiekR1UjJ2r4obI8LtKdaxeg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by DU7PR04MB11210.eurprd04.prod.outlook.com (2603:10a6:10:5b3::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.9; Mon, 22 Sep
- 2025 11:41:24 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::b067:7ceb:e3d7:6f93]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::b067:7ceb:e3d7:6f93%5]) with mapi id 15.20.9160.008; Mon, 22 Sep 2025
- 11:41:24 +0000
-Date: Mon, 22 Sep 2025 14:41:20 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, yangbo.lu@nxp.com,
-	richardcochran@gmail.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Frank.Li@nxp.com, imx@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 0/2] net: enetc: improve the interface for
- obtaining phc_index
-Message-ID: <20250922114120.bogu5vovrafeytow@skbuf>
-References: <20250919084509.1846513-1-wei.fang@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250919084509.1846513-1-wei.fang@nxp.com>
-X-ClientProxiedBy: BE1P281CA0228.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:8c::7) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C925B303A1E;
+	Mon, 22 Sep 2025 11:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758542245; cv=none; b=PuOJenppUBjLpszfqHNhMN5azO5QxgQjBE1Llsc9ISf0kNMLU/XtP1vNMKYh516X8W8cZFLfo7rkVGcEGYdVnApg9an6qx7+9KxRQ+J8X1wk/34CdGPZn1cevTslUV+d10zPyrTvurTZpDfU6q0Uk+SIjPHYvINAIXFvRqQZelA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758542245; c=relaxed/simple;
+	bh=GvG5ejXGXPafTAj+efoN2UKdHGx1hTFLARGVrTbUyiQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=D2lGYzgMuFpPr/FX5MtGiGdXMA9SC9m/ulkuM9ohFAZpt3HmnHQa48qET+vQd/oJGkdgxbP1aJX3m+xWe4kY07auLcMJHYD/XRBlSyXtvsFN5+On88TbriAJFytJTjoRTHYUy7XD3G92ulzBWFW7J5+Z4ed8tdWnlIxcQQwP+MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4cVhNG3dpDz1R9BM;
+	Mon, 22 Sep 2025 19:54:06 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 874181800B2;
+	Mon, 22 Sep 2025 19:57:14 +0800 (CST)
+Received: from huawei.com (10.50.159.234) by dggpemf500016.china.huawei.com
+ (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 22 Sep
+ 2025 19:57:13 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <alibuda@linux.alibaba.com>, <dust.li@linux.alibaba.com>,
+	<sidraya@linux.ibm.com>, <wenjia@linux.ibm.com>, <mjambigi@linux.ibm.com>,
+	<tonylu@linux.alibaba.com>, <guwen@linux.alibaba.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<horms@kernel.org>
+CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<wangliang74@huawei.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-s390@vger.kernel.org>
+Subject: [PATCH net] net/smc: fix general protection fault in __smc_diag_dump
+Date: Mon, 22 Sep 2025 20:18:18 +0800
+Message-ID: <20250922121818.654011-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|DU7PR04MB11210:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9e03bf09-2596-4d87-b804-08ddf9ccf535
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|19092799006|376014|366016|10070799003|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0g3PGeukngwlifzVX6M/rU06u1cncp3jVrBWi+iyAx9VkgoJ39+wFTCPXPiS?=
- =?us-ascii?Q?S7bcgePteOAFpeVlS5rwvH8JZFV2NL3AbWC0a+09OamToZT7Ks+AcIw3rVxU?=
- =?us-ascii?Q?xHu3EQlS8OaozDH0raKOVJQoZF/ROe15RsOdz6Asp1qrL1r0+NRVrEXMElIn?=
- =?us-ascii?Q?pFHJoXBhSXxSiW+ZE6zWaGxHrXCdX9w5BW5HebJLqg2pXcgBffEUpr+eb6eo?=
- =?us-ascii?Q?8zeadA5ATYpAQwa0cTM7pc7JYTGy/LY9jtGWGG/TSPztGgWnIMhjc7TR7+ak?=
- =?us-ascii?Q?9J2bFDD/3d4x/xxnvKFXVsxVHsF27Qe6QZIcVZMYfDGXTFI84X2/6VY0HNhj?=
- =?us-ascii?Q?YzP/ro5oHhxPo3OVf3lOSUincDsYs0uzQ0FrUI0EmFOEY0Yf34EIu7L1FiYZ?=
- =?us-ascii?Q?YDfXqjNwVd7mq89i0ivU0O9XxVm6+I0CPr2urAoOO4h8cz+JIm964fpfp8LT?=
- =?us-ascii?Q?GE/yVQub7/NEMLq520kdFE+vVVLzE0Xw0UPWVoh2bPUqHG1EYHcCN2Hg6bOl?=
- =?us-ascii?Q?/XtewA5/sXf07ATr4H948FEWoelmadmYg7cNFNQ+EG/2FK6WcyMtVDQNX5Ed?=
- =?us-ascii?Q?XnqGS2yQQv62IXwOEw25JzagSguajuL54pHn5xMcJX0Dh06L98exaAMkHcRm?=
- =?us-ascii?Q?PwE0FlTA0zdoyoIx1b9NECC2ED08GQPbKaTJV7HsoCCHhIjk74faqB1TQUOH?=
- =?us-ascii?Q?i/evbRjXM/qRt/Tx4geT5JdnjWPgHW7BTiyJtc9piERHJWndj0dzJ6HLAt0q?=
- =?us-ascii?Q?Fsh2u8My0xPVPW0XSUVILGdFLWZcqVb+Viay1ca4X095cr+Nnx5znx2pVe+D?=
- =?us-ascii?Q?88V/UzU7I65sTFwEho28EV9G8yTjaAp6X06LETyDEl6Abky9KmtHbWeTpPZw?=
- =?us-ascii?Q?q2/GmO4NMTJ9bF/F/TBYbTEMxbHoIYDTjGRT22HTkWYaxw9F0Gohw6QXyXat?=
- =?us-ascii?Q?cZD27+k80W50RZS6H9+4iv9W7tb7+IlLtvi4c0lU5I1KXDgyYR5XERY8x/g3?=
- =?us-ascii?Q?2PFDsK3t64Pg7mYCRc6PxWpIsw5yIHJ24Je73g8CZrtLdQHETzIDX8yom47V?=
- =?us-ascii?Q?JtEeR24heDlCSdE0QorZKhn5vJwf0bPn1rQpyWEdOOShhUbEF7NTnH2mRwhe?=
- =?us-ascii?Q?NGcEK1BYuBGDBrYCrK7AwtAUd8Zh3Lg7rYDstcPbraXX6VmhzdElZMcteK5e?=
- =?us-ascii?Q?koiDQJ8EAEfo2f/Mmvve9Q6JqOJ+nGW/0vmxWg0rrXbLX71uZirttokKJI5+?=
- =?us-ascii?Q?AkLKx7pjXxKOfGx0DmzRRkGcWruehvZcAWE70VAEisY9A3Px/xPAtV7FlFPB?=
- =?us-ascii?Q?565cHoLPYZUO2B6tmCsZCh2PYEG+uuVhSckLu7IMVuo9b44Bg0SCPZiaQM/5?=
- =?us-ascii?Q?tn2PL3I=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(376014)(366016)(10070799003)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?L5ZLjTOJvk6ooGPgHO8T2tzGbON6BlW6LX4r+14K2g7Tc9srHaacUy9PA20J?=
- =?us-ascii?Q?cTtDESBd2dclYujhC53sBaoU05KexZw/EPSqcetnwoU23P5vDicj+5hAhDN8?=
- =?us-ascii?Q?ol26WPFFTnmm4TTSY0Fl4cYEeTe3keQ/ehQzNX0QYGUnjVrEok+aUh28yYYz?=
- =?us-ascii?Q?3mqRe9QcgPYo6AURiSO+slwdUHHNMFFBqrK1xQ08cEwm1tTRZ6QOmJa7W/45?=
- =?us-ascii?Q?ftKPchp1Yy9F+LSheMQtIsv1mgarlBLr2kGYkV1HM7figT4b8PxVufxq7H5/?=
- =?us-ascii?Q?MWKHdXfIg4u8npV6vcUTiDTEvMwnQNmpUOrxsDFlcarcWHAI/HSjQvAsfuhD?=
- =?us-ascii?Q?2m6yFh4TtnErEs41sdN310oPBcy3qaTW2fQbYNP8T6JYvelXl73yaqW8Bpsk?=
- =?us-ascii?Q?grkVo3HtGMIVPoQ5Tc6UVc3djLBtShtL+7Lg3F5B2eSNegQmiOKEHCdVSCYC?=
- =?us-ascii?Q?DycxJYO4eYlB5Ee/HATPjYwZhGAbj5bcd2c80R6fLt+1nzETIIZj5vwCy4yr?=
- =?us-ascii?Q?cQ8aeOmt/dvxvvXa+9JLOZVwkWfYMHReT2Dl7RkWDBbknfjs0zksUwHcZU1H?=
- =?us-ascii?Q?uDh0YKJYUNWXuUqe8QRtq0j7/qMD9YjnajwAoCaewUNHN2BnITZJek5wyi/8?=
- =?us-ascii?Q?smZN6V3/nqPWOuJWPcvlTSvIfwSXFjUtGNQBKXPGj/FeaHw2eN7GrsFDS0z0?=
- =?us-ascii?Q?9ydzUT5fQ4yN+TABGKJT6fN/AuBAhH1day3j52lkP0C+nvE0+FPbF5xZOzMl?=
- =?us-ascii?Q?EydjofQwt2MhiugK0XtLe1DSABHGpdEeIjhSGaGYGpzFPhAo2RzKDx1w5IVT?=
- =?us-ascii?Q?CFBSQrsRzeWApb4E/L1dp68fudvPlwvgdLLR9zK4tZgAyIdJEbCXSDLBz6tM?=
- =?us-ascii?Q?Mbf3G2SjIo5Fg1zzvnl5Hirn49avVVsMyeQ1omUbMtIxObdZePnDfl6J9mr+?=
- =?us-ascii?Q?2z9/LpOrVQY/k7Yvklml9zL0TnLjxbj8E2AjN19Igpe7DonI6CLHT7ZDiMUA?=
- =?us-ascii?Q?BOimJN+agqUopywWS9/Eba+sueMQGbkG+41bPVdsGdCcA+Kik0OBXYoTSjlz?=
- =?us-ascii?Q?1L2tgb/BibyGqutsC9BmPe6KoQ0U7Om8gJSp8Qi6dWQWtgXbeD29pBeUNJbE?=
- =?us-ascii?Q?UQmk8HHUDpwbApeG4jvmSVco/1jdELGevSGJaHgHf/3jLeD1opRGjopUIjmI?=
- =?us-ascii?Q?Hw80YmYtkQXB2awH+OXdBf0JAWFO0Q0l5J1+GCT8mLUNCprdU/PDpdt1iFGR?=
- =?us-ascii?Q?vFGSg2ShpPfgGXfnvnGLou6kfhSKKA46Bzm5YW/MQkiAzBgyMqGE1KViaNxh?=
- =?us-ascii?Q?sE4qS1fw3rgONf6VmNqEmBsOaRRAKE8Y+So2VOin6tBmIiLSGZtX1wddi8mw?=
- =?us-ascii?Q?UiHb1EzXqTywrgtUpN0B5rlUzJnkv6ypBD3tuBmyMIhR8gmuk7ANdwgLISNd?=
- =?us-ascii?Q?aChWjb05EEPjDynrD7ukVS8hCE4VJIt2ETs8KmfIHykRH7uT9Z2f6sACahei?=
- =?us-ascii?Q?80kPS3H2iMbSHP2l7S93MOwS75/StTfS9xzqgujrvQF0PLmyIsG0LBiHz+uo?=
- =?us-ascii?Q?PS0tNrnif9VR9Q5rQfGvhl/ZjsTvmfFBW+oq+TIUNkdxD7ru6scFEm+QddBI?=
- =?us-ascii?Q?VX8lqm/4AycXUrZKdTBLdseeLTv0ZT34lkViq45DsjmxUotizVHkrPKkcvVg?=
- =?us-ascii?Q?uDodqQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9e03bf09-2596-4d87-b804-08ddf9ccf535
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2025 11:41:24.3656
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xGb3uAMQphLJHHkssN4OQuIOIORLAx+PfUpAoiQnakz1JBZT1onQwvg2AsnRYdHB2AuMfHGZlBqs+rP0ulNW2A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU7PR04MB11210
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-On Fri, Sep 19, 2025 at 04:45:07PM +0800, Wei Fang wrote:
-> The first patch is to fix the issue that a sleeping function is called
-> in the context of rcu_read_lock(). The second patch is to use the generic
-> API instead of the custom API to get phc_index. In addition, the second
-> patch depends on the first patch to work.
-> 
-> Note, the first patch is a fix, but the issue does not exist in the net
-> tree, so the target tree is net-next.
-> 
-> ---
-> v2 changes:
-> 1. Add patch 1 to fix the issue that sleeping function called from
->    invalid context
-> 2. Fix the build warning of patch 2.
-> v1 link: https://lore.kernel.org/netdev/20250918074454.1742328-1-wei.fang@nxp.com/
-> ---
-> 
-> Wei Fang (2):
->   net: enetc: fix sleeping function called from rcu_read_lock() context
->   net: enetc: use generic interfaces to get phc_index for ENETC v1
-> 
->  drivers/net/ethernet/freescale/enetc/enetc.h  |  3 --
->  .../ethernet/freescale/enetc/enetc_ethtool.c  | 29 ++++++++-----------
->  .../net/ethernet/freescale/enetc/enetc_ptp.c  |  5 ----
->  3 files changed, 12 insertions(+), 25 deletions(-)
-> 
-> -- 
-> 2.34.1
->
+The syzbot report a crash:
 
-For the set:
+  Oops: general protection fault, probably for non-canonical address 0xfbd5a5d5a0000003: 0000 [#1] SMP KASAN NOPTI
+  KASAN: maybe wild-memory-access in range [0xdead4ead00000018-0xdead4ead0000001f]
+  CPU: 1 UID: 0 PID: 6949 Comm: syz.0.335 Not tainted syzkaller #0 PREEMPT(full)
+  Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+  RIP: 0010:smc_diag_msg_common_fill net/smc/smc_diag.c:44 [inline]
+  RIP: 0010:__smc_diag_dump.constprop.0+0x3ca/0x2550 net/smc/smc_diag.c:89
+  Call Trace:
+   <TASK>
+   smc_diag_dump_proto+0x26d/0x420 net/smc/smc_diag.c:217
+   smc_diag_dump+0x27/0x90 net/smc/smc_diag.c:234
+   netlink_dump+0x539/0xd30 net/netlink/af_netlink.c:2327
+   __netlink_dump_start+0x6d6/0x990 net/netlink/af_netlink.c:2442
+   netlink_dump_start include/linux/netlink.h:341 [inline]
+   smc_diag_handler_dump+0x1f9/0x240 net/smc/smc_diag.c:251
+   __sock_diag_cmd net/core/sock_diag.c:249 [inline]
+   sock_diag_rcv_msg+0x438/0x790 net/core/sock_diag.c:285
+   netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2552
+   netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+   netlink_unicast+0x5a7/0x870 net/netlink/af_netlink.c:1346
+   netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1896
+   sock_sendmsg_nosec net/socket.c:714 [inline]
+   __sock_sendmsg net/socket.c:729 [inline]
+   ____sys_sendmsg+0xa95/0xc70 net/socket.c:2614
+   ___sys_sendmsg+0x134/0x1d0 net/socket.c:2668
+   __sys_sendmsg+0x16d/0x220 net/socket.c:2700
+   do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+   do_syscall_64+0xcd/0x4e0 arch/x86/entry/syscall_64.c:94
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+   </TASK>
 
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+The process like this:
+
+               (CPU1)              |             (CPU2)
+  ---------------------------------|-------------------------------
+  inet_create()                    |
+    // init clcsock to NULL        |
+    sk = sk_alloc()                |
+                                   |
+    // unexpectedly change clcsock |
+    inet_init_csk_locks()          |
+                                   |
+    // add sk to hash table        |
+    smc_inet_init_sock()           |
+      smc_sk_init()                |
+        smc_hash_sk()              |
+                                   | // traverse the hash table
+                                   | smc_diag_dump_proto
+                                   |   __smc_diag_dump()
+                                   |     // visit wrong clcsock
+                                   |     smc_diag_msg_common_fill()
+    // alloc clcsock               |
+    smc_create_clcsk               |
+      sock_create_kern             |
+
+With CONFIG_DEBUG_LOCK_ALLOC=y, the smc->clcsock is unexpectedly changed
+in inet_init_csk_locks(), because the struct smc_sock does not have struct
+inet_connection_sock as the first member.
+
+Previous commit 60ada4fe644e ("smc: Fix various oops due to inet_sock type
+confusion.") add inet_sock as the first member of smc_sock. For protocol
+with INET_PROTOSW_ICSK, use inet_connection_sock instead of inet_sock is
+more appropriate.
+
+Reported-by: syzbot+f775be4458668f7d220e@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=f775be4458668f7d220e
+Tested-by: syzbot+f775be4458668f7d220e@syzkaller.appspotmail.com
+Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
+---
+ net/smc/smc.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/smc/smc.h b/net/smc/smc.h
+index 2c9084963739..1b20f0c927d3 100644
+--- a/net/smc/smc.h
++++ b/net/smc/smc.h
+@@ -285,7 +285,7 @@ struct smc_connection {
+ struct smc_sock {				/* smc sock container */
+ 	union {
+ 		struct sock		sk;
+-		struct inet_sock	icsk_inet;
++		struct inet_connection_sock	inet_conn;
+ 	};
+ 	struct socket		*clcsock;	/* internal tcp socket */
+ 	void			(*clcsk_state_change)(struct sock *sk);
+-- 
+2.34.1
+
 
