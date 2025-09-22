@@ -1,239 +1,196 @@
-Return-Path: <netdev+bounces-225215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 045C2B8FF80
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 12:19:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 796E8B9000F
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 12:29:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2D5F18825AF
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 10:20:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5934418A1302
+	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 10:29:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191D62FDC53;
-	Mon, 22 Sep 2025 10:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41BF9287244;
+	Mon, 22 Sep 2025 10:29:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="iYSZLn1J";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FPsuUoSa";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="iYSZLn1J";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FPsuUoSa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cKbzjI03"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5004627FD54
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 10:19:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D91D182B7
+	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 10:29:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758536391; cv=none; b=YBl6UZpPR+uZcikyKY8A6BF4PivYZcVBncFkzK79sG6/rw5JALKoWNewCd+dTHgiO0O/Sof9Vyyb+Jux/CqE5yhLwDoV1n4JuFHNnRfUbAKPSxCt5G8+T4z/Iyq0eeQ91ZBAiKxQGjyKIUeI8vjhK775pjtgbrRDvU3wPugtuWs=
+	t=1758536971; cv=none; b=jkbbDpOVUIDeEHdCjch0MHfu1c7y7bBB8TTzCj0BDB4jKiueHjsp6eQ5DS/A/TbOOrA8GL0+99KV13fCfjkRYcqIhdpoFS/RcJQ7A3VMUXDf+Vmy+GyK56/QqD30OqkK9FCt31vJw6ha1bfNnfPQeeXFiApznj1XAMATbLF6b6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758536391; c=relaxed/simple;
-	bh=JE6eqHzVPMQMi049oMT9AY3guqoW9SUvz9a8sK5TNWo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=so9VbW611dFMth51Lk3frKTpT1SETfs0iPI1nvoEfDW0cl8WV3yX2LnOwP/PQ08v6zDfSUL7hLcm93p/n4M5sPxECXl/XzOCzwFr1E66kgZ7lHZVKXukJksZbm55DdJKySNyAmAeuRDHCYWcgvhPLhqdCchxAP1pgshb9IDOLuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=iYSZLn1J; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=FPsuUoSa; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=iYSZLn1J; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=FPsuUoSa; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 96277223EF;
-	Mon, 22 Sep 2025 10:19:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758536387; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RAiuS03SpWwOA2S2gGfiYmmunr9i/aaWyctgd7V3wXs=;
-	b=iYSZLn1JntyqA+I6cogq3wX0qOAwNaCuk9s7EBuBuBpGQZZYbyI3qcq2tcC8kCsz0RwZ0k
-	W5ca5XDxazKW8PKsS65TLZHzw8G9nXUBeCgzPUwh8pi2zcugodnORNmWTXb4XAZG2aK/v7
-	lbpXVXC4dZ8ZRWm7XLlpAE9kRYehKUU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758536387;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RAiuS03SpWwOA2S2gGfiYmmunr9i/aaWyctgd7V3wXs=;
-	b=FPsuUoSaBzFUiW089T9i9Cc3L02cTEg2aWNHzjKD31U+jq5rDqz/9wdVVjO3QR2uHpJKec
-	4qnH7utVocSHMHDw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758536387; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RAiuS03SpWwOA2S2gGfiYmmunr9i/aaWyctgd7V3wXs=;
-	b=iYSZLn1JntyqA+I6cogq3wX0qOAwNaCuk9s7EBuBuBpGQZZYbyI3qcq2tcC8kCsz0RwZ0k
-	W5ca5XDxazKW8PKsS65TLZHzw8G9nXUBeCgzPUwh8pi2zcugodnORNmWTXb4XAZG2aK/v7
-	lbpXVXC4dZ8ZRWm7XLlpAE9kRYehKUU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758536387;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RAiuS03SpWwOA2S2gGfiYmmunr9i/aaWyctgd7V3wXs=;
-	b=FPsuUoSaBzFUiW089T9i9Cc3L02cTEg2aWNHzjKD31U+jq5rDqz/9wdVVjO3QR2uHpJKec
-	4qnH7utVocSHMHDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8359B13A63;
-	Mon, 22 Sep 2025 10:19:47 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 5ZgPIMMi0WhlOgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 22 Sep 2025 10:19:47 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 4A874A07C4; Mon, 22 Sep 2025 12:19:43 +0200 (CEST)
-Date: Mon, 22 Sep 2025 12:19:43 +0200
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
-	Amir Goldstein <amir73il@gmail.com>, Josef Bacik <josef@toxicpanda.com>, 
-	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Anna-Maria Behnsen <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 7/9] net: centralize ns_common initialization
-Message-ID: <yfd2esldmb63p3cv43gbnqy4xsefqfdlbfpoi2sr3crocmptp5@ouvz5orl7zlo>
-References: <20250917-work-namespace-ns_common-v1-0-1b3bda8ef8f2@kernel.org>
- <20250917-work-namespace-ns_common-v1-7-1b3bda8ef8f2@kernel.org>
- <kiyr4pnrw2a2oeoc3lavj73glvdg5llsfz2txfnn56bxmytfgw@o6weansm3iyi>
- <20250919-fanatiker-ethik-7a9bb32ee334@brauner>
+	s=arc-20240116; t=1758536971; c=relaxed/simple;
+	bh=rHeBGeR0CylYwkba3GVbQAq+WpKlshVlcqH3lzrXuFA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Q2houWQ+edWkcKtmXrG5mAlZzQ74thKXfq5V4DyxTJZro1igBBKlkGRcCERvev+LfklzHDicZvF1iG/iNHBzM36mFOIZ2ukqbI4Mczb6SxGjPcCKs8aIJb3zWlsaHezbAdp2fvHWtFkgBCpGYFNJ1+4YkG8SquKOeQZqCSc4lTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cKbzjI03; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4d10f772416so1146711cf.1
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 03:29:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758536968; x=1759141768; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1UwEaQVU7bjQdJmjSl9MEBLY5nQHHDFmN43ne1DeMWs=;
+        b=cKbzjI03ugyQmCShN7fWtjDH6tYZWcSntcIQMwTe+ESMJPjtAUJhHTRiJwS6eeLam3
+         PGA72VVFGQqG8pm7SwgUV8/BpAQUYg192waj3aWRnqxzETs7xiIx7k9JF5gpEiCR9DNo
+         iPRuHLpAyHakv+0VM5oAIeVIwjfGuVaTnXcpDbasvdnMiumuB+LKRBHHpHxn2WusJR5x
+         c2WgOZkU9RV9xUQoy7dOHs868TmHo//aVNlK1w0+ueJ0rAW8Ws6YJBqxZL1TgAyK7CEd
+         eIGbiTDB3u8WDFvVyBofDxAeaUpIPnmx5dxgzbds+H7j31YP+KfP2H3ZSqU/7+7LNY5a
+         Gw+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758536968; x=1759141768;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1UwEaQVU7bjQdJmjSl9MEBLY5nQHHDFmN43ne1DeMWs=;
+        b=EsHicQeMHjX7MYsrhWMK5aH+d+X8eoPDBm/5LvRGE4aJ7gwVw1S4GpFdfMs9hiZvO0
+         12Sj7LMeM+fXJkCUTx+WblqSY3JUZJtv3T5uzHeD3pommhvbaVKtXvZyTsxiQjnBF8c8
+         8DzdVb2MIar8xdnunvNvDUXzXHcqrDWJV8nzOuDUy1GtwgFX3hWHrEuGNP2qdhoUT70h
+         eurx1/NwwQF9VZzNS4JYe9OE5xBtfsgqdrLEDfKjlFb+WDSnh9kSv3h1jmPCFkLmUPM2
+         keb4HtDNYqPrklcyWEI7ajS6o6bRkVTsT1AY+nX+Tb2yG5jYqUi7BDCLpt2rU2T6eJNl
+         AAFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWgFx2VmJgWNRWQiXwAf1S056zyxJtUZfc+eftMLYfa7FToKe1mcF+NmrWkxWhGF1rnnX9tg7E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9o8aQEaIxQv9kAkewwPJPwg27aaBLJ0bMHf0/osKyHX8U4eBD
+	jgYpiX11whX8oWI5/jpIOTyyIi6C+XLx1npVW4KbLURrdAe3qvFfLjrq7Vw1+4gW7tfKy/RgDVY
+	jYWb0S8CXZo1hRwyVOfA3wfq0+tBshZOGeN1tEdlf
+X-Gm-Gg: ASbGncvhn8VcJZNw1ylbklSJE9wVHXHY7+W1DorV7GaHAJPJaZIUTELM4J5YF8GFmOi
+	RjvgM+GQy+0p2NB44qLnZD3hz/16Mk8IRC0e2K1gRC7Nh7WiYLv/xle+3y+flZKH2EM25tYWvKJ
+	5L5FYT8nH11sTy67HmJ+VcPWlFHZsYwZO0Y0GqDKCsxa/HY+BX2eWJwq9sNA5RDfDfIQRzt7uGq
+	BSAv6o=
+X-Google-Smtp-Source: AGHT+IHnLoKvNTbS4QOIKyval0lCysJnLf9BXpwBn194Ex/+BTndUkU+yL6NHeenFDhcYPoT1fOpeYwFBcraF+FKQ2k=
+X-Received: by 2002:ac8:5a0c:0:b0:4cd:ff33:1ce7 with SMTP id
+ d75a77b69052e-4cdff51a4eemr14140281cf.3.1758536967964; Mon, 22 Sep 2025
+ 03:29:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250919-fanatiker-ethik-7a9bb32ee334@brauner>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TAGGED_RCPT(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[suse.cz,vger.kernel.org,gmail.com,toxicpanda.com,kernel.org,yhndnzj.com,in.waw.pl,0pointer.de,cyphar.com,zeniv.linux.org.uk,cmpxchg.org,suse.com,linutronix.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.com:email]
-X-Spam-Flag: NO
-X-Spam-Score: -2.30
+References: <20250921095802.875191-1-edumazet@google.com> <3fbe9533-72e9-4667-9cf4-57dd2acf375c@redhat.com>
+ <CANn89i+RbuL9oknRn8uACRF-MMam=LvO6pVoR7BOUk=f5S6iVA@mail.gmail.com>
+ <CANn89iKcye6Zsij4=jQ2V9ofbCwRB45HPJUdn7YbFQU1TmQVbw@mail.gmail.com> <221b8f60-0644-4744-93dc-a46a68411270@redhat.com>
+In-Reply-To: <221b8f60-0644-4744-93dc-a46a68411270@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 22 Sep 2025 03:29:16 -0700
+X-Gm-Features: AS18NWDkGLkNks_HQVp6xOmirZ4MG7R-LUY5D3CY98_KZFzhIuJ5qjnprZpVABs
+Message-ID: <CANn89i+s3kAc_h0kP=enN4jEp1x0HCLaAX4H+X3P=LBGjzjZTw@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next] udp: remove busylock and add per NUMA queues
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri 19-09-25 10:08:33, Christian Brauner wrote:
-> On Thu, Sep 18, 2025 at 11:42:38AM +0200, Jan Kara wrote:
-> > On Wed 17-09-25 12:28:06, Christian Brauner wrote:
-> > > Centralize ns_common initialization.
-> > > 
-> > > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> > > ---
-> > >  net/core/net_namespace.c | 23 +++--------------------
-> > >  1 file changed, 3 insertions(+), 20 deletions(-)
-> > > 
-> > > diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> > > index a57b3cda8dbc..897f4927df9e 100644
-> > > --- a/net/core/net_namespace.c
-> > > +++ b/net/core/net_namespace.c
-> > > @@ -409,7 +409,7 @@ static __net_init int preinit_net(struct net *net, struct user_namespace *user_n
-> > >  	ns_ops = NULL;
-> > >  #endif
-> > >  
-> > > -	ret = ns_common_init(&net->ns, ns_ops, false);
-> > > +	ret = ns_common_init(&net->ns, ns_ops, true);
-> > >  	if (ret)
-> > >  		return ret;
-> > >  
-> > > @@ -597,6 +597,7 @@ struct net *copy_net_ns(unsigned long flags,
-> > >  		net_passive_dec(net);
-> > >  dec_ucounts:
-> > >  		dec_net_namespaces(ucounts);
-> > > +		ns_free_inum(&net->ns);
-> > 
-> > This looks like a wrong place to put it? dec_ucounts also gets called when we
-> > failed to create 'net' and thus net == NULL. 
-> > 
-> > >  		return ERR_PTR(rv);
-> > >  	}
-> > >  	return net;
-> > > @@ -718,6 +719,7 @@ static void cleanup_net(struct work_struct *work)
-> > >  #endif
-> > >  		put_user_ns(net->user_ns);
-> > >  		net_passive_dec(net);
-> > > +		ns_free_inum(&net->ns);
-> > 
-> > The calling of ns_free_inum() after we've dropped our reference
-> > (net_passive_dec()) looks suspicious. Given how 'net' freeing works I don't
-> > think this can lead to actual UAF issues but it is in my opinion a bad
-> > coding pattern and for no good reason AFAICT.
-> 
-> All good points. I can't say I'm fond of the complexity in this specific
-> instance in general.
+On Mon, Sep 22, 2025 at 2:41=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 9/22/25 11:34 AM, Eric Dumazet wrote:
+> > On Mon, Sep 22, 2025 at 1:47=E2=80=AFAM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> >> On Mon, Sep 22, 2025 at 1:37=E2=80=AFAM Paolo Abeni <pabeni@redhat.com=
+> wrote:
+> >>> On 9/21/25 11:58 AM, Eric Dumazet wrote:
+> >>>> @@ -1718,14 +1699,23 @@ static int udp_rmem_schedule(struct sock *sk=
+, int size)
+> >>>>  int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb=
+)
+> >>>>  {
+> >>>>       struct sk_buff_head *list =3D &sk->sk_receive_queue;
+> >>>> +     struct udp_prod_queue *udp_prod_queue;
+> >>>> +     struct sk_buff *next, *to_drop =3D NULL;
+> >>>> +     struct llist_node *ll_list;
+> >>>>       unsigned int rmem, rcvbuf;
+> >>>> -     spinlock_t *busy =3D NULL;
+> >>>>       int size, err =3D -ENOMEM;
+> >>>> +     int total_size =3D 0;
+> >>>> +     int q_size =3D 0;
+> >>>> +     int nb =3D 0;
+> >>>>
+> >>>>       rmem =3D atomic_read(&sk->sk_rmem_alloc);
+> >>>>       rcvbuf =3D READ_ONCE(sk->sk_rcvbuf);
+> >>>>       size =3D skb->truesize;
+> >>>>
+> >>>> +     udp_prod_queue =3D &udp_sk(sk)->udp_prod_queue[numa_node_id()]=
+;
+> >>>> +
+> >>>> +     rmem +=3D atomic_read(&udp_prod_queue->rmem_alloc);
+> >>>> +
+> >>>>       /* Immediately drop when the receive queue is full.
+> >>>>        * Cast to unsigned int performs the boundary check for INT_MA=
+X.
+> >>>>        */
+> >>>
+> >>> Double checking I'm reading the code correctly... AFAICS the rcvbuf s=
+ize
+> >>> check is now only per NUMA node, that means that each node can now ad=
+d
+> >>> at most sk_rcvbuf bytes to the socket receive queue simultaneously, a=
+m I
+> >>> correct?
+> >>
+> >> This is a transient condition. In my tests with 6 NUMA nodes pushing
+> >> packets very hard,
+> >> I was not able to see a  significant bump of sk_rmem_alloc (over sk_rc=
+vbuf)
+> >>
+> >>
+> >>
+> >>>
+> >>> What if the user-space process never reads the packets (or is very
+> >>> slow)? I'm under the impression the max rcvbuf occupation will be
+> >>> limited only by the memory accounting?!? (and not by sk_rcvbuf)
+> >>
+> >> Well, as soon as sk->sk_rmem_alloc is bigger than sk_rcvbuf, all
+> >> further incoming packets are dropped.
+> >>
+> >> As you said, memory accounting is there.
+> >>
+> >> This could matter if we had thousands of UDP sockets under flood at
+> >> the same time,
+> >> but that would require thousands of cpus and/or NIC rx queues.
+> >>
+> >>
+> >>
+> >>>
+> >>> Side note: I'm wondering if we could avoid the numa queue for connect=
+ed
+> >>> sockets? With early demux, and no nft/bridge in between the path from
+> >>> NIC to socket should be pretty fast and possibly the additional queui=
+ng
+> >>> visible?
+> >>
+> >> I tried this last week and got no difference in performance on my test=
+ machines.
+> >>
+> >> I can retry this and give you precise numbers before sending V4.
+> >
+> > I did my experiment again.
+> >
+> > Very little difference (1 or 2 %, but would need many runs to have a
+> > confirmation)
+> >
+> > Also loopback traffic would be unprotected (Only RSS on a physical NIC
+> > would properly use a single cpu for all packets)
+> >
+> > Looking at the performance profile of the cpus
+>
+> [...]
+>
+> Indeed delta looks in the noise range, thanks for checking.
+>
+> Just in case there is any doubt:
+>
+> Acked-by: Paolo Abeni <pabeni@redhat.com>
 
-Agreed. The changes look good to me now. Feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> 
-> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> index 897f4927df9e..9df236811454 100644
-> --- a/net/core/net_namespace.c
-> +++ b/net/core/net_namespace.c
-> @@ -590,6 +590,7 @@ struct net *copy_net_ns(unsigned long flags,
-> 
->         if (rv < 0) {
->  put_userns:
-> +               ns_free_inum(&net->ns);
->  #ifdef CONFIG_KEYS
->                 key_remove_domain(net->key_domain);
->  #endif
-> @@ -597,7 +598,6 @@ struct net *copy_net_ns(unsigned long flags,
->                 net_passive_dec(net);
->  dec_ucounts:
->                 dec_net_namespaces(ucounts);
-> -               ns_free_inum(&net->ns);
->                 return ERR_PTR(rv);
->         }
->         return net;
-> @@ -713,13 +713,13 @@ static void cleanup_net(struct work_struct *work)
->         /* Finally it is safe to free my network namespace structure */
->         list_for_each_entry_safe(net, tmp, &net_exit_list, exit_list) {
->                 list_del_init(&net->exit_list);
-> +               ns_free_inum(&net->ns);
->                 dec_net_namespaces(net->ucounts);
->  #ifdef CONFIG_KEYS
->                 key_remove_domain(net->key_domain);
->  #endif
->                 put_user_ns(net->user_ns);
->                 net_passive_dec(net);
-> -               ns_free_inum(&net->ns);
->         }
->         WRITE_ONCE(cleanup_net_task, NULL);
->  }
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thanks for the review Paolo, I will include your Acked-by to V4.
 
