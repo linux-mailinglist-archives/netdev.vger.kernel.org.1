@@ -1,164 +1,323 @@
-Return-Path: <netdev+bounces-225570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FD34B9586D
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 12:56:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BD56B95924
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:08:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10E3E189BAD9
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 10:56:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A61734A443E
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:08:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7594B1D63F5;
-	Tue, 23 Sep 2025 10:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C0203218CD;
+	Tue, 23 Sep 2025 11:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gmhrueqC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PfGgsiyW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70396313E16;
-	Tue, 23 Sep 2025 10:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D389322537
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 11:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758624992; cv=none; b=sl/KsgzRLH3+n2+ZWV61jxdnRsMxIZs5VMmtSDZs5FPUm1WViiYQqEFoB1GP/ERv7C2g3YwjKri0TrAAb7dhjlRFosuj5jCxXZHDWgZgRebIu8jwJoVCkR0KaK7AVcZ+hMmDVL1TDTM7kRB7pCmOm582SGXmI0E/uxNUFSVEX0M=
+	t=1758625658; cv=none; b=Q65uO1m3GKl6b4bcJL42wba7uJ/w+IfgM3ssEF3yCjR7pipXpA/yLiYXyr+I3lWW4rNxkrS6NWKje66BPc+OcNurmR1mWr25Qcs7Ndev6B7jplfKaRsvni0+3U1dOUxse1YtoZ3WIT7G77FdP/7sqvtQaiWYmqIpsdQm6bSMPZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758624992; c=relaxed/simple;
-	bh=rZpX1cqpB/ZIey8M6xVk2BFhszygIMBGOCqDy8inSU8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uQQxSQ/vOgzKIJoqxlMBJhuyiHhKljwK7yBt0CBIO7Rs4STCRZ3NgcrXzsm50GGH9/I1eHklXV2Ie+jiKbg4qgfsQCp2XJJwnRWfhiRoit5vRy49Ea65dXqLEVkc4WjKAwFGqhicLlkBjWUugdtZR6RvH1oPExPHtQCQuyB7QbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gmhrueqC; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758624990; x=1790160990;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rZpX1cqpB/ZIey8M6xVk2BFhszygIMBGOCqDy8inSU8=;
-  b=gmhrueqC4N+YxeSUXbXjKTCdBTwlOIGAaPpZyZ4XifrpKAYCrz0nfb2N
-   lSGjLlaPOXSx8UQinPbb9keJa7EpFzHfkx+GwgxzDXPgIYSm9Fuwe3/i1
-   3kGRqZW/D6eiQQWbRfzTVBQdi9JAl4YkSaXybHrGo4ylwbH3afvBNc/mr
-   Xfbvb0xY85LCHGJUDDuMII/0ytv4rWl2J8B3hMBD4/TnLCuHvokX+b82o
-   CIxtCnSTn5Auno/y8EN9GTlUsMCjo+c1zmfqxwHievcXwfggGNkQAdPzj
-   cR7vy/wrfE8jDp/qFvOP8tvNtSuv8Svq2UQjt6N2RH3GtPvfOb/RJZYPR
-   A==;
-X-CSE-ConnectionGUID: AOVrKvbTTj2cnWL/UjJrBg==
-X-CSE-MsgGUID: 52I4GKV4SUeKT5u8SgDDpQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="60118418"
-X-IronPort-AV: E=Sophos;i="6.18,287,1751266800"; 
-   d="scan'208";a="60118418"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 03:56:29 -0700
-X-CSE-ConnectionGUID: d4pNVhNKRqqTzpQ3WvrWqA==
-X-CSE-MsgGUID: dHmrTC5PRU+gRttYCgYMHw==
-X-ExtLoop1: 1
-Received: from lkp-server02.sh.intel.com (HELO 84c55410ccf6) ([10.239.97.151])
-  by fmviesa003.fm.intel.com with ESMTP; 23 Sep 2025 03:56:25 -0700
-Received: from kbuild by 84c55410ccf6 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1v10h5-00032H-2B;
-	Tue, 23 Sep 2025 10:56:23 +0000
-Date: Tue, 23 Sep 2025 18:56:21 +0800
-From: kernel test robot <lkp@intel.com>
-To: Guangshuo Li <lgs201920130244@gmail.com>,
-	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Victoria Milhoan (b42089)" <vicki.milhoan@freescale.com>,
-	Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
-	Dan Douglass <dan.douglass@nxp.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Guangshuo Li <lgs201920130244@gmail.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: caam: Add check for kcalloc() in test_len()
-Message-ID: <202509231807.ZFBBKMM4-lkp@intel.com>
-References: <20250922155322.1825714-1-lgs201920130244@gmail.com>
+	s=arc-20240116; t=1758625658; c=relaxed/simple;
+	bh=UmbTsquAUMinpPwTpCPJxW3SPvEozfbyjpEYZQMalA8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iE5BbaoLZXDiIMF/flHXNu5cL4K6ZcTdDdGaAs6fw8PA8lvjhx7IDLQt3F2kaUKzOGYgK2bU0+emoS+fK6XL9QDk8pvwjoDOke+2kkgppUpxa3JSivTpBXqSAI/YzmchHTF4H2OGaTzaZz2ohMpMGbje96k9VOkI7vPRKCFikDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PfGgsiyW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758625655;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8wzOBhyw0VdH6DHC7wg7R415fxU0fgQEUqv8xb9rt14=;
+	b=PfGgsiyWJHk/cV8K67eNTOIVlP7r3j5pZmHYIM0kd/X2qnuPREU8IHKFl7nHSkMDum5Mw7
+	f6CrRTvzaNErY1/g5BearjBw0CTA2+2i0udndcOsEvDj2HR5h/rW5k2c2JHbODL70XS1RW
+	ejRpZ1AHAUTGto1q/3siWyDq5TtZe6I=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-553-I4ttKHZBOtWCQ9FvfOpjtQ-1; Tue, 23 Sep 2025 07:07:33 -0400
+X-MC-Unique: I4ttKHZBOtWCQ9FvfOpjtQ-1
+X-Mimecast-MFC-AGG-ID: I4ttKHZBOtWCQ9FvfOpjtQ_1758625653
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3ef21d77d2eso4488679f8f.1
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 04:07:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758625653; x=1759230453;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8wzOBhyw0VdH6DHC7wg7R415fxU0fgQEUqv8xb9rt14=;
+        b=YnkKjAW0iHIkQxM8mUm+CcPtNAySTbkfmYEjqGMkpjVHWoWT5aJoCcAwGOIAma81tm
+         quQ5RAIC/Qf/E62fU6NV73vVfqkQKc4FAcobXsk6syxA8SniP36AoFNhx/1vKwS3rAI/
+         Gr3ujXPzQHMSf28ckzt1Q+rjUGSVUbB2z0asLiNJZBfwmjzMv4GSLfe5lWzPMHVunCxm
+         k6Dd7g+kfiS+FaxblDsxdQZu62cM5INASzrX7p9IyUupwy+38Z8zx6dw3r12mwDvf2wg
+         k/xhytPJD9ZQr10bwbb9HbEFGrexJljadjMBTL/9PUZF1EnuuOP+7ql1dMDwPvgbbaWS
+         0dNA==
+X-Forwarded-Encrypted: i=1; AJvYcCUh2nnrZybva/m9X2ACFCurEyMHXqUHOR6QWHPht2IkSZ9QpQHMctXSmfxQiRpp5XLDMrSK9Xg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJbNT+N1G6HOv4DchCbmg7SZuV13ZM0ELQ1RCjjPn426Wxb0ek
+	c3XIK+IIVMGHWaGxKcXjRMZUNGnzsA7S2xO0aHewm6ZE75vr5nwJ4T5n+Bm7KJQGJgtlw+EU9Zb
+	0xYi3wSQv2rux/nJQ9rWXWQkFD5DjzSAi2B0hatR8zlqqaYgbu8MeBdAlAQ==
+X-Gm-Gg: ASbGncvhgx8VAVQzlwVN6321YD7vqogLlZ72HoKu2eP+LES+RWY7uWtfHJSwrHAsTC4
+	S9nBoXj9smwI4UB/FA5crwtxqB2enrUzyn8FNgwxB0Zfj5/Pm+hEOUM6kgtjNI8n8e/GV+P7B5O
+	ks5Fhnt6pGd+u8AvqjtkDa38i7k3YIO8VQBs8l9rB5a5DXxbUIgkj+bz/7eSpX+Us9oUKcVhzZE
+	bBYfF8MunLC3XAg/L5DAwp9BnJup4IKYsuFIxUVo7Chk/l80YTqdJEw1kSai2oVMiGgPaIW9kKh
+	RBFkh5iHHcQ8GsBY/aYDCHGZQSkoebiDQBNcZmSwwBBrsuv1Q1KtB5iDT+JQjDxb3fcw7INyhvp
+	9MYBZFU+hyfmi
+X-Received: by 2002:a05:6000:2512:b0:3ec:ce37:3a6a with SMTP id ffacd0b85a97d-405c59e17a9mr1491812f8f.22.1758625652561;
+        Tue, 23 Sep 2025 04:07:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGiNVrh1Vb4Z2SR9W3OxoavNX4r+DNnG1BTKk7kY4JP8xc64yZnQmJJOmaVmCkqxRBWoAYFjQ==
+X-Received: by 2002:a05:6000:2512:b0:3ec:ce37:3a6a with SMTP id ffacd0b85a97d-405c59e17a9mr1491754f8f.22.1758625652064;
+        Tue, 23 Sep 2025 04:07:32 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ee07407fa3sm23492432f8f.21.2025.09.23.04.07.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Sep 2025 04:07:31 -0700 (PDT)
+Message-ID: <7fa38c12-eece-45ae-87b2-da1445c62134@redhat.com>
+Date: Tue, 23 Sep 2025 13:07:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250922155322.1825714-1-lgs201920130244@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 02/15] net: build socket infrastructure for
+ QUIC protocol
+To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
+ quic@lists.linux.dev
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
+ Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
+ Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
+ Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+ kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
+ Jeff Layton <jlayton@kernel.org>, Benjamin Coddington <bcodding@redhat.com>,
+ Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+ Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
+ Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
+ Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
+ <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Daniel Stenberg <daniel@haxx.se>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <cover.1758234904.git.lucien.xin@gmail.com>
+ <b55a2141a1d5aa31cd57be3d22bb8a5f8d40b7e2.1758234904.git.lucien.xin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <b55a2141a1d5aa31cd57be3d22bb8a5f8d40b7e2.1758234904.git.lucien.xin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Guangshuo,
+On 9/19/25 12:34 AM, Xin Long wrote:
+> This patch lays the groundwork for QUIC socket support in the kernel.
+> It defines the core structures and protocol hooks needed to create
+> QUIC sockets, without implementing any protocol behavior at this stage.
+> 
+> Basic integration is included to allow building the module via
+> CONFIG_IP_QUIC=m.
+> 
+> This provides the scaffolding necessary for adding actual QUIC socket
+> behavior in follow-up patches.
+> 
+> Signed-off-by: Pengtao He <hepengtao@xiaomi.com>
+> Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> ---
+> v3:
+>   - Kconfig: add 'default n' for IP_QUIC (reported by Paolo).
+>   - quic_disconnect(): return -EOPNOTSUPP (suggested by Paolo).
+>   - quic_init/destroy_sock(): drop local_bh_disable/enable() calls (noted
+>     by Paolo).
+>   - sysctl: add alpn_demux option to en/disable ALPN-based demux.
+>   - SNMP: remove SNMP_MIB_SENTINEL, switch to
+>     snmp_get_cpu_field_batch_cnt() to align with latest net-next changes.
+> ---
+>  net/Kconfig         |   1 +
+>  net/Makefile        |   1 +
+>  net/quic/Kconfig    |  36 +++++
+>  net/quic/Makefile   |   8 +
+>  net/quic/protocol.c | 379 ++++++++++++++++++++++++++++++++++++++++++++
+>  net/quic/protocol.h |  56 +++++++
+>  net/quic/socket.c   | 207 ++++++++++++++++++++++++
+>  net/quic/socket.h   |  79 +++++++++
+>  8 files changed, 767 insertions(+)
+>  create mode 100644 net/quic/Kconfig
+>  create mode 100644 net/quic/Makefile
+>  create mode 100644 net/quic/protocol.c
+>  create mode 100644 net/quic/protocol.h
+>  create mode 100644 net/quic/socket.c
+>  create mode 100644 net/quic/socket.h
+> 
+> diff --git a/net/Kconfig b/net/Kconfig
+> index d5865cf19799..1205f5b7cf59 100644
+> --- a/net/Kconfig
+> +++ b/net/Kconfig
+> @@ -249,6 +249,7 @@ source "net/bridge/netfilter/Kconfig"
+>  
+>  endif # if NETFILTER
+>  
+> +source "net/quic/Kconfig"
+>  source "net/sctp/Kconfig"
+>  source "net/rds/Kconfig"
+>  source "net/tipc/Kconfig"
+> diff --git a/net/Makefile b/net/Makefile
+> index aac960c41db6..7c6de28e9aa5 100644
+> --- a/net/Makefile
+> +++ b/net/Makefile
+> @@ -42,6 +42,7 @@ obj-$(CONFIG_PHONET)		+= phonet/
+>  ifneq ($(CONFIG_VLAN_8021Q),)
+>  obj-y				+= 8021q/
+>  endif
+> +obj-$(CONFIG_IP_QUIC)		+= quic/
+>  obj-$(CONFIG_IP_SCTP)		+= sctp/
+>  obj-$(CONFIG_RDS)		+= rds/
+>  obj-$(CONFIG_WIRELESS)		+= wireless/
+> diff --git a/net/quic/Kconfig b/net/quic/Kconfig
+> new file mode 100644
+> index 000000000000..1f10a452b3a1
+> --- /dev/null
+> +++ b/net/quic/Kconfig
+> @@ -0,0 +1,36 @@
+> +# SPDX-License-Identifier: GPL-2.0-or-later
+> +#
+> +# QUIC configuration
+> +#
+> +
+> +menuconfig IP_QUIC
+> +	tristate "QUIC: A UDP-Based Multiplexed and Secure Transport (Experimental)"
+> +	depends on INET
+> +	depends on IPV6
+> +	select CRYPTO
+> +	select CRYPTO_HMAC
+> +	select CRYPTO_HKDF
+> +	select CRYPTO_AES
+> +	select CRYPTO_GCM
+> +	select CRYPTO_CCM
+> +	select CRYPTO_CHACHA20POLY1305
+> +	select NET_UDP_TUNNEL
+> +	default n
+> +	help
+> +	  QUIC: A UDP-Based Multiplexed and Secure Transport
+> +
+> +	  From rfc9000 <https://www.rfc-editor.org/rfc/rfc9000.html>.
+> +
+> +	  QUIC provides applications with flow-controlled streams for structured
+> +	  communication, low-latency connection establishment, and network path
+> +	  migration.  QUIC includes security measures that ensure
+> +	  confidentiality, integrity, and availability in a range of deployment
+> +	  circumstances.  Accompanying documents describe the integration of
+> +	  TLS for key negotiation, loss detection, and an exemplary congestion
+> +	  control algorithm.
+> +
+> +	  To compile this protocol support as a module, choose M here: the
+> +	  module will be called quic. Debug messages are handled by the
+> +	  kernel's dynamic debugging framework.
+> +
+> +	  If in doubt, say N.
+> diff --git a/net/quic/Makefile b/net/quic/Makefile
+> new file mode 100644
+> index 000000000000..020e4dd133d8
+> --- /dev/null
+> +++ b/net/quic/Makefile
+> @@ -0,0 +1,8 @@
+> +# SPDX-License-Identifier: GPL-2.0-or-later
+> +#
+> +# Makefile for QUIC support code.
+> +#
+> +
+> +obj-$(CONFIG_IP_QUIC) += quic.o
+> +
+> +quic-y := protocol.o socket.o
+> diff --git a/net/quic/protocol.c b/net/quic/protocol.c
+> new file mode 100644
+> index 000000000000..f79f43f0c17f
+> --- /dev/null
+> +++ b/net/quic/protocol.c
+> @@ -0,0 +1,379 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/* QUIC kernel implementation
+> + * (C) Copyright Red Hat Corp. 2023
+> + *
+> + * This file is part of the QUIC kernel implementation
+> + *
+> + * Initialization/cleanup for QUIC protocol support.
+> + *
+> + * Written or modified by:
+> + *    Xin Long <lucien.xin@gmail.com>
+> + */
+> +
+> +#include <net/inet_common.h>
+> +#include <linux/proc_fs.h>
+> +#include <net/protocol.h>
+> +#include <net/rps.h>
+> +#include <net/tls.h>
+> +
+> +#include "socket.h"
+> +
+> +static unsigned int quic_net_id __read_mostly;
+> +
+> +struct percpu_counter quic_sockets_allocated;
+> +
+> +long sysctl_quic_mem[3];
+> +int sysctl_quic_rmem[3];
+> +int sysctl_quic_wmem[3];
+> +int sysctl_quic_alpn_demux;
+> +
+> +static int quic_inet_connect(struct socket *sock, struct sockaddr *addr, int addr_len, int flags)
+> +{
+> +	struct sock *sk = sock->sk;
+> +	const struct proto *prot;
+> +
+> +	if (addr_len < (int)sizeof(addr->sa_family))
+> +		return -EINVAL;
+> +
+> +	prot = READ_ONCE(sk->sk_prot);
 
-kernel test robot noticed the following build errors:
+Is the above _ONCE() annotation for ADDRFORM's sake? If so it should not
+be needed (only UDP and TCP sockets are affected).
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on herbert-crypto-2.6/master linus/master v6.17-rc7 next-20250922]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> diff --git a/net/quic/socket.h b/net/quic/socket.h
+> new file mode 100644
+> index 000000000000..ded8eb2e6a9c
+> --- /dev/null
+> +++ b/net/quic/socket.h
+> @@ -0,0 +1,79 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/* QUIC kernel implementation
+> + * (C) Copyright Red Hat Corp. 2023
+> + *
+> + * This file is part of the QUIC kernel implementation
+> + *
+> + * Written or modified by:
+> + *    Xin Long <lucien.xin@gmail.com>
+> + */
+> +
+> +#include <net/udp_tunnel.h>
+> +
+> +#include "protocol.h"
+> +
+> +extern struct proto quic_prot;
+> +extern struct proto quicv6_prot;
+> +
+> +enum quic_state {
+> +	QUIC_SS_CLOSED		= TCP_CLOSE,
+> +	QUIC_SS_LISTENING	= TCP_LISTEN,
+> +	QUIC_SS_ESTABLISHING	= TCP_SYN_RECV,
+> +	QUIC_SS_ESTABLISHED	= TCP_ESTABLISHED,
+> +};
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Guangshuo-Li/crypto-caam-Add-check-for-kcalloc-in-test_len/20250922-235723
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20250922155322.1825714-1-lgs201920130244%40gmail.com
-patch subject: [PATCH v2] crypto: caam: Add check for kcalloc() in test_len()
-config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20250923/202509231807.ZFBBKMM4-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250923/202509231807.ZFBBKMM4-lkp@intel.com/reproduce)
+Any special reason to define protocol-specific states? I guess you could
+re-use the TCP ones, as other protocols already do.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509231807.ZFBBKMM4-lkp@intel.com/
+/P
 
-All errors (new ones prefixed by >>):
-
-   drivers/crypto/caam/caamrng.c: In function 'test_len':
->> drivers/crypto/caam/caamrng.c:186:24: error: 'return' with a value, in function returning void [-Wreturn-mismatch]
-     186 |                 return -ENOMEM;
-         |                        ^
-   drivers/crypto/caam/caamrng.c:176:20: note: declared here
-     176 | static inline void test_len(struct hwrng *rng, size_t len, bool wait)
-         |                    ^~~~~~~~
-
-
-vim +/return +186 drivers/crypto/caam/caamrng.c
-
-   174	
-   175	#ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_TEST
-   176	static inline void test_len(struct hwrng *rng, size_t len, bool wait)
-   177	{
-   178		u8 *buf;
-   179		int read_len;
-   180		struct caam_rng_ctx *ctx = to_caam_rng_ctx(rng);
-   181		struct device *dev = ctx->ctrldev;
-   182	
-   183		buf = kcalloc(CAAM_RNG_MAX_FIFO_STORE_SIZE, sizeof(u8), GFP_KERNEL);
-   184	
-   185		if (!buf) {
- > 186			return -ENOMEM;
-   187		}
-   188		while (len > 0) {
-   189			read_len = rng->read(rng, buf, len, wait);
-   190	
-   191			if (read_len < 0 || (read_len == 0 && wait)) {
-   192				dev_err(dev, "RNG Read FAILED received %d bytes\n",
-   193					read_len);
-   194				kfree(buf);
-   195				return;
-   196			}
-   197	
-   198			print_hex_dump_debug("random bytes@: ",
-   199				DUMP_PREFIX_ADDRESS, 16, 4,
-   200				buf, read_len, 1);
-   201	
-   202			len = len - read_len;
-   203		}
-   204	
-   205		kfree(buf);
-   206	}
-   207	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
