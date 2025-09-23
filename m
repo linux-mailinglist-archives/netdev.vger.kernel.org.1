@@ -1,267 +1,132 @@
-Return-Path: <netdev+bounces-225540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3395DB9545A
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:36:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D10EB95475
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:38:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9BEF1707DC
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:36:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A3B11902318
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A67A631CA6F;
-	Tue, 23 Sep 2025 09:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2517320A1B;
+	Tue, 23 Sep 2025 09:38:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eBoK487u"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="cZcOBnsa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from omta036.useast.a.cloudfilter.net (omta036.useast.a.cloudfilter.net [44.202.169.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE0C3191C4
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 09:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D133191C4
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 09:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758620203; cv=none; b=uz9tJ541Xgdv6TS3VzC7eb/Nwsyj8osFY3DI18TusovkRJ0ihit+sgVtNdP85Oa5pYnilM4cvvptUiAwxcgH2KzoHoAV++5KESb2HXCtm0QbibMxnH9X7S7CAW42+H664tdueCYABDsLu4wPiGtjvDGpwyw97cUnHiJQKebs1JA=
+	t=1758620292; cv=none; b=YJOOQku9phkZQSR7Cto9+jTDNeliXowTAqlnZiKcPBj+JSxKO9+dsUcO/SEwRXVITfkOwvU8s1zT/jupwONXcDO53rAsGXStQwJ41oCXpF5Dxn+t60XXBvn5KaDJ3vSdqtyhW2udjSQAJ9kZCwjdzYHQrGmCA565XeBGzcrguFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758620203; c=relaxed/simple;
-	bh=nv2ke6tn+rwle1SH1fZDsEGZYGu0aTRrE5FX+xqK+Ng=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yf5dY78Ch04j1RcptqoCj4APbFp5gae0mOnd6uQYNX3UrbJpCmVp4PJAPyKEa7wSfbjCAXQ1NOqW7pRL3UK3EXefCvw2wXg/ECrhXrwo2bcyOr6Slbf7vyhAPjez16KFDvGIyrHFA144ExsPMVWk0ThfLskpY44r9ee7KcsXSUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eBoK487u; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-42480cb4127so53856465ab.1
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 02:36:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758620201; x=1759225001; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=07gczeZCoNqWTne4WpSyGRUqszogELTK9eMrM+d5nCE=;
-        b=eBoK487ufHEv5ed/Bzy/+oNYCHQnoWX/5jdiYnZBGr2uu7I/h2AKvb95Q37XgA4OYk
-         XGw9TYo1bAN4kSTf68zxx5/UZMKFU784lHbntNRTB3kmACfLrHPg/hIo5OcpML/iWwao
-         4/QZHeI8CuF6ydth/6BEcgrVz9Hm14rCUC7k91eAxg/v8YMocseX6WLYttNCj6xbfEAI
-         X2EdakSil3v3A+RBmudTCsXzGMiXa+PRr/CK7xB+w1qMm0n/JcxpbBnlk/1kWsySZXBE
-         C5OgADuBwTxRAcV4ta8J/Ph85SejykRpREfuII9dzYvVlHsO21StlERs/bGmJBcvLDye
-         nClQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758620201; x=1759225001;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=07gczeZCoNqWTne4WpSyGRUqszogELTK9eMrM+d5nCE=;
-        b=l7GUvPvPJKXNbSrlf50bFLoz3lyHQNzFcepDTFmWO2mlCKbYly8orffV4myIBMRXBN
-         zmkwNt442mxwlwg5Of73ZIxYCjXG+lA81YQh63s1Rund16FhNPom1sj6fi2IvU5NmAtU
-         LzJ9u3wLHRf1ACbz/zgZGFXSF2xYp5Dy7HorI6F4z/iGlIhDkYPJrGQVhOYAEi0QM9Uj
-         oWK8O4qXg5F9sdVJWt4teZ4/gh8qwj1iI7SGx8sElycV/y47biBk9Qb/8BwutQFhZzSd
-         fOJf35au13W4EySu7SLL1s3LoH6wJuuvv2uR115mfQhupxv5u4HKitWhaoC67OzPrvKq
-         GL9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWuS0AVE8hDmlV026nqFrYTpPVvur/GeHSWFDxYcmkkd+IFo3wvZY03SIJ8b55xG8dWIdXDISk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6hiOxq5gwPAM9yJM+0hjwvVdlRy7hyBEV5BGvN3+khr40dprZ
-	HoZzVChHR7EOxoT6vO/cKXWpkCuQBNcCbyp0oHCKRksgPIhycWt8gdyWUIE1H9iitckZc0tr+Fv
-	K439xaa4kns4CW2g2AYEbcdKUxpZTkdk=
-X-Gm-Gg: ASbGncuPPY0aPo9Ynzaz/CbTnu39q5bA03Xa9TyyboPb30N4wo6oeDbfxXfk+TJtVrG
-	zvocIA80FFyBlV9Ui11lp0xMa7mVsgbfclxJqdbeNH5Dfc0bYi8HiAUHXSK7Uaufyj90cNrNTSx
-	PGmVzCwBU4NXT0UvOIXfqKWbAtBGuOUm4cJfiNNKCbJgFSuQkd6YRW4DrvyuKPH8u89EZbaE0oO
-	GtjbA==
-X-Google-Smtp-Source: AGHT+IG0ztFnUownBdDBZUywkW11itbt3hvmhNXknfo4SY5E9GEOqr5UDXaGVO3b8CjtbXoeLITn8WMo1FbyiKecXUU=
-X-Received: by 2002:a05:6e02:3c8a:b0:418:aefa:bb83 with SMTP id
- e9e14a558f8ab-42581e1722fmr28029285ab.5.1758620200853; Tue, 23 Sep 2025
- 02:36:40 -0700 (PDT)
+	s=arc-20240116; t=1758620292; c=relaxed/simple;
+	bh=ibQFUfWgjlrRh6K0i5rnkYWrfmjyVOaaxdim7ktNBj0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LSiNwVukSGZFyJWttzOlrAKeoN8KwcmR8ZaPRsA09WuBw08bVr4a9r4O4CqoO/0tnMR6ASyLH4qtgo1m9rZ4Dybn6gIYf55XxYJAliPVrZi6OAytR/J99zjGv+1bC4fKwWyScGGGN0QyYH73+waWX1w90mqieQ5aghlDL6dW1ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=cZcOBnsa; arc=none smtp.client-ip=44.202.169.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-5005b.ext.cloudfilter.net ([10.0.29.189])
+	by cmsmtp with ESMTPS
+	id 0xwQvXBeQKXDJ0zTHvAvwC; Tue, 23 Sep 2025 09:38:03 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id 0zTFv2WL2fjrX0zTGvC2gc; Tue, 23 Sep 2025 09:38:02 +0000
+X-Authority-Analysis: v=2.4 cv=ItcecK/g c=1 sm=1 tr=0 ts=68d26a7a
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=YFVba0b8p+FN4MzmaWosng==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=7T7KSl7uo7wA:10
+ a=8Vd6GBVApGGO7YSmZGYA:9 a=QEXdDO2ut3YA:10 a=xYX6OU9JNrHFPr8prv8u:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ZY1494lZCKLAGhYiwMqyD720As0K42qBB8WHh+Ldudk=; b=cZcOBnsa1Ssm9jkMVx+Vf6ZVBb
+	DA8xlpCFryl594CBOIOju0oLqGKOBzBpx0cQ9B0Xz1oXRME7A4p8zYNYhX889Rra5rDMwKPrazyQq
+	ItCZtRbV7nX4ICn2Dy66jhJn49ht4FePiJ39eU7BVxVn3hfSAAiYT1LcRJUS0qpiWP+Ox7+vGy+qK
+	6GoHa+Zz/ovS+rdzzTf9wLil0Sw11jBHZf6nYd7Xz4M2W+q2HgM9MJxtpHkfYF+9bKk+7DLrPWTsD
+	N2L7y4jqQ7HtvGF7pqibxfmkjii+lPTsgvA4ef9wDVcxx4K02fwOFQmNufShHBusxyXTSRs4kDZrq
+	76nqKYRw==;
+Received: from [83.214.156.71] (port=40424 helo=[192.168.1.104])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.98.1)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1v0zTE-00000000QEZ-3hjY;
+	Tue, 23 Sep 2025 04:38:01 -0500
+Message-ID: <c9cd2ebb-ecdb-4ba9-8d54-f01e3cd54929@embeddedor.com>
+Date: Tue, 23 Sep 2025 11:37:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250922152600.2455136-1-maciej.fijalkowski@intel.com>
- <20250922152600.2455136-3-maciej.fijalkowski@intel.com> <aNGL5qS8aIfcSDnD@mini-arch>
- <CAL+tcoDp0k74jJtUo179J7mkcf1KCAPMy+fWh-Mn7oC236n-kQ@mail.gmail.com>
-In-Reply-To: <CAL+tcoDp0k74jJtUo179J7mkcf1KCAPMy+fWh-Mn7oC236n-kQ@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 23 Sep 2025 17:36:04 +0800
-X-Gm-Features: AS18NWDG-AjJmMTzE5WawY-uelapX-3CU9ipRLmQKLZ9nTIBG8k0JR09_V8lFP8
-Message-ID: <CAL+tcoBWtG7VHifO0rXxJqs7OC5Raf-RmhqO5=6AvvHD+NsVgA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 2/3] xsk: remove @first_frag from xsk_build_skb()
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, netdev@vger.kernel.org, 
-	magnus.karlsson@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH][next] tls: Avoid -Wflex-array-member-not-at-end warning
+To: Sabrina Dubroca <sd@queasysnail.net>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <aNFfmBLEoDSBSLJe@kspp> <aNFpZ4zg5WIG6Rl6@krikkit>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <aNFpZ4zg5WIG6Rl6@krikkit>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 83.214.156.71
+X-Source-L: No
+X-Exim-ID: 1v0zTE-00000000QEZ-3hjY
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.1.104]) [83.214.156.71]:40424
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 4
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfEngmJFhYPhDQ923AATVCERHj9n8oT6P+tsN5Wav9KSO3K6MRJlvSxcUM1oRXk223+9LyTgNxFkGWbXlAhBFZ2NiHjo3s1B6jlNDNK6LVsmkCgS5ffD6
+ Yj7GDRlKfYeUfzyZ+mRDObTGXm6qwl/zc14ZrFOz/h1BOupnU9Qz1fRR2q0BWqIa+Z7DXTMNRm2Hp6UEERjLlu9w1eFzTncwvyA=
 
-On Tue, Sep 23, 2025 at 5:25=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Tue, Sep 23, 2025 at 1:48=E2=80=AFAM Stanislav Fomichev <stfomichev@gm=
-ail.com> wrote:
-> >
-> > On 09/22, Maciej Fijalkowski wrote:
-> > > Devices that set IFF_TX_SKB_NO_LINEAR will not execute branch that
-> > > handles metadata, as we set @first_frag only for !IFF_TX_SKB_NO_LINEA=
-R
-> > > code in xsk_build_skb().
-> > >
-> > > Same functionality can be achieved with checking if xsk_get_num_desc(=
-)
-> > > returns 0. To replace current usage of @first_frag with
-> > > XSKCB(skb)->num_descs check, pull out the code from
-> > > xsk_set_destructor_arg() that initializes sk_buff::cb and call it bef=
-ore
-> > > skb_store_bits() in branch that creates skb against first processed
-> > > frag. This so error path has the XSKCB(skb)->num_descs initialized an=
-d
-> > > can free skb in case skb_store_bits() failed.
-> > >
-> > > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> > > ---
-> > >  net/xdp/xsk.c | 20 +++++++++++---------
-> > >  1 file changed, 11 insertions(+), 9 deletions(-)
-> > >
-> > > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > > index 72194f0a3fc0..064238400036 100644
-> > > --- a/net/xdp/xsk.c
-> > > +++ b/net/xdp/xsk.c
-> > > @@ -605,6 +605,13 @@ static u32 xsk_get_num_desc(struct sk_buff *skb)
-> > >       return XSKCB(skb)->num_descs;
-> > >  }
-> > >
-> > > +static void xsk_init_cb(struct sk_buff *skb)
-> > > +{
-> > > +     BUILD_BUG_ON(sizeof(struct xsk_addr_head) > sizeof(skb->cb));
-> > > +     INIT_LIST_HEAD(&XSKCB(skb)->addrs_list);
-> > > +     XSKCB(skb)->num_descs =3D 0;
-> > > +}
-> > > +
-> > >  static void xsk_destruct_skb(struct sk_buff *skb)
-> > >  {
-> > >       struct xsk_tx_metadata_compl *compl =3D &skb_shinfo(skb)->xsk_m=
-eta;
-> > > @@ -620,9 +627,6 @@ static void xsk_destruct_skb(struct sk_buff *skb)
-> > >
-> > >  static void xsk_set_destructor_arg(struct sk_buff *skb, u64 addr)
-> > >  {
-> > > -     BUILD_BUG_ON(sizeof(struct xsk_addr_head) > sizeof(skb->cb));
-> > > -     INIT_LIST_HEAD(&XSKCB(skb)->addrs_list);
-> > > -     XSKCB(skb)->num_descs =3D 0;
-> > >       skb_shinfo(skb)->destructor_arg =3D (void *)(uintptr_t)addr;
-> > >  }
-> > >
-> > > @@ -672,7 +676,7 @@ static struct sk_buff *xsk_build_skb_zerocopy(str=
-uct xdp_sock *xs,
-> > >                       return ERR_PTR(err);
-> > >
-> > >               skb_reserve(skb, hr);
-> > > -
-> > > +             xsk_init_cb(skb);
-> > >               xsk_set_destructor_arg(skb, desc->addr);
-> > >       } else {
-> > >               xsk_addr =3D kmem_cache_zalloc(xsk_tx_generic_cache, GF=
-P_KERNEL);
-> > > @@ -725,7 +729,6 @@ static struct sk_buff *xsk_build_skb(struct xdp_s=
-ock *xs,
-> > >       struct xsk_tx_metadata *meta =3D NULL;
-> > >       struct net_device *dev =3D xs->dev;
-> > >       struct sk_buff *skb =3D xs->skb;
-> > > -     bool first_frag =3D false;
-> > >       int err;
-> > >
-> > >       if (dev->priv_flags & IFF_TX_SKB_NO_LINEAR) {
-> > > @@ -742,8 +745,6 @@ static struct sk_buff *xsk_build_skb(struct xdp_s=
-ock *xs,
-> > >               len =3D desc->len;
-> > >
-> > >               if (!skb) {
-> > > -                     first_frag =3D true;
-> > > -
-> > >                       hr =3D max(NET_SKB_PAD, L1_CACHE_ALIGN(dev->nee=
-ded_headroom));
-> > >                       tr =3D dev->needed_tailroom;
-> > >                       skb =3D sock_alloc_send_skb(&xs->sk, hr + len +=
- tr, 1, &err);
-> > > @@ -752,6 +753,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_s=
-ock *xs,
-> > >
-> > >                       skb_reserve(skb, hr);
-> > >                       skb_put(skb, len);
-> > > +                     xsk_init_cb(skb);
-> > >
-> > >                       err =3D skb_store_bits(skb, 0, buffer, len);
-> > >                       if (unlikely(err))
-> > > @@ -797,7 +799,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_s=
-ock *xs,
-> > >                       list_add_tail(&xsk_addr->addr_node, &XSKCB(skb)=
-->addrs_list);
-> > >               }
-> > >
-> > > -             if (first_frag && desc->options & XDP_TX_METADATA) {
-> > > +             if (!xsk_get_num_desc(skb) && desc->options & XDP_TX_ME=
-TADATA) {
-> > >                       if (unlikely(xs->pool->tx_metadata_len =3D=3D 0=
-)) {
-> > >                               err =3D -EINVAL;
-> > >                               goto free_err;
-> > > @@ -839,7 +841,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_s=
-ock *xs,
-> > >       return skb;
-> > >
-> > >  free_err:
-> > > -     if (first_frag && skb)
-> >
-> > [..]
-> >
-> > > +     if (skb && !xsk_get_num_desc(skb))
-> > >               kfree_skb(skb);
-> > >
-> > >       if (err =3D=3D -EOVERFLOW) {
-> >
-> > For IFF_TX_SKB_NO_LINEAR case, the 'goto free_err' is super confusing.
-> > xsk_build_skb_zerocopy either returns skb or an IS_ERR. Can we
-> > add a separate label to jump directly to 'if err =3D=3D -EOVERFLOW' for
-> > the IFF_TX_SKB_NO_LINEAR case?
-> >
-> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > index 72e34bd2d925..f56182c61c99 100644
-> > --- a/net/xdp/xsk.c
-> > +++ b/net/xdp/xsk.c
-> > @@ -732,7 +732,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_soc=
-k *xs,
-> >                 skb =3D xsk_build_skb_zerocopy(xs, desc);
-> >                 if (IS_ERR(skb)) {
-> >                         err =3D PTR_ERR(skb);
-> > -                       goto free_err;
-> > +                       goto out;
-> >                 }
-> >         } else {
-> >                 u32 hr, tr, len;
-> > @@ -842,6 +842,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_soc=
-k *xs,
-> >         if (first_frag && skb)
-> >                 kfree_skb(skb);
-> >
-> > +out:
-> >         if (err =3D=3D -EOVERFLOW) {
-> >                 /* Drop the packet */
-> >                 xsk_inc_num_desc(xs->skb);
-> >
-> > After that, it seems we can look at skb_shinfo(skb)->nr_frags? Instead
-> > of adding new xsk_init_cb, seems more robust?
->
-> +1. It would be simpler.
->
-> And I think this patch should be a standalone one because it actually
-> supports the missing feature for the VM scenario.
 
-Reading the commit message one more time, previously I wrongly
-considered the original goal you wanted to achieve was to support the
-VM case. So please ignore my previous suggestion since it's a simple
-cleanup.
 
-Thanks,
-Jason
+On 9/22/25 17:21, Sabrina Dubroca wrote:
+> 2025-09-22, 16:39:20 +0200, Gustavo A. R. Silva wrote:
+>> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+>> getting ready to enable it, globally.
+>>
+>> Use the new TRAILING_OVERLAP() helper to fix the following warning:
+>>
+>> net/tls/tls.h:131:29: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+>>
+>> This helper creates a union between a flexible-array member (FAM)
+>> and a set of members that would otherwise follow it. This overlays
+>> the trailing members onto the FAM while preserving the original
+>> memory layout.
+> 
+> Do we need to keep aead_req_ctx in tls_rec? It doesn't seem to be
+> used, and I don't see it ever being used since it was introduced in
+> commit a42055e8d2c3 ("net/tls: Add support for async encryption of
+> records for performance").
 
->
-> Thanks,
-> Jason
+If this (flex array) is not going to be needed in the future, I'm
+happy to remove it. :)
+
+Thanks
+-Gustavo
 
