@@ -1,127 +1,134 @@
-Return-Path: <netdev+bounces-225725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8ACFB9789E
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 22:57:11 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A604B97917
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 23:27:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E847D1B21978
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 20:57:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 09F7A4E117E
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 21:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8F2B28134F;
-	Tue, 23 Sep 2025 20:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7D7D30C605;
+	Tue, 23 Sep 2025 21:26:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NA/yMDQp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bPqx9QOL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177D930ACF7
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 20:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C8FA265CBD
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 21:26:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758661027; cv=none; b=bT5pl19+Tq63X3Q43GsFLLcvmWT8q9QoGDrDv1fP3yIAxP5oznpprJZvM51AZc5WOAKKjfYHxJqOsaJlTAfeH1bKYsMhzye49/Gu5/13j1//5V7cx1fNBZQkcDiznQ4CJhyucVDqMPG8YJkSZ3irw2StZ/oHayVzR3k3wkTzG90=
+	t=1758662814; cv=none; b=GVB4dXmjc5gcJbPyin3EIl2k+7r1vwo3bp+wXJgzOAjZQ2NQNTcHOV5cJWx7DKjQWDcoX8bp8KJHyZA6uZtIxJa/xn6pN6J1jwTJu38YK4BEpIpvBxtiFFDZ/1yENhxVCVqCvgTUAdj+IT5PR7fFmqaEoLkpQ4fJDQRNDemR/AU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758661027; c=relaxed/simple;
-	bh=DUltzVLRltYGAvTt76bjQkWcoea8gDK9MIF1iaSQ0Ds=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TNHE5MqsfFOiwmLCXIvQq8umXbWAjv+bVNlsqeGeXf1+ukmjk63iE39nZbZlbYztW43QoqiNkiVWDTiWSQVmcWyb436S7kCTWxpY3k5pFuPLrfeOfYT+jE5T+/i9Sb6pVXpHGo6DoN+PdvMT31HdhyIPHRVKFIdiBLmqPSg/uHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NA/yMDQp; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758661026; x=1790197026;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=DUltzVLRltYGAvTt76bjQkWcoea8gDK9MIF1iaSQ0Ds=;
-  b=NA/yMDQpfcn2DupEJ07ta4VH/OXDPEgh2V0FKabyPOpqquTgPuC4fQ/M
-   RLbcqNIejZKV8pdfaHwyOl4jj4DLm6ZtUm77Cc0wSumaFtGMDuJxyP04y
-   E1nV7E7TD3KqvE63MThzjUdlZLkNUFo9pM6qJ1TrR/iv7LMJ7R/Az+eyU
-   zUaM9T50iQzi3d8XtJu0iWO30sJydq21QRPphZC/dsOholUaVCXWYQ6PX
-   5oa623ty2fI4P0lsBuwIyoRI/1dBY2RlaxtIojZChulO98laRCl6pRsJw
-   ZC2sXghpMQH1+dTgYZ2Ad6yTSUlZQiGDIRl0GQ9VQH4XsrK3YBJExRUgT
-   w==;
-X-CSE-ConnectionGUID: oKVfE+2ZREyq5TsN04pgng==
-X-CSE-MsgGUID: OYaY9+CUQCecgW//Jh2ELQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="60654909"
-X-IronPort-AV: E=Sophos;i="6.18,289,1751266800"; 
-   d="scan'208";a="60654909"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 13:57:05 -0700
-X-CSE-ConnectionGUID: 6J0jhgjrS1OKOzI4hggwyA==
-X-CSE-MsgGUID: elKy0kj1TbSMvbb2VpsAaQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,289,1751266800"; 
-   d="scan'208";a="176459496"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa007.fm.intel.com with ESMTP; 23 Sep 2025 13:57:04 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
-	anthony.l.nguyen@intel.com,
-	michal.swiatkowski@linux.intel.com,
-	aleksander.lobakin@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH net] libie: fix string names for AQ error codes
-Date: Tue, 23 Sep 2025 13:56:56 -0700
-Message-ID: <20250923205657.846759-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1758662814; c=relaxed/simple;
+	bh=98TTorsAAC5opB5uJTgkfC0e3/EFtVZUCwE9L5IqI5I=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=eYBIH28JuM65fqgii3/GieA4KOt4cVpC+cSpPwb1p+uPEJqK4ihIPA4Ko+fYdVDr3OdhdR7PFf2wCHImy9jsdqYtGR5B7XloP6LWTCITTeVikOenr84Vm+//IprXKQxzcOc6WR1olfkE5UZchHVym+kw+BoXi8S9mh1UariKXqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bPqx9QOL; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-80b7a6b2b47so547741685a.0
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 14:26:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758662812; x=1759267612; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TzM+YAdlSU/VZW+2Cq6jx12e0U5MbjPEMSsvWJfPo/o=;
+        b=bPqx9QOLaXpHPp/Dh+Cr2IIHQwxDWy9cz3qqhQrTNIVFgpCdukzDGxr0xsWJD9LzHY
+         Sj0yoM0n5gO/MCCI5P7407/MK48qklBQA/b7cQ2mRmKJG7hQwLArXF+jv4PHGVkyFQ7M
+         kQJMwJLxoiJF1aKRKcgsobGMN0G6YZpviIdCTh0H6rwwETnOnJwS3tIXUbWn7BEj9GBY
+         SavlvAPJxqN0G+ms0g4Wx602Df0noXwF+9JYRLe3/otPKrA6/SpyB0f6T5sZsyBkRBi0
+         Ajssx+uiwYP0VOwYmTtYHN9XH+DyNithD9uXF8vhmF/GYxZeRjz6/zrKoBdAxZD0W7ep
+         sF7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758662812; x=1759267612;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=TzM+YAdlSU/VZW+2Cq6jx12e0U5MbjPEMSsvWJfPo/o=;
+        b=YAJKLcNqfApQKRNKDiuuLVb0xvuYqjPZsTTfLHewbS++p2gT6Oq1r93A2tj2yt246H
+         LR7KAxz8S/Svt1IZb5mAXT8IL3RU01ivGyBDJ0dJ8k5qFHJvOQw7Q3jpKcV0HBxSQ9Xg
+         6mWtXmvkJGe0ZVnic2tdkG02eiub6Y0vPpaAyJEvgSf/uy9aMimUnKEl8uz9Ietu/4uo
+         wE+wFCMzb5Ndm5LOvgBPROLX44N0xOLw3SMVzFCIQAcD4fFqECE5lBmVtwqbrfY2ZAM7
+         d1zD6jRilseB/zOs36AmOilMiBB19YPQouBmCl9UlNpCohZlrS1WrKHIo5R5JXe/ZQVy
+         lj6g==
+X-Forwarded-Encrypted: i=1; AJvYcCXnm/VeKUKuZM79I55NzF1h5QR8pQl6CLiPmZne5mXZ6+3dDQqpQw/8PfJnG+YeqzVwoCRnEl4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFLXijpz/TMBjk2Db/G2ME80RdjfoVzip2MDYKcRJEfLB7dEZm
+	lBW8jTai0hosXLqryevJe2MgS2fQSSv0QrLVUdVZV6jUUzzREdWgsfnz5DG3Bw==
+X-Gm-Gg: ASbGnctJbB+gutMG8faLKpT0x5wYZlm+Ja7axo2GklPCX3UMP+ixexibvPaMQydoRCK
+	qlE2WkUkQvzb9geSZ+sL1yMLpfmAfTpFkHdGSiT4Yd4HNiT7hKZybpZl+B0b3WuY+wdFtl87Ntr
+	6NxgNarRk2mJnMgp+kWrXWm4Z26vASCF1B7NcTPLfKi5kMmYEVXqAjs8cUKD3zUMUT7sjCL0rBy
+	ZpZro39NnD7KWBeBdlbuZbCNe138Ozb+mw7MxRERY6W8r4WrwZOZEvNn2xiNZi936XcdtBFeYvv
+	kiZSd7stvDb17sLkMxg3RkHCMEVQevGFxQ4xz3hnEiRQkETQ3tak6jqPz7ozgcs+yFmfdYEqe24
+	Y6A0vIq0S/lZWDGUSAT9FpKA4FqOuYkycCn2XL61t69F4zqNtW64gk9V25xbdDHk6+k4PQg==
+X-Google-Smtp-Source: AGHT+IH8atUv4YKSIxfZVb6zK7i1Ycf2XPhQsuhnYzuHVn6FuO+wM4OiWHH3TWoKcLdGgcHi4O5NpA==
+X-Received: by 2002:a05:620a:1a8d:b0:83b:d570:acba with SMTP id af79cd13be357-8516aa0ddcamr431669185a.29.1758662812136;
+        Tue, 23 Sep 2025 14:26:52 -0700 (PDT)
+Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-83630481f38sm1039458585a.39.2025.09.23.14.26.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 14:26:51 -0700 (PDT)
+Date: Tue, 23 Sep 2025 17:26:50 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com, 
+ ecree.xilinx@gmail.com, 
+ willemdebruijn.kernel@gmail.com
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ horms@kernel.org, 
+ corbet@lwn.net, 
+ saeedm@nvidia.com, 
+ tariqt@nvidia.com, 
+ mbloch@nvidia.com, 
+ leon@kernel.org, 
+ dsahern@kernel.org, 
+ ncardwell@google.com, 
+ kuniyu@google.com, 
+ shuah@kernel.org, 
+ sdf@fomichev.me, 
+ aleksander.lobakin@intel.com, 
+ florian.fainelli@broadcom.com, 
+ alexander.duyck@gmail.com, 
+ linux-kernel@vger.kernel.org, 
+ linux-net-drivers@amd.com, 
+ Richard Gobert <richardbgobert@gmail.com>
+Message-ID: <willemdebruijn.kernel.2d533675f308@gmail.com>
+In-Reply-To: <20250923085908.4687-4-richardbgobert@gmail.com>
+References: <20250923085908.4687-1-richardbgobert@gmail.com>
+ <20250923085908.4687-4-richardbgobert@gmail.com>
+Subject: Re: [PATCH net-next v8 3/5] net: gso: restore ids of outer ip headers
+ correctly
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+Richard Gobert wrote:
+> Currently, NETIF_F_TSO_MANGLEID indicates that the inner-most ID can
+> be mangled. Outer IDs can always be mangled.
+> 
+> Make GSO preserve outer IDs by default, with NETIF_F_TSO_MANGLEID allowing
+> both inner and outer IDs to be mangled.
+> 
+> This commit also modifies a few drivers that use SKB_GSO_FIXEDID directly.
+> 
+> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+> Reviewed-by: Edward Cree <ecree.xilinx@gmail.com> # for sfc
 
-The LIBIE_AQ_STR macro() introduced by commit 5feaa7a07b85 ("libie: add
-adminq helper for converting err to str") is used in order to generate
-strings for printing human readable error codes. Its definition is missing
-the separating underscore ('_') character which makes the resulting strings
-difficult to read. Additionally, the string won't match the source code,
-preventing search tools from working properly.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-Add the missing underscore character, fixing the error string names.
-
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Fixes: 5feaa7a07b85 ("libie: add adminq helper for converting err to str")
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
-I found this recently while reviewing the libie code. I believe this
-warrants a net fix because it is both simple, and because users may attempt
-to pass printed error codes into search tools like grep, and will be unable
-to locate the error values without manually adding the missing '_'.
-
- drivers/net/ethernet/intel/libie/adminq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/libie/adminq.c b/drivers/net/ethernet/intel/libie/adminq.c
-index 55356548e3f0..7b4ff479e7e5 100644
---- a/drivers/net/ethernet/intel/libie/adminq.c
-+++ b/drivers/net/ethernet/intel/libie/adminq.c
-@@ -6,7 +6,7 @@
- 
- static const char * const libie_aq_str_arr[] = {
- #define LIBIE_AQ_STR(x)					\
--	[LIBIE_AQ_RC_##x]	= "LIBIE_AQ_RC" #x
-+	[LIBIE_AQ_RC_##x]	= "LIBIE_AQ_RC_" #x
- 	LIBIE_AQ_STR(OK),
- 	LIBIE_AQ_STR(EPERM),
- 	LIBIE_AQ_STR(ENOENT),
--- 
-2.47.1
-
+Thanks for added the pointer to segmentation-offloads.rst.
 
