@@ -1,104 +1,84 @@
-Return-Path: <netdev+bounces-225447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5505EB93AAD
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 02:12:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79D59B93AB6
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 02:16:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D36B18953EC
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 00:13:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 346DD44248B
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 00:16:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 917D22746A;
-	Tue, 23 Sep 2025 00:12:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1D262BD11;
+	Tue, 23 Sep 2025 00:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0Cw+UJGd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EaZ0zq87"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A9B290F
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 00:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9F254C92;
+	Tue, 23 Sep 2025 00:16:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758586361; cv=none; b=DzHZYs+JUv4nsHi9CHyMtgs+fxFKBBq7K9fMoBzVMBWA+MT5QPtIgWYen2Ubi5cUXuax7RGG+6miZ9PNkreRXA7e1QtkZuCe4NiYsT7pUye9Hwuvjzh2PbgMvldOSPiYgbplvmYVxvfooYL4fu8c09l0qXMhsiGl9Ex6UizI5Jc=
+	t=1758586589; cv=none; b=DKQO9ODkuoDByANOVANmIOOccOtlEKR+eLOrIN1jQKfM4PJ3ZKU9c0dTYuC0twZ0AsrhIO6DTnaHmdJ4CMlsFy50WV5t0PJS4SLOk8aGenGQkTYI5aQgXPbTLS/Mjdg6/lRUOrNJ6rS+f5wugBJs4YNjHgVlw3vdLb2mOuyjNlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758586361; c=relaxed/simple;
-	bh=FvpPF4ns4VJH1Trs01S7V3rq/0hsf4WM739gAeGBeSs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BWbJECljO9Xcm5eNEuVXoVOkSaU9IZgVzOttFEbGe8JmpImaHGW7FM1ry8ffcL4j+qLyBcGvxbYWIEHH+5kNWa1GqgQ52cJRoSHwKM2SCehszeKeBB2XRYxYr0+SC0sI47UjG0roqJWzDuBJJ0fPjbjkjGy2bTqlxb4S7u15JhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0Cw+UJGd; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-330469eb750so5648503a91.2
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 17:12:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758586359; x=1759191159; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FvpPF4ns4VJH1Trs01S7V3rq/0hsf4WM739gAeGBeSs=;
-        b=0Cw+UJGdxsQ2UlZtHDdSglz7eiWrIsDM8X49fhm4/dXeg1+nxYycZqIqC9odPQiOex
-         a1ieAfO3Pa/cWs/i7PiEMwjIOP+JqyM36sFKBv8Bjcg08j0pw5agRcpNTsnjXpqyrt9y
-         JXP4zJXLBnh4LmwE75Siup4y/rDKFcFt2NdbAA9X8hr6bmapieoClYUtIdNTkp920JFJ
-         AYPO+9K5FPpZEG9oOLqO1nGEIyz4mcb9QzO5GNqfINlIEOIg9y1RDCZOBM0D8elNK2fz
-         krchFesEK/iav40yYWz+B2Pdwb3m/njZl9MHyZ9pF8Up5P1U0VUfEOSi0bs8IeQe8q7/
-         5AwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758586359; x=1759191159;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FvpPF4ns4VJH1Trs01S7V3rq/0hsf4WM739gAeGBeSs=;
-        b=Gc3lwsVrwabK9WSKWfRpRen/CMQXLRtgdiXhkaKCoIMk21rk8HXNSPQtAdwdBojTdQ
-         dY0ihhAPHZ/59oE1omwiBoT0DPMwvBT1wGkDLVSkssK/jskB0nLHrzp2SY88T5aZQGor
-         4WQl/KYNgLyn09qloz+k92+LTNIM+N5ODxNjny8QJhvK1droH1lmqh0YD9DL07nscR6J
-         Asj3ZsIdj1WqI3SuKdZIX5rxdz6ZVG73GDvxXXv2XZeWwRBePytnb5Csr3gLQvIoN+Wd
-         0ph7xdOgphmlr00IQd+IbX4yWDBbjbkFuIscN1JYpdChHiOaAP7lt8MIEkjAzaqqNhUL
-         Ukhw==
-X-Forwarded-Encrypted: i=1; AJvYcCUG3KJQ4stEjsWvjRDJGSC9ZYZdBTiHHGgFCrVjs4riCYA16VOFRG9lIVsjD2h+u1WMRxmq00g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGELOqbqtD19eDu2xAf02LnXbqon1kHoZlPBZG++/+YHFTR+g0
-	cVR/QW2P4FscHHIdO4oPZ8nbnjuRpXPv4SfZeFtswz1Ei4shnu1L6rAX+0diYR2E2nlSjEzTZbk
-	mqIDUHLJizwLD/jzS1v7jp+daTpecb0u1weglVR/t
-X-Gm-Gg: ASbGncuthQtdvDr0hajEzJtJroe+ZDukR/SiyAN59zuKghCYn53WdnDH1EVdDval9wU
-	zSjrY0yVdJZRVQ2M1XVJoquimGKKaO/rF1Kk8u7VuDh1BIi076OqiElMlBFWh4H0GD/avYUNKxi
-	fugAbbHKpBpRAR8ZK2QoDDbZyaLOiUbzXXpf9fxry+3NXuLdkSlZGdiwM1BNpXkJiEVe4/Iumq8
-	A/8VcIGwfFRpvgtbf78OS2883KN5eSPJEprfg==
-X-Google-Smtp-Source: AGHT+IHc2d9YlHilSBzZLIFuyYhWhddHF/VqA98McZQiGth7+g3gdo7PBHqxf02Y/GwFS/nmVasXtoEyKnJd7uMfGAk=
-X-Received: by 2002:a17:90a:d604:b0:32e:4849:78b with SMTP id
- 98e67ed59e1d1-332a95369afmr896211a91.16.1758586359129; Mon, 22 Sep 2025
- 17:12:39 -0700 (PDT)
+	s=arc-20240116; t=1758586589; c=relaxed/simple;
+	bh=7r23lcbt/GB6hHbqcsy6E8TKdYTvlkPbo1bHULJIOQA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=O32c7f4NNAG1qzKgPxtEomzfrfa7xh9j6t2PAxwGM4LcJOLsz1QSHOMYecTJ/6eRjVy35xEhMlnkvD6aGReqJtjRdkeGIC5s/9VT4dG4ocYq3QxKrtqzocmf0WuBJkjVCpQKMsOv5odZ/s+aS0UY8EURl3xXZpZRV3+MWsB/d5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EaZ0zq87; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4A5CC4CEF0;
+	Tue, 23 Sep 2025 00:16:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758586588;
+	bh=7r23lcbt/GB6hHbqcsy6E8TKdYTvlkPbo1bHULJIOQA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EaZ0zq874+HFB7Q/IX4aCZRq/xRyUAxWmff6Anu0ba1vvJ2w9PXGRsHZDkvIlcHOO
+	 5lBODz1iCcIwitu7IW1trlgJXIS7Mv/2TwmOox8btqxUd7UFiQSE4c09hwUL9uaYog
+	 Lzt2xXe9w5Fy0PWs5CfUut+D753+3Sz7YeWZOcEfB5JyJJtXZDSkcsipn4dn7sTr/Z
+	 VI04AZKXZQpTSQQvZYGITJYoZDLZ1MgnA9fQ8SUOg+1RYGVsdOxidYIzwxTB1NBL5j
+	 FzyZi8rkew/yLRN7zxi6Wn9e5c9l0WXLFCJt04CJux8m1SpoILNpnEg6VKi/uZU9M5
+	 dAz7cnhZcBuuA==
+Date: Mon, 22 Sep 2025 17:16:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-can@vger.kernel.org,
+ kernel@pengutronix.de, Stefan =?UTF-8?B?TcOkdGpl?= <stefan.maetje@esd.eu>
+Subject: Re: [PATCH net 08/10] can: esd_usb: Fix not detecting version reply
+ in probe routine
+Message-ID: <20250922171626.2ebb1e30@kernel.org>
+In-Reply-To: <20250922100913.392916-9-mkl@pengutronix.de>
+References: <20250922100913.392916-1-mkl@pengutronix.de>
+	<20250922100913.392916-9-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250919204856.2977245-1-edumazet@google.com> <20250919204856.2977245-9-edumazet@google.com>
-In-Reply-To: <20250919204856.2977245-9-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 22 Sep 2025 17:12:28 -0700
-X-Gm-Features: AS18NWCC-86Oqz13GnBJ7CcZh0rwlC2InqnkkRHrh7SsjPVLADrySwFkr1cYS_4
-Message-ID: <CAAVpQUDzuzTXBKCuy4pCuCpnk26cAT4zQXB1_uCeD6b8e=vT2g@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 8/8] tcp: reclaim 8 bytes in struct request_sock_queue
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Sep 19, 2025 at 1:49=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> synflood_warned had to be u32 for xchg(), but ensuring
-> atomicity is not really needed.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On Mon, 22 Sep 2025 12:07:38 +0200 Marc Kleine-Budde wrote:
+> +	do {
+> +		int actual_length;
+> +		int pos;
+> +
+> +		err = usb_bulk_msg(dev->udev,
+> +				   usb_rcvbulkpipe(dev->udev, 1),
+> +				   rx_buf,
+> +				   ESD_USB_RX_BUFFER_SIZE,
+> +				   &actual_length,
+> +				   ESD_USB_DRAIN_TIMEOUT_MS);
+> +		dev_dbg(&dev->udev->dev, "AT %d, LEN %d, ERR %d\n", attempt, actual_length, err);
+> +		++attempt;
+> +		if (err)
+> +			goto bail;
+> +		if (actual_length == 0)
+> +			continue;
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-
-Thanks!
+continue in do-while loops doesn't check the condition.
+This looks like a potential infinite loop?
 
