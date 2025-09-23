@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-225582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 024E4B95A60
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:26:57 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DC60B95A5D
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:26:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F96218A7852
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:27:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3F2084E2D06
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:26:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD056321F35;
-	Tue, 23 Sep 2025 11:26:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86D9145B3F;
+	Tue, 23 Sep 2025 11:26:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0iFrA0cK"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wvvoM4eu"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EDEF145B3F
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 11:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B778321F31
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 11:26:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758626794; cv=none; b=e8oIUIRTQhMpbf8ImMRKwtWjypqizEc8m34wl8dzV8IgNbJE+mUQYfpdgOy1Iwp7tT+RmhWWg07gZtUYnjegF33jzoTmEPvIVKme9uh+6WYvJ43LJWOdfkZmneTdLHjq+7VlQElwcjW8/uyZ7bb13lZ8EqA8CXwpskFvMfXBTqk=
+	t=1758626799; cv=none; b=KEzyDS5zOt2lUfuBaKkFmThjQoc7+48styl3ze+TZvKYiUxnryYGymgPy3RNP9yO1ulvekRP91Hv/SwAEoRE4xOQmv4tl88vJVcdBy79+T45VaS8onfYAkOrDLYDImD5GkEzb7ZyzDboIbwzyA82OjSX6NR6OVAMr8ABfzMpk6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758626794; c=relaxed/simple;
-	bh=VZUJDNi4ZxBcPjCcDPly3MXDSjrr55q5KUGGiNo+Mtw=;
+	s=arc-20240116; t=1758626799; c=relaxed/simple;
+	bh=U0vHf2j5EEQQF47ggQL/jOeVOq1G4esMf7qdocNs178=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=nwnG9hLocUcWT7v6eHnKlWxTsK91IAnBKkfyPFIUjOHYmapBMb7wAKQJkcYgdmUzJvP+Xx2/B+nNAmoS0Uajp4yMh2UeBxpYZ5Mq+ht0M7Ri69ct/GDAmxE2SUZkwOERM5Gf3ovNsJyYsivQBTl7KoU6FC8lcoVH2t7330lMYNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0iFrA0cK; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=bRWFJ/G+gCe9x2JYM52a04/AFbFh9KXiJembavXVX0qO4DyofiUlMcbO1B+guuCzENepljeXyD3tebHD4zEqbVtckQuph/RNAsPGYvbFBvw4wehBHstaJWCcIIWm6+1l8Dwy7I9xdPfNcWqyxlRQpNVHISl1utEGLQEvP83iBLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wvvoM4eu; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,22 +37,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=iMApgIyGL71JhjcL22dLhUAJuwZE2xcyZ4Sw+gpguC0=; b=0iFrA0cKwsRt1uEBWCM/LVTfp2
-	2Y1HbFYhaxFUu5+A4cmGSIL+e/pWhYr+qKSaCb1W3xGfqZzCBuc4F+bvtDgQwh6p51myo8bIHBxsm
-	2cuzyw99Xk2ASeXdPUB5nxmzfwC+Px27/QITgoQtK5bbhL89W9mnAuhsBTlvTDrmF8tJwqphshmQl
-	erfAYw3KwJJ0q5tkHAo+IhaGWmarj8gL1oKqs6QORVW2HaEYBYkpjTjzguq/GCIjTOSAmWD5szATv
-	bVPNpvFmxR/j3v+XlafggW3z3nsZkUlOQVbaZ/rN8uJF3eHMA21Vpyr6UPrhog98gAob8TOjzv4HD
-	WHg0oW5w==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:39566 helo=rmk-PC.armlinux.org.uk)
+	bh=q24K7de5jaqh0rHllgz2My1TxD+1mvaZiPDKkSvAA3Q=; b=wvvoM4eue0TfQLiDWTqBwk1u4u
+	AsxrfAUxyL7D6hjK6sPr6Geqd2HnXq+KNGvlv1HLDZxk3OgvpFN7fZ/LWRINV+3T4+xru0eBdC2lT
+	ugsvxuDIsfBYn+hLyY1Lpi31onpgDakqrHKKZsRUv4TOz+thtDHi5psMT1uFTew16u1XdXQHzV8TB
+	qOtKTopPDI39RhjAk8o7NwFpjWdnQCkcF8/8trnhh/looSHN5cyhm+zQsl8Wyqh1lTPovM1v+Rayi
+	sRLv+EL9+lW1UVqIlZIbX5QjeaAQRyKKsZ6LCgSu/Jgov2mt/Ugaqx28qDO8VLjRwL6p0AykjbtBP
+	plq2/Oig==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:39568 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1v11A5-0000000079F-2j99;
-	Tue, 23 Sep 2025 12:26:21 +0100
+	id 1v11AB-0000000079Z-0c1x;
+	Tue, 23 Sep 2025 12:26:27 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1v11A3-0000000774G-3PKY;
-	Tue, 23 Sep 2025 12:26:19 +0100
+	id 1v11A8-0000000774M-3pmH;
+	Tue, 23 Sep 2025 12:26:24 +0100
 In-Reply-To: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
 References: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -68,8 +68,7 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 5/6] net: stmmac: move PHY handling out of
- __stmmac_open()/release()
+Subject: [PATCH net-next 6/6] net: stmmac: simplify stmmac_init_phy()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,95 +78,72 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1v11A3-0000000774G-3PKY@rmk-PC.armlinux.org.uk>
+Message-Id: <E1v11A8-0000000774M-3pmH@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 23 Sep 2025 12:26:19 +0100
+Date: Tue, 23 Sep 2025 12:26:24 +0100
 
-Move the PHY attachment/detachment from the network driver out of
-__stmmac_open() and __stmmac_release() into stmmac_open() and
-stmmac_release() where these actions will only happen when the
-interface is administratively brought up or down. It does not make
-sense to detach and re-attach the PHY during a change of MTU.
+If we fail to attach a PHY, there is no point trying to configure WoL
+settings. Exit the function after printing the "cannot attach to PHY"
+error, and remove the now unnecessary code indentation for configuring
+the LPI timer in phylink. Since we know that "ret" must be zero at this
+point, change the final return to use a constant rather than "ret".
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 29 +++++++++++--------
- 1 file changed, 17 insertions(+), 12 deletions(-)
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 25 +++++++++----------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 4acd180d2da8..4844d563e291 100644
+index 4844d563e291..be064f240895 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -3937,10 +3937,6 @@ static int __stmmac_open(struct net_device *dev,
- 	u32 chan;
+@@ -1115,6 +1115,7 @@ static int stmmac_init_phy(struct net_device *dev)
+ 	int mode = priv->plat->phy_interface;
+ 	struct fwnode_handle *phy_fwnode;
+ 	struct fwnode_handle *fwnode;
++	struct ethtool_keee eee;
  	int ret;
  
--	ret = stmmac_init_phy(dev);
--	if (ret)
--		return ret;
--
- 	for (int i = 0; i < MTL_MAX_TX_QUEUES; i++)
- 		if (priv->dma_conf.tx_queue[i].tbs & STMMAC_TBS_EN)
- 			dma_conf->tx_queue[i].tbs = priv->dma_conf.tx_queue[i].tbs;
-@@ -3990,7 +3986,6 @@ static int __stmmac_open(struct net_device *dev,
+ 	if (!phylink_expects_phy(priv->phylink))
+@@ -1160,19 +1161,17 @@ static int stmmac_init_phy(struct net_device *dev)
+ 	if (ret) {
+ 		netdev_err(priv->dev, "cannot attach to PHY (error: %pe)\n",
+ 			   ERR_PTR(ret));
+-	} else {
+-		struct ethtool_keee eee;
++		return ret;
++	}
  
- 	stmmac_release_ptp(priv);
- init_error:
--	phylink_disconnect_phy(priv->phylink);
- 	return ret;
+-		/* Configure phylib's copy of the LPI timer. Normally,
+-		 * phylink_config.lpi_timer_default would do this, but there is
+-		 * a chance that userspace could change the eee_timer setting
+-		 * via sysfs before the first open. Thus, preserve existing
+-		 * behaviour.
+-		 */
+-		if (!phylink_ethtool_get_eee(priv->phylink, &eee)) {
+-			eee.tx_lpi_timer = priv->tx_lpi_timer;
+-			phylink_ethtool_set_eee(priv->phylink, &eee);
+-		}
++	/* Configure phylib's copy of the LPI timer. Normally,
++	 * phylink_config.lpi_timer_default would do this, but there is a
++	 * chance that userspace could change the eee_timer setting via sysfs
++	 * before the first open. Thus, preserve existing behaviour.
++	 */
++	if (!phylink_ethtool_get_eee(priv->phylink, &eee)) {
++		eee.tx_lpi_timer = priv->tx_lpi_timer;
++		phylink_ethtool_set_eee(priv->phylink, &eee);
+ 	}
+ 
+ 	if (!priv->plat->pmt) {
+@@ -1183,7 +1182,7 @@ static int stmmac_init_phy(struct net_device *dev)
+ 		device_set_wakeup_enable(priv->device, !!wol.wolopts);
+ 	}
+ 
+-	return ret;
++	return 0;
  }
  
-@@ -4010,18 +4005,28 @@ static int stmmac_open(struct net_device *dev)
- 
- 	ret = pm_runtime_resume_and_get(priv->device);
- 	if (ret < 0)
--		goto err;
-+		goto err_dma_resources;
-+
-+	ret = stmmac_init_phy(dev);
-+	if (ret)
-+		goto err_runtime_pm;
- 
- 	ret = __stmmac_open(dev, dma_conf);
--	if (ret) {
--		pm_runtime_put(priv->device);
--err:
--		free_dma_desc_resources(priv, dma_conf);
--	}
-+	if (ret)
-+		goto err_disconnect_phy;
- 
- 	kfree(dma_conf);
- 
- 	return ret;
-+
-+err_disconnect_phy:
-+	phylink_disconnect_phy(priv->phylink);
-+err_runtime_pm:
-+	pm_runtime_put(priv->device);
-+err_dma_resources:
-+	free_dma_desc_resources(priv, dma_conf);
-+	kfree(dma_conf);
-+	return ret;
- }
- 
- static void __stmmac_release(struct net_device *dev)
-@@ -4038,7 +4043,6 @@ static void __stmmac_release(struct net_device *dev)
- 
- 	/* Stop and disconnect the PHY */
- 	phylink_stop(priv->phylink);
--	phylink_disconnect_phy(priv->phylink);
- 
- 	stmmac_disable_all_queues(priv);
- 
-@@ -4078,6 +4082,7 @@ static int stmmac_release(struct net_device *dev)
- 
- 	__stmmac_release(dev);
- 
-+	phylink_disconnect_phy(priv->phylink);
- 	pm_runtime_put(priv->device);
- 
- 	return 0;
+ static int stmmac_phy_setup(struct stmmac_priv *priv)
 -- 
 2.47.3
 
