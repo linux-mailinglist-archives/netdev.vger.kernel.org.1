@@ -1,94 +1,218 @@
-Return-Path: <netdev+bounces-225565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8813EB9578F
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 12:44:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E7B1B957BF
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 12:46:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 498842E59D4
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 10:44:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9529D188EB2B
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 10:47:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8558D321290;
-	Tue, 23 Sep 2025 10:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rf3ZLhwW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F29032F6576;
+	Tue, 23 Sep 2025 10:46:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535B031DD87;
-	Tue, 23 Sep 2025 10:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78887199EAD
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 10:46:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758624254; cv=none; b=u98E0uhxFFqYaxrZ7ijKydnV0k9MpkwZGAfjq11l/zBBpsjyuJlKyzr+15XsZ0m9VpI7Sk/OsZ1EvVqxqLopi4LqMzKchJh/njbfoetaimmTng3MCDh0Xf0QdWL21fkZMUx2XEMyAVJ7z7OIe+BHFDkQIR0WDnxSEtD2k8v4jS0=
+	t=1758624411; cv=none; b=E2saBxpV3QZmfOfgi7Z6K7jQ3nZRlmvDpLgQ2nNGKc8lL6qcT3YMVS4Sz4ICNN8QOH9e2wXs3UBDxQCbVPHaH7LvKNL7+o2HBFuvg8b9PFCG2CQUth64CTxcEnMq5yCUAGquxP/SV5kYw2pCgGN8Pr9nyvvk30BQAxh2zpxhTEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758624254; c=relaxed/simple;
-	bh=oeM0MATO8QJVvLW+x4CKlTANx7gTarxXI2pjbjYrmw0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qphelyUYMTf30LVW3j5jGDIGjEce62piPwVCVUEZIa3IIa0L2iYF5HT8SSbpW7FhwzW24gWxAyBdbT+88rUM2cQZs5eWO/DO7Qfgz3HQ3pxNb3rOCpT31X4blnH69LdMGW/K7AtBaI7xQlaFYz9yUHH7o8c3uuIsCzqTH6MRyaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rf3ZLhwW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A1B5C4CEF5;
-	Tue, 23 Sep 2025 10:44:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758624253;
-	bh=oeM0MATO8QJVvLW+x4CKlTANx7gTarxXI2pjbjYrmw0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rf3ZLhwWUNsLQk+XMwVJDlA1h6WRVm8N/d6g/nocw77JDagTrd24YRnly1d+7TLXY
-	 aa5Lx92TQtAh8eJbUxk+QBkZVFYOsS+LC4hDPGzbTe0eztQX9/moQrP66gI8QgKH/X
-	 YIivf85pFovgzUcC50tEQw+oXDhQPQkxhP+kBS2Sdfgwcu4jEstSvSGnrNgE4TSMly
-	 sKtKFAv62NfJYMb/XO4Rs6h+8g0Y/A7yEyb6wiOm8EX2eZjfY+iHvWZCfJMZVh4vcY
-	 2ixdcLVZs0g3OLvY2tPX1hiosx7zcMbpSbbqUzB8Gcre32Zf6t+hddLfUrqdTHjlOp
-	 CxVDU9ZZ/VMYw==
-Date: Tue, 23 Sep 2025 12:44:07 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: linux-fsdevel@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>, 
-	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Anna-Maria Behnsen <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 2/9] mnt: expose pointer to init_mnt_ns
-Message-ID: <20250923-altgedienten-spurwechsel-1b3bbed20edc@brauner>
-References: <20250917-work-namespace-ns_common-v1-0-1b3bda8ef8f2@kernel.org>
- <20250917-work-namespace-ns_common-v1-2-1b3bda8ef8f2@kernel.org>
- <oqtggwqink4kthsxiv6tv6q6l7tgykosz3tenek2vejqfiuqzl@drczxzwwucfi>
- <20250919-sense-evaluieren-eade772e2e6c@brauner>
- <b4mb3kj3v453gduhebg5epbsfvoxcldpj3al7kjxnn64cvgi57@77pqiolvgqgt>
+	s=arc-20240116; t=1758624411; c=relaxed/simple;
+	bh=4UjRc7e4GWxcOat/Xvn4GJ6ijLbkBC8w6lbD8XRmblQ=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=atlexEZSDx03B+ox5Hf99N85V3LbkbWPmf/1aKPGIJUjmHQzA/WmiGhPS0taec1dfluJCJMGufBVGQwCGTH76g/qMT5CIcTJpKS9ibztK22wDQP9S04us4Of3uFsvfF0u0au+YcmQIN6T3j+FrMnLGx4dTFJMtkzQwgUKJCf4yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cWGnz5Wdmz6L5D7;
+	Tue, 23 Sep 2025 18:44:55 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id D0D371402A5;
+	Tue, 23 Sep 2025 18:46:45 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 23 Sep
+ 2025 11:46:44 +0100
+Date: Tue, 23 Sep 2025 11:46:38 +0100
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+CC: <jgg@ziepe.ca>, <michael.chan@broadcom.com>, <dave.jiang@intel.com>,
+	<saeedm@nvidia.com>, <davem@davemloft.net>, <corbet@lwn.net>,
+	<edumazet@google.com>, <gospo@broadcom.com>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<selvin.xavier@broadcom.com>, <leon@kernel.org>,
+	<kalesh-anakkur.purayil@broadcom.com>
+Subject: Re: [PATCH net-next v2 2/6] bnxt_en: Refactor aux bus functions to
+ be generic
+Message-ID: <20250923114638.00005498@huawei.com>
+In-Reply-To: <20250923095825.901529-3-pavan.chebbi@broadcom.com>
+References: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
+	<20250923095825.901529-3-pavan.chebbi@broadcom.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <b4mb3kj3v453gduhebg5epbsfvoxcldpj3al7kjxnn64cvgi57@77pqiolvgqgt>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Mon, Sep 22, 2025 at 12:19:11PM +0200, Jan Kara wrote:
-> On Fri 19-09-25 12:05:16, Christian Brauner wrote:
-> > On Wed, Sep 17, 2025 at 06:28:37PM +0200, Jan Kara wrote:
-> > > On Wed 17-09-25 12:28:01, Christian Brauner wrote:
-> > > > There's various scenarios where we need to know whether we are in the
-> > > > initial set of namespaces or not to e.g., shortcut permission checking.
-> > > > All namespaces expose that information. Let's do that too.
-> > > > 
-> > > > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> > 
-> > I've changed this so it behaves exactly like all the other init
-> > namespaces. See appended.
-> 
-> Yeah, looks good to me. Feel free to add:
-> 
-> Reviewed-by: Jan Kara <jack@suse.cz>
-> 
-> (although I can see you've kept my Reviewed-by in the patch).
+On Tue, 23 Sep 2025 02:58:21 -0700
+Pavan Chebbi <pavan.chebbi@broadcom.com> wrote:
 
-Sorry, that was an accident because I had amended the patch.
-Thanks for paying attention to this!
+> Up until now there was only one auxiliary device that bnxt
+> created and that was for RoCE driver. bnxt fwctl is also
+> going to use an aux bus device that bnxt should create.
+> This requires some nomenclature changes and refactoring of
+> the existing bnxt aux dev functions.
+> 
+> Make aux bus init/uninit/add/del functions generic which will
+> accept aux device type as a parameter. Change aux_dev_ids to
+> aux_dev_rdma_ids to mean it is for RoCE driver.
+> 
+> Also rename the 'aux_priv' and 'edev' members of struct bp to
+> 'aux_priv_rdma' and 'edev_rdma' respectively, to mean they belong
+> to rdma.
+> Rename bnxt_aux_device_release() as bnxt_rdma_aux_device_release()
+> 
+> Future patches will reuse these functions to add an aux bus device
+> for fwctl.
+> 
+Hi Pavan,
+
+It might just be a question of patch break up, but the code here
+doesn't really match with what you suggest when talking about making these
+functions generic.  They still have a lot of what looks to be unconditional
+RDMA specific code in them after this patch.
+
+I think if this 'generic' approach makes sense this patch needs to
+be much clearer on what is rdma specific than it currently is. I'm not
+yet convinced that this approach is preferable to a few helper functions
+(for the generic bits) that rdma and fwctl specific registration functions call.
+
+Thanks,
+
+Jonathan
+
+
+
+> Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
+> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
+> index 992eec874345..665850753f90 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
+
+I stopped reading that this point as the same issue on how generic things are
+continued and would have lead to many similar comments.
+
+> @@ -465,7 +466,8 @@ void bnxt_rdma_aux_device_add(struct bnxt *bp)
+>  	}
+>  }
+>  
+> -void bnxt_rdma_aux_device_init(struct bnxt *bp)
+> +void bnxt_aux_device_init(struct bnxt *bp,
+
+This confuses me a bit.  The patch description says it will make them
+generic and this has a bunch of code that really doesn't look generic.
+
+> +			  enum bnxt_ulp_auxdev_type auxdev_type)
+>  {
+>  	struct auxiliary_device *aux_dev;
+>  	struct bnxt_aux_priv *aux_priv;
+> @@ -473,14 +475,15 @@ void bnxt_rdma_aux_device_init(struct bnxt *bp)
+>  	struct bnxt_ulp *ulp;
+>  	int rc;
+>  
+> -	if (!(bp->flags & BNXT_FLAG_ROCE_CAP))
+> +	if (auxdev_type == BNXT_AUXDEV_RDMA &&
+> +	    !(bp->flags & BNXT_FLAG_ROCE_CAP))
+>  		return;
+>  
+> -	aux_priv = kzalloc(sizeof(*bp->aux_priv), GFP_KERNEL);
+> +	aux_priv = kzalloc(sizeof(*bp->aux_priv_rdma), GFP_KERNEL);
+>  	if (!aux_priv)
+>  		goto exit;
+>  
+> -	aux_priv->id = ida_alloc(&bnxt_aux_dev_ids, GFP_KERNEL);
+> +	aux_priv->id = ida_alloc(&bnxt_rdma_aux_dev_ids, GFP_KERNEL);
+>  	if (aux_priv->id < 0) {
+>  		netdev_warn(bp->dev,
+>  			    "ida alloc failed for ROCE auxiliary device\n");
+> @@ -492,15 +495,15 @@ void bnxt_rdma_aux_device_init(struct bnxt *bp)
+>  	aux_dev->id = aux_priv->id;
+>  	aux_dev->name = "rdma";
+>  	aux_dev->dev.parent = &bp->pdev->dev;
+> -	aux_dev->dev.release = bnxt_aux_dev_release;
+> +	aux_dev->dev.release = bnxt_rdma_aux_dev_release;
+
+Another call that looks very rmda specific.
+I would put these all under conditional checks even if that means
+that if any other value is passed in for type the function doesn't
+yet do anything useful.
+
+>  
+>  	rc = auxiliary_device_init(aux_dev);
+>  	if (rc) {
+> -		ida_free(&bnxt_aux_dev_ids, aux_priv->id);
+> +		ida_free(&bnxt_rdma_aux_dev_ids, aux_priv->id);
+>  		kfree(aux_priv);
+>  		goto exit;
+>  	}
+> -	bp->aux_priv = aux_priv;
+> +	bp->aux_priv_rdma = aux_priv;
+
+As below. This feels like an odd thing to not make conditional on the type.
+
+>  
+>  	/* From this point, all cleanup will happen via the .release callback &
+>  	 * any error unwinding will need to include a call to
+> @@ -517,9 +520,10 @@ void bnxt_rdma_aux_device_init(struct bnxt *bp)
+>  		goto aux_dev_uninit;
+>  
+>  	edev->ulp_tbl = ulp;
+> -	bp->edev = edev;
+> +	bp->edev_rdma = edev;
+
+This seems to have a slightly odd mix of conditional assignment like
+the ulp_num_msix_want below and unconditional assignment of clearly
+RDMA specific things like evdev_rdma.
+
+>  	bnxt_set_edev_info(edev, bp);
+> -	bp->ulp_num_msix_want = bnxt_set_dflt_ulp_msix(bp);
+> +	if (auxdev_type == BNXT_AUXDEV_RDMA)
+> +		bp->ulp_num_msix_want = bnxt_set_dflt_ulp_msix(bp);
+>  
+>  	return;
+>  
+> diff --git a/include/linux/bnxt/ulp.h b/include/linux/bnxt/ulp.h
+> index 7b9dd8ebe4bc..baac0dd44078 100644
+> --- a/include/linux/bnxt/ulp.h
+> +++ b/include/linux/bnxt/ulp.h
+> @@ -20,6 +20,11 @@
+>  struct hwrm_async_event_cmpl;
+>  struct bnxt;
+>  
+> +enum bnxt_ulp_auxdev_type {
+> +	BNXT_AUXDEV_RDMA = 0,
+> +	__BNXT_AUXDEV_MAX,
+
+Trivial but no point in a trailing comma after a entry that will always
+terminate this list (like this one).  Having the comma just makes an
+accidental addition of stuff after this harder to spot!
+
+
+> +};
+
+
 
