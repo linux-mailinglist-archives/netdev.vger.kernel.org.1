@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-225614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E985B9613E
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:49:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8967FB96144
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:49:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38E65440A56
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:48:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AB39481410
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E2331EE7B7;
-	Tue, 23 Sep 2025 13:48:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6761C1FFC48;
+	Tue, 23 Sep 2025 13:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jesQfeOt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jsvgh7a6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD88F1F2C45
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 13:48:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B1C1F2C45
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 13:48:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758635300; cv=none; b=Qshg5kMkZo4+1585I6OMuy/D5kw8f8O5niB+m2UlnVDTsQUMTE5QI6mQ199WCBaHmBt+bALWGjHFSkAQUvzgbE0JpLfwh+jNx16eSbejNChiLpZkBbdQcDR0a//a3rSmZAE7T8KTUplRwFqlxgUbjX+PhPAyTTvhIsxyGKXv5Dg=
+	t=1758635304; cv=none; b=LYNZY7C+q2bYIwDHgn8aypqZ5xX2VT5VsHvqS+TmHfQGZhOS+oYSClR+v+zJ98tY+QK95XNlXoN5kbIokHzOEEKHtxDsnZHP3SqFYk1TJnGmN+wR7ikhXXqn4k3+DtgpasPByix6LQYBVGjp5LVvT/p3JMOw7dFUEPeDDw93xuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758635300; c=relaxed/simple;
-	bh=Dea489MYTgMAAscr01Jb3XXM7CWCWJwmT03WT5H3Udw=;
+	s=arc-20240116; t=1758635304; c=relaxed/simple;
+	bh=HSvxDah8PAJbvi+HUMRmPhIRc1k1FkLhgLsH23IU5pA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qMuV5EBibuBHM2QvUzVihoiDu2n9CIYAXp6zlerbmHmKcwywueiR3Xb6TpleWTcar5eIB8pScamrT9eJgBmyW8A1mvYR8E/0uhvRFDGsapCZzuVZSg1sI4+Z7nKCbWHAXfiZtjY+WKsXeetvCLGo8iBEXqAu/+VRd9BFuxu8JcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jesQfeOt; arc=none smtp.client-ip=209.85.128.48
+	 MIME-Version; b=TDVNpirrw9YE7FSFt6W8ka1iyjoDuqDy1ry2y7O2P5aC5mKO58Dp8WX2Q9u4SP00yr+eKFo3OVI0zDOwrPxC/UrideKdA/j2gDZiJ6cpuvDRHsHFPF1TLUNuf7UqMkaX6dGZZSl257pv+K4hmYVpfgy5xRYgWLGCZct80LjvP3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jsvgh7a6; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-46b303f755aso27818865e9.1
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 06:48:18 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-45f2cf99bbbso26783155e9.0
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 06:48:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758635297; x=1759240097; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758635300; x=1759240100; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9wZCaQ07xtjMvB/PaXsZVCEB7E5r60D1ZTKgnNtEj48=;
-        b=jesQfeOtRRMYagBpCev6vytrEzFJAMuaFFMM0eK32ayeLXSAnNy3E5fNCHVvl3Xv3a
-         Ws1gj6fEqLAzNUQYQykcq/+/A/aNZN8+lQWnbQvFEUV+Hex+3kEAJC/HZnXqGyKR7oU3
-         0SkpPbA4UgJ6e9UJ2at7B7NqjGpcoVEZkIn3A1CYWXcIXb85FedkASBJqE6rUlBEde8N
-         ktLoLeq/md4oowaCebOFC+AdXC/wIk5oNuKlXIRRXOLa920DaSCWGNsehR1lp2lJEl/7
-         MnM+jQeNX0ZbO0SPaj0dIo/izheTkEQsiiNI23SHnU40oYevsyx4hQ0P0Fk5FHrd0O+k
-         YGig==
+        bh=kt95hu8RP1vRz3kETYiiRm4qQ2ioU1izT1ZmP00xGoo=;
+        b=jsvgh7a6tfvXO2awl51tuMWy5k5OD2xiE/Wi7ToOeUpvVBQ8eCDVm3REseom7NHjTn
+         ov21MCj/K77Rf6HuHrf6daXTl79VpRmrW7tCxPPj6J5wKSVA7i9kioxLnIwr/aFJXI7x
+         lLt/otmBdbVGqFCoH+TLsA6rSwITuFn5v5pTD9tzODPqJfm9F2xeSkuDrV5KB+SpifRu
+         lySoeYYfXwOeAl8DZIl03BIMR0qj6VHUvwCCHCk9OGPLfftJY+74kRnuKJbTJLlX6wCq
+         zpNYtNRR1o9elag1uPHmIg5VY43e4tmQx5dvceLo+UDOiMvphsc6s892WRZbjokkJex7
+         6E5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758635297; x=1759240097;
+        d=1e100.net; s=20230601; t=1758635300; x=1759240100;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9wZCaQ07xtjMvB/PaXsZVCEB7E5r60D1ZTKgnNtEj48=;
-        b=rGp9HJ8yNYdcS6uWS2MJeWcQIHc6nSShDG4m8A2LysKZo7xburtXYiUQjZsVUURB2s
-         jptABXbCAg/FKpcMxhgnV/5t2Jmq3i+nhE6dKoEiCI42zFAnWBUHRURZJaQmoxs9JSSZ
-         sbj4oSFxMiglgpXYDHp7V9qs4nRRJCGVbDS8CW4Qhwe+etp9ryHY93eRgmKmYGtuJ9Yz
-         OzEkXbvWlSc4xI2h5qhO8epZDCUGEwU4z688koIfnuByvGdRoy3lt3anldI05GK5m2LO
-         jr893m7127J0rC5TkzOL4ICLTJIsFcfZt25z4gQF6nNzrmRHUEGrddtqeJDAo/DcQe4g
-         xqWg==
-X-Gm-Message-State: AOJu0YwEKA+qNXot6o3/xMTy9kkGO7+Ril+Vht1XfCVs0SIjAcM3OYYn
-	oEx6U3c6x1xLMbh/9rAuR8bRlOJ23NSU4GtJBz6uCz2m+bMVW0ARPlTy
-X-Gm-Gg: ASbGncuWD/Jz1/cL5InBFzHYIEhoi3WVz4uowzrMa3IP73yYaPlevruaWxqDN06uZYE
-	ZovYOKTe2+9rBTdXVV1ohMWru/P992Y5HJ9trrbAN1LcRX5votmDWBuAtCuDINHqOS8D22qU4nz
-	cO6Gv1b1Drl+ltpljtGvFzGzKlFyd8AL5uXoCchfeAnsAWT4SbuEzco9oJZGwek6BMwweJIrcTG
-	/XM7r3q/bKSwXnLE8gRB9sXzmWNlUtPu/mzHWfwRfoOpTk+nxEHkbBYHtfEeR/MWbdW2g5bQ3Nv
-	rE7Y/9YY70qS5/Dl11OdBFIYZYaQZ85C7TKyDH5K6QY8Tak5kECBHdfnla/o0IBop9xutl0qW2r
-	JmJO/WkAKW28J7rJ9E7iY13FahxT6Gq3/Cbeha8dAnhXMksPYRMfNwPPZFik=
-X-Google-Smtp-Source: AGHT+IHBWRayhmJ2OSZMIhWxFU0xglzkseuyRBy/OlWAEkv7f5IDCROXarkD9Maag2qO09JkWdwLrg==
-X-Received: by 2002:a5d:608f:0:b0:408:9c48:e26c with SMTP id ffacd0b85a97d-4089c48e2f5mr197113f8f.62.1758635296895;
-        Tue, 23 Sep 2025 06:48:16 -0700 (PDT)
+        bh=kt95hu8RP1vRz3kETYiiRm4qQ2ioU1izT1ZmP00xGoo=;
+        b=C6EhjaRPX0SA63elo2/ara/AKsjCSauEOJLudxaaSikuvnIbJKTLK0Bgl3vbuU4Kxz
+         RBpzifmBWp1F1i94ywVZwXBf478mdGGqXmOYKl+y5Xz11Mtm47wgjXQrApBOT4p3wlwD
+         3WOXQFxleAOxVLYLV54fJVPQc9/LuK1Txhj1y8q/GWgW9YsN+Rd2qTAZjtm/uofSYEdz
+         1+18IGmfr5rm9T34puKia7WA4oF1BZL3ut1n7umrYKOKcIMbZ1KKe/WBTngOz1jdzNGa
+         ncfAKQGzFWs9WhFTTKXn3/v9qDHcqPGCWgKVv66qYhMYA+YwqqapePdIwFV0GOm6GeLZ
+         96Rw==
+X-Gm-Message-State: AOJu0YxASBcrYD7ishFPNAQYPOyUXLSr+VsU0iaXTjrEmGnexX/sujC1
+	0UGbkLDmbYbBndt0628m6PCrX7PMO/vl6IvtiImOU0JUpEJlkcmV6ElL
+X-Gm-Gg: ASbGncuzLk8YdxtSAGCYVG89Lv3ZzHJHHuv+mRnW8uYOeBqRJJf8l1rL5QKTIyH8Ls3
+	GqCVTcxLGwABj8rZORmLxeg1ZPA4W6CYfqqKmfkVLAo15LZS9dj5XeDewY8YISrU3Vs+ptTTTTL
+	pNzH9wz/3J4mAPJF6StRpSjrl7Addww4ZM0t3Z8zI2xsPzHsHDrKqIcWbAVqpCS/USV2S1zFFvz
+	VevfrJxTmtTIsvJkaUdxi+xYy6kElWe+I0O4ZrCey+BgYuJPJZk+OLcNieJR4GhuiTLrClQKHUK
+	6KsWziuVXqiYjnaSNQiffCAmxGfBKpFkPOIOs0gwWeS0/pU36lUavihFJ27JjRL8DqNpead6TGT
+	CMINMtomuIVYa2NyUYOXVCd2ksm0DzOXRrZ1vOAqVAj8ZfBxr8vG13BkML0g=
+X-Google-Smtp-Source: AGHT+IEvTB0RKWK8YWqDSe/oacHNMiXmgXTZPgRv2vTC77CbQ+2mPOFU1Gekinc/SgafGVCinCcMTQ==
+X-Received: by 2002:a5d:5f54:0:b0:3e9:d0a5:e45d with SMTP id ffacd0b85a97d-405c684751dmr1951089f8f.17.1758635299908;
+        Tue, 23 Sep 2025 06:48:19 -0700 (PDT)
 Received: from localhost (tor.caspervk.net. [31.133.0.235])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3ee0fbffaeasm24119282f8f.62.2025.09.23.06.48.15
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4613ddc01e6sm277234895e9.18.2025.09.23.06.48.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 06:48:16 -0700 (PDT)
+        Tue, 23 Sep 2025 06:48:19 -0700 (PDT)
 From: Maxim Mikityanskiy <maxtram95@gmail.com>
 To: Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -88,9 +88,9 @@ Cc: netdev@vger.kernel.org,
 	Denis Ovsienko <denis@ovsienko.info>,
 	Xin Long <lucien.xin@gmail.com>,
 	Maxim Mikityanskiy <maxim@isovalent.com>
-Subject: [PATCH net-next 11/17] net/ipv6: Remove HBH helpers
-Date: Tue, 23 Sep 2025 16:47:36 +0300
-Message-ID: <20250923134742.1399800-12-maxtram95@gmail.com>
+Subject: [PATCH net-next 12/17] net: Enable BIG TCP with partial GSO
+Date: Tue, 23 Sep 2025 16:47:37 +0300
+Message-ID: <20250923134742.1399800-13-maxtram95@gmail.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250923134742.1399800-1-maxtram95@gmail.com>
 References: <20250923134742.1399800-1-maxtram95@gmail.com>
@@ -106,109 +106,77 @@ From: Maxim Mikityanskiy <maxim@isovalent.com>
 
 From: Maxim Mikityanskiy <maxim@isovalent.com>
 
-Now that the HBH jumbo helpers are not used by any driver or GSO, remove
-them altogether.
+skb_segment is called for partial GSO, when netif_needs_gso returns true
+in validate_xmit_skb. Partial GSO is needed, for example, when
+segmentation of tunneled traffic is offloaded to a NIC that only
+supports inner checksum offload.
+
+Currently, skb_segment clamps the segment length to 65534 bytes, because
+gso_size == 65535 is a special value GSO_BY_FRAGS, and we don't want
+to accidentally assign mss = 65535, as it would fall into the
+GSO_BY_FRAGS check further in the function.
+
+This implementation, however, artificially blocks len > 65534, which is
+possible since the introduction of BIG TCP. To allow bigger lengths and
+avoid resegmentation of BIG TCP packets, store the gso_by_frags flag in
+the beginning and don't use a special value of mss for this purpose
+after mss was modified.
 
 Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
 ---
- include/net/ipv6.h | 77 ----------------------------------------------
- 1 file changed, 77 deletions(-)
+ net/core/skbuff.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-index 38b332f3028e..da42a5e5216f 100644
---- a/include/net/ipv6.h
-+++ b/include/net/ipv6.h
-@@ -149,17 +149,6 @@ struct frag_hdr {
- 	__be32	identification;
- };
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index d331e607edfb..2ebacf5fa09a 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -4699,6 +4699,7 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
+ 	struct sk_buff *tail = NULL;
+ 	struct sk_buff *list_skb = skb_shinfo(head_skb)->frag_list;
+ 	unsigned int mss = skb_shinfo(head_skb)->gso_size;
++	bool gso_by_frags = mss == GSO_BY_FRAGS;
+ 	unsigned int doffset = head_skb->data - skb_mac_header(head_skb);
+ 	unsigned int offset = doffset;
+ 	unsigned int tnl_hlen = skb_tnl_header_len(head_skb);
+@@ -4714,7 +4715,7 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
+ 	int nfrags, pos;
  
--/*
-- * Jumbo payload option, as described in RFC 2675 2.
-- */
--struct hop_jumbo_hdr {
--	u8	nexthdr;
--	u8	hdrlen;
--	u8	tlv_type;	/* IPV6_TLV_JUMBO, 0xC2 */
--	u8	tlv_len;	/* 4 */
--	__be32	jumbo_payload_len;
--};
--
- #define	IP6_MF		0x0001
- #define	IP6_OFFSET	0xFFF8
+ 	if ((skb_shinfo(head_skb)->gso_type & SKB_GSO_DODGY) &&
+-	    mss != GSO_BY_FRAGS && mss != skb_headlen(head_skb)) {
++	    !gso_by_frags && mss != skb_headlen(head_skb)) {
+ 		struct sk_buff *check_skb;
  
-@@ -462,72 +451,6 @@ bool ipv6_opt_accepted(const struct sock *sk, const struct sk_buff *skb,
- struct ipv6_txoptions *ipv6_update_options(struct sock *sk,
- 					   struct ipv6_txoptions *opt);
+ 		for (check_skb = list_skb; check_skb; check_skb = check_skb->next) {
+@@ -4742,7 +4743,7 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
+ 	sg = !!(features & NETIF_F_SG);
+ 	csum = !!can_checksum_protocol(features, proto);
  
--/* This helper is specialized for BIG TCP needs.
-- * It assumes the hop_jumbo_hdr will immediately follow the IPV6 header.
-- * It assumes headers are already in skb->head.
-- * Returns: 0, or IPPROTO_TCP if a BIG TCP packet is there.
-- */
--static inline int ipv6_has_hopopt_jumbo(const struct sk_buff *skb)
--{
--	const struct hop_jumbo_hdr *jhdr;
--	const struct ipv6hdr *nhdr;
--
--	if (likely(skb->len <= GRO_LEGACY_MAX_SIZE))
--		return 0;
--
--	if (skb->protocol != htons(ETH_P_IPV6))
--		return 0;
--
--	if (skb_network_offset(skb) +
--	    sizeof(struct ipv6hdr) +
--	    sizeof(struct hop_jumbo_hdr) > skb_headlen(skb))
--		return 0;
--
--	nhdr = ipv6_hdr(skb);
--
--	if (nhdr->nexthdr != NEXTHDR_HOP)
--		return 0;
--
--	jhdr = (const struct hop_jumbo_hdr *) (nhdr + 1);
--	if (jhdr->tlv_type != IPV6_TLV_JUMBO || jhdr->hdrlen != 0 ||
--	    jhdr->nexthdr != IPPROTO_TCP)
--		return 0;
--	return jhdr->nexthdr;
--}
--
--/* Return 0 if HBH header is successfully removed
-- * Or if HBH removal is unnecessary (packet is not big TCP)
-- * Return error to indicate dropping the packet
-- */
--static inline int ipv6_hopopt_jumbo_remove(struct sk_buff *skb)
--{
--	const int hophdr_len = sizeof(struct hop_jumbo_hdr);
--	int nexthdr = ipv6_has_hopopt_jumbo(skb);
--	struct ipv6hdr *h6;
--
--	if (!nexthdr)
--		return 0;
--
--	if (skb_cow_head(skb, 0))
--		return -1;
--
--	/* Remove the HBH header.
--	 * Layout: [Ethernet header][IPv6 header][HBH][L4 Header]
--	 */
--	memmove(skb_mac_header(skb) + hophdr_len, skb_mac_header(skb),
--		skb_network_header(skb) - skb_mac_header(skb) +
--		sizeof(struct ipv6hdr));
--
--	__skb_pull(skb, hophdr_len);
--	skb->network_header += hophdr_len;
--	skb->mac_header += hophdr_len;
--
--	h6 = ipv6_hdr(skb);
--	h6->nexthdr = nexthdr;
--
--	return 0;
--}
--
- static inline bool ipv6_accept_ra(const struct inet6_dev *idev)
- {
- 	s32 accept_ra = READ_ONCE(idev->cnf.accept_ra);
+-	if (sg && csum && (mss != GSO_BY_FRAGS))  {
++	if (sg && csum && !gso_by_frags)  {
+ 		if (!(features & NETIF_F_GSO_PARTIAL)) {
+ 			struct sk_buff *iter;
+ 			unsigned int frag_len;
+@@ -4776,9 +4777,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
+ 		/* GSO partial only requires that we trim off any excess that
+ 		 * doesn't fit into an MSS sized block, so take care of that
+ 		 * now.
+-		 * Cap len to not accidentally hit GSO_BY_FRAGS.
+ 		 */
+-		partial_segs = min(len, GSO_BY_FRAGS - 1) / mss;
++		partial_segs = len / mss;
+ 		if (partial_segs > 1)
+ 			mss *= partial_segs;
+ 		else
+@@ -4802,7 +4802,7 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
+ 		int hsize;
+ 		int size;
+ 
+-		if (unlikely(mss == GSO_BY_FRAGS)) {
++		if (unlikely(gso_by_frags)) {
+ 			len = list_skb->len;
+ 		} else {
+ 			len = head_skb->len - offset;
 -- 
 2.50.1
 
