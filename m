@@ -1,105 +1,710 @@
-Return-Path: <netdev+bounces-225600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F2DAB96064
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:33:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8F34B960B2
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:39:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4E347B1E2B
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:31:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BC8C17787F
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:39:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B70B327A02;
-	Tue, 23 Sep 2025 13:33:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC684327A11;
+	Tue, 23 Sep 2025 13:39:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ize43+mZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B6832779B
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 13:33:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5733F3277A9
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 13:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758634411; cv=none; b=CNi6tQKNK/Wap9tICDc0bMzLnG0LZALlNbeiNaPZht6nURku6lJKYSH0bBlE39QYhSmT8ZFBUzptaOdR0WPJWdXAGcpTBJgNyIVkfjHx4rQ2/U28HTPNoyQMxD4n8QQVwEZO9jIiDFQgAN/goJyvtoB/71wXPDpyDirtYk9Y6YI=
+	t=1758634754; cv=none; b=ZWsdwxRLoOaN2o7tylelZikTe3gOeHVUWMWn4WVTg4CoTx2PgaKxqOTUmLkOGiUEVUEPy/Its38VWbcFyMXOdQMIWVJHJkywAENL4HdDtQ1v/tuk4Qn3c+vdzyZa2j7fauNgKNLIPd2rDUDHwQy5mQDBZNFru0xqM1SkXlnbvrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758634411; c=relaxed/simple;
-	bh=YlvkxxU77XFmk3dFpiO+TJOZ+LinsW79rmGkl5x0l+o=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=lKW8xb4fUWXfYX1H6ExD+gs5NN7c5ysOfxZ7ujYtstDItq38t+PZNeSfC4aeQAONpnuFMbS4iPsG2yEjwiUsqiz896pMY1HqMSKdktneontuUwZbVFq5JqAIoqMCI0zHekXPRSfz7LGvYQvv+HhDHzz1yC1AV/T0H8c3UNlR6Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-424861a90dfso48272675ab.2
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 06:33:29 -0700 (PDT)
+	s=arc-20240116; t=1758634754; c=relaxed/simple;
+	bh=HE+DzSG/06drWnNkU0X2CeXDBVHUeLbRW6PSZ9GVmh4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VrCF7n8wDkbdu/XoqvZ3L7Y/B3BK4xd+suCO6yPddP+q21lvMv4U9gmXZ5uA372EK1vduuzfrWnoIr67WMRFWhLrt/ifajnUPiybqDCqzqrZhCxdooo89ab6M8kUzrwv/AixQth8+Bpu9LCg8tkIcKNynOAVY0k0kpqGlBTKimE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ize43+mZ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758634751;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YUFfenxYIM+PGGS2NHWViejB6uf1Wuvcw12DaW18/Eg=;
+	b=Ize43+mZeloLi2bVezfKr+8Vx+OY9KRtRvPhtJG8kY7AyllUIpp/i96dScZuNgnuKv/Z3Y
+	/sVcLSn4s+fXgWvKL7VWf2tddl0OavsCSiXZE9VocOx/nMOtEYpzxzEg7OPMJW0cRU9XFE
+	ds7SknXM/2RX1nEXTQzYU9UpDHgskok=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-683-CZh0CtnoMPyJ7l6SKIp4NA-1; Tue, 23 Sep 2025 09:39:09 -0400
+X-MC-Unique: CZh0CtnoMPyJ7l6SKIp4NA-1
+X-Mimecast-MFC-AGG-ID: CZh0CtnoMPyJ7l6SKIp4NA_1758634749
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-40657e09e85so299304f8f.1
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 06:39:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758634408; x=1759239208;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=L5mKuQ5JO4bcOvETst34ZttPMYoeDhLNrrso5xYmAvg=;
-        b=Qev/kvcdaaxvwy8cxU5hgu2j1HkYEG88TNW9nNWr6CiN1YFCYziUGm5QJf9Bvgp9Th
-         BabiVmlJEmi5qv9xUSCDWkuvTP5dvROr+Dxo5znj1gW8O0sg5ewty6nBcSQxVKOalELY
-         1cH/S31WOGY9mBWlsKhvWFO5t9nawcrkR/rSk6VduDrVzVodOtwl9+uzW7ZCl99VdChT
-         kMAYMoqXH34RlcACo3FiOGyikFKgJzpZJS8AR4KLXD9eBTdanHBfPk4O1ZK9/+AflbVg
-         c2bqXnGIwQ+97jXpaXXfTCHSrshUrGrl0qryUhHoX9v5UEYx9bmlHVmGqwKqY4AXYyFk
-         mDtw==
-X-Forwarded-Encrypted: i=1; AJvYcCUSNu4sIQv/FCDgLa5++PQSXp3/pny6WSlM+C5gnNWyLLu21r3+bdIn/gAGhv0wSw3uYd2eOK0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5sD8J5cA99o2BFbNUhEKvEnFIc0PWlYt3qg8DTlAMxYnvYwi1
-	tB0jyuUi0gdCgx/okxi0Z4Q0m1JvwoI4TjW3QRF7FFCSfGVRXLgLkCk95hLpBChp0Hao56FlFsd
-	HMXF8uS2gpTjEiFvk9khDuyehBV7aIhD8ztFKzGjn+NbWBKQAO55uhffZPMg=
-X-Google-Smtp-Source: AGHT+IHJNsc7viNdVlbFrHEq7xL7TBDhlzADDNsNE+LVVzoSddN+60fNp0PjXPNlqlaprDwc1wvOTKb2O96lwV4ajBoirHD+b/jg
+        d=1e100.net; s=20230601; t=1758634749; x=1759239549;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YUFfenxYIM+PGGS2NHWViejB6uf1Wuvcw12DaW18/Eg=;
+        b=h8e+rD3hMrvLuyBl1tnXCqfdfU5FWIIX1ogMOUWh+EMoU9en0HYKujSmzM2JCvzq1j
+         JDzqDw2/sN46agYA1aUphu9+dQIEN43FmLnVBrP4wt1vuk0lZrhU3pqnpYTdyxqCrvM8
+         Svjxs93bX5hCl6HzncX7WpUAllZUMt18U9KQd/WQXMDmu/kq3kPuq7zzXG5o9vt+D68X
+         i89TIJ6HZc7wzz1F0S1YNlIotnJeJJgJy2A7ahVDkFFCvw8LCDMJ4Al65OMY7xc1SDS5
+         gBKXFiw7AijUkpT6R1GMemAQ9dDkeP97mX7NA+z2oQEK4nbchkgP91wpMuXgseOgVNZD
+         HMiA==
+X-Forwarded-Encrypted: i=1; AJvYcCUE+jekpBEZiH6YKJ21dub40kSXsHIuLh/PIdeDx+z/5M5BkKOdimotsf7GhqkGC1FrNLT7PCM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJEeSKAmNXVRFxwugVBrctpJ6X4qNime8ERvVRrHkm7Ua+vrqm
+	auLWuKUUW/ZJcphbmn343GsFsz7fPB/2pISUbCh/9m1xrdKrCSl6w4x9/kHFTMoGVexST/dKWZQ
+	7HzWDyeS2Cl5DgFaWbgabckNXkX9Y20RIJ0Q9GIrL9PS3RJDn9uMO/q13GQ==
+X-Gm-Gg: ASbGnct7BQymd3AaqvE4eVX36ulXF5cKw2QsYREMOG3OZ0Pako666gOl0BF1w9nFeEe
+	9QYGNs+AW9sOCYc2nQIOloVU5ctnURLGSSRdG++DnP0d29vPSZI/+2lOtwDPVS8i7XeZpc1A4cL
+	DwRQ2pUTXTlb5ulApzvDgMmyqmibdqz9lxF1ZFJaCAmO5XfEcug9XsI0yjXsBo+8NHFxVTR99lN
+	U+x7FIUHEsyJwd+j/cbX8VJmO/s/c7TECwlQtSFbcIO2YWbHvzUY+3jIUJwBBtB9n+ten9l3RZo
+	6KL4VhKO5W7wPebFpru99y7Uj+N4dbBYrBRaB6IurXjdwdf164r1oAdwQ/2eSS5xMnr/um1g+XU
+	T6k4liclaA176
+X-Received: by 2002:a05:6000:268a:b0:3ec:75c0:9cf5 with SMTP id ffacd0b85a97d-405ca95a7e4mr1847672f8f.47.1758634748381;
+        Tue, 23 Sep 2025 06:39:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGLty5Sh2dVepbf39FSNvfF6DWjptmBDkYQRwbxXNzmvlAzSia+6WsgmnolLHWJbaOETPc1MA==
+X-Received: by 2002:a05:6000:268a:b0:3ec:75c0:9cf5 with SMTP id ffacd0b85a97d-405ca95a7e4mr1847607f8f.47.1758634747659;
+        Tue, 23 Sep 2025 06:39:07 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ee0740841dsm24102086f8f.23.2025.09.23.06.39.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Sep 2025 06:39:07 -0700 (PDT)
+Message-ID: <2ef635de-7282-4ffe-bdfc-eceafa73857e@redhat.com>
+Date: Tue, 23 Sep 2025 15:39:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1542:b0:415:fe45:3dfe with SMTP id
- e9e14a558f8ab-42581e05edbmr39620545ab.3.1758634408463; Tue, 23 Sep 2025
- 06:33:28 -0700 (PDT)
-Date: Tue, 23 Sep 2025 06:33:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68d2a1a8.a70a0220.1b52b.02ab.GAE@google.com>
-Subject: [syzbot] Monthly hams report (Sep 2025)
-From: syzbot <syzbot+listbffebb470b0c3b001515@syzkaller.appspotmail.com>
-To: linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 06/15] quic: add stream management
+To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
+ quic@lists.linux.dev
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
+ Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
+ Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
+ Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+ kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
+ Jeff Layton <jlayton@kernel.org>, Benjamin Coddington <bcodding@redhat.com>,
+ Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+ Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
+ Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
+ Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
+ <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Daniel Stenberg <daniel@haxx.se>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <cover.1758234904.git.lucien.xin@gmail.com>
+ <5d71a793a5f6e85160748ed30539b98d2629c5ac.1758234904.git.lucien.xin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <5d71a793a5f6e85160748ed30539b98d2629c5ac.1758234904.git.lucien.xin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello hams maintainers/developers,
+On 9/19/25 12:34 AM, Xin Long wrote:
+> +/* Create and register new streams for sending. */
+> +static struct quic_stream *quic_stream_send_create(struct quic_stream_table *streams,
+> +						   s64 max_stream_id, u8 is_serv)
+> +{
+> +	struct quic_stream *stream;
+> +	s64 stream_id;
+> +
+> +	stream_id = streams->send.next_bidi_stream_id;
+> +	if (quic_stream_id_uni(max_stream_id))
+> +		stream_id = streams->send.next_uni_stream_id;
+> +
+> +	/* rfc9000#section-2.1: A stream ID that is used out of order results in all streams
+> +	 * of that type with lower-numbered stream IDs also being opened.
+> +	 */
+> +	while (stream_id <= max_stream_id) {
+> +		stream = kzalloc(sizeof(*stream), GFP_KERNEL);
+> +		if (!stream)
+> +			return NULL;
 
-This is a 31-day syzbot report for the hams subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/hams
+How many streams and connections ID do you foresee per socket? Could
+such number grow significantly (possibly under misuse/attack)? If so you
+you likely use GFP_KERNEL_ACCOUNT here (and in conn_id allocation).
 
-During the period, 1 new issues were detected and 1 were fixed.
-In total, 9 issues are still open and 43 have already been fixed.
+/P
 
-Some of the still happening issues:
+> +
+> +		stream->id = stream_id;
+> +		if (quic_stream_id_uni(stream_id)) {
+> +			stream->send.max_bytes = streams->send.max_stream_data_uni;
+> +
+> +			if (streams->send.next_uni_stream_id < stream_id + QUIC_STREAM_ID_STEP)
+> +				streams->send.next_uni_stream_id = stream_id + QUIC_STREAM_ID_STEP;
+> +			streams->send.streams_uni++;
+> +
+> +			quic_stream_add(streams, stream);
+> +			stream_id += QUIC_STREAM_ID_STEP;
+> +			continue;
+> +		}
+> +
+> +		if (streams->send.next_bidi_stream_id < stream_id + QUIC_STREAM_ID_STEP)
+> +			streams->send.next_bidi_stream_id = stream_id + QUIC_STREAM_ID_STEP;
+> +		streams->send.streams_bidi++;
+> +
+> +		if (quic_stream_id_local(stream_id, is_serv)) {
+> +			stream->send.max_bytes = streams->send.max_stream_data_bidi_remote;
+> +			stream->recv.max_bytes = streams->recv.max_stream_data_bidi_local;
+> +		} else {
+> +			stream->send.max_bytes = streams->send.max_stream_data_bidi_local;
+> +			stream->recv.max_bytes = streams->recv.max_stream_data_bidi_remote;
+> +		}
+> +		stream->recv.window = stream->recv.max_bytes;
+> +
+> +		quic_stream_add(streams, stream);
+> +		stream_id += QUIC_STREAM_ID_STEP;
+> +	}
+> +	return stream;
+> +}
+> +
+> +/* Create and register new streams for receiving. */
+> +static struct quic_stream *quic_stream_recv_create(struct quic_stream_table *streams,
+> +						   s64 max_stream_id, u8 is_serv)
+> +{
+> +	struct quic_stream *stream;
+> +	s64 stream_id;
+> +
+> +	stream_id = streams->recv.next_bidi_stream_id;
+> +	if (quic_stream_id_uni(max_stream_id))
+> +		stream_id = streams->recv.next_uni_stream_id;
+> +
+> +	/* rfc9000#section-2.1: A stream ID that is used out of order results in all streams
+> +	 * of that type with lower-numbered stream IDs also being opened.
+> +	 */
+> +	while (stream_id <= max_stream_id) {
+> +		stream = kzalloc(sizeof(*stream), GFP_ATOMIC);
+> +		if (!stream)
+> +			return NULL;
+> +
+> +		stream->id = stream_id;
+> +		if (quic_stream_id_uni(stream_id)) {
+> +			stream->recv.window = streams->recv.max_stream_data_uni;
+> +			stream->recv.max_bytes = stream->recv.window;
+> +
+> +			if (streams->recv.next_uni_stream_id < stream_id + QUIC_STREAM_ID_STEP)
+> +				streams->recv.next_uni_stream_id = stream_id + QUIC_STREAM_ID_STEP;
+> +			streams->recv.streams_uni++;
+> +
+> +			quic_stream_add(streams, stream);
+> +			stream_id += QUIC_STREAM_ID_STEP;
+> +			continue;
+> +		}
+> +
+> +		if (streams->recv.next_bidi_stream_id < stream_id + QUIC_STREAM_ID_STEP)
+> +			streams->recv.next_bidi_stream_id = stream_id + QUIC_STREAM_ID_STEP;
+> +		streams->recv.streams_bidi++;
+> +
+> +		if (quic_stream_id_local(stream_id, is_serv)) {
+> +			stream->send.max_bytes = streams->send.max_stream_data_bidi_remote;
+> +			stream->recv.max_bytes = streams->recv.max_stream_data_bidi_local;
+> +		} else {
+> +			stream->send.max_bytes = streams->send.max_stream_data_bidi_local;
+> +			stream->recv.max_bytes = streams->recv.max_stream_data_bidi_remote;
+> +		}
+> +		stream->recv.window = stream->recv.max_bytes;
+> +
+> +		quic_stream_add(streams, stream);
+> +		stream_id += QUIC_STREAM_ID_STEP;
+> +	}
+> +	return stream;
+> +}
+> +
+> +/* Check if a send or receive stream ID is already closed. */
+> +static bool quic_stream_id_closed(struct quic_stream_table *streams, s64 stream_id, bool send)
+> +{
+> +	if (quic_stream_id_uni(stream_id)) {
+> +		if (send)
+> +			return stream_id < streams->send.next_uni_stream_id;
+> +		return stream_id < streams->recv.next_uni_stream_id;
+> +	}
+> +	if (send)
+> +		return stream_id < streams->send.next_bidi_stream_id;
+> +	return stream_id < streams->recv.next_bidi_stream_id;
+> +}
+> +
+> +/* Check if a stream ID would exceed local (recv) or peer (send) limits. */
+> +bool quic_stream_id_exceeds(struct quic_stream_table *streams, s64 stream_id, bool send)
+> +{
+> +	u64 nstreams;
+> +
+> +	if (!send) {
+> +		if (quic_stream_id_uni(stream_id))
+> +			return stream_id > streams->recv.max_uni_stream_id;
+> +		return stream_id > streams->recv.max_bidi_stream_id;
+> +	}
+> +
+> +	if (quic_stream_id_uni(stream_id)) {
+> +		if (stream_id > streams->send.max_uni_stream_id)
+> +			return true;
+> +		stream_id -= streams->send.next_uni_stream_id;
+> +		nstreams = quic_stream_id_to_streams(stream_id);
+> +		return nstreams + streams->send.streams_uni > streams->send.max_streams_uni;
+> +	}
+> +
+> +	if (stream_id > streams->send.max_bidi_stream_id)
+> +		return true;
+> +	stream_id -= streams->send.next_bidi_stream_id;
+> +	nstreams = quic_stream_id_to_streams(stream_id);
+> +	return nstreams + streams->send.streams_bidi > streams->send.max_streams_bidi;
+> +}
+> +
+> +/* Get or create a send stream by ID. */
+> +struct quic_stream *quic_stream_send_get(struct quic_stream_table *streams, s64 stream_id,
+> +					 u32 flags, bool is_serv)
+> +{
+> +	struct quic_stream *stream;
+> +
+> +	if (!quic_stream_id_valid(stream_id, is_serv, true))
+> +		return ERR_PTR(-EINVAL);
+> +
+> +	stream = quic_stream_find(streams, stream_id);
+> +	if (stream) {
+> +		if ((flags & MSG_STREAM_NEW) &&
+> +		    stream->send.state != QUIC_STREAM_SEND_STATE_READY)
+> +			return ERR_PTR(-EINVAL);
+> +		return stream;
+> +	}
+> +
+> +	if (quic_stream_id_closed(streams, stream_id, true))
+> +		return ERR_PTR(-ENOSTR);
+> +
+> +	if (!(flags & MSG_STREAM_NEW))
+> +		return ERR_PTR(-EINVAL);
+> +
+> +	if (quic_stream_id_exceeds(streams, stream_id, true))
+> +		return ERR_PTR(-EAGAIN);
+> +
+> +	stream = quic_stream_send_create(streams, stream_id, is_serv);
+> +	if (!stream)
+> +		return ERR_PTR(-ENOSTR);
+> +	streams->send.active_stream_id = stream_id;
+> +	return stream;
+> +}
+> +
+> +/* Get or create a receive stream by ID. */
+> +struct quic_stream *quic_stream_recv_get(struct quic_stream_table *streams, s64 stream_id,
+> +					 bool is_serv)
+> +{
+> +	struct quic_stream *stream;
+> +
+> +	if (!quic_stream_id_valid(stream_id, is_serv, false))
+> +		return ERR_PTR(-EINVAL);
+> +
+> +	stream = quic_stream_find(streams, stream_id);
+> +	if (stream)
+> +		return stream;
+> +
+> +	if (quic_stream_id_local(stream_id, is_serv)) {
+> +		if (quic_stream_id_closed(streams, stream_id, true))
+> +			return ERR_PTR(-ENOSTR);
+> +		return ERR_PTR(-EINVAL);
+> +	}
+> +
+> +	if (quic_stream_id_closed(streams, stream_id, false))
+> +		return ERR_PTR(-ENOSTR);
+> +
+> +	if (quic_stream_id_exceeds(streams, stream_id, false))
+> +		return ERR_PTR(-EAGAIN);
+> +
+> +	stream = quic_stream_recv_create(streams, stream_id, is_serv);
+> +	if (!stream)
+> +		return ERR_PTR(-ENOSTR);
+> +	if (quic_stream_id_valid(stream_id, is_serv, true))
+> +		streams->send.active_stream_id = stream_id;
+> +	return stream;
+> +}
+> +
+> +/* Release or clean up a send stream. This function updates stream counters and state when
+> + * a send stream has either successfully sent all data or has been reset.
+> + */
+> +void quic_stream_send_put(struct quic_stream_table *streams, struct quic_stream *stream,
+> +			  bool is_serv)
+> +{
+> +	if (quic_stream_id_uni(stream->id)) {
+> +		/* For unidirectional streams, decrement uni count and delete immediately. */
+> +		streams->send.streams_uni--;
+> +		quic_stream_delete(stream);
+> +		return;
+> +	}
+> +
+> +	/* For bidi streams, only proceed if receive side is in a final state. */
+> +	if (stream->recv.state != QUIC_STREAM_RECV_STATE_RECVD &&
+> +	    stream->recv.state != QUIC_STREAM_RECV_STATE_READ &&
+> +	    stream->recv.state != QUIC_STREAM_RECV_STATE_RESET_RECVD)
+> +		return;
+> +
+> +	if (quic_stream_id_local(stream->id, is_serv)) {
+> +		/* Local-initiated stream: mark send done and decrement send.bidi count. */
+> +		if (!stream->send.done) {
+> +			stream->send.done = 1;
+> +			streams->send.streams_bidi--;
+> +		}
+> +		goto out;
+> +	}
+> +	/* Remote-initiated stream: mark recv done and decrement recv bidi count. */
+> +	if (!stream->recv.done) {
+> +		stream->recv.done = 1;
+> +		streams->recv.streams_bidi--;
+> +		streams->recv.bidi_pending = 1;
+> +	}
+> +out:
+> +	/* Delete stream if fully read or reset. */
+> +	if (stream->recv.state != QUIC_STREAM_RECV_STATE_RECVD)
+> +		quic_stream_delete(stream);
+> +}
+> +
+> +/* Release or clean up a receive stream. This function updates stream counters and state when
+> + * the receive side has either consumed all data or has been reset.
+> + */
+> +void quic_stream_recv_put(struct quic_stream_table *streams, struct quic_stream *stream,
+> +			  bool is_serv)
+> +{
+> +	if (quic_stream_id_uni(stream->id)) {
+> +		/* For uni streams, decrement uni count and mark done. */
+> +		if (!stream->recv.done) {
+> +			stream->recv.done = 1;
+> +			streams->recv.streams_uni--;
+> +			streams->recv.uni_pending = 1;
+> +		}
+> +		goto out;
+> +	}
+> +
+> +	/* For bidi streams, only proceed if send side is in a final state. */
+> +	if (stream->send.state != QUIC_STREAM_SEND_STATE_RECVD &&
+> +	    stream->send.state != QUIC_STREAM_SEND_STATE_RESET_RECVD)
+> +		return;
+> +
+> +	if (quic_stream_id_local(stream->id, is_serv)) {
+> +		/* Local-initiated stream: mark send done and decrement send.bidi count. */
+> +		if (!stream->send.done) {
+> +			stream->send.done = 1;
+> +			streams->send.streams_bidi--;
+> +		}
+> +		goto out;
+> +	}
+> +	/* Remote-initiated stream: mark recv done and decrement recv bidi count. */
+> +	if (!stream->recv.done) {
+> +		stream->recv.done = 1;
+> +		streams->recv.streams_bidi--;
+> +		streams->recv.bidi_pending = 1;
+> +	}
+> +out:
+> +	/* Delete stream if fully read or reset. */
+> +	if (stream->recv.state != QUIC_STREAM_RECV_STATE_RECVD)
+> +		quic_stream_delete(stream);
+> +}
+> +
+> +/* Updates the maximum allowed incoming stream IDs if any streams were recently closed.
+> + * Recalculates the max_uni and max_bidi stream ID limits based on the number of open
+> + * streams and whether any were marked for deletion.
+> + *
+> + * Returns true if either max_uni or max_bidi was updated, indicating that a
+> + * MAX_STREAMS_UNI or MAX_STREAMS_BIDI frame should be sent to the peer.
+> + */
+> +bool quic_stream_max_streams_update(struct quic_stream_table *streams, s64 *max_uni, s64 *max_bidi)
+> +{
+> +	if (streams->recv.uni_pending) {
+> +		streams->recv.max_uni_stream_id =
+> +			streams->recv.next_uni_stream_id - QUIC_STREAM_ID_STEP +
+> +			((streams->recv.max_streams_uni - streams->recv.streams_uni) <<
+> +			 QUIC_STREAM_TYPE_BITS);
+> +		*max_uni = quic_stream_id_to_streams(streams->recv.max_uni_stream_id);
+> +		streams->recv.uni_pending = 0;
+> +	}
+> +	if (streams->recv.bidi_pending) {
+> +		streams->recv.max_bidi_stream_id =
+> +			streams->recv.next_bidi_stream_id - QUIC_STREAM_ID_STEP +
+> +			((streams->recv.max_streams_bidi - streams->recv.streams_bidi) <<
+> +			 QUIC_STREAM_TYPE_BITS);
+> +		*max_bidi = quic_stream_id_to_streams(streams->recv.max_bidi_stream_id);
+> +		streams->recv.bidi_pending = 0;
+> +	}
+> +
+> +	return *max_uni || *max_bidi;
+> +}
+> +
+> +#define QUIC_STREAM_HT_SIZE	64
+> +
+> +int quic_stream_init(struct quic_stream_table *streams)
+> +{
+> +	struct quic_shash_table *ht = &streams->ht;
+> +	int i, size = QUIC_STREAM_HT_SIZE;
+> +	struct quic_shash_head *head;
+> +
+> +	head = kmalloc_array(size, sizeof(*head), GFP_KERNEL);
+> +	if (!head)
+> +		return -ENOMEM;
+> +	for (i = 0; i < size; i++)
+> +		INIT_HLIST_HEAD(&head[i].head);
+> +	ht->size = size;
+> +	ht->hash = head;
+> +	return 0;
+> +}
+> +
+> +void quic_stream_free(struct quic_stream_table *streams)
+> +{
+> +	struct quic_shash_table *ht = &streams->ht;
+> +	struct quic_shash_head *head;
+> +	struct quic_stream *stream;
+> +	struct hlist_node *tmp;
+> +	int i;
+> +
+> +	for (i = 0; i < ht->size; i++) {
+> +		head = &ht->hash[i];
+> +		hlist_for_each_entry_safe(stream, tmp, &head->head, node)
+> +			quic_stream_delete(stream);
+> +	}
+> +	kfree(ht->hash);
+> +}
+> +
+> +/* Populate transport parameters from stream hash table. */
+> +void quic_stream_get_param(struct quic_stream_table *streams, struct quic_transport_param *p,
+> +			   bool is_serv)
+> +{
+> +	if (p->remote) {
+> +		p->max_stream_data_bidi_remote = streams->send.max_stream_data_bidi_remote;
+> +		p->max_stream_data_bidi_local = streams->send.max_stream_data_bidi_local;
+> +		p->max_stream_data_uni = streams->send.max_stream_data_uni;
+> +		p->max_streams_bidi = streams->send.max_streams_bidi;
+> +		p->max_streams_uni = streams->send.max_streams_uni;
+> +		return;
+> +	}
+> +
+> +	p->max_stream_data_bidi_remote = streams->recv.max_stream_data_bidi_remote;
+> +	p->max_stream_data_bidi_local = streams->recv.max_stream_data_bidi_local;
+> +	p->max_stream_data_uni = streams->recv.max_stream_data_uni;
+> +	p->max_streams_bidi = streams->recv.max_streams_bidi;
+> +	p->max_streams_uni = streams->recv.max_streams_uni;
+> +}
+> +
+> +/* Configure stream hashtable from transport parameters. */
+> +void quic_stream_set_param(struct quic_stream_table *streams, struct quic_transport_param *p,
+> +			   bool is_serv)
+> +{
+> +	u8 type;
+> +
+> +	if (p->remote) {
+> +		streams->send.max_stream_data_bidi_local = p->max_stream_data_bidi_local;
+> +		streams->send.max_stream_data_bidi_remote = p->max_stream_data_bidi_remote;
+> +		streams->send.max_stream_data_uni = p->max_stream_data_uni;
+> +		streams->send.max_streams_bidi = p->max_streams_bidi;
+> +		streams->send.max_streams_uni = p->max_streams_uni;
+> +		streams->send.active_stream_id = -1;
+> +
+> +		if (is_serv) {
+> +			type = QUIC_STREAM_TYPE_SERVER_BIDI;
+> +			streams->send.max_bidi_stream_id =
+> +				quic_stream_streams_to_id(p->max_streams_bidi, type);
+> +			streams->send.next_bidi_stream_id = type;
+> +
+> +			type = QUIC_STREAM_TYPE_SERVER_UNI;
+> +			streams->send.max_uni_stream_id =
+> +				quic_stream_streams_to_id(p->max_streams_uni, type);
+> +			streams->send.next_uni_stream_id = type;
+> +			return;
+> +		}
+> +
+> +		type = QUIC_STREAM_TYPE_CLIENT_BIDI;
+> +		streams->send.max_bidi_stream_id =
+> +			quic_stream_streams_to_id(p->max_streams_bidi, type);
+> +		streams->send.next_bidi_stream_id = type;
+> +
+> +		type = QUIC_STREAM_TYPE_CLIENT_UNI;
+> +		streams->send.max_uni_stream_id =
+> +			quic_stream_streams_to_id(p->max_streams_uni, type);
+> +		streams->send.next_uni_stream_id = type;
+> +		return;
+> +	}
+> +
+> +	streams->recv.max_stream_data_bidi_local = p->max_stream_data_bidi_local;
+> +	streams->recv.max_stream_data_bidi_remote = p->max_stream_data_bidi_remote;
+> +	streams->recv.max_stream_data_uni = p->max_stream_data_uni;
+> +	streams->recv.max_streams_bidi = p->max_streams_bidi;
+> +	streams->recv.max_streams_uni = p->max_streams_uni;
+> +
+> +	if (is_serv) {
+> +		type = QUIC_STREAM_TYPE_CLIENT_BIDI;
+> +		streams->recv.max_bidi_stream_id =
+> +			quic_stream_streams_to_id(p->max_streams_bidi, type);
+> +		streams->recv.next_bidi_stream_id = type;
+> +
+> +		type = QUIC_STREAM_TYPE_CLIENT_UNI;
+> +		streams->recv.max_uni_stream_id =
+> +			quic_stream_streams_to_id(p->max_streams_uni, type);
+> +		streams->recv.next_uni_stream_id = type;
+> +		return;
+> +	}
+> +
+> +	type = QUIC_STREAM_TYPE_SERVER_BIDI;
+> +	streams->recv.max_bidi_stream_id =
+> +		quic_stream_streams_to_id(p->max_streams_bidi, type);
+> +	streams->recv.next_bidi_stream_id = type;
+> +
+> +	type = QUIC_STREAM_TYPE_SERVER_UNI;
+> +	streams->recv.max_uni_stream_id =
+> +		quic_stream_streams_to_id(p->max_streams_uni, type);
+> +	streams->recv.next_uni_stream_id = type;
+> +}
+> diff --git a/net/quic/stream.h b/net/quic/stream.h
+> new file mode 100644
+> index 000000000000..c53d9358605c
+> --- /dev/null
+> +++ b/net/quic/stream.h
+> @@ -0,0 +1,136 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/* QUIC kernel implementation
+> + * (C) Copyright Red Hat Corp. 2023
+> + *
+> + * This file is part of the QUIC kernel implementation
+> + *
+> + * Written or modified by:
+> + *    Xin Long <lucien.xin@gmail.com>
+> + */
+> +
+> +#define QUIC_DEF_STREAMS	100
+> +#define QUIC_MAX_STREAMS	4096ULL
+> +
+> +/*
+> + * rfc9000#section-2.1:
+> + *
+> + *   The least significant bit (0x01) of the stream ID identifies the initiator of the stream.
+> + *   Client-initiated streams have even-numbered stream IDs (with the bit set to 0), and
+> + *   server-initiated streams have odd-numbered stream IDs (with the bit set to 1).
+> + *
+> + *   The second least significant bit (0x02) of the stream ID distinguishes between bidirectional
+> + *   streams (with the bit set to 0) and unidirectional streams (with the bit set to 1).
+> + */
+> +#define QUIC_STREAM_TYPE_BITS	2
+> +#define QUIC_STREAM_ID_STEP	BIT(QUIC_STREAM_TYPE_BITS)
+> +
+> +#define QUIC_STREAM_TYPE_CLIENT_BIDI	0x00
+> +#define QUIC_STREAM_TYPE_SERVER_BIDI	0x01
+> +#define QUIC_STREAM_TYPE_CLIENT_UNI	0x02
+> +#define QUIC_STREAM_TYPE_SERVER_UNI	0x03
+> +
+> +struct quic_stream {
+> +	struct hlist_node node;
+> +	s64 id;				/* Stream ID as defined in RFC 9000 Section 2.1 */
+> +	struct {
+> +		/* Sending-side stream level flow control */
+> +		u64 last_max_bytes;	/* Maximum send offset advertised by peer at last update */
+> +		u64 max_bytes;		/* Current maximum offset we are allowed to send to */
+> +		u64 bytes;		/* Bytes already sent to peer */
+> +
+> +		u32 errcode;		/* Application error code to send in RESET_STREAM */
+> +		u32 frags;		/* Number of sent STREAM frames not yet acknowledged */
+> +		u8 state;		/* Send stream state, per rfc9000#section-3.1 */
+> +
+> +		u8 data_blocked:1;	/* True if flow control blocks sending more data */
+> +		u8 done:1;		/* True if application indicated end of stream (FIN sent) */
+> +	} send;
+> +	struct {
+> +		/* Receiving-side stream level flow control */
+> +		u64 max_bytes;		/* Maximum offset peer is allowed to send to */
+> +		u64 window;		/* Remaining receive window before advertise a new limit */
+> +		u64 bytes;		/* Bytes consumed by application from the stream */
+> +
+> +		u64 highest;		/* Highest received offset */
+> +		u64 offset;		/* Offset up to which data is in buffer or consumed */
+> +		u64 finalsz;		/* Final size of the stream if FIN received */
+> +
+> +		u32 frags;		/* Number of received STREAM frames pending reassembly */
+> +		u8 state;		/* Receive stream state, per rfc9000#section-3.2 */
+> +
+> +		u8 stop_sent:1;		/* True if STOP_SENDING has been sent */
+> +		u8 done:1;		/* True if FIN received and final size validated */
+> +	} recv;
+> +};
+> +
+> +struct quic_stream_table {
+> +	struct quic_shash_table ht;	/* Hash table storing all active streams */
+> +
+> +	struct {
+> +		/* Parameters received from peer, defined in rfc9000#section-18.2 */
+> +		u64 max_stream_data_bidi_remote;	/* initial_max_stream_data_bidi_remote */
+> +		u64 max_stream_data_bidi_local;		/* initial_max_stream_data_bidi_local */
+> +		u64 max_stream_data_uni;		/* initial_max_stream_data_uni */
+> +		u64 max_streams_bidi;			/* initial_max_streams_bidi */
+> +		u64 max_streams_uni;			/* initial_max_streams_uni */
+> +
+> +		s64 next_bidi_stream_id;	/* Next bidi stream ID to be opened */
+> +		s64 next_uni_stream_id;		/* Next uni stream ID to be opened */
+> +		s64 max_bidi_stream_id;		/* Highest allowed bidi stream ID */
+> +		s64 max_uni_stream_id;		/* Highest allowed uni stream ID */
+> +		s64 active_stream_id;		/* Most recently opened stream ID */
+> +
+> +		u8 bidi_blocked:1;	/* True if STREAMS_BLOCKED_BIDI was sent and not ACKed */
+> +		u8 uni_blocked:1;	/* True if STREAMS_BLOCKED_UNI was sent and not ACKed */
+> +		u16 streams_bidi;	/* Number of currently active bidi streams */
+> +		u16 streams_uni;	/* Number of currently active uni streams */
+> +	} send;
+> +	struct {
+> +		 /* Our advertised limits to the peer, per rfc9000#section-18.2 */
+> +		u64 max_stream_data_bidi_remote;	/* initial_max_stream_data_bidi_remote */
+> +		u64 max_stream_data_bidi_local;		/* initial_max_stream_data_bidi_local */
+> +		u64 max_stream_data_uni;		/* initial_max_stream_data_uni */
+> +		u64 max_streams_bidi;			/* initial_max_streams_bidi */
+> +		u64 max_streams_uni;			/* initial_max_streams_uni */
+> +
+> +		s64 next_bidi_stream_id;	/* Next expected bidi stream ID from peer */
+> +		s64 next_uni_stream_id;		/* Next expected uni stream ID from peer */
+> +		s64 max_bidi_stream_id;		/* Current allowed bidi stream ID range */
+> +		s64 max_uni_stream_id;		/* Current allowed uni stream ID range */
+> +
+> +		u8 bidi_pending:1;	/* True if MAX_STREAMS_BIDI needs to be sent */
+> +		u8 uni_pending:1;	/* True if MAX_STREAMS_UNI needs to be sent */
+> +		u16 streams_bidi;	/* Number of currently open bidi streams */
+> +		u16 streams_uni;	/* Number of currently open uni streams */
+> +	} recv;
+> +};
+> +
+> +static inline u64 quic_stream_id_to_streams(s64 stream_id)
+> +{
+> +	return (u64)(stream_id >> QUIC_STREAM_TYPE_BITS) + 1;
+> +}
+> +
+> +static inline s64 quic_stream_streams_to_id(u64 streams, u8 type)
+> +{
+> +	return (s64)((streams - 1) << QUIC_STREAM_TYPE_BITS) | type;
+> +}
+> +
+> +struct quic_stream *quic_stream_send_get(struct quic_stream_table *streams, s64 stream_id,
+> +					 u32 flags, bool is_serv);
+> +struct quic_stream *quic_stream_recv_get(struct quic_stream_table *streams, s64 stream_id,
+> +					 bool is_serv);
+> +void quic_stream_send_put(struct quic_stream_table *streams, struct quic_stream *stream,
+> +			  bool is_serv);
+> +void quic_stream_recv_put(struct quic_stream_table *streams, struct quic_stream *stream,
+> +			  bool is_serv);
+> +
+> +bool quic_stream_max_streams_update(struct quic_stream_table *streams, s64 *max_uni, s64 *max_bidi);
+> +bool quic_stream_id_exceeds(struct quic_stream_table *streams, s64 stream_id, bool send);
+> +struct quic_stream *quic_stream_find(struct quic_stream_table *streams, s64 stream_id);
+> +
+> +void quic_stream_get_param(struct quic_stream_table *streams, struct quic_transport_param *p,
+> +			   bool is_serv);
+> +void quic_stream_set_param(struct quic_stream_table *streams, struct quic_transport_param *p,
+> +			   bool is_serv);
+> +void quic_stream_free(struct quic_stream_table *streams);
+> +int quic_stream_init(struct quic_stream_table *streams);
 
-Ref Crashes Repro Title
-<1> 6492    Yes   possible deadlock in nr_rt_device_down (3)
-                  https://syzkaller.appspot.com/bug?extid=ccdfb85a561b973219c7
-<2> 1509    Yes   possible deadlock in nr_rt_ioctl (2)
-                  https://syzkaller.appspot.com/bug?extid=14afda08dc3484d5db82
-<3> 438     Yes   possible deadlock in nr_remove_neigh (2)
-                  https://syzkaller.appspot.com/bug?extid=8863ad36d31449b4dc17
-<4> 323     No    WARNING: ODEBUG bug in handle_softirqs
-                  https://syzkaller.appspot.com/bug?extid=60db000b8468baeddbb1
-<5> 63      No    WARNING: ODEBUG bug in __run_timers (3)
-                  https://syzkaller.appspot.com/bug?extid=7287222a6d88bdb559a7
-<6> 8       Yes   WARNING: refcount bug in ax25_setsockopt
-                  https://syzkaller.appspot.com/bug?extid=0ee4da32f91ae2a3f015
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
