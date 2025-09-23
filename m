@@ -1,669 +1,332 @@
-Return-Path: <netdev+bounces-225682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3CB8B96C70
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 18:15:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B38EB96CF2
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 18:24:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EE9517D84C
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 16:15:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5474119C656C
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 16:24:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7DD26CE0C;
-	Tue, 23 Sep 2025 16:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50ED5324B27;
+	Tue, 23 Sep 2025 16:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WjFwnUdk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E+Pp50/D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30919C141
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 16:15:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79532322DCF
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 16:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758644150; cv=none; b=cnTp2jmqGAopAsHzAvfyxj3QM6A0uHTRRcRK8foQ3PoDvRBVslGUiMPoCpy8Yhvrn1CAVtMpXF2+D+6z27N0lJNszn0hNKm4e8wiL/ss4d5AfNhPROl77GHm9J2818eF2F96AYTwiKtshjs4mohh2iDJndzm3hLBNaJ/53VlrYo=
+	t=1758644646; cv=none; b=Ap3vwnUYovrEww5AkMXXr6zmq86sSm6KJ59prJZItbhA4fwTcLRXHSDF5cHnsMBGm2gySx46riqVWNFA4Uaq9iVyAmLCOaQYoQzPEp2E0903wYOOPkIvfHlwILq9h0cHFvbvVlYPKY5Q+ef/Co2P1KvK+qj0QVu4WPj82TmC8Cg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758644150; c=relaxed/simple;
-	bh=4zx0+5+9ay+MLcWv70cajEU6N8L5ebaupdKpX+3hV3U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=geXu62EE1MTVpzRuNWqlb+2c/K05KwMBNmy+6/gNBhyWyVGqfKTFWzPzACw4ujJfkB8I85GOQ0y9XkIBKBN5xN+bkg3wUc6A0K6Y/jnoQcR5CLrxrZ2JyX/vbHGNlJNXI0E7Xpd50QLXhqk94QveJvTL4yX4kZn5scfvIF0j308=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WjFwnUdk; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-32e74ae0306so22317a91.1
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 09:15:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758644147; x=1759248947; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=roqOkA4mhpUTuV7zHtlQunwhS2i7eky1y7Fn2tYtn+g=;
-        b=WjFwnUdkyjJ9YmKXFjRWFLuMSk/qlXRxwetuTEKIMKv87PRyzk0E577FJArupeqxiP
-         ADsCvDQEhSoQyK7fzDjkGc1snbW3xNzNTdozU4o5ajCkc4pVK8dRHbVJUnz8zHqM9f/5
-         cG2pNIa0njnFcFWyLHY2wfx35SRBg/GmP80Azksial0umwDcDW+NL51a/fmohkVYZlAW
-         mCaLXV9OpJRzitI9nqUllfx4Ejbf84/EgQNM8emQkLYU/vb0nBo6sj5G9pR3IfnHR2iC
-         OXQaVbxOJuhn5W0QutSn80/AyE9gMX+gAkAOUeLTcXeHr2H+39lv3AueP6MWnikYrF/W
-         MHbg==
+	s=arc-20240116; t=1758644646; c=relaxed/simple;
+	bh=YT4el4xP21BBB42t2PWFoKpg5+LAf3L0g3UU1WpBtt4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QSv0PLtlrfH8Uu4msezqDUaN7NWrvaZs0LkBIAZn3vG5PTuztm4GRaSvodDqQ1ePMh6nChm5IyTFUq+t24RalIgWcKT3SvbXiOeO+xedqaKrHzSTit/imOTTJ4iIKVxs+PyZ+ncCjBxBPsa7so7AWwNoUvEzXT1Ea5H6BVUraxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E+Pp50/D; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758644643;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3gC4BVDLOnUNLEX5DUiA671iXaBW42g+cMsZG4Zf9r4=;
+	b=E+Pp50/DoiQcX1OUgV96NQyRZdqKyTdDywf9AXPD70xrsLp5T9DnnxkXmztps0swrPWglL
+	19tyfndKTNH4KOI0CqS10m6nGZaUW96e9e8SBtStZNlS9wtBWzhIJRGpdcULuv88dz+GMw
+	Z2lGyFMvz8xBoMvNNJprL0lkWPLLkV0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-126-ZbDCypIhP5CApwr63zPZAA-1; Tue, 23 Sep 2025 12:24:01 -0400
+X-MC-Unique: ZbDCypIhP5CApwr63zPZAA-1
+X-Mimecast-MFC-AGG-ID: ZbDCypIhP5CApwr63zPZAA_1758644640
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-46e1a2a28f4so11868995e9.2
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 09:24:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758644147; x=1759248947;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=roqOkA4mhpUTuV7zHtlQunwhS2i7eky1y7Fn2tYtn+g=;
-        b=Vf7H2hWEAfWCFtm/g5WupSM3QgG8K9cHTvs4D6TgXet6JbwhXNN4m5nSagPlMMQNEp
-         bBQ7VcIyrO9HDPFaKDv73ys91aeq2s41sguzXzPAXTIohYoAQIm4OWvAEe6l6WpVBP8S
-         80aYDXgOzasBefNSQIzOdaythL/Svpmtb71fbooaj35dSex4Vwq903aNnnMnTpdHLyzu
-         jp8JxHqYM8enpHO+byw5J76qznWfhEWW5MlzYJpEwkoBsbua3QCx+z8PvSWyGeaMGAA2
-         qySuL3r+YROTTKiiMuK4I26/fFleAXKCZOypQ/hDxV0+U60iOlUuOxm4Q0P6EFmPYGTi
-         Ydvw==
-X-Gm-Message-State: AOJu0Yy1PmmRJnhsoAlg7iheJDKHeFAs9SIx3K6aM9oZwJ1RdH6ZYbIs
-	MIGHw5greJPZrSDjXPqk0nC8WlBsacJS4AVHvkqu71J+JVrv18643qmMJezAV/uTbjv56sAsT4j
-	fT4MNt9PzDLJytVNos/gFJ0cu4a1eFzE=
-X-Gm-Gg: ASbGncuPIU3e9H8Iv4+Et5/4XZc3v/dIKoXnmzSnNkevQ2NG0PA3/smdnP2STL1nSCV
-	fNJ147HX3ftXAwRMtqO4+5iiKok5TgeC/RkQQSB2eYX4Jn1t7hpxCIe0OeqSX9aS4YtZlM1uDNo
-	rgSa6mCdLNRSzU7Yx585R7lpfUsLJE4HkPzTV8oMMf/CdWq+XOiJcddSMqC/0kZc+xnPCaLCSyU
-	97gDeDES+iH6FGSHUkKBSQyYZq0SkeNrXTV3QKWvA==
-X-Google-Smtp-Source: AGHT+IEr1Wp7lnOKYbQogTRU49tZDRjCU4IgU+hKGrAKTHaQZHlUYbH4i5PmQJfU7XjQcSc/cw2/AJTEJkkkscjPCoQ=
-X-Received: by 2002:a17:90b:4f45:b0:32e:64ed:c20a with SMTP id
- 98e67ed59e1d1-332ab42e4c4mr4048060a91.0.1758644146952; Tue, 23 Sep 2025
- 09:15:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758644640; x=1759249440;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3gC4BVDLOnUNLEX5DUiA671iXaBW42g+cMsZG4Zf9r4=;
+        b=ThK96wHGe9XlydsDn4+y8GIBr3pRErHQ3wzvK1Z6zFNthiNN3EeLg+qQGhODanRNob
+         +PZxryFwSbUVdypxku/CKx1sLh0/UVksiq16b9yAEfyDZAzM2d4TObWMm/MRThO2Jvwm
+         29YiIYyUu7fvmnUrPZx9TuBn/TsTqOCxSzTYjGjH+/So8sZFbbvmf+es/7QewPdNFRmK
+         m0i8T8G5sAIzpVT7RV0p804/zqS02HzJbT3AJGpTQu2vjWQigtNGvqIwQkQYRn2heKae
+         +UYJDQfvZI0v9JPR3ZgEbf67wM8CU+RHfmmtHR9hKiR32gwIMNfr14WLjMlJTmUviMoU
+         I+6w==
+X-Forwarded-Encrypted: i=1; AJvYcCVqPIxOZjlLHqaktJVr77+shSaWsG300gqfALl9uPQXibF7+3RGZGqf8G7OBVhf10l0/V++79A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7tbsHA0g9RT6QdjyCrOYpV5/tB849/XbXSDm4qWZEpXilX43z
+	2vrc2t3+RYSSjnjPTaIKXOptXfoVgE/YAcqvmpkHkqPgObGW8FYjrmLeMoPVg0PJIdzZprtfZk7
+	wxD7BSBtdMpPxOfsy8OZMLPqsEU9VBZL5AyZ9lAOd0Z5qvsMNDo2PIcqyLg==
+X-Gm-Gg: ASbGncvf2KS0WOYSRTtUYbyWP/zqZJCYigyOPKiNVSsz4Ppbv3oXbfhF5kv/ZzvWva6
+	jrTa2V7ry8XaS/ZybsHPTLxVctlCOmg6+nH0LXBsQEKHRD5PnvwbbE/A+0b+JZ2hoKajdT4Rrl3
+	nwDRAYs5v1WxVZGupKTkNr19vGSZn8MWBj6XRyvkzJhPLI39xoOzHCZZPJv+IFN1TWFRAuiNc9a
+	cZ2bF8BUCgfM61c1lrYhRPj9Cle0jbn76lItyYqCzUVafrs0LT1S/zl2rpYNztVxj5CWUWwZ2Nl
+	5XO05pCaSKtU4AcYCNonr3T4ij2RXOI/Iw8=
+X-Received: by 2002:a05:600c:1390:b0:45b:43cc:e558 with SMTP id 5b1f17b1804b1-46e1dad77e1mr32752465e9.35.1758644639819;
+        Tue, 23 Sep 2025 09:23:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE7GesyF2ByRRbQYOqNW09UyOpostEcyx/74NI3DJWqp5z34Y6omx1cXSzjAbzY9BmBU7BQsg==
+X-Received: by 2002:a05:600c:1390:b0:45b:43cc:e558 with SMTP id 5b1f17b1804b1-46e1dad77e1mr32752205e9.35.1758644639310;
+        Tue, 23 Sep 2025 09:23:59 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46dd4e52b36sm73010345e9.14.2025.09.23.09.23.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 09:23:58 -0700 (PDT)
+Date: Tue, 23 Sep 2025 12:23:56 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	eperezma@redhat.com, stephen@networkplumber.org, leiyang@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, kvm@vger.kernel.org,
+	Tim Gebauer <tim.gebauer@tu-dortmund.de>
+Subject: Re: [PATCH net-next v5 5/8] TUN & TAP: Provide
+ ptr_ring_consume_batched wrappers for vhost_net
+Message-ID: <20250923122147-mutt-send-email-mst@kernel.org>
+References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+ <20250922221553.47802-6-simon.schippers@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1758234904.git.lucien.xin@gmail.com> <01dd8f3b9afc6c813f036924790997d3ed4bcf3d.1758234904.git.lucien.xin@gmail.com>
- <a3fa95a3-ce18-498a-a656-16581212c6cb@redhat.com>
-In-Reply-To: <a3fa95a3-ce18-498a-a656-16581212c6cb@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 23 Sep 2025 12:15:35 -0400
-X-Gm-Features: AS18NWC507yrnKiwe_bDMHV3OqCbUCcPotGyyraAzalosS-A-S1QEYQItoSZtSA
-Message-ID: <CADvbK_cfdcCEXP8xUa=k6+NxV2JLOBP1Z4KA6Pa+rDEyhc9OTw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 04/15] quic: provide family ops for address
- and protocol
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
-	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
-	Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
-	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250922221553.47802-6-simon.schippers@tu-dortmund.de>
 
-On Tue, Sep 23, 2025 at 7:30=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 9/19/25 12:34 AM, Xin Long wrote:
-> > +static int quic_v4_flow_route(struct sock *sk, union quic_addr *da, un=
-ion quic_addr *sa,
-> > +                           struct flowi *fl)
-> > +{
-> > +     struct flowi4 *fl4;
-> > +     struct rtable *rt;
-> > +     struct flowi _fl;
-> > +
-> > +     if (__sk_dst_check(sk, 0))
-> > +             return 1;
-> > +
-> > +     fl4 =3D &_fl.u.ip4;
-> > +     memset(&_fl, 0x00, sizeof(_fl));
-> > +     fl4->saddr =3D sa->v4.sin_addr.s_addr;
-> > +     fl4->fl4_sport =3D sa->v4.sin_port;
-> > +     fl4->daddr =3D da->v4.sin_addr.s_addr;
-> > +     fl4->fl4_dport =3D da->v4.sin_port;
-> > +     fl4->flowi4_proto =3D IPPROTO_UDP;
-> > +     fl4->flowi4_oif =3D sk->sk_bound_dev_if;
->
-> Why you need a local variable? I think you could use the 'fl' argument
-> directly.
-You're right, I don't really need this '_fl'.
+On Tue, Sep 23, 2025 at 12:15:50AM +0200, Simon Schippers wrote:
+> The wrappers tun_ring_consume_batched/tap_ring_consume_batched are similar
+> to the wrappers tun_ring_consume/tap_ring_consume. They deal with
+> consuming a batch of entries of the ptr_ring and then waking the
+> netdev queue whenever entries get invalidated to be used again by the
+> producer.
+> To avoid waking the netdev queue when the ptr_ring is full, it is checked
+> if the netdev queue is stopped before invalidating entries. Like that the
+> netdev queue can be safely woken after invalidating entries.
+> 
+> The READ_ONCE in __ptr_ring_peek, paired with the smp_wmb() in
+> __ptr_ring_produce within tun_net_xmit guarantees that the information
+> about the netdev queue being stopped is visible after __ptr_ring_peek is
+> called.
 
->
-> > +
-> > +     fl4->flowi4_scope =3D ip_sock_rt_scope(sk);
-> > +     fl4->flowi4_dscp =3D inet_sk_dscp(inet_sk(sk));
-> > +
-> > +     rt =3D ip_route_output_key(sock_net(sk), fl4);
-> > +     if (IS_ERR(rt))
-> > +             return PTR_ERR(rt);
-> > +
-> > +     if (!sa->v4.sin_family) {
-> > +             sa->v4.sin_family =3D AF_INET;
-> > +             sa->v4.sin_addr.s_addr =3D fl4->saddr;
-> > +     }
-> > +     sk_setup_caps(sk, &rt->dst);
-> > +     memcpy(fl, &_fl, sizeof(_fl));
-> > +     return 0;
-> > +}
-> > +
-> > +static int quic_v6_flow_route(struct sock *sk, union quic_addr *da, un=
-ion quic_addr *sa,
-> > +                           struct flowi *fl)
-> > +{
-> > +     struct ipv6_pinfo *np =3D inet6_sk(sk);
-> > +     struct ip6_flowlabel *flowlabel;
-> > +     struct dst_entry *dst;
-> > +     struct flowi6 *fl6;
-> > +     struct flowi _fl;
-> > +
-> > +     if (__sk_dst_check(sk, np->dst_cookie))
-> > +             return 1;
-> > +
-> > +     fl6 =3D &_fl.u.ip6;
-> > +     memset(&_fl, 0x0, sizeof(_fl));
-> > +     fl6->saddr =3D sa->v6.sin6_addr;
-> > +     fl6->fl6_sport =3D sa->v6.sin6_port;
-> > +     fl6->daddr =3D da->v6.sin6_addr;
-> > +     fl6->fl6_dport =3D da->v6.sin6_port;
-> > +     fl6->flowi6_proto =3D IPPROTO_UDP;
-> > +     fl6->flowi6_oif =3D sk->sk_bound_dev_if;
->
-> Same here.
-Yes.
+READ_ONCE generally can't pair with smp_wmb
 
->
-> > +
-> > +     if (inet6_test_bit(SNDFLOW, sk)) {
-> > +             fl6->flowlabel =3D (da->v6.sin6_flowinfo & IPV6_FLOWINFO_=
-MASK);
-> > +             if (fl6->flowlabel & IPV6_FLOWLABEL_MASK) {
-> > +                     flowlabel =3D fl6_sock_lookup(sk, fl6->flowlabel)=
-;
-> > +                     if (IS_ERR(flowlabel))
-> > +                             return -EINVAL;
-> > +                     fl6_sock_release(flowlabel);
-> > +             }
-> > +     }
-> > +
-> > +     dst =3D ip6_dst_lookup_flow(sock_net(sk), sk, fl6, NULL);
-> > +     if (IS_ERR(dst))
-> > +             return PTR_ERR(dst);
-> > +
-> > +     if (!sa->v6.sin6_family) {
-> > +             sa->v6.sin6_family =3D AF_INET6;
-> > +             sa->v6.sin6_addr =3D fl6->saddr;
-> > +     }
-> > +     ip6_dst_store(sk, dst, NULL, NULL);
-> > +     memcpy(fl, &_fl, sizeof(_fl));
-> > +     return 0;
-> > +}
-> > +
-> > +static void quic_v4_lower_xmit(struct sock *sk, struct sk_buff *skb, s=
-truct flowi *fl)
-> > +{
-> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
-> > +     u8 tos =3D (inet_sk(sk)->tos | cb->ecn), ttl;
-> > +     struct flowi4 *fl4 =3D &fl->u.ip4;
-> > +     struct dst_entry *dst;
-> > +     __be16 df =3D 0;
-> > +
-> > +     pr_debug("%s: skb: %p, len: %d, num: %llu, %pI4:%d -> %pI4:%d\n",=
- __func__,
-> > +              skb, skb->len, cb->number, &fl4->saddr, ntohs(fl4->fl4_s=
-port),
-> > +              &fl4->daddr, ntohs(fl4->fl4_dport));
-> > +
-> > +     dst =3D sk_dst_get(sk);
-> > +     if (!dst) {
-> > +             kfree_skb(skb);
-> > +             return;
-> > +     }
-> > +     if (ip_dont_fragment(sk, dst) && !skb->ignore_df)
-> > +             df =3D htons(IP_DF);
-> > +
-> > +     ttl =3D (u8)ip4_dst_hoplimit(dst);
-> > +     udp_tunnel_xmit_skb((struct rtable *)dst, sk, skb, fl4->saddr, fl=
-4->daddr,
-> > +                         tos, ttl, df, fl4->fl4_sport, fl4->fl4_dport,=
- false, false, 0);
-> > +}
-> > +
-> > +static void quic_v6_lower_xmit(struct sock *sk, struct sk_buff *skb, s=
-truct flowi *fl)
-> > +{
-> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
-> > +     u8 tc =3D (inet6_sk(sk)->tclass | cb->ecn), ttl;
-> > +     struct flowi6 *fl6 =3D &fl->u.ip6;
-> > +     struct dst_entry *dst;
-> > +     __be32 label;
-> > +
-> > +     pr_debug("%s: skb: %p, len: %d, num: %llu, %pI6c:%d -> %pI6c:%d\n=
-", __func__,
-> > +              skb, skb->len, cb->number, &fl6->saddr, ntohs(fl6->fl6_s=
-port),
-> > +              &fl6->daddr, ntohs(fl6->fl6_dport));
-> > +
-> > +     dst =3D sk_dst_get(sk);
-> > +     if (!dst) {
-> > +             kfree_skb(skb);
-> > +             return;
-> > +     }
-> > +
-> > +     ttl =3D (u8)ip6_dst_hoplimit(dst);
-> > +     label =3D ip6_make_flowlabel(sock_net(sk), skb, fl6->flowlabel, t=
-rue, fl6);
-> > +     udp_tunnel6_xmit_skb(dst, sk, skb, NULL, &fl6->saddr, &fl6->daddr=
-, tc,
-> > +                          ttl, label, fl6->fl6_sport, fl6->fl6_dport, =
-false, 0);
-> > +}
-> > +
-> > +static void quic_v4_get_msg_addrs(struct sk_buff *skb, union quic_addr=
- *da, union quic_addr *sa)
-> > +{
-> > +     struct udphdr *uh =3D quic_udphdr(skb);
-> > +
-> > +     sa->v4.sin_family =3D AF_INET;
-> > +     sa->v4.sin_port =3D uh->source;
-> > +     sa->v4.sin_addr.s_addr =3D ip_hdr(skb)->saddr;
-> > +
-> > +     da->v4.sin_family =3D AF_INET;
-> > +     da->v4.sin_port =3D uh->dest;
-> > +     da->v4.sin_addr.s_addr =3D ip_hdr(skb)->daddr;
-> > +}
-> > +
-> > +static void quic_v6_get_msg_addrs(struct sk_buff *skb, union quic_addr=
- *da, union quic_addr *sa)
-> > +{
-> > +     struct udphdr *uh =3D quic_udphdr(skb);
-> > +
-> > +     sa->v6.sin6_family =3D AF_INET6;
-> > +     sa->v6.sin6_port =3D uh->source;
-> > +     sa->v6.sin6_addr =3D ipv6_hdr(skb)->saddr;
-> > +
-> > +     da->v6.sin6_family =3D AF_INET6;
-> > +     da->v6.sin6_port =3D uh->dest;
-> > +     da->v6.sin6_addr =3D ipv6_hdr(skb)->daddr;
-> > +}
-> > +
-> > +static int quic_v4_get_mtu_info(struct sk_buff *skb, u32 *info)
-> > +{
-> > +     struct icmphdr *hdr;
-> > +
-> > +     hdr =3D (struct icmphdr *)(skb_network_header(skb) - sizeof(struc=
-t icmphdr));
-> > +     if (hdr->type =3D=3D ICMP_DEST_UNREACH && hdr->code =3D=3D ICMP_F=
-RAG_NEEDED) {
-> > +             *info =3D ntohs(hdr->un.frag.mtu);
-> > +             return 0;
-> > +     }
-> > +
-> > +     /* Defer other types' processing to UDP error handler. */
-> > +     return 1;
-> > +}
-> > +
-> > +static int quic_v6_get_mtu_info(struct sk_buff *skb, u32 *info)
-> > +{
-> > +     struct icmp6hdr *hdr;
-> > +
-> > +     hdr =3D (struct icmp6hdr *)(skb_network_header(skb) - sizeof(stru=
-ct icmp6hdr));
-> > +     if (hdr->icmp6_type =3D=3D ICMPV6_PKT_TOOBIG) {
-> > +             *info =3D ntohl(hdr->icmp6_mtu);
-> > +             return 0;
-> > +     }
-> > +
-> > +     /* Defer other types' processing to UDP error handler. */
-> > +     return 1;
-> > +}
-> > +
-> > +static u8 quic_v4_get_msg_ecn(struct sk_buff *skb)
-> > +{
-> > +     return (ip_hdr(skb)->tos & INET_ECN_MASK);
-> > +}
-> > +
-> > +static u8 quic_v6_get_msg_ecn(struct sk_buff *skb)
-> > +{
-> > +     return (ipv6_get_dsfield(ipv6_hdr(skb)) & INET_ECN_MASK);
-> > +}
-> > +
-> > +static int quic_v4_get_user_addr(struct sock *sk, union quic_addr *a, =
-struct sockaddr *addr,
-> > +                              int addr_len)
-> > +{
-> > +     u32 len =3D sizeof(struct sockaddr_in);
-> > +
-> > +     if (addr_len < len || addr->sa_family !=3D AF_INET)
-> > +             return 1;
-> > +     if (ipv4_is_multicast(quic_addr(addr)->v4.sin_addr.s_addr))
-> > +             return 1;
-> > +     memcpy(a, addr, len);
-> > +     return 0;
-> > +}
-> > +
-> > +static int quic_v6_get_user_addr(struct sock *sk, union quic_addr *a, =
-struct sockaddr *addr,
-> > +                              int addr_len)
-> > +{
-> > +     u32 len =3D sizeof(struct sockaddr_in);
-> > +     int type;
-> > +
-> > +     if (addr_len < len)
-> > +             return 1;
-> > +
-> > +     if (addr->sa_family !=3D AF_INET6) {
-> > +             if (ipv6_only_sock(sk))
-> > +                     return 1;
-> > +             return quic_v4_get_user_addr(sk, a, addr, addr_len);
-> > +     }
-> > +
-> > +     len =3D sizeof(struct sockaddr_in6);
-> > +     if (addr_len < len)
-> > +             return 1;
-> > +     type =3D ipv6_addr_type(&quic_addr(addr)->v6.sin6_addr);
-> > +     if (type !=3D IPV6_ADDR_ANY && !(type & IPV6_ADDR_UNICAST))
-> > +             return 1;
-> > +     memcpy(a, addr, len);
-> > +     return 0;
-> > +}
-> > +
-> > +static void quic_v4_get_pref_addr(struct sock *sk, union quic_addr *ad=
-dr, u8 **pp, u32 *plen)
-> > +{
-> > +     u8 *p =3D *pp;
-> > +
-> > +     memcpy(&addr->v4.sin_addr, p, QUIC_ADDR4_LEN);
-> > +     p +=3D QUIC_ADDR4_LEN;
-> > +     memcpy(&addr->v4.sin_port, p, QUIC_PORT_LEN);
-> > +     p +=3D QUIC_PORT_LEN;
-> > +     addr->v4.sin_family =3D AF_INET;
-> > +     /* Skip over IPv6 address and port, not used for AF_INET sockets.=
- */
-> > +     p +=3D QUIC_ADDR6_LEN;
-> > +     p +=3D QUIC_PORT_LEN;
-> > +
-> > +     if (!addr->v4.sin_port || quic_v4_is_any_addr(addr) ||
-> > +         ipv4_is_multicast(addr->v4.sin_addr.s_addr))
-> > +             memset(addr, 0, sizeof(*addr));
-> > +     *plen -=3D (p - *pp);
-> > +     *pp =3D p;
-> > +}
-> > +
-> > +static void quic_v6_get_pref_addr(struct sock *sk, union quic_addr *ad=
-dr, u8 **pp, u32 *plen)
-> > +{
-> > +     u8 *p =3D *pp;
-> > +     int type;
-> > +
-> > +     /* Skip over IPv4 address and port. */
-> > +     p +=3D QUIC_ADDR4_LEN;
-> > +     p +=3D QUIC_PORT_LEN;
-> > +     /* Try to use IPv6 address and port first. */
-> > +     memcpy(&addr->v6.sin6_addr, p, QUIC_ADDR6_LEN);
-> > +     p +=3D QUIC_ADDR6_LEN;
-> > +     memcpy(&addr->v6.sin6_port, p, QUIC_PORT_LEN);
-> > +     p +=3D QUIC_PORT_LEN;
-> > +     addr->v6.sin6_family =3D AF_INET6;
-> > +
-> > +     type =3D ipv6_addr_type(&addr->v6.sin6_addr);
-> > +     if (!addr->v6.sin6_port || !(type & IPV6_ADDR_UNICAST)) {
-> > +             memset(addr, 0, sizeof(*addr));
-> > +             if (ipv6_only_sock(sk))
-> > +                     goto out;
-> > +             /* Fallback to IPv4 if IPv6 address is not usable. */
-> > +             return quic_v4_get_pref_addr(sk, addr, pp, plen);
-> > +     }
-> > +out:
-> > +     *plen -=3D (p - *pp);
-> > +     *pp =3D p;
-> > +}
-> > +
-> > +static void quic_v4_set_pref_addr(struct sock *sk, u8 *p, union quic_a=
-ddr *addr)
-> > +{
-> > +     memcpy(p, &addr->v4.sin_addr, QUIC_ADDR4_LEN);
-> > +     p +=3D QUIC_ADDR4_LEN;
-> > +     memcpy(p, &addr->v4.sin_port, QUIC_PORT_LEN);
-> > +     p +=3D QUIC_PORT_LEN;
-> > +     memset(p, 0, QUIC_ADDR6_LEN);
-> > +     p +=3D QUIC_ADDR6_LEN;
-> > +     memset(p, 0, QUIC_PORT_LEN);
-> > +}
-> > +
-> > +static void quic_v6_set_pref_addr(struct sock *sk, u8 *p, union quic_a=
-ddr *addr)
-> > +{
-> > +     if (addr->sa.sa_family =3D=3D AF_INET)
-> > +             return quic_v4_set_pref_addr(sk, p, addr);
-> > +
-> > +     memset(p, 0, QUIC_ADDR4_LEN);
-> > +     p +=3D QUIC_ADDR4_LEN;
-> > +     memset(p, 0, QUIC_PORT_LEN);
-> > +     p +=3D QUIC_PORT_LEN;
-> > +     memcpy(p, &addr->v6.sin6_addr, QUIC_ADDR6_LEN);
-> > +     p +=3D QUIC_ADDR6_LEN;
-> > +     memcpy(p, &addr->v6.sin6_port, QUIC_PORT_LEN);
-> > +}
-> > +
-> > +static bool quic_v4_cmp_sk_addr(struct sock *sk, union quic_addr *a, u=
-nion quic_addr *addr)
-> > +{
-> > +     if (a->v4.sin_port !=3D addr->v4.sin_port)
-> > +             return false;
-> > +     if (a->v4.sin_family !=3D addr->v4.sin_family)
-> > +             return false;
-> > +     if (a->v4.sin_addr.s_addr =3D=3D htonl(INADDR_ANY) ||
-> > +         addr->v4.sin_addr.s_addr =3D=3D htonl(INADDR_ANY))
-> > +             return true;
-> > +     return a->v4.sin_addr.s_addr =3D=3D addr->v4.sin_addr.s_addr;
-> > +}
-> > +
-> > +static bool quic_v6_cmp_sk_addr(struct sock *sk, union quic_addr *a, u=
-nion quic_addr *addr)
-> > +{
-> > +     if (a->v4.sin_port !=3D addr->v4.sin_port)
-> > +             return false;
-> > +
-> > +     if (a->sa.sa_family =3D=3D AF_INET && addr->sa.sa_family =3D=3D A=
-F_INET) {
-> > +             if (a->v4.sin_addr.s_addr =3D=3D htonl(INADDR_ANY) ||
-> > +                 addr->v4.sin_addr.s_addr =3D=3D htonl(INADDR_ANY))
-> > +                     return true;
-> > +             return a->v4.sin_addr.s_addr =3D=3D addr->v4.sin_addr.s_a=
-ddr;
-> > +     }
-> > +
-> > +     if (a->sa.sa_family !=3D addr->sa.sa_family) {
-> > +             if (ipv6_only_sock(sk))
-> > +                     return false;
-> > +             if (a->sa.sa_family =3D=3D AF_INET6 && ipv6_addr_any(&a->=
-v6.sin6_addr))
-> > +                     return true;
-> > +             if (a->sa.sa_family =3D=3D AF_INET && addr->sa.sa_family =
-=3D=3D AF_INET6 &&
-> > +                 ipv6_addr_v4mapped(&addr->v6.sin6_addr) &&
-> > +                 addr->v6.sin6_addr.s6_addr32[3] =3D=3D a->v4.sin_addr=
-.s_addr)
-> > +                     return true;
-> > +             if (addr->sa.sa_family =3D=3D AF_INET && a->sa.sa_family =
-=3D=3D AF_INET6 &&
-> > +                 ipv6_addr_v4mapped(&a->v6.sin6_addr) &&
-> > +                 a->v6.sin6_addr.s6_addr32[3] =3D=3D addr->v4.sin_addr=
-.s_addr)
-> > +                     return true;
-> > +             return false;
-> > +     }
-> > +
-> > +     if (ipv6_addr_any(&a->v6.sin6_addr) || ipv6_addr_any(&addr->v6.si=
-n6_addr))
-> > +             return true;
-> > +     return ipv6_addr_equal(&a->v6.sin6_addr, &addr->v6.sin6_addr);
-> > +}
-> > +
-> > +static int quic_v4_get_sk_addr(struct socket *sock, struct sockaddr *u=
-addr, int peer)
-> > +{
-> > +     return inet_getname(sock, uaddr, peer);
-> > +}
-> > +
-> > +static int quic_v6_get_sk_addr(struct socket *sock, struct sockaddr *u=
-addr, int peer)
-> > +{
-> > +     union quic_addr *a =3D quic_addr(uaddr);
-> > +     int ret;
-> > +
-> > +     ret =3D inet6_getname(sock, uaddr, peer);
-> > +     if (ret < 0)
-> > +             return ret;
-> > +
-> > +     if (a->sa.sa_family =3D=3D AF_INET6 && ipv6_addr_v4mapped(&a->v6.=
-sin6_addr)) {
-> > +             a->v4.sin_family =3D AF_INET;
-> > +             a->v4.sin_port =3D a->v6.sin6_port;
-> > +             a->v4.sin_addr.s_addr =3D a->v6.sin6_addr.s6_addr32[3];
-> > +     }
-> > +
-> > +     if (a->sa.sa_family =3D=3D AF_INET) {
-> > +             memset(a->v4.sin_zero, 0, sizeof(a->v4.sin_zero));
-> > +             return sizeof(struct sockaddr_in);
-> > +     }
-> > +     return sizeof(struct sockaddr_in6);
-> > +}
-> > +
-> > +static void quic_v4_set_sk_addr(struct sock *sk, union quic_addr *a, b=
-ool src)
-> > +{
-> > +     if (src) {
-> > +             inet_sk(sk)->inet_sport =3D a->v4.sin_port;
-> > +             inet_sk(sk)->inet_saddr =3D a->v4.sin_addr.s_addr;
-> > +     } else {
-> > +             inet_sk(sk)->inet_dport =3D a->v4.sin_port;
-> > +             inet_sk(sk)->inet_daddr =3D a->v4.sin_addr.s_addr;
-> > +     }
-> > +}
-> > +
-> > +static void quic_v6_copy_sk_addr(struct in6_addr *skaddr, union quic_a=
-ddr *a)
-> > +{
-> > +     if (a->sa.sa_family =3D=3D AF_INET) {
-> > +             skaddr->s6_addr32[0] =3D 0;
-> > +             skaddr->s6_addr32[1] =3D 0;
-> > +             skaddr->s6_addr32[2] =3D htonl(0x0000ffff);
-> > +             skaddr->s6_addr32[3] =3D a->v4.sin_addr.s_addr;
-> > +     } else {
-> > +             *skaddr =3D a->v6.sin6_addr;
-> > +     }
-> > +}
-> > +
-> > +static void quic_v6_set_sk_addr(struct sock *sk, union quic_addr *a, b=
-ool src)
-> > +{
-> > +     if (src) {
-> > +             inet_sk(sk)->inet_sport =3D a->v4.sin_port;
-> > +             quic_v6_copy_sk_addr(&sk->sk_v6_rcv_saddr, a);
-> > +     } else {
-> > +             inet_sk(sk)->inet_dport =3D a->v4.sin_port;
-> > +             quic_v6_copy_sk_addr(&sk->sk_v6_daddr, a);
-> > +     }
-> > +}
-> > +
-> > +static void quic_v4_set_sk_ecn(struct sock *sk, u8 ecn)
-> > +{
-> > +     inet_sk(sk)->tos =3D ((inet_sk(sk)->tos & ~INET_ECN_MASK) | ecn);
-> > +}
-> > +
-> > +static void quic_v6_set_sk_ecn(struct sock *sk, u8 ecn)
-> > +{
-> > +     quic_v4_set_sk_ecn(sk, ecn);
-> > +     inet6_sk(sk)->tclass =3D ((inet6_sk(sk)->tclass & ~INET_ECN_MASK)=
- | ecn);
-> > +}
-> > +
-> > +#define quic_af_ipv4(a)              ((a)->sa.sa_family =3D=3D AF_INET=
-)
-> > +
-> > +u32 quic_encap_len(union quic_addr *a)
-> > +{
-> > +     return (quic_af_ipv4(a) ? sizeof(struct iphdr) : sizeof(struct ip=
-v6hdr)) +
-> > +            sizeof(struct udphdr);
-> > +}
-> > +
-> > +int quic_is_any_addr(union quic_addr *a)
-> > +{
-> > +     return quic_af_ipv4(a) ? quic_v4_is_any_addr(a) : quic_v6_is_any_=
-addr(a);
-> > +}
-> > +
-> > +void quic_seq_dump_addr(struct seq_file *seq, union quic_addr *addr)
-> > +{
-> > +     quic_af_ipv4(addr) ? quic_v4_seq_dump_addr(seq, addr) : quic_v6_s=
-eq_dump_addr(seq, addr);
-> > +}
-> > +
-> > +void quic_udp_conf_init(struct sock *sk, struct udp_port_cfg *conf, un=
-ion quic_addr *a)
-> > +{
-> > +     quic_af_ipv4(a) ? quic_v4_udp_conf_init(sk, conf, a) : quic_v6_ud=
-p_conf_init(sk, conf, a);
-> > +}
-> > +
-> > +int quic_flow_route(struct sock *sk, union quic_addr *da, union quic_a=
-ddr *sa, struct flowi *fl)
-> > +{
-> > +     return quic_af_ipv4(da) ? quic_v4_flow_route(sk, da, sa, fl)
-> > +                             : quic_v6_flow_route(sk, da, sa, fl);
-> > +}
-> > +
-> > +void quic_lower_xmit(struct sock *sk, struct sk_buff *skb, union quic_=
-addr *da, struct flowi *fl)
-> > +{
-> > +     quic_af_ipv4(da) ? quic_v4_lower_xmit(sk, skb, fl) : quic_v6_lowe=
-r_xmit(sk, skb, fl);
-> > +}
-> > +
-> > +#define quic_skb_ipv4(skb)   (ip_hdr(skb)->version =3D=3D 4)
-> > +
-> > +void quic_get_msg_addrs(struct sk_buff *skb, union quic_addr *da, unio=
-n quic_addr *sa)
-> > +{
-> > +     memset(sa, 0, sizeof(*sa));
-> > +     memset(da, 0, sizeof(*da));
-> > +     quic_skb_ipv4(skb) ? quic_v4_get_msg_addrs(skb, da, sa)
-> > +                        : quic_v6_get_msg_addrs(skb, da, sa);
-> > +}
-> > +
-> > +int quic_get_mtu_info(struct sk_buff *skb, u32 *info)
-> > +{
-> > +     return quic_skb_ipv4(skb) ? quic_v4_get_mtu_info(skb, info)
-> > +                               : quic_v6_get_mtu_info(skb, info);
-> > +}
-> > +
-> > +u8 quic_get_msg_ecn(struct sk_buff *skb)
-> > +{
-> > +     return quic_skb_ipv4(skb) ? quic_v4_get_msg_ecn(skb) : quic_v6_ge=
-t_msg_ecn(skb);
-> > +}
-> > +
-> > +#define quic_pf_ipv4(sk)     ((sk)->sk_family =3D=3D PF_INET)
-> > +
-> > +int quic_get_user_addr(struct sock *sk, union quic_addr *a, struct soc=
-kaddr *addr, int addr_len)
-> > +{
-> > +     memset(a, 0, sizeof(*a));
-> > +     return quic_pf_ipv4(sk) ? quic_v4_get_user_addr(sk, a, addr, addr=
-_len)
-> > +                             : quic_v6_get_user_addr(sk, a, addr, addr=
-_len);
->
-> Minor nit: I think the most idiomatic way to express the abvoe is:
->
-> return quic_pf_ipv4(sk) ? quic_v4_get_user_addr(sk, a, addr, addr_len) :
->                           quic_v6_get_user_addr(sk, a, addr, addr_len);
->
-I somehow have been following the style of aligning the ? and : .
-will change to the most idiomatic way. :-)
 
-Thanks.
+From Documentation/memory-barriers.txt
+
+
+SMP BARRIER PAIRING
+-------------------
+                                 
+When dealing with CPU-CPU interactions, certain types of memory barrier should
+always be paired.  A lack of appropriate pairing is almost certainly an error.
+
+
+....
+
+
+A write barrier pairs
+with an address-dependency barrier, a control dependency, an acquire barrier,
+a release barrier, a read barrier, or a general barrier.
+
+
+
+
+> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> ---
+>  drivers/net/tap.c      | 52 ++++++++++++++++++++++++++++++++++++++++
+>  drivers/net/tun.c      | 54 ++++++++++++++++++++++++++++++++++++++++++
+>  include/linux/if_tap.h |  6 +++++
+>  include/linux/if_tun.h |  7 ++++++
+>  4 files changed, 119 insertions(+)
+> 
+> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+> index f8292721a9d6..651d48612329 100644
+> --- a/drivers/net/tap.c
+> +++ b/drivers/net/tap.c
+> @@ -1216,6 +1216,58 @@ struct socket *tap_get_socket(struct file *file)
+>  }
+>  EXPORT_SYMBOL_GPL(tap_get_socket);
+>  
+> +int tap_ring_consume_batched(struct file *file,
+> +			     void **array, int n)
+> +{
+> +	struct tap_queue *q = file->private_data;
+> +	struct netdev_queue *txq;
+> +	struct net_device *dev;
+> +	bool will_invalidate;
+> +	bool stopped;
+> +	void *ptr;
+> +	int i;
+> +
+> +	spin_lock(&q->ring.consumer_lock);
+> +	ptr = __ptr_ring_peek(&q->ring);
+> +
+> +	if (!ptr) {
+> +		spin_unlock(&q->ring.consumer_lock);
+> +		return 0;
+> +	}
+> +
+> +	i = 0;
+> +	do {
+> +		/* Check if the queue stopped before zeroing out, so no
+> +		 * ptr get produced in the meantime, because this could
+> +		 * result in waking even though the ptr_ring is full.
+> +		 * The order of the operations is ensured by barrier().
+> +		 */
+> +		will_invalidate = __ptr_ring_will_invalidate(&q->ring);
+> +		if (unlikely(will_invalidate)) {
+> +			rcu_read_lock();
+> +			dev = rcu_dereference(q->tap)->dev;
+> +			txq = netdev_get_tx_queue(dev, q->queue_index);
+> +			stopped = netif_tx_queue_stopped(txq);
+> +		}
+> +		barrier();
+> +		__ptr_ring_discard_one(&q->ring, will_invalidate);
+> +
+> +		if (unlikely(will_invalidate)) {
+> +			if (stopped)
+> +				netif_tx_wake_queue(txq);
+> +			rcu_read_unlock();
+> +		}
+> +
+> +		array[i++] = ptr;
+> +		if (i >= n)
+> +			break;
+> +	} while ((ptr = __ptr_ring_peek(&q->ring)));
+> +	spin_unlock(&q->ring.consumer_lock);
+> +
+> +	return i;
+> +}
+> +EXPORT_SYMBOL_GPL(tap_ring_consume_batched);
+> +
+>  struct ptr_ring *tap_get_ptr_ring(struct file *file)
+>  {
+>  	struct tap_queue *q;
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index 682df8157b55..7566b22780fb 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -3759,6 +3759,60 @@ struct socket *tun_get_socket(struct file *file)
+>  }
+>  EXPORT_SYMBOL_GPL(tun_get_socket);
+>  
+> +int tun_ring_consume_batched(struct file *file,
+> +			     void **array, int n)
+> +{
+> +	struct tun_file *tfile = file->private_data;
+> +	struct netdev_queue *txq;
+> +	struct net_device *dev;
+> +	bool will_invalidate;
+> +	bool stopped;
+> +	void *ptr;
+> +	int i;
+> +
+> +	spin_lock(&tfile->tx_ring.consumer_lock);
+> +	ptr = __ptr_ring_peek(&tfile->tx_ring);
+> +
+> +	if (!ptr) {
+> +		spin_unlock(&tfile->tx_ring.consumer_lock);
+> +		return 0;
+> +	}
+> +
+> +	i = 0;
+> +	do {
+> +		/* Check if the queue stopped before zeroing out, so no
+> +		 * ptr get produced in the meantime, because this could
+> +		 * result in waking even though the ptr_ring is full.
+> +		 * The order of the operations is ensured by barrier().
+> +		 */
+> +		will_invalidate =
+> +			__ptr_ring_will_invalidate(&tfile->tx_ring);
+> +		if (unlikely(will_invalidate)) {
+> +			rcu_read_lock();
+> +			dev = rcu_dereference(tfile->tun)->dev;
+> +			txq = netdev_get_tx_queue(dev,
+> +						  tfile->queue_index);
+> +			stopped = netif_tx_queue_stopped(txq);
+> +		}
+> +		barrier();
+> +		__ptr_ring_discard_one(&tfile->tx_ring, will_invalidate);
+> +
+> +		if (unlikely(will_invalidate)) {
+> +			if (stopped)
+> +				netif_tx_wake_queue(txq);
+> +			rcu_read_unlock();
+> +		}
+> +
+> +		array[i++] = ptr;
+> +		if (i >= n)
+> +			break;
+> +	} while ((ptr = __ptr_ring_peek(&tfile->tx_ring)));
+> +	spin_unlock(&tfile->tx_ring.consumer_lock);
+> +
+> +	return i;
+> +}
+> +EXPORT_SYMBOL_GPL(tun_ring_consume_batched);
+> +
+>  struct ptr_ring *tun_get_tx_ring(struct file *file)
+>  {
+>  	struct tun_file *tfile;
+> diff --git a/include/linux/if_tap.h b/include/linux/if_tap.h
+> index 553552fa635c..2e5542d6aef4 100644
+> --- a/include/linux/if_tap.h
+> +++ b/include/linux/if_tap.h
+> @@ -11,6 +11,7 @@ struct socket;
+>  #if IS_ENABLED(CONFIG_TAP)
+>  struct socket *tap_get_socket(struct file *);
+>  struct ptr_ring *tap_get_ptr_ring(struct file *file);
+> +int tap_ring_consume_batched(struct file *file, void **array, int n);
+>  #else
+>  #include <linux/err.h>
+>  #include <linux/errno.h>
+> @@ -22,6 +23,11 @@ static inline struct ptr_ring *tap_get_ptr_ring(struct file *f)
+>  {
+>  	return ERR_PTR(-EINVAL);
+>  }
+> +static inline int tap_ring_consume_batched(struct file *f,
+> +						void **array, int n)
+> +{
+> +	return 0;
+> +}
+>  #endif /* CONFIG_TAP */
+>  
+>  /*
+> diff --git a/include/linux/if_tun.h b/include/linux/if_tun.h
+> index 80166eb62f41..5b41525ac007 100644
+> --- a/include/linux/if_tun.h
+> +++ b/include/linux/if_tun.h
+> @@ -22,6 +22,7 @@ struct tun_msg_ctl {
+>  #if defined(CONFIG_TUN) || defined(CONFIG_TUN_MODULE)
+>  struct socket *tun_get_socket(struct file *);
+>  struct ptr_ring *tun_get_tx_ring(struct file *file);
+> +int tun_ring_consume_batched(struct file *file, void **array, int n);
+>  
+>  static inline bool tun_is_xdp_frame(void *ptr)
+>  {
+> @@ -55,6 +56,12 @@ static inline struct ptr_ring *tun_get_tx_ring(struct file *f)
+>  	return ERR_PTR(-EINVAL);
+>  }
+>  
+> +static inline int tun_ring_consume_batched(struct file *file,
+> +						void **array, int n)
+> +{
+> +	return 0;
+> +}
+> +
+>  static inline bool tun_is_xdp_frame(void *ptr)
+>  {
+>  	return false;
+> -- 
+> 2.43.0
+
 
