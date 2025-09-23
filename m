@@ -1,621 +1,127 @@
-Return-Path: <netdev+bounces-225585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E0AAB95AB1
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:30:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F8B2B95ABD
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:31:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12D66162E8D
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:30:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 662BB19C2DC2
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254323218AE;
-	Tue, 23 Sep 2025 11:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFC6D302748;
+	Tue, 23 Sep 2025 11:31:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DpQGBgmM"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="V2Xf7M/4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA598286D5D
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 11:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1BA2566DD
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 11:31:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758627023; cv=none; b=G9UtXH+H2sbARxqIaO1mYc+/2V9K4KJTmI311iF4gcyi1+G0kyRrWDrfRiyZwIXBcLAkGWu3P7WIEb7HjjuoyZt7618ZKvlqG6to7hvyg0sqS3zAQglmSQVuAvv8ehdw4HjYXpBeQZWmrVJE+iWErAQpPSpjTZ8cjqYjRvWt+kk=
+	t=1758627095; cv=none; b=p0SE3rBpIRgb13hEXo3q9U/EyY9h7YSJeHQmdR887Tr7SZUI0xrvcCYjwrdy1JJ1jekLWKKDGfcuob3h2HrkyfBWPJEOqw4nQyWyti2HYm6qw2og/FgSl3CXlXuoxcr/aJuKTrsB8P+v5sxpaBzjSqlSR5T8+0d9s3C4MjoRUfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758627023; c=relaxed/simple;
-	bh=5DaMJrUxXR4YPrxwaj1kZ+kaUXa9/2KwhiV8u06N8Kk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c1QH4HYrm5X0/Ed9eeQ62heeZjc0gtLjh8lEmqd7hGQ3iEFVBX3ef55mM/Fk3T5liIGIf1IzwG+2gPE6/vn9XG7oO1VfT4Yx4EZxjcruwGxr9xXZ1vKYrP69nP3Ag2K5iKkR6KQdliKmd900QVRnGQZ4O77g3M2alE5jax4A6r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DpQGBgmM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758627019;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U8Cz9CK0YHBErPFvNkhud/4SiB4snJhC+aqfyzfqbM4=;
-	b=DpQGBgmMF8UfztmAmPs+U2Hm8VhdXusAAAFijnQy5OnBL+7PTO0B2Rc5B58Zghqj1/N4rL
-	p2FfFGVF6PivCG8E/yhYhXbktumd8bmj7ssKXzf58fvGA+Ly7c8d5oirej1EWfganL1OPw
-	UHlDiUp7kzBdSxUM5l0V3DJ59omoCi4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-600-liSiVQlBN26qAAQAEXSdag-1; Tue, 23 Sep 2025 07:30:18 -0400
-X-MC-Unique: liSiVQlBN26qAAQAEXSdag-1
-X-Mimecast-MFC-AGG-ID: liSiVQlBN26qAAQAEXSdag_1758627017
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3f030846a41so2367708f8f.2
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 04:30:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758627017; x=1759231817;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U8Cz9CK0YHBErPFvNkhud/4SiB4snJhC+aqfyzfqbM4=;
-        b=KJ1o6rIRdobOv2wAK6qtJrQUQtVziXS+yWFABb0JQyvJMutdlnkcMVlzycy0msCbwm
-         krcDY1ybCHbNCBp4FRSGgypmhA4OnLCOywDfnTJzw4a+ijmyDR0zqXd9UFQiFJuPAWG5
-         WaWw6I0u5M0NkeEQWya8ia21OHdmt0cOQsB45gYHbwRC6nZjz9OWtoRpDjijCo5fhg8p
-         pOzrwxrvr9dHOfk5TUnD1itu5CZP4VxN9loX6FMs8oxVpMm9cD5+zbyvRY5h0R14/lux
-         yAado4Vf9IrxN9BbLJFzieFs2sMT/jQlre9GWzBdbyZxn4lX47+QidonB4zdC7L4w7lR
-         sKyA==
-X-Forwarded-Encrypted: i=1; AJvYcCW0EF2tNeFw7SUcNJjN7T5DirStjylTq4D2xJQ+MCOdl/OEMXr546ycl0N3UBuXVmDR1fGw8yg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9LtBy0zxqtLHnUjKPWPKhLsCGJ//OBYiq3UYV0ib5oKr1x8oo
-	B5hhpyM/6FdBYj3A9I/Xo7b97UMQ2BD2dErW2iolzOcEEL1KPh2ETaC0bdARh8UT8ns99rzwbi1
-	NmHWP1JcCoDhMmu/nkpE7IBRJR2N9aegCmbxaLIojoDPvpZo6aL2RveqnDA==
-X-Gm-Gg: ASbGnctH3s2W0jLbvjDTWaAHyoHSHZY1iK+dRckcE70zDSB56P79iFfNzt8mzXUPgBM
-	c8euFK/dV3qMKUGwaz90Na47shNlBtFGajqRh8MB25nvPOEyOA5a9X8Q5xYJjlid0LpOHOHpDAT
-	GMCMuWiMnIJeNEpTPZlRkNeIthmMZrGW4HnF8iORXBhVkSvmhZCpye8fwv++0DD0//ZxDCV3nps
-	jwkXXn5xEg4glxpILeGzLtY1cJ+TLzz4CJ1Pe/b+sSwo0ZtoZZvf03Q1Jk6n7pprSbboAi6/5H3
-	D7A8BfAjCxf6Jk/qql2VWwcWAGZxKMyHXiIyuMJs1hltIWx6ImcWkzrR+Ny+2WJReHRMejasK9i
-	2dhxCI4u7Tyrl
-X-Received: by 2002:a05:6000:26cf:b0:3ea:2ed6:9e37 with SMTP id ffacd0b85a97d-405c523c43dmr1718621f8f.24.1758627017028;
-        Tue, 23 Sep 2025 04:30:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGOtd51dDWtvpstikmjH6brQOCnE92z+FWDlYxnWzVfcNycf+071kLC826JpBeONXc4C3B4Ew==
-X-Received: by 2002:a05:6000:26cf:b0:3ea:2ed6:9e37 with SMTP id ffacd0b85a97d-405c523c43dmr1718576f8f.24.1758627016349;
-        Tue, 23 Sep 2025 04:30:16 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e24835b32sm5932355e9.13.2025.09.23.04.30.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Sep 2025 04:30:15 -0700 (PDT)
-Message-ID: <a3fa95a3-ce18-498a-a656-16581212c6cb@redhat.com>
-Date: Tue, 23 Sep 2025 13:30:13 +0200
+	s=arc-20240116; t=1758627095; c=relaxed/simple;
+	bh=RMOWqrl/Ki35ImGxMv03acL/JyY7dv7EcjF/8Ea40O4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JXgZmjlG8bbvDfZ30eOsOen86YNx4nXZmoJIGZUvzQxDnVaul1Qqafq3hOJReBXCYQDD0p3nvFUtGR+FERod9NIGSldb/Kk80h7+3tYOKXlt+mDX6jW/Ac+DOAntiysPAOTTaORWpfKA5ysCC4vnYTnxJTzpjxDdiWVptIZPmvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=V2Xf7M/4; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=FqqitcQCkxhV32rTsJ+uCNxHvhC6YeG2qjPkLgt2EmY=; b=V2Xf7M/44Zue2oMyR0jrB+6qMg
+	7ZAh961BrfLS0ajhseeoLhfyHCGNfHPNryrtiAnligon5imjUELBnAYYeYvGEq8HyMCjvXGG18NeR
+	xX45bLWzxrnwcB0j2Yuoglb08+J7TKgm0LM9hQOtYHtqGNt/4LLi/I5MvXUR0NQgnNiUhEG5hUbCb
+	JDYoTT3RoUIm3MA855yGNesZCF5JUQgQT8BS9MXHIxnoViLqZaISaVBU/hb0hizZXSiz2+qH5qEXO
+	pgg/MesL/bYJCJJnAnbqqg0IgZRGp7D8trqHGNCTboXfcIhzp4fb1h7R3YigLmTnbHn8DxIhHllQS
+	q3C2v+Fg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54658)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v11F2-000000007BP-0BY1;
+	Tue, 23 Sep 2025 12:31:28 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v11Ez-0000000066T-3bkC;
+	Tue, 23 Sep 2025 12:31:25 +0100
+Date: Tue, 23 Sep 2025 12:31:25 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 0/6] net: stmmac: yet more cleanups
+Message-ID: <aNKFDW_aaSZl2NFE@shell.armlinux.org.uk>
+References: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 04/15] quic: provide family ops for address
- and protocol
-To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
- quic@lists.linux.dev
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
- Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
- Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
- Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
- kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
- Jeff Layton <jlayton@kernel.org>, Benjamin Coddington <bcodding@redhat.com>,
- Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
- Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
- Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
- <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
- illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Daniel Stenberg <daniel@haxx.se>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <cover.1758234904.git.lucien.xin@gmail.com>
- <01dd8f3b9afc6c813f036924790997d3ed4bcf3d.1758234904.git.lucien.xin@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <01dd8f3b9afc6c813f036924790997d3ed4bcf3d.1758234904.git.lucien.xin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 9/19/25 12:34 AM, Xin Long wrote:
-> +static int quic_v4_flow_route(struct sock *sk, union quic_addr *da, union quic_addr *sa,
-> +			      struct flowi *fl)
-> +{
-> +	struct flowi4 *fl4;
-> +	struct rtable *rt;
-> +	struct flowi _fl;
-> +
-> +	if (__sk_dst_check(sk, 0))
-> +		return 1;
-> +
-> +	fl4 = &_fl.u.ip4;
-> +	memset(&_fl, 0x00, sizeof(_fl));
-> +	fl4->saddr = sa->v4.sin_addr.s_addr;
-> +	fl4->fl4_sport = sa->v4.sin_port;
-> +	fl4->daddr = da->v4.sin_addr.s_addr;
-> +	fl4->fl4_dport = da->v4.sin_port;
-> +	fl4->flowi4_proto = IPPROTO_UDP;
-> +	fl4->flowi4_oif = sk->sk_bound_dev_if;
+On Tue, Sep 23, 2025 at 12:25:30PM +0100, Russell King (Oracle) wrote:
+> Building on the previous cleanup series, this cleans up yet more stmmac
+> code.
+> 
+> - Move stmmac_bus_clks_config() into stmmac_platform() which is where
+>   its onlny user is.
+> 
+> - Move the xpcs Clause 73 test into stmmac_init_phy(), resulting in
+>   simpler code in __stmmac_open().
+> 
+> - Move "can't attach PHY" error message into stmmac_init_phy().
+> 
+> We then start moving stuff out of __stmac_open() into stmmac_open()
+> (and correspondingly __stmmac_release() into stmmac_release()) which
+> is not necessary when re-initialising the interface on e.g. MTU change.
+> 
+> - Move initialisation of tx_lpi_timer
+> - Move PHY attachment/detachment
+> - Move PHY error message into stmmac_init_phy()
+> 
+> Finally, simplfy the paths in stmmac_init_phy().
+> 
+>  drivers/net/ethernet/stmicro/stmmac/stmmac.h       |   1 -
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  | 111 ++++++++-------------
+>  .../net/ethernet/stmicro/stmmac/stmmac_platform.c  |  32 ++++++
+>  3 files changed, 73 insertions(+), 71 deletions(-)
 
-Why you need a local variable? I think you could use the 'fl' argument
-directly.
+Should've added: tested on nVidia Jetson Xavier NX.
 
-> +
-> +	fl4->flowi4_scope = ip_sock_rt_scope(sk);
-> +	fl4->flowi4_dscp = inet_sk_dscp(inet_sk(sk));
-> +
-> +	rt = ip_route_output_key(sock_net(sk), fl4);
-> +	if (IS_ERR(rt))
-> +		return PTR_ERR(rt);
-> +
-> +	if (!sa->v4.sin_family) {
-> +		sa->v4.sin_family = AF_INET;
-> +		sa->v4.sin_addr.s_addr = fl4->saddr;
-> +	}
-> +	sk_setup_caps(sk, &rt->dst);
-> +	memcpy(fl, &_fl, sizeof(_fl));
-> +	return 0;
-> +}
-> +
-> +static int quic_v6_flow_route(struct sock *sk, union quic_addr *da, union quic_addr *sa,
-> +			      struct flowi *fl)
-> +{
-> +	struct ipv6_pinfo *np = inet6_sk(sk);
-> +	struct ip6_flowlabel *flowlabel;
-> +	struct dst_entry *dst;
-> +	struct flowi6 *fl6;
-> +	struct flowi _fl;
-> +
-> +	if (__sk_dst_check(sk, np->dst_cookie))
-> +		return 1;
-> +
-> +	fl6 = &_fl.u.ip6;
-> +	memset(&_fl, 0x0, sizeof(_fl));
-> +	fl6->saddr = sa->v6.sin6_addr;
-> +	fl6->fl6_sport = sa->v6.sin6_port;
-> +	fl6->daddr = da->v6.sin6_addr;
-> +	fl6->fl6_dport = da->v6.sin6_port;
-> +	fl6->flowi6_proto = IPPROTO_UDP;
-> +	fl6->flowi6_oif = sk->sk_bound_dev_if;
+However, observed a failure changing the MTU with the link down - our
+old friend, failure to complete the DMA reset.
 
-Same here.
+Once that's been triggered, taking the interface down or changing the
+MTU again results in more problems, with the thread spinning in
+napi_disable_locked() with RTNL held (as we effectively end up calling
+napi_disable() twice on the same napi struct.)
 
-> +
-> +	if (inet6_test_bit(SNDFLOW, sk)) {
-> +		fl6->flowlabel = (da->v6.sin6_flowinfo & IPV6_FLOWINFO_MASK);
-> +		if (fl6->flowlabel & IPV6_FLOWLABEL_MASK) {
-> +			flowlabel = fl6_sock_lookup(sk, fl6->flowlabel);
-> +			if (IS_ERR(flowlabel))
-> +				return -EINVAL;
-> +			fl6_sock_release(flowlabel);
-> +		}
-> +	}
-> +
-> +	dst = ip6_dst_lookup_flow(sock_net(sk), sk, fl6, NULL);
-> +	if (IS_ERR(dst))
-> +		return PTR_ERR(dst);
-> +
-> +	if (!sa->v6.sin6_family) {
-> +		sa->v6.sin6_family = AF_INET6;
-> +		sa->v6.sin6_addr = fl6->saddr;
-> +	}
-> +	ip6_dst_store(sk, dst, NULL, NULL);
-> +	memcpy(fl, &_fl, sizeof(_fl));
-> +	return 0;
-> +}
-> +
-> +static void quic_v4_lower_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl)
-> +{
-> +	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
-> +	u8 tos = (inet_sk(sk)->tos | cb->ecn), ttl;
-> +	struct flowi4 *fl4 = &fl->u.ip4;
-> +	struct dst_entry *dst;
-> +	__be16 df = 0;
-> +
-> +	pr_debug("%s: skb: %p, len: %d, num: %llu, %pI4:%d -> %pI4:%d\n", __func__,
-> +		 skb, skb->len, cb->number, &fl4->saddr, ntohs(fl4->fl4_sport),
-> +		 &fl4->daddr, ntohs(fl4->fl4_dport));
-> +
-> +	dst = sk_dst_get(sk);
-> +	if (!dst) {
-> +		kfree_skb(skb);
-> +		return;
-> +	}
-> +	if (ip_dont_fragment(sk, dst) && !skb->ignore_df)
-> +		df = htons(IP_DF);
-> +
-> +	ttl = (u8)ip4_dst_hoplimit(dst);
-> +	udp_tunnel_xmit_skb((struct rtable *)dst, sk, skb, fl4->saddr, fl4->daddr,
-> +			    tos, ttl, df, fl4->fl4_sport, fl4->fl4_dport, false, false, 0);
-> +}
-> +
-> +static void quic_v6_lower_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl)
-> +{
-> +	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
-> +	u8 tc = (inet6_sk(sk)->tclass | cb->ecn), ttl;
-> +	struct flowi6 *fl6 = &fl->u.ip6;
-> +	struct dst_entry *dst;
-> +	__be32 label;
-> +
-> +	pr_debug("%s: skb: %p, len: %d, num: %llu, %pI6c:%d -> %pI6c:%d\n", __func__,
-> +		 skb, skb->len, cb->number, &fl6->saddr, ntohs(fl6->fl6_sport),
-> +		 &fl6->daddr, ntohs(fl6->fl6_dport));
-> +
-> +	dst = sk_dst_get(sk);
-> +	if (!dst) {
-> +		kfree_skb(skb);
-> +		return;
-> +	}
-> +
-> +	ttl = (u8)ip6_dst_hoplimit(dst);
-> +	label = ip6_make_flowlabel(sock_net(sk), skb, fl6->flowlabel, true, fl6);
-> +	udp_tunnel6_xmit_skb(dst, sk, skb, NULL, &fl6->saddr, &fl6->daddr, tc,
-> +			     ttl, label, fl6->fl6_sport, fl6->fl6_dport, false, 0);
-> +}
-> +
-> +static void quic_v4_get_msg_addrs(struct sk_buff *skb, union quic_addr *da, union quic_addr *sa)
-> +{
-> +	struct udphdr *uh = quic_udphdr(skb);
-> +
-> +	sa->v4.sin_family = AF_INET;
-> +	sa->v4.sin_port = uh->source;
-> +	sa->v4.sin_addr.s_addr = ip_hdr(skb)->saddr;
-> +
-> +	da->v4.sin_family = AF_INET;
-> +	da->v4.sin_port = uh->dest;
-> +	da->v4.sin_addr.s_addr = ip_hdr(skb)->daddr;
-> +}
-> +
-> +static void quic_v6_get_msg_addrs(struct sk_buff *skb, union quic_addr *da, union quic_addr *sa)
-> +{
-> +	struct udphdr *uh = quic_udphdr(skb);
-> +
-> +	sa->v6.sin6_family = AF_INET6;
-> +	sa->v6.sin6_port = uh->source;
-> +	sa->v6.sin6_addr = ipv6_hdr(skb)->saddr;
-> +
-> +	da->v6.sin6_family = AF_INET6;
-> +	da->v6.sin6_port = uh->dest;
-> +	da->v6.sin6_addr = ipv6_hdr(skb)->daddr;
-> +}
-> +
-> +static int quic_v4_get_mtu_info(struct sk_buff *skb, u32 *info)
-> +{
-> +	struct icmphdr *hdr;
-> +
-> +	hdr = (struct icmphdr *)(skb_network_header(skb) - sizeof(struct icmphdr));
-> +	if (hdr->type == ICMP_DEST_UNREACH && hdr->code == ICMP_FRAG_NEEDED) {
-> +		*info = ntohs(hdr->un.frag.mtu);
-> +		return 0;
-> +	}
-> +
-> +	/* Defer other types' processing to UDP error handler. */
-> +	return 1;
-> +}
-> +
-> +static int quic_v6_get_mtu_info(struct sk_buff *skb, u32 *info)
-> +{
-> +	struct icmp6hdr *hdr;
-> +
-> +	hdr = (struct icmp6hdr *)(skb_network_header(skb) - sizeof(struct icmp6hdr));
-> +	if (hdr->icmp6_type == ICMPV6_PKT_TOOBIG) {
-> +		*info = ntohl(hdr->icmp6_mtu);
-> +		return 0;
-> +	}
-> +
-> +	/* Defer other types' processing to UDP error handler. */
-> +	return 1;
-> +}
-> +
-> +static u8 quic_v4_get_msg_ecn(struct sk_buff *skb)
-> +{
-> +	return (ip_hdr(skb)->tos & INET_ECN_MASK);
-> +}
-> +
-> +static u8 quic_v6_get_msg_ecn(struct sk_buff *skb)
-> +{
-> +	return (ipv6_get_dsfield(ipv6_hdr(skb)) & INET_ECN_MASK);
-> +}
-> +
-> +static int quic_v4_get_user_addr(struct sock *sk, union quic_addr *a, struct sockaddr *addr,
-> +				 int addr_len)
-> +{
-> +	u32 len = sizeof(struct sockaddr_in);
-> +
-> +	if (addr_len < len || addr->sa_family != AF_INET)
-> +		return 1;
-> +	if (ipv4_is_multicast(quic_addr(addr)->v4.sin_addr.s_addr))
-> +		return 1;
-> +	memcpy(a, addr, len);
-> +	return 0;
-> +}
-> +
-> +static int quic_v6_get_user_addr(struct sock *sk, union quic_addr *a, struct sockaddr *addr,
-> +				 int addr_len)
-> +{
-> +	u32 len = sizeof(struct sockaddr_in);
-> +	int type;
-> +
-> +	if (addr_len < len)
-> +		return 1;
-> +
-> +	if (addr->sa_family != AF_INET6) {
-> +		if (ipv6_only_sock(sk))
-> +			return 1;
-> +		return quic_v4_get_user_addr(sk, a, addr, addr_len);
-> +	}
-> +
-> +	len = sizeof(struct sockaddr_in6);
-> +	if (addr_len < len)
-> +		return 1;
-> +	type = ipv6_addr_type(&quic_addr(addr)->v6.sin6_addr);
-> +	if (type != IPV6_ADDR_ANY && !(type & IPV6_ADDR_UNICAST))
-> +		return 1;
-> +	memcpy(a, addr, len);
-> +	return 0;
-> +}
-> +
-> +static void quic_v4_get_pref_addr(struct sock *sk, union quic_addr *addr, u8 **pp, u32 *plen)
-> +{
-> +	u8 *p = *pp;
-> +
-> +	memcpy(&addr->v4.sin_addr, p, QUIC_ADDR4_LEN);
-> +	p += QUIC_ADDR4_LEN;
-> +	memcpy(&addr->v4.sin_port, p, QUIC_PORT_LEN);
-> +	p += QUIC_PORT_LEN;
-> +	addr->v4.sin_family = AF_INET;
-> +	/* Skip over IPv6 address and port, not used for AF_INET sockets. */
-> +	p += QUIC_ADDR6_LEN;
-> +	p += QUIC_PORT_LEN;
-> +
-> +	if (!addr->v4.sin_port || quic_v4_is_any_addr(addr) ||
-> +	    ipv4_is_multicast(addr->v4.sin_addr.s_addr))
-> +		memset(addr, 0, sizeof(*addr));
-> +	*plen -= (p - *pp);
-> +	*pp = p;
-> +}
-> +
-> +static void quic_v6_get_pref_addr(struct sock *sk, union quic_addr *addr, u8 **pp, u32 *plen)
-> +{
-> +	u8 *p = *pp;
-> +	int type;
-> +
-> +	/* Skip over IPv4 address and port. */
-> +	p += QUIC_ADDR4_LEN;
-> +	p += QUIC_PORT_LEN;
-> +	/* Try to use IPv6 address and port first. */
-> +	memcpy(&addr->v6.sin6_addr, p, QUIC_ADDR6_LEN);
-> +	p += QUIC_ADDR6_LEN;
-> +	memcpy(&addr->v6.sin6_port, p, QUIC_PORT_LEN);
-> +	p += QUIC_PORT_LEN;
-> +	addr->v6.sin6_family = AF_INET6;
-> +
-> +	type = ipv6_addr_type(&addr->v6.sin6_addr);
-> +	if (!addr->v6.sin6_port || !(type & IPV6_ADDR_UNICAST)) {
-> +		memset(addr, 0, sizeof(*addr));
-> +		if (ipv6_only_sock(sk))
-> +			goto out;
-> +		/* Fallback to IPv4 if IPv6 address is not usable. */
-> +		return quic_v4_get_pref_addr(sk, addr, pp, plen);
-> +	}
-> +out:
-> +	*plen -= (p - *pp);
-> +	*pp = p;
-> +}
-> +
-> +static void quic_v4_set_pref_addr(struct sock *sk, u8 *p, union quic_addr *addr)
-> +{
-> +	memcpy(p, &addr->v4.sin_addr, QUIC_ADDR4_LEN);
-> +	p += QUIC_ADDR4_LEN;
-> +	memcpy(p, &addr->v4.sin_port, QUIC_PORT_LEN);
-> +	p += QUIC_PORT_LEN;
-> +	memset(p, 0, QUIC_ADDR6_LEN);
-> +	p += QUIC_ADDR6_LEN;
-> +	memset(p, 0, QUIC_PORT_LEN);
-> +}
-> +
-> +static void quic_v6_set_pref_addr(struct sock *sk, u8 *p, union quic_addr *addr)
-> +{
-> +	if (addr->sa.sa_family == AF_INET)
-> +		return quic_v4_set_pref_addr(sk, p, addr);
-> +
-> +	memset(p, 0, QUIC_ADDR4_LEN);
-> +	p += QUIC_ADDR4_LEN;
-> +	memset(p, 0, QUIC_PORT_LEN);
-> +	p += QUIC_PORT_LEN;
-> +	memcpy(p, &addr->v6.sin6_addr, QUIC_ADDR6_LEN);
-> +	p += QUIC_ADDR6_LEN;
-> +	memcpy(p, &addr->v6.sin6_port, QUIC_PORT_LEN);
-> +}
-> +
-> +static bool quic_v4_cmp_sk_addr(struct sock *sk, union quic_addr *a, union quic_addr *addr)
-> +{
-> +	if (a->v4.sin_port != addr->v4.sin_port)
-> +		return false;
-> +	if (a->v4.sin_family != addr->v4.sin_family)
-> +		return false;
-> +	if (a->v4.sin_addr.s_addr == htonl(INADDR_ANY) ||
-> +	    addr->v4.sin_addr.s_addr == htonl(INADDR_ANY))
-> +		return true;
-> +	return a->v4.sin_addr.s_addr == addr->v4.sin_addr.s_addr;
-> +}
-> +
-> +static bool quic_v6_cmp_sk_addr(struct sock *sk, union quic_addr *a, union quic_addr *addr)
-> +{
-> +	if (a->v4.sin_port != addr->v4.sin_port)
-> +		return false;
-> +
-> +	if (a->sa.sa_family == AF_INET && addr->sa.sa_family == AF_INET) {
-> +		if (a->v4.sin_addr.s_addr == htonl(INADDR_ANY) ||
-> +		    addr->v4.sin_addr.s_addr == htonl(INADDR_ANY))
-> +			return true;
-> +		return a->v4.sin_addr.s_addr == addr->v4.sin_addr.s_addr;
-> +	}
-> +
-> +	if (a->sa.sa_family != addr->sa.sa_family) {
-> +		if (ipv6_only_sock(sk))
-> +			return false;
-> +		if (a->sa.sa_family == AF_INET6 && ipv6_addr_any(&a->v6.sin6_addr))
-> +			return true;
-> +		if (a->sa.sa_family == AF_INET && addr->sa.sa_family == AF_INET6 &&
-> +		    ipv6_addr_v4mapped(&addr->v6.sin6_addr) &&
-> +		    addr->v6.sin6_addr.s6_addr32[3] == a->v4.sin_addr.s_addr)
-> +			return true;
-> +		if (addr->sa.sa_family == AF_INET && a->sa.sa_family == AF_INET6 &&
-> +		    ipv6_addr_v4mapped(&a->v6.sin6_addr) &&
-> +		    a->v6.sin6_addr.s6_addr32[3] == addr->v4.sin_addr.s_addr)
-> +			return true;
-> +		return false;
-> +	}
-> +
-> +	if (ipv6_addr_any(&a->v6.sin6_addr) || ipv6_addr_any(&addr->v6.sin6_addr))
-> +		return true;
-> +	return ipv6_addr_equal(&a->v6.sin6_addr, &addr->v6.sin6_addr);
-> +}
-> +
-> +static int quic_v4_get_sk_addr(struct socket *sock, struct sockaddr *uaddr, int peer)
-> +{
-> +	return inet_getname(sock, uaddr, peer);
-> +}
-> +
-> +static int quic_v6_get_sk_addr(struct socket *sock, struct sockaddr *uaddr, int peer)
-> +{
-> +	union quic_addr *a = quic_addr(uaddr);
-> +	int ret;
-> +
-> +	ret = inet6_getname(sock, uaddr, peer);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	if (a->sa.sa_family == AF_INET6 && ipv6_addr_v4mapped(&a->v6.sin6_addr)) {
-> +		a->v4.sin_family = AF_INET;
-> +		a->v4.sin_port = a->v6.sin6_port;
-> +		a->v4.sin_addr.s_addr = a->v6.sin6_addr.s6_addr32[3];
-> +	}
-> +
-> +	if (a->sa.sa_family == AF_INET) {
-> +		memset(a->v4.sin_zero, 0, sizeof(a->v4.sin_zero));
-> +		return sizeof(struct sockaddr_in);
-> +	}
-> +	return sizeof(struct sockaddr_in6);
-> +}
-> +
-> +static void quic_v4_set_sk_addr(struct sock *sk, union quic_addr *a, bool src)
-> +{
-> +	if (src) {
-> +		inet_sk(sk)->inet_sport = a->v4.sin_port;
-> +		inet_sk(sk)->inet_saddr = a->v4.sin_addr.s_addr;
-> +	} else {
-> +		inet_sk(sk)->inet_dport = a->v4.sin_port;
-> +		inet_sk(sk)->inet_daddr = a->v4.sin_addr.s_addr;
-> +	}
-> +}
-> +
-> +static void quic_v6_copy_sk_addr(struct in6_addr *skaddr, union quic_addr *a)
-> +{
-> +	if (a->sa.sa_family == AF_INET) {
-> +		skaddr->s6_addr32[0] = 0;
-> +		skaddr->s6_addr32[1] = 0;
-> +		skaddr->s6_addr32[2] = htonl(0x0000ffff);
-> +		skaddr->s6_addr32[3] = a->v4.sin_addr.s_addr;
-> +	} else {
-> +		*skaddr = a->v6.sin6_addr;
-> +	}
-> +}
-> +
-> +static void quic_v6_set_sk_addr(struct sock *sk, union quic_addr *a, bool src)
-> +{
-> +	if (src) {
-> +		inet_sk(sk)->inet_sport = a->v4.sin_port;
-> +		quic_v6_copy_sk_addr(&sk->sk_v6_rcv_saddr, a);
-> +	} else {
-> +		inet_sk(sk)->inet_dport = a->v4.sin_port;
-> +		quic_v6_copy_sk_addr(&sk->sk_v6_daddr, a);
-> +	}
-> +}
-> +
-> +static void quic_v4_set_sk_ecn(struct sock *sk, u8 ecn)
-> +{
-> +	inet_sk(sk)->tos = ((inet_sk(sk)->tos & ~INET_ECN_MASK) | ecn);
-> +}
-> +
-> +static void quic_v6_set_sk_ecn(struct sock *sk, u8 ecn)
-> +{
-> +	quic_v4_set_sk_ecn(sk, ecn);
-> +	inet6_sk(sk)->tclass = ((inet6_sk(sk)->tclass & ~INET_ECN_MASK) | ecn);
-> +}
-> +
-> +#define quic_af_ipv4(a)		((a)->sa.sa_family == AF_INET)
-> +
-> +u32 quic_encap_len(union quic_addr *a)
-> +{
-> +	return (quic_af_ipv4(a) ? sizeof(struct iphdr) : sizeof(struct ipv6hdr)) +
-> +	       sizeof(struct udphdr);
-> +}
-> +
-> +int quic_is_any_addr(union quic_addr *a)
-> +{
-> +	return quic_af_ipv4(a) ? quic_v4_is_any_addr(a) : quic_v6_is_any_addr(a);
-> +}
-> +
-> +void quic_seq_dump_addr(struct seq_file *seq, union quic_addr *addr)
-> +{
-> +	quic_af_ipv4(addr) ? quic_v4_seq_dump_addr(seq, addr) : quic_v6_seq_dump_addr(seq, addr);
-> +}
-> +
-> +void quic_udp_conf_init(struct sock *sk, struct udp_port_cfg *conf, union quic_addr *a)
-> +{
-> +	quic_af_ipv4(a) ? quic_v4_udp_conf_init(sk, conf, a) : quic_v6_udp_conf_init(sk, conf, a);
-> +}
-> +
-> +int quic_flow_route(struct sock *sk, union quic_addr *da, union quic_addr *sa, struct flowi *fl)
-> +{
-> +	return quic_af_ipv4(da) ? quic_v4_flow_route(sk, da, sa, fl)
-> +				: quic_v6_flow_route(sk, da, sa, fl);
-> +}
-> +
-> +void quic_lower_xmit(struct sock *sk, struct sk_buff *skb, union quic_addr *da, struct flowi *fl)
-> +{
-> +	quic_af_ipv4(da) ? quic_v4_lower_xmit(sk, skb, fl) : quic_v6_lower_xmit(sk, skb, fl);
-> +}
-> +
-> +#define quic_skb_ipv4(skb)	(ip_hdr(skb)->version == 4)
-> +
-> +void quic_get_msg_addrs(struct sk_buff *skb, union quic_addr *da, union quic_addr *sa)
-> +{
-> +	memset(sa, 0, sizeof(*sa));
-> +	memset(da, 0, sizeof(*da));
-> +	quic_skb_ipv4(skb) ? quic_v4_get_msg_addrs(skb, da, sa)
-> +			   : quic_v6_get_msg_addrs(skb, da, sa);
-> +}
-> +
-> +int quic_get_mtu_info(struct sk_buff *skb, u32 *info)
-> +{
-> +	return quic_skb_ipv4(skb) ? quic_v4_get_mtu_info(skb, info)
-> +				  : quic_v6_get_mtu_info(skb, info);
-> +}
-> +
-> +u8 quic_get_msg_ecn(struct sk_buff *skb)
-> +{
-> +	return quic_skb_ipv4(skb) ? quic_v4_get_msg_ecn(skb) : quic_v6_get_msg_ecn(skb);
-> +}
-> +
-> +#define quic_pf_ipv4(sk)	((sk)->sk_family == PF_INET)
-> +
-> +int quic_get_user_addr(struct sock *sk, union quic_addr *a, struct sockaddr *addr, int addr_len)
-> +{
-> +	memset(a, 0, sizeof(*a));
-> +	return quic_pf_ipv4(sk) ? quic_v4_get_user_addr(sk, a, addr, addr_len)
-> +				: quic_v6_get_user_addr(sk, a, addr, addr_len);
+This basically makes the platforms networking unusable - and needs to
+be hard-reset.
 
-Minor nit: I think the most idiomatic way to express the abvoe is:
+These issues pre-exist all my cleanups.
 
-return quic_pf_ipv4(sk) ? quic_v4_get_user_addr(sk, a, addr, addr_len) :
-			  quic_v6_get_user_addr(sk, a, addr, addr_len);
-
-(other cases below)
-
-/P
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
