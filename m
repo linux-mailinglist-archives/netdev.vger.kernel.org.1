@@ -1,189 +1,151 @@
-Return-Path: <netdev+bounces-225521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61725B95074
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 10:40:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28665B9508C
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 10:40:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DE6454E1DC9
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 08:40:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACEEA2E1280
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 08:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9407831D379;
-	Tue, 23 Sep 2025 08:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mqJXKFfe"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92DCA31D38A;
+	Tue, 23 Sep 2025 08:40:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E460C31D36B
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 08:40:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F2D431D741
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 08:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758616813; cv=none; b=NbVnIKVsoB1Kv8BARqIIBviAFNxi++FwLXEicnO4yTxKowNBk+eueXVYTlaU0sAVUNB4+OO1t4kbZZKEVQrARAsBR6K2im7yCAbAdpoNAEXp/WA2ussI3Z/KWpiz9u9EH5dc2ny3EjMP+yDKmVHmsrP9d/eeb0a9degGweLVtK4=
+	t=1758616830; cv=none; b=AF78aHuReG0JdVdQAlB2ZLcnzesNUD7Ug/pxu7Dj5dsZczZhEC75MWZDunplfSJ0eDT19FMg21yYnuVr6b6pCmmTL07UvMWR1f9S12juPNclhYrQgbYU3mzew6uDUv8JS82a5xKx5pWmFvN94VlVnkX8lpJOxWTE2kWmPFXF9tY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758616813; c=relaxed/simple;
-	bh=AODaK73CD16jKk+03UbKIxye6WRkDa/4oiNXkx8hylY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VXfRhI5/scP9V19SlMeGf6PrnqCQWaYAfrBgO+IOUMjfbOk6kHYQdMblT+t0hS+c+H/EGcCgcoov2QYzyJK7D6wm/HS2ie3MPXnEgYQwzN8KyActQY68Zbu0SJvPG9jCCvK9gBJZaEOsZY/SX46hFfhv5376eZJjU9JixpHmqIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mqJXKFfe; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-42521ca36d6so15811305ab.3
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 01:40:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758616811; x=1759221611; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=symkmqcspqr8o30esRANp+CrU+zjLpKuDVPbjsgdgTo=;
-        b=mqJXKFfeOlmjGd4katIQhwLygvADaX2FFjghshA1zs2vlw4QG5XmQQnAe2skKuXtjJ
-         IGfIDuz5AZ00WB8tyEycLyZ5pE6Z9rYCkoFDzLixOo1u5Q0dCvj5Hzcr0qJjjtDLVTen
-         mLcNS56PnNBuGZ2Cw4p3jltxCk3/q4o7FNRhDvVTjhgTQgvdERAJeoq/2Z3aNgAEj2vR
-         OUYmA+flvHDq9rCi7CPtY6EXJtkj05nEsh4uvc0+0QxxpJkUye5RFUfyXcEb7wWP1GdR
-         2LbRLO4gZ4Xm79ORpl+UZyPihQgn0ltDLDriHX2cMXyD0YWt9Io13l9aIp896Y5jsjVB
-         bkqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758616811; x=1759221611;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=symkmqcspqr8o30esRANp+CrU+zjLpKuDVPbjsgdgTo=;
-        b=CzepqK0Mv7/PcN8BMiCJhSAv20tYDvCoBao/65tFUlLVLP75aZjViwBNXhSLTZspe4
-         /DdNoifeLl8YMPtCHJaSyXZ/XxV7HIC4CJaxmzQeV3/Xkkm1A1R/s6816KZcNXu42FsH
-         zVzJ5Ie8TuWABu/616q6ayYLq32gllhuxol7SH9mtou4iUk651iYIzw4crZMzmBE1P3/
-         GJ4R8T6LXyp6OvZNEUC4wcy1YP3L/gGxzwQHI/7zx236YeBoa2ss+QqOXE1QNMHZFHLF
-         prglnKJIV8Qsw5StUZBMXbJOmOwtwn/PAC/C1YANqM5bGC6TG6Bm8GA5OFUSzxhBkuhS
-         volg==
-X-Forwarded-Encrypted: i=1; AJvYcCXtsffpMIRgijsPhqzP67vcM4NCQH8ZdCSKm29x3e9KegJHlqj2MlZ1HvVZPpH9j3s7g8L7toM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHyhwdRfZSJutBk+mwc8mZBGRJPbv7wWkzaozafhDhmqbP0Ket
-	wZGt4WuDmXUZ1QxKrjqTSCQMg3WFSad/dX+aRnf3QuRkxxKiKAd4tNDgLshZY4YCIDdevQvCvRX
-	emQzufqOTU7ulrQN/tPc7A49A0uVzYrUUfyzuDh4=
-X-Gm-Gg: ASbGncvJgbudStiDUK3H0ubJho8GwE8MSuObul3XRKFUFjQ9iLlLCcjGqP7S+Fgop/E
-	g1wmgbFfrgJzrkJWJcjhheHs8E5xTYIsME+x1TDmv6inRLnNBOFuyoDZBnCQNH6+CFNDeVplnqT
-	Qqh8ORK6Inb65ODcUP+BPLSxitR9H6x0y7Z57jHlVqBqy05NoiKE8v58np7sFRMRzLfnCD2HJ1D
-	gy8Vtc=
-X-Google-Smtp-Source: AGHT+IE3jRaBDdbMyWwEkuj8pSWIpAJgLExbngsiP4kHQqEPNAVBKry0yg2HISVOBCHlDB/pgKQkleS3bwg0mZdCy7s=
-X-Received: by 2002:a92:cd85:0:b0:425:73c6:9041 with SMTP id
- e9e14a558f8ab-42581ea5bacmr26341995ab.17.1758616810906; Tue, 23 Sep 2025
- 01:40:10 -0700 (PDT)
+	s=arc-20240116; t=1758616830; c=relaxed/simple;
+	bh=q4eeJLqMoq08nHB3H6vwt+kTaSLJsauUW+ZSIELNuOY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eVThO1uVSLLcUOnQ4UmLr0MES3spCeVyvcK6WKEnGBTnEoNZy44k58f3FP5l7qOy+pNpCD5NJyzhr90wR3kcZUyuR7pXODAdI7OIs41chNfbew6ST4XS6iJ0rQhCarQ9Lxi0otg3iyglANWxtTwAKpu91VALQncDE1NPXD87SzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=15.184.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
+X-QQ-mid: esmtpsz18t1758616806teba17e7f
+X-QQ-Originating-IP: Y65HDPkAjT9I/dzKRWpqjqEX1/dZ3RUV9curQL0kqRY=
+Received: from localhost.localdomain ( [111.204.182.100])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 23 Sep 2025 16:40:04 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 2421286488052786642
+EX-QQ-RecipientCnt: 5
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+To: netdev@vger.kernel.org
+Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@gmail.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH RESEND] ip/bond: add broadcast_neighbor support
+Date: Tue, 23 Sep 2025 16:39:53 +0800
+Message-Id: <20250923083953.16363-1-tonghao@bamaicloud.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250922152600.2455136-1-maciej.fijalkowski@intel.com>
- <20250922152600.2455136-2-maciej.fijalkowski@intel.com> <aNGGjMFT_bsByxcZ@mini-arch>
-In-Reply-To: <aNGGjMFT_bsByxcZ@mini-arch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 23 Sep 2025 16:39:33 +0800
-X-Gm-Features: AS18NWDqyMqOt5QmgHBQT5tt0U_VJkVVcTst6vX4-fZ9dkU0tjhEdt1jvkyAvgQ
-Message-ID: <CAL+tcoCN2Lux970eMyXk_SjWsH9M38zsbaJ9o25tJn94DGLMwQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 1/3] xsk: avoid overwriting skb fields for
- multi-buffer traffic
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, netdev@vger.kernel.org, 
-	magnus.karlsson@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: MpO6L0LObisW1Tosg/bqpUTPHFrjYAfIkgFgg0siPUxAUk94fP9Mt/77
+	j/+85MIhjWX0cqt5lJzi5X19J2N8v9k2U7mfbLNbOVt/QElfe0n36KumZ8jbfVL9qmjw5Fd
+	q8MsV6Pc6m2wYtSY+SS4YqhYij7mhvdB3YGd7VUSBwtWMw03Trwo+VgxBnZIjXTIRZj3kXA
+	rz+vmEdyKxwj1XSAYYU7IW7b0yjNTDVm6Gq9mhAmw4tRUdFRvfBz3C5iifzRKnfCCMrwsxT
+	q32z5xn2n84QOU11b/F/CgmbrZTisAFbHfQCU7RWQ+X/3pnh6/7u6kXperE2Cp5S9kPWs0E
+	nZ295MJ2KCInWGHMsApho5IbqkBbzhj1RHv77CT96wyQRYTIumENII90cVqejf+moLEuXl6
+	bndwyVdrzuUl6AP+vdIJjLW8B9U95uMXS/kg3SCwV1flrTzQngkil1QGzDnnswzLgiSSh7E
+	MCu2dge2curvO4hHAXdCsciZ03HTH70nTZkVZv7+s760DmOUxNvU9O//P4PR85E4AGbGZCh
+	7qxiVk9Ot3+GGILbB6RSx61IT3dEjgTxqj6x3Iwdq/uRtH0yzZrLxqEbObpPxmR12Pt8xwD
+	5N4cjSkkyJtMdSapqNXEhcb5ioUTDMv7uCn7/QxDaqUO0NmiWbYkY7whIUrsSZ+sFUYVKQK
+	kXYtrKXLCMKwc5YkX02LcAa42FaAMNgSe7ZnrB0PYhU2jA5SlrXlhaFjV/IztcGUTdr4oeZ
+	u+ZmY3xle9m7WN7T5bcCIZ+AuPFktT7Zm1GFzfDaDGP9mrqbPj4YGYj+CFoa9d+C8RCrMBK
+	YCEAZSGoPslxL+Tnjl/L7y4BbwCTYWZbzXxqYP5vY9OSP5C3Og8lZZYEic9fPswjR2yjiE0
+	Ukh9X05AHUFDsqA2hek5zqmHCd0wkxJnZfbkRsTc6nXCfEi6uvunrzfgkUxueBncbe7ohTK
+	K1G9oZEOsweG0eyNdbYbLSM9TsGvHoR4Yzodh5Y3LXTHP4aHq2P2ERBupdgUa6dGUHp5FJp
+	SOIGm+fLC1Bcu/snRIKKiO2yZw5f8=
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+X-QQ-RECHKSPAM: 0
 
-On Tue, Sep 23, 2025 at 1:25=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 09/22, Maciej Fijalkowski wrote:
-> > We are unnecessarily setting a bunch of skb fields per each processed
-> > descriptor, which is redundant for fragmented frames.
-> >
-> > Let us set these respective members for first fragment only.
-> >
-> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> > ---
-> >  net/xdp/xsk.c | 10 +++++-----
-> >  1 file changed, 5 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > index 72e34bd2d925..72194f0a3fc0 100644
-> > --- a/net/xdp/xsk.c
-> > +++ b/net/xdp/xsk.c
-> > @@ -758,6 +758,10 @@ static struct sk_buff *xsk_build_skb(struct xdp_so=
-ck *xs,
-> >                               goto free_err;
-> >
-> >                       xsk_set_destructor_arg(skb, desc->addr);
-> > +                     skb->dev =3D dev;
-> > +                     skb->priority =3D READ_ONCE(xs->sk.sk_priority);
-> > +                     skb->mark =3D READ_ONCE(xs->sk.sk_mark);
-> > +                     skb->destructor =3D xsk_destruct_skb;
-> >               } else {
-> >                       int nr_frags =3D skb_shinfo(skb)->nr_frags;
-> >                       struct xsk_addr_node *xsk_addr;
-> > @@ -826,14 +830,10 @@ static struct sk_buff *xsk_build_skb(struct xdp_s=
-ock *xs,
-> >
-> >                       if (meta->flags & XDP_TXMD_FLAGS_LAUNCH_TIME)
-> >                               skb->skb_mstamp_ns =3D meta->request.laun=
-ch_time;
-> > +                     xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->=
-xsk_meta);
-> >               }
-> >       }
-> >
-> > -     skb->dev =3D dev;
-> > -     skb->priority =3D READ_ONCE(xs->sk.sk_priority);
-> > -     skb->mark =3D READ_ONCE(xs->sk.sk_mark);
-> > -     skb->destructor =3D xsk_destruct_skb;
-> > -     xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta);
-> >       xsk_inc_num_desc(skb);
->
-> What about IFF_TX_SKB_NO_LINEAR case? I'm not super familiar with
-> it, but I don't see priority/mark being set over there after this change.
+This option has no effect in modes other than 802.3ad mode.
+When this option enabled, the bond device will broadcast ARP/ND
+packets to all active slaves.
 
-Agreed. NO_LINEAR is used for VM. Aside from what you mentioned, with
-this adjustment the initialization of skb is not finished here, which
-leads to 1) failure in __dev_direct_xmit() due to unknown skb->dev, 2)
-losing the chance to set its own destructor, etc. Those fields work
-for either linear drivers (like virtio_net) or physical drivers.
+Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Cc: David Ahern <dsahern@gmail.com>
+Cc: Hangbin Liu <liuhangbin@gmail.com>
+---
+1. no update uapi header.
+2. the kernel patch is accpted, https://patchwork.kernel.org/project/netdevbpf/patch/84d0a044514157bb856a10b6d03a1028c4883561.1751031306.git.tonghao@bamaicloud.com/
+---
+ ip/iplink_bond.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Testing on my VM, I saw the following splat appearing on the screen as
-I pointed out earlier:
-[   91.389269] RIP: 0010:__dev_direct_xmit+0x32/0x1e0
-[   91.389659] Code: e5 41 57 41 56 49 89 fe 41 55 41 54 53 48 83 ec
-18 89 75 c4 48 8b 5f 10 65 48 8b 05 d0 f3 b7 01 48 89 45 d0 31 c0 c6
-45 cf 00 <48> 8b 83 a8 00 00 00 a8 01 0f 84 90 01 00 00 48 8b 83 a8 00
-00 00
-[   91.391095] RSP: 0018:ffffc9000482bce8 EFLAGS: 00010246
-[   91.391538] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 00000000000=
-00001
-[   91.392107] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8881204=
-40700
-[   91.392663] RBP: ffffc9000482bd28 R08: 000000000000003c R09: 00000000000=
-00001
-[   91.393230] R10: 0000000000001000 R11: 0000000000000000 R12: ffff8881204=
-40700
-[   91.393800] R13: ffff888101ed4e00 R14: ffff888120440700 R15: ffff888123b=
-f2c00
-[   91.394360] FS:  00007f2094609540(0000) GS:ffff88907bec2000(0000)
-knlGS:0000000000000000
-[   91.394992] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   91.395447] CR2: 00000000000000a8 CR3: 0000000113d0d000 CR4: 00000000003=
-506f0
-[   91.396015] Call Trace:
-[   91.396226]  <TASK>
-[   91.396415]  __xsk_generic_xmit+0x315/0x3c0
-[   91.396767]  __xsk_sendmsg.constprop.0.isra.0+0x16f/0x1a0
-[   91.397208]  xsk_sendmsg+0x25/0x40
-[   91.397496]  __sys_sendto+0x210/0x220
-[   91.397811]  ? srso_return_thunk+0x5/0x5f
-[   91.398343]  ? _sched_setscheduler.isra.0+0x7b/0xb0
-[   91.398935]  __x64_sys_sendto+0x24/0x30
-[   91.399433]  x64_sys_call+0x8d4/0x1fc0
-[   91.399937]  do_syscall_64+0x5d/0x2e0
-[   91.400437]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
+index 3ae626a0..714fe7bd 100644
+--- a/ip/iplink_bond.c
++++ b/ip/iplink_bond.c
+@@ -150,6 +150,7 @@ static void print_explain(FILE *f)
+ 		"                [ lacp_rate LACP_RATE ]\n"
+ 		"                [ lacp_active LACP_ACTIVE]\n"
+ 		"                [ coupled_control COUPLED_CONTROL ]\n"
++		"                [ broadcast_neighbor BROADCAST_NEIGHBOR ]\n"
+ 		"                [ ad_select AD_SELECT ]\n"
+ 		"                [ ad_user_port_key PORTKEY ]\n"
+ 		"                [ ad_actor_sys_prio SYSPRIO ]\n"
+@@ -166,6 +167,7 @@ static void print_explain(FILE *f)
+ 		"LACP_RATE := slow|fast\n"
+ 		"AD_SELECT := stable|bandwidth|count\n"
+ 		"COUPLED_CONTROL := off|on\n"
++		"BROADCAST_NEIGHBOR := off|on\n"
+ 	);
+ }
+ 
+@@ -185,6 +187,7 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
+ 	__u32 arp_all_targets, resend_igmp, min_links, lp_interval;
+ 	__u32 packets_per_slave;
+ 	__u8 missed_max;
++	__u8 broadcast_neighbor;
+ 	unsigned int ifindex;
+ 	int ret;
+ 
+@@ -377,6 +380,12 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
+ 			if (ret)
+ 				return ret;
+ 			addattr8(n, 1024, IFLA_BOND_COUPLED_CONTROL, coupled_control);
++		} else if (strcmp(*argv, "broadcast_neighbor") == 0) {
++			NEXT_ARG();
++			broadcast_neighbor = parse_on_off("broadcast_neighbor", *argv, &ret);
++			if (ret)
++				return ret;
++			addattr8(n, 1024, IFLA_BOND_BROADCAST_NEIGH, broadcast_neighbor);
+ 		} else if (matches(*argv, "ad_select") == 0) {
+ 			NEXT_ARG();
+ 			if (get_index(ad_select_tbl, *argv) < 0)
+@@ -676,6 +685,13 @@ static void bond_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+ 			     rta_getattr_u8(tb[IFLA_BOND_COUPLED_CONTROL]));
+ 	}
+ 
++	if (tb[IFLA_BOND_BROADCAST_NEIGH]) {
++		print_on_off(PRINT_ANY,
++			     "broadcast_neighbor",
++			     "broadcast_neighbor %s ",
++			     rta_getattr_u8(tb[IFLA_BOND_BROADCAST_NEIGH]));
++	}
++
+ 	if (tb[IFLA_BOND_AD_SELECT]) {
+ 		const char *ad_select = get_name(ad_select_tbl,
+ 						 rta_getattr_u8(tb[IFLA_BOND_AD_SELECT]));
+-- 
+2.34.1
 
-Thanks,
-Jason
 
