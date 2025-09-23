@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-225692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2F1CB9709F
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 19:33:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA17CB970A5
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 19:33:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2FB019C5F46
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 17:33:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A72D3BA3FA
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 17:33:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50DED27E05A;
-	Tue, 23 Sep 2025 17:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85943283C9E;
+	Tue, 23 Sep 2025 17:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oxEpz6eA"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Pu6EW2ZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37138189
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 17:33:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3632765E8
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 17:33:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758648813; cv=none; b=owwrToesT0rYMvyCxOed9ndGqLwaF7Ko84i7qEBPa/tmjv7YCXrbvzuGwaoBgKv7tPk8+WL13b9D6S/UGHVCuH3dMfaTjefIk9eMCMLh03QLvy8caIWNltlxGVU/Q2RyGAVznHHryqD2KVqPi2wQC5pF4lcTj33sSF4eTNhsVsk=
+	t=1758648815; cv=none; b=Kr3rEUTvnLpS0oGciWfm+7YvBcGg4A5z/kFuQ13pa08VvpRckZICETdNYhnAKJPoPELzn98a9xuPaosLkoPTCG+qkVIRc860EWmtUAA98uSQep8N5O+0T/91VAlzoY2uI62aUIfuUcA/xOOHBQanWz6oa2J7MEyu52cwy+YhxRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758648813; c=relaxed/simple;
-	bh=5EpUoK2cW6ZTDCbBYN8qkw7YIdhLP/ZM955kFiYYclI=;
+	s=arc-20240116; t=1758648815; c=relaxed/simple;
+	bh=P+Fp0bkc+KhZZ+i86ovQCjYihf9HT3M7JtK7ar40U3E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r6MBymHx7ybxO57L+ogWGlVfnotb4pEg88EU7/oZTrem7wJpt5o3l19elm6HLAi9KD8bBl9juD9ll8j1vZetQOVnQIWxN9GxR8+vlPV6TjhXa95apM2y0XCBNs0LHiEW6sC/QWJBAL13HjxYFkttr39nBkO5K6z7qS33/mL4/n4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oxEpz6eA; arc=none smtp.client-ip=91.218.175.178
+	 MIME-Version; b=JZXxEcDOe41CelBACes9XV+K1Oj3N2jxrhdXKvMlw0R0hgEr4PymrXevxTEihYHB8az17XrQz8pINMG7qwO7A2KCaZwUFg0SJvzw8iIZ978wOTZOPO0HgyMCkd4Q5B3sJ2cfik6ZT0/9JuXdBwlGi0ZUb9nX99OVR+JTWJ/YbAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Pu6EW2ZA; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758648808;
+	t=1758648809;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=m/YtGKS3Wcj6BagdtENiruk/hTDVb0LTuBjfrBLIrYw=;
-	b=oxEpz6eALq9w7R3DPQB4SxHZZHkpuBNVbFpV6gJspiv6Q3lVQ8NuCFQeqs3gaI9CWu4vBM
-	aVV1IAdomb5EkWtd0IO6zwGiC+EaXuTFi+ejc7YM/RQYtsRaQZYmqhkWi7eoIjJtZmnXDh
-	gbVY0+bd06LjoW83UPnHN7q7JmoRxpg=
+	bh=XcCpgFUP0o7P8eWwINyxEFynb6nAoMsBLI5Olh+liAc=;
+	b=Pu6EW2ZAzjgVBQD0BzhGxgngKTiFdAQF8oX+X/kD9j9dYab5XZt5NoAjpU/vmE/xd187WU
+	d26H7bG76lGPFqLhIqwLu2dbjR7sOoZDdLAi9Cd2UkevFtVdc4/po8tpE09nTN6MAI01H7
+	2L8FqG4a5Dlqa92FOcZGYGY3YXkUe0w=
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 To: Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
@@ -55,9 +55,9 @@ To: Jakub Kicinski <kuba@kernel.org>,
 	Mark Bloch <mbloch@nvidia.com>,
 	Vadim Fedorenko <vadim.fedorenko@linux.dev>
 Cc: netdev@vger.kernel.org
-Subject: [PATCH net-next v2 1/4] tg3: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
-Date: Tue, 23 Sep 2025 17:33:07 +0000
-Message-ID: <20250923173310.139623-2-vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next v2 2/4] bnxt_en: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
+Date: Tue, 23 Sep 2025 17:33:08 +0000
+Message-ID: <20250923173310.139623-3-vadim.fedorenko@linux.dev>
 In-Reply-To: <20250923173310.139623-1-vadim.fedorenko@linux.dev>
 References: <20250923173310.139623-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
@@ -69,32 +69,63 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Convert tg3 driver to new timestamping configuration API.
+Convert bnxt dirver to use new timestamping configuration API.
 
 Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 ---
- drivers/net/ethernet/broadcom/tg3.c | 66 +++++++++++++----------------
- 1 file changed, 29 insertions(+), 37 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  8 ++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 35 +++++++++----------
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  7 ++--
+ 3 files changed, 23 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index b4dc93a48718..7f00ec7fd7b9 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -13929,22 +13929,20 @@ static void tg3_self_test(struct net_device *dev, struct ethtool_test *etest,
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index d59612d1e176..1d0e0e7362bd 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -13278,12 +13278,6 @@ static int bnxt_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
+ 		return bnxt_hwrm_port_phy_write(bp, mdio->phy_id, mdio->reg_num,
+ 						mdio->val_in);
  
+-	case SIOCSHWTSTAMP:
+-		return bnxt_hwtstamp_set(dev, ifr);
+-
+-	case SIOCGHWTSTAMP:
+-		return bnxt_hwtstamp_get(dev, ifr);
+-
+ 	default:
+ 		/* do nothing */
+ 		break;
+@@ -15806,6 +15800,8 @@ static const struct net_device_ops bnxt_netdev_ops = {
+ 	.ndo_xdp_xmit		= bnxt_xdp_xmit,
+ 	.ndo_bridge_getlink	= bnxt_bridge_getlink,
+ 	.ndo_bridge_setlink	= bnxt_bridge_setlink,
++	.ndo_hwtstamp_get	= bnxt_hwtstamp_get,
++	.ndo_hwtstamp_set	= bnxt_hwtstamp_set,
+ };
+ 
+ static void bnxt_get_queue_stats_rx(struct net_device *dev, int i,
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+index ca660e6d28a4..db81cf6d5289 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+@@ -560,10 +560,11 @@ static int bnxt_hwrm_ptp_cfg(struct bnxt *bp)
+ 	return bnxt_ptp_cfg_tstamp_filters(bp);
  }
  
--static int tg3_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
-+static int tg3_hwtstamp_set(struct net_device *dev,
-+			    struct kernel_hwtstamp_config *stmpconf,
-+			    struct netlink_ext_ack *extack)
+-int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
++int bnxt_hwtstamp_set(struct net_device *dev,
++		      struct kernel_hwtstamp_config *stmpconf,
++		      struct netlink_ext_ack *extack)
  {
- 	struct tg3 *tp = netdev_priv(dev);
+ 	struct bnxt *bp = netdev_priv(dev);
 -	struct hwtstamp_config stmpconf;
- 
- 	if (!tg3_flag(tp, PTP_CAPABLE))
+ 	struct bnxt_ptp_cfg *ptp;
+ 	u16 old_rxctl;
+ 	int old_rx_filter, rc;
+@@ -573,17 +574,14 @@ int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 	if (!ptp)
  		return -EOPNOTSUPP;
  
 -	if (copy_from_user(&stmpconf, ifr->ifr_data, sizeof(stmpconf)))
@@ -106,129 +137,83 @@ index b4dc93a48718..7f00ec7fd7b9 100644
 +	    stmpconf->tx_type != HWTSTAMP_TX_OFF)
  		return -ERANGE;
  
+ 	old_rx_filter = ptp->rx_filter;
+ 	old_rxctl = ptp->rxctl;
+ 	old_tx_tstamp_en = ptp->tx_tstamp_en;
 -	switch (stmpconf.rx_filter) {
 +	switch (stmpconf->rx_filter) {
  	case HWTSTAMP_FILTER_NONE:
- 		tp->rxptpctl = 0;
- 		break;
-@@ -14004,74 +14002,72 @@ static int tg3_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
- 		tw32(TG3_RX_PTP_CTL,
- 		     tp->rxptpctl | TG3_RX_PTP_CTL_HWTS_INTERLOCK);
- 
--	if (stmpconf.tx_type == HWTSTAMP_TX_ON)
-+	if (stmpconf->tx_type == HWTSTAMP_TX_ON)
- 		tg3_flag_set(tp, TX_TSTAMP_EN);
- 	else
- 		tg3_flag_clear(tp, TX_TSTAMP_EN);
- 
--	return copy_to_user(ifr->ifr_data, &stmpconf, sizeof(stmpconf)) ?
--		-EFAULT : 0;
-+	return 0;
- }
- 
--static int tg3_hwtstamp_get(struct net_device *dev, struct ifreq *ifr)
-+static int tg3_hwtstamp_get(struct net_device *dev,
-+			    struct kernel_hwtstamp_config *stmpconf)
- {
- 	struct tg3 *tp = netdev_priv(dev);
--	struct hwtstamp_config stmpconf;
- 
- 	if (!tg3_flag(tp, PTP_CAPABLE))
- 		return -EOPNOTSUPP;
- 
--	stmpconf.flags = 0;
--	stmpconf.tx_type = (tg3_flag(tp, TX_TSTAMP_EN) ?
--			    HWTSTAMP_TX_ON : HWTSTAMP_TX_OFF);
-+	stmpconf->flags = 0;
-+	stmpconf->tx_type = tg3_flag(tp, TX_TSTAMP_EN) ?
-+			    HWTSTAMP_TX_ON : HWTSTAMP_TX_OFF;
- 
- 	switch (tp->rxptpctl) {
- 	case 0:
--		stmpconf.rx_filter = HWTSTAMP_FILTER_NONE;
-+		stmpconf->rx_filter = HWTSTAMP_FILTER_NONE;
- 		break;
- 	case TG3_RX_PTP_CTL_RX_PTP_V1_EN | TG3_RX_PTP_CTL_ALL_V1_EVENTS:
--		stmpconf.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
-+		stmpconf->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
- 		break;
- 	case TG3_RX_PTP_CTL_RX_PTP_V1_EN | TG3_RX_PTP_CTL_SYNC_EVNT:
--		stmpconf.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_SYNC;
-+		stmpconf->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_SYNC;
- 		break;
- 	case TG3_RX_PTP_CTL_RX_PTP_V1_EN | TG3_RX_PTP_CTL_DELAY_REQ:
--		stmpconf.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ;
-+		stmpconf->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ;
- 		break;
- 	case TG3_RX_PTP_CTL_RX_PTP_V2_EN | TG3_RX_PTP_CTL_ALL_V2_EVENTS:
--		stmpconf.rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
-+		stmpconf->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
- 		break;
- 	case TG3_RX_PTP_CTL_RX_PTP_V2_L2_EN | TG3_RX_PTP_CTL_ALL_V2_EVENTS:
--		stmpconf.rx_filter = HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
-+		stmpconf->rx_filter = HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
- 		break;
- 	case TG3_RX_PTP_CTL_RX_PTP_V2_L4_EN | TG3_RX_PTP_CTL_ALL_V2_EVENTS:
--		stmpconf.rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_EVENT;
-+		stmpconf->rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_EVENT;
- 		break;
- 	case TG3_RX_PTP_CTL_RX_PTP_V2_EN | TG3_RX_PTP_CTL_SYNC_EVNT:
--		stmpconf.rx_filter = HWTSTAMP_FILTER_PTP_V2_SYNC;
-+		stmpconf->rx_filter = HWTSTAMP_FILTER_PTP_V2_SYNC;
- 		break;
- 	case TG3_RX_PTP_CTL_RX_PTP_V2_L2_EN | TG3_RX_PTP_CTL_SYNC_EVNT:
--		stmpconf.rx_filter = HWTSTAMP_FILTER_PTP_V2_L2_SYNC;
-+		stmpconf->rx_filter = HWTSTAMP_FILTER_PTP_V2_L2_SYNC;
- 		break;
- 	case TG3_RX_PTP_CTL_RX_PTP_V2_L4_EN | TG3_RX_PTP_CTL_SYNC_EVNT:
--		stmpconf.rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_SYNC;
-+		stmpconf->rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_SYNC;
- 		break;
- 	case TG3_RX_PTP_CTL_RX_PTP_V2_EN | TG3_RX_PTP_CTL_DELAY_REQ:
--		stmpconf.rx_filter = HWTSTAMP_FILTER_PTP_V2_DELAY_REQ;
-+		stmpconf->rx_filter = HWTSTAMP_FILTER_PTP_V2_DELAY_REQ;
- 		break;
- 	case TG3_RX_PTP_CTL_RX_PTP_V2_L2_EN | TG3_RX_PTP_CTL_DELAY_REQ:
--		stmpconf.rx_filter = HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ;
-+		stmpconf->rx_filter = HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ;
- 		break;
- 	case TG3_RX_PTP_CTL_RX_PTP_V2_L4_EN | TG3_RX_PTP_CTL_DELAY_REQ:
--		stmpconf.rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ;
-+		stmpconf->rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ;
- 		break;
- 	default:
- 		WARN_ON_ONCE(1);
+ 		ptp->rxctl = 0;
+ 		ptp->rx_filter = HWTSTAMP_FILTER_NONE;
+@@ -616,7 +614,7 @@ int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
  		return -ERANGE;
  	}
  
+-	if (stmpconf.tx_type == HWTSTAMP_TX_ON)
++	if (stmpconf->tx_type == HWTSTAMP_TX_ON)
+ 		ptp->tx_tstamp_en = 1;
+ 	else
+ 		ptp->tx_tstamp_en = 0;
+@@ -625,9 +623,8 @@ int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 	if (rc)
+ 		goto ts_set_err;
+ 
+-	stmpconf.rx_filter = ptp->rx_filter;
 -	return copy_to_user(ifr->ifr_data, &stmpconf, sizeof(stmpconf)) ?
 -		-EFAULT : 0;
++	stmpconf->rx_filter = ptp->rx_filter;
++	return 0;
+ 
+ ts_set_err:
+ 	ptp->rx_filter = old_rx_filter;
+@@ -636,22 +633,22 @@ int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 	return rc;
+ }
+ 
+-int bnxt_hwtstamp_get(struct net_device *dev, struct ifreq *ifr)
++int bnxt_hwtstamp_get(struct net_device *dev,
++		      struct kernel_hwtstamp_config *stmpconf)
+ {
+ 	struct bnxt *bp = netdev_priv(dev);
+-	struct hwtstamp_config stmpconf;
+ 	struct bnxt_ptp_cfg *ptp;
+ 
+ 	ptp = bp->ptp_cfg;
+ 	if (!ptp)
+ 		return -EOPNOTSUPP;
+ 
+-	stmpconf.flags = 0;
+-	stmpconf.tx_type = ptp->tx_tstamp_en ? HWTSTAMP_TX_ON : HWTSTAMP_TX_OFF;
++	stmpconf->flags = 0;
++	stmpconf->tx_type = ptp->tx_tstamp_en ? HWTSTAMP_TX_ON
++					      : HWTSTAMP_TX_OFF;
+ 
+-	stmpconf.rx_filter = ptp->rx_filter;
+-	return copy_to_user(ifr->ifr_data, &stmpconf, sizeof(stmpconf)) ?
+-		-EFAULT : 0;
++	stmpconf->rx_filter = ptp->rx_filter;
 +	return 0;
  }
  
- static int tg3_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
-@@ -14126,12 +14122,6 @@ static int tg3_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
- 
- 		return err;
- 
--	case SIOCSHWTSTAMP:
--		return tg3_hwtstamp_set(dev, ifr);
--
--	case SIOCGHWTSTAMP:
--		return tg3_hwtstamp_get(dev, ifr);
--
- 	default:
- 		/* do nothing */
- 		break;
-@@ -14407,6 +14397,8 @@ static const struct net_device_ops tg3_netdev_ops = {
- #ifdef CONFIG_NET_POLL_CONTROLLER
- 	.ndo_poll_controller	= tg3_poll_controller,
- #endif
-+	.ndo_hwtstamp_get	= tg3_hwtstamp_get,
-+	.ndo_hwtstamp_set	= tg3_hwtstamp_set,
- };
- 
- static void tg3_get_eeprom_size(struct tg3 *tp)
+ static int bnxt_map_regs(struct bnxt *bp, u32 *reg_arr, int count, int reg_win)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+index 0481161d26ef..8cc2fae47644 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+@@ -160,8 +160,11 @@ void bnxt_ptp_update_current_time(struct bnxt *bp);
+ void bnxt_ptp_pps_event(struct bnxt *bp, u32 data1, u32 data2);
+ int bnxt_ptp_cfg_tstamp_filters(struct bnxt *bp);
+ void bnxt_ptp_reapply_pps(struct bnxt *bp);
+-int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr);
+-int bnxt_hwtstamp_get(struct net_device *dev, struct ifreq *ifr);
++int bnxt_hwtstamp_set(struct net_device *dev,
++		      struct kernel_hwtstamp_config *stmpconf,
++		      struct netlink_ext_ack *extack);
++int bnxt_hwtstamp_get(struct net_device *dev,
++		      struct kernel_hwtstamp_config *stmpconf);
+ void bnxt_ptp_free_txts_skbs(struct bnxt_ptp_cfg *ptp);
+ int bnxt_ptp_get_txts_prod(struct bnxt_ptp_cfg *ptp, u16 *prod);
+ void bnxt_get_tx_ts_p5(struct bnxt *bp, struct sk_buff *skb, u16 prod);
 -- 
 2.47.3
 
