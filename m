@@ -1,322 +1,164 @@
-Return-Path: <netdev+bounces-225701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DD46B972F1
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 20:23:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5881FB97315
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 20:28:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2034418A818C
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 18:23:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12ED93AA3B6
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 18:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 482592FE56B;
-	Tue, 23 Sep 2025 18:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E297E2FF142;
+	Tue, 23 Sep 2025 18:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EVEm2i1w"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="djd8ehe3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22814235BE2
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 18:23:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC49272E6D;
+	Tue, 23 Sep 2025 18:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758651795; cv=none; b=tv+gc7tSpPqO6Aos25DOe0Sk3pRpSIWZfnakmMzjKU9GnJU5TJmjY5qk6zYt6HkY5rXYa2m7t9hXAfair7/Qle5Bb8zqoMlkgiY0Puwz4+gTPYjEWZjsvbL66xKbYUDkOkkWIJLlPWmjVFPZQNk72ltv1f7axzBN7Jq3MHqPUPA=
+	t=1758652110; cv=none; b=OheC747+l9BrSnctvCl3PLs6XWGFZCFkdK1ujggmEycnZPPxOdGTzjaI0+qErgKQ9w1708sEYmD8pdBG9Defk7qjrCUh1JPVLp3EtgMYAftkGcGLIAyEsoXIdyJu2QUWb+4boUkSa5zVtL6u1QJfJtq0V9hxKKqu4L6MMpaCuQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758651795; c=relaxed/simple;
-	bh=8jaT+A2dXp3U0beqB5oXT4ih2/C09svOX1a6h3DLpsA=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=cRMW7jz4lEnPXgOcuqF1CZyU/1ZTY1gGZXhRsynqqQ6tFZGEVnuC14OU/y8fwMsGtgaShTZJ6TrkxdcIDAcAHAEgiHgflRqvA5sF8YZyKzqGSxGOgoTmsX2nEW8iGyWfG9yDrhe/zsd006CfJExOylQZIyFhLZtwxWr0wmHgFGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVEm2i1w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 206ECC4CEF5;
-	Tue, 23 Sep 2025 18:23:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758651793;
-	bh=8jaT+A2dXp3U0beqB5oXT4ih2/C09svOX1a6h3DLpsA=;
-	h=From:Date:To:cc:Subject:In-Reply-To:References:From;
-	b=EVEm2i1wN8gHQKEneeqVApOz9YQ9zmYlNsPWomipSz089ucuf7Y7SbnqUC3AStNhQ
-	 cO4VbUgH29ShbamFrni/DzkA+PQYn9k0Sn8uQ1COKdcTDQgtryq/I7gPK0s/9GvAS0
-	 4apWO9xrQdKVlZ9y5xhqKnmlVTPk8ch+noHGksiykC94/uet3AHb7CJk5JUqNrfnTf
-	 zX2KO5DIBSZK+VracHAweXX/peL8IRujnrKo8XiEozh5YzQrMmppFnyQehXCcE4CWD
-	 VR0CH0/d5RSkLKjCmmXgZZbwvG64oAXlMrsgOa++m5aFNhxTijYM9NU6pn92W9Hxyn
-	 v7UEq9wFhv1bQ==
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ij@kernel.org>
-Date: Tue, 23 Sep 2025 21:23:08 +0300 (EEST)
-To: Dan Carpenter <dan.carpenter@linaro.org>, 
-    chia-yu.chang@nokia-bell-labs.com
-cc: netdev@vger.kernel.org
-Subject: Re: [bug report] tcp: accecn: AccECN option
-In-Reply-To: <aNKEGWyWV9LWW3i5@stanley.mountain>
-Message-ID: <da87ed1c-165d-fd21-7292-19468d1c8a8c@kernel.org>
-References: <aNKEGWyWV9LWW3i5@stanley.mountain>
+	s=arc-20240116; t=1758652110; c=relaxed/simple;
+	bh=XzK8Ur5LPNCRLf4lx/sAri5lGTsfFnYyGyivCU1zyio=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=HAc0Ib3BxXQbN05VsJ4ePQo7kxNCwW/TJogTSW43gZJzwepgj+jsFbYXveSesRQttF6AUiE/vK67b0JmtGM+QSo1kPc5DpSyTKFB+ybuplp9zNPZ9H91uXuxQET1LVZyifTU1FDNBau/oD8Fav8sdAKLfY+53vXntcpsVOK7qBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=djd8ehe3; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758652109; x=1790188109;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=XzK8Ur5LPNCRLf4lx/sAri5lGTsfFnYyGyivCU1zyio=;
+  b=djd8ehe3+hIelt+hjNDOfw8gyXKq+3UrJ9Sxg47oZEYpoqp6ntXfgBr1
+   AFflGbwdDbZ/d1dpmnPUFB7akXICUjJfQuP4+jVgN1/maqcuifiK31e2S
+   c63A+QnlYnn94bHZmVcpWLCQLoSaG+ctQPlUH7IRFwBHElVvmfQaWG24F
+   3IbsW9PYVJK0LPik4jskMkCNlQSz1lEyx9PVcEH5x3n6tAVR2M/0jdsrM
+   U8u8ylCJ2XfoG8sHaUqOVuRUq1EpuZ2wQ9wFeFlFw2sjIxsPkwl9ULWHn
+   D7+htlY+gBYBCnZhV0fuG628ZIWPl7fSNdG2btxRHTDlrowlOuA+wUc5w
+   g==;
+X-CSE-ConnectionGUID: HQC8ioNyReKrzQgWztB5pw==
+X-CSE-MsgGUID: Tln6DZwYRbWDwSWzEEwHlw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="60858976"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="60858976"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 11:28:28 -0700
+X-CSE-ConnectionGUID: XetSAgxyQXue0ceWAnfDfA==
+X-CSE-MsgGUID: Wl4R6agrRO+WE3k7u1T3xw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
+   d="scan'208";a="213976224"
+Received: from aschofie-mobl2.amr.corp.intel.com (HELO [10.125.108.174]) ([10.125.108.174])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 11:28:28 -0700
+Message-ID: <710dcb52-7f4d-46fe-a8ef-7e91d52af82d@intel.com>
+Date: Tue, 23 Sep 2025 11:28:26 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="8323328-1467881368-1758651010=:13787"
-Content-ID: <d5214b7b-23f5-33fd-7d20-1a937e17b5f0@kernel.org>
-
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---8323328-1467881368-1758651010=:13787
-Content-Type: text/plain; CHARSET=ISO-8859-15
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Content-ID: <a9ce3636-eac0-c3d0-725b-980dee8330c3@kernel.org>
-
-On Tue, 23 Sep 2025, Dan Carpenter wrote:
-
-> Hello Ilpo J=E4rvinen,
->=20
-> Commit b5e74132dfbe ("tcp: accecn: AccECN option") from Sep 16, 2025
-> (linux-next), leads to the following Smatch static checker warning:
->=20
-> =09net/ipv4/tcp_output.c:747 tcp_options_write()
-> =09error: we previously assumed 'tp' could be null (see line 711)
->=20
-> net/ipv4/tcp_output.c
->     630 static void tcp_options_write(struct tcphdr *th, struct tcp_sock =
-*tp,
->     631                               const struct tcp_request_sock *tcpr=
-sk,
->     632                               struct tcp_out_options *opts,
->     633                               struct tcp_key *key)
->     634 {
->     635         u8 leftover_highbyte =3D TCPOPT_NOP; /* replace 1st NOP i=
-f avail */
->     636         u8 leftover_lowbyte =3D TCPOPT_NOP;  /* replace 2nd NOP i=
-n succession */
->     637         __be32 *ptr =3D (__be32 *)(th + 1);
->     638         u16 options =3D opts->options;        /* mungable copy */
->     639=20
->     640         if (tcp_key_is_md5(key)) {
->     641                 *ptr++ =3D htonl((TCPOPT_NOP << 24) | (TCPOPT_NOP=
- << 16) |
->     642                                (TCPOPT_MD5SIG << 8) | TCPOLEN_MD5=
-SIG);
->     643                 /* overload cookie hash location */
->     644                 opts->hash_location =3D (__u8 *)ptr;
->     645                 ptr +=3D 4;
->     646         } else if (tcp_key_is_ao(key)) {
->     647                 ptr =3D process_tcp_ao_options(tp, tcprsk, opts, =
-key, ptr);
->                                                      ^^
-> Sometimes dereferenced here.
->=20
->     648         }
->     649         if (unlikely(opts->mss)) {
->     650                 *ptr++ =3D htonl((TCPOPT_MSS << 24) |
->     651                                (TCPOLEN_MSS << 16) |
->     652                                opts->mss);
->     653         }
->     654=20
->     655         if (likely(OPTION_TS & options)) {
->     656                 if (unlikely(OPTION_SACK_ADVERTISE & options)) {
->     657                         *ptr++ =3D htonl((TCPOPT_SACK_PERM << 24)=
- |
->     658                                        (TCPOLEN_SACK_PERM << 16) =
-|
->     659                                        (TCPOPT_TIMESTAMP << 8) |
->     660                                        TCPOLEN_TIMESTAMP);
->     661                         options &=3D ~OPTION_SACK_ADVERTISE;
->     662                 } else {
->     663                         *ptr++ =3D htonl((TCPOPT_NOP << 24) |
->     664                                        (TCPOPT_NOP << 16) |
->     665                                        (TCPOPT_TIMESTAMP << 8) |
->     666                                        TCPOLEN_TIMESTAMP);
->     667                 }
->     668                 *ptr++ =3D htonl(opts->tsval);
->     669                 *ptr++ =3D htonl(opts->tsecr);
->     670         }
->     671=20
->     672         if (OPTION_ACCECN & options) {
->     673                 const u32 *ecn_bytes =3D opts->use_synack_ecn_byt=
-es ?
->     674                                        synack_ecn_bytes :
->     675                                        tp->received_ecn_bytes;
->                                                ^^^^
-> Dereference
-
-Hi Dan,
-
-While it is long ago I made these changes (they might have changed a=20
-little from that), I can say this part is going to be extremely tricky=20
-for static checkers because TCP state machine(s) are quite complex.
-
-TCP options can be written to a packet when tp has not yet been created=20
-(during handshake) as well as after creation of tp using this same=20
-function. Not all combinations are possible because handshake has to=20
-complete before some things are enabled.
-
-Without checking this myself, my assumption is that ->use_synack_ecn_bytes=
-=20
-is set when we don't have tp available yet as SYNACKs relate to handshake.
-So the tp check is likely there even if not literally written.
-
-Chia-Yu, could you please check these cases for the parts that new code=20
-was introduced whether tp can be NULL? I think this particular line is the
-most likely one to be wrong if something is, that is, can OPTION_ACCECN=20
-be set while use_synack_ecn_bytes is not when tp is not yet there.
-
->     676                 const u8 ect0_idx =3D INET_ECN_ECT_0 - 1;
->     677                 const u8 ect1_idx =3D INET_ECN_ECT_1 - 1;
->     678                 const u8 ce_idx =3D INET_ECN_CE - 1;
->     679                 u32 e0b;
->     680                 u32 e1b;
->     681                 u32 ceb;
->     682                 u8 len;
->     683=20
->     684                 e0b =3D ecn_bytes[ect0_idx] + TCP_ACCECN_E0B_INIT=
-_OFFSET;
->     685                 e1b =3D ecn_bytes[ect1_idx] + TCP_ACCECN_E1B_INIT=
-_OFFSET;
->     686                 ceb =3D ecn_bytes[ce_idx] + TCP_ACCECN_CEB_INIT_O=
-FFSET;
->     687                 len =3D TCPOLEN_ACCECN_BASE +
->     688                       opts->num_accecn_fields * TCPOLEN_ACCECN_PE=
-RFIELD;
->     689=20
->     690                 if (opts->num_accecn_fields =3D=3D 2) {
->     691                         *ptr++ =3D htonl((TCPOPT_ACCECN1 << 24) |=
- (len << 16) |
->     692                                        ((e1b >> 8) & 0xffff));
->     693                         *ptr++ =3D htonl(((e1b & 0xff) << 24) |
->     694                                        (ceb & 0xffffff));
->     695                 } else if (opts->num_accecn_fields =3D=3D 1) {
->     696                         *ptr++ =3D htonl((TCPOPT_ACCECN1 << 24) |=
- (len << 16) |
->     697                                        ((e1b >> 8) & 0xffff));
->     698                         leftover_highbyte =3D e1b & 0xff;
->     699                         leftover_lowbyte =3D TCPOPT_NOP;
->     700                 } else if (opts->num_accecn_fields =3D=3D 0) {
->     701                         leftover_highbyte =3D TCPOPT_ACCECN1;
->     702                         leftover_lowbyte =3D len;
->     703                 } else if (opts->num_accecn_fields =3D=3D 3) {
->     704                         *ptr++ =3D htonl((TCPOPT_ACCECN1 << 24) |=
- (len << 16) |
->     705                                        ((e1b >> 8) & 0xffff));
->     706                         *ptr++ =3D htonl(((e1b & 0xff) << 24) |
->     707                                        (ceb & 0xffffff));
->     708                         *ptr++ =3D htonl(((e0b & 0xffffff) << 8) =
-|
->     709                                        TCPOPT_NOP);
->     710                 }
->     711                 if (tp) {
->                             ^^
-> Here we assume tp can be NULL
->=20
->     712                         tp->accecn_minlen =3D 0;
->     713                         tp->accecn_opt_tstamp =3D tp->tcp_mstamp;
->     714                         if (tp->accecn_opt_demand)
->     715                                 tp->accecn_opt_demand--;
->     716                 }
->     717         }
->     718=20
->     719         if (unlikely(OPTION_SACK_ADVERTISE & options)) {
->     720                 *ptr++ =3D htonl((leftover_highbyte << 24) |
->     721                                (leftover_lowbyte << 16) |
->     722                                (TCPOPT_SACK_PERM << 8) |
->     723                                TCPOLEN_SACK_PERM);
->     724                 leftover_highbyte =3D TCPOPT_NOP;
->     725                 leftover_lowbyte =3D TCPOPT_NOP;
->     726         }
->     727=20
->     728         if (unlikely(OPTION_WSCALE & options)) {
->     729                 u8 highbyte =3D TCPOPT_NOP;
->     730=20
->     731                 /* Do not split the leftover 2-byte to fit into a=
- single
->     732                  * NOP, i.e., replace this NOP only when 1 byte i=
-s leftover
->     733                  * within leftover_highbyte.
->     734                  */
->     735                 if (unlikely(leftover_highbyte !=3D TCPOPT_NOP &&
->     736                              leftover_lowbyte =3D=3D TCPOPT_NOP))=
- {
->     737                         highbyte =3D leftover_highbyte;
->     738                         leftover_highbyte =3D TCPOPT_NOP;
->     739                 }
->     740                 *ptr++ =3D htonl((highbyte << 24) |
->     741                                (TCPOPT_WINDOW << 16) |
->     742                                (TCPOLEN_WINDOW << 8) |
->     743                                opts->ws);
->     744         }
->     745=20
->     746         if (unlikely(opts->num_sack_blocks)) {
-> --> 747                 struct tcp_sack_block *sp =3D tp->rx_opt.dsack ?
->                                                     ^^^^^^^^^^^^^^^^
-> Unchecked dereference here.
->=20
->     748                         tp->duplicate_sack : tp->selective_acks;
->     749                 int this_sack;
->     750=20
->     751                 *ptr++ =3D htonl((leftover_highbyte << 24) |
->     752                                (leftover_lowbyte << 16) |
->     753                                (TCPOPT_SACK <<  8) |
->     754                                (TCPOLEN_SACK_BASE + (opts->num_sa=
-ck_blocks *
->     755                                                      TCPOLEN_SACK=
-_PERBLOCK)));
->     756                 leftover_highbyte =3D TCPOPT_NOP;
->     757                 leftover_lowbyte =3D TCPOPT_NOP;
->     758=20
->     759                 for (this_sack =3D 0; this_sack < opts->num_sack_=
-blocks;
->     760                      ++this_sack) {
->     761                         *ptr++ =3D htonl(sp[this_sack].start_seq)=
-;
->     762                         *ptr++ =3D htonl(sp[this_sack].end_seq);
->     763                 }
->     764=20
->     765                 tp->rx_opt.dsack =3D 0;
->     766         } else if (unlikely(leftover_highbyte !=3D TCPOPT_NOP ||
->     767                             leftover_lowbyte !=3D TCPOPT_NOP)) {
->     768                 *ptr++ =3D htonl((leftover_highbyte << 24) |
->     769                                (leftover_lowbyte << 16) |
->     770                                (TCPOPT_NOP << 8) |
->     771                                TCPOPT_NOP);
->     772                 leftover_highbyte =3D TCPOPT_NOP;
->     773                 leftover_lowbyte =3D TCPOPT_NOP;
->     774         }
->     775=20
->     776         if (unlikely(OPTION_FAST_OPEN_COOKIE & options)) {
->     777                 struct tcp_fastopen_cookie *foc =3D opts->fastope=
-n_cookie;
->     778                 u8 *p =3D (u8 *)ptr;
->     779                 u32 len; /* Fast Open option length */
->     780=20
->     781                 if (foc->exp) {
->     782                         len =3D TCPOLEN_EXP_FASTOPEN_BASE + foc->=
-len;
->     783                         *ptr =3D htonl((TCPOPT_EXP << 24) | (len =
-<< 16) |
->     784                                      TCPOPT_FASTOPEN_MAGIC);
->     785                         p +=3D TCPOLEN_EXP_FASTOPEN_BASE;
->     786                 } else {
->     787                         len =3D TCPOLEN_FASTOPEN_BASE + foc->len;
->     788                         *p++ =3D TCPOPT_FASTOPEN;
->     789                         *p++ =3D len;
->     790                 }
->     791=20
->     792                 memcpy(p, foc->val, foc->len);
->     793                 if ((len & 3) =3D=3D 2) {
->     794                         p[foc->len] =3D TCPOPT_NOP;
->     795                         p[foc->len + 1] =3D TCPOPT_NOP;
->     796                 }
->     797                 ptr +=3D (len + 3) >> 2;
->     798         }
->     799=20
->     800         smc_options_write(ptr, &options);
->     801=20
->     802         mptcp_options_write(th, ptr, tp, opts);
->                                              ^^
-> The last dereference is checked for NULL but the others aren't.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 00/20] Type2 device basic support
+To: Alejandro Lucero Palau <alucerop@amd.com>,
+ alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+References: <20250918091746.2034285-1-alejandro.lucero-palau@amd.com>
+ <33f5b788-c478-4279-bf9b-a5fc1000bc23@intel.com>
+ <c012498b-d9f9-439a-a926-ef5f10689bf7@amd.com>
+ <aea329a3-9cb9-4552-88e7-2b354483ad53@intel.com>
+ <0b36e5c2-2f15-4e83-bf4b-c4c15f55d3d2@amd.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <0b36e5c2-2f15-4e83-bf4b-c4c15f55d3d2@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
---=20
- i.
---8323328-1467881368-1758651010=:13787--
+
+On 9/23/25 3:35 AM, Alejandro Lucero Palau wrote:
+> 
+> On 9/19/25 22:42, Dave Jiang wrote:
+>>
+>> On 9/19/25 9:55 AM, Alejandro Lucero Palau wrote:
+>>> Hi Dave,
+>>>
+>>>
+>>>
+>>> On 9/19/25 17:26, Dave Jiang wrote:
+>>>> On 9/18/25 2:17 AM, alejandro.lucero-palau@amd.com wrote:
+>>>>> From: Alejandro Lucero <alucerop@amd.com>
+>>>>>
+>>>>> First of all, the patchset should be applied on the described base
+>>>>> commit then applying Terry's v11 about CXL error handling plus last four
+>>>>> pathces from Dan's for-6.18/cxl-probe-order branch.
+>>>>>
+>>> <snip>
+>>>
+>>>>> base-commit: f11a5f89910a7ae970fbce4fdc02d86a8ba8570f
+>>>>> prerequisite-patch-id: 44c914dd079e40d716f3f2d91653247eca731594
+>>>>> prerequisite-patch-id: b13ca5c11c44a736563477d67b1dceadfe3ea19e
+>>>>> prerequisite-patch-id: d0d82965bbea8a2b5ea2f763f19de4dfaa8479c3
+>>>>> prerequisite-patch-id: dd0f24b3bdb938f2f123bc26b31cd5fe659e05eb
+>>>>> prerequisite-patch-id: 2ea41ec399f2360a84e86e97a8f940a62561931a
+>>>>> prerequisite-patch-id: 367b61b5a313db6324f9cf917d46df580f3bbd3b
+>>>>> prerequisite-patch-id: 1805332a9f191bc3547927d96de5926356dac03c
+>>>>> prerequisite-patch-id: 40657fd517f8e835a091c07e93d6abc08f85d395
+>>>>> prerequisite-patch-id: 901eb0d91816499446964b2a9089db59656da08d
+>>>>> prerequisite-patch-id: 79856c0199d6872fd2f76a5829dba7fa46f225d6
+>>>>> prerequisite-patch-id: 6f3503e59a3d745e5ecff4aaed668e2d32da7e4b
+>>>>> prerequisite-patch-id: e9dc88f1b91dce5dc3d46ff2b5bf184aba06439d
+>>>>> prerequisite-patch-id: 196fe106100aad619d5be7266959bbeef29b7c8b
+>>>>> prerequisite-patch-id: 7e719ed404f664ee8d9b98d56f58326f55ea2175
+>>>>> prerequisite-patch-id: 560f95992e13a08279034d5f77aacc9e971332dd
+>>>>> prerequisite-patch-id: 8656445ee654056695ff2894e28c8f1014df919e
+>>>>> prerequisite-patch-id: 001d831149eb8f9ae17b394e4bcd06d844dd39d9
+>>>>> prerequisite-patch-id: 421368aa5eac2af63ef2dc427af2ec11ad45c925
+>>>>> prerequisite-patch-id: 18fd00d4743711d835ad546cfbb558d9f97dcdfc
+>>>>> prerequisite-patch-id: d89bf9e6d3ea5d332ec2c8e441f1fe6d84e726d3
+>>>>> prerequisite-patch-id: 3a6953d11b803abeb437558f3893a3b6a08acdbb
+>>>>> prerequisite-patch-id: 0dd42a82e73765950bd069d421d555ded8bfeb25
+>>>>> prerequisite-patch-id: da6e0df31ad0d5a945e0a0d29204ba75f0c97344
+>>>>> prerequisite-patch-id: ed7d9c768af2ac4e6ce87df2efd0ec359856c6e5
+>>>>> prerequisite-patch-id: ed7f4dce80b4f80ccafb57efcd6189a6e14c9208
+>>>>> prerequisite-patch-id: ccadb682c5edc3babaef5fe7ecb76ee5daa27ea4
+>>>> Alejandro,
+>>>> I'm having trouble creating a branch. The hashes for prereq don't seem to exist. Can you please post a public branch somewhere? Thanks!
+>>>
+>>> Did you read the first paragraph of the cover letter?
+>> I reset to f11a5f89910a7ae970fbce4fdc02d86a8ba8570f
+>> I was able to apply Terry's v11
+>> And after that I think I'm suppose to apply these 4 right?
+>> ab70c6227ee6 dax/cxl: Defer Soft Reserved registration
+>> 88aec5ea7a24 cxl/mem: Introduce a memdev creation ->probe() operation
+>> e23f37a4a834 cxl/port: Arrange for always synchronous endpoint attach
+>> 595f243eeac3 cxl/mem: Arrange for always-synchronous memdev attach
+>>
+>> It failed on cherry picking the first one: 595f243eeac3
+>>
+> 
+> Hi Dave,
+> 
+> 
+> My mistake. I did not remember I had to slightly modify Dan's patches.
+> 
+> 
+> I will send v19 including those patches and working on the minor issues from reviews.
+
+Pushing your code to a public branch on somewhere like github would be great. Thanks!
+
+> 
+> 
+> Thanks
+> 
+
 
