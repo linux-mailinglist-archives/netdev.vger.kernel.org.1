@@ -1,146 +1,131 @@
-Return-Path: <netdev+bounces-225480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35FE5B940F9
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 05:07:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90A66B94251
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 05:47:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 01F7F4E29D1
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 03:07:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C2F83B7E32
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 03:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73BA4236437;
-	Tue, 23 Sep 2025 03:07:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481001B040B;
+	Tue, 23 Sep 2025 03:47:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ebwQJumU"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.229.205.26])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E957E2264BD;
-	Tue, 23 Sep 2025 03:07:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.229.205.26
+Received: from mail-pl1-f225.google.com (mail-pl1-f225.google.com [209.85.214.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1FE5AD24
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 03:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758596832; cv=none; b=B6QdRwEHCP3U0qllNb0a78G5N8NtEb04cDDn/IXHz37ejZAvlF8Cy10y94RCyLJo/aD8po29Wva3y+RxSUwjpFiww+9fspXtPNKXGEEYLvCceecW6capdi9du7k77rXjFaIEABNDwhF3WqA6ldrp9kjwELLVjWMFlqfvlC7Dcrc=
+	t=1758599275; cv=none; b=OKouKViV4/CUeP6nXgpXSowqrbf/ugSiUPRUUOyMZJ3YbJDc451cJverrzku3bSiFMxkLzpFd+dOrkUNvwYeV+yCuJocaqzKFnSp1H2PxcDjXaj06C5bqiEwCFAjJg5BtbuuI7BSc1prN2RBKVFXM/F/giJrc4MciSSyzriP/qE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758596832; c=relaxed/simple;
-	bh=dKjJjUJFFbk7Ak+Tf4z4jgGW1f5LOmkcdWZKxun+c30=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=MPlZID1Tq355PQ2KfJ5EadjMQJIlbQRLalNSvOzkA40KQxeDVzANSVL54d+VsfhATEU0FAE614LqaB298K6tTEqx+69NW7evNIGYkXIuNjLEqlLjWK9EHlJGuEmN8H7jT3ka3Q703Ns3mJw/+hfxwwYFKxFi59DtFdo5G+URkSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=52.229.205.26
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from weishangjuan$eswincomputing.com ( [10.12.96.155] ) by
- ajax-webmail-app2 (Coremail) ; Tue, 23 Sep 2025 11:06:08 +0800 (GMT+08:00)
-Date: Tue, 23 Sep 2025 11:06:08 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?6Z+m5bCa5aif?= <weishangjuan@eswincomputing.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, vladimir.oltean@nxp.com,
-	yong.liang.choong@linux.intel.com, anthony.l.nguyen@intel.com,
-	prabhakar.mahadev-lad.rj@bp.renesas.com, jan.petrous@oss.nxp.com,
-	jszhang@kernel.org, inochiama@gmail.com, 0x1207@gmail.com,
-	boon.khai.ng@altera.com, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
-	linmin@eswincomputing.com, lizhi2@eswincomputing.com,
-	pinkesh.vaghela@einfochips.com
-Subject: Re: Re: [PATCH v7 2/2] ethernet: eswin: Add eic7700 ethernet driver
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.2-cmXT6 build
- 20241203(6b039d88) Copyright (c) 2002-2025 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <aMw-dgNiXgPeqeSz@shell.armlinux.org.uk>
-References: <20250918085612.3176-1-weishangjuan@eswincomputing.com>
- <20250918090026.3280-1-weishangjuan@eswincomputing.com>
- <aMw-dgNiXgPeqeSz@shell.armlinux.org.uk>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1758599275; c=relaxed/simple;
+	bh=bQGdg7yM0G379KQ+yE73tGM4Xi88anrThiadA+CtQKg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Lnsrnzt7SdGXZsNuYpO5clrADVfCdE10LXum81FGIo7MjXWyb02ngu9ytxPLeP7ePXSXMt57sQI7cRY+NBEwu4O8GUvYIfcwRB/kmBOVFs/gFseQwE///NuY9GxRBnKeSQuneTSPoto87QEVfn9hcOZk+jUOTlNs6uZsxB2IbgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ebwQJumU; arc=none smtp.client-ip=209.85.214.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f225.google.com with SMTP id d9443c01a7336-2698e4795ebso51338985ad.0
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 20:47:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758599273; x=1759204073;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FkWmI9pm0Q+PEDKmfvpOccyiT6zs20dN0vwDFm3sBOs=;
+        b=ZRKuGa3zFPsUfv/30IiLn9fPNaaHBpiXHWjmT/ypp4f1vPSoNFITOe/XtUs4OmFvXm
+         WAAVvdyyhJPwqRtJCTLGfFNwzsIQ4xFvyWqPFb/pE5VdpO74BBQ1m8UWJkLreC6Mq5+k
+         qyjfptyBhe2mtunI/O4Q4fqLWgsYAI3VjrXvXs67IU/F4bGyNJK3hjeP6taIA0aKuv4I
+         yHO9mteCVXIHkQmq59J20HRS1Lp0RHomltIUi3IQWzHbAm1GkmtvJtFzli5gj0CcYaJE
+         nfXnSEBGobAwTk72txOWW3GqfPvPMUoB/KQ9ej5G2ULHiKcMc/KlODPAslqdATNBWmCj
+         NfPA==
+X-Forwarded-Encrypted: i=1; AJvYcCVjTv3NlTKitubeKcH8VToAytK191pBi9fJgtdublCFJxxQVW/7ypOONYLGb7H8uY+2W7HVhro=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwR+rWI5/H5pt5TBB6RdwufxdFtcRFCziJoqsXClm8rBmqvflIC
+	HWFGviAk/8uAROmdC9pmJKe/5lbdGHQpkaOFjStSRAenmaAs2ScCynB5ehBA5whOLodyy/+gssA
+	qAdq2lKBMJfUclB09D3IOa3Gc1U38TLmn7dFYpxNGxol/yMTv4SVyhCsMA+vq1hxEZJD2JsjIiH
+	kPNRAvFvtPduE5+Tye7HuCHgbG1zIG6I6qyQu/BpULWq7LmjZlkolzfA9bAcU3NIo6JCz/D3l2u
+	HpPJbBR/MM=
+X-Gm-Gg: ASbGncsNSz+DXRf1euSQ7ghOcMG9B/JnbbNINEnyhVqq9x+ZI7PRFUiI5HBA6D4IjjP
+	qhQ4Zh2aoT738MCCG+Px3MGGIxQOCBW1hqXHd1znE9ANj6fvFijOwLi6cHfF0mWhTAVrqM3utJf
+	XEK3dH+TKAwvCcxtnt7U5jFHLaNbqdpjAJMgAUvhTU6vwExH2ROkJrJYpskMbNcxv5HZIc9y4KN
+	rBZb7rhemQtosN98xrp7B3Z5eOc2xa7qMRtpr1hmdBIA4eFkq63JaYiikkAq7JUAWAjKqe4kZCy
+	VCN8ILYa4H4e52rhnf7i7qqWZi1dXaNx7AeJLwOLvrJh/kzE5hehZp9mOw0psGaVke2LXEq1JWb
+	326YAqxg3OLstxg/+x3J5mXtWAqdcbn+KG/6gtoFrfIx7PE2MYvuo9S4zCmXOv4yHns3DFCVG2s
+	0SsA==
+X-Google-Smtp-Source: AGHT+IE5oJWSVEWwBD3UbfcuRJDGj3qhizUr+/eQAm+xI6mnCwh97hpBQl4VtiFw0bRHqiExYfd2PYnMwNbv
+X-Received: by 2002:a17:902:cf0f:b0:275:8110:7a48 with SMTP id d9443c01a7336-27cc54318a3mr15058815ad.39.1758599272916;
+        Mon, 22 Sep 2025 20:47:52 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-270c5837c10sm4968075ad.18.2025.09.22.20.47.45
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 22 Sep 2025 20:47:45 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-324e41e946eso8693491a91.0
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 20:47:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1758599264; x=1759204064; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FkWmI9pm0Q+PEDKmfvpOccyiT6zs20dN0vwDFm3sBOs=;
+        b=ebwQJumUp/OXtTzpXZBVv27bqUnEokUTaEKW14BZbzWmr9ciY3KdTdnJ+2im+Kga2v
+         GkRxAHc3LFSaI/xooELSORCIM9lt62KRO3LGtUsEUTpLpYQ2pQC+zzb+6ZMeMrn/iG6T
+         aXsgMmYJjJ2GA12GbFTlYInW8+YFuYt1snCn0=
+X-Forwarded-Encrypted: i=1; AJvYcCXqy4+dqBuPIdb94UjH7jN8dQX0gM+sFj1JjJzi4P+FS41vRxNvfdx07SaN7pd/mzX9ztfQVbE=@vger.kernel.org
+X-Received: by 2002:a17:90b:5109:b0:329:ed5b:ecd5 with SMTP id 98e67ed59e1d1-332a95b8b8fmr1337307a91.19.1758599264118;
+        Mon, 22 Sep 2025 20:47:44 -0700 (PDT)
+X-Received: by 2002:a17:90b:5109:b0:329:ed5b:ecd5 with SMTP id
+ 98e67ed59e1d1-332a95b8b8fmr1336921a91.19.1758599253171; Mon, 22 Sep 2025
+ 20:47:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <30080c70.16e1.199748921d3.Coremail.weishangjuan@eswincomputing.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:TQJkCgDHZpWgDtJoo9vXAA--.25976W
-X-CM-SenderInfo: pzhl2xxdqjy31dq6v25zlqu0xpsx3x1qjou0bp/1tbiAgEOEGjRel
-	QTIgABs6
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+References: <20250922165118.10057-1-vadim.fedorenko@linux.dev> <20250922165118.10057-2-vadim.fedorenko@linux.dev>
+In-Reply-To: <20250922165118.10057-2-vadim.fedorenko@linux.dev>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Tue, 23 Sep 2025 09:17:21 +0530
+X-Gm-Features: AS18NWDegvdaY83xtLHBitmIWLHay50k0_cn5OEjXImxFaSwiTrloD7KWxNv6Jk
+Message-ID: <CALs4sv0e8Km3nbABTzNg+y1HTKdbAX3V2rBb4F_vVJ1zF=MpGw@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/4] tg3: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Michael Chan <michael.chan@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-SGkgS2luZywKSSBob3BlIHRoaXMgbWVzc2FnZSBmaW5kcyB5b3Ugd2VsbC4KVGhhbmsgeW91IGZv
-ciB5b3VyIHByb2Zlc3Npb25hbCBhbmQgdmFsdWFibGUgc3VnZ2VzdGlvbnMuCk91ciBxdWVzdGlv
-bnMgYXJlIGVtYmVkZGVkIGJlbG93IHlvdXIgY29tbWVudHMgaW4gdGhlIG9yaWdpbmFsIGVtYWls
-IGJlbG93LgoKQmVzdCByZWdhcmRzLApTaGFuZ2p1YW4gV2VpCgoKPiAtLS0tLeWOn+Wni+mCruS7
-ti0tLS0tCj4g5Y+R5Lu25Lq6OiAiUnVzc2VsbCBLaW5nIChPcmFjbGUpIiA8bGludXhAYXJtbGlu
-dXgub3JnLnVrPgo+IOWPkemAgeaXtumXtDoyMDI1LTA5LTE5IDAxOjE2OjM4ICjmmJ/mnJ/kupQp
-Cj4g5pS25Lu25Lq6OiB3ZWlzaGFuZ2p1YW5AZXN3aW5jb21wdXRpbmcuY29tCj4g5oqE6YCBOiBk
-ZXZpY2V0cmVlQHZnZXIua2VybmVsLm9yZywgYW5kcmV3K25ldGRldkBsdW5uLmNoLCBkYXZlbUBk
-YXZlbWxvZnQubmV0LCBlZHVtYXpldEBnb29nbGUuY29tLCBrdWJhQGtlcm5lbC5vcmcsIHJvYmhA
-a2VybmVsLm9yZywga3J6aytkdEBrZXJuZWwub3JnLCBjb25vcitkdEBrZXJuZWwub3JnLCBuZXRk
-ZXZAdmdlci5rZXJuZWwub3JnLCBwYWJlbmlAcmVkaGF0LmNvbSwgbWNvcXVlbGluLnN0bTMyQGdt
-YWlsLmNvbSwgYWxleGFuZHJlLnRvcmd1ZUBmb3NzLnN0LmNvbSwgdmxhZGltaXIub2x0ZWFuQG54
-cC5jb20sIHlvbmcubGlhbmcuY2hvb25nQGxpbnV4LmludGVsLmNvbSwgYW50aG9ueS5sLm5ndXll
-bkBpbnRlbC5jb20sIHByYWJoYWthci5tYWhhZGV2LWxhZC5yakBicC5yZW5lc2FzLmNvbSwgamFu
-LnBldHJvdXNAb3NzLm54cC5jb20sIGpzemhhbmdAa2VybmVsLm9yZywgaW5vY2hpYW1hQGdtYWls
-LmNvbSwgMHgxMjA3QGdtYWlsLmNvbSwgYm9vbi5raGFpLm5nQGFsdGVyYS5jb20sIGxpbnV4LWtl
-cm5lbEB2Z2VyLmtlcm5lbC5vcmcsIGxpbnV4LXN0bTMyQHN0LW1kLW1haWxtYW4uc3Rvcm1yZXBs
-eS5jb20sIGxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZywgbmluZ3l1QGVzd2lu
-Y29tcHV0aW5nLmNvbSwgbGlubWluQGVzd2luY29tcHV0aW5nLmNvbSwgbGl6aGkyQGVzd2luY29t
-cHV0aW5nLmNvbSwgcGlua2VzaC52YWdoZWxhQGVpbmZvY2hpcHMuY29tCj4g5Li76aKYOiBSZTog
-W1BBVENIIHY3IDIvMl0gZXRoZXJuZXQ6IGVzd2luOiBBZGQgZWljNzcwMCBldGhlcm5ldCBkcml2
-ZXIKPiAKPiBPbiBUaHUsIFNlcCAxOCwgMjAyNSBhdCAwNTowMDoyNlBNICswODAwLCB3ZWlzaGFu
-Z2p1YW5AZXN3aW5jb21wdXRpbmcuY29tIHdyb3RlOgo+ID4gKwlwbGF0X2RhdC0+Y2xrX3R4X2kg
-PSBzdG1tYWNfcGx0ZnJfZmluZF9jbGsocGxhdF9kYXQsICJ0eCIpOwo+ID4gKwlwbGF0X2RhdC0+
-c2V0X2Nsa190eF9yYXRlID0gc3RtbWFjX3NldF9jbGtfdHhfcmF0ZTsKPiA+ICsJcGxhdF9kYXQt
-PmJzcF9wcml2ID0gZHdjX3ByaXY7Cj4gPiArCXBsYXRfZGF0LT5jbGtzX2NvbmZpZyA9IGVpYzc3
-MDBfY2xrc19jb25maWc7Cj4gPiArCWR3Y19wcml2LT5wbGF0X2RhdCA9IHBsYXRfZGF0Owo+ID4g
-Kwo+ID4gKwlyZXQgPSBlaWM3NzAwX2Nsa3NfY29uZmlnKGR3Y19wcml2LCB0cnVlKTsKPiA+ICsJ
-aWYgKHJldCkKPiA+ICsJCXJldHVybiBkZXZfZXJyX3Byb2JlKCZwZGV2LT5kZXYsCj4gPiArCQkJ
-CXJldCwKPiA+ICsJCQkJImVycm9yIGVuYWJsZSBjbG9ja1xuIik7Cj4gPiArCj4gPiArCXJldCA9
-IHN0bW1hY19kdnJfcHJvYmUoJnBkZXYtPmRldiwgcGxhdF9kYXQsICZzdG1tYWNfcmVzKTsKPiA+
-ICsJaWYgKHJldCkgewo+ID4gKwkJZWljNzcwMF9jbGtzX2NvbmZpZyhkd2NfcHJpdiwgZmFsc2Up
-Owo+ID4gKwkJcmV0dXJuIGRldl9lcnJfcHJvYmUoJnBkZXYtPmRldiwKPiA+ICsJCQkJcmV0LAo+
-ID4gKwkJCQkiRmFpbGVkIHRvIGRyaXZlciBwcm9iZVxuIik7Cj4gPiArCX0KPiA+ICsKPiA+ICsJ
-cmV0dXJuIHJldDsKPiA+ICt9Cj4gPiArCj4gPiArc3RhdGljIHZvaWQgZWljNzcwMF9kd21hY19y
-ZW1vdmUoc3RydWN0IHBsYXRmb3JtX2RldmljZSAqcGRldikKPiA+ICt7Cj4gPiArCXN0cnVjdCBl
-aWM3NzAwX3Fvc19wcml2ICpkd2NfcHJpdiA9IGdldF9zdG1tYWNfYnNwX3ByaXYoJnBkZXYtPmRl
-dik7Cj4gPiArCj4gPiArCXN0bW1hY19wbHRmcl9yZW1vdmUocGRldik7Cj4gPiArCWVpYzc3MDBf
-Y2xrc19jb25maWcoZHdjX3ByaXYsIGZhbHNlKTsKPiAKPiBJdCB3b3VsZCBiZSBuaWNlIHRvIHNl
-ZSB0aGUgYWJvdmUgY29kZSBjbGVhbmVkIHVwIGxpa2UgSSBkaWQgZm9yIGFsbAo+IHRoZSBvdGhl
-ciBzdG1tYWMgZ2x1ZSBkcml2ZXJzIHJlY2VudGx5Lgo+IAo+IEhvd2V2ZXIsIHRoaXMgaXMgbm90
-IHRvIHNheSB0aGlzIHNob3VsZG4ndCBiZSBtZXJnZWQgLSBidXQgcGxlYXNlCj4gY29uc2lkZXIg
-dGhpcyBpZiB5b3UgZG8gYW5vdGhlciByZXdvcmsgb2YgdGhlc2UgcGF0Y2hlcywgaWYgbm90IGFz
-Cj4gYSBmb2xsb3ctdXAgcGF0Y2guCj4gCj4gRXNzZW50aWFsbHksIHlvdSBjYW4gdXNlIGRldm1f
-c3RtbWFjX3BsdGZtX3Byb2JlKCksIHBvcHVsYXRlIHRoZQo+IHBsYXRfZGF0LT5pbml0KCkgYW5k
-IHBsYXRfZGF0LT5leGl0KCkgbWV0aG9kcyB0byBjYWxsIHRoZQo+IGNsa3NfY29uZmlnIGZ1bmN0
-aW9uLCBidXQgYXMgeW91IGRvbid0IHdhbnQgdGhlc2UgbWV0aG9kcyB0byBiZQo+IGNhbGxlZCBk
-dXJpbmcgc3VzcGVuZC9yZXN1bWUgKGJlY2F1c2UgcGxhdF9kYXQtPmNsa3NfY29uZmlnKCkgaXMK
-PiBhbHJlYWR5IGNhbGxlZCB0aGVyZSksIHByb3ZpZGUgZW1wdHkgcGxhdF9kYXQtPnN1c3BlbmQo
-KSBhbmQKPiBwbGF0X2RhdC0+cmVzdW1lKCkgbWV0aG9kcy4KPiAKPiBCb251cyBwb2ludHMgaWYg
-eW91IGluY2x1ZGUgYSBwYXRjaCB3aGljaCBwcm92aWRlcyB0aGlzIGZ1bmN0aW9uYWxpdHkKPiBh
-cyBsaWJyYXJ5IGZ1bmN0aW9ucyBpbiBzdG1tYWNfcGxhdGZvcm0uYyB3aGljaCBjYW4gYmUgdXNl
-ZCB0bwo+IGluaXRpYWxpc2UgLT5pbml0KCkgYW5kIC0+ZXhpdCgpIGZvciB0aGlzIGJlaGF2aW91
-ciwgYW5kIGNoZWNrIG90aGVyCj4gc3RtbWFjIHBsYXRmb3JtIGdsdWUgZHJpdmVycyB0byBzZWUg
-aWYgdGhleSB3b3VsZCBiZW5lZml0IGZyb20gdXNpbmcKPiB0aGVzZS4KPiAKCkluIHRoZSBjdXJy
-ZW50IGVpYzc3MDBfZHdtYWMgZ2x1ZSBkcml2ZXIsIHRoZSByZWdtYXBfcmVhZCgpL3dyaXRlKCkK
-b3BlcmF0aW9ucyhmb3IgcGh5X2N0cmwxLCBheGlfbHBfY3RybDEsIGFuZCB0aGUgUlgvVFggZGVs
-YXkgcmVnaXN0ZXJzKSlhcmXCoApwZXJmb3JtZWQgZGlyZWN0bHkgaW4gdGhlIHByb2JlKCkgZnVu
-Y3Rpb24uIFdvdWxkIGl0IGJlIGNsZWFuZXIgdG8gbW92ZSB0aGVzZQpyZWdpc3RlciBjb25maWd1
-cmF0aW9ucyBpbnRvIHRoZSBpbml0KCkgY2FsbGJhY2sgaW5zdGVhZCwgc28gdGhhdCB0aGV5IGFy
-ZQphbHNvIHJlYXBwbGllZCBkdXJpbmcgcmVzdW1lKCk/Cgo+IE9mIGNvdXJzZSwgaXQgd291bGQg
-YmUgbmljZSBub3QgdG8gaGF2ZSB0byBnbyB0byB0aGUgZXh0ZW50IG9mCj4gYWRkaW5nIGVtcHR5
-IGZ1bmN0aW9ucyBmb3IgLT5zdXNwZW5kKCkgYW5kIC0+cmVzdW1lKCksIGJ1dCBzdG1tYWMgaGFz
-Cj4gYSBsb3Qgb2Ygd2VpcmRvIGhpc3RvcnksIGFuZCB0aGVyZSB3YXMgbm8gZWFzeSB3YXkgdG8g
-bWFpbnRhaW4KPiBjb21wYXRpYmlsaXR5IHdpdGhvdXQgZG9pbmcgdGhhdCB3aGVuIEkgYWRkZWQg
-dGhlc2UgdHdvIG5ldyBtZXRob2RzLgo+IAo+IExhc3RseSwgcGxlYXNlIGNvbnNpZGVyIHVzaW5n
-ICJuZXQ6IHN0bW1hYzogPHNob3J0ZW5lZC1nbHVlLW5hbWU+OiBibGFoIgo+IGFzIHRoZSBzdWJq
-ZWN0IHNvIHRoZXJlJ3MgYSBjb25zaXN0ZW50IHN0eWxlIGZvciBzdG1tYWMgcGF0Y2hlcy4KPiAK
-PiBUaGFua3MuCj4gCj4gLS0gCj4gUk1LJ3MgUGF0Y2ggc3lzdGVtOiBodHRwczovL3d3dy5hcm1s
-aW51eC5vcmcudWsvZGV2ZWxvcGVyL3BhdGNoZXMvCj4gRlRUUCBpcyBoZXJlISA4ME1icHMgZG93
-biAxME1icHMgdXAuIERlY2VudCBjb25uZWN0aXZpdHkgYXQgbGFzdCEK
+On Mon, Sep 22, 2025 at 10:30=E2=80=AFPM Vadim Fedorenko
+<vadim.fedorenko@linux.dev> wrote:
+>
+> Convert tg3 driver to new timestamping configuration API.
+>
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> ---
+>  drivers/net/ethernet/broadcom/tg3.c | 66 +++++++++++++----------------
+>  1 file changed, 29 insertions(+), 37 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/b=
+roadcom/tg3.c
+> index b4dc93a48718..7f00ec7fd7b9 100644
+> --- a/drivers/net/ethernet/broadcom/tg3.c
+> +++ b/drivers/net/ethernet/broadcom/tg3.c
+> @@ -13929,22 +13929,20 @@ static void tg3_self_test(struct net_device *de=
+v, struct ethtool_test *etest,
+>
+>  }
+
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
