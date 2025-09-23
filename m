@@ -1,52 +1,104 @@
-Return-Path: <netdev+bounces-225522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28665B9508C
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 10:40:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23564B9518E
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 10:59:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACEEA2E1280
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 08:40:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C59F62E274F
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 08:59:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92DCA31D38A;
-	Tue, 23 Sep 2025 08:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28FD731E0EA;
+	Tue, 23 Sep 2025 08:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zyt4risZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F2D431D741
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 08:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E3331DDB7
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 08:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758616830; cv=none; b=AF78aHuReG0JdVdQAlB2ZLcnzesNUD7Ug/pxu7Dj5dsZczZhEC75MWZDunplfSJ0eDT19FMg21yYnuVr6b6pCmmTL07UvMWR1f9S12juPNclhYrQgbYU3mzew6uDUv8JS82a5xKx5pWmFvN94VlVnkX8lpJOxWTE2kWmPFXF9tY=
+	t=1758617963; cv=none; b=M3dPWD1lfl60S7dtBRpaSr78R9BztolPmoiBKqweuYyZMh9mWOrXl2qgSAfWK2ZxY7B10y2BXr8Sgwl9tKBF1AS1DeoaAUFRcBCT+R0og0y3++at4M13kQzU5trBriada2WaEUk0HtJ03unX6F7zfEjflkNgtkWWZLt4LI7ipF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758616830; c=relaxed/simple;
-	bh=q4eeJLqMoq08nHB3H6vwt+kTaSLJsauUW+ZSIELNuOY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eVThO1uVSLLcUOnQ4UmLr0MES3spCeVyvcK6WKEnGBTnEoNZy44k58f3FP5l7qOy+pNpCD5NJyzhr90wR3kcZUyuR7pXODAdI7OIs41chNfbew6ST4XS6iJ0rQhCarQ9Lxi0otg3iyglANWxtTwAKpu91VALQncDE1NPXD87SzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=15.184.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: esmtpsz18t1758616806teba17e7f
-X-QQ-Originating-IP: Y65HDPkAjT9I/dzKRWpqjqEX1/dZ3RUV9curQL0kqRY=
-Received: from localhost.localdomain ( [111.204.182.100])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 23 Sep 2025 16:40:04 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 2421286488052786642
-EX-QQ-RecipientCnt: 5
-From: Tonghao Zhang <tonghao@bamaicloud.com>
-To: netdev@vger.kernel.org
-Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	David Ahern <dsahern@gmail.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH RESEND] ip/bond: add broadcast_neighbor support
-Date: Tue, 23 Sep 2025 16:39:53 +0800
-Message-Id: <20250923083953.16363-1-tonghao@bamaicloud.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1758617963; c=relaxed/simple;
+	bh=Ff3wsakldoKjVsybc922K8tiJTSpuhb+b2u48dEYPnw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OHuVAZgOCbGijJwOc9YwNwGyYJE5OtlMMdeYvUN/Th0E2/YgNPm//6c6854uaJKrT8LzdmXmtw+h8z5iRVQ0L212HbZ6myhx2Pj6ATi68jB0gNprqGhZL3NedLeYCBYLrup6AmwsvdVPtVQ3huaYw6fbpJuzQ3oOAUX7mdsoA6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zyt4risZ; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-46c78a1784dso7484685e9.0
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 01:59:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758617959; x=1759222759; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MFWyATSfpVmFqTHer4QnnzA9/eMYqpzK4W6xg6dmXUw=;
+        b=Zyt4risZ4tBBJdKBA6TND4A5v8on5gu9iqXOh1eBXeYsgSnOknn8gvFpdTojnQqccn
+         j6th114HA+9wvieUGlJw1iTyVsHw3uKXo7/KizTjpzzMqqDD0ytef4LwU9mWoRsg6HNt
+         0yd+3E66ndu6GhlrnGPP8z7Z2XxVT8EQGWu+M368jvuBUFHZJohtY4kWRFd6MTGrUZVr
+         bPcommV9Dmq4Ut71kXRgzDctcVQtjSBsKyGIQDhr5BQ9wcR2g0v0TAVXttOCKCIKo9eh
+         rOrc/o0RjIywADFKJVm5EfrmasHwmA2nJ8khcCK+zfg8jXlUEk8InfbD7yuSPRLKgCDJ
+         /gsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758617959; x=1759222759;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MFWyATSfpVmFqTHer4QnnzA9/eMYqpzK4W6xg6dmXUw=;
+        b=TlEszO1mpP4Weysn1lbvUSU00Om9IGSmZYpYDVEjXmZwGqwUbejMEdzl45G8FCOqlV
+         jXddfmIOSWejyunaijWQUG18Y50pHXDx+6HWJ5SJ7XCl1/5jsI5oDZOJGbGcv8aDSS3n
+         Ki0CA6DtRdQM7KSezSAKt1U4ZOJo8dLOh7NYlGB9o37fZGQr1hyh8mz+/GXd6qnV1oXf
+         4Zme+7IDUqbzF5bjUBr1nFwH7NBnKFyZ5jxXGd0GRZVwW1meuS+xfYaLrymk1mktPl7J
+         CHDl29Tl/Fni7/wFJmJSdkoBw/31FIegTvMz71a70DTucE1R4S4zz0Bq3eSi9KLygRYh
+         mTAg==
+X-Gm-Message-State: AOJu0Yxk8fvI8XfTrz7zJMIdKbqOfdt2REnH1p8wSR9Up5ov84k/4Dpc
+	iyZxIt3s1AjKcl2H7X3jl1OKyrhXOhL1NBCitGW9gPIAtstc1YVIfyTwqUT/Dw==
+X-Gm-Gg: ASbGncv/TUrFBJ2aMY10VHWpmUXJskXJ1NEW1oQ+sB9RZH/k/GTpYQZ6A2wG35KXbfd
+	9yn/qQA49eoXUCtpePOhXS5ga5XJtvn0u8r2M49QSKORIH1B23pn5+VFfUYvhQFWpsYe3l1DsP/
+	m4P1zSemdjZBjPWyAjlYQhdTBOwUjIm/Vx1iuhkZjcvfv6MwK+Y9v9mI79tyRTLLeL7q9TvD9Ny
+	BTg+n6P5X5ffbmA+Y/g8VChCa5bUAaM3kqvJ6V5rROUAdS71yY8VMVdmgtAoC7buxKdXmyXkClI
+	sr0VIKQQrMKTzaV+WWd5pfAsJ0nzSjwCxYJ0abSB2rDox7aXS6AUhMlzCWk7MbnXQioHOQcviG7
+	85j3U/GYT2StmwyUzYL3OHkCH0t/jGDNPyw==
+X-Google-Smtp-Source: AGHT+IFQa9rL2dZIKUFX147Vp+1LmNLcm+9xvb/xxS/UaSnExqtT1g3niRFM1wKoScQm4YkKXNNcmA==
+X-Received: by 2002:a05:600c:1c03:b0:46d:fe0b:d55a with SMTP id 5b1f17b1804b1-46e1dac7b3emr19082355e9.33.1758617959125;
+        Tue, 23 Sep 2025 01:59:19 -0700 (PDT)
+Received: from localhost ([45.10.155.11])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-461383b7b9csm277904675e9.2.2025.09.23.01.59.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 01:59:18 -0700 (PDT)
+From: Richard Gobert <richardbgobert@gmail.com>
+To: netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	ecree.xilinx@gmail.com,
+	willemdebruijn.kernel@gmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	horms@kernel.org,
+	corbet@lwn.net,
+	saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	leon@kernel.org,
+	dsahern@kernel.org,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	shuah@kernel.org,
+	sdf@fomichev.me,
+	aleksander.lobakin@intel.com,
+	florian.fainelli@broadcom.com,
+	alexander.duyck@gmail.com,
+	linux-kernel@vger.kernel.org,
+	linux-net-drivers@amd.com,
+	Richard Gobert <richardbgobert@gmail.com>
+Subject: [PATCH net-next v8 0/5] net: gso: restore outer ip ids correctly
+Date: Tue, 23 Sep 2025 10:59:03 +0200
+Message-Id: <20250923085908.4687-1-richardbgobert@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,98 +106,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: MpO6L0LObisW1Tosg/bqpUTPHFrjYAfIkgFgg0siPUxAUk94fP9Mt/77
-	j/+85MIhjWX0cqt5lJzi5X19J2N8v9k2U7mfbLNbOVt/QElfe0n36KumZ8jbfVL9qmjw5Fd
-	q8MsV6Pc6m2wYtSY+SS4YqhYij7mhvdB3YGd7VUSBwtWMw03Trwo+VgxBnZIjXTIRZj3kXA
-	rz+vmEdyKxwj1XSAYYU7IW7b0yjNTDVm6Gq9mhAmw4tRUdFRvfBz3C5iifzRKnfCCMrwsxT
-	q32z5xn2n84QOU11b/F/CgmbrZTisAFbHfQCU7RWQ+X/3pnh6/7u6kXperE2Cp5S9kPWs0E
-	nZ295MJ2KCInWGHMsApho5IbqkBbzhj1RHv77CT96wyQRYTIumENII90cVqejf+moLEuXl6
-	bndwyVdrzuUl6AP+vdIJjLW8B9U95uMXS/kg3SCwV1flrTzQngkil1QGzDnnswzLgiSSh7E
-	MCu2dge2curvO4hHAXdCsciZ03HTH70nTZkVZv7+s760DmOUxNvU9O//P4PR85E4AGbGZCh
-	7qxiVk9Ot3+GGILbB6RSx61IT3dEjgTxqj6x3Iwdq/uRtH0yzZrLxqEbObpPxmR12Pt8xwD
-	5N4cjSkkyJtMdSapqNXEhcb5ioUTDMv7uCn7/QxDaqUO0NmiWbYkY7whIUrsSZ+sFUYVKQK
-	kXYtrKXLCMKwc5YkX02LcAa42FaAMNgSe7ZnrB0PYhU2jA5SlrXlhaFjV/IztcGUTdr4oeZ
-	u+ZmY3xle9m7WN7T5bcCIZ+AuPFktT7Zm1GFzfDaDGP9mrqbPj4YGYj+CFoa9d+C8RCrMBK
-	YCEAZSGoPslxL+Tnjl/L7y4BbwCTYWZbzXxqYP5vY9OSP5C3Og8lZZYEic9fPswjR2yjiE0
-	Ukh9X05AHUFDsqA2hek5zqmHCd0wkxJnZfbkRsTc6nXCfEi6uvunrzfgkUxueBncbe7ohTK
-	K1G9oZEOsweG0eyNdbYbLSM9TsGvHoR4Yzodh5Y3LXTHP4aHq2P2ERBupdgUa6dGUHp5FJp
-	SOIGm+fLC1Bcu/snRIKKiO2yZw5f8=
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-X-QQ-RECHKSPAM: 0
 
-This option has no effect in modes other than 802.3ad mode.
-When this option enabled, the bond device will broadcast ARP/ND
-packets to all active slaves.
+GRO currently ignores outer IPv4 header IDs for encapsulated packets
+that have their don't-fragment flag set. GSO, however, always assumes
+that outer IP IDs are incrementing. This results in GSO mangling the
+outer IDs when they aren't incrementing. For example, GSO mangles the
+outer IDs of IPv6 packets that were converted to IPv4, which must
+have an ID of 0 according to RFC 6145, sect. 5.1.
 
-Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-Cc: David Ahern <dsahern@gmail.com>
-Cc: Hangbin Liu <liuhangbin@gmail.com>
----
-1. no update uapi header.
-2. the kernel patch is accpted, https://patchwork.kernel.org/project/netdevbpf/patch/84d0a044514157bb856a10b6d03a1028c4883561.1751031306.git.tonghao@bamaicloud.com/
----
- ip/iplink_bond.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+GRO+GSO is supposed to be entirely transparent by default. GSO already
+correctly restores inner IDs and IDs of non-encapsulated packets. The
+tx-tcp-mangleid-segmentation feature can be enabled to allow the
+mangling of such IDs so that TSO can be used.
 
-diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
-index 3ae626a0..714fe7bd 100644
---- a/ip/iplink_bond.c
-+++ b/ip/iplink_bond.c
-@@ -150,6 +150,7 @@ static void print_explain(FILE *f)
- 		"                [ lacp_rate LACP_RATE ]\n"
- 		"                [ lacp_active LACP_ACTIVE]\n"
- 		"                [ coupled_control COUPLED_CONTROL ]\n"
-+		"                [ broadcast_neighbor BROADCAST_NEIGHBOR ]\n"
- 		"                [ ad_select AD_SELECT ]\n"
- 		"                [ ad_user_port_key PORTKEY ]\n"
- 		"                [ ad_actor_sys_prio SYSPRIO ]\n"
-@@ -166,6 +167,7 @@ static void print_explain(FILE *f)
- 		"LACP_RATE := slow|fast\n"
- 		"AD_SELECT := stable|bandwidth|count\n"
- 		"COUPLED_CONTROL := off|on\n"
-+		"BROADCAST_NEIGHBOR := off|on\n"
- 	);
- }
- 
-@@ -185,6 +187,7 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
- 	__u32 arp_all_targets, resend_igmp, min_links, lp_interval;
- 	__u32 packets_per_slave;
- 	__u8 missed_max;
-+	__u8 broadcast_neighbor;
- 	unsigned int ifindex;
- 	int ret;
- 
-@@ -377,6 +380,12 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
- 			if (ret)
- 				return ret;
- 			addattr8(n, 1024, IFLA_BOND_COUPLED_CONTROL, coupled_control);
-+		} else if (strcmp(*argv, "broadcast_neighbor") == 0) {
-+			NEXT_ARG();
-+			broadcast_neighbor = parse_on_off("broadcast_neighbor", *argv, &ret);
-+			if (ret)
-+				return ret;
-+			addattr8(n, 1024, IFLA_BOND_BROADCAST_NEIGH, broadcast_neighbor);
- 		} else if (matches(*argv, "ad_select") == 0) {
- 			NEXT_ARG();
- 			if (get_index(ad_select_tbl, *argv) < 0)
-@@ -676,6 +685,13 @@ static void bond_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 			     rta_getattr_u8(tb[IFLA_BOND_COUPLED_CONTROL]));
- 	}
- 
-+	if (tb[IFLA_BOND_BROADCAST_NEIGH]) {
-+		print_on_off(PRINT_ANY,
-+			     "broadcast_neighbor",
-+			     "broadcast_neighbor %s ",
-+			     rta_getattr_u8(tb[IFLA_BOND_BROADCAST_NEIGH]));
-+	}
-+
- 	if (tb[IFLA_BOND_AD_SELECT]) {
- 		const char *ad_select = get_name(ad_select_tbl,
- 						 rta_getattr_u8(tb[IFLA_BOND_AD_SELECT]));
+This series fixes outer ID restoration for encapsulated packets when
+tx-tcp-mangleid-segmentation is disabled. It also allows GRO to merge
+packets with fixed IDs that don't have their don't-fragment flag set.
+
+v7 -> v8:
+ - Directly reference documentation in comment
+
+v6 -> v7:
+ - Update comment and commit message
+ - Add BUILD_BUG_ON in tcp4_gro_complete
+
+v5 -> v6:
+ - Fix typo
+ - Fix formatting
+ - Update comment and commit message
+
+v4 -> v5:
+ - Updated documentation and comments
+ - Remove explicit inline keyword in fou_core.c
+ - Fix reverse xmas tree formatting in ef100_tx.c
+ - Remove added KSFT_MACHINE_SLOW check in selftest
+
+v3 -> v4:
+ - Specify that mangleid for outer ids cannot turn incrementing ids to fixed if DF is unset
+ - Update segmentation-offload documentation
+ - Fix setting fixed ids in ef100 TSO
+ - Reformat gro_receive_network_flush again
+
+v2 -> v3:
+ - Make argument const in fou_gro_ops helper
+ - Rename SKB_GSO_TCP_FIXEDID_OUTER to SKB_GSO_TCP_FIXEDID
+ - Fix formatting in selftest, gro_receive_network_flush and tcp4_gro_complete
+
+v1 -> v2:
+ - Add fou_gro_ops helper
+ - Clarify why sk_family check works
+ - Fix ipip packet generation in selftest
+
+Links:
+ - v1: https://lore.kernel.org/netdev/20250814114030.7683-1-richardbgobert@gmail.com/
+ - v2: https://lore.kernel.org/netdev/20250819063223.5239-1-richardbgobert@gmail.com/
+ - v3: https://lore.kernel.org/netdev/20250821073047.2091-1-richardbgobert@gmail.com/
+ - v4: https://lore.kernel.org/netdev/20250901113826.6508-1-richardbgobert@gmail.com/
+ - v5: https://lore.kernel.org/netdev/20250915113933.3293-1-richardbgobert@gmail.com/
+ - v6: https://lore.kernel.org/netdev/20250916144841.4884-1-richardbgobert@gmail.com/
+ - v7: https://lore.kernel.org/netdev/20250922084103.4764-1-richardbgobert@gmail.com/
+
+Richard Gobert (5):
+  net: gro: remove is_ipv6 from napi_gro_cb
+  net: gro: only merge packets with incrementing or fixed outer ids
+  net: gso: restore ids of outer ip headers correctly
+  net: gro: remove unnecessary df checks
+  selftests/net: test ipip packets in gro.sh
+
+ .../networking/segmentation-offloads.rst      | 22 ++++---
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  8 ++-
+ drivers/net/ethernet/sfc/ef100_tx.c           | 17 ++++--
+ include/linux/netdevice.h                     |  9 ++-
+ include/linux/skbuff.h                        |  8 ++-
+ include/net/gro.h                             | 32 ++++------
+ net/core/dev.c                                | 10 +++-
+ net/ipv4/af_inet.c                            | 10 +---
+ net/ipv4/fou_core.c                           | 32 +++++-----
+ net/ipv4/tcp_offload.c                        |  1 +
+ net/ipv4/udp_offload.c                        |  2 -
+ net/ipv6/udp_offload.c                        |  2 -
+ tools/testing/selftests/net/gro.c             | 58 ++++++++++++++-----
+ tools/testing/selftests/net/gro.sh            |  2 +-
+ 14 files changed, 129 insertions(+), 84 deletions(-)
+
 -- 
-2.34.1
+2.36.1
 
 
