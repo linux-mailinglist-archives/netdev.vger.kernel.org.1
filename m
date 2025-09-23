@@ -1,152 +1,163 @@
-Return-Path: <netdev+bounces-225596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83A4EB95DBA
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 14:38:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DE38B95F16
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:08:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 444BD3A7F94
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 12:38:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE862486FCE
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:07:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C03E23161AC;
-	Tue, 23 Sep 2025 12:38:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC80C326D6D;
+	Tue, 23 Sep 2025 13:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="ag6dmO9j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7JPCkPb"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward205d.mail.yandex.net (forward205d.mail.yandex.net [178.154.239.216])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5506A2AF00
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 12:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D54A326D4F;
+	Tue, 23 Sep 2025 13:07:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758631135; cv=none; b=n8/wh48YKudPLt9NSF035K8MHM3CuLglnnnPolbeYMoAMeY9EtSApGfsiBj1RKlRQCzW+oqCGLNgiIaDufArTb07+FC6WGyiW0jOmExwsThtgFt0xfvewQWM2eUCsRsji85I5CPj5jlkX1RzZy//ST7bSm7J73Tp0X/P1jJKMOU=
+	t=1758632837; cv=none; b=Pwnsm+V8m5e5tnVcohe7GekC9bojJWrjsYgFYQZ3pWHOl2L3dSEMZvl0JM6UXLfJ8WsK3UCzeB+ikvOgWxH4YGodsV0MJqFUrmNXu7FNPizTVibYqxd8xqAUZTlkg632g9A6ATQNNAZmLAS+uHmJXhqKrCFPsjaHI65Tonpvn9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758631135; c=relaxed/simple;
-	bh=Yi0pYd13YexmNn8fJo6Hg0/b/+/uF5r76P1KpGNuu8o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DWerbJBc0WCDLzr1e2mAvZO7JB+2UBz3gahIqnI13wvFnGQ+68yzNkMcH7okHMZHsqeiJx+DQlXvvVy3V02hQGPLZZ4L6vEThcV6ykWZ1akCfVGrfe4N06AuLli0J1ok1XYLdLM+0FVfk2ACrn2VsstUTbFqEYCrqhLKJ1H2RZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=ag6dmO9j; arc=none smtp.client-ip=178.154.239.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from forward100d.mail.yandex.net (forward100d.mail.yandex.net [IPv6:2a02:6b8:c41:1300:1:45:d181:d100])
-	by forward205d.mail.yandex.net (Yandex) with ESMTPS id 605AC85FF7
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 15:33:11 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-63.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-63.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:4f41:0:640:844:0])
-	by forward100d.mail.yandex.net (Yandex) with ESMTPS id 4A430C006A;
-	Tue, 23 Sep 2025 15:33:03 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-63.klg.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 0XW0098L3Ko0-995CR1JH;
-	Tue, 23 Sep 2025 15:33:02 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1758630782; bh=nbURxOa40Qcvi6mGF3Wp+FKD8urt/0sEWXtNGgtc0Y4=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=ag6dmO9jPdTLSzorX3lL+UsMRGQ+h6SNkG0ZDo3r83LyUE8C5jd663HeLLg2+b6SO
-	 +QjP8Fi2CwNZnRdgGj/FRtiwyqLVzkMyFwXj542+vdBl2skr8xocXz45JN1Huq1lje
-	 MwKEx89KePz2DO3jXOrTxmqtLjLspJ8kgeJTKZO0=
-Authentication-Results: mail-nwsmtp-smtp-production-main-63.klg.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Jon Maloy <jmaloy@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	tipc-discussion@lists.sourceforge.net,
-	netdev@vger.kernel.org,
-	Dmitry Antipov <dmantipov@yandex.ru>
-Subject: [PATCH] net: tipc: adjust tipc_nodeid2string() to return string length
-Date: Tue, 23 Sep 2025 15:31:48 +0300
-Message-ID: <20250923123148.849753-1-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1758632837; c=relaxed/simple;
+	bh=PQoE3TRiHN3oelWgg/hV7+6jVJh7jqizuFT7IsX27rQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=XMLVfiTU1DfNDYtDCFo+9U4kmODXangBX1naljhSLTSqFbvJr0KNCFN5xjYFYye8tncZM11IqjpqicHGHTtcm55CF+8YlOpgUg7OQC6DpZ0x0TWprCqCSxmGIAcl5cofbsDjyOHvU64U8Z1WaXgoF1v6QEQHPZ+FHw1KI6B9IVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X7JPCkPb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8389EC4CEF5;
+	Tue, 23 Sep 2025 13:07:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758632837;
+	bh=PQoE3TRiHN3oelWgg/hV7+6jVJh7jqizuFT7IsX27rQ=;
+	h=Date:From:To:Cc:Subject:From;
+	b=X7JPCkPbvMuvYEi8d2DY0MFlp2rz4K5IjNJ9rkLaHvAF855wEERBxb9WT4RZWYbD4
+	 JoShFvQIeu9grbepXiocreI/4TCbRAxxuGdEj4ZzZnCBm58ZlU15PFfQ3MPXM+7aXB
+	 2nNTDOH3nJ6KWsr01Ou2wWHp5ClUXc7iKy9XX7SDxlQIbpcEDWUkuk91EQW/iSzsg2
+	 M8nVbIpHYA6gzZQThDoxmTklUh9RzE/BePwcsZOEd5HqZT9pLvG35RXYMV8DjpFkk5
+	 peCHmmKTdO4e0V4BnpH6zE4U9Ye2xI0v+4htDZavQCWHGBuKxwthmzhgHrzvipaal5
+	 WnY0oCKS+urqw==
+Date: Tue, 23 Sep 2025 15:07:13 +0200
+From: Mark Brown <broonie@kernel.org>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Networking <netdev@vger.kernel.org>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+	Alexandra Winter <wintera@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>,
+	Julian Ruess <julianr@linux.ibm.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the net-next tree with the s390 tree
+Message-ID: <aNKbgf7GyU5JP3Zh@finisterre.sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="TimwGka/Vk6vDuIJ"
+Content-Disposition: inline
 
-Since the value returned by 'tipc_nodeid2string()' is not used, the
-function may be adjusted to return the length of the result, which
-is helpful to drop a few calls to 'strlen()' in 'tipc_link_create()'
-and 'tipc_link_bc_create()'. Compile tested only.
 
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
----
- net/tipc/addr.c | 6 +++---
- net/tipc/addr.h | 2 +-
- net/tipc/link.c | 9 +++------
- 3 files changed, 7 insertions(+), 10 deletions(-)
+--TimwGka/Vk6vDuIJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/net/tipc/addr.c b/net/tipc/addr.c
-index fd0796269eed..a8fd119047e4 100644
---- a/net/tipc/addr.c
-+++ b/net/tipc/addr.c
-@@ -79,7 +79,7 @@ void tipc_set_node_addr(struct net *net, u32 addr)
- 	pr_info("Node number set to %u\n", addr);
- }
- 
--char *tipc_nodeid2string(char *str, u8 *id)
-+int tipc_nodeid2string(char *str, u8 *id)
- {
- 	int i;
- 	u8 c;
-@@ -109,7 +109,7 @@ char *tipc_nodeid2string(char *str, u8 *id)
- 	if (i == NODE_ID_LEN) {
- 		memcpy(str, id, NODE_ID_LEN);
- 		str[NODE_ID_LEN] = 0;
--		return str;
-+		return NODE_ID_LEN;
- 	}
- 
- 	/* Translate to hex string */
-@@ -120,5 +120,5 @@ char *tipc_nodeid2string(char *str, u8 *id)
- 	for (i = NODE_ID_STR_LEN - 2; str[i] == '0'; i--)
- 		str[i] = 0;
- 
--	return str;
-+	return i + 1;
- }
-diff --git a/net/tipc/addr.h b/net/tipc/addr.h
-index 93f82398283d..a113cf7e1f89 100644
---- a/net/tipc/addr.h
-+++ b/net/tipc/addr.h
-@@ -130,6 +130,6 @@ static inline int in_own_node(struct net *net, u32 addr)
- bool tipc_in_scope(bool legacy_format, u32 domain, u32 addr);
- void tipc_set_node_id(struct net *net, u8 *id);
- void tipc_set_node_addr(struct net *net, u32 addr);
--char *tipc_nodeid2string(char *str, u8 *id);
-+int tipc_nodeid2string(char *str, u8 *id);
- 
- #endif
-diff --git a/net/tipc/link.c b/net/tipc/link.c
-index 3ee44d731700..e61872b5b2b3 100644
---- a/net/tipc/link.c
-+++ b/net/tipc/link.c
-@@ -495,11 +495,9 @@ bool tipc_link_create(struct net *net, char *if_name, int bearer_id,
- 
- 	/* Set link name for unicast links only */
- 	if (peer_id) {
--		tipc_nodeid2string(self_str, tipc_own_id(net));
--		if (strlen(self_str) > 16)
-+		if (tipc_nodeid2string(self_str, tipc_own_id(net)) > 16)
- 			sprintf(self_str, "%x", self);
--		tipc_nodeid2string(peer_str, peer_id);
--		if (strlen(peer_str) > 16)
-+		if (tipc_nodeid2string(peer_str, peer_id) > 16)
- 			sprintf(peer_str, "%x", peer);
- 	}
- 	/* Peer i/f name will be completed by reset/activate message */
-@@ -570,8 +568,7 @@ bool tipc_link_bc_create(struct net *net, u32 ownnode, u32 peer, u8 *peer_id,
- 	if (peer_id) {
- 		char peer_str[NODE_ID_STR_LEN] = {0,};
- 
--		tipc_nodeid2string(peer_str, peer_id);
--		if (strlen(peer_str) > 16)
-+		if (tipc_nodeid2string(peer_str, peer_id) > 16)
- 			sprintf(peer_str, "%x", peer);
- 		/* Broadcast receiver link name: "broadcast-link:<peer>" */
- 		snprintf(l->name, sizeof(l->name), "%s:%s", tipc_bclink_name,
--- 
-2.51.0
+Hi all,
 
+Today's linux-next merge of the net-next tree got conflicts in:
+
+  arch/s390/configs/defconfig
+  arch/s390/configs/debug_defconfig
+
+between commit:
+
+  e11727b2b0ca2 ("s390/configs: Enable additional network features")
+
+=66rom the s390 tree and commits:
+
+  d324a2ca3f8ef ("dibs: Register smc as dibs_client")
+  cb990a45d7f6e ("dibs: Define dibs loopback")
+  69baaac9361ed ("dibs: Define dibs_client_ops and dibs_dev_ops")
+  a612dbe8d04d4 ("dibs: Move event handling to dibs layer")
+
+=66rom the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+diff --cc arch/s390/configs/debug_defconfig
+index b692c95f8083a,fdde8ee0d7bdd..0000000000000
+--- a/arch/s390/configs/debug_defconfig
++++ b/arch/s390/configs/debug_defconfig
+@@@ -118,15 -118,12 +118,17 @@@ CONFIG_PACKET=3D
+  CONFIG_PACKET_DIAG=3Dm
+  CONFIG_UNIX=3Dy
+  CONFIG_UNIX_DIAG=3Dm
+ +CONFIG_TLS=3Dm
+ +CONFIG_TLS_DEVICE=3Dy
+ +CONFIG_TLS_TOE=3Dy
+  CONFIG_XFRM_USER=3Dm
+  CONFIG_NET_KEY=3Dm
+ +CONFIG_XDP_SOCKETS=3Dy
+ +CONFIG_XDP_SOCKETS_DIAG=3Dm
++ CONFIG_DIBS=3Dy
++ CONFIG_DIBS_LO=3Dy
++ CONFIG_SMC=3Dm
+  CONFIG_SMC_DIAG=3Dm
+- CONFIG_SMC_LO=3Dy
+  CONFIG_INET=3Dy
+  CONFIG_IP_MULTICAST=3Dy
+  CONFIG_IP_ADVANCED_ROUTER=3Dy
+diff --cc arch/s390/configs/defconfig
+index 22c801449139c,bf9e7dbd4a895..0000000000000
+--- a/arch/s390/configs/defconfig
++++ b/arch/s390/configs/defconfig
+@@@ -109,15 -109,12 +109,17 @@@ CONFIG_PACKET=3D
+  CONFIG_PACKET_DIAG=3Dm
+  CONFIG_UNIX=3Dy
+  CONFIG_UNIX_DIAG=3Dm
+ +CONFIG_TLS=3Dm
+ +CONFIG_TLS_DEVICE=3Dy
+ +CONFIG_TLS_TOE=3Dy
+  CONFIG_XFRM_USER=3Dm
+  CONFIG_NET_KEY=3Dm
+ +CONFIG_XDP_SOCKETS=3Dy
+ +CONFIG_XDP_SOCKETS_DIAG=3Dm
++ CONFIG_DIBS=3Dy
++ CONFIG_DIBS_LO=3Dy
++ CONFIG_SMC=3Dm
+  CONFIG_SMC_DIAG=3Dm
+- CONFIG_SMC_LO=3Dy
+  CONFIG_INET=3Dy
+  CONFIG_IP_MULTICAST=3Dy
+  CONFIG_IP_ADVANCED_ROUTER=3Dy
+
+--TimwGka/Vk6vDuIJ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEyBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjSm4AACgkQJNaLcl1U
+h9CXUwf3b6tW49QUgVuPcW1g/dApNp13k5VCOjxQq4MvOhUE8j23lvuxAPvtUw9f
+hSiK/anX2vANRvJAMRMYvImghQIMsFacu4mdnN/KxLaOWQuUyvAwQkYVHvwGxg+U
+sngJ/Z2e9njTKBfM/nZz3ZTAyYZf6pGXq8PwpfoT8Li+i4Ze2GIPCv+SmqdiJil6
+piu560FO6qMtkfhQpXHqbpBMTpmsdxcLNwFYNfVm5yzzrB+M3c6eWkAjeIgMoPBI
+OL1ZLUBOcguaWNL+CQfEuWALpnDCyMWAUqNTACMbib97MhJm/y/0FL+2E2AGHFvb
+jq93xPOdxMKMJ80q6BD5o5ufJFVi
+=QGbX
+-----END PGP SIGNATURE-----
+
+--TimwGka/Vk6vDuIJ--
 
