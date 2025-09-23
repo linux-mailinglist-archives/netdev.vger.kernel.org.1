@@ -1,79 +1,80 @@
-Return-Path: <netdev+bounces-225665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0E5FB96AEC
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 17:58:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DC60B96AF8
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 17:58:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C29416F91C
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:58:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2BB34A0573
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:58:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E426926D4D4;
-	Tue, 23 Sep 2025 15:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA5A270EBB;
+	Tue, 23 Sep 2025 15:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="n7hCF2Xt"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="gIbNOtGm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3FC26B2D2
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 15:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA3CD25CC74
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 15:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758643087; cv=none; b=XRI2y6qyx1y604w9K4YEfjbkMku1EymJsWn8S90k5iYQ6mjozoXm7u4Pn1Uu1gHhH65qB1rGoeECfDp0A0GM1Ap38hoZc1fHSGRL9XxxjTwMXLkztVJzVBoE5r8/rl/NEtBAW0nV3/ydjotcpoIBpgD5iKGt32yu7iwUcD7HwsA=
+	t=1758643135; cv=none; b=oQdpjCJl3mXpH+BSChF/vhZYwxpQ/jGsePZtMWdKIZuXg/XeaRecPPn/GwB7sJqhi5T/Zr+IXBa+9XvjRyabgRh1ThOQluSPibHhKifkoS5usxEJpIf4OMnQNToEW9j72NNAnnXJ3fratduSKBRokeFGyr7vkpSe1EMuTYJitbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758643087; c=relaxed/simple;
-	bh=rPlEGrL2pSsOp2Ur1sQTwPfwBtQuV96uTVhhnTcOo34=;
+	s=arc-20240116; t=1758643135; c=relaxed/simple;
+	bh=gcdrUkEE7k8h3bL5EJjiXIehhukiVZtEsgd/zcv4Nxg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O6FoSZt6r1PMequxxWodDXEmrXXNU+W5kt2haPk+Wel2E+ExUNFXugDuJgrbr/8Fec/69HP+g+1ELfTPecoq1KTsom0I9DYi+tv1T4aNCcWQMhtvflzMF11155LdkcbxFfanlM4VCPvhU1oILQG2yD7kw15MkCPK6CAwkiibcpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=n7hCF2Xt; arc=none smtp.client-ip=209.85.210.175
+	 In-Reply-To:Content-Type; b=tu4vgUIfYq9kc7ugID97n2LSXlTYJ9BcneY1c4MtEinrzqLf0QHooyMyAvSLZT7TFQH3oxdba28ZNxCAXT+IlhUFoiMQFKd6cjvBeZrMsiP8gZrAJWTA37FAp14xH9ew3darrmZCeOtQcLZxLTb1dK0wpRhSJ6LIzPZzq/l8WTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=gIbNOtGm; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-77f0efd84abso2964140b3a.3
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 08:58:06 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-77f41086c11so2072362b3a.0
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 08:58:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1758643086; x=1759247886; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1758643133; x=1759247933; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=8/JqpgYOrCxMsYzwby8uwVZtPIWnLh7RtxpA1RDm/gA=;
-        b=n7hCF2XtSslpOewvTcBasezpcKsQfHWLTBXGygnxA0JTJV3fjO14jhMBusJl0RabDT
-         EgCZem37hXv7hqkjoeykfgudItEE6w8DjBwM4hjlsPk8uCAeYUSEaEsmrRK96kQR57vJ
-         cC5k0cEbhmVRs8myeC7abPwmDDrlrOS3BAZTUXn0Wp9uQQOtRhP0p2xqBYE3RmQ3OhN+
-         UE5fBgGknXIYDRZ8dKjkhIoLXw9MPVNYc4TH6RewJKWIjwvigwwTsMQTpJIZErpee3uG
-         Kn8ZR4TD0O1Xua65a4+sxkPextw+hbxIIKrMM/3hvHWJ7ehNhyZp7psqA8HOXjPMGt3Z
-         mpWA==
+        bh=uNQhOf7kY2F8TCqI/O1nW/ycDnR2r4OrVFQr57e8EJs=;
+        b=gIbNOtGmomRbmruZM7FVk9qYoSl0f0mfBchtP00Tp9jy9Mi9YU31pbUtQrzOcMstcI
+         J0wTBdNOKzYe318cAUgEsbx2sgIh6pDfpNmh7INPq42fK0gS9WT+zLBlJMkbTA9qamg1
+         O9bBvAHqgLC4r8GBT9wJRS2G+ol/1SqhyxQU8p/lhucNcqXxg+1occo+YX4l+3ZSRN1K
+         kf1FoCmsoFGwpUHNHWI3n5UhAESIrobgj4D0CuMZz75uIeUmi8og+Wo5aPctmZjTY3i9
+         zv/k3SyOFgG9LugN2opdCWJDsFypOfzM7mCUZbe2Iv1DjkluJF057v4D9vpFAmeKJ07a
+         2tMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758643086; x=1759247886;
+        d=1e100.net; s=20230601; t=1758643133; x=1759247933;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8/JqpgYOrCxMsYzwby8uwVZtPIWnLh7RtxpA1RDm/gA=;
-        b=WMMaKhVCmdqbeb9sB/H+yLF7KScBX2LsqOx7huiOAB/6MVHhmMBXLq4XjX4EzlO1ku
-         ynWC8RkB9LUGHcHydzr1XhodDPeHkHIrsS6D/JyS1pBpOhn76XdZfPM58hNSF13nZrWA
-         /76Vk8WzthPRGzSkKbeyqOWbiZej5AzMfmAdQX56yM0R+ZOAxeLQATxIgEHXYGzoHFHG
-         PXjG3Ai0S6NFgRNo7kCkMigAIoS57HyrQQZQW0xVGxkE0/89gbnDnf1e9eXRN8NgR4Dh
-         ttCPCFrQESLRbqGQ11SXjOMWw76AXJtAqeuCOyFZrNxq+citFW0O8JLotqtgzoIL/Wtk
-         R0Xw==
-X-Gm-Message-State: AOJu0Yz5jx7qbZYKkbj8Iny2kSaccbjRkfuhu3i9eTeE21/0w/C+tDcd
-	GmLs9uaftNj/Xw9OS1sVgCXm6ngcNbCKK7Gksh3+BrAWlUvT4oceEPHrE7/jeQJpK9M=
-X-Gm-Gg: ASbGnctzkUC8B/dRnDOCuCEedesJq/ruR3ag9O9/lCdcbVAmOENeJ9rW/kN8wxAmorP
-	1pe7CcnAz4DabCiLEJs54rhqOdqaP+29DgrI39AOBUcvnE5lRsJdS5kYx1kxMMtjUIfk7HSc7bo
-	mHo0obPEmoG0IS+dBzb9tE+N5Cvo7NhwjpPZ0Py51aC059Reozvr/R2EYlUtZcS69F2xFNVcDVU
-	5NFzw97ay2gRphU4f9/GngoVU5MKgegiTCPT4KCre6DgWNcJlnVVNWXeGbkJMq6ZNjFkSLNOMOB
-	4yRgjqMvIVJweQbmft3bwW6DQ+l9Zn6O7GR8s3a/GKfqUdL5US0WfZMa9VuMlK3ZTG8nqrBhTO1
-	/c2LmsY2WHy6Vs5jR+3mly/2qcZ7k7qoCAfHsu/DdhxoLomxhw2hsm8ORjy4D8kOdgmt/HA==
-X-Google-Smtp-Source: AGHT+IFCcRtj0+HKM0frArQ32BTYMbiJqh2ZgWGCXPfVCoshw0GKNKHvIU5ZFdNPv+sMiGIxtX/iJQ==
-X-Received: by 2002:a05:6a00:391b:b0:776:130f:e1a1 with SMTP id d2e1a72fcca58-77f537f4668mr3580539b3a.5.1758643085558;
-        Tue, 23 Sep 2025 08:58:05 -0700 (PDT)
+        bh=uNQhOf7kY2F8TCqI/O1nW/ycDnR2r4OrVFQr57e8EJs=;
+        b=PXV97PuN3kFSgBZ7vhjLqOG/j1A/glpFgQOTRdtwVybwqiokxWHpmfopxw0lYf2X3T
+         iWkJBVYus+iinDBgSTO4pIwiqqHOcaSSP+QXRDEr7gwRkhURnA/hSgq4sbsgKguNLnzU
+         v1j4ooGKOyBBEH3q1tAaVcbbMIuEL/cVYB1qPwijag/KQ2QSIPK4Dlc9DLR3kM8pae9D
+         FASm8nBLtFOy2wf9ffK08Eb1LQNP4qOEKbjQywsttqX/4Nvd4W0vW/tHHn+jWKJnhFsv
+         /1k+abQ4rPwr5ArwuGYnRDbvTR5Gs2UDRMHSRjCbrEsCRu1iOkewsfTVxvizsg1jG3Vp
+         /uOw==
+X-Gm-Message-State: AOJu0YzsgMM3/R/5oxFWAkT+1OSBMamcdJQHsYhsLr7XFbAqOPUUZf7E
+	r2eSVzBFA8cMDv0CmY3z85ji/1Sa5XIVKdFjYNN+6MIEfQeNKqSEAd9fuWYTDv6nSeLTITYyewE
+	OLaghtKA=
+X-Gm-Gg: ASbGncuFVAy/maLa9m1AeiB+5QSWgcKrEK+E40NSRzZnONKC+3gFBF2YZERq1qsvL6N
+	mw4AG9jOCPwICB4REnumonHsjhG/MQKHal44t5OwoWNV0XpfE0P/XEAQ2Wk+p4U2QpUe4MNILfM
+	AU8TdZzPVqr2awUWZGlOJu4qtK9eXR1Edf9KTEbTr9rie6RCJedis5N81fuBTGiYHdCSAhGk7Xl
+	1NmyVJY3DnK0cfudZgOh+MDVoC85xIoUa7KmVe9qAWzc3KvguxvmltUNvLyTc+AfN9SJZwBT6YS
+	IwfL/UPaeyItGFcmOanObpXANl5wKdugW2XWp9t9fuuBA0LdxRGE4oT3OgUNbw90H6bM8AOljRu
+	UnUBpI81qPGDGCyP42ABtSaWJBM4zYpPt67z+QZAVevdcUOdOba166SCDbZI=
+X-Google-Smtp-Source: AGHT+IHaWWQsxNkqF1/Ox1XypUQNX2Lmei4T4nsZ50MiDDU2VB8sz/+STs+7VGJfCSePr8jpdwU4wQ==
+X-Received: by 2002:a05:6a00:8c2:b0:77f:33c5:e271 with SMTP id d2e1a72fcca58-77f53ba52bdmr4279406b3a.32.1758643133009;
+        Tue, 23 Sep 2025 08:58:53 -0700 (PDT)
 Received: from ?IPV6:2a03:83e0:1156:1:ce1:3e76:c55d:88cf? ([2620:10d:c090:500::7:1c14])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77f23d92ef0sm8780103b3a.102.2025.09.23.08.58.04
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77f188dd4a8sm10312819b3a.39.2025.09.23.08.58.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Sep 2025 08:58:05 -0700 (PDT)
-Message-ID: <32b82a8f-2c81-41ee-804d-83ee847a27f0@davidwei.uk>
-Date: Tue, 23 Sep 2025 08:58:03 -0700
+        Tue, 23 Sep 2025 08:58:52 -0700 (PDT)
+Message-ID: <a3c19679-a229-49ab-97b0-8a702b714bbc@davidwei.uk>
+Date: Tue, 23 Sep 2025 08:58:51 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,23 +83,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH net-next 03/20] net: Add ndo_queue_create callback
-To: Stanislav Fomichev <stfomichev@gmail.com>,
- Daniel Borkmann <daniel@iogearbox.net>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, kuba@kernel.org,
- davem@davemloft.net, razor@blackwall.org, pabeni@redhat.com,
- willemb@google.com, sdf@fomichev.me, john.fastabend@gmail.com,
- martin.lau@kernel.org, jordan@jrife.io, maciej.fijalkowski@intel.com,
- magnus.karlsson@intel.com
+To: Jakub Kicinski <kuba@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
+ john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com
 References: <20250919213153.103606-1-daniel@iogearbox.net>
- <20250919213153.103606-4-daniel@iogearbox.net> <aNFzlHafjUFOvkG3@mini-arch>
+ <20250919213153.103606-4-daniel@iogearbox.net>
+ <20250922182231.197635c1@kernel.org>
 Content-Language: en-US
 From: David Wei <dw@davidwei.uk>
-In-Reply-To: <aNFzlHafjUFOvkG3@mini-arch>
+In-Reply-To: <20250922182231.197635c1@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2025-09-22 09:04, Stanislav Fomichev wrote:
-> On 09/19, Daniel Borkmann wrote:
+On 2025-09-22 18:22, Jakub Kicinski wrote:
+> On Fri, 19 Sep 2025 23:31:36 +0200 Daniel Borkmann wrote:
 >> From: David Wei <dw@davidwei.uk>
 >>
 >> Add ndo_queue_create() to netdev_queue_mgmt_ops that will create a new
@@ -123,9 +123,11 @@ On 2025-09-22 09:04, Stanislav Fomichev wrote:
 >>   	struct device *		(*ndo_queue_get_dma_dev)(struct net_device *dev,
 >>   							 int idx);
 >> +	int			(*ndo_queue_create)(struct net_device *dev);
+>>   };
+>>   
+>>   bool netif_rxq_has_unreadable_mp(struct net_device *dev, int idx);
 > 
-> kdoc is missing
+> This patch is meaningless, please squash it into something that matters.
 
-Will add. This was meant to be an RFC so I didn't write one - then it
-became a proper patchset.
+(Y)
 
