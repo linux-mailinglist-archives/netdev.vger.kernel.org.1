@@ -1,154 +1,236 @@
-Return-Path: <netdev+bounces-225484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5AF3B942BA
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 06:06:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7E2CB942CC
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 06:12:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 643523AA36F
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 04:06:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5541B7AE2B7
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 04:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86F1273800;
-	Tue, 23 Sep 2025 04:06:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9138627381F;
+	Tue, 23 Sep 2025 04:12:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k5glPcMZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YVC4Dsy5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044AE2CCC0;
-	Tue, 23 Sep 2025 04:06:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D480AD5A
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 04:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758600401; cv=none; b=WrWPgGYKpMdaVCrjPlLUwojB77juzcq9Jp9xoqD1Y/fe3b8P0cfyJKJXs8quz8UeemkRio6g7Rmkxxo5hxSnh+Sd9Gm179nE63PcENcuwZbTkkW/fca/VlIiahgG6jK7MTcJ8m3jyUpxmyzO8/TNmXkCUDqB/A2zlCKcSPdhr8Q=
+	t=1758600748; cv=none; b=ZHzupYWBud1Lf0PGWWZdqVYUzRKunlCn6y72fE1QQsSk7ZrCZ1fw+H1Gc+0Jru6G+hCXTyPM5qUfl+5n/ISboq6t1z5AE28EERQKGF98b3d9C85mC2P1HUwSf1zjRc5eEUD6UfSFo6nofszHV/uanyODLivxmwBvMxGDTMompk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758600401; c=relaxed/simple;
-	bh=VZX0azsj2Y+I4tix4/GQPEAlzuuwnGYKkwOGjH+jPEM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VSHHS7upziXcoNHhaDVNbTdZxQF45blRWJwnzwq/WbIGMLkZDZeWpScKsRBf76CtehQHa6aTdbfTNwsMLVskAViSCg6nodWRBahM0kXHlf53RoLD9gIBK1caywAm3PItkfm2XiPjIXQ1OUzzPWHXp/FTyZqjcL0IzD9wcdbRE7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k5glPcMZ; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758600400; x=1790136400;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VZX0azsj2Y+I4tix4/GQPEAlzuuwnGYKkwOGjH+jPEM=;
-  b=k5glPcMZ/eeAqPtIrSFuBDMrj7AceTtSHPscwmQu0VxuE5vDL/UW3AR8
-   PEq92ZFaxsW32/dr6V/VcG6mmw7+OVsUw13/xbuNJItfesKQN9ZtIcAp9
-   BK64JbUBCpPDyKrTll4/hQz4ENZTJMAytp+4ROfROsZ9/WVNAdOCqNwWH
-   csP+t9dl0ZTzo7+ytp7p5pffp47n/LKjpVxN0ENXPoXtv50HIy7fsQMVK
-   tPA+ZCSlfeW/T+DdD+FfI8uEFOxB24XPLRcIeTerJwxYsNZQKxLQ5zENG
-   y/XqF66eE0lnz1xRxLeYUbzj/LoQ3nyLyhVA1xkth0GYhai1VqwhtO+WE
-   A==;
-X-CSE-ConnectionGUID: oYgo5dhoQ8eEYvKt3UNUUQ==
-X-CSE-MsgGUID: SuxTSzTTSuq9oXtUWhrzQg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="86307513"
-X-IronPort-AV: E=Sophos;i="6.18,287,1751266800"; 
-   d="scan'208";a="86307513"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 21:06:39 -0700
-X-CSE-ConnectionGUID: cX+GWRf6Tu2t5gJnCXlABw==
-X-CSE-MsgGUID: Es1S0oWbQ6miuIDWmPNphw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,287,1751266800"; 
-   d="scan'208";a="177030369"
-Received: from lkp-server02.sh.intel.com (HELO 84c55410ccf6) ([10.239.97.151])
-  by fmviesa008.fm.intel.com with ESMTP; 22 Sep 2025 21:06:35 -0700
-Received: from kbuild by 84c55410ccf6 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1v0uIQ-0002jV-2y;
-	Tue, 23 Sep 2025 04:06:31 +0000
-Date: Tue, 23 Sep 2025 12:06:22 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>
-Subject: Re: [PATCH net-next 7/7] net/mlx5e: Use extack in set rxfh callback
-Message-ID: <202509231125.Tsan9Qny-lkp@intel.com>
-References: <1758531671-819655-8-git-send-email-tariqt@nvidia.com>
+	s=arc-20240116; t=1758600748; c=relaxed/simple;
+	bh=E8un3FXROc70m9PsRsQtm/sFi8qoAHR+suCsO+66rsY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r8uRsRMNSvUSXb1IAE1Azathk5ixuiJILvuz8wklnYrRiX76ATvL3jAhhaheGS7soqRxp7448gQY7Gbsof56+YrU3D6t40PzINGqk1kHcKUxwawQW/qqCqlQpB+uoMfOVC2ImdoHmLkMwK9aw92ncInQ0FHYlVJ3yCqPozhFqsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YVC4Dsy5; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <0c60711f-31d4-463d-a1c9-92cad9ba79f1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758600744;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XDZT2wqQKVoy7pxqLv2KOoKQ5wh5mlqNeK0H1aieLw8=;
+	b=YVC4Dsy5Nk9uBqxKcz2kOh4PSxGTelCwT5Fo2nfKkovJTZo3TOxMQYf9Xmj5E6Qvsg0Bwm
+	zQgYiUbuViw+s4YZ7YUmNtPZ2rdcSxmtnCazwrstYhzRIM4yhnIIu9ehfmGS+9/opiDz1n
+	wYcM1nN630msg7IQnhAHhkx73a0n5S8=
+Date: Tue, 23 Sep 2025 12:11:38 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1758531671-819655-8-git-send-email-tariqt@nvidia.com>
-
-Hi Tariq,
-
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on 312e6f7676e63bbb9b81e5c68e580a9f776cc6f0]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Tariq-Toukan/net-mlx5-HWS-Generalize-complex-matchers/20250922-170716
-base:   312e6f7676e63bbb9b81e5c68e580a9f776cc6f0
-patch link:    https://lore.kernel.org/r/1758531671-819655-8-git-send-email-tariqt%40nvidia.com
-patch subject: [PATCH net-next 7/7] net/mlx5e: Use extack in set rxfh callback
-config: x86_64-rhel-9.4-rust (https://download.01.org/0day-ci/archive/20250923/202509231125.Tsan9Qny-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-rustc: rustc 1.88.0 (6b00bc388 2025-06-23)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250923/202509231125.Tsan9Qny-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509231125.Tsan9Qny-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c:1508:4: warning: 'snprintf' will always be truncated; specified size is 80, but format string expands to at least 131 [-Wformat-truncation]
-    1508 |                         NL_SET_ERR_MSG_FMT_MOD(
-         |                         ^
-   include/linux/netlink.h:131:2: note: expanded from macro 'NL_SET_ERR_MSG_FMT_MOD'
-     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
-         |         ^
-   include/linux/netlink.h:116:6: note: expanded from macro 'NL_SET_ERR_MSG_FMT'
-     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
-         |             ^
-   1 warning generated.
+Subject: Re: [PATCH net-next v4 3/3] inet: Avoid ehash lookup race in
+ inet_twsk_hashdance_schedule()
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: edumazet@google.com, kerneljasonxing@gmail.com, davem@davemloft.net,
+ kuba@kernel.org, netdev@vger.kernel.org,
+ Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+References: <20250920105945.538042-1-xuanqiang.luo@linux.dev>
+ <20250920105945.538042-4-xuanqiang.luo@linux.dev>
+ <CAAVpQUDaYX5ZQN+EYL3q4yeu0Ni2cqNODEY--Wb-2+yY650Mbw@mail.gmail.com>
+ <c90e37cf-82a5-4c31-abe1-1fca8bfc8867@linux.dev>
+ <CAAVpQUBqiSkPGSGLqDweeOifGUPVx6TvyYcy2BoxKSY2qrtOPg@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: luoxuanqiang <xuanqiang.luo@linux.dev>
+In-Reply-To: <CAAVpQUBqiSkPGSGLqDweeOifGUPVx6TvyYcy2BoxKSY2qrtOPg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
 
-vim +/snprintf +1508 drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+在 2025/9/23 11:56, Kuniyuki Iwashima 写道:
+> On Mon, Sep 22, 2025 at 7:07 PM luoxuanqiang <xuanqiang.luo@linux.dev> wrote:
+>>
+>> 在 2025/9/23 08:45, Kuniyuki Iwashima 写道:
+>>> On Sat, Sep 20, 2025 at 4:00 AM <xuanqiang.luo@linux.dev> wrote:
+>>>> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+>>>>
+>>>> Since ehash lookups are lockless, if another CPU is converting sk to tw
+>>>> concurrently, fetching the newly inserted tw with tw->tw_refcnt == 0 cause
+>>>> lookup failure.
+>>>>
+>>>> The call trace map is drawn as follows:
+>>>>      CPU 0                                CPU 1
+>>>>      -----                                -----
+>>>>                                        inet_twsk_hashdance_schedule()
+>>>>                                        spin_lock()
+>>>>                                        inet_twsk_add_node_rcu(tw, ...)
+>>>> __inet_lookup_established()
+>>>> (find tw, failure due to tw_refcnt = 0)
+>>>>                                        __sk_nulls_del_node_init_rcu(sk)
+>>>>                                        refcount_set(&tw->tw_refcnt, 3)
+>>>>                                        spin_unlock()
+>>>>
+>>>> By replacing sk with tw atomically via hlist_nulls_replace_init_rcu() after
+>>>> setting tw_refcnt, we ensure that tw is either fully initialized or not
+>>>> visible to other CPUs, eliminating the race.
+>>>>
+>>>> It's worth noting that we replace under lock_sock(), so no need to check if sk
+>>>> is hashed. Thanks to Kuniyuki Iwashima!
+>>>>
+>>>> Fixes: 3ab5aee7fe84 ("net: Convert TCP & DCCP hash tables to use RCU / hlist_nulls")
+>>>> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+>>> This is not needed.  A pure review does not deserve Suggested-by.
+>>> This is used when someone suggests changing the core idea of
+>>> the patch.
+>> Got it, but still really appreciate your detailed
+>> and patient review!
+>>
+>>>> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+>>>> ---
+>>>>    net/ipv4/inet_timewait_sock.c | 13 ++++---------
+>>>>    1 file changed, 4 insertions(+), 9 deletions(-)
+>>>>
+>>>> diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
+>>>> index 5b5426b8ee92..bb98888584a8 100644
+>>>> --- a/net/ipv4/inet_timewait_sock.c
+>>>> +++ b/net/ipv4/inet_timewait_sock.c
+>>>> @@ -116,7 +116,7 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+>>>>           spinlock_t *lock = inet_ehash_lockp(hashinfo, sk->sk_hash);
+>>>>           struct inet_bind_hashbucket *bhead, *bhead2;
+>>>>
+>>>> -       /* Step 1: Put TW into bind hash. Original socket stays there too.
+>>>> +       /* Put TW into bind hash. Original socket stays there too.
+>>>>              Note, that any socket with inet->num != 0 MUST be bound in
+>>>>              binding cache, even if it is closed.
+>>>>            */
+>>>> @@ -140,14 +140,6 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+>>>>
+>>>>           spin_lock(lock);
+>>>>
+>>>> -       /* Step 2: Hash TW into tcp ehash chain */
+>>>> -       inet_twsk_add_node_rcu(tw, &ehead->chain);
+>>>> -
+>>>> -       /* Step 3: Remove SK from hash chain */
+>>>> -       if (__sk_nulls_del_node_init_rcu(sk))
+>>>> -               sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
+>>>> -
+>>>> -
+>>>>           /* Ensure above writes are committed into memory before updating the
+>>>>            * refcount.
+>>>>            * Provides ordering vs later refcount_inc().
+>>>> @@ -162,6 +154,9 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+>>>>            */
+>>>>           refcount_set(&tw->tw_refcnt, 3);
+>>> I discussed this series with Eric last week, and he pointed out
+>>> (thanks!) that we need to be careful here about memory barrier.
+>>>
+>>> refcount_set() is just WRITE_ONCE() and thus can be reordered,
+>>> and twsk could be published with 0 refcnt, resulting in another RST.
+>>>
+>> Thanks for Eric's pointer!
+>>
+>> Could you let me know if my modification here works?
+>>
+>> That is, moving smp_wmb() to after the refcount update:
+> I think this should be fine, small comment below
+>
+>> @@ -140,19 +140,6 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+>>
+>>           spin_lock(lock);
+>>
+>> -       /* Step 2: Hash TW into tcp ehash chain */
+>> -       inet_twsk_add_node_rcu(tw, &ehead->chain);
+>> -
+>> -       /* Step 3: Remove SK from hash chain */
+>> -       if (__sk_nulls_del_node_init_rcu(sk))
+>> -               sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
+>> -
+>> -
+>> -       /* Ensure above writes are committed into memory before updating the
+>> -        * refcount.
+>> -        * Provides ordering vs later refcount_inc().
+>> -        */
+>> -       smp_wmb();
+>>           /* tw_refcnt is set to 3 because we have :
+>>            * - one reference for bhash chain.
+>>            * - one reference for ehash chain.
+>> @@ -162,6 +149,14 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+>>            */
+>>           refcount_set(&tw->tw_refcnt, 3);
+>>
+>> +       /* Ensure tw_refcnt has been set before tw is published by
+>> +        * necessary memory barrier.
+> This sounds like tw is published by memory barrier,
+> perhaps remove after 'by' ?  It's obvious that the comment
+> is for smp_wmb() below.
 
-  1495	
-  1496	static int mlx5e_rxfh_hfunc_check(struct mlx5e_priv *priv,
-  1497					  const struct ethtool_rxfh_param *rxfh,
-  1498					  struct netlink_ext_ack *extack)
-  1499	{
-  1500		unsigned int count;
-  1501	
-  1502		count = priv->channels.params.num_channels;
-  1503	
-  1504		if (rxfh->hfunc == ETH_RSS_HASH_XOR) {
-  1505			unsigned int xor8_max_channels = mlx5e_rqt_max_num_channels_allowed_for_xor8();
-  1506	
-  1507			if (count > xor8_max_channels) {
-> 1508				NL_SET_ERR_MSG_FMT_MOD(
-  1509					extack,
-  1510					"Cannot set RSS hash function to XOR, current number of channels (%d) exceeds the maximum allowed for XOR8 RSS hfunc (%d)\n",
-  1511					count, xor8_max_channels);
-  1512				return -EINVAL;
-  1513			}
-  1514		}
-  1515	
-  1516		return 0;
-  1517	}
-  1518	
+I'm sorry for the confusion caused by my poor English.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+I will express it more clearly in the next version,
+like the following:
+
+@@ -162,6 +149,15 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+          */
+         refcount_set(&tw->tw_refcnt, 3);
+
++       /* Ensure tw_refcnt has been set before tw is published.
++        * smp_wmb() provides the necessary memory barrier to enforce this
++        * ordering.
++        */
++       smp_wmb();
++
++       hlist_nulls_replace_init_rcu(&sk->sk_nulls_node, &tw->tw_node);
++       sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
++
+         inet_twsk_schedule(tw, timeo);
+         spin_unlock(lock);
+
+Thanks!
+Xuanqiang
+
+>
+>
+>> +        */
+>> +       smp_wmb();
+>> +
+>> +       hlist_nulls_replace_init_rcu(&sk->sk_nulls_node, &tw->tw_node);
+>> +       sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
+>> +
+>>           inet_twsk_schedule(tw, timeo);
+>>
+>>           spin_unlock(lock);
+>>
+>> Thanks!
+>> Xuanqiang
+>>
+>>>> +       hlist_nulls_replace_init_rcu(&sk->sk_nulls_node, &tw->tw_node);
+>>>> +       sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
+>>>> +
+>>>>           inet_twsk_schedule(tw, timeo);
+>>>>
+>>>>           spin_unlock(lock);
+>>>> --
+>>>> 2.25.1
+>>>>
 
