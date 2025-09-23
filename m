@@ -1,84 +1,160 @@
-Return-Path: <netdev+bounces-225472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5E89B93EC0
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 03:59:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75AFBB93EC7
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 04:00:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 764BA447CEF
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 01:59:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 566AE188C43C
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 02:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C0326E70E;
-	Tue, 23 Sep 2025 01:59:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FE7674420;
+	Tue, 23 Sep 2025 02:00:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WEccxrNh"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j9rnxSnN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0217F946C;
-	Tue, 23 Sep 2025 01:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75797CA5A
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 02:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758592750; cv=none; b=C62kXGnSBqAtUC8gzDLejPNQHi7Cemx83bxe2x2ox4nnOAZimAC0LbfoPKy9khb+lL2ZHc0D5zIMCn7xi1dTTvgRaaXzft1VMTdIN3qs/cVTX/YbfbCln5o/ja8WsbeWF3EBNnSLMtKXvhVV5S+g/0OSp2GAa3tCFWjSghffNww=
+	t=1758592842; cv=none; b=fOJgjChZAeV93KxvCvK8MZzniKUBvIdimQsbSTMeafwp155bZ/G6mN6SQvfQMrDf5VOTdNpuxVucSX9O+nMN0FXzKQBCIjqI+gemtauhkf5957Q8Yu8WPm34w2LLbAdd/dIwJdALmb2MzzPfDSTybr+DeyCdqt23FHbaONyMT18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758592750; c=relaxed/simple;
-	bh=w0Hb5cF5iLtr3oPKYi/w1XIZm+99kosiGCqKTaApEkg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g6QxY87WEJIrUqx4INkENNe/3EKwiTVVzTiTpLFungZRQt/CJLQS3Rd6reOvBCgxgOOEEZ3mTQBnZAecJCmbL3XcSIT8YpMbkke4CH2P0tTOsYmBv+3GWCv/Wn9YaiEYROLybrnWUGm5W6vKVrGt3HRi36kc/Pndg4GTO7rnFJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WEccxrNh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E223BC4CEF0;
-	Tue, 23 Sep 2025 01:59:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758592749;
-	bh=w0Hb5cF5iLtr3oPKYi/w1XIZm+99kosiGCqKTaApEkg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WEccxrNhCJWNHWj4DFVf+HbT9AqYN+fmGnieUbDzC3MVcyskqYAg39jeIHGOi9P0G
-	 uS2Ehwg1rYXh7oBjREtnOB6T8j6zHlc4MuxsEtwUIdOS0HFWq82xgqPmAH2hHc9EGH
-	 8oTMNiEVLalYtRKPpXj4ocZIR526Vl++Lt+noXUPjsMCgCxYpfFb4AzcoMuWAqVriz
-	 2UN2yFImaZujUtfvJ+mkpPHiH0S5fmBgEVC718iKrw8+82OwG+lX+exfrZ0xPVt/nb
-	 Rd6e38Az7EXYeVgz4il0DfOchvvL93Ub2eb4Uk8Ilhs+6kSTwfjp4NTXA9dbf5rfUf
-	 NbXGnu/mwnVvw==
-Date: Mon, 22 Sep 2025 18:59:08 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- razor@blackwall.org, pabeni@redhat.com, willemb@google.com,
- sdf@fomichev.me, john.fastabend@gmail.com, martin.lau@kernel.org,
- jordan@jrife.io, maciej.fijalkowski@intel.com, magnus.karlsson@intel.com
-Subject: Re: [PATCH net-next 00/20] netkit: Support for io_uring zero-copy
- and AF_XDP
-Message-ID: <20250922185908.3305137e@kernel.org>
-In-Reply-To: <20250919213153.103606-1-daniel@iogearbox.net>
-References: <20250919213153.103606-1-daniel@iogearbox.net>
+	s=arc-20240116; t=1758592842; c=relaxed/simple;
+	bh=cwMYcUz1TyoCrTTOZjYBgWQOQ08ML5noRxzzTxbzEpM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IFLKC6uVGGJIvsHvVcDYA0s4VxL7jYFcdQVsdIHbX2CfwsNIMt0pOD7S4nes4mKxfNnwgiAVUX31xbMVAGDP8RcWnpgQzLj5nus5HqENnPPxwYjUAh6jBj0GKnW63k/cVI457DvEoS4t6BCXmSs2nzc3+6nSZYr1z3B5UseGZ+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j9rnxSnN; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6715c8c6-f252-42d3-b9b2-3032cd38c65f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758592836;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O6feZAtpw2aGJxDoWvjqgD/I/qe8QQtN5aZV8q99sfs=;
+	b=j9rnxSnNnqbi/0y3iNYMiSTKCixa46Eeg+Y1Y3EIUXxs1tvW8BgfALi7zVFgWpWGByECXT
+	HrJKJyUNFc7cG93rEzTuD0qp2wBpRPFTo02/F8xk3Pcu2UONqY1HAt8E3Uz2Irv8IjDuJA
+	fYTj8EjZI9u0DDrNhEI+8iapl3VbZ7w=
+Date: Tue, 23 Sep 2025 09:59:56 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH net-next v4 1/3] rculist: Add __hlist_nulls_replace_rcu()
+ and hlist_nulls_replace_init_rcu()
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: edumazet@google.com, kerneljasonxing@gmail.com, davem@davemloft.net,
+ kuba@kernel.org, netdev@vger.kernel.org,
+ Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+References: <20250920105945.538042-1-xuanqiang.luo@linux.dev>
+ <20250920105945.538042-2-xuanqiang.luo@linux.dev>
+ <CAAVpQUD5LrDvt2ow_uGYvwqu4U+v0dOgTKZWAVfhf4eo7594bQ@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: luoxuanqiang <xuanqiang.luo@linux.dev>
+In-Reply-To: <CAAVpQUD5LrDvt2ow_uGYvwqu4U+v0dOgTKZWAVfhf4eo7594bQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 19 Sep 2025 23:31:33 +0200 Daniel Borkmann wrote:
-> We have implemented support for this concept in netkit and tested the
-> latter against Nvidia ConnectX-6 (mlx5) as well as Broadcom BCM957504
-> (bnxt_en) 100G NICs. For more details see the individual patches.
 
-at high level
+在 2025/9/23 08:19, Kuniyuki Iwashima 写道:
+> On Sat, Sep 20, 2025 at 4:00 AM <xuanqiang.luo@linux.dev> wrote:
+>> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+>>
+>> Add two functions to atomically replace RCU-protected hlist_nulls entries.
+>>
+>> Keep using WRITE_ONCE() to assign values to ->next and ->pprev, as mentioned in
+>> the patch below:
+>> efd04f8a8b45 ("rcu: Use WRITE_ONCE() for assignments to ->next for rculist_nulls")
+>> 860c8802ace1 ("rcu: Use WRITE_ONCE() for assignments to ->pprev for hlist_nulls")
+>>
+>> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+>> ---
+>>   include/linux/rculist_nulls.h | 52 +++++++++++++++++++++++++++++++++++
+>>   1 file changed, 52 insertions(+)
+>>
+>> diff --git a/include/linux/rculist_nulls.h b/include/linux/rculist_nulls.h
+>> index 89186c499dd4..d86331ce22c4 100644
+>> --- a/include/linux/rculist_nulls.h
+>> +++ b/include/linux/rculist_nulls.h
+>> @@ -152,6 +152,58 @@ static inline void hlist_nulls_add_fake(struct hlist_nulls_node *n)
+>>          n->next = (struct hlist_nulls_node *)NULLS_MARKER(NULL);
+>>   }
+>>
+>> +/**
+>> + * __hlist_nulls_replace_rcu - replace an old entry by a new one
+> nit: '__' is not needed as there is not no-'__' version.
+>
+>
+>> + * @old: the element to be replaced
+>> + * @new: the new element to insert
+>> + *
+>> + * Description:
+>> + * Replace the old entry with the new one in a RCU-protected hlist_nulls, while
+>> + * permitting racing traversals.
+>> + *
+>> + * The caller must take whatever precautions are necessary (such as holding
+>> + * appropriate locks) to avoid racing with another list-mutation primitive, such
+>> + * as hlist_nulls_add_head_rcu() or hlist_nulls_del_rcu(), running on this same
+>> + * list.  However, it is perfectly legal to run concurrently with the _rcu
+>> + * list-traversal primitives, such as hlist_nulls_for_each_entry_rcu().
+>> + */
+>> +static inline void __hlist_nulls_replace_rcu(struct hlist_nulls_node *old,
+>> +                                            struct hlist_nulls_node *new)
+>> +{
+>> +       struct hlist_nulls_node *next = old->next;
+>> +
+>> +       WRITE_ONCE(new->next, next);
+>> +       WRITE_ONCE(new->pprev, old->pprev);
+>> +       rcu_assign_pointer(*(struct hlist_nulls_node __rcu **)new->pprev, new);
+>> +       if (!is_a_nulls(next))
+>> +               WRITE_ONCE(new->next->pprev, &new->next);
+>> +}
+>> +
+>> +/**
+>> + * hlist_nulls_replace_init_rcu - replace an old entry by a new one and
+>> + * initialize the old
+>> + * @old: the element to be replaced
+>> + * @new: the new element to insert
+>> + *
+>> + * Description:
+>> + * Replace the old entry with the new one in a RCU-protected hlist_nulls, while
+>> + * permitting racing traversals, and reinitialize the old entry.
+>> + *
+>> + * Note: @old should be hashed.
+> nit: s/should/must/
 
- - not sure how instance locking is going to work here
- - integration with other queue related APIs is missing (stats and
-   upcoming config API)
- - the model of "allocating a queue" needs careful thought, the model
-   of bumping the real num rx on the remote is fine here but it will
-   not work for real HW queue alloc
- - I'd have expected more of the code to live in the core vs so much
-   handling in netkit
- - we need selftests (while the sample is unnecessary)
- - last but not least - I recommend
-   https://lore.kernel.org/all/20250912095730.1efaac16@kernel.org/
-   ;)
+Will fix them in the next version!
+
+Thanks, Kuniyuki!
+
+>> + *
+>> + * The caller must take whatever precautions are necessary (such as holding
+>> + * appropriate locks) to avoid racing with another list-mutation primitive, such
+>> + * as hlist_nulls_add_head_rcu() or hlist_nulls_del_rcu(), running on this same
+>> + * list. However, it is perfectly legal to run concurrently with the _rcu
+>> + * list-traversal primitives, such as hlist_nulls_for_each_entry_rcu().
+>> + */
+>> +static inline void hlist_nulls_replace_init_rcu(struct hlist_nulls_node *old,
+>> +                                               struct hlist_nulls_node *new)
+>> +{
+>> +       __hlist_nulls_replace_rcu(old, new);
+>> +       WRITE_ONCE(old->pprev, NULL);
+>> +}
+>> +
+>>   /**
+>>    * hlist_nulls_for_each_entry_rcu - iterate over rcu list of given type
+>>    * @tpos:      the type * to use as a loop cursor.
+>> --
+>> 2.25.1
+>>
 
