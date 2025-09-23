@@ -1,127 +1,171 @@
-Return-Path: <netdev+bounces-225535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00509B95379
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:20:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91914B95391
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:21:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE4FD2A408E
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:20:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6523162CD6
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:21:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29EEA2F5320;
-	Tue, 23 Sep 2025 09:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58C3530FF36;
+	Tue, 23 Sep 2025 09:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AqkdkOyG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a0OviZWE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F056E18027;
-	Tue, 23 Sep 2025 09:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95EF22AE99;
+	Tue, 23 Sep 2025 09:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758619226; cv=none; b=kxsxe0HsawfFptYoCLUC9UGYXK1/oSIVN7zov0R+G7wHIDR/8cUEYB7C/RdqdT9eae6Cg+l5bktxbIYev0stbUaqqCuLLCUfdsf1uuZsU9hvzhp70YfEczMtbj0BAlOOpuGrq5b0DYeW9IPNtBFgpuH2OrCvYHK3nRct4NhYmmw=
+	t=1758619289; cv=none; b=r00ttOOHluwoKzg/y7+QFVEXfgjiGVZQBJxEf2gy7WpBDq6EzP+lNotliJ1PDfJbdqAH1mpIHRB3TeC5Hr6mVMIZvbgar+guc8f75lX9Eu8IygN4ZXmndKQmk9DZzvb2uQ+Jczl2Dj5qVoky//ooyvFH+SPZLgg9XDuwUP2sVAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758619226; c=relaxed/simple;
-	bh=gdoXPqKcRwqsS6xGmaE6ieeKY1UOE2LdWb4KSBpnMZQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fKSnGl9+gmXx/kzyYs7ji/g7BPWL4wcrR0gMlvOZ7+ig1nhsT3LZ9dQTPKU4zSTXaeoRwLbIMGcnTqePgzW3L0RLl28o3t3aaxTEn84GucvvdfcGeVjdi9pg6HXA/CuGA8E7ohbnNKQ1wfPHHRDlMEcLorcUCRCKHl/Vh4NeFEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AqkdkOyG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79FD2C4CEF5;
-	Tue, 23 Sep 2025 09:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758619225;
-	bh=gdoXPqKcRwqsS6xGmaE6ieeKY1UOE2LdWb4KSBpnMZQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AqkdkOyGWQX0zxAuGM24pyt9Rz33HurS1DtRVsIVpuEsrOI2VlKsbQ9sA+m+wwYHD
-	 fzT4FN68udJLKcsKFb5gog4nWOKFSSogj5wnnF3iUUDij9GPGBM7dRTsh9KTYmE6t7
-	 1mUVpRvEwojqO1GAGvxqBw7ljAycYZayGTNYqCChzQEWd9AqDlOpnS4ZssfRNvjC7j
-	 2LgwuZabZdJUG3AcfcndlEflm3iwzX+KHg7vsAZgNZ3ryS2+9hPT+0NoYOtBARurA1
-	 PlP2Sd1l/552W5uNUVzmPYoWFYQSh1OdWARTYD06P8kDL14rfszkCR9wVMkaLsvoWL
-	 Fu7B7YezHQNpw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB36439D0C20;
-	Tue, 23 Sep 2025 09:20:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1758619289; c=relaxed/simple;
+	bh=bp+sUW3/VySg0r+uo4biT0MX4DtmWftriQRRDUg+x9c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UvPjUlWz2i6BvRbT0yW90jSCDwGenwYKS7ZLOwfieW+QW6c84KcyvAm4aOmlx8/HOM0u48jT0KKoKQGaGtukx4mK1gsMONHDfpUSZHhAWrxFFlhUA4lTp1S0Ub3oo/YmoHSLmPrYwBLwZ0qCWLtUfuLPu/JHUTxLeUp/fq8DfUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a0OviZWE; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758619287; x=1790155287;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=bp+sUW3/VySg0r+uo4biT0MX4DtmWftriQRRDUg+x9c=;
+  b=a0OviZWE/Xbp0o9OBlW9eqV296Q3OaHKumIW8anuCxVNvRc4Yck1hyFl
+   vA3bf8SE5k3hD6jUT2VYHPFhLszBb/RHlh0oth4DR0THSKPPTsRT/fjnG
+   P+cxZHvKVh3avKThVV/UtB9wSRtGM3Nd8+YsFDwHEP4fKMzy8ngqoNsVB
+   64Fy3rHms3JtQfHZAgaDNNZT4+S6z1gmyLHDXNyF0uzee5tsUoOnBCjM6
+   dmYViQwcUrhPjWCtxhqmSqHbyofZDHlAqzlquRq5B7bhte2tJzmOCxWKf
+   nTxXAPmGluTGxakkt/6WkoZjQzhn36L3e6j+R6/7GO7ZDG2UWMbNY68wZ
+   A==;
+X-CSE-ConnectionGUID: IFV+ofI8Tei0nbmiXE9pOA==
+X-CSE-MsgGUID: 3Ho+KrNlTkCIRgBOlXjnHw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="86328865"
+X-IronPort-AV: E=Sophos;i="6.18,287,1751266800"; 
+   d="scan'208";a="86328865"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 02:21:27 -0700
+X-CSE-ConnectionGUID: iJdzp6WtTpGB8sO1xzv26w==
+X-CSE-MsgGUID: wPmYcF5hRwSNsVnsnF819g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,287,1751266800"; 
+   d="scan'208";a="176304124"
+Received: from lkp-server02.sh.intel.com (HELO 84c55410ccf6) ([10.239.97.151])
+  by fmviesa007.fm.intel.com with ESMTP; 23 Sep 2025 02:21:23 -0700
+Received: from kbuild by 84c55410ccf6 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1v0zD1-0002xh-0D;
+	Tue, 23 Sep 2025 09:21:19 +0000
+Date: Tue, 23 Sep 2025 17:20:58 +0800
+From: kernel test robot <lkp@intel.com>
+To: Guangshuo Li <lgs201920130244@gmail.com>,
+	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Victoria Milhoan (b42089)" <vicki.milhoan@freescale.com>,
+	Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
+	Dan Douglass <dan.douglass@nxp.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Guangshuo Li <lgs201920130244@gmail.com>, stable@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: caam: Add check for kcalloc() in test_len()
+Message-ID: <202509231744.SGr3Dh19-lkp@intel.com>
+References: <20250922155322.1825714-1-lgs201920130244@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 00/14] dibs - Direct Internal Buffer Sharing
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175861922275.1349779.9038445436427700576.git-patchwork-notify@kernel.org>
-Date: Tue, 23 Sep 2025 09:20:22 +0000
-References: <20250918110500.1731261-1-wintera@linux.ibm.com>
-In-Reply-To: <20250918110500.1731261-1-wintera@linux.ibm.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: alibuda@linux.alibaba.com, dust.li@linux.alibaba.com,
- sidraya@linux.ibm.com, wenjia@linux.ibm.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
- andrew+netdev@lunn.ch, julianr@linux.ibm.com, aswin@linux.ibm.com,
- pasic@linux.ibm.com, mjambigi@linux.ibm.com, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com, linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com,
- horms@kernel.org, ebiggers@kernel.org, ardb@kernel.org,
- herbert@gondor.apana.org.au, freude@linux.ibm.com, kshk@linux.ibm.com,
- dan.j.williams@intel.com, dave.jiang@intel.com, Jonathan.Cameron@huawei.com,
- sln@onemain.com, geert@linux-m68k.org, jgg@ziepe.ca
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250922155322.1825714-1-lgs201920130244@gmail.com>
 
-Hello:
+Hi Guangshuo,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+kernel test robot noticed the following build warnings:
 
-On Thu, 18 Sep 2025 13:04:46 +0200 you wrote:
-> This series introduces a generic abstraction of existing components like:
-> - the s390 specific ISM device (Internal Shared Memory),
-> - the SMC-D loopback mechanism (Shared Memory Communication - Direct)
-> - the client interface of the SMC-D module to the transport devices
-> This generic shim layer can be extended with more devices, more clients and
-> more features in the future.
-> 
-> [...]
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on herbert-crypto-2.6/master linus/master v6.17-rc7 next-20250922]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Here is the summary with links:
-  - [net-next,v3,01/14] net/smc: Remove error handling of unregister_dmb()
-    https://git.kernel.org/netdev/net-next/c/884eee8e43f3
-  - [net-next,v3,02/14] net/smc: Decouple sf and attached send_buf in smc_loopback
-    https://git.kernel.org/netdev/net-next/c/a4997e17d137
-  - [net-next,v3,03/14] dibs: Create drivers/dibs
-    https://git.kernel.org/netdev/net-next/c/35758b0032c0
-  - [net-next,v3,04/14] dibs: Register smc as dibs_client
-    https://git.kernel.org/netdev/net-next/c/d324a2ca3f8e
-  - [net-next,v3,05/14] dibs: Register ism as dibs device
-    https://git.kernel.org/netdev/net-next/c/269726968f95
-  - [net-next,v3,06/14] dibs: Define dibs loopback
-    https://git.kernel.org/netdev/net-next/c/cb990a45d7f6
-  - [net-next,v3,07/14] dibs: Define dibs_client_ops and dibs_dev_ops
-    https://git.kernel.org/netdev/net-next/c/69baaac9361e
-  - [net-next,v3,08/14] dibs: Move struct device to dibs_dev
-    https://git.kernel.org/netdev/net-next/c/845c334a0186
-  - [net-next,v3,09/14] dibs: Create class dibs
-    https://git.kernel.org/netdev/net-next/c/804737349813
-  - [net-next,v3,10/14] dibs: Local gid for dibs devices
-    https://git.kernel.org/netdev/net-next/c/05e68d8dedf3
-  - [net-next,v3,11/14] dibs: Move vlan support to dibs_dev_ops
-    https://git.kernel.org/netdev/net-next/c/92a0f7bb081d
-  - [net-next,v3,12/14] dibs: Move query_remote_gid() to dibs_dev_ops
-    https://git.kernel.org/netdev/net-next/c/719c3b67bb7e
-  - [net-next,v3,13/14] dibs: Move data path to dibs layer
-    https://git.kernel.org/netdev/net-next/c/cc21191b584c
-  - [net-next,v3,14/14] dibs: Move event handling to dibs layer
-    https://git.kernel.org/netdev/net-next/c/a612dbe8d04d
+url:    https://github.com/intel-lab-lkp/linux/commits/Guangshuo-Li/crypto-caam-Add-check-for-kcalloc-in-test_len/20250922-235723
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20250922155322.1825714-1-lgs201920130244%40gmail.com
+patch subject: [PATCH v2] crypto: caam: Add check for kcalloc() in test_len()
+config: loongarch-allyesconfig (https://download.01.org/0day-ci/archive/20250923/202509231744.SGr3Dh19-lkp@intel.com/config)
+compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project cafc064fc7a96b3979a023ddae1da2b499d6c954)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250923/202509231744.SGr3Dh19-lkp@intel.com/reproduce)
 
-You are awesome, thank you!
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509231744.SGr3Dh19-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from <built-in>:3:
+   In file included from include/linux/compiler_types.h:171:
+   include/linux/compiler-clang.h:28:9: warning: '__SANITIZE_ADDRESS__' macro redefined [-Wmacro-redefined]
+      28 | #define __SANITIZE_ADDRESS__
+         |         ^
+   <built-in>:371:9: note: previous definition is here
+     371 | #define __SANITIZE_ADDRESS__ 1
+         |         ^
+>> drivers/crypto/caam/caamrng.c:186:3: warning: void function 'test_len' should not return a value [-Wreturn-mismatch]
+     186 |                 return -ENOMEM;
+         |                 ^      ~~~~~~~
+   2 warnings generated.
+
+
+vim +/test_len +186 drivers/crypto/caam/caamrng.c
+
+   174	
+   175	#ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_TEST
+   176	static inline void test_len(struct hwrng *rng, size_t len, bool wait)
+   177	{
+   178		u8 *buf;
+   179		int read_len;
+   180		struct caam_rng_ctx *ctx = to_caam_rng_ctx(rng);
+   181		struct device *dev = ctx->ctrldev;
+   182	
+   183		buf = kcalloc(CAAM_RNG_MAX_FIFO_STORE_SIZE, sizeof(u8), GFP_KERNEL);
+   184	
+   185		if (!buf) {
+ > 186			return -ENOMEM;
+   187		}
+   188		while (len > 0) {
+   189			read_len = rng->read(rng, buf, len, wait);
+   190	
+   191			if (read_len < 0 || (read_len == 0 && wait)) {
+   192				dev_err(dev, "RNG Read FAILED received %d bytes\n",
+   193					read_len);
+   194				kfree(buf);
+   195				return;
+   196			}
+   197	
+   198			print_hex_dump_debug("random bytes@: ",
+   199				DUMP_PREFIX_ADDRESS, 16, 4,
+   200				buf, read_len, 1);
+   201	
+   202			len = len - read_len;
+   203		}
+   204	
+   205		kfree(buf);
+   206	}
+   207	
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
