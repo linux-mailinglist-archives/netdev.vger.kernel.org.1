@@ -1,152 +1,162 @@
-Return-Path: <netdev+bounces-225494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AACE2B94BFC
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:23:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 593CCB94BB2
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:20:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7096116E152
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 07:23:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4992D18A5BD9
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 07:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DF633101D9;
-	Tue, 23 Sep 2025 07:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DEA53101DF;
+	Tue, 23 Sep 2025 07:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="HzUPGJ4X"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V27zlUZt"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7359030FF1D;
-	Tue, 23 Sep 2025 07:23:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D8730F944;
+	Tue, 23 Sep 2025 07:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758612224; cv=none; b=DKR7DMEUcMcWaQ8eoZb0l3ioU8wQaHdqG6inEKg8RJDOgH+ECCBYfEo2qzAYqr9vaIsiQ7FkRT6MdakaW329lAQCj8kf5P2t/iSUjAKvCz+GY0kXV49fvmpdei8hyVKOnFDcW0wZwzZrlrbi6TqmY59qFS2dGBf18K4h8VKY2Tw=
+	t=1758612011; cv=none; b=XjkeA+G3DSfV/ifog8JzaE6B/D4dv5TmoO0jvxT7ZEIBqT1NSmIpFWOUctEks4Mi2etkH6ii5Rptbl7aKdw7j5K0ekg8uKbXqj7MZ+QqtKxBsPnSvQFzUQd/Y/JWYRd8z1MbrS2CIy/ACnYjTDphlgeRkoT7yhp/B2uYAGYTn+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758612224; c=relaxed/simple;
-	bh=oLKAFVBFGji1BM0e3bwl9ofrTl0S49cVof+Rq9Es9EU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H9qn7hLfoUpvrJF0OtiACLcxJT8kaPuz82tDesj1pMY8k5lF/xwfNpmmbE/L3hUgiEXkImw/nOdxZ4+VzUvMhSYM6Hg/SWb+iatLDkWpLMVv3shZEJREQvVx/qNGT0qdgeLSigWcMzJqJcsrQWtotE30kRuwIlbHU9ScNy2HbkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=HzUPGJ4X; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	s=arc-20240116; t=1758612011; c=relaxed/simple;
+	bh=lwJ9UOqD//PDM/RdW1ujxGd44CcPYvzNz6RKR54u+xI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yj1FISjaxTUCAGfusr+7oHk1yesMVustihRryI+bUbf0omv9otsul2J5KyAGycPAvnXEyg72001XTcz/8wU4YqXoU8z97XYdqtRi184DkTvwm8lddq0ZftU5QjkmZrMNyzWiRJU4F2H9L3OBbJGqTDCSII8xRftXZHS2vjpfKYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V27zlUZt; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1758612222; x=1790148222;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758612009; x=1790148009;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=oLKAFVBFGji1BM0e3bwl9ofrTl0S49cVof+Rq9Es9EU=;
-  b=HzUPGJ4Xez2HMvdB2jBVO90AhC1sP2+nkJ75+i2Sk0cRcY6VF8EkpSeu
-   iZZuPNlVhqJNphL+Nz9LA+k+plrTbJpeZfqXtXBFAhY/YCa3qf2q2OhFX
-   z5/XuJwACDMZjnvDJIrOgiAzMqTUGJnLGMt2snwuYbr/EC6HuwtH17/2A
-   LL447Vkqq3MI5okg/fPjM5c2xffVPlC/ROVpMc1r+Wcper0UCeVY/y9jI
-   tIT7Q+kEM1rrronSAxhm9NFr5WGydg19h3cf+wf1hrdt0papFCa/zf82b
-   DvjPMkTi04RV8v96W591ZvrlXUHqfrUxOa/wggoFEUEl6/jz8qSl6j/Cp
-   Q==;
-X-CSE-ConnectionGUID: Clh3Iro3RuGsH6I1ZfMyHA==
-X-CSE-MsgGUID: rrE015PYSV6z38R8hVZzdA==
+  bh=lwJ9UOqD//PDM/RdW1ujxGd44CcPYvzNz6RKR54u+xI=;
+  b=V27zlUZtetY/r9/AQeifUAGuFD7QaUmRDnDq7FBycNHBxIswHpwSHAIq
+   vZbBPCCCukaoMk26CpDrGlm6l6Dld3zxJyLPVOwmdM/SyGNTGFOXdEPNd
+   ZNIQfDKr8mncxv+NCxz5wiFbnA1OAE+1X3hJ4ltTAM4+z2/eJk/xt/zxl
+   E62Mr9JqWxGTo4U/EdyFMiUJiU26qk0Fs5ebPE7Cg1R71KHOCwKT4kmPK
+   MMLpDBS0W8U2PwR+s6Dk1PsV7OL73bM84IJnnxGzoLNI/Y/oV6bzH7+/c
+   OZmGPE8rOhsiQtGoIlAokvrgz+U3OC9tp1K1RlveVCbj5iJJ+73SXkOiq
+   A==;
+X-CSE-ConnectionGUID: ldYJDQNkRtylDdNddlP6bA==
+X-CSE-MsgGUID: nJqbN5ogQC68l4NrdimYhQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="72310800"
 X-IronPort-AV: E=Sophos;i="6.18,287,1751266800"; 
-   d="scan'208";a="46277281"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Sep 2025 00:23:40 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Tue, 23 Sep 2025 00:23:28 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Tue, 23 Sep 2025 00:23:28 -0700
-Date: Tue, 23 Sep 2025 09:19:24 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: Jakub Kicinski <kuba@kernel.org>, <andrew@lunn.ch>,
-	<hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <richardcochran@gmail.com>,
-	<vadim.fedorenko@linux.dev>, <rmk+kernel@armlinux.org.uk>,
-	<christophe.jaillet@wanadoo.fr>, <rosenp@gmail.com>,
-	<steen.hegelund@microchip.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v2] phy: mscc: Fix PTP for vsc8574 and VSC8572
-Message-ID: <20250923071924.mv6ytwtifuu5limg@DEN-DL-M31836.microchip.com>
-References: <20250917113316.3973777-1-horatiu.vultur@microchip.com>
- <20250918160942.3dc54e9a@kernel.org>
- <20250922121524.3baplkjgw2xnwizr@skbuf>
- <20250922123301.y7qjguatajhci67o@DEN-DL-M31836.microchip.com>
- <20250922132846.jkch266gd2p6k4w5@skbuf>
+   d="scan'208";a="72310800"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 00:20:08 -0700
+X-CSE-ConnectionGUID: Yfyb9R4/Q+iN3TxSgmOafA==
+X-CSE-MsgGUID: tJaYf2dMRTq2G+2tFbHnZg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,287,1751266800"; 
+   d="scan'208";a="181079366"
+Received: from lkp-server02.sh.intel.com (HELO 84c55410ccf6) ([10.239.97.151])
+  by fmviesa005.fm.intel.com with ESMTP; 23 Sep 2025 00:20:02 -0700
+Received: from kbuild by 84c55410ccf6 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1v0xJf-0002rB-2I;
+	Tue, 23 Sep 2025 07:19:59 +0000
+Date: Tue, 23 Sep 2025 15:19:38 +0800
+From: kernel test robot <lkp@intel.com>
+To: Tariq Toukan <tariqt@nvidia.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Michael Guralnik <michaelgur@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>, Will Deacon <will@kernel.org>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Justin Stitt <justinstitt@google.com>, linux-s390@vger.kernel.org
+Subject: Re: [PATCH net-next V4] net/mlx5: Improve write-combining test
+ reliability for ARM64 Grace CPUs
+Message-ID: <202509231437.exOuF9vQ-lkp@intel.com>
+References: <1758528951-817323-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250922132846.jkch266gd2p6k4w5@skbuf>
+In-Reply-To: <1758528951-817323-1-git-send-email-tariqt@nvidia.com>
 
-The 09/22/2025 16:28, Vladimir Oltean wrote:
-> 
-> On Mon, Sep 22, 2025 at 02:33:01PM +0200, Horatiu Vultur wrote:
-> > Thanks for the advice.
-> > What about to make the PHY_ID_VSC8572 and PHY_ID_VSC8574 to use
-> > vsc8584_probe() and then in this function just have this check:
-> >
-> > ---
-> > if ((phydev->phy_id & 0xfffffff0) != PHY_ID_VSC8572 &&
-> >     (phydev->phy_id & 0xfffffff0) != PHY_ID_VSC8574) {
-> >       if ((phydev->phy_id & MSCC_DEV_REV_MASK) != VSC8584_REVB) {
-> >               dev_err(&phydev->mdio.dev, "Only VSC8584 revB is supported.\n");
-> >               return -ENOTSUPP;
-> >       }
-> > }
-> 
-> Personally, I think you are making the code harder to understand what
-> PHYs the test is referring to, and why it exists in the first place.
-> 
-> Ideally this test would have not existed. Instead of the open-coded
-> phy_id and phy_id_mask fields from the struct phy_driver array entries,
-> one could have used PHY_ID_MATCH_MODEL() for those entries where the
-> bits 3:0 of the PHY ID do not matter, and PHY_ID_MATCH_EXACT() where
-> they do. Instead of failing the probe, just not match the device with
-> this driver and let the system handle it some other way (Generic PHY).
+Hi Tariq,
 
-Yes, I can see your point. That would be a nicer fix.
+kernel test robot noticed the following build errors:
 
-> 
-> I'm not sure if this is intended or not, but the combined effect of:
-> - commit a5afc1678044 ("net: phy: mscc: add support for VSC8584 PHY")
-> - commit 75a1ccfe6c72 ("mscc.c: Add support for additional VSC PHYs")
-> 
-> is that for VSC856X, VSC8575, VSC8582, VSC8584, the driver will only
-> probe on Rev B silicon, and fail otherwise. Initially, the revision test
-> was only there for VSC8584, and it transferred to the others by virtue
-> of reusing the same vsc8584_probe() function. I don't see signs that
-> this was 100% intentional. I say this because when probing e.g. on
-> VSC8575 revA, the kernel will print "Only VSC8584 revB is supported."
-> which looks more like an error than someone's actual intention.
-> 
-> By excluding VSC8574 and VSC8572 from the above revision test, it feels
-> like a double workaround rather than using the conventional PHY ID match
-> helpers as intended.
-> 
-> As a Microchip employee, maybe you have access to some info regarding
-> whether the limitations mentioned by Quentin Schulz for VSC8584 revA
-> are valid for all the other PHYs for which they are currently imposed.
-> What makes VSC8574/VSC8572 unlike the others in this regard?
+[auto build test ERROR on 312e6f7676e63bbb9b81e5c68e580a9f776cc6f0]
 
-Let me start by asking my colleagues and figure out which revisions were
-produced for which PHYs.
-Thanks for the advice.
+url:    https://github.com/intel-lab-lkp/linux/commits/Tariq-Toukan/net-mlx5-Improve-write-combining-test-reliability-for-ARM64-Grace-CPUs/20250922-161859
+base:   312e6f7676e63bbb9b81e5c68e580a9f776cc6f0
+patch link:    https://lore.kernel.org/r/1758528951-817323-1-git-send-email-tariqt%40nvidia.com
+patch subject: [PATCH net-next V4] net/mlx5: Improve write-combining test reliability for ARM64 Grace CPUs
+config: arm-allmodconfig (https://download.01.org/0day-ci/archive/20250923/202509231437.exOuF9vQ-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250923/202509231437.exOuF9vQ-lkp@intel.com/reproduce)
 
-> 
-> It looks like the review comments to clean things up are getting bigger.
-> I'm not sure this is all adequate for 'net' any longer.
-> On the other hand, you said PTP never worked for VSC8574/VSC8572,
-> without any crash, it was just not enabled. Maybe this can all be
-> reconsidered as new functionality for net-next, and there we have more
-> space for shuffling things around?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509231437.exOuF9vQ-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In function 'mlx5_iowrite64_copy',
+       inlined from 'mlx5_wc_post_nop' at drivers/net/ethernet/mellanox/mlx5/core/wc.c:317:2:
+>> drivers/net/ethernet/mellanox/mlx5/core/wc.c:268:17: error: unknown register name 'v0' in 'asm'
+     268 |                 asm volatile
+         |                 ^~~
+
+
+vim +268 drivers/net/ethernet/mellanox/mlx5/core/wc.c
+
+   261	
+   262	static void mlx5_iowrite64_copy(struct mlx5_wc_sq *sq, __be32 mmio_wqe[16],
+   263					size_t mmio_wqe_size, unsigned int offset)
+   264	{
+   265	#ifdef CONFIG_KERNEL_MODE_NEON
+   266		if (cpu_has_neon()) {
+   267			kernel_neon_begin();
+ > 268			asm volatile
+   269			(".arch_extension simd;\n\t"
+   270			"ld1 {v0.16b, v1.16b, v2.16b, v3.16b}, [%0]\n\t"
+   271			"st1 {v0.16b, v1.16b, v2.16b, v3.16b}, [%1]"
+   272			:
+   273			: "r"(mmio_wqe), "r"(sq->bfreg.map + offset)
+   274			: "memory", "v0", "v1", "v2", "v3");
+   275			kernel_neon_end();
+   276			return;
+   277		}
+   278	#endif
+   279		__iowrite64_copy(sq->bfreg.map + offset, mmio_wqe,
+   280				 mmio_wqe_size / 8);
+   281	}
+   282	
 
 -- 
-/Horatiu
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
