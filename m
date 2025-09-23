@@ -1,105 +1,109 @@
-Return-Path: <netdev+bounces-225440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5BB8B93A70
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 01:56:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB17BB93A89
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 02:00:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC2451894EEC
-	for <lists+netdev@lfdr.de>; Mon, 22 Sep 2025 23:57:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EA143A7CD4
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 00:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87152F4A03;
-	Mon, 22 Sep 2025 23:56:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC323EEB3;
+	Tue, 23 Sep 2025 00:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y90a5Fb8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UsLxTdPo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361632C187
-	for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 23:56:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E8D4A0C;
+	Tue, 23 Sep 2025 00:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758585402; cv=none; b=aU76YGPCnCMvgsCVCekUAYGGqHWgWrNFy1HvPRRPO3xhc5YbYFknWW8VtnhS6xMudc8YdCgSYI1Kpiw1+D+IJmRDpdE/tWxNws9yUD4wTIOEpxlNCujB3T/uADZwa8Wk4nVZK0e/7HPNmqxjIzP1vWFGnAQ0Nk/Z+YUqAxMaWF4=
+	t=1758585623; cv=none; b=N4m/6Os0WRdZIPOv3qhPA6GxtoWnYDo5XgGcI9hIhGOz0omran5T2epNKAQIy+6ErMcJmlB/Ilb/iDitvp2YZ4GUaA+IGrV58NjlCWDFbxD+4UWN3sXfwwPCQ+7zncZ7Orib/3NPvl8/dWJB08lo3XFPFrZ+p23nr551fq615/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758585402; c=relaxed/simple;
-	bh=lUVNUim699D2pSehdz0uONhBPvRLCB0gZ2x8hvIHyr4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X5xn4Jc2Ay6OZ1Go2jyk5Xkx3RqJ4jwUecE4A29gWdbOSeEkdzGwiHUseqFUuoS/lHLRGMT7ZAf91/5TBj0LXrWOk6nKln04NNPyghRmZ0mZYIUxEgOVwXWy9zFZmHAtNHgta4YfUvl1Yq1CLCXfUYw76zUaDc2q+I6HuWbkBaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y90a5Fb8; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b551350adfaso3903340a12.3
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 16:56:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758585400; x=1759190200; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lUVNUim699D2pSehdz0uONhBPvRLCB0gZ2x8hvIHyr4=;
-        b=Y90a5Fb8IPKuksW7v1xPaISfe4xK6Ig8JGpUDkGmYLCbOLcYsDWdoP7eUx4PEoC+J2
-         /FY64P7VAxsXC4MyGbjj6OqzeCN5iOA+EDMN6G7qtH/VNfR3G22TJDiFYYavm16NQxxZ
-         TRH5vA4VyEEC6IDpDGiCwTI+gFV+P+/bVkamD/WaurApVmEPPt/KvwwyKgqaN2VpGML7
-         JWzxGD/ETue+FWRjGEgK/FtXdi5U8QtCMkAZubLMoYakNnOaumutmVpBeFU2BMCuyh27
-         9GI0rQRS/jD6D8Ena928goQdIe2K3oOlOXhA9M43ntDOYN7j7xF4e0oxV0cpKdOulDaW
-         JSAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758585400; x=1759190200;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lUVNUim699D2pSehdz0uONhBPvRLCB0gZ2x8hvIHyr4=;
-        b=o29ALl3N6rTNiP70HFtHyLaKNmNAtwFjJWhJ+mCBe6cpFuUs5DQjxyLLACgHD/IpmX
-         Ufs0ke7IlDW2p+JSkKgjtar5nmWMgpi4QwORhQZnuVtyQDu/iofH6Rcq5htSLR8KKfVw
-         Dh9sgeysdnXVDnRM1YwxU3afQe3bm4fTtSGbTR+X5BSEeUJf9Qs3Veuz+d3Sfdy/Y0LZ
-         b3RH6kJwWFfCvV1t77IfYVRITb/BkXww1Tc6qGOnDob4/naTobRNmLMAMQXhGrTAmKq3
-         0MhE7XcRLOiWeLik9cvh/dBwOyb7ReWejg0UOWA0SVcnSI3BQgnHOhQKQWje+5Q94vYT
-         YHpw==
-X-Forwarded-Encrypted: i=1; AJvYcCWcH20mVCljdK4Ii8ces8jC+8OAsaPdTOX6RSbjuqXCwVnKNoWwat4KdRg4NOELvGT/kzh6ZsE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDWbogLq9LAY28RUwvDfDCWVc7vZb0yvMxd9O7OOAkwsCUpZUR
-	gOGYgZCA+JNcJJf2x8SgmLOMsswkzXtsUgkuIT4RCj/LupkKwxYAI81C+VZvZH9tCwzblezI1Bn
-	ETkckt8wPx2NB4jCjInv8KyljxmoZFLXMySVd1puc
-X-Gm-Gg: ASbGncvP0RGSouqsl6h7nOFLwlaY0+tS8bi5ZN11swCqJzGWtw/ppEyRtIkxCsvtOsJ
-	iIuldZqXOqfvxOjW2eqJrMBXV14WyqVYW6LpTgZJf95U8ECyhHqyMev4A1af4wpKIG1sF6oV/uI
-	T1iSNA7WBmVyQ/OpX/kt3OM2u0RqHteWM+W2MAyVTyWVz4Zd0sfaqjL+aHRYJiN7yGk3mL+tQIe
-	0FZkk/VkMKrTixF/0DnrRGaGW1IYMxslXEGqQ==
-X-Google-Smtp-Source: AGHT+IFr8622ZNA60fEnIpq5SSUfRj55NZPJHcgm3fnFKNsz7du8nJp/ZB2zpMD425cbBy/obySl86UKQHmCjqJcsOk=
-X-Received: by 2002:a17:90b:4c45:b0:32e:a59f:b25d with SMTP id
- 98e67ed59e1d1-332a9705e25mr875509a91.30.1758585400323; Mon, 22 Sep 2025
- 16:56:40 -0700 (PDT)
+	s=arc-20240116; t=1758585623; c=relaxed/simple;
+	bh=aTWqzVPJp0tVTroXybp1dWR20hXFzK6CE/cu3gnsP2M=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MtXnn6Ixj0KqhQcKS9Xy0IBVOU8tJB+4PSJpCAqTHuFGn5NNneF9oIllbjwvJfj5LY1wjVIfdhNeMEs+skrh6RaOoPpv2VlmhiH54Y4+CoqxTbBLKFsCn6SM2ieiWpzRe2/4Ny3rfjlRwn618FD5KNMxD0NXc9cyLpzre8H4SrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UsLxTdPo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44884C4CEF0;
+	Tue, 23 Sep 2025 00:00:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758585622;
+	bh=aTWqzVPJp0tVTroXybp1dWR20hXFzK6CE/cu3gnsP2M=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UsLxTdPoIVxjiuhJ6oZeR9qTPblPBR9Y9z0Uhe4K2JHa2zoy5Y0LxePt8G+Ba6edM
+	 1+imKt2kjzsUvRHujnNO9AQFxx0L6g2Ujs3FLew/ASwe+WJFfszmmIBQ2FSVo3dbVB
+	 5t0myHcoi7VsSnx3p9UMYu3xZqmySNC2WRqO6/LI14d5FbznNTr50x+WcQ+LEh2NdY
+	 fpNXvAc5ZxhE09Kq3M6VPAL2PYKKS8173UX7XLhyEEjpVMfXyd/DJGUOcZN0xBY5+2
+	 XVpptoHs+nFYI+anTVs93w7sIVNwDcdivN2MEJIW5JFQdv5qA0iEAts7y3gIX6nXGa
+	 qYL7ip2lq7rAg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF1D39D0C20;
+	Tue, 23 Sep 2025 00:00:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250919204856.2977245-1-edumazet@google.com> <20250919204856.2977245-6-edumazet@google.com>
-In-Reply-To: <20250919204856.2977245-6-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 22 Sep 2025 16:56:29 -0700
-X-Gm-Features: AS18NWBzRqpGWStLWzou9WNV17sLpphx8hCjvebQKp9Z8AXzzfeXcP8ygniiEeg
-Message-ID: <CAAVpQUAV9v04akO6w41TWbQWXy7qwvsOfW7Fc0A+sc9yTKdgKw@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 5/8] tcp: move recvmsg_inq to tcp_sock_read_txrx
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/8][pull request] i40e: virtchnl improvements
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175858561975.1199974.11092135002090778258.git-patchwork-notify@kernel.org>
+Date: Tue, 23 Sep 2025 00:00:19 +0000
+References: <20250919184959.656681-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20250919184959.656681-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+ lukasz.czapnik@intel.com, przemyslaw.kitszel@intel.com,
+ leszek.pepiak@intel.com, jeremiah.kyle@intel.com, gregkh@linuxfoundation.org,
+ stable@vger.kernel.org
 
-On Fri, Sep 19, 2025 at 1:49=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> Fill a hole in tcp_sock_read_txrx, instead of possibly wasting
-> a cache line.
->
-> Note that tcp_recvmsg_locked() is also reading tp->repair,
-> so this removes one cache line miss in tcp recvmsg().
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+Hello:
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+This series was applied to netdev/net.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
+
+On Fri, 19 Sep 2025 11:49:50 -0700 you wrote:
+> Przemek Kitszel says:
+> 
+> Improvements hardening PF-VF communication for i40e driver.
+> This patchset targets several issues that can cause undefined behavior
+> or be exploited in some other way.
+> ---
+> IWL: https://lore.kernel.org/intel-wired-lan/20250813104552.61027-1-przemyslaw.kitszel@intel.com/
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/8] i40e: add validation for ring_len param
+    https://git.kernel.org/netdev/net/c/55d225670def
+  - [net,2/8] i40e: fix idx validation in i40e_validate_queue_map
+    https://git.kernel.org/netdev/net/c/aa68d3c3ac8d
+  - [net,3/8] i40e: fix idx validation in config queues msg
+    https://git.kernel.org/netdev/net/c/f1ad24c5abe1
+  - [net,4/8] i40e: fix input validation logic for action_meta
+    https://git.kernel.org/netdev/net/c/9739d5830497
+  - [net,5/8] i40e: fix validation of VF state in get resources
+    https://git.kernel.org/netdev/net/c/877b7e6ffc23
+  - [net,6/8] i40e: add max boundary check for VF filters
+    https://git.kernel.org/netdev/net/c/cb79fa7118c1
+  - [net,7/8] i40e: add mask to apply valid bits for itr_idx
+    https://git.kernel.org/netdev/net/c/eac04428abe9
+  - [net,8/8] i40e: improve VF MAC filters accounting
+    https://git.kernel.org/netdev/net/c/b99dd77076bd
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
