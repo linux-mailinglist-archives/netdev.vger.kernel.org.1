@@ -1,168 +1,161 @@
-Return-Path: <netdev+bounces-225690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E8B9B96FAF
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 19:17:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13483B97078
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 19:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15E8318A552C
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 17:17:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C312A3AE22E
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 17:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6763027934B;
-	Tue, 23 Sep 2025 17:17:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F0927E041;
+	Tue, 23 Sep 2025 17:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bR69AqSe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N7txsixn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f228.google.com (mail-vk1-f228.google.com [209.85.221.228])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD76D2737FB
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 17:17:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D0626CE0C
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 17:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758647832; cv=none; b=Jzay6jTFx4I+BA7MrmA7YvKyGLimmbWEOFI9vGm+Z/wzmQOG7mY0Zy3dR9p8w43hB3V5KxQ7Tf2V+Sj5MhoQ1T/cG3NtNVFVDWfyR3SzXhlN3raN8voF8PUj/YO9S5ge4pZ5OfXe1V/jm7gBPi+JHtTA7vJtApn7lRa7ZaNHkkc=
+	t=1758648633; cv=none; b=UtAtw7tQhamHm4pxOT2mfXWGHhWsPEnm8FAxA8LFmQ620IrJe9QOPdRWUsTlt3smI41ediQD3pwx6gJzwquEkRxcQug3WAZr7daDHMHRZcCtVEH2z86grYmsYPu2u18eg2/uVNjUrtfhZ5HwCGwGBKqSi3pZ43Wp53DOFtW4mNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758647832; c=relaxed/simple;
-	bh=2EGHVQtTFIYKF5voFEiTBzC9TbQhQGA7OeekjX1wpxs=;
+	s=arc-20240116; t=1758648633; c=relaxed/simple;
+	bh=hghWyqMLEkBfQ6eizevoRvpGAa/9gRmG+OWcHoOGofk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r0Idn1xKklyz5pzlK2vs4trgcUTUaZJj58+65RENb/qGxlTQxrujMujpPKLIM0yUK+q93UAnkTg9kK5cawJmvxlYhToXP/4mzQIqhkf72GkxAzvp5opk9vt0MeA/+RfNok/MY5gItQbIhl7aCqfhWP6tzBgN2bPwyYLZ82f3fyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=bR69AqSe; arc=none smtp.client-ip=209.85.221.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-vk1-f228.google.com with SMTP id 71dfb90a1353d-54bc6356624so70635e0c.1
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 10:17:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758647829; x=1759252629;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GBmDDXU1IVnC7UAPPZvbxGn03hq5hZpSF1QqVSLzmLw=;
-        b=BjQCtX9BEe0aRo1XpkowtTRm/TmMWN+fAn46aitTdEExFzgHHRvVmgTvea2uYXnhVu
-         tUEtm+OtMWcTOK+NS2oowDA8MYp58JLbAMG2p7gDTLh1uJHBzdJBU0EMawYLH2p+5WqD
-         FCeQrSXtmIiCpw7/lyUkZyXOYL5LvaUSh0ofrmzfRxr73U/WhpuKHKPiFWct4uLZJIt/
-         Oe+1L+cEz1sT88Tu+3bl8AazppqKoBtH8+kohUKLQLU+NYoSvWL60kH9whc3ZVouka8a
-         fudTH1R08dWuEIfuL08UxdXyhNNOBU+Y29pO28yh5ll0iSo+ryVePU+452B4vV3OX6IR
-         wkNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVoV0Bl0a4Mj1wZQQEcu7GSoa7tw7ltUMgP4h+z32PIEQypzt0YvrgZ9JW2PTReeKFBKgdLDLU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoaLyE43t3aLLMG4TEREuRvEgO2ka9ItdpldJFNxkjS7hv7xsS
-	XeiqbMM66ZT3qK7sOfENrdphtN3BxUSa1SqW4rZCcVd+eNSRICq6HY6pb4bugom9YcbEi2P7gBh
-	pTBkq5lkpXLzxHYloxs+JoNtzle52fTtf/6sfxvBszAmNv1c5QP144dO4fuQHqbSyl3E3eNv902
-	r529VPDdScxbZaiH3wdn6cuXkyKVsghVCT6LSLUR8o3H1+1/Y+NLu5Xq1SYjXM7xSjfSISjpzZw
-	Ap4elj01Ck=
-X-Gm-Gg: ASbGncv+mdtiK06pnCAmLc92LnWO6y3r+ivqHJEgUMkuILhZq6zUqtx71n3qg4RON33
-	pEC/JJTf7bqC3aUKq60KWgau0MojoILypFtownnwwBvewgD6zGyvRqp6XbR7Mw8F05bFDDYpoZE
-	/USE+WZpf0AV+UEwUZgcEkoINdFgsNDFuchkv+3/0yHzd5/xh1SxjVMx4+BHe1dHDU6vBt6uv2+
-	eKYlUcFVETF02Nu8+EnKZSyin7TRfM4Wqa8u0ahTjvhXeeSMnsXpxHI11N1DDOz3E9A7M8eEpOV
-	RTUDVMmO3c2lOc9ttUMxWHV75rWDmqRreRGLXNMw8BjyOEz0oEtsCRm2GzZYPPiiJyyEPmQoiqA
-	Y8JDSW3GDdM4iglKPhLObhENxsuRPX9eQ9lcPV6A7xWDbb0zA0mws27dAearQO9yNqJ3/4Z7Xdk
-	s=
-X-Google-Smtp-Source: AGHT+IF/NwDCzcAt7gb6Fkh57sR9bK7o4SQcFpXz05p9Z/lThdwJllii7N+WCHmXZJYghpVe0q3vpeQJakw+
-X-Received: by 2002:a05:6122:659b:b0:54a:87d3:2f2d with SMTP id 71dfb90a1353d-54bcc0fa89cmr1163273e0c.2.1758647829518;
-        Tue, 23 Sep 2025 10:17:09 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-25.dlp.protect.broadcom.com. [144.49.247.25])
-        by smtp-relay.gmail.com with ESMTPS id a1e0cc1a2514c-8e3e7afb20esm155928241.6.2025.09.23.10.17.09
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 23 Sep 2025 10:17:09 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-3306543e5abso97641a91.1
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 10:17:09 -0700 (PDT)
+	 To:Cc:Content-Type; b=UwWJhv8qr5P1dQab8llSKZkxdeXFAX447O8xYkWNZ6/onI7aFfU3/2a3TjmeJuq59G483g557078rwWwJ8XXJMD9v6qEZJXQuS3sl7NoiHbfZzsxjtzPpu0HNfQDXx8fOFCLfis8aO+J0P72m+/+8kh53KszTASWOeTf55U7imA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N7txsixn; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-77f2077d1c8so115540b3a.0
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 10:30:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1758647828; x=1759252628; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758648631; x=1759253431; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GBmDDXU1IVnC7UAPPZvbxGn03hq5hZpSF1QqVSLzmLw=;
-        b=bR69AqSeq2DAlw1En+Y1NQBh5Xa0cfUYorRVSU3rt7Ai7xsQ+u96RhCh6uaILmylu3
-         v8rHJ2dv6b3R3n9lUR+MfRsm6rhj0eu9zd+Dv6uk1PLcqHqhabOSrApAi9Ytg9urYhX4
-         Oz0CnKlebIB0qfR1SIySYaoThd+3Atw1Fn8CU=
-X-Forwarded-Encrypted: i=1; AJvYcCV+JgDxaVd/tt6ewoYGEaFIv7HnVVj9gJzo74sX/2CgZEUE/UG4uE4StVJcdQ67xDAyrpCohjg=@vger.kernel.org
-X-Received: by 2002:a17:90a:d44c:b0:32d:e309:8d76 with SMTP id 98e67ed59e1d1-332abf0482dmr3556719a91.10.1758647826826;
-        Tue, 23 Sep 2025 10:17:06 -0700 (PDT)
-X-Received: by 2002:a17:90a:d44c:b0:32d:e309:8d76 with SMTP id
- 98e67ed59e1d1-332abf0482dmr3556688a91.10.1758647826409; Tue, 23 Sep 2025
- 10:17:06 -0700 (PDT)
+        bh=otSvr9lp4hjuRht1Ui7CukSWsccNU1CrkcBBZa9JT28=;
+        b=N7txsixn1hOuj81pR6oPrWvG/agfoS+y3XG/5Uw9TfrJgglBmiZm++8OoAYvKFb9IO
+         ZX8iY2gUpXiAH+Xj95oFps0qBKm1eHHcTU+BY7gONfHQk+BLtGdYdb0jgSvV9Jde3pKE
+         +g2gFfWAUkEkmddAnka6otlyyhDMEVDUPuy1PRU4j+Aq46PrFTINZiHfC2I9hRaoKbkI
+         HQzXzAzlI/EvCasLkG0J10Y3/75d7ZJUoMb4rKZo4gu7y2d3M2+XaCViYjGFNLL5ndRF
+         03qLvw4NSZAzK/y17d23D+Ti1oSpPGMzALJ12kRP4lEmMpsEs+J9yom/u3Rl3gWKmWeD
+         JL7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758648631; x=1759253431;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=otSvr9lp4hjuRht1Ui7CukSWsccNU1CrkcBBZa9JT28=;
+        b=XU3wdn8SV2d9/1z5eDTJazIPUWk0Kd6SEK+3joubUIkpdVHZN9shK5HRsY/T2xUTrG
+         wPipaypteXJVGcBT4lLKk6K/BI+p/+6Va0ixXUfSJTWyxBsMctUjErx5cXiIvDgtbqzB
+         ikl18v1mLT8LD39kQTnbzrY7j9EVB8byQJzl2DiGOkH6ZFD/0N0TP9QT7+hpVA7fUlk0
+         molVUceg3nI+jDFJxdYMt9fhPI2cRp17zMBZH2A1Pk885kh9JwK7yH155hp+OAVTdKWx
+         QMaDhVMHSwTRayLU849d+DP76mVct4gDJLvnilKzhDYQHRIAA6RGdy+98oC+cqzjtrOY
+         zf+Q==
+X-Gm-Message-State: AOJu0YzdNAcITxcwTYxgRfia8axc1NX99X9dzZuRA6W5qg3pR7MBaxmj
+	eho/EpCw+HswXip2ujbXiZG+yVPt6svawhYw1Emo6kt5+vIAaYPJ9LhZpe5ahBH1ABD7ESz9GOK
+	QyyZr5IiTTG6CbqN7bkqgXtVK4U+t8YM=
+X-Gm-Gg: ASbGncuNw6rL5Ozj8Gk1dF58dBp8jJ29p2okjKLc/wLSKpRyKFP8p3NzV6b3zR0b+x0
+	1nj1H91CHSAMVlUmmosdBJ7eFgPJwG99e+HY2uHuL1pDw2pMNjdVQK3Zr3+vZYOIpWkyTrGvsqw
+	kzvBQMcaoZmCpZjj2H9OQnOR8OBZvWvSZlVpu9DG2xf98tUeVMDki1IkEX30ZXomuKPMyXm4Ri6
+	wUhL3zE8Q==
+X-Google-Smtp-Source: AGHT+IHb7FTPS0aqNTQzQxRJZ7PGJRzwxQRu5Dd0GpM/MUJTuLqqFTKwQpdKNuhZ2pSdZPeFP657nduMMphE8QtkB48=
+X-Received: by 2002:a17:902:fc8d:b0:26b:3cb5:a906 with SMTP id
+ d9443c01a7336-27cdaa73d2amr41672395ad.16.1758648631008; Tue, 23 Sep 2025
+ 10:30:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
- <20250923095825.901529-2-pavan.chebbi@broadcom.com> <aNLL3L2SERi2IRhg@x130>
-In-Reply-To: <aNLL3L2SERi2IRhg@x130>
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Tue, 23 Sep 2025 22:46:55 +0530
-X-Gm-Features: AS18NWDSgTGQIvq55yTTrk6GUjzApEVTNtvqI6c1mBhhg7R_jkrg5J4b3JzOxkU
-Message-ID: <CALs4sv0F+RW8gFu83=1-PfdbT7Eyfy6Kb2FYiAP3JhuVw7Jo7Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/6] bnxt_en: Move common definitions to include/linux/bnxt/
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: jgg@ziepe.ca, michael.chan@broadcom.com, dave.jiang@intel.com, 
-	saeedm@nvidia.com, Jonathan.Cameron@huawei.com, davem@davemloft.net, 
-	corbet@lwn.net, edumazet@google.com, gospo@broadcom.com, kuba@kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch, 
-	selvin.xavier@broadcom.com, leon@kernel.org, 
-	kalesh-anakkur.purayil@broadcom.com
+References: <cover.1758234904.git.lucien.xin@gmail.com> <5d71a793a5f6e85160748ed30539b98d2629c5ac.1758234904.git.lucien.xin@gmail.com>
+ <20250923090951.GF836419@horms.kernel.org>
+In-Reply-To: <20250923090951.GF836419@horms.kernel.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Tue, 23 Sep 2025 13:30:19 -0400
+X-Gm-Features: AS18NWC9LYwbDwlF4C91L7kgoi_08hlFtRBrmqddeIKr75MWVxTZmLpz7q1S7tQ
+Message-ID: <CADvbK_fCEr+oRvbtomrN8=cJc9nLFLioAXATJsU6_r24r3WOtw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 06/15] quic: add stream management
+To: Simon Horman <horms@kernel.org>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
+	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
+	Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
+	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-.
-
-On Tue, Sep 23, 2025 at 10:03=E2=80=AFPM Saeed Mahameed <saeed@kernel.org> =
-wrote:
-
-> >diff --git a/include/linux/bnxt/common.h b/include/linux/bnxt/common.h
-> >new file mode 100644
-> >index 000000000000..2ee75a0a1feb
-> >--- /dev/null
-> >+++ b/include/linux/bnxt/common.h
-> >@@ -0,0 +1,20 @@
-> >+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> >+/*
-> >+ * Copyright (c) 2025, Broadcom Corporation
-> >+ *
-> >+ */
-> >+
-> >+#ifndef BNXT_COMN_H
-> >+#define BNXT_COMN_H
-> >+
-> >+#include <linux/bnxt/hsi.h>
-> >+#include <linux/bnxt/ulp.h>
-> >+#include <linux/auxiliary_bus.h>
-> >+
-> >+struct bnxt_aux_priv {
-> >+      struct auxiliary_device aux_dev;
-> >+      struct bnxt_en_dev *edev;
-> >+      int id;
-> >+};
-> >+
+On Tue, Sep 23, 2025 at 5:09=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
+te:
 >
-> This file is redundant since ulp.h already holds every thing "aux", so th=
-is
-> struct belongs there. Also the only place you include this is file:
->    drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> On Thu, Sep 18, 2025 at 06:34:55PM -0400, Xin Long wrote:
+>
+> ...
+>
+> > diff --git a/net/quic/stream.c b/net/quic/stream.c
+>
+> ...
+>
+> > +/* Create and register new streams for sending. */
+> > +static struct quic_stream *quic_stream_send_create(struct quic_stream_=
+table *streams,
+> > +                                                s64 max_stream_id, u8 =
+is_serv)
+> > +{
+> > +     struct quic_stream *stream;
+> > +     s64 stream_id;
+> > +
+> > +     stream_id =3D streams->send.next_bidi_stream_id;
+> > +     if (quic_stream_id_uni(max_stream_id))
+> > +             stream_id =3D streams->send.next_uni_stream_id;
+> > +
+> > +     /* rfc9000#section-2.1: A stream ID that is used out of order res=
+ults in all streams
+> > +      * of that type with lower-numbered stream IDs also being opened.
+> > +      */
+> > +     while (stream_id <=3D max_stream_id) {
+> > +             stream =3D kzalloc(sizeof(*stream), GFP_KERNEL);
+> > +             if (!stream)
+> > +                     return NULL;
+>
+> ...
+>
+> > +     }
+> > +     return stream;
+>
+> Hi Xin,
+>
+> I'm unsure if can happen - actually I doubt it can - but
+> if the loop above iterates zero times then stream will be used
+> uninitialised here.
+This can't happen.
 
-Hi Saeed, later bnxt fwctl will include it as well. You could say it
-can still be
-inside ulp.h but fwctl is only going to need bnxt_aux_priv. So I
-carved it out of
-earlier bnxt.h.
+But it's better to initialize it to NULL. Othersize, it always looks
+like a potential issue.
+
+Thanks.
+
+
 
 >
-> So I am not sure if you have your include paths properly setup to avoid
-> cross subsystem includes, in-case this was the point of this patch :).
+> Likewise in quic_stream_recv_create().
 >
-> >diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h b/include/lin=
-ux/bnxt/ulp.h
-> >similarity index 100%
-> >rename from drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-> >rename to include/linux/bnxt/ulp.h
-> >--
-> >2.39.1
-> >
-> >
+> Flagged by Smatch
+>
+> ...
 
