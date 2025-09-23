@@ -1,163 +1,108 @@
-Return-Path: <netdev+bounces-225597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DE38B95F16
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:08:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D73D9B95F49
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:10:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE862486FCE
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:07:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9270A1890060
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC80C326D6D;
-	Tue, 23 Sep 2025 13:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44D15326D67;
+	Tue, 23 Sep 2025 13:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7JPCkPb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uxTvbuAS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D54A326D4F;
-	Tue, 23 Sep 2025 13:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1844F326D4D;
+	Tue, 23 Sep 2025 13:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758632837; cv=none; b=Pwnsm+V8m5e5tnVcohe7GekC9bojJWrjsYgFYQZ3pWHOl2L3dSEMZvl0JM6UXLfJ8WsK3UCzeB+ikvOgWxH4YGodsV0MJqFUrmNXu7FNPizTVibYqxd8xqAUZTlkg632g9A6ATQNNAZmLAS+uHmJXhqKrCFPsjaHI65Tonpvn9g=
+	t=1758633013; cv=none; b=tvqqANh4LDHzfJJxwzv+vL+aSCHmIMqc7fuZQJokEap3XUsEnXSB5eVaaz+JtkvatQfgjTjrONMaCNV5Cm2P98BN2r71CkQt2LWiVIzJGcPy4NZ6ZBdrq6PxTCwg3ccVmiOUJSa6+MD+9dBnAnewzx++Yn/NibP/4mYR3z+2BFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758632837; c=relaxed/simple;
-	bh=PQoE3TRiHN3oelWgg/hV7+6jVJh7jqizuFT7IsX27rQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=XMLVfiTU1DfNDYtDCFo+9U4kmODXangBX1naljhSLTSqFbvJr0KNCFN5xjYFYye8tncZM11IqjpqicHGHTtcm55CF+8YlOpgUg7OQC6DpZ0x0TWprCqCSxmGIAcl5cofbsDjyOHvU64U8Z1WaXgoF1v6QEQHPZ+FHw1KI6B9IVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X7JPCkPb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8389EC4CEF5;
-	Tue, 23 Sep 2025 13:07:16 +0000 (UTC)
+	s=arc-20240116; t=1758633013; c=relaxed/simple;
+	bh=3eTEM5iteMPKpUUiayTkYaX7myBwc3OUeGnJqH5onNw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N9ERFZwc8Z0d8l6tnfAoOveYBYPiFMSuMYM9bIycb8Pq68WAqf1Z8EIYquW5S9j5XRiIVH7fDE0XuSFAvCryvNS9RZcylNhcNv/PaNX6vLX2OP+NlERqN7uEWqBK5FZXGXvo49txG3INvcIcDX/m27oVfb6+X3YlhWUS+tzlAz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uxTvbuAS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EAC7C4CEF5;
+	Tue, 23 Sep 2025 13:10:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758632837;
-	bh=PQoE3TRiHN3oelWgg/hV7+6jVJh7jqizuFT7IsX27rQ=;
-	h=Date:From:To:Cc:Subject:From;
-	b=X7JPCkPbvMuvYEi8d2DY0MFlp2rz4K5IjNJ9rkLaHvAF855wEERBxb9WT4RZWYbD4
-	 JoShFvQIeu9grbepXiocreI/4TCbRAxxuGdEj4ZzZnCBm58ZlU15PFfQ3MPXM+7aXB
-	 2nNTDOH3nJ6KWsr01Ou2wWHp5ClUXc7iKy9XX7SDxlQIbpcEDWUkuk91EQW/iSzsg2
-	 M8nVbIpHYA6gzZQThDoxmTklUh9RzE/BePwcsZOEd5HqZT9pLvG35RXYMV8DjpFkk5
-	 peCHmmKTdO4e0V4BnpH6zE4U9Ye2xI0v+4htDZavQCWHGBuKxwthmzhgHrzvipaal5
-	 WnY0oCKS+urqw==
-Date: Tue, 23 Sep 2025 15:07:13 +0200
-From: Mark Brown <broonie@kernel.org>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	s=k20201202; t=1758633011;
+	bh=3eTEM5iteMPKpUUiayTkYaX7myBwc3OUeGnJqH5onNw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uxTvbuASkvlEqAuHBYNx3FhRWzQd1sr6u8f3MwHB20Eeci9+PGh1yQh1c525P7zi6
+	 tFvlD4NIm8Xl+43c58KqPIREiZAi7/IwK9hqLgKGIizsJR5+BmmrXUkTA9we+Lq8iz
+	 A0GP3mUWKZNPlybZwogmBOUnZdeFY/q6JIKSnj1EblWryF7L07UEk8Id9yeqiY3QER
+	 oxGlbFTUtLEO2Pv+ItLS24AgG0Btp3gz2FNrn0rqSnPBqOc8XJYpX7lUzOUY2mJhMV
+	 yTEan4n/dV1S2/X4ebR7ShUPVsYa3gm0W2mFLvAcJAA2+2Jrpv1XnAZrlL6d/ou1Xb
+	 gzvb7Y2FQ+J/w==
+Date: Tue, 23 Sep 2025 14:10:06 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Networking <netdev@vger.kernel.org>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Julian Ruess <julianr@linux.ibm.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the net-next tree with the s390 tree
-Message-ID: <aNKbgf7GyU5JP3Zh@finisterre.sirena.org.uk>
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next 2/2] net/mlx5e: Clamp page_pool size to max
+Message-ID: <20250923131006.GK836419@horms.kernel.org>
+References: <1758532715-820422-1-git-send-email-tariqt@nvidia.com>
+ <1758532715-820422-3-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="TimwGka/Vk6vDuIJ"
-Content-Disposition: inline
-
-
---TimwGka/Vk6vDuIJ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1758532715-820422-3-git-send-email-tariqt@nvidia.com>
 
-Hi all,
+On Mon, Sep 22, 2025 at 12:18:35PM +0300, Tariq Toukan wrote:
+> From: Dragos Tatulea <dtatulea@nvidia.com>
+> 
+> When the user configures a large ring size (8K) and a large MTU (9000)
+> in HW-GRO mode, the queue will fail to allocate due to the size of the
+> page_pool going above the limit.
+> 
+> This change clamps the pool_size to the limit.
+> 
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> index 5e007bb3bad1..e56052895776 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> @@ -989,6 +989,8 @@ static int mlx5e_alloc_rq(struct mlx5e_params *params,
+>  		/* Create a page_pool and register it with rxq */
+>  		struct page_pool_params pp_params = { 0 };
+>  
+> +		pool_size = min_t(u32, pool_size, PAGE_POOL_SIZE_LIMIT);
 
-Today's linux-next merge of the net-next tree got conflicts in:
+pool_size is u32 and PAGE_POOL_SIZE_LIMIT is a constant.
+AFAIK min() would work just fine here.
 
-  arch/s390/configs/defconfig
-  arch/s390/configs/debug_defconfig
-
-between commit:
-
-  e11727b2b0ca2 ("s390/configs: Enable additional network features")
-
-=66rom the s390 tree and commits:
-
-  d324a2ca3f8ef ("dibs: Register smc as dibs_client")
-  cb990a45d7f6e ("dibs: Define dibs loopback")
-  69baaac9361ed ("dibs: Define dibs_client_ops and dibs_dev_ops")
-  a612dbe8d04d4 ("dibs: Move event handling to dibs layer")
-
-=66rom the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
-diff --cc arch/s390/configs/debug_defconfig
-index b692c95f8083a,fdde8ee0d7bdd..0000000000000
---- a/arch/s390/configs/debug_defconfig
-+++ b/arch/s390/configs/debug_defconfig
-@@@ -118,15 -118,12 +118,17 @@@ CONFIG_PACKET=3D
-  CONFIG_PACKET_DIAG=3Dm
-  CONFIG_UNIX=3Dy
-  CONFIG_UNIX_DIAG=3Dm
- +CONFIG_TLS=3Dm
- +CONFIG_TLS_DEVICE=3Dy
- +CONFIG_TLS_TOE=3Dy
-  CONFIG_XFRM_USER=3Dm
-  CONFIG_NET_KEY=3Dm
- +CONFIG_XDP_SOCKETS=3Dy
- +CONFIG_XDP_SOCKETS_DIAG=3Dm
-+ CONFIG_DIBS=3Dy
-+ CONFIG_DIBS_LO=3Dy
-+ CONFIG_SMC=3Dm
-  CONFIG_SMC_DIAG=3Dm
-- CONFIG_SMC_LO=3Dy
-  CONFIG_INET=3Dy
-  CONFIG_IP_MULTICAST=3Dy
-  CONFIG_IP_ADVANCED_ROUTER=3Dy
-diff --cc arch/s390/configs/defconfig
-index 22c801449139c,bf9e7dbd4a895..0000000000000
---- a/arch/s390/configs/defconfig
-+++ b/arch/s390/configs/defconfig
-@@@ -109,15 -109,12 +109,17 @@@ CONFIG_PACKET=3D
-  CONFIG_PACKET_DIAG=3Dm
-  CONFIG_UNIX=3Dy
-  CONFIG_UNIX_DIAG=3Dm
- +CONFIG_TLS=3Dm
- +CONFIG_TLS_DEVICE=3Dy
- +CONFIG_TLS_TOE=3Dy
-  CONFIG_XFRM_USER=3Dm
-  CONFIG_NET_KEY=3Dm
- +CONFIG_XDP_SOCKETS=3Dy
- +CONFIG_XDP_SOCKETS_DIAG=3Dm
-+ CONFIG_DIBS=3Dy
-+ CONFIG_DIBS_LO=3Dy
-+ CONFIG_SMC=3Dm
-  CONFIG_SMC_DIAG=3Dm
-- CONFIG_SMC_LO=3Dy
-  CONFIG_INET=3Dy
-  CONFIG_IP_MULTICAST=3Dy
-  CONFIG_IP_ADVANCED_ROUTER=3Dy
-
---TimwGka/Vk6vDuIJ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEyBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjSm4AACgkQJNaLcl1U
-h9CXUwf3b6tW49QUgVuPcW1g/dApNp13k5VCOjxQq4MvOhUE8j23lvuxAPvtUw9f
-hSiK/anX2vANRvJAMRMYvImghQIMsFacu4mdnN/KxLaOWQuUyvAwQkYVHvwGxg+U
-sngJ/Z2e9njTKBfM/nZz3ZTAyYZf6pGXq8PwpfoT8Li+i4Ze2GIPCv+SmqdiJil6
-piu560FO6qMtkfhQpXHqbpBMTpmsdxcLNwFYNfVm5yzzrB+M3c6eWkAjeIgMoPBI
-OL1ZLUBOcguaWNL+CQfEuWALpnDCyMWAUqNTACMbib97MhJm/y/0FL+2E2AGHFvb
-jq93xPOdxMKMJ80q6BD5o5ufJFVi
-=QGbX
------END PGP SIGNATURE-----
-
---TimwGka/Vk6vDuIJ--
+> +
+>  		pp_params.order     = 0;
+>  		pp_params.flags     = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
+>  		pp_params.pool_size = pool_size;
+> -- 
+> 2.31.1
+> 
+> 
 
