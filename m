@@ -1,92 +1,179 @@
-Return-Path: <netdev+bounces-225657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0107B968D7
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 17:23:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01273B9695E
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 17:30:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED8567AE895
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:21:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAD7B18A64AA
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A413257830;
-	Tue, 23 Sep 2025 15:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3169014EC73;
+	Tue, 23 Sep 2025 15:30:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pvkBnLEE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HFEEdsVF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79C81E0B9C;
-	Tue, 23 Sep 2025 15:23:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5A050276
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 15:30:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758640992; cv=none; b=oElVE+wLgu/WJfYeRgkY8hJQ05fXVYTeXw8htgX5vAlU6KsMvMumAgE/3h+2EaFAmr4diWD5lqq93lDdDstxFEBmUzbLabn77oJ6CFPo+/5vNpGXPw4ZKog+IfzFNXYSoYX1MThHRKIzWL16MUP1FMg3I3YWY2VzkO+T+eFsJjg=
+	t=1758641452; cv=none; b=bUKdwp6m+kcMjyPSNAtpcxmeXdA5YI6uR2ShSNAZyPqHq/VVqlyKiXWEJXiGCizevX35c2Gc/ATPMqOO40soq6b1qzgrCLQQLB25XYC9NZwQrmawYycXco7XjuZ8T7XV+mX/WhA2KOCX42MbRtfko4kvsBiGvz4mremV65Xkj9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758640992; c=relaxed/simple;
-	bh=iWTdvTd18ug7RGIuY5XN1LnYLa6ileenwsLR0FWRDxY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CHt0kyVbteqbaxQRXOkH9EWVPoGeCxTFvDP1iirdzOkfrEomonPsW/7hkzhD4TVQUbn8883kwlTqO05mr20kjLHeGScsRAAeGDMDy7ERnmQD9o1fZaniGYQGWk5XlI4ix6FsboJg4+0b8oc3rc8QEQ8gvmUgZt2phUEJHv2hOF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pvkBnLEE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAED6C113CF;
-	Tue, 23 Sep 2025 15:23:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758640991;
-	bh=iWTdvTd18ug7RGIuY5XN1LnYLa6ileenwsLR0FWRDxY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pvkBnLEE2ltgyg6ZwvmA0uWE8A6nvX5u/30d9iRQrleloE5z/6yB4XchqAtFyCw9O
-	 MXskExp+GirsZSSZppO1jHdFMjYc4KKy75uXj/y4A470Mx551nvs96b+zTyQ/V0SpH
-	 cBwRyWvu/03vEj7HT8+6x/jx//5SudiFloKh885B5fuiDkncSeP8TAzL1i9tqLNVNi
-	 e3P8YJMcN959VjYyQCTgDHK7p57L467bH+LOZ1hDbDx7xHd9e6nuTaBpJxq4HqSIEc
-	 0pVwn0WDZ+u0vf1J1VqHgkEnLk6ZBTBz8HgFr1KZOwKJAYgBeihWWZrp6vjAipu0R3
-	 RxiyGGjxnG6FQ==
-Date: Tue, 23 Sep 2025 08:23:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Saeed Mahameed
- <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, Gal Pressman
- <gal@nvidia.com>
-Subject: Re: [PATCH net-next 2/2] net/mlx5e: Clamp page_pool size to max
-Message-ID: <20250923082310.2316e34d@kernel.org>
-In-Reply-To: <a5m5pobrmlrilms7q6latcmakhuectxma7j3u6jjnamcvwsrdb@3jxnbm2lo55s>
-References: <1758532715-820422-1-git-send-email-tariqt@nvidia.com>
-	<1758532715-820422-3-git-send-email-tariqt@nvidia.com>
-	<20250923072356.7e6c234f@kernel.org>
-	<a5m5pobrmlrilms7q6latcmakhuectxma7j3u6jjnamcvwsrdb@3jxnbm2lo55s>
+	s=arc-20240116; t=1758641452; c=relaxed/simple;
+	bh=BoZ3n31XF4k/zwk0/9nzF0zAUkK+pEhRgqlJRlN9Bls=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i3N6c66j2kFfRObEoJ+lZO2wYP74O3st0lzQpnBlrRb6NXYoTRjV64gzuuFNrxcLxOfoNSghwqzkuYdKcVsHijnVLe9cv61SkD9/B6MA1hSYqCqYrnpUuF1tbqyqPXbuoW/H+Kswik0A1Ob1M4fomkP3GAXQEA+DCnm2aRepBU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HFEEdsVF; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758641451; x=1790177451;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=BoZ3n31XF4k/zwk0/9nzF0zAUkK+pEhRgqlJRlN9Bls=;
+  b=HFEEdsVFrwv7wequs7e393An1BdS9FTosJ7lYAzVQSvHG0UeOeSb8CCy
+   cBKdBd6D+NMhvarQcN1hY852RZm48QIwk+4TXgl+zVQ6Yp6iWL1UfVH9X
+   z6PG95m2oMrgTkbguuo6KIIEM8upclSwuBkqx2L0rPcugKW5fjnez8tma
+   7I0QcrRu8l9peIbBwFJtZyi4gNWZKWtxCrni3m+aXT6Uduu6ImOjmCG+B
+   BUF3lNhbiU9zHOoL/6P1iC9bgdCUzfheAJDlDUFNLPGfz+i3iunjDJ3hX
+   +DQAhtGK7R3cpaFlZqT0+scaHAJWKxfJREjEkJfd7obl7HuRtur1U4ObX
+   A==;
+X-CSE-ConnectionGUID: b1Rl3aY/TQeu/MUuUACgTQ==
+X-CSE-MsgGUID: zJtG1hcaQ0meVLCD3Unzeg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="83527939"
+X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
+   d="scan'208";a="83527939"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 08:30:49 -0700
+X-CSE-ConnectionGUID: DHJdUguSRFmsy3PkqPxcYg==
+X-CSE-MsgGUID: I2vduRIeQmKTmHCMrFQusw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
+   d="scan'208";a="176875467"
+Received: from gklab-003-001.igk.intel.com ([10.91.173.48])
+  by orviesa008.jf.intel.com with ESMTP; 23 Sep 2025 08:30:47 -0700
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>,
+	Arkadiusz Kubalewski <Arkadiusz.kubalewski@intel.com>
+Subject: [PATCH iwl-net] ice: fix destination CGU for dual complex E825
+Date: Tue, 23 Sep 2025 17:29:04 +0200
+Message-Id: <20250923152904.1869397-1-grzegorz.nitka@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 23 Sep 2025 15:12:33 +0000 Dragos Tatulea wrote:
-> On Tue, Sep 23, 2025 at 07:23:56AM -0700, Jakub Kicinski wrote:
-> > On Mon, 22 Sep 2025 12:18:35 +0300 Tariq Toukan wrote:  
-> > > When the user configures a large ring size (8K) and a large MTU (9000)
-> > > in HW-GRO mode, the queue will fail to allocate due to the size of the
-> > > page_pool going above the limit.  
-> > 
-> > Please do some testing. A PP cache of 32k is just silly, you should
-> > probably use a smaller limit.  
-> You mean clamping the pool_size to a certain limit so that the page_pool
-> ring size doesn't cover a full RQ when the RQ ring size is too large?
+On dual complex E825, only complex 0 has functional CGU (Clock
+Generation Unit), powering all the PHYs.
+SBQ (Side Band Queue) destination device 'cgu' in current implementation
+points to CGU on current complex and, in order to access primary CGU
+from the secondary complex, the driver should use 'cgu_peer' as
+a destination device in read/write CGU registers operations.
 
-Yes, 8k ring will take milliseconds to drain. We don't really need
-milliseconds of page cache. By the time the driver processed the full
-ring we must have gone thru 128 NAPI cycles, and the application
-most likely already stated freeing the pages.
+Define new 'cgu_peer' (15) as RDA (Remote Device Access) client over
+SB-IOSF interface and use it as device target when accessing CGU from
+secondary complex.
 
-If my math is right at 80Gbps per ring and 9k MTU it takes more than a
-1usec to receive a frame. So 8msec to just _receive_ a full ring worth
-of data. At Meta we mostly use large rings to cover up scheduler and
-IRQ masking latency.
+This problem has been identified when working on recovery clock
+enablement [1]. In existing implementation for E825 devices, only PF0,
+which is clock owner, is involved in CGU configuration, thus the
+problem was not exposed to the user.
+
+[1] https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20250905150947.871566-1-grzegorz.nitka@intel.com/
+
+Fixes: e2193f9f9ec9 ("ice: enable timesync operation on 2xNAC E825 devices")
+Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Reviewed-by: Arkadiusz Kubalewski <Arkadiusz.kubalewski@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_common.c  | 30 ++++++++++++++++++--
+ drivers/net/ethernet/intel/ice/ice_sbq_cmd.h |  1 +
+ 2 files changed, 29 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index eb6abf452b05..5ea420c76f54 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -6382,6 +6382,32 @@ u32 ice_get_link_speed(u16 index)
+ 	return ice_aq_to_link_speed[index];
+ }
+ 
++/**
++ * ice_get_dest_cgu - get destination CGU dev for given HW
++ * @hw: pointer to the HW struct
++ *
++ * Get CGU client id for CGU register read/write operations.
++ *
++ * Return:
++ * * ice_sbq_dev_cgu - default value
++ * * ice_sbq_dev_cgu_peer - when accessing CGU from 2nd complex (E825 only)
++ *
++ */
++static enum ice_sbq_dev_id ice_get_dest_cgu(struct ice_hw *hw)
++{
++	/* On dual complex E825 only complex 0 has functional CGU powering all
++	 * the PHYs.
++	 * SBQ destination device cgu points to CGU on a current complex and to
++	 * access primary CGU from the secondary complex, the driver should use
++	 * cgu_peer as a destination device.
++	 */
++	if (hw->mac_type == ICE_MAC_GENERIC_3K_E825 && ice_is_dual(hw) &&
++	    !ice_is_primary(hw))
++		return ice_sbq_dev_cgu_peer;
++	else
++		return ice_sbq_dev_cgu;
++}
++
+ /**
+  * ice_read_cgu_reg - Read a CGU register
+  * @hw: Pointer to the HW struct
+@@ -6396,8 +6422,8 @@ u32 ice_get_link_speed(u16 index)
+ int ice_read_cgu_reg(struct ice_hw *hw, u32 addr, u32 *val)
+ {
+ 	struct ice_sbq_msg_input cgu_msg = {
++		.dest_dev = ice_get_dest_cgu(hw),
+ 		.opcode = ice_sbq_msg_rd,
+-		.dest_dev = ice_sbq_dev_cgu,
+ 		.msg_addr_low = addr
+ 	};
+ 	int err;
+@@ -6428,8 +6454,8 @@ int ice_read_cgu_reg(struct ice_hw *hw, u32 addr, u32 *val)
+ int ice_write_cgu_reg(struct ice_hw *hw, u32 addr, u32 val)
+ {
+ 	struct ice_sbq_msg_input cgu_msg = {
++		.dest_dev = ice_get_dest_cgu(hw),
+ 		.opcode = ice_sbq_msg_wr,
+-		.dest_dev = ice_sbq_dev_cgu,
+ 		.msg_addr_low = addr,
+ 		.data = val
+ 	};
+diff --git a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
+index 183dd5457d6a..21bb861febbf 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
+@@ -50,6 +50,7 @@ enum ice_sbq_dev_id {
+ 	ice_sbq_dev_phy_0	= 0x02,
+ 	ice_sbq_dev_cgu		= 0x06,
+ 	ice_sbq_dev_phy_0_peer	= 0x0D,
++	ice_sbq_dev_cgu_peer	= 0x0F,
+ };
+ 
+ enum ice_sbq_msg_opcode {
+
+base-commit: 84cb3483445f9ac0a106eb846fa100393433d469
+-- 
+2.39.3
+
 
