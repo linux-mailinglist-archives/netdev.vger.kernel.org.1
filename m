@@ -1,179 +1,104 @@
-Return-Path: <netdev+bounces-225658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01273B9695E
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 17:30:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF71B969C3
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 17:34:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAD7B18A64AA
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:31:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2BA73211F6
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3169014EC73;
-	Tue, 23 Sep 2025 15:30:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D0917A5BE;
+	Tue, 23 Sep 2025 15:34:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HFEEdsVF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QEtC+gep"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5A050276
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 15:30:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153AC3FB31;
+	Tue, 23 Sep 2025 15:34:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758641452; cv=none; b=bUKdwp6m+kcMjyPSNAtpcxmeXdA5YI6uR2ShSNAZyPqHq/VVqlyKiXWEJXiGCizevX35c2Gc/ATPMqOO40soq6b1qzgrCLQQLB25XYC9NZwQrmawYycXco7XjuZ8T7XV+mX/WhA2KOCX42MbRtfko4kvsBiGvz4mremV65Xkj9Y=
+	t=1758641681; cv=none; b=gb/3fr9hF3yGA4/bkjXPKWIcb3wZrvZO0VmElxeEtuGMyJhCp4uYRABPg//12LnAfa76QgrF8gSvkAT0FteE3OS2gNVt3D7ZSAmN+J44oMjp++47msbJjh66l5XKramcQQ2m/iYiZ8YRc1fgWxPbsD4k3szMFO5K+f8AFoxZNJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758641452; c=relaxed/simple;
-	bh=BoZ3n31XF4k/zwk0/9nzF0zAUkK+pEhRgqlJRlN9Bls=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i3N6c66j2kFfRObEoJ+lZO2wYP74O3st0lzQpnBlrRb6NXYoTRjV64gzuuFNrxcLxOfoNSghwqzkuYdKcVsHijnVLe9cv61SkD9/B6MA1hSYqCqYrnpUuF1tbqyqPXbuoW/H+Kswik0A1Ob1M4fomkP3GAXQEA+DCnm2aRepBU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HFEEdsVF; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758641451; x=1790177451;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=BoZ3n31XF4k/zwk0/9nzF0zAUkK+pEhRgqlJRlN9Bls=;
-  b=HFEEdsVFrwv7wequs7e393An1BdS9FTosJ7lYAzVQSvHG0UeOeSb8CCy
-   cBKdBd6D+NMhvarQcN1hY852RZm48QIwk+4TXgl+zVQ6Yp6iWL1UfVH9X
-   z6PG95m2oMrgTkbguuo6KIIEM8upclSwuBkqx2L0rPcugKW5fjnez8tma
-   7I0QcrRu8l9peIbBwFJtZyi4gNWZKWtxCrni3m+aXT6Uduu6ImOjmCG+B
-   BUF3lNhbiU9zHOoL/6P1iC9bgdCUzfheAJDlDUFNLPGfz+i3iunjDJ3hX
-   +DQAhtGK7R3cpaFlZqT0+scaHAJWKxfJREjEkJfd7obl7HuRtur1U4ObX
-   A==;
-X-CSE-ConnectionGUID: b1Rl3aY/TQeu/MUuUACgTQ==
-X-CSE-MsgGUID: zJtG1hcaQ0meVLCD3Unzeg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="83527939"
-X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
-   d="scan'208";a="83527939"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 08:30:49 -0700
-X-CSE-ConnectionGUID: DHJdUguSRFmsy3PkqPxcYg==
-X-CSE-MsgGUID: I2vduRIeQmKTmHCMrFQusw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
-   d="scan'208";a="176875467"
-Received: from gklab-003-001.igk.intel.com ([10.91.173.48])
-  by orviesa008.jf.intel.com with ESMTP; 23 Sep 2025 08:30:47 -0700
-From: Grzegorz Nitka <grzegorz.nitka@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Arkadiusz Kubalewski <Arkadiusz.kubalewski@intel.com>
-Subject: [PATCH iwl-net] ice: fix destination CGU for dual complex E825
-Date: Tue, 23 Sep 2025 17:29:04 +0200
-Message-Id: <20250923152904.1869397-1-grzegorz.nitka@intel.com>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1758641681; c=relaxed/simple;
+	bh=QKHNV75aCp57Clg0EwLjV2C9do6/aTrn+yffdg935to=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R/2Dofa5lde+quxxqSnGL5SJvjnOnWpP6Kybi4P5I9nUSMoLOgKxIEvIRTq7ZCszemNkbshWvASSeF4kBAkQhrgBy6iNj9VY8DcOrlzQKYaS3hheRB84mCmDIhJo415rzT7GPa1U2v0Eu7hBRqaWFpqAIf1sLgGIHbcRGv6UjLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QEtC+gep; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6C29C4CEF5;
+	Tue, 23 Sep 2025 15:34:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758641680;
+	bh=QKHNV75aCp57Clg0EwLjV2C9do6/aTrn+yffdg935to=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QEtC+gepjHi7KdgVb+buA7TG5/0VvPkQCB0JDUlx3+lJo623+raxs5n0lA/Oigbqq
+	 YE0aT8jTJ2UCuGO234fvJstwDZntXJ/Sr48I6x+uWWFx/0hkSKAdAk7TKLqtZZMody
+	 LTQMX68hbytnn8T5E00XTd6L2r0VaDisdpLDh9WRmH4MnDhIedarTWG5G48ZTBJDOn
+	 vOvsRDiXjQIG1LsiBt1tKAx/bedIY6GaaW/6YeVN1v8oRlIOJvVI6nIToYsuGb5T0g
+	 KvRhIpkAyqXBEczb1x4Ypt3sCRQC8HrnXtATzD+itezLm/84IZV8s+Q/nGNoOI6Irs
+	 PEGisDEDFbnoQ==
+Date: Tue, 23 Sep 2025 08:34:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>, Clark Williams <clrkwllms@kernel.org>, Steven
+ Rostedt <rostedt@goodmis.org>, netdev@vger.kernel.org, Tariq Toukan
+ <tariqt@nvidia.com>, linux-kernel@vger.kernel.org,
+ linux-rt-devel@lists.linux.dev
+Subject: Re: [PATCH net-next] page_pool: add debug for release to cache from
+ wrong CPU
+Message-ID: <20250923083439.60c64f5e@kernel.org>
+In-Reply-To: <ncerbfkwxgdwvu57kmbdvtndc6ruxhwlbsugxzx7xnyjg5f6rv@x2rqjadywnuk>
+References: <20250918084823.372000-1-dtatulea@nvidia.com>
+	<20250919165746.5004bb8c@kernel.org>
+	<muuya2c2qrnmr3wzxslgkpeufet3rlnitw5dijcaq2gpy4tnwa@5p2xnefrp5rk>
+	<20250922161827.4c4aebd1@kernel.org>
+	<ncerbfkwxgdwvu57kmbdvtndc6ruxhwlbsugxzx7xnyjg5f6rv@x2rqjadywnuk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On dual complex E825, only complex 0 has functional CGU (Clock
-Generation Unit), powering all the PHYs.
-SBQ (Side Band Queue) destination device 'cgu' in current implementation
-points to CGU on current complex and, in order to access primary CGU
-from the secondary complex, the driver should use 'cgu_peer' as
-a destination device in read/write CGU registers operations.
+On Tue, 23 Sep 2025 15:23:02 +0000 Dragos Tatulea wrote:
+> On Mon, Sep 22, 2025 at 04:18:27PM -0700, Jakub Kicinski wrote:
+> > On Sat, 20 Sep 2025 09:25:31 +0000 Dragos Tatulea wrote:  
+> > > The point is not to chase leaks but races from doing a recycle to cache
+> > > from the wrong CPU. This is how XDP issue was caught where
+> > > xdp_set_return_frame_no_direct() was not set appropriately for cpumap [1].
+> > > 
+> > > My first approach was to __page_pool_put_page() but then I figured that
+> > > the warning should live closer to where the actual assignment happens.
+> > > 
+> > > [1] https://lore.kernel.org/all/e60404e2-4782-409f-8596-ae21ce7272c4@kernel.org/  
+> > 
+> > Ah, that thing. I wonder whether the complexity in the driver-facing 
+> > xdp_return API is really worth the gain here. IIUC we want to extract
+> > the cases where we're doing local recycling and let those cases use
+> > the lockless cache. But all those cases should be caught by automatic
+> > local recycling detection, so caller can just pass false..
+> >  
+> This patch was simply adding the debugging code to catch the potential
+> misuse from any callers.
+> 
+> I was planning to send another patch for the xdp_return() API part
+> once/if this one got accepted. If it makes more sense I can bundle them
+> together in a RFC (as merge window is coming).
 
-Define new 'cgu_peer' (15) as RDA (Remote Device Access) client over
-SB-IOSF interface and use it as device target when accessing CGU from
-secondary complex.
+Combined RFC would make sense, yes.
 
-This problem has been identified when working on recovery clock
-enablement [1]. In existing implementation for E825 devices, only PF0,
-which is clock owner, is involved in CGU configuration, thus the
-problem was not exposed to the user.
-
-[1] https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20250905150947.871566-1-grzegorz.nitka@intel.com/
-
-Fixes: e2193f9f9ec9 ("ice: enable timesync operation on 2xNAC E825 devices")
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <Arkadiusz.kubalewski@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_common.c  | 30 ++++++++++++++++++--
- drivers/net/ethernet/intel/ice/ice_sbq_cmd.h |  1 +
- 2 files changed, 29 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index eb6abf452b05..5ea420c76f54 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -6382,6 +6382,32 @@ u32 ice_get_link_speed(u16 index)
- 	return ice_aq_to_link_speed[index];
- }
- 
-+/**
-+ * ice_get_dest_cgu - get destination CGU dev for given HW
-+ * @hw: pointer to the HW struct
-+ *
-+ * Get CGU client id for CGU register read/write operations.
-+ *
-+ * Return:
-+ * * ice_sbq_dev_cgu - default value
-+ * * ice_sbq_dev_cgu_peer - when accessing CGU from 2nd complex (E825 only)
-+ *
-+ */
-+static enum ice_sbq_dev_id ice_get_dest_cgu(struct ice_hw *hw)
-+{
-+	/* On dual complex E825 only complex 0 has functional CGU powering all
-+	 * the PHYs.
-+	 * SBQ destination device cgu points to CGU on a current complex and to
-+	 * access primary CGU from the secondary complex, the driver should use
-+	 * cgu_peer as a destination device.
-+	 */
-+	if (hw->mac_type == ICE_MAC_GENERIC_3K_E825 && ice_is_dual(hw) &&
-+	    !ice_is_primary(hw))
-+		return ice_sbq_dev_cgu_peer;
-+	else
-+		return ice_sbq_dev_cgu;
-+}
-+
- /**
-  * ice_read_cgu_reg - Read a CGU register
-  * @hw: Pointer to the HW struct
-@@ -6396,8 +6422,8 @@ u32 ice_get_link_speed(u16 index)
- int ice_read_cgu_reg(struct ice_hw *hw, u32 addr, u32 *val)
- {
- 	struct ice_sbq_msg_input cgu_msg = {
-+		.dest_dev = ice_get_dest_cgu(hw),
- 		.opcode = ice_sbq_msg_rd,
--		.dest_dev = ice_sbq_dev_cgu,
- 		.msg_addr_low = addr
- 	};
- 	int err;
-@@ -6428,8 +6454,8 @@ int ice_read_cgu_reg(struct ice_hw *hw, u32 addr, u32 *val)
- int ice_write_cgu_reg(struct ice_hw *hw, u32 addr, u32 val)
- {
- 	struct ice_sbq_msg_input cgu_msg = {
-+		.dest_dev = ice_get_dest_cgu(hw),
- 		.opcode = ice_sbq_msg_wr,
--		.dest_dev = ice_sbq_dev_cgu,
- 		.msg_addr_low = addr,
- 		.data = val
- 	};
-diff --git a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-index 183dd5457d6a..21bb861febbf 100644
---- a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-@@ -50,6 +50,7 @@ enum ice_sbq_dev_id {
- 	ice_sbq_dev_phy_0	= 0x02,
- 	ice_sbq_dev_cgu		= 0x06,
- 	ice_sbq_dev_phy_0_peer	= 0x0D,
-+	ice_sbq_dev_cgu_peer	= 0x0F,
- };
- 
- enum ice_sbq_msg_opcode {
-
-base-commit: 84cb3483445f9ac0a106eb846fa100393433d469
--- 
-2.39.3
-
+But you get what I'm saying right? I'm questioning whether _rx_napi()
+flavor of calls even make sense these days. If they don't I'd think
+the drivers can't be wrong and the need for the debug check is
+diminished?
 
