@@ -1,149 +1,115 @@
-Return-Path: <netdev+bounces-225628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70D59B96230
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 16:04:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4FF4B96276
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 16:10:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAEDC19C2AB9
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 14:04:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86B9C3A1ABA
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 14:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BADC325DB12;
-	Tue, 23 Sep 2025 14:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E66A219A8A;
+	Tue, 23 Sep 2025 14:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rUp0aMdO"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mmfI7w5e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF5525A357;
-	Tue, 23 Sep 2025 14:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E81C1DF994
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 14:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758636173; cv=none; b=JyNIMoEm+jU0go1iwKkZjsZ537rfCpQyUBchXTrhoDHzG419RYCyqnBiMPBvG9s9O8mKXT5qtZFLWplpDnMt3ns+BbkbfAGeLTED9N+BM/Z2RUsrhZt0rhzSZ/s+1yR2H9xqGhC5yiBOl3uM3h6+DAZk3wEb8ssgjrRCNFiRYMg=
+	t=1758636612; cv=none; b=H0uXQEgNOfoEKOLFFW35rKtdYLwUkLH/d4NR3jaGCfg4UmpLKmEuRkBe8qUQUpbbXNSdv8F2NomsnY5nH+fWFywNvFT1SaiFowkqB2F/vWXG9Gbog0NrencupLoV7TY9SXzrF1SZ4CKysul0dudtMuHeVfXfUprqYZMxmEHge0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758636173; c=relaxed/simple;
-	bh=Qg34C9exkp2NB8HBKF6gQRoaPUtMAb5daqSaeZ5VcOE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s6r3vhW6ZbBw0Kk+CDuTSXIWSVMjCxT6Kgl64pqUVqug3K7LpPV7zzFDM67gUN/QyinONtSqEOIj9955opwH+CXgXcqJXo3RQWqxKWThSb2iJ3j9vl3Io/oLPiTAOqQgrfc1NKqPPXk9HehswBKySDPl9V2Hg+U6M6ZMU5qI7J8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rUp0aMdO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDB2DC19423;
-	Tue, 23 Sep 2025 14:02:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758636172;
-	bh=Qg34C9exkp2NB8HBKF6gQRoaPUtMAb5daqSaeZ5VcOE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rUp0aMdO5ZtjRnqrzLLuX8BbdqZ+4uxgtW6rUXzh7F5DBC2rNEc23n8NM7BBRfEPY
-	 3gpkUuh4eD2ptjdd26nk7U/r/5JuikR3D6gHHeQ3RamrOLtQlJfwSN44tWkPzM/2D1
-	 mNhNCrVt8zPLR/qaoPBhd+JZ25zPjqamL1qaH7b+YrFi4nc10BgnrE3vneIAvvU/El
-	 kGrAoWZDbv9H5NOe08sexZnoWw1cgC1A/Uv5JbqoK0y4TI9YziSUlaC9zfC3L5oYUZ
-	 po3V4AgAaq9+aDwy+0V84jRVo3snDhnVpJi1Hv6Wi4gG2QOAARoxY+JAFrqfgOKQb2
-	 vj2j8SxtbHXZQ==
-Received: by wens.tw (Postfix, from userid 1000)
-	id 50B67606B2; Tue, 23 Sep 2025 22:02:48 +0800 (CST)
-From: Chen-Yu Tsai <wens@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej@kernel.org>,
-	Samuel Holland <samuel@sholland.org>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Andre Przywara <andre.przywara@arm.com>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next v7 6/6] arm64: dts: allwinner: t527: orangepi-4a: Enable Ethernet port
-Date: Tue, 23 Sep 2025 22:02:46 +0800
-Message-ID: <20250923140247.2622602-7-wens@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250923140247.2622602-1-wens@kernel.org>
-References: <20250923140247.2622602-1-wens@kernel.org>
+	s=arc-20240116; t=1758636612; c=relaxed/simple;
+	bh=9WCf9bmBIBRqk22K93pUAM9eZ7SWbnvhwGOnYi0z6zc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g/aYlDjftW3g9l2tQgg5xSkVMB6j56BTFwYjWeIJCtLewBbTBAv/oC7g0C8Z4Uu7Yk9eEKRO/xHGh7sSvOFUE9ETphBUkkcoMfoGhnpDQchWDZXS6K1Pv2VPG5ppzCfxFpgUyBYR/lqbjKOqCgpL+gwurcVEx3kB7aJjqw4Z3ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mmfI7w5e; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 09A05C01FB4;
+	Tue, 23 Sep 2025 14:09:50 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 0686760690;
+	Tue, 23 Sep 2025 14:10:07 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id ABCC4102F190F;
+	Tue, 23 Sep 2025 16:09:45 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1758636606; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=4DukHAljRLEAyr8m6U7o38VUfR/uV1WnyVeEUjrVjW8=;
+	b=mmfI7w5e/fwO1dbJfiJiKTFlDB6GlSMiPyPvV6nfqszIXotRRsr+okXrUUyjKmjPkhKC3+
+	RoVtHl9f9Ak9LRf/4iRwBY+ykJZRkgXIBLbXwYejGDdHv1/5HE/zBD2hDPv22jW9Gcmtxx
+	wWM9/GxDOqyi5cb9s3Y31468ZB1Z5T5zy1mFKKWkOTd7gyq0IeHTY5I/eenH02wd91XYIS
+	xGnaTwuBKX0PwhLAQA8tTdQ9Ouv63mePARKs6grtbizYG7z9xB/cvvIm0DRtAn4/FE4GIQ
+	6KlL35wkYLyM8d9AU72fjBOwxEy5/4fPxLjJwEbiZVVEjxBNxGawI1O2g1LIIg==
+Message-ID: <bf7f7637-dfcf-41fd-aff3-82a0ecac4db9@bootlin.com>
+Date: Tue, 23 Sep 2025 19:39:34 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/6] net: stmmac: yet more cleanups
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>
+References: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-From: Chen-Yu Tsai <wens@csie.org>
+Hi Russell,
 
-On the Orangepi 4A board, the second Ethernet controller, aka the GMAC200,
-is connected to an external Motorcomm YT8531 PHY. The PHY uses an external
-25MHz crystal, has the SoC's PI15 pin connected to its reset pin, and
-the PI16 pin for its interrupt pin.
+On 23/09/2025 16:55, Russell King (Oracle) wrote:
+> Building on the previous cleanup series, this cleans up yet more stmmac
+> code.
+> 
+> - Move stmmac_bus_clks_config() into stmmac_platform() which is where
+>    its onlny user is.
+> 
+> - Move the xpcs Clause 73 test into stmmac_init_phy(), resulting in
+>    simpler code in __stmmac_open().
+> 
+> - Move "can't attach PHY" error message into stmmac_init_phy().
+> 
+> We then start moving stuff out of __stmac_open() into stmmac_open()
+> (and correspondingly __stmmac_release() into stmmac_release()) which
+> is not necessary when re-initialising the interface on e.g. MTU change.
+> 
+> - Move initialisation of tx_lpi_timer
+> - Move PHY attachment/detachment
+> - Move PHY error message into stmmac_init_phy()
+> 
+> Finally, simplfy the paths in stmmac_init_phy().
+> 
+>   drivers/net/ethernet/stmicro/stmmac/stmmac.h       |   1 -
+>   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  | 111 ++++++++-------------
+>   .../net/ethernet/stmicro/stmmac/stmmac_platform.c  |  32 ++++++
+>   3 files changed, 73 insertions(+), 71 deletions(-)
+> 
 
-Enable it.
+For the series,
 
-Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Chen-Yu Tsai <wens@csie.org>
----
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Changes since v1:
-- Switch to generic (tx|rx)-internal-delay-ps properties
----
- .../dts/allwinner/sun55i-t527-orangepi-4a.dts | 23 +++++++++++++++++++
- 1 file changed, 23 insertions(+)
+Thanks for the cleanup,
 
-diff --git a/arch/arm64/boot/dts/allwinner/sun55i-t527-orangepi-4a.dts b/arch/arm64/boot/dts/allwinner/sun55i-t527-orangepi-4a.dts
-index 39a4e194712a..9e6b21cf293e 100644
---- a/arch/arm64/boot/dts/allwinner/sun55i-t527-orangepi-4a.dts
-+++ b/arch/arm64/boot/dts/allwinner/sun55i-t527-orangepi-4a.dts
-@@ -15,6 +15,7 @@ / {
- 	compatible = "xunlong,orangepi-4a", "allwinner,sun55i-t527";
- 
- 	aliases {
-+		ethernet0 = &gmac1;
- 		serial0 = &uart0;
- 	};
- 
-@@ -102,11 +103,33 @@ &ehci1 {
- 	status = "okay";
- };
- 
-+&gmac1 {
-+	phy-mode = "rgmii-id";
-+	phy-handle = <&ext_rgmii_phy>;
-+	phy-supply = <&reg_cldo4>;
-+
-+	tx-internal-delay-ps = <0>;
-+	rx-internal-delay-ps = <300>;
-+
-+	status = "okay";
-+};
-+
- &gpu {
- 	mali-supply = <&reg_dcdc2>;
- 	status = "okay";
- };
- 
-+&mdio1 {
-+	ext_rgmii_phy: ethernet-phy@1 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <1>;
-+		interrupts-extended = <&pio 8 16 IRQ_TYPE_LEVEL_LOW>; /* PI16 */
-+		reset-gpios = <&pio 8 15 GPIO_ACTIVE_LOW>; /* PI15 */
-+		reset-assert-us = <10000>;
-+		reset-deassert-us = <150000>;
-+	};
-+};
-+
- &mmc0 {
- 	vmmc-supply = <&reg_cldo3>;
- 	cd-gpios = <&pio 5 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; /* PF6 */
--- 
-2.47.3
-
+Maxime
 
