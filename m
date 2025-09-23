@@ -1,121 +1,94 @@
-Return-Path: <netdev+bounces-225564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44BB9B9572F
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 12:35:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8813EB9578F
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 12:44:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4F58189AF82
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 10:36:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 498842E59D4
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 10:44:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1B31D63F5;
-	Tue, 23 Sep 2025 10:35:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8558D321290;
+	Tue, 23 Sep 2025 10:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rf3ZLhwW"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D016A2594BD
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 10:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535B031DD87;
+	Tue, 23 Sep 2025 10:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758623747; cv=none; b=ceGc+cgHXjcI0nHDZW7j0uL7pCROib4XPM64BcHvakY5YgHFmADGinKRuNF8cXXxDksVdketSt9jibNraTgdfqPjacbTY39WCJFRMz1uSyspmoG7EmBx1ehSP69LV7WEFFYUff3+tTvOiIkn67+d4L/5O7D0ciF+XU3rvcZ0sMw=
+	t=1758624254; cv=none; b=u98E0uhxFFqYaxrZ7ijKydnV0k9MpkwZGAfjq11l/zBBpsjyuJlKyzr+15XsZ0m9VpI7Sk/OsZ1EvVqxqLopi4LqMzKchJh/njbfoetaimmTng3MCDh0Xf0QdWL21fkZMUx2XEMyAVJ7z7OIe+BHFDkQIR0WDnxSEtD2k8v4jS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758623747; c=relaxed/simple;
-	bh=wSFHc1i5/7QGnUyylcL4SPLwXpS9RoscdTzn9/vUsJ0=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qgmAD6QnTGs6n8cByzdLifag3IXYc8kUp7FBy+OOfNGzxC+UiH9gyd9xG/WnMm739Ji9ezNVxH5mXtZjuCcyIIjlLpdk5U8dglqE8ZBjuT2H6fjHEtnlFSZ9QzokF7lAujEAaytvinVXEqIBzhq2e/zz+4fYdjEjJ4kg+lM+ozw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cWGYD2W5Vz6L5D7;
-	Tue, 23 Sep 2025 18:33:52 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 67C491402ED;
-	Tue, 23 Sep 2025 18:35:42 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 23 Sep
- 2025 11:35:41 +0100
-Date: Tue, 23 Sep 2025 11:35:40 +0100
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-CC: <jgg@ziepe.ca>, <michael.chan@broadcom.com>, <dave.jiang@intel.com>,
-	<saeedm@nvidia.com>, <davem@davemloft.net>, <corbet@lwn.net>,
-	<edumazet@google.com>, <gospo@broadcom.com>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<selvin.xavier@broadcom.com>, <leon@kernel.org>,
-	<kalesh-anakkur.purayil@broadcom.com>
-Subject: Re: [PATCH net-next v2 1/6] bnxt_en: Move common definitions to
- include/linux/bnxt/
-Message-ID: <20250923113540.000032ab@huawei.com>
-In-Reply-To: <20250923095825.901529-2-pavan.chebbi@broadcom.com>
-References: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
-	<20250923095825.901529-2-pavan.chebbi@broadcom.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1758624254; c=relaxed/simple;
+	bh=oeM0MATO8QJVvLW+x4CKlTANx7gTarxXI2pjbjYrmw0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qphelyUYMTf30LVW3j5jGDIGjEce62piPwVCVUEZIa3IIa0L2iYF5HT8SSbpW7FhwzW24gWxAyBdbT+88rUM2cQZs5eWO/DO7Qfgz3HQ3pxNb3rOCpT31X4blnH69LdMGW/K7AtBaI7xQlaFYz9yUHH7o8c3uuIsCzqTH6MRyaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rf3ZLhwW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A1B5C4CEF5;
+	Tue, 23 Sep 2025 10:44:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758624253;
+	bh=oeM0MATO8QJVvLW+x4CKlTANx7gTarxXI2pjbjYrmw0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rf3ZLhwWUNsLQk+XMwVJDlA1h6WRVm8N/d6g/nocw77JDagTrd24YRnly1d+7TLXY
+	 aa5Lx92TQtAh8eJbUxk+QBkZVFYOsS+LC4hDPGzbTe0eztQX9/moQrP66gI8QgKH/X
+	 YIivf85pFovgzUcC50tEQw+oXDhQPQkxhP+kBS2Sdfgwcu4jEstSvSGnrNgE4TSMly
+	 sKtKFAv62NfJYMb/XO4Rs6h+8g0Y/A7yEyb6wiOm8EX2eZjfY+iHvWZCfJMZVh4vcY
+	 2ixdcLVZs0g3OLvY2tPX1hiosx7zcMbpSbbqUzB8Gcre32Zf6t+hddLfUrqdTHjlOp
+	 CxVDU9ZZ/VMYw==
+Date: Tue, 23 Sep 2025 12:44:07 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: linux-fsdevel@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>, 
+	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Anna-Maria Behnsen <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 2/9] mnt: expose pointer to init_mnt_ns
+Message-ID: <20250923-altgedienten-spurwechsel-1b3bbed20edc@brauner>
+References: <20250917-work-namespace-ns_common-v1-0-1b3bda8ef8f2@kernel.org>
+ <20250917-work-namespace-ns_common-v1-2-1b3bda8ef8f2@kernel.org>
+ <oqtggwqink4kthsxiv6tv6q6l7tgykosz3tenek2vejqfiuqzl@drczxzwwucfi>
+ <20250919-sense-evaluieren-eade772e2e6c@brauner>
+ <b4mb3kj3v453gduhebg5epbsfvoxcldpj3al7kjxnn64cvgi57@77pqiolvgqgt>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <b4mb3kj3v453gduhebg5epbsfvoxcldpj3al7kjxnn64cvgi57@77pqiolvgqgt>
 
-On Tue, 23 Sep 2025 02:58:20 -0700
-Pavan Chebbi <pavan.chebbi@broadcom.com> wrote:
-
-> We have common definitions that are now going to be used
-> by more than one component outside of bnxt (bnxt_re and
-> fwctl)
+On Mon, Sep 22, 2025 at 12:19:11PM +0200, Jan Kara wrote:
+> On Fri 19-09-25 12:05:16, Christian Brauner wrote:
+> > On Wed, Sep 17, 2025 at 06:28:37PM +0200, Jan Kara wrote:
+> > > On Wed 17-09-25 12:28:01, Christian Brauner wrote:
+> > > > There's various scenarios where we need to know whether we are in the
+> > > > initial set of namespaces or not to e.g., shortcut permission checking.
+> > > > All namespaces expose that information. Let's do that too.
+> > > > 
+> > > > Signed-off-by: Christian Brauner <brauner@kernel.org>
+> > 
+> > I've changed this so it behaves exactly like all the other init
+> > namespaces. See appended.
 > 
-> Move bnxt_ulp.h to include/linux/bnxt/ as ulp.h.
-> Have a new common.h, also at the same place that will
-> have some non-ulp but shared bnxt declarations.
+> Yeah, looks good to me. Feel free to add:
 > 
-> Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
-> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-One really minor comment inline. Given this does exactly what you say
-FWIW.
+> Reviewed-by: Jan Kara <jack@suse.cz>
+> 
+> (although I can see you've kept my Reviewed-by in the patch).
 
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-
-> diff --git a/include/linux/bnxt/common.h b/include/linux/bnxt/common.h
-> new file mode 100644
-> index 000000000000..2ee75a0a1feb
-> --- /dev/null
-> +++ b/include/linux/bnxt/common.h
-> @@ -0,0 +1,20 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +/*
-> + * Copyright (c) 2025, Broadcom Corporation
-> + *
-
-Totally trivial but this blank line adds nothing useful.
-
-> + */
-> +
-> +#ifndef BNXT_COMN_H
-> +#define BNXT_COMN_H
-> +
-> +#include <linux/bnxt/hsi.h>
-> +#include <linux/bnxt/ulp.h>
-> +#include <linux/auxiliary_bus.h>
-> +
-> +struct bnxt_aux_priv {
-> +	struct auxiliary_device aux_dev;
-> +	struct bnxt_en_dev *edev;
-> +	int id;
-> +};
-> +
-> +#endif /* BNXT_COMN_H */
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h b/include/linux/bnxt/ulp.h
-> similarity index 100%
-> rename from drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-> rename to include/linux/bnxt/ulp.h
-
+Sorry, that was an accident because I had amended the patch.
+Thanks for paying attention to this!
 
