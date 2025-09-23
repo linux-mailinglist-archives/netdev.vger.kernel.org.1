@@ -1,88 +1,189 @@
-Return-Path: <netdev+bounces-225520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B484B95026
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 10:34:15 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61725B95074
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 10:40:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB0063ADAEB
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 08:34:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DE6454E1DC9
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 08:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8DA31BCA3;
-	Tue, 23 Sep 2025 08:34:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9407831D379;
+	Tue, 23 Sep 2025 08:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H9pFyYXU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mqJXKFfe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15ED3191BD;
-	Tue, 23 Sep 2025 08:34:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E460C31D36B
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 08:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758616450; cv=none; b=XK+OSXV0Q3zLMuflhm67YjaegmtgM1IJmM6tNfFOSZKHjhwU3zw10+pLznCTZ3UXdKEhr2StTVPTeCj32bjBqahs5XDGA61c61b9zFnrTQi2iYMRc0TFV7gaBHOTytA54ghHK+MSmKDLVoCPs2jtn4OrHjcrTGj3JslfV4J6aQM=
+	t=1758616813; cv=none; b=NbVnIKVsoB1Kv8BARqIIBviAFNxi++FwLXEicnO4yTxKowNBk+eueXVYTlaU0sAVUNB4+OO1t4kbZZKEVQrARAsBR6K2im7yCAbAdpoNAEXp/WA2ussI3Z/KWpiz9u9EH5dc2ny3EjMP+yDKmVHmsrP9d/eeb0a9degGweLVtK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758616450; c=relaxed/simple;
-	bh=9+vLcO8ESWufQ4GrLTo49CyYtV2hVVePvmbQggCLtHU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jXIYsZkR47rud0humS3jDGpfintLfMzzCAxLBWxrv39ew2RIqHtxyqUgdQu19CKkT4a9TY2M20phEI69tadY9hr02P3OHx5jquqCZ2hRK0DbeZmut7dM8+zgzmkeC8uzCxqhK+fQLmHxAoF6iUz7Vkex9WulfWp4X9toRn1TlX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H9pFyYXU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CD77C4CEF5;
-	Tue, 23 Sep 2025 08:34:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758616450;
-	bh=9+vLcO8ESWufQ4GrLTo49CyYtV2hVVePvmbQggCLtHU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=H9pFyYXUPRLvq1d2G3N1CVYu95xNSoUl6HBpq5K1cZ8JoRof0mpK+uDiNCF3Lgblg
-	 YiMN/J0arDpEfmSNqVgVqBTIU8j/TYHv9AtvOsxkHPa5TuaeyyVgtQ/oL1jTIeKVRv
-	 zvNx0aOOB0+i4mKo42wPX43UAHh0Ku4gPQMTxBvq6xLSJ/e3VhW+L277331k45BmSj
-	 IsEEWYSyh9bD63d0RpkN5FqT9zHtk3qT7bv56eUNOydyo1jWwqmkPxayoFHPuMtSBl
-	 jqKvSQ/7hcuVuoktQaZEJHGPC229XCr+O7rBvxuzS5uxzgAQZOWuRj1P3ZNKqvRXJj
-	 WElY3JdEfPdCA==
-Date: Tue, 23 Sep 2025 09:34:06 +0100
-From: Simon Horman <horms@kernel.org>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux AFS <linux-afs@lists.infradead.org>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH net-next RESEND] Documentation: rxrpc: Demote three
- sections
-Message-ID: <20250923083406.GD836419@horms.kernel.org>
-References: <20250922124137.5266-1-bagasdotme@gmail.com>
+	s=arc-20240116; t=1758616813; c=relaxed/simple;
+	bh=AODaK73CD16jKk+03UbKIxye6WRkDa/4oiNXkx8hylY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VXfRhI5/scP9V19SlMeGf6PrnqCQWaYAfrBgO+IOUMjfbOk6kHYQdMblT+t0hS+c+H/EGcCgcoov2QYzyJK7D6wm/HS2ie3MPXnEgYQwzN8KyActQY68Zbu0SJvPG9jCCvK9gBJZaEOsZY/SX46hFfhv5376eZJjU9JixpHmqIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mqJXKFfe; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-42521ca36d6so15811305ab.3
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 01:40:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758616811; x=1759221611; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=symkmqcspqr8o30esRANp+CrU+zjLpKuDVPbjsgdgTo=;
+        b=mqJXKFfeOlmjGd4katIQhwLygvADaX2FFjghshA1zs2vlw4QG5XmQQnAe2skKuXtjJ
+         IGfIDuz5AZ00WB8tyEycLyZ5pE6Z9rYCkoFDzLixOo1u5Q0dCvj5Hzcr0qJjjtDLVTen
+         mLcNS56PnNBuGZ2Cw4p3jltxCk3/q4o7FNRhDvVTjhgTQgvdERAJeoq/2Z3aNgAEj2vR
+         OUYmA+flvHDq9rCi7CPtY6EXJtkj05nEsh4uvc0+0QxxpJkUye5RFUfyXcEb7wWP1GdR
+         2LbRLO4gZ4Xm79ORpl+UZyPihQgn0ltDLDriHX2cMXyD0YWt9Io13l9aIp896Y5jsjVB
+         bkqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758616811; x=1759221611;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=symkmqcspqr8o30esRANp+CrU+zjLpKuDVPbjsgdgTo=;
+        b=CzepqK0Mv7/PcN8BMiCJhSAv20tYDvCoBao/65tFUlLVLP75aZjViwBNXhSLTZspe4
+         /DdNoifeLl8YMPtCHJaSyXZ/XxV7HIC4CJaxmzQeV3/Xkkm1A1R/s6816KZcNXu42FsH
+         zVzJ5Ie8TuWABu/616q6ayYLq32gllhuxol7SH9mtou4iUk651iYIzw4crZMzmBE1P3/
+         GJ4R8T6LXyp6OvZNEUC4wcy1YP3L/gGxzwQHI/7zx236YeBoa2ss+QqOXE1QNMHZFHLF
+         prglnKJIV8Qsw5StUZBMXbJOmOwtwn/PAC/C1YANqM5bGC6TG6Bm8GA5OFUSzxhBkuhS
+         volg==
+X-Forwarded-Encrypted: i=1; AJvYcCXtsffpMIRgijsPhqzP67vcM4NCQH8ZdCSKm29x3e9KegJHlqj2MlZ1HvVZPpH9j3s7g8L7toM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHyhwdRfZSJutBk+mwc8mZBGRJPbv7wWkzaozafhDhmqbP0Ket
+	wZGt4WuDmXUZ1QxKrjqTSCQMg3WFSad/dX+aRnf3QuRkxxKiKAd4tNDgLshZY4YCIDdevQvCvRX
+	emQzufqOTU7ulrQN/tPc7A49A0uVzYrUUfyzuDh4=
+X-Gm-Gg: ASbGncvJgbudStiDUK3H0ubJho8GwE8MSuObul3XRKFUFjQ9iLlLCcjGqP7S+Fgop/E
+	g1wmgbFfrgJzrkJWJcjhheHs8E5xTYIsME+x1TDmv6inRLnNBOFuyoDZBnCQNH6+CFNDeVplnqT
+	Qqh8ORK6Inb65ODcUP+BPLSxitR9H6x0y7Z57jHlVqBqy05NoiKE8v58np7sFRMRzLfnCD2HJ1D
+	gy8Vtc=
+X-Google-Smtp-Source: AGHT+IE3jRaBDdbMyWwEkuj8pSWIpAJgLExbngsiP4kHQqEPNAVBKry0yg2HISVOBCHlDB/pgKQkleS3bwg0mZdCy7s=
+X-Received: by 2002:a92:cd85:0:b0:425:73c6:9041 with SMTP id
+ e9e14a558f8ab-42581ea5bacmr26341995ab.17.1758616810906; Tue, 23 Sep 2025
+ 01:40:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250922124137.5266-1-bagasdotme@gmail.com>
+References: <20250922152600.2455136-1-maciej.fijalkowski@intel.com>
+ <20250922152600.2455136-2-maciej.fijalkowski@intel.com> <aNGGjMFT_bsByxcZ@mini-arch>
+In-Reply-To: <aNGGjMFT_bsByxcZ@mini-arch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 23 Sep 2025 16:39:33 +0800
+X-Gm-Features: AS18NWDqyMqOt5QmgHBQT5tt0U_VJkVVcTst6vX4-fZ9dkU0tjhEdt1jvkyAvgQ
+Message-ID: <CAL+tcoCN2Lux970eMyXk_SjWsH9M38zsbaJ9o25tJn94DGLMwQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 1/3] xsk: avoid overwriting skb fields for
+ multi-buffer traffic
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, netdev@vger.kernel.org, 
+	magnus.karlsson@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 22, 2025 at 07:41:37PM +0700, Bagas Sanjaya wrote:
-> Three sections ("Socket Options", "Security", and "Example Client Usage")
-> use title headings, which increase number of entries in the networking
-> docs toctree by three, and also make the rest of sections headed under
-> "Example Client Usage".
-> 
-> Demote these sections back to section headings.
-> 
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+On Tue, Sep 23, 2025 at 1:25=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
+>
+> On 09/22, Maciej Fijalkowski wrote:
+> > We are unnecessarily setting a bunch of skb fields per each processed
+> > descriptor, which is redundant for fragmented frames.
+> >
+> > Let us set these respective members for first fragment only.
+> >
+> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> > ---
+> >  net/xdp/xsk.c | 10 +++++-----
+> >  1 file changed, 5 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> > index 72e34bd2d925..72194f0a3fc0 100644
+> > --- a/net/xdp/xsk.c
+> > +++ b/net/xdp/xsk.c
+> > @@ -758,6 +758,10 @@ static struct sk_buff *xsk_build_skb(struct xdp_so=
+ck *xs,
+> >                               goto free_err;
+> >
+> >                       xsk_set_destructor_arg(skb, desc->addr);
+> > +                     skb->dev =3D dev;
+> > +                     skb->priority =3D READ_ONCE(xs->sk.sk_priority);
+> > +                     skb->mark =3D READ_ONCE(xs->sk.sk_mark);
+> > +                     skb->destructor =3D xsk_destruct_skb;
+> >               } else {
+> >                       int nr_frags =3D skb_shinfo(skb)->nr_frags;
+> >                       struct xsk_addr_node *xsk_addr;
+> > @@ -826,14 +830,10 @@ static struct sk_buff *xsk_build_skb(struct xdp_s=
+ock *xs,
+> >
+> >                       if (meta->flags & XDP_TXMD_FLAGS_LAUNCH_TIME)
+> >                               skb->skb_mstamp_ns =3D meta->request.laun=
+ch_time;
+> > +                     xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->=
+xsk_meta);
+> >               }
+> >       }
+> >
+> > -     skb->dev =3D dev;
+> > -     skb->priority =3D READ_ONCE(xs->sk.sk_priority);
+> > -     skb->mark =3D READ_ONCE(xs->sk.sk_mark);
+> > -     skb->destructor =3D xsk_destruct_skb;
+> > -     xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta);
+> >       xsk_inc_num_desc(skb);
+>
+> What about IFF_TX_SKB_NO_LINEAR case? I'm not super familiar with
+> it, but I don't see priority/mark being set over there after this change.
+
+Agreed. NO_LINEAR is used for VM. Aside from what you mentioned, with
+this adjustment the initialization of skb is not finished here, which
+leads to 1) failure in __dev_direct_xmit() due to unknown skb->dev, 2)
+losing the chance to set its own destructor, etc. Those fields work
+for either linear drivers (like virtio_net) or physical drivers.
+
+Testing on my VM, I saw the following splat appearing on the screen as
+I pointed out earlier:
+[   91.389269] RIP: 0010:__dev_direct_xmit+0x32/0x1e0
+[   91.389659] Code: e5 41 57 41 56 49 89 fe 41 55 41 54 53 48 83 ec
+18 89 75 c4 48 8b 5f 10 65 48 8b 05 d0 f3 b7 01 48 89 45 d0 31 c0 c6
+45 cf 00 <48> 8b 83 a8 00 00 00 a8 01 0f 84 90 01 00 00 48 8b 83 a8 00
+00 00
+[   91.391095] RSP: 0018:ffffc9000482bce8 EFLAGS: 00010246
+[   91.391538] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 00000000000=
+00001
+[   91.392107] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8881204=
+40700
+[   91.392663] RBP: ffffc9000482bd28 R08: 000000000000003c R09: 00000000000=
+00001
+[   91.393230] R10: 0000000000001000 R11: 0000000000000000 R12: ffff8881204=
+40700
+[   91.393800] R13: ffff888101ed4e00 R14: ffff888120440700 R15: ffff888123b=
+f2c00
+[   91.394360] FS:  00007f2094609540(0000) GS:ffff88907bec2000(0000)
+knlGS:0000000000000000
+[   91.394992] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   91.395447] CR2: 00000000000000a8 CR3: 0000000113d0d000 CR4: 00000000003=
+506f0
+[   91.396015] Call Trace:
+[   91.396226]  <TASK>
+[   91.396415]  __xsk_generic_xmit+0x315/0x3c0
+[   91.396767]  __xsk_sendmsg.constprop.0.isra.0+0x16f/0x1a0
+[   91.397208]  xsk_sendmsg+0x25/0x40
+[   91.397496]  __sys_sendto+0x210/0x220
+[   91.397811]  ? srso_return_thunk+0x5/0x5f
+[   91.398343]  ? _sched_setscheduler.isra.0+0x7b/0xb0
+[   91.398935]  __x64_sys_sendto+0x24/0x30
+[   91.399433]  x64_sys_call+0x8d4/0x1fc0
+[   91.399937]  do_syscall_64+0x5d/0x2e0
+[   91.400437]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
 Thanks,
-
-I looked at the output of make htmldocs in a browser. I agree that both
-the entries in index.html and the header arrangement in rxrpc.html make
-more sense with this change.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+Jason
 
