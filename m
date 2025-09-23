@@ -1,239 +1,343 @@
-Return-Path: <netdev+bounces-225660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36D07B96A17
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 17:43:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C20CB96A68
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 17:48:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CB9619C4127
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:44:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF17D487C50
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E8EA242D90;
-	Tue, 23 Sep 2025 15:43:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC095272E71;
+	Tue, 23 Sep 2025 15:47:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dpw8qN6P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ix6wTGDi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360AA1DC9B1;
-	Tue, 23 Sep 2025 15:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758642229; cv=fail; b=OXsazF2Si4X1AT0xnYpF9OwrUdzYrH4Nv/6myw3n0Q2nMf4GYXQ0iT0SGzEn/7FjZiFEFxZYL3B1P7uB9B/MjqLKMXRFS14vlLYLTTEEjDeU48IhVnMflRFgV8UZHz3+ikX3ECgvrbxK9zeEMicfapReD74SpcP5DPj1phVzaVQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758642229; c=relaxed/simple;
-	bh=7UkA/RRgnVx8VEqM9fyRLlusGmtExym5qEQ7t3AsSBU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=cDO/hTb1wlI/wi7iFd6BmuSHG8FlpODOUIy/wY/9rQAq2rxx7V8E4/GvfUDA7FxhdR4LoeH2bK3mFm31UB5miwaAE+sXXp4148bR838jFYJKp1PbRqkbf3Pcc5bAZkY9yMsQMT/f9NDFjlmGL44qiGIbvIqGlNpPDNWJ00CaVnY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dpw8qN6P; arc=fail smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758642229; x=1790178229;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=7UkA/RRgnVx8VEqM9fyRLlusGmtExym5qEQ7t3AsSBU=;
-  b=dpw8qN6PQ13F2A6SpFpSKygCi3tX7PIKffMSz/jpDaTnYT8pbPZaYpPE
-   IPpJ/jIvv4ovCHTje8jlJTA+tI2RPpCi6QTpQkZU/b8sg1STKRLw2sl64
-   DD7D4ozkLWPrdcXq+YYcRB/9uAFNrd7gMhz2WBQTNhPkrlG01gqnWr06L
-   B5M1S/f1gukrFWAzqUtWVatd+3cdkAt5pC997CMHmuqScxfifPUptRRwE
-   oAc+iUU73WHaGQxPigprl+KAKcE85ANvFWMVGpWlZEqEllCB8I0kVuF6y
-   Bknq50c7qLk4UU0PYzTsZ1hOTVJzynrrUDDsL/6uvoQy0H+TzqJyvDA2M
-   Q==;
-X-CSE-ConnectionGUID: K45Alk7vQW6MvfC6+LI/BQ==
-X-CSE-MsgGUID: HtE+mgJ3TuSib1dtAGuDLA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="60816808"
-X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
-   d="scan'208";a="60816808"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 08:43:48 -0700
-X-CSE-ConnectionGUID: E++qsPkoTnS+8RNE76aXow==
-X-CSE-MsgGUID: 8YJ9r38xThyIn7heCRRAlg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
-   d="scan'208";a="176740332"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 08:43:47 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 23 Sep 2025 08:43:46 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Tue, 23 Sep 2025 08:43:46 -0700
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.63)
- by edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 23 Sep 2025 08:43:45 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LOamGkCQwTKVt1E8OUWTTlZ0x+TWg+MuL15vip8RQRcLFK6b0LGYGzzRQ9XZO0PT+IEBH01TJKLO6xI4JsDFyEU6vRSOSJ6x6akciOGCGtLCwoXQAfATwZCfb2hVSl1wJiN4orc+TZQ1rHHYRUazV2RsNhy27O7nkQamVxCt4+cLJqSek82m4698Bo8DZCXbydzjSEZfpkq7mKRR0Uxvd36jKGQ9vvPT+rjqwFUgaWkTVA0er7TBl2PuLR9mpx+rWaGqDfmCp9dFvdAxhtkhWo+sLzyOip/ljo4kL0vqTICV/G6Wia9p/bXbKpLxlgu1Alvr8eEgBZGgLxZYpMXVgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U/nfE+U4hyoorGWTSR6+TPnO5NfUFh2uMGueLaqs6K4=;
- b=CKlCWT8ptQypKwv++Lw8w0wUjtqislq+nQ4ytt+EhHcV7mGcfCSiN0G3TCpvFWqi3cUZpUVCZmjysLAGqvZxpE1SRXWO5drRdLAePEa9eiPRu4B9cm+P4vGRrQgapQdA2egeEP79xmC6TV5aDgT2FdIVbLMiPAWbr7JuQWBN7CsxJfPnUwGdC4ZH5uLPMtt8/9ZGuwcg0KcIfLw7pcAlpoetF+kXGJTdVwcwL/9c7rHNU2BoPZNrVMby03uOo+bM1yO8aYDmZBIl5iambbNGoGFS1DllMtt1V7HVVWGzDY7zDNM5ugCNnIYkizl/zhmC78TeEVQB0dCWEFfJdsK4nA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- IA1PR11MB7774.namprd11.prod.outlook.com (2603:10b6:208:3f2::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.19; Tue, 23 Sep
- 2025 15:43:40 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9137.018; Tue, 23 Sep 2025
- 15:43:40 +0000
-Date: Tue, 23 Sep 2025 17:43:32 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-CC: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
-	<andrii@kernel.org>, <netdev@vger.kernel.org>, <magnus.karlsson@intel.com>,
-	<kerneljasonxing@gmail.com>
-Subject: Re: [PATCH bpf-next 1/3] xsk: avoid overwriting skb fields for
- multi-buffer traffic
-Message-ID: <aNLAJJoWLibivhXR@boxer>
-References: <20250922152600.2455136-1-maciej.fijalkowski@intel.com>
- <20250922152600.2455136-2-maciej.fijalkowski@intel.com>
- <aNGGjMFT_bsByxcZ@mini-arch>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aNGGjMFT_bsByxcZ@mini-arch>
-X-ClientProxiedBy: TLZP290CA0009.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:9::18) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C9426563B
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 15:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758642440; cv=none; b=NDpYVFSQE8HcMAwqDyAwbXUHmTJ/Q/OdDL+/zSZBlqCx0jixp9H4jnzvhP8/nqMQQzQRd/p4EY0s22cjW8n6vW5At7HNvH449YIMqnwpTomn+OsQqtn8C3TmYO4VbSAFLRM2VRgf4AtpRImDcBpRj76aWL2iV60wl9EojnNqtNs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758642440; c=relaxed/simple;
+	bh=9p9i27tUyKdfKZGTPyYzDE0lmLfpf9V2AqPccZf7Pk4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sHevFtvE/glVkvVGOjA7SnWv1ZMjZDtk7/UWxyLiIxKgTEQXGdaL9zH+sPcCJFehKGjMPbmySgQG7+yQC0+iBy4fajZTdu2Ix2iI3CXKd5qFnc6368q2E2wvn6B3/puv5GnDohOapBSty3aLglH/l8Lif0lrLMPKCzPUJzgSGas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ix6wTGDi; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2680cf68265so42362565ad.2
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 08:47:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758642437; x=1759247237; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yhpqH9TkrxXvAreo6l0vcwYoZQHmwa+llxfXYxYt+Qw=;
+        b=ix6wTGDilNGc1K4rw7gocrP1y88Q66X2sR1hqEuy1ptYN+RNCgCLwyForI1KEQxBAh
+         /NcYxuiutgGJA9QvwrAUzUjYHnPzYmJia+WnCChCWdDlxzb1BCPg86Mg6UTA0mHL49ZH
+         pozNZRYZeUfDhPjOed18wNKBH2WUNETLrfdRCD9GLxXP0q6Wlw2EgWjWfu+CXZwWeLN/
+         xJKUnYEUxRjCcDArYO5C7p3Wqj2Lj8gMnKBX/7A0p/GZB0+VF6siiFPpS40nNArhjioK
+         MNr/n4B/ogLY26u5o2FLX5RmnUxT4AHp/j3lsHnWo45Q7xTWxSTRPXsoDCyCc6/WLY0P
+         UDoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758642437; x=1759247237;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yhpqH9TkrxXvAreo6l0vcwYoZQHmwa+llxfXYxYt+Qw=;
+        b=vE5E7NLhV4G7HSyzRl6+0wQQVjoh9Ar0Lm/BqsRfsV3EVHoV50ebcXHyps4jmAXbYQ
+         TOVY8aQal3qGZgpsg2QgfghUFygva/krC2C/rijOwEsCWoejt0ZtVXaIMYxJoJVIXX33
+         f+1jQ2EoBNY03fhjq1MPQOQibC5A2rbmHoydlDC7XHegBVp/WQyrk1v2VbWiBtKIaNjp
+         Q/pJ3ArKEAiZlElxmYMu6u2uiSWL7qcbDANa5X/QykEyxmZByipnj2MUVh3jGgf1/R/Z
+         bMQ7XLmaHc8gaL6JUDInIB6Yzzu6CejH0cHBOrgXLIg/my5ZjGS+YOlI8iCOKIpQhWMq
+         tHtg==
+X-Gm-Message-State: AOJu0YyyztpJ2nY9uw3VLmjFCWOF2pKjR1sDjlSFEDHUCVyx8IFmudXH
+	yKSX+2vWczmMQU9yACH18rA27zEYWFMegs/3giz/PP2U5AefS5UAiKrbsmQA+Rak++O+pjSiip0
+	4Goyhmiw7ToUtdiEKTtWoR5vz/IA3XEw=
+X-Gm-Gg: ASbGncv9nmZlhUIji3VhJQixK1DBgMGHqNNyHv6Y5sOUZUK9x2y6DdB2zeLN0VRnPxv
+	4FMAEHhCrv/LxKUbVTgLSvDYHnoe1JZY9vQ/SEMjfC8A8SmLZHmrCyOygrAISjU3e1BNUV+LQYk
+	iSQu3MJdBiZ/2G9YGK4Fg+bdEHR9WzMmlH3BdHJzR41EMRTRbZE2uyHIhcmSFNNNRac43ellHwb
+	Eoq8gvOkUXnlbYQkxGCn1BMn+GJBuDeeERJuYlp5A==
+X-Google-Smtp-Source: AGHT+IFN/oaB5/gk3KWElKiAaSQb1o1xjeVkko+CwZ/pASyULfoho/ZKUXbJLQUPfB5WBG+juhRExqZmRAnXZkeFJw0=
+X-Received: by 2002:a17:902:cf07:b0:26c:bcb5:1573 with SMTP id
+ d9443c01a7336-27cc7120837mr31767975ad.53.1758642437350; Tue, 23 Sep 2025
+ 08:47:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|IA1PR11MB7774:EE_
-X-MS-Office365-Filtering-Correlation-Id: 837fbbf5-5c0f-498c-2038-08ddfab7f817
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?YSdSJckgeKhzfRXnEDCe8EU74Tn6Z6vKrnO0w70u3gGb/sHUIhrJYegD3qVp?=
- =?us-ascii?Q?edxI/usC1W0cnjd9j3qyexXxPyGcuIM9dyPcCJUb+pNqz38pnMNJTFq5QKc4?=
- =?us-ascii?Q?AewURgzZ8MvMdiTIbjoreQwrRkiu0tINMZ1PjJX11fMcsH4q2E8z2q0YMnm3?=
- =?us-ascii?Q?+iXupKBnsIg9RB16rtcyEgBlnyAEQ3Supa47EbqwByb1ku5ymACKzjM+WmzL?=
- =?us-ascii?Q?11MVJ5OJf424F8u2Son6V7F4eEwQRiuYhVvVXWEysvAFrzkRpH6qxcHTyGvC?=
- =?us-ascii?Q?U/GsoTA1FJ0/8LNcd2H0/6bk0O7b+lRL90ZIRbMaJfBvAUTVr9E/JKdCRlvE?=
- =?us-ascii?Q?r5cIWpczXNG9QjgtY2PTcfPC79WGlLmb21wUUaEPsR9UY+hqugD4jZTmUYj/?=
- =?us-ascii?Q?KTjgYf8FhAx8Xh0LIiPlYkSy9XkdhrZ70n38q/o09Z4HhmbtiFI5QWMoMcsY?=
- =?us-ascii?Q?NCKoPmi9AcUmpC83w60hipBYlnPbJ8gmNhw7HO/vS+xclHAuSV9NnIQXxzsT?=
- =?us-ascii?Q?IfhaIlPo7BCNOH+ChqjT7anh/7uicTBj+ZYMP1ufK1iMiLNawYpdwe2vF83p?=
- =?us-ascii?Q?nLunnX0U9szoxYdMhCOGZvvWDj8d5s6QAKbocchFTKdAos0BWcuuYOOM9U9v?=
- =?us-ascii?Q?m3D56VdFf5WYKxTzoM/xGSHIzu649ajmy4uAud8F0Ss/h6qroZ15fCc1+L48?=
- =?us-ascii?Q?+eahKzFri1a76Fs2hDAJip6/tCfN37kF26qiZMb2s9t8T5ck6LVj9c0HssmU?=
- =?us-ascii?Q?7dmzsWZG2M60O37biCLlqJKjT2ST97rRbgrkn3TRqGLjgEtNcGC/t+Sz+KNL?=
- =?us-ascii?Q?gGPAfIX9md3UnKYVtG1drvK6/Ip7UKmTa/HMJeqPbjC0uoDR4YwQvGCOZJYN?=
- =?us-ascii?Q?4XtzAYhW1iIlAl4vHfaNSreeZbKpjJX3/ll4pTnHjTkKA+1GUND+moioc5TX?=
- =?us-ascii?Q?xod5I3Spq3gGJmPMHnbErxQqpEtXIEgCEQLW3CSRYWGuKUN+lx7p+f9R5P9x?=
- =?us-ascii?Q?Z0yg1lnECZccmAN8614FqcqE3FsxeoyQycZujRmKJZo+P6fI377JiQz8Vnqg?=
- =?us-ascii?Q?ITj9ehYCpQTo0mC/0biv7yHIHjvemkJw5CyK8tbG0+tHlKcXUy+amvL4KJe4?=
- =?us-ascii?Q?l7S4jXksqs35GoFwSPjkxaODLF7UvcDns/2zU7mAuZqmGjRs/0PZvUBtVS01?=
- =?us-ascii?Q?myqcdqkjXI5kocstZC5ZCIcH5iKGYShkzrIEoAxDtpkvaGXhQ5TJQhZYNB52?=
- =?us-ascii?Q?j2NI2iuIDiKeSCzMz7vFBRlEqE3K57m0hDGz/q3L6b1/xmSiBOj4ZBtV9sZe?=
- =?us-ascii?Q?1YkF9xAGe8SgYuO2DnEleJCKOVzWAZ6xwT2jH7gELdcDXHqhA15WC0Thy7vm?=
- =?us-ascii?Q?b8x7PLggxueD5QRbD/xIBFf1PAxNgY8Qlu7/P3dcN8mwuOJLfDgji7A3/ePQ?=
- =?us-ascii?Q?V1A4+MR43Z0=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?YM/3axmXPBC63IPLRE6C+t2CnQtlWHNpsc1Dy7yer5n5VLXVnDkDj7ys8qKC?=
- =?us-ascii?Q?qKkT5ynvh8dVhgJRH+drXBNn4Nqs9zMSsFYlSkcI+kg9CJg/4tgIrqBZb0sp?=
- =?us-ascii?Q?GSMLCZn5lTq/Zwpsvl77cwnns/DLeH9gKLOxnjIhEhudRd5UoTO14p7Q/Wyy?=
- =?us-ascii?Q?HcU7Ryse51kWcAWZilo/5j1bRe6BkTv09M0U/4kgYRIf3n91Ub3DKaCiXDUj?=
- =?us-ascii?Q?aHZo3pwYjGLdZ/Kuzo6IP56fhyL925hpqsRQtv4sjyRGjRgxharQ7cvlxrW4?=
- =?us-ascii?Q?+vjPOaQwL9svduK0Z7wUQQgxGyfLCuGOIy8SSeLQbXlT596eu4a7p6m/+3Oc?=
- =?us-ascii?Q?t3Igpp24nIWDNEScXq6jNs5p3Q0tpKq9CfPIi4B8dSODbVAj7rIW4znCrmYd?=
- =?us-ascii?Q?1YzEzoLbQKc5IbDcnGwonoQWTWgMyulQ9GBN0lwTsrHdSvspG5KfltBrxx0V?=
- =?us-ascii?Q?6y14TMqauT0TfAYKeA0U4F6kOmbHXAuZm9CJsdJ89FLslRROILy8qyd3pYP9?=
- =?us-ascii?Q?xKYV/YRZbu0/l7vEZmBctSE3JwpFIFRlo6oa6rFXr5mUQq1fRTdnthMNFW8e?=
- =?us-ascii?Q?huKs4Bywb11SW74vi5v2V7wmJXpHsByh8Ne22pX2BJObUTXyWtn48BmZlVHg?=
- =?us-ascii?Q?gH/PdYhXzb3rozQP4G4fCJi6DuFz51TO38fo7LThC4HDdjsZ+1MoBIlJxQfY?=
- =?us-ascii?Q?PRlk0MmBR/1ysOLuvWAQyZh4dK4ZLAA80RVfpbcwVfXHVwpnKTSeYTk9iSOz?=
- =?us-ascii?Q?AUEhmT1cqb889DCitvhyZUC5R3nFvnMSK+HA4QxFjeAv8Pj6yJlT3u23SAQs?=
- =?us-ascii?Q?u6Hgn2ZNyZmeq+nXtoc1Kl8M6LT9gbPTpKBSpNOu0q4F3zJAGuyqWUjjgCVU?=
- =?us-ascii?Q?Egc5hFmIBP1rEsisyHijZVemXwHPyv4O83Qy84TY1JkZDh/eHff/APhG9XF7?=
- =?us-ascii?Q?eYQ1aYt+PkN4mvZkgX30TJQniBEfoaYmXHjim1AgzMsPtolcahZBQacaPQxF?=
- =?us-ascii?Q?BV6wWbVjHwqEeyZM3loeMyyj3wdNlSsCGrqTryfR1x6XoKyjbMQI9zhOysts?=
- =?us-ascii?Q?JMGUNqwh5Hi+mP2aGH6wJbn8LX5Q7con5hFWDLJGlFQ57Aq/THLaNjhKGVbT?=
- =?us-ascii?Q?0J0SwqtRQhDMcQ2Y2HlcKZOgx2X/u/MurEMBmMeOB9cAbevuHVxwj6MnObwb?=
- =?us-ascii?Q?NeHe4wyWAvtLBZGxy8MuzeLVS8ictewbM8aueLDP1AkGkxRaHOhmmeVrclpr?=
- =?us-ascii?Q?sdUYbg+nVKUdVFAJULCI1WFJJc2L5nVCcjVSVaYHeTcanIFd0BDnUhK8ZtuF?=
- =?us-ascii?Q?o5bPc7eW63TQjoJzkgW9wpigS9JXCd9A6bZhdSVtaWrrUoQ7T1WZ1gLB7P4K?=
- =?us-ascii?Q?UWxLc4yERBx1dsbZiyaBibQSE4HmeW99KpEiQ2v2357kC5+zzAsDCOSbrRsV?=
- =?us-ascii?Q?u4fBpWkOVFKzj5ThceMEstuxXp5dRiUWdCQ/1MY8sYiUGJwDLeWGNAoDkZpx?=
- =?us-ascii?Q?vDB9i+Rahh/mdpBDMtXr2/x73cwuEEtArDspORY3DJ8qNCSbv+Q4usssMmvc?=
- =?us-ascii?Q?RyiFIB8gjsOe+8cZcihfFLr13uqLxNDBCpEYVyJXX2vvECCplwDxULuipm/D?=
- =?us-ascii?Q?ig=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 837fbbf5-5c0f-498c-2038-08ddfab7f817
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2025 15:43:40.6273
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fhI4HUb+DHf+aojdr64YzDChUVV7W1XHitF7NqS1e0zBR3j7/MHyIIEEgbdf7ilq6XiEBkRq/upSP6KaN8hKqupHg9pzkcF8idnB3pI5BVE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7774
-X-OriginatorOrg: intel.com
+References: <cover.1758234904.git.lucien.xin@gmail.com> <b55a2141a1d5aa31cd57be3d22bb8a5f8d40b7e2.1758234904.git.lucien.xin@gmail.com>
+ <7fa38c12-eece-45ae-87b2-da1445c62134@redhat.com>
+In-Reply-To: <7fa38c12-eece-45ae-87b2-da1445c62134@redhat.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Tue, 23 Sep 2025 11:47:05 -0400
+X-Gm-Features: AS18NWDVh9Ut3oT-GZAbfWLi8dW5scSVH2ja6lUmEjpU4ERb5oyr4BIw0IFHYeE
+Message-ID: <CADvbK_dxOHmDycm1D3-Ga4YSP7E2S91SQD1bdL+u2s-f+=Bkxg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 02/15] net: build socket infrastructure for
+ QUIC protocol
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
+	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
+	Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
+	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 22, 2025 at 10:25:32AM -0700, Stanislav Fomichev wrote:
-> On 09/22, Maciej Fijalkowski wrote:
-> > We are unnecessarily setting a bunch of skb fields per each processed
-> > descriptor, which is redundant for fragmented frames.
-> > 
-> > Let us set these respective members for first fragment only.
-> > 
-> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+On Tue, Sep 23, 2025 at 7:07=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 9/19/25 12:34 AM, Xin Long wrote:
+> > This patch lays the groundwork for QUIC socket support in the kernel.
+> > It defines the core structures and protocol hooks needed to create
+> > QUIC sockets, without implementing any protocol behavior at this stage.
+> >
+> > Basic integration is included to allow building the module via
+> > CONFIG_IP_QUIC=3Dm.
+> >
+> > This provides the scaffolding necessary for adding actual QUIC socket
+> > behavior in follow-up patches.
+> >
+> > Signed-off-by: Pengtao He <hepengtao@xiaomi.com>
+> > Signed-off-by: Xin Long <lucien.xin@gmail.com>
 > > ---
-> >  net/xdp/xsk.c | 10 +++++-----
-> >  1 file changed, 5 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > index 72e34bd2d925..72194f0a3fc0 100644
-> > --- a/net/xdp/xsk.c
-> > +++ b/net/xdp/xsk.c
-> > @@ -758,6 +758,10 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
-> >  				goto free_err;
-> >  
-> >  			xsk_set_destructor_arg(skb, desc->addr);
-> > +			skb->dev = dev;
-> > +			skb->priority = READ_ONCE(xs->sk.sk_priority);
-> > +			skb->mark = READ_ONCE(xs->sk.sk_mark);
-> > +			skb->destructor = xsk_destruct_skb;
-> >  		} else {
-> >  			int nr_frags = skb_shinfo(skb)->nr_frags;
-> >  			struct xsk_addr_node *xsk_addr;
-> > @@ -826,14 +830,10 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
-> >  
-> >  			if (meta->flags & XDP_TXMD_FLAGS_LAUNCH_TIME)
-> >  				skb->skb_mstamp_ns = meta->request.launch_time;
-> > +			xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta);
-> >  		}
-> >  	}
-> >  
-> > -	skb->dev = dev;
-> > -	skb->priority = READ_ONCE(xs->sk.sk_priority);
-> > -	skb->mark = READ_ONCE(xs->sk.sk_mark);
-> > -	skb->destructor = xsk_destruct_skb;
-> > -	xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta);
-> >  	xsk_inc_num_desc(skb);
-> 
-> What about IFF_TX_SKB_NO_LINEAR case? I'm not super familiar with
-> it, but I don't see priority/mark being set over there after this change.
+> > v3:
+> >   - Kconfig: add 'default n' for IP_QUIC (reported by Paolo).
+> >   - quic_disconnect(): return -EOPNOTSUPP (suggested by Paolo).
+> >   - quic_init/destroy_sock(): drop local_bh_disable/enable() calls (not=
+ed
+> >     by Paolo).
+> >   - sysctl: add alpn_demux option to en/disable ALPN-based demux.
+> >   - SNMP: remove SNMP_MIB_SENTINEL, switch to
+> >     snmp_get_cpu_field_batch_cnt() to align with latest net-next change=
+s.
+> > ---
+> >  net/Kconfig         |   1 +
+> >  net/Makefile        |   1 +
+> >  net/quic/Kconfig    |  36 +++++
+> >  net/quic/Makefile   |   8 +
+> >  net/quic/protocol.c | 379 ++++++++++++++++++++++++++++++++++++++++++++
+> >  net/quic/protocol.h |  56 +++++++
+> >  net/quic/socket.c   | 207 ++++++++++++++++++++++++
+> >  net/quic/socket.h   |  79 +++++++++
+> >  8 files changed, 767 insertions(+)
+> >  create mode 100644 net/quic/Kconfig
+> >  create mode 100644 net/quic/Makefile
+> >  create mode 100644 net/quic/protocol.c
+> >  create mode 100644 net/quic/protocol.h
+> >  create mode 100644 net/quic/socket.c
+> >  create mode 100644 net/quic/socket.h
+> >
+> > diff --git a/net/Kconfig b/net/Kconfig
+> > index d5865cf19799..1205f5b7cf59 100644
+> > --- a/net/Kconfig
+> > +++ b/net/Kconfig
+> > @@ -249,6 +249,7 @@ source "net/bridge/netfilter/Kconfig"
+> >
+> >  endif # if NETFILTER
+> >
+> > +source "net/quic/Kconfig"
+> >  source "net/sctp/Kconfig"
+> >  source "net/rds/Kconfig"
+> >  source "net/tipc/Kconfig"
+> > diff --git a/net/Makefile b/net/Makefile
+> > index aac960c41db6..7c6de28e9aa5 100644
+> > --- a/net/Makefile
+> > +++ b/net/Makefile
+> > @@ -42,6 +42,7 @@ obj-$(CONFIG_PHONET)                +=3D phonet/
+> >  ifneq ($(CONFIG_VLAN_8021Q),)
+> >  obj-y                                +=3D 8021q/
+> >  endif
+> > +obj-$(CONFIG_IP_QUIC)                +=3D quic/
+> >  obj-$(CONFIG_IP_SCTP)                +=3D sctp/
+> >  obj-$(CONFIG_RDS)            +=3D rds/
+> >  obj-$(CONFIG_WIRELESS)               +=3D wireless/
+> > diff --git a/net/quic/Kconfig b/net/quic/Kconfig
+> > new file mode 100644
+> > index 000000000000..1f10a452b3a1
+> > --- /dev/null
+> > +++ b/net/quic/Kconfig
+> > @@ -0,0 +1,36 @@
+> > +# SPDX-License-Identifier: GPL-2.0-or-later
+> > +#
+> > +# QUIC configuration
+> > +#
+> > +
+> > +menuconfig IP_QUIC
+> > +     tristate "QUIC: A UDP-Based Multiplexed and Secure Transport (Exp=
+erimental)"
+> > +     depends on INET
+> > +     depends on IPV6
+> > +     select CRYPTO
+> > +     select CRYPTO_HMAC
+> > +     select CRYPTO_HKDF
+> > +     select CRYPTO_AES
+> > +     select CRYPTO_GCM
+> > +     select CRYPTO_CCM
+> > +     select CRYPTO_CHACHA20POLY1305
+> > +     select NET_UDP_TUNNEL
+> > +     default n
+> > +     help
+> > +       QUIC: A UDP-Based Multiplexed and Secure Transport
+> > +
+> > +       From rfc9000 <https://www.rfc-editor.org/rfc/rfc9000.html>.
+> > +
+> > +       QUIC provides applications with flow-controlled streams for str=
+uctured
+> > +       communication, low-latency connection establishment, and networ=
+k path
+> > +       migration.  QUIC includes security measures that ensure
+> > +       confidentiality, integrity, and availability in a range of depl=
+oyment
+> > +       circumstances.  Accompanying documents describe the integration=
+ of
+> > +       TLS for key negotiation, loss detection, and an exemplary conge=
+stion
+> > +       control algorithm.
+> > +
+> > +       To compile this protocol support as a module, choose M here: th=
+e
+> > +       module will be called quic. Debug messages are handled by the
+> > +       kernel's dynamic debugging framework.
+> > +
+> > +       If in doubt, say N.
+> > diff --git a/net/quic/Makefile b/net/quic/Makefile
+> > new file mode 100644
+> > index 000000000000..020e4dd133d8
+> > --- /dev/null
+> > +++ b/net/quic/Makefile
+> > @@ -0,0 +1,8 @@
+> > +# SPDX-License-Identifier: GPL-2.0-or-later
+> > +#
+> > +# Makefile for QUIC support code.
+> > +#
+> > +
+> > +obj-$(CONFIG_IP_QUIC) +=3D quic.o
+> > +
+> > +quic-y :=3D protocol.o socket.o
+> > diff --git a/net/quic/protocol.c b/net/quic/protocol.c
+> > new file mode 100644
+> > index 000000000000..f79f43f0c17f
+> > --- /dev/null
+> > +++ b/net/quic/protocol.c
+> > @@ -0,0 +1,379 @@
+> > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > +/* QUIC kernel implementation
+> > + * (C) Copyright Red Hat Corp. 2023
+> > + *
+> > + * This file is part of the QUIC kernel implementation
+> > + *
+> > + * Initialization/cleanup for QUIC protocol support.
+> > + *
+> > + * Written or modified by:
+> > + *    Xin Long <lucien.xin@gmail.com>
+> > + */
+> > +
+> > +#include <net/inet_common.h>
+> > +#include <linux/proc_fs.h>
+> > +#include <net/protocol.h>
+> > +#include <net/rps.h>
+> > +#include <net/tls.h>
+> > +
+> > +#include "socket.h"
+> > +
+> > +static unsigned int quic_net_id __read_mostly;
+> > +
+> > +struct percpu_counter quic_sockets_allocated;
+> > +
+> > +long sysctl_quic_mem[3];
+> > +int sysctl_quic_rmem[3];
+> > +int sysctl_quic_wmem[3];
+> > +int sysctl_quic_alpn_demux;
+> > +
+> > +static int quic_inet_connect(struct socket *sock, struct sockaddr *add=
+r, int addr_len, int flags)
+> > +{
+> > +     struct sock *sk =3D sock->sk;
+> > +     const struct proto *prot;
+> > +
+> > +     if (addr_len < (int)sizeof(addr->sa_family))
+> > +             return -EINVAL;
+> > +
+> > +     prot =3D READ_ONCE(sk->sk_prot);
+>
+> Is the above _ONCE() annotation for ADDRFORM's sake? If so it should not
+> be needed (only UDP and TCP sockets are affected).
+I will delete it.
 
-The thing is I tricked myself with running xskxceiver against the changes
-and not seeing issues :< so IFF_TX_SKB_NO_LINEAR case needs a test
-coverage pretty badly I'd say...
+>
+> > diff --git a/net/quic/socket.h b/net/quic/socket.h
+> > new file mode 100644
+> > index 000000000000..ded8eb2e6a9c
+> > --- /dev/null
+> > +++ b/net/quic/socket.h
+> > @@ -0,0 +1,79 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> > +/* QUIC kernel implementation
+> > + * (C) Copyright Red Hat Corp. 2023
+> > + *
+> > + * This file is part of the QUIC kernel implementation
+> > + *
+> > + * Written or modified by:
+> > + *    Xin Long <lucien.xin@gmail.com>
+> > + */
+> > +
+> > +#include <net/udp_tunnel.h>
+> > +
+> > +#include "protocol.h"
+> > +
+> > +extern struct proto quic_prot;
+> > +extern struct proto quicv6_prot;
+> > +
+> > +enum quic_state {
+> > +     QUIC_SS_CLOSED          =3D TCP_CLOSE,
+> > +     QUIC_SS_LISTENING       =3D TCP_LISTEN,
+> > +     QUIC_SS_ESTABLISHING    =3D TCP_SYN_RECV,
+> > +     QUIC_SS_ESTABLISHED     =3D TCP_ESTABLISHED,
+> > +};
+>
+> Any special reason to define protocol-specific states? I guess you could
+> re-use the TCP ones, as other protocols already do.
+>
+I know TIPC and SCTP define the states like this:
+
+enum {
+        TIPC_LISTEN =3D TCP_LISTEN,
+        TIPC_ESTABLISHED =3D TCP_ESTABLISHED,
+        TIPC_OPEN =3D TCP_CLOSE,
+        TIPC_DISCONNECTING =3D TCP_CLOSE_WAIT,
+        TIPC_CONNECTING =3D TCP_SYN_SENT,
+};
+
+and
+
+enum sctp_sock_state {
+        SCTP_SS_CLOSED         =3D TCP_CLOSE,
+        SCTP_SS_LISTENING      =3D TCP_LISTEN,
+        SCTP_SS_ESTABLISHING   =3D TCP_SYN_SENT,
+        SCTP_SS_ESTABLISHED    =3D TCP_ESTABLISHED,
+        SCTP_SS_CLOSING        =3D TCP_CLOSE_WAIT,
+};
+
+It should be fine to keep as is, or you have more and better
+examples from other protocols.
+
+Thanks.
 
