@@ -1,164 +1,88 @@
-Return-Path: <netdev+bounces-225518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF2B3B95005
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 10:32:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B484B95026
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 10:34:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CA5E3A5EDA
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 08:32:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB0063ADAEB
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 08:34:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1A3311C22;
-	Tue, 23 Sep 2025 08:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8DA31BCA3;
+	Tue, 23 Sep 2025 08:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GBUjPX4Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H9pFyYXU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C957BA34
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 08:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15ED3191BD;
+	Tue, 23 Sep 2025 08:34:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758616350; cv=none; b=QeOPgp+lR+PIIXuT0sGerlQoLcSjv0PgwVP1nP6Y52jjCLyLu/ABmKKpFen6IhgBVpFC3j9283N2T0s7ARcQgMwJgBk28DlR3+go1e101TMJMlAmBn4AMWfg3LjjfnDG+X+61hq3y27+RNVXzCX0vZzznFcIwqFC5sCz2iS+rzI=
+	t=1758616450; cv=none; b=XK+OSXV0Q3zLMuflhm67YjaegmtgM1IJmM6tNfFOSZKHjhwU3zw10+pLznCTZ3UXdKEhr2StTVPTeCj32bjBqahs5XDGA61c61b9zFnrTQi2iYMRc0TFV7gaBHOTytA54ghHK+MSmKDLVoCPs2jtn4OrHjcrTGj3JslfV4J6aQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758616350; c=relaxed/simple;
-	bh=NiZilVO952t8xhzkfD3k2tB4t5QzfJ5IvxtJx2lENi0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kgh2xQU3C77aSUW3fTrHAk8Qr4ldsID45ITcZbmwZ0SxYuVocV5syXDV8Zgo5zccIMan/IOLsAIEB5EcHpufQhqWtWQPFTnYzspaRKwiF9zjMhsaJ5fT+TvMJ2z/CDxwZWYcER9wNWlVc0wDFBf3WepwtQ66zbFc+7HaSpmuT4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GBUjPX4Q; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758616347;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AofCBIF9FsjYV+UgMxZqWzFMIGGZG+5eyuxtGxpb2KA=;
-	b=GBUjPX4QfcKVkLivVduw5rOxE3cCbhPEVDuJuuiYKXJjWNl+0YABEs6kUhRVSPp8+H+c/Z
-	i/v22SuTheLKU5cwRUMfcBe9ZdKIFqTDijLoEHimKRkMsBVlq1mKkUnjN+83rxSew35vx/
-	8HN05gnhYKN4fPldrdSXwBMYFyPr068=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-629-yoqiy1I4MQG0C_6MjOFMMw-1; Tue, 23 Sep 2025 04:32:25 -0400
-X-MC-Unique: yoqiy1I4MQG0C_6MjOFMMw-1
-X-Mimecast-MFC-AGG-ID: yoqiy1I4MQG0C_6MjOFMMw_1758616345
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3f7b5c27d41so943896f8f.0
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 01:32:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758616344; x=1759221144;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AofCBIF9FsjYV+UgMxZqWzFMIGGZG+5eyuxtGxpb2KA=;
-        b=HAf0HlNrMQmT8bft9kUaJQP3BIhMu4AH6pNRqlX/LInJK5TzoVagzbT5uJ0EqvB34e
-         WuzAhlfQbPuNmz5yGzvnDWLsLW5tw+KQuURx9yaoy/6gyoM2N8baHqtWxH1bAPdN2/Ku
-         J5TUVjbHNFGXjw5HxtxRUw5cbgSyIddhB+6faJyj/zWSCGVHIQbk0LswuOX4ui9VoNCT
-         wMnR5rEmvB2ER36hA3GcJ4YVAspoviK0rmxMc2edkHwKCOM0b8rOLoTgyVROZs2v+MPr
-         S44ZNtQX+1q+r9v66PTkbmZsGhdqeaU2RjBtLnBPLmxWUeH+dHwgjwFyrN8qrl3/faAk
-         GHOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXBZ3hl3EDQON1Jc9JzrzpVcC9uxzadqNl8a6p0u5Dxv2d77XwTA0l30jTdBuNToDVYWbmgHMA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMitULkst6cdiKdFODp5/yZefj0hZJ5njMDRkRqXmqfDq6uB7w
-	KBvfL7vEf8b2tlLVI13ZIUjaaQ42LWIPy5G5Rw+nrqhXCKStDrLOnCEtODFf51AhKtluw+yuFdM
-	lPiHAlBYR1jJ5oHazE+RbDF9Ljt8fpv2G1CrNIGzDjj92w3txnEUgSoIExg==
-X-Gm-Gg: ASbGncviuhsy4BIcev0f9benp9BjELTjE2HCC80E7QpF2lAnJ8ZW1rw7o+UrdPGxSmI
-	ZSyx6NJJIcgkeg/b8XuSM90dpuivJ0ggc/b7CCI2QVwOp7qW1jEHE1WtyDwFYLgQ+stkaAQZ3TB
-	PhRhBh4LZLdk2PQnCt/CrUgw5Y5VDwaLXORyc8Z8ROhRDIcsvO3wQg+PRwUT5Vbtxh/jCdou4Qr
-	90WQMaY+lsd83UPoHYgDEdutHfQt8GBxYoPO3KA1bVrGLDKa0jfCCA30uTRmuVLNQzp+vkF/XWe
-	CN4bajZugs7qKenFQidBdyLtAbf8LFR7qeNxnHuq8lCSiNeGlXBaxIimDEbjHmvbI8DEWZEVhdb
-	mrCu05Im3/xUS
-X-Received: by 2002:a05:6000:2484:b0:3fd:7388:28a with SMTP id ffacd0b85a97d-405cb3e57efmr1100211f8f.8.1758616344538;
-        Tue, 23 Sep 2025 01:32:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHNRhUtcGLLr4h24SLafmawf/1r1TuWen0JWEexdyB4FM711uxWMVzCfOmriGj/xPN14FiEAg==
-X-Received: by 2002:a05:6000:2484:b0:3fd:7388:28a with SMTP id ffacd0b85a97d-405cb3e57efmr1100193f8f.8.1758616344066;
-        Tue, 23 Sep 2025 01:32:24 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-464f0aac271sm231480095e9.3.2025.09.23.01.32.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Sep 2025 01:32:23 -0700 (PDT)
-Message-ID: <ae9f772b-d1fb-4688-a809-b4507060d205@redhat.com>
-Date: Tue, 23 Sep 2025 10:32:22 +0200
+	s=arc-20240116; t=1758616450; c=relaxed/simple;
+	bh=9+vLcO8ESWufQ4GrLTo49CyYtV2hVVePvmbQggCLtHU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jXIYsZkR47rud0humS3jDGpfintLfMzzCAxLBWxrv39ew2RIqHtxyqUgdQu19CKkT4a9TY2M20phEI69tadY9hr02P3OHx5jquqCZ2hRK0DbeZmut7dM8+zgzmkeC8uzCxqhK+fQLmHxAoF6iUz7Vkex9WulfWp4X9toRn1TlX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H9pFyYXU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CD77C4CEF5;
+	Tue, 23 Sep 2025 08:34:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758616450;
+	bh=9+vLcO8ESWufQ4GrLTo49CyYtV2hVVePvmbQggCLtHU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=H9pFyYXUPRLvq1d2G3N1CVYu95xNSoUl6HBpq5K1cZ8JoRof0mpK+uDiNCF3Lgblg
+	 YiMN/J0arDpEfmSNqVgVqBTIU8j/TYHv9AtvOsxkHPa5TuaeyyVgtQ/oL1jTIeKVRv
+	 zvNx0aOOB0+i4mKo42wPX43UAHh0Ku4gPQMTxBvq6xLSJ/e3VhW+L277331k45BmSj
+	 IsEEWYSyh9bD63d0RpkN5FqT9zHtk3qT7bv56eUNOydyo1jWwqmkPxayoFHPuMtSBl
+	 jqKvSQ/7hcuVuoktQaZEJHGPC229XCr+O7rBvxuzS5uxzgAQZOWuRj1P3ZNKqvRXJj
+	 WElY3JdEfPdCA==
+Date: Tue, 23 Sep 2025 09:34:06 +0100
+From: Simon Horman <horms@kernel.org>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux AFS <linux-afs@lists.infradead.org>,
+	David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH net-next RESEND] Documentation: rxrpc: Demote three
+ sections
+Message-ID: <20250923083406.GD836419@horms.kernel.org>
+References: <20250922124137.5266-1-bagasdotme@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net 2/2] selftests: bonding: add ipsec offload test
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>,
- linux-kselftest@vger.kernel.org
-References: <20250918020202.440904-1-liuhangbin@gmail.com>
- <20250918020202.440904-2-liuhangbin@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250918020202.440904-2-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250922124137.5266-1-bagasdotme@gmail.com>
 
-On 9/18/25 4:02 AM, Hangbin Liu wrote:
-> diff --git a/tools/testing/selftests/drivers/net/bonding/bond_ipsec_offload.sh b/tools/testing/selftests/drivers/net/bonding/bond_ipsec_offload.sh
-> new file mode 100755
-> index 000000000000..4b19949a4c33
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/net/bonding/bond_ipsec_offload.sh
-> @@ -0,0 +1,154 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +# IPsec over bonding offload test:
-> +#
-> +#  +----------------+
-> +#  |     bond0      |
-> +#  |       |        |
-> +#  |  eth0    eth1  |
-> +#  +---+-------+----+
-> +#
-> +# We use netdevsim instead of physical interfaces
-> +#-------------------------------------------------------------------
-> +# Example commands
-> +#   ip x s add proto esp src 192.0.2.1 dst 192.0.2.2 \
-> +#            spi 0x07 mode transport reqid 0x07 replay-window 32 \
-> +#            aead 'rfc4106(gcm(aes))' 1234567890123456dcba 128 \
-> +#            sel src 192.0.2.1/24 dst 192.0.2.2/24
-> +#            offload dev bond0 dir out
-> +#   ip x p add dir out src 192.0.2.1/24 dst 192.0.2.2/24 \
-> +#            tmpl proto esp src 192.0.2.1 dst 192.0.2.2 \
-> +#            spi 0x07 mode transport reqid 0x07
-> +#
-> +#-------------------------------------------------------------------
-> +
-> +lib_dir=$(dirname "$0")
-> +source "$lib_dir"/../../../net/lib.sh
-> +algo="aead rfc4106(gcm(aes)) 0x3132333435363738393031323334353664636261 128"
-> +srcip=192.0.2.1
-> +dstip=192.0.2.2
-> +ipsec0=/sys/kernel/debug/netdevsim/netdevsim0/ports/0/ipsec
-> +ipsec1=/sys/kernel/debug/netdevsim/netdevsim0/ports/1/ipsec
-> +active_slave=""
-> +
-> +active_slave_changed()
-> +{
-> +        local old_active_slave=$1
-> +        local new_active_slave=$(ip -n ${ns} -d -j link show bond0 | \
-> +				 jq -r ".[].linkinfo.info_data.active_slave")
-
-shell check is not super happy about the lack of double quotes  around
-the variables (above and many places below) and about declaring the
-variable and assigning it to a subshell in the same statement.
-
-I think it's better to address such warnings for consistency.
+On Mon, Sep 22, 2025 at 07:41:37PM +0700, Bagas Sanjaya wrote:
+> Three sections ("Socket Options", "Security", and "Example Client Usage")
+> use title headings, which increase number of entries in the networking
+> docs toctree by three, and also make the rest of sections headed under
+> "Example Client Usage".
+> 
+> Demote these sections back to section headings.
+> 
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 
 Thanks,
 
-Paolo
+I looked at the output of make htmldocs in a browser. I agree that both
+the entries in index.html and the header arrangement in rxrpc.html make
+more sense with this change.
 
+Reviewed-by: Simon Horman <horms@kernel.org>
 
