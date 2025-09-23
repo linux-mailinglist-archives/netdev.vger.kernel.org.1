@@ -1,118 +1,123 @@
-Return-Path: <netdev+bounces-225506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73760B94D90
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:47:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C530B94E26
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:56:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 973B318A82F5
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 07:47:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BAC616C294
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 07:56:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CFC831197E;
-	Tue, 23 Sep 2025 07:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hb+jRBoa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D625A3164B7;
+	Tue, 23 Sep 2025 07:56:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944B7548EE
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 07:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EEDC2EDD5D
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 07:56:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758613644; cv=none; b=IdB6fGgtlDRY/+LEm5FrilJfqXV/4sCm8axzeN0MNYkA+oTgqZYZ+UzBqNjSsMHb9ugGotQ4/5n2MwdpKVrbIIciykfWpNSCIngM83VGhz0ehrhxv199o3BvGkM02tAUhNAI4G/YAJmpZ8ZgfHKGScLnLkOPc7Un5MMenAzDlzA=
+	t=1758614189; cv=none; b=axcKzPVk5K3Kc7uhBlLb/4xUV+lnVWuRSnfhdY6MT0CaNoUx95DvYSK3xBULTT1GxQx9EjHbCwtgC8Kdj9gegNK/1S2H/N4hWxdYjYOl9Lk6IS4yQHKt5V3YYi6SfE0mmvYoH3PO3YoA4lzV7TiarrLzQljX10SV+pqOgNvIJwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758613644; c=relaxed/simple;
-	bh=m6w75x5KmuboRbte2t8Bef+Y5vLZQaZtpC0JTZQjfAs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nHue9zICSbl/cSW9o3Y0vmRIYGx9W6u3WTEaK6JOJzpMQGmghw3Unt6QHEPzRmM4MVBlujCkQbyd1k4Q3k22la9A9z0bEAIkhz1CJICQR0XcndWx8KutWGyDgtzFw3DZ5xAebduCK3PdyyeJiOJGt4NQMVp9VgqrK8bles3O69Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hb+jRBoa; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-57933d3e498so5621109e87.3
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 00:47:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758613641; x=1759218441; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p3zTrXIgrjNde7MVV+dQe94AXCJb9BQSJNtQ02xJwZs=;
-        b=Hb+jRBoaW25Oj5LVwuGp7pHGOFDrDFFhIeie7Dfkq7+H92LLpf9dwG1qxKUu1KIpXK
-         a/+ETLzxr+qq6Vfu9r4bMk8iF4z14DgqEzefgubl9MbHat1K6GPmHCzsRMZQsn5cli/c
-         y+37BqQKvT056OX1pmV4nkBy1M0tOrXJHHLYTX5/30rCKPjKYURVGchkSCOFrYlF4kYg
-         K9GkjJZS9AVEAOPnwxvU+Ng0lgrJH6AQ0sDuinpD6dC9iZvf9aOw6mklkaMgK1VN7H+v
-         dySneeWOdEqBp330cNJV29C5OkWDgrMoYCVCQzyX13KEXMEYYJrzzMLTweOkWEVbfzqL
-         fAVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758613641; x=1759218441;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=p3zTrXIgrjNde7MVV+dQe94AXCJb9BQSJNtQ02xJwZs=;
-        b=MpI6I0cUUUKDaY3y+TrBvZ8NWFNWJmFfyojgL1f5ImgW4UaMNPceCs2dc2JwQPYOUo
-         YkkDkgqRaPuMldefvKbbsjXV3+2BajapsXDRPlVmvcsI7JH9Cg1AA8cQJTaz6HGhKgvO
-         A9+OWcDBFkVGEqq4SlAHI5lMD7h+mq36+4GPjXMcxXepWWFf7EU+UrAjtRqkuhQ0p5Qs
-         XFSmNajCrkQCLr8p780Ud7bgfve1tlXgQQg5ZCDl1GyNbnHsxnHNiSQIccU/c11JTV3U
-         JuJBNMTA/Y34zVy66V163zNzUrnBUsUk9UAMfdtaMRo8QfLgBIJEgIFvGS8pHhKMz36B
-         EyFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVCGWEA9P18cFb+Yh3XWK5z5VVqUIaVak6B6QqufUte58XLmHd6ZD+CTmTr8xtaZmjeUB+hDow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvkMtjB6FnRe3CGRdJ8U07/a3brAiXHWeAEpoKShVTaC1e8sIV
-	Z6ZOWBnk5HNOwN8wbUQKRznl9av3cYdXqnZ5X5mk7UpBskAssuqsgsdu
-X-Gm-Gg: ASbGnctfnkdcxsI01+Vv+vVIcw8QYaUwI4t7JjQ7QJRLVio01ftqv4LLCQ1gdlA8eyZ
-	wjTBMxMTwfGaIJ/+p0r6jwyJaTimQ80rBRxymv5mvxz+xHaKLhfZfMHZ9vhDEyV042sIhojtIg7
-	0EO/DffHcmeH9JPqbfGcHMZt0HpJo08yUTF+h2PhAxpPfH30WTrcdiwmb5DYZJUHeyfzf5i40gf
-	HJiWiyvBTh+CfY5Sw+Dy0sn8SoFb8+uHi//N8Wg04E8TXJDM3RcKMBy17ek7pLf6B7n4RRCJJfK
-	X3nFT0bsIVjhCGle/LEGiy2FlMpjrSwaD76W8Qr/392rHDJLPUJcCL2zbwAg5D3CxvhS8c3916X
-	f3ESLNQx74NL389rUzEbWTl2E+WwSrn3WmpI=
-X-Google-Smtp-Source: AGHT+IHdpC5HbX3ix1zT26Flp+EGyUUBeKiByHFSuNEWqr8rJkXfKIJvyKcJk6flJER7ibjGFmTI7Q==
-X-Received: by 2002:a05:6512:4207:b0:57e:1e1b:dde5 with SMTP id 2adb3069b0e04-58071403f46mr357677e87.25.1758613640434;
-        Tue, 23 Sep 2025 00:47:20 -0700 (PDT)
-Received: from foxbook (bfe191.neoplus.adsl.tpnet.pl. [83.28.42.191])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-57fcb89170asm791542e87.63.2025.09.23.00.47.19
-        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
-        Tue, 23 Sep 2025 00:47:20 -0700 (PDT)
-Date: Tue, 23 Sep 2025 09:47:11 +0200
-From: Michal Pecio <michal.pecio@gmail.com>
+	s=arc-20240116; t=1758614189; c=relaxed/simple;
+	bh=czjeFbWL6mEfzT3no8tAGT2BnMUdT1Kh4lkm5v1oaEU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kzscaH9/h2zqIorGS4vgb0MX6tqoH3rvbEbe6MVX7TxwImwkGkqtOtJJIcVO7w/bU/FuB1GHaTWGPKst6oecLY2cTtbNDaecfSoJrN8imt2z9i8Hw9G45gm29hmNxUEyzY3I8Ck40I3S/YMiovAsT3a6QPwmQr17Qr0GoKzu8eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1v0xsu-0005Ou-As; Tue, 23 Sep 2025 09:56:24 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1v0xsu-0003P3-0F;
+	Tue, 23 Sep 2025 09:56:24 +0200
+Received: from pengutronix.de (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id B6103477B13;
+	Tue, 23 Sep 2025 07:56:23 +0000 (UTC)
+Date: Tue, 23 Sep 2025 09:56:23 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: I Viswanath <viswanathiyyappan@gmail.com>, andrew@lunn.ch,
- andrew+netdev@lunn.ch, davem@davemloft.net, david.hunter.linux@gmail.com,
- edumazet@google.com, linux-kernel-mentees@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, petkan@nucleusys.com,
- skhan@linuxfoundation.org,
- syzbot+78cae3f37c62ad092caa@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v2] net: usb: Remove disruptive netif_wake_queue in
- rtl8150_set_multicast
-Message-ID: <20250923094711.200b96f1.michal.pecio@gmail.com>
-In-Reply-To: <20250922180742.6ef6e2d5@kernel.org>
-References: <83171a57-cb40-4c97-b736-0e62930b9e5c@lunn.ch>
-	<20250920181852.18164-1-viswanathiyyappan@gmail.com>
-	<20250922180742.6ef6e2d5@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-can@vger.kernel.org, 
+	kernel@pengutronix.de
+Subject: Re: [PATCH net 0/10] pull-request: can 2025-09-22
+Message-ID: <20250923-free-hallowed-swallow-dc3871-mkl@pengutronix.de>
+References: <20250922100913.392916-1-mkl@pengutronix.de>
+ <20250922171926.63ec8518@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="3opm7w2mydbbb4sb"
+Content-Disposition: inline
+In-Reply-To: <20250922171926.63ec8518@kernel.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, 22 Sep 2025 18:07:42 -0700, Jakub Kicinski wrote:
-> On Sat, 20 Sep 2025 23:48:52 +0530 I Viswanath wrote:
-> > rtl8150_set_multicast is rtl8150's implementation of ndo_set_rx_mode and
-> > should not be calling netif_stop_queue and notif_start_queue as these handle 
-> > TX queue synchronization.
-> > 
-> > The net core function dev_set_rx_mode handles the synchronization
-> > for rtl8150_set_multicast making it safe to remove these locks.  
-> 
-> Last time someone tried to add device ID to this driver was 20 years
-> ago. Please post a patch to delete this driver completely. If someone
-> speaks up we'll revert the removal and ask them to test the fix.
 
-These were quite common, I still have one.
+--3opm7w2mydbbb4sb
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net 0/10] pull-request: can 2025-09-22
+MIME-Version: 1.0
 
-What sort of testing do you need?
+On 22.09.2025 17:19:26, Jakub Kicinski wrote:
+> On Mon, 22 Sep 2025 12:07:30 +0200 Marc Kleine-Budde wrote:
+> > Stefan M=C3=A4tje (3):
+> >       can: esd_usb: Fix not detecting version reply in probe routine
+> >       can: esd_usb: Fix handling of TX context objects
+> >       can: esd_usb: Add watermark handling for TX jobs
+>=20
+> I have mixed feelings about these. Could you resend the PR for just=20
+> the first 7 ASAP? Feel free to also send another with the (fixed) esd=20
+> patches but whether those reach 6.17 final or not will depend on
+> whether we can review them in time..
+
+Makes sense, here's the updated one:
+
+| https://lore.kernel.org/all/20250923073427.493034-1-mkl@pengutronix.de/
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--3opm7w2mydbbb4sb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmjSUqQACgkQDHRl3/mQ
+kZx30Qf/VPgryM0OjYkp7uNLPcnJvJvm4ewgs8XECTsHupvm3TvhlC7o0q8ZnC4R
+ncvq/r+lZ9175Hp06YQ6YidujhVK8r2sP9haxO0gofne7HhATCNjwcWCMOptBP2I
+PEKIaoZvakIzFLKU3U0JlqBm49+iwHx+9oLRuERjNuX0wWDY+AVCKtMav2FLZ7TY
+v2WxoItqoVbcU6knrkZwIaOiLV2JpbB4yhW2ne7Ku4PfbofCSYgCDFkZ75Pd8dde
+ZJjnFvlgJ9wNl/7OSF52rwEjHTCbKyPm41nt97mL/DvaethfJFD15ViE/S0B/Am7
+2TtddJL9d07veejkRrEcvJYpKZMMIg==
+=jArF
+-----END PGP SIGNATURE-----
+
+--3opm7w2mydbbb4sb--
 
