@@ -1,192 +1,175 @@
-Return-Path: <netdev+bounces-225553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E249B95529
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:51:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD9BFB95611
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 12:05:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62821188CA77
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:50:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 880AA3B305C
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 10:05:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA948320CB5;
-	Tue, 23 Sep 2025 09:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3074D286413;
+	Tue, 23 Sep 2025 10:05:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="AuyQqYXO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fscTTd83"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f227.google.com (mail-qt1-f227.google.com [209.85.160.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF5028850B
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 09:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7709C26E709
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 10:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758621016; cv=none; b=cFkI4LjI0MpHDGWp1H3yT+gjN8l0t2tyFKeHo1b3Q4RYZpKoMg2UinsAoy20+MChHfQbTbEHIT6kVp+tPA2baO1P0yQCKHX+Jg5gtozTeqOh+iDzbyj8K6JsYp5/zu179SUso6zqlFNholrLFtEO1DBKyZJLVgo/UYs1J/gd0u4=
+	t=1758621905; cv=none; b=OpQokXn4HHc1iaT1fK6Cp309unPqiHQRKCYOz2xGglgz5HirpFhPotscJ+qBK4R0sSPMuTz0mTA3NoIyx0fqbRjwnDmXPYWT0ight/+9Z4NBSNqy4lsKda2d7hL98YFp9KdzkkLaJLKg2O9W1qNnBW/9rcvYL0vz1u/cp3nxFiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758621016; c=relaxed/simple;
-	bh=TOIzxHnD8azJMyks8dj+0Bgw7zq9WIFh1IqTUTQHvnk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bqYMiSQRFbPaC/yUfv6qSOzpwfLvoYDdwkRoParSycdmNxXfzV0k9Z5p5VOTEjMTXBAYlWF/nxWXMqJCfoRy9V3yoH/ngyknjA87hzCFyL2bHVnaQmUm4eVdVneAcOg+XOedDCilq1VWJf2yboa8txL4IgXZF+2VYXayT+wAYWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=AuyQqYXO; arc=none smtp.client-ip=209.85.160.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qt1-f227.google.com with SMTP id d75a77b69052e-4b5eee40cc0so53042851cf.0
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 02:50:15 -0700 (PDT)
+	s=arc-20240116; t=1758621905; c=relaxed/simple;
+	bh=ZumSwhxH522m/LliPqf9t5tJA+MJDBIhWI+I852334M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pZA+qkeviucOu/64zz2oP06b4aVtaPY/XaNGVv0tQ3xEWAyVKnLTmIgdHDhP7ceKF7uR9g/fPZUHMSbc1njW0De/or6ZjSM5iyT64rVRHg10n3tITl6NWRMN59wB0j5g6Gcg7UFUVnNfTK8bU6aHzXSdKE8WgJVm28sO7QSHoLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fscTTd83; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758621902;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8MlXEXY9viVFYgaW7HM7/EGwK4GqnOUp4Wcb/T7Io6s=;
+	b=fscTTd83rxPbkWP1sUCnnvULMMOB9UtIprODnFxnmM5LSo7jo/UPtXXr11+iNKLx8jHDxS
+	+yueW/YUw7QlUVOTPvSDimmafIWZgxRcRvs7CqFxxGYAkyft0AN0B93alIEs/2vMTkDUAL
+	qZArSgEA+Xne/2hf/I5W3wZ7wW+fIaw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-355-At-NgoYWM2aw3jKt5czWRA-1; Tue, 23 Sep 2025 06:05:01 -0400
+X-MC-Unique: At-NgoYWM2aw3jKt5czWRA-1
+X-Mimecast-MFC-AGG-ID: At-NgoYWM2aw3jKt5czWRA_1758621900
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-46d46692831so12803905e9.3
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 03:05:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758621014; x=1759225814;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature
+        d=1e100.net; s=20230601; t=1758621900; x=1759226700;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A8ahRD5h4PIIPw1I1TySZWohjvVeAAasu3oQp+8Rxc8=;
-        b=lEs2s/Pj8n2AsuRXE3277lKQr7rO7nfBLkgMH0a4eZKfTKBKCeGbfAdZeKxLTefGE1
-         N5mvDquvIDrrYEEk9DoJ1xybKsHectndIzStxJlKSbLbeF1o2k4sG5COdO64DfcS1OpZ
-         0NWjv4MqlF4fj4WyxHpznWaJW+GTwoYU8wRvwfmI5YjZIRuJC0jn25KO89qYtKwLJreW
-         IFpZ5IuzdCd0srM9AW+g9vtbaKkcnpCdNNM7GmVofiRqb2lPKbzeR+JBB9Go+SJQgkkX
-         7bc5MWAD5cZuaP0eaiwEw5m3bVay6BV2qTpmZCUJbTsxlpgiCg49dDwnh/MMXAZ4RaFX
-         EZyw==
-X-Forwarded-Encrypted: i=1; AJvYcCVIjxH6QaTG6UjPrHiPZJrEIFpAHs6l9iCu6/ZfOn0HGNmiqZmjSlalGtRlmrjYP5Y8p3/rFPQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjqQQsN873MKafq+geplZL1iblgaIZqAk5kCds19v5EhTlP4lr
-	l90oghuN7J8/Uw7y7/vrYxeQOFJ9V/mjZ/3pFqoPFImI4SIllCcWMsq4pHEV0N51FLtXJHH5CiD
-	AMwhJB+Hqu9zWBOwEMUfMLI/Jds4kQ1PIElY2JMxNiBvPDnHwVRrGjvq+Sc3krgknQZxtaRYPIE
-	CIg940KOaKKDmgxAAhPT/DPI9+v+B/iFvKmil3OUoi4k4NsWh4/acocBNZSe3gvbxVejm28KxiN
-	y1E5AOHwvE=
-X-Gm-Gg: ASbGncubME7DfxNikP1lgZwBdsv811vzf9JYkTBvd98Z4R6zB5nTIYOvLmXBtwcePOY
-	NbP8NJWySwTvrNNe7z2wIpFeo3RbhBn29wsBG4WBJadTWuSMrrcfixrpt8woBYHkYK+wtwgGqdC
-	HzsYmG+AO2reR5EAlFKt8XWtQNh+5YRBCyzgS6xjjRbZt5njjt+a38HiveZ6whHrGpgolRg9sog
-	b7ZbK6q3EBHG4vVGpfOQBpXYxzYONv3NooVw/g9/R2wfa+Y3skEF2QHBC/McJNTCTU7ffjw4ShC
-	1rqe80EBfSE0yVUdxpgS9cqzb6+wT33y/ffOzncYp14NRgRAeio1jnQ4R+/7Wxa1+ombiak+rvO
-	nE4WIoEL/Khn4Gcw9joHmEhJBA/uEu4ypZcoArmqgpMK7ea+bxeL8gQdcvZif8sjIim380tIOBd
-	FtLQ==
-X-Google-Smtp-Source: AGHT+IEXffx+m/hS7Lp3Tcr7HICsUU+cjjK9/tKWXsAFY7i1HUHXzqPrWbLjM3pGDu63dyI1Nwr0BF2Ov+Zl
-X-Received: by 2002:a05:622a:a949:20b0:4d6:5c76:43a7 with SMTP id d75a77b69052e-4d65c76489cmr490501cf.66.1758621014037;
-        Tue, 23 Sep 2025 02:50:14 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-121.dlp.protect.broadcom.com. [144.49.247.121])
-        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-4d00f2cb812sm1518791cf.13.2025.09.23.02.50.13
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 23 Sep 2025 02:50:14 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b54df707c1cso3276781a12.2
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 02:50:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1758621013; x=1759225813; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A8ahRD5h4PIIPw1I1TySZWohjvVeAAasu3oQp+8Rxc8=;
-        b=AuyQqYXO2mkYd7DHGmu2vKYLAdV9k6DWg1UGDo7tTXS9AnkY5Vp2IDvK0VD6tj6eai
-         vrWNALwQWUMiz7rAPN5mhVuJDk2pfpojjS75uT44ylEszfkedOePcGwW9LwvKdPWWj+R
-         NYbpq+owZI9pJIZxVade/OOIZr3TBGxrpao7U=
-X-Forwarded-Encrypted: i=1; AJvYcCVmHwEvy1/M1uKFujM00t3hxIU/aq1Gz/fDyalvpK1u92bg98JrkehfBm4d45Pju7uXH4ebEwc=@vger.kernel.org
-X-Received: by 2002:a17:902:ec83:b0:269:aba0:f0a7 with SMTP id d9443c01a7336-27cc28bed7fmr28836285ad.2.1758621012785;
-        Tue, 23 Sep 2025 02:50:12 -0700 (PDT)
-X-Received: by 2002:a17:902:ec83:b0:269:aba0:f0a7 with SMTP id d9443c01a7336-27cc28bed7fmr28835945ad.2.1758621012290;
-        Tue, 23 Sep 2025 02:50:12 -0700 (PDT)
-Received: from PC-MID-R740.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-269a75d63eesm139105945ad.100.2025.09.23.02.50.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 02:50:11 -0700 (PDT)
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-To: jgg@ziepe.ca,
-	michael.chan@broadcom.com
-Cc: dave.jiang@intel.com,
-	saeedm@nvidia.com,
-	Jonathan.Cameron@huawei.com,
-	davem@davemloft.net,
-	corbet@lwn.net,
-	edumazet@google.com,
-	gospo@broadcom.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	selvin.xavier@broadcom.com,
-	leon@kernel.org,
-	kalesh-anakkur.purayil@broadcom.com,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: [PATCH net-next v2 6/6] bnxt_fwctl: Add documentation entries
-Date: Tue, 23 Sep 2025 02:58:25 -0700
-Message-Id: <20250923095825.901529-7-pavan.chebbi@broadcom.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
-References: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
+        bh=8MlXEXY9viVFYgaW7HM7/EGwK4GqnOUp4Wcb/T7Io6s=;
+        b=o7CBoed77FdKApWQ+yu2HziovL5IBKMSSBEOGiPoGLE5kJFd15LYkn+xeUe+9o2CuB
+         xmqfLiNlKrSRMysCL5dkvcmC6X2p3q6aH8kKLc4H5a36TiQuZI3o95Jqm0iVJrgC5Ubj
+         sSoFXfJ1sjN8Ys1ZYRkqNAKOtgvYybrlMJ/Kc4uA9u5BnpuLcMevhNyynNyd/YdczDyn
+         8UiMLxhYjeYQ+sU8z5OdnytdeBW5rdeMYJBi7c8DOhjE05pGdDFF8zwpB3b1/pWsQliT
+         iCI3iJV+Rr2nQy2JfUR0GMVGBAs1dzCcp6taYQAw40RCHAMDqly8Ro5GazTImSZle49C
+         vy6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUIbH3UqCuDXnOKHXB6kMIeJtQc9qBCxsyso6aezgZj0iIP3JWfpHXKaYzteBOOqdP+TggABeA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaqtV8KZUN5pt1bMPm869kIM+5I9uky1ZSo+wICLyPMJ47Zkk3
+	fC32brkLkjX5wyqRCI38t5JPTT+2Ue5OftzXrAU/FcZKHCF025HI+bRM/XaxGcvp4uR9Rd734up
+	tN/YcDusfnEIkyEKA8yoLD6hb9QtwPpx7S2rIgEh5GLgUdYpj5b/izTAP7Q==
+X-Gm-Gg: ASbGncu+L+CJCFiAipteGrDqMRwu4yX1+Xn+WabxcRrlrKXupLRWKCogubjpm7aUMQ4
+	QZ0s8ZFT2tJIqkWSo8UUZkPUYmrEVQKM6DpqC7Hj8i6Dp7+KzymiKQ4Y3IRoaZkcSY5HQFRgWGg
+	n4OhM4qnDx2170eVOt4IWoxFliuhXCbcPPDaVaWeCYOwifOnzLed1DgwQtVTlOtO2bT8xBjVFhl
+	b8ciKiXIZ4xcbFHamnOBgf/NXPpazIu13Gg65ryjFvKZ8v0aJByC8vYXWUj10eHZXi0RX5o2WJB
+	6kaYbL3Mxq8o/gaRmsCdtOKB53OxfsPV2gkkDKxzGhggYOyvi2Xhv29VJvKN96e+c9a4kYldb1s
+	rElCxhDAtJxNM
+X-Received: by 2002:a05:600c:c8a:b0:46e:978:e231 with SMTP id 5b1f17b1804b1-46e1e0aec9bmr21981395e9.17.1758621899782;
+        Tue, 23 Sep 2025 03:04:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHI25GAUzFMzn1I18q3eiplupnGbcDgSnNTWVjo5qrpHHjC0ezlLXo+X0Ba4DizXVJNpGvdsQ==
+X-Received: by 2002:a05:600c:c8a:b0:46e:978:e231 with SMTP id 5b1f17b1804b1-46e1e0aec9bmr21981025e9.17.1758621899350;
+        Tue, 23 Sep 2025 03:04:59 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-403ec628ff7sm3599419f8f.4.2025.09.23.03.04.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Sep 2025 03:04:58 -0700 (PDT)
+Message-ID: <476c5c79-bc37-4c41-865d-d04d1d6974c4@redhat.com>
+Date: Tue, 23 Sep 2025 12:04:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 04/14] tcp: L4S ECT(1) identifier and
+ NEEDS_ACCECN for CC modules
+To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com,
+ linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
+ dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
+ kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
+ donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+ ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Cc: Olivier Tilmans <olivier.tilmans@nokia.com>
+References: <20250918162133.111922-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250918162133.111922-5-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250918162133.111922-5-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add bnxt_fwctl to the driver and fwctl documentation pages.
+On 9/18/25 6:21 PM, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> 
+> Two CA module flags are added in this patch. First, a new CA module
+> flag (TCP_CONG_NEEDS_ACCECN) defines that the CA expects to negotiate
+> AccECN functionality using the ECE, CWR and AE flags in the TCP header.
+> The detailed AccECN negotiaotn during the 3WHS can be found in the
+> AccECN spec:
+>   https://tools.ietf.org/id/draft-ietf-tcpm-accurate-ecn-28.txt
+> 
+> Second, when ECN is negociated for a TCP flow, it defaults to use
+> ECT(0) in the IP header. L4S service, however, needs to se ECT(1).
+> This patch enables CA to control whether ECT(0) or ECT(1) should
+> be used on a per-segment basis. A new flag (TCP_CONG_WANTS_ECT_1)
 
-Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
-Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
----
- .../userspace-api/fwctl/bnxt_fwctl.rst        | 27 +++++++++++++++++++
- Documentation/userspace-api/fwctl/fwctl.rst   |  1 +
- Documentation/userspace-api/fwctl/index.rst   |  1 +
- 3 files changed, 29 insertions(+)
- create mode 100644 Documentation/userspace-api/fwctl/bnxt_fwctl.rst
+I find this description confusing/contradictory with the implementation
+where TCP_CONG_WANTS_ECT_1 is actually a mask.
 
-diff --git a/Documentation/userspace-api/fwctl/bnxt_fwctl.rst b/Documentation/userspace-api/fwctl/bnxt_fwctl.rst
-new file mode 100644
-index 000000000000..78f24004af02
---- /dev/null
-+++ b/Documentation/userspace-api/fwctl/bnxt_fwctl.rst
-@@ -0,0 +1,27 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+================
-+fwctl bnxt driver
-+================
-+
-+:Author: Pavan Chebbi
-+
-+Overview
-+========
-+
-+BNXT driver makes a fwctl service available through an auxiliary_device.
-+The bnxt_fwctl driver binds to this device and registers itself with the
-+fwctl subsystem.
-+
-+The bnxt_fwctl driver is agnostic to the device firmware internals. It
-+uses the ULP conduit provided by bnxt to send requests (HWRM commands)
-+to firmware.
-+
-+bnxt_fwctl User API
-+==================
-+
-+Each RPC request contains a message request structure (HWRM input) its,
-+legth, optional request timeout, and dma buffers' information if the
-+command needs any DMA. The request is then put together with the request
-+data and sent through bnxt's message queue to the firmware, and the results
-+are returned to the caller.
-diff --git a/Documentation/userspace-api/fwctl/fwctl.rst b/Documentation/userspace-api/fwctl/fwctl.rst
-index a74eab8d14c6..e9f345797ca0 100644
---- a/Documentation/userspace-api/fwctl/fwctl.rst
-+++ b/Documentation/userspace-api/fwctl/fwctl.rst
-@@ -151,6 +151,7 @@ fwctl User API
- .. kernel-doc:: include/uapi/fwctl/fwctl.h
- .. kernel-doc:: include/uapi/fwctl/mlx5.h
- .. kernel-doc:: include/uapi/fwctl/pds.h
-+.. kernel-doc:: include/uapi/fwctl/bnxt.h
- 
- sysfs Class
- -----------
-diff --git a/Documentation/userspace-api/fwctl/index.rst b/Documentation/userspace-api/fwctl/index.rst
-index 316ac456ad3b..c0630d27afeb 100644
---- a/Documentation/userspace-api/fwctl/index.rst
-+++ b/Documentation/userspace-api/fwctl/index.rst
-@@ -12,3 +12,4 @@ to securely construct and execute RPCs inside device firmware.
-    fwctl
-    fwctl-cxl
-    pds_fwctl
-+   bnxt_fwctl
--- 
-2.39.1
+
+> @@ -1322,6 +1328,18 @@ static inline bool tcp_ca_needs_ecn(const struct sock *sk)
+>  	return icsk->icsk_ca_ops->flags & TCP_CONG_NEEDS_ECN;
+>  }
+>  
+> +static inline bool tcp_ca_needs_accecn(const struct sock *sk)
+> +{
+> +	const struct inet_connection_sock *icsk = inet_csk(sk);
+> +
+> +	return icsk->icsk_ca_ops->flags & TCP_CONG_NEEDS_ACCECN;
+> +}
+> +
+> +static inline bool tcp_ca_wants_ect_1(const struct sock *sk)
+> +{
+> +	return inet_csk(sk)->icsk_ca_ops->flags & TCP_CONG_WANTS_ECT_1;
+
+Should the above tests be:
+
+	(inet_csk(sk)->icsk_ca_ops->flags & TCP_CONG_WANTS_ECT_1) ==
+TCP_CONG_WANTS_ECT_1
+
+?
+
+Otherwise existing CC with TCP_CONG_NEEDS_ECN will unexpectedly switch
+to ECT_1 usage.
+
+[...]
+> diff --git a/net/ipv4/tcp_cong.c b/net/ipv4/tcp_cong.c
+> index df758adbb445..f9efbcf1d856 100644
+> --- a/net/ipv4/tcp_cong.c
+> +++ b/net/ipv4/tcp_cong.c
+> @@ -227,7 +227,7 @@ void tcp_assign_congestion_control(struct sock *sk)
+>  
+>  	memset(icsk->icsk_ca_priv, 0, sizeof(icsk->icsk_ca_priv));
+>  	if (ca->flags & TCP_CONG_NEEDS_ECN)
+> -		INET_ECN_xmit(sk);
+> +		__INET_ECN_xmit(sk, tcp_ca_wants_ect_1(sk));
+
+Possibly a new helper for the above statement could be useful
+
+/P
 
 
