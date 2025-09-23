@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-225611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9FCDB96126
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:48:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E627B96141
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:49:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DC091791EC
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:48:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 536B219C4429
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:49:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6318C2153C1;
-	Tue, 23 Sep 2025 13:48:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2BF14A0BC;
+	Tue, 23 Sep 2025 13:48:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pi5Uu7FE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NHxbRLjS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 947BD218AD4
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 13:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0171A4F12
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 13:48:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758635291; cv=none; b=fNyUHLoDhyoI7x8bw08Vm1/7Ua96E3iE9ykT2Ogn1JnPx8ICvq7xJA1nsih6qm+CGvv/16DnRxykTXwnG8/gDQHeK/wRZi9wzggM45lLRipieN5ssHEgaDAj8xCgVZS7sxu9HCAB+1lcBZUPO87SN0Hz94iYaD0vbdVeHPdkMCI=
+	t=1758635296; cv=none; b=TpOeuJSuIvKo8BmZVVvgWY2Wfl+9pM+gbWzwaxNTxczJRlH6NWN3LrlIhfuYqp/Qn/odamRBQ+8aXH87El7jJ0ZS3gWn8ow7HuQ5B6rGAJe+gsi5SHlZPQPHHoBXt6tJg/29MB2LSRiTacPih/Hcc/pEsjBnYjfXjpZtGc/oNAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758635291; c=relaxed/simple;
-	bh=XZp276NPdc/FQ5nsh8KGf614UeKySK1cn+XDFG6RsmA=;
+	s=arc-20240116; t=1758635296; c=relaxed/simple;
+	bh=I0JMVMkxbiDYQyEkwL9i4HgJzjy9iFcQ8Je4BhdWpi8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R4VAO0Vb4qVAfW5y0ke0U7RvRiMViqASG/vLFXDdERj342oiD5vK6qrWRIbCon+iKwqmPXH/SbEMlmRVonRgIAkuhwZBnOj4K3ToUhS7Nwfi1jJKp9Hawq5td2SAFNTIlLdv0j2DcuRwALNZcKSHDbgJ64h90QeQMDBjgcLvlxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pi5Uu7FE; arc=none smtp.client-ip=209.85.128.51
+	 MIME-Version; b=S1jtGg1JPiLH7+VczEYei256flZEm9FW+TvA2p26EY34PzE/1fD0NBbv5k9WUcxqhFWVL7PSfHrzBEyfWSTH/h2pk4Lf8A6/HmZZaJkSSsDQ1V8FzYrYv9uoDInzKLh3hJ8HoHtHsHUVZ/ztbaskDCM1F+9DT4QQgtCuzmxcZx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NHxbRLjS; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-46c889b310dso26448465e9.0
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 06:48:09 -0700 (PDT)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-46d40c338b8so16661895e9.0
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 06:48:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758635288; x=1759240088; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758635291; x=1759240091; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZEELF53X/oyK/iLXDVVAz2PmIQGvhzwOkPBm+ufqyBs=;
-        b=Pi5Uu7FEMfyQ8TScvhzvtakwszFy3ZbZqsMHsVsT7uZJUUCDghTdWQDlH0+Mxa2V6+
-         X66g8NK0O+zrrEqDIKgYhNbXho2v6sRJidg819G07GTeq9b6FEbUHKGlmQdvZrvzjTey
-         iliPJx+VuIsqJ5yDnXP/VbnSSAg9E/6lfxVIj0M0Tu6mQuAreATwCJyLUcwPp8xsNj8/
-         VGAugIfQqoW9vrSZOmqTJBD7565rOu/ytdaH4S9pE05iwkThDpcA46Gw0Q+VwIIx8TSV
-         QYgrpZLvMExpQxSuxcowOu/ESAoKktO4Skx+tG5vFyZvMlibZ4K411vESbPvB3I2cMD9
-         NgYg==
+        bh=jYrEAYGhHvjaVQ7/HWTUrwRP3myHModbarlQ+DQ3Xg8=;
+        b=NHxbRLjS3u1V8AtEHbkzEvFPfMr1tRjDVqpwqjp2OhMBwv4LC7uCcwrC++GDq57ogJ
+         sRVXvOLwwX1+GoKfWbBrfKW/E3nmdCoCXIIpNX+3BFgJwKr5Jq7NG/3wO5Ro0JWWheDK
+         yYUvSWr5P/87tKllkIz2pm6BkfYUMnApNUU+YyoPWlGv5zDiQgtLg/Zk/QykRaSducGB
+         SkQMvmS+y04vlMXCMga8c1GzZhkRfzIBlbOkpRd4PAXAWVYDLjlUzpo3Oz1u8z/ppoOR
+         dvANjSPNE7ME1bTANdy4Sv2cWwhxVlI6aEkGxW+keTIUC7CoIPgcnC8cHQUV2yDYB/Ic
+         V5bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758635288; x=1759240088;
+        d=1e100.net; s=20230601; t=1758635291; x=1759240091;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZEELF53X/oyK/iLXDVVAz2PmIQGvhzwOkPBm+ufqyBs=;
-        b=PT0Mxt/NzEBA1732XZQ5KQpduC+EdZEnAnXXZ2KlB6dC3OskFGoa0mqspg2Brxp6/Z
-         /8tNa+oOAmZnpvLxSBJ5k2cUu3xt1/3fLTj73iZ+wYeHSoQNm6LRN4mlCCm1bEGsGqLa
-         kSK94aXY4mH0sqQOKcdL8oMEeVKTxQnKdpww9kVs3gbQtUdX9/6ELfFAhz+LLrtr7/qa
-         R0iI1VijoOTv6OSU08ZVl4LQMY25r+Qg+LKtGXjfY79C2n8/aRcP7y+RfEpavGsq7hDL
-         43nNK37MnYlva5Vt31x/xzoVmRDeQU/tb/LF+qsxijnjIFnSKfwvlBVIXrLX6CjYLCZP
-         yeSA==
-X-Gm-Message-State: AOJu0YzNAUfiDdgPi5gKHDeuxXZMC86Oj/k7gnhgoRS8E31AjkDkTknZ
-	mYtCe8M6r0ZMURg3C4YZz2XIxegWaXE1CG+OpfwjCKXTol5R4+S4usMQ
-X-Gm-Gg: ASbGncvgttrH454WQRUnQ5SNHKQ7s1yIOrqTotsbtrqlge/UGiTQhntpwg5v8fOk3VJ
-	u7mRh1i6kTklvb+n4K1H5gQ2Ctl6vaoyojCzOmvgOJxdLu/BQhuNPa6SpHIJd4yWh4B0r0PcZeb
-	7xM9EqC63/8EJz7d9aWv9jQoeqhOx33+3jIsIPpwsa91qgdEl9OcPMgO2KaxkNqyvf+VrqLovUb
-	xraLWJuN+/Ygv/tsvtTeV/s4Z2cWxPZin5qcgnzxyPGROOtfhR4oZ0wlzinWB8rpkFpmx7tvUI4
-	lInjU8ouQ2ZLH1K3+vqWdv2xzuhT9CI3dNxMBr1Aypoj2st+0T7McxxgxUG25HDhXwebQNCQa7Y
-	1uZ1f2YWj2mTVfWanxA1RNTdsRkLEdUQDQPyCkpObMLnku0Ms0Qnmf0A/AOE=
-X-Google-Smtp-Source: AGHT+IF/3t7s+m5PxBwr7Y6UdKkBoIlXtsZa277kUqAiiBj96QiAmO7XceBKvT+5eaExjKyehOOqiA==
-X-Received: by 2002:a05:600c:4fcf:b0:46d:1a9b:6d35 with SMTP id 5b1f17b1804b1-46e1e167fa7mr27308995e9.14.1758635287844;
-        Tue, 23 Sep 2025 06:48:07 -0700 (PDT)
+        bh=jYrEAYGhHvjaVQ7/HWTUrwRP3myHModbarlQ+DQ3Xg8=;
+        b=C+wF9ogbGAF90rveZLUhkt4ohVp8VVMi/0zjweTx9AyJO1dmjQBocEE8mperkD5OK9
+         Oyk52jm9t1u9T3KG81F1yA7IbCJrKZ+ISFu/xCV7UzN0h2cRNcsN1bFrZ3Tq2CSO83uy
+         5k8Z7xNL5u/yBP9xWIHS/2Xnatc0gFHSMd2cpoZ7KKeTXVoiKK6G7HHQxNMqKZCSLtcl
+         qaVjVyFL2qIMDlU53tbG5Ay9GuFaF7PB0Lu8gqT4wmhjZ+lyp+lcdWlK1Kru24joy8q5
+         EgfPJ5Tc7nZ3AhXsHroNu8PgjJIJWOlxnLt0Vsncnc2RrzXtgj7Q67AdWh4bYbB5TaC1
+         aKDA==
+X-Gm-Message-State: AOJu0YyQHKL3gpv9nMMwpIdLR473xYEkZYkYB+2FI/BsrnQ3KXlno9dt
+	DJQoh4REfqZVlIPM2QhI+ZcCnsRDBxSeiiRDQiWqRGEEF272tQmvQSOD
+X-Gm-Gg: ASbGnctExGZzbMyDzLQQqsbQsiJPAzlI8C99R6mLSJ1SbAoAY5q+RrygVTb+Z/em9X4
+	D9SYG2E6OQpj3pZTVw8yCbGvKuuk3LkpjNzPqr9oy7JPUAFTKIPr4dTPpvg/yI+qTZS1TEOHJ7/
+	4X4n7lLgsnjpJLvyZUsHk+cqtHObcVzKOKTBxeX/ZVV1TLXYIKoAZi20kry73Crw+aQI8/N1pl5
+	tmaBFsSdtJKDYD1qcEsPUIFCD6dxxjiFZUg2FgLU6b6FKxZFl5tl/58RZzZfz4fIqeLpqG5dhlH
+	yeeKKJz/BCI7OI4hw/NULEBQ32SxhtTgdTgmQjDWU4/SPx/2WkUUKd2XJKr3amWAoj9Xp2tNnqK
+	PjXXW+6abCEYZF8Re/VuwnILFeDAHQdKejZfJSEhlRSK1B35REJMzX0aynDA=
+X-Google-Smtp-Source: AGHT+IFRMXpoozL13jL9PbE/34adZ6Mf2QbCNOVpGhZ4+6sUw5B5RIEzoAzh3gMJBBVLoPSgCCRSrg==
+X-Received: by 2002:a05:600c:4693:b0:46d:a04:50c6 with SMTP id 5b1f17b1804b1-46e1daca953mr29647425e9.30.1758635290962;
+        Tue, 23 Sep 2025 06:48:10 -0700 (PDT)
 Received: from localhost (tor.caspervk.net. [31.133.0.235])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4613d14d564sm322241435e9.14.2025.09.23.06.48.07
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-46e1bc00695sm44964045e9.4.2025.09.23.06.48.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 06:48:07 -0700 (PDT)
+        Tue, 23 Sep 2025 06:48:10 -0700 (PDT)
 From: Maxim Mikityanskiy <maxtram95@gmail.com>
 To: Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -88,9 +88,9 @@ Cc: netdev@vger.kernel.org,
 	Denis Ovsienko <denis@ovsienko.info>,
 	Xin Long <lucien.xin@gmail.com>,
 	Maxim Mikityanskiy <maxim@isovalent.com>
-Subject: [PATCH net-next 08/17] bnxt_en: Remove jumbo_remove step from TX path
-Date: Tue, 23 Sep 2025 16:47:33 +0300
-Message-ID: <20250923134742.1399800-9-maxtram95@gmail.com>
+Subject: [PATCH net-next 09/17] gve: Remove jumbo_remove step from TX path
+Date: Tue, 23 Sep 2025 16:47:34 +0300
+Message-ID: <20250923134742.1399800-10-maxtram95@gmail.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250923134742.1399800-1-maxtram95@gmail.com>
 References: <20250923134742.1399800-1-maxtram95@gmail.com>
@@ -107,61 +107,28 @@ From: Maxim Mikityanskiy <maxim@isovalent.com>
 From: Maxim Mikityanskiy <maxim@isovalent.com>
 
 Now that the kernel doesn't insert HBH for BIG TCP IPv6 packets, remove
-unnecessary steps from the bnxt_en TX path, that used to check and
-remove HBH.
+unnecessary steps from the gve TX path, that used to check and remove
+HBH.
 
 Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 21 ---------------------
- 1 file changed, 21 deletions(-)
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index d59612d1e176..b3c31282b002 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -517,9 +517,6 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 			return NETDEV_TX_BUSY;
- 	}
+diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+index 6f1d515673d2..984a918433f1 100644
+--- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+@@ -963,9 +963,6 @@ static int gve_try_tx_skb(struct gve_priv *priv, struct gve_tx_ring *tx,
+ 	int num_buffer_descs;
+ 	int total_num_descs;
  
--	if (unlikely(ipv6_hopopt_jumbo_remove(skb)))
--		goto tx_free;
+-	if (skb_is_gso(skb) && unlikely(ipv6_hopopt_jumbo_remove(skb)))
+-		goto drop;
 -
- 	length = skb->len;
- 	len = skb_headlen(skb);
- 	last_frag = skb_shinfo(skb)->nr_frags;
-@@ -13792,7 +13789,6 @@ static bool bnxt_exthdr_check(struct bnxt *bp, struct sk_buff *skb, int nw_off,
- 			      u8 **nextp)
- {
- 	struct ipv6hdr *ip6h = (struct ipv6hdr *)(skb->data + nw_off);
--	struct hop_jumbo_hdr *jhdr;
- 	int hdr_count = 0;
- 	u8 *nexthdr;
- 	int start;
-@@ -13821,24 +13817,7 @@ static bool bnxt_exthdr_check(struct bnxt *bp, struct sk_buff *skb, int nw_off,
- 		if (hdrlen > 64)
- 			return false;
- 
--		/* The ext header may be a hop-by-hop header inserted for
--		 * big TCP purposes. This will be removed before sending
--		 * from NIC, so do not count it.
--		 */
--		if (*nexthdr == NEXTHDR_HOP) {
--			if (likely(skb->len <= GRO_LEGACY_MAX_SIZE))
--				goto increment_hdr;
--
--			jhdr = (struct hop_jumbo_hdr *)hp;
--			if (jhdr->tlv_type != IPV6_TLV_JUMBO || jhdr->hdrlen != 0 ||
--			    jhdr->nexthdr != IPPROTO_TCP)
--				goto increment_hdr;
--
--			goto next_hdr;
--		}
--increment_hdr:
- 		hdr_count++;
--next_hdr:
- 		nexthdr = &hp->nexthdr;
- 		start += hdrlen;
- 	}
+ 	if (tx->dqo.qpl) {
+ 		/* We do not need to verify the number of buffers used per
+ 		 * packet or per segment in case of TSO as with 2K size buffers
 -- 
 2.50.1
 
