@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-225609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30FDEB9612F
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:49:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90854B9612C
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:48:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FE7819C429D
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:48:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D0613B8038
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:48:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E1861A5BA2;
-	Tue, 23 Sep 2025 13:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5B11FBCA7;
+	Tue, 23 Sep 2025 13:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xz81mPd6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l3IL54Sk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C46B20766E
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 13:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 116022045B5
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 13:48:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758635286; cv=none; b=GZqA9w+YpoQQOF8EAhtYjasGmfD2hvMf+N6bExg60fglF+TmDzNjRtLTmsNp8dMPqPbu4DGZfyVnTLtIQBdiVyvgBfldZG7CbT4jcQ+QC2MeYLPnjSiPIg2NSo2YqQT1j67N7Qbw76GiY374SgqpnwiSbKBxpPzoG1KT/Si/THE=
+	t=1758635288; cv=none; b=GiSUIedDCXs9AHSDwOwaCKy1ttLj2yIlQIM/aKTTNYqV8FCy5BbMmfajgW6PYbkIcI3gYlKvLIZ6GM4ql2Zl04hcQNO86NjiH0LHLmqOjY/EeatPRoa8gmaK3DPyDhupT7IqtCkILRbvA2bhHZMbkJqhMvRzdZSy7RRVJ64qQZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758635286; c=relaxed/simple;
-	bh=DwqYpKTXau6vhBXM+pzvs28rbUhSSDoTbAVZk1c8v+I=;
+	s=arc-20240116; t=1758635288; c=relaxed/simple;
+	bh=ubtbo/7i91ihrLlwf65kGCD4rQTWY7ekmlyJ4hBJ8j4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UZkEdYXJNoieBFxEWlu9fAjf0uBgIM6YhqOHT5rbiKQyeq3DDMnCYOEDF1vSre1MQ3/NicD8fMULD6xMlrCBEQZzDGQpYC9hQRxsgyJmYRAoTubBGJ7Ehvygd+awrbXmjXiFj4M8Pk2Uv1vFEloL2M+fxDz8G1Nb0hiQ6JnG5nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xz81mPd6; arc=none smtp.client-ip=209.85.128.52
+	 MIME-Version; b=SKGMvqQdh4ZthTNOTjg453+Yw0y8AGcJ8okEGAtQsa8uWuE1nnKBe3JN6rHKZTJgIprxY2CNiqMLqyV6AtGJ/n7CkOYyluGGMnz8zQjnz/Fu6EVgIs4MPrhiBzl12CWO4SMJgccBxSV1182BJp+I2ivaffrFMf6Xnj+j+jnFUtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l3IL54Sk; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-46d25f99d5aso15669335e9.0
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 06:48:04 -0700 (PDT)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3b9edf4cf6cso4981494f8f.3
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 06:48:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758635283; x=1759240083; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758635285; x=1759240085; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=st+ur//QDkwfuMGditKwVjge5bMAayZ6QeaI82Ojcu4=;
-        b=Xz81mPd6WCfBKCpYn98b+UURHlPYxVSXpthIRBgsK4jKSSzuuJDqiR4yIuHNURuSir
-         l4qqZ7XAl6kjjbBLXwzzfsxkIti/R/b9aWlfvPkEwrunfOBz1FoPbGEgt4o0udeM4tvZ
-         6U4jaHx/k6gHzKIDjoS2QallNiKSeTdiHTSMg0T1yOFox3ZRb8Z9EDw5Lt+WGqhL8X12
-         7E1gdZfRUKrDJjt9seBzRhGVPFHXZj0LrHRjZgxkVx8kGWiQDY6Ps+M286c0XminjPL7
-         gwMqaLENbZyflSVdHpKO5421jioltMKvwLK85FkOqs4Lkcoa85IcRf5+9lL34+wreC7N
-         DAVA==
+        bh=5k9nEZHDmwE9ekP8wjWhluIJHQ3tjWAvaKboZAzLqlE=;
+        b=l3IL54Sk1GbQwpxiEywuhYIZ56kCwi4ZBjYdKWKERDyoGu1lhgDXMrWAxF87dQTIM6
+         mjNh90H1VVfrUR0F0NL+ulPAvcxPxhLMfay6dhZlfI6HdtxmeJCj79FifEd2wr2E2vY1
+         FQkIgm1+uQFFNolBZdGxct+KhbGAGnJ89SayHBWnC0VFz9paKrdVWg9T26W1w9mU4Rd6
+         AzTRM6DfhwdI+kGLYGW05O3Q7+qZJBl1DbSmXovN+V0rBTa4ZgkRQYpeNasP9f/4y9VD
+         JNcsp/kAeCiyFDzpisY0bHf8ujh2vGAQBk1hCXS8LGqd0HlOZMZQSSOnuWo3Xk/OM2Yl
+         GuQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758635283; x=1759240083;
+        d=1e100.net; s=20230601; t=1758635285; x=1759240085;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=st+ur//QDkwfuMGditKwVjge5bMAayZ6QeaI82Ojcu4=;
-        b=gCy3kKEuEypLpj95jejPrpx/+SfRUabAqRU5l46pXwtZzomDLyYLXq5W/I11pX5iIc
-         pd3Q6GM5brN52wtnlKKCOJi8krrSgHUqYWxfWL4LAq5RQC8NJen8+E+VTtjsJd2PRE5y
-         wh43nkw408qfo343wm5Yb6ABKgWuqh1VBcyCuWdIJwbulfN6psvNh63cDj2zuxghNu9j
-         pYcLNHM07CnSo9/ELsizcNY3x/bBbVosTIolJnuHeQdoyKpCiC9pOe0DUAGOzhYjuazs
-         MA17SEfnv1fY+o+9r88b2uPEaEbi2Nbf8fOriF8dBCTEqc+qIZ6mOZNf20yGYtiiF8vs
-         v9ww==
-X-Gm-Message-State: AOJu0Yy9LIxHaoxJCCCC6GFN4GoVJSFcAu9OQ21vvy6aOwpQXG1g10aS
-	q1QAa99vDd1Sl6xT8TyJ32T6fOEwqleCgmxEJgmLlJKt16r5U/EgD3jc
-X-Gm-Gg: ASbGncv3D9bPD9jE1mty+3rJomkUfSv8MJbQngEIGkUfiZ6+gFJIqcG4Y2A8ZSonj9+
-	aQ6vZfD00DFii6iv0XjW96H72vGdD3jOeB+wnvV21VSU22xg9Km0IhbRgA2kTx8gd2Mo4yQtgkd
-	k+YhVR9rrA8qV8mkNBDTraqK0EMlTbg4C75wxKXZwcjb8YHPguAT2QZwyB0HeGspWREqZZchADq
-	JOAEnP+1QlL/bqEZdWjGiSrnStnoZFhj7LN4mN/crkqIiwxwA8h2MK1SIScLFu3rq2oXVGNVzKa
-	iq+RMZKdt28mI8dqN+R12yMaIveFAWwqWA9629EwKDLWFnULFh5Tx+V9tkBYb7QEkDJjTXbgDpy
-	8lEG1nEJgA+Eng3qSa1XBNi4xaa29vyBYN0eSR0ixxVdz0+jmFHxNRNFrKCU=
-X-Google-Smtp-Source: AGHT+IEGOePtXL0eudR5Pwqxhf5w613K1ZKRlie2QD1JZdsWORnIyr1q6XRLgOGqsyCfLDksblwfcA==
-X-Received: by 2002:a05:6000:40c7:b0:3ea:63d:44a8 with SMTP id ffacd0b85a97d-405d090c6f8mr2553939f8f.15.1758635282691;
-        Tue, 23 Sep 2025 06:48:02 -0700 (PDT)
+        bh=5k9nEZHDmwE9ekP8wjWhluIJHQ3tjWAvaKboZAzLqlE=;
+        b=SUiShSWXandwQbNzbN49RFQuYSic6gL+9kXrsF79S/BykvRA8YsigXgd+bybjhtY0R
+         ugyTfKiIc6tuptG16k3dDcGrBAfxvT0WngQUh3bP4FOJxPHyVUQOy/DmHzbMC9SLo19Q
+         Bz5miKylxGcNqsf8LoGizE1BqFsZGX0mIPbFtjFiAckSiLoakXS7RUi/sbwSHr2U13oE
+         BGfQZHYhBtxvERMSjHQgI0Zs0AyPbEJIR0Z2zyS6/zh8D4lyhZ54AGcLPzUNO0Yb9VeA
+         jtfVpvP7tM4rts6xov661LZ+mWK0vs3mU0Q0xOnjCVNHTm55luyT1d0iCY/zy/9whLSr
+         Z88A==
+X-Gm-Message-State: AOJu0Yy1XS/fAODeUVZqR1Ef4J01A2xEqhy7ifkDVhMUWJZS0SK1Xafj
+	mIKXjePJ5SiWN/x9TSgcOxYVH16jppXoF9peRtj9SqdpW2QNply0bKnp
+X-Gm-Gg: ASbGnctNqw2nuhMbVcwqemMTolwjXHE5peBQAw4ccAu/cW6WRxxsQMCpH2IpXn0+LtD
+	HBoQPkZWi2vDHULX60FQc83ORZxPgCHeS5K1CUa0GLPIYNkwg59qwDJdG1oOW8Lg5r+wex8tGz5
+	yolXs6Js46UhzGF3nx9Jr8XJ35/0nCPPDMK582+ndomsmqUPuK4/rKSb//e6PU47dg2aidcYX1E
+	HTPQzX7rxurzFU8nKa2qLQ9KsPqnnMTctT9VBzsXfVkFVAeOjJ9Qr3emsrjti+H7ewoNo0iv49W
+	IQXbRyNHikgTZtRvdAy+TAI/9In6LvTWzZ2KbGfxRKr5tz91ulk3DsvSpdmDhUzTYQEipeXR6ne
+	ernz1QeD4qQPup482v/Y2mpmHDrUHuAzeRRCi4DG25ywSn4CPplQ2Ek54oqw=
+X-Google-Smtp-Source: AGHT+IGhagL5j2uXUbZVuLLVlNlAigxx1lnVGHOSSTDsIOGg2VXK41WRQgF99UFHQ8Wi4kmYmSopww==
+X-Received: by 2002:a05:6000:40e0:b0:3f4:84d0:401a with SMTP id ffacd0b85a97d-405c551b8ddmr1662334f8f.4.1758635285327;
+        Tue, 23 Sep 2025 06:48:05 -0700 (PDT)
 Received: from localhost (tor.caspervk.net. [31.133.0.235])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3f9c62d083esm12082311f8f.32.2025.09.23.06.48.01
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-46c9d5d52dcsm116147915e9.8.2025.09.23.06.48.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 06:48:02 -0700 (PDT)
+        Tue, 23 Sep 2025 06:48:04 -0700 (PDT)
 From: Maxim Mikityanskiy <maxtram95@gmail.com>
 To: Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -88,9 +88,9 @@ Cc: netdev@vger.kernel.org,
 	Denis Ovsienko <denis@ovsienko.info>,
 	Xin Long <lucien.xin@gmail.com>,
 	Maxim Mikityanskiy <maxim@isovalent.com>
-Subject: [PATCH net-next 06/17] net/mlx4: Remove jumbo_remove step from TX path
-Date: Tue, 23 Sep 2025 16:47:31 +0300
-Message-ID: <20250923134742.1399800-7-maxtram95@gmail.com>
+Subject: [PATCH net-next 07/17] ice: Remove jumbo_remove step from TX path
+Date: Tue, 23 Sep 2025 16:47:32 +0300
+Message-ID: <20250923134742.1399800-8-maxtram95@gmail.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250923134742.1399800-1-maxtram95@gmail.com>
 References: <20250923134742.1399800-1-maxtram95@gmail.com>
@@ -107,119 +107,28 @@ From: Maxim Mikityanskiy <maxim@isovalent.com>
 From: Maxim Mikityanskiy <maxim@isovalent.com>
 
 Now that the kernel doesn't insert HBH for BIG TCP IPv6 packets, remove
-unnecessary steps from the mlx4 TX path, that used to check and remove
+unnecessary steps from the ice TX path, that used to check and remove
 HBH.
 
 Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
 ---
- drivers/net/ethernet/mellanox/mlx4/en_tx.c | 42 +++++-----------------
- 1 file changed, 8 insertions(+), 34 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_txrx.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_tx.c b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
-index 87f35bcbeff8..c5d564e5a581 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_tx.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
-@@ -636,28 +636,20 @@ static int get_real_size(const struct sk_buff *skb,
- 			 struct net_device *dev,
- 			 int *lso_header_size,
- 			 bool *inline_ok,
--			 void **pfrag,
--			 int *hopbyhop)
-+			 void **pfrag)
- {
- 	struct mlx4_en_priv *priv = netdev_priv(dev);
- 	int real_size;
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index 17cda5e2f6a4..5db84ef36fd6 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -2427,9 +2427,6 @@ ice_xmit_frame_ring(struct sk_buff *skb, struct ice_tx_ring *tx_ring)
  
- 	if (shinfo->gso_size) {
- 		*inline_ok = false;
--		*hopbyhop = 0;
- 		if (skb->encapsulation) {
- 			*lso_header_size = skb_inner_tcp_all_headers(skb);
- 		} else {
--			/* Detects large IPV6 TCP packets and prepares for removal of
--			 * HBH header that has been pushed by ip6_xmit(),
--			 * mainly so that tcpdump can dissect them.
--			 */
--			if (ipv6_has_hopopt_jumbo(skb))
--				*hopbyhop = sizeof(struct hop_jumbo_hdr);
- 			*lso_header_size = skb_tcp_all_headers(skb);
- 		}
- 		real_size = CTRL_SIZE + shinfo->nr_frags * DS_SIZE +
--			ALIGN(*lso_header_size - *hopbyhop + 4, DS_SIZE);
-+			ALIGN(*lso_header_size + 4, DS_SIZE);
- 		if (unlikely(*lso_header_size != skb_headlen(skb))) {
- 			/* We add a segment for the skb linear buffer only if
- 			 * it contains data */
-@@ -884,7 +876,6 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
- 	int desc_size;
- 	int real_size;
- 	u32 index, bf_index;
--	struct ipv6hdr *h6;
- 	__be32 op_own;
- 	int lso_header_size;
- 	void *fragptr = NULL;
-@@ -893,7 +884,6 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
- 	bool stop_queue;
- 	bool inline_ok;
- 	u8 data_offset;
--	int hopbyhop;
- 	bool bf_ok;
+ 	ice_trace(xmit_frame_ring, tx_ring, skb);
  
- 	tx_ind = skb_get_queue_mapping(skb);
-@@ -903,7 +893,7 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
- 		goto tx_drop;
- 
- 	real_size = get_real_size(skb, shinfo, dev, &lso_header_size,
--				  &inline_ok, &fragptr, &hopbyhop);
-+				  &inline_ok, &fragptr);
- 	if (unlikely(!real_size))
- 		goto tx_drop_count;
- 
-@@ -956,7 +946,7 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
- 		data = &tx_desc->data;
- 		data_offset = offsetof(struct mlx4_en_tx_desc, data);
- 	} else {
--		int lso_align = ALIGN(lso_header_size - hopbyhop + 4, DS_SIZE);
-+		int lso_align = ALIGN(lso_header_size + 4, DS_SIZE);
- 
- 		data = (void *)&tx_desc->lso + lso_align;
- 		data_offset = offsetof(struct mlx4_en_tx_desc, lso) + lso_align;
-@@ -1021,31 +1011,15 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
- 			((ring->prod & ring->size) ?
- 				cpu_to_be32(MLX4_EN_BIT_DESC_OWN) : 0);
- 
--		lso_header_size -= hopbyhop;
- 		/* Fill in the LSO prefix */
- 		tx_desc->lso.mss_hdr_size = cpu_to_be32(
- 			shinfo->gso_size << 16 | lso_header_size);
- 
-+		/* Copy headers;
-+		 * note that we already verified that it is linear
-+		 */
-+		memcpy(tx_desc->lso.header, skb->data, lso_header_size);
- 
--		if (unlikely(hopbyhop)) {
--			/* remove the HBH header.
--			 * Layout: [Ethernet header][IPv6 header][HBH][TCP header]
--			 */
--			memcpy(tx_desc->lso.header, skb->data, ETH_HLEN + sizeof(*h6));
--			h6 = (struct ipv6hdr *)((char *)tx_desc->lso.header + ETH_HLEN);
--			h6->nexthdr = IPPROTO_TCP;
--			/* Copy the TCP header after the IPv6 one */
--			memcpy(h6 + 1,
--			       skb->data + ETH_HLEN + sizeof(*h6) +
--					sizeof(struct hop_jumbo_hdr),
--			       tcp_hdrlen(skb));
--			/* Leave ipv6 payload_len set to 0, as LSO v2 specs request. */
--		} else {
--			/* Copy headers;
--			 * note that we already verified that it is linear
--			 */
--			memcpy(tx_desc->lso.header, skb->data, lso_header_size);
--		}
- 		ring->tso_packets++;
- 
- 		i = shinfo->gso_segs;
+-	if (unlikely(ipv6_hopopt_jumbo_remove(skb)))
+-		goto out_drop;
+-
+ 	count = ice_xmit_desc_count(skb);
+ 	if (ice_chk_linearize(skb, count)) {
+ 		if (__skb_linearize(skb))
 -- 
 2.50.1
 
