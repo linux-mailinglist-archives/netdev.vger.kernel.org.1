@@ -1,113 +1,202 @@
-Return-Path: <netdev+bounces-225475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D2ABB93F16
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 04:07:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 225F0B93F3F
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 04:08:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CA11448495
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 02:07:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB94F18A5B7A
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 02:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1232271A9D;
-	Tue, 23 Sep 2025 02:07:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6ED288C0E;
+	Tue, 23 Sep 2025 02:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bX9xsQVP"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wogl13CX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5313226B2D2
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 02:07:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53D0286427
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 02:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758593238; cv=none; b=VSLbJQpPxVupJoy1H8IS3NPCdXEak7M9z0Q/kow0yG4rqmHAlTKZC5IcJp40l4MtKNJx2Y7PAoYRYI1ZoABXgJM0j05MuFS7lN5Ce9/5A9vNvbo4RIyKirHJigJk6jVGJMMSj6cT0F/spy/qxiTtbC9AeO9ERAv12911h5V5fOY=
+	t=1758593260; cv=none; b=gC8XR7y4uylO8pL/kUZuslLQFovTxRVhOhtgT5RoZMhvnRXy/c3KufnTWsZoTpMknd1rzh2htEH0OtBd8HCtTx7sV6ZD7QLsKayUcPjSGYtOkOI3WcXFsR4n3oGoZu4ZbKSOAFGawP/sFPv76xrc+EY2cOsC4ZnHvS3pcNG/WOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758593238; c=relaxed/simple;
-	bh=MRlBwg2VR4zhkZFPOBIJyEsnC4HaYFMMyEQY7TKIMl8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jgBYbUgrbCMpNqCINPY+ueX9qPMz8RYY+E394YxS9j81Xjz0EdYs8IKjBM4otgadGaBZA4TU0EvYVuI74mNFo9vfj4G7ymh/KCeucyYUbhLTXKeGJRth0l+xb7cbwWgMKNMDA6pskaHCtQsln44VBLWKkQgPdz+21S1Mp9iTfO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bX9xsQVP; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2570bf605b1so64985615ad.2
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 19:07:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758593234; x=1759198034; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MRlBwg2VR4zhkZFPOBIJyEsnC4HaYFMMyEQY7TKIMl8=;
-        b=bX9xsQVPHoN7a1aBou5n+0WM4pMcawqLi3gvd8+Pa767zh+x1XSH1Kbq3uVnE1mKDK
-         tS8mNL/NTHAKToMhh9gKOlkD/NwxSakxbV4JTR1UVh82EeprXl4rf9BhBnz+B/3G5xt5
-         XhVJEQaqcmfFB3Q3xT8X86VFNiAJVxpCYD4T9N5p+MOXtK4/per0bic/PvL3CF5y4Vyc
-         9HVyq7k/+aZv/fY7YQmKNdvM1N7UJWxdE2WLlPVi/YVMArRJyq7y0l9erliCHWx75ECh
-         WA4mWCfPV578KaCfWYPVGzWEXtrsLBb0TYIlZN210YjRaCIdsu3FuRFEWD0hr4Lhk4co
-         gqSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758593234; x=1759198034;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MRlBwg2VR4zhkZFPOBIJyEsnC4HaYFMMyEQY7TKIMl8=;
-        b=lcau3MOLJYJKbjpLh2AtRBfHDmKpf6Yy7ZXM+IizyZLzwRhnXI+dnDE0EDSsGPwFeZ
-         GI68eC7hQfJAdv9UHouGzcHyJliMVgsqtZUcrAysbC278tOuNYMShxSKXEM1N2tSL3Sl
-         8CeFi/XTSmSlcOOzj6CMH9ll0ZGiRGlGclLpCOVy7//J102SpsL7oAvkCNDmyeSK8YE+
-         peH2YRI80RIPSV2syAjQSBiaUlQFvyudrN5rQ6rcsxzpzSkosJihcCOc0HtZS/ayQOv1
-         CROShp/vE6O9/fBC/AUHAagUYkg6n6yXANiWDIYZe6vTVjvY1Xoo+36oCCVWQIZKW0b8
-         9tWQ==
-X-Gm-Message-State: AOJu0YwPEv1lyOoi5WdRTBsHmOBTobkR4IiWRFPHT6Sf5H11omsNmZgQ
-	F8uM7e270QaGrHOrHkFFLX3ZTon+jlShFS2NTUmlO+OmnDXHThiEc7Kq
-X-Gm-Gg: ASbGncsCprKPQsOkwIdIZuGMfyArlBgdp3WFTz/JZwvojeNE3EaWaPFXzMjNvc9m5bZ
-	AW2qCinP/eCB2k0w6gQFXpppwbCZDQYABH2v2Qq8zhnwNhOCWy4rR5KrfW8lictYFE+K/mjDvrR
-	DKA9k8awTtqXMuOALHSpIwU32VuKBiy/WjVR5xYi56Y0AFiVxwZT0loyg3nkUuniaOPFJIbJMiX
-	aijfR2LSjQN4XH8Hy+rEpTYG6Z9SjSWXdwjrPvKVfsZEK/gs2bZrdzyAWBOsA8W2RVS7bQE41Pp
-	pksoOQZISMc92npTWkyRiWUZrV+dOeimlt//wKDzGtEQ2SjOQXs2sZVwhiCaKe9wIz2MYMVh0nK
-	4VtzCmpLAYefxI0sdSFAShDagO+c=
-X-Google-Smtp-Source: AGHT+IE0+PWJUQMS01eA+Ju+sRk+tquHKei3LeDGfeGroqZ3Ex1WCkVIuEUgaJxxBmpZMRU8UHhafQ==
-X-Received: by 2002:a17:903:37ce:b0:24c:f589:661 with SMTP id d9443c01a7336-27cc0fa8314mr11935885ad.11.1758593234474;
-        Mon, 22 Sep 2025 19:07:14 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-26980180bdesm144946805ad.56.2025.09.22.19.07.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Sep 2025 19:07:13 -0700 (PDT)
-Date: Tue, 23 Sep 2025 02:07:06 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Tonghao Zhang <tonghao@bamaicloud.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Zengbing Tu <tuzengbing@didiglobal.com>
-Subject: Re: [net-next v8 2/3] net: bonding: add broadcast_neighbor netlink
- option
-Message-ID: <aNIAytaEhRGVTRvu@fedora>
-References: <cover.1751031306.git.tonghao@bamaicloud.com>
- <76b90700ba5b98027dfb51a2f3c5cfea0440a21b.1751031306.git.tonghao@bamaicloud.com>
+	s=arc-20240116; t=1758593260; c=relaxed/simple;
+	bh=5Wb9m62FfFTrECQZbqRXPoInZRSGH+uaxVzcuR6tqDA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cXAD3sADyWPpf0a3r791JwBoIrL5eLOb9K+hi58dQLBAQJxtkVgCQhMeq0PcfMszYIYulnyGtkIBkLYKSim6xNbLhwwJ47tFFObHiq7uOQv1LUihl4QPKFPyTnhyLGacObmGkNxLDbx2eHnWwKku2F8ZyoDRPxlhA93e+Sujiok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wogl13CX; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c90e37cf-82a5-4c31-abe1-1fca8bfc8867@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758593252;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jPHHDyBu7fbsLMcBrmfdxFEmohUKJ5Cry6I2TtdMTBk=;
+	b=wogl13CXH1rjboajAXBQOwoINEWo2XXVMxMc/RzM3HScEE03NeSeFyE2siP2h4DBUDqZql
+	klYfumSOpw73HacB0e3dNm3LXSLLQqkBDYYqmAY46pYCEe1Tq0lTzO7oeHWEbQ6AiUHucp
+	q/ibrbzYYfH+czxMqsHbot3XoJOIkiQ=
+Date: Tue, 23 Sep 2025 10:07:28 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <76b90700ba5b98027dfb51a2f3c5cfea0440a21b.1751031306.git.tonghao@bamaicloud.com>
+Subject: Re: [PATCH net-next v4 3/3] inet: Avoid ehash lookup race in
+ inet_twsk_hashdance_schedule()
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: edumazet@google.com, kerneljasonxing@gmail.com, davem@davemloft.net,
+ kuba@kernel.org, netdev@vger.kernel.org,
+ Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+References: <20250920105945.538042-1-xuanqiang.luo@linux.dev>
+ <20250920105945.538042-4-xuanqiang.luo@linux.dev>
+ <CAAVpQUDaYX5ZQN+EYL3q4yeu0Ni2cqNODEY--Wb-2+yY650Mbw@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: luoxuanqiang <xuanqiang.luo@linux.dev>
+In-Reply-To: <CAAVpQUDaYX5ZQN+EYL3q4yeu0Ni2cqNODEY--Wb-2+yY650Mbw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Jun 27, 2025 at 09:49:29PM +0800, Tonghao Zhang wrote:
-> User can config or display the bonding broadcast_neighbor option via
-> iproute2/netlink.
 
-Hi Tonghao,
+在 2025/9/23 08:45, Kuniyuki Iwashima 写道:
+> On Sat, Sep 20, 2025 at 4:00 AM <xuanqiang.luo@linux.dev> wrote:
+>> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+>>
+>> Since ehash lookups are lockless, if another CPU is converting sk to tw
+>> concurrently, fetching the newly inserted tw with tw->tw_refcnt == 0 cause
+>> lookup failure.
+>>
+>> The call trace map is drawn as follows:
+>>     CPU 0                                CPU 1
+>>     -----                                -----
+>>                                       inet_twsk_hashdance_schedule()
+>>                                       spin_lock()
+>>                                       inet_twsk_add_node_rcu(tw, ...)
+>> __inet_lookup_established()
+>> (find tw, failure due to tw_refcnt = 0)
+>>                                       __sk_nulls_del_node_init_rcu(sk)
+>>                                       refcount_set(&tw->tw_refcnt, 3)
+>>                                       spin_unlock()
+>>
+>> By replacing sk with tw atomically via hlist_nulls_replace_init_rcu() after
+>> setting tw_refcnt, we ensure that tw is either fully initialized or not
+>> visible to other CPUs, eliminating the race.
+>>
+>> It's worth noting that we replace under lock_sock(), so no need to check if sk
+>> is hashed. Thanks to Kuniyuki Iwashima!
+>>
+>> Fixes: 3ab5aee7fe84 ("net: Convert TCP & DCCP hash tables to use RCU / hlist_nulls")
+>> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+> This is not needed.  A pure review does not deserve Suggested-by.
+> This is used when someone suggests changing the core idea of
+> the patch.
 
-Have you post the iproute2 patch? I can't find it.
+Got it, but still really appreciate your detailed
+and patient review!
 
-Thanks
-Hangbin
+>
+>> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+>> ---
+>>   net/ipv4/inet_timewait_sock.c | 13 ++++---------
+>>   1 file changed, 4 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
+>> index 5b5426b8ee92..bb98888584a8 100644
+>> --- a/net/ipv4/inet_timewait_sock.c
+>> +++ b/net/ipv4/inet_timewait_sock.c
+>> @@ -116,7 +116,7 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+>>          spinlock_t *lock = inet_ehash_lockp(hashinfo, sk->sk_hash);
+>>          struct inet_bind_hashbucket *bhead, *bhead2;
+>>
+>> -       /* Step 1: Put TW into bind hash. Original socket stays there too.
+>> +       /* Put TW into bind hash. Original socket stays there too.
+>>             Note, that any socket with inet->num != 0 MUST be bound in
+>>             binding cache, even if it is closed.
+>>           */
+>> @@ -140,14 +140,6 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+>>
+>>          spin_lock(lock);
+>>
+>> -       /* Step 2: Hash TW into tcp ehash chain */
+>> -       inet_twsk_add_node_rcu(tw, &ehead->chain);
+>> -
+>> -       /* Step 3: Remove SK from hash chain */
+>> -       if (__sk_nulls_del_node_init_rcu(sk))
+>> -               sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
+>> -
+>> -
+>>          /* Ensure above writes are committed into memory before updating the
+>>           * refcount.
+>>           * Provides ordering vs later refcount_inc().
+>> @@ -162,6 +154,9 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+>>           */
+>>          refcount_set(&tw->tw_refcnt, 3);
+> I discussed this series with Eric last week, and he pointed out
+> (thanks!) that we need to be careful here about memory barrier.
+>
+> refcount_set() is just WRITE_ONCE() and thus can be reordered,
+> and twsk could be published with 0 refcnt, resulting in another RST.
+>
+Thanks for Eric's pointer!
+
+Could you let me know if my modification here works?
+
+That is, moving smp_wmb() to after the refcount update:
+
+@@ -140,19 +140,6 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+
+         spin_lock(lock);
+
+-       /* Step 2: Hash TW into tcp ehash chain */
+-       inet_twsk_add_node_rcu(tw, &ehead->chain);
+-
+-       /* Step 3: Remove SK from hash chain */
+-       if (__sk_nulls_del_node_init_rcu(sk))
+-               sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
+-
+-
+-       /* Ensure above writes are committed into memory before updating the
+-        * refcount.
+-        * Provides ordering vs later refcount_inc().
+-        */
+-       smp_wmb();
+         /* tw_refcnt is set to 3 because we have :
+          * - one reference for bhash chain.
+          * - one reference for ehash chain.
+@@ -162,6 +149,14 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+          */
+         refcount_set(&tw->tw_refcnt, 3);
+
++       /* Ensure tw_refcnt has been set before tw is published by
++        * necessary memory barrier.
++        */
++       smp_wmb();
++
++       hlist_nulls_replace_init_rcu(&sk->sk_nulls_node, &tw->tw_node);
++       sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
++
+         inet_twsk_schedule(tw, timeo);
+
+         spin_unlock(lock);
+
+Thanks!
+Xuanqiang
+
+>> +       hlist_nulls_replace_init_rcu(&sk->sk_nulls_node, &tw->tw_node);
+>> +       sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
+>> +
+>>          inet_twsk_schedule(tw, timeo);
+>>
+>>          spin_unlock(lock);
+>> --
+>> 2.25.1
+>>
 
