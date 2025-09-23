@@ -1,137 +1,124 @@
-Return-Path: <netdev+bounces-225529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E44FB95206
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:05:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B48A7B9520F
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:06:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CD0018A54C9
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:05:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 727111734B9
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:06:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65A931E8AD;
-	Tue, 23 Sep 2025 09:05:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA2B26560A;
+	Tue, 23 Sep 2025 09:06:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="NhHdJAC5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PaNNYWLH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A073101B4;
-	Tue, 23 Sep 2025 09:05:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA8622ACEB;
+	Tue, 23 Sep 2025 09:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758618312; cv=none; b=VUbXM0k+DToK0IR/xybzgrsS70rRwSMeCz3hjB3aCJYkGCOJ0a8x1Zdk6VymgKEIPx2oh7tOCD5uHACR4/2VNTOHWuVMTmU8S7LJxdEHJtDAWd6H9PLdFBclqdrPTiRg/FVofT4zdRCxSg2bbq8tEnuiiNtHK32JmAZrfB3W6nw=
+	t=1758618409; cv=none; b=Sw3W81bdg+H/vGyk8bf0aBav5flpQ7ThHCwP9bOyGFAhr7fGUhFuRYaMHKJFoLKFxUrr0/8lcKz5R7JQcLDYYODMnCqHRev4cSDKWSMATArFoEx/4c/NX/4woA23SBJdcfAqbBwaZYgAXeOu66HuvboZBisPCq/sbHFhQJMqBxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758618312; c=relaxed/simple;
-	bh=Hfg0snLcgfFu5drLfEucVNQPyA7ydLPTcft7R/VdprU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gFjywXgbMX6AL7iSYNHg5nKMMYOEeh1yaNy9cDnaqj5zXlgrZC4/OoKhTyYADaEfz79omIO1bIUlnmJPq8x3PPRjDi1QcTyT7zapb0p11jc31L1Zaruk78ZcY5oOoINgZ9qTUjFOpa6bRMFwPAMuydl/mq86s4aBD2lxoHtsiew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=NhHdJAC5; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 63868C0078E;
-	Tue, 23 Sep 2025 09:04:50 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 6829760690;
-	Tue, 23 Sep 2025 09:05:07 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 03226102F191C;
-	Tue, 23 Sep 2025 11:04:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1758618306; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=QZg1/K8eQxDZg+ZHRMpx/uJpEdtJih4Wqz5DwLkTAs4=;
-	b=NhHdJAC5RIm/LtUIxmzXVoIFWuHVZ0tCPbKn0pTjLUJe6pbxoDHnFssRCVVJazDIyoeslC
-	9lJRS98MgiaLeEunfg/4U0rnpt8ZpQdifGbVj+RvPGY0g+dJPllOevjlony+90kaQyBDM8
-	BeAlnh+2Xwqz8l72iUmqF54fXOJq6/erK8tCqnowJE8Pix7ciruZWqDOhDhbcPYZ61rvWR
-	mCPCmPTd+RQ9oyYTx7r+ckw1nXbGChoo4phJ5TqYCP9IzJ+zE3usD6l0oUWB13JrxhtFGw
-	D74d7zj4fQOxVrtJhgxJSATe+vf2hPaOSyTvPNbVULi8fgTtvj3fo2Z74BMumg==
-Date: Tue, 23 Sep 2025 11:04:51 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
- <jiri@resnulli.us>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>,
- kernel@pengutronix.de, Dent Project <dentproject@linuxfoundation.org>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, linux-doc@vger.kernel.org, Kyle Swenson
- <kyle.swenson@est.tech>, Luka Perkov <luka.perkov@sartura.hr>, Robert Marko
- <robert.marko@sartura.hr>, Sridhar Rao <srao@linuxfoundation.org>
-Subject: Re: [PATCH net-next v3 0/5] net: pse-pd: pd692x0: Add permanent
- configuration management support
-Message-ID: <20250923110451.6d402a79@kmaincent-XPS-13-7390>
-In-Reply-To: <20250922110220.4909e58b@kernel.org>
-References: <20250915-feature_poe_permanent_conf-v3-0-78871151088b@bootlin.com>
-	<20250916165440.3d4e498a@kernel.org>
-	<20250917114655.6ed579eb@kmaincent-XPS-13-7390>
-	<20250917141912.314ea89b@kernel.org>
-	<20250922182002.6948586f@kmaincent-XPS-13-7390>
-	<20250922110220.4909e58b@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1758618409; c=relaxed/simple;
+	bh=ZDzclZSQdzF1oEaN1C3ZiYcW4WfselUNILKqPuhL7q8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BRIv9H0nGBPayFO7DfoQ3224XO713OCPJXQJPHHZsDaUZ/bRPOqz4rYTDAfinynz10js6pBeTu36/UZyBuMvuK66OFNYdbyyZms9gLNYlwI1j1hxK1I2IN/7qkLdx7I4qyO3WSZfrPj1iYnzYVS+u6guKNRVvNfZRABTjsdUqrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PaNNYWLH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D502C4CEF5;
+	Tue, 23 Sep 2025 09:06:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758618409;
+	bh=ZDzclZSQdzF1oEaN1C3ZiYcW4WfselUNILKqPuhL7q8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PaNNYWLHy4fDFnFg0POymQxjyKJRllvvW2PUUnr0Jp8qv3XJcg61GIMhs0/KUaYCi
+	 lX/Wm0QAu11qh8ACDIi6gny9gGL3pMdWMmwslyzGrPd9Yv+CqqAPBioASdIaJFAHz5
+	 nWochXiHzX7gDhPOTrw3KFTulztGvv4VFW3L4V+yHV6oSRn7wFV54X6ukuc3WU74Gw
+	 l+qoCxx9MlWVSKvZQspuPwwpo6a2fQ4HKGPxOBeq/VS/xyIltNYrFtJ3cKWD+aA4yw
+	 5vqH75FRH5jDyhzcPK5yrdIwqpyRlKbWvslpXBVzVoR6vrHFwJO0dwI1zJYKozBxpq
+	 VJ+7xEh6SPO4g==
+Date: Tue, 23 Sep 2025 10:06:41 +0100
+From: Simon Horman <horms@kernel.org>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev,
+	davem@davemloft.net, kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Moritz Buhl <mbuhl@openbsd.org>,
+	Tyler Fanelli <tfanelli@redhat.com>,
+	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
+	Steve French <smfrench@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+	kernel-tls-handshake@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Benjamin Coddington <bcodding@redhat.com>,
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+	Alexander Aring <aahringo@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	John Ericson <mail@johnericson.me>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	"D . Wythe" <alibuda@linux.alibaba.com>,
+	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Daniel Stenberg <daniel@haxx.se>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH net-next v3 03/15] quic: provide common utilities and
+ data structures
+Message-ID: <20250923090641.GE836419@horms.kernel.org>
+References: <cover.1758234904.git.lucien.xin@gmail.com>
+ <a7fb75136c7c2e51b7081d3bff421e01b435288f.1758234904.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a7fb75136c7c2e51b7081d3bff421e01b435288f.1758234904.git.lucien.xin@gmail.com>
 
-On Mon, 22 Sep 2025 11:02:20 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Thu, Sep 18, 2025 at 06:34:52PM -0400, Xin Long wrote:
 
-> On Mon, 22 Sep 2025 18:20:02 +0200 Kory Maincent wrote:
->  [...] =20
-> > >=20
-> > > Right, subjectively I focused on the last sentence of Oleksij's reply.
-> > > I vote we leave it out for now.   =20
-> >=20
-> > I would like to restart the discussion as I have one more argument besi=
-des
-> > the boot time optimization coming from Luka Perkov in CC.
-> >=20
-> > According to him, not having this feature supported also brings an issue
-> > across reboot:
-> > "When a network switch reboots, any devices receiving Power over
-> > Ethernet (PoE) from that switch will lose power unless the PoE
-> > configuration is persisted across the reboot cycle. This creates a
-> > significant operational impact: WiFi access points and other
-> > PoE-powered devices will experience an unplanned hard power loss,
-> > forcing them offline without any opportunity for graceful shutdown.
-> >=20
-> > The critical issue is not the impact on the switch itself, but rather
-> > the cascading effect on all dependent infrastructure. Without
-> > kernel-level persistence of PoE settings, a simple switch reboot
-> > (whether for maintenance, updates, or recovery) forces all connected
-> > PoE devices into an abrupt power cycle. This results in extended
-> > downtime as these devices must complete their full boot sequence once
-> > power is restored, rather than remaining operational throughout the
-> > switch's reboot process." =20
->=20
-> Any sort of hot reset that maintains the pre-existing configuration=20
-> and doesn't issue resets is orthogonal to storing the configuration
-> into the flash.
+> index f79f43f0c17f..b54532916aa2 100644
+> --- a/net/quic/protocol.c
+> +++ b/net/quic/protocol.c
+> @@ -336,6 +336,9 @@ static __init int quic_init(void)
+>  	if (err)
+>  		goto err_percpu_counter;
+>  
+> +	if (quic_hash_tables_init())
 
-Indeed if the switch reboot and the PSE lose its power supply, the devices =
-will
-in any cases face a power loss. While if the PSE does not lose its power the
-configuration won't be reset whether there is a permanent configuration or
-not. We just need to detect during the boot if the port matrix has already
-been flashed to not reconfigure all the ports. =20
-This argument is indeed not relevant.
+Hi Xin,
 
-Luka any other arguments in favor of permanent configuration support?
+If we reach here then the function will return err, which is 0.
+So it seems that err should be set to a negative error value instead.
+Perhaps the return value of quic_hash_tables_init.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Flagged by Smatch.
+
+
+> +		goto err_hash;
+> +
+>  	err = register_pernet_subsys(&quic_net_ops);
+>  	if (err)
+>  		goto err_def_ops;
+> @@ -353,6 +356,8 @@ static __init int quic_init(void)
+>  err_protosw:
+>  	unregister_pernet_subsys(&quic_net_ops);
+>  err_def_ops:
+> +	quic_hash_tables_destroy();
+> +err_hash:
+>  	percpu_counter_destroy(&quic_sockets_allocated);
+>  err_percpu_counter:
+>  	return err;
+
+...
 
