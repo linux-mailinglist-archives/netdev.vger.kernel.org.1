@@ -1,154 +1,135 @@
-Return-Path: <netdev+bounces-225496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A495BB94C9B
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:31:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 974F3B94D39
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:43:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0EC01902D1B
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 07:32:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CDB72E1B0E
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 07:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04EB30F940;
-	Tue, 23 Sep 2025 07:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qg7SaUn4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D2CA3164D8;
+	Tue, 23 Sep 2025 07:42:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65962E7F30;
-	Tue, 23 Sep 2025 07:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACDE93164C2
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 07:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758612695; cv=none; b=rvyMEj7x9m4iy5i6eLuZsdL8EuQLCctPClJNJLHd/w4rrWJyCT35FIrrZBLPiPPXmISQ50Omp5wrIIwszJVgQrb0VW4XW2eANb0B5LW5JPI7hbi1cQzZiuqkTupfkGmwVHlOY+G7B3k7S55jqUtkznz36dINNZQQaPnHqIsUwCI=
+	t=1758613378; cv=none; b=ZI/TdBjvosAVaByTKrS/E9vfDzgCxCA23KNFHll99Femu8cP7QhJX+p8fvm2JkEC5pZhrFNoEj0Yct+TwwFzg39Y4CE5ohb4J4H1oWT2WkcFV1xjuNGCFPKdwW5HN90wNygOJ+4DQtGt3o2yWUu7Je4I+GDsmOQSAqN+8DPVOHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758612695; c=relaxed/simple;
-	bh=OZ3KgbdB+Q5onuycNUzgfOP/P+g//1x2G/mTz9EqRFQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZU+I1icU18NNPWYHqVwqHlHnYtRYdma+Y2Lg4875ePOIdFoPX4p/dCTfKjDDss9aH4y3+DL7tfQzCwHz7NhGHMoofNklhJoMPBQ/pzUYgXm4yuLPIOWYEG+VH9ImQPTWCN5pT+ctIQLLCdvHF0X/SAWOMJfwfVG8jeo6/OhlUqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qg7SaUn4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1272C4CEF5;
-	Tue, 23 Sep 2025 07:31:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758612695;
-	bh=OZ3KgbdB+Q5onuycNUzgfOP/P+g//1x2G/mTz9EqRFQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Qg7SaUn4m6D4w+ipeevEIX8mDFrCY2bQc2Ep5qh6kvf73amNB/FWfsZxusjlbq6oG
-	 T9MoycaE2i4jsuQ761wBggNlnGRG191a539dDOHvdf8qj5KkNvYyzdcoSZDC3vGBIv
-	 He01kO4iEpx2lxVMNYjKX5ShqNGwhJsxUxvzwLvz5L//r4thSWhQ5A98/QEk+NWbNf
-	 e1PGjwx0+Sh4oYXQL8sYohroQWTbhBLcPApyf0+biRspzFv39xv03Sfa3L6NPlDx7R
-	 idkSlN415ZRipFZdk19O7Zv/5eKRynphO6Gpvoz6XkupITKvzx/mPZVzxJkWlmUlw5
-	 99RpJ3HX7ehwQ==
-Date: Tue, 23 Sep 2025 08:31:27 +0100
-From: Simon Horman <horms@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Lukasz Majewski <lukma@denx.de>, Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>, Divya.Koppera@microchip.com,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH net-next v6 1/1] Documentation: net: add flow control
- guide and document ethtool API
-Message-ID: <20250923073127.GC836419@horms.kernel.org>
-References: <20250922112123.3072398-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1758613378; c=relaxed/simple;
+	bh=7+xUfCB1aKwd8F9tPQYDfPP0+KThw87QTnZkmMsFrCg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DU4g85RB1JokGepOWzoIR1en0VZJ81jvgT5VKoyZBbaxZqy3dd0y9PQIqJKqlvx9cUIpwYN7+rletgdiYGqqGjYI3nF+iSfcMLp0HqhoRBP/d8TkKPvR6kKKwu2xUhAjjy9cluauYDalTz1cC/3CH54iB7l6YTemxi/6xmYi4yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1v0xfg-0003ck-QX; Tue, 23 Sep 2025 09:42:44 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1v0xff-0003Nb-3D;
+	Tue, 23 Sep 2025 09:42:44 +0200
+Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 94B19477A82;
+	Tue, 23 Sep 2025 07:34:31 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/7] pull-request: can 2025-09-23
+Date: Tue, 23 Sep 2025 09:32:46 +0200
+Message-ID: <20250923073427.493034-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250922112123.3072398-1-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Sep 22, 2025 at 01:21:23PM +0200, Oleksij Rempel wrote:
+Hello netdev-team,
 
-...
+this is a pull request of 7 patches for net/main.
 
-> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-> index 7a7594713f1f..7587a00af49d 100644
-> --- a/Documentation/netlink/specs/ethtool.yaml
-> +++ b/Documentation/netlink/specs/ethtool.yaml
-> @@ -864,7 +864,9 @@ attribute-sets:
->  
->    -
->      name: pause-stat
-> +    doc: Statistics counters for link-wide PAUSE frames (IEEE 802.3 Annex 31B).
->      attr-cnt-name: __ethtool-a-pause-stat-cnt
-> +    enum-name: ethtool-a-pause-stat
->      attributes:
->        -
->          name: unspec
-> @@ -875,13 +877,17 @@ attribute-sets:
->          type: pad
->        -
->          name: tx-frames
-> +        doc: Number of PAUSE frames transmitted.
->          type: u64
->        -
->          name: rx-frames
-> +        doc: Number of PAUSE frames received.
->          type: u64
->    -
->      name: pause
-> +    doc: Parameters for link-wide PAUSE (IEEE 802.3 Annex 31B).
->      attr-cnt-name: __ethtool-a-pause-cnt
-> +    enum-name: ethtool-a-pause
->      attributes:
->        -
->          name: unspec
+The 1st patch is by Chen Yufeng and fixes a potential NULL pointer
+deref in the hi311x driver.
 
-Hi Oleksij,
+Duy Nguyen contributes a patch for the rcar_canfd driver to fix the
+controller mode setting.
 
-I believe it is due to the enum-name changes above, but in any case
-this patch alters the output produced by tools/net/ynl/ynl-regen.sh -f
-and those changes need to be included in this commit (or the commit changes
-so the out put of ynl-gregen.sh is unchanged).
+The next 4 patches are by Vincent Mailhol and populate the
+ndo_change_mtu(( callback in the etas_es58x, hi311x, sun4i_can and
+mcba_usb driver to prevent buffer overflows.
 
-In short, in it's current form, this commit seems to be missing:
+Stéphane Grosjean's patch for the peak_usb driver fixes a
+shift-out-of-bounds issue.
 
-diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
-index e3b881346..4a8eec944 100644
---- a/include/uapi/linux/ethtool_netlink_generated.h
-+++ b/include/uapi/linux/ethtool_netlink_generated.h
-@@ -375,7 +375,7 @@ enum {
- 	ETHTOOL_A_COALESCE_MAX = (__ETHTOOL_A_COALESCE_CNT - 1)
- };
+regards,
+Marc
 
--enum {
-+enum ethtool_a_pause_stat {
- 	ETHTOOL_A_PAUSE_STAT_UNSPEC,
- 	ETHTOOL_A_PAUSE_STAT_PAD,
- 	ETHTOOL_A_PAUSE_STAT_TX_FRAMES,
-@@ -385,7 +385,7 @@ enum {
- 	ETHTOOL_A_PAUSE_STAT_MAX = (__ETHTOOL_A_PAUSE_STAT_CNT - 1)
- };
+---
 
--enum {
-+enum ethtool_a_pause {
- 	ETHTOOL_A_PAUSE_UNSPEC,
- 	ETHTOOL_A_PAUSE_HEADER,
- 	ETHTOOL_A_PAUSE_AUTONEG,
+The following changes since commit cbf658dd09419f1ef9de11b9604e950bdd5c170b:
 
--- 
-pw-bot: changes-requested
+  Merge tag 'net-6.17-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-09-18 10:22:02 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.17-20250923
+
+for you to fetch changes up to c443be70aaee42c2d1d251e0329e0a69dd96ae54:
+
+  can: peak_usb: fix shift-out-of-bounds issue (2025-09-19 19:17:37 +0200)
+
+----------------------------------------------------------------
+linux-can-fixes-for-6.17-20250923
+
+----------------------------------------------------------------
+Chen Yufeng (1):
+      can: hi311x: fix null pointer dereference when resuming from sleep before interface was enabled
+
+Duy Nguyen (1):
+      can: rcar_canfd: Fix controller mode setting
+
+Marc Kleine-Budde (1):
+      Merge patch series "can: populate ndo_change_mtu() to prevent buffer overflow"
+
+Stéphane Grosjean (1):
+      can: peak_usb: fix shift-out-of-bounds issue
+
+Vincent Mailhol (4):
+      can: etas_es58x: populate ndo_change_mtu() to prevent buffer overflow
+      can: hi311x: populate ndo_change_mtu() to prevent buffer overflow
+      can: sun4i_can: populate ndo_change_mtu() to prevent buffer overflow
+      can: mcba_usb: populate ndo_change_mtu() to prevent buffer overflow
+
+ drivers/net/can/rcar/rcar_canfd.c            |  7 +++---
+ drivers/net/can/spi/hi311x.c                 | 34 +++++++++++++++-------------
+ drivers/net/can/sun4i_can.c                  |  1 +
+ drivers/net/can/usb/etas_es58x/es58x_core.c  |  3 ++-
+ drivers/net/can/usb/mcba_usb.c               |  1 +
+ drivers/net/can/usb/peak_usb/pcan_usb_core.c |  2 +-
+ 6 files changed, 27 insertions(+), 21 deletions(-)
 
