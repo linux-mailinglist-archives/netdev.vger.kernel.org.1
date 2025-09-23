@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-225550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDDEDB95520
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:50:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A3CF4B95523
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D70E52E1F59
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:50:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 101A22E2697
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D315C3203AA;
-	Tue, 23 Sep 2025 09:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3780320A20;
+	Tue, 23 Sep 2025 09:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="X7e/6tHj"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="IqPICzxq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f226.google.com (mail-il1-f226.google.com [209.85.166.226])
+Received: from mail-pf1-f225.google.com (mail-pf1-f225.google.com [209.85.210.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A64F3191B4
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 09:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A463191B4
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 09:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758621003; cv=none; b=n6KwQDgWOIGqSKpVi9icojcQfR/TtnogSJR+kvXLuzu5ID85mG8VSHCHbR2YI2v2j1nnvjNV3GzePnPoFgrsph6cLa5rX4+7zPhj2xJmUzJhReK42dBNp9Y2oRquyEjtcUrTytlLqSKt2qLKUih0Hd5yc71YCdhqcDz1Y9c1Cqg=
+	t=1758621007; cv=none; b=Oq1FVMTcuBtubqZyl2SkT7swxNfhBQu8bzlkuSHZrOFQFHwwiEReYNAdf/L5GHdMTPwU8E32C4dgZB28+g50OSuKnB8gEJwS5HWa7PTNP+JmOI08wMSUq7pPyolY+3xAT8XxJWirC4p/sknPoeZ8lHXG3MCPyKOnI/NPa5PRndg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758621003; c=relaxed/simple;
-	bh=IpYR51ndOFvlv/bMFEmfUG27BspXq8PKAr1aGXcT0U4=;
+	s=arc-20240116; t=1758621007; c=relaxed/simple;
+	bh=P+xbXXENIRr59C9H8dmSx7rvC10vfBao+7CkpfUO3bM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aSEDvKYqDjCMDf0/VEs9cHfe2z6quhiW6Ig3TUIkfqk6nlx9OyGvTzo0QqgHrFbpGPOL2FJBcIHgSHm1YQj99fJKwQocV+jmvq70FD74IKQ76hjuT+FPzoUXKH078vI5gVDFN8jmeQ81m1YQAPx7UjNKQGRplRezjNq562p/2pE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=X7e/6tHj; arc=none smtp.client-ip=209.85.166.226
+	 MIME-Version; b=a2lEj5p0cfXqG/HPk1VvFMuReX+yRHHlQG3XOpsVWkfPI6Ga5+yViFud0r6mIorjCPBM5ar026mI6tfdFY/7wO6XndgyeBz0fYb8x6IAZJe2UPKjjcoRSkn4lYuz/WLN3GjeyETHwlYhbu0FMJVzIDoQvucnDkOZgRv//uh9B9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=IqPICzxq; arc=none smtp.client-ip=209.85.210.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-il1-f226.google.com with SMTP id e9e14a558f8ab-42480cb42e9so22403545ab.0
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 02:50:00 -0700 (PDT)
+Received: by mail-pf1-f225.google.com with SMTP id d2e1a72fcca58-77f41086c11so1693965b3a.0
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 02:50:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758621000; x=1759225800;
+        d=1e100.net; s=20230601; t=1758621005; x=1759225805;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aUpTZgFhasJBvfgda9efPsDK2iofgo2kIh+Fv09uyaw=;
-        b=Jc+AhqFBXJg/PN6kMDAA00KX2EYEwmmWe9KoyspdqzQiaatKufB9bh4HsYqrlcAh1k
-         Lufu4WCQ4iFk+A/hVsV/S2BY160X7RdAoFQHUr7w855aLpQltBJ5P+xo7fLTjJjU5W2h
-         OEAXWzr28xLql8Lxo+d3FxviJX0cxbNacktuwE5kdWit0rzXI3r4RRMd4mPdmxEJVWqu
-         gUxsb7SJwGh4sZABTd7mdptFYrDPtwCI9XbCVeCq7MWoT1I+iJXsfbhEj4IjgJ7Xq09y
-         HjXYl7eAOS2lc515rY9avxTdE1dsghhCZRkPYnc+FqxHOmMTwPCUA7gqouVydokyAkmT
-         zi+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV8az/XpUR4AOhGGJepY5ZEbFL2oV1c/fKlPDNmcXJE4pf/tD5Y4spcskpQoQueRFwHvo9aZYk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBc2HaWvTcQV3BPZGk3qRnuz/hP69a5TU+mNVJ0IocF18++Dbb
-	6/d7KYo4Y6ZTjoZWsZTIRBRx0kuK5hE4TwlrNhB4kYSvAqKPrcfp+boMXuAGORyecdocbU80N5Z
-	cbMZyimhpoWJ/kjgxFNlGh09E/WUmzAlQJJmgEJkglLQe04FXcC637vAzTmRu595ZbUbJ8KfxuV
-	EGhipCk4XTAHBx8mpxlLb0bCjCoX+C7Fs2r+cpqNodhrdNuY1jrFaPayYZ8jBWfsWkFy4bxSECH
-	C+yxq5aSz8=
-X-Gm-Gg: ASbGncv1fOQwj+FGfPi4WBxVL96yKZbIrMYqfLz6Qkyn5aZvNKFNesnM1JX/pfLQdgn
-	uJSyKndNqLbwzolNcb0On/kk5rrz+X0GHVyq/QhgojwNHRPFPZatnOZt18A1YzQ/Fc3UlCMtqmT
-	v5SDS6Bd76J/kaoySOsVf8sJHm/PCgtDacqZ8EEa/vzJrWXun3gQRykDQ7qPdss0aaZteVVRGms
-	WulDrQqmc30gqyP8e3WYXkS8B0YPINnuiYiMxKFJN3T5yADwjJcJSBo7H4VaAhIQYz1Dq4tZVF2
-	xNDHDc1eEOU0G98paJHd/zLg1I7q5KCmO5rZo30jLAdSp+uTPiCeisWtif6iKcwkgCvA6RljFbO
-	47IR+Nmw1p5zNHT2QJhJND2Hvlt0bBEFz/vvr6FLIki3NEQJZpJBwv9HZOHXqWE0tmOHB4FxZpp
-	A=
-X-Google-Smtp-Source: AGHT+IE+G8+ex6APxiPXE55nIiatFBh6l4nbplvFvujZ6CTNyZONpg1pqu+Pu/c7Ns9H9cvB+kxJX8AwIg99
-X-Received: by 2002:a05:6e02:380d:b0:424:8d44:a267 with SMTP id e9e14a558f8ab-42581eac095mr32893805ab.29.1758621000168;
-        Tue, 23 Sep 2025 02:50:00 -0700 (PDT)
+        bh=sTZFfTvToc3eSrZtaGP9vkY5xr5lWepCbD04a99pHno=;
+        b=Go9SBIIIoWS3dSMEuwQuNq8RkzSc7mQWl8rxkXVs9Ly5xgGh6XzVs6Sc53i2UiuBxG
+         phIah4M5Pi5ZP/+ZbMgrxWphAirMR4xfGP/sogaRZYUFzWpdTtrU4A9k47pVWuFcZ7ZM
+         0MYSFgaUiWKdOdraODdcEnOS5As+Ac1AeLcEAalwrAKwayUwskkmD4uR7rvVJnN4sdtp
+         nMSdXVhVcsefop5KON98YegnNnsVjHUBEdhhgCW2kAjLI7xUpe9BqV9XzEUmraxYAMYo
+         cXg2VScseWFFJ2JAzJg9G+qwYt5r8VCFOBzRPGj3QNGHN2GXGNVQpAtqsT94wqmHBJPr
+         y/Bg==
+X-Forwarded-Encrypted: i=1; AJvYcCXwggQWAVRv8GAAuxJBwjGu9FJ7/CpmxBqZrnxrH0oDnFGjSx/TNrTmvpae4z9McLPbPuGhdYI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzP6LUYCcunerZxrLMXg1/FYOjb/3iv7A1jsJF4FFbqBQBUch7m
+	CCfvf6b5JATKqx7hqw73qqBkwUlvlDo90yCeAcc/rbUAKlHafRwKwDoMDuxgI338P0jpRq/trlH
+	B9EkV4EG83cVbwt9DwTKGgPWBGjqJnq9xfcFqwDss44Nu/GcquEzRLSWLmYwOYTcfM+0P2qO61A
+	wM/vsMKu7ZxLdLNyacWLQX1Rkawqxb8OZ/UDbes6DeqMCXJAnuvXVl/yIXVdoT1kTA7RRLPovr5
+	x4N1vN+2LI=
+X-Gm-Gg: ASbGncswOyzYe4f0hs7PiQOjYAj4q8/3nS7NermkAySbsCk6LAzHiiCJwbfHFme+WN5
+	f36WVlnoDRQo8Ir2X0uL6Tqrmv7KWH0MxyP8cnI9GoqR5XJk9XGc0SqFwbfLIkP795wALoksYGF
+	lSWSwIkm7+jdUviaiO/pVHAOcfaM+gZSSMpKWPyLbxp1GfXVGjBZUpdTlLtkJbw8fayZKn2RZ57
+	WqEmemG+yWyzdFIKnF2DYwlkfDeWZXyZvTHXNxVhvPpg2i7nAihOfaGdrz04wTMXYzfyrI8T+4r
+	3R1Z9560tIo5IWUeGpU8NyWmt1g23WXger7DMh/qK2hOaJwdM7s9J+WnTNE89SHq9vdqmRcsN3n
+	zwoECNV5a+6Gyw7Ym/EpoMgLsrkAbFWQGa+1IpzLZQHyDVPE7+KBdP4+N1uEVxq3VZWObUpuuNB
+	Q=
+X-Google-Smtp-Source: AGHT+IEfq5/O9rLbKAlmRmoUFcrF8N+uWXwxQzX3pK8bI2L938BS+BDTUhey6P89v7t5ZykEigx5mJFzuYiC
+X-Received: by 2002:a05:6a00:1a8c:b0:77f:5048:8a8c with SMTP id d2e1a72fcca58-77f53b65aa7mr2255109b3a.28.1758621005357;
+        Tue, 23 Sep 2025 02:50:05 -0700 (PDT)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-11.dlp.protect.broadcom.com. [144.49.247.11])
-        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-4244a369a9dsm9568175ab.8.2025.09.23.02.49.59
+        by smtp-relay.gmail.com with ESMTPS id d2e1a72fcca58-77cfec3f5a5sm949746b3a.12.2025.09.23.02.50.04
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 23 Sep 2025 02:50:00 -0700 (PDT)
+        Tue, 23 Sep 2025 02:50:05 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b4f87c691a7so9045022a12.3
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 02:49:59 -0700 (PDT)
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2699ed6d43dso52547525ad.1
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 02:50:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1758620999; x=1759225799; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1758621003; x=1759225803; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aUpTZgFhasJBvfgda9efPsDK2iofgo2kIh+Fv09uyaw=;
-        b=X7e/6tHjUQFvo/JCYfWagj9t1a/VqWjtUnJGUtuORo4CnpcCHpV7vIsY8PtJflshEv
-         EmFQQeC9Uhuu0y4D4dRcQjx3rdfZPrnV6ihgVelsyubs4YzkjJja6NUxFAFzWQY0laHz
-         z2I+TgK5WKc0itzI1kq4M/FYheGgmyPF+ha1E=
-X-Forwarded-Encrypted: i=1; AJvYcCWFB0rA/BzBFS4E5iPAe0yQqHiHeyygUUABfhpIt6oURgMtgBZNLXQjeA6E4CQZ+H90sY8vudM=@vger.kernel.org
-X-Received: by 2002:a17:903:32d0:b0:26b:da03:60db with SMTP id d9443c01a7336-27cc185330cmr31261465ad.13.1758620998610;
-        Tue, 23 Sep 2025 02:49:58 -0700 (PDT)
-X-Received: by 2002:a17:903:32d0:b0:26b:da03:60db with SMTP id d9443c01a7336-27cc185330cmr31261205ad.13.1758620998179;
-        Tue, 23 Sep 2025 02:49:58 -0700 (PDT)
+        bh=sTZFfTvToc3eSrZtaGP9vkY5xr5lWepCbD04a99pHno=;
+        b=IqPICzxqldgP0Xqk8zaTu2tEj82YP4yanL+IiwtIACSCEXF6U6FGRXgmCWL5nSl9MC
+         2ktcB31zB/tqwpXT8ckIFI+AsGcU1Zl1SH1cg9/9KXpUXBpkhtZ2pdKDaFLRSjSO1/Rz
+         GgRCX7cVA4wWxLroheVdQHiLudvpkzZ90vr1A=
+X-Forwarded-Encrypted: i=1; AJvYcCWdr3kU1490fhr9RnJQyy7kZMUFRPRNPUUPA6lZe/xV1savu34PdTIb686FcT9xO3VcbrbSqz8=@vger.kernel.org
+X-Received: by 2002:a17:903:986:b0:271:479d:3ddc with SMTP id d9443c01a7336-27cc1e1ace8mr24394255ad.15.1758621003370;
+        Tue, 23 Sep 2025 02:50:03 -0700 (PDT)
+X-Received: by 2002:a17:903:986:b0:271:479d:3ddc with SMTP id d9443c01a7336-27cc1e1ace8mr24394035ad.15.1758621002933;
+        Tue, 23 Sep 2025 02:50:02 -0700 (PDT)
 Received: from PC-MID-R740.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-269a75d63eesm139105945ad.100.2025.09.23.02.49.53
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-269a75d63eesm139105945ad.100.2025.09.23.02.49.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 02:49:57 -0700 (PDT)
+        Tue, 23 Sep 2025 02:50:02 -0700 (PDT)
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 To: jgg@ziepe.ca,
 	michael.chan@broadcom.com
@@ -106,9 +106,9 @@ Cc: dave.jiang@intel.com,
 	leon@kernel.org,
 	kalesh-anakkur.purayil@broadcom.com,
 	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: [PATCH net-next v2 3/6] bnxt_en: Make a lookup table for supported aux bus devices
-Date: Tue, 23 Sep 2025 02:58:22 -0700
-Message-Id: <20250923095825.901529-4-pavan.chebbi@broadcom.com>
+Subject: [PATCH net-next v2 4/6] bnxt_en: Create an aux device for fwctl
+Date: Tue, 23 Sep 2025 02:58:23 -0700
+Message-Id: <20250923095825.901529-5-pavan.chebbi@broadcom.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
 References: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
@@ -121,195 +121,234 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-We could maintain a look up table of aux bus devices supported
-by bnxt. This way, the aux bus init/add/uninit/del could have
-generic code to work on any of bnxt's aux devices.
+Create an additional auxiliary device to support fwctl.
+The next patch will create bnxt_fwctl and bind to this
+device.
 
 Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
 Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 105 ++++++++++++++++--
- 1 file changed, 93 insertions(+), 12 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  5 ++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  2 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 79 +++++++++++++++++--
+ include/linux/bnxt/ulp.h                      |  1 +
+ 4 files changed, 82 insertions(+), 5 deletions(-)
 
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index feb11b9ea4dd..58a7c0af89a7 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -16189,11 +16189,13 @@ static void bnxt_remove_one(struct pci_dev *pdev)
+ 		__bnxt_sriov_disable(bp);
+ 
+ 	bnxt_aux_device_del(bp, BNXT_AUXDEV_RDMA);
++	bnxt_aux_device_del(bp, BNXT_AUXDEV_FWCTL);
+ 
+ 	unregister_netdev(dev);
+ 	bnxt_ptp_clear(bp);
+ 
+ 	bnxt_aux_device_uninit(bp, BNXT_AUXDEV_RDMA);
++	bnxt_aux_device_uninit(bp, BNXT_AUXDEV_FWCTL);
+ 
+ 	bnxt_free_l2_filters(bp, true);
+ 	bnxt_free_ntp_fltrs(bp, true);
+@@ -16780,6 +16782,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	bnxt_init_ring_params(bp);
+ 	bnxt_set_ring_params(bp);
+ 	bnxt_aux_device_init(bp, BNXT_AUXDEV_RDMA);
++	bnxt_aux_device_init(bp, BNXT_AUXDEV_FWCTL);
+ 	rc = bnxt_set_dflt_rings(bp, true);
+ 	if (rc) {
+ 		if (BNXT_VF(bp) && rc == -ENODEV) {
+@@ -16844,6 +16847,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	bnxt_dl_fw_reporters_create(bp);
+ 
+ 	bnxt_aux_device_add(bp, BNXT_AUXDEV_RDMA);
++	bnxt_aux_device_add(bp, BNXT_AUXDEV_FWCTL);
+ 
+ 	bnxt_print_device_info(bp);
+ 
+@@ -16852,6 +16856,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	return 0;
+ init_err_cleanup:
+ 	bnxt_aux_device_uninit(bp, BNXT_AUXDEV_RDMA);
++	bnxt_aux_device_uninit(bp, BNXT_AUXDEV_FWCTL);
+ 	bnxt_dl_unregister(bp);
+ init_err_dl:
+ 	bnxt_shutdown_tc(bp);
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index b2f139eddfec..1eeea0884e09 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2340,6 +2340,8 @@ struct bnxt {
+ 
+ 	struct bnxt_napi	**bnapi;
+ 
++	struct bnxt_en_dev	*edev_fwctl;
++	struct bnxt_aux_priv	*aux_priv_fwctl;
+ 	struct bnxt_rx_ring_info	*rx_ring;
+ 	struct bnxt_tx_ring_info	*tx_ring;
+ 	u16			*tx_ring_map;
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-index 665850753f90..ecad1947ccb5 100644
+index ecad1947ccb5..c06a9503b551 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-@@ -29,6 +29,70 @@
+@@ -28,6 +28,7 @@
+ #include "bnxt_hwrm.h"
  
  static DEFINE_IDA(bnxt_rdma_aux_dev_ids);
++static DEFINE_IDA(bnxt_fwctl_aux_dev_ids);
  
-+struct bnxt_aux_device {
-+	const char *name;
-+	const u32 id;
-+	u32 (*alloc_ida)(void);
-+	void (*free_ida)(struct bnxt_aux_priv *priv);
-+	void (*release)(struct device *dev);
-+	void (*set_priv)(struct bnxt *bp, struct bnxt_aux_priv *priv);
-+	struct bnxt_aux_priv *(*get_priv)(struct bnxt *bp);
-+	void (*set_edev)(struct bnxt *bp, struct bnxt_en_dev *edev);
-+	struct bnxt_en_dev *(*get_edev)(struct bnxt *bp);
-+	struct auxiliary_device *(*get_auxdev)(struct bnxt *bp);
-+};
-+
-+static void bnxt_rdma_aux_dev_release(struct device *dev);
-+
-+static void bnxt_rdma_aux_dev_set_priv(struct bnxt *bp,
-+				       struct bnxt_aux_priv *priv)
+ struct bnxt_aux_device {
+ 	const char *name;
+@@ -43,6 +44,7 @@ struct bnxt_aux_device {
+ };
+ 
+ static void bnxt_rdma_aux_dev_release(struct device *dev);
++static void bnxt_fwctl_aux_dev_release(struct device *dev);
+ 
+ static void bnxt_rdma_aux_dev_set_priv(struct bnxt *bp,
+ 				       struct bnxt_aux_priv *priv)
+@@ -81,6 +83,43 @@ static void bnxt_rdma_aux_dev_free_ida(struct bnxt_aux_priv *aux_priv)
+ 	ida_free(&bnxt_rdma_aux_dev_ids, aux_priv->id);
+ }
+ 
++static void bnxt_fwctl_aux_dev_set_priv(struct bnxt *bp,
++					struct bnxt_aux_priv *priv)
 +{
-+	bp->aux_priv_rdma = priv;
++	bp->aux_priv_fwctl = priv;
 +}
 +
-+static struct bnxt_aux_priv *bnxt_rdma_aux_dev_get_priv(struct bnxt *bp)
++static struct bnxt_aux_priv *bnxt_fwctl_aux_dev_get_priv(struct bnxt *bp)
 +{
-+	return bp->aux_priv_rdma;
++	return bp->aux_priv_fwctl;
 +}
 +
-+static struct auxiliary_device *bnxt_rdma_aux_dev_get_auxdev(struct bnxt *bp)
++static struct auxiliary_device *bnxt_fwctl_aux_dev_get_auxdev(struct bnxt *bp)
 +{
-+	return &bp->aux_priv_rdma->aux_dev;
++	return &bp->aux_priv_fwctl->aux_dev;
 +}
 +
-+static void bnxt_rdma_aux_dev_set_edev(struct bnxt *bp,
-+				       struct bnxt_en_dev *edev)
++static void bnxt_fwctl_aux_dev_set_edev(struct bnxt *bp,
++					struct bnxt_en_dev *edev)
 +{
-+	bp->edev_rdma = edev;
++	bp->edev_fwctl = edev;
 +}
 +
-+static struct bnxt_en_dev *bnxt_rdma_aux_dev_get_edev(struct bnxt *bp)
++static struct bnxt_en_dev *bnxt_fwctl_aux_dev_get_edev(struct bnxt *bp)
 +{
-+	return bp->edev_rdma;
++	return bp->edev_fwctl;
 +}
 +
-+static u32 bnxt_rdma_aux_dev_alloc_ida(void)
++static u32 bnxt_fwctl_aux_dev_alloc_ida(void)
 +{
-+	return ida_alloc(&bnxt_rdma_aux_dev_ids, GFP_KERNEL);
++	return ida_alloc(&bnxt_fwctl_aux_dev_ids, GFP_KERNEL);
 +}
 +
-+static void bnxt_rdma_aux_dev_free_ida(struct bnxt_aux_priv *aux_priv)
++static void bnxt_fwctl_aux_dev_free_ida(struct bnxt_aux_priv *aux_priv)
 +{
-+	ida_free(&bnxt_rdma_aux_dev_ids, aux_priv->id);
++	ida_free(&bnxt_fwctl_aux_dev_ids, aux_priv->id);
 +}
 +
-+static struct bnxt_aux_device bnxt_aux_devices[__BNXT_AUXDEV_MAX] = {{
-+	.name		= "rdma",
-+	.alloc_ida	= bnxt_rdma_aux_dev_alloc_ida,
-+	.free_ida	= bnxt_rdma_aux_dev_free_ida,
-+	.release	= bnxt_rdma_aux_dev_release,
-+	.set_priv       = bnxt_rdma_aux_dev_set_priv,
-+	.get_priv	= bnxt_rdma_aux_dev_get_priv,
-+	.set_edev       = bnxt_rdma_aux_dev_set_edev,
-+	.get_edev	= bnxt_rdma_aux_dev_get_edev,
-+	.get_auxdev	= bnxt_rdma_aux_dev_get_auxdev,
-+}};
-+
+ static struct bnxt_aux_device bnxt_aux_devices[__BNXT_AUXDEV_MAX] = {{
+ 	.name		= "rdma",
+ 	.alloc_ida	= bnxt_rdma_aux_dev_alloc_ida,
+@@ -91,6 +130,16 @@ static struct bnxt_aux_device bnxt_aux_devices[__BNXT_AUXDEV_MAX] = {{
+ 	.set_edev       = bnxt_rdma_aux_dev_set_edev,
+ 	.get_edev	= bnxt_rdma_aux_dev_get_edev,
+ 	.get_auxdev	= bnxt_rdma_aux_dev_get_auxdev,
++}, {
++	.name		= "fwctl",
++	.alloc_ida	= bnxt_fwctl_aux_dev_alloc_ida,
++	.free_ida	= bnxt_fwctl_aux_dev_free_ida,
++	.release	= bnxt_fwctl_aux_dev_release,
++	.set_priv       = bnxt_fwctl_aux_dev_set_priv,
++	.get_priv	= bnxt_fwctl_aux_dev_get_priv,
++	.set_edev       = bnxt_fwctl_aux_dev_set_edev,
++	.get_edev	= bnxt_fwctl_aux_dev_get_edev,
++	.get_auxdev	= bnxt_fwctl_aux_dev_get_auxdev,
+ }};
+ 
  static void bnxt_fill_msix_vecs(struct bnxt *bp, struct bnxt_msix_entry *ent)
- {
- 	struct bnxt_en_dev *edev = bp->edev_rdma;
-@@ -391,11 +455,15 @@ void bnxt_aux_device_uninit(struct bnxt *bp,
- 	struct bnxt_aux_priv *aux_priv;
- 	struct auxiliary_device *adev;
- 
-+	if (auxdev_type >= __BNXT_AUXDEV_MAX) {
-+		netdev_warn(bp->dev, "Failed to uninit: unrecognized auxiliary device\n");
-+		return;
-+	}
- 	/* Skip if no auxiliary device init was done. */
--	if (!bp->aux_priv_rdma)
-+	if (!bnxt_aux_devices[auxdev_type].get_priv(bp))
- 		return;
- 
--	aux_priv = bp->aux_priv_rdma;
-+	aux_priv = bnxt_aux_devices[auxdev_type].get_priv(bp);
- 	adev = &aux_priv->aux_dev;
- 	auxiliary_device_uninit(adev);
- }
-@@ -416,10 +484,14 @@ static void bnxt_rdma_aux_dev_release(struct device *dev)
- 
- void bnxt_aux_device_del(struct bnxt *bp, enum bnxt_ulp_auxdev_type auxdev_type)
- {
--	if (!bp->edev_rdma)
-+	if (auxdev_type >= __BNXT_AUXDEV_MAX) {
-+		netdev_warn(bp->dev, "Failed to del: unrecognized auxiliary device\n");
-+		return;
-+	}
-+	if (!bnxt_aux_devices[auxdev_type].get_edev(bp))
- 		return;
- 
--	auxiliary_device_delete(&bp->aux_priv_rdma->aux_dev);
-+	auxiliary_device_delete(bnxt_aux_devices[auxdev_type].get_auxdev(bp));
+@@ -314,6 +363,8 @@ void bnxt_ulp_stop(struct bnxt *bp)
+ 		}
+ 	}
+ ulp_stop_exit:
++	if (bp->edev_fwctl)
++		bp->edev_fwctl->flags |= BNXT_EN_FLAG_ULP_STOPPED;
+ 	mutex_unlock(&edev->en_dev_lock);
  }
  
- static void bnxt_set_edev_info(struct bnxt_en_dev *edev, struct bnxt *bp)
-@@ -454,10 +526,14 @@ void bnxt_aux_device_add(struct bnxt *bp, enum bnxt_ulp_auxdev_type auxdev_type)
- 	struct auxiliary_device *aux_dev;
- 	int rc;
+@@ -347,6 +398,8 @@ void bnxt_ulp_start(struct bnxt *bp, int err)
+ 	}
+ ulp_start_exit:
+ 	edev->flags &= ~BNXT_EN_FLAG_ULP_STOPPED;
++	if (bp->edev_fwctl)
++		bp->edev_fwctl->flags &= ~BNXT_EN_FLAG_ULP_STOPPED;
+ 	mutex_unlock(&edev->en_dev_lock);
+ }
  
--	if (!bp->edev_rdma)
-+	if (auxdev_type >= __BNXT_AUXDEV_MAX) {
-+		netdev_warn(bp->dev, "Failed to add: unrecognized auxiliary device\n");
-+		return;
-+	}
-+	if (!bnxt_aux_devices[auxdev_type].get_edev(bp))
- 		return;
- 
--	aux_dev = &bp->aux_priv_rdma->aux_dev;
-+	aux_dev = bnxt_aux_devices[auxdev_type].get_auxdev(bp);
+@@ -536,12 +589,27 @@ void bnxt_aux_device_add(struct bnxt *bp, enum bnxt_ulp_auxdev_type auxdev_type)
+ 	aux_dev = bnxt_aux_devices[auxdev_type].get_auxdev(bp);
  	rc = auxiliary_device_add(aux_dev);
  	if (rc) {
- 		netdev_warn(bp->dev, "Failed to add auxiliary device for ROCE\n");
-@@ -475,6 +551,11 @@ void bnxt_aux_device_init(struct bnxt *bp,
- 	struct bnxt_ulp *ulp;
- 	int rc;
+-		netdev_warn(bp->dev, "Failed to add auxiliary device for ROCE\n");
++		netdev_warn(bp->dev, "Failed to add auxiliary device for auxdev type %d\n",
++			    auxdev_type);
+ 		auxiliary_device_uninit(aux_dev);
+-		bp->flags &= ~BNXT_FLAG_ROCE_CAP;
++		if (auxdev_type == BNXT_AUXDEV_RDMA)
++			bp->flags &= ~BNXT_FLAG_ROCE_CAP;
+ 	}
+ }
  
-+	if (auxdev_type >= __BNXT_AUXDEV_MAX) {
-+		netdev_warn(bp->dev, "Failed to init: unrecognized auxiliary device\n");
-+		return;
-+	}
++static void bnxt_fwctl_aux_dev_release(struct device *dev)
++{
++	struct bnxt_aux_priv *aux_priv =
++		container_of(dev, struct bnxt_aux_priv, aux_dev.dev);
++	struct bnxt *bp = netdev_priv(aux_priv->edev->net);
 +
- 	if (auxdev_type == BNXT_AUXDEV_RDMA &&
- 	    !(bp->flags & BNXT_FLAG_ROCE_CAP))
- 		return;
-@@ -483,7 +564,7 @@ void bnxt_aux_device_init(struct bnxt *bp,
- 	if (!aux_priv)
- 		goto exit;
++	ida_free(&bnxt_fwctl_aux_dev_ids, aux_priv->id);
++	kfree(aux_priv->edev);
++	bp->edev_fwctl = NULL;
++	kfree(bp->aux_priv_fwctl);
++	bp->aux_priv_fwctl = NULL;
++}
++
+ void bnxt_aux_device_init(struct bnxt *bp,
+ 			  enum bnxt_ulp_auxdev_type auxdev_type)
+ {
+@@ -566,8 +634,8 @@ void bnxt_aux_device_init(struct bnxt *bp,
  
--	aux_priv->id = ida_alloc(&bnxt_rdma_aux_dev_ids, GFP_KERNEL);
-+	aux_priv->id = bnxt_aux_devices[auxdev_type].alloc_ida();
+ 	aux_priv->id = bnxt_aux_devices[auxdev_type].alloc_ida();
  	if (aux_priv->id < 0) {
- 		netdev_warn(bp->dev,
- 			    "ida alloc failed for ROCE auxiliary device\n");
-@@ -493,17 +574,17 @@ void bnxt_aux_device_init(struct bnxt *bp,
- 
- 	aux_dev = &aux_priv->aux_dev;
- 	aux_dev->id = aux_priv->id;
--	aux_dev->name = "rdma";
-+	aux_dev->name = bnxt_aux_devices[auxdev_type].name;
- 	aux_dev->dev.parent = &bp->pdev->dev;
--	aux_dev->dev.release = bnxt_rdma_aux_dev_release;
-+	aux_dev->dev.release = bnxt_aux_devices[auxdev_type].release;
- 
- 	rc = auxiliary_device_init(aux_dev);
- 	if (rc) {
--		ida_free(&bnxt_rdma_aux_dev_ids, aux_priv->id);
-+		bnxt_aux_devices[auxdev_type].free_ida(aux_priv);
+-		netdev_warn(bp->dev,
+-			    "ida alloc failed for ROCE auxiliary device\n");
++		netdev_warn(bp->dev, "ida alloc failed for %d auxiliary device\n",
++			    auxdev_type);
  		kfree(aux_priv);
  		goto exit;
  	}
--	bp->aux_priv_rdma = aux_priv;
-+	bnxt_aux_devices[auxdev_type].set_priv(bp, aux_priv);
+@@ -611,5 +679,6 @@ void bnxt_aux_device_init(struct bnxt *bp,
+ aux_dev_uninit:
+ 	auxiliary_device_uninit(aux_dev);
+ exit:
+-	bp->flags &= ~BNXT_FLAG_ROCE_CAP;
++	if (auxdev_type == BNXT_AUXDEV_RDMA)
++		bp->flags &= ~BNXT_FLAG_ROCE_CAP;
+ }
+diff --git a/include/linux/bnxt/ulp.h b/include/linux/bnxt/ulp.h
+index baac0dd44078..5a580bc37a06 100644
+--- a/include/linux/bnxt/ulp.h
++++ b/include/linux/bnxt/ulp.h
+@@ -22,6 +22,7 @@ struct bnxt;
  
- 	/* From this point, all cleanup will happen via the .release callback &
- 	 * any error unwinding will need to include a call to
-@@ -520,7 +601,7 @@ void bnxt_aux_device_init(struct bnxt *bp,
- 		goto aux_dev_uninit;
+ enum bnxt_ulp_auxdev_type {
+ 	BNXT_AUXDEV_RDMA = 0,
++	BNXT_AUXDEV_FWCTL,
+ 	__BNXT_AUXDEV_MAX,
+ };
  
- 	edev->ulp_tbl = ulp;
--	bp->edev_rdma = edev;
-+	bnxt_aux_devices[auxdev_type].set_edev(bp, edev);
- 	bnxt_set_edev_info(edev, bp);
- 	if (auxdev_type == BNXT_AUXDEV_RDMA)
- 		bp->ulp_num_msix_want = bnxt_set_dflt_ulp_msix(bp);
 -- 
 2.39.1
 
