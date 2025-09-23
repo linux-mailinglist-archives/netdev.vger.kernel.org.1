@@ -1,298 +1,134 @@
-Return-Path: <netdev+bounces-225573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA3ADB959AF
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:18:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A083B959C0
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:19:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CE4D2A18B9
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:18:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D61A817E24E
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:19:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516CC322750;
-	Tue, 23 Sep 2025 11:17:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B5E23218C9;
+	Tue, 23 Sep 2025 11:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D37FU1jK"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095F232255F
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 11:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3518189
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 11:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758626238; cv=none; b=sbN3i4CEpDS3q9uGR340V02V3LJWn4OI8/e1cZvfGKZkqCbjpEY/EKR4GDm47fjlYWCLyqx3OVatyHosIVWsNB4cNb5Y/DVfISNo/zbiNaeerc5v7QqcHuS26+Aa5R8D/jbJ4tCxZ2a2gS+EhZLX8h2NjrxEYbMTFt3LPonQxWk=
+	t=1758626360; cv=none; b=TrddVs3hT/8OQOrd3bWLXWO1THg5FBZBBLYUYEE5hlB8oow5g0anWboOY2mlnh0/9ey+lZ1R/RJi0AcJgvtkx9xuKP8BDeOMYvLUPzQ78SYc9dRcIfYKNfe0sHPniYHmoe2Cu6KE5yourtTaKhNDmb5qDhmVfkrb4B8ju/MUonk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758626238; c=relaxed/simple;
-	bh=J/vSO5Gpj19mzI9MQnqFLTUPsBm1nfJ5s1FhEKwO3xQ=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=khWPU5DJFC96/9MWOOcqxP48tgK/6+r9syea5KmqWZcE9GIRTo2EpFutmUEIJtJQtT6hIYxV1l2sRjVYWdAEm0J6FvICKxg0H+LyhdTxLFLbDQkGkVMsW+O+gaBO6Rja/aInwF4xcVAJEFjGzT3PK9O0Q+rULzpEAJbSMwQ/Vpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cWHT05k6rz6L5F7;
-	Tue, 23 Sep 2025 19:15:16 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id E5C7214020A;
-	Tue, 23 Sep 2025 19:17:06 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 23 Sep
- 2025 12:17:05 +0100
-Date: Tue, 23 Sep 2025 12:17:04 +0100
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-CC: <jgg@ziepe.ca>, <michael.chan@broadcom.com>, <dave.jiang@intel.com>,
-	<saeedm@nvidia.com>, <davem@davemloft.net>, <corbet@lwn.net>,
-	<edumazet@google.com>, <gospo@broadcom.com>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<selvin.xavier@broadcom.com>, <leon@kernel.org>,
-	<kalesh-anakkur.purayil@broadcom.com>
-Subject: Re: [PATCH net-next v2 5/6] bnxt_fwctl: Add bnxt fwctl device
-Message-ID: <20250923121704.00000eb7@huawei.com>
-In-Reply-To: <20250923095825.901529-6-pavan.chebbi@broadcom.com>
-References: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
-	<20250923095825.901529-6-pavan.chebbi@broadcom.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1758626360; c=relaxed/simple;
+	bh=FhrQh8wlJhkiGsJ13lu3sPHpZl+KsdORpiUvpf3eogg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=c6uO3SxgMw0P/bIQm9F/bBMbauWX2EH0+IAg85Y/kUSpVGj7lzO63R67d/rLrRg9ECF9/2w9yCHMxah+Qwi+eA7djS2193n4JYMHqZNCBZ9NXuL/CgfcuYseM/faPSPjAUasysqXF9UmwHypvG9GTGx0BwAaWRi8894eDSqzEtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=D37FU1jK; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-45df0cde41bso37169055e9.3
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 04:19:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1758626356; x=1759231156; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9vLuVuYkRxMOaPm/QX7PGxaAYbQhLbxbW+ekIalkme8=;
+        b=D37FU1jKSGczue9Dgn4zjh9Q/9VOAh+Yxhv0mQl+5nKSGCDiXZGY3pGN4lWAI7UK+K
+         Sr3m8eynRP4a1FkciFF9zEdU7/0a/CSr/F/zJXyewRCuD+KRCdsshMRGIbppC1JiklEU
+         i7gokirPy7078/H9d1e8jgklpRF3/NWc2xfPDSMUAT3kQzMpnQAiMPR59f1BS11i2EFW
+         L2xv5ldWrCMIdDNTg6lFyBIc/HcTjXomjswdeA0ENkpgQmwCyF6nNq2RUDaxXa/Z7ntJ
+         i7qeX4ioCj5dFUh6oPzktQjEn+3HFg+DoAdoqewsIrGAuCWKqUMb0lSkZIfQV92btOo3
+         h+rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758626356; x=1759231156;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9vLuVuYkRxMOaPm/QX7PGxaAYbQhLbxbW+ekIalkme8=;
+        b=TM62H4Bv6YNmeAtZV73AxJuz1+nuitzIXBGkYK44f/348uZ/9guxlw4+M0wlcfndf+
+         8V55G1VVgVJ0eategCN1/4bA8LWjb7+MOW6HS39YX9+PUbsFo+tNa/cPCTf8pFvN601n
+         gVbcOeK2s5ClkoA8K9aZ/qseTftNzkukhZl3heNAlgUzEIg0Xh/0UVQPu0SXv+mkPOHn
+         N7Y9wgzv5q3FuV1NZ9n7WJapaiHe17hwNRfq8xhg5wRCVMKtru3DXdtWpRQvY9e6smN5
+         qSlflM38kRqcFdny2wTwzDf5MXMBjJQSaaqkCWT7twAMxcRqkoKpE0b1wNK2SjajmcUW
+         wsyg==
+X-Forwarded-Encrypted: i=1; AJvYcCW/JtXwGmhhyWtntacXStfngawE1eTA6eMb5T/stXECd+zajjVPmyBt99+0WDEZcK4FAQBz6lc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaYT366W9FCwEQ8groFsx30sFcwm19WyAxlwS04FjpZxgwoVU+
+	7DQHhIbwQ0gr5FNQqRn6wZbkFT40ER9tYQV/00mBXYMQZbLfDul9RXeDPI5tD8cE9F0=
+X-Gm-Gg: ASbGncve6493HKvQLlaINT/3+n8T4l7Q9dTrtBwKd/btibCqTFL6kkKzenm3fjjNMtr
+	NG9OIg/Q3X6BJ5cYKMGeVuKjfylj1Pg9ehtLL3/+Num8NAXSvJ/Ev9jhWKmDmcwFhIAVFekf63f
+	ZKm8AKIkRaU3PoEATaR94nMVYfCQhGZdw/y5DCU9iiWFC4/exNv37XAnfdJGm+LZJgH7GSBpgJs
+	P/V4Q58NOZx2g3jyEeS9sGZkhi5Ss15ewYr+Gt0wEdCoCsixnjE5nXP6qWcoosrvYfToKSsomkd
+	niDs3ydv7gF8nSy7Vdj3tHMAG1qJip333hbQ6VP1osTw0jm47GDHOY4tz53fsCKDYw58NOebDgj
+	2EqP9gN+UfzaRMSAoywDyppBiK4AW
+X-Google-Smtp-Source: AGHT+IESbMFQk6ILiLYUPMLicqqy9m7l+w2rx4L3CO/8J2ovvY0DfEOMfixD2agK3xBqmlyogy/9iQ==
+X-Received: by 2002:a05:6000:25c1:b0:3ee:15b4:846c with SMTP id ffacd0b85a97d-405c5ccd2bdmr1761131f8f.28.1758626355940;
+        Tue, 23 Sep 2025 04:19:15 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3ee073f53c4sm24050430f8f.3.2025.09.23.04.19.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 04:19:15 -0700 (PDT)
+Date: Tue, 23 Sep 2025 14:19:11 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Subbaraya Sundeep <sbhatta@marvell.com>
+Cc: Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net] octeontx2-pf: Fix potential use after free in
+ otx2_tc_add_flow()
+Message-ID: <aNKCL1jKwK8GRJHh@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-On Tue, 23 Sep 2025 02:58:24 -0700
-Pavan Chebbi <pavan.chebbi@broadcom.com> wrote:
+This code calls kfree_rcu(new_node, rcu) and then dereferences "new_node"
+and then dereferences it on the next line.  Two lines later, we take
+a mutex so I don't think this is an RCU safe region.  Re-order it to do
+the dereferences before queuing up the free.
 
-> Create bnxt_fwctl device. This will bind to bnxt's aux device.
-> On the upper edge, it will register with the fwctl subsystem.
-> It will make use of bnxt's ULP functions to send FW commands.
-> 
-> Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
-> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Fixes: 68fbff68dbea ("octeontx2-pf: Add police action for TC flower")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm failing to find where this driver applies the fwctl_rpc_scope
-to commands issued.  I suppose maybe they are all entirely safe
-non invasive requests for data?
-
-That scope stuff is probably the most important thing that fwctl
-provides so all drivers need to deal with it.
-
-Thanks,
-
-Jonathan
-
-> --- /dev/null
-> +++ b/drivers/fwctl/bnxt/main.c
-> @@ -0,0 +1,297 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (c) 2025, Broadcom Corporation
-> + *
-This blank line doesn't add anything.
-> + */
-> +
-> +#include <linux/kernel.h>
-> +#include <linux/auxiliary_bus.h>
-> +#include <linux/slab.h>
-> +#include <linux/pci.h>
-
-Is there anything pci specific in here?  I'd check all the includes
-to ensure they follow (approx) include what you used iwyu principles.
-
-> +#include <linux/fwctl.h>
-> +#include <uapi/fwctl/fwctl.h>
-> +#include <uapi/fwctl/bnxt.h>
-> +#include <linux/bnxt/common.h>
-> +#include <linux/bnxt/ulp.h>
-
-> +static bool bnxtctl_validate_rpc(struct bnxt_en_dev *edev,
-> +				 struct bnxt_fw_msg *hwrm_in)
-> +{
-> +	struct input *req = (struct input *)hwrm_in->msg;
-
-> +
-> +	mutex_lock(&edev->en_dev_lock);
-
-Neater if you use guard() 
-
-> +	if (edev->flags & BNXT_EN_FLAG_ULP_STOPPED) {
-> +		mutex_unlock(&edev->en_dev_lock);
-> +		return false;
-> +	}
-> +	mutex_unlock(&edev->en_dev_lock);
-> +
-> +	if (le16_to_cpu(req->req_type) <= HWRM_LAST)
-> +		return true;
-> +
-> +	return false;
-
-I was kind of expecting something called validate_rpc to do
-the scope checks that we see in other drivers.
-e.g. mlx5ctl_validate_rpc()
-
-> +}
-
-> +
-> +static void *bnxtctl_fw_rpc(struct fwctl_uctx *uctx,
-> +			    enum fwctl_rpc_scope scope,
-> +			    void *in, size_t in_len, size_t *out_len)
-> +{
-> +	struct bnxtctl_dev *bnxtctl =
-> +		container_of(uctx->fwctl, struct bnxtctl_dev, fwctl);
-> +	struct bnxt_aux_priv *bnxt_aux_priv = bnxtctl->aux_priv;
-> +	struct fwctl_dma_info_bnxt *dma_buf = NULL;
-> +	struct device *dev = &uctx->fwctl->dev;
-> +	struct fwctl_rpc_bnxt *msg = in;
-> +	struct bnxt_fw_msg rpc_in;
-> +	int i, rc, err = 0;
-> +	int dma_buf_size;
-> +
-> +	rpc_in.msg = kzalloc(msg->req_len, GFP_KERNEL);
-> +	if (!rpc_in.msg) {
-> +		err = -ENOMEM;
-> +		goto err_out;
-
-Nothing to clean up at this point, so returning here would be simpler.
-
-> +	}
-> +	if (copy_from_user(rpc_in.msg, u64_to_user_ptr(msg->req),
-> +			   msg->req_len)) {
-> +		dev_dbg(dev, "Failed to copy in_payload from user\n");
-> +		err = -EFAULT;
-> +		goto err_out;
-> +	}
-> +
-> +	if (!bnxtctl_validate_rpc(bnxt_aux_priv->edev, &rpc_in))
-> +		return ERR_PTR(-EPERM);
-> +
-> +	rpc_in.msg_len = msg->req_len;
-> +	rpc_in.resp = kzalloc(*out_len, GFP_KERNEL);
-> +	if (!rpc_in.resp) {
-> +		err = -ENOMEM;
-> +		goto err_out;
-> +	}
-> +
-> +	rpc_in.resp_max_len = *out_len;
-> +	if (!msg->timeout)
-> +		rpc_in.timeout = DFLT_HWRM_CMD_TIMEOUT;
-> +	else
-> +		rpc_in.timeout = msg->timeout;
-> +
-> +	if (msg->num_dma) {
-> +		if (msg->num_dma > MAX_NUM_DMA_INDICATIONS) {
-> +			dev_err(dev, "DMA buffers exceed the number supported\n");
-> +			err = -EINVAL;
-> +			goto err_out;
-> +		}
-> +		dma_buf_size = msg->num_dma * sizeof(*dma_buf);
-
-kcalloc probably more appropriate given it looks like an array.
-
-> +		dma_buf = kzalloc(dma_buf_size, GFP_KERNEL);
-> +		if (!dma_buf) {
-> +			dev_err(dev, "Failed to allocate dma buffers\n");
-> +			err = -ENOMEM;
-
-General (growing) convention is don't bother printing messages on memory
-failure as the allocator is very noisy if this happen away.
-
-> +			goto err_out;
-> +		}
-> +
-> +		if (copy_from_user(dma_buf, u64_to_user_ptr(msg->payload),
-> +				   dma_buf_size)) {
-> +			dev_dbg(dev, "Failed to copy payload from user\n");
-> +			err = -EFAULT;
-> +			goto err_out;
-> +		}
-> +
-> +		rc = bnxt_fw_setup_input_dma(bnxtctl, dev, msg->num_dma,
-> +					     dma_buf, &rpc_in);
-> +		if (rc) {
-> +			err = -EIO;
-> +			goto err_out;
-> +		}
-> +	}
-> +
-> +	rc = bnxt_send_msg(bnxt_aux_priv->edev, &rpc_in);
-> +	if (rc) {
-> +		err = -EIO;
-> +		goto err_out;
-> +	}
-> +
-> +	for (i = 0; i < msg->num_dma; i++) {
-> +		if (dma_buf[i].read_from_device) {
-> +			if (copy_to_user(u64_to_user_ptr(dma_buf[i].data),
-> +					 bnxtctl->dma_virt_addr[i],
-> +					 dma_buf[i].len)) {
-> +				dev_dbg(dev, "Failed to copy resp to user\n");
-> +				err = -EFAULT;
-> +			}
-> +		}
-> +	}
-> +	for (i = 0; i < msg->num_dma; i++)
-> +		dma_free_coherent(dev->parent, dma_buf[i].len,
-> +				  bnxtctl->dma_virt_addr[i],
-> +				  bnxtctl->dma_addr[i]);
-> +
-> +err_out:
-> +	kfree(dma_buf);
-> +	kfree(rpc_in.msg);
-> +
-> +	if (err)
-> +		return ERR_PTR(err);
-> +
-> +	return rpc_in.resp;
-> +}
-> +
-> +static const struct fwctl_ops bnxtctl_ops = {
-> +	.device_type = FWCTL_DEVICE_TYPE_BNXT,
-> +	.uctx_size = sizeof(struct bnxtctl_uctx),
-> +	.open_uctx = bnxtctl_open_uctx,
-> +	.close_uctx = bnxtctl_close_uctx,
-> +	.info = bnxtctl_info,
-> +	.fw_rpc = bnxtctl_fw_rpc,
-> +};
-
-
-...
-
-> +static const struct auxiliary_device_id bnxtctl_id_table[] = {
-> +	{ .name = "bnxt_en.fwctl", },
-> +	{},
-
-No need for trailing comma.
-
-> +};
-> +MODULE_DEVICE_TABLE(auxiliary, bnxtctl_id_table);
-
-> diff --git a/include/uapi/fwctl/bnxt.h b/include/uapi/fwctl/bnxt.h
-> new file mode 100644
-> index 000000000000..cf8f2b80f3de
-> --- /dev/null
-> +++ b/include/uapi/fwctl/bnxt.h
-> @@ -0,0 +1,63 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +/*
-> + * Copyright (c) 2025, Broadcom Corporation
-> + *
-
-Trivial, blank line here adds nothing useful.
-
-> + */
-> +
-> +#ifndef _UAPI_FWCTL_BNXT_H_
-> +#define _UAPI_FWCTL_BNXT_H_
-> +
-> +#include <linux/types.h>
-> +
-> +#define MAX_DMA_MEM_SIZE		0x10000 /*64K*/
-> +#define DFLT_HWRM_CMD_TIMEOUT		500
-
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+index 5f80b23c5335..26a08d2cfbb1 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+@@ -1326,7 +1326,6 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
+ 
+ free_leaf:
+ 	otx2_tc_del_from_flow_list(flow_cfg, new_node);
+-	kfree_rcu(new_node, rcu);
+ 	if (new_node->is_act_police) {
+ 		mutex_lock(&nic->mbox.lock);
+ 
+@@ -1346,6 +1345,7 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
+ 
+ 		mutex_unlock(&nic->mbox.lock);
+ 	}
++	kfree_rcu(new_node, rcu);
+ 
+ 	return rc;
+ }
+-- 
+2.51.0
 
 
