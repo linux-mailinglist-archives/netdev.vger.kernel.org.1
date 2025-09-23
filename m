@@ -1,129 +1,156 @@
-Return-Path: <netdev+bounces-225720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5834AB97841
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 22:45:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C773DB97856
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 22:48:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 338AF3A34D0
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 20:45:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82D4C3A7B2C
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 20:48:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEF55305068;
-	Tue, 23 Sep 2025 20:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28856280004;
+	Tue, 23 Sep 2025 20:48:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ORs4JD8W"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Dh5OxCMr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7372F56
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 20:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B655E1D798E
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 20:48:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758660316; cv=none; b=TVwZjXjl2oTb1IF7yDlimh1LJp7AGncAKJKail8LloF9WNXD71waE/pmhEpKCNm9BFoO8fhz3ppOpaOuGQm0tB3uTDCUOEpS00tzeiP6NYESHxxgUSe+F3IjYXryscjutC+39tePxI7q2DBcNfkNnBdLjrmyqLLgIJ85W6cUXhg=
+	t=1758660512; cv=none; b=TE52hkgrUHD9MYDTbRj2geQFaA3q5NCLGwmmqGRVyEH9zp6R8Q0oG6/7VQFxlJQokN2wkNBOHjnWThcy6LoboQtXbH4PEBZ5qt6MeEvqCPwBJEbwyVG/ih/jF0hocxISfG3cjKZsOFVHO3hhg0eLzxhO4P/qfOJmnKLR0aOcOtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758660316; c=relaxed/simple;
-	bh=nGwmEIjf0Z80ZC/Qqkye+v7lXX7+Uyfj55BEPrjCfjk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gfqnMpJSgCbnk+UIxLiEuj6fK8ATRWrCN4zrhT1ufl5NK/RTMRAEYCmNznLjfynpLl+0OIAho1aBunXYaH32VO8v293/wjOBZ/VZ2Vt14OTkkhuRF4yKd3Gc7Ksp7wOJoetnN4nE5UXA7+f1aeUd2objZUXc5X4bmBRYMzXJOdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ORs4JD8W; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-24457f581aeso59824165ad.0
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 13:45:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758660314; x=1759265114; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sipScXl1CFAIZEiqAz6v2zuPdeVOTifZUwgP7G5st/0=;
-        b=ORs4JD8Wq/POKafG29v8kG7lpNbTfeh62uOMPMZa3MrkfXUFlFPRvg95ct0NJ1UrMm
-         LZ5HwUAW0eNIzXL7+4s6lxO0j6/gvRMRdgnlwGwfe9FCHh0xiyDRXJMi3ilgSIKm/QM6
-         luv3G1al2u2FzioMDZwy3W+PF1kxxsO8QHINbx7D0mbUxPQZGfYmKzHRuLUYNEpohoNQ
-         8UvOAhQePxRRuq2iveUfhotQCBG2/+QUTOK13fjvEnkIjPGAC4CsEuYKwfwYtPj+32Vu
-         RkdT4s6VKwSm6KIJGwK8uqhL2h95jQU2rGJju/4RY9cFVB16H2lNTrp3CS1vAYfDDaIa
-         ywuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758660314; x=1759265114;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sipScXl1CFAIZEiqAz6v2zuPdeVOTifZUwgP7G5st/0=;
-        b=nknrSAot9jGOR1kQ7MgodnVhbIfyLCAV+Zw9zCDoG1P0UQ9tkABOhqIfTucY24Hvls
-         7xZ1qN7LoR0LuzvJ6ETebyxUIPPbGyq3LUTP5mVlD+65GHW1dQLPtLOQ5kcR1gEjSEu2
-         IrGZEJySfw6+DrEwUvnD/QqWPsf4Se6pwZTIf3TqjKik0PMcOn6b0TivLP7vgDap31xz
-         z+kcWs/L4Ag8rcgNDVBkVXDsh7fVfKeXp8QDQKYUB9W6bsxYnijkzHLFqD+3dNIJWFsl
-         BbYhil40iKUWfOB8aWT2DTXfLSLFC4Al6bEroThPoWNH+CBc9jMSlNra1MvI5Dz6OHdT
-         gvmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXj1Qqj5XsttJTmroxjnbdSp6KUrD9Fm7lMjxJECxmkJoUSUQJJIFR1NByOhQD0VW97KOxgQ1Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1pukFnLyj6d1TeBYpiCGr9SX0/MPVescsiPljGTO4Nr34Z5yM
-	uJnZGlXaD80SRDltPbpbrSnARc72EltNWympH7BGQC9ObJjSE4KR3jM=
-X-Gm-Gg: ASbGncseC3j7gjzXDMIcAoSTwJSQMZZscuKFABbFLjLBiRJ1DdpcltrYc05Jzca9hrF
-	NZqqGQw47er/6hylrpRHFgDQMlWoHdYS8vWIiyFcMNGDncfOICV2HGXG/9PK9LdWPMqtSIk+lDL
-	5VDjb5e7Y9LJ4ntnIKLxYWx5eslaAyuZc1pYHSolWy1ojat2urM6rGfmvxF0qKhXROrZ9orYvZ7
-	dS1bFSliy4Y2xj5ck2Wq93hs6TxcGWq/iosQmfuTRSe5OdKQE5pjmOC5a6AGj5kj/700aB9ks6d
-	N9lv+cUmvfRDyHZyRXO86qDf6+U0pB1EaCXvtOjytOzIwORobT8p7PEgoRFWhztygU4HX4f1qxb
-	IM4q13tJiLhmt1JIo2de/aOHn+t/aLuBrxBsdtaaaLAYUvWF+W8O+pAFCpJqn/yqyBDoNdpuATF
-	Ge4bX40KwAbceNTk+16h7uSf265dRkdXWI3Kg4il8AOo9a8ztcZeHA+ptaqHqDbBREfgxgcl0GS
-	Uvv
-X-Google-Smtp-Source: AGHT+IFlpvsj7lKaK/ZqzoeecXc8ehWZkc0IxVgAN+LI3oeEEkFfcubTmnGuNVbCi3mV+UCdDzJmEg==
-X-Received: by 2002:a17:903:190:b0:277:9193:f2da with SMTP id d9443c01a7336-27cc0dbb137mr49147325ad.5.1758660314194;
-        Tue, 23 Sep 2025 13:45:14 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2698016c098sm166380315ad.33.2025.09.23.13.45.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 13:45:13 -0700 (PDT)
-Date: Tue, 23 Sep 2025 13:45:13 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, donald.hunter@gmail.com, andrew+netdev@lunn.ch,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, matttbe@kernel.org,
-	chuck.lever@oracle.com, jdamato@fastly.com, skhawaja@google.com,
-	dw@davidwei.uk, mkarsten@uwaterloo.ca, yoong.siang.song@intel.com,
-	david.hunter.linux@gmail.com, skhan@linuxfoundation.org,
-	horms@kernel.org, sdf@fomichev.me, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org
-Subject: Re: [PATCH RFC 0/4] Add XDP RX queue index metadata via kfuncs
-Message-ID: <aNMG2X2GLDLBIjzB@mini-arch>
-References: <20250923210026.3870-1-mehdi.benhadjkhelifa@gmail.com>
+	s=arc-20240116; t=1758660512; c=relaxed/simple;
+	bh=WoRIuCI/ZYo+FAPzp36f3oE/lfOFVVqJgoA0ByqYDN4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SfeEAxjqmy0No0n+x7PvUQObqZF0RLtARufMUMHlvQRZc85VhNfFbb3tgMoNBgDjg4Cy4LHfU3ke1RA01+Sy+gDy2F2UUgc+XXBIZQZH6n6oQSDgo7YL3beyHGuBSwBUIQWXRFeK8AIomcGSKffjU1YoytU8qNmYL+vf2xVkLXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Dh5OxCMr; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <3a6ce0da-9f3f-4630-8c01-43ae980828d1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758660506;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nLOK08KsNyE+Atee9Sw6ZH5oINchnh99jP6cC9VKOuY=;
+	b=Dh5OxCMru65KgbEUXoptbfoczFbiVY9aCGv7nkD+fDJ3vEVeGML5/WEYm9goLdg/ylFp0P
+	szEQK0aQNtIT1mta7OtnrnLJ2D3wBr6NSWop1k5xoS0BAFvufk7pOTEf2V7995CExZQmQl
+	6rQDVYYKfF7zqs4QiuVQ+iiUMv2Ezjc=
+Date: Tue, 23 Sep 2025 21:48:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250923210026.3870-1-mehdi.benhadjkhelifa@gmail.com>
+Subject: Re: [PATCH net-next 3/4] mlx5: convert to ndo_hwtstamp_get() and
+ ndo_hwtstamp_set()
+To: Carolina Jubran <cjubran@nvidia.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Michael Chan
+ <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Tariq Toukan <tariqt@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Mark Bloch <mbloch@nvidia.com>
+References: <20250922165118.10057-1-vadim.fedorenko@linux.dev>
+ <20250922165118.10057-4-vadim.fedorenko@linux.dev>
+ <5b42dbf4-cc20-4cf7-bad5-fbe3e9055c0c@nvidia.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <5b42dbf4-cc20-4cf7-bad5-fbe3e9055c0c@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 09/23, Mehdi Ben Hadj Khelifa wrote:
-> ---
-> Mehdi Ben Hadj Khelifa (4):
->   netlink: specs: Add XDP RX queue index to XDP metadata
->   net: xdp: Add xmo_rx_queue_index callback
->   uapi: netdev: Add XDP RX queue index metadata flags
->   net: veth: Implement RX queue index XDP hint
+On 23/09/2025 18:44, Carolina Jubran wrote:
 > 
->  Documentation/netlink/specs/netdev.yaml |  5 +++++
->  drivers/net/veth.c                      | 12 ++++++++++++
->  include/net/xdp.h                       |  5 +++++
->  include/uapi/linux/netdev.h             |  3 +++
->  net/core/xdp.c                          | 15 +++++++++++++++
->  tools/include/uapi/linux/netdev.h       |  3 +++
->  6 files changed, 43 insertions(+)
->  ---
->  base-commit: 07e27ad16399afcd693be20211b0dfae63e0615f
->  this is the commit of tag: v6.17-rc7 on the mainline.
->  This patch series is intended to make a base for setting
->  queue_index in the xdp_rxq_info struct in bpf/cpumap.c to
->  the right index. Although that part I still didn't figure
->  out yet,I m searching for my guidance to do that as well
->  as for the correctness of the patches in this series.
+> On 22/09/2025 19:51, Vadim Fedorenko wrote:
+> Hi Vadim, thanks for the patch!
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/ 
+>> drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+>> index 5e007bb3bad1..74a63371ab69 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+>> @@ -4755,9 +4755,11 @@ static int mlx5e_hwstamp_config_ptp_rx(struct 
+>> mlx5e_priv *priv, bool ptp_rx)
+>>                       &new_params.ptp_rx, true);
+>>   }
+>> -int mlx5e_hwstamp_set(struct mlx5e_priv *priv, struct ifreq *ifr)
+>> +int mlx5e_hwstamp_set(struct net_device *dev,
+>> +              struct kernel_hwtstamp_config *config,
+>> +              struct netlink_ext_ack *extack)
+>>   {
+>> -    struct hwtstamp_config config;
+>> +    struct mlx5e_priv *priv = netdev_priv(dev);
+>>       bool rx_cqe_compress_def;
+>>       bool ptp_rx;
+>>       int err;
+>> @@ -4766,11 +4768,8 @@ int mlx5e_hwstamp_set(struct mlx5e_priv *priv, 
+>> struct ifreq *ifr)
+>>           (mlx5_clock_get_ptp_index(priv->mdev) == -1))
+> 
+> 
+> I would add an |extack| message here.
 
-But why do you need a kfunc getter? You can already get rxq index
-via xdp_md rx_queue_index.
+Yeah, but the !MLX5_CAP_GEN(priv->mdev, device_frequency_khz) check
+looks redundant as mdev->clock->ptp will be null in case of absent of
+device_frequency_khz, according to mlx5_init_clock()
+
+> 
+>> @@ -4814,47 +4813,34 @@ int mlx5e_hwstamp_set(struct mlx5e_priv *priv, 
+>> struct ifreq *ifr)
+>>       if (!mlx5e_profile_feature_cap(priv->profile, PTP_RX))
+>>           err = mlx5e_hwstamp_config_no_ptp_rx(priv,
+>> -                             config.rx_filter != HWTSTAMP_FILTER_NONE);
+>> +                             config->rx_filter != HWTSTAMP_FILTER_NONE);
+>>       else
+>>           err = mlx5e_hwstamp_config_ptp_rx(priv, ptp_rx);
+>>       if (err)
+>>           goto err_unlock;
+>> -    memcpy(&priv->tstamp, &config, sizeof(config));
+>> +    memcpy(&priv->tstamp, config, sizeof(*config));
+> 
+> 
+> A direct assignment would be cleaner.
+
+Just wanted to follow original style. I'll change it in the next ver
+
+> 
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c b/ 
+>> drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
+>> index 79ae3a51a4b3..ff8ffd997b17 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
+>> @@ -52,7 +52,8 @@ static const struct net_device_ops mlx5i_netdev_ops = {
+>>       .ndo_init                = mlx5i_dev_init,
+>>       .ndo_uninit              = mlx5i_dev_cleanup,
+>>       .ndo_change_mtu          = mlx5i_change_mtu,
+>> -    .ndo_eth_ioctl            = mlx5i_ioctl,
+>> +    .ndo_hwtstamp_get        = mlx5e_hwstamp_get,
+>> +    .ndo_hwtstamp_set        = mlx5e_hwstamp_set,
+>>   };
+>>   /* IPoIB mlx5 netdev profile */
+>> @@ -557,20 +558,6 @@ int mlx5i_dev_init(struct net_device *dev)
+>>       return 0;
+>>   }
+>> -int mlx5i_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
+>> -{
+>> -    struct mlx5e_priv *priv = mlx5i_epriv(dev);
+>> -
+> 
+> 
+> mlx5i_epriv should still be used here. on IPoIB netdev_priv gives you a
+> struct mlx5i_priv .
+
+Oh, I see... we have to have slightly different hwstamp functions for
+mlx5i and mlx5e because of different netdev->priv type. Let me see how
+it can be factorized.
 
