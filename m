@@ -1,163 +1,118 @@
-Return-Path: <netdev+bounces-225505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 485BDB94D7B
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:45:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73760B94D90
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 09:47:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F182C3A67F8
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 07:45:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 973B318A82F5
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 07:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A514572608;
-	Tue, 23 Sep 2025 07:45:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CFC831197E;
+	Tue, 23 Sep 2025 07:47:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WuwTrJ4a"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hb+jRBoa"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E9326D4DA
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 07:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944B7548EE
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 07:47:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758613520; cv=none; b=fVYlVgP0tqhWL1tjl2c1vtbl/YcMks/jCAcpDFQGBs581PaZM8ko5OmavK8GF1YAMwO9pYhpqWOJnxIRC7d5bHu6J8Litafl6AifZsDw+cP/MyxR8hpzAk0TTFu7UT76hdYkaDcIO/uyjf+mRgycF432jos2trl6FIPaxqfQkxw=
+	t=1758613644; cv=none; b=IdB6fGgtlDRY/+LEm5FrilJfqXV/4sCm8axzeN0MNYkA+oTgqZYZ+UzBqNjSsMHb9ugGotQ4/5n2MwdpKVrbIIciykfWpNSCIngM83VGhz0ehrhxv199o3BvGkM02tAUhNAI4G/YAJmpZ8ZgfHKGScLnLkOPc7Un5MMenAzDlzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758613520; c=relaxed/simple;
-	bh=ddQGYeKjVw7NbBw7gXNw/cQHqMfOOBRU5ItAYxje4pQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gkdqrGiaukhDTyzeed3oyqRZGzyMe3yoxuUJLl62uA27E03eLfz3u1aB8dQDZessv4/1AZUauoZAKiD2f8eL8W2XjiO7g7rnIow+Y2GU3XDqmR5KVhirWsYdRXwEkRZj6qsrZgmyL/ajHG9CN6n4VBnMKae3bPMRzZ3r9ernIU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WuwTrJ4a; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758613517;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iIaDMz1YoA70BA5LikkpXDzRFgHss3C8YjmIR9+lStM=;
-	b=WuwTrJ4a/sZTKj0fyiTSIMI3Hre2ErZuaYrvdAYk2ElkC4+834EjN5bonFVecGnQzVELpy
-	eAjmx9wOPdOifp3XxONrmLxrCLuH6xyyfTkhFZjWCRnb0gj3yZel/1nAtAXN5v0h5vBSaL
-	AMw+vUxkP2Wp56AUXZDXklU605gIKo0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-609-BrLV7kFfMuuAmHPaCNRA5w-1; Tue, 23 Sep 2025 03:45:15 -0400
-X-MC-Unique: BrLV7kFfMuuAmHPaCNRA5w-1
-X-Mimecast-MFC-AGG-ID: BrLV7kFfMuuAmHPaCNRA5w_1758613514
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3fba0d9eb87so916701f8f.0
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 00:45:15 -0700 (PDT)
+	s=arc-20240116; t=1758613644; c=relaxed/simple;
+	bh=m6w75x5KmuboRbte2t8Bef+Y5vLZQaZtpC0JTZQjfAs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nHue9zICSbl/cSW9o3Y0vmRIYGx9W6u3WTEaK6JOJzpMQGmghw3Unt6QHEPzRmM4MVBlujCkQbyd1k4Q3k22la9A9z0bEAIkhz1CJICQR0XcndWx8KutWGyDgtzFw3DZ5xAebduCK3PdyyeJiOJGt4NQMVp9VgqrK8bles3O69Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hb+jRBoa; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-57933d3e498so5621109e87.3
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 00:47:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758613641; x=1759218441; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p3zTrXIgrjNde7MVV+dQe94AXCJb9BQSJNtQ02xJwZs=;
+        b=Hb+jRBoaW25Oj5LVwuGp7pHGOFDrDFFhIeie7Dfkq7+H92LLpf9dwG1qxKUu1KIpXK
+         a/+ETLzxr+qq6Vfu9r4bMk8iF4z14DgqEzefgubl9MbHat1K6GPmHCzsRMZQsn5cli/c
+         y+37BqQKvT056OX1pmV4nkBy1M0tOrXJHHLYTX5/30rCKPjKYURVGchkSCOFrYlF4kYg
+         K9GkjJZS9AVEAOPnwxvU+Ng0lgrJH6AQ0sDuinpD6dC9iZvf9aOw6mklkaMgK1VN7H+v
+         dySneeWOdEqBp330cNJV29C5OkWDgrMoYCVCQzyX13KEXMEYYJrzzMLTweOkWEVbfzqL
+         fAVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758613514; x=1759218314;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iIaDMz1YoA70BA5LikkpXDzRFgHss3C8YjmIR9+lStM=;
-        b=R6uyKIVYeAfYcd7EpSmhJ/VV0m7AQ6eslY/cfXQjaMLIWD0EbCHlQpoPQ2rzQoM24U
-         epGiD/Zl5WC7AydQ2GcwMW273EsVkcVdc8tp18XCSEgJYpMmSTPicp3wd7waE42jlGp5
-         jNRA9H6ZRMSJEGnwMbeP/e4bqIXpAkBwzNejaHt9s0tXDb7q1OngKckRTBKnR8cqr17q
-         /kqfY+qU0fivSnEYWq/3Zl/XtKv3vcwyum9JVIXMr5PGkWMEkb8VnjdCiam975XNRZSo
-         E6hBrBK9/v92SFT8DZglucsaRklQasfpHkiQRC7QT5Ioax+k5UcA8XFAlbSlvEWlYzn0
-         f+ow==
-X-Gm-Message-State: AOJu0YxfqgjtrwLLKgCpZ4yPhIJjD3UfczOPpbkMiHh6wpuItzZn51hG
-	RpW/5q+/JnSX2qqleTp7HnnR3XW+YqKZoVXSRDNwWERvYCr+sEFwvicN6O/43j/BhN919Ck4wdr
-	OMXJBcTDKsWge0n2vVqSrWzADjOWOB+hEDSOZHx37P61B32KWzXijM03gDA==
-X-Gm-Gg: ASbGncsAcSEWhNB3lQkp04GhOtMTERAe5ZqH/GdtXPfpu/iKjSWuqHcUH9nGYvOK76J
-	vYmeBP7H7lX0sGDxiysAncTYb4yPmxHLoRb5l5325Cg6NV+h0d1lX8kbaaYfRHIMMNoTydsbY69
-	XvGPp5Di1qKGWzuXVVRHXeVzfZIYPvsCLCIoJdPO+zD9y43Bytb9gdvM9nj6dDZGtgsJivuyGdj
-	GQ8qm/S//pwTlEmCe5pRHyeIMoZ0z/3jxlhjScds58gW5SWyCPEZbEQmiJAO84KZ0KOTwaMQxIX
-	wnN+5E2wQLUCK+VQqaqjAN6/mEe0LEcQbT4Qy3otzD1r2yjs1nee52/svKfW+Zib/LCg2zTdNpz
-	vZ8Wxi9qoX+fH
-X-Received: by 2002:a05:6000:1887:b0:3ea:c893:95a7 with SMTP id ffacd0b85a97d-405c9446acfmr863467f8f.31.1758613514062;
-        Tue, 23 Sep 2025 00:45:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFbJ5Hy5G84IeQDFp3qulWDkvJLd3K+sKIlJt6A5SEKpuB/r538fhY7bTK32U70jlHAc8iv3Q==
-X-Received: by 2002:a05:6000:1887:b0:3ea:c893:95a7 with SMTP id ffacd0b85a97d-405c9446acfmr863446f8f.31.1758613513563;
-        Tue, 23 Sep 2025 00:45:13 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ee074106f4sm22648109f8f.25.2025.09.23.00.45.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Sep 2025 00:45:13 -0700 (PDT)
-Message-ID: <fa753eac-3dd4-40d0-861e-3768d2ec2ddd@redhat.com>
-Date: Tue, 23 Sep 2025 09:45:11 +0200
+        d=1e100.net; s=20230601; t=1758613641; x=1759218441;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=p3zTrXIgrjNde7MVV+dQe94AXCJb9BQSJNtQ02xJwZs=;
+        b=MpI6I0cUUUKDaY3y+TrBvZ8NWFNWJmFfyojgL1f5ImgW4UaMNPceCs2dc2JwQPYOUo
+         YkkDkgqRaPuMldefvKbbsjXV3+2BajapsXDRPlVmvcsI7JH9Cg1AA8cQJTaz6HGhKgvO
+         A9+OWcDBFkVGEqq4SlAHI5lMD7h+mq36+4GPjXMcxXepWWFf7EU+UrAjtRqkuhQ0p5Qs
+         XFSmNajCrkQCLr8p780Ud7bgfve1tlXgQQg5ZCDl1GyNbnHsxnHNiSQIccU/c11JTV3U
+         JuJBNMTA/Y34zVy66V163zNzUrnBUsUk9UAMfdtaMRo8QfLgBIJEgIFvGS8pHhKMz36B
+         EyFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVCGWEA9P18cFb+Yh3XWK5z5VVqUIaVak6B6QqufUte58XLmHd6ZD+CTmTr8xtaZmjeUB+hDow=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvkMtjB6FnRe3CGRdJ8U07/a3brAiXHWeAEpoKShVTaC1e8sIV
+	Z6ZOWBnk5HNOwN8wbUQKRznl9av3cYdXqnZ5X5mk7UpBskAssuqsgsdu
+X-Gm-Gg: ASbGnctfnkdcxsI01+Vv+vVIcw8QYaUwI4t7JjQ7QJRLVio01ftqv4LLCQ1gdlA8eyZ
+	wjTBMxMTwfGaIJ/+p0r6jwyJaTimQ80rBRxymv5mvxz+xHaKLhfZfMHZ9vhDEyV042sIhojtIg7
+	0EO/DffHcmeH9JPqbfGcHMZt0HpJo08yUTF+h2PhAxpPfH30WTrcdiwmb5DYZJUHeyfzf5i40gf
+	HJiWiyvBTh+CfY5Sw+Dy0sn8SoFb8+uHi//N8Wg04E8TXJDM3RcKMBy17ek7pLf6B7n4RRCJJfK
+	X3nFT0bsIVjhCGle/LEGiy2FlMpjrSwaD76W8Qr/392rHDJLPUJcCL2zbwAg5D3CxvhS8c3916X
+	f3ESLNQx74NL389rUzEbWTl2E+WwSrn3WmpI=
+X-Google-Smtp-Source: AGHT+IHdpC5HbX3ix1zT26Flp+EGyUUBeKiByHFSuNEWqr8rJkXfKIJvyKcJk6flJER7ibjGFmTI7Q==
+X-Received: by 2002:a05:6512:4207:b0:57e:1e1b:dde5 with SMTP id 2adb3069b0e04-58071403f46mr357677e87.25.1758613640434;
+        Tue, 23 Sep 2025 00:47:20 -0700 (PDT)
+Received: from foxbook (bfe191.neoplus.adsl.tpnet.pl. [83.28.42.191])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-57fcb89170asm791542e87.63.2025.09.23.00.47.19
+        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
+        Tue, 23 Sep 2025 00:47:20 -0700 (PDT)
+Date: Tue, 23 Sep 2025 09:47:11 +0200
+From: Michal Pecio <michal.pecio@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: I Viswanath <viswanathiyyappan@gmail.com>, andrew@lunn.ch,
+ andrew+netdev@lunn.ch, davem@davemloft.net, david.hunter.linux@gmail.com,
+ edumazet@google.com, linux-kernel-mentees@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, petkan@nucleusys.com,
+ skhan@linuxfoundation.org,
+ syzbot+78cae3f37c62ad092caa@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v2] net: usb: Remove disruptive netif_wake_queue in
+ rtl8150_set_multicast
+Message-ID: <20250923094711.200b96f1.michal.pecio@gmail.com>
+In-Reply-To: <20250922180742.6ef6e2d5@kernel.org>
+References: <83171a57-cb40-4c97-b736-0e62930b9e5c@lunn.ch>
+	<20250920181852.18164-1-viswanathiyyappan@gmail.com>
+	<20250922180742.6ef6e2d5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 1/2] tcp: Update bind bucket state on port
- release
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Kuniyuki Iwashima <kuniyu@google.com>, Neal Cardwell <ncardwell@google.com>,
- kernel-team@cloudflare.com, Lee Valentine <lvalentine@cloudflare.com>
-References: <20250913-update-bind-bucket-state-on-unhash-v4-0-33a567594df7@cloudflare.com>
- <20250913-update-bind-bucket-state-on-unhash-v4-1-33a567594df7@cloudflare.com>
- <b22af0eb-e50b-4d5c-a5bc-eb475388da10@redhat.com>
- <875xdi5yjy.fsf@cloudflare.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <875xdi5yjy.fsf@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Hi,
-
-I'm sorry for the latency, I got lost in pending threads.
-
-On 9/16/25 3:14 PM, Jakub Sitnicki wrote:
-> On Tue, Sep 16, 2025 at 12:14 PM +02, Paolo Abeni wrote:
->> On 9/13/25 12:09 PM, Jakub Sitnicki wrote:
->>> Today, once an inet_bind_bucket enters a state where fastreuse >= 0 or
->>> fastreuseport >= 0 after a socket is explicitly bound to a port, it remains
->>> in that state until all sockets are removed and the bucket is destroyed.
->>>
->>> In this state, the bucket is skipped during ephemeral port selection in
->>> connect(). For applications using a reduced ephemeral port
->>> range (IP_LOCAL_PORT_RANGE socket option), this can cause faster port
->>> exhaustion since blocked buckets are excluded from reuse.
->>>
->>> The reason the bucket state isn't updated on port release is unclear.
->>> Possibly a performance trade-off to avoid scanning bucket owners, or just
->>> an oversight.
->>>
->>> Fix it by recalculating the bucket state when a socket releases a port. To
->>> limit overhead, each inet_bind2_bucket stores its own (fastreuse,
->>> fastreuseport) state. On port release, only the relevant port-addr bucket
->>> is scanned, and the overall state is derived from these.
->>
->> I'm possibly likely lost, but I think that the bucket state could change
->> even after inet_bhash2_update_saddr(), but AFAICS it's not updated there.
+On Mon, 22 Sep 2025 18:07:42 -0700, Jakub Kicinski wrote:
+> On Sat, 20 Sep 2025 23:48:52 +0530 I Viswanath wrote:
+> > rtl8150_set_multicast is rtl8150's implementation of ndo_set_rx_mode and
+> > should not be calling netif_stop_queue and notif_start_queue as these handle 
+> > TX queue synchronization.
+> > 
+> > The net core function dev_set_rx_mode handles the synchronization
+> > for rtl8150_set_multicast making it safe to remove these locks.  
 > 
-> Let me double check if I understand what you have in mind because now I
-> also feel a bit lost :-)
-> 
-> We already update the bucket state in inet_bhash2_update_saddr(). I
-> assume we are talking about the main body, not the early bailout path
-> when the socket is not bound yet [1].
-> 
-> This code gets called only in the obscure (?) case when ip_dynaddr [2]
-> sysctl is set, and we have a routing failure during connection setup
-> phase (SYN-SENT).
-> 
-> In such case, on source address update, call to
-> inet_bind2_bucket_destroy() will recalculate port-addr bucket state,
-> potentially "downgrading" it to (fastreuse=-1, fastreuseport=-1).
-> 
-> But if the "downgrade" happens, it changes nothing for the port bucket
-> state, as we are about to re-add the socket into another port-addr
-> bucket.
+> Last time someone tried to add device ID to this driver was 20 years
+> ago. Please post a patch to delete this driver completely. If someone
+> speaks up we'll revert the removal and ask them to test the fix.
 
-This was indeed the path I was looking for. I lost track of the fact
-that the port bucket affected by the removed and add is the same, so
-it's state does not change.
+These were quite common, I still have one.
 
-It clear now that you pointed that out, thanks!
-
-Paolo
-
+What sort of testing do you need?
 
