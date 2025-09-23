@@ -1,122 +1,298 @@
-Return-Path: <netdev+bounces-225572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFCA6B95969
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:13:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA3ADB959AF
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:18:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB9B019C218B
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:13:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CE4D2A18B9
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:18:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA4D3218A1;
-	Tue, 23 Sep 2025 11:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wssa56PB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516CC322750;
+	Tue, 23 Sep 2025 11:17:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF9230DD00
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 11:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095F232255F
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 11:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758625990; cv=none; b=fev/2E8V+AohlYuTnBHct2DvjzFJshToh04m/Nr3lkhXW1qlgqR8APp9VyXv6yob0JSwlZCgzJDl5yelQDyv2u3ZzncXibiS57SI9KRmbovBlysNmaJDgTksCplVmFJ5rwgpmLQo5JtVeRSMs89TbOg5ecQ0R5eSr5xkUqtBfGE=
+	t=1758626238; cv=none; b=sbN3i4CEpDS3q9uGR340V02V3LJWn4OI8/e1cZvfGKZkqCbjpEY/EKR4GDm47fjlYWCLyqx3OVatyHosIVWsNB4cNb5Y/DVfISNo/zbiNaeerc5v7QqcHuS26+Aa5R8D/jbJ4tCxZ2a2gS+EhZLX8h2NjrxEYbMTFt3LPonQxWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758625990; c=relaxed/simple;
-	bh=Xu3aFhrso3x/XEZB/pUFkQq50ed8XXakXxPeuUqgUyg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=HIcWkTK0zHtYMIn0Cd38Vt0evPpKDjyAx50L2wk+hm+55w6fJfrNXjj12QFlfFTDAGq5SJdnA0pjiA6E//wYMpX2BH96wQpHoSr7uDbHsLHS2D7JK+9VKzcdaOjLVjTyghcIu4CaF/GRe7OUWVdiRhROjwNVQXQupPQXjaq/5ZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wssa56PB; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-45ed646b656so47623195e9.3
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 04:13:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1758625985; x=1759230785; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kPfB6vZFAN1UWmkMopxYEPmOWLUUuC+tX7ts8FDpK5M=;
-        b=wssa56PB25qRd4yA0y3AsSRitOAHTtIyTAqQoQ8NdRHDjov5CO9rTtzl5gAUKP/J+Y
-         90IrEzZTGDXrVfM3ABzhnBt5Uj0rbAP8OKLlMjo7PAErA46zUblb0dK4jaBpzZhRM4Oc
-         mV1mFiwyPL0Y+zSXRrPSkY9leP7nQivXgAEJJNYR7F8qjwAdfdMVuGEt3sI7Ahzotjn7
-         fB4NSJX7NobcMe6cUs4kwrXTBV1PH2Y9UNu9zT+6NxkjYMD6XFqzLt414bZ3EG9GkPeW
-         IIVhCkT1XdctQGnPBLBTghoACjRP4bISDUyJLLddwPbaBdczlpqeDMA8xSLIruGZJmzK
-         RJYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758625985; x=1759230785;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kPfB6vZFAN1UWmkMopxYEPmOWLUUuC+tX7ts8FDpK5M=;
-        b=nRSjV3JVWIUyjLO2mzxsN0YTvmMN78WGMozF9q7vHOrgJDuE76WiKYXQx+ngA8aosD
-         k5kp4Ina6GkQfXQuP6Vs8A6HQZZuGl5qlwcem2p3L5FgyZZTEGraXKHrlH95QkOaabiU
-         FRjbyXMKuCvqprFT9nDv9Yk+1TASBa99UaoyEwh+i+TOfbS+7W/xCHW3VE8243YNNCRj
-         r9V743lrr9PlM9OiBsDm3QOogcHQbZGwUsvLaiy1UeXOLV78uKNJN5Bw8R3Y44dWvyoH
-         JhJdkXLqrPaElvBPzidXrKmUUFRH6OCqkw76D14ev8RbUJdSby9Tnl8DizwyGLo3rmNd
-         zigQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWWE8Td2n2ZbugSpiUbg16RpMnDDODZIiEhnumapNmp+avVUqQ2M+j8tJIsx/oIJLnxPebaTsE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywb1iQ5fNhvp8AeemQ36L89OjYYbTtPyx4jzYhGiq5jHSFPAsGU
-	gK897SulCn5LyTvDsxEj575UJX3g55PDofQo8+tDGY5k5wkx2rrXD+5kyESiCIiEUPg=
-X-Gm-Gg: ASbGnctBqAb+q2DLiagquU3arUn+FUW/lBqEpgLUibnT0WeVXPgmZ8+VsExOHshoz80
-	kILy32htQy5C4H607l1YwyuPxoa4h6wXlpwWXVxnsdPI7t2Y2h53bYxoTj4DVsi7Sht+qtdL7vJ
-	drZzACxbhsihSXNFzqmgOIdcVEFVNpoeJMLx7+zUg56dvwVyJdphx8ECs/jIrqKj2jZTgZbGcEM
-	PZ+j1Nlv0X9LPtEOEeKcSDrnGVzwczkv2LviAQ9o8vJ0cLqkShYNqGDLHVoUd2qioNcUIAl/F/2
-	n545AYLoW6kD82c/HzfAtR0EhEoeBMm3CEbuSIdfhWtc0aKiEqJsk6/ilXWwAWRzxCz5CkQuSDs
-	8F4+Rua4Lw25CEohvn/64o2KtxvR3ta0nM42rnC0=
-X-Google-Smtp-Source: AGHT+IGkTADoNqcmQjP+QOFZr6eMBbrG7pkg/2yNv5pLWE/18q+4r2nqJqLF9iBKY05vapp9F1P7rw==
-X-Received: by 2002:a05:600c:3103:b0:45d:d68c:2a36 with SMTP id 5b1f17b1804b1-46e1dac2d45mr21237175e9.27.1758625985079;
-        Tue, 23 Sep 2025 04:13:05 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-46e1daa4a4fsm14991665e9.1.2025.09.23.04.13.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 04:13:04 -0700 (PDT)
-Date: Tue, 23 Sep 2025 14:13:01 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH net-next] dpll: zl3073x: Fix double free in
- zl3073x_devlink_flash_update()
-Message-ID: <aNKAvXzRqk_27k7E@stanley.mountain>
+	s=arc-20240116; t=1758626238; c=relaxed/simple;
+	bh=J/vSO5Gpj19mzI9MQnqFLTUPsBm1nfJ5s1FhEKwO3xQ=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=khWPU5DJFC96/9MWOOcqxP48tgK/6+r9syea5KmqWZcE9GIRTo2EpFutmUEIJtJQtT6hIYxV1l2sRjVYWdAEm0J6FvICKxg0H+LyhdTxLFLbDQkGkVMsW+O+gaBO6Rja/aInwF4xcVAJEFjGzT3PK9O0Q+rULzpEAJbSMwQ/Vpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cWHT05k6rz6L5F7;
+	Tue, 23 Sep 2025 19:15:16 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id E5C7214020A;
+	Tue, 23 Sep 2025 19:17:06 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 23 Sep
+ 2025 12:17:05 +0100
+Date: Tue, 23 Sep 2025 12:17:04 +0100
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+CC: <jgg@ziepe.ca>, <michael.chan@broadcom.com>, <dave.jiang@intel.com>,
+	<saeedm@nvidia.com>, <davem@davemloft.net>, <corbet@lwn.net>,
+	<edumazet@google.com>, <gospo@broadcom.com>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<selvin.xavier@broadcom.com>, <leon@kernel.org>,
+	<kalesh-anakkur.purayil@broadcom.com>
+Subject: Re: [PATCH net-next v2 5/6] bnxt_fwctl: Add bnxt fwctl device
+Message-ID: <20250923121704.00000eb7@huawei.com>
+In-Reply-To: <20250923095825.901529-6-pavan.chebbi@broadcom.com>
+References: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
+	<20250923095825.901529-6-pavan.chebbi@broadcom.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-The zl3073x_devlink_flash_prepare() function calls zl3073x_fw_free()
-and the caller also calls zl3073x_devlink_flash_update() so it leads
-to a double free.  Delete the extra free.
+On Tue, 23 Sep 2025 02:58:24 -0700
+Pavan Chebbi <pavan.chebbi@broadcom.com> wrote:
 
-Fixes: a1e891fe4ae8 ("dpll: zl3073x: Implement devlink flash callback")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- drivers/dpll/zl3073x/devlink.c | 1 -
- 1 file changed, 1 deletion(-)
+> Create bnxt_fwctl device. This will bind to bnxt's aux device.
+> On the upper edge, it will register with the fwctl subsystem.
+> It will make use of bnxt's ULP functions to send FW commands.
+> 
+> Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
+> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-diff --git a/drivers/dpll/zl3073x/devlink.c b/drivers/dpll/zl3073x/devlink.c
-index f55d5309d4f9..ccc22332b346 100644
---- a/drivers/dpll/zl3073x/devlink.c
-+++ b/drivers/dpll/zl3073x/devlink.c
-@@ -167,7 +167,6 @@ zl3073x_devlink_flash_prepare(struct zl3073x_dev *zldev,
- 		zl3073x_devlink_flash_notify(zldev,
- 					     "Utility is missing in firmware",
- 					     NULL, 0, 0);
--		zl3073x_fw_free(zlfw);
- 		return -ENOEXEC;
- 	}
- 
--- 
-2.51.0
+I'm failing to find where this driver applies the fwctl_rpc_scope
+to commands issued.  I suppose maybe they are all entirely safe
+non invasive requests for data?
+
+That scope stuff is probably the most important thing that fwctl
+provides so all drivers need to deal with it.
+
+Thanks,
+
+Jonathan
+
+> --- /dev/null
+> +++ b/drivers/fwctl/bnxt/main.c
+> @@ -0,0 +1,297 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (c) 2025, Broadcom Corporation
+> + *
+This blank line doesn't add anything.
+> + */
+> +
+> +#include <linux/kernel.h>
+> +#include <linux/auxiliary_bus.h>
+> +#include <linux/slab.h>
+> +#include <linux/pci.h>
+
+Is there anything pci specific in here?  I'd check all the includes
+to ensure they follow (approx) include what you used iwyu principles.
+
+> +#include <linux/fwctl.h>
+> +#include <uapi/fwctl/fwctl.h>
+> +#include <uapi/fwctl/bnxt.h>
+> +#include <linux/bnxt/common.h>
+> +#include <linux/bnxt/ulp.h>
+
+> +static bool bnxtctl_validate_rpc(struct bnxt_en_dev *edev,
+> +				 struct bnxt_fw_msg *hwrm_in)
+> +{
+> +	struct input *req = (struct input *)hwrm_in->msg;
+
+> +
+> +	mutex_lock(&edev->en_dev_lock);
+
+Neater if you use guard() 
+
+> +	if (edev->flags & BNXT_EN_FLAG_ULP_STOPPED) {
+> +		mutex_unlock(&edev->en_dev_lock);
+> +		return false;
+> +	}
+> +	mutex_unlock(&edev->en_dev_lock);
+> +
+> +	if (le16_to_cpu(req->req_type) <= HWRM_LAST)
+> +		return true;
+> +
+> +	return false;
+
+I was kind of expecting something called validate_rpc to do
+the scope checks that we see in other drivers.
+e.g. mlx5ctl_validate_rpc()
+
+> +}
+
+> +
+> +static void *bnxtctl_fw_rpc(struct fwctl_uctx *uctx,
+> +			    enum fwctl_rpc_scope scope,
+> +			    void *in, size_t in_len, size_t *out_len)
+> +{
+> +	struct bnxtctl_dev *bnxtctl =
+> +		container_of(uctx->fwctl, struct bnxtctl_dev, fwctl);
+> +	struct bnxt_aux_priv *bnxt_aux_priv = bnxtctl->aux_priv;
+> +	struct fwctl_dma_info_bnxt *dma_buf = NULL;
+> +	struct device *dev = &uctx->fwctl->dev;
+> +	struct fwctl_rpc_bnxt *msg = in;
+> +	struct bnxt_fw_msg rpc_in;
+> +	int i, rc, err = 0;
+> +	int dma_buf_size;
+> +
+> +	rpc_in.msg = kzalloc(msg->req_len, GFP_KERNEL);
+> +	if (!rpc_in.msg) {
+> +		err = -ENOMEM;
+> +		goto err_out;
+
+Nothing to clean up at this point, so returning here would be simpler.
+
+> +	}
+> +	if (copy_from_user(rpc_in.msg, u64_to_user_ptr(msg->req),
+> +			   msg->req_len)) {
+> +		dev_dbg(dev, "Failed to copy in_payload from user\n");
+> +		err = -EFAULT;
+> +		goto err_out;
+> +	}
+> +
+> +	if (!bnxtctl_validate_rpc(bnxt_aux_priv->edev, &rpc_in))
+> +		return ERR_PTR(-EPERM);
+> +
+> +	rpc_in.msg_len = msg->req_len;
+> +	rpc_in.resp = kzalloc(*out_len, GFP_KERNEL);
+> +	if (!rpc_in.resp) {
+> +		err = -ENOMEM;
+> +		goto err_out;
+> +	}
+> +
+> +	rpc_in.resp_max_len = *out_len;
+> +	if (!msg->timeout)
+> +		rpc_in.timeout = DFLT_HWRM_CMD_TIMEOUT;
+> +	else
+> +		rpc_in.timeout = msg->timeout;
+> +
+> +	if (msg->num_dma) {
+> +		if (msg->num_dma > MAX_NUM_DMA_INDICATIONS) {
+> +			dev_err(dev, "DMA buffers exceed the number supported\n");
+> +			err = -EINVAL;
+> +			goto err_out;
+> +		}
+> +		dma_buf_size = msg->num_dma * sizeof(*dma_buf);
+
+kcalloc probably more appropriate given it looks like an array.
+
+> +		dma_buf = kzalloc(dma_buf_size, GFP_KERNEL);
+> +		if (!dma_buf) {
+> +			dev_err(dev, "Failed to allocate dma buffers\n");
+> +			err = -ENOMEM;
+
+General (growing) convention is don't bother printing messages on memory
+failure as the allocator is very noisy if this happen away.
+
+> +			goto err_out;
+> +		}
+> +
+> +		if (copy_from_user(dma_buf, u64_to_user_ptr(msg->payload),
+> +				   dma_buf_size)) {
+> +			dev_dbg(dev, "Failed to copy payload from user\n");
+> +			err = -EFAULT;
+> +			goto err_out;
+> +		}
+> +
+> +		rc = bnxt_fw_setup_input_dma(bnxtctl, dev, msg->num_dma,
+> +					     dma_buf, &rpc_in);
+> +		if (rc) {
+> +			err = -EIO;
+> +			goto err_out;
+> +		}
+> +	}
+> +
+> +	rc = bnxt_send_msg(bnxt_aux_priv->edev, &rpc_in);
+> +	if (rc) {
+> +		err = -EIO;
+> +		goto err_out;
+> +	}
+> +
+> +	for (i = 0; i < msg->num_dma; i++) {
+> +		if (dma_buf[i].read_from_device) {
+> +			if (copy_to_user(u64_to_user_ptr(dma_buf[i].data),
+> +					 bnxtctl->dma_virt_addr[i],
+> +					 dma_buf[i].len)) {
+> +				dev_dbg(dev, "Failed to copy resp to user\n");
+> +				err = -EFAULT;
+> +			}
+> +		}
+> +	}
+> +	for (i = 0; i < msg->num_dma; i++)
+> +		dma_free_coherent(dev->parent, dma_buf[i].len,
+> +				  bnxtctl->dma_virt_addr[i],
+> +				  bnxtctl->dma_addr[i]);
+> +
+> +err_out:
+> +	kfree(dma_buf);
+> +	kfree(rpc_in.msg);
+> +
+> +	if (err)
+> +		return ERR_PTR(err);
+> +
+> +	return rpc_in.resp;
+> +}
+> +
+> +static const struct fwctl_ops bnxtctl_ops = {
+> +	.device_type = FWCTL_DEVICE_TYPE_BNXT,
+> +	.uctx_size = sizeof(struct bnxtctl_uctx),
+> +	.open_uctx = bnxtctl_open_uctx,
+> +	.close_uctx = bnxtctl_close_uctx,
+> +	.info = bnxtctl_info,
+> +	.fw_rpc = bnxtctl_fw_rpc,
+> +};
+
+
+...
+
+> +static const struct auxiliary_device_id bnxtctl_id_table[] = {
+> +	{ .name = "bnxt_en.fwctl", },
+> +	{},
+
+No need for trailing comma.
+
+> +};
+> +MODULE_DEVICE_TABLE(auxiliary, bnxtctl_id_table);
+
+> diff --git a/include/uapi/fwctl/bnxt.h b/include/uapi/fwctl/bnxt.h
+> new file mode 100644
+> index 000000000000..cf8f2b80f3de
+> --- /dev/null
+> +++ b/include/uapi/fwctl/bnxt.h
+> @@ -0,0 +1,63 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + * Copyright (c) 2025, Broadcom Corporation
+> + *
+
+Trivial, blank line here adds nothing useful.
+
+> + */
+> +
+> +#ifndef _UAPI_FWCTL_BNXT_H_
+> +#define _UAPI_FWCTL_BNXT_H_
+> +
+> +#include <linux/types.h>
+> +
+> +#define MAX_DMA_MEM_SIZE		0x10000 /*64K*/
+> +#define DFLT_HWRM_CMD_TIMEOUT		500
+
 
 
