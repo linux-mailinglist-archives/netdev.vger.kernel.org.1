@@ -1,124 +1,81 @@
-Return-Path: <netdev+bounces-225458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21C3EB93C80
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 03:03:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C4B2B93C9B
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 03:07:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29D3E19C18D0
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 01:04:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6333219054C8
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 01:08:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 984B91DF99C;
-	Tue, 23 Sep 2025 01:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DC5C1DF985;
+	Tue, 23 Sep 2025 01:07:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HUgiQ5Yc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EA4oY0Xz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2EF01DF247
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 01:03:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5AD1DE4CA;
+	Tue, 23 Sep 2025 01:07:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758589420; cv=none; b=DtrN3DmuFTQqiPtsvnTQzF2R7LBmT1q3BaFnXHDhJx8gTR6dkMut2nvLTfqmOQAe41xd6dHzapeqHKXFAItZpfpa9XT7J3vGf5DKbeWAJz5XB8RHhUA4XHvDlVEp+YONTg4oWpxgb9p5Npw2Fv+k4E62kzOjhyXOWtEmc1/eMaw=
+	t=1758589664; cv=none; b=kcMsm0jxnirm6HN9040uaDyEdJcBmJ38ac8rIExkqkma9bszZrFAz/YNPNvkBjmYBoz79qZ3qaZswt1UCowpYQ3DuzwPXTIuhgcer3xpNWzXrNLBQJj6g8nLMnB9jXlzddtRnGPUKbhNGPUUxyH/2ghnYNYCzTlfz/ohFSF2wqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758589420; c=relaxed/simple;
-	bh=i6Of2jAUL+zQjJ8mC94XwylCjFmErxMFeVoMP3a6500=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DQUVSYcM7gQ+Tk2rR0pZr6Kq8EggmYJILoz0sKdYA1Mp1i6+VAeC3SIrku+I6rzuGdAGb0gDkxXOC8KcueM9p0IVR9fFcMCF0tXA7MoRBGCQ60u1lD0WP6PS07Yv48DBoSgLgcUhHiWmorxsLLsHkaE246J35NLU5vOXbL5NrYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HUgiQ5Yc; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b5516ee0b0bso2684419a12.1
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 18:03:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758589418; x=1759194218; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x33yQCiS8yD4t00RGUcUdYXvxGF8NkkkcCi7P/JHd/M=;
-        b=HUgiQ5YcWjQFquCPubpxmHoqDYVyL8Pl9u40e4LEBO1Hz4pTehTPy/LrzenufVT+1n
-         HNtF67XfHYdXCIsiALwkPMC4x7wiNo06LakgR2uDEToKI9mi6zjJOAx2c9GK6OfZ5qMy
-         HXAEBLTFi+EPoqAO932P8UvVWU9rIe/VM2qmRQC0jjvqe3eT8Svd0iTlzXoxWlvRLa9G
-         KAmOY6LELFQBNuWWLcVbFJiiqgFDWtsgCNBgD4R1A5WXqRvP1aeZFO+Dh4yEd1yLvD96
-         EsmVDZvHXLgA1VerIWja67jAv/jsoggADxLHjdHCWEXgIEsKlidPgiL3GvI7teVVbpYH
-         0x9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758589418; x=1759194218;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x33yQCiS8yD4t00RGUcUdYXvxGF8NkkkcCi7P/JHd/M=;
-        b=hmsZlAVKR1OZpUWdeYlg3Po0cjCW7Qa79I5aho/NnqecztUWV7dAN16GlvNS3B/SQs
-         6AHsNo87JKFp8IAxMgimA1h0mUiKgIro0v6E2xw2jX1AT5QXOGWMFB5KmRmKDXm2q/h2
-         aKYtwpRbHeIu96G/88xOWRUbyLlnGKosnW6rAB7x9BUU+lx1c5mvvPhNF5be6ZaKcth0
-         r6ztxgw0dlhkWlXTPeYgNmzyy8tToGCZ7bRsHGN7ReP5gauOWB6weY3iUD2LPYOhLDDg
-         AGpVuOPv6flW4bnNkR4nO+OfB1ytd5Lxz1xEagXHIzl5Y26644nIPOjipWGhHcemKk+/
-         8kLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWSYMEhmzJNfMVuAljd7P6gCchCG2lMGIlxeHCW2E3WhzRnS+VnPpfVcN6YQvyl0IsPChjhX0M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxX9x/Pnu51kxzCSOipvG63OtvXIHBSFRB4fWgSO9+5IOWuB5jm
-	64GIHxfkFqYs6oRjoV2+SrpS6ySHTAW1SeC0ywf38FX+TB6iPx/DBWjmXlLOR1qNU587i0K8pM3
-	rKepNB53Efgl0YQfKLJoXc05xWxzPhFiXsKZ3HYDt
-X-Gm-Gg: ASbGncuIcVRUEfYaoN8yOfR9WTOYXVJCOLNz96YFeQDPJ0bohLaqfbM+n1Rv+8lKOqA
-	9lbSksBqnMJRlMWRmxUTlc3QCRb0Se4PvAu/nqix0RuYMjQ+HvpWq+PGCAp3XHPtos8CtkQYbzW
-	Qutqq6wksHBx/OxwCUivFv3uNXno/6pPVWHmN3QA1ASDlOZt4PK3M7P8G5tdfn51IyIB1u750zd
-	5mC0BE=
-X-Google-Smtp-Source: AGHT+IF4V7vLCAX99zE2i1WgDrb/NvJZo/98rUrRoBuo4S05a+IOKORc6ElcP1wyehzVZqK2h4N0L8kJZulAJ8PxgQE=
-X-Received: by 2002:a17:90b:2d8b:b0:32e:a54a:be5d with SMTP id
- 98e67ed59e1d1-332a91baa9fmr956929a91.2.1758589417994; Mon, 22 Sep 2025
- 18:03:37 -0700 (PDT)
+	s=arc-20240116; t=1758589664; c=relaxed/simple;
+	bh=KfCEe+TsG87YvDPSQorY/miKGure0NErSK1Ry9X9WfY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rFqGbv4rJ7b9SbDRXV7vDT8miQ4qjUTFA9u+uCcDYVIkMw+Wyh0sUtPDclJHSSVIwajCm4idfjw4W4YMbkOTaGH52swfhFKoguRdTcvf1feCve4QEgMdaSYuaqkajCLzuGhZwkHPE7xhPSNzq0SNnEUH5rGOBuCe4lOPMT4l2vY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EA4oY0Xz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EA84C4CEF0;
+	Tue, 23 Sep 2025 01:07:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758589663;
+	bh=KfCEe+TsG87YvDPSQorY/miKGure0NErSK1Ry9X9WfY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EA4oY0XzS87mtk9x1RY7lBr16Ih2Le3KofSD8/RrOiWV1rIZXkA/okXOlMBL+FIex
+	 Tr5IRzVBMsyOHajrQRJYFdcNaVLLkLjMAJhJ+6BIvTdDsvMgUB9eCd4dmQKwMY4Oga
+	 8aBJHhwfjxo9ED60j+lbMxG3W3Bs7haFzGhXc0MY2WEffjhvvGZD61qdGYNxNx7nU0
+	 DMV0kUASaIBEM03Sxu36/OadpmV1Q4NvGM48GDB8zciyUA4Rc9XGpIuB05dj6wfgCg
+	 wKWp4ngcBp3MnZBA/G2NOOT/ydczPHijCoddo9rK6KuKEkT4dy3WwToJcfvofVynKq
+	 H8Ojha3hhI8Pg==
+Date: Mon, 22 Sep 2025 18:07:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: I Viswanath <viswanathiyyappan@gmail.com>
+Cc: andrew@lunn.ch, andrew+netdev@lunn.ch, davem@davemloft.net,
+ david.hunter.linux@gmail.com, edumazet@google.com,
+ linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ petkan@nucleusys.com, skhan@linuxfoundation.org,
+ syzbot+78cae3f37c62ad092caa@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v2] net: usb: Remove disruptive netif_wake_queue in
+ rtl8150_set_multicast
+Message-ID: <20250922180742.6ef6e2d5@kernel.org>
+In-Reply-To: <20250920181852.18164-1-viswanathiyyappan@gmail.com>
+References: <83171a57-cb40-4c97-b736-0e62930b9e5c@lunn.ch>
+	<20250920181852.18164-1-viswanathiyyappan@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250920000751.2091731-1-kuniyu@google.com> <20250920000751.2091731-4-kuniyu@google.com>
- <pmti7ebtl7zfom5ndqcvpdwjxlkrvmly2ol64llabcwfk7bdg2@mc3pigkg2ppq>
-In-Reply-To: <pmti7ebtl7zfom5ndqcvpdwjxlkrvmly2ol64llabcwfk7bdg2@mc3pigkg2ppq>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 22 Sep 2025 18:03:25 -0700
-X-Gm-Features: AS18NWA4Ta5V2LkgBMhN9GY-RVQdhXUu2iIiDrc6jXD7aYqae5HSof66nqd6WU4
-Message-ID: <CAAVpQUBZSK6ptrRgruj0BGXBqDUOu3MKYKfD9FkWFn55OduwOw@mail.gmail.com>
-Subject: Re: [PATCH v10 bpf-next/net 3/6] net-memcg: Introduce
- net.core.memcg_exclusive sysctl.
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 22, 2025 at 5:54=E2=80=AFPM Shakeel Butt <shakeel.butt@linux.de=
-v> wrote:
->
-> On Sat, Sep 20, 2025 at 12:07:17AM +0000, Kuniyuki Iwashima wrote:
-> > diff --git a/net/core/sock.c b/net/core/sock.c
-> > index 814966309b0e..348e599c3fbc 100644
-> > --- a/net/core/sock.c
-> > +++ b/net/core/sock.c
-> > @@ -2519,6 +2519,7 @@ struct sock *sk_clone_lock(const struct sock *sk,=
- const gfp_t priority)
-> >  #ifdef CONFIG_MEMCG
-> >       /* sk->sk_memcg will be populated at accept() time */
-> >       newsk->sk_memcg =3D NULL;
-> > +     mem_cgroup_sk_set_flags(newsk, mem_cgroup_sk_get_flags(sk));
->
-> Why do you need to set the flag here? Will doing in __inet_accept only
-> be too late i.e. protocol accounting would have happened?
+On Sat, 20 Sep 2025 23:48:52 +0530 I Viswanath wrote:
+> rtl8150_set_multicast is rtl8150's implementation of ndo_set_rx_mode and
+> should not be calling netif_stop_queue and notif_start_queue as these handle 
+> TX queue synchronization.
+> 
+> The net core function dev_set_rx_mode handles the synchronization
+> for rtl8150_set_multicast making it safe to remove these locks.
 
-Currently, we only allow bpf_setsockopt() during socket(2) not
-to make things complicated as explained in patch 4.
-
-So, this is to preserve the listener's flag set by bpf_setsockopt()
-since network applications basically assume setsockopt() for a
-listener socket is inherited to its child sockets.
+Last time someone tried to add device ID to this driver was 20 years
+ago. Please post a patch to delete this driver completely. If someone
+speaks up we'll revert the removal and ask them to test the fix.
+-- 
+pw-bot: cr
 
