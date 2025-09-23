@@ -1,139 +1,128 @@
-Return-Path: <netdev+bounces-225591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4232B95C52
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 14:05:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AB07B95D0A
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 14:20:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F8022E4A80
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 12:05:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C498E1898D55
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 12:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40F4322547;
-	Tue, 23 Sep 2025 12:05:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 053F3322DBA;
+	Tue, 23 Sep 2025 12:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="L0C9g3J+"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ONyn2DhS"
 X-Original-To: netdev@vger.kernel.org
-Received: from forwardcorp1d.mail.yandex.net (forwardcorp1d.mail.yandex.net [178.154.239.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f226.google.com (mail-yw1-f226.google.com [209.85.128.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731062FC86F;
-	Tue, 23 Sep 2025 12:04:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C06322DAD
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 12:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758629101; cv=none; b=uxMhPYbOtRjlKMJSIdrreaCbQDAjrnrZxLJhp2AUyyacjdjTWRFOCAxVfjfczm0iezBn9k8GOWs7cvL5dexFHykYkY9g7LGftpxyA58W90ZoGCN3YJZ/8iJF5ce8nWPPOJOzxW5tiXubK/v8fgfXlGs2YdW2XgIx6yLk5dd0dII=
+	t=1758630005; cv=none; b=GYUEfGwGMPwDalWTXeGRUvPJmNqk1wCeQIHe62+cPGzg7/ILhbnIKnHm9Uf7LYPaz/ZbIhIOR3iQyV8Q18+PcVAqgHei/QzlE3/Eagt+uK4X3O800iWzuryR3yhmuB2kMqXJaIo+oBKIvNjn88paJxc37udeksYazx+rFqjYu3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758629101; c=relaxed/simple;
-	bh=ThjKCuq/Gkaa6sxkQ2iw8pcH9Scy6bno0C+2htC9uZc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g1vZbYLbMyZcOg6K/Kcrir6+QpsyFuaE00FAmwU5sPEDSDbWuhA81yNW3rpowGRatVO3CYzyFHJqGsiPoz+xz+NJgfTq1moAT1P77zezHczsf6RWfCOxYfiYwPZaVnhNvP92ndj9OXshGZZQv+z68oZXbjrQxSwQfhY4+fkHw10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=L0C9g3J+; arc=none smtp.client-ip=178.154.239.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
-Received: from mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:cf2d:0:640:140f:0])
-	by forwardcorp1d.mail.yandex.net (Yandex) with ESMTPS id 1672F80C96;
-	Tue, 23 Sep 2025 15:04:53 +0300 (MSK)
-Received: from [IPV6:2a02:6bf:8080:c77::1:3b] (unknown [2a02:6bf:8080:c77::1:3b])
-	by mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id o4WuUE0FriE0-fAFtdmJZ;
-	Tue, 23 Sep 2025 15:04:52 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; t=1758629092;
-	bh=Vf6v1fCk8K2cHd1wSxGVsZZHow2DvCl4rn6gHJ3UDJw=;
-	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
-	b=L0C9g3J+Buq5IlPqK24blre2NyAlID7zKCiGaanAQ7d0uVqQ7U304SQTzWELPkSL8
-	 HMobw6+QoJSStHaluNL8R7Het0vAbLmykTCNFFkLIWSdda7hRKRd9vIeNFOXeEU84z
-	 XBO11aEutOxbdbL3c7nPknSeN0QFZpXNj6RbvJwM=
-Authentication-Results: mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-Message-ID: <348f209e-89bc-4289-aaf9-e57437e31b0d@yandex-team.ru>
-Date: Tue, 23 Sep 2025 15:04:50 +0300
+	s=arc-20240116; t=1758630005; c=relaxed/simple;
+	bh=5u3Tf4zsWxGWOtJhDSUGMOTvoKdRhCkB563LHF1FknA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Pop9MOlKWJjQ//jQX3lED+YXC7rSyjk9U54ZMQRWIhDzgg5gV56mDTLGNC/XZFFkcxL3WzRSfpoUfMPm9B3x/8oUssN29JsJ5Np9NNMSBEFXy3cRmKsl1d7pe5tcIfdto7lCpbcFPHkZEE6mD/K/6filWQBoXs6LYoW1rzzqzFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ONyn2DhS; arc=none smtp.client-ip=209.85.128.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-yw1-f226.google.com with SMTP id 00721157ae682-74435335177so32728997b3.0
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 05:20:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758630003; x=1759234803;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5u3Tf4zsWxGWOtJhDSUGMOTvoKdRhCkB563LHF1FknA=;
+        b=dIoKcQnAG9T+Qk9cz/f7eCG1yfNjEHUyEFXRSBs5d4Li5RySy7qH9XaAy2VbjdVHen
+         XLu8vyb2tR+JcQX6jDIc5SxSlG5iE2DjAYTBq0L3KOokOYBfB/GmcNPekrVuiWNDna1x
+         5RIIiBxa56bwzJ6ZqW7OPh3UdXVVOEodVFGEcaeRZD2S9nVQh7bseam1YHvdkmeIhLLZ
+         EtFMsWJ97oHGrrspkY3KWaQT/7H3oIejlOUWYXnSJAWWS6zQCJw3yxGpGOycin+UVo1g
+         h2s9vAl9dDemY3Y4qk5zj2y3McYFWZJ10qZSItUM5OmxkoQH2vz8ctg/520m9j/UOnmC
+         znAg==
+X-Forwarded-Encrypted: i=1; AJvYcCXzvITr1mCK/EsqbXj7Ld+rrAbVkFzTpH2qyBRDugp1bXzDTShpSW8p/4CCvCxwc5qeI4SStXY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzj5U4KK0rdJvJyJraElhbpbqmQ1FCUzjBOv+1RnIg46Y17N6f/
+	xR9piDLh/e6VRIAVUtjX3hfNGAmqQZ+APdvvMAGEPmx7WzsYc1sm8H2VfxnWhAF3YnlJeRsjGf9
+	Ej59U93UAKGZarcPvuxb6MNu4IIdo09klcd8h7hl2yp3GuVs/UpfpATL/Lf6cNs805YbybD046K
+	eWpo4Mo0hGPptj1z2BWVsHhg5ITITGyYBMzZPo8ews1ZMptdusvpSKVcwQl+IXutAKpOoMffoSu
+	wQ6fGZGbIM=
+X-Gm-Gg: ASbGncufY03HvLArgx11uX43Sw0yDxgdZfgoCppOoiqZublgaUs++YTjx8jYl1psjE/
+	bOSoRhUStJodOr8vQttWwMBCGJoD6YBnc4iO90OB5bsQFrE+rdtkTbwIQvOQn0nl7mJvvVgF/Zd
+	t86JRIkunr5RPxKaLdFejN5uDjJoTshT7qwKjd4VHNYGV80hndGFtPmUQ7wJisuIbz0WZsXFgw8
+	0pm31nP/UagICz9dgU8UMMtghqzTLi6orNvlsmfTioxBnq1anStBI3FypRO84g4XwWln+HQC75L
+	GD2QTawIyiaBRizeKHkRTmBOIUfmIMwd/hSdLJ5yB6GiHfn1Zm5uKUYSJ2JdYDnBC0gjrrw1gbM
+	qawiQbUxpJTHOUFyrd6uQqm6w/pcvdn13bih35fLbsBxPXhnNG5ols6TmuFgeFiB/zd7Yti6Hvi
+	Q=
+X-Google-Smtp-Source: AGHT+IFYUn+fmAiTV4VuOXIkpxMThdoCPuvdNzoIS7nihnHCgI3IVVqjwqbRPZC105ZQG2qypO62YZR7iSNk
+X-Received: by 2002:a05:690c:5887:b0:744:9c41:c54b with SMTP id 00721157ae682-758928a5dadmr10857367b3.12.1758630003124;
+        Tue, 23 Sep 2025 05:20:03 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-11.dlp.protect.broadcom.com. [144.49.247.11])
+        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-7397197380dsm7109547b3.36.2025.09.23.05.20.02
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 23 Sep 2025 05:20:03 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-b54d0ffd172so4288457a12.0
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 05:20:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1758630001; x=1759234801; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5u3Tf4zsWxGWOtJhDSUGMOTvoKdRhCkB563LHF1FknA=;
+        b=ONyn2DhSVR6LRldRb0wKOUM1+qdBgb3vpBlHj+RfnvOrEutUwtgckbsd8Pz/Gd8ZA+
+         j/J9/q4DAiFxvdhwsmoedfPilpnzKR0HWaZnWE8saHthurFucN47YSsmvQ3qCna6Pgjs
+         6Qh3SE8d95x6X1vbtPo0/0w/G9vvkngzA7xqc=
+X-Forwarded-Encrypted: i=1; AJvYcCUT7xBTfM2QBMT+ke+vVufGpgp+hYkfLT8PG3YXcdGV95M5xijvEvZjdzG0GPXQEDcfykmwWWI=@vger.kernel.org
+X-Received: by 2002:a05:6a21:99a4:b0:2ce:67b2:3c41 with SMTP id adf61e73a8af0-2d108952c2bmr2932189637.5.1758630001462;
+        Tue, 23 Sep 2025 05:20:01 -0700 (PDT)
+X-Received: by 2002:a05:6a21:99a4:b0:2ce:67b2:3c41 with SMTP id
+ adf61e73a8af0-2d108952c2bmr2932156637.5.1758630001091; Tue, 23 Sep 2025
+ 05:20:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] netfilter/x_tables: go back to using vmalloc for
- xt_table_info
-To: Florian Westphal <fw@strlen.de>
-Cc: Eric Dumazet <edumazet@google.com>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Phil Sutter <phil@nwl.cc>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20250922194819.182809-1-d-tatianin@yandex-team.ru>
- <20250922194819.182809-2-d-tatianin@yandex-team.ru>
- <CANn89i+GoVZLcdHxuf33HpmgyPNKxGqEjXGpi=XiB-QOsAG52A@mail.gmail.com>
- <5f1ff52a-d2c2-40de-b00c-661b75c18dc7@yandex-team.ru>
- <aNKGWZSxY9RC0VWS@strlen.de>
-Content-Language: en-US
-From: Daniil Tatianin <d-tatianin@yandex-team.ru>
-In-Reply-To: <aNKGWZSxY9RC0VWS@strlen.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
+ <20250923095825.901529-6-pavan.chebbi@broadcom.com> <20250923121704.00000eb7@huawei.com>
+In-Reply-To: <20250923121704.00000eb7@huawei.com>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Tue, 23 Sep 2025 17:49:50 +0530
+X-Gm-Features: AS18NWAHrU1KtZ1-lxx3sgGEcq2CmV9ssymb8cxBP8El-aUe8vbtDeNTu-N_JLo
+Message-ID: <CALs4sv2gUisgf4QxO3Sed4y7TSo3tnieVSen6yGSPSgHh9xT7w@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 5/6] bnxt_fwctl: Add bnxt fwctl device
+To: Jonathan Cameron <jonathan.cameron@huawei.com>
+Cc: jgg@ziepe.ca, michael.chan@broadcom.com, dave.jiang@intel.com, 
+	saeedm@nvidia.com, davem@davemloft.net, corbet@lwn.net, edumazet@google.com, 
+	gospo@broadcom.com, kuba@kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, selvin.xavier@broadcom.com, 
+	leon@kernel.org, kalesh-anakkur.purayil@broadcom.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-On 9/23/25 2:36 PM, Florian Westphal wrote:
-
-> Daniil Tatianin <d-tatianin@yandex-team.ru> wrote:
->>> On Mon, Sep 22, 2025 at 12:48 PM Daniil Tatianin
->>> <d-tatianin@yandex-team.ru> wrote:
->>>> This code previously always used vmalloc for anything above
->>>> PAGE_ALLOC_COSTLY_ORDER, but this logic was changed in
->>>> commit eacd86ca3b036 ("net/netfilter/x_tables.c: use kvmalloc() in xt_alloc_table_info()").
->>>>
->>>> The commit that changed it did so because "xt_alloc_table_info()
->>>> basically opencodes kvmalloc()", which is not actually what it was
->>>> doing. kvmalloc() does not attempt to go directly to vmalloc if the
->>>> order the caller is trying to allocate is "expensive", instead it only
->>>> uses vmalloc as a fallback in case the buddy allocator is not able to
->>>> fullfill the request.
->>>>
->>>> The difference between the two is actually huge in case the system is
->>>> under memory pressure and has no free pages of a large order. Before the
->>>> change to kvmalloc we wouldn't even try going to the buddy allocator for
->>>> large orders, but now we would force it to try to find a page of the
->>>> required order by waking up kswapd/kcompactd and dropping reclaimable memory
->>>> for no reason at all to satisfy our huge order allocation that could easily
->>>> exist within vmalloc'ed memory instead.
->>> This would hint at an issue with kvmalloc(), why not fixing it, instead
->>> of trying to fix all its users ?
-> I agree with Eric.  There is nothing special in xtables compared to
-> kvmalloc usage elsewhere in the stack.  Why "fix" xtables and not e.g.
-> rhashtable?
+On Tue, Sep 23, 2025 at 4:47=E2=80=AFPM Jonathan Cameron
+<jonathan.cameron@huawei.com> wrote:
 >
-> Please work with mm hackers to improve the situation for your use case.
+> I was kind of expecting something called validate_rpc to do
+> the scope checks that we see in other drivers.
+> e.g. mlx5ctl_validate_rpc()
 >
-> Maybe its enough to raise __GFP_NORETRY in kmalloc_gfp_adjust() if size
-> results in >= PAGE_ALLOC_COSTLY_ORDER allocation.
-
-Thanks for your reply! Perhaps this is the way to go, although this 
-might have
-much broader implications since there are tons of other callers to take 
-into account.
-
-I'm not sure whether rhashtable's size also directly depends on user 
-input, I was only
-aware of x_table since this is the case we ran into specifically.
-
->
->> Thanks for the quick reply! From my understanding, there is a lot of
->> callers of kvmalloc
->> who do indeed benefit from the physical memory being contiguous, because
->> it is then
->> used for hardware DMA etc., so I'm not sure that would be feasible.
-> How can that work?  kvmalloc won't make vmalloc backed memory
-> physically contiguous.
-
-The allocated physical memory won't be contiguous only for fallback 
-cases (which should be rare),
-I assume in that case the hardware operation may end up being more 
-expensive with larger scatter-gather
-lists etc. So most of the time such code can take optimized paths for 
-fully contiguous memory. This is not
-the case for x_tables etc.
-
+Right, skipped applying scope with the intention to support all the command=
+s,
+assuming good faith in the sender. Thanks for your comment, I realize besid=
+es
+missing to implement an important fwctl construct, it also does make me app=
+ear
+lazy, to segregate commands from a really large list. But I will do it in v=
+3.
+Thanks for pointing out.
 
