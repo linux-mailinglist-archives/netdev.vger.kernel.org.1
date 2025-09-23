@@ -1,104 +1,80 @@
-Return-Path: <netdev+bounces-225442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A46D2B93A8F
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 02:00:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74C08B93A9B
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 02:06:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 726D419C0AA9
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 00:01:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 242A03BFCBD
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 00:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7D7EEB3;
-	Tue, 23 Sep 2025 00:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60703DDAB;
+	Tue, 23 Sep 2025 00:06:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OhHkS6gV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ja8uqtR7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB4A28FD
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 00:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35907BE5E;
+	Tue, 23 Sep 2025 00:06:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758585652; cv=none; b=NAvBpaHevoW2RIxTGHRiR6vvMIlT2G9OvhA6enrMQZwDEUyVLxXrNcOm7aZiBEd8m8PXcVhIw94YLLrFUyib470lcIOz6mMHLpB1Tv+dIK0W5dWpIG30pKuMGR89eeTdgSWl5/a4t0m7LdculLtdHsUzC7ZjMN9z4XjiyH2aJt8=
+	t=1758586004; cv=none; b=hGGDq8Crhs0UjKVg9AwDl9Xv8sS2PHpcIlNA0200PoM8EbxFfCVQeKsECrEN7bJ9FT71Zd9OL7IXmgtkaTsRLS+2qgmyGNTD0h79pz5lo+K5gF0Du8LNz9LVxbPRA1eub8sG1kev8EPT/cXL+7BJYxHQ9yBd7v8N2CYc3wlxX4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758585652; c=relaxed/simple;
-	bh=Xso6C5DnCXq0L6TjTJIpYhGpWwY9tYt+zQYpusTHhMo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MUP7ky+BvEKxyjEyFvwN0BeqCBtuZ77KX5orKqg3u7TTDdsCS0YYXLo3SSZjlHAaQJ6PdxCrZJ78Y/6JbCHaLsvZApbCHjA8c/cM/R8Ebj6RgdXcikFn716XeM8mst6zGIxfNEvJstPDLByOST4t8JfHX/Xv45FuGuCGZ92W4nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OhHkS6gV; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-323266d6f57so5124248a91.0
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 17:00:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758585650; x=1759190450; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xso6C5DnCXq0L6TjTJIpYhGpWwY9tYt+zQYpusTHhMo=;
-        b=OhHkS6gV+OnD0zCgZStTO/4S4PULlCCM3lXAeNPV5z2YKg9ePk6d8Cj7I9LP75s28x
-         H26cULEfvCVff06yocdEK27UKJoCtIY/Uem0KnVlv/ScVpO0PS1Uncmk1Fff4tSgSL0C
-         RZbY26FDxCMalQmuGfzR/TLqpeKqzV51meBOwjTltNnuCoLynEPnlKEjn43zkdRILh9e
-         MtQbr3hgzOv6zjy7Jgg0Qm6TIiHzUfJzEOrdYSYxisSGPNrUPPaFS7Qsuuf54TyBsK+3
-         74U+ddbARsh9o3irbQbPGrC0haFhiU5q/mM4tGCeo3NWdkrVhtc8Soy0Lpn1+b+3qOWu
-         4XFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758585650; x=1759190450;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Xso6C5DnCXq0L6TjTJIpYhGpWwY9tYt+zQYpusTHhMo=;
-        b=M7lQehr8KJ6popDjp4l/8qbuqLFfbytW0mYiCEZUkW17V2BEyJyLF+k73Ucc2V2/TP
-         ZuNy+l90hcy3yaldL6IDTqHxLs/V71FxNBiqRjHKV4Nd82StJXwT1NTFYUKAZ64ObKLZ
-         jLpgYL2ett8sgoGB61Zxbn4EqEL7pKG7vfs5oeHfMo+Ip614ktUsYiy0k3R1WJVSX0B5
-         55mqxD4/GVyeuCgem0Gi78sW3R5kN/Ph0Xh8c8gQqz/TaEc7ey4l231tE56UionHoZbg
-         zBOnhfP5fGXKEXOSg+NPLU26kb94g8uvBEepC8DfRU9+8KnJdsXebnSkJRzpMj1aRxGv
-         w5KA==
-X-Forwarded-Encrypted: i=1; AJvYcCUdkfP4rR9tsjipt+SY5zkxpPr2puTbHLTyhEyxKYwU5LxSzsbTjrE6xvrUcXz9xH30MGikJ+4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXKavYfWiMF4BQuvLksX+gLHeQ5fYAZhplpSKgSJZwhTnoZSkp
-	6fFT7n4EuqQSwb/t+gu+Ui00BLBJ5gVPceTmCxRzsU+R5e+7f1aPNu8uputqGUubmVLIUUTEY7L
-	O97jS2egCbVv2GTK0kUDJ9yd963ColRjW7/RtQpUI
-X-Gm-Gg: ASbGncu6kqu3IS4/VvSDnCXC8tBLDU7cki3pjdecZOe/rWO3Ihe4iXi/qwS25nLE10D
-	csuI3Xbl3c8Bo85GChONIHV+HEGpMTd/EL4CPKND/6Vg3yIVmXeLLg7GZ8SxkoHMYy7c7XY+a/g
-	8ooi+sj7rnobk+c2NlPeAQJErJj5O3BzKZ3T8VopEAhgyra0g59p76iRSdJA2FC90Y5o/2tMwku
-	1534aFpudBTp6e65PyJbvlGF/wdvn6eXh0BEg==
-X-Google-Smtp-Source: AGHT+IHLnwcNpBzlET4+D/Seks8+WkB8gvy/jDrJaYeDJgEo82q5MK2YIdsDdTwqxl5yW3nsp6eaxp8EQGYjiDG3EoQ=
-X-Received: by 2002:a17:90b:4f43:b0:32e:749d:fcb6 with SMTP id
- 98e67ed59e1d1-332a951c1c4mr876799a91.12.1758585650223; Mon, 22 Sep 2025
- 17:00:50 -0700 (PDT)
+	s=arc-20240116; t=1758586004; c=relaxed/simple;
+	bh=9EZM2bQ1+x+9RpmEnYsLQfLA1yzHuL/f+/Q6zAHJuME=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iuyJJPcH/bX4jSZbs/dBB04QLxxRepUeUi0uWxDgxJlbKIBHGj/YAQmZs04V9ONTsa+90cg3G8bekN7pgG2iEb/6ZaH91LwESusivP5XV3tA3XQFjuJBIlWE5gFQBsZaa8UawD4kuxHBwXN1gpE8RIrlT1Go+8DEBrq58f5sdco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ja8uqtR7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6D49C4CEF0;
+	Tue, 23 Sep 2025 00:06:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758586003;
+	bh=9EZM2bQ1+x+9RpmEnYsLQfLA1yzHuL/f+/Q6zAHJuME=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ja8uqtR7yoLtRy4qlBt58qGUBIrQ4d7Z3MJbvrg+oigryoxB3DyWzqTMj8dQom0JD
+	 NMpNT6QMHOz2eFMGWvUDLeybUqlz4WTqRQ5/NZiwH+WqHu3zL5Vvb4L4cI3Ia5R+Ow
+	 le6xDqbiz2sNIgD7HyOCVpQMAgH/OwUhMYIhZVr7DIz/uXuMkfcwFx9tiSwyyszk7P
+	 6mR5oB/cOh230fN6eLggCxsfSD0CPl4pL2X6B9rfakowFbHJIRKwwa6xBmNZFziIXP
+	 ZGZ16+CWJjkjOqhO1FI9MMPduPGF5CtxeUSGr/HUcKaQl8uHDectYqNQBZBn/Mt5AU
+	 Wd3HrJmHp4m6g==
+Date: Mon, 22 Sep 2025 17:06:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+ <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+ <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Moshe
+ Shemesh <moshe@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>
+Subject: Re: [PATCH net-next 3/7] net/mlx5: Improve QoS error messages with
+ actual depth values
+Message-ID: <20250922170642.2d79e14b@kernel.org>
+In-Reply-To: <1758531671-819655-4-git-send-email-tariqt@nvidia.com>
+References: <1758531671-819655-1-git-send-email-tariqt@nvidia.com>
+	<1758531671-819655-4-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250919204856.2977245-1-edumazet@google.com> <20250919204856.2977245-7-edumazet@google.com>
-In-Reply-To: <20250919204856.2977245-7-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 22 Sep 2025 17:00:38 -0700
-X-Gm-Features: AS18NWC1CZWCqthlYxUnCsmOmLGnyv-AtBx4VGgT8tNa6SxLYJM3tYnsbTcM8_Q
-Message-ID: <CAAVpQUCHQprTy7QBTw9Ufu6u23-3CA9DCW4RJXR=gxojhyQ2qA@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 6/8] tcp: move tcp_clean_acked to
- tcp_sock_read_tx group
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Sep 19, 2025 at 1:49=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> tp->tcp_clean_acked is fetched in tx path when snd_una is updated.
->
-> This field thus belongs to tcp_sock_read_tx group.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On Mon, 22 Sep 2025 12:01:07 +0300 Tariq Toukan wrote:
+>  		if (new_level > max_level) {
+> -			NL_SET_ERR_MSG_MOD(extack,
+> -					   "TC arbitration on leafs is not supported beyond max scheduling depth");
+> +			NL_SET_ERR_MSG_FMT_MOD(extack,
+> +					       "TC arbitration on leafs is not supported beyond max scheduling depth %d",
+> +					       max_level);
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+clang points out that these messages are too long to fit in extack
+-- 
+pw-bot: cr
 
