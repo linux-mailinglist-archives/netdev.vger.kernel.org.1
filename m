@@ -1,144 +1,146 @@
-Return-Path: <netdev+bounces-225684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C7BEB96D07
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 18:25:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06531B96D2E
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 18:27:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CDCA3B10D9
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 16:25:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0B4619C6812
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 16:27:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088FF2F6198;
-	Tue, 23 Sep 2025 16:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B5D7322C98;
+	Tue, 23 Sep 2025 16:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BXf3E5MF"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="LID7HP6c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D895A322A36
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 16:25:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281E0321F32;
+	Tue, 23 Sep 2025 16:26:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758644726; cv=none; b=FXiDV+7pX+tDRhnfCrHkU2/7upncP3kFxazMESQXyleh2y3wAct8zZD1wDCbTyABCGj1XN5mZqdmCKlBKVkUv5yUSsw0JgR4qPyZhJXfzqWR/mKCApN+lsz6og0nx9xeclARRiiqPc2VURtBYZG35keqeDShs/qdMc57+icUqy0=
+	t=1758644806; cv=none; b=cvks4yk5sHXcoKTOFe1vCucitehfvUIQvUT7F/M4CMj7C0qW21qtxKXPkRCKcltzCckjnd5Mv7sIiodaH9tEqvFXTnITRm/Fk/kbiC/Iie94fkj//j58Pycpi0ib38bFiKQIOvPpoSKpJkD7s8H/hzlQgt9HTobv2ePNue96Ve0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758644726; c=relaxed/simple;
-	bh=Ksch2+BSpFHugi8K2XfWfnQpzGjm4zc4+6bW101vXvE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aGtBi21uF40cJvwWlrXEcBdm0XKLkfo52XrRqWSvtp2g7LrJzzHM5JOduDs/YLFEuchUGlmhRJqw8JcHjzH5HdgawS1j7xXVjccqvZYfEbsyGX79XVxZT+1Dc31W4zjY3zJMs0nbODyXjxmp1HZvBYrE33Ddvtzd+HKH3+pZLi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BXf3E5MF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BF3DC4CEF5;
-	Tue, 23 Sep 2025 16:25:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758644726;
-	bh=Ksch2+BSpFHugi8K2XfWfnQpzGjm4zc4+6bW101vXvE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BXf3E5MFvN4Z8p/kmbBmdl8hdO/LTu+cmdYKvKzZI0d/5M7qnei4TfjkjqlJ4eVez
-	 P45kIYPAkAIij8Nr8E+Ey8P1bQPaNfkpQ6gh8uF/4Ud8IIBh5/nVovWpvMdqMHijei
-	 +5boQTHelkl/uB5p4ymU+/fz4DU8Y4suL8RwKGSxNVtqnzC+7PZJEi493iqlAiQXoC
-	 xCZ8rezSgljSJrPianoGda8Vc5swIwhXcj0qNiglUB9G/8iJvdePre5GibilJn84Ff
-	 pQQMng3KaKud43vu6oWcuPT4sCc0ZSvXamS4nRakalpAKQX35XHInfLRdGS0Yd4Oij
-	 LXBI+3aRDjpjg==
-Date: Tue, 23 Sep 2025 09:25:24 -0700
-From: Saeed Mahameed <saeed@kernel.org>
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: jgg@ziepe.ca, michael.chan@broadcom.com, dave.jiang@intel.com,
-	saeedm@nvidia.com, Jonathan.Cameron@huawei.com, davem@davemloft.net,
-	corbet@lwn.net, edumazet@google.com, gospo@broadcom.com,
-	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, selvin.xavier@broadcom.com, leon@kernel.org,
-	kalesh-anakkur.purayil@broadcom.com
-Subject: Re: [PATCH net-next v2 0/6] bnxt_fwctl: fwctl for Broadcom Netxtreme
- devices
-Message-ID: <aNLJ9NjHKz93hixO@x130>
-References: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
+	s=arc-20240116; t=1758644806; c=relaxed/simple;
+	bh=KrrHFMCnA6aF9D42XKfDP34xwEGQRzGrpfvKFl2dIlg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Gfpx7nQAorQ5XAFJ0VqPD1PbASlmzJEAEpILRWAKgXN5jQrIFJ65SAvZ/C53HymV7hK15qOrYM756yk3CNcHC9gB96ODUNsrf4eZaY1kzYrVMvEHLQs7A9qWX09EtwCsOxDdhHV9NM+A7GPWf97fWsf9xktV/l9V0EjFu0JSEic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=LID7HP6c; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=nxbdRgQK7ciHStyImT6Z+i9IRJCZrEuPc/ZPzT/mo1c=; b=LID7HP6cYkhRWPwIQiarJCoQYr
+	Zg+DgrnU7iHE3z6Pq9f4BQHHFYTDTe8UVgrh3Rs9Dwn1nBoGW+Lzpb9De8dIeDRarmJx3ehwoJzBm
+	xfhsvy+ZOxW1q2Db3qNHZKEgYmYpvwb2FuKa9E4cBC0bNZoCqBkwpzGTcPJBnX86bRWwvEjG2tO3g
+	l7yYJOCFpfho9+gNKEm0R8exMBjRz67gMy50zmclZ45MWiWnyF7GbBeCeOCws49kcvXYcS1izI4oP
+	tW3+0DDBkxdd6UmO+8EgEimV4F0sMckWhPUxreOZZEVhBh7dm6JakHQOZgj8dtZXs0aOKzQs7polP
+	GePrgqUQ==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1v15qL-000OF5-0q;
+	Tue, 23 Sep 2025 18:26:17 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1v15qJ-000ECX-39;
+	Tue, 23 Sep 2025 18:26:16 +0200
+Message-ID: <3715920a-a8b6-4025-9f8f-ba847a5eb7f5@iogearbox.net>
+Date: Tue, 23 Sep 2025 18:26:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 04/20] net: Add ndo_{peer,unpeer}_queues callback
+To: David Wei <dw@davidwei.uk>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
+ john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com
+References: <20250919213153.103606-1-daniel@iogearbox.net>
+ <20250919213153.103606-5-daniel@iogearbox.net>
+ <20250922182350.4a585fff@kernel.org>
+ <dc23879e-1c63-4158-b002-c291548055cb@davidwei.uk>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <dc23879e-1c63-4158-b002-c291548055cb@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: Clear (ClamAV 1.0.9/27771/Tue Sep 23 10:26:39 2025)
 
-On 23 Sep 02:58, Pavan Chebbi wrote:
->Introducing bnxt_fwctl which follows along Jason's work [1].
->It is an aux bus driver that enables fwctl for Broadcom
->NetXtreme 574xx, 575xx and 576xx series chipsets by using
->bnxt driver's capability to talk to devices' firmware.
->
->The first patch moves the ULP definitions to a common place
->inside include/linux/bnxt/. The second and third patches
->refactor and extend the existing bnxt aux bus functions to
->be able to add more than one auxiliary device. The last three
->patches create an additional bnxt aux device, add bnxt_fwctl,
->and the documentation.
->
->[1] https://lore.kernel.org/netdev/0-v5-642aa0c94070+4447f-fwctl_jgg@nvidia.com/
->
->v2: In patch #5, fixed a sparse warning where a __le16 was
->degraded to an integer. Also addressed kdoc warnings for
->include/uapi/fwctl/bnxt.h in the same patch.
->
->v1: https://lore.kernel.org/netdev/20250922090851.719913-1-pavan.chebbi@broadcom.com/
->
->Pavan Chebbi (6):
->  bnxt_en: Move common definitions to include/linux/bnxt/
->  bnxt_en: Refactor aux bus functions to be generic
->  bnxt_en: Make a lookup table for supported aux bus devices
->  bnxt_en: Create an aux device for fwctl
->  bnxt_fwctl: Add bnxt fwctl device
->  bnxt_fwctl: Add documentation entries
->
-> .../userspace-api/fwctl/bnxt_fwctl.rst        |  27 ++
-> Documentation/userspace-api/fwctl/fwctl.rst   |   1 +
-> Documentation/userspace-api/fwctl/index.rst   |   1 +
-> MAINTAINERS                                   |   6 +
-> drivers/fwctl/Kconfig                         |  11 +
-> drivers/fwctl/Makefile                        |   1 +
-> drivers/fwctl/bnxt/Makefile                   |   4 +
-> drivers/fwctl/bnxt/main.c                     | 297 ++++++++++++++++++
-> drivers/infiniband/hw/bnxt_re/debugfs.c       |   2 +-
-> drivers/infiniband/hw/bnxt_re/main.c          |   2 +-
-> drivers/infiniband/hw/bnxt_re/qplib_fp.c      |   2 +-
-> drivers/infiniband/hw/bnxt_re/qplib_res.h     |   2 +-
-> drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  30 +-
-> drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  13 +-
-> .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |   2 +-
-> .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   4 +-
-> .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |   2 +-
-> drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 266 ++++++++++++----
-> include/linux/bnxt/common.h                   |  20 ++
-> .../bnxt_ulp.h => include/linux/bnxt/ulp.h    |  14 +-
-> include/uapi/fwctl/bnxt.h                     |  63 ++++
-> include/uapi/fwctl/fwctl.h                    |   1 +
-> 22 files changed, 683 insertions(+), 88 deletions(-)
-> create mode 100644 Documentation/userspace-api/fwctl/bnxt_fwctl.rst
-> create mode 100644 drivers/fwctl/bnxt/Makefile
-> create mode 100644 drivers/fwctl/bnxt/main.c
-> create mode 100644 include/linux/bnxt/common.h
-> rename drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h => include/linux/bnxt/ulp.h (90%)
-> create mode 100644 include/uapi/fwctl/bnxt.h
->
+On 9/23/25 6:06 PM, David Wei wrote:
+> On 2025-09-22 18:23, Jakub Kicinski wrote:
+>> On Fri, 19 Sep 2025 23:31:37 +0200 Daniel Borkmann wrote:
+>>> Add ndo_{peer,unpeer}_queues() callback which can be used by virtual drivers
+>>> that implement rxq mapping to a real rxq to update their internal state or
+>>> exposed capability flags from the set of rxq mappings.
+>>
+>> Why is this something that virtual drivers implement?
+>> I'd think that queue forwarding can be almost entirely implemented
+>> in the core.
+> 
+> I believe Daniel needs it for AF_XDP.
 
-We need to better plan the target tree, this series is touching 3
-sub-systems, this is very dangerous this late in the release cycle.
-
-To apply this I would recommend a side branch to be pulled into all
-subsystems at once before merge window,
-
- From the patch planing it seems that:
-1. First patch infra common code movement. (rdma + netdev)
-2. 2nd..4th patches aux refactoring (netdev only)
-3. final patch bnxt fwctl (fwctl only)
-
-
-
->-- 
->2.39.1
->
->
+Yes, in case of af_xdp we basically need to propagate related capabilities
+of the netdev, so that we can expose the given xdp flags in this case
+further to netkit which implements ndo_bpf etc. Thinking about it, maybe
+an alternative could be that netkit always exposes NETDEV_XDP_ACT_XSK etc
+and we catch it in netkit's ndo_bpf + ndo_xsk_wakeup implementation when
+checking peer queue's dev, and let it fail there instead. I'll play a bit
+with this idea instead, perhaps this simplifies things.
 
