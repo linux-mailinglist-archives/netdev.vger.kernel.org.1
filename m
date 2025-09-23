@@ -1,197 +1,322 @@
-Return-Path: <netdev+bounces-225700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5B59B972E8
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 20:22:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DD46B972F1
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 20:23:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90E6718A8115
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 18:22:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2034418A818C
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 18:23:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D320427A135;
-	Tue, 23 Sep 2025 18:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 482592FE56B;
+	Tue, 23 Sep 2025 18:23:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g8obXiPo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EVEm2i1w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BE220C00E
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 18:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22814235BE2
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 18:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758651749; cv=none; b=O4LzQH9sNhrvpbsEexmY8kDe9iJt+yAtGm0WqnbBKRXSuShe+5YoycaycaDsINSUPR1iC4RLcGqwVD+N+jKdpLyIt6PlCzqFcFCWzMSp6oYCatkwpE3nCaX788wn6kVjHT2HHxSBF9d6GBbexohZry9uWDGtuy7LLoQOPiOc9qY=
+	t=1758651795; cv=none; b=tv+gc7tSpPqO6Aos25DOe0Sk3pRpSIWZfnakmMzjKU9GnJU5TJmjY5qk6zYt6HkY5rXYa2m7t9hXAfair7/Qle5Bb8zqoMlkgiY0Puwz4+gTPYjEWZjsvbL66xKbYUDkOkkWIJLlPWmjVFPZQNk72ltv1f7axzBN7Jq3MHqPUPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758651749; c=relaxed/simple;
-	bh=lG8HqIkETFbjop5LvJlM5o07LzAENX6B+fkwBs+UuUs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NIUOmxAiG9dGu5QrQsM1l/mb7HTuXF5/6H2geJICC1jjpb9F7+S9fjdLUaXXaM25+ae6Nf93Km5LkXlXmsJxmOOlNyWUXnhHmRl8FFKPCA6GGTm67KUMz6WgX5+VSupQ8znlBYMg0AIHa3QfDwa71r9rMOeQAR2Ay36vKRx2yic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g8obXiPo; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-32eb45ab7a0so5666146a91.0
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 11:22:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758651747; x=1759256547; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bLipmlobx9xFBejkL9LIG2h6j4kUcZbmXvXP/ouCDtM=;
-        b=g8obXiPoW6aw+wzJuwmKZPmDM/zDcWzebF76f/k7bxLZWOAGEqCf7IwJUbH1FPbUZx
-         nxPjkfbVymJ1HyLwpGUsGQ65IONIjunL/C5Uo88JOnYsnoDLX9bM0lpke80erHHVaVpA
-         MsNyp3+Ltj1/jku3CdtSNprHr/fqfef1svU44ILS9hW5AZP9vy0qDidG/7A+AirrGmQ+
-         eEYAkuT+mUNMhqzR3C41/+qAgxg+rZsUXQ54ZkTIb+i0ubXT8Ub7zYG45DOGC7KZwiP4
-         yLEf0usnN8MnaCofmwHdnUqD3gnBnRaeLXQ1wZUwmMVrojkZFbXAyOfPcOTgZD1fbvbC
-         p5Wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758651747; x=1759256547;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bLipmlobx9xFBejkL9LIG2h6j4kUcZbmXvXP/ouCDtM=;
-        b=m2s/wdnWe1UUPGuJWAxXrxiTUV/KEp7yhjjLMSA5vq5bZg7Z85drJts6MhjEOD+NCS
-         jyykSC8iIVEmQeUFT5F5Z0tynHyDdi7J0kl9rmtlCtiVuxq5Gk/gDTiOxvNmDVAGh6N9
-         t9UwJmzaoTykb7CGMThoIqWJk6RY1r8rPlyndu73uDZgmqufHwsOr04D9nRagaLXiT/A
-         wVYjQNEFbC89FjWJQrk5wKCFhJ7LPBAtvjr6B0ywTQUmEgHX6t/I2dwnlYzKb9YZAhhi
-         F8H2Lapw7boyHO816UcfEI9YluBCyFxOpzcmKO2UNP5TQAa2SfRqdR5apMj4XIQpgX/p
-         GgaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUC1S+6ClD3ohgzHCD95TyHSrvkOPEmN/Hx4Zh9USTiwPl5D777etZKg09W0VH36VejkIunzvM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZOskIhOLXe/HwJVPBoXIGbzwB3CE+1XrdpwGED6YbDnLAeu/Y
-	IHsLJ2GCY/J5AS1dxXQ0cnEdj5slhDfKnbyRVjpPK0Gaq1oPqkcPhi3GmcT1S4LxmKwei+6W9SP
-	1Anxb7PSzlbn9D5cHeQWZ2CjyvhQFBu7JVfqGh1Fe
-X-Gm-Gg: ASbGncvwjBcolTacjRueDatDKanNvlkFNnWTxQKDolSjFQoVtHzAuRXU1V+AasF7+Oq
-	jbI5PRlLxBl97y43U8ocmPxAp1R0My9jJBjvx2FZCUMirwJE7yDzTDmUISrU9baFcG8j3KO6xrR
-	V0h6dYsxglrWVB2oDVp9ee44HQ52VVB6ME+7b9bYlS79nah2xaP4j2XG3+XGD0d5gbXJ7mdTdsX
-	KijjDRsrephhX04scqfEBf59yBPvmphTI18P+cqxz16
-X-Google-Smtp-Source: AGHT+IFP9ou0WtzoSuqIgAB+dHVkXI0CupDnlmjUKW/qWJO0NRIEIHox7of0tkwRIXCZ5Y6/JDl6kKoVbCYK2Hpx+kg=
-X-Received: by 2002:a17:90b:2cc6:b0:32b:d089:5c12 with SMTP id
- 98e67ed59e1d1-332a96faf21mr4040803a91.33.1758651747305; Tue, 23 Sep 2025
- 11:22:27 -0700 (PDT)
+	s=arc-20240116; t=1758651795; c=relaxed/simple;
+	bh=8jaT+A2dXp3U0beqB5oXT4ih2/C09svOX1a6h3DLpsA=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=cRMW7jz4lEnPXgOcuqF1CZyU/1ZTY1gGZXhRsynqqQ6tFZGEVnuC14OU/y8fwMsGtgaShTZJ6TrkxdcIDAcAHAEgiHgflRqvA5sF8YZyKzqGSxGOgoTmsX2nEW8iGyWfG9yDrhe/zsd006CfJExOylQZIyFhLZtwxWr0wmHgFGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVEm2i1w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 206ECC4CEF5;
+	Tue, 23 Sep 2025 18:23:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758651793;
+	bh=8jaT+A2dXp3U0beqB5oXT4ih2/C09svOX1a6h3DLpsA=;
+	h=From:Date:To:cc:Subject:In-Reply-To:References:From;
+	b=EVEm2i1wN8gHQKEneeqVApOz9YQ9zmYlNsPWomipSz089ucuf7Y7SbnqUC3AStNhQ
+	 cO4VbUgH29ShbamFrni/DzkA+PQYn9k0Sn8uQ1COKdcTDQgtryq/I7gPK0s/9GvAS0
+	 4apWO9xrQdKVlZ9y5xhqKnmlVTPk8ch+noHGksiykC94/uet3AHb7CJk5JUqNrfnTf
+	 zX2KO5DIBSZK+VracHAweXX/peL8IRujnrKo8XiEozh5YzQrMmppFnyQehXCcE4CWD
+	 VR0CH0/d5RSkLKjCmmXgZZbwvG64oAXlMrsgOa++m5aFNhxTijYM9NU6pn92W9Hxyn
+	 v7UEq9wFhv1bQ==
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ij@kernel.org>
+Date: Tue, 23 Sep 2025 21:23:08 +0300 (EEST)
+To: Dan Carpenter <dan.carpenter@linaro.org>, 
+    chia-yu.chang@nokia-bell-labs.com
+cc: netdev@vger.kernel.org
+Subject: Re: [bug report] tcp: accecn: AccECN option
+In-Reply-To: <aNKEGWyWV9LWW3i5@stanley.mountain>
+Message-ID: <da87ed1c-165d-fd21-7292-19468d1c8a8c@kernel.org>
+References: <aNKEGWyWV9LWW3i5@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250922104240.2182559-1-edumazet@google.com>
-In-Reply-To: <20250922104240.2182559-1-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 23 Sep 2025 11:22:16 -0700
-X-Gm-Features: AS18NWBcXR_X7OErMAxzzVcnTZGCEKY-DoLqAC2gMmtQYlVrtqm0B6dSYZiK3CY
-Message-ID: <CAAVpQUBD3VoDzV+4T4w58QGeu+ij3Lf+LGptwcXHkjv=bm3QVw@mail.gmail.com>
-Subject: Re: [PATCH v4 net-next] udp: remove busylock and add per NUMA queues
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/mixed; BOUNDARY="8323328-1467881368-1758651010=:13787"
+Content-ID: <d5214b7b-23f5-33fd-7d20-1a937e17b5f0@kernel.org>
 
-On Mon, Sep 22, 2025 at 3:42=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> busylock was protecting UDP sockets against packet floods,
-> but unfortunately was not protecting the host itself.
->
-> Under stress, many cpus could spin while acquiring the busylock,
-> and NIC had to drop packets. Or packets would be dropped
-> in cpu backlog if RPS/RFS were in place.
->
-> This patch replaces the busylock by intermediate
-> lockless queues. (One queue per NUMA node).
->
-> This means that fewer number of cpus have to acquire
-> the UDP receive queue lock.
->
-> Most of the cpus can either:
-> - immediately drop the packet.
-> - or queue it in their NUMA aware lockless queue.
->
-> Then one of the cpu is chosen to process this lockless queue
-> in a batch.
->
-> The batch only contains packets that were cooked on the same
-> NUMA node, thus with very limited latency impact.
->
-> Tested:
->
-> DDOS targeting a victim UDP socket, on a platform with 6 NUMA nodes
-> (Intel(R) Xeon(R) 6985P-C)
->
-> Before:
->
-> nstat -n ; sleep 1 ; nstat | grep Udp
-> Udp6InDatagrams                 1004179            0.0
-> Udp6InErrors                    3117               0.0
-> Udp6RcvbufErrors                3117               0.0
->
-> After:
-> nstat -n ; sleep 1 ; nstat | grep Udp
-> Udp6InDatagrams                 1116633            0.0
-> Udp6InErrors                    14197275           0.0
-> Udp6RcvbufErrors                14197275           0.0
->
-> We can see this host can now proces 14.2 M more packets per second
-> while under attack, and the victim socket can receive 11 % more
-> packets.
->
-> I used a small bpftrace program measuring time (in us) spent in
-> __udp_enqueue_schedule_skb().
->
-> Before:
->
-> @udp_enqueue_us[398]:
-> [0]                24901 |@@@                                            =
-     |
-> [1]                63512 |@@@@@@@@@                                      =
-     |
-> [2, 4)            344827 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@@@@@|
-> [4, 8)            244673 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           =
-     |
-> [8, 16)            54022 |@@@@@@@@                                       =
-     |
-> [16, 32)          222134 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@              =
-     |
-> [32, 64)          232042 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@             =
-     |
-> [64, 128)           4219 |                                               =
-     |
-> [128, 256)           188 |                                               =
-     |
->
-> After:
->
-> @udp_enqueue_us[398]:
-> [0]              5608855 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@@@@@|
-> [1]              1111277 |@@@@@@@@@@                                     =
-     |
-> [2, 4)            501439 |@@@@                                           =
-     |
-> [4, 8)            102921 |                                               =
-     |
-> [8, 16)            29895 |                                               =
-     |
-> [16, 32)           43500 |                                               =
-     |
-> [32, 64)           31552 |                                               =
-     |
-> [64, 128)            979 |                                               =
-     |
-> [128, 256)            13 |                                               =
-     |
->
-> Note that the remaining bottleneck for this platform is in
-> udp_drops_inc() because we limited struct numa_drop_counters
-> to only two nodes so far.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Acked-by: Paolo Abeni <pabeni@redhat.com>
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+--8323328-1467881368-1758651010=:13787
+Content-Type: text/plain; CHARSET=ISO-8859-15
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-ID: <a9ce3636-eac0-c3d0-725b-980dee8330c3@kernel.org>
 
-Thanks!
+On Tue, 23 Sep 2025, Dan Carpenter wrote:
+
+> Hello Ilpo J=E4rvinen,
+>=20
+> Commit b5e74132dfbe ("tcp: accecn: AccECN option") from Sep 16, 2025
+> (linux-next), leads to the following Smatch static checker warning:
+>=20
+> =09net/ipv4/tcp_output.c:747 tcp_options_write()
+> =09error: we previously assumed 'tp' could be null (see line 711)
+>=20
+> net/ipv4/tcp_output.c
+>     630 static void tcp_options_write(struct tcphdr *th, struct tcp_sock =
+*tp,
+>     631                               const struct tcp_request_sock *tcpr=
+sk,
+>     632                               struct tcp_out_options *opts,
+>     633                               struct tcp_key *key)
+>     634 {
+>     635         u8 leftover_highbyte =3D TCPOPT_NOP; /* replace 1st NOP i=
+f avail */
+>     636         u8 leftover_lowbyte =3D TCPOPT_NOP;  /* replace 2nd NOP i=
+n succession */
+>     637         __be32 *ptr =3D (__be32 *)(th + 1);
+>     638         u16 options =3D opts->options;        /* mungable copy */
+>     639=20
+>     640         if (tcp_key_is_md5(key)) {
+>     641                 *ptr++ =3D htonl((TCPOPT_NOP << 24) | (TCPOPT_NOP=
+ << 16) |
+>     642                                (TCPOPT_MD5SIG << 8) | TCPOLEN_MD5=
+SIG);
+>     643                 /* overload cookie hash location */
+>     644                 opts->hash_location =3D (__u8 *)ptr;
+>     645                 ptr +=3D 4;
+>     646         } else if (tcp_key_is_ao(key)) {
+>     647                 ptr =3D process_tcp_ao_options(tp, tcprsk, opts, =
+key, ptr);
+>                                                      ^^
+> Sometimes dereferenced here.
+>=20
+>     648         }
+>     649         if (unlikely(opts->mss)) {
+>     650                 *ptr++ =3D htonl((TCPOPT_MSS << 24) |
+>     651                                (TCPOLEN_MSS << 16) |
+>     652                                opts->mss);
+>     653         }
+>     654=20
+>     655         if (likely(OPTION_TS & options)) {
+>     656                 if (unlikely(OPTION_SACK_ADVERTISE & options)) {
+>     657                         *ptr++ =3D htonl((TCPOPT_SACK_PERM << 24)=
+ |
+>     658                                        (TCPOLEN_SACK_PERM << 16) =
+|
+>     659                                        (TCPOPT_TIMESTAMP << 8) |
+>     660                                        TCPOLEN_TIMESTAMP);
+>     661                         options &=3D ~OPTION_SACK_ADVERTISE;
+>     662                 } else {
+>     663                         *ptr++ =3D htonl((TCPOPT_NOP << 24) |
+>     664                                        (TCPOPT_NOP << 16) |
+>     665                                        (TCPOPT_TIMESTAMP << 8) |
+>     666                                        TCPOLEN_TIMESTAMP);
+>     667                 }
+>     668                 *ptr++ =3D htonl(opts->tsval);
+>     669                 *ptr++ =3D htonl(opts->tsecr);
+>     670         }
+>     671=20
+>     672         if (OPTION_ACCECN & options) {
+>     673                 const u32 *ecn_bytes =3D opts->use_synack_ecn_byt=
+es ?
+>     674                                        synack_ecn_bytes :
+>     675                                        tp->received_ecn_bytes;
+>                                                ^^^^
+> Dereference
+
+Hi Dan,
+
+While it is long ago I made these changes (they might have changed a=20
+little from that), I can say this part is going to be extremely tricky=20
+for static checkers because TCP state machine(s) are quite complex.
+
+TCP options can be written to a packet when tp has not yet been created=20
+(during handshake) as well as after creation of tp using this same=20
+function. Not all combinations are possible because handshake has to=20
+complete before some things are enabled.
+
+Without checking this myself, my assumption is that ->use_synack_ecn_bytes=
+=20
+is set when we don't have tp available yet as SYNACKs relate to handshake.
+So the tp check is likely there even if not literally written.
+
+Chia-Yu, could you please check these cases for the parts that new code=20
+was introduced whether tp can be NULL? I think this particular line is the
+most likely one to be wrong if something is, that is, can OPTION_ACCECN=20
+be set while use_synack_ecn_bytes is not when tp is not yet there.
+
+>     676                 const u8 ect0_idx =3D INET_ECN_ECT_0 - 1;
+>     677                 const u8 ect1_idx =3D INET_ECN_ECT_1 - 1;
+>     678                 const u8 ce_idx =3D INET_ECN_CE - 1;
+>     679                 u32 e0b;
+>     680                 u32 e1b;
+>     681                 u32 ceb;
+>     682                 u8 len;
+>     683=20
+>     684                 e0b =3D ecn_bytes[ect0_idx] + TCP_ACCECN_E0B_INIT=
+_OFFSET;
+>     685                 e1b =3D ecn_bytes[ect1_idx] + TCP_ACCECN_E1B_INIT=
+_OFFSET;
+>     686                 ceb =3D ecn_bytes[ce_idx] + TCP_ACCECN_CEB_INIT_O=
+FFSET;
+>     687                 len =3D TCPOLEN_ACCECN_BASE +
+>     688                       opts->num_accecn_fields * TCPOLEN_ACCECN_PE=
+RFIELD;
+>     689=20
+>     690                 if (opts->num_accecn_fields =3D=3D 2) {
+>     691                         *ptr++ =3D htonl((TCPOPT_ACCECN1 << 24) |=
+ (len << 16) |
+>     692                                        ((e1b >> 8) & 0xffff));
+>     693                         *ptr++ =3D htonl(((e1b & 0xff) << 24) |
+>     694                                        (ceb & 0xffffff));
+>     695                 } else if (opts->num_accecn_fields =3D=3D 1) {
+>     696                         *ptr++ =3D htonl((TCPOPT_ACCECN1 << 24) |=
+ (len << 16) |
+>     697                                        ((e1b >> 8) & 0xffff));
+>     698                         leftover_highbyte =3D e1b & 0xff;
+>     699                         leftover_lowbyte =3D TCPOPT_NOP;
+>     700                 } else if (opts->num_accecn_fields =3D=3D 0) {
+>     701                         leftover_highbyte =3D TCPOPT_ACCECN1;
+>     702                         leftover_lowbyte =3D len;
+>     703                 } else if (opts->num_accecn_fields =3D=3D 3) {
+>     704                         *ptr++ =3D htonl((TCPOPT_ACCECN1 << 24) |=
+ (len << 16) |
+>     705                                        ((e1b >> 8) & 0xffff));
+>     706                         *ptr++ =3D htonl(((e1b & 0xff) << 24) |
+>     707                                        (ceb & 0xffffff));
+>     708                         *ptr++ =3D htonl(((e0b & 0xffffff) << 8) =
+|
+>     709                                        TCPOPT_NOP);
+>     710                 }
+>     711                 if (tp) {
+>                             ^^
+> Here we assume tp can be NULL
+>=20
+>     712                         tp->accecn_minlen =3D 0;
+>     713                         tp->accecn_opt_tstamp =3D tp->tcp_mstamp;
+>     714                         if (tp->accecn_opt_demand)
+>     715                                 tp->accecn_opt_demand--;
+>     716                 }
+>     717         }
+>     718=20
+>     719         if (unlikely(OPTION_SACK_ADVERTISE & options)) {
+>     720                 *ptr++ =3D htonl((leftover_highbyte << 24) |
+>     721                                (leftover_lowbyte << 16) |
+>     722                                (TCPOPT_SACK_PERM << 8) |
+>     723                                TCPOLEN_SACK_PERM);
+>     724                 leftover_highbyte =3D TCPOPT_NOP;
+>     725                 leftover_lowbyte =3D TCPOPT_NOP;
+>     726         }
+>     727=20
+>     728         if (unlikely(OPTION_WSCALE & options)) {
+>     729                 u8 highbyte =3D TCPOPT_NOP;
+>     730=20
+>     731                 /* Do not split the leftover 2-byte to fit into a=
+ single
+>     732                  * NOP, i.e., replace this NOP only when 1 byte i=
+s leftover
+>     733                  * within leftover_highbyte.
+>     734                  */
+>     735                 if (unlikely(leftover_highbyte !=3D TCPOPT_NOP &&
+>     736                              leftover_lowbyte =3D=3D TCPOPT_NOP))=
+ {
+>     737                         highbyte =3D leftover_highbyte;
+>     738                         leftover_highbyte =3D TCPOPT_NOP;
+>     739                 }
+>     740                 *ptr++ =3D htonl((highbyte << 24) |
+>     741                                (TCPOPT_WINDOW << 16) |
+>     742                                (TCPOLEN_WINDOW << 8) |
+>     743                                opts->ws);
+>     744         }
+>     745=20
+>     746         if (unlikely(opts->num_sack_blocks)) {
+> --> 747                 struct tcp_sack_block *sp =3D tp->rx_opt.dsack ?
+>                                                     ^^^^^^^^^^^^^^^^
+> Unchecked dereference here.
+>=20
+>     748                         tp->duplicate_sack : tp->selective_acks;
+>     749                 int this_sack;
+>     750=20
+>     751                 *ptr++ =3D htonl((leftover_highbyte << 24) |
+>     752                                (leftover_lowbyte << 16) |
+>     753                                (TCPOPT_SACK <<  8) |
+>     754                                (TCPOLEN_SACK_BASE + (opts->num_sa=
+ck_blocks *
+>     755                                                      TCPOLEN_SACK=
+_PERBLOCK)));
+>     756                 leftover_highbyte =3D TCPOPT_NOP;
+>     757                 leftover_lowbyte =3D TCPOPT_NOP;
+>     758=20
+>     759                 for (this_sack =3D 0; this_sack < opts->num_sack_=
+blocks;
+>     760                      ++this_sack) {
+>     761                         *ptr++ =3D htonl(sp[this_sack].start_seq)=
+;
+>     762                         *ptr++ =3D htonl(sp[this_sack].end_seq);
+>     763                 }
+>     764=20
+>     765                 tp->rx_opt.dsack =3D 0;
+>     766         } else if (unlikely(leftover_highbyte !=3D TCPOPT_NOP ||
+>     767                             leftover_lowbyte !=3D TCPOPT_NOP)) {
+>     768                 *ptr++ =3D htonl((leftover_highbyte << 24) |
+>     769                                (leftover_lowbyte << 16) |
+>     770                                (TCPOPT_NOP << 8) |
+>     771                                TCPOPT_NOP);
+>     772                 leftover_highbyte =3D TCPOPT_NOP;
+>     773                 leftover_lowbyte =3D TCPOPT_NOP;
+>     774         }
+>     775=20
+>     776         if (unlikely(OPTION_FAST_OPEN_COOKIE & options)) {
+>     777                 struct tcp_fastopen_cookie *foc =3D opts->fastope=
+n_cookie;
+>     778                 u8 *p =3D (u8 *)ptr;
+>     779                 u32 len; /* Fast Open option length */
+>     780=20
+>     781                 if (foc->exp) {
+>     782                         len =3D TCPOLEN_EXP_FASTOPEN_BASE + foc->=
+len;
+>     783                         *ptr =3D htonl((TCPOPT_EXP << 24) | (len =
+<< 16) |
+>     784                                      TCPOPT_FASTOPEN_MAGIC);
+>     785                         p +=3D TCPOLEN_EXP_FASTOPEN_BASE;
+>     786                 } else {
+>     787                         len =3D TCPOLEN_FASTOPEN_BASE + foc->len;
+>     788                         *p++ =3D TCPOPT_FASTOPEN;
+>     789                         *p++ =3D len;
+>     790                 }
+>     791=20
+>     792                 memcpy(p, foc->val, foc->len);
+>     793                 if ((len & 3) =3D=3D 2) {
+>     794                         p[foc->len] =3D TCPOPT_NOP;
+>     795                         p[foc->len + 1] =3D TCPOPT_NOP;
+>     796                 }
+>     797                 ptr +=3D (len + 3) >> 2;
+>     798         }
+>     799=20
+>     800         smc_options_write(ptr, &options);
+>     801=20
+>     802         mptcp_options_write(th, ptr, tp, opts);
+>                                              ^^
+> The last dereference is checked for NULL but the others aren't.
+
+
+--=20
+ i.
+--8323328-1467881368-1758651010=:13787--
 
