@@ -1,98 +1,91 @@
-Return-Path: <netdev+bounces-225487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E926AB946CB
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 07:33:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93E94B9480B
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 08:07:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BBA748260D
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 05:32:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77C8218A2BBE
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 06:07:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 769DB30EF9E;
-	Tue, 23 Sep 2025 05:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 281EC30DEDA;
+	Tue, 23 Sep 2025 06:07:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K5tJ60wz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TFNm/XXN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A604930E849
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 05:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923DB1990A7
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 06:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758605553; cv=none; b=HZLQCOLIZ+zPnoJhPp3Brd1pT2+VS4QUXi9FJO7P7Qq9FqvispL182S2fuWvtwdLihwdQfY1mVjIbBdJNru5ufx0lfy6ME3b7tCJ7LBR/BGu7DVZz5w1Y+W7VmxarQleqXp9qz/FhFUWCcZf7H9vB60uOQ4jss+FPKSs9D8FMKc=
+	t=1758607643; cv=none; b=LYWIMXrJ1KiWLK/UhF9XJ3J/fGoe8FucUvOqbyqH32Wiqbpl4I/e20JoIWJrlTYC1wmtS94iZWrdWYfS2Tsr3onDh/tQLfXBMf9MN9TUxJhepyUaDYLmQLHeKHng+HVGjVnXEK+l25mCcErIgSQiqleayUmOnGJ7S1hX4N0IOOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758605553; c=relaxed/simple;
-	bh=1pS++iW3e+7ZhIj9iPpIm2WsDUNya31yJigHOIM7hSo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l51pYEJhR9aql0XXKrYcQsDvcDtUZ2odFSIMpWtj2twSx2k75u41DIJ9XRToJOWoxSxzhlD/pc28JHFzHpVVxwdjBviiGQSlBNYDJLZYbcs1sChASHlz6VqLB9juWrawMDSlId16gGQp++YTzD+/ycrh3WcBHdQclhFGwBQe/N8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K5tJ60wz; arc=none smtp.client-ip=209.85.210.182
+	s=arc-20240116; t=1758607643; c=relaxed/simple;
+	bh=zIeebnKmD1CpAB3zNGRBqSsvaYPYnjzbweCaU4XO9wo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UISHaMuTsrPnTkepqBJ+adtcLcbxBZrEEOUHqIafz9n0QJdKm1tdY9cmMZ4NmSm6DLeSeNz4Ek6FO+LQUOtWx0HEj3yqeBQvX2dqHxk7szYerdZQ2E41YLZ69Wkts6LwjuMKCOyKrtSFXd290tS1OFITft8xRueiDmcMMRNvmy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TFNm/XXN; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-77da29413acso5509046b3a.1
-        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 22:32:31 -0700 (PDT)
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b550eff972eso3097963a12.3
+        for <netdev@vger.kernel.org>; Mon, 22 Sep 2025 23:07:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758605551; x=1759210351; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LElroZcQYrizHT6tMHELz8wvWrEyU+n/zvC8wyzfdOY=;
-        b=K5tJ60wzx5GBM9zbWHLW321NGy7ynOuikVisbcEho3tAsCd/FXG83ubZFSdhECck7U
-         0smTEG7P6GEcIAxA2SGJeNJN99zmtuaVeZ1MlhM4aSVTQcgMfoKSKJQlmGoZ0BR397Wa
-         bVtzx8e/0TJhJDax8wZt2zgkAzy0NA6DkQrmwVnszm7G9IVwDJl6FmszZ9HaH+Rsdins
-         02w9R8P4K15rIruXe6QyM+4PYOQqWErGCMFfJKXmMELDcOM6/Shklji/o6xoopxbR5JK
-         q+anD1GNonneyUxqehQOAfA2YtiYPeQbh+Vkj0ezt9i2K1mblfc6VdCSXbicOQzJnZ5E
-         7RpA==
+        d=gmail.com; s=20230601; t=1758607641; x=1759212441; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+3LxoSV41O4pRbEmBipgFoQjHZW3/tDYocGhgDPfNrI=;
+        b=TFNm/XXNFQvkuneWejVqEaiiob8bpxD+jiYbY7fgW7Ih4W7ePK6k7UNl6PJQcT1f4X
+         Tu8CrgkHPeiCsd18R0Eck8k61uPEw1NAzCu0yCGUC6dwjqapxKqYHCA9t5iBDE3Wsv+E
+         3TD9vBL3ZXO0iR8igNq8AFU9XqnP76N+Fnzf7Fst875/BKsXVl1hqiEx5FmBVUpirFqV
+         YEg5FdifwcsJarNhSU0Hmi5Dbq3577eBm6fBwwcbexFOPWcGKHG1ve8mVur17WcvMYYg
+         WsN0kWXSfBupIBLoRD9np0B2mFmlUdGtdcMQdPxfn+A19EdTjHrzt4Wn+117y6++9+kE
+         OtZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758605551; x=1759210351;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LElroZcQYrizHT6tMHELz8wvWrEyU+n/zvC8wyzfdOY=;
-        b=fk1Yw4I6tmLHLskZloNc05bW4b8/HRnjMSxIM+v3PULV7e0IQYhp9AEIGIowXPVoPH
-         shNVqg02HpPSNUHTWJCUDUIGJs1dHRo4uA3fLG9BtyR2iuiu5DgCaSPp+E+rrUfssjXB
-         ZlbbsjVSkp1mCO6WrUBRHN+v18VNttHFd2uWZD9GP5FXP3i4zUhCBj+NQPFZOklMbEfT
-         upxf3UWrITIu3YQEuF4QyOjCk5FwE+18IpfaSdB8kbtARmmfyIf8txDe2PAc7b0is+Xd
-         YvVkzIvgSBCWy1YhIey4UQmIiv7YiiC7zvIbJKkPVIT4gZAC9ypJGBOCFNa4TpNsKigM
-         ULNQ==
-X-Gm-Message-State: AOJu0Ywn8Pf75dnxSQX+kph4Zi4bg9six15Df0mZHrEitWNxy6KPjiPF
-	P0JnGDdCo255tq36tvOW7HAN2Kz+ndYaPGnlB45KD1o7Ly/IcjN+VomyNHAbIsWP
-X-Gm-Gg: ASbGnctz+3kEd5YeyRiB51ftfyqvIXsGUTBvidAuLdRG2f3vO8zD+tj01/ipT6dqYIg
-	t++opYQrQlFIgLOQCZ0cFry63wcrlFY/9IGXSjepx1Y0GtTRj/SkiN1I014mcaLu2VwZZnkJXj5
-	AavkGOD2YX0fVUuARBgNGcKCTBJK/DV9kg0LWYYUxu4aVMZRduykGlj3NUfLGMG9wVQiT8kQ5U6
-	bt/y/hTUv8QaOmRJch3ndg4D2HPEMAMmmF42F/nTLJxBY1p5q6iL4RVZTj0V5inEA3jPRvdj8gF
-	qYDuIKsGl9YuX4g2Yke5COSz+0DUAnGUBmavf1/9qOdrSqkZDYQssB4QvYmXB+Jv55gRitbe3jU
-	Vq8y4RebiA5k6D7KTeOkAPrI/cZc=
-X-Google-Smtp-Source: AGHT+IGkt4j8KVJKU+v7beSqHDNw563BzIVI/+APRZhBu+0GLuw5ol/2rDP4fdS5XeLUIfJuRJ9+Kg==
-X-Received: by 2002:a05:6a00:21ca:b0:771:e4c6:10cc with SMTP id d2e1a72fcca58-77f53899b37mr1970577b3a.6.1758605550782;
-        Mon, 22 Sep 2025 22:32:30 -0700 (PDT)
-Received: from fedora ([159.196.5.243])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77f1550f70asm9639446b3a.13.2025.09.22.22.32.25
+        d=1e100.net; s=20230601; t=1758607641; x=1759212441;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+3LxoSV41O4pRbEmBipgFoQjHZW3/tDYocGhgDPfNrI=;
+        b=c/7Ho+YsRra1I3yAsLrLWhHr0kemWy8LvKY32bfKbihUqcNQb0kIYaIv1MCuBkpIgB
+         aCycvCmoV8tWjJdUFuE1vEE5O5fLIbnssKb7r0ZxCwvrHJHDNcpkpiT/o5eZIwGuHa1p
+         YG/P+ypZFPFOlmDA7YEjk/kyqyz030Vngbblp0Z5pAlvkI5lJ1FqkQiR0Od2sWEx5EGs
+         Dk/kjiWuJkF9qfx+DPAPBLK1/Dkl3SxlimvOwuN9Ytvt+MpND1dii5ZE4JyHyZrMUT2U
+         kQOREaKDU4dCF7TDsKZjX/gc03rlzRTKxeZXYkewpPhrU23VrtloeWLmvD9pR5CKpvZ/
+         8KJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVrN7JrBpop1LWwoG2N1h9vaq/Hi7zN5rD395wklQi4Hq/MsGzbjVhyCkZ1j/YbME+bleBI+tw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAGWPP4rly1A+Kpo90y97R8S6vRXUp6RcN30ncjn6+0tjKdPix
+	OEEBg617HdevCuu+zBx8ZLjnqhZYt3wB5T+/+t4uCE0vcHbMybM4YxQ0
+X-Gm-Gg: ASbGncu8Ov0ksu44vduJhgCWPxh2w24Av1MyyKtztK8Zt6Iv7MIjAyh9rRy7jiNFcWy
+	snHnRIKrRFbxqX1K0TIDvcg4mBHFiucAvmwiaEZuWiQ+Z9Ay2Lp8d9jDwvs8Zxb81GOpoItwwHW
+	f97gqqRL/WREBkN1b1Cbfwhju+50Y8nkyO0r+2Mw4bAkr30J8Y3Tm+7mQtjsacTfRQg2pIRQ9vK
+	/PYV+ejD3X8WcPbm6ze1hLhvOFcb6+zKUfle9FX6gfEZCaw2A3loU3JJi5hSDW5Zv96cSpxpTpw
+	evuysf6nAasrWio5ylqR61daZP5oZHleWo6JvLkFCrAdMvYIWr941C4F03quu6aRIhRAK2rf+9v
+	wNmrFFI5mmqvshA==
+X-Google-Smtp-Source: AGHT+IG9wVckl3J02PgzQlOHGCMc4gEZihFiU2EGjoVZPsvunoSERLnJSklfDM/IenyZlf2m3S479g==
+X-Received: by 2002:a17:903:2c0b:b0:275:b1cf:6dd7 with SMTP id d9443c01a7336-27cc48a0b06mr16117835ad.34.1758607640874;
+        Mon, 22 Sep 2025 23:07:20 -0700 (PDT)
+Received: from gmail.com ([223.166.84.15])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3306064edb8sm15220223a91.7.2025.09.22.23.07.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Sep 2025 22:32:30 -0700 (PDT)
-From: Wilfred Mallawa <wilfred.opensource@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	corbet@lwn.net,
-	john.fastabend@gmail.com,
-	sd@queasysnail.net,
-	shuah@kernel.org,
-	Wilfred Mallawa <wilfred.mallawa@wdc.com>
-Subject: [PATCH v4 2/2] selftests: tls: add tls record_size_limit test
-Date: Tue, 23 Sep 2025 15:32:07 +1000
-Message-ID: <20250923053207.113938-2-wilfred.opensource@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250923053207.113938-1-wilfred.opensource@gmail.com>
-References: <20250923053207.113938-1-wilfred.opensource@gmail.com>
+        Mon, 22 Sep 2025 23:07:20 -0700 (PDT)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Andreas Koensgen <ajk@comnets.uni-bremen.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-hams@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: syzbot+5fd749c74105b0e1b302@syzkaller.appspotmail.com
+Subject: [PATCH net-next] 6pack: drop redundant locking and refcounting
+Date: Tue, 23 Sep 2025 14:07:06 +0800
+Message-ID: <20250923060706.10232-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,189 +94,163 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Wilfred Mallawa <wilfred.mallawa@wdc.com>
+The TTY layer already serializes line discipline operations with
+tty->ldisc_sem, so the extra disc_data_lock and refcnt in 6pack
+are unnecessary.
 
-Test that outgoing plaintext records respect the tls record_size_limit
-set using setsockopt(). The record size limit is set to be 128, thus,
-in all received records, the plaintext must not exceed this amount.
+Removing them simplifies the code and also resolves a lockdep warning
+reported by syzbot. The warning did not indicate a real deadlock, since
+the write-side lock was only taken in process context with hardirqs
+disabled.
 
-Also test that setting a new record size limit whilst a pending open
-record exists is handled correctly by discarding the request.
-
-Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
-Signed-off-by: Wilfred Mallawa <wilfred.mallawa@wdc.com>
+Reported-by: syzbot+5fd749c74105b0e1b302@syzkaller.appspotmail.com
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
 ---
- tools/testing/selftests/net/tls.c | 149 ++++++++++++++++++++++++++++++
- 1 file changed, 149 insertions(+)
+ drivers/net/hamradio/6pack.c | 57 ++++--------------------------------
+ 1 file changed, 5 insertions(+), 52 deletions(-)
 
-diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
-index 0f5640d8dc7f..c5bd431d5af3 100644
---- a/tools/testing/selftests/net/tls.c
-+++ b/tools/testing/selftests/net/tls.c
-@@ -24,6 +24,7 @@
- #include "../kselftest_harness.h"
+diff --git a/drivers/net/hamradio/6pack.c b/drivers/net/hamradio/6pack.c
+index c5e5423e1863..885992951e8a 100644
+--- a/drivers/net/hamradio/6pack.c
++++ b/drivers/net/hamradio/6pack.c
+@@ -115,8 +115,6 @@ struct sixpack {
  
- #define TLS_PAYLOAD_MAX_LEN 16384
-+#define TLS_TX_RECORD_SIZE_LIM 5
- #define SOL_TLS 282
+ 	struct timer_list	tx_t;
+ 	struct timer_list	resync_t;
+-	refcount_t		refcnt;
+-	struct completion	dead;
+ 	spinlock_t		lock;
+ };
  
- static int fips_enabled;
-@@ -2770,6 +2771,154 @@ TEST_F(tls_err, poll_partial_rec_async)
+@@ -353,42 +351,13 @@ static void sp_bump(struct sixpack *sp, char cmd)
+ 
+ /* ----------------------------------------------------------------------- */
+ 
+-/*
+- * We have a potential race on dereferencing tty->disc_data, because the tty
+- * layer provides no locking at all - thus one cpu could be running
+- * sixpack_receive_buf while another calls sixpack_close, which zeroes
+- * tty->disc_data and frees the memory that sixpack_receive_buf is using.  The
+- * best way to fix this is to use a rwlock in the tty struct, but for now we
+- * use a single global rwlock for all ttys in ppp line discipline.
+- */
+-static DEFINE_RWLOCK(disc_data_lock);
+-                                                                                
+-static struct sixpack *sp_get(struct tty_struct *tty)
+-{
+-	struct sixpack *sp;
+-
+-	read_lock(&disc_data_lock);
+-	sp = tty->disc_data;
+-	if (sp)
+-		refcount_inc(&sp->refcnt);
+-	read_unlock(&disc_data_lock);
+-
+-	return sp;
+-}
+-
+-static void sp_put(struct sixpack *sp)
+-{
+-	if (refcount_dec_and_test(&sp->refcnt))
+-		complete(&sp->dead);
+-}
+-
+ /*
+  * Called by the TTY driver when there's room for more data.  If we have
+  * more packets to send, we send them here.
+  */
+ static void sixpack_write_wakeup(struct tty_struct *tty)
+ {
+-	struct sixpack *sp = sp_get(tty);
++	struct sixpack *sp = tty->disc_data;
+ 	int actual;
+ 
+ 	if (!sp)
+@@ -400,7 +369,7 @@ static void sixpack_write_wakeup(struct tty_struct *tty)
+ 		clear_bit(TTY_DO_WRITE_WAKEUP, &tty->flags);
+ 		sp->tx_enable = 0;
+ 		netif_wake_queue(sp->dev);
+-		goto out;
++		return;
  	}
+ 
+ 	if (sp->tx_enable) {
+@@ -408,9 +377,6 @@ static void sixpack_write_wakeup(struct tty_struct *tty)
+ 		sp->xleft -= actual;
+ 		sp->xhead += actual;
+ 	}
+-
+-out:
+-	sp_put(sp);
  }
  
-+/*
-+ * Parse a stream of TLS records and ensure that each record respects
-+ * the specified @record_size_limit.
-+ */
-+static size_t parse_tls_records(struct __test_metadata *_metadata,
-+				const __u8 *rx_buf, int rx_len, int overhead,
-+				__u16 record_size_limit)
-+{
-+	const __u8 *rec = rx_buf;
-+	size_t total_plaintext_rx = 0;
-+	const __u8 rec_header_len = 5;
-+
-+	while (rec < rx_buf + rx_len) {
-+		__u16 record_payload_len;
-+		__u16 plaintext_len;
-+
-+		/* Sanity check that it's a TLS header for application data */
-+		ASSERT_EQ(rec[0], 23);
-+		ASSERT_EQ(rec[1], 0x3);
-+		ASSERT_EQ(rec[2], 0x3);
-+
-+		memcpy(&record_payload_len, rec + 3, 2);
-+		record_payload_len = ntohs(record_payload_len);
-+		ASSERT_GE(record_payload_len, overhead);
-+
-+		plaintext_len = record_payload_len - overhead;
-+		total_plaintext_rx += plaintext_len;
-+
-+		/* Plaintext must not exceed the specified limit */
-+		ASSERT_LE(plaintext_len, record_size_limit);
-+		rec += rec_header_len + record_payload_len;
-+	}
-+
-+	return total_plaintext_rx;
-+}
-+
-+TEST(tx_record_size)
-+{
-+	struct tls_crypto_info_keys tls12;
-+	int cfd, ret, fd, rx_len, overhead;
-+	size_t total_plaintext_rx = 0;
-+	__u8 tx[1024], rx[2000];
-+	__u8 *rec;
-+	__u16 limit = 128;
-+	__u16 opt = 0;
-+	__u8 rec_header_len = 5;
-+	unsigned int optlen = sizeof(opt);
-+	bool notls;
-+
-+	tls_crypto_info_init(TLS_1_2_VERSION, TLS_CIPHER_AES_CCM_128,
-+			     &tls12, 0);
-+
-+	ulp_sock_pair(_metadata, &fd, &cfd, &notls);
-+
-+	if (notls)
-+		exit(KSFT_SKIP);
-+
-+	/* Don't install keys on fd, we'll parse raw records */
-+	ret = setsockopt(cfd, SOL_TLS, TLS_TX, &tls12, tls12.len);
-+	ASSERT_EQ(ret, 0);
-+
-+	ret = setsockopt(cfd, SOL_TLS, TLS_TX_RECORD_SIZE_LIM, &limit, sizeof(limit));
-+	ASSERT_EQ(ret, 0);
-+
-+	ret = getsockopt(cfd, SOL_TLS, TLS_TX_RECORD_SIZE_LIM, &opt, &optlen);
-+	ASSERT_EQ(ret, 0);
-+	ASSERT_EQ(limit, opt);
-+	ASSERT_EQ(optlen, sizeof(limit));
-+
-+	memset(tx, 0, sizeof(tx));
-+	EXPECT_EQ(send(cfd, tx, sizeof(tx), 0), sizeof(tx));
-+	close(cfd);
-+
-+	ret = recv(fd, rx, sizeof(rx), 0);
-+	memcpy(&rx_len, rx + 3, 2);
-+	rx_len = htons(rx_len);
-+
-+	/*
-+	 * 16B tag + 8B IV -- record header (5B) is not counted but we'll
-+	 * need it to walk the record stream
-+	 */
-+	overhead = 16 + 8;
-+	total_plaintext_rx = parse_tls_records(_metadata, rx, ret, overhead,
-+					       limit);
-+
-+	ASSERT_EQ(total_plaintext_rx, sizeof(tx));
-+	close(fd);
-+}
-+
-+TEST(tx_record_size_open_rec)
-+{
-+	struct tls_crypto_info_keys tls12;
-+	int cfd, ret, fd, rx_len, overhead;
-+	size_t total_plaintext_rx = 0;
-+	__u8 tx[1024], rx[2000];
-+	__u16 tx_partial = 256;
-+	__u8 *rec;
-+	__u16 og_limit = 512, limit = 128;
-+	__u8 rec_header_len = 5;
-+	bool notls;
-+
-+	tls_crypto_info_init(TLS_1_2_VERSION, TLS_CIPHER_AES_CCM_128,
-+			     &tls12, 0);
-+
-+	ulp_sock_pair(_metadata, &fd, &cfd, &notls);
-+
-+	if (notls)
-+		exit(KSFT_SKIP);
-+
-+	/* Don't install keys on fd, we'll parse raw records */
-+	ret = setsockopt(cfd, SOL_TLS, TLS_TX, &tls12, tls12.len);
-+	ASSERT_EQ(ret, 0);
-+
-+	ret = setsockopt(cfd, SOL_TLS, TLS_TX_RECORD_SIZE_LIM, &og_limit,
-+			 sizeof(og_limit));
-+	ASSERT_EQ(ret, 0);
-+
-+	memset(tx, 0, sizeof(tx));
-+	EXPECT_EQ(send(cfd, tx, tx_partial, MSG_MORE), tx_partial);
-+
-+	/*
-+	 * Changing the record size limit with a pending open record should
-+	 * not be allowed.
-+	 */
-+	ret = setsockopt(cfd, SOL_TLS, TLS_TX_RECORD_SIZE_LIM, &limit,
-+			 sizeof(limit));
-+	ASSERT_EQ(ret, -1);
-+	ASSERT_EQ(errno, EBUSY);
-+
-+	EXPECT_EQ(send(cfd, tx + tx_partial, sizeof(tx) - tx_partial, MSG_EOR),
-+		  sizeof(tx) - tx_partial);
-+	close(cfd);
-+
-+	ret = recv(fd, rx, sizeof(rx), 0);
-+	memcpy(&rx_len, rx + 3, 2);
-+	rx_len = htons(rx_len);
-+
-+	/*
-+	 * 16B tag + 8B IV -- record header (5B) is not counted but we'll
-+	 * need it to walk the record stream
-+	 */
-+	overhead = 16 + 8;
-+	total_plaintext_rx = parse_tls_records(_metadata, rx, ret, overhead,
-+					       og_limit);
-+	ASSERT_EQ(total_plaintext_rx, sizeof(tx));
-+	close(fd);
-+}
-+
- TEST(non_established) {
- 	struct tls12_crypto_info_aes_gcm_256 tls12;
- 	struct sockaddr_in addr;
+ /* ----------------------------------------------------------------------- */
+@@ -430,7 +396,7 @@ static void sixpack_receive_buf(struct tty_struct *tty, const u8 *cp,
+ 	if (!count)
+ 		return;
+ 
+-	sp = sp_get(tty);
++	sp = tty->disc_data;
+ 	if (!sp)
+ 		return;
+ 
+@@ -446,7 +412,6 @@ static void sixpack_receive_buf(struct tty_struct *tty, const u8 *cp,
+ 	}
+ 	sixpack_decode(sp, cp, count1);
+ 
+-	sp_put(sp);
+ 	tty_unthrottle(tty);
+ }
+ 
+@@ -561,8 +526,6 @@ static int sixpack_open(struct tty_struct *tty)
+ 
+ 	spin_lock_init(&sp->lock);
+ 	spin_lock_init(&sp->rxlock);
+-	refcount_set(&sp->refcnt, 1);
+-	init_completion(&sp->dead);
+ 
+ 	/* !!! length of the buffers. MTU is IP MTU, not PACLEN!  */
+ 
+@@ -638,19 +601,11 @@ static void sixpack_close(struct tty_struct *tty)
+ {
+ 	struct sixpack *sp;
+ 
+-	write_lock_irq(&disc_data_lock);
+ 	sp = tty->disc_data;
+-	tty->disc_data = NULL;
+-	write_unlock_irq(&disc_data_lock);
+ 	if (!sp)
+ 		return;
+ 
+-	/*
+-	 * We have now ensured that nobody can start using ap from now on, but
+-	 * we have to wait for all existing users to finish.
+-	 */
+-	if (!refcount_dec_and_test(&sp->refcnt))
+-		wait_for_completion(&sp->dead);
++	tty->disc_data = NULL;
+ 
+ 	/* We must stop the queue to avoid potentially scribbling
+ 	 * on the free buffers. The sp->dead completion is not sufficient
+@@ -673,7 +628,7 @@ static void sixpack_close(struct tty_struct *tty)
+ static int sixpack_ioctl(struct tty_struct *tty, unsigned int cmd,
+ 		unsigned long arg)
+ {
+-	struct sixpack *sp = sp_get(tty);
++	struct sixpack *sp = tty->disc_data;
+ 	struct net_device *dev;
+ 	unsigned int tmp, err;
+ 
+@@ -725,8 +680,6 @@ static int sixpack_ioctl(struct tty_struct *tty, unsigned int cmd,
+ 		err = tty_mode_ioctl(tty, cmd, arg);
+ 	}
+ 
+-	sp_put(sp);
+-
+ 	return err;
+ }
+ 
 -- 
-2.51.0
+2.43.0
 
 
