@@ -1,294 +1,621 @@
-Return-Path: <netdev+bounces-225584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42636B95A93
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:28:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E0AAB95AB1
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2B4474E2D88
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:28:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12D66162E8D
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28448321F22;
-	Tue, 23 Sep 2025 11:27:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254323218AE;
+	Tue, 23 Sep 2025 11:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MAAw+EYw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DpQGBgmM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A2C8321F3A
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 11:27:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA598286D5D
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 11:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758626849; cv=none; b=MgBbIqUm0cvyh1CJOYl0PKWkbiF64QUqmS3yTnVjx/4tHKeQ/87i6+0R4wWbvWWaVdgWvsAXRsfDzECQTLF71GFN5dxvWCoTILS3KhGa5w/xVr+p3csxOAqZXKXMroaJTUs24kq+CgYQ/F/+UdNq98TdH9xiG8X/7ibXamYq8JE=
+	t=1758627023; cv=none; b=G9UtXH+H2sbARxqIaO1mYc+/2V9K4KJTmI311iF4gcyi1+G0kyRrWDrfRiyZwIXBcLAkGWu3P7WIEb7HjjuoyZt7618ZKvlqG6to7hvyg0sqS3zAQglmSQVuAvv8ehdw4HjYXpBeQZWmrVJE+iWErAQpPSpjTZ8cjqYjRvWt+kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758626849; c=relaxed/simple;
-	bh=nExO9XuiNrcu0CDjAt3idck3jLqSZKCieYe2CkXKmOY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=oe6ln0a0Zc3piXYxLOarIj1N6lp1/RUwaqH2K6881F/gvk8XgBYaY2P1B5WfXQOxhXJLB0qhBrHRdG5vt8D2s6esHTNMIAnBVS3sMI+ZffAq71dxawrjVCAQQBaHhr0yxFgdyU5g1wLOr3h5fwX4J1aycNhyekVUV7rXQTef6nU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MAAw+EYw; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-46e21249891so3580895e9.3
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 04:27:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1758626845; x=1759231645; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=so1SQgkCsw7y835XopxQQ+rCSXelKEKDLiudYAtWcmQ=;
-        b=MAAw+EYwqd4awuiyT9oC8mXJVST56dd1gRZttL7AznpfclJgE3TrQZ4mok+faByNDc
-         I1+H6rgNHpCQecNpQE2Y5rhzwl2MGdNof/7icNyUMcn4AVDFrq7Ekt61SMoC+1bk/Y47
-         keSALkOB7pYe2ccfqvn7kvOO0BPPyBwfGe0uuIF4htpzTMyoZElR1z169fxUEV208Z23
-         nKJ3CtjvyyRHkA8hbZTa9Y2vKPwYr8fYl55aJHA1tSBFvJLZuc+s4LcDeMdHeji0aNa9
-         xeHYlmFBXfssVDpbqeO9E6rubpEUNdTy8axip4JBAdja3odl187pbpb4zPY6eQNl3XrB
-         FHBQ==
+	s=arc-20240116; t=1758627023; c=relaxed/simple;
+	bh=5DaMJrUxXR4YPrxwaj1kZ+kaUXa9/2KwhiV8u06N8Kk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c1QH4HYrm5X0/Ed9eeQ62heeZjc0gtLjh8lEmqd7hGQ3iEFVBX3ef55mM/Fk3T5liIGIf1IzwG+2gPE6/vn9XG7oO1VfT4Yx4EZxjcruwGxr9xXZ1vKYrP69nP3Ag2K5iKkR6KQdliKmd900QVRnGQZ4O77g3M2alE5jax4A6r0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DpQGBgmM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758627019;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U8Cz9CK0YHBErPFvNkhud/4SiB4snJhC+aqfyzfqbM4=;
+	b=DpQGBgmMF8UfztmAmPs+U2Hm8VhdXusAAAFijnQy5OnBL+7PTO0B2Rc5B58Zghqj1/N4rL
+	p2FfFGVF6PivCG8E/yhYhXbktumd8bmj7ssKXzf58fvGA+Ly7c8d5oirej1EWfganL1OPw
+	UHlDiUp7kzBdSxUM5l0V3DJ59omoCi4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-600-liSiVQlBN26qAAQAEXSdag-1; Tue, 23 Sep 2025 07:30:18 -0400
+X-MC-Unique: liSiVQlBN26qAAQAEXSdag-1
+X-Mimecast-MFC-AGG-ID: liSiVQlBN26qAAQAEXSdag_1758627017
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3f030846a41so2367708f8f.2
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 04:30:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758626845; x=1759231645;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=so1SQgkCsw7y835XopxQQ+rCSXelKEKDLiudYAtWcmQ=;
-        b=TGfCA0PSK0LoI37GkKN59nwG7KRA4OPIF+Lv8JktRLftNjCF+dtb1Uf9ZezKx6Pawf
-         LJb3NJT6AA2V9dIQ/SOA5f/WHm56lmrjj1G+Cv3KiKbNBLzLSomW30lEutbl4hT+xxkw
-         2/Ed+2PGkfTZ+Qzx1cyoPvTu4P/z6vmzXVdTIozyZ+p4xtuB1ECpzyj2GnWL1KOPZRo+
-         sadUMO8kS2vN8LyPMxgGePwrw92v/y/6oa3FW2jJTX2t0dqUQ1eCYUMkkHn1Lz7Bsr33
-         NxXPCgD2mwF9pRQ9QEYYhB85+Du1DDEeIWtg/J2mDUR3d3FtPH1LmXlU4dLgsBkIClVh
-         wSDQ==
-X-Gm-Message-State: AOJu0YwP0N2gy/PsX6vMKoeCpJG9+1Lpdxpt1FX6o66ehJoA9qho+EXC
-	95Jy5j8hYVunZejCxfKzEUokAOzHASX18ZJe4Eds9ECMYTIMgZYphTj7trx1C/eqaRKAzfAqD+e
-	1xf9+
-X-Gm-Gg: ASbGncuo4h6dXquLOj2Y/gq7Sr/4QkSMw0gXVVCF8f56vgT0G4tXWTXHJLI/RMAc72m
-	L1B+TB5OEaz1hmc+sk2ti0vdu5B87NFpKWXu6VLHUYzVLYYyPV1FK4KrnYRvdVnycFSrF9EmKqt
-	LwnjH3ixzE5XLodkP84dFKQ+wegBXYIvhRHgHQ2n4adlXpWZmTcXQHtqcZDRiS2BFbuq7JFyEmp
-	xIGr1yg9EQeAlVOGzQDMJktiungU5RMPMieBv54RkckhEnsw3hMquaWAtgdQi/ZlKRJZFj+y25U
-	ZE6t4oRB36DWGdHLMpgZwTmB44KvzbJtqumq+vI2ZftGZMITQGhhZVTiRkc7NqBTR14RNTpWfrS
-	IqOgrxcP5uKGMfj+Kls1NEPHS6wUI
-X-Google-Smtp-Source: AGHT+IHxAgIxQYbAuSEqv2ENhshbn3kXGvzRRXd10eb/EZ3Ny8vjLE8V/hGk0NAfLwQYDQbulbNEKA==
-X-Received: by 2002:a05:600c:46c5:b0:46d:9d28:fb5e with SMTP id 5b1f17b1804b1-46e1d97384emr24213325e9.5.1758626845068;
-        Tue, 23 Sep 2025 04:27:25 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-46e1dc3c011sm11438255e9.6.2025.09.23.04.27.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 04:27:24 -0700 (PDT)
-Date: Tue, 23 Sep 2025 14:27:21 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ij@kernel.org>
-Cc: netdev@vger.kernel.org
-Subject: [bug report] tcp: accecn: AccECN option
-Message-ID: <aNKEGWyWV9LWW3i5@stanley.mountain>
+        d=1e100.net; s=20230601; t=1758627017; x=1759231817;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U8Cz9CK0YHBErPFvNkhud/4SiB4snJhC+aqfyzfqbM4=;
+        b=KJ1o6rIRdobOv2wAK6qtJrQUQtVziXS+yWFABb0JQyvJMutdlnkcMVlzycy0msCbwm
+         krcDY1ybCHbNCBp4FRSGgypmhA4OnLCOywDfnTJzw4a+ijmyDR0zqXd9UFQiFJuPAWG5
+         WaWw6I0u5M0NkeEQWya8ia21OHdmt0cOQsB45gYHbwRC6nZjz9OWtoRpDjijCo5fhg8p
+         pOzrwxrvr9dHOfk5TUnD1itu5CZP4VxN9loX6FMs8oxVpMm9cD5+zbyvRY5h0R14/lux
+         yAado4Vf9IrxN9BbLJFzieFs2sMT/jQlre9GWzBdbyZxn4lX47+QidonB4zdC7L4w7lR
+         sKyA==
+X-Forwarded-Encrypted: i=1; AJvYcCW0EF2tNeFw7SUcNJjN7T5DirStjylTq4D2xJQ+MCOdl/OEMXr546ycl0N3UBuXVmDR1fGw8yg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9LtBy0zxqtLHnUjKPWPKhLsCGJ//OBYiq3UYV0ib5oKr1x8oo
+	B5hhpyM/6FdBYj3A9I/Xo7b97UMQ2BD2dErW2iolzOcEEL1KPh2ETaC0bdARh8UT8ns99rzwbi1
+	NmHWP1JcCoDhMmu/nkpE7IBRJR2N9aegCmbxaLIojoDPvpZo6aL2RveqnDA==
+X-Gm-Gg: ASbGnctH3s2W0jLbvjDTWaAHyoHSHZY1iK+dRckcE70zDSB56P79iFfNzt8mzXUPgBM
+	c8euFK/dV3qMKUGwaz90Na47shNlBtFGajqRh8MB25nvPOEyOA5a9X8Q5xYJjlid0LpOHOHpDAT
+	GMCMuWiMnIJeNEpTPZlRkNeIthmMZrGW4HnF8iORXBhVkSvmhZCpye8fwv++0DD0//ZxDCV3nps
+	jwkXXn5xEg4glxpILeGzLtY1cJ+TLzz4CJ1Pe/b+sSwo0ZtoZZvf03Q1Jk6n7pprSbboAi6/5H3
+	D7A8BfAjCxf6Jk/qql2VWwcWAGZxKMyHXiIyuMJs1hltIWx6ImcWkzrR+Ny+2WJReHRMejasK9i
+	2dhxCI4u7Tyrl
+X-Received: by 2002:a05:6000:26cf:b0:3ea:2ed6:9e37 with SMTP id ffacd0b85a97d-405c523c43dmr1718621f8f.24.1758627017028;
+        Tue, 23 Sep 2025 04:30:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGOtd51dDWtvpstikmjH6brQOCnE92z+FWDlYxnWzVfcNycf+071kLC826JpBeONXc4C3B4Ew==
+X-Received: by 2002:a05:6000:26cf:b0:3ea:2ed6:9e37 with SMTP id ffacd0b85a97d-405c523c43dmr1718576f8f.24.1758627016349;
+        Tue, 23 Sep 2025 04:30:16 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e24835b32sm5932355e9.13.2025.09.23.04.30.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Sep 2025 04:30:15 -0700 (PDT)
+Message-ID: <a3fa95a3-ce18-498a-a656-16581212c6cb@redhat.com>
+Date: Tue, 23 Sep 2025 13:30:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 04/15] quic: provide family ops for address
+ and protocol
+To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
+ quic@lists.linux.dev
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
+ Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
+ Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
+ Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+ kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
+ Jeff Layton <jlayton@kernel.org>, Benjamin Coddington <bcodding@redhat.com>,
+ Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+ Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
+ Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
+ Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
+ <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Daniel Stenberg <daniel@haxx.se>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <cover.1758234904.git.lucien.xin@gmail.com>
+ <01dd8f3b9afc6c813f036924790997d3ed4bcf3d.1758234904.git.lucien.xin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <01dd8f3b9afc6c813f036924790997d3ed4bcf3d.1758234904.git.lucien.xin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello Ilpo Järvinen,
+On 9/19/25 12:34 AM, Xin Long wrote:
+> +static int quic_v4_flow_route(struct sock *sk, union quic_addr *da, union quic_addr *sa,
+> +			      struct flowi *fl)
+> +{
+> +	struct flowi4 *fl4;
+> +	struct rtable *rt;
+> +	struct flowi _fl;
+> +
+> +	if (__sk_dst_check(sk, 0))
+> +		return 1;
+> +
+> +	fl4 = &_fl.u.ip4;
+> +	memset(&_fl, 0x00, sizeof(_fl));
+> +	fl4->saddr = sa->v4.sin_addr.s_addr;
+> +	fl4->fl4_sport = sa->v4.sin_port;
+> +	fl4->daddr = da->v4.sin_addr.s_addr;
+> +	fl4->fl4_dport = da->v4.sin_port;
+> +	fl4->flowi4_proto = IPPROTO_UDP;
+> +	fl4->flowi4_oif = sk->sk_bound_dev_if;
 
-Commit b5e74132dfbe ("tcp: accecn: AccECN option") from Sep 16, 2025
-(linux-next), leads to the following Smatch static checker warning:
+Why you need a local variable? I think you could use the 'fl' argument
+directly.
 
-	net/ipv4/tcp_output.c:747 tcp_options_write()
-	error: we previously assumed 'tp' could be null (see line 711)
+> +
+> +	fl4->flowi4_scope = ip_sock_rt_scope(sk);
+> +	fl4->flowi4_dscp = inet_sk_dscp(inet_sk(sk));
+> +
+> +	rt = ip_route_output_key(sock_net(sk), fl4);
+> +	if (IS_ERR(rt))
+> +		return PTR_ERR(rt);
+> +
+> +	if (!sa->v4.sin_family) {
+> +		sa->v4.sin_family = AF_INET;
+> +		sa->v4.sin_addr.s_addr = fl4->saddr;
+> +	}
+> +	sk_setup_caps(sk, &rt->dst);
+> +	memcpy(fl, &_fl, sizeof(_fl));
+> +	return 0;
+> +}
+> +
+> +static int quic_v6_flow_route(struct sock *sk, union quic_addr *da, union quic_addr *sa,
+> +			      struct flowi *fl)
+> +{
+> +	struct ipv6_pinfo *np = inet6_sk(sk);
+> +	struct ip6_flowlabel *flowlabel;
+> +	struct dst_entry *dst;
+> +	struct flowi6 *fl6;
+> +	struct flowi _fl;
+> +
+> +	if (__sk_dst_check(sk, np->dst_cookie))
+> +		return 1;
+> +
+> +	fl6 = &_fl.u.ip6;
+> +	memset(&_fl, 0x0, sizeof(_fl));
+> +	fl6->saddr = sa->v6.sin6_addr;
+> +	fl6->fl6_sport = sa->v6.sin6_port;
+> +	fl6->daddr = da->v6.sin6_addr;
+> +	fl6->fl6_dport = da->v6.sin6_port;
+> +	fl6->flowi6_proto = IPPROTO_UDP;
+> +	fl6->flowi6_oif = sk->sk_bound_dev_if;
 
-net/ipv4/tcp_output.c
-    630 static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
-    631                               const struct tcp_request_sock *tcprsk,
-    632                               struct tcp_out_options *opts,
-    633                               struct tcp_key *key)
-    634 {
-    635         u8 leftover_highbyte = TCPOPT_NOP; /* replace 1st NOP if avail */
-    636         u8 leftover_lowbyte = TCPOPT_NOP;  /* replace 2nd NOP in succession */
-    637         __be32 *ptr = (__be32 *)(th + 1);
-    638         u16 options = opts->options;        /* mungable copy */
-    639 
-    640         if (tcp_key_is_md5(key)) {
-    641                 *ptr++ = htonl((TCPOPT_NOP << 24) | (TCPOPT_NOP << 16) |
-    642                                (TCPOPT_MD5SIG << 8) | TCPOLEN_MD5SIG);
-    643                 /* overload cookie hash location */
-    644                 opts->hash_location = (__u8 *)ptr;
-    645                 ptr += 4;
-    646         } else if (tcp_key_is_ao(key)) {
-    647                 ptr = process_tcp_ao_options(tp, tcprsk, opts, key, ptr);
-                                                     ^^
-Sometimes dereferenced here.
+Same here.
 
-    648         }
-    649         if (unlikely(opts->mss)) {
-    650                 *ptr++ = htonl((TCPOPT_MSS << 24) |
-    651                                (TCPOLEN_MSS << 16) |
-    652                                opts->mss);
-    653         }
-    654 
-    655         if (likely(OPTION_TS & options)) {
-    656                 if (unlikely(OPTION_SACK_ADVERTISE & options)) {
-    657                         *ptr++ = htonl((TCPOPT_SACK_PERM << 24) |
-    658                                        (TCPOLEN_SACK_PERM << 16) |
-    659                                        (TCPOPT_TIMESTAMP << 8) |
-    660                                        TCPOLEN_TIMESTAMP);
-    661                         options &= ~OPTION_SACK_ADVERTISE;
-    662                 } else {
-    663                         *ptr++ = htonl((TCPOPT_NOP << 24) |
-    664                                        (TCPOPT_NOP << 16) |
-    665                                        (TCPOPT_TIMESTAMP << 8) |
-    666                                        TCPOLEN_TIMESTAMP);
-    667                 }
-    668                 *ptr++ = htonl(opts->tsval);
-    669                 *ptr++ = htonl(opts->tsecr);
-    670         }
-    671 
-    672         if (OPTION_ACCECN & options) {
-    673                 const u32 *ecn_bytes = opts->use_synack_ecn_bytes ?
-    674                                        synack_ecn_bytes :
-    675                                        tp->received_ecn_bytes;
-                                               ^^^^
-Dereference
+> +
+> +	if (inet6_test_bit(SNDFLOW, sk)) {
+> +		fl6->flowlabel = (da->v6.sin6_flowinfo & IPV6_FLOWINFO_MASK);
+> +		if (fl6->flowlabel & IPV6_FLOWLABEL_MASK) {
+> +			flowlabel = fl6_sock_lookup(sk, fl6->flowlabel);
+> +			if (IS_ERR(flowlabel))
+> +				return -EINVAL;
+> +			fl6_sock_release(flowlabel);
+> +		}
+> +	}
+> +
+> +	dst = ip6_dst_lookup_flow(sock_net(sk), sk, fl6, NULL);
+> +	if (IS_ERR(dst))
+> +		return PTR_ERR(dst);
+> +
+> +	if (!sa->v6.sin6_family) {
+> +		sa->v6.sin6_family = AF_INET6;
+> +		sa->v6.sin6_addr = fl6->saddr;
+> +	}
+> +	ip6_dst_store(sk, dst, NULL, NULL);
+> +	memcpy(fl, &_fl, sizeof(_fl));
+> +	return 0;
+> +}
+> +
+> +static void quic_v4_lower_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl)
+> +{
+> +	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
+> +	u8 tos = (inet_sk(sk)->tos | cb->ecn), ttl;
+> +	struct flowi4 *fl4 = &fl->u.ip4;
+> +	struct dst_entry *dst;
+> +	__be16 df = 0;
+> +
+> +	pr_debug("%s: skb: %p, len: %d, num: %llu, %pI4:%d -> %pI4:%d\n", __func__,
+> +		 skb, skb->len, cb->number, &fl4->saddr, ntohs(fl4->fl4_sport),
+> +		 &fl4->daddr, ntohs(fl4->fl4_dport));
+> +
+> +	dst = sk_dst_get(sk);
+> +	if (!dst) {
+> +		kfree_skb(skb);
+> +		return;
+> +	}
+> +	if (ip_dont_fragment(sk, dst) && !skb->ignore_df)
+> +		df = htons(IP_DF);
+> +
+> +	ttl = (u8)ip4_dst_hoplimit(dst);
+> +	udp_tunnel_xmit_skb((struct rtable *)dst, sk, skb, fl4->saddr, fl4->daddr,
+> +			    tos, ttl, df, fl4->fl4_sport, fl4->fl4_dport, false, false, 0);
+> +}
+> +
+> +static void quic_v6_lower_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl)
+> +{
+> +	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
+> +	u8 tc = (inet6_sk(sk)->tclass | cb->ecn), ttl;
+> +	struct flowi6 *fl6 = &fl->u.ip6;
+> +	struct dst_entry *dst;
+> +	__be32 label;
+> +
+> +	pr_debug("%s: skb: %p, len: %d, num: %llu, %pI6c:%d -> %pI6c:%d\n", __func__,
+> +		 skb, skb->len, cb->number, &fl6->saddr, ntohs(fl6->fl6_sport),
+> +		 &fl6->daddr, ntohs(fl6->fl6_dport));
+> +
+> +	dst = sk_dst_get(sk);
+> +	if (!dst) {
+> +		kfree_skb(skb);
+> +		return;
+> +	}
+> +
+> +	ttl = (u8)ip6_dst_hoplimit(dst);
+> +	label = ip6_make_flowlabel(sock_net(sk), skb, fl6->flowlabel, true, fl6);
+> +	udp_tunnel6_xmit_skb(dst, sk, skb, NULL, &fl6->saddr, &fl6->daddr, tc,
+> +			     ttl, label, fl6->fl6_sport, fl6->fl6_dport, false, 0);
+> +}
+> +
+> +static void quic_v4_get_msg_addrs(struct sk_buff *skb, union quic_addr *da, union quic_addr *sa)
+> +{
+> +	struct udphdr *uh = quic_udphdr(skb);
+> +
+> +	sa->v4.sin_family = AF_INET;
+> +	sa->v4.sin_port = uh->source;
+> +	sa->v4.sin_addr.s_addr = ip_hdr(skb)->saddr;
+> +
+> +	da->v4.sin_family = AF_INET;
+> +	da->v4.sin_port = uh->dest;
+> +	da->v4.sin_addr.s_addr = ip_hdr(skb)->daddr;
+> +}
+> +
+> +static void quic_v6_get_msg_addrs(struct sk_buff *skb, union quic_addr *da, union quic_addr *sa)
+> +{
+> +	struct udphdr *uh = quic_udphdr(skb);
+> +
+> +	sa->v6.sin6_family = AF_INET6;
+> +	sa->v6.sin6_port = uh->source;
+> +	sa->v6.sin6_addr = ipv6_hdr(skb)->saddr;
+> +
+> +	da->v6.sin6_family = AF_INET6;
+> +	da->v6.sin6_port = uh->dest;
+> +	da->v6.sin6_addr = ipv6_hdr(skb)->daddr;
+> +}
+> +
+> +static int quic_v4_get_mtu_info(struct sk_buff *skb, u32 *info)
+> +{
+> +	struct icmphdr *hdr;
+> +
+> +	hdr = (struct icmphdr *)(skb_network_header(skb) - sizeof(struct icmphdr));
+> +	if (hdr->type == ICMP_DEST_UNREACH && hdr->code == ICMP_FRAG_NEEDED) {
+> +		*info = ntohs(hdr->un.frag.mtu);
+> +		return 0;
+> +	}
+> +
+> +	/* Defer other types' processing to UDP error handler. */
+> +	return 1;
+> +}
+> +
+> +static int quic_v6_get_mtu_info(struct sk_buff *skb, u32 *info)
+> +{
+> +	struct icmp6hdr *hdr;
+> +
+> +	hdr = (struct icmp6hdr *)(skb_network_header(skb) - sizeof(struct icmp6hdr));
+> +	if (hdr->icmp6_type == ICMPV6_PKT_TOOBIG) {
+> +		*info = ntohl(hdr->icmp6_mtu);
+> +		return 0;
+> +	}
+> +
+> +	/* Defer other types' processing to UDP error handler. */
+> +	return 1;
+> +}
+> +
+> +static u8 quic_v4_get_msg_ecn(struct sk_buff *skb)
+> +{
+> +	return (ip_hdr(skb)->tos & INET_ECN_MASK);
+> +}
+> +
+> +static u8 quic_v6_get_msg_ecn(struct sk_buff *skb)
+> +{
+> +	return (ipv6_get_dsfield(ipv6_hdr(skb)) & INET_ECN_MASK);
+> +}
+> +
+> +static int quic_v4_get_user_addr(struct sock *sk, union quic_addr *a, struct sockaddr *addr,
+> +				 int addr_len)
+> +{
+> +	u32 len = sizeof(struct sockaddr_in);
+> +
+> +	if (addr_len < len || addr->sa_family != AF_INET)
+> +		return 1;
+> +	if (ipv4_is_multicast(quic_addr(addr)->v4.sin_addr.s_addr))
+> +		return 1;
+> +	memcpy(a, addr, len);
+> +	return 0;
+> +}
+> +
+> +static int quic_v6_get_user_addr(struct sock *sk, union quic_addr *a, struct sockaddr *addr,
+> +				 int addr_len)
+> +{
+> +	u32 len = sizeof(struct sockaddr_in);
+> +	int type;
+> +
+> +	if (addr_len < len)
+> +		return 1;
+> +
+> +	if (addr->sa_family != AF_INET6) {
+> +		if (ipv6_only_sock(sk))
+> +			return 1;
+> +		return quic_v4_get_user_addr(sk, a, addr, addr_len);
+> +	}
+> +
+> +	len = sizeof(struct sockaddr_in6);
+> +	if (addr_len < len)
+> +		return 1;
+> +	type = ipv6_addr_type(&quic_addr(addr)->v6.sin6_addr);
+> +	if (type != IPV6_ADDR_ANY && !(type & IPV6_ADDR_UNICAST))
+> +		return 1;
+> +	memcpy(a, addr, len);
+> +	return 0;
+> +}
+> +
+> +static void quic_v4_get_pref_addr(struct sock *sk, union quic_addr *addr, u8 **pp, u32 *plen)
+> +{
+> +	u8 *p = *pp;
+> +
+> +	memcpy(&addr->v4.sin_addr, p, QUIC_ADDR4_LEN);
+> +	p += QUIC_ADDR4_LEN;
+> +	memcpy(&addr->v4.sin_port, p, QUIC_PORT_LEN);
+> +	p += QUIC_PORT_LEN;
+> +	addr->v4.sin_family = AF_INET;
+> +	/* Skip over IPv6 address and port, not used for AF_INET sockets. */
+> +	p += QUIC_ADDR6_LEN;
+> +	p += QUIC_PORT_LEN;
+> +
+> +	if (!addr->v4.sin_port || quic_v4_is_any_addr(addr) ||
+> +	    ipv4_is_multicast(addr->v4.sin_addr.s_addr))
+> +		memset(addr, 0, sizeof(*addr));
+> +	*plen -= (p - *pp);
+> +	*pp = p;
+> +}
+> +
+> +static void quic_v6_get_pref_addr(struct sock *sk, union quic_addr *addr, u8 **pp, u32 *plen)
+> +{
+> +	u8 *p = *pp;
+> +	int type;
+> +
+> +	/* Skip over IPv4 address and port. */
+> +	p += QUIC_ADDR4_LEN;
+> +	p += QUIC_PORT_LEN;
+> +	/* Try to use IPv6 address and port first. */
+> +	memcpy(&addr->v6.sin6_addr, p, QUIC_ADDR6_LEN);
+> +	p += QUIC_ADDR6_LEN;
+> +	memcpy(&addr->v6.sin6_port, p, QUIC_PORT_LEN);
+> +	p += QUIC_PORT_LEN;
+> +	addr->v6.sin6_family = AF_INET6;
+> +
+> +	type = ipv6_addr_type(&addr->v6.sin6_addr);
+> +	if (!addr->v6.sin6_port || !(type & IPV6_ADDR_UNICAST)) {
+> +		memset(addr, 0, sizeof(*addr));
+> +		if (ipv6_only_sock(sk))
+> +			goto out;
+> +		/* Fallback to IPv4 if IPv6 address is not usable. */
+> +		return quic_v4_get_pref_addr(sk, addr, pp, plen);
+> +	}
+> +out:
+> +	*plen -= (p - *pp);
+> +	*pp = p;
+> +}
+> +
+> +static void quic_v4_set_pref_addr(struct sock *sk, u8 *p, union quic_addr *addr)
+> +{
+> +	memcpy(p, &addr->v4.sin_addr, QUIC_ADDR4_LEN);
+> +	p += QUIC_ADDR4_LEN;
+> +	memcpy(p, &addr->v4.sin_port, QUIC_PORT_LEN);
+> +	p += QUIC_PORT_LEN;
+> +	memset(p, 0, QUIC_ADDR6_LEN);
+> +	p += QUIC_ADDR6_LEN;
+> +	memset(p, 0, QUIC_PORT_LEN);
+> +}
+> +
+> +static void quic_v6_set_pref_addr(struct sock *sk, u8 *p, union quic_addr *addr)
+> +{
+> +	if (addr->sa.sa_family == AF_INET)
+> +		return quic_v4_set_pref_addr(sk, p, addr);
+> +
+> +	memset(p, 0, QUIC_ADDR4_LEN);
+> +	p += QUIC_ADDR4_LEN;
+> +	memset(p, 0, QUIC_PORT_LEN);
+> +	p += QUIC_PORT_LEN;
+> +	memcpy(p, &addr->v6.sin6_addr, QUIC_ADDR6_LEN);
+> +	p += QUIC_ADDR6_LEN;
+> +	memcpy(p, &addr->v6.sin6_port, QUIC_PORT_LEN);
+> +}
+> +
+> +static bool quic_v4_cmp_sk_addr(struct sock *sk, union quic_addr *a, union quic_addr *addr)
+> +{
+> +	if (a->v4.sin_port != addr->v4.sin_port)
+> +		return false;
+> +	if (a->v4.sin_family != addr->v4.sin_family)
+> +		return false;
+> +	if (a->v4.sin_addr.s_addr == htonl(INADDR_ANY) ||
+> +	    addr->v4.sin_addr.s_addr == htonl(INADDR_ANY))
+> +		return true;
+> +	return a->v4.sin_addr.s_addr == addr->v4.sin_addr.s_addr;
+> +}
+> +
+> +static bool quic_v6_cmp_sk_addr(struct sock *sk, union quic_addr *a, union quic_addr *addr)
+> +{
+> +	if (a->v4.sin_port != addr->v4.sin_port)
+> +		return false;
+> +
+> +	if (a->sa.sa_family == AF_INET && addr->sa.sa_family == AF_INET) {
+> +		if (a->v4.sin_addr.s_addr == htonl(INADDR_ANY) ||
+> +		    addr->v4.sin_addr.s_addr == htonl(INADDR_ANY))
+> +			return true;
+> +		return a->v4.sin_addr.s_addr == addr->v4.sin_addr.s_addr;
+> +	}
+> +
+> +	if (a->sa.sa_family != addr->sa.sa_family) {
+> +		if (ipv6_only_sock(sk))
+> +			return false;
+> +		if (a->sa.sa_family == AF_INET6 && ipv6_addr_any(&a->v6.sin6_addr))
+> +			return true;
+> +		if (a->sa.sa_family == AF_INET && addr->sa.sa_family == AF_INET6 &&
+> +		    ipv6_addr_v4mapped(&addr->v6.sin6_addr) &&
+> +		    addr->v6.sin6_addr.s6_addr32[3] == a->v4.sin_addr.s_addr)
+> +			return true;
+> +		if (addr->sa.sa_family == AF_INET && a->sa.sa_family == AF_INET6 &&
+> +		    ipv6_addr_v4mapped(&a->v6.sin6_addr) &&
+> +		    a->v6.sin6_addr.s6_addr32[3] == addr->v4.sin_addr.s_addr)
+> +			return true;
+> +		return false;
+> +	}
+> +
+> +	if (ipv6_addr_any(&a->v6.sin6_addr) || ipv6_addr_any(&addr->v6.sin6_addr))
+> +		return true;
+> +	return ipv6_addr_equal(&a->v6.sin6_addr, &addr->v6.sin6_addr);
+> +}
+> +
+> +static int quic_v4_get_sk_addr(struct socket *sock, struct sockaddr *uaddr, int peer)
+> +{
+> +	return inet_getname(sock, uaddr, peer);
+> +}
+> +
+> +static int quic_v6_get_sk_addr(struct socket *sock, struct sockaddr *uaddr, int peer)
+> +{
+> +	union quic_addr *a = quic_addr(uaddr);
+> +	int ret;
+> +
+> +	ret = inet6_getname(sock, uaddr, peer);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	if (a->sa.sa_family == AF_INET6 && ipv6_addr_v4mapped(&a->v6.sin6_addr)) {
+> +		a->v4.sin_family = AF_INET;
+> +		a->v4.sin_port = a->v6.sin6_port;
+> +		a->v4.sin_addr.s_addr = a->v6.sin6_addr.s6_addr32[3];
+> +	}
+> +
+> +	if (a->sa.sa_family == AF_INET) {
+> +		memset(a->v4.sin_zero, 0, sizeof(a->v4.sin_zero));
+> +		return sizeof(struct sockaddr_in);
+> +	}
+> +	return sizeof(struct sockaddr_in6);
+> +}
+> +
+> +static void quic_v4_set_sk_addr(struct sock *sk, union quic_addr *a, bool src)
+> +{
+> +	if (src) {
+> +		inet_sk(sk)->inet_sport = a->v4.sin_port;
+> +		inet_sk(sk)->inet_saddr = a->v4.sin_addr.s_addr;
+> +	} else {
+> +		inet_sk(sk)->inet_dport = a->v4.sin_port;
+> +		inet_sk(sk)->inet_daddr = a->v4.sin_addr.s_addr;
+> +	}
+> +}
+> +
+> +static void quic_v6_copy_sk_addr(struct in6_addr *skaddr, union quic_addr *a)
+> +{
+> +	if (a->sa.sa_family == AF_INET) {
+> +		skaddr->s6_addr32[0] = 0;
+> +		skaddr->s6_addr32[1] = 0;
+> +		skaddr->s6_addr32[2] = htonl(0x0000ffff);
+> +		skaddr->s6_addr32[3] = a->v4.sin_addr.s_addr;
+> +	} else {
+> +		*skaddr = a->v6.sin6_addr;
+> +	}
+> +}
+> +
+> +static void quic_v6_set_sk_addr(struct sock *sk, union quic_addr *a, bool src)
+> +{
+> +	if (src) {
+> +		inet_sk(sk)->inet_sport = a->v4.sin_port;
+> +		quic_v6_copy_sk_addr(&sk->sk_v6_rcv_saddr, a);
+> +	} else {
+> +		inet_sk(sk)->inet_dport = a->v4.sin_port;
+> +		quic_v6_copy_sk_addr(&sk->sk_v6_daddr, a);
+> +	}
+> +}
+> +
+> +static void quic_v4_set_sk_ecn(struct sock *sk, u8 ecn)
+> +{
+> +	inet_sk(sk)->tos = ((inet_sk(sk)->tos & ~INET_ECN_MASK) | ecn);
+> +}
+> +
+> +static void quic_v6_set_sk_ecn(struct sock *sk, u8 ecn)
+> +{
+> +	quic_v4_set_sk_ecn(sk, ecn);
+> +	inet6_sk(sk)->tclass = ((inet6_sk(sk)->tclass & ~INET_ECN_MASK) | ecn);
+> +}
+> +
+> +#define quic_af_ipv4(a)		((a)->sa.sa_family == AF_INET)
+> +
+> +u32 quic_encap_len(union quic_addr *a)
+> +{
+> +	return (quic_af_ipv4(a) ? sizeof(struct iphdr) : sizeof(struct ipv6hdr)) +
+> +	       sizeof(struct udphdr);
+> +}
+> +
+> +int quic_is_any_addr(union quic_addr *a)
+> +{
+> +	return quic_af_ipv4(a) ? quic_v4_is_any_addr(a) : quic_v6_is_any_addr(a);
+> +}
+> +
+> +void quic_seq_dump_addr(struct seq_file *seq, union quic_addr *addr)
+> +{
+> +	quic_af_ipv4(addr) ? quic_v4_seq_dump_addr(seq, addr) : quic_v6_seq_dump_addr(seq, addr);
+> +}
+> +
+> +void quic_udp_conf_init(struct sock *sk, struct udp_port_cfg *conf, union quic_addr *a)
+> +{
+> +	quic_af_ipv4(a) ? quic_v4_udp_conf_init(sk, conf, a) : quic_v6_udp_conf_init(sk, conf, a);
+> +}
+> +
+> +int quic_flow_route(struct sock *sk, union quic_addr *da, union quic_addr *sa, struct flowi *fl)
+> +{
+> +	return quic_af_ipv4(da) ? quic_v4_flow_route(sk, da, sa, fl)
+> +				: quic_v6_flow_route(sk, da, sa, fl);
+> +}
+> +
+> +void quic_lower_xmit(struct sock *sk, struct sk_buff *skb, union quic_addr *da, struct flowi *fl)
+> +{
+> +	quic_af_ipv4(da) ? quic_v4_lower_xmit(sk, skb, fl) : quic_v6_lower_xmit(sk, skb, fl);
+> +}
+> +
+> +#define quic_skb_ipv4(skb)	(ip_hdr(skb)->version == 4)
+> +
+> +void quic_get_msg_addrs(struct sk_buff *skb, union quic_addr *da, union quic_addr *sa)
+> +{
+> +	memset(sa, 0, sizeof(*sa));
+> +	memset(da, 0, sizeof(*da));
+> +	quic_skb_ipv4(skb) ? quic_v4_get_msg_addrs(skb, da, sa)
+> +			   : quic_v6_get_msg_addrs(skb, da, sa);
+> +}
+> +
+> +int quic_get_mtu_info(struct sk_buff *skb, u32 *info)
+> +{
+> +	return quic_skb_ipv4(skb) ? quic_v4_get_mtu_info(skb, info)
+> +				  : quic_v6_get_mtu_info(skb, info);
+> +}
+> +
+> +u8 quic_get_msg_ecn(struct sk_buff *skb)
+> +{
+> +	return quic_skb_ipv4(skb) ? quic_v4_get_msg_ecn(skb) : quic_v6_get_msg_ecn(skb);
+> +}
+> +
+> +#define quic_pf_ipv4(sk)	((sk)->sk_family == PF_INET)
+> +
+> +int quic_get_user_addr(struct sock *sk, union quic_addr *a, struct sockaddr *addr, int addr_len)
+> +{
+> +	memset(a, 0, sizeof(*a));
+> +	return quic_pf_ipv4(sk) ? quic_v4_get_user_addr(sk, a, addr, addr_len)
+> +				: quic_v6_get_user_addr(sk, a, addr, addr_len);
 
-    676                 const u8 ect0_idx = INET_ECN_ECT_0 - 1;
-    677                 const u8 ect1_idx = INET_ECN_ECT_1 - 1;
-    678                 const u8 ce_idx = INET_ECN_CE - 1;
-    679                 u32 e0b;
-    680                 u32 e1b;
-    681                 u32 ceb;
-    682                 u8 len;
-    683 
-    684                 e0b = ecn_bytes[ect0_idx] + TCP_ACCECN_E0B_INIT_OFFSET;
-    685                 e1b = ecn_bytes[ect1_idx] + TCP_ACCECN_E1B_INIT_OFFSET;
-    686                 ceb = ecn_bytes[ce_idx] + TCP_ACCECN_CEB_INIT_OFFSET;
-    687                 len = TCPOLEN_ACCECN_BASE +
-    688                       opts->num_accecn_fields * TCPOLEN_ACCECN_PERFIELD;
-    689 
-    690                 if (opts->num_accecn_fields == 2) {
-    691                         *ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
-    692                                        ((e1b >> 8) & 0xffff));
-    693                         *ptr++ = htonl(((e1b & 0xff) << 24) |
-    694                                        (ceb & 0xffffff));
-    695                 } else if (opts->num_accecn_fields == 1) {
-    696                         *ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
-    697                                        ((e1b >> 8) & 0xffff));
-    698                         leftover_highbyte = e1b & 0xff;
-    699                         leftover_lowbyte = TCPOPT_NOP;
-    700                 } else if (opts->num_accecn_fields == 0) {
-    701                         leftover_highbyte = TCPOPT_ACCECN1;
-    702                         leftover_lowbyte = len;
-    703                 } else if (opts->num_accecn_fields == 3) {
-    704                         *ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
-    705                                        ((e1b >> 8) & 0xffff));
-    706                         *ptr++ = htonl(((e1b & 0xff) << 24) |
-    707                                        (ceb & 0xffffff));
-    708                         *ptr++ = htonl(((e0b & 0xffffff) << 8) |
-    709                                        TCPOPT_NOP);
-    710                 }
-    711                 if (tp) {
-                            ^^
-Here we assume tp can be NULL
+Minor nit: I think the most idiomatic way to express the abvoe is:
 
-    712                         tp->accecn_minlen = 0;
-    713                         tp->accecn_opt_tstamp = tp->tcp_mstamp;
-    714                         if (tp->accecn_opt_demand)
-    715                                 tp->accecn_opt_demand--;
-    716                 }
-    717         }
-    718 
-    719         if (unlikely(OPTION_SACK_ADVERTISE & options)) {
-    720                 *ptr++ = htonl((leftover_highbyte << 24) |
-    721                                (leftover_lowbyte << 16) |
-    722                                (TCPOPT_SACK_PERM << 8) |
-    723                                TCPOLEN_SACK_PERM);
-    724                 leftover_highbyte = TCPOPT_NOP;
-    725                 leftover_lowbyte = TCPOPT_NOP;
-    726         }
-    727 
-    728         if (unlikely(OPTION_WSCALE & options)) {
-    729                 u8 highbyte = TCPOPT_NOP;
-    730 
-    731                 /* Do not split the leftover 2-byte to fit into a single
-    732                  * NOP, i.e., replace this NOP only when 1 byte is leftover
-    733                  * within leftover_highbyte.
-    734                  */
-    735                 if (unlikely(leftover_highbyte != TCPOPT_NOP &&
-    736                              leftover_lowbyte == TCPOPT_NOP)) {
-    737                         highbyte = leftover_highbyte;
-    738                         leftover_highbyte = TCPOPT_NOP;
-    739                 }
-    740                 *ptr++ = htonl((highbyte << 24) |
-    741                                (TCPOPT_WINDOW << 16) |
-    742                                (TCPOLEN_WINDOW << 8) |
-    743                                opts->ws);
-    744         }
-    745 
-    746         if (unlikely(opts->num_sack_blocks)) {
---> 747                 struct tcp_sack_block *sp = tp->rx_opt.dsack ?
-                                                    ^^^^^^^^^^^^^^^^
-Unchecked dereference here.
+return quic_pf_ipv4(sk) ? quic_v4_get_user_addr(sk, a, addr, addr_len) :
+			  quic_v6_get_user_addr(sk, a, addr, addr_len);
 
-    748                         tp->duplicate_sack : tp->selective_acks;
-    749                 int this_sack;
-    750 
-    751                 *ptr++ = htonl((leftover_highbyte << 24) |
-    752                                (leftover_lowbyte << 16) |
-    753                                (TCPOPT_SACK <<  8) |
-    754                                (TCPOLEN_SACK_BASE + (opts->num_sack_blocks *
-    755                                                      TCPOLEN_SACK_PERBLOCK)));
-    756                 leftover_highbyte = TCPOPT_NOP;
-    757                 leftover_lowbyte = TCPOPT_NOP;
-    758 
-    759                 for (this_sack = 0; this_sack < opts->num_sack_blocks;
-    760                      ++this_sack) {
-    761                         *ptr++ = htonl(sp[this_sack].start_seq);
-    762                         *ptr++ = htonl(sp[this_sack].end_seq);
-    763                 }
-    764 
-    765                 tp->rx_opt.dsack = 0;
-    766         } else if (unlikely(leftover_highbyte != TCPOPT_NOP ||
-    767                             leftover_lowbyte != TCPOPT_NOP)) {
-    768                 *ptr++ = htonl((leftover_highbyte << 24) |
-    769                                (leftover_lowbyte << 16) |
-    770                                (TCPOPT_NOP << 8) |
-    771                                TCPOPT_NOP);
-    772                 leftover_highbyte = TCPOPT_NOP;
-    773                 leftover_lowbyte = TCPOPT_NOP;
-    774         }
-    775 
-    776         if (unlikely(OPTION_FAST_OPEN_COOKIE & options)) {
-    777                 struct tcp_fastopen_cookie *foc = opts->fastopen_cookie;
-    778                 u8 *p = (u8 *)ptr;
-    779                 u32 len; /* Fast Open option length */
-    780 
-    781                 if (foc->exp) {
-    782                         len = TCPOLEN_EXP_FASTOPEN_BASE + foc->len;
-    783                         *ptr = htonl((TCPOPT_EXP << 24) | (len << 16) |
-    784                                      TCPOPT_FASTOPEN_MAGIC);
-    785                         p += TCPOLEN_EXP_FASTOPEN_BASE;
-    786                 } else {
-    787                         len = TCPOLEN_FASTOPEN_BASE + foc->len;
-    788                         *p++ = TCPOPT_FASTOPEN;
-    789                         *p++ = len;
-    790                 }
-    791 
-    792                 memcpy(p, foc->val, foc->len);
-    793                 if ((len & 3) == 2) {
-    794                         p[foc->len] = TCPOPT_NOP;
-    795                         p[foc->len + 1] = TCPOPT_NOP;
-    796                 }
-    797                 ptr += (len + 3) >> 2;
-    798         }
-    799 
-    800         smc_options_write(ptr, &options);
-    801 
-    802         mptcp_options_write(th, ptr, tp, opts);
-                                             ^^
-The last dereference is checked for NULL but the others aren't.
+(other cases below)
 
+/P
 
-    803 }
-
-regards,
-dan carpenter
 
