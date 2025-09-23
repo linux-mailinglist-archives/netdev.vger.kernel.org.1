@@ -1,508 +1,183 @@
-Return-Path: <netdev+bounces-225621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0933EB9619E
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 15:56:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C513B96203
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 16:03:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6221F18A6CEF
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:56:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 086D24462EF
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 14:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2AA32066F7;
-	Tue, 23 Sep 2025 13:55:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F482288C6;
+	Tue, 23 Sep 2025 14:02:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="THFGmdxS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZSih8M4O"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6DEF2045B5
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 13:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1052E221555;
+	Tue, 23 Sep 2025 14:02:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758635753; cv=none; b=IVjQRGZcqglsITxrbDcbxmaA7DnFZiWL5N/W8dHif0XZXgKgiXCTPX7fn8YSNZ3V2vRFnaXm7GM9/1IKvvAKIX2KDyT/Ca7vp0NLVr+F4wKYDkWN25OIV9yYA6i/u+UyjNmAZRkjDtzWIb2SsYeswwPWAT+Qq1ZmsmC7emFZhAo=
+	t=1758636171; cv=none; b=Y2naCPQ2R4N1qsepnkz6qJZKJUjfvW4rFGVF/s4ATutfsTUYqOrRSnzTZRTCqWYrUVEqdSsdo6lwQ2ZTkg4cbtYI0qeje/SU2EephOkdBbNsUb8VSFWraYi+Em7i2+0FzjqYn+UpC6UtLFBEqfV6hBE2GH25SSmC6j4Hi+Ga8LY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758635753; c=relaxed/simple;
-	bh=cnTfLJI2pHLi4V2mGZyxw2bhd/bpRm/B1dmmuW1cYhM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fhpN1mS/C/ZUiQLQnAtPhO6gxcaZkWwBTpn+Xa3buYbuLj1ZoyfPBxd9uyltVhsC8Xj9c3A1kGpgiF/QGxK+c8A8nwbbxVrdhZEh/ouS+zUTaHdCRp0kUUMkl4Xck1i16W4OkCU4UmeoY+tAKEOZVvYTDU6amYZCG8tARswDtns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=THFGmdxS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758635750;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8dTPPsQ1FUilXUGs6h0qcZ7nsZZHyKGum6Mc+HwP8/0=;
-	b=THFGmdxSQP9u8AFAQ27ZdSicb+D+p1QDAFwd/co6NfbxXZJLMeBx2TvHOLukAeQN8OgZ6J
-	gjmlEk/XQxXx6FgvMePRjyhPCLWIskV4iTn9KcbOvHqx5VOTqOCDj4EAUoCPcLNHWTYE7d
-	Vx7gNBL/UwpjqbC7Z0Evyp1rDb/TSmY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-418-7_DEQi3wNlubZk8GlhaM_g-1; Tue, 23 Sep 2025 09:55:49 -0400
-X-MC-Unique: 7_DEQi3wNlubZk8GlhaM_g-1
-X-Mimecast-MFC-AGG-ID: 7_DEQi3wNlubZk8GlhaM_g_1758635748
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3f3c118cbb3so3553061f8f.3
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 06:55:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758635748; x=1759240548;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8dTPPsQ1FUilXUGs6h0qcZ7nsZZHyKGum6Mc+HwP8/0=;
-        b=pTnpyWf+5avrONKE8htIswVQ70Zfv7HwX8Osj9b0eX5GjtjOMCer+JKkQ5hpUEdip8
-         fwSVqwR5Kg+yrPXG4JyON/XZXmaSCdFOxm0ywY4/+f3SS54nwp/ex5PEWBzTJ7yREqjM
-         8AmtHCXeNC0sRPNPvnMUtiQUF04TDlgCeW/A5Szw1kLz6FvZDMCZMmNtdVgGfrtN3X7b
-         m8VQNE0++PgYoy7tnpusarRjcBhF0pzBQF+WYqe4GU3yrJcUYgzCqtATvW1/8TFHHcpl
-         TCPD/69PsU+T+M0WmC1mEbp/22Z/IujGvTTzMWBfn2LBadwVppWZdkZvd0VYs7QhCWqK
-         Ba1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXfmLsueG2cjqoZMK4egHFM8vXrXJ6G2ke3VFb9TGq3JjL/dZXhLcY6KPM+yyV3RHsEtXVYpgc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz12j6Rfx4b6anCS57d0urzTU+GIMimIifCImTvq/ETICguNSFe
-	VxIO0XqM2SpCMcSk/4iVX4pfK4D0XzLdUN1R2SmR7o9raW+wBnEz54gLXnhnbkEAl3VNA2S66ga
-	MY6MXUlqcT9Kpk0PJhcGxxwhX47YPD3l4M23/30DHCnPKEG08U3Hu7Lff7Q==
-X-Gm-Gg: ASbGncuEZtIpeg2uoFDCo0atoy61hyzpzG7OJdhoVRrRT3pJNVSbE3XQAKDqmCAo/DE
-	6zikQ9MDMkGcxVjntzHR8tnlMRg9smZ5nzzppW6AV1Fy+z6LQM3haJkt7+ZMLVT6V7VGTF3swo+
-	fIwIl13hCSxlVZ6sewZrdW3RhSZ8fQus9B0pfvyHVghE6dGFqTxYZPzRFyY1HYsv3Cf0vDResbT
-	HTyga55vhUzk7LwND1rv7YFVzXpLtONe+KUqrgN7yNsN5N7iIPECw0bE3gjXDVsTHorJw5C/yjK
-	PRPLrjfFQNLffEkSeY3sb11sLYswMK00YGMi5EtT14e05kv71g70AiTK56Z1K4AteAaAp2hkTOk
-	sLK2RYbZp2HxS
-X-Received: by 2002:a05:600c:35cc:b0:45d:f7f9:9ac7 with SMTP id 5b1f17b1804b1-46e1d9953dbmr30369825e9.6.1758635747985;
-        Tue, 23 Sep 2025 06:55:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IERnVs+bjgTt7HFjVD6e97zPFqfTBQN5k2Cpyw71l8HfcrwfQSxqLVGtCM/vafT4NMHtBqKZw==
-X-Received: by 2002:a05:600c:35cc:b0:45d:f7f9:9ac7 with SMTP id 5b1f17b1804b1-46e1d9953dbmr30369235e9.6.1758635747482;
-        Tue, 23 Sep 2025 06:55:47 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-464f0aac3fdsm237468995e9.1.2025.09.23.06.55.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Sep 2025 06:55:46 -0700 (PDT)
-Message-ID: <a9427359-a798-4f3a-88ef-c10a0bf614ec@redhat.com>
-Date: Tue, 23 Sep 2025 15:55:44 +0200
+	s=arc-20240116; t=1758636171; c=relaxed/simple;
+	bh=Bdab41UPVGCNYNXeNsvpKwijaIhSb6VqLy0ymP3WGVo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qOYb7Qyu2yomP8uz7cKv+zt0DFyUTi1zC9akuewBDPWdFZlCacZzTUk8qhXdyllz/V8rIxJGg+Vv/VhagLZdvHwCAYEt1gHDneU37A4zSM5rGvbipCmTbmS8PE32C5GuC7yTz15n5FJsEMdMcPjx7o4JOA5kvLdkn+M0wRhN3Xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZSih8M4O; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 738F5C116D0;
+	Tue, 23 Sep 2025 14:02:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758636170;
+	bh=Bdab41UPVGCNYNXeNsvpKwijaIhSb6VqLy0ymP3WGVo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ZSih8M4O23EyUehproFaHkLhOvx3ZozQSLHdN5XkFKixHU7vmzVbtnynwCiTQBZZu
+	 Wzdr8L5iUviZG2yqgLdV+qBldayuPioFtn2T4dDGHnjeCnC3HIvyEiLz9B+QxuRuEX
+	 hat+0hQYIYzud0uYC6XRE1ML1r2CaES8R6pYT/FrlTWEJcKs46ZsqqZj1MwW0zHkLt
+	 5vxvn+rJQsA/LreTtRmGbCRSQ66hRVlmIB1Syju8h1EcIgiIJ7K2x7iK+R7Hqum9B7
+	 3P0m3kNwyyNdoIgSzuwFbCcVMPmlO7ZvYB3K35vNMPDtQLESmFPp0ChfSfBP5siJiF
+	 u4YzPsfJszNhQ==
+Received: by wens.tw (Postfix, from userid 1000)
+	id 026905FC52; Tue, 23 Sep 2025 22:02:47 +0800 (CST)
+From: Chen-Yu Tsai <wens@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej@kernel.org>,
+	Samuel Holland <samuel@sholland.org>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH net-next v7 0/6] net: stmmac: Add support for Allwinner A523 GMAC200
+Date: Tue, 23 Sep 2025 22:02:40 +0800
+Message-ID: <20250923140247.2622602-1-wens@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 09/15] quic: add congestion control
-To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
- quic@lists.linux.dev
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
- Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
- Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
- Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
- kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
- Jeff Layton <jlayton@kernel.org>, Benjamin Coddington <bcodding@redhat.com>,
- Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
- Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
- Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
- <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
- illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Daniel Stenberg <daniel@haxx.se>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <cover.1758234904.git.lucien.xin@gmail.com>
- <3475257318dcfce0ee996131142969b1fce7ae8b.1758234904.git.lucien.xin@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <3475257318dcfce0ee996131142969b1fce7ae8b.1758234904.git.lucien.xin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 9/19/25 12:34 AM, Xin Long wrote:
-> This patch introduces 'quic_cong' for RTT measurement and congestion
-> control. The 'quic_cong_ops' is added to define the congestion
-> control algorithm.
-> 
-> It implements a congestion control state machine with slow start,
-> congestion avoidance, and recovery phases, and introduces the New
-> Reno and CUBIC algorithms.
+From: Chen-Yu Tsai <wens@csie.org>
 
-To moderate the initial submission size, you could initially introduce
-just one of the above.
+Hi everyone,
 
-> The implementation updates RTT estimates when packets are acknowledged,
-> reacts to loss and ECN signals, and adjusts the congestion window
-> accordingly during packet transmission and acknowledgment processing.
-> 
-> - quic_cong_rtt_update(): Performs RTT measurement, invoked when a
->   packet is acknowledged by the largest number in the ACK frame.
-> 
-> - quic_cong_on_packet_acked(): Invoked when a packet is acknowledged.
-> 
-> - quic_cong_on_packet_lost(): Invoked when a packet is marked as lost.
-> 
-> - quic_cong_on_process_ecn(): Invoked when an ACK_ECN frame is received.
-> 
-> - quic_cong_on_packet_sent(): Invoked when a packet is transmitted.
-> 
-> - quic_cong_on_ack_recv(): Invoked when an ACK frame is received.
-> 
-> Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> ---
->  net/quic/Makefile |   3 +-
->  net/quic/cong.c   | 700 ++++++++++++++++++++++++++++++++++++++++++++++
->  net/quic/cong.h   | 120 ++++++++
->  net/quic/socket.c |   1 +
->  net/quic/socket.h |   7 +
->  5 files changed, 830 insertions(+), 1 deletion(-)
->  create mode 100644 net/quic/cong.c
->  create mode 100644 net/quic/cong.h
-> 
-> diff --git a/net/quic/Makefile b/net/quic/Makefile
-> index 1565fb5cef9d..4d4a42c6d565 100644
-> --- a/net/quic/Makefile
-> +++ b/net/quic/Makefile
-> @@ -5,4 +5,5 @@
->  
->  obj-$(CONFIG_IP_QUIC) += quic.o
->  
-> -quic-y := common.o family.o protocol.o socket.o stream.o connid.o path.o
-> +quic-y := common.o family.o protocol.o socket.o stream.o connid.o path.o \
-> +	  cong.o
-> diff --git a/net/quic/cong.c b/net/quic/cong.c
-> new file mode 100644
-> index 000000000000..d598cc14b15e
-> --- /dev/null
-> +++ b/net/quic/cong.c
-> @@ -0,0 +1,700 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/* QUIC kernel implementation
-> + * (C) Copyright Red Hat Corp. 2023
-> + *
-> + * This file is part of the QUIC kernel implementation
-> + *
-> + * Initialization/cleanup for QUIC protocol support.
-> + *
-> + * Written or modified by:
-> + *    Xin Long <lucien.xin@gmail.com>
-> + */
-> +
-> +#include <linux/jiffies.h>
-> +#include <linux/quic.h>
-> +#include <net/sock.h>
-> +
-> +#include "common.h"
-> +#include "cong.h"
-> +
-> +/* CUBIC APIs */
-> +struct quic_cubic {
-> +	/* Variables of Interest in rfc9438#section-4.1.2 */
-> +	u32 pending_w_add;		/* Accumulate fractional increments to W_est */
-> +	u32 origin_point;		/* W_max */
-> +	u32 epoch_start;		/* t_epoch */
-> +	u32 pending_add;		/* Accumulates fractional additions to W_cubic */
-> +	u32 w_last_max;			/* last W_max */
-> +	u32 w_tcp;			/* W_est */
-> +	u64 k;				/* K */
-> +
-> +	/* HyStart++ variables in rfc9406#section-4.2 */
-> +	u32 current_round_min_rtt;	/* currentRoundMinRTT */
-> +	u32 css_baseline_min_rtt;	/* cssBaselineMinRtt */
-> +	u32 last_round_min_rtt;		/* lastRoundMinRTT */
-> +	u16 rtt_sample_count;		/* rttSampleCount */
-> +	u16 css_rounds;			/* Counter for consecutive rounds showing RTT increase */
-> +	s64 window_end;			/* End of current CSS round (packet number) */
-> +};
-> +
-> +/* HyStart++ constants in rfc9406#section-4.3 */
-> +#define QUIC_HS_MIN_SSTHRESH		16
-> +#define QUIC_HS_N_RTT_SAMPLE		8
-> +#define QUIC_HS_MIN_ETA			4000
-> +#define QUIC_HS_MAX_ETA			16000
-> +#define QUIC_HS_MIN_RTT_DIVISOR		8
-> +#define QUIC_HS_CSS_GROWTH_DIVISOR	4
-> +#define QUIC_HS_CSS_ROUNDS		5
-> +
-> +static u64 cubic_root(u64 n)
-> +{
-> +	u64 a, d;
-> +
-> +	if (!n)
-> +		return 0;
-> +
-> +	d = (64 - __builtin_clzll(n)) / 3;
-> +	a = BIT_ULL(d + 1);
-> +
-> +	for (; a * a * a > n;) {
-> +		d = div64_ul(n, a * a);
-> +		a = div64_ul(2 * a + d, 3);
-> +	}
-> +	return a;
-> +}
+This is v7 of my Allwinner A523 GMAC200 support series. This is based on
+next-20250922.
 
-tcp_cubic() has already an helper to compute the square root. You could
-re-use that one.
+Changes since v6:
+- Collected acks for DT binding patch
+- Rebased onto next-20250922
 
-> +
-> +/* rfc9406#section-4: HyStart++ Algorithm */
-> +static void cubic_slow_start(struct quic_cong *cong, u32 bytes, s64 number)
-> +{
-> +	struct quic_cubic *cubic = quic_cong_priv(cong);
-> +	u32 eta;
-> +
-> +	if (cubic->window_end <= number)
-> +		cubic->window_end = -1;
-> +
-> +	/* cwnd = cwnd + (min(N, L * SMSS) / CSS_GROWTH_DIVISOR) */
-> +	if (cubic->css_baseline_min_rtt != U32_MAX)
-> +		bytes = bytes / QUIC_HS_CSS_GROWTH_DIVISOR;
-> +	cong->window = min_t(u32, cong->window + bytes, cong->max_window);
-> +
-> +	if (cubic->css_baseline_min_rtt != U32_MAX) {
-> +		/* If CSS_ROUNDS rounds are complete, enter congestion avoidance. */
-> +		if (++cubic->css_rounds > QUIC_HS_CSS_ROUNDS) {
-> +			cubic->css_baseline_min_rtt = U32_MAX;
-> +			cubic->w_last_max = cong->window;
-> +			cong->ssthresh = cong->window;
-> +			cubic->css_rounds = 0;
-> +		}
-> +		return;
-> +	}
-> +
-> +	/* if ((rttSampleCount >= N_RTT_SAMPLE) AND
-> +	 *     (currentRoundMinRTT != infinity) AND
-> +	 *     (lastRoundMinRTT != infinity))
-> +	 *   RttThresh = max(MIN_RTT_THRESH,
-> +	 *     min(lastRoundMinRTT / MIN_RTT_DIVISOR, MAX_RTT_THRESH))
-> +	 *   if (currentRoundMinRTT >= (lastRoundMinRTT + RttThresh))
-> +	 *     cssBaselineMinRtt = currentRoundMinRTT
-> +	 *     exit slow start and enter CSS
-> +	 */
-> +	if (cubic->last_round_min_rtt != U32_MAX &&
-> +	    cubic->current_round_min_rtt != U32_MAX &&
-> +	    cong->window >= QUIC_HS_MIN_SSTHRESH * cong->mss &&
-> +	    cubic->rtt_sample_count >= QUIC_HS_N_RTT_SAMPLE) {
-> +		eta = cubic->last_round_min_rtt / QUIC_HS_MIN_RTT_DIVISOR;
-> +		if (eta < QUIC_HS_MIN_ETA)
-> +			eta = QUIC_HS_MIN_ETA;
-> +		else if (eta > QUIC_HS_MAX_ETA)
-> +			eta = QUIC_HS_MAX_ETA;
-> +
-> +		pr_debug("%s: current_round_min_rtt: %u, last_round_min_rtt: %u, eta: %u\n",
-> +			 __func__, cubic->current_round_min_rtt, cubic->last_round_min_rtt, eta);
-> +
-> +		/* Delay increase triggers slow start exit and enter CSS. */
-> +		if (cubic->current_round_min_rtt >= cubic->last_round_min_rtt + eta)
-> +			cubic->css_baseline_min_rtt = cubic->current_round_min_rtt;
-> +	}
-> +}
-> +
-> +/* rfc9438#section-4: CUBIC Congestion Control */
-> +static void cubic_cong_avoid(struct quic_cong *cong, u32 bytes)
-> +{
-> +	struct quic_cubic *cubic = quic_cong_priv(cong);
-> +	u64 tx, kx, time_delta, delta, t;
-> +	u64 target_add, tcp_add = 0;
-> +	u64 target, cwnd_thres, m;
-> +
-> +	if (cubic->epoch_start == U32_MAX) {
-> +		cubic->epoch_start = cong->time;
-> +		if (cong->window < cubic->w_last_max) {
-> +			/*
-> +			 *        ┌────────────────┐
-> +			 *     3  │W    - cwnd
-> +			 *     ╲  │ max       epoch
-> +			 * K =  ╲ │────────────────
-> +			 *       ╲│       C
-> +			 */
-> +			cubic->k = cubic->w_last_max - cong->window;
-> +			cubic->k = cubic_root(div64_ul(cubic->k * 10, (u64)cong->mss * 4));
+Changes since v5:
+- Use plat->phy_interface instead of plat->mac_interface (Russell)
+- Link to v5
+  https://lore.kernel.org/all/20250911174032.3147192-1-wens@kernel.org/
 
-Can `mss` be 0 at this point? Why?
+Changes since v4:
+- Moved clock-names list to main schema in DT binding (Rob)
+- Dropped 4 patches that are already merged
+- Link to v4
+  https://lore.kernel.org/all/20250908181059.1785605-1-wens@kernel.org/
 
-> +			cubic->origin_point = cubic->w_last_max;
-> +		} else {
-> +			cubic->k = 0;
-> +			cubic->origin_point = cong->window;
-> +		}
-> +		cubic->w_tcp = cong->window;
-> +		cubic->pending_add = 0;
-> +		cubic->pending_w_add = 0;
-> +	}
-> +
-> +	/*
-> +	 * t = t        - t
-> +	 *      current    epoch
-> +	 */
-> +	t = cong->time - cubic->epoch_start;
-> +	tx = div64_ul(t << 10, USEC_PER_SEC);
-> +	kx = (cubic->k << 10);
-> +	if (tx > kx)
-> +		time_delta = tx - kx;
-> +	else
-> +		time_delta = kx - tx;
-> +	/*
-> +	 *                        3
-> +	 * W     (t) = C * (t - K)  + W
-> +	 *  cubic                      max
-> +	 */
-> +	delta = cong->mss * ((((time_delta * time_delta) >> 10) * time_delta) >> 10);
-> +	delta = div64_ul(delta * 4, 10) >> 10;
-> +	if (tx > kx)
-> +		target = cubic->origin_point + delta;
-> +	else
-> +		target = cubic->origin_point - delta;
-> +
-> +	/*
-> +	 * W     (t + RTT)
-> +	 *  cubic
-> +	 */
-> +	cwnd_thres = (div64_ul((t + cong->smoothed_rtt) << 10, USEC_PER_SEC) * target) >> 10;
-> +	pr_debug("%s: tgt: %llu, thres: %llu, delta: %llu, t: %llu, srtt: %u, tx: %llu, kx: %llu\n",
-> +		 __func__, target, cwnd_thres, delta, t, cong->smoothed_rtt, tx, kx);
-> +	/*
-> +	 *          ⎧
-> +	 *          ⎪cwnd            if  W     (t + RTT) < cwnd
-> +	 *          ⎪                     cubic
-> +	 *          ⎨1.5 * cwnd      if  W     (t + RTT) > 1.5 * cwnd
-> +	 * target = ⎪                     cubic
-> +	 *          ⎪W     (t + RTT) otherwise
-> +	 *          ⎩ cubic
-> +	 */
-> +	if (cwnd_thres < cong->window)
-> +		target = cong->window;
-> +	else if (cwnd_thres * 2 > (u64)cong->window * 3)
-> +		target = cong->window * 3 / 2;
-> +	else
-> +		target = cwnd_thres;
-> +
-> +	/*
-> +	 * target - cwnd
-> +	 * ─────────────
-> +	 *      cwnd
-> +	 */
-> +	if (target > cong->window) {
-> +		target_add = cubic->pending_add + cong->mss * (target - cong->window);
-> +		cubic->pending_add = do_div(target_add, cong->window);
-> +	} else {
-> +		target_add = cubic->pending_add + cong->mss;
-> +		cubic->pending_add = do_div(target_add, 100 * cong->window);
-> +	}
+Changes since v3:
+- driver
+  - Fixed printf format specifier warning
+- Link to v3
+  https://lore.kernel.org/all/20250906041333.642483-1-wens@kernel.org/
 
-Can `window` be 0 here? why?
+Changes since v2:
+- DT binding
+  - Added "select" to avoid matching against all dwmac entries
+- driver
+  - Include "ps" unit in "... must be multiple of ..." error message
+  - Use FIELD_FIT to check if delay value is in range and FIELD_MAX to get
+    the maximum value
+  - Reword error message for delay value exceeding maximum
+  - Drop MASK_TO_VAL
+- Link to v2:
+  https://lore.kernel.org/all/20250813145540.2577789-1-wens@kernel.org/
 
-> +
-> +	pr_debug("%s: target: %llu, window: %u, target_add: %llu\n",
-> +		 __func__, target, cong->window, target_add);
-> +
-> +	/*
-> +	 *                        segments_acked
-> +	 * W    = W    + α      * ──────────────
-> +	 *  est    est    cubic        cwnd
-> +	 */
-> +	m = cubic->pending_w_add + cong->mss * bytes;
-> +	cubic->pending_w_add = do_div(m, cong->window);
-> +	cubic->w_tcp += m;
-> +
-> +	if (cubic->w_tcp > cong->window)
-> +		tcp_add = div64_ul((u64)cong->mss * (cubic->w_tcp - cong->window), cong->window);
-> +
-> +	pr_debug("%s: w_tcp: %u, window: %u, tcp_add: %llu\n",
-> +		 __func__, cubic->w_tcp, cong->window, tcp_add);
-> +
-> +	/* W_cubic(_t_) or _W_est_, whichever is bigger. */
-> +	cong->window += max(tcp_add, target_add);
-> +}
-> +
-> +static void cubic_recovery(struct quic_cong *cong)
-> +{
-> +	struct quic_cubic *cubic = quic_cong_priv(cong);
-> +
-> +	cong->recovery_time = cong->time;
-> +	cubic->epoch_start = U32_MAX;
-> +
-> +	/* rfc9438#section-3.4:
-> +	 *   CUBIC sets the multiplicative window decrease factor (β__cubic_) to 0.7,
-> +	 *   whereas Reno uses 0.5.
-> +	 *
-> +	 * rfc9438#section-4.6:
-> +	 *   ssthresh =  flight_size * β      new  ssthresh
-> +	 *
-> +	 *   Some implementations of CUBIC currently use _cwnd_ instead of _flight_size_ when
-> +	 *   calculating a new _ssthresh_.
-> +	 *
-> +	 * rfc9438#section-4.7:
-> +	 *
-> +	 *          ⎧       1 + β
-> +	 *          ⎪            cubic
-> +	 *          ⎪cwnd * ────────── if  cwnd < W_max and fast convergence
-> +	 *   W    = ⎨           2
-> +	 *    max   ⎪                  enabled, further reduce  W_max
-> +	 *          ⎪
-> +	 *          ⎩cwnd             otherwise, remember cwnd before reduction
-> +	 */
-> +	if (cong->window < cubic->w_last_max)
-> +		cubic->w_last_max = cong->window * 17 / 10 / 2;
-> +	else
-> +		cubic->w_last_max = cong->window;
-> +
-> +	cong->ssthresh = cong->window * 7 / 10;
+Changes since v1:
+- Dropped RFT tag
+- Switched to generic (tx|rx)-internal-delay-ps 
+- dwmac-sun55i driver bits
+  - Changed dev_err() + return to dev_err_probe()
+  - Added check of return value from syscon regmap write
+  - Changed driver name to match file name
+- sram driver bits
+  - Fixed check on return value
+  - Expanded commit message
+- dtsi
+  - Fixed typo in tx-queues-config
+- cubie a5e
+  - Add PHY regulator delay
+- Link to v1:
+  https://lore.kernel.org/all/20250701165756.258356-1-wens@kernel.org/
 
-There are quite a bit of magic numbers that should be replaced by macros
-and/or associated with explainatory comments.
+This series adds support for the second Ethernet controller found on the
+Allwinner A523 SoC family. This controller, dubbed GMAC200, is a DWMAC4
+core with an integration layer around it. The integration layer is
+similar to older Allwinner generations, but with an extra memory bus
+gate and separate power domain.
 
-> +
-> +/* rfc9002#section-5: Estimating the Round-Trip Time */
-> +void quic_cong_rtt_update(struct quic_cong *cong, u32 time, u32 ack_delay)
-> +{
-> +	u32 adjusted_rtt, rttvar_sample;
-> +
-> +	/* Ignore RTT sample if ACK delay is suspiciously large. */
-> +	if (ack_delay > cong->max_ack_delay * 2)
-> +		return;
-> +
-> +	/* rfc9002#section-5.1: latest_rtt = ack_time - send_time_of_largest_acked */
-> +	cong->latest_rtt = cong->time - time;
-> +
-> +	/* rfc9002#section-5.2: Estimating min_rtt */
-> +	if (!cong->min_rtt_valid) {
-> +		cong->min_rtt = cong->latest_rtt;
-> +		cong->min_rtt_valid = 1;
-> +	}
-> +	if (cong->min_rtt > cong->latest_rtt)
-> +		cong->min_rtt = cong->latest_rtt;
-> +
-> +	if (!cong->is_rtt_set) {
-> +		/* rfc9002#section-5.3:
-> +		 *   smoothed_rtt = latest_rtt
-> +		 *   rttvar = latest_rtt / 2
-> +		 */
-> +		cong->smoothed_rtt = cong->latest_rtt;
-> +		cong->rttvar = cong->smoothed_rtt / 2;
-> +		quic_cong_pto_update(cong);
-> +		cong->is_rtt_set = 1;
-> +		return;
-> +	}
-> +
-> +	/* rfc9002#section-5.3:
-> +	 *   adjusted_rtt = latest_rtt
-> +	 *   if (latest_rtt >= min_rtt + ack_delay):
-> +	 *     adjusted_rtt = latest_rtt - ack_delay
-> +	 *   smoothed_rtt = 7/8 * smoothed_rtt + 1/8 * adjusted_rtt
-> +	 *   rttvar_sample = abs(smoothed_rtt - adjusted_rtt)
-> +	 *   rttvar = 3/4 * rttvar + 1/4 * rttvar_sample
-> +	 */
-> +	adjusted_rtt = cong->latest_rtt;
-> +	if (cong->latest_rtt >= cong->min_rtt + ack_delay)
-> +		adjusted_rtt = cong->latest_rtt - ack_delay;
-> +
-> +	cong->smoothed_rtt = (cong->smoothed_rtt * 7 + adjusted_rtt) / 8;
-> +	if (cong->smoothed_rtt >= adjusted_rtt)
-> +		rttvar_sample = cong->smoothed_rtt - adjusted_rtt;
-> +	else
-> +		rttvar_sample = adjusted_rtt - cong->smoothed_rtt;
+Patch 1 adds a new compatible string combo to the existing Allwinner
+EMAC binding.
 
-Here in a few other place before you could use abs_diff()
+Patch 2 adds a new driver for this core and integration combo.
 
-/P
+Patch 3 adds a device node and pinmux settings for the GMAC200.
+
+Patches 4, 5, and 6 enable the GMAC200 on three boards. I only tested
+the Orangepi 4A and Radxa Cubie A5E.
+
+
+Please have a look and help test on the Avaota A1. I don't expect
+any issues there though, since the PHY is always on, unlike on the
+Cubie A5E.
+
+Patches 1 and 2 should go through net-next, and I will take all the
+other patches through the sunxi tree. Hopefully we can get this merged
+for v6.18.
+
+
+Thanks
+ChenYu
+
+Chen-Yu Tsai (6):
+  dt-bindings: net: sun8i-emac: Add A523 GMAC200 compatible
+  net: stmmac: Add support for Allwinner A523 GMAC200
+  arm64: dts: allwinner: a523: Add GMAC200 ethernet controller
+  arm64: dts: allwinner: a527: cubie-a5e: Enable second Ethernet port
+  arm64: dts: allwinner: t527: avaota-a1: enable second Ethernet port
+  arm64: dts: allwinner: t527: orangepi-4a: Enable Ethernet port
+
+ .../net/allwinner,sun8i-a83t-emac.yaml        |  95 ++++++++++-
+ .../arm64/boot/dts/allwinner/sun55i-a523.dtsi |  55 ++++++
+ .../dts/allwinner/sun55i-a527-cubie-a5e.dts   |  28 ++-
+ .../dts/allwinner/sun55i-t527-avaota-a1.dts   |  26 ++-
+ .../dts/allwinner/sun55i-t527-orangepi-4a.dts |  23 +++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  12 ++
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-sun55i.c    | 159 ++++++++++++++++++
+ 8 files changed, 393 insertions(+), 6 deletions(-)
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c
+
+-- 
+2.47.3
 
 
