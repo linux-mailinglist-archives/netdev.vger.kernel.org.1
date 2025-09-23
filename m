@@ -1,127 +1,104 @@
-Return-Path: <netdev+bounces-225586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F8B2B95ABD
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:31:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C398FB95AD2
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:37:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 662BB19C2DC2
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:32:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F58F447FF8
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFC6D302748;
-	Tue, 23 Sep 2025 11:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="V2Xf7M/4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420AB322522;
+	Tue, 23 Sep 2025 11:37:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1BA2566DD
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 11:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1B22ED842;
+	Tue, 23 Sep 2025 11:37:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758627095; cv=none; b=p0SE3rBpIRgb13hEXo3q9U/EyY9h7YSJeHQmdR887Tr7SZUI0xrvcCYjwrdy1JJ1jekLWKKDGfcuob3h2HrkyfBWPJEOqw4nQyWyti2HYm6qw2og/FgSl3CXlXuoxcr/aJuKTrsB8P+v5sxpaBzjSqlSR5T8+0d9s3C4MjoRUfQ=
+	t=1758627430; cv=none; b=COCXl4xoNivdgx5zGz2e8q21qAYW4oMCIy1Xia6tkal1uLwT33jzszU46g5lsorMcEfiBSKLCCCshp9wOGBn7QeQlTmlCyVSLGhsm+uGyT1fzUfkf7gil7NfQTNyvqgo9ACKjBMxLI9o77HxQObtTR+l0WAYxJXgLuvwjEEmObw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758627095; c=relaxed/simple;
-	bh=RMOWqrl/Ki35ImGxMv03acL/JyY7dv7EcjF/8Ea40O4=;
+	s=arc-20240116; t=1758627430; c=relaxed/simple;
+	bh=uzUZxWdNwLXaq2vkcCdfykg45qz1g3WKbSfUMKaIkq8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JXgZmjlG8bbvDfZ30eOsOen86YNx4nXZmoJIGZUvzQxDnVaul1Qqafq3hOJReBXCYQDD0p3nvFUtGR+FERod9NIGSldb/Kk80h7+3tYOKXlt+mDX6jW/Ac+DOAntiysPAOTTaORWpfKA5ysCC4vnYTnxJTzpjxDdiWVptIZPmvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=V2Xf7M/4; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=FqqitcQCkxhV32rTsJ+uCNxHvhC6YeG2qjPkLgt2EmY=; b=V2Xf7M/44Zue2oMyR0jrB+6qMg
-	7ZAh961BrfLS0ajhseeoLhfyHCGNfHPNryrtiAnligon5imjUELBnAYYeYvGEq8HyMCjvXGG18NeR
-	xX45bLWzxrnwcB0j2Yuoglb08+J7TKgm0LM9hQOtYHtqGNt/4LLi/I5MvXUR0NQgnNiUhEG5hUbCb
-	JDYoTT3RoUIm3MA855yGNesZCF5JUQgQT8BS9MXHIxnoViLqZaISaVBU/hb0hizZXSiz2+qH5qEXO
-	pgg/MesL/bYJCJJnAnbqqg0IgZRGp7D8trqHGNCTboXfcIhzp4fb1h7R3YigLmTnbHn8DxIhHllQS
-	q3C2v+Fg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54658)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1v11F2-000000007BP-0BY1;
-	Tue, 23 Sep 2025 12:31:28 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1v11Ez-0000000066T-3bkC;
-	Tue, 23 Sep 2025 12:31:25 +0100
-Date: Tue, 23 Sep 2025 12:31:25 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=hxU7N5aRDuDCJstya27Zh6JyPJ2stwHT5PuI4NzC7NhK0Ju74erJqtRgn8XaGDiRBcza8ilfwhsaX+6/P6jr66TwEi5hjPzKnDL4MBpiavYnJtl9Ie07j4hr39NqY64H7SgA1vYWlq+10O0sG7DrbptGz4RLPfaAtuKbXGo2PNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 32F0E6061B; Tue, 23 Sep 2025 13:36:58 +0200 (CEST)
+Date: Tue, 23 Sep 2025 13:36:57 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Daniil Tatianin <d-tatianin@yandex-team.ru>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>, Phil Sutter <phil@nwl.cc>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 0/6] net: stmmac: yet more cleanups
-Message-ID: <aNKFDW_aaSZl2NFE@shell.armlinux.org.uk>
-References: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/3] netfilter/x_tables: go back to using vmalloc for
+ xt_table_info
+Message-ID: <aNKGWZSxY9RC0VWS@strlen.de>
+References: <20250922194819.182809-1-d-tatianin@yandex-team.ru>
+ <20250922194819.182809-2-d-tatianin@yandex-team.ru>
+ <CANn89i+GoVZLcdHxuf33HpmgyPNKxGqEjXGpi=XiB-QOsAG52A@mail.gmail.com>
+ <5f1ff52a-d2c2-40de-b00c-661b75c18dc7@yandex-team.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5f1ff52a-d2c2-40de-b00c-661b75c18dc7@yandex-team.ru>
 
-On Tue, Sep 23, 2025 at 12:25:30PM +0100, Russell King (Oracle) wrote:
-> Building on the previous cleanup series, this cleans up yet more stmmac
-> code.
-> 
-> - Move stmmac_bus_clks_config() into stmmac_platform() which is where
->   its onlny user is.
-> 
-> - Move the xpcs Clause 73 test into stmmac_init_phy(), resulting in
->   simpler code in __stmmac_open().
-> 
-> - Move "can't attach PHY" error message into stmmac_init_phy().
-> 
-> We then start moving stuff out of __stmac_open() into stmmac_open()
-> (and correspondingly __stmmac_release() into stmmac_release()) which
-> is not necessary when re-initialising the interface on e.g. MTU change.
-> 
-> - Move initialisation of tx_lpi_timer
-> - Move PHY attachment/detachment
-> - Move PHY error message into stmmac_init_phy()
-> 
-> Finally, simplfy the paths in stmmac_init_phy().
-> 
->  drivers/net/ethernet/stmicro/stmmac/stmmac.h       |   1 -
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  | 111 ++++++++-------------
->  .../net/ethernet/stmicro/stmmac/stmmac_platform.c  |  32 ++++++
->  3 files changed, 73 insertions(+), 71 deletions(-)
+Daniil Tatianin <d-tatianin@yandex-team.ru> wrote:
+> > On Mon, Sep 22, 2025 at 12:48 PM Daniil Tatianin
+> > <d-tatianin@yandex-team.ru> wrote:
+> >> This code previously always used vmalloc for anything above
+> >> PAGE_ALLOC_COSTLY_ORDER, but this logic was changed in
+> >> commit eacd86ca3b036 ("net/netfilter/x_tables.c: use kvmalloc() in xt_alloc_table_info()").
+> >>
+> >> The commit that changed it did so because "xt_alloc_table_info()
+> >> basically opencodes kvmalloc()", which is not actually what it was
+> >> doing. kvmalloc() does not attempt to go directly to vmalloc if the
+> >> order the caller is trying to allocate is "expensive", instead it only
+> >> uses vmalloc as a fallback in case the buddy allocator is not able to
+> >> fullfill the request.
+> >>
+> >> The difference between the two is actually huge in case the system is
+> >> under memory pressure and has no free pages of a large order. Before the
+> >> change to kvmalloc we wouldn't even try going to the buddy allocator for
+> >> large orders, but now we would force it to try to find a page of the
+> >> required order by waking up kswapd/kcompactd and dropping reclaimable memory
+> >> for no reason at all to satisfy our huge order allocation that could easily
+> >> exist within vmalloc'ed memory instead.
+> > This would hint at an issue with kvmalloc(), why not fixing it, instead
+> > of trying to fix all its users ?
 
-Should've added: tested on nVidia Jetson Xavier NX.
+I agree with Eric.  There is nothing special in xtables compared to
+kvmalloc usage elsewhere in the stack.  Why "fix" xtables and not e.g.
+rhashtable?
 
-However, observed a failure changing the MTU with the link down - our
-old friend, failure to complete the DMA reset.
+Please work with mm hackers to improve the situation for your use case.
 
-Once that's been triggered, taking the interface down or changing the
-MTU again results in more problems, with the thread spinning in
-napi_disable_locked() with RTNL held (as we effectively end up calling
-napi_disable() twice on the same napi struct.)
+Maybe its enough to raise __GFP_NORETRY in kmalloc_gfp_adjust() if size
+results in >= PAGE_ALLOC_COSTLY_ORDER allocation.
 
-This basically makes the platforms networking unusable - and needs to
-be hard-reset.
+> Thanks for the quick reply! From my understanding, there is a lot of 
+> callers of kvmalloc
+> who do indeed benefit from the physical memory being contiguous, because 
+> it is then
+> used for hardware DMA etc., so I'm not sure that would be feasible.
 
-These issues pre-exist all my cleanups.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+How can that work?  kvmalloc won't make vmalloc backed memory
+physically contiguous.
 
