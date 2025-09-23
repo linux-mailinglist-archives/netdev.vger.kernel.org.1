@@ -1,303 +1,303 @@
-Return-Path: <netdev+bounces-225686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A47DB96D70
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 18:33:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50097B96D8E
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 18:36:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFCD23A7576
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 16:33:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 962C016C651
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 16:36:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302C1327A33;
-	Tue, 23 Sep 2025 16:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A01A328580;
+	Tue, 23 Sep 2025 16:36:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nemr63Fb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NBEcD5Qi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C0F327A2D
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 16:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1270328587
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 16:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758645214; cv=none; b=CJSr/pKqQh4ltwCVX0+wBdsY5NfPe+97U5P6XiqljHDJc/Kzu1eW2CVLtUL27fnPlHktgmb/Gwh28O32ayBP6HaHmFYMfYNpIPJnPNBQ7OaUmZCm/O0J3p0kVkk/NgBZ7HKWl7ehHPNvTaoxEBb08Y4awPxoKArzzXRZujBEXCo=
+	t=1758645399; cv=none; b=YHXSFUdGvnFMI03Jtf4mbRjCIBLUdwV3grt7zsgBWyDm8lK3p7le58ASTpayawLpfCpJMZH9paSh26CF/nBRxhGzeOClXmY+AstVpXSRS5EidyRQq0QWf9JBWL/RhpLkXSXcOEJjXN7O2lx59yts5/+/PFAxrm5UdUzRGF9G1H8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758645214; c=relaxed/simple;
-	bh=yyxLKFRUSaOLMyipF1taoQiRhF8zu9NLYdzoTScfv00=;
+	s=arc-20240116; t=1758645399; c=relaxed/simple;
+	bh=WRbvQlH5wzDRTJnGfw2q29Hf/ZHyrfDOIIYTdpuj9BM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=US4YiP1IOm2vXuseDRMoO9NI9kx4U0XtrY4StQX4XjZ+1CCIJEjAzjKRfgzjohBj0j3zjjk4d7LEjqpFZBovQt/so4fCzA2TcHPLotRFZ9chutZAd0xGWPNm0U8bPyxbGhJ22KPM53VIWk1qljjnpD3/2LjJNBlSC4PnFOawvwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nemr63Fb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8014CC4CEF5;
-	Tue, 23 Sep 2025 16:33:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758645213;
-	bh=yyxLKFRUSaOLMyipF1taoQiRhF8zu9NLYdzoTScfv00=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Nemr63Fbqh6w+kFZnOKSJH+v2ugbEUdcPhuyOPLSRogRVG71ZKTMWINbpNzcLva4+
-	 NoZ0DRoKeiufTxGcBbRop4qB5to9LOxjbxvOPwDBnZiWXjXFzFt7p1XloX0GwqV2hx
-	 eZx6Y7FxB5siOUIpxRvjhuSlceFUaPC6ESyrW5WxbqjWbn1FVuFSt6xWNnP0FUx5cn
-	 fVlDnSgo0lbQzAIrTm9RxkCNi1jy7f+VuAS+RGz7VcOjnwMvZ9cHsGXNtPB1RcYSSt
-	 SpuKRCyMkIwAakpNLaQKHMxKB/HcziQih3MHSAoW+YJAGqzheEdIt8gPKIsYvtFhm6
-	 26KOXDYZ/SURg==
-Date: Tue, 23 Sep 2025 09:33:32 -0700
-From: Saeed Mahameed <saeed@kernel.org>
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: jgg@ziepe.ca, michael.chan@broadcom.com, dave.jiang@intel.com,
-	saeedm@nvidia.com, Jonathan.Cameron@huawei.com, davem@davemloft.net,
-	corbet@lwn.net, edumazet@google.com, gospo@broadcom.com,
-	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, selvin.xavier@broadcom.com, leon@kernel.org,
-	kalesh-anakkur.purayil@broadcom.com
-Subject: Re: [PATCH net-next v2 1/6] bnxt_en: Move common definitions to
- include/linux/bnxt/
-Message-ID: <aNLL3L2SERi2IRhg@x130>
-References: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
- <20250923095825.901529-2-pavan.chebbi@broadcom.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=b842JnQVjJQhbwzBKOOErpR19KW0tay9h3p8QTRmwNWl7MkNqCCdKhGmhtsW3bPpCNbEZwGSzUdhxUFAv7X67qFWPqGFNcG1PggV3H2l0fwpCW3lXm+MT5HO2pjQRq82GINEnBZKzJ/swue7DqxQLwapU0DMogIzXelwpOhv9LA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NBEcD5Qi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758645396;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4zPpYQN6ZewmJa/VE3YRRkMpzAS6jQaLK0K7KotGZpQ=;
+	b=NBEcD5Qiv2gX0T753SGheBABSh8/ttSYFCmv1qWl/Fnx92Gwx+QC+gu4qg9iY7ONhdO9vu
+	awR7mU70XecMqFcCAp5QaqCC0jyNlOGrgM3u6avZOsijgGYhKF7dwSsNMDa3F6yaiX6Zc3
+	/b9J6z8PF8MUihh2N5/r4zsjF4DxjPI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-344-Rt-GDcEINAu7w5_Y2vWbiw-1; Tue, 23 Sep 2025 12:36:35 -0400
+X-MC-Unique: Rt-GDcEINAu7w5_Y2vWbiw-1
+X-Mimecast-MFC-AGG-ID: Rt-GDcEINAu7w5_Y2vWbiw_1758645394
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3ee10a24246so3975240f8f.3
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 09:36:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758645394; x=1759250194;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4zPpYQN6ZewmJa/VE3YRRkMpzAS6jQaLK0K7KotGZpQ=;
+        b=cMXOptEFSZdFzzuvkSU0E44tB1sqZkvcrki2fQviGO87imXQs5gfJC1o0VfudzARlG
+         sg7sQUDHGjRl+rYlQtxgNDDP7mK17oID6YIjAn5GWOeGlOEIGKIpo7gtlNhv66uPmVBA
+         JUvvCgkusKPdImJiMfzyagn4iRroDlorSIr6EMrjc7CPbuYXn6rT7FYv0pxPKCh9aXY2
+         aUcAyuolR2Mjk2fO+TTOydGTNddMcMzAM9mEq3SOo7CiGAqG2gNHc1SpUbzs5+OeJQqW
+         TD/sE9GW8YgSBqeqch84GFIvP9AYVxTvcyOHcH1fCbH9OytEi69s+zarm75/Bmuvx8t6
+         Aeeg==
+X-Forwarded-Encrypted: i=1; AJvYcCU9WX8R/9ARGoHJtElrevn0QTquFdibwdxxt4MLwHpIGk5S3+AiwOchYefn4t8JE6p0KapYn38=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLwvB+Qj3/IgLSGn3OddipFJZeI6GLn0hCtPHEEOApx1vWUOll
+	8gMBqVU7k2dz4qrc7b/0zvIKDf0X4imiTKVhFdnobzO/nxRpUx4gFO583METh68wQ7VwdEgQm18
+	Gx/lNNDbtNqG4MSU96vnT4LQ8GMEDfDanSP2xULfLIbi6ZERMa9/6f2vV9g==
+X-Gm-Gg: ASbGncuCOOidk/ggvXP/ZsLg+El7pMPD8ZsBaCmzmSQIXADuwazpntuP7nQ0iBzJSgp
+	fkWDTeJzvhn9dT9CUMYrBfCBx51vQjdvLwQYhZ5HOD33mx2/pgszHU3HpzotzGsLMJMBiO/Ey2P
+	XfJpYDzMrydjDsvm7HS2hZNGbxInQkZi5bngtuNrsb0Sf8zpTzrHibmjUGjXTjmKC7ZZr+FOvaO
+	vyCKRHl8JU7/9qA+wfyvgRkxBmC4iIZHFdl/HlZeeEe4BHbK1zzmMSnmxmcdxX+irqqLGqJL+la
+	M4h/pv5wdk3lS1tcylvvFN7LDRnMXbXR+G0=
+X-Received: by 2002:a05:6000:1a87:b0:3ff:f55b:274a with SMTP id ffacd0b85a97d-405cb6c6b56mr2974003f8f.43.1758645393685;
+        Tue, 23 Sep 2025 09:36:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEOZ04vpd4BJvD9C2hR3DHmCmGT6e5v2KZ+8ep2PmkrMv09043lQZ0v8NtS5c34X1dkjLA54g==
+X-Received: by 2002:a05:6000:1a87:b0:3ff:f55b:274a with SMTP id ffacd0b85a97d-405cb6c6b56mr2973978f8f.43.1758645393257;
+        Tue, 23 Sep 2025 09:36:33 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-464f64ad359sm288273635e9.22.2025.09.23.09.36.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 09:36:32 -0700 (PDT)
+Date: Tue, 23 Sep 2025 12:36:30 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	eperezma@redhat.com, stephen@networkplumber.org, leiyang@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, kvm@vger.kernel.org,
+	Tim Gebauer <tim.gebauer@tu-dortmund.de>
+Subject: Re: [PATCH net-next v5 4/8] TUN & TAP: Wake netdev queue after
+ consuming an entry
+Message-ID: <20250923123101-mutt-send-email-mst@kernel.org>
+References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+ <20250922221553.47802-5-simon.schippers@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250923095825.901529-2-pavan.chebbi@broadcom.com>
+In-Reply-To: <20250922221553.47802-5-simon.schippers@tu-dortmund.de>
 
-On 23 Sep 02:58, Pavan Chebbi wrote:
->We have common definitions that are now going to be used
->by more than one component outside of bnxt (bnxt_re and
->fwctl)
->
->Move bnxt_ulp.h to include/linux/bnxt/ as ulp.h.
->Have a new common.h, also at the same place that will
->have some non-ulp but shared bnxt declarations.
->
->Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
->Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
->---
-> drivers/infiniband/hw/bnxt_re/debugfs.c       |  2 +-
-> drivers/infiniband/hw/bnxt_re/main.c          |  2 +-
-> drivers/infiniband/hw/bnxt_re/qplib_fp.c      |  2 +-
-> drivers/infiniband/hw/bnxt_re/qplib_res.h     |  2 +-
-> drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  2 +-
-> drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  7 +------
-> .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |  2 +-
-> .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  2 +-
-> .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |  2 +-
-> drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c |  2 +-
-> include/linux/bnxt/common.h                   | 20 +++++++++++++++++++
-> .../bnxt_ulp.h => include/linux/bnxt/ulp.h    |  0
-> 12 files changed, 30 insertions(+), 15 deletions(-)
-> create mode 100644 include/linux/bnxt/common.h
-> rename drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h => include/linux/bnxt/ulp.h (100%)
->
->diff --git a/drivers/infiniband/hw/bnxt_re/debugfs.c b/drivers/infiniband/hw/bnxt_re/debugfs.c
->index e632f1661b92..a9dd3597cfbc 100644
->--- a/drivers/infiniband/hw/bnxt_re/debugfs.c
->+++ b/drivers/infiniband/hw/bnxt_re/debugfs.c
->@@ -9,8 +9,8 @@
-> #include <linux/debugfs.h>
-> #include <linux/pci.h>
-> #include <rdma/ib_addr.h>
->+#include <linux/bnxt/ulp.h>
->
->-#include "bnxt_ulp.h"
-> #include "roce_hsi.h"
-> #include "qplib_res.h"
-> #include "qplib_sp.h"
->diff --git a/drivers/infiniband/hw/bnxt_re/main.c b/drivers/infiniband/hw/bnxt_re/main.c
->index df7cf8d68e27..b773556fc5e9 100644
->--- a/drivers/infiniband/hw/bnxt_re/main.c
->+++ b/drivers/infiniband/hw/bnxt_re/main.c
->@@ -55,8 +55,8 @@
-> #include <rdma/ib_umem.h>
-> #include <rdma/ib_addr.h>
-> #include <linux/hashtable.h>
->+#include <linux/bnxt/ulp.h>
->
->-#include "bnxt_ulp.h"
-> #include "roce_hsi.h"
-> #include "qplib_res.h"
-> #include "qplib_sp.h"
->diff --git a/drivers/infiniband/hw/bnxt_re/qplib_fp.c b/drivers/infiniband/hw/bnxt_re/qplib_fp.c
->index ee36b3d82cc0..bb252cd8509b 100644
->--- a/drivers/infiniband/hw/bnxt_re/qplib_fp.c
->+++ b/drivers/infiniband/hw/bnxt_re/qplib_fp.c
->@@ -46,6 +46,7 @@
-> #include <linux/delay.h>
-> #include <linux/prefetch.h>
-> #include <linux/if_ether.h>
->+#include <linux/bnxt/ulp.h>
-> #include <rdma/ib_mad.h>
->
-> #include "roce_hsi.h"
->@@ -55,7 +56,6 @@
-> #include "qplib_sp.h"
-> #include "qplib_fp.h"
-> #include <rdma/ib_addr.h>
->-#include "bnxt_ulp.h"
-> #include "bnxt_re.h"
-> #include "ib_verbs.h"
->
->diff --git a/drivers/infiniband/hw/bnxt_re/qplib_res.h b/drivers/infiniband/hw/bnxt_re/qplib_res.h
->index 6a13927674b4..7cdddf921b48 100644
->--- a/drivers/infiniband/hw/bnxt_re/qplib_res.h
->+++ b/drivers/infiniband/hw/bnxt_re/qplib_res.h
->@@ -39,7 +39,7 @@
-> #ifndef __BNXT_QPLIB_RES_H__
-> #define __BNXT_QPLIB_RES_H__
->
->-#include "bnxt_ulp.h"
->+#include <linux/bnxt/ulp.h>
->
-> extern const struct bnxt_qplib_gid bnxt_qplib_gid_zero;
->
->diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->index d59612d1e176..917a39f8865c 100644
->--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->@@ -59,10 +59,10 @@
-> #include <net/netdev_rx_queue.h>
-> #include <linux/pci-tph.h>
-> #include <linux/bnxt/hsi.h>
->+#include <linux/bnxt/ulp.h>
->
-> #include "bnxt.h"
-> #include "bnxt_hwrm.h"
->-#include "bnxt_ulp.h"
-> #include "bnxt_sriov.h"
-> #include "bnxt_ethtool.h"
-> #include "bnxt_dcb.h"
->diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
->index 06a4c2afdf8a..2578bac16f6c 100644
->--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
->+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
->@@ -33,6 +33,7 @@
-> #ifdef CONFIG_TEE_BNXT_FW
-> #include <linux/firmware/broadcom/tee_bnxt_fw.h>
-> #endif
->+#include <linux/bnxt/common.h>
->
-> #define BNXT_DEFAULT_RX_COPYBREAK 256
-> #define BNXT_MAX_RX_COPYBREAK 1024
->@@ -2075,12 +2076,6 @@ struct bnxt_fw_health {
-> #define BNXT_FW_IF_RETRY		10
-> #define BNXT_FW_SLOT_RESET_RETRY	4
->
->-struct bnxt_aux_priv {
->-	struct auxiliary_device aux_dev;
->-	struct bnxt_en_dev *edev;
->-	int id;
->-};
->-
-> enum board_idx {
-> 	BCM57301,
-> 	BCM57302,
->diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
->index 02961d93ed35..cfcd3335a2d3 100644
->--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
->+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
->@@ -13,12 +13,12 @@
-> #include <net/devlink.h>
-> #include <net/netdev_lock.h>
-> #include <linux/bnxt/hsi.h>
->+#include <linux/bnxt/ulp.h>
-> #include "bnxt.h"
-> #include "bnxt_hwrm.h"
-> #include "bnxt_vfr.h"
-> #include "bnxt_devlink.h"
-> #include "bnxt_ethtool.h"
->-#include "bnxt_ulp.h"
-> #include "bnxt_ptp.h"
-> #include "bnxt_coredump.h"
-> #include "bnxt_nvm_defs.h"
->diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
->index be32ef8f5c96..3231d3c022dc 100644
->--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
->+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
->@@ -27,9 +27,9 @@
-> #include <net/netdev_queues.h>
-> #include <net/netlink.h>
-> #include <linux/bnxt/hsi.h>
->+#include <linux/bnxt/ulp.h>
-> #include "bnxt.h"
-> #include "bnxt_hwrm.h"
->-#include "bnxt_ulp.h"
-> #include "bnxt_xdp.h"
-> #include "bnxt_ptp.h"
-> #include "bnxt_ethtool.h"
->diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
->index 80fed2c07b9e..84c43f83193a 100644
->--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
->+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
->@@ -17,9 +17,9 @@
-> #include <linux/etherdevice.h>
-> #include <net/dcbnl.h>
-> #include <linux/bnxt/hsi.h>
->+#include <linux/bnxt/ulp.h>
-> #include "bnxt.h"
-> #include "bnxt_hwrm.h"
->-#include "bnxt_ulp.h"
-> #include "bnxt_sriov.h"
-> #include "bnxt_vfr.h"
-> #include "bnxt_ethtool.h"
->diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
->index 61cf201bb0dc..992eec874345 100644
->--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
->+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
->@@ -22,10 +22,10 @@
-> #include <linux/auxiliary_bus.h>
-> #include <net/netdev_lock.h>
-> #include <linux/bnxt/hsi.h>
->+#include <linux/bnxt/ulp.h>
->
-> #include "bnxt.h"
-> #include "bnxt_hwrm.h"
->-#include "bnxt_ulp.h"
->
-> static DEFINE_IDA(bnxt_aux_dev_ids);
->
->diff --git a/include/linux/bnxt/common.h b/include/linux/bnxt/common.h
->new file mode 100644
->index 000000000000..2ee75a0a1feb
->--- /dev/null
->+++ b/include/linux/bnxt/common.h
->@@ -0,0 +1,20 @@
->+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->+/*
->+ * Copyright (c) 2025, Broadcom Corporation
->+ *
->+ */
->+
->+#ifndef BNXT_COMN_H
->+#define BNXT_COMN_H
->+
->+#include <linux/bnxt/hsi.h>
->+#include <linux/bnxt/ulp.h>
->+#include <linux/auxiliary_bus.h>
->+
->+struct bnxt_aux_priv {
->+	struct auxiliary_device aux_dev;
->+	struct bnxt_en_dev *edev;
->+	int id;
->+};
->+
+On Tue, Sep 23, 2025 at 12:15:49AM +0200, Simon Schippers wrote:
+> The new wrappers tun_ring_consume/tap_ring_consume deal with consuming an
+> entry of the ptr_ring and then waking the netdev queue when entries got
+> invalidated to be used again by the producer.
+> To avoid waking the netdev queue when the ptr_ring is full, it is checked
+> if the netdev queue is stopped before invalidating entries. Like that the
+> netdev queue can be safely woken after invalidating entries.
+> 
+> The READ_ONCE in __ptr_ring_peek, paired with the smp_wmb() in
+> __ptr_ring_produce within tun_net_xmit guarantees that the information
+> about the netdev queue being stopped is visible after __ptr_ring_peek is
+> called.
+> 
+> The netdev queue is also woken after resizing the ptr_ring.
+> 
+> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> ---
+>  drivers/net/tap.c | 44 +++++++++++++++++++++++++++++++++++++++++++-
+>  drivers/net/tun.c | 47 +++++++++++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 88 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+> index 1197f245e873..f8292721a9d6 100644
+> --- a/drivers/net/tap.c
+> +++ b/drivers/net/tap.c
+> @@ -753,6 +753,46 @@ static ssize_t tap_put_user(struct tap_queue *q,
+>  	return ret ? ret : total;
+>  }
+>  
+> +static struct sk_buff *tap_ring_consume(struct tap_queue *q)
+> +{
+> +	struct netdev_queue *txq;
+> +	struct net_device *dev;
+> +	bool will_invalidate;
+> +	bool stopped;
+> +	void *ptr;
+> +
+> +	spin_lock(&q->ring.consumer_lock);
+> +	ptr = __ptr_ring_peek(&q->ring);
+> +	if (!ptr) {
+> +		spin_unlock(&q->ring.consumer_lock);
+> +		return ptr;
+> +	}
+> +
+> +	/* Check if the queue stopped before zeroing out, so no ptr get
+> +	 * produced in the meantime, because this could result in waking
+> +	 * even though the ptr_ring is full.
 
-This file is redundant since ulp.h already holds every thing "aux", so this
-struct belongs there. Also the only place you include this is file:
-   drivers/net/ethernet/broadcom/bnxt/bnxt.h
+So what? Maybe it would be a bit suboptimal? But with your design, I do
+not get what prevents this:
 
-So I am not sure if you have your include paths properly setup to avoid
-cross subsystem includes, in-case this was the point of this patch :).
 
->diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h b/include/linux/bnxt/ulp.h
->similarity index 100%
->rename from drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
->rename to include/linux/bnxt/ulp.h
->-- 
->2.39.1
->
->
+	stopped? -> No
+		ring is stopped
+	discard
+
+and queue stays stopped forever
+
+
+> The order of the operations
+> +	 * is ensured by barrier().
+> +	 */
+> +	will_invalidate = __ptr_ring_will_invalidate(&q->ring);
+> +	if (unlikely(will_invalidate)) {
+> +		rcu_read_lock();
+> +		dev = rcu_dereference(q->tap)->dev;
+> +		txq = netdev_get_tx_queue(dev, q->queue_index);
+> +		stopped = netif_tx_queue_stopped(txq);
+> +	}
+> +	barrier();
+> +	__ptr_ring_discard_one(&q->ring, will_invalidate);
+> +
+> +	if (unlikely(will_invalidate)) {
+> +		if (stopped)
+> +			netif_tx_wake_queue(txq);
+> +		rcu_read_unlock();
+> +	}
+
+
+After an entry is consumed, you can detect this by checking
+
+	                r->consumer_head >= r->consumer_tail
+
+
+so it seems you could keep calling regular ptr_ring_consume
+and check afterwards?
+
+
+
+
+> +	spin_unlock(&q->ring.consumer_lock);
+> +
+> +	return ptr;
+> +}
+> +
+>  static ssize_t tap_do_read(struct tap_queue *q,
+>  			   struct iov_iter *to,
+>  			   int noblock, struct sk_buff *skb)
+> @@ -774,7 +814,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
+>  					TASK_INTERRUPTIBLE);
+>  
+>  		/* Read frames from the queue */
+> -		skb = ptr_ring_consume(&q->ring);
+> +		skb = tap_ring_consume(q);
+>  		if (skb)
+>  			break;
+>  		if (noblock) {
+> @@ -1207,6 +1247,8 @@ int tap_queue_resize(struct tap_dev *tap)
+>  	ret = ptr_ring_resize_multiple_bh(rings, n,
+>  					  dev->tx_queue_len, GFP_KERNEL,
+>  					  __skb_array_destroy_skb);
+> +	if (netif_running(dev))
+> +		netif_tx_wake_all_queues(dev);
+>  
+>  	kfree(rings);
+>  	return ret;
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index c6b22af9bae8..682df8157b55 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -2114,13 +2114,53 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+>  	return total;
+>  }
+>  
+> +static void *tun_ring_consume(struct tun_file *tfile)
+> +{
+> +	struct netdev_queue *txq;
+> +	struct net_device *dev;
+> +	bool will_invalidate;
+> +	bool stopped;
+> +	void *ptr;
+> +
+> +	spin_lock(&tfile->tx_ring.consumer_lock);
+> +	ptr = __ptr_ring_peek(&tfile->tx_ring);
+> +	if (!ptr) {
+> +		spin_unlock(&tfile->tx_ring.consumer_lock);
+> +		return ptr;
+> +	}
+> +
+> +	/* Check if the queue stopped before zeroing out, so no ptr get
+> +	 * produced in the meantime, because this could result in waking
+> +	 * even though the ptr_ring is full. The order of the operations
+> +	 * is ensured by barrier().
+> +	 */
+> +	will_invalidate = __ptr_ring_will_invalidate(&tfile->tx_ring);
+> +	if (unlikely(will_invalidate)) {
+> +		rcu_read_lock();
+> +		dev = rcu_dereference(tfile->tun)->dev;
+> +		txq = netdev_get_tx_queue(dev, tfile->queue_index);
+> +		stopped = netif_tx_queue_stopped(txq);
+> +	}
+> +	barrier();
+> +	__ptr_ring_discard_one(&tfile->tx_ring, will_invalidate);
+> +
+> +	if (unlikely(will_invalidate)) {
+> +		if (stopped)
+> +			netif_tx_wake_queue(txq);
+> +		rcu_read_unlock();
+> +	}
+> +	spin_unlock(&tfile->tx_ring.consumer_lock);
+> +
+> +	return ptr;
+> +}
+> +
+>  static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>  {
+>  	DECLARE_WAITQUEUE(wait, current);
+>  	void *ptr = NULL;
+>  	int error = 0;
+>  
+> -	ptr = ptr_ring_consume(&tfile->tx_ring);
+> +	ptr = tun_ring_consume(tfile);
+>  	if (ptr)
+>  		goto out;
+>  	if (noblock) {
+> @@ -2132,7 +2172,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>  
+>  	while (1) {
+>  		set_current_state(TASK_INTERRUPTIBLE);
+> -		ptr = ptr_ring_consume(&tfile->tx_ring);
+> +		ptr = tun_ring_consume(tfile);
+>  		if (ptr)
+>  			break;
+>  		if (signal_pending(current)) {
+> @@ -3621,6 +3661,9 @@ static int tun_queue_resize(struct tun_struct *tun)
+>  					  dev->tx_queue_len, GFP_KERNEL,
+>  					  tun_ptr_free);
+>  
+> +	if (netif_running(dev))
+> +		netif_tx_wake_all_queues(dev);
+> +
+>  	kfree(rings);
+>  	return ret;
+>  }
+> -- 
+> 2.43.0
+
 
