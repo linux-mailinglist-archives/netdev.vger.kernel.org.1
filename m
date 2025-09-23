@@ -1,61 +1,55 @@
-Return-Path: <netdev+bounces-225685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06531B96D2E
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 18:27:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 031ADB96D7C
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 18:34:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0B4619C6812
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 16:27:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDF152A2C85
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 16:34:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B5D7322C98;
-	Tue, 23 Sep 2025 16:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2DA4327A39;
+	Tue, 23 Sep 2025 16:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="LID7HP6c"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IxSv1tFb"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281E0321F32;
-	Tue, 23 Sep 2025 16:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8735E327A3D
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 16:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758644806; cv=none; b=cvks4yk5sHXcoKTOFe1vCucitehfvUIQvUT7F/M4CMj7C0qW21qtxKXPkRCKcltzCckjnd5Mv7sIiodaH9tEqvFXTnITRm/Fk/kbiC/Iie94fkj//j58Pycpi0ib38bFiKQIOvPpoSKpJkD7s8H/hzlQgt9HTobv2ePNue96Ve0=
+	t=1758645238; cv=none; b=YMFtH46C5ThP5RO2Rcc4tfmZwCoS/IMjLqJA1qbpc5pQowYTYFnKEVosW2Y4u87Oxa5UcOYR+n+hr1fjfeyr6gGCH+gfEPXxESnG5KOzo+mFDIOHy2OOMObP9nYdCtxOWPIhBMXAKjw91CIJ+s4y4DQ7tHqgv3/r3X4hk6XLCTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758644806; c=relaxed/simple;
-	bh=KrrHFMCnA6aF9D42XKfDP34xwEGQRzGrpfvKFl2dIlg=;
+	s=arc-20240116; t=1758645238; c=relaxed/simple;
+	bh=oQO5uXI6/yKG4Ie6ao7EnmBkagYnHlh4OZll8X7T5H4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gfpx7nQAorQ5XAFJ0VqPD1PbASlmzJEAEpILRWAKgXN5jQrIFJ65SAvZ/C53HymV7hK15qOrYM756yk3CNcHC9gB96ODUNsrf4eZaY1kzYrVMvEHLQs7A9qWX09EtwCsOxDdhHV9NM+A7GPWf97fWsf9xktV/l9V0EjFu0JSEic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=LID7HP6c; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=nxbdRgQK7ciHStyImT6Z+i9IRJCZrEuPc/ZPzT/mo1c=; b=LID7HP6cYkhRWPwIQiarJCoQYr
-	Zg+DgrnU7iHE3z6Pq9f4BQHHFYTDTe8UVgrh3Rs9Dwn1nBoGW+Lzpb9De8dIeDRarmJx3ehwoJzBm
-	xfhsvy+ZOxW1q2Db3qNHZKEgYmYpvwb2FuKa9E4cBC0bNZoCqBkwpzGTcPJBnX86bRWwvEjG2tO3g
-	l7yYJOCFpfho9+gNKEm0R8exMBjRz67gMy50zmclZ45MWiWnyF7GbBeCeOCws49kcvXYcS1izI4oP
-	tW3+0DDBkxdd6UmO+8EgEimV4F0sMckWhPUxreOZZEVhBh7dm6JakHQOZgj8dtZXs0aOKzQs7polP
-	GePrgqUQ==;
-Received: from sslproxy07.your-server.de ([78.47.199.104])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1v15qL-000OF5-0q;
-	Tue, 23 Sep 2025 18:26:17 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1v15qJ-000ECX-39;
-	Tue, 23 Sep 2025 18:26:16 +0200
-Message-ID: <3715920a-a8b6-4025-9f8f-ba847a5eb7f5@iogearbox.net>
-Date: Tue, 23 Sep 2025 18:26:15 +0200
+	 In-Reply-To:Content-Type; b=OChi5PO0HWHUIB/pNlPVfrMPGGzy5HGSG4JIjUdBUU24v6yLAmRYWxtIaZscBfRnpxrVVb8okiQsuOfovBAwQjiRhA/0k/nioFHq9LfK9gqXp8bshRYrpQRHV3waLoYUXynQqRUAc9uGqFAozad3f4iZgPImQOw17r8MndolIGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IxSv1tFb; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 8307C1A0EA4;
+	Tue, 23 Sep 2025 16:33:49 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 4701860690;
+	Tue, 23 Sep 2025 16:33:49 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D8CC2102F1960;
+	Tue, 23 Sep 2025 18:33:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1758645227; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=Nf6TbTTKpnL7mG5m//aAjoL13/cGP7KHINrrFH8p8l8=;
+	b=IxSv1tFbbPL+umkvEM7djR6Yg3cz7Q2UpQOiuIDLVBOMNmPas+rqfuSPpYEwwmPnwbbhX7
+	iyU8gRAEFEJxOGVjk8oFOFWqQuy193oS6ZkWZpkcspm4SOvyMGLSOcQiClfSkZGuzzMd/x
+	mLJHUPoAEORo8qPGaXuGZD9o2RMTCUz/YiULpu35NKxe33xKoLQGEGmuntusBxIE+/PuAx
+	bvmgZZ8PVFakA5zNOGZgzYYrnHournuWPnsbUmBuK43eReNjZ28U2VPgEmhK/7LSESXVZ/
+	wngvVxssQbdW6trXKSOS0w4l66tKt7FP4VecgcIMU7IYm57HE55YXPI6spxjHw==
+Message-ID: <bbcca781-9ac4-4eec-b3fb-ff4e01950127@bootlin.com>
+Date: Tue, 23 Sep 2025 22:03:09 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,84 +57,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 04/20] net: Add ndo_{peer,unpeer}_queues callback
-To: David Wei <dw@davidwei.uk>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
- john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
- maciej.fijalkowski@intel.com, magnus.karlsson@intel.com
-References: <20250919213153.103606-1-daniel@iogearbox.net>
- <20250919213153.103606-5-daniel@iogearbox.net>
- <20250922182350.4a585fff@kernel.org>
- <dc23879e-1c63-4158-b002-c291548055cb@davidwei.uk>
+Subject: Re: [PATCH v7 2/2] ethernet: eswin: Add eic7700 ethernet driver
+To: weishangjuan@eswincomputing.com, devicetree@vger.kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, vladimir.oltean@nxp.com,
+ rmk+kernel@armlinux.org.uk, yong.liang.choong@linux.intel.com,
+ anthony.l.nguyen@intel.com, prabhakar.mahadev-lad.rj@bp.renesas.com,
+ jan.petrous@oss.nxp.com, jszhang@kernel.org, inochiama@gmail.com,
+ 0x1207@gmail.com, boon.khai.ng@altera.com, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+Cc: ningyu@eswincomputing.com, linmin@eswincomputing.com,
+ lizhi2@eswincomputing.com, pinkesh.vaghela@einfochips.com
+References: <20250918085612.3176-1-weishangjuan@eswincomputing.com>
+ <20250918090026.3280-1-weishangjuan@eswincomputing.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <dc23879e-1c63-4158-b002-c291548055cb@davidwei.uk>
+In-Reply-To: <20250918090026.3280-1-weishangjuan@eswincomputing.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: Clear (ClamAV 1.0.9/27771/Tue Sep 23 10:26:39 2025)
+X-Last-TLS-Session-Version: TLSv1.3
 
-On 9/23/25 6:06 PM, David Wei wrote:
-> On 2025-09-22 18:23, Jakub Kicinski wrote:
->> On Fri, 19 Sep 2025 23:31:37 +0200 Daniel Borkmann wrote:
->>> Add ndo_{peer,unpeer}_queues() callback which can be used by virtual drivers
->>> that implement rxq mapping to a real rxq to update their internal state or
->>> exposed capability flags from the set of rxq mappings.
->>
->> Why is this something that virtual drivers implement?
->> I'd think that queue forwarding can be almost entirely implemented
->> in the core.
+Hi,
+
+On 18/09/2025 14:30, weishangjuan@eswincomputing.com wrote:
+> From: Shangjuan Wei <weishangjuan@eswincomputing.com>
 > 
-> I believe Daniel needs it for AF_XDP.
+> Add Ethernet controller support for Eswin's eic7700 SoC. The driver
+> implements hardware initialization, clock configuration, delay
+> adjustment functions based on DWC Ethernet controller, and supports
+> device tree configuration and platform driver integration.
+> 
+> Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
+> Signed-off-by: Shangjuan Wei <weishangjuan@eswincomputing.com>
+> ---
+>   drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
+>   drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+>   .../ethernet/stmicro/stmmac/dwmac-eic7700.c   | 230 ++++++++++++++++++
+>   3 files changed, 242 insertions(+)
+>   create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> index 67fa879b1e52..a13b15ce1abd 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> @@ -67,6 +67,17 @@ config DWMAC_ANARION
+> 
+>   	  This selects the Anarion SoC glue layer support for the stmmac driver.
+> 
+> +config DWMAC_EIC7700
+> +	tristate "Support for Eswin eic7700 ethernet driver"
+> +	select CRC32
+> +	select MII
 
-Yes, in case of af_xdp we basically need to propagate related capabilities
-of the netdev, so that we can expose the given xdp flags in this case
-further to netkit which implements ndo_bpf etc. Thinking about it, maybe
-an alternative could be that netkit always exposes NETDEV_XDP_ACT_XSK etc
-and we catch it in netkit's ndo_bpf + ndo_xsk_wakeup implementation when
-checking peer queue's dev, and let it fail there instead. I'll play a bit
-with this idea instead, perhaps this simplifies things.
+Seems like CRC32 and MII are already selected by STMMAC_ETH. I guess 
+this is inspired by CONFIG_DWMAC_DWC_QOS_ETH that also seems to have 
+these unnecessary dependencies.
+
+Maxime
+
 
