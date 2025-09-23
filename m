@@ -1,82 +1,139 @@
-Return-Path: <netdev+bounces-225590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27E9FB95C03
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 13:55:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4232B95C52
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 14:05:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 455FB189B05E
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 11:55:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F8022E4A80
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 12:05:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8FC322A34;
-	Tue, 23 Sep 2025 11:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40F4322547;
+	Tue, 23 Sep 2025 12:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="of1pDfB8"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="L0C9g3J+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from forwardcorp1d.mail.yandex.net (forwardcorp1d.mail.yandex.net [178.154.239.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2B32E8881
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 11:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731062FC86F;
+	Tue, 23 Sep 2025 12:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758628501; cv=none; b=NdFrLTmdVC5+T8OsYNUa5Sjvu1KZxk6H5pCuHR77Cr1JlpZQa+X+97gW5+QHnUA9fmny8dR6JnKTRtHNaBsI8X8fdkb+iusoZg8z/bb6dFFL7Ox96quO3Eqbs53pB4BtC88OgoiZkszIa8L47xymankip1D4obrnGuHmwgYsAnY=
+	t=1758629101; cv=none; b=uxMhPYbOtRjlKMJSIdrreaCbQDAjrnrZxLJhp2AUyyacjdjTWRFOCAxVfjfczm0iezBn9k8GOWs7cvL5dexFHykYkY9g7LGftpxyA58W90ZoGCN3YJZ/8iJF5ce8nWPPOJOzxW5tiXubK/v8fgfXlGs2YdW2XgIx6yLk5dd0dII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758628501; c=relaxed/simple;
-	bh=QA6cRqhcpdLpAWirm6EGftRJEfBt1QUnxbDN9YyZymg=;
+	s=arc-20240116; t=1758629101; c=relaxed/simple;
+	bh=ThjKCuq/Gkaa6sxkQ2iw8pcH9Scy6bno0C+2htC9uZc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I2DPgFWoNhZXs52leeDgGCijLu0ekLR5xCoVy0bQ12YL/nzoBe7BLoAZL8HvEhZmUovru+JgTcoW3gcD66Ga60tu+ncRljNmHSejKZMHCX2dv8d93olCn8VTV9gr53yq25A3Jy6PO16oIh2zK64fDdkvr1NGYXnVR0JWrifWWuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=of1pDfB8; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <178b8313-654d-411a-b9b6-c5e468ab1c80@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758628487;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tJ6TFLUv8Lt32fbF+Mh4OLsiVkeX5RLzlYeIcdSd4OU=;
-	b=of1pDfB8UiuM+oOq/XljmA059f1LAgZq6bMrFXp1hQ3MYyBMeoZgshZdLUEWwx7Ijl0V7y
-	wSstXglVnfR5LnL9tgaXyO7F9ZZDsN0h5i27sZ/ZEQoB9Us7DelARS9op3+6BPrMQ0kWtu
-	Ntw3xhgLyOXwl6Pd6Tp1842LbvLWD7M=
-Date: Tue, 23 Sep 2025 12:54:42 +0100
+	 In-Reply-To:Content-Type; b=g1vZbYLbMyZcOg6K/Kcrir6+QpsyFuaE00FAmwU5sPEDSDbWuhA81yNW3rpowGRatVO3CYzyFHJqGsiPoz+xz+NJgfTq1moAT1P77zezHczsf6RWfCOxYfiYwPZaVnhNvP92ndj9OXshGZZQv+z68oZXbjrQxSwQfhY4+fkHw10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=L0C9g3J+; arc=none smtp.client-ip=178.154.239.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
+Received: from mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:cf2d:0:640:140f:0])
+	by forwardcorp1d.mail.yandex.net (Yandex) with ESMTPS id 1672F80C96;
+	Tue, 23 Sep 2025 15:04:53 +0300 (MSK)
+Received: from [IPV6:2a02:6bf:8080:c77::1:3b] (unknown [2a02:6bf:8080:c77::1:3b])
+	by mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id o4WuUE0FriE0-fAFtdmJZ;
+	Tue, 23 Sep 2025 15:04:52 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+	s=default; t=1758629092;
+	bh=Vf6v1fCk8K2cHd1wSxGVsZZHow2DvCl4rn6gHJ3UDJw=;
+	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
+	b=L0C9g3J+Buq5IlPqK24blre2NyAlID7zKCiGaanAQ7d0uVqQ7U304SQTzWELPkSL8
+	 HMobw6+QoJSStHaluNL8R7Het0vAbLmykTCNFFkLIWSdda7hRKRd9vIeNFOXeEU84z
+	 XBO11aEutOxbdbL3c7nPknSeN0QFZpXNj6RbvJwM=
+Authentication-Results: mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
+Message-ID: <348f209e-89bc-4289-aaf9-e57437e31b0d@yandex-team.ru>
+Date: Tue, 23 Sep 2025 15:04:50 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] octeontx2-pf: Fix potential use after free in
- otx2_tc_add_flow()
-To: Dan Carpenter <dan.carpenter@linaro.org>,
- Subbaraya Sundeep <sbhatta@marvell.com>
-Cc: Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya
- <gakula@marvell.com>, hariprasad <hkelam@marvell.com>,
- Bharat Bhushan <bbhushan2@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] netfilter/x_tables: go back to using vmalloc for
+ xt_table_info
+To: Florian Westphal <fw@strlen.de>
+Cc: Eric Dumazet <edumazet@google.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Phil Sutter <phil@nwl.cc>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-janitors@vger.kernel.org
-References: <aNKCL1jKwK8GRJHh@stanley.mountain>
+ Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20250922194819.182809-1-d-tatianin@yandex-team.ru>
+ <20250922194819.182809-2-d-tatianin@yandex-team.ru>
+ <CANn89i+GoVZLcdHxuf33HpmgyPNKxGqEjXGpi=XiB-QOsAG52A@mail.gmail.com>
+ <5f1ff52a-d2c2-40de-b00c-661b75c18dc7@yandex-team.ru>
+ <aNKGWZSxY9RC0VWS@strlen.de>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <aNKCL1jKwK8GRJHh@stanley.mountain>
+From: Daniil Tatianin <d-tatianin@yandex-team.ru>
+In-Reply-To: <aNKGWZSxY9RC0VWS@strlen.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 23/09/2025 12:19, Dan Carpenter wrote:
-> This code calls kfree_rcu(new_node, rcu) and then dereferences "new_node"
-> and then dereferences it on the next line.  Two lines later, we take
-> a mutex so I don't think this is an RCU safe region.  Re-order it to do
-> the dereferences before queuing up the free.
-> 
-> Fixes: 68fbff68dbea ("octeontx2-pf: Add police action for TC flower")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+On 9/23/25 2:36 PM, Florian Westphal wrote:
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> Daniil Tatianin <d-tatianin@yandex-team.ru> wrote:
+>>> On Mon, Sep 22, 2025 at 12:48 PM Daniil Tatianin
+>>> <d-tatianin@yandex-team.ru> wrote:
+>>>> This code previously always used vmalloc for anything above
+>>>> PAGE_ALLOC_COSTLY_ORDER, but this logic was changed in
+>>>> commit eacd86ca3b036 ("net/netfilter/x_tables.c: use kvmalloc() in xt_alloc_table_info()").
+>>>>
+>>>> The commit that changed it did so because "xt_alloc_table_info()
+>>>> basically opencodes kvmalloc()", which is not actually what it was
+>>>> doing. kvmalloc() does not attempt to go directly to vmalloc if the
+>>>> order the caller is trying to allocate is "expensive", instead it only
+>>>> uses vmalloc as a fallback in case the buddy allocator is not able to
+>>>> fullfill the request.
+>>>>
+>>>> The difference between the two is actually huge in case the system is
+>>>> under memory pressure and has no free pages of a large order. Before the
+>>>> change to kvmalloc we wouldn't even try going to the buddy allocator for
+>>>> large orders, but now we would force it to try to find a page of the
+>>>> required order by waking up kswapd/kcompactd and dropping reclaimable memory
+>>>> for no reason at all to satisfy our huge order allocation that could easily
+>>>> exist within vmalloc'ed memory instead.
+>>> This would hint at an issue with kvmalloc(), why not fixing it, instead
+>>> of trying to fix all its users ?
+> I agree with Eric.  There is nothing special in xtables compared to
+> kvmalloc usage elsewhere in the stack.  Why "fix" xtables and not e.g.
+> rhashtable?
+>
+> Please work with mm hackers to improve the situation for your use case.
+>
+> Maybe its enough to raise __GFP_NORETRY in kmalloc_gfp_adjust() if size
+> results in >= PAGE_ALLOC_COSTLY_ORDER allocation.
+
+Thanks for your reply! Perhaps this is the way to go, although this 
+might have
+much broader implications since there are tons of other callers to take 
+into account.
+
+I'm not sure whether rhashtable's size also directly depends on user 
+input, I was only
+aware of x_table since this is the case we ran into specifically.
+
+>
+>> Thanks for the quick reply! From my understanding, there is a lot of
+>> callers of kvmalloc
+>> who do indeed benefit from the physical memory being contiguous, because
+>> it is then
+>> used for hardware DMA etc., so I'm not sure that would be feasible.
+> How can that work?  kvmalloc won't make vmalloc backed memory
+> physically contiguous.
+
+The allocated physical memory won't be contiguous only for fallback 
+cases (which should be rare),
+I assume in that case the hardware operation may end up being more 
+expensive with larger scatter-gather
+lists etc. So most of the time such code can take optimized paths for 
+fully contiguous memory. This is not
+the case for x_tables etc.
+
 
