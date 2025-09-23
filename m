@@ -1,156 +1,130 @@
-Return-Path: <netdev+bounces-225722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C773DB97856
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 22:48:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96BD6B97880
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 22:53:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82D4C3A7B2C
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 20:48:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AEFF162F2A
+	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 20:53:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28856280004;
-	Tue, 23 Sep 2025 20:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C32330AAD0;
+	Tue, 23 Sep 2025 20:53:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Dh5OxCMr"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="0FwvzxPh"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from omta038.useast.a.cloudfilter.net (omta038.useast.a.cloudfilter.net [44.202.169.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B655E1D798E
-	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 20:48:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175D81BD9D3
+	for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 20:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758660512; cv=none; b=TE52hkgrUHD9MYDTbRj2geQFaA3q5NCLGwmmqGRVyEH9zp6R8Q0oG6/7VQFxlJQokN2wkNBOHjnWThcy6LoboQtXbH4PEBZ5qt6MeEvqCPwBJEbwyVG/ih/jF0hocxISfG3cjKZsOFVHO3hhg0eLzxhO4P/qfOJmnKLR0aOcOtY=
+	t=1758660812; cv=none; b=H6d3+4xuR/QFEHcqAVU8MsAfokfTj4sEvpBO9vpjAQYZ9vP6xZAhGpgE/EzbRpS9+toHy23RCbKeztnrIJDumnDwsBlixtcGx2bpozeaqPcbDbVTRqIOcIbJ8fuYDbbpw7F45GCiv4RTZsTcOPznrVAb+ZimYZnicgcA8l9P29c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758660512; c=relaxed/simple;
-	bh=WoRIuCI/ZYo+FAPzp36f3oE/lfOFVVqJgoA0ByqYDN4=;
+	s=arc-20240116; t=1758660812; c=relaxed/simple;
+	bh=A9g20I8lseVKXlAh/tg+QgMk7GC67zftnbhm/6Ovfnk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SfeEAxjqmy0No0n+x7PvUQObqZF0RLtARufMUMHlvQRZc85VhNfFbb3tgMoNBgDjg4Cy4LHfU3ke1RA01+Sy+gDy2F2UUgc+XXBIZQZH6n6oQSDgo7YL3beyHGuBSwBUIQWXRFeK8AIomcGSKffjU1YoytU8qNmYL+vf2xVkLXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Dh5OxCMr; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3a6ce0da-9f3f-4630-8c01-43ae980828d1@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758660506;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nLOK08KsNyE+Atee9Sw6ZH5oINchnh99jP6cC9VKOuY=;
-	b=Dh5OxCMru65KgbEUXoptbfoczFbiVY9aCGv7nkD+fDJ3vEVeGML5/WEYm9goLdg/ylFp0P
-	szEQK0aQNtIT1mta7OtnrnLJ2D3wBr6NSWop1k5xoS0BAFvufk7pOTEf2V7995CExZQmQl
-	6rQDVYYKfF7zqs4QiuVQ+iiUMv2Ezjc=
-Date: Tue, 23 Sep 2025 21:48:23 +0100
+	 In-Reply-To:Content-Type; b=IPuYbNnDuStfAwHmJQ8sG+esh4LYzkFbGl3gKPludhIhzpj4OuYAk9l1h0LYp33F2Vy2CnyK23dkp7bXjQ/QfmR50UrnACcIhUiIXnGpdRJna94uMi8bZD1QHdLYfzKKol6Fkq/NBsTHs9kfjLxWAwdeO5+JQU1fyClRFlkU6u4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=0FwvzxPh; arc=none smtp.client-ip=44.202.169.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-5006b.ext.cloudfilter.net ([10.0.29.217])
+	by cmsmtp with ESMTPS
+	id 16KFv91gnSkcf1A0vvDVHf; Tue, 23 Sep 2025 20:53:29 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id 1A0svD4Vj0HUD1A0tvtgoh; Tue, 23 Sep 2025 20:53:27 +0000
+X-Authority-Analysis: v=2.4 cv=TIhFS0la c=1 sm=1 tr=0 ts=68d308c7
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=N332or4wHRcdzxpigiEmqg==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=7T7KSl7uo7wA:10 a=VwQbUJbxAAAA:8
+ a=gaVSdRgQbUJKjHIfkZ4A:9 a=QEXdDO2ut3YA:10 a=xYX6OU9JNrHFPr8prv8u:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=xR+Ojw/IUQBpUZG1R+fgJRf6pEBM1UY4TV59RRigg/U=; b=0FwvzxPhR3boWRA2R2jjvhqYf6
+	Q+1uW31zrwDf2agKemJJdl1COGeQRKC0xFJWGjEkmdijHZDk9uT5cn03tRrO5IQ2SJWPFpmVloKDK
+	f0inm9STgU7QCFbrmeVmJrlAO7pp6hBBOWSpt15OZR5oC9gTxBXCzwS8u2FLsTd1aqx9uAr8DAS6F
+	rf0NBai9QZIr9gZThB+KniC3pLlxWJlaBaqi01oetGI2Pne+kxKdPZby7kqLUkdsaNVyOOj8v3iGc
+	zj6iiuajCRgkiqKxsqxGyKVSxLGqY1E0zE0lwS4qMaguxptZjfx6NRx/KlZwolb4lxqzYF7WdHrs+
+	xq2IPNsQ==;
+Received: from [83.214.155.155] (port=35596 helo=[192.168.1.104])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.98.1)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1v1A0r-00000003Mp0-2G1U;
+	Tue, 23 Sep 2025 15:53:26 -0500
+Message-ID: <a4b598a1-3ad6-4e42-9f48-21db966f0a34@embeddedor.com>
+Date: Tue, 23 Sep 2025 22:53:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 3/4] mlx5: convert to ndo_hwtstamp_get() and
- ndo_hwtstamp_set()
-To: Carolina Jubran <cjubran@nvidia.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH][next] tls: Avoid -Wflex-array-member-not-at-end warning
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Michael Chan
- <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Tariq Toukan <tariqt@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>
-References: <20250922165118.10057-1-vadim.fedorenko@linux.dev>
- <20250922165118.10057-4-vadim.fedorenko@linux.dev>
- <5b42dbf4-cc20-4cf7-bad5-fbe3e9055c0c@nvidia.com>
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+References: <aNFfmBLEoDSBSLJe@kspp> <aNFpZ4zg5WIG6Rl6@krikkit>
+ <c9cd2ebb-ecdb-4ba9-8d54-f01e3cd54929@embeddedor.com>
+ <aNMCznixxL2veGxK@krikkit>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <5b42dbf4-cc20-4cf7-bad5-fbe3e9055c0c@nvidia.com>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <aNMCznixxL2veGxK@krikkit>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 83.214.155.155
+X-Source-L: No
+X-Exim-ID: 1v1A0r-00000003Mp0-2G1U
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.1.104]) [83.214.155.155]:35596
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 3
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfJpdU9mKBGmwum+GefuqxcB/poj5yni8iepy0tpRlW6m3ENb5tW2A/USTWSSWhsEnZlG1ZC6ZweSBvPSINc1JuTelENKUERkimE0oBeFiOAb062dHlhf
+ 6G1QwCvjmpArlhhGRnS/0HaufmNNjbO9dlOwBerKBTgu5kztwHu8zSsNE9P5dA39pNCgmIS4TZ6M0hwkq7B3Um0vNp61CDJ6aOY=
 
-On 23/09/2025 18:44, Carolina Jubran wrote:
-> 
-> On 22/09/2025 19:51, Vadim Fedorenko wrote:
-> Hi Vadim, thanks for the patch!
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/ 
->> drivers/net/ethernet/mellanox/mlx5/core/en_main.c
->> index 5e007bb3bad1..74a63371ab69 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
->> @@ -4755,9 +4755,11 @@ static int mlx5e_hwstamp_config_ptp_rx(struct 
->> mlx5e_priv *priv, bool ptp_rx)
->>                       &new_params.ptp_rx, true);
->>   }
->> -int mlx5e_hwstamp_set(struct mlx5e_priv *priv, struct ifreq *ifr)
->> +int mlx5e_hwstamp_set(struct net_device *dev,
->> +              struct kernel_hwtstamp_config *config,
->> +              struct netlink_ext_ack *extack)
->>   {
->> -    struct hwtstamp_config config;
->> +    struct mlx5e_priv *priv = netdev_priv(dev);
->>       bool rx_cqe_compress_def;
->>       bool ptp_rx;
->>       int err;
->> @@ -4766,11 +4768,8 @@ int mlx5e_hwstamp_set(struct mlx5e_priv *priv, 
->> struct ifreq *ifr)
->>           (mlx5_clock_get_ptp_index(priv->mdev) == -1))
-> 
-> 
-> I would add an |extack| message here.
 
-Yeah, but the !MLX5_CAP_GEN(priv->mdev, device_frequency_khz) check
-looks redundant as mdev->clock->ptp will be null in case of absent of
-device_frequency_khz, according to mlx5_init_clock()
 
+>>
+>> If this (flex array) is not going to be needed in the future, I'm
+>> happy to remove it. :)
 > 
->> @@ -4814,47 +4813,34 @@ int mlx5e_hwstamp_set(struct mlx5e_priv *priv, 
->> struct ifreq *ifr)
->>       if (!mlx5e_profile_feature_cap(priv->profile, PTP_RX))
->>           err = mlx5e_hwstamp_config_no_ptp_rx(priv,
->> -                             config.rx_filter != HWTSTAMP_FILTER_NONE);
->> +                             config->rx_filter != HWTSTAMP_FILTER_NONE);
->>       else
->>           err = mlx5e_hwstamp_config_ptp_rx(priv, ptp_rx);
->>       if (err)
->>           goto err_unlock;
->> -    memcpy(&priv->tstamp, &config, sizeof(config));
->> +    memcpy(&priv->tstamp, config, sizeof(*config));
+> I don't see what we'd use it for, aead_request.__ctx contains private
+> data from the crypto code (all accesses seem to be through
+> aead_request_ctx defined in include/crypto/internal/aead.h, see also
+> the kdoc: "Start of private context data").
+> And we haven't seen the author of a42055e8d2c3 in a while, so we can't
+> ask about the intention behind this field.
 > 
+> So IMO, tls_rec.aead_req_ctx can simply go away. Would you send the
+> patch?
 > 
-> A direct assignment would be cleaner.
 
-Just wanted to follow original style. I'll change it in the next ver
+Done: https://lore.kernel.org/linux-hardening/aNMG1lyXw4XEAVaE@kspp/
 
-> 
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c b/ 
->> drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
->> index 79ae3a51a4b3..ff8ffd997b17 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
->> @@ -52,7 +52,8 @@ static const struct net_device_ops mlx5i_netdev_ops = {
->>       .ndo_init                = mlx5i_dev_init,
->>       .ndo_uninit              = mlx5i_dev_cleanup,
->>       .ndo_change_mtu          = mlx5i_change_mtu,
->> -    .ndo_eth_ioctl            = mlx5i_ioctl,
->> +    .ndo_hwtstamp_get        = mlx5e_hwstamp_get,
->> +    .ndo_hwtstamp_set        = mlx5e_hwstamp_set,
->>   };
->>   /* IPoIB mlx5 netdev profile */
->> @@ -557,20 +558,6 @@ int mlx5i_dev_init(struct net_device *dev)
->>       return 0;
->>   }
->> -int mlx5i_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
->> -{
->> -    struct mlx5e_priv *priv = mlx5i_epriv(dev);
->> -
-> 
-> 
-> mlx5i_epriv should still be used here. on IPoIB netdev_priv gives you a
-> struct mlx5i_priv .
+Thank you for the feedback. :)
 
-Oh, I see... we have to have slightly different hwstamp functions for
-mlx5i and mlx5e because of different netdev->priv type. Let me see how
-it can be factorized.
+-Gustavo
 
