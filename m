@@ -1,241 +1,393 @@
-Return-Path: <netdev+bounces-225828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A15FAB98B03
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 09:52:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F45BB98B21
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 09:53:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 84A444E2667
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 07:52:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EE6C18874A7
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 07:54:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37D928153C;
-	Wed, 24 Sep 2025 07:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A6A287260;
+	Wed, 24 Sep 2025 07:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WVndi3mW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fFiAjPdf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D6A27E060
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 07:47:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A5C28725A
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 07:50:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758700071; cv=none; b=hbF5TGCDqEGwAvgcig2j6verlikneJR+x2Wxe++KT5SsGvTxGgWrpGNxe4ItTgNOIaXw/mw6AEhSDpV9p2DJMktRA1O7xLRKWmJ12bSBrsa01ODYnwOL/Z3c3iCBb2mRvCT2Xf7g50qT/uJoYZbIzJyXjJa29JCDAFI51wrPOdA=
+	t=1758700206; cv=none; b=bOm5HBHC1573iZoEARca+/X/s8gFHoYELbGeg7zSs6wcfZVYUCcL5zYHsQxLFOXhixQnsZ1xtG+1s/iQs55cZlun6H6WYYPSluK9gBymClQeYsh09f9Uny3fZpHtyaD907midyy3LYLmizwV5LegniCU33WOEYgj2dcyb4Clakc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758700071; c=relaxed/simple;
-	bh=Z+vCoNdBMvuFeQgv/9edk+YvTT+7IoVHX3zaZJkyQk8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BlXFSBsRMntz5qubaZnvPAnuZ9sZ8ePqaKge2WZbz7TB9V9BIFZl2d2pWCu2kVCqsF6ZI8VoObS4JlINZVfCK5DjoapxpunxJw0ZBOCgsGpDS8OKYOJdpXoJf4Qs6mMenNqM+6ZCIk5+MenbUj0z1Dv/Ks0jnl5AhzS/dWTN4Mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WVndi3mW; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-36d77ae9de5so11917371fa.2
-        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 00:47:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758700067; x=1759304867; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CCAbY5J9TVOpKMtUVutIq51AeK08EZi5hcnzWE/qk4k=;
-        b=WVndi3mWEu7D8tFMlRPKJ5HnltmiMDvoW6L5Q86pv+CRnUnUl2qGwMV2GkjtPDfotW
-         o/Z1o9s1uIYD8gqhcfxXmMVZYmGgmmGQvTE5+nHMj8ARMQchKhbfap1XxvFqGMgiRvm1
-         /HaJ2l+91WNcngNxmNAsNmV5cmsdGC4+hBBL2Wm0RobzX9QrdLKkHJ7fS2rTTcyYr/qC
-         1MlzpbF64HjwbVNxmVpV8eydKVGJePpNVkrGGIMoFkCd7fG+4qwdyyWhxBPnHucnhO9O
-         BaxakSKs/ZYpTfrlv+cgeljc63QkCf7JImrAWRrvYcF42QxB6PRXiLkjIRq1dd6P9dSp
-         NEqQ==
+	s=arc-20240116; t=1758700206; c=relaxed/simple;
+	bh=uc6ISieAaXFT4aav6NNM2tVosCA7b7yxzr213CmqjSk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qpfUaXRWuXJOx/fbPWbTZyohYzmQFByn7pIHZsQTIBKAoUjAA7abAsZigOXXvZ8eTIPXHAwmivHGP9XbkXpb7nb730m2xhPoHgSA/qRnUpiU7KQSW3McX8Nm7eWmYI/dvdQHdSd9ItvivRcEI1cUBWZGmMXIPVCM9CsXbBjT3eU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fFiAjPdf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758700203;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jdMx3QVWSZ6LKmjhlJB1nzhhz5UUzIgjxX638ayHrZQ=;
+	b=fFiAjPdfYg9H8HUKiVwpsfxvCP3pCkb+CoTSAIf9dHqVkit+tQWQreXuTX9IoKUbq+hCXL
+	H9nz+FCqIMtvxX5nRCsolUeaCPBAqaHWAW3Qy6ItFiTuHjbUyvIHxCf9dmT/mKPD2BVN5k
+	UVyKLZijfTvci25yOafXkFWUG41mUDM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-568-MN6Wv87tMJOSh1O9xUDlBQ-1; Wed, 24 Sep 2025 03:49:56 -0400
+X-MC-Unique: MN6Wv87tMJOSh1O9xUDlBQ-1
+X-Mimecast-MFC-AGG-ID: MN6Wv87tMJOSh1O9xUDlBQ_1758700195
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3ee1365964cso4473039f8f.2
+        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 00:49:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758700067; x=1759304867;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CCAbY5J9TVOpKMtUVutIq51AeK08EZi5hcnzWE/qk4k=;
-        b=TSW7O+kwZmdWUUKHTd8lan7Cj3DxVpvoL5rGMNPTxjlA8g2x6zilFDEpJpIxazkXhG
-         3PCt5oyVS2obSrVkAH4exMRPzPhazq9hPsTe3JOAhijeT5nLRKdXPSm2Kq56k4eQGFDl
-         w12+jQnzIPuA8E6vmdQfDChVvOyIAQohcmrQySaZ1DtTYCyCdJ0m2CdNpFd4x+auy87E
-         x+JI/G6VZWSVofq6b0lck9wOcu2vMkdCJ+ElrjfqMFfYcEhZg1xZZQ4FI2lVx+SGEPTK
-         Xh8emQgPic0mQNBgEnOzWL3yo7oslrUWc1pTKWgfSNOon5/MKk3VujLv6Vt4PQ9/0gJT
-         bjsg==
-X-Forwarded-Encrypted: i=1; AJvYcCWYgyonx6h1XxauxuJzQlidNnkDng1O6vql4x0MbSt/wk6Hulq7X4am1hAdfOze3tKqcpK6M0o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNVJoKV7hALwZ31/IHbMgST950+5e4iB4lWWkx1NPyKK+DxFUV
-	GDorgkVrKh/VvCuRm03+2D6F3L0GiN8SWt+SgYRNaZgKLgIB39puK0++
-X-Gm-Gg: ASbGncsB0M6oytPgEBzX1rsNvygNsycsJSQ00bbb05NaujmoYygeLUm0IAgBg1UFeRo
-	xm5HuOeeVFbTgkPNI73268PSK/9D6Mz4mgS9qmkdFFmDxsvX1dammppQcQMoaUyegp/7Jiafde7
-	GUZcpCkOp/8L8BxaXX7CcUr4KvRkQyOa8glh1maiCUMZSu/3ZZ7iKOufJeWSN8kbjThNfAqhsf0
-	5LFmhT7KzRaMggPerx5IWOGKeaL5USRwJ5jTMByL98SHLRCwmseJ1Xw3iU/Zru04UxRIRcynKH/
-	YIgl+gNSMwL2LoUW0Rs9vtVE51nD65QMuScP0jmZsp9W+2HkASNo4y8igUKLrGImT2g1yslDR1O
-	beumDI0zVoKI0HXufB4FljrGJR1F+K21kAkM=
-X-Google-Smtp-Source: AGHT+IEbgdfhaSVwYw/hXIWU4C46EY3Pxhpiy1aKwy2RIdIiClgIYWPgTKxgS7oHeI7zJZkGYI3r6Q==
-X-Received: by 2002:a2e:be27:0:b0:36d:3113:63ac with SMTP id 38308e7fff4ca-36d311365c5mr18771751fa.7.1758700066521;
-        Wed, 24 Sep 2025 00:47:46 -0700 (PDT)
-Received: from foxbook (bfe191.neoplus.adsl.tpnet.pl. [83.28.42.191])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-36a13c0d94dsm24008991fa.49.2025.09.24.00.47.45
-        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
-        Wed, 24 Sep 2025 00:47:46 -0700 (PDT)
-Date: Wed, 24 Sep 2025 09:47:41 +0200
-From: Michal Pecio <michal.pecio@gmail.com>
-To: I Viswanath <viswanathiyyappan@gmail.com>
-Cc: andrew@lunn.ch, andrew+netdev@lunn.ch, davem@davemloft.net,
- david.hunter.linux@gmail.com, edumazet@google.com, kuba@kernel.org,
- linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- petkan@nucleusys.com, skhan@linuxfoundation.org,
- syzbot+78cae3f37c62ad092caa@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v2] net: usb: Remove disruptive netif_wake_queue in
- rtl8150_set_multicast
-Message-ID: <20250924094741.65e12028.michal.pecio@gmail.com>
-In-Reply-To: <20250920181852.18164-1-viswanathiyyappan@gmail.com>
-References: <83171a57-cb40-4c97-b736-0e62930b9e5c@lunn.ch>
-	<20250920181852.18164-1-viswanathiyyappan@gmail.com>
+        d=1e100.net; s=20230601; t=1758700194; x=1759304994;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jdMx3QVWSZ6LKmjhlJB1nzhhz5UUzIgjxX638ayHrZQ=;
+        b=gqZxb2lxMYznAcQOslB/56kHzfW7uhReU5NQ10ddxOycWRMK8c6HnupeqAXh3eUjkI
+         qhBEg+YSohRfxznnTwmtCVPiKUW2MDFU+LdV/huW5ZYdyZcs9MhSs3GVXEPjeHz6Yuun
+         1Lgp5YvH54HfkStYYxm2fUFpfF5hCLQj7jNTiPG0AhH22nu3eUtLcAWJ3SobvNG9gseZ
+         2RZ1+ecRXJC21M9TGuUxoXs1IYEFCozRTyCkecvCr3yul0FpoyUi4jNB9qHhI4TjSI0s
+         GHzH1qgdAud1Tse+acd5s4FFDJnfBPZ+X/21eKflBnP/ZGU3ynx38NVDBLKTgSReJ6Fj
+         X4ew==
+X-Forwarded-Encrypted: i=1; AJvYcCVyfFMoGs0zh6A2fXh3cd+kUknbEASqqBlIcXFqzmrEOWEwrx6uvDpVlakqLmPDqJzztWa5s5c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhsArn4ExO6QrDftmVW63hGmXaJeSvE6BpMaZDyBHV82HOuX3O
+	KpDWFwbdViVu4zISbsmi6sKYU4kvjP2/t1JXYXpsM2vmGZ0+QdfJFFUbXJ0ZFcnu5ewdqcKVmbq
+	qIGzGhUA0VHypyCsrYiCM8tsB91ZzjB8i9oLJkGc4cfaLCvk7tA7l8ixUyw==
+X-Gm-Gg: ASbGncsysHjZ/mm8CS0sSfDhum/YOB8tpKK1cF7poNRWoERhYVW3RVqCnfvqqTEAosW
+	xWzTd85AgWmUXmWYbUg7rGc40kjrD/lIYvAFUo1f1nO3D9MAiSq/lLG+j4gQ+LJFpSc0BMFJucD
+	yGVqJ1GG9Hvef7yxFg9epsyjOvKZkhS7b8Ud8AhJWp0x3X+7mXbNG55MEtGhw1jFVOYFkiRj1HR
+	M9r3RBMFYR+M/ufOXjF5EJX0KHosdf7ltJlgiS+tmF5qdFZpUpVtvWxsnXjj98LaYnsdA0hLsgd
+	WJdcAca48aq7COFqZX11oNHip2/eSf8GHaw=
+X-Received: by 2002:a05:6000:2204:b0:3e7:65a6:dbf with SMTP id ffacd0b85a97d-405c5ccc9d5mr4161810f8f.6.1758700194526;
+        Wed, 24 Sep 2025 00:49:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEAd953qSH8hZIgDHBwYLoc8FquXuXRMDSqiFyKFFPq3vdIpLOnAbvFV8zHb6qxjx8ZavCtZw==
+X-Received: by 2002:a05:6000:2204:b0:3e7:65a6:dbf with SMTP id ffacd0b85a97d-405c5ccc9d5mr4161779f8f.6.1758700194045;
+        Wed, 24 Sep 2025 00:49:54 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3f9c62d083esm15058456f8f.32.2025.09.24.00.49.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Sep 2025 00:49:53 -0700 (PDT)
+Date: Wed, 24 Sep 2025 03:49:51 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	eperezma@redhat.com, stephen@networkplumber.org, leiyang@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, kvm@vger.kernel.org,
+	Tim Gebauer <tim.gebauer@tu-dortmund.de>
+Subject: Re: [PATCH net-next v5 4/8] TUN & TAP: Wake netdev queue after
+ consuming an entry
+Message-ID: <20250924034534-mutt-send-email-mst@kernel.org>
+References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+ <20250922221553.47802-5-simon.schippers@tu-dortmund.de>
+ <20250923123101-mutt-send-email-mst@kernel.org>
+ <aacb449c-ad20-48b0-aa0f-b3866a3ed7f6@tu-dortmund.de>
+ <20250924024416-mutt-send-email-mst@kernel.org>
+ <a16b643a-3cfe-4b95-b76a-100f512cdb79@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a16b643a-3cfe-4b95-b76a-100f512cdb79@tu-dortmund.de>
 
-On Sat, 20 Sep 2025 23:48:52 +0530, I Viswanath wrote:
-> syzbot reported WARNING in rtl8150_start_xmit/usb_submit_urb.
-> This is the sequence of events that leads to the Warning:
+On Wed, Sep 24, 2025 at 09:42:45AM +0200, Simon Schippers wrote:
+> On 24.09.25 08:55, Michael S. Tsirkin wrote:
+> > On Wed, Sep 24, 2025 at 07:56:33AM +0200, Simon Schippers wrote:
+> >> On 23.09.25 18:36, Michael S. Tsirkin wrote:
+> >>> On Tue, Sep 23, 2025 at 12:15:49AM +0200, Simon Schippers wrote:
+> >>>> The new wrappers tun_ring_consume/tap_ring_consume deal with consuming an
+> >>>> entry of the ptr_ring and then waking the netdev queue when entries got
+> >>>> invalidated to be used again by the producer.
+> >>>> To avoid waking the netdev queue when the ptr_ring is full, it is checked
+> >>>> if the netdev queue is stopped before invalidating entries. Like that the
+> >>>> netdev queue can be safely woken after invalidating entries.
+> >>>>
+> >>>> The READ_ONCE in __ptr_ring_peek, paired with the smp_wmb() in
+> >>>> __ptr_ring_produce within tun_net_xmit guarantees that the information
+> >>>> about the netdev queue being stopped is visible after __ptr_ring_peek is
+> >>>> called.
+> >>>>
+> >>>> The netdev queue is also woken after resizing the ptr_ring.
+> >>>>
+> >>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> >>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> >>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> >>>> ---
+> >>>>  drivers/net/tap.c | 44 +++++++++++++++++++++++++++++++++++++++++++-
+> >>>>  drivers/net/tun.c | 47 +++++++++++++++++++++++++++++++++++++++++++++--
+> >>>>  2 files changed, 88 insertions(+), 3 deletions(-)
+> >>>>
+> >>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+> >>>> index 1197f245e873..f8292721a9d6 100644
+> >>>> --- a/drivers/net/tap.c
+> >>>> +++ b/drivers/net/tap.c
+> >>>> @@ -753,6 +753,46 @@ static ssize_t tap_put_user(struct tap_queue *q,
+> >>>>  	return ret ? ret : total;
+> >>>>  }
+> >>>>  
+> >>>> +static struct sk_buff *tap_ring_consume(struct tap_queue *q)
+> >>>> +{
+> >>>> +	struct netdev_queue *txq;
+> >>>> +	struct net_device *dev;
+> >>>> +	bool will_invalidate;
+> >>>> +	bool stopped;
+> >>>> +	void *ptr;
+> >>>> +
+> >>>> +	spin_lock(&q->ring.consumer_lock);
+> >>>> +	ptr = __ptr_ring_peek(&q->ring);
+> >>>> +	if (!ptr) {
+> >>>> +		spin_unlock(&q->ring.consumer_lock);
+> >>>> +		return ptr;
+> >>>> +	}
+> >>>> +
+> >>>> +	/* Check if the queue stopped before zeroing out, so no ptr get
+> >>>> +	 * produced in the meantime, because this could result in waking
+> >>>> +	 * even though the ptr_ring is full.
+> >>>
+> >>> So what? Maybe it would be a bit suboptimal? But with your design, I do
+> >>> not get what prevents this:
+> >>>
+> >>>
+> >>> 	stopped? -> No
+> >>> 		ring is stopped
+> >>> 	discard
+> >>>
+> >>> and queue stays stopped forever
+> >>>
+> >>>
+> >>
+> >> I totally missed this (but I am not sure why it did not happen in my 
+> >> testing with different ptr_ring sizes..).
+> >>
+> >> I guess you are right, there must be some type of locking.
+> >> It probably makes sense to lock the netdev txq->_xmit_lock whenever the 
+> >> consumer invalidates old ptr_ring entries (so when r->consumer_head >= 
+> >> r->consumer_tail). The producer holds this lock with dev->lltx=false. Then 
+> >> the consumer is able to wake the queue safely.
+> >>
+> >> So I would now just change the implementation to:
+> >> tun_net_xmit:
+> >> ...
+> >> if ptr_ring_produce
+> >>     // Could happen because of unproduce in vhost_net..
+> >>     netif_tx_stop_queue
+> >>     ...
+> >>     goto drop
+> >>
+> >> if ptr_ring_full
+> >>     netif_tx_stop_queue
+> >> ...
+> >>
+> >> tun_ring_recv/tap_do_read (the implementation for the batched methods 
+> >> would be done in the similar way):
+> >> ...
+> >> ptr_ring_consume
+> >> if r->consumer_head >= r->consumer_tail
+> >>     __netif_tx_lock_bh
+> >>     netif_tx_wake_queue
+> >>     __netif_tx_unlock_bh
+> >>
+> >> This implementation does not need any new ptr_ring helpers and no fancy 
+> >> ordering tricks.
+> >> Would this implementation be sufficient in your opinion?
+> > 
+> > 
+> > Maybe you mean == ? Pls don't poke at ptr ring internals though.
+> > What are we testing for here?
+> > I think the point is that a batch of entries was consumed?
+> > Maybe __ptr_ring_consumed_batch ? and a comment explaining
+> > this returns true when last successful call to consume
+> > freed up a batch of space in the ring for producer to make
+> > progress.
+> >
 > 
->     CPU0 (in rtl8150_start_xmit)   CPU1 (in rtl8150_start_xmit)    CPU2 (in rtl8150_set_multicast)
->     netif_stop_queue();
->                                                                     netif_stop_queue();
->     usb_submit_urb();
->                                                                     netif_wake_queue();  <-- Wakes up TX queue before it's ready
->                                     netif_stop_queue();
->                                     usb_submit_urb();                                    <-- Warning
-> 	freeing urb
-
-It's not freeing which matters but URB completion in USB subsystem.
-I think this description is needlessly complex, the essence is:
-
-rtl8150_start_xmit() {
-	netif_stop_queue();
-	usb_submit_urb(dev->tx_urb);
-}
-
-rtl8150_set_multicast() {
-	netif_stop_queue();
-	netif_wake_queue();  <-- wakes up TX queue before URB is done
-}
-
-rtl8150_start_xmit() {
-	netif_stop_queue();
-	usb_submit_urb(dev->tx_urb);	<-- double submission
-}
-
-
-> rtl8150_set_multicast is rtl8150's implementation of ndo_set_rx_mode and
-> should not be calling netif_stop_queue and notif_start_queue as these handle 
-> TX queue synchronization.
+> Yes, I mean ==.
 > 
-> The net core function dev_set_rx_mode handles the synchronization
-> for rtl8150_set_multicast making it safe to remove these locks.
+> Having a dedicated helper for this purpose makes sense. I just find
+> the name __ptr_ring_consumed_batch a bit confusing next to
+> __ptr_ring_consume_batched, since they both refer to different kinds of
+> batches.
+
+__ptr_ring_consume_created_space ?
+
+/* Previous call to ptr_ring_consume created some space.
+ *
+ * NB: only refers to the last call to __ptr_ring_consume,
+ * if you are calling ptr_ring_consume multiple times, you
+ * have to check this multiple times.
+ * Accordingly, do not use this after __ptr_ring_consume_batched.
+ */
+
+> > 
+> > consumer_head == consumer_tail also happens rather a lot,
+> > though thankfully not on every entry.
+> > So taking tx lock each time this happens, even if queue
+> > is not stopped, seems heavyweight.
+> > 
+> > 
 > 
-> Reported-and-tested-by: syzbot+78cae3f37c62ad092caa@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=78cae3f37c62ad092caa
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: I Viswanath <viswanathiyyappan@gmail.com>
+> Yes, I agree — but avoiding locking probably requires some fancy
+> ordering tricks again..
+> 
+> 
+> > 
+> > 
+> > 
+> >>>> The order of the operations
+> >>>> +	 * is ensured by barrier().
+> >>>> +	 */
+> >>>> +	will_invalidate = __ptr_ring_will_invalidate(&q->ring);
+> >>>> +	if (unlikely(will_invalidate)) {
+> >>>> +		rcu_read_lock();
+> >>>> +		dev = rcu_dereference(q->tap)->dev;
+> >>>> +		txq = netdev_get_tx_queue(dev, q->queue_index);
+> >>>> +		stopped = netif_tx_queue_stopped(txq);
+> >>>> +	}
+> >>>> +	barrier();
+> >>>> +	__ptr_ring_discard_one(&q->ring, will_invalidate);
+> >>>> +
+> >>>> +	if (unlikely(will_invalidate)) {
+> >>>> +		if (stopped)
+> >>>> +			netif_tx_wake_queue(txq);
+> >>>> +		rcu_read_unlock();
+> >>>> +	}
+> >>>
+> >>>
+> >>> After an entry is consumed, you can detect this by checking
+> >>>
+> >>> 	                r->consumer_head >= r->consumer_tail
+> >>>
+> >>>
+> >>> so it seems you could keep calling regular ptr_ring_consume
+> >>> and check afterwards?
+> >>>
+> >>>
+> >>>
+> >>>
+> >>>> +	spin_unlock(&q->ring.consumer_lock);
+> >>>> +
+> >>>> +	return ptr;
+> >>>> +}
+> >>>> +
+> >>>>  static ssize_t tap_do_read(struct tap_queue *q,
+> >>>>  			   struct iov_iter *to,
+> >>>>  			   int noblock, struct sk_buff *skb)
+> >>>> @@ -774,7 +814,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
+> >>>>  					TASK_INTERRUPTIBLE);
+> >>>>  
+> >>>>  		/* Read frames from the queue */
+> >>>> -		skb = ptr_ring_consume(&q->ring);
+> >>>> +		skb = tap_ring_consume(q);
+> >>>>  		if (skb)
+> >>>>  			break;
+> >>>>  		if (noblock) {
+> >>>> @@ -1207,6 +1247,8 @@ int tap_queue_resize(struct tap_dev *tap)
+> >>>>  	ret = ptr_ring_resize_multiple_bh(rings, n,
+> >>>>  					  dev->tx_queue_len, GFP_KERNEL,
+> >>>>  					  __skb_array_destroy_skb);
+> >>>> +	if (netif_running(dev))
+> >>>> +		netif_tx_wake_all_queues(dev);
+> >>>>  
+> >>>>  	kfree(rings);
+> >>>>  	return ret;
+> >>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> >>>> index c6b22af9bae8..682df8157b55 100644
+> >>>> --- a/drivers/net/tun.c
+> >>>> +++ b/drivers/net/tun.c
+> >>>> @@ -2114,13 +2114,53 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+> >>>>  	return total;
+> >>>>  }
+> >>>>  
+> >>>> +static void *tun_ring_consume(struct tun_file *tfile)
+> >>>> +{
+> >>>> +	struct netdev_queue *txq;
+> >>>> +	struct net_device *dev;
+> >>>> +	bool will_invalidate;
+> >>>> +	bool stopped;
+> >>>> +	void *ptr;
+> >>>> +
+> >>>> +	spin_lock(&tfile->tx_ring.consumer_lock);
+> >>>> +	ptr = __ptr_ring_peek(&tfile->tx_ring);
+> >>>> +	if (!ptr) {
+> >>>> +		spin_unlock(&tfile->tx_ring.consumer_lock);
+> >>>> +		return ptr;
+> >>>> +	}
+> >>>> +
+> >>>> +	/* Check if the queue stopped before zeroing out, so no ptr get
+> >>>> +	 * produced in the meantime, because this could result in waking
+> >>>> +	 * even though the ptr_ring is full. The order of the operations
+> >>>> +	 * is ensured by barrier().
+> >>>> +	 */
+> >>>> +	will_invalidate = __ptr_ring_will_invalidate(&tfile->tx_ring);
+> >>>> +	if (unlikely(will_invalidate)) {
+> >>>> +		rcu_read_lock();
+> >>>> +		dev = rcu_dereference(tfile->tun)->dev;
+> >>>> +		txq = netdev_get_tx_queue(dev, tfile->queue_index);
+> >>>> +		stopped = netif_tx_queue_stopped(txq);
+> >>>> +	}
+> >>>> +	barrier();
+> >>>> +	__ptr_ring_discard_one(&tfile->tx_ring, will_invalidate);
+> >>>> +
+> >>>> +	if (unlikely(will_invalidate)) {
+> >>>> +		if (stopped)
+> >>>> +			netif_tx_wake_queue(txq);
+> >>>> +		rcu_read_unlock();
+> >>>> +	}
+> >>>> +	spin_unlock(&tfile->tx_ring.consumer_lock);
+> >>>> +
+> >>>> +	return ptr;
+> >>>> +}
+> >>>> +
+> >>>>  static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+> >>>>  {
+> >>>>  	DECLARE_WAITQUEUE(wait, current);
+> >>>>  	void *ptr = NULL;
+> >>>>  	int error = 0;
+> >>>>  
+> >>>> -	ptr = ptr_ring_consume(&tfile->tx_ring);
+> >>>> +	ptr = tun_ring_consume(tfile);
+> >>>>  	if (ptr)
+> >>>>  		goto out;
+> >>>>  	if (noblock) {
+> >>>> @@ -2132,7 +2172,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+> >>>>  
+> >>>>  	while (1) {
+> >>>>  		set_current_state(TASK_INTERRUPTIBLE);
+> >>>> -		ptr = ptr_ring_consume(&tfile->tx_ring);
+> >>>> +		ptr = tun_ring_consume(tfile);
+> >>>>  		if (ptr)
+> >>>>  			break;
+> >>>>  		if (signal_pending(current)) {
+> >>>> @@ -3621,6 +3661,9 @@ static int tun_queue_resize(struct tun_struct *tun)
+> >>>>  					  dev->tx_queue_len, GFP_KERNEL,
+> >>>>  					  tun_ptr_free);
+> >>>>  
+> >>>> +	if (netif_running(dev))
+> >>>> +		netif_tx_wake_all_queues(dev);
+> >>>> +
+> >>>>  	kfree(rings);
+> >>>>  	return ret;
+> >>>>  }
+> >>>> -- 
+> >>>> 2.43.0
+> >>>
+> > 
 
-Tested-by: Michal Pecio <michal.pecio@gmail.com>
-
-This is instantly triggered on HW simply by running:
-
-ncat remote-host port < /dev/zero &
-ifconfig ethX allmulti
-
-and results in:
-
-[ 1253.338536] URB ffff88810ad01240 submitted while active
-[ 1253.338616] WARNING: CPU: 2 PID: 2785 at drivers/usb/core/urb.c:379 usb_submit_urb+0x5f1/0x640 [usbcore]
-[ 1253.338686] Modules linked in: usbhid uvcvideo rtl8150 xhci_pci xhci_hcd usbcore ext2 uvc videobuf2_vmalloc videobuf2_memops videobuf2_v4l2 videodev videobuf2_common snd_pcsp usb_common serio_raw ppdev dm_mod nfnetlink [last unloaded: usbcore]
-[ 1253.338724] CPU: 2 UID: 0 PID: 2785 Comm: ifconfig Tainted: G        W           6.17.0-rc4 #1 PREEMPT 
-[ 1253.338734] Tainted: [W]=WARN
-[ 1253.338737] Hardware name: HP HP EliteDesk 705 G3 MT/8265, BIOS P06 Ver. 02.45 07/16/2024
-[ 1253.338740] RIP: 0010:usb_submit_urb+0x5f1/0x640 [usbcore]
-[ 1253.338791] Code: 56 23 a0 e8 b1 17 3f e1 eb da b8 fe ff ff ff e9 fc fd ff ff 48 89 fe 48 c7 c7 88 20 25 a0 c6 05 c0 30 e1 ff 01 e8 cf 3a f0 e0 <0f> 0b eb a0 b8 f8 ff ff ff e9 d8 fd ff ff b8 ea ff ff ff c3 66 2e
-[ 1253.338798] RSP: 0018:ffffc90000154e28 EFLAGS: 00010282
-[ 1253.338804] RAX: 000000000000002b RBX: ffff88810ad01240 RCX: 0000000000000027
-[ 1253.338808] RDX: ffff888226f17e08 RSI: 0000000000000001 RDI: ffff888226f17e00
-[ 1253.338812] RBP: ffff88810be0ff00 R08: 00000000fff7ffff R09: ffffffff85a4d628
-[ 1253.338816] R10: ffffffff82e4d680 R11: 0000000000000002 R12: ffff888125e19e00
-[ 1253.338820] R13: 00000000000005ea R14: ffff88810be0ff00 R15: ffff8881326b4000
-[ 1253.338824] FS:  00007fbb30220740(0000) GS:ffff88829ff7d000(0000) knlGS:0000000000000000
-[ 1253.338830] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 1253.338834] CR2: 00007fbb301e5e38 CR3: 000000010be04000 CR4: 00000000001506f0
-[ 1253.338838] Call Trace:
-[ 1253.338846]  <IRQ>
-[ 1253.338855]  rtl8150_start_xmit+0xa1/0x100 [rtl8150]
-[ 1253.338865]  dev_hard_start_xmit+0x59/0x1c0
-[ 1253.338875]  sch_direct_xmit+0x117/0x280
-[ 1253.338883]  __qdisc_run+0x136/0x590
-[ 1253.338890]  net_tx_action+0x1bb/0x2c0
-[ 1253.338898]  handle_softirqs+0xcd/0x270
-[ 1253.338907]  do_softirq+0x3b/0x50
-[ 1253.338914]  </IRQ>
-[ 1253.338916]  <TASK>
-[ 1253.338919]  __local_bh_enable_ip+0x54/0x60
-[ 1253.338927]  __dev_change_flags+0x9a/0x1e0
-[ 1253.338933]  ? filemap_map_pages+0x3f3/0x620
-[ 1253.338941]  netif_change_flags+0x22/0x60
-[ 1253.338946]  dev_change_flags+0x3d/0x70
-[ 1253.338951]  devinet_ioctl+0x388/0x710
-[ 1253.338959]  inet_ioctl+0x145/0x190
-[ 1253.338966]  ? netdev_name_node_lookup_rcu+0x59/0x70
-[ 1253.338971]  ? netdev_name_node_lookup_rcu+0x59/0x70
-[ 1253.338976]  ? dev_get_by_name_rcu+0xa/0x20
-[ 1253.338982]  ? dev_ioctl+0x2fc/0x4b0
-[ 1253.338989]  sock_do_ioctl+0x2f/0xd0
-[ 1253.338996]  __x64_sys_ioctl+0x76/0xc0
-[ 1253.339005]  do_syscall_64+0x42/0x180
-[ 1253.339013]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[ 1253.339019] RIP: 0033:0x7fbb3013fced
-[ 1253.339024] Code: 04 25 28 00 00 00 48 89 45 c8 31 c0 48 8d 45 10 c7 45 b0 10 00 00 00 48 89 45 b8 48 8d 45 d0 48 89 45 c0 b8 10 00 00 00 0f 05 <89> c2 3d 00 f0 ff ff 77 1a 48 8b 45 c8 64 48 2b 04 25 28 00 00 00
-[ 1253.339028] RSP: 002b:00007ffdc876a850 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-[ 1253.339035] RAX: ffffffffffffffda RBX: 00007ffdc876a960 RCX: 00007fbb3013fced
-[ 1253.339039] RDX: 00007ffdc876a8b0 RSI: 0000000000008914 RDI: 0000000000000004
-[ 1253.339042] RBP: 00007ffdc876a8a0 R08: 000000000000000a R09: 000000000000000b
-[ 1253.339045] R10: fffffffffffff8cb R11: 0000000000000246 R12: 00007ffdc876a8b0
-[ 1253.339048] R13: 0000000000000004 R14: 0000000000000200 R15: 0000000000000000
-[ 1253.339054]  </TASK>
-[ 1253.339056] ---[ end trace 0000000000000000 ]---
-[ 1253.339062] net eth1: failed tx_urb -16
-[ 1253.339068] net eth1: failed tx_urb -16
-[ 1253.339072] net eth1: failed tx_urb -16
-[ 1253.339075] net eth1: failed tx_urb -16
-[ 1253.339078] net eth1: failed tx_urb -16
-[ 1253.339081] net eth1: failed tx_urb -16
-[ 1253.339084] net eth1: failed tx_urb -16
-[ 1253.339088] net eth1: failed tx_urb -16
-[ 1253.339091] net eth1: failed tx_urb -16
-[ 1253.339094] net eth1: failed tx_urb -16
-[ 1253.339097] net eth1: failed tx_urb -16
-[ 1253.339204] net eth1: failed tx_urb -16
-[ 1253.339209] net eth1: failed tx_urb -16
-[ 1253.339212] net eth1: failed tx_urb -16
-[ 1253.339215] net eth1: failed tx_urb -16
-[ 1253.339218] net eth1: failed tx_urb -16
-[ 1253.339221] net eth1: failed tx_urb -16
-[ 1253.339224] net eth1: failed tx_urb -16
-[ 1253.339226] net eth1: failed tx_urb -16
-[ 1253.339229] net eth1: failed tx_urb -16
-[ 1253.339232] net eth1: failed tx_urb -16
-[ 1253.339235] net eth1: failed tx_urb -16
-[ 1253.339237] net eth1: failed tx_urb -16
-[ 1253.339240] net eth1: failed tx_urb -16
-[ 1253.339243] net eth1: failed tx_urb -16
-[ 1253.339246] net eth1: failed tx_urb -16
-[ 1253.339249] net eth1: failed tx_urb -16
-[ 1253.339252] net eth1: failed tx_urb -16
-[ 1253.339255] net eth1: failed tx_urb -16
-[ 1253.339258] net eth1: failed tx_urb -16
-[ 1253.339261] net eth1: failed tx_urb -16
-[ 1253.339263] net eth1: failed tx_urb -16
-[ 1253.339266] net eth1: failed tx_urb -16
-[ 1253.339268] net eth1: failed tx_urb -16
-[ 1253.339348] rtl8150 1-1:1.0 eth1: entered allmulticast mode
 
