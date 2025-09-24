@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-225957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBC34B99E56
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 14:42:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB125B99E6B
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 14:43:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0C831B25727
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 12:42:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72F8C3B5BA1
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 12:42:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F7C3093D1;
-	Wed, 24 Sep 2025 12:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ECF430AAC2;
+	Wed, 24 Sep 2025 12:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iHuLZ2Ql"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RO4ose7E"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CCD307486
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 12:40:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC1C3043B9
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 12:40:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758717656; cv=none; b=Cgdodj8hQ+vizTsepBClj4VQV61n0FtsWo4S/JkPEnukPyLggDvlj+K1362Cs5iBNHH5FKRw+ocWPP1wQwSveu2Rgjg8cLAV75t+kRF9uEjICLozbIpRQhmIfEpQiaMRNQ2LJVQB9Wskl5NnjgENDFcBU7M14CZ3BZIVm9gqDdM=
+	t=1758717658; cv=none; b=JSkoZidrKqv0/WsxVPELvuG7YHjeDxoVJ75T74fdtQwML7xF2SO1lawNkki/r8dX5SaHannbFvShpgQc7g5f3VTyNJsNdVx8zhnEQTr7qn7OU5wbdHGa/QPKaQfGZemR+gqcev2nX0p0qgrYmqkx+IIszEY9QKAb3awXtX/G3og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758717656; c=relaxed/simple;
-	bh=xK6ZNQiO8q9I6WhUYdmt8kq9K2Rwlm20XmybUxru0hQ=;
+	s=arc-20240116; t=1758717658; c=relaxed/simple;
+	bh=CAOVKyhQXn5O/peVyB/XKfL56epoYfXypq2IX/nNAnQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LOifLMbwW2CrRn1xGKeOT4ZseiLcEf91hEOTx3NcHLt50Q9aRP449XrmrF0THgsRFkL206Ps4EDnFatnkxhcPUfpgtsQS1akFR763c8F4PJYCASPBXF1Cqry1TRlIq3lkuwD9BSHlwL+zrlJSzo5rzsIi3nLjl05jUZmNcPHfsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iHuLZ2Ql; arc=none smtp.client-ip=95.215.58.179
+	 MIME-Version; b=A4orJCGzA6NNZm+N324twytJTMqQ3XAqNSF9euaccsKFFrdzHoKHDhPtKTSwEO1tEsm/X0WVlzrrCk0MxHt4sp0Eg/yTenxXqE/DfcWAJ6Skswt8U8pl2B3SoSoMVR4Rxrei0nlUx0BkwXFWNFcCgaOgB6YERqY0Yq6KWIUSMVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RO4ose7E; arc=none smtp.client-ip=95.215.58.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758717652;
+	t=1758717654;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/TpAPgWJejoNMptW7LvqfFt/hMK/gaHXEvGCOvAL75o=;
-	b=iHuLZ2QlUkU788iumqlehwAt972NP8xjYQLZ8lA/EDYfQ0o3RwrtSqBRXcPkPil+ox8wBN
-	KbfF1lOkzMZaCmmukPp7ROtwiSs17xfS2TWAgkoQOE7IdM5sshEi5F+OIEjMRFrIDL2/Vq
-	FvIcmtyrCHncV8fOOXGdYFlKOs+96/M=
+	bh=jb95sxRLVrSFxZgk5r7LpLEkfEHXk+sjjbkD0E2G2NQ=;
+	b=RO4ose7E/7u/QwUp85ypgQHw9W3fIL4IkhWjSW83r6Z9cv4rcFRlDNIOyx+zJYk6aVFo+J
+	IIyjv1LtbWrjyiV5ZnJAcXQG5afTgjMWb8eVZpqbUQ5O6G6x6PndhYp6GtEA+clQlaVtEs
+	OfaEsBMJfgKjNnu7eLuMm1kzOSd+G2M=
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 To: Jakub Kicinski <kuba@kernel.org>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -57,11 +57,11 @@ To: Jakub Kicinski <kuba@kernel.org>,
 Cc: Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	netdev@vger.kernel.org,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Yael Chemla <ychemla@nvidia.com>
-Subject: [PATCH net-next v6 2/5] net/mlx5e: Don't query FEC statistics when FEC is disabled
-Date: Wed, 24 Sep 2025 12:40:34 +0000
-Message-ID: <20250924124037.1508846-3-vadim.fedorenko@linux.dev>
+	Yael Chemla <ychemla@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: [PATCH net-next v6 3/5] net/mlx5e: Add logic to read RS-FEC histogram bin ranges from PPHCR
+Date: Wed, 24 Sep 2025 12:40:35 +0000
+Message-ID: <20250924124037.1508846-4-vadim.fedorenko@linux.dev>
 In-Reply-To: <20250924124037.1508846-1-vadim.fedorenko@linux.dev>
 References: <20250924124037.1508846-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
@@ -75,57 +75,196 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Carolina Jubran <cjubran@nvidia.com>
 
-Update mlx5e_stats_fec_get() to check the active FEC mode and skip
-statistics collection when FEC is disabled.
+Introduce support for querying the Ports Phy Histogram Configuration
+Register (PPHCR) to retrieve RS-FEC histogram bin ranges. The ranges
+are stored in a static array and will be used to map histogram counters
+to error levels.
 
+The actual RS-FEC histogram statistics are not yet reported in this
+commit and will be handled in a downstream patch.
+
+Co-developed-by: Yael Chemla <ychemla@nvidia.com>
+Signed-off-by: Yael Chemla <ychemla@nvidia.com>
 Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
 Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 Reviewed-by: Yael Chemla <ychemla@nvidia.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_stats.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |  1 +
+ .../ethernet/mellanox/mlx5/core/en_ethtool.c  |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  8 ++
+ .../ethernet/mellanox/mlx5/core/en_stats.c    | 83 ++++++++++++++++++-
+ .../ethernet/mellanox/mlx5/core/en_stats.h    |  3 +-
+ 5 files changed, 94 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-index 87536f158d07..aae0022e8736 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-@@ -1446,16 +1446,13 @@ static void fec_set_rs_stats(struct ethtool_fec_stats *fec_stats, u32 *ppcnt)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+index 4ffbc263d60f..14e3207b14e7 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+@@ -956,6 +956,7 @@ struct mlx5e_priv {
+ 	struct mlx5e_mqprio_rl    *mqprio_rl;
+ 	struct dentry             *dfs_root;
+ 	struct mlx5_devcom_comp_dev *devcom;
++	struct ethtool_fec_hist_range *fec_ranges;
+ };
+ 
+ struct mlx5e_dev {
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+index bcc3bbb78cc9..fd45384a855b 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+@@ -1932,7 +1932,7 @@ static void mlx5e_get_fec_stats(struct net_device *netdev,
+ {
+ 	struct mlx5e_priv *priv = netdev_priv(netdev);
+ 
+-	mlx5e_stats_fec_get(priv, fec_stats);
++	mlx5e_stats_fec_get(priv, fec_stats, hist);
  }
  
- static void fec_set_block_stats(struct mlx5e_priv *priv,
-+				int mode,
- 				struct ethtool_fec_stats *fec_stats)
- {
- 	struct mlx5_core_dev *mdev = priv->mdev;
- 	u32 out[MLX5_ST_SZ_DW(ppcnt_reg)] = {};
- 	u32 in[MLX5_ST_SZ_DW(ppcnt_reg)] = {};
- 	int sz = MLX5_ST_SZ_BYTES(ppcnt_reg);
--	int mode = fec_active_mode(mdev);
--
--	if (mode == MLX5E_FEC_NOFEC)
--		return;
+ static int mlx5e_get_fecparam(struct net_device *netdev,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 5e007bb3bad1..0c79c42ae538 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -6279,8 +6279,15 @@ int mlx5e_priv_init(struct mlx5e_priv *priv,
+ 	if (!priv->channel_stats)
+ 		goto err_free_tx_rates;
  
- 	MLX5_SET(ppcnt_reg, in, local_port, 1);
- 	MLX5_SET(ppcnt_reg, in, grp, MLX5_PHYSICAL_LAYER_COUNTERS_GROUP);
-@@ -1496,11 +1493,14 @@ static void fec_set_corrected_bits_total(struct mlx5e_priv *priv,
- void mlx5e_stats_fec_get(struct mlx5e_priv *priv,
- 			 struct ethtool_fec_stats *fec_stats)
- {
--	if (!MLX5_CAP_PCAM_FEATURE(priv->mdev, ppcnt_statistical_group))
-+	int mode = fec_active_mode(priv->mdev);
++	priv->fec_ranges = kcalloc(ETHTOOL_FEC_HIST_MAX,
++				   sizeof(*priv->fec_ranges), GFP_KERNEL);
++	if (!priv->fec_ranges)
++		goto err_free_channel_stats;
 +
-+	if (mode == MLX5E_FEC_NOFEC ||
-+	    !MLX5_CAP_PCAM_FEATURE(priv->mdev, ppcnt_statistical_group))
+ 	return 0;
+ 
++err_free_channel_stats:
++	kfree(priv->channel_stats);
+ err_free_tx_rates:
+ 	kfree(priv->tx_rates);
+ err_free_txq2sq_stats:
+@@ -6304,6 +6311,7 @@ void mlx5e_priv_cleanup(struct mlx5e_priv *priv)
+ 	if (!priv->mdev)
  		return;
  
++	kfree(priv->fec_ranges);
+ 	for (i = 0; i < priv->stats_nch; i++)
+ 		kvfree(priv->channel_stats[i]);
+ 	kfree(priv->channel_stats);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+index aae0022e8736..c0bf0d49d7d5 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+@@ -1490,8 +1490,88 @@ static void fec_set_corrected_bits_total(struct mlx5e_priv *priv,
+ 				      phy_corrected_bits);
+ }
+ 
++#define MLX5_RS_HISTOGRAM_ENTRIES \
++	(MLX5_FLD_SZ_BYTES(rs_histogram_cntrs, hist) / \
++	 MLX5_FLD_SZ_BYTES(rs_histogram_cntrs, hist[0]))
++
++enum {
++	MLX5E_HISTOGRAM_FEC_RS_544_514 = 1,
++	MLX5E_HISTOGRAM_FEC_LLRS = 2,
++	MLX5E_HISTOGRAM_FEC_RS_528_514 = 3,
++};
++
++static bool fec_rs_validate_hist_type(int mode, int hist_type)
++{
++	switch (mode) {
++	case MLX5E_FEC_RS_528_514:
++		return hist_type == MLX5E_HISTOGRAM_FEC_RS_528_514;
++	case MLX5E_FEC_RS_544_514_INTERLEAVED_QUAD:
++	case MLX5E_FEC_RS_544_514:
++		return hist_type == MLX5E_HISTOGRAM_FEC_RS_544_514;
++	case MLX5E_FEC_LLRS_272_257_1:
++		return hist_type == MLX5E_HISTOGRAM_FEC_LLRS;
++	default:
++		break;
++	}
++
++	return false;
++}
++
++static u8
++fec_rs_histogram_fill_ranges(struct mlx5e_priv *priv, int mode,
++			     const struct ethtool_fec_hist_range **ranges)
++{
++	struct mlx5_core_dev *mdev = priv->mdev;
++	u32 out[MLX5_ST_SZ_DW(pphcr_reg)] = {0};
++	u32 in[MLX5_ST_SZ_DW(pphcr_reg)] = {0};
++	int sz = MLX5_ST_SZ_BYTES(pphcr_reg);
++	u8 hist_type, num_of_bins;
++
++	memset(priv->fec_ranges, 0,
++	       ETHTOOL_FEC_HIST_MAX * sizeof(*priv->fec_ranges));
++	MLX5_SET(pphcr_reg, in, local_port, 1);
++	if (mlx5_core_access_reg(mdev, in, sz, out, sz, MLX5_REG_PPHCR, 0, 0))
++		return 0;
++
++	hist_type = MLX5_GET(pphcr_reg, out, active_hist_type);
++	if (!fec_rs_validate_hist_type(mode, hist_type))
++		return 0;
++
++	num_of_bins = MLX5_GET(pphcr_reg, out, num_of_bins);
++	if (WARN_ON_ONCE(num_of_bins > MLX5_RS_HISTOGRAM_ENTRIES))
++		return 0;
++
++	for (int i = 0; i < num_of_bins; i++) {
++		void *bin_range = MLX5_ADDR_OF(pphcr_reg, out, bin_range[i]);
++
++		priv->fec_ranges[i].high = MLX5_GET(bin_range_layout, bin_range,
++						    high_val);
++		priv->fec_ranges[i].low = MLX5_GET(bin_range_layout, bin_range,
++						   low_val);
++	}
++	*ranges = priv->fec_ranges;
++
++	return num_of_bins;
++}
++
++static void fec_set_histograms_stats(struct mlx5e_priv *priv, int mode,
++				     struct ethtool_fec_hist *hist)
++{
++	switch (mode) {
++	case MLX5E_FEC_RS_528_514:
++	case MLX5E_FEC_RS_544_514:
++	case MLX5E_FEC_LLRS_272_257_1:
++	case MLX5E_FEC_RS_544_514_INTERLEAVED_QUAD:
++		fec_rs_histogram_fill_ranges(priv, mode, &hist->ranges);
++		break;
++	default:
++		return;
++	}
++}
++
+ void mlx5e_stats_fec_get(struct mlx5e_priv *priv,
+-			 struct ethtool_fec_stats *fec_stats)
++			 struct ethtool_fec_stats *fec_stats,
++			 struct ethtool_fec_hist *hist)
+ {
+ 	int mode = fec_active_mode(priv->mdev);
+ 
+@@ -1501,6 +1581,7 @@ void mlx5e_stats_fec_get(struct mlx5e_priv *priv,
+ 
  	fec_set_corrected_bits_total(priv, fec_stats);
--	fec_set_block_stats(priv, fec_stats);
-+	fec_set_block_stats(priv, mode, fec_stats);
+ 	fec_set_block_stats(priv, mode, fec_stats);
++	fec_set_histograms_stats(priv, mode, hist);
  }
  
  #define PPORT_ETH_EXT_OFF(c) \
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
+index 72dbcc1928ef..09f155acb461 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
+@@ -117,7 +117,8 @@ void mlx5e_stats_update_ndo_stats(struct mlx5e_priv *priv);
+ void mlx5e_stats_pause_get(struct mlx5e_priv *priv,
+ 			   struct ethtool_pause_stats *pause_stats);
+ void mlx5e_stats_fec_get(struct mlx5e_priv *priv,
+-			 struct ethtool_fec_stats *fec_stats);
++			 struct ethtool_fec_stats *fec_stats,
++			 struct ethtool_fec_hist *hist);
+ 
+ void mlx5e_stats_eth_phy_get(struct mlx5e_priv *priv,
+ 			     struct ethtool_eth_phy_stats *phy_stats);
 -- 
 2.47.3
 
