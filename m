@@ -1,210 +1,182 @@
-Return-Path: <netdev+bounces-225789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1279DB98491
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 07:28:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5447AB984B8
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 07:41:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 777962A76FC
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 05:28:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 153B316772C
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 05:41:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5AB22DF9E;
-	Wed, 24 Sep 2025 05:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DFBD221D96;
+	Wed, 24 Sep 2025 05:41:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RtCdeT/j"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="m0SCUKtU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFACE1C84C7
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 05:28:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A6722F75B;
+	Wed, 24 Sep 2025 05:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758691684; cv=none; b=t+YDAkl5RfRGaaPQ8ga4TyLiPyl4bBef03/LBeqd1i7BEgl6LXIASs5AH72dcyx0tz0IBZzsHpfkLQgaEcFOFZWC+eC1yE7XL8EGMuFzdvZlZRB/5O9RSysCJIwaQd3df6KyeG5i3/EGouAbc5Lhh2MgwwIvz7hCO50yIoIBJPY=
+	t=1758692498; cv=none; b=jEriHN/eOVftmDr2CAOHtHvz5xhXIjoYVuf/d8YflymspJS0brQC8Myxl7/hhtwe2eTQg6w2SsUpLd2Al271swKGmhKFfcxvz5tYc16M2SuJNLeNNLslwUPd7w5FJ+D0MrARaDMftNiH+DohvHUP31CbmDqDfwPapZB8KjNyQuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758691684; c=relaxed/simple;
-	bh=UFjExh43UXaUp/tZZHYT7ARaZowSev2WWH8n7m8z8D8=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=taQANdnobGkrNPgcVejgbIZzadlU+TcvfawsjVXrDJvgRHrLPe4UKwfbji50ObV4PFo0I8rxrCmOKCahvVKSBzznMc2AIbVuqX3xKUi7ytrnmE3ZMPcLuqZ+TBoX0AqsBjzGIQC8qJJqxnLvwOprjUJ4HjMYvGm5Cm+Y0xxOBU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RtCdeT/j; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758691680;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Op26YAffBp8tOKfuV5Tcf4HuI3YKE+atQUTpt3Pe7A8=;
-	b=RtCdeT/jc5y8UnjiNxOJ75Vff2QyTmaTRi/3GY0ARxHOr3ORp+7ph2UAd56bDl9k5GqoES
-	nkM2VQtL4Gt5EGPNLuXTBOBcBvYh6s9ploAK4LYw0pOEwVvIwrkXCaXqA6RZ65FvrGBEUG
-	lbHiTFtz9vB2vUh/GmXWmQQkxg3hVH4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-196-RvNhP7IqNDOv2U9VHIYilA-1; Wed, 24 Sep 2025 01:27:52 -0400
-X-MC-Unique: RvNhP7IqNDOv2U9VHIYilA-1
-X-Mimecast-MFC-AGG-ID: RvNhP7IqNDOv2U9VHIYilA_1758691671
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3ee12ab7f33so2605449f8f.2
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 22:27:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758691671; x=1759296471;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Op26YAffBp8tOKfuV5Tcf4HuI3YKE+atQUTpt3Pe7A8=;
-        b=LQfa0i6nMhVf6Ws62hUVxdVAtlA/S98JqRdX2cBZCSRlC/BGt7u6bNBBehy1+5D2HI
-         UKi8Gmfgjruup3GDRhK8nColmM/oeHmXBiuLAh2hTpEnCnHiDZmx2Wz89wabqRrsqiI0
-         FwieJZ0WEtNVEPFteUeWiPxg33KKjr5mYmInSwYrv9Tpi9nHXw/w94tZnPDuxLMRf9g7
-         9Q9ArggUTEwWt3l9m+WYhidMXBa/oGHpEvKR4q+fb9dYwWgG2n8Q/76S/6JD8POCyn0k
-         R5BL4sQaKy3ODe4sOH6YBoGkQ3zXf8Yihm10Gbrcvytf4f7+s8IGrK7H0jOhHb55P8n5
-         bapQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUbqnvkfoPB7+h5PDf94K3Emu+/epMj67VABOA9aATHE8+elNQnSv2ieef7XplgvNLZrebEHCA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7bz15vsPOV4+fUtN93qEUzqXoBUVik+/Hx8TF1mPlp5frh+Sx
-	7odj66dM5yJMu/ItQqPjNkBceM4BRClQxd3J+C5I8YpFl5a70EUT8cR76L0DV5b1uXR1/NPCGlD
-	+/TzB4tu8CI8tlwOtMqa1dgqLjhjCmIptKIXX2ysNIvUqJcAX4ymGYENk7g==
-X-Gm-Gg: ASbGnctcnEn/Xu8VPWlUUlcT91bM91DP9rMH+vYj9KYR8FpHwRoX0XxL52BVIe+USM+
-	rFHA+mIlZp8knQpxT2Uvu550bUrnw1evHrYLCyRlMOFvZLFDIq2dtri9viSiJEaOlhOoA4wGcOv
-	yeg2gTc7Chyyk8jv3SNBKZyK4FwJqolpQhhYPqpExnSoSFenz5ZnPL8EMrmexHRvwDUpWIuktYg
-	iIf5KBZUSRG2MIytUPD4OeaQKC5esHEuC/oP2se+Yvdp4Qg2gmFT64zsVepJRClgpGRznSM9dPB
-	Yz2ASgZKCgBPwpELJd63jtKS7yfsLfpD2oE=
-X-Received: by 2002:a05:6000:2304:b0:3ee:1357:e18f with SMTP id ffacd0b85a97d-405c49a252amr4041717f8f.12.1758691670939;
-        Tue, 23 Sep 2025 22:27:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE+yFqhaqoFopq7rZf8kR+Ni9QC+PbuNvIk77bkhBjbuNAj+k34PkCijOGnyeAujdQIjd3OOA==
-X-Received: by 2002:a05:6000:2304:b0:3ee:1357:e18f with SMTP id ffacd0b85a97d-405c49a252amr4041699f8f.12.1758691670369;
-        Tue, 23 Sep 2025 22:27:50 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ee0fbf1d35sm28457392f8f.55.2025.09.23.22.27.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 22:27:49 -0700 (PDT)
-Date: Wed, 24 Sep 2025 01:27:47 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH net] ptr_ring: drop duplicated tail zeroing code
-Message-ID: <20250924012728-mutt-send-email-mst@kernel.org>
-References: <adb9d941de4a2b619ddb2be271a9939849e70687.1758690291.git.mst@redhat.com>
+	s=arc-20240116; t=1758692498; c=relaxed/simple;
+	bh=b5/KwQIxRa2W6DBLHfGTOY25AMH2zO7MTbk5nBe4IDE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IYM6rKQMp6JQfIhj3NFdzOMeSGfIqIe5pxVfMshL1C04joJ3Ol9mGH72Jan4dzSrW+0gNaDCjH2TGQ4v/cbvaPQQARxZsWO6Rff08o1cfZBYj9UlQYBOXvIzmfIBz67ozThuOruW6j1GBPbWO1eyRz2U9vOjiqYpKIn1MA1/NCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=m0SCUKtU; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [IPV6:2a01:599:c11:dc72:32f8:2997:5bae:168a] (tmo-123-4.customers.d1-online.com [80.187.123.4])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 58O5fTOL005992
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 24 Sep 2025 07:41:30 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1758692491;
+	bh=b5/KwQIxRa2W6DBLHfGTOY25AMH2zO7MTbk5nBe4IDE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=m0SCUKtUrzBbqH9oQ86ECQavDI2kae9gX8/D1JceqLnNBz5Phhc0fQhtqpD7N91Lx
+	 LIyXAzG7rLByKiP3zBjd1HpiieWzySa9VKwipIACvDm+oT/WaaTq8Qrgd96DnVZIpR
+	 c3ldEEu73A8o6++sAte/3YQN4Jpgv74nkouqD/84=
+Message-ID: <71afbe18-3a5a-44ca-bb3b-b018f73ae8c6@tu-dortmund.de>
+Date: Wed, 24 Sep 2025 07:41:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <adb9d941de4a2b619ddb2be271a9939849e70687.1758690291.git.mst@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH net-next v5 3/8] TUN, TAP & vhost_net: Stop netdev queue
+ before reaching a full ptr_ring
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com, eperezma@redhat.com,
+        stephen@networkplumber.org, leiyang@redhat.com, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+        kvm@vger.kernel.org, Tim Gebauer <tim.gebauer@tu-dortmund.de>
+References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+ <20250922221553.47802-4-simon.schippers@tu-dortmund.de>
+ <20250923104348-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20250923104348-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 24, 2025 at 01:27:09AM -0400, Michael S. Tsirkin wrote:
-> We have some rather subtle code around zeroing tail entries, minimizing
-> cache bouncing.  Let's put it all in one place.
+Hi,
+first of all thank you very much for your detailed replies! :)
+
+On 23.09.25 16:47, Michael S. Tsirkin wrote:
+> On Tue, Sep 23, 2025 at 12:15:48AM +0200, Simon Schippers wrote:
+>> Stop the netdev queue ahead of __ptr_ring_produce when
+>> __ptr_ring_full_next signals the ring is about to fill. Due to the
+>> smp_wmb() of __ptr_ring_produce the consumer is guaranteed to be able to
+>> notice the stopped netdev queue after seeing the new ptr_ring entry. As
+>> both __ptr_ring_full_next and __ptr_ring_produce need the producer_lock,
+>> the lock is held during the execution of both methods.
+>>
+>> dev->lltx is disabled to ensure that tun_net_xmit is not called even
+>> though the netdev queue is stopped (which happened in my testing,
+>> resulting in rare packet drops). Consequently, the update of trans_start
+>> in tun_net_xmit is also removed.
+>>
+>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>> ---
+>>  drivers/net/tun.c | 16 ++++++++++------
+>>  1 file changed, 10 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>> index 86a9e927d0ff..c6b22af9bae8 100644
+>> --- a/drivers/net/tun.c
+>> +++ b/drivers/net/tun.c
+>> @@ -931,7 +931,7 @@ static int tun_net_init(struct net_device *dev)
+>>  	dev->vlan_features = dev->features &
+>>  			     ~(NETIF_F_HW_VLAN_CTAG_TX |
+>>  			       NETIF_F_HW_VLAN_STAG_TX);
+>> -	dev->lltx = true;
+>> +	dev->lltx = false;
+>>  
+>>  	tun->flags = (tun->flags & ~TUN_FEATURES) |
+>>  		      (ifr->ifr_flags & TUN_FEATURES);
+>> @@ -1060,14 +1060,18 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>  
+>>  	nf_reset_ct(skb);
+>>  
+>> -	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
+>> +	queue = netdev_get_tx_queue(dev, txq);
+>> +
+>> +	spin_lock(&tfile->tx_ring.producer_lock);
+>> +	if (__ptr_ring_full_next(&tfile->tx_ring))
+>> +		netif_tx_stop_queue(queue);
+>> +
+>> +	if (unlikely(__ptr_ring_produce(&tfile->tx_ring, skb))) {
+>> +		spin_unlock(&tfile->tx_ring.producer_lock);
+>>  		drop_reason = SKB_DROP_REASON_FULL_RING;
+>>  		goto drop;
+>>  	}
 > 
-> Doing this also reduces the text size slightly, e.g. for
-> drivers/vhost/net.o
->   Before: text: 15,114 bytes
->   After: text: 15,082 bytes
+> The comment makes it sound like you always keep one slot free
+> in the queue but that is not the case - you just
+> check before calling __ptr_ring_produce.
 > 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
+I agree.
 
-Ugh net-next obviously. Sorry.
-
-
-> ---
 > 
-> Lightly tested.
+> But it is racy isn't it? So first of all I suspect you
+> are missing an mb before netif_tx_stop_queue.
 > 
->  include/linux/ptr_ring.h | 42 +++++++++++++++++++++++-----------------
->  1 file changed, 24 insertions(+), 18 deletions(-)
-> 
-> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
-> index 551329220e4f..a736b16859a6 100644
-> --- a/include/linux/ptr_ring.h
-> +++ b/include/linux/ptr_ring.h
-> @@ -243,6 +243,24 @@ static inline bool ptr_ring_empty_bh(struct ptr_ring *r)
->  	return ret;
->  }
->  
-> +/* Zero entries from tail to specified head.
-> + * NB: if consumer_head can be >= r->size need to fixup tail later.
-> + */
-> +static inline void __ptr_ring_zero_tail(struct ptr_ring *r, int consumer_head)
-> +{
-> +	int head = consumer_head - 1;
-> +
-> +	/* Zero out entries in the reverse order: this way we touch the
-> +	 * cache line that producer might currently be reading the last;
-> +	 * producer won't make progress and touch other cache lines
-> +	 * besides the first one until we write out all entries.
-> +	 */
-> +	while (likely(head >= r->consumer_tail))
-> +		r->queue[head--] = NULL;
-> +
-> +	r->consumer_tail = consumer_head;
-> +}
-> +
->  /* Must only be called after __ptr_ring_peek returned !NULL */
->  static inline void __ptr_ring_discard_one(struct ptr_ring *r)
->  {
-> @@ -261,8 +279,7 @@ static inline void __ptr_ring_discard_one(struct ptr_ring *r)
->  	/* Note: we must keep consumer_head valid at all times for __ptr_ring_empty
->  	 * to work correctly.
->  	 */
-> -	int consumer_head = r->consumer_head;
-> -	int head = consumer_head++;
-> +	int consumer_head = r->consumer_head + 1;
->  
->  	/* Once we have processed enough entries invalidate them in
->  	 * the ring all at once so producer can reuse their space in the ring.
-> @@ -270,16 +287,9 @@ static inline void __ptr_ring_discard_one(struct ptr_ring *r)
->  	 * but helps keep the implementation simple.
->  	 */
->  	if (unlikely(consumer_head - r->consumer_tail >= r->batch ||
-> -		     consumer_head >= r->size)) {
-> -		/* Zero out entries in the reverse order: this way we touch the
-> -		 * cache line that producer might currently be reading the last;
-> -		 * producer won't make progress and touch other cache lines
-> -		 * besides the first one until we write out all entries.
-> -		 */
-> -		while (likely(head >= r->consumer_tail))
-> -			r->queue[head--] = NULL;
-> -		r->consumer_tail = consumer_head;
-> -	}
-> +		     consumer_head >= r->size))
-> +		__ptr_ring_zero_tail(r, consumer_head);
-> +
->  	if (unlikely(consumer_head >= r->size)) {
->  		consumer_head = 0;
->  		r->consumer_tail = 0;
-> @@ -513,7 +523,6 @@ static inline void ptr_ring_unconsume(struct ptr_ring *r, void **batch, int n,
->  				      void (*destroy)(void *))
->  {
->  	unsigned long flags;
-> -	int head;
->  
->  	spin_lock_irqsave(&r->consumer_lock, flags);
->  	spin_lock(&r->producer_lock);
-> @@ -525,17 +534,14 @@ static inline void ptr_ring_unconsume(struct ptr_ring *r, void **batch, int n,
->  	 * Clean out buffered entries (for simplicity). This way following code
->  	 * can test entries for NULL and if not assume they are valid.
->  	 */
-> -	head = r->consumer_head - 1;
-> -	while (likely(head >= r->consumer_tail))
-> -		r->queue[head--] = NULL;
-> -	r->consumer_tail = r->consumer_head;
-> +	__ptr_ring_zero_tail(r, r->consumer_head);
->  
->  	/*
->  	 * Go over entries in batch, start moving head back and copy entries.
->  	 * Stop when we run into previously unconsumed entries.
->  	 */
->  	while (n) {
-> -		head = r->consumer_head - 1;
-> +		int head = r->consumer_head - 1;
->  		if (head < 0)
->  			head = r->size - 1;
->  		if (r->queue[head]) {
-> -- 
-> MST
 
+I don’t really get this point right now.
+
+> Second it's racy because more entries can get freed
+> afterwards. Which maybe is ok in this instance?
+> But it really should be explained in more detail, if so.
+> 
+
+Will be covered in the next mail.
+
+> 
+> 
+> Now - why not just check ring full *after* __ptr_ring_produce?
+> Why do we need all these new APIs, and we can
+> use existing ones which at least are not so hard to understand.
+> 
+> 
+
+You convinced me about changing my implementation anyway but here my (old) 
+idea:
+I did this in V1-V4. The problem is that vhost_net is only called on 
+EPOLLIN triggered by tun_net_xmit. Then, after consuming a batch from the 
+ptr_ring, it must be able to see if the netdev queue stopped or not. If 
+this is not the case the ptr_ring might get empty and vhost_net is not 
+able to wake the queue again (because it is not stopped from its POV), 
+which happened in my testing in my V4.
+
+This is the reason why, now in the V5, in tun_net_xmit I stop the netdev 
+queue before producing. With that I exploit the smp_wmb() in 
+__ptr_ring_produce which is paired with the READ_ONCE in __ptr_ring_peek 
+to ensure that the consumer in vhost_net sees that the netdev queue 
+stopped after consuming a batch.
+
+> 
+> 
+>> -
+>> -	/* dev->lltx requires to do our own update of trans_start */
+>> -	queue = netdev_get_tx_queue(dev, txq);
+>> -	txq_trans_cond_update(queue);
+>> +	spin_unlock(&tfile->tx_ring.producer_lock);
+>>  
+>>  	/* Notify and wake up reader process */
+>>  	if (tfile->flags & TUN_FASYNC)
+>> -- 
+>> 2.43.0
+> 
 
