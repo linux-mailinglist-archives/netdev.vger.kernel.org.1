@@ -1,130 +1,257 @@
-Return-Path: <netdev+bounces-226038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85F09B9B1C6
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:50:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36FD7B9B1DE
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:51:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB89E1B264FC
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 17:50:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB3813B43DA
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 17:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBEA313E3E;
-	Wed, 24 Sep 2025 17:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77155314B69;
+	Wed, 24 Sep 2025 17:50:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HO3rF3uB"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="iT8duxwz";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="m08DfW+o"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540B52FBE05;
-	Wed, 24 Sep 2025 17:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E792FBE05;
+	Wed, 24 Sep 2025 17:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758736230; cv=none; b=LD7v0v1ZlPSE1kzurYByicUMv0GIzZfnjBLVIs204fYvB3Z5sXDMVRCVB79i519w3mz3r1MsPkpWInNANxl3hXaR6Z7bgywWMEwCxTKMtzWzn42QhNzKNXoiPd0HNvqEe09E3wh8fPw4fMXAbgGfMTslTfLhw+xWMvgmdLbMwqU=
+	t=1758736238; cv=none; b=ZDS/gR1Fu7/+t9UE1YA35Fy5XXMCvvpHFAt4jKAey6RjAktbvZayOcloJQY3qb6Igwc+IrKDrw3H2xtynvSF8/zrMOBLvSDYyZjztygwciljY091JNrt1L4HnNJgVra01vsBDELma02y25F/wjDSAaMiiLosTxbjlDCW8QngNs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758736230; c=relaxed/simple;
-	bh=xB7pPlWW0+eiQnT8mrW75khUnjKN0I9h+uNbHWk55Uk=;
+	s=arc-20240116; t=1758736238; c=relaxed/simple;
+	bh=NPGlUlaUMBUpPVyqYO4XSqsnRuXnfdEkj6waMAL1ODE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BkTKBmU9wb6Qmf4QqkkjH5ZLAnHJ1SYz3W779IYaMHhuKPEy9OnVDQsFbM2cMeLpr6x+ts1+w7jgxWRtqWpgI1FxBkiAZz40RDlM90bWAzKRXlrAv3M7TGs8IymV5zqRjh8OMvJPThzxk9QzG60lVdb2J8QipT9jgPYiT1CkkpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HO3rF3uB; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=+vJ1dOlsQQaSGt9wLwAFi3DtF1NLVEuTTQ4UpKnYZ3M=; b=HO3rF3uBCQ2jcVMAxeZgSdPp+w
-	8JkNip2tIfNxVFlpWPPVkI3BxcxjT7OnUMTN+u9aYpdeRIv/Z9nfvGmfCqFFLocvpncoMTU5AwrkI
-	GV91ILjtr0b025Bd2tFtERmWPEgLfydMGRbR6Kkz9kOtIt8R+KhJO3N4o8dzZ/RcLDeIWSHByJTuh
-	I8aS1ggLI1BYgbwVQZNMs+x+aNZ0IqLloKs2pVEMtkg7neTQ9XzTSoonUdT7AOxQyVR7yg7kQVeaw
-	lZ7J5eK6Fi/eEXF2iAgmf8NpuEfoORJxZQZD/gDLQXImTU2ZIActbAJNmtXC3rWEy4r+Ijg2uaRNS
-	aCqWKUXQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55252)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1v1TdH-000000000z7-0TDa;
-	Wed, 24 Sep 2025 18:50:23 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1v1TdE-000000007L9-04ys;
-	Wed, 24 Sep 2025 18:50:20 +0100
-Date: Wed, 24 Sep 2025 18:50:19 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: David Yang <mmyangfl@gmail.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Simon Horman <horms@kernel.org>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v11 2/5] net: phy: introduce
- PHY_INTERFACE_MODE_REVSGMII
-Message-ID: <aNQvW54sk3EzmoJp@shell.armlinux.org.uk>
-References: <20250922131148.1917856-1-mmyangfl@gmail.com>
- <20250922131148.1917856-3-mmyangfl@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RGsSUuSzqaictzZVaEVvhmUJXyvYmGNNHzgVLrKMuIUhbCczJiH1G48aaevs85SVmMMmibqGj6RxuIJAlFse1Rtd1zEhzL3AtEWWXiOfIZlNaJWbqc68SufDvPtE3urORkzNaDsc7rEUCAo6XCSFNEwYtMBqtVMfCCGwltY9Ors=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=iT8duxwz; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=m08DfW+o; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.phl.internal (Postfix) with ESMTP id 1C9F4EC00B6;
+	Wed, 24 Sep 2025 13:50:34 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Wed, 24 Sep 2025 13:50:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
+	 t=1758736234; x=1758822634; bh=moKr34pnawcljfj8OP/P5kJrgh1m2F+Q
+	E1r8IvMYRIM=; b=iT8duxwzuK2zGKi4NgeVmyVO/fVTTRwr61CyIAOihTyIUHEy
+	+0JGk8qYPdyr/8w0fi3gHClaLb9cCxTKY1Lw5HGvsjoSK+OlejSmgOKWDvSMe2qU
+	wD+n+Isj+KSTHCV2xRTQcpaBFmIE5x3kI2qnJJ6g1pMC0frWSccHy8I1Da+i9Wf0
+	Z+BW18gbfb1whu4XvSRrz83Dz9xegm6kI3qW3Fews0MAijGEC+ux5sxHUGfHSp+E
+	bBjr05or6d1v6Y1dYxQSNWgFBWXkrvYIHGqpPitdXPGRvZr2EcWHmuIx4CyBK5J4
+	U0gIhABn0t6ZeBvvgdEV+6eVUmpYvyde1Oa5yQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1758736234; x=
+	1758822634; bh=moKr34pnawcljfj8OP/P5kJrgh1m2F+QE1r8IvMYRIM=; b=m
+	08DfW+oAcWXd+bAH7w4CvXtClNfIFKdrbEfJdJoGqOJXdih4CNLPvT7rlP2qzraR
+	BiUN7HjfIE5fNydz3Qn90Z0T9S4lkg1x4JZdqurnuNS+rWpVojmwtqz0DCIIxKa/
+	wOuMgGw36IfQqEjTTA9WNjmmSotmqa7b6YNxSpfbb4YgStqGujyfeA1mbkgZYx4E
+	cbENVTg464dXZGB4VzS0JDPrAVBYTZLKgZUJOfffI6pUtiBaRRIbJ119CiXDj6hS
+	Q97RhwB5MwPeF5mI1R06hK+NYktjQ/WwfYlA70i7NKBjspn+aGEl7n8b5K9q9X8G
+	ShYoHsfZ6Fhxd8f+mUtXQ==
+X-ME-Sender: <xms:aS_UaOUB5uQJpjGm5uW48h34b1E_2dxi0gD5q5KAdAaS-qdfhstk-g>
+    <xme:aS_UaG8Mn7F8Cuoklc-yViFbEofuML_rLGbF_wd4Q8Izj2AupMxBwm9JxlKpUWCIM
+    kE7-f4BMntzJrLRLn3gBRv-y7oCdQ_U-qGtSQegbF0Ch4fYreMOjTw>
+X-ME-Received: <xmr:aS_UaG2W84DgZpAz3cPnC1pU22cG1i2feuhigjmn0hT0fLzX9-oMK4bLw1RK>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdeigedvhecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtugfgjgesthekrodttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnheptedttdeijeetgeelkedttedvgefhheeuffeghfdviedvheelhfdvheef
+    ffeuvdefnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdr
+    nhgvthdpnhgspghrtghpthhtohepudegpdhmohguvgepshhmthhpohhuthdprhgtphhtth
+    hopeifihhlfhhrvggurdhophgvnhhsohhurhgtvgesghhmrghilhdrtghomhdprhgtphht
+    thhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlih
+    hnuhigqdguohgtsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhu
+    gidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinh
+    hugidqkhhsvghlfhhtvghsthesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
+    pegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivg
+    htsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-ME-Proxy: <xmx:aS_UaDcPjnod5XhER5-UXNUiYuwQYTPga7OzJiISPhDluvDlyKHBKw>
+    <xmx:aS_UaFCEojX29xTEgH735Kq1bWlb59yKsTh6uFtQxHGH3V2Uj-B25A>
+    <xmx:aS_UaC9aOU6cAXPW0SC0GnN_p6FQ1VAvYHKnDR1wYX9fiGGcfqZ55Q>
+    <xmx:aS_UaBql8E6iRb-8-7Hc40vc1ivrtkysPeoGYbdSUeh8G3ycLv-02g>
+    <xmx:ai_UaItRc-UPAsQFv6kaqrW6CDmhWPMks014ZWeR9i2f-2ragQ6fUnxq>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 24 Sep 2025 13:50:32 -0400 (EDT)
+Date: Wed, 24 Sep 2025 19:50:30 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Wilfred Mallawa <wilfred.opensource@gmail.com>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+	john.fastabend@gmail.com, shuah@kernel.org,
+	Wilfred Mallawa <wilfred.mallawa@wdc.com>
+Subject: Re: [PATCH v4 2/2] selftests: tls: add tls record_size_limit test
+Message-ID: <aNQvZnCWhymiXYPO@krikkit>
+References: <20250923053207.113938-1-wilfred.opensource@gmail.com>
+ <20250923053207.113938-2-wilfred.opensource@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250922131148.1917856-3-mmyangfl@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250923053207.113938-2-wilfred.opensource@gmail.com>
 
-On Mon, Sep 22, 2025 at 09:11:40PM +0800, David Yang wrote:
-> The "reverse SGMII" protocol name is a personal invention, derived from
-> "reverse MII" and "reverse RMII", this means: "behave like an SGMII
-> PHY".
+[got a bit distracted while writing this so Simon got to the process
+stuff before me, but I'll leave it in:]
 
-Sorry to mess you around, but... I've been getting further with stmmac's
-PCS stuff (I've started again with it) and I've come to realise that the
-stmmac driver is full of worms here.
+BTW, a few details about process: since this is a new feature, the
+subject prefix should be [PATCH net-next v4 n/m] (new stuff targets
+the net-next tree), and the patches should be based on the net-next
+tree [1] (I'm not sure what you based this on, git am complained on
+both net and net-next for this patch). More info about this in the
+docs [2].
 
-I think we need to have a bigger discussion here.
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/
+[2] https://docs.kernel.org/process/maintainer-netdev.html
+    (in case you're not aware: also note the bits about "merge window"
+    which will quite likely become relevant in a few days)
 
-Today, we have:
 
-- PHY_INTERFACE_MODE_REVMII
-- PHY_INTERFACE_MODE_REVRMII
+2025-09-23, 15:32:07 +1000, Wilfred Mallawa wrote:
+> From: Wilfred Mallawa <wilfred.mallawa@wdc.com>
+> 
+> Test that outgoing plaintext records respect the tls record_size_limit
+> set using setsockopt(). The record size limit is set to be 128, thus,
+> in all received records, the plaintext must not exceed this amount.
+> 
+> Also test that setting a new record size limit whilst a pending open
+> record exists is handled correctly by discarding the request.
+> 
+> Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
+> Signed-off-by: Wilfred Mallawa <wilfred.mallawa@wdc.com>
 
-which both complement their _MII and _RMII definitions. So, it seems
-entirely sensible to also introduce REVSGMII to complement SGMII.
+Thanks for adding this patch.
+(and for the tag :))
 
-However, stmmac hardware supports "reverse" mode for more than just
-SGMII, also RGMII and SMII. The driver doesn't support SMII, and is
-actually buggy - despite having the DT configuration knobs (which
-are used), the hardware is never actually configured to operate in
-"reverse" mode (it never has the GMAC_CONFIG_TC bit set to allow the
-core to, in effect, act as a PHY.) That said, the core does have
-it's SGMII rate adapter switched from using the incoming inband word
-to using the MAC configuration.
+> ---
+>  tools/testing/selftests/net/tls.c | 149 ++++++++++++++++++++++++++++++
+>  1 file changed, 149 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
+> index 0f5640d8dc7f..c5bd431d5af3 100644
+> --- a/tools/testing/selftests/net/tls.c
+> +++ b/tools/testing/selftests/net/tls.c
+> @@ -24,6 +24,7 @@
+>  #include "../kselftest_harness.h"
+>  
+>  #define TLS_PAYLOAD_MAX_LEN 16384
+> +#define TLS_TX_RECORD_SIZE_LIM 5
 
-So, while I thought this would be useful for stmmac, given that all
-the platforms we have today aren't actually using "reverse SGMII"
-mode, I don't think this will be useful there.
+nit: That should not be needed if you run `make headers_install`
+before compiling the selftest:
 
-If we go round the route of adding REVSGMII, we are also opening
-the path to also having REVSMII, and all four REVRGMII* as well.
-Is this a good idea?
+make -s headers_install ; make -C tools/testing/selftests/net tls
+make: Entering directory '/home/sab/linux/net/tools/testing/selftests/net'
+gcc -Wall -Wl,--no-as-needed -O2 -g -I../../../../usr/include/ -isystem /home/sab/linux/net/tools/testing/selftests/../../../usr/include -I../ -D_GNU_SOURCE=     tls.c   -o tls
 
-Would it be better to have phy_interface_t + reverse-mode flag
-and accept REVMII and REVRMII as a pecularity? That's probably
-going to be a very painful change.
+and that will find the new constant defined in the previous patch
+using the headers from the current kernel tree, instead of those in
+the system.
 
-Andrew, any views?
+
+[...]
+> +TEST(tx_record_size)
+> +{
+> +	struct tls_crypto_info_keys tls12;
+> +	int cfd, ret, fd, rx_len, overhead;
+> +	size_t total_plaintext_rx = 0;
+> +	__u8 tx[1024], rx[2000];
+> +	__u8 *rec;
+> +	__u16 limit = 128;
+> +	__u16 opt = 0;
+> +	__u8 rec_header_len = 5;
+
+gcc complains about unused variables, I guess leftovers from
+extracting parse_tls_records:
+
+tls.c: In function ‘tx_record_size’:
+tls.c:2840:14: warning: unused variable ‘rec_header_len’ [-Wunused-variable]
+ 2840 |         __u8 rec_header_len = 5;
+      |              ^~~~~~~~~~~~~~
+tls.c:2837:15: warning: unused variable ‘rec’ [-Wunused-variable]
+ 2837 |         __u8 *rec;
+      |               ^~~
+tls.c: In function ‘tx_record_size_open_rec’:
+tls.c:2893:14: warning: unused variable ‘rec_header_len’ [-Wunused-variable]
+ 2893 |         __u8 rec_header_len = 5;
+      |              ^~~~~~~~~~~~~~
+tls.c:2891:15: warning: unused variable ‘rec’ [-Wunused-variable]
+ 2891 |         __u8 *rec;
+      |               ^~~
+
+
+> +	unsigned int optlen = sizeof(opt);
+> +	bool notls;
+> +
+> +	tls_crypto_info_init(TLS_1_2_VERSION, TLS_CIPHER_AES_CCM_128,
+> +			     &tls12, 0);
+> +
+> +	ulp_sock_pair(_metadata, &fd, &cfd, &notls);
+> +
+> +	if (notls)
+> +		exit(KSFT_SKIP);
+> +
+> +	/* Don't install keys on fd, we'll parse raw records */
+> +	ret = setsockopt(cfd, SOL_TLS, TLS_TX, &tls12, tls12.len);
+> +	ASSERT_EQ(ret, 0);
+> +
+> +	ret = setsockopt(cfd, SOL_TLS, TLS_TX_RECORD_SIZE_LIM, &limit, sizeof(limit));
+> +	ASSERT_EQ(ret, 0);
+> +
+> +	ret = getsockopt(cfd, SOL_TLS, TLS_TX_RECORD_SIZE_LIM, &opt, &optlen);
+> +	ASSERT_EQ(ret, 0);
+> +	ASSERT_EQ(limit, opt);
+> +	ASSERT_EQ(optlen, sizeof(limit));
+
+nit: Maybe a few of those should be EXPECT_EQ? (ASSERT_* stops the
+test, EXPECT_* will run the rest of the test)
+
+Getting the wrong value back from this getsockopt is worth noting but
+there's value in running the traffic through anyway?
+
+> +
+> +	memset(tx, 0, sizeof(tx));
+> +	EXPECT_EQ(send(cfd, tx, sizeof(tx), 0), sizeof(tx));
+
+But this one should maybe be an ASSERT because trying to parse records
+from whatever data we managed to send (if any) may not make much
+sense?
+
+(just some thoughts, this is not a "strict requirement" to change
+anything in the patch)
+
+
+> +	close(cfd);
+> +
+> +	ret = recv(fd, rx, sizeof(rx), 0);
+> +	memcpy(&rx_len, rx + 3, 2);
+> +	rx_len = htons(rx_len);
+
+nit: set but not used (also in tx_record_size_open_rec)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Sabrina
 
