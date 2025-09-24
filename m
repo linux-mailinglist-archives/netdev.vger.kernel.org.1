@@ -1,690 +1,297 @@
-Return-Path: <netdev+bounces-225971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26315B9A0FA
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 15:38:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 035A8B9A112
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 15:39:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0FCC3A90BA
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 13:38:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 266981B23740
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 13:39:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF6630214B;
-	Wed, 24 Sep 2025 13:38:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428673043A9;
+	Wed, 24 Sep 2025 13:39:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YnPCFdcd"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="jPHKzx/Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mo4-p02-ob.smtp.rzone.de (mo4-p02-ob.smtp.rzone.de [81.169.146.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9BF413FEE
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 13:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A44A4143C69;
+	Wed, 24 Sep 2025 13:39:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.171
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758721123; cv=fail; b=WM4GeB9AsUU1cdYa6GPSKjYb9nBAztOOHD/7xPGJ/4+lwtwnSaDkyObeYv6wSn3XTsCrREWXv6070F9wniADSolS2BsuFjcvCL64yTOFBo8d4K2iY76Q5JbP5ZG3mDklGjSTeQeJ06isfeI3bwgofBD5mUE0F6R/bfHQhMH1/HE=
+	t=1758721154; cv=pass; b=H0Nz15WwxIYPE2yPCb6jEDXzabwhwiJ4jtPovOqYg/U470RC19mUUUuzeLFOM2bwZOxAVCV2AsvixKojsTwDSIgWVBS06CSuSvfK8nGhv284Pf9BcX5MCIGcFLxJHYOL1Hw7GnGUDRS0hPSEkFqmbnssXTJEdRUhYgae0n/qP4Y=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758721123; c=relaxed/simple;
-	bh=RLyawFC1CpUDBN9SOoVyhPW60xIJ0PEPPKph9lOl6dk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=JwXXAvc2xNey222rRHmsgAIWM2vR4AWh1vLOt0mg5bGJpLN+dtp9KqVINaZaFV2+/ck8sMH6syjelMPzhsUC7bGDeTsXmrnixg3jyn3EPOYVCYu+Y856L+hCkXgaw7Z8BGvHvjpofguztBy86kpMOtb5aGCWVHzojR257CUjkG4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YnPCFdcd; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758721121; x=1790257121;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=RLyawFC1CpUDBN9SOoVyhPW60xIJ0PEPPKph9lOl6dk=;
-  b=YnPCFdcdxcPqK2pNcZiR6r/HfzwmsNnjoBPKOE53Y2fJHhVrL0b9G+vZ
-   mXy7YMwNjJBVvTeHZIINaXGfX0aMw+6PA3NlMlxxRq9Gd87PakhtyOp+U
-   Jg/ThTbEDWcd0AuC2Dfcf0T2W/DGadReIy3ztBeEuUbkHI3z7wvQuVYn8
-   znBEHh8MP1CpjDwgWfzjcZgnmHp+b+KPjJw2h4FExthuJp4goJ+vg2rtC
-   t+ize2mZAVbeIiZejCtxL6f6PPNzCtdzcg1kgi5Dlz72tAK/7eL5Z8MhF
-   jpvDfz0D4J2OC7VVPr1NLGPLYqEMpe45HbNZIS+9dpRDdQiY3EYg+TNtC
-   Q==;
-X-CSE-ConnectionGUID: KL1qWQmoSae9VywPQae+/g==
-X-CSE-MsgGUID: h3WybKhLTR+5BkyeO6Wn6Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11563"; a="71638902"
-X-IronPort-AV: E=Sophos;i="6.18,290,1751266800"; 
-   d="scan'208";a="71638902"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 06:38:40 -0700
-X-CSE-ConnectionGUID: gFcnFwW7Rsqru5xgE3cWaQ==
-X-CSE-MsgGUID: k6kteW4WSAem6NBQRz5abw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,290,1751266800"; 
-   d="scan'208";a="177807694"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 06:38:40 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 24 Sep 2025 06:38:39 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Wed, 24 Sep 2025 06:38:39 -0700
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.50) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Wed, 24 Sep 2025 06:38:38 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DGAiH0ZRgjor9cUlawLvgRhfzL30grFDp9LtrU0jw4TxY8uTgIc7X7AbIS9YowKE7wl1kge8vwDRUDy/TQpLrYv8RYk7PAYjbla0acqtVU7DLI4drA7tleBoXnmMKqqeCInYTkmpoMuExnqGiKH0klqvNPy+8MQOG7Dx1vfM0EokL/Cdot52IMeTEI+DGCygKqPBRdYVBqRTRVh46VN0EdzLR4lFM3C5tqJfvT4ExTngPEQhHN6ZIA0DqGiA6BaEj+JJJBwbQzZth032+qWG6R/uf4ITDzXtMzKXeBKvFLT8JrUi1X2I96oswDU7TqNr94tMth/A+xAp9IrtH76BsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IiUz/NZ6eAHrd6b6CXA/xywAmNGWr2ZfzN/B3k2icbI=;
- b=K2J51KiXgGis1VxVMNe2KUO/Uy+1/K2kQesy4hhjR1sC/oYLmbd8C5GF7pc4LfdDNS5WBLOS9ySgxaeb4lOHuPkTAuDuImcHGfFZxrH+DxVdfLgiCcLh9pjQG+siklwxNIyV2gbrreV/efhP2mxeoUBScqaDCmy7XWktmCnt53Zm/QV8TJuysBJ3wmYlkm1qukjsAPrCIHeH/C3D1gkeeeiNjlbbp8RucHWdmoKaS2kdNhTgDFBUQxGnspEHt3aUouPYAVZDjcBKHboAWO5jXV2V2sXi2OCtZcgnGHIeFrkKhDc+IuULPHe6LvGqW//IFAqhItrZdsQbhpDYpnfrMg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by PH7PR11MB7002.namprd11.prod.outlook.com (2603:10b6:510:209::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.9; Wed, 24 Sep
- 2025 13:38:36 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9137.018; Wed, 24 Sep 2025
- 13:38:36 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jakub Kicinski
-	<kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>, Michael Chan
-	<michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, "Tariq
- Toukan" <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, Donald
- Hunter <donald.hunter@gmail.com>, Carolina Jubran <cjubran@nvidia.com>
-CC: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH net-next v6 1/5] ethtool: add FEC bins histogram report
-Thread-Topic: [PATCH net-next v6 1/5] ethtool: add FEC bins histogram report
-Thread-Index: AQHcLVB+uBWqW6LjRk2juCxa/QO1RrSiVj3g
-Date: Wed, 24 Sep 2025 13:38:36 +0000
-Message-ID: <IA3PR11MB8986056877BF5CAF253F0F23E51CA@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20250924124037.1508846-1-vadim.fedorenko@linux.dev>
- <20250924124037.1508846-2-vadim.fedorenko@linux.dev>
-In-Reply-To: <20250924124037.1508846-2-vadim.fedorenko@linux.dev>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|PH7PR11MB7002:EE_
-x-ms-office365-filtering-correlation-id: 82439552-7be4-4d93-073e-08ddfb6fa99c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?FwgsUDQSUnVReoTp/QrSB44Q9+56LcyIiGhvBAx0jghimjEUtNm3WZtV8pJ2?=
- =?us-ascii?Q?nyVTvTjhcxs6RAp0MBbE/ovWfxGDmY/JX9gN5pCTS0un/ZTdfju7spEbnfUz?=
- =?us-ascii?Q?2aNB9ZfDu/zjIwq6oPEGiEw7OdwD6b4jPgfRG0Ma4fHol/L9svuuV3XulIlI?=
- =?us-ascii?Q?dsf49ap8+e2COKzd+VNrFZqAlU3Hmk23NQZRdc4qua+qMAhhy6MrwV+w1AKP?=
- =?us-ascii?Q?8LxkD2GFEKhxP1lYxgaNYhXj841vbSTpVDjmUsQvYfFo9HWjqET6QBJqg+hd?=
- =?us-ascii?Q?iywKXK3FPvt/gkTJB4UBBZjXijPKgJYdZwIw8ciW+nEfaGyR3kScQIgrQA3W?=
- =?us-ascii?Q?iClN0EdMcST9zNERDsWqy44tkNRVwLMjUIXUrMntl11VDAztDdbFFJLQMeGZ?=
- =?us-ascii?Q?PJlWk1he7CsBdc2t3klrHIGo4LARn38LceLPz7a/8Gq42Qb0ZSyth+Z57cS9?=
- =?us-ascii?Q?0LpcIH96L7ZSTreANVYwv5WC4Af7C+sNGpWfa3jXxOGk0XltW2a+oM5nLbbf?=
- =?us-ascii?Q?pPjDACA3sns4alccgLfIk+d1Wb5JhU1VOLCiHaLCFoVU0UIqlUKipNSx3E2q?=
- =?us-ascii?Q?U7oTRQG/1ecxUOnLSwRve8yaReCbOeHAY2wbuSmXzZDkiWaJ0GKrFmtq719K?=
- =?us-ascii?Q?5z43d/u8ssEdCP6ceAf8vzPAVY1zm7D5zA5gFY361mBs61jL/QmGhuSUoEsC?=
- =?us-ascii?Q?gBVZ3HJNtQNQaF/izrOlxs55eMNsBLJOjHduvzAdf8NrJ+IXef/uWsl5u7p2?=
- =?us-ascii?Q?pIOMizoxkgxxU2OFkbrfdBt/hNCTlWTgGcWWrQJPqEDC6eR/iZu/g/xQIJfT?=
- =?us-ascii?Q?U0JluGLqtYDBEPWvuL1sc7gvsz4IQ2nNHF62cGkF9CSfOdUW4VzFeYIUXtsK?=
- =?us-ascii?Q?NTnZtAwUUiKaNMLHiWpr6rE2KOQB+o5FGxAkyp73+AJ0CiBx2b8bX7g3znum?=
- =?us-ascii?Q?WLvZbqLqEvqlGeD4it/NsSis9Vj8d+Wkqvu+hIoITb88bQ9MJZNc2GAzfLPV?=
- =?us-ascii?Q?NVMTqrMjD/vbY9MG3CfUgCHr4OJ0Oozh251Xmtc80GcA/o01SYjXO6xwyNrD?=
- =?us-ascii?Q?hBitBAefypxYeoEBpvRAzs5soQ8ykDTXRkv2OfHTyI74QbOP1oxKhPYkrhqu?=
- =?us-ascii?Q?GdFmJpuMZEgGOnwTQtS5IREuSXA48xFXACygdQ0VXRG5EG5gc6BKNABtx/7t?=
- =?us-ascii?Q?PKaszbynzP2KoSW0lEuK75KjhGdfQI/OhNXXFgjZ/Fni63A7G8eQaMCSmjYV?=
- =?us-ascii?Q?2ZLYD6yHFeNBQFEsvZlObWjnR5H4DPZu8FF/lh+4tDgfP2rNATtqgylFDeMh?=
- =?us-ascii?Q?ZT4wtFHe6ADGAn3YiNVmU7W+d10bnwsvii3c0V+f2bN6aTXgIEF7B3zXGrt6?=
- =?us-ascii?Q?f4V45RDhPK3IR9buXeFucqPHQS3bgVInr+xxfhbhis3m9AIDnLCIJqaOOGLw?=
- =?us-ascii?Q?kRcE7y3qZ14yZVaAOpExk0McbXPvGYuEch1D55IbLDwNUnjwhehbf2ZNbN5p?=
- =?us-ascii?Q?GFL9Op2BifqwbpU=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?tLQ85FfcA1pfi0hSky+lJcMr6psIOfPEpjeAquN20fzoRnac/ZNBZ0X3N3dc?=
- =?us-ascii?Q?GYxBLe9g/62X0kqpPqd26X7arOJ51cHgcLSZHdRMEVPb/dVPCviyndoWCRAM?=
- =?us-ascii?Q?4yVmbBZ2MA3GxIuCRdxL289gyJ6GwC+1/ssMAJj5BCu5kdQalqjL9gJbWPDD?=
- =?us-ascii?Q?lxdRSBVLG5+956pznB5YV+emS8f/PY1xHBTxr1CokrVzJI3alhSfDPpyt6CB?=
- =?us-ascii?Q?5JGP1ny39IxatfGmRc+/EORlRLy6ntozFIOgjDdhacWle7r4yBHDNuC6pDDS?=
- =?us-ascii?Q?M+8sHcJLt0/xpPW7oBMo0WLZ2Wzcb8o1TgGLAaSOXB3zEhViRelGth02gZUR?=
- =?us-ascii?Q?5XCFvhZltdZ/yhvNldY/sqQjZ4Eo369niNEZlgDbsCq4jQEndzD6WQYIIIBx?=
- =?us-ascii?Q?2x6mLvnpqmn1Za+qcwWWt4Z5lM4tlZ42A7m2Yn07WqGg0xZ2SuLO8GZNyeAl?=
- =?us-ascii?Q?xX41n05Walu2XO2LGEyb466JRjuhahlhRMbFFhfS+7DhEseyNo2Fyn474LbD?=
- =?us-ascii?Q?ibiYA/Y0HgM46SjJZcpmCzF8JnrmRKSAC5TeEYLqs97DYPuxs3NoYpdGKkhb?=
- =?us-ascii?Q?XWt7vONsa8hRl/x7yrGcHKnsqpR0MY+nNhjmnNLFlQ9xL7nYUxga+5269ygq?=
- =?us-ascii?Q?Z/lbQmuHjpf/tY+J4njbfOYKqHXVKB3QVsAN31A024JkxplJy0tnLKBFNTTe?=
- =?us-ascii?Q?LCXxwh4Kjcz7dxiFzvhzhGwQhVhw0/IjtWfTxBWimgHi5DrbgX+GOm/lsqta?=
- =?us-ascii?Q?lrk+yOAGNlv6aLEnX4W+1bgK9zUJ2difqrqwIGLkNlG4tbk/iW7sXKHRPgkg?=
- =?us-ascii?Q?zLYCFInC9R2QuqQLLrGhvZm+aByccW/iV6a36DkNCfZn402KGMxMi2kE/Aye?=
- =?us-ascii?Q?8wfJ1Hw/QcbreTOnn0bLMHehkves0ex3ZiZY5vazCWIQJXotnQBXMdQVA5Ct?=
- =?us-ascii?Q?48v7Ka36X4PsBVvMblv52P0J6MJtu0hqqf6Te+7u1xj75iW2o1G/7FzXVMhu?=
- =?us-ascii?Q?7CyYUB56Pu2oDZsuCbEFGOjuHvxt7bZjdUVJiOMvnVzVhTf7isActjjZ6S4h?=
- =?us-ascii?Q?pr3jn8tc4QzJkgyYaNLzHdKsviUiY1THEw+RmSHU0JOKBn0wYfEGusqJMWXE?=
- =?us-ascii?Q?TH9S1mnU4Ur/6xFc4urr+XdZmpvA9v1BzKsnAuGVLItadXY35yHprywVTq8/?=
- =?us-ascii?Q?CVZ1WxgtYI698fQzuSMMsMzV+hwLVH/VXukf+3yInW75Z0cohiUkeh88vhmm?=
- =?us-ascii?Q?N7mx0VQsMsgPk6leesyY+kw1d42/ZDjc51ft+vv/TPiX4PKBwIm6yGdD9CWa?=
- =?us-ascii?Q?ppG8nnAzwoGNFXcQ37+Q0BxZEEbHx43wqGqwWlSwJF8ffLS5JoR5fhRAz2/9?=
- =?us-ascii?Q?In7N9dgvROtOGBl7o5kYiel26LTWpZ9pQ6dPV3VYVttyz8epM5yHuaM5mt8o?=
- =?us-ascii?Q?Pkp/iUBzsXJiWFYbYOoNDT6Jk0qJXYIrmF88Tu+CGQET0QgOrWDdDclVIbP7?=
- =?us-ascii?Q?ZQxTcnPZpS52YT17zPwZD8k1c3X02K0pD0gHBEA+9g1dhFqacDfwtS/HEfEx?=
- =?us-ascii?Q?0THLE19mWumwuxxD9EzixelKZ4ZK4kdJHc9qZy6dgezTWttE4E4nespdurpV?=
- =?us-ascii?Q?6g=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1758721154; c=relaxed/simple;
+	bh=Gp6ACbHBiEjRgibVPGqSjwZ46dFlHlIrT9hg36BTe5s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eISisSrczkG2mZnNAFJMOTABuvVeZ2R3xVsYeQLhhVxfTRLTJz0CE6D9eY860k5Z2M6wr0ESGp4Hs91QE2cPzcTqkAXXpGmuke1Nzg8AuynaVMrD90NjBZO5d71xyDol7S89W/b+HZAEfhsTokGn8J2I10l7E7MYDtXE4izvX+U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=jPHKzx/Z; arc=pass smtp.client-ip=81.169.146.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1758721141; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=iNVEhFk9lryqBjR3wnwfUMDh+4SICxs6hg6mnRDiIQiK3HePM9wddvPIqtdvEIhlMn
+    AzpfAT6WAXt5wawUBU3xTT67FgJe5+TyKxj9eRZQWmQS+kbnjeSrwRMh3WBpRyv2Pa6F
+    iBLQ6P/+h573IicCwaU2qODJZ6hrz1/bkahDaAy/yCmYf+bbjLh8uI7X5eEOlRl5JqJ+
+    Gep324NB7fN9WzGVlYuex7UkvAhYNm41QGn+fylnfXXoKIJYAMlvStzkJNvQX2EwAOIQ
+    J+p4SDxwGILhh58si7CjPxCnrmDuufetjVc6yEdgYTtIaCkP6Ro+lByvWdXZx/7FbiGP
+    g1ZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1758721141;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=DDqHd59PnNOz2qkKA++2O46j3KKR/13diigjWjCqIVk=;
+    b=Y+KYb4xmQNorqPQuCb/gmMH9B6el1eORpNdRP8ZfqJBVlYfCAAiv42L5dU0VyFLp95
+    rwv0FLkdBj+K6TXNFqaRuFXODXYUgjYxZQDt/5NzPyoNfF5Z1Xmc+qzbnw8gTdVAFzWH
+    uBiElPzobjc4WLvE/V7bAFZXu4WUHGwB4/sV8uytOervEkAGFtVrEYLHBoFAlDYcfLjA
+    e+tpLgeLVVacNhWVQ+fin0PcTvHyKx8BDoVchPEJe2YYNSHuRBa+qEdG4sF3JadRn5Xc
+    T5hoa0Wj30hc01Q4UeYmaoWCj0dGURzCGRaEPvJVQJXXMqLOg+UsOvaXVZTQ4ZuOAKg3
+    XI/w==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo02
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1758721141;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=DDqHd59PnNOz2qkKA++2O46j3KKR/13diigjWjCqIVk=;
+    b=jPHKzx/Zrs6Xuj3gB+IbvpEFNehHOLNERvyrY25J3ipHY9/f9XR+EFbVCgoDcHpTo3
+    6eAmmAk81jEvJ4wUfzIzClE0n1Bfx1UhcOSObHWjZ7fXRjN1ZHJJiaErOAUcivqUyuTg
+    DKTB6sZIvwoGkPKfKC3ZOpiopHJeHmgQlV4fYwrhfPOrcb0FysnxajDtocD45NsVvenE
+    G6GlR+Yo5Wq685iCw+aIODqnIJAfed+gAXSov7SNJDBEOEA9h9Bi+EmpF11jozo5LCMl
+    8eOcWVzTlDvKZN2XzmPklhKZLsoCjuL22p1UC+prrl6BHcsOjkUGXxLHRsBq/Sn5it+c
+    9vFg==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tR5Jgv+fvVh2Tlv+VN3s="
+Received: from [192.168.188.239]
+    by smtp.strato.de (RZmta 53.3.2 AUTH)
+    with ESMTPSA id Kcff9718ODcx9F7
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Wed, 24 Sep 2025 15:38:59 +0200 (CEST)
+Message-ID: <ee5bdf78-1955-4e7f-96e0-b62c0a977e18@hartkopp.net>
+Date: Wed, 24 Sep 2025 15:38:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 82439552-7be4-4d93-073e-08ddfb6fa99c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Sep 2025 13:38:36.1690
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vnvEE1RVHolbYd/Fej61Z1Zj+LVYPQbpAawdOVcuRQIAV8Jc8u/Wx7B1CaOoZoYBfTyFHsZGpsAr5A2rIJprbovk/sxTxGXGvd2JkHP84Pw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7002
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot ci] Re: pull-request: can-next 2025-09-24
+To: Vincent Mailhol <mailhol@kernel.org>
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com,
+ syzbot ci <syzbot+ci284feacb80736eb0@syzkaller.appspotmail.com>,
+ biju.das.jz@bp.renesas.com, davem@davemloft.net, geert@glider.be,
+ kernel@pengutronix.de, kuba@kernel.org, linux-can@vger.kernel.org,
+ mkl@pengutronix.de, netdev@vger.kernel.org, stefan.maetje@esd.eu,
+ stephane.grosjean@hms-networks.com, zhao.xichao@vivo.com
+References: <68d3e6ce.a70a0220.4f78.0028.GAE@google.com>
+ <c952c748-4ae7-4ab9-8fd0-3e284a017273@hartkopp.net>
+ <651d24b9-fe26-4e6f-a144-22c5997eeafb@kernel.org>
+Content-Language: en-US
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <651d24b9-fe26-4e6f-a144-22c5997eeafb@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
 
-> -----Original Message-----
-> From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> Sent: Wednesday, September 24, 2025 2:41 PM
-> To: Jakub Kicinski <kuba@kernel.org>; Andrew Lunn <andrew@lunn.ch>;
-> Michael Chan <michael.chan@broadcom.com>; Pavan Chebbi
-> <pavan.chebbi@broadcom.com>; Tariq Toukan <tariqt@nvidia.com>; Gal
-> Pressman <gal@nvidia.com>; intel-wired-lan@lists.osuosl.org; Donald
-> Hunter <donald.hunter@gmail.com>; Carolina Jubran
-> <cjubran@nvidia.com>; Loktionov, Aleksandr
-> <aleksandr.loktionov@intel.com>; Vadim Fedorenko
-> <vadim.fedorenko@linux.dev>
-> Cc: Paolo Abeni <pabeni@redhat.com>; Simon Horman <horms@kernel.org>;
-> netdev@vger.kernel.org
-> Subject: [PATCH net-next v6 1/5] ethtool: add FEC bins histogram
-> report
->=20
-> IEEE 802.3ck-2022 defines counters for FEC bins and 802.3df-2024
-> clarifies it a bit further. Implement reporting interface through as
-> addition to FEC stats available in ethtool. Drivers can leave bin
-> counter uninitialized if per-lane values are provided. In this case
-> the core will recalculate summ for the bin.
->=20
-> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> ---
->  Documentation/netlink/specs/ethtool.yaml      | 29 +++++++
->  Documentation/networking/ethtool-netlink.rst  |  5 ++
-> .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  3 +-
-> .../ethernet/fungible/funeth/funeth_ethtool.c |  3 +-
->  .../ethernet/hisilicon/hns3/hns3_ethtool.c    |  3 +-
->  drivers/net/ethernet/intel/ice/ice_ethtool.c  |  4 +-
->  .../marvell/octeontx2/nic/otx2_ethtool.c      |  3 +-
->  .../ethernet/mellanox/mlx5/core/en_ethtool.c  |  3 +-
->  .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |  3 +-
->  drivers/net/ethernet/sfc/ethtool.c            |  3 +-
->  drivers/net/ethernet/sfc/siena/ethtool.c      |  3 +-
->  drivers/net/netdevsim/ethtool.c               | 25 ++++++-
->  include/linux/ethtool.h                       | 25 ++++++-
->  .../uapi/linux/ethtool_netlink_generated.h    | 12 +++
->  net/ethtool/fec.c                             | 75
-> ++++++++++++++++++-
->  15 files changed, 186 insertions(+), 13 deletions(-)
->=20
-> diff --git a/Documentation/netlink/specs/ethtool.yaml
-> b/Documentation/netlink/specs/ethtool.yaml
-> index 7a7594713f1f..6a0fb1974513 100644
-> --- a/Documentation/netlink/specs/ethtool.yaml
-> +++ b/Documentation/netlink/specs/ethtool.yaml
-> @@ -1219,6 +1219,30 @@ attribute-sets:
->          name: udp-ports
->          type: nest
->          nested-attributes: tunnel-udp
-> +  -
-> +    name: fec-hist
-> +    attr-cnt-name: --ethtool-a-fec-hist-cnt
-> +    attributes:
-> +      -
-> +        name: pad
-> +        type: pad
-> +      -
-> +        name: bin-low
-> +        type: u32
-> +        doc: Low bound of FEC bin (inclusive)
-> +      -
-> +        name: bin-high
-> +        type: u32
-> +        doc: High bound of FEC bin (inclusive)
-> +      -
-> +        name: bin-val
-> +        type: uint
-> +        doc: Error count in the bin (optional if per-lane values
-> exist)
-> +      -
-> +        name: bin-val-per-lane
-> +        type: binary
-> +        sub-type: u64
-> +        doc: An array of per-lane error counters in the bin
-> (optional)
->    -
->      name: fec-stat
->      attr-cnt-name: __ethtool-a-fec-stat-cnt @@ -1242,6 +1266,11 @@
-> attribute-sets:
->          name: corr-bits
->          type: binary
->          sub-type: u64
-> +      -
-> +        name: hist
-> +        type: nest
-> +        multi-attr: True
-> +        nested-attributes: fec-hist
->    -
->      name: fec
->      attr-cnt-name: __ethtool-a-fec-cnt
-> diff --git a/Documentation/networking/ethtool-netlink.rst
-> b/Documentation/networking/ethtool-netlink.rst
-> index ab20c644af24..b270886c5f5d 100644
-> --- a/Documentation/networking/ethtool-netlink.rst
-> +++ b/Documentation/networking/ethtool-netlink.rst
-> @@ -1541,6 +1541,11 @@ Drivers fill in the statistics in the following
-> structure:
->  .. kernel-doc:: include/linux/ethtool.h
->      :identifiers: ethtool_fec_stats
->=20
-> +Statistics may have FEC bins histogram attribute
-> +``ETHTOOL_A_FEC_STAT_HIST`` as defined in IEEE 802.3ck-2022 and
-> +802.3df-2024. Nested attributes will have the range of FEC errors in
-> +the bin (inclusive) and the amount of error events in the bin.
-> +
->  FEC_SET
->  =3D=3D=3D=3D=3D=3D=3D
->=20
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> index be32ef8f5c96..41686a6f84b5 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> @@ -3208,7 +3208,8 @@ static int bnxt_get_fecparam(struct net_device
-> *dev,  }
->=20
->  static void bnxt_get_fec_stats(struct net_device *dev,
-> -			       struct ethtool_fec_stats *fec_stats)
-> +			       struct ethtool_fec_stats *fec_stats,
-> +			       struct ethtool_fec_hist *hist)
->  {
->  	struct bnxt *bp =3D netdev_priv(dev);
->  	u64 *rx;
-> diff --git a/drivers/net/ethernet/fungible/funeth/funeth_ethtool.c
-> b/drivers/net/ethernet/fungible/funeth/funeth_ethtool.c
-> index ba83dbf4ed22..1966dba512f8 100644
-> --- a/drivers/net/ethernet/fungible/funeth/funeth_ethtool.c
-> +++ b/drivers/net/ethernet/fungible/funeth/funeth_ethtool.c
-> @@ -930,7 +930,8 @@ static void fun_get_rmon_stats(struct net_device
-> *netdev,  }
->=20
->  static void fun_get_fec_stats(struct net_device *netdev,
-> -			      struct ethtool_fec_stats *stats)
-> +			      struct ethtool_fec_stats *stats,
-> +			      struct ethtool_fec_hist *hist)
->  {
->  	const struct funeth_priv *fp =3D netdev_priv(netdev);
->=20
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-> b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-> index a752d0e3db3a..a5eefa28454c 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-> @@ -1659,7 +1659,8 @@ static void hns3_set_msglevel(struct net_device
-> *netdev, u32 msg_level)  }
->=20
->  static void hns3_get_fec_stats(struct net_device *netdev,
-> -			       struct ethtool_fec_stats *fec_stats)
-> +			       struct ethtool_fec_stats *fec_stats,
-> +			       struct ethtool_fec_hist *hist)
->  {
->  	struct hnae3_handle *handle =3D hns3_get_handle(netdev);
->  	struct hnae3_ae_dev *ae_dev =3D hns3_get_ae_dev(handle); diff --
-> git a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> index 348acd46a0ef..dc131779d426 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> @@ -4624,10 +4624,12 @@ static int ice_get_port_fec_stats(struct
-> ice_hw *hw, u16 pcs_quad, u16 pcs_port,
->   * ice_get_fec_stats - returns FEC correctable, uncorrectable stats
-> per netdev
->   * @netdev: network interface device structure
->   * @fec_stats: buffer to hold FEC statistics for given port
-> + * @hist: buffer to put FEC histogram statistics for given port
->   *
->   */
->  static void ice_get_fec_stats(struct net_device *netdev,
-> -			      struct ethtool_fec_stats *fec_stats)
-> +			      struct ethtool_fec_stats *fec_stats,
-> +			      struct ethtool_fec_hist *hist)
->  {
->  	struct ice_netdev_priv *np =3D netdev_priv(netdev);
->  	struct ice_port_topology port_topology; diff --git
-> a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-> b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-> index 998c734ff839..b90e23dc49de 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-> @@ -1283,7 +1283,8 @@ static int otx2_set_link_ksettings(struct
-> net_device *netdev,  }
->=20
->  static void otx2_get_fec_stats(struct net_device *netdev,
-> -			       struct ethtool_fec_stats *fec_stats)
-> +			       struct ethtool_fec_stats *fec_stats,
-> +			       struct ethtool_fec_hist *hist)
->  {
->  	struct otx2_nic *pfvf =3D netdev_priv(netdev);
->  	struct cgx_fw_data *rsp;
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-> b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-> index d507366d773e..bcc3bbb78cc9 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-> @@ -1927,7 +1927,8 @@ static int mlx5e_set_wol(struct net_device
-> *netdev, struct ethtool_wolinfo *wol)  }
->=20
->  static void mlx5e_get_fec_stats(struct net_device *netdev,
-> -				struct ethtool_fec_stats *fec_stats)
-> +				struct ethtool_fec_stats *fec_stats,
-> +				struct ethtool_fec_hist *hist)
->  {
->  	struct mlx5e_priv *priv =3D netdev_priv(netdev);
->=20
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-> b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-> index b4ff98ee2051..b6e5bdd509f1 100644
-> --- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-> @@ -1659,7 +1659,8 @@ fbnic_get_pause_stats(struct net_device *netdev,
->=20
->  static void
->  fbnic_get_fec_stats(struct net_device *netdev,
-> -		    struct ethtool_fec_stats *fec_stats)
-> +		    struct ethtool_fec_stats *fec_stats,
-> +		    struct ethtool_fec_hist *hist)
->  {
->  	struct fbnic_net *fbn =3D netdev_priv(netdev);
->  	struct fbnic_phy_stats *phy_stats;
-> diff --git a/drivers/net/ethernet/sfc/ethtool.c
-> b/drivers/net/ethernet/sfc/ethtool.c
-> index 23c6a7df78d0..18fe5850a978 100644
-> --- a/drivers/net/ethernet/sfc/ethtool.c
-> +++ b/drivers/net/ethernet/sfc/ethtool.c
-> @@ -217,7 +217,8 @@ static int efx_ethtool_set_wol(struct net_device
-> *net_dev,  }
->=20
->  static void efx_ethtool_get_fec_stats(struct net_device *net_dev,
-> -				      struct ethtool_fec_stats *fec_stats)
-> +				      struct ethtool_fec_stats *fec_stats,
-> +				      struct ethtool_fec_hist *hist)
->  {
->  	struct efx_nic *efx =3D efx_netdev_priv(net_dev);
->=20
-> diff --git a/drivers/net/ethernet/sfc/siena/ethtool.c
-> b/drivers/net/ethernet/sfc/siena/ethtool.c
-> index 994909789bfe..8c3ebd0617fb 100644
-> --- a/drivers/net/ethernet/sfc/siena/ethtool.c
-> +++ b/drivers/net/ethernet/sfc/siena/ethtool.c
-> @@ -217,7 +217,8 @@ static int efx_ethtool_set_wol(struct net_device
-> *net_dev,  }
->=20
->  static void efx_ethtool_get_fec_stats(struct net_device *net_dev,
-> -				      struct ethtool_fec_stats *fec_stats)
-> +				      struct ethtool_fec_stats *fec_stats,
-> +				      struct ethtool_fec_hist *hist)
->  {
->  	struct efx_nic *efx =3D netdev_priv(net_dev);
->=20
-> diff --git a/drivers/net/netdevsim/ethtool.c
-> b/drivers/net/netdevsim/ethtool.c index f631d90c428a..36a201533aae
-> 100644
-> --- a/drivers/net/netdevsim/ethtool.c
-> +++ b/drivers/net/netdevsim/ethtool.c
-> @@ -165,11 +165,34 @@ nsim_set_fecparam(struct net_device *dev, struct
-> ethtool_fecparam *fecparam)
->  	return 0;
->  }
->=20
-> +static const struct ethtool_fec_hist_range netdevsim_fec_ranges[] =3D {
-> +	{ 0, 0},
-> +	{ 1, 3},
-> +	{ 4, 7},
-> +	{ 0, 0}
-> +};
-> +
->  static void
-> -nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats
-> *fec_stats)
-> +nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats
-> *fec_stats,
-> +		   struct ethtool_fec_hist *hist)
->  {
-> +	struct ethtool_fec_hist_value *values =3D hist->values;
-> +
-> +	hist->ranges =3D netdevsim_fec_ranges;
-> +
->  	fec_stats->corrected_blocks.total =3D 123;
->  	fec_stats->uncorrectable_blocks.total =3D 4;
-> +
-> +	values[0].per_lane[0] =3D 125;
-> +	values[0].per_lane[1] =3D 120;
-> +	values[0].per_lane[2] =3D 100;
-> +	values[0].per_lane[3] =3D 100;
-> +	values[1].sum =3D 12;
-> +	values[2].sum =3D 2;
-> +	values[2].per_lane[0] =3D 2;
-> +	values[2].per_lane[1] =3D 0;
-> +	values[2].per_lane[2] =3D 0;
-> +	values[2].per_lane[3] =3D 0;
->  }
->=20
->  static int nsim_get_ts_info(struct net_device *dev, diff --git
-> a/include/linux/ethtool.h b/include/linux/ethtool.h index
-> c869b7f8bce8..c2d8b4ec62eb 100644
-> --- a/include/linux/ethtool.h
-> +++ b/include/linux/ethtool.h
-> @@ -492,7 +492,29 @@ struct ethtool_pause_stats {  };
->=20
->  #define ETHTOOL_MAX_LANES	8
-> +/**
-> + * IEEE 802.3ck/df defines 16 bins for FEC histogram plus one more
-> for
-> + * the end-of-list marker, total 17 items  */
-> +#define ETHTOOL_FEC_HIST_MAX	17
-> +/**
-> + * struct ethtool_fec_hist_range - error bits range for FEC histogram
-> + * statistics
-> + * @low: low bound of the bin (inclusive)
-> + * @high: high bound of the bin (inclusive)  */ struct
-> +ethtool_fec_hist_range {
-> +	u16 low;
-> +	u16 high;
-> +};
->=20
-> +struct ethtool_fec_hist {
-> +	struct ethtool_fec_hist_value {
-> +		u64 sum;
-> +		u64 per_lane[ETHTOOL_MAX_LANES];
-> +	} values[ETHTOOL_FEC_HIST_MAX];
-> +	const struct ethtool_fec_hist_range *ranges; };
->  /**
->   * struct ethtool_fec_stats - statistics for IEEE 802.3 FEC
->   * @corrected_blocks: number of received blocks corrected by FEC @@ -
-> 1214,7 +1236,8 @@ struct ethtool_ops {
->  	int	(*set_link_ksettings)(struct net_device *,
->  				      const struct ethtool_link_ksettings
-> *);
->  	void	(*get_fec_stats)(struct net_device *dev,
-> -				 struct ethtool_fec_stats *fec_stats);
-> +				 struct ethtool_fec_stats *fec_stats,
-> +				 struct ethtool_fec_hist *hist);
->  	int	(*get_fecparam)(struct net_device *,
->  				      struct ethtool_fecparam *);
->  	int	(*set_fecparam)(struct net_device *,
-> diff --git a/include/uapi/linux/ethtool_netlink_generated.h
-> b/include/uapi/linux/ethtool_netlink_generated.h
-> index e3b8813465d7..0e8ac0d974e2 100644
-> --- a/include/uapi/linux/ethtool_netlink_generated.h
-> +++ b/include/uapi/linux/ethtool_netlink_generated.h
-> @@ -561,12 +561,24 @@ enum {
->  	ETHTOOL_A_TUNNEL_INFO_MAX =3D (__ETHTOOL_A_TUNNEL_INFO_CNT - 1)
-> };
->=20
-> +enum {
-> +	ETHTOOL_A_FEC_HIST_PAD =3D 1,
-> +	ETHTOOL_A_FEC_HIST_BIN_LOW,
-> +	ETHTOOL_A_FEC_HIST_BIN_HIGH,
-> +	ETHTOOL_A_FEC_HIST_BIN_VAL,
-> +	ETHTOOL_A_FEC_HIST_BIN_VAL_PER_LANE,
-> +
-> +	__ETHTOOL_A_FEC_HIST_CNT,
-> +	ETHTOOL_A_FEC_HIST_MAX =3D (__ETHTOOL_A_FEC_HIST_CNT - 1) };
-> +
->  enum {
->  	ETHTOOL_A_FEC_STAT_UNSPEC,
->  	ETHTOOL_A_FEC_STAT_PAD,
->  	ETHTOOL_A_FEC_STAT_CORRECTED,
->  	ETHTOOL_A_FEC_STAT_UNCORR,
->  	ETHTOOL_A_FEC_STAT_CORR_BITS,
-> +	ETHTOOL_A_FEC_STAT_HIST,
->=20
->  	__ETHTOOL_A_FEC_STAT_CNT,
->  	ETHTOOL_A_FEC_STAT_MAX =3D (__ETHTOOL_A_FEC_STAT_CNT - 1) diff --
-> git a/net/ethtool/fec.c b/net/ethtool/fec.c index
-> e7d3f2c352a3..4669e74cbcaa 100644
-> --- a/net/ethtool/fec.c
-> +++ b/net/ethtool/fec.c
-> @@ -17,6 +17,7 @@ struct fec_reply_data {
->  		u64 stats[1 + ETHTOOL_MAX_LANES];
->  		u8 cnt;
->  	} corr, uncorr, corr_bits;
-> +	struct ethtool_fec_hist fec_stat_hist;
->  };
->=20
->  #define FEC_REPDATA(__reply_base) \
-> @@ -113,7 +114,10 @@ static int fec_prepare_data(const struct
-> ethnl_req_info *req_base,
->  		struct ethtool_fec_stats stats;
->=20
->  		ethtool_stats_init((u64 *)&stats, sizeof(stats) / 8);
-> -		dev->ethtool_ops->get_fec_stats(dev, &stats);
-> +		ethtool_stats_init((u64 *)data->fec_stat_hist.values,
-> +				   sizeof(data->fec_stat_hist.values) / 8);
-> +		dev->ethtool_ops->get_fec_stats(dev, &stats,
-> +						&data->fec_stat_hist);
->=20
->  		fec_stats_recalc(&data->corr, &stats.corrected_blocks);
->  		fec_stats_recalc(&data->uncorr,
-> &stats.uncorrectable_blocks); @@ -157,13 +161,77 @@ static int
-> fec_reply_size(const struct ethnl_req_info *req_base,
->  	len +=3D nla_total_size(sizeof(u8)) +	/* _FEC_AUTO */
->  	       nla_total_size(sizeof(u32));	/* _FEC_ACTIVE */
->=20
-> -	if (req_base->flags & ETHTOOL_FLAG_STATS)
-> +	if (req_base->flags & ETHTOOL_FLAG_STATS) {
->  		len +=3D 3 * nla_total_size_64bit(sizeof(u64) *
->  						(1 + ETHTOOL_MAX_LANES));
-> +		/* add FEC bins information */
-> +		len +=3D (nla_total_size(0) +  /* _A_FEC_HIST */
-> +			nla_total_size(4) +  /* _A_FEC_HIST_BIN_LOW */
-> +			nla_total_size(4) +  /* _A_FEC_HIST_BIN_HI */
-> +			/* _A_FEC_HIST_BIN_VAL + per-lane values */
-> +			nla_total_size_64bit(sizeof(u64)) +
-> +			nla_total_size_64bit(sizeof(u64) *
-> ETHTOOL_MAX_LANES)) *
-> +			ETHTOOL_FEC_HIST_MAX;
-> +	}
->=20
->  	return len;
->  }
->=20
-> +static int fec_put_hist(struct sk_buff *skb,
-> +			const struct ethtool_fec_hist *hist) {
-> +	const struct ethtool_fec_hist_range *ranges =3D hist->ranges;
-> +	const struct ethtool_fec_hist_value *values =3D hist->values;
-> +	struct nlattr *nest;
-> +	int i, j;
-> +	u64 sum;
-> +
-> +	if (!ranges)
-> +		return 0;
-> +
-> +	for (i =3D 0; i < ETHTOOL_FEC_HIST_MAX; i++) {
-> +		if (i && !ranges[i].low && !ranges[i].high)
-> +			break;
-> +
-> +		if (WARN_ON_ONCE(values[i].sum =3D=3D ETHTOOL_STAT_NOT_SET
-> &&
-> +				 values[i].per_lane[0] =3D=3D
-> ETHTOOL_STAT_NOT_SET))
-> +			break;
-> +
-> +		nest =3D nla_nest_start(skb, ETHTOOL_A_FEC_STAT_HIST);
-> +		if (!nest)
-> +			return -EMSGSIZE;
-> +
-> +		if (nla_put_u32(skb, ETHTOOL_A_FEC_HIST_BIN_LOW,
-> +				ranges[i].low) ||
-> +		    nla_put_u32(skb, ETHTOOL_A_FEC_HIST_BIN_HIGH,
-> +				ranges[i].high))
-> +			goto err_cancel_hist;
-> +		sum =3D 0;
-> +		for (j =3D 0; j < ETHTOOL_MAX_LANES; j++) {
-> +			if (values[i].per_lane[j] =3D=3D
-> ETHTOOL_STAT_NOT_SET)
-> +				break;
-> +			sum +=3D values[i].per_lane[j];
-> +		}
-> +		if (nla_put_uint(skb, ETHTOOL_A_FEC_HIST_BIN_VAL,
-> +				 values[i].sum =3D=3D ETHTOOL_STAT_NOT_SET ?
-> +				 sum : values[i].sum))
-> +			goto err_cancel_hist;
-> +		if (j && nla_put_64bit(skb,
-> ETHTOOL_A_FEC_HIST_BIN_VAL_PER_LANE,
-> +				       sizeof(u64) * j,
-> +				       values[i].per_lane,
-> +				       ETHTOOL_A_FEC_HIST_PAD))
-> +			goto err_cancel_hist;
-> +
-> +		nla_nest_end(skb, nest);
-> +	}
-> +
-> +	return 0;
-> +
-> +err_cancel_hist:
-> +	nla_nest_cancel(skb, nest);
-> +	return -EMSGSIZE;
-> +}
-> +
->  static int fec_put_stats(struct sk_buff *skb, const struct
-> fec_reply_data *data)  {
->  	struct nlattr *nest;
-> @@ -183,6 +251,9 @@ static int fec_put_stats(struct sk_buff *skb,
-> const struct fec_reply_data *data)
->  			  data->corr_bits.stats, ETHTOOL_A_FEC_STAT_PAD))
->  		goto err_cancel;
->=20
-> +	if (fec_put_hist(skb, &data->fec_stat_hist))
-> +		goto err_cancel;
-> +
->  	nla_nest_end(skb, nest);
->  	return 0;
->=20
-> --
-> 2.47.3
+On 24.09.25 15:31, Vincent Mailhol wrote:
+> On 24/09/2025 at 22:18, Oliver Hartkopp wrote:
+>> Hello Vincent,
+>>
+>> On 24.09.25 14:40, syzbot ci wrote:
+>>> syzbot ci has tested the following series
+>>>
+>>> [v1] pull-request: can-next 2025-09-24
+>>> https://lore.kernel.org/all/20250924082104.595459-1-mkl@pengutronix.de
+>>> * [PATCH net-next 01/48] can: m_can: use us_to_ktime() where appropriate
+>>> * [PATCH net-next 02/48] MAINTAINERS: update Vincent Mailhol's email address
+>>> * [PATCH net-next 03/48] can: dev: sort includes by alphabetical order
+>>> * [PATCH net-next 04/48] can: peak: Modification of references to email
+>>> accounts being deleted
+>>> * [PATCH net-next 05/48] can: rcar_canfd: Update bit rate constants for RZ/G3E
+>>> and R-Car Gen4
+>>> * [PATCH net-next 06/48] can: rcar_canfd: Update RCANFD_CFG_* macros
+>>> * [PATCH net-next 07/48] can: rcar_canfd: Simplify nominal bit rate config
+>>> * [PATCH net-next 08/48] can: rcar_canfd: Simplify data bit rate config
+>>> * [PATCH net-next 09/48] can: rcar_can: Consistently use ndev for net_device
+>>> pointers
+>>> * [PATCH net-next 10/48] can: rcar_can: Add helper variable dev to
+>>> rcar_can_probe()
+>>> * [PATCH net-next 11/48] can: rcar_can: Convert to Runtime PM
+>>> * [PATCH net-next 12/48] can: rcar_can: Convert to BIT()
+>>> * [PATCH net-next 13/48] can: rcar_can: Convert to GENMASK()
+>>> * [PATCH net-next 14/48] can: rcar_can: CTLR bitfield conversion
+>>> * [PATCH net-next 15/48] can: rcar_can: TFCR bitfield conversion
+>>> * [PATCH net-next 16/48] can: rcar_can: BCR bitfield conversion
+>>> * [PATCH net-next 17/48] can: rcar_can: Mailbox bitfield conversion
+>>> * [PATCH net-next 18/48] can: rcar_can: Do not print alloc_candev() failures
+>>> * [PATCH net-next 19/48] can: rcar_can: Convert to %pe
+>>> * [PATCH net-next 20/48] can: esd_usb: Rework display of error messages
+>>> * [PATCH net-next 21/48] can: esd_usb: Avoid errors triggered from USB disconnect
+>>> * [PATCH net-next 22/48] can: raw: reorder struct uniqframe's members to
+>>> optimise packing
+>>> * [PATCH net-next 23/48] can: raw: use bitfields to store flags in struct
+>>> raw_sock
+>>> * [PATCH net-next 24/48] can: raw: reorder struct raw_sock's members to
+>>> optimise packing
+>>> * [PATCH net-next 25/48] can: annotate mtu accesses with READ_ONCE()
+>>> * [PATCH net-next 26/48] can: dev: turn can_set_static_ctrlmode() into a non-
+>>> inline function
+>>> * [PATCH net-next 27/48] can: populate the minimum and maximum MTU values
+>>> * [PATCH net-next 28/48] can: enable CAN XL for virtual CAN devices by default
+>>> * [PATCH net-next 29/48] can: dev: move struct data_bittiming_params to linux/
+>>> can/bittiming.h
+>>> * [PATCH net-next 30/48] can: dev: make can_get_relative_tdco() FD agnostic
+>>> and move it to bittiming.h
+>>> * [PATCH net-next 31/48] can: netlink: document which symbols are FD specific
+>>> * [PATCH net-next 32/48] can: netlink: refactor can_validate_bittiming()
+>>> * [PATCH net-next 33/48] can: netlink: add can_validate_tdc()
+>>> * [PATCH net-next 34/48] can: netlink: add can_validate_databittiming()
+>>> * [PATCH net-next 35/48] can: netlink: refactor CAN_CTRLMODE_TDC_{AUTO,MANUAL}
+>>> flag reset logic
+>>> * [PATCH net-next 36/48] can: netlink: remove useless check in
+>>> can_tdc_changelink()
+>>> * [PATCH net-next 37/48] can: netlink: make can_tdc_changelink() FD agnostic
+>>> * [PATCH net-next 38/48] can: netlink: add can_dtb_changelink()
+>>> * [PATCH net-next 39/48] can: netlink: add can_ctrlmode_changelink()
+>>> * [PATCH net-next 40/48] can: netlink: make can_tdc_get_size() FD agnostic
+>>> * [PATCH net-next 41/48] can: netlink: add can_data_bittiming_get_size()
+>>> * [PATCH net-next 42/48] can: netlink: add can_bittiming_fill_info()
+>>> * [PATCH net-next 43/48] can: netlink: add can_bittiming_const_fill_info()
+>>> * [PATCH net-next 44/48] can: netlink: add can_bitrate_const_fill_info()
+>>> * [PATCH net-next 45/48] can: netlink: make can_tdc_fill_info() FD agnostic
+>>> * [PATCH net-next 46/48] can: calc_bittiming: make can_calc_tdco() FD agnostic
+>>> * [PATCH net-next 47/48] can: dev: add can_get_ctrlmode_str()
+>>> * [PATCH net-next 48/48] can: netlink: add userland error messages
+>>>
+>>> and found the following issue:
+>>> KASAN: slab-out-of-bounds Read in can_setup
+>>>
+>>> Full report is available here:
+>>> https://ci.syzbot.org/series/7feff13b-7247-438c-9d92-b8e9fda977c7
+>>>
+>>> ***
+>>>
+>>> KASAN: slab-out-of-bounds Read in can_setup
+>>>
+>>> tree:      net-next
+>>> URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/
+>>> net-next.git
+>>> base:      315f423be0d1ebe720d8fd4fa6bed68586b13d34
+>>> arch:      amd64
+>>> compiler:  Debian clang version 20.1.8 (+
+>>> +20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+>>> config:    https://ci.syzbot.org/builds/08331a39-4a31-4f96-a377-3125df2af883/
+>>> config
+>>> C repro:   https://ci.syzbot.org/findings/46cae752-cb54-4ceb-87cb-
+>>> bb9d2fdb1d79/c_repro
+>>> syz repro: https://ci.syzbot.org/findings/46cae752-cb54-4ceb-87cb-
+>>> bb9d2fdb1d79/syz_repro
+>>>
+>>> netlink: 24 bytes leftover after parsing attributes in process `syz.0.17'.
+>>> ==================================================================
+>>> BUG: KASAN: slab-out-of-bounds in can_set_default_mtu drivers/net/can/dev/
+>>> dev.c:350 [inline]
+>>> BUG: KASAN: slab-out-of-bounds in can_setup+0x209/0x280 drivers/net/can/dev/
+>>> dev.c:279
+>>> Read of size 4 at addr ffff888106a6ee74 by task syz.0.17/5999
+>>>
+>>> CPU: 1 UID: 0 PID: 5999 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full)
+>>> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-
+>>> debian-1.16.2-1 04/01/2014
+>>> Call Trace:
+>>>    <TASK>
+>>>    dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+>>>    print_address_description mm/kasan/report.c:378 [inline]
+>>>    print_report+0xca/0x240 mm/kasan/report.c:482
+>>>    kasan_report+0x118/0x150 mm/kasan/report.c:595
+>>>    can_set_default_mtu drivers/net/can/dev/dev.c:350 [inline]
+>>
+>> When can_set_default_mtu() is called from the netlink config context it is also
+>> used for virtual CAN interfaces (which was created by syzbot here), where the
+>> priv pointer is not valid.
+> 
+> Ack. I am pretty sure that I tested it on the virtual interfaces, but I did not
+> have KASAN activated. So I did not notice the problem.
+> 
+>> Please use
+>>
+>> struct can_priv *priv = safe_candev_priv(dev);
+>>
+>> to detect virtual CAN interfaces too.
+> 
+> Exactly! I am reaching the same conclusion.
+> 
+> Right now, I am testing this patch:
+> 
+> diff --git a/drivers/net/can/dev/dev.c b/drivers/net/can/dev/dev.c
+> index e5a82aa77958..1a309ae4850d 100644
+> --- a/drivers/net/can/dev/dev.c
+> +++ b/drivers/net/can/dev/dev.c
+> @@ -345,9 +345,9 @@ EXPORT_SYMBOL_GPL(free_candev);
+> 
+>   void can_set_default_mtu(struct net_device *dev)
+>   {
+> -       struct can_priv *priv = netdev_priv(dev);
+> +       struct can_priv *priv = safe_candev_priv(dev);
+> 
+> -       if (priv->ctrlmode & CAN_CTRLMODE_FD) {
+> +       if (priv && (priv->ctrlmode & CAN_CTRLMODE_FD)) {
+>                  dev->mtu = CANFD_MTU;
+>                  dev->min_mtu = CANFD_MTU;
+>                  dev->max_mtu = CANFD_MTU;
+> 
+> It is compiling rigth now. Another potential fix could also be:
+> 
+> diff --git a/drivers/net/can/dev/dev.c b/drivers/net/can/dev/dev.c
+> index e5a82aa77958..66c7a9eee7dd 100644
+> --- a/drivers/net/can/dev/dev.c
+> +++ b/drivers/net/can/dev/dev.c
+> @@ -273,11 +273,12 @@ void can_setup(struct net_device *dev)
+>   {
+>          dev->type = ARPHRD_CAN;
+>          dev->hard_header_len = 0;
+> +       dev->mtu = CAN_MTU;
+> +       dev->min_mtu = CAN_MTU;
+> +       dev->max_mtu = CAN_MTU;
+>          dev->addr_len = 0;
+>          dev->tx_queue_len = 10;
+> 
+> -       can_set_default_mtu(dev);
+> -
+>          /* New-style flags. */
+>          dev->flags = IFF_NOARP;
+>          dev->features = NETIF_F_HW_CSUM;
+> 
 
-Thank you
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+I tend to prefer this kind of fix.
+
+This would make clear that can_set_default_mtu() is only triggered when 
+a new netlink configuration process on real(!) CAN interfaces is finalized.
+
+Maybe this restriction should go into a comment describing 
+can_set_default_mtu() then.
+
+Best regards,
+Oliver
+
+> @Marc, once I finish testing, can I just send you a diff patch and ask to squash
+> it in:
+> 
+>    [PATCH net-next 27/48] can: populate the minimum and maximum MTU values
+> 
+> ?
+> 
+> 
+> Yours sincerely,
+> Vincent Mailhol
+> 
+> 
+
 
