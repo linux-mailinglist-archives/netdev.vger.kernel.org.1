@@ -1,264 +1,105 @@
-Return-Path: <netdev+bounces-225868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B30DB98D97
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 10:25:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 38DB8B98C08
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 10:08:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A29944C4F93
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 08:24:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B10A84C3647
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 08:08:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1015C2BF3CF;
-	Wed, 24 Sep 2025 08:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C75528313B;
+	Wed, 24 Sep 2025 08:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fnp4wJ7o"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E57A28851F
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 08:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A11C281520
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 08:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758702116; cv=none; b=itCQR59H9kmz2u3x4N8oHb6RFRegDOmqBqCfDgngZbTtpiOanSSs56De/8cnLeJbsJZ9ts4RYANawinW5nolkDZKlACiG28lIkm5skweuoGSdOtWE9tCmp+N7uCX1oH/aYUWmhYTMtvcX7J5lwIb78bci/xbhrxXBq1zVl573Lg=
+	t=1758701270; cv=none; b=rrMzGWOCC5o2lLbxE5jPuYNoyHei6bfDT54hVl5NqeO2zbK7UZn3DU6/m2+8j1q7WFBLeEUs3yTM0PJ9UBNrpQ7jnC4JwzHAE4y0NW/IjG/1ugH/qH41rRpb3Jza1gr7x/xi0ewrVs//0D4FhwBLZESZFwZ6Aw1q6NtirXB0m3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758702116; c=relaxed/simple;
-	bh=ARoB4N4UyQFWYljOs3TO8QYdImHXJ73Z2AEofYwRdnA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mHYtYWoZMyVM7WoA6isSmzCNJ0qoBP8MEbOE32cWZ4avAQIDBSmdAkBrdAVlDwHu04SsNdkIB86pbSCgfCkqNNjMYIBzNwtelSLvuNawp/WhiuKrS4WeURrvbnQN4FjgBqw5iPcUny68JVkZf8zU5U4I7sR+f57n4E7S1ktK5fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1v1Kke-0001FO-Dp; Wed, 24 Sep 2025 10:21:24 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1v1Kkc-000Dvu-2x;
-	Wed, 24 Sep 2025 10:21:22 +0200
-Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 569894788C4;
-	Wed, 24 Sep 2025 08:21:11 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Vincent Mailhol <mailhol@kernel.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 48/48] can: netlink: add userland error messages
-Date: Wed, 24 Sep 2025 10:07:05 +0200
-Message-ID: <20250924082104.595459-49-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250924082104.595459-1-mkl@pengutronix.de>
-References: <20250924082104.595459-1-mkl@pengutronix.de>
+	s=arc-20240116; t=1758701270; c=relaxed/simple;
+	bh=CPJFhlS86lHjQ8Ti2XaTHsWA+1yz9pSmmfGw3hKwYcE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I+Ho4NIGVSidJQPKpx1nhTUoRA/tH1qNUVOflZVOP7CGWlm/l6O31cTJsmko9dFGR5OyHkF+LuGXMnlGOHO8E8+v1BUTRdrsfLtvF7Kp+wDld5XDVUi8LVkc6h9ktFh7az4Ltt45MNUm5Q73elRW4b0HFuoYg16EQLw83p4xKnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fnp4wJ7o; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b2e66a300cbso499029466b.3
+        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 01:07:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758701267; x=1759306067; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=CPJFhlS86lHjQ8Ti2XaTHsWA+1yz9pSmmfGw3hKwYcE=;
+        b=fnp4wJ7opiJX1+q2nsrQptUKXzAnZRKZg4g8saYB/aUadbuHQV18LvkD45Krh3hDRz
+         kz+GDpHiyI0VBc+MayLeOnRzjJ7IXYB6Pod2t8XJkOtQfa9qg82Z2JuP+RfPfnf/AiRV
+         grH3iZPSRT4EEfNc8/2MZhihK9H/SqM+FC/R1IItW4+i38QU0Ct0Gmkd+ODtRhocuQHz
+         ZnK2BRTNDWnEhz+2Hj7LX2agSpMjUgO3tvjUwCRCB9eO4huo5J4iqtcQ7Tz1zMHr9lUP
+         1bIGafWHzsGQ39i6FuQDJxluLVIqWk4ws7B/s4sg+kYS1LNgF8vrYmfpLCRCUTj6H+Au
+         +Rnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758701267; x=1759306067;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CPJFhlS86lHjQ8Ti2XaTHsWA+1yz9pSmmfGw3hKwYcE=;
+        b=pqBQzrlLxb8EZjCE72qaCMkH8m5RR+5zV0MxV10DeC8tp4buP1ILpOOFSD++qNHnmB
+         53IGzjes4ZILtKLEhSioDyOUGpTROZIDIUrLWgnojFKLtTqme2hd6SCLwzoOMX0Xkk/9
+         n/mIkociT5A4f2KOumil0kfBtMN3vQFeljEFwInZTVw3LyX52E1kytqLiqI69Cv9++yZ
+         OWFCZMQg2dpPvZrI3PF0xle1q0pO5015+VBjFuBEt9LyNN1T5pfXSmjWXgfqBjO2R+Oi
+         LvlVl7wGq2bSU5RU8qlMvpcNXX2w4A7/1fIcGCxV1grGu2vy6jyNjYoZE4Bcyjdu/eGe
+         q+tg==
+X-Forwarded-Encrypted: i=1; AJvYcCXvenwUKl3MjLcwKKv7tHlyDq57tKznTZ97liXQm9WI3s7qdfSr7H6HzXZpMhivUQsiLtwPGys=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlnGYXMLBYRo+R1PnBl9mjqZk0vGHIKJgGfD4zwR6aK9lC99y5
+	NELSb2FgWv/eKUf2l7VFcC+q3Hh0Fd4DEgcf0hXyiF4arDhI5Jur79ExtpKUrvvHND4e6seGKz3
+	ZUQUIgSe/ZL5RP1p0Q1KKcz9C/Jpujnk=
+X-Gm-Gg: ASbGncss5cMVJqu+h9bJ1dfjkbT09vcmpZ5vDj5X74mHOV4MZ5u8sjCY47ZPGmNVPiH
+	E3vIrM+7BUy6qCyRQoJMUXrHWpXo57TA4wiTK2D6W3YIfnsIN5bxU442Y+D2tW9Iddr36xEQS6s
+	RHI9kfeCrqcG4ZZ0hkO2xkEA3TDteaB/uHKuCXx0CouGVsEwALDE8QeKcC4Y7Re9pQZCwfdfM/Z
+	KSgFw4We7lSwle85JHyceysVC+DLNpy5+L0OflBZt+PaoP+iKQnQw==
+X-Google-Smtp-Source: AGHT+IFWa4lkAHwf/4SArdm61wLTC4F7gQbf86GEjLZLwo2VefWv8FFXmP8OkTgdIk6qtNPTw6EZddqMonym0lxMhp0=
+X-Received: by 2002:a17:907:26c4:b0:b2b:a56f:541a with SMTP id
+ a640c23a62f3a-b3027260835mr530198366b.7.1758701266609; Wed, 24 Sep 2025
+ 01:07:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20250923022205.9075-1-viswanathiyyappan@gmail.com> <20250923164916.5b8c7c28@kernel.org>
+In-Reply-To: <20250923164916.5b8c7c28@kernel.org>
+From: viswanath <viswanathiyyappan@gmail.com>
+Date: Wed, 24 Sep 2025 13:37:33 +0530
+X-Gm-Features: AS18NWCT-FjALMCOah9bf_auRuFbM1Q3yx9_Iw8e7RGCWur-FeBhqSVRINH2d0w
+Message-ID: <CAPrAcgOzf4XYGA8X6TneRrmVwYVYgF=KvnpmRbT6XA+D9HR6jQ@mail.gmail.com>
+Subject: Re: [PATCH net] net: usb: remove rtl8150 driver
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: petkan@nucleusys.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev, 
+	david.hunter.linux@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Vincent Mailhol <mailhol@kernel.org>
+On Wed, 24 Sept 2025 at 05:19, Jakub Kicinski <kuba@kernel.org> wrote:
 
-Use NL_SET_ERR_MSG() and NL_SET_ERR_MSG_FMT() to return meaningful
-error messages to the userland whenever a -EOPNOTSUPP error is
-returned due to a failed validation of the CAN netlink arguments.
+> Thanks for sending this one.
+> Based on Michal's reply I guess we need to wait a bit longer.
 
-Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
-Link: https://patch.msgid.link/20250923-canxl-netlink-prep-v4-20-e720d28f66fe@kernel.org
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/dev/netlink.c | 82 ++++++++++++++++++++++++++---------
- 1 file changed, 62 insertions(+), 20 deletions(-)
+Sorry, this version breaks the build.
 
-diff --git a/drivers/net/can/dev/netlink.c b/drivers/net/can/dev/netlink.c
-index 92d8df13e886..0591406b6f32 100644
---- a/drivers/net/can/dev/netlink.c
-+++ b/drivers/net/can/dev/netlink.c
-@@ -64,15 +64,23 @@ static int can_validate_tdc(struct nlattr *data_tdc,
- 	bool tdc_auto = tdc_flags & CAN_CTRLMODE_TDC_AUTO_MASK;
- 	int err;
- 
--	/* CAN_CTRLMODE_TDC_{AUTO,MANUAL} are mutually exclusive */
--	if (tdc_auto && tdc_manual)
-+	if (tdc_auto && tdc_manual) {
-+		NL_SET_ERR_MSG(extack,
-+			       "TDC manual and auto modes are mutually exclusive");
- 		return -EOPNOTSUPP;
-+	}
- 
- 	/* If one of the CAN_CTRLMODE_TDC_* flag is set then TDC
- 	 * must be set and vice-versa
- 	 */
--	if ((tdc_auto || tdc_manual) != !!data_tdc)
-+	if ((tdc_auto || tdc_manual) && !data_tdc) {
-+		NL_SET_ERR_MSG(extack, "TDC parameters are missing");
- 		return -EOPNOTSUPP;
-+	}
-+	if (!(tdc_auto || tdc_manual) && data_tdc) {
-+		NL_SET_ERR_MSG(extack, "TDC mode (auto or manual) is missing");
-+		return -EOPNOTSUPP;
-+	}
- 
- 	/* If providing TDC parameters, at least TDCO is needed. TDCV
- 	 * is needed if and only if CAN_CTRLMODE_TDC_MANUAL is set
-@@ -86,15 +94,23 @@ static int can_validate_tdc(struct nlattr *data_tdc,
- 			return err;
- 
- 		if (tb_tdc[IFLA_CAN_TDC_TDCV]) {
--			if (tdc_auto)
-+			if (tdc_auto) {
-+				NL_SET_ERR_MSG(extack,
-+					       "TDCV is incompatible with TDC auto mode");
- 				return -EOPNOTSUPP;
-+			}
- 		} else {
--			if (tdc_manual)
-+			if (tdc_manual) {
-+				NL_SET_ERR_MSG(extack,
-+					       "TDC manual mode requires TDCV");
- 				return -EOPNOTSUPP;
-+			}
- 		}
- 
--		if (!tb_tdc[IFLA_CAN_TDC_TDCO])
-+		if (!tb_tdc[IFLA_CAN_TDC_TDCO]) {
-+			NL_SET_ERR_MSG(extack, "TDCO is missing");
- 			return -EOPNOTSUPP;
-+		}
- 	}
- 
- 	return 0;
-@@ -105,6 +121,7 @@ static int can_validate_databittiming(struct nlattr *data[],
- 				      int ifla_can_data_bittiming, u32 flags)
- {
- 	struct nlattr *data_tdc;
-+	const char *type;
- 	u32 tdc_flags;
- 	bool is_on;
- 	int err;
-@@ -120,18 +137,31 @@ static int can_validate_databittiming(struct nlattr *data[],
- 		data_tdc = data[IFLA_CAN_TDC];
- 		tdc_flags = flags & CAN_CTRLMODE_FD_TDC_MASK;
- 		is_on = flags & CAN_CTRLMODE_FD;
-+		type = "FD";
- 	} else {
- 		return -EOPNOTSUPP; /* Place holder for CAN XL */
- 	}
- 
- 	if (is_on) {
--		if (!data[IFLA_CAN_BITTIMING] || !data[ifla_can_data_bittiming])
-+		if (!data[IFLA_CAN_BITTIMING] || !data[ifla_can_data_bittiming]) {
-+			NL_SET_ERR_MSG_FMT(extack,
-+					   "Provide both nominal and %s data bittiming",
-+					   type);
- 			return -EOPNOTSUPP;
--	}
--
--	if (data[ifla_can_data_bittiming] || data_tdc) {
--		if (!is_on)
-+		}
-+	} else {
-+		if (data[ifla_can_data_bittiming]) {
-+			NL_SET_ERR_MSG_FMT(extack,
-+					   "%s data bittiming requires CAN %s",
-+					   type, type);
- 			return -EOPNOTSUPP;
-+		}
-+		if (data_tdc) {
-+			NL_SET_ERR_MSG_FMT(extack,
-+					   "%s TDC requires CAN %s",
-+					   type, type);
-+			return -EOPNOTSUPP;
-+		}
- 	}
- 
- 	err = can_validate_bittiming(data, extack, ifla_can_data_bittiming);
-@@ -178,8 +208,7 @@ static int can_ctrlmode_changelink(struct net_device *dev,
- {
- 	struct can_priv *priv = netdev_priv(dev);
- 	struct can_ctrlmode *cm;
--	u32 maskedflags;
--	u32 ctrlstatic;
-+	u32 ctrlstatic, maskedflags, notsupp, ctrlstatic_missing;
- 
- 	if (!data[IFLA_CAN_CTRLMODE])
- 		return 0;
-@@ -189,20 +218,28 @@ static int can_ctrlmode_changelink(struct net_device *dev,
- 		return -EBUSY;
- 
- 	cm = nla_data(data[IFLA_CAN_CTRLMODE]);
--	maskedflags = cm->flags & cm->mask;
- 	ctrlstatic = can_get_static_ctrlmode(priv);
-+	maskedflags = cm->flags & cm->mask;
-+	notsupp = maskedflags & ~(priv->ctrlmode_supported | ctrlstatic);
-+	ctrlstatic_missing = (maskedflags & ctrlstatic) ^ ctrlstatic;
- 
--	/* check whether provided bits are allowed to be passed */
--	if (maskedflags & ~(priv->ctrlmode_supported | ctrlstatic))
-+	if (notsupp) {
-+		NL_SET_ERR_MSG_FMT(extack,
-+				   "requested control mode %s not supported",
-+				   can_get_ctrlmode_str(notsupp));
- 		return -EOPNOTSUPP;
-+	}
- 
- 	/* do not check for static fd-non-iso if 'fd' is disabled */
- 	if (!(maskedflags & CAN_CTRLMODE_FD))
- 		ctrlstatic &= ~CAN_CTRLMODE_FD_NON_ISO;
- 
--	/* make sure static options are provided by configuration */
--	if ((maskedflags & ctrlstatic) != ctrlstatic)
-+	if (ctrlstatic_missing) {
-+		NL_SET_ERR_MSG_FMT(extack,
-+				   "missing required %s static control mode",
-+				   can_get_ctrlmode_str(ctrlstatic_missing));
- 		return -EOPNOTSUPP;
-+	}
- 
- 	/* If a top dependency flag is provided, reset all its dependencies */
- 	if (cm->mask & CAN_CTRLMODE_FD)
-@@ -234,8 +271,10 @@ static int can_tdc_changelink(struct data_bittiming_params *dbt_params,
- 	const struct can_tdc_const *tdc_const = dbt_params->tdc_const;
- 	int err;
- 
--	if (!tdc_const)
-+	if (!tdc_const) {
-+		NL_SET_ERR_MSG(extack, "The device does not support TDC");
- 		return -EOPNOTSUPP;
-+	}
- 
- 	err = nla_parse_nested(tb_tdc, IFLA_CAN_TDC_MAX, nla,
- 			       can_tdc_policy, extack);
-@@ -450,8 +489,11 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
- 		const unsigned int num_term = priv->termination_const_cnt;
- 		unsigned int i;
- 
--		if (!priv->do_set_termination)
-+		if (!priv->do_set_termination) {
-+			NL_SET_ERR_MSG(extack,
-+				       "Termination is not configurable on this device");
- 			return -EOPNOTSUPP;
-+		}
- 
- 		/* check whether given value is supported by the interface */
- 		for (i = 0; i < num_term; i++) {
--- 
-2.51.0
+I will submit a v2 that removes the driver properly
 
+I hope we won't need to apply it.
+
+Thanks
+Viswanath
 
