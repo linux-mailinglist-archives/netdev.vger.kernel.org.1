@@ -1,120 +1,121 @@
-Return-Path: <netdev+bounces-225804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04292B987C2
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 09:18:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E96A3B98885
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 09:27:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 218071B20A64
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 07:19:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AD274A6AC3
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 07:27:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2461026FDA9;
-	Wed, 24 Sep 2025 07:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13830274FE8;
+	Wed, 24 Sep 2025 07:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BpvRQHn7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ohyQTZ3q"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8742026E165
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 07:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE1443AA4
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 07:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758698328; cv=none; b=p6Y0lCo34iRmjGcD4Rn7CyXhz/x2mYv200v2zeGyq1JhatinWGbH8PLhn1tlUS6EEazMvpj8kx3ZuXSyhKPBijVCzUVxZ4ZZ7+FE2+Ub0+eN/4e2fY55JZdMAOgg7kqd4umITwfV26Ltz9QGiVioYAjxKJprlX3xpO0EpjVJMB8=
+	t=1758698834; cv=none; b=uTpYJb55HMO8achJyvxJtIbYeD+rs/7+HAN58Y9xxojdHVWabplgQCyhIbzip36p6iBZwOoF64WXzTIFx+0GnxiXpHGTkfv8F7gLxhR9ZgxE4Ow5YicVG1uCi8Fz12/rv4D2yG/W/5WcPaNNBjhjX/9AenIGGzDLtMxk6jsuQWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758698328; c=relaxed/simple;
-	bh=vFGV/5SdrXTqAjDg1Z+qtUf7lXuT4QgHCPVLjdBhXkI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X7fO+CiLheTHW4KYEN3RwGEassoDs3Q9MWVwEsukmH1I6CJfm2jo7GQlBkKLt0RG0erf9iMM9oaElz8YDZ7qDsjnVM415BRsZ5+d5SEdhzssQXRjU8pN99n3DmyH/f5CEIQjPZWtfxe3NT1hzSAUdfDRcXh7wEPyFwXmY2myyWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BpvRQHn7; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758698325;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x4iJVB6lD2fruztfkG80c2BDXVSi3uw6WFakzazt5Zo=;
-	b=BpvRQHn7cNZq5pWuP49RkKnIJZSwSvxbcsKmuYQldlXbAvde6XqEptmVyzmZH/r09K5D6H
-	+7sgFaxferELr0RINM2gvyMLzHBOnWvWwHhcEwdmK8ResiqFRH9VTfBpPHIKlCUJ1AdI+E
-	UZBC0o+0lzXyX8gB/7//m/MCdrOGCes=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-90-Z7QgNu6PNyacjYUgYKum6Q-1; Wed, 24 Sep 2025 03:18:44 -0400
-X-MC-Unique: Z7QgNu6PNyacjYUgYKum6Q-1
-X-Mimecast-MFC-AGG-ID: Z7QgNu6PNyacjYUgYKum6Q_1758698323
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46e19ee1094so23831675e9.0
-        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 00:18:43 -0700 (PDT)
+	s=arc-20240116; t=1758698834; c=relaxed/simple;
+	bh=YNphk3mB4ivfNu3QKEs10XGiMwMxpi1YPo4dtv7YWgw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WqvXlFSdr0vcBMtfKaBx7bvdJqDOovkZOakfPDTyZsoepUtqMl91gKSnAgiiVmg7XDgVzm01E/oTOcnJFa+bVTCTxuOSoY2d7GyPsEWerBbQGOdBdI3xorbqpnKFwrHiY+A36++uYDE39zbg8jk5HiSPRYNfcriQQSFAPuzvOD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ohyQTZ3q; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8589058c59bso43023585a.2
+        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 00:27:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758698831; x=1759303631; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6K5fm+QUCrwoVlxEjRVdfqv7MdLli6zI+B4E/bRgTXA=;
+        b=ohyQTZ3q2fraYCAMhNK3QabeQtpo8SHjb+wiVksTOG3j+P6RcrUpKXRP+OeQj9Axf1
+         E9mUrgSV2BGuoMtP3N+wOLqX9rMJDMOBAzivKwZ+q1cdqniESFmbLVKXKiKdva90nq9w
+         lcqyzBtBfqKyvLogZ6Af925AgM2IHhYPu0j3PGccqVGhG6zywo1QOGRjv/LmyAt5H7g5
+         NBlmPDpn8ue9R8qf6Z2W+Lxx/fr3NNZL+0YbWGxGQIJ8tuPbRgxxt8AUCb866gJOie3D
+         PgJpzzpHUYlnY1QHzvrOunkbQjvFasE3ZFeD8uQ5awquqYKiCQfACn40lD0PBb3uxYp4
+         2B+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758698323; x=1759303123;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x4iJVB6lD2fruztfkG80c2BDXVSi3uw6WFakzazt5Zo=;
-        b=OQoCvBw1qAwn04cmZBbOda9fOASNz+HfLrD10CdNNFRR8kcP2o+v8+ynH5pwB6Euiz
-         AdAoejGXd4WYaqmFEJfTSJlBeMiCkj1M/FYE++Px1uVg6qakPy+MiAEjYexdIc7ns2IJ
-         UdXQl7j4vnScSC4wBjfCpsphLvAsiDXJGmvZ8BpK1Ib05ASNuw6evmXnv6tM0HEAYinZ
-         YAZ9W2U3iFRGnvoYXu0EMDW3ZFaC5Qm9+CmZBeCe15DfslD3FD0K4TWa/plDXCUmlYvA
-         CGe6Tp7mK08Oscci8h6IzC8vTVul6QHPgp66Uf9LlQUBTn/IV1UAnQVc5fuZL3AzA0A/
-         5w5g==
-X-Forwarded-Encrypted: i=1; AJvYcCWJz0CfTSmo6edFjbpr6+24FouhKLU4Er8bJ1i7abcTjzBNkbPO5TsQRJTM+038i7yRx+HPBlM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw41rUPqnGdEBNgiO+l8n7BT/YBi4/nF/fzR4AFN0rkiYI4VQ/L
-	nNblTsIEnRALcsc22bV//NcQjsXt2vgUU1XDsPsCl6NJM4GSQIPNegdQXB1bvLA9G9innhpnFlS
-	JsS48DgQ30tf4QTQsxNLSSkPhsO7N2OvEaK512TJgDbpirFxkrJ01XrdbMqe8OsyUKw==
-X-Gm-Gg: ASbGncuueqEaWoISrLBn30UbVHf3+GpDW2Uha76z3RoELuoJB0mBAKsefRAjuo7e5js
-	Wz954MquwXmfaAx8idh22NL7vaZEP4qwDLRBE2VulxD+dfYhlCh58/613/ag23jSJKIt2ms/Uce
-	ScADNf+eP3V85Bd01f2vE17h8xjbTgN3xGKwVh8m4KC6piaMKsb4ybIarJs4o6M8GupFYksNZsP
-	A0Me6QKrKl1hBN99d7JoZS1vl/WemMok+GCxyIjqpS5utJ3X8Dx6kPcnJIBDGfo6VhXklqXRXef
-	Xn4guLgT2WoStCDGmE2Ts5KJjZUIf3Jvky4=
-X-Received: by 2002:a05:600c:4f16:b0:45f:28ed:6e22 with SMTP id 5b1f17b1804b1-46e1d9789cdmr54641455e9.3.1758698322526;
-        Wed, 24 Sep 2025 00:18:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHbSI2vy3Xtfu4Q9BvlHbV7J5LuaePh9VoqJOvv5JsIaLhsTV8uduTMFmV9uZ4PhlaEw7WBrw==
-X-Received: by 2002:a05:600c:4f16:b0:45f:28ed:6e22 with SMTP id 5b1f17b1804b1-46e1d9789cdmr54641135e9.3.1758698321969;
-        Wed, 24 Sep 2025 00:18:41 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e2a9b1dd4sm18905645e9.8.2025.09.24.00.18.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Sep 2025 00:18:41 -0700 (PDT)
-Date: Wed, 24 Sep 2025 03:18:38 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	eperezma@redhat.com, stephen@networkplumber.org, leiyang@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [PATCH net-next v5 0/8] TUN/TAP & vhost_net: netdev queue flow
- control to avoid ptr_ring tail drop
-Message-ID: <20250924031105-mutt-send-email-mst@kernel.org>
-References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+        d=1e100.net; s=20230601; t=1758698831; x=1759303631;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6K5fm+QUCrwoVlxEjRVdfqv7MdLli6zI+B4E/bRgTXA=;
+        b=UgY7Gfdyo/7Vz0lEMvO8FGLDHD2julzH7NQx81/9Ly04BTNhTotZpVNNmWfBvQluyg
+         DoWZlymuPlxTGyQ9TZ/SFGpx7v2T6kgZ7pKXNuJSsc2vA86I6rNRXXwQ7Gv9wprQstC4
+         jK4uEvAhohLYZgLV1yctTwXTfb//E0Uhz3v0dEqgncvjjF8k0hN6Q3hzCqgLhHgp9zwG
+         4WohdfUiH3coCPubLpYJYtVwXHd2quzNsF19E7VfOe+XpdofPmT2DEGq07B4noXO+jBT
+         xN0ZpX/grNTYZg4kwUdJJsxAUh6TqtclPLR5+5YfWYwwjnFyPDAaV9Dl2SZQU1PVDjIn
+         CBjA==
+X-Gm-Message-State: AOJu0Yzy7+y0P6kuOFhbDEi9mq8ALnDuWcZEvfeSgd15YxAfo1Uao64q
+	88fsWtixI67tiNX6D8GRWnhZbPCb6gp9uVsN0wIJJvbABgBbFwL7U/8BzQPiHa3de5zlVhqiwX3
+	KIb/dGqGPk5m/nA==
+X-Google-Smtp-Source: AGHT+IHbInjHcu8+g2yR5s/vHlw8EvDs5k3IxMOhdo2jXUPw2zbEl2OhrziWz6q5iYS5mQWH4t6sJSc2lQWqVA==
+X-Received: from qknqj10.prod.google.com ([2002:a05:620a:880a:b0:84f:d9a2:d24d])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:4627:b0:84d:9f49:6898 with SMTP id af79cd13be357-85173700769mr688877485a.61.1758698831223;
+ Wed, 24 Sep 2025 00:27:11 -0700 (PDT)
+Date: Wed, 24 Sep 2025 07:27:09 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.534.gc79095c0ca-goog
+Message-ID: <20250924072709.2891285-1-edumazet@google.com>
+Subject: [PATCH nf] netfilter: nf_conntrack: do not skip entries in /proc/net/nf_conntrack
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	coreteam@netfilter.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Sep 23, 2025 at 12:15:45AM +0200, Simon Schippers wrote:
-> This patch series deals with TUN, TAP and vhost_net which drop incoming 
-> SKBs whenever their internal ptr_ring buffer is full. Instead, with this 
-> patch series, the associated netdev queue is stopped before this happens. 
-> This allows the connected qdisc to function correctly as reported by [1] 
-> and improves application-layer performance, see our paper [2]. Meanwhile 
-> the theoretical performance differs only slightly:
+ct_seq_show() has an opportunistic garbage collector :
 
+if (nf_ct_should_gc(ct)) {
+    nf_ct_kill(ct);
+    goto release;
+}
 
-About this whole approach.
-What if userspace is not consuming packets?
-Won't the watchdog warnings appear?
-Is it safe to allow userspace to block a tx queue
-indefinitely?
+So if one nf_conn is killed there, next time ct_get_next() runs,
+we skip the following item in the bucket, even if it should have
+been displayed if gc did not take place.
 
+We can decrement st->skip_elems to tell ct_get_next() one of the items
+was removed from the chain.
+
+Fixes: 58e207e4983d ("netfilter: evict stale entries when user reads /proc/net/nf_conntrack")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/netfilter/nf_conntrack_standalone.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
+index 1f14ef0436c65fccc8e64956a105d5473e21b55e..708b79380f047f32aa8e6047c52c807b4019f2b9 100644
+--- a/net/netfilter/nf_conntrack_standalone.c
++++ b/net/netfilter/nf_conntrack_standalone.c
+@@ -317,6 +317,9 @@ static int ct_seq_show(struct seq_file *s, void *v)
+ 	smp_acquire__after_ctrl_dep();
+ 
+ 	if (nf_ct_should_gc(ct)) {
++		struct ct_iter_state *st = s->private;
++
++		st->skip_elems--;
+ 		nf_ct_kill(ct);
+ 		goto release;
+ 	}
 -- 
-MST
+2.51.0.534.gc79095c0ca-goog
 
 
