@@ -1,169 +1,168 @@
-Return-Path: <netdev+bounces-225750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4094B97F15
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 02:51:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B5C0B97F2C
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 02:52:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58B887A818C
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 00:50:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B24B37AB8B3
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 00:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9451DEFE9;
-	Wed, 24 Sep 2025 00:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1617E1DF273;
+	Wed, 24 Sep 2025 00:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O0JCvPIa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RKJdzHkZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 726FC1DE4DC
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 00:51:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A331EA7CE
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 00:52:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758675107; cv=none; b=Fux/U91GKRnX54zbIDoN4UamBiZadJ9/TGDp4Qsi3PQ9RBUYBCQ32JedvWkQMJSVg+iOu5/Ui+SGiLdBtwuso2g+SGUBJmFYQa2hZ0RpcN4mvs7+Zo65YivZBNmRzqK4z/NzltWVVshJOFy5fkpxU8dRkSWLGu1lty+U90Va8j0=
+	t=1758675151; cv=none; b=CYYO3AiARo1Xax6vlKUvfmZ4It1vsn1TgRltMUpqWLmtPcb9dlrZDpAvG041pjGen4VOWCz2A38iSPdTbBktODACj7hIwGeITshcUYxqEm1BPdg7qStyc9IO+xZa/q9ikcmUsX01dlQ1A3AFiKlfUTlaKN913bjzTBnt22LOwb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758675107; c=relaxed/simple;
-	bh=B+gaEmpZQToa9D3BoDg5LW16aK2GKwumpEPqc28GJP4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n0pvT3OGEZ+Je2q6GejvG7KHZoGBOXQ5b7ZguICeqEVBKDEK3NZpZsBwYcpBBoyoHfaRKqHSxFASm92RRS80xaDf/kjd2i65V9TLQ8Fw4A8V7hMj7NeX1nPQ6Mz1Z0eObX9bkNRM0bwXHfY6BpHX61jb2JPEGCcC1t4mKdvjCBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O0JCvPIa; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758675104;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0+CF+f8ZPtjHdoOi5iGDqJ4Pzq5sIU1lG9ApqP2SS3I=;
-	b=O0JCvPIavLoq726+R0omDED72OFfP+C30QiLA0bp4wGhrJ4LnM1TkWPQFowq+S/lyuLZ9k
-	cO7ymcTogshIXklgqFlmq2rFqM315i0Qja3qgFsONuXXWcA77vR6VJdwZixOT7eYDbwHBx
-	Sf9lsSHrR9ZusTVD7jEe+CwFAnOyyTQ=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-524-uzk12-ceMLOCLnRYDEQ-3Q-1; Tue, 23 Sep 2025 20:51:42 -0400
-X-MC-Unique: uzk12-ceMLOCLnRYDEQ-3Q-1
-X-Mimecast-MFC-AGG-ID: uzk12-ceMLOCLnRYDEQ-3Q_1758675102
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-32e09eaf85dso7407387a91.1
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 17:51:42 -0700 (PDT)
+	s=arc-20240116; t=1758675151; c=relaxed/simple;
+	bh=AEf0I95B1tjH5s61FQZBvW27y0/Hum/gRqAnEH0Yebk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QUsiiGZrIHIQGDwWYG15f2ljawTKQLWdw3a9N6/v5KoMXlq0t4fSoPYbJd65d1q+pq38hmBhFbb1XZnHT+GFtoXRmfz6b0tiMg68ihbVAJEr91+ytdEYNvt839r1iC8z+5BZJn5Mj1vE346ITTevXSuTgITgxGs7uBu0Qwk2Fl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RKJdzHkZ; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-77f2c7ba550so3007310b3a.1
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 17:52:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758675148; x=1759279948; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RAUmB/RuCiCZPtVgZPv0J2E666nuMHsy58KGKXw1oKM=;
+        b=RKJdzHkZyjwKgK/kyT3C82zrCXsu0iQ8WR/ki62qb6o9UYv0l7fjpwJpNH3VkTKssI
+         y/t7R9zUIgaOtHYpitE4mShndrsibRcqnDUe1eoRuTa9raBxbmftvh+8FmA8B5Na4KKh
+         dgtwfSPHZ7VlRGR5gLFrrnh7SWmz0JBqn3jUjwhen/mREzmLrk9w3mNrkOVbQH+fWCem
+         i4Q3/jZvwLaTK1F2bi30TKsvcVuDTky4aa4v1J4VZ0oV9ThEvuP2Rkl8uUI4KGKLRW2/
+         l8q5CYOU2t9DVOA7d5H9hRn4ZM9EEuuhLTo+7q351xcAQUh0AzBEBsL0cb9V7g7GmJtd
+         gWAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758675101; x=1759279901;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0+CF+f8ZPtjHdoOi5iGDqJ4Pzq5sIU1lG9ApqP2SS3I=;
-        b=aPgFyWfnf45WFZCgqx/ZcnUafxITRt1VWVXg2gu6YMlzKXwPnZuR1CFxXpidU6zkyk
-         aBzIlT3+SfWhURzXkYZfwtjkdVvocK2IauuNc65IAZuwDJR9TrQ4mg8LLWt2Tn+WkQ06
-         EWCEVuL9hCxcmStVtlipf2khpde01H1oFPLaECTMJmoUFJN0RE6uLjASXdeqoMxBEqOr
-         tEAwS0yfB3mcim2+A5TT/k87j07f3IjTHr31e/61irWYEJQP4d/1uqSm3YEYBHM3eYO0
-         Jqcfe26x76YXAtkRhAgUhfXiz2/AtKQSUK3AARUyXqXpTPen9W+X3elT6ihuK/7Sgipj
-         yEog==
-X-Gm-Message-State: AOJu0YxpCyD+rv/TKFS1hVig+yN/He+RcjDvT7AUUwfH0mTaxdqjnsqr
-	bJq0cAxjfK4oaC5qLPS1mclZTk7hKdTN1m+2+okQGJZiA+Ndt+e4z9vaBkQYpNtPVl2IOPlF2Xr
-	E5mBSl1TFQ0662Lgs67FvqSnbbZ/7a+w9Wvh0bh4QClsOSI2agZbaNrfzw1v5esNrKygb0++sqU
-	m78XZxfL1/I4zkiCn3DbgaiUL07hpRTR99p9wQ+5C6
-X-Gm-Gg: ASbGncsqiQMvxfNvTUYb3WBLs4zlA/fz3DH6ipVaV6xZSWGZbH+0Gzm/0fetoaenVzQ
-	/vDaNIiTlakd0pTFiOCo0KZHMCN5PPVHcPyhD3O6OUHHIaP78loKCCxdXl9HXxb8eKbFbd6FRLn
-	hF6Q8W3MDkvLNr8ahQBw==
-X-Received: by 2002:a17:90b:3811:b0:32e:5d87:8abc with SMTP id 98e67ed59e1d1-332a970664cmr4735582a91.36.1758675101153;
-        Tue, 23 Sep 2025 17:51:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6wlZU45QFpZaoYYGJj/yXqXhdztwIB8H8KjfQJG+1bAi7ZxkXTql04g41IaDsPBl3CCKvK35kQdqhNnbKqmU=
-X-Received: by 2002:a17:90b:3811:b0:32e:5d87:8abc with SMTP id
- 98e67ed59e1d1-332a970664cmr4735562a91.36.1758675100707; Tue, 23 Sep 2025
- 17:51:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758675148; x=1759279948;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RAUmB/RuCiCZPtVgZPv0J2E666nuMHsy58KGKXw1oKM=;
+        b=KxW1ULL4iagJO2nijxLV+zQ5x6o+kocF5/rjuZX1pupX5Ms0UKTkvhZc6DhgNIteci
+         yEzC3IjCrU2TM1gbCD5QGCw8CP10KHdpjjCSn7P/N9Tw+2uAghT228R5W11Zw3opRdUl
+         EO0J1YqIjozMEzO7LFVIyRmzAAb41qZOkKaVigiwBduOwTboKImpS/XbsP3cFZSjYJNi
+         jDEQbPSSQuxKkDjYt1DP+7cVycgKkVvQ9vv8gDht450ed8AZ7Jr++uLdp3R3asavW/t/
+         hvHD4YRYU7r8sWCuAJJipXrqXqMvlg4ERKRP6jlUuFlITIZJNSFfC17LMiLrgBa5N+y2
+         r5KA==
+X-Gm-Message-State: AOJu0YydYOiOdTH5hgbqSQ5OCNJmhPiMOvHr3IVbICn3Zz4RfqoSSfCe
+	Qfufys6kRhnM9doCJXzaXrttbtI7iAwEHud3dki2wKkkkn9cxa12r8Cz
+X-Gm-Gg: ASbGnct1VM4pC6VdcyqkOy8T0caHljABrh6B7tGMSkvYmvowVeQq0VxOGXYksa5H3Zv
+	nIGWdksuXCXALxbBj3xo2Ye1QaAW4tzIK2D0jP71JVPIhnLH0WTjxBxUGR2EHMr5vo7J+bavfUU
+	GCHmjg+jno8e2Zj3YkIV9kOyFGD0pp8i1laMm/BCTJxn3vUNZdyzJ8Hgk3i8IK81GeUIPiBkeUH
+	wemSonE4htUwB/KooMnYEWR9Ed/npmwVlyWg6EvIA0V8AKnJIKPEaq60Muc4X3XUaTS1WjAIXWD
+	kPH9CwwuOaIXgAdKMrTR2mk02i3DOZJGZUD4h4dGtAmbwkwXuHRng1CVCch+0a90WelYSKDxk7K
+	9wcIQOUAyRyLVTcGNjcXD/cU3ckI=
+X-Google-Smtp-Source: AGHT+IF+5cs5xruTMc57tUQH+FOmNEUAbOBlTyYLxBZ6GcxYCdZp496Z6fd+L8/0yXpQiT/vlp1XQQ==
+X-Received: by 2002:a05:6a00:2e25:b0:77f:1a6a:e728 with SMTP id d2e1a72fcca58-77f53b0e05dmr5495256b3a.17.1758675143531;
+        Tue, 23 Sep 2025 17:52:23 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77f20b61586sm9946959b3a.83.2025.09.23.17.52.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 17:52:23 -0700 (PDT)
+Date: Wed, 24 Sep 2025 00:52:18 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Tonghao Zhang <tonghao@bamaicloud.com>
+Cc: netdev@vger.kernel.org, Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@gmail.com>
+Subject: Re: [PATCH RESEND] ip/bond: add broadcast_neighbor support
+Message-ID: <aNNAwo6wDpSasVsY@fedora>
+References: <20250923083953.16363-1-tonghao@bamaicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250923202258.2738717-1-kshankar@marvell.com> <20250923202258.2738717-2-kshankar@marvell.com>
-In-Reply-To: <20250923202258.2738717-2-kshankar@marvell.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 24 Sep 2025 08:51:29 +0800
-X-Gm-Features: AS18NWDo9GoRDKQ-kypc5YbeoTNltuvTxzdNxXyoo3qGwjJnvJLpDCXfXyisvgk
-Message-ID: <CACGkMEvUMq7xgOndvWUYU=BZL=ZZD1q_LRy=5YFL7k80cYBRRg@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 1/3] net: implement virtio helper to handle
- outer nw offset
-To: Kommula Shiva Shankar <kshankar@marvell.com>
-Cc: netdev@vger.kernel.org, mst@redhat.com, pabeni@redhat.com, 
-	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev, parav@nvidia.com, 
-	jerinj@marvell.com, ndabilpuram@marvell.com, sburla@marvell.com, 
-	schalla@marvell.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250923083953.16363-1-tonghao@bamaicloud.com>
 
-On Wed, Sep 24, 2025 at 4:23=E2=80=AFAM Kommula Shiva Shankar
-<kshankar@marvell.com> wrote:
->
-> virtio specification introduced support for outer network
-> header offset broadcast.
->
-> This patch implements the needed defines and virtio header
-> parsing capabilities.
->
-> Signed-off-by: Kommula Shiva Shankar <kshankar@marvell.com>
+On Tue, Sep 23, 2025 at 04:39:53PM +0800, Tonghao Zhang wrote:
+> This option has no effect in modes other than 802.3ad mode.
+> When this option enabled, the bond device will broadcast ARP/ND
+> packets to all active slaves.
+> 
+> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+> Cc: Stephen Hemminger <stephen@networkplumber.org>
+> Cc: David Ahern <dsahern@gmail.com>
+> Cc: Hangbin Liu <liuhangbin@gmail.com>
 > ---
->  include/linux/virtio_net.h      | 40 +++++++++++++++++++++++++++++++++
->  include/uapi/linux/virtio_net.h |  8 +++++++
->  2 files changed, 48 insertions(+)
->
-> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-> index 20e0584db1dd..e6153e9106d3 100644
-> --- a/include/linux/virtio_net.h
-> +++ b/include/linux/virtio_net.h
-> @@ -374,6 +374,46 @@ static inline int virtio_net_handle_csum_offload(str=
-uct sk_buff *skb,
->         return 0;
+> 1. no update uapi header.
+> 2. the kernel patch is accpted, https://patchwork.kernel.org/project/netdevbpf/patch/84d0a044514157bb856a10b6d03a1028c4883561.1751031306.git.tonghao@bamaicloud.com/
+> ---
+>  ip/iplink_bond.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
+> index 3ae626a0..714fe7bd 100644
+> --- a/ip/iplink_bond.c
+> +++ b/ip/iplink_bond.c
+> @@ -150,6 +150,7 @@ static void print_explain(FILE *f)
+>  		"                [ lacp_rate LACP_RATE ]\n"
+>  		"                [ lacp_active LACP_ACTIVE]\n"
+>  		"                [ coupled_control COUPLED_CONTROL ]\n"
+> +		"                [ broadcast_neighbor BROADCAST_NEIGHBOR ]\n"
+>  		"                [ ad_select AD_SELECT ]\n"
+>  		"                [ ad_user_port_key PORTKEY ]\n"
+>  		"                [ ad_actor_sys_prio SYSPRIO ]\n"
+> @@ -166,6 +167,7 @@ static void print_explain(FILE *f)
+>  		"LACP_RATE := slow|fast\n"
+>  		"AD_SELECT := stable|bandwidth|count\n"
+>  		"COUPLED_CONTROL := off|on\n"
+> +		"BROADCAST_NEIGHBOR := off|on\n"
+>  	);
 >  }
->
-> +static inline int
-> +virtio_net_out_net_header_to_skb(struct sk_buff *skb,
-> +                                struct virtio_net_hdr_v1_hash_tunnel_out=
-_net_hdr *vhdr,
-> +                                bool out_net_hdr_negotiated,
-> +                                bool little_endian)
-> +{
-> +       unsigned int out_net_hdr_off;
+>  
+> @@ -185,6 +187,7 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
+>  	__u32 arp_all_targets, resend_igmp, min_links, lp_interval;
+>  	__u32 packets_per_slave;
+>  	__u8 missed_max;
+> +	__u8 broadcast_neighbor;
+>  	unsigned int ifindex;
+>  	int ret;
+>  
+> @@ -377,6 +380,12 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
+>  			if (ret)
+>  				return ret;
+>  			addattr8(n, 1024, IFLA_BOND_COUPLED_CONTROL, coupled_control);
+> +		} else if (strcmp(*argv, "broadcast_neighbor") == 0) {
+> +			NEXT_ARG();
+> +			broadcast_neighbor = parse_on_off("broadcast_neighbor", *argv, &ret);
+> +			if (ret)
+> +				return ret;
+> +			addattr8(n, 1024, IFLA_BOND_BROADCAST_NEIGH, broadcast_neighbor);
+>  		} else if (matches(*argv, "ad_select") == 0) {
+>  			NEXT_ARG();
+>  			if (get_index(ad_select_tbl, *argv) < 0)
+> @@ -676,6 +685,13 @@ static void bond_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+>  			     rta_getattr_u8(tb[IFLA_BOND_COUPLED_CONTROL]));
+>  	}
+>  
+> +	if (tb[IFLA_BOND_BROADCAST_NEIGH]) {
+> +		print_on_off(PRINT_ANY,
+> +			     "broadcast_neighbor",
+> +			     "broadcast_neighbor %s ",
+> +			     rta_getattr_u8(tb[IFLA_BOND_BROADCAST_NEIGH]));
+> +	}
 > +
-> +       if (!out_net_hdr_negotiated)
-> +               return 0;
-> +
-> +       if (vhdr->outer_nh_offset) {
-> +               out_net_hdr_off =3D __virtio16_to_cpu(little_endian, vhdr=
-->outer_nh_offset);
-> +               skb_set_network_header(skb, out_net_hdr_off);
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static inline int
-> +virtio_net_out_net_header_from_skb(const struct sk_buff *skb,
-> +                                  struct virtio_net_hdr_v1_hash_tunnel_o=
-ut_net_hdr *vhdr,
-> +                                  bool out_net_hdr_negotiated,
-> +                                  bool little_endian)
-> +{
-> +       unsigned int out_net_hdr_off;
-> +
-> +       if (!out_net_hdr_negotiated) {
-> +               vhdr->outer_nh_offset =3D 0;
-> +               return 0;
-> +       }
-> +
-> +       out_net_hdr_off =3D skb_network_offset(skb);
-> +       if (out_net_hdr_off && skb->protocol =3D=3D htons(ETH_P_IP))
-> +               vhdr->outer_nh_offset =3D __cpu_to_virtio16(little_endian=
-,
-> +                                                         out_net_hdr_off=
-);
+>  	if (tb[IFLA_BOND_AD_SELECT]) {
+>  		const char *ad_select = get_name(ad_select_tbl,
+>  						 rta_getattr_u8(tb[IFLA_BOND_AD_SELECT]));
+> -- 
+> 2.34.1
+> 
 
-I'd expect this to work for IPV6 as well.
-
-Thanks
-
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
