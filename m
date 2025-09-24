@@ -1,240 +1,232 @@
-Return-Path: <netdev+bounces-225792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3154B984D1
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 07:50:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71125B984DA
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 07:50:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5167F4A1A20
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 05:50:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2626B3BFE7A
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 05:50:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A65523B618;
-	Wed, 24 Sep 2025 05:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B1023C8D5;
+	Wed, 24 Sep 2025 05:50:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ENW3/D30"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gMvemh7F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C4421FF4C;
-	Wed, 24 Sep 2025 05:50:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758693007; cv=fail; b=fGKl2sCtSb0awGbfAr4H1AyxvNhZWVKo/HcpJ7f19wk4bZVlqXlLDqENZJJKc+vMahkZ/4SVHGV2ji9r+oiWieR6Cw3ypQFV6jwUMUf0CMGISHEDMpwGJ0/exv/v1sdii9KwpYHneJuO1I/dmZaldHD8VPlaLUD8DPJmKi/LhRc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758693007; c=relaxed/simple;
-	bh=A37QmJaBvye4+3QSY/HTAoke1mblLgsQoSM4LWF/cmI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=OTz2HV2VU34sS7pfpy9ERKM+eYNu56rxjSuHE0JUTUImu818+atYuUjSC+fJkWltW0bZyQWg5UP43C1QvCb+8qGrkLAidsW5fGcimThwina3Bu2O+UFXP1SVv2yqColTgdofd1mHmualzEfhdDC0xgDEAI8X1l59MM5x22/lmxE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ENW3/D30; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758693006; x=1790229006;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=A37QmJaBvye4+3QSY/HTAoke1mblLgsQoSM4LWF/cmI=;
-  b=ENW3/D30GNr3eXouapqRZcvLN/r713H1nUw25JWsGWYNPO6MOgKlDMS1
-   XW0iS5t0Xww6YZ/1LdIfFBothxSRkBRLv1Vs4m83LWG1aef4cdMer4skd
-   E5ezEXWddT5VBp74MXIeq6YOmB6CS+XMX7JwWrKenEj5Edi7arvWgZOMd
-   mP8sGP0D5Ve1+rERfqpYQ6irv+I2YAfRvk8kIPON6NdJtQ4wpj9Tx0FmJ
-   wLFruO4xG3J788gi//kpv3Dgx3vsMXf7MBBvFIxo1ge7m4vvR+/La3PdE
-   aX65cquifvXA6ObysD7K3CjJQ3iYYRa2eeVvkJPp8uesRTES1lb6PmmgI
-   w==;
-X-CSE-ConnectionGUID: PhpBR7WITRSekf0FZkjc/w==
-X-CSE-MsgGUID: JTGz9W1USI+0y4gYT5iUjQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="48547375"
-X-IronPort-AV: E=Sophos;i="6.18,290,1751266800"; 
-   d="scan'208";a="48547375"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 22:50:05 -0700
-X-CSE-ConnectionGUID: YrvMd8cKTImC8Z1gGcNSZw==
-X-CSE-MsgGUID: mmw0unKaQkC7W/29pQMFUA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,290,1751266800"; 
-   d="scan'208";a="176779886"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 22:50:04 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 23 Sep 2025 22:50:02 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Tue, 23 Sep 2025 22:50:02 -0700
-Received: from CO1PR03CU002.outbound.protection.outlook.com (52.101.46.62) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 23 Sep 2025 22:49:59 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XESjSNpd/R4VsfYkMVIzBoBHAuYb3cVFv1omqnFxLalHxYX3anDwf2wOoKGxItlPXTvdP2TYyJlBbZ/gDXHUeAy6wW9yREFOe5MLbyGpizkNmmnGyMqu/xECx9cGIIy4L5Al5lLTJghqHM/lTo9FT3xeoLmHwcI7dC5IMmndsxUEfvh8X8vgL5AzfHXplh6WDsoSkEhWrUCpFh4qsSPuuSgDSfQ7fb1AOeI9WCyZrO25E6Wv9eL45YxURMqLNVZ/zpfXqLSqph3eWlvPnRBbjfozU5ixHRCl1/DY0MT7LhgRZgDRvdVDonHoVLrrkELFEvsYxKctHYRWh2ONGVqv/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/WdCvkvHMNZcKT2DCe1YYJYq9rIOuJTGTQAY3OeXKBc=;
- b=dgzq2c7jIH2HWGTSh2gTUKhQ5y7dP5Hhqwu7m2aYcFbYZAG/jNweLi45CT79pQj/IPqUVqrX3JC5H7fJ+SML5csagXyiXaJiSGM0s8hWV3QKFkYNvf4D5nNtQ4Br6Gvd/pIUT+LDAH415Lpbeo60Ztghm115vtVio/DH9kma8cDOJ4DNglSGAlSAR5WlI1Uo85oCYkvQr4gIYzKxRpIHz/zh3bE2CLE+uQWOHrm6nY39sGmtttxNHKhtEvBlzk7k61jkO0jhHvZp0jq5W4oJsIow3Tn0XTx/OS0EOdWsw0lRoI8k5og5Vxtia1nNip6Gcgd14jbjrnOI8MQ1QVJp8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM4PR11MB6455.namprd11.prod.outlook.com (2603:10b6:8:ba::17) by
- DS0PR11MB9502.namprd11.prod.outlook.com (2603:10b6:8:295::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9137.20; Wed, 24 Sep 2025 05:49:52 +0000
-Received: from DM4PR11MB6455.namprd11.prod.outlook.com
- ([fe80::304a:afb1:cd4:3425]) by DM4PR11MB6455.namprd11.prod.outlook.com
- ([fe80::304a:afb1:cd4:3425%7]) with mapi id 15.20.9137.018; Wed, 24 Sep 2025
- 05:49:52 +0000
-From: "R, Ramu" <ramu.r@intel.com>
-To: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Lobakin, Aleksander" <aleksander.lobakin@intel.com>, "Kubiak, Michal"
-	<michal.kubiak@intel.com>, "Fijalkowski, Maciej"
-	<maciej.fijalkowski@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "Simon
- Horman" <horms@kernel.org>, NXNE CNSE OSDT ITP Upstreaming
-	<nxne.cnse.osdt.itp.upstreaming@intel.com>, "bpf@vger.kernel.org"
-	<bpf@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next 3/5] idpf: implement XSk xmit
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next 3/5] idpf: implement XSk xmit
-Thread-Index: AQHcIzh6uvvI8RWxrU2WDautA93dCrSggQcAgAFmMHA=
-Date: Wed, 24 Sep 2025 05:49:52 +0000
-Message-ID: <DM4PR11MB645563F1FAA13275576E2420981CA@DM4PR11MB6455.namprd11.prod.outlook.com>
-References: <20250911162233.1238034-1-aleksander.lobakin@intel.com>
- <20250911162233.1238034-4-aleksander.lobakin@intel.com>
- <PH0PR11MB501396D4B46250A8D3D88869961DA@PH0PR11MB5013.namprd11.prod.outlook.com>
-In-Reply-To: <PH0PR11MB501396D4B46250A8D3D88869961DA@PH0PR11MB5013.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR11MB6455:EE_|DS0PR11MB9502:EE_
-x-ms-office365-filtering-correlation-id: 2343f173-e359-4036-fe72-08ddfb2e2e79
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024|7053199007|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?u8wnY3SFEKO9PGlRWz92dYVEX3wLoWQ6FrCuGXEd36PYTWItF/vZNzHBnHlZ?=
- =?us-ascii?Q?iB6h52vDF33PeWAgCl/hOeL9ryroQDFBvk09nFANlEs9oY+PRRlHDLR8QGFW?=
- =?us-ascii?Q?ENNGFNZW4D2GJbRhJUZ68sSXOoVq0rX9a36PxTuHhGHNb65KNvRZI4KE6Zys?=
- =?us-ascii?Q?6pHVjxvTVYHwb6Q6D0nRqPgWDhVgBW5GJSvaXw6fBs6yHPD+803kRyRUcpyK?=
- =?us-ascii?Q?oO5m/+9YyP/kHHLcAwrdXqxEToAlgkBBvVziIzv2U1ov0z3L+Gy7WBOK/1NW?=
- =?us-ascii?Q?vbmBDc9zKkl9eBtewrFhxjoRnlSIX8i5ZwfPXNMcacywyM1YiCmbApyCKFn5?=
- =?us-ascii?Q?kAaPn2FktQLDIlXvmlBTgJnEmrZX12WKLntb/FtPg4zcGLzeOq6xm4T2Ij7B?=
- =?us-ascii?Q?Bm4bOxtZxK+W3KIZxAbjxNIeX9p/6WmlFTvhLfyA7fr+ex8qwGsmIH0zTUYz?=
- =?us-ascii?Q?0kxX0PaDMQqJ0C5yxEN2ucfRH8WBW1H8BTqdBdTeKYyNeGyKXrWJF8s9TjIa?=
- =?us-ascii?Q?YYyWf3RcQK7NXlocxd2F9dVzb+Fq/PJ+DojiK7h1WP9NdCjOnhyis+qNg5pQ?=
- =?us-ascii?Q?jGSaSXN5rr/brG3RcJIPK4VYwD+4x8tLOav9dmv/cQQXEQQoWDzHejkfIoXy?=
- =?us-ascii?Q?7RTlbqL+/241gYUGVx0Jsg55UrTNThuDrtBQYov0WHqQ9ClWG4huEzk0z1cH?=
- =?us-ascii?Q?jLTpgFso5skno6Hnz5Ijucd/Emt9pBNCyBA4Ne9EGEzqCa/cf4TuO8jvhMSc?=
- =?us-ascii?Q?aWvtxFsiZ30iTQTe/ztmxPTcg7zX8SBOnhTYKyS+T2I8suxEUTWrCEmhZ0LZ?=
- =?us-ascii?Q?RroOkqKv7jTGDjvlQ3Oq9ZT7CdQVPhkFXICL4jrgLkUy8zuhgb4Y3eoWEk0i?=
- =?us-ascii?Q?YTy6e1ioyN7f2oT951XwvCsDB/zEya+1AYiWdBLTQ1Wqrg/RzfkPMhCoSoxc?=
- =?us-ascii?Q?/96jcm0B6+Qgqw/NB3FUprBe/T0xIvWl3HdXPD1A5y2yRxuXRl8BK/OMNFy0?=
- =?us-ascii?Q?Jt5G17IWRmjeRF7qYfMx+qS5Vp8CXbz4hXqjLDbtfjpTOK5Ay0HibOvp7D8u?=
- =?us-ascii?Q?gGKv6xd5K8C9LAlMNaeW8i44xLH7vPCb3FZORhX21WtSlWRFoI1rmGcmtpDZ?=
- =?us-ascii?Q?oVPscKL5oZ5qlr7OWSQ5OtuXajtVJcCt4WNyJxbdMHsBArX7eQZRlzui8mxv?=
- =?us-ascii?Q?mNVBnjzU1UVOb3nVFCDataKdZUY8N/eo4pVJPBq3Hz2AU2K+4vjUCkQfT2V9?=
- =?us-ascii?Q?ybI3dn/oS+iB25fAMAx4qPFeBCuaozjHwpmQfpD5BCFwGqdMSBLBR7z4+ciL?=
- =?us-ascii?Q?YnbGZnNgF4A8snkRWw24xj5vUiVbCvMlU5vDryfxPSKWqxSX/NUSUvJtG0nH?=
- =?us-ascii?Q?JKWQtQ/hNuHyOAJ7xmSrWHh183VWWcbQUkguVzuX/2g/AJpBBXLThtduXqbJ?=
- =?us-ascii?Q?8qsmYaEZERXgv9L+CbB6rnrLxvH6YgP83xhEkrTWOtbqWjZQH4er3pVZy95J?=
- =?us-ascii?Q?AHEYMedOGAyH73E=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6455.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(7053199007)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?SBGA3MoHfymwnyXLrbTlaiLsCcuiaj2K3OHYn/aNhxiq2cHPi1ssNA9zHkE3?=
- =?us-ascii?Q?CO/OULMnVw2ykvYDogI6wE/AuMaQXkLjLtiOWT3TQBZjUymYw+vXGoObVSH5?=
- =?us-ascii?Q?73jhwN1hGTNWin+onGucXwCqJBZpOjZBC2zUNmUm4ZnVY4JHclKH5hafqStj?=
- =?us-ascii?Q?/oF7j0I6N2R/bZILgnisATYICMjG9c8I7YiTbNeCql637LzyNQsmsKKyV25y?=
- =?us-ascii?Q?VsvBbR2ygCRI3a2G/Va+toaNlcpjYjAxhG8PlqSrMlMW89nU1vqWJCrr89vL?=
- =?us-ascii?Q?ltOsgLGGGC61KocWjqv/+KroEFFFW1DseMbPFJ2W83uP0snpNM4LvvyYPgDU?=
- =?us-ascii?Q?YhF493wPTjxyLH2Wu2l8Q2qeu9CFJ2Pe2zFoxC+Tug3T96UhaMWn5GJNkMqo?=
- =?us-ascii?Q?6LvwG0Wk5VzXD3U1hGxiLzcg/ESEiawUpNG1CgTswrP/G2xZQ8pyWhfWGkos?=
- =?us-ascii?Q?6oYj/EuCDyoYsmFvV0VOfeGW6ZkcP2KgyaDWHBSYfAnpZlmdkXo0kqhmTHHg?=
- =?us-ascii?Q?GKiSDUUKAmLx4wOCSSGzP0V6cJ6ua8YlInVKzuQ/XSb43PkTBX1ckCeA1+iA?=
- =?us-ascii?Q?x86BMLv4WYZkEagOYsefqzA3BLDTbEvv9e7F8aIFBKPk4tcq9fRcTsdLywbW?=
- =?us-ascii?Q?UdjKtZ7sg2+st30zUc1KifQpEn0RPD7ZeG+mS9sbRjEdhe1qXDgTbv6rSjQu?=
- =?us-ascii?Q?45LeRGVIANoArYCBpz/+QXs+9nm9HuOauU1dZQ3QdMgbUKPeAv+fr8jvA1+e?=
- =?us-ascii?Q?5Loap8QY6EWW1olPrrUU4M1Q1K9BbNhPxlKRhv06Aq0MA7NBvgQ0o/GMhqUV?=
- =?us-ascii?Q?D6ubJYQmsiYIAhtKJLe9mEl63NyMCMhjxr8vk40GYUafStKhvt8TrwHugA5S?=
- =?us-ascii?Q?KAO9YPGKFUmD8hA9iAs+6arWPkLbhfDMlCNfKkmS1jyxwDuVoMk6GfqNr0Ja?=
- =?us-ascii?Q?m66tPzRtTMRpKBcX2OvGTf56BWHNBprfIHIFA0/Gq4Qs4EqnVwCCaOwjD1o3?=
- =?us-ascii?Q?+z1Gc59MmIQ4cJvbLOtLeOYpdLyNTJ/Et4F4q2mWlJqXPFJqcv9sCSYi00oW?=
- =?us-ascii?Q?dWkxVIJYJZpiQ2KHwL2iFfYVK9Itj2cy5cQsNBGWRE4jh8PRfiU6qmBYs2oR?=
- =?us-ascii?Q?Zt/ibax3U+yVtx8k5mZ04V+ADOAhENO2dC56IvdB4TRZ3iJhGEXSKJiiv5kF?=
- =?us-ascii?Q?oce8NV9DWL6AwH2iPDQasMLF4JraJRhRJbidCwC/QS46engXsbkzfNQOPQjW?=
- =?us-ascii?Q?PH+EHbdaGGTy2LMXYR4uFaSFK79UoxdTeelw+0V9SxdGMTtc1I/W3+0gSQZ0?=
- =?us-ascii?Q?KAafdX6uDpAzMZppPoBqx5H4xDXRUZeQYXXgFGHQRFmiFjfPRmT4g+Lwm+89?=
- =?us-ascii?Q?eaZXCqJaOhVx1z4tCpxChuZEwwh1vGggh6vHuR+nLWkjFSSLxKMFzkC8niSt?=
- =?us-ascii?Q?sa/URiU5DdG03J7Y0pArVlLxnlON2FjBTsTve9+x7uuzhztd9vL34Vc7pqCz?=
- =?us-ascii?Q?1+K2HZzmnmYovimmbPgx7PCn/0y27NNUYiIp+mnTkI8oe0EGkBeDfo7MpDX9?=
- =?us-ascii?Q?4ybMNh0hysL0ra55y9Y=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B72423B604
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 05:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758693045; cv=none; b=phM0cYI4yE2jjDjSZJceI1P3Tc/LTiLqKEvk2rVqdzPZcdQqJT21QM4hcgWtxnj+FR4dE0gqyi2oBlyH5+0aelVITfvrgGqWoSr1Q2gRdyZcGRsiJP4jKGCCIVJIoCnf5zsU1K8XtucAnVlxPk6yHK15YwMjr43eXc/G8GgIowY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758693045; c=relaxed/simple;
+	bh=/J1NuLRSXzUZpYo/ANfB3d4ysGO2emGoUiZYdgGvFRo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZqXm7zNdkbz7N6tYlepIafUM0fpIR6bLaDhLCLLGi/LxCH+3obMf/VkTxZ0q6MzG9JL8+tJi0nsR0NvQPC3AmCqTi5UrsEJR08XTTSiGP7q4MAoHifHY5VS7bNwndb4CyF3KAXPNwxhjLPH0hTwOavQpbhMicyDBcQ4JJFk3WhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gMvemh7F; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758693041;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ppJ/4+p6+d9eQBtSGx+90R7i7ZmKWove36hByh++FaI=;
+	b=gMvemh7FX6iDENF2CQyXd3nwJaGhXOhdSwLlw0j6ZR/dRW4wuaeFqptNalp1yR0cofghzg
+	++XTzqvgFKWYzQo+qWbcHTMHFr5feyMPlGDgSwEW/4jWcI0DP7hIzNIcEVjTCt989f7ykR
+	QGACc2IzTmhK0uyDj4jjCSLGiICtWFk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-475-rR37T211NwKAgtE_qt0DpQ-1; Wed, 24 Sep 2025 01:50:39 -0400
+X-MC-Unique: rR37T211NwKAgtE_qt0DpQ-1
+X-Mimecast-MFC-AGG-ID: rR37T211NwKAgtE_qt0DpQ_1758693038
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46e23a66122so7283825e9.0
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 22:50:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758693038; x=1759297838;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ppJ/4+p6+d9eQBtSGx+90R7i7ZmKWove36hByh++FaI=;
+        b=qCizg4XaF8ShS3f04fqywD02zYKV8YrmdNqSEH27VtKU7zhDfgSIVEfmkjFguhKNc1
+         A+xa86GxDWAdhNRSTZBymxAdOCPQo4/GE/ExD3mfSU2e7xRvnxzgmOtrQ8xbMdieigad
+         AdbyJqT5ab2eK54HK14/x2gBuZ6N8CfZ8yy5h/lFwL74bFa1REwq60QUD587NuKSk52n
+         vKL2zgIiuK1A39y/1O5L0G9OiC5ezuHvjcSlWcmnQVZS8hSNU9DrdkkrHrRe3PegNG2J
+         eXCU/l31S0GPg7dXEE81VlvdZ64j9R/R5/yj66EsxvvyQeXgOg4QZR2FwimiD5mfQdga
+         Q/qw==
+X-Forwarded-Encrypted: i=1; AJvYcCWXE59B3YDJ/8Rjh7IcBhURSE3hJZuRbbGAqw7vINAveNWd7i8L9ErI2ozLUlxuAWLxvM08+eY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrGybs3QH9XkZ6j/yRgi0MXIV9iAUmeLmd8YXg0aOJ8xs6FZMA
+	v81TEvOc8RGUJ8qMumPS5aUYopleAFaEJS6blMyCpCkxoJqqjcsu3Iy2m41szDLOzzqLNjAUp1d
+	vN9HrFlGJhkDTRxLUnD+aQPcepfX//MzQ14RGlvVSpdEl3EgNnuFmEah+0w==
+X-Gm-Gg: ASbGncviG9OXZzWYchWYuM9y3Ts31lbsY/qVuz+lo2Q6IH8BX8woAIM2NBHRcifBdjS
+	HcgWYGRef67HJnKG3lwUMt2/fMFGhF03xT8vbgtZqm8nSvvwSe+59aKjV9ziwZ6Q/JuAvdWKFsU
+	qJnMKGzIMQyNjtG4UP+kIKjfbXG57IhGqdGixfC1lE3f1IZhiZ7FQsBQW3E6e7928sxGB2M6D3B
+	hRoladWDvkwF2vJbeZaWZEwBdDf/0iEKItkS5zsIFTuAZQQ7k+dBhwwoy14yNDha6VlPLiPen8L
+	VeJHbDP6SB67hGYm+mgXKxw3XB8hLg9WivA=
+X-Received: by 2002:a05:600c:1d11:b0:45d:d9ca:9f8a with SMTP id 5b1f17b1804b1-46e1dac604cmr44570235e9.27.1758693038301;
+        Tue, 23 Sep 2025 22:50:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEI5yChju2CNQTfr7bjk/jSZjz66aaKFh1WsB19/2l6F8R6L8aK5fNSSg13stYE6WzGdJUdzA==
+X-Received: by 2002:a05:600c:1d11:b0:45d:d9ca:9f8a with SMTP id 5b1f17b1804b1-46e1dac604cmr44570045e9.27.1758693037866;
+        Tue, 23 Sep 2025 22:50:37 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e21c8b7eesm22011065e9.4.2025.09.23.22.50.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 22:50:37 -0700 (PDT)
+Date: Wed, 24 Sep 2025 01:50:34 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	eperezma@redhat.com, stephen@networkplumber.org, leiyang@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, kvm@vger.kernel.org,
+	Tim Gebauer <tim.gebauer@tu-dortmund.de>
+Subject: Re: [PATCH net-next v5 3/8] TUN, TAP & vhost_net: Stop netdev queue
+ before reaching a full ptr_ring
+Message-ID: <20250924014703-mutt-send-email-mst@kernel.org>
+References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+ <20250922221553.47802-4-simon.schippers@tu-dortmund.de>
+ <20250923104348-mutt-send-email-mst@kernel.org>
+ <71afbe18-3a5a-44ca-bb3b-b018f73ae8c6@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6455.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2343f173-e359-4036-fe72-08ddfb2e2e79
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Sep 2025 05:49:52.3051
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: fuhnJbwjph3NbOwYqX5KS9zKrGY8CSpcgF/rb2ECiz0dbfg+OSmL18+418CBiXE5IYKORyPMPTk8V7LGYoLRuw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB9502
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <71afbe18-3a5a-44ca-bb3b-b018f73ae8c6@tu-dortmund.de>
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Alexander Lobakin
-> Sent: Thursday, September 11, 2025 9:53 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Lobakin, Aleksander <aleksander.lobakin@intel.com>; Kubiak, Michal
-> <michal.kubiak@intel.com>; Fijalkowski, Maciej
-> <maciej.fijalkowski@intel.com>; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>;
-> David S. Miller <davem@davemloft.net>; Eric Dumazet
-> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
-> <pabeni@redhat.com>; Alexei Starovoitov <ast@kernel.org>; Daniel
-> Borkmann <daniel@iogearbox.net>; Simon Horman <horms@kernel.org>;
-> NXNE CNSE OSDT ITP Upstreaming
-> <nxne.cnse.osdt.itp.upstreaming@intel.com>; bpf@vger.kernel.org;
-> netdev@vger.kernel.org; linux-kernel@vger.kernel.org
-> Subject: [Intel-wired-lan] [PATCH iwl-next 3/5] idpf: implement XSk xmit
->=20
-> Implement the XSk transmit path using the libeth (libeth_xdp) XSk infra.
-> When the NAPI poll is called, XSk Tx queues are polled first, before regu=
-lar Tx
-> and Rx. They're generally faster to serve and have higher priority compar=
-ing
-> to regular traffic.
->=20
-> Co-developed-by: Michal Kubiak <michal.kubiak@intel.com>
-> Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
->  drivers/net/ethernet/intel/idpf/idpf_txrx.h |  14 +-
->  drivers/net/ethernet/intel/idpf/xdp.h       |   1 +
->  drivers/net/ethernet/intel/idpf/xsk.h       |   9 +
->  drivers/net/ethernet/intel/idpf/idpf_txrx.c | 117 ++++++++--
->  drivers/net/ethernet/intel/idpf/xdp.c       |   2 +-
->  drivers/net/ethernet/intel/idpf/xsk.c       | 232 ++++++++++++++++++++
->  6 files changed, 354 insertions(+), 21 deletions(-)
->=20
-Tested-by: Ramu R <ramu.r@intel.com>
+On Wed, Sep 24, 2025 at 07:41:28AM +0200, Simon Schippers wrote:
+> Hi,
+> first of all thank you very much for your detailed replies! :)
+> 
+> On 23.09.25 16:47, Michael S. Tsirkin wrote:
+> > On Tue, Sep 23, 2025 at 12:15:48AM +0200, Simon Schippers wrote:
+> >> Stop the netdev queue ahead of __ptr_ring_produce when
+> >> __ptr_ring_full_next signals the ring is about to fill. Due to the
+> >> smp_wmb() of __ptr_ring_produce the consumer is guaranteed to be able to
+> >> notice the stopped netdev queue after seeing the new ptr_ring entry. As
+> >> both __ptr_ring_full_next and __ptr_ring_produce need the producer_lock,
+> >> the lock is held during the execution of both methods.
+> >>
+> >> dev->lltx is disabled to ensure that tun_net_xmit is not called even
+> >> though the netdev queue is stopped (which happened in my testing,
+> >> resulting in rare packet drops). Consequently, the update of trans_start
+> >> in tun_net_xmit is also removed.
+> >>
+> >> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> >> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> >> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> >> ---
+> >>  drivers/net/tun.c | 16 ++++++++++------
+> >>  1 file changed, 10 insertions(+), 6 deletions(-)
+> >>
+> >> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> >> index 86a9e927d0ff..c6b22af9bae8 100644
+> >> --- a/drivers/net/tun.c
+> >> +++ b/drivers/net/tun.c
+> >> @@ -931,7 +931,7 @@ static int tun_net_init(struct net_device *dev)
+> >>  	dev->vlan_features = dev->features &
+> >>  			     ~(NETIF_F_HW_VLAN_CTAG_TX |
+> >>  			       NETIF_F_HW_VLAN_STAG_TX);
+> >> -	dev->lltx = true;
+> >> +	dev->lltx = false;
+> >>  
+> >>  	tun->flags = (tun->flags & ~TUN_FEATURES) |
+> >>  		      (ifr->ifr_flags & TUN_FEATURES);
+> >> @@ -1060,14 +1060,18 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+> >>  
+> >>  	nf_reset_ct(skb);
+> >>  
+> >> -	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
+> >> +	queue = netdev_get_tx_queue(dev, txq);
+> >> +
+> >> +	spin_lock(&tfile->tx_ring.producer_lock);
+> >> +	if (__ptr_ring_full_next(&tfile->tx_ring))
+> >> +		netif_tx_stop_queue(queue);
+> >> +
+> >> +	if (unlikely(__ptr_ring_produce(&tfile->tx_ring, skb))) {
+> >> +		spin_unlock(&tfile->tx_ring.producer_lock);
+> >>  		drop_reason = SKB_DROP_REASON_FULL_RING;
+> >>  		goto drop;
+> >>  	}
+> > 
+> > The comment makes it sound like you always keep one slot free
+> > in the queue but that is not the case - you just
+> > check before calling __ptr_ring_produce.
+> > 
+> 
+> I agree.
+> 
+> > 
+> > But it is racy isn't it? So first of all I suspect you
+> > are missing an mb before netif_tx_stop_queue.
+> > 
+> 
+> I don’t really get this point right now.
+
+ring full next is a read. stop queue is a write. if you are
+relying on ordering them in some way you need a full mb generally.
+
+
+
+
+> > Second it's racy because more entries can get freed
+> > afterwards. Which maybe is ok in this instance?
+> > But it really should be explained in more detail, if so.
+> > 
+> 
+> Will be covered in the next mail.
+> 
+> > 
+> > 
+> > Now - why not just check ring full *after* __ptr_ring_produce?
+> > Why do we need all these new APIs, and we can
+> > use existing ones which at least are not so hard to understand.
+> > 
+> > 
+> 
+> You convinced me about changing my implementation anyway but here my (old) 
+> idea:
+> I did this in V1-V4. The problem is that vhost_net is only called on 
+> EPOLLIN triggered by tun_net_xmit. Then, after consuming a batch from the 
+> ptr_ring, it must be able to see if the netdev queue stopped or not. If 
+> this is not the case the ptr_ring might get empty and vhost_net is not 
+> able to wake the queue again (because it is not stopped from its POV), 
+> which happened in my testing in my V4.
+> 
+> This is the reason why, now in the V5, in tun_net_xmit I stop the netdev 
+> queue before producing. With that I exploit the smp_wmb() in 
+> __ptr_ring_produce which is paired with the READ_ONCE in __ptr_ring_peek 
+> to ensure that the consumer in vhost_net sees that the netdev queue 
+> stopped after consuming a batch.
+
+yea you said it somewhere in code, too, and I am not sure I understand it all, but
+wmb isn't paired with READ_ONCE generally. barrier pairing
+is described in memory-barriers.txt, READ_ONCE is not a barrier
+at all.
+
+> > 
+> > 
+> >> -
+> >> -	/* dev->lltx requires to do our own update of trans_start */
+> >> -	queue = netdev_get_tx_queue(dev, txq);
+> >> -	txq_trans_cond_update(queue);
+> >> +	spin_unlock(&tfile->tx_ring.producer_lock);
+> >>  
+> >>  	/* Notify and wake up reader process */
+> >>  	if (tfile->flags & TUN_FASYNC)
+> >> -- 
+> >> 2.43.0
+> > 
+
 
