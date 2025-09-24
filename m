@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-225737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E902B97D7E
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 02:01:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E349B97D81
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 02:01:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F7E21AE2B13
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 00:01:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7CF01AE2D0D
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 00:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A29C8189BB6;
-	Wed, 24 Sep 2025 00:00:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF2B1DED64;
+	Wed, 24 Sep 2025 00:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L07b4tkl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MECXLCPM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2D12D052;
-	Wed, 24 Sep 2025 00:00:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523462D052;
+	Wed, 24 Sep 2025 00:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758672034; cv=none; b=tYFnCxieLaU3BmP9pOcrQ+AyDGItukFCWhTv8ah/OzzLvcPFs/Yf2Vym76VywZE3cisEZ9rc/npbQ1q0x/Z2EKlkfz8/DlQTaacXNQ9odjFQcDCukZN62hM42sANvt/K8GIswKwz49K5tArhCF2Q9Waeciafsr69rbV52D13+UM=
+	t=1758672036; cv=none; b=ciVdroBTLMvGIM4JWDzf6vpPS2BXvdNsPu2mzguAQ80weX0VcCOC5et+F2npYd/mO+d8NormHRzEeDSH6yXLTzQgmYLFnV6eI1azUZ7FtL8ZzSuTEzaaLO+W5ICyKdGBCOUzDq6PdNwfJTz4idEjcHS0rzjCkEQJRwuBArNPJGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758672034; c=relaxed/simple;
-	bh=hodydOGysaICJobwA4ubzUn7rdJXQNa8LAcVCjHt8P0=;
+	s=arc-20240116; t=1758672036; c=relaxed/simple;
+	bh=XQ5387VeiqYIFOjg5vsVPE0sAGAoAH+TzEKOi3G8ozg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ikCiDVgp/xajgPmHrtGKG3jUYc2PqSqqnb/vKO9XvalANslqVb1hM6JOh1m0nJ8X+iLE3RzpoQPApAfzvkib9FsXgIjzyoLDl9O/shiY35TFUo51ewMFrcqaTaWMjhtWGhRghJOa7uy6ihxqFTXYcjWfOySUSZKHOsuMJOBVd74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L07b4tkl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5631EC4CEF5;
-	Wed, 24 Sep 2025 00:00:34 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ExEOp+uLV28Ze/h2NXHscOtWPXGfZiXuAhubb4FuZtRJWYeKL/VKsR56oe7UitjyeLNvkAbDe1yotI4X0oDfK5HzDkOauRp71KibRugt22z96OOhwgoMHZrxDMOAqD4XMpRCvM2sYlNYtKyKBmmVL9V+UY+2Evb11pDb2Q7GLD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MECXLCPM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D800DC4CEF5;
+	Wed, 24 Sep 2025 00:00:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758672034;
-	bh=hodydOGysaICJobwA4ubzUn7rdJXQNa8LAcVCjHt8P0=;
+	s=k20201202; t=1758672035;
+	bh=XQ5387VeiqYIFOjg5vsVPE0sAGAoAH+TzEKOi3G8ozg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=L07b4tklURHCDfK5o5f10N2yjmv6Vv5jxhJgqwli0QXZ8m1zvnM56gCJQxi8ExD0h
-	 VywuTj+IMI+nyz9/BKl9rBWA3ZdhUypdxJcrN2RsbDJQE/J1MJGXFV8Y9o85RYbLWe
-	 B2I4XY7061fX0H8eVmZeCk66w1Fh7cMtNMQ5lvKPZ456dnX3RUV595fEAHhDps9z+k
-	 hV68y4bpBoWLhEHpgWbD1JKPwgx+0KAy5EsXF3N1esh6dzZTQZzeafB67kS0tBdZkP
-	 BcAWxFRl7lopizD2lKbIUjICN11ZaasVD4k6/H52gUMbD6wDELeVHwvFfEAWSGA0CV
-	 mzORbMn0U//0w==
+	b=MECXLCPMCnMxpgLiTlcLvDpbfa0px1tjSHHTSFplWTRDBWeU3XsNU+1tF+K8mfjpq
+	 C+bbjQ/6Ui6sHDgbF9BoZQLSeo/VWyapteTvT7tZRW4VqfFyKw+0N/v8TaRkAZD3va
+	 DMHUfsP/3d36twR6tNdPWkt5nom+bnJZzZzyQHJJ4BQ084sGl/f+T074bpWv4DUSeP
+	 uOebdP6LYrC1RidXi6rVw7ZL9aRMyDgDPwKWeU4yk+JHOixHw7QK9OitEPV0+vEvkK
+	 PnEbiqpPOFDFl96zBshZtq+Fq3hYr6m81CEiwnN+l9CQvKGsDJsm7LGFGCR+nC9Qnj
+	 czB9EeMXWLMnA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710DF39D0C20;
-	Wed, 24 Sep 2025 00:00:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB16839D0C20;
+	Wed, 24 Sep 2025 00:00:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: rtnetlink: correct error message in
- rtnetlink.sh fou test
+Subject: Re: [PATCH][next] net: airoha: Avoid -Wflex-array-member-not-at-end
+ warning
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175867203104.1967235.15942314492809685727.git-patchwork-notify@kernel.org>
-Date: Wed, 24 Sep 2025 00:00:31 +0000
-References: <20250921192111.1567498-1-alok.a.tiwari@oracle.com>
-In-Reply-To: <20250921192111.1567498-1-alok.a.tiwari@oracle.com>
-To: ALOK TIWARI <alok.a.tiwari@oracle.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+ <175867203251.1967235.16855989267443539182.git-patchwork-notify@kernel.org>
+Date: Wed, 24 Sep 2025 00:00:32 +0000
+References: <aNFYVYLXQDqm4yxb@kspp>
+In-Reply-To: <aNFYVYLXQDqm4yxb@kspp>
+To: Gustavo A. R. Silva <gustavoars@kernel.org>
+Cc: lorenzo@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 21 Sep 2025 12:21:08 -0700 you wrote:
-> The rtnetlink FOU selftest prints an incorrect string:
-> "FAIL: fou"s. Change it to the intended "FAIL: fou" by
-> removing a stray character in the end_test string of the test.
+On Mon, 22 Sep 2025 16:08:21 +0200 you wrote:
+> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+> getting ready to enable it, globally.
 > 
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-> ---
->  tools/testing/selftests/net/rtnetlink.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Move the conflicting declaration to the end of the corresponding
+> structure. Notice that `struct airoha_foe_entry` is a flexible
+> structure, this is a structure that contains a flexible-array
+> member.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] selftests: rtnetlink: correct error message in rtnetlink.sh fou test
-    https://git.kernel.org/netdev/net-next/c/f77064586026
+  - [next] net: airoha: Avoid -Wflex-array-member-not-at-end warning
+    https://git.kernel.org/netdev/net-next/c/09630ab91d84
 
 You are awesome, thank you!
 -- 
