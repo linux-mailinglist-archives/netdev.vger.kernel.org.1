@@ -1,344 +1,478 @@
-Return-Path: <netdev+bounces-226006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D019B9A658
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 16:56:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CA28B9A6BC
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 16:59:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B175160942
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 14:55:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DDF04E19D2
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 14:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A5B53164AA;
-	Wed, 24 Sep 2025 14:50:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819FF31D396;
+	Wed, 24 Sep 2025 14:52:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="xgAxSahX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KyLKf1E5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F97314B90;
-	Wed, 24 Sep 2025 14:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758725445; cv=none; b=G6BtwV2tOcbhiguROefxuLGVmZGHcRnprIEC3e9ym90lbIblhibL/hDWkouPdIPBey2+sFz3+cK7pKU1q3YS7cMJsD6k3Ltq17wo2BkSaVA+X2IwZYbBEqcdWXOMj2biEj3jYDr5Zm3a9Edd5igbJD81WQ2fUuv8emHJUEsujVM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758725445; c=relaxed/simple;
-	bh=7SKzH8PxYzpAySCoXAtnf3AzABu9MFjk+10aWHUVLi0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ErEvoTnDybm4M2ZrGAlWb0Tm8dTq80rfSwUcSJ4GvDiuwd4qRtCb5e5VhVxQV+QKbMakVKZOqjcJugtGFLGkPxKhDpDAcVVuS1me0PUTqwiiEiNB8yLiYs8UuNQByzvawE8wP0CJcbKLpIv2uOUwfpBm4fLSSxgBO8hA+c3+yug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=xgAxSahX; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id B4C301A0F82;
-	Wed, 24 Sep 2025 14:50:41 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 83FEB60634;
-	Wed, 24 Sep 2025 14:50:41 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 58B7D102F1916;
-	Wed, 24 Sep 2025 16:50:38 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1758725440; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=oPEzeTnQ7Or1TuaZXMgQBye/vToi6RorrJA8q5MfX8w=;
-	b=xgAxSahXYK8tzd2470KLTRxFZnW5OqM8zs3ibyWTQ1PBZP/AoO1iH+YGzVEmG92eQtDAQo
-	KSqwOrTR8Et0nyBBM060kEDf9HceqlOMsFvsJOtMonFhjhp0qDmNyLYThfjKNq/dQH37oL
-	NiUnDniBpLBijK4IEV9J0D1r9ETo7OfumAn8AOL4h+N9fJCq6wPLurDPGDP3s44biNrZBx
-	uw6ZmEG/0LfC3XdNFCJHaucZEpmuoCV4LBWDCAbWZhRQoVOr/ufiiPNtUGY1UZO7L/NkBp
-	wpq44H3WnvJs72ICzYkrpQ7eCWKRVzJ5qUlgx6uApZgw4Y0Qz/rlv8mziiIidA==
-From: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
-Date: Wed, 24 Sep 2025 16:49:50 +0200
-Subject: [PATCH bpf-next v4 15/15] selftests/bpf: test_xsk: Integrate
- test_xsk.c to test_progs framework
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4320131D379
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 14:52:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758725541; cv=fail; b=NWjNCbUFxjQz4TsOq9JxI2ZZkC+R7GPdtKsFfaKuQf6EdqVi7TwMiqzz9rqi4dRrr6qeHbRA37zLQCfQTmEcZKFeZQa2lfN9km/KIgP/CdhJtm1voS03vU20eBJvGJWIBSSTma+0ziQqSeEUvZZ3zzpiLVdm6FARb6bgl/z7EiQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758725541; c=relaxed/simple;
+	bh=PhgqOZLIlXMx6s/gvl0zy2auQ1BQRQShbHsiqhxgVhs=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=hPzb4KWRtMjvARf6OM9ArBERB6iwjXL/QuFaEOPkSsatANbE0hlvp7joSlsv7htDACSaKzyVDI8SVMACCwJO/bs50qOjYkrdTMOG5Tvhvxs7DAL7hTrdRrsYs9Y0iv+zzYmYH9qxQ71ZIUTfz7HDieZueFEfrKPS+5Sf0NxLOy4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KyLKf1E5; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758725539; x=1790261539;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=PhgqOZLIlXMx6s/gvl0zy2auQ1BQRQShbHsiqhxgVhs=;
+  b=KyLKf1E5aHMxJmQucZ+CRjH45Lox+3DQPeWVZXsSFs5CjqE2Ku97E5D7
+   /0y8kMOUCpZIZsMXmZc5a94t87peYqsY54MhApZu93OIm+I83UoKkZcUX
+   J4Yx+I2MCQVzRdgsTZAEop0pAh3qLqPT8NvdLUrgcFNRVstlAcjvgAngZ
+   TxrATod1nEXgWsLk5qV8SoQoXrnHCYir7m8jGgtVRHKKCcnV666I3tORT
+   nEhhkOwo2KzX9lT8NEo650oRnP2RiTMar3w26g0C8kJsNSLkwMbqXMtJ/
+   OAvmnZQKXfJcx3L0byR6t+W4TRmERlN0FpK4E8OekcO3IoKRb2GDC3ToB
+   Q==;
+X-CSE-ConnectionGUID: AMtnoIwBQjWdttYWC/gkRg==
+X-CSE-MsgGUID: VKNh2D6lSFms+is8Si4Oew==
+X-IronPort-AV: E=McAfee;i="6800,10657,11563"; a="78659590"
+X-IronPort-AV: E=Sophos;i="6.18,290,1751266800"; 
+   d="scan'208";a="78659590"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 07:52:18 -0700
+X-CSE-ConnectionGUID: XlOF31sOQJu+f7maem40Pg==
+X-CSE-MsgGUID: W6t2y+6/S+qJiJWQxxMURg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,290,1751266800"; 
+   d="scan'208";a="176895565"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 07:52:18 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 24 Sep 2025 07:52:17 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Wed, 24 Sep 2025 07:52:17 -0700
+Received: from BN8PR05CU002.outbound.protection.outlook.com (52.101.57.60) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 24 Sep 2025 07:52:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OeuG8rspCjrPKVCoPhUx/IT6m0Doo2jz3eFBLqc5qMoIGujpMhoF5jwc+u2nHKNwLeG8hM0dVfXEyTc4GTGOEf+VKUeK5cl3TPa8RVXltAYVqio7/mepsS0et2if+ePdQAwcbJ74sJPlanMt70BbGNQzR82SbXVC8Ex4tVXmjjwEUBbkJ6EIeDgnnnF+PFH6LljDcFOVoeE6O/3y6HQb2wauIIuGjS34tn2sPWm5oIm9CLt55EOUM6KC9An0ao5LoY9IUzlBuLnTGVkOU5ukJKl+OfeY/vcNn0MKbRojPQa8z8iIOLFhhhAJt8zo/M9MrroDZAwL7W4AC5hUWQPRaQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CJbGi8UWa81jlvg/khlUfFuAn/iXUyJNiUm/8+1IOIk=;
+ b=Gab3AnU9Ze6Jb6UYqJcfbq0/Aiiq/lon/yG1JNCqTFGE+HsOb4ucTOEcR/PGsLU0ovuCqnA8ImtnDOVtvNoZdKnvuhyCMmDeXpllEPURTtpcthtzrn0mGTK7bBZDM/EdFC8iWzEb6GP5YZxd5rUn1iw3E/2VfROAm+YxeYrNM3M9aI7J9y1mQlnDb2lRWBCGNl6DINccCRrq04WJz3y7xe9ueU7ZSZVZndZ8/71t4rovReIjajf+r4tEPEF2TMWrzdLAERFRqPGccGFQl1YJnC/YjjqVH9reqCjzVTySMpT06DN3eo8TSgEQMC9LFSBY8RRsRvn7brc/4n4y2QjWHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by IA3PR11MB8917.namprd11.prod.outlook.com (2603:10b6:208:57d::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.9; Wed, 24 Sep
+ 2025 14:52:14 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.9160.008; Wed, 24 Sep 2025
+ 14:52:14 +0000
+Message-ID: <18111eee-3b3b-4cfe-98be-ab5f93b0aafb@intel.com>
+Date: Wed, 24 Sep 2025 16:52:09 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next v4] idpf: add support for IDPF
+ PCI programming interface
+To: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <madhu.chittim@intel.com>,
+	<netdev@vger.kernel.org>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Simon Horman <horms@kernel.org>
+References: <20250903035853.23095-1-pavan.kumar.linga@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <20250903035853.23095-1-pavan.kumar.linga@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR0202CA0021.eurprd02.prod.outlook.com
+ (2603:10a6:803:14::34) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250924-xsk-v4-15-20e57537b876@bootlin.com>
-References: <20250924-xsk-v4-0-20e57537b876@bootlin.com>
-In-Reply-To: <20250924-xsk-v4-0-20e57537b876@bootlin.com>
-To: =?utf-8?q?Bj=C3=B6rn_T=C3=B6pel?= <bjorn@kernel.org>, 
- Magnus Karlsson <magnus.karlsson@intel.com>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
- Jonathan Lemon <jonathan.lemon@gmail.com>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Alexis Lothore <alexis.lothore@bootlin.com>, netdev@vger.kernel.org, 
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
-X-Mailer: b4 0.14.2
-X-Last-TLS-Session-Version: TLSv1.3
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|IA3PR11MB8917:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1de47079-eaa3-4de7-2319-08ddfb79f26e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SXVJQ0o4bHE0dk1WMFVNSlhDdTd0MGcvc3V3M2VxajZQbHVkWXRId1g4TzdI?=
+ =?utf-8?B?V1h5OWgzbG5lb25IcHpQTjBsSzFTdVRQZHk4dW5GUVhYaEkvVXVqdHlqQ0tq?=
+ =?utf-8?B?TTBwSkt4bC9uMlU5UElWK0hKa0dPQ2NTL20zTmk5Y3QwRlE2TmFCblZUT2hT?=
+ =?utf-8?B?dzExMGZVZVBnaThUWDQwV3FOeGErM3ltUGpOcmN5Vzh2SHh0R3grZHB4enZQ?=
+ =?utf-8?B?MGFLQmk3NFlWZHN1U2EwY2ovVlN3U2JGbWhnYm9DVW1mcFcvaTN4aDZCVFk5?=
+ =?utf-8?B?UnF2aHErWlhrbm03V3VMYnVSR2c2cTBMWTczT1dmQUpOc3QzZkVGMmZZRzhy?=
+ =?utf-8?B?dWwwU1Q2MkRJV2RMc1J4eVlrUGN2S1ZYK2tSV1lwdHlscE03K2k5UGNzYzkr?=
+ =?utf-8?B?TllYWk1VbjdzOGcvS09tbUtVVG1QQVB4NHRZTW1lbTBPOUtaQmU5OW5mbXVz?=
+ =?utf-8?B?ZS9LK3FqS3loYWVmakpNOFowY3MraDV0RnozenRFNFVmYmptbmdodU8wdXl0?=
+ =?utf-8?B?c0tOb3ZQTElOMkVKMVowNFQrNXlBa1FEdVR2Sk10eTJaUlV2cnVvT0ZzS1FS?=
+ =?utf-8?B?TzV5UWJOYlVlY0k1SllZcXNBTUtjSlpteVUrRWZwRXM2MVBOM2NXc0o3T2Ft?=
+ =?utf-8?B?OGswQ3Y2QTdrVVNueC9lbm1YNFRZUUlNWXBwMWE3QjNlVlhmb3MvMDBKZGl1?=
+ =?utf-8?B?Z0xlTFhBeEFSdTMrYlRscS9yRVNBTG8vNmx2VjhlcCtmT2F1R2c5NVM0VGd4?=
+ =?utf-8?B?U0xOVjNmUGhtM3EwMThBYmhoNjdVQndZRUFtQ2E3cU1nL0g2a0ZyNzVKMWpN?=
+ =?utf-8?B?Y3lEaHJSeWhoR1BrOW9HYXJMTHNFcVZrR3lHa3dZMnJYMTRZNFZBTWxXekt4?=
+ =?utf-8?B?QnlmNXErMG1WTlpyUjE3YmhUTXlNY0h5cXRpczZoMzd1RnVXcXVHN1V5MnJz?=
+ =?utf-8?B?RWt5d2FYTFBHb2ZQK2p4amhKMjVRQ2xFUDFrTUtwVkUvaHdudEMyYnFPL2FD?=
+ =?utf-8?B?UUo1L002MDBYMFYycmJqZFdHQmRSV3FXTUU2R3dob1duMjFaR1l5K3N6NW56?=
+ =?utf-8?B?UjN2ZjlXN2VYeXpVY2dCNmd4SVFtejVPSTlEaVpoMmhNL25EaFRRaHVTcEJN?=
+ =?utf-8?B?ZklWTUhBdE5rNkJQcC81SUQwYy9jMXVmNnhuLzFtT1BpVmV4VTE2MUVxRmtz?=
+ =?utf-8?B?dDFhd1BwaGJkN21mN3NnOXA1VzczTmZaQ3EzVm1NMzJZUStpRVAyUzRxaTZT?=
+ =?utf-8?B?UHRFWkh0MGFoVDRab0h5SUEydjdIYkYrNU1KOTRwUkpRamM5R0RlcU9xQ3Jj?=
+ =?utf-8?B?dHh4cWpVSThqbWhFRktyNjE2WlhDL2xxZDhjUnNQb0FnWWtnQXRaYVllK21O?=
+ =?utf-8?B?MkZjZnhJc01qeFRvNXFoSWxwOHBhUXk2U3BmaVdaNHg5d0l6dEVROUYrWWFa?=
+ =?utf-8?B?Q0NDYk1pR3J1NlRESWxvaWdQZWR1WFljSFppZWlJdDkxUlpKSEUwcHBZMWNt?=
+ =?utf-8?B?VkxaaGRiTzk0aks4bUdrMWxBUGZzZm1TN3NXYlU4c2dzMkdnMWM1ZTQxUmlm?=
+ =?utf-8?B?QUJnc01HUE5kMmJ6bkUvOUFpSjFpdExnSGZSY2dUWE01M1J3eGJIbVJ5SFIr?=
+ =?utf-8?B?Rm1RbEdtV2xjaStDdmo1MklWeDQ2WW93MHJGZXdIc0wvc2lrekhpU0xnY1Q3?=
+ =?utf-8?B?N3FaWUJFWjNVNVpMN00vcTVORVFWYUlIWnpiNm0rRnQrWGFFM3hycCtBc3Ft?=
+ =?utf-8?B?cnFQeUtqeXBuWjZVc0s3TzJhWWdQbnJJeTIwSkJMblJMZk95L0tBazE2Ny9k?=
+ =?utf-8?Q?py1uCOHU4VTTrQ3/AfQZ1dYpajy31QJqNiwKg=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZFNjMVEwaG9ENURmS0ZseHpKMXVzTUZJcTdvZlc5dEY4c0pZNGxuQ3JtdHBS?=
+ =?utf-8?B?TEkzRjFpdFRjdUZINnI4RTc0Ym5ldG9qT1dHaTR4b1RHSFdOV3Y5bnp0NWNS?=
+ =?utf-8?B?UVVGaVlwMUFqNjJBZE1TazhjNmlzMy9EemFBWUpOczUvM01JMFZnUzZnU0Fs?=
+ =?utf-8?B?eVI5ZTVKUFN3ZG9wUTRoc0tRZU4rY1N0ZHBxRUVqRmdtb2trelBVUjB2RkVK?=
+ =?utf-8?B?RGZUOFQ0amovUkltVnhGZWsyWHVWZU5qTDR6TTcxV2Q1RjVJQ3BGS2dqOEY0?=
+ =?utf-8?B?Z1JyMUV6dS9SMWUwbGVTd2pnR3RQNGVKeTJORDJUN2VWRi9uVmIyciszNGlU?=
+ =?utf-8?B?R240Z3c1UFRoZnp3dGg5b1E3QWtmQWZUR2FDeUxUN1NKRm0vUzNTdEhvVU9k?=
+ =?utf-8?B?VlJrR0diU3h4RlQ4dkk1MDBPZGFMczgxSHhiQ25HcWVJSGRLQ1ZHc3lBcjhu?=
+ =?utf-8?B?VVluWGNQVEdpUmJ2cXNFamZPZGhFakhrRHpWeXZLWW05em92L3VXUkd2MEJa?=
+ =?utf-8?B?MUVzK0ZCcjJWTGpwMmtiL3hsMHNSQm5zRnYrNWR0cW82dFJkdVBvVmJKZjcr?=
+ =?utf-8?B?TTRZbDZObkt4WU0rWnhML01FbWRSZUppZ093TWgvbWRiNko2cFBKL0dCRHQr?=
+ =?utf-8?B?bkNTUXNnZVBTNVlUcFd1MkdRRUc5T1NubnFobUxrUmduWmU4MG5SaW16Zlg0?=
+ =?utf-8?B?Y2FkVUVlVklpckF0UUluRnRUbDY4cEQvZTY2Nyt1ejFiRVI1K0tiOWtHaFRp?=
+ =?utf-8?B?cjZZbFlKZ25adU9uN0RNcDB5MlNzTWlUeXQ2NTZwaFNDeXpKNTIzQWIyMTFG?=
+ =?utf-8?B?TjhaR3ExRndmYjBVa053bjdhY0wzM1ZjUUloWlBJTkhWVHNXVzgxMitzMGJM?=
+ =?utf-8?B?WC8ycW5MNEM1UmYxN29zS3RFUXZUcmxBOU5ldVBSN1dQMFo3bFkvTTg2SEFS?=
+ =?utf-8?B?enlJenllMXBJWFpFaDJWZHY0Z29VemNvaStjQ2hPcmdKNEcrcUlMSmlIbG9L?=
+ =?utf-8?B?NjBlTGdrdENRcnZ0YzhucVBRcmRqL0s1U1BXa0sxUE42bllKM3ZmaW0zQzBQ?=
+ =?utf-8?B?RkVqSDl5aWVwR1NiQXU4UWVjUWhhOE9oUnYreC9CZGJseTJIeE1hWi9QWlV4?=
+ =?utf-8?B?QmFHRTI3OGhDU1FtUnFid2YrZjFiekhZQ0FkamNNUVgxRmRZVFlxTWtmUXRX?=
+ =?utf-8?B?T05wMjRKbTE5YlpURHJlRFU4b2ZkbGZ4MmxXSnBsaVlzVjFXUGk0R2xJVHor?=
+ =?utf-8?B?RzJucEJRZXBLNGpFWnB5ZWNjL0ZsdGpnSjBwSHFXQ2hyTzR1bWhDSXRNTG1T?=
+ =?utf-8?B?M2lrUit6M1pwUklRa1ZVOFlwTmFHcFprUzVCQ2d3Qjg3Mk5HTGhYR1l1dndS?=
+ =?utf-8?B?djRWRUVPOFI0Nm02WG93akJiUEVaaEFJTG94amZQa0dyTnMwMDl2V1htQUwr?=
+ =?utf-8?B?SmtHRFRzWFVzYWx5K0d4Y2RjL2JLMTVpbzJ5ZjN6M3VKQTRkcENjY09PUGxU?=
+ =?utf-8?B?Y05YaGl4OVZtSGR3Wm50UVhHSVN4bHlvZHlrN21vemo0Z1dBWkYzd25Hb3Uz?=
+ =?utf-8?B?MDNVSDJXQ1BjRm5qNWhJM3FYcGZRQlhleVd0Q1A1Uy9hYlBONTJZdUZjV0tz?=
+ =?utf-8?B?OG5weHdodjNJUE1LY2x3OFV1MGFydHRqRmZYRllmMzRPTThEVmt6TUpWMk85?=
+ =?utf-8?B?bTZVRDFoODZuOG94MWw3Ym5ERGlRbEt2c2lNSXo2ZU9USFpzUHJ4c2QyVi9B?=
+ =?utf-8?B?azgrZTcwVlJTZHRnb01GbFhmVUdDSkRIS1hnUG15dTNaZGpKYkIzYytyaHlJ?=
+ =?utf-8?B?UGFWOHNoeU5PSlNIYk1hdWFvZy9TZVdla0pVZklHVGlnQ0xSQldXZDllRDUz?=
+ =?utf-8?B?RVN0NFRCMXpqa2laV3c0MzNsdVdOZGZtZ24zcmwvVW5PNDRZWEFWV0JlVlo2?=
+ =?utf-8?B?dEo2R29vUFZaOEx3cytOeUdHbnJPRnRYbnJSeGFRS0hTS0s4Y01nM3VRNzRK?=
+ =?utf-8?B?SG41TWJIUEd3SC9HcEQzVTRqTXNWUGFaL2ZVemNZZHllSnZjaGR6K0FwTVFF?=
+ =?utf-8?B?SHVqY3RIVmtFK050elJSMTkvQXVGWDU3aTRJNVpNWDdKc0RFSjFDK09rSUNs?=
+ =?utf-8?B?d05KT0IwNDRMK1kxTHhwYi9mQjNDZk04bnkyeCtpUkhuM2hoMy9RbkJaNGdH?=
+ =?utf-8?B?UWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1de47079-eaa3-4de7-2319-08ddfb79f26e
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Sep 2025 14:52:13.9197
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Zlj1SuQFHwJOdP7j7HDAnkJ/WiMupaJKBVKeCTWX6L+zxIjI26kELgJHTdJMVT2mP4ww52rfDf4QyIvgkRM1aL4l77ZgMtjixMNgDtpa/F4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR11MB8917
+X-OriginatorOrg: intel.com
 
-test_xsk.c isn't part of the test_progs framework.
+From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+Date: Tue,  2 Sep 2025 20:58:52 -0700
 
-Integrate the tests defined by test_xsk.c into the test_progs framework
-through a new file : prog_tests/xsk.c. ZeroCopy mode isn't tested in it
-as veth peers don't support it.
+> At present IDPF supports only 0x1452 and 0x145C as PF and VF device IDs
+> on our current generation hardware. Future hardware exposes a new set of
+> device IDs for each generation. To avoid adding a new device ID for each
+> generation and to make the driver forward and backward compatible,
+> make use of the IDPF PCI programming interface to load the driver.
+> 
+> Write and read the VF_ARQBAL mailbox register to find if the current
+> device is a PF or a VF.
+> 
+> PCI SIG allocated a new programming interface for the IDPF compliant
+> ethernet network controller devices. It can be found at:
+> https://members.pcisig.com/wg/PCI-SIG/document/20113
+> with the document titled as 'PCI Code and ID Assignment Revision 1.16'
+> or any latest revisions.
+> 
+> Tested this patch by doing a simple driver load/unload on Intel IPU E2000
+> hardware which supports 0x1452 and 0x145C device IDs and new hardware
+> which supports the IDPF PCI programming interface.
+> 
+> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+> Signed-off-by: Madhu Chittim <madhu.chittim@intel.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+> ---
+> v4:
+> - add testing info
+> - use resource_size_t instead of long
+> - add error statement for ioremap failure
+> 
+> v3:
+> - reworked logic to avoid gotos
+> 
+> v2:
+> - replace *u8 with *bool in idpf_is_vf_device function parameter
+> - use ~0 instead of 0xffffff in PCI_DEVICE_CLASS parameter
+> 
+> ---
+>  drivers/net/ethernet/intel/idpf/idpf.h        |  1 +
+>  drivers/net/ethernet/intel/idpf/idpf_main.c   | 73 ++++++++++++++-----
+>  drivers/net/ethernet/intel/idpf/idpf_vf_dev.c | 40 ++++++++++
+>  3 files changed, 97 insertions(+), 17 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+> index c56abf8b4c92..4a16e481faf7 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf.h
+> +++ b/drivers/net/ethernet/intel/idpf/idpf.h
+> @@ -1041,6 +1041,7 @@ void idpf_mbx_task(struct work_struct *work);
+>  void idpf_vc_event_task(struct work_struct *work);
+>  void idpf_dev_ops_init(struct idpf_adapter *adapter);
+>  void idpf_vf_dev_ops_init(struct idpf_adapter *adapter);
+> +int idpf_is_vf_device(struct pci_dev *pdev, bool *is_vf);
+>  int idpf_intr_req(struct idpf_adapter *adapter);
+>  void idpf_intr_rel(struct idpf_adapter *adapter);
+>  u16 idpf_get_max_tx_hdr_size(struct idpf_adapter *adapter);
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
+> index 8c46481d2e1f..493604d50143 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_main.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
+> @@ -7,11 +7,57 @@
+>  
+>  #define DRV_SUMMARY	"Intel(R) Infrastructure Data Path Function Linux Driver"
+>  
+> +#define IDPF_NETWORK_ETHERNET_PROGIF				0x01
+> +#define IDPF_CLASS_NETWORK_ETHERNET_PROGIF			\
+> +	(PCI_CLASS_NETWORK_ETHERNET << 8 | IDPF_NETWORK_ETHERNET_PROGIF)
+> +
+>  MODULE_DESCRIPTION(DRV_SUMMARY);
+>  MODULE_IMPORT_NS("LIBETH");
+>  MODULE_IMPORT_NS("LIBETH_XDP");
+>  MODULE_LICENSE("GPL");
+>  
+> +/**
+> + * idpf_dev_init - Initialize device specific parameters
+> + * @adapter: adapter to initialize
+> + * @ent: entry in idpf_pci_tbl
+> + *
+> + * Return: %0 on success, -%errno on failure.
+> + */
+> +static int idpf_dev_init(struct idpf_adapter *adapter,
+> +			 const struct pci_device_id *ent)
+> +{
+> +	bool is_vf = false;
+> +	int err;
+> +
+> +	if (ent->class == IDPF_CLASS_NETWORK_ETHERNET_PROGIF) {
+> +		err = idpf_is_vf_device(adapter->pdev, &is_vf);
+> +		if (err)
+> +			return err;
+> +		if (is_vf) {
+> +			idpf_vf_dev_ops_init(adapter);
+> +			adapter->crc_enable = true;
+> +		} else {
+> +			idpf_dev_ops_init(adapter);
+> +		}
+> +
+> +		return 0;
+> +	}
+> +
+> +	switch (ent->device) {
+> +	case IDPF_DEV_ID_PF:
+> +		idpf_dev_ops_init(adapter);
+> +		break;
+> +	case IDPF_DEV_ID_VF:
+> +		idpf_vf_dev_ops_init(adapter);
+> +		adapter->crc_enable = true;
+> +		break;
+> +	default:
+> +		return -ENODEV;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  /**
+>   * idpf_remove - Device removal routine
+>   * @pdev: PCI device information struct
+> @@ -165,21 +211,6 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	adapter->req_tx_splitq = true;
+>  	adapter->req_rx_splitq = true;
+>  
+> -	switch (ent->device) {
+> -	case IDPF_DEV_ID_PF:
+> -		idpf_dev_ops_init(adapter);
+> -		break;
+> -	case IDPF_DEV_ID_VF:
+> -		idpf_vf_dev_ops_init(adapter);
+> -		adapter->crc_enable = true;
+> -		break;
+> -	default:
+> -		err = -ENODEV;
+> -		dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
+> -			ent->device);
+> -		goto err_free;
+> -	}
+> -
+>  	adapter->pdev = pdev;
+>  	err = pcim_enable_device(pdev);
+>  	if (err)
+> @@ -259,11 +290,18 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	/* setup msglvl */
+>  	adapter->msg_enable = netif_msg_init(-1, IDPF_AVAIL_NETIF_M);
+>  
+> +	err = idpf_dev_init(adapter, ent);
+> +	if (err) {
+> +		dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
+> +			ent->device);
+> +		goto destroy_vc_event_wq;
+> +	}
+> +
+>  	err = idpf_cfg_hw(adapter);
+>  	if (err) {
+>  		dev_err(dev, "Failed to configure HW structure for adapter: %d\n",
+>  			err);
+> -		goto err_cfg_hw;
+> +		goto destroy_vc_event_wq;
+>  	}
+>  
+>  	mutex_init(&adapter->vport_ctrl_lock);
+> @@ -284,7 +322,7 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  
+>  	return 0;
+>  
+> -err_cfg_hw:
+> +destroy_vc_event_wq:
+>  	destroy_workqueue(adapter->vc_event_wq);
+>  err_vc_event_wq_alloc:
+>  	destroy_workqueue(adapter->stats_wq);
+> @@ -304,6 +342,7 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  static const struct pci_device_id idpf_pci_tbl[] = {
+>  	{ PCI_VDEVICE(INTEL, IDPF_DEV_ID_PF)},
+>  	{ PCI_VDEVICE(INTEL, IDPF_DEV_ID_VF)},
+> +	{ PCI_DEVICE_CLASS(IDPF_CLASS_NETWORK_ETHERNET_PROGIF, ~0)},
+>  	{ /* Sentinel */ }
+>  };
+>  MODULE_DEVICE_TABLE(pci, idpf_pci_tbl);
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
+> index 7527b967e2e7..4774b933ae50 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
+> @@ -7,6 +7,46 @@
+>  
+>  #define IDPF_VF_ITR_IDX_SPACING		0x40
+>  
+> +#define IDPF_VF_TEST_VAL		0xFEED0000
 
-Move test_xsk{.c/.h} to prog_tests/.
+0xfeed0000U
 
-Add the find_bit library to test_progs sources in the Makefile as it is
-is used by test_xsk.c
+> +
+> +/**
+> + * idpf_is_vf_device - Helper to find if it is a VF device
+> + * @pdev: PCI device information struct
+> + * @is_vf: used to update VF device status
+> + *
+> + * Return: %0 on success, -%errno on failure.
+> + */
+> +int idpf_is_vf_device(struct pci_dev *pdev, bool *is_vf)
+> +{
+> +	struct resource mbx_region;
+> +	resource_size_t mbx_start;
+> +	void __iomem *mbx_addr;
+> +	resource_size_t len;
+> +
+> +	resource_set_range(&mbx_region,	VF_BASE, IDPF_VF_MBX_REGION_SZ);
 
-Signed-off-by: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
----
- tools/testing/selftests/bpf/Makefile               |  13 +-
- .../selftests/bpf/{ => prog_tests}/test_xsk.c      |   0
- .../selftests/bpf/{ => prog_tests}/test_xsk.h      |   0
- tools/testing/selftests/bpf/prog_tests/xsk.c       | 146 +++++++++++++++++++++
- tools/testing/selftests/bpf/xskxceiver.c           |   2 +-
- 5 files changed, 158 insertions(+), 3 deletions(-)
+Why use `struct resource` at all here. You  have start and len already.
+Encapsulating them in a resource only complicates the code.
 
-diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-index ecd6f6fb540d968473227c770c6617f56257c7d8..ff2de16eafdade22c97c6a632bc200fb67e83b2f 100644
---- a/tools/testing/selftests/bpf/Makefile
-+++ b/tools/testing/selftests/bpf/Makefile
-@@ -543,6 +543,8 @@ TRUNNER_TEST_OBJS := $$(patsubst %.c,$$(TRUNNER_OUTPUT)/%.test.o,	\
- 				 $$(notdir $$(wildcard $(TRUNNER_TESTS_DIR)/*.c)))
- TRUNNER_EXTRA_OBJS := $$(patsubst %.c,$$(TRUNNER_OUTPUT)/%.o,		\
- 				 $$(filter %.c,$(TRUNNER_EXTRA_SOURCES)))
-+TRUNNER_LIB_OBJS := $$(patsubst %.c,$$(TRUNNER_OUTPUT)/%.o,		\
-+				 $$(filter %.c,$(TRUNNER_LIB_SOURCES)))
- TRUNNER_EXTRA_HDRS := $$(filter %.h,$(TRUNNER_EXTRA_SOURCES))
- TRUNNER_TESTS_HDR := $(TRUNNER_TESTS_DIR)/tests.h
- TRUNNER_BPF_SRCS := $$(notdir $$(wildcard $(TRUNNER_BPF_PROGS_DIR)/*.c))
-@@ -686,6 +688,10 @@ $(TRUNNER_EXTRA_OBJS): $(TRUNNER_OUTPUT)/%.o:				\
- 	$$(call msg,EXT-OBJ,$(TRUNNER_BINARY),$$@)
- 	$(Q)$$(CC) $$(CFLAGS) -c $$< $$(LDLIBS) -o $$@
- 
-+$(TRUNNER_LIB_OBJS): $(TRUNNER_OUTPUT)/%.o:$(TOOLSDIR)/lib/%.c
-+	$$(call msg,LIB-OBJ,$(TRUNNER_BINARY),$$@)
-+	$(Q)$$(CC) $$(CFLAGS) -c $$< $$(LDLIBS) -o $$@
-+
- # non-flavored in-srctree builds receive special treatment, in particular, we
- # do not need to copy extra resources (see e.g. test_btf_dump_case())
- $(TRUNNER_BINARY)-extras: $(TRUNNER_EXTRA_FILES) | $(TRUNNER_OUTPUT)
-@@ -699,6 +705,7 @@ $(OUTPUT)/$(TRUNNER_BINARY): | $(TRUNNER_BPF_OBJS)
- 
- $(OUTPUT)/$(TRUNNER_BINARY): $(TRUNNER_TEST_OBJS)			\
- 			     $(TRUNNER_EXTRA_OBJS) $$(BPFOBJ)		\
-+			     $(TRUNNER_LIB_OBJS)			\
- 			     $(RESOLVE_BTFIDS)				\
- 			     $(TRUNNER_BPFTOOL)				\
- 			     $(OUTPUT)/veristat				\
-@@ -745,6 +752,7 @@ TRUNNER_EXTRA_SOURCES := test_progs.c		\
- 			 $(VERIFY_SIG_HDR)		\
- 			 flow_dissector_load.h	\
- 			 ip_check_defrag_frags.h
-+TRUNNER_LIB_SOURCES := find_bit.c
- TRUNNER_EXTRA_FILES := $(OUTPUT)/urandom_read				\
- 		       $(OUTPUT)/liburandom_read.so			\
- 		       $(OUTPUT)/xdp_synproxy				\
-@@ -782,6 +790,7 @@ endif
- TRUNNER_TESTS_DIR := map_tests
- TRUNNER_BPF_PROGS_DIR := progs
- TRUNNER_EXTRA_SOURCES := test_maps.c
-+TRUNNER_LIB_SOURCES :=
- TRUNNER_EXTRA_FILES :=
- TRUNNER_BPF_BUILD_RULE := $$(error no BPF objects should be built)
- TRUNNER_BPF_CFLAGS :=
-@@ -803,8 +812,8 @@ $(OUTPUT)/test_verifier: test_verifier.c verifier/tests.h $(BPFOBJ) | $(OUTPUT)
- 	$(Q)$(CC) $(CFLAGS) $(filter %.a %.o %.c,$^) $(LDLIBS) -o $@
- 
- # Include find_bit.c to compile xskxceiver.
--EXTRA_SRC := $(TOOLSDIR)/lib/find_bit.c
--$(OUTPUT)/xskxceiver: $(EXTRA_SRC) test_xsk.c test_xsk.h xskxceiver.c xskxceiver.h $(OUTPUT)/network_helpers.o $(OUTPUT)/xsk.o $(OUTPUT)/xsk_xdp_progs.skel.h $(BPFOBJ) | $(OUTPUT)
-+EXTRA_SRC := $(TOOLSDIR)/lib/find_bit.c prog_tests/test_xsk.c prog_tests/test_xsk.h
-+$(OUTPUT)/xskxceiver: $(EXTRA_SRC) xskxceiver.c xskxceiver.h $(OUTPUT)/network_helpers.o $(OUTPUT)/xsk.o $(OUTPUT)/xsk_xdp_progs.skel.h $(BPFOBJ) | $(OUTPUT)
- 	$(call msg,BINARY,,$@)
- 	$(Q)$(CC) $(CFLAGS) $(filter %.a %.o %.c,$^) $(LDLIBS) -o $@
- 
-diff --git a/tools/testing/selftests/bpf/test_xsk.c b/tools/testing/selftests/bpf/prog_tests/test_xsk.c
-similarity index 100%
-rename from tools/testing/selftests/bpf/test_xsk.c
-rename to tools/testing/selftests/bpf/prog_tests/test_xsk.c
-diff --git a/tools/testing/selftests/bpf/test_xsk.h b/tools/testing/selftests/bpf/prog_tests/test_xsk.h
-similarity index 100%
-rename from tools/testing/selftests/bpf/test_xsk.h
-rename to tools/testing/selftests/bpf/prog_tests/test_xsk.h
-diff --git a/tools/testing/selftests/bpf/prog_tests/xsk.c b/tools/testing/selftests/bpf/prog_tests/xsk.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..7ce5ddd7d3fc848df27534f00a6a9f82fbc797c5
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/xsk.c
-@@ -0,0 +1,146 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <net/if.h>
-+#include <stdarg.h>
-+
-+#include "network_helpers.h"
-+#include "test_progs.h"
-+#include "test_xsk.h"
-+#include "xsk_xdp_progs.skel.h"
-+
-+#define VETH_RX "veth0"
-+#define VETH_TX "veth1"
-+#define MTU	1500
-+
-+int setup_veth(bool busy_poll)
-+{
-+	SYS(fail,
-+	"ip link add %s numtxqueues 4 numrxqueues 4 type veth peer name %s numtxqueues 4 numrxqueues 4",
-+	VETH_RX, VETH_TX);
-+	SYS(fail, "sysctl -wq net.ipv6.conf.%s.disable_ipv6=1", VETH_RX);
-+	SYS(fail, "sysctl -wq net.ipv6.conf.%s.disable_ipv6=1", VETH_TX);
-+
-+	if (busy_poll) {
-+		SYS(fail, "echo 2 > /sys/class/net/%s/napi_defer_hard_irqs", VETH_RX);
-+		SYS(fail, "echo 200000 > /sys/class/net/%s/gro_flush_timeout", VETH_RX);
-+		SYS(fail, "echo 2 > /sys/class/net/%s/napi_defer_hard_irqs", VETH_TX);
-+		SYS(fail, "echo 200000 > /sys/class/net/%s/gro_flush_timeout", VETH_TX);
-+	}
-+
-+	SYS(fail, "ip link set %s mtu %d", VETH_RX, MTU);
-+	SYS(fail, "ip link set %s mtu %d", VETH_TX, MTU);
-+	SYS(fail, "ip link set %s up", VETH_RX);
-+	SYS(fail, "ip link set %s up", VETH_TX);
-+
-+	return 0;
-+
-+fail:
-+	return -1;
-+}
-+
-+void delete_veth(void)
-+{
-+	SYS_NOFAIL("ip link del %s", VETH_RX);
-+	SYS_NOFAIL("ip link del %s", VETH_TX);
-+}
-+
-+int configure_ifobj(struct ifobject *tx, struct ifobject *rx)
-+{
-+	rx->ifindex = if_nametoindex(VETH_RX);
-+	if (!ASSERT_OK_FD(rx->ifindex, "get RX ifindex"))
-+		return -1;
-+
-+	tx->ifindex = if_nametoindex(VETH_TX);
-+	if (!ASSERT_OK_FD(tx->ifindex, "get TX ifindex"))
-+		return -1;
-+
-+	tx->shared_umem = false;
-+	rx->shared_umem = false;
-+
-+
-+	return 0;
-+}
-+
-+static void test_xsk(const struct test_spec *test_to_run, enum test_mode mode)
-+{
-+	struct ifobject *ifobj_tx, *ifobj_rx;
-+	struct test_spec test;
-+	int ret;
-+
-+	ifobj_tx = ifobject_create();
-+	if (!ASSERT_OK_PTR(ifobj_tx, "create ifobj_tx"))
-+		return;
-+
-+	ifobj_rx = ifobject_create();
-+	if (!ASSERT_OK_PTR(ifobj_rx, "create ifobj_rx"))
-+		goto delete_tx;
-+
-+	if (!ASSERT_OK(setup_veth(false), "setup veth"))
-+		goto delete_rx;
-+
-+	if (!ASSERT_OK(configure_ifobj(ifobj_tx, ifobj_rx), "conigure ifobj"))
-+		goto delete_veth;
-+
-+	ret = get_hw_ring_size(ifobj_tx->ifname, &ifobj_tx->ring);
-+	if (!ret) {
-+		ifobj_tx->hw_ring_size_supp = true;
-+		ifobj_tx->set_ring.default_tx = ifobj_tx->ring.tx_pending;
-+		ifobj_tx->set_ring.default_rx = ifobj_tx->ring.rx_pending;
-+	}
-+
-+	if (!ASSERT_OK(init_iface(ifobj_rx, worker_testapp_validate_rx), "init RX"))
-+		goto delete_veth;
-+	if (!ASSERT_OK(init_iface(ifobj_tx, worker_testapp_validate_tx), "init TX"))
-+		goto delete_veth;
-+
-+	test_init(&test, ifobj_tx, ifobj_rx, 0, &tests[0]);
-+
-+	test.tx_pkt_stream_default = pkt_stream_generate(DEFAULT_PKT_CNT, MIN_PKT_SIZE);
-+	if (!ASSERT_OK_PTR(test.tx_pkt_stream_default, "TX pkt generation"))
-+		goto delete_veth;
-+	test.rx_pkt_stream_default = pkt_stream_generate(DEFAULT_PKT_CNT, MIN_PKT_SIZE);
-+	if (!ASSERT_OK_PTR(test.rx_pkt_stream_default, "RX pkt generation"))
-+		goto delete_veth;
-+
-+
-+	test_init(&test, ifobj_tx, ifobj_rx, mode, test_to_run);
-+	ret = test.test_func(&test);
-+	if (ret != TEST_SKIP)
-+		ASSERT_OK(ret, "Run test");
-+	pkt_stream_restore_default(&test);
-+
-+	if (ifobj_tx->hw_ring_size_supp)
-+		hw_ring_size_reset(ifobj_tx);
-+
-+	pkt_stream_delete(test.tx_pkt_stream_default);
-+	pkt_stream_delete(test.rx_pkt_stream_default);
-+	xsk_xdp_progs__destroy(ifobj_tx->xdp_progs);
-+	xsk_xdp_progs__destroy(ifobj_rx->xdp_progs);
-+
-+delete_veth:
-+	delete_veth();
-+delete_rx:
-+	ifobject_delete(ifobj_rx);
-+delete_tx:
-+	ifobject_delete(ifobj_tx);
-+}
-+
-+void test_ns_xsk_skb(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(tests); i++) {
-+		if (test__start_subtest(tests[i].name))
-+			test_xsk(&tests[i], TEST_MODE_SKB);
-+	}
-+}
-+
-+void test_ns_xsk_drv(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(tests); i++) {
-+		if (test__start_subtest(tests[i].name))
-+			test_xsk(&tests[i], TEST_MODE_DRV);
-+	}
-+}
-+
-diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
-index 8707f4a0fac64e1ebb6a4241edf8e874a1eb67c3..a54904783c757d282e3b99194aaed5f74d510763 100644
---- a/tools/testing/selftests/bpf/xskxceiver.c
-+++ b/tools/testing/selftests/bpf/xskxceiver.c
-@@ -90,7 +90,7 @@
- #include <sys/mman.h>
- #include <sys/types.h>
- 
--#include "test_xsk.h"
-+#include "prog_tests/test_xsk.h"
- #include "xsk_xdp_progs.skel.h"
- #include "xsk.h"
- #include "xskxceiver.h"
+	mbx_addr = ioremap(pci_resource_start(pdev, 0) + VF_BASE,
+			   IDPF_VF_MBX_REGION_SZ);
 
--- 
-2.51.0
+> +
+> +	mbx_start = pci_resource_start(pdev, 0) + mbx_region.start;
+> +	len = resource_size(&mbx_region);
+> +
+> +	mbx_addr = ioremap(mbx_start, len);
+> +	if (!mbx_addr) {
+> +		pci_err(pdev, "Failed to allocate BAR0 mbx region\n");
+> +
+> +		return -EIO;
 
+I'd remove this newline.
+
+> +	}
+> +
+> +	writel(IDPF_VF_TEST_VAL, mbx_addr + VF_ARQBAL - VF_BASE);
+> +
+> +	/* Force memory write to complete before reading it back */
+> +	wmb();
+
+Make sure you know what you are doing. writel() is not writel_relaxed(),
+it already has a barrier inside.
+
+> +
+> +	*is_vf = readl(mbx_addr + VF_ARQBAL - VF_BASE) == IDPF_VF_TEST_VAL;
+
+Maybe put this `mbx_addr + VF_ARQBAL - VF_BASE` in a variable to not
+spell it out two times...
+
+Also weird logic. You don't map the whole BAR, you map only a piece of
+it. Ok. But going this route, you need to read only one register. Why
+not then
+
+	addr = ioremap(pci_resource_start(pdev, 0) + VF_ARQBAL, 4);
+
+	writel(IDPF_VF_TEST_VAL, addr);
+	is_vf = readl(addr) == IDPF_VF_TEST_VAL;
+
+?
+
+> +
+> +	iounmap(mbx_addr);
+> +
+> +	return 0;
+> +}
+
+Instead of returning only either 0 or -EIO and passing the result via a
+pointer to bool, you could instead just return either:
+
+* IDPF_DEV_ID_PF
+* IDPF_DEV_ID_VF
+* -EIO
+
+> +
+>  /**
+>   * idpf_vf_ctlq_reg_init - initialize default mailbox registers
+>   * @adapter: adapter structure
+
+Thanks,
+Olek
 
