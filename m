@@ -1,205 +1,138 @@
-Return-Path: <netdev+bounces-226074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98D08B9BB7A
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 21:31:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DE99B9BB9B
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 21:34:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6E647B365A
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:30:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A0727A81AA
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:32:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A14D25A352;
-	Wed, 24 Sep 2025 19:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A53726D4C6;
+	Wed, 24 Sep 2025 19:34:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="b5/u/dXh"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cQavH0yQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF7C425BEE8;
-	Wed, 24 Sep 2025 19:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95F726D4DF
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 19:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758742306; cv=none; b=O2G8ZMKpx9D01rAvRNblyQyGQ5LUS9T/fz4XbC4geRjh22Xuh6QyvH8Ppkm5f6z3tkxrdfEYoD3pPdqNnuFL5hKuNx8NUlzTIm5aGVl9U8VVCs+lqhuUyCqR/rzAWfG+J2oVkFx5IC60+7Kyg5UY/e0jYQII5u5w6SxSFZeMPlU=
+	t=1758742460; cv=none; b=pxIx6lzJDMtn80Ktu06CZpUJtnlxSke9W+UrgglAYcRiXEpXbwnYZZYyZdr21HOQ1j33HhtMWKuAxR89LiE1G3YBql9mdYLg4H059kZd0M4lPvkS3ydvm3C8CrI4sLH1MWvT0L/hkE9jbQuX/nstsPHlhHZD1ZDryGdFs0kSDWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758742306; c=relaxed/simple;
-	bh=tlixfbHwjHBby8L7DHyt8s5o7TZ4R6qxUBlWrExicus=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cCSoXZUDBXvx4kty6ux+5P+UFUHGuldKaCvhVCjNQApruvhLz7GJKJ7mei6CrCww1DdbENKiH6AKWjKLXZ3m2Vm73PnC8ldjPmTsJqZjvcE1naQoQminDBN86gSxrBd4dfFTgfeaoSINGN4TU1OJW+1aK/dQdX+sPG/b63mFOgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=b5/u/dXh; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=wWHuMNffMGutQbJvBKG/MZveRAosfgTjgtTC/tzZqkI=; b=b5/u/dXh0JBJyMqjvQCaQFkHk+
-	8Ksv2CPwkCAHaWyXWet8FTyq9FgPyo7XewgPvma6VXyppo3tezvBghJZfbT9HetuKxM795x5Kn7sr
-	hIwXirxpW1Br4vDkZdC0CkWR6PKd2tEIxzEtktNIuD7WKO7pXP4kAfvgqHmmkTra4W+m4smtqCSuK
-	XCOL9BxcPLVKGW785xU3zvkHu3JWuKs4AbGatRATYJYy4dHehqcVXwlroC7HjAXdeuwBz+1c2MDRq
-	4FJmYWRFEXRXE1ABa/Jzw5zSJ3zIMTfFp8EaqrW37NtkfPs0PSG0jrfnENMkugEBKVbMTyULQoSIV
-	Sb37R4Rg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34686)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1v1VCp-000000001DY-2osw;
-	Wed, 24 Sep 2025 20:31:11 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1v1VCd-000000007PA-3Edy;
-	Wed, 24 Sep 2025 20:30:59 +0100
-Date: Wed, 24 Sep 2025 20:30:59 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Abhishek Chauhan <quic_abchauha@quicinc.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Alexis Lothore <alexis.lothore@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Boon Khai Ng <boon.khai.ng@altera.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Drew Fustini <dfustini@tenstorrent.com>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	Furong Xu <0x1207@gmail.com>, Inochi Amaoto <inochiama@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
-	Jisheng Zhang <jszhang@kernel.org>, Kees Cook <kees@kernel.org>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Matthew Gerlach <matthew.gerlach@altera.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rohan G Thomas <rohan.g.thomas@altera.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Simon Horman <horms@kernel.org>,
-	Song Yoong Siang <yoong.siang.song@intel.com>,
-	Swathi K S <swathi.ks@samsung.com>,
-	Tiezhu Yang <yangtiezhu@loongson.cn>, Vinod Koul <vkoul@kernel.org>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH RFC net-next 0/9] net: stmmac: experimental PCS conversion
-Message-ID: <aNRG82biP9mA-rvm@shell.armlinux.org.uk>
-References: <aNQ1oI0mt3VVcUcF@shell.armlinux.org.uk>
- <b7fb3c8c-bfa6-4e46-b5ed-05e4752bbc00@intel.com>
+	s=arc-20240116; t=1758742460; c=relaxed/simple;
+	bh=OQZkpxpeoeidb0N4ZGignANHuxeM1au7IE8DrNG1Rm8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k3mYTpAcY+7xg87VixG8oWwuc0Q+dT2xvipGcoqT7Xp7ou/Oce9/rQRuMvlMYVjV8KwZ7OcBaVcoCAtRKypOA5JrXasAitDyIOKN/DYecAG1eHbNo+r+mRrgXUvZL8zD+Pmawmo1EuyB3FB0kQocoBiH6UO5Q4VrCLKPUr5EuDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=cQavH0yQ; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58OIuCnW002028;
+	Wed, 24 Sep 2025 19:34:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=m81IE41gRb+fvCv3Pvhwo5nSPB6TA
+	A2+GNoh0QIDkkM=; b=cQavH0yQybtSvGhpFXGBK6FIAIPnOmqJav8Rz+hDC9ZmW
+	9DY5rztIQmPmB3HOzEJF7swbIon8JL7YNCGl5LBC1kWIZoL5i4Up6fGV+6Wi/Val
+	iuo8MlFe10eQUQmxlXDlzcrD/2Bo01tre5OSx+2bGgO9GhzHjsta8sZdNB+7X0r3
+	x8pyihkILvODUEjMgZO3goJvnsJQVvyu+8KzYPTQqKotkeTlPemntcNhgv5i5vtM
+	vsUXvfnFs1Vtxx7WaazHIAdosyBp7YbJNCE35ijJlqwr+jW7hWriy4CJTSqpXKgb
+	zNApZDd+/Dpg+FKW2TqVsEUQ10NU8oMudhtl523dw==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 499k6b0g32-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 24 Sep 2025 19:34:08 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 58OJ6NWi014991;
+	Wed, 24 Sep 2025 19:34:07 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 49a9515v7k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 24 Sep 2025 19:34:07 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 58OJUH2L003662;
+	Wed, 24 Sep 2025 19:34:06 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 49a9515v6d-1;
+	Wed, 24 Sep 2025 19:34:06 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+        netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
+Cc: alok.a.tiwari@oracle.com
+Subject: [PATCH net-next] ixgbe: avoid redundant call to ixgbe_non_sfp_link_config()
+Date: Wed, 24 Sep 2025 12:33:54 -0700
+Message-ID: <20250924193403.360122-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b7fb3c8c-bfa6-4e46-b5ed-05e4752bbc00@intel.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-24_06,2025-09-24_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ bulkscore=0 phishscore=0 suspectscore=0 spamscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2508110000 definitions=main-2509240171
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDAxNyBTYWx0ZWRfXxYbteJMbvrFm
+ KEVraSYjE6FUVeU7PUpItSF5jv3drqS3Z/bDs7GI21uSSELcfPiXy8Im98SDE9zo+acRKwjtRBu
+ s9tFtczxtgyyVmb/m51r8O8mMod9omyG6TzZrcmdCfNzbT2dx0zbgJD1pG+fyD6xYFbhVv7p5ku
+ X4vrQNjhfd1uD60ZjyDW2xHWcEcfISQcFgzIfloQUSIIXY4rxJdZsKqr5e8REK/OAlgDvA4OecB
+ 7zncPM374CNkRF7VP8A8CVObmlcDILdrnBr91dN6kINVjdoFDoCFY0335F1m9bsQYZKnEvOPjS4
+ Wgyp3atZSCAEM04FMtSd1lJzrhxitZOXoqGvs0gJgUhi+U5XpyCsJgdlVZQNYMnALMZ4/T/26W7
+ 08rNqdIB4EAbuiG61o4gMgq1TiH+xw==
+X-Proofpoint-GUID: LNQ1Yeaopg5D0hS6J7mifrndKfOruwbJ
+X-Authority-Analysis: v=2.4 cv=E47Npbdl c=1 sm=1 tr=0 ts=68d447b0 b=1 cx=c_pps
+ a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
+ a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=xcvOPl_opqY7jcd9CMoA:9 cc=ntf
+ awl=host:12090
+X-Proofpoint-ORIG-GUID: LNQ1Yeaopg5D0hS6J7mifrndKfOruwbJ
 
-On Wed, Sep 24, 2025 at 12:13:18PM -0700, Jacob Keller wrote:
-> 
-> 
-> On 9/24/2025 11:17 AM, Russell King (Oracle) wrote:
-> > This series is radical - it takes the brave step of ripping out much of
-> > the existing PCS support code and throwing it all away.
-> > 
-> > I have discussed the introduction of the STMMAC_FLAG_HAS_INTEGRATED_PCS
-> > flag with Bartosz Golaszewski, and the conclusion I came to is that
-> > this is to workaround the breakage that I've been going on about
-> > concerning the phylink conversion for the last five or six years.
-> > 
-> > The problem is that the stmmac PCS code manipulates the netif carrier
-> > state, which confuses phylink.
-> > 
-> > There is a way of testing this out on the Jetson Xavier NX platform as
-> > the "PCS" code paths can be exercised while in RGMII mode - because
-> > RGMII also has in-band status and the status register is shared with
-> > SGMII. Testing this out confirms my long held theory: the interrupt
-> > handler manipulates the netif carrier state before phylink gets a
-> > look-in, which means that the mac_link_up() and mac_link_down() methods
-> > are never called, resulting in the device being non-functional.
-> > 
-> > Moreover, on dwmac4 cores, ethtool reports incorrect information -
-> > despite having a full-duplex link, ethtool reports that it is
-> > half-dupex.
-> > 
-> > Thus, this code is completely broken - anyone using it will not have
-> > a functional platform, and thus it doesn't deserve to live any longer,
-> > especially as it's a thorn in phylink.
-> > 
-> > Rip all this out, leaving just the bare bones initialisation in place.
-> > 
-> > However, this is not the last of what's broken. We have this hw->ps
-> > integer which is really not descriptive, and the DT property from
-> > which it comes from does little to help understand what's going on.
-> > Putting all the clues together:
-> > 
-> > - early configuration of the GMAC configuration register for the
-> >   speed.
-> > - setting the SGMII rate adapter layer to take its speed from the
-> >   GMAC configuration register.
-> > 
-> > Lastly, setting the transmit enable (TE) bit, which is a typo that puts
-> > the nail in the coffin of this code. It should be the transmit
-> > configuration (TC) bit. Given that when the link comes up, phylink
-> > will call mac_link_up() which will overwrite the speed in the GMAC
-> > configuration register, the only part of this that is functional is
-> > changing where the SGMII rate adapter layer gets its speed from,
-> > which is a boolean.
-> > 
-> > From what I've found so far, everyone who sets the snps,ps-speed
-> > property which configures this mode also configures a fixed link,
-> > so the pre-configuration is unnecessary - the link will come up
-> > anyway.
-> > 
-> > So, this series rips that out the preconfiguration as well, and
-> > replaces hw->ps with a boolean hw->reverse_sgmii_enable flag.
-> > 
-> > We then move the sole PCS configuration into a phylink_pcs instance,
-> > which configures the PCS control register in the same way as is done
-> > during the probe function.
-> > 
-> > Thus, we end up with much easier and simpler conversion to phylink PCS
-> > than previous attempts.
-> > 
-> > Even so, this still results in inband mode always being enabled at the
-> > moment in the new .pcs_config() method to reflect what the probe
-> > function was doing. The next stage will be to change that to allow
-> > phylink to correctly configure the PCS. This needs fixing to allow
-> > platform glue maintainers who are currently blocked to progress.
-> > 
-> > Please note, however, that this has not been tested with any SGMII
-> > platform.
-> > 
-> > I've tried to get as many people into the Cc list with get_maintainers,
-> > I hope that's sufficient to get enough eyeballs on this.
-> > 
-> 
-> I'm no expert with this hardware or driver, but all of your explanations
-> seem reasonable to me.
-> 
-> I'd guess the real step is to try and get this tested against the
-> variety of hardware supported by stmmac?
+ixgbe_non_sfp_link_config() is called twice in ixgbe_open()
+once to assign its return value to err and again in the
+conditional check. This patch uses the stored err value
+instead of calling the function a second time. This avoids
+redundant work and ensures consistent error reporting.
 
-Yes please, that would be very helpful, as I don't want to regress
-anyone's setup. I'm hoping that this series is going to be the low-
-risk change.
+Also fix a small typo in the ixgbe_remove() comment:
+"The could be caused" -> "This could be caused".
 
-Thanks.
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index 90d4e57b1c93..39ef604af3eb 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -7449,7 +7449,7 @@ int ixgbe_open(struct net_device *netdev)
+ 					 adapter->hw.link.link_info.link_cfg_err);
+ 
+ 		err = ixgbe_non_sfp_link_config(&adapter->hw);
+-		if (ixgbe_non_sfp_link_config(&adapter->hw))
++		if (err)
+ 			e_dev_err("Link setup failed, err %d.\n", err);
+ 	}
+ 
+@@ -12046,7 +12046,7 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+  * @pdev: PCI device information struct
+  *
+  * ixgbe_remove is called by the PCI subsystem to alert the driver
+- * that it should release a PCI device.  The could be caused by a
++ * that it should release a PCI device.  This could be caused by a
+  * Hot-Plug event, or because the driver is going to be removed from
+  * memory.
+  **/
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.50.1
+
 
