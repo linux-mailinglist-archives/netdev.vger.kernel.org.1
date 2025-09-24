@@ -1,95 +1,62 @@
-Return-Path: <netdev+bounces-225772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 388B0B9811C
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 04:23:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3936B98167
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 04:45:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEA08168E60
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 02:23:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 508783A77BF
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 02:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96B121C16E;
-	Wed, 24 Sep 2025 02:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AYIbKe5c"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19CDD2116F4;
+	Wed, 24 Sep 2025 02:45:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 432702AE77
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 02:23:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9514317D;
+	Wed, 24 Sep 2025 02:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758680600; cv=none; b=OJhaXdbfPu2d58PuI3FGP0w/30gl1UiJizgOb0xHhp9RR2DgzEzwkJx5OCuKChrQ8/V+IBidW15xB7LE2x6BIk+GqgtwqUA46TSeoHAKcqvzQEAQIUCvq+/rImmP8QvBhIFmq5BccY4NzXZ7qkEpdinySHv3crRHEt+UG0b+bhg=
+	t=1758681921; cv=none; b=AxHxHDQASlx57/snfIg1JqGcEmc2D7zr3ByYp+Br7VuxD0rt5mUicb22aer/kswZFkZ7ZGK/Wy1oYKRM6OGf/6x+898bA0jsHjYJRAWq23C6QplbRpbP4TTo/YiDyPSO1bDP53fVnwgPkf99WYj6TW8dsg4vib3/uY50f8a9FDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758680600; c=relaxed/simple;
-	bh=puo2H/6mO0H48GEkLudy3w1BhhOybtcbqYj55OdwEJU=;
+	s=arc-20240116; t=1758681921; c=relaxed/simple;
+	bh=lqxklR9mOWs81KNj4z4qsLpILTVDdfn7+J979dqGXGc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MEmrQ/eHWqqzbRRQ7J2r31AOmaTWwEdVCsuG9flYRThvkOFvKcOGv4gykYj/alQMTkzUXSq5+rDXk1i4CvtzmcyQ2X2qOIOTTuR6EspqNlkXGpH3mxwe5ZZbuASzxbdArjcd4+BZLSmzEFFt+uN6vdEg8tnNJdjzt5SgJhEUcEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AYIbKe5c; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-77f358c7b8fso369562b3a.1
-        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 19:23:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758680598; x=1759285398; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=puo2H/6mO0H48GEkLudy3w1BhhOybtcbqYj55OdwEJU=;
-        b=AYIbKe5cpIN7y9b8t7+U80NRr/vX2fEUtMQTbR5nSVfJ70XrEZJftgoH9G5tdbCTjJ
-         gObBmZF3xBCTEyABjOrZMwRytbbmxUIvf5QdnQw7QASgL4jyz2v9hp7Mi2ZaY7qekKpW
-         1w9OA2ZYLki+xu5qJRUf60jTewb0uEVY4+hw41ue0X9v7wQN2aBkd1p34gxHK5aWBFP1
-         UOJHsuvG7KBpkDB2zDYsI5avig4gv0mHe//tt8J4UGgx3hFr7MIuQKgF4/GkHItK+kMI
-         hF9aYIeDsNe6Vmzpi8Xkflujurl6Atop2R+d2rxXJIuA9jOG51tByGTk/7xd3knkVVjm
-         Bkng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758680598; x=1759285398;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=puo2H/6mO0H48GEkLudy3w1BhhOybtcbqYj55OdwEJU=;
-        b=BZCCEI+WuKA1nCiM/zU1lRtGrDAvkJZQVjX+0yFqS2FVP6gNF/IFkXzGKaj1XDmfzs
-         S9pPZ1O4KktecxYo3aQXE8Oi4z7PVpn+yN4FFhH0E9jJQIL0rLO+hV+88pMCLrEHmbMC
-         N23CHlsXb5NOkIQgIZhnpLMMPiqnbGk7HZUP4cPmUuVaF5qnAIXeflcxUKomp7aLVRDe
-         XE/EoKzpWffjCDLqV6FDXjNSviMRUa06NUIdPUrpGbryLnzIbUjt8JvL3fywOZmwog8r
-         XLluqVdVGr/WPlGkvfzhNmtwRF+nfBUGt5rd/jVlTnx4TboTAwe7on9DK/M7EX8uXMrF
-         +fQg==
-X-Gm-Message-State: AOJu0YwOOGyRgsMedr2dHrFhS4mAuWFX1f/XiSK5sBbfDruFM5/H/iDA
-	1z3Zik6gS0IbZfbbKJCjMqOJeLaMbsruKH8HKaR+TEO+diBD3z1g1uQd
-X-Gm-Gg: ASbGncuiJnKDSTyHJmvT9vnTZ8fHt+vF4yokGtm3iS0j6CErTUDVPUCpoeQecyhctKH
-	cG5auOUNLwdebm7kjr7avRvK1xdcNmFM+RQsNIomx5oO4hyXc/FVHaYMRBrsMhG0ly5aCamuwcl
-	phXVWWt52gDYoZZaSECql9DOEUZuBfHUoJh4MsALwQhrhL8HEl8mb4rzhkZRB1jL8/eQ1PoPCbo
-	pEn8upqe7o/beIu2aAPzhfogzf48KRQpMZ4aEGexWeun1U0Wx+8QpEwCqmyLRn4BMMjMBHKZV0o
-	tR9ZkmBGEomiEUaw+aUWDSLMbLjB7a0s7hmMo51Zj6KqUaX7nVGVTnq76hPE8+R7uQ/Db0rlVdM
-	w1OI/5CpGQ5dgYPN09WFdPVLCEOI=
-X-Google-Smtp-Source: AGHT+IHYHC7RbMygklI1SWnMd2kQMMolzDCetw+ZscTfyEtsvx/wmZ03qcZprzqZt2WpPPUgC3wrRg==
-X-Received: by 2002:a05:6a20:e14:b0:2ca:f345:5673 with SMTP id adf61e73a8af0-2de94224f2emr666582637.27.1758680598513;
-        Tue, 23 Sep 2025 19:23:18 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77f315254edsm7936832b3a.84.2025.09.23.19.23.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 19:23:17 -0700 (PDT)
-Date: Wed, 24 Sep 2025 02:23:09 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Tonghao Zhang <tonghao@bamaicloud.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Zengbing Tu <tuzengbing@didiglobal.com>,
-	Liang Li <liali@redhat.com>
-Subject: Re: [net-next v8 0/3] add broadcast_neighbor for no-stacking
- networking arch
-Message-ID: <aNNWDcvO6aCG94Qe@fedora>
-References: <cover.1751031306.git.tonghao@bamaicloud.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qB65p3hg/EK0A055wvwdY60W2BkbHlyEjrixCcI67JvgO9XYn6B6nDnWWBSnsEBOC3YPMG3I3bn+9Kv6AStJg3emTp/as8qPBFd5VahP6JCpyJTH93Ec+2lHmknTrYJfgMexMgP32gDn5HOqEi9FLxTtTMbx9ckW/2DRSNJGPCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.206.34.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: zesmtpsz4t1758681876t1e3ccc25
+X-QQ-Originating-IP: 4kgQSL6STHaKosl1eg/Ylv5lM/i5m44RFczJ2nXYIEw=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 24 Sep 2025 10:44:34 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 17616937174524784097
+Date: Wed, 24 Sep 2025 10:44:34 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
+	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
+	lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
+	gustavoars@kernel.org, rdunlap@infradead.org,
+	vadim.fedorenko@linux.dev, joerg@jo-so.de, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH net-next v13 1/5] net: rnpgbe: Add build support for
+ rnpgbe
+Message-ID: <EA71F5311AF8C4FB+20250924024434.GA292859@nic-Precision-5820-Tower>
+References: <20250922014111.225155-1-dong100@mucse.com>
+ <20250922014111.225155-2-dong100@mucse.com>
+ <20250923180854.46adc958@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,19 +65,104 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1751031306.git.tonghao@bamaicloud.com>
+In-Reply-To: <20250923180854.46adc958@kernel.org>
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: N2uUxVy6vITVQTcXJo2r0ul7TI+3+DuMqgDHgQqYv0Eq7/CjlRyceLmV
+	eby+lNbv7omMBKyA96mOP+uIqRqeYm9HbVB/OamPyCZZSUF+xUURZB9LlfbDSkE6vjnYYVY
+	u6TCrfJ2IQ1GXc5hfCqnkE1rBSbdl+A0UAjNglRtBO9Cu7CNZMjUCotPc5a89VAjwKAx4CO
+	ThIJ419eyWmVpOfIjUmmInIisVVZP2s5RJ8mQCzJN7qpebZjam3po6j68SV9bAdEKV3fau+
+	IOvLdIjVSKYlNJ2Bc8tPBT8r2xHVB6lCW/dB1NeUfRPuAlxKxFF9EVS1Gg4DtK5ENWbEc6X
+	JmAHfwKPgslLKYN/IeHKr8cQdiaqe6cEVFpyIKLnDd1wozG5pV9tm4EFw3oYlM9zdkhFBsn
+	N606SfA5vUkR4oPvOhg0lYErpFeKhHX/QRqzRbS39DhCcdhyY1fIAvUtEtcnI9qhsdZ7qJ4
+	X+slA9Um0LYVBwTPfiYGmc9+TwLE8yrCqqcflzHN5bpAKg+JxwlT6fflEIMeiWaFG7P39UJ
+	netksuCoar4aatyB8Lx8vre/6zwcHlUE/UdErpXXoKIeFuThHiiIt9L4MAaVozsIS7uFhC3
+	WB0KQxxlwf4c9+WtFxAOwH1x20u/1x3ZWtN0CCC6DS7L7y7H3SKnom4la+r8DCrfTKGihSq
+	Z6kv/S6uZlAtjccM6A02EfHnSBVEpR5y+bXAiunh0gO03sj2R7tNWwMT+jusP5Oap81bq3A
+	UJD/D2V8iJR9mYWEQFZBHBR0D8XHnUd915sGHNkezKh2jgpuzGodWWx0dExBjGj9dH9Xl6t
+	GLlWdjP8iW4Ne3wYVzPPPZWk1jnCub4sN7Kd4yvmPgY5DCoZkx/u+CBi0tdwfKVD3jX7HYs
+	DT+D6907gxAlk6fKd34ZaxaTJBZmONzrQFGzZBi2ZL14/fgGRnahg4S7+Ts0ArZ4qsxtkEJ
+	OKo3a3So8Xj+8X2rUUAdHW1wUN4GTGsWckWfe867mHpVjhTG7tg7yxqfpp1bPvtap1XPaNw
+	M20HtVLg==
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-RECHKSPAM: 0
 
-On Fri, Jun 27, 2025 at 09:49:27PM +0800, Tonghao Zhang wrote:
-> For no-stacking networking arch, and enable the bond mode 4(lacp) in
-> datacenter, the switch require arp/nd packets as session synchronization.
-> More details please see patch.
+Hi, Jakub:
 
-Hi Tonghao,
+On Tue, Sep 23, 2025 at 06:08:54PM -0700, Jakub Kicinski wrote:
+> On Mon, 22 Sep 2025 09:41:07 +0800 Dong Yibo wrote:
+> > +===========================================================
+> > +Linux Base Driver for MUCSE(R) Gigabit PCI Express Adapters
+> > +===========================================================
+> > +
+> > +MUCSE Gigabit Linux driver.
+> 
+> You already said that in the heading above
+> 
+> > +Copyright (c) 2020 - 2025 MUCSE Co.,Ltd.
+> 
+> copyright is metadata, it should not be part of the user-visible doc.
+> 
+> > +Identifying Your Adapter
+> > +========================
+> > +The driver is compatible with devices based on the following:
+> > +
+> > + * MUCSE(R) Ethernet Controller N500 series
+> > + * MUCSE(R) Ethernet Controller N210 series
+> 
+> These are out of numeric sort order
+> 
+> > +Support
+> > +=======
+> > + If you have problems with the software or hardware, please contact our
+> > + customer support team via email at techsupport@mucse.com or check our
+> > + website at https://www.mucse.com/en/
+> 
+> Please don't add support statements. People can use a search engine if
+> they want to find the corporate support. The kernel docs are for kernel
+> topics, and "support" in the kernel is done on the mailing list.
+> 
+> 
 
-Our engineer has a question about this feature. Since the switch requires
-ARP/ND packets for session synchronization, do we also need to send IGMP
-join/leave messages to the switch for synchronization?
+Got it. I will update this file like this:
 
-Thanks
-Hangbin
+.. SPDX-License-Identifier: GPL-2.0
+
+===========================================================
+Linux Base Driver for MUCSE(R) Gigabit PCI Express Adapters
+===========================================================
+
+Identifying Your Adapter
+========================
+The driver is compatible with devices based on the following:
+
+ * MUCSE(R) Ethernet Controller N210 series
+ * MUCSE(R) Ethernet Controller N500 series
+
+> > +config MGBE
+> > +	tristate "Mucse(R) 1GbE PCI Express adapters support"
+> > +	depends on PCI
+> > +	select PAGE_POOL
+> 
+> you're not using page pool in this series
+> 
+
+Yes, I will remove it, and add this when truely use.
+
+> > +MODULE_DEVICE_TABLE(pci, rnpgbe_pci_tbl);
+> > +MODULE_AUTHOR("Mucse Corporation, <techsupport@mucse.com>");
+> 
+> Only humans can author code, not corporations. Delete his AUTHOR entry
+> or add yourself as the author.
+> 
+
+Will fix this.
+
+> > +MODULE_DESCRIPTION("Mucse(R) 1 Gigabit PCI Express Network Driver");
+> > +MODULE_LICENSE("GPL");
+> 
+> 
+
+Thanks for your feedback.
+
 
