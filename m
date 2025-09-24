@@ -1,190 +1,149 @@
-Return-Path: <netdev+bounces-226009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 494CEB9A920
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 17:20:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D6B8B9A8E8
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 17:16:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76ADA1B2427F
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 15:21:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AFB34E2559
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 15:14:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5555430CB41;
-	Wed, 24 Sep 2025 15:20:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9977830FF30;
+	Wed, 24 Sep 2025 15:13:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B5EE30CDA6;
-	Wed, 24 Sep 2025 15:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C7B30FF3A
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 15:13:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758727237; cv=none; b=Uddlmylhj0cJIkHWBvBKjm4wFHl9H5VxOeqrMjj1j6Imyhgjh4QOkliDj5D6wxS4dRKEEyme5yxH5dfug2nCw/IOAWTZ25uFzcbTlDMOa9ghN328DtDUn5b3QGkAId3xWP2bEg4AJnAK5rw7ihCOpM1F6NW8fRdyAmhX5byi5RY=
+	t=1758726804; cv=none; b=R2IsVc7GWxHERFDArxUkNkMh+W9/zgC9DJQdleHzZdJIQrToUxoZd3mfdR72WIIZJpeF2hrj8RFsCroPrusHvl9qltpDBuo9dLbffEd/ziw0yheRbH+5WSh71GXnLnkNC2h+JU8f9PVu0i9FVSPoRPr+xv5R3y0o8HPu0EID9OE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758727237; c=relaxed/simple;
-	bh=NUgMFd1DP4iApIqk7SLIwHxdIBK3tE7nt9mFkQcSPH8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YE8WglqfqjyldUfd9+65UfvY1yOS14tH5n5Y9JpVIP8XqB5P36pvoUszaVp3L/XldtVe2rbKOcMlPfK1MTkwbJro2c3N2o9BAHm+UyWpzGfjAJQve+0Vjvj+9nLkF7X6hu13cr2V0JrlFq96cmU7rWD6gC+USwkvVLT8DW9BV1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4cX0Z81XR9z9sVT;
-	Wed, 24 Sep 2025 17:07:12 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7JBvIGokpC-x; Wed, 24 Sep 2025 17:07:12 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4cX0Z80gXXz9sVR;
-	Wed, 24 Sep 2025 17:07:12 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 05FB98B768;
-	Wed, 24 Sep 2025 17:07:12 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id EeCTNJu2vLct; Wed, 24 Sep 2025 17:07:11 +0200 (CEST)
-Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id B2BF38B763;
-	Wed, 24 Sep 2025 17:07:10 +0200 (CEST)
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-To: Herve Codina <herve.codina@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v3] net: wan: framer: Add version sysfs attribute for the Lantiq PEF2256 framer
-Date: Wed, 24 Sep 2025 17:06:47 +0200
-Message-ID: <77a27941d6924b1009df0162ed9f0fa07ed6e431.1758726302.git.christophe.leroy@csgroup.eu>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1758726804; c=relaxed/simple;
+	bh=d5WdCjL+KLMcdfoEj3LjFIZq/32CnK9rsIrugyz6h6Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KUPUZBi+CdASQQaaG/jdhrkygskEoeUWfRTVQeaSFPsrQVoJzZb7CdAW1J6DK4xxnvv9STW9iCiTRSZQSD7syQF1UCaK4ptCKmbppxwmRuRA0rN1RKdHFObFYl50EhAz/4Sj4noNTwvUzZ5TTPv6b3f/C6M2gIyZC2sGSUeseag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1v1RB2-0007z8-Re; Wed, 24 Sep 2025 17:13:04 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1v1RB0-000H7u-0f;
+	Wed, 24 Sep 2025 17:13:02 +0200
+Received: from pengutronix.de (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id C7A50478E7A;
+	Wed, 24 Sep 2025 15:13:01 +0000 (UTC)
+Date: Wed, 24 Sep 2025 17:13:01 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Vincent Mailhol <mailhol@kernel.org>
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>, syzbot@lists.linux.dev, 
+	syzkaller-bugs@googlegroups.com, syzbot ci <syzbot+ci284feacb80736eb0@syzkaller.appspotmail.com>, 
+	biju.das.jz@bp.renesas.com, davem@davemloft.net, geert@glider.be, kernel@pengutronix.de, 
+	kuba@kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	stefan.maetje@esd.eu, stephane.grosjean@hms-networks.com, zhao.xichao@vivo.com
+Subject: Re: [PATCH] can: dev: fix out-of-bound read in can_set_default_mtu()
+Message-ID: <20250924-monumental-impartial-auk-719514-mkl@pengutronix.de>
+References: <68d3e6ce.a70a0220.4f78.0028.GAE@google.com>
+ <20250924143644.17622-2-mailhol@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1758726407; l=3835; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=NUgMFd1DP4iApIqk7SLIwHxdIBK3tE7nt9mFkQcSPH8=; b=w2Ex0uy0q9ZKCt7WkNFVTS7mpr1zxnBazlqSSHvD8KPCMlDk4Jkifqjn/R+uhGXp0s2AR9gEG ZiNdUB3EIQ0BCHEchCO7TeGUgJUg8EkPDlUkcTQ0bC+r4VTK2VWpdHC
-X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="bje7xa3t5opp4lec"
+Content-Disposition: inline
+In-Reply-To: <20250924143644.17622-2-mailhol@kernel.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Lantiq PEF2256 framer has some little differences in behaviour
-depending on its version.
 
-Add a sysfs attribute to allow user applications to know the
-version.
+--bje7xa3t5opp4lec
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH] can: dev: fix out-of-bound read in can_set_default_mtu()
+MIME-Version: 1.0
 
-Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
----
-v3:
-- Added documentation Documentation/ABI/testing/sysfs-driver-framer-pef2256
+On 24.09.2025 23:35:44, Vincent Mailhol wrote:
+> Under normal usage, the virtual interfaces do not call can_setup(),
+> unless if trigger by a call to can_link_ops->setup().
+>=20
+> Patch [1] did not consider this scenario resulting in an out of bound
+> read in can_setup() when calling can_link_ops->setup() as reported by
+> syzbot ci in [2].
+>=20
+> Replacing netdev_priv() by safe_candev_priv() may look like a
+> potential solution at first glance but is not: can_setup() is used as
+> a callback function in alloc_netdev_mqs(). At the moment this callback
+> is called, priv is not yet fully setup and thus, safe_candev_priv()
+> would fail on physical interfaces. In other words, safe_candev_priv()
+> is solving the problem for virtual interfaces, but adding another
+> issue for physical interfaces.
+>=20
+> Remove the call to can_set_default_mtu() in can_setup(). Instead,
+> manually set the MTU the default CAN MTU. This decorrelates the two
+> functions, effectively removing the conflict.
+>=20
+> [1] can: populate the minimum and maximum MTU values
+> Link: https://lore.kernel.org/linux-can/20250923-can-fix-mtu-v3-3-581bde1=
+13f52@kernel.org/
+>=20
+> [2] https://lore.kernel.org/linux-can/68d3e6ce.a70a0220.4f78.0028.GAE@goo=
+gle.com/
+>=20
+> Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
+> ---
+> @Marc, please squash in
+>=20
+>   [PATCH net-next 27/48] can: populate the minimum and maximum MTU values
 
-v2: https://lore.kernel.org/all/2e01f4ed00d0c1475863ffa30bdc2503f330b688.1758089951.git.christophe.leroy@csgroup.eu
-- Split version_show() prototype to 80 chars
-- Make DEVICE_ATTR_RO(version) static
+I've not changed the commit message of "can: populate the minimum and
+maximum MTU values", just added the note that I've squashed this fixup
+patch.
 
-v1: https://lore.kernel.org/all/f9aaa89946f1417dc0a5e852702410453e816dbc.1757754689.git.christophe.leroy@csgroup.eu/
----
- .../ABI/testing/sysfs-driver-framer-pef2256   |  8 +++++++
- drivers/net/wan/framer/pef2256/pef2256.c      | 24 +++++++++++++++----
- 2 files changed, 27 insertions(+), 5 deletions(-)
- create mode 100644 Documentation/ABI/testing/sysfs-driver-framer-pef2256
+I've created a new tag: linux-can-next-for-6.18-20250924
 
-diff --git a/Documentation/ABI/testing/sysfs-driver-framer-pef2256 b/Documentation/ABI/testing/sysfs-driver-framer-pef2256
-new file mode 100644
-index 000000000000..ead1ae84ef2a
---- /dev/null
-+++ b/Documentation/ABI/testing/sysfs-driver-framer-pef2256
-@@ -0,0 +1,8 @@
-+What:		/sys/bus/platform/devices/xxx/version
-+Date:		Sep 2025
-+Contact:	netdev@vger.kernel.org
-+Description:	Reports the version of the PEF2256 framer
-+
-+		Access: Read
-+
-+		Valid values: Represented as string
-diff --git a/drivers/net/wan/framer/pef2256/pef2256.c b/drivers/net/wan/framer/pef2256/pef2256.c
-index 1e4c8e85d598..a2166b424428 100644
---- a/drivers/net/wan/framer/pef2256/pef2256.c
-+++ b/drivers/net/wan/framer/pef2256/pef2256.c
-@@ -37,6 +37,7 @@ struct pef2256 {
- 	struct device *dev;
- 	struct regmap *regmap;
- 	enum pef2256_version version;
-+	const char *version_txt;
- 	struct clk *mclk;
- 	struct clk *sclkr;
- 	struct clk *sclkx;
-@@ -114,6 +115,16 @@ enum pef2256_version pef2256_get_version(struct pef2256 *pef2256)
- }
- EXPORT_SYMBOL_GPL(pef2256_get_version);
- 
-+static ssize_t version_show(struct device *dev, struct device_attribute *attr,
-+			    char *buf)
-+{
-+	struct pef2256 *pef2256 = dev_get_drvdata(dev);
-+
-+	return sysfs_emit(buf, "%s\n", pef2256->version_txt);
-+}
-+
-+static DEVICE_ATTR_RO(version);
-+
- enum pef2256_gcm_config_item {
- 	PEF2256_GCM_CONFIG_1544000 = 0,
- 	PEF2256_GCM_CONFIG_2048000,
-@@ -697,7 +708,6 @@ static int pef2256_probe(struct platform_device *pdev)
- 	unsigned long sclkr_rate, sclkx_rate;
- 	struct framer_provider *framer_provider;
- 	struct pef2256 *pef2256;
--	const char *version_txt;
- 	void __iomem *iomem;
- 	int ret;
- 	int irq;
-@@ -763,18 +773,18 @@ static int pef2256_probe(struct platform_device *pdev)
- 	pef2256->version = pef2256_get_version(pef2256);
- 	switch (pef2256->version) {
- 	case PEF2256_VERSION_1_2:
--		version_txt = "1.2";
-+		pef2256->version_txt = "1.2";
- 		break;
- 	case PEF2256_VERSION_2_1:
--		version_txt = "2.1";
-+		pef2256->version_txt = "2.1";
- 		break;
- 	case PEF2256_VERSION_2_2:
--		version_txt = "2.2";
-+		pef2256->version_txt = "2.2";
- 		break;
- 	default:
- 		return -ENODEV;
- 	}
--	dev_info(pef2256->dev, "Version %s detected\n", version_txt);
-+	dev_info(pef2256->dev, "Version %s detected\n", pef2256->version_txt);
- 
- 	ret = pef2556_of_parse(pef2256, np);
- 	if (ret)
-@@ -835,6 +845,8 @@ static int pef2256_probe(struct platform_device *pdev)
- 		return ret;
- 	}
- 
-+	device_create_file(pef2256->dev, &dev_attr_version);
-+
- 	return 0;
- }
- 
-@@ -849,6 +861,8 @@ static void pef2256_remove(struct platform_device *pdev)
- 	pef2256_write8(pef2256, PEF2256_IMR3, 0xff);
- 	pef2256_write8(pef2256, PEF2256_IMR4, 0xff);
- 	pef2256_write8(pef2256, PEF2256_IMR5, 0xff);
-+
-+	device_remove_file(pef2256->dev, &dev_attr_version);
- }
- 
- static const struct of_device_id pef2256_id_table[] = {
--- 
-2.49.0
+regards,
+Marc
 
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--bje7xa3t5opp4lec
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmjUCnoACgkQDHRl3/mQ
+kZxSpwgAtkAzMP/MbF0LK+TUgUVBCCK/Oq6V0QJF1DzbCeoJREAghWi2PVSE7xcK
+Bhp9v5tJFtzX+nlncVcR5umFmnltrowKA1OuAivnBl7jTMp/COWddvGOJ/nTIq1j
+bLLCtyTlfRaM6VgK92IH3PgpPRL9rh+yi38dFTeyPDy9yV0YcjmbDd+1+KFigeA5
+WDoz4vcHjsLDazkIiaRJ00x3ub+W6z4m+OoY1aav5ALt6l1i6l9xWWdqXlSyba/9
+12oEaDXvaEsR7auAxmTF8OCG6OljKIwDOUsfkMDrAdof/UDO/O6B10DY44EYLbsO
+PJfwUzrIkNb7ND9FPTbkb9Vss7tg5A==
+=CWNe
+-----END PGP SIGNATURE-----
+
+--bje7xa3t5opp4lec--
 
