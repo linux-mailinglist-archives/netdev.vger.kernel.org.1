@@ -1,151 +1,136 @@
-Return-Path: <netdev+bounces-225774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF508B98185
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 04:51:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEDCEB981D9
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 05:13:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 864A816AD92
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 02:51:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78E227B57DD
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 03:11:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95C8220694;
-	Wed, 24 Sep 2025 02:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4460B22FF22;
+	Wed, 24 Sep 2025 03:13:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="DLZOdXdj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA35B1F91D6;
-	Wed, 24 Sep 2025 02:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC00224225;
+	Wed, 24 Sep 2025 03:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758682298; cv=none; b=iBx7VBhesJOOGPLjYD2myJ6RWAkMGkfZhsDM9PWQkajXKcy1IymLPgAPXCLWVEpkGpF/2XwrUabto2TMuyxu1+w5O08nVKTNQUNLYUzAOn55q9IEt8wgkNfnnA/LqUPv3TxToy5bZlbWSN7onmPc31pGgmLr1rruIhEBfLmjPTQ=
+	t=1758683593; cv=none; b=NZ6eXiPDsVru829VTULKoVdHLOpk/y/giPCmq1WMEd2iGJ9L2n749RwbWQ5Tx3MdePUAZcfuMn4MM8YaBmswo4OT0NKHxIyBCe4nzW61ZM9NyntJ1ZJj6knowqZA0hWM9nIxxMIFLe00XFP1mop+osVm8ktazgw5Tdxzjdj/FQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758682298; c=relaxed/simple;
-	bh=3oLB6vCE1DfzkqZf/vAwDz1ydYPw5Afe+K3kLP/dAMw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mGUQyvF5HmSAem38ABWnX07lR4nTlP5DV5ugG6vfVkGYkxgL+EUYTCqmuHbzmNf6/7WNjw5eYyyhjeh1FKHKdTZczosw9CYKsVwgF4nf7G/FPdKNCOvOb8Igop6uEkNy3nIh3jUaC21HCyZECj8LAA37q2gtL07zrH2KzN2r5j0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.169.211.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpsz16t1758682260t98e3d42d
-X-QQ-Originating-IP: AbOZ0NN9SNEvHEDbZxb+4svvgPghtDBuBPNPgeZ/T+s=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 24 Sep 2025 10:50:58 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 13274150697629646599
-Date: Wed, 24 Sep 2025 10:50:58 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
-	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
-	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
-	lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
-	gustavoars@kernel.org, rdunlap@infradead.org,
-	vadim.fedorenko@linux.dev, joerg@jo-so.de, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v13 5/5] net: rnpgbe: Add register_netdev
-Message-ID: <CB1199BE018DD3DE+20250924025058.GB292859@nic-Precision-5820-Tower>
-References: <20250922014111.225155-1-dong100@mucse.com>
- <20250922014111.225155-6-dong100@mucse.com>
- <20250923181639.6755cca4@kernel.org>
+	s=arc-20240116; t=1758683593; c=relaxed/simple;
+	bh=Iu8F7B89dEF/lT14VXPako98TSEnjF2DviQJuVNcmWE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XouL+AUD8FFdTtmme37lwhUFVnaTDtIAqePJF4amhSyFvkig+tpBNxzGsqhOioBcPwq+XpH7r4gCFivlt1kiQyaYsjg438MRgzsbxvEpfe+f8W585W9lZYQ4CWFlByqnFb2vzFtzS282onAf0tJYBAzua+0D5ZPd8Am+rnZs600=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=DLZOdXdj; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1758683587; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=b+CiZ/ws2vTrRYAbVi6irLmhLVkR3R52CUsAsqU0XPU=;
+	b=DLZOdXdjjr1rehl9zQlckhtD4hRbBaI7qbNYKrllJTHy+vJGr43UXpNZPzDmm7fjLnYH4K6kq/wg9kcnvondiF8GxhYGawj2b4SFuDleKAg5ySmlEfvClhLoA1F7Wjod3b5ifu4isknBS57B2/K6ps7oyq4Q+EiEpuBZ0iRVLHs=
+Received: from 30.221.114.81(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WohxFPm_1758683586 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 24 Sep 2025 11:13:07 +0800
+Message-ID: <06a87a92-6cce-4a63-99d0-463a1d035478@linux.alibaba.com>
+Date: Wed, 24 Sep 2025 11:13:05 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250923181639.6755cca4@kernel.org>
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MijavZDuOhz7yv5Z4Dt2sQhXQGPZTdV+gAL8akzkl3xjzXPLE2Wy2kSp
-	0FVeTaKqOSaY+ZJzuH20boS+NF6eU8UQFVTOWDtuhJ1dwPDfszYEF1/S1Q7cDUZ7WzkYTys
-	kdH0y9rLTTl+rlqr5QJiLdKzRxaQBHVVc5eC4y03mOjdyruSwstc0DCxbozwLSVTHeWiIug
-	KlSEoPKBbICUCMtIPlL+9o243BmbQwFxJiTx+7h8sL2ZlyWlrY27/RfhNWMYwPXf2eLABcx
-	aU12xH/giU/1wWWA9rF3rmPXs8FKW+BQ9hl/PNxjv5EhMyj8Jjzc45FqIasx6XeUGggbKDo
-	VbO/8bM5o53x9ZHu1igyQI87YbDkmgyRmXB9lUx0n/bKpK3ge2tmRiBE4S0tDiCTk/ALxPV
-	atfZ2PMG0nkCQo8h9nm/v+iT9mz/TlheRWN2+7O6rPrUr4zi0ZyjtC80oJo0tYO4U/J/PIw
-	w5RQ1DjpEuk90UHnRy0AVVJWkV8xhNyMidY9mSpNG6DZOTx7s8VrecBTLGfXtzS82/Ey2Jl
-	oW9nxga43B6PDps4lYy2Lh9PHj8lm7pJ2AQNcY9x9c+Pjsr2aON/9a7mDfsNRuNc/su7HcJ
-	0OqhvLuH0OBjwOF10g4t+pVgvh98VnTiPpwu799Xv1whIpyubRSetkN+vgLCxIoafqjE4uM
-	xtcjKZ3/4dspAAqxbGv0YYKkXJ6NZWOM6UFMngnGDKg8AtZJRPl/Sw+VNP48de7NdpmQKJk
-	2tT6bXRDbTTJ4Zmhg5GVxgQWAGvRWZLy4PbJMT3Muu8tTuB5pOeXg1LSz8kj5bKy4Zllm/f
-	0gAQBkhwuYqu4j7ITo7l4APBgWWW9S36vs7e7tgIkIjsXnZ9mV7TJ4B8OSgOitit5nYrbhd
-	wtRwbjuI6hJi8Mbm0pvMYrEJufgy6whJLQw8RNSq4x1H6AX/TsJcnBN1TA9oejHTurXmDQa
-	NkRm4HsJoF9sZmPEW8ffXnfH3eqUGm2zXnKa09ccoR3VC1Wcekv3BpytJjFckigHfBDUD2P
-	jBg2HcGC243mkvBlSgNfGghfvA2mf5Wdw7GoYnauXq6AZRO49e
-X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
-X-QQ-RECHKSPAM: 0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/2] net/smc: make wr buffer count
+ configurable
+To: Halil Pasic <pasic@linux.ibm.com>, Dust Li <dust.li@linux.alibaba.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, "D. Wythe" <alibuda@linux.alibaba.com>,
+ Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang
+ <wenjia@linux.ibm.com>, Mahanta Jambigi <mjambigi@linux.ibm.com>,
+ Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-s390@vger.kernel.org
+References: <20250908220150.3329433-1-pasic@linux.ibm.com>
+ <20250908220150.3329433-2-pasic@linux.ibm.com>
+ <aL-YYoYRsFiajiPW@linux.alibaba.com>
+ <20250909121850.2635894a.pasic@linux.ibm.com>
+ <20250919165549.7bebfbc3.pasic@linux.ibm.com>
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+In-Reply-To: <20250919165549.7bebfbc3.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi, Jakub:
 
-On Tue, Sep 23, 2025 at 06:16:39PM -0700, Jakub Kicinski wrote:
-> On Mon, 22 Sep 2025 09:41:11 +0800 Dong Yibo wrote:
-> > +static const struct mucse_hw_operations rnpgbe_hw_ops = {
-> > +	.reset_hw = rnpgbe_reset,
-> > +	.get_perm_mac = rnpgbe_get_permanent_mac,
-> > +	.mbx_send_notify = rnpgbe_mbx_send_notify,
+
+在 2025/9/19 22:55, Halil Pasic 写道:
+> On Tue, 9 Sep 2025 12:18:50 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
 > 
-> Please don't add abstraction layers, you only have one set of ops right
-> now call them directly. The abstractions layers make the code harder to
-> follow.
 > 
-
-Ok, remove abstraction layers in this series. I will add abstraction
-layers when adding more sets of ops.
-
-> > +static netdev_tx_t rnpgbe_xmit_frame(struct sk_buff *skb,
-> > +				     struct net_device *netdev)
-> > +{
-> > +	dev_kfree_skb_any(skb);
-> > +	netdev->stats.tx_dropped++;
-> 
-> Please add your own stats, the stats in struct net_device
-> are deprecated and should not be used by new drivers.
+> Can maybe Wen Gu and  Guangguan Wang chime in. From what I read
+> link->wr_rx_buflen can be either SMC_WR_BUF_SIZE that is 48 in which
+> case it does not matter, or SMC_WR_BUF_V2_SIZE that is 8192, if
+> !smc_link_shared_v2_rxbuf(lnk) i.e. max_recv_sge == 1. So we talk
+> about roughly a factor of 170 here. For a large pref_recv_wr the
+> back of logic is still there to save us but I really would not say that
+> this is how this is intended to work.
 > 
 
-Got it, I will fix this.
+Hi Halil,
 
-> >  	err = rnpgbe_init_hw(hw, board_type);
-> >  	if (err) {
-> >  		dev_err(&pdev->dev, "Init hw err %d\n", err);
-> >  		goto err_free_net;
-> >  	}
-> > +	/* Step 1: Send power-up notification to firmware (no response expected)
-> > +	 * This informs firmware to initialize hardware power state, but
-> > +	 * firmware only acknowledges receipt without returning data. Must be
-> > +	 * done before synchronization as firmware may be in low-power idle
-> > +	 * state initially.
-> > +	 */
-> > +	err = hw->ops->mbx_send_notify(hw, true, mucse_fw_powerup);
-> > +	if (err) {
+I think the root cause of the problem this patchset try to solve is a mismatch
+between SMC_WR_BUF_CNT and the max_conns per lgr(which value is 255). Furthermore,
+I believe that value 255 of the max_conns per lgr is not an optimal value, as too
+few connections lead to a waste of memory and too many connections lead to I/O queuing
+within a single QP(every WR post_send to a single QP will initiate and complete in sequence).
+
+We actually identified this problem long ago. In Alibaba Cloud Linux distribution, we have
+changed SMC_WR_BUF_CNT to 64 and reduced max_conns per lgr to 32(for SMC-R V2.1). This
+configuration has worked well under various workflow for a long time.
+
+SMC-R V2.1 already support negotiation of the max_conns per lgr. Simply change the value of
+the macro SMC_CONN_PER_LGR_PREFER can influence the negotiation result. But SMC-R V1.0 and SMC-R
+v2.0 do not support the negotiation of the max_conns per lgr.
+I think it is better to reduce SMC_CONN_PER_LGR_PREFER for SMC-R V2.1. But for SMC-R V1.0 and
+SMC-R V2.0, I do not have any good idea.
+
+> Maybe not supporting V2 on devices with max_recv_sge is a better choice,
+> assuming that a maximal V2 LLC msg needs to fit each and every receive
+> WR buffer. Which seems to be the case based on 27ef6a9981fe ("net/smc:
+> support SMC-R V2 for rdma devices with max_recv_sge equals to 1").
+>
+
+For rdma dev whose max_recv_sge is 1, as metioned in the commit log in the related patch,
+it is better to support than SMC_CLC_DECL_INTERR fallback, as SMC_CLC_DECL_INTERR fallback
+is not a fast fallback, and may heavily influence the efficiency of the connecting process
+in both the server and client side.
+
+ 
+> For me the best course of action seems to be to send a V3 using
+> link->wr_rx_buflen. I'm really not that knowledgeable about RDMA or
+> the SMC-R protocol, but I'm happy to be part of the discussion on this
+> matter.
 > 
-> Don't you have to power it down on errors later in this function?
+> Regards,
+> Halil
+And a tiny suggestion for the risk you mentioned in commit log
+("Addressing this by simply bumping SMC_WR_BUF_CNT to 256 was deemed
+risky, because the large-ish physically continuous allocation could fail
+and lead to TCP fall-backs."). Non-physically continuous allocation (vmalloc/vzalloc .etc.) is
+also supported for wr buffers. SMC-R snd_buf and rmb have already supported for non-physically
+continuous memory, when sysctl_smcr_buf_type is set to SMCR_VIRT_CONT_BUFS or SMCR_MIXED_BUFS.
+It can be an example of using non-physically continuous memory.
 
-I will add an lable err_powerdown to handle errors later in this function.
-
-err_powerdown:
-         /* notify powerdown only powerup ok */
-         if (!err_notify) {
-                 err_notify = rnpgbe_send_notify(hw, false, mucse_fw_powerup);
-                 if (err_notify)
-                         dev_warn(&pdev->dev, "Send powerdown to hw failed %d\n",
-                                  err_notify);
-         }
-
-> -- 
-> pw-bot: cr
-> 
-
-thanks for your feedback.
+Regards,
+Guangguan Wang
 
 
