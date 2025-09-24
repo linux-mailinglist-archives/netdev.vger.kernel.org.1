@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-226081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DFC9B9BC3B
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 21:50:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DF1DB9BC4D
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 21:51:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EADB77AD0A8
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:48:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77A3F1BC2898
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:51:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5733272814;
-	Wed, 24 Sep 2025 19:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 425EE273D75;
+	Wed, 24 Sep 2025 19:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iw0pf/8I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fYF70C+u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1019F2727E7
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 19:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569DC2727F3
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 19:50:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758743409; cv=none; b=UZ4lz9MySNICU5Uw2yrrHr6BNwEmkdL4jH/G/YeRCcBopEJMKBcCjA44wRJM4uIy5tI4Bp3q5LF14vx6/tbzUUeGVqyqS57jSd7evF3zZJPMVaypM/7viwSBkPaz7CwpriSAuGg0B8rUm9OUJjLmY57l3qQOsaQZkSb2WfSuJu8=
+	t=1758743411; cv=none; b=bN2YM9vzdh28MGw8NjCqij2dsoBwUiUcmAxN0SV4kPl8nK/jprgEteYnxKe2n5qqyWEMftwMye0xCUDwqU7Kwd9wT+B/nFFtWAZt9ZTWEJywuxe70EfIGOx/09iV0bmhc/oPQH74y9u/bhxQJUwsL3wSIJUQ5DeYFRroT74UDto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758743409; c=relaxed/simple;
-	bh=HOmEzB9J5OfuB1QQOJ8F/jhFtBB1+xZIEXsmm2bQ3wQ=;
+	s=arc-20240116; t=1758743411; c=relaxed/simple;
+	bh=hBG7n4J6M7LZu9HF1nfql3CnNtgdo2g9Gwx9FZ9weuc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nqCuear8CMMwrCdmERrDHVSG123c/yDH+ZGvaPEuX2yq08Bm2GOCQFc/coThs8V0F+Gl/oy+J3yaHo8jP1MFg8hGeUXlKvWqYVxvx3j9/DiS1ksJKFATS3aEdiVeTx6za1D1D3dGV4pQFyazVMNiGM0aYKCMXpR4pJCZwuv+cyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iw0pf/8I; arc=none smtp.client-ip=74.125.224.43
+	 MIME-Version; b=TSvZdN/NFFqkXKek8mjavXnoAspJBng1PXgutj76rXPi4+UGrfOrmLndCzqjnF6Oz4Pyryr1IZYre+E2FSAewKAUodDEVNizh4Y8oVpWO2ggv9uL0UHeRfVM8Z8u1RjbaESUA8Oeu6a2MaJF5p/utJwMerypo39w7k4/g7EQK7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fYF70C+u; arc=none smtp.client-ip=209.85.128.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-6352ba3c35cso66932d50.3
-        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 12:50:07 -0700 (PDT)
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-749399349ddso2718977b3.3
+        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 12:50:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758743407; x=1759348207; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758743408; x=1759348208; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/IKd8t9WfLu7Fkl9HNvxSBVOebr4mUd0DJPiQ0lHQDM=;
-        b=iw0pf/8IfYyH7rdGXdn2BDGTgnPoKFFA/UyUiFOO40A02GrOCBumz4vxOZbg0wFDFx
-         t50tX27MdJPy83/fHw4C7xGLBXGWDzQEtnYCOgsuyQWt+ILzHLVerMNiQuR7vLqjxaoV
-         GA7YQ8uc8C4/Q4ALIEROmIZD3/Ok+pp/fNX7tEjWCAQxFcU8bcb2XoM+UY9O3iaG+yjY
-         zTVaBQflHQbqf+/W5VieaMrB42PC7e+b+JWR7AccjZXMT2SObiywbq1++jH8EvDws/wK
-         4lPvZWrrZLFNiBwzo9roRiCa5dV+44DgLQGtkDqHfxoLNfcbX82QCdJ/bW7ehkE2p9QV
-         cJuQ==
+        bh=lFFEYDcEyI2leiiDXvVsUHKXiEXYYXz1ExuhhGqLCtI=;
+        b=fYF70C+uMz+/XFcYiWHZSWT+7Kfm6SQpaOr4SeR79mZ4w0MWnCflTcckH9ulNlmL5Y
+         lDzvjdPtgvBPf/LVZT3p4U0hpS/wUrZ2T1QoeEB4673pnze5klJWDO0JM8155yWe5Dgt
+         l52cxYP6uE+nozO9Pq7ttqC6o+ZhhbMZ86yd/iFeIiJ5WnF3WJP5N+N9DoXkR99AhBRt
+         k+se3u5DmUYGbLrWd3UWFXaIdM52hlkNBB7lxALed+55iNj5ih5d7xtS+mdYBYuYbLvI
+         sYCNRgouosbTOUrpvkvtt2FUhzKO1SB+h+JdqaQclMTFs1N2OnPZcgMT1rUjLS/sEfpQ
+         F77Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758743407; x=1759348207;
+        d=1e100.net; s=20230601; t=1758743408; x=1759348208;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/IKd8t9WfLu7Fkl9HNvxSBVOebr4mUd0DJPiQ0lHQDM=;
-        b=v9P8u0Xxm24mLwqclU5PZ0KeDbZ+qJKKhxMMmb0zWTHglJDVwSntHYVNpUe+msxtlK
-         fbUzNji63kBtffzZA4ATj9ydAqBkBiMyBrA3RYaIhZAyRzfilKOSAXKs8zd/IlcGlY38
-         9thZypksV1JzqV2yRF7yozQjF/RRAPbHuXm/sdITVuiwCj80OxxVTfOVJNpAn7sDoTf5
-         sJ9OuH0lcRpS5okJy4b1HvUXASgIUUw8OLCnTy0x8mVxHXcLbkQ8IEAqiVQd2pKfx6mJ
-         a0xqcTWtwhc98YsfUEh+FrupQqo9ru9gB+DHH+P3E1awWTt2tOtdBtZNprPrKpF9JCBN
-         DkgA==
-X-Forwarded-Encrypted: i=1; AJvYcCWEYlB3NWHf3UtcRlqZQS+kYrsO0CZjWUqC58/g6OV+63h+lnZgA2+6QH18b87LZvWsrF30Bao=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIroVdQPeJD4a4eS4eqxVUlMrr1cKmt/gCZqBcQ/gn1P09oNa2
-	Xjp05UT9vHpr1yjpKskBgklYesWNnshNb3UeyHneHukQZUkICRMA8f0m
-X-Gm-Gg: ASbGncufddMHzg6YbscGNc6RQjvLHGNdACV016hl4/9vG3KUNx3UihBfiFbq71J2Dlp
-	V8NYrSm6gS53/oWGjCnTMKG2i4T49j7Stw7EN9V/F1O2HwKhdKybMt9X18Fn2cVuc97a/03UsqO
-	5ifjVXw0kfHLjR1MGxjr2UvjDqR0xAsMkHfTMqzGPuLUuHLsCeMBU0cXWfBRfrWP5TIaphwiW6y
-	7usFECJL3qS4nbZyXJUr5z1CclDBExNR3o6DOf6/LPWyQCJOuPV4OOUpsALiCsXLNYNgDfzLTk5
-	A656vtDb8VW92fpL3LrzDCqKd6JdW0/vXoYM/UkYPnYA7/7qx9rL3FkZEUk4Ypd9ckP9r3Bdt5V
-	w3/XBQ625FeJILfHQpgv+
-X-Google-Smtp-Source: AGHT+IGglOTKpULDfqrSyTEy0Ymr/RC6vDH7i0XqthnpxhMeEoxcrQO8TwVFoaYFBBUJ4EISJ5N8mw==
-X-Received: by 2002:a05:690e:434b:b0:632:f380:1462 with SMTP id 956f58d0204a3-6361a7164e1mr508899d50.5.1758743406953;
-        Wed, 24 Sep 2025 12:50:06 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:70::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-739716be6fbsm51547507b3.4.2025.09.24.12.50.06
+        bh=lFFEYDcEyI2leiiDXvVsUHKXiEXYYXz1ExuhhGqLCtI=;
+        b=e9Z4g0lYN6jqUIr7FGAXvRkw2nNrRgY0dSbkdSaDwSIiyJh8NilOMQq4++daeOd3fJ
+         bHGUT6N3k1Vyd4E751F5Rj0WyOzL0yuQ2i4GslgcSgpb8/5fUzYjc94hxdElWezFpzj8
+         5IODpBlcW3FXiandOEsfFpEKpLsDnuyfk/xvt355NAndYwXZVRXEeJTE/3ipNsXY8vjr
+         QPVCzXdy1zspXb2ffSEmNKhTmwidnZ4yrzApfEWGCER394/jzyEyZn8lwyAllBK1o38U
+         vVU9Kbpw7Bx402E1mKMqoKpZmOyrzFuGzU723rbveoBU3FUz2krjB3ZLVDzsilXgEKKs
+         g2Hg==
+X-Forwarded-Encrypted: i=1; AJvYcCWQgCGvzJo1QCjWpKC9EV1Hi37XLb/5AKPQuyPHFK4Jt8mv8pZ16yC54ed/mtgV+ywslwj2QFY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUjC+/vtDKS0w/l5CeMPHo4Zqx/MZSVcQiLGJrmHU4UrBgolP5
+	vPLBXhLsfflHI9rsDqULPQ7x2Xn5iehcYjH0CyFJZDbJZj81bhaN1q40
+X-Gm-Gg: ASbGncuWNilCJuBrl9ZJQgz5lQfaSmaADHPxE8iIsdPkTQOuOFj8KjRl0ujYJHytVkt
+	LbD/MSdcEPW/1oEsktJfo/MVc7L5L9+wZX0UBlZlWsBykJ197p62WYuW4bdBLSssJFXIgpJ76Z4
+	f3/yfrDx1eZlWQ+gyP9WC1AKQsOXEBG1b/IKIKJAeAT602+UBslBUjcd8fCHbJ+2Fw5unlJADGe
+	rYt8tv6IJzIu8kDeu0BzyR2wrPaE+OmAIrp2c1SNGfXFav212EAoPKcRBaXETC+wzcjltMtHmum
+	th4/BZKYYl0OSuaZ+iIizhM8VsdEAazcTeqe4Yjt7rDnlocVtbLelbyvN4g/ahTbo+nQa8rMERa
+	/L60jsT7vMHqCil1KflVF
+X-Google-Smtp-Source: AGHT+IEgSnjhccUb/qqaKCgTF/vTJb1tPNAnij/ZaPH4rExJiP7FP6dAUWLGY3zw/qJd7eG4tsHaig==
+X-Received: by 2002:a05:690c:868f:10b0:73e:6140:684 with SMTP id 00721157ae682-76402e64d0cmr8865077b3.38.1758743408005;
+        Wed, 24 Sep 2025 12:50:08 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:43::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-75210e5afa0sm21896787b3.3.2025.09.24.12.50.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Sep 2025 12:50:06 -0700 (PDT)
+        Wed, 24 Sep 2025 12:50:07 -0700 (PDT)
 From: Daniel Zahka <daniel.zahka@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -89,9 +89,9 @@ Cc: Willem de Bruijn <willemb@google.com>,
 	Carolina Jubran <cjubran@nvidia.com>,
 	Donald Hunter <donald.hunter@gmail.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next 5/9] selftests: drv-net: psp: add basic data transfer and key rotation tests
-Date: Wed, 24 Sep 2025 12:49:51 -0700
-Message-ID: <20250924194959.2845473-6-daniel.zahka@gmail.com>
+Subject: [PATCH net-next 6/9] selftests: drv-net: psp: add association tests
+Date: Wed, 24 Sep 2025 12:49:52 -0700
+Message-ID: <20250924194959.2845473-7-daniel.zahka@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250924194959.2845473-1-daniel.zahka@gmail.com>
 References: <20250924194959.2845473-1-daniel.zahka@gmail.com>
@@ -105,245 +105,236 @@ Content-Transfer-Encoding: 8bit
 
 From: Jakub Kicinski <kuba@kernel.org>
 
-Add basic tests for sending data over PSP and making sure that key
-rotation toggles the MSB of the spi.
-
-Deploy PSP responder on the remote end. We also need a healthy dose
-of common helpers for setting up the connections, assertions and
-interrogating socket state on the Python side.
+Add tests for exercising PSP associations for TCP sockets.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 ---
- tools/testing/selftests/drivers/net/psp.py | 200 ++++++++++++++++++++-
- 1 file changed, 192 insertions(+), 8 deletions(-)
+ .../drivers/net/hw/lib/py/__init__.py         |   2 +-
+ .../selftests/drivers/net/lib/py/__init__.py  |   2 +-
+ tools/testing/selftests/drivers/net/psp.py    | 145 +++++++++++++++++-
+ tools/testing/selftests/net/lib/py/ksft.py    |   5 +
+ 4 files changed, 150 insertions(+), 4 deletions(-)
 
+diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
+index 559c572e296a..1c631f3c81f1 100644
+--- a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
++++ b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
+@@ -22,7 +22,7 @@ try:
+     from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
+         ksft_setup
+     from net.lib.py import ksft_eq, ksft_ge, ksft_in, ksft_is, ksft_lt, \
+-        ksft_ne, ksft_not_in, ksft_raises, ksft_true
++        ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt
+     from net.lib.py import NetNSEnter
+     from drivers.net.lib.py import GenerateTraffic
+     from drivers.net.lib.py import NetDrvEnv, NetDrvEpEnv
+diff --git a/tools/testing/selftests/drivers/net/lib/py/__init__.py b/tools/testing/selftests/drivers/net/lib/py/__init__.py
+index 31ecc618050c..8a795eeb5051 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/__init__.py
++++ b/tools/testing/selftests/drivers/net/lib/py/__init__.py
+@@ -21,7 +21,7 @@ try:
+     from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
+         ksft_setup
+     from net.lib.py import ksft_eq, ksft_ge, ksft_in, ksft_is, ksft_lt, \
+-        ksft_ne, ksft_not_in, ksft_raises, ksft_true
++        ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt
+ except ModuleNotFoundError as e:
+     ksft_pr("Failed importing `net` library from kernel sources")
+     ksft_pr(str(e))
 diff --git a/tools/testing/selftests/drivers/net/psp.py b/tools/testing/selftests/drivers/net/psp.py
-index 965e456836d2..b4f8a32ccbbb 100755
+index b4f8a32ccbbb..1c504975b07d 100755
 --- a/tools/testing/selftests/drivers/net/psp.py
 +++ b/tools/testing/selftests/drivers/net/psp.py
-@@ -3,9 +3,94 @@
+@@ -10,7 +10,7 @@ import termios
+ import time
  
- """Test suite for PSP capable drivers."""
- 
--from lib.py import ksft_run, ksft_exit
--from lib.py import ksft_true, ksft_eq
-+import fcntl
-+import socket
-+import struct
-+import termios
-+import time
-+
-+from lib.py import ksft_run, ksft_exit, ksft_pr
-+from lib.py import ksft_true, ksft_eq, ksft_ne, KsftSkipEx
+ from lib.py import ksft_run, ksft_exit, ksft_pr
+-from lib.py import ksft_true, ksft_eq, ksft_ne, KsftSkipEx
++from lib.py import ksft_true, ksft_eq, ksft_ne, ksft_gt, ksft_raises, KsftSkipEx
  from lib.py import NetDrvEpEnv, PSPFamily, NlError
-+from lib.py import bkg, rand_port, wait_port_listen
-+
-+
-+def _get_outq(s):
-+    one = b'\0' * 4
-+    outq = fcntl.ioctl(s.fileno(), termios.TIOCOUTQ, one)
-+    return struct.unpack("I", outq)[0]
-+
-+
-+def _send_with_ack(cfg, msg):
-+    cfg.comm_sock.send(msg)
-+    response = cfg.comm_sock.recv(4)
-+    if response != b'ack\0':
-+        raise Exception("Unexpected server response", response)
-+
-+
-+def _remote_read_len(cfg):
-+    cfg.comm_sock.send(b'read len\0')
-+    return int(cfg.comm_sock.recv(1024)[:-1].decode('utf-8'))
-+
-+
-+def _make_psp_conn(cfg, version=0, ipver=None):
-+    _send_with_ack(cfg, b'conn psp\0' + struct.pack('BB', version, version))
+ from lib.py import bkg, rand_port, wait_port_listen
+ 
+@@ -33,6 +33,13 @@ def _remote_read_len(cfg):
+     return int(cfg.comm_sock.recv(1024)[:-1].decode('utf-8'))
+ 
+ 
++def _make_clr_conn(cfg, ipver=None):
++    _send_with_ack(cfg, b'conn clr\0')
 +    remote_addr = cfg.remote_addr_v[ipver] if ipver else cfg.remote_addr
 +    s = socket.create_connection((remote_addr, cfg.comm_port), )
 +    return s
 +
 +
-+def _close_conn(cfg, s):
-+    _send_with_ack(cfg, b'data close\0')
-+    s.close()
-+
-+
-+def _close_psp_conn(cfg, s):
-+    _close_conn(cfg, s)
-+
-+
-+def _spi_xchg(s, rx):
-+    s.send(struct.pack('I', rx['spi']) + rx['key'])
-+    tx = s.recv(4 + len(rx['key']))
-+    return {
-+        'spi': struct.unpack('I', tx[:4])[0],
-+        'key': tx[4:]
-+    }
-+
-+
-+def _send_careful(cfg, s, rounds):
-+    data = b'0123456789' * 200
-+    for i in range(rounds):
-+        n = 0
-+        retries = 0
-+        while True:
-+            try:
-+                n += s.send(data[n:], socket.MSG_DONTWAIT)
-+                if n == len(data):
-+                    break
-+            except BlockingIOError:
-+                time.sleep(0.05)
-+
-+            retries += 1
-+            if retries > 10:
-+                rlen = _remote_read_len(cfg)
-+                outq = _get_outq(s)
-+                report = f'sent: {i * len(data) + n} remote len: {rlen} outq: {outq}'
-+                if retries > 10:
-+                    raise Exception(report)
-+
-+    return len(data) * rounds
-+
-+
-+def _check_data_rx(cfg, exp_len):
-+    read_len = -1
-+    for _ in range(30):
-+        cfg.comm_sock.send(b'read len\0')
-+        read_len = int(cfg.comm_sock.recv(1024)[:-1].decode('utf-8'))
-+        if read_len == exp_len:
-+            break
-+        time.sleep(0.01)
-+    ksft_eq(read_len, exp_len)
- 
- #
- # Test cases
-@@ -38,6 +123,75 @@ def dev_get_device_bad(cfg):
-     ksft_true(raised)
+ def _make_psp_conn(cfg, version=0, ipver=None):
+     _send_with_ack(cfg, b'conn psp\0' + struct.pack('BB', version, version))
+     remote_addr = cfg.remote_addr_v[ipver] if ipver else cfg.remote_addr
+@@ -151,6 +158,140 @@ def dev_rotate_spi(cfg):
+     ksft_ne(top_a, top_b)
  
  
-+def dev_rotate(cfg):
-+    """ Test key rotation """
-+    rot = cfg.pspnl.key_rotate({"id": cfg.psp_dev_id})
-+    ksft_eq(rot['id'], cfg.psp_dev_id)
-+    rot = cfg.pspnl.key_rotate({"id": cfg.psp_dev_id})
-+    ksft_eq(rot['id'], cfg.psp_dev_id)
-+
-+
-+def dev_rotate_spi(cfg):
-+    """ Test key rotation and SPI check """
-+    top_a = top_b = 0
++def assoc_basic(cfg):
++    """ Test creating associations """
 +    with socket.socket(socket.AF_INET6, socket.SOCK_STREAM) as s:
-+        assoc_a = cfg.pspnl.rx_assoc({"version": 0,
-+                                     "dev-id": cfg.psp_dev_id,
-+                                     "sock-fd": s.fileno()})
-+        top_a = assoc_a['rx-key']['spi'] >> 31
++        assoc = cfg.pspnl.rx_assoc({"version": 0,
++                                  "dev-id": cfg.psp_dev_id,
++                                  "sock-fd": s.fileno()})
++        ksft_eq(assoc['dev-id'], cfg.psp_dev_id)
++        ksft_gt(assoc['rx-key']['spi'], 0)
++        ksft_eq(len(assoc['rx-key']['key']), 16)
++
++        assoc = cfg.pspnl.tx_assoc({"dev-id": cfg.psp_dev_id,
++                                  "version": 0,
++                                  "tx-key": assoc['rx-key'],
++                                  "sock-fd": s.fileno()})
++        ksft_eq(len(assoc), 0)
 +        s.close()
-+    rot = cfg.pspnl.key_rotate({"id": cfg.psp_dev_id})
++
++
++def assoc_bad_dev(cfg):
++    """ Test creating associations with bad device ID """
 +    with socket.socket(socket.AF_INET6, socket.SOCK_STREAM) as s:
-+        ksft_eq(rot['id'], cfg.psp_dev_id)
-+        assoc_b = cfg.pspnl.rx_assoc({"version": 0,
-+                                    "dev-id": cfg.psp_dev_id,
++        with ksft_raises(NlError) as cm:
++            cfg.pspnl.rx_assoc({"version": 0,
++                              "dev-id": cfg.psp_dev_id + 1234567,
++                              "sock-fd": s.fileno()})
++        ksft_eq(cm.exception.nl_msg.error, -19)
++
++
++def assoc_sk_only_conn(cfg):
++    """ Test creating associations based on socket """
++    with _make_clr_conn(cfg) as s:
++        assoc = cfg.pspnl.rx_assoc({"version": 0,
++                                  "sock-fd": s.fileno()})
++        ksft_eq(assoc['dev-id'], cfg.psp_dev_id)
++        cfg.pspnl.tx_assoc({"version": 0,
++                          "tx-key": assoc['rx-key'],
++                          "sock-fd": s.fileno()})
++        _close_conn(cfg, s)
++
++
++def assoc_sk_only_mismatch(cfg):
++    """ Test creating associations based on socket (dev mismatch) """
++    with _make_clr_conn(cfg) as s:
++        with ksft_raises(NlError) as cm:
++            cfg.pspnl.rx_assoc({"version": 0,
++                              "dev-id": cfg.psp_dev_id + 1234567,
++                              "sock-fd": s.fileno()})
++        the_exception = cm.exception
++        ksft_eq(the_exception.nl_msg.extack['bad-attr'], ".dev-id")
++        ksft_eq(the_exception.nl_msg.error, -22)
++
++
++def assoc_sk_only_mismatch_tx(cfg):
++    """ Test creating associations based on socket (dev mismatch) """
++    with _make_clr_conn(cfg) as s:
++        with ksft_raises(NlError) as cm:
++            assoc = cfg.pspnl.rx_assoc({"version": 0,
++                                      "sock-fd": s.fileno()})
++            cfg.pspnl.tx_assoc({"version": 0,
++                              "tx-key": assoc['rx-key'],
++                              "dev-id": cfg.psp_dev_id + 1234567,
++                              "sock-fd": s.fileno()})
++        the_exception = cm.exception
++        ksft_eq(the_exception.nl_msg.extack['bad-attr'], ".dev-id")
++        ksft_eq(the_exception.nl_msg.error, -22)
++
++
++def assoc_sk_only_unconn(cfg):
++    """ Test creating associations based on socket (unconnected, should fail) """
++    with socket.socket(socket.AF_INET6, socket.SOCK_STREAM) as s:
++        with ksft_raises(NlError) as cm:
++            cfg.pspnl.rx_assoc({"version": 0,
++                              "sock-fd": s.fileno()})
++        the_exception = cm.exception
++        ksft_eq(the_exception.nl_msg.extack['miss-type'], "dev-id")
++        ksft_eq(the_exception.nl_msg.error, -22)
++
++
++def assoc_version_mismatch(cfg):
++    """ Test creating associations where Rx and Tx PSP versions do not match """
++    versions = list(cfg.psp_supported_versions)
++    if len(versions) < 2:
++        raise KsftSkipEx("Not enough PSP versions supported by the device for the test")
++
++    # Translate versions to integers
++    versions = [cfg.pspnl.consts["version"].entries[v].value for v in versions]
++
++    with socket.socket(socket.AF_INET6, socket.SOCK_STREAM) as s:
++        rx = cfg.pspnl.rx_assoc({"version": versions[0],
++                                 "dev-id": cfg.psp_dev_id,
++                                 "sock-fd": s.fileno()})
++
++        for version in versions[1:]:
++            with ksft_raises(NlError) as cm:
++                cfg.pspnl.tx_assoc({"dev-id": cfg.psp_dev_id,
++                                    "version": version,
++                                    "tx-key": rx['rx-key'],
 +                                    "sock-fd": s.fileno()})
-+        top_b = assoc_b['rx-key']['spi'] >> 31
++            the_exception = cm.exception
++            ksft_eq(the_exception.nl_msg.error, -22)
++
++
++def assoc_twice(cfg):
++    """ Test reusing Tx assoc for two sockets """
++    def rx_assoc_check(s):
++        assoc = cfg.pspnl.rx_assoc({"version": 0,
++                                  "dev-id": cfg.psp_dev_id,
++                                  "sock-fd": s.fileno()})
++        ksft_eq(assoc['dev-id'], cfg.psp_dev_id)
++        ksft_gt(assoc['rx-key']['spi'], 0)
++        ksft_eq(len(assoc['rx-key']['key']), 16)
++
++        return assoc
++
++    with socket.socket(socket.AF_INET6, socket.SOCK_STREAM) as s:
++        assoc = rx_assoc_check(s)
++        tx = cfg.pspnl.tx_assoc({"dev-id": cfg.psp_dev_id,
++                               "version": 0,
++                               "tx-key": assoc['rx-key'],
++                               "sock-fd": s.fileno()})
++        ksft_eq(len(tx), 0)
++
++        # Use the same Tx assoc second time
++        with socket.socket(socket.AF_INET6, socket.SOCK_STREAM) as s2:
++            rx_assoc_check(s2)
++            tx = cfg.pspnl.tx_assoc({"dev-id": cfg.psp_dev_id,
++                                   "version": 0,
++                                   "tx-key": assoc['rx-key'],
++                                   "sock-fd": s2.fileno()})
++            ksft_eq(len(tx), 0)
++
 +        s.close()
-+    ksft_ne(top_a, top_b)
 +
 +
-+def _data_basic_send(cfg, version, ipver):
-+    """ Test basic data send """
-+    # Version 0 is required by spec, don't let it skip
-+    if version:
-+        name = cfg.pspnl.consts["version"].entries_by_val[version].name
-+        if name not in cfg.psp_supported_versions:
-+            with socket.socket(socket.AF_INET6, socket.SOCK_STREAM) as s:
-+                with ksft_raises(NlError) as cm:
-+                    cfg.pspnl.rx_assoc({"version": version,
-+                                        "dev-id": cfg.psp_dev_id,
-+                                        "sock-fd": s.fileno()})
-+                ksft_eq(cm.exception.nl_msg.error, -95)
-+            raise KsftSkipEx("PSP version not supported", name)
-+
-+    s = _make_psp_conn(cfg, version, ipver)
-+
-+    rx_assoc = cfg.pspnl.rx_assoc({"version": version,
-+                                   "dev-id": cfg.psp_dev_id,
-+                                   "sock-fd": s.fileno()})
-+    rx = rx_assoc['rx-key']
-+    tx = _spi_xchg(s, rx)
-+
-+    cfg.pspnl.tx_assoc({"dev-id": cfg.psp_dev_id,
-+                        "version": version,
-+                        "tx-key": tx,
-+                        "sock-fd": s.fileno()})
-+
-+    data_len = _send_careful(cfg, s, 100)
-+    _check_data_rx(cfg, data_len)
-+    _close_psp_conn(cfg, s)
-+
-+
-+def psp_ip_ver_test_builder(name, test_func, psp_ver, ipver):
-+    """Build test cases for each combo of PSP version and IP version"""
-+    def test_case(cfg):
-+        cfg.require_ipver(ipver)
-+        test_case.__name__ = f"{name}_v{psp_ver}_ip{ipver}"
-+        test_func(cfg, psp_ver, ipver)
-+    return test_case
-+
-+
- def main() -> None:
-     with NetDrvEpEnv(__file__) as cfg:
-         cfg.pspnl = PSPFamily()
-@@ -55,12 +209,42 @@ def main() -> None:
-                 versions = info['psp-versions-ena']
-                 cfg.pspnl.dev_set({"id": cfg.psp_dev_id,
-                                    "psp-versions-ena": info['psp-versions-cap']})
--
--        ksft_run(globs=globals(), case_pfx={"dev_"},
--                 args=(cfg, ), skip_all=(cfg.psp_dev_id is None))
--
--        if versions is not None:
--            cfg.pspnl.dev_set({"id": cfg.psp_dev_id, "psp-versions-ena": versions})
-+            cfg.psp_supported_versions = info['psp-versions-cap']
-+
-+        # Set up responder and communication sock
-+        responder = cfg.remote.deploy("psp_responder")
-+
-+        cfg.comm_port = rand_port()
-+        try:
-+            with bkg(responder + f" -p {cfg.comm_port}", host=cfg.remote, exit_wait=True) as srv:
-+                wait_port_listen(cfg.comm_port, host=cfg.remote)
-+
-+                cfg.comm_sock = socket.create_connection((cfg.remote_addr,
-+                                                          cfg.comm_port), timeout=1)
-+
-+                cases = [
-+                    psp_ip_ver_test_builder(
-+                        "data_basic_send", _data_basic_send, version, ipver
-+                    )
-+                    for version in range(0, 4)
-+                    for ipver in ("4", "6")
-+                ]
-+                ksft_run(cases = cases, globs=globals(), case_pfx={"dev_", "data_"},
-+                         args=(cfg, ), skip_all=(cfg.psp_dev_id is None))
-+                cfg.comm_sock.send(b"exit\0")
-+                cfg.comm_sock.close()
-+
-+            if versions is not None:
-+                cfg.pspnl.dev_set({"id": cfg.psp_dev_id, "psp-versions-ena": versions})
-+
-+        finally:
-+            if srv.stdout or srv.stderr:
-+                ksft_pr("")
-+                ksft_pr(f"Responder logs ({srv.ret}):")
-+            if srv.stdout:
-+                ksft_pr("STDOUT:\n#  " + srv.stdout.strip().replace("\n", "\n#  "))
-+            if srv.stderr:
-+                ksft_pr("STDERR:\n#  " + srv.stderr.strip().replace("\n", "\n#  "))
-     ksft_exit()
+ def _data_basic_send(cfg, version, ipver):
+     """ Test basic data send """
+     # Version 0 is required by spec, don't let it skip
+@@ -229,7 +370,7 @@ def main() -> None:
+                     for version in range(0, 4)
+                     for ipver in ("4", "6")
+                 ]
+-                ksft_run(cases = cases, globs=globals(), case_pfx={"dev_", "data_"},
++                ksft_run(cases = cases, globs=globals(), case_pfx={"dev_", "data_", "assoc_"},
+                          args=(cfg, ), skip_all=(cfg.psp_dev_id is None))
+                 cfg.comm_sock.send(b"exit\0")
+                 cfg.comm_sock.close()
+diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
+index 375020d3edf2..d65dd087c549 100644
+--- a/tools/testing/selftests/net/lib/py/ksft.py
++++ b/tools/testing/selftests/net/lib/py/ksft.py
+@@ -92,6 +92,11 @@ def ksft_ge(a, b, comment=""):
+         _fail("Check failed", a, "<", b, comment)
  
  
++def ksft_gt(a, b, comment=""):
++    if a <= b:
++        _fail("Check failed", a, "<=", b, comment)
++
++
+ def ksft_lt(a, b, comment=""):
+     if a >= b:
+         _fail("Check failed", a, ">=", b, comment)
 -- 
 2.47.3
 
