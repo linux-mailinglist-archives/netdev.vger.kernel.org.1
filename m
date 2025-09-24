@@ -1,87 +1,91 @@
-Return-Path: <netdev+bounces-225761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C31EB9804E
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 03:41:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CB0FB9806F
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 03:49:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3AAD1749B4
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 01:41:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4216F1B20DD7
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 01:49:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F3631F4613;
-	Wed, 24 Sep 2025 01:41:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57A619D065;
+	Wed, 24 Sep 2025 01:48:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="i9V6+sh1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AZ0iAamN"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6BDC8CE
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 01:41:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B27C2E0
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 01:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758678112; cv=none; b=M583UpdgDl9LVgppwoQXB9sjRkRx4tV1qb85dHdzwOMZ98FrJE3B9LRwnx34zGJbUv7bNyqpqM4Bd6tzvr6lEO0FsMqJBV1i4JgpBcBI4DIm4DGNf4RpH+cLzIAD/xIQvec+1a8dhOYtbAAng8cIZIuGkkKOp4ksPOJ9LR+VDPU=
+	t=1758678537; cv=none; b=K4VBNbV88F5yU7I0k/C4sAXEx+++h04iJ5DriQrBENdwe4ZIw2WlX47v2k9++/l/Xie/p70WkeIa2hhiVCIMS0ZOQEgWqipeIR7vJEGFuRoY8CDVrUp0v/TLuoTvXY4dbvIHPX0wlpJvW/fVF3LYh3QkxLGWOEFnVU70LsdEtn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758678112; c=relaxed/simple;
-	bh=cXs9Owtwm5o6WI/dGqnXnOeTUqhihC4uz2+RrT6ySqE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aSZBoBwDU1JXPsuGE7PSciXfV5ZAEZFcBV5lSjeMkpUvZSaEl1NuUPRVJSyveoRLmx6gDIxl2Meu3Acyb2cn8uQsVmFpI174JZL5gUgGj1a+iZY+qIiLxaRk6EvICaV8uQsD4AdhrBvCxR/vHzdbrKxx+1jtKuDwhnp7SDxLagw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=i9V6+sh1; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <87568a0b-93c8-4fc1-a721-dbfeda01d0bb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758678108;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hirYrJPjT9hxA6JxeStFs+VMmPTpuoEk/zkkhuulHMI=;
-	b=i9V6+sh1ybXBPf1eF5EKPYHUlisYDpcAIkxaaYbHBabMJRgv1iMqkyyIZn7YLcYmk4KVhT
-	lITCxeWnp3+iXR5e052+P4SPA8pw11coE/cTKn80at+0JxHCS0a4ypQ0YccaLrr7SZeCvc
-	VHA4a1FtzAZprTZHAvromiU9Hqo5FjA=
-Date: Tue, 23 Sep 2025 18:41:40 -0700
+	s=arc-20240116; t=1758678537; c=relaxed/simple;
+	bh=keYawX+md+ZCO7ZblPXvtGUH/MCNBo8dpci9fyEcHCg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J5F0Mype4RQgpBLPgRiz/lmPqk9eHA2OkzAlX0+ModaxDA5Xn0ligHm96x2kiPrItzpYsM4OAemhF5IBN4KKW6oLuOmA8Lgb1LoELnS5iMy+5GqyXm/EWw8QYtlbbCmkiwmVNFJYZdkcOakmLs4EocaHA01z91yCHG4B3niA5Ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AZ0iAamN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1134DC4CEF5;
+	Wed, 24 Sep 2025 01:48:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758678537;
+	bh=keYawX+md+ZCO7ZblPXvtGUH/MCNBo8dpci9fyEcHCg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AZ0iAamNgI28vpzHV+VLhygT6PjwNfl8geXWBrAaS4VibJWqliUdmDEH0dprW0IsP
+	 7VzAtSt+QoDWxF64c5kQk0HOvPyJMi/DpUAwtT+8GeYFvjbv1GK2YkGrfOnl9i/oZj
+	 Zfhou55GndCDxdikDQWu30wdL37+rBV3wZn+yiTu7P8hy3xrVIZ90h7y4wgdQZDv9g
+	 kQwR5g1TLqRx6hH2FekTcenK1/ACu6HddVrBYcOx3RDTtYvxnHAr8Nnn+vCW5wa5cJ
+	 4/tYTH6lREcvAmqNHawO0mGVQBT3RZll9A0IXRoFmDwHsO5mUx9Mwu16zXN35tFTiF
+	 sLO04c0wcGQWg==
+Date: Tue, 23 Sep 2025 18:48:56 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Marek Mietus <mmietus97@yahoo.com>
+Cc: netdev@vger.kernel.org, sd@queasysnail.net, antonio@openvpn.net,
+ openvpn-devel@lists.sourceforge.net
+Subject: Re: [PATCH net-next v3 0/3] net: tunnel: introduce noref xmit flows
+ for tunnels
+Message-ID: <20250923184856.6cce6530@kernel.org>
+In-Reply-To: <20250922110622.10368-1-mmietus97@yahoo.com>
+References: <20250922110622.10368-1-mmietus97.ref@yahoo.com>
+	<20250922110622.10368-1-mmietus97@yahoo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v7 0/8] Add kfunc bpf_xdp_pull_data
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
- paul.chaignon@gmail.com, kuba@kernel.org, stfomichev@gmail.com,
- martin.lau@kernel.org, mohsin.bashr@gmail.com, noren@nvidia.com,
- dtatulea@nvidia.com, saeedm@nvidia.com, tariqt@nvidia.com,
- mbloch@nvidia.com, maciej.fijalkowski@intel.com, kernel-team@meta.com
-References: <20250922233356.3356453-1-ameryhung@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20250922233356.3356453-1-ameryhung@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 9/22/25 4:33 PM, Amery Hung wrote:
->    bpf: Clear pfmemalloc flag when freeing all fragments
->    bpf: Allow bpf_xdp_shrink_data to shrink a frag from head and tail
->    bpf: Support pulling non-linear xdp data
->    bpf: Clear packet pointers after changing packet data in kfuncs
+On Mon, 22 Sep 2025 13:06:19 +0200 Marek Mietus wrote:
+> This patchset introduces new noref xmit helpers and incorporates
+> them in the OpenVPN driver. A similar improvement can also be
+> applied to other tunnel code in the future. The implementation
+> for OpenVPN is a good starting point as it doesn't use the
+> udp_tunnel_dst_lookup helper which adds some complexity.
 
-Please follow up with a selftest for this change. For global func, there is an 
-example in commit 3f23ee5590d9.
+You're basically refactoring an API, it's fairly unusual to leave both
+APIs in place upstream. Unless the number of callers is really huge,
+say >100, or complexity very high. Not sure how others feel but IMHO
+you should try to convert all the tunnels.
 
->    bpf: Make variables in bpf_prog_test_run_xdp less confusing
+> There are already noref optimizations in both ipv4 and ip6 
+> (See __ip_queue_xmit, inet6_csk_xmit). This patchset allows for
+> similar optimizations in udp tunnels. Referencing the dst_entry
+> is now redundant, as the entire flow is protected under RCU, so
+> it is removed.
+> 
+> With this patchset, I was able to observe a 4% decrease in the total
+> time for ovpn_udp_send_skb using perf.
 
-This makes the code easier to reason. Thanks. Applied.
+Please provide more meaningful perf wins. Relative change of perf in
+one function doesn't tell use.. well.. anything.
 
->    bpf: Support specifying linear xdp packet data size for
->      BPF_PROG_TEST_RUN
->    selftests/bpf: Test bpf_xdp_pull_data
->    selftests: drv-net: Pull data before parsing headers
+Please do not remove the diff stat generated by git in the cover
+letter.
 
 
