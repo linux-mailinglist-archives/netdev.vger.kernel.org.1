@@ -1,73 +1,96 @@
-Return-Path: <netdev+bounces-226075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DE99B9BB9B
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 21:34:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FBD7B9BC35
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 21:50:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A0727A81AA
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:32:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 732D21896631
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A53726D4C6;
-	Wed, 24 Sep 2025 19:34:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F0524DCE2;
+	Wed, 24 Sep 2025 19:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cQavH0yQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZKaEv6a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95F726D4DF
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 19:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9596821FF46
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 19:50:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758742460; cv=none; b=pxIx6lzJDMtn80Ktu06CZpUJtnlxSke9W+UrgglAYcRiXEpXbwnYZZYyZdr21HOQ1j33HhtMWKuAxR89LiE1G3YBql9mdYLg4H059kZd0M4lPvkS3ydvm3C8CrI4sLH1MWvT0L/hkE9jbQuX/nstsPHlhHZD1ZDryGdFs0kSDWg=
+	t=1758743403; cv=none; b=C+D54esjhRHNcEveBA2gbILcxnzjQ4wqrrcAFRAM9WZTSNS8ZyhSlARFNC07wtJBzX9ZbZdggJC9QhMZJuaRuQca42bq6tgUVq7bBhMQJw0e6vhXX7vYP5Ch40EpP30Fqha8dZqk/R7rAC3hf94QNJ7i3gcErPnU6IuDqUWXhsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758742460; c=relaxed/simple;
-	bh=OQZkpxpeoeidb0N4ZGignANHuxeM1au7IE8DrNG1Rm8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k3mYTpAcY+7xg87VixG8oWwuc0Q+dT2xvipGcoqT7Xp7ou/Oce9/rQRuMvlMYVjV8KwZ7OcBaVcoCAtRKypOA5JrXasAitDyIOKN/DYecAG1eHbNo+r+mRrgXUvZL8zD+Pmawmo1EuyB3FB0kQocoBiH6UO5Q4VrCLKPUr5EuDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=cQavH0yQ; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58OIuCnW002028;
-	Wed, 24 Sep 2025 19:34:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=m81IE41gRb+fvCv3Pvhwo5nSPB6TA
-	A2+GNoh0QIDkkM=; b=cQavH0yQybtSvGhpFXGBK6FIAIPnOmqJav8Rz+hDC9ZmW
-	9DY5rztIQmPmB3HOzEJF7swbIon8JL7YNCGl5LBC1kWIZoL5i4Up6fGV+6Wi/Val
-	iuo8MlFe10eQUQmxlXDlzcrD/2Bo01tre5OSx+2bGgO9GhzHjsta8sZdNB+7X0r3
-	x8pyihkILvODUEjMgZO3goJvnsJQVvyu+8KzYPTQqKotkeTlPemntcNhgv5i5vtM
-	vsUXvfnFs1Vtxx7WaazHIAdosyBp7YbJNCE35ijJlqwr+jW7hWriy4CJTSqpXKgb
-	zNApZDd+/Dpg+FKW2TqVsEUQ10NU8oMudhtl523dw==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 499k6b0g32-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 24 Sep 2025 19:34:08 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 58OJ6NWi014991;
-	Wed, 24 Sep 2025 19:34:07 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 49a9515v7k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 24 Sep 2025 19:34:07 +0000
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 58OJUH2L003662;
-	Wed, 24 Sep 2025 19:34:06 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 49a9515v6d-1;
-	Wed, 24 Sep 2025 19:34:06 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-        netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
-Cc: alok.a.tiwari@oracle.com
-Subject: [PATCH net-next] ixgbe: avoid redundant call to ixgbe_non_sfp_link_config()
-Date: Wed, 24 Sep 2025 12:33:54 -0700
-Message-ID: <20250924193403.360122-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1758743403; c=relaxed/simple;
+	bh=r753Y7v/HnEGHLVGshS1GkoSFLsdz0vXtz21Blb7cnc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UOdhoR7jmnICcJ7NXV6tbW/AmfYBM6Jzwp6dVKteM5WlVoTenQdUFgAje54OA9svdXtXFJ6uUxOA+hrpCTAH8LwPfWSI9Ix3kDdgV8XdBk8ZUaH/NFHExuR0sESIY9WZZg/fye68quZWL5zswtYE3qKI1AzhrcXdyU00ckc6r88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eZKaEv6a; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-71d601859f5so2574747b3.0
+        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 12:50:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758743400; x=1759348200; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tEUEgN71ZA4sRB5scDQfC5Em06mqQDj4FFf+ugAG1cg=;
+        b=eZKaEv6aWRL5tWAKIMCS/Y+/Sz0DJtXrdDTPFyb+fJgZbAuk+ieR2lD5M9gbSFC3/h
+         xjeRCshV6hQMOsGEggc3BhyEk1kpKkd6TRvyFrqfP6k5x0udskCYxDfCF8v+1U2e2t5f
+         G1MWJRbxS8luDzalXcBt6NPmX8UeM8pLipAjYd83xDARVfmPmL9MCHVhMSKDXaauhv3C
+         5gvh6nlcEVuS6tTNKsCENDCEWQjrSB1yUY8cbn5z5wYEsANmqkBj/meEL2Z5eoh6i/ul
+         gaagSnBpzUlO6+sS7F0vDGEAYxj4A+eOrBkmT0z2moE0aGllp3BSzjC2pQ2pjO/U4B2W
+         JSsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758743400; x=1759348200;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tEUEgN71ZA4sRB5scDQfC5Em06mqQDj4FFf+ugAG1cg=;
+        b=bPOFewsH32RmU72smE0GGczMLv4kX8H2fE2dFUDKLNU7X1vInf0lnpluc4hsMTwIGv
+         OChUJXf9l/pjN7AN1xbwNmYOIvxGZdRPTRHeGFonEPRbiESmBJGkwvdKdftC09SvmwIr
+         o7FXfxpU2J1z5HMTd1ki1dakw/u51LPSs+P7cdL2Cffjq5HaKifjIM0S27p5n5Yc/4pb
+         BoBwAFv0j3Ea0gAXM914JhTS01Es2QqudvMm+5icUM6AzOhoW/RgAhUqCQxvOtQbkUhp
+         nX63H26DUEktW36twet+uqWLklukN1LPHKxXcD+3OCoX1axwycOGrJ+qvpKZ+gHAooRp
+         q6Iw==
+X-Forwarded-Encrypted: i=1; AJvYcCUJbKDAe5koVLHw6OjkaceMWLcfhc1G7hJjUgK+S39Utqo/ZY+PLXq3Dor144hEUCFdI5sOuqg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcNAfWofoc/vohq+6dzRYSdjbJ8p1u07/Q7cIn7sOf526g8OF1
+	Zq0Xhzfb96bnUWf8hvLryYSscH/nwDo6VkJwyv9sV1sQM361s/Tex5nr
+X-Gm-Gg: ASbGncuHzppqcoYqBcJXzYezC7rCDSH7gsNJVMAlrokxQ6KC/AjFgM0Y4d1lkVXXj/S
+	sAEfD4/6weNqhlR+4B0rEzXkom5JGwBXJlq0SwtLDzvD20NTTE1scqTjQAtOahp5nij6J5H1P99
+	gFhLIKjxZu4Qh2f5ZlfltsJQJgSQm/VZFe+UaX+JXc2gAlpc4GmekY9qAw3hMB17//dVzd1pHC0
+	7ItlSbpOcTXVNT9Iir2nCTfIWLN7yIH8jP4dgFFgsGevwjkcZ8wd+JwkJhJNuajgXGzM9mPof50
+	sTbirBwQTDtl4T6zqFlE3ewWmqsxjIwP3w5WhDxqEEopthsuM07zZJeG8TE2EbqIkKlPe8snzRT
+	YPY3bdC/N65VV3fRzGgw=
+X-Google-Smtp-Source: AGHT+IH/DaSMfQgo68HIXNoVMs0zIgKNlfrwiGAY7uGng6ZQ2VLl12YiYDT45M+Tk52gspgj9NQB2g==
+X-Received: by 2002:a05:690c:3609:b0:723:adfc:5a4a with SMTP id 00721157ae682-764018539d0mr11110757b3.33.1758743400463;
+        Wed, 24 Sep 2025 12:50:00 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:9::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-739716e7b26sm50822847b3.16.2025.09.24.12.49.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Sep 2025 12:50:00 -0700 (PDT)
+From: Daniel Zahka <daniel.zahka@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>
+Cc: Willem de Bruijn <willemb@google.com>,
+	Breno Leitao <leitao@debian.org>,
+	Petr Machata <petrm@nvidia.com>,
+	Yuyang Huang <yuyanghuang@google.com>,
+	Xiao Liang <shaw.leon@gmail.com>,
+	Carolina Jubran <cjubran@nvidia.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next 0/9] psp: add a kselftest suite and netdevsim implementation.
+Date: Wed, 24 Sep 2025 12:49:46 -0700
+Message-ID: <20250924194959.2845473-1-daniel.zahka@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,64 +98,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-24_06,2025-09-24_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
- bulkscore=0 phishscore=0 suspectscore=0 spamscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2508110000 definitions=main-2509240171
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDAxNyBTYWx0ZWRfXxYbteJMbvrFm
- KEVraSYjE6FUVeU7PUpItSF5jv3drqS3Z/bDs7GI21uSSELcfPiXy8Im98SDE9zo+acRKwjtRBu
- s9tFtczxtgyyVmb/m51r8O8mMod9omyG6TzZrcmdCfNzbT2dx0zbgJD1pG+fyD6xYFbhVv7p5ku
- X4vrQNjhfd1uD60ZjyDW2xHWcEcfISQcFgzIfloQUSIIXY4rxJdZsKqr5e8REK/OAlgDvA4OecB
- 7zncPM374CNkRF7VP8A8CVObmlcDILdrnBr91dN6kINVjdoFDoCFY0335F1m9bsQYZKnEvOPjS4
- Wgyp3atZSCAEM04FMtSd1lJzrhxitZOXoqGvs0gJgUhi+U5XpyCsJgdlVZQNYMnALMZ4/T/26W7
- 08rNqdIB4EAbuiG61o4gMgq1TiH+xw==
-X-Proofpoint-GUID: LNQ1Yeaopg5D0hS6J7mifrndKfOruwbJ
-X-Authority-Analysis: v=2.4 cv=E47Npbdl c=1 sm=1 tr=0 ts=68d447b0 b=1 cx=c_pps
- a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=xcvOPl_opqY7jcd9CMoA:9 cc=ntf
- awl=host:12090
-X-Proofpoint-ORIG-GUID: LNQ1Yeaopg5D0hS6J7mifrndKfOruwbJ
 
-ixgbe_non_sfp_link_config() is called twice in ixgbe_open()
-once to assign its return value to err and again in the
-conditional check. This patch uses the stored err value
-instead of calling the function a second time. This avoids
-redundant work and ensures consistent error reporting.
+Add a basic test suite for drivers that support PSP. Also, add a PSP
+implementation in the netdevsim driver.
 
-Also fix a small typo in the ixgbe_remove() comment:
-"The could be caused" -> "This could be caused".
+The netdevsim implementation does encapsulation and decapsulation of
+PSP packets, but no crypto.
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The tests cover the basic usage of the uapi, and demonstrate key
+exchange and connection setup. The tests and netdevsim support IPv4
+and IPv6. Here is an example run on a system with a CX7 NIC.
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 90d4e57b1c93..39ef604af3eb 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -7449,7 +7449,7 @@ int ixgbe_open(struct net_device *netdev)
- 					 adapter->hw.link.link_info.link_cfg_err);
- 
- 		err = ixgbe_non_sfp_link_config(&adapter->hw);
--		if (ixgbe_non_sfp_link_config(&adapter->hw))
-+		if (err)
- 			e_dev_err("Link setup failed, err %d.\n", err);
- 	}
- 
-@@ -12046,7 +12046,7 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
-  * @pdev: PCI device information struct
-  *
-  * ixgbe_remove is called by the PCI subsystem to alert the driver
-- * that it should release a PCI device.  The could be caused by a
-+ * that it should release a PCI device.  This could be caused by a
-  * Hot-Plug event, or because the driver is going to be removed from
-  * memory.
-  **/
+    TAP version 13
+    1..28
+    ok 1 psp.test_case # SKIP Test requires IPv4 connectivity
+    ok 2 psp.data_basic_send_v0_ip6
+    ok 3 psp.test_case # SKIP Test requires IPv4 connectivity
+    ok 4 psp.data_basic_send_v1_ip6
+    ok 5 psp.test_case # SKIP Test requires IPv4 connectivity
+    ok 6 psp.data_basic_send_v2_ip6 # SKIP ('PSP version not supported', 'hdr0-aes-gmac-128')
+    ok 7 psp.test_case # SKIP Test requires IPv4 connectivity
+    ok 8 psp.data_basic_send_v3_ip6 # SKIP ('PSP version not supported', 'hdr0-aes-gmac-256')
+    ok 9 psp.test_case # SKIP Test requires IPv4 connectivity
+    ok 10 psp.data_mss_adjust_ip6
+    ok 11 psp.dev_list_devices
+    ok 12 psp.dev_get_device
+    ok 13 psp.dev_get_device_bad
+    ok 14 psp.dev_rotate
+    ok 15 psp.dev_rotate_spi
+    ok 16 psp.assoc_basic
+    ok 17 psp.assoc_bad_dev
+    ok 18 psp.assoc_sk_only_conn
+    ok 19 psp.assoc_sk_only_mismatch
+    ok 20 psp.assoc_sk_only_mismatch_tx
+    ok 21 psp.assoc_sk_only_unconn
+    ok 22 psp.assoc_version_mismatch
+    ok 23 psp.assoc_twice
+    ok 24 psp.data_send_bad_key
+    ok 25 psp.data_send_disconnect
+    ok 26 psp.data_stale_key
+    ok 27 psp.removal_device_rx # XFAIL Test only works on netdevsim
+    ok 28 psp.removal_device_bi # XFAIL Test only works on netdevsim
+    # Totals: pass:19 fail:0 xfail:2 xpass:0 skip:7 error:0
+    # 
+    # Responder logs (0):
+    # STDERR:
+    #  Set PSP enable on device 1 to 0x3
+    #  Set PSP enable on device 1 to 0x0
+
+Daniel Zahka (1):
+  selftests: net: add skip all feature to ksft_run()
+
+Jakub Kicinski (8):
+  netdevsim: a basic test PSP implementation
+  selftests: drv-net: base device access API test
+  selftests: drv-net: add PSP responder
+  selftests: drv-net: psp: add basic data transfer and key rotation
+    tests
+  selftests: drv-net: psp: add association tests
+  selftests: drv-net: psp: add connection breaking tests
+  selftests: drv-net: psp: add test for auto-adjusting TCP MSS
+  selftests: drv-net: psp: add tests for destroying devices
+
+ drivers/net/netdevsim/Makefile                |   4 +
+ drivers/net/netdevsim/netdev.c                |  56 +-
+ drivers/net/netdevsim/netdevsim.h             |  38 ++
+ drivers/net/netdevsim/psp.c                   | 218 +++++++
+ net/core/skbuff.c                             |   1 +
+ .../testing/selftests/drivers/net/.gitignore  |   1 +
+ tools/testing/selftests/drivers/net/Makefile  |  10 +
+ tools/testing/selftests/drivers/net/config    |   1 +
+ .../drivers/net/hw/lib/py/__init__.py         |   4 +-
+ .../selftests/drivers/net/lib/py/__init__.py  |   4 +-
+ .../selftests/drivers/net/lib/py/env.py       |   5 +
+ tools/testing/selftests/drivers/net/psp.py    | 609 ++++++++++++++++++
+ .../selftests/drivers/net/psp_responder.c     | 481 ++++++++++++++
+ .../testing/selftests/net/lib/py/__init__.py  |   2 +-
+ tools/testing/selftests/net/lib/py/ksft.py    |  14 +-
+ tools/testing/selftests/net/lib/py/ynl.py     |   5 +
+ 16 files changed, 1439 insertions(+), 14 deletions(-)
+ create mode 100644 drivers/net/netdevsim/psp.c
+ create mode 100755 tools/testing/selftests/drivers/net/psp.py
+ create mode 100644 tools/testing/selftests/drivers/net/psp_responder.c
+
 -- 
-2.50.1
+2.47.3
 
 
