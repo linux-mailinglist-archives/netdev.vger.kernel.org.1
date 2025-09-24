@@ -1,158 +1,204 @@
-Return-Path: <netdev+bounces-225835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7594B98C3E
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 10:10:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06437B98DAF
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 10:26:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CB5A3ADE25
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 08:10:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F02C16C92C
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 08:26:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85C3628152A;
-	Wed, 24 Sep 2025 08:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PIaKNLU5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529892820D7;
+	Wed, 24 Sep 2025 08:22:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47E627FD64
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 08:09:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA71D284669
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 08:22:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758701401; cv=none; b=QWQD5KboFicqT3rBlcOJtWr92unn5sUaJprVCG3617LGbcFiVboyCFN0undFcfL2UUHblXKg5f8HJ12sPDw1Y2YCVQJCRVRTRUMi7bXv4bFPP1dfse/TFRpZ1v2OQL1kQVaUAoa1crG6J5zGRQa5keILgvDhLvuBnALkPDleIgA=
+	t=1758702130; cv=none; b=Hdvvn2YDdzf2cBS/illReLxiqoe9SvZWSj1MTFXY9+gGGrT1HUJJwW6r9yER7eyDoeMA7EOyuJnarCFrAZkzEElz7OWk2iijOlhpTc89ypZE1n5jowSS6dnSeCmNEBLtHJJmD23fX1j7o6CAQICxxq8CVSGg7EBnSVgWZP4T7+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758701401; c=relaxed/simple;
-	bh=iyV5w9cbgt6ZgVOTxo8iAQ4w6DBDgBjEsyMsIZQh/kU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KhBzdfVPZbJ7oBZX2x+D0cgFIm0mHGKjs8pPRNFYWrPU3yGg3/GXoBoHGOB/MYsdw4yf5kejbgKTZcMgseeazQ1XyNY8T1M3nHzBUcqttjC1IRKGaY1LIeVNcFyv2x+OoWtNFn5IEW9X7UsHNbmS/wIjCiyBknya5xWCEO/vdrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PIaKNLU5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758701398;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CkM4oXRVV4nD2vjM2JL+8uqwWZZi2+21i3PZycL5UHY=;
-	b=PIaKNLU5Anfh732lj7csOM1LaofINFbc6I4L4Oe0GG6CLB9C8aYy8BXk58JAHurJA7nNWP
-	HqudR35Cf7km8ENtqyDtRUw6+emaVNuTrKURA8aXlGY7FqamhM1csDAh6Uv2LTA1mH0Mli
-	hgCYyNIqyuO/+9/NsU8MY8F0v83yinY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-686-MNrJ1tNRNqyCAwUF3fKeQA-1; Wed, 24 Sep 2025 04:09:56 -0400
-X-MC-Unique: MNrJ1tNRNqyCAwUF3fKeQA-1
-X-Mimecast-MFC-AGG-ID: MNrJ1tNRNqyCAwUF3fKeQA_1758701395
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45b990eb77cso4376805e9.0
-        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 01:09:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758701395; x=1759306195;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CkM4oXRVV4nD2vjM2JL+8uqwWZZi2+21i3PZycL5UHY=;
-        b=Rzab+ECYu0ntI/JRKF6hl082r7IIbivHG3OqJOtq+b+hklAtmHUD4AndWAhtMeMUy/
-         mO5eqfLUDr++M+eOefOFufCe+pj3a6+2mQursr2Itrkmw5W21GOb44QX22LZuEkt/ICB
-         m0MpmZB3BblcUXbg1p/YWIeaP3oymRiyDnA964XtOgadUUknYZidqP3r7VYQfHDPPiYY
-         3c5HyvvwMVyGKZA6cpPfqdU3TaC0pS5oamxO+FABUu0+JpsOSS0Te53s0A13sNfGPJEH
-         r8nVPd5dCkAgvyuVN70lOACCliYJxJjE/ul9mIL/uaWcDWQDywrEA7ffkx37Ueui7mo6
-         owWw==
-X-Forwarded-Encrypted: i=1; AJvYcCV4iMG7XVadFmsCXMKZXvzH9sYdnb2IS/sJT6wCTy21kpVMBhYjCb3IW8Pm1mpZ/OcKAcdh8KI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3SkQbeMQ9aH9xA2Ge3w8qolBYVcKwZ0U3F+U1XCu4ya3xV82G
-	1YIGdQCb4Q8P7+H4B98jHGK5kIqVVyqmHiafELlA0vYLUByaDhhQDJD3JuohNsY8PqShfIuLVqG
-	+UAQVaw50gbiSO37Va5/tGhTMzQvVCBG8RlSrvwxEPU1fmkaf4X346UryPw==
-X-Gm-Gg: ASbGnctmPyS9E49LhIpLcg3AFmz+L2FLJDud0ThRGktUCOIEdSnLURf1756lTl2ROW2
-	0YkblaJwfg/HW2rMT12mWYpw2zjC+q93YCfOOlcWg7uJ5YT9zkJ0nbhejiVB4pwopSF0cMoA7Ed
-	MhUwtlESxOgqG2MpimBRnlUHyGqGpbdyfkCCx+vUbzllxOCzVA954GLTp8hRcZCGHLvXcd5M4tp
-	4UfatjUTxAoQ2B5a4UOfhAhBTn7pOHmxZMk83SjCYrwFr0CAD3AmtiSDRNMjHhnOSuft3kVtfGE
-	EoQSYdltQ7uWXpJcqxxhKTa5nkiHFKT7jv8=
-X-Received: by 2002:a05:600c:540b:b0:46e:28cc:e56f with SMTP id 5b1f17b1804b1-46e2b539770mr14433315e9.6.1758701395314;
-        Wed, 24 Sep 2025 01:09:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG2isQpxZ6pAJzr2vpEkZfoKb5tx8a+WdsYfEl5CDZPv35AgMoMJYvNF0tcDqDtm8H3UIV5Gg==
-X-Received: by 2002:a05:600c:540b:b0:46e:28cc:e56f with SMTP id 5b1f17b1804b1-46e2b539770mr14432985e9.6.1758701394926;
-        Wed, 24 Sep 2025 01:09:54 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e2ab31bdesm20213965e9.11.2025.09.24.01.09.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Sep 2025 01:09:54 -0700 (PDT)
-Date: Wed, 24 Sep 2025 04:09:51 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Simon Schippers <simon.schippers@tu-dortmund.de>,
-	willemdebruijn.kernel@gmail.com, eperezma@redhat.com,
-	stephen@networkplumber.org, leiyang@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [PATCH net-next v5 0/8] TUN/TAP & vhost_net: netdev queue flow
- control to avoid ptr_ring tail drop
-Message-ID: <20250924040915-mutt-send-email-mst@kernel.org>
-References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
- <20250924031105-mutt-send-email-mst@kernel.org>
- <CACGkMEuriTgw4+bFPiPU-1ptipt-WKvHdavM53ANwkr=iSvYYg@mail.gmail.com>
- <20250924034112-mutt-send-email-mst@kernel.org>
- <CACGkMEtdQ8j0AXttjLyPNSKq9-s0tSJPzRtKcWhXTF3M_PkVLQ@mail.gmail.com>
+	s=arc-20240116; t=1758702130; c=relaxed/simple;
+	bh=L5UUEsLHMksXyWvD69JUm67UHcD7qiLJ4bcv0bnG2/M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ezTZgbJU5mf3akJQ1i9PWqweAC84JCWONPleuAe4G4MrrQxawVOEkG8DahzT5oCCymuHGZoByjFo6hrZm3WR3XgpNBUkJakIgjpoq16yQA3xr8LfOgfbg73AJjtHtIrU/3vMtfVUNrDBiejqadSoRy41i8BMLMyScDIwShhUQwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.254.200.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: zesmtpsz8t1758702104tf0345847
+X-QQ-Originating-IP: tOMHaifYukaA/lKfy+n5vWqYB4TnXq23JWbJtce3xgo=
+Received: from localhost.localdomain ( [115.220.236.115])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 24 Sep 2025 16:21:42 +0800 (CST)
+X-QQ-SSF: 0001000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 15422174651440948574
+EX-QQ-RecipientCnt: 5
+From: Mengyuan Lou <mengyuanlou@net-swift.com>
+To: netdev@vger.kernel.org
+Cc: jiawenwu@trustnetic.com,
+	duanqiangwen@net-swift.com,
+	linglingzhang@trustnetic.com,
+	Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: [PATCH net-next] Wangxun: vf: Implement some ethtool apis for get_xxx
+Date: Wed, 24 Sep 2025 16:21:40 +0800
+Message-Id: <20250924082140.41612-1-mengyuanlou@net-swift.com>
+X-Mailer: git-send-email 2.30.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEtdQ8j0AXttjLyPNSKq9-s0tSJPzRtKcWhXTF3M_PkVLQ@mail.gmail.com>
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: MpEJ4rE15GTAnvrb8N0uggqMGoh+jLdoTPgxF2TWq7nJKdFHOVJuivDe
+	YiqWFuUymL53Fr8i9558AbFrnzGmox4w93x4qYZ89Iq6BsH4+X2O8EdBYCQtwaO2QNXs4Da
+	p9nfAkjoAVYvYjAg6mlTXTp9FcpiaXOsUyVlYCwUDz7uEGnyKrDKIoB5lLshd5f6paItEQy
+	uEycnOUb4tjY9ZI8O+XzJZYx4+2HC1JZrmzpUXYcMzajsnFBBlUVHiiDXAUQ6XitgOjMRY0
+	z9+jHLZT8XPEnEjLwikHrOz4LePFq5JFcGmmEC2Dm/+cQI8ukFpgnl2ImSZKTEIO/DblhVh
+	Qm2u6BHFoD9ezxt/ZFsNyirK0Mw/UnqlOoybG24Mrbmih/METelJyDxHuuUYeYLYekJ9TN6
+	eRdy3UTLopso/M+V6xwNIETj/rNgZpNbqKp0LEZ6FD4OTGP9kFebOgi3EbXOOwhJIKsSLbo
+	tpO1qsmR2dFx6PcFCcxPtCs6LhDxnZBZrU19X+YoWjOm1GZ/tAaxD5yS8ohoZidRaMmJAUo
+	Nmdew8C5FugRglW+9jewzxm3/9tltTYoYE82PnebFzCiuKAd7ME0Dbl78laZB9ESDoYNHI/
+	IzYOwYxijp3+pecFAvwyj+Z+TrjKI5Z9g97y0lnakScvoIWtDtZG+MxvHwxrt0EAFHZuVcS
+	K8pq9qwf4Ii0PqFiqbnjkVDIAhXOq+mrhJAe8gqGTluHo3VQ4nzoAl1VS2IrNnSzvxFDKYb
+	AymeSjUy0duJQPxM73WLr783XqBTK5/lhviSqwWvh8jFoo53warKuCpFGKUbsIRV/PiqPJg
+	5y0YvNyN0BPK7kZIxu0v04A3lO5LzyK2KdpmkpLnoays5/XmUXwFhCTxjH+zhw41xokRGPQ
+	76LwjH6ACoUlS2S6d1+8qlLNJWcZM+i7s84AqFDR7at0jZ/AMVsopWfIAjDbeKvIibfoH1g
+	oBChM6fCmxG5e10g0u7izCgrX2sQlQT1sTcIl6d/rmFINOQRRr96x9ixN1Ebm4sGo36nx39
+	BQcrkOx1xjh0fwS0nb/JXMWigHQJwooPVzqYco4AGb9PKiPwIE/ztmhmcaDCXoCuKTqBsMt
+	gtyWmBom79HD6poZlHspIDUOjA4YuAMgVOm16f3V9ANkqUWr6bLkAhP8c3GTocB2Eot/L46
+	WUD7rND4rewLdnjtVUQfUJbn9A==
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+X-QQ-RECHKSPAM: 0
 
-On Wed, Sep 24, 2025 at 04:08:33PM +0800, Jason Wang wrote:
-> On Wed, Sep 24, 2025 at 3:42 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Wed, Sep 24, 2025 at 03:33:08PM +0800, Jason Wang wrote:
-> > > On Wed, Sep 24, 2025 at 3:18 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > >
-> > > > On Tue, Sep 23, 2025 at 12:15:45AM +0200, Simon Schippers wrote:
-> > > > > This patch series deals with TUN, TAP and vhost_net which drop incoming
-> > > > > SKBs whenever their internal ptr_ring buffer is full. Instead, with this
-> > > > > patch series, the associated netdev queue is stopped before this happens.
-> > > > > This allows the connected qdisc to function correctly as reported by [1]
-> > > > > and improves application-layer performance, see our paper [2]. Meanwhile
-> > > > > the theoretical performance differs only slightly:
-> > > >
-> > > >
-> > > > About this whole approach.
-> > > > What if userspace is not consuming packets?
-> > > > Won't the watchdog warnings appear?
-> > > > Is it safe to allow userspace to block a tx queue
-> > > > indefinitely?
-> > >
-> > > I think it's safe as it's a userspace device, there's no way to
-> > > guarantee the userspace can process the packet in time (so no watchdog
-> > > for TUN).
-> > >
-> > > Thanks
-> >
-> > Hmm. Anyway, I guess if we ever want to enable timeout for tun,
-> > we can worry about it then.
-> 
-> The problem is that the skb is freed until userspace calls recvmsg(),
-> so it would be tricky to implement a watchdog. (Or if we can do, we
-> can do BQL as well).
+Implement some ethtool interfaces for obtaining the status of
+Wangxun Virtual Function Ethernet.
+Just like connection status, version information, queue depth and so on.
 
-I thought the watchdog generally watches queues not individual skbs?
+Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+---
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 33 +++++++++++++++++++
+ .../net/ethernet/wangxun/libwx/wx_ethtool.h   |  1 +
+ .../net/ethernet/wangxun/ngbevf/ngbevf_main.c |  4 +++
+ .../ethernet/wangxun/txgbevf/txgbevf_main.c   |  4 +++
+ 4 files changed, 42 insertions(+)
 
-> > Does not need to block this patchset.
-> 
-> Yes.
-> 
-> Thanks
-> 
-> >
-> > > >
-> > > > --
-> > > > MST
-> > > >
-> >
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+index 9572b9f28e59..1a9b7bfbd1d2 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+@@ -546,3 +546,36 @@ void wx_get_ptp_stats(struct net_device *dev,
+ 	}
+ }
+ EXPORT_SYMBOL(wx_get_ptp_stats);
++
++static int wx_get_link_ksettings_vf(struct net_device *netdev,
++				    struct ethtool_link_ksettings *cmd)
++{
++	struct wx *wx = netdev_priv(netdev);
++
++	ethtool_link_ksettings_zero_link_mode(cmd, supported);
++	cmd->base.autoneg = AUTONEG_DISABLE;
++	cmd->base.port = PORT_NONE;
++	cmd->base.duplex = DUPLEX_FULL;
++	cmd->base.speed = wx->speed;
++
++	return 0;
++}
++
++static const struct ethtool_ops wx_ethtool_ops_vf = {
++	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
++				     ETHTOOL_COALESCE_TX_MAX_FRAMES_IRQ |
++				     ETHTOOL_COALESCE_USE_ADAPTIVE,
++	.get_drvinfo		= wx_get_drvinfo,
++	.get_link		= ethtool_op_get_link,
++	.get_ringparam		= wx_get_ringparam,
++	.get_msglevel		= wx_get_msglevel,
++	.get_coalesce		= wx_get_coalesce,
++	.get_ts_info		= ethtool_op_get_ts_info,
++	.get_link_ksettings	= wx_get_link_ksettings_vf,
++};
++
++void wx_set_ethtool_ops_vf(struct net_device *netdev)
++{
++	netdev->ethtool_ops = &wx_ethtool_ops_vf;
++}
++EXPORT_SYMBOL(wx_set_ethtool_ops_vf);
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
+index 9e002e699eca..073f1149a578 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
+@@ -44,4 +44,5 @@ int wx_get_ts_info(struct net_device *dev,
+ 		   struct kernel_ethtool_ts_info *info);
+ void wx_get_ptp_stats(struct net_device *dev,
+ 		      struct ethtool_ts_stats *ts_stats);
++void wx_set_ethtool_ops_vf(struct net_device *netdev);
+ #endif /* _WX_ETHTOOL_H_ */
+diff --git a/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c b/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
+index 5f9ddb5e5403..6ef43adcc425 100644
+--- a/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
++++ b/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
+@@ -14,6 +14,7 @@
+ #include "../libwx/wx_mbx.h"
+ #include "../libwx/wx_vf.h"
+ #include "../libwx/wx_vf_common.h"
++#include "../libwx/wx_ethtool.h"
+ #include "ngbevf_type.h"
+ 
+ /* ngbevf_pci_tbl - PCI Device ID Table
+@@ -186,6 +187,8 @@ static int ngbevf_probe(struct pci_dev *pdev,
+ 		goto err_pci_release_regions;
+ 	}
+ 
++	wx->driver_name = KBUILD_MODNAME;
++	wx_set_ethtool_ops_vf(netdev);
+ 	netdev->netdev_ops = &ngbevf_netdev_ops;
+ 
+ 	/* setup the private structure */
+@@ -203,6 +206,7 @@ static int ngbevf_probe(struct pci_dev *pdev,
+ 	if (err)
+ 		goto err_free_sw_init;
+ 
++	wx_get_fw_version_vf(wx);
+ 	err = register_netdev(netdev);
+ 	if (err)
+ 		goto err_register;
+diff --git a/drivers/net/ethernet/wangxun/txgbevf/txgbevf_main.c b/drivers/net/ethernet/wangxun/txgbevf/txgbevf_main.c
+index 3755bb399f71..72663e3c4205 100644
+--- a/drivers/net/ethernet/wangxun/txgbevf/txgbevf_main.c
++++ b/drivers/net/ethernet/wangxun/txgbevf/txgbevf_main.c
+@@ -14,6 +14,7 @@
+ #include "../libwx/wx_mbx.h"
+ #include "../libwx/wx_vf.h"
+ #include "../libwx/wx_vf_common.h"
++#include "../libwx/wx_ethtool.h"
+ #include "txgbevf_type.h"
+ 
+ /* txgbevf_pci_tbl - PCI Device ID Table
+@@ -239,6 +240,8 @@ static int txgbevf_probe(struct pci_dev *pdev,
+ 		goto err_pci_release_regions;
+ 	}
+ 
++	wx->driver_name = KBUILD_MODNAME;
++	wx_set_ethtool_ops_vf(netdev);
+ 	netdev->netdev_ops = &txgbevf_netdev_ops;
+ 
+ 	/* setup the private structure */
+@@ -256,6 +259,7 @@ static int txgbevf_probe(struct pci_dev *pdev,
+ 	if (err)
+ 		goto err_free_sw_init;
+ 
++	wx_get_fw_version_vf(wx);
+ 	err = register_netdev(netdev);
+ 	if (err)
+ 		goto err_register;
+-- 
+2.30.1
 
 
