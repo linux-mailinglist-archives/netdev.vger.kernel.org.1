@@ -1,117 +1,152 @@
-Return-Path: <netdev+bounces-225934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64347B99914
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 13:24:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92F62B99920
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 13:27:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 261983A32B3
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 11:24:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CB104A6BAF
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 11:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19EB92E62A4;
-	Wed, 24 Sep 2025 11:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 933642E62A8;
+	Wed, 24 Sep 2025 11:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aw451M62"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="rpEn9uZ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from forward103b.mail.yandex.net (forward103b.mail.yandex.net [178.154.239.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04E922541B;
-	Wed, 24 Sep 2025 11:24:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37EF92877DB
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 11:27:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758713053; cv=none; b=kNlk7to7gwMz5FeYKNOeXkwYimV6H8blHcCGWp9TI+4LJc4eyZvOvud7Vb2XpEXBFOQGD7HJmdoTQnJ94s+gfJG1UKH+9utv4uXerUcSujNvKfWL9RER2NUo6Ke2dZtJ5KvP9iq/BZyK+LiFM1x6C0sIevB5YJUWo96ACXSWlw8=
+	t=1758713229; cv=none; b=XG2eLlO67jh4U6+Dbrphw5qZkbuv4mv9F5MvP+SZILTiCJrNapxDCYEdZ1sq/5zathv2saU8QCOUFfy8n41idki0jKoxhnVpF2EuKVOUu7o5yH6OdQ1WtqnmKwUBvHZSSlM/kmREBvl7KoFgHcItXYJxPtVRy6gZO2RtM2hRQGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758713053; c=relaxed/simple;
-	bh=l60f/RSTs+a+EhA0GxHhEjYraeSuVIk+FgKQ8Yud31E=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=pSYtWKRXmIlzTOqet18ECydc9qKHiqlZ5Vo8qBv+GFzFQVTY+zLcxWL6JxBVeRoDff18Et2vfpSRfYqBBIaIfPN+HsOAmuB7SsINX+sOgNukogXoG9xrDBHDlKCZHz3dD93eygVfT4lVZn+7yaM7DIrDBypl7hPWveTxGePPeLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aw451M62; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34365C4CEE7;
-	Wed, 24 Sep 2025 11:24:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758713052;
-	bh=l60f/RSTs+a+EhA0GxHhEjYraeSuVIk+FgKQ8Yud31E=;
-	h=Date:From:To:Cc:Subject:From;
-	b=aw451M62zUz5uFAP2OeKJCYKWEpB1Ofo636npyROCuXiY44Yceh/+bLA1p1N6uE28
-	 1Xgfoq1tK4csqrMEhmIBSuUMiBZJCklwJrzialVIeo7pdjHe3qSlmkP6sJKrltckBt
-	 yg03m3U+mfg3f4Rhg9boiqtKe3YpiiTzaI/K1eFJ3MxgMXsNJPxnxjFCg1pqjtFA2f
-	 NdtMKdBnzwQNjtdLLDwh1D5cE2x9dMDbc+IPL660Y/sY9ZvVmNF6u7vZjPfUHi0EP6
-	 +mw5n8wDsDKhz+9Tm9BbL+6dZsZzT458XYwxSZTk0ykfMvJyENgyz6guh0GhGOLM8V
-	 vDldMAsR/o0bg==
-Date: Wed, 24 Sep 2025 13:24:06 +0200
-From: Mark Brown <broonie@kernel.org>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Networking <netdev@vger.kernel.org>
-Cc: Chen Yufeng <chenyufeng@iie.ac.cn>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Marco Crivellari <marco.crivellari@suse.com>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <aNPU1h6hQ7DAC2KO@finisterre.sirena.org.uk>
+	s=arc-20240116; t=1758713229; c=relaxed/simple;
+	bh=l8PfmgmKzULt1MqCLozX2AbvzYApxqUllq3ODQdvuuk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p4oCBAdlpWy+jagWypswt4V0SyK2u8E8MQPWVCHzHdkIFxl1jnFj2jAYYYMNXswUNfsPeUQPtaYfrkei6g3cN0f3txhiOCJrKWnYQDTOoJVEglU15wkgr9JvNOEdlSpx7H99VjO3FIbESd8EUrzdB2E/A/Xa/o/i8Kvap3aQhiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=rpEn9uZ0; arc=none smtp.client-ip=178.154.239.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-63.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-63.sas.yp-c.yandex.net [IPv6:2a02:6b8:c37:8120:0:640:c15b:0])
+	by forward103b.mail.yandex.net (Yandex) with ESMTPS id ADBAEC03A9;
+	Wed, 24 Sep 2025 14:26:52 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-63.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id oQWosmLMoSw0-FiWtxGJk;
+	Wed, 24 Sep 2025 14:26:52 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1758713212; bh=8k0GITqOudCcgEjF/5ZMyaMFBR/KHg74OmR0Ii2Zx1g=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=rpEn9uZ0dr3WXkknTl45q3hnUDSLhUTYSiYfhCs/K+CUT1P0flY8woYCDPe+eumXq
+	 jaJYViXjif63ORH8I1s0p2JgXfhlY+HnUqK1R2XBg2Isuz7eHhtNUdWnkr9LTxQ/Q6
+	 YO91P+6DfE2umTJEGBNMqoH+TXZ9Usmvs/E13lC4=
+Authentication-Results: mail-nwsmtp-smtp-production-main-63.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Jon Maloy <jmaloy@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Tung Quang Nguyen <tung.quang.nguyen@est.tech>,
+	tipc-discussion@lists.sourceforge.net,
+	netdev@vger.kernel.org,
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH v2 net-next] tipc: adjust tipc_nodeid2string() to return string length
+Date: Wed, 24 Sep 2025 14:26:49 +0300
+Message-ID: <20250924112649.1371695-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="PowpCBnIW/R5W19f"
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
+Since the value returned by 'tipc_nodeid2string()' is not used, the
+function may be adjusted to return the length of the result, which
+is helpful to drop a few calls to 'strlen()' in 'tipc_link_create()'
+and 'tipc_link_bc_create()'. Compile tested only.
 
---PowpCBnIW/R5W19f
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+---
+v2: adjusted to target net-next (Tung Quang Nguyen)
+---
+ net/tipc/addr.c | 6 +++---
+ net/tipc/addr.h | 2 +-
+ net/tipc/link.c | 9 +++------
+ 3 files changed, 7 insertions(+), 10 deletions(-)
 
-Hi all,
+diff --git a/net/tipc/addr.c b/net/tipc/addr.c
+index fd0796269eed..6f5c54cbf8d9 100644
+--- a/net/tipc/addr.c
++++ b/net/tipc/addr.c
+@@ -79,7 +79,7 @@ void tipc_set_node_addr(struct net *net, u32 addr)
+ 	pr_info("Node number set to %u\n", addr);
+ }
+ 
+-char *tipc_nodeid2string(char *str, u8 *id)
++int tipc_nodeid2string(char *str, u8 *id)
+ {
+ 	int i;
+ 	u8 c;
+@@ -109,7 +109,7 @@ char *tipc_nodeid2string(char *str, u8 *id)
+ 	if (i == NODE_ID_LEN) {
+ 		memcpy(str, id, NODE_ID_LEN);
+ 		str[NODE_ID_LEN] = 0;
+-		return str;
++		return i;
+ 	}
+ 
+ 	/* Translate to hex string */
+@@ -120,5 +120,5 @@ char *tipc_nodeid2string(char *str, u8 *id)
+ 	for (i = NODE_ID_STR_LEN - 2; str[i] == '0'; i--)
+ 		str[i] = 0;
+ 
+-	return str;
++	return i + 1;
+ }
+diff --git a/net/tipc/addr.h b/net/tipc/addr.h
+index 93f82398283d..a113cf7e1f89 100644
+--- a/net/tipc/addr.h
++++ b/net/tipc/addr.h
+@@ -130,6 +130,6 @@ static inline int in_own_node(struct net *net, u32 addr)
+ bool tipc_in_scope(bool legacy_format, u32 domain, u32 addr);
+ void tipc_set_node_id(struct net *net, u8 *id);
+ void tipc_set_node_addr(struct net *net, u32 addr);
+-char *tipc_nodeid2string(char *str, u8 *id);
++int tipc_nodeid2string(char *str, u8 *id);
+ 
+ #endif
+diff --git a/net/tipc/link.c b/net/tipc/link.c
+index 3ee44d731700..e61872b5b2b3 100644
+--- a/net/tipc/link.c
++++ b/net/tipc/link.c
+@@ -495,11 +495,9 @@ bool tipc_link_create(struct net *net, char *if_name, int bearer_id,
+ 
+ 	/* Set link name for unicast links only */
+ 	if (peer_id) {
+-		tipc_nodeid2string(self_str, tipc_own_id(net));
+-		if (strlen(self_str) > 16)
++		if (tipc_nodeid2string(self_str, tipc_own_id(net)) > 16)
+ 			sprintf(self_str, "%x", self);
+-		tipc_nodeid2string(peer_str, peer_id);
+-		if (strlen(peer_str) > 16)
++		if (tipc_nodeid2string(peer_str, peer_id) > 16)
+ 			sprintf(peer_str, "%x", peer);
+ 	}
+ 	/* Peer i/f name will be completed by reset/activate message */
+@@ -570,8 +568,7 @@ bool tipc_link_bc_create(struct net *net, u32 ownnode, u32 peer, u8 *peer_id,
+ 	if (peer_id) {
+ 		char peer_str[NODE_ID_STR_LEN] = {0,};
+ 
+-		tipc_nodeid2string(peer_str, peer_id);
+-		if (strlen(peer_str) > 16)
++		if (tipc_nodeid2string(peer_str, peer_id) > 16)
+ 			sprintf(peer_str, "%x", peer);
+ 		/* Broadcast receiver link name: "broadcast-link:<peer>" */
+ 		snprintf(l->name, sizeof(l->name), "%s:%s", tipc_bclink_name,
+-- 
+2.51.0
 
-Today's linux-next merge of the net-next tree got a conflict in:
-
-  drivers/net/can/spi/hi311x.c
-
-between commit:
-
-  6b69680847219 ("can: hi311x: fix null pointer dereference when resuming f=
-rom sleep before interface was enabled")
-
-=66rom the net tree and commit:
-
-  27ce71e1ce818 ("net: WQ_PERCPU added to alloc_workqueue users")
-
-=66rom the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
-diff --cc drivers/net/can/spi/hi311x.c
-index 963ea8510dd9b,96f23311b4ee3..0000000000000
---- a/drivers/net/can/spi/hi311x.c
-+++ b/drivers/net/can/spi/hi311x.c
-
---PowpCBnIW/R5W19f
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjT1NEACgkQJNaLcl1U
-h9BteAf+IEeLcd9W8mlFBByfFO28DbxJRcAUE+pjdH4KCXxdRh6qeGClHlaiVKhK
-XmdrQy6IJ3oPS629u20ZwTC9adMvJ1SzPCNL++XlEW05tVLafBcb3/yrNYsoVgJD
-51mHHfE1ZFX9greDPHw53k5qc9gThzbCnuvofJPME8/0sfZX97D4F4Fb+vsmTZEE
-I3rUVhY4Z+9IhK5quhuxecuTNaFY4j4JmWZhKJew7e9oHepi2x/TvmGlJ/QzkMb2
-dwT/31ZHMlGrBB7nUpaNqdMQrYDydk6aLqLL1jPQRWRqSr/iwy+pckl5u6gZT7m8
-6qZByfHm6cG7V6DDD1RPLGrNtFkZxA==
-=UKIT
------END PGP SIGNATURE-----
-
---PowpCBnIW/R5W19f--
 
