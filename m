@@ -1,167 +1,121 @@
-Return-Path: <netdev+bounces-226117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AD09B9C605
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 00:40:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D71EB9C62A
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 00:51:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 591BE32260D
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 22:40:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F083E173EAF
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 22:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 504B2296BD1;
-	Wed, 24 Sep 2025 22:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9579A2882D7;
+	Wed, 24 Sep 2025 22:51:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K6Mrh9DL"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="LvTaCmAj";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="DOI+ZmiX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7FCDF49
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 22:40:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CAD27E066;
+	Wed, 24 Sep 2025 22:51:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758753653; cv=none; b=lPfzgH7PucP6Fn8Ct+E46dKTE1uXVyVnS8IetJJGRqYMjt2JAZDEE8SIIqM081NZKdoC3XnvcuACd1voVfRy3BgsaHOLTG0NgHHKqznr1v/h2msK8nQ/uanfs4+siIW5KzWyZ02SkeY0zX+Abs+StD1U/9/QGFgYia25D2nM93I=
+	t=1758754278; cv=none; b=OeoAxb1g+1PC3icPJhZ51DZerxtIUysYXaE+YMjn9lmBV1Ax36Q/hV2zdzbiylHY1LMqcJUb5JX98H0abowXWdA9ACh/rypDlKBQbIbtivJnYY92FozBWjm8wF3IqBanMnwE8OtyUjdPv6Gl3aq03ZV8zUcSUnta1uOg7IbJSEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758753653; c=relaxed/simple;
-	bh=TL9tSqQs9DJoH1eG3I4NYwiJF5mKaMofy4gYs9c67Ow=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZrTSqi2cT0vPOlf/sAhsHkvWKTuUvcLj/RLb5FuC54sVbQNIu5JiDr4Koyr0Pz0YfxRo0DgCi+9SoxHt5qhKR1y9pAH7a1siys2Sp4JifRBvMcifAd6Tb+TmaXwF6SIyscRrik7jxH7XmmL4dFUNmKD091iVpX5Ve0qIKb0c/8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K6Mrh9DL; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758753652; x=1790289652;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=TL9tSqQs9DJoH1eG3I4NYwiJF5mKaMofy4gYs9c67Ow=;
-  b=K6Mrh9DL7hQIpYguS0KoboTVrr3gcqPgQtyuDxHZp5tKJMlEI6Ze8JOI
-   AcXgKNVLgXu+12YW+nVx9y5VAU0w9uDilNxvWYo2PI7t0YrmRxd7vAJjn
-   KfhmVP5PSgWMWt6q+J71eVlrGXBVwf9dgSwxEjEcg+E3JkRgehDicgmpd
-   v8mbaEGYNiD2Da242s4pBvLYPlYa+gSAXE27NrrgE8GBz3ZzAF/ii6pg6
-   PlaecNiWqHZIsRdflUyZBh6g+RNlbtbMUWE6DAWRE2rXeXpIOyJC01miX
-   /uIGiBv0Ot8bn0knWL13/4hpPYDVCvCw2nuv+rTYeY9tmIIiqM6rhVzKe
-   A==;
-X-CSE-ConnectionGUID: WgUuPVaBQyS7hgVDBASvFA==
-X-CSE-MsgGUID: 7pqeqeWpQwGm1/UGB8PJAg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="61116247"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="61116247"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 15:40:51 -0700
-X-CSE-ConnectionGUID: R63qJkI4SCSLH0RXwjCmUQ==
-X-CSE-MsgGUID: iZYu5PhRTO6jGB97eWIoGw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,291,1751266800"; 
-   d="scan'208";a="177591950"
-Received: from gabaabhi-mobl2.amr.corp.intel.com (HELO [10.125.108.218]) ([10.125.108.218])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 15:40:48 -0700
-Message-ID: <9556a62d-3aa0-4810-af53-ce0f3a5c4d61@intel.com>
-Date: Wed, 24 Sep 2025 15:40:47 -0700
+	s=arc-20240116; t=1758754278; c=relaxed/simple;
+	bh=h83iygs2s9Ldl3h7B7pFWbWQJHVrhWeWQeGcW05NHaE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qTDQEJnJ/ZhwUlF8fnaHor9jf8aZ3+wu0L0P2MRB7GS18SvjHXKmYPu373OJHSelIxtNJmt2BamzLFfptt0i3HSXEQgVv/yuIPeeuCfAZNVV2TMjHvyz/5FqZicwzHL4gMSFTj6LHLxbCImbJ8NA6kE12EbrkrIy0XINNRbg4NI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=LvTaCmAj; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=DOI+ZmiX; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 1E82360279; Thu, 25 Sep 2025 00:51:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1758754273;
+	bh=9wVF5HzDtmu1OxUD7YMD/AGvt/7TIpkUXfx7yqLSTbc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LvTaCmAjq+XGwhNuFsAfAv7lWiQ6oG2RXVnEyXkyZFg5/ZzGs/p+9dHqSLbYDe8W3
+	 Jh8W7lZmc/cjp3KQ0wuI6lOmZZeXlpf2nNP66MffMQtqHn7UdYTQzZz6akuteE3xk3
+	 OnZURmegY3v49GsdfhOmSpYEu9Yl1vXIh92yNNu9AA5UEuqEZ+3gRsyzieS/xMja96
+	 3mFF3nof5Vrlejd0jnpYwyccDP+k5RPmMEbx9wPq8rvaKiKsj47g2fV0q26BJyuTlJ
+	 X/NyIHOZhGXzfEmfZZYH7eB4JkrSe9avi4xszWk+Br6EWjSn8qE2+ZfvAN7N/aADFn
+	 OnByCDX6OnY+A==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id D72BF60262;
+	Thu, 25 Sep 2025 00:51:09 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1758754269;
+	bh=9wVF5HzDtmu1OxUD7YMD/AGvt/7TIpkUXfx7yqLSTbc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DOI+ZmiXU3AkYTL0/N3fDBqzp70sfzB1ct7EQFd+i7h6tZrmN8D4kyDd0NlgbqESh
+	 6uLXMijdd9xW8CdWfmN3UupoXwDDebrQ/7Xstu1eXta2+WTgYT7gt27GTHbJRuqxIF
+	 KN/jEKI5ps5Eb2CMVNufIPJktFqR3h5lkKE7dn5x6EqYqQYSCuBuazD0oIMWQpAibG
+	 SvQhTtk/Blvtv9IhLV5wD/M2ftmg0VX4bWxYN++uFj/5WlDiw3FHIPb0zVjTONYbBp
+	 Lizek8QtZ0jYOHxE6rgXlpUSxzqY0LXu9+m9zQwVo7EmJgvl1ffEL+fTwL3xRca+o1
+	 dWxG0YXogPJfg==
+Date: Thu, 25 Sep 2025 00:51:07 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Elad Yifee <eladwf@gmail.com>
+Cc: Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next RFC] netfilter: flowtable: add CT metadata
+ action for nft flowtables
+Message-ID: <aNR12z5OQzsC0yKl@calendula>
+References: <20250912163043.329233-1-eladwf@gmail.com>
+ <CA+SN3sp6ZidPXhZnP0E4KQyt95pp_-M9h2MMwLozObp9JH-8LQ@mail.gmail.com>
+ <aMnnKsqCGw5JFVrD@calendula>
+ <CA+SN3srpbVBK10-PtOcikSphYDRf1WwWjS0d+R76-qCouAV2rQ@mail.gmail.com>
+ <aMpuwRiqBtG7ps30@calendula>
+ <CA+SN3spZ7Q4zqpgiDbdE5T7pb8PWceUf5bGH+oHLEz6XhT9H+g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 6/6] bnxt_fwctl: Add documentation entries
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>, jgg@ziepe.ca,
- michael.chan@broadcom.com
-Cc: saeedm@nvidia.com, Jonathan.Cameron@huawei.com, davem@davemloft.net,
- corbet@lwn.net, edumazet@google.com, gospo@broadcom.com, kuba@kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
- selvin.xavier@broadcom.com, leon@kernel.org,
- kalesh-anakkur.purayil@broadcom.com
-References: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
- <20250923095825.901529-7-pavan.chebbi@broadcom.com>
-Content-Language: en-US
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <20250923095825.901529-7-pavan.chebbi@broadcom.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+SN3spZ7Q4zqpgiDbdE5T7pb8PWceUf5bGH+oHLEz6XhT9H+g@mail.gmail.com>
 
-
-
-On 9/23/25 2:58 AM, Pavan Chebbi wrote:
-> Add bnxt_fwctl to the driver and fwctl documentation pages.
+On Wed, Sep 17, 2025 at 08:33:49PM +0300, Elad Yifee wrote:
+> On Wed, Sep 17, 2025 at 11:18 AM Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> > Just to make sure we are on the same page: Software plane has to match
+> > the capabilities of the hardware offload plan, new features must work
+> > first in the software plane, then extend the hardware offload plane to
+> > support it.
 > 
-> Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
-> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> ---
->  .../userspace-api/fwctl/bnxt_fwctl.rst        | 27 +++++++++++++++++++
->  Documentation/userspace-api/fwctl/fwctl.rst   |  1 +
->  Documentation/userspace-api/fwctl/index.rst   |  1 +
->  3 files changed, 29 insertions(+)
->  create mode 100644 Documentation/userspace-api/fwctl/bnxt_fwctl.rst
+> Thanks - I see what you meant now.
 > 
-> diff --git a/Documentation/userspace-api/fwctl/bnxt_fwctl.rst b/Documentation/userspace-api/fwctl/bnxt_fwctl.rst
-> new file mode 100644
-> index 000000000000..78f24004af02
-> --- /dev/null
-> +++ b/Documentation/userspace-api/fwctl/bnxt_fwctl.rst
-> @@ -0,0 +1,27 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +================
-> +fwctl bnxt driver
-> +================
-> +
-> +:Author: Pavan Chebbi
-> +
-> +Overview
-> +========
-> +
-> +BNXT driver makes a fwctl service available through an auxiliary_device.
-> +The bnxt_fwctl driver binds to this device and registers itself with the
-> +fwctl subsystem.
-> +
-> +The bnxt_fwctl driver is agnostic to the device firmware internals. It
-> +uses the ULP conduit provided by bnxt to send requests (HWRM commands)
+> This isn’t a new feature that needs to be implemented in software
+> first. We’re not introducing new user semantics, matches, or actions
+> in nft/TC. no datapath changes (including the flowtable software
+> offload fast path). The change only surfaces existing CT state
+> (mark/labels/dir) as FLOW_ACTION_CT_METADATA at the hardware offload
+> boundary so drivers can use it for per-flow QoS, or simply ignore it.
+>
+> When a flow stays in software, behavior remains exactly as today,
+> software QoS continues to use existing tools (nft/TC setting
+> skb->priority/mark, qdiscs, etc.). There’s no SW-HW mismatch
+> introduced here.
 
-Probably should expand the TLA on first time usage in documentation. What's ULP? What's HWRM?
+You have to show me there is no mismatch.
 
-> +to firmware.
-> +
-> +bnxt_fwctl User API
-> +==================
-> +
-> +Each RPC request contains a message request structure (HWRM input) its,
+This is exposing the current ct mark/label to your hardware, the
+flowtable infrastructure (the software representation) makes no use of
+this information from the flowtable datapath, can you explain how you
+plan to use this?
 
-s/) its,/), its /
-
-> +legth, optional request timeout, and dma buffers' information if the
-
-s/legth/length/
-
-> +command needs any DMA. The request is then put together with the request
-> +data and sent through bnxt's message queue to the firmware, and the results
-> +are returned to the caller.
-
-Would be helpful to explain the ioctls provided and perhaps some sample code for user side.
-
-> diff --git a/Documentation/userspace-api/fwctl/fwctl.rst b/Documentation/userspace-api/fwctl/fwctl.rst
-> index a74eab8d14c6..e9f345797ca0 100644
-> --- a/Documentation/userspace-api/fwctl/fwctl.rst
-> +++ b/Documentation/userspace-api/fwctl/fwctl.rst
-> @@ -151,6 +151,7 @@ fwctl User API
->  .. kernel-doc:: include/uapi/fwctl/fwctl.h
->  .. kernel-doc:: include/uapi/fwctl/mlx5.h
->  .. kernel-doc:: include/uapi/fwctl/pds.h
-> +.. kernel-doc:: include/uapi/fwctl/bnxt.h
->  
->  sysfs Class
->  -----------
-> diff --git a/Documentation/userspace-api/fwctl/index.rst b/Documentation/userspace-api/fwctl/index.rst
-> index 316ac456ad3b..c0630d27afeb 100644
-> --- a/Documentation/userspace-api/fwctl/index.rst
-> +++ b/Documentation/userspace-api/fwctl/index.rst
-> @@ -12,3 +12,4 @@ to securely construct and execute RPCs inside device firmware.
->     fwctl
->     fwctl-cxl
->     pds_fwctl
-> +   bnxt_fwctl
-
+Thanks.
 
