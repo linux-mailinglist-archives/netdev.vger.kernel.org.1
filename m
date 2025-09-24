@@ -1,478 +1,190 @@
-Return-Path: <netdev+bounces-226007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CA28B9A6BC
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 16:59:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 494CEB9A920
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 17:20:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DDF04E19D2
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 14:58:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76ADA1B2427F
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 15:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819FF31D396;
-	Wed, 24 Sep 2025 14:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KyLKf1E5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5555430CB41;
+	Wed, 24 Sep 2025 15:20:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4320131D379
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 14:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758725541; cv=fail; b=NWjNCbUFxjQz4TsOq9JxI2ZZkC+R7GPdtKsFfaKuQf6EdqVi7TwMiqzz9rqi4dRrr6qeHbRA37zLQCfQTmEcZKFeZQa2lfN9km/KIgP/CdhJtm1voS03vU20eBJvGJWIBSSTma+0ziQqSeEUvZZ3zzpiLVdm6FARb6bgl/z7EiQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758725541; c=relaxed/simple;
-	bh=PhgqOZLIlXMx6s/gvl0zy2auQ1BQRQShbHsiqhxgVhs=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=hPzb4KWRtMjvARf6OM9ArBERB6iwjXL/QuFaEOPkSsatANbE0hlvp7joSlsv7htDACSaKzyVDI8SVMACCwJO/bs50qOjYkrdTMOG5Tvhvxs7DAL7hTrdRrsYs9Y0iv+zzYmYH9qxQ71ZIUTfz7HDieZueFEfrKPS+5Sf0NxLOy4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KyLKf1E5; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758725539; x=1790261539;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=PhgqOZLIlXMx6s/gvl0zy2auQ1BQRQShbHsiqhxgVhs=;
-  b=KyLKf1E5aHMxJmQucZ+CRjH45Lox+3DQPeWVZXsSFs5CjqE2Ku97E5D7
-   /0y8kMOUCpZIZsMXmZc5a94t87peYqsY54MhApZu93OIm+I83UoKkZcUX
-   J4Yx+I2MCQVzRdgsTZAEop0pAh3qLqPT8NvdLUrgcFNRVstlAcjvgAngZ
-   TxrATod1nEXgWsLk5qV8SoQoXrnHCYir7m8jGgtVRHKKCcnV666I3tORT
-   nEhhkOwo2KzX9lT8NEo650oRnP2RiTMar3w26g0C8kJsNSLkwMbqXMtJ/
-   OAvmnZQKXfJcx3L0byR6t+W4TRmERlN0FpK4E8OekcO3IoKRb2GDC3ToB
-   Q==;
-X-CSE-ConnectionGUID: AMtnoIwBQjWdttYWC/gkRg==
-X-CSE-MsgGUID: VKNh2D6lSFms+is8Si4Oew==
-X-IronPort-AV: E=McAfee;i="6800,10657,11563"; a="78659590"
-X-IronPort-AV: E=Sophos;i="6.18,290,1751266800"; 
-   d="scan'208";a="78659590"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 07:52:18 -0700
-X-CSE-ConnectionGUID: XlOF31sOQJu+f7maem40Pg==
-X-CSE-MsgGUID: W6t2y+6/S+qJiJWQxxMURg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,290,1751266800"; 
-   d="scan'208";a="176895565"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 07:52:18 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 24 Sep 2025 07:52:17 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Wed, 24 Sep 2025 07:52:17 -0700
-Received: from BN8PR05CU002.outbound.protection.outlook.com (52.101.57.60) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Wed, 24 Sep 2025 07:52:17 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OeuG8rspCjrPKVCoPhUx/IT6m0Doo2jz3eFBLqc5qMoIGujpMhoF5jwc+u2nHKNwLeG8hM0dVfXEyTc4GTGOEf+VKUeK5cl3TPa8RVXltAYVqio7/mepsS0et2if+ePdQAwcbJ74sJPlanMt70BbGNQzR82SbXVC8Ex4tVXmjjwEUBbkJ6EIeDgnnnF+PFH6LljDcFOVoeE6O/3y6HQb2wauIIuGjS34tn2sPWm5oIm9CLt55EOUM6KC9An0ao5LoY9IUzlBuLnTGVkOU5ukJKl+OfeY/vcNn0MKbRojPQa8z8iIOLFhhhAJt8zo/M9MrroDZAwL7W4AC5hUWQPRaQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CJbGi8UWa81jlvg/khlUfFuAn/iXUyJNiUm/8+1IOIk=;
- b=Gab3AnU9Ze6Jb6UYqJcfbq0/Aiiq/lon/yG1JNCqTFGE+HsOb4ucTOEcR/PGsLU0ovuCqnA8ImtnDOVtvNoZdKnvuhyCMmDeXpllEPURTtpcthtzrn0mGTK7bBZDM/EdFC8iWzEb6GP5YZxd5rUn1iw3E/2VfROAm+YxeYrNM3M9aI7J9y1mQlnDb2lRWBCGNl6DINccCRrq04WJz3y7xe9ueU7ZSZVZndZ8/71t4rovReIjajf+r4tEPEF2TMWrzdLAERFRqPGccGFQl1YJnC/YjjqVH9reqCjzVTySMpT06DN3eo8TSgEQMC9LFSBY8RRsRvn7brc/4n4y2QjWHQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by IA3PR11MB8917.namprd11.prod.outlook.com (2603:10b6:208:57d::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.9; Wed, 24 Sep
- 2025 14:52:14 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.9160.008; Wed, 24 Sep 2025
- 14:52:14 +0000
-Message-ID: <18111eee-3b3b-4cfe-98be-ab5f93b0aafb@intel.com>
-Date: Wed, 24 Sep 2025 16:52:09 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next v4] idpf: add support for IDPF
- PCI programming interface
-To: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <madhu.chittim@intel.com>,
-	<netdev@vger.kernel.org>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>
-References: <20250903035853.23095-1-pavan.kumar.linga@intel.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20250903035853.23095-1-pavan.kumar.linga@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1PR0202CA0021.eurprd02.prod.outlook.com
- (2603:10a6:803:14::34) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B5EE30CDA6;
+	Wed, 24 Sep 2025 15:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758727237; cv=none; b=Uddlmylhj0cJIkHWBvBKjm4wFHl9H5VxOeqrMjj1j6Imyhgjh4QOkliDj5D6wxS4dRKEEyme5yxH5dfug2nCw/IOAWTZ25uFzcbTlDMOa9ghN328DtDUn5b3QGkAId3xWP2bEg4AJnAK5rw7ihCOpM1F6NW8fRdyAmhX5byi5RY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758727237; c=relaxed/simple;
+	bh=NUgMFd1DP4iApIqk7SLIwHxdIBK3tE7nt9mFkQcSPH8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YE8WglqfqjyldUfd9+65UfvY1yOS14tH5n5Y9JpVIP8XqB5P36pvoUszaVp3L/XldtVe2rbKOcMlPfK1MTkwbJro2c3N2o9BAHm+UyWpzGfjAJQve+0Vjvj+9nLkF7X6hu13cr2V0JrlFq96cmU7rWD6gC+USwkvVLT8DW9BV1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4cX0Z81XR9z9sVT;
+	Wed, 24 Sep 2025 17:07:12 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 7JBvIGokpC-x; Wed, 24 Sep 2025 17:07:12 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4cX0Z80gXXz9sVR;
+	Wed, 24 Sep 2025 17:07:12 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 05FB98B768;
+	Wed, 24 Sep 2025 17:07:12 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id EeCTNJu2vLct; Wed, 24 Sep 2025 17:07:11 +0200 (CEST)
+Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id B2BF38B763;
+	Wed, 24 Sep 2025 17:07:10 +0200 (CEST)
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: Herve Codina <herve.codina@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v3] net: wan: framer: Add version sysfs attribute for the Lantiq PEF2256 framer
+Date: Wed, 24 Sep 2025 17:06:47 +0200
+Message-ID: <77a27941d6924b1009df0162ed9f0fa07ed6e431.1758726302.git.christophe.leroy@csgroup.eu>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|IA3PR11MB8917:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1de47079-eaa3-4de7-2319-08ddfb79f26e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?SXVJQ0o4bHE0dk1WMFVNSlhDdTd0MGcvc3V3M2VxajZQbHVkWXRId1g4TzdI?=
- =?utf-8?B?V1h5OWgzbG5lb25IcHpQTjBsSzFTdVRQZHk4dW5GUVhYaEkvVXVqdHlqQ0tq?=
- =?utf-8?B?TTBwSkt4bC9uMlU5UElWK0hKa0dPQ2NTL20zTmk5Y3QwRlE2TmFCblZUT2hT?=
- =?utf-8?B?dzExMGZVZVBnaThUWDQwV3FOeGErM3ltUGpOcmN5Vzh2SHh0R3grZHB4enZQ?=
- =?utf-8?B?MGFLQmk3NFlWZHN1U2EwY2ovVlN3U2JGbWhnYm9DVW1mcFcvaTN4aDZCVFk5?=
- =?utf-8?B?UnF2aHErWlhrbm03V3VMYnVSR2c2cTBMWTczT1dmQUpOc3QzZkVGMmZZRzhy?=
- =?utf-8?B?dWwwU1Q2MkRJV2RMc1J4eVlrUGN2S1ZYK2tSV1lwdHlscE03K2k5UGNzYzkr?=
- =?utf-8?B?TllYWk1VbjdzOGcvS09tbUtVVG1QQVB4NHRZTW1lbTBPOUtaQmU5OW5mbXVz?=
- =?utf-8?B?ZS9LK3FqS3loYWVmakpNOFowY3MraDV0RnozenRFNFVmYmptbmdodU8wdXl0?=
- =?utf-8?B?c0tOb3ZQTElOMkVKMVowNFQrNXlBa1FEdVR2Sk10eTJaUlV2cnVvT0ZzS1FS?=
- =?utf-8?B?TzV5UWJOYlVlY0k1SllZcXNBTUtjSlpteVUrRWZwRXM2MVBOM2NXc0o3T2Ft?=
- =?utf-8?B?OGswQ3Y2QTdrVVNueC9lbm1YNFRZUUlNWXBwMWE3QjNlVlhmb3MvMDBKZGl1?=
- =?utf-8?B?Z0xlTFhBeEFSdTMrYlRscS9yRVNBTG8vNmx2VjhlcCtmT2F1R2c5NVM0VGd4?=
- =?utf-8?B?U0xOVjNmUGhtM3EwMThBYmhoNjdVQndZRUFtQ2E3cU1nL0g2a0ZyNzVKMWpN?=
- =?utf-8?B?Y3lEaHJSeWhoR1BrOW9HYXJMTHNFcVZrR3lHa3dZMnJYMTRZNFZBTWxXekt4?=
- =?utf-8?B?QnlmNXErMG1WTlpyUjE3YmhUTXlNY0h5cXRpczZoMzd1RnVXcXVHN1V5MnJz?=
- =?utf-8?B?RWt5d2FYTFBHb2ZQK2p4amhKMjVRQ2xFUDFrTUtwVkUvaHdudEMyYnFPL2FD?=
- =?utf-8?B?UUo1L002MDBYMFYycmJqZFdHQmRSV3FXTUU2R3dob1duMjFaR1l5K3N6NW56?=
- =?utf-8?B?UjN2ZjlXN2VYeXpVY2dCNmd4SVFtejVPSTlEaVpoMmhNL25EaFRRaHVTcEJN?=
- =?utf-8?B?ZklWTUhBdE5rNkJQcC81SUQwYy9jMXVmNnhuLzFtT1BpVmV4VTE2MUVxRmtz?=
- =?utf-8?B?dDFhd1BwaGJkN21mN3NnOXA1VzczTmZaQ3EzVm1NMzJZUStpRVAyUzRxaTZT?=
- =?utf-8?B?UHRFWkh0MGFoVDRab0h5SUEydjdIYkYrNU1KOTRwUkpRamM5R0RlcU9xQ3Jj?=
- =?utf-8?B?dHh4cWpVSThqbWhFRktyNjE2WlhDL2xxZDhjUnNQb0FnWWtnQXRaYVllK21O?=
- =?utf-8?B?MkZjZnhJc01qeFRvNXFoSWxwOHBhUXk2U3BmaVdaNHg5d0l6dEVROUYrWWFa?=
- =?utf-8?B?Q0NDYk1pR3J1NlRESWxvaWdQZWR1WFljSFppZWlJdDkxUlpKSEUwcHBZMWNt?=
- =?utf-8?B?VkxaaGRiTzk0aks4bUdrMWxBUGZzZm1TN3NXYlU4c2dzMkdnMWM1ZTQxUmlm?=
- =?utf-8?B?QUJnc01HUE5kMmJ6bkUvOUFpSjFpdExnSGZSY2dUWE01M1J3eGJIbVJ5SFIr?=
- =?utf-8?B?Rm1RbEdtV2xjaStDdmo1MklWeDQ2WW93MHJGZXdIc0wvc2lrekhpU0xnY1Q3?=
- =?utf-8?B?N3FaWUJFWjNVNVpMN00vcTVORVFWYUlIWnpiNm0rRnQrWGFFM3hycCtBc3Ft?=
- =?utf-8?B?cnFQeUtqeXBuWjZVc0s3TzJhWWdQbnJJeTIwSkJMblJMZk95L0tBazE2Ny9k?=
- =?utf-8?Q?py1uCOHU4VTTrQ3/AfQZ1dYpajy31QJqNiwKg=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZFNjMVEwaG9ENURmS0ZseHpKMXVzTUZJcTdvZlc5dEY4c0pZNGxuQ3JtdHBS?=
- =?utf-8?B?TEkzRjFpdFRjdUZINnI4RTc0Ym5ldG9qT1dHaTR4b1RHSFdOV3Y5bnp0NWNS?=
- =?utf-8?B?UVVGaVlwMUFqNjJBZE1TazhjNmlzMy9EemFBWUpOczUvM01JMFZnUzZnU0Fs?=
- =?utf-8?B?eVI5ZTVKUFN3ZG9wUTRoc0tRZU4rY1N0ZHBxRUVqRmdtb2trelBVUjB2RkVK?=
- =?utf-8?B?RGZUOFQ0amovUkltVnhGZWsyWHVWZU5qTDR6TTcxV2Q1RjVJQ3BGS2dqOEY0?=
- =?utf-8?B?Z1JyMUV6dS9SMWUwbGVTd2pnR3RQNGVKeTJORDJUN2VWRi9uVmIyciszNGlU?=
- =?utf-8?B?R240Z3c1UFRoZnp3dGg5b1E3QWtmQWZUR2FDeUxUN1NKRm0vUzNTdEhvVU9k?=
- =?utf-8?B?VlJrR0diU3h4RlQ4dkk1MDBPZGFMczgxSHhiQ25HcWVJSGRLQ1ZHc3lBcjhu?=
- =?utf-8?B?VVluWGNQVEdpUmJ2cXNFamZPZGhFakhrRHpWeXZLWW05em92L3VXUkd2MEJa?=
- =?utf-8?B?MUVzK0ZCcjJWTGpwMmtiL3hsMHNSQm5zRnYrNWR0cW82dFJkdVBvVmJKZjcr?=
- =?utf-8?B?TTRZbDZObkt4WU0rWnhML01FbWRSZUppZ093TWgvbWRiNko2cFBKL0dCRHQr?=
- =?utf-8?B?bkNTUXNnZVBTNVlUcFd1MkdRRUc5T1NubnFobUxrUmduWmU4MG5SaW16Zlg0?=
- =?utf-8?B?Y2FkVUVlVklpckF0UUluRnRUbDY4cEQvZTY2Nyt1ejFiRVI1K0tiOWtHaFRp?=
- =?utf-8?B?cjZZbFlKZ25adU9uN0RNcDB5MlNzTWlUeXQ2NTZwaFNDeXpKNTIzQWIyMTFG?=
- =?utf-8?B?TjhaR3ExRndmYjBVa053bjdhY0wzM1ZjUUloWlBJTkhWVHNXVzgxMitzMGJM?=
- =?utf-8?B?WC8ycW5MNEM1UmYxN29zS3RFUXZUcmxBOU5ldVBSN1dQMFo3bFkvTTg2SEFS?=
- =?utf-8?B?enlJenllMXBJWFpFaDJWZHY0Z29VemNvaStjQ2hPcmdKNEcrcUlMSmlIbG9L?=
- =?utf-8?B?NjBlTGdrdENRcnZ0YzhucVBRcmRqL0s1U1BXa0sxUE42bllKM3ZmaW0zQzBQ?=
- =?utf-8?B?RkVqSDl5aWVwR1NiQXU4UWVjUWhhOE9oUnYreC9CZGJseTJIeE1hWi9QWlV4?=
- =?utf-8?B?QmFHRTI3OGhDU1FtUnFid2YrZjFiekhZQ0FkamNNUVgxRmRZVFlxTWtmUXRX?=
- =?utf-8?B?T05wMjRKbTE5YlpURHJlRFU4b2ZkbGZ4MmxXSnBsaVlzVjFXUGk0R2xJVHor?=
- =?utf-8?B?RzJucEJRZXBLNGpFWnB5ZWNjL0ZsdGpnSjBwSHFXQ2hyTzR1bWhDSXRNTG1T?=
- =?utf-8?B?M2lrUit6M1pwUklRa1ZVOFlwTmFHcFprUzVCQ2d3Qjg3Mk5HTGhYR1l1dndS?=
- =?utf-8?B?djRWRUVPOFI0Nm02WG93akJiUEVaaEFJTG94amZQa0dyTnMwMDl2V1htQUwr?=
- =?utf-8?B?SmtHRFRzWFVzYWx5K0d4Y2RjL2JLMTVpbzJ5ZjN6M3VKQTRkcENjY09PUGxU?=
- =?utf-8?B?Y05YaGl4OVZtSGR3Wm50UVhHSVN4bHlvZHlrN21vemo0Z1dBWkYzd25Hb3Uz?=
- =?utf-8?B?MDNVSDJXQ1BjRm5qNWhJM3FYcGZRQlhleVd0Q1A1Uy9hYlBONTJZdUZjV0tz?=
- =?utf-8?B?OG5weHdodjNJUE1LY2x3OFV1MGFydHRqRmZYRllmMzRPTThEVmt6TUpWMk85?=
- =?utf-8?B?bTZVRDFoODZuOG94MWw3Ym5ERGlRbEt2c2lNSXo2ZU9USFpzUHJ4c2QyVi9B?=
- =?utf-8?B?azgrZTcwVlJTZHRnb01GbFhmVUdDSkRIS1hnUG15dTNaZGpKYkIzYytyaHlJ?=
- =?utf-8?B?UGFWOHNoeU5PSlNIYk1hdWFvZy9TZVdla0pVZklHVGlnQ0xSQldXZDllRDUz?=
- =?utf-8?B?RVN0NFRCMXpqa2laV3c0MzNsdVdOZGZtZ24zcmwvVW5PNDRZWEFWV0JlVlo2?=
- =?utf-8?B?dEo2R29vUFZaOEx3cytOeUdHbnJPRnRYbnJSeGFRS0hTS0s4Y01nM3VRNzRK?=
- =?utf-8?B?SG41TWJIUEd3SC9HcEQzVTRqTXNWUGFaL2ZVemNZZHllSnZjaGR6K0FwTVFF?=
- =?utf-8?B?SHVqY3RIVmtFK050elJSMTkvQXVGWDU3aTRJNVpNWDdKc0RFSjFDK09rSUNs?=
- =?utf-8?B?d05KT0IwNDRMK1kxTHhwYi9mQjNDZk04bnkyeCtpUkhuM2hoMy9RbkJaNGdH?=
- =?utf-8?B?UWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1de47079-eaa3-4de7-2319-08ddfb79f26e
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Sep 2025 14:52:13.9197
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Zlj1SuQFHwJOdP7j7HDAnkJ/WiMupaJKBVKeCTWX6L+zxIjI26kELgJHTdJMVT2mP4ww52rfDf4QyIvgkRM1aL4l77ZgMtjixMNgDtpa/F4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR11MB8917
-X-OriginatorOrg: intel.com
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1758726407; l=3835; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=NUgMFd1DP4iApIqk7SLIwHxdIBK3tE7nt9mFkQcSPH8=; b=w2Ex0uy0q9ZKCt7WkNFVTS7mpr1zxnBazlqSSHvD8KPCMlDk4Jkifqjn/R+uhGXp0s2AR9gEG ZiNdUB3EIQ0BCHEchCO7TeGUgJUg8EkPDlUkcTQ0bC+r4VTK2VWpdHC
+X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
+Content-Transfer-Encoding: 8bit
 
-From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-Date: Tue,  2 Sep 2025 20:58:52 -0700
+Lantiq PEF2256 framer has some little differences in behaviour
+depending on its version.
 
-> At present IDPF supports only 0x1452 and 0x145C as PF and VF device IDs
-> on our current generation hardware. Future hardware exposes a new set of
-> device IDs for each generation. To avoid adding a new device ID for each
-> generation and to make the driver forward and backward compatible,
-> make use of the IDPF PCI programming interface to load the driver.
-> 
-> Write and read the VF_ARQBAL mailbox register to find if the current
-> device is a PF or a VF.
-> 
-> PCI SIG allocated a new programming interface for the IDPF compliant
-> ethernet network controller devices. It can be found at:
-> https://members.pcisig.com/wg/PCI-SIG/document/20113
-> with the document titled as 'PCI Code and ID Assignment Revision 1.16'
-> or any latest revisions.
-> 
-> Tested this patch by doing a simple driver load/unload on Intel IPU E2000
-> hardware which supports 0x1452 and 0x145C device IDs and new hardware
-> which supports the IDPF PCI programming interface.
-> 
-> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> Signed-off-by: Madhu Chittim <madhu.chittim@intel.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-> ---
-> v4:
-> - add testing info
-> - use resource_size_t instead of long
-> - add error statement for ioremap failure
-> 
-> v3:
-> - reworked logic to avoid gotos
-> 
-> v2:
-> - replace *u8 with *bool in idpf_is_vf_device function parameter
-> - use ~0 instead of 0xffffff in PCI_DEVICE_CLASS parameter
-> 
-> ---
->  drivers/net/ethernet/intel/idpf/idpf.h        |  1 +
->  drivers/net/ethernet/intel/idpf/idpf_main.c   | 73 ++++++++++++++-----
->  drivers/net/ethernet/intel/idpf/idpf_vf_dev.c | 40 ++++++++++
->  3 files changed, 97 insertions(+), 17 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-> index c56abf8b4c92..4a16e481faf7 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf.h
-> +++ b/drivers/net/ethernet/intel/idpf/idpf.h
-> @@ -1041,6 +1041,7 @@ void idpf_mbx_task(struct work_struct *work);
->  void idpf_vc_event_task(struct work_struct *work);
->  void idpf_dev_ops_init(struct idpf_adapter *adapter);
->  void idpf_vf_dev_ops_init(struct idpf_adapter *adapter);
-> +int idpf_is_vf_device(struct pci_dev *pdev, bool *is_vf);
->  int idpf_intr_req(struct idpf_adapter *adapter);
->  void idpf_intr_rel(struct idpf_adapter *adapter);
->  u16 idpf_get_max_tx_hdr_size(struct idpf_adapter *adapter);
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-> index 8c46481d2e1f..493604d50143 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-> @@ -7,11 +7,57 @@
->  
->  #define DRV_SUMMARY	"Intel(R) Infrastructure Data Path Function Linux Driver"
->  
-> +#define IDPF_NETWORK_ETHERNET_PROGIF				0x01
-> +#define IDPF_CLASS_NETWORK_ETHERNET_PROGIF			\
-> +	(PCI_CLASS_NETWORK_ETHERNET << 8 | IDPF_NETWORK_ETHERNET_PROGIF)
-> +
->  MODULE_DESCRIPTION(DRV_SUMMARY);
->  MODULE_IMPORT_NS("LIBETH");
->  MODULE_IMPORT_NS("LIBETH_XDP");
->  MODULE_LICENSE("GPL");
->  
-> +/**
-> + * idpf_dev_init - Initialize device specific parameters
-> + * @adapter: adapter to initialize
-> + * @ent: entry in idpf_pci_tbl
-> + *
-> + * Return: %0 on success, -%errno on failure.
-> + */
-> +static int idpf_dev_init(struct idpf_adapter *adapter,
-> +			 const struct pci_device_id *ent)
-> +{
-> +	bool is_vf = false;
-> +	int err;
-> +
-> +	if (ent->class == IDPF_CLASS_NETWORK_ETHERNET_PROGIF) {
-> +		err = idpf_is_vf_device(adapter->pdev, &is_vf);
-> +		if (err)
-> +			return err;
-> +		if (is_vf) {
-> +			idpf_vf_dev_ops_init(adapter);
-> +			adapter->crc_enable = true;
-> +		} else {
-> +			idpf_dev_ops_init(adapter);
-> +		}
-> +
-> +		return 0;
-> +	}
-> +
-> +	switch (ent->device) {
-> +	case IDPF_DEV_ID_PF:
-> +		idpf_dev_ops_init(adapter);
-> +		break;
-> +	case IDPF_DEV_ID_VF:
-> +		idpf_vf_dev_ops_init(adapter);
-> +		adapter->crc_enable = true;
-> +		break;
-> +	default:
-> +		return -ENODEV;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  /**
->   * idpf_remove - Device removal routine
->   * @pdev: PCI device information struct
-> @@ -165,21 +211,6 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	adapter->req_tx_splitq = true;
->  	adapter->req_rx_splitq = true;
->  
-> -	switch (ent->device) {
-> -	case IDPF_DEV_ID_PF:
-> -		idpf_dev_ops_init(adapter);
-> -		break;
-> -	case IDPF_DEV_ID_VF:
-> -		idpf_vf_dev_ops_init(adapter);
-> -		adapter->crc_enable = true;
-> -		break;
-> -	default:
-> -		err = -ENODEV;
-> -		dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
-> -			ent->device);
-> -		goto err_free;
-> -	}
-> -
->  	adapter->pdev = pdev;
->  	err = pcim_enable_device(pdev);
->  	if (err)
-> @@ -259,11 +290,18 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	/* setup msglvl */
->  	adapter->msg_enable = netif_msg_init(-1, IDPF_AVAIL_NETIF_M);
->  
-> +	err = idpf_dev_init(adapter, ent);
-> +	if (err) {
-> +		dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
-> +			ent->device);
-> +		goto destroy_vc_event_wq;
-> +	}
-> +
->  	err = idpf_cfg_hw(adapter);
->  	if (err) {
->  		dev_err(dev, "Failed to configure HW structure for adapter: %d\n",
->  			err);
-> -		goto err_cfg_hw;
-> +		goto destroy_vc_event_wq;
->  	}
->  
->  	mutex_init(&adapter->vport_ctrl_lock);
-> @@ -284,7 +322,7 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  
->  	return 0;
->  
-> -err_cfg_hw:
-> +destroy_vc_event_wq:
->  	destroy_workqueue(adapter->vc_event_wq);
->  err_vc_event_wq_alloc:
->  	destroy_workqueue(adapter->stats_wq);
-> @@ -304,6 +342,7 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  static const struct pci_device_id idpf_pci_tbl[] = {
->  	{ PCI_VDEVICE(INTEL, IDPF_DEV_ID_PF)},
->  	{ PCI_VDEVICE(INTEL, IDPF_DEV_ID_VF)},
-> +	{ PCI_DEVICE_CLASS(IDPF_CLASS_NETWORK_ETHERNET_PROGIF, ~0)},
->  	{ /* Sentinel */ }
->  };
->  MODULE_DEVICE_TABLE(pci, idpf_pci_tbl);
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-> index 7527b967e2e7..4774b933ae50 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-> @@ -7,6 +7,46 @@
->  
->  #define IDPF_VF_ITR_IDX_SPACING		0x40
->  
-> +#define IDPF_VF_TEST_VAL		0xFEED0000
+Add a sysfs attribute to allow user applications to know the
+version.
 
-0xfeed0000U
+Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+---
+v3:
+- Added documentation Documentation/ABI/testing/sysfs-driver-framer-pef2256
 
-> +
-> +/**
-> + * idpf_is_vf_device - Helper to find if it is a VF device
-> + * @pdev: PCI device information struct
-> + * @is_vf: used to update VF device status
-> + *
-> + * Return: %0 on success, -%errno on failure.
-> + */
-> +int idpf_is_vf_device(struct pci_dev *pdev, bool *is_vf)
-> +{
-> +	struct resource mbx_region;
-> +	resource_size_t mbx_start;
-> +	void __iomem *mbx_addr;
-> +	resource_size_t len;
-> +
-> +	resource_set_range(&mbx_region,	VF_BASE, IDPF_VF_MBX_REGION_SZ);
+v2: https://lore.kernel.org/all/2e01f4ed00d0c1475863ffa30bdc2503f330b688.1758089951.git.christophe.leroy@csgroup.eu
+- Split version_show() prototype to 80 chars
+- Make DEVICE_ATTR_RO(version) static
 
-Why use `struct resource` at all here. You  have start and len already.
-Encapsulating them in a resource only complicates the code.
+v1: https://lore.kernel.org/all/f9aaa89946f1417dc0a5e852702410453e816dbc.1757754689.git.christophe.leroy@csgroup.eu/
+---
+ .../ABI/testing/sysfs-driver-framer-pef2256   |  8 +++++++
+ drivers/net/wan/framer/pef2256/pef2256.c      | 24 +++++++++++++++----
+ 2 files changed, 27 insertions(+), 5 deletions(-)
+ create mode 100644 Documentation/ABI/testing/sysfs-driver-framer-pef2256
 
-	mbx_addr = ioremap(pci_resource_start(pdev, 0) + VF_BASE,
-			   IDPF_VF_MBX_REGION_SZ);
+diff --git a/Documentation/ABI/testing/sysfs-driver-framer-pef2256 b/Documentation/ABI/testing/sysfs-driver-framer-pef2256
+new file mode 100644
+index 000000000000..ead1ae84ef2a
+--- /dev/null
++++ b/Documentation/ABI/testing/sysfs-driver-framer-pef2256
+@@ -0,0 +1,8 @@
++What:		/sys/bus/platform/devices/xxx/version
++Date:		Sep 2025
++Contact:	netdev@vger.kernel.org
++Description:	Reports the version of the PEF2256 framer
++
++		Access: Read
++
++		Valid values: Represented as string
+diff --git a/drivers/net/wan/framer/pef2256/pef2256.c b/drivers/net/wan/framer/pef2256/pef2256.c
+index 1e4c8e85d598..a2166b424428 100644
+--- a/drivers/net/wan/framer/pef2256/pef2256.c
++++ b/drivers/net/wan/framer/pef2256/pef2256.c
+@@ -37,6 +37,7 @@ struct pef2256 {
+ 	struct device *dev;
+ 	struct regmap *regmap;
+ 	enum pef2256_version version;
++	const char *version_txt;
+ 	struct clk *mclk;
+ 	struct clk *sclkr;
+ 	struct clk *sclkx;
+@@ -114,6 +115,16 @@ enum pef2256_version pef2256_get_version(struct pef2256 *pef2256)
+ }
+ EXPORT_SYMBOL_GPL(pef2256_get_version);
+ 
++static ssize_t version_show(struct device *dev, struct device_attribute *attr,
++			    char *buf)
++{
++	struct pef2256 *pef2256 = dev_get_drvdata(dev);
++
++	return sysfs_emit(buf, "%s\n", pef2256->version_txt);
++}
++
++static DEVICE_ATTR_RO(version);
++
+ enum pef2256_gcm_config_item {
+ 	PEF2256_GCM_CONFIG_1544000 = 0,
+ 	PEF2256_GCM_CONFIG_2048000,
+@@ -697,7 +708,6 @@ static int pef2256_probe(struct platform_device *pdev)
+ 	unsigned long sclkr_rate, sclkx_rate;
+ 	struct framer_provider *framer_provider;
+ 	struct pef2256 *pef2256;
+-	const char *version_txt;
+ 	void __iomem *iomem;
+ 	int ret;
+ 	int irq;
+@@ -763,18 +773,18 @@ static int pef2256_probe(struct platform_device *pdev)
+ 	pef2256->version = pef2256_get_version(pef2256);
+ 	switch (pef2256->version) {
+ 	case PEF2256_VERSION_1_2:
+-		version_txt = "1.2";
++		pef2256->version_txt = "1.2";
+ 		break;
+ 	case PEF2256_VERSION_2_1:
+-		version_txt = "2.1";
++		pef2256->version_txt = "2.1";
+ 		break;
+ 	case PEF2256_VERSION_2_2:
+-		version_txt = "2.2";
++		pef2256->version_txt = "2.2";
+ 		break;
+ 	default:
+ 		return -ENODEV;
+ 	}
+-	dev_info(pef2256->dev, "Version %s detected\n", version_txt);
++	dev_info(pef2256->dev, "Version %s detected\n", pef2256->version_txt);
+ 
+ 	ret = pef2556_of_parse(pef2256, np);
+ 	if (ret)
+@@ -835,6 +845,8 @@ static int pef2256_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
+ 
++	device_create_file(pef2256->dev, &dev_attr_version);
++
+ 	return 0;
+ }
+ 
+@@ -849,6 +861,8 @@ static void pef2256_remove(struct platform_device *pdev)
+ 	pef2256_write8(pef2256, PEF2256_IMR3, 0xff);
+ 	pef2256_write8(pef2256, PEF2256_IMR4, 0xff);
+ 	pef2256_write8(pef2256, PEF2256_IMR5, 0xff);
++
++	device_remove_file(pef2256->dev, &dev_attr_version);
+ }
+ 
+ static const struct of_device_id pef2256_id_table[] = {
+-- 
+2.49.0
 
-> +
-> +	mbx_start = pci_resource_start(pdev, 0) + mbx_region.start;
-> +	len = resource_size(&mbx_region);
-> +
-> +	mbx_addr = ioremap(mbx_start, len);
-> +	if (!mbx_addr) {
-> +		pci_err(pdev, "Failed to allocate BAR0 mbx region\n");
-> +
-> +		return -EIO;
-
-I'd remove this newline.
-
-> +	}
-> +
-> +	writel(IDPF_VF_TEST_VAL, mbx_addr + VF_ARQBAL - VF_BASE);
-> +
-> +	/* Force memory write to complete before reading it back */
-> +	wmb();
-
-Make sure you know what you are doing. writel() is not writel_relaxed(),
-it already has a barrier inside.
-
-> +
-> +	*is_vf = readl(mbx_addr + VF_ARQBAL - VF_BASE) == IDPF_VF_TEST_VAL;
-
-Maybe put this `mbx_addr + VF_ARQBAL - VF_BASE` in a variable to not
-spell it out two times...
-
-Also weird logic. You don't map the whole BAR, you map only a piece of
-it. Ok. But going this route, you need to read only one register. Why
-not then
-
-	addr = ioremap(pci_resource_start(pdev, 0) + VF_ARQBAL, 4);
-
-	writel(IDPF_VF_TEST_VAL, addr);
-	is_vf = readl(addr) == IDPF_VF_TEST_VAL;
-
-?
-
-> +
-> +	iounmap(mbx_addr);
-> +
-> +	return 0;
-> +}
-
-Instead of returning only either 0 or -EIO and passing the result via a
-pointer to bool, you could instead just return either:
-
-* IDPF_DEV_ID_PF
-* IDPF_DEV_ID_VF
-* -EIO
-
-> +
->  /**
->   * idpf_vf_ctlq_reg_init - initialize default mailbox registers
->   * @adapter: adapter structure
-
-Thanks,
-Olek
 
