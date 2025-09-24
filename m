@@ -1,50 +1,56 @@
-Return-Path: <netdev+bounces-225763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FE3FB9807E
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 03:50:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 040D5B98084
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 03:51:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05BEB7ABDFE
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 01:48:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7FBA3B7A55
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 01:51:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFF002040B6;
-	Wed, 24 Sep 2025 01:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C0191FDE09;
+	Wed, 24 Sep 2025 01:51:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tY96a/5Q"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y50dKvtr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A812C18A
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 01:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819B715A85A
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 01:51:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758678610; cv=none; b=l+4lOwVxVP0Tjjb6siBbWFLCwe2iaw9C/w+WgDMv6dOFXhKlPaxAwCqoBNktl85D2jGFvrRtiFEQ1Luyh8deFsNDL6YiR65+q2SEI05lc5d9zXngkHMWdM3bB95ldWcANJ++RB/OjIuf/mYf/CVHL5WxQdwLsVpVAQ7kSAottCM=
+	t=1758678711; cv=none; b=rN91Cr6o/u2v+KKbTMQ736yXshdkRr7wRUruARgpDogJn4P8kget/FHZ/+ocEK8qeKbRz4aw4caBoSXnDIwrO1GGE1nzxHn9kK+tTXQhsm93QtsijdeIgedGANY0MQ313BkHcTEae/WhVUqFfI4e2mLxaudYZ5U6grJgLvp3zIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758678610; c=relaxed/simple;
-	bh=QqwikQrkN8QBPo4cBRMKtvWlP3hZ2QVqVxzDJDyTn60=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CMWj+MUr90oqCj2y8lxkAuXT8pl5OaRUgAEnSnEbtCSGGrzllxoM47fr+ZNrSX1rRBHYV1A/EpPy/9Vzya5BDC9m8dPgMCazrfurMzXzZniakns+kj49FMaZI5KSJApzMMSZsLWmxBKYG1UjB9VBspQvTp0DLJb8DycasTtfAHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tY96a/5Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E00CC4CEF5;
-	Wed, 24 Sep 2025 01:50:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758678610;
-	bh=QqwikQrkN8QBPo4cBRMKtvWlP3hZ2QVqVxzDJDyTn60=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tY96a/5Q1jVaecHLbeMHiqWFBj1B/rTFZw/ucSp1PNFZo3X/gsDQwstuLNSVf8QGa
-	 1ye4+EmQoPYwD+tdeT1XcymvbKjzmjn3GCVr1CDnTL9Q8cFhQnPF3gjj9ZyDRD7Z3+
-	 /nqPLHuTCGRxzjn/paT0+w2ey8i9BsKSr3n+tvQ/KCQokXvz0V1U2xwHFJunxC5BmB
-	 ximBtH3qlAo0PRU7rG8wnHc5RWlD/YxVDnghGD9yhEAg7c2Z/4Jzkx4KyTZl4wJbsw
-	 3TOznkQPf6faV6aHlp1U/mn8Fx+xto3AJWjSFkQFSro2mzG97USTlU0onYhaRSQnkK
-	 Fz+BiRqOgEnRw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CCE39D0C20;
-	Wed, 24 Sep 2025 01:50:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1758678711; c=relaxed/simple;
+	bh=FjHojtCN7AQpVEq1nEVB1/vM37l3NbHzRFLhWMwR1+s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Qx9F7tOTEco70pcvJDwEKQm3OM+L3TDjkBr5k7BDyzGy/1txoRp+HakkvosmmCQO8fMEaAmc96HlOP2jnk11x5wso9d3B/u3OGjsI3fP8uj205cp9du3ougWoiC8wkHkv7Z9Ej5wFVoyB9DPf3lca300+eCuf6PbxGqQsdDAZRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y50dKvtr; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758678707;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=HAZf/KZIY9K9jX7FFN9rFzc0hT+otMp2Fzu4morMicQ=;
+	b=Y50dKvtr7xtX8uuY1SU5Dq2S4dE94svfnKNXMPoML69HYteja+gdrtsaFnpgn2wjOqdKBa
+	CUC5piOQIBuquoWaOZceFlga6uibWAOZEGyq2HnPaLqLCgWvUWJGu2aRydpdywosm2BnUj
+	DPUwxzA9H2SfNbt6rYcVPKkfe5SLXig=
+From: xuanqiang.luo@linux.dev
+To: edumazet@google.com,
+	kuniyu@google.com
+Cc: kerneljasonxing@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+Subject: [PATCH net-next v5 0/3] net: Avoid ehash lookup races
+Date: Wed, 24 Sep 2025 09:50:31 +0800
+Message-Id: <20250924015034.587056-1-xuanqiang.luo@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,42 +58,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net-next] tcp: Remove stale locking comment for TFO.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175867860700.1994582.15023356418215363140.git-patchwork-notify@kernel.org>
-Date: Wed, 24 Sep 2025 01:50:07 +0000
-References: <20250923005441.4131554-1-kuniyu@google.com>
-In-Reply-To: <20250923005441.4131554-1-kuniyu@google.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: edumazet@google.com, ncardwell@google.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kuni1840@gmail.com,
- netdev@vger.kernel.org
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
+From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+After replacing R/W locks with RCU in commit 3ab5aee7fe84 ("net: Convert
+TCP & DCCP hash tables to use RCU / hlist_nulls"), a race window emerged
+during the switch from reqsk/sk to sk/tw.
 
-On Tue, 23 Sep 2025 00:54:19 +0000 you wrote:
-> The listener -> child locking no longer exists in the fast path
-> since commit e994b2f0fb92 ("tcp: do not lock listener to process
-> SYN packets").
-> 
-> Let's remove the stale comment for reqsk_fastopen_remove().
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> 
-> [...]
+Now that both timewait sock (tw) and full sock (sk) reside on the same
+ehash chain, it is appropriate to introduce hlist_nulls replace
+operations, to eliminate the race conditions caused by this window.
 
-Here is the summary with links:
-  - [v1,net-next] tcp: Remove stale locking comment for TFO.
-    https://git.kernel.org/netdev/net-next/c/dc1dea796b19
+Before this series of patches, I previously sent another version of the
+patch, attempting to avoid the issue using a lock mechanism. However, it
+seems there are some problems with that approach now, so I've switched to
+the "replace" method in the current patches to resolve the issue.
+For details, refer to:
+https://lore.kernel.org/netdev/20250903024406.2418362-1-xuanqiang.luo@linux.dev/
 
-You are awesome, thank you!
+Before I encountered this type of issue recently, I found there had been
+several historical discussions about it. Therefore, I'm adding this
+background information for those interested to reference:
+1. https://lore.kernel.org/lkml/20230118015941.1313-1-kerneljasonxing@gmail.com/
+2. https://lore.kernel.org/netdev/20230606064306.9192-1-duanmuquan@baidu.com/
+
+---
+
+Changes:
+  v5:
+    * Patch 1
+	* Rename __hlist_nulls_replace_rcu() to hlist_nulls_replace_rcu()
+	  and update the description of hlist_nulls_replace_init_rcu().
+    * Patch 2
+	* Remove __sk_nulls_replace_node_init_rcu() and inline it into
+	  sk_nulls_replace_node_init_rcu().
+	* Use DEBUG_NET_WARN_ON_ONCE() instead of WARN_ON().
+    * Patch 3
+	* Move smp_wmb() after setting the refcount.
+
+  v4: https://lore.kernel.org/all/20250920105945.538042-1-xuanqiang.luo@linux.dev/
+    * Patch 1
+	* Use WRITE_ONCE() for ->next in __hlist_nulls_replace_rcu(), and
+	  add why in the commit message.
+	* Remove the node hash check in hlist_nulls_replace_init_rcu() to
+	  avoid redundancy. Also remove the return value, as it serves no
+	  purpose in this patch series.
+    * Patch 3
+	* Remove the check of hlist_nulls_replace_init_rcu() return value
+	  in inet_twsk_hashdance_schedule() as it is unnecessary.
+          Thanks to Kuni for clarifying this.
+
+  v3: https://lore.kernel.org/all/20250916103054.719584-1-xuanqiang.luo@linux.dev/
+    * Add more background information on this type of issue to the letter
+      cover.
+
+  v2: https://lore.kernel.org/all/20250916064614.605075-1-xuanqiang.luo@linux.dev/
+    * Patch 1
+	* Use WRITE_ONCE() to initialize old->pprev.
+    * Patch 2&3
+	* Optimize sk hashed check. Thanks Kuni for pointing it out!
+
+  v1: https://lore.kernel.org/all/20250915070308.111816-1-xuanqiang.luo@linux.dev/
+
+Xuanqiang Luo (3):
+  rculist: Add hlist_nulls_replace_rcu() and
+    hlist_nulls_replace_init_rcu()
+  inet: Avoid ehash lookup race in inet_ehash_insert()
+  inet: Avoid ehash lookup race in inet_twsk_hashdance_schedule()
+
+ include/linux/rculist_nulls.h | 52 +++++++++++++++++++++++++++++++++++
+ include/net/sock.h            | 14 ++++++++++
+ net/ipv4/inet_hashtables.c    |  4 ++-
+ net/ipv4/inet_timewait_sock.c | 24 +++++++---------
+ 4 files changed, 79 insertions(+), 15 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
