@@ -1,231 +1,220 @@
-Return-Path: <netdev+bounces-226035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E79BBB9B10F
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:31:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A5B1B9B15D
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:40:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 307674C09B8
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 17:31:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C387C38100B
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 17:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175A03148C4;
-	Wed, 24 Sep 2025 17:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21A2315765;
+	Wed, 24 Sep 2025 17:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=esdhannover.onmicrosoft.com header.i=@esdhannover.onmicrosoft.com header.b="A/+H34zy"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CVygGL61"
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11022125.outbound.protection.outlook.com [52.101.66.125])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A673191B7;
-	Wed, 24 Sep 2025 17:30:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.125
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758735050; cv=fail; b=idLcDdA8NWFJNZY2qafdPizidfdjc51HDwpD6kT1G2/MjAHTYjG1WeIeVyMTc2sUh9wkwZtEIXJ+jgGJCu3X2cCUULnXUaEhOUTFDjqnBwQOM1DP8B4S8Kl9l4xkUbcgQYkXTT/5wZmRVq83aO8IL9jSKeFMJtMT3lCSlwGeDxM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758735050; c=relaxed/simple;
-	bh=3dMcrfV2URR0yI/cjjkTmjwV1BTucSl5MD6pKbgFh1M=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b9YkdCS7twzR4RyX25tOLkxKXzMMU7KNbrB20C44dEP+/zemBZdvq39o41w6mz53Xohc0XmakuMMHxuytHreJcKYCxNw2QxljK3i5Rv9N3Evdj8t/z8VtbP5htVsyujSwmtQGugg6nDD2iSvsRFeGYmFg+QGV80rkZFYAGBYyYk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=esd.eu; spf=pass smtp.mailfrom=esd.eu; dkim=pass (1024-bit key) header.d=esdhannover.onmicrosoft.com header.i=@esdhannover.onmicrosoft.com header.b=A/+H34zy; arc=fail smtp.client-ip=52.101.66.125
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=esd.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=esd.eu
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bZFaHRg0qsDcDTT2Urf4HXts16cMBVCH4EhbgJaRfRebfqtutAMJA8kMO5anCmHfI1rSPsS2l5w5PgHrGwmmSz19SXdlJhaLHUY92ooQgPz2sgbAipLc5nDLFKRQc1BsINBn0AH5UNRUXKYM1g6FVAeoV52YdShUC4eVwBnYBuNShrCt4RDUdcpnrFRwfG+BZFu/mjr3LESJeIKWe8PPdpfEU4nx96b7xTCnQ6d10Zb5M8phYe+OxvE5mGHPqGa8/OHSodHPTWQp/cEfhBSAJEim4eQuzD9Lpf8IHZdPZNoEygz98xq+E+qNTB8oqsdZV4z8sXKYrmoApLmVd9R/aQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nPxyuxybxjqTXwQLpo06+rU9ns1WmAtnMMiPn2PLlgk=;
- b=idsDYlambwhwfV+CMj/gtu2yVPRMjpGW4/Ab1QBK+sJPV0Umes7A+2roKIdxIHBVg/eZmCSrHY2xBrqOpwnI87eai0LGdrsnyqyiywPnELSzFc1HrcubHWetxomjFjVkSL3y70Qk8iDTMnHDnLIJgj53RGkhxUWxQyWdb93TD7mvIwufn45jAkucCfq73tq2gKalyakhHbg8eiscdVo0XbnQGngPwoP6Vuq1GaE/9ftZf1KWT8smxhumGDhYrFt2kqMYcrR5YzoCcX86722/XHvgRUWos0rj6301sPm68TVgNLNhn4uOHv8Xogg2gardPjZhEmiPNwBsRfVmsvY8Fw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=softfail (sender ip
- is 80.151.164.27) smtp.rcpttodomain=davemloft.net smtp.mailfrom=esd.eu;
- dmarc=fail (p=none sp=none pct=100) action=none header.from=esd.eu; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=esdhannover.onmicrosoft.com; s=selector1-esdhannover-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nPxyuxybxjqTXwQLpo06+rU9ns1WmAtnMMiPn2PLlgk=;
- b=A/+H34zybxkMuKT+Ai54AJHB5dg+J/ZeX1175/WqqGEZwxs8iCZZxNZEomUrQaZWZRFW1iKVUgfm3jV4HyeYM0ikgFn+KPVW3UmuIo90ZOYnJgPDoIatr5Uz8HVQoMLfRZteQ49SCCvl/KZ8uKS+YJphhYFpaBihLwSPHLsr6RE=
-Received: from AS4P191CA0028.EURP191.PROD.OUTLOOK.COM (2603:10a6:20b:5d9::20)
- by VI1PR03MB10079.eurprd03.prod.outlook.com (2603:10a6:800:1cf::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.19; Wed, 24 Sep
- 2025 17:30:40 +0000
-Received: from AM3PEPF00009B9E.eurprd04.prod.outlook.com
- (2603:10a6:20b:5d9::4) by AS4P191CA0028.outlook.office365.com
- (2603:10a6:20b:5d9::20) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.21 via Frontend Transport; Wed,
- 24 Sep 2025 17:30:40 +0000
-X-MS-Exchange-Authentication-Results: spf=softfail (sender IP is
- 80.151.164.27) smtp.mailfrom=esd.eu; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=esd.eu;
-Received-SPF: SoftFail (protection.outlook.com: domain of transitioning esd.eu
- discourages use of 80.151.164.27 as permitted sender)
-Received: from esd-s7.esd (80.151.164.27) by
- AM3PEPF00009B9E.mail.protection.outlook.com (10.167.16.23) with Microsoft
- SMTP Server id 15.20.9160.9 via Frontend Transport; Wed, 24 Sep 2025 17:30:39
- +0000
-Received: from debby.esd.local (jenkins.esd [10.0.0.190])
-	by esd-s7.esd (Postfix) with ESMTPS id E29F97C16CC;
-	Wed, 24 Sep 2025 19:30:35 +0200 (CEST)
-Received: by debby.esd.local (Postfix, from userid 2044)
-	id DC31F2E25B5; Wed, 24 Sep 2025 19:30:35 +0200 (CEST)
-From: =?UTF-8?q?Stefan=20M=C3=A4tje?= <stefan.maetje@esd.eu>
-To: Frank Jungclaus <frank.jungclaus@esd.eu>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol@kernel.org>,
-	linux-can@vger.kernel.org,
-	socketcan@esd.eu
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Simon Horman <horms@kernel.org>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH v3 3/3] can: esd_usb: Add watermark handling for TX jobs
-Date: Wed, 24 Sep 2025 19:30:35 +0200
-Message-Id: <20250924173035.4148131-4-stefan.maetje@esd.eu>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250924173035.4148131-1-stefan.maetje@esd.eu>
-References: <20250924173035.4148131-1-stefan.maetje@esd.eu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3FA30B52C;
+	Wed, 24 Sep 2025 17:39:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758735600; cv=none; b=AbMnGz086GRsDgkeFUtl12DH5U5JG5fWYDTCqaJThLe2g2u3wydYbHLmflHMyWiW2FsZxY2XgQo8PQt1sW94sv0wicQoLNlPuo06Yco0Zs584CU+eBC2YXZH1F/i5ORsPiKHvquGzOW0hXbGspYEiO2m5CqloaUia49N4kXnE1o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758735600; c=relaxed/simple;
+	bh=EIw+yL1rX4b+MKvL5gnnvFIX08EsOT9gAqyFYS1Hd1M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gHus0gThA4E3mJO38zEOl7ZffWAyyo7NhlT9ux69ewbrxvIQkSap0HEyHccOE20xaa9F2mLvLMTtl09m1t+dN+9EEej7RF81Esx36/9KcVoXv5M3g+gEgq8RMiUC8kmBFgEB6cdg/+/dtnWxnpEUVN8AxzrVimFUZwg9s4sA67U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=CVygGL61; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58OFRPUc019571;
+	Wed, 24 Sep 2025 17:34:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=swderQ
+	AQ/nLjRIWI4WUjnk1C6gRE9oS7mOEk5E6A8v4=; b=CVygGL61X6fvpRBxSP9rMW
+	bB4tnPX68n0K7wp7JgmZxZzI6/mzE64H0Lpqq8x39xLU5K9DIUelzWCxeEUAcDUL
+	vu78tWgiTxa2iOPWn0WHtqAdE35Kdgubwybj5aMx3iv1TcNxm1WV2qvhtlZHhwSB
+	Ii82LdPvq7zqTsNYjpxwYBrJXmUr7ZfJmgJAOFm32iaB3CupWv7oAS81lUTDClLP
+	GJT0dUbl42tDKWSiligv4WeP5n8VFHHckyWzk3jqXQC1yGCTwPE4WghO8uipd5bq
+	xA+V3fuvdkaVpWBdSF4j0HipugpYt2dguQjLWf0CTOxdkk+WOLk2UfcnN584UYYQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 499hpqgkbs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Sep 2025 17:34:28 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58OHYRZN010227;
+	Wed, 24 Sep 2025 17:34:27 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 499hpqgkbq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Sep 2025 17:34:27 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58OHPah1013345;
+	Wed, 24 Sep 2025 17:34:26 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49cj348wqw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Sep 2025 17:34:26 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58OHYMuJ57934224
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 24 Sep 2025 17:34:22 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8100320040;
+	Wed, 24 Sep 2025 17:34:22 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9D45220043;
+	Wed, 24 Sep 2025 17:34:21 +0000 (GMT)
+Received: from [9.111.167.228] (unknown [9.111.167.228])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 24 Sep 2025 17:34:21 +0000 (GMT)
+Message-ID: <d2674df8-166b-4af7-97d0-e67fe0145151@linux.ibm.com>
+Date: Wed, 24 Sep 2025 19:34:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 13/14] dibs: Move data path to dibs layer:
+ manual merge
+To: Matthieu Baerts <matttbe@kernel.org>,
+        Sidraya Jayagond <sidraya@linux.ibm.com>
+Cc: Julian Ruess <julianr@linux.ibm.com>,
+        Aswin Karuvally <aswin@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Mahanta Jambigi <mjambigi@linux.ibm.com>,
+        Tony Lu
+ <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Konstantin Shkolnyy <kshk@linux.ibm.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Shannon Nelson <sln@onemain.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>, "D. Wythe" <alibuda@linux.alibaba.com>,
+        Dust Li <dust.li@linux.alibaba.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Stephen Rothwell <sfr@canb.auug.org.au>
+References: <20250918110500.1731261-1-wintera@linux.ibm.com>
+ <20250918110500.1731261-14-wintera@linux.ibm.com>
+ <74368a5c-48ac-4f8e-a198-40ec1ed3cf5f@kernel.org>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <74368a5c-48ac-4f8e-a198-40ec1ed3cf5f@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM3PEPF00009B9E:EE_|VI1PR03MB10079:EE_
-X-MS-Office365-Filtering-Correlation-Id: 12918814-e689-40bd-e2fe-08ddfb90145f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|19092799006|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VEZMMExFbVk1bDcyL0M3enM4bkJMTVVEMjkxdm5kNytmMU1Sekc1TTM5WXBW?=
- =?utf-8?B?aDA3ZllmNzhhT05FeUFZeWhCTHNqaXJXNjA0ZktQZE40aHBYQVRwc2pZUTN4?=
- =?utf-8?B?THI5Vlh0c0h0WWNqZXNINnc4d29VU0QzMUVQaHlBUXFHWWkyUlNXQlJQMC9s?=
- =?utf-8?B?UDVyU05oNHRqU3Rmd1FrU0thV0xpU0NMZEJWZlVPNWkvSktaTnU4UmxXSGpw?=
- =?utf-8?B?RVJRKytxQldpV2Q0VVJGRHJObDBlNmdpUThGb2xUN0VwNmVJTmt0SlZ1aWdv?=
- =?utf-8?B?UkxFOGhDeE9LSzM1UnJDUGJleUJCS0VMcjZBZ2srSWhhR2VqbEsxVHQyYVdl?=
- =?utf-8?B?L3RTcGJkU1k3d3JVWlJFeVJxQ3AwRVJRTnFOa1pIclhtWlQrNk14VU1PTlhC?=
- =?utf-8?B?Vzhid0o5eHQ5OWl3dzRkOG8zL1dHZ2d0OFN2eXlTVlg5cjVtUCtNa2oxZzlL?=
- =?utf-8?B?eGpVQjdydE5MdkVTYmZFWDlMNHdKcXA0cThSQUhRWmVKeW5YcG5BSCt4SUZW?=
- =?utf-8?B?YUFaR0tBQ3hOdTFnY0d1VndMeXhlZFpnTUF5R2MxSlpiZ0ljenpEaFIxS0t4?=
- =?utf-8?B?OU16MGVNdzk3SmRvMEFPQVIzQmEwYmZ3R2FGQkZUVFgvUStCbGh2ejRXYlNH?=
- =?utf-8?B?U0NJMnJ4R2V6ZGFZeWpWRlFUR2lwQXVNT3NwamgzSklIUzA5cUUxY3ZCSkFu?=
- =?utf-8?B?eFZ5ZEN3d1NhREx2MXBERHI0cDlIRXhiR3N5dGM2em1IOVVDVDhQS3cydzU3?=
- =?utf-8?B?aFNhUGJkdWxkS2JFa3gvR2dUcHU1RHNxckYyWXAxRkpIVlYzQmUzT3ExYzlj?=
- =?utf-8?B?SkxaNUxpL00zMzV4M1d5WVgrd1JQb1M4UjRtR0tjV1BIUlZFTTlkdy9YREsz?=
- =?utf-8?B?bWMrdkxqdElUNmxwUGI4NGttWmwxNnljNGh6R2Nlc1ZSeHY0bk93bENzeU5q?=
- =?utf-8?B?ZnNNQTJnZDBJM3MrOWRpL0huR3lZKzBqSjhUTEk0R1hDUWhySzI0YlRiYVVi?=
- =?utf-8?B?TTh3UmFUSnBRWml3YXpXTUE5T1lpWlhUMkNGekJ6TXlOYkhFRGVnaVAwalFx?=
- =?utf-8?B?VTZpT1EwRUo2Z0lRRlBURjhSaDc4ZHdGNm01dDBVVmkwZy9QamttUFk3QTky?=
- =?utf-8?B?OTBwK3BUNER5ZUVCTC9WVGJ6SzNVVElJbk5iT1BYMmEwNnNPRzVYcFBuVzhL?=
- =?utf-8?B?WDdQRXVnVEdXeGZTTWZBWkc0RmxFYWJtVTk5SGxvd2Fzb0NhaDh3R2M0ZXNN?=
- =?utf-8?B?TGpuUlpjT2owaUpMdGRYd21VYVRWaDB0OFlOdUZpbWRha2VtSkh5TkxoaURB?=
- =?utf-8?B?QU95UmFNbXNWdlViZ0tiWHNWbVlPOGtDbHptUWtHd2VEMGJ3dVhTRFludEJM?=
- =?utf-8?B?ZFNFZVJLcUtWcTFkMGJmMW5ZWHVHc2F0bHZodWtraldRWmNIQW14c2pJSVN2?=
- =?utf-8?B?VGJDMFVXakVzUDJTRWZrQTdwcS9SLytFTXU5ZmRnRVdqYUEzOFlSU1JCZjVn?=
- =?utf-8?B?b3dtRys0V3VlRlNxOUdKNVcreU12MEF6S1lKM1FtU2xJZm1FWVBOeGdDYkFC?=
- =?utf-8?B?bTViVzllck83eFNIWHE1dUJ3QXRjSXFyVU9CWVNDWEJyNXZFQ1RPaHRCRFMv?=
- =?utf-8?B?SVJtK0hRaVoyK1E4TXhGMEpPWHlBZmZVU0dqcVl6YlkrNWtxd3BUWDBvVXFp?=
- =?utf-8?B?WUZacGtsbFFjb2hPK0x2NDFQVDRyU0VFcTZIcUVaYTBOWHJDSmVJNUpkRHp6?=
- =?utf-8?B?bXZDRUtSUDl1RGxRbUJEMnN1b2hucnlDWDl6d0RieXRQQkNEbW9NRmwwanF5?=
- =?utf-8?B?MlFNSnJ4bERHZVJ3RllVS0tkM1pKMjZVNVBGc3ZkblpLM01pS0RtTFV5SjB2?=
- =?utf-8?B?MVYwS250cU5OK3l0dUVRUHR3amhzSXdSb3hkaDNMa0NJZE94UFhjc2dTT0x1?=
- =?utf-8?B?bGw5UTJtTzVUQ2oyZkRvbGU2bDY1Vk9yR1BibmNocnZHOFNXZVpMUWJTN21i?=
- =?utf-8?B?K2FCdTluc213PT0=?=
-X-Forefront-Antispam-Report:
-	CIP:80.151.164.27;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:esd-s7.esd;PTR:p5097a41b.dip0.t-ipconnect.de;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(19092799006)(376014)(82310400026);DIR:OUT;SFP:1102;
-X-OriginatorOrg: esd.eu
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Sep 2025 17:30:39.1423
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12918814-e689-40bd-e2fe-08ddfb90145f
-X-MS-Exchange-CrossTenant-Id: 5a9c3a1d-52db-4235-b74c-9fd851db2e6b
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5a9c3a1d-52db-4235-b74c-9fd851db2e6b;Ip=[80.151.164.27];Helo=[esd-s7.esd]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM3PEPF00009B9E.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR03MB10079
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=FrEF/3rq c=1 sm=1 tr=0 ts=68d42ba4 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=NEAV23lmAAAA:8 a=VnNF1IyMAAAA:8
+ a=_P0N5cATbgLpTNkhML8A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: xkQDjNqQ_gxnFSJC3dHidaCVh6PIaE33
+X-Proofpoint-GUID: OEggMEipIdt4bOHYaBYZX8tjCzsVNSP2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE5MDIyNCBTYWx0ZWRfX8mj6tUGyBtdN
+ LTbnaTOwTk3OQdsXFwWrpPX62SCLne/CaANoasKwW1ZJM+GCR3SxhCXOfNiCPk1yL3hNnI55Epl
+ 3x7uQEE8Lr2sLehAy5jnLk5NfYQ8X+qai+Se2lKnBdN/MqmCql2108zIpqUh60I8Aj8RHk5NmoV
+ /GRfSFge2TFoK11Ny1+HQENxc1pxtQuLrvB09hKrCFfopc6UtLM9LSiTYE+6nKJZz06V0XDsr9B
+ 1o7CMHzglI+czbEdUtVv0QDbgcPkQQaZEC3CSGWIYTakY/Ys9uFQ+5tviZB+BCUCauKnFUzljqu
+ vWRAIBWQBkQf3Cj7JgfNKShmXsLynFysCUSUkkxSUm4+a1uVwbMHBGrTFheEW58DMFXDhXZGCKp
+ JNcSnLK2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-24_04,2025-09-24_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 phishscore=0 priorityscore=1501 malwarescore=0 adultscore=0
+ clxscore=1011 impostorscore=0 spamscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509190224
 
-The driver tried to keep as much CAN frames as possible submitted to the
-USB device (ESD_USB_MAX_TX_URBS). This has led to occasional "No free
-context" error messages in high load situations like with
-"cangen -g 0 -p 10 canX".
 
-Now call netif_stop_queue() already if the number of active jobs
-reaches ESD_USB_TX_URBS_HI_WM which is < ESD_USB_MAX_TX_URBS. The
-netif_start_queue() is called in esd_usb_tx_done_msg() only if the
-number of active jobs is <= ESD_USB_TX_URBS_LO_WM.
 
-This change eliminates the occasional error messages and significantly
-reduces the number of calls to netif_start_queue() and
-netif_stop_queue().
+On 24.09.25 11:07, Matthieu Baerts wrote:
+> Hi Alexandra, Sidraya,
+> 
+> On 18/09/2025 12:04, Alexandra Winter wrote:
+>> Use struct dibs_dmb instead of struct smc_dmb and move the corresponding
+>> client tables to dibs_dev. Leave driver specific implementation details
+>> like sba in the device drivers.
+>>
+>> Register and unregister dmbs via dibs_dev_ops. A dmb is dedicated to a
+>> single client, but a dibs device can have dmbs for more than one client.
+>>
+>> Trigger dibs clients via dibs_client_ops->handle_irq(), when data is
+>> received into a dmb. For dibs_loopback replace scheduling an smcd receive
+>> tasklet with calling dibs_client_ops->handle_irq().
+>>
+>> For loopback devices attach_dmb(), detach_dmb() and move_data() need to
+>> access the dmb tables, so move those to dibs_dev_ops in this patch as well.
+>>
+>> Remove remaining definitions of smc_loopback as they are no longer
+>> required, now that everything is in dibs_loopback.
+>>
+>> Note that struct ism_client and struct ism_dev are still required in smc
+>> until a follow-on patch moves event handling to dibs. (Loopback does not
+>> use events).
+> 
+> FYI, we got a conflict when merging 'net' in 'net-next' in the MPTCP
+> tree due to this patch applied in 'net':
+> 
+>   a35c04de2565 ("net/smc: fix warning in smc_rx_splice() when calling
+> get_page()")
+> 
+> and this one from 'net-next':
+> 
+>   cc21191b584c ("dibs: Move data path to dibs layer")
+> 
+> ----- Generic Message -----
+> The best is to avoid conflicts between 'net' and 'net-next' trees but if
+> they cannot be avoided when preparing patches, a note about how to fix
+> them is much appreciated.
+> The conflict has been resolved on our side[1] and the resolution we
+> suggest is attached to this email. Please report any issues linked to
+> this conflict resolution as it might be used by others. If you worked on
+> the mentioned patches, don't hesitate to ACK this conflict resolution.
+> ---------------------------
+> 
+> Regarding this conflict, I hope the resolution is correct. The patch
+> from 'net' was modifying 'net/smc/smc_loopback.c' in
+> smc_lo_register_dmb() and __smc_lo_unregister_dmb(). I applied the same
+> modifications in 'drivers/dibs/dibs_loopback.c', in
+> dibs_lo_register_dmb() and __dibs_lo_unregister_dmb(). In net-next,
+> kfree(cpu_addr) was used instead of kvfree(cpu_addr), but this was done
+> on purpose. Also, I had to include mm.h to be able to build this driver.
+> I also attached a simple diff of the modifications I did.
+> 
+> Does that look OK to both of you?
+> 
+> Note: no rerere cache is available for this kind of conflicts.
+> 
+> Cheers,
+> Matt
+> 
+> [1] https://github.com/multipath-tcp/mptcp_net-next/commit/af2dbdbb0a91
 
-The watermark limits have been chosen with the CAN-USB/Micro in mind to
-not to compromise its TX throughput. This device is running on USB 1.1
-only with its 1ms USB polling cycle where a ESD_USB_TX_URBS_LO_WM
-value below 9 decreases the TX throughput.
+Acked-by: Alexandra Winter <wintera@linux.ibm.com>
 
-Fixes: 96d8e90382dc ("can: Add driver for esd CAN-USB/2 device")
-Signed-off-by: Stefan Mätje <stefan.maetje@esd.eu>
-Link: https://patch.msgid.link/20250821143422.3567029-4-stefan.maetje@esd.eu
-[mkl: minor change patch description to imperative language]
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/usb/esd_usb.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/can/usb/esd_usb.c b/drivers/net/can/usb/esd_usb.c
-index 588ec02b9b21..a5206ff27565 100644
---- a/drivers/net/can/usb/esd_usb.c
-+++ b/drivers/net/can/usb/esd_usb.c
-@@ -98,6 +98,8 @@ MODULE_LICENSE("GPL v2");
- #define ESD_USB_RX_BUFFER_SIZE		1024
- #define ESD_USB_MAX_RX_URBS		4
- #define ESD_USB_MAX_TX_URBS		16 /* must be power of 2 */
-+#define ESD_USB_TX_URBS_HI_WM		((15 * ESD_USB_MAX_TX_URBS) / 16)
-+#define ESD_USB_TX_URBS_LO_WM		((9 * ESD_USB_MAX_TX_URBS) / 16)
- #define ESD_USB_DRAIN_TIMEOUT_MS	100
- 
- /* Modes for CAN-USB/3, to be used for esd_usb_3_set_baudrate_msg_x.mode */
-@@ -478,7 +480,8 @@ static void esd_usb_tx_done_msg(struct esd_usb_net_priv *priv,
- 	if (!netif_device_present(netdev))
- 		return;
- 
--	netif_wake_queue(netdev);
-+	if (atomic_read(&priv->active_tx_jobs) <= ESD_USB_TX_URBS_LO_WM)
-+		netif_wake_queue(netdev);
- }
- 
- static void esd_usb_read_bulk_callback(struct urb *urb)
-@@ -988,7 +991,7 @@ static netdev_tx_t esd_usb_start_xmit(struct sk_buff *skb,
- 	context->priv = priv;
- 	context->echo_index = i;
- 
--	/* hnd must not be 0 - MSB is stripped in txdone handling */
-+	/* hnd must not be 0 - MSB is stripped in TX done handling */
- 	msg->tx.hnd = BIT(31) | i; /* returned in TX done message */
- 
- 	usb_fill_bulk_urb(urb, dev->udev, usb_sndbulkpipe(dev->udev, 2), buf,
-@@ -1003,8 +1006,8 @@ static netdev_tx_t esd_usb_start_xmit(struct sk_buff *skb,
- 
- 	atomic_inc(&priv->active_tx_jobs);
- 
--	/* Slow down tx path */
--	if (atomic_read(&priv->active_tx_jobs) >= ESD_USB_MAX_TX_URBS)
-+	/* Slow down TX path */
-+	if (atomic_read(&priv->active_tx_jobs) >= ESD_USB_TX_URBS_HI_WM)
- 		netif_stop_queue(netdev);
- 
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
--- 
-2.34.1
+LGTM, thank you very much Matthieu.
 
 
