@@ -1,155 +1,587 @@
-Return-Path: <netdev+bounces-226113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 173EBB9C5C0
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 00:31:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D37A6B9C5C9
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 00:32:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 231E41B259F0
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 22:32:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E9892E4465
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 22:32:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43562882A7;
-	Wed, 24 Sep 2025 22:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5494D28A704;
+	Wed, 24 Sep 2025 22:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SRfjKh/O"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HzJrlLhi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F33E246BB4
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 22:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A6F27B4E8
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 22:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758753096; cv=none; b=MuXbb9GziotjQGL7M547vqFXmTOWf+FI3bv1Tquue66wH4YmT184DJwSIbFZpYGpthFiCwr5h5j0Z4ZXxzQ33RxDmEKXMbxMv/HqQtbf4cxzJpThbphr4T/2fUxvnyT27GSD0Gb9hFUc5U29wErQsgcyLMPj6smOdjZWZj63dQM=
+	t=1758753123; cv=none; b=WbwO3z0euznORtrRJ0kvAAzlmyQECTIJgTns621T5H1sO5K7Ewi9osDwFXi7v+vE+eN/UrJukh7SXwap5yHMDaV9UZ+zmYFUZcp5U0MpZ3lHVDhvB1suBgedwcBhKOZEA7q8Kvip9mB3Zbf9Bq53gi1+lWAazpvn70/pKJFc/0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758753096; c=relaxed/simple;
-	bh=E3mp818XeEDGifzwzdOnw8G4qn3w2nYXo2kiXHXmH1I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YJbHLHFK01kOpGnAcUZXo+phONCB03/ezmxmh2dNvJsmEEy0W1OiiPTEMMoJT2HZxq7BT7aJe7ujdgQ9wFwplEpU0nvA3qDAP1UtblLKNZTpvT7Wf8GG5avoVvea5YAJ7Oc8vL8AUVAvRRPt7FLu8SFHjWp6Fl2mclupwalZ69k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SRfjKh/O; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2697899a202so11915415ad.0
-        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 15:31:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758753094; x=1759357894; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NWJ481WqwYt03Qs8yEQYxXt74IruS1KgxQpyoMD3fOU=;
-        b=SRfjKh/Oa3qxnxurXBHLFYIKs7j1n9CLuhpwWHyYUxayMNFcNQVXm4ZASByYSs9Lbk
-         UT1NcZXphV3AcX1QZwHuB+i0IQxjOHFIGekrxQeZ/k9qIlf4pvJSlt2Frf+XtH3CpO7M
-         8kbiBObSyIDfnpr/7/A3T9TztmBRgfKYvoFRtGkm877SIQWugPpJBRRZtqVwXw6dKEK/
-         pPfLTqVhpueuVrrB21n8NBKHfE6Lyvz4T10wCpJit5xP5jWQxjZIatn6DLt1pjcqAVis
-         KMGYztjABG5OSGd+81koCGFMBFGIIDqCI2YGpjTPXXfh8jO890vihlBAdjDIFjTC4ywg
-         KL1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758753094; x=1759357894;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NWJ481WqwYt03Qs8yEQYxXt74IruS1KgxQpyoMD3fOU=;
-        b=lPivP7J+KBGAshwBqEykMRl0CvGb/UFo8QpZXHUNBGCPxebaFrs4aM8DuoNLaN3nPz
-         RZe50s84NuE1lQ1IY025Gno0bcGPtE3VRv20S4kr2I+cnuvMo8OTRo7RUJmVuy35ubud
-         3jRSgbfrxrvfpk1dXsm6Tc1hUTW/oaHIDiIKlBaWgUtCZPBvvi3n9vnPRNu1/gZhDDrp
-         P7Rk/U9AnCT2P7F2RCQdjFkz7IY6OKshyJ0k1iuEFwCmnZ6HPy5Bo1Gst5wkicNB3Hsx
-         SensowH6dJ6Z1FLpGwmwZ1MAp+ubqVWOchnbcBugJyR+1txO7bJJ13pwmfWx3axEf7TD
-         /UUw==
-X-Forwarded-Encrypted: i=1; AJvYcCUBW1+lEOBrOkCS8JvE5K8U4fWKpF0j4qVw9oZXw1rZr/9F1qR48yheys67W+37PlsxMubsHYM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjfP5gMe3ubbYDJfj+JpWJGFw77x0prowyLcGYtkb3aPBxb7av
-	0OC+c8klqV0CihEqMzkKxkRWZTw1WbRO1xxsqDoO6bRZvuNUjwkpsNQ=
-X-Gm-Gg: ASbGncuBaDv1180fapUCTsTVmJpUomoaAuuhSYFog5iERiXMWZT7cXmRQEkWcgl8q2T
-	4zuO0QL1SVi9khjEuLA1/orNGRWzxVmDwV7EonvlKZIFNjkyWKJjmz32PNSm0u4nHUNU50CULe0
-	+pd8+W0V0mZysuGSZnHKPYS8banVdU1BR16fTeXkwWLAbD7o3fWeeby0AULh7lJEGDMVbYwmIOh
-	yrGhQSBvkCAelVo51/UZgnQsU5gGcscKDMDXQIQ1e/vnKdFv6ab+grYKv88i7KPqxv8BxPjRHjq
-	SDSTf+b8nN948JnUVYpubi28b+KpN74xl6yVu6J/KyLoonOMjViu7q23A60G4avtzXqfNeXuSad
-	4PzThmkcYHzc3SxnY6R4SwrRVoJ0iASX9jAcEeKR2eYi/8WVc9HjahtFnDIwT6A3GWCgxiFn/Ph
-	Y6cxvGfbYZAEDhaDQ8jXqd9Z7hmhBiuoftC6J3MyQVzLfc2pJYblmz+RxBjVdwTMsJrYyxQmLov
-	Yb6
-X-Google-Smtp-Source: AGHT+IGqXSUCi05Q6A/shBANKJJ+7L6thhmdeK778FmwuGU+D6HEICoXlQ65iZTp1I/QU4cKU7BZPQ==
-X-Received: by 2002:a17:902:8210:b0:267:44e6:11d6 with SMTP id d9443c01a7336-27ed6aca024mr3396525ad.6.1758753094437;
-        Wed, 24 Sep 2025 15:31:34 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-27ed6886f4esm3083585ad.80.2025.09.24.15.31.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Sep 2025 15:31:34 -0700 (PDT)
-Date: Wed, 24 Sep 2025 15:31:33 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, donald.hunter@gmail.com, andrew+netdev@lunn.ch,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, matttbe@kernel.org,
-	chuck.lever@oracle.com, jdamato@fastly.com, skhawaja@google.com,
-	dw@davidwei.uk, mkarsten@uwaterloo.ca, yoong.siang.song@intel.com,
-	david.hunter.linux@gmail.com, skhan@linuxfoundation.org,
-	horms@kernel.org, sdf@fomichev.me, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org
-Subject: Re: [PATCH RFC 0/4] Add XDP RX queue index metadata via kfuncs
-Message-ID: <aNRxRRSfjOzSPNks@mini-arch>
-References: <20250923210026.3870-1-mehdi.benhadjkhelifa@gmail.com>
- <aNMG2X2GLDLBIjzB@mini-arch>
- <f103da72-0973-4a45-af81-ec1537422433@gmail.com>
+	s=arc-20240116; t=1758753123; c=relaxed/simple;
+	bh=cT6oNBp8/7IFqr2aUEVAHaBua3aX8Se9Xch61lrDVX4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W4MZUAWAj6DmxREYoGpgFWYDB8/Kq7oXl0MRDIhUxYGUdARYLRSL+kaHkKLq+ufWOrXo9MnF4/HHQPLSDOFJZscyYbzZ+XHcdJvF5BoFC6Lw7i5aoaK1SN3d5iXJxKiPgLnY2rqDWnbt12mITUsQjUKndqwUoskOn3UceTrmAwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HzJrlLhi; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758753122; x=1790289122;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=cT6oNBp8/7IFqr2aUEVAHaBua3aX8Se9Xch61lrDVX4=;
+  b=HzJrlLhiPENOvKGauAd+GvrtA18Zoza6O/oPx7vg57IcR13fUy6Tl0hG
+   G/Y+oPprGA9m8gnpsIkllWAtpWMEc+j/rqh1TG+UlD8/shGI7XGZOfr4y
+   c11hVW6k8oPfVdbx+BnOn0D45m2FY/73tO8/DIyTrV+doVuIW3wOI20y2
+   Hanf9Z/PMYZos6GCKMIN0n1dR01qHci2/gBgraffPdJTV8OIzftGsyCo3
+   svMtpBE1DywVeqjKxbgDIle7M6zTGVW9XhSDrK77qWGgjiVYhwmXnNH07
+   k35XU6De0XTaeO5qiOUtChVIuQAoYeiimmNbRBXlJZ7hRAuPPClhz5cfk
+   A==;
+X-CSE-ConnectionGUID: cj7O62EPTMqbOLoYJ2Nt/g==
+X-CSE-MsgGUID: liWuUUS9TYWiEpViQ89A4A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11563"; a="61230583"
+X-IronPort-AV: E=Sophos;i="6.18,291,1751266800"; 
+   d="scan'208";a="61230583"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 15:32:01 -0700
+X-CSE-ConnectionGUID: c6FSmw8FQ5arNvM5PiVEkQ==
+X-CSE-MsgGUID: 9IlraFBcR+yRs3FMY0YGqA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,291,1751266800"; 
+   d="scan'208";a="176754285"
+Received: from gabaabhi-mobl2.amr.corp.intel.com (HELO [10.125.108.218]) ([10.125.108.218])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 15:31:59 -0700
+Message-ID: <548092f9-74b0-4b10-8db0-aeb2f6c96dcd@intel.com>
+Date: Wed, 24 Sep 2025 15:31:57 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f103da72-0973-4a45-af81-ec1537422433@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 5/6] bnxt_fwctl: Add bnxt fwctl device
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>, jgg@ziepe.ca,
+ michael.chan@broadcom.com
+Cc: saeedm@nvidia.com, Jonathan.Cameron@huawei.com, davem@davemloft.net,
+ corbet@lwn.net, edumazet@google.com, gospo@broadcom.com, kuba@kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+ selvin.xavier@broadcom.com, leon@kernel.org,
+ kalesh-anakkur.purayil@broadcom.com
+References: <20250923095825.901529-1-pavan.chebbi@broadcom.com>
+ <20250923095825.901529-6-pavan.chebbi@broadcom.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20250923095825.901529-6-pavan.chebbi@broadcom.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 09/24, Mehdi Ben Hadj Khelifa wrote:
-> On 9/23/25 9:45 PM, Stanislav Fomichev wrote:
-> > On 09/23, Mehdi Ben Hadj Khelifa wrote:
-> > > ---
-> > > Mehdi Ben Hadj Khelifa (4):
-> > >    netlink: specs: Add XDP RX queue index to XDP metadata
-> > >    net: xdp: Add xmo_rx_queue_index callback
-> > >    uapi: netdev: Add XDP RX queue index metadata flags
-> > >    net: veth: Implement RX queue index XDP hint
-> > > 
-> > >   Documentation/netlink/specs/netdev.yaml |  5 +++++
-> > >   drivers/net/veth.c                      | 12 ++++++++++++
-> > >   include/net/xdp.h                       |  5 +++++
-> > >   include/uapi/linux/netdev.h             |  3 +++
-> > >   net/core/xdp.c                          | 15 +++++++++++++++
-> > >   tools/include/uapi/linux/netdev.h       |  3 +++
-> > >   6 files changed, 43 insertions(+)
-> > >   ---
-> > >   base-commit: 07e27ad16399afcd693be20211b0dfae63e0615f
-> > >   this is the commit of tag: v6.17-rc7 on the mainline.
-> > >   This patch series is intended to make a base for setting
-> > >   queue_index in the xdp_rxq_info struct in bpf/cpumap.c to
-> > >   the right index. Although that part I still didn't figure
-> > >   out yet,I m searching for my guidance to do that as well
-> > >   as for the correctness of the patches in this series.
-> 
-> > But why do you need a kfunc getter? You can already get rxq index
-> > via xdp_md rx_queue_index.
-> 
-> Hi Stanislav, When i was looking at the available information or recent
-> similar patches to populate the queue_index in xdp_rxq_info inside of
-> the cpu map of an ebpf program to run xdp. i stumbled upon this:
-> https://lkml.rescloud.iu.edu/2506.1/02808.html
-> 
-> which suggests that in order to that, a struct called "xdp_rx_meta" should
-> be the route to do that. In my navigation of code i only found
-> the closest thing to that is xdp_rx_metadata which is an enum. I tried to
-> follow was done for other metadata there like timestamp in order to see if
-> that gets me closer to do that. which was stupid with the information that i
-> have now but for my lack of experience (this is my first patch) i tried to
-> reason with the code.So yeah, since xdp_md is the structure for transfering
-> metadata to ebpf programs that use xdp. it's useless to have a kfunc to
-> expose queue_index since it's already present there. But how would one try
-> to populate the queue_index in xdp_rxq_info in cpu_map_bpf_prog_run_xdp()?
-> Any sort of hints or guides would be much appreciated.
-> Thank you for your time.
 
-I don't really understand what queue_index means for the cpu map. It is
-a kernel thread doing work, there is no queue. Maybe whoever added
-the todo can clarify?
+
+On 9/23/25 2:58 AM, Pavan Chebbi wrote:
+> Create bnxt_fwctl device. This will bind to bnxt's aux device.
+> On the upper edge, it will register with the fwctl subsystem.
+> It will make use of bnxt's ULP functions to send FW commands.
+> 
+> Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
+> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> ---
+>  MAINTAINERS                 |   6 +
+>  drivers/fwctl/Kconfig       |  11 ++
+>  drivers/fwctl/Makefile      |   1 +
+>  drivers/fwctl/bnxt/Makefile |   4 +
+>  drivers/fwctl/bnxt/main.c   | 297 ++++++++++++++++++++++++++++++++++++
+>  include/uapi/fwctl/bnxt.h   |  63 ++++++++
+>  include/uapi/fwctl/fwctl.h  |   1 +
+>  7 files changed, 383 insertions(+)
+>  create mode 100644 drivers/fwctl/bnxt/Makefile
+>  create mode 100644 drivers/fwctl/bnxt/main.c
+>  create mode 100644 include/uapi/fwctl/bnxt.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index a8a770714101..8954da3e9203 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10115,6 +10115,12 @@ L:	linux-kernel@vger.kernel.org
+>  S:	Maintained
+>  F:	drivers/fwctl/pds/
+>  
+> +FWCTL BNXT DRIVER
+> +M:	Pavan Chebbi <pavan.chebbi@broadcom.com>
+> +L:	linux-kernel@vger.kernel.org
+> +S:	Maintained
+> +F:	drivers/fwctl/bnxt/
+> +
+>  GALAXYCORE GC0308 CAMERA SENSOR DRIVER
+>  M:	Sebastian Reichel <sre@kernel.org>
+>  L:	linux-media@vger.kernel.org
+> diff --git a/drivers/fwctl/Kconfig b/drivers/fwctl/Kconfig
+> index b5583b12a011..203b6ebb06fc 100644
+> --- a/drivers/fwctl/Kconfig
+> +++ b/drivers/fwctl/Kconfig
+> @@ -29,5 +29,16 @@ config FWCTL_PDS
+>  	  to access the debug and configuration information of the AMD/Pensando
+>  	  DSC hardware family.
+>  
+> +	  If you don't know what to do here, say N.
+> +
+> +config FWCTL_BNXT
+> +	tristate "bnxt control fwctl driver"
+> +	depends on BNXT
+> +	help
+> +	  BNXT provides interface for the user process to access the debug and
+> +	  configuration registers of the Broadcom NIC hardware family
+> +	  This will allow configuration and debug tools to work out of the box on
+> +	  mainstream kernel.
+> +
+>  	  If you don't know what to do here, say N.
+>  endif
+> diff --git a/drivers/fwctl/Makefile b/drivers/fwctl/Makefile
+> index c093b5f661d6..fdd46f3a0e4e 100644
+> --- a/drivers/fwctl/Makefile
+> +++ b/drivers/fwctl/Makefile
+> @@ -2,5 +2,6 @@
+>  obj-$(CONFIG_FWCTL) += fwctl.o
+>  obj-$(CONFIG_FWCTL_MLX5) += mlx5/
+>  obj-$(CONFIG_FWCTL_PDS) += pds/
+> +obj-$(CONFIG_FWCTL_BNXT) += bnxt/
+>  
+>  fwctl-y += main.o
+> diff --git a/drivers/fwctl/bnxt/Makefile b/drivers/fwctl/bnxt/Makefile
+> new file mode 100644
+> index 000000000000..b47172761f1e
+> --- /dev/null
+> +++ b/drivers/fwctl/bnxt/Makefile
+> @@ -0,0 +1,4 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +obj-$(CONFIG_FWCTL_BNXT) += bnxt_fwctl.o
+> +
+> +bnxt_fwctl-y += main.o
+> diff --git a/drivers/fwctl/bnxt/main.c b/drivers/fwctl/bnxt/main.c
+> new file mode 100644
+> index 000000000000..1bec4567e35c
+> --- /dev/null
+> +++ b/drivers/fwctl/bnxt/main.c
+> @@ -0,0 +1,297 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (c) 2025, Broadcom Corporation
+> + *
+> + */
+> +
+> +#include <linux/kernel.h>
+> +#include <linux/auxiliary_bus.h>
+> +#include <linux/slab.h>
+> +#include <linux/pci.h>
+> +#include <linux/fwctl.h>
+> +#include <uapi/fwctl/fwctl.h>
+> +#include <uapi/fwctl/bnxt.h>
+> +#include <linux/bnxt/common.h>
+> +#include <linux/bnxt/ulp.h>
+> +
+> +struct bnxtctl_uctx {
+> +	struct fwctl_uctx uctx;
+> +	u32 uctx_caps;
+> +};
+> +
+> +struct bnxtctl_dev {
+> +	struct fwctl_device fwctl;
+> +	struct bnxt_aux_priv *aux_priv;
+> +	void *dma_virt_addr[MAX_NUM_DMA_INDICATIONS];
+> +	dma_addr_t dma_addr[MAX_NUM_DMA_INDICATIONS];
+> +};
+> +
+> +DEFINE_FREE(bnxtctl, struct bnxtctl_dev *, if (_T) fwctl_put(&_T->fwctl))
+> +
+> +static int bnxtctl_open_uctx(struct fwctl_uctx *uctx)
+> +{
+> +	struct bnxtctl_uctx *bnxtctl_uctx =
+> +		container_of(uctx, struct bnxtctl_uctx, uctx);
+> +
+> +	bnxtctl_uctx->uctx_caps = BIT(FWCTL_BNXT_QUERY_COMMANDS) |
+> +				  BIT(FWCTL_BNXT_SEND_COMMAND);
+> +	return 0;
+> +}
+> +
+> +static void bnxtctl_close_uctx(struct fwctl_uctx *uctx)
+> +{
+> +}
+> +
+> +static void *bnxtctl_info(struct fwctl_uctx *uctx, size_t *length)
+> +{
+> +	struct bnxtctl_uctx *bnxtctl_uctx =
+> +		container_of(uctx, struct bnxtctl_uctx, uctx);
+> +	struct fwctl_info_bnxt *info;
+> +
+> +	info = kzalloc(sizeof(*info), GFP_KERNEL);
+> +	if (!info)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	info->uctx_caps = bnxtctl_uctx->uctx_caps;
+> +
+> +	*length = sizeof(*info);
+> +	return info;
+> +}
+> +
+> +static bool bnxtctl_validate_rpc(struct bnxt_en_dev *edev,
+> +				 struct bnxt_fw_msg *hwrm_in)
+> +{
+> +	struct input *req = (struct input *)hwrm_in->msg;
+> +
+> +	mutex_lock(&edev->en_dev_lock);
+> +	if (edev->flags & BNXT_EN_FLAG_ULP_STOPPED) {
+> +		mutex_unlock(&edev->en_dev_lock);
+> +		return false;
+> +	}
+> +	mutex_unlock(&edev->en_dev_lock);
+> +
+> +	if (le16_to_cpu(req->req_type) <= HWRM_LAST)
+> +		return true;
+> +
+> +	return false;
+
+guard(mutex)(&edev->en_dev_lock);
+if (edev->flags & BNXT_EN_FLAG_ULP_STOPPED)
+	return false;
+
+return le16_to_cpu(req->req_type) <= HWRM_LAST;
+
+
+> +}
+> +
+> +static int bnxt_fw_setup_input_dma(struct bnxtctl_dev *bnxt_dev,
+> +				   struct device *dev,
+> +				   int num_dma,
+> +				   struct fwctl_dma_info_bnxt *msg,
+> +				   struct bnxt_fw_msg *fw_msg)
+> +{
+> +	u8 i, num_allocated = 0;
+> +	void *dma_ptr;
+> +	int rc = 0;
+> +
+> +	for (i = 0; i < num_dma; i++) {
+> +		if (msg->len == 0 || msg->len > MAX_DMA_MEM_SIZE) {
+> +			rc = -EINVAL;
+> +			goto err;
+> +		}
+> +		bnxt_dev->dma_virt_addr[i] = dma_alloc_coherent(dev->parent,
+> +								msg->len,
+> +								&bnxt_dev->dma_addr[i],
+> +								GFP_KERNEL);
+> +		if (!bnxt_dev->dma_virt_addr[i]) {
+> +			rc = -ENOMEM;
+> +			goto err;
+> +		}
+> +		num_allocated++;
+> +		if (!(msg->read_from_device)) {
+
+unnecessary () around msg->read_from_device?
+
+> +			if (copy_from_user(bnxt_dev->dma_virt_addr[i],
+> +					   u64_to_user_ptr(msg->data),
+> +					   msg->len)) {
+> +				rc = -EFAULT;
+> +				goto err;
+> +			}
+> +		}
+> +		dma_ptr = fw_msg->msg + msg->offset;
+> +
+> +		if ((PTR_ALIGN(dma_ptr, 8) == dma_ptr) &&
+> +		    msg->offset < fw_msg->msg_len) {
+> +			__le64 *dmap = dma_ptr;
+> +
+> +			*dmap = cpu_to_le64(bnxt_dev->dma_addr[i]);
+> +		} else {
+> +			rc = -EINVAL;
+> +			goto err;
+> +		}
+> +		msg += 1;
+> +	}
+> +
+> +	return rc;
+
+return 0 should be ok?
+
+> +err:
+> +	for (i = 0; i < num_allocated; i++)
+> +		dma_free_coherent(dev->parent,
+> +				  msg->len,
+> +				  bnxt_dev->dma_virt_addr[i],
+> +				  bnxt_dev->dma_addr[i]);
+> +
+> +	return rc;
+> +}
+> +
+> +static void *bnxtctl_fw_rpc(struct fwctl_uctx *uctx,
+> +			    enum fwctl_rpc_scope scope,
+> +			    void *in, size_t in_len, size_t *out_len)
+> +{
+> +	struct bnxtctl_dev *bnxtctl =
+> +		container_of(uctx->fwctl, struct bnxtctl_dev, fwctl);
+> +	struct bnxt_aux_priv *bnxt_aux_priv = bnxtctl->aux_priv;
+> +	struct fwctl_dma_info_bnxt *dma_buf = NULL;
+> +	struct device *dev = &uctx->fwctl->dev;
+> +	struct fwctl_rpc_bnxt *msg = in;
+> +	struct bnxt_fw_msg rpc_in;
+> +	int i, rc, err = 0;
+> +	int dma_buf_size;
+> +
+> +	rpc_in.msg = kzalloc(msg->req_len, GFP_KERNEL);
+
+I think if you use __free(kfree) for all the allocations in the function, you can be rid of the gotos.
+
+> +	if (!rpc_in.msg) {
+> +		err = -ENOMEM;
+> +		goto err_out;
+
+nothing to free here, no need to go to err_out
+
+> +	}
+> +	if (copy_from_user(rpc_in.msg, u64_to_user_ptr(msg->req),
+> +			   msg->req_len)) {
+> +		dev_dbg(dev, "Failed to copy in_payload from user\n");
+> +		err = -EFAULT;
+> +		goto err_out;
+> +	}
+> +
+> +	if (!bnxtctl_validate_rpc(bnxt_aux_priv->edev, &rpc_in))
+> +		return ERR_PTR(-EPERM);
+> +
+> +	rpc_in.msg_len = msg->req_len;
+> +	rpc_in.resp = kzalloc(*out_len, GFP_KERNEL);
+
+I think you missed freeing this buffer on error later on. __free() should help you avoid that.
+
+> +	if (!rpc_in.resp) {
+> +		err = -ENOMEM;
+> +		goto err_out;
+
+calling kfree(dma_buf) when unnecessary
+> +	}
+> +
+> +	rpc_in.resp_max_len = *out_len;
+> +	if (!msg->timeout)
+> +		rpc_in.timeout = DFLT_HWRM_CMD_TIMEOUT;
+> +	else
+> +		rpc_in.timeout = msg->timeout;
+> +
+> +	if (msg->num_dma) {
+> +		if (msg->num_dma > MAX_NUM_DMA_INDICATIONS) {
+> +			dev_err(dev, "DMA buffers exceed the number supported\n");
+> +			err = -EINVAL;
+> +			goto err_out;
+calling kfree(dma_buf) when unnecessary
+> +		}
+> +		dma_buf_size = msg->num_dma * sizeof(*dma_buf);
+> +		dma_buf = kzalloc(dma_buf_size, GFP_KERNEL);
+> +		if (!dma_buf) {
+> +			dev_err(dev, "Failed to allocate dma buffers\n");
+> +			err = -ENOMEM;
+> +			goto err_out;
+calling kfree(dma_buf) when unnecessary
+> +		}
+> +
+> +		if (copy_from_user(dma_buf, u64_to_user_ptr(msg->payload),
+> +				   dma_buf_size)) {
+> +			dev_dbg(dev, "Failed to copy payload from user\n");
+> +			err = -EFAULT;
+> +			goto err_out;
+> +		}
+> +
+> +		rc = bnxt_fw_setup_input_dma(bnxtctl, dev, msg->num_dma,
+> +					     dma_buf, &rpc_in);
+> +		if (rc) {
+> +			err = -EIO;
+> +			goto err_out;
+> +		}
+> +	}
+> +
+> +	rc = bnxt_send_msg(bnxt_aux_priv->edev, &rpc_in);
+> +	if (rc) {
+> +		err = -EIO;
+> +		goto err_out;
+
+Do all the DMA buffers allocated from bnxt_fw_setup_input_dma() need to be freed here? Maybe DEFINE_FREE() a macro for bnxt_fw_setup_input_dma() might help since you are freeing everything at the end of the function anyways. 
+
+> +	}
+> +
+> +	for (i = 0; i < msg->num_dma; i++) {
+> +		if (dma_buf[i].read_from_device) {
+> +			if (copy_to_user(u64_to_user_ptr(dma_buf[i].data),
+> +					 bnxtctl->dma_virt_addr[i],
+> +					 dma_buf[i].len)) {
+> +				dev_dbg(dev, "Failed to copy resp to user\n");
+> +				err = -EFAULT;
+should we break out of this loop on error?
+
+> +			}
+> +		}
+> +	}
+> +	for (i = 0; i < msg->num_dma; i++)
+> +		dma_free_coherent(dev->parent, dma_buf[i].len,
+> +				  bnxtctl->dma_virt_addr[i],
+> +				  bnxtctl->dma_addr[i]);
+> +
+> +err_out:
+> +	kfree(dma_buf);
+> +	kfree(rpc_in.msg);
+> +
+> +	if (err)
+> +		return ERR_PTR(err);
+> +
+> +	return rpc_in.resp;
+> +}
+> +
+> +static const struct fwctl_ops bnxtctl_ops = {
+> +	.device_type = FWCTL_DEVICE_TYPE_BNXT,
+> +	.uctx_size = sizeof(struct bnxtctl_uctx),
+> +	.open_uctx = bnxtctl_open_uctx,
+> +	.close_uctx = bnxtctl_close_uctx,
+> +	.info = bnxtctl_info,
+> +	.fw_rpc = bnxtctl_fw_rpc,
+> +};
+> +
+> +static int bnxtctl_probe(struct auxiliary_device *adev,
+> +			 const struct auxiliary_device_id *id)
+> +{
+> +	struct bnxt_aux_priv *aux_priv =
+> +		container_of(adev, struct bnxt_aux_priv, aux_dev);
+> +	struct bnxtctl_dev *bnxtctl __free(bnxtctl) =
+> +		fwctl_alloc_device(&aux_priv->edev->pdev->dev, &bnxtctl_ops,
+> +				   struct bnxtctl_dev, fwctl);
+> +	int rc;
+> +
+> +	if (!bnxtctl)
+> +		return -ENOMEM;
+> +
+> +	bnxtctl->aux_priv = aux_priv;
+> +
+> +	rc = fwctl_register(&bnxtctl->fwctl);
+> +	if (rc)
+> +		return rc;
+> +
+> +	auxiliary_set_drvdata(adev, no_free_ptr(bnxtctl));
+> +	return 0;
+> +}
+> +
+> +static void bnxtctl_remove(struct auxiliary_device *adev)
+> +{
+> +	struct bnxtctl_dev *ctldev = auxiliary_get_drvdata(adev);
+> +
+> +	fwctl_unregister(&ctldev->fwctl);
+> +	fwctl_put(&ctldev->fwctl);
+> +}
+> +
+> +static const struct auxiliary_device_id bnxtctl_id_table[] = {
+> +	{ .name = "bnxt_en.fwctl", },
+> +	{},
+> +};
+> +MODULE_DEVICE_TABLE(auxiliary, bnxtctl_id_table);
+> +
+> +static struct auxiliary_driver bnxtctl_driver = {
+> +	.name = "bnxt_fwctl",
+> +	.probe = bnxtctl_probe,
+> +	.remove = bnxtctl_remove,
+> +	.id_table = bnxtctl_id_table,
+> +};
+> +
+> +module_auxiliary_driver(bnxtctl_driver);
+> +
+> +MODULE_IMPORT_NS("FWCTL");
+> +MODULE_DESCRIPTION("BNXT fwctl driver");
+> +MODULE_AUTHOR("Pavan Chebbi <pavan.chebbi@broadcom.com>");
+> +MODULE_AUTHOR("Andy Gospodarek <gospo@broadcom.com>");
+> +MODULE_LICENSE("GPL");
+> diff --git a/include/uapi/fwctl/bnxt.h b/include/uapi/fwctl/bnxt.h
+> new file mode 100644
+> index 000000000000..cf8f2b80f3de
+> --- /dev/null
+> +++ b/include/uapi/fwctl/bnxt.h
+> @@ -0,0 +1,63 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + * Copyright (c) 2025, Broadcom Corporation
+> + *
+> + */
+> +
+> +#ifndef _UAPI_FWCTL_BNXT_H_
+> +#define _UAPI_FWCTL_BNXT_H_
+> +
+> +#include <linux/types.h>
+> +
+> +#define MAX_DMA_MEM_SIZE		0x10000 /*64K*/
+> +#define DFLT_HWRM_CMD_TIMEOUT		500
+> +
+> +enum fwctl_bnxt_commands {
+> +	FWCTL_BNXT_QUERY_COMMANDS = 0,
+> +	FWCTL_BNXT_SEND_COMMAND,
+> +};
+> +
+> +/**
+> + * struct fwctl_info_bnxt - ioctl(FWCTL_INFO) out_device_data
+> + * @uctx_caps: The command capabilities driver accepts.
+> + *
+> + * Return basic information about the FW interface available.
+> + */
+> +struct fwctl_info_bnxt {
+> +	__u32 uctx_caps;
+> +};
+> +
+> +#define MAX_NUM_DMA_INDICATIONS 10
+> +
+> +/**
+> + * struct fwctl_dma_info_bnxt - describe the buffer that should be DMAed
+> + * @data: DMA-intended buffer
+> + * @len: length of the @data
+> + * @offset: offset at which FW (HWRM) input structure needs DMA address
+> + * @read_from_device: DMA direction, 0 or 1
+> + * @unused: pad
+> + */
+> +struct fwctl_dma_info_bnxt {
+> +	__aligned_u64 data;
+> +	__u32 len;
+> +	__u16 offset;
+> +	__u8 read_from_device;
+
+variable name doesn't convey writing to device on value of 1. Maybe 'dma_direction'? Also create enum or define for DEVICE_READ and DEVICE_WRITE so it's obvoius when setting or checking the variable. Although you can always use 'enum dma_data_direction' if you don't mind changing the values.
+
+> +	__u8 unused;
+> +};
+> +
+> +/**
+> + * struct fwctl_rpc_bnxt - describe the fwctl message for bnxt
+> + * @req: FW (HWRM) command input structure
+> + * @req_len: length of @req
+> + * @timeout: if the user wants to override the driver's default, 0 otherwise
+> + * @num_dma: number of DMA buffers to be added to @req
+> + * @payload: DMA buffer details in struct fwctl_dma_info_bnxt format
+> + */
+> +struct fwctl_rpc_bnxt {
+> +	__aligned_u64 req;
+> +	__u32 req_len;
+> +	__u32 timeout;
+> +	__u32 num_dma;
+> +	__aligned_u64 payload;
+> +};
+> +#endif
+> diff --git a/include/uapi/fwctl/fwctl.h b/include/uapi/fwctl/fwctl.h
+> index 716ac0eee42d..2d6d4049c205 100644
+> --- a/include/uapi/fwctl/fwctl.h
+> +++ b/include/uapi/fwctl/fwctl.h
+> @@ -44,6 +44,7 @@ enum fwctl_device_type {
+>  	FWCTL_DEVICE_TYPE_ERROR = 0,
+>  	FWCTL_DEVICE_TYPE_MLX5 = 1,
+>  	FWCTL_DEVICE_TYPE_CXL = 2,
+> +	FWCTL_DEVICE_TYPE_BNXT = 3,
+>  	FWCTL_DEVICE_TYPE_PDS = 4,
+>  };
+>  
+
 
