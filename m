@@ -1,102 +1,67 @@
-Return-Path: <netdev+bounces-226062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A1C6B9B808
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 20:36:20 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CED55B9B89B
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 20:41:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CB0994E2212
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 18:36:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7CA8E4E30C1
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 18:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC156314A90;
-	Wed, 24 Sep 2025 18:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A331631329E;
+	Wed, 24 Sep 2025 18:41:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FtBmNeMB"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZG/ewCJR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289022FD1B5
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 18:36:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5D7199230;
+	Wed, 24 Sep 2025 18:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758738973; cv=none; b=CqA2YYCWv/M3/x58KuzLPmgA8/xVhCZltAu82ZW6siqjedwfmXjNZ5YIrST8Ef37rnHHIRzIjl4cIg4IJH7UI/FtDQyXdiqLE+1RegzIe3B053Bbq4gGb2o06dScE4/46znxxC5Mr33ArFqExXvKpIZazyisL9GziqjlbfxagqU=
+	t=1758739286; cv=none; b=SqYr/aBfVXfKTPDf11BlnCExjUxl3HWwu66IunSAj4qcpNCOQ/tGCFsUKFNIJ39iA4pl45dZiJsgVEEApm97OyW/NWAvXJ/Kq7VDPyhlf9Xm9KAMCoK9tbCGsFJEtheJPAvmyluGtXUiYEbHo/9yRRZe93SJv/xuSqftgP7YgEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758738973; c=relaxed/simple;
-	bh=2aLfX7a8qrLe04EEuCsSWXOjT7NO0ExrjFnQIBlHj04=;
+	s=arc-20240116; t=1758739286; c=relaxed/simple;
+	bh=rk/YqIAr3psTXwnRF88FFgZF0USARgQwHWYYUih+ZrM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TcFyAN2+1dMzti2uSybEgpCnhcDPzoMdRJCX0BkT7+PUX8CJeILcQpKMS3VC40yNqtIzgkUOT14R4VfnEFiQBbPA9a88Llf/PoLYSIpYg3OSsJ8ffoXU7zfAtDSkelc2FPumy42FhbBmKIYZm591dMEvNJwBtBHI4ZKa+kUwB1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FtBmNeMB; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-27a6c3f482dso910655ad.1
-        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 11:36:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758738971; x=1759343771; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RuMDAryKyhqMDr6B+XSq4gaOR0tjLhHQ+hf5EwbyoXs=;
-        b=FtBmNeMB04FY3JGB6PNvtOFMiiWfAj4garK3jVjddYu+aBCpnKJv62bLvq1W//T70a
-         y4kpNyp7rAle3Axx60PHhi6UEdug4mVpmTWaiXKH7HrgfEK/PWpxCcW0GSz76SJe4Dr9
-         occhHLHIxPq0kTA95Jz5yBEygNFimb1rEmkA1gh+VV5Pqlk8iMz81SJJZ0+AJISXUxZt
-         wdtaeEH1wwkn7kSP5ttEoRqBmeHlsXKKhB8JQMcokPHbGgOVheMDGjqihXZULw08wYio
-         ZlNFk+yeDUGN96q/XFWEIvy11lkr81KqELV2YRixghqOF9U1I8bvBJ6ZhOrkKSss3XPz
-         GONQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758738971; x=1759343771;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RuMDAryKyhqMDr6B+XSq4gaOR0tjLhHQ+hf5EwbyoXs=;
-        b=eCztQ550BvkpWrrubG+6WbmuzPzpSPALvWtmqIlALtE5hIdn16bZPfZAnxsYtucCCe
-         L0GdmdkqStZNx9jwN1xrn+6o4GBKMzNLlx2jQGp+FrCkdTOuTz+psBggCGYDUkVpKGp/
-         M9BoEyhVBA8BDs/RnYAsq9qgLEz+xzQpMRnx+zg1mBjVSVpiy9NenMUWlS55/8K98xhe
-         oY49zdMhsvhR0a0l1kU7UxBvDoI/nGGZMH9NRPyNhBn8HIkNvSNNhPIiYzU9Ba9vKEVg
-         rETI/F69tkdnSDZwhi2nOzArTaPISnEMJGhAH9vad/8VF0MACtj+r+6A4wqn3y0cPWaD
-         pkDw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZimXf2T2rQOSebhiIGGx6V5POV83Kk7PUH/g3/k7Uok40DPIobOzQFDVEgq4kJnc+OG9/RPU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOE4H3LLojUl58edhpgy2GD2YY2LH3x8t3CjIONj7ZVVpsSr9c
-	39pU65eR//wK7jeozzsR8/fchyz3qHCT3Cyy66+L4I4I42trFZUbY6Ft
-X-Gm-Gg: ASbGncsZ/sEO+u8VQ1hhIDNdbg18TPYrO++QX+Sd413Px3nYIKaSUv24u4NykK4Rrjw
-	8pv+SBsPOKkCOZ9/c8KxPTQwq5ImReR5WfngREA1TbC2Vd9V6aj0RR6JqejSByJ6PRUTw6BEFEc
-	AMs5gWbBA2lVqX+FzyEVeLqZZKvSFjk8SMV5cHZBS9hfk4rNOUbkYdf8vFro/gLcOJbK7ZWRNmM
-	ZUxJrs3XdtfFZjIxz4+OWo1JWNAkMzHhnRviD6sZLZgEtXZnMDyZwx8ZC/RU2r7xP5256G+3PjB
-	7rTCq4zz5oRPZzIOecOgx1UaKeZo+kubQU69BGLRB3FgDUyUispneP9Qs7NuzM1SEMN0/wGKQiJ
-	R4hpjv65fHnHx0jaGvdIvDZQ=
-X-Google-Smtp-Source: AGHT+IFpCuPX+NdIWL+u5IkcBx4+VbKV/4827jy+s9/WEKKxG/dZ2BXBXewNNRlOFgtg+akJrLG03A==
-X-Received: by 2002:a17:902:dac5:b0:27a:6c30:49c with SMTP id d9443c01a7336-27ed4a56ba4mr5732905ad.27.1758738971104;
-        Wed, 24 Sep 2025 11:36:11 -0700 (PDT)
-Received: from google.com ([2620:15c:9d:2:f4c4:bad6:f33e:ddc9])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3341bd90367sm3096304a91.5.2025.09.24.11.36.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Sep 2025 11:36:10 -0700 (PDT)
-Date: Wed, 24 Sep 2025 11:36:07 -0700
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To: Sakari Ailus <sakari.ailus@linux.intel.com>
-Cc: linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-input@vger.kernel.org, linux-leds@vger.kernel.org, linux-media@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-spi@vger.kernel.org, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Danilo Krummrich <dakr@kernel.org>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Daniel Scally <djrscally@gmail.com>, 
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>, Javier Carrasco <javier.carrasco@wolfvision.net>, 
-	Lee Jones <lee@kernel.org>, Pavel Machek <pavel@kernel.org>, 
-	Matthias Fend <matthias.fend@emfend.at>, Chanwoo Choi <cw00.choi@samsung.com>, 
-	Krzysztof Kozlowski <krzk@kernel.org>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, 
-	Paul Elder <paul.elder@ideasonboard.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
-	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Mark Brown <broonie@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: [PATCH v2 11/16] Input: touch-overlay - Use
- fwnode_for_each_child_node() instead
-Message-ID: <amnjiro7qhreys4upoh6ggqurom6gudk2gw5ayrfjhj243wqwh@o4hf6txhsm62>
-References: <20250924074602.266292-1-sakari.ailus@linux.intel.com>
- <20250924074602.266292-12-sakari.ailus@linux.intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=sca7C1h8OAR5vO1NVVIFpVx8fo8HXFjEvhtC+pQZmFqj+HCbXFXrWXpMsfqqB+5SDp2+KwHGCiUlK3REiUE8XQy9gkpo88m0CGcF3S02j9aH6cNvMcoyOf9B9umqudDfAdIdm+5VgJxyvUAeRXIArNreC6Lq+oUZP1425gR60iI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZG/ewCJR; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=oP/eS7INwt9yq8GjuQkiEiRAXKwufdViyrT21UpRM/o=; b=ZG/ewCJRLBP0Eckk7X8wsBMFes
+	jeE1L/DOiWCYl4VjvcHNgFgTV7ruTEtQIZnQM01o335XjkxyaOOr/npGPQFOwaC/oAGAcwfwwLyGi
+	0TSQznoCR2ukfEJ3Rm2DbMGCMdjcJ+7N8EsHE5QmhbGK0JUuILflNHW2bEvXmdtPU8Yc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v1UQM-009O1c-5E; Wed, 24 Sep 2025 20:41:06 +0200
+Date: Wed, 24 Sep 2025 20:41:06 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: David Yang <mmyangfl@gmail.com>, netdev@vger.kernel.org,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Simon Horman <horms@kernel.org>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v11 2/5] net: phy: introduce
+ PHY_INTERFACE_MODE_REVSGMII
+Message-ID: <fe6a4073-eed0-499d-89ee-04559967b420@lunn.ch>
+References: <20250922131148.1917856-1-mmyangfl@gmail.com>
+ <20250922131148.1917856-3-mmyangfl@gmail.com>
+ <aNQvW54sk3EzmoJp@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,36 +70,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250924074602.266292-12-sakari.ailus@linux.intel.com>
+In-Reply-To: <aNQvW54sk3EzmoJp@shell.armlinux.org.uk>
 
-On Wed, Sep 24, 2025 at 10:45:57AM +0300, Sakari Ailus wrote:
-> fwnode_for_each_child_node() is now the same as
-> fwnode_for_each_available_child_node() on all backends (OF, ACPI and
-> swnode). In order to remove the available variants, switch the uses to
-> non-available variants.
+On Wed, Sep 24, 2025 at 06:50:19PM +0100, Russell King (Oracle) wrote:
+> On Mon, Sep 22, 2025 at 09:11:40PM +0800, David Yang wrote:
+> > The "reverse SGMII" protocol name is a personal invention, derived from
+> > "reverse MII" and "reverse RMII", this means: "behave like an SGMII
+> > PHY".
 > 
-> Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
-
-Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-
-> ---
->  drivers/input/touch-overlay.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Sorry to mess you around, but... I've been getting further with stmmac's
+> PCS stuff (I've started again with it) and I've come to realise that the
+> stmmac driver is full of worms here.
 > 
-> diff --git a/drivers/input/touch-overlay.c b/drivers/input/touch-overlay.c
-> index b9fd82c4829d..7eaaaef1bd82 100644
-> --- a/drivers/input/touch-overlay.c
-> +++ b/drivers/input/touch-overlay.c
-> @@ -82,7 +82,7 @@ int touch_overlay_map(struct list_head *list, struct input_dev *input)
->  	if (!overlay)
->  		return 0;
->  
-> -	fwnode_for_each_available_child_node(overlay, fw_segment) {
-> +	fwnode_for_each_child_node(overlay, fw_segment) {
->  		segment = devm_kzalloc(dev, sizeof(*segment), GFP_KERNEL);
->  		if (!segment) {
->  			fwnode_handle_put(fw_segment);
+> I think we need to have a bigger discussion here.
+> 
+> Today, we have:
+> 
+> - PHY_INTERFACE_MODE_REVMII
+> - PHY_INTERFACE_MODE_REVRMII
+> 
+> which both complement their _MII and _RMII definitions. So, it seems
+> entirely sensible to also introduce REVSGMII to complement SGMII.
 
--- 
-Dmitry
+Maybe we need to think about, what does REVfoo actually mean?
+
+Is it simply about, who provides the clock? For MII, the 'PHY'
+provides the clock to the 'MAC;. So does REVMII simply mean a MAC in
+REVMII mode provides the clock? Is more needed? As far as i know MII
+does not have any inband signalling.
+
+For RMII, it appears each side can provide the clock, or consume the
+clock, or a 3rd party can provide the clock. It is a hardware design
+choice. So does REVRMII actual mean anything? Again there is no inband
+signalling.
+
+GMII the transmit clock is provided by the transmitter, the receive
+clock by the receiver. It is symmetrical. REV has no meaning here?
+
+In theory, {R}GMII does have inband signalling, but it is pretty much
+never used. REV for GMII could thus indicate what role the device is
+playing in this in-band signalling?
+
+For any SERDES based links likes like SGMII, 1000Base-X and above,
+clocking is part of the SERDES, so symmetrical. There clearly is
+inband signalling, mostly, when it is not broken because of
+overclocked SGMII. But we have never needed to specify what role each
+end needs to play.
+
+> However, stmmac hardware supports "reverse" mode for more than just
+> SGMII, also RGMII and SMII.
+
+How does the databook describe reverse SGMII? How does it differ from
+SGMII?
+
+	Andrew
 
