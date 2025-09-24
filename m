@@ -1,297 +1,279 @@
-Return-Path: <netdev+bounces-225972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 035A8B9A112
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 15:39:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0115B9A118
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 15:39:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 266981B23740
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 13:39:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD9DD3B9B4A
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 13:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428673043A9;
-	Wed, 24 Sep 2025 13:39:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0792301494;
+	Wed, 24 Sep 2025 13:39:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="jPHKzx/Z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XZlSJfXD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p02-ob.smtp.rzone.de (mo4-p02-ob.smtp.rzone.de [81.169.146.171])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A44A4143C69;
-	Wed, 24 Sep 2025 13:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC101A0BD6
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 13:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758721154; cv=pass; b=H0Nz15WwxIYPE2yPCb6jEDXzabwhwiJ4jtPovOqYg/U470RC19mUUUuzeLFOM2bwZOxAVCV2AsvixKojsTwDSIgWVBS06CSuSvfK8nGhv284Pf9BcX5MCIGcFLxJHYOL1Hw7GnGUDRS0hPSEkFqmbnssXTJEdRUhYgae0n/qP4Y=
+	t=1758721172; cv=fail; b=NKLO2ajGY3bY7jFppMIGkkkty3qCF8alzjCn0zCQE0Dn2kYl4es1Oxr/YNEphUtc4S/R4ryd/mLiiBAcV5/6gFYW4i+v2ILu0dau5t4A2QDK7QCmuCy8syv2IIbzUoTWdxAzZi/S1CTl1B1/DpsJI5ks60/H6xysvZIPJKjqf3w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758721154; c=relaxed/simple;
-	bh=Gp6ACbHBiEjRgibVPGqSjwZ46dFlHlIrT9hg36BTe5s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eISisSrczkG2mZnNAFJMOTABuvVeZ2R3xVsYeQLhhVxfTRLTJz0CE6D9eY860k5Z2M6wr0ESGp4Hs91QE2cPzcTqkAXXpGmuke1Nzg8AuynaVMrD90NjBZO5d71xyDol7S89W/b+HZAEfhsTokGn8J2I10l7E7MYDtXE4izvX+U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=jPHKzx/Z; arc=pass smtp.client-ip=81.169.146.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1758721141; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=iNVEhFk9lryqBjR3wnwfUMDh+4SICxs6hg6mnRDiIQiK3HePM9wddvPIqtdvEIhlMn
-    AzpfAT6WAXt5wawUBU3xTT67FgJe5+TyKxj9eRZQWmQS+kbnjeSrwRMh3WBpRyv2Pa6F
-    iBLQ6P/+h573IicCwaU2qODJZ6hrz1/bkahDaAy/yCmYf+bbjLh8uI7X5eEOlRl5JqJ+
-    Gep324NB7fN9WzGVlYuex7UkvAhYNm41QGn+fylnfXXoKIJYAMlvStzkJNvQX2EwAOIQ
-    J+p4SDxwGILhh58si7CjPxCnrmDuufetjVc6yEdgYTtIaCkP6Ro+lByvWdXZx/7FbiGP
-    g1ZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1758721141;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=DDqHd59PnNOz2qkKA++2O46j3KKR/13diigjWjCqIVk=;
-    b=Y+KYb4xmQNorqPQuCb/gmMH9B6el1eORpNdRP8ZfqJBVlYfCAAiv42L5dU0VyFLp95
-    rwv0FLkdBj+K6TXNFqaRuFXODXYUgjYxZQDt/5NzPyoNfF5Z1Xmc+qzbnw8gTdVAFzWH
-    uBiElPzobjc4WLvE/V7bAFZXu4WUHGwB4/sV8uytOervEkAGFtVrEYLHBoFAlDYcfLjA
-    e+tpLgeLVVacNhWVQ+fin0PcTvHyKx8BDoVchPEJe2YYNSHuRBa+qEdG4sF3JadRn5Xc
-    T5hoa0Wj30hc01Q4UeYmaoWCj0dGURzCGRaEPvJVQJXXMqLOg+UsOvaXVZTQ4ZuOAKg3
-    XI/w==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo02
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1758721141;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=DDqHd59PnNOz2qkKA++2O46j3KKR/13diigjWjCqIVk=;
-    b=jPHKzx/Zrs6Xuj3gB+IbvpEFNehHOLNERvyrY25J3ipHY9/f9XR+EFbVCgoDcHpTo3
-    6eAmmAk81jEvJ4wUfzIzClE0n1Bfx1UhcOSObHWjZ7fXRjN1ZHJJiaErOAUcivqUyuTg
-    DKTB6sZIvwoGkPKfKC3ZOpiopHJeHmgQlV4fYwrhfPOrcb0FysnxajDtocD45NsVvenE
-    G6GlR+Yo5Wq685iCw+aIODqnIJAfed+gAXSov7SNJDBEOEA9h9Bi+EmpF11jozo5LCMl
-    8eOcWVzTlDvKZN2XzmPklhKZLsoCjuL22p1UC+prrl6BHcsOjkUGXxLHRsBq/Sn5it+c
-    9vFg==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tR5Jgv+fvVh2Tlv+VN3s="
-Received: from [192.168.188.239]
-    by smtp.strato.de (RZmta 53.3.2 AUTH)
-    with ESMTPSA id Kcff9718ODcx9F7
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Wed, 24 Sep 2025 15:38:59 +0200 (CEST)
-Message-ID: <ee5bdf78-1955-4e7f-96e0-b62c0a977e18@hartkopp.net>
-Date: Wed, 24 Sep 2025 15:38:59 +0200
+	s=arc-20240116; t=1758721172; c=relaxed/simple;
+	bh=WGn/DArRhsQq1eCT5iARdyLaHdFAMORqUOPaPbq/I3A=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CWI3rB8BaZfTS9MELYCqeN7LbejdPUbz11aNuz9xocbNVMeajvbg3LEtvxQkvVtmS0r4D0bvHlgYRhT6PURwQn53IqIvSdO5zHJP0V+6cotPYbiKlb32dxIVf1pZULkOUHi3eDYBvjF1+OKvhk5d5T9x3fX1iMDp5its6Qio+Zo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XZlSJfXD; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758721171; x=1790257171;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=WGn/DArRhsQq1eCT5iARdyLaHdFAMORqUOPaPbq/I3A=;
+  b=XZlSJfXDYpwysdEYaQDuHN34ngK0KGeLowSf7A/uo9XUpFvDkUSTXtEc
+   zwDplhGmaYmFKx/FqHKudQ0wcQFFMFJcqQxloKy7+Bzb9K6GT1YfGTtWX
+   OiywfCRUzRPDN4/9XAlLZkyy2V88aejWYBGngzLbNnhzQ9MHcsUd0QMfw
+   WBXkh4iHQWxgdiNO2t7q2rdxGdcRbi3OdoARbdMwj0x1Z1pDbCdRdwZds
+   NK85ZrMXo/JmsGbtGtD6elV9xpKkhoP375op7CaR6TGm89CDZ/OQsd2mA
+   UEk/7wDFUKcNDbfpLvT67sJlNZJzXRDTkRmLrllxM3QNw7qZT2ftLwrbD
+   g==;
+X-CSE-ConnectionGUID: T24TGlWlQYWvklOR2dDCqA==
+X-CSE-MsgGUID: 8Vjz8LLJR5iLdz00c4PbCg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11563"; a="48583115"
+X-IronPort-AV: E=Sophos;i="6.18,290,1751266800"; 
+   d="scan'208";a="48583115"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 06:39:30 -0700
+X-CSE-ConnectionGUID: 2RFm2CgPQ/WSnimPoJnWGg==
+X-CSE-MsgGUID: zbQHZdO2S6a8LATB0LBX/Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,290,1751266800"; 
+   d="scan'208";a="177433987"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 06:39:29 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 24 Sep 2025 06:39:29 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Wed, 24 Sep 2025 06:39:29 -0700
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.37)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 24 Sep 2025 06:39:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Vc1LA6zD8lr5/j3h40ZQXGcWKo5FPhZyrHErjuGd+6HBMVqhan35lRG7MTN3mLG5G1nXLv9c8lEG1W73dDkA+1iLqXNClNUpEQ+W923WFgzRVhMbfLt4JrCeKyK6KyY9aw4+lXp8Kh85doeEhcmJuUkk9Ei092Sm3yUJfd+fEC25UruszHmD25ieSzw3y8KOjsJVmJxaa1Iyxwp5cNA4tZTyVJzl46XVXoDfDA85mlAbSnU3sTiMSI6a6w7+Ykv3Q9Ddgd37vSHday3eIydipcvnhBgZlRTTBwy9rlAgesGzYImh8nAsPPnCvsozKJky8twYjETbTZ430pBt/nhXsQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AAGeHNbkagcSLqYiz+6s7SiBqJkxjhvAX6qlRrDuNdk=;
+ b=fi89oBuy9vl6xEEwu/gZQpEbT/4y80bKn60/9JnxSR1v3tA4LSDdIGuXfwc6Qf14sWvK3giqbKnHeEweS9AZgaa3AB6fsYASuw/M8VNVZOnbJTqdRydKrZMTg07vJVDL36b3XZ7kjx0hSTHt1ZURttx0VDSPipcJvfEnpZ0dvuIFuqfeCwR73yEuUNkuE9EtZGwPxalPMY2cpGZsOWH6enkgSVlN3jThPFc6QXjK7tENkctPA/fovUyWi4YlBG/Ong0PGAvD58iheH2KxGCbWuOV8zCTzW+8de80iyXlhUBKKqSOv3dgDZ1cyTQlN5jK2Gvj00CsEtzmJPnc5POa0g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by PH7PR11MB7002.namprd11.prod.outlook.com (2603:10b6:510:209::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.9; Wed, 24 Sep
+ 2025 13:39:25 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9137.018; Wed, 24 Sep 2025
+ 13:39:25 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jakub Kicinski
+	<kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>, Michael Chan
+	<michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, "Tariq
+ Toukan" <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, Donald
+ Hunter <donald.hunter@gmail.com>, Carolina Jubran <cjubran@nvidia.com>
+CC: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Dragos Tatulea
+	<dtatulea@nvidia.com>, Yael Chemla <ychemla@nvidia.com>
+Subject: RE: [PATCH net-next v6 2/5] net/mlx5e: Don't query FEC statistics
+ when FEC is disabled
+Thread-Topic: [PATCH net-next v6 2/5] net/mlx5e: Don't query FEC statistics
+ when FEC is disabled
+Thread-Index: AQHcLVB/HkbGJnsSD0iLcY+2AkGMUbSiVpSg
+Date: Wed, 24 Sep 2025 13:39:25 +0000
+Message-ID: <IA3PR11MB8986F2F97E7EE8011A255B79E51CA@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20250924124037.1508846-1-vadim.fedorenko@linux.dev>
+ <20250924124037.1508846-3-vadim.fedorenko@linux.dev>
+In-Reply-To: <20250924124037.1508846-3-vadim.fedorenko@linux.dev>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|PH7PR11MB7002:EE_
+x-ms-office365-filtering-correlation-id: 10b32e46-75e6-4e6d-1f4f-08ddfb6fc70f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020|38070700021;
+x-microsoft-antispam-message-info: =?us-ascii?Q?aXGnOOLXySvi/9iCVIGnXbKf8fQp6yFp22yarnkD85PV+kWELYBXGl9x/M8U?=
+ =?us-ascii?Q?+LDvlj+H57mmwP6mxtDhSEWLoJBfwjdwnSU35+6Bc2gyXfw2VKtSUGc5YKM4?=
+ =?us-ascii?Q?V/tHu5twcCbNzTAtVRVkvWndp5ZyTXcR9Lj7wgj6CLOBcGWvO2vSO7+zmCN3?=
+ =?us-ascii?Q?YfJH/JBUBvfnGOjQaB5FA5qV2CD2zptQUU3phDgpk6GfyZn643SN4C4VxPYI?=
+ =?us-ascii?Q?11Y6jG8UopAkwCnuZE9jqO8FkNQFsOEG5f8NZ61gD7Ybw81f7dOu7ikG2DIr?=
+ =?us-ascii?Q?mdfATXxp8pCL61pmKxlyhpbtP1vRC01ehPmys2Lga5ad0EYcBJ8nvI2Cwtbz?=
+ =?us-ascii?Q?H0ny/kXljvijuAEDgPwMUx2ceV0+N40A9szKyPR/oRIVdjI8b70Hu8vBUpS2?=
+ =?us-ascii?Q?32Ka1bnA6DtZByaouzsKgmuzshoXOtD9kAECpUClNAcDg1BykzZTP7g6yacu?=
+ =?us-ascii?Q?Q5Qb+lrXPeiCrYSy4MdY7KrRuip0xHWWl4vUid5Inge7/ybXmjWsehneZOW5?=
+ =?us-ascii?Q?ki6XP9oSqAum3DnYHVl/0PwDjLTubauANzen04UAUIAgJUUvsqQmchIG3PHo?=
+ =?us-ascii?Q?6lmjPg7FqO6cjU9yY2RMVAjvp7PRucgcQz54xfqXYJ55FKcddarvRmiZadwb?=
+ =?us-ascii?Q?EyO+qvjcMkNIsIJZ7UOKAlv3j6/WnBdybGsvJ2QC9qFsGXEL4La+qEGBYNVq?=
+ =?us-ascii?Q?ZAhwJdodFxdfWNzf0K1f2WvNyWeWG7rZ3NC9Xg02qwHoyeQYAzBau7tF9Jg3?=
+ =?us-ascii?Q?UqEXdS99usc2m4DTy3R94i1MsSIZ56gZZ7HAC4uIxo4Y6D+O9252mBjGmygs?=
+ =?us-ascii?Q?RrN+OKCg/iFy9+7iZWofL5m1QBYksN0SrKRD21a3sVXyv0p+W2Bia3yjojaC?=
+ =?us-ascii?Q?rUlcJxdi3RzfaBmoLAo1d+SjP37VxxTaRWzflvp5mJ6bnQ5hyJEIRReq50zp?=
+ =?us-ascii?Q?OC8mnQ9mWUsJUGvyMvWGr7gk8z8QTcjcJ4MRzV9ToEMlprKrbL/sqFYlz7c+?=
+ =?us-ascii?Q?LJCUOhSSXpQOKsmJxo2cbXIR5nirQT2a2Koc95Uh9zgrtoodTq6WbATbpPgG?=
+ =?us-ascii?Q?GQ2guNcLAsj4I8jMiZPETyXAYjxVP1KOLTBGo/HU/qTrvGg/BZ+Jy77qqpf3?=
+ =?us-ascii?Q?033NO8bIjC6jX+VFrCHjiOjx1/7Jt8eWw6aSmD009YndIuDaMRqQHlbfbecA?=
+ =?us-ascii?Q?4CIByGyv+SKY+TzNNmbG3A1Yh+H+Uh8Y64iHw/t2TTunqUNDT8Zf6XZ+HkKf?=
+ =?us-ascii?Q?IWfJORdUugUBPCb3rrkiWYBy8P1Ajaim0u692ifhvnaxi21U2+09z6R7TmeW?=
+ =?us-ascii?Q?4euB4bpnwLMW1wAOIIL2OAV52si7GnMcs723sonT+Yvi9xTEI/L1Z3TBnWH3?=
+ =?us-ascii?Q?sVinVJl6Jwi+gYVzKzZQdotWnsLDHkPzRmk7Tjw7PciOKCq/5aVuGjSCebvD?=
+ =?us-ascii?Q?z6NcKOiM6QUF5zfMIh5mXIIXOwwsezH4YZE6mI7tp3ugedqHDcRMcHmlBWeD?=
+ =?us-ascii?Q?WfZky14Nu0SiJaB3X1gPhwJc2OXUAMVfbKyX?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?dn5NiMoZIPwDR4OgotV4EhGa8+OyyhTmkrxDMzbo2AQaixxySHRK78qLdExf?=
+ =?us-ascii?Q?0ca1ArBD40H4EAs9rL9MPSmtUETwV0A2ZUTA0PAni1VEnOKeX0ZPrEOdcOGb?=
+ =?us-ascii?Q?1Ll4Lu6nAgCInIRMck7zuEm1iKhgxrH6Z8HhMa97Ui2YemWaFHbKMniRT9jy?=
+ =?us-ascii?Q?JWZJhM3dfyRL7rHqDCg2VMj/dntywF3DDr0S69OpyKd3V1G9DulOkNDeHtix?=
+ =?us-ascii?Q?eVkkWAW6IlssRfmdoJM6D7IJLFQknTmG8YXTQgrgb32iGVs06CfrpbWbQgD7?=
+ =?us-ascii?Q?cJUZ6efXZzSVzQAwg3/9MoQ3haowtbpkVozHR5/oxkdt00NmjR7gfSMAzbTI?=
+ =?us-ascii?Q?rZVtTvr0/kXoJUA4BsCO7oFSoxuFV+Y1brkgiEns1TUxdvl0btpl9d8KofvK?=
+ =?us-ascii?Q?ftDi+DR0GGrZAFVqbik25nxxN+VnqZt8zmMB7l68OsJqDjYL0J1kpGTEkuja?=
+ =?us-ascii?Q?rXwjDcUiS+gGIKMSv1W9JBsPDklN2mJmtnZmxR2OzPXaoPUHAvuwF0WpRlWL?=
+ =?us-ascii?Q?K0GyNZ/CSAUY4xhERnc8nt9KX83ZvgWBEerL/Tbu7JQy9pnYCn2+/aDOV3GD?=
+ =?us-ascii?Q?b/RL1y86OCzq6Uf95iICm/XdWN8GA9lb0I6aLCjv67RUVgwXdt7rbJizX1kp?=
+ =?us-ascii?Q?woKaSevXJGxZ+YwLtGzLUKC3p0JTyV7qpMYL7K6ATGfMwSAfG+T2Lkcsvl2d?=
+ =?us-ascii?Q?37dErnFr7jwWIgXVYJFKNN9JfBvuW8MIy/P5nRJX4k+cUBDBx++hdbV9fK5t?=
+ =?us-ascii?Q?7607MV4rpCoPkG6eT3NpYYp3W9O8xRBX3mEknQgKp7JnnVwradiwG35+YvtU?=
+ =?us-ascii?Q?aGVQCju1vT807HPbGSYhbb3SB6To6CZQZ4MZze4On1TXXn7+Ex1h41UhibNK?=
+ =?us-ascii?Q?mpLDB7J7jJmIu25NkVRXD71VBp1msX4H1n/tweXMe2SWO2iRWb1nXfw7cO1R?=
+ =?us-ascii?Q?soAUX311+WmXYXPD1oxgPRMKIZPzoDURiqRAyW9DmFrvc+YvA16TPkp9j/cy?=
+ =?us-ascii?Q?x5XkO/HOtFQY9smfwpbiQZKK5zuWZIv5D0eMgi6PgNnLlkJg0AcuqfkoLko6?=
+ =?us-ascii?Q?hbqzbtLxBNXG0c00ybN9ycutZ8qnzTg8SU9DxtYQAY4z2QHLN1QcfZ3glU32?=
+ =?us-ascii?Q?uHZiNhqC/1LKxaU3/ugH36iJWGEPV4KmP/OW5crzqbOuAzpKiKqFWe7l80fQ?=
+ =?us-ascii?Q?y/RjjrFQGQN+TVdg4mw5f0PRX6FyQ/2XlBIVdAI9FP7nG851a866VGKSlH9j?=
+ =?us-ascii?Q?OctCvm36jHIbrqgC9a+Y4OaEf4nqSLtMTs+C5nz3s5l3sjrrWrJZZlrHv8+G?=
+ =?us-ascii?Q?Oxt2LI+4PaITUaDkW5h/F0pWoJ3Nu4OOVt7BjWfalBISlf0NwSdAWI9+Yais?=
+ =?us-ascii?Q?Sl9f48xi2DvO1qoVvVd69VbHFhi/sRkRp+liK33waOSVpqzQ8o+xrwnPOv8j?=
+ =?us-ascii?Q?jEByrXdBRqh34FhBLEVG55mu3yHhfNBLL80/9/iVEOb5/YFTIM6FgeoNNwmK?=
+ =?us-ascii?Q?i4TOb13fvra6+c6DlIRzXmNd2ZB7xmN4FlC2zkhvOXlVj9CjUe5XfDy+griL?=
+ =?us-ascii?Q?pMVEAmSSLHOl20VyY/sCw2BP4K/uASCqKge+rHea9zzgeZZHXQCYFAolMIus?=
+ =?us-ascii?Q?bQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot ci] Re: pull-request: can-next 2025-09-24
-To: Vincent Mailhol <mailhol@kernel.org>
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com,
- syzbot ci <syzbot+ci284feacb80736eb0@syzkaller.appspotmail.com>,
- biju.das.jz@bp.renesas.com, davem@davemloft.net, geert@glider.be,
- kernel@pengutronix.de, kuba@kernel.org, linux-can@vger.kernel.org,
- mkl@pengutronix.de, netdev@vger.kernel.org, stefan.maetje@esd.eu,
- stephane.grosjean@hms-networks.com, zhao.xichao@vivo.com
-References: <68d3e6ce.a70a0220.4f78.0028.GAE@google.com>
- <c952c748-4ae7-4ab9-8fd0-3e284a017273@hartkopp.net>
- <651d24b9-fe26-4e6f-a144-22c5997eeafb@kernel.org>
-Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <651d24b9-fe26-4e6f-a144-22c5997eeafb@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 10b32e46-75e6-4e6d-1f4f-08ddfb6fc70f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Sep 2025 13:39:25.5887
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2MlMMCD0gfqtwYCb0NWpCAAFpytRbka7XZ1gqxQ0jfVX3yFQkGLXFOVSf5zs/loFV35MDDSgHssAx158yHLbsE/TN3SeuXQI27jsBvkJCVw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7002
+X-OriginatorOrg: intel.com
 
 
 
-On 24.09.25 15:31, Vincent Mailhol wrote:
-> On 24/09/2025 at 22:18, Oliver Hartkopp wrote:
->> Hello Vincent,
->>
->> On 24.09.25 14:40, syzbot ci wrote:
->>> syzbot ci has tested the following series
->>>
->>> [v1] pull-request: can-next 2025-09-24
->>> https://lore.kernel.org/all/20250924082104.595459-1-mkl@pengutronix.de
->>> * [PATCH net-next 01/48] can: m_can: use us_to_ktime() where appropriate
->>> * [PATCH net-next 02/48] MAINTAINERS: update Vincent Mailhol's email address
->>> * [PATCH net-next 03/48] can: dev: sort includes by alphabetical order
->>> * [PATCH net-next 04/48] can: peak: Modification of references to email
->>> accounts being deleted
->>> * [PATCH net-next 05/48] can: rcar_canfd: Update bit rate constants for RZ/G3E
->>> and R-Car Gen4
->>> * [PATCH net-next 06/48] can: rcar_canfd: Update RCANFD_CFG_* macros
->>> * [PATCH net-next 07/48] can: rcar_canfd: Simplify nominal bit rate config
->>> * [PATCH net-next 08/48] can: rcar_canfd: Simplify data bit rate config
->>> * [PATCH net-next 09/48] can: rcar_can: Consistently use ndev for net_device
->>> pointers
->>> * [PATCH net-next 10/48] can: rcar_can: Add helper variable dev to
->>> rcar_can_probe()
->>> * [PATCH net-next 11/48] can: rcar_can: Convert to Runtime PM
->>> * [PATCH net-next 12/48] can: rcar_can: Convert to BIT()
->>> * [PATCH net-next 13/48] can: rcar_can: Convert to GENMASK()
->>> * [PATCH net-next 14/48] can: rcar_can: CTLR bitfield conversion
->>> * [PATCH net-next 15/48] can: rcar_can: TFCR bitfield conversion
->>> * [PATCH net-next 16/48] can: rcar_can: BCR bitfield conversion
->>> * [PATCH net-next 17/48] can: rcar_can: Mailbox bitfield conversion
->>> * [PATCH net-next 18/48] can: rcar_can: Do not print alloc_candev() failures
->>> * [PATCH net-next 19/48] can: rcar_can: Convert to %pe
->>> * [PATCH net-next 20/48] can: esd_usb: Rework display of error messages
->>> * [PATCH net-next 21/48] can: esd_usb: Avoid errors triggered from USB disconnect
->>> * [PATCH net-next 22/48] can: raw: reorder struct uniqframe's members to
->>> optimise packing
->>> * [PATCH net-next 23/48] can: raw: use bitfields to store flags in struct
->>> raw_sock
->>> * [PATCH net-next 24/48] can: raw: reorder struct raw_sock's members to
->>> optimise packing
->>> * [PATCH net-next 25/48] can: annotate mtu accesses with READ_ONCE()
->>> * [PATCH net-next 26/48] can: dev: turn can_set_static_ctrlmode() into a non-
->>> inline function
->>> * [PATCH net-next 27/48] can: populate the minimum and maximum MTU values
->>> * [PATCH net-next 28/48] can: enable CAN XL for virtual CAN devices by default
->>> * [PATCH net-next 29/48] can: dev: move struct data_bittiming_params to linux/
->>> can/bittiming.h
->>> * [PATCH net-next 30/48] can: dev: make can_get_relative_tdco() FD agnostic
->>> and move it to bittiming.h
->>> * [PATCH net-next 31/48] can: netlink: document which symbols are FD specific
->>> * [PATCH net-next 32/48] can: netlink: refactor can_validate_bittiming()
->>> * [PATCH net-next 33/48] can: netlink: add can_validate_tdc()
->>> * [PATCH net-next 34/48] can: netlink: add can_validate_databittiming()
->>> * [PATCH net-next 35/48] can: netlink: refactor CAN_CTRLMODE_TDC_{AUTO,MANUAL}
->>> flag reset logic
->>> * [PATCH net-next 36/48] can: netlink: remove useless check in
->>> can_tdc_changelink()
->>> * [PATCH net-next 37/48] can: netlink: make can_tdc_changelink() FD agnostic
->>> * [PATCH net-next 38/48] can: netlink: add can_dtb_changelink()
->>> * [PATCH net-next 39/48] can: netlink: add can_ctrlmode_changelink()
->>> * [PATCH net-next 40/48] can: netlink: make can_tdc_get_size() FD agnostic
->>> * [PATCH net-next 41/48] can: netlink: add can_data_bittiming_get_size()
->>> * [PATCH net-next 42/48] can: netlink: add can_bittiming_fill_info()
->>> * [PATCH net-next 43/48] can: netlink: add can_bittiming_const_fill_info()
->>> * [PATCH net-next 44/48] can: netlink: add can_bitrate_const_fill_info()
->>> * [PATCH net-next 45/48] can: netlink: make can_tdc_fill_info() FD agnostic
->>> * [PATCH net-next 46/48] can: calc_bittiming: make can_calc_tdco() FD agnostic
->>> * [PATCH net-next 47/48] can: dev: add can_get_ctrlmode_str()
->>> * [PATCH net-next 48/48] can: netlink: add userland error messages
->>>
->>> and found the following issue:
->>> KASAN: slab-out-of-bounds Read in can_setup
->>>
->>> Full report is available here:
->>> https://ci.syzbot.org/series/7feff13b-7247-438c-9d92-b8e9fda977c7
->>>
->>> ***
->>>
->>> KASAN: slab-out-of-bounds Read in can_setup
->>>
->>> tree:      net-next
->>> URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/
->>> net-next.git
->>> base:      315f423be0d1ebe720d8fd4fa6bed68586b13d34
->>> arch:      amd64
->>> compiler:  Debian clang version 20.1.8 (+
->>> +20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
->>> config:    https://ci.syzbot.org/builds/08331a39-4a31-4f96-a377-3125df2af883/
->>> config
->>> C repro:   https://ci.syzbot.org/findings/46cae752-cb54-4ceb-87cb-
->>> bb9d2fdb1d79/c_repro
->>> syz repro: https://ci.syzbot.org/findings/46cae752-cb54-4ceb-87cb-
->>> bb9d2fdb1d79/syz_repro
->>>
->>> netlink: 24 bytes leftover after parsing attributes in process `syz.0.17'.
->>> ==================================================================
->>> BUG: KASAN: slab-out-of-bounds in can_set_default_mtu drivers/net/can/dev/
->>> dev.c:350 [inline]
->>> BUG: KASAN: slab-out-of-bounds in can_setup+0x209/0x280 drivers/net/can/dev/
->>> dev.c:279
->>> Read of size 4 at addr ffff888106a6ee74 by task syz.0.17/5999
->>>
->>> CPU: 1 UID: 0 PID: 5999 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full)
->>> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-
->>> debian-1.16.2-1 04/01/2014
->>> Call Trace:
->>>    <TASK>
->>>    dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
->>>    print_address_description mm/kasan/report.c:378 [inline]
->>>    print_report+0xca/0x240 mm/kasan/report.c:482
->>>    kasan_report+0x118/0x150 mm/kasan/report.c:595
->>>    can_set_default_mtu drivers/net/can/dev/dev.c:350 [inline]
->>
->> When can_set_default_mtu() is called from the netlink config context it is also
->> used for virtual CAN interfaces (which was created by syzbot here), where the
->> priv pointer is not valid.
-> 
-> Ack. I am pretty sure that I tested it on the virtual interfaces, but I did not
-> have KASAN activated. So I did not notice the problem.
-> 
->> Please use
->>
->> struct can_priv *priv = safe_candev_priv(dev);
->>
->> to detect virtual CAN interfaces too.
-> 
-> Exactly! I am reaching the same conclusion.
-> 
-> Right now, I am testing this patch:
-> 
-> diff --git a/drivers/net/can/dev/dev.c b/drivers/net/can/dev/dev.c
-> index e5a82aa77958..1a309ae4850d 100644
-> --- a/drivers/net/can/dev/dev.c
-> +++ b/drivers/net/can/dev/dev.c
-> @@ -345,9 +345,9 @@ EXPORT_SYMBOL_GPL(free_candev);
-> 
->   void can_set_default_mtu(struct net_device *dev)
->   {
-> -       struct can_priv *priv = netdev_priv(dev);
-> +       struct can_priv *priv = safe_candev_priv(dev);
-> 
-> -       if (priv->ctrlmode & CAN_CTRLMODE_FD) {
-> +       if (priv && (priv->ctrlmode & CAN_CTRLMODE_FD)) {
->                  dev->mtu = CANFD_MTU;
->                  dev->min_mtu = CANFD_MTU;
->                  dev->max_mtu = CANFD_MTU;
-> 
-> It is compiling rigth now. Another potential fix could also be:
-> 
-> diff --git a/drivers/net/can/dev/dev.c b/drivers/net/can/dev/dev.c
-> index e5a82aa77958..66c7a9eee7dd 100644
-> --- a/drivers/net/can/dev/dev.c
-> +++ b/drivers/net/can/dev/dev.c
-> @@ -273,11 +273,12 @@ void can_setup(struct net_device *dev)
->   {
->          dev->type = ARPHRD_CAN;
->          dev->hard_header_len = 0;
-> +       dev->mtu = CAN_MTU;
-> +       dev->min_mtu = CAN_MTU;
-> +       dev->max_mtu = CAN_MTU;
->          dev->addr_len = 0;
->          dev->tx_queue_len = 10;
-> 
-> -       can_set_default_mtu(dev);
+> -----Original Message-----
+> From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> Sent: Wednesday, September 24, 2025 2:41 PM
+> To: Jakub Kicinski <kuba@kernel.org>; Andrew Lunn <andrew@lunn.ch>;
+> Michael Chan <michael.chan@broadcom.com>; Pavan Chebbi
+> <pavan.chebbi@broadcom.com>; Tariq Toukan <tariqt@nvidia.com>; Gal
+> Pressman <gal@nvidia.com>; intel-wired-lan@lists.osuosl.org; Donald
+> Hunter <donald.hunter@gmail.com>; Carolina Jubran
+> <cjubran@nvidia.com>; Loktionov, Aleksandr
+> <aleksandr.loktionov@intel.com>; Vadim Fedorenko
+> <vadim.fedorenko@linux.dev>
+> Cc: Paolo Abeni <pabeni@redhat.com>; Simon Horman <horms@kernel.org>;
+> netdev@vger.kernel.org; Dragos Tatulea <dtatulea@nvidia.com>; Yael
+> Chemla <ychemla@nvidia.com>
+> Subject: [PATCH net-next v6 2/5] net/mlx5e: Don't query FEC statistics
+> when FEC is disabled
+>=20
+> From: Carolina Jubran <cjubran@nvidia.com>
+>=20
+> Update mlx5e_stats_fec_get() to check the active FEC mode and skip
+> statistics collection when FEC is disabled.
+>=20
+> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Reviewed-by: Yael Chemla <ychemla@nvidia.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/en_stats.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> index 87536f158d07..aae0022e8736 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> @@ -1446,16 +1446,13 @@ static void fec_set_rs_stats(struct
+> ethtool_fec_stats *fec_stats, u32 *ppcnt)  }
+>=20
+>  static void fec_set_block_stats(struct mlx5e_priv *priv,
+> +				int mode,
+>  				struct ethtool_fec_stats *fec_stats)  {
+>  	struct mlx5_core_dev *mdev =3D priv->mdev;
+>  	u32 out[MLX5_ST_SZ_DW(ppcnt_reg)] =3D {};
+>  	u32 in[MLX5_ST_SZ_DW(ppcnt_reg)] =3D {};
+>  	int sz =3D MLX5_ST_SZ_BYTES(ppcnt_reg);
+> -	int mode =3D fec_active_mode(mdev);
 > -
->          /* New-style flags. */
->          dev->flags = IFF_NOARP;
->          dev->features = NETIF_F_HW_CSUM;
-> 
+> -	if (mode =3D=3D MLX5E_FEC_NOFEC)
+> -		return;
+>=20
+>  	MLX5_SET(ppcnt_reg, in, local_port, 1);
+>  	MLX5_SET(ppcnt_reg, in, grp,
+> MLX5_PHYSICAL_LAYER_COUNTERS_GROUP);
+> @@ -1496,11 +1493,14 @@ static void
+> fec_set_corrected_bits_total(struct mlx5e_priv *priv,  void
+> mlx5e_stats_fec_get(struct mlx5e_priv *priv,
+>  			 struct ethtool_fec_stats *fec_stats)  {
+> -	if (!MLX5_CAP_PCAM_FEATURE(priv->mdev,
+> ppcnt_statistical_group))
+> +	int mode =3D fec_active_mode(priv->mdev);
+> +
+> +	if (mode =3D=3D MLX5E_FEC_NOFEC ||
+> +	    !MLX5_CAP_PCAM_FEATURE(priv->mdev,
+> ppcnt_statistical_group))
+>  		return;
+>=20
+>  	fec_set_corrected_bits_total(priv, fec_stats);
+> -	fec_set_block_stats(priv, fec_stats);
+> +	fec_set_block_stats(priv, mode, fec_stats);
+>  }
+>=20
+>  #define PPORT_ETH_EXT_OFF(c) \
+> --
+> 2.47.3
 
-I tend to prefer this kind of fix.
-
-This would make clear that can_set_default_mtu() is only triggered when 
-a new netlink configuration process on real(!) CAN interfaces is finalized.
-
-Maybe this restriction should go into a comment describing 
-can_set_default_mtu() then.
-
-Best regards,
-Oliver
-
-> @Marc, once I finish testing, can I just send you a diff patch and ask to squash
-> it in:
-> 
->    [PATCH net-next 27/48] can: populate the minimum and maximum MTU values
-> 
-> ?
-> 
-> 
-> Yours sincerely,
-> Vincent Mailhol
-> 
-> 
-
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
