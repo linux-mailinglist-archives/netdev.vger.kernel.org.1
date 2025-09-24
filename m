@@ -1,121 +1,128 @@
-Return-Path: <netdev+bounces-226118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D71EB9C62A
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 00:51:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD20B9C710
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 01:04:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F083E173EAF
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 22:51:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2FB1E7A3D62
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 23:02:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9579A2882D7;
-	Wed, 24 Sep 2025 22:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6509D28488A;
+	Wed, 24 Sep 2025 23:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="LvTaCmAj";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="DOI+ZmiX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UrLRx5BJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CAD27E066;
-	Wed, 24 Sep 2025 22:51:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA5A1D618A
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 23:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758754278; cv=none; b=OeoAxb1g+1PC3icPJhZ51DZerxtIUysYXaE+YMjn9lmBV1Ax36Q/hV2zdzbiylHY1LMqcJUb5JX98H0abowXWdA9ACh/rypDlKBQbIbtivJnYY92FozBWjm8wF3IqBanMnwE8OtyUjdPv6Gl3aq03ZV8zUcSUnta1uOg7IbJSEs=
+	t=1758755068; cv=none; b=MB+4DvDqDBJTGsQX3+PruhPr+PqLl8sKGlEC/1Tck5k3lDomgVwKVoS0tdnXMKhFAEPeLjfgJ0fYfNvRS0jCUts/OEJpPqm1pJ3F6hK4jivTY1eB051H6qBRf636yCKnsR3kuoB8Q4Yottivz/g8+LHDedcG3g4yip1Ad7Ehb7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758754278; c=relaxed/simple;
-	bh=h83iygs2s9Ldl3h7B7pFWbWQJHVrhWeWQeGcW05NHaE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qTDQEJnJ/ZhwUlF8fnaHor9jf8aZ3+wu0L0P2MRB7GS18SvjHXKmYPu373OJHSelIxtNJmt2BamzLFfptt0i3HSXEQgVv/yuIPeeuCfAZNVV2TMjHvyz/5FqZicwzHL4gMSFTj6LHLxbCImbJ8NA6kE12EbrkrIy0XINNRbg4NI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=LvTaCmAj; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=DOI+ZmiX; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 1E82360279; Thu, 25 Sep 2025 00:51:13 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1758754273;
-	bh=9wVF5HzDtmu1OxUD7YMD/AGvt/7TIpkUXfx7yqLSTbc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LvTaCmAjq+XGwhNuFsAfAv7lWiQ6oG2RXVnEyXkyZFg5/ZzGs/p+9dHqSLbYDe8W3
-	 Jh8W7lZmc/cjp3KQ0wuI6lOmZZeXlpf2nNP66MffMQtqHn7UdYTQzZz6akuteE3xk3
-	 OnZURmegY3v49GsdfhOmSpYEu9Yl1vXIh92yNNu9AA5UEuqEZ+3gRsyzieS/xMja96
-	 3mFF3nof5Vrlejd0jnpYwyccDP+k5RPmMEbx9wPq8rvaKiKsj47g2fV0q26BJyuTlJ
-	 X/NyIHOZhGXzfEmfZZYH7eB4JkrSe9avi4xszWk+Br6EWjSn8qE2+ZfvAN7N/aADFn
-	 OnByCDX6OnY+A==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id D72BF60262;
-	Thu, 25 Sep 2025 00:51:09 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1758754269;
-	bh=9wVF5HzDtmu1OxUD7YMD/AGvt/7TIpkUXfx7yqLSTbc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DOI+ZmiXU3AkYTL0/N3fDBqzp70sfzB1ct7EQFd+i7h6tZrmN8D4kyDd0NlgbqESh
-	 6uLXMijdd9xW8CdWfmN3UupoXwDDebrQ/7Xstu1eXta2+WTgYT7gt27GTHbJRuqxIF
-	 KN/jEKI5ps5Eb2CMVNufIPJktFqR3h5lkKE7dn5x6EqYqQYSCuBuazD0oIMWQpAibG
-	 SvQhTtk/Blvtv9IhLV5wD/M2ftmg0VX4bWxYN++uFj/5WlDiw3FHIPb0zVjTONYbBp
-	 Lizek8QtZ0jYOHxE6rgXlpUSxzqY0LXu9+m9zQwVo7EmJgvl1ffEL+fTwL3xRca+o1
-	 dWxG0YXogPJfg==
-Date: Thu, 25 Sep 2025 00:51:07 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Elad Yifee <eladwf@gmail.com>
-Cc: Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
+	s=arc-20240116; t=1758755068; c=relaxed/simple;
+	bh=PUMWr1KcbhmB/IOqYU14+Ove2tvnxcz4UzVWOTY2pAU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h4LdEOnQLyXjZnIWRe/yrUZrzmAXq3hcEzwYoCd68vx1vxuWIL0Pzdqt1Dn9mIet/bc/J+xfKBmQO2LwpcdMnirF62p3ZZFWVaS2DyPwUJND223f9ShUi8zdSU/eyr6wNoSAp9koMMJO5nuTFxXO+7Dr3i0ZG+Oq0vN56EpB0B0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UrLRx5BJ; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b33d785db6fso67492766b.2
+        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 16:04:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758755065; x=1759359865; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fnszhabCzVTZUNrenHHSvEHdol2FKszGcCj5sQfSnxE=;
+        b=UrLRx5BJGBQ+LztwingaNwl/eEbPDYfCxN5BFbeySAnj7PRfHBdqI4nH9ckd50Q7Ou
+         Fsd7ZitkKDvkXgsVmSXlKq1OXaSRaWyew2/9zVcEfkeInTmmWTa9Y3Zkuxf0zZ1Slf0A
+         fAoN0QLwbZVBuTeRoSHoCj9rQRIA+GXDNTxRhuGOpvs4QdQLhmx+cUxasqlGFSySUX7U
+         NXpOG5asC4rt78A6A/N+TJhYMo9UVQ36kXuChSrFwfxOLTbTIMHD6B5R3REJiZmvVDIO
+         MhUj8AWSqACpEgDeX8BkbEfFgE4yCH5AYTIk+fLjzk6ls0A3z8oX4iq8oMSI2Cw17tzV
+         YHZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758755065; x=1759359865;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fnszhabCzVTZUNrenHHSvEHdol2FKszGcCj5sQfSnxE=;
+        b=bJaAp3SpdurTeHj6SlOZfKCoArwawlQBpfkWu25+cjmCwIuA2EDKOGucrrG6NG6y4m
+         PC3VjTtgS/huN9Knnouv7Rf0abfa616OODb4KF7M2CqZQb1zOkxXXaKGgmYukkFZjYEm
+         CL/wbVj8+03Wz68dzmeMFs1TP6WlBlTEDEX+v/HsGPW7LpLBURBLIIQ5cYSgxB+WLVSY
+         iWRv7X0NC0RyvpjESyDaxYt85XIHSw7RLz1KWXNoOwBfn1/gEdLpamvLelq+IhP7BA4U
+         ZMeBF0V07irPWo0tWoKtYshYjVCTPpj/YqIGNWZlxbXKcNx/Nq8Yyny64HJ1jvqOurQz
+         ZF6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVIK2GEYmjqawalLvVylkPstvzZ+s/YHeN205vSUzm0Sh+U4fqOnE/koeOQowLRwQ6FXuaMKSo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySZOiTOG68J7OPj4tLe1g+x5631SSlK+6PK752aDAQcpMWxQZK
+	Wn87KTN8zunds/0l190Ngiu08QkgoS44UfgcDPZg6XLqccy3piiZp+x7
+X-Gm-Gg: ASbGncuBJqg49oB27IW2RZbHiz8oUY96qR6Y9ANCFudHNfSgTwLw0v3OHBtT5r36pNM
+	hPKS4O+ww7DgnLXA+IkHbvb+rtLjcvifhqDI3uH2LkeHDb+bWuqADRdIe8tbJNhm1OIS/PnbkEL
+	O4a/EdHsQaQDNGW1RMJUuegDs5xHggW77ZI4HIVfShFrWuuUSpMwaQpC9k+NRw9hRPMDwnKsAPx
+	6it3J7ayhg7A9ajTTibGG9vX++UsMIA55J7mVmqUEXxe5aOzc8OleNL/YHPt/KSuN6fDH79SoSM
+	KxaaoyTOlT91t83rMM8IZEpiNsvTV/wdKrrKXJ7lHqNqXcR4mO6W11z1XnH4DbNwWU51tDYpce5
+	bsni9B4YQqGTe/x0YejbvA5xW5Vo62n1hzRHtBozEyffI+H1nr7NHlo9uZfGg/5qBvE0xeZuwkD
+	c4iA9dnQ36terErZal
+X-Google-Smtp-Source: AGHT+IEppvE3960x6XIR7URKU78EOKSYRIAcJdBEOqPrulJnmbx5gMilskPWXare99l4J1hqwdTmQw==
+X-Received: by 2002:a17:907:6093:b0:b04:6a58:560b with SMTP id a640c23a62f3a-b34ba93ce11mr146872666b.39.1758755064614;
+        Wed, 24 Sep 2025 16:04:24 -0700 (PDT)
+Received: from alessandro-pc.station (net-2-37-207-41.cust.vodafonedsl.it. [2.37.207.41])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b353f772528sm34363266b.37.2025.09.24.16.04.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Sep 2025 16:04:24 -0700 (PDT)
+From: Alessandro Zanni <alessandro.zanni87@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org
+Cc: Alessandro Zanni <alessandro.zanni87@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next RFC] netfilter: flowtable: add CT metadata
- action for nft flowtables
-Message-ID: <aNR12z5OQzsC0yKl@calendula>
-References: <20250912163043.329233-1-eladwf@gmail.com>
- <CA+SN3sp6ZidPXhZnP0E4KQyt95pp_-M9h2MMwLozObp9JH-8LQ@mail.gmail.com>
- <aMnnKsqCGw5JFVrD@calendula>
- <CA+SN3srpbVBK10-PtOcikSphYDRf1WwWjS0d+R76-qCouAV2rQ@mail.gmail.com>
- <aMpuwRiqBtG7ps30@calendula>
- <CA+SN3spZ7Q4zqpgiDbdE5T7pb8PWceUf5bGH+oHLEz6XhT9H+g@mail.gmail.com>
+Subject: [PATCH] selftest: net: Fix error message if empty variable
+Date: Thu, 25 Sep 2025 01:04:07 +0200
+Message-ID: <20250924230413.75246-1-alessandro.zanni87@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+SN3spZ7Q4zqpgiDbdE5T7pb8PWceUf5bGH+oHLEz6XhT9H+g@mail.gmail.com>
 
-On Wed, Sep 17, 2025 at 08:33:49PM +0300, Elad Yifee wrote:
-> On Wed, Sep 17, 2025 at 11:18 AM Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> > Just to make sure we are on the same page: Software plane has to match
-> > the capabilities of the hardware offload plan, new features must work
-> > first in the software plane, then extend the hardware offload plane to
-> > support it.
-> 
-> Thanks - I see what you meant now.
-> 
-> This isn’t a new feature that needs to be implemented in software
-> first. We’re not introducing new user semantics, matches, or actions
-> in nft/TC. no datapath changes (including the flowtable software
-> offload fast path). The change only surfaces existing CT state
-> (mark/labels/dir) as FLOW_ACTION_CT_METADATA at the hardware offload
-> boundary so drivers can use it for per-flow QoS, or simply ignore it.
->
-> When a flow stays in software, behavior remains exactly as today,
-> software QoS continues to use existing tools (nft/TC setting
-> skb->priority/mark, qdiscs, etc.). There’s no SW-HW mismatch
-> introduced here.
+Fix to avoid cases where the `res` shell variable is
+empty in script comparisons.
 
-You have to show me there is no mismatch.
+The issue can be reproduced with the command:
+make kselftest TARGETS=net
 
-This is exposing the current ct mark/label to your hardware, the
-flowtable infrastructure (the software representation) makes no use of
-this information from the flowtable datapath, can you explain how you
-plan to use this?
+It solves the error:
+./tfo_passive.sh: line 98: [: -eq: unary operator expected
 
-Thanks.
+Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
+---
+ tools/testing/selftests/net/tfo_passive.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/net/tfo_passive.sh b/tools/testing/selftests/net/tfo_passive.sh
+index 80bf11fdc046..2655931b2396 100755
+--- a/tools/testing/selftests/net/tfo_passive.sh
++++ b/tools/testing/selftests/net/tfo_passive.sh
+@@ -95,7 +95,7 @@ wait
+ res=$(cat $out_file)
+ rm $out_file
+ 
+-if [ $res -eq 0 ]; then
++if [ -n "$res" ] && [ $res -eq 0 ]; then
+ 	echo "got invalid NAPI ID from passive TFO socket"
+ 	cleanup_ns
+ 	exit 1
+-- 
+2.43.0
+
 
