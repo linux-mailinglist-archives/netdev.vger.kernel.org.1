@@ -1,110 +1,96 @@
-Return-Path: <netdev+bounces-226124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E517CB9C945
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 01:31:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7374B9CABD
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 01:41:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16D691BC417B
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 23:32:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A429B3A5FA7
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 23:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57E0274668;
-	Wed, 24 Sep 2025 23:31:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E136283FE9;
+	Wed, 24 Sep 2025 23:40:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aY4fjG81"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cA0e6Eoa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FDE3202960
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 23:31:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BA763CB
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 23:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758756676; cv=none; b=DzPoDI+iCcMOXevIMuCyHbXEO0znnimr4poy72kHIv/sHjhHvQ05fap61MY0LzWoqsHSRDW2lxmPRxs51orulbdY62XUJi7Rz/PkftE8cgR1ee4NtZpxNP62FgkKGeNsDLqdwBgd3rSwI6IYv6EfjVcwtx4FC4bQn8XP/MaRPDw=
+	t=1758757243; cv=none; b=l6MMrvhkQpdaD+R1SRPtSfpdPaPf4uxhixk+SAp/ID+pKWZgPuVhtwdjxK15sLtg//2NhixV/KkitY6Thn/lSRCdcbxKP5tmnCrw0GBke+PU61staM79+rvHQH3tT7fXEkhqoOLrCxCIu5++8ixmR2WHQgh+4c8PruAvsE38YHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758756676; c=relaxed/simple;
-	bh=OSHr7+nHz+hF+isrcqplKblSjslyVerqC5yQhioXbf8=;
+	s=arc-20240116; t=1758757243; c=relaxed/simple;
+	bh=MZiAY1G9URGZ+FV5XwIuXmUKR+Uwo4DY8qBrtVJMlDw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q6hhbqkQxRwvhIuvyKmhF4WJ9nZgTr8gfgxHrQCpcQ2ZCe81R+q6bw6k6irEF19bAVnaUE6KzEojRTDeDGRrTIytmAPmtkR4+wBzH4+jw1AYv79SsxjEpIJBQ1LP+Ulc2LRR0agyMvPXpuly5tMLT/kvOT/RyMOxTyktjYn3Sfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aY4fjG81; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 898FDC4CEE7;
-	Wed, 24 Sep 2025 23:31:15 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Yp1s4Cth7zM+0X9R9ygOxtfJA2s4kF+FW4eozar+3eo5K2zX+/4rDVt6hU0Pgn2cPOatXojszSM15aO07OENySSydui/9NDkAXUT++Nzxq+JKksiEOiiHMlC7R1Gpo+fH0O9pxIgvWHFhouzGZCMN5jRonKI1uSMc1arKCtvcQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cA0e6Eoa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B8F2C4CEE7;
+	Wed, 24 Sep 2025 23:40:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758756676;
-	bh=OSHr7+nHz+hF+isrcqplKblSjslyVerqC5yQhioXbf8=;
+	s=k20201202; t=1758757242;
+	bh=MZiAY1G9URGZ+FV5XwIuXmUKR+Uwo4DY8qBrtVJMlDw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aY4fjG81Bq1t2JBiRdqghGIBSnYEPSz75HRxc3j4ptcM3IopTqw/cjQ29pwah3rKh
-	 SsxIJdRjofmimtQ2lgmFnsa5Gl7yKEbCnSjIxwlmivpegkfS3Qd7IKMTNWOg2elhVS
-	 p9UwjOj7sVP9hSMm8xUXUfdDLRMh6+X8VBblaFk5SwI5YPb4TNuMZOTAcMqQX5EBTj
-	 AcU1trs6Ra1WiQDHyz42r5SXp5++DQOMeZN5/x/nnJJUSdFqw75Hef8/gDUupGGM2Z
-	 UwAGiJrcXBV4oXwOin0l/XnmXNBO3bz94NplMb50XvaSrkaou3LdIe8nOKAGcFECJ6
-	 +utQdsj5RZFwQ==
-Date: Wed, 24 Sep 2025 16:31:14 -0700
+	b=cA0e6EoaSaTjYAgDWp3yQwcyFL3Qq7lYpQqPBbJj2vTqPVm3gOeLEANtZTig8jzo+
+	 tjDIhgA4oTpcjdzVQX5vE5saev45x8/MrkHuSOx9iK+wua9rZu7sZN6ycMmz6BCOvy
+	 iWEF58BxFfgPOWHHy3cXmNg/9+is9GqdxoLssL8q8jYdc/YEUWaZQOOOFXrOZLHxnB
+	 3e+Wy6Oczrl0TsxsEspa3hec47d7mNlhCm+9WS1yvhxAT7y8uX+gNK9jjUHFIj83N5
+	 KiuBf/2Ab23NPNif1TpaoJQImknb5OYyMpjF5h3hhGdOkAS2zbVDanUfnQSU/kLfNQ
+	 rYgv1qeevbMHQ==
+Date: Wed, 24 Sep 2025 16:40:41 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Marek Mietus <mmietus97@yahoo.com>
-Cc: netdev@vger.kernel.org, sd@queasysnail.net, antonio@openvpn.net,
- openvpn-devel@lists.sourceforge.net
-Subject: Re: [PATCH net-next v3 0/3] net: tunnel: introduce noref xmit flows
- for tunnels
-Message-ID: <20250924163114.2adc671b@kernel.org>
-In-Reply-To: <3f9e0aa5-1628-4ad7-8078-86a55b09b216@yahoo.com>
-References: <20250922110622.10368-1-mmietus97.ref@yahoo.com>
-	<20250922110622.10368-1-mmietus97@yahoo.com>
-	<20250923184856.6cce6530@kernel.org>
-	<3f9e0aa5-1628-4ad7-8078-86a55b09b216@yahoo.com>
+To: =?UTF-8?B?SsOhbiBWw6FjbGF2?= <jvaclav@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 net-next] net/hsr: add protocol version to fill_info
+ output
+Message-ID: <20250924164041.3f938cab@kernel.org>
+In-Reply-To: <CAEQfnk3Ft4ke3UXS60WMYH8M6WsLgH=D=7zXmkcr3tx0cdiR_g@mail.gmail.com>
+References: <20250922093743.1347351-3-jvaclav@redhat.com>
+	<20250923170604.6c629d90@kernel.org>
+	<CAEQfnk3Ft4ke3UXS60WMYH8M6WsLgH=D=7zXmkcr3tx0cdiR_g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 24 Sep 2025 18:27:46 +0200 Marek Mietus wrote:
-> > On Mon, 22 Sep 2025 13:06:19 +0200 Marek Mietus wrote:  
-> >> This patchset introduces new noref xmit helpers and incorporates
-> >> them in the OpenVPN driver. A similar improvement can also be
-> >> applied to other tunnel code in the future. The implementation
-> >> for OpenVPN is a good starting point as it doesn't use the
-> >> udp_tunnel_dst_lookup helper which adds some complexity.  
-> > 
-> > You're basically refactoring an API, it's fairly unusual to leave both
-> > APIs in place upstream. Unless the number of callers is really huge,
-> > say >100, or complexity very high. Not sure how others feel but IMHO
-> > you should try to convert all the tunnels.
-> >   
-> 
-> I'm introducing an opt-in API, which is useful in some cases, but not
-> always as it optimizes flows that follow a specific pattern.
-> 
-> Since this API is opt-in, there is no need to over-complicate code
-> to integrate the new API. The current API is still retained and is not 
-> made redundant by the new API. Some tunnels may benefit from the new
-> API with only minor complications, and should be modified in separate
-> patchsets after this one.
+On Wed, 24 Sep 2025 13:21:32 +0200 J=C3=A1n V=C3=A1clav wrote:
+> On Wed, Sep 24, 2025 at 2:06=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> > On Mon, 22 Sep 2025 11:37:45 +0200 Jan Vaclav wrote: =20
+> > >       if (hsr->prot_version =3D=3D PRP_V1)
+> > >               proto =3D HSR_PROTOCOL_PRP;
+> > > +     if (nla_put_u8(skb, IFLA_HSR_VERSION, hsr->prot_version))
+> > > +             goto nla_put_failure; =20
+> >
+> > Looks like configuration path does not allow setting version if proto
+> > is PRP. Should we add an else before the if? since previous if is
+> > checking for PRP already
+> > =20
+>=20
+> The way HSR configuration is currently handled seems very confusing to
+> me, because it allows setting the protocol version, but for PRP_V1
+> only as a byproduct of setting the protocol to PRP. If you configure
+> an interface with (proto =3D PRP, version =3D PRP_V1), it will fail, which
+> seems wrong to me, considering this is the end result of configuring
+> only with proto =3D PRP anyways.
 
-My objection stands. Unless you have a reason why some tunnels need 
-to ref the dst you should just convert all. Otherwise this is just
-technical debt you're pushing on posterity.
+I'm not very familiar with HSR or PRP. But The PRP_V1 which has value
+of 3 looks like a kernel-internal hack. Or does the protocol actually
+specify value 3 to mean PRP?
 
-> >> There are already noref optimizations in both ipv4 and ip6 
-> >> (See __ip_queue_xmit, inet6_csk_xmit). This patchset allows for
-> >> similar optimizations in udp tunnels. Referencing the dst_entry
-> >> is now redundant, as the entire flow is protected under RCU, so
-> >> it is removed.
-> >>
-> >> With this patchset, I was able to observe a 4% decrease in the total
-> >> time for ovpn_udp_send_skb using perf.  
-> > 
-> > Please provide more meaningful perf wins. Relative change of perf in
-> > one function doesn't tell use.. well.. anything.
-> 
-> Okay. Currently, I'm getting a consistent 2% increase in throughput on a VM,
-> using iperf. Is this what I should mention in the next cover-letter?
+I don't think there's anything particularly wrong with the code.
+The version is for HSR because PRP only has one version, there's no
+ambiguity.
 
-Yes, that's much better! Some kind of average over multiple runs and/or
-stddev would be ideal.
+But again, I'm just glancing at the code I could be wrong..
 
