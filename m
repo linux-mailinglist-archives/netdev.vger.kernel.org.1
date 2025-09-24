@@ -1,257 +1,122 @@
-Return-Path: <netdev+bounces-226039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36FD7B9B1DE
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:51:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C627B9B1F9
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:52:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB3813B43DA
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 17:50:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67C074E3A30
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 17:51:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77155314B69;
-	Wed, 24 Sep 2025 17:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01F733164C4;
+	Wed, 24 Sep 2025 17:51:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="iT8duxwz";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="m08DfW+o"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CgnCzGBT"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E792FBE05;
-	Wed, 24 Sep 2025 17:50:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266973161AC
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 17:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758736238; cv=none; b=ZDS/gR1Fu7/+t9UE1YA35Fy5XXMCvvpHFAt4jKAey6RjAktbvZayOcloJQY3qb6Igwc+IrKDrw3H2xtynvSF8/zrMOBLvSDYyZjztygwciljY091JNrt1L4HnNJgVra01vsBDELma02y25F/wjDSAaMiiLosTxbjlDCW8QngNs0=
+	t=1758736273; cv=none; b=CZUKHDpGJ9Xff4vUrk7PIIVyMuEWbQ/sugUpqb/NZPwi26aBia7DMTigWEK2ely85bwmq7B1EfIDFvyfeP7xgJjL03fMJxyXlQGYfL/mlE6c3oejz+IMr0y4Exc9RTMmpC8fruh3ekQQn0pMXqIUs+OORF+Eu9AgeqZTov693HU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758736238; c=relaxed/simple;
-	bh=NPGlUlaUMBUpPVyqYO4XSqsnRuXnfdEkj6waMAL1ODE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RGsSUuSzqaictzZVaEVvhmUJXyvYmGNNHzgVLrKMuIUhbCczJiH1G48aaevs85SVmMMmibqGj6RxuIJAlFse1Rtd1zEhzL3AtEWWXiOfIZlNaJWbqc68SufDvPtE3urORkzNaDsc7rEUCAo6XCSFNEwYtMBqtVMfCCGwltY9Ors=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=iT8duxwz; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=m08DfW+o; arc=none smtp.client-ip=103.168.172.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfout.phl.internal (Postfix) with ESMTP id 1C9F4EC00B6;
-	Wed, 24 Sep 2025 13:50:34 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Wed, 24 Sep 2025 13:50:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
-	 t=1758736234; x=1758822634; bh=moKr34pnawcljfj8OP/P5kJrgh1m2F+Q
-	E1r8IvMYRIM=; b=iT8duxwzuK2zGKi4NgeVmyVO/fVTTRwr61CyIAOihTyIUHEy
-	+0JGk8qYPdyr/8w0fi3gHClaLb9cCxTKY1Lw5HGvsjoSK+OlejSmgOKWDvSMe2qU
-	wD+n+Isj+KSTHCV2xRTQcpaBFmIE5x3kI2qnJJ6g1pMC0frWSccHy8I1Da+i9Wf0
-	Z+BW18gbfb1whu4XvSRrz83Dz9xegm6kI3qW3Fews0MAijGEC+ux5sxHUGfHSp+E
-	bBjr05or6d1v6Y1dYxQSNWgFBWXkrvYIHGqpPitdXPGRvZr2EcWHmuIx4CyBK5J4
-	U0gIhABn0t6ZeBvvgdEV+6eVUmpYvyde1Oa5yQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1758736234; x=
-	1758822634; bh=moKr34pnawcljfj8OP/P5kJrgh1m2F+QE1r8IvMYRIM=; b=m
-	08DfW+oAcWXd+bAH7w4CvXtClNfIFKdrbEfJdJoGqOJXdih4CNLPvT7rlP2qzraR
-	BiUN7HjfIE5fNydz3Qn90Z0T9S4lkg1x4JZdqurnuNS+rWpVojmwtqz0DCIIxKa/
-	wOuMgGw36IfQqEjTTA9WNjmmSotmqa7b6YNxSpfbb4YgStqGujyfeA1mbkgZYx4E
-	cbENVTg464dXZGB4VzS0JDPrAVBYTZLKgZUJOfffI6pUtiBaRRIbJ119CiXDj6hS
-	Q97RhwB5MwPeF5mI1R06hK+NYktjQ/WwfYlA70i7NKBjspn+aGEl7n8b5K9q9X8G
-	ShYoHsfZ6Fhxd8f+mUtXQ==
-X-ME-Sender: <xms:aS_UaOUB5uQJpjGm5uW48h34b1E_2dxi0gD5q5KAdAaS-qdfhstk-g>
-    <xme:aS_UaG8Mn7F8Cuoklc-yViFbEofuML_rLGbF_wd4Q8Izj2AupMxBwm9JxlKpUWCIM
-    kE7-f4BMntzJrLRLn3gBRv-y7oCdQ_U-qGtSQegbF0Ch4fYreMOjTw>
-X-ME-Received: <xmr:aS_UaG2W84DgZpAz3cPnC1pU22cG1i2feuhigjmn0hT0fLzX9-oMK4bLw1RK>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdeigedvhecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtugfgjgesthekrodttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnheptedttdeijeetgeelkedttedvgefhheeuffeghfdviedvheelhfdvheef
-    ffeuvdefnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdr
-    nhgvthdpnhgspghrtghpthhtohepudegpdhmohguvgepshhmthhpohhuthdprhgtphhtth
-    hopeifihhlfhhrvggurdhophgvnhhsohhurhgtvgesghhmrghilhdrtghomhdprhgtphht
-    thhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlih
-    hnuhigqdguohgtsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhu
-    gidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinh
-    hugidqkhhsvghlfhhtvghsthesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
-    pegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivg
-    htsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
-    pdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-X-ME-Proxy: <xmx:aS_UaDcPjnod5XhER5-UXNUiYuwQYTPga7OzJiISPhDluvDlyKHBKw>
-    <xmx:aS_UaFCEojX29xTEgH735Kq1bWlb59yKsTh6uFtQxHGH3V2Uj-B25A>
-    <xmx:aS_UaC9aOU6cAXPW0SC0GnN_p6FQ1VAvYHKnDR1wYX9fiGGcfqZ55Q>
-    <xmx:aS_UaBql8E6iRb-8-7Hc40vc1ivrtkysPeoGYbdSUeh8G3ycLv-02g>
-    <xmx:ai_UaItRc-UPAsQFv6kaqrW6CDmhWPMks014ZWeR9i2f-2ragQ6fUnxq>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 24 Sep 2025 13:50:32 -0400 (EDT)
-Date: Wed, 24 Sep 2025 19:50:30 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Wilfred Mallawa <wilfred.opensource@gmail.com>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
-	john.fastabend@gmail.com, shuah@kernel.org,
-	Wilfred Mallawa <wilfred.mallawa@wdc.com>
-Subject: Re: [PATCH v4 2/2] selftests: tls: add tls record_size_limit test
-Message-ID: <aNQvZnCWhymiXYPO@krikkit>
-References: <20250923053207.113938-1-wilfred.opensource@gmail.com>
- <20250923053207.113938-2-wilfred.opensource@gmail.com>
+	s=arc-20240116; t=1758736273; c=relaxed/simple;
+	bh=irDF2NGT01tFVGcKv8Aw+yXSxcZKqrHPtgX88XxrmqM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rhuXg1TammwC23niXRNcp8g71fGzggtRxUqVX20DpDzRSvlPwVQjEMB4k6KumXQrGtefZmlCX3iLGyPkoh3MZ9TDztWdeoAbDSfApJZgT8rFcQ6bceckcQYKXqht1ZW+RFqfpxqfIIa2vTlw4kDWFVG218GnTBmwCZKClVyMTBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CgnCzGBT; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-57a59124323so40469e87.2
+        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 10:51:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758736270; x=1759341070; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pquafnPzR8S6cEVo4ZSJasnk4ic+4rsTQNuSE4g5qVk=;
+        b=CgnCzGBTMYiRzSQuPlR/SAm+ecE/5DkRsGCNRhjv5VzXZMroiPF+xV8XhF9/Xt2utA
+         Oy33mz36r66ywcpgpc/+fYQ8wNQV/8beQSDK7ahgsx8/GIMHSA0Xj7DRNMrC/jXiGGPq
+         OOLmGeZW87uw9A20JrLRGU9yffNA3foBoe6AokC6okFGqoegv95dK0s09+oON5kD4nqT
+         j3CxD2WEoDGNEV3dHaEDa9LwHxyVx0aA5+vX3vMGSeD5LnCsOT3gi6jOc3dCiVzzp4v8
+         f1sH0GdTz//2gT7konbV3QrvIBOYmA+b5IS1a8NeZZOdwwn7mVqi/FE+V9OgWukIifkS
+         miMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758736270; x=1759341070;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pquafnPzR8S6cEVo4ZSJasnk4ic+4rsTQNuSE4g5qVk=;
+        b=Ic98Qn13krqeisdzSRCa1Qb1YCV5b7i6Ca0zNcmAZ9FxxSdPexuxD2QM+PWs1cXxWZ
+         1MhHNcOIkL4uX/uRfzJ8C94ELQ/Gjyid221t2yRbaLgrsVZwM3eczpcU+gtZDao+Yz3m
+         vXRDuFU4Gi2si5rKYZkcY9yyEv6vV97al+kUXTXIq3RvoPAf0mMV7Y5DOQC3BHDWpl8o
+         dJj2EDSONLiHKf0XMpOOh4dnacnEJ5YuLghSfMdiMQk707u76ufWgwAcVdRwXdPRb+La
+         QUj8pM7wZ6UgimugjOcsPQ8tqVfIUvYfBD3ukbvDkMwCwm4Nxa9xkYyRdGjNSMQGI0MK
+         nhqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7bkxwysPWppwVapvW2/mqXm3TBA77+PX3RelAuAJ00TdCbx6pfyZILRAqZcLg7SLwPQ1PJgk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhUn2N4rLgddB2v6F8qz2133bzXuIdbxc8AFaGNype5HNBMbsq
+	G1gZ8hMtI9P2jE89b48g6VRWz1SjeIX2S8LDD+kJzhcj11ux7z4GySJ9
+X-Gm-Gg: ASbGncuWnoOTjBhF42KyjgSf8yHfPYE27DpUtUuhCnuql7zSRCtFj3a3UdLFRqLQNkr
+	JZYmR5WZU59d0ZMx/Rt84uGD7AneB1/GtXxRgt5GHlCouVfspjxBIDtQhazWZTTJJKm3iUClfb1
+	x7VIIberQsPDbaOcO8m3emAd0YlnSE3nDPjvd6AK/e7v4FSa760CRC/pMmVjKgkWVRr458MYKim
+	5zIiwXKKuTykf07fwl8ejR8niG3w3BHPeC/hSvgC8LQMXYwkcxxi2j/fbSN7ozP6BgO7zmxywdk
+	tb7D89qLAos1xR+b9uk6GYIPHAotC3qbg6jDJrIWmbrtnBxgOMYkP1rnJrXHIJfPHLtugItkv13
+	zYE635ppRMwiVsu8CNYLIOl2g9gbIheXplAY=
+X-Google-Smtp-Source: AGHT+IFHPEAgajKTiH7Ls3GaEiRPS2Tkaju+/hcYdJg8P1mtwrJiU+kcknlPPPv2gncoIiP6NgFWvg==
+X-Received: by 2002:a05:6512:ac5:b0:55f:6d6e:1e97 with SMTP id 2adb3069b0e04-582d4257f20mr104190e87.52.1758736270018;
+        Wed, 24 Sep 2025 10:51:10 -0700 (PDT)
+Received: from foxbook (bfe191.neoplus.adsl.tpnet.pl. [83.28.42.191])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-578a5f44740sm5227645e87.14.2025.09.24.10.51.08
+        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
+        Wed, 24 Sep 2025 10:51:09 -0700 (PDT)
+Date: Wed, 24 Sep 2025 19:50:55 +0200
+From: Michal Pecio <michal.pecio@gmail.com>
+To: Petko Manolov <petkan@nucleusys.com>
+Cc: I Viswanath <viswanathiyyappan@gmail.com>, kuba@kernel.org,
+ edumazet@google.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ pabeni@redhat.com, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+ linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com,
+ syzbot+78cae3f37c62ad092caa@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v3] net: usb: Remove disruptive netif_wake_queue in
+ rtl8150_set_multicast
+Message-ID: <20250924195055.15735499.michal.pecio@gmail.com>
+In-Reply-To: <20250924135814.GC5387@cabron.k.g>
+References: <20250924134350.264597-1-viswanathiyyappan@gmail.com>
+	<20250924135814.GC5387@cabron.k.g>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250923053207.113938-2-wilfred.opensource@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-[got a bit distracted while writing this so Simon got to the process
-stuff before me, but I'll leave it in:]
+On Wed, 24 Sep 2025 16:58:14 +0300, Petko Manolov wrote:
+> netif_[stop|wake]_queue() should have been removed from rtl8150_set_multicast()
+> long time ago, but somehow it has slipped under the radar.  As far as i can tell
+> this is the only change needed.
 
-BTW, a few details about process: since this is a new feature, the
-subject prefix should be [PATCH net-next v4 n/m] (new stuff targets
-the net-next tree), and the patches should be based on the net-next
-tree [1] (I'm not sure what you based this on, git am complained on
-both net and net-next for this patch). More info about this in the
-docs [2].
+Hi,
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/
-[2] https://docs.kernel.org/process/maintainer-netdev.html
-    (in case you're not aware: also note the bits about "merge window"
-    which will quite likely become relevant in a few days)
+Glad to see that you are still around.
 
+Do you happen to remember what was the reason for padding all TX frames
+to at least 60 bytes?
 
-2025-09-23, 15:32:07 +1000, Wilfred Mallawa wrote:
-> From: Wilfred Mallawa <wilfred.mallawa@wdc.com>
-> 
-> Test that outgoing plaintext records respect the tls record_size_limit
-> set using setsockopt(). The record size limit is set to be 128, thus,
-> in all received records, the plaintext must not exceed this amount.
-> 
-> Also test that setting a new record size limit whilst a pending open
-> record exists is handled correctly by discarding the request.
-> 
-> Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
-> Signed-off-by: Wilfred Mallawa <wilfred.mallawa@wdc.com>
+This was apparently added in version "v0.5.0 (2002/03/28)".
 
-Thanks for adding this patch.
-(and for the tag :))
+I'm yet to test the exact effect of this hack (will the HW really send
+frames with trailing garbage?) and what happens if it's removed (maybe
+nothing bad? or was there a HW bug?), but this part caught my attention
+because I think nowadays some people could consider it "information
+leak" ;) And it looks like a waste of bandwidth at least.
 
-> ---
->  tools/testing/selftests/net/tls.c | 149 ++++++++++++++++++++++++++++++
->  1 file changed, 149 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
-> index 0f5640d8dc7f..c5bd431d5af3 100644
-> --- a/tools/testing/selftests/net/tls.c
-> +++ b/tools/testing/selftests/net/tls.c
-> @@ -24,6 +24,7 @@
->  #include "../kselftest_harness.h"
->  
->  #define TLS_PAYLOAD_MAX_LEN 16384
-> +#define TLS_TX_RECORD_SIZE_LIM 5
-
-nit: That should not be needed if you run `make headers_install`
-before compiling the selftest:
-
-make -s headers_install ; make -C tools/testing/selftests/net tls
-make: Entering directory '/home/sab/linux/net/tools/testing/selftests/net'
-gcc -Wall -Wl,--no-as-needed -O2 -g -I../../../../usr/include/ -isystem /home/sab/linux/net/tools/testing/selftests/../../../usr/include -I../ -D_GNU_SOURCE=     tls.c   -o tls
-
-and that will find the new constant defined in the previous patch
-using the headers from the current kernel tree, instead of those in
-the system.
-
-
-[...]
-> +TEST(tx_record_size)
-> +{
-> +	struct tls_crypto_info_keys tls12;
-> +	int cfd, ret, fd, rx_len, overhead;
-> +	size_t total_plaintext_rx = 0;
-> +	__u8 tx[1024], rx[2000];
-> +	__u8 *rec;
-> +	__u16 limit = 128;
-> +	__u16 opt = 0;
-> +	__u8 rec_header_len = 5;
-
-gcc complains about unused variables, I guess leftovers from
-extracting parse_tls_records:
-
-tls.c: In function ‘tx_record_size’:
-tls.c:2840:14: warning: unused variable ‘rec_header_len’ [-Wunused-variable]
- 2840 |         __u8 rec_header_len = 5;
-      |              ^~~~~~~~~~~~~~
-tls.c:2837:15: warning: unused variable ‘rec’ [-Wunused-variable]
- 2837 |         __u8 *rec;
-      |               ^~~
-tls.c: In function ‘tx_record_size_open_rec’:
-tls.c:2893:14: warning: unused variable ‘rec_header_len’ [-Wunused-variable]
- 2893 |         __u8 rec_header_len = 5;
-      |              ^~~~~~~~~~~~~~
-tls.c:2891:15: warning: unused variable ‘rec’ [-Wunused-variable]
- 2891 |         __u8 *rec;
-      |               ^~~
-
-
-> +	unsigned int optlen = sizeof(opt);
-> +	bool notls;
-> +
-> +	tls_crypto_info_init(TLS_1_2_VERSION, TLS_CIPHER_AES_CCM_128,
-> +			     &tls12, 0);
-> +
-> +	ulp_sock_pair(_metadata, &fd, &cfd, &notls);
-> +
-> +	if (notls)
-> +		exit(KSFT_SKIP);
-> +
-> +	/* Don't install keys on fd, we'll parse raw records */
-> +	ret = setsockopt(cfd, SOL_TLS, TLS_TX, &tls12, tls12.len);
-> +	ASSERT_EQ(ret, 0);
-> +
-> +	ret = setsockopt(cfd, SOL_TLS, TLS_TX_RECORD_SIZE_LIM, &limit, sizeof(limit));
-> +	ASSERT_EQ(ret, 0);
-> +
-> +	ret = getsockopt(cfd, SOL_TLS, TLS_TX_RECORD_SIZE_LIM, &opt, &optlen);
-> +	ASSERT_EQ(ret, 0);
-> +	ASSERT_EQ(limit, opt);
-> +	ASSERT_EQ(optlen, sizeof(limit));
-
-nit: Maybe a few of those should be EXPECT_EQ? (ASSERT_* stops the
-test, EXPECT_* will run the rest of the test)
-
-Getting the wrong value back from this getsockopt is worth noting but
-there's value in running the traffic through anyway?
-
-> +
-> +	memset(tx, 0, sizeof(tx));
-> +	EXPECT_EQ(send(cfd, tx, sizeof(tx), 0), sizeof(tx));
-
-But this one should maybe be an ASSERT because trying to parse records
-from whatever data we managed to send (if any) may not make much
-sense?
-
-(just some thoughts, this is not a "strict requirement" to change
-anything in the patch)
-
-
-> +	close(cfd);
-> +
-> +	ret = recv(fd, rx, sizeof(rx), 0);
-> +	memcpy(&rx_len, rx + 3, 2);
-> +	rx_len = htons(rx_len);
-
-nit: set but not used (also in tx_record_size_open_rec)
-
--- 
-Sabrina
+Regards,
+Michal
 
