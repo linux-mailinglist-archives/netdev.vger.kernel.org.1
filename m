@@ -1,192 +1,163 @@
-Return-Path: <netdev+bounces-225901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7F1EB98FD0
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 10:53:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F18F7B98FE2
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 10:55:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60DFB16DF3E
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 08:53:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA3C81892F07
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 08:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852A62BF3CF;
-	Wed, 24 Sep 2025 08:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E61A2C026E;
+	Wed, 24 Sep 2025 08:55:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YBW9kOB3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LKPQJMFl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C29D2BEFF3;
-	Wed, 24 Sep 2025 08:53:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF1D28AAEE
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 08:55:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758704028; cv=none; b=aEcC7vSAIquv3CE0fMta5Ch3o/261AkeNzAIWUARpSnRK+iYa5dA0V/76nejJs6StAQJA58Q7oT0bEc6jI4L2iDQV+pa0V1s88WWPZIuWTM8WoxyGZQ4QiUQPsllyalI+kYyAP7laAMkehqE7GL2c3c/FSfyQ0FlWmjBkc3bIFQ=
+	t=1758704106; cv=none; b=J8EeYWsJgMMGB0b91AnOuhycVc4GBVrUcxRs9EP4S/UL1d5m4LHYPJm/3WsRw+hhi7BKNU49S0pXw05k4pH/WHgoHKLUycP9EyDUeu+O7gGYaVakELHlYwpcsbFIfuhGOtsobwH70xHP/yNZtKEw6gDgQa2NQjRBNGwCryS+MTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758704028; c=relaxed/simple;
-	bh=ghsGak9SLbf36dyogpamMQUpmUYkTxTL/IVAsMO5FWc=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=b5XLtVI1KRrJxIH9PL1ZV6g5paLvfnDluXipoxT6+5SRvhSAgGoYgIA4gc4p8Xsq0Xek/0G4YN+NLobXilwcW0rcKXRGQUI8pL4gvX4461m/QpH556mW6nFbSFLEh40K29kxqmaZorhYUKxQT2BG40Qo1AL7cdNpwjluKZ/HeI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YBW9kOB3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 232F7C113CF;
-	Wed, 24 Sep 2025 08:53:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758704026;
-	bh=ghsGak9SLbf36dyogpamMQUpmUYkTxTL/IVAsMO5FWc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YBW9kOB3H0y+XMc/eWX8oiNDSM+eazSp8pTl3d0FOW3nz05oXCDEq1go57+lGHLJy
-	 2xge3bLDLAvyUBdIB3SBDpKMo/foQSAEnZHEGFkc/wk2f+h+U8b4gyZZXIYD1qYq8r
-	 JuzINUEz/7ulT9J0eCJYt/zlUewn80dU+ztet9jzUwsS+M35c2srf9HwRvv2kvgqi5
-	 3zUasuOiz6/lTffMicooCErk7e1Z5Y2y1i7e6I/ufrfmvi3aS6voM4HBytIiGqj0Mn
-	 umB5VVquM1OtKAwlf/tXg0WFy1UwI2/BbQwr+RQPVNMb4gLDPo8/GCf/eUXmKU/NAV
-	 7cB8qhkeD4mCA==
-Content-Type: multipart/mixed; boundary="------------jg0dEBfEdtIU7TRisj0uiPKa"
-Message-ID: <72ce7599-1b5b-464a-a5de-228ff9724701@kernel.org>
-Date: Wed, 24 Sep 2025 09:53:42 +0100
+	s=arc-20240116; t=1758704106; c=relaxed/simple;
+	bh=yC4F9BxKMD2tLjzPZNMkOfB70p02zY5u5wUAbNq4KtE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HF8fYlrWbekzMgtLimntfR0gEaXWA6leEvJVP/QcNwCvKp4P/zlRcT3ccQ0aTDCaXH/ydn4a8t6DG0eNWnPrwtVxgQyafSweG6+PiLL1Ag2aLrDQe9lkebMF7mkuQXb2QAamADpTCv5xtH1Q392u7cXq/rvfSYJ0oZ9hByZuk7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LKPQJMFl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758704103;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oeF4iLafWqiyYhAJj/z0HEWgGu1flHRP9T+bwNm7VOY=;
+	b=LKPQJMFlPtlepooEfDAZhUqpUFS1VJAA3mhfz0yE9QIMcmitxyvLd3qKqqj8xGAb2uYCel
+	LWnPCTxVOfWE/yWPx+bypCwf0O3FMKvF7CDW2iwAPYNRvfpp3t2p1Xew1FUVr5x2e2xsJx
+	yCoZN8VitByyd4ETILd9MBAaIpFmmpc=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-658-L9oTIcoZP-OatoGMk5E47w-1; Wed, 24 Sep 2025 04:55:02 -0400
+X-MC-Unique: L9oTIcoZP-OatoGMk5E47w-1
+X-Mimecast-MFC-AGG-ID: L9oTIcoZP-OatoGMk5E47w_1758704101
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-631845b4998so4363299a12.1
+        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 01:55:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758704101; x=1759308901;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oeF4iLafWqiyYhAJj/z0HEWgGu1flHRP9T+bwNm7VOY=;
+        b=Z2IPn93/2Pb807CXH4i2GnVrHOBMRYcHBKy1ZO8A1OUTEtSnCAjXUSqOO3nUZzYkaK
+         JBRSow7+poK5sBYMC4hsDRnc2eknL05p14tEYQE0mQ6yKSJJUDNCljWQCy2RZZm8yx6j
+         mpZ1XFegG3oVuUhb88qfEjvUt7Dqko4V+srb77tGzkFH5XLmHHtNvICnu3Aq5QiAJVRV
+         ZMRH7OFLhmnrMgFuqVEAlcPUdz78YTyKxOCEnxULuIsKzN5QHxbLWLtk1AfvFBdxg7qz
+         bu2pj4qmmEkIBgnW5spIOSgbjH0LufBTBgLuq+9wtsiR7icE5BQdT4LFpa2BSaBeGd9/
+         WIBg==
+X-Forwarded-Encrypted: i=1; AJvYcCWWB83uqvqVjCD4047KgEQV2wugj1OABL/kgLcIg0Q/VnETuCSa+D3iqImKS2y0LhHtE3btXts=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMIZs4GRCIcPhwuJ+VzN4toND/Mtkj2l9bQl+90QFGRuuXvvPQ
+	AMAWlfZ1hJjGYTtCWLKjwvndYpMXVREs4ooq1Jq0nVuaTs40mVCagNQSM37H4OWNv+hjpsKDsu8
+	fVk5rKmGiwK5pWn1ZNvB+GHWXu0zSUWQV44vsxp15kF3P5KiLwOvhfOEU7A==
+X-Gm-Gg: ASbGncsWwWwaYdIhQKTWBbAzFSs2nmnVP8Ev6Um/Da8Xcg4sWTixUKEQ7SAVNLcYV6O
+	oH6OPom5Sp7WSjzuje9OhINMSkS/PD1oApF1uivH6yRGG2XhtflmR9Hfp6dqTLKI0m0HsTJ4FqT
+	qGPOYN0pkvLwT0VCtvhUGS82zQPxU+wnN8nG8XdTQ4cRjcinBsOVf6yuVxqvKb8b3VDDQNUJikY
+	appZR16NeCSW7P4Wh1VS4uR/Q12Hs6jwIQCzgyYTfoLPdXUAXa2yOxVJ5Uj3g25pmVOvjWS5nl1
+	RUF+rAuPqbN/7FsE85vO5pCza9Cr
+X-Received: by 2002:a05:6402:42d4:b0:634:66c8:9e6d with SMTP id 4fb4d7f45d1cf-63467a196c6mr5117516a12.35.1758704100844;
+        Wed, 24 Sep 2025 01:55:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGsvQzI/barPCHCcY3wmgFpimCqdL8DPZENn3l5dqczZHN9mqSB95iiRU7jvEjFsRYlUtc7jA==
+X-Received: by 2002:a05:6402:42d4:b0:634:66c8:9e6d with SMTP id 4fb4d7f45d1cf-63467a196c6mr5117491a12.35.1758704100372;
+        Wed, 24 Sep 2025 01:55:00 -0700 (PDT)
+Received: from redhat.com ([31.187.78.57])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-62fa5d03befsm12964100a12.2.2025.09.24.01.54.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Sep 2025 01:54:59 -0700 (PDT)
+Date: Wed, 24 Sep 2025 04:54:56 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Simon Schippers <simon.schippers@tu-dortmund.de>,
+	willemdebruijn.kernel@gmail.com, eperezma@redhat.com,
+	stephen@networkplumber.org, leiyang@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [PATCH net-next v5 0/8] TUN/TAP & vhost_net: netdev queue flow
+ control to avoid ptr_ring tail drop
+Message-ID: <20250924045430-mutt-send-email-mst@kernel.org>
+References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+ <20250924031105-mutt-send-email-mst@kernel.org>
+ <CACGkMEuriTgw4+bFPiPU-1ptipt-WKvHdavM53ANwkr=iSvYYg@mail.gmail.com>
+ <20250924034112-mutt-send-email-mst@kernel.org>
+ <CACGkMEtdQ8j0AXttjLyPNSKq9-s0tSJPzRtKcWhXTF3M_PkVLQ@mail.gmail.com>
+ <20250924040915-mutt-send-email-mst@kernel.org>
+ <CACGkMEtfbZv+6BYT-oph1r8HsFTL0dVxcfsEwC6T-OvHOA1Ciw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net 1/7] can: hi311x: fix null pointer dereference when
- resuming from sleep before interface was enabled: manual merge
-Content-Language: en-GB, fr-BE
-To: Marc Kleine-Budde <mkl@pengutronix.de>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, linux-can@vger.kernel.org,
- kernel@pengutronix.de, Chen Yufeng <chenyufeng@iie.ac.cn>,
- Stephen Rothwell <sfr@canb.auug.org.au>
-References: <20250923073427.493034-1-mkl@pengutronix.de>
- <20250923073427.493034-2-mkl@pengutronix.de>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20250923073427.493034-2-mkl@pengutronix.de>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEtfbZv+6BYT-oph1r8HsFTL0dVxcfsEwC6T-OvHOA1Ciw@mail.gmail.com>
 
-This is a multi-part message in MIME format.
---------------jg0dEBfEdtIU7TRisj0uiPKa
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
-Hello,
-
-On 23/09/2025 08:32, Marc Kleine-Budde wrote:
-> From: Chen Yufeng <chenyufeng@iie.ac.cn>
+On Wed, Sep 24, 2025 at 04:30:45PM +0800, Jason Wang wrote:
+> On Wed, Sep 24, 2025 at 4:10 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Wed, Sep 24, 2025 at 04:08:33PM +0800, Jason Wang wrote:
+> > > On Wed, Sep 24, 2025 at 3:42 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Wed, Sep 24, 2025 at 03:33:08PM +0800, Jason Wang wrote:
+> > > > > On Wed, Sep 24, 2025 at 3:18 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > >
+> > > > > > On Tue, Sep 23, 2025 at 12:15:45AM +0200, Simon Schippers wrote:
+> > > > > > > This patch series deals with TUN, TAP and vhost_net which drop incoming
+> > > > > > > SKBs whenever their internal ptr_ring buffer is full. Instead, with this
+> > > > > > > patch series, the associated netdev queue is stopped before this happens.
+> > > > > > > This allows the connected qdisc to function correctly as reported by [1]
+> > > > > > > and improves application-layer performance, see our paper [2]. Meanwhile
+> > > > > > > the theoretical performance differs only slightly:
+> > > > > >
+> > > > > >
+> > > > > > About this whole approach.
+> > > > > > What if userspace is not consuming packets?
+> > > > > > Won't the watchdog warnings appear?
+> > > > > > Is it safe to allow userspace to block a tx queue
+> > > > > > indefinitely?
+> > > > >
+> > > > > I think it's safe as it's a userspace device, there's no way to
+> > > > > guarantee the userspace can process the packet in time (so no watchdog
+> > > > > for TUN).
+> > > > >
+> > > > > Thanks
+> > > >
+> > > > Hmm. Anyway, I guess if we ever want to enable timeout for tun,
+> > > > we can worry about it then.
+> > >
+> > > The problem is that the skb is freed until userspace calls recvmsg(),
+> > > so it would be tricky to implement a watchdog. (Or if we can do, we
+> > > can do BQL as well).
+> >
+> > I thought the watchdog generally watches queues not individual skbs?
 > 
-> This issue is similar to the vulnerability in the `mcp251x` driver,
-> which was fixed in commit 03c427147b2d ("can: mcp251x: fix resume from
-> sleep before interface was brought up").
+> Yes, but only if ndo_tx_timeout is implemented.
 > 
-> In the `hi311x` driver, when the device resumes from sleep, the driver
-> schedules `priv->restart_work`. However, if the network interface was
-> not previously enabled, the `priv->wq` (workqueue) is not allocated and
-> initialized, leading to a null pointer dereference.
+> I mean it would be tricky if we want to implement ndo_tx_timeout since
+> we can't choose a good timeout.
 > 
-> To fix this, we move the allocation and initialization of the workqueue
-> from the `hi3110_open` function to the `hi3110_can_probe` function.
-> This ensures that the workqueue is properly initialized before it is
-> used during device resume. And added logic to destroy the workqueue
-> in the error handling paths of `hi3110_can_probe` and in the
-> `hi3110_can_remove` function to prevent resource leaks.
+> Thanks
 
-FYI, we got a small conflict when merging 'net' in 'net-next' in the
-MPTCP tree due to this patch applied in 'net':
+userspace could supply that, thinkably. anyway, we can worry
+about that when we need that.
 
-  6b6968084721 ("can: hi311x: fix null pointer dereference when resuming
-from sleep before interface was enabled")
-
-and this one from 'net-next':
-
-  27ce71e1ce81 ("net: WQ_PERCPU added to alloc_workqueue users")
-
------ Generic Message -----
-The best is to avoid conflicts between 'net' and 'net-next' trees but if
-they cannot be avoided when preparing patches, a note about how to fix
-them is much appreciated.
-The conflict has been resolved on our side[1] and the resolution we
-suggest is attached to this email. Please report any issues linked to
-this conflict resolution as it might be used by others. If you worked on
-the mentioned patches, don't hesitate to ACK this conflict resolution.
----------------------------
-
-Regarding this conflict, I simply added "WQ_PERCPU" flag to
-alloc_workqueue() in hi3110_can_probe() -- the new location after the
-modification in 'net' -- instead of in hi3110_open().
-
-Rerere cache is available in [2].
-
-Cheers,
-Matt
-
-1: https://github.com/multipath-tcp/mptcp_net-next/commit/4ef39a01f1f0
-2: https://github.com/multipath-tcp/mptcp-upstream-rr-cache/commit/1a8b8
 -- 
-Sponsored by the NGI0 Core fund.
+MST
 
---------------jg0dEBfEdtIU7TRisj0uiPKa
-Content-Type: text/x-patch; charset=UTF-8;
- name="4ef39a01f1f0d195d0d4daae6312d1ae71d59188.patch"
-Content-Disposition: attachment;
- filename="4ef39a01f1f0d195d0d4daae6312d1ae71d59188.patch"
-Content-Transfer-Encoding: base64
-
-ZGlmZiAtLWNjIGRyaXZlcnMvbmV0L2Nhbi9zcGkvaGkzMTF4LmMKaW5kZXggOTZmMjMzMTFi
-NGVlLDk2M2VhODUxMGRkOS4uNmQ0YjY0M2UxMzVmCi0tLSBhL2RyaXZlcnMvbmV0L2Nhbi9z
-cGkvaGkzMTF4LmMKKysrIGIvZHJpdmVycy9uZXQvY2FuL3NwaS9oaTMxMXguYwpAQEAgLTkw
-OSw2IC04OTYsMTUgKzg5NiwxNiBAQEAgc3RhdGljIGludCBoaTMxMTBfY2FuX3Byb2JlKHN0
-cnVjdCBzcGlfCiAgCWlmIChyZXQpCiAgCQlnb3RvIG91dF9jbGs7CiAgCiAtCXByaXYtPndx
-ID0gYWxsb2Nfd29ya3F1ZXVlKCJoaTMxMTBfd3EiLCBXUV9GUkVFWkFCTEUgfCBXUV9NRU1f
-UkVDTEFJTSwKKysJcHJpdi0+d3EgPSBhbGxvY193b3JrcXVldWUoImhpMzExMF93cSIsCisr
-CQkJCSAgIFdRX0ZSRUVaQUJMRSB8IFdRX01FTV9SRUNMQUlNIHwgV1FfUEVSQ1BVLAorIAkJ
-CQkgICAwKTsKKyAJaWYgKCFwcml2LT53cSkgeworIAkJcmV0ID0gLUVOT01FTTsKKyAJCWdv
-dG8gb3V0X2NsazsKKyAJfQorIAlJTklUX1dPUksoJnByaXYtPnR4X3dvcmssIGhpMzExMF90
-eF93b3JrX2hhbmRsZXIpOworIAlJTklUX1dPUksoJnByaXYtPnJlc3RhcnRfd29yaywgaGkz
-MTEwX3Jlc3RhcnRfd29ya19oYW5kbGVyKTsKKyAKICAJcHJpdi0+c3BpID0gc3BpOwogIAlt
-dXRleF9pbml0KCZwcml2LT5oaTMxMTBfbG9jayk7CiAgCg==
-
---------------jg0dEBfEdtIU7TRisj0uiPKa--
 
