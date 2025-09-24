@@ -1,46 +1,55 @@
-Return-Path: <netdev+bounces-225775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEDCEB981D9
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 05:13:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14779B98287
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 05:55:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78E227B57DD
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 03:11:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA1484A547C
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 03:55:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4460B22FF22;
-	Wed, 24 Sep 2025 03:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79072224B05;
+	Wed, 24 Sep 2025 03:55:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="DLZOdXdj"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GCN4JXvy"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC00224225;
-	Wed, 24 Sep 2025 03:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2B44C98;
+	Wed, 24 Sep 2025 03:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758683593; cv=none; b=NZ6eXiPDsVru829VTULKoVdHLOpk/y/giPCmq1WMEd2iGJ9L2n749RwbWQ5Tx3MdePUAZcfuMn4MM8YaBmswo4OT0NKHxIyBCe4nzW61ZM9NyntJ1ZJj6knowqZA0hWM9nIxxMIFLe00XFP1mop+osVm8ktazgw5Tdxzjdj/FQQ=
+	t=1758686106; cv=none; b=Ow8dfzLCU9RT4i3QStWKVAVNgrikzlTVgBkZIrozGdKtC+d26CquYD5kUC9xuj6nsx1j30ORxTSRH6oNpJmxKNaa4N7Njy27VEKDJM/mje6qR++D1HRiRcojcY0Po23QfVC/9yZf2gMj44uKBqyKuE+a0pliEyl32dDnWHdT/ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758683593; c=relaxed/simple;
-	bh=Iu8F7B89dEF/lT14VXPako98TSEnjF2DviQJuVNcmWE=;
+	s=arc-20240116; t=1758686106; c=relaxed/simple;
+	bh=GLI4abl8FZ4HfkmnRdlogF0X6++XTS/tUyrTv2strik=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XouL+AUD8FFdTtmme37lwhUFVnaTDtIAqePJF4amhSyFvkig+tpBNxzGsqhOioBcPwq+XpH7r4gCFivlt1kiQyaYsjg438MRgzsbxvEpfe+f8W585W9lZYQ4CWFlByqnFb2vzFtzS282onAf0tJYBAzua+0D5ZPd8Am+rnZs600=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=DLZOdXdj; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1758683587; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=b+CiZ/ws2vTrRYAbVi6irLmhLVkR3R52CUsAsqU0XPU=;
-	b=DLZOdXdjjr1rehl9zQlckhtD4hRbBaI7qbNYKrllJTHy+vJGr43UXpNZPzDmm7fjLnYH4K6kq/wg9kcnvondiF8GxhYGawj2b4SFuDleKAg5ySmlEfvClhLoA1F7Wjod3b5ifu4isknBS57B2/K6ps7oyq4Q+EiEpuBZ0iRVLHs=
-Received: from 30.221.114.81(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WohxFPm_1758683586 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 24 Sep 2025 11:13:07 +0800
-Message-ID: <06a87a92-6cce-4a63-99d0-463a1d035478@linux.alibaba.com>
-Date: Wed, 24 Sep 2025 11:13:05 +0800
+	 In-Reply-To:Content-Type; b=e7jg/n+NufNMx3/MNnaXg6HadiQr/1BBPuUINBjMSD3BDQmwMT0YChBg1ylQH2Bn+V10OZSbPLXudT+sZQ7NLLhQuoLdsVeJzqdxYqzi6T0Xh/I8OZSBGeks7NjID54bBc3K0HN0Sl0mO36eI5UTrASjkv3fIC2qnCdqe3hgLbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GCN4JXvy; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 22D034E40CF2;
+	Wed, 24 Sep 2025 03:54:58 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id D3384606B6;
+	Wed, 24 Sep 2025 03:54:57 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EF2FD102F1886;
+	Wed, 24 Sep 2025 05:54:01 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1758686096; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=g+qDq5wTJI6x9EY39D0tJB9MH6r0WcMVdVhtkKarOt0=;
+	b=GCN4JXvy5Jr2Cc5svIW5gg1tIvUpzdNR4vXL3iilzXOvA0IDaSnXsAipk852bsHFxPGIar
+	8xzEeaC3wRS7xz17WwtS9be1O0lZdzovwkekvueR4jPF20QzmTvDy5Eq7nR2JGLrRuKNSg
+	Ku8B522sIzaksIy3APEcrUHJ7wxRltQdFreb3Em9UPhhxCvlEUtSvVjcr+qiOZXaP+j8Yl
+	IAewYMc7DqVeRLKEno1S6nCb+rdumy5n1bjCodVN71F+Mm5tjr8DpQQfvqkUvJdnPQmJIq
+	y4ltufGnQ4H3zsCCGOJOSY/k69w417eWj3go6jOn9ibxoz7FxppNR2aVFDu9SA==
+Message-ID: <ff7432c4-27ce-45a1-ac4d-c18d612ef04d@bootlin.com>
+Date: Wed, 24 Sep 2025 09:23:55 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,89 +57,79 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] net/smc: make wr buffer count
- configurable
-To: Halil Pasic <pasic@linux.ibm.com>, Dust Li <dust.li@linux.alibaba.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, "D. Wythe" <alibuda@linux.alibaba.com>,
- Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang
- <wenjia@linux.ibm.com>, Mahanta Jambigi <mjambigi@linux.ibm.com>,
- Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-s390@vger.kernel.org
-References: <20250908220150.3329433-1-pasic@linux.ibm.com>
- <20250908220150.3329433-2-pasic@linux.ibm.com>
- <aL-YYoYRsFiajiPW@linux.alibaba.com>
- <20250909121850.2635894a.pasic@linux.ibm.com>
- <20250919165549.7bebfbc3.pasic@linux.ibm.com>
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-In-Reply-To: <20250919165549.7bebfbc3.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v13 13/18] net: phy: marvell10g: Support SFP
+ through phy_port
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>
+References: <20250921160419.333427-1-maxime.chevallier@bootlin.com>
+ <20250921160419.333427-14-maxime.chevallier@bootlin.com>
+ <20250923182429.697b149b@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20250923182429.697b149b@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
 
 
-在 2025/9/19 22:55, Halil Pasic 写道:
-> On Tue, 9 Sep 2025 12:18:50 +0200
-> Halil Pasic <pasic@linux.ibm.com> wrote:
+On 24/09/2025 06:54, Jakub Kicinski wrote:
+> On Sun, 21 Sep 2025 21:34:11 +0530 Maxime Chevallier wrote:
+>> +/**
+>> + * phy_port_restrict_mediums - Mask away some of the port's supported mediums
+>> + * @port: The port to act upon
+>> + * @mediums: A mask of mediums to support on the port
+>> + *
+>> + * This helper allows removing some mediums from a port's list of supported
+>> + * mediums, which occurs once we have enough information about the port to
+>> + * know its nature.
+>> + *
+>> + * Returns 0 if the change was donne correctly, a negative value otherwise.
 > 
+> kdoc likes colons after return so:
 > 
-> Can maybe Wen Gu and  Guangguan Wang chime in. From what I read
-> link->wr_rx_buflen can be either SMC_WR_BUF_SIZE that is 48 in which
-> case it does not matter, or SMC_WR_BUF_V2_SIZE that is 8192, if
-> !smc_link_shared_v2_rxbuf(lnk) i.e. max_recv_sge == 1. So we talk
-> about roughly a factor of 170 here. For a large pref_recv_wr the
-> back of logic is still there to save us but I really would not say that
-> this is how this is intended to work.
+>   Returns 0 -> Return: 0
 > 
+> sorry for only providing an automated nit pick..
 
-Hi Halil,
+It's OK, the series no longer applies with Russell's sfp_module_caps 
+series being here, so a new version is due anyway.
 
-I think the root cause of the problem this patchset try to solve is a mismatch
-between SMC_WR_BUF_CNT and the max_conns per lgr(which value is 255). Furthermore,
-I believe that value 255 of the max_conns per lgr is not an optimal value, as too
-few connections lead to a waste of memory and too many connections lead to I/O queuing
-within a single QP(every WR post_send to a single QP will initiate and complete in sequence).
+Russell, I missed this series of yours as I wasn't available at all at 
+that time, but as this phy_port series has been in the pipe for quite a 
+while, and you commented on the used of sfp_parse_support et.al. that 
+was being replaced, I'd have appreciated to be in CC :(
 
-We actually identified this problem long ago. In Alibaba Cloud Linux distribution, we have
-changed SMC_WR_BUF_CNT to 64 and reduced max_conns per lgr to 32(for SMC-R V2.1). This
-configuration has worked well under various workflow for a long time.
+Given my schedule, next iteration is probably going to be for the next 
+cycle anyway so no harm :)
 
-SMC-R V2.1 already support negotiation of the max_conns per lgr. Simply change the value of
-the macro SMC_CONN_PER_LGR_PREFER can influence the negotiation result. But SMC-R V1.0 and SMC-R
-v2.0 do not support the negotiation of the max_conns per lgr.
-I think it is better to reduce SMC_CONN_PER_LGR_PREFER for SMC-R V2.1. But for SMC-R V1.0 and
-SMC-R V2.0, I do not have any good idea.
+Thanks,
 
-> Maybe not supporting V2 on devices with max_recv_sge is a better choice,
-> assuming that a maximal V2 LLC msg needs to fit each and every receive
-> WR buffer. Which seems to be the case based on 27ef6a9981fe ("net/smc:
-> support SMC-R V2 for rdma devices with max_recv_sge equals to 1").
->
+Maxime
 
-For rdma dev whose max_recv_sge is 1, as metioned in the commit log in the related patch,
-it is better to support than SMC_CLC_DECL_INTERR fallback, as SMC_CLC_DECL_INTERR fallback
-is not a fast fallback, and may heavily influence the efficiency of the connecting process
-in both the server and client side.
-
- 
-> For me the best course of action seems to be to send a V3 using
-> link->wr_rx_buflen. I'm really not that knowledgeable about RDMA or
-> the SMC-R protocol, but I'm happy to be part of the discussion on this
-> matter.
 > 
-> Regards,
-> Halil
-And a tiny suggestion for the risk you mentioned in commit log
-("Addressing this by simply bumping SMC_WR_BUF_CNT to 256 was deemed
-risky, because the large-ish physically continuous allocation could fail
-and lead to TCP fall-backs."). Non-physically continuous allocation (vmalloc/vzalloc .etc.) is
-also supported for wr buffers. SMC-R snd_buf and rmb have already supported for non-physically
-continuous memory, when sysctl_smcr_buf_type is set to SMCR_VIRT_CONT_BUFS or SMCR_MIXED_BUFS.
-It can be an example of using non-physically continuous memory.
-
-Regards,
-Guangguan Wang
+>> + */
+>> +int phy_port_restrict_mediums(struct phy_port *port, unsigned long mediums)
 
 
