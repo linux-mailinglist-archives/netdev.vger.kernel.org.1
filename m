@@ -1,188 +1,157 @@
-Return-Path: <netdev+bounces-225899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C0A3B98F88
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 10:50:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6527DB98E5B
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 10:33:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4F9D3A6A0A
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 08:50:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C2511883565
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 08:31:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07BD42BD00C;
-	Wed, 24 Sep 2025 08:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B538E28489A;
+	Wed, 24 Sep 2025 08:31:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="hz+az0lI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SG1Tkhwm"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013066.outbound.protection.outlook.com [40.107.159.66])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0243FC2;
-	Wed, 24 Sep 2025 08:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758703797; cv=fail; b=JL564hQwnDB9V0uRzQa4zyiborwb/nx/BYBOy7B1AX6pmDTP77sDkOqXP5Eq8yZYpA6SaHi0nLy/mISzUwMumayqorNdjmzZGjRvx2iRLFcFAPj+K44MfmzD1uvzGCVoQLCj6R0Mw3ozpAzTxIEdWz6AEg5FD2iiszLzpbsc4qs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758703797; c=relaxed/simple;
-	bh=ZNcHH8hLu1+EEr5O9E9bZ20hcDF8cg63SiPg2QLOOAs=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=pUxSnJu+AH080cC3vYp7P1XXEsEP07o/ox6cDRpM+jNoTj/hUofOYOcZcIL1SorsuFMgcz201+UfL3Kj235hh23XMQixl7gGCxDtVv7X6JDEtElurhVQJCPz/ERYdJjW79F1DzZUPU0AXAnpuhTQJToCEt6KND8qePw+hnMf49k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=hz+az0lI; arc=fail smtp.client-ip=40.107.159.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AoJ2efQrOs1H4SJkB/vOmE0w+EsQH0uMtwqiIkz/w2XdTruY1LC4dL6NtQgFQUqEEJW8nabmJCQeJZY+fVGYNbafyaOPF44gg4qMVEdY+hihVBZOxthbotOcejvieGUcmEKhXy+f8d0t5+mb0Pm4OMc8rslAk+zH3GrbgcSL+4iBfaMeJ243j9j76kSIQjHwUdvOYRDacqDnNWcLo1NAIO8WxPNrlxrbElbLnUxpX3lFx2igQAoAhE8lRG+YZBVlZpsdesxEgotDVUxMrPhKTdbo6RctwIeEe1QDPBZieIZTG3PgCqSjbqI2ZFSKQhCMuSAyIa6Xe3Esss7RTRt95A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZIsZmLiqxnOpzIgBYGT6+CiO8Cn8NCckEcPmnfHuYAI=;
- b=yxpWr3VJd57Eh2WvQimaTIr0V54HyPAQ3nUg5VitBRIsQUx8M1/7g+ehQm5z5H6Cs5Y6OUnOCfhGiCV4giG6LydiGm5/hGusKX0cwqjb5022pi24CRQrWl4BckXCYGTwygroWNvF2NtQszoxhqHIkofsfsfpvQpXs80JzNOq7e334gqfVSPv6HRfwkDR/c3xaXS4gsftFbBdmWNMt9wG6hNp/uJTyl8d6qIfGSwWZlk5ZR/OLDUwZb/rdqEAzTXfONYn3qHGvRbWysvffu4doUYrDRbclhvuvXJUYzEnXhOGCswbtAnVD1WnfVglz9ErqY+QwjTmVjGB9BhrxEUyOw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZIsZmLiqxnOpzIgBYGT6+CiO8Cn8NCckEcPmnfHuYAI=;
- b=hz+az0lISzKoPxHjNxcM5T7vCuGWB8UJ8laGLtf7YgxtHcEnaSAlTaPoXQr/V43zGPrWXEHZsiB3nNcnACNfnvSCKLLaO8lctaNUjl0iWwujDRC6RPbGF9N06sanUnLlz+DYYuuhukauXLZLpy4UjWyNnvEJAMw254yc9ZJ22DCkfjoYmlgSq6m8YrKQ7wuuaq5kCRvmbaq5u/20B3a5/C/ZN0HShywMSwgFLfM2eR6Gc62Q5q+TFCzEy3rh02LWOKAI2/5v6TdKszxU9SRghE3w/FT2chVaC2xX7UTZDY30NNCIw9jrlwwlk0HK5QSCZRiGkti0umg0nXU/2qOG5g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by DB8PR04MB7002.eurprd04.prod.outlook.com (2603:10a6:10:119::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.9; Wed, 24 Sep
- 2025 08:49:52 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.9160.008; Wed, 24 Sep 2025
- 08:49:52 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Frank.Li@nxp.com
-Cc: imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: enetc: Fix probing error message typo for the ENETCv4 PF driver
-Date: Wed, 24 Sep 2025 16:27:55 +0800
-Message-Id: <20250924082755.1984798-1-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2P153CA0039.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c6::8)
- To PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6832848A9
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 08:31:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758702664; cv=none; b=Zzv0HgVJvMPNMDE6apfhwJLEHHBiKsp8LeDxWoRbLw1f/5fJKZeqWeCFXIsAgtSSMcImeLM/tdj2p+Q8b+757eJ9+/wND7ZNk4V1kjBP7ixYdHXls5Mh011CIICzdgx2VbnC4Or7ZeHpzCE/PO7QT/NxJQ2f1FtBK8uog1Utxus=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758702664; c=relaxed/simple;
+	bh=tvDkOCfsuaQ7GYS4gx1Mnhg3p9IRHU5mftTan4zgXSM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=giOCd6Z4WMXzq506nF1oMWt+k5Pzj25aSeFNgVnq2qVw3K6yoPQgt8ERODq5r/DkSGa0CTNny1Hi5WaO+biwxn1N02W7Jwt22YlHU0gYc994XAfQJ47jZmBbOFPcHNfySjqcA+IF4NsNfNyqbUyQT4tYlidCVKcxEYerImBbKaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SG1Tkhwm; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758702661;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tvDkOCfsuaQ7GYS4gx1Mnhg3p9IRHU5mftTan4zgXSM=;
+	b=SG1Tkhwm4UYRiyBY500S4/WptnGq3MR52y1BXR8dgpkh7QKnHiE3FniUoGy+EuxqrNWWsh
+	MhChkB8qQj2mksCkAjuJmvows9SBoZtdC6DWHCme2f+gMpuYLsFD8bX3W5aj+ADiFbmb/1
+	Sg4pbExS2DLFCfKvR9aZ8GzCniTYHKw=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-511-wB3Q_L6GPKGWRcjgpW9PCw-1; Wed, 24 Sep 2025 04:31:00 -0400
+X-MC-Unique: wB3Q_L6GPKGWRcjgpW9PCw-1
+X-Mimecast-MFC-AGG-ID: wB3Q_L6GPKGWRcjgpW9PCw_1758702659
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-32edda89a37so6346955a91.1
+        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 01:31:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758702659; x=1759307459;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tvDkOCfsuaQ7GYS4gx1Mnhg3p9IRHU5mftTan4zgXSM=;
+        b=nfaMzMhvGvWbJ4bJKQ+iGGJcg4x1pBeiMlBT+IDB8Jw0HJks2vAnLiRsl4rn40m+Ea
+         U5jDDIaD0/KB5SQxeswcpmiz8M68uLh27ZG2teKU7Ih+wGhlLmTYbXVHNnD/q1iEuvi6
+         BxGUusHQ+JQX42tFpBmsc04BWMwaJ1YQZOuWvGJFWqPvDmtMnUCvc8ISsCDgKg/ysAeR
+         QiBtqYiKpZ3vhVA+G53dTemb8NKX6aqDjtKVtiD27nvLDUHkUwpJFguwUwjXIXWWtVad
+         +crgCQFz6WYkQIqgwkTSQItSLmJZ1Zxzrm7T8hsvUBhw/wkZAIdPkax8JeYRJbTVDCSR
+         e8Zw==
+X-Forwarded-Encrypted: i=1; AJvYcCWoP1q9s2nulf0Llh1t6qGYr7/uMI/tG+n3jgSJESSzMaUupdHdgndETVdMzGP3NOsOoiFOfLQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCeOh2TFzylXUekgjHdnUaSqm5mYhsBk0itVUfAUrV7KSUfTyg
+	8q04m1LyCifhbv148F4/tFT3wc5IVikYHSduvT7jVFG1FFV7Ez1mzeZf6x2D7yZMJ3R7I0R4/da
+	3gxFKefwEyTZ/Pw/O0new8Uh6HtmHOF02UtGLS6SAl6vX+irwQau0kcNEm5ThlBKUGrhhh0auJH
+	2lnHeK091EBSMOAyey0l+av9cgKHS3FmR8
+X-Gm-Gg: ASbGncurSGhVZd2Ya1byj7+XzikISzPsJ4WW0YMPLFeuNBjRz21Uyzbag7TH+rKRIEo
+	F7PKNyuQZC9UCTXNSke/X9r3lObvcqOG42LG5bgc3gFmqYrI/yOt/PpZ7OfBhLoPTM2Ep1+l5M4
+	WUHl6jv5QpcER6ZE6aZQ==
+X-Received: by 2002:a17:90b:54cb:b0:332:250e:eec8 with SMTP id 98e67ed59e1d1-332a9513715mr7286797a91.15.1758702659072;
+        Wed, 24 Sep 2025 01:30:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHSuHUP7PGnJisv3R6suoi7mEFCXCrr7ybnyTOFly8Wrp69Kyr1dy9P3+Fdf6NLo31cwCaZ5AfWhe2/V/RdhQ0=
+X-Received: by 2002:a17:90b:54cb:b0:332:250e:eec8 with SMTP id
+ 98e67ed59e1d1-332a9513715mr7286747a91.15.1758702658536; Wed, 24 Sep 2025
+ 01:30:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|DB8PR04MB7002:EE_
-X-MS-Office365-Filtering-Correlation-Id: d69244e3-5e51-46c8-a573-08ddfb475353
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|19092799006|376014|52116014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?yP3AGNyuwY+oVu4wqUvNB5MlTov99KMBMOuM5dBTiYtCR+H2kfGs/nkDM5PT?=
- =?us-ascii?Q?OCorZXJJxUX0KQreaoCEgKt2BQNUzVn5v0iCL/EhLgfAY0hTpYDv3DJm+phc?=
- =?us-ascii?Q?iIq4qIr/fg69Icrz35k38pGBl1T16+hqwrPerOwhd2vOcuY7O8udA5Y6r5MU?=
- =?us-ascii?Q?+wSdOiCCldTtnUDnrlhJ4WbA1XANWmPtAC6LnPIHSHFiGrwmxXKr3Gx1hlVd?=
- =?us-ascii?Q?P9vPF8Tlf5j7wnsIJWBByAyw/7APtSovIrSRcyQqDmCBtW1bF/utwohlihar?=
- =?us-ascii?Q?neJVANT83TEcEvWvE0aVAjoSCVYZCyCwqATvw+exotegVI3FJtEUjn2JROLJ?=
- =?us-ascii?Q?anzOr8wgUBjoM37GGMA7nWWyPz5HEraKkAB3shcz7YQ3Zm135PycRJmNnmpi?=
- =?us-ascii?Q?jPQ2Wm4FeKnW3c08UmXZ9Oa4sCxmu2qkCFIaTTgDkaGDgqle9RLNMKlo6zFB?=
- =?us-ascii?Q?7mgcj3SoYzsk38OQDw6Sm8oFWuncspjtigNo5ap+fk0Hw9lr8jBmZLz05TDB?=
- =?us-ascii?Q?YadPUf/TxoAbp6IS41SMGPc6K9I9Q0NBVljkC0MExAk9LFsNRWL4gTgIJOAV?=
- =?us-ascii?Q?XzZ41kNXe4AXwUVa4xEgcon9DzZu+7YOJxZwH2pMU8sf3x7IpFjMZRh450/W?=
- =?us-ascii?Q?Gtuzzwm9IIPpFO4DAGbf4izOEuf6ljKbhmQFyqi6OmT1PbHyApxR1y+q0kVd?=
- =?us-ascii?Q?nF8YMr/CEE4bCbsX9Rge9V3WZ6dGeP9jAUzSkUSy7aJThfo2q+wMOtLuWFw5?=
- =?us-ascii?Q?H7n3v8XyI6KpyEoukTo88vSvkIPjASKiojvlHPG2Ee2KP7TX58A/C7zcJfy1?=
- =?us-ascii?Q?Kp0L22rjgPo+7PoWFWW0c8Pu1CyZf5bk5lESZ+/HyP0Oxnmmxo4+vXpHjapl?=
- =?us-ascii?Q?qgirSSrvr1tkdCF0fNw7/2Au7MnS7y9a+Lju4LgscnGnvSdixcxhVp9+TBmi?=
- =?us-ascii?Q?6LIqcDRSIxqBB3Bk+nZT1Abes4n2iSkWS+WCUqbzRL1EIyxqpRDo+ls0jDcp?=
- =?us-ascii?Q?OJXsVuk451tFJh3Xeh1t7Cj9sTmjklc+GPtgvyM7Q4HkrgD/o++8cgpg79Yf?=
- =?us-ascii?Q?eIH3Fz0ws4zzWivH9BzlxKxxHp/zFdZCZPs0X/8B3P2NiO7P++lSFR4KBZ62?=
- =?us-ascii?Q?sZJtIL3LypQCbmOa45tKUwtSrGL8q+V6agUQbL4QX8LvKmrnKhNKtgMI1n9C?=
- =?us-ascii?Q?z104fSY/4qpv8K7OWwNiPVXBYGVpATMlE9m/5nQIeHfEvHwez+UvpAyvJmi6?=
- =?us-ascii?Q?bVJwS0Aes4bKheWMU965kMfu5RC7N4C7nF6QIXP+UzmcMAnv/qQlY4I/LhbF?=
- =?us-ascii?Q?xUVXWFlD2p+D4gDNvaC+8JZOsA+p9hAWu4sNkNaoAiEPM4zegxdsLOmr+Fj6?=
- =?us-ascii?Q?CtigO7V2x3vSU47NjVY+Kielh8dL/HBQkLhZl/Gl+iMor9donxTNRpKpNJh5?=
- =?us-ascii?Q?r0f+TcXSHu10xBgmxkvyAbNwWPHa6o5+1pzqRjnmeNxuULJ2D41rLg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(19092799006)(376014)(52116014)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?XZ8KRdRSgtbF7BpCJS6zW8n/s2XYye0X/s8JjCbDHaCwxKx0bwjBdqqpAeyT?=
- =?us-ascii?Q?VssYd+fhOFiAl2A3Li5QbR01byovyi0fbEpxNCieVMiR1s+O+54U+rMdgQT3?=
- =?us-ascii?Q?qFXo0FXuVRR1Qm/aphovJ4Sise3hvn+r20KjdSnF/yoSpalwYU7mo0mxgl5t?=
- =?us-ascii?Q?bb/5DS6bLRu1iXZBmz0rNN4XtrhqW4/7fd9K6JGr+r5Vv5j4fW7140dgq9OZ?=
- =?us-ascii?Q?qwjzs9MusjdDCI1FTx+VR51MJqYR+nt9+pJ8HJzbSAD7fuN5bBjNOpykL1Fc?=
- =?us-ascii?Q?OO5R7OIjpNLWwlBT7D97n6jghnBjRTCuWTpbudMIlKkg0YxZJKymNypAP9i/?=
- =?us-ascii?Q?c387XZtO99zb51BvAZQnAPxl/Wfkmh5cry/GdK1j4+31vS39FZFQS/qEkOIH?=
- =?us-ascii?Q?kBXHBjb24BWNuMMcGw6HNv/yjX5eefVFg9735rSDWEVkjmklMS+B7wjap6Wv?=
- =?us-ascii?Q?CUrwvJCwNCCOjqm8IQPKToQtbKlELJI3vw9l/gCMsiJ+BXBdYONRNDGCDDAt?=
- =?us-ascii?Q?RrBYsjrT9xCUXqgJ6CB1oJcA8bzXACLClA944AQz/NsjT18gmr2hKqZoRuWh?=
- =?us-ascii?Q?DKzuLAtConqkMOF6mazBeFuE5LbSqmw077zXYaFh2T82sW6a6n8Tncn6NsEv?=
- =?us-ascii?Q?yDXcj2SmBZCdYKdUoq/AF+4Lwm7+Q21cnlPwj3qAyN/FyX5zmVd4woUu2zye?=
- =?us-ascii?Q?qa69t9hsq/OzR+2O0oKJyYru0DjLbY4SnSKeRFbc5gp2XXQRlOiA1zvaqPLi?=
- =?us-ascii?Q?uKlvMbXPdFq135skH4BL85WL/nd5emfi2WozL55IlfnckElVUpAjkmHx5N2D?=
- =?us-ascii?Q?25e/4CftS8aeFrWHbOIhUWwIoNlHLxct609iLvTbKqB2bfgYjPhtdMZkpEr5?=
- =?us-ascii?Q?4XXtl2M8qnrB3kvK8w0pP2eAiTGae4yXBeayjHhbV+xGdxThLnDEv7hQ1vLh?=
- =?us-ascii?Q?Gsa2RZHwHBOYqwqqmU9/IuhOzH8FyWcrwfc4FExeNnDw/sftoR4oG/T0eSu9?=
- =?us-ascii?Q?bxsqo44NjJsICLRcwbis+B3lOtwmDtdUElooDcHo/6v5+g28nG6yWu+hiiYJ?=
- =?us-ascii?Q?20xLCHrbBCPjMcVmW7mOGzxdWcrAC9PDBL50kQT3zm8YUN69z+/w3aiCliCc?=
- =?us-ascii?Q?sKHMu0yauWts1BYB7D3WwyAdVbhUfFwuq4ynBS8365l4jPPdPhmr1XYgI0rG?=
- =?us-ascii?Q?zdPQWSnVqrb39wDMXxMb2/FSkuo49/dCfbY/0Zb5GyW8aR+9jzaNfcC9SqMS?=
- =?us-ascii?Q?MZ8OobFaLKYBpK/Zmzdsy1MFvvHFoSJMVl36TLaGF/wYpuIh6e8v3Axs3G69?=
- =?us-ascii?Q?obHfFUJa1IQL2NE9o2RoFagPHWdYiX9DZW/zeRmK5RMbGT32DWRFvMWvjggv?=
- =?us-ascii?Q?DE7zgp8xkiSZ3IiZPbP7Z/YkEghAQdegyFP7xo1xnfIRAqGtCIahfp4K/ZqU?=
- =?us-ascii?Q?PkWm6klb8aqk9nR61nKPrvMgEvb95RHtWIEJU0eMoIVK/lrOuyNgqenAoZul?=
- =?us-ascii?Q?Kc6CICuh2DX0E179jI/5ZCBZk6daQRTtcyTe1TtYh26DV7pKwDJaoa1sFl2u?=
- =?us-ascii?Q?DZnVtoru9s36Lz0m5ju9zZtGXPfDXq30s0Qo6i6y?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d69244e3-5e51-46c8-a573-08ddfb475353
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Sep 2025 08:49:52.3026
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fDGbhrBAdVg4Xd4UcUXqDcS/WKXzibOaK7SE7T5Iq1xeTXPlN1YyzSIjjEeCxNDhY5BFGrLdLqfA9JZdTRVCog==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB7002
+References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+ <20250924031105-mutt-send-email-mst@kernel.org> <CACGkMEuriTgw4+bFPiPU-1ptipt-WKvHdavM53ANwkr=iSvYYg@mail.gmail.com>
+ <20250924034112-mutt-send-email-mst@kernel.org> <CACGkMEtdQ8j0AXttjLyPNSKq9-s0tSJPzRtKcWhXTF3M_PkVLQ@mail.gmail.com>
+ <20250924040915-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20250924040915-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 24 Sep 2025 16:30:45 +0800
+X-Gm-Features: AS18NWC70PosrkMr5g8LAeoMZx5xvquUOdY0YTAw2VzbuPvii9GWMNdWpFU8UFA
+Message-ID: <CACGkMEtfbZv+6BYT-oph1r8HsFTL0dVxcfsEwC6T-OvHOA1Ciw@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 0/8] TUN/TAP & vhost_net: netdev queue flow
+ control to avoid ptr_ring tail drop
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Simon Schippers <simon.schippers@tu-dortmund.de>, willemdebruijn.kernel@gmail.com, 
+	eperezma@redhat.com, stephen@networkplumber.org, leiyang@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Claudiu Manoil <claudiu.manoil@nxp.com>
+On Wed, Sep 24, 2025 at 4:10=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Wed, Sep 24, 2025 at 04:08:33PM +0800, Jason Wang wrote:
+> > On Wed, Sep 24, 2025 at 3:42=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
+com> wrote:
+> > >
+> > > On Wed, Sep 24, 2025 at 03:33:08PM +0800, Jason Wang wrote:
+> > > > On Wed, Sep 24, 2025 at 3:18=E2=80=AFPM Michael S. Tsirkin <mst@red=
+hat.com> wrote:
+> > > > >
+> > > > > On Tue, Sep 23, 2025 at 12:15:45AM +0200, Simon Schippers wrote:
+> > > > > > This patch series deals with TUN, TAP and vhost_net which drop =
+incoming
+> > > > > > SKBs whenever their internal ptr_ring buffer is full. Instead, =
+with this
+> > > > > > patch series, the associated netdev queue is stopped before thi=
+s happens.
+> > > > > > This allows the connected qdisc to function correctly as report=
+ed by [1]
+> > > > > > and improves application-layer performance, see our paper [2]. =
+Meanwhile
+> > > > > > the theoretical performance differs only slightly:
+> > > > >
+> > > > >
+> > > > > About this whole approach.
+> > > > > What if userspace is not consuming packets?
+> > > > > Won't the watchdog warnings appear?
+> > > > > Is it safe to allow userspace to block a tx queue
+> > > > > indefinitely?
+> > > >
+> > > > I think it's safe as it's a userspace device, there's no way to
+> > > > guarantee the userspace can process the packet in time (so no watch=
+dog
+> > > > for TUN).
+> > > >
+> > > > Thanks
+> > >
+> > > Hmm. Anyway, I guess if we ever want to enable timeout for tun,
+> > > we can worry about it then.
+> >
+> > The problem is that the skb is freed until userspace calls recvmsg(),
+> > so it would be tricky to implement a watchdog. (Or if we can do, we
+> > can do BQL as well).
+>
+> I thought the watchdog generally watches queues not individual skbs?
 
-Blamed commit wrongly indicates VF error in case of PF probing error.
+Yes, but only if ndo_tx_timeout is implemented.
 
-Fixes: 99100d0d9922 ("net: enetc: add preliminary support for i.MX95 ENETC PF")
-Signed-off-by: Claudiu Manoil <claudiu.manoil@nxp.com>
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
----
- drivers/net/ethernet/freescale/enetc/enetc4_pf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I mean it would be tricky if we want to implement ndo_tx_timeout since
+we can't choose a good timeout.
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-index b3dc1afeefd1..a5c1f1cef3b0 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-@@ -1030,7 +1030,7 @@ static int enetc4_pf_probe(struct pci_dev *pdev,
- 	err = enetc_get_driver_data(si);
- 	if (err)
- 		return dev_err_probe(dev, err,
--				     "Could not get VF driver data\n");
-+				     "Could not get PF driver data\n");
- 
- 	err = enetc4_pf_struct_init(si);
- 	if (err)
--- 
-2.34.1
+Thanks
 
 
