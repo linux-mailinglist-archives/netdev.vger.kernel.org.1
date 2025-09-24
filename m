@@ -1,141 +1,143 @@
-Return-Path: <netdev+bounces-226019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B2CFB9AE09
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 18:28:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28BD6B9AE30
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 18:37:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B2651709C1
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 16:28:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 797404C6451
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 16:37:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E712330C622;
-	Wed, 24 Sep 2025 16:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99727305E1F;
+	Wed, 24 Sep 2025 16:37:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="nxUPglwS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DvSgCOis"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic314-20.consmr.mail.ne1.yahoo.com (sonic314-20.consmr.mail.ne1.yahoo.com [66.163.189.146])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F9718C034
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 16:28:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.189.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0537F83A14
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 16:37:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758731284; cv=none; b=HLP1xMbXpGMN3PPNE+3sDRasjoMnX6/AfChT9t1JBrvDyOKuWftlg1FVihWTrtjTCsNf8uGCnQGi+bz7QiGWXenTLO3vKhFlompWuCKlM3WVbYH1SIT1IWQEXVsFXHvH4VTcz7Ck4kJjoOKnOPwzWyIOf7GIMeteeiNczoPYqHs=
+	t=1758731823; cv=none; b=OBVhizbfcy6mpLzZnh7u/ogJ7ouZusEgj6hYSIn4muw/kaaTNY00Uj96ZOYXt8JtE7oX16gPxF+s7YegPFUWPzAdcVBQDkW0ENt9huSaVMj3VXBRvF5YK7vOhpnvL4MGm1nJpTYz0D93+ecdZpeVXdGoXg7P7Pz04cpbSsUS/ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758731284; c=relaxed/simple;
-	bh=XZtKio9Cb4GVPCg7WbHGNN1FzcEhyERcmH5B00Si3/E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ECaX6wE37VAp/D/6tOBGRIqb3u4Ez4wXez18wK+UE1RpivsNnt/j/qS4kmS4isSwhGYJF2KdpOZRwdrCPcEvkG8sC5TvWiQoamBjAuhli15D5UV1aZr3ZVCEwc+hJgXx9eOafijZrdvpvyIaNIlQNuUOqDEpkxpSiFpHTyHPsNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=nxUPglwS; arc=none smtp.client-ip=66.163.189.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1758731276; bh=rhrY+0rc5RGy49wVuDazTYpMf9P73mg2TQhHdzhAwdw=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=nxUPglwSRz2jeLY1STKMyZc3q4f5hhKd+a2QYJPD7G0fTVy9kQJ70wdSjRv5uz5nNppCwGg+dWtE0YiPJmThxwZi4qn4Kg6J9vgaSKbVTACo+inG/3zZNppOpVIdDJsFi1+4mBs6YeDUtaEQzfpUdIzgQfK2VIJYWYsUqffARuFmUYrZ70wv0mVVHH5Q7sSmf8Y0o6vnARafaZB7gU4nsGnw+ajdSAY3uVUPsrJYpVjH1TClzdMHBX/e1YRLiDeBCMOzJdLxgvfRKZHXUJbiszVwTEyNeDd4s8v74HM1BfuBHiYYJofpWC3r5lDrzC3zo0nwU6iP6C0B6poevdGA8Q==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1758731276; bh=86Oa65abceXpjfgS3uiarFsjuigj/9zbuMPPW9kJSiB=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=eNn3bcLx+bXZ75RBesB7yXrBBG6GSp87kjo3j+beNJ9iSpjAbjK2wfStVBRrx3ownXeakHgYyZkGQFqmJOg/e9aFsQjPyLu8OI6ux+StxDVlv2a2yISwih0i1ccd/uRzadcgE3PovMLmCn79DDkFGMimEQ+ZS4ZOl1JbeXY2AWjQRsRsOATZSk7QZIYa8dx0YnJBYxr7ddyOYjPNRyKXn452UDjNykCm7haEmrQuMfXnQ0BmAacS5BhjzsAFJ/9m4lTqugmbTLqoP1NQDhyAkA7i+TCCyNKfB44TQ2duWsMwhN4jJ5qUqcX7i/xN/sR3k3A7N8s0qCPbJXUhwneQ0A==
-X-YMail-OSG: S_.apQgVM1mShf6LlHKsUsfImGtniVkSz8jRrEMZSqrUiYR31gWUmhYMJFjlT1o
- 8On5g.BDtmdsBPSbVpBhCP_HwygrvUA81xty7XDWUtT4IqNRYXPYLlyEe6JmvY.iIseo5vssNrQ5
- M5MMhjYBMygMpB9e3SxctduyoNQaeqR8V8yLqcMSaOiL_fac7RfMQ6BjytGTsJcZDsQ1Era.pcFQ
- hicBiMm9un07861kjT7EzNDtieVsb_GyP4P80Aphhwm6qis30vOw0reGxXXijO0inQUalMvSEbyi
- 3DgNcQh5tvjRzRNErAoee3J7D_N37kFDpWG0DPzN3bkrYC0BJt3PJ69BgETuDNUU06GgD1c4xHhU
- fWnijyGaImR4bRxk0F7irCrrVz9Ja8v8dMzSnF.foKXKVH2htLRZbR3uTwB1Zu3rzrUdGJ4T4Ffg
- KSxq8QeMG.NoCCcOya5b8Arxn9aoFq.KopHZlLqzZ9AbESHmauPuG4l3JOIHt462ezDWI6ArLTtW
- aS9A1mMMf61R89LTWvirbd22y_ZCX0k3UXJ9vReKQboPw2X5HKa1XAZwbyTfE4nIvSNrW50jZzvv
- LYukxqiHqGLlq7vBmcHnkOSLT2dAes_ve1wDOzRzrU1Psu3.vb3FP382O.jOhuSqKBrESzwU01ZG
- XW4dHJVTChDWtx02wL2Bydwz7.coysAI9qW6MmQdnvoWDEO_ACp7f0QnU.9mxoR7ynNrOMw_WaGh
- Hy6Fb5ZEw7A3LOip18f0nDvazr6oUPDEZCUznkf_Vx9t74Fx9Bplq1lGpsMvXVZdzg.10E.goSQe
- qewZBlyCst1nOkY5urCOk9zMrcSd8jHLGWe7bZoM64q9X2ZVQ1sutu_o4Fvcrv9GQMfuNEMtHoFt
- ouUznmxtPts331VfOeyBlVNDBUOBV_VPWdMNJb8PlWJlehIohaGvEnE5OMz4gg_3j.9GDrOQxqPg
- SQOsA.uOlowi.xFvE56sTb4IRSU9eXpPVLUqIQ.oTX8DWJY0Zh_fByBGqvDB.OMpa18URpgnT5v5
- 7POeIqeoWsLUeRlK26jMOvalfyDLiTdiQmfIYjSLMG9TvT8mXXTwSN4KSXE5sAXqpWxOatL_8XVQ
- h0OGrX30rj3DPBMiRyJ6WRZfLhvlLzYApKAbrtnxfSf2JayxjgUo4Bo3NM9ibJHWh7N4ipbF5UwG
- 2K9SN_Qu1vHDOGOoa2Mi9bn9qHM3jYm1UmU_Wc3mO7eAzWFgDbqntMSQ_V_nRii9jh3u428uVHZH
- aE6NOjlfjPoTm8dffEOwe_17gVFiVf3n2bpN_SO7ULCOH0GNgr99IxOuqh8bQw_nDPh5YiH5eckr
- IHmDHukfoOXHQZixAa7EDIa4fKzbja97YxBfe3sr6SdoiCT7v2r1fAuzkUFTmL7p1r2AzblIc633
- pVfBkN35fmjvIbbxN6GdDAao6lNNym9RQQ4iMWHXO_CbF7B_Z3ON0hnautFgL4O06X9yNOLY2DMM
- vIbPUl7bVvvE_AK2EPdtXsxVfIZzePlR56tYkAGxu0Yt53iHBO5dYPiRezFXkf9xyQLw81sUjIx2
- HMdAxCkra2BSIX5xK6J_E1kxPOlDeyVszuZOCr46bRn.eMsXItu2ui406_wUD7TrUosvWU79htPh
- OxypD8LdeuyaqT6ylzRiR7Up3l.ibC9d053GrXKphh1f2nOs1lw7qqS7LXkEhWsi_IcKeYpURBgA
- GthxLlU.WhcbUf858zziHcAlO1zKek6Ps7yK2FpeWt0n1BrKZS40AgUtdHOsJeo2nEk.yS585Dk_
- LTuzZExzE70nNV17GzLt6Q1hMZtZxZbyDmbz1ZXTI0LHS72dcuYEBlo3hXRCBsPRXnYKXco8q7.b
- fS0TI3a0vuhCwgRhFGFy.Mp9vgo7o1faqewban9fV1Ew1jdNGH288EZhw7N9A32L_6GO_nOw4axP
- kImc2W6aW3XkGdDVroqT92jbAkYce24n1GfgUUfcMja4dPPBYVtr3uONz6DDCq.Z7IAGJs3eADhY
- 1H0GJGKmbZV7bq6uxxBHAqG0mIcHE8JNYij2RjWKspudbzDEUN4U4emRDxpLvN1YOHDQsoFKztMq
- 9lqf2gsZoBBmwppl2SXcpNAlZD1DoYKqTopeCOW_KOpYHht3yUD_6jINvWuUA_GK1WYOIubO1dKH
- yXjrlsu7aV16P2ojA4aaHOwPAlBuMYDzC6.a_bLw-
-X-Sonic-MF: <mmietus97@yahoo.com>
-X-Sonic-ID: 0f5db19c-0c5a-42b6-b06f-38acfec9d6a1
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic314.consmr.mail.ne1.yahoo.com with HTTP; Wed, 24 Sep 2025 16:27:56 +0000
-Received: by hermes--production-ir2-74585cff4f-nk58f (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID ff2816ec2364a67e46f15858e361aed4;
-          Wed, 24 Sep 2025 16:27:54 +0000 (UTC)
-Message-ID: <3f9e0aa5-1628-4ad7-8078-86a55b09b216@yahoo.com>
-Date: Wed, 24 Sep 2025 18:27:46 +0200
+	s=arc-20240116; t=1758731823; c=relaxed/simple;
+	bh=slMHZf7pDj+LFIrXTqw09zXP6T1Q1gmwv3Y28fwaRO4=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=r5kSqIOZq0nyfwRtQw0jqcY+afwXVHNVDh5CNuBViHHa9CzwfDcHSsqPhj6UV1N7g5ajXaWcfN5CXyrKwsOJ2/jSVJ3x3mctr2g7/oV4L7y//oXNG381mGfWbvo5Fyl12tsiVCtLDKFi12iiw42GbXocWLoISYQxACEQJA91O4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DvSgCOis; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-780f6632e64so19884b3a.2
+        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 09:37:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758731821; x=1759336621; darn=vger.kernel.org;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z3wqzINicnkLL2c14gwZ1hx+hWX66mtEw47ebSibOks=;
+        b=DvSgCOis5AC8MvFwMlKcNFkj6pGO3wBPWML9+EKEwhyq1oFV0I2uXi5wvZzXnIGxnV
+         95iHDdRhbjMjvRX/2w55u8I1eQXdo9cwvJk8CHqPBslUBNFkOXLrYKeAurd9DCk+bcUE
+         W3bKMmIdULAZf0Sxcdx0iITFQwjmC6hlNj0NzswXtZqasURqj/tgdU1/Xqh+3ibdDEq3
+         OrtVq5OKyAkTaPkfNg8vikRjP2xtrPlN/p0V+CXBWpDw+29Y/tR96n51mF7dxIbro4VU
+         64P1QaF4jDkTH4t2qMkMWV1mLJdzume7MKUMhi1JMTphrZ2byvNqapAVHRc87PQgv9zJ
+         d4Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758731821; x=1759336621;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=z3wqzINicnkLL2c14gwZ1hx+hWX66mtEw47ebSibOks=;
+        b=hKM+/B+jJw7m0yKoFgQKWUXzwM+Sh5Q3wEq3X7gV/9HQBaxSqVOPAO/nlMk4RZLdhv
+         Rudpu28aDA10uTXEpHfRxepP+5HKBKe3TggwYHRDOFsk7P0id2bFgAI4HYYu5avvOGqu
+         wkxeaU00dMV+seBLw9cBdxIzzycRlDe8ITBer81x/9P+EH6AuL7Kn74QiO+ohW8QagiT
+         bRLQEm68NknLELVqHvvUBOmDvGRBsWAIAZFWhGb0eakLurDHWlkF7uONNNebHAYSY/G5
+         nzrgaGqfs6uCOUUV0bYIMljKmgXXm1AEzb7CG52DmVg76ZdnGJ/akb8rR/07WzwFeiMZ
+         FZwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWDhvJSsrUDAZKDu2s1qoph7+jz9yMQLJG9gdu1zK4sosR08Q3v+R/cBKs+g2ujngNt8vxq7wY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQHDnBalsdPOlBmHEihu3F3pQRyS1PB85JOFHcdw2dAynIthTa
+	k7qp6eF0LrR4VllQLKFQsGAAAEhgvtYGQcQ7083/eaExGya7hedmBQQx
+X-Gm-Gg: ASbGncsTEQMU4Ff10bID4dxTuKs6KJ/O+PlKqLWRKZbmTzThbpAXsFfRs+jPiy6f/9f
+	dAHycgTQc+o/oh2EXvsb4pZLryr8Og6dXhta8U1pWKq2qXifZX/+eSVHHTnarmZI3p2wQ/0q1+G
+	ODvFgDSpMYsidN0XzpUK9RKBPPhXBdZOz+DEPYba+nBAc9kSxowiUkU8l4bRjSne0Vst/J2U87J
+	Du+dTkxem6/Vfu9/hY+6rzNZwpNdYpEeSWOSDm2PgLEyCIHDq3sux1tCcCcU/hdu3dbBk1bPLr6
+	7QpCKwMdGOUaznqIQrJNuea6061lI86u1EgAetl4KMO7AtxYeQbay6o6HSQ1d9BazjgxN3dICDb
+	zQ2hNrnqdWibwcks6gXSUc80IgbrkYPGErWjoFe7h2Zj2HbAyEosc
+X-Google-Smtp-Source: AGHT+IHIiPcXqnb4ZuXzHkhTE/WRNCDaCxsTg2AL8U2suEQAkNt7mCt5UlbYVTc4ITkK9ujzuppd6w==
+X-Received: by 2002:a05:6300:2109:b0:2ba:eb8c:92e7 with SMTP id adf61e73a8af0-2e7d2c5cf1cmr258004637.49.1758731821173;
+        Wed, 24 Sep 2025 09:37:01 -0700 (PDT)
+Received: from localhost ([121.159.229.173])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b551b31ebb2sm14540645a12.6.2025.09.24.09.36.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Sep 2025 09:37:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 0/3] net: tunnel: introduce noref xmit flows
- for tunnels
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, sd@queasysnail.net, antonio@openvpn.net,
- openvpn-devel@lists.sourceforge.net
-References: <20250922110622.10368-1-mmietus97.ref@yahoo.com>
- <20250922110622.10368-1-mmietus97@yahoo.com>
- <20250923184856.6cce6530@kernel.org>
-Content-Language: en-US
-From: Marek Mietus <mmietus97@yahoo.com>
-In-Reply-To: <20250923184856.6cce6530@kernel.org>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Mailer: WebService/1.1.24485 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+Date: Thu, 25 Sep 2025 01:36:57 +0900
+Message-Id: <DD16EAXYP4SM.1JYDYPDJ4I7VV@gmail.com>
+Subject: Re: [PATCH net v3 2/2] net: dlink: handle copy_thresh allocation
+ failure
+Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Paolo Abeni"
+ <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+To: "Jakub Kicinski" <kuba@kernel.org>
+From: "Yeounsu Moon" <yyyynoom@gmail.com>
+X-Mailer: aerc 0.20.1
+References: <20250916183305.2808-1-yyyynoom@gmail.com>
+ <20250916183305.2808-3-yyyynoom@gmail.com>
+ <20250917160924.6c2a5f47@kernel.org>
+In-Reply-To: <20250917160924.6c2a5f47@kernel.org>
 
-W dniu 9/24/25 o 03:48, Jakub Kicinski pisze:
-> On Mon, 22 Sep 2025 13:06:19 +0200 Marek Mietus wrote:
->> This patchset introduces new noref xmit helpers and incorporates
->> them in the OpenVPN driver. A similar improvement can also be
->> applied to other tunnel code in the future. The implementation
->> for OpenVPN is a good starting point as it doesn't use the
->> udp_tunnel_dst_lookup helper which adds some complexity.
-> 
-> You're basically refactoring an API, it's fairly unusual to leave both
-> APIs in place upstream. Unless the number of callers is really huge,
-> say >100, or complexity very high. Not sure how others feel but IMHO
-> you should try to convert all the tunnels.
-> 
+On Thu Sep 18, 2025 at 8:09 AM KST, Jakub Kicinski wrote:
 
-I'm introducing an opt-in API, which is useful in some cases, but not
-always as it optimizes flows that follow a specific pattern.
+Thank you for reviewing! and sorry for the delayed reply.
+There have been quite a lot of things on my end recently.
 
-Since this API is opt-in, there is no need to over-complicate code
-to integrate the new API. The current API is still retained and is not 
-made redundant by the new API. Some tunnels may benefit from the new
-API with only minor complications, and should be modified in separate
-patchsets after this one.
-
->> There are already noref optimizations in both ipv4 and ip6 
->> (See __ip_queue_xmit, inet6_csk_xmit). This patchset allows for
->> similar optimizations in udp tunnels. Referencing the dst_entry
->> is now redundant, as the entire flow is protected under RCU, so
->> it is removed.
->>
->> With this patchset, I was able to observe a 4% decrease in the total
->> time for ovpn_udp_send_skb using perf.
-> 
-> Please provide more meaningful perf wins. Relative change of perf in
-> one function doesn't tell use.. well.. anything.
+> On Wed, 17 Sep 2025 03:33:05 +0900 Yeounsu Moon wrote:
+>> @@ -965,14 +965,11 @@ receive_packet (struct net_device *dev)
+>>  			struct sk_buff *skb;
+>> =20
+>>  			/* Small skbuffs for short packets */
+>> -			if (pkt_len > copy_thresh) {
+>> -				dma_unmap_single(&np->pdev->dev,
+>> -						 desc_to_dma(desc),
+>> -						 np->rx_buf_sz,
+>> -						 DMA_FROM_DEVICE);
+>> -				skb_put(skb =3D np->rx_skbuff[entry], pkt_len);
+>> -				np->rx_skbuff[entry] =3D NULL;
+>> -			} else if ((skb =3D netdev_alloc_skb_ip_align(dev, pkt_len))) {
+>> +			if (pkt_len <=3D copy_thresh) {
+>> +				skb =3D netdev_alloc_skb_ip_align(dev, pkt_len);
+>> +				if (!skb)
+>> +					goto fallback_to_normal_path;
 >
+> The goto looks pretty awkward.
+>
+> 	skb =3D NULL;
+> 	if (pkt_len <=3D copy_thresh)
+> 		skb =3D netdev_alloc_skb_ip_align(dev, pkt_len);
+> 	if (!skb) {
+> 		// existing non-copy path
+> 	} else {
+> 		// existing copybreak path
+> 	}
 
-Okay. Currently, I'm getting a consistent 2% increase in throughput on a VM,
-using iperf. Is this what I should mention in the next cover-letter?
- 
-> Please do not remove the diff stat generated by git in the cover
-> letter.
-> 
-> 
+I totally agree with your point. However, the two cases handle `skb` and
+`rx_skbuff` differently depending on the `copy_thresh` condition,
+regardless of whether `skb` is NULL or not.
 
-I'll make sure to include it in the next revision.
+This patch is only intended to gracefully handle the failure case when `skb=
+`
+allocation fails.
 
+	Yeounsu Moon
 
