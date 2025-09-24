@@ -1,89 +1,94 @@
-Return-Path: <netdev+bounces-225748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2F27B97F00
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 02:45:54 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84BD0B97D8A
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 02:10:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 647F83BE7DA
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 00:45:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2C82B4E0131
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 00:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F37CA6F;
-	Wed, 24 Sep 2025 00:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA46F15D1;
+	Wed, 24 Sep 2025 00:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=maguitec.com.mx header.i=@maguitec.com.mx header.b="NdWVh3G1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m+obHWTQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-g3-154.zohomail360.com (sender4-g3-154.zohomail360.com [136.143.188.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06AF4A35
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 00:45:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.154
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758674751; cv=pass; b=Dx+pBkN2rKReWDH4FXeoIb7cthYaMiQ9jsmqQ7Dv+dKVZRaGCsejr/GyWDnLeATrrK3SkfoaE71ld5wBqQ6E32ZYaQs9U2VMuafsWS2/8iSB1xO6YfRenNmXfGvis45h3v1XYAL83woTd5IacxYmam7OcwusKA+H+tivQQ/qXi4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758674751; c=relaxed/simple;
-	bh=oi4R8c4MgwjwK+TTcFQxOesTdzAxcogkHs5IOioNJbM=;
-	h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type; b=V2AJDDf0ylzOKP6mvmUSFSwLEexhARQvM/iki/f2VS4M16kNtl/VBl6Ssx3g2h0TvRN6Btdp9mJRvtP5afK3V5Y5p14YBWzRqy9smbIg4RP4K1WQ+GuW81IHlOGZwdAZTaAXivkctiirQUSy3Bb3eGo9tpiTRcSyRSksDy/P5wg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=maguitec.com.mx; spf=pass smtp.mailfrom=bounce-zem.maguitec.com.mx; dkim=pass (1024-bit key) header.d=maguitec.com.mx header.i=@maguitec.com.mx header.b=NdWVh3G1; arc=pass smtp.client-ip=136.143.188.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=maguitec.com.mx
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce-zem.maguitec.com.mx
-ARC-Seal: i=1; a=rsa-sha256; t=1758674747; cv=none; 
-	d=us.zohomail360.com; s=zohoarc; 
-	b=e49lySlb9t7fjWi9tNku7JjkxXy07i/7wd50p/RW+tPQ0o68m4I3RICc+wN5YC9O8QIft6oVKcVyDWW3KSaz3z5c/qp7PjibQaOEfA38Hlk2jZvKgYX+5POy7IssSBNsZaVKR1i2Eh5snVL+ped3PHs4NsRUBxbbjqwPtG762gM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=us.zohomail360.com; s=zohoarc; 
-	t=1758674747; h=Content-Type:Content-Transfer-Encoding:Date:Date:From:From:MIME-Version:Message-ID:Reply-To:Reply-To:Subject:Subject:To:To:Message-Id:Cc; 
-	bh=oi4R8c4MgwjwK+TTcFQxOesTdzAxcogkHs5IOioNJbM=; 
-	b=Zf1g4YSsH95AM+v+2qzHyZDntCN60JQLu7XfXqgsioZwG26erTkKX72r7lRglVNk3sDweDJhZC6CSsceA4nvw94z+oYQWilp+eJkIBHL/dlr2jd6NzdlcTklw3cf6LEGdt9f759jmD8D7IOHVVWK+QKsvTMZJUQhjej9sSFb9Gc=
-ARC-Authentication-Results: i=1; mx.us.zohomail360.com;
-	dkim=pass  header.i=maguitec.com.mx;
-	spf=pass  smtp.mailfrom=investorrelations+1589c140-98d9-11f0-8217-5254007ea3ec_vt1@bounce-zem.maguitec.com.mx;
-	dmarc=pass header.from=<investorrelations@maguitec.com.mx>
-Received: by mx.zohomail.com with SMTPS id 175867185957018.91936189267051;
-	Tue, 23 Sep 2025 16:57:39 -0700 (PDT)
-DKIM-Signature: a=rsa-sha256; b=NdWVh3G1Xyv1ajd2jwWbUz4aU5m0bQcHK7UyH+eXKTUCInWQfr3mSU4pbW/6IjpE6WmbUj2v2cxpCXSnc02gqPmGXJlcH8yHzsNQaKgIVnF7a3BuxWjBj4Z+n2fMF1BKCIME1O8cwcl8geWkQeF2E+SwEk65EmXvM0sYvpq/sT0=; c=relaxed/relaxed; s=15205840; d=maguitec.com.mx; v=1; bh=oi4R8c4MgwjwK+TTcFQxOesTdzAxcogkHs5IOioNJbM=; h=date:from:reply-to:to:message-id:subject:mime-version:content-type:content-transfer-encoding:date:from:reply-to:to:message-id:subject;
-Date: Tue, 23 Sep 2025 16:57:39 -0700 (PDT)
-From: Al Sayyid Sultan <investorrelations@maguitec.com.mx>
-Reply-To: investorrelations@alhaitham-investment.ae
-To: netdev@vger.kernel.org
-Message-ID: <2d6f.1aedd99b146bc1ac.m1.1589c140-98d9-11f0-8217-5254007ea3ec.1997902eb54@bounce-zem.maguitec.com.mx>
-Subject: Thematic Funds Letter Of Intent
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856034C6C
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 00:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758672612; cv=none; b=eLiZE9buPnxoHXmgDcPrQeUcU0ZtNpEtzJwAtCWvaV+LmMAgIS4WXVyp/URnHDwuMBQgaBsnGPVnAaoOywpwbdTj7EyApft4ri0mFRLj/gd2NnGjwu+8sUIVwhbz9G2Hu6IzdkjtY0ET9JCAL4UoqkbBQHrrarsaonYBfWB6O/A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758672612; c=relaxed/simple;
+	bh=/o0FGhrUAZ+oxYrfk+E3PYUzIRtYM7ymasxWSjBlMUg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=o68tN18byJ1+Z9uCcuhbDiai6Or9ehiC7K+Cxds1eVjP23+ZRsIaDa4uO1izEKkG1/CDArYaYT5JyqERm8rg5VfKLxT/CvPex3Za/SvL086VI2WvBzRK+ZFqPHyeMrwMAXp9z/DrY4z6QrBt9IxjlFrOkUHdOOOuUvGAPJHylF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m+obHWTQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17E3AC4CEF5;
+	Wed, 24 Sep 2025 00:10:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758672612;
+	bh=/o0FGhrUAZ+oxYrfk+E3PYUzIRtYM7ymasxWSjBlMUg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=m+obHWTQiUx2QDXeW8XujAyjG7lWyZNW28EbIZOJzYWJjkAIavpJJtVNUt31p4Zwg
+	 kGI630PMqK5LOyEU0IPuJHYSxW1eyr+gd9QOp47T97b95CFnpVhgARj5bl/s9Z9jkR
+	 RwxPkVVxD28gAfY8xOmY2mLWKV3ynR02aDyiG7fv3F2PvWPWLMSjCdW4EWY3XzQ3Hg
+	 4RWU0XuOhcBkusYuKaA2RjndowWGaFHlc+KUn9XkHtWHBFvtH6qR8QuQxCiBx8zqIG
+	 NOkSYKYzUWqS06HOU0ksc5hyU4jBfNMIAnmEb5/c4cko0xNYEACBznBXxwta/07jPk
+	 zwYNUN/fGoZYQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DBA39D0C20;
+	Wed, 24 Sep 2025 00:10:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-content-transfer-encoding-Orig: quoted-printable
-content-type-Orig: text/plain;\r\n\tcharset="utf-8"
-Original-Envelope-Id: 2d6f.1aedd99b146bc1ac.m1.1589c140-98d9-11f0-8217-5254007ea3ec.1997902eb54
-X-JID: 2d6f.1aedd99b146bc1ac.s1.1589c140-98d9-11f0-8217-5254007ea3ec.1997902eb54
-TM-MAIL-JID: 2d6f.1aedd99b146bc1ac.m1.1589c140-98d9-11f0-8217-5254007ea3ec.1997902eb54
-X-App-Message-ID: 2d6f.1aedd99b146bc1ac.m1.1589c140-98d9-11f0-8217-5254007ea3ec.1997902eb54
-X-Report-Abuse: <abuse+2d6f.1aedd99b146bc1ac.m1.1589c140-98d9-11f0-8217-5254007ea3ec.1997902eb54@zeptomail.com>
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/2] net: phy: stop exporting phy_driver_register
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175867260900.1969801.17701597899099018236.git-patchwork-notify@kernel.org>
+Date: Wed, 24 Sep 2025 00:10:09 +0000
+References: <b86c2ecc-41f6-4f7f-85db-b7fa684d1fb7@gmail.com>
+In-Reply-To: <b86c2ecc-41f6-4f7f-85db-b7fa684d1fb7@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: andrew@lunn.ch, andrew+netdev@lunn.ch, linux@armlinux.org.uk,
+ edumazet@google.com, pabeni@redhat.com, kuba@kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org
 
-To: netdev@vger.kernel.org
-Date: 24-09-2025
-Thematic Funds Letter Of Intent
+Hello:
 
-It's a pleasure to connect with you
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Having been referred to your investment by my team, we would be=20
-honored to review your available investment projects for onward=20
-referral to my principal investors who can allocate capital for=20
-the financing of it.
+On Sat, 20 Sep 2025 23:31:23 +0200 you wrote:
+> Once the last user of a clock in dp83640 has been removed, the clock should
+> be removed. So far orphaned clocks are cleaned up in dp83640_free_clocks()
+> only. Add the logic to remove orphaned clocks in dp83640_remove().
+> This allows to simplify the code, and use standard macro
+> module_phy_driver(). dp83640 was the last external user of
+> phy_driver_register(), so we can stop exporting this function afterwards.
+> 
+> [...]
 
-kindly advise at your convenience
+Here is the summary with links:
+  - [net-next,1/2] net: phy: dp83640: improve phydev and driver removal handling
+    https://git.kernel.org/netdev/net-next/c/42e2a9e11a1d
+  - [net-next,2/2] net: phy: stop exporting phy_driver_register
+    https://git.kernel.org/netdev/net-next/c/092263a03105
 
-Best Regards,
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Respectfully,
-Al Sayyid Sultan Yarub Al Busaidi
-Director
+
 
