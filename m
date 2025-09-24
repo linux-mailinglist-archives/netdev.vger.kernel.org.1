@@ -1,291 +1,367 @@
-Return-Path: <netdev+bounces-225896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67F78B98EF5
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 10:40:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E37EB98EFB
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 10:40:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB0627A8C3D
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 08:38:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24A3116D5C2
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 08:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E452882DE;
-	Wed, 24 Sep 2025 08:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A39289E36;
+	Wed, 24 Sep 2025 08:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ckwqclxa"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="Ztajcb9d"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013066.outbound.protection.outlook.com [40.107.159.66])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C20A28A1F3;
-	Wed, 24 Sep 2025 08:39:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758703194; cv=fail; b=jSyuf1IpDzYTHYhD+UdIRmWjlWCyb4dEC7X+KXa0OPLbJ7LsT6XqJPXYlRJopUTnOZD7g8Aw/Og17qBrQ6xAFTuA9Fv1PLqfQ289ZdFzMqfc4W86LkraX/mdnFv4M6DMoLxUMSP1REtCxOgmqk+xyLT7i/fcIevEIIEHOGK2DKw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758703194; c=relaxed/simple;
-	bh=ui/M004we8LQ+szHMq2OZ/1wfI/IqMVtn7fAOkEYU40=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=frtx1dUrcnUF1p/IHTButPFYOzPfxefLTZJeJP4QL43fLT9gmwmJm3dqd188htVe+KW/X3dzXqrUDWasWUQNG6Fhg1Tbr68MPaRPTgxsn8VD963LGaAnCUI5spWoFQ6/Oj3gHBee0G4eQVuR84cmnm6dRQ9qHr1TLJ0lvbnbbgw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ckwqclxa; arc=fail smtp.client-ip=40.107.159.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=N5neNI08OTvooxd9CoBG6zVmdlYxmO+utPaAEISvOTgKnWY/p5T5tnyChw2u+mMMrDIcZPiJUkZ68HTT/x2AYnFVhV4hCSOsQgaHfbsZ4fYxEg9BgR7QrGQG4zJ8J9hqVL1O6A6nCRrRkqWhhDC18fmNuT7bup8Am36AZOz8/TMtIcQpVy80Uv+/SjSjQbBvJWh0sM5gi36fCHo98dOQLZMExaYe8vlrUlwxZns1t26Dfvs68mpqA4mdh6KygcSLYhxpyhs5CqeG6sEE1LXwSH1ARiQChJmp39YIHR/eVdRSIfhNFZFFcJd2X7IA04Kx1mELBrkGAv8WokKDQnLsKw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ouDXIbVCq+4BtEbNIoZDP0uV7RlsVEFli145MyUH9MA=;
- b=KnEWggcVnFIecDfaKrVJLDo3oNDiVIkMwgt+GNU4nHTUnolTMXgittS99FY2yG+Glte0uHSYyO9O18QRUUME3+DLwDHk/Hq1rea8FZsAQ5sbawbCVKG2IUHXx/xowuXt9Bzmjydvg2CZlrzRdiM+SFNICKSGHcwxjV7e5279ta4wwzqHCQGQjdxbbhaxLFpUqUuVRNVwFkyXyIC1yzisTFzpl5bhW0Hwg5lJvwN7Te/bAvnM6zg5JyvOS6SRS8db/VJQZ5rElBWprnr/3rfAdM9F6P/ZnVGEkK2KvHSoV8BokPi+WuVjaVQV/m84caJEwVxtKjZeP4CvhRmTDuBxKA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ouDXIbVCq+4BtEbNIoZDP0uV7RlsVEFli145MyUH9MA=;
- b=ckwqclxapjVmoUgNidHa2WFeUqHcIdkWktjJeBSCtfxdXjzXkA/ThOFbdjCvEYF+KE66ypLIWvXQFiELH4jHW9yH4eLuSqQ+qHMjevF+zc8Nr7Z74Xa7a7UVibhSigi0LgE5hX5EAFa4YDlqK2tS7+WSZQkNAlpkgLgAhnj8HoUs4jLDUGLOA6cBpk2iW8lPCZGUlXazzOYx75v66IRPtWZsfbXr21eJXUQPTRBOkrxDNdXkM7IdYZhkcyoZllKvYkshmfdCMs9UCJU/gq/oGjDQyudq0AqvNDN+3IG1PtZG1E+Csbohs5Hrr/hOMizHu4Ncry32mK+3YMf+RI3Sfw==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by VI0PR04MB11844.eurprd04.prod.outlook.com (2603:10a6:800:2eb::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.9; Wed, 24 Sep
- 2025 08:39:47 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.9160.008; Wed, 24 Sep 2025
- 08:39:47 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Jianpeng Chang <jianpeng.chang.cn@windriver.com>
-CC: "imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, Alexandru Marginean
-	<alexandru.marginean@nxp.com>
-Subject: RE: [PATCH] net: enetc: fix the deadlock of enetc_mdio_lock
-Thread-Topic: [PATCH] net: enetc: fix the deadlock of enetc_mdio_lock
-Thread-Index: AQHcLRa4p93zS5zz2UC/+ImNSDj9z7Sh+w1Q
-Date: Wed, 24 Sep 2025 08:39:47 +0000
-Message-ID:
- <PAXPR04MB851022A10BB676DBCEBF66BC881CA@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20250924054704.2795474-1-jianpeng.chang.cn@windriver.com>
-In-Reply-To: <20250924054704.2795474-1-jianpeng.chang.cn@windriver.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|VI0PR04MB11844:EE_
-x-ms-office365-filtering-correlation-id: 6cef7815-1c35-4e31-a10e-08ddfb45eb6c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|376014|19092799006|1800799024|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?/+/+u1EU4W1JJAX+xhW8e59f8lCzoZmrg4fSYlR0wBpN5jON8UbBQ2qhsjcI?=
- =?us-ascii?Q?rRf3cCz13K1UGxPRrZt8SWHSQzoXHZo7S93DqQAEejb/3c7qwwbxpe60Qpm5?=
- =?us-ascii?Q?KDZzUyors8O9BR3UzbCH9R+7flPj3UvPbaxDqKdm0XYyKbWc2D1ORMj+HCIZ?=
- =?us-ascii?Q?3bgkLZ1ccVcx5OdlYsrPAhP3FcHyJn4wRAXMNUijS9Z2g6DweKJCjUnecP16?=
- =?us-ascii?Q?DvOb7BiNA95YGnR7PormYGmtfI2fDrwKHapNOE0Ycp3YR2MHQ7gBJ8fMamnx?=
- =?us-ascii?Q?XZRXnuVubYick4O+CINR9m8ysOTFAoLgZGIlts7zg6+UFBzaxJrpj756JxfI?=
- =?us-ascii?Q?vH7YcnnMr970HNpNWKxnddLm5S2DDZF9BPFuv9u1t11UJfc3owGnwFGd+gpM?=
- =?us-ascii?Q?N+N8jp1ckbtS+NXrdvHQlZnVvhj38zAfo/r6N/qtj1tPA0gtPV15+0wKAtdN?=
- =?us-ascii?Q?eCQG+y5jT9Bynw1EQxws8Ij/pHyUiQrGk2uR5CIpCc+lZEk8iesgFTGwJBn7?=
- =?us-ascii?Q?kWYxXoXJTVcLLw9PrxVMkFLu2b/qxYxf3PBgDz7C48+bxyVbQn6e3BSbCk2R?=
- =?us-ascii?Q?Jy8QgPP//delEUgNrpHKI1igeWDrZCsH8vox5APthh4NRN+d4p35E9iGtB+6?=
- =?us-ascii?Q?ydrnmnCBUbgm7Y7TCnyvfE8acdVtaDXkwh4QW3QV1pvpchePDUv4AsqeRPmT?=
- =?us-ascii?Q?oRFXmQHDG7jK22sKQTTUR8ZaXQJB2slEVNnajTJjhP1XWPfS4gDQWXHj54zZ?=
- =?us-ascii?Q?XeI87NpZo0IKO62dLpBeorrlAlSgal9WPMjKrLiVisAvAR4JBEgCeoEM56W1?=
- =?us-ascii?Q?HKAsdob7Ig+/yLrLNV0JMB4Ue1GKHS9gueM4mSdfny3G7L9zC0ONl9vsL6rL?=
- =?us-ascii?Q?lNygUD7TDHMrhpcZBlDBHLE+AfSBPfdc8c45FiUnSLFr50GkSSPzFeOpl3TE?=
- =?us-ascii?Q?K41YBX+SGfp2nnI3tUwRDy/kGM4ZIPDk0tZ+pKAO2Ry4hHcku8TDOZdUCPcu?=
- =?us-ascii?Q?IGc12AaHiCRW8f5T2xZB40DFvS0vRKMIVe7qk5fxpSvWK/Pne5nqbGQOU9ru?=
- =?us-ascii?Q?wEwTd2TQYOQ6sgSrBhdoAAGwI6EE7Y1BWXejh1ngAw+CZdHqG3jnH3b7F9rt?=
- =?us-ascii?Q?ZVjX2TPS6xi3kgxZsLFgODdsmONhnHzPZVCqxT1TBgzdsjZqKYr0P8PaX5BA?=
- =?us-ascii?Q?JNSkIwTA4DjrR+p6gk2/LQ4uLfzOzFLDcv/JaPET7dMgxJ+pAE1n/6uw6fcs?=
- =?us-ascii?Q?MUdl7N0XPvwiDlQ5KByK4Z4YmZK6jEmKuGRpjQJSqg15EL2M+b/hxE5MegBE?=
- =?us-ascii?Q?IWy9BvIIqHRkWP1N/H1vFpKXis8kKI9T2FdYXxcfp58104kyYMZeoFzpWFg3?=
- =?us-ascii?Q?B6ZtUlhPHC77udD3dCQWn9q4tyaU/9nlTfpT7OMrGtFbYWEKT+VYIncAKe1q?=
- =?us-ascii?Q?cS0KoNpjCM5knhNZjjJmTO+kpsh/D7um/Vk5CtrkpiokLpE7pV+xWA=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(19092799006)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?etkEY9IYuCnzlKds9rfDP8Pi3n/YQlPQa3mexIzpgE+qtGUcJ4JsNdfGV9XE?=
- =?us-ascii?Q?L3VRc4grbOdSUlmu8laHt3fO0PDLA0TfvL+bvwjR1ZFA9YTAib/EG+ZclqFX?=
- =?us-ascii?Q?7LDzNHqRFdsjRS/Navcu6n+0ftV/HdgAPptt1PYsu3sD5OSDR5PsYl+Iv+Td?=
- =?us-ascii?Q?WE9y9cQQdlgoNg4BvKcxW9//usOBDhjHjJt5zhH3JUP/70hgRu11ltGvdNTX?=
- =?us-ascii?Q?kz2URtN/8eFtMgPFPHHv97FFeV5IZ6cg7lONIXTVyn4fhEzpx7iKxZ+hJ5Dl?=
- =?us-ascii?Q?eu2GXyMoqxruoeYDD1wdHvljJ/HW8gbPVkKAVtmSjhrxEAp8CNAjHLifHVs+?=
- =?us-ascii?Q?Ddz6mgN3pwk5Q95456ytWNgKGWgStI7EVn9bX0TN2dTd+lX0/QRtaph9tYDx?=
- =?us-ascii?Q?9FY1n9aEFZY/OdBhcXO/KNeSbhP6IrGFqQdJEDvfc2gco2FAjpNBMqMji3g/?=
- =?us-ascii?Q?CdXSfMc/pXcteNMW6/ZOB2M8u8xReVSZAPYb/HLagTI5Sj6nBJxwvm0Rego+?=
- =?us-ascii?Q?Qs4AmagcuXas0i7yzy6fey25G90tlpJUARt/BZJDJuzD3F8NRmhzvbjvet1e?=
- =?us-ascii?Q?mqA8mRkWZq21e8Plh4MOQzKjvd+SZbVsEM7UJod/cW+lyWUs1OQk1KivFr81?=
- =?us-ascii?Q?P/ViOetw8xlV+fB1l2oZO3QUVpwC/fMI1Ib82xLt7+6TmnKo3NtBKZTn/CH9?=
- =?us-ascii?Q?0EVmWaqJXUVKtgxbo+uG1iqRZjjO3z5jiCkAcZsOpt7MIqiAnlwnj2Z/Ovu4?=
- =?us-ascii?Q?VB09hod9H5U/Ejti+IVsTB1eodowG2K6Nez9vGP2pjTaSb4MoaP0iiHRLMZc?=
- =?us-ascii?Q?y8h3YiZ1ik+nMlpPI807Ht1adHTmpBmk297ilFUAoDRICnlrklmjRwV7qPFn?=
- =?us-ascii?Q?VqQl8xRatCqlMzBcJqa8imW3sz3jtCkJIFT5jxlUqmcDwbzsKz2o8ILzaJ7v?=
- =?us-ascii?Q?Y35C9g7Iovix46J2mRqNr6ahpiMqgBDP/uam5ISjVguKm1qCyIWFDnCl6sj3?=
- =?us-ascii?Q?Ko53O2X7YF2giW6ULs9G79quYZnjYG8TMPzN6MN3kbh5307M5QNC2mrm/oqr?=
- =?us-ascii?Q?Q/SLK2TnE5ge39TF09SKBH04MZPfxV7k2DbHPz7BFslBUtBmaU/EbowXlTDY?=
- =?us-ascii?Q?dLRHAEFn85Vht3aXBwBJ7KxDf+jH7QpHJ9yXqiNww8FS9BWf9vGpOlftdmmS?=
- =?us-ascii?Q?vtLUilT6PpaYyBiI7kMeFhYhGKf8t0BBvxHIzcN2WXmZkzbVZMOoYJMBdMWF?=
- =?us-ascii?Q?R8DPgs1LlHLuO9z1bfkbF1nkbj8U8UxgdZ1wbPfH5UGdZEme1U/buQG2jUfM?=
- =?us-ascii?Q?9BJDmIBDbcwuK7w0lZbk8T0g2L5Fcm+o5SX8lM2WS1kWPO0YlgjwHooV6P6q?=
- =?us-ascii?Q?XPwqwUJPY1sy85BkrB9HkuYwVP6Fok1AFa1U9EbD5IYOrRpsZTtE5Jm2Q5QV?=
- =?us-ascii?Q?W3OgMK8Yto6E7Cp3l7G9UdtahzhpOxchh7+s+l9Vd6KmPiaRj4qDmY91aEiT?=
- =?us-ascii?Q?CWy40VdApljUamliu/lJMrQYLk/ozqI2oxSFym/ptUPUbw1UvNQ9RAOxAitC?=
- =?us-ascii?Q?YAB37C5rAdTrG78ZYT0=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFEB28851F;
+	Wed, 24 Sep 2025 08:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758703210; cv=none; b=TYiufZ8HpUy26QAGdrviF9zk0Sxm/sQqbZv/GGQQlwiAzY5p8ErjWUsHQ/0R9fobP50g8aEXJL6qH06oqy/FjlnmVShrQKzQdnqAjZysEyLZ4kFjTKAPR4HQwklKIUkiZy/YQfjJ77RwW+rUI0s9PtzZy2X0NWHAb1bPbjvQgj4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758703210; c=relaxed/simple;
+	bh=hyUuaDTnDR9cZMfkUVTucVAIu2XBYzlqLT3CmCKBVSE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YaV+yzfEQdZ1zcj1aZrRnBCrywxMO0SDMRUOuDcnGKDyTP9sjLsldnJ/fFfrTzglTuCRU6LyiGxhHmrZH3+FdWLpx4EWrXcZy7I++bXmi3qCm5buQ1VPYXNtQ7FDOKepk4/ZCvCglLlcrSQPrdcEfQIuhe5Bi8VecSCzMWXOA7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=Ztajcb9d; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [129.217.186.216] ([129.217.186.216])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 58O8e4Eb029808
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 24 Sep 2025 10:40:04 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1758703204;
+	bh=hyUuaDTnDR9cZMfkUVTucVAIu2XBYzlqLT3CmCKBVSE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=Ztajcb9dz5YlFnKabmJtwjyMweiXxm8goOwG5M6LqKD2L2dSlDVA/XUS6Me8zcUGF
+	 0VmhJXzXc9NZEJ5TD3YEuxkCiVNeiweVMhlsUtnlU2+eYyghVTMujknpn+zbp5OxI8
+	 TZUF1zvf8JQIkD8o/qqMpg3A72s+ip/mqR4vQx2A=
+Message-ID: <9e7b0931-afde-4b14-8a6e-372bda6cf95e@tu-dortmund.de>
+Date: Wed, 24 Sep 2025 10:40:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6cef7815-1c35-4e31-a10e-08ddfb45eb6c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Sep 2025 08:39:47.7352
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: khtYUa2KxbUZk4WNzPmFGsBciXgAuDtX96TRk2DQg7aeB1q7NOwNtCOd+KdHXpPsJaA3EfrgqqBJ2W5hhDP2OA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR04MB11844
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 4/8] TUN & TAP: Wake netdev queue after
+ consuming an entry
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com, eperezma@redhat.com,
+        stephen@networkplumber.org, leiyang@redhat.com, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+        kvm@vger.kernel.org, Tim Gebauer <tim.gebauer@tu-dortmund.de>
+References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+ <20250922221553.47802-5-simon.schippers@tu-dortmund.de>
+ <20250923123101-mutt-send-email-mst@kernel.org>
+ <aacb449c-ad20-48b0-aa0f-b3866a3ed7f6@tu-dortmund.de>
+ <20250924024416-mutt-send-email-mst@kernel.org>
+ <a16b643a-3cfe-4b95-b76a-100f512cdb79@tu-dortmund.de>
+ <20250924034534-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20250924034534-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Jianpeng,
+On 24.09.25 09:49, Michael S. Tsirkin wrote:
+> On Wed, Sep 24, 2025 at 09:42:45AM +0200, Simon Schippers wrote:
+>> On 24.09.25 08:55, Michael S. Tsirkin wrote:
+>>> On Wed, Sep 24, 2025 at 07:56:33AM +0200, Simon Schippers wrote:
+>>>> On 23.09.25 18:36, Michael S. Tsirkin wrote:
+>>>>> On Tue, Sep 23, 2025 at 12:15:49AM +0200, Simon Schippers wrote:
+>>>>>> The new wrappers tun_ring_consume/tap_ring_consume deal with consuming an
+>>>>>> entry of the ptr_ring and then waking the netdev queue when entries got
+>>>>>> invalidated to be used again by the producer.
+>>>>>> To avoid waking the netdev queue when the ptr_ring is full, it is checked
+>>>>>> if the netdev queue is stopped before invalidating entries. Like that the
+>>>>>> netdev queue can be safely woken after invalidating entries.
+>>>>>>
+>>>>>> The READ_ONCE in __ptr_ring_peek, paired with the smp_wmb() in
+>>>>>> __ptr_ring_produce within tun_net_xmit guarantees that the information
+>>>>>> about the netdev queue being stopped is visible after __ptr_ring_peek is
+>>>>>> called.
+>>>>>>
+>>>>>> The netdev queue is also woken after resizing the ptr_ring.
+>>>>>>
+>>>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>>>> ---
+>>>>>>  drivers/net/tap.c | 44 +++++++++++++++++++++++++++++++++++++++++++-
+>>>>>>  drivers/net/tun.c | 47 +++++++++++++++++++++++++++++++++++++++++++++--
+>>>>>>  2 files changed, 88 insertions(+), 3 deletions(-)
+>>>>>>
+>>>>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+>>>>>> index 1197f245e873..f8292721a9d6 100644
+>>>>>> --- a/drivers/net/tap.c
+>>>>>> +++ b/drivers/net/tap.c
+>>>>>> @@ -753,6 +753,46 @@ static ssize_t tap_put_user(struct tap_queue *q,
+>>>>>>  	return ret ? ret : total;
+>>>>>>  }
+>>>>>>  
+>>>>>> +static struct sk_buff *tap_ring_consume(struct tap_queue *q)
+>>>>>> +{
+>>>>>> +	struct netdev_queue *txq;
+>>>>>> +	struct net_device *dev;
+>>>>>> +	bool will_invalidate;
+>>>>>> +	bool stopped;
+>>>>>> +	void *ptr;
+>>>>>> +
+>>>>>> +	spin_lock(&q->ring.consumer_lock);
+>>>>>> +	ptr = __ptr_ring_peek(&q->ring);
+>>>>>> +	if (!ptr) {
+>>>>>> +		spin_unlock(&q->ring.consumer_lock);
+>>>>>> +		return ptr;
+>>>>>> +	}
+>>>>>> +
+>>>>>> +	/* Check if the queue stopped before zeroing out, so no ptr get
+>>>>>> +	 * produced in the meantime, because this could result in waking
+>>>>>> +	 * even though the ptr_ring is full.
+>>>>>
+>>>>> So what? Maybe it would be a bit suboptimal? But with your design, I do
+>>>>> not get what prevents this:
+>>>>>
+>>>>>
+>>>>> 	stopped? -> No
+>>>>> 		ring is stopped
+>>>>> 	discard
+>>>>>
+>>>>> and queue stays stopped forever
+>>>>>
+>>>>>
+>>>>
+>>>> I totally missed this (but I am not sure why it did not happen in my 
+>>>> testing with different ptr_ring sizes..).
+>>>>
+>>>> I guess you are right, there must be some type of locking.
+>>>> It probably makes sense to lock the netdev txq->_xmit_lock whenever the 
+>>>> consumer invalidates old ptr_ring entries (so when r->consumer_head >= 
+>>>> r->consumer_tail). The producer holds this lock with dev->lltx=false. Then 
+>>>> the consumer is able to wake the queue safely.
+>>>>
+>>>> So I would now just change the implementation to:
+>>>> tun_net_xmit:
+>>>> ...
+>>>> if ptr_ring_produce
+>>>>     // Could happen because of unproduce in vhost_net..
+>>>>     netif_tx_stop_queue
+>>>>     ...
+>>>>     goto drop
+>>>>
+>>>> if ptr_ring_full
+>>>>     netif_tx_stop_queue
+>>>> ...
+>>>>
+>>>> tun_ring_recv/tap_do_read (the implementation for the batched methods 
+>>>> would be done in the similar way):
+>>>> ...
+>>>> ptr_ring_consume
+>>>> if r->consumer_head >= r->consumer_tail
+>>>>     __netif_tx_lock_bh
+>>>>     netif_tx_wake_queue
+>>>>     __netif_tx_unlock_bh
+>>>>
+>>>> This implementation does not need any new ptr_ring helpers and no fancy 
+>>>> ordering tricks.
+>>>> Would this implementation be sufficient in your opinion?
+>>>
+>>>
+>>> Maybe you mean == ? Pls don't poke at ptr ring internals though.
+>>> What are we testing for here?
+>>> I think the point is that a batch of entries was consumed?
+>>> Maybe __ptr_ring_consumed_batch ? and a comment explaining
+>>> this returns true when last successful call to consume
+>>> freed up a batch of space in the ring for producer to make
+>>> progress.
+>>>
+>>
+>> Yes, I mean ==.
+>>
+>> Having a dedicated helper for this purpose makes sense. I just find
+>> the name __ptr_ring_consumed_batch a bit confusing next to
+>> __ptr_ring_consume_batched, since they both refer to different kinds of
+>> batches.
+> 
+> __ptr_ring_consume_created_space ?
+> 
+> /* Previous call to ptr_ring_consume created some space.
+>  *
+>  * NB: only refers to the last call to __ptr_ring_consume,
+>  * if you are calling ptr_ring_consume multiple times, you
+>  * have to check this multiple times.
+>  * Accordingly, do not use this after __ptr_ring_consume_batched.
+>  */
+>
 
-This patch should target to net tree, please add the target tree to the
-subject, for example, "[PATCH net]".
+Sounds good.
 
-> After applying the workaround for err050089, the LS1028A platform
-> experiences RCU stalls on RT kernel. This issue is caused by the
-> recursive acquisition of the read lock enetc_mdio_lock. Here list some
-> of the call stacks identified under the enetc_poll path that may lead to
-> a deadlock:
->=20
-> enetc_poll
->   -> enetc_lock_mdio
->   -> enetc_clean_rx_ring OR napi_complete_done
->      -> napi_gro_receive
->         -> enetc_start_xmit
->            -> enetc_lock_mdio
->            -> enetc_map_tx_buffs
->            -> enetc_unlock_mdio
->   -> enetc_unlock_mdio
->=20
-> After enetc_poll acquires the read lock, a higher-priority writer attempt=
-s
-> to acquire the lock, causing preemption. The writer detects that a
-> read lock is already held and is scheduled out. However, readers under
-> enetc_poll cannot acquire the read lock again because a writer is already
-> waiting, leading to a thread hang.
->=20
-> Currently, the deadlock is avoided by adjusting enetc_lock_mdio to preven=
-t
-> recursive lock acquisition.
->=20
-> Fixes: fd5736bf9f23 ("enetc: Workaround for MDIO register access issue")
+Regarding __ptr_ring_consume_batched:
+Theoretically the consumer_tail before and after calling the method could
+be compared to avoid calling __ptr_ring_consume_created_space at each
+iteration. But I guess it is also fine calling it at each iteration.
 
-Thanks for catching this issue, we also found the similar issue on i.MX95, =
-but
-i.MX95 does not have the hardware issue, so we removed the lock for i.MX95,
-see 86831a3f4cd4 ("net: enetc: remove ERR050089 workaround for i.MX95").
-We also supposed that the LS1028A should have the same issue, but we did
-not reproduce it on LS1028A and did not debug the issue further.
-
-Claudiu previously suspected that this issue was introduced by 6d36ecdbc441
-("net: enetc: take the MDIO lock only once per NAPI poll cycle"). Your patc=
-h
-is basically the same as the one after reverting it. Therefore, the blamed
-commit may be the commit 6d36ecdbc441 not the commit fd5736bf9f23,
-please help check it.
-
-> Signed-off-by: Jianpeng Chang <jianpeng.chang.cn@windriver.com>
-> ---
->  drivers/net/ethernet/freescale/enetc/enetc.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c
-> b/drivers/net/ethernet/freescale/enetc/enetc.c
-> index e4287725832e..164d2e9ec68c 100644
-> --- a/drivers/net/ethernet/freescale/enetc/enetc.c
-> +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-> @@ -1558,6 +1558,8 @@ static int enetc_clean_rx_ring(struct enetc_bdr
-> *rx_ring,
->         /* next descriptor to process */
->         i =3D rx_ring->next_to_clean;
->=20
-> +       enetc_lock_mdio();
-> +
->         while (likely(rx_frm_cnt < work_limit)) {
->                 union enetc_rx_bd *rxbd;
->                 struct sk_buff *skb;
-> @@ -1593,7 +1595,9 @@ static int enetc_clean_rx_ring(struct enetc_bdr
-> *rx_ring,
->                 rx_byte_cnt +=3D skb->len + ETH_HLEN;
->                 rx_frm_cnt++;
->=20
-> +               enetc_unlock_mdio();
->                 napi_gro_receive(napi, skb);
-> +               enetc_lock_mdio();
->         }
->=20
->         rx_ring->next_to_clean =3D i;
-> @@ -1601,6 +1605,7 @@ static int enetc_clean_rx_ring(struct enetc_bdr
-> *rx_ring,
->         rx_ring->stats.packets +=3D rx_frm_cnt;
->         rx_ring->stats.bytes +=3D rx_byte_cnt;
->=20
-> +       enetc_unlock_mdio();
-
-Nit: please add a blank line before "return".
-
->         return rx_frm_cnt;
->  }
->=20
-> @@ -1910,6 +1915,8 @@ static int enetc_clean_rx_ring_xdp(struct enetc_bdr
-> *rx_ring,
->         /* next descriptor to process */
->         i =3D rx_ring->next_to_clean;
->=20
-> +       enetc_lock_mdio();
-> +
->         while (likely(rx_frm_cnt < work_limit)) {
->                 union enetc_rx_bd *rxbd, *orig_rxbd;
->                 struct xdp_buff xdp_buff;
-> @@ -1973,7 +1980,9 @@ static int enetc_clean_rx_ring_xdp(struct enetc_bdr
-> *rx_ring,
->                          */
->                         enetc_bulk_flip_buff(rx_ring, orig_i, i);
->=20
-> +                       enetc_unlock_mdio();
->                         napi_gro_receive(napi, skb);
-> +                       enetc_lock_mdio();
->                         break;
->                 case XDP_TX:
->                         tx_ring =3D priv->xdp_tx_ring[rx_ring->index];
-> @@ -2038,6 +2047,7 @@ static int enetc_clean_rx_ring_xdp(struct enetc_bdr
-> *rx_ring,
->                 enetc_refill_rx_ring(rx_ring, enetc_bd_unused(rx_ring) -
->                                      rx_ring->xdp.xdp_tx_in_flight);
->=20
-> +       enetc_unlock_mdio();
-
-Nit: same as above.
-
->         return rx_frm_cnt;
->  }
-
-
+>>>
+>>> consumer_head == consumer_tail also happens rather a lot,
+>>> though thankfully not on every entry.
+>>> So taking tx lock each time this happens, even if queue
+>>> is not stopped, seems heavyweight.
+>>>
+>>>
+>>
+>> Yes, I agree — but avoiding locking probably requires some fancy
+>> ordering tricks again..
+>>
+>>
+>>>
+>>>
+>>>
+>>>>>> The order of the operations
+>>>>>> +	 * is ensured by barrier().
+>>>>>> +	 */
+>>>>>> +	will_invalidate = __ptr_ring_will_invalidate(&q->ring);
+>>>>>> +	if (unlikely(will_invalidate)) {
+>>>>>> +		rcu_read_lock();
+>>>>>> +		dev = rcu_dereference(q->tap)->dev;
+>>>>>> +		txq = netdev_get_tx_queue(dev, q->queue_index);
+>>>>>> +		stopped = netif_tx_queue_stopped(txq);
+>>>>>> +	}
+>>>>>> +	barrier();
+>>>>>> +	__ptr_ring_discard_one(&q->ring, will_invalidate);
+>>>>>> +
+>>>>>> +	if (unlikely(will_invalidate)) {
+>>>>>> +		if (stopped)
+>>>>>> +			netif_tx_wake_queue(txq);
+>>>>>> +		rcu_read_unlock();
+>>>>>> +	}
+>>>>>
+>>>>>
+>>>>> After an entry is consumed, you can detect this by checking
+>>>>>
+>>>>> 	                r->consumer_head >= r->consumer_tail
+>>>>>
+>>>>>
+>>>>> so it seems you could keep calling regular ptr_ring_consume
+>>>>> and check afterwards?
+>>>>>
+>>>>>
+>>>>>
+>>>>>
+>>>>>> +	spin_unlock(&q->ring.consumer_lock);
+>>>>>> +
+>>>>>> +	return ptr;
+>>>>>> +}
+>>>>>> +
+>>>>>>  static ssize_t tap_do_read(struct tap_queue *q,
+>>>>>>  			   struct iov_iter *to,
+>>>>>>  			   int noblock, struct sk_buff *skb)
+>>>>>> @@ -774,7 +814,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
+>>>>>>  					TASK_INTERRUPTIBLE);
+>>>>>>  
+>>>>>>  		/* Read frames from the queue */
+>>>>>> -		skb = ptr_ring_consume(&q->ring);
+>>>>>> +		skb = tap_ring_consume(q);
+>>>>>>  		if (skb)
+>>>>>>  			break;
+>>>>>>  		if (noblock) {
+>>>>>> @@ -1207,6 +1247,8 @@ int tap_queue_resize(struct tap_dev *tap)
+>>>>>>  	ret = ptr_ring_resize_multiple_bh(rings, n,
+>>>>>>  					  dev->tx_queue_len, GFP_KERNEL,
+>>>>>>  					  __skb_array_destroy_skb);
+>>>>>> +	if (netif_running(dev))
+>>>>>> +		netif_tx_wake_all_queues(dev);
+>>>>>>  
+>>>>>>  	kfree(rings);
+>>>>>>  	return ret;
+>>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>>>>>> index c6b22af9bae8..682df8157b55 100644
+>>>>>> --- a/drivers/net/tun.c
+>>>>>> +++ b/drivers/net/tun.c
+>>>>>> @@ -2114,13 +2114,53 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+>>>>>>  	return total;
+>>>>>>  }
+>>>>>>  
+>>>>>> +static void *tun_ring_consume(struct tun_file *tfile)
+>>>>>> +{
+>>>>>> +	struct netdev_queue *txq;
+>>>>>> +	struct net_device *dev;
+>>>>>> +	bool will_invalidate;
+>>>>>> +	bool stopped;
+>>>>>> +	void *ptr;
+>>>>>> +
+>>>>>> +	spin_lock(&tfile->tx_ring.consumer_lock);
+>>>>>> +	ptr = __ptr_ring_peek(&tfile->tx_ring);
+>>>>>> +	if (!ptr) {
+>>>>>> +		spin_unlock(&tfile->tx_ring.consumer_lock);
+>>>>>> +		return ptr;
+>>>>>> +	}
+>>>>>> +
+>>>>>> +	/* Check if the queue stopped before zeroing out, so no ptr get
+>>>>>> +	 * produced in the meantime, because this could result in waking
+>>>>>> +	 * even though the ptr_ring is full. The order of the operations
+>>>>>> +	 * is ensured by barrier().
+>>>>>> +	 */
+>>>>>> +	will_invalidate = __ptr_ring_will_invalidate(&tfile->tx_ring);
+>>>>>> +	if (unlikely(will_invalidate)) {
+>>>>>> +		rcu_read_lock();
+>>>>>> +		dev = rcu_dereference(tfile->tun)->dev;
+>>>>>> +		txq = netdev_get_tx_queue(dev, tfile->queue_index);
+>>>>>> +		stopped = netif_tx_queue_stopped(txq);
+>>>>>> +	}
+>>>>>> +	barrier();
+>>>>>> +	__ptr_ring_discard_one(&tfile->tx_ring, will_invalidate);
+>>>>>> +
+>>>>>> +	if (unlikely(will_invalidate)) {
+>>>>>> +		if (stopped)
+>>>>>> +			netif_tx_wake_queue(txq);
+>>>>>> +		rcu_read_unlock();
+>>>>>> +	}
+>>>>>> +	spin_unlock(&tfile->tx_ring.consumer_lock);
+>>>>>> +
+>>>>>> +	return ptr;
+>>>>>> +}
+>>>>>> +
+>>>>>>  static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>>>>>>  {
+>>>>>>  	DECLARE_WAITQUEUE(wait, current);
+>>>>>>  	void *ptr = NULL;
+>>>>>>  	int error = 0;
+>>>>>>  
+>>>>>> -	ptr = ptr_ring_consume(&tfile->tx_ring);
+>>>>>> +	ptr = tun_ring_consume(tfile);
+>>>>>>  	if (ptr)
+>>>>>>  		goto out;
+>>>>>>  	if (noblock) {
+>>>>>> @@ -2132,7 +2172,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>>>>>>  
+>>>>>>  	while (1) {
+>>>>>>  		set_current_state(TASK_INTERRUPTIBLE);
+>>>>>> -		ptr = ptr_ring_consume(&tfile->tx_ring);
+>>>>>> +		ptr = tun_ring_consume(tfile);
+>>>>>>  		if (ptr)
+>>>>>>  			break;
+>>>>>>  		if (signal_pending(current)) {
+>>>>>> @@ -3621,6 +3661,9 @@ static int tun_queue_resize(struct tun_struct *tun)
+>>>>>>  					  dev->tx_queue_len, GFP_KERNEL,
+>>>>>>  					  tun_ptr_free);
+>>>>>>  
+>>>>>> +	if (netif_running(dev))
+>>>>>> +		netif_tx_wake_all_queues(dev);
+>>>>>> +
+>>>>>>  	kfree(rings);
+>>>>>>  	return ret;
+>>>>>>  }
+>>>>>> -- 
+>>>>>> 2.43.0
+>>>>>
+>>>
+> 
 
