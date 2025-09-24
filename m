@@ -1,71 +1,108 @@
-Return-Path: <netdev+bounces-225732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A22BB97D21
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 01:49:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03B45B97D6A
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 02:00:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4340D321EF5
-	for <lists+netdev@lfdr.de>; Tue, 23 Sep 2025 23:49:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF2FF3A98A1
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 00:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E8D30BB9E;
-	Tue, 23 Sep 2025 23:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 048894C9D;
+	Wed, 24 Sep 2025 00:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pBTVhZMz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XBA6AimS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1DA82F657A;
-	Tue, 23 Sep 2025 23:49:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF381862;
+	Wed, 24 Sep 2025 00:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758671358; cv=none; b=FuUkED/yG2YVF1H0/IYPtuSQ5p4kkvc7kqjvaG4TG0lJU81GJQ8iYYvoDyrkmc03HMsUk/TwFTPX7lOZAxm5hjYUQfeG4i2kg3sJn/F3MG6zDGNEqulz5m4en+SbPI884OtMUlPQoAfPjKWbjiLlnPanaDfTdeU5KUNUAjvlh1Q=
+	t=1758672022; cv=none; b=oCCi1+gdCGYJZME2gxNhMTOKKDGrNceOtjN6epodfLEtUEuVCORi+G+y/kjcQQB6BgZWDcgm5Xf55jI7oczFMeCRFCoUK7YKJ06FRZTJyDAuZaRubU7nS/canC5hc1b1n/wMFIV+vB/+3UVHnIjk+KK+81BQJf44MSxALYzKRlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758671358; c=relaxed/simple;
-	bh=hrLsdcZp2M4mpYAZYDY8MkkOj2h89n+GgXDk4sCMadw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q2Hk/jQI1gLQUVLxT6vNtSjkJOdxQYC4a/F7998XZsS7IBmUeSEJh7E5Rk2BjNqzrC+Kt44IsQCo5F297ZdS8COI4CbZS1ZlWNeopCJgrV3Z6QznsIF+OusGlsw239Jxv4N5fjaZ/BPipsU8leAI+D+u20wyxDz9U0paVDC0MfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pBTVhZMz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2AC4C4CEF5;
-	Tue, 23 Sep 2025 23:49:17 +0000 (UTC)
+	s=arc-20240116; t=1758672022; c=relaxed/simple;
+	bh=IPOUXZRpPCKo9EsM7cRGDcNzDaViPFcu5W1XAdj51Js=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=r5lJLabVpy9yhPlI41yRrssM6GgNxIWsreDn4IYauDw1ufgGQu0jEOFqfWX3XizFrHpbydEzAR1IFtUFJOlYQEXdo7oL1ssUhFCWN2qlP9QDUvrdHoE7a6lbxKguVb7IL7iCOKiluRfUEr9LbzHeSPjZwPhqKC9mCjzsxLut/eA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XBA6AimS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5053FC4CEF5;
+	Wed, 24 Sep 2025 00:00:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758671358;
-	bh=hrLsdcZp2M4mpYAZYDY8MkkOj2h89n+GgXDk4sCMadw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pBTVhZMzD5E9fQ75vqSi4ZivOhVB0Me1GWubmq2TPY+uYB+zJyNsdyxMeI24ohyEo
-	 rCL+STk8ZJw34dQCXjVQhnm+VLZ8y/EeC/kGE8YKwHbM4x2HVOFGTqmIcYxVWmO0Vs
-	 pTdz2ZhbWtcy2T7y8FBVtR7bm853zjhx97G4vb9zfUDuJYqhzDDbQrqSw5qi9vgHU5
-	 bd/VEAJABdNHHs00zR7y5K9yL2WVjYx7G6faRdec6+zifypAGHj/dKA2LumFfiZkkr
-	 IsNEcol2u3wyjRzx533VEubRe8VEmXU2DrlroZ7wMlHJPEAxbPSunuZJSTJagOmQL2
-	 F/dc8ECJci1EQ==
-Date: Tue, 23 Sep 2025 16:49:16 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: I Viswanath <viswanathiyyappan@gmail.com>
-Cc: petkan@nucleusys.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev,
- david.hunter.linux@gmail.com
-Subject: Re: [PATCH net] net: usb: remove rtl8150 driver
-Message-ID: <20250923164916.5b8c7c28@kernel.org>
-In-Reply-To: <20250923022205.9075-1-viswanathiyyappan@gmail.com>
-References: <20250923022205.9075-1-viswanathiyyappan@gmail.com>
+	s=k20201202; t=1758672022;
+	bh=IPOUXZRpPCKo9EsM7cRGDcNzDaViPFcu5W1XAdj51Js=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XBA6AimSOkk+PviYkned9GW6/ee6J+1DeUr1SZVEOQTgsEG5rnDLSUDyJkSOGt5ad
+	 8vqPUMGcbHuh7F/dX7FnGiJtMWwVlVlyBE/uXc8/olF2aIai6ku8lPzy5HgOd9Q8rV
+	 ellI8/5vsQy+lxf908PReRaJQdZlJSg+dgEvLliwh6SdaD9OPnMHw7wivkQn0pOq+X
+	 XsnsJh39baQgu/b6iry+4nUjTEzNfd391yJs4s/+HtaAvcOH5GpL8WTcIivN46YeGR
+	 743F5ME1jIuf6DVTkaMUcbkYOUobRWl6rpS6a+C9x68KE9k6t5PTdXWt9ZUaO2zNUU
+	 mi7AQkJmyRirA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7115A39D0C20;
+	Wed, 24 Sep 2025 00:00:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/7] can: hi311x: fix null pointer dereference when
+ resuming from sleep before interface was enabled
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175867201903.1967235.17720180740461695292.git-patchwork-notify@kernel.org>
+Date: Wed, 24 Sep 2025 00:00:19 +0000
+References: <20250923073427.493034-2-mkl@pengutronix.de>
+In-Reply-To: <20250923073427.493034-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, chenyufeng@iie.ac.cn
 
-On Tue, 23 Sep 2025 07:52:05 +0530 I Viswanath wrote:
-> Remove the rtl8150 driver, as the most recent device ID was added
-> on 2006-12-04
+Hello:
 
-Thanks for sending this one.
-Based on Michal's reply I guess we need to wait a bit longer.
+This series was applied to netdev/net.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
+
+On Tue, 23 Sep 2025 09:32:47 +0200 you wrote:
+> From: Chen Yufeng <chenyufeng@iie.ac.cn>
+> 
+> This issue is similar to the vulnerability in the `mcp251x` driver,
+> which was fixed in commit 03c427147b2d ("can: mcp251x: fix resume from
+> sleep before interface was brought up").
+> 
+> In the `hi311x` driver, when the device resumes from sleep, the driver
+> schedules `priv->restart_work`. However, if the network interface was
+> not previously enabled, the `priv->wq` (workqueue) is not allocated and
+> initialized, leading to a null pointer dereference.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/7] can: hi311x: fix null pointer dereference when resuming from sleep before interface was enabled
+    https://git.kernel.org/netdev/net/c/6b6968084721
+  - [net,2/7] can: rcar_canfd: Fix controller mode setting
+    https://git.kernel.org/netdev/net/c/5cff263606a1
+  - [net,3/7] can: etas_es58x: populate ndo_change_mtu() to prevent buffer overflow
+    https://git.kernel.org/netdev/net/c/38c0abad45b1
+  - [net,4/7] can: hi311x: populate ndo_change_mtu() to prevent buffer overflow
+    https://git.kernel.org/netdev/net/c/ac1c7656fa71
+  - [net,5/7] can: sun4i_can: populate ndo_change_mtu() to prevent buffer overflow
+    https://git.kernel.org/netdev/net/c/61da0bd4102c
+  - [net,6/7] can: mcba_usb: populate ndo_change_mtu() to prevent buffer overflow
+    https://git.kernel.org/netdev/net/c/17c8d794527f
+  - [net,7/7] can: peak_usb: fix shift-out-of-bounds issue
+    https://git.kernel.org/netdev/net/c/c443be70aaee
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
