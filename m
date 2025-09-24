@@ -1,128 +1,99 @@
-Return-Path: <netdev+bounces-226119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCD20B9C710
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 01:04:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8036B9C71B
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 01:05:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2FB1E7A3D62
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 23:02:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB6921B25960
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 23:06:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6509D28488A;
-	Wed, 24 Sep 2025 23:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1890527B4E8;
+	Wed, 24 Sep 2025 23:05:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UrLRx5BJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o2B+AppW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA5A1D618A
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 23:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D342557A;
+	Wed, 24 Sep 2025 23:05:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758755068; cv=none; b=MB+4DvDqDBJTGsQX3+PruhPr+PqLl8sKGlEC/1Tck5k3lDomgVwKVoS0tdnXMKhFAEPeLjfgJ0fYfNvRS0jCUts/OEJpPqm1pJ3F6hK4jivTY1eB051H6qBRf636yCKnsR3kuoB8Q4Yottivz/g8+LHDedcG3g4yip1Ad7Ehb7Q=
+	t=1758755138; cv=none; b=f8reu2CRJ37vAoupHhtRg2fmupjEV05L0HHTpNwJW8eiUW73IJxeXS+NlBz1JOisVX6GsZgToSnp4UZjcjP6gdCJ3fPlVrqMxMyWpjRNMUrlzrKZscWWa5Dm9PQz6vEY8b24bfDfHb6zl2rxJbYhRdiBlC9EQMJOXmF283xyHU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758755068; c=relaxed/simple;
-	bh=PUMWr1KcbhmB/IOqYU14+Ove2tvnxcz4UzVWOTY2pAU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h4LdEOnQLyXjZnIWRe/yrUZrzmAXq3hcEzwYoCd68vx1vxuWIL0Pzdqt1Dn9mIet/bc/J+xfKBmQO2LwpcdMnirF62p3ZZFWVaS2DyPwUJND223f9ShUi8zdSU/eyr6wNoSAp9koMMJO5nuTFxXO+7Dr3i0ZG+Oq0vN56EpB0B0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UrLRx5BJ; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b33d785db6fso67492766b.2
-        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 16:04:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758755065; x=1759359865; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fnszhabCzVTZUNrenHHSvEHdol2FKszGcCj5sQfSnxE=;
-        b=UrLRx5BJGBQ+LztwingaNwl/eEbPDYfCxN5BFbeySAnj7PRfHBdqI4nH9ckd50Q7Ou
-         Fsd7ZitkKDvkXgsVmSXlKq1OXaSRaWyew2/9zVcEfkeInTmmWTa9Y3Zkuxf0zZ1Slf0A
-         fAoN0QLwbZVBuTeRoSHoCj9rQRIA+GXDNTxRhuGOpvs4QdQLhmx+cUxasqlGFSySUX7U
-         NXpOG5asC4rt78A6A/N+TJhYMo9UVQ36kXuChSrFwfxOLTbTIMHD6B5R3REJiZmvVDIO
-         MhUj8AWSqACpEgDeX8BkbEfFgE4yCH5AYTIk+fLjzk6ls0A3z8oX4iq8oMSI2Cw17tzV
-         YHZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758755065; x=1759359865;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fnszhabCzVTZUNrenHHSvEHdol2FKszGcCj5sQfSnxE=;
-        b=bJaAp3SpdurTeHj6SlOZfKCoArwawlQBpfkWu25+cjmCwIuA2EDKOGucrrG6NG6y4m
-         PC3VjTtgS/huN9Knnouv7Rf0abfa616OODb4KF7M2CqZQb1zOkxXXaKGgmYukkFZjYEm
-         CL/wbVj8+03Wz68dzmeMFs1TP6WlBlTEDEX+v/HsGPW7LpLBURBLIIQ5cYSgxB+WLVSY
-         iWRv7X0NC0RyvpjESyDaxYt85XIHSw7RLz1KWXNoOwBfn1/gEdLpamvLelq+IhP7BA4U
-         ZMeBF0V07irPWo0tWoKtYshYjVCTPpj/YqIGNWZlxbXKcNx/Nq8Yyny64HJ1jvqOurQz
-         ZF6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVIK2GEYmjqawalLvVylkPstvzZ+s/YHeN205vSUzm0Sh+U4fqOnE/koeOQowLRwQ6FXuaMKSo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySZOiTOG68J7OPj4tLe1g+x5631SSlK+6PK752aDAQcpMWxQZK
-	Wn87KTN8zunds/0l190Ngiu08QkgoS44UfgcDPZg6XLqccy3piiZp+x7
-X-Gm-Gg: ASbGncuBJqg49oB27IW2RZbHiz8oUY96qR6Y9ANCFudHNfSgTwLw0v3OHBtT5r36pNM
-	hPKS4O+ww7DgnLXA+IkHbvb+rtLjcvifhqDI3uH2LkeHDb+bWuqADRdIe8tbJNhm1OIS/PnbkEL
-	O4a/EdHsQaQDNGW1RMJUuegDs5xHggW77ZI4HIVfShFrWuuUSpMwaQpC9k+NRw9hRPMDwnKsAPx
-	6it3J7ayhg7A9ajTTibGG9vX++UsMIA55J7mVmqUEXxe5aOzc8OleNL/YHPt/KSuN6fDH79SoSM
-	KxaaoyTOlT91t83rMM8IZEpiNsvTV/wdKrrKXJ7lHqNqXcR4mO6W11z1XnH4DbNwWU51tDYpce5
-	bsni9B4YQqGTe/x0YejbvA5xW5Vo62n1hzRHtBozEyffI+H1nr7NHlo9uZfGg/5qBvE0xeZuwkD
-	c4iA9dnQ36terErZal
-X-Google-Smtp-Source: AGHT+IEppvE3960x6XIR7URKU78EOKSYRIAcJdBEOqPrulJnmbx5gMilskPWXare99l4J1hqwdTmQw==
-X-Received: by 2002:a17:907:6093:b0:b04:6a58:560b with SMTP id a640c23a62f3a-b34ba93ce11mr146872666b.39.1758755064614;
-        Wed, 24 Sep 2025 16:04:24 -0700 (PDT)
-Received: from alessandro-pc.station (net-2-37-207-41.cust.vodafonedsl.it. [2.37.207.41])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b353f772528sm34363266b.37.2025.09.24.16.04.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Sep 2025 16:04:24 -0700 (PDT)
-From: Alessandro Zanni <alessandro.zanni87@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org
-Cc: Alessandro Zanni <alessandro.zanni87@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] selftest: net: Fix error message if empty variable
-Date: Thu, 25 Sep 2025 01:04:07 +0200
-Message-ID: <20250924230413.75246-1-alessandro.zanni87@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1758755138; c=relaxed/simple;
+	bh=5nkOcXtCrUSyUylrHVFJ3GThi+rvDI6+s49nr6gVhIE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TuOHLXdVwATsPgLkMWJmSq1VhEWKj3iaLtYp4Ci/NebEQ/yPl+2hXKcvYBaa+mVrv6VqVx1EtCOiE1Z+IFWnYonh4htQLioDa+kW6Fi+2lOkg+gs54ueNrJttbR9IW4hAg5UZMdcaT3KsmNIDLWb/0tA5PJl5nVWUqzi2ga4khc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o2B+AppW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABB16C4CEE7;
+	Wed, 24 Sep 2025 23:05:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758755137;
+	bh=5nkOcXtCrUSyUylrHVFJ3GThi+rvDI6+s49nr6gVhIE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=o2B+AppW01bYd+MqBDecD+SP/V9GbfDTxn/PBf73IXN0zz71y/75bOrFOH1ffL15l
+	 USGG9YEhz/ZHlUOgLnforvbQS70LJIVGswy1eM+35tuLEoraYhcsC4TOMRB/nDPuP9
+	 UADMv215SbIq3RyGg+xQmp5dQE3fV9nuKNwp0YJI2/OLnxu07gQV3lZez3r72J2WPx
+	 HSVgGio6T3k726XlmEkC3RNro04vRJDTrStw/cz/LJD4R/4yLir25W9T8CwRkGhQtw
+	 zFjHFI+2VjPlHvpJveCKeZrMfZC6ylNEHRf2mC9dv1I/l9MGMjgTl68qnLo78IAmRP
+	 QtvXZM8V6kR2g==
+Date: Wed, 24 Sep 2025 16:05:35 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
+Cc: Rohan G Thomas via B4 Relay
+ <devnull+rohan.g.thomas.altera.com@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <Jose.Abreu@synopsys.com>, Rohan
+ G Thomas <rohan.g.thomas@intel.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Matthew
+ Gerlach <matthew.gerlach@altera.com>, "Ng, Boon Khai"
+ <boon.khai.ng@altera.com>
+Subject: Re: [PATCH net v2 2/2] net: stmmac: Consider Tx VLAN offload tag
+ length for maxSDU
+Message-ID: <20250924160535.12c14ae9@kernel.org>
+In-Reply-To: <a914f668-95b2-4e6d-bd04-01932fe0fe48@altera.com>
+References: <20250915-qbv-fixes-v2-0-ec90673bb7d4@altera.com>
+	<20250915-qbv-fixes-v2-2-ec90673bb7d4@altera.com>
+	<20250917154920.7925a20d@kernel.org>
+	<20250917155412.7b2af4f1@kernel.org>
+	<a914f668-95b2-4e6d-bd04-01932fe0fe48@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Fix to avoid cases where the `res` shell variable is
-empty in script comparisons.
+On Wed, 24 Sep 2025 10:24:44 +0530 G Thomas, Rohan wrote:
+> >> Is the device adding the same VLAN tag twice if the proto is 8021AD?
+> >> It looks like it from the code, but how every strange..
+> >>
+> >> In any case, it doesn't look like the driver is doing anything with
+> >> the NETIF_F_HW_VLAN_* flags right? stmmac_vlan_insert() works purely
+> >> off of vlan proto. So I think we should do the same thing here?  
+> > 
+> > I suppose the double tagging depends on the exact SKU but first check
+> > looks unnecessary. Maybe stmmac_vlan_insert() should return the number
+> > of vlans it decided to insert?
+> >   
+> 
+> I overlooked the behavior of stmmac_vlan_insert(). It seems the hardware
+> supports inserting only one VLAN tag at a time, with the default setting
+> being SVLAN for 802.1AD and CVLAN for 802.1Q. I'll update the patch to
+> simply add VLAN_HLEN when stmmac_vlan_insert() returns true. Please let
+> me know if you have any further concerns.
 
-The issue can be reproduced with the command:
-make kselftest TARGETS=net
+SG, no further concerns.
 
-It solves the error:
-./tfo_passive.sh: line 98: [: -eq: unary operator expected
-
-Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
----
- tools/testing/selftests/net/tfo_passive.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/tfo_passive.sh b/tools/testing/selftests/net/tfo_passive.sh
-index 80bf11fdc046..2655931b2396 100755
---- a/tools/testing/selftests/net/tfo_passive.sh
-+++ b/tools/testing/selftests/net/tfo_passive.sh
-@@ -95,7 +95,7 @@ wait
- res=$(cat $out_file)
- rm $out_file
- 
--if [ $res -eq 0 ]; then
-+if [ -n "$res" ] && [ $res -eq 0 ]; then
- 	echo "got invalid NAPI ID from passive TFO socket"
- 	cleanup_ns
- 	exit 1
--- 
-2.43.0
-
+Please make sure to CC "Ng, Boon Khai" <boon.khai.ng@altera.com>
+who wrote the VLAN support (IIRC).
 
