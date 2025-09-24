@@ -1,122 +1,201 @@
-Return-Path: <netdev+bounces-226041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C627B9B1F9
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:52:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E5C5B9B1D8
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:51:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67C074E3A30
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 17:51:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F23F1B267BF
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 17:51:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01F733164C4;
-	Wed, 24 Sep 2025 17:51:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF3C315D5B;
+	Wed, 24 Sep 2025 17:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CgnCzGBT"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="QczILfrf";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Bdq+eCwb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266973161AC
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 17:51:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB8722068B;
+	Wed, 24 Sep 2025 17:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758736273; cv=none; b=CZUKHDpGJ9Xff4vUrk7PIIVyMuEWbQ/sugUpqb/NZPwi26aBia7DMTigWEK2ely85bwmq7B1EfIDFvyfeP7xgJjL03fMJxyXlQGYfL/mlE6c3oejz+IMr0y4Exc9RTMmpC8fruh3ekQQn0pMXqIUs+OORF+Eu9AgeqZTov693HU=
+	t=1758736265; cv=none; b=Eh8p9hdxctzKGnD7xst7FGvi82FFFUpxfELw12k52Myho1PwgOf2QRAB908c+xLdZnLmiKw1FU6+Ae0jPqlPSaTvqIm79kFcdZGD3DEcBGCzJtSkpJhFb8tRx0SCLDqv/df0eopEMWxMDBwJjbX+A3grl/2SXAdjNvH8XOJpjkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758736273; c=relaxed/simple;
-	bh=irDF2NGT01tFVGcKv8Aw+yXSxcZKqrHPtgX88XxrmqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rhuXg1TammwC23niXRNcp8g71fGzggtRxUqVX20DpDzRSvlPwVQjEMB4k6KumXQrGtefZmlCX3iLGyPkoh3MZ9TDztWdeoAbDSfApJZgT8rFcQ6bceckcQYKXqht1ZW+RFqfpxqfIIa2vTlw4kDWFVG218GnTBmwCZKClVyMTBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CgnCzGBT; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-57a59124323so40469e87.2
-        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 10:51:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758736270; x=1759341070; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pquafnPzR8S6cEVo4ZSJasnk4ic+4rsTQNuSE4g5qVk=;
-        b=CgnCzGBTMYiRzSQuPlR/SAm+ecE/5DkRsGCNRhjv5VzXZMroiPF+xV8XhF9/Xt2utA
-         Oy33mz36r66ywcpgpc/+fYQ8wNQV/8beQSDK7ahgsx8/GIMHSA0Xj7DRNMrC/jXiGGPq
-         OOLmGeZW87uw9A20JrLRGU9yffNA3foBoe6AokC6okFGqoegv95dK0s09+oON5kD4nqT
-         j3CxD2WEoDGNEV3dHaEDa9LwHxyVx0aA5+vX3vMGSeD5LnCsOT3gi6jOc3dCiVzzp4v8
-         f1sH0GdTz//2gT7konbV3QrvIBOYmA+b5IS1a8NeZZOdwwn7mVqi/FE+V9OgWukIifkS
-         miMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758736270; x=1759341070;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pquafnPzR8S6cEVo4ZSJasnk4ic+4rsTQNuSE4g5qVk=;
-        b=Ic98Qn13krqeisdzSRCa1Qb1YCV5b7i6Ca0zNcmAZ9FxxSdPexuxD2QM+PWs1cXxWZ
-         1MhHNcOIkL4uX/uRfzJ8C94ELQ/Gjyid221t2yRbaLgrsVZwM3eczpcU+gtZDao+Yz3m
-         vXRDuFU4Gi2si5rKYZkcY9yyEv6vV97al+kUXTXIq3RvoPAf0mMV7Y5DOQC3BHDWpl8o
-         dJj2EDSONLiHKf0XMpOOh4dnacnEJ5YuLghSfMdiMQk707u76ufWgwAcVdRwXdPRb+La
-         QUj8pM7wZ6UgimugjOcsPQ8tqVfIUvYfBD3ukbvDkMwCwm4Nxa9xkYyRdGjNSMQGI0MK
-         nhqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU7bkxwysPWppwVapvW2/mqXm3TBA77+PX3RelAuAJ00TdCbx6pfyZILRAqZcLg7SLwPQ1PJgk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhUn2N4rLgddB2v6F8qz2133bzXuIdbxc8AFaGNype5HNBMbsq
-	G1gZ8hMtI9P2jE89b48g6VRWz1SjeIX2S8LDD+kJzhcj11ux7z4GySJ9
-X-Gm-Gg: ASbGncuWnoOTjBhF42KyjgSf8yHfPYE27DpUtUuhCnuql7zSRCtFj3a3UdLFRqLQNkr
-	JZYmR5WZU59d0ZMx/Rt84uGD7AneB1/GtXxRgt5GHlCouVfspjxBIDtQhazWZTTJJKm3iUClfb1
-	x7VIIberQsPDbaOcO8m3emAd0YlnSE3nDPjvd6AK/e7v4FSa760CRC/pMmVjKgkWVRr458MYKim
-	5zIiwXKKuTykf07fwl8ejR8niG3w3BHPeC/hSvgC8LQMXYwkcxxi2j/fbSN7ozP6BgO7zmxywdk
-	tb7D89qLAos1xR+b9uk6GYIPHAotC3qbg6jDJrIWmbrtnBxgOMYkP1rnJrXHIJfPHLtugItkv13
-	zYE635ppRMwiVsu8CNYLIOl2g9gbIheXplAY=
-X-Google-Smtp-Source: AGHT+IFHPEAgajKTiH7Ls3GaEiRPS2Tkaju+/hcYdJg8P1mtwrJiU+kcknlPPPv2gncoIiP6NgFWvg==
-X-Received: by 2002:a05:6512:ac5:b0:55f:6d6e:1e97 with SMTP id 2adb3069b0e04-582d4257f20mr104190e87.52.1758736270018;
-        Wed, 24 Sep 2025 10:51:10 -0700 (PDT)
-Received: from foxbook (bfe191.neoplus.adsl.tpnet.pl. [83.28.42.191])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-578a5f44740sm5227645e87.14.2025.09.24.10.51.08
-        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
-        Wed, 24 Sep 2025 10:51:09 -0700 (PDT)
-Date: Wed, 24 Sep 2025 19:50:55 +0200
-From: Michal Pecio <michal.pecio@gmail.com>
-To: Petko Manolov <petkan@nucleusys.com>
-Cc: I Viswanath <viswanathiyyappan@gmail.com>, kuba@kernel.org,
- edumazet@google.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- pabeni@redhat.com, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
- linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com,
- syzbot+78cae3f37c62ad092caa@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v3] net: usb: Remove disruptive netif_wake_queue in
- rtl8150_set_multicast
-Message-ID: <20250924195055.15735499.michal.pecio@gmail.com>
-In-Reply-To: <20250924135814.GC5387@cabron.k.g>
-References: <20250924134350.264597-1-viswanathiyyappan@gmail.com>
-	<20250924135814.GC5387@cabron.k.g>
+	s=arc-20240116; t=1758736265; c=relaxed/simple;
+	bh=rtsBUMiaIy6TYtCPgN29kdioK8qxXz4HS+p0U7bKED8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nWwctPpr5tUEXg8HBeOLDED5++iAAbeoW3c9of74I79qfEGjDLvfjNIfgesLW6Mc4kjryTN1G66OkXRClc/FPAA/tYQjJfFBg7Do1ZhYiM8lY2ormAmhdJV1/ByNkKgSuIRb85C93Epzza0BT/rqYrij24G5GLonRvh30NO9fAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=QczILfrf; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Bdq+eCwb; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfout.phl.internal (Postfix) with ESMTP id ACEB2EC011B;
+	Wed, 24 Sep 2025 13:50:59 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Wed, 24 Sep 2025 13:50:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1758736259; x=
+	1758822659; bh=PiczgBaiQtiGl2TfSKm/7nhe5+iR70Rhzl3gA9tA4t8=; b=Q
+	czILfrfaCryzpAn7FTDCOkU4mXFif1KGRsJFf+nqhKkK2wyjlVimQekZthRw/X0c
+	1cgpuwrJGpZYabC4RRifk3SAkpomHJ7psEOt5E3CRREQBnDGFQD8630/RhgCHWnf
+	49HWZfgInWzF39gcMimN5iMrj7qHm+4l9XWBB+CWhpLbKuHezAVMHkE53eFhweCg
+	Xdk7TyMqSCBqNciFL6sdW+VoDtrXie/AE+OK/qWuKZ3wmnI2qbqniwqewACVq/kd
+	oJ3SI0We2uDwr5x8ufolHL2NKSrhxzsj8K9+obCdrnbX96Wpi+oSkTG4rP13ECM2
+	7NaG73PZgg7H0LnmOxyTw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1758736259; x=1758822659; bh=PiczgBaiQtiGl2TfSKm/7nhe5+iR70Rhzl3
+	gA9tA4t8=; b=Bdq+eCwbxtxzRNOsR8717EgGC5QolF7SafR6Wo0TrBqyBvg9hS3
+	Rb1daOyUTYG0M1p0hevo7DXVqNKMyWSb0+HLHWHzUAjoE/9YG3479mQuet1S/kBf
+	e0jLVQorcI0YhADKZLt5DN7mAXCYdK7MJayZcYN1ZvYg0bKEe3q6f4gvba5Zepa/
+	oYajmRToWgT1H2MWdKTg3ikXS1wI9IMrNRPua8b4rcbHKcvPHLu7JUe6ETBtgoUx
+	J5zv2AvzNCu95C6Op0mJkdLAB/QfzJctUrTS06toDXT6X2uurWjWSWbxfAfsEaSI
+	NWa+6zs59LceIYGNZ4+Qaiqh0LVX9O54pjQ==
+X-ME-Sender: <xms:gy_UaORv2Dmfrkm6tT1VOuUYQo_AIqpUZ1_DV65rQt6wrDyVmMR0Ug>
+    <xme:gy_UaAL8vjSu9UE3DI2KoCD42JGXQ3H_Xi2hO5Vlxxv1YKM5fWtIvSud5nSv_qqOD
+    uxR6yM7EFzAQymvX7BGO5BmIKowKcEiljYix5oTxar68wJDrMXkhc0>
+X-ME-Received: <xmr:gy_UaASqTlwzJSltULq9NEnyq7F2ljIXeejhvzcdAfrOu_GRF1nt8oXB9VR2>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdeigedvhecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
+    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
+    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudegpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopeifihhlfhhrvggurdhophgvnhhsohhurhgtvg
+    esghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopehlihhnuhigqdguohgtsehvghgvrhdrkhgvrhhnvghlrd
+    horhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghl
+    rdhorhhgpdhrtghpthhtoheplhhinhhugidqkhhsvghlfhhtvghsthesvhhgvghrrdhkvg
+    hrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvght
+    pdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhope
+    hkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgr
+    thdrtghomh
+X-ME-Proxy: <xmx:gy_UaIIQI7XWNZ459IUHenWHcPHY-1v6-bG-p13xn73_B9DvTLC4bg>
+    <xmx:gy_UaD9zYUFp84SD5QahjPOYQvCHKcxMFjlhARyRuX5sCKOw9qZhKA>
+    <xmx:gy_UaPLPg18Q85Q3RIlk2lBsgQujyFxFv-dFJUvvCGCxZfaL1xeTmg>
+    <xmx:gy_UaCH7NTsy7RvWNVxA4BCzhEoZbAMr5rOVA7oP4feE5luMjAim_g>
+    <xmx:gy_UaFJ1flSdn3jq17m_cxUMK9qM0eOzppBQZJYAfsTaH9KdgdyhIB1b>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 24 Sep 2025 13:50:58 -0400 (EDT)
+Date: Wed, 24 Sep 2025 19:50:56 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Wilfred Mallawa <wilfred.opensource@gmail.com>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+	john.fastabend@gmail.com, shuah@kernel.org,
+	Wilfred Mallawa <wilfred.mallawa@wdc.com>
+Subject: Re: [PATCH v4 1/2] net/tls: support maximum record size limit
+Message-ID: <aNQvgD7AvFe7-sAv@krikkit>
+References: <20250923053207.113938-1-wilfred.opensource@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250923053207.113938-1-wilfred.opensource@gmail.com>
 
-On Wed, 24 Sep 2025 16:58:14 +0300, Petko Manolov wrote:
-> netif_[stop|wake]_queue() should have been removed from rtl8150_set_multicast()
-> long time ago, but somehow it has slipped under the radar.  As far as i can tell
-> this is the only change needed.
+2025-09-23, 15:32:06 +1000, Wilfred Mallawa wrote:
+> diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+> index a3ccb3135e51..09883d9c6c96 100644
+> --- a/net/tls/tls_main.c
+> +++ b/net/tls/tls_main.c
+> @@ -544,6 +544,31 @@ static int do_tls_getsockopt_no_pad(struct sock *sk, char __user *optval,
+>  	return 0;
+>  }
+>  
+> +static int do_tls_getsockopt_tx_record_size(struct sock *sk, char __user *optval,
+> +					    int __user *optlen)
+> +{
+> +	struct tls_context *ctx = tls_get_ctx(sk);
+> +	int len;
+> +	/* TLS 1.3: Record length contains ContentType */
+> +	u16 record_size_limit = ctx->prot_info.version == TLS_1_3_VERSION ?
+> +				ctx->tx_record_size_limit + 1 :
+> +				ctx->tx_record_size_limit;
 
-Hi,
+nit: reverse xmas tree
 
-Glad to see that you are still around.
 
-Do you happen to remember what was the reason for padding all TX frames
-to at least 60 bytes?
+[...]
+> +static int do_tls_setsockopt_tx_record_size(struct sock *sk, sockptr_t optval,
+> +					    unsigned int optlen)
+> +{
+> +	struct tls_context *ctx = tls_get_ctx(sk);
+> +	struct tls_sw_context_tx *sw_ctx = tls_sw_ctx_tx(ctx);
+> +	u16 value;
+> +
+> +	if (sw_ctx->open_rec)
+> +		return -EBUSY;
+> +
+> +	if (sockptr_is_null(optval) || optlen != sizeof(value))
+> +		return -EINVAL;
+> +
+> +	if (copy_from_sockptr(&value, optval, sizeof(value)))
+> +		return -EFAULT;
+> +
+> +	if (value < TLS_MIN_RECORD_SIZE_LIM)
+> +		return -EINVAL;
+> +
+> +	if (ctx->prot_info.version == TLS_1_2_VERSION &&
+> +	    value > TLS_MAX_PAYLOAD_SIZE)
+> +		return -EINVAL;
+> +
+> +	if (ctx->prot_info.version == TLS_1_3_VERSION &&
+> +	    value - 1 > TLS_MAX_PAYLOAD_SIZE)
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * For TLS 1.3: 'value' includes one byte for the appended ContentType.
+> +	 * Adjust the kernel's internal plaintext limit accordingly.
+> +	 */
+> +	ctx->tx_record_size_limit = ctx->prot_info.version == TLS_1_3_VERSION ?
+> +				    value - 1 : value;
+> +
+> +	return 0;
+> +}
+> +
+>  static int do_tls_setsockopt(struct sock *sk, int optname, sockptr_t optval,
+>  			     unsigned int optlen)
+>  {
+> @@ -833,6 +898,9 @@ static int do_tls_setsockopt(struct sock *sk, int optname, sockptr_t optval,
+>  	case TLS_RX_EXPECT_NO_PAD:
+>  		rc = do_tls_setsockopt_no_pad(sk, optval, optlen);
+>  		break;
+> +	case TLS_TX_RECORD_SIZE_LIM:
+> +		rc = do_tls_setsockopt_tx_record_size(sk, optval, optlen);
 
-This was apparently added in version "v0.5.0 (2002/03/28)".
+I think we want to lock the socket here, to avoid any concurrent send()?
+Especially now with the ->open_rec check.
 
-I'm yet to test the exact effect of this hack (will the HW really send
-frames with trailing garbage?) and what happens if it's removed (maybe
-nothing bad? or was there a HW bug?), but this part caught my attention
-because I think nowadays some people could consider it "information
-leak" ;) And it looks like a waste of bandwidth at least.
 
-Regards,
-Michal
+> @@ -1111,6 +1180,11 @@ static int tls_get_info(struct sock *sk, struct sk_buff *skb, bool net_admin)
+>  			goto nla_failure;
+>  	}
+>  
+> +	err = nla_put_u16(skb, TLS_INFO_TX_RECORD_SIZE_LIM,
+> +			  ctx->tx_record_size_limit);
+
+I'm not sure here: if we do the +1 adjustment we'd be consistent with
+the value reported by getsockopt, but OTOH users may get confused
+about seeing a value larger than TLS_MAX_PAYLOAD_SIZE.
+
+-- 
+Sabrina
 
