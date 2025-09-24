@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-225866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73721B98D75
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 10:24:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5290B98D9A
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 10:25:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9F242E3732
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 08:24:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13F944C4FF8
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 08:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A592BE7B4;
-	Wed, 24 Sep 2025 08:21:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 144BF2BFC9B;
+	Wed, 24 Sep 2025 08:21:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1862882BB
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 08:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5EA288524
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 08:21:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758702115; cv=none; b=Z5+FMvPrF8RINSnTJHd1x9q/uwbTdEWononvdcKO7JoCPDCJZVFNYCSTOG8Og0XrI3mZLtauYNcZYhYy5hRIl21PPyttq6Hsxms2ehynPafv9kqmWOtREQ16vWDfUDkqyE821R3J0LgrtVxEuqfMzbmmjqxEaZFB8lKEXPAwa5E=
+	t=1758702116; cv=none; b=U82mattPKLiaB5a+gErpom5M3TrGFuY+VzpLZgX0VuBzDuVEYcwBXmKtiDZ3lDpv02mO/s6hPDCiViCT05DBDlKEmS7YugNbxIE3lZ90T5h0/IuftwbU+gsRDqWMKfgFZTNlM+alkpmXxJqgAtdYew7G57PuMciAFdrrGa3umn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758702115; c=relaxed/simple;
-	bh=1hMgtbcpCIHT85BZOKOYvog0eBg6GGoFYXVxqO9eXqk=;
+	s=arc-20240116; t=1758702116; c=relaxed/simple;
+	bh=8kazcmo+vnijgvTt+pY6bcaPfuTPkvoiYz3DMDAHuiE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=M4aeMVEw4Ymdj4eGMhQDskproK8vKSxJSfA1dGp3qxp8e1ZHkbXRn5pglaKBRM/pzMnaO1O2/YjPx1/rhlOJXvZYdLcbRym6f7YJEj5jwZ423lwJGGnpmBxpyQ5xKOdHOdTL+t4eX0+nR/MhYxbcnnslYg/AH++tZj+g6Bimd54=
+	 MIME-Version; b=eh815vK9VNyALkXijaMoVQV7FPT4+EUu/YbCo/oOluldHFR8nKJf9L0XkblTXggXAh2cMK+K7v/L8qDh/igyFivaVEldKlYGkpXzupLCqDRvssBdmzZbb/1hczI4+OEs+bidG8NXfAWC6dMw8v4icKrABFcPdCdtX9ADr88nTqQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,19 +33,19 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1v1Kkd-0001EX-Rk; Wed, 24 Sep 2025 10:21:23 +0200
+	id 1v1Kke-0001Fm-Os; Wed, 24 Sep 2025 10:21:24 +0200
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1v1Kkd-000Dw0-00;
+	id 1v1Kkd-000Dw4-0n;
 	Wed, 24 Sep 2025 10:21:23 +0200
 Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
 	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 63B964788AC;
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 776134788AE;
 	Wed, 24 Sep 2025 08:21:10 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -55,9 +55,9 @@ Cc: davem@davemloft.net,
 	kernel@pengutronix.de,
 	Vincent Mailhol <mailhol@kernel.org>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 36/48] can: netlink: remove useless check in can_tdc_changelink()
-Date: Wed, 24 Sep 2025 10:06:53 +0200
-Message-ID: <20250924082104.595459-37-mkl@pengutronix.de>
+Subject: [PATCH net-next 37/48] can: netlink: make can_tdc_changelink() FD agnostic
+Date: Wed, 24 Sep 2025 10:06:54 +0200
+Message-ID: <20250924082104.595459-38-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250924082104.595459-1-mkl@pengutronix.de>
 References: <20250924082104.595459-1-mkl@pengutronix.de>
@@ -75,38 +75,58 @@ X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 From: Vincent Mailhol <mailhol@kernel.org>
 
-can_tdc_changelink() return -EOPNOTSUPP under this condition:
-
-  !tdc_const || !can_fd_tdc_is_enabled(priv)
-
-But this function is only called if the data[IFLA_CAN_TDC] parameters
-are provided. At this point, can_validate_tdc() already checked that
-either of the tdc auto or tdc manual control modes were provided, that
-is to say, can_fd_tdc_is_enabled(priv) must be true.
-
-Because the right hand operand of this condition is always true,
-remove it.
+can_tdc_changelink() needs to access can_priv->fd making it
+specific to CAN FD. Change the function parameter from struct can_priv
+to struct data_bittiming_params. This way, the function becomes CAN FD
+agnostic and can be reused later on for the CAN XL TDC.
 
 Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
-Link: https://patch.msgid.link/20250923-canxl-netlink-prep-v4-8-e720d28f66fe@kernel.org
+Link: https://patch.msgid.link/20250923-canxl-netlink-prep-v4-9-e720d28f66fe@kernel.org
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/dev/netlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/can/dev/netlink.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/can/dev/netlink.c b/drivers/net/can/dev/netlink.c
-index c212c7ff26cd..17ed52d238e3 100644
+index 17ed52d238e3..abff7b84fdce 100644
 --- a/drivers/net/can/dev/netlink.c
 +++ b/drivers/net/can/dev/netlink.c
-@@ -180,7 +180,7 @@ static int can_tdc_changelink(struct can_priv *priv, const struct nlattr *nla,
- 	const struct can_tdc_const *tdc_const = priv->fd.tdc_const;
+@@ -172,12 +172,13 @@ static int can_validate(struct nlattr *tb[], struct nlattr *data[],
+ 	return 0;
+ }
+ 
+-static int can_tdc_changelink(struct can_priv *priv, const struct nlattr *nla,
++static int can_tdc_changelink(struct data_bittiming_params *dbt_params,
++			      const struct nlattr *nla,
+ 			      struct netlink_ext_ack *extack)
+ {
+ 	struct nlattr *tb_tdc[IFLA_CAN_TDC_MAX + 1];
+ 	struct can_tdc tdc = { 0 };
+-	const struct can_tdc_const *tdc_const = priv->fd.tdc_const;
++	const struct can_tdc_const *tdc_const = dbt_params->tdc_const;
  	int err;
  
--	if (!tdc_const || !can_fd_tdc_is_enabled(priv))
-+	if (!tdc_const)
- 		return -EOPNOTSUPP;
+ 	if (!tdc_const)
+@@ -215,7 +216,7 @@ static int can_tdc_changelink(struct can_priv *priv, const struct nlattr *nla,
+ 		tdc.tdcf = tdcf;
+ 	}
  
- 	err = nla_parse_nested(tb_tdc, IFLA_CAN_TDC_MAX, nla,
+-	priv->fd.tdc = tdc;
++	dbt_params->tdc = tdc;
+ 
+ 	return 0;
+ }
+@@ -382,8 +383,8 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
+ 		memset(&priv->fd.tdc, 0, sizeof(priv->fd.tdc));
+ 		if (data[IFLA_CAN_TDC]) {
+ 			/* TDC parameters are provided: use them */
+-			err = can_tdc_changelink(priv, data[IFLA_CAN_TDC],
+-						 extack);
++			err = can_tdc_changelink(&priv->fd,
++						 data[IFLA_CAN_TDC], extack);
+ 			if (err) {
+ 				priv->ctrlmode &= ~CAN_CTRLMODE_FD_TDC_MASK;
+ 				return err;
 -- 
 2.51.0
 
