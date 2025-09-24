@@ -1,180 +1,124 @@
-Return-Path: <netdev+bounces-225932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A97CB997EB
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 12:52:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BCFEB99902
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 13:21:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAC60326D96
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 10:52:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 510B92A2D6B
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 11:21:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A85742E1EEC;
-	Wed, 24 Sep 2025 10:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1EC2E425E;
+	Wed, 24 Sep 2025 11:21:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dG8VUQLE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YdWCQrqh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833D22E1731
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 10:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA9E2DFA46
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 11:21:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758711146; cv=none; b=ogw/NUyQhRqFLEnG7QiR22K8K6Qqmw9mRhYTdwtYw8x7YgUDsd9fgWgHkt5IoNIxsH8R2hbXbYA+3tqfNJXdU8KDfIcApNwDAfzpUliDt7qDYGgCYogPIv3XmQ9dsL/F0UEJ8sDFu1r1WmnbFAMW+8oGq/hVKrAuDjhvH93R6aI=
+	t=1758712913; cv=none; b=mO1ZwCoR7dPXaYm6IBvEQ7Ne6+S4oM9HIgRkZAPiT1hCsA7DjxRWhRqfE10CaGMwPm4GeFLJ0fhW3zS/9I0v6q7MS3iwHcAZoDZWSoKj62lFsHOH/eQ+95ZDAwhGWlg2fWOfd0WJbiUK/+fUVO2NIG588rvRt/S9iA6PTl1H5hE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758711146; c=relaxed/simple;
-	bh=xCDPc5y7d7WCp3lQou1gJLzgPsjIpA8s9dbP+kcvNIg=;
+	s=arc-20240116; t=1758712913; c=relaxed/simple;
+	bh=YXL4lPnbAJH3NIq7JPnUD3UdEKqqq1Cg32Z9C3s9+s4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eP2PwyZXXr5GbBr1Gdle0p+DC6amqz80bhsZHrN2l8w7D1kqPHHuvwW23o8/4RV8nAO7mk73hCd/GvJlJOtLvuuSjp/fzAX1rKzt0rl6aYLQu0hPI/Ht3LZRjxMB5TfwcJZjSmimkWvrUcU+8wXJBFsefDmI5mHgDUwq4Cv/gow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dG8VUQLE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40E8EC2BC9E
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 10:52:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758711146;
-	bh=xCDPc5y7d7WCp3lQou1gJLzgPsjIpA8s9dbP+kcvNIg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=dG8VUQLEQO6rumXUWPyuJMbAWM35Bj7FP4hq3VC6xyhrgmfldUcvL3iGQJbeF6q7l
-	 9xFhsmEJ3RUeZyCOnMIofh4uneMMaAIRZjh9gO30VdH73LsYfmVCYujLqm/C0p7t5G
-	 NjSWwgRC/7BEliaM1n5JKfEPzDHaHwpMIYpz6Jy5AaIUyWb3f5540+I1OjGVpi0+eF
-	 LntdgaY81sDWTrir4C5kEe6qPIHYy33EzYCtlGC0sBTtVqOENfYREQpK1CTRHcgbhj
-	 4obidwdHgVuT1qQqDyHPWG2VHg4F6yALwIKdb2ay4gGBkpmVTSISzAV5d5s9SwOF9E
-	 LxKMTw1mtDcPA==
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-30cce86052cso5137589fac.1
-        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 03:52:26 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUwq0ZH/bI94ihfigrJvWKouMF82wSLDIoJN4Ailc1roXfYxYP6kA+FNU6Dc+Z8wY5YImq8fv8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGt47aATpM+p9OJxwkw0ahY1zqTWQWt727WbPxWqfy5j2zTbno
-	v/v25AECVrkSwJA1rXRkUIWIjyuYpAjoewlLtNGqa81hcF4Xf9q9aGau+s8i/sIPbDO3krfGxoq
-	s96MflQkT31fzCQL92Qc8jmtzSY5SxAM=
-X-Google-Smtp-Source: AGHT+IGEgSAb7PwthMT480H5j0SYdHpLlRhlrtZ+iuewQGA9Jkcl/bfStgYc/Gc6s4+VwKbrFzCE17TX9oVZJW6wMhs=
-X-Received: by 2002:a05:6871:758a:b0:314:b6a6:6894 with SMTP id
- 586e51a60fabf-34c835413d5mr3060169fac.40.1758711145254; Wed, 24 Sep 2025
- 03:52:25 -0700 (PDT)
+	 To:Cc:Content-Type; b=sJUd2tg7Ruc6wz4VaCTykXiNpO1GQEp0IlbHHpIbkTm7zjOJqyRkVLq+ig6OGjKZj3qTVTdXYpwRnBOgsCNYlAoYbpt+TDT4AGdt8CIab7l4EfNB9GjPEq+TPQqyIOGjCh6NrirRv0I7lLS0T2GJBUPL1fAIfPYSfce6gAteTFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YdWCQrqh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758712906;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3vAP8FsUJk8PIZpACRyUvOqyIq/F22fin2PfGx/vcc4=;
+	b=YdWCQrqhYGMQaDNY3KTM9sJQ8tFdjeuD/Ja61IuTTVQv7d15FZImT3qZ2qde3/Z0rrDWUF
+	mVzwazXV09Q1XlW0nynsGegBiM5YkQG5vIhwZ9LWdnVeC1j4q2/3H8MDEujG93t923dRkG
+	yWxj91/z3bBeyIGq17HD6xx20yIO3VU=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-651-Ot73_y9fM7KwNpqn2RiP-Q-1; Wed, 24 Sep 2025 07:21:45 -0400
+X-MC-Unique: Ot73_y9fM7KwNpqn2RiP-Q-1
+X-Mimecast-MFC-AGG-ID: Ot73_y9fM7KwNpqn2RiP-Q_1758712904
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2711a55da20so31839975ad.1
+        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 04:21:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758712904; x=1759317704;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3vAP8FsUJk8PIZpACRyUvOqyIq/F22fin2PfGx/vcc4=;
+        b=bICCK0gh2GL4sumsxdj8NSIVvBu7sE2R1b/0xb/8CeuV4aLq6nzeAtYAc1oX3G1e+y
+         T3JjIXfUrbf+spIpiaTWf54Q3XxLNNvLCCbABOtIQwW4UJKU4bFnT6VErpUtwavImL3a
+         dTaJjjR5PL790pEGvyF1TM8fi+h+29gA1ApeRufI0koL74LbbUpAylYSECssNGYPfybg
+         htQUKJlm+TQqo/vUW02+X0Ltwm17lVhUwsAdBoWdDl8p9WYyX/FJkxsoPOqNn4uujyoA
+         dm3yZJDJPaIL7ICH5VrsoZRbnazFtEoBwNYm+IPWtT0z+KqgreInRtqaXS86Zhq3ashc
+         72XQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUSc7dGyUqh+AKXaQeaAwiKZa5E3Ls7xR+dHaNPtyF4ZJtG9mOrHYCjWH8+SGZKg7qMNGFDmFo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycS8A6FCHmc0n9wMql1s/I6Pvfgkh2+FZV7X99z4diaaPgFOtl
+	ymX7u+RTw1sCxlIOxqnVNNZF4dUuUzAl8WmnhwTlGgRng2PWflcc1y/+LEiILzMZIXkh4Wicf9v
+	5WEsMiLaDyqLd4vG6AS7PXR2vAFJUKH0nbrflFoFP4nh7nfW5W+kwORL6sRoxNSNN5PNAGjePNn
+	fYkstTiRImq8GRZkVdIev3sxpPrLV8dXGb
+X-Gm-Gg: ASbGncuuw4L3zJGNDlwi1/M5ewWEl68z/OUijresWZRxxTxfsc8QN0rJUx6vzD5yCWa
+	UEkLQSrBUr+SEYyJPl30JWs4gJqSH0B6aStwLtmE0XvdWyaQiXH+9PN/kB76+2gMYtkeMdpKAsW
+	MXseaB4z4MCdWQYyS8OLxu
+X-Received: by 2002:a17:903:2292:b0:26d:353c:75cd with SMTP id d9443c01a7336-27cc2100f79mr87319875ad.21.1758712904352;
+        Wed, 24 Sep 2025 04:21:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGK5j25zp+qR3y2Or9C3OlE2KjTlI6YV0TR8vyb+TBnaF9UqEPA0DkV6tRpB8e0GWVbP0wWJa2qxezYCPDmOAw=
+X-Received: by 2002:a17:903:2292:b0:26d:353c:75cd with SMTP id
+ d9443c01a7336-27cc2100f79mr87319645ad.21.1758712903978; Wed, 24 Sep 2025
+ 04:21:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250924074602.266292-1-sakari.ailus@linux.intel.com>
-In-Reply-To: <20250924074602.266292-1-sakari.ailus@linux.intel.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Wed, 24 Sep 2025 12:52:12 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0hSy9zQd6cP9B4QPSZi-6ughmkW=VoEBV-0MbUr2xcaAQ@mail.gmail.com>
-X-Gm-Features: AS18NWB0nF3M_Qh13bpf9jNMtOHP6GaQKliTE12EO3NKN8SlzbsSaUYuu04ZXT8
-Message-ID: <CAJZ5v0hSy9zQd6cP9B4QPSZi-6ughmkW=VoEBV-0MbUr2xcaAQ@mail.gmail.com>
-Subject: Re: [PATCH v2 00/16] Align availability checks on fwnode child node enumeration
-To: Sakari Ailus <sakari.ailus@linux.intel.com>
-Cc: linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-input@vger.kernel.org, linux-leds@vger.kernel.org, 
-	linux-media@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-spi@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Danilo Krummrich <dakr@kernel.org>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Daniel Scally <djrscally@gmail.com>, 
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>, 
-	Javier Carrasco <javier.carrasco@wolfvision.net>, 
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>, Lee Jones <lee@kernel.org>, 
-	Pavel Machek <pavel@kernel.org>, Matthias Fend <matthias.fend@emfend.at>, 
-	Chanwoo Choi <cw00.choi@samsung.com>, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Laurent Pinchart <laurent.pinchart@ideasonboard.com>, 
-	Paul Elder <paul.elder@ideasonboard.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
-	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Mark Brown <broonie@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+References: <20250922093743.1347351-3-jvaclav@redhat.com> <20250923170604.6c629d90@kernel.org>
+In-Reply-To: <20250923170604.6c629d90@kernel.org>
+From: =?UTF-8?B?SsOhbiBWw6FjbGF2?= <jvaclav@redhat.com>
+Date: Wed, 24 Sep 2025 13:21:32 +0200
+X-Gm-Features: AS18NWDsDXr22u2_E2zXqbAuYteKBCpdfAJ8_fD3vo_MssgmJS29OCt-zWJiSWU
+Message-ID: <CAEQfnk3Ft4ke3UXS60WMYH8M6WsLgH=D=7zXmkcr3tx0cdiR_g@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] net/hsr: add protocol version to fill_info output
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Sakari,
-
-On Wed, Sep 24, 2025 at 9:46=E2=80=AFAM Sakari Ailus
-<sakari.ailus@linux.intel.com> wrote:
+On Wed, Sep 24, 2025 at 2:06=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> Hello everyone,
+> On Mon, 22 Sep 2025 11:37:45 +0200 Jan Vaclav wrote:
+> >       if (hsr->prot_version =3D=3D PRP_V1)
+> >               proto =3D HSR_PROTOCOL_PRP;
+> > +     if (nla_put_u8(skb, IFLA_HSR_VERSION, hsr->prot_version))
+> > +             goto nla_put_failure;
 >
-> Historically the fwnode property API has enumerated only available device
-> nodes on OF whereas on ACPI, also nodes that haven't been present in the
-> system have been provided. Both OF and ACPI have similar concepts of node
-> availbility, on OF it's the "status" property present on device nodes and
-> on ACPI the _STA object evaluates to device present, enabled and
-> functional bits, of which the present and functional bits are currently
-> being used to determine whether to enumerate a device.
+> Looks like configuration path does not allow setting version if proto
+> is PRP. Should we add an else before the if? since previous if is
+> checking for PRP already
 >
-> Two additional functions, fwnode_get_next_available_child_node() and
-> fwnode_for_each_available_child_node(), have been provided to enumerate
-> the available nodes only on ACPI, whereas on OF the implementation has
-> been the same on the non-available variants. The motivation for providing
-> these has very likely been to provide fwnode variants of the similarly
-> named functions but the difference isn't justifiable from API consistency
-> viewpoint.
->
-> This set switches the users away from the "available" fwnode API function=
-s
-> and later on removes them, aligning the functionality on all fwnode
-> backends.
->
-> since v1:
->
-> - Move patch "ACPI: property: Make acpi_get_next_subnode() static" as
->   first.
->
-> - Add missing parentheses and kernel-doc Return: section in
->   acpi_get_next_present_subnode() documentation and move the Return
->   section: of fwnode_graph_get_endpoint_by_id() to the end of the
->   documentation section (new patch for the latter).
->
-> - Use device_get_next_child_node() instead of fwnode_get_next_child_node(=
-)
->   in flash LED driver drivers.
->
-> - Rework iterating port nodes in acpi_graph_get_next_endpoint() as
->   suggested by Andy (new patch).
 
-I think that you really have four series here, or rather two series, a
-collection of patches depending on them, and a follow-up cleanup.
+The way HSR configuration is currently handled seems very confusing to
+me, because it allows setting the protocol version, but for PRP_V1
+only as a byproduct of setting the protocol to PRP. If you configure
+an interface with (proto =3D PRP, version =3D PRP_V1), it will fail, which
+seems wrong to me, considering this is the end result of configuring
+only with proto =3D PRP anyways.
 
-> Sakari Ailus (16):
->   ACPI: property: Make acpi_get_next_subnode() static
->   ACPI: property: Use ACPI functions in acpi_graph_get_next_endpoint()
->     only
->   ACPI: property: Rework acpi_graph_get_next_endpoint()
->   ACPI: property: Return present device nodes only on fwnode interface
+I think the best solution would be to introduce another change that
+allows explicitly setting the version to PRP_V1 if the protocol is set
+to PRP.
 
-So the above is one series, focused on ACPI property changes.
+What do you think?
 
-They can go in via ACPI as soon as everyone is happy with them.  I
-think I can push them for 6.18 if that helps to process the other
-patches.
-
->   property: Move Return: section of fwnode_graph_get_endpoint_by_id()
->     down
->   property: Drop DEVICE_DISABLED flag in
->     fwnode_graph_get_endpoint_by_id()
->   property: Drop DEVICE_DISABLED flag in
->     fwnode_graph_get_endpoint_count()
-
-The above patches are another series that doesn't depend on the first
-one AFAICS and can go in via driver core.
-
->   property: Document that fwnode API returns available nodes
->   driver core: Use fwnode_for_each_child_node() instead
->   net: lan966x: Use fwnode_for_each_child_node() instead
->   Input: touch-overlay - Use fwnode_for_each_child_node() instead
->   media: thp7312: Use fwnode_for_each_child_node() instead
->   leds: Use fwnode_for_each_child_node() instead
->   leds: Use fwnode_get_next_child_node() instead
-
-The above can go in via respective subsystem trees when the ACPI
-property series gets in (I'm not sure if/how they depend on the second
-series).
-
-And the following one is a follow-up cleanup getting rid of code that
-would be redundant going forward.
-
->   property: Drop functions operating on "available" child nodes
->   spi: cadence: Remove explicit device node availability check
-
-Does the spi change depend on the previous patch?
 
