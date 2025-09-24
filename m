@@ -1,172 +1,105 @@
-Return-Path: <netdev+bounces-226011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29CE6B9A932
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 17:22:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70C8AB9AAF4
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 17:35:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E70DC7BB00A
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 15:20:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F07E23BE4FD
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 15:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE72030DEC4;
-	Wed, 24 Sep 2025 15:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D839C30B522;
+	Wed, 24 Sep 2025 15:33:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NqGAOMwO"
+	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="yzaJmM62"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEEE8488
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 15:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F8B155326
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 15:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758727347; cv=none; b=bgevxCAyDS91w2fl26UgEcv64jJw4Rh8lIvjavZLoqhVmF+r1jglApusDmroZFAv9syEKl7gK54wFoBYETqdEzI0sBYinqsKw/8pq1o3O9YZ/ta5R1CpF4wlwvF98xSpIoCiriH+jP4x1Hlt4w4f3Y1nnv1voYGFv6uaG6sgY7g=
+	t=1758728002; cv=none; b=S5Gj4TTjEisaqIZrII8FF29k3qw4vkWQJQNJ90G4A9foBySp/liHzVEZ/9VEuclH0fsZrwZRQCD1V2BlTboa14YU3cLXaZzKOANDzF4SfCEZunlvIRVAIEnv557qlYvgNgr4RRwcfkymkvZwbqEo01rr3Gcjjq4W8zJKGnKxkDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758727347; c=relaxed/simple;
-	bh=FS4csAU4UjODPSrVFMni0m6zQChg9uz5gLxhc+eDh+U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CqlYHwc2EvIa6h9Wsx+eY5o4vvthESstQqMmN1UcmlOJ8VfQKcmXP8tITG36xlRW1IGy/lSJ5bRKDzvYWx85oZ/D6Rpx0UP2nsj65Tn9f5HtZwV2m2s2NmVc+4IcM5iWO2QYYtRti3JWABpecbYbG79LNkmKmG3bO0GNqxNeoZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NqGAOMwO; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-4258bd8c19bso10192185ab.2
-        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 08:22:26 -0700 (PDT)
+	s=arc-20240116; t=1758728002; c=relaxed/simple;
+	bh=oj40lHJe2CXGo61XnScdHEqFvpXJOdvbt9aC6Rr03U8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jmBH5dYgMf2+l0iG6QDYbzxl7C/YI6Q2Egb1wyUClqmjs0+p+TZXN3zd4s9ghD5lcgz6t/pRGDQnUwvw7FBSA175bnUZoz2NKwF/zJL4MMCxGVe0NOuCRPu84+N56vTZtoQ3v9iZVjeAQV1tbAg45A4wiuEnOfWWyw3DXwBdfIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=yzaJmM62; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5821dec0408so963769e87.1
+        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 08:33:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758727345; x=1759332145; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GpJzLeRv3JvJ6Rn4+qItSuKPl8oje1EaG6ybTvv5B8g=;
-        b=NqGAOMwOBBW4yUoMAVWeMzIY7jxBGG0nujY8MV3krvqjLQO6f3cEwSN4km8hj+1vvP
-         HCL+UL76Iwa2QdEaJqPxdQd+A0vtfHf1nzWvpYcmSguZponlereQrs6h5hDVZOl7Ve2b
-         m/8ItzFObPEcKnucCGJn1S9Pw5KRcsrqMzYAUGayRiHhpGBFkFCHCU+8Us0s5E5QdeLO
-         6UyuDjEzjwPJVUip0lH20o6/LiVkGziIscUVYUufEJKZdt5nG26BIfmT1o9eWE6DRQLR
-         YqekAPROxllE6eIIaxC6F1RN2Q7z99oX814VHraP4GyuHDJBFBvwKqTUFkN0CvRBUxpW
-         m+DQ==
+        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1758727999; x=1759332799; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LIkBf3qivogFIYB3w/+L+S2G/9aj30PqRjDjHIQrDuQ=;
+        b=yzaJmM62jiv9QSyXTAJV8YMaZYJPsQJnaZ8EQSGY6iVJcTB1Y6jck+O/vzR4fvBo23
+         Lmys3K/s8KmivHQSc3Rks5UVyvtvFjJucSNig5Yek3vT8q+AByNaweeRdseBYBX+rrM3
+         tCU9dkng65n4FlD3hyKvWXtaJRtAvO28kHEDlmALkb9zKk/MaFrfa2BshSPywPI0aDfs
+         LyuYVJ4wsIzEoHJ6OlRUL5xTTnsDXlNWVPWSkDV0xYBnATj1E3jSdV5DRXA9uZA0uK6c
+         TnXZi9rw8GV02Lip0YajFcviymIFM4XwxKPwr/Vvt7jrCJeRzAwg3LDsB/6FdTHOWHa1
+         iD2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758727345; x=1759332145;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GpJzLeRv3JvJ6Rn4+qItSuKPl8oje1EaG6ybTvv5B8g=;
-        b=GWsC+DMHefkmv/4iv/vUkjFqZVFn3L4GBcjO/6L3y00QF4Y/BGgaF7G8cTfZSmLFZ1
-         fAb9D296JEIj/xM5m1Ev9wwAgLPzINbLE94iqpbpfMJVkd+gR0AVPm6yw2S0+Gg6Kf8x
-         LInzjrvGEtRGHywxtcNnEYN3WD4sHgx54XoLxOn8QluMAw2ksQ8TWTpNbvudGDikdo7G
-         Ts6tviMw1rgztz/k5idOC+vczpmdeYcZJ9NxabK+EBtAA543B/yOBMEkLNdz+5TY1l/s
-         RTCK9fXl0Ez3BNaqVusIjOROK456TjKaS575dPa4hMERPplOO2+RsBxKP8piFRy8cIvq
-         ApWA==
-X-Gm-Message-State: AOJu0YyIeISZyx5BZo4K7KH+YhsiDXgV46fweveAnKhRFs32Ubm8AVQ/
-	zFevV5Tp6kGa24BU98x+dI7YM5Ej5nMiJQ9rqdCQylDXLPMj1ePx2v5AFm+bNA==
-X-Gm-Gg: ASbGncvyVJfGw5wqN3ytqvsrN9Cq+FTOWlM7uuk52QbKbIyjLCFC8wznh/5Rxd61bCM
-	1Qyhn9+9zRYuG0YcXkvI8N1mW7pnlIILyMLyaJM0QYX+EjuzBBcPZeFwDIkj3qZhoWKB43TNOZn
-	hXcT7H0SWEd+l7Rj+/Ybri2f2m9boS5A+GKbRnJMHIEt94nw8OJqjU2RhuxJtn3NgTyEssrqrEq
-	ZDclHx6KsTdekL/vNcqewaLId2RYV9fuxlzKi5AD82ZwM/tlqBzsnQV1O3dsfKWJXuRlHVC4LeB
-	xCz13z5TV2lC0LQtqy8am0aHV3Vo6kO2Ggd1uZ+JEPAKHKWf+2irIKIX++xSizxvIHXff0TV/pV
-	Pktet4POA2oj1Qxaodx3ZQW7HKM0=
-X-Google-Smtp-Source: AGHT+IGIwXjPAbpzXy2+r7fwj/06ZO4SrCKju2WlzvWmjdH68NQxMQU95BaeD2UiUHkahmoqPGREIw==
-X-Received: by 2002:a05:6e02:228f:b0:3e5:4e4f:65df with SMTP id e9e14a558f8ab-42581e0fb6emr107166725ab.9.1758727344790;
-        Wed, 24 Sep 2025 08:22:24 -0700 (PDT)
-Received: from orangepi5-plus.lan ([144.24.43.60])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-56150787e91sm2786797173.51.2025.09.24.08.22.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Sep 2025 08:22:24 -0700 (PDT)
-From: Furong Xu <0x1207@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	xfr@outlook.com,
-	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net-next] net: stmmac: Convert open-coded register polling to helper macro
-Date: Wed, 24 Sep 2025 23:22:17 +0800
-Message-ID: <20250924152217.10749-1-0x1207@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1758727999; x=1759332799;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LIkBf3qivogFIYB3w/+L+S2G/9aj30PqRjDjHIQrDuQ=;
+        b=C0Z9tdBaFZmI/3Nwd1+E7DwhSeeUSW/xkOAF4OS6H7wYwY7ZWJWDswM/Wc+5K9EDio
+         N7jPbSP3f2QMAs9EzM5rGeCXr3u4iQFDqC1Fxqcq3VfDLqiaO5yilXkEwW08fugdNjZd
+         eAne7O8TjJAjAvJm/kFoYBiLkO1fGPmZ3PzXyWAsn93JQHu0g5AfJKsXyDsZ3mY6QGhz
+         1Gvr2JAGE5KKDZFsZRX0f4ltHDYF+nAMxZyujmAfh6VzVBORAXLqfWu+h77B6WgUn7iY
+         UVp8DV7WC5fagSBFsxnoIeQIEwIyYm9kzNYpkMuN54N461rEHPyBXN/E1w1cBk4ow4nY
+         yZ/A==
+X-Gm-Message-State: AOJu0YyOj/bSCqxpAsT9xG/+80xr3GOqVLeTzCAsLOAqxTu5tFQfUEgh
+	ZQOxfV71nPtSvefUmYQq8flS7vRKColHvqN/sTLK1X/9Yu+N1BsF28NmcDtw/+Rt1bY=
+X-Gm-Gg: ASbGncuNS262UwrlJ7Q/mkXeG3BAKcPdtxGy1DjszpcQK7Ab4TqEFsu0jfSIDQPqPBL
+	z83h6kl2oO3EJw7sIeUqfaJKFLkB3F/5rT1xhVGO34/W4wuvrc8Q1w4ec2UXT8afGelV6GxPhJZ
+	KzdIySirYyPx7D4jyWHVFE1a/4W6HUJCTe6o9Gxwph8tq7wLGwgw2LZGD9aHQeSY+xKhwQ1+Ke3
+	9cJlyhNx174zj8Zy4P+1YvwKlYWrCw1qGjzYhIyhswe/FkMCweIdxNyWmqGCq9zrVFct2Stp90Y
+	11V774X2hYxnqFjhKdTMNaZFsod7aFBYzZs/duEkQMn45q7uhvIHuVLcFVoIvgFCXV8MnZl3peq
+	/77iB3oibm0i5FBbvONK4f730sqgf/G4yldQtMrTEal/nWB+f
+X-Google-Smtp-Source: AGHT+IH1GOx/pgpEVam+Qq+Qt3KSl//uKOXGpLYUqrQ7YkBLxLp90yiM5cgLCS5fXN5hydSO30VRWA==
+X-Received: by 2002:a05:6512:a91:b0:57d:a4e9:5b00 with SMTP id 2adb3069b0e04-58072cf64e0mr1912058e87.30.1758727998821;
+        Wed, 24 Sep 2025 08:33:18 -0700 (PDT)
+Received: from ?IPV6:2a02:810a:b98:a000::9a07? ([2a02:810a:b98:a000::9a07])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-578a9f1419csm5120236e87.148.2025.09.24.08.33.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Sep 2025 08:33:18 -0700 (PDT)
+Message-ID: <007fd561-70be-4960-9e74-06792be5818d@cogentembedded.com>
+Date: Wed, 24 Sep 2025 17:33:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] [net-next] net: renesas: rswitch: Remove unneeded
+ semicolons
+To: Geert Uytterhoeven <geert+renesas@glider.be>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ Michael Dege <michael.dege@renesas.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+References: <e6b57123f319c03b3f078981cb452be49e86253b.1758719832.git.geert+renesas@glider.be>
+Content-Language: en-US, ru-RU
+From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+In-Reply-To: <e6b57123f319c03b3f078981cb452be49e86253b.1758719832.git.geert+renesas@glider.be>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Drop the open-coded register polling routines.
-Use readl_poll_timeout_atomic() in atomic state.
+> Semicolons after end of function braces are not needed, remove them.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Compile tested only.
-No functional change intended.
-
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
- .../ethernet/stmicro/stmmac/stmmac_hwtstamp.c | 28 ++++---------------
- 1 file changed, 6 insertions(+), 22 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-index e2840fa241f2..9e445ad1aa77 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-@@ -135,7 +135,6 @@ static int init_systime(void __iomem *ioaddr, u32 sec, u32 nsec)
- static int config_addend(void __iomem *ioaddr, u32 addend)
- {
- 	u32 value;
--	int limit;
- 
- 	writel(addend, ioaddr + PTP_TAR);
- 	/* issue command to update the addend value */
-@@ -144,23 +143,15 @@ static int config_addend(void __iomem *ioaddr, u32 addend)
- 	writel(value, ioaddr + PTP_TCR);
- 
- 	/* wait for present addend update to complete */
--	limit = 10;
--	while (limit--) {
--		if (!(readl(ioaddr + PTP_TCR) & PTP_TCR_TSADDREG))
--			break;
--		mdelay(10);
--	}
--	if (limit < 0)
--		return -EBUSY;
--
--	return 0;
-+	return readl_poll_timeout_atomic(ioaddr + PTP_TCR, value,
-+				!(value & PTP_TCR_TSADDREG),
-+				10, 100000);
- }
- 
- static int adjust_systime(void __iomem *ioaddr, u32 sec, u32 nsec,
- 		int add_sub, int gmac4)
- {
- 	u32 value;
--	int limit;
- 
- 	if (add_sub) {
- 		/* If the new sec value needs to be subtracted with
-@@ -187,16 +178,9 @@ static int adjust_systime(void __iomem *ioaddr, u32 sec, u32 nsec,
- 	writel(value, ioaddr + PTP_TCR);
- 
- 	/* wait for present system time adjust/update to complete */
--	limit = 10;
--	while (limit--) {
--		if (!(readl(ioaddr + PTP_TCR) & PTP_TCR_TSUPDT))
--			break;
--		mdelay(10);
--	}
--	if (limit < 0)
--		return -EBUSY;
--
--	return 0;
-+	return readl_poll_timeout_atomic(ioaddr + PTP_TCR, value,
-+				!(value & PTP_TCR_TSUPDT),
-+				10, 100000);
- }
- 
- static void get_systime(void __iomem *ioaddr, u64 *systime)
--- 
-2.43.0
-
+Reviewed-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
 
