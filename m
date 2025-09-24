@@ -1,145 +1,128 @@
-Return-Path: <netdev+bounces-225936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8C24B99926
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 13:27:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8E99B99983
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 13:34:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82CBB4A6DEE
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 11:27:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B22018826DE
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 11:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDAF92E7BAA;
-	Wed, 24 Sep 2025 11:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3494F2FD7AD;
+	Wed, 24 Sep 2025 11:34:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q1GHCSDT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jk1hnEN8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA3F2877DB;
-	Wed, 24 Sep 2025 11:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F972FC011;
+	Wed, 24 Sep 2025 11:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758713268; cv=none; b=Ug4cQ2Tin06vo4mx8WH75TDSKb3mfkWCO67U9JWqhg0dlllA1zqaO9Mas9vL525gYnxv4VKQq3058CdkXcfJpzFE5gfMdXFHTF6sOheEE7hiGxlZD4kFzDcKIv4aWUWVGHiRVna/F6Eu6mbW4MvKKUKpoqEp17l1dx21D3Wma/k=
+	t=1758713652; cv=none; b=Kg5E8fc4aXpruKnxASVPdvc5zyzH3dTiZbY7Q3jFAposNjUzYuP7DaaNGw2GwU2ZIKio2/558jHai5ffA8tTiZbTI2Gsgr0O0pSxiR9l3m1+bqEFjAnExoAVk5mZh6hWS8jmcSgiYNFQuhf3g+95R4Lid96UIqO+cUYYMI7dvHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758713268; c=relaxed/simple;
-	bh=zUOu4ulqC4rhaNoCJYCbjYRifBVTQcO9unlaf/FjJeg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=OLb9nlbV/wEdcB7u3qF/UDp3A/Hy+JkKhYYnBnPKCgEfc31WDaf9zeylWaUX1WP4IPkQNicoC3jij6TtBTno5Uy5pdv1r1Zpj0M21TOZ5stWmJUE2YSLQVulWtKPg9PfWWjGf6DL4/UDVkXem8O17nZgHp2lzmjB7eXA1CE/zGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q1GHCSDT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B269C4CEE7;
-	Wed, 24 Sep 2025 11:27:47 +0000 (UTC)
+	s=arc-20240116; t=1758713652; c=relaxed/simple;
+	bh=/ezYUcqnip5J6jqaTEpaDvjUfR7giuaSikKG8yRZwBc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=cBe+oZv7Btp3eV1DYUbLS/1XXwJvUti70qARZYIPxLXCFXlmYl9Cs3b/EcUmRXafFOZlDplpYMF19+Po3YpFK2qU0ES2Z7p0mWMyZiTgNIy53E+oFh+39j/Qp+dVKkle9l0Gh12xDxiPQauJTcNCbZxh4CxQ27hI3tyLX60Tk1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jk1hnEN8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8268C19422;
+	Wed, 24 Sep 2025 11:34:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758713268;
-	bh=zUOu4ulqC4rhaNoCJYCbjYRifBVTQcO9unlaf/FjJeg=;
-	h=Date:From:To:Cc:Subject:From;
-	b=q1GHCSDT+MOwapCSBbVSBjXHPzxohwqhD6ghy/G3OgJRFIHuv8RGZBjwEygTcy1Q+
-	 8G+BWUXA4apBc2GNKhZ6t595GwY3oRBQwgwJI46eTvL9AqVqdMh0TO/pBZ8l9ziGvf
-	 n1IpiAWrf1hT9wNWysnO9fiNAgv6f+irKb2rSmxR1s4h8CIwC0af32pWTQM+sFuDkh
-	 59SdxUKu/lvo8LA+tiZsrJ7U0eniPbuM4xYy8CH34sepx/QUAYVWbezTTuDwf9nI1F
-	 2ZEPETikj7xe9gogAGMflFhT1z3Dsl5xUlbKG5DF/CMPJxbdw0B6EalglN2oa4qaQA
-	 gioFM7PK1QLTg==
-Date: Wed, 24 Sep 2025 13:27:44 +0200
-From: Mark Brown <broonie@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>,
-	Networking <netdev@vger.kernel.org>
-Cc: Amery Hung <ameryhung@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: linux-next: manual merge of the bpf-next tree with the net-next tree
-Message-ID: <aNPVsFPIJUbcepia@finisterre.sirena.org.uk>
+	s=k20201202; t=1758713651;
+	bh=/ezYUcqnip5J6jqaTEpaDvjUfR7giuaSikKG8yRZwBc=;
+	h=From:Subject:Date:To:Cc:From;
+	b=jk1hnEN8qankoJ/FNrwmre+6GPzRS4KY13pRpnEIjo9dc01ZDY8Ww3pT6I0OTXz2d
+	 pqfDAjRfQo4gAn93M7toNw5ttyW8DyEITN6r0CLyC1xVvIP8sfQW7E4Bo5i0iZNp3g
+	 2cijDCcMBRwLaXfnueMsIDTt7jpNi6LYO8V7/gFyvvHQwgb84HlCBDyiyZg29A7aSH
+	 rqKvtmcZ5qJSWpYTJSKS6Sv7kzpQfAzvR6Ab551CvR3Eai900z7JaNKspkz58ZyJp4
+	 BjqZQANaUcwvkaUq1ANrZN7JAjWwMQq7FtnRSkjbdrVCfe2c7ULvi1AXMDzzQQjKQf
+	 iYjfnRauM4RMQ==
+From: Christian Brauner <brauner@kernel.org>
+Subject: [PATCH 0/3] ns: tweak ns common handling
+Date: Wed, 24 Sep 2025 13:33:57 +0200
+Message-Id: <20250924-work-namespaces-fixes-v1-0-8fb682c8678e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Ms46dy0Odeo4DFZW"
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACXX02gC/z2MQQrCMBBFr1Jm7WgTtDReRVxMk7EdrEmZgAqld
+ 3d04ebD4/PeCpVVuMK5WUH5KVVKNnC7BuJEeWSUZAy+9ac2+CO+it4x04PrQpEr3uRtG0Jqo4v
+ sU9+BuYvy7zD1cjUeqDIOSjlO31pRGSUjzfPhn8Ju73rYtg9tKdwrkwAAAA==
+X-Change-ID: 20250924-work-namespaces-fixes-99d0c1ce2d86
+To: linux-fsdevel@vger.kernel.org
+Cc: Amir Goldstein <amir73il@gmail.com>, Josef Bacik <josef@toxicpanda.com>, 
+ Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+ =?utf-8?q?Zbigniew_J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, 
+ Lennart Poettering <mzxreary@0pointer.de>, Aleksa Sarai <cyphar@cyphar.com>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
+ Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+ =?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+ Frederic Weisbecker <frederic@kernel.org>, 
+ Thomas Gleixner <tglx@linutronix.de>, cgroups@vger.kernel.org, 
+ netdev@vger.kernel.org, Christian Brauner <brauner@kernel.org>
+X-Mailer: b4 0.15-dev-56183
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1709; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=/ezYUcqnip5J6jqaTEpaDvjUfR7giuaSikKG8yRZwBc=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWRcvq6vtnv3jc8Ll6qoL709dZvGwXSrYGOWuRnMKgvF0
+ pLk6pbt7ChlYRDjYpAVU2RxaDcJl1vOU7HZKFMDZg4rE8gQBi5OAZgIdzwjwycxxRlxpnIKOzxN
+ n6+fsl1qQRzbvOq3+00Dtsy6+1vq6U9GhmtKPkUiDmmcC048Mft9oDR6psbiBeHXpBdFZN1xZtC
+ azg8A
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
+This contains three minor tweaks for namespace handling:
 
---Ms46dy0Odeo4DFZW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+* Make struct ns_tree private. There's no need for anything to access
+  that directly.
 
-Hi all,
+* Drop a debug assert that would trigger in conditions that are benign.
 
-Today's linux-next merge of the bpf-next tree got a conflict in:
+* Move the type of the namespace out of struct proc_ns_operations and
+  into struct ns_common. This eliminates a pointer dereference and also
+  allows assertions to work when the namespace type is disabled and the
+  operations field set to NULL.
 
-  include/net/xdp.h
+"Trust me, just one more fixes series, bro. Just one more, bro."
 
-between commits:
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+---
+Christian Brauner (3):
+      nstree: make struct ns_tree private
+      ns: move ns type into struct ns_common
+      ns: drop assert
 
-  1827f773e4168 ("net: xdp: pass full flags to xdp_update_skb_shared_info()=
-")
-  6bffdc0f88f85 ("net: xdp: handle frags with unreadable memory")
+ fs/namespace.c            |  6 +++---
+ fs/nsfs.c                 | 18 +++++++++---------
+ include/linux/ns_common.h | 30 +++++++++++++++++++++++++-----
+ include/linux/nstree.h    | 13 -------------
+ include/linux/proc_ns.h   |  1 -
+ init/version-timestamp.c  |  1 +
+ ipc/msgutil.c             |  1 +
+ ipc/namespace.c           |  1 -
+ kernel/cgroup/cgroup.c    |  1 +
+ kernel/cgroup/namespace.c |  1 -
+ kernel/nscommon.c         |  7 +++----
+ kernel/nsproxy.c          |  4 ++--
+ kernel/nstree.c           | 21 +++++++++++++++++----
+ kernel/pid.c              |  1 +
+ kernel/pid_namespace.c    |  2 --
+ kernel/time/namespace.c   |  3 +--
+ kernel/user.c             |  1 +
+ kernel/user_namespace.c   |  1 -
+ kernel/utsname.c          |  1 -
+ net/core/net_namespace.c  |  1 -
+ 20 files changed, 65 insertions(+), 50 deletions(-)
+---
+base-commit: d969328c513c6679b4be11a995ffd4d184c25b34
+change-id: 20250924-work-namespaces-fixes-99d0c1ce2d86
 
-=66rom the net-next tree and commit:
-
-  8f12d1137c238 ("bpf: Clear pfmemalloc flag when freeing all fragments")
-
-=66rom the bpf-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
-diff --cc include/net/xdp.h
-index 6fd294fa6841d,f288c348a6c13..0000000000000
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@@ -126,16 -115,11 +126,21 @@@ static __always_inline void xdp_buff_se
-  	xdp->flags |=3D XDP_FLAGS_FRAGS_PF_MEMALLOC;
-  }
- =20
- +static __always_inline void xdp_buff_set_frag_unreadable(struct xdp_buff =
-*xdp)
- +{
- +	xdp->flags |=3D XDP_FLAGS_FRAGS_UNREADABLE;
- +}
- +
- +static __always_inline u32 xdp_buff_get_skb_flags(const struct xdp_buff *=
-xdp)
- +{
- +	return xdp->flags;
- +}
- +
-+ static __always_inline void xdp_buff_clear_frag_pfmemalloc(struct xdp_buf=
-f *xdp)
-+ {
-+ 	xdp->flags &=3D ~XDP_FLAGS_FRAGS_PF_MEMALLOC;
-+ }
-+=20
-  static __always_inline void
-  xdp_init_buff(struct xdp_buff *xdp, u32 frame_sz, struct xdp_rxq_info *rx=
-q)
-  {
-
---Ms46dy0Odeo4DFZW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjT1a8ACgkQJNaLcl1U
-h9DXBAf9HJYzJ29925w09ryPHc1ZVs6mgTV3WZnR8ULVwjvt/6M7Y90NQPsqefMT
-Ai9auaIqaTiC8tRsLcX74XgHqABq4jjf/gLcKu+zw3GRPO8lFn2lbyFTXenC25J3
-60eISD4nmb2vi04U0dNv891ffKuddE0Qq5E8NZYRHVN4hNmTOhuixXvlRESZvzv3
-PS9dIysY5DIUlUQPpvho9vNYvI4Vwm4psrcE+03iveELDeMrFjIOlvn3YTCQHEEt
-cakP8JjikRglrFev+ZLqqQGjuD/ZJeqA9KdgSWiOBx0wQE5aHMZqgk/6W79crvMi
-QyjPYVWN60AGM9Ir9abjALIZRrawEg==
-=ez26
------END PGP SIGNATURE-----
-
---Ms46dy0Odeo4DFZW--
 
