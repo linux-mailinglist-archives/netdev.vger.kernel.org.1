@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-226079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4B12B9BC44
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 21:50:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35CEFB9BC38
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 21:50:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAB323AB004
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:50:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA2E63268D0
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 19:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB20A27145C;
-	Wed, 24 Sep 2025 19:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B1E257820;
+	Wed, 24 Sep 2025 19:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AkdZ3Osg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h2/lZIkU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0827A21FF46
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 19:50:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F6C26F47D
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 19:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758743406; cv=none; b=UutmPAs/TQlGWOOXmtgRWQXMqGzw7xNOmLGBcpaFytAlENflTmz1d++P/x+y6pZh8oibE2hopF13HayV8B0wVJ3vyOqqIBbXDphTeHZo0BwSDsq19yFdZD3Y4/3Kn+A4t/8wmqoEQsNEeqMUlZkpD4k+wman+MfVo7MbZU3Gxzw=
+	t=1758743409; cv=none; b=X34UC1L7Krf+vzQ2hVeLedZUVgNV+l3jDtfILfgWqkDvmY/djQkETCWlDrOjYSH4FxADj7FTJFCXonqqdaw6BHxFAfpkkGzHYNkNswq9IxeWSsBIZXuUOv89ga2OOBzZjDygi+KEbBtFT/LXTBZDLMzkjV9ljP2+QNBlM9GAeWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758743406; c=relaxed/simple;
-	bh=T49vNSY6pz1wPu4gr1Mzr/cSbWhjFf8g2c27jGwl6CU=;
+	s=arc-20240116; t=1758743409; c=relaxed/simple;
+	bh=PO+QEquAdzGxI7lfAX4MeTyLBj7pWnOiB/8MKjNje9M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DEalIJHATARD/HzstIfTOENoRDlQeQUMRuLfRfnkwXMWbDhsUV+wFQfN9YsTr0zbi+LsFAAqs+U//dU9YawsFbbH1keE/9LQlqVg/Xf1CnAcUIEAtJDjVQQwMho3oL02eqGnSAQUcow3SZac0LznJ4nw0zgjuMYIG6xnilSWL1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AkdZ3Osg; arc=none smtp.client-ip=209.85.128.182
+	 MIME-Version; b=FOcD/98Nbjt4r5GCMm7KmLz2WvxXjmQVlX1mPN8fmcaQ0123qyWQz+zBXt+gHpivhnwDnmSg76Pq9v3V+MSZgGCJeo87fQCo3y+J6xxWXwKcLw4qI2yrCX+NTDPodDlzP47Mw4xjv6BZ0DPQrt8Lp1TiCPeoQ2ip5WNUTiMHp9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h2/lZIkU; arc=none smtp.client-ip=209.85.128.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-743ba48eb71so13414437b3.1
-        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 12:50:04 -0700 (PDT)
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-74109e2ed70so2433037b3.3
+        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 12:50:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758743404; x=1759348204; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758743406; x=1759348206; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kY96mX97MRxfvZCK7M9VqGP7HciWDDUZY+NtwzfPinY=;
-        b=AkdZ3OsgH7DTX75NTGhMvUxfVXuAcB5uBOqL/6w3TaAvFKvRu9680PP9FfwtR4ABmw
-         oQff0LezPt5ccR5gEfyZRUQTF0NCd14cLXTO3nEx0sN5l3M6vKNs2a6zM4fe5qPDMHri
-         d4Nyg4OuL4iuGgRm/sSuXJoZok+d8cQn62A2XFntUsSktosxS/kG84d5EhsDBr8HJfuN
-         lnVRIRhdbqwA2+eohadlJLlDoX6hDnTaA17b3uliBA0wWt+qgW0iWQPs8kVotOlz1Ixn
-         hN2ZWcyQF72GivnzA+2wno9VUi2b9xsqkdpl+ldksqgp4DndhGbE7KvqCaXhNV3wiP/V
-         fg1Q==
+        bh=iixqKO23M9D9jP1mvifgIAymBJqZjcMeHazMtlVjuGw=;
+        b=h2/lZIkUk6lFw3BblLz7bPZMjMkv5/eP9DNNMQ/nPmmVu+p0SlCOvJAH5oH12RQTEH
+         WAMQ3wOyAQ/Z9catqJy8UMzl9UFkxN5HJk/PJiZnNs5rJ5weT46OvPlCSmPl2ueVR/zw
+         +igALeNQmgaonjISPvfLQjDA1ahyF7e1ptVRXDUIt4oPeBSL+FFiikj3lBYc+7xzfk1+
+         PZc4RuoVvEdFBpEs2UUHhA0IJxWHRAn0tD5Vh5Jr3sh5PXsw78yQlfb4Ro7EgcDdNtXC
+         sYhbbMFxSWBUZ6ybPhrb0q6HCAZOJo4J/2qtcFSFoXxwh0Q9hpbd1sG3X21DKBni2AFh
+         OlRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758743404; x=1759348204;
+        d=1e100.net; s=20230601; t=1758743406; x=1759348206;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kY96mX97MRxfvZCK7M9VqGP7HciWDDUZY+NtwzfPinY=;
-        b=mDG43p5Q7zG+NPq65U0LFGyH0FkcEdrtuUP8YYkinDv8ZzTf0dLsHgN9TvXamxHf1W
-         ksS+4NACbA4pcCol47137ZLMrH7cj5nA6dUfUQwekCTSKa3j3KU0UOK+GfwH38F91ay5
-         TdVXG7ue0ahUNFAwkMdxt5Nq+SHHLgMdH2y6LbIXT3kbtt891gyPE3KVI7ZthvyoukBy
-         26TEdEegkVvF1eiW55TMTLqCL8eOO/q6KiX/vYCz3PtDo41lsivcPduZk6I650REGRy2
-         x+Q0yX6aG3uOjFPsBln2IlqJugju2Yh6xgSn+c/j8h28zrjAAGYdJ6TueE1X7a+l7juH
-         lbTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVeqYRoYq6Am5eTLtyiuj77zsg9QYGpOFDYjuTnrbDkiTJkBQeU/CrMHT6eyvUAVlo4rqR7T/E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXt7dTsRBqtsutToD46qHNBe7G9+WYi9cBZX/31WqzznlVpUjI
-	QpQGst9ycDOoviL7l/rVk8RFDLDur0m49vHFeD8peaUoeIPRRTgKPOFp
-X-Gm-Gg: ASbGnct56Ow68nwtY/I+zdE1R6c+kB8WA/EIN0MgXsC6ocPJGuCbCuUXN0Mw/nSGtpT
-	gwuyZa/HKI7onR1Otj6uRYYOLXLfiU/GT32a8Nd1Yvrci5OtLXyPVJRyb+HCzS25HAh+Q+1hVHs
-	9tr7LHcYyDmh0JPPTU3thShGnTZWtqDx7sJerp7y2NiWZ4mVO3Ya0TGOH9chUbleQpIpeD2sW3J
-	cKRg7qwbN5QoU/fJxvZPjJvDkacsLCsoTZy6vH888WejM3zwR2sbj8wiZZUnc+fcznpEQ9X3gJD
-	LhnqVdEeTM8AxLz6ckoFmSa8vT5Y8g0xh+O/lRzJl3psz4Um4+t84COlBpt2nJPIbOPkGrHNJIT
-	ZHUi2NpHbd/O22WySg4Ed
-X-Google-Smtp-Source: AGHT+IGwe3rk8yYngyycVzC18xS4tv9hQOKC0bOeHGwAmmjTwHfFzjkEzdOIYGfgSBZ7nGp7h8RZzg==
-X-Received: by 2002:a05:690c:6d12:b0:737:506f:da08 with SMTP id 00721157ae682-76559b62b77mr493347b3.15.1758743403813;
-        Wed, 24 Sep 2025 12:50:03 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:44::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-739718cc2dcsm51322287b3.67.2025.09.24.12.50.03
+        bh=iixqKO23M9D9jP1mvifgIAymBJqZjcMeHazMtlVjuGw=;
+        b=mT1rUusmGT6vvwi6870oysl9sh29sSAVmz6WIUyZW/7uWNFXYhlwnRnOW01JjQWIqY
+         NBPxSDjCWLUAZzHCa6a6ONXri0Qr00WuOB+OlbATIudxA+pkLZSfhbXB6RvcEerPKRfj
+         Agz3QYd37GGBdatoJYKFCMvhquxbOesn+SbPhIWup2oDJAa/5fu/YALC8N3lKI6WNToR
+         zthCznwbzZNAnGJ3a3LOvSAK5CCQfSzfWaGyzGyZjy9nnFXJed1ytG8MUY8Dgkc7DGoj
+         P2Ch1F0ZvdE5cvWyLQmJR+hAHAlCuHU6erwYIUP+SSk3wL11eW2heTcVQ9HEtgnZot85
+         H+gg==
+X-Forwarded-Encrypted: i=1; AJvYcCUIN6ePTI/So3BUVgg7pZ9VIrOsOETUQ6kdwXEHeRCU8ahLhXAOXvEcpIzThb+V0zBDwixTk5o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcQv/uQXjJLP8xdIWSAU+tMG7j2xnHmpqrdYCg+/9MgX8RV8DL
+	j7L1pnFD8jTqGIpDVnuTaBoa6z/VPuv8PlrRzQ+kKmKqNa0LV/wyvsdK
+X-Gm-Gg: ASbGncs0GeOcZxiP7/Ptm2DIVGFZ/Tsa1+STCAn3UbpdXy32Zabuia/bPCvfmA3/BS3
+	WD7HoGibLjM1yuhoYoyW8SZgSRhUx7VEPPZeSlwzPLQwjO7yjwXm7qCI+SqnM5OyUqdWiLlXAkX
+	IN2vZOavwQxpKAlBxwdHUF6qjXw3/cEfUDoJRmhnRU2y0JhM9sCqiMY22MwVALKHtnBmGNQ1v7S
+	gSriZVYE57/CCLzfwWIpQhdZDbUe94ZpDA1KDlwBrNP8g5E3IXQyaeZMwjV+s7xIxoQvHLxuauy
+	OO4TXDCeAlb3aIEvZYH6e7/ZKvUrRS+fIiSUNy3xUxZEIRIF4Ob9v0D+02e+WK1i87KU6dnHF4d
+	+Kk7He1KcTfqCjKihaPM=
+X-Google-Smtp-Source: AGHT+IEJRx0qyymTcTAD6QqMTDOk4K++pcwxBf8HeMRaxmsXe/jWSNpTycVMJF8IZzUeOGC7H0eXhw==
+X-Received: by 2002:a05:690c:7485:b0:74b:e290:1e2e with SMTP id 00721157ae682-7640624f3a5mr10129467b3.52.1758743405797;
+        Wed, 24 Sep 2025 12:50:05 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:a::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7397171f586sm50576777b3.33.2025.09.24.12.50.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Sep 2025 12:50:03 -0700 (PDT)
+        Wed, 24 Sep 2025 12:50:05 -0700 (PDT)
 From: Daniel Zahka <daniel.zahka@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -89,9 +89,9 @@ Cc: Willem de Bruijn <willemb@google.com>,
 	Carolina Jubran <cjubran@nvidia.com>,
 	Donald Hunter <donald.hunter@gmail.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next 3/9] selftests: drv-net: base device access API test
-Date: Wed, 24 Sep 2025 12:49:49 -0700
-Message-ID: <20250924194959.2845473-4-daniel.zahka@gmail.com>
+Subject: [PATCH net-next 4/9] selftests: drv-net: add PSP responder
+Date: Wed, 24 Sep 2025 12:49:50 -0700
+Message-ID: <20250924194959.2845473-5-daniel.zahka@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250924194959.2845473-1-daniel.zahka@gmail.com>
 References: <20250924194959.2845473-1-daniel.zahka@gmail.com>
@@ -105,165 +105,534 @@ Content-Transfer-Encoding: 8bit
 
 From: Jakub Kicinski <kuba@kernel.org>
 
-Simple PSP test to getting info about PSP devices.
+PSP tests need the remote system to support PSP, and some PSP capable
+application to exchange data with. Create a simple PSP responder app
+which we can build and deploy to the remote host. The tests themselves
+can be written in Python but for ease of deploying the responder is in C
+(using C YNL).
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 ---
- tools/testing/selftests/drivers/net/Makefile  |  1 +
- tools/testing/selftests/drivers/net/config    |  1 +
- .../drivers/net/hw/lib/py/__init__.py         |  2 +-
- .../selftests/drivers/net/lib/py/__init__.py  |  2 +-
- tools/testing/selftests/drivers/net/psp.py    | 68 +++++++++++++++++++
- .../testing/selftests/net/lib/py/__init__.py  |  2 +-
- tools/testing/selftests/net/lib/py/ynl.py     |  5 ++
- 7 files changed, 78 insertions(+), 3 deletions(-)
- create mode 100755 tools/testing/selftests/drivers/net/psp.py
+ .../testing/selftests/drivers/net/.gitignore  |   1 +
+ tools/testing/selftests/drivers/net/Makefile  |   9 +
+ .../selftests/drivers/net/psp_responder.c     | 481 ++++++++++++++++++
+ 3 files changed, 491 insertions(+)
+ create mode 100644 tools/testing/selftests/drivers/net/psp_responder.c
 
+diff --git a/tools/testing/selftests/drivers/net/.gitignore b/tools/testing/selftests/drivers/net/.gitignore
+index d634d8395d90..585ecb4d5dc4 100644
+--- a/tools/testing/selftests/drivers/net/.gitignore
++++ b/tools/testing/selftests/drivers/net/.gitignore
+@@ -1,2 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ napi_id_helper
++psp_responder
 diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index 984ece05f7f9..102cfb36846c 100644
+index 102cfb36846c..bd3af9a34e2f 100644
 --- a/tools/testing/selftests/drivers/net/Makefile
 +++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -19,6 +19,7 @@ TEST_PROGS := \
- 	netcons_sysdata.sh \
- 	netpoll_basic.py \
- 	ping.py \
-+	psp.py \
- 	queues.py \
- 	stats.py \
- 	shaper.py \
-diff --git a/tools/testing/selftests/drivers/net/config b/tools/testing/selftests/drivers/net/config
-index f27172ddee0a..ac13da8847ca 100644
---- a/tools/testing/selftests/drivers/net/config
-+++ b/tools/testing/selftests/drivers/net/config
-@@ -5,3 +5,4 @@ CONFIG_NETCONSOLE=m
- CONFIG_NETCONSOLE_DYNAMIC=y
- CONFIG_NETCONSOLE_EXTENDED_LOG=y
- CONFIG_XDP_SOCKETS=y
-+CONFIG_INET_PSP=y
-diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-index 1462a339a74b..559c572e296a 100644
---- a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-+++ b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-@@ -13,7 +13,7 @@ try:
+@@ -27,4 +27,13 @@ TEST_PROGS := \
+ 	xdp.py \
+ # end of TEST_PROGS
  
-     # Import one by one to avoid pylint false positives
-     from net.lib.py import EthtoolFamily, NetdevFamily, NetshaperFamily, \
--        NlError, RtnlFamily, DevlinkFamily
-+        NlError, RtnlFamily, DevlinkFamily, PSPFamily
-     from net.lib.py import CmdExitFailure
-     from net.lib.py import bkg, cmd, defer, ethtool, fd_read_timeout, ip, \
-         rand_port, tool, wait_port_listen
-diff --git a/tools/testing/selftests/drivers/net/lib/py/__init__.py b/tools/testing/selftests/drivers/net/lib/py/__init__.py
-index a07b56a75c8a..31ecc618050c 100644
---- a/tools/testing/selftests/drivers/net/lib/py/__init__.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/__init__.py
-@@ -12,7 +12,7 @@ try:
- 
-     # Import one by one to avoid pylint false positives
-     from net.lib.py import EthtoolFamily, NetdevFamily, NetshaperFamily, \
--        NlError, RtnlFamily, DevlinkFamily
-+        NlError, RtnlFamily, DevlinkFamily, PSPFamily
-     from net.lib.py import CmdExitFailure
-     from net.lib.py import bkg, cmd, bpftool, bpftrace, defer, ethtool, \
-         fd_read_timeout, ip, rand_port, tool, wait_port_listen, wait_file
-diff --git a/tools/testing/selftests/drivers/net/psp.py b/tools/testing/selftests/drivers/net/psp.py
-new file mode 100755
-index 000000000000..965e456836d2
++# YNL files, must be before "include ..lib.mk"
++YNL_GEN_FILES := psp_responder
++TEST_GEN_FILES += $(YNL_GEN_FILES)
++
+ include ../../lib.mk
++
++# YNL build
++YNL_GENS := psp
++
++include ../../net/ynl.mk
+diff --git a/tools/testing/selftests/drivers/net/psp_responder.c b/tools/testing/selftests/drivers/net/psp_responder.c
+new file mode 100644
+index 000000000000..e54b6fcec9a1
 --- /dev/null
-+++ b/tools/testing/selftests/drivers/net/psp.py
-@@ -0,0 +1,68 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
++++ b/tools/testing/selftests/drivers/net/psp_responder.c
+@@ -0,0 +1,481 @@
++#include <stdio.h>
++#include <string.h>
++#include <sys/poll.h>
++#include <sys/socket.h>
++#include <sys/time.h>
++#include <netinet/in.h>
++#include <unistd.h>
 +
-+"""Test suite for PSP capable drivers."""
++#include <ynl.h>
 +
-+from lib.py import ksft_run, ksft_exit
-+from lib.py import ksft_true, ksft_eq
-+from lib.py import NetDrvEpEnv, PSPFamily, NlError
++#include "psp-user.h"
 +
-+#
-+# Test cases
-+#
++#define dbg(msg...)				\
++do {						\
++	if (opts->verbose)			\
++		fprintf(stderr, "DEBUG: " msg);	\
++} while (0)
 +
-+def dev_list_devices(cfg):
-+    """ Dump all devices """
-+    devices = cfg.pspnl.dev_get({}, dump=True)
++static bool should_quit;
 +
-+    found = False
-+    for dev in devices:
-+        found |= dev['id'] == cfg.psp_dev_id
-+    ksft_true(found)
++struct opts {
++	int port;
++	int devid;
++	bool verbose;
++};
 +
++enum accept_cfg {
++	ACCEPT_CFG_NONE = 0,
++	ACCEPT_CFG_CLEAR,
++	ACCEPT_CFG_PSP,
++};
 +
-+def dev_get_device(cfg):
-+    """ Get the device we intend to use """
-+    dev = cfg.pspnl.dev_get({'id': cfg.psp_dev_id})
-+    ksft_eq(dev['id'], cfg.psp_dev_id)
++static struct {
++	unsigned char tx;
++	unsigned char rx;
++} psp_vers;
 +
++static int conn_setup_psp(struct ynl_sock *ys, struct opts *opts, int data_sock)
++{
++	struct psp_rx_assoc_rsp *rsp;
++	struct psp_rx_assoc_req *req;
++	struct psp_tx_assoc_rsp *tsp;
++	struct psp_tx_assoc_req *teq;
++	char info[300];
++	int key_len;
++	ssize_t sz;
++	__u32 spi;
 +
-+def dev_get_device_bad(cfg):
-+    """ Test getting device which doesn't exist """
-+    raised = False
-+    try:
-+        cfg.pspnl.dev_get({'id': cfg.psp_dev_id + 1234567})
-+    except NlError as e:
-+        ksft_eq(e.nl_msg.error, -19)
-+        raised = True
-+    ksft_true(raised)
++	dbg("create PSP connection\n");
 +
++	// Rx assoc alloc
++	req = psp_rx_assoc_req_alloc();
 +
-+def main() -> None:
-+    with NetDrvEpEnv(__file__) as cfg:
-+        cfg.pspnl = PSPFamily()
++	psp_rx_assoc_req_set_sock_fd(req, data_sock);
++	psp_rx_assoc_req_set_version(req, psp_vers.rx);
 +
-+        # Figure out which local device we are testing against
-+        cfg.psp_dev_id = None
-+        versions = None
-+        devs = [dev for dev in cfg.pspnl.dev_get({}, dump=True) if dev["ifindex"] == cfg.ifindex]
-+        if devs:
-+            info = devs[0]
-+            cfg.psp_dev_id = info['id']
++	rsp = psp_rx_assoc(ys, req);
++	psp_rx_assoc_req_free(req);
 +
-+            # Enable PSP if necessary
-+            if info['psp-versions-ena'] != info['psp-versions-cap']:
-+                versions = info['psp-versions-ena']
-+                cfg.pspnl.dev_set({"id": cfg.psp_dev_id,
-+                                   "psp-versions-ena": info['psp-versions-cap']})
++	if (!rsp) {
++		perror("ERROR: failed to Rx assoc");
++		return -1;
++	}
 +
-+        ksft_run(globs=globals(), case_pfx={"dev_"},
-+                 args=(cfg, ), skip_all=(cfg.psp_dev_id is None))
++	// SPI exchange
++	key_len = rsp->rx_key._len.key;
++	memcpy(info, &rsp->rx_key.spi, sizeof(spi));
++	memcpy(&info[sizeof(spi)], rsp->rx_key.key, key_len);
++	sz = sizeof(spi) + key_len;
 +
-+        if versions is not None:
-+            cfg.pspnl.dev_set({"id": cfg.psp_dev_id, "psp-versions-ena": versions})
-+    ksft_exit()
++	send(data_sock, info, sz, MSG_WAITALL);
++	psp_rx_assoc_rsp_free(rsp);
 +
++	sz = recv(data_sock, info, sz, MSG_WAITALL);
++	if (sz < 0) {
++		perror("ERROR: failed to read PSP key from sock");
++		return -1;
++	}
++	memcpy(&spi, info, sizeof(spi));
 +
-+if __name__ == "__main__":
-+    main()
-diff --git a/tools/testing/selftests/net/lib/py/__init__.py b/tools/testing/selftests/net/lib/py/__init__.py
-index 02be28dcc089..997b85cc216a 100644
---- a/tools/testing/selftests/net/lib/py/__init__.py
-+++ b/tools/testing/selftests/net/lib/py/__init__.py
-@@ -6,4 +6,4 @@ from .netns import NetNS, NetNSEnter
- from .nsim import *
- from .utils import *
- from .ynl import NlError, YnlFamily, EthtoolFamily, NetdevFamily, RtnlFamily, RtnlAddrFamily
--from .ynl import NetshaperFamily, DevlinkFamily
-+from .ynl import NetshaperFamily, DevlinkFamily, PSPFamily
-diff --git a/tools/testing/selftests/net/lib/py/ynl.py b/tools/testing/selftests/net/lib/py/ynl.py
-index 2b3a61ea3bfa..32c223e93b2c 100644
---- a/tools/testing/selftests/net/lib/py/ynl.py
-+++ b/tools/testing/selftests/net/lib/py/ynl.py
-@@ -61,3 +61,8 @@ class DevlinkFamily(YnlFamily):
-     def __init__(self, recv_size=0):
-         super().__init__((SPEC_PATH / Path('devlink.yaml')).as_posix(),
-                          schema='', recv_size=recv_size)
++	// Setup Tx assoc
++	teq = psp_tx_assoc_req_alloc();
 +
-+class PSPFamily(YnlFamily):
-+    def __init__(self, recv_size=0):
-+        super().__init__((SPEC_PATH / Path('psp.yaml')).as_posix(),
-+                         schema='', recv_size=recv_size)
++	psp_tx_assoc_req_set_sock_fd(teq, data_sock);
++	psp_tx_assoc_req_set_version(teq, psp_vers.tx);
++	psp_tx_assoc_req_set_tx_key_spi(teq, spi);
++	psp_tx_assoc_req_set_tx_key_key(teq, &info[sizeof(spi)], key_len);
++
++	tsp = psp_tx_assoc(ys, teq);
++	psp_tx_assoc_req_free(teq);
++	if (!tsp) {
++		perror("ERROR: failed to Tx assoc");
++		return -1;
++	}
++	psp_tx_assoc_rsp_free(tsp);
++
++	return 0;
++}
++
++static void send_ack(int sock)
++{
++	send(sock, "ack", 4, MSG_WAITALL);
++}
++
++static void send_err(int sock)
++{
++	send(sock, "err", 4, MSG_WAITALL);
++}
++
++static void send_str(int sock, int value)
++{
++	char buf[128];
++	int ret;
++
++	ret = snprintf(buf, sizeof(buf), "%d", value);
++	send(sock, buf, ret + 1, MSG_WAITALL);
++}
++
++static void
++run_session(struct ynl_sock *ys, struct opts *opts,
++	    int server_sock, int comm_sock)
++{
++	enum accept_cfg accept_cfg = ACCEPT_CFG_NONE;
++	struct pollfd pfds[3];
++	size_t data_read = 0;
++	int data_sock = -1;
++
++	while (true) {
++		bool race_close = false;
++		int nfds;
++
++		memset(pfds, 0, sizeof(pfds));
++
++		pfds[0].fd = server_sock;
++		pfds[0].events = POLLIN;
++
++		pfds[1].fd = comm_sock;
++		pfds[1].events = POLLIN;
++
++		nfds = 2;
++		if (data_sock >= 0) {
++			pfds[2].fd = data_sock;
++			pfds[2].events = POLLIN;
++			nfds++;
++		}
++
++		dbg(" ...\n");
++		if (poll(pfds, nfds, -1) < 0) {
++			perror("poll");
++			break;
++		}
++
++		/* data sock */
++		if (pfds[2].revents & POLLIN) {
++			char buf[8192];
++			ssize_t n;
++
++			n = recv(data_sock, buf, sizeof(buf), 0);
++			if (n <= 0) {
++				if (n < 0)
++					perror("data read");
++				close(data_sock);
++				data_sock = -1;
++				dbg("data sock closed\n");
++			} else {
++				data_read += n;
++				dbg("data read %zd\n", data_read);
++			}
++		}
++
++		/* comm sock */
++		if (pfds[1].revents & POLLIN) {
++			static char buf[4096];
++			static ssize_t off;
++			bool consumed;
++			ssize_t n;
++
++			n = recv(comm_sock, &buf[off], sizeof(buf) - off, 0);
++			if (n <= 0) {
++				if (n < 0)
++					perror("comm read");
++				return;
++			}
++
++			off += n;
++			n = off;
++
++#define __consume(sz)						\
++		({						\
++			if (n == (sz)) {			\
++				off = 0;			\
++			} else {				\
++				off -= (sz);			\
++				memmove(buf, &buf[(sz)], off);	\
++			}					\
++		})
++
++#define cmd(_name)							\
++		({							\
++			ssize_t sz = sizeof(_name);			\
++			bool match = n >= sz &&	!memcmp(buf, _name, sz); \
++									\
++			if (match) {					\
++				dbg("command: " _name "\n");		\
++				__consume(sz);				\
++			}						\
++			consumed |= match;				\
++			match;						\
++		})
++
++			do {
++				consumed = false;
++
++				if (cmd("read len"))
++					send_str(comm_sock, data_read);
++
++				if (cmd("data echo")) {
++					if (data_sock >= 0)
++						send(data_sock, "echo", 5,
++						     MSG_WAITALL);
++					else
++						fprintf(stderr, "WARN: echo but no data sock\n");
++					send_ack(comm_sock);
++				}
++				if (cmd("data close")) {
++					if (data_sock >= 0) {
++						close(data_sock);
++						data_sock = -1;
++						send_ack(comm_sock);
++					} else {
++						race_close = true;
++					}
++				}
++				if (cmd("conn psp")) {
++					if (accept_cfg != ACCEPT_CFG_NONE)
++						fprintf(stderr, "WARN: old conn config still set!\n");
++					accept_cfg = ACCEPT_CFG_PSP;
++					send_ack(comm_sock);
++					/* next two bytes are versions */
++					if (off >= 2) {
++						memcpy(&psp_vers, buf, 2);
++						__consume(2);
++					} else {
++						fprintf(stderr, "WARN: short conn psp command!\n");
++					}
++				}
++				if (cmd("conn clr")) {
++					if (accept_cfg != ACCEPT_CFG_NONE)
++						fprintf(stderr, "WARN: old conn config still set!\n");
++					accept_cfg = ACCEPT_CFG_CLEAR;
++					send_ack(comm_sock);
++				}
++				if (cmd("exit"))
++					should_quit = true;
++#undef cmd
++
++				if (!consumed) {
++					fprintf(stderr, "WARN: unknown cmd: [%zd] %s\n",
++						off, buf);
++				}
++			} while (consumed && off);
++		}
++
++		/* server sock */
++		if (pfds[0].revents & POLLIN) {
++			if (data_sock >= 0) {
++				fprintf(stderr, "WARN: new data sock but old one still here\n");
++				close(data_sock);
++				data_sock = -1;
++			}
++			data_sock = accept(server_sock, NULL, NULL);
++			if (data_sock < 0) {
++				perror("accept");
++				continue;
++			}
++			data_read = 0;
++
++			if (accept_cfg == ACCEPT_CFG_CLEAR) {
++				dbg("new data sock: clear\n");
++				/* nothing to do */
++			} else if (accept_cfg == ACCEPT_CFG_PSP) {
++				dbg("new data sock: psp\n");
++				conn_setup_psp(ys, opts, data_sock);
++			} else {
++				fprintf(stderr, "WARN: new data sock but no config\n");
++			}
++			accept_cfg = ACCEPT_CFG_NONE;
++		}
++
++		if (race_close) {
++			if (data_sock >= 0) {
++				/* indeed, ordering problem, handle the close */
++				close(data_sock);
++				data_sock = -1;
++				send_ack(comm_sock);
++			} else {
++				fprintf(stderr, "WARN: close but no data sock\n");
++				send_err(comm_sock);
++			}
++		}
++	}
++	dbg("session ending\n");
++}
++
++static int spawn_server(struct opts *opts)
++{
++	struct sockaddr_in6 addr;
++	int fd;
++
++	fd = socket(AF_INET6, SOCK_STREAM, 0);
++	if (fd < 0) {
++		perror("can't open socket");
++		return -1;
++	}
++
++	memset(&addr, 0, sizeof(addr));
++
++	addr.sin6_family = AF_INET6;
++	addr.sin6_addr = in6addr_any;
++	addr.sin6_port = htons(opts->port);
++
++	if (bind(fd, (struct sockaddr *)&addr, sizeof(addr))) {
++		perror("can't bind socket");
++		return -1;
++	}
++
++	if (listen(fd, 5)) {
++		perror("can't listen");
++		return -1;
++	}
++
++	return fd;
++}
++
++static int run_responder(struct ynl_sock *ys, struct opts *opts)
++{
++	int server_sock, comm;
++
++	server_sock = spawn_server(opts);
++	if (server_sock < 0)
++		return 4;
++
++	while (!should_quit) {
++		comm = accept(server_sock, NULL, NULL);
++		if (comm < 0) {
++			perror("accept failed");
++		} else {
++			run_session(ys, opts, server_sock, comm);
++			close(comm);
++		}
++	}
++
++	return 0;
++}
++
++static void usage(const char *name, const char *miss)
++{
++	if (miss)
++		fprintf(stderr, "Missing argument: %s\n", miss);
++
++	fprintf(stderr, "Usage: %s -p port [-v] [-d psp-dev-id]\n", name);
++	exit(EXIT_FAILURE);
++}
++
++static void parse_cmd_opts(int argc, char **argv, struct opts *opts)
++{
++	int opt;
++
++	while ((opt = getopt(argc, argv, "vp:d:")) != -1) {
++		switch (opt) {
++		case 'v':
++			opts->verbose = 1;
++			break;
++		case 'p':
++			opts->port = atoi(optarg);
++			break;
++		case 'd':
++			opts->devid = atoi(optarg);
++			break;
++		default:
++			usage(argv[0], NULL);
++		}
++	}
++}
++
++static int psp_dev_set_ena(struct ynl_sock *ys, __u32 dev_id, __u32 versions)
++{
++	struct psp_dev_set_req *sreq;
++	struct psp_dev_set_rsp *srsp;
++
++	fprintf(stderr, "Set PSP enable on device %d to 0x%x\n",
++		dev_id, versions);
++
++	sreq = psp_dev_set_req_alloc();
++
++	psp_dev_set_req_set_id(sreq, dev_id);
++	psp_dev_set_req_set_psp_versions_ena(sreq, versions);
++
++	srsp = psp_dev_set(ys, sreq);
++	psp_dev_set_req_free(sreq);
++	if (!srsp)
++		return 10;
++
++	psp_dev_set_rsp_free(srsp);
++	return 0;
++}
++
++int main(int argc, char **argv)
++{
++	struct psp_dev_get_list *dev_list;
++	bool devid_found = false;
++	__u32 ver_ena, ver_cap;
++	struct opts opts = {};
++	struct ynl_error yerr;
++	struct ynl_sock *ys;
++	int first_id = 0;
++	int ret;
++
++	parse_cmd_opts(argc, argv, &opts);
++	if (!opts.port)
++		usage(argv[0], "port"); // exits
++
++	ys = ynl_sock_create(&ynl_psp_family, &yerr);
++	if (!ys) {
++		fprintf(stderr, "YNL: %s\n", yerr.msg);
++		return 1;
++	}
++
++	dev_list = psp_dev_get_dump(ys);
++	if (ynl_dump_empty(dev_list)) {
++		if (ys->err.code)
++			goto err_close;
++		fprintf(stderr, "No PSP devices\n");
++		goto err_close_silent;
++	}
++
++	ynl_dump_foreach(dev_list, d) {
++		if (opts.devid) {
++			devid_found = true;
++			ver_ena = d->psp_versions_ena;
++			ver_cap = d->psp_versions_cap;
++		} else if (!first_id) {
++			first_id = d->id;
++			ver_ena = d->psp_versions_ena;
++			ver_cap = d->psp_versions_cap;
++		} else {
++			fprintf(stderr, "Multiple PSP devices found\n");
++			goto err_close_silent;
++		}
++	}
++	psp_dev_get_list_free(dev_list);
++
++	if (opts.devid && !devid_found) {
++		fprintf(stderr, "PSP device %d requested on cmdline, not found\n",
++			opts.devid);
++		goto err_close_silent;
++	} else if (!opts.devid) {
++		opts.devid = first_id;
++	}
++
++	if (ver_ena != ver_cap) {
++		ret = psp_dev_set_ena(ys, opts.devid, ver_cap);
++		if (ret)
++			goto err_close;
++	}
++
++	ret = run_responder(ys, &opts);
++
++	if (ver_ena != ver_cap && psp_dev_set_ena(ys, opts.devid, ver_ena))
++		fprintf(stderr, "WARN: failed to set the PSP versions back\n");
++
++	ynl_sock_destroy(ys);
++
++	return ret;
++
++err_close:
++	fprintf(stderr, "YNL: %s\n", ys->err.msg);
++err_close_silent:
++	ynl_sock_destroy(ys);
++	return 2;
++}
 -- 
 2.47.3
 
