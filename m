@@ -1,116 +1,139 @@
-Return-Path: <netdev+bounces-225801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC741B9864F
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 08:32:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E29FB9859A
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 08:09:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A83F4A060A
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 06:32:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E0071889ED5
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 06:10:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4551917CD;
-	Wed, 24 Sep 2025 06:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99C6B23A9AE;
+	Wed, 24 Sep 2025 06:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xj8X9cOV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m21468.qiye.163.com (mail-m21468.qiye.163.com [117.135.214.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118B424677F
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 06:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.214.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ADD22D7BF
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 06:09:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758695511; cv=none; b=XQte8R6HjTQeQQ0oPCaSTwR+vSqZm3HEaly9ML8oXoqPphRV7Due9YsJNsruP7sxUklFFmhiYx5oaeiA8yMDVGklBTd5b6lihDPfKF2H/PsNmrFGP2XFaJFP8m/SZYWWYcBFMawd6T/Nzy4uDaTcMC6uQQvvCmG1WZ7nS4ygPT4=
+	t=1758694185; cv=none; b=DwJAndlMQ2Q8858gxTf6huC39/jh/LATxhF47o5VqEaGwEeJOrL7HC7SFZdquD+aKjvXLTNU3WaOnwHwLwWSCze2YXTx0NpKESAKYoa9LIlMnMIEufhRvjcSXZhNRzf11ySdsMWwsTEJpxupqBn+axR+bV4sTLcw0FlARvQsP3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758695511; c=relaxed/simple;
-	bh=FeI2Z8PYG3Q79RX93AO97K9R9VFYKdxcHpYSpE64Nrc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=SpOLo2kYQBSVwnAEhLYNMDeWf41a9lEYEYJsm4T8NyrJlnX1bIusjml3QcTzCDO2XifoLs6NguXscNg9CsezgMeD0vecpn175JFyRs4wR3mse5tUS55cS1gvtjqQbsXZ20ZBMRNAkwofpR8nHbW0uvnysDSdhGTDjyT0pJAlcB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn; spf=pass smtp.mailfrom=easystack.cn; arc=none smtp.client-ip=117.135.214.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=easystack.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=easystack.cn
-Received: from localhost.localdomain (unknown [218.94.118.90])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 10a847808;
-	Wed, 24 Sep 2025 11:02:29 +0800 (GMT+08:00)
-From: Zhen Ni <zhen.ni@easystack.cn>
-To: manishc@marvell.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	Zhen Ni <zhen.ni@easystack.cn>
-Subject: [PATCH] net: qed: Remove redundant NULL checks after list_first_entry()
-Date: Wed, 24 Sep 2025 11:02:19 +0800
-Message-Id: <20250924030219.1252773-1-zhen.ni@easystack.cn>
-X-Mailer: git-send-email 2.20.1
+	s=arc-20240116; t=1758694185; c=relaxed/simple;
+	bh=EhcXvjDksM360UK0Vc1kfwj42Glaw8DRfiy1mwD5d2o=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=V5nY3tOcLc5FI4mKHcHpT9ZZjaoTrUzZOkqQylu770kSMCg+o91roDSJklAld/Dwc8Nm+0cgWNhUd9wWURqZutxcQp5kNanN3S5zHt7yxYNT4NwnnQt67TIwI0B7P425MDhZyoH1lTKcNyyboPM77KanKpzSVwpKH4mpTeBY/e8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tavip.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xj8X9cOV; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tavip.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-329b750757aso5351482a91.1
+        for <netdev@vger.kernel.org>; Tue, 23 Sep 2025 23:09:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758694183; x=1759298983; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VesomAbu95SiSwEJQVEDMDpoIPq0ZwIbbU6hCVXWd88=;
+        b=Xj8X9cOVm5A73FG9phTGQteR+C/LYOjdZQGakP1LJ+GRAC7AbJEgXCyPV49o/PUNN4
+         PWhLX6WjA7oQajBUQRj0tEVJnLp9cDvQ++aq1BlmvS2lHoHalZrmvcJ7nW3Hw9Y1GroA
+         2X/oCIJ5LL4PepWjnJy4gf8eVWiX+eGmpcqs3vXe0WrUuhRda/pDACUz91cNvXHSLgCG
+         mz/U7aoAwo7dGmJMSr9fVtVk9aEvM37RrbcDTJEpoIsAKTryXvodL2oIIOVvYTNuIMJq
+         vi4Jf/9YfoKwgX2mH4655/JQGZAma1Wr56SJaAQBaDS4/cmlEFqZ4F4WJfDY1boDEm+B
+         8vZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758694183; x=1759298983;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VesomAbu95SiSwEJQVEDMDpoIPq0ZwIbbU6hCVXWd88=;
+        b=QamcAXRJ+PYKK3hsgm/tfH/jU+UpfqpAtWe8GRAb9uXVjrM5c1wrklETbPLbx6PD91
+         toY0wJ9nfmPK5KQEF3tsx2nlwX9X3YRr5cZRwtLqlt9alWKjxiH5MzpNywx2g6cEyPrq
+         3YPuE/JzC4W61Sfws1b8gtW4na48sqwlLRjfIrGmTbZPm1l1djhEeh2eSATckLaooqXy
+         6Cr9UXkKsDwJf+piL3DOgWHbIqLHiZ+toCdlxebvVWiKjoWgh4m2lPJPM+Jfn6tAsbNC
+         wGrIykl5xdcOT2coTax8WJc9MVdV+DoDAPZKs4JLln7ImNXTvKhFRl/p1YLpQ5P3ImwQ
+         +7qw==
+X-Forwarded-Encrypted: i=1; AJvYcCUmmHYrdwXaQ7ofchJX6Ww/5SR2yRxeZWnh6etcFoSXZGMYjbGNNexrO81jafsfnaxYGiN0DNk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxcns6PaHxs9Ubcson/gwwXIIg8h3MvQXAD0V59Fj+UErqdlmcG
+	2K87x8PAKo+/CnwN6T7xwUIM4TSfn+cYzQDG/4aCh6bKVBIYok3rJGAOkSVLSkRVVZYonAXaWtV
+	+rQ==
+X-Google-Smtp-Source: AGHT+IHPYYt8LHeRbkdZ6BC5gEw24RQTAxzur79wWGM+UNPt7dswDqktCbgAAACHQQTYTv0OWU5feY1szQ==
+X-Received: from pjbqe17.prod.google.com ([2002:a17:90b:4f91:b0:330:55ed:d836])
+ (user=tavip job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:33c8:b0:32e:7c34:70cf
+ with SMTP id 98e67ed59e1d1-332a95e9348mr5433618a91.36.1758694183313; Tue, 23
+ Sep 2025 23:09:43 -0700 (PDT)
+Date: Wed, 24 Sep 2025 06:08:42 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9979ac27520229kunm67902e9b181e88
-X-HM-MType: 1
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVlCS0hJVh5LHk9LSR5KHRpLGVYVFAkWGhdVGRETFh
-	oSFyQUDg9ZV1kYEgtZQVlJSkNVQk9VSkpDVUJLWVdZFhoPEhUdFFlBWU9LSFVKS0lPT09IVUpLS1
-	VKQktLWQY+
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.534.gc79095c0ca-goog
+Message-ID: <20250924060843.2280499-1-tavip@google.com>
+Subject: [PATCH net] xdp: use multi-buff only if receive queue supports page pool
+From: Octavian Purdila <tavip@google.com>
+To: kuba@kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	horms@kernel.org, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, sdf@fomichev.me, uniyu@google.com, 
+	ahmed.zaki@intel.com, aleksander.lobakin@intel.com, toke@redhat.com, 
+	lorenzo@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Octavian Purdila <tavip@google.com>, syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-list_first_entry() never returns NULL — if the list is empty, it still
-returns a pointer to an invalid object, leading to potential invalid
-memory access when dereferenced.
-The calls to list_first_entry() are always guarded by !list_empty(),
-which guarantees a valid entry is returned. Therefore, the additional
-`if (!p_buffer) break;` checks in qed_ooo_release_connection_isles(),
-qed_ooo_release_all_isles(), and qed_ooo_free() are redundant and
-unreachable.
+When a BPF program that supports BPF_F_XDP_HAS_FRAGS is issuing
+bpf_xdp_adjust_tail and a large packet is injected via /dev/net/tun a
+crash occurs due to detecting a bad page state (page_pool leak).
 
-Remove the dead code for clarity and consistency with common list
-handling patterns in the kernel. No functional change intended.
+This is because xdp_buff does not record the type of memory and
+instead relies on the netdev receive queue xdp info. Since the TUN/TAP
+driver is using a MEM_TYPE_PAGE_SHARED memory model buffer, shrinking
+will eventually call page_frag_free. But with current multi-buff
+support for BPF_F_XDP_HAS_FRAGS programs buffers are allocated via the
+page pool.
 
-Signed-off-by: Zhen Ni <zhen.ni@easystack.cn>
+To fix this issue check that the receive queue memory mode is of
+MEM_TYPE_PAGE_POOL before using multi-buffs.
+
+Reported-by: syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/6756c37b.050a0220.a30f1.019a.GAE@google.com/
+Fixes: e6d5dbdd20aa ("xdp: add multi-buff support for xdp running in generic mode")
+Signed-off-by: Octavian Purdila <tavip@google.com>
 ---
- drivers/net/ethernet/qlogic/qed/qed_ooo.c | 9 ---------
- 1 file changed, 9 deletions(-)
+ net/core/dev.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_ooo.c b/drivers/net/ethernet/qlogic/qed/qed_ooo.c
-index 5d725f59db24..8be567a6ad44 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_ooo.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_ooo.c
-@@ -183,9 +183,6 @@ void qed_ooo_release_connection_isles(struct qed_hwfn *p_hwfn,
- 						    struct qed_ooo_buffer,
- 						    list_entry);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 8d49b2198d07..b195ee3068c2 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -5335,13 +5335,18 @@ static int
+ netif_skb_check_for_xdp(struct sk_buff **pskb, const struct bpf_prog *prog)
+ {
+ 	struct sk_buff *skb = *pskb;
++	struct netdev_rx_queue *rxq;
+ 	int err, hroom, troom;
  
--			if (!p_buffer)
--				break;
--
- 			list_move_tail(&p_buffer->list_entry,
- 				       &p_ooo_info->free_buffers_list);
- 		}
-@@ -218,9 +215,6 @@ void qed_ooo_release_all_isles(struct qed_hwfn *p_hwfn,
- 						     struct qed_ooo_buffer,
- 						     list_entry);
+-	local_lock_nested_bh(&system_page_pool.bh_lock);
+-	err = skb_cow_data_for_xdp(this_cpu_read(system_page_pool.pool), pskb, prog);
+-	local_unlock_nested_bh(&system_page_pool.bh_lock);
+-	if (!err)
+-		return 0;
++	rxq = netif_get_rxqueue(skb);
++	if (rxq->xdp_rxq.mem.type == MEM_TYPE_PAGE_POOL) {
++		local_lock_nested_bh(&system_page_pool.bh_lock);
++		err = skb_cow_data_for_xdp(this_cpu_read(system_page_pool.pool),
++					   pskb, prog);
++		local_unlock_nested_bh(&system_page_pool.bh_lock);
++		if (!err)
++			return 0;
++	}
  
--				if (!p_buffer)
--					break;
--
- 				list_move_tail(&p_buffer->list_entry,
- 					       &p_ooo_info->free_buffers_list);
- 			}
-@@ -255,9 +249,6 @@ void qed_ooo_free(struct qed_hwfn *p_hwfn)
- 		p_buffer = list_first_entry(&p_ooo_info->free_buffers_list,
- 					    struct qed_ooo_buffer, list_entry);
- 
--		if (!p_buffer)
--			break;
--
- 		list_del(&p_buffer->list_entry);
- 		dma_free_coherent(&p_hwfn->cdev->pdev->dev,
- 				  p_buffer->rx_buffer_size,
+ 	/* In case we have to go down the path and also linearize,
+ 	 * then lets do the pskb_expand_head() work just once here.
 -- 
-2.20.1
+2.51.0.534.gc79095c0ca-goog
 
 
