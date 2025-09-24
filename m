@@ -1,115 +1,157 @@
-Return-Path: <netdev+bounces-225954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-225956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 761DBB99DC8
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 14:34:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC98EB99E47
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 14:42:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C8A416C4BD
-	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 12:34:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC6F07B3333
+	for <lists+netdev@lfdr.de>; Wed, 24 Sep 2025 12:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A3522E7658;
-	Wed, 24 Sep 2025 12:34:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A117303CBD;
+	Wed, 24 Sep 2025 12:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nKFN8r8p"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fVOzhOMG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF859155A30
-	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 12:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2510306B24
+	for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 12:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758717275; cv=none; b=oM3eXHZzdx30KEegUHdvpMo9YQXBs/HMmp3if/RnoCYVeh6Xy/u8OL0/tajBbLPa4WDxh+XtCj8FL6y7oepV3q3LKdPO/AjdjICkh/MXVyY3027xd9yy6jrH7plQHbHQFJnGFAtPPuhrMOWQndDMOTS21IUoq5dSq1C4G7xQ2kM=
+	t=1758717655; cv=none; b=nxvgGa7O+qXCM6qC9TZMu4kVltlyLwlVtIU/GoaGIARlD2iAPKRR5yzKEi7laFjQ1KJ3Y8oLAwaxMRlPCleMqxovcyzuvAhIxHNQzMZjKYrMjNfjQmBV1phRLovyOubQVK7IPYUp3SZIn9PJMeMAj1uwbxqO6AxljQ7vQbBXcx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758717275; c=relaxed/simple;
-	bh=w/Y7hFj+095plLmyj6F//RB0JJaVllnXem2h/GAL5DM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fT31hWZqgmi+mw0XTyHpAImdPqTSAZebYLnCYAl35eQCyKmxUjVlKOLpKtZPcdQu3m2nT+bcXBOLGQ91wJQS4sb2YVrlroM3e12IWdoInn/VViK8n6evlrDrh9Z5eKOwM1A0bQAP45kK7VRBEn6GDkOsvav/nj7bSptHHbqEmBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nKFN8r8p; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-77f5d497692so1882215b3a.1
-        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 05:34:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758717273; x=1759322073; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CTDFZgAdQghFMqYnaQQne0DSQg8eYDQbEUoZypuZEl0=;
-        b=nKFN8r8px+pzegy2l8GzbujA3yONawgNDtwnTyjN3MVG+becplTcAFlrefsHstjep3
-         Uub109iAJRU1KOEBZRFhm0MlO5B/XDZ5204pKV5O1S25FAmW1hjAuKLsZY5D9yBOgue1
-         wzQzZpyoAs3gMYfKOBD0twEMueSvXUHwcdvVcfy/Venut+jIUoEBvOw0k88ejbw3FyaL
-         OXjj5SaAg5Axb1gReX4SUBHgktHAlvjF6sQQatvc5qdtB7sraWLw5SR+ezqLf+E6B1oy
-         GPhrXvwiHxtcwplCpwNX4Nupiar2cWlj1pbTEcCXNi6Pe4jSUNFvZfNpRgbj680D9TDu
-         /CSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758717273; x=1759322073;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CTDFZgAdQghFMqYnaQQne0DSQg8eYDQbEUoZypuZEl0=;
-        b=oN3LRuMhPPRknnEbCwFGZdyfcCoPZuMhm/Et3kC15pS83fK5Yvv6M9EaUqqyH7NDqC
-         njQa0VgzEdybqVUTTthPuoCX5ZHEbcTZdsPnNiqEFhYEwcFiE1IXmTTnCxm17XdWw7Ds
-         2Ip3LitHkDTO4FImbjP9Ot5TkxJ4uRx5iq1hBKda/ykBm0FcYHvGKg0v3EEDoXwifGkB
-         SrVb4CTlFuSHfUS+P5G8u88iOvPSSi8cg7n8ZLzg3Cb9KXuNAxIxiCvM/J7edY/M9UK4
-         zsujpD1OiV+hXSnIzsBkxwC85q6ass0J9C3KHRsl7EE9X7WfxWc+LyA7L08Iv4mV8usZ
-         LdzQ==
-X-Gm-Message-State: AOJu0YycNGlCSqMJR4o/NOpmwzUTEz2o+FB5a81YYGb7BE4iPHe/qV6c
-	x/JoOQvaSu5tjrW1iSxxMIJbVXG5AlR6AqRqPT77/b28jGi+x7wdcoYvpwPL5b1sLhiqrLonK50
-	+BE/kgbeBAJTOQvUhD+Dpmq75aqPqum0=
-X-Gm-Gg: ASbGncsvxCONq1fQGtzA41cOWRgIlQh3LF3RJTa+YsGCHW/shTWyoO8pg8/Ug6QKYg2
-	fb5XFmkgRB3l33BOkesvE2Q7SeAMoNd10WawIuY1T0qfrSflE033qBFMCpmizV1IKnt6UT+N8MY
-	JcBHT9sZbWVv9yXGwFTEHASx/klNoPG/3UQ1CPSjXMQ04IgKMs4e1XlxxFqrfFe7qadAiNYi4uj
-	OU4VPHbvLinok8Ubj1M9WGbkJhbzLhfHbMQ6k+x
-X-Google-Smtp-Source: AGHT+IHdx5C/tIG+bo3u5C0cXUba70Ijx6a94OsvdZgP19XusiUpG+AOBXv8usuNF4dJmHieFVzFc321rHyvoQrN75Y=
-X-Received: by 2002:a17:90b:58c5:b0:32b:dfdb:b276 with SMTP id
- 98e67ed59e1d1-332a98fc381mr6768390a91.34.1758717273147; Wed, 24 Sep 2025
- 05:34:33 -0700 (PDT)
+	s=arc-20240116; t=1758717655; c=relaxed/simple;
+	bh=KL1E8AHqn5C3mdmhcGrgCE3T2smnT7CodnJvHoVbP1w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=otWojEg1MjGjeWvy1ZKIyqUxhxnjOlljzMv/jiX0W2ITXm3S84V9fpaiwoT7YTXvrSAiS6GcYxdqw3iT1QS7uv9K60RkK4G2JTzGeKRfe5JxbJoA/E0C/0GJB8OYQFNisKoI4nbJgb9buw/KiijwlATcPFPcZlOyKVWbU9iqWsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fVOzhOMG; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758717650;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=10nL7bXwomAQHLnTpYVbxfBSNFJlIBNfZqpDvPIqdzU=;
+	b=fVOzhOMGJdle8yQ8r2sRlmImdLkDlfB2aw1iys0FfvCjmJnyhaBYDl7plUj+o+kvlLzl+l
+	iQh0/2yPSvsVTo2Mi5k9UNjFHRyl/C4h7wy37TUnUG0eEILUrJ7Q0nRrgUsYSulsJOlosS
+	lqSZB5UqvYNPfhTeCvB5GgrHqkU/5Zk=
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
+	intel-wired-lan@lists.osuosl.org,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Carolina Jubran <cjubran@nvidia.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v6 0/5] add FEC bins histogram report via ethtool
+Date: Wed, 24 Sep 2025 12:40:32 +0000
+Message-ID: <20250924124037.1508846-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250922131148.1917856-1-mmyangfl@gmail.com> <20250922131148.1917856-6-mmyangfl@gmail.com>
- <20250923174737.4759aaf4@kernel.org>
-In-Reply-To: <20250923174737.4759aaf4@kernel.org>
-From: Yangfl <mmyangfl@gmail.com>
-Date: Wed, 24 Sep 2025 20:33:57 +0800
-X-Gm-Features: AS18NWBjGVWilxW3m5lF33pWes0iHg7AU_L8xzuQ8IGPKI3mtuMEre2fBRoTZXw
-Message-ID: <CAAXyoMNBHgG-DFv16ua-T__iBXg=chFQ6TNoXdZvk4VP2aYESA@mail.gmail.com>
-Subject: Re: [PATCH net-next v11 5/5] net: dsa: yt921x: Add support for
- Motorcomm YT921x
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Simon Horman <horms@kernel.org>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Sep 24, 2025 at 8:47=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
-...
->
-> > +static void yt921x_mdio_remove(struct mdio_device *mdiodev)
-> > +{
->
-> > +             cancel_delayed_work_sync(&pp->mib_read);
-> > +     }
-> > +
-> > +     dsa_unregister_switch(&priv->ds);
->
-> The work canceling looks racy, the port can come up in between
-> cancel_work and dsa_unregister ? disable_delayed_work.. will likely
-> do the job.
+IEEE 802.3ck-2022 defines counters for FEC bins and 802.3df-2024
+clarifies it a bit further. Implement reporting interface through as
+addition to FEC stats available in ethtool. NetDevSim driver has simple
+implementation as an example while mlx5 has much more complex solution.
 
-Are you sure about this? There are many others who use
-cancel_delayed_work_sync in their teardown methods (for example
-ar9331_sw_remove). If that is true, they should be fixed too.
+The example query is the same as usual FEC statistics while the answer
+is a bit more verbose:
+
+[vmuser@archvm9 linux]$ ./tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/ethtool.yaml --do fec-get --json '{"header":{"dev-index": 10, "flags": 4}}'
+{'auto': 0,
+ 'header': {'dev-index': 10, 'dev-name': 'eni10np1'},
+ 'modes': {'bits': {}, 'nomask': True, 'size': 121},
+ 'stats': {'corr-bits': [],
+           'corrected': [123],
+           'hist': [{'bin-high': 0,
+                     'bin-low': 0,
+                     'bin-val': 445,
+                     'bin-val-per-lane': [125, 120, 100, 100]},
+                    {'bin-high': 3, 'bin-low': 1, 'bin-val': 12},
+                    {'bin-high': 7,
+                     'bin-low': 4,
+                     'bin-val': 2,
+                     'bin-val-per-lane': [2, 0, 0, 0]}],
+           'uncorr': [4]}}
+
+v5 -> v6:
+* adjust yaml spec to have padding field within fec-hist namespace
+* mlx5: adjust max histogram entries check to match the size of array of
+  mapped registers
+v4 -> v5:
+* fix selftests error path
+v3 -> v4:
+* update spec to avoid using underscores
+* make core accumulate per-lane errors into bin error counter
+* adjust wording in Documentation
+* improve FEC type check in mlx5
+* add selftest to do sanity check of reported histogram
+* partially carry-over Rb tags from Aleksandr because of logical changes
+v3 Link - https://lore.kernel.org/netdev/20250916191257.13343-1-vadim.fedorenko@linux.dev/
+v2 -> v3:
+* fix yaml spec to use binary array for histogram per-lane values
+* fix spelling
+v1 -> v2:
+* fix memset size of FEC histogram bins in mlx5
+* adjust fbnic driver FEC stats callback
+
+Links to RFC discussions:
+v1 - https://lore.kernel.org/netdev/20250729102354.771859-1-vadfed@meta.com/
+v2 - https://lore.kernel.org/netdev/20250731231019.1809172-1-vadfed@meta.com/
+v3 - https://lore.kernel.org/netdev/20250802063024.2423022-1-vadfed@meta.com/
+v4 - https://lore.kernel.org/netdev/20250807155924.2272507-1-vadfed@meta.com/
+v5 - https://lore.kernel.org/netdev/20250815132729.2251597-1-vadfed@meta.com/
+
+Carolina Jubran (3):
+  net/mlx5e: Don't query FEC statistics when FEC is disabled
+  net/mlx5e: Add logic to read RS-FEC histogram bin ranges from PPHCR
+  net/mlx5e: Report RS-FEC histogram statistics via ethtool
+
+Vadim Fedorenko (2):
+  ethtool: add FEC bins histogram report
+  selftests: net-drv: stats: sanity check FEC histogram
+
+ Documentation/netlink/specs/ethtool.yaml      |  29 ++++
+ Documentation/networking/ethtool-netlink.rst  |   5 +
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   3 +-
+ .../ethernet/fungible/funeth/funeth_ethtool.c |   3 +-
+ .../ethernet/hisilicon/hns3/hns3_ethtool.c    |   3 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |   4 +-
+ .../marvell/octeontx2/nic/otx2_ethtool.c      |   3 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |   1 +
+ .../ethernet/mellanox/mlx5/core/en_ethtool.c  |   5 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |   8 ++
+ .../ethernet/mellanox/mlx5/core/en_stats.c    | 127 +++++++++++++++++-
+ .../ethernet/mellanox/mlx5/core/en_stats.h    |   3 +-
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |   3 +-
+ drivers/net/ethernet/sfc/ethtool.c            |   3 +-
+ drivers/net/ethernet/sfc/siena/ethtool.c      |   3 +-
+ drivers/net/netdevsim/ethtool.c               |  25 +++-
+ include/linux/ethtool.h                       |  25 +++-
+ .../uapi/linux/ethtool_netlink_generated.h    |  12 ++
+ net/ethtool/fec.c                             |  75 ++++++++++-
+ tools/testing/selftests/drivers/net/stats.py  |  35 ++++-
+ 20 files changed, 351 insertions(+), 24 deletions(-)
+
+-- 
+2.47.3
+
 
