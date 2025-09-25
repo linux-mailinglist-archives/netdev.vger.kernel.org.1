@@ -1,250 +1,113 @@
-Return-Path: <netdev+bounces-226449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 877C3BA0869
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 18:01:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E515BA0866
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 18:01:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14325387FAB
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 16:01:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CA771890DDD
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 16:01:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1180303CBB;
-	Thu, 25 Sep 2025 16:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jCXCiHEO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 700312FFFBE;
+	Thu, 25 Sep 2025 16:01:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D25E2F2611;
-	Thu, 25 Sep 2025 16:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34442E2DDE
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 16:01:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758816055; cv=none; b=nl4gOwZUVzfOEy8zIqOI/x8UV4uCpE8oGq3kJ6nLlUJDHXKN3aFKi3ETL5ARiLkI8G9E5ziExEeYtKKugHRY0zoKrO8yFs5hp9FyeEzg30t+y3j8dtTp0bl4HczlChQZVBjhdumAx11mGUYLeRQCKbvuuH7cLC5dx17o4iLuGbA=
+	t=1758816086; cv=none; b=d9OpmAJVjsbFQRzCw23TiYx+oWGA6R5fCz9/gA+4L6/ismuNhgDES2HOstLAGi3+6A6O16CMHlMj5z/5IgI3Qu84JacTy0Shx/5+KVIVIe54W7S9WQD9hLkPKpBgfKQEgTneQIavoFLVZXGiu+UOU6SEM/eY2Q7TJwdVm7QKvUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758816055; c=relaxed/simple;
-	bh=fMZ9pDkVKjK47hn36tt0DCxnyx57G4AESffknPyF/hM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dnN6rG+AjYzpYpuD9coRLxKgjHUvHPFOIi6oewfV7mflN7NhndJRfVzwqfZF+QfunhiMwZchD21l558Oh/0qbcTESShLbdldkUVjTX1TnbqRj2oViLKOw34SC+1vW65gBrnPn0biVOGJefopUTuxPRKQMRUiqt4YW6VfD8ZHpGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jCXCiHEO; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758816051; x=1790352051;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=fMZ9pDkVKjK47hn36tt0DCxnyx57G4AESffknPyF/hM=;
-  b=jCXCiHEOIm3+/wb+8MXHEopB3HYBZo6vMC240XBF1CppwiQnytAF2csM
-   SYz4IiH5qXbT6vsyak3Lh4hG4MYxyl/IG4qrgcGHn1lXv10sMUD7YYcWr
-   MvXHjAHQ4uUPt0gCsUV9To73L1lq+2VrVrLfhFSt+G9f1jMeLKAMsohZ+
-   +P492U//exzVLqoNIwq7X/Pb3m1O1vNJvyPuIDTtWWXwt4b2YamwhwLPC
-   1ySgvfcqln5VeYlWd3oFl1N1adNkhdHiFiMBFionTHDq8KskCrP5tGocf
-   yENS5B7LnlObLCpisIRl7PfQeHTzg9fxEX0lNaFPw/vIQ0DPrOYrFgArk
-   g==;
-X-CSE-ConnectionGUID: itok4C2LS9iYgv5dRarDyw==
-X-CSE-MsgGUID: M6hm33jKQS67Ui6HHXRZNg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11564"; a="71759865"
-X-IronPort-AV: E=Sophos;i="6.18,292,1751266800"; 
-   d="scan'208";a="71759865"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2025 09:00:50 -0700
-X-CSE-ConnectionGUID: kiEikI7NQGqYwPS+mDtTmQ==
-X-CSE-MsgGUID: qkQNymMYRWOUtVSqi/Y+UA==
-X-ExtLoop1: 1
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by fmviesa003.fm.intel.com with ESMTP; 25 Sep 2025 09:00:48 -0700
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: bpf@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org
-Cc: netdev@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	stfomichev@gmail.com,
-	kerneljasonxing@gmail.com,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Subject: [PATCH v2 bpf-next 3/3] xsk: wrap generic metadata handling onto separate function
-Date: Thu, 25 Sep 2025 18:00:09 +0200
-Message-Id: <20250925160009.2474816-4-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20250925160009.2474816-1-maciej.fijalkowski@intel.com>
-References: <20250925160009.2474816-1-maciej.fijalkowski@intel.com>
+	s=arc-20240116; t=1758816086; c=relaxed/simple;
+	bh=vDNDhXb51t11ecjweGcxO6tZH7hRi/SsZUkwnb+CTOo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=C2r4idiBS5xAdOGBB6qVz+cc2xT/jnvq50b06u+yGrtp2wkg7V1EDUEyihy6njJ0Vhra5CXcO1FSzoPxXKI7QzUFwi3//V9Wity9fXZHyHgvQY6Wl9WVbNfw4aN4hjtnbFNWuS+qWVb6T9zLwTCAw1zp+I4srgZt5MKICSiePOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-424c8578d40so13568025ab.1
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 09:01:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758816084; x=1759420884;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wC9eoNmxGFzwBPKZvnASVvExWPvQq7FONJl+BGjmkSM=;
+        b=fRyp7Lg0D6Hffmym2dMESnyI9v7YzDMfQSe/jXEf6Qk841VhEJf9gDzKYaw/3FVT5T
+         34nSAP94vKwbw1xK3qOVej342tQ9DPOhhOdegE5d2iMVebFRMZ/+wm6qs3d+SrsEs3ew
+         +kAucu865b3viYHIY3qq8EzB/NbNG/aIC2Y2uLBUeBdXnJ9B/Jnks5yUTPjTzSqf6SuT
+         DTB1u0zEFQUoc5AmsRRAXgldA0Nf9NyhgNoZnqoRhmYHi3YdlQxc61T/De+5FF9+0lrx
+         oZM9bnplkdWISu1aSOQO0el8p9dRNFlX9g0I4bbP/pQVxOk7qiipcQWeFFm1p1JWtbSi
+         LTzg==
+X-Forwarded-Encrypted: i=1; AJvYcCX5zJNJ4bO7WBmvD30uHa6XGNHImhLEX10Unuxp25zYoM5TsIA8FdlL99XGqfNrLqb6rVbhb0Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrLbhGEtZRKZYxV19lUCofIFSreGBdzE5F/4omd+RRIImxgxip
+	/adtvkUKDDYPd3Y71gRpizhMcGxhcJPmCVgn8ZlP5mvaBB90DRup+83NlBNA/EGYwvXWn49BRav
+	y6zP2WPJh1Gp8Y7QzePCaAArk5Ak5NS8a9joZYbMm6IzXYI7XUc07F9FVRd0=
+X-Google-Smtp-Source: AGHT+IFqidjahOsPHralLRd7agu4VD0AO4qJ7WVMC7UNgEJhzK16ZgAQFMxVKpXj9sskRWloeV0Mr+kSq5E0JX/l2uo03MoXq8KU
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:c91:b0:424:8b66:fbdc with SMTP id
+ e9e14a558f8ab-425956509d3mr46700845ab.28.1758816083860; Thu, 25 Sep 2025
+ 09:01:23 -0700 (PDT)
+Date: Thu, 25 Sep 2025 09:01:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68d56753.050a0220.3a612a.000d.GAE@google.com>
+Subject: [syzbot] Monthly wireless report (Sep 2025)
+From: syzbot <syzbot+list7a42d00aaa51d0121b8c@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-xsk_build_skb() has gone wild with its size and one of the things we can
-do about it is to pull out a branch that takes care of metadata handling
-and make it a separate function.
+Hello wireless maintainers/developers,
 
-While at it, let us add metadata SW support for devices supporting
-IFF_TX_SKB_NO_LINEAR flag, that happen to have separate logic for
-building skb in xsk's generic xmit path.
+This is a 31-day syzbot report for the wireless subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireless
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+During the period, 1 new issues were detected and 0 were fixed.
+In total, 56 issues are still open and 168 have already been fixed.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  15578   Yes   WARNING in rate_control_rate_init (3)
+                   https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
+<2>  10293   Yes   WARNING in __rate_control_send_low (3)
+                   https://syzkaller.appspot.com/bug?extid=34463a129786910405dd
+<3>  6859    Yes   WARNING in __cfg80211_ibss_joined (2)
+                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
+<4>  1291    No    WARNING in drv_unassign_vif_chanctx (3)
+                   https://syzkaller.appspot.com/bug?extid=6506f7abde798179ecc4
+<5>  1221    Yes   WARNING in ieee80211_start_next_roc
+                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
+<6>  842     Yes   INFO: task hung in reg_process_self_managed_hints
+                   https://syzkaller.appspot.com/bug?extid=1f16507d9ec05f64210a
+<7>  734     Yes   INFO: task hung in reg_check_chans_work (7)
+                   https://syzkaller.appspot.com/bug?extid=a2de4763f84f61499210
+<8>  595     Yes   INFO: task hung in crda_timeout_work (8)
+                   https://syzkaller.appspot.com/bug?extid=d41f74db64598e0b5016
+<9>  564     Yes   INFO: rcu detected stall in ieee80211_handle_queued_frames
+                   https://syzkaller.appspot.com/bug?extid=1c991592da3ef18957c0
+<10> 477     No    WARNING in ieee80211_request_ibss_scan
+                   https://syzkaller.appspot.com/bug?extid=1634c5399e29d8b66789
+
 ---
- net/xdp/xsk.c | 92 +++++++++++++++++++++++++++++----------------------
- 1 file changed, 53 insertions(+), 39 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index f7e0d254a723..7b0c68a70888 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -657,6 +657,45 @@ static void xsk_drop_skb(struct sk_buff *skb)
- 	xsk_consume_skb(skb);
- }
- 
-+static int xsk_skb_metadata(struct sk_buff *skb, void *buffer,
-+			    struct xdp_desc *desc, struct xsk_buff_pool *pool,
-+			    u32 hr)
-+{
-+	struct xsk_tx_metadata *meta = NULL;
-+
-+	if (unlikely(pool->tx_metadata_len == 0))
-+		return -EINVAL;
-+
-+	meta = buffer - pool->tx_metadata_len;
-+	if (unlikely(!xsk_buff_valid_tx_metadata(meta)))
-+		return -EINVAL;
-+
-+	if (meta->flags & XDP_TXMD_FLAGS_CHECKSUM) {
-+		if (unlikely(meta->request.csum_start +
-+			     meta->request.csum_offset +
-+			     sizeof(__sum16) > desc->len))
-+			return -EINVAL;
-+
-+		skb->csum_start = hr + meta->request.csum_start;
-+		skb->csum_offset = meta->request.csum_offset;
-+		skb->ip_summed = CHECKSUM_PARTIAL;
-+
-+		if (unlikely(pool->tx_sw_csum)) {
-+			int err;
-+
-+			err = skb_checksum_help(skb);
-+			if (err)
-+				return err;
-+		}
-+	}
-+
-+	if (meta->flags & XDP_TXMD_FLAGS_LAUNCH_TIME)
-+		skb->skb_mstamp_ns = meta->request.launch_time;
-+	xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta);
-+
-+	return 0;
-+}
-+
- static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
- 					      struct xdp_desc *desc)
- {
-@@ -669,6 +708,9 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
- 	int err, i;
- 	u64 addr;
- 
-+	addr = desc->addr;
-+	buffer = xsk_buff_raw_get_data(pool, addr);
-+
- 	if (!skb) {
- 		hr = max(NET_SKB_PAD, L1_CACHE_ALIGN(xs->dev->needed_headroom));
- 
-@@ -679,6 +721,11 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
- 		skb_reserve(skb, hr);
- 
- 		xsk_skb_init_misc(skb, xs, desc->addr);
-+		if (desc->options & XDP_TX_METADATA) {
-+			err = xsk_skb_metadata(skb, buffer, desc, pool, hr);
-+			if (unlikely(err))
-+				return ERR_PTR(err);
-+		}
- 	} else {
- 		xsk_addr = kmem_cache_zalloc(xsk_tx_generic_cache, GFP_KERNEL);
- 		if (!xsk_addr)
-@@ -692,11 +739,9 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
- 		list_add_tail(&xsk_addr->addr_node, &XSKCB(skb)->addrs_list);
- 	}
- 
--	addr = desc->addr;
- 	len = desc->len;
- 	ts = pool->unaligned ? len : pool->chunk_size;
- 
--	buffer = xsk_buff_raw_get_data(pool, addr);
- 	offset = offset_in_page(buffer);
- 	addr = buffer - pool->addrs;
- 
-@@ -727,7 +772,6 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
- static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 				     struct xdp_desc *desc)
- {
--	struct xsk_tx_metadata *meta = NULL;
- 	struct net_device *dev = xs->dev;
- 	struct sk_buff *skb = xs->skb;
- 	int err;
-@@ -761,6 +805,12 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 				goto free_err;
- 
- 			xsk_skb_init_misc(skb, xs, desc->addr);
-+			if (desc->options & XDP_TX_METADATA) {
-+				err = xsk_skb_metadata(skb, buffer, desc,
-+						       xs->pool, hr);
-+				if (unlikely(err))
-+					goto free_err;
-+			}
- 		} else {
- 			int nr_frags = skb_shinfo(skb)->nr_frags;
- 			struct xsk_addr_node *xsk_addr;
-@@ -795,42 +845,6 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 			xsk_addr->addr = desc->addr;
- 			list_add_tail(&xsk_addr->addr_node, &XSKCB(skb)->addrs_list);
- 		}
--
--		if (!skb_shinfo(skb)->nr_frags && desc->options & XDP_TX_METADATA) {
--			if (unlikely(xs->pool->tx_metadata_len == 0)) {
--				err = -EINVAL;
--				goto free_err;
--			}
--
--			meta = buffer - xs->pool->tx_metadata_len;
--			if (unlikely(!xsk_buff_valid_tx_metadata(meta))) {
--				err = -EINVAL;
--				goto free_err;
--			}
--
--			if (meta->flags & XDP_TXMD_FLAGS_CHECKSUM) {
--				if (unlikely(meta->request.csum_start +
--					     meta->request.csum_offset +
--					     sizeof(__sum16) > len)) {
--					err = -EINVAL;
--					goto free_err;
--				}
--
--				skb->csum_start = hr + meta->request.csum_start;
--				skb->csum_offset = meta->request.csum_offset;
--				skb->ip_summed = CHECKSUM_PARTIAL;
--
--				if (unlikely(xs->pool->tx_sw_csum)) {
--					err = skb_checksum_help(skb);
--					if (err)
--						goto free_err;
--				}
--			}
--
--			if (meta->flags & XDP_TXMD_FLAGS_LAUNCH_TIME)
--				skb->skb_mstamp_ns = meta->request.launch_time;
--			xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta);
--		}
- 	}
- 
- 	xsk_inc_num_desc(skb);
--- 
-2.43.0
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
