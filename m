@@ -1,265 +1,124 @@
-Return-Path: <netdev+bounces-226362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91050B9F955
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 15:32:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E5B2B9F919
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 15:28:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 900AD7BD588
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 13:25:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FB313AA179
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 13:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3331A23D7C7;
-	Thu, 25 Sep 2025 13:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA1731F542A;
+	Thu, 25 Sep 2025 13:28:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KlAns0s6"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kfMZnx4P"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068BD233145
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 13:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E180A1A83F9
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 13:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758806721; cv=none; b=PCQHWSsV3UR+PTyhyJB4iCITujnAgJY0TQ5fsjwk9MpFo9irOzhp59CD6tGCpzqkVsKhwvN66rqwkayliA/xNIP0ueEnVJ9OHiujonDcZBHmoX/K8U8OI2DCMDKb/RNk0KEgh9tSSLcTV98npG45wiIAiTd04owb7/+giSh0bNQ=
+	t=1758806900; cv=none; b=lMKf5O3WT/5FF54PHKUMIG/9v3AV6MTcJIG+YvqSvFLCO0JhPfssNyXrZmKwyRYUdBFqai67FZP1p0ba+x10a7SMuxit+3HXJ4ElH2KNHYVbLj2WS2RwUp8cWtN9yUbEMfLceJgjqr0pN9ZzPici2zF41OxJNtwZFQLyw7stBFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758806721; c=relaxed/simple;
-	bh=jTzL17HFK1c7+mgAykOkTzCuS3EP3Lk7nHiSpVjNIQU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=j3VLMWqjhZ0Xo4wzM5Z+ok00+NjbX+4r00zHSxb8oQvqtaWLlocI/g0XvIj5oxG6u9N/L97Z8dpscS64CQQ5hWbGJx7f3/NIv3jImz/SPgnwDQ0dcCWLGRr9jHwf5XH/VqGj/O62WTZezCkM2OU/DL56xDrGTv95tKeTIKVQhDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KlAns0s6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758806718;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=xdMIKqdFt0Lw0gtozRUBLh+0hn0Gwhguue/NQ9kDJlg=;
-	b=KlAns0s6vdsNYFoaerwqYsBDMGhys1VDnDJ/YFeW+iMRHU9FW2Uuinsvn8LJI3n6Vwy0/q
-	6a8teYxTQ2X6eaQo0jX3PFhWGWllm7qXDAG/wREhpCNXZzrj1XnrPv2itipxLWF4JwpfBP
-	MTRop/3zrAvzG9KpArYTunYdubmoEhQ=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-613-s6zK_NuVP4ytLGY3d55kWg-1; Thu,
- 25 Sep 2025 09:25:16 -0400
-X-MC-Unique: s6zK_NuVP4ytLGY3d55kWg-1
-X-Mimecast-MFC-AGG-ID: s6zK_NuVP4ytLGY3d55kWg_1758806714
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E267B180034A;
-	Thu, 25 Sep 2025 13:25:13 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.32.246])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DBD5919560A2;
-	Thu, 25 Sep 2025 13:25:11 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.17-rc8
-Date: Thu, 25 Sep 2025 15:25:02 +0200
-Message-ID: <20250925132502.65191-1-pabeni@redhat.com>
+	s=arc-20240116; t=1758806900; c=relaxed/simple;
+	bh=flAw5KKjXu42FlukgIcjdTtfBFEAB68+Z4z5lvAgfpE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=lz+vs/4Eea+T1TBuxSuI2wtd3oHMKNthqzEvg0ULCE96KAeMfmjxwqvUY4ToG7f2fu/v4qFDX0VduuNrbh71ZzMP1rKtStIoiYX0XX2L6P/jIgVngDIqPEyCcYU9ngLcXLJXd2LiyFlgaikJWlzGufjA7poZF+IqCEQutNxJxCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kfMZnx4P; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-46e34bd8eb2so7436955e9.3
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 06:28:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1758806897; x=1759411697; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LhZs0QbdJYRw6FSQz/b2p4quCXTn98S2BMBiWzLFh48=;
+        b=kfMZnx4P99A4TvCSgt8C9naZK1lYcSYm8N3ZkFkGs9Nfi7o+r4PYy8N8/syHwh7h+z
+         Qi8xFpGiqi0YcSRnUUmKFFBqxaNKdwxN6/fSTqXgaMyq3OxmQXlYb21BvHVD/hcc62al
+         VZJwglDUcBq5LsgXRTt8U/4BY6dj7Mo5CYc9reOHSoPZDIvXeISQHW5rgwssPdM0l4ys
+         U6N6hGPSxY1S/KaPDJCmq+88MvT8oVsjOUpMf4BRKAXau6dnI/qI9alfL7nNJD3+Kifw
+         I5/Tb0NOfa0SOI2BEKkG3ttfD2tAKXAXbZfL2dKLmwH24hiwLIexeLWtQoD1QAPMkFVF
+         Hfug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758806897; x=1759411697;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LhZs0QbdJYRw6FSQz/b2p4quCXTn98S2BMBiWzLFh48=;
+        b=iM9L+5Nwwh9E9wwIpztmn+IpleqV/1ES3ruVTDsxj+PVszGehk7r8B0QFVpopR5SsV
+         YigXI3v8vsAHu07vI1q+b0XHsMznhCSYIZNIxftxfxqnfzZDAinSy0Od6K78DCji8cq/
+         F/AVxGX/h4Cz0s5ZE8+6te+AkNxsA21CCfpwHxINu8y9mr6hqPSCRJB5LTG1TYBlrySl
+         SOnN7WPWNPhTpg72/CHUanuO18jeIcpjGE8u1farraJXJuL8y0A6AMSknpSVwfB2BFoO
+         TroC62DypW1uUCtmw2Wf06D1qPc2G88ZmsnTaF8msp3JWpjo593F4VwJ862KSKsEAQFK
+         LSkw==
+X-Forwarded-Encrypted: i=1; AJvYcCU1EURr3f4n71kaM+cZxOEHYqZosYRJF2ZgEshQUaK5Fhl5pae46z0lCba7kj7V7uKsnAb9pPc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGVHf8cNrlpjIj7+fBW/fLc4EYUK53HSviG+xRV/pB6q3SuAl/
+	7uFLB6tQEgbgaT2nrtXIy1IZ84Fp7eMgXYSRSZm/e+53drIIbtEvk6tYLXjq9zQFOwQ=
+X-Gm-Gg: ASbGncvDz7oVE5uDVO/Zk0jRq+WkXK4dIpd95tLmmnwPA6zOn+5tree87rrBmjvmntb
+	zqSREvhhySwqHyxT8swcVncelFNDE0o9NyjDW7Q2px4+Rx0rV2OTUKP5DTWZDOosvIS1u2ugYTu
+	yqdMsOPKZLxZ/0Jal5M8HcCvQ+BL0UUfyzGfJ0f41FfByiiELqIjdLsVz3xSDYShHf6j8xbDKfk
+	y2CdN4wywfoEW8WDfq16vpqDa/hqO/8zoTpkShQ0sjtySsPLQs9ODEScPrhhihmQ+aGIwpzwHHi
+	l/25ruAA9iFp/+sBTkVUhUcc4VXpt+qRA/K9Z4bvTyqBfA2CSVfY0vtUWJIWITSMH6hxz72VGz2
+	UwADyzW+JgBQYpwilHPdIUdzlIFwP
+X-Google-Smtp-Source: AGHT+IE8huo9gSXYF3zbdT3uLvSy0gSrDiXlprLcEpyFX1ppWGNriITL3c4SgFMXRwSFCbcgfglmbg==
+X-Received: by 2002:a5d:64e8:0:b0:3ff:17ac:a34b with SMTP id ffacd0b85a97d-40e499acbf7mr3135758f8f.42.1758806897199;
+        Thu, 25 Sep 2025 06:28:17 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-40fc7e2c6b3sm3257259f8f.54.2025.09.25.06.28.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Sep 2025 06:28:16 -0700 (PDT)
+Date: Thu, 25 Sep 2025 16:28:13 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH v2 net-next] dpll: zl3073x: Fix double free in
+ zl3073x_devlink_flash_update()
+Message-ID: <aNVDbcIQq4RmU_fl@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hi Linus!
+The zl3073x_devlink_flash_prepare() function calls zl3073x_fw_free() and
+the caller, zl3073x_devlink_flash_update(), also calls that same free
+function so it leads to a double free.  Delete the extra free.
 
-The following changes since commit cbf658dd09419f1ef9de11b9604e950bdd5c170b:
+Fixes: a1e891fe4ae8 ("dpll: zl3073x: Implement devlink flash callback")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Ivan Vecera <ivecera@redhat.com>
+---
+v2: Fix the commit message.  Words in wrong order == nonsense.
 
-  Merge tag 'net-6.17-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-09-18 10:22:02 -0700)
+ drivers/dpll/zl3073x/devlink.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.17-rc8
-
-for you to fetch changes up to d9c70e93ec5988ab07ad2a92d9f9d12867f02c56:
-
-  octeontx2-pf: Fix potential use after free in otx2_tc_add_flow() (2025-09-25 11:04:34 +0200)
-
-----------------------------------------------------------------
-Including fixes from Bluetooth, IPsec and CAN.
-
-No known regressions at this point.
-
-Current release - regressions:
-
-  - xfrm: xfrm_alloc_spi shouldn't use 0 as SPI
-
-Previous releases - regressions:
-
-  - xfrm: fix offloading of cross-family tunnels
-
-  - bluetooth: fix several races leading to UaFs
-
-  - dsa: lantiq_gswip: fix FDB entries creation for the CPU port
-
-  - eth: tun: update napi->skb after XDP process
-
-  - eth: mlx: fix UAF in flow counter release
-
-Previous releases - always broken:
-
-  - core: forbid FDB status change while nexthop is in a group
-
-  - smc: fix warning in smc_rx_splice() when calling get_page()
-
-  - can: provide missing ndo_change_mtu(), to prevent buffer overflow.
-
-  - eth: i40e: fix VF config validation
-
-  - eth: broadcom: fix support for PTP_EXTTS_REQUEST2 ioctl
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Alok Tiwari (1):
-      bnxt_en: correct offset handling for IPv6 destination address
-
-Calvin Owens (1):
-      Bluetooth: Fix build after header cleanup
-
-Carolina Jubran (1):
-      net/mlx5e: Fix missing FEC RS stats for RS_544_514_INTERLEAVED_QUAD
-
-Chen Yufeng (1):
-      can: hi311x: fix null pointer dereference when resuming from sleep before interface was enabled
-
-Dan Carpenter (1):
-      octeontx2-pf: Fix potential use after free in otx2_tc_add_flow()
-
-Duy Nguyen (1):
-      can: rcar_canfd: Fix controller mode setting
-
-Ido Schimmel (3):
-      nexthop: Forbid FDB status change while nexthop is in a group
-      selftests: fib_nexthops: Fix creation of non-FDB nexthops
-      selftests: fib_nexthops: Add test cases for FDB status change
-
-Jacob Keller (4):
-      broadcom: fix support for PTP_PEROUT_DUTY_CYCLE
-      broadcom: fix support for PTP_EXTTS_REQUEST2 ioctl
-      ptp: document behavior of PTP_STRICT_FLAGS
-      libie: fix string names for AQ error codes
-
-Jakub Kicinski (7):
-      Merge branch 'broadcom-report-the-supported-flags-for-ancillary-features'
-      Merge tag 'for-net-2025-09-22' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
-      Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      Merge tag 'ipsec-2025-09-22' of git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec
-      Merge tag 'linux-can-fixes-for-6.17-20250923' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can
-      Merge branch 'nexthop-various-fixes'
-      Merge branch 'mlx5-misc-fixes-2025-09-22'
-
-Jason Baron (1):
-      net: allow alloc_skb_with_frags() to use MAX_SKB_FRAGS
-
-Luiz Augusto von Dentz (4):
-      Bluetooth: hci_sync: Fix hci_resume_advertising_sync
-      Bluetooth: hci_event: Fix UAF in hci_conn_tx_dequeue
-      Bluetooth: hci_event: Fix UAF in hci_acl_create_conn_sync
-      Bluetooth: MGMT: Fix possible UAFs
-
-Lukasz Czapnik (8):
-      i40e: add validation for ring_len param
-      i40e: fix idx validation in i40e_validate_queue_map
-      i40e: fix idx validation in config queues msg
-      i40e: fix input validation logic for action_meta
-      i40e: fix validation of VF state in get resources
-      i40e: add max boundary check for VF filters
-      i40e: add mask to apply valid bits for itr_idx
-      i40e: improve VF MAC filters accounting
-
-Marc Kleine-Budde (1):
-      Merge patch series "can: populate ndo_change_mtu() to prevent buffer overflow"
-
-Moshe Shemesh (1):
-      net/mlx5: fs, fix UAF in flow counter release
-
-Paolo Abeni (1):
-      Merge branch 'lantiq_gswip-fixes'
-
-Petr Malat (1):
-      ethernet: rvu-af: Remove slash from the driver name
-
-Sabrina Dubroca (2):
-      xfrm: xfrm_alloc_spi shouldn't use 0 as SPI
-      xfrm: fix offloading of cross-family tunnels
-
-Sidraya Jayagond (1):
-      net/smc: fix warning in smc_rx_splice() when calling get_page()
-
-Stéphane Grosjean (1):
-      can: peak_usb: fix shift-out-of-bounds issue
-
-Vincent Mailhol (4):
-      can: etas_es58x: populate ndo_change_mtu() to prevent buffer overflow
-      can: hi311x: populate ndo_change_mtu() to prevent buffer overflow
-      can: sun4i_can: populate ndo_change_mtu() to prevent buffer overflow
-      can: mcba_usb: populate ndo_change_mtu() to prevent buffer overflow
-
-Vladimir Oltean (2):
-      net: dsa: lantiq_gswip: move gswip_add_single_port_br() call to port_setup()
-      net: dsa: lantiq_gswip: suppress -EINVAL errors for bridge FDB entries added to the CPU port
-
-Wang Liang (1):
-      net: tun: Update napi->skb after XDP process
-
-Yevgeny Kliteynik (1):
-      net/mlx5: HWS, ignore flow level for multi-dest table
-
- drivers/bluetooth/Kconfig                          |   6 +
- drivers/bluetooth/hci_uart.h                       |   8 +-
- drivers/net/can/rcar/rcar_canfd.c                  |   7 +-
- drivers/net/can/spi/hi311x.c                       |  34 +--
- drivers/net/can/sun4i_can.c                        |   1 +
- drivers/net/can/usb/etas_es58x/es58x_core.c        |   3 +-
- drivers/net/can/usb/mcba_usb.c                     |   1 +
- drivers/net/can/usb/peak_usb/pcan_usb_core.c       |   2 +-
- drivers/net/dsa/lantiq_gswip.c                     |  21 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c       |   2 +-
- drivers/net/ethernet/intel/i40e/i40e.h             |   3 +-
- drivers/net/ethernet/intel/i40e/i40e_main.c        |  26 ++-
- drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 110 +++++----
- drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h |   3 +-
- drivers/net/ethernet/intel/libie/adminq.c          |   2 +-
- drivers/net/ethernet/marvell/octeontx2/af/cgx.c    |   3 +-
- .../net/ethernet/marvell/octeontx2/nic/otx2_tc.c   |   2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_stats.c |   1 +
- drivers/net/ethernet/mellanox/mlx5/core/fs_core.c  |   2 +-
- drivers/net/ethernet/mellanox/mlx5/core/fs_core.h  |   1 +
- .../net/ethernet/mellanox/mlx5/core/fs_counters.c  |  25 +-
- .../mellanox/mlx5/core/steering/hws/action.c       |   4 +-
- .../mellanox/mlx5/core/steering/hws/fs_hws.c       |  11 +-
- .../mellanox/mlx5/core/steering/hws/fs_hws_pools.c |   8 +-
- .../mellanox/mlx5/core/steering/hws/mlx5hws.h      |   3 +-
- drivers/net/phy/bcm-phy-ptp.c                      |   6 +-
- drivers/net/tun.c                                  |   3 +
- include/linux/mlx5/fs.h                            |   2 +
- include/net/bluetooth/hci_core.h                   |  21 ++
- include/uapi/linux/ptp_clock.h                     |   3 +
- net/bluetooth/hci_event.c                          |  30 ++-
- net/bluetooth/hci_sync.c                           |   7 +
- net/bluetooth/mgmt.c                               | 259 +++++++++++++++------
- net/bluetooth/mgmt_util.c                          |  46 ++++
- net/bluetooth/mgmt_util.h                          |   3 +
- net/core/skbuff.c                                  |   2 +-
- net/ipv4/nexthop.c                                 |   7 +
- net/smc/smc_loopback.c                             |  14 +-
- net/xfrm/xfrm_device.c                             |   2 +-
- net/xfrm/xfrm_state.c                              |   3 +
- tools/testing/selftests/net/fib_nexthops.sh        |  52 ++++-
- 41 files changed, 548 insertions(+), 201 deletions(-)
-
+diff --git a/drivers/dpll/zl3073x/devlink.c b/drivers/dpll/zl3073x/devlink.c
+index f55d5309d4f9..ccc22332b346 100644
+--- a/drivers/dpll/zl3073x/devlink.c
++++ b/drivers/dpll/zl3073x/devlink.c
+@@ -167,7 +167,6 @@ zl3073x_devlink_flash_prepare(struct zl3073x_dev *zldev,
+ 		zl3073x_devlink_flash_notify(zldev,
+ 					     "Utility is missing in firmware",
+ 					     NULL, 0, 0);
+-		zl3073x_fw_free(zlfw);
+ 		return -ENOEXEC;
+ 	}
+ 
+-- 
+2.51.0
 
