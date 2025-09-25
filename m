@@ -1,87 +1,57 @@
-Return-Path: <netdev+bounces-226350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02E11B9F4D7
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:41:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEAA7B9F558
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:47:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 590CE4A5B59
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 12:41:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B3A67AA5EA
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 12:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 749351B4224;
-	Thu, 25 Sep 2025 12:40:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDCE11DFDA1;
+	Thu, 25 Sep 2025 12:47:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mzKo123o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MwOKBEWa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954ED1A5B9E
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 12:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F871D54C2
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 12:47:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758804054; cv=none; b=s0dMrt6qHAQuEf/6IYyl22nhc3bu3CxbM3bORSWeZdtiptEH07D0Jcd+uxVeRWr9xfuAEEtdHyZoiQuiyK1GFzd9S0S5H+QPAY5YXhtUmUEkfZUV75PDiicI2ltkXyI14XqD65CLl3eI5EZ4ECc6LJyr10AIHseZdZu/rlZNPi8=
+	t=1758804433; cv=none; b=B3jotj2CMOymdykOSReUBEiwGAHG4eo77CfUvteMisXdrRrPssZcy9k8C5GKYQBQQXsZsSGX2uFKncyctAtPraCBYp5idnlzVhYZ/tgN9A5+m38kT8yURNGoPF8Tvswz7BCC0HI/qkXZVC8eZICHRUyxfKn7zyul9ajC0nYy+GA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758804054; c=relaxed/simple;
-	bh=VXON1v7RvXA7Y4H/9zywjlqD/4OXJyQ9u4H3dPvrN4o=;
+	s=arc-20240116; t=1758804433; c=relaxed/simple;
+	bh=h8dj3q/tU9y+h1ZUDAZ0aunuRC0Jsphsil4OfIWN+Xo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rmJpFVfMvdWMcBlKeJtbrVvgo8WbO59CxndvMEEKodgoApT3w6l4+oob7MaTN/IwPKNurfexIiMQW4sD4zPS1FEcrbEdPPxKRP2s8WcAtKiDXi04ixN/208v6EK0tJXkZBTo4oNpQaL2vQ9j4/C6y71UNYMYS+9eGV034JQozU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mzKo123o; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b07e3a77b72so342739366b.0
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 05:40:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758804051; x=1759408851; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=w4iZfEG4kVECR3QGnQozF1ONlvbS7K+/HZuIx+Nym7I=;
-        b=mzKo123o4mA17/bqhXtbHWqZBbRW5bi7sjPdCyD40EEOLSaQ31nZeX1S7JfJmEg9Hw
-         cZJpnnrTFGZ8o/MEnFiMSnWrBYRwn5Sakn+WjXyKySbF+5DP87a9wkEb6njD5yvmLgiP
-         vyZ+SEICL8SHPi9J0WxNUm6yG/9Hnhy9wTd9Z/LPXVxIkryKtemptmaApy1o3Al9M7hi
-         50M4ej39G4lMY/Bqi1N8QeHkMzG5Irbi2shA+6Fz/SDiPTPcEyl8N4pPljjwQsu2+DkO
-         zaWolASy9P+6Nm3eFW6mtGxIU8PRaT7000FHU7hPVC08pKkphDFvkFS+j+H7rq+ZPO2h
-         YSOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758804051; x=1759408851;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w4iZfEG4kVECR3QGnQozF1ONlvbS7K+/HZuIx+Nym7I=;
-        b=M8gIf6e9YApWlLrW0snXBkiFjBTxtZUuUI2MH0lz/SXSTAoHu/Q5T8B7E0QoChW+n/
-         nsb35zn2CQnelio6xsTs2MNNuMFXJJqHiAp6zYXuQ2I0iiexqf52ueEGJs/TesupFgZx
-         EQ/1xfyHLdbK4SpvceFEerfAyImY4x0Yx2k98AYCEiQZf25n6ZyhDSH2Nn/gYvypmeZj
-         EpFF/qa7H6yzSxqk3bn1BpWW0o9DVy20568epdZZECJCv3fv1SDkYafFX3YY1kjdmBli
-         UR/vtacnWPP2T1gnE1CGVv7KbsVcWLLsBi6A+57bOWuM4MmLhwIbdvfrM3M5SCjowQiD
-         BtAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVteFLdTGRVP2EFr12GB19JGOYxDVdCcMUGareJPi6498pWUR/EMy+oSS0eK44FWPwYoE4ndV0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIOZmLMuTHG866Mqzbx4ykIWPuKLK4kl2WKaLNPfcoNNFc1/F3
-	inXd9/vuxbAbdpNJz9G3pgFQudEwWVMcidqmCrFqTI8pe/qYJtwMpSTg
-X-Gm-Gg: ASbGncuSLiz2OVoJ8T4/qAsKGbrr7RF9qYex2yF4sDoKSqPfkmxeguvVk4qU+XlgSeQ
-	rbNoYL9gN2u5iEOgC99VSD+rTULFvh3mR88rqXdA+Z9Oq5fcV/+m8UFfFJ9nMlMGZCt9Xkq+JwC
-	DmqqMbXLlqSZ47k3z9t4W/gvWLjyBAIBAyfKaeVMAW52MG5ZEBH8psrz9h6hwcKfDpp3dVmMzDb
-	nt74fpWFM9vD7cJIg7DfKEIy4Kod0SHBbMX91zF3M8XlZ3fgakGExPQJiU1jLQyQgOjkuZ5eiMu
-	zfe1YflrBCXYOJbnRJi1jEIm3X77ShgL3VBluOlPIx/3s1PP8emtmzVMOzHKebm9kJIMT54ppO1
-	dvkhXtr+zxidILmm4f969NPtXPtqYR/Bd7WKxuKQygpGpAbFDp8a1RjMb74eEP007gmUyHrtH
-X-Google-Smtp-Source: AGHT+IH1zVng8lk0TycVJy+o3g1mDILGx3FJMUy3vX3S9k2pmy4r7gL8isXWlnXBqQz/KWO9gE7z2w==
-X-Received: by 2002:a17:907:1c94:b0:afe:ef8a:a48b with SMTP id a640c23a62f3a-b354e41468amr279935366b.30.1758804050688;
-        Thu, 25 Sep 2025 05:40:50 -0700 (PDT)
-Received: from alessandro-pc (net-2-37-207-41.cust.vodafonedsl.it. [2.37.207.41])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b3545a98416sm158093566b.102.2025.09.25.05.40.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 05:40:50 -0700 (PDT)
-Date: Thu, 25 Sep 2025 14:40:47 +0200
-From: Alessandro Zanni <alessandrozanni.dev@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Alessandro Zanni <alessandro.zanni87@gmail.com>, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftest: net: Fix error message if empty variable
-Message-ID: <ryyvwk64xplpvwozytdsfkyxls7sa3r4p4xpdqfhh6h2k4rdhl@chwwppzuvbop>
-References: <20250924230413.75246-1-alessandro.zanni87@gmail.com>
- <20250925104930.GG836419@horms.kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kdV5gsHJAHkrgwrFf4jj21sF9zdH+LwqzOcrnNTsG7enCwYlu7dx//ODa8Fj+liHeZJG71EhxwyePntVfacvhwLKdxp+Awp57yqBRmqg3umAxhoecj9BMcru2kXb/Tv+ALDyiT4hJ4jIOKRC1TWbwyyX44DAclqiz2qoi43B/wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MwOKBEWa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFB51C4CEF0;
+	Thu, 25 Sep 2025 12:47:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758804431;
+	bh=h8dj3q/tU9y+h1ZUDAZ0aunuRC0Jsphsil4OfIWN+Xo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MwOKBEWaBY2FwgNQU/9v6FuHWn53jynfIe0RQbVIH0WsJqEyU2nLnSTFhJAaBNr2w
+	 QGUf1H7zdXRKe5MsYDi1GcwjEeKUsJtVc5h1OE3FWGmK6qpWSj7lv4UufpDglX3kAV
+	 6YbF+W8JiYd0vGpQWYuM9C41m3tVXlgUTaHDTXwMKSd6MONm2JhxZ5KFDNhFAjMVgU
+	 4owJ4shSBvkIcVCgkmMiM2FNH2Pkxw2P+/1Z2kp+H3hYaE4VMCiX8Okq41DZ0tp6ph
+	 6ptT1duQ3E6TppYlSiJTgEMAQVEAmr4QtTkjMpmrIHmdbF2/hsiqkUd9uBHPj4XL2E
+	 Ux3BxasBMc3Lg==
+Date: Thu, 25 Sep 2025 13:47:07 +0100
+From: Simon Horman <horms@kernel.org>
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: Jon Maloy <jmaloy@redhat.com>, "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Tung Quang Nguyen <tung.quang.nguyen@est.tech>,
+	tipc-discussion@lists.sourceforge.net, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 net-next] tipc: adjust tipc_nodeid2string() to return
+ string length
+Message-ID: <20250925124707.GH836419@horms.kernel.org>
+References: <20250924112649.1371695-1-dmantipov@yandex.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,67 +60,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250925104930.GG836419@horms.kernel.org>
+In-Reply-To: <20250924112649.1371695-1-dmantipov@yandex.ru>
 
-On Thu, Sep 25, 2025 at 11:49:30AM +0100, Simon Horman wrote:
-> On Thu, Sep 25, 2025 at 01:04:07AM +0200, Alessandro Zanni wrote:
-> > Fix to avoid cases where the `res` shell variable is
-> > empty in script comparisons.
-> > 
-> > The issue can be reproduced with the command:
-> > make kselftest TARGETS=net
-> > 
-> > It solves the error:
-> > ./tfo_passive.sh: line 98: [: -eq: unary operator expected
-> > 
-> > Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
-> > ---
-> >  tools/testing/selftests/net/tfo_passive.sh | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/tools/testing/selftests/net/tfo_passive.sh b/tools/testing/selftests/net/tfo_passive.sh
-> > index 80bf11fdc046..2655931b2396 100755
-> > --- a/tools/testing/selftests/net/tfo_passive.sh
-> > +++ b/tools/testing/selftests/net/tfo_passive.sh
-> > @@ -95,7 +95,7 @@ wait
-> >  res=$(cat $out_file)
-> >  rm $out_file
-> >  
-> > -if [ $res -eq 0 ]; then
-> > +if [ -n "$res" ] && [ $res -eq 0 ]; then
-> >  	echo "got invalid NAPI ID from passive TFO socket"
-> >  	cleanup_ns
-> >  	exit 1
-> 
-> Hi Alessandro,
-> 
-> I'm not sure what $res can be in practice.
-> But as it is the contents of $out_file (or more specifically,
-> the stdout of running cat $outfile), in theory it could be anything.
-> 
-> So while your patch addresses one error case.
-> I think there are others.
-> 
-> f.e. if res is not empty but not numeric, then we may see
-> 
-> bash: [: b: integer expression expected
-> 
-> Or if res contains a newline, then we may see
-> 
-> bash: [: too many arguments
-> 
-> 
-> So I wonder if it is better to treat $res as a string,
-> and quote it to avoid unexpected side effects.
-> 
-> [ "$res" = "0" ]
+On Wed, Sep 24, 2025 at 02:26:49PM +0300, Dmitry Antipov wrote:
 
-I'm not sure about the possible values in $res neither.
-I assumed it was numeric because of the "-eq" operator but,
-if it can be any value, a string comparison would be better.
+...
 
-I'm going to edit it.
+> diff --git a/net/tipc/link.c b/net/tipc/link.c
+> index 3ee44d731700..e61872b5b2b3 100644
+> --- a/net/tipc/link.c
+> +++ b/net/tipc/link.c
+> @@ -495,11 +495,9 @@ bool tipc_link_create(struct net *net, char *if_name, int bearer_id,
+>  
+>  	/* Set link name for unicast links only */
+>  	if (peer_id) {
+> -		tipc_nodeid2string(self_str, tipc_own_id(net));
+> -		if (strlen(self_str) > 16)
+> +		if (tipc_nodeid2string(self_str, tipc_own_id(net)) > 16)
+>  			sprintf(self_str, "%x", self);
 
-Thanks,
-Alessandro
+I see this is a nice clean-up. Thanks.
+
+Would it make sense to move the '> 16' logic also be folded into
+tipc_nodeid2string(), or a wrapper provided, to further simplify the
+callers?
+
+> -		tipc_nodeid2string(peer_str, peer_id);
+> -		if (strlen(peer_str) > 16)
+> +		if (tipc_nodeid2string(peer_str, peer_id) > 16)
+>  			sprintf(peer_str, "%x", peer);
+>  	}
+>  	/* Peer i/f name will be completed by reset/activate message */
+> @@ -570,8 +568,7 @@ bool tipc_link_bc_create(struct net *net, u32 ownnode, u32 peer, u8 *peer_id,
+>  	if (peer_id) {
+>  		char peer_str[NODE_ID_STR_LEN] = {0,};
+>  
+> -		tipc_nodeid2string(peer_str, peer_id);
+> -		if (strlen(peer_str) > 16)
+> +		if (tipc_nodeid2string(peer_str, peer_id) > 16)
+>  			sprintf(peer_str, "%x", peer);
+>  		/* Broadcast receiver link name: "broadcast-link:<peer>" */
+>  		snprintf(l->name, sizeof(l->name), "%s:%s", tipc_bclink_name,
+> -- 
+> 2.51.0
+> 
+> 
 
