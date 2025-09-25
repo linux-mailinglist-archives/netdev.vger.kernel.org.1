@@ -1,133 +1,205 @@
-Return-Path: <netdev+bounces-226370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36151B9F9C5
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 15:40:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78486B9F998
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 15:35:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EBD71C22A2D
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 13:40:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC2967AB490
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 13:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E61CF275878;
-	Thu, 25 Sep 2025 13:40:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6A726136D;
+	Thu, 25 Sep 2025 13:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="jFHwPNYr"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WnYSM/C8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E5A526CE0F
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 13:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A37230D1E;
+	Thu, 25 Sep 2025 13:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758807611; cv=none; b=jGHdV5NEIRSMYzXUgdFZ6yk8/G1ObifHYtRQThzs913f/p/TKxbxT8tVXkyIBnxCJG7i35Wok4gHt4/hHN+/sFazXp0Wp1h7yCfZ2qNKArG/SmV0MRwSlk6+CvYK6XC4R6/xR0HGMbTbvf5nky+fsohvQe1BM7jRwOZtyglY1sQ=
+	t=1758807146; cv=none; b=rducIsnoscV8h4k+YjA+WLGFOuKkiYk+bqXpQg/HN/p6mszovKjTgkKUeeTWUVqdTB7HYZKgDmXNDRo5DvEgdRcUS0b48Vnpuvn0qaUZwtrlKaiqSPAA87aRcyjjSS+Pb+XivC1N63QHI7k3kPg4UDUQX16tfLLFcry0ffkav2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758807611; c=relaxed/simple;
-	bh=A/h/juuCPsvd250S715gwteOI9pU724vXu2yT9Odr6s=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Ze+U/vdkQ3yA3M/sqPA4RRWIXBvEvjXX9Kcrp7YjFdNPIhgBshnRmr+CwDKMItIMim9niexRWVEVIyBt6apWtHj+bc4jKEBu0BIFmkHH+G1UTFnqSFnMChGtpfiYWEnYBzY2f//vDHgbQDPA8TX3/vX5NgpIoJgT8SN+unHmxmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=jFHwPNYr; arc=none smtp.client-ip=45.145.95.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
-	t=1758806997; bh=A/h/juuCPsvd250S715gwteOI9pU724vXu2yT9Odr6s=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=jFHwPNYrPGOppsG8JtxNE16F/hYWoT/UDrsgYLPJKLCndrQPDiXdQ9ERpR70v70qH
-	 Etlg6hvAfyNk/NB2NMxVdlDr5aJEZCdpAjEwValo3ef8dNonMYFBMh7PG/OrSWFW8n
-	 Rhau2pz4QaSS9PUnP1jDlT1GOUpE/YHoh4aObXrVpEbgENoVL+RzBqHCHeErXCGhzW
-	 o+3Lk2DC5MsUIKLaSSqTBLI9UQrcGAxKdKKZqxPVZOZBscROkm+wWCFmhG8GRlth4A
-	 flu6eHMotG+69USiC5fVBrb4L+55jjlgi9MwcBXBFeQBC7qOO2LGgSJZ2tdXpy5xT4
-	 K7PlLUXb08fhA==
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Jonas =?utf-8?Q?K=C3=B6ppeler?=
- <j.koeppeler@tu-berlin.de>,
- cake@lists.bufferbloat.net, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 4/4] net/sched: sch_cake: share shaper
- state across sub-instances of cake_mq
-In-Reply-To: <m2ecrusy11.fsf@gmail.com>
-References: <20250924-mq-cake-sub-qdisc-v1-0-43a060d1112a@redhat.com>
- <20250924-mq-cake-sub-qdisc-v1-4-43a060d1112a@redhat.com>
- <m2ecrusy11.fsf@gmail.com>
-Date: Thu, 25 Sep 2025 15:29:55 +0200
-X-Clacks-Overhead: GNU Terry Pratchett
-Message-ID: <87o6qypsmk.fsf@toke.dk>
+	s=arc-20240116; t=1758807146; c=relaxed/simple;
+	bh=eXk5c65/ZeMSWeIcTcOzAK6FyGQ4YI5tGmbGiDLUIE0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EnTdgOTv5bPa+7P/No6/Z/BCiv5C53atC1k3xsjK5DdtGwSJrKAgDZK9b1JCyUkR/4usToAx3C0OvhXv8uCNxDbADV872uqjVoWAGi5jjAWmrZjgGkDsZI6DY0hTv9tjAiHSlHQ6V1PbG1DHUckChA1uoJGDWa39H2M0MpNcIXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WnYSM/C8; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=+JTi6m8c71S5T93QgsVYDnnHaK5veNh8luB+E8eyeWY=; b=WnYSM/C8fOejMG1d2bpodYRk8t
+	wALItpSq7FYCgA2YHczQb+FMz3p21BaGlbQPutk7M0D9OFcnHngOCO3asmhRv0g/UFZ3dybOMeMfg
+	qt3k/h8GG/lESNkqP1H7274pfR/Y6jSsb+gYiyVMLZ6fas4mm3MT1zXXlsg7WfQU4nEie7q3gsjxv
+	IUqrrriRvLN3PZUJY5yont0AdpYn1BSgwgfjLrqgWREvPTDfpUBXDJJYOVQpmt5DVVhesFpXXVCru
+	DOfb8y3/RJfxu/kbYmUvi49AXkWyTHROJuSWKe/0TWNcaJ5BV+Bm1UTiCQVTx0vwCEAVEUas9cHpf
+	pyeEt3ug==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35828)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v1m4c-000000002En-1dmh;
+	Thu, 25 Sep 2025 14:31:50 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v1m4N-000000008A2-3RWp;
+	Thu, 25 Sep 2025 14:31:35 +0100
+Date: Thu, 25 Sep 2025 14:31:35 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Abhishek Chauhan <quic_abchauha@quicinc.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexis Lothore <alexis.lothore@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Boon Khai Ng <boon.khai.ng@altera.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Drew Fustini <dfustini@tenstorrent.com>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
+	Furong Xu <0x1207@gmail.com>, Inochi Amaoto <inochiama@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+	Jisheng Zhang <jszhang@kernel.org>, Kees Cook <kees@kernel.org>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthew Gerlach <matthew.gerlach@altera.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rohan G Thomas <rohan.g.thomas@altera.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Simon Horman <horms@kernel.org>,
+	Song Yoong Siang <yoong.siang.song@intel.com>,
+	Swathi K S <swathi.ks@samsung.com>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>, Vinod Koul <vkoul@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: Re: [PATCH RFC net-next 0/9] net: stmmac: experimental PCS conversion
+Message-ID: <aNVENwSF4I3hyP4q@shell.armlinux.org.uk>
+References: <aNQ1oI0mt3VVcUcF@shell.armlinux.org.uk>
+ <4822b6a5-5b40-47bb-8bff-7a3cc91f93c8@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4822b6a5-5b40-47bb-8bff-7a3cc91f93c8@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Donald Hunter <donald.hunter@gmail.com> writes:
+On Thu, Sep 25, 2025 at 05:26:01PM +0530, Maxime Chevallier wrote:
+> Hi Russell,
+> 
+> On 24/09/2025 23:47, Russell King (Oracle) wrote:
+> > This series is radical - it takes the brave step of ripping out much of
+> > the existing PCS support code and throwing it all away.
+> > 
+> > I have discussed the introduction of the STMMAC_FLAG_HAS_INTEGRATED_PCS
+> > flag with Bartosz Golaszewski, and the conclusion I came to is that
+> > this is to workaround the breakage that I've been going on about
+> > concerning the phylink conversion for the last five or six years.
+> > 
+> > The problem is that the stmmac PCS code manipulates the netif carrier
+> > state, which confuses phylink.
+> > 
+> > There is a way of testing this out on the Jetson Xavier NX platform as
+> > the "PCS" code paths can be exercised while in RGMII mode - because
+> > RGMII also has in-band status and the status register is shared with
+> > SGMII. Testing this out confirms my long held theory: the interrupt
+> > handler manipulates the netif carrier state before phylink gets a
+> > look-in, which means that the mac_link_up() and mac_link_down() methods
+> > are never called, resulting in the device being non-functional.
+> > 
+> > Moreover, on dwmac4 cores, ethtool reports incorrect information -
+> > despite having a full-duplex link, ethtool reports that it is
+> > half-dupex.
+> > 
+> > Thus, this code is completely broken - anyone using it will not have
+> > a functional platform, and thus it doesn't deserve to live any longer,
+> > especially as it's a thorn in phylink.
+> > 
+> > Rip all this out, leaving just the bare bones initialisation in place.
+> > 
+> > However, this is not the last of what's broken. We have this hw->ps
+> > integer which is really not descriptive, and the DT property from
+> > which it comes from does little to help understand what's going on.
+> > Putting all the clues together:
+> > 
+> > - early configuration of the GMAC configuration register for the
+> >    speed.
+> > - setting the SGMII rate adapter layer to take its speed from the
+> >    GMAC configuration register.
+> > 
+> > Lastly, setting the transmit enable (TE) bit, which is a typo that puts
+> > the nail in the coffin of this code. It should be the transmit
+> > configuration (TC) bit. Given that when the link comes up, phylink
+> > will call mac_link_up() which will overwrite the speed in the GMAC
+> > configuration register, the only part of this that is functional is
+> > changing where the SGMII rate adapter layer gets its speed from,
+> > which is a boolean.
+> > 
+> >  From what I've found so far, everyone who sets the snps,ps-speed
+> > property which configures this mode also configures a fixed link,
+> > so the pre-configuration is unnecessary - the link will come up
+> > anyway.
+> > 
+> > So, this series rips that out the preconfiguration as well, and
+> > replaces hw->ps with a boolean hw->reverse_sgmii_enable flag.
+> > 
+> > We then move the sole PCS configuration into a phylink_pcs instance,
+> > which configures the PCS control register in the same way as is done
+> > during the probe function.
+> > 
+> > Thus, we end up with much easier and simpler conversion to phylink PCS
+> > than previous attempts.
+> > 
+> > Even so, this still results in inband mode always being enabled at the
+> > moment in the new .pcs_config() method to reflect what the probe
+> > function was doing. The next stage will be to change that to allow
+> > phylink to correctly configure the PCS. This needs fixing to allow
+> > platform glue maintainers who are currently blocked to progress.
+> > 
+> > Please note, however, that this has not been tested with any SGMII
+> > platform.
+> 
+> Thanks for that.
+> 
+> I'll give this a test on socfpga next week, as I don't have access to the HW
+> right now. It may not be the best platform to test this on, as it has a lynx
+> PCS and no internal PCS :/
 
-> Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
->
->> From: Jonas K=C3=B6ppeler <j.koeppeler@tu-berlin.de>
->>
->> This commit adds shared shaper state across the cake instances beneath a
->> cake_mq qdisc. It works by periodically tracking the number of active
->> instances, and scaling the configured rate by the number of active
->> queues.
->>
->> The scan is lockless and simply reads the qlen and the last_active state
->> variable of each of the instances configured beneath the parent cake_mq
->> instance. Locking is not required since the values are only updated by
->> the owning instance, and eventual consistency is sufficient for the
->> purpose of estimating the number of active queues.
->>
->> The interval for scanning the number of active queues is configurable
->> and defaults to 200 us. We found this to be a good tradeoff between
->> overhead and response time. For a detailed analysis of this aspect see
->> the Netdevconf talk:
->>
->> https://netdevconf.info/0x19/docs/netdev-0x19-paper16-talk-paper.pdf
->>
->> Signed-off-by: Jonas K=C3=B6ppeler <j.koeppeler@tu-berlin.de>
->> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
->> ---
->>  include/uapi/linux/pkt_sched.h |  2 ++
->>  net/sched/sch_cake.c           | 67 +++++++++++++++++++++++++++++++++++=
-+++++++
->>  2 files changed, 69 insertions(+)
->>
->> diff --git a/include/uapi/linux/pkt_sched.h b/include/uapi/linux/pkt_sch=
-ed.h
->> index c2da76e78badebbdf7d5482cef1a3132aec99fe1..a4aa812bfbe86424c502de5b=
-b2e5b1429b440088 100644
->> --- a/include/uapi/linux/pkt_sched.h
->> +++ b/include/uapi/linux/pkt_sched.h
->> @@ -1014,6 +1014,7 @@ enum {
->>  	TCA_CAKE_ACK_FILTER,
->>  	TCA_CAKE_SPLIT_GSO,
->>  	TCA_CAKE_FWMARK,
->> +	TCA_CAKE_SYNC_TIME,
->>  	__TCA_CAKE_MAX
->>  };
->>  #define TCA_CAKE_MAX	(__TCA_CAKE_MAX - 1)
->> @@ -1036,6 +1037,7 @@ enum {
->>  	TCA_CAKE_STATS_DROP_NEXT_US,
->>  	TCA_CAKE_STATS_P_DROP,
->>  	TCA_CAKE_STATS_BLUE_TIMER_US,
->> +	TCA_CAKE_STATS_ACTIVE_QUEUES,
->>  	__TCA_CAKE_STATS_MAX
->>  };
->>  #define TCA_CAKE_STATS_MAX (__TCA_CAKE_STATS_MAX - 1)
->
-> Hi Toke,
->
-> Could you include this diff in the patch to keep the ynl spec up to
-> date?
+Thanks for the offer of testing.
 
-Ah yes, will do, thanks! :)
+Do you know how the stmmac core has been synthesized as far as the
+MII interface from it?
 
--Toke
+If not, if it's using gmac1000, possibly later cores as well, then
+DMA_HW_FEATURE (or FEATURE0) bits 30:28 should give that information.
+I'd guess GMII, so probably contains 0. The driver doesn't actually
+use these, or even look at them.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
