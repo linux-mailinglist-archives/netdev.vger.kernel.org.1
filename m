@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-226504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DEADBA11B6
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 21:00:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4789BA11C2
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 21:01:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8446F17FB5A
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 19:00:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 092A56C114C
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 19:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4F9431B130;
-	Thu, 25 Sep 2025 19:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D51B931BCB9;
+	Thu, 25 Sep 2025 19:00:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="ofxrBzYW"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="dYCECRRx"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11020143.outbound.protection.outlook.com [52.101.201.143])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11021090.outbound.protection.outlook.com [52.101.62.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23E4B227E95;
-	Thu, 25 Sep 2025 19:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.143
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1202621B9F1;
+	Thu, 25 Sep 2025 19:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.90
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758826840; cv=fail; b=GKKrvDM8HwWzZ0ZUWAOo2eoJusmMsZ3STaszUiCqhIocSuGdyhcLgpPPO/6ZAolIYVlApw7iFSF/Qxer0wHkl/+DCr7KQi2vwS84rGm3uI+ZOZx9+KGzjJHYEUWlj/bE3PzxcshSrEa1NnIqTf6bZLt6QZveZncrszt98eQPr18=
+	t=1758826844; cv=fail; b=XSHH17WMJvmhMEnoVU1DN4GOqs7v/QEjwIPFqI1uzg5nsHyZ79edCTYvkbKGMu+7GZaK3nRHvYMB8kAFFLe7RFdTVDS6LTMMIEyJxpP10tsxKum4sARVOiswiTASVgQp1pa5GcqzHz2ZL1dqY1rUBDgzuCWPA4rf+OSy6/i5HlY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758826840; c=relaxed/simple;
-	bh=cN8DKJLz9d1KY6MBdmnELf8kGoUj7CwC1hb/8UHXo8k=;
+	s=arc-20240116; t=1758826844; c=relaxed/simple;
+	bh=ZV3xG33PVbtBV/O4yxf9TiGMvblkV5xTaG1TH84rjDo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Ph2JI2OAbC1eWqzTV9SWqFMU5sDL9aNOs/Kc6msB1UgcE2wUjm4s3PvIDo0VPShndy4+IU6IvUjDY5WUPtTXJyziwp2K/UaYSASXv++sQ1FsTjS93keO6g04pstnWESr7dOkUCRIObd9Pje8CrSJwNznUCSVC3MslC8HSbDKI2E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=ofxrBzYW; arc=fail smtp.client-ip=52.101.201.143
+	 Content-Type:MIME-Version; b=KdROUmaGO/BjEFBdfh2XGc4z4FCFlOW/jweCFP53uK6kCXgy+N7wgV8iy+3zGZjzVXAW0hAqH9qgZEmt77m2FIvrJ0NfNo5bKPo616nMb/s3D6bOJW5s4AEGSkbTtOUZqyKTT3WF3tCljnjYOtgz4OYBVzD+TGhM8yYHZ6VwWkQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=dYCECRRx; arc=fail smtp.client-ip=52.101.62.90
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZPzC16rrau/RouaFACiEV+zUH0WOP+3H1do/+/u+iBNHTvs8dyFyMrRNw1VXY9sJy1DWYVJk8gaSxx+88JWZIVvySt6byMrbiv18ovapd3rMONM+K2Q1KfSkctZ4jJ2j1WZHaYhgfKbZ+pV6B1qaiDgpaGWjjKTLEzIsJ+3FQarhzWbnVV6EpgKi0VNJiihLNoOxEY/FQggLADIFfgFlVDmhJ6Yvsvhzpv1MHGKxcLaMETZ9dKe3Mqm0TXRNQGESKl+qTS8Lkv9yIqm3tP4GHZnL8Vob4lEF1HB3RvAjyiayc5D+LNebg/oNeZC1UrKuuHOGjc8IrVrh2VVdiKaVuQ==
+ b=jSj7NBWGYiljZ6Ujl6wSLLuDLSkgC/Ibw/mD9lK/9dUIebaUoBfpBcEo8rcKn/Z6ohovep9dGnIt61oAxKmGaY99RLpZwRTtFyUnZbb3FPPkGWTUutKjDJmRX+mJBxWkPsdXDRStGCjxdgnEjY7NY2/BqNMZXOA9YQ2XjGqPJVT78nc6ZJf8sugaw2W1m+/rtXz27RAIyhpuaFq3jcKuKtgwSfQP/0TCLzuCW1lOSUDSZHZYkGnc+UUzCnrYv9wl6lRyB4ndcsTK+z9EkSr1qN7pOosQ/GSiwmP5pSORpYAUnlHva83CU2rTrh726dxNXcfU/Fszo+LpfjJde+woOw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gZalEeRoZFufC0ht6s19Dnr3xBqJjC6TWx69Y5/sDSA=;
- b=G867deq+jTI07RAol26sTqf78gITbmub1GpxaEzJY0XZgzFgshLQxICurnZ5JWWC4FaGlvjk5y01MeQwAAX4WgPmBzt65M6/P+vfql4W0V8treBRQSE3lzx01moO9s//1YBG37GbdNOUCVmQCkQ8W17zoZH4rK3YVrNWZ/eUom2o8q3JeY0fZiFslmkhLLHXQx6YZVMCcpUkhnqw4a1dHU2RxCZFgfnNMruDUAUIfggHITHp4hLB6vQRodKGVktS9gSQ4BrUMkpfIXpxkiujg//vzQDFZa3JNjABEygaS21KfshLLzXenkF+nLQOZnGGSoxYrXDpa28mtahw1rBPpA==
+ bh=jycDfBGlCZFxhjLBUZd4Ey+3i9OnuuWO7p+tq/6qt+8=;
+ b=Tpk2nB3d4VLbtRWXGVQPkiKCPo3RwUI40d8vV/ZiaASAyeXLh6Xgya/DcIP2ElRXFyjuaWoiGJ/hN6DyLa9p9tHQ087JspgN64jENt2mymEDlBPah1PwVk1PRGr7atHi7rmkoi7ZZcNrPTlpUc4Vid9357Ie4Wtp33oubl4aPNRZ8Ggk6vV+lIH8uavEiLCUgcjZFuT2HjGRA7rVPFkKXOjiStR+op0A3akkRH+Pc3/cKbb3lrhXGJxQQ2axEUnPcIyVr1W77E8qaOa4Os4B+FV4b2PqWKJG4IOvszzFtxb9nRFHVOCdv8+IU0f+3OVtJeFunv1lJlH70JTxM+CCvw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
  header.from=os.amperecomputing.com; dkim=pass
@@ -45,20 +45,24 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gZalEeRoZFufC0ht6s19Dnr3xBqJjC6TWx69Y5/sDSA=;
- b=ofxrBzYWasloLwG8n5UKK3xeUg6sLXSKUsc/4cbmZnADAYXbt0vcE4K8T+gJeYbWSEmD9XIUitunMp4U9TxUidHMS8+d8qH+A+JzY63/tt13GzMcxMfdu9/23jcSG7r9qjdVYw5Ol5ykRBwRSXzZ2XX99MPjDJ/toa9Jv7b1TIk=
+ bh=jycDfBGlCZFxhjLBUZd4Ey+3i9OnuuWO7p+tq/6qt+8=;
+ b=dYCECRRxtm4asbqXXDBqsXvhJxcnE28C/1QhcUppSN59T9VoZe9tpfaHPRGWl9CUb0i0igAMQ3zKV2TS32/GE1a/+HKmR3CTbz2lhDjKVtfExrCd9H03BppwxQDhjR3oiH6oSUmZ9vS3NKq+GmAItiFt5MqGzqQszw8iw7mhBGk=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
 Received: from BN3PR01MB9212.prod.exchangelabs.com (2603:10b6:408:2cb::8) by
  SJ0PR01MB6160.prod.exchangelabs.com (2603:10b6:a03:2a1::22) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9160.11; Thu, 25 Sep 2025 19:00:37 +0000
+ 15.20.9160.11; Thu, 25 Sep 2025 19:00:40 +0000
 Received: from BN3PR01MB9212.prod.exchangelabs.com
  ([fe80::3513:ad6e:208c:5dbd]) by BN3PR01MB9212.prod.exchangelabs.com
  ([fe80::3513:ad6e:208c:5dbd%3]) with mapi id 15.20.9160.008; Thu, 25 Sep 2025
- 19:00:37 +0000
+ 19:00:40 +0000
 From: Adam Young <admiyo@os.amperecomputing.com>
-To: Jassi Brar <jassisinghbrar@gmail.com>
+To: Sudeep Holla <sudeep.holla@arm.com>,
+	Jassi Brar <jassisinghbrar@gmail.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Robert Moore <robert.moore@intel.com>,
+	Len Brown <lenb@kernel.org>
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Jeremy Kerr <jk@codeconstruct.com.au>,
@@ -67,19 +71,18 @@ Cc: netdev@vger.kernel.org,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
 	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
 	Huisong Li <lihuisong@huawei.com>
-Subject: [PATCH net-next v29 1/3] mailbox: add callback function for rx buffer allocation
-Date: Thu, 25 Sep 2025 15:00:24 -0400
-Message-ID: <20250925190027.147405-2-admiyo@os.amperecomputing.com>
+Subject: [PATCH net-next v29 2/3] mailbox/pcc: use mailbox-api level rx_alloc callback
+Date: Thu, 25 Sep 2025 15:00:25 -0400
+Message-ID: <20250925190027.147405-3-admiyo@os.amperecomputing.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250925190027.147405-1-admiyo@os.amperecomputing.com>
 References: <20250925190027.147405-1-admiyo@os.amperecomputing.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: CYXPR03CA0015.namprd03.prod.outlook.com
- (2603:10b6:930:d0::10) To BN3PR01MB9212.prod.exchangelabs.com
+X-ClientProxiedBy: CY8PR19CA0019.namprd19.prod.outlook.com
+ (2603:10b6:930:44::28) To BN3PR01MB9212.prod.exchangelabs.com
  (2603:10b6:408:2cb::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -89,125 +92,191 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: BN3PR01MB9212:EE_|SJ0PR01MB6160:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5df81f8b-c908-46ca-c550-08ddfc65d00c
+X-MS-Office365-Filtering-Correlation-Id: 04dffc28-02da-47ec-70bd-08ddfc65d208
 X-MS-Exchange-AtpMessageProperties: SA
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|52116014|376014|7416014|1800799024|10070799003;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?48faFeHYKhFkTXQA2ooFVdj9eyC9x9Y6swap+cM7YxWFKNaKBFZIacwZaq77?=
- =?us-ascii?Q?7vaacAcqpa7fiS1pw9QQxq6ZBxRhEnck2wpe+OxgN5aVUYhIZ25UDq382Llr?=
- =?us-ascii?Q?RBwL9rc9r9vNpyx8IEmIfAC0joE2bGGS7SvomKhao+Zvcx+ScawSDFKmSfvE?=
- =?us-ascii?Q?jqrWwfS2kwRH6qMrauHK4F1EgH9LD2c2qAmnXW33qCMjLuN+fhAEK2cJ3so8?=
- =?us-ascii?Q?k0tWj/liJheb8beNSc9ep+gtKUvJCioAUOXKweCpte6tqSJY+himYGLBOmZ/?=
- =?us-ascii?Q?2VcXuHxesBK9FvZevxck6upUReKmrx2JRGk43OvTVQ8+B0Oymtyjl3BPMumc?=
- =?us-ascii?Q?bWbvclnuk2287luBbSoeqjFs+UQea0jw501zO2jxN5tbI+qAAknv8K2bt6pV?=
- =?us-ascii?Q?WiCT9pnVgo1U6pITrgEmD4sv4v5TlZhsffIyDA9AbeypUZ6NsCkhebr2gfGw?=
- =?us-ascii?Q?pohGEr1tt/pbxJu8mDAaNTgF5oI3hnqyzoLpCuxxc/KzxtS346Zl9DRsjqSZ?=
- =?us-ascii?Q?roXYmYOs3aOLsjCl16ViMBG2hinLCzYqKMiJdPpZXlybdn9gdfoGOB4yG8Sb?=
- =?us-ascii?Q?AAgg6BYW9Q74WmxTcg/FGlJkieVd6NNXgP1lWaAk4O7zSxBl/GbitmEDgHvj?=
- =?us-ascii?Q?E40ftFl/QSZrhALqsBxYhMzYT3Ub4sssHAZBYGDBthkkwUkga8edcVwxbqnP?=
- =?us-ascii?Q?JAZmNZYtWG4fULIQappOSO/tw7HwwirbPNB+ui887RnbmLbxfKKF8XweAbBs?=
- =?us-ascii?Q?5k+XYyKysAFEMZFmhv3lZ9AGRBLxXmPICup4/BjgtRvT0TvzPxv3LfZV8ktq?=
- =?us-ascii?Q?MqsTKBjy7OQP7/SxnYXm1eAgYel+FhCFwS2uInl9r1F3rrQLVlaLe/yPJceS?=
- =?us-ascii?Q?pMhshEPk2P4Hd43ZncGOtfXkfysZFAGOoLu74hJX3AW68yBOaQOsjSo4eiu0?=
- =?us-ascii?Q?cnuMpIBvKvEBgxV3wTOVPwSXPOpkofUJY5g4f6yzzwHksTZs3KhT/vK2Waie?=
- =?us-ascii?Q?H5y24sgyz3JGCZ4stjbkXheQrkDV1JEhkwCjQjoRsKu5Dk4dBr6v3yjIYN2z?=
- =?us-ascii?Q?JpNhHy2Kqh90PYLK6+YUBl2Y96OBsuZ+yFKoj89r4dMxN1hmKpQdwv46U2wj?=
- =?us-ascii?Q?9+zy+L10TlgdqqFKTFTZ6B42V3SGV4MZ75HfRJshBnYsKMUnbuMQntKlTRaZ?=
- =?us-ascii?Q?4cwUH5MaGj3z9gCdIT8P9bevkSAe5FKjUzyHr4xDEBSfZLshtlTyIrZmmcKU?=
- =?us-ascii?Q?NGQDbkxW4MspbGqcwKbQ/ElpDtBKFmbYhvvv8idoYbTVyozbaYMIw3KD+kmQ?=
- =?us-ascii?Q?K6AgyS6jCp4cDsdOPaL9Rf3D9kkRZALMzxidNd+h+twHHQh2U6onjm3R3yQu?=
- =?us-ascii?Q?16j/oolT+6FKINeksmWOXmZgeCKVYOuo1YbUFvq3nJEHu2PCfxAOA92YkBaP?=
- =?us-ascii?Q?9VEtV6EBhpz/M8mURtOFZ+XGG9jr3cog?=
+	=?us-ascii?Q?aeJcoRszJiJieZGMl8zmyvteUm4k64scg/lh5+4fvICE7PoUTo0e5hNrQkVJ?=
+ =?us-ascii?Q?9Z6OhuFF38mil/WpyUo4RnOaNdf0gbXHyV+KOsOZA+rUpMjrTxMm6oenuT1u?=
+ =?us-ascii?Q?f8eeDPpztqtT2WGcvEv68tk+EXqorSS9K5mxKjxL4FiKTCNt8DvXiq8IGZAY?=
+ =?us-ascii?Q?fqFfiE7G7Bog8YFrrKPU7GW++pbYe5B+Ai8aYScqHjKgheXzLwxX2YcKNQyY?=
+ =?us-ascii?Q?qPs2+EZQw640K9IGLl4TbE/kenNcF0HzJt1silKROb/ds5jskcXSYJUixhGI?=
+ =?us-ascii?Q?TuIdpiFeciL400aNcYoVh6Vsla4ZBztgMTT+4lh2ahiwcVS9Y5JilfSww0O6?=
+ =?us-ascii?Q?a87fQoD308LBR7QDxLyRZn/osnlvY9tPhDVXGDY94tE8wmGI+oqpjtdULa0I?=
+ =?us-ascii?Q?VdU4tLxf8a9/4FHR0fGyxgcKyAyO1iMbo2znjNBYs/4Ffc0sOAR6FPDbwtzc?=
+ =?us-ascii?Q?ftKfPpvpwXuYr/likhC/xfT0zwXJccHydenN7zIHsIBebsWrHglgEveFb98c?=
+ =?us-ascii?Q?nNWNDp/QlLowCd4mK2RgxmY1sVDPulExTsrv/yKDjK48GHRFwe85NxvNe8Cy?=
+ =?us-ascii?Q?WdStfqi07idPUbxXf/Qw4/k2nRbch5ekRDqlH8R2rVfbJRoEEjluGZxD9ju4?=
+ =?us-ascii?Q?vONnCZAMvWFZgqxnUT+vaZGg+cAW5e+KqMby58/5MpJAtQGnNu2ChE3fvOJC?=
+ =?us-ascii?Q?kJmOfMr1JQGFLgWUOB2poVCOvOW0d8MeQMvndXykkN5Ih1MS70UdO0q7AZ4X?=
+ =?us-ascii?Q?CeCT5CoHKY96jOwRkAMasvIkEZpiHFCyMZyXKaGn5r/BmWPfTvJq7tXNQ55V?=
+ =?us-ascii?Q?oaM96GR4yiYzSHdjUyMrjOS7xofpMSXKlvz5st60Kd10FzNsGa0JeN7H0OPK?=
+ =?us-ascii?Q?6QBA3JNzpB80HBwD/Vyg+5UQ9J5SbYrPu5NlyWoG6ozxL0wp/woklGXsubsp?=
+ =?us-ascii?Q?mU9voJIVpWTvrGcGYpAzEljpeFjmqncBFYalOn1Lxhq80sgQ84OYtgQwNhZy?=
+ =?us-ascii?Q?jmKDBQi/++wWZrZJPKM8ajzqk7wq1QwvPrUTE0tMgS8SAzJXGu5e4B8uoSNK?=
+ =?us-ascii?Q?RSVGxOHKv/+XPtQTuRFGnreSV4jxc3wU4OztMjWJPdufQddQOqxv5E4//uAV?=
+ =?us-ascii?Q?AAap2kkcJ6iU8Y43bn4Bp5KwP7TT06GLMA+saghmKT1gYtQ41kWqSggKJdfC?=
+ =?us-ascii?Q?mCr/mh6T/eJpVuiYoYR2WENz+eZf/2etRiKMyvsiO07CUoamFO7GM9o94Ne3?=
+ =?us-ascii?Q?WIk3cRlHK2WncFS5TOELQM5V0f+fVQ+tp9/5cgZzx2x2cj44hZpt/Q6mAsWa?=
+ =?us-ascii?Q?teXN3HZOcv45vo+LXgO8NOHguvuwvfS8B2OBFB1itTUX3pXJ4A4a3QPycjO7?=
+ =?us-ascii?Q?T5MJBC4MsrnmlubkNlMTaHOSm+Ug5GAEd47xLyyCqqZ0LJZ/UbPWeI2fh/rO?=
+ =?us-ascii?Q?aecyYx/g3fqXVM9D9d5Jv9rLwLoud2DJ?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN3PR01MB9212.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(52116014)(376014)(7416014)(1800799024)(10070799003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?J8hUuxylvEGNwGuHgFcRRbwe+8kl9qKVTlQc+9bIIsEGgWknxzHw7bUXhzfR?=
- =?us-ascii?Q?CB+XfbPu2W4HcEsGWOa8XfcL4h3DBKiZGR4xTI3pbO5kjlE1cCw7z3NMdCM7?=
- =?us-ascii?Q?vbMzUWAKLAB8tK8nTsU0CyFc/IES81w0LEigGjykoMRzFGNGdcUjgByFkpiz?=
- =?us-ascii?Q?Ws/AgzxzHY1lJWMaSbHPWG3Lu8RfsLdEme/PhKXV7w8Enxd2gmCsNDXYw3qH?=
- =?us-ascii?Q?2s7JzIFHKIS5aWXWjb+G94PuGeGfm+POR4OF+MXTP1zS+eYA7tsLtWxts7ck?=
- =?us-ascii?Q?78qJvidbFSaJchb4ASruAmzQoVOcGc5lbzFMvlHii4b45KtaXaS4fiT6JmEa?=
- =?us-ascii?Q?faw7ywCnh4Molne993ZKsmeSv3VPB3BzYzFNoxBQhZglZwsOmSOaNDTTGGas?=
- =?us-ascii?Q?srWk4tSkoOJnQK0HIoQ6LWQB5DWQTBNSvx0IY+23+fmS1oEmMFuD8uVbVUPk?=
- =?us-ascii?Q?sjuR+HUYcKyNQQSpDo8XQN1vbMxKdOkFNxVu8ySeKwOrqg3HigTVs3ejG04f?=
- =?us-ascii?Q?o3WHwwHlGGKZ+OX00hz3bnIcTFhqN7IRbp2lLJqdRlxVLOPq96ujWQ+9QmQr?=
- =?us-ascii?Q?mWZH/RCxRXoDyRwS60GttkV2XTV2H9/IKbP4ke6ZFoAgu7QMkwhg4hKvG3t0?=
- =?us-ascii?Q?spt2YW6siPlfLkj8RLDA6wMJ0ZosI4lp73xOA855/aw9Q2JovWq5SKYHzfhN?=
- =?us-ascii?Q?UgFxzKQ4rLb4gwdQ5KGxz4NsCatDAd3xjKm4lbUkRU64sLYxhVtIezrDPysL?=
- =?us-ascii?Q?J37TI5mKONtLjmwlygMVbm3hWz2ey+A0maEvJu4F9GcguxMoSkw+juEyJTKR?=
- =?us-ascii?Q?gNwVng85Bxl3ediJBZWsv2usSfaUXhdHiaYE8my2pWMgpcebRv7GaGxKqfXR?=
- =?us-ascii?Q?Et8H46OS6vT3gw52XAw0wHXvf+b5DSkzbDHRL6L2MCM9Jx8Gg3aOAUBW1ozf?=
- =?us-ascii?Q?bMYho22qHZ1wVKOshOyhQpbQwwhf64h6Z0UZBvaCKZE6TC6y9mqYmgwk/eTn?=
- =?us-ascii?Q?267ckmHUZiElYvejxC+XjXfLQjJ0rEQwpbmhI6Z5kNxoIFkfl23uRo4D5qTg?=
- =?us-ascii?Q?SA2LKlpcBQR1F79VaTIG65GlnYH1kvKZnkI+oL0ctQjoDr4890ndnbdEITNO?=
- =?us-ascii?Q?eZVqe/XnkpMcE4Kxgkvd9/54+r0YSXhxuEzOQd1IAMSmdKBhMq921Kilbut7?=
- =?us-ascii?Q?/mD7ag6vg/wYXO6oMe+u6JNZZB4oYd5I0AC2WhY+wwq2xhpyi/NIeSbowfTI?=
- =?us-ascii?Q?OLYlXesGscyOuRESljh2fiwEJB1E8olJxs80EYaMkVhTIhw+aqugW9bNC3B1?=
- =?us-ascii?Q?Yy2qk+8/8usBRrDYsMrLxccXhV7KQc8jUivyp/ShbXGtBJS9v02iZMoez+u/?=
- =?us-ascii?Q?0fravOF4I24vE8SBmKJOiJP2QN5aLzq60dQfStYvJEIFG82cS4at0/AiVhXu?=
- =?us-ascii?Q?R+nByJjP00CqgcHfQM/NQS9GYwgMVph27SSN72AgB9n65FkHJsMa/B0SGXpe?=
- =?us-ascii?Q?Oqgc6oq9RErijGjSRxsIMiJKC/z+4UFr/QBiTsm3/+vkcxSmQOOeHaqry7l5?=
- =?us-ascii?Q?UvgO1FztlfVLch3PFAkcQUju1U9I2mR72R3RptNiwWaUjqK29BDCjS5ioXUo?=
- =?us-ascii?Q?I7juqshes2zjx26nvKdHPxy9IuaGoynUBvpglwtU0muydnBfbiyqtH+VgRL8?=
- =?us-ascii?Q?FCod19hQv3FpnIxF0OEJC5tgJvQ=3D?=
+	=?us-ascii?Q?GMjcuyo1Z+j5KSAOLb360pvNztwMTEaLulFxbFctSoO+7D5LIF+IVWJPi767?=
+ =?us-ascii?Q?xcNp4pEPskAH4LDFfpPB9HwraJ0mQOqLEGKJ9N8XOORpdRqpujIDKdnqhqZo?=
+ =?us-ascii?Q?N1jyLJjhb921aj6RJ06trAc3GlBZlEo22R7XL6QhLM7rWKRHzXqIowtUSVQF?=
+ =?us-ascii?Q?i7qWa484NeyDe0BrdG8kOTu8cwsZx3fS5cz7pQ4acYZsYxaaLFPtFqrgtZ6G?=
+ =?us-ascii?Q?OYn1Fe5eS5fPT/yFXqYgmoJvYZxJK6+SZ9YeulifdzUnOdA8R9WfBX2lpn5h?=
+ =?us-ascii?Q?QKFxMtRUWMXwcFFiAiAcibMyM4Ny/zijaPlgKW/4XoOsem6v9Zom+oP9l29/?=
+ =?us-ascii?Q?GJAzjjTBQPzQE/jiv2wV8RFiZ2VjJJZLL/C6vikZLAi0Ik0cyvquUMu+stWQ?=
+ =?us-ascii?Q?x5z/qDRaafGIpWTCBJrPqG0TZM6XsV0HDVxKB2Di8g4EcFXaWsab9V+1/pF7?=
+ =?us-ascii?Q?/mebwUyJEdwfrXelHVQGfE5CLW3bpH9vDWi7N4zUgD+BUEqiKzIHIwtWEn3W?=
+ =?us-ascii?Q?a/zLEgjbKoYZF1Kgmpn9CrZhUF6qi7XR94SmhN+7ACMVSOoQL5yBdZoCo2+5?=
+ =?us-ascii?Q?wWM2DU4nhQnft1y4ZeyKDcb691M7nx2Y5m1MiuGP7560lypFlNcigKO+COiH?=
+ =?us-ascii?Q?0ChCA4Q/vmGFpvS0PBqwTxi21pSFn11bFBehvqOdQ5NAJUda45R4HYueu075?=
+ =?us-ascii?Q?7B/QPq0MLg6jRWLSUTYQVm1/Q0R7j5FaMiHow5SBQvUY2Q8MVtc/h07QXtYk?=
+ =?us-ascii?Q?eZ0r/22I6t+Q7qMuzQ67uEUF0E5QJ6xW9UOF27s3+2e9Tq76M9OZemaTQi9F?=
+ =?us-ascii?Q?Pl9LRpIQxW347jy9iXliC3+o0pVUcQ8KJjrpIwG24ACcnp6PTXKz9kwRH38X?=
+ =?us-ascii?Q?8TZ1FAu4fGafWCcJeSs4FvXHJY4e8mqztAVluFITvVvm7M1IsfRqnqNmUlez?=
+ =?us-ascii?Q?ADLd3UtcDX1MZVMSMYGRd49AR0K35HzanmpRSiwBrZBY5fzddwWvDBaPbHbM?=
+ =?us-ascii?Q?Wse7YreESmwXh+DUBoRGm8mGFmeBWsuc6RCNqZQspHtiaj5qbZFHHXWs041t?=
+ =?us-ascii?Q?SfzA/8/sx2axvM+75GN6R7qEzdi9v/3i5fIAo+afQfYnfHcpH6yNnyOoi6av?=
+ =?us-ascii?Q?k9af3ZP4TxF92UlVxVFw0PiWQqMGUkPAlq2mkvvBSPVD1nt39hPLTLa19DPz?=
+ =?us-ascii?Q?gIRk8HaoaefMUHAU1urOCp67iiDikdUTuD9fuBAdz7KkY321GiDE5ZicrlLV?=
+ =?us-ascii?Q?7qdufjigMTJLHZUn5P8GJT7xJCF6R12KoNixUIhPhtOrgM2JLGFnNjMEDxIg?=
+ =?us-ascii?Q?OJ/svuz0OFp6iA1uPKUqZelNM85JIDbrzn/DjdbhoFV4B3qdWw4EmX7KLl56?=
+ =?us-ascii?Q?R7MvCasvJ2iLV7igdzs0M0okRHm66Jd1uldMg2M9M2CNaHtHzIK/TwpnLmqf?=
+ =?us-ascii?Q?GvsFCbeXCb3WPWWOGGZDl0cm1LAGtlMfvunkdtBZWcIb8Oj7Tq7xGXRIDpmF?=
+ =?us-ascii?Q?cGr9580kFjiyzv39czTF6kluICVMdhY362//wDK4W7GF9SWnV2QJOWVSDcQk?=
+ =?us-ascii?Q?gVxJ9pNusk46Rn7shkVcfoLp9kpmWC1wbLITG4RSlAbXnHo+xgr2MyQZcBee?=
+ =?us-ascii?Q?uXO6b9veTSB2oglFeoemFbJG/8UMkZzUMupIZ64QSwmlJkMkTSt/vat0UaS6?=
+ =?us-ascii?Q?OT2domD4sNRsxwMGaOx91EkWmxI=3D?=
 X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5df81f8b-c908-46ca-c550-08ddfc65d00c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 04dffc28-02da-47ec-70bd-08ddfc65d208
 X-MS-Exchange-CrossTenant-AuthSource: BN3PR01MB9212.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2025 19:00:37.0577
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2025 19:00:40.4688
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3lsOleQ22gcQDNViFKQbzE15RfGW9xz5UiiIBwAKuagRzHCT/CGNvgEnA8xIISoJ7lZDhxuGIrf27jvSod6YsekQhJ2rR7H29GpbcK5BGSLBsAgxPnTm+hkf33Wi9J70
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4d4ysJXTn7h1jKbAYhcSZxYD92Z/ruxY2B8IJmJow0v8WekIyjXfTBjlDasXtA+eaabFhGVbjA1NehvXJOwgCbbO2Qulqf+j3DRuL95SiIJ6Ur74QAHprotUkBrVupu9
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR01MB6160
 
-Allows the mailbox client to specify how to allocate the memory
-that the mailbox controller uses to send the message to the client.
+Uses the newly introduced mailbox_api rx_alloc callback. Since this
+callback is registered in the call to request a channel, it prevents a
+race condition.  Without it, it is impossible to assign the callback before
+activating the mailbox delivery of messages.
 
-In the case of a network driver, the message should be allocated as
-a struct sk_buff allocated and managed by the network subsystem.  The
-two parameters passed back from the callback represent the sk_buff
-itself and the data section inside the skbuff where the message gets
-written.
-
-For simpler cases where the client kmallocs a buffer or returns
-static memory, both pointers should point to the same value.
+This patch also removes the flag pcc_mchan->manage_writes which
+is not necessary: only type 3 and type 4 subspaces will have their
+buffers managed by the mailbox.  It is not required for the driver
+to explicitly specify.  If a future type 3 or type 4 drivers wishes
+to manage the buffer directly, they can do so by passing NULL in
+to mbox_send_message.
 
 Signed-off-by: Adam Young <admiyo@os.amperecomputing.com>
 ---
- include/linux/mailbox_client.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/mailbox/pcc.c | 16 ++++++++++------
+ include/acpi/pcc.h    | 22 ----------------------
+ 2 files changed, 10 insertions(+), 28 deletions(-)
 
-diff --git a/include/linux/mailbox_client.h b/include/linux/mailbox_client.h
-index c6eea9afb943..901184d0515e 100644
---- a/include/linux/mailbox_client.h
-+++ b/include/linux/mailbox_client.h
-@@ -21,6 +21,12 @@ struct mbox_chan;
-  * @knows_txdone:	If the client could run the TX state machine. Usually
-  *			if the client receives some ACK packet for transmission.
-  *			Unused if the controller already has TX_Done/RTR IRQ.
-+ * @rx_alloc		Optional callback that allows the driver
-+ *			to allocate the memory used for receiving
-+ *			messages.  The handle parameter is the value to return
-+ *			to the client,buffer is the location the mailbox should
-+ *			write to, and size it the size of the buffer to allocate.
-+ *			inside the buffer where the mailbox should write the data.
-  * @rx_callback:	Atomic callback to provide client the data received
-  * @tx_prepare: 	Atomic callback to ask client to prepare the payload
-  *			before initiating the transmission if required.
-@@ -32,6 +38,7 @@ struct mbox_client {
- 	unsigned long tx_tout;
- 	bool knows_txdone;
+diff --git a/drivers/mailbox/pcc.c b/drivers/mailbox/pcc.c
+index 0a00719b2482..4535cd208b9e 100644
+--- a/drivers/mailbox/pcc.c
++++ b/drivers/mailbox/pcc.c
+@@ -309,17 +309,20 @@ static void pcc_chan_acknowledge(struct pcc_chan_info *pchan)
+ static void *write_response(struct pcc_chan_info *pchan)
+ {
+ 	struct pcc_header pcc_header;
++	struct mbox_client *cl;
++	void *handle;
+ 	void *buffer;
+ 	int data_len;
  
-+	void (*rx_alloc)(struct mbox_client *cl, void **handle, void **buffer, int size);
- 	void (*rx_callback)(struct mbox_client *cl, void *mssg);
- 	void (*tx_prepare)(struct mbox_client *cl, void *mssg);
- 	void (*tx_done)(struct mbox_client *cl, void *mssg, int r);
++	cl = pchan->chan.mchan->cl;
+ 	memcpy_fromio(&pcc_header, pchan->chan.shmem,
+ 		      sizeof(pcc_header));
+ 	data_len = pcc_header.length - sizeof(u32) + sizeof(struct pcc_header);
+ 
+-	buffer = pchan->chan.rx_alloc(pchan->chan.mchan->cl, data_len);
++	cl->rx_alloc(cl, &handle, &buffer, data_len);
+ 	if (buffer != NULL)
+ 		memcpy_fromio(buffer, pchan->chan.shmem, data_len);
+-	return buffer;
++	return handle;
+ }
+ 
+ /**
+@@ -359,7 +362,7 @@ static irqreturn_t pcc_mbox_irq(int irq, void *p)
+ 	 */
+ 	pchan->chan_in_use = false;
+ 
+-	if (pchan->chan.rx_alloc)
++	if (pchan->chan.mchan->cl->rx_alloc)
+ 		handle = write_response(pchan);
+ 
+ 	if (chan->active_req) {
+@@ -415,8 +418,6 @@ pcc_mbox_request_channel(struct mbox_client *cl, int subspace_id)
+ 	if (!pcc_mchan->shmem)
+ 		goto err;
+ 
+-	pcc_mchan->manage_writes = false;
+-
+ 	/* This indicates that the channel is ready to accept messages.
+ 	 * This needs to happen after the channel has registered
+ 	 * its callback. There is no access point to do that in
+@@ -466,7 +467,10 @@ static int pcc_write_to_buffer(struct mbox_chan *chan, void *data)
+ 	struct pcc_mbox_chan *pcc_mbox_chan = &pchan->chan;
+ 	struct pcc_header *pcc_header = data;
+ 
+-	if (!pchan->chan.manage_writes)
++	if (data == NULL)
++		return 0;
++	if (pchan->type < ACPI_PCCT_TYPE_EXT_PCC_MASTER_SUBSPACE ||
++	    pchan->type > ACPI_PCCT_TYPE_EXT_PCC_SLAVE_SUBSPACE)
+ 		return 0;
+ 
+ 	/* The PCC header length includes the command field
+diff --git a/include/acpi/pcc.h b/include/acpi/pcc.h
+index 9af3b502f839..5506490e628c 100644
+--- a/include/acpi/pcc.h
++++ b/include/acpi/pcc.h
+@@ -17,28 +17,6 @@ struct pcc_mbox_chan {
+ 	u32 latency;
+ 	u32 max_access_rate;
+ 	u16 min_turnaround_time;
+-
+-	/* Set to true to indicate that the mailbox should manage
+-	 * writing the dat to the shared buffer. This differs from
+-	 * the case where the drivesr are writing to the buffer and
+-	 * using send_data only to  ring the doorbell.  If this flag
+-	 * is set, then the void * data parameter of send_data must
+-	 * point to a kernel-memory buffer formatted in accordance with
+-	 * the PCC specification.
+-	 *
+-	 * The active buffer management will include reading the
+-	 * notify_on_completion flag, and will then
+-	 * call mbox_chan_txdone when the acknowledgment interrupt is
+-	 * received.
+-	 */
+-	bool manage_writes;
+-
+-	/* Optional callback that allows the driver
+-	 * to allocate the memory used for receiving
+-	 * messages.  The return value is the location
+-	 * inside the buffer where the mailbox should write the data.
+-	 */
+-	void *(*rx_alloc)(struct mbox_client *cl,  int size);
+ };
+ 
+ struct pcc_header {
 -- 
 2.43.0
 
