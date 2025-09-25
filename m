@@ -1,105 +1,107 @@
-Return-Path: <netdev+bounces-226157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C520B9D112
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 03:52:14 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65397B9D115
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 03:57:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1C14172F42
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 01:52:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2C2F64E0EE7
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 01:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4DC72DEA73;
-	Thu, 25 Sep 2025 01:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3E0F2DECD2;
+	Thu, 25 Sep 2025 01:57:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RUmY27mI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i3iADYCR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF42D25487A
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 01:52:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358B82DECB0
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 01:57:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758765131; cv=none; b=gT7WeL6Tq+Ejfzt7mT8GJgQymOoogobqslVIoy7HQrKoOIkzlzEKIGNvmgx/9hCE63lx6GviQk0vtHimqglOpjwAGncWwegl9j+N62Jnb2ZPK2GIoQRpRnS/bzyA6wTwLJl5TbSZZ2ysmV39q5qrobSrkmjFPRsuSjsfs/E33qE=
+	t=1758765470; cv=none; b=CdxvpYWKf3qo/rpKb79eLVmKt5pZV0zjxv6X7i9bT8MO4ylvokuO/+pCdz6LIIxzoIoY/SC02A+0KXZOymWYHWMdgiPC9nAPIthqzus0luADSRVw0SYhqjvlpBY2I7wLiV2QB5k09yeYRJALJ1djT67I8wg8PLo5nevx2c4QtEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758765131; c=relaxed/simple;
-	bh=Hmte3WOiRjRo380ZLWpKNE0N2ZBN2LOqtZQ1Rqe94x4=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=FovmqU9t3kAPlU+fSiQ+VBVrtZCf0bavZKSk9vwLNKD+UeUCgsSdQ/8gb7VOpIrZeX5m6ohHKRYMMrrb31Yu9wlbt1lUYZBO6DK0dPMDyIPMvUnzJEfx052Bg7PM0U+vriV3GGykWwme+S6/H3QpnExNUgH/Tb0iHxVnM/Ayk/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RUmY27mI; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a02bf61e-bb72-41fa-b8c3-0efbd3738aeb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758765125;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PzF0EKfxrFefgtjiDdlptwr6Elo99QeNwkgwDVtTzEE=;
-	b=RUmY27mI8T/30dw4ISVypMox7Coc2aMsVZ2C3muXZfUTEbcFY/Q0I+pKhb+fBxVvIuCDsq
-	Mlb1R2qy93KaGswoR2tqSkiHpX1Iq4ar2Fk60j91Di2swRSkdDZL+veQl7bxaJosKVGtYz
-	uDKuthk99qSmS72XhWTvZPpEnx3xeDc=
-Date: Thu, 25 Sep 2025 09:51:59 +0800
+	s=arc-20240116; t=1758765470; c=relaxed/simple;
+	bh=BzE2nWlHaSb09IJHmQN5hhf4/KfURbjwUnfIYkRiAM8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DHSxlj6JLZVE2VbvH4h3DlZI4t9DPuZsrMMhBXB+SfLDjB9z1CjUuiNjqwwY+42Fs3vxohy2GWHpnYuRXvsJD6Mf9l+QlozuL3MPFIBRlMzOfdWaAR0Jxq8eI/nAXr6A8vzzw+2Fj68ocIxzgQLgLP/Xm+2wRTQRLoUlU3endsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i3iADYCR; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-62fbfeb097eso739095a12.2
+        for <netdev@vger.kernel.org>; Wed, 24 Sep 2025 18:57:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758765467; x=1759370267; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=BzE2nWlHaSb09IJHmQN5hhf4/KfURbjwUnfIYkRiAM8=;
+        b=i3iADYCRoiSH0HlgpBlG6Uvh1LClCZa1ZyZW1UtYjJWenhLmjNv141j/EGTi9ThmIr
+         ymIlMQuZ4tRP1/yJUWhjxhLHO4kJZJQC6yPe8kkO6WkuUmnXxu850IikYq38NqkyfWrU
+         KJmHNHAEjB3Y4BEMsSqwDcVTgEx1uSmTs8P5DqU3XR5L5h1m7Mr3f2hxfY2wLNdMJkih
+         m+nUgwA/0/bh32BNXB9OohK2fJ4EBNzOws8wQebGqmSHUs75mikvC7Uj14ZLCeRp1CN6
+         H36YPpY+dAjd7gggJ2ozy90kCsL7kKfML3UFel7MwWZej1Km+ASP33ZlLEEY5hCAIVR8
+         rDGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758765467; x=1759370267;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BzE2nWlHaSb09IJHmQN5hhf4/KfURbjwUnfIYkRiAM8=;
+        b=qjM6g5aish5gh5q/9jbIzZQS5rDWcfp4KmX4JJyNGBpwzLwaWZy7g7ON8C2hf5ypKm
+         8ghuKVaTZJFO1PjlnAcgwlOUvV/6xtXZOyYc/QvtpjcOTNa9NFFqYe2Q/I5+CDxoswT/
+         bXec54+Sw77gH2EllPR+KeNKcH7YytfTJfkCqX/Ff+SWD6+pDoltFm/qdREb4hAYPjZO
+         VzyrcZzLmFGZTYpdJZesDIR2De4xZDaXLkagBl/CaLtojRBTVPPPMCdBlxKxnYY+dBSN
+         aJbA/tYzyNLksDgfHrV7yubOtveaj4LOa2ZUR936vx0Gc54z1ohCNklCFXzoWvyJkcMA
+         OC7w==
+X-Forwarded-Encrypted: i=1; AJvYcCVU9HkRNTAQLO0RgA3OT8V7FFyiU771J7yFIL7oAbQ7Jcu5CgxwxFNTya1+5ZIFoktmuQjT6TQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyueX3iQkVesarl60tPTK0H+koGo4HWrJKliXHmOQUEiEKKIBL3
+	D6KS0AKzUkZ5iYXR5zZjs7qfTGFj8/NaQUuY4eX5aRlr52QIJ+EONNB8wdEGDRfp+MifdXRs3PE
+	isGivNmrtoGOcKTItCRGvkkg6hEugjuM=
+X-Gm-Gg: ASbGnctTzcEnYj86HjwwAROelhtZ5s+JxSZZ2p2yjEuoaU4EcUy75//ETMDiQGGf3nH
+	magrBi9BViXlEGztJznLps+J2RQPZ6PpJz5sXTUt7QwR+jWMBOFzdFeTyeEqL6f22TQuyGPSHdv
+	+MKjnI61q5dSBwtwv9+hhQiw9YGDwhwIw2b4YmKE7KLYpjkYOmVPS+msD82oVT7LY7istu+lteE
+	M5jeWgXH/5DRXaJ7sgRYgcwplwT6FIlibHXUwF9OXKNxZptnXhxQH57
+X-Google-Smtp-Source: AGHT+IF+/+JTZumqPSyotdgOAvpzeHBPXP4w8U2968XjiTAnXz6ZQtIbPEAD2FTktGdPpJGqn+Q97s4zzwKHhgbTGFk=
+X-Received: by 2002:a05:6402:13cd:b0:626:4774:2420 with SMTP id
+ 4fb4d7f45d1cf-6349fa71749mr1317160a12.20.1758765467408; Wed, 24 Sep 2025
+ 18:57:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: luoxuanqiang <xuanqiang.luo@linux.dev>
-Subject: Re: [PATCH net-next v5 3/3] inet: Avoid ehash lookup race in
- inet_twsk_hashdance_schedule()
+References: <20250924134350.264597-1-viswanathiyyappan@gmail.com> <20250924161835.63e9a44f@kernel.org>
+In-Reply-To: <20250924161835.63e9a44f@kernel.org>
+From: viswanath <viswanathiyyappan@gmail.com>
+Date: Thu, 25 Sep 2025 07:27:35 +0530
+X-Gm-Features: AS18NWDW6_dN93pbRL3G38WQSpiXZWIIBNijqFMY5K6yqGxEhObamRG-8b5i7SE
+Message-ID: <CAPrAcgOQmBHkehYTpeLds9yobofXhxJmxAa2Nq80b1T3HFZZ0w@mail.gmail.com>
+Subject: Re: [PATCH net v3] net: usb: Remove disruptive netif_wake_queue in rtl8150_set_multicast
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: edumazet@google.com, kuniyu@google.com, kerneljasonxing@gmail.com,
- davem@davemloft.net, netdev@vger.kernel.org,
- Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-References: <20250924015034.587056-1-xuanqiang.luo@linux.dev>
- <20250924015034.587056-4-xuanqiang.luo@linux.dev>
- <20250924175527.4642e32a@kernel.org>
-In-Reply-To: <20250924175527.4642e32a@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Cc: michal.pecio@gmail.com, edumazet@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, petkan@nucleusys.com, pabeni@redhat.com, 
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org, 
+	linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com, 
+	syzbot+78cae3f37c62ad092caa@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-
-在 2025/9/25 08:55, Jakub Kicinski 写道:
-> On Wed, 24 Sep 2025 09:50:34 +0800xuanqiang.luo@linux.dev wrote:
->> From: Xuanqiang Luo<luoxuanqiang@kylinos.cn>
->>
->> Since ehash lookups are lockless, if another CPU is converting sk to tw
->> concurrently, fetching the newly inserted tw with tw->tw_refcnt == 0 cause
->> lookup failure.
->>
->> The call trace map is drawn as follows:
->>     CPU 0                                CPU 1
->>     -----                                -----
->> 				     inet_twsk_hashdance_schedule()
->> 				     spin_lock()
->> 				     inet_twsk_add_node_rcu(tw, ...)
->> __inet_lookup_established()
->> (find tw, failure due to tw_refcnt = 0)
->> 				     __sk_nulls_del_node_init_rcu(sk)
->> 				     refcount_set(&tw->tw_refcnt, 3)
->> 				     spin_unlock()
->>
->> By replacing sk with tw atomically via hlist_nulls_replace_init_rcu() after
->> setting tw_refcnt, we ensure that tw is either fully initialized or not
->> visible to other CPUs, eliminating the race.
-> This one doesn't build cleanly
+On Thu, 25 Sept 2025 at 04:48, Jakub Kicinski <kuba@kernel.org> wrote:
 >
-> net/ipv4/inet_timewait_sock.c:116:28: warning: unused variable 'ehead' [-Wunused-variable]
->    116 |         struct inet_ehash_bucket *ehead = inet_ehash_bucket(hashinfo, sk->sk_hash);
->        |                                   ^~~~~
-> net/ipv4/inet_timewait_sock.c:91:13: warning: unused function 'inet_twsk_add_node_rcu' [-Wunused-function]
->     91 | static void inet_twsk_add_node_rcu(struct inet_timewait_sock *tw,
->        |             ^~~~~~~~~~~~~~~~~~~~~~
+> On Wed, 24 Sep 2025 19:13:50 +0530 I Viswanath wrote:
+> > Signed-off-by: I Viswanath <viswanathiyyappan@gmail.com>
+>
+> Sorry, one more nit - please spell out your first name, not just
+> the initial (in Author/From and SoB).
+> --
+> pw-bot: cr
 
-Oops, I introduced those build warnings in my changes and missed them.
+I know it's uncommon but "I Viswanath" is actually my legal name
 
-Thanks for pointing this out—I'll fix them shortly.
-
+Thanks
+Viswanath
 
