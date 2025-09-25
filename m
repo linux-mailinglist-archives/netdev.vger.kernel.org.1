@@ -1,195 +1,136 @@
-Return-Path: <netdev+bounces-226485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78CA9BA0F7B
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 20:00:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEC18BA0F84
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 20:02:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D3C57A9186
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 17:59:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39598188F2D2
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 18:03:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D67733128BA;
-	Thu, 25 Sep 2025 18:00:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 161B43128BA;
+	Thu, 25 Sep 2025 18:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dpKnSPfx"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="b1MKHSP2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5078A3128AC
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 18:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81021279351
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 18:02:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758823251; cv=none; b=TIPZ8r5pdtdyaE0BsWVor0o2WlMz/FYjk1eKDFt2/g90MMIcJKEW31xb8DqATV6enbX6kPRBLrhUMCf94luF5KtkK/6nal03RNFa0CQ3cAYfGGqrQSoMmrdhTTXEjdGhm+UlcVggjEMcnyMrs/OH+HYLVEoSwq7fT0rub7S3tq4=
+	t=1758823354; cv=none; b=HdNSTbsfEmsK05+1XlKoBmhE+Joz4DonsIRlRJTdrD/w7uNapoDIdZhdgIi34myxE9V4y0dz2qqa8/Yiq30vP6JWk/TGHvoduwLST0TufMyvnJci5dDnF8/1Bqk7cymQXKzeFQ0aVmCudmD74VX1d8YdjnHGa9BITzutgCYNAAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758823251; c=relaxed/simple;
-	bh=o0i6eLb82CDmHv3IDKdYuxByMtu6VG1uJdc7mqNYSyc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r71SGnnRGU+OInuqgZn8yJ/t0zV2UUF/3iHBgNGzHJebVS4Gx/sXWwIT/PKy6H1TOUxRY6YLnG0buClz8ASZVXw0BcU/7V5vKNYeHCtMXKoXqUJhbvTyArkfIm5Ooes7vmDZBIj44+Z/G29QQltXxh+1KIjabwrwnJp+7PURYmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dpKnSPfx; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b555ed30c1cso963278a12.1
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 11:00:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758823249; x=1759428049; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=19XbSqIuIQCk2xtUVuKvKYbAnOYLtOl8R56GVHvT50w=;
-        b=dpKnSPfxpxwT2b8xr7X6k3LgP/rTAW+cMfPF+5FCitu6xeVFFXwp7vQADPvNrouU0D
-         PuVswkJWaH1L4IvQ7Lm+Zzcmb598lfTMcGCicMEwpnBpE4F3fpxCLSW1Cp+xkbe/bh0D
-         Egv1/5Dxy1WzqKYx39TLOejREPT/xXqrsibTWDpvabgMfe3/9xb1TcLsP8/l4PBIf9ta
-         zBzxqNCTH3TypF0WsCALwcugxqKfhiJbvORTgbCvvn1xsvEf5QmQ/vAOa59yJltdH6Bb
-         6EQqAnkUNYSzX0RDnOGvQx8xc+PG41VyhT/RsJxSMOiklH73+V8x1sANWRLOT7Ok0aeZ
-         3+xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758823249; x=1759428049;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=19XbSqIuIQCk2xtUVuKvKYbAnOYLtOl8R56GVHvT50w=;
-        b=OIXpyU3kMg3+cbUEe6phjkctcEfk9RJsBqVTtCjElE5UFBaVM51pE/0evEUato7ypr
-         wLOtFRMk+yMexu1jABKj2wUiuCtYj4o3moqCPh+kf6OK/UCJ+jfexOdiPhO/IhpamfWC
-         vu0iz7jNlnJY9E/G0G4HM55cyjc9xoYAlq1axQmCI3TtNnwenWSg7FsOnBitow5+gKT4
-         GUlV+6WEVwnLG2pYdTP+ynDopxCeYQYx/gaQRpQnXhw+AVj+/ZkCzsC8So/4SJNJPzsm
-         +0VAqzSuDHeCUSJVL/2yu9/oDQPrbvOL9tmpFmjV6+jZwQb6F9mMJ1lM9dEyUsCqnoI7
-         pydA==
-X-Forwarded-Encrypted: i=1; AJvYcCUr8k3sIf/at2FdBQjaSlyRIyAzNuydOi+CrFsm0DZivs60XaHbM6WipDH7sV0DXfvmtuMEnpA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaEBm8MTolV4pHyPtTq9fL2pJr9TSdkC0T5XjAyg7U8ERHgE9V
-	+mkzOx3BmMOz1z9LpyMp18/TLytjK4tBK7eQWM0HgH7ZYETJchkZPpHK6RyH4a98WFR6YxabXn1
-	8dsF5F+NF6df4bIM+1hS0vcgRyCgat9HapgxIdSzY
-X-Gm-Gg: ASbGnct3nXCsz/iWENWm24Ollr+E1qpyb2JmiF6nEdzhqKnRffS2FwDjJoMbsfN779E
-	pfjW8Xb2VUK3GYPZN91+XJTpM3SnhN0hyENYpfGlfQnY2FKOh0LMXFEv/N0LKTIHQTD5nXSb4XL
-	z1Hf28eB+OvVgXKs1G7iyXiP764hHJLnWEmwG+5zXo/nr4xUPltPCN6YhIotUxDblnDifMVd6C0
-	trvWQghiiSYfzwgT9n8jGpTm4Wz5z+BgFBF2CzgPD/sOFs=
-X-Google-Smtp-Source: AGHT+IHrKA9UVRs8oLMLInQWtOtJXu2aRiNqlztEeersVIIde1jWDx+3vgthMrkZAyt5I79ayKYlEHKGEKetBvwKbFQ=
-X-Received: by 2002:a17:903:3d0e:b0:271:5bde:697e with SMTP id
- d9443c01a7336-27ed49b9e58mr45420605ad.3.1758823249216; Thu, 25 Sep 2025
- 11:00:49 -0700 (PDT)
+	s=arc-20240116; t=1758823354; c=relaxed/simple;
+	bh=B73gyIOK1gT+mP7CJIUTbIlqjfSS2xShEqiW1uzYaXU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pSR1cxfl8SempMkVhX9237cceEpTibGSIPB7oe9+ON1r6PDJdZBVOd+QiiWqzIxwlTg+EfwZs74gAg5a09h58mzoIT76zrbneYxm/EIopaR3Xufm3aFYc559j4wJOyXlUq/u5sInv0wffXwsF3qRqtDv7zK1HaSRDqzuaKUld2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=b1MKHSP2; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58PFuKoV010461;
+	Thu, 25 Sep 2025 18:02:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=2YkWXtt+/iNmBo0YKAv/upVPd12D2
+	aqpm9C0JlblUaY=; b=b1MKHSP2MjFgriKm1ajWP2S/3X3vb3qR9/rTubjTTJ6EL
+	A9ABLJEVF5LyWIBOTuCuDul3JJDuaNuBABxTos6UUyqeH7rEwGTOyHoorszUZh26
+	0qiz2Qrwm2VzXJraDOdrctxF/MdiiRl6+P0Mu/lkcHsHHmntxbttZGn/z9e9bmkQ
+	n0MpgxSI8zCxbcQ30a6sLhV36reR9RVm1jnoYNwp6ufqII3s85Gwv9AA7GfG09tF
+	jFLnlELilPwFgzMKgVPzkVsYH2PrY+unDBowcXzLPmAUk1D0ciKeRIw3VGk6EemT
+	Typx/34WmC4yILgtkhxS7g+MoA40KiuoAW4hBDBgw==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 499jpdtfey-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 25 Sep 2025 18:02:17 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 58PHjCxK014657;
+	Thu, 25 Sep 2025 18:02:17 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 49a952fggy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 25 Sep 2025 18:02:17 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 58PI2GJs002050;
+	Thu, 25 Sep 2025 18:02:16 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 49a952fgfr-1;
+	Thu, 25 Sep 2025 18:02:16 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: krishneil.k.singh@intel.com, alan.brady@intel.com,
+        aleksander.lobakin@intel.com, andrew+netdev@lunn.ch,
+        anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+        intel-wired-lan@lists.osuosl.org
+Cc: alok.a.tiwari@oracle.com
+Subject: [PATCH net] idpf: fix mismatched free function for dma_alloc_coherent
+Date: Thu, 25 Sep 2025 11:02:10 -0700
+Message-ID: <20250925180212.415093-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250925021628.886203-1-xuanqiang.luo@linux.dev> <20250925021628.886203-3-xuanqiang.luo@linux.dev>
-In-Reply-To: <20250925021628.886203-3-xuanqiang.luo@linux.dev>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 25 Sep 2025 11:00:37 -0700
-X-Gm-Features: AS18NWD0-9fKJhkbcLAPX9KSe_rySltiVgNfVGjXO8-6pNvCPbtjbPCR4UMbtjs
-Message-ID: <CAAVpQUBKLzVWs_gNZ-KUn9zjkyck5NBGQWsD+Am7kK7s3LZTWA@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 2/3] inet: Avoid ehash lookup race in inet_ehash_insert()
-To: xuanqiang.luo@linux.dev
-Cc: edumazet@google.com, kerneljasonxing@gmail.com, davem@davemloft.net, 
-	kuba@kernel.org, netdev@vger.kernel.org, 
-	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-25_01,2025-09-25_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ bulkscore=0 phishscore=0 suspectscore=0 spamscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2508110000 definitions=main-2509250167
+X-Proofpoint-GUID: k1rCsmWWRNMsQDPyhidLnwUPFUX7zwcL
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDAxMiBTYWx0ZWRfXyy/ei0Ix7dju
+ ukfYwNrULI0LUnSXF1rIibOq6oD6zQ9bx0FKI9AdB8DMd6d2LXfwd2gMm8aIotPWlo+IgOVrY4S
+ AOgcUmYy9Wsyxf4hwffcfIlQgRVwjYQkA1awD8dI0fZuzTSG7UsUt3XLVt7nTcQEX4zzlBECH2v
+ owFBY/3Ge56cMVJ70nlGLpQFnyQbknmYX1pC0aKsWLCZvwrKHmccPsG5ZH3m5T594Zco7PcbQ+Q
+ KZyEsAuCTlPghprsvlx+PigpP3QQY/3GxOcv1oEw6217S87+HZTSX9W8kcxEPe1u9nmeV4HWAgi
+ +FhM9uyQpt8ROaj0j6pesE7i75pSS74HH68ppOVHJLu7irIcNY+thn7n8f0x7HlDpzPzRr47yzd
+ xv6UwRnZQDEx2N+U7PR9Z77n0YVTZg==
+X-Authority-Analysis: v=2.4 cv=aJPwqa9m c=1 sm=1 tr=0 ts=68d583a9 b=1 cx=c_pps
+ a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
+ a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=OrEgqHaMTj2tCEy2Q7sA:9 cc=ntf
+ awl=host:12090
+X-Proofpoint-ORIG-GUID: k1rCsmWWRNMsQDPyhidLnwUPFUX7zwcL
 
-On Wed, Sep 24, 2025 at 7:18=E2=80=AFPM <xuanqiang.luo@linux.dev> wrote:
->
-> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
->
-> Since ehash lookups are lockless, if one CPU performs a lookup while
-> another concurrently deletes and inserts (removing reqsk and inserting sk=
-),
-> the lookup may fail to find the socket, an RST may be sent.
->
-> The call trace map is drawn as follows:
->    CPU 0                           CPU 1
->    -----                           -----
->                                 inet_ehash_insert()
->                                 spin_lock()
->                                 sk_nulls_del_node_init_rcu(osk)
-> __inet_lookup_established()
->         (lookup failed)
->                                 __sk_nulls_add_node_rcu(sk, list)
->                                 spin_unlock()
->
-> As both deletion and insertion operate on the same ehash chain, this patc=
-h
-> introduces a new sk_nulls_replace_node_init_rcu() helper functions to
-> implement atomic replacement.
->
-> Fixes: 5e0724d027f0 ("tcp/dccp: fix hashdance race for passive sessions")
-> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-> ---
->  include/net/sock.h         | 14 ++++++++++++++
->  net/ipv4/inet_hashtables.c |  4 +++-
->  2 files changed, 17 insertions(+), 1 deletion(-)
->
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index 0fd465935334..5d67f5cbae52 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -854,6 +854,20 @@ static inline bool sk_nulls_del_node_init_rcu(struct=
- sock *sk)
->         return rc;
->  }
->
-> +static inline bool sk_nulls_replace_node_init_rcu(struct sock *old,
-> +                                                 struct sock *new)
-> +{
-> +       if (sk_hashed(old)) {
-> +               hlist_nulls_replace_init_rcu(&old->sk_nulls_node,
-> +                                            &new->sk_nulls_node);
-> +               DEBUG_NET_WARN_ON_ONCE(refcount_read(&old->sk_refcnt) =3D=
-=3D 1);
-> +               __sock_put(old);
-> +               return true;
-> +       }
-> +
-> +       return false;
-> +}
-> +
->  static inline void __sk_add_node(struct sock *sk, struct hlist_head *lis=
-t)
->  {
->         hlist_add_head(&sk->sk_node, list);
-> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> index ef4ccfd46ff6..83c9ec625419 100644
-> --- a/net/ipv4/inet_hashtables.c
-> +++ b/net/ipv4/inet_hashtables.c
-> @@ -685,7 +685,8 @@ bool inet_ehash_insert(struct sock *sk, struct sock *=
-osk, bool *found_dup_sk)
->         spin_lock(lock);
->         if (osk) {
->                 WARN_ON_ONCE(sk->sk_hash !=3D osk->sk_hash);
-> -               ret =3D sk_nulls_del_node_init_rcu(osk);
-> +               ret =3D sk_nulls_replace_node_init_rcu(osk, sk);
-> +               goto unlock;
->         } else if (found_dup_sk) {
+The mailbox receive path allocates coherent DMA memory with
+dma_alloc_coherent(), but frees it with dmam_free_coherent().
+This is incorrect since dmam_free_coherent() is only valid for
+buffers allocated with dmam_alloc_coherent().
 
-As you need another iteration, remove else here since
-we bail out above with goto:
+Fix the mismatch by using dma_free_coherent() instead of
+dmam_free_coherent
 
-    goto unlock;
-}
+Fixes: e54232da1238 ("idpf: refactor idpf_recv_mb_msg")
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-if (found_dup_sk) {
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+index 6330d4a0ae07..c1f34381333d 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+@@ -702,9 +702,9 @@ int idpf_recv_mb_msg(struct idpf_adapter *adapter)
+ 		/* If post failed clear the only buffer we supplied */
+ 		if (post_err) {
+ 			if (dma_mem)
+-				dmam_free_coherent(&adapter->pdev->dev,
+-						   dma_mem->size, dma_mem->va,
+-						   dma_mem->pa);
++				dma_free_coherent(&adapter->pdev->dev,
++						  dma_mem->size, dma_mem->va,
++						  dma_mem->pa);
+ 			break;
+ 		}
+ 
+-- 
+2.50.1
 
-Other than that
-
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-
-Thanks!
-
-
->                 *found_dup_sk =3D inet_ehash_lookup_by_sk(sk, list);
->                 if (*found_dup_sk)
-> @@ -695,6 +696,7 @@ bool inet_ehash_insert(struct sock *sk, struct sock *=
-osk, bool *found_dup_sk)
->         if (ret)
->                 __sk_nulls_add_node_rcu(sk, list);
->
-> +unlock:
->         spin_unlock(lock);
->
->         return ret;
-> --
-> 2.25.1
->
 
