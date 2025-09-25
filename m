@@ -1,159 +1,117 @@
-Return-Path: <netdev+bounces-226463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F056BA0B8C
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 19:00:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C456CBA0BCE
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 19:04:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41C2E32302B
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 17:00:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AD7C325791
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 17:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A1E7309DB0;
-	Thu, 25 Sep 2025 17:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B6DC2FB975;
+	Thu, 25 Sep 2025 17:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JG4/9Smv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LZOS1dRs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD61130AAC2
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 17:00:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D9119F40B
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 17:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758819619; cv=none; b=h7u6q2ryn2sMw9Grv3wIEPzWsdmARQprDs4Vlxi/xj0KeWlnYUW89+nEEpzNAvC+nxMvkEpcSOi4gl5IaAmF7W0MRAV41bWJOnk8SJPne91O9E3NoiHinXxRwVmdq2PA9tiEdk6A+/Ubg8ohfNIhDnajMZQdoudsjLxuTRyjofI=
+	t=1758819867; cv=none; b=rMU/dhPOYgORBSesfvv70kaN4ck57WUsT+Zaxgg+jHgfqxmnDFTiWFMAM7Fm9XXhl9OJwqxUaZDRZO/YMi8qMXM2u1g8tR9rY6ZMubeJb6Q5LtBKbD+ONl40az+h0VVZjowgPcQwPsICA6IDGNFXVlV3hAhyTvOnxbIq0337yRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758819619; c=relaxed/simple;
-	bh=WNxAnmCw4P1TtKlBwI2Ow+v7MaCfjNgBJ6uifpDB/70=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dgwsnxAfCr7d+rAKYwb07/VgDozFfwlfWW4Vr8p66/yk0aA3ixGA1Ay3lqvSRsc+VNJYI6s3XjvipkxueHmMX7P73ly/lpCpTsC3HiX0RcPv1hkqucD2Y7olXLFk6x7Tj7k04WwN19oonZ1KxdTasQ5kOdk/Y/aqCMusmeBkYiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JG4/9Smv; arc=none smtp.client-ip=209.85.210.182
+	s=arc-20240116; t=1758819867; c=relaxed/simple;
+	bh=44gyp6vKdy1xn+uQ05Jc1VwLiYdISbIi5vZyvpU5pko=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GAPTD/GaJ1zGSVY5ITyb2TdutyVmkMQED36CZdF3P/u1rQZMQXwK9kZeJnJXkO516dajXdXD0+2yUQWxXeokrqXadsHljR40YJ6VH6pL92Q75hoZ2bXUUc70EUCnZgqvbL7MjeVGnt8PRxBk+BSJ2CaShR4w5iuTEAcWsD/a3as=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LZOS1dRs; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7704f3c46ceso1230560b3a.2
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 10:00:16 -0700 (PDT)
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b61161dd37so8182041cf.3
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 10:04:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758819616; x=1759424416; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QJ5kMbOBwIZudleYReSesMHzWocvI5qVkxY80vlrovE=;
-        b=JG4/9Smv0i9lA64Q928iGiX6nn/o3A2O6sCpvHqXfGj+D1rh/UpNE8Mbx9j+MiJVtp
-         WFWbTPz2fui6R8OOD/luCjoO8SaeAsk5iH/x4PKuHDOVpoDcQXCRkZKt8oAo1PCrtjcJ
-         csyNLxiT/mFSm5k48YmW1r/+I0TEtkoXlw7UCngpxz9Y+Xt3r4CSy8LX1xG8s0z88xST
-         Dv8xy7izmRZ2pk79dpKGPVfatkv4pGm/hMcwD58U54mRHedaQ9H2W6IIlOVWISBS9t+j
-         V75hIUyhhhlWFMmBuqEIa0MhO5yxv6KLqQGgleBKdsn7ehpJbPDZRJ8awB+fbOQcNLNY
-         Jwow==
+        d=gmail.com; s=20230601; t=1758819865; x=1759424665; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FedGuuQ9EoLGZHyVuUa4kxaEEe0W3EgjNiYDYZcgNxY=;
+        b=LZOS1dRsOjl4u9mFMtt729T+jKuVkUPK4tLy7imvuwkV1byI8gXYsnvJx5C6A8ChFu
+         TtY2t/1+B87RzZiBOHylsVEeicmXeb+ryzkLukYSf51bQM0WkHMRn7l4WFpxsU5KOvyM
+         jr4FkGBFS6vCcPYdnaAgMiaoNSuQL2S/BaNwu7bwfZeKJFE93/BAZ3VmhTVvBMuGmR50
+         QbxeITVwYUhbboBISoz5JXwZg8q5Gr63DkHXQ0e4UcLRxOIkbVGePx7oenQ121zvl+hL
+         lJBmCnPs1LNonSyXvZ/PA/O/vg6T2fM8iEfu7HInl1jV8ncD26sMc0llQ20cN2wzGRJA
+         icEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758819616; x=1759424416;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QJ5kMbOBwIZudleYReSesMHzWocvI5qVkxY80vlrovE=;
-        b=lpkYJEClx5iLPePrwDLqMaGeMIgFC/GyAglc1gBVjJ55vGjfWrzy58CDNjqzOKLVCg
-         9tbyENlLk5nWvpGEUE6GApGP1Z4ktuqMMsqhVa78x4vUp/QSYoRUXATxk94fCvW54Fkn
-         reQwWESTdi9KN5T2uKFkPMXTW1jp9Akr7h1vjW7vodwre/RouN18rJ1cglJle2d/sGv6
-         BMJFVmiCPunSAKhZW48Eavmr122RCawXH7dw1rZ3OJA3jt5W3sHPNjaRaksyey2qfDWs
-         fKMZ8I61Sx704QB/ci1XQYXHcHO1QEUrr1eh7UmqMFlBMjIUGUDrcxqjwCJmgI4SIW5z
-         LlGg==
-X-Gm-Message-State: AOJu0Yy2e6nnXnv7gCkNhPip44aAvXFDoCDbj6n8+h/Q8HVBshKDbQvm
-	bbWOxsmk1uDFO8Me7cBWiwxE8y1JgDRAsfRtNQqis9xndTWvD7YqG4Zj
-X-Gm-Gg: ASbGncubMlXHdddEmKuYvgG3H2HC81FxnWLUpCy72thSF/m09rDUVGHOAdyuQW83Ary
-	6s0vHub1Jyqwoz+HVQUmKyu0C2MaxUqqT1MI68IAl8/2UOBGcf7uZ/6rRzSyNrfez/r81m3nmMz
-	epiGcYgx/FiJm2gLpoTU4Fh6UTR2YX8hABlKz/MMHHeUDyv4Ka8eMyRQdWZW4r45ySMBpBWY1/v
-	svw5GY/lKZhJVjr6VHLmNobetVD6ZzNoU7G7EjMV/YyhG6qz/tVVhQIKMTitn7UC87Wv2NQscX2
-	cRDmD6SiafT6PbbPX5livHxAwCZgkDnyOhrfHYt1qT7FG1O7kcIzTmKREPtJ1ox70Sr92ThZcJr
-	y/FzU7Eoyf/Qz
-X-Google-Smtp-Source: AGHT+IF64W5FA8cGGFwXqDnRK2BW/s5biCaOMMt7UPRhhyPKNl8ixpKfpsD7Kltnj/s+mxRuFg050g==
-X-Received: by 2002:a05:6a20:d305:b0:2f1:302d:1275 with SMTP id adf61e73a8af0-2f1302d14d4mr1255040637.17.1758819615743;
-        Thu, 25 Sep 2025 10:00:15 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:1::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-781023cb593sm2434880b3a.39.2025.09.25.10.00.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 10:00:15 -0700 (PDT)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	martin.lau@kernel.org,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next 2/2] selftests/bpf: Test changing packet data from global functions with a kfunc
-Date: Thu, 25 Sep 2025 10:00:13 -0700
-Message-ID: <20250925170013.1752561-2-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250925170013.1752561-1-ameryhung@gmail.com>
-References: <20250925170013.1752561-1-ameryhung@gmail.com>
+        d=1e100.net; s=20230601; t=1758819865; x=1759424665;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FedGuuQ9EoLGZHyVuUa4kxaEEe0W3EgjNiYDYZcgNxY=;
+        b=qyOLLQEnd48Y1QgiDEGrcNAUwKYTo1FtUkJKVsI4e4LXOXCxqfJON+otj1k+Cvcl2/
+         UUIv/b1oDBecsbN4tCDhr2eUQLkKcu6QoBqZMrhPGfk4KYFkb1+tnouPL65HLpjgcxNS
+         8fyZKKUbpJ9ee/2QzczKxDFJSj3ZwC/Mx7CMK6WiqKAj16dKW2/hpMI5TcuGZY2ntRG4
+         MfqE0T9reHCMjA4iQdQOgmgweoGh39mUdJ9XaruV67cyFL7p4ht1ySOIVEGpwh6WC4I4
+         vx73u38RnEhzhE/wlvJykyU7MyxIj41yUZuBlj1oCfEeHHFOSOFQfYLwlrgWDZ5SJsOF
+         b1lQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXDnM4z0AnmZFGgaK4ZrsoK2+CctdL5AzcoQCKNT/MKBAJVf300ATv6GkwnUMfpsayWhsymxdc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9/1VPephx+CM3oC3OOLtJVWUjeriPs0wxqYVgg8xltIj9tisu
+	NeEUfPgF9Kyd/k5bfgex6BoNI4dBqFaLxNpOOppUR+MpBbxYwTbVNtKqbDDw5A==
+X-Gm-Gg: ASbGncv9SIHaqEeHW3aaoAKd+Pi+OsvWyctqK2OXaWb0YCLXOeUZYfVI+lOR8lyntLr
+	lcIjlC7ElX13kFJsodNBOwPtEA7QnnnwmXH+0U0/6NKQMNQ02AduqiQ4eyhO9YJHAC9hgh10qjD
+	YUxbJNmixVg91Pq+b9mEmy6WDmiW0qLDmSfdyWhqdF9XUJT5e8zCMM71TB5Xvki8m1zHcOcBxOj
+	f7Jk9IuUo8F0lz0Z+QKuTXeJ1zPxp0J0xSZrX2QFdKiN35KZku8iItPcECbWbja8XTRXl/zPUYY
+	JK7ejSJ3C8++ZeiR/VJk5Dy8P0VArvEkUfNBQ+DgNN4AhKfOWslTTxq4BVSjv7xCrDQSRCdCiDN
+	XwvoYkiHlIHcZfG7v6VDxELLIGjMVV6UmFEucHg==
+X-Google-Smtp-Source: AGHT+IHB4nL1f17zZ3DDXlsvZ0gPqjUEC63iZEjaLTYX9Xc6Org1u16Qu1czS6Ft94AAeAs01OiPxA==
+X-Received: by 2002:a05:622a:4111:b0:4b7:9581:a211 with SMTP id d75a77b69052e-4da47dfd4b9mr54903681cf.24.1758819865241;
+        Thu, 25 Sep 2025 10:04:25 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c0a8:11c9::113c? ([2620:10d:c091:400::5:846b])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-85c286b424dsm143564385a.15.2025.09.25.10.04.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Sep 2025 10:04:24 -0700 (PDT)
+Message-ID: <7e099b09-75d3-437b-a1d3-ed964032f9b6@gmail.com>
+Date: Thu, 25 Sep 2025 13:04:23 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/9] selftests: net: add skip all feature to
+ ksft_run()
+To: Petr Machata <petrm@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Willem de Bruijn <willemb@google.com>,
+ Breno Leitao <leitao@debian.org>, Yuyang Huang <yuyanghuang@google.com>,
+ Xiao Liang <shaw.leon@gmail.com>, Carolina Jubran <cjubran@nvidia.com>,
+ Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org
+References: <20250924194959.2845473-1-daniel.zahka@gmail.com>
+ <20250924194959.2845473-3-daniel.zahka@gmail.com> <87jz1mwksz.fsf@nvidia.com>
+Content-Language: en-US
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <87jz1mwksz.fsf@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The verifier should invalidate all packet pointers after a packet data
-changing kfunc is called. So, similar to commit 3f23ee5590d9
-("selftests/bpf: test for changing packet data from global functions"),
-test changing packet data from global functions to make sure packet
-pointers are indeed invalidated.
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
----
- .../selftests/bpf/progs/verifier_sock.c       | 30 ++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/bpf/progs/verifier_sock.c b/tools/testing/selftests/bpf/progs/verifier_sock.c
-index bf88c644eb30..0bed5715c9e1 100644
---- a/tools/testing/selftests/bpf/progs/verifier_sock.c
-+++ b/tools/testing/selftests/bpf/progs/verifier_sock.c
-@@ -1,7 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Converted from tools/testing/selftests/bpf/verifier/sock.c */
- 
--#include <linux/bpf.h>
-+#include "vmlinux.h"
- #include <bpf/bpf_helpers.h>
- #include "bpf_misc.h"
- 
-@@ -1068,6 +1068,34 @@ int invalidate_pkt_pointers_from_global_func(struct __sk_buff *sk)
- 	return TCX_PASS;
- }
- 
-+__noinline
-+long xdp_pull_data2(struct xdp_md *x, __u32 len)
-+{
-+	return bpf_xdp_pull_data(x, len);
-+}
-+
-+__noinline
-+long xdp_pull_data1(struct xdp_md *x, __u32 len)
-+{
-+	return xdp_pull_data2(x, len);
-+}
-+
-+/* global function calls bpf_xdp_pull_data(), which invalidates packet
-+ * pointers established before global function call.
-+ */
-+SEC("xdp")
-+__failure __msg("invalid mem access")
-+int invalidate_xdp_pkt_pointers_from_global_func(struct xdp_md *x)
-+{
-+	int *p = (void *)(long)x->data;
-+
-+	if ((void *)(p + 1) > (void *)(long)x->data_end)
-+		return TCX_DROP;
-+	xdp_pull_data1(x, 0);
-+	*p = 42; /* this is unsafe */
-+	return TCX_PASS;
-+}
-+
- __noinline
- int tail_call(struct __sk_buff *sk)
- {
--- 
-2.47.3
+On 9/25/25 12:09 PM, Petr Machata wrote:
+> Personally I'm not very fond of this. Calling a run helper just to have
+> it skip all tests... eh, wouldn't it make more sense to just not call
+> the function at all then? If all tests have PSP as prereq, just have the
+> test say so and bail out early?
+>
+> Topic-specific tests are pretty common, so it's not nonsense to have a
+> facility that supports that. But this API just seems wrong to me. Run
+> these tests, except don't run them, just show they are all skipped.
 
+That's fair. I will change that for the next posting. Thanks for taking 
+a look.
 
