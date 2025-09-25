@@ -1,214 +1,100 @@
-Return-Path: <netdev+bounces-226483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5163BBA0F65
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 19:57:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FD25BA0F68
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 19:57:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A7791C24F12
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 17:57:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C44FB381FFC
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 17:57:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67B493064B2;
-	Thu, 25 Sep 2025 17:57:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C04AE30F929;
+	Thu, 25 Sep 2025 17:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SYWDofhy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ceJ6yMw7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03481DE3DC
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 17:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CC712E7641;
+	Thu, 25 Sep 2025 17:57:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758823030; cv=none; b=PLORIk7I9dKSjSxqvh6ON0axa418UMjs11JeMFUtZRIpr+a9PihgcmwpDX8GKcUJdHvZnD9ArBxLfltuHzdROgB/qdi0J0h9kqdngiMiDDPwGxDBKaKUoI3J78f2GEKw0dgw7jpBuOBJc7GhttEiHzn2Kh3og//PTGTaoiZ1jZA=
+	t=1758823056; cv=none; b=ImfJycbhkgnKqW43mEQgQSS9s+H/YGPNzbjZ2wHhUoREe+oStXQVb36AOlNthCwN8gw5Pzrx8XDcaeqOT67ezfSLdFnV+zSiS2NiXcZsAjuPD8saALXYlgcny9TGb2Ad2kyqu6I+rAyNCGP1pkjtw2/gnhA6cAXbGhdHcZXJnRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758823030; c=relaxed/simple;
-	bh=EbdG7V81pu90iejsyhKo95owybGLx96TwDOKu3dMPRE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lV/M0+ygsPmNaVy9ZC4TzTW7e4FxxOtGOo6O0WpIqb8fBNFwD5mE8iADKkReFPFZ0mAIjWfPXiL/uVcxpWsL+9fe9zGtXpjRvHCoZwB2zghiRu/vIJ4CIm7zMBKbhV/UOpfUtQrp9NZcXgg2/aAH2MMAkCTlmEoAQwLq5rM6yLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SYWDofhy; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3324fdfd54cso1356381a91.0
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 10:57:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758823028; x=1759427828; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SqXkB57On4uS8bDc2xWGndi8Elal12GhorDr1bW3AFI=;
-        b=SYWDofhypPin1+LXVZZ9rIFE9VzvNXJwdED1QIuCB9W3k4h0DT5FHNSLNJjMN87gHD
-         dnMIKZSpt2tYmRqtmhOe1acIGr6TT/TpsO33PvR0Tl6mVovgXY7MLhLzUYfqcFDRYU0I
-         Rg7WbPIR9rjXxxG/FvW9WsTqCBZrwLwvtD8ELLBvYbmxVrO2XLoyPr7hNcv/8ODP10IN
-         TtUVI6uxwNZ/HVq0OBdaGejTIcdqCLVsXecrlvJWfO3kcvtWK/lLy0NgwY6pIiAhOjzQ
-         GCwSQvfwpUtRjLfabHG2CYhkubkK7/xVCqKE5SJ3AcvhQlvR1lvPzA/GUMqB69/5gurB
-         E8LA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758823028; x=1759427828;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SqXkB57On4uS8bDc2xWGndi8Elal12GhorDr1bW3AFI=;
-        b=Wbc+2ht//WOHZ/omVzR8eZr6zD8gpfifl11A3ZLeSxfWJSoexesiJeeboaX5SjcPnY
-         4TnJobz2bRrwLGA0WJj+mHkY6SXOtOaBJ9yBYclmQRQtOlcrqAMvci79tFaE67923BgD
-         Sx/U6fyRXG3ahxd2Y8AINh0+MjvtRwxAPeXHsDjSP3wQWoKsCXXVFAkeGGEl3xUsKQrI
-         S6W01gqmgTMlMH37Buf20NH0zxeBAJAg0o3W21yMYwvMSpIe3j6gmvlulLP3UArRdVEe
-         HBgPqP60zRbKBo181jmvBAjvrlDxKCbSn9Oh/qlt3TMx9lTJTzpyMW8B7Ibho55d+AAx
-         /Pww==
-X-Forwarded-Encrypted: i=1; AJvYcCUe29HUUNipdbTr49Sx8MjZJirPlNPJVi/NptLGzo5wjK3cALDlUBCnoYNNZ53ppafVsn6hQzU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+vH0q/1URBBXobV6Gy0WRP5pyCKtkEaVa8Q8VVf2unFE/MSqd
-	OOZ1oxm6dYXVdeqxsp5zXVLI5lHJQ0IA/ERS1Rqy/89YwPrrolYjKAXtIZ3Owzmr0gyARPT8zB/
-	nMfDHkZVEEYbILeOb9ZcUT6qv6kFF9PupESXdixV+
-X-Gm-Gg: ASbGnctbudD2gKpB4qQTpfgGiOeMt3rDcy+3dYS/CezgDo+sAyUX9MxhvIF3vU3wN9+
-	pxRS6Ika8EBRzyzowllzFrhyAfgLYGkq2rJJP3Vd8zXgE53+ZqmVhNg0UcogpbuUitdcdDTCDkV
-	FJOsnuV8zk0cc0lVGGfb0bEH/G51zOzjJQk2tMXeLMvMYs5Yx4laZrM6ZVbPVRQ4hgHdcyIcHNQ
-	dU4Qtr92uwQ1Jxz7G573//TS4tIM+vT2yAF12TusUNi3OU=
-X-Google-Smtp-Source: AGHT+IFKhEQRlR2jQiD3UJ5dJi86a0xkbeDXxuCH4Cep+fCFsRCI2p43BRTLMkgVWiYwJ8xiCQG1tE9kV63KS/HtMv8=
-X-Received: by 2002:a17:90b:4b10:b0:32b:ab04:291e with SMTP id
- 98e67ed59e1d1-3342a2af4b5mr4299628a91.25.1758823027636; Thu, 25 Sep 2025
- 10:57:07 -0700 (PDT)
+	s=arc-20240116; t=1758823056; c=relaxed/simple;
+	bh=qoifE3zJBGyy8pHJ5F5xTTvVhsEV8efkkUoMsXjzTe0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LyQXOnfnoHDE61f5MymyY74FxTEsuwM6PYIyEVWMlKiK0WMa6kj6FKbjOM5oZmBWl49MOogRXTv4Rz12U174K7UawPGDYTvXClF95l4OMz14zATx2uYzA9gUumtszJRTnnFWVsDAWe4PIlhMw1M0Wxw+RfBrAA7w7J6JgBfKFm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ceJ6yMw7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AFF9C4CEF0;
+	Thu, 25 Sep 2025 17:57:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758823056;
+	bh=qoifE3zJBGyy8pHJ5F5xTTvVhsEV8efkkUoMsXjzTe0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ceJ6yMw7lJUX9dmO+ynu8AwRojuaHCYTII2JpwpLSHULnUvPwYrfZ6q//NFxAK5+x
+	 3Im+PV8UQ3qdDUVTiaKs6NYL8q5jiW5CqXHks1GTdPkhfvSVFALYdyzQnrmuuQt80I
+	 EjfoxlsnkUie13/Yu+NPeWMyRsT0W9XvRTjHcht4hgL0pVX91JeWd4E3DVrKCqGcX8
+	 8znv3cmhhTgeB8j0c8MlMgwPh9M+Nk9SiA+qZONF9+D2lXYcGm0/kUxZWk7w5YKQAe
+	 UGm/zfGgH9DJW3HzCx1EB3wrfY37nc7qA1AgwhWZn1yPCcq4Z56vfdKBe6uWtSz/sF
+	 WNTYAJku+1Rfw==
+Date: Thu, 25 Sep 2025 10:57:33 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Alexandra Winter <wintera@linux.ibm.com>, Sidraya Jayagond
+ <sidraya@linux.ibm.com>, Julian Ruess <julianr@linux.ibm.com>, Aswin
+ Karuvally <aswin@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Mahanta
+ Jambigi <mjambigi@linux.ibm.com>, Tony Lu <tonylu@linux.alibaba.com>, Wen
+ Gu <guwen@linux.alibaba.com>, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, linux-s390@vger.kernel.org, Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Simon
+ Horman <horms@kernel.org>, Eric Biggers <ebiggers@kernel.org>, Ard
+ Biesheuvel <ardb@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
+ Harald Freudenberger <freude@linux.ibm.com>, Konstantin Shkolnyy
+ <kshk@linux.ibm.com>, Dan Williams <dan.j.williams@intel.com>, Dave Jiang
+ <dave.jiang@intel.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Shannon Nelson <sln@onemain.com>, Geert Uytterhoeven
+ <geert@linux-m68k.org>, Jason Gunthorpe <jgg@ziepe.ca>, "D. Wythe"
+ <alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>, Wenjia
+ Zhang <wenjia@linux.ibm.com>, David Miller <davem@davemloft.net>, Paolo
+ Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [PATCH net-next v3 13/14] dibs: Move data path to dibs layer:
+ manual merge
+Message-ID: <20250925105733.040604ca@kernel.org>
+In-Reply-To: <74368a5c-48ac-4f8e-a198-40ec1ed3cf5f@kernel.org>
+References: <20250918110500.1731261-1-wintera@linux.ibm.com>
+	<20250918110500.1731261-14-wintera@linux.ibm.com>
+	<74368a5c-48ac-4f8e-a198-40ec1ed3cf5f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250925021628.886203-1-xuanqiang.luo@linux.dev> <20250925021628.886203-2-xuanqiang.luo@linux.dev>
-In-Reply-To: <20250925021628.886203-2-xuanqiang.luo@linux.dev>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 25 Sep 2025 10:56:56 -0700
-X-Gm-Features: AS18NWBvTLzsJFJbo144ff1nH8QOme_2CBK4VXbI_Wy8AWNA-iOI7iKVnZxz-5c
-Message-ID: <CAAVpQUDNiOyfUz5nwW+v7oZ-EvR0Pf82yD0S2Wsq+LEO2Y2hhA@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 1/3] rculist: Add hlist_nulls_replace_rcu()
- and hlist_nulls_replace_init_rcu()
-To: xuanqiang.luo@linux.dev
-Cc: edumazet@google.com, "Paul E. McKenney" <paulmck@kernel.org>, kerneljasonxing@gmail.com, 
-	davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org, 
-	Xuanqiang Luo <luoxuanqiang@kylinos.cn>, Frederic Weisbecker <frederic@kernel.org>, 
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 24, 2025 at 7:18=E2=80=AFPM <xuanqiang.luo@linux.dev> wrote:
->
-> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
->
-> Add two functions to atomically replace RCU-protected hlist_nulls entries=
-.
->
-> Keep using WRITE_ONCE() to assign values to ->next and ->pprev, as
-> mentioned in the patch below:
-> commit efd04f8a8b45 ("rcu: Use WRITE_ONCE() for assignments to ->next for
-> rculist_nulls")
-> commit 860c8802ace1 ("rcu: Use WRITE_ONCE() for assignments to ->pprev fo=
-r
-> hlist_nulls")
->
-> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-> ---
->  include/linux/rculist_nulls.h | 52 +++++++++++++++++++++++++++++++++++
->  1 file changed, 52 insertions(+)
->
-> diff --git a/include/linux/rculist_nulls.h b/include/linux/rculist_nulls.=
-h
-> index 89186c499dd4..c3ba74b1890d 100644
-> --- a/include/linux/rculist_nulls.h
-> +++ b/include/linux/rculist_nulls.h
-> @@ -152,6 +152,58 @@ static inline void hlist_nulls_add_fake(struct hlist=
-_nulls_node *n)
->         n->next =3D (struct hlist_nulls_node *)NULLS_MARKER(NULL);
->  }
->
-> +/**
-> + * hlist_nulls_replace_rcu - replace an old entry by a new one
-> + * @old: the element to be replaced
-> + * @new: the new element to insert
-> + *
-> + * Description:
-> + * Replace the old entry with the new one in a RCU-protected hlist_nulls=
-, while
-> + * permitting racing traversals.
-> + *
-> + * The caller must take whatever precautions are necessary (such as hold=
-ing
-> + * appropriate locks) to avoid racing with another list-mutation primiti=
-ve, such
-> + * as hlist_nulls_add_head_rcu() or hlist_nulls_del_rcu(), running on th=
-is same
-> + * list.  However, it is perfectly legal to run concurrently with the _r=
-cu
-> + * list-traversal primitives, such as hlist_nulls_for_each_entry_rcu().
-> + */
-> +static inline void hlist_nulls_replace_rcu(struct hlist_nulls_node *old,
-> +                                            struct hlist_nulls_node *new=
-)
+On Wed, 24 Sep 2025 10:07:35 +0100 Matthieu Baerts wrote:
+> Regarding this conflict, I hope the resolution is correct. The patch
+> from 'net' was modifying 'net/smc/smc_loopback.c' in
+> smc_lo_register_dmb() and __smc_lo_unregister_dmb(). I applied the same
+> modifications in 'drivers/dibs/dibs_loopback.c', in
+> dibs_lo_register_dmb() and __dibs_lo_unregister_dmb(). In net-next,
+> kfree(cpu_addr) was used instead of kvfree(cpu_addr), but this was done
+> on purpose. Also, I had to include mm.h to be able to build this driver.
+> I also attached a simple diff of the modifications I did.
 
-nit: checkpatch complains here..
-https://patchwork.kernel.org/project/netdevbpf/patch/20250925021628.886203-=
-2-xuanqiang.luo@linux.dev/
+Thanks a lot for sharing the resolutions!
 
-CHECK: Alignment should match open parenthesis
-#46: FILE: include/linux/rculist_nulls.h:171:
-+static inline void hlist_nulls_replace_rcu(struct hlist_nulls_node *old,
-+     struct hlist_nulls_node *new)
+> Note: no rerere cache is available for this kind of conflicts.
 
-
-> +{
-> +       struct hlist_nulls_node *next =3D old->next;
-> +
-> +       WRITE_ONCE(new->next, next);
-> +       WRITE_ONCE(new->pprev, old->pprev);
-> +       rcu_assign_pointer(*(struct hlist_nulls_node __rcu **)new->pprev,=
- new);
-
-nit: define hlist_nulls_prev_rcu() like hlist_nulls_next_rcu().
-
-
-> +       if (!is_a_nulls(next))
-> +               WRITE_ONCE(new->next->pprev, &new->next);
-
-nit: s/new->next->pprev/next->pprev/
-
-> +}
-> +
-> +/**
-> + * hlist_nulls_replace_init_rcu - replace an old entry by a new one and
-> + * initialize the old
-> + * @old: the element to be replaced
-> + * @new: the new element to insert
-> + *
-> + * Description:
-> + * Replace the old entry with the new one in a RCU-protected hlist_nulls=
-, while
-> + * permitting racing traversals, and reinitialize the old entry.
-> + *
-> + * Note: @old must be hashed.
-> + *
-> + * The caller must take whatever precautions are necessary (such as hold=
-ing
-> + * appropriate locks) to avoid racing with another list-mutation primiti=
-ve, such
-> + * as hlist_nulls_add_head_rcu() or hlist_nulls_del_rcu(), running on th=
-is same
-> + * list. However, it is perfectly legal to run concurrently with the _rc=
-u
-> + * list-traversal primitives, such as hlist_nulls_for_each_entry_rcu().
-> + */
-> +static inline void hlist_nulls_replace_init_rcu(struct hlist_nulls_node =
-*old,
-> +                                               struct hlist_nulls_node *=
-new)
-> +{
-> +       hlist_nulls_replace_rcu(old, new);
-> +       WRITE_ONCE(old->pprev, NULL);
-> +}
-> +
->  /**
->   * hlist_nulls_for_each_entry_rcu - iterate over rcu list of given type
->   * @tpos:      the type * to use as a loop cursor.
-> --
-> 2.25.1
->
+BTW have you figured out how to resolve that automatically?
+NIPA does trusts rerere but because it didn't work we were running
+without net for the last few days (knowingly) :(
 
