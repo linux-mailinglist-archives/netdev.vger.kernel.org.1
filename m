@@ -1,168 +1,157 @@
-Return-Path: <netdev+bounces-226171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71BBBB9D56A
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 05:54:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21371B9D57F
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 05:56:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 522661BC33ED
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 03:54:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AA457B3316
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 03:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257B22E5B2A;
-	Thu, 25 Sep 2025 03:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B5062E6CC3;
+	Thu, 25 Sep 2025 03:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="sOV4m1lm"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="G9sOACPm"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6C7DF49;
-	Thu, 25 Sep 2025 03:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604B0202963
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 03:56:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758772464; cv=none; b=t2ZAIHwORIayvdxJepiqtxjr3WBgaJe6TduxkkMXk1Fr7PbLEf8DxVCs8+rGLaHD2Ugy2T6SOqm4NkPbObGF9Y2OJjVl44l6P7dAkPR4nzk+kCRsh4x0aE9Qbw1O8oJ2Ag3juRhkeZ5k7DCV8sTntiJMg78Hzn2lqtQI8SdCuuk=
+	t=1758772586; cv=none; b=otqY7E6LD42EUiOFFm/p8QpV2odmZoHfHSaSLuVc8aIlyMLR3s2spRMkxgcqROVcmR2LR3+o0WMrNPWPtDBIAIeS0P+KWsL6QRv67Jie32lqUow6i7g9hYac4cKCMx0W1GzSIy1Y7OpxwlUZMC8PQdBkwnC+f5m8UZh8qqz3Gfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758772464; c=relaxed/simple;
-	bh=nGIho2dwWkohzWHCgUzJMDybe+bcnDzqaHkwa/e4A9I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TWESuRnUOCSMWdH7FqKggE9j3i1Y0AZn5UXmAqg7lW2V9AgwhlJNaa7y3etjGzZIA2qZPHM1HXtUcrVyJDg0nhlkXB8An506/EmuXoNnVEe2Is8Vf9Bhwirb5RKY26MG6QWbz78Xv4frUgeS/uAH7Vb4Qx24VS/oPrkUUk6r4jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=sOV4m1lm; arc=none smtp.client-ip=115.124.30.112
+	s=arc-20240116; t=1758772586; c=relaxed/simple;
+	bh=/KIoZd0r1Y7KKzJ2RR52blGQ3ZRO0Y22C8ZgVh8YRwE=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=oklCBcTRD5uqJDeWkdxv019SbIypAzi+CbvwOx14RTg8jApDCn+3iQUNrd9FUmK36tseoK5Wl/Vlpswo30g/wPLkiDw+7jxiSexh8epc8BU7yUqUU4uMNeaJBWOsE4AbANkAYeclMap0ksNp47tKJipHgJL2C29wpxoGYPAGbkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=G9sOACPm; arc=none smtp.client-ip=115.124.30.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1758772452; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=wsAuT+Pm1Q6WqoYdsP5p4PwG0In8tq3ybZz3jyVwdSY=;
-	b=sOV4m1lmNcVYY39ybrDgVqE1HUTpFS/XIZFBra2nuz+VWmqI/fMQwWKR4PXBZXrwaVSSp0r2kU/sCd22ZAHE5pcWZERf4DTrzQNr8NUQ1C7vKFvNzfWpo1ZOIS2X9Roi56SFbCNOzu97aety7vsI0oRcDtnFeYxzxKVDNBdN6wA=
-Received: from 30.221.116.42(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0Wom3gRQ_1758772127 cluster:ay36)
+	t=1758772579; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=cYnBq4FpMSnVpjQPz1SwhErmA/eqFcylsAK7kkWeQSI=;
+	b=G9sOACPmZRI20eM9VTmvXfy3TJKOk0Nt8FmSQZbciT+0eK7oHkaQ44by7ILgatg642PLesLPFC3of8EmnwMj+2ipsTwwxZ57alAgBEgUTACFvF3e+JXEaD/GSr/8LP61UPt2sc3+1Y4438YWxW1kjyXOZ/9FI9SW1q+1Xe/Pib0=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Wom3LfR_1758772578 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Thu, 25 Sep 2025 11:48:47 +0800
-Message-ID: <2aced457-5f1e-4c1a-b5ea-035240f73aaf@linux.alibaba.com>
-Date: Thu, 25 Sep 2025 11:48:46 +0800
+          Thu, 25 Sep 2025 11:56:18 +0800
+Message-ID: <1758772569.13948-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v3 03/11] virtio_net: Create virtio_net directory
+Date: Thu, 25 Sep 2025 11:56:09 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Daniel Jurgens <danielj@nvidia.com>
+Cc: <virtualization@lists.linux.dev>,
+ <parav@nvidia.com>,
+ <shshitrit@nvidia.com>,
+ <yohadt@nvidia.com>,
+ <xuanzhuo@linux.alibaba.com>,
+ <eperezma@redhat.com>,
+ <shameerali.kolothum.thodi@huawei.com>,
+ <jgg@ziepe.ca>,
+ <kevin.tian@intel.com>,
+ <kuba@kernel.org>,
+ <andrew+netdev@lunn.ch>,
+ <edumazet@google.com>,
+ Daniel Jurgens <danielj@nvidia.com>,
+ <netdev@vger.kernel.org>,
+ <mst@redhat.com>,
+ <jasowang@redhat.com>,
+ <alex.williamson@redhat.com>,
+ <pabeni@redhat.com>
+References: <20250923141920.283862-1-danielj@nvidia.com>
+ <20250923141920.283862-4-danielj@nvidia.com>
+In-Reply-To: <20250923141920.283862-4-danielj@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] net/smc: make wr buffer count
- configurable
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Dust Li <dust.li@linux.alibaba.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- "D. Wythe" <alibuda@linux.alibaba.com>,
- Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang
- <wenjia@linux.ibm.com>, Mahanta Jambigi <mjambigi@linux.ibm.com>,
- Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-s390@vger.kernel.org
-References: <20250908220150.3329433-1-pasic@linux.ibm.com>
- <20250908220150.3329433-2-pasic@linux.ibm.com>
- <aL-YYoYRsFiajiPW@linux.alibaba.com>
- <20250909121850.2635894a.pasic@linux.ibm.com>
- <20250919165549.7bebfbc3.pasic@linux.ibm.com>
- <06a87a92-6cce-4a63-99d0-463a1d035478@linux.alibaba.com>
- <20250924115010.38d2f3cb.pasic@linux.ibm.com>
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-In-Reply-To: <20250924115010.38d2f3cb.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+
+On Tue, 23 Sep 2025 09:19:12 -0500, Daniel Jurgens <danielj@nvidia.com> wro=
+te:
+> The flow filter implementaion requires minimal changes to the
+> existing virtio_net implementation. It's cleaner to separate it into
+> another file. In order to do so, move virtio_net.c into the new
+> virtio_net directory, and create a makefile for it. Note the name is
+> changed to virtio_net_main.c, so the module can retain the name
+> virtio_net.
+>
+> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+> Reviewed-by: Parav Pandit <parav@nvidia.com>
+> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
+
+To help this work move forward smoothly, I don't recommend splitting the
+directory structure within this patchset. Directory reorganization can be a
+separate effort=C3=A2=E2=82=AC=E2=80=9DI've previously experimented with th=
+is myself. I'd really
+like to see this work progress smoothly.
+
+Thanks.
 
 
-
-在 2025/9/24 17:50, Halil Pasic 写道:
-> On Wed, 24 Sep 2025 11:13:05 +0800
-> Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
-> 
->> 在 2025/9/19 22:55, Halil Pasic 写道:
->>> On Tue, 9 Sep 2025 12:18:50 +0200
->>> Halil Pasic <pasic@linux.ibm.com> wrote:
->>>
->>>
->>> Can maybe Wen Gu and  Guangguan Wang chime in. From what I read
->>> link->wr_rx_buflen can be either SMC_WR_BUF_SIZE that is 48 in which
->>> case it does not matter, or SMC_WR_BUF_V2_SIZE that is 8192, if
->>> !smc_link_shared_v2_rxbuf(lnk) i.e. max_recv_sge == 1. So we talk
->>> about roughly a factor of 170 here. For a large pref_recv_wr the
->>> back of logic is still there to save us but I really would not say that
->>> this is how this is intended to work.
->>>   
->>
->> Hi Halil,
->>
->> I think the root cause of the problem this patchset try to solve is a mismatch
->> between SMC_WR_BUF_CNT and the max_conns per lgr(which value is 255). Furthermore,
->> I believe that value 255 of the max_conns per lgr is not an optimal value, as too
->> few connections lead to a waste of memory and too many connections lead to I/O queuing
->> within a single QP(every WR post_send to a single QP will initiate and complete in sequence).
->>
->> We actually identified this problem long ago. In Alibaba Cloud Linux distribution, we have
->> changed SMC_WR_BUF_CNT to 64 and reduced max_conns per lgr to 32(for SMC-R V2.1). This
->> configuration has worked well under various workflow for a long time.
->>
->> SMC-R V2.1 already support negotiation of the max_conns per lgr. Simply change the value of
->> the macro SMC_CONN_PER_LGR_PREFER can influence the negotiation result. But SMC-R V1.0 and SMC-R
->> v2.0 do not support the negotiation of the max_conns per lgr.
->> I think it is better to reduce SMC_CONN_PER_LGR_PREFER for SMC-R V2.1. But for SMC-R V1.0 and
->> SMC-R V2.0, I do not have any good idea.
->>
-> 
-> I agree, the number of WR buffers and the max number of connections per
-> lgr can an should be tuned in concert.
-> 
->>> Maybe not supporting V2 on devices with max_recv_sge is a better choice,
->>> assuming that a maximal V2 LLC msg needs to fit each and every receive
->>> WR buffer. Which seems to be the case based on 27ef6a9981fe ("net/smc:
->>> support SMC-R V2 for rdma devices with max_recv_sge equals to 1").
->>>  
->>
->> For rdma dev whose max_recv_sge is 1, as metioned in the commit log in the related patch,
->> it is better to support than SMC_CLC_DECL_INTERR fallback, as SMC_CLC_DECL_INTERR fallback
->> is not a fast fallback, and may heavily influence the efficiency of the connecting process
->> in both the server and client side.
-> 
-> I mean another possible mitigation of the problem can be the following,
-> if there is a device in the mix with max_recv_sge < 2 the don't propose/
-> accept SMCR-V2. 
-> 
-> Do you know how prevalent and relevant are max_recv_sge < 2 RDMA
-> devices, and how likely is it that somebody would like to use SMC-R with
-> such devices?
-> 
-
-eRDMA in Alibaba Cloud is max_recv_sge < 2, and it is the RDMA device we are primarily focusing on.
-eRDMA prefer works on SMC-R V2.1, is it possible that supported in SMC-R V2.1 but not in V2.0? 
-
->>
->>  
->>> For me the best course of action seems to be to send a V3 using
->>> link->wr_rx_buflen. I'm really not that knowledgeable about RDMA or
->>> the SMC-R protocol, but I'm happy to be part of the discussion on this
->>> matter.
->>>
->>> Regards,
->>> Halil  
->>
->> And a tiny suggestion for the risk you mentioned in commit log
->> ("Addressing this by simply bumping SMC_WR_BUF_CNT to 256 was deemed
->> risky, because the large-ish physically continuous allocation could fail
->> and lead to TCP fall-backs."). Non-physically continuous allocation (vmalloc/vzalloc .etc.) is
->> also supported for wr buffers. SMC-R snd_buf and rmb have already supported for non-physically
->> continuous memory, when sysctl_smcr_buf_type is set to SMCR_VIRT_CONT_BUFS or SMCR_MIXED_BUFS.
->> It can be an example of using non-physically continuous memory.
->>
-> 
-> I think we can put this on the list of possible enhancements. I would
-> perfer to not add this to the scope of this series. But I would be happy to
-> see this happen. Don't know know if somebody form Alibaba, or maybe
-> Mahanta or Sid would like to pick this up as an enhancement on top.
-> > Thank you very much for for your comments!
-> 
-> Regards,
-> Halil 
-
+> ---
+>  MAINTAINERS                                               | 2 +-
+>  drivers/net/Makefile                                      | 2 +-
+>  drivers/net/virtio_net/Makefile                           | 8 ++++++++
+>  .../net/{virtio_net.c =3D> virtio_net/virtio_net_main.c}    | 0
+>  4 files changed, 10 insertions(+), 2 deletions(-)
+>  create mode 100644 drivers/net/virtio_net/Makefile
+>  rename drivers/net/{virtio_net.c =3D> virtio_net/virtio_net_main.c} (100=
+%)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index a8a770714101..09d26c4225a9 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -26685,7 +26685,7 @@ F:	Documentation/devicetree/bindings/virtio/
+>  F:	Documentation/driver-api/virtio/
+>  F:	drivers/block/virtio_blk.c
+>  F:	drivers/crypto/virtio/
+> -F:	drivers/net/virtio_net.c
+> +F:	drivers/net/virtio_net/
+>  F:	drivers/vdpa/
+>  F:	drivers/virtio/
+>  F:	include/linux/vdpa.h
+> diff --git a/drivers/net/Makefile b/drivers/net/Makefile
+> index 73bc63ecd65f..cf28992658a6 100644
+> --- a/drivers/net/Makefile
+> +++ b/drivers/net/Makefile
+> @@ -33,7 +33,7 @@ obj-$(CONFIG_NET_TEAM) +=3D team/
+>  obj-$(CONFIG_TUN) +=3D tun.o
+>  obj-$(CONFIG_TAP) +=3D tap.o
+>  obj-$(CONFIG_VETH) +=3D veth.o
+> -obj-$(CONFIG_VIRTIO_NET) +=3D virtio_net.o
+> +obj-$(CONFIG_VIRTIO_NET) +=3D virtio_net/
+>  obj-$(CONFIG_VXLAN) +=3D vxlan/
+>  obj-$(CONFIG_GENEVE) +=3D geneve.o
+>  obj-$(CONFIG_BAREUDP) +=3D bareudp.o
+> diff --git a/drivers/net/virtio_net/Makefile b/drivers/net/virtio_net/Mak=
+efile
+> new file mode 100644
+> index 000000000000..c0a4725ddd69
+> --- /dev/null
+> +++ b/drivers/net/virtio_net/Makefile
+> @@ -0,0 +1,8 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +#
+> +# Makefile for the VirtIO Net driver
+> +#
+> +
+> +obj-$(CONFIG_VIRTIO_NET) +=3D virtio_net.o
+> +
+> +virtio_net-objs :=3D virtio_net_main.o
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net/virtio_net=
+_main.c
+> similarity index 100%
+> rename from drivers/net/virtio_net.c
+> rename to drivers/net/virtio_net/virtio_net_main.c
+> --
+> 2.45.0
+>
 
