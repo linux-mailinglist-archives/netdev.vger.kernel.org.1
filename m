@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-226536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9891BA1814
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 23:18:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B5B3BA1838
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 23:20:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 597C47421F4
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 21:17:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 123AA1C8152B
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 21:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A1B322C73;
-	Thu, 25 Sep 2025 21:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C88322C8E;
+	Thu, 25 Sep 2025 21:17:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IfJ5SpYn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KEGWFikO"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 430BF32274A
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 21:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA5E322A3B
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 21:17:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758835020; cv=none; b=jaYe6Uwau/QDpmFm+R0NwQfg/jyuLGbXF6tz9aSNO+na4+JQTIQwyOmWzuSQYSyhkywq7Zvzm9fAxVVUF6uGZCtHANFWqQ7putU+5Lo/cKuLqP1LPI9Bvv2eLb/UU/2Cd/a9pdxVJr8Jm/QgNGVt2aW29O6MHkI5HSzqQd+V24Q=
+	t=1758835022; cv=none; b=quz6+KCG0s3bTGfOhYpW5De8RE95vawJi9OAIXW+0MaFOs+QAxzhdokeklVExIJhZX8v+5f9XrE6hbrLGwhtmWFUpmbqs3WbYdfZeEUUOmSxJMwwX0XgYvr0r/XcwC9xmtMyrS4Pb3Hoj4G+nfZfPNwcniH+5arVcuttnp2Vwso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758835020; c=relaxed/simple;
-	bh=TibBUxjer8sn4SHd81lBBre6CGD0DuO16jKiKhsjTK8=;
+	s=arc-20240116; t=1758835022; c=relaxed/simple;
+	bh=W0zrtGCRv1JKDtb4hNj0Ew9zhUISoAAsd0ngYP0rDks=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m6OLl3Ui8larNS+ovhIH8imLDRFo1hUgVBrutcJlCgl7WReYdFbYuIsDpRiJHA19j+CJZ0ULGYI1I0kPow+ITDmDznN4FlOy8IE5HSVrSN6VSjnZRF2EVBND+hzbp43nSnTlm81KRvCaGV3OLg9aKq6xOyvePO1Cm6w2gCekw9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IfJ5SpYn; arc=none smtp.client-ip=209.85.128.170
+	 MIME-Version; b=e+ecDIqgZkFa2nJQl+fILFXX0dUPrn/f4/rgQFzbj4EyKektPzKVpWICfCMRctRd3ouWbX689Ng1w5i+XtzxOlzeEod/gGkk/hW0gNUYylkVROcVa9KKawoRusivBWd8pSes+YVTJyPw70i3f73FJ1UFWNImUTOylqfSa0Vmp5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KEGWFikO; arc=none smtp.client-ip=209.85.128.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-723ad237d1eso17612897b3.1
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 14:16:59 -0700 (PDT)
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-71d60504788so13586767b3.2
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 14:17:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758835018; x=1759439818; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758835019; x=1759439819; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xO0MHYB2g91WEo5u4+rJ17OMCJlsE7G9zuPzeJmEyd4=;
-        b=IfJ5SpYnDvkGsnBuyrPePuWgNZngYeOo8vBm3/kNKvtVmMDSJGINZc9CVGMdC0T/EA
-         AuFmtitpKU2jLMOBPAjbr3Mr0YEHTsCV1HoQTwThSwXkb5MuK2nlPQWDvfnFZdBjwZV5
-         YnbgVoGjJNUkhokU8UdIeUQU7wBU05KF8pWVnmXslvpXsx2iyT5hbcvibt1ciA6luHQg
-         0j9aDl9Tq/n8kyI8Zu5vCQPvm39YQfpJcrdsqn2WOlwDnoEtM06T9/sliw9LuKRvppeU
-         qFrGtHo3Kkn1z1uRlJ7mcPTgxPRZITLGjJ+Ai2bqD0RXndzPDKo4j0lY+22pXX25wiKP
-         Py/A==
+        bh=dApBtpQ38j5H0cAjXKBJNlLXE3pUCuEyhNWBe3vyq94=;
+        b=KEGWFikOmGYSP+bbLIGZWRtjQJ2m6O4lRhCj3jStCYm+g4tToNtn/mU5ccoJUSLIiz
+         2YGJlCZzRMgJI60XaHhB53gz3Gz3vi+OVuuK/zLUki2Hq/2SuJGG5xepDV/DS/kHXxO1
+         ay9RZUOslsE2Tp3v4qBBn2nJVgzZwbTKuFZp4gPB543mOMf2abd6dSWQJWjNtBpy+TS+
+         X9P9XvsqBQ1bV1JTz0Q6NTrJwepUGfhKWxpAmMgRKMtV+DnKsw34ispDNYXAR/q21NLv
+         Z4/8S2aNnsafOQ3Ack3XJ4BPZWCUoJ3GVlJTH9KNu6sBipkCxXMtOvxc37LL2ANnEe/o
+         bzsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758835018; x=1759439818;
+        d=1e100.net; s=20230601; t=1758835019; x=1759439819;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xO0MHYB2g91WEo5u4+rJ17OMCJlsE7G9zuPzeJmEyd4=;
-        b=A6oxukYTuhSNSUDbwH8kwtZ1Ujxr2NqdJxIv5jgv7b9BWF0ByFFF0c3NtnyHEgVDRm
-         gFj/b0T1REoA1Yd5aXxWgE4bUC3ddrzWAAnj0fLn6j5uvGxKji4gOCOpFFGS+KMfkki1
-         lvH6k9BPHmqjnv/YvPirqtQ+qDbpq7QmBtnD2vvEYIqhsdMtaih6h4taEo6iP70CURhM
-         3eC7mADmogvPi/P15NXc1zDX2anhsTWIDps5yPUvAq8sauL3KP7HvyqbEgKMrxKrmB0n
-         mmLzCHhbUJMzbtwkvtcRVyfWCqXq2APQ1vr/BOUFmobD3ORafkwrSHUXnsVME/cmaobT
-         r4qw==
-X-Forwarded-Encrypted: i=1; AJvYcCWiaSB2190a5+tCP4WRkBPcmYppkHcQ9vAd4+Kn+s8DXETzjxzOXYntpmydnDOMbeSm0MpUtGE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yznugq38Ch9ods7B2AqtLAJqXNa4xL3OpKgnr5eCdqkmtP83AVn
-	/eDC+tiMvzl6gpNPMp0RBy+QbQXbMRb61VhoRuPVvmkYCoe5Q7AJEqeJ
-X-Gm-Gg: ASbGncvC/xaEUIg6a2muDUMKR/rN+KZQ+9tjl3xCWl7gRtaOaGGDQviIO/cisLjlT1b
-	2cvWxfCIGgkbbMZ9ChYQ3gslXSP/+K/P11ER6ooKTpX0jPXziexHUBQvncsCc3fYuFY7BsV/In8
-	Uz54cikNBK9FKWtf6icFGKQjIqx9J0qki5oF4DOU4TwNWm8ydkXteIY7OjXz/t0YaMZj2EoMGAy
-	3p++VSC3Nf+p9f3qwSvIFo/otMhI9La7o9yrP5sYBQmAZ6IdowyYCQaP3U1BomeMeD5hALzCD3R
-	fCcIw6OPmkFDdZo4IU4PrLUgZkYdYG0GzVZNyq+Uox6trqSUzEOT/JOCyFFyqLdXR9R8F+uGVHy
-	a1rK5Sb6roV38weMItYc9dw7fy/vrnrtz
-X-Google-Smtp-Source: AGHT+IEZ0RMSsUoH+5O2rBo0k5lMsNm3odujpQYlX22DhoC1XTq5eVAG6pOnXtYG7QiO/j47Je32XQ==
-X-Received: by 2002:a05:690c:4b82:b0:748:9715:f672 with SMTP id 00721157ae682-763fe75420amr52505507b3.24.1758835018099;
-        Thu, 25 Sep 2025 14:16:58 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:71::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-765be66afddsm7288797b3.30.2025.09.25.14.16.57
+        bh=dApBtpQ38j5H0cAjXKBJNlLXE3pUCuEyhNWBe3vyq94=;
+        b=NXGlsbTW5eqJyIDZUBQGsNX+k1ysuTME5ktP8VtZsew9g5m+VKoqzy75du17QKouNU
+         +xvXKk4oaO12ZqF8IV7CZbb75jS2Ou6sDy+6v2r+UhC0Lo6V14LSS8op3P2HPc+AnOrC
+         5AhR2wgeLNxPyQhy+vnyH4LQ3cZ/PUw+YOyqH/JIm7wmg0IQM7YMl4NqRrdYoI3ScKZl
+         H32XfCvqrZwPFFlHQ99UwPlq+/lXkb8MfyD/w7gdfPK67XYmEMdI8TNeAPf+2QmIZJfr
+         xGvBG4cFCKk+3CWE8XhXe1gpdGjhPKOdB8bq6ZkF5IkpbFLF89LtPSNn9tfpchLPf/zL
+         KB6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVK5VeF37gw4ptkHt1DXBcD8J2otRZh8cUZN9p4yc6qvX7igVtiPoa8IKJ4QDqYA+Dko5v7/T8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwY48utIQ6Shj0EmutC9bjPOvzuaM/7qFdTXKuXkHWuxfYMLBRr
+	QBn7gDziw4gUoRyVxFQMalJhfTeGnAmrF8G9HhjZfvLjQ52gwsxn0S8O
+X-Gm-Gg: ASbGncvEM7JJ9yCb4Jm8zfUJK7FmhpZ5rQrBuZOoWkRpE8V6AaZNASZ41pVUjvN18ZR
+	JRbMWVfqDTMzZYJFZpkvzgvs+FLJGqTr5kMB0P7yoKsaMY6wYgWgSIIeFv0SMMeLdEidGkP1zP4
+	i/ShL450uU98p1mQ5Dzg/91pCUSQU5JbfRygjyj9ZDg840H+7wy5zG9dVOZmT0w7A6nCz3+qp/V
+	hb/oJUN37RY4xnEOymzvM/qY59SY4S0UHoJuT8kGo3vUxUrLevsLhw/Pd5YPqoKEVGGWkTuEftY
+	DYCqvOJMW/EiCkApkPDNrJl8TwunwUgaAyAOglbIdp+DUeF6A8teqm9NqT3EzkCtoeVuzDhSWZb
+	Bg8Y0ZsoY/saPWO4kveJU
+X-Google-Smtp-Source: AGHT+IEJ1AFHr+6bBlVzr8CLiHkEL2bqG/pjqIeLOMVV3TNKpaPCF/1iEo9aRz547n4B55jNjCD5NQ==
+X-Received: by 2002:a05:690c:708c:b0:717:ca51:d781 with SMTP id 00721157ae682-763fbe14bb7mr49967787b3.17.1758835019352;
+        Thu, 25 Sep 2025 14:16:59 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:58::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-636d5b1d955sm108147d50.30.2025.09.25.14.16.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 14:16:57 -0700 (PDT)
+        Thu, 25 Sep 2025 14:16:58 -0700 (PDT)
 From: Daniel Zahka <daniel.zahka@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -90,9 +90,9 @@ Cc: Willem de Bruijn <willemb@google.com>,
 	Donald Hunter <donald.hunter@gmail.com>,
 	netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v2 7/8] selftests: drv-net: psp: add test for auto-adjusting TCP MSS
-Date: Thu, 25 Sep 2025 14:16:43 -0700
-Message-ID: <20250925211647.3450332-8-daniel.zahka@gmail.com>
+Subject: [PATCH net-next v2 8/8] selftests: drv-net: psp: add tests for destroying devices
+Date: Thu, 25 Sep 2025 14:16:44 -0700
+Message-ID: <20250925211647.3450332-9-daniel.zahka@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250925211647.3450332-1-daniel.zahka@gmail.com>
 References: <20250925211647.3450332-1-daniel.zahka@gmail.com>
@@ -106,92 +106,169 @@ Content-Transfer-Encoding: 8bit
 
 From: Jakub Kicinski <kuba@kernel.org>
 
-Test TCP MSS getting auto-adjusted. PSP adds an encapsulation overhead
-of 40B per packet, when used in transport mode without any
-virtualization cookie or other optional PSP header fields. The kernel
-should adjust the MSS for a connection after PSP tx state is reached.
+Add tests for making sure device can disappear while associations
+exist. This is netdevsim-only since destroying real devices is
+more tricky.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 ---
- tools/testing/selftests/drivers/net/psp.py | 50 ++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+ .../drivers/net/hw/lib/py/__init__.py         |  2 +-
+ .../selftests/drivers/net/lib/py/__init__.py  |  2 +-
+ .../selftests/drivers/net/lib/py/env.py       |  5 ++
+ tools/testing/selftests/drivers/net/psp.py    | 59 ++++++++++++++++++-
+ tools/testing/selftests/net/lib/py/ksft.py    |  5 ++
+ 5 files changed, 69 insertions(+), 4 deletions(-)
 
+diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
+index 1c631f3c81f1..0ceb297e7757 100644
+--- a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
++++ b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
+@@ -22,7 +22,7 @@ try:
+     from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
+         ksft_setup
+     from net.lib.py import ksft_eq, ksft_ge, ksft_in, ksft_is, ksft_lt, \
+-        ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt
++        ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt, ksft_not_none
+     from net.lib.py import NetNSEnter
+     from drivers.net.lib.py import GenerateTraffic
+     from drivers.net.lib.py import NetDrvEnv, NetDrvEpEnv
+diff --git a/tools/testing/selftests/drivers/net/lib/py/__init__.py b/tools/testing/selftests/drivers/net/lib/py/__init__.py
+index 8a795eeb5051..2a645415c4ca 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/__init__.py
++++ b/tools/testing/selftests/drivers/net/lib/py/__init__.py
+@@ -21,7 +21,7 @@ try:
+     from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
+         ksft_setup
+     from net.lib.py import ksft_eq, ksft_ge, ksft_in, ksft_is, ksft_lt, \
+-        ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt
++        ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt, ksft_not_none
+ except ModuleNotFoundError as e:
+     ksft_pr("Failed importing `net` library from kernel sources")
+     ksft_pr(str(e))
+diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
+index c1f3b608c6d8..fc12e20af880 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/env.py
++++ b/tools/testing/selftests/drivers/net/lib/py/env.py
+@@ -7,6 +7,7 @@ from lib.py import KsftSkipEx, KsftXfailEx
+ from lib.py import ksft_setup, wait_file
+ from lib.py import cmd, ethtool, ip, CmdExitFailure
+ from lib.py import NetNS, NetdevSimDev
++from lib.py import KsftXfailEx
+ from .remote import Remote
+ 
+ 
+@@ -245,6 +246,10 @@ class NetDrvEpEnv(NetDrvEnvBase):
+         if not self.addr_v[ipver] or not self.remote_addr_v[ipver]:
+             raise KsftSkipEx(f"Test requires IPv{ipver} connectivity")
+ 
++    def require_nsim(self):
++        if self._ns is None:
++            raise KsftXfailEx("Test only works on netdevsim")
++
+     def _require_cmd(self, comm, key, host=None):
+         cached = self._required_cmd.get(comm, {})
+         if cached.get(key) is None:
 diff --git a/tools/testing/selftests/drivers/net/psp.py b/tools/testing/selftests/drivers/net/psp.py
-index f9647371b791..3eed986e587e 100755
+index 3eed986e587e..f32f3ffe440d 100755
 --- a/tools/testing/selftests/drivers/net/psp.py
 +++ b/tools/testing/selftests/drivers/net/psp.py
-@@ -383,6 +383,43 @@ def data_send_disconnect(cfg):
-         s.close()
+@@ -10,7 +10,7 @@ import termios
+ import time
+ 
+ from lib.py import ksft_run, ksft_exit, ksft_pr
+-from lib.py import ksft_true, ksft_eq, ksft_ne, ksft_gt, ksft_raises, KsftSkipEx
++from lib.py import ksft_true, ksft_eq, ksft_ne, ksft_gt, ksft_raises, ksft_not_none, KsftSkipEx
+ from lib.py import NetDrvEpEnv, PSPFamily, NlError
+ from lib.py import bkg, rand_port, wait_port_listen
+ 
+@@ -449,6 +449,61 @@ def data_stale_key(cfg):
+         _close_psp_conn(cfg, s)
  
  
-+def _data_mss_adjust(cfg, ipver):
-+    # First figure out what the MSS would be without any adjustments
-+    s = _make_clr_conn(cfg, ipver)
-+    s.send(b"0123456789abcdef" * 1024)
-+    _check_data_rx(cfg, 16 * 1024)
-+    mss = s.getsockopt(socket.IPPROTO_TCP, socket.TCP_MAXSEG)
-+    _close_conn(cfg, s)
++def __nsim_psp_rereg(cfg):
++    # The PSP dev ID will change, remember what was there before
++    before = set([x['id'] for x in cfg.pspnl.dev_get({}, dump=True)])
 +
-+    s = _make_psp_conn(cfg, 0, ipver)
++    cfg._ns.nsims[0].dfs_write('psp_rereg', '1')
++
++    after = set([x['id'] for x in cfg.pspnl.dev_get({}, dump=True)])
++
++    new_devs = list(after - before)
++    ksft_eq(len(new_devs), 1)
++    cfg.psp_dev_id = list(after - before)[0]
++
++
++def removal_device_rx(cfg):
++    """ Test removing a netdev / PSD with active Rx assoc """
++
++    # We could technically devlink reload real devices, too
++    # but that kills the control socket. So test this on
++    # netdevsim only for now
++    cfg.require_nsim()
++
++    s = _make_clr_conn(cfg)
 +    try:
 +        rx_assoc = cfg.pspnl.rx_assoc({"version": 0,
-+                                     "dev-id": cfg.psp_dev_id,
-+                                     "sock-fd": s.fileno()})
-+        rx = rx_assoc['rx-key']
-+        tx = _spi_xchg(s, rx)
++                                       "dev-id": cfg.psp_dev_id,
++                                       "sock-fd": s.fileno()})
++        ksft_not_none(rx_assoc)
 +
-+        rxmss = s.getsockopt(socket.IPPROTO_TCP, socket.TCP_MAXSEG)
-+        ksft_eq(mss, rxmss)
-+
-+        cfg.pspnl.tx_assoc({"dev-id": cfg.psp_dev_id,
-+                          "version": 0,
-+                          "tx-key": tx,
-+                          "sock-fd": s.fileno()})
-+
-+        txmss = s.getsockopt(socket.IPPROTO_TCP, socket.TCP_MAXSEG)
-+        ksft_eq(mss, txmss + 40)
-+
-+        data_len = _send_careful(cfg, s, 100)
-+        _check_data_rx(cfg, data_len)
-+        _check_data_outq(s, 0)
-+
-+        txmss = s.getsockopt(socket.IPPROTO_TCP, socket.TCP_MAXSEG)
-+        ksft_eq(mss, txmss + 40)
++        __nsim_psp_rereg(cfg)
 +    finally:
-+        _close_psp_conn(cfg, s)
++        _close_conn(cfg, s)
 +
 +
- def data_stale_key(cfg):
-     """ Test send on a double-rotated key """
- 
-@@ -421,6 +458,15 @@ def psp_ip_ver_test_builder(name, test_func, psp_ver, ipver):
-     return test_case
- 
- 
-+def ipver_test_builder(name, test_func, ipver):
-+    """Build test cases for each IP version"""
-+    def test_case(cfg):
-+        cfg.require_ipver(ipver)
-+        test_case.__name__ = f"{name}_ip{ipver}"
-+        test_func(cfg, ipver)
-+    return test_case
++def removal_device_bi(cfg):
++    """ Test removing a netdev / PSD with active Rx/Tx assoc """
++
++    # We could technically devlink reload real devices, too
++    # but that kills the control socket. So test this on
++    # netdevsim only for now
++    cfg.require_nsim()
++
++    s = _make_clr_conn(cfg)
++    try:
++        rx_assoc = cfg.pspnl.rx_assoc({"version": 0,
++                                       "dev-id": cfg.psp_dev_id,
++                                       "sock-fd": s.fileno()})
++        cfg.pspnl.tx_assoc({"dev-id": cfg.psp_dev_id,
++                            "version": 0,
++                            "tx-key": rx_assoc['rx-key'],
++                            "sock-fd": s.fileno()})
++        __nsim_psp_rereg(cfg)
++    finally:
++        _close_conn(cfg, s)
 +
 +
- def main() -> None:
-     with NetDrvEpEnv(__file__) as cfg:
-         cfg.pspnl = PSPFamily()
-@@ -459,6 +505,10 @@ def main() -> None:
-                     for version in range(0, 4)
-                     for ipver in ("4", "6")
-                 ]
-+                cases += [
-+                    ipver_test_builder("data_mss_adjust", _data_mss_adjust, ipver)
-+                    for ipver in ("4", "6")
-+                ]
+ def psp_ip_ver_test_builder(name, test_func, psp_ver, ipver):
+     """Build test cases for each combo of PSP version and IP version"""
+     def test_case(cfg):
+@@ -512,7 +567,7 @@ def main() -> None:
  
                  if cfg.psp_dev_id is not None:
                      ksft_run(cases=cases, globs=globals(),
+-                             case_pfx={"dev_", "data_", "assoc_"},
++                             case_pfx={"dev_", "data_", "assoc_", "removal_"},
+                              args=(cfg, ))
+                 else:
+                     ksft_pr("No PSP device found, skipping all tests")
+diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
+index 72cddd6abae8..83b1574f7719 100644
+--- a/tools/testing/selftests/net/lib/py/ksft.py
++++ b/tools/testing/selftests/net/lib/py/ksft.py
+@@ -72,6 +72,11 @@ def ksft_true(a, comment=""):
+         _fail("Check failed", a, "does not eval to True", comment)
+ 
+ 
++def ksft_not_none(a, comment=""):
++    if a is None:
++        _fail("Check failed", a, "is None", comment)
++
++
+ def ksft_in(a, b, comment=""):
+     if a not in b:
+         _fail("Check failed", a, "not in", b, comment)
 -- 
 2.47.3
 
