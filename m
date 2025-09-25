@@ -1,122 +1,90 @@
-Return-Path: <netdev+bounces-226544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F4FCBA1B67
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 23:58:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FAADBA1B7B
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 00:00:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39B3F3A9B87
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 21:58:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59A3C3BBC23
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 22:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7490927145C;
-	Thu, 25 Sep 2025 21:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F3A2750FB;
+	Thu, 25 Sep 2025 22:00:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oZjPrux9"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mCsdIWll"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A4014A8E
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 21:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0588D22D4F9;
+	Thu, 25 Sep 2025 22:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758837517; cv=none; b=IkTyTwYs+8E75jxwfKOW0qMcAlYURNV80y69ax5eHh7y4l5SbBnrMseNR6hVQOQJ3zSvBK4bX4kEwwDrzLnh53zzHTKquqYWNtONt6GXJtF9IG4hWLLSB/g74KO5D2bOThZcEyf2UJefXlzuCfqlgpEJF8HZ/CK95bf77HS8BgY=
+	t=1758837652; cv=none; b=sG2TqatbO1Jhyh5iqemjFzWldLor/jjKIFSqHGoX/c3x8OazxprECRxxyxkNUNYzgKvyC/QSPUQ8MuAKkCSyPn48TU3QGd6o+hoPZqsurzi8P5COMq8QKnKetfs+efPqR3XD2/jCdXFG3dM+CrrqnEnGf5dx2979xA3wuXgJyIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758837517; c=relaxed/simple;
-	bh=cToozM6ezO+LQr3pSe4C/JWreMuOsGdBuu32DliRvYM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uVTHUbdEpmOpycUrY1froMIkR1jQH8NmHoSz/YNLo6vyPDwMREmR3r681GicMKidpOiKHppPqsGXi9lK0BX1mJFbQTD0Iw0cA5aktJzon4lIHlIzwlZfhtLBa/vGu/M1YkMMjsjZJXy0gxnEVxamKlmpzFwttIori3PPpBnpmsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oZjPrux9; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <87a79618-cd71-4f4f-ad65-b492e571ade5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758837503;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Da1AnYFKZOYbydtOENlbTwNXKCnTdbj62v3042MjlAw=;
-	b=oZjPrux9myXDIybzr3Vb2r3jkYsQMpallQPCY1TmDjwAtt5p37XKogi8PxZqnid5Pa2pKW
-	knMsUR77+khyiAPqdsbHaMij7MUoQJSeHm8u97sffD3Gp0+k+Z7jhunqEssLivqe5pKcF7
-	cx4OkwPxjZbXs7HlSIyWzBoYtXnSqbg=
-Date: Thu, 25 Sep 2025 14:58:16 -0700
+	s=arc-20240116; t=1758837652; c=relaxed/simple;
+	bh=OZ2mSDCtHXvMzea0lTp5F7xIMOMGoZ1WJKVYVSPzMfY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UOF2OxJQtfwTbR/OzbN7cvlslBh4h4vYB4glP5FoMz5atdSRNbbnFf5v4q8rMwd+1w3qFtJrQNhHhjqrcDdOEcvgn96U10DWw9CgB5nBH80rKsrqxP7oeWYfqizPi6IuxI+iFZiAht6nQrIECLdMx4StSbMP31lorsdynFPUh6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mCsdIWll; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Y1AKqVxOcQwyhkid55ZdNasv23OvCJ6hz4wrxtH2pCU=; b=mCsdIWllhqrnL/pnEdyHEhDO5b
+	3oQWdovzkYjSCMj+gzLTtK5Ml+JZhmXSnVNwgFHfUX5J4Rlkm84KrVoGDDCIewGoxwrYYZzAzJnF/
+	dwwQ8bvOFuTmx/j9ySJVm6hoHlGdP4Etp/SY3zW3vyub6kHyEwcqddeUzdXMsP4b/7fA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v1u0o-009Vna-GM; Fri, 26 Sep 2025 00:00:26 +0200
+Date: Fri, 26 Sep 2025 00:00:26 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Josef Raschen <josef@raschen.org>
+Cc: Arun Ramadoss <arun.ramadoss@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: microchip_t1: LAN887X: Fix device init issues.
+Message-ID: <3e2ea3a1-6c5e-4427-9b23-2c07da09088d@lunn.ch>
+References: <20250925205231.67764-1-josef@raschen.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next 2/2] selftests/bpf: Test changing packet data
- from global functions with a kfunc
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
- martin.lau@kernel.org, kernel-team@meta.com
-References: <20250925170013.1752561-1-ameryhung@gmail.com>
- <20250925170013.1752561-2-ameryhung@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20250925170013.1752561-2-ameryhung@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250925205231.67764-1-josef@raschen.org>
 
-On 9/25/25 10:00 AM, Amery Hung wrote:
-> The verifier should invalidate all packet pointers after a packet data
-> changing kfunc is called. So, similar to commit 3f23ee5590d9
-> ("selftests/bpf: test for changing packet data from global functions"),
-> test changing packet data from global functions to make sure packet
-> pointers are indeed invalidated.
+On Thu, Sep 25, 2025 at 10:52:22PM +0200, Josef Raschen wrote:
+> Currently, for a LAN8870 phy, before link up, a call to ethtool to set
+> master-slave fails with 'operation not supported'. Reason: speed, duplex
+> and master/slave are not properly initialized.
+> 
+> This change sets proper initial states for speed and duplex and publishes
+> master-slave states. A default link up for speed 1000, full duplex and
+> slave mode then works without having to call ethtool.
 
-Applied. Thanks.
+Hi Josef
 
-> +__noinline
-> +long xdp_pull_data2(struct xdp_md *x, __u32 len)
-> +{
-> +	return bpf_xdp_pull_data(x, len);
+What you are missing from the commit message is an explanation why the
+LAN8870 is special, it needs to do something no other PHY does. Is
+there something broken with this PHY? Some register not following
+802.3?
 
-This tested the mark_subprog_changes_pkt_data() in visit_insn().
+    Andrew
 
-afaik, it does not test the clear_all_pkt_pointers() in check_"k"func_call(). 
-Unlike the existing "changes_data" helpers, it is the first kfunc doing it. 
-Although we know that it should work after fixing the xdp_native.bpf.c :), it is 
-still good to have a regression test for it. Probably another xdp prog in 
-verifier_sock.c that does bpf_xdp_pull_data() in the main prog. Please follow up.
-
-
-> +}
-> +
-> +__noinline
-> +long xdp_pull_data1(struct xdp_md *x, __u32 len)
-> +{
-> +	return xdp_pull_data2(x, len);
-> +}
-> +
-> +/* global function calls bpf_xdp_pull_data(), which invalidates packet
-> + * pointers established before global function call.
-> + */
-> +SEC("xdp")
-> +__failure __msg("invalid mem access")
-> +int invalidate_xdp_pkt_pointers_from_global_func(struct xdp_md *x)
-> +{
-> +	int *p = (void *)(long)x->data;
-> +
-> +	if ((void *)(p + 1) > (void *)(long)x->data_end)
-> +		return TCX_DROP;
-> +	xdp_pull_data1(x, 0);
-> +	*p = 42; /* this is unsafe */
-> +	return TCX_PASS;
-
-I fixed this to XDP_PASS as we discussed offline.
-
-> +}
-> +
->   __noinline
->   int tail_call(struct __sk_buff *sk)
->   {
+---
+pw-bot: cr
 
 
