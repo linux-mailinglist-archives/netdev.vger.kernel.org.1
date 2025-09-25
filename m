@@ -1,65 +1,53 @@
-Return-Path: <netdev+bounces-226409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CF3EB9FECA
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 16:18:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12013B9FE4E
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 16:15:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9DFB1C2527D
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:13:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 859CA562107
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:09:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B7EB2F617A;
-	Thu, 25 Sep 2025 14:07:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF252D320E;
+	Thu, 25 Sep 2025 14:06:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="CS+lChZJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UWuWl3JO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF77E2868A9;
-	Thu, 25 Sep 2025 14:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33109221FC8;
+	Thu, 25 Sep 2025 14:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758809234; cv=none; b=AAOZXBVKwnF28Iqno6yzxX+azSV8JVcIkvqMC8ZvRF67yM4X7FmaC0jy4Ri1IDnyeKY0n7anNShedK+blw90/n4i2rlhHveuC6f9EEhIwhjPuEJoMnpLfSJcMj08gV5NgH0vXabKTG3ehbl36Zgq7mXYeXqH8Q1KjhEegw1FOXk=
+	t=1758809188; cv=none; b=LBHQjGJ3+Fhg4AyP+uYBboGPY/vjaJzQqcB/dA9jyLKPwionyHcsypoNftQur5kywAuHZ3vmLYbxQNDYOW8WFr5dfpm+1bMy/D9XRTF0r5U5cMvJusxGXNZ/xJYS3yoAUMz9BeHvNEbw09pXQZw0tp9I4OnJ5PDRHS/KZ5s2JJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758809234; c=relaxed/simple;
-	bh=fnZWzDDTTDEeBhEL/SWi3sXl1ujwKnlewazpL/KxiIY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=hZmKMlPapjgZURoyDnh6DeBjXWba3AEebn3nd7lIcbPxuV14u6rDhRew+9CUvWzCfIZR9o39wt4mZYgRoWpEGeSf0hRW7LwUOOdUGobk3Ntc6zQAo350i0adbCUHuMurV9FKpfxXrtPfIDGBWg09mGlnjUeZebiUFYk944Jz9Tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=CS+lChZJ; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58PDRnxI027521;
-	Thu, 25 Sep 2025 14:06:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Y1yWgRltFJNThhSeNnr24vonmIf66fXtjWEcKmCdkMs=; b=CS+lChZJ/3LigltF
-	21d7Ze3D7cJC3e0M0F56KvN8TUXAH5xvkC5vnXgIM5+kpVYwvA8wEGgcrMLH3GQG
-	IPPHXbcdA1XwirNZ+yHCXnFi+tMpOCw6oKV+Ev/eI50fDgJdvNMXHsL/zJLWoud+
-	SZ8OmeLupJ4CxaGQ77Wo2qjOSAj5csNuAQuT52rd1L3lf2kyMW6cK4W2/evtd82f
-	Jr7S0JJnivqMXrfFhlVaWe37YoVgOQNXYZq0Qp4QgciPahQUVYxk6PjcqBMt5B6Q
-	0DyXp7UV9mbBncTuqe9HZ14GSjV50lSVVtRrHqjiWkU6QORUUgvO1l0iqjOXz59s
-	Nl04qg==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 49cxup1j3v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Sep 2025 14:06:53 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 58PE6qUt023450
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Sep 2025 14:06:52 GMT
-Received: from nsssdc-sh01-lnx.ap.qualcomm.com (10.80.80.8) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.24; Thu, 25 Sep 2025 07:06:46 -0700
-From: Luo Jie <quic_luoj@quicinc.com>
-Date: Thu, 25 Sep 2025 22:05:44 +0800
-Subject: [PATCH v6 10/10] arm64: defconfig: Build NSS clock controller
- driver for IPQ5424
+	s=arc-20240116; t=1758809188; c=relaxed/simple;
+	bh=JZaRkLJomBSdsRDEvpNByeOgtyybOCR1lGmXJvP8BFY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=LUn7+fXnFauH2nfMCclX1xlJlouWWfyT79vgEmPSDL21p89VyDvzYFGDKr0NLi8S4WK69IkmVmWtMq3xxx/+QtedJsVFdk/hingW2NGEW1OrIYCgT9kexZ79zVjb4Juty4RPsTRIYVhqrkxxIV67TwLTDVVXEcyBaaAkEMKK2AA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UWuWl3JO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B97C8C4CEF0;
+	Thu, 25 Sep 2025 14:06:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758809187;
+	bh=JZaRkLJomBSdsRDEvpNByeOgtyybOCR1lGmXJvP8BFY=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=UWuWl3JO3I1hyQnyCuRFoMUj1Qt8daxDMicwUYK9zZCern+4HLS9pUwbsfmRVCf4n
+	 GjCaYCks8GPJgvmd6J/+r9b/xwQ3Pdm5ik8Vj0lWbax/1ffxb/0DbR/AUWu2izkGzK
+	 qztRMiBw0wJasoBpeN1Trc3sHxB7dCSa2pKDqGYcV1NwtS9PJuG+sMCtZE40ZmJpoF
+	 JQMpAQ5uQSYjT5gAJCjt+HVqn6OTTcGloysWtzlR886x1zl/hbazGZtLFoF/JiYAqr
+	 SEjPJ0uJt/HQ8JMHXmWI5+0UBbhWj2aophDg3QgaZTV8zsDmI2kpi9sPzTTB1f6H86
+	 baxi76HXACwhA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFAABCAC5B1;
+	Thu, 25 Sep 2025 14:06:27 +0000 (UTC)
+From: Rohan G Thomas via B4 Relay <devnull+rohan.g.thomas.altera.com@kernel.org>
+Subject: [PATCH net-next v3 0/2] net: stmmac: Drop frames causing HLBS
+ error
+Date: Thu, 25 Sep 2025 22:06:12 +0800
+Message-Id: <20250925-hlbs_2-v3-0-3b39472776c2@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,100 +56,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20250925-qcom_ipq5424_nsscc-v6-10-7fad69b14358@quicinc.com>
-References: <20250925-qcom_ipq5424_nsscc-v6-0-7fad69b14358@quicinc.com>
-In-Reply-To: <20250925-qcom_ipq5424_nsscc-v6-0-7fad69b14358@quicinc.com>
-To: Bjorn Andersson <andersson@kernel.org>,
-        Michael Turquette
-	<mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        "Varadarajan
- Narayanan" <quic_varada@quicinc.com>,
-        Georgi Djakov <djakov@kernel.org>, "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Anusha Rao <quic_anusha@quicinc.com>,
-        "Manikanta Mylavarapu" <quic_mmanikan@quicinc.com>,
-        Devi Priya
-	<quic_devipriy@quicinc.com>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        "Richard
- Cochran" <richardcochran@gmail.com>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>
-CC: <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-pm@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski@linaro.org>,
-        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
-        <quic_leiwei@quicinc.com>, <quic_pavir@quicinc.com>,
-        <quic_suruchia@quicinc.com>, Luo Jie
-	<quic_luoj@quicinc.com>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1758809144; l=836;
- i=quic_luoj@quicinc.com; s=20250209; h=from:subject:message-id;
- bh=fnZWzDDTTDEeBhEL/SWi3sXl1ujwKnlewazpL/KxiIY=;
- b=SN/4xdbONLu/QOmtSKdVibONLiFW545wC0zLvg7ctC9vx6L6oA+HtF9N6hYFXDgQIgO6E9DLa
- z4hhqQcJEY9Ahvp7c5T+AROd2X/HMOcsh9ElhuMdGGxM6ShgYqzyeoh
-X-Developer-Key: i=quic_luoj@quicinc.com; a=ed25519;
- pk=pzwy8bU5tJZ5UKGTv28n+QOuktaWuriznGmriA9Qkfc=
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=B4a50PtM c=1 sm=1 tr=0 ts=68d54c7e cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=KKAkSRfTAAAA:8
- a=COk6AnOGAAAA:8 a=ikIlBLl75NxfxiEf-eQA:9 a=QEXdDO2ut3YA:10
- a=cvBusfyB2V15izCimMoJ:22 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTI1MDA0MiBTYWx0ZWRfX2i28j8dI5x9+
- zzIBXBJ3RYgEpUkiHJEJS21SX3Rf90pdR5ziAFH0wnj0zgYDT0tumue27+GNRr2jW3JlwCLrhiu
- GQLzOUJxQRAKrDjjQNEIALhAkPT1yqdiA1SJDInF+5MZoWoMrfJIjqu/WVe2vajkP+aTqyOMrnj
- c8kvR8hsDRGqOorQfIlajoLQSWT8kfbmtYHFyXBU9pSfsurO/J16OHBehTBZz5usyZ0T28Ysw/H
- +UwdyutRwdfwe3mJz4OYoLjpTVSaAQTn0WJN8eVHtK00oGu3OBJvgYvoSbH9HQRfn+R4oZxhnic
- ML5kvtTbDgVc9+dk2JtCpRGBjdJg/sidcce5fDSDiJ8B+qTMk01Ow0afJ1jR+y9gYTqrP9OaHGl
- MYvEvKDr
-X-Proofpoint-GUID: UyHL3T9c1N6aC39EVs_ZnhiIydtZbQM8
-X-Proofpoint-ORIG-GUID: UyHL3T9c1N6aC39EVs_ZnhiIydtZbQM8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-25_01,2025-09-25_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 impostorscore=0 suspectscore=0 priorityscore=1501 adultscore=0
- phishscore=0 clxscore=1015 spamscore=0 malwarescore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2509250042
+X-B4-Tracking: v=1; b=H4sIAFRM1WgC/12OQQ6CMBBFr0JmbQ0dLFBW3sMY08IgTbCYtmkwh
+ LvbdGHU5c+f9/5s4MkZ8tAVGziKxpvFplAdCugnZe/EzJAyYImilJyzadb+hkyMwyDo1FZjiZC
+ On45Gs2bRBSwFZmkNcE3NZHxY3CsvRJ77f1nkjLNe10JQK6XQzVnNgZw69ssjOyJ+c+LDYeKww
+ brWqNJD8ofb9/0NjG7N9t8AAAA=
+X-Change-ID: 20250911-hlbs_2-5fdd5e483f02
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ Rohan G Thomas <rohan.g.thomas@altera.com>, 
+ Matthew Gerlach <matthew.gerlach@altera.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1758809186; l=1247;
+ i=rohan.g.thomas@altera.com; s=20250815; h=from:subject:message-id;
+ bh=JZaRkLJomBSdsRDEvpNByeOgtyybOCR1lGmXJvP8BFY=;
+ b=cjIvuKTzoFGnXBwe3ISNMpVhnpZwew0JHYG4Cg3JIILuwsqz/31E73x5REcfTS+HOiIBAxP40
+ 5LpEvSW8hGRBsW89XRb0Ndgdh0Hd8lnVPVPYxTf5ljE4KsOiQFCMIH5
+X-Developer-Key: i=rohan.g.thomas@altera.com; a=ed25519;
+ pk=5yZXkXswhfUILKAQwoIn7m6uSblwgV5oppxqde4g4TY=
+X-Endpoint-Received: by B4 Relay for rohan.g.thomas@altera.com/20250815
+ with auth_id=494
+X-Original-From: Rohan G Thomas <rohan.g.thomas@altera.com>
+Reply-To: rohan.g.thomas@altera.com
 
-NSS clock controller is needed for supplying clocks and resets to the
-networking blocks for the Ethernet functions on the IPQ5424 platforms.
+This patchset consists of following patchset to avoid netdev watchdog
+reset due to Head-of-Line Blocking due to EST scheduling error.
+ 1. Drop those frames causing HLBS error
+ 2. Add HLBS frame drops to taprio stats
 
-All boards based on the IPQ5424 SoC will require this driver to be enabled.
-
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
 ---
- arch/arm64/configs/defconfig | 1 +
- 1 file changed, 1 insertion(+)
+Changes in v3:
+- Split commit into 2 and add this cover letter
+- Updated the commit messages with expansion for HLBS and DFBS
+- Link to v2: https://lore.kernel.org/r/20250915-hlbs_2-v2-1-27266b2afdd9@altera.com
 
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index acb6807d3461..013325255119 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -1379,6 +1379,7 @@ CONFIG_IPQ_GCC_5424=y
- CONFIG_IPQ_GCC_6018=y
- CONFIG_IPQ_GCC_8074=y
- CONFIG_IPQ_GCC_9574=y
-+CONFIG_IPQ_NSSCC_5424=m
- CONFIG_IPQ_NSSCC_9574=m
- CONFIG_MSM_GCC_8916=y
- CONFIG_MSM_MMCC_8994=m
+Changes in v2:
+- Removed unnecessary parantheses
+- Link to v1: https://lore.kernel.org/r/20250911-hlbs_2-v1-1-cb655e8995b7@altera.com
 
+---
+Rohan G Thomas (2):
+      net: stmmac: est: Drop frames causing HLBS error
+      net: stmmac: tc: Add HLBS drop count to taprio stats
+
+ drivers/net/ethernet/stmicro/stmmac/common.h     | 1 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac_est.c | 9 ++++++---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_est.h | 1 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c  | 7 +++++--
+ 4 files changed, 13 insertions(+), 5 deletions(-)
+---
+base-commit: 12de5f0f6c2d7aad7e60aada650fcfb374c28a5e
+change-id: 20250911-hlbs_2-5fdd5e483f02
+
+Best regards,
 -- 
-2.34.1
+Rohan G Thomas <rohan.g.thomas@altera.com>
+
 
 
