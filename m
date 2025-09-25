@@ -1,96 +1,86 @@
-Return-Path: <netdev+bounces-226209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6B15B9E13F
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 10:37:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E466B9E1B0
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 10:45:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71C703B3C21
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 08:37:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0E3B3ADAF2
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 08:45:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CACF25EF97;
-	Thu, 25 Sep 2025 08:37:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1642773E5;
+	Thu, 25 Sep 2025 08:45:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HhtWRQqo";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="6xsUzMyJ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HhtWRQqo";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="6xsUzMyJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OC33709i"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB4C21ADA7
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 08:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89BA4275B16
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 08:45:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758789473; cv=none; b=aeY2yL+oWAzqVTbDlsna23dCVTF7K7qiKYq0JEAAKWjQZJFu8mvZwrR0swm6VHAejyse94dXTNbYBcAGoS+oRH26OsblZcBXDm9tfdndTPNqkVP5CUHx1IzQpyL7iZD5/nrZ2duIVUDpIyF+D1vuiM2sCPO7IZ7JDOo+/UhOBxo=
+	t=1758789924; cv=none; b=EBG/tkPugkX1YWUnaom+aOyaqQ1oxijoQ+CMBD3D44fcQXNsJOp5grqehaIwPw4Idp9J9Dtl7q+PCVvZ5aD1czXP9Ks6rwdj+u0Mev2HjLCFmhwtVDrjz1x7td2jj5ImiSjN7jPzKDcfxAulXC1V0n+G1T1d08sb41t7SkWrshw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758789473; c=relaxed/simple;
-	bh=77psQUD1KnFwasJRTiuYObH4bT1pSDUU/jt2XswaBs0=;
+	s=arc-20240116; t=1758789924; c=relaxed/simple;
+	bh=qC1aIoK5yYcF83FkI9Dqc3KWerwB3ZBIP/sva6h4a9w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aBgcfQPc+tJO82jF7yQdToNfiloogPqe27wpH5Juq3gcNQEkjb3+NvmmfsqMOofMwj21qbRSrZWhiwpwpMtLhpMhWBM2BPIGTtHQ9HBw9z4rhhoQG3M1A0vS4IVAA1UFF2T6vSWguDOZcNm4dwgOuEgPL6qIkKFlAXoyB/C3vek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HhtWRQqo; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=6xsUzMyJ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HhtWRQqo; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=6xsUzMyJ; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 224155CED0;
-	Thu, 25 Sep 2025 08:37:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1758789464; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	 In-Reply-To:Content-Type; b=HCcsMgBmQnZnmlmFtBLiSQ0Be7i+B2moZ9aJqGIBoDg80OLRxkxFjkwTivhQPrrr26GqdU7IQQzzA4z0Gw81kzd5z9MBcFxg9GE0y65CnXGdensQgHu2hs451+DIIaumvKM7sVpqOISX69t86sojxC9vQh4q88dUE2DeYThYmbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OC33709i; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758789920;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=z1YUPMJxZpYlSuPcCViU3wuERoHp7DApV4SYW2XNkgA=;
-	b=HhtWRQqoYJsKU8u0cdqJRXnHlsSieU3mFxTlCzgIK4PW/Fx4CUytCy6IRYPoRKVQzlu4lQ
-	Umzl5ditQHxpmUNKLu+aIO2P30NXIMOTqtPSc5nUR+LU/pbaT8CbRPXSQ8YoMvVoK3VkZX
-	EVtSlsguFelfEK/j2cxjpyYW2upTBd8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1758789464;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z1YUPMJxZpYlSuPcCViU3wuERoHp7DApV4SYW2XNkgA=;
-	b=6xsUzMyJqLXExZlBzhuewdbQv1za93DZPOhGPTG7lWk6RKk5sxCS5qALqaB65IyiK1F+s1
-	ShVE8xeXUNFca6AA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=HhtWRQqo;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=6xsUzMyJ
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1758789464; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z1YUPMJxZpYlSuPcCViU3wuERoHp7DApV4SYW2XNkgA=;
-	b=HhtWRQqoYJsKU8u0cdqJRXnHlsSieU3mFxTlCzgIK4PW/Fx4CUytCy6IRYPoRKVQzlu4lQ
-	Umzl5ditQHxpmUNKLu+aIO2P30NXIMOTqtPSc5nUR+LU/pbaT8CbRPXSQ8YoMvVoK3VkZX
-	EVtSlsguFelfEK/j2cxjpyYW2upTBd8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1758789464;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z1YUPMJxZpYlSuPcCViU3wuERoHp7DApV4SYW2XNkgA=;
-	b=6xsUzMyJqLXExZlBzhuewdbQv1za93DZPOhGPTG7lWk6RKk5sxCS5qALqaB65IyiK1F+s1
-	ShVE8xeXUNFca6AA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BAA2B132C9;
-	Thu, 25 Sep 2025 08:37:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Xz4RK1f/1GgOSAAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Thu, 25 Sep 2025 08:37:43 +0000
-Message-ID: <c39e6626-02db-4a83-9f77-3d661f63ac0e@suse.de>
-Date: Thu, 25 Sep 2025 10:37:38 +0200
+	bh=9ShWX7vwoNNn+VH+yd+QMji4HEbe496xkh5xSQsMnu0=;
+	b=OC33709i+7jes+BNHIYwmWUuhZB5B0QKUBIiVnAHL3sD5hI7uyfsCbs3qWTf1fMmahHwaP
+	ucrAMgpbMQgOv3w+UtE1oKHHpj/5fVa1kl+7fAOhJ/4vlP9U/jB3fFefUtUYu0SWpu+KGX
+	036BD334KCWcwiWRNnYgCJfetRFOhhE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-341-KiAcqopgNU2ssD1Ls0Iigg-1; Thu, 25 Sep 2025 04:45:18 -0400
+X-MC-Unique: KiAcqopgNU2ssD1Ls0Iigg-1
+X-Mimecast-MFC-AGG-ID: KiAcqopgNU2ssD1Ls0Iigg_1758789917
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-40cfb98eddbso499352f8f.0
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 01:45:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758789917; x=1759394717;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9ShWX7vwoNNn+VH+yd+QMji4HEbe496xkh5xSQsMnu0=;
+        b=pqhko4mWWtpXJaDIKR/spZkd97955iqlt64QlfJig4pClpEiWkXLGc0IekMlEAHUab
+         Tbi/GVtkEMHftveViUVHNnMVrRpIRRzMPD8ycyxVWQjTf19RYO7OG+CfnPRlk0NWEf9G
+         bx+X1u7Pdkn2SQSJMRkojEyCXu5p4K3sbTNwx0TdklOn0GFZ4V9L/SR2LN+ktMnS1KPb
+         jLffoItCBhOpCfMFOZmGqkSlAbPulkEtPyEbfMqwRqZsP6HFvHPuXD4FAkqDntcV2wbx
+         oW/RFTNtwIekfzcDfxK2RKCQiLpsLcF8j28UOzYCzmAH3xIFv+UHliHwBLxD2mkECE4p
+         DJyg==
+X-Gm-Message-State: AOJu0Yy0uUPeGfFlbNYD9qQ5hXxVSH7SYGV6d/mhUrSWSN/f8JUTGUHB
+	hIiWBdVKSIYuro6iA0kYYVhbnGi9QGD5KZIZvfZAcZj1/QmNtCiwibHSiylXqKYSmmy0iaVsufE
+	uf5+uF8x3roSprC8yGJPNGxooDWz0i4pGhBnHdfbiX2+J+ZfAKJly9RK1OQ==
+X-Gm-Gg: ASbGncsh0pw7hMtLXyvhSC+Ijd4/wcQdyChdBnXR3yTJEkZDOcscNWhhov8eN4wiwq4
+	LN0by0n5JKoRozF/yq7h4lCbqQQJh12bwEYRY4q+CL05OZtK575XkRt3YGbdix5VMiPcJZ6/eyq
+	BLKSjEPX2Y9gn+n5EQfWsIvbjhWqZ2K3f3X8sHbtSxjgtlQrLnozmrfovkg4ZfiY8JcHdMoRc17
+	RjSdsKbXPiNdCxx0pPpANVSIUkq5ySNnKXlTvKmwak7n/eHRhxq8UMpsFZheuuCJwuPQnz00ZCJ
+	ViV5xWTnmkEMB+kq4DBu89Qa91i6aP2lehJ1kVPj//VG+Pq+7PB2phUpPl57/hZ5CibFK7vVF5s
+	ZKKgu9lDVssha
+X-Received: by 2002:a05:6000:2302:b0:3f3:97df:a2b9 with SMTP id ffacd0b85a97d-40f652293d8mr1558669f8f.24.1758789917246;
+        Thu, 25 Sep 2025 01:45:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH8MnKrqVU5iaRZyEisFTtWADltgBvMSKns5i2HHc+LVMjxuzcCkWpGyCR51gWllXQXpAW+mg==
+X-Received: by 2002:a05:6000:2302:b0:3f3:97df:a2b9 with SMTP id ffacd0b85a97d-40f652293d8mr1558628f8f.24.1758789916763;
+        Thu, 25 Sep 2025 01:45:16 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc5602dfdsm1974284f8f.33.2025.09.25.01.45.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Sep 2025 01:45:16 -0700 (PDT)
+Message-ID: <f95da89a-152d-4899-8068-3b6aab568825@redhat.com>
+Date: Thu, 25 Sep 2025 10:45:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,91 +88,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next] net/hsr: add protocol version to fill_info
- output
-To: Jakub Kicinski <kuba@kernel.org>, =?UTF-8?B?SsOhbiBWw6FjbGF2?=
- <jvaclav@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-References: <20250922093743.1347351-3-jvaclav@redhat.com>
- <20250923170604.6c629d90@kernel.org>
- <CAEQfnk3Ft4ke3UXS60WMYH8M6WsLgH=D=7zXmkcr3tx0cdiR_g@mail.gmail.com>
- <20250924164041.3f938cab@kernel.org>
+Subject: Re: [PATCH RESEND net v3] net: nfc: nci: Add parameter validation for
+ packet data
+To: Deepak Sharma <deepak.sharma.472935@gmail.com>, krzk@kernel.org,
+ vadim.fedorenko@linux.dev
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
+ linux-kernel-mentees@lists.linux.dev, linville@tuxdriver.com,
+ kuba@kernel.org, edumazet@google.com, juraj@sarinay.com, horms@kernel.org,
+ syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
+References: <20250921182325.12537-1-deepak.sharma.472935@gmail.com>
 Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20250924164041.3f938cab@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 224155CED0
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_TLS_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Score: -4.51
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250921182325.12537-1-deepak.sharma.472935@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 9/21/25 8:23 PM, Deepak Sharma wrote:
+>  static int nci_extract_activation_params_iso_dep(struct nci_dev *ndev,
+> @@ -501,7 +536,7 @@ static int nci_store_general_bytes_nfc_dep(struct nci_dev *ndev,
+>  	case NCI_NFC_A_PASSIVE_POLL_MODE:
+>  	case NCI_NFC_F_PASSIVE_POLL_MODE:
+>  		ndev->remote_gb_len = min_t(__u8,
+> -			(ntf->activation_params.poll_nfc_dep.atr_res_len
+> +					    (ntf->activation_params.poll_nfc_dep.atr_res_len
+>  						- NFC_ATR_RES_GT_OFFSET),
+>  			NFC_ATR_RES_GB_MAXSIZE);
+>  		memcpy(ndev->remote_gb,
+> @@ -513,7 +548,7 @@ static int nci_store_general_bytes_nfc_dep(struct nci_dev *ndev,
+>  	case NCI_NFC_A_PASSIVE_LISTEN_MODE:
+>  	case NCI_NFC_F_PASSIVE_LISTEN_MODE:
+>  		ndev->remote_gb_len = min_t(__u8,
+> -			(ntf->activation_params.listen_nfc_dep.atr_req_len
+> +					    (ntf->activation_params.listen_nfc_dep.atr_req_len
+>  						- NFC_ATR_REQ_GT_OFFSET),
+>  			NFC_ATR_REQ_GB_MAXSIZE);
+>  		memcpy(ndev->remote_gb,
 
+I'm sorry for the late feedback. The above 2 chunks looks unrelated from
+the real fix, please drop them: they will make stable teams work more
+difficult for no good reason.
 
-On 9/25/25 1:40 AM, Jakub Kicinski wrote:
-> On Wed, 24 Sep 2025 13:21:32 +0200 Ján Václav wrote:
->> On Wed, Sep 24, 2025 at 2:06 AM Jakub Kicinski <kuba@kernel.org> wrote:
->>> On Mon, 22 Sep 2025 11:37:45 +0200 Jan Vaclav wrote:
->>>>        if (hsr->prot_version == PRP_V1)
->>>>                proto = HSR_PROTOCOL_PRP;
->>>> +     if (nla_put_u8(skb, IFLA_HSR_VERSION, hsr->prot_version))
->>>> +             goto nla_put_failure;
->>>
->>> Looks like configuration path does not allow setting version if proto
->>> is PRP. Should we add an else before the if? since previous if is
->>> checking for PRP already
->>>   
->>
->> The way HSR configuration is currently handled seems very confusing to
->> me, because it allows setting the protocol version, but for PRP_V1
->> only as a byproduct of setting the protocol to PRP. If you configure
->> an interface with (proto = PRP, version = PRP_V1), it will fail, which
->> seems wrong to me, considering this is the end result of configuring
->> only with proto = PRP anyways.
-> 
-> I'm not very familiar with HSR or PRP. But The PRP_V1 which has value
-> of 3 looks like a kernel-internal hack. Or does the protocol actually
-> specify value 3 to mean PRP?
-> 
-> I don't think there's anything particularly wrong with the code.
-> The version is for HSR because PRP only has one version, there's no
-> ambiguity.
-> 
-> But again, I'm just glancing at the code I could be wrong..
-> 
+Thanks,
 
-No you are right, this is a hack made to integrate PRP with HSR driver. 
-PRP does not have a version other than PRP_V1 therefore it does not make 
-much sense to configure it. Having said that, I think it's weird to 
-report HSR_VERSION 3 but fail when configuring it.
+Paolo
 
-IMHO HSR_VERSION should be hidden for PRP or it should be possible to 
-configure it to "3" (which now that you say it, it looks weird).
 
