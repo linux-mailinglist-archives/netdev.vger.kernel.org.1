@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-226421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CAD1B9FFAE
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 16:26:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD645B9FFEE
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 16:29:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B06D3A5056
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:24:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FDE63A4B41
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 492FC29B79A;
-	Thu, 25 Sep 2025 14:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 424FE2C159E;
+	Thu, 25 Sep 2025 14:26:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HtyPcheZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qvx69Yq8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C24629ACF0
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 14:24:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894FA286422
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 14:26:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758810249; cv=none; b=p/pOIZAx1UGIQDryE91NIOv3aSARCiBU8ImH+54fH+/J+XNcExuiwnqdRnrPGLydMQLpQw/Jq2/cqGuxjdxk8h4xyb+J5sfmJRiHi/QRMzNb8FVLAa29CrtRDQhU/5QEwuz06P67Yy2rLMETVwJZOc/+aBAXc1V42vMsjIy/q2o=
+	t=1758810389; cv=none; b=VGQw0O+xGmypXYVX6Cf2QPHmMMHR5sLofn+bCiD+GLa5IEzOdP/j6Z+OAH3k/fpIf8YgEeGZ7Tdp2xfjeef2cJ3Y5oSscAxG7J7CBscC8vi4x5uH5IiCUgtNfUQ+m1P4nuuLoZwhqkV5nWVNfJHcq5zI9ThOjJRqV4u8gQUL7Ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758810249; c=relaxed/simple;
-	bh=dYuqr2GSG8NOMs6Xn8T29IWXFaooQ8AMUrrXaiN16FE=;
+	s=arc-20240116; t=1758810389; c=relaxed/simple;
+	bh=fXF76Zrhj1RMOv916kcRrWRpAOD3FLABQM1r4KxSI4o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nnUfSwSrJFV3QtkTZeHgB4sJ3BBqfOgt5p/1phZuV2T5D3RKEcoNLFWuNEG12tSxSgdXZy0lvQvKQ9JBskG66IRb8rvw7cS/K/CTqjeSA3KG6wOFr+oLLq1ZOQGs76siO5ZIwtVwXihGXzGyhjT1lCNf3MF+yI1IHtmdORtwb2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HtyPcheZ; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=pM3EiPe4ECcEau0ISpQLvwpRQST6Sj0zb4IP9itYNCSqTa5olodjMDHvGVLUhowRIrs7Ok4epb02+EmLGM8MUm7AfLxxFHGhi0Te3D238/atQQ09XRLlP081/0hwIyz6AK32wjQUvWMyg3UYhxuWSDTY4yew5hB/aW3UNgVO/Ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qvx69Yq8; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758810246;
+	s=mimecast20190719; t=1758810386;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iMuxM89R6MEfDdd+6bytrowoXrE1EfEgsSy96sExds8=;
-	b=HtyPcheZL8R5stNnnUcFiQG9KLvV1nTt1fg4cJCK1NagfAh6+LUT4mYyNAdqlsLVTzgR0p
-	twkJS8KINgrZhTItW2W5D78z1kYNjQJBk4i/UipaXtZDB6ykr1QDC4UfGSXMfkLnwEhOQk
-	XEE3rbTRGh5bb9fqRWq5OHroiJD/5TQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=0FucIY5KdsJxyaHXyTgMuxe7Icu/BgEuhO+vf9F6BlY=;
+	b=Qvx69Yq81JW6JUNEaTyEMJ7VloEO3m0LNowbH9QMT5o5LBNp1ewHuSt0DivdxdWuxsl+yu
+	nttvi7TqfjPe9QDDtR4I+ZWSq18kWo05XlA9OofFTDmlJI+PXtWT+8w6IW5uIwBaUymgA9
+	C557KbwKlCczTaWCzAJK8/9NGztG3sk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-564-4ECyEnjnPAu1W59Hs8R3CQ-1; Thu, 25 Sep 2025 10:24:05 -0400
-X-MC-Unique: 4ECyEnjnPAu1W59Hs8R3CQ-1
-X-Mimecast-MFC-AGG-ID: 4ECyEnjnPAu1W59Hs8R3CQ_1758810244
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-46e39567579so777185e9.0
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 07:24:04 -0700 (PDT)
+ us-mta-357-JtAFKKoIOAGR2rKgmmW19A-1; Thu, 25 Sep 2025 10:26:25 -0400
+X-MC-Unique: JtAFKKoIOAGR2rKgmmW19A-1
+X-Mimecast-MFC-AGG-ID: JtAFKKoIOAGR2rKgmmW19A_1758810384
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3ee13baf21dso1003806f8f.0
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 07:26:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758810244; x=1759415044;
+        d=1e100.net; s=20230601; t=1758810384; x=1759415184;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iMuxM89R6MEfDdd+6bytrowoXrE1EfEgsSy96sExds8=;
-        b=kQmSbzqWtx5eqlM3t3LFrDFaelYoLR0oj90Gk1OHpV25HhJDNfmqJ+2iSRsWba5GYV
-         nQ/GqpbEw+Rj+TVrCwvkqzhNX8O6Vk2IgDu/viB8mrMqh+waCQLEplkm66T1UUiGy650
-         0aNweq5RxrhT1pgGkprj/xC+udmVt/NWaJM2pxs72R7MYfEpS1ITj7N9txVm1OfgUyI3
-         vMS+Bw4HRRRnmQLMqLtqmZiLCaqE5rfT8qPGFZWvAwAVHAQuvnl/5X8lOYONHuaPX0Ay
-         +nYjSAKMoAFApbrZe6le6azSOb02/FBh8gHAHGgy2HPqRAHm3NpA7Q0UxjHtMSctf7tG
-         h7GA==
-X-Gm-Message-State: AOJu0YwvUUvgYkX1G8u+byNcZJUYlefln4vLGkbu+OLsNJeMCIgOqt0S
-	VeVpEfiua5KbcqevRmQIL0tF48pbAh+vzupDkoJkbglRxyLcSke4AhcuM97HavPZxA7AApKSasr
-	MkDEMNW2XOPZGSElA5NzlvDizhbUY4V/DQRTV0emnEj2G4s3Fdz1Pfj60Rg==
-X-Gm-Gg: ASbGncvHzDD+OyaGxJh8NjDHPUADvimP2T16q9+e64CVypaF9M3CzrK6qcDO+IHP9Aj
-	MRs+RuchX95n7MgL5vrfeUd4zug4/WesNJl+Jbfq4QzOQOg3eER3OoCQo2xIqixJkz2lgVPLKFQ
-	UnWOPxEC/de2OnxGUUGt1rILU9qnWV433aHEU5xPWKvql0UgLiOYJNlDRmlsvQ8HnmS/k/J8DVu
-	cGuWoGynIk9MtK0o5ZcAhNNi+oDKnMgqwHpfIwJuWLPAOYFVvKyJfHnwT8m/d96rbO5tZhIBkqA
-	XIIZ2/HWSEZoZl1mCaB6sd94xfw8eIFX4z/Jp7a+AGVajB6XWMCGT+TA/KYwEMUS4IGYev38IDl
-	NMolznwaDljos
-X-Received: by 2002:a05:600c:1c9b:b0:45d:d9ab:b85a with SMTP id 5b1f17b1804b1-46e3299f565mr43904305e9.7.1758810243696;
-        Thu, 25 Sep 2025 07:24:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9YXnhD0FxsllUyBaiVQWY9PkmgoZepRKRm35fQoWyBGnECcfNupZbIZQvTB8qYn0+J32BDg==
-X-Received: by 2002:a05:600c:1c9b:b0:45d:d9ab:b85a with SMTP id 5b1f17b1804b1-46e3299f565mr43903915e9.7.1758810243276;
-        Thu, 25 Sep 2025 07:24:03 -0700 (PDT)
+        bh=0FucIY5KdsJxyaHXyTgMuxe7Icu/BgEuhO+vf9F6BlY=;
+        b=sKS7yv2wcTUZJYzSP/ENDFi90UoDjNYCkgDzAQmOvtAvEs9aDhi82231J3J5FA5NYr
+         Kp3NVjWr/r/GRQSoEnseSiEZOsDHWXGzXXMcTqrg7oAkI4gghoJbEz3Gh6gUV9fXQfyZ
+         HWjS53p+Gf+2YDkDwwWzPGLRh7uiVpZdDayoK6ZvypYQg65zUsF8i7qUzxy+Spg9gUrW
+         Yt46ROXZdb9aSeFhqpRP43Q0ttGRYM4VU9CYwbwhtx+qAXqvaaBUSi/sgdN+9wab5Ahu
+         DMsbBGLyYtD+p6QGFkaraAlyXlSwdDTvlif+U/GHN4mizDYI18rbDbEFCY/127gj4VmB
+         wI3A==
+X-Gm-Message-State: AOJu0Yzq25L3K4htqsWuFpimMMPlgMq7qLUs/ZTTRgcqev+AvyINiAJk
+	4Ud/ut4yqGOF7prackNJia/e5rW0/hkXlsJh0HN3EmYko7pjxMoH2gaU5lBzxBgCbkWDOFZw98p
+	cMxviXEmhsTGhshMmDd/qML5kk2miQ7769bHEmgwd7vG04cwfjTFosPUhbA==
+X-Gm-Gg: ASbGnctT76AmVeWE/UGm8vT159V7qiTSg7LfHQ1/+NiPFxULYBAcYhuVfFujPjmaA/G
+	7gUvrqF7f0EnNC82KP4TAY3ng/p64CJwz/D43twyzk8eC40cEdP0U1K3QKK1Oz3OUPmxUv3hH85
+	vt2PW5vlaUcSKDHejYyqHcquExomI0PM6UrmDocuxAUkYFHLwmhD/N9F8uOsh1q1qTAUOXod7eM
+	izTHmi93rOcjSv7uh98BNtWVUn+N3DIPSFaXdaK5+fKjkbn0z3hTgHjObx4pHsABGy+6sznHT63
+	DO/o45YIrHwlNQGNh6bAhyrF9bZBA3ZeF5uV4bfvGiH2yYr3o5pwLBsElnHGOnX0+3PNSSEXnkm
+	wxvWAXwmoc2bQ
+X-Received: by 2002:a05:600c:3b29:b0:45b:7b00:c129 with SMTP id 5b1f17b1804b1-46e35d31f08mr26102595e9.35.1758810383969;
+        Thu, 25 Sep 2025 07:26:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHt6+e7Sjp5Gx01g7AoesSjqAqFYLN+zmoXr/rP27KlAKto0/qvp/0CRQs8vOAazuW8mIiGRQ==
+X-Received: by 2002:a05:600c:3b29:b0:45b:7b00:c129 with SMTP id 5b1f17b1804b1-46e35d31f08mr26102255e9.35.1758810383536;
+        Thu, 25 Sep 2025 07:26:23 -0700 (PDT)
 Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e33b9eabbsm39079635e9.3.2025.09.25.07.24.01
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc560338csm3331931f8f.41.2025.09.25.07.26.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Sep 2025 07:24:02 -0700 (PDT)
-Message-ID: <0bf3a83d-2fa0-4dc9-9a50-39463d31d4de@redhat.com>
-Date: Thu, 25 Sep 2025 16:24:01 +0200
+        Thu, 25 Sep 2025 07:26:22 -0700 (PDT)
+Message-ID: <811b3df7-b008-4331-842a-eeff54b96874@redhat.com>
+Date: Thu, 25 Sep 2025 16:26:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,7 +88,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 17/17] geneve: Enable BIG TCP packets
+Subject: Re: [PATCH net-next 00/17] BIG TCP for UDP tunnels
 To: Maxim Mikityanskiy <maxtram95@gmail.com>,
  Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -100,32 +100,63 @@ Cc: netdev@vger.kernel.org, tcpdump-workers@lists.tcpdump.org,
  Denis Ovsienko <denis@ovsienko.info>, Xin Long <lucien.xin@gmail.com>,
  Maxim Mikityanskiy <maxim@isovalent.com>
 References: <20250923134742.1399800-1-maxtram95@gmail.com>
- <20250923134742.1399800-18-maxtram95@gmail.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250923134742.1399800-18-maxtram95@gmail.com>
+In-Reply-To: <20250923134742.1399800-1-maxtram95@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 9/23/25 3:47 PM, Maxim Mikityanskiy wrote:
-> diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-> index 77b0c3d52041..374798abed7c 100644
-> --- a/drivers/net/geneve.c
-> +++ b/drivers/net/geneve.c
-> @@ -1225,6 +1225,8 @@ static void geneve_setup(struct net_device *dev)
->  	dev->max_mtu = IP_MAX_MTU - GENEVE_BASE_HLEN - dev->hard_header_len;
->  
->  	netif_keep_dst(dev);
-> +	netif_set_tso_max_size(dev, GSO_MAX_SIZE);
-> +
->  	dev->priv_flags &= ~IFF_TX_SKB_SHARING;
->  	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
->  	dev->lltx = true;
+> From: Maxim Mikityanskiy <maxim@isovalent.com>
+> 
+> This series consists adds support for BIG TCP IPv4/IPv6 workloads for vxlan
+> and geneve. It consists of two parts:
+> 
+> 01-11: Remove hop-by-hop header for BIG TCP IPv6 to align with BIG TCP IPv4
+> 12-17: Fix up things that prevent BIG TCP from working with tunnels.
 
-I think it would be nice to extend the big_tcp.sh selftests (or gro.sh
-whatever is easier) to cover this code path for both geneve and vxlan.
+What about splitting the series in 2, so that both chunks are below the
+formal 15 patches limit and you can more easily add test-cases?
 
-Thanks,
+> There are a few places that make assumptions about skb->len being
+> smaller than 64k and/or that store it in 16-bit fields, trimming the
+> length. The first step to enable BIG TCP with VXLAN and GENEVE tunnels
+> is to patch those places to handle bigger lengths properly (patches
+> 12-17). This is enough to make IPv4 in IPv4 work with BIG TCP, but when
+> either the outer or the inner protocol is IPv6, the current BIG TCP code
+> inserts a hop-by-hop extension header that stores the actual 32-bit
+> length of the packet. This additional hop-by-hop header turns out to be
+> problematic for encapsulated cases, because:
+> 
+> 1. The drivers don't strip it, and they'd all need to know the structure
+> of each tunnel protocol in order to strip it correctly.
+> 
+> 2. Even if (1) is implemented, it would be an additional performance
+> penalty per aggregated packet.
+> 
+> 3. The skb_gso_validate_network_len check is skipped in
+> ip6_finish_output_gso when IP6SKB_FAKEJUMBO is set, but it seems that it
+> would make sense to do the actual validation, just taking into account
+> the length of the HBH header. When the support for tunnels is added, it
+> becomes trickier, because there may be one or two HBH headers, depending
+> on whether it's IPv6 in IPv6 or not.
+> 
+> At the same time, having an HBH header to store the 32-bit length is not
+> strictly necessary, as BIG TCP IPv4 doesn't do anything like this and
+> just restores the length from skb->len. The same thing can be done for
+> BIG TCP IPv6 (patches 01-11). Removing HBH from BIG TCP would allow to
+> simplify the implementation significantly, and align it with BIG TCP IPv4.
+> 
+> A trivial tcpdump PR for IPv6 is pending here [0]. While the tcpdump
+> commiters seem actively contributing code to the repository, it
+> appears community PRs are stuck for a long time (?). We checked
+> with Xin Long with regards to BIG TCP IPv4, and it turned out only
+> GUESS_TSO was added to the Fedora distro spec file CFLAGS definition
+> back then. In any case we have Cc'ed Guy Harris et al (tcpdump maintainer/
+> committer) here just in case to see if he could help out with unblocking [0].
+
+@tcpdump crew: any feedback on the mentioned PR would be very
+appreciated, thanks!
 
 Paolo
 
