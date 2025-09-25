@@ -1,285 +1,256 @@
-Return-Path: <netdev+bounces-226453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C7FEBA0909
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 18:18:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0696ABA0A00
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 18:35:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44602189A760
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 16:19:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF1864E5399
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 16:35:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A27DC3054D8;
-	Thu, 25 Sep 2025 16:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B5Y+Ovmr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB9A92F5A12;
+	Thu, 25 Sep 2025 16:35:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97AF43596B
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 16:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13DB82DE710
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 16:35:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758817119; cv=none; b=Qyg0bkGPU25p7l8NZp834ZIgrrsaHcGSsNJNsTH/VTDgJvHZEzYb6VAorPUnr5aiAZyajVnGSHfMiamC50yrA9Ym/sptdbNImZ9qu6wrYDbDfctHVdAGWc8+RzL+QwdiCqS28EGqoXir99amFd10krB3HQodVnKgRUaJd8ydQuo=
+	t=1758818127; cv=none; b=AVKVYreXyMOaZ5siIi4GCJ+5Ok0EOquHWJyG9SnMcZgU7ubc4PdR9Lao7MK6gelZmTzVzGtjGHbxcvPr5rkJL/1hW55HHvfBltK/HYH4n+rkxSffMtvYE6ub+MyqHpIrMN2s2b9l5AbzOvVNHFvAYpPYc3Y/NeLEMT6WUi9tP8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758817119; c=relaxed/simple;
-	bh=B39erYFu+IADpwH47mN8zsMtIScBC4vuaTnziuWPKH0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uMHVYJ30GdrkQIGGNPOf2pKseO+/z01I2uujNj7KcKsNnJQRTbmB4Y5vATUhLpLoGwKC1fxpDK8qejlbNhliW/cmOA61YLf7f0swjAdOVpG5VXYq8ZDON8FIUzx0eS5EO1aJfxAAZSelwsJWtxQLC8oaycYbo/k+jo3vf4/2IMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B5Y+Ovmr; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-61cc281171cso2419256a12.0
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 09:18:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758817115; x=1759421915; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s5xevkUUTmwlKwAyY0Wx9nWf1Int/iLI6fP1YJUNaVA=;
-        b=B5Y+Ovmrra4dXWKtLm3K9PZye+O1v3ro5Woqt6BD9MTX+kd1cohHm7vFQ2j9BQoqfq
-         p6ViAsWDFlSl9KWe0jcJwC5t2dt0mi4U6cggvfyKnn6Di1BAPd21rvjUtz+eS25X7cEO
-         sLERZjRHjXqlHGWWMjuC7QmJzm7U2V0wya74o+AvvUdTfhs1gx1eStrw5uPKz6LS+7/z
-         pwB4zKDNXyUacCYpo45re0vOyqfQGsFHZNKICjNQYln3yY87wEcW2UUWFwALkvK5v/xU
-         /Cd/mSJy9hGqMXGkUHE2rNf5Uu+YHrNpPRoMGeMXFnPf3csH2YT3rIAKXfCGXrOy1y5r
-         Dhew==
+	s=arc-20240116; t=1758818127; c=relaxed/simple;
+	bh=hm8Jz6FaWuh/Ug7+j1E71c0i/h5RZ4hWpewomV5LsYs=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KgrkzJsKRlL9IJ5EcehKBa9FtJbZVxdQHPIljPntNK4SwpteCJ3iMPdv4mN9h/LpD6eyTJR2OxV3vBSq9zDrSIlXvBxDbEIZqOEXrbruCK4J1qIAMHqDsJYqCmyaksYkBXTuKXxirSLOKT3kC3lwyAvTugpseWxmOG2Gs1EhiVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-425788b03a0so29885335ab.1
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 09:35:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758817115; x=1759421915;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s5xevkUUTmwlKwAyY0Wx9nWf1Int/iLI6fP1YJUNaVA=;
-        b=Ijbd8IyqwVS37zrrsQKYg1f1mXF7yM0EImAaSPsIXKHZScf72VjM2KGfRWjRQDO6AA
-         qc6CwZnrruEjsNVy9gCRVYvFrVbCAu1KV0psqjqW6HJKf6dfbhdm0IYj2Znwhfqu2M8n
-         ajA0rm38rX6ixI5KzgkZhKgE8JlUhvMRhSfDxLW/Xr+sKz5+lax6tcjesqd9shcJwIbZ
-         Sda+dfalM+fdwflC67CzGTFs6795j60FkBuBftJcU0EMlsOHd7XjQ/kRMghFXCl7hLB2
-         xUD+Zuur8972esGHnlXB/6g6uIbRlcXdoInox4rUf03OLxBYsmIJGEWSH8wH49USWh3h
-         uIZg==
-X-Forwarded-Encrypted: i=1; AJvYcCVCVupzBA1ABmGcFT9gmYma4WseV4lCy9NGGO3tzNp71ujD9bWeEJa2YLlnpy9e/+/WFEjkRJk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZ+aOU1+BSasxFN7/LtkUpa9gGVk4P0KW1oW8Vzp67M7DB4fLq
-	kVCS3Jjz4CFSG1cmhj4u4KhKk53WcbPqi5OVKxOjgkrzdbgN7CMftHQPnJlUmx8wF3Y13c243pG
-	jkJUuQWtnABf64ORCauoN5cETJd6NGUY=
-X-Gm-Gg: ASbGncsXAI7V1hzVTvEPzBS4EhPLRFAYWrrjIc8VEZBqw2RZYaC56zt2dPNpgGfSIra
-	GE1oRJW4pcphp+ZLwL6AAWZWnHEebhaMVSOBhh2hlMSn54Z0bIOIXDhk6rpVX1CLwAB7wL5GpAq
-	0wmaTnqiFu08K3HOfRSj8OEUQdtl4wwhh1qUyjfmfXES8KspNKS+uYAZY1WxY90vNadPNksy6uQ
-	j4cfDN/EFzHRlfy73WyutVtWVzFSE0zxsR7LcELJ0MkqZsYnL8=
-X-Google-Smtp-Source: AGHT+IFwv2YwsWAIKIDmxsrJN0NY39IA3xgFkg9Xv9DM8KA1HxgqMZQFSM1VnRv5Sj5R14hL06ntb/V9/P6xF1NLvs4=
-X-Received: by 2002:a17:907:720b:b0:b2a:7f08:23da with SMTP id
- a640c23a62f3a-b34bbebe2f0mr416672066b.56.1758817114676; Thu, 25 Sep 2025
- 09:18:34 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758818125; x=1759422925;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=c6jG7pr3bxwwLSPK7p0MnLiBfePcgwX2SpZvPRuaIF8=;
+        b=FJgnO4qHhv66+Kb9+bzilXMI6Rt+KZOt4dXQilHow3N1zhjkH68AinRCMBbfEtWzsC
+         N+ZtPBPD2qd5BnxRBvJwhxcSiW4iNxr9b/CuiuEppJKsfbef3fXCAGpG0zZPtUgjcyMH
+         m3ZgFVP/dXqA6l0rdrPKqD69v7YKiMWli0CvaJgZ9bNU2LCfdLGtm3gJQ4bKtxgWSEnj
+         DBhhgUsKQ8yCkE7wQzm9WDOOjaMDzmLOjTqqQQD6WRkPQUtJBDTkP/YULyLNWrcoyl6l
+         SWzZ6r/UGgGm74mpJsHQXl30OXPxvWDNm1uQV9Wo5MK/Ilgn4m7Dc0wFTBUaBiVGsKJV
+         qGFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUfIBWo8njnkvh6INTkLhHHLFpqb28QQxkdlW3/hxAw1IUJg5GNUv8MOgRmZLiTJWdfklfFjT4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyg3D7cAsH8dFyGP9EwpACFNoMfheC1cVZZJ4c9lMKDO2sGqxKw
+	muflCXPzf8BOijPXfNrY8b84m28RkKIuIZyb6TbCR1WKsX9nX2xiAPDEvOYH5yvm7wvTzhwZVHn
+	ppriq7xwCjLfylYj41c5UI+J6THiGaJ+kNhsy1g2IlaC2MWiOQaVqG9QKJBI=
+X-Google-Smtp-Source: AGHT+IGkaCEgj1Z499HPtD8FrlU/t7pvMQT/1DrPGEJRKjaDMWbI7zkrn2/Irs27auXakuU0EsjKWseYkDag4lVQpjDj1KMq50N2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250925103559.14876-1-mehdi.benhadjkhelifa@gmail.com>
- <20250925103559.14876-4-mehdi.benhadjkhelifa@gmail.com> <5ad26663-a3cc-4bf4-9d6f-8213ac8e8ce6@iogearbox.net>
- <4b77c830-2a7d-444a-adeb-4d1370f8923f@gmail.com>
-In-Reply-To: <4b77c830-2a7d-444a-adeb-4d1370f8923f@gmail.com>
-From: vivek yadav <vivekyadav1207731111@gmail.com>
-Date: Thu, 25 Sep 2025 21:48:22 +0530
-X-Gm-Features: AS18NWDavCeJ5JOczMPLBfdxzac54ktOAMOZM_aUlp9EmmRHO_1O8MKFqbGzkPg
-Message-ID: <CABPSWR7_w3mxr74wCDEF=MYYuG2F_vMJeD-dqotc8MDmaS_FpQ@mail.gmail.com>
-Subject: Re: [PATCH v3 3/3] selftests/bpf: Prepare to add -Wsign-compare for
- bpf tests
-To: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, andrii@kernel.org, eddyz87@gmail.com, 
-	ast@kernel.org, martin.lau@linux.dev, song@kernel.org, 
-	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, 
-	matttbe@kernel.org, martineau@kernel.org, geliang@kernel.org, 
-	davem@davemloft.net, kuba@kernel.org, hawk@kernel.org, linux@jordanrome.com, 
-	ameryhung@gmail.com, toke@redhat.com, houtao1@huawei.com, 
-	emil@etsalapatis.com, yatsenko@meta.com, isolodrai@meta.com, 
-	a.s.protopopov@gmail.com, dxu@dxuuu.xyz, memxor@gmail.com, vmalik@redhat.com, 
-	bigeasy@linutronix.de, tj@kernel.org, gregkh@linuxfoundation.org, 
-	paul@paul-moore.com, bboscaccy@linux.microsoft.com, 
-	James.Bottomley@hansenpartnership.com, mrpre@163.com, jakub@cloudflare.com, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
-	mptcp@lists.linux.dev, linux-kernel-mentees@lists.linuxfoundation.org, 
-	skhan@linuxfoundation.org, david.hunter.linux@gmail.com
+X-Received: by 2002:a92:d0d0:0:b0:423:f9d1:e913 with SMTP id
+ e9e14a558f8ab-4259566e72emr48317225ab.31.1758818125203; Thu, 25 Sep 2025
+ 09:35:25 -0700 (PDT)
+Date: Thu, 25 Sep 2025 09:35:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68d56f4d.050a0220.25d7ab.0047.GAE@google.com>
+Subject: [syzbot] [hams?] KASAN: slab-use-after-free Read in nr_add_node
+From: syzbot <syzbot+2860e75836a08b172755@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Mehdi,
-You are trying to do much with the patch series. I don't think it will
-help much as reviewers will give comments and you will revise the
-patches. This loop will continue forever.
+Hello,
 
-I totally agree with Daniel. Please write a proper commit message.
+syzbot found the following issue on:
 
-While writing a commit message or creating a patch.Please try to give
-the answers of the following questions.
-1) What is the issue which your patch resolves?
-2) Are you trying to do more than one thing at a time? Please don't.
-3) if a patch modifies more than one file then either these changes
-inter link with each other or they have similar kind of work.
+HEAD commit:    846bd2225ec3 Add linux-next specific files for 20250919
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=130c08e2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=135377594f35b576
+dashboard link: https://syzkaller.appspot.com/bug?extid=2860e75836a08b172755
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13f3fe42580000
 
-~~Vivek
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/c53d48022f8a/disk-846bd222.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/483534e784c8/vmlinux-846bd222.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/721b36eec9b3/bzImage-846bd222.xz
 
-On Thu, Sep 25, 2025 at 9:04=E2=80=AFPM Mehdi Ben Hadj Khelifa
-<mehdi.benhadjkhelifa@gmail.com> wrote:
->
-> On 9/25/25 4:04 PM, Daniel Borkmann wrote:
-> > On 9/25/25 12:35 PM, Mehdi Ben Hadj Khelifa wrote:
-> >> -Change only variable types for correct sign comparisons
-> >>
-> >> Signed-off-by: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>
-> >
-> > Pls write some better commit messages and not just copy/paste the same
-> > $subj/
-> > message every time; proper sentences w/o the weird " -" indent.
->
-> Understood, though the changes are very similar / are the same with the
-> same goal that's why it made sense to me to do that and I will remove
-> the - in future commits.> Also say
-> > why
-> > this is needed in the commit message, and add a reference to the commit
-> > which
-> > initially added this as a TODO, i.e. 495d2d8133fd ("selftests/bpf:
-> > Attempt to
-> > build BPF programs with -Wsign-compare").
-> I will do that in the upcoming version.
->
-> > If you group these, then maybe
-> > also
-> > include the parts of the compiler-emitted warnings during build which a=
-re
-> > relevant to the code changes you do here.
->
-> Okay. I will do that. Should i send a v4 with the recommended changes
-> but not including the rest of the files meaning the ones that I haven't
-> uploaded in this patch series which contain type casting or should i
-> just make changes for these files in this series?
-> Also will it be better if dropped these versions and made a new patch
-> with v1?
->
-> Thank you for your review and time Daniel.
-> Regards,
-> Mehdi
-> >> ---
-> >>   tools/testing/selftests/bpf/progs/test_xdp_dynptr.c          | 2 +-
-> >>   tools/testing/selftests/bpf/progs/test_xdp_loop.c            | 2 +-
-> >>   tools/testing/selftests/bpf/progs/test_xdp_noinline.c        | 4 ++-=
--
-> >>   tools/testing/selftests/bpf/progs/uprobe_multi.c             | 4 ++-=
--
-> >>   .../selftests/bpf/progs/uprobe_multi_session_recursive.c     | 5 +++=
---
-> >>   .../selftests/bpf/progs/verifier_iterating_callbacks.c       | 2 +-
-> >>   6 files changed, 10 insertions(+), 9 deletions(-)
-> >>
-> >> diff --git a/tools/testing/selftests/bpf/progs/test_xdp_dynptr.c b/
-> >> tools/testing/selftests/bpf/progs/test_xdp_dynptr.c
-> >> index 67a77944ef29..12ad0ec91021 100644
-> >> --- a/tools/testing/selftests/bpf/progs/test_xdp_dynptr.c
-> >> +++ b/tools/testing/selftests/bpf/progs/test_xdp_dynptr.c
-> >> @@ -89,7 +89,7 @@ static __always_inline int handle_ipv4(struct xdp_md
-> >> *xdp, struct bpf_dynptr *xd
-> >>       struct vip vip =3D {};
-> >>       int dport;
-> >>       __u32 csum =3D 0;
-> >> -    int i;
-> >> +    size_t i;
-> >>       __builtin_memset(eth_buffer, 0, sizeof(eth_buffer));
-> >>       __builtin_memset(iph_buffer_tcp, 0, sizeof(iph_buffer_tcp));
-> >> diff --git a/tools/testing/selftests/bpf/progs/test_xdp_loop.c b/
-> >> tools/testing/selftests/bpf/progs/test_xdp_loop.c
-> >> index 93267a68825b..e9b7bbff5c23 100644
-> >> --- a/tools/testing/selftests/bpf/progs/test_xdp_loop.c
-> >> +++ b/tools/testing/selftests/bpf/progs/test_xdp_loop.c
-> >> @@ -85,7 +85,7 @@ static __always_inline int handle_ipv4(struct xdp_md
-> >> *xdp)
-> >>       struct vip vip =3D {};
-> >>       int dport;
-> >>       __u32 csum =3D 0;
-> >> -    int i;
-> >> +    size_t i;
-> >>       if (iph + 1 > data_end)
-> >>           return XDP_DROP;
-> >> diff --git a/tools/testing/selftests/bpf/progs/test_xdp_noinline.c b/
-> >> tools/testing/selftests/bpf/progs/test_xdp_noinline.c
-> >> index fad94e41cef9..85ef3c0a3e20 100644
-> >> --- a/tools/testing/selftests/bpf/progs/test_xdp_noinline.c
-> >> +++ b/tools/testing/selftests/bpf/progs/test_xdp_noinline.c
-> >> @@ -372,7 +372,7 @@ bool encap_v4(struct xdp_md *xdp, struct ctl_value
-> >> *cval,
-> >>       next_iph_u16 =3D (__u16 *) iph;
-> >>       __pragma_loop_unroll_full
-> >> -    for (int i =3D 0; i < sizeof(struct iphdr) >> 1; i++)
-> >> +    for (size_t i =3D 0; i < sizeof(struct iphdr) >> 1; i++)
-> >>           csum +=3D *next_iph_u16++;
-> >>       iph->check =3D ~((csum & 0xffff) + (csum >> 16));
-> >>       if (bpf_xdp_adjust_head(xdp, (int)sizeof(struct iphdr)))
-> >> @@ -423,7 +423,7 @@ int send_icmp_reply(void *data, void *data_end)
-> >>       iph->check =3D 0;
-> >>       next_iph_u16 =3D (__u16 *) iph;
-> >>       __pragma_loop_unroll_full
-> >> -    for (int i =3D 0; i < sizeof(struct iphdr) >> 1; i++)
-> >> +    for (size_t i =3D 0; i < sizeof(struct iphdr) >> 1; i++)
-> >>           csum +=3D *next_iph_u16++;
-> >>       iph->check =3D ~((csum & 0xffff) + (csum >> 16));
-> >>       return swap_mac_and_send(data, data_end);
-> >> diff --git a/tools/testing/selftests/bpf/progs/uprobe_multi.c b/tools/
-> >> testing/selftests/bpf/progs/uprobe_multi.c
-> >> index 44190efcdba2..f99957773c3a 100644
-> >> --- a/tools/testing/selftests/bpf/progs/uprobe_multi.c
-> >> +++ b/tools/testing/selftests/bpf/progs/uprobe_multi.c
-> >> @@ -20,13 +20,13 @@ __u64 uretprobe_multi_func_3_result =3D 0;
-> >>   __u64 uprobe_multi_sleep_result =3D 0;
-> >> -int pid =3D 0;
-> >> +__u32 pid =3D 0;
-> >>   int child_pid =3D 0;
-> >>   int child_tid =3D 0;
-> >>   int child_pid_usdt =3D 0;
-> >>   int child_tid_usdt =3D 0;
-> >> -int expect_pid =3D 0;
-> >> +__u32 expect_pid =3D 0;
-> >>   bool bad_pid_seen =3D false;
-> >>   bool bad_pid_seen_usdt =3D false;
-> >> diff --git a/tools/testing/selftests/bpf/progs/
-> >> uprobe_multi_session_recursive.c b/tools/testing/selftests/bpf/progs/
-> >> uprobe_multi_session_recursive.c
-> >> index 8fbcd69fae22..017f1859ebe8 100644
-> >> --- a/tools/testing/selftests/bpf/progs/uprobe_multi_session_recursive=
-.c
-> >> +++ b/tools/testing/selftests/bpf/progs/uprobe_multi_session_recursive=
-.c
-> >> @@ -3,6 +3,7 @@
-> >>   #include <bpf/bpf_helpers.h>
-> >>   #include <bpf/bpf_tracing.h>
-> >>   #include <stdbool.h>
-> >> +#include <stddef.h>
-> >>   #include "bpf_kfuncs.h"
-> >>   #include "bpf_misc.h"
-> >> @@ -10,8 +11,8 @@ char _license[] SEC("license") =3D "GPL";
-> >>   int pid =3D 0;
-> >> -int idx_entry =3D 0;
-> >> -int idx_return =3D 0;
-> >> +size_t idx_entry =3D 0;
-> >> +size_t idx_return =3D 0;
-> >>   __u64 test_uprobe_cookie_entry[6];
-> >>   __u64 test_uprobe_cookie_return[3];
-> >> diff --git a/tools/testing/selftests/bpf/progs/
-> >> verifier_iterating_callbacks.c b/tools/testing/selftests/bpf/progs/
-> >> verifier_iterating_callbacks.c
-> >> index 75dd922e4e9f..72f9f8c23c93 100644
-> >> --- a/tools/testing/selftests/bpf/progs/verifier_iterating_callbacks.c
-> >> +++ b/tools/testing/selftests/bpf/progs/verifier_iterating_callbacks.c
-> >> @@ -593,7 +593,7 @@ int loop_inside_iter_volatile_limit(const void *ct=
-x)
-> >>   {
-> >>       struct bpf_iter_num it;
-> >>       int *v, sum =3D 0;
-> >> -    __u64 i =3D 0;
-> >> +    __s32 i =3D 0;
-> >>       bpf_iter_num_new(&it, 0, ARR2_SZ);
-> >>       while ((v =3D bpf_iter_num_next(&it))) {
-> >
->
->
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2860e75836a08b172755@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in nr_add_node+0x251b/0x2580 net/netrom/nr_route.c:248
+Read of size 2 at addr ffff888078ae2632 by task syz.0.4719/15936
+
+CPU: 0 UID: 0 PID: 15936 Comm: syz.0.4719 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xca/0x240 mm/kasan/report.c:482
+ kasan_report+0x118/0x150 mm/kasan/report.c:595
+ nr_add_node+0x251b/0x2580 net/netrom/nr_route.c:248
+ nr_rt_ioctl+0x9f1/0xb00 net/netrom/nr_route.c:651
+ sock_do_ioctl+0xdc/0x300 net/socket.c:1241
+ sock_ioctl+0x576/0x790 net/socket.c:1362
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f29de38ec29
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f29df216038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f29de5d5fa0 RCX: 00007f29de38ec29
+RDX: 0000200000000000 RSI: 000000000000890b RDI: 0000000000000004
+RBP: 00007f29de411e41 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f29de5d6038 R14: 00007f29de5d5fa0 R15: 00007ffedaf2ceb8
+ </TASK>
+
+Allocated by task 15939:
+ kasan_save_stack mm/kasan/common.c:56 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+ poison_kmalloc_redzone mm/kasan/common.c:400 [inline]
+ __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:417
+ kasan_kmalloc include/linux/kasan.h:262 [inline]
+ __kmalloc_cache_noprof+0x3d5/0x6f0 mm/slub.c:5723
+ kmalloc_noprof include/linux/slab.h:957 [inline]
+ nr_add_node+0x804/0x2580 net/netrom/nr_route.c:146
+ nr_rt_ioctl+0x9f1/0xb00 net/netrom/nr_route.c:651
+ sock_do_ioctl+0xdc/0x300 net/socket.c:1241
+ sock_ioctl+0x576/0x790 net/socket.c:1362
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 15936:
+ kasan_save_stack mm/kasan/common.c:56 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+ __kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:587
+ kasan_save_free_info mm/kasan/kasan.h:406 [inline]
+ poison_slab_object mm/kasan/common.c:252 [inline]
+ __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:284
+ kasan_slab_free include/linux/kasan.h:234 [inline]
+ slab_free_hook mm/slub.c:2507 [inline]
+ slab_free mm/slub.c:6557 [inline]
+ kfree+0x19a/0x6d0 mm/slub.c:6765
+ nr_add_node+0x1cbe/0x2580 net/netrom/nr_route.c:246
+ nr_rt_ioctl+0x9f1/0xb00 net/netrom/nr_route.c:651
+ sock_do_ioctl+0xdc/0x300 net/socket.c:1241
+ sock_ioctl+0x576/0x790 net/socket.c:1362
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff888078ae2600
+ which belongs to the cache kmalloc-64 of size 64
+The buggy address is located 50 bytes inside of
+ freed 64-byte region [ffff888078ae2600, ffff888078ae2640)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x78ae2
+flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 00fff00000000000 ffff88801b0418c0 ffffea0000c51900 dead000000000004
+raw: 0000000000000000 0000000000200020 00000000f5000000 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52c40(GFP_NOFS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 5233, tgid 5233 (udevd), ts 92365645188, free_ts 92323224662
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x240/0x2a0 mm/page_alloc.c:1850
+ prep_new_page mm/page_alloc.c:1858 [inline]
+ get_page_from_freelist+0x21e4/0x22c0 mm/page_alloc.c:3869
+ __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5159
+ alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2416
+ alloc_slab_page mm/slub.c:3023 [inline]
+ allocate_slab+0x96/0x3a0 mm/slub.c:3196
+ new_slab mm/slub.c:3250 [inline]
+ ___slab_alloc+0xe94/0x1920 mm/slub.c:4626
+ __slab_alloc+0x65/0x100 mm/slub.c:4745
+ __slab_alloc_node mm/slub.c:4821 [inline]
+ slab_alloc_node mm/slub.c:5232 [inline]
+ __do_kmalloc_node mm/slub.c:5601 [inline]
+ __kmalloc_noprof+0x471/0x7f0 mm/slub.c:5614
+ kmalloc_noprof include/linux/slab.h:961 [inline]
+ kzalloc_noprof include/linux/slab.h:1094 [inline]
+ tomoyo_encode2 security/tomoyo/realpath.c:45 [inline]
+ tomoyo_encode+0x28b/0x550 security/tomoyo/realpath.c:80
+ tomoyo_realpath_from_path+0x58d/0x5d0 security/tomoyo/realpath.c:283
+ tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
+ tomoyo_path_perm+0x213/0x4b0 security/tomoyo/file.c:822
+ security_inode_getattr+0x12f/0x330 security/security.c:2416
+ vfs_getattr fs/stat.c:259 [inline]
+ vfs_fstat fs/stat.c:281 [inline]
+ __do_sys_newfstat fs/stat.c:555 [inline]
+ __se_sys_newfstat fs/stat.c:550 [inline]
+ __x64_sys_newfstat+0xfc/0x200 fs/stat.c:550
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+page last free pid 5528 tgid 5528 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1394 [inline]
+ __free_frozen_pages+0xbc4/0xd30 mm/page_alloc.c:2906
+ rcu_do_batch kernel/rcu/tree.c:2605 [inline]
+ rcu_core+0xcab/0x1770 kernel/rcu/tree.c:2861
+ handle_softirqs+0x286/0x870 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ invoke_softirq kernel/softirq.c:496 [inline]
+ __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:723
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:739
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1052 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1052
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
+
+Memory state around the buggy address:
+ ffff888078ae2500: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff888078ae2580: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+>ffff888078ae2600: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+                                     ^
+ ffff888078ae2680: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff888078ae2700: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
