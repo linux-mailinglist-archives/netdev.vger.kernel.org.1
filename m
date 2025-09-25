@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-226400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12013B9FE4E
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 16:15:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E4C0B9FE42
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 16:14:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 859CA562107
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04886562139
 	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:09:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF252D320E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BBE728B512;
 	Thu, 25 Sep 2025 14:06:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UWuWl3JO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tiPz4dJA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33109221FC8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3309C1E503D;
 	Thu, 25 Sep 2025 14:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758809188; cv=none; b=LBHQjGJ3+Fhg4AyP+uYBboGPY/vjaJzQqcB/dA9jyLKPwionyHcsypoNftQur5kywAuHZ3vmLYbxQNDYOW8WFr5dfpm+1bMy/D9XRTF0r5U5cMvJusxGXNZ/xJYS3yoAUMz9BeHvNEbw09pXQZw0tp9I4OnJ5PDRHS/KZ5s2JJs=
+	t=1758809188; cv=none; b=MlMz7+2mKh2XAJ6b0LWRXqNuCZFUdN+WtoNLC/0aHoEXDLKmKjrnVwYKA/N41XAdoRDsco1nuI72lFuPs+c4J1JvjqSA44NKlvzUKCpmyTvqRvnQUwW0QijasS2/Jy0qyx0ZXcO1fhv08dq20qtoKF5LHNAhz63A9yRM2nbtCyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1758809188; c=relaxed/simple;
-	bh=JZaRkLJomBSdsRDEvpNByeOgtyybOCR1lGmXJvP8BFY=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=LUn7+fXnFauH2nfMCclX1xlJlouWWfyT79vgEmPSDL21p89VyDvzYFGDKr0NLi8S4WK69IkmVmWtMq3xxx/+QtedJsVFdk/hingW2NGEW1OrIYCgT9kexZ79zVjb4Juty4RPsTRIYVhqrkxxIV67TwLTDVVXEcyBaaAkEMKK2AA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UWuWl3JO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B97C8C4CEF0;
+	bh=zSY/958KOCpOwFRxar6kTLevxJFIWpMxyuGHYhwxU7k=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=bZM8fC4DmGLDNjtJy5bt65ilT4U0cTIFs1MnpOQy/kfAeBPIiJIXmnGa6jHdyPmtYeIhE8vUT7ssbGVqcbrnmxoyDTiV16yj4g9HuBBaalsRUQZxcQ442213jcbVWpZ+XCcld1FSrLPotymXT2LtOgybi7rcpFGl8HX83/xx718=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tiPz4dJA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CBAC1C4CEF7;
 	Thu, 25 Sep 2025 14:06:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1758809187;
-	bh=JZaRkLJomBSdsRDEvpNByeOgtyybOCR1lGmXJvP8BFY=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=UWuWl3JO3I1hyQnyCuRFoMUj1Qt8daxDMicwUYK9zZCern+4HLS9pUwbsfmRVCf4n
-	 GjCaYCks8GPJgvmd6J/+r9b/xwQ3Pdm5ik8Vj0lWbax/1ffxb/0DbR/AUWu2izkGzK
-	 qztRMiBw0wJasoBpeN1Trc3sHxB7dCSa2pKDqGYcV1NwtS9PJuG+sMCtZE40ZmJpoF
-	 JQMpAQ5uQSYjT5gAJCjt+HVqn6OTTcGloysWtzlR886x1zl/hbazGZtLFoF/JiYAqr
-	 SEjPJ0uJt/HQ8JMHXmWI5+0UBbhWj2aophDg3QgaZTV8zsDmI2kpi9sPzTTB1f6H86
-	 baxi76HXACwhA==
+	bh=zSY/958KOCpOwFRxar6kTLevxJFIWpMxyuGHYhwxU7k=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=tiPz4dJA953Eq7WiiXNtY8Da30yNCIhru9tzAm1DI+1ynLbFstBbJYfR4g8TDh58l
+	 ZJgNm46swAELQTb96Kxq0JPV091OHhtfCAwTgOvM+/ChwjHqSKoDovJfeEgSvWHzSV
+	 2qz7sXJL3Wu4MAk75vwKFfn+4tuVga3ZVXKbz2aVhg/YSiKZwCitg08YOdnpk5/cdK
+	 SKoYBxqhXZVE4hW5LyQ7GHeFUMFkX6Nl7iyZd5dj+cxvJrcSI0i5wC8cTeIdpHPsbi
+	 +krgt+kPpndBKfBywNyzG5GrqoxYUUQ3zMkAPLGwhaaeLaNkewW6qsr3Ygn09/860D
+	 azuchr7Sxkk4Q==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFAABCAC5B1;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD4FACAC5A7;
 	Thu, 25 Sep 2025 14:06:27 +0000 (UTC)
 From: Rohan G Thomas via B4 Relay <devnull+rohan.g.thomas.altera.com@kernel.org>
-Subject: [PATCH net-next v3 0/2] net: stmmac: Drop frames causing HLBS
+Date: Thu, 25 Sep 2025 22:06:13 +0800
+Subject: [PATCH net-next v3 1/2] net: stmmac: est: Drop frames causing HLBS
  error
-Date: Thu, 25 Sep 2025 22:06:12 +0800
-Message-Id: <20250925-hlbs_2-v3-0-3b39472776c2@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,11 +56,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAFRM1WgC/12OQQ6CMBBFr0JmbQ0dLFBW3sMY08IgTbCYtmkwh
- LvbdGHU5c+f9/5s4MkZ8tAVGziKxpvFplAdCugnZe/EzJAyYImilJyzadb+hkyMwyDo1FZjiZC
- On45Gs2bRBSwFZmkNcE3NZHxY3CsvRJ77f1nkjLNe10JQK6XQzVnNgZw69ssjOyJ+c+LDYeKww
- brWqNJD8ofb9/0NjG7N9t8AAAA=
-X-Change-ID: 20250911-hlbs_2-5fdd5e483f02
+Message-Id: <20250925-hlbs_2-v3-1-3b39472776c2@altera.com>
+References: <20250925-hlbs_2-v3-0-3b39472776c2@altera.com>
+In-Reply-To: <20250925-hlbs_2-v3-0-3b39472776c2@altera.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -71,11 +69,11 @@ Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
  Rohan G Thomas <rohan.g.thomas@altera.com>, 
  Matthew Gerlach <matthew.gerlach@altera.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1758809186; l=1247;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1758809186; l=3161;
  i=rohan.g.thomas@altera.com; s=20250815; h=from:subject:message-id;
- bh=JZaRkLJomBSdsRDEvpNByeOgtyybOCR1lGmXJvP8BFY=;
- b=cjIvuKTzoFGnXBwe3ISNMpVhnpZwew0JHYG4Cg3JIILuwsqz/31E73x5REcfTS+HOiIBAxP40
- 5LpEvSW8hGRBsW89XRb0Ndgdh0Hd8lnVPVPYxTf5ljE4KsOiQFCMIH5
+ bh=U2GpYPDapoJb67AF7YZfXLYJz7u/9hkBR8xWCl+t188=;
+ b=k7vpTLnNXsMkDiKz+37H6mNODT5JstRk2/Veg+ISYJlBI6kE6Em5cTVhPKrovC0m83vJYK9pg
+ uymIw+ThuLqDYqtYTtCsxFuIMmr7jI34nwSYdAqkxGEOKIcAdq58ONL
 X-Developer-Key: i=rohan.g.thomas@altera.com; a=ed25519;
  pk=5yZXkXswhfUILKAQwoIn7m6uSblwgV5oppxqde4g4TY=
 X-Endpoint-Received: by B4 Relay for rohan.g.thomas@altera.com/20250815
@@ -83,39 +81,87 @@ X-Endpoint-Received: by B4 Relay for rohan.g.thomas@altera.com/20250815
 X-Original-From: Rohan G Thomas <rohan.g.thomas@altera.com>
 Reply-To: rohan.g.thomas@altera.com
 
-This patchset consists of following patchset to avoid netdev watchdog
-reset due to Head-of-Line Blocking due to EST scheduling error.
- 1. Drop those frames causing HLBS error
- 2. Add HLBS frame drops to taprio stats
+From: Rohan G Thomas <rohan.g.thomas@altera.com>
+
+Drop those frames causing Head-of-Line Blocking due to Scheduling
+(HLBS) error to avoid HLBS interrupt flooding and netdev watchdog
+timeouts due to blocked packets. Tx queues can be configured to drop
+those blocked packets by setting Drop Frames causing Scheduling Error
+(DFBS) bit of EST_CONTROL register.
+
+Also, add per queue HLBS drop count.
 
 Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
 ---
-Changes in v3:
-- Split commit into 2 and add this cover letter
-- Updated the commit messages with expansion for HLBS and DFBS
-- Link to v2: https://lore.kernel.org/r/20250915-hlbs_2-v2-1-27266b2afdd9@altera.com
-
-Changes in v2:
-- Removed unnecessary parantheses
-- Link to v1: https://lore.kernel.org/r/20250911-hlbs_2-v1-1-cb655e8995b7@altera.com
-
----
-Rohan G Thomas (2):
-      net: stmmac: est: Drop frames causing HLBS error
-      net: stmmac: tc: Add HLBS drop count to taprio stats
-
  drivers/net/ethernet/stmicro/stmmac/common.h     | 1 +
  drivers/net/ethernet/stmicro/stmmac/stmmac_est.c | 9 ++++++---
  drivers/net/ethernet/stmicro/stmmac/stmmac_est.h | 1 +
- drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c  | 7 +++++--
- 4 files changed, 13 insertions(+), 5 deletions(-)
----
-base-commit: 12de5f0f6c2d7aad7e60aada650fcfb374c28a5e
-change-id: 20250911-hlbs_2-5fdd5e483f02
+ 3 files changed, 8 insertions(+), 3 deletions(-)
 
-Best regards,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+index eaa1f2e1c5a53b297b014a8218bf8f3db5beb4de..8f34c9ad457f07553206841223fd38e55208d5ab 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/common.h
++++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+@@ -228,6 +228,7 @@ struct stmmac_extra_stats {
+ 	unsigned long mtl_est_btrlm;
+ 	unsigned long max_sdu_txq_drop[MTL_MAX_TX_QUEUES];
+ 	unsigned long mtl_est_txq_hlbf[MTL_MAX_TX_QUEUES];
++	unsigned long mtl_est_txq_hlbs[MTL_MAX_TX_QUEUES];
+ 	/* per queue statistics */
+ 	struct stmmac_txq_stats txq_stats[MTL_MAX_TX_QUEUES];
+ 	struct stmmac_rxq_stats rxq_stats[MTL_MAX_RX_QUEUES];
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_est.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_est.c
+index ac6f2e3a3fcd2f9ae21913845282ff015cd2f7ec..4b513d27a9889046e8b5e404adfd917f469c3f05 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_est.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_est.c
+@@ -63,7 +63,7 @@ static int est_configure(struct stmmac_priv *priv, struct stmmac_est *cfg,
+ 			 EST_GMAC5_PTOV_SHIFT;
+ 	}
+ 	if (cfg->enable)
+-		ctrl |= EST_EEST | EST_SSWL;
++		ctrl |= EST_EEST | EST_SSWL | EST_DFBS;
+ 	else
+ 		ctrl &= ~EST_EEST;
+ 
+@@ -109,6 +109,10 @@ static void est_irq_status(struct stmmac_priv *priv, struct net_device *dev,
+ 
+ 		x->mtl_est_hlbs++;
+ 
++		for (i = 0; i < txqcnt; i++)
++			if (value & BIT(i))
++				x->mtl_est_txq_hlbs[i]++;
++
+ 		/* Clear Interrupt */
+ 		writel(value, est_addr + EST_SCH_ERR);
+ 
+@@ -131,10 +135,9 @@ static void est_irq_status(struct stmmac_priv *priv, struct net_device *dev,
+ 
+ 		x->mtl_est_hlbf++;
+ 
+-		for (i = 0; i < txqcnt; i++) {
++		for (i = 0; i < txqcnt; i++)
+ 			if (feqn & BIT(i))
+ 				x->mtl_est_txq_hlbf[i]++;
+-		}
+ 
+ 		/* Clear Interrupt */
+ 		writel(feqn, est_addr + EST_FRM_SZ_ERR);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_est.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_est.h
+index d247fa383a6e44a5a8371dd491eab5b1c99cd1f2..f70221c9c84afe6bce62782c7847a8005e469dd7 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_est.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_est.h
+@@ -16,6 +16,7 @@
+ #define EST_XGMAC_PTOV_MUL		9
+ #define EST_SSWL			BIT(1)
+ #define EST_EEST			BIT(0)
++#define EST_DFBS			BIT(5)
+ 
+ #define EST_STATUS			0x00000008
+ #define EST_GMAC5_BTRL			GENMASK(11, 8)
+
 -- 
-Rohan G Thomas <rohan.g.thomas@altera.com>
+2.35.3
 
 
 
