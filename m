@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-226138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9577DB9CEBA
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 02:50:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF03B9CEBD
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 02:50:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EFD97A1902
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 00:48:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 352DD3B09A5
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 00:50:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003142D7DCD;
-	Thu, 25 Sep 2025 00:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1EF2D8360;
+	Thu, 25 Sep 2025 00:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LqPSWHN/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tCxtvk7p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03A327D77A
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 00:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646712D7DF6;
+	Thu, 25 Sep 2025 00:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758761430; cv=none; b=tOCBQL5bHRTRz9y/kYnLHNQN8EMtJCytCXcd6dFCMDOjGyXRhBNRszWSLWt9NH2e/1q7PV6iNWlmU3qSQmf2O8GM3AEjIlfxSBg6QT47vOdekkcaI1PRqIrqO0VORlG43eFgXGIwv6ti8X56hIvJb1d/fqEMelBDKjI/9VaSStA=
+	t=1758761432; cv=none; b=T7I4hqTWx+jncazqPSHZ1ehr55xpgEGLPVALgrQeQFYKNc7bHAesuTY74HKzsYFHCoYRYHdTXqWL72p6A6vH+mZzzkKtYTT30Ma/i3qz1DPUrbezhHZWKJNe3E5Ci8cFrafHEntg+eK8HGlYvRzDid8D1xfxyS0eNvszmiuAENw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758761430; c=relaxed/simple;
-	bh=JOl8bvOaXKHP/plKSiwbXnFjVcEniK9Q1dE2r/E8ICA=;
+	s=arc-20240116; t=1758761432; c=relaxed/simple;
+	bh=jW8GTZzdIDV1xOgTnZ5qtmNmh8KXvtcpO4RSLSCVNAM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CPFy0ua07XSUG2E23CPr5jf6/3lBCbQk90wkEcG98sp01ofyOiNZEeV2SYvRE+zdaLSMFZP2VkuZPLu88AP3M+26jLU9QnbWdj05fZGFVVajLKxPunsj41JChsD3eewYR1IhTR/AOR3FV7X6da6B1FiW9VfHm9vQ/uvLkJ9NdFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LqPSWHN/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B9B9C4CEE7;
-	Thu, 25 Sep 2025 00:50:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=bk/myTBVTb4qjZiOzS/O/YGhp2+rR2JwhetcN32gyIaTID82NzJRTT1qF9ghIrscmh57sYqj1lVa/XFdBH+izCm8DSHw2uJ9z0Z4JKFFJFpTmK1Drbby0WY8LqwWzMpSXVz+ThLixKagnThbl4wOY+4aHcCXZ9+qMMXaIevMYgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tCxtvk7p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4408C4CEF0;
+	Thu, 25 Sep 2025 00:50:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758761430;
-	bh=JOl8bvOaXKHP/plKSiwbXnFjVcEniK9Q1dE2r/E8ICA=;
+	s=k20201202; t=1758761431;
+	bh=jW8GTZzdIDV1xOgTnZ5qtmNmh8KXvtcpO4RSLSCVNAM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LqPSWHN/3chhCOmy+6YDPFN6xr8NDxzNO998lF9/Ht+yNjj1+/ryFEXHvdi3MFwOF
-	 YIO81ZOdsUqiOOBydKwfNk5kaHi1kgSOoCUrrckwpPePseATf+b88RMEnSfBL6wmor
-	 i9MlFI2y9QiIMofu7E1nZJFpIDteI9gw5e1GcTj7tYisIrEsOFf9TdMcaoqx5EWCpE
-	 foJyUvGBudfGMWJvxptNTuThOu2IP3THl246s1RUgZuqlwif8OXYPIa2JY9X1vjk1O
-	 NKcXnEmEmqAg+5umPWUvoUpLKXMKFi8n+NgG9KjqEZ61Dh2nq/TyU6YrFpqrdSr8GZ
-	 s5RrflQCldl4A==
+	b=tCxtvk7p3xsEqZCOuQ/mwnoJzjmAQ/kCKhzDR+iKmjRAptN60yxWZOnm7y6jjc8NE
+	 2ljAMCqPR6gkh/RoXUMFRrHIGX3uxsCpfp0vIr6ayzh/AmxqNzJuGlgISDHD+7Ok5C
+	 H2vYMutZULQuSDIUvauXdaB/AZA3aHZxPu+69RDjJsaBSli8eRO1E3xzO5BFjGySd/
+	 wugz47i5rnm6tdNTZ62dpmPwBs0+rEYOu3v3vnU+SOvaQsH3aQYLmIhhkNH4afWG3V
+	 ZQsfbIkgZj5W2O0XKMc/7w3/U11gvII7pmsXwzDQ7ms+F2HYWYNR3eSeC7FpZkAIUF
+	 ma/zPmqIxtp6A==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEE139D0C20;
-	Thu, 25 Sep 2025 00:50:27 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DAC39D0C20;
+	Thu, 25 Sep 2025 00:50:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,50 +52,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/6] net: stmmac: yet more cleanups
+Subject: Re: [PATCH net-next 1/6] ipvs: Defer ip_vs_ftp unregister during
+ netns
+ cleanup
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175876142648.2757835.630635315199558536.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Sep 2025 00:50:26 +0000
-References: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
-In-Reply-To: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
- netdev@vger.kernel.org, pabeni@redhat.com
+ <175876142799.2757835.12600541116025822006.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Sep 2025 00:50:27 +0000
+References: <20250924140654.10210-2-fw@strlen.de>
+In-Reply-To: <20250924140654.10210-2-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
+ pablo@netfilter.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+by Florian Westphal <fw@strlen.de>:
 
-On Tue, 23 Sep 2025 12:25:30 +0100 you wrote:
-> Building on the previous cleanup series, this cleans up yet more stmmac
-> code.
+On Wed, 24 Sep 2025 16:06:49 +0200 you wrote:
+> From: Slavin Liu <slavin452@gmail.com>
 > 
-> - Move stmmac_bus_clks_config() into stmmac_platform() which is where
->   its onlny user is.
+> On the netns cleanup path, __ip_vs_ftp_exit() may unregister ip_vs_ftp
+> before connections with valid cp->app pointers are flushed, leading to a
+> use-after-free.
 > 
-> - Move the xpcs Clause 73 test into stmmac_init_phy(), resulting in
->   simpler code in __stmmac_open().
+> Fix this by introducing a global `exiting_module` flag, set to true in
+> ip_vs_ftp_exit() before unregistering the pernet subsystem. In
+> __ip_vs_ftp_exit(), skip ip_vs_ftp unregister if called during netns
+> cleanup (when exiting_module is false) and defer it to
+> __ip_vs_cleanup_batch(), which unregisters all apps after all connections
+> are flushed. If called during module exit, unregister ip_vs_ftp
+> immediately.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/6] net: stmmac: move stmmac_bus_clks_config() to stmmac_platform.c
-    https://git.kernel.org/netdev/net-next/c/79d6e14e9cb3
-  - [net-next,2/6] net: stmmac: move xpcs clause 73 test into stmmac_init_phy()
-    https://git.kernel.org/netdev/net-next/c/f005ec4a3d6b
-  - [net-next,3/6] net: stmmac: move PHY attachment error message into stmmac_init_phy()
-    https://git.kernel.org/netdev/net-next/c/9641d727162d
-  - [net-next,4/6] net: stmmac: move initialisation of priv->tx_lpi_timer to stmmac_open()
-    https://git.kernel.org/netdev/net-next/c/bae62989a31b
-  - [net-next,5/6] net: stmmac: move PHY handling out of __stmmac_open()/release()
-    https://git.kernel.org/netdev/net-next/c/db299a0c09e9
-  - [net-next,6/6] net: stmmac: simplify stmmac_init_phy()
-    https://git.kernel.org/netdev/net-next/c/50acea3662bf
+  - [net-next,1/6] ipvs: Defer ip_vs_ftp unregister during netns cleanup
+    https://git.kernel.org/netdev/net-next/c/134121bfd99a
+  - [net-next,2/6] netfilter: nfnetlink: reset nlh pointer during batch replay
+    https://git.kernel.org/netdev/net-next/c/09efbac953f6
+  - [net-next,3/6] netfilter: nft_set_pipapo: use 0 genmask for packetpath lookups
+    https://git.kernel.org/netdev/net-next/c/4dbac7db17f1
+  - [net-next,4/6] netfilter: nft_set_pipapo_avx2: fix skip of expired entries
+    https://git.kernel.org/netdev/net-next/c/5823699a11cf
+  - [net-next,5/6] selftests: netfilter: nft_concat_range.sh: add check for double-create bug
+    https://git.kernel.org/netdev/net-next/c/94bd247bc25b
+  - [net-next,6/6] netfilter: nf_conntrack: do not skip entries in /proc/net/nf_conntrack
+    https://git.kernel.org/netdev/net-next/c/c5ba345b2d35
 
 You are awesome, thank you!
 -- 
