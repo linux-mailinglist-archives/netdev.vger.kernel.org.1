@@ -1,283 +1,174 @@
-Return-Path: <netdev+bounces-226438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A6B3BA066D
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 17:42:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE519BA0671
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 17:42:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C56A620CDA
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 15:34:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 702D4175497
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 15:42:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4AC22EA47E;
-	Thu, 25 Sep 2025 15:34:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06022F616B;
+	Thu, 25 Sep 2025 15:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hUqaFdUa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iozdQ2hY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A32C2EC097
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 15:34:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB7C2F4A09
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 15:42:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758814460; cv=none; b=cCryafO/1shxl1CbCvMeaBlWWSTevyYtH/UnOIge/GyWou0ySvtVt2x4O1g4ISoplQJU+72q31xD/RrOu6WJDtmBbYjPcCdCizL6JG0/6owdS6yYcr3rEgmuGz0SktxV2vTfmnrky436URhoz+xnX0VeKqoc4hQgReO/bAlI8DM=
+	t=1758814947; cv=none; b=HWvNwrHq39LcaiR9D6Y0hKMd4dWzTYzu9z6KsoeSxj5w3XC/xgED/pP67wtZbfMJt/GOofmJsbZgtb5P3U4RWGvVdFW6MjM1M4qDpsn1YlqGAIdrbZyvw+VEPnbO1gJmpm+CXM8gWdRy1uM7j90jDZ7FS6dV/9nXheb3NYJidiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758814460; c=relaxed/simple;
-	bh=ykLhi+WcKmW7+gVKC4ajZ63BqypGmAKHuKRlaD2W8J8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ruKjnRM4Q9kF6GNa3LSRaaWIFA++gbaojNrS/ucQjWoKMml0YgGgBxJLlEalahmWwsjN5Iq8dVoaFELdKxxuKPySHkVihVzZ5mA2Nam/uvsAbo9mxbGAB9DNPPyalz9RGFv11m3d5KaDaH9xMXd9Fx+9ubhM96bIVm3G8R3XRVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hUqaFdUa; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758814460; x=1790350460;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ykLhi+WcKmW7+gVKC4ajZ63BqypGmAKHuKRlaD2W8J8=;
-  b=hUqaFdUa2hD/gxhGWreAyR6/tS0NR9cqzspnXGVZ/NcBV9GHAiDujWOm
-   aVc+SrKW1zruJJepTiS6z2k2w/XQWAdLHOW+W8U540IajXB6rpbDq1pL/
-   Pl7kz+Y+UzqBRgXpBGbQx53L9eTzrVDDuckharlmuQ33JI8Jkwu0oPWTX
-   +NGnQ0kjv1wQKlN9cTT0TiKQ6RtAfIeQMviSPpV0/fQrIkfZDGl/trxWR
-   xikD2UZLbM+5kiFsJZROa9e1Hhr6GqDEmxGoTgmc9D1238dO4Yf/jfnyy
-   LGbqsK4NUKHUxumwNNmTbgN/ljI7fbLeaW9GXhJmwzA4AeqAnE8gL7hR4
-   Q==;
-X-CSE-ConnectionGUID: FtQBKBeSQKiw2MsP4EHxPA==
-X-CSE-MsgGUID: XgxFQzXISR+TgyQ6xk5uCA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="64947231"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="64947231"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2025 08:34:19 -0700
-X-CSE-ConnectionGUID: ogqVkYnuTEqwvB6wZysmeQ==
-X-CSE-MsgGUID: Ses6bB1+Rde3CKoFL3dGWg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,292,1751266800"; 
-   d="scan'208";a="208298266"
-Received: from aus-labsrv3.an.intel.com ([10.123.116.23])
-  by fmviesa001.fm.intel.com with ESMTP; 25 Sep 2025 08:34:17 -0700
-From: Sreedevi Joshi <sreedevi.joshi@intel.com>
-To: sreedevi.joshi@intel.com,
-	intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Erik Gabriel Carrillo <erik.g.carrillo@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH iwl-net 2/2] idpf: fix issue with ethtool -n command display
-Date: Thu, 25 Sep 2025 10:33:58 -0500
-Message-Id: <20250925153358.143112-3-sreedevi.joshi@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250925153358.143112-1-sreedevi.joshi@intel.com>
-References: <20250925153358.143112-1-sreedevi.joshi@intel.com>
+	s=arc-20240116; t=1758814947; c=relaxed/simple;
+	bh=LhDkyJuwGceVSUcNSeREAlWI1ETmNdprkTkUlk7sbNw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BS8aBzRfwfIEWRxxx5cjAFOaFWQJopR/U8g2hs3XUkBV0K9wuIsPP6jLMcsptCy+ntdKRzB++CPvA7Yp/GDBEKJvMZiaOS6ibDfMjdtoACI7D/JAz4+LHTugeqwv7f4wmP+/OLrMlrMJoa8UMmT+MZQhqr0NOwJpwsVVZo1CU9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iozdQ2hY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758814945;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SoWyNGq2+WEDxr2I8yMYU8hP5EE3I7EnsFFg3yAOwPM=;
+	b=iozdQ2hY7njN3FOnbbCehisHx0WO4R48EGtd6B2HWZInvKZ98GdLisfD/IDlzrK9R5K97Y
+	8DdaWqbecKnr+BWvSTSVXzP3bCpmPIBInqmaM967zv0r7S4/haDYLJjezwJExduQ4YkH4U
+	05K+C0gSB42FyL+MWESMIk0ArKGMV9A=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-101-cye5ZmQzODSN2-2vf_D2WA-1; Thu, 25 Sep 2025 11:42:23 -0400
+X-MC-Unique: cye5ZmQzODSN2-2vf_D2WA-1
+X-Mimecast-MFC-AGG-ID: cye5ZmQzODSN2-2vf_D2WA_1758814942
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46e303235e8so8058025e9.1
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 08:42:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758814942; x=1759419742;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SoWyNGq2+WEDxr2I8yMYU8hP5EE3I7EnsFFg3yAOwPM=;
+        b=qcZQaW0AxdsuI9PAuXGAQ2vWvSNv43FOgpylgpyMjgFXpdHoTpfE/KszzOq+emy3hW
+         eAfZkhG4ZhAuAbTnxp2tneySaEdZSZIiP/LNFAulzawdQQnxbAAEunjzW+p7rNeDQ6zY
+         iSyLyYfVPyFU4tYVYatdPWhLguPOqxRLe2RewI0NaCZdpOjflY5hdkeRt5hHOsE+ewPL
+         Y0B/SVJ2Vk+wFQ35i3qChJ5Kefd0Har0ZCc/CWvBc+IhLebEdixNep9XpBmla6T8dIBX
+         Sf/3EuM50nrY24YHbW2608/O7sWOSRJ03q5870xg1PHgvo6iVloOiYpLutnBNFac4gIo
+         uq+g==
+X-Forwarded-Encrypted: i=1; AJvYcCXGrzYNFzTQ2oCxpm3jQyffyU1myEwYCu7qWORURnqakwBEjkhVw5kAUYkD3heBrCXXHCbWqRo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx35T0TBXXyHYBTnCuakfWARQ0s3DRflhX7iUUZXTCy047eoiiZ
+	DAXULP5X0tnDBbhDyKvo9Y/do0jtL/Rw1yBXCETNw0vVGHO64hKb0hEtCaBh/Fd20xhPlAJxKvi
+	3osyBuw4D/MuxEsvC9Gv4Z2sdOIOy3K3utepz2HZqPuceuwIZa8jae1ia9g==
+X-Gm-Gg: ASbGnctWtIKZZirv/qLhiCwr0FG6buh3iV5UkCHihgpQwxXPAO/wi2sTVJY8kZioXCg
+	Qk6nW2nj5hcktgdXT2EicQVDV0IAZWSPmNTqywWVE1YRS4ERO+ds1Ny9EHu1mM1+kdOmX4z0Es7
+	iYlieEXb/yAoo46V+2tU9t3aIOBd3ivfjtzCstgtFUbI9/PgXUcEooao1zKmkWUINPNoe7EFpI0
+	G3tGDMKVR392lk8cQBjZlbXBpicSLwiJkvSUiv/A4jZabeXM3+BI30HmBDinT+0mlzd8iCviHWw
+	A242RvsidtbXn1AwTIYBSm1foW/oJUQumqecC2qqLPzNMpGgOVAFr3adzL5oPa1HR6VFuiPmz6C
+	jWZ29+ec5UpKj
+X-Received: by 2002:a05:600c:5290:b0:46e:394b:4991 with SMTP id 5b1f17b1804b1-46e394b4b1emr8849505e9.11.1758814942082;
+        Thu, 25 Sep 2025 08:42:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGY7q5cCEKSY5G+qO3YdgamXeF+8HAdkjrLynzDo9gNcCUiRa67Z8FZ6kXO+htyHwA/0LS8Aw==
+X-Received: by 2002:a05:600c:5290:b0:46e:394b:4991 with SMTP id 5b1f17b1804b1-46e394b4b1emr8821345e9.11.1758814896033;
+        Thu, 25 Sep 2025 08:41:36 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e33bef4b4sm37808335e9.20.2025.09.25.08.41.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Sep 2025 08:41:31 -0700 (PDT)
+Message-ID: <30a1dc4e-e1ef-43bd-8a63-7a8ff48297d2@redhat.com>
+Date: Thu, 25 Sep 2025 17:41:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/2] net/smc: handle -ENOMEM from
+ smc_wr_alloc_link_mem gracefully
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ "D. Wythe" <alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>,
+ Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang
+ <wenjia@linux.ibm.com>, Mahanta Jambigi <mjambigi@linux.ibm.com>,
+ Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-s390@vger.kernel.org
+References: <20250921214440.325325-1-pasic@linux.ibm.com>
+ <20250921214440.325325-3-pasic@linux.ibm.com>
+ <cd1c6040-0a8f-45fb-91aa-2df2c5ae085a@redhat.com>
+ <20250925170524.7adc1aa3.pasic@linux.ibm.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250925170524.7adc1aa3.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Erik Gabriel Carrillo <erik.g.carrillo@intel.com>
+On 9/25/25 5:05 PM, Halil Pasic wrote:
+> On Thu, 25 Sep 2025 11:40:40 +0200
+> Paolo Abeni <pabeni@redhat.com> wrote:
+> 
+>>> +	do {
+>>> +		rc = smc_ib_create_queue_pair(lnk);
+>>> +		if (rc)
+>>> +			goto dealloc_pd;
+>>> +		rc = smc_wr_alloc_link_mem(lnk);
+>>> +		if (!rc)
+>>> +			break;
+>>> +		else if (rc != -ENOMEM) /* give up */
+>>> +			goto destroy_qp;
+>>> +		/* retry with smaller ... */
+>>> +		lnk->max_send_wr /= 2;
+>>> +		lnk->max_recv_wr /= 2;
+>>> +		/* ... unless droping below old SMC_WR_BUF_SIZE */
+>>> +		if (lnk->max_send_wr < 16 || lnk->max_recv_wr < 48)
+>>> +			goto destroy_qp;  
+>>
+>> If i.e. smc.sysctl_smcr_max_recv_wr == 2048, and
+>> smc.sysctl_smcr_max_send_wr == 16, the above loop can give-up a little
+>> too early - after the first failure. What about changing the termination
+>> condition to:
+>>
+>> 	lnk->max_send_wr < 16 && lnk->max_recv_wr < 48
+>>
+>> and use 2 as a lower bound for both lnk->max_send_wr and lnk->max_recv_wr?
+> 
+> My intention was to preserve the ratio (max_recv_wr/max_send_wr) because 
+> I assume that the optimal ratio is workload dependent, and that scaling
+> both down at the same rate is easy to understand. And also to never dip
+> below the old values to avoid regressions due to even less WR buffers
+> than before the change.
+> 
+> I get your point, but as long as the ratio is kept I think the problem,
+> if considered a problem is there to stay. For example for 
+> smc.sysctl_smcr_max_recv_wr == 2048 and smc.sysctl_smcr_max_send_wr == 2
+> we would still give up after the first failure even with 2 as a lower
+> bound.
+> 
+> Let me also state that in my opinion giving up isn't that bad, because
+> SMC-R is supposed to be an optimization, and we still have the TCP
+> fallback. If we end up much worse than TCP because of back-off going
+> overboard, that is probably worse than just giving up on SMC-R and
+> going with TCP.
+> 
+> On the other hand, making the ratio change would make things more
+> complicated, less predictable, and also possibly take more iterations.
+> For example smc.sysctl_smcr_max_recv_wr == 2048 and
+> smc.sysctl_smcr_max_send_wr == 2000.
+> 
+> So I would prefer sticking to the current logic.
 
-When ethtool -n is executed on an interface to display the flow steering
-rules, "rxclass: Unknown flow type" error is generated.
+Ok, makes sense to me. Please capture some of the above either in the
+commit message or in a code comment.
 
-The flow steering list maintained in the driver currently stores only the
-location and q_index but other fields of the ethtool_rx_flow_spec are not
-stored. This may be enough for the virtchnl command to delete the entry.
-However, when the ethtool -n command is used to query the flow steering
-rules, the ethtool_rx_flow_spec returned is not complete causing the
-error below.
+Thanks,
 
-Resolve this by storing the flow spec (fsp) when rules are added and
-returning the complete flow spec when rules are queried.
-
-Also, change the return value from EINVAL to ENOENT when flow steering
-entry is not found during query by location or when deleting an entry.
-
-Add logic to detect and reject duplicate filter entries at the same
-location.
-
-Example:
-Before the fix:
-ethtool -n eth1
-2 RX rings available
-Total 2 rules
-
-rxclass: Unknown flow type
-rxclass: Unknown flow type
-
-After the fix:
-ethtool -n eth1
-2 RX rings available
-Total 2 rules
-
-Filter: 0
-        Rule Type: TCP over IPv4
-        Src IP addr: 10.0.0.1 mask: 0.0.0.0
-        Dest IP addr: 0.0.0.0 mask: 255.255.255.255
-        TOS: 0x0 mask: 0xff
-        Src port: 0 mask: 0xffff
-        Dest port: 0 mask: 0xffff
-        Action: Direct to queue 0
-
-Filter: 1
-        Rule Type: UDP over IPv4
-        Src IP addr: 10.0.0.1 mask: 0.0.0.0
-        Dest IP addr: 0.0.0.0 mask: 255.255.255.255
-        TOS: 0x0 mask: 0xff
-        Src port: 0 mask: 0xffff
-        Dest port: 0 mask: 0xffff
-        Action: Direct to queue 0
-
-Fixes: ada3e24b84a0 ("idpf: add flow steering support")
-Signed-off-by: Erik Gabriel Carrillo <erik.g.carrillo@intel.com>
-Co-developed-by: Sreedevi Joshi <sreedevi.joshi@intel.com>
-Signed-off-by: Sreedevi Joshi <sreedevi.joshi@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf.h        |  3 +-
- .../net/ethernet/intel/idpf/idpf_ethtool.c    | 57 ++++++++++++-------
- 2 files changed, 38 insertions(+), 22 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-index 4f4cf21e3c46..ec759bc5b3ce 100644
---- a/drivers/net/ethernet/intel/idpf/idpf.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf.h
-@@ -269,8 +269,7 @@ struct idpf_port_stats {
- 
- struct idpf_fsteer_fltr {
- 	struct list_head list;
--	u32 loc;
--	u32 q_index;
-+	struct ethtool_rx_flow_spec fs;
- };
- 
- /**
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-index 1352f18b60b0..6a39cc1feeb5 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-@@ -38,11 +38,13 @@ static int idpf_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd,
- 		cmd->data = idpf_fsteer_max_rules(vport);
- 		break;
- 	case ETHTOOL_GRXCLSRULE:
--		err = -EINVAL;
-+		err = -ENOENT;
- 		spin_lock_bh(&vport_config->flow_steer_list_lock);
- 		list_for_each_entry(f, &user_config->flow_steer_list, list)
--			if (f->loc == cmd->fs.location) {
--				cmd->fs.ring_cookie = f->q_index;
-+			if (f->fs.location == cmd->fs.location) {
-+				/* Avoid infoleak from padding: zero first, then assign fields */
-+				memset(&cmd->fs, 0, sizeof(cmd->fs));
-+				cmd->fs = f->fs;
- 				err = 0;
- 				break;
- 			}
-@@ -56,7 +58,7 @@ static int idpf_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd,
- 				err = -EMSGSIZE;
- 				break;
- 			}
--			rule_locs[cnt] = f->loc;
-+			rule_locs[cnt] = f->fs.location;
- 			cnt++;
- 		}
- 		if (!err)
-@@ -158,7 +160,7 @@ static int idpf_add_flow_steer(struct net_device *netdev,
- 	struct idpf_vport *vport;
- 	u32 flow_type, q_index;
- 	u16 num_rxq;
--	int err;
-+	int err = 0;
- 
- 	vport = idpf_netdev_to_vport(netdev);
- 	vport_config = vport->adapter->vport_config[np->vport_idx];
-@@ -184,6 +186,29 @@ static int idpf_add_flow_steer(struct net_device *netdev,
- 	if (!rule)
- 		return -ENOMEM;
- 
-+	fltr = kzalloc(sizeof(*fltr), GFP_KERNEL);
-+	if (!fltr) {
-+		err = -ENOMEM;
-+		goto out_free_rule;
-+	}
-+
-+	/* detect duplicate entry and reject before adding rules */
-+	spin_lock_bh(&vport_config->flow_steer_list_lock);
-+	list_for_each_entry(f, &user_config->flow_steer_list, list) {
-+		if (f->fs.location == fsp->location) {
-+			err = -EEXIST;
-+			break;
-+		}
-+
-+		if (f->fs.location > fsp->location)
-+			break;
-+		parent = f;
-+	}
-+	spin_unlock_bh(&vport_config->flow_steer_list_lock);
-+
-+	if (err)
-+		goto out;
-+
- 	rule->vport_id = cpu_to_le32(vport->vport_id);
- 	rule->count = cpu_to_le32(1);
- 	info = &rule->rule_info[0];
-@@ -222,28 +247,20 @@ static int idpf_add_flow_steer(struct net_device *netdev,
- 		goto out;
- 	}
- 
--	fltr = kzalloc(sizeof(*fltr), GFP_KERNEL);
--	if (!fltr) {
--		err = -ENOMEM;
--		goto out;
--	}
-+	/* Save a copy of the user's flow spec so ethtool can later retrieve it */
-+	fltr->fs = *fsp;
- 
--	fltr->loc = fsp->location;
--	fltr->q_index = q_index;
- 	spin_lock_bh(&vport_config->flow_steer_list_lock);
--	list_for_each_entry(f, &user_config->flow_steer_list, list) {
--		if (f->loc >= fltr->loc)
--			break;
--		parent = f;
--	}
--
- 	parent ? list_add(&fltr->list, &parent->list) :
- 		 list_add(&fltr->list, &user_config->flow_steer_list);
- 
- 	user_config->num_fsteer_fltrs++;
- 	spin_unlock_bh(&vport_config->flow_steer_list_lock);
-+	goto out_free_rule;
- 
- out:
-+	kfree(fltr);
-+out_free_rule:
- 	kfree(rule);
- 	return err;
- }
-@@ -297,14 +314,14 @@ static int idpf_del_flow_steer(struct net_device *netdev,
- 	spin_lock_bh(&vport_config->flow_steer_list_lock);
- 	list_for_each_entry_safe(f, iter,
- 				 &user_config->flow_steer_list, list) {
--		if (f->loc == fsp->location) {
-+		if (f->fs.location == fsp->location) {
- 			list_del(&f->list);
- 			kfree(f);
- 			user_config->num_fsteer_fltrs--;
- 			goto out_unlock;
- 		}
- 	}
--	err = -EINVAL;
-+	err = -ENOENT;
- 
- out_unlock:
- 	spin_unlock_bh(&vport_config->flow_steer_list_lock);
--- 
-2.43.0
+Paolo
 
 
