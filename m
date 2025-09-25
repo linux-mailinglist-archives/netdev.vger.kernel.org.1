@@ -1,142 +1,353 @@
-Return-Path: <netdev+bounces-226525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C954BA177D
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 23:11:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9629BA1702
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 22:53:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57B123BF4D2
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 21:11:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5EA318992CD
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 20:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DB362749DF;
-	Thu, 25 Sep 2025 21:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F83D320CAB;
+	Thu, 25 Sep 2025 20:53:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=raschen.org header.i=@raschen.org header.b="FAHQKuOc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N6RCOe4m"
 X-Original-To: netdev@vger.kernel.org
-Received: from www642.your-server.de (www642.your-server.de [188.40.219.134])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A4F263F38;
-	Thu, 25 Sep 2025 21:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.219.134
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F764204E
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 20:53:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758834688; cv=none; b=tM2q9yWWFVpiuCxk93quTiN5Phga2euIbTHl9A07H/Ic5vw+zUvIdJdZ/Ij33ymJVW0+5jJWLnp3/77mak4YKcOIBAN413V60UGoAwS6A8Jdo+PuHHy20kwRLL98cq2ChWUImprnwh6gjBHFqlxgv50TzeUm+vliXHx5E705xYA=
+	t=1758833613; cv=none; b=Frn3dob6qMn1izdf59R1CApGrlbnUqxKoSW2C6ITqEYIWZUnIcbrVa00Mi6tT3LEztvIEIHV9ZU0dvrjCCDYlwaxzqGzJJKac4Gzu77ym2Vblu5HD6rdO2+ZvPXazDTAt8lebXGrFpgnp6hDuNgE10pQS1iID9IJkotXXmiiY8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758834688; c=relaxed/simple;
-	bh=PJA8i195WXxQigdsQuZPO61AlxwJ4EvrodBNERVbgfY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TiuQEkiflLjEy+qiPTkdiAZj5Wi/kJQZ9wPN9s8hzfj1XgtCfk8xQDAFoj4bwBUanaUWTop6RjR7VBccGuVq/ZqhId/QkkHCuolTx4JfB5OgFU6vI71+nAZEjvNL184vLMKSTqtpu2HV1lnDaYJkocgoNWxQo9xpQcIZuzYNxPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=raschen.org; spf=pass smtp.mailfrom=raschen.org; dkim=pass (2048-bit key) header.d=raschen.org header.i=@raschen.org header.b=FAHQKuOc; arc=none smtp.client-ip=188.40.219.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=raschen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raschen.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=raschen.org
-	; s=default2505; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:
-	Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=lRKe25XhJacBkOZi9mK3sD2wANF36h3/HXZ9eLBGgYY=; b=FAHQKuOczfqPK+aqKr6adzThxU
-	55wOTVgD6c547mYfAbfBd6Q4MUJY/4yR487cGyHKA2hGD9AT4km6yQzL723kqgPgsQAjbrOww0Y69
-	EgxB/Ah1W8vS2NMO0iJsKoZOIbIfncZxEbZn0LQL6JqjWuSQWqov+UTw4bPWEdjMHJFPKu5bQZj+A
-	CvqY7/MU2JdaKBiYkkOqgGitk7DiUKjTWhebWZ001wMNHRuAm+D6rRglFK3yc08r3h3rON4/1d19R
-	YUR/rZJX+J0carhqTRHdCPd034MGaHEBkXFx+ua965+P0j8OIiMPeZXcnNwKaMJDyaWSOqoN7YD4H
-	I7fCiiQw==;
-Received: from sslproxy08.your-server.de ([78.47.166.52])
-	by www642.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <josef@raschen.org>)
-	id 1v1sxs-000K6H-1P;
-	Thu, 25 Sep 2025 22:53:20 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy08.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <josef@raschen.org>)
-	id 1v1sxs-000MKE-1X;
-	Thu, 25 Sep 2025 22:53:20 +0200
-From: Josef Raschen <josef@raschen.org>
-To: 
-Cc: josef@raschen.org,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: phy: microchip_t1: LAN887X: Fix device init issues.
-Date: Thu, 25 Sep 2025 22:52:22 +0200
-Message-ID: <20250925205231.67764-1-josef@raschen.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1758833613; c=relaxed/simple;
+	bh=+OP/gBUm9FmhTMS53uZe1B4xHPtCyqIjuR+deKPFAfA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CGpbbeM65jQuI2X/BDgUYX4de91Vg6bwKxh4qiYaGGPwMy3fu18oD4DnsyPwLBSpHVZJUscOyiBodqMlwFulCIrajAup09LgGvZ+8N+uJx3ik1KqWJTMwkps6+O9UcePUi0gVQSTF8FXHP6H0ZNbItqNKUPiwGrgLDT7Fm+jZ2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N6RCOe4m; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758833610;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MipXnPr5GEwnUlZAIURDsCzQViB4tslWhi1ag8MYmJo=;
+	b=N6RCOe4me81y/583i4rEFvbbw+JUnp5x8fWpmYhjQzS9K7NX+mH+voL2XpH9tQZ7tHtuC3
+	2P5AbLWyWqAxsRVoZfFHPtrnilaP2HLF2Io/g/vaf9DgH/UcbfdfuNwCbW/DuPncg280cI
+	kaZblaYKFlmeXSehWwJz0gMxFxveigk=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-646-XFNKY-jNPcKUAcNkE8VusA-1; Thu, 25 Sep 2025 16:53:28 -0400
+X-MC-Unique: XFNKY-jNPcKUAcNkE8VusA-1
+X-Mimecast-MFC-AGG-ID: XFNKY-jNPcKUAcNkE8VusA_1758833607
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45f28552927so10378145e9.2
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 13:53:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758833607; x=1759438407;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MipXnPr5GEwnUlZAIURDsCzQViB4tslWhi1ag8MYmJo=;
+        b=tLKJfkOQe8IqYaRvDoNo1+Y06o+5Bxs4LiEYTGNu49pQWIMf3F5aBqBw0M1cJRv/NL
+         XvYPsIhVVA6SyoerEcaqkD1oljNwTAWJF01nZFdNDOPM7GPgNq9Q3HbqeYjKI4ix4Hya
+         FRJOl+22ZTYlLCd56pqxzvkqj8peJ/StqlUpEpR/J48W+fa4xe0v7vccGXr14LEQG0g0
+         WpRlAeif7nWadk06661DnkuvIgsBMqFIf23LVpDCcqukSq+5tB4x1Rgc2ewSw7zWlmkW
+         Fo3AxUOwtCK/nyQubmBasRssH/AvnVWRMpY2ZLPmWBNRe236Y2oA5xa+UeVNvpu3FLsh
+         QZPg==
+X-Gm-Message-State: AOJu0Yy09YRSyr8YY3wwRwBei02rnnjoLIwoB28H3guaHv+gqnsKLRir
+	wmlXNSY+fw/AOFKswRQo5hvPEO9yA29d6uZXguy+jVQ7RxzTUuTRBa3KBtF9BcnnLLqhx0IF2k4
+	7nsTf+ksKfR2tZRDz8YGQ9pCxBWyJ4+6mzKFsi0gRGWCSlpUyrkzY0cROfQ==
+X-Gm-Gg: ASbGncsxLdLYHMzjXEKYTxfpSVWGayB5Q17Ryq6+54iK2AlWEIWWKwsk0slCLlBKnyr
+	dCdWw7UgQReFCMVVwQ9hz3Kcf+tqWJZgJs3JeTQ1YT8gKHQ519s+kA4v7pWzezFvah88LULRf4f
+	uwOJfqpGIyZFvy+v3f/3Th4pzRpEuYJpraJnz7jQS/jXfGmvdsgbL1Jnb9isZLuFGrNOHiF0ai4
+	fEazHd5k+dwLgCxz6kvHX5GAr8JWqdZP4cm+WfrgiLO/AlF8SVaoXUi4duZV44MjIXpOncSOT2a
+	DhZUh2a947cj653mSmJuSiBYbS1ncGpVJQ==
+X-Received: by 2002:a05:600c:1c0b:b0:45f:28ed:6e22 with SMTP id 5b1f17b1804b1-46e329d4992mr55555955e9.3.1758833607042;
+        Thu, 25 Sep 2025 13:53:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF/nAk3zS8i0QurY2J8qG2/NB0XEn+zAdaJVlfQNrdrE9bVadTDwtK1Iw/ehky14Hd+Wq4PUQ==
+X-Received: by 2002:a05:600c:1c0b:b0:45f:28ed:6e22 with SMTP id 5b1f17b1804b1-46e329d4992mr55555735e9.3.1758833606604;
+        Thu, 25 Sep 2025 13:53:26 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1538:2200:56d4:5975:4ce3:246f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e2ab838b6sm88733595e9.24.2025.09.25.13.53.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Sep 2025 13:53:26 -0700 (PDT)
+Date: Thu, 25 Sep 2025 16:53:23 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Daniel Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, jasowang@redhat.com, alex.williamson@redhat.com,
+	pabeni@redhat.com, virtualization@lists.linux.dev, parav@nvidia.com,
+	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, shameerali.kolothum.thodi@huawei.com,
+	jgg@ziepe.ca, kevin.tian@intel.com, kuba@kernel.org,
+	andrew+netdev@lunn.ch, edumazet@google.com
+Subject: Re: [PATCH net-next v3 08/11] virtio_net: Implement IPv4 ethtool
+ flow rules
+Message-ID: <20250925164807-mutt-send-email-mst@kernel.org>
+References: <20250923141920.283862-1-danielj@nvidia.com>
+ <20250923141920.283862-9-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.0.9/27773/Thu Sep 25 10:27:35 2025)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250923141920.283862-9-danielj@nvidia.com>
 
-Currently, for a LAN8870 phy, before link up, a call to ethtool to set
-master-slave fails with 'operation not supported'. Reason: speed, duplex
-and master/slave are not properly initialized.
+On Tue, Sep 23, 2025 at 09:19:17AM -0500, Daniel Jurgens wrote:
+> Add support for IP_USER type rules from ethtool.
+> 
+> Example:
+> $ ethtool -U ens9 flow-type ip4 src-ip 192.168.51.101 action -1
+> Added rule with ID 1
+> 
+> The example rule will drop packets with the source IP specified.
+> 
+> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+> Reviewed-by: Parav Pandit <parav@nvidia.com>
+> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
+> ---
+>  drivers/net/virtio_net/virtio_net_ff.c | 127 +++++++++++++++++++++++--
+>  1 file changed, 119 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net/virtio_net_ff.c b/drivers/net/virtio_net/virtio_net_ff.c
+> index 30c5ded57ab5..0374676d1342 100644
+> --- a/drivers/net/virtio_net/virtio_net_ff.c
+> +++ b/drivers/net/virtio_net/virtio_net_ff.c
+> @@ -90,6 +90,34 @@ static bool validate_eth_mask(const struct virtnet_ff *ff,
+>  	return true;
+>  }
+>  
+> +static bool validate_ip4_mask(const struct virtnet_ff *ff,
+> +			      const struct virtio_net_ff_selector *sel,
+> +			      const struct virtio_net_ff_selector *sel_cap)
 
-This change sets proper initial states for speed and duplex and publishes
-master-slave states. A default link up for speed 1000, full duplex and
-slave mode then works without having to call ethtool.
+I'd prefer that all functions have virtnet prefix,
+avoid polluting the global namespace.
 
-Signed-off-by: Josef Raschen <josef@raschen.org>
----
- drivers/net/phy/microchip_t1.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/phy/microchip_t1.c b/drivers/net/phy/microchip_t1.c
-index 62b36a318100..5fcbfa730910 100644
---- a/drivers/net/phy/microchip_t1.c
-+++ b/drivers/net/phy/microchip_t1.c
-@@ -1319,7 +1319,12 @@ static int lan887x_phy_init(struct phy_device *phydev)
- 		return ret;
- 
- 	/* PHY interface setup */
--	return lan887x_config_phy_interface(phydev);
-+	ret = lan887x_config_phy_interface(phydev);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* Make configuration visible for ethtool. */
-+	return genphy_c45_pma_baset1_read_master_slave(phydev);
- }
- 
- static int lan887x_phy_config(struct phy_device *phydev,
-@@ -1489,7 +1494,12 @@ static int lan887x_config_aneg(struct phy_device *phydev)
- 	if (ret < 0)
- 		return ret;
- 
--	return lan887x_phy_reconfig(phydev);
-+	ret = lan887x_phy_reconfig(phydev);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* Make configuration changes visible for ethtool. */
-+	return genphy_c45_pma_baset1_read_master_slave(phydev);
- }
- 
- static int lan887x_probe(struct phy_device *phydev)
-@@ -1503,6 +1513,10 @@ static int lan887x_probe(struct phy_device *phydev)
- 	priv->init_done = false;
- 	phydev->priv = priv;
- 
-+	/* Set default link parameters. */
-+	phydev->duplex = DUPLEX_FULL;
-+	phydev->speed = SPEED_1000;
-+
- 	return lan887x_phy_setup(phydev);
- }
- 
--- 
-2.43.0
+> +{
+> +	bool partial_mask = !!(sel_cap->flags & VIRTIO_NET_FF_MASK_F_PARTIAL_MASK);
+> +	struct iphdr *cap, *mask;
+> +
+> +	cap = (struct iphdr *)&sel_cap->mask;
+> +	mask = (struct iphdr *)&sel->mask;
+> +
+> +	if (mask->saddr &&
+> +	    !check_mask_vs_cap(&mask->saddr, &cap->saddr,
+> +	    sizeof(__be32), partial_mask))
+
+
+pls align continuation to the right of (.
+
+> +		return false;
+> +
+> +	if (mask->daddr &&
+> +	    !check_mask_vs_cap(&mask->daddr, &cap->daddr,
+> +	    sizeof(__be32), partial_mask))
+
+
+and here
+
+> +		return false;
+> +
+> +	if (mask->protocol &&
+> +	    !check_mask_vs_cap(&mask->protocol, &cap->protocol,
+> +	    sizeof(u8), partial_mask))
+
+
+and here
+
+
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+>  static bool validate_mask(const struct virtnet_ff *ff,
+>  			  const struct virtio_net_ff_selector *sel)
+>  {
+> @@ -101,11 +129,36 @@ static bool validate_mask(const struct virtnet_ff *ff,
+>  	switch (sel->type) {
+>  	case VIRTIO_NET_FF_MASK_TYPE_ETH:
+>  		return validate_eth_mask(ff, sel, sel_cap);
+> +
+> +	case VIRTIO_NET_FF_MASK_TYPE_IPV4:
+> +		return validate_ip4_mask(ff, sel, sel_cap);
+>  	}
+>  
+>  	return false;
+>  }
+>  
+> +static void parse_ip4(struct iphdr *mask, struct iphdr *key,
+> +		      const struct ethtool_rx_flow_spec *fs)
+> +{
+> +	const struct ethtool_usrip4_spec *l3_mask = &fs->m_u.usr_ip4_spec;
+> +	const struct ethtool_usrip4_spec *l3_val  = &fs->h_u.usr_ip4_spec;
+> +
+> +	mask->saddr = l3_mask->ip4src;
+> +	mask->daddr = l3_mask->ip4dst;
+> +	key->saddr = l3_val->ip4src;
+> +	key->daddr = l3_val->ip4dst;
+> +
+> +	if (mask->protocol) {
+> +		mask->protocol = l3_mask->proto;
+
+Is this right? You just checked mask->protocol and are
+now overriding it?
+
+
+> +		key->protocol = l3_val->proto;
+> +	}
+> +}
+> +
+> +static bool has_ipv4(u32 flow_type)
+> +{
+> +	return flow_type == IP_USER_FLOW;
+> +}
+> +
+>  static int setup_classifier(struct virtnet_ff *ff,
+>  			    struct virtnet_classifier **c)
+>  {
+> @@ -237,6 +290,7 @@ static bool supported_flow_type(const struct ethtool_rx_flow_spec *fs)
+>  {
+>  	switch (fs->flow_type) {
+>  	case ETHER_FLOW:
+> +	case IP_USER_FLOW:
+>  		return true;
+>  	}
+>  
+> @@ -260,16 +314,27 @@ static int validate_flow_input(struct virtnet_ff *ff,
+>  
+>  	if (!supported_flow_type(fs))
+>  		return -EOPNOTSUPP;
+> -
+>  	return 0;
+>  }
+>  
+>  static void calculate_flow_sizes(struct ethtool_rx_flow_spec *fs,
+> -				 size_t *key_size, size_t *classifier_size,
+> -				 int *num_hdrs)
+> +				size_t *key_size, size_t *classifier_size,
+> +				int *num_hdrs)
+>  {
+> +	size_t size = sizeof(struct ethhdr);
+> +
+>  	*num_hdrs = 1;
+>  	*key_size = sizeof(struct ethhdr);
+> +
+> +	if (fs->flow_type == ETHER_FLOW)
+> +		goto done;
+> +
+> +	(*num_hdrs)++;
+
+I prefer ++(*num_hdrs) in such cases generally. why return old value if
+we discard it anyway?
+
+> +	if (has_ipv4(fs->flow_type))
+> +		size += sizeof(struct iphdr);
+> +
+> +done:
+> +	*key_size = size;
+>  	/*
+>  	 * The classifier size is the size of the classifier header, a selector
+>  	 * header for each type of header in the match criteria, and each header
+> @@ -281,8 +346,9 @@ static void calculate_flow_sizes(struct ethtool_rx_flow_spec *fs,
+>  }
+>  
+>  static void setup_eth_hdr_key_mask(struct virtio_net_ff_selector *selector,
+> -				   u8 *key,
+> -				   const struct ethtool_rx_flow_spec *fs)
+> +				  u8 *key,
+> +				  const struct ethtool_rx_flow_spec *fs,
+> +				  int num_hdrs)
+>  {
+>  	struct ethhdr *eth_m = (struct ethhdr *)&selector->mask;
+>  	struct ethhdr *eth_k = (struct ethhdr *)key;
+> @@ -290,8 +356,33 @@ static void setup_eth_hdr_key_mask(struct virtio_net_ff_selector *selector,
+>  	selector->type = VIRTIO_NET_FF_MASK_TYPE_ETH;
+>  	selector->length = sizeof(struct ethhdr);
+>  
+> -	memcpy(eth_m, &fs->m_u.ether_spec, sizeof(*eth_m));
+> -	memcpy(eth_k, &fs->h_u.ether_spec, sizeof(*eth_k));
+> +	if (num_hdrs > 1) {
+> +		eth_m->h_proto = cpu_to_be16(0xffff);
+> +		eth_k->h_proto = cpu_to_be16(ETH_P_IP);
+> +	} else {
+> +		memcpy(eth_m, &fs->m_u.ether_spec, sizeof(*eth_m));
+> +		memcpy(eth_k, &fs->h_u.ether_spec, sizeof(*eth_k));
+> +	}
+> +}
+> +
+> +static int setup_ip_key_mask(struct virtio_net_ff_selector *selector,
+> +			     u8 *key,
+> +			     const struct ethtool_rx_flow_spec *fs)
+> +{
+> +	struct iphdr *v4_m = (struct iphdr *)&selector->mask;
+> +	struct iphdr *v4_k = (struct iphdr *)key;
+> +
+> +	selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV4;
+> +	selector->length = sizeof(struct iphdr);
+> +
+> +	if (fs->h_u.usr_ip4_spec.l4_4_bytes ||
+> +	    fs->h_u.usr_ip4_spec.tos ||
+> +	    fs->h_u.usr_ip4_spec.ip_ver != ETH_RX_NFC_IP4)
+> +		return -EOPNOTSUPP;
+> +
+> +	parse_ip4(v4_m, v4_k, fs);
+> +
+> +	return 0;
+>  }
+>  
+>  static int
+> @@ -312,6 +403,17 @@ validate_classifier_selectors(struct virtnet_ff *ff,
+>  	return 0;
+>  }
+>  
+> +static
+> +struct virtio_net_ff_selector *next_selector(struct virtio_net_ff_selector *sel)
+> +{
+> +	void *nextsel;
+> +
+> +	nextsel = (u8 *)sel + sizeof(struct virtio_net_ff_selector) +
+> +		  sel->length;
+
+you do not need this variable. and cast to void* looks cleaner imho.
+
+> +
+> +	return nextsel;
+> +}
+> +
+>  static int build_and_insert(struct virtnet_ff *ff,
+>  			    struct virtnet_ethtool_rule *eth_rule)
+>  {
+> @@ -349,8 +451,17 @@ static int build_and_insert(struct virtnet_ff *ff,
+>  	classifier->count = num_hdrs;
+>  	selector = &classifier->selectors[0];
+>  
+> -	setup_eth_hdr_key_mask(selector, key, fs);
+> +	setup_eth_hdr_key_mask(selector, key, fs, num_hdrs);
+> +	if (num_hdrs == 1)
+> +		goto validate;
+> +
+> +	selector = next_selector(selector);
+> +
+> +	err = setup_ip_key_mask(selector, key + sizeof(struct ethhdr), fs);
+> +	if (err)
+> +		goto err_classifier;
+>  
+> +validate:
+>  	err = validate_classifier_selectors(ff, classifier, num_hdrs);
+>  	if (err)
+>  		goto err_key;
+> -- 
+> 2.45.0
 
 
