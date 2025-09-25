@@ -1,220 +1,156 @@
-Return-Path: <netdev+bounces-226488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D0EABA0FEE
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 20:23:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85844BA0FF7
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 20:23:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D5EC1BC6CB9
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 18:23:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 973901BC6CC1
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 18:23:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 799483148CD;
-	Thu, 25 Sep 2025 18:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8F2E314A75;
+	Thu, 25 Sep 2025 18:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bRkjy1NY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gHP89Sjh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6AFA241663
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 18:22:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9F61DBB13
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 18:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758824577; cv=none; b=A2E8VEWBSwk/7CFEB9xgqdinlHgKlhrjmRTg6T+XEj7cyYkmOVqAVAzhUkI1AhXK/W3yKDVdvk55zbYQS0ieOgT9+Pl7ZypEKv3q+SgpYKW6VLpaR0TrbIO3eAkSFhQjAvVrnHS0V9GqbFhc/lMDHji3/fkZ/1A4rv6msFIFfu4=
+	t=1758824590; cv=none; b=uVlCaVu4CJ7io57ZXmMOQHA+7gSVktDoBTXEf8vY5cwQjVkeNY4i4BCNXBGFxpO1jcrdjnJ4Pno4VLhTNb2cW8/yimobbQzVMc/R6f/ecxk6/j1oAgfaPGL1CngnFzk3ZwtwTO7rWn5ZaZvq4hkvRbw5C7SL3MPveucpeTcmmaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758824577; c=relaxed/simple;
-	bh=NEMTfHp3pWKxKHKhm3ZKnwtV8Sf1356zJ54+nKQrN54=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PCG5IMtZdHjwOsS0BmnyKMvP/9Wmw7Hk7WNlc63jO64pzICI3LdND+YDYV+a1djP4MBguzSa2jev0URjCS1+drXfRQ/a8QEocVAViFnGwIv1p1zqfVfnkCcqyFGzSunvuQsyS68ci4YlH2Bz6o+EXMfmlrpxmURbdJN1ZnPytYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bRkjy1NY; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-244580523a0so14412855ad.1
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 11:22:54 -0700 (PDT)
+	s=arc-20240116; t=1758824590; c=relaxed/simple;
+	bh=BvzO5IGPXAH8AszZvtVkeqN60wUfOELdmpWbB1Tyrks=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m0xB+y/r1DkbjFqwbP4Xop8kiiB1OUW1Mexp2NAF2vyrqunxHXqcmGay9rMsZjoFu+GPgQRAZFcMETvLp6Po9mfkm4S16q+C630SqcGFpLqpn/er0K4BNKCIPBq//0iELmdjSqFKfGhkJmGmZzOGrDcCez6BzWsDIVOk36AMBUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gHP89Sjh; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-26c209802c0so14276355ad.0
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 11:23:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758824574; x=1759429374; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=13KKN1knQpC4Gybm3Q4Xow1MdiTElE8QtuEOW0gc9AY=;
-        b=bRkjy1NYXx8Ur4mQ0/fHNK347R1HXQdNeN9uUinzcE6H+39rN8u16MtjHFyhvZ2C1R
-         vntIaThQAMfDylZWupcswYs1zPkKaqn8JKCa/bI82KAyT2MtvFZp+QJ/3yXqzFxt0kbN
-         wcKEoINA1Jjwc9p9faqM0t5yuoYROKUvkVO0f+0ubyizdvW3BzSYzYJ1jW9mmgysGAXt
-         gz5gdrnCjhzSCct7ImQR9nn4Xdzyj/iDOG5Jqynvgoq3fUV9THZoidbI4Fh5MAmEANkx
-         rbSj/nRSnKo8dMFVu5+QMEnCsk0y0AyJl1I/jRa1YWQ0GcVgQaNIA2a1J3csJv8wmi94
-         0XjQ==
+        d=gmail.com; s=20230601; t=1758824588; x=1759429388; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lth8QcyLx7F4pyBD6VMqUXYvqxSLPBEAdQsdCe6N6Dk=;
+        b=gHP89SjhaeVcCCZb4T2BDpt5HAvZxzfVByhAuLOl0ZQ2hEgGd3h8KJM6f0avtl3hT6
+         Byu4FlF3gyt+VPKOJ5dVQPzwv1o0uDYs+9AelQGY34UHqK3NipYrEfSEYdwfA5O1bJBk
+         z7CMJ/apx+zVcHuzrBdbJ0JAOB4ZGEwRcmiH0AAM+GWA41g8PLtvLBDb7jrzh4v/khB7
+         e5B1hVvwISLOXoa1U1jXcLHvMbi4gFJcMU0gjwLidVKHXnYpx/JI/NhXv2frOEU55X/L
+         27rxKP/MK6aOArRzwrYXz5ZAsAbV05uElDZABQ3/PaSGE5+hIgattPwuGcWXMfMHMcVr
+         sAWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758824574; x=1759429374;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=13KKN1knQpC4Gybm3Q4Xow1MdiTElE8QtuEOW0gc9AY=;
-        b=h8mRjXnS8G0Xuz1khVSV3kCARv2ZaMp6K2PEqI5Fw8X2O23LH03dSYAdf38jp4maQk
-         w2UFwMvHF3fH+GiL+U10VM7h8oEXDGdTGC/szKHrSRVuDZQoBmIcYie2nCd6oOWmJFR7
-         muLUeyvc18Xc4sA2OzXL4W88K8VIo5d6nYfBGsgnDnDshcRlJUDAWskFkjcchaPdhiNS
-         gcqIhuQIXxylXaZeS3zmij3aLiPUF2qBePhpMs1ko3WPoC2WsVVSSvz0upA0+n5Oub4N
-         EPQoOF6QIZuwmyB751MSZOvlE10ckdn/GUv+V+vHKjrt4UGV4Ichk54ct4EGu6FBkg+O
-         tUJA==
-X-Forwarded-Encrypted: i=1; AJvYcCVCu8PRIRhMxHVVvbPIzn9YgLQTesBP2YFhr5aUMt4o5d5kyLb7NRafNMQXQeEgw5DkmRxW+3E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDYrA+LzEQYlVU4pZHT+kHRbq+4G6DplmKeZq+40qTKVc+bElZ
-	OlNLOtns7UqiV3suSaGpW8yvmXEh9PJ5nujajwp/MLhFgCmOwRumW3rGjbRCNHcaVqnriFEhSYI
-	MeppiOXLor3voZ8zaMv01tAIt8Y45eWi7Gl4nUVjvLfCoysqVNajs1TMByWw=
-X-Gm-Gg: ASbGncujwl3Tn8CJ9eCsDTaUfFNR7kN0IIFhVmWsdoZ5ZcvdUC4YYb569fYlwFYOC2y
-	myNfe3E8yzXMUXEz+4PU8svsYAOC91pJOGGxW6cukzItFRoi/waRuIyvCOUQUIHg0T41w7mi4Hu
-	JyNQLwbzxWltvFMaOXhMWBFYiUskfV1MYpy48MufhixXa+3AiqJBJv9A3a3O75sAJub586DQZSv
-	N6Jm1eazl1t6WmpAv5swWzd2iNbm3SsQBM/CCpEPlWfdDM=
-X-Google-Smtp-Source: AGHT+IEJwdNkNxqceB+eVbkTfty5OiXFLJf8G8aPK9wHvY0OgFmrFmEfXHwhZBVca3sWdTwRhDxJNBfb928Ozf9iorI=
-X-Received: by 2002:a17:903:b10:b0:262:d081:96c with SMTP id
- d9443c01a7336-27ed49d2c1dmr53284255ad.17.1758824573908; Thu, 25 Sep 2025
- 11:22:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758824588; x=1759429388;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lth8QcyLx7F4pyBD6VMqUXYvqxSLPBEAdQsdCe6N6Dk=;
+        b=fI5v439zMHOz0/yZqN5pn9vOdkT4qUMo1Vzq3AP4ITC4zwej3GZbnD/3ReGv+ICQzk
+         ctRkDQrJFnsNc1LfPzed31BVxLJ9e/NgJLeevePyRlTs9ZJvYYpoQ3LHFiyrVXj1G1RS
+         Co0/1ElFQ8Oh4G6FEaohW1AR4akeheJXK9lDvLJpuU1uHpY/zqM/OmsnE8OPQ+sfbrpt
+         +t+IcpW4uxKVam8MA72xyJcOU8pAjiumyQnxGuq71UKhB0DEg9KNWc7SCP+HQxTUNKvV
+         ENYj6/kQAbzL08QRuGoVswwBT+2OOOfX3dTr8tmg1HDaYtkohBIdgNfn61li5bsitQVO
+         A9jA==
+X-Forwarded-Encrypted: i=1; AJvYcCVR2Z/0qAqet+zzTMCXHB9BwtIISBMUVvPzYO3y3UWujlNjCZG53N/HdGQS+u1wGax3wIlLSik=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWeU2yJzg+XBVOzdlfOLr+gSH4oSDj3FzJoOQDWefaLQkkK/jP
+	cEhNw8yc/fWtM8ayS30IwkYu/NgUAPXB1UfoAi6/yCHDmizt8kcZ2pg=
+X-Gm-Gg: ASbGnctVaWSqy7dsKq9SVIeKxe4NSn2qbjiMFyMQwpgMjJMLb3J3sLUI9ne2wV07p6W
+	zkdZSUw/Wxq1vZ55ta+PanAm51ckI+FjAFzX88iYEy8RaqB91SU7IMWX29CDUCVvj3oo1F7b6MC
+	TjvkD2cIBZYC912B/mMMue1TyLfH5YiWiSfFh+7v8+zTiMnMci1Vil1SbQjTUK9iPdnmpLxxbz7
+	uQyt0ST8mIfSYM9XPqdvuP2NkD/8leaygJsaB3AF2v19+Z2RX2zzK5/MyBZBtQDNxbVnvQufGUP
+	tEYhz15xzgc07D8a9ssJDC8SuZB2mJ9BOwJA6WQ4m6V23ds8P9j7ZMfSwjk3x4JsMUrOwR+/wNc
+	rQFyo9avTHlGJ+ksDDkufbLAYrYfuhDl5mAjYfHyvm3PHSSW5tPo8fDgXc82vUTMLH56n4Fb7/n
+	6qJlWZSP2J4kd/Zg+fNRZz3fSqsrLLRt8nZtpK4+fXKX2MLLB66P+sp1lR0G+6kBJvH9i/Xvep9
+	lxK
+X-Google-Smtp-Source: AGHT+IHbywIdyU5hPvvl0ByoJgbnxSrHP20+PyoZRGg7GmIPpNtUuU/sZqQgcx7kwOHToZ4FpfpD6g==
+X-Received: by 2002:a17:903:244c:b0:24b:25f:5f81 with SMTP id d9443c01a7336-27ed4a1a44bmr55472705ad.17.1758824588171;
+        Thu, 25 Sep 2025 11:23:08 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3347500a554sm3089696a91.29.2025.09.25.11.23.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Sep 2025 11:23:07 -0700 (PDT)
+Date: Thu, 25 Sep 2025 11:23:07 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Maxim Mikityanskiy <maxtram95@gmail.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	David Ahern <dsahern@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
+	tcpdump-workers@lists.tcpdump.org, Guy Harris <gharris@sonic.net>,
+	Michael Richardson <mcr@sandelman.ca>,
+	Denis Ovsienko <denis@ovsienko.info>,
+	Xin Long <lucien.xin@gmail.com>,
+	Maxim Mikityanskiy <maxim@isovalent.com>
+Subject: Re: [PATCH net-next 01/17] net/ipv6: Introduce payload_len helpers
+Message-ID: <aNWIi0Ni-kwUmYul@mini-arch>
+References: <20250923134742.1399800-1-maxtram95@gmail.com>
+ <20250923134742.1399800-2-maxtram95@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250925021628.886203-1-xuanqiang.luo@linux.dev> <20250925021628.886203-4-xuanqiang.luo@linux.dev>
-In-Reply-To: <20250925021628.886203-4-xuanqiang.luo@linux.dev>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 25 Sep 2025 11:22:42 -0700
-X-Gm-Features: AS18NWCmv-pBsDSh5xzbB72op49jcv70NYsSgQuRpgGCiROLR82HfSXIYuj8wvw
-Message-ID: <CAAVpQUD7-6hgCSvhP3KL+thgxcyWAJQanfPHS+BQ5LDfrY9-bQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 3/3] inet: Avoid ehash lookup race in inet_twsk_hashdance_schedule()
-To: xuanqiang.luo@linux.dev
-Cc: edumazet@google.com, kerneljasonxing@gmail.com, davem@davemloft.net, 
-	kuba@kernel.org, netdev@vger.kernel.org, 
-	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250923134742.1399800-2-maxtram95@gmail.com>
 
-On Wed, Sep 24, 2025 at 7:18=E2=80=AFPM <xuanqiang.luo@linux.dev> wrote:
->
-> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
->
-> Since ehash lookups are lockless, if another CPU is converting sk to tw
-> concurrently, fetching the newly inserted tw with tw->tw_refcnt =3D=3D 0 =
-cause
-> lookup failure.
->
-> The call trace map is drawn as follows:
->    CPU 0                                CPU 1
->    -----                                -----
->                                      inet_twsk_hashdance_schedule()
->                                      spin_lock()
->                                      inet_twsk_add_node_rcu(tw, ...)
-> __inet_lookup_established()
-> (find tw, failure due to tw_refcnt =3D 0)
->                                      __sk_nulls_del_node_init_rcu(sk)
->                                      refcount_set(&tw->tw_refcnt, 3)
->                                      spin_unlock()
->
-> By replacing sk with tw atomically via hlist_nulls_replace_init_rcu() aft=
-er
-> setting tw_refcnt, we ensure that tw is either fully initialized or not
-> visible to other CPUs, eliminating the race.
->
-> It's worth noting that we held lock_sock() before the replacement, so
-> there's no need to check if sk is hashed. Thanks to Kuniyuki Iwashima!
->
-> Fixes: 3ab5aee7fe84 ("net: Convert TCP & DCCP hash tables to use RCU / hl=
-ist_nulls")
-> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+On 09/23, Maxim Mikityanskiy wrote:
+> From: Maxim Mikityanskiy <maxim@isovalent.com>
+> 
+> From: Maxim Mikityanskiy <maxim@isovalent.com>
+> 
+> The next commits will transition away from using the hop-by-hop
+> extension header to encode packet length for BIG TCP. Add wrappers
+> around ip6->payload_len that return the actual value if it's non-zero,
+> and calculate it from skb->len if payload_len is set to zero (and a
+> symmetrical setter).
+> 
+> The new helpers are used wherever the surrounding code supports the
+> hop-by-hop jumbo header for BIG TCP IPv6, or the corresponding IPv4 code
+> uses skb_ip_totlen (e.g., in include/net/netfilter/nf_tables_ipv6.h).
+> 
+> No behavioral change in this commit.
+> 
+> Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
 > ---
->  net/ipv4/inet_timewait_sock.c | 31 ++++++++++---------------------
->  1 file changed, 10 insertions(+), 21 deletions(-)
->
-> diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.=
-c
-> index 5b5426b8ee92..89dc0a5d7248 100644
-> --- a/net/ipv4/inet_timewait_sock.c
-> +++ b/net/ipv4/inet_timewait_sock.c
-> @@ -87,12 +87,6 @@ void inet_twsk_put(struct inet_timewait_sock *tw)
+>  include/linux/ipv6.h                       | 20 ++++++++++++++++++++
+>  include/net/ipv6.h                         |  2 --
+>  include/net/netfilter/nf_tables_ipv6.h     |  4 ++--
+>  net/bridge/br_netfilter_ipv6.c             |  2 +-
+>  net/bridge/netfilter/nf_conntrack_bridge.c |  4 ++--
+>  net/ipv6/ip6_input.c                       |  2 +-
+>  net/ipv6/ip6_offload.c                     |  7 +++----
+>  net/ipv6/output_core.c                     |  7 +------
+>  net/netfilter/ipvs/ip_vs_xmit.c            |  2 +-
+>  net/netfilter/nf_conntrack_ovs.c           |  2 +-
+>  net/netfilter/nf_log_syslog.c              |  2 +-
+>  net/sched/sch_cake.c                       |  2 +-
+>  12 files changed, 34 insertions(+), 22 deletions(-)
+> 
+> diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
+> index 43b7bb828738..44c4b791eceb 100644
+> --- a/include/linux/ipv6.h
+> +++ b/include/linux/ipv6.h
+> @@ -126,6 +126,26 @@ static inline unsigned int ipv6_transport_len(const struct sk_buff *skb)
+>  	       skb_network_header_len(skb);
 >  }
->  EXPORT_SYMBOL_GPL(inet_twsk_put);
->
-> -static void inet_twsk_add_node_rcu(struct inet_timewait_sock *tw,
-> -                                  struct hlist_nulls_head *list)
-> -{
-> -       hlist_nulls_add_head_rcu(&tw->tw_node, list);
-> -}
-> -
->  static void inet_twsk_schedule(struct inet_timewait_sock *tw, int timeo)
->  {
->         __inet_twsk_schedule(tw, timeo, false);
-> @@ -112,11 +106,10 @@ void inet_twsk_hashdance_schedule(struct inet_timew=
-ait_sock *tw,
->  {
->         const struct inet_sock *inet =3D inet_sk(sk);
->         const struct inet_connection_sock *icsk =3D inet_csk(sk);
-> -       struct inet_ehash_bucket *ehead =3D inet_ehash_bucket(hashinfo, s=
-k->sk_hash);
->         spinlock_t *lock =3D inet_ehash_lockp(hashinfo, sk->sk_hash);
->         struct inet_bind_hashbucket *bhead, *bhead2;
->
-> -       /* Step 1: Put TW into bind hash. Original socket stays there too=
-.
-> +       /* Put TW into bind hash. Original socket stays there too.
->            Note, that any socket with inet->num !=3D 0 MUST be bound in
->            binding cache, even if it is closed.
-
-While at it, could you update the comment style at these 2 line above too ?
-
-/* Put ..
- * Note, ...
- * binding ...
- */
-
-Otherwise looks good, thanks.
-
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-
-
-
-
->          */
-> @@ -140,19 +133,6 @@ void inet_twsk_hashdance_schedule(struct inet_timewa=
-it_sock *tw,
->
->         spin_lock(lock);
->
-> -       /* Step 2: Hash TW into tcp ehash chain */
-> -       inet_twsk_add_node_rcu(tw, &ehead->chain);
-> -
-> -       /* Step 3: Remove SK from hash chain */
-> -       if (__sk_nulls_del_node_init_rcu(sk))
-> -               sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
-> -
-> -
-> -       /* Ensure above writes are committed into memory before updating =
-the
-> -        * refcount.
-> -        * Provides ordering vs later refcount_inc().
-> -        */
-> -       smp_wmb();
->         /* tw_refcnt is set to 3 because we have :
->          * - one reference for bhash chain.
->          * - one reference for ehash chain.
-> @@ -162,6 +142,15 @@ void inet_twsk_hashdance_schedule(struct inet_timewa=
-it_sock *tw,
->          */
->         refcount_set(&tw->tw_refcnt, 3);
->
-> +       /* Ensure tw_refcnt has been set before tw is published.
-> +        * smp_wmb() provides the necessary memory barrier to enforce thi=
-s
-> +        * ordering.
-> +        */
-> +       smp_wmb();
+>  
+> +static inline unsigned int ipv6_payload_len(const struct sk_buff *skb, const struct ipv6hdr *ip6)
+> +{
+> +	u32 len = ntohs(ip6->payload_len);
 > +
-> +       hlist_nulls_replace_init_rcu(&sk->sk_nulls_node, &tw->tw_node);
-> +       sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
-> +
->         inet_twsk_schedule(tw, timeo);
->
->         spin_unlock(lock);
-> --
-> 2.25.1
->
+> +	return (len || !skb_is_gso(skb) || !skb_is_gso_tcp(skb)) ?
+> +	       len : skb->len - skb_network_offset(skb) - sizeof(struct ipv6hdr);
+
+Any reason not to return skb->len - skb_network_offset(skb) - sizeof(struct ipv6hdr)
+here unconditionally? Will it not work in some cases?
 
