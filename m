@@ -1,114 +1,341 @@
-Return-Path: <netdev+bounces-226249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BD6EB9E806
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 11:51:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52BBEB9E812
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 11:51:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90F3D1BC0EFA
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 09:51:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF4D74245AA
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 09:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E96127EFFB;
-	Thu, 25 Sep 2025 09:51:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E6127AC59;
+	Thu, 25 Sep 2025 09:51:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="LU6oAXxM"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MDXhakmt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013010.outbound.protection.outlook.com [40.107.201.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E28277C8D
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 09:51:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758793869; cv=none; b=tYOs+DMl4Ojej2DMAfIesAZ7YTTKMX83mm/MHnXjiXDdZejYFQNYgamuqTu3n9yRoake8gVbgFjgb5LaVB1oqPEICIgIvLlTDpZTISVEk8AflvU+GDADmL2ucWlrvenwCaN8W7E5B/ZNyJM5GVDNeBU0Um1dsEwzOw/7+33SkI0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758793869; c=relaxed/simple;
-	bh=ZmkFbEfQivCqBMVs45gL6yXtOiKwXDMn9AvVAlKM2NA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=YGxVZ4Z7O7qGdtEtt2Wo0TBYjbSCJQCdYdhQfyyme9fPUXWxLXQVVHISpIOJj/eFJIZI0MoRn089Wa7rjiQJfxDJRXjQi8axLkO5Vqb/qMLnFyzsgDzih4ItPXIN4XO5fUyygw7SAVm4gXum21BLVRDgLBJqF1vauIZnnRqK/xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=LU6oAXxM; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b2e66a300cbso146276266b.3
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 02:51:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1758793867; x=1759398667; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZmkFbEfQivCqBMVs45gL6yXtOiKwXDMn9AvVAlKM2NA=;
-        b=LU6oAXxM646knKdDRetHDdvY5uXOb4M4EZgpP8OGwWE5C5MTxEB/SMWkDEpO1K4WXU
-         peE6mvythlUU1n6naOwG9r0orSbpuEn5pM7wOOIdJYTM9IxUNWeS+E7Bx2LVA6CwQ+Uv
-         ZC00HEdLuz90PmjEf0YdItWdhcNXN6xpANEXnChhMndyO1JJiAZEfPUymK/GBIiPvObO
-         7YaYlZFrC4zBQTEfcv2fuNk1UcsyE3+9GQApNA+/ual1fCWG8fsGOHMNbvGLjVFhY5F+
-         5Fg5ToleSGmSB6IyYPql3RFwYnondio1r6BuuHmuPVoTPZJ6P/TX/a8MkD9wRz+KFCZo
-         agaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758793867; x=1759398667;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZmkFbEfQivCqBMVs45gL6yXtOiKwXDMn9AvVAlKM2NA=;
-        b=HAstaaNB+EP4EopSxrDEncf/e8mGlr91R5zwnLHm4es3I/mxQAIVrE4mG3CNfkOTA4
-         jXDeKX+xUZWnW6QZYQiyF9yB3Nhad9iEphTY0wWYgPKKaOnLUTYH3Vy2ZJEzMCCYrOQ7
-         WlArTy0y1VTOkN3Drlfby/VFAHUkdd9JhnDr4AGt/Hw5NKDGrSy/8xD8toMlMDwPC8dd
-         WygxJ3BBAdIUGYx+B3C3x/ND7veX1vNWLgwklkOBLoC6DyjyA2fUPM67529tmftRbIUw
-         6jAJr8zlH6ji5hdQ1WZBcTxMwkr+agwfcwEX9mM1YJxPRr7o9d8Y/PqKVjqzkz3I38jn
-         PUXA==
-X-Forwarded-Encrypted: i=1; AJvYcCVpVFMCiiXgpF6vuBaxLJHJhavUpCjS3tC1E6dIe3q29qwhYPNoTjmoI30zcMNZjr+6t2xVhi4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzm1hqS7CLid+RTnp+sZGugD5+gKwbm817tnZg9/TpcQ3FARKuz
-	WxcFO3md16cArfo0WZaWB0F+jZDKmaRlc+aWYUfKcmRg1wEcv72lqZDtRgLCMjqO3So=
-X-Gm-Gg: ASbGncuN9HnVelmUjJSqJ38mgGbseb/C7llFmZ09o1v4esdV2aTzCi87eksZy6Qeocq
-	PZtfIB7gyroZ47tm5qGynUAkPk/cE06hxocfZfKIOysVU/xIJQZCMya6oOg61Xnyb6QrYM1sJ9F
-	8M0t9xJLvgYABiShFXOprFNQhE6X6q/zXUTN0qhlQsq2zcToc8H867mG7FgEVMyl5juo5WZR2Ao
-	+IYFjSHTdi/klyOqCjTP1qXwAvCL+6F3Uu3xqo4PqWmTSz0ohYGKN2Sh1B9E6xNfdCYWeYrMCY7
-	MWW8mzfLaBmJRpkPFVE2YG7IfAs+yt2z4Iy1FWxAK+VwRKECCDsYW5NgtLXNsIYjgmR/ygOMEbr
-	HNallzwCJbmb14wI=
-X-Google-Smtp-Source: AGHT+IGEVGUv7B9GwkQ2/AJ6K1sBRZgNTUuhBCswgHVtL42XXaKHIxqK5bg7kju7asdvwIL8eCRs8w==
-X-Received: by 2002:a17:907:1c8d:b0:b33:671:8a58 with SMTP id a640c23a62f3a-b34bd440633mr294373466b.37.1758793866605;
-        Thu, 25 Sep 2025 02:51:06 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac6:d677:295f::41f:5e])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b353f8686e6sm131994066b.38.2025.09.25.02.51.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 02:51:05 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Donald Hunter <donald.hunter@gmail.com>,  Jakub Kicinski
- <kuba@kernel.org>,  "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Simon Horman
- <horms@kernel.org>,  Alexei Starovoitov <ast@kernel.org>,  Daniel Borkmann
- <daniel@iogearbox.net>,  Jesper Dangaard Brouer <hawk@kernel.org>,  John
- Fastabend <john.fastabend@gmail.com>,  Stanislav Fomichev
- <sdf@fomichev.me>,  Andrew Lunn <andrew+netdev@lunn.ch>,  Tony Nguyen
- <anthony.l.nguyen@intel.com>,  Przemek Kitszel
- <przemyslaw.kitszel@intel.com>,  Alexander Lobakin
- <aleksander.lobakin@intel.com>,  Andrii Nakryiko <andrii@kernel.org>,
-  Martin KaFai Lau <martin.lau@linux.dev>,  Eduard Zingerman
- <eddyz87@gmail.com>,  Song Liu <song@kernel.org>,  Yonghong Song
- <yonghong.song@linux.dev>,  KP Singh <kpsingh@kernel.org>,  Hao Luo
- <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  Shuah Khan
- <shuah@kernel.org>,  Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-  netdev@vger.kernel.org,  bpf@vger.kernel.org,
-  intel-wired-lan@lists.osuosl.org,  linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH RFC bpf-next v2 0/5] Add the the capability to load HW
- RX checsum in eBPF programs
-In-Reply-To: <20250925-bpf-xdp-meta-rxcksum-v2-0-6b3fe987ce91@kernel.org>
-	(Lorenzo Bianconi's message of "Thu, 25 Sep 2025 11:30:32 +0200")
-References: <20250925-bpf-xdp-meta-rxcksum-v2-0-6b3fe987ce91@kernel.org>
-Date: Thu, 25 Sep 2025 11:51:04 +0200
-Message-ID: <87bjmy508n.fsf@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5C138FA6
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 09:51:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758793915; cv=fail; b=JksKoY4PP8vzoH/WMGe7i1XpthRFZStGyRJRY2LYS5LzQxRjx6GiT9OkLMQRLAD9aDnDYhpoYTyE3/OI8y8Sy6iCcBeGj94FkrwFqXnTji/NCxxJgtJeYgH/F8FkliHTCy8R2Vlx53Z7p6cv86SGecMuBKiMttS8GW/NyZD+/8Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758793915; c=relaxed/simple;
+	bh=Wgrk7D2eDpNsAs2u5xmj5YkjzaKdg2CXL6HuTqcwjfY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=nrtLgmFu5HXHhZFq8Elkdy1BXTgrQyiXYj90K9ty0OrGKQd5Gvi0fI42mLNsr+brdqd16C1pXolTkhiIlN0lJkgdPYvfWuUhd+Um6QExyYg1ZtWZDSJi0DK4wrnNz9C3WPdQikQI8IQJxQsW2y/ov3qixImr5ikKq0jXeYhglzA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MDXhakmt; arc=fail smtp.client-ip=40.107.201.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=U+RdZpNlkCkGhoOpEJ7+kYwjbg+rbg4Ep+2jt+fNJcGyTTTQ4hVLnqLCv3qzc7bYFCalrRYRNStkgWleu9ixs/NeBz2LuspoFRvP84gTGwkO9BUoI7K6mQ2AeKpoXp0QVhHLOEOIq6JZyNHwEViSSk9IryJhFLMZ4g275gJwvMlRJmlT3AnTDk9yCx71Xtk3f4ZcO3PwRrLCkCRgrNy24inHmfKcXfW/1XULYsYO41MVVR8hrZ0glKx5CqiBvZZa5tbh1wjeQOSLwmJiU/Mb8JeTuI0tTgKlBi0SmaT+tuOskQd8WuEl/v78JLHEsSgYLwJgKCpQKSPy1q5MJ+EocA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=o+b5zpKbujGIp05DtHAq2wbibz/MA0O8S9pvUbPKXc8=;
+ b=AU3/BdtUIDmou5LdCsudstq8pJyhCkngFMBW1WDpsGHdOQUrMRineeGLUgvkZ+yMN45SufuHJd67X1by+f18mheQiwSMdkrp6eGyi8LqqX0Pc/a3NdlY8zP6iu0gGqPuGcG0C45GnC4iSHj8auY7UbQjxwRI6wWzEv50CPbzE+sDCI208/n6kX6x0VosXQgEDmBsgFGOjZy4TAAhSA2I+tI145XQJriCFrlondoBCyQqY0ZgzIS8U0pe26ghHeThaNKLxxTzmm2tNkUNKTdf7eyQTWlAC7ti2GkQOa5BEUpYXw4FlwXaJN+vDezqQGZXZxxQDX9DPrjX3xgvEOJ3kg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=o+b5zpKbujGIp05DtHAq2wbibz/MA0O8S9pvUbPKXc8=;
+ b=MDXhakmtCRDCn/4l7WjJZGLm/HDuHH3sAbSmY3KPFLJYVXPgiJS0s40d0vYGUtnZtMGf0LFIxDN5d8iraphRuF6nVHqqLYLqKTOpvJeL3V6bt5ok9l1veTre55Xehle3hIMrpPa7IFFS7ZRgfly46wB18E7ysGIgUEiutTPEnLDz3s/m8283ma5DItMkxd+a+nWW4kQc6ezKmB4m3hpYZJXNXLSMTnIrWBO70qQH1I5Nf5qdpLJmtT864kZwr/crj9EqxL1ezhOjkoC5EMCDMDHWnWPi/KPBBuvnivqEbSGRHcGiT1CHKDimCN+hcg6quHXdovoqJ52oWXfa0HizVw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY8PR12MB7195.namprd12.prod.outlook.com (2603:10b6:930:59::11)
+ by DM6PR12MB4218.namprd12.prod.outlook.com (2603:10b6:5:21b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.10; Thu, 25 Sep
+ 2025 09:51:50 +0000
+Received: from CY8PR12MB7195.namprd12.prod.outlook.com
+ ([fe80::e571:5f76:2b46:e0f8]) by CY8PR12MB7195.namprd12.prod.outlook.com
+ ([fe80::e571:5f76:2b46:e0f8%5]) with mapi id 15.20.9137.021; Thu, 25 Sep 2025
+ 09:51:49 +0000
+Message-ID: <4fa7bf85-e935-45aa-bb2f-f37926397c31@nvidia.com>
+Date: Thu, 25 Sep 2025 15:21:38 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 01/11] virtio-pci: Expose generic device
+ capability operations
+To: "Michael S. Tsirkin" <mst@redhat.com>, Dan Jurgens <danielj@nvidia.com>
+Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+ alex.williamson@redhat.com, pabeni@redhat.com,
+ virtualization@lists.linux.dev, shshitrit@nvidia.com, yohadt@nvidia.com,
+ xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, jgg@ziepe.ca, kevin.tian@intel.com,
+ kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com,
+ Yishai Hadas <yishaih@nvidia.com>
+References: <20250923141920.283862-1-danielj@nvidia.com>
+ <20250923141920.283862-2-danielj@nvidia.com>
+ <CACGkMEtkqhvsP1-b8zBnrFZwnK3LvEO4GBN52rxzdbOXJ3J7Qw@mail.gmail.com>
+ <20250924021637-mutt-send-email-mst@kernel.org>
+ <16019785-ca9e-4d63-8a0f-c2f3fdcd32b8@nvidia.com>
+ <20250925021351-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Parav Pandit <parav@nvidia.com>
+In-Reply-To: <20250925021351-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MA0PR01CA0121.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:11d::11) To CY8PR12MB7195.namprd12.prod.outlook.com
+ (2603:10b6:930:59::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY8PR12MB7195:EE_|DM6PR12MB4218:EE_
+X-MS-Office365-Filtering-Correlation-Id: fa7f4d22-ab54-46d7-e442-08ddfc192559
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SmgrcStOZjd6L2lUeW5sdmZiaytXQk5ZcCtZb0J6eWFzc1VldHg3WVloVFFV?=
+ =?utf-8?B?WmJKb0xKWDc4Sm1sWE9DdUpJMFlvOEUxQ3FMWDNHdFFVTEl2YzJvck1SQTBy?=
+ =?utf-8?B?em82ZFY0N1ZRYStVQTF5U2NWUURaVSs4Mjl1a3VYS2xDY2E1U1BncDhVZU9h?=
+ =?utf-8?B?OXUzdzBrdDNsRzdqeDZaZHV0Yjcwbk5tK24yRDBxcHIrWEthNUovT0VPSXg3?=
+ =?utf-8?B?V3plU2ttNmRsNkdPL1dVNFArSWRJQmtoZFJRZW81bUo4VVM0eVNPbE9KYW0v?=
+ =?utf-8?B?eWRKL09iZ1cvRFZ5TlhZNWtvclVLK0ZVb2V2VFhIZmI0bGJNK1ZlSFRYaHlH?=
+ =?utf-8?B?WGhhbm4vTytqdWcyWGhqYjBwRWFKYThNZVNiVXNXbTRLSUttdnRyaWtaR0Zw?=
+ =?utf-8?B?M2c1bGhpcnBQMzhYRVRVUDFvaTE5ald4Q090ckJkbS9naE5pQTh6YXRrSGcz?=
+ =?utf-8?B?NnlqNzM0d3ExaGNENUozTUpWajQwc3NRYjhoUWJucm9YMXN1dGY1WC9zVlI5?=
+ =?utf-8?B?V0dLQ0tYN2VCVmg5Nm5TZk9KRTNPTEwxOCtJRS8wUUJHRCt5cXU0eXhnVUtn?=
+ =?utf-8?B?Q2wwSFhNamM2NVB4ZlRRc2FOUDRMOXhJRkRJa0JKTFl3SjBTdnFXeEZMdDBR?=
+ =?utf-8?B?bGdpSHQxSmVUM2lDU2ExNWJDd2VLUDNtWHhxYXBiYTErUGE0cVlnV0ZLaktB?=
+ =?utf-8?B?eSs5L2hIN3ZvQS8rcVdjT2Zmei82dUVkOXM2MlUxVktDYlUxbFFBM3h3Z2gv?=
+ =?utf-8?B?Y3haM2NwcVB5M2xuOUdUT3BodW1pOHpCdDUwRzdUQXpLdjhLNFdBYWNUVWZy?=
+ =?utf-8?B?NlYxQmdudmhrQS9vZUJBcTZ0eTUrOGRiRS84ZDdXYWFkQ1pKUk02UFNWTDY1?=
+ =?utf-8?B?Wk1iUVBtdU1hTTNLRjFTK3JCNDdveTZRUkRDNEg3MjAxaDdFTFhyVU4zRE9U?=
+ =?utf-8?B?QjlqbzRPS0I5NkpkcGRBV3kwZDZ6ekRlQW9PMnFFbDgzL0l3Q2NzejRiVnRa?=
+ =?utf-8?B?VWNGbzhUWjhwd2g5Sm16dHQveng0WlEzd3dvL1phVkxOUGlaalRaRGtsSGVt?=
+ =?utf-8?B?dFFLNHRFZmV4eXNVczI3d0dXSUU0dzB5dlZlNEVEeFpzWGRCc2p5TUtaR1Ra?=
+ =?utf-8?B?c3VhcmM4bDI1QWtwdmc4M3VYSk9GNnNIbm1ZbXFtM1VzeUlRdFpYcVpZR1ZZ?=
+ =?utf-8?B?N2JXQnhLb0hGc1Vqc0xsWElKVk5DbzlBYVFwWnVPcGN0SXJndjZ4SXBtd3kz?=
+ =?utf-8?B?TGtkbjRhcGlBc3VFSG14UlMxVEE4V3BmZGRTQ25NalNxcVMxdGJTY095ZzBy?=
+ =?utf-8?B?TEdMeE9IRittNVdRRFhkZS92VmN5dlphQ3VKWHVtVzRrQ05URHdCQVRlSHZ6?=
+ =?utf-8?B?STlqV1NxbHRNNTVEVHJMUzU2dTd5Rm5mQ2w0L2J2Z1A4M0pyUW42TWg1dG1O?=
+ =?utf-8?B?djN2dG1rSmI2MXRnWXo4WWNlL2pYWmdMbitGWDd4THIya3RHZnM5QTdDK1By?=
+ =?utf-8?B?LzlSY0NYTldlUWVHelpvdnc2aXpDNTNtbWhlRnVnUXhONktpNkZSL0tkTVRM?=
+ =?utf-8?B?UlRzL205bXltWm4zdnVDMlBnMjYvSDlZNUF5Qm1Dc0tDMHJFbStjb1A2eUlq?=
+ =?utf-8?B?U2h4a3NaN1hyR0l6QVBUMFEyLzQrSkZxSXV1cWc3WSttYWVnZVFZZUg4L2J0?=
+ =?utf-8?B?WVpMSzNkZmtnVkNyMW5pVDFvSk5HcUgwRWZrVFBadnk5Sko3UzBhdnhBVXhB?=
+ =?utf-8?B?VERBYTlQWXBVNjlzYVozNGlUemtEWkt0Z1RkeVpqLzNqY2JuaERUdTAxOUxu?=
+ =?utf-8?B?ZFJkTVFkaFRMVElQVGxFY1Q1UytUYjZVYnQyT1NEdGVIeS9nNzg5aElsQW0x?=
+ =?utf-8?B?ZDIzVHppTVZ1QjZaeVE4eExnZXRaYWZHTGRkZC9ZZUd3cU9xK0pQWS9EK0tT?=
+ =?utf-8?Q?bUXAqaJbRAY=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB7195.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NmY0UTNxSFU4VHJ4ejRObllEa2JLOTNHbzZYM2NzYjFPdS8wVjNpREN4Uk5C?=
+ =?utf-8?B?S2dFekFuT0FlOWFuMWNTT2U4TjZ6dkEzUm43VC9QcXpBaElzWEwyWmpDRUR5?=
+ =?utf-8?B?c1c4VTZ4WmhHcHNHT0RJbDdyRGt0c01GWHpIaCtUOXlheGhPNlZqNFFocEoy?=
+ =?utf-8?B?TGphSU1RU0pyNlBwTGlXR0lGUDc5MExqZzdaWU9Ma25IWFZFc1dRdmp6MFNh?=
+ =?utf-8?B?anFMRDBxZTMvZlN3OERQbEkxRTBzalU5SUxjSHZRQXduSEQ5eE90NGNzM21N?=
+ =?utf-8?B?Y0lXNTA4Mkxnb0ZqTms1TUV5d1FKT1VhL1IxVXZsV2RzVkxwalJ4eGRyVHRw?=
+ =?utf-8?B?OHF5L3J3dnZ2c3JyRlpSNlVUblc0R1k3TW56N1B2V0Q2dU9VOHVlNlo3dFZQ?=
+ =?utf-8?B?VzZsVWJGSWQyWkQ4Z1M3aDgzK2hBZndyTTNSeWRvMTRoQWU1Y0lQL0JqdXZv?=
+ =?utf-8?B?TXlmcnhockd3Zk1aYmN4VUR5SnJoeDM2S1ozcEx1eUozNFc1d1VUSXZncFBP?=
+ =?utf-8?B?TnNkc3lnbzNrU3lpWkxLR1ZoM1RxUmZzdmJJajhzUDlHK1lIcGRDL2ErOHFI?=
+ =?utf-8?B?ZVFBT29qZ0pVTmlPdmVOY3pEMWZOUmlmOHg5N1BjK0dXODdKc0paVjRDc3Vx?=
+ =?utf-8?B?T1RIWkxVQTZTZlBiSENYTG8yc0FHRkhuQ29Rd2VoYTBOWmc3VllKaC9HM3d4?=
+ =?utf-8?B?VHNKem5QSjRRdG1MSkZLM2tlNGRmbWwxVmhNNkJvaGYzbGRCVUdnTU4wZjNZ?=
+ =?utf-8?B?aDkzNmVkcUROV01qSnBMc3EyZlNIb1NKaU5iVkxmWVM1dnU2S0J5a3dCSnM2?=
+ =?utf-8?B?QzllNEtzeHUydU9sM1ZMNGU3OGU0QXNkVWh4SlRiQXhiUGVGTlRhTkRMWnhp?=
+ =?utf-8?B?MkltajQ4MkVoMkp2NDlhRUoxNXRZWFFIV1NoQ09VbmlVUDBCU3hEWW9uclEz?=
+ =?utf-8?B?amVyaktwcWZKTXJWU2dHQTRVM2s0b1VtUnJZUnhFSzRpOHpEOGkyQlhyREVy?=
+ =?utf-8?B?WVBoU05OS1UvUFUyV0pkbmtoekJhbHFBUmZXemJnWTluOCtjSVg4cUxLWkFq?=
+ =?utf-8?B?dWxCZW0yRFdWQXJKenR4MzRPdlRyRU9CL09SZ2VGM1E4QzFoeGR0eDRTZEJN?=
+ =?utf-8?B?RWt3UUVMWTFYbHMzVWpxT3dHTEpBS1NZa2NzNXZpVlJqL0hrMVl2di9PQUtW?=
+ =?utf-8?B?RnJpajJNSUxkNEVJdWMxK1JJYzVLcU94d3VXcmI4d3FPN21WSStqNkNTcURh?=
+ =?utf-8?B?dVhHc0w4QzVVemxBdXQ4VFVpeDNrU0Z2UWNtYWw2d3RYRVZVamxVQ3JQOFRy?=
+ =?utf-8?B?L0ZFa28vMVhJcmJHWkxNQWpPK2ZXOVNSUUROUG90dmZOYW5xYVFaUjUxajE2?=
+ =?utf-8?B?R3Z4aDFyZUovQjlDVW1UUUFDeHF0TlNFTnZpMmVVZlYwVGhMbzhqb3FuVXBG?=
+ =?utf-8?B?WmlQNENjaWV2YVcwME9VTDUvNTNTZXhhbkg4Z0lqTzdhS3AwQnl0TlJjZnkv?=
+ =?utf-8?B?dzB5eFk5OGphWVVmSFd5M043SjdrTHl0T1ptYVFWRkk1czY1V1F1SHVFanYv?=
+ =?utf-8?B?REtCSnk4SFB2SHhMV3FtaitMd3o0SjdaMmwwZkgyajlzdVVvTCt2eFVSYzVD?=
+ =?utf-8?B?Wk8xYlQ5cU5ZbFpiczZ3cTBnbkdlV2xXTUlyK3owVkJhVjFkL29yeFBjb1I0?=
+ =?utf-8?B?WnVZVHF1VUFCOTd0blU2L00yT1Q2Wi9BQzVlVDZyY25TNlUxM3ZwVkprY2Ju?=
+ =?utf-8?B?ZFRkVDdDaDkvbGRTdXBNb0RUL1B0OWR4TktPSDNnT0FnQXU2Vm16QzZ5QWNq?=
+ =?utf-8?B?UVV3cDJ1NEs0M3JiL20yNC9Lb1lVWjhGS2pCQytDVWtvQUhldHZuWHZGTGVV?=
+ =?utf-8?B?ejRnYUVYOG4wSHRkdlhCMzN0Rkp5M1YzMEpLM0ZvSjJFRE9SNmZaa243bkwr?=
+ =?utf-8?B?aGJaRkQxYXVPZTZIR04yL1ZwNkh5NXNPSGhMQjdtTVhGR1ZJdzd4bEUwNHVy?=
+ =?utf-8?B?U01ua3lJOTVLTVRJOXVwSWd4TndKRFdid3crbXczNjNZc0RsWmRpL3VsK1lZ?=
+ =?utf-8?B?TGZrTUQxYzhscWI4QVN3QjE1UDRJNTdsb0FRYXBTdVVOc25kdjUrN2pIMERW?=
+ =?utf-8?Q?0L6Gvb2FKs7XiI0YDbKT3vDo/?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fa7f4d22-ab54-46d7-e442-08ddfc192559
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB7195.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2025 09:51:49.1688
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kSQ2YR4A2Qgm4Om/gCreZ9fqY4kkuiHGaizPVXwhJVaf1NpEePQCLtpEpEycNgrvw7HYjoyapoNqtHseXxMsRQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4218
 
-On Thu, Sep 25, 2025 at 11:30 AM +02, Lorenzo Bianconi wrote:
-> Introduce bpf_xdp_metadata_rx_checksum() kfunc in order to load the HW
-> RX cheksum results in the eBPF program binded to the NIC.
-> Implement xmo_rx_checksum callback for veth and ice drivers.
 
-What are going to do with HW RX checksum once XDP prog can access it?
+On 25-09-2025 11:46 am, Michael S. Tsirkin wrote:
+> On Wed, Sep 24, 2025 at 02:02:34PM -0500, Dan Jurgens wrote:
+>> On 9/24/25 1:22 AM, Michael S. Tsirkin wrote:
+>>> On Wed, Sep 24, 2025 at 09:16:32AM +0800, Jason Wang wrote:
+>>>> On Tue, Sep 23, 2025 at 10:20 PM Daniel Jurgens <danielj@nvidia.com> wrote:
+>>>>> Currently querying and setting capabilities is restricted to a single
+>>>>> capability and contained within the virtio PCI driver. However, each
+>>>>> device type has generic and device specific capabilities, that may be
+>>>>> queried and set. In subsequent patches virtio_net will query and set
+>>>>> flow filter capabilities.
+>>>>>
+>>>>> Move the admin related definitions to a new header file. It needs to be
+>>>>> abstracted away from the PCI specifics to be used by upper layer
+>>>>> drivers.
+>>>>>
+>>>>> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+>>>>> Reviewed-by: Parav Pandit <parav@nvidia.com>
+>>>>> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
+>>>>> Reviewed-by: Yishai Hadas <yishaih@nvidia.com>
+>>>>> ---
+>>>> [...]
+>>>>
+>>>>>   size_t virtio_max_dma_size(const struct virtio_device *vdev);
+>>>>>
+>>>>> diff --git a/include/linux/virtio_admin.h b/include/linux/virtio_admin.h
+>>>>> new file mode 100644
+>>>>> index 000000000000..bbf543d20be4
+>>>>> --- /dev/null
+>>>>> +++ b/include/linux/virtio_admin.h
+>>>>> @@ -0,0 +1,68 @@
+>>>>> +/* SPDX-License-Identifier: GPL-2.0-only
+>>>>> + *
+>>>>> + * Header file for virtio admin operations
+>>>>> + */
+>>>>> +#include <uapi/linux/virtio_pci.h>
+>>>>> +
+>>>>> +#ifndef _LINUX_VIRTIO_ADMIN_H
+>>>>> +#define _LINUX_VIRTIO_ADMIN_H
+>>>>> +
+>>>>> +struct virtio_device;
+>>>>> +
+>>>>> +/**
+>>>>> + * VIRTIO_CAP_IN_LIST - Check if a capability is supported in the capability list
+>>>>> + * @cap_list: Pointer to capability list structure containing supported_caps array
+>>>>> + * @cap: Capability ID to check
+>>>>> + *
+>>>>> + * The cap_list contains a supported_caps array of little-endian 64-bit integers
+>>>>> + * where each bit represents a capability. Bit 0 of the first element represents
+>>>>> + * capability ID 0, bit 1 represents capability ID 1, and so on.
+>>>>> + *
+>>>>> + * Return: 1 if capability is supported, 0 otherwise
+>>>>> + */
+>>>>> +#define VIRTIO_CAP_IN_LIST(cap_list, cap) \
+>>>>> +       (!!(1 & (le64_to_cpu(cap_list->supported_caps[cap / 64]) >> cap % 64)))
+>>>>> +
+>>>>> +/**
+>>>>> + * struct virtio_admin_ops - Operations for virtio admin functionality
+>>>>> + *
+>>>>> + * This structure contains function pointers for performing administrative
+>>>>> + * operations on virtio devices. All data and caps pointers must be allocated
+>>>>> + * on the heap by the caller.
+>>>>> + */
+>>>>> +struct virtio_admin_ops {
+>>>>> +       /**
+>>>>> +        * @cap_id_list_query: Query the list of supported capability IDs
+>>>>> +        * @vdev: The virtio device to query
+>>>>> +        * @data: Pointer to result structure (must be heap allocated)
+>>>>> +        * Return: 0 on success, negative error code on failure
+>>>>> +        */
+>>>>> +       int (*cap_id_list_query)(struct virtio_device *vdev,
+>>>>> +                                struct virtio_admin_cmd_query_cap_id_result *data);
+>>>>> +       /**
+>>>>> +        * @cap_get: Get capability data for a specific capability ID
+>>>>> +        * @vdev: The virtio device
+>>>>> +        * @id: Capability ID to retrieve
+>>>>> +        * @caps: Pointer to capability data structure (must be heap allocated)
+>>>>> +        * @cap_size: Size of the capability data structure
+>>>>> +        * Return: 0 on success, negative error code on failure
+>>>>> +        */
+>>>>> +       int (*cap_get)(struct virtio_device *vdev,
+>>>>> +                      u16 id,
+>>>>> +                      void *caps,
+>>>>> +                      size_t cap_size);
+>>>>> +       /**
+>>>>> +        * @cap_set: Set capability data for a specific capability ID
+>>>>> +        * @vdev: The virtio device
+>>>>> +        * @id: Capability ID to set
+>>>>> +        * @caps: Pointer to capability data structure (must be heap allocated)
+>>>>> +        * @cap_size: Size of the capability data structure
+>>>>> +        * Return: 0 on success, negative error code on failure
+>>>>> +        */
+>>>>> +       int (*cap_set)(struct virtio_device *vdev,
+>>>>> +                      u16 id,
+>>>>> +                      const void *caps,
+>>>>> +                      size_t cap_size);
+>>>>> +};
+>>>> Looking at this, it's nothing admin virtqueue specific, I wonder why
+>>>> it is not part of virtio_config_ops.
+
+It is very clear from the virtio_admin_ops definition that it is not 
+specific to admin vq. It is a admin command interface.
+
+
+>>>> Thanks
+>>> cap things are admin commands. But what I do not get is why they
+>>> need to be callbacks.
+>>>
+>>> The only thing about admin commands that is pci specific is finding
+>>> the admin vq.
+>>>
+>>> I'd expect an API for that in config then, and the rest of code can
+>>> be completely transport independent.
+>>>
+>>>
+>> The idea was that each transport would implement the callbacks, and we
+>> have indirection at the virtio_device level. Similar to the config_ops.
+>> So the drivers stay transport agnostic. I know these are PCI specific
+>> now, but thought it should be implemented generically.
+>>
+>> These could go in config ops. But I thought it was better to isolate
+>> them in a new _ops structure.
+>>
+>> An earlier implementation had the net driver accessing the admin_ops
+>> directly. But Parav thought this was better.
+> Right, but most stuff is not transport specific. If you are going to
+> put in the work, what is transport specific is admin VQ access.
+> Commands themselves are transport agnostic, we just did not need
+> them in non-pci previously.
+>
+Should config_ops be extended to have admin cmd interface there?
+
+No strong preference for putting function pointers in new admin_ops or 
+config_ops.
+
+I just find it better to have admin_ops clearly defined as it makes the 
+code crystal clear of what the ops are about.
+
+Today, one needs to be cautious when reading config_ops of below note.
+
+"Note: Do not assume that a transport implements all of the operations".
+
+Having well defined admin_ops appeared more clear. But config_ops 
+extension (or overloading) seems more simpler, no strong preference to me.
+
+Regarding Dan's comment on "net driver directly accessing admin_ops 
+directly" seems a bad idea to me.
+
+Function pointers are there for multiple transports to implement their 
+own implementation.
+
+it is not meant to develop open coded drivers. In fact some day 
+config_ops struct definition can be restricted to only transport drivers.
+
+Major part of the kernel does not follow open coding function pointer calls.
+
 
