@@ -1,160 +1,221 @@
-Return-Path: <netdev+bounces-226287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0135B9EDAF
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 13:03:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2480EB9F1A4
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:13:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F5B2320434
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 11:03:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84FC44E4A26
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 12:13:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D9282F5A33;
-	Thu, 25 Sep 2025 11:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ObxWacTp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA282FC897;
+	Thu, 25 Sep 2025 12:13:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E4D2EE274
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 11:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D262FB629
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 12:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758798198; cv=none; b=CnMq7ctTIEdB7naDDc2vfr3MciEkGkBt/k/Fz9gKmOw68lZuhZCva/mvsGtJwcq+BumkrnVq449qDVLHNNsQ6TIeIPgy2Xm8Xv2+xCBAtZiRNcV9mww+I91QexDZQ9eVR8aEg+UqnWNYlSTbbG3hyLS4HkrpDHRDU5Xw6mZQyU0=
+	t=1758802434; cv=none; b=sDwzAuB1C6fv7cJiF2tfoX84PNwbVGKnouMbDlqKYL0lcaIKUuPxeIu2JpLGtcpqntedDmzqAVKpDUxyGq168zxDTcaRjXPw7Ntm+gW/Hmtsn1F9YnpM8/FQzTWkuf9LdtjjeYKP8qKRCAQiouJU7oNYwevUDxgbroNxx1sktKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758798198; c=relaxed/simple;
-	bh=5f5jzmY/8z4+Z/yXxNdh/MioRwPbuZwA+8mB7aWl2NQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GtgG8y6miTZrkAe7JF/grQNNBc/Ndp8XCULUeRWPwxMR0RNI5iHqNpOT6M/Sf+ulFPn3gzn13G2ArduUa7Br/bTG/cRbd3eDoVVn0iEkd+NMdl/KtGh+iMsN+TQBv3w7cj77QGdBVxFdnBhjsBO2G/wJt30y4MSJg7UowBEoGBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ObxWacTp; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b2a55c5dd2dso22382166b.1
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 04:03:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758798195; x=1759402995; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Kbayy13shJENppb8XOVzKg697zuEvFkUeRfz0DCdeZk=;
-        b=ObxWacTpU7Po3m5cDA2rCo7GRT5kKJHL3jxsWrtdYiMkwiGoMhZxEEmboziMo9JJFh
-         OWlXBt6dh4pUWNLU+RNNPGRI0gJBnvlLOuOOG8oM0xIhGVohcCUErFBFV+9Hhq9jL5fK
-         Hd2G9Hk3f/ZXgVp/McpZwVl5YO99Ook1E6onuuJ/rPxWkk2iVwQdYcAHZ4qTBKV0HHf9
-         ki7wvGfeiMUMuxXkWBdnFolxs0+xSydebIfhcfPBzH6Qbko5/mNRaVadckYwdNrJ3dSe
-         DHRj6jVf3qcgIEVaFQKVLgxGAGXFf3X/yehHOLmJlFP5B82RZiawoPsGsLw8YsHbuH+T
-         ptzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758798195; x=1759402995;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kbayy13shJENppb8XOVzKg697zuEvFkUeRfz0DCdeZk=;
-        b=A/LaAEGcMAGs4XHa8j2/j2OejifDoNkBCacbPmNm/Nq8Tklzuom5ddXoveKdxlbbD+
-         p1k4RvC5qXmlKb/YhjAsEvWbGFjJUacosXWzSgfh1Sk8t9jSkg+T2oe87KHY4kG26/6x
-         jtbEIPwUbP279RgUiQxLyr7Fnxf8gEVF3ITIoPTmxkn2Xa91lVfPPh4fM84zR5gX6MyH
-         I4oB30pToW9rOPTa/vmj/X/wt85G0MwU9Ou9Nh9+jur/6G50ZuQQv4HLbUuzMwoa42RX
-         m1dPpaW0imBuFvK8f9+t+V0uJx8RFwuGDw/sgqjTr+8LmuDIicWDLXEn1KRZRLPzkXGK
-         Y6FQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWe+24RwGYLw2QOjwz1Jl4siLoWzHLKv6gX7e7wahbmqUKEXbzMUpHpexbdAmijj4VKkNtv2EE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1jgUFFUwOF8dk+AGy7tyF66OcqCmXJ+YimOoEt3Llxgjk88RI
-	cJZZVjr6eQgrYVyydBS9j2VRrbHKw3uZVPfLTWOPcEQsRufZydmmwi0+
-X-Gm-Gg: ASbGnctbTendwD2Oa4eFNIbDRR+QA79GHEyLSkkDSpnEOfD1f7j+38uphdYW0FrBK9d
-	Mv2IqwKryxy0vtvyzVOZ4lo80+1+aoWz864rQ/tyOse/jLjh+LyTs++7BbsH2s7kZKz/5ymKvn0
-	XdPmsL7nWneepkTLBf/W22EmTE3nwWlfygstk+RicDC73fFpEYC7DKcuY40iWEW4uGFXPITwzKv
-	wytd6uDI9VBVxYIhXBT1D3Tak0uG6nlFtmgwA+qWNmnRURB/qh/cT8lAW2Fn9s4oGsVveiALSi1
-	u9e3FEbI3JFErRCio/EzszmQW5bBESp2XJp20Y78j5KCPVnXfmxFsTVbOKjlskdH0ifPScXL7gb
-	Yl3fLkCsgFmAfuJ/szh5xHWG7khcNTPUXshAK7XC2d77s3yVzDdyv6NuR1Sc+Dg==
-X-Google-Smtp-Source: AGHT+IE+FDIp8REoReNlisltZxekgZurykBl8HQME4zI0tHguqI3KAp9IuApteihHX89I/9CUSSgZw==
-X-Received: by 2002:a17:907:868d:b0:afe:88ac:ab9 with SMTP id a640c23a62f3a-b34bbeba6d0mr166541366b.9.1758798195396;
-        Thu, 25 Sep 2025 04:03:15 -0700 (PDT)
-Received: from [192.168.1.105] ([165.50.112.244])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b35446f7806sm147331066b.70.2025.09.25.04.03.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Sep 2025 04:03:15 -0700 (PDT)
-Message-ID: <941fece6-9660-4aa8-91ed-346b0c2d97c1@gmail.com>
-Date: Thu, 25 Sep 2025 13:03:11 +0100
+	s=arc-20240116; t=1758802434; c=relaxed/simple;
+	bh=DFdiWmdao7KZo7AIIDbKusbCSJDpJqQ95DfmvrCBdqo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fnAZdp5clDTvUL8aVwwOc2I6ObqXt3tkoq53dYfUyHDzI67ii3QUBth4Y9fWrln8W0J1XtVK3TOD6TVu7e9zr2pg/qm+4ODQOPed8J7E4Tc49laATvu7TyDBScX1onfcRX36iJdJfBSr2hFttjbq3De7xUwNH6GjESdDpN+0TXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1v1kqu-0000Vc-BO; Thu, 25 Sep 2025 14:13:36 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1v1kqt-000Pv7-0h;
+	Thu, 25 Sep 2025 14:13:35 +0200
+Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id C523D47996C;
+	Thu, 25 Sep 2025 12:13:34 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net-next 0/48] pull-request: can-next 2025-09-25
+Date: Thu, 25 Sep 2025 14:07:37 +0200
+Message-ID: <20250925121332.848157-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 0/4] Add XDP RX queue index metadata via kfuncs
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, donald.hunter@gmail.com, andrew+netdev@lunn.ch,
- ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, matttbe@kernel.org, chuck.lever@oracle.com,
- jdamato@fastly.com, skhawaja@google.com, dw@davidwei.uk,
- mkarsten@uwaterloo.ca, yoong.siang.song@intel.com,
- david.hunter.linux@gmail.com, skhan@linuxfoundation.org, horms@kernel.org,
- sdf@fomichev.me, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel-mentees@lists.linuxfoundation.org
-References: <20250923210026.3870-1-mehdi.benhadjkhelifa@gmail.com>
- <87h5wq50l0.fsf@cloudflare.com>
- <0cddb596-a70b-48d4-9d8e-c6cb76abd9d2@gmail.com>
- <87348a4yyd.fsf@cloudflare.com>
- <e85e7bb2-6229-4b04-9c2a-7a7b79497c6c@gmail.com>
- <87y0q23j2w.fsf@cloudflare.com>
-Content-Language: en-US
-From: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>
-In-Reply-To: <87y0q23j2w.fsf@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 9/25/25 11:47 AM, Jakub Sitnicki wrote:
-> On Thu, Sep 25, 2025 at 12:28 PM +01, Mehdi Ben Hadj Khelifa wrote:
->> On 9/25/25 11:18 AM, Jakub Sitnicki wrote:
->>> On Thu, Sep 25, 2025 at 11:54 AM +01, Mehdi Ben Hadj Khelifa wrote:
->>>> On 9/25/25 10:43 AM, Jakub Sitnicki wrote:
->>>>> On Tue, Sep 23, 2025 at 10:00 PM +01, Mehdi Ben Hadj Khelifa wrote:
->>>>>>     This patch series is intended to make a base for setting
->>>>>>     queue_index in the xdp_rxq_info struct in bpf/cpumap.c to
->>>>>>     the right index. Although that part I still didn't figure
->>>>>>     out yet,I m searching for my guidance to do that as well
->>>>>>     as for the correctness of the patches in this series.
->>>>> What is the use case/movtivation behind this work?
->>>>
->>>> The goal of the work is to have xdp programs have the correct packet RX queue
->>>> index after being redirected through cpumap because currently the queue_index
->>>> gets unset or more accurately set to 0 as a default in xdp_rxq_info. This is my
->>>> current understanding.I still have to know how I can propogate that HW hint from
->>>> the NICs to the function where I need it.
->>> This explains what this series does, the desired end state of
->>> information passing, but not why is does it - how that information is
->>> going to be consumed? To what end?
->>
->> In my vision,The queue index propagated correctly through cpumap can help xdp
->> programs use it for things such as per queue load balancing,Adaptive RSS tuning
->> and even maybe for DDoS mitigation where they can drop traffic per queue.I mean
->> if these aren't correct intents or if they don't justify the added code, I can
->> abort working on it. Even if they weren't I need more guidance on how I can have
->> that metadata from HW hints...
-> 
-> Both filtering or load balancing you'd want to do early on - in the XDP
-> program invoked on receive from NIC, which as Stanislav pointed out
-> already has access to the RX queue index in its context. Not on the
-> remote CPU after spending cycles on a redirect.
-> 
-> And even if you wanted to pass that information to the remote XDP
-> program, to do something with it, you can already store it in custom XDP
-> metadata [1].
-> 
-> So while perhaps there is something that you can't do today but would be
-> useful, I don't know what it is. Hence my question about the use case.
-> 
-> [1] https://docs.ebpf.io/linux/helper-function/bpf_xdp_adjust_meta/
-> 
-Very clear,
-I will abort working on this since it can be passed as a custom XDP 
-metadata [1] until further valid use cases or when it proves to be more 
-useful.
-Thank you for your review and time.
-Best Regards,
-Mehdi
+Hello netdev-team,
 
-[1] https://docs.ebpf.io/linux/helper-function/bpf_xdp_adjust_meta/
+this is a pull request of 48 patches for net-next/main, which
+supersedes tags/linux-can-next-for-6.18-20250923.
+
+The 1st patch is by Xichao Zhao and converts ns_to_ktime() to
+us_to_ktime() in the m_can driver.
+
+Vincent Mailhol contributes 2 patches: Updating the MAINTAINERS and
+mailmap files to Vincent's new email address and sorting the includes
+in the CAN helper library alphabeticaly.
+
+Stéphane Grosjean's patch modifies all peak CAN drivers and the
+mailmap to reflect Stéphane's new email address.
+
+4 patches by Biju Das update the CAN-FD handling in the rcar_canfd
+driver.
+
+Followed by 11 patches by Geert Uytterhoeven updating and improving
+the rcar_can driver.
+
+Stefan Mätje contributes 2 patches for the esd_usb driver updating the
+error messages.
+
+The next 3 patch series are all by Vincent Mailhol: 3 patches to
+optimize the size of struct raw_sock and struct uniqframe. 4 patches
+which rework the CAN MTU logic as preparation for CAN-XL interfaces.
+And finally 20 patches that prepare and refactor the CAN netlink code
+for the upcoming CAN-XL support.
+
+regards,
+Marc
+
+---
+
+The following changes since commit fc006f5478fcf07d79b35e9dcdc51ecd11a6bf82:
+
+  net: phy: micrel: Update Kconfig help text (2025-09-12 17:34:27 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git tags/linux-can-next-for-6.18-20250924
+
+for you to fetch changes up to 896d52af944107c0644c12378741af9a3834c514:
+
+  Merge patch series "can: netlink: preparation before introduction of CAN XL step 3/3" (2025-09-24 17:10:01 +0200)
+
+----------------------------------------------------------------
+linux-can-next-for-6.18-20250924
+
+----------------------------------------------------------------
+Biju Das (4):
+      can: rcar_canfd: Update bit rate constants for RZ/G3E and R-Car Gen4
+      can: rcar_canfd: Update RCANFD_CFG_* macros
+      can: rcar_canfd: Simplify nominal bit rate config
+      can: rcar_canfd: Simplify data bit rate config
+
+Geert Uytterhoeven (11):
+      can: rcar_can: Consistently use ndev for net_device pointers
+      can: rcar_can: Add helper variable dev to rcar_can_probe()
+      can: rcar_can: Convert to Runtime PM
+      can: rcar_can: Convert to BIT()
+      can: rcar_can: Convert to GENMASK()
+      can: rcar_can: CTLR bitfield conversion
+      can: rcar_can: TFCR bitfield conversion
+      can: rcar_can: BCR bitfield conversion
+      can: rcar_can: Mailbox bitfield conversion
+      can: rcar_can: Do not print alloc_candev() failures
+      can: rcar_can: Convert to %pe
+
+Marc Kleine-Budde (6):
+      Merge patch series "can: rcar_canfd: R-Car CANFD Improvements"
+      Merge patch series "can: rcar_can: Miscellaneous cleanups and improvements"
+      Merge patch series "can: esd_usb: Fixes and improvements"
+      Merge patch series "can: raw: optimize the sizes of struct uniqframe and struct raw_sock"
+      Merge patch series "can: rework the CAN MTU logic (CAN XL preparation step 2/3)"
+      Merge patch series "can: netlink: preparation before introduction of CAN XL step 3/3"
+
+Stefan Mätje (2):
+      can: esd_usb: Rework display of error messages
+      can: esd_usb: Avoid errors triggered from USB disconnect
+
+Stéphane Grosjean (1):
+      can: peak: Modification of references to email accounts being deleted
+
+Vincent Mailhol (29):
+      MAINTAINERS: update Vincent Mailhol's email address
+      can: dev: sort includes by alphabetical order
+      can: raw: reorder struct uniqframe's members to optimise packing
+      can: raw: use bitfields to store flags in struct raw_sock
+      can: raw: reorder struct raw_sock's members to optimise packing
+      can: annotate mtu accesses with READ_ONCE()
+      can: dev: turn can_set_static_ctrlmode() into a non-inline function
+      can: populate the minimum and maximum MTU values
+      can: enable CAN XL for virtual CAN devices by default
+      can: dev: move struct data_bittiming_params to linux/can/bittiming.h
+      can: dev: make can_get_relative_tdco() FD agnostic and move it to bittiming.h
+      can: netlink: document which symbols are FD specific
+      can: netlink: refactor can_validate_bittiming()
+      can: netlink: add can_validate_tdc()
+      can: netlink: add can_validate_databittiming()
+      can: netlink: refactor CAN_CTRLMODE_TDC_{AUTO,MANUAL} flag reset logic
+      can: netlink: remove useless check in can_tdc_changelink()
+      can: netlink: make can_tdc_changelink() FD agnostic
+      can: netlink: add can_dtb_changelink()
+      can: netlink: add can_ctrlmode_changelink()
+      can: netlink: make can_tdc_get_size() FD agnostic
+      can: netlink: add can_data_bittiming_get_size()
+      can: netlink: add can_bittiming_fill_info()
+      can: netlink: add can_bittiming_const_fill_info()
+      can: netlink: add can_bitrate_const_fill_info()
+      can: netlink: make can_tdc_fill_info() FD agnostic
+      can: calc_bittiming: make can_calc_tdco() FD agnostic
+      can: dev: add can_get_ctrlmode_str()
+      can: netlink: add userland error messages
+
+Xichao Zhao (1):
+      can: m_can: use us_to_ktime() where appropriate
+
+ .mailmap                                      |   3 +
+ MAINTAINERS                                   |   4 +-
+ drivers/net/can/dev/calc_bittiming.c          |  10 +-
+ drivers/net/can/dev/dev.c                     |  80 +++-
+ drivers/net/can/dev/netlink.c                 | 628 ++++++++++++++++----------
+ drivers/net/can/m_can/m_can.c                 |   6 +-
+ drivers/net/can/peak_canfd/peak_canfd.c       |   4 +-
+ drivers/net/can/peak_canfd/peak_canfd_user.h  |   4 +-
+ drivers/net/can/peak_canfd/peak_pciefd_main.c |   6 +-
+ drivers/net/can/rcar/rcar_can.c               | 290 ++++++------
+ drivers/net/can/rcar/rcar_canfd.c             |  84 ++--
+ drivers/net/can/sja1000/peak_pci.c            |   6 +-
+ drivers/net/can/sja1000/peak_pcmcia.c         |   8 +-
+ drivers/net/can/usb/esd_usb.c                 |  64 ++-
+ drivers/net/can/usb/peak_usb/pcan_usb.c       |   6 +-
+ drivers/net/can/usb/peak_usb/pcan_usb_core.c  |   6 +-
+ drivers/net/can/usb/peak_usb/pcan_usb_core.h  |   4 +-
+ drivers/net/can/usb/peak_usb/pcan_usb_fd.c    |   3 +-
+ drivers/net/can/usb/peak_usb/pcan_usb_pro.c   |   4 +-
+ drivers/net/can/usb/peak_usb/pcan_usb_pro.h   |   4 +-
+ drivers/net/can/vcan.c                        |   2 +-
+ drivers/net/can/vxcan.c                       |   2 +-
+ include/linux/can/bittiming.h                 |  48 +-
+ include/linux/can/dev.h                       |  66 +--
+ include/linux/can/dev/peak_canfd.h            |   4 +-
+ include/uapi/linux/can/netlink.h              |  14 +-
+ net/can/af_can.c                              |   2 +-
+ net/can/isotp.c                               |   2 +-
+ net/can/raw.c                                 |  67 +--
+ 29 files changed, 848 insertions(+), 583 deletions(-)
 
