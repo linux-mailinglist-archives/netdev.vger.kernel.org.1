@@ -1,81 +1,83 @@
-Return-Path: <netdev+bounces-226374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68741B9FAEE
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 15:54:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C7F1B9FB46
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 15:55:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8065A382672
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 13:54:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D78747B695E
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 13:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2A72868A6;
-	Thu, 25 Sep 2025 13:54:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0F1285CAB;
+	Thu, 25 Sep 2025 13:54:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JLJWKHAG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z6J/uTPs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27AD285CB4
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 13:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F1CA287253
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 13:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758808453; cv=none; b=SgYEUD2FVuZZ0C0GsEeYnGIIipgVi3keev5ZLu+YNBv4LEoXu1GCj11oFayxXSFwwI7NkadakfXla4qgaUQMUr1HzFNGEnlMdU3u4S1igzOAkIUEzULj/4RVzDKSbOTdEHk5ytryHMxoQ3PE+kNbh25R6bxjWQqNHXWhxOjzwMg=
+	t=1758808462; cv=none; b=nUMNyxuh1P5W2shVocgOLHM6CVNIQqFEVBcVWBnvQbJWw25nqovA1j7CnXMtuT2Etj5qZcqrK5iEiKbnYQGL9Ba4koJ19UWevQAYDuoiGbKTQs2vs/B+8U0wIm8VLIAel4bgnHuLIbNucU3tvyj9WL0VNW0+L2DnnxZ6XBI90vQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758808453; c=relaxed/simple;
-	bh=GEMmqrP/RK6YlUrlIRTRGi0wnwQ4oY7ol2RY5xlPCRg=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=qouRK59dsESTc279XPzi4jE6LKy89WRhBLFtCfUtxRuSsEjM/T6Gyhvzd9oGEN0woG2Ui83jUDevFq3wRJ+hTj7GALRd24leN/ntNwqEnlUwFvVBakLsL05FPHY63TaN2Zal9eHz9iFTDowV9Xcw3WMdsh6nbiPHm7fyADVJre0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JLJWKHAG; arc=none smtp.client-ip=209.85.219.52
+	s=arc-20240116; t=1758808462; c=relaxed/simple;
+	bh=jCTV/tUAugB6kQuG6h16qXAYA9gVjuY3K+nRw8uudBM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=mmXHe+FfJfx5HUpNbWXYBhlkEEegELiLr2kYtj5kOrni//Yapq3SRe0RNSR2MopiGjhO9IaHT3Xo0OgGoaKF1YrRiuFXqOhXmmz5o7uHsxeKV0WgDCFpxgfuZMd8DimrHbKwX2lalJz72vZk5IruP47dx30+YT48bg4Rdya68js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z6J/uTPs; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-7970e8d1cfeso10195746d6.1
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 06:54:10 -0700 (PDT)
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-85780d76b48so103598685a.1
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 06:54:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758808450; x=1759413250; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nN1kM5+gletp/n333+wlIxoZSFpVAQ/wESePzoHRX5k=;
-        b=JLJWKHAGUWUD5n+daBh1yvQGe+dkjXTvaQXgJ1gmVtp4/mSWBBVvDEvDZOsH14YnrZ
-         +4I9IX/aidqSUCt3sibrJFJnr0RwxqLxgzAt4VEEacDZZO4O1Laf+tOX3G4V4cTfBPCw
-         bjIP9BOOzDaNXyOUAKYNmgyM4L0E1MZFIuDEO2bj/sH2avsvDJezLh0N+lPD9a19jzxK
-         yeY5HNqR8L6Yhoy+/Q6rEcpPf+JC9Qdfdr4/64oDMBqyByZAAmlntiaPfXZP5ATtOjbV
-         ojxH2IetDyfVotGuZXPMhb6N6WVjDG3PPc6Pzu2FZVXLnpUdRLsdHuzlUyEPnlmgoLK9
-         pvHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758808450; x=1759413250;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1758808459; x=1759413259; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=nN1kM5+gletp/n333+wlIxoZSFpVAQ/wESePzoHRX5k=;
-        b=j4Fn/BYsnfaOMKNpoZb7EoA/RPEPd6BlfzM/EE0Z6UR3HyOLyW6vNqQSnRZ1v7J3vF
-         KA7XXCk4diueaZ5ZPNy7O4hS8m3EK2QNrZrOyvIThU3KcilejgkQ2ggFvmxdxfQWovzP
-         IH/GBJH8ZUrdJCuxpH7CItrxO23UQEOzF6FQv2ERFCaI5R/9R6aB3dB/MfeQVPPnP+ee
-         OFDu8rDEYyCYlN/cz0zj2iT7jEuMFNAs/qo+Dxj9ns5XZ0/3RhO2ujZ7PQGXvojwSabi
-         zPXpPdxZdrYgjyVfKs/jj21W25UlHynEMTt2XSW+us6Rx7lW8WOnL7jBoiKfas8KiXGs
-         TfNA==
-X-Forwarded-Encrypted: i=1; AJvYcCWeOwdpeNmL1tDVq2a/nqRA3772DKEiPEcYPCBriwtprVz/54cDO+zsks9xIFphQai8bbO/Egs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUozToaV9sZ9ke1qEWL1Wopb6m0RefnCxsbvd8SGVSvpVT4C5z
-	tRGYM2hegxHQDq5Ss+QU7lUF2xJlXkg5HL5PfwuwTCkxrwJFCPeACg4j
-X-Gm-Gg: ASbGnctfh0yXcbTiHVDTxwD63zSxwa4qOjBj31oF1QJh7LeiB4MlAkVSltHTms+9WIU
-	4HFHm6Rq+Dus/ifZaURhTSRn0IQEtvKNBL0oSDlLem/eA+5P8lBzShmurt7KymUzhB0m21tT4k+
-	gxe+mNk36FmVYc4wRifD2Q91F5jytgmb5x5p/cQLm+5zlHetuT5kzck1BmcdT+rRVenKINnqccq
-	6EzKkMo2OLnVVrKfXAnH3sMG8MwhEGASnhtbHGV9oLYWzRb1Typdd+Il/Um9WE7ghcPJM8lL5x1
-	+VfaYppP0f4BsqxsK8bNC8wwKgmW5V6SKNqV/2s8XqCVhqyNt8TRTLhJeuGAk+OtKhVe5vf0Mu7
-	L4Z0Xsko+I5xgWsOc+OBye62tnW3UeHJeY4B5vZdAfiREQng0xHmly2dZao6rNClHGmnUSmkov0
-	InJ+dSr2mDLgorFtlNAUiHJ8SdZ5xPIT/MykFPOw/02pYi10FJASu+07TB0NAyg62Sfr4k
-X-Google-Smtp-Source: AGHT+IG8iotWiF9WZ9QNmLnrLYD4Bm/T3WD/aC7e1ZFkIy8L1i0Vs2M7Ocbk3KWdS/5CartACRQexA==
-X-Received: by 2002:a05:6214:258a:b0:80f:517d:2647 with SMTP id 6a1803df08f44-80f517d27e1mr14445326d6.22.1758808449532;
-        Thu, 25 Sep 2025 06:54:09 -0700 (PDT)
+        bh=NalRugr56a/X75BPbSyIQMh/LBa9oMHO7W+8WbDPYnY=;
+        b=Z6J/uTPsKBAx6HJvmtIfO7ZFGEZlxiRThXTNdmWpI6dnkrWfEZoIBlrMY8XFP9vkXV
+         kzjwUZ2cyShty0w+OGd1mcm/0TBWPX1Vck7YyMRIwlt2uE/SZemGRNTGSoK7wmMT3o6B
+         LRfr8ljEB9QhHA6pE03bg5FmyemcnqeNJbjjQ7Emo6yibervgmQ8hMLtHaa/1Pr31JOW
+         ThqJQ2sWN34kuFIerLiPC27ilZaIOKZNADlF8WZIY2fkcYHgkin4qh1jy62oyvp+DSLm
+         f37Pe+aqxutH6a3OaydVe4TxZ0GTgSzG5Y0kw3MjNzPWkWOWnFbeYGSPOF/L8QRQvhHF
+         K/PA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758808459; x=1759413259;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NalRugr56a/X75BPbSyIQMh/LBa9oMHO7W+8WbDPYnY=;
+        b=wdJEgjnneKsOkdpW/iI6ZapK48Tk28DoEi7SHcN2+PUuosBLeCT/dZnn/zKCb1rdSk
+         /8fquNm6R51cOEwqumvmTwX6ZD3I6CABBsVpar1MP5i2rUwm4B7g83v1tSlx7WA7xbaa
+         HYmKZBEeYXpnHJpK7XWKDG3lemvqOWEBPXgnDHuFSaJMs7PMRTRkcN1F6TV+OABpcdUy
+         tH2np+K2vIM0YsZW4DAxyokjprGx1hr3Tn0ulSEu5x39j4l5zaVCwxd5Dgu2yZW6cYEz
+         FkEy0GPEyLcjuKIhgUpm96vhpbglVRtac3XaxVI4Pyt/MA5FviY9iC/Ox6BkMWzXlynH
+         iHxA==
+X-Forwarded-Encrypted: i=1; AJvYcCWknGxBXg18bGxxYLaHrSdCD5dHhpYwKPWKv5+JpbaTMeONNNETALqT+qx5aGTF3BfF/uqeapY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXA7xPkBUMTQ6NA7pMxyB4ch62vOrmtE+B6Mpt1r3KTW4sTOZ6
+	NNlcL733T/yh7RRgiobPnkq3dpxx/WIgT8NbN3Wmuu2KKkm+LhjRCIB8
+X-Gm-Gg: ASbGncupulOqtkJmB0lu2BLKsxtuc8JbPzKLRpaC/Kw9Iv3oRzbXuvSCQUVUvxeq+Bf
+	IUIPX5AuEOr5/zFOnmp3yLXU+eXp0rnRbHUQPwUtNrZDbRLNinkJF+2R8jdX7igVOjOI5d8toR6
+	LgXdkLgoOz0MM5MEu2KBSP6qXbUlqeiN9zksYo5eSo0Drq/qf9TZmlyolIb2nd5vVl6ahScSsbr
+	9iVAGXi5bkS2RP6gSZneIQoC6iJ2x+cNgHPzG5r28z21UxmnKAP6W2KNpGWCpA7gcQmwiPzp+3n
+	HxG6FuIuB1GTgTUz7W8FDwofWyvFOKyWZ4Rl2n7P+DlwtVsgLzJ1KNZ4wzLkSodLcUbEX+HHqWz
+	nfr59eMA03s3BA5EyOoHDBMXNQzIn8ulMu9kBU2/lTEjEqPuu0Yao7yllPACAPPuq4tM2zIu/wK
+	M8BAmygjKfPPvZmgQK25qYghtY5jTCdIIoRRK/gF2FNw+OhCHq6lyNsnc0NEbyV62gDtmb
+X-Google-Smtp-Source: AGHT+IGDJTlODDEEGMd+XqS6TrdaLhozVUbA41arvcw2luGPWfwQ5X2fWdHexXOWX/V4ddEWfD+pug==
+X-Received: by 2002:a05:6214:500e:b0:784:bd2b:abbf with SMTP id 6a1803df08f44-7fc39460bacmr55347756d6.24.1758808459061;
+        Thu, 25 Sep 2025 06:54:19 -0700 (PDT)
 Received: from 137.1.168.192.in-addr.arpa ([2600:4808:6353:5c00:7c:b286:dba3:5ba8])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-80135968d5esm11536916d6.12.2025.09.25.06.53.59
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-80135968d5esm11536916d6.12.2025.09.25.06.54.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 06:54:08 -0700 (PDT)
+        Thu, 25 Sep 2025 06:54:18 -0700 (PDT)
 From: Tamir Duberstein <tamird@gmail.com>
-Subject: [PATCH v2 00/19] rust: replace `kernel::c_str!` with C-Strings
-Date: Thu, 25 Sep 2025 09:53:48 -0400
-Message-Id: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
+Date: Thu, 25 Sep 2025 09:53:49 -0400
+Subject: [PATCH v2 01/19] drivers: net: replace `kernel::c_str!` with
+ C-Strings
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,12 +86,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAG1J1WgC/32PzU7EMAyEX6XKmSA7SV3aE++B9pAfpxuJtktSK
- tCq707a5cCJi6WxNDPf3EXhnLiIobmLzFsqaZmrUE+N8Fc7jyxTqFooUC10CNIvmaUvaz5Pmsc
- iMVprSasIMYhqvGWO6esMfbs8dOaPz5q9Pp7C2VJDlmlK69BEHclpIqNBMRJH9OR6BG1sp0JsW
- zKB3IsVf5kq4kGkAH9hDqxgXO+oRwU+DhuSONqvqaxL/j4XbnjW/zdmQwkSVGcUsO36nl/Hyab
- 350orLvu+/wD88s8sMgEAAA==
-X-Change-ID: 20250710-core-cstr-cstrings-1faaa632f0fd
+Message-Id: <20250925-core-cstr-cstrings-v2-1-78e0aaace1cd@gmail.com>
+References: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
+In-Reply-To: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
 To: "Rafael J. Wysocki" <rafael@kernel.org>, 
  Viresh Kumar <viresh.kumar@linaro.org>, Miguel Ojeda <ojeda@kernel.org>, 
  Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
@@ -127,95 +126,99 @@ Cc: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
  Tamir Duberstein <tamird@gmail.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openssh-sha256; t=1758808436; l=3853;
+X-Developer-Signature: v=1; a=openssh-sha256; t=1758808436; l=3366;
  i=tamird@gmail.com; h=from:subject:message-id;
- bh=GEMmqrP/RK6YlUrlIRTRGi0wnwQ4oY7ol2RY5xlPCRg=;
+ bh=jCTV/tUAugB6kQuG6h16qXAYA9gVjuY3K+nRw8uudBM=;
  b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
  MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QO/26UCYVrC1IViagcUS26Xk65Ejp4ZjzAzAyQQVar2N9GQH7mgOjszrNtLW6r94x8eZkRa/Pgk
- CZf+Ko+eviwM=
+ QM5FRv8eNJ3CAtJrq8ctlI58A1uhfnem30wXWxndQdEjlI88vgu5PfmeFU3nqX15SZ72W8uXUUc
+ 90i73MD8nTAw=
 X-Developer-Key: i=tamird@gmail.com; a=openssh;
  fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
-This series depends on step 3[0].
+C-String literals were added in Rust 1.77. Replace instances of
+`kernel::c_str!` with C-String literals where possible.
 
-Subsystem maintainers: I would appreciate your `Acked-by`s so that this
-can be taken through Miguel's tree (where the previous series must go).
-
-Link: https://lore.kernel.org/all/20250925-cstr-core-v16-0-5cdcb3470ec2@gmail.com/ [0]
-
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Reviewed-by: Benno Lossin <lossin@kernel.org>
 Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 ---
-Changes in v2:
-- Rebase.
-- Add two patches to address new code.
-- Drop incorrectly applied Acked-by tags from Danilo.
-- Link to v1: https://lore.kernel.org/r/20250710-core-cstr-cstrings-v1-0-027420ea799e@gmail.com
+ drivers/net/phy/ax88796b_rust.rs | 7 +++----
+ drivers/net/phy/qt2025.rs        | 5 ++---
+ 2 files changed, 5 insertions(+), 7 deletions(-)
 
----
-Tamir Duberstein (19):
-      drivers: net: replace `kernel::c_str!` with C-Strings
-      gpu: nova-core: replace `kernel::c_str!` with C-Strings
-      rust: auxiliary: replace `kernel::c_str!` with C-Strings
-      rust: clk: replace `kernel::c_str!` with C-Strings
-      rust: configfs: replace `kernel::c_str!` with C-Strings
-      rust: cpufreq: replace `kernel::c_str!` with C-Strings
-      rust: device: replace `kernel::c_str!` with C-Strings
-      rust: firmware: replace `kernel::c_str!` with C-Strings
-      rust: kunit: replace `kernel::c_str!` with C-Strings
-      rust: macros: replace `kernel::c_str!` with C-Strings
-      rust: miscdevice: replace `kernel::c_str!` with C-Strings
-      rust: net: replace `kernel::c_str!` with C-Strings
-      rust: pci: replace `kernel::c_str!` with C-Strings
-      rust: platform: replace `kernel::c_str!` with C-Strings
-      rust: seq_file: replace `kernel::c_str!` with C-Strings
-      rust: str: replace `kernel::c_str!` with C-Strings
-      rust: sync: replace `kernel::c_str!` with C-Strings
-      rust: io: replace `kernel::c_str!` with C-Strings
-      rust: regulator: replace `kernel::c_str!` with C-Strings
+diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796b_rust.rs
+index bc73ebccc2aa..2d24628a4e58 100644
+--- a/drivers/net/phy/ax88796b_rust.rs
++++ b/drivers/net/phy/ax88796b_rust.rs
+@@ -5,7 +5,6 @@
+ //!
+ //! C version of this driver: [`drivers/net/phy/ax88796b.c`](./ax88796b.c)
+ use kernel::{
+-    c_str,
+     net::phy::{self, reg::C22, DeviceId, Driver},
+     prelude::*,
+     uapi,
+@@ -41,7 +40,7 @@ fn asix_soft_reset(dev: &mut phy::Device) -> Result {
+ #[vtable]
+ impl Driver for PhyAX88772A {
+     const FLAGS: u32 = phy::flags::IS_INTERNAL;
+-    const NAME: &'static CStr = c_str!("Asix Electronics AX88772A");
++    const NAME: &'static CStr = c"Asix Electronics AX88772A";
+     const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_exact_mask(0x003b1861);
+ 
+     // AX88772A is not working properly with some old switches (NETGEAR EN 108TP):
+@@ -105,7 +104,7 @@ fn link_change_notify(dev: &mut phy::Device) {
+ #[vtable]
+ impl Driver for PhyAX88772C {
+     const FLAGS: u32 = phy::flags::IS_INTERNAL;
+-    const NAME: &'static CStr = c_str!("Asix Electronics AX88772C");
++    const NAME: &'static CStr = c"Asix Electronics AX88772C";
+     const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_exact_mask(0x003b1881);
+ 
+     fn suspend(dev: &mut phy::Device) -> Result {
+@@ -125,7 +124,7 @@ fn soft_reset(dev: &mut phy::Device) -> Result {
+ 
+ #[vtable]
+ impl Driver for PhyAX88796B {
+-    const NAME: &'static CStr = c_str!("Asix Electronics AX88796B");
++    const NAME: &'static CStr = c"Asix Electronics AX88796B";
+     const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_model_mask(0x003b1841);
+ 
+     fn soft_reset(dev: &mut phy::Device) -> Result {
+diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+index 0b9400dcb4c1..9ccc75f70219 100644
+--- a/drivers/net/phy/qt2025.rs
++++ b/drivers/net/phy/qt2025.rs
+@@ -9,7 +9,6 @@
+ //!
+ //! The QT2025 PHY integrates an Intel 8051 micro-controller.
+ 
+-use kernel::c_str;
+ use kernel::error::code;
+ use kernel::firmware::Firmware;
+ use kernel::net::phy::{
+@@ -36,7 +35,7 @@
+ 
+ #[vtable]
+ impl Driver for PhyQT2025 {
+-    const NAME: &'static CStr = c_str!("QT2025 10Gpbs SFP+");
++    const NAME: &'static CStr = c"QT2025 10Gpbs SFP+";
+     const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x0043a400);
+ 
+     fn probe(dev: &mut phy::Device) -> Result<()> {
+@@ -69,7 +68,7 @@ fn probe(dev: &mut phy::Device) -> Result<()> {
+         // The micro-controller will start running from the boot ROM.
+         dev.write(C45::new(Mmd::PCS, 0xe854), 0x00c0)?;
+ 
+-        let fw = Firmware::request(c_str!("qt2025-2.0.3.3.fw"), dev.as_ref())?;
++        let fw = Firmware::request(c"qt2025-2.0.3.3.fw", dev.as_ref())?;
+         if fw.data().len() > SZ_16K + SZ_8K {
+             return Err(code::EFBIG);
+         }
 
- drivers/block/rnull.rs                |  2 +-
- drivers/cpufreq/rcpufreq_dt.rs        |  5 ++---
- drivers/gpu/drm/nova/driver.rs        | 10 +++++-----
- drivers/gpu/nova-core/driver.rs       |  6 +++---
- drivers/net/phy/ax88796b_rust.rs      |  7 +++----
- drivers/net/phy/qt2025.rs             |  5 ++---
- rust/kernel/clk.rs                    |  6 ++----
- rust/kernel/configfs.rs               |  9 +++++----
- rust/kernel/cpufreq.rs                |  3 +--
- rust/kernel/device.rs                 |  4 +---
- rust/kernel/device/property.rs        |  6 +++---
- rust/kernel/firmware.rs               |  6 +++---
- rust/kernel/io/mem.rs                 |  7 +++----
- rust/kernel/kunit.rs                  | 11 ++++-------
- rust/kernel/net/phy.rs                |  6 ++----
- rust/kernel/platform.rs               |  6 +++---
- rust/kernel/regulator.rs              |  9 +++------
- rust/kernel/seq_file.rs               |  4 ++--
- rust/kernel/str.rs                    |  5 ++---
- rust/kernel/sync.rs                   |  5 ++---
- rust/kernel/sync/completion.rs        |  2 +-
- rust/kernel/workqueue.rs              |  8 ++++----
- rust/macros/kunit.rs                  | 10 +++++-----
- rust/macros/module.rs                 |  2 +-
- samples/rust/rust_configfs.rs         |  5 ++---
- samples/rust/rust_driver_auxiliary.rs |  4 ++--
- samples/rust/rust_driver_faux.rs      |  4 ++--
- samples/rust/rust_driver_pci.rs       |  4 ++--
- samples/rust/rust_driver_platform.rs  | 30 ++++++++++++++----------------
- samples/rust/rust_misc_device.rs      |  3 +--
- scripts/rustdoc_test_gen.rs           |  4 ++--
- 31 files changed, 88 insertions(+), 110 deletions(-)
----
-base-commit: f3f6b3664302e16ef1c6b91034a72df5564d6b8a
-change-id: 20250710-core-cstr-cstrings-1faaa632f0fd
-prerequisite-change-id: 20250201-cstr-core-d4b9b69120cf:v16
-prerequisite-patch-id: e0ca756f740ab0ce7478bbf6510948ba89529a2f
-prerequisite-patch-id: 6d8dbdf864f79fc0c2820e702a7cb87753649ca0
-prerequisite-patch-id: 7d4d1d036043a85dcbaf0d09ea85768120efe094
-
-Best regards,
---  
-Tamir Duberstein <tamird@gmail.com>
+-- 
+2.51.0
 
 
