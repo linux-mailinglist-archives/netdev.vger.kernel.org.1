@@ -1,114 +1,450 @@
-Return-Path: <netdev+bounces-226365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 006E1B9F92B
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 15:29:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1DC8B9F95B
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 15:33:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AC1F19C0AD4
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 13:29:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC3947A6B5F
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 13:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A33235358;
-	Thu, 25 Sep 2025 13:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4A425BF14;
+	Thu, 25 Sep 2025 13:31:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KHhaud+s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SnpZtK17"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998412417D4
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 13:28:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67691255240
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 13:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758806929; cv=none; b=eb/+vY0B5REBg8QeIAgOYuB+IASLpIHZIt35I70tuudPhqtJBvtcngd8fv3aTLSQTMrQ+oA+pGITDbNHAEMoS/zXZ3kw9iIWUDCC7AlDmhpJ1A2eckPJWJ5MDg0N1fcu9ltqG4ZGPK5bj39JqErt3XDKetMUv8zqTlp5ryMEwNI=
+	t=1758807084; cv=none; b=eoal2OC6ZIJYA1KH5qlu57azoB2bM27zjev8K1p/pdXPW2+mtqbYUC+Bj3CxrSDeSrIyFNIsHq2tF/sbDEP6jaGy5VEl+7BfhLROuK7kFaHTnU5Z/p+xPhpf+WLU7tTvLky0/UdwW70yJ+mls8Esbjo8Wm9+bAYunBQ9e9mmKQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758806929; c=relaxed/simple;
-	bh=1FiNIcneYN0lx2HvUgcqUBdFJAhxJjJ2x/onBI+Yrs8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LUuGcOGv7GM2EThvAv+btmi/ghWWfMzQy+OfUQhVIAnovUfCOXoTerwI4ZjPpP524eKYomiJRA1HaqIttnrGuSqbBQD1tfmIHq1zCJ1gI32UPN2hbvVPMpQrPco0jIMzCG+nj3rXhstDrALR/UsHLrzjtKbg81A2Vr5F0WNG4rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KHhaud+s; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3f0ae439b56so674334f8f.3
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 06:28:47 -0700 (PDT)
+	s=arc-20240116; t=1758807084; c=relaxed/simple;
+	bh=nFiN2U30gVPLljWDJIzzdHUgnqj++SjZcucgoCoiVLw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VpKDXwHrnnsJbDFB9xr04j//66DfvTFuXmqYn3/fdhFbCj5tsltlZ0v8znPYI7l39Y+im80nepezA4kWRuZt0tSmK84LMUE8cmBVaWAk58VhPZQhC0d5w4Lieq6IQkvys2yoqyboMhDitytR7TvLmhXXOo9ayIlYnnbBq9CqEU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SnpZtK17; arc=none smtp.client-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b5241e51764so924828a12.1
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 06:31:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1758806926; x=1759411726; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wp58/Fg9Zw3xoKwG1DXjRBI51T+T1GKwsDLk64qZArA=;
-        b=KHhaud+sKfU9GmJ7mcrVLGKUOYK06gbcMRTOgwvCbMmQY6zBc8tsg5EBWu9tvCFTOv
-         xkEcmWNS/FsRnqu9zm3Ev0huYQZja+d8dI44wgOkiY4456V75zBwgJiTfkMnKmAJxssl
-         RpZnaGEkcY/EIYWC0neFYTEClurx9W3CR3ap1PmZDflZ5muMGvDXZWs0kuET+SqKybRR
-         Q/61fU5FBOAngp4U4nQGtE+7Ac+a7HSv9in9LKdTvlUVYgHQRNyr/ZiJqEjuxHfGatsp
-         gDrQ+ZUzgFGNnAhl58hMrLGbgn4TXFxMd/gr1rErJ8FHgdkUS6VmiyEuyTFqXgGaQriH
-         aaVg==
+        d=gmail.com; s=20230601; t=1758807082; x=1759411882; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NWYJEU94U2Dg118hCuoxD/7fhyGK/q/mT362d28LjB8=;
+        b=SnpZtK17/smBj+j1IE8eu/+MqsSkTkUPynyQc2fs1N+fol5fUZZ2ShxBo2A2GJZcWm
+         LgoHCq2wsJNeE5g2OsMcaTWQXu+VVO4ZpQRq4pk+mdnj9aqlkHSuBja3zzgBs9Iiath1
+         F8kwpFl+G8JyK8itWC4xHLMh9R5skdqVsjC33srVJY3RT85HAStrhnm4yVAhgjFDcgXT
+         bT3PyJIIl/O1/Qptt/nfrQ+D4W9NLR0Pm9Z/+TvAG4zu4kxrnkYSGCQJDldrXYnSafvj
+         MQPnjK37bs5UfsNZqPihSL9+5y1KGea66XMiwdGVyOcdzaZEkUi6FmQo25Ukf3Wl0FCe
+         mQGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758806926; x=1759411726;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wp58/Fg9Zw3xoKwG1DXjRBI51T+T1GKwsDLk64qZArA=;
-        b=VOCTXAr3H/bS57ptCKbAeRTDWmjbXUBzOwc33EOzTcLIH23tRELHpyz/to+TcMyZ7g
-         N2WWASy72Om+ogXaDXKhcr3TXKNwHfTlwXpdEf089uhpZoIIvZxVeh/IX0R8lPxEOi6p
-         TIhfY1r1BsOJ7Yo2VGPG1t+qbY/SATMk2IEUnV77kgKRTq4jqxQSE0ouveaKnZyso99p
-         aBxeSJ0QRickzKM46nKk9G+/1VOj/IM0zRkZnaKSdzHCkTTr3R/z4KCMitrGX6qFVTGj
-         vpsUxGh94Pfwh9QHxEVu6fov90d3OAs0mFS55wYUV1VVAmpbC/tarqI7BF6kkv1y8q32
-         hfug==
-X-Forwarded-Encrypted: i=1; AJvYcCVmCWWDJpgoCabgUEdi96atodovtxJ8w/z0jqe1Td37uZDIxkfSLCdNSK+KEbflAg3CVw5fuco=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3VlyFbxnW0pwyl0pWZSc2r7Gam7f+WgEBoEBFHHz9iCSYw44Q
-	xQM+5I+8guU+1NgK5AQo+DYX/K+9ATYbW9t1+vc9m/voNTpZZdhAB3DvnWP+GM1eXS4=
-X-Gm-Gg: ASbGncu3YuhgyhWKmRF3h64VgODeFZJDU2pY40ynXmMuF54KB+LANKjJslPKiyEOHi4
-	CwsiJwMFhRDPMUS/zHFGnhRCKeP93piAXrLz5zOgZ4C6oO1anPXiRYx9dH/i+cBL3K7YQsfe+oJ
-	tb49uhdyEM6wXcLQnIxVsaFQI06sjzQgQ4EaJBHEzmJJn/OtzBFq3NovTMUqf0d/A4p0su3NQVC
-	h8p/A7B3FcfIYxz3L1ulgOHX6p8ifv8x4u0kq1DihXQ+ynqPt8ZkqqEjLT2qZkPuZlzAUR3Fwrx
-	4Hclr/oTh/PRzPsttNEwjDt64/MJCRAz8H+xewMvKolUzxf5DlHWEa5ETudjvcSODlsxgWyNBSW
-	oiQGU9hFQFcsOINS1R7V5sma4tYZX
-X-Google-Smtp-Source: AGHT+IHEfXijaL+23iCR11cBYBG6j0gp/yAlAN7xoxHtuYkzjN8fDbBiJ7bNzYz3ne5Aj8wBn5ePpA==
-X-Received: by 2002:a05:6000:2c0c:b0:3ee:1294:4780 with SMTP id ffacd0b85a97d-40e4a05bf15mr2460323f8f.30.1758806925981;
-        Thu, 25 Sep 2025 06:28:45 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-40fc7e2c6b3sm3258932f8f.54.2025.09.25.06.28.45
+        d=1e100.net; s=20230601; t=1758807082; x=1759411882;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NWYJEU94U2Dg118hCuoxD/7fhyGK/q/mT362d28LjB8=;
+        b=gRDqwIL4QZn2NufaeIN0ZfYct7aRuF2AlBQ7Wxv0rETnrfTEjV5WZGMvwrJRzkKmgC
+         zyK5ZRj8t8h4Gpo74gKsTPRzor7jV8ss5f0HFmITcguup6Q/sWHi43q2htCC7m/l4nae
+         aA/MbDruneC59tWryEsnM5aexsFiyzbJlyRdvZHdKVuhhBsm0KhLcFhoJL1GGu/jg0O3
+         VrDRdSKwXhSJmPaJe8ISlFk86L9jfGOF2H8VcC2TOB3bYmJ61CS8wS2hNWjeL2R7vxud
+         eqZf2UmcFo+lgAnl/14XkJmcKV0FEj6NycuL6WWDXRKxXRO0yOixuGaYQynOtTHIi+l2
+         /2YA==
+X-Gm-Message-State: AOJu0Yx0rRRnudL3sblo/XC1VhzlsNEt6YSzZa0aFif+qw0/PL9zdbWG
+	Yco+M62HSgtb1P5tsJVw8QgRAnPu4s4eQvXLrJNNKf1xWj9GatH5rAFp
+X-Gm-Gg: ASbGnctctj6MavEaUI6JgDifFZeg9qHvM8cZ6CsELQAsY0+eKig/jm8IWwDoSPrnplB
+	xnEKgC6bd/iB0yFz0sLFWzaPb9d1ljBlPtahHCjTr/d/DxTeGPKofGV57Jifd7VLg0VgP2pccIp
+	N2jQMGYj7lMn77fzfVwft+IB+Wp+KRGdYVWtAFrfMw7jaiOmlHHBoxYT34tfd2ewOn6805xYyEU
+	XCRpi/tNVUtWcXIj0zbBf4GgAjvf//7c8Q5rf8Yy3IjyKW4S0aDCYqg1d48favTA9sECTuDJXvo
+	0UvNutNoJwLmND1pM2gp3NR124NYXzQBvikfkKN1F3viasj/0O25vffFH2q4Ph8yYRHo7XE81Go
+	R2Op3gDg99cjbqpHEG5gr+2rlwaNgZ2ut2/NBPRU=
+X-Google-Smtp-Source: AGHT+IEtl1R4GGtXwzv/auMtQA6O0GCzISjAhkZhJ8Lr2wgaROiHi3q/YOQNr2EgxUd44IODkvm8pw==
+X-Received: by 2002:a17:903:b83:b0:265:47:a7bd with SMTP id d9443c01a7336-27ed49b802bmr39325835ad.4.1758807081417;
+        Thu, 25 Sep 2025 06:31:21 -0700 (PDT)
+Received: from cortexauth ([2401:4900:889b:7045:558:5033:2b7a:fd84])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-27ed66d37casm25631725ad.8.2025.09.25.06.31.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 06:28:45 -0700 (PDT)
-Date: Thu, 25 Sep 2025 16:28:42 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Ivan Vecera <ivecera@redhat.com>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net-next] dpll: zl3073x: Fix double free in
- zl3073x_devlink_flash_update()
-Message-ID: <aNVDijGWI3ZO2aOw@stanley.mountain>
-References: <aNKAvXzRqk_27k7E@stanley.mountain>
- <20250924170057.GQ836419@horms.kernel.org>
+        Thu, 25 Sep 2025 06:31:20 -0700 (PDT)
+From: Deepak Sharma <deepak.sharma.472935@gmail.com>
+To: krzk@kernel.org,
+	vadim.fedorenko@linux.dev,
+	linville@tuxdriver.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	juraj@sarinay.com,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	stable@vger.kernel.org,
+	linux-kernel-mentees@lists.linux.dev,
+	david.hunter.linux@gmail.com,
+	skhan@linuxfoundation.org,
+	Deepak Sharma <deepak.sharma.472935@gmail.com>,
+	syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
+Subject: [PATCH net v4] net: nfc: nci: Add parameter validation for packet data
+Date: Thu, 25 Sep 2025 18:58:46 +0530
+Message-ID: <20250925132846.213425-1-deepak.sharma.472935@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250924170057.GQ836419@horms.kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 24, 2025 at 06:00:57PM +0100, Simon Horman wrote:
-> On Tue, Sep 23, 2025 at 02:13:01PM +0300, Dan Carpenter wrote:
-> > The zl3073x_devlink_flash_prepare() function calls zl3073x_fw_free()
-> > and the caller also calls zl3073x_devlink_flash_update() so it leads
-> 
-> s/zl3073x_devlink_flash_update/zl3073x_fw_free/ ?
-> 
+Syzbot reported an uninitialized value bug in nci_init_req, which was 
+introduced by commit 5aca7966d2a7 ("Merge tag 
+'perf-tools-fixes-for-v6.17-2025-09-16' of 
+git://git.kernel.org/pub/scm/linux/kernel/git/perf/perf-tools").
 
-Sigh.  Let me resend.
+This bug arises due to very limited and poor input validation
+that was done at nic_valid_size(). This validation only
+validates the skb->len (directly reflects size provided at the
+userspace interface) with the length provided in the buffer
+itself (interpreted as NCI_HEADER). This leads to the processing
+of memory content at the address assuming the correct layout
+per what opcode requires there. This leads to the accesses to
+buffer of `skb_buff->data` which is not assigned anything yet.
 
-regards,
-dan carpenter
+Following the same silent drop of packets of invalid sizes at
+`nic_valid_size()`, add validation of the data in the respective
+handlers and return error values in case of failure. Release
+the skb if error values are returned from handlers in 
+`nci_nft_packet` and effectively do a silent drop
+
+Possible TODO: because we silently drop the packets, the
+call to `nci_request` will be waiting for completion of request
+and will face timeouts. These timeouts can get excessively logged
+in the dmesg. A proper handling of them may require to export
+`nci_request_cancel` (or propagate error handling from the
+nft packets handlers).
+
+Reported-by: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=740e04c2a93467a0f8c8
+Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation")
+Tested-by: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
+Cc: stable@vger.kernel.org
+Signed-off-by: Deepak Sharma <deepak.sharma.472935@gmail.com>
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+---
+v4:
+ - Remove changes unrelated to the fix
+
+v3:
+ - Move the checks inside the packet data handlers
+ - Improvements to the commit message
+
+v2:
+ - Fix the release of skb in case of the early return
+
+v1:
+ - Add checks in `nci_ntf_packet` on the skb->len and do early return
+   on failure
+
+ net/nfc/nci/ntf.c | 139 +++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 101 insertions(+), 38 deletions(-)
+
+diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
+index a818eff27e6b..c0edf8242e22 100644
+--- a/net/nfc/nci/ntf.c
++++ b/net/nfc/nci/ntf.c
+@@ -27,11 +27,16 @@
+ 
+ /* Handle NCI Notification packets */
+ 
+-static void nci_core_reset_ntf_packet(struct nci_dev *ndev,
+-				      const struct sk_buff *skb)
++static int nci_core_reset_ntf_packet(struct nci_dev *ndev,
++				     const struct sk_buff *skb)
+ {
+ 	/* Handle NCI 2.x core reset notification */
+-	const struct nci_core_reset_ntf *ntf = (void *)skb->data;
++	const struct nci_core_reset_ntf *ntf;
++
++	if (skb->len < sizeof(struct nci_core_reset_ntf))
++		return -EINVAL;
++
++	ntf = (struct nci_core_reset_ntf *)skb->data;
+ 
+ 	ndev->nci_ver = ntf->nci_ver;
+ 	pr_debug("nci_ver 0x%x, config_status 0x%x\n",
+@@ -42,15 +47,22 @@ static void nci_core_reset_ntf_packet(struct nci_dev *ndev,
+ 		__le32_to_cpu(ntf->manufact_specific_info);
+ 
+ 	nci_req_complete(ndev, NCI_STATUS_OK);
++
++	return 0;
+ }
+ 
+-static void nci_core_conn_credits_ntf_packet(struct nci_dev *ndev,
+-					     struct sk_buff *skb)
++static int nci_core_conn_credits_ntf_packet(struct nci_dev *ndev,
++					    struct sk_buff *skb)
+ {
+-	struct nci_core_conn_credit_ntf *ntf = (void *) skb->data;
++	struct nci_core_conn_credit_ntf *ntf;
+ 	struct nci_conn_info *conn_info;
+ 	int i;
+ 
++	if (skb->len < sizeof(struct nci_core_conn_credit_ntf))
++		return -EINVAL;
++
++	ntf = (struct nci_core_conn_credit_ntf *)skb->data;
++
+ 	pr_debug("num_entries %d\n", ntf->num_entries);
+ 
+ 	if (ntf->num_entries > NCI_MAX_NUM_CONN)
+@@ -68,7 +80,7 @@ static void nci_core_conn_credits_ntf_packet(struct nci_dev *ndev,
+ 		conn_info = nci_get_conn_info_by_conn_id(ndev,
+ 							 ntf->conn_entries[i].conn_id);
+ 		if (!conn_info)
+-			return;
++			return 0;
+ 
+ 		atomic_add(ntf->conn_entries[i].credits,
+ 			   &conn_info->credits_cnt);
+@@ -77,12 +89,19 @@ static void nci_core_conn_credits_ntf_packet(struct nci_dev *ndev,
+ 	/* trigger the next tx */
+ 	if (!skb_queue_empty(&ndev->tx_q))
+ 		queue_work(ndev->tx_wq, &ndev->tx_work);
++
++	return 0;
+ }
+ 
+-static void nci_core_generic_error_ntf_packet(struct nci_dev *ndev,
+-					      const struct sk_buff *skb)
++static int nci_core_generic_error_ntf_packet(struct nci_dev *ndev,
++					     const struct sk_buff *skb)
+ {
+-	__u8 status = skb->data[0];
++	__u8 status;
++
++	if (skb->len < 1)
++		return -EINVAL;
++
++	status = skb->data[0];
+ 
+ 	pr_debug("status 0x%x\n", status);
+ 
+@@ -91,12 +110,19 @@ static void nci_core_generic_error_ntf_packet(struct nci_dev *ndev,
+ 		   (the state remains the same) */
+ 		nci_req_complete(ndev, status);
+ 	}
++
++	return 0;
+ }
+ 
+-static void nci_core_conn_intf_error_ntf_packet(struct nci_dev *ndev,
+-						struct sk_buff *skb)
++static int nci_core_conn_intf_error_ntf_packet(struct nci_dev *ndev,
++					       struct sk_buff *skb)
+ {
+-	struct nci_core_intf_error_ntf *ntf = (void *) skb->data;
++	struct nci_core_intf_error_ntf *ntf;
++
++	if (skb->len < sizeof(struct nci_core_intf_error_ntf))
++		return -EINVAL;
++
++	ntf = (struct nci_core_intf_error_ntf *)skb->data;
+ 
+ 	ntf->conn_id = nci_conn_id(&ntf->conn_id);
+ 
+@@ -105,6 +131,8 @@ static void nci_core_conn_intf_error_ntf_packet(struct nci_dev *ndev,
+ 	/* complete the data exchange transaction, if exists */
+ 	if (test_bit(NCI_DATA_EXCHANGE, &ndev->flags))
+ 		nci_data_exchange_complete(ndev, NULL, ntf->conn_id, -EIO);
++
++	return 0;
+ }
+ 
+ static const __u8 *
+@@ -329,13 +357,18 @@ void nci_clear_target_list(struct nci_dev *ndev)
+ 	ndev->n_targets = 0;
+ }
+ 
+-static void nci_rf_discover_ntf_packet(struct nci_dev *ndev,
+-				       const struct sk_buff *skb)
++static int nci_rf_discover_ntf_packet(struct nci_dev *ndev,
++				      const struct sk_buff *skb)
+ {
+ 	struct nci_rf_discover_ntf ntf;
+-	const __u8 *data = skb->data;
++	const __u8 *data;
+ 	bool add_target = true;
+ 
++	if (skb->len < sizeof(struct nci_rf_discover_ntf))
++		return -EINVAL;
++
++	data = skb->data;
++
+ 	ntf.rf_discovery_id = *data++;
+ 	ntf.rf_protocol = *data++;
+ 	ntf.rf_tech_and_mode = *data++;
+@@ -390,6 +423,8 @@ static void nci_rf_discover_ntf_packet(struct nci_dev *ndev,
+ 		nfc_targets_found(ndev->nfc_dev, ndev->targets,
+ 				  ndev->n_targets);
+ 	}
++
++	return 0;
+ }
+ 
+ static int nci_extract_activation_params_iso_dep(struct nci_dev *ndev,
+@@ -553,14 +588,19 @@ static int nci_store_ats_nfc_iso_dep(struct nci_dev *ndev,
+ 	return NCI_STATUS_OK;
+ }
+ 
+-static void nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
+-					     const struct sk_buff *skb)
++static int nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
++					    const struct sk_buff *skb)
+ {
+ 	struct nci_conn_info *conn_info;
+ 	struct nci_rf_intf_activated_ntf ntf;
+-	const __u8 *data = skb->data;
++	const __u8 *data;
+ 	int err = NCI_STATUS_OK;
+ 
++	if (skb->len < sizeof(struct nci_rf_intf_activated_ntf))
++		return -EINVAL;
++
++	data = skb->data;
++
+ 	ntf.rf_discovery_id = *data++;
+ 	ntf.rf_interface = *data++;
+ 	ntf.rf_protocol = *data++;
+@@ -667,7 +707,7 @@ static void nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
+ 	if (err == NCI_STATUS_OK) {
+ 		conn_info = ndev->rf_conn_info;
+ 		if (!conn_info)
+-			return;
++			return 0;
+ 
+ 		conn_info->max_pkt_payload_len = ntf.max_data_pkt_payload_size;
+ 		conn_info->initial_num_credits = ntf.initial_num_credits;
+@@ -721,19 +761,26 @@ static void nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
+ 				pr_err("error when signaling tm activation\n");
+ 		}
+ 	}
++
++	return 0;
+ }
+ 
+-static void nci_rf_deactivate_ntf_packet(struct nci_dev *ndev,
+-					 const struct sk_buff *skb)
++static int nci_rf_deactivate_ntf_packet(struct nci_dev *ndev,
++					const struct sk_buff *skb)
+ {
+ 	const struct nci_conn_info *conn_info;
+-	const struct nci_rf_deactivate_ntf *ntf = (void *)skb->data;
++	const struct nci_rf_deactivate_ntf *ntf;
++
++	if (skb->len < sizeof(struct nci_rf_deactivate_ntf))
++		return -EINVAL;
++
++	ntf = (struct nci_rf_deactivate_ntf *)skb->data;
+ 
+ 	pr_debug("entry, type 0x%x, reason 0x%x\n", ntf->type, ntf->reason);
+ 
+ 	conn_info = ndev->rf_conn_info;
+ 	if (!conn_info)
+-		return;
++		return 0;
+ 
+ 	/* drop tx data queue */
+ 	skb_queue_purge(&ndev->tx_q);
+@@ -765,14 +812,20 @@ static void nci_rf_deactivate_ntf_packet(struct nci_dev *ndev,
+ 	}
+ 
+ 	nci_req_complete(ndev, NCI_STATUS_OK);
++
++	return 0;
+ }
+ 
+-static void nci_nfcee_discover_ntf_packet(struct nci_dev *ndev,
+-					  const struct sk_buff *skb)
++static int nci_nfcee_discover_ntf_packet(struct nci_dev *ndev,
++					 const struct sk_buff *skb)
+ {
+ 	u8 status = NCI_STATUS_OK;
+-	const struct nci_nfcee_discover_ntf *nfcee_ntf =
+-				(struct nci_nfcee_discover_ntf *)skb->data;
++	const struct nci_nfcee_discover_ntf *nfcee_ntf;
++
++	if (skb->len < sizeof(struct nci_nfcee_discover_ntf))
++		return -EINVAL;
++
++	nfcee_ntf = (struct nci_nfcee_discover_ntf *)skb->data;
+ 
+ 	/* NFCForum NCI 9.2.1 HCI Network Specific Handling
+ 	 * If the NFCC supports the HCI Network, it SHALL return one,
+@@ -783,6 +836,8 @@ static void nci_nfcee_discover_ntf_packet(struct nci_dev *ndev,
+ 	ndev->cur_params.id = nfcee_ntf->nfcee_id;
+ 
+ 	nci_req_complete(ndev, status);
++
++	return 0;
+ }
+ 
+ void nci_ntf_packet(struct nci_dev *ndev, struct sk_buff *skb)
+@@ -809,35 +864,43 @@ void nci_ntf_packet(struct nci_dev *ndev, struct sk_buff *skb)
+ 
+ 	switch (ntf_opcode) {
+ 	case NCI_OP_CORE_RESET_NTF:
+-		nci_core_reset_ntf_packet(ndev, skb);
++		if (nci_core_reset_ntf_packet(ndev, skb))
++			goto end;
+ 		break;
+ 
+ 	case NCI_OP_CORE_CONN_CREDITS_NTF:
+-		nci_core_conn_credits_ntf_packet(ndev, skb);
++		if (nci_core_conn_credits_ntf_packet(ndev, skb))
++			goto end;
+ 		break;
+ 
+ 	case NCI_OP_CORE_GENERIC_ERROR_NTF:
+-		nci_core_generic_error_ntf_packet(ndev, skb);
++		if (nci_core_generic_error_ntf_packet(ndev, skb))
++			goto end;
+ 		break;
+ 
+ 	case NCI_OP_CORE_INTF_ERROR_NTF:
+-		nci_core_conn_intf_error_ntf_packet(ndev, skb);
++		if (nci_core_conn_intf_error_ntf_packet(ndev, skb))
++			goto end;
+ 		break;
+ 
+ 	case NCI_OP_RF_DISCOVER_NTF:
+-		nci_rf_discover_ntf_packet(ndev, skb);
++		if (nci_rf_discover_ntf_packet(ndev, skb))
++			goto end;
+ 		break;
+ 
+ 	case NCI_OP_RF_INTF_ACTIVATED_NTF:
+-		nci_rf_intf_activated_ntf_packet(ndev, skb);
++		if (nci_rf_intf_activated_ntf_packet(ndev, skb))
++			goto end;
+ 		break;
+ 
+ 	case NCI_OP_RF_DEACTIVATE_NTF:
+-		nci_rf_deactivate_ntf_packet(ndev, skb);
++		if (nci_rf_deactivate_ntf_packet(ndev, skb))
++			goto end;
+ 		break;
+ 
+ 	case NCI_OP_NFCEE_DISCOVER_NTF:
+-		nci_nfcee_discover_ntf_packet(ndev, skb);
++		if (nci_nfcee_discover_ntf_packet(ndev, skb))
++			goto end;
+ 		break;
+ 
+ 	case NCI_OP_RF_NFCEE_ACTION_NTF:
+-- 
+2.51.0
 
 
