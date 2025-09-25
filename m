@@ -1,164 +1,201 @@
-Return-Path: <netdev+bounces-226292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81317B9EFF9
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 13:49:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF54CB9F06E
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 13:55:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C9AA4E2B84
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 11:49:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB8DB1BC81EE
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 11:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91AB720CCCA;
-	Thu, 25 Sep 2025 11:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC522FFDF3;
+	Thu, 25 Sep 2025 11:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PPMuqA5X"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="t4AQXLXt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010014.outbound.protection.outlook.com [52.101.193.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9DFA25B67D
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 11:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758800991; cv=none; b=rHhfP/BVCb/sLJD9QNqeENqurglZViq/ssrF5tA1o5SxZ/Q5dZAlXt+xBM5+n2Unkm5/Tb/nlvme+yyX9dAbQy4yXHDI9lXz5wsi9rD0p+qz+0q9Xyt5NcpxtTan1NKeYgR4lsVpNTgKO25JX1xz+KbE73QU9KZkWwkEsNDufdI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758800991; c=relaxed/simple;
-	bh=t0e0Wy9HiD96QW6i2mmx1lwB0XsE2scmYpVQv+XaRu8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b/5fL576zBM/kh8yZYqp1UV491siX1BshmY5QHPQrUQ7brW+v6tIfi0RbXLZpf5Sfu/MG2YXuLFjvy57789y2pYNISm/UTbZfO36Fu7BvxeEx5UpPcRYoxv/n/kn+SMvyMiStn+GIDHGYdyHhLXI388cGaE8XyPH7uAreU6kZjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PPMuqA5X; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758800988;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+KVPxjCMCSupXy09kWALvkdL9X3jhSe67fQlVKrtFiE=;
-	b=PPMuqA5X0Wcw1QxpvWtAcHBrNCag0aCKOOb7iWC5QYzMrUX4KKNPLRJuNlTg4YqLorIqBu
-	wZP4YI6FB5ckYAbn/gr+CQcTKZhH/JkZo10ElUNDDI2bPgkOLMgPlAEagYUmBzvy/SwItF
-	Gw5138gYA4Jz38jdGrYxrj14/tSqe1c=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-138-ejHZcBBgNjmGvWouO9MQ1w-1; Thu, 25 Sep 2025 07:49:46 -0400
-X-MC-Unique: ejHZcBBgNjmGvWouO9MQ1w-1
-X-Mimecast-MFC-AGG-ID: ejHZcBBgNjmGvWouO9MQ1w_1758800985
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45f2b9b99f0so5229035e9.1
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 04:49:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758800985; x=1759405785;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+KVPxjCMCSupXy09kWALvkdL9X3jhSe67fQlVKrtFiE=;
-        b=Dem6AuUPC83lDjbFCA+N7QJpDL1j4KcgY2LfhEyJy5PtefBqGJZk5TIalTnbi+8SUh
-         VoL3+QRfuboTkfw3gYzLKVvaVwFSv3pAcMHNvtocSmetZrkf7uqt2MVzF1tipxPOq6L5
-         KwWCgihWRss41AkkyK2eqojp5qXGh4LYParPnnD4tMAQXcU86pfabYI0ucLHNPAZPrvM
-         +3o653/LAb2hUY8bqW7MFVAgtU4Q2i8gQsmFaLldPHnLrlXCMEr8DKNnFjirCIkMAzCV
-         JNVk7wz6pShbgKhd8mObVWdC48mRfr3GccgoVx992aZjGED+QR6gUU8lnivQrV+WHnOe
-         DZ5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUMMPrtNGzurxZWpRN7Gs4ghDXRYvl0nev57f41c88mOa74R4FPInkVxURwNiajsWZTUPXICDA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZDfildBINfndkAR7lslxkMogmfUQubYaJzSqMyiwBTk50OLD7
-	PArO+XIwnwtFpt01EcYdPr/WJeK9Ntm+s5o9WWdtV+9xEH2aoZN7f8QsMVhkWorGx6g6nSLc5X1
-	pOBQFMZXa6Ke7A6wk7TVAaxquNk8IMGb9cJJpqa02YcxebfBYoZSwPPDE/Q==
-X-Gm-Gg: ASbGncutVpagDa0YXhbFfetHBg82ZwMfXYWWDnXteZ9f/19YNZIN5VG8jR3B7uxbzfH
-	/I68gC7fbnMvNxCrblXHOYLf6wQas7bcmD4Rtpg4m/FscfnRa5LagMLSF5r3g3HRH9i7uY9BKSR
-	S/4ZKFzG2wUhJfeLTxl0GNL3N67lY2LfSMb5pz02b85RsMyeqCtwU+mXfv8Majw4vwZx+P9QqyC
-	w43afr+pdEwd7AVEfHixFCyTDIcbRTm3y9z4cuS65+S27EFVGWJgBGKOji+OxKtm0STWaDx6IWY
-	aFhtHfJem78987Cr2f0KOqKPwGt7Z2BcqA==
-X-Received: by 2002:a05:600c:4ecc:b0:46e:33ed:bca4 with SMTP id 5b1f17b1804b1-46e33edbe6fmr21722965e9.15.1758800984854;
-        Thu, 25 Sep 2025 04:49:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEnkMk4Mj0ELsCsrAjcuQkpsgbxny3/tEAQCMvsxl7J67IGzgbX3TMTdlCtiY5/jDU50JELDA==
-X-Received: by 2002:a05:600c:4ecc:b0:46e:33ed:bca4 with SMTP id 5b1f17b1804b1-46e33edbe6fmr21722805e9.15.1758800984415;
-        Thu, 25 Sep 2025 04:49:44 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1538:2200:56d4:5975:4ce3:246f])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb74e46bcsm2758466f8f.8.2025.09.25.04.49.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 04:49:43 -0700 (PDT)
-Date: Thu, 25 Sep 2025 07:49:40 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Parav Pandit <parav@nvidia.com>
-Cc: Dan Jurgens <danielj@nvidia.com>, Jason Wang <jasowang@redhat.com>,
-	netdev@vger.kernel.org, alex.williamson@redhat.com,
-	pabeni@redhat.com, virtualization@lists.linux.dev,
-	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, shameerali.kolothum.thodi@huawei.com,
-	jgg@ziepe.ca, kevin.tian@intel.com, kuba@kernel.org,
-	andrew+netdev@lunn.ch, edumazet@google.com,
-	Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH net-next v3 01/11] virtio-pci: Expose generic device
- capability operations
-Message-ID: <20250925074814-mutt-send-email-mst@kernel.org>
-References: <20250923141920.283862-1-danielj@nvidia.com>
- <20250923141920.283862-2-danielj@nvidia.com>
- <CACGkMEtkqhvsP1-b8zBnrFZwnK3LvEO4GBN52rxzdbOXJ3J7Qw@mail.gmail.com>
- <20250924021637-mutt-send-email-mst@kernel.org>
- <16019785-ca9e-4d63-8a0f-c2f3fdcd32b8@nvidia.com>
- <20250925021351-mutt-send-email-mst@kernel.org>
- <4fa7bf85-e935-45aa-bb2f-f37926397c31@nvidia.com>
- <20250925062741-mutt-send-email-mst@kernel.org>
- <92ca5ed1-629d-4dc3-85fc-f1c6299a42ba@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C8F2FC86F;
+	Thu, 25 Sep 2025 11:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758801279; cv=fail; b=ZJjwYe82enTPJr/Phoz7eRHBtizOfz/Ns2eWrcMfmfgPwMt8HxatH1q1idnepeevncZ+GrErczhjEaPUgua7V6wDwjc6exTRNp2sUAnqTrTNLPN7XXOLwd831wCaAXDAZu2T4tP+zsod2/fPeaVpNT22LYa3aES/RMyN4lXx/Ps=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758801279; c=relaxed/simple;
+	bh=dlph6o31dFLDvPXyrvgxT+7rjsfgEUpM1z+QbnEqxDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=npMpMha8wTom3jDu/1rrxmfqOvh8LlyLZnE4ms6myhpFLqsvGjZg1kiRsEejhV83LW9b6ShRXeJMdV7tJXolgLPs2taJGTJueJwsFS/XxTAfGJNxTDYFzIuMVO4tr1AGz8p0wSe4ihyJ9LqlqYrDDmvp+yHJoxmf7/J+OJaOdQ0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=t4AQXLXt; arc=fail smtp.client-ip=52.101.193.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cbs0hnzel0q9YXikV1/28HxI9z4iakLwUfQRh41ERGi3PeKriFObcUKnYANk6FzD1WZIgupVS64O8zWfs9mLic6K5lIBmj8tfGUQiInWsF4Aojp5f0p9SQXSKyI7m9J/+axsv0gaR8HkAMeJfmnhodgwUrPffjEga6mh87l2fwuSuNRMvhU96w4j4kjfaT0laM/LBUdyuQ2qgr+hUpWr4ab59FLCl6mUB3+KwoJYbFBiEBa8sw/oR4625us6humRK2pVKFwavZlsnJgy6xnmZ1cJ6Ga10IwyYevx4mu2SUvNLcHoJlGvpmFtLg6r6bEW1+8rkvx2X2BHvzJiy7fa7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6CKBTlbBHaVU7zmfD+ehydjL7VNeIZ+gKA7/F9VJBEI=;
+ b=LRKfkkhdVDK/BGQLEPrQd1L4/y/V/zAGGL1T9C0wXwRTtC/uFfCG+GRZmwfgMDeAUI17WRdANXEyuq5mlT0vNpq6+Q/SSSLvVwjHRWtDTL47dXWRa8WoFkG+e19xFp/jamiW+jItLT9E3FLT3lRuH9Xw9zr52f+AX3p8iTjpKKC2w2Uso1hA1RW8cwSWtfJBlCcUqq+j7dsf25RDRaebTspSvv0SNDDL/xuxwDMYv9qSW/zOw0SRTZ+0p4vQwGd9by+yYNdiSuMJ1S5rinSEX6VwnUYlicste5pDlWuthskoW/hSq0xx4C5iZimCouIj+7Tdqtj9b67c4MOd5zAx7Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6CKBTlbBHaVU7zmfD+ehydjL7VNeIZ+gKA7/F9VJBEI=;
+ b=t4AQXLXtFIOp/AZUi5+0KmrCpWm5Sohb2ewRRdEwgJ+B5miNCw26sSgw44BSrKsiOXXrFxiZWSBK5iWVabasj8mRccWToGDzERAl2E8wMDLql+X7uHF6jnBbugPjMjtoToQVyUZTFqu0cqL+Nt/imxlfTYYK4Fq8R6Z34g0BeQ8icTMVRecIVNKZHGL1VOvQMxwTkQA/1iG5jtwHzDN0UtgKXDNNyUSq8MUj5KdN4iml+m3QtAUqBfc5HYnobRLK6HmoCB2jeNoRORvMNXaH7GGv8nhQFiKrqGCV8AYYo3ZcHSPDqAfluPWZkTZjlrPtunuC9zDMAyCKjG0akfYGqg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from PH7PR12MB5757.namprd12.prod.outlook.com (2603:10b6:510:1d0::13)
+ by SA1PR12MB6751.namprd12.prod.outlook.com (2603:10b6:806:258::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.9; Thu, 25 Sep
+ 2025 11:54:34 +0000
+Received: from PH7PR12MB5757.namprd12.prod.outlook.com
+ ([fe80::f012:300c:6bf4:7632]) by PH7PR12MB5757.namprd12.prod.outlook.com
+ ([fe80::f012:300c:6bf4:7632%2]) with mapi id 15.20.9137.021; Thu, 25 Sep 2025
+ 11:54:34 +0000
+Date: Thu, 25 Sep 2025 08:54:33 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Michael Guralnik <michaelgur@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>, Will Deacon <will@kernel.org>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Justin Stitt <justinstitt@google.com>, linux-s390@vger.kernel.org,
+	llvm@lists.linux.dev, Ingo Molnar <mingo@redhat.com>,
+	Bill Wendling <morbo@google.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Leon Romanovsky <leonro@mellanox.com>, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Mark Rutland <mark.rutland@arm.com>,
+	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Jijie Shao <shaojijie@huawei.com>, Simon Horman <horms@kernel.org>,
+	Patrisious Haddad <phaddad@nvidia.com>
+Subject: Re: [PATCH net-next V5] net/mlx5: Improve write-combining test
+ reliability for ARM64 Grace CPUs
+Message-ID: <20250925115433.GU2617119@nvidia.com>
+References: <1758800913-830383-1-git-send-email-tariqt@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1758800913-830383-1-git-send-email-tariqt@nvidia.com>
+X-ClientProxiedBy: SA9PR13CA0040.namprd13.prod.outlook.com
+ (2603:10b6:806:22::15) To PH7PR12MB5757.namprd12.prod.outlook.com
+ (2603:10b6:510:1d0::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <92ca5ed1-629d-4dc3-85fc-f1c6299a42ba@nvidia.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5757:EE_|SA1PR12MB6751:EE_
+X-MS-Office365-Filtering-Correlation-Id: a2d40625-a664-4f6e-e9a9-08ddfc2a4bb5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?E9i0Jm/v9KFVLaQiIk5TjFX8KzrZSY2wGxb1b+SdZ53SPbQDI3Iu7/WnsyxO?=
+ =?us-ascii?Q?ZpYHr/fOWWgQsYKnEakEhpRCpI/BMTY1MFGdzn+/YqE7DdBoapuw+zUIfH9y?=
+ =?us-ascii?Q?eKGN/7sGH91ATHGIb7eckQWnVg9vBnh47Xf4I2loHIe2UKmeWUXXAxDbZf+o?=
+ =?us-ascii?Q?ww/Z1yfSJDvKfTW3ATIlasXel7Z6417OMEpnwlXv76FI+sUN84fVoHgJyDgy?=
+ =?us-ascii?Q?95u4pGM4oJ+qw4EbZyCjmJHMo9Akvj9ReMOpKlqkS8pbiaKBNraw+7PAv4Xa?=
+ =?us-ascii?Q?3LRtnR+S2Yzwih4eQGhzrE4cBj9t7mEUvb9IAtPI4FUj8RI3NlTwVtLOTKrI?=
+ =?us-ascii?Q?j5RnYIf8HK16UYPBpUfLCq7R5ZR75t0wfxB6Kn008MFXCyPLmO7udLy09hto?=
+ =?us-ascii?Q?Uyexj+GjPUok69nIzuOxyaKY0upfDud+aI0pCjoyhDes5Nwos/675aM0I0BP?=
+ =?us-ascii?Q?Fh8uzX1ck1W5wGMXNV7FEEWUnhrfdCJLZW/WcOJOUsV+7TFZqQDxmPgo1eSL?=
+ =?us-ascii?Q?84qZtHMFxLwfkh4HX6OI69IpIJQJNAZ/bja4FfaU0ZBo3vS177fPq2yzJhxb?=
+ =?us-ascii?Q?jpq4gUMidFOb/ltdDb0kQH4o4v3Xun/amFNPMD7oHCGXIk8ZAfEO6N2KeiG/?=
+ =?us-ascii?Q?1qlkiZ+3foUwF3VZTlO3sgCsLaVFoOcro7XUIWIZbMUnmMnHm+ypUmD3n6GW?=
+ =?us-ascii?Q?1LXx98KVmNMQdXC+3ixnLsuFUASFh8S9yIEi90BBp0ZmoAT6AHUpdYJrMVdl?=
+ =?us-ascii?Q?x2cnLX1gkOUmuw4HkVmTh4CbP2PR+km6lHCrdoOCM3HPduDpwyN1eOgAzpVn?=
+ =?us-ascii?Q?QuY2oPQ4jzUThguoZXYxDlQHyKAy3fv4UvGA1+fx9Z2ylFniinrbgsvUvfgg?=
+ =?us-ascii?Q?a4/Z3TnwRRwoPHBNVxN53NU9uXuCiAIHJylKN1r2MkVT6VR/HGedKX6BQ1/1?=
+ =?us-ascii?Q?3np2HEJuT0OEGwY+YAA3VIT+KDnEikrihfcwWGfejmd/PS4JPUQKSS+zPOom?=
+ =?us-ascii?Q?LwnV+goqZoRSRqynDCtEpqr2HIy6S7RUrtRQc27P77GwBYVtINtmrEQOB1uk?=
+ =?us-ascii?Q?mNZX8ArBz8NAhGxIXSmm7kdyI6ybHNARi4YRtcK4bDXUQBo+YnI6HVfgdeN6?=
+ =?us-ascii?Q?eK2WzeE9l/4Sbkih4z0fUL+G1W/Xcq7mAubsDmFWNITnDjPexpnXVnn9wrGp?=
+ =?us-ascii?Q?QvDW3aALDoJdo99DbSGI/IDyfvjYTzm7TqA9kOjuApycGwtASq36/pyWAlxO?=
+ =?us-ascii?Q?rh+XTcrQuPxQBzncAKpvQNUk8QHpJM9ngJAZM3IO6vYURojWzwLuHVQbeqfv?=
+ =?us-ascii?Q?gWIGxoELrnVGrqSxVgacIc+r3ko2xYhXhjKkqRw64eci1lu00WvGIUC0r6Ak?=
+ =?us-ascii?Q?sx3uYjh0F6FJ7ecmJKx3+0KQ1QSIfwNvHjgvCspi4OdK4bvNM4mniewgGJPY?=
+ =?us-ascii?Q?aRyXoqzjVvc=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5757.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Impwt5fsRUe+CVxBsLK8CRs9eV/OhlXT4vkmUjB7xGgiijJUHsjnrDb8KhUQ?=
+ =?us-ascii?Q?Yh6H5Y1nkf1FcXwKDQL3U+qUYt+hbzF6ZUgpqZhS/vEmANSC0bNfE0xfXcN+?=
+ =?us-ascii?Q?Wt4BzSs4RqKCBOo7sa8p8/c6hOLsqV8wbnWLY5KDLOf20n+CrBkqGjsB5ASB?=
+ =?us-ascii?Q?l6ty57rzptRFfSBQBdBu+WWAHlf/c3LqPunIJx0pCvlFjrpO3vhj3Ea/2082?=
+ =?us-ascii?Q?UjF6yEgandiP9bAR2HPN+kGPkFbgYLW9Q0bRnW3pyoaXjAwg6eJAI7UC9dVm?=
+ =?us-ascii?Q?P6p6oJ/dtdb5E+RF7Y+o1jetuaGZ+X4Q30rAOfCxcp6pZ2i//40z/AVlZc/o?=
+ =?us-ascii?Q?8+vAbtnjzS6EYyo/n/qWGxm7qGZxnDCv350S8H9VhSxKgLsRVFDC4PopiotV?=
+ =?us-ascii?Q?tw7riVCz7QeZjEpzk1tgAGvzyMTZuTNbL9KNEVL+Mp61BJS53uqa+cXxPK5v?=
+ =?us-ascii?Q?iUwTPzmt8G72OqP6rGBkbfZyzUbWDbXv+S8EnTtOHUorAzIFPX5rNbwIUNLF?=
+ =?us-ascii?Q?zqWzoceEG2cWK8LwqZU1CXuqZpfOVpfggnyj44KGPUunFk6qgf/qyMHyXhVH?=
+ =?us-ascii?Q?sOAvlyucu57jtef8Eoiu2woDGqK2dA/OvVH2wDUCME5LlYl2qXbYrhRFBQ0G?=
+ =?us-ascii?Q?vH5yo3FM6QBK6Fvf0QjZ2J0Oqr6NAWPAAJ6pcchGiDXZEeg6w+qLtKybezTe?=
+ =?us-ascii?Q?6EGGp8JHhrv9S97aRnlSzgas+v4bvHBkcI8Fek7ie+sA5MXc1jtmeAj094aB?=
+ =?us-ascii?Q?fSXqgrc/W3VR8ab0WYf/WbcHXguCLCCmKdiKR08FYEjAFlQbNKVK5j0ylNZe?=
+ =?us-ascii?Q?ldO01GqHKr9wGASe/7hyY4FlvjQzs5zBEHaHjExRroaCDB1KAXMsnFosvTxq?=
+ =?us-ascii?Q?1+NKaDH1tPTi//fp+HUFhhYZU10VuzxUBXRETdgVCrhwmcQqUr35p6EBr3UO?=
+ =?us-ascii?Q?ffSnHNGYHZulNWFdMfcuD2r+jwX41Dm5oh3zb8du7O1ChLq0kYbnSdHCIsNC?=
+ =?us-ascii?Q?PhoQ6qATeCZa1dwECoHnmpvdAQatPtspjnKjU+hXpuFV7USvaq7378Nkdpsq?=
+ =?us-ascii?Q?WvPewX8XXrrPFepT7m5SgG0yXo2YBE+oD+bXXNwOh94HgvEvKagrB5pXEBM8?=
+ =?us-ascii?Q?Z6QxgQoy9/v1RuXY+eVUTToDAVuLr7vW4orLCqlJAx/r+XDtsYu6CkZ+M127?=
+ =?us-ascii?Q?398Hm1Nr0NBu/1na/dEUfF8uiYUVdT1mBYNKS3ZiiIai3BohiR7FuNlcXEA7?=
+ =?us-ascii?Q?fwtxpBc7vZxvNYCmWxSefPvqCJa7nWz7fjVkJUyD0zCNfvRKKTfu3rgdE5pj?=
+ =?us-ascii?Q?wOZjUzj6yxh2+u/qKDtvNLCg0Z71qPay9Qo7x4OqnZ7ohwum8//VYEOOoR6C?=
+ =?us-ascii?Q?iXfQG+HABAHIk3A/9YNlaK/J1FcTVDkhTQiQuItoELlciZs9jYiSeX9TlsJM?=
+ =?us-ascii?Q?EPShi1ByZeZ932G6w/TaFQQij+bZlaIK0wjwz19ZY5GuLRuYobw6g7VzHwI4?=
+ =?us-ascii?Q?WbnAj8J4+0q/ckgmJim8wfKFM0yOl7qE59+niajW4GfWQl4Anl/V64RBh3pz?=
+ =?us-ascii?Q?/fSDldSfddux1Y3F94cJIB9XFTRJmK1S+uGmiIpT?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a2d40625-a664-4f6e-e9a9-08ddfc2a4bb5
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5757.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2025 11:54:34.7307
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: V/BJvwey8bcxoxH/SbADoxvQf323yqkSLTJrV7zhr9oSWmj5TC9YQ66vJTxSm/vA
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6751
 
-On Thu, Sep 25, 2025 at 04:15:19PM +0530, Parav Pandit wrote:
-> 
-> On 25-09-2025 04:05 pm, Michael S. Tsirkin wrote:
-> > On Thu, Sep 25, 2025 at 03:21:38PM +0530, Parav Pandit wrote:
-> > > Function pointers are there for multiple transports to implement their own
-> > > implementation.
-> > My understanding is that you want to use flow control admin commands
-> > in virtio net, without making it depend on virtio pci.
-> No flow control in vnet.
-> > This why the callbacks are here. Is that right?
-> 
-> No. callbacks are there so that transport agnostic layer can invoke it,
-> which is drivers/virtio/virtio.c.
-> 
-> And transport specific code stays in transport layer, which is presently
-> following config_ops design.
-> 
-> > 
-> > That is fair enough, but it looks like every new command then
-> > needs a lot of boilerplate code with a callback a wrapper and
-> > a transport implementation.
-> 
-> Not really. I dont see any callbacks or wrapper in current proposed patches.
-> 
-> All it has is transport specific implementation of admin commands.
-> 
-> > 
-> > 
-> > Why not just put all this code in virtio core? It looks like the
-> > transport just needs to expose an API to find the admin vq.
-> 
-> Can you please be specific of which line in the current code can be moved to
-> virtio core?
-> 
-> When the spec was drafted, _one_ was thinking of admin command transport
-> over non admin vq also.
-> 
-> So current implementation of letting transport decide on how to transport a
-> command seems right to me.
-> 
-> But sure, if you can pin point the lines of code that can be shifted to
-> generic layer, that would be good.
+On Thu, Sep 25, 2025 at 02:48:33PM +0300, Tariq Toukan wrote:
+> +static void mlx5_iowrite64_copy(struct mlx5_wc_sq *sq, __be32 mmio_wqe[16],
+> +				size_t mmio_wqe_size, unsigned int offset)
+> +{
+> +#if defined(CONFIG_KERNEL_MODE_NEON) && defined(CONFIG_ARM64)
 
-I imagine a get_admin_vq operation in config_ops. The rest of the
-code seems to be transport independent and could be part of
-the core. WDYT?
+IS_ENABLED() not defined()
 
--- 
-MST
-
+Jason
 
