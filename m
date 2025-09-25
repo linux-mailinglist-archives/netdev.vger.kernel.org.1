@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-226384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53004B9FC15
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 16:00:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 420ABB9FC33
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 16:01:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 422EE4C691E
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 13:59:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCB7918848EE
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:00:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C602D2491;
-	Thu, 25 Sep 2025 13:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAF512D47E8;
+	Thu, 25 Sep 2025 13:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EcYXPhQt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cbV65Ngf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55BA72D0C88
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 13:55:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CD128A72F
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 13:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758808520; cv=none; b=kypncxJAQoQWaQaLWrgupSm9hT50ZRfgHci1oabZ0RG/kBUHSK6uCCa65uPkoXyF7d67No6e2OfQL8H/dLff9gRGTCn2fHIKIdrWTvYgN6a1D77zN9r+WSL0f8yhFYufZbF8nNmWIbYWubbusDiot0OrwaOgEAbqj9bapsy8y1w=
+	t=1758808526; cv=none; b=bTi8ewui7KauA2OIgaDucKxzLxIfLehUVIv5PnqCXexoepSiIOm37bW6wX69ReZBA/cxt839CSzs+vW+jeDoCXXRF/OMiFc9L/N7tXNVQJs0PaaVHApNCvoLlX/lNrZrJ98IsTp1zWGBYiu36UB+6g670dBEMX/HnMCBZYwT4M8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758808520; c=relaxed/simple;
-	bh=zng85sA8+SsVec6zNo4TiEoP/H6f+tIcV689AAppDzE=;
+	s=arc-20240116; t=1758808526; c=relaxed/simple;
+	bh=G1wsZhjB9YFMrkpz5gcBxDMgotSl9l62JYKqp+2kvv0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=KtYIref3aZUPJQK74Yhi9G6RAGouzzrl/GEbf8HQprztWoZTxjP8oH9qCqH14DNXuM20wjDKQ1+jz3Spd2rffew4geGTXhre5HweSVPGjeCQVnbTAcDAqmuzJZdtwEbDrrtNXDubH6kp372r9qIIqNJvduzFFqAIZQVgUORtU8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EcYXPhQt; arc=none smtp.client-ip=209.85.219.50
+	 In-Reply-To:To:Cc; b=j7aSAVDOOfbQr+q/JbAzIhgDcXnN7VH3BZTwYmG+aGXkEIw+la/QmOxcM/aGWXEcqi8EoksgzMZBay+bURqIO1xG5AnCAYrEL/FIFH0XQR6s3ZTPpyF/UlWjyCJS4oMf0YyUoNJtOO5jRMkac75k4k+oWrjWabD9JQiH87ix1zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cbV65Ngf; arc=none smtp.client-ip=209.85.219.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-796d68804a0so10063916d6.3
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 06:55:18 -0700 (PDT)
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-79a7d439efbso7613556d6.0
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 06:55:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758808517; x=1759413317; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758808524; x=1759413324; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=NYha/ksIy3nvgxYlzdJIQEddJjIGfcGOB5STOc36XYg=;
-        b=EcYXPhQtkXXRN7OTov2ez9YRzmFF4pdKpT+1C30EZOesc7+986YR52Y2wti6MkR3c7
-         E8wqFyf8rFflFZMsomMVUqAqz1qa0lDKweu8x2Hwoi6G/KLwNmWUHtKHWknP0LAKERIB
-         qMqkB3kyT1A+QER7Kwr+6/CqyEx6z9jkqLgfoFYHFadzVK7y7OSjSIg98jsY8qrT0iKu
-         Jq8vHlWdf7tS/YJ8nkzFo6oKXWOe71Th1wxLuNx9NUXVG9DVNzfkDe4ESx9qcFPB97zB
-         lGGXENCy1LWY6NV0oA4kkcAspPFsx5oGFhffY8U2rg5Sdkp6fhIg7Es67gPHi0HRhYVb
-         TcXw==
+        bh=9F//OQcCcTSCVUN93IinXT3LeiwclsyrHd76W2OsUHM=;
+        b=cbV65Ngfv2wRlEQycfdgsdZ4HyL0QMsjiUgFkW3x6wmAA4RJNKRWCzbOWivIDV3PsC
+         7b+sL8NR+96IIeE20jn88m12eoaaT5clg/qTv76iOKiW2TNEx0WjLvHkS7tFU14cNsAQ
+         B0LPn3uFZVOm2LLgF5xsO1es5hzs+DTWEyhe3ufC0x3dlZzGvCFUSbEU8Nf9JEydJMJL
+         mgkgXp7ydD7pec4+bV4VWpSLqAsIYhgFBAMNaTC1and1dW7vfAk7WLilJkUTb3rdF3mC
+         5EJjUMqF5AdTatgsWuHsKenJjxu89sJW+zn4zQUwjemPdSVpx1Cho6LvB5I7aWyGqDQ0
+         p1rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758808517; x=1759413317;
+        d=1e100.net; s=20230601; t=1758808524; x=1759413324;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NYha/ksIy3nvgxYlzdJIQEddJjIGfcGOB5STOc36XYg=;
-        b=UE/5mxze6PNRhta5zJ9OzkLAuCwiKt9SJOvUTcjhuEGeDS3ykFibu+5jOY5aRW8NnY
-         GWVz7sYqRmcy+sTJWVF7V63gxfamHdSfMddMQYsvWcxZjR5hFYx1RA2iq1TUhLqg+Zqs
-         NbY2FJlh+TPTiSsCBYtKI8Rlak9dEa7k2gbwY7cOZXepy3RgLRL3lz26NcxnwQmV3FhD
-         53BU8rCimgdjjTmjx09egtrcow0KGhK0FHgf16wHdKqiDqSKIR0YtwaUWVS75P1Udqbf
-         VrWLV+44mUj5fc3VtdbryYqz1ct6l9L6yhwNREfWKMj3/pH7UqpQFZbCsjss+2ymaOCn
-         d8Jw==
-X-Forwarded-Encrypted: i=1; AJvYcCXtnUUUHb/9mMxcN4InFySIlnYgL9XjOUREjuIFCfOCq4q8FkHa/3FWH2sNZxUhtAppCbVDONk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaeZ53yEcy6YJT6eCViSRH0nUpPKV9NdnqriPbGA+cCrHKdCAq
-	w0JPtpslc/tQNUhO3KNmnWrU4XzeTH3rkiVUJCh8P8RctHllrwljZc/P
-X-Gm-Gg: ASbGncuW4wY+qwqCWLrpZY438mbcMGd+EEDZVkijUY4IKmtFsPBmMqFr6/5YHDUJuC7
-	WzsLzEdT6qdTxefF+YMaZBiAITNA3QuTUKc55Ec3/SGAwNkclr5EF/VVSe5vJErvTFy4AfQSD+T
-	mh4eIxvzrIOAnt+3gmMZ27OofypzA2pp5F9VdjDFeXMNxSPVy+Gz/+l8H853gSkN+u7ewlznM+r
-	zd7NHG/JgqgSfIYqGsH9AQmulZwjUIJ5Vh+Ttpi79X9ZM2XkMy6eXr7u3T27+1C8PhLV+IN5Tdb
-	BZO5sGnFB7sHCIH3hxdlDm+bBUMWhnKFIBCpD0tixa/sKgK3lyOPc5u8M8pD1gXxUiaFPtQlM3G
-	YNapUpTk99dRlplcqFRgnV5u3d0hw7kO1mCQRgVtojS5hE1GTdfS/y3FkW83gvoHvyB8oWHfxxO
-	clokORANuWHCKDFqSsQaYZ5SwDa8Ki+268WGcG2LcP8+O4as4C9HVGsIMagAoGlZwua7Rg
-X-Google-Smtp-Source: AGHT+IEZqYEZb8mISdLJuHBwRf4k0Tn3piTiphxdju20VgZskXS1fQZSSYTbb7BgZgibnFeCDmQS/g==
-X-Received: by 2002:a05:6214:27cd:b0:78a:e10c:1f6a with SMTP id 6a1803df08f44-7fc2864221fmr42029446d6.1.1758808516914;
-        Thu, 25 Sep 2025 06:55:16 -0700 (PDT)
+        bh=9F//OQcCcTSCVUN93IinXT3LeiwclsyrHd76W2OsUHM=;
+        b=cIdC6Y1vP+ReS50OYfpq0NLRLBWqiMME4222kQIfeXGvZLDChEHaFilhYAJ/BPIJim
+         uDzpUIcXOsE0JN/zWpJPLZiJJP5BuVXOQP30hfUoZ8n05fT56czonsrwAqp9A6QflkrH
+         pGHVoeOjPalRoVsm8P1alKrCelvF9B5+DlSdpJ9LD6nHwOI4KL7CHym0luyVjdRqrj/R
+         tG4d2GoRsXiVd+cSPSgoglFcIAeeXEsccKoQVuU4Er1AA4UnFYJxM10fOEqHoW5fIF5g
+         c+VwtIVHyyb0j3BRXADSSacxFsg+RW20/5rWT3NT9g3Ez8Ep69mATgloZNo99seL9gzW
+         aZ5A==
+X-Forwarded-Encrypted: i=1; AJvYcCVF9OV4cb1HQU76/k1A3COwCZI1qNF/q/+jKQbPkFMTkFIo1bYnRogmECdQWJwCQUpZgOkp7oY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhiWT4kt/AZyFU+Ey1bCK5fbwFfZt6HafucF04jR1shoSwXcIp
+	pLIEFrTMGzLbrCjcH/ZgCCwVXiRn/H+cEZSEKdW5IAJy5vfsWmmR8Ptx
+X-Gm-Gg: ASbGncvA/6KkYUu8AqVZ3Ishku/7NWq5R50yhL+2yuu1KBH/WF6qvGcdt9Fhto+KmM/
+	6tiNJCfKiIwLkoTELu267hsVB9UP45czlneoTmvJlhDrL52SSoX5Euz9fEmPGcLdtg/w0hDwVJb
+	S4FvKDnr7VIEiL1NY3Ww/EQj38TWQz4fyw/fnIg/3B1ttWdIW/fC1Enk4X2z+uiUiHH2dd9vstC
+	fgWaE/O6eeupQZLU1k3gOtRvilD4vD5ULK5JiaNTG45W9qnzDoraCJhr4OPugZV/Ceo0fQjoQ4i
+	CM7e/sXu463j62HvARLOMoDIhzbC9BvOBeVBeXO1f3t+QoVUFxzWdoJ8o7FoaFCLhA558rhEyzM
+	3H9Wmc6nXEm0zM9i+g2e54A5kVHptUjCw8Uraxom2MKkmEGZHBtxOFBhqkOcrw9Ap0bPXzUFRFC
+	JP1YGWFAfq5NV96p5b2xUXf178BDb6Jir9OaMwV6Q3gJx5fEYdSmzGwdVV3Qqj9bakwpqz
+X-Google-Smtp-Source: AGHT+IG8Gyrq/9aswoyGrByufUDOEDDpB4vAZLNl1cBk/1ws0VqwO4eeWj7YZE4dhPO66F/wFvg1uw==
+X-Received: by 2002:a05:6214:1d28:b0:7d6:c615:ecd1 with SMTP id 6a1803df08f44-7fc4ec0e7dcmr46038496d6.61.1758808522761;
+        Thu, 25 Sep 2025 06:55:22 -0700 (PDT)
 Received: from 137.1.168.192.in-addr.arpa ([2600:4808:6353:5c00:7c:b286:dba3:5ba8])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-80135968d5esm11536916d6.12.2025.09.25.06.55.11
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-80135968d5esm11536916d6.12.2025.09.25.06.55.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 06:55:16 -0700 (PDT)
+        Thu, 25 Sep 2025 06:55:22 -0700 (PDT)
 From: Tamir Duberstein <tamird@gmail.com>
-Date: Thu, 25 Sep 2025 09:53:58 -0400
-Subject: [PATCH v2 10/19] rust: macros: replace `kernel::c_str!` with
+Date: Thu, 25 Sep 2025 09:53:59 -0400
+Subject: [PATCH v2 11/19] rust: miscdevice: replace `kernel::c_str!` with
  C-Strings
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -86,7 +86,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250925-core-cstr-cstrings-v2-10-78e0aaace1cd@gmail.com>
+Message-Id: <20250925-core-cstr-cstrings-v2-11-78e0aaace1cd@gmail.com>
 References: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
 In-Reply-To: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
 To: "Rafael J. Wysocki" <rafael@kernel.org>, 
@@ -126,13 +126,13 @@ Cc: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
  Tamir Duberstein <tamird@gmail.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openssh-sha256; t=1758808437; l=1049;
+X-Developer-Signature: v=1; a=openssh-sha256; t=1758808438; l=1136;
  i=tamird@gmail.com; h=from:subject:message-id;
- bh=zng85sA8+SsVec6zNo4TiEoP/H6f+tIcV689AAppDzE=;
+ bh=G1wsZhjB9YFMrkpz5gcBxDMgotSl9l62JYKqp+2kvv0=;
  b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
  MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QIVNC06tKtgyxIKxAK3EObC8MiCaZE3yn180AX/LsynQ5F4vys0WrFsiwfjmzPM+0UA7iPHoZU6
- G25wrGtAh8gk=
+ QDPHa5h0Ln008NycRhnUYHSwita6ft61YpP6UIaouguWtU37E7gPYJQE7EoOJeFshI2ze3iWBrO
+ I6yLKReNrlA0=
 X-Developer-Key: i=tamird@gmail.com; a=openssh;
  fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
@@ -144,22 +144,30 @@ Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Reviewed-by: Benno Lossin <lossin@kernel.org>
 Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 ---
- rust/macros/module.rs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ samples/rust/rust_misc_device.rs | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/rust/macros/module.rs b/rust/macros/module.rs
-index 5ee54a00c0b6..8cef6cc958b5 100644
---- a/rust/macros/module.rs
-+++ b/rust/macros/module.rs
-@@ -228,7 +228,7 @@ pub(crate) fn module(ts: TokenStream) -> TokenStream {
-             type LocalModule = {type_};
+diff --git a/samples/rust/rust_misc_device.rs b/samples/rust/rust_misc_device.rs
+index e7ab77448f75..60ab10b02574 100644
+--- a/samples/rust/rust_misc_device.rs
++++ b/samples/rust/rust_misc_device.rs
+@@ -98,7 +98,6 @@
+ use core::pin::Pin;
  
-             impl ::kernel::ModuleMetadata for {type_} {{
--                const NAME: &'static ::kernel::str::CStr = ::kernel::c_str!(\"{name}\");
-+                const NAME: &'static ::kernel::str::CStr = c\"{name}\";
-             }}
+ use kernel::{
+-    c_str,
+     device::Device,
+     fs::File,
+     ioctl::{_IO, _IOC_SIZE, _IOR, _IOW},
+@@ -133,7 +132,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
+         pr_info!("Initialising Rust Misc Device Sample\n");
  
-             // Double nested modules, since then nobody can access the public items inside.
+         let options = MiscDeviceOptions {
+-            name: c_str!("rust-misc-device"),
++            name: c"rust-misc-device",
+         };
+ 
+         try_pin_init!(Self {
 
 -- 
 2.51.0
