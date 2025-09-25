@@ -1,152 +1,122 @@
-Return-Path: <netdev+bounces-226543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 427A4BA1AB9
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 23:48:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F4FCBA1B67
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 23:58:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26A1E3B3874
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 21:47:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39B3F3A9B87
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 21:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 838EB25B31D;
-	Thu, 25 Sep 2025 21:46:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7490927145C;
+	Thu, 25 Sep 2025 21:58:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gIFat5Te"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oZjPrux9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64833FC2;
-	Thu, 25 Sep 2025 21:46:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A4014A8E
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 21:58:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758836814; cv=none; b=Ie++Wtf/qI76eS/cKKbZg1DeCfcsPy35KmeXXCIA7RmJewN91uwt0zJ2vaYDVzLdByfuPQ+mUHEPRKZT3aNTQpsFwh09XCU7iXlnr08Hy8GJ7dvTz064juV+tVL6DoY//v0rwQ2CdERYI5zF1pfjNNAfa1vJLVR4FmuAclSbN24=
+	t=1758837517; cv=none; b=IkTyTwYs+8E75jxwfKOW0qMcAlYURNV80y69ax5eHh7y4l5SbBnrMseNR6hVQOQJ3zSvBK4bX4kEwwDrzLnh53zzHTKquqYWNtONt6GXJtF9IG4hWLLSB/g74KO5D2bOThZcEyf2UJefXlzuCfqlgpEJF8HZ/CK95bf77HS8BgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758836814; c=relaxed/simple;
-	bh=WKpoc9+9K5GGgKrOubiqmZ+Fm1Kf3gzxbsj2jNle1hI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cLB7vIW/XX8p5qXcY5+GA5Pw7+KaInx/QPG2qW895yi0pwJR/VBaA96PVChWKntGU5czilngurvLb6XnNEAebMlVYZDI+TfezlEoIntL1+eawZGaaCivE9ulnuDbnjAWkBKfe/iIPrhs05Fz9lGiUvrwBnIF5MyoeULEjJPrOgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gIFat5Te; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58PImZPZ018041;
-	Thu, 25 Sep 2025 21:46:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Hm9hP/
-	63NIlAC2AM2rcR859l86G4CCxgjB4jsqGxKe0=; b=gIFat5TeP6kCBAolsemnoC
-	RLgO309c6OhZN0RrnehSUq9Nu32vZCuhE80nGR7YO2WWDZJGMHXq0tr0rrQ320g1
-	jakFWiEUMKXm/dHNZs2XjH3tnrWpNeHRPG+Ic8voAUm5fcowBhYYbPOJo++Qh6Q2
-	OtUaWyX1WNXApiqWqqq7WhJQ2aUwAsOjqBGL64R3NxgDaOcgejnUcJG/dkvkXwiR
-	/VDATYdmKYOPtyA+BUaBvGScHILNFPg5K003X4cFNV+t+8dIVOpeReeJwkoCNiqp
-	pTgtgRWGo7cqEV4RbbHnu0drIQaqJExug+E/rmHdlWyLiC3R8bk3AwqpH9vnIqYw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49dbbd8u3c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Sep 2025 21:46:42 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58PLkfVV028392;
-	Thu, 25 Sep 2025 21:46:41 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49dbbd8u39-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Sep 2025 21:46:41 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58PLdq9F006428;
-	Thu, 25 Sep 2025 21:46:40 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49dawpgvyq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Sep 2025 21:46:40 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58PLkaGK43778482
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 25 Sep 2025 21:46:36 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7391620043;
-	Thu, 25 Sep 2025 21:46:36 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8966720040;
-	Thu, 25 Sep 2025 21:46:35 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.87.151.15])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Thu, 25 Sep 2025 21:46:35 +0000 (GMT)
-Date: Thu, 25 Sep 2025 23:46:33 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-        "D.
- Wythe" <alibuda@linux.alibaba.com>,
-        Dust Li <dust.li@linux.alibaba.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang
- <wenjia@linux.ibm.com>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu
- <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH net-next v3 2/2] net/smc: handle -ENOMEM from
- smc_wr_alloc_link_mem gracefully
-Message-ID: <20250925234633.3f0db19c.pasic@linux.ibm.com>
-In-Reply-To: <30a1dc4e-e1ef-43bd-8a63-7a8ff48297d2@redhat.com>
-References: <20250921214440.325325-1-pasic@linux.ibm.com>
-	<20250921214440.325325-3-pasic@linux.ibm.com>
-	<cd1c6040-0a8f-45fb-91aa-2df2c5ae085a@redhat.com>
-	<20250925170524.7adc1aa3.pasic@linux.ibm.com>
-	<30a1dc4e-e1ef-43bd-8a63-7a8ff48297d2@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1758837517; c=relaxed/simple;
+	bh=cToozM6ezO+LQr3pSe4C/JWreMuOsGdBuu32DliRvYM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uVTHUbdEpmOpycUrY1froMIkR1jQH8NmHoSz/YNLo6vyPDwMREmR3r681GicMKidpOiKHppPqsGXi9lK0BX1mJFbQTD0Iw0cA5aktJzon4lIHlIzwlZfhtLBa/vGu/M1YkMMjsjZJXy0gxnEVxamKlmpzFwttIori3PPpBnpmsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oZjPrux9; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <87a79618-cd71-4f4f-ad65-b492e571ade5@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758837503;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Da1AnYFKZOYbydtOENlbTwNXKCnTdbj62v3042MjlAw=;
+	b=oZjPrux9myXDIybzr3Vb2r3jkYsQMpallQPCY1TmDjwAtt5p37XKogi8PxZqnid5Pa2pKW
+	knMsUR77+khyiAPqdsbHaMij7MUoQJSeHm8u97sffD3Gp0+k+Z7jhunqEssLivqe5pKcF7
+	cx4OkwPxjZbXs7HlSIyWzBoYtXnSqbg=
+Date: Thu, 25 Sep 2025 14:58:16 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=F/Jat6hN c=1 sm=1 tr=0 ts=68d5b842 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=20KFwNOVAAAA:8 a=gcIiauuOHNroVWZtbkkA:9
- a=CjuIK1q_8ugA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTI1MDE3NCBTYWx0ZWRfX1UaTgoUMjRDy
- AAalRIIPJZ0fRvRVZp8FA/ouqDsLpQ+3HLpf/XofMIOO2zjm/gylEWzrZClbujy9TjBY1yYVtxv
- hP/KDkMCasCWhd+GtNUcyzbTkvtpmeFKZHs1DM+ZJtXUVs3C5EySoyY4v7GtoA3VZJu3HwnEkXz
- CZI/ZTwkEGK93uErxDgIsIWa7dM946fVlwTmyIAx5fWMkzOhm/EWPFjKNKIrIcDjYsGm3ccxl47
- AJm0ikpzFAdCCx5SRLgdNOT4q4K2FAZtZEDWwaX9OWgOAilE7VDcShm/T3Y0aRj9CkZMvJKPw9p
- L9NmT//8oDaWbZEVfIYDMrjwlXowNtdUYSKPr/TeLbMYlSuroQOTrowPiYhrOqZji443fjarjRW
- WMOqd0mEvrmOir39DFfDjfDCVyqypg==
-X-Proofpoint-GUID: 6ZFowF36Cau9lYzkJEqovgmnubqUtIbW
-X-Proofpoint-ORIG-GUID: JSD8DgPPMK9RnzsH7PPWtR66_XcfgGw2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-25_02,2025-09-25_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 priorityscore=1501 malwarescore=0 spamscore=0 phishscore=0
- lowpriorityscore=0 clxscore=1015 adultscore=0 bulkscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2509150000 definitions=main-2509250174
+Subject: Re: [PATCH bpf-next 2/2] selftests/bpf: Test changing packet data
+ from global functions with a kfunc
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
+ martin.lau@kernel.org, kernel-team@meta.com
+References: <20250925170013.1752561-1-ameryhung@gmail.com>
+ <20250925170013.1752561-2-ameryhung@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20250925170013.1752561-2-ameryhung@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 25 Sep 2025 17:41:29 +0200
-Paolo Abeni <pabeni@redhat.com> wrote:
+On 9/25/25 10:00 AM, Amery Hung wrote:
+> The verifier should invalidate all packet pointers after a packet data
+> changing kfunc is called. So, similar to commit 3f23ee5590d9
+> ("selftests/bpf: test for changing packet data from global functions"),
+> test changing packet data from global functions to make sure packet
+> pointers are indeed invalidated.
 
-> > So I would prefer sticking to the current logic.  
-> 
-> Ok, makes sense to me. Please capture some of the above either in the
-> commit message or in a code comment.
+Applied. Thanks.
 
-I will make sure to add to the commit message that the ratio is preserved
-when backing off and spell out the old values the 'we give up condition'.
-Maybe add some more words on possible implications for v4.
+> +__noinline
+> +long xdp_pull_data2(struct xdp_md *x, __u32 len)
+> +{
+> +	return bpf_xdp_pull_data(x, len);
 
-Thank you very much for your review!
+This tested the mark_subprog_changes_pkt_data() in visit_insn().
 
-Regards,
-Halil
+afaik, it does not test the clear_all_pkt_pointers() in check_"k"func_call(). 
+Unlike the existing "changes_data" helpers, it is the first kfunc doing it. 
+Although we know that it should work after fixing the xdp_native.bpf.c :), it is 
+still good to have a regression test for it. Probably another xdp prog in 
+verifier_sock.c that does bpf_xdp_pull_data() in the main prog. Please follow up.
+
+
+> +}
+> +
+> +__noinline
+> +long xdp_pull_data1(struct xdp_md *x, __u32 len)
+> +{
+> +	return xdp_pull_data2(x, len);
+> +}
+> +
+> +/* global function calls bpf_xdp_pull_data(), which invalidates packet
+> + * pointers established before global function call.
+> + */
+> +SEC("xdp")
+> +__failure __msg("invalid mem access")
+> +int invalidate_xdp_pkt_pointers_from_global_func(struct xdp_md *x)
+> +{
+> +	int *p = (void *)(long)x->data;
+> +
+> +	if ((void *)(p + 1) > (void *)(long)x->data_end)
+> +		return TCX_DROP;
+> +	xdp_pull_data1(x, 0);
+> +	*p = 42; /* this is unsafe */
+> +	return TCX_PASS;
+
+I fixed this to XDP_PASS as we discussed offline.
+
+> +}
+> +
+>   __noinline
+>   int tail_call(struct __sk_buff *sk)
+>   {
+
 
