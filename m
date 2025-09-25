@@ -1,90 +1,110 @@
-Return-Path: <netdev+bounces-226545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FAADBA1B7B
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 00:00:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8431FBA1BF8
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 00:12:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59A3C3BBC23
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 22:00:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B87071C271B4
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 22:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F3A2750FB;
-	Thu, 25 Sep 2025 22:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6832131DD88;
+	Thu, 25 Sep 2025 22:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mCsdIWll"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JTWBqhfZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0588D22D4F9;
-	Thu, 25 Sep 2025 22:00:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0A0235358;
+	Thu, 25 Sep 2025 22:12:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758837652; cv=none; b=sG2TqatbO1Jhyh5iqemjFzWldLor/jjKIFSqHGoX/c3x8OazxprECRxxyxkNUNYzgKvyC/QSPUQ8MuAKkCSyPn48TU3QGd6o+hoPZqsurzi8P5COMq8QKnKetfs+efPqR3XD2/jCdXFG3dM+CrrqnEnGf5dx2979xA3wuXgJyIs=
+	t=1758838340; cv=none; b=WRyxPvZSdl1f8/xFIg91nVUZqFvydUg6j9NwO4tGzdrvmHRZrLtWYeNugo+sdx9s9MZrwQE22ZCzEecDMvqhWiJzWyzQ4329SVKacJNNecoOE3mQSnNYg0QYOTT7ZYvWl+gjG2XX4Fs4aJ78R/pUi3vdEeG5abw8blVAM33LKqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758837652; c=relaxed/simple;
-	bh=OZ2mSDCtHXvMzea0lTp5F7xIMOMGoZ1WJKVYVSPzMfY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UOF2OxJQtfwTbR/OzbN7cvlslBh4h4vYB4glP5FoMz5atdSRNbbnFf5v4q8rMwd+1w3qFtJrQNhHhjqrcDdOEcvgn96U10DWw9CgB5nBH80rKsrqxP7oeWYfqizPi6IuxI+iFZiAht6nQrIECLdMx4StSbMP31lorsdynFPUh6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mCsdIWll; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Y1AKqVxOcQwyhkid55ZdNasv23OvCJ6hz4wrxtH2pCU=; b=mCsdIWllhqrnL/pnEdyHEhDO5b
-	3oQWdovzkYjSCMj+gzLTtK5Ml+JZhmXSnVNwgFHfUX5J4Rlkm84KrVoGDDCIewGoxwrYYZzAzJnF/
-	dwwQ8bvOFuTmx/j9ySJVm6hoHlGdP4Etp/SY3zW3vyub6kHyEwcqddeUzdXMsP4b/7fA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1v1u0o-009Vna-GM; Fri, 26 Sep 2025 00:00:26 +0200
-Date: Fri, 26 Sep 2025 00:00:26 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Josef Raschen <josef@raschen.org>
-Cc: Arun Ramadoss <arun.ramadoss@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: microchip_t1: LAN887X: Fix device init issues.
-Message-ID: <3e2ea3a1-6c5e-4427-9b23-2c07da09088d@lunn.ch>
-References: <20250925205231.67764-1-josef@raschen.org>
+	s=arc-20240116; t=1758838340; c=relaxed/simple;
+	bh=c7108jwqpOV4+pWr+PhgmM1iKDmFVdJiyCtcy1mN2cY=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=uFMc8n1x2uc33QxPaTXpwANG/F3V/KVZ66ciIgadO+oILGUaPZ1O1t98BTFu0PRn5cmJXyctiqsoGRuJ5k7bpXfWJiYIq2yeL6NqK0ZYjJCgtOi34meIvh0HnTQvFLT7jeKBeSfSlvLTgDyZdRQHoznxRtTuVq2CT1O6BqNDDSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JTWBqhfZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34ABBC4CEF0;
+	Thu, 25 Sep 2025 22:12:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758838339;
+	bh=c7108jwqpOV4+pWr+PhgmM1iKDmFVdJiyCtcy1mN2cY=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=JTWBqhfZxOwUEuDpU8HMg9wskI7rQ2bhGgOMM5JaFNn7OZZFkUYF4DgZwGNQkmdSW
+	 uUwJNNV218XJp0cK8cfwzwLs7Y7nccd+DXiv+vZwJwGkE0zT8ajUaBaFMKgRE9gt3J
+	 9wJxt7DaG1GR5DAVStev5fRHal9v7CCXed3tI99B/OCRd4Hn5VB67ZOu9Qx6V2G49c
+	 ygdytilAIcB13MK2jUDvK/mgpCE2ElRi29eO4U51HhfN/tOS9AdZ7GDL4qtZp63cLK
+	 RRkdPTmB5EafZ3qqXa1AHfBZRax0WxluH7Pa0aPnnXhrY9IMZpWhF2xxg8bk9Nq1xl
+	 ctKy2Ch/HdHxA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250925205231.67764-1-josef@raschen.org>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 26 Sep 2025 00:12:06 +0200
+Message-Id: <DD285GJWLA78.10DN8N20YVHQI@kernel.org>
+Cc: <linux-pm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <rust-for-linux@vger.kernel.org>, <nouveau@lists.freedesktop.org>,
+ <dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>,
+ <linux-clk@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>, <kunit-dev@googlegroups.com>,
+ <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH v2 18/19] rust: io: replace `kernel::c_str!` with
+ C-Strings
+From: "Benno Lossin" <lossin@kernel.org>
+To: "Tamir Duberstein" <tamird@gmail.com>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, "Viresh Kumar" <viresh.kumar@linaro.org>, "Miguel
+ Ojeda" <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>, "Boqun
+ Feng" <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Andreas
+ Hindborg" <a.hindborg@kernel.org>, "Alice Ryhl" <aliceryhl@google.com>,
+ "Trevor Gross" <tmgross@umich.edu>, "Danilo Krummrich" <dakr@kernel.org>,
+ "Maarten Lankhorst" <maarten.lankhorst@linux.intel.com>, "Maxime Ripard"
+ <mripard@kernel.org>, "Thomas Zimmermann" <tzimmermann@suse.de>, "David
+ Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "FUJITA
+ Tomonori" <fujita.tomonori@gmail.com>, "Andrew Lunn" <andrew@lunn.ch>,
+ "Heiner Kallweit" <hkallweit1@gmail.com>, "Russell King"
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Michael Turquette" <mturquette@baylibre.com>,
+ "Stephen Boyd" <sboyd@kernel.org>, "Breno Leitao" <leitao@debian.org>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>, "Luis Chamberlain"
+ <mcgrof@kernel.org>, "Russ Weight" <russ.weight@linux.dev>, "Dave Ertman"
+ <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>, "Leon
+ Romanovsky" <leon@kernel.org>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, "Arnd
+ Bergmann" <arnd@arndb.de>, "Brendan Higgins" <brendan.higgins@linux.dev>,
+ "David Gow" <davidgow@google.com>, "Rae Moar" <rmoar@google.com>, "Jens
+ Axboe" <axboe@kernel.dk>, "Alexandre Courbot" <acourbot@nvidia.com>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>, "Christian Brauner"
+ <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>, "Liam Girdwood"
+ <lgirdwood@gmail.com>, "Mark Brown" <broonie@kernel.org>
+X-Mailer: aerc 0.21.0
+References: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
+ <20250925-core-cstr-cstrings-v2-18-78e0aaace1cd@gmail.com>
+In-Reply-To: <20250925-core-cstr-cstrings-v2-18-78e0aaace1cd@gmail.com>
 
-On Thu, Sep 25, 2025 at 10:52:22PM +0200, Josef Raschen wrote:
-> Currently, for a LAN8870 phy, before link up, a call to ethtool to set
-> master-slave fails with 'operation not supported'. Reason: speed, duplex
-> and master/slave are not properly initialized.
-> 
-> This change sets proper initial states for speed and duplex and publishes
-> master-slave states. A default link up for speed 1000, full duplex and
-> slave mode then works without having to call ethtool.
+On Thu Sep 25, 2025 at 3:54 PM CEST, Tamir Duberstein wrote:
+> C-String literals were added in Rust 1.77. Replace instances of
+> `kernel::c_str!` with C-String literals where possible.
+>
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-Hi Josef
-
-What you are missing from the commit message is an explanation why the
-LAN8870 is special, it needs to do something no other PHY does. Is
-there something broken with this PHY? Some register not following
-802.3?
-
-    Andrew
+Reviewed-by: Benno Lossin <lossin@kernel.org>
 
 ---
-pw-bot: cr
+Cheers,
+Benno
 
+> ---
+>  rust/kernel/io/mem.rs | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
 
