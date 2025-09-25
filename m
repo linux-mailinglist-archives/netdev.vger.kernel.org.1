@@ -1,147 +1,101 @@
-Return-Path: <netdev+bounces-226188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CE49B9DB91
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 08:48:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F8ACB9DBCD
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 08:56:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C25D52E35DC
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 06:48:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70B641B2225F
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 06:56:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74C51E2614;
-	Thu, 25 Sep 2025 06:48:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E7FC2E8DE5;
+	Thu, 25 Sep 2025 06:56:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TGYesiqm"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="xiKysYkG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D46182B4
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 06:48:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E7F2676DE
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 06:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758782909; cv=none; b=SosTtOyj4V/7Vf666SC94hakSekesliFEtTTITdnPbdFrftG6t3f/SauVbijZdkd/lMpJuhtYpZFpAfMpJefqGK8WyxIaiFLa7QIA5ApY5jWqJUXDFAFMW8k3qSz8SkPYlTHEfIVsJWFg1MGieA0Wschtzvg/wmd+mykRpjItCk=
+	t=1758783379; cv=none; b=b7YO4KHeT6rsGbM4mfFrqIGs9UJvgHJr93oEPvt9MbHeo8K23+m7j0HfAN0PjSGMYOdXnPV4f4AFjnhrJjxCrkzrEteMQkqC9M8rj8oXJN7VIfFQ0cxTxZp9BhVFs6jKBFWtBDaSNQpuI5dWsq1hmkB1Wsco+qZdI8khCGNB9Sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758782909; c=relaxed/simple;
-	bh=/Jh9narK//Vdct6harcwA5oRwFRD6C/h9Pvtm7ja7UI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r7++DlRgpUFGz3sxDHeh8MVNoXZF9ozMYRHi12Ff1YxisqleGB8org4SZNNlAA0KSdqY86KM9nHASE/ASic1QbkyAEJhm7iR2F7gWM5yVZbDl/wXk5blNpvCeBIeWp2g/QBCj5xeNd9lz71NgB1U1JfAov7UC6/4CNCkb/hHZU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TGYesiqm; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758782908; x=1790318908;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/Jh9narK//Vdct6harcwA5oRwFRD6C/h9Pvtm7ja7UI=;
-  b=TGYesiqmEDGqbMtrh3rI5tjrJQStiy+LXm73ZrUkZTP4anpSk3quje81
-   QOPgDBSHa/SJJ4FsjTOhK6jligCWT1zF+zppHus24ijadCJwKm1tsK4d4
-   PngO6HrWyDV/4h/AwfcAdHk7zs4VR0DBPoZdl/EcHjVwIo/uKUoK3JGCB
-   PwMMO3I6jd3Iy+scliDOI2gPh0r2oibLvEtov+lMZT11PLNNn/NWVh47d
-   eNR1kX6IJjFLykw/1XjSHt5Qr8X4sV4Kjrj6ELu5U/gCtE86rrlfrrvLQ
-   eX85/0qQ5CIyyjWxeIq4NsJCUQbm3Z8FkrZ2V4d+UMrIUTodY/wq8wgxo
-   Q==;
-X-CSE-ConnectionGUID: 22fAunL4RB2Yk5657G5/Jg==
-X-CSE-MsgGUID: 8JDbO5iJRxaVX4dcPMdP4Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11563"; a="72520225"
-X-IronPort-AV: E=Sophos;i="6.18,292,1751266800"; 
-   d="scan'208";a="72520225"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 23:48:27 -0700
-X-CSE-ConnectionGUID: 0laVTdjgR/O9U2gJbq7RfA==
-X-CSE-MsgGUID: 6hCP+bN0SLe9K0FCbDqTvg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,292,1751266800"; 
-   d="scan'208";a="208185905"
-Received: from lkp-server02.sh.intel.com (HELO 84c55410ccf6) ([10.239.97.151])
-  by fmviesa001.fm.intel.com with ESMTP; 24 Sep 2025 23:48:23 -0700
-Received: from kbuild by 84c55410ccf6 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1v1fm8-0004zj-31;
-	Thu, 25 Sep 2025 06:48:20 +0000
-Date: Thu, 25 Sep 2025 14:48:16 +0800
-From: kernel test robot <lkp@intel.com>
-To: Daniel Zahka <daniel.zahka@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Willem de Bruijn <willemb@google.com>,
-	Breno Leitao <leitao@debian.org>, Petr Machata <petrm@nvidia.com>,
-	Yuyang Huang <yuyanghuang@google.com>,
-	Xiao Liang <shaw.leon@gmail.com>,
-	Carolina Jubran <cjubran@nvidia.com>,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: Re: [PATCH net-next 1/9] netdevsim: a basic test PSP implementation
-Message-ID: <202509251404.crckqEdD-lkp@intel.com>
-References: <20250924194959.2845473-2-daniel.zahka@gmail.com>
+	s=arc-20240116; t=1758783379; c=relaxed/simple;
+	bh=U+/ZCHWp5n62zUJkVh2GWyCWLWNte4kdeatyl1hYiuQ=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=A73mgr79DyYqpapU6SvLAzop02VxEmo9KG/WHBMNpk3cf+KPxV89cYwxx3+mMyLQM6teoL7qob0rY3Y+JsRVhJ5OtLZbbHK7w3601luCOYHX6c4EPQg7u0BXzpYDQlqrQdjMshrp4T6kr0h6wLmNjv9X3HqRqdqdDJNmX63AH9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=xiKysYkG; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1758783368; h=Message-ID:Subject:Date:From:To;
+	bh=HwMHqrDTzWXAsTudfeETOLyQXa2iP2EbNwTyicCtxAo=;
+	b=xiKysYkGMhPmaWog8jO3sDBRSQoPyrqdCyX09nRlDHcCl/jsWvfOjMDmrSSnyu0n6NwO0rV0kUx6S5VSafRa71Jh2l1uQ6DqOMrENZ+4u5F2hM++ZpyHDpXQKy5zXNVEFyAZVB1RNCbclJxvZEDtX53KsSLD8ONLGv0X55yBeVE=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WomiAeB_1758783366 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 25 Sep 2025 14:56:06 +0800
+Message-ID: <1758783354.8636878-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v3] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
+Date: Thu, 25 Sep 2025 14:55:54 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Wen Gu <guwen@linux.alibaba.com>,
+ Philo Lu <lulie@linux.alibaba.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Vivian Wang <wangruikang@iscas.ac.cn>,
+ Troy Mitchell <troy.mitchell@linux.spacemit.com>,
+ Dust Li <dust.li@linux.alibaba.com>
+References: <20250919014856.20267-1-xuanzhuo@linux.alibaba.com>
+ <8b70630c-163b-474b-8322-d72ea8de8778@lunn.ch>
+In-Reply-To: <8b70630c-163b-474b-8322-d72ea8de8778@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250924194959.2845473-2-daniel.zahka@gmail.com>
 
-Hi Daniel,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Zahka/netdevsim-a-basic-test-PSP-implementation/20250925-035305
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250924194959.2845473-2-daniel.zahka%40gmail.com
-patch subject: [PATCH net-next 1/9] netdevsim: a basic test PSP implementation
-config: i386-buildonly-randconfig-003-20250925 (https://download.01.org/0day-ci/archive/20250925/202509251404.crckqEdD-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250925/202509251404.crckqEdD-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509251404.crckqEdD-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/net/netdevsim/netdev.c: In function 'nsim_forward_skb':
->> drivers/net/netdevsim/netdev.c:116:36: error: 'SKB_EXT_PSP' undeclared (first use in this function); did you mean 'SKB_EXT_NUM'?
-     116 |                 __skb_ext_set(skb, SKB_EXT_PSP, psp_ext);
-         |                                    ^~~~~~~~~~~
-         |                                    SKB_EXT_NUM
-   drivers/net/netdevsim/netdev.c:116:36: note: each undeclared identifier is reported only once for each function it appears in
+On Fri, 19 Sep 2025 18:35:51 +0200, Andrew Lunn <andrew@lunn.ch> wrote:
+> > +static int eea_set_ringparam(struct net_device *netdev,
+> > +			     struct ethtool_ringparam *ring,
+> > +			     struct kernel_ethtool_ringparam *kernel_ring,
+> > +			     struct netlink_ext_ack *extack)
+> > +{
+> > +	struct eea_net *enet = netdev_priv(netdev);
+> > +	struct eea_net_tmp tmp = {};
+> > +	bool need_update = false;
+> > +	struct eea_net_cfg *cfg;
+> > +	bool sh;
+> > +
+> > +	enet_mk_tmp_cfg(enet, &tmp);
+> > +
+> > +	cfg = &tmp.cfg;
+> > +
+> > +	if (ring->rx_mini_pending || ring->rx_jumbo_pending)
+> > +		return -EINVAL;
+>
+> You have extack, so you can give a useful error message, in addition
+> to EINVAL. set ringparam has soo many parameters it is hard to user
+> space to know which values can be set. So seeing "rx_mini_pending not
+> supported" is a big help.
+>
+> 	Andrew
 
 
-vim +116 drivers/net/netdevsim/netdev.c
+YES. I see.
 
-   102	
-   103	static int nsim_forward_skb(struct net_device *tx_dev,
-   104				    struct net_device *rx_dev,
-   105				    struct sk_buff *skb,
-   106				    struct nsim_rq *rq,
-   107				    struct skb_ext *psp_ext)
-   108	{
-   109		int ret;
-   110	
-   111		ret = __dev_forward_skb(rx_dev, skb);
-   112		if (ret)
-   113			return ret;
-   114	
-   115		if (psp_ext)
- > 116			__skb_ext_set(skb, SKB_EXT_PSP, psp_ext);
-   117	
-   118		return nsim_napi_rx(tx_dev, rx_dev, rq, skb);
-   119	}
-   120	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks.
+>
 
