@@ -1,213 +1,181 @@
-Return-Path: <netdev+bounces-226348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26861B9F35F
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:23:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27FF6B9F47D
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:38:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9B161890CCE
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 12:22:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAEBD17005D
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 12:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE85A2FD1BA;
-	Thu, 25 Sep 2025 12:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9B0192D68;
+	Thu, 25 Sep 2025 12:37:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CscnSF8U"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="wX2sVrxu"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012048.outbound.protection.outlook.com [40.93.195.48])
+Received: from omta40.uswest2.a.cloudfilter.net (omta40.uswest2.a.cloudfilter.net [35.89.44.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1737F2EAB6D;
-	Thu, 25 Sep 2025 12:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758802907; cv=fail; b=MdGOlZDGsLRMa32y7EH/UbLfO3ySw2JwywgsKP4m5ncFPKIWSoS8FncKuhRDodOSQtImngzVS8hrQ9eRSUDzCi+ZnspTaELeWVXHfmxlvDzHIAULbATqocMV6XIIcoTwKz0W6uvY37CrzB6jHPNUTrE2ekmfoGz9/gU9Y5Djawk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758802907; c=relaxed/simple;
-	bh=cm3TG5HPYCvcWiLhRr1hGCUE6g0Zz/qsXwldlf3eZF4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=eWJAeqjvTVznFZPQrEcVsoN/dv/lhGuP8l3WdtCjYyisFy899bnlYuYv9Gqpf9Q4L2z5AXi3wp6OvGZjyAXNqwy4Ufpp+ftwpfOJ8zrlBcaPu24qMggGRfTOn4tEHZkdJdpJ85eBCrcXjXfSgXW/lx64cQ+NLDCvLyKsBBeVm2U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CscnSF8U; arc=fail smtp.client-ip=40.93.195.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wbb0j1YsRx4GcpSxtR/OTlnV1e8G/vQJ1B7Tv/5UTVPhnQiXvHuGzDFGyMU015b+dB6EIvIZJrAVxkbryO3MiQKaVqntDDtl5bgd951DPTMAXQuoAWmGcOSOTyal+48y+mWri5I0dYkG4FWULnvdyMq1fZHhNNdC+hch+VdCiUDmnK9Wg5AJrHgzvxNnQhs7LTZ+2dkEaSAmQ2T2zodWeTor621CVDOZtyANNUsDFrilRAA68OyHawqsO3gi/VBD6G6rm1D/7hktaVReMXDlPM221IIBk5Foca9AnnCq98aND+Y9zPKhNDqxuIih9jjFJsKQu4Goyf8sK+qOw+Onwg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uX8YkeusmhfTNoEkcfVemAzMql2PPy18BCHSOfBEKjw=;
- b=qEwCvVjeuw61Ljb5EnNv5ryErJGlGxuFVu4QZUEipr/WQE1Xyr1u3ASVqAdMfSfSl5XyRJdYWcYnC5a6CIIHK4DkbAQMiKNgj4NYxYlKactBoMW/XOjyZLlHSOZ2j+4BgaLavpDJP2cVfqxWX/vPXSqKUqoBMD9MD+2qVzB5pSLFQpLk9UCsxQe/iqZtDQa0wMHioWzeavLegiNxwittZreyGPHspkH5/akwWvoG9nODnSY3Cfzk6x6UBT2nO+Uww67agxIHTQvPVbLKVN2ekt8QhqaJYN0NZNBe5QVOTOqBi2lsuSWLNtZwEkQ10qLLZtX15fUK5fEjX3GOKp2NyQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uX8YkeusmhfTNoEkcfVemAzMql2PPy18BCHSOfBEKjw=;
- b=CscnSF8U6tuSYVkd87XsitfuJtcBAwpB1G0ZqdayQSHvRFFVUZDYY4hKctKpKY96QmII5EJiRrYDH/Hq6SaUNOlU57RFbXzS2sLA5YUUnDApH0R8ZrbyeKdFnuvTrz26h715+4Zshv84rxrPzXo/hZNUHeM/7N9qTK44aR2k+uMv27j/X1C1o3Ig1Qb4awqDasd4cFUq1A33K+aT9DLQHDlsSxp7mIt8yiNui/R9Iie5FLJjbYBKVNLf9i7OF0NAHGH6GeNVVevo24gVtl0jD5IX12n5d/voTXabqcKujbCiMdqXnvGSS36rZ2+/i20MjXsAzHTQOOsHl2/8VWQnsw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from PH7PR12MB5757.namprd12.prod.outlook.com (2603:10b6:510:1d0::13)
- by DS0PR12MB7993.namprd12.prod.outlook.com (2603:10b6:8:14b::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.10; Thu, 25 Sep
- 2025 12:21:42 +0000
-Received: from PH7PR12MB5757.namprd12.prod.outlook.com
- ([fe80::f012:300c:6bf4:7632]) by PH7PR12MB5757.namprd12.prod.outlook.com
- ([fe80::f012:300c:6bf4:7632%2]) with mapi id 15.20.9137.021; Thu, 25 Sep 2025
- 12:21:41 +0000
-Date: Thu, 25 Sep 2025 09:21:39 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Patrisious Haddad <phaddad@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Michael Guralnik <michaelgur@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>, Will Deacon <will@kernel.org>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Justin Stitt <justinstitt@google.com>, linux-s390@vger.kernel.org,
-	llvm@lists.linux.dev, Ingo Molnar <mingo@redhat.com>,
-	Bill Wendling <morbo@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Leon Romanovsky <leonro@mellanox.com>, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Jijie Shao <shaojijie@huawei.com>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next V5] net/mlx5: Improve write-combining test
- reliability for ARM64 Grace CPUs
-Message-ID: <20250925122139.GW2617119@nvidia.com>
-References: <1758800913-830383-1-git-send-email-tariqt@nvidia.com>
- <20250925115433.GU2617119@nvidia.com>
- <d548b14e-ae28-4807-9b29-9961543ea549@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d548b14e-ae28-4807-9b29-9961543ea549@nvidia.com>
-X-ClientProxiedBy: DS0PR17CA0014.namprd17.prod.outlook.com
- (2603:10b6:8:191::10) To PH7PR12MB5757.namprd12.prod.outlook.com
- (2603:10b6:510:1d0::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDAC114A0B5
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 12:37:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.39
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758803877; cv=none; b=KxVsDxpo461i2x+EMcXXuXVxiLsT7VGQrx9qlRrsxV2QtaBvanEQTwUfs9IDrCnHYzqQWi0WX7OgO6UeNafEBlz1prDE02k3vZD725Alx51M4f6mFSwm7KLyuF49pWdXWtq1VcVtM/u+KVklgduNp6kIxan4J83tqVIGj94CiPU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758803877; c=relaxed/simple;
+	bh=sKcOPTxnCJ5a4uUqyFcDkFbORkBcdmjDCZ5NAf7dLyg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s3YsiWGgy/eHb2hHUo9sOnU5ok5Xb6Dm+/6c5WpqADtWUqn3vQEM4qdpWByThf7Qyp/+mhCdO6AYjMa1yOVWAxhzNMHT9Qw12Hx2eSKLZ1rXdqUl3pEMshyqCfCW6HTYzDaUnDk/GTbSPjufRksqcVdPHNHv+w3gQo4mzjMX5xA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=wX2sVrxu; arc=none smtp.client-ip=35.89.44.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-5006b.ext.cloudfilter.net ([10.0.29.217])
+	by cmsmtp with ESMTPS
+	id 1kAmv213RaPqL1lELvIxN9; Thu, 25 Sep 2025 12:37:49 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id 1lEKvwI1O0HUD1lEKvaOaT; Thu, 25 Sep 2025 12:37:49 +0000
+X-Authority-Analysis: v=2.4 cv=TIhFS0la c=1 sm=1 tr=0 ts=68d5379d
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=TDP2S4RWD7HzL5QBIXWMeQ==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=7T7KSl7uo7wA:10 a=VwQbUJbxAAAA:8
+ a=n6cUM9N_SOF4ly-ecgYA:9 a=QEXdDO2ut3YA:10 a=xYX6OU9JNrHFPr8prv8u:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=jHQEQP6ZDcTVOhUjzvTyaPCqzaUVdzFlGtFP2wFxfNw=; b=wX2sVrxudqIgwgpYFfECf9gNBn
+	b6lrLbgF43by0ZF23koUMsxB99bIXyy+VYpGG86IgUkI/4tdEkll8bJWtmbgMpEMYTUg8kMKklChU
+	6jdE7Fug5TwxiF2UZ0RMhbDUvU8LRqSEJLxehPiqHJ8519ItDFJRHbCx354gGYLfxaHjqKRrJu/L2
+	qI/4f5BdOb4j7G1wGT9Iw0k+RdUtha4PLgvhxTnVMWtG+J59LSFjqNGmXtplhEhrAivjkSPRek8bO
+	YAbiC4oqx6Ia7C0lgJx0Xu5Up1xKGkPo5Ut+sayd9aNc/aowxGIM05Dw/lDbMTQXkibwPt8GjPnfm
+	MSW6ktNw==;
+Received: from [83.214.222.209] (port=59262 helo=[192.168.1.104])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.98.1)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1v1lEH-00000002lYu-2Gu8;
+	Thu, 25 Sep 2025 07:37:45 -0500
+Message-ID: <8497d3e4-fa7f-436c-9e94-b669c7be73f1@embeddedor.com>
+Date: Thu, 25 Sep 2025 14:37:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5757:EE_|DS0PR12MB7993:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1ac25156-c1a6-4d4f-84c5-08ddfc2e151e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?k5JBA2NWdC0qCiOzXh4YtWKm6HOVY2Khju5GHc+7eImtMzR1gIkj8sTPo76Q?=
- =?us-ascii?Q?o/nOktghBmu5uJ7ww2Tqx3nY9iEsnFPAbM7/9YlTeWNWYK7EyWPi3vwc2wpv?=
- =?us-ascii?Q?0mSV5CHPUieeoL4BUndatsTiv0gzKTTSZQ3eq8sGmyqG9EpAK89gvK3UNhaG?=
- =?us-ascii?Q?1Qq6tlD9Pb0Z3dQC5qC7ap799TcSs7xxFyhXVJ1uHQTsrdUWR9xZneuTvWFv?=
- =?us-ascii?Q?9IDIxBcbn+HQULkcEN3zxn17OqMIfVBcp0jH+warLFRNoptfECqcj7qe3cPi?=
- =?us-ascii?Q?ypLwbTDh5i7Rt82pWY9LfmoB5rK2LlUo62NISYSxbuyT+ojy8d/id2S/jlXi?=
- =?us-ascii?Q?AlvpdmxoGn64t7yxeVpN6OezODysl+3Gw+bm2u/nprikx4DAT0qZX0AX14uq?=
- =?us-ascii?Q?VUlebsR30KkY5heWR2O4WhOCvhxofqExrYh5lvvG2vglOgGsSqfArwdAqDPf?=
- =?us-ascii?Q?x6eFHa4zYOVT8RWMRDRvrb5ST89Natt7VWipvu097SC0Pl99bV/KUBUS8Ist?=
- =?us-ascii?Q?ojubMl+/UfwrzNxSPsJ9t+l3qc2nc1MBNveMfzqvMFx6FXxRhQkOusObmu6f?=
- =?us-ascii?Q?vT55Xb5NfQ1DYHHTh1qmYLGdGFs/Jo/18HEHfcpHwLdpTtGZ7c0gg72v8eXv?=
- =?us-ascii?Q?vtJHanRN71BZljWzZasNG2dRIIupsDit2XpX1cdwE7I8ZHk7Jkx4kw0ssmst?=
- =?us-ascii?Q?sjSM6NbfWgMsCfY/pGmVys3TSBO5D0P90753A75+OBYg4yGLHb9K2zKqSj4N?=
- =?us-ascii?Q?HBNRL7BlG6i76OYp1w2wn/DyKX9uJxuquaQi/deHybPr/dApdD93YfEhlePo?=
- =?us-ascii?Q?1ARMpbLvN7vpM9nZj0OzhzqGjKSp6CXg2Xwykuakn31vDjICeBeR689/uK0T?=
- =?us-ascii?Q?TcsMKaZn6beD8eNMe7X/WTPRuLB/tq8/WRX49j7F4796ISx2G7M2Th13gwwu?=
- =?us-ascii?Q?uw7CdrEchwuggmkElYWjmecVtJPV/AXpjgwK6pYaMvxr7Bz6ozjrEerlOaKO?=
- =?us-ascii?Q?079cEakPUsG4AS7ch+c5lAOIngqqCcEFbIBP6AIuxPgMhAzpwD3/tv3Gn5jA?=
- =?us-ascii?Q?e1REEvDUu4VvQ/Ko/620Yym+vr9QkIO1liplXAspiK7Fe+GfXZeo5hPFGZsG?=
- =?us-ascii?Q?Iz24acxP09vSGnQkWFEQq9e3V+9QIB2Peu7gLR1avkARkJrvwm13Lm18i6Zg?=
- =?us-ascii?Q?zkk1l+orEe9CO8T1w8oFaB1KgSsf1dxoXuaYusnzQ1dSAB7Y+vIq2ZjKWrIZ?=
- =?us-ascii?Q?Ca39RFpxhJSX7Jb6I4ne27YaiEjlbr7RDo68ZYTlruugku95quSi5b/bs0By?=
- =?us-ascii?Q?dV7SzMtcbozl0zy5GKDonViV/IMoaWEYAzKk7+osUtMouk/ZeExT5eS/4R7T?=
- =?us-ascii?Q?3LzJYAWPvJNWeAcGgL6CN/Ax1JfuULtVQyReX3GtzeU7fvDTkOItk4v80BSf?=
- =?us-ascii?Q?05zeOqaEg9Ojv85zDrLArVJ1L+doRFcK?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5757.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?DPQUp8U1r+X/uLD/pybdwnt/uDfUASmI41LsIU9ylrGYrOb0KtaL1gRr/5BS?=
- =?us-ascii?Q?xJxc9soBSBa+M/Hn+tlLQPKVF4KdJohu5fbqpMygJlWZVPZBp8cBYR3ou+dL?=
- =?us-ascii?Q?rISSEk0rS0TpKa4C0GTIHa8jCM/z8UVPtTYv8so/Qr37ucRof/0zEIg1VC1H?=
- =?us-ascii?Q?gcVrr0yg2BL0FCEttPWaENyVdZzKjFPI/8Sc4uU8ZxDU+V0iYAb7mVoJyP4z?=
- =?us-ascii?Q?fPVOp7tUknFwofL+pDWoCy7bvcWAb2o5d7JfyyjvIFVh55TKUK0DCvOfrKqq?=
- =?us-ascii?Q?l2+CqML3fBGLSefKZlMCeE7HJnjgQE+qoCeRfHTHnvLUFJPuew36AKrX7rOt?=
- =?us-ascii?Q?qseBLFAsIiffB/sPbcHqHOdLd61QXleLkQWE4lI+cSGpYzKfnPBmKbbiP2NV?=
- =?us-ascii?Q?XfVZJe08UqeDEtolVOnl9HbqZpDXRYDGqWDE2LzFkpHhX9H+2Kg0aWQI+PGT?=
- =?us-ascii?Q?CKvxodo69AwSnN0I+M3MHZ0n5HLNwWvmoA0qCJrVtIwcDdrsLBrFEC+BKjVX?=
- =?us-ascii?Q?JhFdQrKXxk6VyOWVSM+iq0ojqrFUcyhvxOm/RfJo5uz53XBHY1u+YAkrrXTt?=
- =?us-ascii?Q?10LOjFaLClBFCqHte4l3Cu8X3IYnjHUrzZ2TZ5jIxaAbWnTgLUgc2iWZXtq8?=
- =?us-ascii?Q?pdsqJKk+TuDd5JnboMj4sUPrfePa874otcfBFczF6FhEFiNpBZwSCW9NyY+C?=
- =?us-ascii?Q?ymsn0KgsgxyCasz0RKIHm8C88jgF3oPlhNU0zr7Twk06l7/cwAXbGYiZfq/D?=
- =?us-ascii?Q?Q4w8+p9yGiKf35sjWO+r7/hAkmPEibYOm0QTXL8j1nqP8In6sxhTzn3YuHAC?=
- =?us-ascii?Q?Mj7GDixL40WpSn+A8HJ3gbe96Hf5R2ciqu8sCOD+8GDIgX38mD0+jciJo3NI?=
- =?us-ascii?Q?TSXXpUC5OBFeJGd0HoqQfWm55pWarDioRvu6mKrzGPokFmcEa9F2tukI+o/K?=
- =?us-ascii?Q?wipUL57ExZQMZW68BFYFcslUges9g1BCUsnwmqfHqOffHk2k7TJ+Um2eERSG?=
- =?us-ascii?Q?6jdvgMH8jWL8SZN6Gtr4Z1ZVyzFqS8dm+1ZF15HzkhuLtIM3d3RjAGhwPoDI?=
- =?us-ascii?Q?i3T9rEY9kOabDQuAnFL8s2JzmwQUPiwHLfwX0GY37LJk1S0sa+1IOpZ5beI9?=
- =?us-ascii?Q?pL75U2fW6xKpmgppZUFze5UdAW3R4jNadGU0InnopqLKLR+uUnkDjlRamWeF?=
- =?us-ascii?Q?kaQcD6BSJZnKf/ph9lzNulJD0/7xSk4cpAcxKIdW3wG6eyl2vij+xVW4Fvap?=
- =?us-ascii?Q?7ekClstuEa7Jh5hA57Z3e7siwYPZTZK/XPm4PzUyjutC89A0GedMUQcOqxJ6?=
- =?us-ascii?Q?wAhfmukc4IT+dAKsYCdAEV4nmILxjlzgYco3i3W2h3DU7rYybDU4XDTmsoYd?=
- =?us-ascii?Q?I/xBGXjY8iuqgrblFYA6GFNVBBcDdKtX9xu4lObCpuh4ouk4jq8eOHBRlJAJ?=
- =?us-ascii?Q?NBxkqcyaIvYvHC4+uFY7X2W2No4V3EWm/+Il8rsZ6ifBzJCbHfhwjIplXRgE?=
- =?us-ascii?Q?bN7ZA4s/SXapifgnxQusKflEnT/y3zZQ7d+w9xZt/qZWcbdvUfDk73zgMNU6?=
- =?us-ascii?Q?cin9km/8CiTzb7LYCVQucjybjl+giVRHfFPFN7k9?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1ac25156-c1a6-4d4f-84c5-08ddfc2e151e
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5757.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2025 12:21:41.1198
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BlCAQyTsqqG6ss+jy7zlUp3puVoYlJobrLIwgaK9l1ZOgo/wwh5oUQpIx9avNvH4
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7993
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2][next] Bluetooth: Avoid a couple dozen
+ -Wflex-array-member-not-at-end warnings
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <aMAZ7wIeT1sDZ4_V@kspp>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <aMAZ7wIeT1sDZ4_V@kspp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 83.214.222.209
+X-Source-L: No
+X-Exim-ID: 1v1lEH-00000002lYu-2Gu8
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.1.104]) [83.214.222.209]:59262
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 4
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfCoMNbQ3UeO9O7JONQN+0WF3AQDCa+1GZBpSap+fPlTrSN7gELKo05GEtLCrcGy9kfrnFQ4LumkkcRxwJMhI4QXM5DLg4IubZgzGCTExEykRYiSAMoOT
+ xMDbcn2Zc0bGlpPOkIpwZ59ET6AltInObjMJ6XuTrZjmoiQV0ixsgWU4NwE/nnWgKCz6Yh5u9+oV3CzfXLR7EtCOFTrzY5qvB+8=
 
-On Thu, Sep 25, 2025 at 03:15:46PM +0300, Patrisious Haddad wrote:
+Hi all,
+
+Friendly ping: who can take this, please? :)
+
+Thanks!
+-Gustavo
+
+On 9/9/25 14:13, Gustavo A. R. Silva wrote:
+> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+> getting ready to enable it, globally.
 > 
-> On 9/25/2025 2:54 PM, Jason Gunthorpe wrote:
-> > On Thu, Sep 25, 2025 at 02:48:33PM +0300, Tariq Toukan wrote:
-> > > +static void mlx5_iowrite64_copy(struct mlx5_wc_sq *sq, __be32 mmio_wqe[16],
-> > > +				size_t mmio_wqe_size, unsigned int offset)
-> > > +{
-> > > +#if defined(CONFIG_KERNEL_MODE_NEON) && defined(CONFIG_ARM64)
-> > IS_ENABLED() not defined()
-> I just wonder why, Is there a preference in the driver from like
-> aesthetic/convention point of view?
-> Since here it technically doesnt matter - IS_ENABLED have no functional
-> difference from defined since these are boolean configs not *tristate*ones
-> (cant be loaded as module).
+> Use the __struct_group() helper to fix 31 instances of the following
+> type of warnings:
+> 
+> 30 net/bluetooth/mgmt_config.c:16:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> 1 net/bluetooth/mgmt_config.c:22:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> 
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> ---
+> Changes in v2:
+>   - Use __struct_group() instead of TRAILING_OVERLAP().
+> 
+> v1:
+>   - Link: https://lore.kernel.org/linux-hardening/aLSCu8U62Hve7Dau@kspp/
+> 
+>   include/net/bluetooth/mgmt.h | 9 +++++++--
+>   net/bluetooth/mgmt_config.c  | 4 ++--
+>   2 files changed, 9 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index 3575cd16049a..74edea06985b 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -53,10 +53,15 @@ struct mgmt_hdr {
+>   } __packed;
+>   
+>   struct mgmt_tlv {
+> -	__le16 type;
+> -	__u8   length;
+> +	/* New members MUST be added within the __struct_group() macro below. */
+> +	__struct_group(mgmt_tlv_hdr, __hdr, __packed,
+> +		__le16 type;
+> +		__u8   length;
+> +	);
+>   	__u8   value[];
+>   } __packed;
+> +static_assert(offsetof(struct mgmt_tlv, value) == sizeof(struct mgmt_tlv_hdr),
+> +	      "struct member likely outside of __struct_group()");
+>   
+>   struct mgmt_addr_info {
+>   	bdaddr_t	bdaddr;
+> diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
+> index 6ef701c27da4..c4063d200c0a 100644
+> --- a/net/bluetooth/mgmt_config.c
+> +++ b/net/bluetooth/mgmt_config.c
+> @@ -13,13 +13,13 @@
+>   
+>   #define HDEV_PARAM_U16(_param_name_) \
+>   	struct {\
+> -		struct mgmt_tlv entry; \
+> +		struct mgmt_tlv_hdr entry; \
+>   		__le16 value; \
+>   	} __packed _param_name_
+>   
+>   #define HDEV_PARAM_U8(_param_name_) \
+>   	struct {\
+> -		struct mgmt_tlv entry; \
+> +		struct mgmt_tlv_hdr entry; \
+>   		__u8 value; \
+>   	} __packed _param_name_
+>   
 
-I think it is an aesthetic convention to avoid defined(CONFIG_*) as
-the reasoning it is not tristate is a bit tricky.
-
-Jason
 
