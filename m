@@ -1,275 +1,174 @@
-Return-Path: <netdev+bounces-226537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B5B3BA1838
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 23:20:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4814BA180E
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 23:18:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 123AA1C8152B
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 21:18:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07B79563E2B
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 21:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C88322C8E;
-	Thu, 25 Sep 2025 21:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 544572E7193;
+	Thu, 25 Sep 2025 21:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KEGWFikO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QKU5CpTJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA5E322A3B
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 21:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65DC275AE2
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 21:17:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758835022; cv=none; b=quz6+KCG0s3bTGfOhYpW5De8RE95vawJi9OAIXW+0MaFOs+QAxzhdokeklVExIJhZX8v+5f9XrE6hbrLGwhtmWFUpmbqs3WbYdfZeEUUOmSxJMwwX0XgYvr0r/XcwC9xmtMyrS4Pb3Hoj4G+nfZfPNwcniH+5arVcuttnp2Vwso=
+	t=1758835066; cv=none; b=jZ0Yexv/wheqgFxct8730pUwO0r//P8rLuFahqOTqs9GxIJR/oJj8x873eKCsLCll5pH9WGbwHgllPKOnqtdWQJNZFIq3NW5sGiuMElqGJpghqOrTItitaZw2Ui4yO3UYFBtPweP60VRvge/UJuiG2cmOcSH22n+e0n5d/b+XOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758835022; c=relaxed/simple;
-	bh=W0zrtGCRv1JKDtb4hNj0Ew9zhUISoAAsd0ngYP0rDks=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e+ecDIqgZkFa2nJQl+fILFXX0dUPrn/f4/rgQFzbj4EyKektPzKVpWICfCMRctRd3ouWbX689Ng1w5i+XtzxOlzeEod/gGkk/hW0gNUYylkVROcVa9KKawoRusivBWd8pSes+YVTJyPw70i3f73FJ1UFWNImUTOylqfSa0Vmp5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KEGWFikO; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-71d60504788so13586767b3.2
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 14:17:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758835019; x=1759439819; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dApBtpQ38j5H0cAjXKBJNlLXE3pUCuEyhNWBe3vyq94=;
-        b=KEGWFikOmGYSP+bbLIGZWRtjQJ2m6O4lRhCj3jStCYm+g4tToNtn/mU5ccoJUSLIiz
-         2YGJlCZzRMgJI60XaHhB53gz3Gz3vi+OVuuK/zLUki2Hq/2SuJGG5xepDV/DS/kHXxO1
-         ay9RZUOslsE2Tp3v4qBBn2nJVgzZwbTKuFZp4gPB543mOMf2abd6dSWQJWjNtBpy+TS+
-         X9P9XvsqBQ1bV1JTz0Q6NTrJwepUGfhKWxpAmMgRKMtV+DnKsw34ispDNYXAR/q21NLv
-         Z4/8S2aNnsafOQ3Ack3XJ4BPZWCUoJ3GVlJTH9KNu6sBipkCxXMtOvxc37LL2ANnEe/o
-         bzsQ==
+	s=arc-20240116; t=1758835066; c=relaxed/simple;
+	bh=uMYvDDi76m0SjYLL/+X5HrviapVaV9pGIvPYvBnmmfY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n2/xhqmqC490ftBUmgFHbjD9cOJSUeSa3dxzfH3otvEzZui+3R9oX5PNjqE13PV67Z6uSz+omDkUguAeI4lx/Z2ikmmfHnr5YsOlaVUy+xWZLsUh4l8iuxn2SP+TQ0kb3a0bKmvhnMX9ouhOf1lAE++lOKvorU/mmm65eD8FUjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QKU5CpTJ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758835063;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=InMs270U7tNzmYsR7wyJORKxbY23YzNflcIxA8PlZo4=;
+	b=QKU5CpTJ4wqjm55CvGh6qx20CKHzwBjGZk422pAC4Ewe1luxSU1gSFi0ymGgr2XAN/FXyE
+	WA4dMRa9CJ9ODUFD00GQT8aeUPptQM56xSauB6YIgCTkz4llz7gasWbnncHn860/QjJITD
+	pdY+/xc4F2sHeQxCoPH9I5tSgQIvQQA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-564-kGN4bGOqPl-YipPe_rx_-g-1; Thu, 25 Sep 2025 17:17:41 -0400
+X-MC-Unique: kGN4bGOqPl-YipPe_rx_-g-1
+X-Mimecast-MFC-AGG-ID: kGN4bGOqPl-YipPe_rx_-g_1758835059
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3f42b54d159so1044714f8f.2
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 14:17:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758835019; x=1759439819;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dApBtpQ38j5H0cAjXKBJNlLXE3pUCuEyhNWBe3vyq94=;
-        b=NXGlsbTW5eqJyIDZUBQGsNX+k1ysuTME5ktP8VtZsew9g5m+VKoqzy75du17QKouNU
-         +xvXKk4oaO12ZqF8IV7CZbb75jS2Ou6sDy+6v2r+UhC0Lo6V14LSS8op3P2HPc+AnOrC
-         5AhR2wgeLNxPyQhy+vnyH4LQ3cZ/PUw+YOyqH/JIm7wmg0IQM7YMl4NqRrdYoI3ScKZl
-         H32XfCvqrZwPFFlHQ99UwPlq+/lXkb8MfyD/w7gdfPK67XYmEMdI8TNeAPf+2QmIZJfr
-         xGvBG4cFCKk+3CWE8XhXe1gpdGjhPKOdB8bq6ZkF5IkpbFLF89LtPSNn9tfpchLPf/zL
-         KB6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVK5VeF37gw4ptkHt1DXBcD8J2otRZh8cUZN9p4yc6qvX7igVtiPoa8IKJ4QDqYA+Dko5v7/T8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwY48utIQ6Shj0EmutC9bjPOvzuaM/7qFdTXKuXkHWuxfYMLBRr
-	QBn7gDziw4gUoRyVxFQMalJhfTeGnAmrF8G9HhjZfvLjQ52gwsxn0S8O
-X-Gm-Gg: ASbGncvEM7JJ9yCb4Jm8zfUJK7FmhpZ5rQrBuZOoWkRpE8V6AaZNASZ41pVUjvN18ZR
-	JRbMWVfqDTMzZYJFZpkvzgvs+FLJGqTr5kMB0P7yoKsaMY6wYgWgSIIeFv0SMMeLdEidGkP1zP4
-	i/ShL450uU98p1mQ5Dzg/91pCUSQU5JbfRygjyj9ZDg840H+7wy5zG9dVOZmT0w7A6nCz3+qp/V
-	hb/oJUN37RY4xnEOymzvM/qY59SY4S0UHoJuT8kGo3vUxUrLevsLhw/Pd5YPqoKEVGGWkTuEftY
-	DYCqvOJMW/EiCkApkPDNrJl8TwunwUgaAyAOglbIdp+DUeF6A8teqm9NqT3EzkCtoeVuzDhSWZb
-	Bg8Y0ZsoY/saPWO4kveJU
-X-Google-Smtp-Source: AGHT+IEJ1AFHr+6bBlVzr8CLiHkEL2bqG/pjqIeLOMVV3TNKpaPCF/1iEo9aRz547n4B55jNjCD5NQ==
-X-Received: by 2002:a05:690c:708c:b0:717:ca51:d781 with SMTP id 00721157ae682-763fbe14bb7mr49967787b3.17.1758835019352;
-        Thu, 25 Sep 2025 14:16:59 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:58::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-636d5b1d955sm108147d50.30.2025.09.25.14.16.58
+        d=1e100.net; s=20230601; t=1758835059; x=1759439859;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=InMs270U7tNzmYsR7wyJORKxbY23YzNflcIxA8PlZo4=;
+        b=bp+dSmXWU00l19Wme1NXP0Ad+HC92Bwznqbi/cBF+xoCXuQoRV2Sb9sgvktVmdo4CX
+         ew+PMk9lr49SZlNbJkbJDhc/WMYe7j3iTYJR6wAQH8EGuywoifcg0E7TxKsP5q+8YeRD
+         KnZerqrPxLtkwm7BapUrQWimATpAmbSbmG16y9huWyv3WhVuGVth6rUgIQ+JWhLC4Wiw
+         03A0fT7gPumA5TEgzZ1/iD3dMdvrpoLGY0ZxoZwfqf9xJELbDOh8BnwYALi4Tmdr7c0l
+         eqQgxfSTH4CPJLOpWKWciLvKfusnUI6inH9ICDuI+9fJyODdQ3jS+Iuy096qFRw3GpWL
+         1rrg==
+X-Gm-Message-State: AOJu0Yxc9uviecU2y1BpFz08k7eKLG9uHSvjyspGP+CUDgDIb5uTvieI
+	HGbnqVmxYvh1jFO4r6iFmgIGihn1D35dx8S5IElUcgVjrFGJN/Tdv7fI8w/LYuFR4VbhiJ2LPD+
+	NnFHH6j56oO06ejyMfpzE5kNwV9d0j0+coYcpXVwC843tPI5NZ4TmV/KA7g==
+X-Gm-Gg: ASbGncvxQ8Gvx80C8wk56xwW+g5f4q+d4mxqA2rAm6eOnoNM8vd84+FELaIfripuruW
+	l5TvKvCcTBhls5SvaXoygP6/0Z1LCGHrV7hLqnTqPtUdHDuO7fwhGI3u1TrCnPb0znrBFCdKXwh
+	tV/O+/fZ3H+iE0PFj8Bl+UGluqou0SR9/msJkZM+SSiurTHztFP50CKw2RyEZdes8zF8VerTX/r
+	TYsXt0AZOrsorC6gD6sWDysSoUFz9CRlJmLbc1qMY2xrt2N3S6UcZJxt4CKYsz0auhUqBCKOh61
+	KBXVBiOmbtQQraGkYpUGD7QqIfZtRvVwFw==
+X-Received: by 2002:a05:6000:2901:b0:3eb:60a6:3167 with SMTP id ffacd0b85a97d-40e4bb2f6c4mr4971946f8f.32.1758835059165;
+        Thu, 25 Sep 2025 14:17:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFyfQdBXXom1LNY4hzsZo9rtJMz+NF0dmBeIX72tlfFZXC2O/zmQ4r9tU2in2I61YuZlQYweQ==
+X-Received: by 2002:a05:6000:2901:b0:3eb:60a6:3167 with SMTP id ffacd0b85a97d-40e4bb2f6c4mr4971932f8f.32.1758835058759;
+        Thu, 25 Sep 2025 14:17:38 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1538:2200:56d4:5975:4ce3:246f])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb72fbb27sm4235081f8f.4.2025.09.25.14.17.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 14:16:58 -0700 (PDT)
-From: Daniel Zahka <daniel.zahka@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>
-Cc: Willem de Bruijn <willemb@google.com>,
-	Breno Leitao <leitao@debian.org>,
-	Petr Machata <petrm@nvidia.com>,
-	Yuyang Huang <yuyanghuang@google.com>,
-	Xiao Liang <shaw.leon@gmail.com>,
-	Carolina Jubran <cjubran@nvidia.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v2 8/8] selftests: drv-net: psp: add tests for destroying devices
-Date: Thu, 25 Sep 2025 14:16:44 -0700
-Message-ID: <20250925211647.3450332-9-daniel.zahka@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250925211647.3450332-1-daniel.zahka@gmail.com>
-References: <20250925211647.3450332-1-daniel.zahka@gmail.com>
+        Thu, 25 Sep 2025 14:17:38 -0700 (PDT)
+Date: Thu, 25 Sep 2025 17:17:35 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Daniel Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, jasowang@redhat.com, alex.williamson@redhat.com,
+	pabeni@redhat.com, virtualization@lists.linux.dev, parav@nvidia.com,
+	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, shameerali.kolothum.thodi@huawei.com,
+	jgg@ziepe.ca, kevin.tian@intel.com, kuba@kernel.org,
+	andrew+netdev@lunn.ch, edumazet@google.com
+Subject: Re: [PATCH net-next v3 03/11] virtio_net: Create virtio_net directory
+Message-ID: <20250925171724-mutt-send-email-mst@kernel.org>
+References: <20250923141920.283862-1-danielj@nvidia.com>
+ <20250923141920.283862-4-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250923141920.283862-4-danielj@nvidia.com>
 
-From: Jakub Kicinski <kuba@kernel.org>
+On Tue, Sep 23, 2025 at 09:19:12AM -0500, Daniel Jurgens wrote:
+> The flow filter implementaion 
 
-Add tests for making sure device can disappear while associations
-exist. This is netdevsim-only since destroying real devices is
-more tricky.
+implementation
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
----
- .../drivers/net/hw/lib/py/__init__.py         |  2 +-
- .../selftests/drivers/net/lib/py/__init__.py  |  2 +-
- .../selftests/drivers/net/lib/py/env.py       |  5 ++
- tools/testing/selftests/drivers/net/psp.py    | 59 ++++++++++++++++++-
- tools/testing/selftests/net/lib/py/ksft.py    |  5 ++
- 5 files changed, 69 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-index 1c631f3c81f1..0ceb297e7757 100644
---- a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-+++ b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-@@ -22,7 +22,7 @@ try:
-     from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
-         ksft_setup
-     from net.lib.py import ksft_eq, ksft_ge, ksft_in, ksft_is, ksft_lt, \
--        ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt
-+        ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt, ksft_not_none
-     from net.lib.py import NetNSEnter
-     from drivers.net.lib.py import GenerateTraffic
-     from drivers.net.lib.py import NetDrvEnv, NetDrvEpEnv
-diff --git a/tools/testing/selftests/drivers/net/lib/py/__init__.py b/tools/testing/selftests/drivers/net/lib/py/__init__.py
-index 8a795eeb5051..2a645415c4ca 100644
---- a/tools/testing/selftests/drivers/net/lib/py/__init__.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/__init__.py
-@@ -21,7 +21,7 @@ try:
-     from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
-         ksft_setup
-     from net.lib.py import ksft_eq, ksft_ge, ksft_in, ksft_is, ksft_lt, \
--        ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt
-+        ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt, ksft_not_none
- except ModuleNotFoundError as e:
-     ksft_pr("Failed importing `net` library from kernel sources")
-     ksft_pr(str(e))
-diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
-index c1f3b608c6d8..fc12e20af880 100644
---- a/tools/testing/selftests/drivers/net/lib/py/env.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-@@ -7,6 +7,7 @@ from lib.py import KsftSkipEx, KsftXfailEx
- from lib.py import ksft_setup, wait_file
- from lib.py import cmd, ethtool, ip, CmdExitFailure
- from lib.py import NetNS, NetdevSimDev
-+from lib.py import KsftXfailEx
- from .remote import Remote
- 
- 
-@@ -245,6 +246,10 @@ class NetDrvEpEnv(NetDrvEnvBase):
-         if not self.addr_v[ipver] or not self.remote_addr_v[ipver]:
-             raise KsftSkipEx(f"Test requires IPv{ipver} connectivity")
- 
-+    def require_nsim(self):
-+        if self._ns is None:
-+            raise KsftXfailEx("Test only works on netdevsim")
-+
-     def _require_cmd(self, comm, key, host=None):
-         cached = self._required_cmd.get(comm, {})
-         if cached.get(key) is None:
-diff --git a/tools/testing/selftests/drivers/net/psp.py b/tools/testing/selftests/drivers/net/psp.py
-index 3eed986e587e..f32f3ffe440d 100755
---- a/tools/testing/selftests/drivers/net/psp.py
-+++ b/tools/testing/selftests/drivers/net/psp.py
-@@ -10,7 +10,7 @@ import termios
- import time
- 
- from lib.py import ksft_run, ksft_exit, ksft_pr
--from lib.py import ksft_true, ksft_eq, ksft_ne, ksft_gt, ksft_raises, KsftSkipEx
-+from lib.py import ksft_true, ksft_eq, ksft_ne, ksft_gt, ksft_raises, ksft_not_none, KsftSkipEx
- from lib.py import NetDrvEpEnv, PSPFamily, NlError
- from lib.py import bkg, rand_port, wait_port_listen
- 
-@@ -449,6 +449,61 @@ def data_stale_key(cfg):
-         _close_psp_conn(cfg, s)
- 
- 
-+def __nsim_psp_rereg(cfg):
-+    # The PSP dev ID will change, remember what was there before
-+    before = set([x['id'] for x in cfg.pspnl.dev_get({}, dump=True)])
-+
-+    cfg._ns.nsims[0].dfs_write('psp_rereg', '1')
-+
-+    after = set([x['id'] for x in cfg.pspnl.dev_get({}, dump=True)])
-+
-+    new_devs = list(after - before)
-+    ksft_eq(len(new_devs), 1)
-+    cfg.psp_dev_id = list(after - before)[0]
-+
-+
-+def removal_device_rx(cfg):
-+    """ Test removing a netdev / PSD with active Rx assoc """
-+
-+    # We could technically devlink reload real devices, too
-+    # but that kills the control socket. So test this on
-+    # netdevsim only for now
-+    cfg.require_nsim()
-+
-+    s = _make_clr_conn(cfg)
-+    try:
-+        rx_assoc = cfg.pspnl.rx_assoc({"version": 0,
-+                                       "dev-id": cfg.psp_dev_id,
-+                                       "sock-fd": s.fileno()})
-+        ksft_not_none(rx_assoc)
-+
-+        __nsim_psp_rereg(cfg)
-+    finally:
-+        _close_conn(cfg, s)
-+
-+
-+def removal_device_bi(cfg):
-+    """ Test removing a netdev / PSD with active Rx/Tx assoc """
-+
-+    # We could technically devlink reload real devices, too
-+    # but that kills the control socket. So test this on
-+    # netdevsim only for now
-+    cfg.require_nsim()
-+
-+    s = _make_clr_conn(cfg)
-+    try:
-+        rx_assoc = cfg.pspnl.rx_assoc({"version": 0,
-+                                       "dev-id": cfg.psp_dev_id,
-+                                       "sock-fd": s.fileno()})
-+        cfg.pspnl.tx_assoc({"dev-id": cfg.psp_dev_id,
-+                            "version": 0,
-+                            "tx-key": rx_assoc['rx-key'],
-+                            "sock-fd": s.fileno()})
-+        __nsim_psp_rereg(cfg)
-+    finally:
-+        _close_conn(cfg, s)
-+
-+
- def psp_ip_ver_test_builder(name, test_func, psp_ver, ipver):
-     """Build test cases for each combo of PSP version and IP version"""
-     def test_case(cfg):
-@@ -512,7 +567,7 @@ def main() -> None:
- 
-                 if cfg.psp_dev_id is not None:
-                     ksft_run(cases=cases, globs=globals(),
--                             case_pfx={"dev_", "data_", "assoc_"},
-+                             case_pfx={"dev_", "data_", "assoc_", "removal_"},
-                              args=(cfg, ))
-                 else:
-                     ksft_pr("No PSP device found, skipping all tests")
-diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
-index 72cddd6abae8..83b1574f7719 100644
---- a/tools/testing/selftests/net/lib/py/ksft.py
-+++ b/tools/testing/selftests/net/lib/py/ksft.py
-@@ -72,6 +72,11 @@ def ksft_true(a, comment=""):
-         _fail("Check failed", a, "does not eval to True", comment)
- 
- 
-+def ksft_not_none(a, comment=""):
-+    if a is None:
-+        _fail("Check failed", a, "is None", comment)
-+
-+
- def ksft_in(a, b, comment=""):
-     if a not in b:
-         _fail("Check failed", a, "not in", b, comment)
--- 
-2.47.3
+>requires minimal changes to the
+> existing virtio_net implementation. It's cleaner to separate it into
+> another file. In order to do so, move virtio_net.c into the new
+> virtio_net directory, and create a makefile for it. Note the name is
+> changed to virtio_net_main.c, so the module can retain the name
+> virtio_net.
+> 
+> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+> Reviewed-by: Parav Pandit <parav@nvidia.com>
+> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
+> ---
+>  MAINTAINERS                                               | 2 +-
+>  drivers/net/Makefile                                      | 2 +-
+>  drivers/net/virtio_net/Makefile                           | 8 ++++++++
+>  .../net/{virtio_net.c => virtio_net/virtio_net_main.c}    | 0
+>  4 files changed, 10 insertions(+), 2 deletions(-)
+>  create mode 100644 drivers/net/virtio_net/Makefile
+>  rename drivers/net/{virtio_net.c => virtio_net/virtio_net_main.c} (100%)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index a8a770714101..09d26c4225a9 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -26685,7 +26685,7 @@ F:	Documentation/devicetree/bindings/virtio/
+>  F:	Documentation/driver-api/virtio/
+>  F:	drivers/block/virtio_blk.c
+>  F:	drivers/crypto/virtio/
+> -F:	drivers/net/virtio_net.c
+> +F:	drivers/net/virtio_net/
+>  F:	drivers/vdpa/
+>  F:	drivers/virtio/
+>  F:	include/linux/vdpa.h
+> diff --git a/drivers/net/Makefile b/drivers/net/Makefile
+> index 73bc63ecd65f..cf28992658a6 100644
+> --- a/drivers/net/Makefile
+> +++ b/drivers/net/Makefile
+> @@ -33,7 +33,7 @@ obj-$(CONFIG_NET_TEAM) += team/
+>  obj-$(CONFIG_TUN) += tun.o
+>  obj-$(CONFIG_TAP) += tap.o
+>  obj-$(CONFIG_VETH) += veth.o
+> -obj-$(CONFIG_VIRTIO_NET) += virtio_net.o
+> +obj-$(CONFIG_VIRTIO_NET) += virtio_net/
+>  obj-$(CONFIG_VXLAN) += vxlan/
+>  obj-$(CONFIG_GENEVE) += geneve.o
+>  obj-$(CONFIG_BAREUDP) += bareudp.o
+> diff --git a/drivers/net/virtio_net/Makefile b/drivers/net/virtio_net/Makefile
+> new file mode 100644
+> index 000000000000..c0a4725ddd69
+> --- /dev/null
+> +++ b/drivers/net/virtio_net/Makefile
+> @@ -0,0 +1,8 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +#
+> +# Makefile for the VirtIO Net driver
+> +#
+> +
+> +obj-$(CONFIG_VIRTIO_NET) += virtio_net.o
+> +
+> +virtio_net-objs := virtio_net_main.o
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net/virtio_net_main.c
+> similarity index 100%
+> rename from drivers/net/virtio_net.c
+> rename to drivers/net/virtio_net/virtio_net_main.c
+> -- 
+> 2.45.0
 
 
