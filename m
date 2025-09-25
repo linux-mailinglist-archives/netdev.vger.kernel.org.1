@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-226320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1930B9F2A2
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:17:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9976B9F2BA
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:17:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 003703AF596
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 12:15:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE0D33B76C4
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 12:16:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E81630AAC6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60B2F30C347;
 	Thu, 25 Sep 2025 12:14:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D913A2FE566
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 12:14:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52480303A3C
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 12:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758802450; cv=none; b=MO68wMMJdw7qRG9DXtEkCsNBeCF+iQ0Oln610u/9J5Rnsss08pCjHt+7LGchUugx20tjoVr1874BIUj8oVvhrdLSM2/y1Ry+8KD+dzvxVm8iN6GVTZ0M4HrP8wmS9l1fFyvJTnzm2gHUPLbF+GM70N22uByBLYu7mW/vjXyMouQ=
+	t=1758802453; cv=none; b=CCskdUuvRFY1y6cwZCQ3zKvfrh0XPG7fP/Ix2iNKWq9Ax26e4aIaZj0ig73vkyH8fNsoIFBvw/K6Ug6fkHkq6XuvS/zgUjVyacukHPvFzFJ39V3WPbIXzb212u8Qy5uwtxzWptvlXnr4mnsjT0UKZV7VWYqKjq/49Li7n8bwPQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758802450; c=relaxed/simple;
-	bh=6MfKNAQhIC0Q77ReZydt3uN1PloOk63arEu8W47bNAA=;
+	s=arc-20240116; t=1758802453; c=relaxed/simple;
+	bh=685rTr9nCcwREiR08zo1S98YrF4qAPSK0xbXtvhANGU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TAq3+x7hgQnhCOKoG/Uy8APhZGGeIoMrPlwgOyGpulxqCp3PpDBIj8RgotQDFtzGCZnvu1T+X5tDzubvK9kYS5LQyiH6Y2KMWIp3BR7ycq8nb/SdUE23ewr0n1jy0MNFOChtf1XWrKsE9Ifi3SdEEJomGuiEinuPEM6EFh3eUFM=
+	 MIME-Version; b=kI43u9PVfS+6aMKMKTm2afgA9nIk1rI3FW89/ie2cxBWlud7z1sanMFw6bIc7RcvvnzlMMgocrgraCg7dLT/vO72n94wUnjukNadGZfQYVgbQFDrauFNuOwkD7ntq5+KDQrMxg8VMCigL/U6VXUQJqQgvFYo7IrT9VTdjye9MuQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,19 +33,19 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1v1kqu-0000Vl-Gw; Thu, 25 Sep 2025 14:13:36 +0200
+	id 1v1kqu-0000Vm-Gv; Thu, 25 Sep 2025 14:13:36 +0200
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1v1kqt-000PvN-21;
+	id 1v1kqt-000PvQ-2D;
 	Thu, 25 Sep 2025 14:13:35 +0200
 Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
 	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 60D97479974;
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 6FF52479975;
 	Thu, 25 Sep 2025 12:13:35 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -53,12 +53,12 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	linux-can@vger.kernel.org,
 	kernel@pengutronix.de,
-	Biju Das <biju.das.jz@bp.renesas.com>,
 	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 08/48] can: rcar_canfd: Simplify data bit rate config
-Date: Thu, 25 Sep 2025 14:07:45 +0200
-Message-ID: <20250925121332.848157-9-mkl@pengutronix.de>
+Subject: [PATCH net-next 09/48] can: rcar_can: Consistently use ndev for net_device pointers
+Date: Thu, 25 Sep 2025 14:07:46 +0200
+Message-ID: <20250925121332.848157-10-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250925121332.848157-1-mkl@pengutronix.de>
 References: <20250925121332.848157-1-mkl@pengutronix.de>
@@ -74,72 +74,48 @@ X-SA-Exim-Mail-From: mkl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Biju Das <biju.das.jz@bp.renesas.com>
+From: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Introduce rcar_canfd_compute_data_bit_rate_cfg() for simplifying data bit
-rate configuration by replacing function-like macros.
+Most net_device pointers are named "ndev", but some are called "dev".
+Increase uniformity by always using "ndev".
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
-Link: https://patch.msgid.link/20250908120940.147196-5-biju.das.jz@bp.renesas.com
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Reviewed-by: Biju Das <biju.das.jz@bp.renesas.com>
+Link: https://patch.msgid.link/aac66fb5b5e1d6787121cf2ec36b551b41d4b32e.1755857536.git.geert+renesas@glider.be
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/rcar/rcar_canfd.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+ drivers/net/can/rcar/rcar_can.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/can/rcar/rcar_canfd.c b/drivers/net/can/rcar/rcar_canfd.c
-index 99719c84f452..401505264676 100644
---- a/drivers/net/can/rcar/rcar_canfd.c
-+++ b/drivers/net/can/rcar/rcar_canfd.c
-@@ -169,15 +169,7 @@
- #define RCANFD_CERFL_ERR(x)		((x) & (0x7fff)) /* above bits 14:0 */
- 
- /* RSCFDnCFDCmDCFG */
--#define RCANFD_DCFG_DSJW(gpriv, x)	(((x) & ((gpriv)->info->data_bittiming->sjw_max - 1)) << 24)
--
--#define RCANFD_DCFG_DTSEG2(gpriv, x) \
--	(((x) & ((gpriv)->info->data_bittiming->tseg2_max - 1)) << (gpriv)->info->sh->dtseg2)
--
--#define RCANFD_DCFG_DTSEG1(gpriv, x) \
--	(((x) & ((gpriv)->info->data_bittiming->tseg1_max - 1)) << (gpriv)->info->sh->dtseg1)
--
--#define RCANFD_DCFG_DBRP(x)		(((x) & 0xff) << 0)
-+#define RCANFD_DCFG_DBRP		GENMASK(7, 0)
- 
- /* RSCFDnCFDCmFDCFG */
- #define RCANFD_GEN4_FDCFG_CLOE		BIT(30)
-@@ -1401,6 +1393,19 @@ static inline u32 rcar_canfd_compute_nominal_bit_rate_cfg(struct rcar_canfd_chan
- 	return (ntseg1 | ntseg2 | nsjw | nbrp);
+diff --git a/drivers/net/can/rcar/rcar_can.c b/drivers/net/can/rcar/rcar_can.c
+index 87c134bcd48d..5b0b495d127c 100644
+--- a/drivers/net/can/rcar/rcar_can.c
++++ b/drivers/net/can/rcar/rcar_can.c
+@@ -420,9 +420,9 @@ static irqreturn_t rcar_can_interrupt(int irq, void *dev_id)
+ 	return IRQ_HANDLED;
  }
  
-+static inline u32 rcar_canfd_compute_data_bit_rate_cfg(const struct rcar_canfd_hw_info *info,
-+						       u16 tseg1, u16 tseg2, u16 sjw, u16 brp)
-+{
-+	u32 dtseg1, dtseg2, dsjw, dbrp;
-+
-+	dtseg1 = (tseg1 & (info->data_bittiming->tseg1_max - 1)) << info->sh->dtseg1;
-+	dtseg2 = (tseg2 & (info->data_bittiming->tseg2_max - 1)) << info->sh->dtseg2;
-+	dsjw = (sjw & (info->data_bittiming->sjw_max - 1)) << 24;
-+	dbrp = FIELD_PREP(RCANFD_DCFG_DBRP, brp);
-+
-+	return (dtseg1 | dtseg2 | dsjw | dbrp);
-+}
-+
- static void rcar_canfd_set_bittiming(struct net_device *ndev)
+-static void rcar_can_set_bittiming(struct net_device *dev)
++static void rcar_can_set_bittiming(struct net_device *ndev)
  {
- 	u32 mask = RCANFD_FDCFG_TDCO | RCANFD_FDCFG_TDCE | RCANFD_FDCFG_TDCOC;
-@@ -1430,10 +1435,7 @@ static void rcar_canfd_set_bittiming(struct net_device *ndev)
- 	sjw = dbt->sjw - 1;
- 	tseg1 = dbt->prop_seg + dbt->phase_seg1 - 1;
- 	tseg2 = dbt->phase_seg2 - 1;
--
--	cfg = (RCANFD_DCFG_DTSEG1(gpriv, tseg1) | RCANFD_DCFG_DBRP(brp) |
--	       RCANFD_DCFG_DSJW(gpriv, sjw) | RCANFD_DCFG_DTSEG2(gpriv, tseg2));
--
-+	cfg = rcar_canfd_compute_data_bit_rate_cfg(gpriv->info, tseg1, tseg2, sjw, brp);
- 	writel(cfg, &gpriv->fcbase[ch].dcfg);
+-	struct rcar_can_priv *priv = netdev_priv(dev);
++	struct rcar_can_priv *priv = netdev_priv(ndev);
+ 	struct can_bittiming *bt = &priv->can.bittiming;
+ 	u32 bcr;
  
- 	/* Transceiver Delay Compensation */
+@@ -715,10 +715,10 @@ static int rcar_can_do_set_mode(struct net_device *ndev, enum can_mode mode)
+ 	}
+ }
+ 
+-static int rcar_can_get_berr_counter(const struct net_device *dev,
++static int rcar_can_get_berr_counter(const struct net_device *ndev,
+ 				     struct can_berr_counter *bec)
+ {
+-	struct rcar_can_priv *priv = netdev_priv(dev);
++	struct rcar_can_priv *priv = netdev_priv(ndev);
+ 	int err;
+ 
+ 	err = clk_prepare_enable(priv->clk);
 -- 
 2.51.0
 
