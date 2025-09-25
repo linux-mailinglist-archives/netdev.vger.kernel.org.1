@@ -1,114 +1,105 @@
-Return-Path: <netdev+bounces-226283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB4B8B9ECEF
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 12:49:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D353BB9ED0A
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 12:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7989F3AD8AB
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 10:49:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29C213ACF30
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 10:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19182F1FDD;
-	Thu, 25 Sep 2025 10:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 947B42F5306;
+	Thu, 25 Sep 2025 10:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kDwGEOIH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lxB9D27N"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B647620DD51;
-	Thu, 25 Sep 2025 10:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B9952EA47E;
+	Thu, 25 Sep 2025 10:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758797374; cv=none; b=a2R7Vn52HGxQ4KWT8eLJVx1fpY5PVmZTlc/6gR7ThGXaJ2Mtg7OXqByN1Q3lzTL5OzCXFtRQlOt9g73tYmiIx9VWKWkvGw9srSs4kXMgdqxO70QhApK/9FQeuw5fmkyIfp10ySpJFvI3PkDAT0O3toh/iQ8CcPuScZyd+uo7/a0=
+	t=1758797416; cv=none; b=FAb6cTr5+V0tDhHX1XzntTiMVjvE62h5kewKTwl0guX1nsn1qcplVOXXy4dNWyzzofxbPOwKRURcCKYNrL0doghXWVSeNLAEGQGcv4h7Eq3Ug7dsuphIf6u7cJsYfbmeRQPv4TCXNihS2+JWGH3lJ6zaioUO7TZ5GL/6DRHKJnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758797374; c=relaxed/simple;
-	bh=rFN5Z8FcdvSu6T/zPde/tldoP5MZ9bU5WlrMTrZ5vSY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cC2xVDBZ8Gi3EViOtkP9ic5ITfq7x4pM6WVx0xfeJouAhfYpNREO+xN/CgEGaR1P8NM7uiFRmMhtvrnjW9cMRfpv8pYF9J5K+uFiG6uAaWX1tvMc6TReG8GklnAoF+/qrKGrn4wOFeAMRuLyeTvH++IOTbBHfTfF7Jjb3v0Zdr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kDwGEOIH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F5BDC4CEF7;
-	Thu, 25 Sep 2025 10:49:32 +0000 (UTC)
+	s=arc-20240116; t=1758797416; c=relaxed/simple;
+	bh=+wlZn7QPyajocFdqL/fg4gZvcEePNLZTcYaBoVafrNA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=dwalhqpJqSgr5D8gE/uJA6vCy+BEtlE8w/IQpj1lQQl/CgAZBLNBfQcuw4O5PQYECC28AWPw8j8uQKZEl+1Hd7izY+bt9t9UTo+221/K4nbxUKZtM9fI4ZxMWvApcGW/ssobM4O+P2FfLB8Gw/QpTokDf9Qlmaz3tKLGtW2rmfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lxB9D27N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1A8AC4CEF4;
+	Thu, 25 Sep 2025 10:50:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758797374;
-	bh=rFN5Z8FcdvSu6T/zPde/tldoP5MZ9bU5WlrMTrZ5vSY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kDwGEOIHgpHjWwNi7yoFKnSXVW0jjz39A6A/iqU6mgnCowDLPEiX6pLjJm4C8zqP8
-	 27VVGQ56CpVVwIAW77CsqJ3CwajdzF4Yeg6UCIl0Nx9hR1MkY3bZ1IAq56vQkSW5jC
-	 z+EY4jh/9WGfIx4U4Xpv1j4fJ2Aq8aouErL6mvf3/9huzycgqWTctxn0c9e2gvRM7q
-	 NoIbJLpFoNc7w+pgNWPvjqFIOwT03qGHwwruJFjua5qnRzLVikElqXbbFwO0RniukD
-	 P0vga4T+ewCV+QWdYcs1QBbTkTtSDa5PfiVTFIPdY8PPDtzbAkjbi1P4EZ7F6NvVf+
-	 6P+WDmJdg5Rtw==
-Date: Thu, 25 Sep 2025 11:49:30 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alessandro Zanni <alessandro.zanni87@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftest: net: Fix error message if empty variable
-Message-ID: <20250925104930.GG836419@horms.kernel.org>
-References: <20250924230413.75246-1-alessandro.zanni87@gmail.com>
+	s=k20201202; t=1758797415;
+	bh=+wlZn7QPyajocFdqL/fg4gZvcEePNLZTcYaBoVafrNA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lxB9D27NhD1w3LUVthAhO1VJ06649vMMlTs6XWsy+Ls9QdGMm7Z+a1Xo8JEky/rHG
+	 5JE6FC5OLTTSo//K0deosufdGHBBEJ1YSSiGV9hiH8PqOGELDJauixCRAyPD0t+i+0
+	 EKrbCflOIhymKeOlxTgs/Obz5gJTFl6Gs/KQuciZsmKViw9jaxPExImwzxSkppN448
+	 8mvFMqUIwt13MDyUyB3T860blru5GAgZQ07aU+Z7VLkCx9dkK8X1LpvUJn/7oXv96w
+	 vG4jODer0XV9ZHlRSVZuHb3BoevhFzO1n3IBBhMyPv6ArZiSjtr0QPkVWwBd++xpm5
+	 tLqqAEQ35c8fA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D4339D0C21;
+	Thu, 25 Sep 2025 10:50:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250924230413.75246-1-alessandro.zanni87@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v8 0/5] net: gso: restore outer ip ids correctly
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175879741200.2924890.4123184469600808130.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Sep 2025 10:50:12 +0000
+References: <20250923085908.4687-1-richardbgobert@gmail.com>
+In-Reply-To: <20250923085908.4687-1-richardbgobert@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, ecree.xilinx@gmail.com,
+ willemdebruijn.kernel@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, corbet@lwn.net, saeedm@nvidia.com,
+ tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org, dsahern@kernel.org,
+ ncardwell@google.com, kuniyu@google.com, shuah@kernel.org, sdf@fomichev.me,
+ aleksander.lobakin@intel.com, florian.fainelli@broadcom.com,
+ alexander.duyck@gmail.com, linux-kernel@vger.kernel.org,
+ linux-net-drivers@amd.com
 
-On Thu, Sep 25, 2025 at 01:04:07AM +0200, Alessandro Zanni wrote:
-> Fix to avoid cases where the `res` shell variable is
-> empty in script comparisons.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 23 Sep 2025 10:59:03 +0200 you wrote:
+> GRO currently ignores outer IPv4 header IDs for encapsulated packets
+> that have their don't-fragment flag set. GSO, however, always assumes
+> that outer IP IDs are incrementing. This results in GSO mangling the
+> outer IDs when they aren't incrementing. For example, GSO mangles the
+> outer IDs of IPv6 packets that were converted to IPv4, which must
+> have an ID of 0 according to RFC 6145, sect. 5.1.
 > 
-> The issue can be reproduced with the command:
-> make kselftest TARGETS=net
-> 
-> It solves the error:
-> ./tfo_passive.sh: line 98: [: -eq: unary operator expected
-> 
-> Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
-> ---
->  tools/testing/selftests/net/tfo_passive.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/net/tfo_passive.sh b/tools/testing/selftests/net/tfo_passive.sh
-> index 80bf11fdc046..2655931b2396 100755
-> --- a/tools/testing/selftests/net/tfo_passive.sh
-> +++ b/tools/testing/selftests/net/tfo_passive.sh
-> @@ -95,7 +95,7 @@ wait
->  res=$(cat $out_file)
->  rm $out_file
->  
-> -if [ $res -eq 0 ]; then
-> +if [ -n "$res" ] && [ $res -eq 0 ]; then
->  	echo "got invalid NAPI ID from passive TFO socket"
->  	cleanup_ns
->  	exit 1
+> [...]
 
-Hi Alessandro,
+Here is the summary with links:
+  - [net-next,v8,1/5] net: gro: remove is_ipv6 from napi_gro_cb
+    https://git.kernel.org/netdev/net-next/c/25c550464acd
+  - [net-next,v8,2/5] net: gro: only merge packets with incrementing or fixed outer ids
+    https://git.kernel.org/netdev/net-next/c/21f7484220ac
+  - [net-next,v8,3/5] net: gso: restore ids of outer ip headers correctly
+    https://git.kernel.org/netdev/net-next/c/3271f19bf7b9
+  - [net-next,v8,4/5] net: gro: remove unnecessary df checks
+    https://git.kernel.org/netdev/net-next/c/f095a358faf2
+  - [net-next,v8,5/5] selftests/net: test ipip packets in gro.sh
+    https://git.kernel.org/netdev/net-next/c/5e9ff9378adc
 
-I'm not sure what $res can be in practice.
-But as it is the contents of $out_file (or more specifically,
-the stdout of running cat $outfile), in theory it could be anything.
-
-So while your patch addresses one error case.
-I think there are others.
-
-f.e. if res is not empty but not numeric, then we may see
-
-bash: [: b: integer expression expected
-
-Or if res contains a newline, then we may see
-
-bash: [: too many arguments
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-So I wonder if it is better to treat $res as a string,
-and quote it to avoid unexpected side effects.
-
-[ "$res" = "0" ]
 
