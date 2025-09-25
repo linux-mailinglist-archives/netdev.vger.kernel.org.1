@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-226165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B3D1B9D225
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 04:25:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1B26B9D22E
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 04:26:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72F0E426738
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 02:25:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4CA6426E66
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 02:25:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97CFD2D24A6;
-	Thu, 25 Sep 2025 02:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B6232E54A0;
+	Thu, 25 Sep 2025 02:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ZBPGeRbe"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="EUciYcCY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47A720FAAB
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 02:25:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398F8219A71
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 02:25:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758767149; cv=none; b=k9vBxs0JNR6ZJiWNzM+g8PRiZTgFq0LI6X3hCkUDUQAVZFATbgzkgcf9bfzy3Pvg1BrMd8yuXv8WpEBp4mKFJszvGUAwFFB14IJqLAvb1sHjGqLhznktbPi5uo7Cvat9W7s9SlxaW0h0yqbiWbSEX3QFZZb2jpTI7QeyQycgBJA=
+	t=1758767150; cv=none; b=T0qzFul/7Gb/7+G4pMUizmURrGeNan112HpQGQiwubuJH+uTaMq3ZsJSedhRZlNKuQJmdbzE9lLuSAjTECTqun6lBSYAExgCEOA2jYpU/n6RDLNzO7/Wpd5Btbh1CwTfns428qBK6OMBv075gSOLqtRmcUBpexeFfh71S3Wb61I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758767149; c=relaxed/simple;
-	bh=FN5QRrKIhutJfqEtTne7hdy3jJhrWQQKr49voPveuD4=;
+	s=arc-20240116; t=1758767150; c=relaxed/simple;
+	bh=tgSEc1HWM2agW5biNxl6fL16hgInhogKEOYYFZfpNZE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=c/nZ51y59gNeagSLnBh86NVgU7W7hMMbqO8E426Arml0+pQbw+tJLayJvKanmR/qCgo3jpuCH5R0LCtQm/6Lz8FQWkPBTQvkjVDsU0WHghvMk+HqJ+fgYrSeRtTccgHhzACz3DZW4HZ/euq7eubUwm26nmD3KMKca116RLDBbOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ZBPGeRbe; arc=none smtp.client-ip=115.124.30.110
+	 MIME-Version; b=FyhpwaEA7inzCOhK0gje1SHjUJyQVcHCAPG3cNPNEZkq6Vedit/KZFI6m9XCCbj8YYAbhDWrUmNHFzRKUYYibVb173UbvCCoCyzCMJSBgs7Deu6jw7hFg3lasMvumabxapS4M1JLYerzB4AlDE/kg53aVXotxJlaolTHDgtyb10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=EUciYcCY; arc=none smtp.client-ip=115.124.30.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1758767139; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=hx401d9vnv0JwrsbTrOOJFtVHIfpt62ewmom373j6G8=;
-	b=ZBPGeRbeGijFqV6aPLKMb+issXDX7LpYG76oHH4vKn0Jn99KxJGaDD8S52XJUXEB56wy1GHr+9Z5vIhpRcqI9/TvYGqjCpTQflhrmUu0Uhx7Qn3LBJzSLw/1+wRcBoDbl1QhsYMqoEjTxrW1w55WLucJN7UwYZw+RVsxNiDAg0M=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WolqhB7_1758767138 cluster:ay36)
+	t=1758767140; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=TvbEHsio3yyITRN8SE97bu3O15GrQXTz/5regTBpZEI=;
+	b=EUciYcCY4btbAxKxqBz1sDcdbTOtW1arYsvb5lo6Asgzx03/cRDSCZ8hpQ5HJI7ozGWAlrD7LvRh5cmsXAVtRDgjiPrY27M4ZGjYqF/j4dz7V1Aky7Ws+kxAU7Pqy1z9FSCw072X0ZI1RUiEFKy+bruZ51cCsPD61Wrn0Qza5Gs=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WolqhBY_1758767138 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Thu, 25 Sep 2025 10:25:38 +0800
+          Thu, 25 Sep 2025 10:25:39 +0800
 From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 To: netdev@vger.kernel.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>,
@@ -55,9 +55,9 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>,
 	Alvaro Karsz <alvaro.karsz@solid-run.com>,
 	Heng Qi <hengqi@linux.alibaba.com>,
 	virtualization@lists.linux.dev
-Subject: [PATCH net 1/2] virtio-net: fix incorrect flags recording in big mode
-Date: Thu, 25 Sep 2025 10:25:36 +0800
-Message-Id: <20250925022537.91774-2-xuanzhuo@linux.alibaba.com>
+Subject: [PATCH net 2/2] virtio-net: correct hdr_len handling for VIRTIO_NET_F_GUEST_HDRLEN
+Date: Thu, 25 Sep 2025 10:25:37 +0800
+Message-Id: <20250925022537.91774-3-xuanzhuo@linux.alibaba.com>
 X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 In-Reply-To: <20250925022537.91774-1-xuanzhuo@linux.alibaba.com>
 References: <20250925022537.91774-1-xuanzhuo@linux.alibaba.com>
@@ -70,60 +70,61 @@ MIME-Version: 1.0
 X-Git-Hash: 833f31d30d57
 Content-Transfer-Encoding: 8bit
 
-The purpose of commit 703eec1b2422 ("virtio_net: fixing XDP for fully
-checksummed packets handling") is to record the flags in advance, as
-their value may be overwritten in the XDP case. However, the flags
-recorded under big mode are incorrect, because in big mode, the passed
-buf does not point to the rx buffer, but rather to the page of the
-submitted buffer. This commit fixes this issue.
+The commit be50da3e9d4a ("net: virtio_net: implement exact header length
+guest feature") introduces support for the VIRTIO_NET_F_GUEST_HDRLEN
+feature in virtio-net.
 
-For the small mode, the commit c11a49d58ad2 ("virtio_net: Fix mismatched
-buf address when unmapping for small packets") fixed it.
+This feature requires virtio-net to set hdr_len to the actual header
+length of the packet when transmitting, the number of
+bytes from the start of the packet to the beginning of the
+transport-layer payload.
 
-Fixes: 703eec1b2422 ("virtio_net: fixing XDP for fully checksummed packets handling")
+However, in practice, hdr_len was being set using skb_headlen(skb),
+which is clearly incorrect. This commit fixes that issue.
+
+Fixes: be50da3e9d4a ("net: virtio_net: implement exact header length guest feature")
 Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 ---
- drivers/net/virtio_net.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ include/linux/virtio_net.h | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 975bdc5dab84..b4d1c09ff488 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -2621,22 +2621,28 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
- 		return;
- 	}
+diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+index 20e0584db1dd..4273420a9ff9 100644
+--- a/include/linux/virtio_net.h
++++ b/include/linux/virtio_net.h
+@@ -217,20 +217,25 @@ static inline int virtio_net_hdr_from_skb(const struct sk_buff *skb,
  
--	/* 1. Save the flags early, as the XDP program might overwrite them.
-+	/* About the flags below:
-+	 * 1. Save the flags early, as the XDP program might overwrite them.
- 	 * These flags ensure packets marked as VIRTIO_NET_HDR_F_DATA_VALID
- 	 * stay valid after XDP processing.
- 	 * 2. XDP doesn't work with partially checksummed packets (refer to
- 	 * virtnet_xdp_set()), so packets marked as
- 	 * VIRTIO_NET_HDR_F_NEEDS_CSUM get dropped during XDP processing.
- 	 */
--	flags = ((struct virtio_net_common_hdr *)buf)->hdr.flags;
+ 	if (skb_is_gso(skb)) {
+ 		struct skb_shared_info *sinfo = skb_shinfo(skb);
++		u16 hdr_len;
  
--	if (vi->mergeable_rx_bufs)
-+	if (vi->mergeable_rx_bufs) {
-+		flags = ((struct virtio_net_common_hdr *)buf)->hdr.flags;
- 		skb = receive_mergeable(dev, vi, rq, buf, ctx, len, xdp_xmit,
- 					stats);
--	else if (vi->big_packets)
-+	} else if (vi->big_packets) {
-+		void *p = page_address((struct page *)buf);
+-		/* This is a hint as to how much should be linear. */
+-		hdr->hdr_len = __cpu_to_virtio16(little_endian,
+-						 skb_headlen(skb));
++		hdr_len = skb_transport_offset(skb);
+ 		hdr->gso_size = __cpu_to_virtio16(little_endian,
+ 						  sinfo->gso_size);
+-		if (sinfo->gso_type & SKB_GSO_TCPV4)
++		if (sinfo->gso_type & SKB_GSO_TCPV4) {
+ 			hdr->gso_type = VIRTIO_NET_HDR_GSO_TCPV4;
+-		else if (sinfo->gso_type & SKB_GSO_TCPV6)
++			hdr_len += tcp_hdrlen(skb);
++		} else if (sinfo->gso_type & SKB_GSO_TCPV6) {
+ 			hdr->gso_type = VIRTIO_NET_HDR_GSO_TCPV6;
+-		else if (sinfo->gso_type & SKB_GSO_UDP_L4)
++			hdr_len += tcp_hdrlen(skb);
++		} else if (sinfo->gso_type & SKB_GSO_UDP_L4) {
+ 			hdr->gso_type = VIRTIO_NET_HDR_GSO_UDP_L4;
+-		else
++			hdr_len += sizeof(struct udphdr);
++		} else {
+ 			return -EINVAL;
++		}
 +
-+		flags = ((struct virtio_net_common_hdr *)p)->hdr.flags;
- 		skb = receive_big(dev, vi, rq, buf, len, stats);
--	else
-+	} else {
-+		flags = ((struct virtio_net_common_hdr *)buf)->hdr.flags;
- 		skb = receive_small(dev, vi, rq, buf, ctx, len, xdp_xmit, stats);
-+	}
- 
- 	if (unlikely(!skb))
- 		return;
++		hdr->hdr_len = __cpu_to_virtio16(little_endian, hdr_len);
+ 		if (sinfo->gso_type & SKB_GSO_TCP_ECN)
+ 			hdr->gso_type |= VIRTIO_NET_HDR_GSO_ECN;
+ 	} else
 -- 
 2.32.0.3.g01195cf9f
 
