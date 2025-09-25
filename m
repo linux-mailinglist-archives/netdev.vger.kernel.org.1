@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-226420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E6CDB9FF9C
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 16:25:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CAD1B9FFAE
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 16:26:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B8253A5308
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:22:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B06D3A5056
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 14:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 722F929B20A;
-	Thu, 25 Sep 2025 14:22:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 492FC29B79A;
+	Thu, 25 Sep 2025 14:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hvFr3C41"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HtyPcheZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC93B1E50E
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 14:22:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C24629ACF0
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 14:24:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758810127; cv=none; b=XA+TSkxp9fbu2f41uRYU6qpRucsg+CvhCixd4P6Kholc0MX5UjgaPv/sl4tIzlItv3UUvCgIMjC6h5CO6jxcnRoY9vswI6ldfnENWiOX93BTSqRLcINCBe2/MAhMx7f/4oj6sJ9rMadYpMWqeyGKauwuYQ0PoRHW0+ZgWW0G21A=
+	t=1758810249; cv=none; b=p/pOIZAx1UGIQDryE91NIOv3aSARCiBU8ImH+54fH+/J+XNcExuiwnqdRnrPGLydMQLpQw/Jq2/cqGuxjdxk8h4xyb+J5sfmJRiHi/QRMzNb8FVLAa29CrtRDQhU/5QEwuz06P67Yy2rLMETVwJZOc/+aBAXc1V42vMsjIy/q2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758810127; c=relaxed/simple;
-	bh=EKG2WXysLoCvoTe3QfEw3Qjx0gwEzluktK084EedUQs=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=CiG13XVKJc4+FZQIJD9IrL4JLGwwQyuUfH8KGngxz3tgbWRiOMYqsuuGpWAXWqq4E0auoMoLDQTzgC8HNMXmpnbTaTsWQsDUWyKH09occyFu4P47ylnLacJ+zYSeSxIFmtsOCtpB83Aj/Wpf46/4qcC1ExK5ABfqCebFkg22yNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hvFr3C41; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1758810249; c=relaxed/simple;
+	bh=dYuqr2GSG8NOMs6Xn8T29IWXFaooQ8AMUrrXaiN16FE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nnUfSwSrJFV3QtkTZeHgB4sJ3BBqfOgt5p/1phZuV2T5D3RKEcoNLFWuNEG12tSxSgdXZy0lvQvKQ9JBskG66IRb8rvw7cS/K/CTqjeSA3KG6wOFr+oLLq1ZOQGs76siO5ZIwtVwXihGXzGyhjT1lCNf3MF+yI1IHtmdORtwb2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HtyPcheZ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758810125;
+	s=mimecast20190719; t=1758810246;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lV93FB3pFQVIaxq7ycuLXtCoCRvlOAi0eLumyxrNoUU=;
-	b=hvFr3C41vborFmHnKpovlTvZ7t4pKrRTXmXRZvNqy5UksTGbH8DDV2sKmtXP+Zw+oLwzbz
-	jgx5T5hqJMyGkuWosl0Yucmg5p5ro8bAgHyFdSLtDfmAvMj2RdT21cKrnaYB0I8ShQ7/A7
-	u5fGNY6mSL+iSwzZsMXmFP6EncHk5u4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=iMuxM89R6MEfDdd+6bytrowoXrE1EfEgsSy96sExds8=;
+	b=HtyPcheZL8R5stNnnUcFiQG9KLvV1nTt1fg4cJCK1NagfAh6+LUT4mYyNAdqlsLVTzgR0p
+	twkJS8KINgrZhTItW2W5D78z1kYNjQJBk4i/UipaXtZDB6ykr1QDC4UfGSXMfkLnwEhOQk
+	XEE3rbTRGh5bb9fqRWq5OHroiJD/5TQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-651-IEq9H-TXM6GrqvWygTqDNw-1; Thu, 25 Sep 2025 10:22:03 -0400
-X-MC-Unique: IEq9H-TXM6GrqvWygTqDNw-1
-X-Mimecast-MFC-AGG-ID: IEq9H-TXM6GrqvWygTqDNw_1758810122
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3ecdd80ea44so633741f8f.1
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 07:22:03 -0700 (PDT)
+ us-mta-564-4ECyEnjnPAu1W59Hs8R3CQ-1; Thu, 25 Sep 2025 10:24:05 -0400
+X-MC-Unique: 4ECyEnjnPAu1W59Hs8R3CQ-1
+X-Mimecast-MFC-AGG-ID: 4ECyEnjnPAu1W59Hs8R3CQ_1758810244
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-46e39567579so777185e9.0
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 07:24:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758810122; x=1759414922;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1758810244; x=1759415044;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lV93FB3pFQVIaxq7ycuLXtCoCRvlOAi0eLumyxrNoUU=;
-        b=qjFY04z0Vg7k36gsYJZIkdqAhv6QCUapTuTAufDb7pVzOUhpJ5brEHizYZBCQ0kyua
-         /Z+YYtPQCZAztmF4Ez5D5/VZUJNlqHgw//y8bOAbresPCrlzjHdVR72M+bxC4kc0vnvg
-         vWTYCSlCbfDdNGjU4UlpY4xy8drvgbR9sXshO29F/N2k+T3tgSiQQ7CgiBqGocqpv12c
-         Ok9VQgM1Jlcvok5Se3jpKjWP89sQRMaZ0KP9l7XdvQQRyNYq//JZys/fmPcY03JYLmld
-         VM9iMjLn3qUqKYcM/6oSCMVCeURWZf3DA7r1SX7Og8d8U09DnzyIqGXQmjIJ2FTANCXy
-         b+pA==
-X-Gm-Message-State: AOJu0Yz2DKTP3qVWEBBZk05155wJhEHwwyccPNI3tOZz/ibppJ6KrCox
-	z2iwP4t4lkyJb3q5dreaCPbwCIhN1o1ENOPPuixBy6/x9rFWuJ05OFMdRzAjJ/zM8CKSNK8fSal
-	PPQQID/Dem3FbwGo/aIRrpaz+b3vTWtpbzbdl+d+HLD9wgP2l6AS2Um2KrA==
-X-Gm-Gg: ASbGncs70qWjZAg2miy1G9zcW91NHX5x3MYoXnyjySQWAyIhmv2zbRxW673e7JG1unB
-	LCLvobaLMlZ3D2wYpF6ouVM/JpnqsVCSxWXs+TxNW1tzvYCoGYcvtUdSq7urnzHAXrwIxxkuNLt
-	3nUHoukw//Qs+qjYk2UvbnMv86V8jLmIxRFBxYwwQz8vDfwXOh0T/eKnWy75emZmSYr6m4aSeiZ
-	bvR/j/SzjHkG2dSOZUVrVcC5ADSNpvQQQLPSlJWG46yO6h3dLqaVJ5sh3G1SK7L0IRdvHoNxz2q
-	F6SkgmpplDqxvNvQA/VvU9R17xnFrjvXu9oUtNAwaU1tOBm+SIx0cWbWEsoFBaJJllzJHxqCafU
-	RlWNJ80UY/yJw
-X-Received: by 2002:a5d:64c4:0:b0:410:88db:1c6e with SMTP id ffacd0b85a97d-41088db1ec2mr1925576f8f.16.1758810122460;
-        Thu, 25 Sep 2025 07:22:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGdUOUgl1HpwHY5z7X62/FPsf6dceCEMiAL7qgjKbw/iE4srX6gn0oVY88kG0BvyMD3niC+EA==
-X-Received: by 2002:a5d:64c4:0:b0:410:88db:1c6e with SMTP id ffacd0b85a97d-41088db1ec2mr1925552f8f.16.1758810122026;
-        Thu, 25 Sep 2025 07:22:02 -0700 (PDT)
+        bh=iMuxM89R6MEfDdd+6bytrowoXrE1EfEgsSy96sExds8=;
+        b=kQmSbzqWtx5eqlM3t3LFrDFaelYoLR0oj90Gk1OHpV25HhJDNfmqJ+2iSRsWba5GYV
+         nQ/GqpbEw+Rj+TVrCwvkqzhNX8O6Vk2IgDu/viB8mrMqh+waCQLEplkm66T1UUiGy650
+         0aNweq5RxrhT1pgGkprj/xC+udmVt/NWaJM2pxs72R7MYfEpS1ITj7N9txVm1OfgUyI3
+         vMS+Bw4HRRRnmQLMqLtqmZiLCaqE5rfT8qPGFZWvAwAVHAQuvnl/5X8lOYONHuaPX0Ay
+         +nYjSAKMoAFApbrZe6le6azSOb02/FBh8gHAHGgy2HPqRAHm3NpA7Q0UxjHtMSctf7tG
+         h7GA==
+X-Gm-Message-State: AOJu0YwvUUvgYkX1G8u+byNcZJUYlefln4vLGkbu+OLsNJeMCIgOqt0S
+	VeVpEfiua5KbcqevRmQIL0tF48pbAh+vzupDkoJkbglRxyLcSke4AhcuM97HavPZxA7AApKSasr
+	MkDEMNW2XOPZGSElA5NzlvDizhbUY4V/DQRTV0emnEj2G4s3Fdz1Pfj60Rg==
+X-Gm-Gg: ASbGncvHzDD+OyaGxJh8NjDHPUADvimP2T16q9+e64CVypaF9M3CzrK6qcDO+IHP9Aj
+	MRs+RuchX95n7MgL5vrfeUd4zug4/WesNJl+Jbfq4QzOQOg3eER3OoCQo2xIqixJkz2lgVPLKFQ
+	UnWOPxEC/de2OnxGUUGt1rILU9qnWV433aHEU5xPWKvql0UgLiOYJNlDRmlsvQ8HnmS/k/J8DVu
+	cGuWoGynIk9MtK0o5ZcAhNNi+oDKnMgqwHpfIwJuWLPAOYFVvKyJfHnwT8m/d96rbO5tZhIBkqA
+	XIIZ2/HWSEZoZl1mCaB6sd94xfw8eIFX4z/Jp7a+AGVajB6XWMCGT+TA/KYwEMUS4IGYev38IDl
+	NMolznwaDljos
+X-Received: by 2002:a05:600c:1c9b:b0:45d:d9ab:b85a with SMTP id 5b1f17b1804b1-46e3299f565mr43904305e9.7.1758810243696;
+        Thu, 25 Sep 2025 07:24:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE9YXnhD0FxsllUyBaiVQWY9PkmgoZepRKRm35fQoWyBGnECcfNupZbIZQvTB8qYn0+J32BDg==
+X-Received: by 2002:a05:600c:1c9b:b0:45d:d9ab:b85a with SMTP id 5b1f17b1804b1-46e3299f565mr43903915e9.7.1758810243276;
+        Thu, 25 Sep 2025 07:24:03 -0700 (PDT)
 Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e33fede76sm33506345e9.14.2025.09.25.07.22.00
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e33b9eabbsm39079635e9.3.2025.09.25.07.24.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Sep 2025 07:22:01 -0700 (PDT)
-Message-ID: <61b001c3-bf6f-410b-aa56-2b0c2c93523e@redhat.com>
-Date: Thu, 25 Sep 2025 16:22:00 +0200
+        Thu, 25 Sep 2025 07:24:02 -0700 (PDT)
+Message-ID: <0bf3a83d-2fa0-4dc9-9a50-39463d31d4de@redhat.com>
+Date: Thu, 25 Sep 2025 16:24:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,8 +88,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 13/17] udp: Support gro_ipv4_max_size > 65536
-From: Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 17/17] geneve: Enable BIG TCP packets
 To: Maxim Mikityanskiy <maxtram95@gmail.com>,
  Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -101,45 +100,33 @@ Cc: netdev@vger.kernel.org, tcpdump-workers@lists.tcpdump.org,
  Denis Ovsienko <denis@ovsienko.info>, Xin Long <lucien.xin@gmail.com>,
  Maxim Mikityanskiy <maxim@isovalent.com>
 References: <20250923134742.1399800-1-maxtram95@gmail.com>
- <20250923134742.1399800-14-maxtram95@gmail.com>
- <5b8ed8b5-2805-4cfb-8c9c-2a8fa4ca8fb2@redhat.com>
+ <20250923134742.1399800-18-maxtram95@gmail.com>
 Content-Language: en-US
-In-Reply-To: <5b8ed8b5-2805-4cfb-8c9c-2a8fa4ca8fb2@redhat.com>
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250923134742.1399800-18-maxtram95@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 9/25/25 4:15 PM, Paolo Abeni wrote:
-> On 9/23/25 3:47 PM, Maxim Mikityanskiy wrote:
->> From: Maxim Mikityanskiy <maxim@isovalent.com>
->>
->> From: Maxim Mikityanskiy <maxim@isovalent.com>
->>
->> Currently, gro_max_size and gro_ipv4_max_size can be set to values
->> bigger than 65536, and GRO will happily aggregate UDP to the configured
->> size (for example, with TCP traffic in VXLAN tunnels). However,
->> udp_gro_complete uses the 16-bit length field in the UDP header to store
->> the length of the aggregated packet. It leads to the packet truncation
->> later in __udp4_lib_rcv.
->>
->> Fix this by storing 0 to the UDP length field and by restoring the real
->> length from skb->len in __udp4_lib_rcv.
->>
->> Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
-> 
-> If I read correctly, after this patch plain UDP GRO can start
-> aggregating packets up to a total len above 64K.
+On 9/23/25 3:47 PM, Maxim Mikityanskiy wrote:
+> diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
+> index 77b0c3d52041..374798abed7c 100644
+> --- a/drivers/net/geneve.c
+> +++ b/drivers/net/geneve.c
+> @@ -1225,6 +1225,8 @@ static void geneve_setup(struct net_device *dev)
+>  	dev->max_mtu = IP_MAX_MTU - GENEVE_BASE_HLEN - dev->hard_header_len;
+>  
+>  	netif_keep_dst(dev);
+> +	netif_set_tso_max_size(dev, GSO_MAX_SIZE);
+> +
+>  	dev->priv_flags &= ~IFF_TX_SKB_SHARING;
+>  	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
+>  	dev->lltx = true;
 
-Re-reading the patch, I now thing the above is not true.
+I think it would be nice to extend the big_tcp.sh selftests (or gro.sh
+whatever is easier) to cover this code path for both geneve and vxlan.
 
-But geneve/vxlan will do that before the end of the series, so the
-following should still stand:
+Thanks,
 
-> Potentially every point in the RX/TX path can unexpectedly process UDP
-> GSO packets with uh->len == 0 and skb->len > 64K which sounds
-> potentially dangerous. How about adding an helper to access the UDP len,
-> and use it everywhere tree wide (except possibly H/W NIC rx path)?
-> 
-> You could pin-point all the relevant location changing in a local build
-> of your the udphdr len field and looking for allmod build breakge.
+Paolo
 
 
