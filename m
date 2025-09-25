@@ -1,134 +1,114 @@
-Return-Path: <netdev+bounces-226364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6537B9F964
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 15:33:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 006E1B9F92B
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 15:29:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D56B7BC529
-	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 13:27:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AC1F19C0AD4
+	for <lists+netdev@lfdr.de>; Thu, 25 Sep 2025 13:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8F0A2264AA;
-	Thu, 25 Sep 2025 13:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A33235358;
+	Thu, 25 Sep 2025 13:28:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AR3y7+40"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KHhaud+s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378062356D2
-	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 13:28:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998412417D4
+	for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 13:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758806924; cv=none; b=oYxf5wwJeaMgBW/2XPOwEDvFrevDBvnq54a69V0zUmkb3mpDDkMqsnLqsBpWg3epdGXe2Y0Oo42h714ZLS/3qkg+C9CSyWmqZT37q3Vuzy6jehyDBwlrGyKysnAa2V+LW+qzD33qqBY7QRCQSAXZaJ+WdmS1001tF18TeoQBvH8=
+	t=1758806929; cv=none; b=eb/+vY0B5REBg8QeIAgOYuB+IASLpIHZIt35I70tuudPhqtJBvtcngd8fv3aTLSQTMrQ+oA+pGITDbNHAEMoS/zXZ3kw9iIWUDCC7AlDmhpJ1A2eckPJWJ5MDg0N1fcu9ltqG4ZGPK5bj39JqErt3XDKetMUv8zqTlp5ryMEwNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758806924; c=relaxed/simple;
-	bh=WNzxPrFin73Lh2ypAKh0zFTGhRAVwxDD1dobdQ9kdBI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TPZbI5zGpUJfECaymtWo3OpyRK7YnnkMWVlcmg6OEFFWLeDMWweJ3eV9bHpxFIyMnUtG7lqljkB9hHpViwCQM6ioD2B224ZCfN6gIEORmCTLW5vOK8LqW3VQtoEadSEVLo96VOXuHxm7hMpSv7+6seo3cLOjw+wVpnfDw1gNyoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AR3y7+40; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-634a3327ff7so1582847a12.1
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 06:28:42 -0700 (PDT)
+	s=arc-20240116; t=1758806929; c=relaxed/simple;
+	bh=1FiNIcneYN0lx2HvUgcqUBdFJAhxJjJ2x/onBI+Yrs8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LUuGcOGv7GM2EThvAv+btmi/ghWWfMzQy+OfUQhVIAnovUfCOXoTerwI4ZjPpP524eKYomiJRA1HaqIttnrGuSqbBQD1tfmIHq1zCJ1gI32UPN2hbvVPMpQrPco0jIMzCG+nj3rXhstDrALR/UsHLrzjtKbg81A2Vr5F0WNG4rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KHhaud+s; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3f0ae439b56so674334f8f.3
+        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 06:28:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758806921; x=1759411721; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RIjBW0HGJ1nhvOGLp1W0sfAHAgMMEq0zVvUkf/NQa8k=;
-        b=AR3y7+40bS4vLrdByw6VpDa3ZXTdOXtstO/0xWrva5oNUBYV5ZtTRdRvK1RlMecLX3
-         /UgFk5Et6I/DGiI2jid3F+kvfNLBuY5laGTMPcojrOY16dToUiCWmakcyffT2hLJjWTa
-         Tmt5IiUL843rxtWTgMZiRBoQsTtNzbOC5Ccp+qrbB7SPObD5uR0ago8OyTXOjmL0C72i
-         OE8laPZApuUHi7fVlbTlWCUvxH+FrC40VjtKViWGK7DI/k+K0H4Cd1bSGli7zft8kK1B
-         XWiTx+DXqGgxOMY7fUt5nZM1tpPBhxEvmH5RcCASSaIO3Flzx1uRDG8v6weWbvScX3aD
-         WzHw==
+        d=linaro.org; s=google; t=1758806926; x=1759411726; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wp58/Fg9Zw3xoKwG1DXjRBI51T+T1GKwsDLk64qZArA=;
+        b=KHhaud+sKfU9GmJ7mcrVLGKUOYK06gbcMRTOgwvCbMmQY6zBc8tsg5EBWu9tvCFTOv
+         xkEcmWNS/FsRnqu9zm3Ev0huYQZja+d8dI44wgOkiY4456V75zBwgJiTfkMnKmAJxssl
+         RpZnaGEkcY/EIYWC0neFYTEClurx9W3CR3ap1PmZDflZ5muMGvDXZWs0kuET+SqKybRR
+         Q/61fU5FBOAngp4U4nQGtE+7Ac+a7HSv9in9LKdTvlUVYgHQRNyr/ZiJqEjuxHfGatsp
+         gDrQ+ZUzgFGNnAhl58hMrLGbgn4TXFxMd/gr1rErJ8FHgdkUS6VmiyEuyTFqXgGaQriH
+         aaVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758806921; x=1759411721;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RIjBW0HGJ1nhvOGLp1W0sfAHAgMMEq0zVvUkf/NQa8k=;
-        b=B3fd/LlFS8xnoJYJYyAuD5iv1cGt4sSUUEokIq5WMC0AkFRgm42O012xZ0m9I6eoO1
-         jt1sgVGiRpa65ydnQO8a1TAhEtIDQHBTmmcwhry34wMHo1a11u1jmhDr1w7pIFndnkYM
-         dxUxYN7n5kqkajRl13uqfQpXcC2WWlWq+bWuERIa3AJuLcfw5IYaSbRgoTjeN12Hnz3x
-         X+BXxlzXg0s3ela9itMbGVa8NYccSJqpoHU5383zEw0NzFV3yMwRCDLd6sE0yLx5jLsI
-         CBEiGSYjzmy4fva9lJpBywyDzCSnNguDYAO/n7o/kzkF34GeGmn84sjZ6lBFjijqLHrp
-         7/4g==
-X-Forwarded-Encrypted: i=1; AJvYcCUrlRZ9UUmoMr91/f4nAt7Br5AFCvxVhJrPXtSaWcVPwa6q2x2e44wNpTrJJLokOH1vHv0CPCg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFDoSmo01ViKEP7YOZ5mS9FtUnmL6tqzTIHEmzziO5ODpJ0xh2
-	Bbd8WZOo5jZQCLb2q9nHsyUAziqNv3fBl2uQ4mBXOw7E7Oru9GrGX5KL
-X-Gm-Gg: ASbGncv+DS7jI/TmphO7O/z9dS3SHSGgonIJV4VZr6DXJAxnGva8sXfDPwXVPeNsBbk
-	wDeZjyIifqOBboLOT+B5WiSiYP5knJTk77HI7S3IOvUcEJn7urrJCq7MmWFRewVWFJFnzdu5mpR
-	H0wk+B6Z6yJEUf6sxoAKa+s62v1kVLw7O16EnKIbqH3xflTWzBghs1GQyQBq/l7qjgXP/UXsNDd
-	DbETczSH6PSY5me2uJ+bYIX+WY1+lGQvz+LLNO/rJbJGrJ2CLxpbrDm2Ky/ZCT0iBU55MKYsVIO
-	b3lfWGdJa50LrXFnctvTFMkFRShihMDNbWTO6AWmpjWzmgIYgIUTmlErV2svoWnSpG0k4t+FLhc
-	fppaf3dvFCDoUjiXlglZxZMe3nrOp060LwfvhAfn+SEppF0n1Q8rwSJW7VmMJzDoJ7lr4btfDxj
-	Z0AESyaw==
-X-Google-Smtp-Source: AGHT+IE3bLNJPUzSKiXc9lkzEM/Izf2jTetxO9oV5D9S6+ZprF/oHUQ3nKipbH/bpNZu/lVBwAtFEQ==
-X-Received: by 2002:a05:6402:348b:b0:62f:32c7:6c2b with SMTP id 4fb4d7f45d1cf-6349f9fad7emr2672620a12.11.1758806921247;
-        Thu, 25 Sep 2025 06:28:41 -0700 (PDT)
-Received: from alessandro-pc.station (net-2-37-207-41.cust.vodafonedsl.it. [2.37.207.41])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-634a3b02d8asm1185354a12.44.2025.09.25.06.28.40
+        d=1e100.net; s=20230601; t=1758806926; x=1759411726;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wp58/Fg9Zw3xoKwG1DXjRBI51T+T1GKwsDLk64qZArA=;
+        b=VOCTXAr3H/bS57ptCKbAeRTDWmjbXUBzOwc33EOzTcLIH23tRELHpyz/to+TcMyZ7g
+         N2WWASy72Om+ogXaDXKhcr3TXKNwHfTlwXpdEf089uhpZoIIvZxVeh/IX0R8lPxEOi6p
+         TIhfY1r1BsOJ7Yo2VGPG1t+qbY/SATMk2IEUnV77kgKRTq4jqxQSE0ouveaKnZyso99p
+         aBxeSJ0QRickzKM46nKk9G+/1VOj/IM0zRkZnaKSdzHCkTTr3R/z4KCMitrGX6qFVTGj
+         vpsUxGh94Pfwh9QHxEVu6fov90d3OAs0mFS55wYUV1VVAmpbC/tarqI7BF6kkv1y8q32
+         hfug==
+X-Forwarded-Encrypted: i=1; AJvYcCVmCWWDJpgoCabgUEdi96atodovtxJ8w/z0jqe1Td37uZDIxkfSLCdNSK+KEbflAg3CVw5fuco=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3VlyFbxnW0pwyl0pWZSc2r7Gam7f+WgEBoEBFHHz9iCSYw44Q
+	xQM+5I+8guU+1NgK5AQo+DYX/K+9ATYbW9t1+vc9m/voNTpZZdhAB3DvnWP+GM1eXS4=
+X-Gm-Gg: ASbGncu3YuhgyhWKmRF3h64VgODeFZJDU2pY40ynXmMuF54KB+LANKjJslPKiyEOHi4
+	CwsiJwMFhRDPMUS/zHFGnhRCKeP93piAXrLz5zOgZ4C6oO1anPXiRYx9dH/i+cBL3K7YQsfe+oJ
+	tb49uhdyEM6wXcLQnIxVsaFQI06sjzQgQ4EaJBHEzmJJn/OtzBFq3NovTMUqf0d/A4p0su3NQVC
+	h8p/A7B3FcfIYxz3L1ulgOHX6p8ifv8x4u0kq1DihXQ+ynqPt8ZkqqEjLT2qZkPuZlzAUR3Fwrx
+	4Hclr/oTh/PRzPsttNEwjDt64/MJCRAz8H+xewMvKolUzxf5DlHWEa5ETudjvcSODlsxgWyNBSW
+	oiQGU9hFQFcsOINS1R7V5sma4tYZX
+X-Google-Smtp-Source: AGHT+IHEfXijaL+23iCR11cBYBG6j0gp/yAlAN7xoxHtuYkzjN8fDbBiJ7bNzYz3ne5Aj8wBn5ePpA==
+X-Received: by 2002:a05:6000:2c0c:b0:3ee:1294:4780 with SMTP id ffacd0b85a97d-40e4a05bf15mr2460323f8f.30.1758806925981;
+        Thu, 25 Sep 2025 06:28:45 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-40fc7e2c6b3sm3258932f8f.54.2025.09.25.06.28.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 06:28:40 -0700 (PDT)
-From: Alessandro Zanni <alessandro.zanni87@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org
-Cc: Alessandro Zanni <alessandro.zanni87@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] selftest: net: Fix error message if empty variable
-Date: Thu, 25 Sep 2025 15:28:23 +0200
-Message-ID: <20250925132832.9828-1-alessandro.zanni87@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Thu, 25 Sep 2025 06:28:45 -0700 (PDT)
+Date: Thu, 25 Sep 2025 16:28:42 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Ivan Vecera <ivecera@redhat.com>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net-next] dpll: zl3073x: Fix double free in
+ zl3073x_devlink_flash_update()
+Message-ID: <aNVDijGWI3ZO2aOw@stanley.mountain>
+References: <aNKAvXzRqk_27k7E@stanley.mountain>
+ <20250924170057.GQ836419@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250924170057.GQ836419@horms.kernel.org>
 
-Fix to avoid cases where the `res` shell variable is
-empty in script comparisons.
-The comparison has been modified into string comparison to
-handle other possible values the variable could assume.
+On Wed, Sep 24, 2025 at 06:00:57PM +0100, Simon Horman wrote:
+> On Tue, Sep 23, 2025 at 02:13:01PM +0300, Dan Carpenter wrote:
+> > The zl3073x_devlink_flash_prepare() function calls zl3073x_fw_free()
+> > and the caller also calls zl3073x_devlink_flash_update() so it leads
+> 
+> s/zl3073x_devlink_flash_update/zl3073x_fw_free/ ?
+> 
 
-The issue can be reproduced with the command:
-make kselftest TARGETS=net
+Sigh.  Let me resend.
 
-It solves the error:
-./tfo_passive.sh: line 98: [: -eq: unary operator expected
-
-Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
----
-
-Notes:
-    v2: edit condition to handle strings
-
- tools/testing/selftests/net/tfo_passive.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/tfo_passive.sh b/tools/testing/selftests/net/tfo_passive.sh
-index 80bf11fdc046..a4550511830a 100755
---- a/tools/testing/selftests/net/tfo_passive.sh
-+++ b/tools/testing/selftests/net/tfo_passive.sh
-@@ -95,7 +95,7 @@ wait
- res=$(cat $out_file)
- rm $out_file
- 
--if [ $res -eq 0 ]; then
-+if [ "$res" = "0" ]; then
- 	echo "got invalid NAPI ID from passive TFO socket"
- 	cleanup_ns
- 	exit 1
--- 
-2.43.0
+regards,
+dan carpenter
 
 
