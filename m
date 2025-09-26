@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-226816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA805BA55AE
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 00:40:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF6C5BA55B1
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 00:40:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 035ED3BEDF4
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 22:40:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D64FC38416B
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 22:40:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8762275B16;
-	Fri, 26 Sep 2025 22:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D48D2BE048;
+	Fri, 26 Sep 2025 22:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k3OjYO4b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eL251epk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAAC015278E;
-	Fri, 26 Sep 2025 22:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15DC2BE020;
+	Fri, 26 Sep 2025 22:40:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758926417; cv=none; b=n+gM6IrMEctDAhOKOQT+bbVTU6gTNpvj0tzx83KkQ2/a/7Ltc9O3e0VkZIieZGUVX6y57+spgnRHRf/kLWdan89X4ST6EYCSLhXOCrY05TwJzlW+tCJ4LxkvQYrXg1Ey1uMGkC9tSidbx5LtCLAgHxYcGIz0Q8594593YHcvrrc=
+	t=1758926418; cv=none; b=CgckkxPK8MxfOHiZc6JNVZtrZB0eLvc3BA2475Dmb208gKNN46meTwDcLMGnz+Sqp4BydCSdvIrY0/2ShGPK3gSX5f+cCVvC7aaxBOvlcb1eqnzfAiAsZgyFF8mS046kBiO0CwRBLXXqtqe507Zi6EaBLB2KjO2mvCRhZaqIw0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758926417; c=relaxed/simple;
-	bh=eQzc4Q0h8XcaMlb4UGs79EVBMhAKWd5o8JWig9NItxc=;
+	s=arc-20240116; t=1758926418; c=relaxed/simple;
+	bh=nwyPuUt5g5WjvIkRMJrnAzdGhpP04k7ZC/H0qRKgz9I=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Krosy4wAbowRjYrvR1eV8rOk2XBWbXmDa4Wc0IlYqT8qbZilKyuRSy9QElQMc4C4t//9Z1u29IZe4qManxTimiBTBUSxqB0cyI/wA2UtCdFvPPozSR3ZB1A6052JdmdOOxiUwx4qo17rpZTeIDbePwI6LPrg+36buoLPjIUXt/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k3OjYO4b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 463C1C4CEF4;
-	Fri, 26 Sep 2025 22:40:17 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BtJ8nNrB98yORF0xX52d4IlNflAmRPDndR67hIzqLBnP0BEXiKCv29+V1832dOIvc/GpxUU4YwHDeYDj0C0SYwQ9txbEChkCfiSwkjE1TeElTSVRDLshF4D2xLZxnzRW7IuopLB1QVVZlYqvSO8jGPosOp+RysKen7n8Y4lxpaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eL251epk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75D4DC4CEF4;
+	Fri, 26 Sep 2025 22:40:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758926417;
-	bh=eQzc4Q0h8XcaMlb4UGs79EVBMhAKWd5o8JWig9NItxc=;
+	s=k20201202; t=1758926418;
+	bh=nwyPuUt5g5WjvIkRMJrnAzdGhpP04k7ZC/H0qRKgz9I=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=k3OjYO4bvtorKORglOqzOEqc9et3Yd+ac2k7qLnCcJBr/PLZ/Z/7WFpZ9t87s34An
-	 4fK7BzJZwVPCeW9Bro2olyZZjHeuC1eJXjmzmInMfGwo6F9APCflZwkJ+1+ridvlCx
-	 zv/EutcYQhy2dWslIkpNOWHONVFY/na8OWJwkiI1vXtQqjWokNPiMDNtIQlfrPmNTx
-	 Y95SmmT6nE7aweTaXLaIc1aix3LwqrwnsBitGDlwdM9wyNL82EpNeQxhT3BuSKU5K7
-	 QPUu4MaT0UqDNH4egGjx0r6lsOylmfSt8BbDB8D4eCZZRDQ964BOxB66rF/6MNNzha
-	 Q94BkiZwZ4eXg==
+	b=eL251epkjnJmOikRKSPjGI7dNazqVDaDvR3XwXYHovH+IvXLUK5VsU/QCrxIC8hif
+	 3v1RK/dmk9LII7ymQk2LMWPQQacCBEoDSdKP53deOGseb2LcELCG2KhnO7/PxXwpz6
+	 YQ1aXgTKb4NSMmqQftkzZz/1LsCIj6tDJcG/n/sBK53UTQ34deWWHMS53nOozpcwgR
+	 7SrKpIHgYHTr4Mm0Qqtcn+PNi70Z05pet4E3FWBP9d+mIKhmI1mYb0efpoxpL9Z7vY
+	 sH6svXgElMcJ110bgl0PYl3pLFEEQO8XQns3KyMuaN2oXrGhCzGuE6V/kb5ojpfDt6
+	 KHPSzU0WhXZSA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEEA39D0C3F;
-	Fri, 26 Sep 2025 22:40:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB20239D0C3F;
+	Fri, 26 Sep 2025 22:40:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] selftest: net: Fix error message if empty variable
+Subject: Re: [PATCH v2 net-next] dpll: zl3073x: Fix double free in
+ zl3073x_devlink_flash_update()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175892641224.83117.18217809973759169577.git-patchwork-notify@kernel.org>
-Date: Fri, 26 Sep 2025 22:40:12 +0000
-References: <20250925132832.9828-1-alessandro.zanni87@gmail.com>
-In-Reply-To: <20250925132832.9828-1-alessandro.zanni87@gmail.com>
-To: Alessandro Zanni <alessandro.zanni87@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <175892641374.83117.12589904543957170406.git-patchwork-notify@kernel.org>
+Date: Fri, 26 Sep 2025 22:40:13 +0000
+References: <aNVDbcIQq4RmU_fl@stanley.mountain>
+In-Reply-To: <aNVDbcIQq4RmU_fl@stanley.mountain>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: ivecera@redhat.com, Prathosh.Satish@microchip.com,
+ vadim.fedorenko@linux.dev, arkadiusz.kubalewski@intel.com, jiri@resnulli.us,
+ przemyslaw.kitszel@intel.com, kuba@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 25 Sep 2025 15:28:23 +0200 you wrote:
-> Fix to avoid cases where the `res` shell variable is
-> empty in script comparisons.
-> The comparison has been modified into string comparison to
-> handle other possible values the variable could assume.
+On Thu, 25 Sep 2025 16:28:13 +0300 you wrote:
+> The zl3073x_devlink_flash_prepare() function calls zl3073x_fw_free() and
+> the caller, zl3073x_devlink_flash_update(), also calls that same free
+> function so it leads to a double free.  Delete the extra free.
 > 
-> The issue can be reproduced with the command:
-> make kselftest TARGETS=net
+> Fixes: a1e891fe4ae8 ("dpll: zl3073x: Implement devlink flash callback")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Reviewed-by: Ivan Vecera <ivecera@redhat.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] selftest: net: Fix error message if empty variable
-    https://git.kernel.org/netdev/net-next/c/81dcfdd21dbd
+  - [v2,net-next] dpll: zl3073x: Fix double free in zl3073x_devlink_flash_update()
+    https://git.kernel.org/netdev/net-next/c/347afa390427
 
 You are awesome, thank you!
 -- 
