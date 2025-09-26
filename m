@@ -1,130 +1,140 @@
-Return-Path: <netdev+bounces-226746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 258DDBA4B01
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:42:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39235BA4B0A
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:42:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B91D1C201B7
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:42:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A0921C203B1
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:43:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C662FFFB9;
-	Fri, 26 Sep 2025 16:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DA73244661;
+	Fri, 26 Sep 2025 16:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fKuOSBgz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jXjCDoU7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F24F2FFF97
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 16:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4421F823DD;
+	Fri, 26 Sep 2025 16:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758904906; cv=none; b=KqKY2zC06g5er90oAOzcRUR6MlY0U3pp/8s4pL3BgoplQEn3PM9NCNygOf0m5d1DYhpv7EMu3b9dSWZ9trmqT0ksF4YpN5P2iMvfXsOuhSHqkUnBvobUY5UST7CfLBrtmnZjyspCo/v83Gez9/zhEKWMy2gDErCjqTHwnnceLSQ=
+	t=1758904965; cv=none; b=NbJOOteZ9ekkIrcl9HB40Zg0i5zOK5VV0EJScUAB3ZKJIlfN0f7vwq0u9IeU4/Q+gz6dFXIqEu9kQT9uQr2yvtcgvsUl5PGbf5J5VPayK8gZHYU+YcymFYtBjse4O1vyDotIZOt5LShOdHqqQn8U7yZQAcZkxr/S/H8kgv/D5Yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758904906; c=relaxed/simple;
-	bh=qyqX7t2D2AFwHTZ3eL7TWaKzkEfQ2PGisj1lvLkzWhA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nen/OZBIO3UJgq4x/k7Yv0Kgvt/POMLBKMOk4NMieqIyjGhE34hKw2gyaqQUV6vUTiqLEbApfY3AXSO6wzddP/atbtdjGNXnhViCmgj62JDTvDhvJ91ftpo3t6UdPnQAM5QB6pQQb3alJkVO3HM9dGpDy6YuOk4fYcLELedYSbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fKuOSBgz; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-781251eec51so94896b3a.3
-        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 09:41:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758904904; x=1759509704; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UNJOhq8VwuyFG50xZ7ZJPwq5CFAtDgJOVKFow8+S4rY=;
-        b=fKuOSBgz42HeS5XEb3UdhDyMtDBqkKeiwrYp17fjpAVb36vVr3NZuwLdZWTceI/T6W
-         KdQ7zIcdZxYgEe01gzLFjZwaxkZNifWo0Q3tWN/2Ec/B961PUJDm4IUEo2faDq12XmKN
-         MWaN/wK0clrcpJghUvu7lq6tH0stpdj3UfnjZYlII8Pe/EbQoKqueaatNpcgLVhwz1zU
-         qXTZmwJYreIUT9+iHKtULxL334/6FCvi6EGyYrWY38VQav+Nv0qQ71FZ+9TcUAAQoheP
-         MXHH5nqtVHzhWx1QQXIxS4xeal1lbXNgrU0F96/M3H/8iz5Nf7HUAgjSPhX/n7WDaJBA
-         dw2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758904904; x=1759509704;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UNJOhq8VwuyFG50xZ7ZJPwq5CFAtDgJOVKFow8+S4rY=;
-        b=Fu/Nq/rZL73XkfSny2TTvqJp4faF3UBwpL1Uoq7peDRFEoVHfeXp6ZCNW7oXMRKRk7
-         Q/gBXkXuPtADiFxFeRyWquhCJ8RIYAf4qm6oSO6+6ql2Ul7d9Gmwmxi2hGydkpF/kueS
-         S/2hwHiWzhUdpPAss0o736svOwfMS6Og1A80utgvMKzD7xKA46E0pl9MXA0xc/AK5uwb
-         LbCJDmJe6QuwwxGyCUNPkthFykcdrhOt48laVukIb4mAXf36/BwFM+qJIX6y/d0Le+I/
-         UjIwiixLP09meWOc+0ycgOMAXXkcSdWjNYrhjh6G1xvuhjB0GkKPa55CCm0+J8Fscbeg
-         BOIw==
-X-Gm-Message-State: AOJu0Yzp824SnD8Y4f7+6Wv1jL2NFYOBdejivf7JMKv6XXoUmGtlShtP
-	E1R6aqPt3xD7rvT17LOSKbu31uLot4Jv/8cev1DffAs2LJc48Ax3+beB
-X-Gm-Gg: ASbGncs4JDBGaHuTD+pb7DNhEHmkgDLOobTqF27sIByb++zLyRA4Aac7O4Z4roBpVZo
-	8IN5kFk7v6sxycYLU6Mhnm4Xf+XpLYicds60oW/pzrFxL1KPPcFw3zlUaWDX/peh/hQirZKJ4um
-	P+4R2hzn3PwewOTvDq6IiCWRyBGT0+PfXU8hfdmFpbW0XOiIdX5GkoIfxRiU0JcDLVF5PH+qifQ
-	zYp1CEjNBdEu4LiHN9b171xfMggLXkayHdxOoX2WzJGd9WCx3nfVoVG8q8h5G3THxvqMMJspKGl
-	S0s6AlGKQaZe7Nq6z0TDH+Us3Ha9iFYSuwwlL3DbWgHJ6A4A7RR4TCUSbUvwvcnCs1Iaj7Z1hoj
-	8VQC5owHWk/YtkvonNj+ivzdN3qraxh+aXqA=
-X-Google-Smtp-Source: AGHT+IEww0vtp8h9B9Mv9EQJ9duDPa9TOq2QShBdNfIFoOYK4H3EiTt/JKWMlUxAzRagqBnQQC3NJA==
-X-Received: by 2002:a05:6a00:218c:b0:781:1f6c:1c59 with SMTP id d2e1a72fcca58-7811f6c1e7cmr1889760b3a.26.1758904903796;
-        Fri, 26 Sep 2025 09:41:43 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:45::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7810238cab8sm4860221b3a.2.2025.09.26.09.41.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Sep 2025 09:41:43 -0700 (PDT)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	martin.lau@kernel.org,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next 1/1] selftests/bpf: Test changing packet data from kfunc
-Date: Fri, 26 Sep 2025 09:41:42 -0700
-Message-ID: <20250926164142.1850176-1-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1758904965; c=relaxed/simple;
+	bh=EkEGdQzRoQHV/+qgTce+eYgdmMYG6X7KUjwNyIGarvs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UlPT6xwXdADAi4TPv8lhrLuUDBrGtTJEc9/lwbqsA1BJNlYZG25nEwYmTo2FE01UMyfXC6H14ZTm99/Ndd1IJAC23iCMzmRHqGfnYgJz3HAtw++hKAt3t4mKi9s9TPk7ZDsAEp4E3rckjZPy2kf3J+XiqcTJurZ0A7H3oZ4FEpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jXjCDoU7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C48F8C4CEF4;
+	Fri, 26 Sep 2025 16:42:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758904964;
+	bh=EkEGdQzRoQHV/+qgTce+eYgdmMYG6X7KUjwNyIGarvs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jXjCDoU7UvglbHeWZlcgdKM51GzyfPYJ50WZcIvbOLT5FgCmiMLvkmFCrrO4aoEAR
+	 N7NOisYGIWkXtNetrrSAdLSkg6F2zt6DfYtYNr/WkAduuhS7F005fGtwqKzLQ3CqzC
+	 UsJkGx6shKRqXks1NKpSK27vt3p4abdEdL8Z9tLqTUwulM7xEkD8QwPCxmLZLVHgS+
+	 udPJey5RoIhrJXpW5qUbVNZ2yTVt4JuDowuoXEGhOmoqPX3ZOJr+nGUiG71EYLK4UW
+	 rVa6y4cBKsruTw5cCfCgqDCAPrETY3n9SkZsf4o0A4sIMXgGXN1uCtSCBl3sOgwnDR
+	 TeGph+6DY7wTg==
+Date: Fri, 26 Sep 2025 17:42:40 +0100
+From: Simon Horman <horms@kernel.org>
+To: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: Nishanth Menon <nm@ti.com>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] net: netcp: Fix crash in error path when DMA channel
+ open fails
+Message-ID: <aNbCgK76kQqhcQY2@horms.kernel.org>
+References: <20250926150853.2907028-1-nm@ti.com>
+ <aNa7rEQLJreJF58p@horms.kernel.org>
+ <ef2bd666-f320-4dc5-b7ae-d12c0487c284@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ef2bd666-f320-4dc5-b7ae-d12c0487c284@ti.com>
 
-bpf_xdp_pull_data() is the first kfunc that changes packet data. Make
-sure the verifier clear all packet pointers after calling packet data
-changing kfunc.
+On Fri, Sep 26, 2025 at 09:57:02PM +0530, Siddharth Vadapalli wrote:
+> On 26/09/25 9:43 PM, Simon Horman wrote:
+> > On Fri, Sep 26, 2025 at 10:08:53AM -0500, Nishanth Menon wrote:
+> > > When knav_dma_open_channel() fails in netcp_setup_navigator_resources(),
+> > > the rx_channel field is set to an ERR_PTR value. Later, when
+> > > netcp_free_navigator_resources() is called in the error path, it attempts
+> > > to close this invalid channel pointer, causing a crash.
+> > > 
+> > > Add a check for ERR values to handle the failure scenario.
+> > > 
+> > > Fixes: 84640e27f230 ("net: netcp: Add Keystone NetCP core driver")
+> > > Signed-off-by: Nishanth Menon <nm@ti.com>
+> > > ---
+> > > 
+> > > Seen on kci log for k2hk: https://dashboard.kernelci.org/log-viewer?itemId=ti%3A2eb55ed935eb42c292e02f59&org=ti&type=test&url=http%3A%2F%2Ffiles.kernelci.org%2F%2Fti%2Fmainline%2Fmaster%2Fv6.17-rc7-59-gbf40f4b87761%2Farm%2Fmulti_v7_defconfig%2BCONFIG_EFI%3Dy%2BCONFIG_ARM_LPAE%3Dy%2Bdebug%2Bkselftest%2Btinyconfig%2Fgcc-12%2Fbaseline-nfs-boot.nfs-k2hk-evm.txt.gz
+> > > 
+> > >   drivers/net/ethernet/ti/netcp_core.c | 2 +-
+> > >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/drivers/net/ethernet/ti/netcp_core.c b/drivers/net/ethernet/ti/netcp_core.c
+> > > index 857820657bac..4ff17fd6caae 100644
+> > > --- a/drivers/net/ethernet/ti/netcp_core.c
+> > > +++ b/drivers/net/ethernet/ti/netcp_core.c
+> > > @@ -1549,7 +1549,7 @@ static void netcp_free_navigator_resources(struct netcp_intf *netcp)
+> > >   {
+> > >   	int i;
+> > > -	if (netcp->rx_channel) {
+> > > +	if (!IS_ERR(netcp->rx_channel)) {
+> > >   		knav_dma_close_channel(netcp->rx_channel);
+> > >   		netcp->rx_channel = NULL;
+> > >   	}
+> > 
+> > Hi Nishanth,
+> > 
+> > Thanks for your patch.
+> > 
+> > I expect that netcp_txpipe_close() has a similar problem too.
+> > 
+> > But I also think that using IS_ERR is not correct, because it seems to me
+> > that there are also cases where rx_channel can be NULL.
+> 
+> Could you please clarify where rx_channel is NULL? rx_channel is set by
+> invoking knav_dma_open_channel().
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
----
- tools/testing/selftests/bpf/progs/verifier_sock.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Hi Siddharth,
 
-diff --git a/tools/testing/selftests/bpf/progs/verifier_sock.c b/tools/testing/selftests/bpf/progs/verifier_sock.c
-index b4d31f10a976..2b4610b53382 100644
---- a/tools/testing/selftests/bpf/progs/verifier_sock.c
-+++ b/tools/testing/selftests/bpf/progs/verifier_sock.c
-@@ -1096,6 +1096,20 @@ int invalidate_xdp_pkt_pointers_from_global_func(struct xdp_md *x)
- 	return XDP_PASS;
- }
- 
-+/* XDP packet changing kfunc calls invalidate packet pointers */
-+SEC("xdp")
-+__failure __msg("invalid mem access")
-+int invalidate_xdp_pkt_pointers(struct xdp_md *x)
-+{
-+	int *p = (void *)(long)x->data;
-+
-+	if ((void *)(p + 1) > (void *)(long)x->data_end)
-+		return XDP_DROP;
-+	bpf_xdp_pull_data(x, 0);
-+	*p = 42; /* this is unsafe */
-+	return XDP_PASS;
-+}
-+
- __noinline
- int tail_call(struct __sk_buff *sk)
- {
--- 
-2.47.3
+I am assuming that when netcp_setup_navigator_resources() is called, at
+least for the first time, that netcp->rx_channel is NULL. So any of the
+occurrence of 'goto fail' in that function before the call to
+knav_dma_open_channel().
 
+> Also, please refer to:
+> https://github.com/torvalds/linux/commit/5b6cb43b4d62
+> which specifically points out that knav_dma_open_channel() will not return
+> NULL so the check for NULL isn't required.
+> > 
+> > I see that on error knav_dma_open_channel() always returns ERR_PTR(-EINVAL)
+> > (open coded as (void *)-EINVAL) on error. So I think a better approach
+> > would be to change knav_dma_open_channel() to return NULL, and update callers
+> > accordingly.
+> 
+> The commit referred to above made changes to the driver specifically due to
+> the observation that knav_dma_open_channel() never returns NULL. Modifying
+> knav_dma_open_channel() to return NULL will effectively result in having to
+> undo the changes made by the commit.
+
+I wasn't aware of that patch. But my observation is that the return value
+of knav_dma_open_channel() is still not handled correctly. E.g. the bug
+your patch is fixing.  And I'm proposing an alternate approach which I feel
+will be less error-prone.
 
