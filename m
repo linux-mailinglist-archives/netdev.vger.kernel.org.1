@@ -1,65 +1,59 @@
-Return-Path: <netdev+bounces-226736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7FF0BA48FE
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:11:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05508BA4935
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:13:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0C8A189A68A
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:11:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8F527AFB89
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F176123817E;
-	Fri, 26 Sep 2025 16:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A329E239E9B;
+	Fri, 26 Sep 2025 16:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cg9+AN10"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JgYG+uue"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664E7823DD;
-	Fri, 26 Sep 2025 16:10:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B25521D3CA;
+	Fri, 26 Sep 2025 16:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758903036; cv=none; b=l/F/OTlvmH2WHKVD1WslfMiU1AA7JAlmRikuR+7nFoV7n2WrbruAIC8x8ozZxddLgr6yqOp3/o4JK9bJCnBGc+XhATFWBptXQAWQLRSk3KiZREYv3yOb1vPVFRFp7KXlR13odH30plMagpHu9jpfSZ+3xI9fNbU2GWR68TaozW0=
+	t=1758903217; cv=none; b=kO1g/XGFJMIl8W7oxUXSj1JGqCxQl96p6ikf99kjkMvq40Cf/KN7xfCMnNggCXnqcSyRdzJ+gPZjf2VQ2UldCK9fO/oCcUqMcyaA0AGc/kzLzOIFRGnSqNvIcbEqBgxY1Jc7Atvcl8W8XkU1iAMfFmg5socZSoSdlC8h2Rhcw7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758903036; c=relaxed/simple;
-	bh=pJH5Hrwro75kzGiHFMA0wqzpgMM0shT+yN0jZxl8B4U=;
+	s=arc-20240116; t=1758903217; c=relaxed/simple;
+	bh=wh9M9QTkVwk+Ja56zSTTBOIJV0Iqe7hniIh4R1RLg1c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KTscQoG/rslR8YtK49qF8E64aS2qXqQtVZStKHZCX2n9hLZvSXyHLrs9z9oJETuGHV85iuuQex8uf+09FkgWr1++Hm0G7TBd+1RGWNb1Li0LSAJ2ljMElPj5W4OFv9J9RH8YmonSlGrl8gukCRyP9wNGEKm+5VE+JtW7wJqMXvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cg9+AN10; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=a8ppqvzfJbHLORVI4FUGxAEtvpysmOlFWvNRW2iwm/E=; b=cg9+AN104PlZDbjadHhLemQ6P3
-	2SECT9YE20k1+7x95YYYNw64/FuHB2bAG83MSCcNdmOFxUVGUxbju3lD93C6rwX26VOe8M9IEDEtz
-	nZZJn3lRXRQC8dkazzykeIzR/huKAQJlAUgvHcvi+NpFW+Wj0XaBPBwZxqytRph6F2js=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1v2B1g-009a97-KM; Fri, 26 Sep 2025 18:10:28 +0200
-Date: Fri, 26 Sep 2025 18:10:28 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=t1DBDEYIQi1FMz2WP2zSLQW4WTMVqgaW0VK40Rfxgh9YpvREilQ54NksYW4HdvCokqbS0tEJ+NtwJwM+CU3Sv8euz6BxoQdXEOknmr3EG0ZUUrsMqX2TZZUW4G52c41UTQq/+OnKZLW/ywa/3U8GZZYk+xHqFg5HRvh66U2EXmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JgYG+uue; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0064AC4CEF4;
+	Fri, 26 Sep 2025 16:13:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758903217;
+	bh=wh9M9QTkVwk+Ja56zSTTBOIJV0Iqe7hniIh4R1RLg1c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JgYG+uue4dcR73rbUpd7FW2IP/THmhCbkZJN5ATwVASV/92yg7I4LHPQQfprckKJ3
+	 rLYlaJ4dIdmQSKWiO/U79+6stXY2JruZf+GW92X2DmcXKniCAm8/zbNXj4dGWT8M5s
+	 FqazBYazLSvH9QiXrQ4Nqlg9Jharodw9aTmahfAwjX4JcGayP+IHycGE2sBSoV69UH
+	 XSbQ7j+TK6YZQ56qUu4timJFyebojxJJfqZHQOe5wKAI1r/ieKfgjNns6d97D1JNzX
+	 cHQZ1snplHDs4fbPPObXPSAe1pXoAUmgPDhAnrV+QJhV+q1di/mC8zYdYV7VHwa00l
+	 r2YmUditon04g==
+Date: Fri, 26 Sep 2025 17:13:32 +0100
+From: Simon Horman <horms@kernel.org>
+To: Nishanth Menon <nm@ti.com>
+Cc: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next 2/2] net: airoha: npu: Add 7583 SoC support
-Message-ID: <b5ff2e06-df4f-423a-86ac-fb025b243844@lunn.ch>
-References: <20250926-airoha-npu-7583-v1-0-447e5e2df08d@kernel.org>
- <20250926-airoha-npu-7583-v1-2-447e5e2df08d@kernel.org>
- <82a08bb5-cbc3-4bba-abad-393092d66557@lunn.ch>
- <aNa464zcFCvNhL33@lore-desk>
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, "Vadapalli, Siddharth" <s-vadapalli@ti.com>
+Subject: Re: [PATCH] net: netcp: Fix crash in error path when DMA channel
+ open fails
+Message-ID: <aNa7rEQLJreJF58p@horms.kernel.org>
+References: <20250926150853.2907028-1-nm@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,34 +62,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aNa464zcFCvNhL33@lore-desk>
+In-Reply-To: <20250926150853.2907028-1-nm@ti.com>
 
-On Fri, Sep 26, 2025 at 06:01:47PM +0200, Lorenzo Bianconi wrote:
-> > > -	ret = request_firmware(&fw, NPU_EN7581_FIRMWARE_DATA, dev);
-> > > +	if (of_device_is_compatible(dev->of_node, "airoha,an7583-npu"))
-> > > +		fw_name = NPU_AN7583_FIRMWARE_DATA;
-> > > +	else
-> > > +		fw_name = NPU_EN7581_FIRMWARE_DATA;
-> > > +	ret = request_firmware(&fw, fw_name, dev);
-> > >  	if (ret)
-> > >  		return ret == -ENOENT ? -EPROBE_DEFER : ret;
-> > >  
-> > > @@ -612,6 +623,7 @@ EXPORT_SYMBOL_GPL(airoha_npu_put);
-> > >  
-> > >  static const struct of_device_id of_airoha_npu_match[] = {
-> > >  	{ .compatible = "airoha,en7581-npu" },
-> > > +	{ .compatible = "airoha,an7583-npu" },
-> > 
-> > It would be more normal to make use of the void * in of_device_id to
-> > have per compatible data, such are firmware name.
-> > 
-> > 	Andrew
+On Fri, Sep 26, 2025 at 10:08:53AM -0500, Nishanth Menon wrote:
+> When knav_dma_open_channel() fails in netcp_setup_navigator_resources(),
+> the rx_channel field is set to an ERR_PTR value. Later, when
+> netcp_free_navigator_resources() is called in the error path, it attempts
+> to close this invalid channel pointer, causing a crash.
 > 
-> ack, I implemted this way since we have 2 fw names but we can have a struct
-> pointed by of_device_id driver_data pointer to contains both of them.
-> What do you think?
+> Add a check for ERR values to handle the failure scenario.
+> 
+> Fixes: 84640e27f230 ("net: netcp: Add Keystone NetCP core driver")
+> Signed-off-by: Nishanth Menon <nm@ti.com>
+> ---
+> 
+> Seen on kci log for k2hk: https://dashboard.kernelci.org/log-viewer?itemId=ti%3A2eb55ed935eb42c292e02f59&org=ti&type=test&url=http%3A%2F%2Ffiles.kernelci.org%2F%2Fti%2Fmainline%2Fmaster%2Fv6.17-rc7-59-gbf40f4b87761%2Farm%2Fmulti_v7_defconfig%2BCONFIG_EFI%3Dy%2BCONFIG_ARM_LPAE%3Dy%2Bdebug%2Bkselftest%2Btinyconfig%2Fgcc-12%2Fbaseline-nfs-boot.nfs-k2hk-evm.txt.gz
+> 
+>  drivers/net/ethernet/ti/netcp_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/netcp_core.c b/drivers/net/ethernet/ti/netcp_core.c
+> index 857820657bac..4ff17fd6caae 100644
+> --- a/drivers/net/ethernet/ti/netcp_core.c
+> +++ b/drivers/net/ethernet/ti/netcp_core.c
+> @@ -1549,7 +1549,7 @@ static void netcp_free_navigator_resources(struct netcp_intf *netcp)
+>  {
+>  	int i;
+>  
+> -	if (netcp->rx_channel) {
+> +	if (!IS_ERR(netcp->rx_channel)) {
+>  		knav_dma_close_channel(netcp->rx_channel);
+>  		netcp->rx_channel = NULL;
+>  	}
 
-That would work.
+Hi Nishanth,
 
-	Andrew
+Thanks for your patch.
+
+I expect that netcp_txpipe_close() has a similar problem too.
+
+But I also think that using IS_ERR is not correct, because it seems to me
+that there are also cases where rx_channel can be NULL.
+
+I see that on error knav_dma_open_channel() always returns ERR_PTR(-EINVAL)
+(open coded as (void *)-EINVAL) on error. So I think a better approach
+would be to change knav_dma_open_channel() to return NULL, and update callers
+accordingly.
 
