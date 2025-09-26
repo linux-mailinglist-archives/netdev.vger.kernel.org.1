@@ -1,208 +1,144 @@
-Return-Path: <netdev+bounces-226637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59F5DBA34D9
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 12:13:08 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC956BA3545
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 12:20:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06BE817A19F
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 10:13:08 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9CEDD4E0223
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 10:20:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6846B2D7DCE;
-	Fri, 26 Sep 2025 10:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DA732EAD16;
+	Fri, 26 Sep 2025 10:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aGS8g3jp"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jSh/M411"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D4929D289;
-	Fri, 26 Sep 2025 10:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CBC38DEC;
+	Fri, 26 Sep 2025 10:20:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758881584; cv=none; b=A5LM9M7O50hIXtbbJWkC5Xj3pgQDAJ9It6oR6M1o+jEVwUkGtkdQFmLk3qEBsN2sej56nHFrgf3Cukuiq3aZMa5nUZMCwMY3CADSebW48YB4HR/tUuNNLCqUzd092ig1860WXNuKs0IGnvZhZA5bwfz4BcITCj2oxgTjv7pNWfU=
+	t=1758882007; cv=none; b=XPH8Ct7aKiKcYgO1xMOD3gn68MHGmEGQu3WWNqAdP+Zn6JOw6uagbaOHcSP5VdhCwzQHp7d8rwte5Ky7qpCO4InUMP1IzHvHJWhaSgWdxPZSonv+WBo0pzAD7sTZrsqL8/AjveLPyxqAlpWcKpEnjp7ctOPy8YqUxVlRbd6YdTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758881584; c=relaxed/simple;
-	bh=jxwkLcSlFmLlhuSO9JAqyrMk8tO6ktk/gXc+hdvU51Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q1BHJHh1ZG+NVrJEFLqMZSpaaz2MtKt8Ig9DzwuTo78c2pAOQbpImcjJ4Gmtigu1NNNZ7tkcU+kPbwzaLDBjTjgvnNtSNHJdDr5lKYaNQc0YlLxImhD4wZ3Y8ClGOfk6nlLVjbFjTnAd391sWQRArjKpG5pDQRwyIPOwlp9vvTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aGS8g3jp; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58Q5qIwk029715;
-	Fri, 26 Sep 2025 10:12:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=20t6D+
-	fKshQ1xZ374I0WRhkvucIJKVOb9UKEMWdZ/5w=; b=aGS8g3jpKTORvjbZ87voR5
-	tl+j9rvZZQGXJVdbqOVym/WWD/BYc+6rJq9dXtCJBxj5kDs6JpmxI2A2z6T+0sbz
-	gYto8PXuAJSqa5Xbih2XND4uGvbHPuJ6D+pAy9Qq0BYW8BaPVoOsyKZ909tgMOMR
-	KmgwUiQFTlDE8epBDr0HwZ17TT26qBP021kyIv7Gp0UDz/twERDL8L5fPKFSwMgC
-	jQmeFalVHYaF2BtIvqUFNdqflX6x3kMQqjDSRFjxtbD+lJAIRToDp+VIIq9UEn7c
-	KwDlhR+Z5mdDI3v3AlY3JZghLsMI2lw53uC1bEvh1Gj9UxWk9//NY0V+HZP8EbyQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49dbb3uter-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Sep 2025 10:12:58 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58Q9n5fZ025930;
-	Fri, 26 Sep 2025 10:12:57 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49dbb3uten-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Sep 2025 10:12:57 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58QACbg1006458;
-	Fri, 26 Sep 2025 10:12:56 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49dawpkgj4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Sep 2025 10:12:56 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58QACqle52691358
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 26 Sep 2025 10:12:52 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5C70A20043;
-	Fri, 26 Sep 2025 10:12:52 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6944720040;
-	Fri, 26 Sep 2025 10:12:51 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.87.129.170])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Fri, 26 Sep 2025 10:12:51 +0000 (GMT)
-Date: Fri, 26 Sep 2025 12:12:49 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Simon
- Horman <horms@kernel.org>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Dust Li
- <dust.li@linux.alibaba.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        Mahanta Jambigi
- <mjambigi@linux.ibm.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu
- <guwen@linux.alibaba.com>,
-        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org, Halil Pasic
- <pasic@linux.ibm.com>
-Subject: Re: [PATCH net-next v3 1/2] net/smc: make wr buffer count
- configurable
-Message-ID: <20250926121249.687b519d.pasic@linux.ibm.com>
-In-Reply-To: <1aa764d0-0613-499e-bc44-52e70602b661@linux.alibaba.com>
-References: <20250921214440.325325-1-pasic@linux.ibm.com>
-	<20250921214440.325325-2-pasic@linux.ibm.com>
-	<1aa764d0-0613-499e-bc44-52e70602b661@linux.alibaba.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1758882007; c=relaxed/simple;
+	bh=KCm2VJk2nXfK7Z0Jq5Z3NKfCnrGXp1QGrGlVcFJba68=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mhqr4PCVXed01bfDYnbjZKjw0Egg4QwOJn1P4+fjP0Low4ee4FW+xTMGv3VviwOfnqQFQ7OSYPie5LwhAMF+2ZhDAoWOYmOZBt8APnoeoFsFsDkywJAVNKGD7ec5P/pQUJcT/YY3kzHjrAE8ZhfLmhqPli8TAG07BgtCFbqRLrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jSh/M411; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=t8z7avQFAccQVkbESrDO1n6Pl1Pm0UzXLe65X57CLZU=; b=jSh/M411nbEWw0I51B8K6M1Azb
+	Fe+My+/hiI2l9Y2h7cPyMCXsNMJdJa0KB/DxQdhO77CfG9dmO6RYB/RlHVr6FcwHM23G1eXWOMSsc
+	/kng+XkEIn9Snd5iwMDpa0sH3he8JyyRzzs/PLCy2N7iQGnWlQ1nQzh/9G7HQHNDvuux3QhVbR4dH
+	lWmf7YXEZXD4krqRm+Z5NTYPkJ+/QDcs/gK7GVyuqi/WzzKtxj63ZuKBcYadP03E2AkyE23pcsHiP
+	mFeDRL5TIH7oYeb9S1Zw9Di0oy4b+bKBtHhTcVGzqEt52K9fTzrEcTpjKCdQRjPYaXGyY70QpC8F0
+	xGT6f8AA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33074)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v25YR-000000003MO-0Lnc;
+	Fri, 26 Sep 2025 11:19:55 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v25YO-000000000a9-3bFI;
+	Fri, 26 Sep 2025 11:19:52 +0100
+Date: Fri, 26 Sep 2025 11:19:52 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Jakub Kicinski <kuba@kernel.org>, andrew@lunn.ch,
+	hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, richardcochran@gmail.com,
+	vadim.fedorenko@linux.dev, christophe.jaillet@wanadoo.fr,
+	rosenp@gmail.com, steen.hegelund@microchip.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] phy: mscc: Fix PTP for vsc8574 and VSC8572
+Message-ID: <aNZoyOPu3hUDadWv@shell.armlinux.org.uk>
+References: <20250917113316.3973777-1-horatiu.vultur@microchip.com>
+ <20250918160942.3dc54e9a@kernel.org>
+ <20250922121524.3baplkjgw2xnwizr@skbuf>
+ <20250922123301.y7qjguatajhci67o@DEN-DL-M31836.microchip.com>
+ <aNZhB5LnqH5voBBR@shell.armlinux.org.uk>
+ <20250926095203.dqg2vkjr5tdwri7w@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTI1MDE3NCBTYWx0ZWRfX4LsnfnEISYHh
- YdnXdz1EUb+HFq89QlFF5kq0OZsIj8n842o2KZ96MiJ4HoJtGZ13BnsbouTe8doGQ4oAl6yhk7f
- I5zYL/o39QyywMwpwfmpoz1zKJBuq23nqMqid391Bz3FFOa4dfIH2/85ws4ZQb7IaFHfl893qHh
- oPy8edTI9hRY0iLLgpvMsogibKIw4dlAL1Eo3gCoro8DiwuM+eY7lASGM7mBWQOBbG4e7IN0z31
- RWcsbJn4ct4PaNr8x1nPOENSI81yD4klScLj6RKSIpMTaoje8LYbTGSumN9iRK7PQXxjj3mC24z
- F1p7cnXdtbgiVoN/sgNf0wmhOFlad6aQ3Hhy9pkRutlorVsZ0TALzXApdBc5JGdxSN0jJuEtYsu
- 6Q0hliHXlAYnSEPnd7l2RAPJJSdaxA==
-X-Proofpoint-GUID: 6dQaDM1mPAJ4Jzk0yl6fQVY57NpGgFXK
-X-Authority-Analysis: v=2.4 cv=T/qBjvKQ c=1 sm=1 tr=0 ts=68d6672a cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=SRrdq9N9AAAA:8 a=hP6Lh0ber_LRzFWUQkQA:9
- a=CjuIK1q_8ugA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-ORIG-GUID: UWvketDTN0Ot3v1bfgOxKp68MJngqz5N
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-26_02,2025-09-26_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 phishscore=0 priorityscore=1501 impostorscore=0 suspectscore=0
- lowpriorityscore=0 spamscore=0 adultscore=0 clxscore=1015 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2509150000 definitions=main-2509250174
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250926095203.dqg2vkjr5tdwri7w@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, 26 Sep 2025 10:44:00 +0800
-Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
-
-> > +
-> > +smcr_max_send_wr - INTEGER
-> > +	So called work request buffers are SMCR link (and RDMA queue pair) level
-> > +	resources necessary for performing RDMA operations. Since up to 255
-> > +	connections can share a link group and thus also a link and the number
-> > +	of the work request buffers is decided when the link is allocated,
-> > +	depending on the workload it can a bottleneck in a sense that threads
-> > +	have to wait for work request buffers to become available. Before the
-> > +	introduction of this control the maximal number of work request buffers
-> > +	available on the send path used to be hard coded to 16. With this control
-> > +	it becomes configurable. The acceptable range is between 2 and 2048.
-> > +
-> > +	Please be aware that all the buffers need to be allocated as a physically
-> > +	continuous array in which each element is a single buffer and has the size
-> > +	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails we give up much
-> > +	like before having this control.
-> > +
-> > +	Default: 16
-> > +
-> > +smcr_max_recv_wr - INTEGER
-> > +	So called work request buffers are SMCR link (and RDMA queue pair) level
-> > +	resources necessary for performing RDMA operations. Since up to 255
-> > +	connections can share a link group and thus also a link and the number
-> > +	of the work request buffers is decided when the link is allocated,
-> > +	depending on the workload it can a bottleneck in a sense that threads
-> > +	have to wait for work request buffers to become available. Before the
-> > +	introduction of this control the maximal number of work request buffers
-> > +	available on the receive path used to be hard coded to 16. With this control
-> > +	it becomes configurable. The acceptable range is between 2 and 2048.
-> > +
-> > +	Please be aware that all the buffers need to be allocated as a physically
-> > +	continuous array in which each element is a single buffer and has the size
-> > +	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails we give up much
-> > +	like before having this control.
-> > +
-> > +	Default: 48  
+On Fri, Sep 26, 2025 at 12:52:03PM +0300, Vladimir Oltean wrote:
+> On Fri, Sep 26, 2025 at 10:46:47AM +0100, Russell King (Oracle) wrote:
+> > On Mon, Sep 22, 2025 at 02:33:01PM +0200, Horatiu Vultur wrote:
+> > > Thanks for the advice.
+> > > What about to make the PHY_ID_VSC8572 and PHY_ID_VSC8574 to use
+> > > vsc8584_probe() and then in this function just have this check:
+> > > 
+> > > ---
+> > > if ((phydev->phy_id & 0xfffffff0) != PHY_ID_VSC8572 &&
+> > >     (phydev->phy_id & 0xfffffff0) != PHY_ID_VSC8574) {
+> > > 	if ((phydev->phy_id & MSCC_DEV_REV_MASK) != VSC8584_REVB) {
+> > > 		dev_err(&phydev->mdio.dev, "Only VSC8584 revB is supported.\n");
+> > > 		return -ENOTSUPP;
+> > > 	}
+> > > }
+> > 
+> > Please, no, not like this. Have a look how the driver already compares
+> > PHY IDs in the rest of the code.
+> > 
+> > When a PHY driver is matched, the PHY ID is compared using the
+> > .phy_id and .phy_id_mask members of the phy_driver structure.
+> > 
+> > The .phy_id is normally stuff like PHY_ID_VSC8572 and PHY_ID_VSC8574.
+> > 
+> > When the driver is probed, phydev->drv is set to point at the
+> > appropriate phy_driver structure. Thus, the tests can be simplified
+> > to merely looking at phydev->drv->phy_id:
+> > 
+> > 	if (phydev->drv->phy_id != PHY_ID_VSC8572 &&
+> > 	    phydev->drv->phy_id != PHY_ID_VSC8574 &&
+> > 	    (phydev->phy_id & MSCC_DEV_REV_MASK) != VSC8584_REVB) {
+> > ...
+> > 
+> > Alternatively, please look at the phy_id*() and phydev_id_compare()
+> > families of functions.
+> > 
+> > -- 
+> > RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> > FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 > 
-> Notice that the ratio of smcr_max_recv_wr to smcr_max_send_wr is set to 3:1, with the
-> intention of ensuring that the peer QP's smcr_max_recv_wr is three times the local QP's
-> smcr_max_send_wr and the local QP's smcr_max_recv_wr is three times the peer QP's
-> smcr_max_send_wr, rather than making the local QP's smcr_max_recv_wr three times its own
-> smcr_max_send_wr. The purpose of this design is to guarantee sufficient receive WRs on
-> the side to receive incoming data when peer QP doing RDMA sends. Otherwise, RNR (Receiver
-> Not Ready) may occur, leading to poor performance(RNR will drop the packet and retransmit
-> happens in the transport layer of the RDMA).
+> The phydev->phy_id comparisons are problematic with clause 45 PHYs where
+> this field is zero, but with clause 22 they should technically work.
+> It's good to know coming from a phylib maintainer that it's preferable
+> to use phydev->drv->phy_id everywhere (I also wanted to comment on this
+> aspect, but because technically nothing is broken, I didn't).
 
-Thank you Guangguan! I think we already had that discussion. 
-> 
-> Let us guess a scenario that have multiple hosts, and the multiple hosts have different
-> smcr_max_send_wr and smcr_max_recv_wr configurations, mesh connections between these hosts.
-> It is difficult to ensure that the smcr_max_recv_wr/smcr_max_send_wr is 3:1 on the connected
-> QPs between these hosts, and it may even be hard to guarantee the smcr_max_recv_wr > smcr_max_send_wr
-> on the connected QPs between these hosts.
+Yes indeed, which is another reason to use phydev->drv->* as these
+get matched against the C22 and C45 IDs during PHY probe.
 
+If we wish to get more clever (in terms of wanthing to know the
+revision without knowing how the driver was matched) we could store
+the matched ID in phydev, as read from hardware. This would also get
+around the problem that where the ID is provided in the DT compatible,
+we would have the real hardware-read ID to check things like the
+revision against, rather than a fixed value in DT.
 
-It is not difficult IMHO. You just leave the knobs alone and you have
-3:1 per default. If tuning is attempted that needs to be done carefully.
-At least with SMC-R V2 there is this whole EID business, as well so it
-is reasonable to assume that the environment can be tuned in a coherent
-fashion. E.g. whoever is calling the EID could call use smcr_max_recv_wr:=32 and smcr_max_send_wr:=
-
-> 
-> Therefore, I believe that if these values are made configurable, additional mechanisms must be
-> in place to prevent RNR from occurring. Otherwise we need to carefully configure smcr_max_recv_wr
-> and smcr_max_send_wr, or ensure that all hosts capable of establishing SMC-R connections are configured
-> smcr_max_recv_wr and smcr_max_send_wr with the same values.
-
-Thank you for 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
