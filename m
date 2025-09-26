@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-226757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96648BA4C49
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 19:24:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EDB45BA4CA3
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 19:53:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 571F52A3D7F
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 17:24:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C83E2A3AAC
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 17:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1478230C0E0;
-	Fri, 26 Sep 2025 17:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8AA296BDF;
+	Fri, 26 Sep 2025 17:53:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iKzX1zOO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fj+1mQVV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359B42AD35
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 17:24:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76041E51FA
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 17:53:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758907479; cv=none; b=KJmxjHfgagt7zcnz40t3YHyGcDSrOokNa5VEYpWq8qAc/Fb4btj+If5wm5+2Dv2lClpJYv4ea7T3mdOQbwQiondUNHsaSCOSIfOtTmBdgr2yS3YqjhfKf68XjzXJWwyiediRGFKoMr27kZ7ZQknsAQ7rOBKp3A+YrRVSsNwb5Bs=
+	t=1758909201; cv=none; b=qMPq8YlhNO2U5fm2Va4pZQ0BpN+pZOzbt5yMXsg/8/qPDnqCrHvgthAFfG/kogFk05Zqx8u+X1E2/onsDjCkgPlRI1OdAV1nUSVXjlRd1q6hKyLtsty4T7MOTG5QEnrnmRRNP+BmxL7RX/J8AFNBW0uMPX356/uqw37/31T87sM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758907479; c=relaxed/simple;
-	bh=IXjM460G+pQoC9dt3t9ch3nvitDQe6KKfQT28W+y630=;
+	s=arc-20240116; t=1758909201; c=relaxed/simple;
+	bh=yTWNE091ucFvirVLLSRvWfjkbaAtrIlG5NdwknBjyKw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SpiOwjw82QZSBQ1Nm0QpuVyxYBd2QKXeA/conPAoreJ6WxXaoggPsFfJQIiHzRHex1Hnl59E0MBajIeKEexsiQ9ob8IVlS4ttyM++GacJIXmdAdkmQUPmsvi5blmHEF38lD7tnZL5nsuJyuHwvRJymYZD9EuqocYPAEinkJnEY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iKzX1zOO; arc=none smtp.client-ip=198.175.65.10
+	 In-Reply-To:Content-Type; b=jShsI0BIw/N/ruc9smzMsoZXjcFqM+oDIU7JUYJ73PfoYsLfgGReMFam2b+ClLmiDsd3fOOw5D2jrFwDFl/SjF6+9yy4IIvoUp1TaSQStALnzOrd8Y5i7vhT3LswDZW+WMldn+CEhlxoOtWSvLNdA2DS+ObplwZhUepxrOrTNPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fj+1mQVV; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758907477; x=1790443477;
+  t=1758909200; x=1790445200;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=IXjM460G+pQoC9dt3t9ch3nvitDQe6KKfQT28W+y630=;
-  b=iKzX1zOOI0vDna84+6xp2WCDlAphmlPQZcxr8QT54+rtUynf0VR1hKzJ
-   3VKBiVGHI1r8YlMFR6k7z3wgkN3TJ1RtjPzG8JXh4XhvVqfveKmZN67QT
-   ZhxmnE/LOpEtdME+qCzsiXJIX85paYnV8DJiCrGS2QVr5rdmMRwRx1Z7m
-   bEz51xx8kogN26yavCUp4+DjqkhMRAOGfK8qQ5yuty29xozFmMhO86zcL
-   /tYwqGDehzzDqnbteg4DqVHBurzujDpe6K4wFZuZPsv5L7vCZcFYGsf4i
-   5YwEnAjGKTFj6zIE8TPfNCvypxGzDQpIO8vuH7SFvNH164p0LOVnZeQFO
-   w==;
-X-CSE-ConnectionGUID: A1fokC6ST7eHYMrAJU7TKA==
-X-CSE-MsgGUID: 62bPMdbfRgmwbTAV0G1Fqg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11565"; a="78675956"
+  bh=yTWNE091ucFvirVLLSRvWfjkbaAtrIlG5NdwknBjyKw=;
+  b=Fj+1mQVVewkpzv1PzJVMSZ7nLx8A7xLevQuR3MsIqwt7MCRphhfw9eAt
+   OosSMGIG+UnFVhRUcA64hGbvVLTwE8JLz6fLS15DJeUaxMOPRtCP0y0OY
+   uttFT2DrehcwmCjhV0q07gOWzp3NmsFN+XFOJM4R/5svWHe5SQqqx+Ub6
+   fOfAqWfK83Ys87Ro0dkcGupgwMWT0OtahxlN8qa/rzVTvfsFb/Y5ejfjz
+   Yp0yopaMT0PDj3T9mca7yIq45ejVCsFvVzeCSwxUKTnTef4sNuiXAH75k
+   N8NqH84Zvt4fMM4EOUwEpdwudKKqr84rbNJyA2xK5xKXJrqIOsOhOFipc
+   g==;
+X-CSE-ConnectionGUID: ox9CY3n+RfmwV9xdoY2bsg==
+X-CSE-MsgGUID: sAFFR/NlQ3SOOn6MBgoBoA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11565"; a="71865704"
 X-IronPort-AV: E=Sophos;i="6.18,295,1751266800"; 
-   d="scan'208";a="78675956"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2025 10:24:36 -0700
-X-CSE-ConnectionGUID: thk8yZZkR2u5yZ/4WUWa2A==
-X-CSE-MsgGUID: O9Y3vAXjQI6ZKiBRRatpgw==
+   d="scan'208";a="71865704"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2025 10:53:19 -0700
+X-CSE-ConnectionGUID: GdHLDNZZSmaO4zit3rRlKA==
+X-CSE-MsgGUID: qmpdvEdzQTGQO0+TrYuNDw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,295,1751266800"; 
-   d="scan'208";a="182852319"
+   d="scan'208";a="177723423"
 Received: from gabaabhi-mobl2.amr.corp.intel.com (HELO [10.125.109.69]) ([10.125.109.69])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2025 10:24:35 -0700
-Message-ID: <c4b907aa-726b-4d44-b485-d24c7790c73c@intel.com>
-Date: Fri, 26 Sep 2025 10:24:34 -0700
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2025 10:53:18 -0700
+Message-ID: <aa28f51d-341c-4477-b5d8-a15b4f2000e4@intel.com>
+Date: Fri, 26 Sep 2025 10:53:16 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,46 +67,107 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 4/5] bnxt_fwctl: Add bnxt fwctl device
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: jgg@ziepe.ca, michael.chan@broadcom.com, saeedm@nvidia.com,
- Jonathan.Cameron@huawei.com, davem@davemloft.net, corbet@lwn.net,
- edumazet@google.com, gospo@broadcom.com, kuba@kernel.org,
+Subject: Re: [PATCH net-next v3 5/5] bnxt_fwctl: Add documentation entries
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>, jgg@ziepe.ca,
+ michael.chan@broadcom.com
+Cc: saeedm@nvidia.com, Jonathan.Cameron@huawei.com, davem@davemloft.net,
+ corbet@lwn.net, edumazet@google.com, gospo@broadcom.com, kuba@kernel.org,
  netdev@vger.kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
  selvin.xavier@broadcom.com, leon@kernel.org,
  kalesh-anakkur.purayil@broadcom.com
 References: <20250926085911.354947-1-pavan.chebbi@broadcom.com>
- <20250926085911.354947-5-pavan.chebbi@broadcom.com>
- <5f581053-b231-4f37-91dc-4f2fd8c571a4@intel.com>
- <CALs4sv3P_W=ipS5MWKQrThDkPXmdFnfxRroDiZXbdrQXXqetsQ@mail.gmail.com>
+ <20250926085911.354947-6-pavan.chebbi@broadcom.com>
 Content-Language: en-US
 From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <CALs4sv3P_W=ipS5MWKQrThDkPXmdFnfxRroDiZXbdrQXXqetsQ@mail.gmail.com>
+In-Reply-To: <20250926085911.354947-6-pavan.chebbi@broadcom.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
 
-On 9/26/25 10:11 AM, Pavan Chebbi wrote:
-> On Fri, Sep 26, 2025 at 9:31 PM Dave Jiang <dave.jiang@intel.com> wrote:
->>
->>
->>
+On 9/26/25 1:59 AM, Pavan Chebbi wrote:
+> Add bnxt_fwctl to the driver and fwctl documentation pages.
 > 
->>> +     if (msg->num_dma) {
->>> +             if (msg->num_dma > MAX_NUM_DMA_INDICATIONS) {
->>> +                     dev_err(dev, "DMA buffers exceed the number supported\n");
->>> +                     err = -EINVAL;
->>> +                     goto free_msg_out;
->>
->> Shouldn't rpc_in.resp get freed with an error returned? It's leaking rpc_in.resp on all the error paths from this point onward.
->>
->> DJ
+> Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
+> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> ---
+>  .../userspace-api/fwctl/bnxt_fwctl.rst        | 38 +++++++++++++++++++
+>  Documentation/userspace-api/fwctl/fwctl.rst   |  1 +
+>  Documentation/userspace-api/fwctl/index.rst   |  1 +
+>  3 files changed, 40 insertions(+)
+>  create mode 100644 Documentation/userspace-api/fwctl/bnxt_fwctl.rst
 > 
-> Isn't the caller taking care of it? The fw_rpc is called as:
-> void *outbuf __free(kvfree) = fwctl->ops->fw_rpc()
-> I was expecting that outbuf will be freed once it goes out of scope,
-> regardless of success or error?
+> diff --git a/Documentation/userspace-api/fwctl/bnxt_fwctl.rst b/Documentation/userspace-api/fwctl/bnxt_fwctl.rst
+> new file mode 100644
+> index 000000000000..2d7dbe56c622
+> --- /dev/null
+> +++ b/Documentation/userspace-api/fwctl/bnxt_fwctl.rst
+> @@ -0,0 +1,38 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +================
+> +fwctl bnxt driver
+> +================
+> +
+> +:Author: Pavan Chebbi
+> +
+> +Overview
+> +========
+> +
+> +BNXT driver makes a fwctl service available through an auxiliary_device.
+> +The bnxt_fwctl driver binds to this device and registers itself with the
+> +fwctl subsystem.
+> +
+> +The bnxt_fwctl driver is agnostic to the device firmware internals. It
+> +uses the Upper Layer Protocol (ULP) conduit provided by bnxt to send
+> +HardWare Resource Manager (HWRM) commands to firmware.
+> +
+> +These commands can query or change firmware driven device configurations
+> +and read/write registers that are useful for debugging.
+> +
+> +bnxt_fwctl User API
+> +==================
+> +
+May be a good idea to add the info() call and detail what gets returned. What are the expectations of the bits in caps value.
 
-Not exactly. Because when the function errors, it is returning ERR_PTR(rc) rather than rpc_in.resp. So the caller can't really free it because it doesn't have the pointer to the buffer. And even for the sake of argument lets say it works that way, it's best practice to clean up in the function on error paths rather than expecting the caller to do it for you. 
+> +Each RPC request contains a message request structure (HWRM input), its
+> +length, optional request timeout, and dma buffers' information if the
+> +command needs any DMA. The request is then put together with the request
+> +data and sent through bnxt's message queue to the firmware, and the results
+> +are returned to the caller.
+> +
+> +A typical user application would send a FWCTL_RPC using ioctl() for a FW
+> +command as below:
+> +
+> +        ioctl(fd, FWCTL_RPC, &rpc_msg);
+> +
+> +where rpc_msg (struct fwctl_rpc) is an encapsulation of fwctl_rpc_bnxt
+> +(which contains the HWRM command description) and its response.
+
+This part looks good. May want to add the expectation of the input and output buffer contents? Main thing is you want to make it easier for the user application developer when they look at this guide and know what they need to do.
+
+> diff --git a/Documentation/userspace-api/fwctl/fwctl.rst b/Documentation/userspace-api/fwctl/fwctl.rst
+> index a74eab8d14c6..826817bfd54d 100644
+> --- a/Documentation/userspace-api/fwctl/fwctl.rst
+> +++ b/Documentation/userspace-api/fwctl/fwctl.rst
+> @@ -148,6 +148,7 @@ area resulting in clashes will be resolved in favour of a kernel implementation.
+>  fwctl User API
+>  ==============
+>  
+> +.. kernel-doc:: include/uapi/fwctl/bnxt.h
+>  .. kernel-doc:: include/uapi/fwctl/fwctl.h
+>  .. kernel-doc:: include/uapi/fwctl/mlx5.h
+>  .. kernel-doc:: include/uapi/fwctl/pds.h
+> diff --git a/Documentation/userspace-api/fwctl/index.rst b/Documentation/userspace-api/fwctl/index.rst
+> index 316ac456ad3b..8062f7629654 100644
+> --- a/Documentation/userspace-api/fwctl/index.rst
+> +++ b/Documentation/userspace-api/fwctl/index.rst
+> @@ -10,5 +10,6 @@ to securely construct and execute RPCs inside device firmware.
+>     :maxdepth: 1
+>  
+>     fwctl
+> +   bnxt_fwctl
+>     fwctl-cxl
+>     pds_fwctl
+
 
