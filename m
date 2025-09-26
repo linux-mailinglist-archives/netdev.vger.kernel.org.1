@@ -1,297 +1,312 @@
-Return-Path: <netdev+bounces-226643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4E44BA37C5
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 13:24:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 315CFBA37F5
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 13:40:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A97262439E
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 11:24:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5759E189207A
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 11:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 448CC27467E;
-	Fri, 26 Sep 2025 11:24:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F2C2765D2;
+	Fri, 26 Sep 2025 11:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ui1d9yJO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PuwhUDJ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5062367D7;
-	Fri, 26 Sep 2025 11:24:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758885876; cv=fail; b=tsfN1bgIubzj0Vu878sfbaYtARL2wBZk7zfjHNHUMAcdKPbfRg4Iskw7L9FtsKMfFfgqCge/kU56dO5lyYvCrLO6eQpTE8RQ8NNB4HJm3n84jj794iNGTCA5ODZFHz7gfbqxGJdIMhr5FvrZpeGgJ0hOso4YudSa1btZPPCmPXA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758885876; c=relaxed/simple;
-	bh=n7FeJjOfZHXC3X3Wohw7VCfcmpeWOZgCL2qNgx5Fh2U=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=XuLamBDjnD6UyvnOc43WcVUS/fkWBblRmrv6dS8iDmd7ZD861sEEHQR5+zRcx/YYyM4DszDSbC7k8ttF+VzzX1IBxtjevUkc4QzM7ZRTwpLs8fZmVK3FLeJHEMrTQCYRAdF5xQuOv38gid2va2/J0lf96MV0Yd+X8XifCSEMWpE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ui1d9yJO; arc=fail smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758885874; x=1790421874;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=n7FeJjOfZHXC3X3Wohw7VCfcmpeWOZgCL2qNgx5Fh2U=;
-  b=Ui1d9yJOcBKii4RUMCIlTHx6oQ3QJByawsIGbU8xM4+Iu1MRFAPqUhat
-   8020KcQ1GDaKyXqEh8a5akm4UIinoIgKw3lApDxV3y0qOAOiI3XsiqP9m
-   UkDSCEsAIbbrPJUs0h4BbDHisnuLkrXqxh5QLBvg+t40tFTd6DJm250mT
-   tdZZqGemHM7F0az8USY1MI4ByAR+g7iKXqoQGKsfq7//NznIAHXzlNdbS
-   869942l2sRwIT+8RbzK/6PySi9ArvQkvv4a+R14N2hbwfclraKKr+uLgu
-   QCY9dkrOzCde/4jx0+v0kTE4yFfhGkZffg2gQv5EZuljaFO+kP443HOv9
-   g==;
-X-CSE-ConnectionGUID: ++9aNKOWTCiQIKv/ecbjAw==
-X-CSE-MsgGUID: pKZ/uiRUREqbERh4ie39cA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11564"; a="64848647"
-X-IronPort-AV: E=Sophos;i="6.18,295,1751266800"; 
-   d="scan'208";a="64848647"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2025 04:24:33 -0700
-X-CSE-ConnectionGUID: LGnV/aArS8eN8Ex0fKBlvw==
-X-CSE-MsgGUID: JqQX5cUBQvGDe14hynYMFQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,295,1751266800"; 
-   d="scan'208";a="177433215"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2025 04:24:32 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 26 Sep 2025 04:24:30 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Fri, 26 Sep 2025 04:24:30 -0700
-Received: from CY7PR03CU001.outbound.protection.outlook.com (40.93.198.30) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 26 Sep 2025 04:24:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=p9lMPYO6MOq7QNvwucpygzRE1FdO7GRhze9NR1MZ00CPzn9odwI9NjELiKY7sCstmG/J4PcmJI/S0SVB3wXmnm8XpFr9p0tF1PK1Y9TGhKT7uGzOOPAWehejX3LwislgagffcIS4tkgtiM0qT/OR7obgPNrQLx+DcWhGSOTncB6+SWEbMh9Faw4W00iQMBg04ZX3wHWrOqy2VSgOwtYiMR4paPuEIR6qXrMtr08bMB5UVAPO9JRJSIghAmt+3cNQFAt/qtWZM+t46cJbzSgCZxDZkboz5amlfQ3NuUgVb2T7LS6KEhkinDJEKTqrzWHt6BhQrP9soeXksgDnVfsUqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AYu7hSaTIF7nZ0aGQk7pfui5N8aNrUmMCJ5z1BHxKvI=;
- b=go9HB3vSNaqT4lHIo41DePJeSjJvSHpnuAaJoFk9Qz9nTWtdlQNNNrX0FFCN/5k1/25G6xdR82p9zH8dH+PuThOQUOmHwQOlIfTO+ZMlE0V+RGkjsTa1L1V5NyeNubcQvGt5R+B6dXbzZemX8nM0bH6qpzHRqvw5etft/Gs5sDEIlOCdie7NeZpKZgpwdcnaKoou7zRv8HPReCJVk1mLSbCDNr6MfHGynXMlWJlcNsUJr4uBiDyg3jnW7luPabVqTN+6tMEDqL994KiHE97UA7ujeghJLi0oRNm6tB3qhCr11iijrRIQaT61kCHKaImjHQr+q6DvBfjBWbFO9agbgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- SJ0PR11MB4781.namprd11.prod.outlook.com (2603:10b6:a03:2d8::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.13; Fri, 26 Sep
- 2025 11:24:27 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9160.008; Fri, 26 Sep 2025
- 11:24:27 +0000
-Date: Fri, 26 Sep 2025 13:24:12 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Octavian Purdila <tavip@google.com>
-CC: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<ast@kernel.org>, <daniel@iogearbox.net>, <hawk@kernel.org>,
-	<john.fastabend@gmail.com>, <sdf@fomichev.me>, <ahmed.zaki@intel.com>,
-	<aleksander.lobakin@intel.com>, <toke@redhat.com>, <lorenzo@kernel.org>,
-	<netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com>, Kuniyuki Iwashima
-	<kuniyu@google.com>
-Subject: Re: [PATCH net] xdp: use multi-buff only if receive queue supports
- page pool
-Message-ID: <aNZ33HRt+SxltbcP@boxer>
-References: <20250924060843.2280499-1-tavip@google.com>
- <20250924170914.20aac680@kernel.org>
- <CAGWr4cQCp4OwF8ESCk4QtEmPUCkhgVXZitp5esDc++rgxUhO8A@mail.gmail.com>
- <aNUObDuryXVFJ1T9@boxer>
- <20250925191219.13a29106@kernel.org>
- <CAGWr4cSiVDTUDfqAsHrsu1TRbumDf-rUUP=Q9PVajwUTHf2bYg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAGWr4cSiVDTUDfqAsHrsu1TRbumDf-rUUP=Q9PVajwUTHf2bYg@mail.gmail.com>
-X-ClientProxiedBy: VI1PR08CA0206.eurprd08.prod.outlook.com
- (2603:10a6:802:15::15) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B16158DAC
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 11:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758886799; cv=none; b=unfOg4yFlha8tEymAG2WBKR/1JPX0rXxtQi3CkdVLsllfAWC65s6mVEm64eIHgjeP+g8Ms/fKs7XgL8CEwQgmnXvfzXQWAu8dVcyhQgJkezeOVCXn8YV+u9CyI7aJpfqDNhrBLb3fOzCUsFrkXmc9nhYQIaF9edqLjGxllICem0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758886799; c=relaxed/simple;
+	bh=C4FA9c9TzoPy/6VPbp8AYsIpxAcjx25Vb0xVGWfCwLY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uFGYb7rfCGZ97AQHLlaAkoyJQbZlhyxmpm8jj2SWhO4PAuwsT77bo2QIdsCo54tqkHHGuK6AyjVL39qCfeoZ0kFDc2pd7JHkM6lNy070hl1AuUBRdG6RfRymvZqlECfjGAgWNxJhAcQCORtE8OgSOV34tmRtewWQ4HkNdcXhGHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PuwhUDJ/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758886797;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AtJ/1mk75ioxBq+kB3S7YkMI6itFh86Ny1CHtMfezGs=;
+	b=PuwhUDJ/RfoqEJMLKfkeYxc+CmTn/EIN5jH4z2LjtxJKYOuYGjCFkXQJKp7e7nBQrjavoE
+	Q6BBvsQuKdD9gat1UaJojIF2s04zebyb9P5yK8HWk0NAtc1Vlo7YgZQyYOXwx+C9SOMqCQ
+	LwCfsfDv5kAlINVb73G4KxeOW2jDfXI=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-115-5FQkXDSEO2SShcmLBfYsDQ-1; Fri, 26 Sep 2025 07:39:55 -0400
+X-MC-Unique: 5FQkXDSEO2SShcmLBfYsDQ-1
+X-Mimecast-MFC-AGG-ID: 5FQkXDSEO2SShcmLBfYsDQ_1758886794
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-57a8a75cb30so1339789e87.2
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 04:39:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758886794; x=1759491594;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AtJ/1mk75ioxBq+kB3S7YkMI6itFh86Ny1CHtMfezGs=;
+        b=kwjO+5VzaKQ8jYjTr7SVVE2r0rx3Zr28R2Hxl5TvSQkT519Xy1APZFLIrh0Q3ZUwNL
+         ++FXJ/dl9dPi8YLsSnkhECcjvRI4cS14XJ+4w2GGsDNdI5JjPU6QNr07NtkeqazOu2oZ
+         eZ5zOVrf1S+6sqFHmTXH/1QdDMPS2V1xhWeul8Aagg3YMwFqLrQ3tUv5C36C16DNY9vp
+         YDfcAsqcFrQy37728qSDSPvyoJi39c6aWylIvuh4qr60owzeXoQsNrpTYbnXnf6OztDP
+         7FOPyPLJI0SsZLbZLVnJW90F6d3py9HoDc11pwBH4P6I21qk46olmhS/SW2r3OZVoY94
+         7L5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU7+qS3mClBEXfVG+uQCIHYp9b0zwRs1ELSq8WrM6sSBx6ERaRGuoJHrzt3HTurhRCrI/oyuDc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznbXKXouyRMfxx5Ss9cfAcUcpM02vxkUK1mMKSywC5GViwOofs
+	bUwdCLTmM6An6uYoDARrv/9wf7QMq0XjQVUAwycs/yIbjjPaMaB6fnCPangqCL/SCiEpFCIXF52
+	9iyBNKciDmawQx5eclzGQR+C3X+RSNfwEZowQErt/AfzR2BZA2wT/pv68Dw==
+X-Gm-Gg: ASbGncvAU8qdOULWZKBbp3Fr4mi7hmCpUMqcHlvs+sfuTn3uYkEmdNEf913mDEpkmKJ
+	M3aeYdZ0r4webvIXPptxMS9lly3hoOJO0VkyPQwbQooLQnEzbZUTtzHb+0fVvOyVdQ4+woDdLFL
+	CTsIfvmISdGG2/4a24+STpqas1vibMETLoZw4L3V8fbirmiURRsIq7uP9LMI5qPRo6Bf3OuLHdD
+	jxiRLO+FHWXOWvDkycZYqsBO3TIb8VARXlTqAbDVQIvANgSFBlKxPH9QdwDW1o2ZQ64R5NEQPnH
+	9EiYrX//AdgpDhFfsyVVoR0mAPznkGQnpYvb3V8umhAed6Mx3QCZkoYYhAcDijn+0o0=
+X-Received: by 2002:a05:6512:39d1:b0:55b:842d:5828 with SMTP id 2adb3069b0e04-582d2f2796emr2598424e87.36.1758886793729;
+        Fri, 26 Sep 2025 04:39:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGOkzLCVigWsLXFz4HKYVY99wW4ETi6/xnHL05Mfvqi+0yC4WxRRgQmbTgHpaOV9jp1BFmI0A==
+X-Received: by 2002:a05:6512:39d1:b0:55b:842d:5828 with SMTP id 2adb3069b0e04-582d2f2796emr2598408e87.36.1758886793243;
+        Fri, 26 Sep 2025 04:39:53 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-58313430dd5sm1751076e87.24.2025.09.26.04.39.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Sep 2025 04:39:52 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id F014F2771C6; Fri, 26 Sep 2025 13:39:50 +0200 (CEST)
+From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@redhat.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Helge Deller <deller@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net] page_pool: Fix PP_MAGIC_MASK to avoid crashing on some 32-bit arches
+Date: Fri, 26 Sep 2025 13:38:39 +0200
+Message-ID: <20250926113841.376461-1-toke@redhat.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|SJ0PR11MB4781:EE_
-X-MS-Office365-Filtering-Correlation-Id: 78e5c156-76ec-4cb1-0870-08ddfcef40c7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?UGhhWTIrL1g4RnVXTG9sNWxkaDBWaDhxbG1pMmNNRTZmQ004eWc4Ly84Skt3?=
- =?utf-8?B?UVVJdEozNHZ1dmlTcTJEeThUdytKd0dod2dpTk1PUGdjSG5xNDJoZkxhWDVV?=
- =?utf-8?B?MFpWTHZpVlRrSkdEdndqMWJkMlA0ZFN0ZlB4QWo2NkV5Umgxei9YL0pXUlNv?=
- =?utf-8?B?bEtEMkRuQnIybjRhWFRDZUw5RjJsZnV5NUdQa1krN1JhOU9PZXNydkhYdjM2?=
- =?utf-8?B?TnFCemIxR2h5YzQ4OTZpZGRNdkxsaGhTbVJhdy9IZDJJWmJBNURtT2d2aGtG?=
- =?utf-8?B?Z1ZITHlrOTBUU0x4UWJUaVRxQWlhZmFQUmsxWFByK0s4Y2JJTFVKQ0paWGcw?=
- =?utf-8?B?eUt6NyswSllicGhWaDlTamZNZDY5WHBIa3hIQk45R1BCVjcxZXE4TFFNdGpF?=
- =?utf-8?B?ZDZWdHppaU1Nb2xYdVNRMGplQlpVSjEwako2UG1nMGVwbHc5S1ZyS2tRRUtt?=
- =?utf-8?B?ZnBZSTZxUGk0dDJaNFNYNkI1dVlBV05PWUJFaGs3cXN2NnorSzNVRUFlTFBy?=
- =?utf-8?B?VEQzdms1bGpQM0JyODQxZ3YzcEtYQzBKM3pLVzRDKy93OEZhaWFwalI1R1Fi?=
- =?utf-8?B?eTgxUXcxSXJncVIwVGVmdlE3MXo3OW5NS1FQSS9lMjFNZmV4Zmt3MzliNnVO?=
- =?utf-8?B?cEZRNy9iT0hXbFl5R29KWU9CZkFuc2hyYXZ1aGtnN0dKLzQ2ZWd4OHFmVTVR?=
- =?utf-8?B?M0R5dGk3cjNwNCtBQmRzTE0vNHhqQm8xVU1YeXJ6OE9sQ3J2L2FuN3Nndk5x?=
- =?utf-8?B?R1A3UW5qT3pkbm4zL1pmZm41NHBZQXorTWU5UjArZ0piVkNRSlZEQnVGOGJm?=
- =?utf-8?B?cDI3cWJLTUl4dWRwSGJ3ZkRTM096V3ppdFBWMTN3YmxPdGU5Tk93WDVMYi9w?=
- =?utf-8?B?ZDRrQUZTUkVxZ05tck9INzhEOXd5NWk5dzVIRkdMQkhiU25ESmxReHlhbUZJ?=
- =?utf-8?B?VWVZSjVpTjdvSzBieEhyNm5JVG1xQVc3Rjc0SExpYU1kQnRCbU9GUHpYdzVV?=
- =?utf-8?B?L2c3b3hHYjJqUi8wVXpoakYySjhRbDZGOUFudnFpOXBLYTE4WXNId09vU2dN?=
- =?utf-8?B?ZlRRR205QUUwR0dvYU9XdXFlRWl5T0p2NHNRZGdJNTRkZ0Q3NExwWi82Z1A4?=
- =?utf-8?B?TlJsS0E3bVdhWGRLajR6Q2cwZEphL0g1OVZseWVYOHM1K1Z2NEtzcHdMWFhz?=
- =?utf-8?B?UmhXS2dEN0JVdW14TFVOQjU3QytkcllVdkw2aTZ0U2FGUENpQjBuL0tBTnlv?=
- =?utf-8?B?N1ZQTjduL0E4MGZHQmpPMWNUR2VkYnBtdWI4R3hMUytLemtJM2tlR2s5ZE9T?=
- =?utf-8?B?OVVZNWVJSTB6d1V1ZTF3cjF6ZHdWcldKblJUbWZabDNScEFTdU10eU9HcW4r?=
- =?utf-8?B?VTFWeFErc3d4VVFFcGNYc3plUmdYeDVwL29yMHNPZFVES0hNSmQ4MXd5eEZF?=
- =?utf-8?B?Ym9JaStsaTRGVzIyZ1JDWlppb090cjJLbE14M2p3ZDZuSkpRL2R5d0pxK0pH?=
- =?utf-8?B?T093dXkwRmRsSFAyNDlHRDNxWWlzVHFkdEo5cHlXbjJQZFZLbFdhVTBUSENK?=
- =?utf-8?B?ajNIOVFTMW56bTJsTlFSaC9FZ1hWVGw1QkxJN3EzQkRSODZzSzV0M0Y0MG5G?=
- =?utf-8?B?WmNxeFBQemRTMFRFMjNoNTRJSFYweG1Sc2thR056anpTTkU2LzZUTzVDTzBl?=
- =?utf-8?B?T3U4TVpLczYwa1Q4MVc0eUhldzNGY0dadHk2dkRsYStPbTdsTEFHWXZsMGNC?=
- =?utf-8?B?aG1KNlNUL3lrdzc4THhHUEdDb3ZmSndMd2ZPZklxNndtbE5SV3VsNzNRd3g1?=
- =?utf-8?B?cFNaM2NVQVY3emRvaDMrL05uZE1MdG1oUWJiYnhYZmtqNzQ4SzJHMy9XLzRB?=
- =?utf-8?B?NXhhT2NlMk9jSXIrQTlCN0F0YXhyZFFrMjNiRXdwY3FQWXc9PQ==?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a3hGKzJNcWNCdjF5RDZ6SitwWVZTNFFkTER6dVpvRWV4Z2ZXY3pic24rUWY4?=
- =?utf-8?B?UGF3a1p3dmVCSlkyTllyRU5yUm9vaUR2c1JSZ3RwUW5SanFLOHJkRUx3Tzly?=
- =?utf-8?B?UHFlWUxvZEs4c2dNTms0ZXNadmlqcm0wZXY3cllxaGlaRnIzQ1dJc05ZUU5X?=
- =?utf-8?B?ZFFaUkhzUnNwVjhpWXNhMEU0ODZpQ09jUUZ2MDRTemZRU216T0VzWFh4ejFQ?=
- =?utf-8?B?ZlpZa2lhQld6UW5VSGVxQzFKMjF0RXhxd25CWFFnZk5EMFRPYmduLy9YcUtp?=
- =?utf-8?B?U05tTTNMbk1aakkwRTY1K2IzMThBcmVBM1U0NWRrMkRDc1BjS0FyRUpobTBO?=
- =?utf-8?B?MUY0amF6a3dtV1FvVVkwaHlwaEFTZmxjQmpEeEVOTlhxa1BqU1B0ZFh3enJ6?=
- =?utf-8?B?RmFwdGRRQUlnMEJ0dk9ucWpCbzZpRmxsVzd5OUJMc3B5aUhaM0RBa3pGV0hF?=
- =?utf-8?B?TC9lQUZqVVQ0RkpZUzdaL3A0Vi9OYkU5SHFTVEdFUVlXaHFNWTZJa1liUGps?=
- =?utf-8?B?cWZyRTZ2ZzRnL0pLOGN4dHhER3hEb2ZnbkZEMkhWVEZkcWcvVy9LcG91WGxI?=
- =?utf-8?B?TUkxQzNPUCtUZjk4emU4NVBFTnVYZW9PME9xd2hiaHMwZW5lbWl1aXFCbGNw?=
- =?utf-8?B?WHhWTXhEUkJ1NldUTVhOSklYcEhkVndMNDFYLytsYWtVR0R2eDFTaVQ2TElJ?=
- =?utf-8?B?RkZESDgzRmd0VTk2RlJITnF5SHhPTDBRS0k1ZG5pM2U2NldrOVVlWnNuUmpI?=
- =?utf-8?B?RzBMdUNIMXZQS0p4MXJKU3ZrazZCbXZJV3JMSjdWbVNzaHUrak5GWFd4dXlp?=
- =?utf-8?B?RHIrbkczUU5kVE13T0tobk81VEcrQ3BPT3oyaGYvSWhxRmI0cGltOFl0Mi9B?=
- =?utf-8?B?Tnh1blErWlpRUUViNE1CSXdHMmMybFBvTjdkTmtrVUNBRlVEOVhEZFVGUTB1?=
- =?utf-8?B?MUFHUjh1RWRsM2w4ak80WUt6RzFUWTlhOEpySFo5NFlsZlVRQUtiN0lKR2dT?=
- =?utf-8?B?cFhBZ3BsKzE5NGMxMnVrSlVoZEF6a0Fhb1FYRDlPOTVXTlpNbUcrSVcreU5a?=
- =?utf-8?B?SzlzUGlRNHJwMk5jY0VZQmZCb0hKKzZLMVE5MDFWOGhsYlJwS3pTRmFJZmhX?=
- =?utf-8?B?Sm5JSk1OUWFhTGJxQ0FyU0pURXRST3M5U1hCenpucVN6eW95Qk5iTzFjYzkv?=
- =?utf-8?B?V3BNMFFkWTE4a3BaNlNBR3JYbVhLUWt0QVBFanAzd2FJSjhmNjZ3UmtUVkpB?=
- =?utf-8?B?dTB4aDd1ZzBXRXZoZ0xKRU03ZXdmNnFlUFoycVZ3dXhrL010SXlKN3ByaXBE?=
- =?utf-8?B?anRLRytSQ1lxMmRSRW5odjBIL2dtMVlsaEl5YytWY1RwemV4M091WVZQM2Jz?=
- =?utf-8?B?SVBjVkF0RngyeHI4clJ3eXJFcHdqY3hqSmxJK2R3NGxpT2pWekxGNkdudjlB?=
- =?utf-8?B?TGhMK1hMUUZzMFNVM3EzNitlbWo4T3BTZW03TEl4em9CQnU3ZVA3czlBNDVQ?=
- =?utf-8?B?K0dlTWhXZ0dBNGQ3RjBnaHl6K0NiWmpxRlRRK1JWTnZtZXNTbDBJNmlwaGY1?=
- =?utf-8?B?dFppQldiTjhROEtia3BvdjdrMnFrTkp5ekRQekErc0dJNXh5QlVORFVKTGR2?=
- =?utf-8?B?YlU1MmoySGNReUFFWmpxaHlxREkvR0Rib2s3WWJZRHpHeVpHV3RHWXRtWEtK?=
- =?utf-8?B?eXM2ZVRhKzU4eEhOdE5KazRLWmtiWmwxejhQRnptT092T0dLeDRxUHkrRnMr?=
- =?utf-8?B?Tm01ckVlblo0aldQTDY3dzZvK29PekN2b0cvdk5zV2F2eXIwL2FtWUdoZXVy?=
- =?utf-8?B?dTFjdHZoaGNPZ3NEL3Q0VklVZkY5VzkrV0Z4K2h5UzQyUkpZdDF0TThKS3ha?=
- =?utf-8?B?Q0R2dUVqMlFJRWQ1cU85cURlaENDYkNyK1JKRkJSUnUwZ2dLc1EzVVAxTmxn?=
- =?utf-8?B?RUZaeFNZc2NqdTVLc0NSQnlHbW9jUFNZU2h0MUtPVWpLcGkzbERCd2hvalcv?=
- =?utf-8?B?WFl0enZMT1FEWUV2WDlvQnZzVEI2QnAxUnlFV1RyakQ3MWVUaDJVczdpQVFE?=
- =?utf-8?B?amoxa0lPTG0zUWx1SUc2cFNGYytmbmRNK2ZIY3BuNjc0RDlNb2RkYnkxRHBh?=
- =?utf-8?B?dDg1SGV3a2Z0L0xpRU1CTTlxYkh0TWluWWRBMWlSNWlsdS8yQXJTZHNjZG1H?=
- =?utf-8?B?dWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 78e5c156-76ec-4cb1-0870-08ddfcef40c7
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2025 11:24:27.2609
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SJN7GV19IcGhJFtLjfy1rLHYexLo84zRmVjuN/QBqqT2ttdgItyrwB9fAu6eZNZS68spTWkqqdDY+wqeQZdrsmqa7k6X59DX7IJuGuwVqnA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4781
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 26, 2025 at 12:33:46AM -0700, Octavian Purdila wrote:
-> On Thu, Sep 25, 2025 at 7:12 PM Jakub Kicinski <kuba@kernel.org> wrote:
-> >
-> > On Thu, 25 Sep 2025 11:42:04 +0200 Maciej Fijalkowski wrote:
-> > > On Thu, Sep 25, 2025 at 12:53:53AM -0700, Octavian Purdila wrote:
-> > > > On Wed, Sep 24, 2025 at 5:09 PM Jakub Kicinski <kuba@kernel.org> wrote:
-> > > > >
-> > > > > On Wed, 24 Sep 2025 06:08:42 +0000 Octavian Purdila wrote:
-> > >  [...]
-> > > > >
-> > > > > This can also happen on veth, right? And veth re-stamps the Rx queues.
-> > >
-> > > What do you mean by 're-stamps' in this case?
-> > >
-> > > >
-> > > > I am not sure if re-stamps will have ill effects.
-> > > >
-> > > > The allocation and deallocation for this issue happens while
-> > > > processing the same packet (receive skb -> skb_pp_cow_data ->
-> > > > page_pool alloc ... __bpf_prog_run ->  bpf_xdp_adjust_tail).
-> > > >
-> > > > IIUC, if the veth re-stamps the RX queue to MEM_TYPE_PAGE_POOL
-> > > > skb_pp_cow_data will proceed to allocate from page_pool and
-> > > > bpf_xdp_adjust_tail will correctly free from page_pool.
-> > >
-> > > netif_get_rxqueue() gives you a pointer the netstack queue, not the driver
-> > > one. Then you take the xdp_rxq from there. Do we even register memory
-> > > model for these queues? Or am I missing something here.
-> > >
-> 
-> Ah, yes, you are right. So my comment in the commit message about
-> TUN/TAP registering a page shared memory model is wrong. But I think
-> the fix is still correct for the reported syzkaller issue. From
-> bpf_prog_run_generic_xdp:
-> 
->         rxqueue = netif_get_rxqueue(skb);
->         xdp_init_buff(xdp, frame_sz, rxq: &rxqueue->xdp_rxq);
-> 
-> So xdp_buff's rxq is set to the netstack queue for the generic XDP
-> hook. And adding the check in netif_skb_check_for_xdp based on the
-> netstack queue should be correct, right?
+Helge reported that the introduction of PP_MAGIC_MASK let to crashes on
+boot on his 32-bit parisc machine. The cause of this is the mask is set
+too wide, so the page_pool_page_is_pp() incurs false positives which
+crashes the machine.
 
-Per my limited understanding your change is making skb_cow_data_for_xdp()
-a dead code as I don't see mem model being registered for these stack
-queues - netif_alloc_rx_queues() only calls xdp_rxq_info_reg() and
-mem.type defaults to MEM_TYPE_PAGE_SHARED as it's defined as 0, which
-means it's never going to be MEM_TYPE_PAGE_POOL.
+Just disabling the check in page_pool_is_pp() will lead to the page_pool
+code itself malfunctioning; so instead of doing this, this patch changes
+the define for PP_DMA_INDEX_BITS to avoid mistaking arbitrary kernel
+pointers for page_pool-tagged pages.
 
-IMHO that single case where we rewrite skb to memory backed by page pool
-should have it reflected in mem.type so __xdp_return() potentially used in
-bpf helpers could act correctly.
+The fix relies on the kernel pointers that alias with the pp_magic field
+always being above PAGE_OFFSET. With this assumption, we can use the
+lowest bit of the value of PAGE_OFFSET as the upper bound of the
+PP_DMA_INDEX_MASK, which should avoid the false positives.
 
-> 
-> > > We're in generic XDP hook where driver specifics should not matter here
-> > > IMHO.
-> >
-> > Well, IDK how helpful the flow below would be but:
-> >
-> > veth_xdp_xmit() -> [ptr ring] -> veth_xdp_rcv() -> veth_xdp_rcv_one()
-> >                                                                |
-> >                             | xdp_convert_frame_to_buff()   <-'
-> >     ( "re-stamps" ;) ->     | xdp->rxq = &rq->xdp_rxq;
-> >   can eat frags but now rxq | bpf_prog_run_xdp()
-> >          is veth's          |
-> >
-> > I just glanced at the code so >50% changes I'm wrong, but that's what
-> > I meant.
-> 
-> Thanks for the clarification, I thought that "re-stamps" means the:
-> 
->     xdp->rxq->mem.type = frame->mem_type;
-> 
-> from veth_xdp_rcv_one in the XDP_TX/XDP_REDIRECT cases.
-> 
-> And yes, now I think the same issue can happen because veth sets the
-> memory model to MEM_TYPE_PAGE_SHARED but veth_convert_skb_to_xdp_buff
-> calls skb_pp_cow_data that uses page_pool for allocations. I'll try to
-> see if I can adapt the syzkaller repro to trigger it for confirmation.
+Because we cannot rely on PAGE_OFFSET always being a compile-time
+constant, nor on it always being >0, we fall back to disabling the
+dma_index storage when there are no bits available. This leaves us in
+the situation we were in before the patch in the Fixes tag, but only on
+a subset of architecture configurations. This seems to be the best we
+can do until the transition to page types in complete for page_pool
+pages.
 
-That is a good catch.
+Link: https://lore.kernel.org/all/aMNJMFa5fDalFmtn@p100/
+Fixes: ee62ce7a1d90 ("page_pool: Track DMA-mapped pages and unmap them when destroying the pool")
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+---
+Sorry for the delay on getting this out. I have only compile-tested it,
+since I don't have any hardware that triggers the original bug. Helge, I'm
+hoping you can take it for a spin?
+
+ include/linux/mm.h   | 18 +++++------
+ net/core/page_pool.c | 76 ++++++++++++++++++++++++++++++--------------
+ 2 files changed, 62 insertions(+), 32 deletions(-)
+
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 1ae97a0b8ec7..28541cb40f69 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -4159,14 +4159,13 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
+  * since this value becomes part of PP_SIGNATURE; meaning we can just use the
+  * space between the PP_SIGNATURE value (without POISON_POINTER_DELTA), and the
+  * lowest bits of POISON_POINTER_DELTA. On arches where POISON_POINTER_DELTA is
+- * 0, we make sure that we leave the two topmost bits empty, as that guarantees
+- * we won't mistake a valid kernel pointer for a value we set, regardless of the
+- * VMSPLIT setting.
++ * 0, we use the lowest bit of PAGE_OFFSET as the boundary if that value is
++ * known at compile-time.
+  *
+- * Altogether, this means that the number of bits available is constrained by
+- * the size of an unsigned long (at the upper end, subtracting two bits per the
+- * above), and the definition of PP_SIGNATURE (with or without
+- * POISON_POINTER_DELTA).
++ * If the value of PAGE_OFFSET is not known at compile time, or if it is too
++ * small to leave some bits available above PP_SIGNATURE, we define the number
++ * of bits to be 0, which turns off the DMA index tracking altogether (see
++ * page_pool_register_dma_index()).
+  */
+ #define PP_DMA_INDEX_SHIFT (1 + __fls(PP_SIGNATURE - POISON_POINTER_DELTA))
+ #if POISON_POINTER_DELTA > 0
+@@ -4175,8 +4174,9 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
+  */
+ #define PP_DMA_INDEX_BITS MIN(32, __ffs(POISON_POINTER_DELTA) - PP_DMA_INDEX_SHIFT)
+ #else
+-/* Always leave out the topmost two; see above. */
+-#define PP_DMA_INDEX_BITS MIN(32, BITS_PER_LONG - PP_DMA_INDEX_SHIFT - 2)
++/* Constrain to the lowest bit of PAGE_OFFSET if known; see above. */
++#define PP_DMA_INDEX_BITS ((__builtin_constant_p(PAGE_OFFSET) && PAGE_OFFSET > PP_SIGNATURE) ? \
++			      MIN(32, __ffs(PAGE_OFFSET) - PP_DMA_INDEX_SHIFT) : 0)
+ #endif
+ 
+ #define PP_DMA_INDEX_MASK GENMASK(PP_DMA_INDEX_BITS + PP_DMA_INDEX_SHIFT - 1, \
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 36a98f2bcac3..e224d2145eed 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -472,11 +472,60 @@ page_pool_dma_sync_for_device(const struct page_pool *pool,
+ 	}
+ }
+ 
++static int page_pool_register_dma_index(struct page_pool *pool,
++					netmem_ref netmem, gfp_t gfp)
++{
++	int err = 0;
++	u32 id;
++
++	if (unlikely(!PP_DMA_INDEX_BITS))
++		goto out;
++
++	if (in_softirq())
++		err = xa_alloc(&pool->dma_mapped, &id, netmem_to_page(netmem),
++			       PP_DMA_INDEX_LIMIT, gfp);
++	else
++		err = xa_alloc_bh(&pool->dma_mapped, &id, netmem_to_page(netmem),
++				  PP_DMA_INDEX_LIMIT, gfp);
++	if (err) {
++		WARN_ONCE(err != -ENOMEM, "couldn't track DMA mapping, please report to netdev@");
++		goto out;
++	}
++
++	netmem_set_dma_index(netmem, id);
++out:
++	return err;
++}
++
++static int page_pool_release_dma_index(struct page_pool *pool,
++				       netmem_ref netmem)
++{
++	struct page *old, *page = netmem_to_page(netmem);
++	unsigned long id;
++
++	if (unlikely(!PP_DMA_INDEX_BITS))
++		return 0;
++
++	id = netmem_get_dma_index(netmem);
++	if (!id)
++		return -1;
++
++	if (in_softirq())
++		old = xa_cmpxchg(&pool->dma_mapped, id, page, NULL, 0);
++	else
++		old = xa_cmpxchg_bh(&pool->dma_mapped, id, page, NULL, 0);
++	if (old != page)
++		return -1;
++
++	netmem_set_dma_index(netmem, 0);
++
++	return 0;
++}
++
+ static bool page_pool_dma_map(struct page_pool *pool, netmem_ref netmem, gfp_t gfp)
+ {
+ 	dma_addr_t dma;
+ 	int err;
+-	u32 id;
+ 
+ 	/* Setup DMA mapping: use 'struct page' area for storing DMA-addr
+ 	 * since dma_addr_t can be either 32 or 64 bits and does not always fit
+@@ -495,18 +544,10 @@ static bool page_pool_dma_map(struct page_pool *pool, netmem_ref netmem, gfp_t g
+ 		goto unmap_failed;
+ 	}
+ 
+-	if (in_softirq())
+-		err = xa_alloc(&pool->dma_mapped, &id, netmem_to_page(netmem),
+-			       PP_DMA_INDEX_LIMIT, gfp);
+-	else
+-		err = xa_alloc_bh(&pool->dma_mapped, &id, netmem_to_page(netmem),
+-				  PP_DMA_INDEX_LIMIT, gfp);
+-	if (err) {
+-		WARN_ONCE(err != -ENOMEM, "couldn't track DMA mapping, please report to netdev@");
++	err = page_pool_register_dma_index(pool, netmem, gfp);
++	if (err)
+ 		goto unset_failed;
+-	}
+ 
+-	netmem_set_dma_index(netmem, id);
+ 	page_pool_dma_sync_for_device(pool, netmem, pool->p.max_len);
+ 
+ 	return true;
+@@ -684,8 +725,6 @@ void page_pool_clear_pp_info(netmem_ref netmem)
+ static __always_inline void __page_pool_release_netmem_dma(struct page_pool *pool,
+ 							   netmem_ref netmem)
+ {
+-	struct page *old, *page = netmem_to_page(netmem);
+-	unsigned long id;
+ 	dma_addr_t dma;
+ 
+ 	if (!pool->dma_map)
+@@ -694,15 +733,7 @@ static __always_inline void __page_pool_release_netmem_dma(struct page_pool *poo
+ 		 */
+ 		return;
+ 
+-	id = netmem_get_dma_index(netmem);
+-	if (!id)
+-		return;
+-
+-	if (in_softirq())
+-		old = xa_cmpxchg(&pool->dma_mapped, id, page, NULL, 0);
+-	else
+-		old = xa_cmpxchg_bh(&pool->dma_mapped, id, page, NULL, 0);
+-	if (old != page)
++	if (page_pool_release_dma_index(pool, netmem))
+ 		return;
+ 
+ 	dma = page_pool_get_dma_addr_netmem(netmem);
+@@ -712,7 +743,6 @@ static __always_inline void __page_pool_release_netmem_dma(struct page_pool *poo
+ 			     PAGE_SIZE << pool->p.order, pool->p.dma_dir,
+ 			     DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING);
+ 	page_pool_set_dma_addr_netmem(netmem, 0);
+-	netmem_set_dma_index(netmem, 0);
+ }
+ 
+ /* Disconnects a page (from a page_pool).  API users can have a need
+-- 
+2.51.0
 
 
