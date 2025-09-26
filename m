@@ -1,134 +1,295 @@
-Return-Path: <netdev+bounces-226719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3956BA4696
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 17:30:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03551BA46EA
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 17:33:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A86283A0460
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 15:30:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A54B316C577
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 15:33:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5415215F5C;
-	Fri, 26 Sep 2025 15:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uTTkJW0q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499A2218827;
+	Fri, 26 Sep 2025 15:33:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09602045B7
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 15:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 166882046BA;
+	Fri, 26 Sep 2025 15:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758900611; cv=none; b=bb0y51R0K8em+aOU84lbm7l8vossZLV9T05K7zo3HK/A+jLO18keMEVfgJ1DrNA8kfps0hw71V2Jz+l6D74CLTEWuuxwohfWO5iKLQ8Bg0SsYV2aR0z143v8aoNkfXh5eedmDYndowEH4qL/QY+Q2oS17bp83nItSj1STHhbpi0=
+	t=1758900798; cv=none; b=Df48VgmAnCE3a21AvfvXqkkuPExpwirnzuXJWw3Ril4cliSXn+FxcOhmGRyUWrIGGszNOPhKbLXJcDXDYoYsvGadAHBHEzpVm7l4q24hxVLfwT7aGyM/rs6C389+wf5V0pzVfnLvKpeDEzpzrR5Hog+nt73RiMFOn8a9qZaTeqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758900611; c=relaxed/simple;
-	bh=nkeq185D9yQ9yxxChCIJcs1e3lmihBDJv2qnVelLEBc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CxWhcG7HNh6mJhiDJnOMNd5fb5so2b/cZalLyadRLjvq2Th69icRa5TRDg4xd2VkQNgZUuxvlDzRb6xD7b3w21fX6HNROVrTx0uIPBSFlQlVpUS42GEfkev4QTSa9h/Mc9K9QFm4hClM0wNmguZaAe5tTtQXkY9IrsThSh29Voc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uTTkJW0q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B091C4CEF4;
-	Fri, 26 Sep 2025 15:30:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758900611;
-	bh=nkeq185D9yQ9yxxChCIJcs1e3lmihBDJv2qnVelLEBc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uTTkJW0qJG4yuIPpK2aFpnhhMoS5zHe4ZHjDCZDNQ9Ek2Gd5B30EXPbdDPwVWHf5R
-	 qyeRxxfUscNvkOx5vooFRcR+a1LZLXWywumf5zm6sQjqI+S5e/DoLAIVqe96Srmpqd
-	 YbA4qkBnhgJ0SSRGp/hiYS74GX7yH6beS/9F7/czkp0yON6tKcY3TjYX3m/zEc7u60
-	 1mZqSD3Uwjck8zchuN5DNBi5u6AHW7Q4TE9vd8tjcrd18NV0gt6c/pbkvcSm/qux4M
-	 9FdGh1o9IbxP6GoKk3mht4lvjHYvlOLQuWJgZQkSeUch1qC5vgjnsjTz2vArwv/bXW
-	 GygNgocE2HEhw==
-Date: Fri, 26 Sep 2025 16:30:06 +0100
-From: Simon Horman <horms@kernel.org>
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Breno Leitao <leitao@debian.org>, Petr Machata <petrm@nvidia.com>,
-	Yuyang Huang <yuyanghuang@google.com>,
-	Xiao Liang <shaw.leon@gmail.com>,
-	Carolina Jubran <cjubran@nvidia.com>,
-	Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 1/9] netdevsim: a basic test PSP implementation
-Message-ID: <aNaxfvNzp9zyWXEd@horms.kernel.org>
-References: <20250924194959.2845473-1-daniel.zahka@gmail.com>
- <20250924194959.2845473-2-daniel.zahka@gmail.com>
+	s=arc-20240116; t=1758900798; c=relaxed/simple;
+	bh=ni3wiqzdcrWJ5hA14fX69yFGyXTIV7lbBZKPSRcswf0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dsnMgefqfb3N3QSW+JMCHwtIVq8kUrs00D5X3pRqtUT1seI+FGDIqIY71LaYwYDImIPtQTl5ZSb0O7lB2qXi2eG8+AYq+GesThwjaJalp8AUiipl05l7QPPytk3wWeJDPnm7MpFgkFan6hUzWIBxacJXWKDdRUsjKEMqD9fIsjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 177F7168F;
+	Fri, 26 Sep 2025 08:33:07 -0700 (PDT)
+Received: from usa.arm.com (e133711.arm.com [10.1.196.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2C11B3F66E;
+	Fri, 26 Sep 2025 08:33:14 -0700 (PDT)
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: Jassi Brar <jassisinghbrar@gmail.com>,
+	Adam Young <admiyo@os.amperecomputing.com>
+Cc: Sudeep Holla <sudeep.holla@arm.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Revert "mailbox/pcc: support mailbox management of the shared buffer"
+Date: Fri, 26 Sep 2025 16:33:11 +0100
+Message-Id: <20250926153311.2202648-1-sudeep.holla@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250924194959.2845473-2-daniel.zahka@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 24, 2025 at 12:49:47PM -0700, Daniel Zahka wrote:
-> From: Jakub Kicinski <kuba@kernel.org>
-> 
-> Provide a PSP implementation for netdevsim.
-> 
-> Use psp_dev_encapsulate() and psp_dev_rcv() to do actual encapsulation
-> and decapsulation on skbs, but perform no encryption or decryption. In
-> order to make encryption with a bad key result in a drop on the peer's
-> rx side, we stash our psd's generation number in the first byte of each
-> key before handing to the peer.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Co-developed-by: Daniel Zahka <daniel.zahka@gmail.com>
-> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
+This reverts commit 5378bdf6a611a32500fccf13d14156f219bb0c85.
 
-...
+Commit 5378bdf6a611 ("mailbox/pcc: support mailbox management of the shared buffer")
+attempted to introduce generic helpers for managing the PCC shared memory,
+but it largely duplicates functionality already provided by the mailbox
+core and leaves gaps:
 
-> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+1. TX preparation: The mailbox framework already supports this via
+  ->tx_prepare callback for mailbox clients. The patch adds
+  pcc_write_to_buffer() and expects clients to toggle pchan->chan.manage_writes,
+  but no drivers set manage_writes, so pcc_write_to_buffer() has no users.
 
-...
+2. RX handling: Data reception is already delivered through
+   mbox_chan_received_data() and client ->rx_callback. The patch adds an
+   optional pchan->chan.rx_alloc, which again has no users and duplicates
+   the existing path.
 
-> @@ -1039,12 +1060,29 @@ static int nsim_init_netdevsim(struct netdevsim *ns)
->  	if (IS_ENABLED(CONFIG_DEBUG_NET)) {
->  		ns->nb.notifier_call = netdev_debug_event;
->  		if (register_netdevice_notifier_dev_net(ns->netdev, &ns->nb,
-> -							&ns->nn))
-> +							&ns->nn)){
->  			ns->nb.notifier_call = NULL;
-> +			goto err_unregister_netdev;
+3. Completion handling: While adding last_tx_done is directionally useful,
+   the implementation only covers Type 3/4 and fails to handle the absence
+   of a command_complete register, so it is incomplete for other types.
 
-Hi Daniel, Jakub, all,
+Given the duplication and incomplete coverage, revert this change. Any new
+requirements should be addressed in focused follow-ups rather than bundling
+multiple behavioral changes together.
 
-This will result in this function returning err.
-But here err is set to 0, wheras it seems it
-should be set to a negative error value.
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+---
+ drivers/mailbox/pcc.c | 102 ++----------------------------------------
+ include/acpi/pcc.h    |  29 ------------
+ 2 files changed, 4 insertions(+), 127 deletions(-)
 
-Flagged by Smatch.
+diff --git a/drivers/mailbox/pcc.c b/drivers/mailbox/pcc.c
+index 0a00719b2482..f6714c233f5a 100644
+--- a/drivers/mailbox/pcc.c
++++ b/drivers/mailbox/pcc.c
+@@ -306,22 +306,6 @@ static void pcc_chan_acknowledge(struct pcc_chan_info *pchan)
+ 		pcc_chan_reg_read_modify_write(&pchan->db);
+ }
+ 
+-static void *write_response(struct pcc_chan_info *pchan)
+-{
+-	struct pcc_header pcc_header;
+-	void *buffer;
+-	int data_len;
+-
+-	memcpy_fromio(&pcc_header, pchan->chan.shmem,
+-		      sizeof(pcc_header));
+-	data_len = pcc_header.length - sizeof(u32) + sizeof(struct pcc_header);
+-
+-	buffer = pchan->chan.rx_alloc(pchan->chan.mchan->cl, data_len);
+-	if (buffer != NULL)
+-		memcpy_fromio(buffer, pchan->chan.shmem, data_len);
+-	return buffer;
+-}
+-
+ /**
+  * pcc_mbox_irq - PCC mailbox interrupt handler
+  * @irq:	interrupt number
+@@ -333,8 +317,6 @@ static irqreturn_t pcc_mbox_irq(int irq, void *p)
+ {
+ 	struct pcc_chan_info *pchan;
+ 	struct mbox_chan *chan = p;
+-	struct pcc_header *pcc_header = chan->active_req;
+-	void *handle = NULL;
+ 
+ 	pchan = chan->con_priv;
+ 
+@@ -358,17 +340,7 @@ static irqreturn_t pcc_mbox_irq(int irq, void *p)
+ 	 * required to avoid any possible race in updatation of this flag.
+ 	 */
+ 	pchan->chan_in_use = false;
+-
+-	if (pchan->chan.rx_alloc)
+-		handle = write_response(pchan);
+-
+-	if (chan->active_req) {
+-		pcc_header = chan->active_req;
+-		if (pcc_header->flags & PCC_CMD_COMPLETION_NOTIFY)
+-			mbox_chan_txdone(chan, 0);
+-	}
+-
+-	mbox_chan_received_data(chan, handle);
++	mbox_chan_received_data(chan, NULL);
+ 
+ 	pcc_chan_acknowledge(pchan);
+ 
+@@ -412,24 +384,9 @@ pcc_mbox_request_channel(struct mbox_client *cl, int subspace_id)
+ 	pcc_mchan = &pchan->chan;
+ 	pcc_mchan->shmem = acpi_os_ioremap(pcc_mchan->shmem_base_addr,
+ 					   pcc_mchan->shmem_size);
+-	if (!pcc_mchan->shmem)
+-		goto err;
+-
+-	pcc_mchan->manage_writes = false;
+-
+-	/* This indicates that the channel is ready to accept messages.
+-	 * This needs to happen after the channel has registered
+-	 * its callback. There is no access point to do that in
+-	 * the mailbox API. That implies that the mailbox client must
+-	 * have set the allocate callback function prior to
+-	 * sending any messages.
+-	 */
+-	if (pchan->type == ACPI_PCCT_TYPE_EXT_PCC_SLAVE_SUBSPACE)
+-		pcc_chan_reg_read_modify_write(&pchan->cmd_update);
+-
+-	return pcc_mchan;
++	if (pcc_mchan->shmem)
++		return pcc_mchan;
+ 
+-err:
+ 	mbox_free_channel(chan);
+ 	return ERR_PTR(-ENXIO);
+ }
+@@ -460,38 +417,8 @@ void pcc_mbox_free_channel(struct pcc_mbox_chan *pchan)
+ }
+ EXPORT_SYMBOL_GPL(pcc_mbox_free_channel);
+ 
+-static int pcc_write_to_buffer(struct mbox_chan *chan, void *data)
+-{
+-	struct pcc_chan_info *pchan = chan->con_priv;
+-	struct pcc_mbox_chan *pcc_mbox_chan = &pchan->chan;
+-	struct pcc_header *pcc_header = data;
+-
+-	if (!pchan->chan.manage_writes)
+-		return 0;
+-
+-	/* The PCC header length includes the command field
+-	 * but not the other values from the header.
+-	 */
+-	int len = pcc_header->length - sizeof(u32) + sizeof(struct pcc_header);
+-	u64 val;
+-
+-	pcc_chan_reg_read(&pchan->cmd_complete, &val);
+-	if (!val) {
+-		pr_info("%s pchan->cmd_complete not set", __func__);
+-		return -1;
+-	}
+-	memcpy_toio(pcc_mbox_chan->shmem,  data, len);
+-	return 0;
+-}
+-
+-
+ /**
+- * pcc_send_data - Called from Mailbox Controller code. If
+- *		pchan->chan.rx_alloc is set, then the command complete
+- *		flag is checked and the data is written to the shared
+- *		buffer io memory.
+- *
+- *		If pchan->chan.rx_alloc is not set, then it is used
++ * pcc_send_data - Called from Mailbox Controller code. Used
+  *		here only to ring the channel doorbell. The PCC client
+  *		specific read/write is done in the client driver in
+  *		order to maintain atomicity over PCC channel once
+@@ -507,37 +434,17 @@ static int pcc_send_data(struct mbox_chan *chan, void *data)
+ 	int ret;
+ 	struct pcc_chan_info *pchan = chan->con_priv;
+ 
+-	ret = pcc_write_to_buffer(chan, data);
+-	if (ret)
+-		return ret;
+-
+ 	ret = pcc_chan_reg_read_modify_write(&pchan->cmd_update);
+ 	if (ret)
+ 		return ret;
+ 
+ 	ret = pcc_chan_reg_read_modify_write(&pchan->db);
+-
+ 	if (!ret && pchan->plat_irq > 0)
+ 		pchan->chan_in_use = true;
+ 
+ 	return ret;
+ }
+ 
+-
+-static bool pcc_last_tx_done(struct mbox_chan *chan)
+-{
+-	struct pcc_chan_info *pchan = chan->con_priv;
+-	u64 val;
+-
+-	pcc_chan_reg_read(&pchan->cmd_complete, &val);
+-	if (!val)
+-		return false;
+-	else
+-		return true;
+-}
+-
+-
+-
+ /**
+  * pcc_startup - Called from Mailbox Controller code. Used here
+  *		to request the interrupt.
+@@ -583,7 +490,6 @@ static const struct mbox_chan_ops pcc_chan_ops = {
+ 	.send_data = pcc_send_data,
+ 	.startup = pcc_startup,
+ 	.shutdown = pcc_shutdown,
+-	.last_tx_done = pcc_last_tx_done,
+ };
+ 
+ /**
+diff --git a/include/acpi/pcc.h b/include/acpi/pcc.h
+index 9af3b502f839..840bfc95bae3 100644
+--- a/include/acpi/pcc.h
++++ b/include/acpi/pcc.h
+@@ -17,35 +17,6 @@ struct pcc_mbox_chan {
+ 	u32 latency;
+ 	u32 max_access_rate;
+ 	u16 min_turnaround_time;
+-
+-	/* Set to true to indicate that the mailbox should manage
+-	 * writing the dat to the shared buffer. This differs from
+-	 * the case where the drivesr are writing to the buffer and
+-	 * using send_data only to  ring the doorbell.  If this flag
+-	 * is set, then the void * data parameter of send_data must
+-	 * point to a kernel-memory buffer formatted in accordance with
+-	 * the PCC specification.
+-	 *
+-	 * The active buffer management will include reading the
+-	 * notify_on_completion flag, and will then
+-	 * call mbox_chan_txdone when the acknowledgment interrupt is
+-	 * received.
+-	 */
+-	bool manage_writes;
+-
+-	/* Optional callback that allows the driver
+-	 * to allocate the memory used for receiving
+-	 * messages.  The return value is the location
+-	 * inside the buffer where the mailbox should write the data.
+-	 */
+-	void *(*rx_alloc)(struct mbox_client *cl,  int size);
+-};
+-
+-struct pcc_header {
+-	u32 signature;
+-	u32 flags;
+-	u32 length;
+-	u32 command;
+ };
+ 
+ /* Generic Communications Channel Shared Memory Region */
+-- 
+2.34.1
 
-> +		}
->  	}
->  
-> +	err = nsim_psp_init(ns);
-> +	if (err)
-> +		goto err_unregister_notifier;
-> +
->  	return 0;
->  
-> +err_unregister_notifier:
-> +	if (ns->nb.notifier_call)
-> +		unregister_netdevice_notifier_dev_net(ns->netdev, &ns->nb,
-> +						      &ns->nn);
-> +err_unregister_netdev:
-> +	rtnl_lock();
-> +	peer = rtnl_dereference(ns->peer);
-> +	if (peer)
-> +		RCU_INIT_POINTER(peer->peer, NULL);
-> +	RCU_INIT_POINTER(ns->peer, NULL);
-> +	unregister_netdevice(ns->netdev);
->  err_ipsec_teardown:
->  	nsim_ipsec_teardown(ns);
->  	nsim_macsec_teardown(ns);
-
-...
 
