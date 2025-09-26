@@ -1,209 +1,189 @@
-Return-Path: <netdev+bounces-226622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CDCEBA3081
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 10:56:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B6DDBA3035
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 10:50:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4DBC624379
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 08:56:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFB50165509
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 08:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5548929B229;
-	Fri, 26 Sep 2025 08:56:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89FD529A300;
+	Fri, 26 Sep 2025 08:50:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gGG2Y4LC"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="h32SFcYS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f228.google.com (mail-pg1-f228.google.com [209.85.215.228])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB1429A300
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 08:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB22C299A84
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 08:50:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758876966; cv=none; b=QN/vlODIBG9moRUBuPYLxys1tckk2ZUqk/khutW0syLETs1FtXgozWKGL1sx9YxQnP+Sh6EqvbOM8yFX/QcvNxRV336owuZKCqPur7+OMSRkVPzId9qy3O0CMIbuakjBUfSCyEW+sUiEKvz20wngl+f96F5xoDHhzyxmqXUq7H0=
+	t=1758876651; cv=none; b=cfEtk/qcwLAM5Be0ad+9Dzyu7PIEP9E54mybt6iNMnsF9M/JztL0kph7yFlPZjyR1rMgH2xWfH/qAiYWpcbKdbKWogk9oSHX0Wpzkqsjw3xCOqb7VCXvQv4/zqAlhwX1ky6RZkV/F6DEJ7pETSQILdJ9xlwVeXa+RB/p/efHrLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758876966; c=relaxed/simple;
-	bh=wiLl+QzGP4jkl9gd7uZj88hnx36VRjSUVnnmvbJs20I=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ES7ZgqU7RWd4BaoR0r3fV5q3g5JPLW29cp1lTIxp61OBmi1YAw1qAM4eyvEqbQRyLoeRjp8fukKnl8ORX8cJd+qSNu7FDbDij+qQPCnYCDoDX5qmvKWb4Ob11/XASM7oR0Gpwl3+KdCQiXtyN3dE8Y5lMp8FpuajeolHJar8yaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gGG2Y4LC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758876963;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=C67xH3Vlopkqdp7cUYZYysDv/9rtz6w4Y9k2ipC7sI4=;
-	b=gGG2Y4LCvq3lxbPJOprZ/ayf/KyShMJc8Y8HTfna6HqceUU0l6MTMOZqs7LM6KBQfCPFfV
-	GK+Ufc4hvs9k0Yc69NiOP5C/KAqu6Gl3dYMPk1ISKJbruXGdD3gx8UljUxYA41vGrJjgzw
-	AB+H3R71pt3UPXdlqKGQMxNEN3VHnY8=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-75-lPTU8e7RMrOcQ_EWDRbO-w-1; Fri, 26 Sep 2025 04:56:02 -0400
-X-MC-Unique: lPTU8e7RMrOcQ_EWDRbO-w-1
-X-Mimecast-MFC-AGG-ID: lPTU8e7RMrOcQ_EWDRbO-w_1758876961
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-6339aa08acfso2705823a12.0
-        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 01:56:01 -0700 (PDT)
+	s=arc-20240116; t=1758876651; c=relaxed/simple;
+	bh=jc+9Mwnghg2l2bQRFJhPRIKyzBA30DKAzbGjmqZDRuY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=N31xYwXvkxBCTTHTNZfr128NbPiXHIDVe0vGptZp4yYyXMgoWZZ/JUHW/Eed1MLs4v6dTKmhLQduOM0ZvQ1TEaHw4ZzD7nkDyHCZAtsjKgOEk4o1v+ZMTWxNPqxR0RuTa+6mWVAfFs2Pu9mrZHhoDBx9ZP3M07oDvSd7DXo6MBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=h32SFcYS; arc=none smtp.client-ip=209.85.215.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pg1-f228.google.com with SMTP id 41be03b00d2f7-b550a522a49so1721650a12.2
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 01:50:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758876961; x=1759481761;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C67xH3Vlopkqdp7cUYZYysDv/9rtz6w4Y9k2ipC7sI4=;
-        b=Kbv8SeRu2aEdJRvrHMs/Z4q3/qXbY4aB/7D7qB5GgXfYJ/hI4m7ifi5w2mSvhr15Wv
-         UzoyqQzBhkoDXLyqSfbWuLEafIoCDiPFD9QR84JHmCRM5bw3JW4x4aaDeAq+Kk766+Y5
-         Jeiieq8VfEQzxXL4DT4a0iWG45dzwaXKfYDLjbbc1TqhvmpJOXG/5c3F6kalG/TI7Wnn
-         4hhB//ex5JiGGCO1q1eBPlPtLD/IIK1Klcxh3/LYP6d+x0juMZ6f+pM8Fi3xxwDdWWyf
-         4dC6VP0Mzn1wDUpnPXQrHkM8CPMGjl9Hp9cLUAXsjY/l7B/vRnpI2umWBpXgtKHODREk
-         Wvlg==
-X-Forwarded-Encrypted: i=1; AJvYcCV2a1lq44E9Xg8V84Zwq/93FH9bOj35IWkDUPmi4y6kGLJyd0/T3CpQ4OEGzxNkZ1hzP7/TV0g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynYaNYemn5oJpe8mvkL/daa8mf05gs8lJMzs0elXKiIHUuL+fR
-	1AiD32HOItqxT9k3/y2sepszNeWF8hUMQ2p/4vASrCVbliqNZz6HWslEEgxg2zpehjwHoczSvo2
-	wYVBChJldTDimrceW22eoJPdHCUOwxWQ/f8drxjPU4qNQi8xCcscggLwHYneZrGwhqQ==
-X-Gm-Gg: ASbGncu4vnu+NAFuO6oIqvHUlbrpTyxqBC2mZYKJwKFNRjgRvRw2AWm6RWBPFgvOVVe
-	1OIxC77lE0TZQvISBoGx80MN3WexPbvCWkyxY+TSu2Sz0olAxCrYa20A2XQXB4k1uyhdnfNE0kn
-	uhLD7fuRdZl5jDbyQdOKT+6QEpLaBC0Ogpz/WubE17o77xc/kCIoogPjUUXJavBmNs2Ubi9IPSG
-	QZYGrgicfXWmViPYxTCtrBen/BBKV4fH/IAEZvIh88d/zadqKXdgqfADLxh+GeVtApeQF8LfFW8
-	+tGK9o6ZqpnebkQuSL24KtNb/G5aYOqzuVIcWPnFkizOOf/ABXmrAUZDj/1y5ZsJ
-X-Received: by 2002:a05:6402:23d6:b0:633:14bb:dcb1 with SMTP id 4fb4d7f45d1cf-634a332f3fcmr4932594a12.11.1758876960624;
-        Fri, 26 Sep 2025 01:56:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHab/SkJB4tH1HftkLBDBn0zd3NxTVPVjI7bTzKn4ouyJoGVkSgFQIIFCEApQe8Ufb4NT3s5w==
-X-Received: by 2002:a05:6402:23d6:b0:633:14bb:dcb1 with SMTP id 4fb4d7f45d1cf-634a332f3fcmr4932567a12.11.1758876960175;
-        Fri, 26 Sep 2025 01:56:00 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-634a3629cbdsm2546635a12.3.2025.09.26.01.55.58
+        d=1e100.net; s=20230601; t=1758876649; x=1759481449;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JGJWSmoM+8Phql35kYHgcLi2uTPHv9JlqBXehjilKJw=;
+        b=KvEc/v4yLXmxSTkIAoOrzzBRrRHfuyRmbMbt3z+PADJvsOOFrtOPtICUTq8YYcsti/
+         +gSsCh2uBOUog528BntMi4KjkFJ89CShVdahqAjLDq7iCtd9T175BnZ7Ghs7XDDTSJzw
+         40jbFo+RBhWLo1eIl/lmwlV6M7mbqMVShJu/CQls2U5YgRDJEB7K7m9lD6EKMBenxdh5
+         YlpGJrWpXyezOXfExeXEDerNTe52cht5a3jz+N0z0d6R/SrW3vKYWOCj1ZxNgPzXTI0k
+         cvjIJWqcrVkNUOkqacmeWEsDuWzHMGSJ8joDnfKwc8ZrYb4eZFee7DaBHP69YriMR0rX
+         JcVA==
+X-Forwarded-Encrypted: i=1; AJvYcCURi3DJ1ezlfH/VYOezAYuBpdFgBPG1ER2QctNyezVgIxi/E2fhfFflWQrOOib3q0s6js/JhRI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyG3Ic7n2UfBjrNd9LOD8eqIyTwLs4fNoEewESd1/9c1yWRVrnR
+	ItSbCOrGwNIEeBdXi4xFym9xstCAIJsAZjZ/qNB7ELtBhIAfWO2ESSvyNeWAo3iEEZlhjWxD+8T
+	9SalU6BMaUlMwKAphJhDQrMavG30LKS7LOCaKmo6179SMGQQ+uyfRZvAcd6Q3Yt+UleJC+4azF4
+	2AptNJnyymcSuHt3zKR/CoLiGkeCsdCiE5pG9yVWbQqgHBIohcYeWbx5pHp2HYLB7xe7sUPwzCH
+	LJ1vv6KnI4=
+X-Gm-Gg: ASbGnctUjBfaW59dowW4xC/o25wK96Zh+PgR8Ona+9t+++NzOhNW/LV6eqiLsHI4/02
+	e2208933AZtM7xHdbmRMGbdBFRTmdO2apT+w8AK1/PW8uorL3Ih3XR/acJ6TqziNO8eCs3vu8vM
+	4BhHa7nrRqyl7lg13V5zdpAxYkPW62dOzTILTBcO6M67Ll9x1bdJsaGvCW6ReLlgXOcXWnoYhoJ
+	OYtH5g6v5/2DAQKKL70OizlL7Kl8wK+jFvpI2tBVQVx96v/RJJ3mYRTe0v89wwx4nlCIgDJ941s
+	ZRMwaCVcnF/dkUjEhgTK0jm7CelYi+bDTs6UVU8+BiSym0Cxvuki0AROOeuitN5IIU0TGJdARGM
+	aaJD+cI0DEjpTQvMtYc5H3JG6gCzv9rKcVjiDnms/5AvN+EKhJXLk1tmQ6wXeGelr1xeu6T76tO
+	Psww==
+X-Google-Smtp-Source: AGHT+IGfMLfpl1r8UiOuXJhqCZKSnETB6Ur9TnXbCm+CykLqr6gyLIAkyrO9TZvesxjupxdXUbloLXWp8eaT
+X-Received: by 2002:a17:902:f54c:b0:271:479d:3de3 with SMTP id d9443c01a7336-27ed49c7763mr74298605ad.12.1758876649203;
+        Fri, 26 Sep 2025 01:50:49 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-27ed6845576sm3296075ad.69.2025.09.26.01.50.48
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 26 Sep 2025 01:50:49 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-7810af03a63so2541113b3a.3
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 01:50:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1758876647; x=1759481447; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JGJWSmoM+8Phql35kYHgcLi2uTPHv9JlqBXehjilKJw=;
+        b=h32SFcYSXoa5FD2mRlZigB4KV4nvTnN5Bb79xkb7BBkHgZasZw+ChCNtxmg4hDx3Xo
+         SJz7jc/EQYaW03IjvmbJ83phXzn27inZ5NCtT82ClT87Ewh+EcIb6dzD9tDSS08aua09
+         T7qdAStZacBkTg9IdotFlR2BpnPKJa6uyUJKk=
+X-Forwarded-Encrypted: i=1; AJvYcCW3eAB9UJcQ5jbBU/3VjlBOSRjtc1E/i9M68FbR6m6xddN2j+fzwhR3mqTQjMFnmmvE+ta7QKY=@vger.kernel.org
+X-Received: by 2002:a05:6a00:2e98:b0:77f:620f:45bd with SMTP id d2e1a72fcca58-780fcdd2201mr7038497b3a.7.1758876647291;
+        Fri, 26 Sep 2025 01:50:47 -0700 (PDT)
+X-Received: by 2002:a05:6a00:2e98:b0:77f:620f:45bd with SMTP id d2e1a72fcca58-780fcdd2201mr7038470b3a.7.1758876646907;
+        Fri, 26 Sep 2025 01:50:46 -0700 (PDT)
+Received: from PC-MID-R740.dhcp.broadcom.net ([192.19.234.250])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-78102c1203fsm3959896b3a.92.2025.09.26.01.50.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Sep 2025 01:55:58 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 641E7277197; Fri, 26 Sep 2025 10:55:57 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
- razor@blackwall.org, pabeni@redhat.com, willemb@google.com,
- sdf@fomichev.me, john.fastabend@gmail.com, martin.lau@kernel.org,
- jordan@jrife.io, maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
- David Wei <dw@davidwei.uk>
-Subject: Re: [PATCH net-next 19/20] netkit: Add xsk support for af_xdp
- applications
-In-Reply-To: <5d139efa-c78e-4323-b79d-bbf566ac19b8@iogearbox.net>
-References: <20250919213153.103606-1-daniel@iogearbox.net>
- <20250919213153.103606-20-daniel@iogearbox.net> <87zfalpf8w.fsf@toke.dk>
- <5d139efa-c78e-4323-b79d-bbf566ac19b8@iogearbox.net>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 26 Sep 2025 10:55:57 +0200
-Message-ID: <87plbdoan6.fsf@toke.dk>
+        Fri, 26 Sep 2025 01:50:46 -0700 (PDT)
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+To: jgg@ziepe.ca,
+	michael.chan@broadcom.com
+Cc: dave.jiang@intel.com,
+	saeedm@nvidia.com,
+	Jonathan.Cameron@huawei.com,
+	davem@davemloft.net,
+	corbet@lwn.net,
+	edumazet@google.com,
+	gospo@broadcom.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	selvin.xavier@broadcom.com,
+	leon@kernel.org,
+	kalesh-anakkur.purayil@broadcom.com,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>
+Subject: [PATCH net-next v3 0/5] bnxt_fwctl: fwctl for Broadcom Netxtreme devices
+Date: Fri, 26 Sep 2025 01:59:06 -0700
+Message-Id: <20250926085911.354947-1-pavan.chebbi@broadcom.com>
+X-Mailer: git-send-email 2.39.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-Daniel Borkmann <daniel@iogearbox.net> writes:
+Introducing bnxt_fwctl which follows along Jason's work [1].
+It is an aux bus driver that enables fwctl for Broadcom
+NetXtreme 574xx, 575xx and 576xx series chipsets by using
+bnxt driver's capability to talk to devices' firmware.
 
-> On 9/23/25 1:42 PM, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> Daniel Borkmann <daniel@iogearbox.net> writes:
->>=20
->>> Enable support for AF_XDP applications to operate on a netkit device.
->>> The goal is that AF_XDP applications can natively consume AF_XDP
->>> from network namespaces. The use-case from Cilium side is to support
->>> Kubernetes KubeVirt VMs through QEMU's AF_XDP backend. KubeVirt is a
->>> virtual machine management add-on for Kubernetes which aims to provide
->>> a common ground for virtualization. KubeVirt spawns the VMs inside
->>> Kubernetes Pods which reside in their own network namespace just like
->>> regular Pods.
->>>
->>> Raw QEMU AF_XDP backend example with eth0 being a physical device with
->>> 16 queues where netkit is bound to the last queue (for multi-queue RSS
->>> context can be used if supported by the driver):
->>>
->>>    # ethtool -X eth0 start 0 equal 15
->>>    # ethtool -X eth0 start 15 equal 1 context new
->>>    # ethtool --config-ntuple eth0 flow-type ether \
->>>              src 00:00:00:00:00:00 \
->>>              src-mask ff:ff:ff:ff:ff:ff \
->>>              dst $mac dst-mask 00:00:00:00:00:00 \
->>>              proto 0 proto-mask 0xffff action 15
->>>    # ip netns add foo
->>>    # ip link add numrxqueues 2 nk type netkit single
->>>    # ynl-bind eth0 15 nk
->>>    # ip link set nk netns foo
->>>    # ip netns exec foo ip link set lo up
->>>    # ip netns exec foo ip link set nk up
->>>    # ip netns exec foo qemu-system-x86_64 \
->>>            -kernel $kernel \
->>>            -drive file=3D${image_name},index=3D0,media=3Ddisk,format=3D=
-raw \
->>>            -append "root=3D/dev/sda rw console=3DttyS0" \
->>>            -cpu host \
->>>            -m $memory \
->>>            -enable-kvm \
->>>            -device virtio-net-pci,netdev=3Dnet0,mac=3D$mac \
->>>            -netdev af-xdp,ifname=3Dnk,id=3Dnet0,mode=3Dnative,queues=3D=
-1,start-queue=3D1,inhibit=3Don,map-path=3D$dir/xsks_map \
->>>            -nographic
->>=20
->> So AFAICT, this example relies on the control plane installing an XDP
->> program on the physical NIC which will redirect into the right socket;
->> and since in this example, qemu will install the XSK socket at index 1
->> in the xsk map, that XDP program will also need to be aware of the queue
->> index mapping. I can see from your qemu commit[0] that there's support
->> on the qemu side for specifying an offset into the map to avoid having
->> to do this translation in the XDP program, but at the very least that
->> makes this example incomplete, no?
->>=20
->> However, even with a complete example, this breaks isolation in the
->> sense that the entire XSK map is visible inside the pod, so a
->> misbehaving qemu could interfere with traffic on other queues (by
->> clearing the map, say). Which seems less than ideal?
->
-> For getting to a first starting point to connect all things with KubeVirt,
-> bind mounting the xsk map from Cilium into the VM launcher Pod which acts
-> as a regular K8s Pod while not perfect, its not a big issue given its out
-> of reach from the application sitting inside the VM (and some of the
-> control plane aspects are baked in the launcher Pod already), so the
-> isolation barrier is still VM. Eventually my goal is to have a xdp/xsk
-> redirect extension where we don't need to have the xsk map, and can just
-> derive the target xsk through the rxq we received traffic on.
+The first patch moves the ULP definitions to a common place
+inside include/linux/bnxt/. The second and third patches
+refactor and extend the existing bnxt aux bus functions to
+be able to add more than one auxiliary device. The last three
+patches create an additional bnxt aux device, add bnxt_fwctl,
+and the documentation.
 
-Right, okay, makes sense.
+[1] https://lore.kernel.org/netdev/0-v5-642aa0c94070+4447f-fwctl_jgg@nvidia.com/
 
->> Taking a step back, for AF_XDP we already support decoupling the
->> application-side access to the redirected packets from the interface,
->> through the use of sockets. Meaning that your use case here could just
->> as well be served by the control plane setting up AF_XDP socket(s) on
->> the physical NIC and passing those into qemu, in which case we don't
->> need this whole queue proxying dance at all.
->
-> Cilium should not act as a proxy handing out xsk sockets. Existing
-> applications expect a netdev from kernel side and should not need to
-> rewrite just to implement one CNI's protocol. Also, all the memory
-> should not be accounted against Cilium but rather the application Pod
-> itself which is consuming af_xdp. Further, on up/downgrades we expect
-> the data plane to being completely decoupled from the control plane,
-> if Cilium would own the sockets that would be disruptive which is
-> nogo.
+v3: Addressed the review comments as below
+Patch #1: Removed redundant common.h [thanks Saeed]
+Patch #2 and #3 merged into a single patch [thanks Jonathan]
+Patch #3: Addressed comments from Jonathan
+Patch #4 and #5: Addressed comments from Jonathan and Dave
 
-Hmm, okay, so the kernel-side RXQ buffering is to make it transparent to
-the application inside the pod? I guess that makes sense; would be good
-to mention in the commit message, though (+ the bit about the map
-needing to be in sync) :)
+v2: In patch #5, fixed a sparse warning where a __le16 was
+degraded to an integer. Also addressed kdoc warnings for
+include/uapi/fwctl/bnxt.h in the same patch.
 
->> So, erm, what am I missing that makes this worth it (for AF_XDP; I can
->> see how it is useful for other things)? :)
-> Yeap there are other use cases we've seen from Cilium users as well,
-> e.g. running dpdk applications on top of af_xdp in regular k8s Pods.
+v1: https://lore.kernel.org/netdev/20250922090851.719913-1-pavan.chebbi@broadcom.com/
 
-Yeah, being able to do stuff like that without having to rely on SR-IOV
-would be cool, certainly!
+The following are changes since commit 4ff71af020ae59ae2d83b174646fc2ad9fcd4dc4:
+  Merge tag 'net-6.17-rc8' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+and are available in the git repository at:
+  https://github.com/pavanchebbi/linux/tree/bnxt_fwctl_v3
 
--Toke
+Pavan Chebbi (5):
+  bnxt_en: Move common definitions to include/linux/bnxt/
+  bnxt_en: Refactor aux bus functions to be more generic
+  bnxt_en: Create an aux device for fwctl
+  bnxt_fwctl: Add bnxt fwctl device
+  bnxt_fwctl: Add documentation entries
+
+ .../userspace-api/fwctl/bnxt_fwctl.rst        |  38 ++
+ Documentation/userspace-api/fwctl/fwctl.rst   |   1 +
+ Documentation/userspace-api/fwctl/index.rst   |   1 +
+ MAINTAINERS                                   |   6 +
+ drivers/fwctl/Kconfig                         |  11 +
+ drivers/fwctl/Makefile                        |   1 +
+ drivers/fwctl/bnxt/Makefile                   |   4 +
+ drivers/fwctl/bnxt/main.c                     | 452 ++++++++++++++++++
+ drivers/infiniband/hw/bnxt_re/debugfs.c       |   2 +-
+ drivers/infiniband/hw/bnxt_re/main.c          |   2 +-
+ drivers/infiniband/hw/bnxt_re/qplib_fp.c      |   2 +-
+ drivers/infiniband/hw/bnxt_re/qplib_res.h     |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  30 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  12 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |   2 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   4 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 245 +++++++---
+ .../bnxt_ulp.h => include/linux/bnxt/ulp.h    |  22 +-
+ include/uapi/fwctl/bnxt.h                     |  64 +++
+ include/uapi/fwctl/fwctl.h                    |   1 +
+ 21 files changed, 816 insertions(+), 88 deletions(-)
+ create mode 100644 Documentation/userspace-api/fwctl/bnxt_fwctl.rst
+ create mode 100644 drivers/fwctl/bnxt/Makefile
+ create mode 100644 drivers/fwctl/bnxt/main.c
+ rename drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h => include/linux/bnxt/ulp.h (87%)
+ create mode 100644 include/uapi/fwctl/bnxt.h
+
+-- 
+2.39.1
 
 
