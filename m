@@ -1,123 +1,114 @@
-Return-Path: <netdev+bounces-226569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 116F6BA22D4
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 04:04:09 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2AC8BA2304
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 04:12:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2F941C2637E
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 02:04:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 82F844E024A
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 02:12:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D03622A7F2;
-	Fri, 26 Sep 2025 02:04:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F71F24678F;
+	Fri, 26 Sep 2025 02:12:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oonl2xbF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZqzkEGnF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781A517C220
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 02:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4713A1534EC;
+	Fri, 26 Sep 2025 02:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758852244; cv=none; b=FMSkITaSrCivKtQ/Knb9V5aGeNgBp4hhyR+KVQARYsZPcJ//jQO/fDnzN/H0x9yc9Q52ygsEj4RwOxzdEcQVac8aXCMoAwdtSTIQKyvAk0PtnyKMd0LAQqC6jWvbRKiDO0+EHcbwPtBV4uJ85qm7Hm9DUIjbPJE7Z40V7E/BMH0=
+	t=1758852742; cv=none; b=DlJQOKjpgnptmptltT8hDi4cc4NU9SD1p+A92t4ZnFmOoURUFQ2Ujux4tEjxSXmj/GTMdQu2ae+yOlj2lKkIFne+DGLSdRX8Shjm37zlEMUFrZSpRfgdN9AXDTQ7g8304n8S+cZ+ylCX3x0yxiCV3HeW5+AVh8ZIcZzLzJTgwxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758852244; c=relaxed/simple;
-	bh=75J+/BCYXqLZXJy2HtE8aY2HcCOpUZrdZ+5TOVwlc+4=;
+	s=arc-20240116; t=1758852742; c=relaxed/simple;
+	bh=axYxobLrEUeHYdl48BRAqpExYcCmC5GjLRrR6i9h/1Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GVdLvuHFuH5E62Oyh1kQe4LysjQklDCYk8r5OhCwPCFe75h3GHGbnjtZTysuRpqnsetFXgBomECM8erOs2hA4v2mOePwwKyWUXxh966WaZ/+86N9ni7CY/BVBtpy2lw8CzaxEuBqTO5Q4cAQcxq1glKYxES6VW6kYg8q/VKctOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oonl2xbF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F71EC4CEF0;
-	Fri, 26 Sep 2025 02:04:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=i/Z1khUJqY98035Fy9Igf8AASHAdADo7HXcXqQ/T1OyDNFpKfv6GQjcADMy2tbnItWgHmc5SKBzdiYLcFFm/WwCZN1yadi1fkoYpg/51bYrF/1jIjumvlAegz1axEymw+13w3QALkFXcSYNDuyzOJlZE00nuUWBiT9eyKHxEoJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZqzkEGnF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC002C4CEF0;
+	Fri, 26 Sep 2025 02:12:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758852243;
-	bh=75J+/BCYXqLZXJy2HtE8aY2HcCOpUZrdZ+5TOVwlc+4=;
+	s=k20201202; t=1758852740;
+	bh=axYxobLrEUeHYdl48BRAqpExYcCmC5GjLRrR6i9h/1Q=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oonl2xbFc2JomR53IPHS99gyCMvzD4KfqScn+16/n064QsupbA96KDScJitCkMqVB
-	 b7D1n3Bf8OiLAzsMELfF//rjFHWV+y+ctQDNwoL2bKSHIltPtXVq9j1gN/A8uyeOFi
-	 ZfeX7uhG0lnk/QxU811lQK2sby04xHO94ql55na2676jQX9Nlsm7tOQKCosWgH+Ifc
-	 hFXtfUL4ku7qsXDgeNJ7Th1ieEbWT0Mvnbj0WVRwqPPtj+HhCBftRXO6E9OSFFibAT
-	 kDljgKIOizXX98T7YIt8ymvz5pSb2iOKirqFIX+8in3Yjmevg2v7swvVYe8S9bPMVt
-	 NM+ixF7HxSKqw==
-Date: Thu, 25 Sep 2025 19:04:01 -0700
+	b=ZqzkEGnFf2sR1w1qOTD6Xldroqh3jwG/UbPm+TnsgJu2VWLGlYD9pvIj+Ikw5DC3w
+	 1P/3YFar9vTliRrmDmhxaR5BWF0C2eaPxspqgapZtfJhaXOphtjZaCj8gwQVx+L6TR
+	 aHWlHXHqXjsYeHShU5gP9/y08cK9L4Oq5WRBKWwwQD++2JNVVKy9UTjVtPC9gd8CgX
+	 x5leQanvc1i9J4fn4E7YdS3q6CuXDZ6Mu3DLrBQOatY40zH2zUn3KpoHeJuPKDUdha
+	 Yxfun13e2dqNcnQw27e/IkOEq7lMnAsZ5i4dlrgiOLZPbl8i9GKqbWhX4P0AKnF9eg
+	 p4G3T1whB0o4g==
+Date: Thu, 25 Sep 2025 19:12:19 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: <netdev@vger.kernel.org>, "'Andrew Lunn'" <andrew+netdev@lunn.ch>,
- "'David S. Miller'" <davem@davemloft.net>, "'Eric Dumazet'"
- <edumazet@google.com>, "'Paolo Abeni'" <pabeni@redhat.com>, "'Simon
- Horman'" <horms@kernel.org>, "'Alexander Lobakin'"
- <aleksander.lobakin@intel.com>, "'Mengyuan Lou'"
- <mengyuanlou@net-swift.com>
-Subject: Re: [PATCH net-next v5 0/4] net: wangxun: support to configure RSS
-Message-ID: <20250925190401.70c85ada@kernel.org>
-In-Reply-To: <05ab01dc2ded$f2e9a610$d8bcf230$@trustnetic.com>
-References: <20250922094327.26092-1-jiawenwu@trustnetic.com>
-	<20250924183640.62a1293e@kernel.org>
-	<05ab01dc2ded$f2e9a610$d8bcf230$@trustnetic.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Octavian Purdila <tavip@google.com>, <davem@davemloft.net>,
+ <edumazet@google.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+ <ast@kernel.org>, <daniel@iogearbox.net>, <hawk@kernel.org>,
+ <john.fastabend@gmail.com>, <sdf@fomichev.me>, <ahmed.zaki@intel.com>,
+ <aleksander.lobakin@intel.com>, <toke@redhat.com>, <lorenzo@kernel.org>,
+ <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
+ <syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com>, Kuniyuki Iwashima
+ <kuniyu@google.com>
+Subject: Re: [PATCH net] xdp: use multi-buff only if receive queue supports
+ page pool
+Message-ID: <20250925191219.13a29106@kernel.org>
+In-Reply-To: <aNUObDuryXVFJ1T9@boxer>
+References: <20250924060843.2280499-1-tavip@google.com>
+	<20250924170914.20aac680@kernel.org>
+	<CAGWr4cQCp4OwF8ESCk4QtEmPUCkhgVXZitp5esDc++rgxUhO8A@mail.gmail.com>
+	<aNUObDuryXVFJ1T9@boxer>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 25 Sep 2025 15:28:11 +0800 Jiawen Wu wrote:
-> On Thu, Sep 25, 2025 9:37 AM, Jakub Kicinski wrote:
-> > On Mon, 22 Sep 2025 17:43:23 +0800 Jiawen Wu wrote:  
-> > > Implement ethtool ops for RSS configuration, and support multiple RSS
-> > > for multiple pools.  
-> > 
-> > There is a few tests for the RSS API in the tree:
-> > 
-> > tools/testing/selftests/drivers/net/hw/rss_api.py
-> > tools/testing/selftests/drivers/net/hw/rss_ctx.py
-> > 
-> > Please run these and add the output to the cover letter.
-> > 
-> > Instructions for running the tests are here:
-> > 
-> > https://github.com/linux-netdev/nipa/wiki/Running-driver-tests  
-> 
-> The output shows many fail cases. Is it normal? Or is there some issue
-> with my environment?
+On Thu, 25 Sep 2025 11:42:04 +0200 Maciej Fijalkowski wrote:
+> On Thu, Sep 25, 2025 at 12:53:53AM -0700, Octavian Purdila wrote:
+> > On Wed, Sep 24, 2025 at 5:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
+> wrote: =20
+> > >
+> > > On Wed, 24 Sep 2025 06:08:42 +0000 Octavian Purdila wrote: =20
+>  [...] =20
+> > >
+> > > This can also happen on veth, right? And veth re-stamps the Rx queues=
+. =20
+>=20
+> What do you mean by 're-stamps' in this case?
+>=20
+> >=20
+> > I am not sure if re-stamps will have ill effects.
+> >=20
+> > The allocation and deallocation for this issue happens while
+> > processing the same packet (receive skb -> skb_pp_cow_data ->
+> > page_pool alloc ... __bpf_prog_run ->  bpf_xdp_adjust_tail).
+> >=20
+> > IIUC, if the veth re-stamps the RX queue to MEM_TYPE_PAGE_POOL
+> > skb_pp_cow_data will proceed to allocate from page_pool and
+> > bpf_xdp_adjust_tail will correctly free from page_pool. =20
+>=20
+> netif_get_rxqueue() gives you a pointer the netstack queue, not the driver
+> one. Then you take the xdp_rxq from there. Do we even register memory
+> model for these queues? Or am I missing something here.
+>=20
+> We're in generic XDP hook where driver specifics should not matter here
+> IMHO.
 
-It's most;u normal, the test don't check capabilities so if you don't
-support a feature the test case will fail.
+Well, IDK how helpful the flow below would be but:
 
-> root@w-MS-7E16:~/net-next# NETIF=enp17s0f0 tools/testing/selftests/drivers/net/hw/rss_api.py
-> TAP version 13
-> 1..12
-> ok 1 rss_api.test_rxfh_nl_set_fail
-> ok 2 rss_api.test_rxfh_nl_set_indir
-> not ok 3 rss_api.test_rxfh_nl_set_indir_ctx
-> ok 4 rss_api.test_rxfh_indir_ntf
-> not ok 5 rss_api.test_rxfh_indir_ctx_ntf
-> ok 6 rss_api.test_rxfh_nl_set_key
-> ok 7 rss_api.test_rxfh_fields
-> not ok 9 rss_api.test_rxfh_fields_set_xfrm
-> ok 10 rss_api.test_rxfh_fields_ntf
-> not ok 11 rss_api.test_rss_ctx_add
-> not ok 12 rss_api.test_rss_ctx_ntf
-> # Totals: pass:6 fail:6 xfail:0 xpass:0 skip:0 error:0
+veth_xdp_xmit() -> [ptr ring] -> veth_xdp_rcv() -> veth_xdp_rcv_one()=20
+                                                               |
+                            | xdp_convert_frame_to_buff()   <-'
+    ( "re-stamps" ;) ->     | xdp->rxq =3D &rq->xdp_rxq;
+  can eat frags but now rxq | bpf_prog_run_xdp()
+         is veth's          |
 
-These all look fine. You don't support RSS contexts (yet) so the
-context tests can fail
-
-> root@w-MS-7E16:~/net-next# NETIF=enp17s0f0 LOCAL_V4="10.10.10.1" REMOTE_V4="10.10.10.2" REMOTE_TYPE=ssh
-> REMOTE_ARGS="root@192.168.14.104" tools/testing/selftests/drivers/net/hw/rss_ctx.py
-> root@192.168.14.104's password:
-> TAP version 13
-> 1..17
-> not ok 1 rss_ctx.test_rss_key_indir
-> ok 2 rss_ctx.test_rss_queue_reconfigure # SKIP Not enough queues for the test or qstat not supported
-> ok 3 rss_ctx.test_rss_resize
-> ok 4 rss_ctx.test_hitless_key_update # SKIP Test requires command: iperf3
-
-Please install iperf3 and retry just this one?
-
-> not ok 5 rss_ctx.test_rss_context
+I just glanced at the code so >50% changes I'm wrong, but that's what=20
+I meant.
 
