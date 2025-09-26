@@ -1,188 +1,188 @@
-Return-Path: <netdev+bounces-226601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50018BA2AAD
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 09:16:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E337BA2ACF
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 09:18:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 025E7383EA8
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 07:16:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EE1E1BC5A1F
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 07:18:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ABF82472A4;
-	Fri, 26 Sep 2025 07:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 667052853FA;
+	Fri, 26 Sep 2025 07:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="TWZgccce"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ew0z7Eoj"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A45D1E503D;
-	Fri, 26 Sep 2025 07:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160AF276028;
+	Fri, 26 Sep 2025 07:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758870969; cv=none; b=R7w6P/SED1mTkC/yDZwGdOHA7o7aX5Nb+bYfifQvQz+1rFKuuk68vf2uleEtCCszmJbzLoHCHTPajy/l14/TDIhUMV9ee0IOtszzyEQ3LCrB1qrUpUefoXhz5Z8Q5HE4wOUBV48dJfPYOXs8AijkqdmJyjGZG68DdpUPaT2nacw=
+	t=1758871088; cv=none; b=oh4XZYYyj36v5LVtirfI/SCo6VxVT80WEE1/YsDg6uqQtWeVnc05DA3k3uWPuMG+6JEuuG8CBYTLGrw1/5jusCI3K+ntQSP40zI9eJUUYsj5td8GgXqTeutf4zs6TR3JvG4czMV8FuypE1aN3dnnGLqg9Q+AXpa44R8/3DAC9GQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758870969; c=relaxed/simple;
-	bh=ZdACV22BjkW/Y27c1XltJ7WBPOP763D7G5MAFoqJgY8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YGcLLDJaEOclb1wp/scfNQCejUUVatLGEzHC1mw8+YEPUO26c0npdv+eyx4NN7yo06tZsY45imIc8ILcjH46rPOufdmjCBC6af0ymSxBuzhgKgghJViMfPWlXq+hwL+R77jFxLDOqpVYpMyQ59mA9Jq8aOULYjlasPHHThRpmSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=TWZgccce; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1758870967; x=1790406967;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZdACV22BjkW/Y27c1XltJ7WBPOP763D7G5MAFoqJgY8=;
-  b=TWZgccceqsh78N2ZppYiPJAhTxKM45cHF9geEb0dCRewMdkAFy3zznSe
-   qlWOYYIkWZBCYmXU9rdNrXqekKYBxdUD6eM4TC20TUtV9J6vVC+bI6dwX
-   2RUrzKXuIEZo6kT4cI2mooNTHlh56KCdbz4PNx4zDUYX/YZc2m3Uwn7WQ
-   3Ka+A1RFNKw7N5/Tamkf+YJAmSdU21gHfNM1sjSSl+aEMT2ofQiO8yIlt
-   /vU33UUugQTCCbEdcEeU/tV1CGppakFWic4KwN6oui2/M5n2hlG7Ast0E
-   UeJ7RaJFRClubwv4bURHJtCeDrLgWCvj4ICQI0/VRev7pr+P3wS86+0da
-   A==;
-X-CSE-ConnectionGUID: adtckK8bQgKJXJZbdyXOCA==
-X-CSE-MsgGUID: yKLtYzkgTCSpO59bXGSDhA==
-X-IronPort-AV: E=Sophos;i="6.18,294,1751266800"; 
-   d="scan'208";a="214391105"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Sep 2025 00:15:59 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Fri, 26 Sep 2025 00:15:19 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Fri, 26 Sep 2025 00:15:18 -0700
-Date: Fri, 26 Sep 2025 09:11:11 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: Jakub Kicinski <kuba@kernel.org>, <andrew@lunn.ch>,
-	<hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <richardcochran@gmail.com>,
-	<vadim.fedorenko@linux.dev>, <rmk+kernel@armlinux.org.uk>,
-	<christophe.jaillet@wanadoo.fr>, <rosenp@gmail.com>,
-	<steen.hegelund@microchip.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v2] phy: mscc: Fix PTP for vsc8574 and VSC8572
-Message-ID: <20250926071111.bdxffjghguawcobp@DEN-DL-M31836.microchip.com>
-References: <20250917113316.3973777-1-horatiu.vultur@microchip.com>
- <20250918160942.3dc54e9a@kernel.org>
- <20250922121524.3baplkjgw2xnwizr@skbuf>
- <20250922123301.y7qjguatajhci67o@DEN-DL-M31836.microchip.com>
- <20250922132846.jkch266gd2p6k4w5@skbuf>
- <20250923071924.mv6ytwtifuu5limg@DEN-DL-M31836.microchip.com>
+	s=arc-20240116; t=1758871088; c=relaxed/simple;
+	bh=DZSiNp4mUrgSOCnWr/OoNntVV0aK9bR5xT1y3MmSL7A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=COhb4JYpdB8nI7jKSFNC2zFpCArVa44tUvtVtdb591NKjI3cIBqj9rBWNOSoI6dUCYKrV35aLlNJxB/+k6bEuurIxS+QpXrK6lkBJFtKN0VlO0FUdEayFPo09jxfBd3p1FFGeVaYkgcZsF/NExleoflughUZ98IjqvaFyaij9mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ew0z7Eoj; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1758871077; h=From:To:Subject:Date:Message-ID:MIME-Version;
+	bh=GbWobDZaSf9PqXPbbZ1rtsOM9VENhukO3OXKCzullK8=;
+	b=ew0z7EojK5P+5BzSOmJK61U1VFPATHn5nwzZpK1Tpa1y4dWOEWMsgqNCcrjoNfWcgtofksIf8hxyYMScRaTMMMu1MLxaJj1phUJn2g39h+RmRsecQqFUV7Ue6TavUV6Pi/Jim6ChvttHqkldkIa7vPHnfxLHyntWLqmE6nc/1oI=
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WorI9XE_1758871071 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 26 Sep 2025 15:17:55 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	pabeni@redhat.com,
+	song@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	yhs@fb.com,
+	edumazet@google.com,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	jolsa@kernel.org,
+	mjambigi@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	wintera@linux.ibm.com,
+	dust.li@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com
+Cc: bpf@vger.kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	sidraya@linux.ibm.com,
+	jaka@linux.ibm.com
+Subject: [PATCH bpf-next] libbpf: fix error when st-prefix_ops and ops from differ btf
+Date: Fri, 26 Sep 2025 15:17:51 +0800
+Message-ID: <20250926071751.108293-1-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <20250923071924.mv6ytwtifuu5limg@DEN-DL-M31836.microchip.com>
+Content-Transfer-Encoding: 8bit
 
-The 09/23/2025 09:19, Horatiu Vultur wrote:
+When a module registers a struct_ops, the struct_ops type and its
+corresponding map_value type ("bpf_struct_ops_") may reside in different
+btf objects, here are four possible case:
 
-Hi,
++--------+---------------+-------------+---------------------------------+
+|        |bpf_struct_ops_| xxx_ops     |                                 |
++--------+---------------+-------------+---------------------------------+
+| case 0 | btf_vmlinux   | bft_vmlinux | be used and reg only in vmlinux |
++--------+---------------+-------------+---------------------------------+
+| case 1 | btf_vmlinux   | mod_btf     | INVALID                         |
++--------+---------------+-------------+---------------------------------+
+| case 2 | mod_btf       | btf_vmlinux | reg in mod but be used both in  |
+|        |               |             | vmlinux and mod.                |
++--------+---------------+-------------+---------------------------------+
+| case 3 | mod_btf       | mod_btf     | be used and reg only in mod     |
++--------+---------------+-------------+---------------------------------+
 
-> The 09/22/2025 16:28, Vladimir Oltean wrote:
-> > 
-> > On Mon, Sep 22, 2025 at 02:33:01PM +0200, Horatiu Vultur wrote:
-> > > Thanks for the advice.
-> > > What about to make the PHY_ID_VSC8572 and PHY_ID_VSC8574 to use
-> > > vsc8584_probe() and then in this function just have this check:
-> > >
-> > > ---
-> > > if ((phydev->phy_id & 0xfffffff0) != PHY_ID_VSC8572 &&
-> > >     (phydev->phy_id & 0xfffffff0) != PHY_ID_VSC8574) {
-> > >       if ((phydev->phy_id & MSCC_DEV_REV_MASK) != VSC8584_REVB) {
-> > >               dev_err(&phydev->mdio.dev, "Only VSC8584 revB is supported.\n");
-> > >               return -ENOTSUPP;
-> > >       }
-> > > }
-> > 
-> > Personally, I think you are making the code harder to understand what
-> > PHYs the test is referring to, and why it exists in the first place.
-> > 
-> > Ideally this test would have not existed. Instead of the open-coded
-> > phy_id and phy_id_mask fields from the struct phy_driver array entries,
-> > one could have used PHY_ID_MATCH_MODEL() for those entries where the
-> > bits 3:0 of the PHY ID do not matter, and PHY_ID_MATCH_EXACT() where
-> > they do. Instead of failing the probe, just not match the device with
-> > this driver and let the system handle it some other way (Generic PHY).
-> 
-> Yes, I can see your point. That would be a nicer fix.
-> 
-> > 
-> > I'm not sure if this is intended or not, but the combined effect of:
-> > - commit a5afc1678044 ("net: phy: mscc: add support for VSC8584 PHY")
-> > - commit 75a1ccfe6c72 ("mscc.c: Add support for additional VSC PHYs")
-> > 
-> > is that for VSC856X, VSC8575, VSC8582, VSC8584, the driver will only
-> > probe on Rev B silicon, and fail otherwise. Initially, the revision test
-> > was only there for VSC8584, and it transferred to the others by virtue
-> > of reusing the same vsc8584_probe() function. I don't see signs that
-> > this was 100% intentional. I say this because when probing e.g. on
-> > VSC8575 revA, the kernel will print "Only VSC8584 revB is supported."
-> > which looks more like an error than someone's actual intention.
-> > 
-> > By excluding VSC8574 and VSC8572 from the above revision test, it feels
-> > like a double workaround rather than using the conventional PHY ID match
-> > helpers as intended.
-> > 
-> > As a Microchip employee, maybe you have access to some info regarding
-> > whether the limitations mentioned by Quentin Schulz for VSC8584 revA
-> > are valid for all the other PHYs for which they are currently imposed.
-> > What makes VSC8574/VSC8572 unlike the others in this regard?
-> 
-> Let me start by asking my colleagues and figure out which revisions were
-> produced for which PHYs.
-> Thanks for the advice.
+Currently we figure out the mod_btf by searching with the struct_ops type,
+which makes it impossible to figure out the mod_btf when the struct_ops
+type is in btf_vmlinux while it's corresponding map_value type is in
+mod_btf (case 2).
 
-I have been asking around about these revisions of the PHYs and what is
-available:
-vsc856x - only rev B exists
-vsc8575 - only rev B exists
-vsc8582 - only rev B exists
-vsc8584 - only rev B exists
-vsc8574 - rev A,B,C,D,E exists
-vsc8572 - rev A,B,C,D,E exists
+The fix is to use the corresponding map_value type ("bpf_struct_ops_")
+as the lookup anchor instead of the struct_ops type to figure out the
+`btf` and `mod_btf` via find_ksym_btf_id(), and then we can locate
+the kern_type_id via btf__find_by_name_kind() with the `btf` we just
+obtained from find_ksym_btf_id().
 
-For vsc856x, vsc8575, vsc8582, vsc8584 the lower 4 bits in register 3
-will have a value of 1.
-For vsc8574 and vsc8572 the lower 4 bits in register 3 will have a value
-of 0 for rev A, 1 for rev B and C, 2 for D and E.
+With this change the lookup obtains the correct btf and mod_btf for case 2,
+preserves correct behavior for other valid cases, and still fails as
+expected for the invalid scenario (case 1).
 
-Based on this information, I think both commits a5afc1678044 and
-75a1ccfe6c72 are correct regarding the revision check.
+Fixes: 590a00888250 ("bpf: libbpf: Add STRUCT_OPS support")
+Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+Acked-by: Andrii Nakryiko <andrii@kernel.org>
+---
+ tools/lib/bpf/libbpf.c | 37 ++++++++++++++++++-------------------
+ 1 file changed, 18 insertions(+), 19 deletions(-)
 
-So, now to be able to fix the PTP for vsc8574 and vsc8572, I can do the
-following:
-- start to use PHY_ID_MATCH_MODEL for vsc856x, vsc8575, vsc8582, vsc8584
-- because of this change I will need to remove also the WARN_ON() in the
-  function vsc8584_config_init()
-- then I can drop the check for revision in vsc8584_probe()
-- then I can make vsc8574 and vsc8572 to use vsc8584_probe()
-
-What do you think about this?
-
-> 
-> > 
-> > It looks like the review comments to clean things up are getting bigger.
-> > I'm not sure this is all adequate for 'net' any longer.
-> > On the other hand, you said PTP never worked for VSC8574/VSC8572,
-> > without any crash, it was just not enabled. Maybe this can all be
-> > reconsidered as new functionality for net-next, and there we have more
-> > space for shuffling things around?
-> 
-> -- 
-> /Horatiu
-
+diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+index 5161c2b39875..a93eed660404 100644
+--- a/tools/lib/bpf/libbpf.c
++++ b/tools/lib/bpf/libbpf.c
+@@ -1018,35 +1018,34 @@ find_struct_ops_kern_types(struct bpf_object *obj, const char *tname_raw,
+ 	const struct btf_member *kern_data_member;
+ 	struct btf *btf = NULL;
+ 	__s32 kern_vtype_id, kern_type_id;
+-	char tname[256];
++	char tname[256], stname[256];
+ 	__u32 i;
+ 
+ 	snprintf(tname, sizeof(tname), "%.*s",
+ 		 (int)bpf_core_essential_name_len(tname_raw), tname_raw);
+ 
+-	kern_type_id = find_ksym_btf_id(obj, tname, BTF_KIND_STRUCT,
+-					&btf, mod_btf);
+-	if (kern_type_id < 0) {
+-		pr_warn("struct_ops init_kern: struct %s is not found in kernel BTF\n",
+-			tname);
+-		return kern_type_id;
+-	}
+-	kern_type = btf__type_by_id(btf, kern_type_id);
++	snprintf(stname, sizeof(stname), "%s%.*s", STRUCT_OPS_VALUE_PREFIX,
++		 (int)strlen(tname), tname);
+ 
+-	/* Find the corresponding "map_value" type that will be used
+-	 * in map_update(BPF_MAP_TYPE_STRUCT_OPS).  For example,
+-	 * find "struct bpf_struct_ops_tcp_congestion_ops" from the
+-	 * btf_vmlinux.
++	/* Look for the corresponding "map_value" type that will be used
++	 * in map_update(BPF_MAP_TYPE_STRUCT_OPS) first, figure out the btf
++	 * and the mod_btf.
++	 * For example, find "struct bpf_struct_ops_tcp_congestion_ops".
+ 	 */
+-	kern_vtype_id = find_btf_by_prefix_kind(btf, STRUCT_OPS_VALUE_PREFIX,
+-						tname, BTF_KIND_STRUCT);
++	kern_vtype_id = find_ksym_btf_id(obj, stname, BTF_KIND_STRUCT, &btf, mod_btf);
+ 	if (kern_vtype_id < 0) {
+-		pr_warn("struct_ops init_kern: struct %s%s is not found in kernel BTF\n",
+-			STRUCT_OPS_VALUE_PREFIX, tname);
++		pr_warn("struct_ops init_kern: struct %s is not found in kernel BTF\n", stname);
+ 		return kern_vtype_id;
+ 	}
+ 	kern_vtype = btf__type_by_id(btf, kern_vtype_id);
+ 
++	kern_type_id = btf__find_by_name_kind(btf, tname, BTF_KIND_STRUCT);
++	if (kern_type_id < 0) {
++		pr_warn("struct_ops init_kern: struct %s is not found in kernel BTF\n", tname);
++		return kern_type_id;
++	}
++	kern_type = btf__type_by_id(btf, kern_type_id);
++
+ 	/* Find "struct tcp_congestion_ops" from
+ 	 * struct bpf_struct_ops_tcp_congestion_ops {
+ 	 *	[ ... ]
+@@ -1059,8 +1058,8 @@ find_struct_ops_kern_types(struct bpf_object *obj, const char *tname_raw,
+ 			break;
+ 	}
+ 	if (i == btf_vlen(kern_vtype)) {
+-		pr_warn("struct_ops init_kern: struct %s data is not found in struct %s%s\n",
+-			tname, STRUCT_OPS_VALUE_PREFIX, tname);
++		pr_warn("struct_ops init_kern: struct %s data is not found in struct %s\n",
++			tname, stname);
+ 		return -EINVAL;
+ 	}
+ 
 -- 
-/Horatiu
+2.45.0
+
 
