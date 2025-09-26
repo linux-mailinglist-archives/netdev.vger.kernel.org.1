@@ -1,111 +1,141 @@
-Return-Path: <netdev+bounces-226737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05508BA4935
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:13:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B9AFBA4941
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:15:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8F527AFB89
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:12:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB67E189AC2E
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:16:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A329E239E9B;
-	Fri, 26 Sep 2025 16:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E33D023C51D;
+	Fri, 26 Sep 2025 16:15:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JgYG+uue"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ATR+jDnu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B25521D3CA;
-	Fri, 26 Sep 2025 16:13:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64CE723D7CE
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 16:15:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758903217; cv=none; b=kO1g/XGFJMIl8W7oxUXSj1JGqCxQl96p6ikf99kjkMvq40Cf/KN7xfCMnNggCXnqcSyRdzJ+gPZjf2VQ2UldCK9fO/oCcUqMcyaA0AGc/kzLzOIFRGnSqNvIcbEqBgxY1Jc7Atvcl8W8XkU1iAMfFmg5socZSoSdlC8h2Rhcw7A=
+	t=1758903345; cv=none; b=KChoP3Y2JCkDGf8ogCYso3hyZptNZytFrVDfEhWI2BHEZP3/I1utXeYBLdIzBI/GNr/qotmZu2U6YpcXcXX1Ytg76M9GKcz8FHKRNBQOXlwMRHx83p+KJjlK5BabobEJN6WgbHYsYoL03qhdOgxG3Qu1iH5EvtX5VGzb5a0hT+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758903217; c=relaxed/simple;
-	bh=wh9M9QTkVwk+Ja56zSTTBOIJV0Iqe7hniIh4R1RLg1c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t1DBDEYIQi1FMz2WP2zSLQW4WTMVqgaW0VK40Rfxgh9YpvREilQ54NksYW4HdvCokqbS0tEJ+NtwJwM+CU3Sv8euz6BxoQdXEOknmr3EG0ZUUrsMqX2TZZUW4G52c41UTQq/+OnKZLW/ywa/3U8GZZYk+xHqFg5HRvh66U2EXmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JgYG+uue; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0064AC4CEF4;
-	Fri, 26 Sep 2025 16:13:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758903217;
-	bh=wh9M9QTkVwk+Ja56zSTTBOIJV0Iqe7hniIh4R1RLg1c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JgYG+uue4dcR73rbUpd7FW2IP/THmhCbkZJN5ATwVASV/92yg7I4LHPQQfprckKJ3
-	 rLYlaJ4dIdmQSKWiO/U79+6stXY2JruZf+GW92X2DmcXKniCAm8/zbNXj4dGWT8M5s
-	 FqazBYazLSvH9QiXrQ4Nqlg9Jharodw9aTmahfAwjX4JcGayP+IHycGE2sBSoV69UH
-	 XSbQ7j+TK6YZQ56qUu4timJFyebojxJJfqZHQOe5wKAI1r/ieKfgjNns6d97D1JNzX
-	 cHQZ1snplHDs4fbPPObXPSAe1pXoAUmgPDhAnrV+QJhV+q1di/mC8zYdYV7VHwa00l
-	 r2YmUditon04g==
-Date: Fri, 26 Sep 2025 17:13:32 +0100
-From: Simon Horman <horms@kernel.org>
-To: Nishanth Menon <nm@ti.com>
-Cc: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, "Vadapalli, Siddharth" <s-vadapalli@ti.com>
-Subject: Re: [PATCH] net: netcp: Fix crash in error path when DMA channel
- open fails
-Message-ID: <aNa7rEQLJreJF58p@horms.kernel.org>
-References: <20250926150853.2907028-1-nm@ti.com>
+	s=arc-20240116; t=1758903345; c=relaxed/simple;
+	bh=fCFtnpHpwYMofzs/A1ZBMsIX2GLcFi3vYB2j7+QN0bI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RCjPQrM6ejt3P4xjLWZbLgeTCAK/mhWBrm/x2hoEJubkDzhpvoCQqez/KbqfwFAld9PypvYO8AJU9r/ydgYoqUzVEW562Tvu5pun4OP48Xzv+MEwpu5JqJYPr3F0obYppIs7acv9st5uP+Wm0ludumpJ8+eUuA/zoRylR7k+J7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ATR+jDnu; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b3882e7432bso148943866b.2
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 09:15:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758903342; x=1759508142; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qTwebXNfRQKHZNFBatzbVF/Los3WPx3q3T72l22p6FM=;
+        b=ATR+jDnuI2i/wG6nbwVYU1iGnWa58dGkPeQ0/yHU0HkVLwBsOBmKEuuszuB/9igH+b
+         +ugeJSUfBAB3ewmywmnhnRQUcFXpdW1j/pbum7l2B8vEyVO6p6mpKnw/dAEPdiLTxp47
+         sBrhvK/UZyKIiHRqzfMxHIf/XAM59AhzcYPJAM0KG363zh8hVF2gN8BZI47N8CbGjQxZ
+         vagveqDPCuPgCHbVwwu6W8XoU8sihqHTprX8H38Vq1XYSIRk2jUNXJ4S/EteQ2CeXAH/
+         8aXjMpugm7/oQks7MkYwwHyN9z3FftmU6DFsG94IizA1J16JLSgRo2pxtwakOvE+RL+Y
+         Ding==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758903342; x=1759508142;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qTwebXNfRQKHZNFBatzbVF/Los3WPx3q3T72l22p6FM=;
+        b=eAD7zkx8YTcRx5DELybTRx9OUJu54+PksidsaaRGNyM4fdsAEnRlozgFQ+mIvse6ye
+         zh4X0dwTsIqEy0dAYEvgPEt+hVGUS36NaisyP/4+fswhd+TBUphRztVbpweGa8F0tpK4
+         50l5NRP7Kyki4y5PRzGwrTA0GLf4EDZXadNpggPe4hqggzrzj0MWEV1PE9E6Xg6HVDCO
+         wn4NP1N4qwFQBIygiYO0P30Q6sHIVIyyJRjMoNwblc3G6q5cZTbuvU6IbYRqny0yiy1l
+         E7IlnUrzF/yEtRSWC972q7qEIDrdEUYBOt++AxBWv4f5Lbgiqyzr9WGGvI/5upuQlpo4
+         KDYA==
+X-Forwarded-Encrypted: i=1; AJvYcCVs7JIlGjxGp0ztz7FuX7a2KEAiFoeqhf9tCxIPcvZZYGTqYiypTn1ebf5KMO8K4tDA8YSJVcs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsO4hxz9IkcsdoLKfzhePpjFXeYisPEVHVkLDKEgmhb45Zypcw
+	CRGYOl2tz0+AGzexwAlrrAqm4ZMPsFIcNv2h286/LNEHySuw7j2wxSH7
+X-Gm-Gg: ASbGncvrg07rma3K/LkUa/znwRnUQcDgPLDEz0o0JxlOROm80r1lNMdImvcD64uwMdj
+	hftx/b12f5FykzsqBirM2+MwqCFANdJxTe/J2bJc2x5zGqLDX2wZpau4+bRQ/cUzrZRoMB+shPt
+	Ae+C6t5gM/K1hA1kmVUY4eF0X81XlpZUQpJVR+CBH74GlhC8FCQ1nWzuNdT6UUFuLrLFco4G80P
+	ubE4eJNRkyaGq+TuDpqaA7BHM5Sd4zdheWITtU1E0Mjlv6f6klnKfVClBq1KyTvuquF5PgMDWDo
+	ANNhnxc31vCEo3+WGppJWBW0cISqmSLzzr3Yopi4CxAQ1QxnmMHf7DdlN+61K+dSi3tZzD+No2O
+	B5oInI4njsNFUKrqoHryAJbhwSI9xMeQkFDzEvx5vrHY0RkG6JNWWVXchNqBsCjVGFHrftNmIgZ
+	OTHWxe2s8R98mD/ZHv
+X-Google-Smtp-Source: AGHT+IGSKS33vEp7IxROvUKAQKlFRVsjIANObx7t3xDIK+wvc7qqDK/f+4CjmaBx5z0SlWt790YXtQ==
+X-Received: by 2002:a17:907:6ea3:b0:b07:c909:ceb0 with SMTP id a640c23a62f3a-b34bbbda586mr890952766b.32.1758903341471;
+        Fri, 26 Sep 2025 09:15:41 -0700 (PDT)
+Received: from alessandro-pc.station (net-2-37-207-41.cust.vodafonedsl.it. [2.37.207.41])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b36f410e129sm248308566b.89.2025.09.26.09.15.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Sep 2025 09:15:41 -0700 (PDT)
+From: Alessandro Zanni <alessandro.zanni87@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org
+Cc: Alessandro Zanni <alessandro.zanni87@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] selftest: net: Check return value from read
+Date: Fri, 26 Sep 2025 18:15:37 +0200
+Message-ID: <20250926161538.57896-1-alessandro.zanni87@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250926150853.2907028-1-nm@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 26, 2025 at 10:08:53AM -0500, Nishanth Menon wrote:
-> When knav_dma_open_channel() fails in netcp_setup_navigator_resources(),
-> the rx_channel field is set to an ERR_PTR value. Later, when
-> netcp_free_navigator_resources() is called in the error path, it attempts
-> to close this invalid channel pointer, causing a crash.
-> 
-> Add a check for ERR values to handle the failure scenario.
-> 
-> Fixes: 84640e27f230 ("net: netcp: Add Keystone NetCP core driver")
-> Signed-off-by: Nishanth Menon <nm@ti.com>
-> ---
-> 
-> Seen on kci log for k2hk: https://dashboard.kernelci.org/log-viewer?itemId=ti%3A2eb55ed935eb42c292e02f59&org=ti&type=test&url=http%3A%2F%2Ffiles.kernelci.org%2F%2Fti%2Fmainline%2Fmaster%2Fv6.17-rc7-59-gbf40f4b87761%2Farm%2Fmulti_v7_defconfig%2BCONFIG_EFI%3Dy%2BCONFIG_ARM_LPAE%3Dy%2Bdebug%2Bkselftest%2Btinyconfig%2Fgcc-12%2Fbaseline-nfs-boot.nfs-k2hk-evm.txt.gz
-> 
->  drivers/net/ethernet/ti/netcp_core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/ti/netcp_core.c b/drivers/net/ethernet/ti/netcp_core.c
-> index 857820657bac..4ff17fd6caae 100644
-> --- a/drivers/net/ethernet/ti/netcp_core.c
-> +++ b/drivers/net/ethernet/ti/netcp_core.c
-> @@ -1549,7 +1549,7 @@ static void netcp_free_navigator_resources(struct netcp_intf *netcp)
->  {
->  	int i;
->  
-> -	if (netcp->rx_channel) {
-> +	if (!IS_ERR(netcp->rx_channel)) {
->  		knav_dma_close_channel(netcp->rx_channel);
->  		netcp->rx_channel = NULL;
->  	}
+Fix to retrieve the return value from the read() function
+and raise an error if negative.
 
-Hi Nishanth,
+When building the test with the command
+`make -C tools/testing/selftests TARGETS=net` emits the
+following warning:
 
-Thanks for your patch.
+tfo.c: In function ‘run_server’:
+tfo.c:84:9: warning: ignoring return value of ‘read’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   84 |         read(connfd, buf, 64);
 
-I expect that netcp_txpipe_close() has a similar problem too.
+Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
+---
+ tools/testing/selftests/net/tfo.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-But I also think that using IS_ERR is not correct, because it seems to me
-that there are also cases where rx_channel can be NULL.
+diff --git a/tools/testing/selftests/net/tfo.c b/tools/testing/selftests/net/tfo.c
+index eb3cac5e583c..8fce369e6c37 100644
+--- a/tools/testing/selftests/net/tfo.c
++++ b/tools/testing/selftests/net/tfo.c
+@@ -50,6 +50,7 @@ static void run_server(void)
+ 	socklen_t len;
+ 	char buf[64];
+ 	FILE *outfile;
++	int ret;
+ 
+ 	outfile = fopen(cfg_outfile, "w");
+ 	if (!outfile)
+@@ -81,7 +82,9 @@ static void run_server(void)
+ 	if (getsockopt(connfd, SOL_SOCKET, SO_INCOMING_NAPI_ID, &opt, &len) < 0)
+ 		error(1, errno, "getsockopt(SO_INCOMING_NAPI_ID)");
+ 
+-	read(connfd, buf, 64);
++	ret = read(connfd, buf, 64);
++	if (ret < 0)
++		error(1, errno, "read()");
+ 	fprintf(outfile, "%d\n", opt);
+ 
+ 	fclose(outfile);
+-- 
+2.43.0
 
-I see that on error knav_dma_open_channel() always returns ERR_PTR(-EINVAL)
-(open coded as (void *)-EINVAL) on error. So I think a better approach
-would be to change knav_dma_open_channel() to return NULL, and update callers
-accordingly.
 
