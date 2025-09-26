@@ -1,86 +1,88 @@
-Return-Path: <netdev+bounces-226723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFA60BA474C
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 17:41:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AED9BA4758
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 17:43:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 442B5189C9B3
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 15:41:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 254A45612E3
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 15:43:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60275212B2F;
-	Fri, 26 Sep 2025 15:41:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776AC21CC55;
+	Fri, 26 Sep 2025 15:43:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F0R43WcR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tNPR4TfN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9A535966
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 15:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CACB10FD;
+	Fri, 26 Sep 2025 15:43:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758901291; cv=none; b=MLqrqdUm5VP71iOHIJSI39YWaeS/WLb2fE/eUNyHSzcFwWjCYSfXTkXeU2EGb7xL786jmV5vXvEYn8Q2BFfqeLeRVfrQ14eBapYW1GnjHlb5O1QJsAZGRLMBVYsfdTT49Ff++UORfQ+g071C3ZhSNUDpwOdWP87BIDJSUu8wjPo=
+	t=1758901414; cv=none; b=tfvANcDy1Ok/rmBi7Aj59PxmrxqUUGnVegktbLxcjtVVr7iFjC9zdUHWwICGtbDgckxGTTcjNCnOeU8MS6kjHQR2vlEsCdymqxQpqdny3QVpZQ9OL7PftYrtCgNQXUb3DZ47RWfZP464JOtdk9HIluVO2XovrNbfxg3tSRB+yDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758901291; c=relaxed/simple;
-	bh=MDLb91xtZ/aXbB5ApDp6V4+f5YVnmyTeQR35+jPnC8k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lylFeSmBghA7ZuDprGpzEXkRW87LgDIIYodUX6oyYdq96gdcjrTeJBZyLqJAtaQiOfBzgZ2lMsUiS1QUG0TXeiFhozTRybPpTMZu6r/SCZYitFyi3dIJWB+bTqgLhg4pxE1Nj7dYValSCp33Wwn0JvNT4OWh39fvezLnIX6RFBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F0R43WcR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46E7EC4CEF4;
-	Fri, 26 Sep 2025 15:41:29 +0000 (UTC)
+	s=arc-20240116; t=1758901414; c=relaxed/simple;
+	bh=kiQw1h1Bhq5/hBehSmba5mkf1vpWGZs7wBgPUjiAOwc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=m4BTe6YeLBKTyWUWrJBVFK/nkDgri2dSWyE6h9wHgZTCZxOWhuSELek+vtV5Gy2GtVjiFIsbsaeHoSl/g62XpwmHeZGETmxMHV3wT16AcCffGa0wjPt5rNjLP3mJirGkEFHwiiqtgIMx+Gfy3f1uUy4RAQofy8XpvsJkg4C35Eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tNPR4TfN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55D37C4CEF4;
+	Fri, 26 Sep 2025 15:43:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758901290;
-	bh=MDLb91xtZ/aXbB5ApDp6V4+f5YVnmyTeQR35+jPnC8k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F0R43WcRyhzg8l5Uie/6hs0lS5IU8pd6YQhX7I7xv8N5jlXeMXHF6ZuwabXWNSH8+
-	 N8OQv9Zrw07nNYFmQtdkHjmiM2z9qLOuD4cEpgw4ymPBGOZ9Ww7kKo9XusRD9/Lwta
-	 97rjeaF1+O82MJbND1m31WxUYXJMkgJxo7Pafxbu/a05UgnyLYjzknNeNR+Uzz83RC
-	 oKud2Rpbt0o/+Wste0q3FMzEjoQU58xI/LC2/3nFaGZU/Cpe76uFNv4omw3GvOo+Nw
-	 g1L+gKKGp9YIdvWv8hJuvV9KVLix0BXCt6OH3HRlF5oI/D6jkw8p4pyb60m9qB+481
-	 bnCAB1I7C1BGA==
-Date: Fri, 26 Sep 2025 16:41:27 +0100
-From: Simon Horman <horms@kernel.org>
-To: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-Cc: Dmitry Antipov <dmantipov@yandex.ru>, Jon Maloy <jmaloy@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"tipc-discussion@lists.sourceforge.net" <tipc-discussion@lists.sourceforge.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v4 net-next] tipc: adjust tipc_nodeid2string() to return
- string length
-Message-ID: <aNa0J14NdhrTus4S@horms.kernel.org>
-References: <GV1P189MB1988AF3D7C3BC2F0F8DE2491C61EA@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
- <20250926074113.914399-1-dmantipov@yandex.ru>
- <GV1P189MB19887FECAF892F25ED014D95C61EA@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+	s=k20201202; t=1758901413;
+	bh=kiQw1h1Bhq5/hBehSmba5mkf1vpWGZs7wBgPUjiAOwc=;
+	h=From:Subject:Date:To:Cc:From;
+	b=tNPR4TfNmex+GgVpRuaQwhJGpQVmEF2UwUhVjOQyTLK+XU8wrCimu8rdWzNMrv9bj
+	 LrYHFZbuA7cuFGzOb5raIB+L4Mdl2/kQPmZabAoBhzFcxmBVDHKfwYsSgcxFHqS9Bj
+	 wSPjZaW2ZZZoKGCDRUhs+8d+PAw14qzBlqU24MInxa2lzqRLQiINhEIKHuXp+N9CiN
+	 ejEN4QOMaT1UF+a8rqMxkCJ3Y2t6NU/nbNGQ5Nil/EKWGuLEgh9kPMwuq4+0oCy23a
+	 eNvpf6T18/2KP2Lxzkr/ZUxxJnS0XSCaK/mbkUysMiimBKtWOQy+nKTqjawzmo69v6
+	 IYXE8FVWwCK7A==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH net-next 0/2] net: airoha: npu: Introduce support for
+ Airoha 7583 NPU
+Date: Fri, 26 Sep 2025 17:43:21 +0200
+Message-Id: <20250926-airoha-npu-7583-v1-0-447e5e2df08d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <GV1P189MB19887FECAF892F25ED014D95C61EA@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJm01mgC/x3MOQqAMBBA0avI1A5kd7mKWAQdzTSJJCiCeHeD5
+ Sv+f6BQZiowNg9kurhwihWybWAJPu6EvFaDEsqKQTn0nFPwGI8TO9trdJqM1EI6Zxao1ZFp4/s
+ /TvP7fpwh/41hAAAA
+X-Change-ID: 20250926-airoha-npu-7583-63e41301664c
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-On Fri, Sep 26, 2025 at 10:29:31AM +0000, Tung Quang Nguyen wrote:
-> >Subject: [PATCH v4 net-next] tipc: adjust tipc_nodeid2string() to return string
-> >length
-> >
-> >Since the value returned by 'tipc_nodeid2string()' is not used, the function may
-> >be adjusted to return the length of the result, which is helpful to drop a few
-> >calls to 'strlen()' in 'tipc_link_create()'
-> >and 'tipc_link_bc_create()'. Compile tested only.
-> >
-> >Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
-> >---
-> >v4: revert to v2's behavior and prefer NODE_ID_LEN over
-> >    explicit constant (Tung Quang Nguyen)
-> >v3: convert to check against NODE_ID_LEN (Simon Horman)
-> >v2: adjusted to target net-next (Tung Quang Nguyen)
+Introduce support for Airoha 7583 SoC NPU.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+---
+Lorenzo Bianconi (2):
+      dt-bindings: net: airoha: npu: Add AN7583 support
+      net: airoha: npu: Add 7583 SoC support
+
+ .../devicetree/bindings/net/airoha,en7581-npu.yaml     |  1 +
+ drivers/net/ethernet/airoha/airoha_npu.c               | 18 ++++++++++++++++--
+ 2 files changed, 17 insertions(+), 2 deletions(-)
+---
+base-commit: 203e3beb73e53584ca90bc2a6d8240b9b12b9bcf
+change-id: 20250926-airoha-npu-7583-63e41301664c
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
