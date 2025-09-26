@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-226755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1777CBA4BE5
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 19:11:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 387CEBA4C46
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 19:23:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AFC21BC7716
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 17:12:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55DDD188FA2E
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 17:24:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4648B301026;
-	Fri, 26 Sep 2025 17:11:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 748343002CA;
+	Fri, 26 Sep 2025 17:23:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="B3icIpfe"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KWOdcNWZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f227.google.com (mail-yw1-f227.google.com [209.85.128.227])
+Received: from mail-il1-f226.google.com (mail-il1-f226.google.com [209.85.166.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D8B15B0FE
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 17:11:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069DB155C97
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 17:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758906698; cv=none; b=UXNWRWtA+nK6exkhEjBzwhGnXmgBS0zepnS6JsofedOBPo3FOyDbISCNNc5CCZEVo/IfPQnk24MS4ED8WDz3Rh7eKffy/g/W3gGUnn3vfntEfNvNB2pLXqnnjy/mdINZuj94+hTH0Cm/v/eJxKb99OanECqyYf9IgmxMr8MyOyQ=
+	t=1758907430; cv=none; b=I+WhfAVX/6xHe58FudA0K73oNpiXObpEnh05UXmHHXByth3kiONovLhmhW5FD8iXNR53CEs4U8QgXpEWllbmPtWZljimbXE9aah/klsRsynOB0L1SEzUbMizlseNJ8sintv6tpyYQV8ytdeMj2owkAlT9OnbgnVwf7jJLqMegSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758906698; c=relaxed/simple;
-	bh=sQmZfbtulkySjSeVegznf2FDXPfAPv76mxj+IloQK8Y=;
+	s=arc-20240116; t=1758907430; c=relaxed/simple;
+	bh=hcpvErHxHB+DEreETzyem37npiXbN4vCs3OzUfQyRng=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hYr2rGTeADAPxEFfnvIVdiOstEgZ5jZuInVYVXriQeZxrBz0CHlesgrjM388S1AjEEJAbX7+L0MK5QS7HAqEc4CecwdjJ0Se2shGd4SeGLLWLxaXdX6v4RYgE6Fdfz7SmZMpXuF+aOfU9rVKubCjfl1fMv6taGPqwEt35WbAdgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=B3icIpfe; arc=none smtp.client-ip=209.85.128.227
+	 To:Cc:Content-Type; b=qDrralfwOE4gO/S0FuLHjo0Cqr6DADmSoC8ucm3D2721gjCmjSfKBoJpWwtewvIb7LhDrm+MbJfwrAbkFH5aNLvlQ6VnxjN2ZWFi0PKrY1IsRWjua2IqPM5pX3LiScvKMYMtvm5IOMIrhU33nsp2DD47PaLdr5O65InR/A6/CCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KWOdcNWZ; arc=none smtp.client-ip=209.85.166.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yw1-f227.google.com with SMTP id 00721157ae682-71d60528734so25108727b3.2
-        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 10:11:36 -0700 (PDT)
+Received: by mail-il1-f226.google.com with SMTP id e9e14a558f8ab-4278a8ecf9fso3996765ab.0
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 10:23:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758906696; x=1759511496;
+        d=1e100.net; s=20230601; t=1758907428; x=1759512228;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=F+dZBJhlgPbdr4blYJgZXcVBNkB4L88ISsyPq3YMh+4=;
-        b=DQZ/yvKE/hd/vb1e7BryJrMclIe+lDNpZfwc897Tu2Zr1IjY8XE6R2cL1WoABZHNcR
-         dq2Lio/L9DIYEmQcbjMm0ULpnYAfb4e8HK0ppMpu6ZDhVH8MBOG5W7q5TcFJtK2tE+Wo
-         Y4Ug8ryGJ6oiplsuEiq5SpQImpOR489vPWYZlO456wFak15C1GBdiQn/xfU/21K4Q1sv
-         LWeZidwkkBQEM+sW59TxDhbzUvHAARJX/5l9obmR4234j3i11UxK92865wqK04oRAFGD
-         PzOaAnzjAzwJPgqbLvv276M9iEGxzQfp73fqTxQDxI/8sWC6UdzT/8OCW7QPEg7BcNxu
-         EXAg==
-X-Forwarded-Encrypted: i=1; AJvYcCXirOZ3MCwX+KgTZ9vjKmCmTSX4dHbR3BpctgIbzce/NUuJfWpCy5z8atwR6HmnYq4Qlf8h2ZY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOca8aQaEaXNbCs+98S5GQKmahJsLICpiCEIy4CREkgXYjXL+6
-	MC2gBfj9Xa0dDkXFuG8/mslo2xRF1E4HD8ttNNKvZtWfifuwGD3JtL9gTzM+fFoOLpl6w1vI29f
-	2mm7u142n00GNP3VZwThg9y10SX0G5p0djab3RdVz/2Z1ZJmQK1kUhqHhRLQJOhsMYQkLMeauSC
-	tETfdDYjDD0DdqfZDvOo4n3yRbBnRvuR+C6Oz9G+GDJTxJEtXdn2HlmZLeJ0lxyK7ONHA839tHO
-	k8y8U8rcfFw4g==
-X-Gm-Gg: ASbGncu2E9PyTkg5rd19NjZR7jKxErx4bwFsVaESbGRqNBzwd9lple7FqwE0UnB1bYG
-	lvT8+YkxqnIL8hwmoNA/WOAXH7kBnB08MINKfyFj7zp9wRizbpzhKwGNfPfsIT9fySuL9ePsuRV
-	+iTZMXx3lE39BM7IV1Rb7LmAepy0BntqVMPL4SqRyb0+qCyfgbJmzMYFLvGW2PoaFJ6DmYL6ZqJ
-	FWi0w+kFV+TYS6xm1IU6L9azS33kyLc9BiLmXdbHmHRYiXWMaMXg0/8+5D1UXeEz6cwlTmAOech
-	cVkRHurWCzqZ8FP5FFcFxh+iUCVQ39TiVEb19kLeMlJ5uNLhfT5S+GRkGuTvJHeV0mLo9U61jKK
-	nZFwtcqaVOs6AVeoL237cbmwct4GwXEoPEfnlIP9QiMQa2yIAzkAHdgu7N2aZwdrCtcrpmklC2Z
-	Ig3w==
-X-Google-Smtp-Source: AGHT+IEQ4O2l0eLpWWIPmAcZ4vhin5bo69vdn/lQ5f79xUFS570WXXCamMIxkv2FiPeG7OXchX+0LrAZzy64
-X-Received: by 2002:a05:690c:6087:b0:739:634e:b430 with SMTP id 00721157ae682-763f87770b3mr73629377b3.7.1758906695438;
-        Fri, 26 Sep 2025 10:11:35 -0700 (PDT)
+        bh=t0QolULlc3VuPbuO/n3TlX7LsO8RmJSjCATNiECqeYw=;
+        b=Rr0jHiMwCcrvat6SbrRcLwQm3PS0wF5ZisrBsmPN+rgiOlIBOkAGNOywfMDBr4RZ7g
+         ZZWXHyuyUo8UAd58oAbmLSPai+KJEXdiPRic/A4YCo48NP70lbvlERSGCO8ZqosukgyZ
+         +Hw6qs9es4FiNXIvAzPH7iEnMm9ZVJgQXJ+EM4J1hvAPBJ9O8mA8o4v4wh31HfZjvuyc
+         rK3lmNx5Zs87qHvOB5aXee+T+EFAwfY8SjYZwC02JJ32L1j50eyn8HTwtEyKuuBeFI9C
+         MbiGYpcPrmY07xCl/PO86CR2trtPl+3BMuMmKEveGuvpsDvsFF3XeFShtjZBoOkCN+/t
+         qdPg==
+X-Forwarded-Encrypted: i=1; AJvYcCV8cp+GF6xtWSV8kvkVaAjKqyPMwnmS0x8YMBUiJ+SuC3ag4SgocabNV0LA9ZV34Kr4/JkWb3w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzctxDwk/EF8B+POEP1RpWerGeuarDSHEHuQrbqh5EnUvms6l7p
+	IA17aFmAHU2ivEXIJji6C8TyMMQdqsGuYy08y5DUJcVXjWwZntYoQNQeb+dwM6ujVo6b+u/Mu/G
+	9Zfy01qo+Xg+u+dZAn8cT3sUEdqj+1kxqy2kBpUryzExaT21rV5zvtCpSrnOUzbbZBkgzePy4Qd
+	mSsZzNzmsEqS/sG+5f61w+xSQiCw2fA9QFfRLpURBbN6gKmTwtmfk6bYdfe2deOCfLkxTmslLKY
+	TJGFAHOil8i5Q==
+X-Gm-Gg: ASbGncsvbSx84NX/L0KjSX4me3Xl+uD1UBrgu2mU8k0siF0xy8zoS1pTufKic4QoBTh
+	uQDpXvymsswlOQ7rx9POBrL2/ImJ5UFi18E6hj/Ac6bEhM3PrMNNts05qyqcFp7en6RRXbskOUF
+	dbaAWMVvhiu0L/SNs8etJTJKm8jgSSkgWd9O8ZQdszSQ3wHUYQztzCfhRpr+g54bPOlDpe4OoHA
+	50g/S21GPdsZMoKbLkqvz0w9QsgGqLIYl3sGx3c8zIq6r7IdXedZqdMzw54dCvdi+JJEB8sIKse
+	FUrZdiwLDqduxXLGs1ZRL8YFF23Og75xuNzZqgy1qqf5aip+hDPSPqWy+M4c3iAyU0sTS7euSNN
+	1OTawVV/OHy0rwXL1bMpI2RVRo3qHcvVA+rz00m77MVgGp1x/cS/z2Hfa1/nHV+Mx3cU1NAT3DN
+	Zz0g==
+X-Google-Smtp-Source: AGHT+IHpC3hUpsdOxkGGFpIkmzHLX0S6dft1BqlO40RvYpRCqx2XF2vBhmmjwJtkDmwGJ1VvHKZ1bd6a30fm
+X-Received: by 2002:a05:6e02:1fc8:b0:411:6759:bfad with SMTP id e9e14a558f8ab-428752ab8e0mr5070185ab.10.1758907427524;
+        Fri, 26 Sep 2025 10:23:47 -0700 (PDT)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-121.dlp.protect.broadcom.com. [144.49.247.121])
-        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-6361e9416d5sm234034d50.14.2025.09.26.10.11.34
+        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-42717780677sm2022745ab.32.2025.09.26.10.23.46
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 26 Sep 2025 10:11:35 -0700 (PDT)
+        Fri, 26 Sep 2025 10:23:47 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b55153c5ef2so1729147a12.0
-        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 10:11:34 -0700 (PDT)
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-77b73bddbdcso2183171b3a.1
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 10:23:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1758906694; x=1759511494; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1758907426; x=1759512226; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=F+dZBJhlgPbdr4blYJgZXcVBNkB4L88ISsyPq3YMh+4=;
-        b=B3icIpfevkYBQr3E6xmrgZypXfzHMlO09H53+nBZMY/TLUJ9ArIE6dv1/Dh1hXM9p/
-         HcWw+E7UXvoTCboBjGN3pM/ovawSTitD05SYxLjzRzrH3kcNPgeWwp04Qr/mazS8nCGO
-         SCjKUqrUOlHTOfxVa2CxDqH7LqdXhpLXCbtcg=
-X-Forwarded-Encrypted: i=1; AJvYcCXt6vQqp271ZnF+wuvrefeN4tp2LnhjXiWGlN8FqW2WNstZiZTSBiIC0iSLoLotET30VEqs9F4=@vger.kernel.org
-X-Received: by 2002:a17:90b:1a8b:b0:32e:59ef:f403 with SMTP id 98e67ed59e1d1-3342a299099mr9208989a91.17.1758906693944;
-        Fri, 26 Sep 2025 10:11:33 -0700 (PDT)
-X-Received: by 2002:a17:90b:1a8b:b0:32e:59ef:f403 with SMTP id
- 98e67ed59e1d1-3342a299099mr9208960a91.17.1758906693534; Fri, 26 Sep 2025
- 10:11:33 -0700 (PDT)
+        bh=t0QolULlc3VuPbuO/n3TlX7LsO8RmJSjCATNiECqeYw=;
+        b=KWOdcNWZ7tXcYHGllJXyDdwjHfFjFcCZ4paJsdVrLWKsIMaBosXbKPhSSQr5ElFggn
+         TRPp1ULMQdpowq8IddENyamr748vN7WAID+XQx2tstplYm5hAokbPJUV4P3T+lGg6ozd
+         GzC2HKpfHtUrHUJzRY2oP5YWkUpqPA4dINcZo=
+X-Forwarded-Encrypted: i=1; AJvYcCXfpcNwA4Y4Ccr/M+WPxx1vfkvV6cfCSpSVoSCkap2t07YQEZzY9tj9fl/SfatMbry/FeMUgWw=@vger.kernel.org
+X-Received: by 2002:a05:6a00:2395:b0:772:397b:b270 with SMTP id d2e1a72fcca58-78100fcf632mr7319115b3a.10.1758907425519;
+        Fri, 26 Sep 2025 10:23:45 -0700 (PDT)
+X-Received: by 2002:a05:6a00:2395:b0:772:397b:b270 with SMTP id
+ d2e1a72fcca58-78100fcf632mr7319067b3a.10.1758907425113; Fri, 26 Sep 2025
+ 10:23:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,11 +92,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250926085911.354947-1-pavan.chebbi@broadcom.com>
  <20250926085911.354947-5-pavan.chebbi@broadcom.com> <5f581053-b231-4f37-91dc-4f2fd8c571a4@intel.com>
-In-Reply-To: <5f581053-b231-4f37-91dc-4f2fd8c571a4@intel.com>
+ <CALs4sv3P_W=ipS5MWKQrThDkPXmdFnfxRroDiZXbdrQXXqetsQ@mail.gmail.com>
+In-Reply-To: <CALs4sv3P_W=ipS5MWKQrThDkPXmdFnfxRroDiZXbdrQXXqetsQ@mail.gmail.com>
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Fri, 26 Sep 2025 22:41:22 +0530
-X-Gm-Features: AS18NWBCxZkGewpzCNyKF6JbZlR59xuNZzNvmuf4NnxK91jSZZtNqchqW8SYO4o
-Message-ID: <CALs4sv3P_W=ipS5MWKQrThDkPXmdFnfxRroDiZXbdrQXXqetsQ@mail.gmail.com>
+Date: Fri, 26 Sep 2025 22:53:34 +0530
+X-Gm-Features: AS18NWC-_wsPKwOZ6MZpkpwf_QPbGLRjrS73S_yqJcp282b8Mdrs7IupfK7YGCM
+Message-ID: <CALs4sv2Eqx7On04w15WnFw9pDkeeF1DRAoVD5aFjTyHpbzD1GA@mail.gmail.com>
 Subject: Re: [PATCH net-next v3 4/5] bnxt_fwctl: Add bnxt fwctl device
 To: Dave Jiang <dave.jiang@intel.com>
 Cc: jgg@ziepe.ca, michael.chan@broadcom.com, saeedm@nvidia.com, 
@@ -107,36 +108,42 @@ Cc: jgg@ziepe.ca, michael.chan@broadcom.com, saeedm@nvidia.com,
 	kalesh-anakkur.purayil@broadcom.com
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000b45d39063fb760ed"
+	boundary="00000000000052bfb9063fb78c18"
 
---000000000000b45d39063fb760ed
+--00000000000052bfb9063fb78c18
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 26, 2025 at 9:31=E2=80=AFPM Dave Jiang <dave.jiang@intel.com> w=
-rote:
+On Fri, Sep 26, 2025 at 10:41=E2=80=AFPM Pavan Chebbi <pavan.chebbi@broadco=
+m.com> wrote:
 >
+> On Fri, Sep 26, 2025 at 9:31=E2=80=AFPM Dave Jiang <dave.jiang@intel.com>=
+ wrote:
+> >
+> >
+> >
 >
+> > > +     if (msg->num_dma) {
+> > > +             if (msg->num_dma > MAX_NUM_DMA_INDICATIONS) {
+> > > +                     dev_err(dev, "DMA buffers exceed the number sup=
+ported\n");
+> > > +                     err =3D -EINVAL;
+> > > +                     goto free_msg_out;
+> >
+> > Shouldn't rpc_in.resp get freed with an error returned? It's leaking rp=
+c_in.resp on all the error paths from this point onward.
+> >
+> > DJ
 >
+> Isn't the caller taking care of it? The fw_rpc is called as:
+> void *outbuf __free(kvfree) =3D fwctl->ops->fw_rpc()
+> I was expecting that outbuf will be freed once it goes out of scope,
+> regardless of success or error?
 
-> > +     if (msg->num_dma) {
-> > +             if (msg->num_dma > MAX_NUM_DMA_INDICATIONS) {
-> > +                     dev_err(dev, "DMA buffers exceed the number suppo=
-rted\n");
-> > +                     err =3D -EINVAL;
-> > +                     goto free_msg_out;
->
-> Shouldn't rpc_in.resp get freed with an error returned? It's leaking rpc_=
-in.resp on all the error paths from this point onward.
->
-> DJ
+Oh, the buffer is not returned when there is an error :( I should have
+seen that.
 
-Isn't the caller taking care of it? The fw_rpc is called as:
-void *outbuf __free(kvfree) =3D fwctl->ops->fw_rpc()
-I was expecting that outbuf will be freed once it goes out of scope,
-regardless of success or error?
-
---000000000000b45d39063fb760ed
+--00000000000052bfb9063fb78c18
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -229,14 +236,14 @@ eIj4fd2b29HwMCvfX78QR4JQM9dkDoD1ZFClV17bxRPtxhwEU8DzzcGlLfKJhj8IxkLoww9hqNul
 Md+LwA5kUTLPBBl9irP7Rn3jfftdK1MgrNyomyZUZSI1pisbv0Zn/ru3KD3QZLE17esvHAqCfXAZ
 a2vE+o+ZbomB5XkihtQpb/DYrfjAMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
 ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCBXO3kA
-0bhdeOIePSeKLHcIMh24CJfMpCFHhy5lRaPV0TAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNTA5MjYxNzExMzRaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCDxwDim
+o55L4J7jBPC9y+ao73xoMqYPPKlGctN5Z5b1kTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNTA5MjYxNzIzNDZaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
 MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCLlVTjx19hxHsee47EZON49nt5vYmOOnmZy75+4zvk
-zlar3RhIj3mRzsc9B0IJVWgm4Vi5IixNgdGpYLlANN7r47jhvJM5wevt7ThxhzPt1xlUIoX8Tg33
-qMz4RDxqCkb5cU5fEK+2g2H0f7WzMfW5iOmwf+pKk221MpcQR4TajfJ+IkawKkESJBOMAYtADulx
-vmwE3dz6doFzMZ8pFj2m2Of5P9dxA95ze8LgLjaXIQGjuxCCu4CuqDe1bXENc21HVsNszdxognNU
-pV6x1kHrIAtY2n7NXKZGgIUUv1fARHjUjoJpxLJ9/qPIGdoY4fT24VU6Ebg15v8lNsv6ukHR
---000000000000b45d39063fb760ed--
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCAcSc2hH3+mUWDeBvZnfgWm48zYEFQR6o0JcmCkhms
+Pv/hlM8vwGwitK6+soagE4qYQkzq2gEVHI7K/U7LyRnXNedGDxh7AdvmAUxX5xej/e+GAcPnEi+5
+cjnvxo7TbZXAsJ0JrHJjRjxi2p/f5CFVhSoUDJ0NccremumgjZPrWgOsjENyykaxC2chsu1sdByt
+AbxYYCqD+ipsOsovL/1NrG8zIsRoHNCd42GTFbOzcJYXxaEnPEHiJw0CST4Pnum7h5uWoa5U6asQ
+Tb+j3E2KrQpOhgnIQjfplomHFHM0JM1wjt4cX+Z1X3x/cOwo5ylkU9+subQEJBYdc++uZmo2
+--00000000000052bfb9063fb78c18--
 
