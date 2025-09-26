@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-226811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78273BA551B
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 00:21:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B324ABA5548
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 00:30:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F3F7626139
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 22:21:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D3D8380991
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 22:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85FD30FC1C;
-	Fri, 26 Sep 2025 22:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71062288EE;
+	Fri, 26 Sep 2025 22:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C5WAyhgX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HasqbAM3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B093330F957;
-	Fri, 26 Sep 2025 22:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADEA6433AD;
+	Fri, 26 Sep 2025 22:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758925232; cv=none; b=YzC7j7oiPh6K0E8oFkH4o4xSdcYKmnsaGKPCrX4q5UehDUYPSxqNvelr7et/b10+zfQ0tG5zm/89+wjBlQv+kvvFG/cbvCY6E0lY6JNQOwSBSrRhMXGZk66KwGhP4zTPjWk0CRCmAqesf9e44+sYvSjGipcDLK5ti/nCVVZpNtU=
+	t=1758925816; cv=none; b=QpLEn+86vLJyutUYwArfoW1iddq5ECGJPrALD7THAfMFQJy5W6RvHUZh+YrnLH5UQJabQPxYO51FQTrKtLCKz1iU8oiVDnEwj00eawZXj9DbIEKyUnS994vAIF4hZLFPBub/HbNxkvR6TSv9yUFX5RwEAYz2dTFcqaWrfSaXjSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758925232; c=relaxed/simple;
-	bh=FmplK52TNGXVvIJ80ZpgbBnrnbf+hfS7s8cFUx4blBg=;
+	s=arc-20240116; t=1758925816; c=relaxed/simple;
+	bh=MiyKNnG8zTc+6RsPfPKid4TJomwqt7rOOXsO2nMcGdk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hbi4mdxOjdq+XB2fUqi4GgPQWTLl5nGNcV+BZHmNM0Ve+u2/LUmxbtFcUxP8htCUQF7Ve0hFCQ2pCWHtlb36qJ02Qg2Bl3NNRUt99Sb4V4Bq7/RHCnlWXTkf9RgDAeCWoeEGgw2ri/WDGYlDuk2EBf4VXsxlVdIVNcY2SC94o4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C5WAyhgX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46280C4CEF4;
-	Fri, 26 Sep 2025 22:20:32 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=c6VMNPU2L3EGRkXybxSCMCzKTR2pzXpfNOF4pKxg9BZNCshTlWHf75DVXrULsg5JtrpvYbQEwkHYRXYh70OmGWvBxdPuPJEpVJCfvFmL57qgPkpZjH9bkYLwazEOP4iZNM2D40mwCIeefRY166o9TwjCZarHU+D2haUp15qf6cI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HasqbAM3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8598BC4CEF4;
+	Fri, 26 Sep 2025 22:30:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758925232;
-	bh=FmplK52TNGXVvIJ80ZpgbBnrnbf+hfS7s8cFUx4blBg=;
+	s=k20201202; t=1758925816;
+	bh=MiyKNnG8zTc+6RsPfPKid4TJomwqt7rOOXsO2nMcGdk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=C5WAyhgX3BvAUOEqncVDM1+wT8tZUdO7CWybG34FiFA30sK2Hs6p5j7+pSLFInnRE
-	 SeEYdVNVixlqweKmG37hYo8u45bnpeYrNUkDypKqfDw7B0PVJtCFBuXiIUMluS5aQD
-	 EQ0deinxxRq85OHemw8t5kqRCC3ZLAC2fauta82mJ/KTw4vd+RkX+ctd/DfINelA3v
-	 lziMuSIme696Y83z/SYizaZ7IHDWpo35/xnAPk+Q/FjLsTRspbNYSWvIu6023c9RYh
-	 pIrzlEn6tXX4hSr54AHarYii4ScPFRZqXqUaYU/HnwOGHB1kZDOSMJtAvkQdK+cKUD
-	 eoxORWyEHusbA==
+	b=HasqbAM3t9KZpuT1R9s0G7U0qFqyInPVc+uu2s8dyZLSSrUP/aLXP/QFC7fAGRRFW
+	 9GLiiWOJynSj7BMO5+9MH/Z8zt0+KZ57zvLYs1LEK9J2dKhHbMkaZ+5s3coWjYz9HL
+	 rhvdx+LqY78qSazGVmq/EbgudO0Nn7qjOUgzji+oVz6EcptTKl/IYjthIiuiQxZ1K3
+	 Zqq3B4JcvEdW2I0HMi9B822is/IrXpdTncZDAuFfpNN3av8SzX1R7ijyW8ObU/GHGx
+	 5uiNnduGlTYc7nL3c2zHo+a3Oc6chOk1Ss9wZ689vuNy1UVSWRJOO0uiPGrlmj2hNo
+	 o7dfDP0jY8sgw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEA239D0C3F;
-	Fri, 26 Sep 2025 22:20:28 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEF639D0C3F;
+	Fri, 26 Sep 2025 22:30:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] [net-next] net: renesas: rswitch: Remove unneeded
- semicolons
+Subject: Re: [PATCH net] ptr_ring: drop duplicated tail zeroing code
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175892522724.77570.12314729124866518832.git-patchwork-notify@kernel.org>
-Date: Fri, 26 Sep 2025 22:20:27 +0000
+ <175892581176.80352.17113730544408747678.git-patchwork-notify@kernel.org>
+Date: Fri, 26 Sep 2025 22:30:11 +0000
 References: 
- <e6b57123f319c03b3f078981cb452be49e86253b.1758719832.git.geert+renesas@glider.be>
+ <adb9d941de4a2b619ddb2be271a9939849e70687.1758690291.git.mst@redhat.com>
 In-Reply-To: 
- <e6b57123f319c03b3f078981cb452be49e86253b.1758719832.git.geert+renesas@glider.be>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: yoshihiro.shimoda.uh@renesas.com, michael.dege@renesas.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, nikita.yoush@cogentembedded.com,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+ <adb9d941de4a2b619ddb2be271a9939849e70687.1758690291.git.mst@redhat.com>
+To: Michael S. Tsirkin <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, jasowang@redhat.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 24 Sep 2025 15:19:30 +0200 you wrote:
-> Semicolons after end of function braces are not needed, remove them.
+On Wed, 24 Sep 2025 01:27:07 -0400 you wrote:
+> We have some rather subtle code around zeroing tail entries, minimizing
+> cache bouncing.  Let's put it all in one place.
 > 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
->  drivers/net/ethernet/renesas/rswitch_main.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Doing this also reduces the text size slightly, e.g. for
+> drivers/vhost/net.o
+>   Before: text: 15,114 bytes
+>   After: text: 15,082 bytes
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] net: renesas: rswitch: Remove unneeded semicolons
-    https://git.kernel.org/netdev/net-next/c/72bc38077e80
+  - [net] ptr_ring: drop duplicated tail zeroing code
+    https://git.kernel.org/netdev/net-next/c/4e9510f16218
 
 You are awesome, thank you!
 -- 
