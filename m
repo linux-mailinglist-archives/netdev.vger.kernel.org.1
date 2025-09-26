@@ -1,55 +1,63 @@
-Return-Path: <netdev+bounces-226727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 840E9BA4775
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 17:45:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16DD4BA482E
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 17:55:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 125437A6680
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 15:43:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9F0A384C67
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 15:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2752721D3F4;
-	Fri, 26 Sep 2025 15:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31F842309BE;
+	Fri, 26 Sep 2025 15:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Yt/mIccI"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8722221CC68;
-	Fri, 26 Sep 2025 15:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A51A223DF6;
+	Fri, 26 Sep 2025 15:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758901501; cv=none; b=YontRJ0AJJdXXjiRtJUuqFPef0dytlXpBsH0mXiiNriJdfJVyUK3mZIHT9FFnMtHoC8aQzPbw15p/KcsFs4TsAZfNPZEKt24ni6riz5Sx5U0VmwOI/vgdMox+u3ClLEeRegQqLUixFRvw6bFVqqNZblJb/OLBEk1F98v00T5lLE=
+	t=1758902108; cv=none; b=nN6jgL9ycHuoUtm18Gwnwh/y8cYF+L5+PRKosLXx+9zEy3j9a6i1ji6XXihbsxpjAs0jBC3hwkQasMAuwsUZ97NaV8FLpEKhXKueQcDSICXt8yKXsE5SMIK+ZFZsUPX/hKZug16stj0JWdTpz/UoztxmRGDrLSq348t7g2ZJgQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758901501; c=relaxed/simple;
-	bh=Z+08pd5trXxeIG91iltKrZxqf8DLeOFMe/rwCu6XuHw=;
+	s=arc-20240116; t=1758902108; c=relaxed/simple;
+	bh=kvGHudag2hQMvaCMbZ6u9R41aw6YO+LBGx/OObLVKuY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YbzIy7UZ/0muoYU9eQ/BPBLuLGiD3ZXMA82qP/VKaA7OyUYpTVWZvk6u3KYQDj8wUwxZXxoVwwyKSVnUFf/svnr6hXy/4LzB0r+8ndqUDGm7kO4z46fKx/KKaCzO2DPAK8JzWeAz85D6VbauNWDWEs6Qv9tyEW2XdmuzHlYH9co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B60691691;
-	Fri, 26 Sep 2025 08:44:50 -0700 (PDT)
-Received: from bogus (e133711.arm.com [10.1.196.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A07A23F66E;
-	Fri, 26 Sep 2025 08:44:56 -0700 (PDT)
-Date: Fri, 26 Sep 2025 16:44:53 +0100
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Adam Young <admiyo@os.amperecomputing.com>
-Cc: Jassi Brar <jassisinghbrar@gmail.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Sudeep Holla <sudeep.holla@arm.com>,
-	Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	"David S . Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=BP/l1kPQhKCxP4kBhps/jla1cxkb3c1Zu6G1f47aLngC+cbnoTTok/dFww6taGz0DYmDDO4Y6d6KXInZ1e607mB8BoSZKxNx/fEwScwXu9R84BicVbwXByV/v/lp1KvhoRuw0HvtCoVAb1nyvMiB/EGWK3X9oQvyRkeUgENlbtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Yt/mIccI; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=LDqdoJk9lubv55rDAuOytv8/K4Mn4cbUmQU9E/sNBGg=; b=Yt/mIccIH8D+vqtslbMH4u7aif
+	Lh9lE2zaAFQ4JJvskOU91hQF3wzOQsRIZ5xafcxXCaUlKqUvTBuqg/aEfiEP5bBykK3Ytnq2ETOH7
+	26tZlKzlxGkY96gLhDoQQ0AeNakHSegmpTVeOFmtTV3jXOYLiUgudWdAyib1ZH+icivk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v2Amf-009a1U-Q7; Fri, 26 Sep 2025 17:54:57 +0200
+Date: Fri, 26 Sep 2025 17:54:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Huisong Li <lihuisong@huawei.com>
-Subject: Re: [PATCH net-next v29 1/3] mailbox: add callback function for rx
- buffer allocation
-Message-ID: <aNa09S7h8MgWajKe@bogus>
-References: <20250925190027.147405-1-admiyo@os.amperecomputing.com>
- <20250925190027.147405-2-admiyo@os.amperecomputing.com>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next 2/2] net: airoha: npu: Add 7583 SoC support
+Message-ID: <82a08bb5-cbc3-4bba-abad-393092d66557@lunn.ch>
+References: <20250926-airoha-npu-7583-v1-0-447e5e2df08d@kernel.org>
+ <20250926-airoha-npu-7583-v1-2-447e5e2df08d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,49 +66,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250925190027.147405-2-admiyo@os.amperecomputing.com>
+In-Reply-To: <20250926-airoha-npu-7583-v1-2-447e5e2df08d@kernel.org>
 
-Hi,
+> -	ret = request_firmware(&fw, NPU_EN7581_FIRMWARE_DATA, dev);
+> +	if (of_device_is_compatible(dev->of_node, "airoha,an7583-npu"))
+> +		fw_name = NPU_AN7583_FIRMWARE_DATA;
+> +	else
+> +		fw_name = NPU_EN7581_FIRMWARE_DATA;
+> +	ret = request_firmware(&fw, fw_name, dev);
+>  	if (ret)
+>  		return ret == -ENOENT ? -EPROBE_DEFER : ret;
+>  
+> @@ -612,6 +623,7 @@ EXPORT_SYMBOL_GPL(airoha_npu_put);
+>  
+>  static const struct of_device_id of_airoha_npu_match[] = {
+>  	{ .compatible = "airoha,en7581-npu" },
+> +	{ .compatible = "airoha,an7583-npu" },
 
-On Thu, Sep 25, 2025 at 03:00:24PM -0400, Adam Young wrote:
-> Allows the mailbox client to specify how to allocate the memory
-> that the mailbox controller uses to send the message to the client.
-> 
-> In the case of a network driver, the message should be allocated as
-> a struct sk_buff allocated and managed by the network subsystem.  The
-> two parameters passed back from the callback represent the sk_buff
-> itself and the data section inside the skbuff where the message gets
-> written.
-> 
-> For simpler cases where the client kmallocs a buffer or returns
-> static memory, both pointers should point to the same value.
-> 
+It would be more normal to make use of the void * in of_device_id to
+have per compatible data, such are firmware name.
 
-I have posted a revert[1] of a patch that you got merged recently and
-this change builds on top of that. Please start fresh with that patch/revert
-applied and explain why you can't use tx_prepare and rx_callback as
-suggested and then we can take it from there. It makes no sense to add
-these optional callbacks the way it is done at the least. If you are
-worried about duplication of shmem handling, IIUC, it is done intentionally
-to give that flexibility to the clients. If you think it can be consolidated,
-I would rather have them as a standard helper which can be assigned to
-tx_prepare and rx_callback and convert few users to demonstrate the same.
-
-So I definitely don't like this addition and NACK until all those details
-are looked at and you have convinced it can't be achieved via those and need
-more changes.
-
-On the other hand, the consolidation is a good thought, but it can't be
-addition without any other drivers except you new yet to be merged driver
-as the sole user of that. If there are no users needing copying to/from
-the shared memory like you driver, then I am happy to consider this but it
-needs more thinking and reviewing for sure. I will also have a look.
-
-Sorry for missing the review of the original patch that got merged, my bad.
-
--- 
-Regards,
-Sudeep
-
-[1] https://lore.kernel.org/all/20250926153311.2202648-1-sudeep.holla@arm.com
+	Andrew
 
