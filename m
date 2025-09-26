@@ -1,140 +1,242 @@
-Return-Path: <netdev+bounces-226747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39235BA4B0A
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:42:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C715BA4B16
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:43:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A0921C203B1
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:43:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 171E53BEE01
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:43:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DA73244661;
-	Fri, 26 Sep 2025 16:42:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22712FE580;
+	Fri, 26 Sep 2025 16:43:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jXjCDoU7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BGR67sLF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4421F823DD;
-	Fri, 26 Sep 2025 16:42:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9518B2FF14D
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 16:43:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758904965; cv=none; b=NbJOOteZ9ekkIrcl9HB40Zg0i5zOK5VV0EJScUAB3ZKJIlfN0f7vwq0u9IeU4/Q+gz6dFXIqEu9kQT9uQr2yvtcgvsUl5PGbf5J5VPayK8gZHYU+YcymFYtBjse4O1vyDotIZOt5LShOdHqqQn8U7yZQAcZkxr/S/H8kgv/D5Yk=
+	t=1758904999; cv=none; b=X0htG2jV6opl+aLwlFrI1cBJIwfNuwHGwBE/XdJTrkMNfxlGBY9wTs9DgOv7XkX8/KQSlicSWQnESSxf7eTf8pr3/FpisJyHa/fJQo8uBwxVyQsLlUMzybRp4dQaVGsD62o9+w6CDDvBlQTMRrfsFTFMu24UVu8pkGOLFFN78WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758904965; c=relaxed/simple;
-	bh=EkEGdQzRoQHV/+qgTce+eYgdmMYG6X7KUjwNyIGarvs=;
+	s=arc-20240116; t=1758904999; c=relaxed/simple;
+	bh=+Qi6lHi3BWk4h+soVr8AsqrSbtdpevz1/dCL0JiOSVU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UlPT6xwXdADAi4TPv8lhrLuUDBrGtTJEc9/lwbqsA1BJNlYZG25nEwYmTo2FE01UMyfXC6H14ZTm99/Ndd1IJAC23iCMzmRHqGfnYgJz3HAtw++hKAt3t4mKi9s9TPk7ZDsAEp4E3rckjZPy2kf3J+XiqcTJurZ0A7H3oZ4FEpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jXjCDoU7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C48F8C4CEF4;
-	Fri, 26 Sep 2025 16:42:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758904964;
-	bh=EkEGdQzRoQHV/+qgTce+eYgdmMYG6X7KUjwNyIGarvs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jXjCDoU7UvglbHeWZlcgdKM51GzyfPYJ50WZcIvbOLT5FgCmiMLvkmFCrrO4aoEAR
-	 N7NOisYGIWkXtNetrrSAdLSkg6F2zt6DfYtYNr/WkAduuhS7F005fGtwqKzLQ3CqzC
-	 UsJkGx6shKRqXks1NKpSK27vt3p4abdEdL8Z9tLqTUwulM7xEkD8QwPCxmLZLVHgS+
-	 udPJey5RoIhrJXpW5qUbVNZ2yTVt4JuDowuoXEGhOmoqPX3ZOJr+nGUiG71EYLK4UW
-	 rVa6y4cBKsruTw5cCfCgqDCAPrETY3n9SkZsf4o0A4sIMXgGXN1uCtSCBl3sOgwnDR
-	 TeGph+6DY7wTg==
-Date: Fri, 26 Sep 2025 17:42:40 +0100
-From: Simon Horman <horms@kernel.org>
-To: Siddharth Vadapalli <s-vadapalli@ti.com>
-Cc: Nishanth Menon <nm@ti.com>,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] net: netcp: Fix crash in error path when DMA channel
- open fails
-Message-ID: <aNbCgK76kQqhcQY2@horms.kernel.org>
-References: <20250926150853.2907028-1-nm@ti.com>
- <aNa7rEQLJreJF58p@horms.kernel.org>
- <ef2bd666-f320-4dc5-b7ae-d12c0487c284@ti.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=iwEClSFFv9Fne/opJKcQj/56NE/Zh0Y4LyCrmgtuJHu4cqCqEz3/rL0FQBr4n+sFLtubbcRC/7QB9uI95naWxWbikF57siY9nMGQFzdhzSwZ2P0tFADpAHaF7vDfWy0bAfolPc/+w6WPoP9tqNU6qmZpIXY6OfG3XAasOi4Ic3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BGR67sLF; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758904996;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0W6XP1kSbzIw7BM2wwEE7uA0WcDIj3WgTXNjhtqbHyE=;
+	b=BGR67sLFSMtlDoN/z3Mzs9EyMTI52/wBPMLrdJiNAGd7ITci6yuf7qH0w9zjCokjc87k26
+	2euJozV8bBSgn4JfwI75QB3vQjhPI7CAjxwKySe8u8uI9sI+deiBoePgD3f0lFmsYy5YEu
+	ylkpu60LNbfc8o8keuJlOVjEgJGcT10=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-303-ouo4I75nOXuwIdo7O9rWlQ-1; Fri, 26 Sep 2025 12:43:15 -0400
+X-MC-Unique: ouo4I75nOXuwIdo7O9rWlQ-1
+X-Mimecast-MFC-AGG-ID: ouo4I75nOXuwIdo7O9rWlQ_1758904994
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-46e2d845ebeso16691365e9.1
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 09:43:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758904994; x=1759509794;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0W6XP1kSbzIw7BM2wwEE7uA0WcDIj3WgTXNjhtqbHyE=;
+        b=WQ3OsOjDn+wL3D62LRdNgYE9gz8efVpE2uRwTDmbXUxb0BslPbei2Ond07MjeEFuyl
+         PgEnzi+ellyYYxWxYu820Po62+Dys4c7o1x+B4SKAAZ+mUcUuMHZAYr4n1cLW2+3oj8f
+         ffSuLYFgpYJiYrmDQ5o4i8X58EwP8vqx6a1Q8VJxNvzdpM1dkIOcQOhdIJRPvGzmAaLq
+         SAomdu3RibIApLKNnE6foHZqiBmjtRZL2EyvnQEb3sOuHmxi4lLoBr0cBLzM71tUCB4b
+         tz4AorkK2ZlefUp4Aejb1yj1EhgPJVBWd+M90smK49dS6A6QxajYvEB0Lqmv29h+ckbU
+         1BMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX5TsyiVX2BmA8P1NCtSIR5mEx6kQdTASF/RMozDPQIOCyoEuHT57XIJO62sH4gECHtoPA7pr4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfAxkn+kFsQtxRdaN1/c7jN8+f5iKAl3sRJ6wwDCMU9fyu1yhP
+	1dHwMaPoqlmIlkn9YNQ9YXPvGrZcRPUKDRbJL5QzjXe4mpV/4LUCRMrQNmQ2hAQo7K6qUpUOC74
+	vgtkxKRujd959W9sUnPIQszT9950SlPQ4WtC9nngUZlvisGPpXNnTg6gyww==
+X-Gm-Gg: ASbGnctTuk2hY2QkN60UOSvhE6pUtL3uvVzamhgQf0ui0tPMJQhTG+ORrFKL33m/sr/
+	42QfFVmx94xnK7Kaz4sp+EYxpJqw1XGfBX02druzpmJMOwx7/fHLEEZI1Ck1tJAORLN0pA0GysE
+	GiOm8aHBfe1TlasJZgMa0HQuyf+9WgvKn9RSjewRiIvJEVO2pSofv/09K8sfx9K1djAwbX/Igh7
+	lQOpWmUwY11WZgdbXfvcRffcLrtnoYTuXpuNmTmGyWNPKEqHDJVtfWxIbpo/eSoCDsGyrCQtnpB
+	IFnbxVxA50hvkcYWOSnnsBp1l6rDgfjRpG4AYkpF
+X-Received: by 2002:a05:600c:154a:b0:46e:330a:1762 with SMTP id 5b1f17b1804b1-46e330a1a9cmr61704765e9.22.1758904993878;
+        Fri, 26 Sep 2025 09:43:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHQy5MzShEqo4W4mpHSCNBzEP0InFkBO55wUBdI9t6CxMRbrJ2zCQ8i54MhS96fd25/1RMU9g==
+X-Received: by 2002:a05:600c:154a:b0:46e:330a:1762 with SMTP id 5b1f17b1804b1-46e330a1a9cmr61704445e9.22.1758904993353;
+        Fri, 26 Sep 2025 09:43:13 -0700 (PDT)
+Received: from sgarzare-redhat ([5.77.94.69])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e33bef4b4sm79560515e9.20.2025.09.26.09.43.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Sep 2025 09:43:12 -0700 (PDT)
+Date: Fri, 26 Sep 2025 18:43:03 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v6 5/9] vsock/virtio: add netns to virtio
+ transport common
+Message-ID: <jukftp6dcz7padxxistl6ifuqnfhsd45owv46d2l4755t7vhxa@tbpri2oxyfyp>
+References: <20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com>
+ <20250916-vsock-vmtest-v6-5-064d2eb0c89d@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <ef2bd666-f320-4dc5-b7ae-d12c0487c284@ti.com>
+In-Reply-To: <20250916-vsock-vmtest-v6-5-064d2eb0c89d@meta.com>
 
-On Fri, Sep 26, 2025 at 09:57:02PM +0530, Siddharth Vadapalli wrote:
-> On 26/09/25 9:43 PM, Simon Horman wrote:
-> > On Fri, Sep 26, 2025 at 10:08:53AM -0500, Nishanth Menon wrote:
-> > > When knav_dma_open_channel() fails in netcp_setup_navigator_resources(),
-> > > the rx_channel field is set to an ERR_PTR value. Later, when
-> > > netcp_free_navigator_resources() is called in the error path, it attempts
-> > > to close this invalid channel pointer, causing a crash.
-> > > 
-> > > Add a check for ERR values to handle the failure scenario.
-> > > 
-> > > Fixes: 84640e27f230 ("net: netcp: Add Keystone NetCP core driver")
-> > > Signed-off-by: Nishanth Menon <nm@ti.com>
-> > > ---
-> > > 
-> > > Seen on kci log for k2hk: https://dashboard.kernelci.org/log-viewer?itemId=ti%3A2eb55ed935eb42c292e02f59&org=ti&type=test&url=http%3A%2F%2Ffiles.kernelci.org%2F%2Fti%2Fmainline%2Fmaster%2Fv6.17-rc7-59-gbf40f4b87761%2Farm%2Fmulti_v7_defconfig%2BCONFIG_EFI%3Dy%2BCONFIG_ARM_LPAE%3Dy%2Bdebug%2Bkselftest%2Btinyconfig%2Fgcc-12%2Fbaseline-nfs-boot.nfs-k2hk-evm.txt.gz
-> > > 
-> > >   drivers/net/ethernet/ti/netcp_core.c | 2 +-
-> > >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/drivers/net/ethernet/ti/netcp_core.c b/drivers/net/ethernet/ti/netcp_core.c
-> > > index 857820657bac..4ff17fd6caae 100644
-> > > --- a/drivers/net/ethernet/ti/netcp_core.c
-> > > +++ b/drivers/net/ethernet/ti/netcp_core.c
-> > > @@ -1549,7 +1549,7 @@ static void netcp_free_navigator_resources(struct netcp_intf *netcp)
-> > >   {
-> > >   	int i;
-> > > -	if (netcp->rx_channel) {
-> > > +	if (!IS_ERR(netcp->rx_channel)) {
-> > >   		knav_dma_close_channel(netcp->rx_channel);
-> > >   		netcp->rx_channel = NULL;
-> > >   	}
-> > 
-> > Hi Nishanth,
-> > 
-> > Thanks for your patch.
-> > 
-> > I expect that netcp_txpipe_close() has a similar problem too.
-> > 
-> > But I also think that using IS_ERR is not correct, because it seems to me
-> > that there are also cases where rx_channel can be NULL.
-> 
-> Could you please clarify where rx_channel is NULL? rx_channel is set by
-> invoking knav_dma_open_channel().
+On Tue, Sep 16, 2025 at 04:43:49PM -0700, Bobby Eshleman wrote:
+>From: Bobby Eshleman <bobbyeshleman@meta.com>
+>
+>Add support to the virtio-vsock common code for passing around net
+>namespace pointers (tx and rx). The series still requires vhost/virtio
+>transport support to be added by future patches.
+>
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>---
+> include/linux/virtio_vsock.h            |  1 +
+> net/vmw_vsock/virtio_transport_common.c | 18 ++++++++++++++++--
+> 2 files changed, 17 insertions(+), 2 deletions(-)
+>
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index ea955892488a..165157580cb8 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -196,6 +196,7 @@ struct virtio_vsock_pkt_info {
+> 	u32 remote_cid, remote_port;
+> 	struct vsock_sock *vsk;
+> 	struct msghdr *msg;
+>+	struct net *net;
+> 	u32 pkt_len;
+> 	u16 type;
+> 	u16 op;
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index 1a9129e33d51..8a08a5103e7c 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -316,6 +316,11 @@ static struct sk_buff *virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *
+> 					 info->flags,
+> 					 zcopy);
+>
+>+	virtio_vsock_skb_set_net(skb, info->net);
+>+
+>+	if (vsk)
+>+		virtio_vsock_skb_set_orig_net_mode(skb, vsk->orig_net_mode);
 
-Hi Siddharth,
+If `vsk` is NULL we don't set it, is it right?
 
-I am assuming that when netcp_setup_navigator_resources() is called, at
-least for the first time, that netcp->rx_channel is NULL. So any of the
-occurrence of 'goto fail' in that function before the call to
-knav_dma_open_channel().
+I'd add a comment to explain that, because it's not clear.
 
-> Also, please refer to:
-> https://github.com/torvalds/linux/commit/5b6cb43b4d62
-> which specifically points out that knav_dma_open_channel() will not return
-> NULL so the check for NULL isn't required.
-> > 
-> > I see that on error knav_dma_open_channel() always returns ERR_PTR(-EINVAL)
-> > (open coded as (void *)-EINVAL) on error. So I think a better approach
-> > would be to change knav_dma_open_channel() to return NULL, and update callers
-> > accordingly.
-> 
-> The commit referred to above made changes to the driver specifically due to
-> the observation that knav_dma_open_channel() never returns NULL. Modifying
-> knav_dma_open_channel() to return NULL will effectively result in having to
-> undo the changes made by the commit.
+Thanks,
+Stefano
 
-I wasn't aware of that patch. But my observation is that the return value
-of knav_dma_open_channel() is still not handled correctly. E.g. the bug
-your patch is fixing.  And I'm proposing an alternate approach which I feel
-will be less error-prone.
+>+
+> 	return skb;
+> out:
+> 	kfree_skb(skb);
+>@@ -527,6 +532,7 @@ static int virtio_transport_send_credit_update(struct vsock_sock *vsk)
+> 	struct virtio_vsock_pkt_info info = {
+> 		.op = VIRTIO_VSOCK_OP_CREDIT_UPDATE,
+> 		.vsk = vsk,
+>+		.net = sock_net(sk_vsock(vsk)),
+> 	};
+>
+> 	return virtio_transport_send_pkt_info(vsk, &info);
+>@@ -1067,6 +1073,7 @@ int virtio_transport_connect(struct vsock_sock *vsk)
+> 	struct virtio_vsock_pkt_info info = {
+> 		.op = VIRTIO_VSOCK_OP_REQUEST,
+> 		.vsk = vsk,
+>+		.net = sock_net(sk_vsock(vsk)),
+> 	};
+>
+> 	return virtio_transport_send_pkt_info(vsk, &info);
+>@@ -1082,6 +1089,7 @@ int virtio_transport_shutdown(struct vsock_sock *vsk, int mode)
+> 			 (mode & SEND_SHUTDOWN ?
+> 			  VIRTIO_VSOCK_SHUTDOWN_SEND : 0),
+> 		.vsk = vsk,
+>+		.net = sock_net(sk_vsock(vsk)),
+> 	};
+>
+> 	return virtio_transport_send_pkt_info(vsk, &info);
+>@@ -1108,6 +1116,7 @@ virtio_transport_stream_enqueue(struct vsock_sock *vsk,
+> 		.msg = msg,
+> 		.pkt_len = len,
+> 		.vsk = vsk,
+>+		.net = sock_net(sk_vsock(vsk)),
+> 	};
+>
+> 	return virtio_transport_send_pkt_info(vsk, &info);
+>@@ -1145,6 +1154,7 @@ static int virtio_transport_reset(struct vsock_sock *vsk,
+> 		.op = VIRTIO_VSOCK_OP_RST,
+> 		.reply = !!skb,
+> 		.vsk = vsk,
+>+		.net = sock_net(sk_vsock(vsk)),
+> 	};
+>
+> 	/* Send RST only if the original pkt is not a RST pkt */
+>@@ -1165,6 +1175,7 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
+> 		.op = VIRTIO_VSOCK_OP_RST,
+> 		.type = le16_to_cpu(hdr->type),
+> 		.reply = true,
+>+		.net = virtio_vsock_skb_net(skb),
+> 	};
+> 	struct sk_buff *reply;
+>
+>@@ -1465,6 +1476,7 @@ virtio_transport_send_response(struct vsock_sock *vsk,
+> 		.remote_port = le32_to_cpu(hdr->src_port),
+> 		.reply = true,
+> 		.vsk = vsk,
+>+		.net = sock_net(sk_vsock(vsk)),
+> 	};
+>
+> 	return virtio_transport_send_pkt_info(vsk, &info);
+>@@ -1578,7 +1590,9 @@ static bool virtio_transport_valid_type(u16 type)
+> void virtio_transport_recv_pkt(struct virtio_transport *t,
+> 			       struct sk_buff *skb)
+> {
+>+	enum vsock_net_mode orig_net_mode = virtio_vsock_skb_orig_net_mode(skb);
+> 	struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
+>+	struct net *net = virtio_vsock_skb_net(skb);
+> 	struct sockaddr_vm src, dst;
+> 	struct vsock_sock *vsk;
+> 	struct sock *sk;
+>@@ -1606,9 +1620,9 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+> 	/* The socket must be in connected or bound table
+> 	 * otherwise send reset back
+> 	 */
+>-	sk = vsock_find_connected_socket(&src, &dst, vsock_global_dummy_net());
+>+	sk = vsock_find_connected_socket(&src, &dst, net, orig_net_mode);
+> 	if (!sk) {
+>-		sk = vsock_find_bound_socket(&dst, vsock_global_dummy_net());
+>+		sk = vsock_find_bound_socket(&dst, net, orig_net_mode);
+> 		if (!sk) {
+> 			(void)virtio_transport_reset_no_sock(t, skb);
+> 			goto free_pkt;
+>
+>-- 
+>2.47.3
+>
+
 
