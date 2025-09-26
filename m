@@ -1,62 +1,61 @@
-Return-Path: <netdev+bounces-226567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8847FBA22CB
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 04:00:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 116F6BA22D4
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 04:04:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3D1B7A6090
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 01:58:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2F941C2637E
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 02:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0766B22156C;
-	Fri, 26 Sep 2025 02:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D03622A7F2;
+	Fri, 26 Sep 2025 02:04:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TIYcc9jV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oonl2xbF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D610A221DAD
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 02:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781A517C220
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 02:04:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758852015; cv=none; b=tSW53R8A4rBvyBKaSNSbzxFofkuuhh84iNKJUee8z0LjPdQyqIwGBX5Ad9hFN4xtafPEW8ymt++VaiCde3dm/uWEsgI1fgevsSaC7AJeEpdyh+TelVg06F12TrFqWtAdAwo+zSg/RZ0s+Dru8ArANasXte0xR9piqT6kfeTm438=
+	t=1758852244; cv=none; b=FMSkITaSrCivKtQ/Knb9V5aGeNgBp4hhyR+KVQARYsZPcJ//jQO/fDnzN/H0x9yc9Q52ygsEj4RwOxzdEcQVac8aXCMoAwdtSTIQKyvAk0PtnyKMd0LAQqC6jWvbRKiDO0+EHcbwPtBV4uJ85qm7Hm9DUIjbPJE7Z40V7E/BMH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758852015; c=relaxed/simple;
-	bh=c0AjAa4UbhcAiqd5Ooj9+Es4YVPslcJD9CzAighG7cY=;
+	s=arc-20240116; t=1758852244; c=relaxed/simple;
+	bh=75J+/BCYXqLZXJy2HtE8aY2HcCOpUZrdZ+5TOVwlc+4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QQ0k8VYBUIOm8qf2WL970JqhzJOYvYNR/GJJuWGrmyXs/eWXtXpvbhr3vOqgECiM4uUiOC+ZBhL4szB6aq2juc3rkwZ8vrU2znqtq0sh2g14I8dYSm8yzFUoabX4ARywTzxK9HTfvV7fzH7OOsoatw+X75VHGbI2VxNLh0dkAm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TIYcc9jV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE7D9C4CEF0;
-	Fri, 26 Sep 2025 02:00:13 +0000 (UTC)
+	 MIME-Version:Content-Type; b=GVdLvuHFuH5E62Oyh1kQe4LysjQklDCYk8r5OhCwPCFe75h3GHGbnjtZTysuRpqnsetFXgBomECM8erOs2hA4v2mOePwwKyWUXxh966WaZ/+86N9ni7CY/BVBtpy2lw8CzaxEuBqTO5Q4cAQcxq1glKYxES6VW6kYg8q/VKctOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oonl2xbF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F71EC4CEF0;
+	Fri, 26 Sep 2025 02:04:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758852014;
-	bh=c0AjAa4UbhcAiqd5Ooj9+Es4YVPslcJD9CzAighG7cY=;
+	s=k20201202; t=1758852243;
+	bh=75J+/BCYXqLZXJy2HtE8aY2HcCOpUZrdZ+5TOVwlc+4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TIYcc9jVmqYxUJah9bJBh/cHoipP/3e/Odx+s4/ra/kk/N/hAcjZBDs/SNxKG8CIX
-	 rBcmugsNMX6RhkOLF3E/DMxj39ACacRrR8qnbf0UKUMj3ivfWcdOWf4nwB29gh0nkY
-	 BRzQ2+niSpaIocvNaB6hxoo7MMyhLEyybzg3VGy9G4Pi5HwbAgk8BTBfNiRfqS3pr3
-	 bFpkv5OBpi0jXPSi5/26HLYGhnHXdE7NMPQ4myvsvTWZSn75AO6+QV1b2Qewt5pPxK
-	 XcPufBws1QWCta53cSe2m6xRc+qOB0Uv4k+rNKBP3AV0oYRl7wrhr1QVXyFCi3+wHW
-	 2ac6giWJmsxbQ==
-Date: Thu, 25 Sep 2025 19:00:12 -0700
+	b=oonl2xbFc2JomR53IPHS99gyCMvzD4KfqScn+16/n064QsupbA96KDScJitCkMqVB
+	 b7D1n3Bf8OiLAzsMELfF//rjFHWV+y+ctQDNwoL2bKSHIltPtXVq9j1gN/A8uyeOFi
+	 ZfeX7uhG0lnk/QxU811lQK2sby04xHO94ql55na2676jQX9Nlsm7tOQKCosWgH+Ifc
+	 hFXtfUL4ku7qsXDgeNJ7Th1ieEbWT0Mvnbj0WVRwqPPtj+HhCBftRXO6E9OSFFibAT
+	 kDljgKIOizXX98T7YIt8ymvz5pSb2iOKirqFIX+8in3Yjmevg2v7swvVYe8S9bPMVt
+	 NM+ixF7HxSKqw==
+Date: Thu, 25 Sep 2025 19:04:01 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Fernando Fernandez Mancera <fmancera@suse.de>
-Cc: =?UTF-8?B?SsOhbiBWw6FjbGF2?= <jvaclav@redhat.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net-next] net/hsr: add protocol version to fill_info
- output
-Message-ID: <20250925190012.58e1b3b1@kernel.org>
-In-Reply-To: <c39e6626-02db-4a83-9f77-3d661f63ac0e@suse.de>
-References: <20250922093743.1347351-3-jvaclav@redhat.com>
-	<20250923170604.6c629d90@kernel.org>
-	<CAEQfnk3Ft4ke3UXS60WMYH8M6WsLgH=D=7zXmkcr3tx0cdiR_g@mail.gmail.com>
-	<20250924164041.3f938cab@kernel.org>
-	<c39e6626-02db-4a83-9f77-3d661f63ac0e@suse.de>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: <netdev@vger.kernel.org>, "'Andrew Lunn'" <andrew+netdev@lunn.ch>,
+ "'David S. Miller'" <davem@davemloft.net>, "'Eric Dumazet'"
+ <edumazet@google.com>, "'Paolo Abeni'" <pabeni@redhat.com>, "'Simon
+ Horman'" <horms@kernel.org>, "'Alexander Lobakin'"
+ <aleksander.lobakin@intel.com>, "'Mengyuan Lou'"
+ <mengyuanlou@net-swift.com>
+Subject: Re: [PATCH net-next v5 0/4] net: wangxun: support to configure RSS
+Message-ID: <20250925190401.70c85ada@kernel.org>
+In-Reply-To: <05ab01dc2ded$f2e9a610$d8bcf230$@trustnetic.com>
+References: <20250922094327.26092-1-jiawenwu@trustnetic.com>
+	<20250924183640.62a1293e@kernel.org>
+	<05ab01dc2ded$f2e9a610$d8bcf230$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,38 +65,59 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 25 Sep 2025 10:37:38 +0200 Fernando Fernandez Mancera wrote:
-> > I'm not very familiar with HSR or PRP. But The PRP_V1 which has value
-> > of 3 looks like a kernel-internal hack. Or does the protocol actually
-> > specify value 3 to mean PRP?
+On Thu, 25 Sep 2025 15:28:11 +0800 Jiawen Wu wrote:
+> On Thu, Sep 25, 2025 9:37 AM, Jakub Kicinski wrote:
+> > On Mon, 22 Sep 2025 17:43:23 +0800 Jiawen Wu wrote:  
+> > > Implement ethtool ops for RSS configuration, and support multiple RSS
+> > > for multiple pools.  
 > > 
-> > I don't think there's anything particularly wrong with the code.
-> > The version is for HSR because PRP only has one version, there's no
-> > ambiguity.
+> > There is a few tests for the RSS API in the tree:
 > > 
-> > But again, I'm just glancing at the code I could be wrong..
-> >   
+> > tools/testing/selftests/drivers/net/hw/rss_api.py
+> > tools/testing/selftests/drivers/net/hw/rss_ctx.py
+> > 
+> > Please run these and add the output to the cover letter.
+> > 
+> > Instructions for running the tests are here:
+> > 
+> > https://github.com/linux-netdev/nipa/wiki/Running-driver-tests  
 > 
-> No you are right, this is a hack made to integrate PRP with HSR driver. 
-> PRP does not have a version other than PRP_V1 therefore it does not make 
-> much sense to configure it. Having said that, I think it's weird to 
-> report HSR_VERSION 3 but fail when configuring it.
-> 
-> IMHO HSR_VERSION should be hidden for PRP or it should be possible to 
-> configure it to "3" (which now that you say it, it looks weird).
+> The output shows many fail cases. Is it normal? Or is there some issue
+> with my environment?
 
-I think we're in agreement then? i was suggesting:
+It's most;u normal, the test don't check capabilities so if you don't
+support a feature the test case will fail.
 
---- a/net/hsr/hsr_netlink.c
-+++ b/net/hsr/hsr_netlink.c
-@@ -166,6 +166,8 @@ static int hsr_fill_info(struct sk_buff *skb, const struct net_device *dev)
- 		goto nla_put_failure;
- 	if (hsr->prot_version == PRP_V1)
- 		proto = HSR_PROTOCOL_PRP;
-+	else if (nla_put_u8(skb, IFLA_HSR_VERSION, hsr->prot_version))
-+		goto nla_put_failure;
- 	if (nla_put_u8(skb, IFLA_HSR_PROTOCOL, proto))
- 		goto nla_put_failure;
+> root@w-MS-7E16:~/net-next# NETIF=enp17s0f0 tools/testing/selftests/drivers/net/hw/rss_api.py
+> TAP version 13
+> 1..12
+> ok 1 rss_api.test_rxfh_nl_set_fail
+> ok 2 rss_api.test_rxfh_nl_set_indir
+> not ok 3 rss_api.test_rxfh_nl_set_indir_ctx
+> ok 4 rss_api.test_rxfh_indir_ntf
+> not ok 5 rss_api.test_rxfh_indir_ctx_ntf
+> ok 6 rss_api.test_rxfh_nl_set_key
+> ok 7 rss_api.test_rxfh_fields
+> not ok 9 rss_api.test_rxfh_fields_set_xfrm
+> ok 10 rss_api.test_rxfh_fields_ntf
+> not ok 11 rss_api.test_rss_ctx_add
+> not ok 12 rss_api.test_rss_ctx_ntf
+> # Totals: pass:6 fail:6 xfail:0 xpass:0 skip:0 error:0
 
-This will not report the HSR version if prot is PRP
+These all look fine. You don't support RSS contexts (yet) so the
+context tests can fail
+
+> root@w-MS-7E16:~/net-next# NETIF=enp17s0f0 LOCAL_V4="10.10.10.1" REMOTE_V4="10.10.10.2" REMOTE_TYPE=ssh
+> REMOTE_ARGS="root@192.168.14.104" tools/testing/selftests/drivers/net/hw/rss_ctx.py
+> root@192.168.14.104's password:
+> TAP version 13
+> 1..17
+> not ok 1 rss_ctx.test_rss_key_indir
+> ok 2 rss_ctx.test_rss_queue_reconfigure # SKIP Not enough queues for the test or qstat not supported
+> ok 3 rss_ctx.test_rss_resize
+> ok 4 rss_ctx.test_hitless_key_update # SKIP Test requires command: iperf3
+
+Please install iperf3 and retry just this one?
+
+> not ok 5 rss_ctx.test_rss_context
 
