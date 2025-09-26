@@ -1,147 +1,105 @@
-Return-Path: <netdev+bounces-226634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10DD6BA3404
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 11:53:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40BC6BA3531
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 12:17:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D8D71C037F6
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 09:53:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2186D2A3610
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 10:17:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C2429E114;
-	Fri, 26 Sep 2025 09:53:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28ABB2F260E;
+	Fri, 26 Sep 2025 10:16:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cas4uuwF"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="BxjfsKl5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED98429BDB9;
-	Fri, 26 Sep 2025 09:53:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21403233704;
+	Fri, 26 Sep 2025 10:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758880414; cv=none; b=EdUmem6yRr5OsRgifCCauUICkIysHQLK44WxcrsSpeiy16Q17yTn4+ag3JrW/XLcDFjVGmZC4adaT7OQeMuq6eqg7LJpZCjkwvxWbqJhiV5lyAtCmBCwMbd28eqGDy+DuQURils0ILvzAUhSEFZTlHTn5cBtdRE7KCcFhhk8y4c=
+	t=1758881808; cv=none; b=pllitqMuq1b7SCQHa2/0bgfrSFXM6P4ueqjwQIEuiHzDTSNWEwVW6+p9xxy6KR0wd6LhDKnAAeB6rUm9ZkRMjR5DZumu+VvcEa4dyl+7nojQyhv2Gm9yWxezEgLc8Z1p48S6mqPFSXBbl0tbYJCbh2cJkC4e1G1rmLrqKmAe1ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758880414; c=relaxed/simple;
-	bh=ABg3JBeJ+y7C2RlZnbDls+ChldG2KSsda0gRwyTvuI0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RwLjgw5LtCAfrtdEyKbRJGmLWK/nx9qdJrFs2CGS7spPWwyc1rBG6IXWfWaJABTYCWHIaxUYwM3NUFlQLg9o1dFbuFd/A6Ah0532a/CmBuGd6n2zfo9jh06PVB7D02z48gEQ9XsBRMVMmCfVugClnXABhBdmLzMXDPXde5nZu00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cas4uuwF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E7FCC4CEF4;
-	Fri, 26 Sep 2025 09:53:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758880413;
-	bh=ABg3JBeJ+y7C2RlZnbDls+ChldG2KSsda0gRwyTvuI0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cas4uuwFB7OKkpV/FnG+acSoxR41ScdeuIv7ja/onD16BlgqutbP/jnASuWyGWEdM
-	 8A4uYWl5EAcwpG98C1N4Ag1ZWbEMdhOxY1CwbS9Y093SnHo/Sin1nllvyrnAwoE4wY
-	 /ntmer5ATxSnRkDWeyQm9kDH6SgE7j1xrIeQQ5gV6+naE0yRVLQg3yN3zR5TwsOwPL
-	 ryAMFZtLb7ksQyThdnNDE0OO4R8B+WSD34eiH244lSeGsUy6BHHQtJY9/5HS8rzLa4
-	 CYBCEcCYH2R+CoaLVfxIQlXLRnqv3w1HQ1sfFRZDF2xZqoZrxOEgSX94ofgcD2uSFz
-	 e/lJOFgG/SQaA==
-Message-ID: <0608935c-1c1c-4374-a058-bc78d114c630@kernel.org>
-Date: Fri, 26 Sep 2025 11:53:25 +0200
+	s=arc-20240116; t=1758881808; c=relaxed/simple;
+	bh=FPM50SUFxE4R91GbidRBo+cPANFD0VljE4jNjCG8P8o=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=CvAq2QnYsRr8sHgPSSLYfvuZru6MyBCVoCcsv3+n0ZisqI6kac07CPrz19ocFdY3jAKa+5E88Wx4n1PiRjxDCjj5KiIRPWsET9IQdNh2quDm/srBEon2jC8AVlmNXGJDaFJhlDUO2WUqheI1bJW/M3MBMCH9ONtQubVZjllaBqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=BxjfsKl5; arc=none smtp.client-ip=43.163.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1758881493; bh=p/FWhBW97flJy6Joa5iUDeBbgx31a8n/Yv7gttstfUc=;
+	h=From:To:Cc:Subject:Date;
+	b=BxjfsKl5WlO3X4eQZLqVsKpg4F75JjuE90xXkVG0GaLejDbQ3XKRT4ECIHsjmJ3gJ
+	 aqqaZAG7nrRoW0a8h93fBDi3RPFYMXeg0WyKnjG6sRDJsP94hZnRQxxJBcyTPPcwn9
+	 xB5nXgjz3dTHuRpPRihYlfB3YKAGWoCWhnfrUwCQ=
+Received: from localhost.localdomain ([116.128.244.171])
+	by newxmesmtplogicsvrszb20-1.qq.com (NewEsmtp) with SMTP
+	id E96088A8; Fri, 26 Sep 2025 17:58:22 +0800
+X-QQ-mid: xmsmtpt1758880702tj7hgavkk
+Message-ID: <tencent_16B08FED03C970A0B8F75F16AE3D7A2F3305@qq.com>
+X-QQ-XMAILINFO: OJYupdf7O4WtOarT0umYcT9n2WOK4VNELW60YPTHZEKji+pviCYYHZR6mVbHYl
+	 Pfgs+o+CpTCnb6IkWZ7CPweVeSm1olyv6MW+OIYSEzfAdNuOMqZmIoaHJaduO5xhn95u01kuRJKe
+	 zAxQNh5RigmOXbBmwUB3TXhIhVvSktJkQjXuNEH+mmsSXpP6+0oEKUEicoRx/0tjO8kccRovlVmV
+	 kNYc7y7FxEDuH47dWg2Pntaie4sscqJNkOfXmiLc2SalGfdxV/Mg2T6K0dlFfGPyCYKU7m9foMv4
+	 c4db7W+TcXil8ltSJzaG/loywS4yG1NAr/fFYNLmdhupL55QomwtkT9cH1KkZ2cWLONYKoyYjFsP
+	 ZUhYz1iTvwfV6UJHx7opEzEfAPrPaLuM5j2g6r3wVuHMt7bf/lt1whDjgHAjEi461AjUHsntPd+o
+	 zDEpVWy51qSXwo7QqHreIlk1SzF8Ta4kv7N9QPk0RzCcf19AsXAqL/RLTJUWiOzN3qvX+Iu8l2aa
+	 0eqUoTbG643R3CM5XL+d7Y9eI6zY266su8MZQoIQXQPgPUiDOrufUr+wHYdXycnazBzWb7EQ4cME
+	 hZyTijukkO6FeeMWHakpJ4s6wqjPa3W1bTmDfY4pI4mNLIPrF6AUbNFp66sdxZuSyBOkGL0UEdl4
+	 4ZzItesOC8eQR5vQUorcMtyW6pOGn1fvK4y8iUb4vgI7/HdqbqqS2lJmg2BcZNTbC1oVhdtEOQia
+	 orBrc5Xap99pjam9OCxgzRTv/Qpdmn/C72tKGaHTMSqbVaf/aL3HdJ3YXc6caYsOSZ6P6/qdSCai
+	 QTcTSrp8M+ZUp124o9xdlyi7PXI8FdorRDRY9ti1KZJzAzWyjlHq6HVaceMnp1ptxA7gezu+cX7e
+	 Y8MkABxiYfTwAbR92iwmiOKQvaLAVTpNqD2pb9RfqbcNO9EETgnpvYT37INW6AEqr6cyYiKrYbcf
+	 DyCOO8ODyjtpiYYkdht/FLAdu1Izk/z7nSbBU7HVtGUjSxIjpxMxJ/1vy9BNgjarEvEk3werzcxo
+	 9JE51IutOeezRv657ACic8Wm53XvLbdr1yowBFwhGcg3FkXmuGN4NxUA4+nIQv8TcloTjNXQ==
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+From: Haofeng Li <920484857@qq.com>
+To: Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haofeng Li <13266079573@163.com>,
+	Haofeng Li <lihaofeng@kylinos.cn>
+Subject: [PATCH] net: ynl: return actual error code in ynl_exec_dump()
+Date: Fri, 26 Sep 2025 17:58:20 +0800
+X-OQ-MSGID: <20250926095820.2570975-1-920484857@qq.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC bpf-next v2 1/5] netlink: specs: Add XDP RX checksum
- capability to XDP metadata specs
-To: Lorenzo Bianconi <lorenzo@kernel.org>,
- Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-kselftest@vger.kernel.org
-References: <20250925-bpf-xdp-meta-rxcksum-v2-0-6b3fe987ce91@kernel.org>
- <20250925-bpf-xdp-meta-rxcksum-v2-1-6b3fe987ce91@kernel.org>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20250925-bpf-xdp-meta-rxcksum-v2-1-6b3fe987ce91@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+From: Haofeng Li <lihaofeng@kylinos.cn>
 
+Return the real error code 'err' instead of hardcoded -1 in the error
+path of ynl_exec_dump(). This provides better error information to
+callers for debugging and error handling.
 
-On 25/09/2025 11.30, Lorenzo Bianconi wrote:
-> +/**
-> + * bpf_xdp_metadata_rx_checksum - Read XDP frame RX checksum.
-> + * @ctx: XDP context pointer.
-> + * @ip_summed: Return value pointer indicating checksum result.
-> + * @cksum_meta: Return value pointer indicating checksum result metadata.
-> + *
-> + * In case of success, ``ip_summed`` is set to the RX checksum result. Possible
-> + * values are:
-> + * ``XDP_CHECKSUM_NONE``
-> + * ``XDP_CHECKSUM_UNNECESSARY``
-> + * ``XDP_CHECKSUM_COMPLETE``
-> + * ``XDP_CHECKSUM_PARTIAL``
-> + *
-> + * In case of success, ``cksum_meta`` contains the hw computed checksum value
-> + * for ``XDP_CHECKSUM_COMPLETE`` or the ``csum_level`` for
-> + * ``XDP_CHECKSUM_UNNECESSARY``. It is set to 0 for ``XDP_CHECKSUM_NONE`` and
-> + * ``XDP_CHECKSUM_PARTIAL``.
-> + *
+Signed-off-by: Haofeng Li <lihaofeng@kylinos.cn>
+---
+ tools/net/ynl/lib/ynl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-It is very important that we explain the meaning of XDP_CHECKSUM_NONE.
-As I hinted in other email, this also covers the non-existing FAIL case.
+diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
+index 2a169c3c0797..1a79adcc3ac0 100644
+--- a/tools/net/ynl/lib/ynl.c
++++ b/tools/net/ynl/lib/ynl.c
+@@ -1064,5 +1064,5 @@ int ynl_exec_dump(struct ynl_sock *ys, struct nlmsghdr *req_nlh,
+ 
+ err_close_list:
+ 	yds->first = ynl_dump_end(yds);
+-	return -1;
++	return err;
+ }
+-- 
+2.25.1
 
-If the hardware detects a wrong or failed checksum, the code still
-returns CHECKSUM_NONE. This is where we could consider adding a
-CHECKSUM_FAIL return value instead.
-The driver will also return CHECKSUM_NONE for the cases where it cannot
-parse the packet, and therefor naturally cannot calculate the checksum
-(given it doesn't know the protocol).
-
-Thus, for CHECKSUM_NONE we don't know if this is because of bad checksum
-or hardware don't know this packet type.  The philosophy is that 
-hardware might be wrong and cannot know of newer protocols, so it is 
-safer to let software handle recalculation of checksum for all negative 
-cases.
-
-Thus, if we want to use this in a (XDP) DDoS filter, then we need to
-combine RX-hash info about if hardware saw this as an L4 packet or not
-(see XDP_RSS_L4 / enum xdp_rss_hash_type).  If hardware saw this as e.g.
-XDP_RSS_L4_TCP (or XDP_RSS_L4_UDP) and rx-csum is CHECKSUM_NONE, then we
-know this was a wrong/failed checksum (given this hardware knows howto
-csum TCP).
-
-What do people think: Do we leave it as an exercise to the BPF-developer
-to deduct hardware detected a wrong/failed checksum, as that is possible
-as described above.  Or do we introduce a CHECKSUM_FAILED?
-
-An argument for sticking with CHECKSUM_NONE, is that it will make it
-much easier to add driver support, as we don't need to deal with any
-logic changes in the existing code.
-
-
-> + * Return:
-> + * * Returns 0 on success or ``-errno`` on error.
-> + * * ``-EOPNOTSUPP`` : means device driver does not implement kfunc
-> + * * ``-ENODATA``    : means no RX-timestamp available for this frame
-> + */
-> +__bpf_kfunc int bpf_xdp_metadata_rx_checksum(const struct xdp_md *ctx,
-> +					     u8 *ip_summed, u32 *cksum_meta)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
 
 
