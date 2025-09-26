@@ -1,172 +1,242 @@
-Return-Path: <netdev+bounces-226754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6B3CBA4BA9
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:59:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1777CBA4BE5
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 19:11:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80C204A2F1F
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:59:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AFC21BC7716
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 17:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7DFE30B539;
-	Fri, 26 Sep 2025 16:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4648B301026;
+	Fri, 26 Sep 2025 17:11:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="zPmry0cB"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="B3icIpfe"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f227.google.com (mail-yw1-f227.google.com [209.85.128.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BCC730597F;
-	Fri, 26 Sep 2025 16:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D8B15B0FE
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 17:11:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758905944; cv=none; b=Yr8fkLGha7rT3QW33QAjr3UhDAPoC1Q4NcziFFSbUAISUYVycV2DMKrx2poeQNN/RWq2UsMAiQfHuhI2fNqqcLe8yQA2Yh3MIgY0hATuja4iczmUDPW64SQTxUcAzdtlYeYSHPfz+5FE9EELNbOSlrDFyOBXPUABu0+ZYtMfjIQ=
+	t=1758906698; cv=none; b=UXNWRWtA+nK6exkhEjBzwhGnXmgBS0zepnS6JsofedOBPo3FOyDbISCNNc5CCZEVo/IfPQnk24MS4ED8WDz3Rh7eKffy/g/W3gGUnn3vfntEfNvNB2pLXqnnjy/mdINZuj94+hTH0Cm/v/eJxKb99OanECqyYf9IgmxMr8MyOyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758905944; c=relaxed/simple;
-	bh=Nv1y1fToKCLS5D56SGWW3Fu02+TSW9GRhBBGCOoj1CY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=L21c4xznzSwn8GBal+LEJ4pV8mLybURe7prtjrRzIba9W+jll5q8JWzPkLhQ/nAdCEKGrVD81Vcu1K8smFwnGISg2tCdy0Yvg/LGM+SJorZE5CF6VJrRXBqd+mSlSrnSUVAhOlwVZ0TrGQcRvtfwJwH5OgkZYc/nXuNfOfPm6Gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=zPmry0cB; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58QGwqoq1724430;
-	Fri, 26 Sep 2025 11:58:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1758905932;
-	bh=I+fvoCdpVjcpW6UNDPo2u0wUq3wToFlQcHSjQljHVmc=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=zPmry0cBQUeAHT8RLuJArVnm2ZntV5ECbGa/ln5JQhEw3Zz9drcNLP3yK/M2hZvTp
-	 FBk+5XfIN6xTdvygI6Y0dZ6jZM8c7tYLxvpO8vVxmfdnGz2LLMGYb2jSFZj6BBMToc
-	 xHhzpbs46h779CU+nnRpAJvjEgvKW/Fqd5HefI28=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58QGwq3q3562496
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Fri, 26 Sep 2025 11:58:52 -0500
-Received: from DLEE208.ent.ti.com (157.170.170.97) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Fri, 26
- Sep 2025 11:58:52 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE208.ent.ti.com
- (157.170.170.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Fri, 26 Sep 2025 11:58:52 -0500
-Received: from [10.249.139.123] ([10.249.139.123])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58QGwm3w1617584;
-	Fri, 26 Sep 2025 11:58:48 -0500
-Message-ID: <08a13fb0-dd12-491e-98af-ef67d55cc403@ti.com>
-Date: Fri, 26 Sep 2025 22:28:47 +0530
+	s=arc-20240116; t=1758906698; c=relaxed/simple;
+	bh=sQmZfbtulkySjSeVegznf2FDXPfAPv76mxj+IloQK8Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hYr2rGTeADAPxEFfnvIVdiOstEgZ5jZuInVYVXriQeZxrBz0CHlesgrjM388S1AjEEJAbX7+L0MK5QS7HAqEc4CecwdjJ0Se2shGd4SeGLLWLxaXdX6v4RYgE6Fdfz7SmZMpXuF+aOfU9rVKubCjfl1fMv6taGPqwEt35WbAdgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=B3icIpfe; arc=none smtp.client-ip=209.85.128.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-yw1-f227.google.com with SMTP id 00721157ae682-71d60528734so25108727b3.2
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 10:11:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758906696; x=1759511496;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=F+dZBJhlgPbdr4blYJgZXcVBNkB4L88ISsyPq3YMh+4=;
+        b=DQZ/yvKE/hd/vb1e7BryJrMclIe+lDNpZfwc897Tu2Zr1IjY8XE6R2cL1WoABZHNcR
+         dq2Lio/L9DIYEmQcbjMm0ULpnYAfb4e8HK0ppMpu6ZDhVH8MBOG5W7q5TcFJtK2tE+Wo
+         Y4Ug8ryGJ6oiplsuEiq5SpQImpOR489vPWYZlO456wFak15C1GBdiQn/xfU/21K4Q1sv
+         LWeZidwkkBQEM+sW59TxDhbzUvHAARJX/5l9obmR4234j3i11UxK92865wqK04oRAFGD
+         PzOaAnzjAzwJPgqbLvv276M9iEGxzQfp73fqTxQDxI/8sWC6UdzT/8OCW7QPEg7BcNxu
+         EXAg==
+X-Forwarded-Encrypted: i=1; AJvYcCXirOZ3MCwX+KgTZ9vjKmCmTSX4dHbR3BpctgIbzce/NUuJfWpCy5z8atwR6HmnYq4Qlf8h2ZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOca8aQaEaXNbCs+98S5GQKmahJsLICpiCEIy4CREkgXYjXL+6
+	MC2gBfj9Xa0dDkXFuG8/mslo2xRF1E4HD8ttNNKvZtWfifuwGD3JtL9gTzM+fFoOLpl6w1vI29f
+	2mm7u142n00GNP3VZwThg9y10SX0G5p0djab3RdVz/2Z1ZJmQK1kUhqHhRLQJOhsMYQkLMeauSC
+	tETfdDYjDD0DdqfZDvOo4n3yRbBnRvuR+C6Oz9G+GDJTxJEtXdn2HlmZLeJ0lxyK7ONHA839tHO
+	k8y8U8rcfFw4g==
+X-Gm-Gg: ASbGncu2E9PyTkg5rd19NjZR7jKxErx4bwFsVaESbGRqNBzwd9lple7FqwE0UnB1bYG
+	lvT8+YkxqnIL8hwmoNA/WOAXH7kBnB08MINKfyFj7zp9wRizbpzhKwGNfPfsIT9fySuL9ePsuRV
+	+iTZMXx3lE39BM7IV1Rb7LmAepy0BntqVMPL4SqRyb0+qCyfgbJmzMYFLvGW2PoaFJ6DmYL6ZqJ
+	FWi0w+kFV+TYS6xm1IU6L9azS33kyLc9BiLmXdbHmHRYiXWMaMXg0/8+5D1UXeEz6cwlTmAOech
+	cVkRHurWCzqZ8FP5FFcFxh+iUCVQ39TiVEb19kLeMlJ5uNLhfT5S+GRkGuTvJHeV0mLo9U61jKK
+	nZFwtcqaVOs6AVeoL237cbmwct4GwXEoPEfnlIP9QiMQa2yIAzkAHdgu7N2aZwdrCtcrpmklC2Z
+	Ig3w==
+X-Google-Smtp-Source: AGHT+IEQ4O2l0eLpWWIPmAcZ4vhin5bo69vdn/lQ5f79xUFS570WXXCamMIxkv2FiPeG7OXchX+0LrAZzy64
+X-Received: by 2002:a05:690c:6087:b0:739:634e:b430 with SMTP id 00721157ae682-763f87770b3mr73629377b3.7.1758906695438;
+        Fri, 26 Sep 2025 10:11:35 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-121.dlp.protect.broadcom.com. [144.49.247.121])
+        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-6361e9416d5sm234034d50.14.2025.09.26.10.11.34
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 26 Sep 2025 10:11:35 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b55153c5ef2so1729147a12.0
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 10:11:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1758906694; x=1759511494; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=F+dZBJhlgPbdr4blYJgZXcVBNkB4L88ISsyPq3YMh+4=;
+        b=B3icIpfevkYBQr3E6xmrgZypXfzHMlO09H53+nBZMY/TLUJ9ArIE6dv1/Dh1hXM9p/
+         HcWw+E7UXvoTCboBjGN3pM/ovawSTitD05SYxLjzRzrH3kcNPgeWwp04Qr/mazS8nCGO
+         SCjKUqrUOlHTOfxVa2CxDqH7LqdXhpLXCbtcg=
+X-Forwarded-Encrypted: i=1; AJvYcCXt6vQqp271ZnF+wuvrefeN4tp2LnhjXiWGlN8FqW2WNstZiZTSBiIC0iSLoLotET30VEqs9F4=@vger.kernel.org
+X-Received: by 2002:a17:90b:1a8b:b0:32e:59ef:f403 with SMTP id 98e67ed59e1d1-3342a299099mr9208989a91.17.1758906693944;
+        Fri, 26 Sep 2025 10:11:33 -0700 (PDT)
+X-Received: by 2002:a17:90b:1a8b:b0:32e:59ef:f403 with SMTP id
+ 98e67ed59e1d1-3342a299099mr9208960a91.17.1758906693534; Fri, 26 Sep 2025
+ 10:11:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: netcp: Fix crash in error path when DMA channel open
- fails
-To: Simon Horman <horms@kernel.org>
-CC: Nishanth Menon <nm@ti.com>,
-        =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?=
-	<u.kleine-koenig@baylibre.com>,
-        Paolo Abeni <pabeni@redhat.com>, Jakub
- Kicinski <kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <s-vadapalli@ti.com>
-References: <20250926150853.2907028-1-nm@ti.com>
- <aNa7rEQLJreJF58p@horms.kernel.org>
- <ef2bd666-f320-4dc5-b7ae-d12c0487c284@ti.com>
- <aNbCgK76kQqhcQY2@horms.kernel.org>
-Content-Language: en-US
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-In-Reply-To: <aNbCgK76kQqhcQY2@horms.kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+References: <20250926085911.354947-1-pavan.chebbi@broadcom.com>
+ <20250926085911.354947-5-pavan.chebbi@broadcom.com> <5f581053-b231-4f37-91dc-4f2fd8c571a4@intel.com>
+In-Reply-To: <5f581053-b231-4f37-91dc-4f2fd8c571a4@intel.com>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Fri, 26 Sep 2025 22:41:22 +0530
+X-Gm-Features: AS18NWBCxZkGewpzCNyKF6JbZlR59xuNZzNvmuf4NnxK91jSZZtNqchqW8SYO4o
+Message-ID: <CALs4sv3P_W=ipS5MWKQrThDkPXmdFnfxRroDiZXbdrQXXqetsQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 4/5] bnxt_fwctl: Add bnxt fwctl device
+To: Dave Jiang <dave.jiang@intel.com>
+Cc: jgg@ziepe.ca, michael.chan@broadcom.com, saeedm@nvidia.com, 
+	Jonathan.Cameron@huawei.com, davem@davemloft.net, corbet@lwn.net, 
+	edumazet@google.com, gospo@broadcom.com, kuba@kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch, 
+	selvin.xavier@broadcom.com, leon@kernel.org, 
+	kalesh-anakkur.purayil@broadcom.com
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000b45d39063fb760ed"
 
-On 26/09/25 10:12 PM, Simon Horman wrote:
-> On Fri, Sep 26, 2025 at 09:57:02PM +0530, Siddharth Vadapalli wrote:
->> On 26/09/25 9:43 PM, Simon Horman wrote:
->>> On Fri, Sep 26, 2025 at 10:08:53AM -0500, Nishanth Menon wrote:
->>>> When knav_dma_open_channel() fails in netcp_setup_navigator_resources(),
->>>> the rx_channel field is set to an ERR_PTR value. Later, when
->>>> netcp_free_navigator_resources() is called in the error path, it attempts
->>>> to close this invalid channel pointer, causing a crash.
->>>>
->>>> Add a check for ERR values to handle the failure scenario.
->>>>
->>>> Fixes: 84640e27f230 ("net: netcp: Add Keystone NetCP core driver")
->>>> Signed-off-by: Nishanth Menon <nm@ti.com>
->>>> ---
->>>>
->>>> Seen on kci log for k2hk: https://dashboard.kernelci.org/log-viewer?itemId=ti%3A2eb55ed935eb42c292e02f59&org=ti&type=test&url=http%3A%2F%2Ffiles.kernelci.org%2F%2Fti%2Fmainline%2Fmaster%2Fv6.17-rc7-59-gbf40f4b87761%2Farm%2Fmulti_v7_defconfig%2BCONFIG_EFI%3Dy%2BCONFIG_ARM_LPAE%3Dy%2Bdebug%2Bkselftest%2Btinyconfig%2Fgcc-12%2Fbaseline-nfs-boot.nfs-k2hk-evm.txt.gz
->>>>
->>>>    drivers/net/ethernet/ti/netcp_core.c | 2 +-
->>>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/ti/netcp_core.c b/drivers/net/ethernet/ti/netcp_core.c
->>>> index 857820657bac..4ff17fd6caae 100644
->>>> --- a/drivers/net/ethernet/ti/netcp_core.c
->>>> +++ b/drivers/net/ethernet/ti/netcp_core.c
->>>> @@ -1549,7 +1549,7 @@ static void netcp_free_navigator_resources(struct netcp_intf *netcp)
->>>>    {
->>>>    	int i;
->>>> -	if (netcp->rx_channel) {
->>>> +	if (!IS_ERR(netcp->rx_channel)) {
->>>>    		knav_dma_close_channel(netcp->rx_channel);
->>>>    		netcp->rx_channel = NULL;
->>>>    	}
->>>
->>> Hi Nishanth,
->>>
->>> Thanks for your patch.
->>>
->>> I expect that netcp_txpipe_close() has a similar problem too.
->>>
->>> But I also think that using IS_ERR is not correct, because it seems to me
->>> that there are also cases where rx_channel can be NULL.
->>
->> Could you please clarify where rx_channel is NULL? rx_channel is set by
->> invoking knav_dma_open_channel().
-> 
-> Hi Siddharth,
-> 
-> I am assuming that when netcp_setup_navigator_resources() is called, at
-> least for the first time, that netcp->rx_channel is NULL. So any of the
-> occurrence of 'goto fail' in that function before the call to
-> knav_dma_open_channel().
+--000000000000b45d39063fb760ed
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I missed this. Thank you for pointing this out.
+On Fri, Sep 26, 2025 at 9:31=E2=80=AFPM Dave Jiang <dave.jiang@intel.com> w=
+rote:
+>
+>
+>
 
-> 
->> Also, please refer to:
->> https://github.com/torvalds/linux/commit/5b6cb43b4d62
->> which specifically points out that knav_dma_open_channel() will not return
->> NULL so the check for NULL isn't required.
->>>
->>> I see that on error knav_dma_open_channel() always returns ERR_PTR(-EINVAL)
->>> (open coded as (void *)-EINVAL) on error. So I think a better approach
->>> would be to change knav_dma_open_channel() to return NULL, and update callers
->>> accordingly.
->>
->> The commit referred to above made changes to the driver specifically due to
->> the observation that knav_dma_open_channel() never returns NULL. Modifying
->> knav_dma_open_channel() to return NULL will effectively result in having to
->> undo the changes made by the commit.
-> 
-> I wasn't aware of that patch. But my observation is that the return value
-> of knav_dma_open_channel() is still not handled correctly. E.g. the bug
-> your patch is fixing.  And I'm proposing an alternate approach which I feel
-> will be less error-prone.
+> > +     if (msg->num_dma) {
+> > +             if (msg->num_dma > MAX_NUM_DMA_INDICATIONS) {
+> > +                     dev_err(dev, "DMA buffers exceed the number suppo=
+rted\n");
+> > +                     err =3D -EINVAL;
+> > +                     goto free_msg_out;
+>
+> Shouldn't rpc_in.resp get freed with an error returned? It's leaking rpc_=
+in.resp on all the error paths from this point onward.
+>
+> DJ
 
-Ok. If I understand correctly, you are proposing that the 'error codes' 
-returned by knav_dma_open_channel() should be turned into a dev_err() 
-print for the user and knav_dma_open_channel() should always return NULL 
-in case of failure and a pointer to the channel in case of success. Is 
-that right?
+Isn't the caller taking care of it? The fw_rpc is called as:
+void *outbuf __free(kvfree) =3D fwctl->ops->fw_rpc()
+I was expecting that outbuf will be freed once it goes out of scope,
+regardless of success or error?
+
+--000000000000b45d39063fb760ed
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+/HTPxpDrr4vzZL0yoc9XefyCbdiwfyFl99oBekp+1ZxXc5bZsVhRPVyEWFtCys66nqu5cU2GPT3a
+ySQEHOtIKyGGgzMVvitOzO2suQkoMvu/swsftfgCY/PObdlBZhv0BD97+WwR6CQJh/YEuDDEHYCy
+NDeiVtF3/jwT04bHB7lR9n+AiCSLr9wlgBHGdBFIOmT/XMX3K8fuMMGLq9PpGQEMvYa9QTkE9+zc
+MddiNNh1xtCTG0+kC7KIttdXTnffisXKsX44B8ECAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
+oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
+Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
+BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
+IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
+FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
+hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
+BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUxJ6fps/yOGneJRYDWUKPuLPk
+miYwDQYJKoZIhvcNAQELBQADggIBAI2j2qBMKYV8SLK1ysjOOS54Lpm3geezjBYrWor/BAKGP7kT
+QN61VWg3QlZqiX21KLNeBWzJH7r+zWiS8ykHApTnBlTjfNGF8ihZz7GkpBTa3xDW5rT/oLfyVQ5k
+Wr2OZ268FfZPyAgHYnrfhmojupPS4c7bT9fQyep3P0sAm6TQxmhLDh/HcsloIn7w1QywGRyesbRw
+CFkRbTnhhTS9Tz3pYs5kHbphHY5oF3HNdKgFPrfpF9ei6dL4LlwvQgNlRB6PhdUBL80CJ0UlY2Oz
+jIAKPusiSluFH+NvwqsI8VuId34ug+B5VOM2dWXR/jY0as0Va5Fpjpn1G+jG2pzr1FQu2OHR5GAh
+6Uw50Yh3H77mYK67fCzQVcHrl0qdOLSZVsz/T3qjRGjAZlIDyFRjewxLNunJl/TGtu1jk1ij7Uzh
+PtF4nfZaVnWJowp/gE+Hr21BXA1nj+wBINHA0eufDHd/Y0/MLK+++i3gPTermGBIfadXUj8NGCGe
+eIj4fd2b29HwMCvfX78QR4JQM9dkDoD1ZFClV17bxRPtxhwEU8DzzcGlLfKJhj8IxkLoww9hqNul
+Md+LwA5kUTLPBBl9irP7Rn3jfftdK1MgrNyomyZUZSI1pisbv0Zn/ru3KD3QZLE17esvHAqCfXAZ
+a2vE+o+ZbomB5XkihtQpb/DYrfjAMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
+ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
+MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCBXO3kA
+0bhdeOIePSeKLHcIMh24CJfMpCFHhy5lRaPV0TAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNTA5MjYxNzExMzRaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCLlVTjx19hxHsee47EZON49nt5vYmOOnmZy75+4zvk
+zlar3RhIj3mRzsc9B0IJVWgm4Vi5IixNgdGpYLlANN7r47jhvJM5wevt7ThxhzPt1xlUIoX8Tg33
+qMz4RDxqCkb5cU5fEK+2g2H0f7WzMfW5iOmwf+pKk221MpcQR4TajfJ+IkawKkESJBOMAYtADulx
+vmwE3dz6doFzMZ8pFj2m2Of5P9dxA95ze8LgLjaXIQGjuxCCu4CuqDe1bXENc21HVsNszdxognNU
+pV6x1kHrIAtY2n7NXKZGgIUUv1fARHjUjoJpxLJ9/qPIGdoY4fT24VU6Ebg15v8lNsv6ukHR
+--000000000000b45d39063fb760ed--
 
