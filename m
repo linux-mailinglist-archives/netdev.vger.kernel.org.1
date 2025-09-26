@@ -1,146 +1,130 @@
-Return-Path: <netdev+bounces-226752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC559BA4B76
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:54:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0684BA4B8F
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:56:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CA022A0B38
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:54:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1564C1C229D9
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:57:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F62307AE9;
-	Fri, 26 Sep 2025 16:53:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE89308F16;
+	Fri, 26 Sep 2025 16:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AKxxMsJS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CoWTEHTR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F69267B07
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 16:53:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5233A1D86DC
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 16:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758905636; cv=none; b=DY4EkTad45ePbF5BYKClm26EwsygWBQc7pygVWTwpRjf8+VA4Yywff5AV1xvaj5Uy/rYzyjVhf2TD36AgHT/4Yu/03xJRbkVmBOAeHBbhYmdWZJYxXwr2+6DfJlZV0QCbTOxQ2mhZ4oGzc4tHhw+Xq1/YyfjmXAr2SbFg0X8Vn0=
+	t=1758905795; cv=none; b=c1asUdmlchnCuMfelcVxoBErGFmLQN9v1Xuk8gs1M04jj4zDO4WNM+PCvnJeTlDmyKvsKHxP2MRbbjzs6AlNuC7cg84L9sr6GiAr9ah/uVKtYhIt+8E2VGK6CCOFfE2176dllhOZ5bxy6WQJ80MdfrNeQFl0y4+j4dzCa2Y3kNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758905636; c=relaxed/simple;
-	bh=LwOJpW+sePplAG4eX66QcVDUAwVdGU5QRYA0F0ndEt0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mP4NsobHQtXs43JjqYzB5nN24GZVdHCsJLFrUwJxIYoyl1pPjkiaUCVEnV2i1xQ1EqsL8eEiE1JBnyDSYgEOvoj62spzYUFXNTnWxzQby9rW//hmKXa8E/0jvjLf8M0rAAz5WYE7Z0guiF2IhsryJXCDRPcKovz+lR6hVnHjboQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AKxxMsJS; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <bf53fe2d-366f-46eb-bd9c-5820ebd87db7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758905623;
+	s=arc-20240116; t=1758905795; c=relaxed/simple;
+	bh=pXbsgR7Ss1aZW3LlfLUf8FaVnZ9Gf2yLcMLB47EnsOc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JFNeaeXn2bwPbTnKAtzyHh6/vo8j5CDpgEv3WB37quNHTIzk8DBggHDxEgr2K9P6ItZKSyuUTRg6dWi75m8gOUvzH3yEHfWr7PJ2jzNRKA70bBPnKT0K6FeOdkJgCreIXFqTOm0Qq4uI6j/wh3wqz1Ce25oomXFkyUMbeR6ty5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CoWTEHTR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758905793;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=FxQha2U3givTWX9Jey3JjHcMVKjbxrYi3ZLCeQ5vxsw=;
-	b=AKxxMsJSpuanP0Rm7dhGi4SoTEpl2Csgqr0/89nSGlKItU958szk8s8HqBwyGYTK2X/ocl
-	QcfbfZFc758ls8azpu84GabvqgIg5v3/V8ulCKxVJaATI9UZaw1iaMT5F0T1UUuvJmP/gI
-	1DtZZTIGpDgZ7CJ5M+z5vSAPSlArCN8=
-Date: Fri, 26 Sep 2025 09:53:33 -0700
+	bh=pXbsgR7Ss1aZW3LlfLUf8FaVnZ9Gf2yLcMLB47EnsOc=;
+	b=CoWTEHTRcUr2vMLRYOgll24MCESPKgM8YVcuHG9vO4n8ybwBQdad2WOyTL1s8zgs8CEJB7
+	dDdb8fbUXISwP1V3+6VltuYIkqZQ65Wt0bKsQgfBk0F02MOky+7aGE+o+goREUyQFaGMq/
+	uAugh4RoT+k0yyiIakXVFC+fwU3Os3I=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-92-0BTyj1FmMaaYVenxEw2o2w-1; Fri, 26 Sep 2025 12:56:32 -0400
+X-MC-Unique: 0BTyj1FmMaaYVenxEw2o2w-1
+X-Mimecast-MFC-AGG-ID: 0BTyj1FmMaaYVenxEw2o2w_1758905791
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-32ee4998c50so2133398a91.3
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 09:56:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758905791; x=1759510591;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pXbsgR7Ss1aZW3LlfLUf8FaVnZ9Gf2yLcMLB47EnsOc=;
+        b=oNiLXS24KOQylut6o5RE5mJblFB7qrGbAGAPHIRb7gqATogvJvKffvTcgVUHpULbTU
+         N2Y6QN7F5lte/FOJVh5ftFglJGaaO8zLO0GIXiAq5/A55DXXHoM6Tn4MYzZRyPxuQmd8
+         zNs2aMuxhqYwr+6FC1K5dK4x6QVVwqRbCUhVqeS5nsNvt8oMAInguAqKaHTyZuXqZBY3
+         XAL1e5/1FYywwzoAaWu88HvAupEON+dGaBNZypAOZFnUOmoNI5W8Z+U5ZtGdN/mesKPv
+         QPK5d9Mtn30R7zwWQpkXBfBNYudC1UvG9jVhRxJQVXc3fExx8ZkAjZZmU9hfUnSJlm2D
+         0ZhA==
+X-Forwarded-Encrypted: i=1; AJvYcCWX479v9ljZG6MZeBgIvgZDqz7ClPxGECOGkM1csZth1SHafGbd17ohIycfu/VdkAuj31Rt68s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9jvsMRhhWiafcXpyt/x7NqjltOmHhpl1fQVidozGNpBWwHplr
+	Cn1eBJStEcI99/Tx1a9ZuLANxP0vRta94vSha7hpOIfozdpZhaEVeYd6XQKLqqLneOmyeC86Tq0
+	nFy31iu31bzFqeoiS+B+MtkRHjMqnZaynUNC9XMLBQbgDeK0+2T1UkdXrFZcwEqCMlYMHkHU2Oa
+	rpnq1mOIrM+T/1CQALxR7cL9VXqpxYp3tF
+X-Gm-Gg: ASbGncs/+ar1c6RdN7bN4yEEQO9mOWuTDQ8yx+mSR6wmn+1PCNEq1uNje30PGcVRg7u
+	dyDdO6ZigKYtO7La2X57qx2DjcDcobf00b30p0FNNjFe7GpueTW93x0zlx5ftPEndh1fEPmUkNZ
+	/nvLj0J1WC0Tru8d0i
+X-Received: by 2002:a17:90b:1c8e:b0:330:6d2f:1b5d with SMTP id 98e67ed59e1d1-3342a2e3a0amr9010759a91.26.1758905790894;
+        Fri, 26 Sep 2025 09:56:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHe/T2nb02ygPzWQlJc91OzCWfWy7tzKbeCqK0AzZtfTw4rJhgRJgzOCPPd+wuatdh/bS3alm4U9h9urtacQQ4=
+X-Received: by 2002:a17:90b:1c8e:b0:330:6d2f:1b5d with SMTP id
+ 98e67ed59e1d1-3342a2e3a0amr9010727a91.26.1758905790446; Fri, 26 Sep 2025
+ 09:56:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next] libbpf: fix error when st-prefix_ops and ops
- from differ btf
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- pabeni@redhat.com, song@kernel.org, sdf@google.com, haoluo@google.com,
- yhs@fb.com, edumazet@google.com, john.fastabend@gmail.com,
- kpsingh@kernel.org, jolsa@kernel.org, mjambigi@linux.ibm.com,
- wenjia@linux.ibm.com, wintera@linux.ibm.com, dust.li@linux.alibaba.com,
- tonylu@linux.alibaba.com, guwen@linux.alibaba.com, bpf@vger.kernel.org,
- davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
- sidraya@linux.ibm.com, jaka@linux.ibm.com
-References: <20250926071751.108293-1-alibuda@linux.alibaba.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20250926071751.108293-1-alibuda@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com> <wcts7brlugr337mcdfbrz5vkhvjikcaql3pdzgke5ahuuut37v@mgcqyo2umu7w>
+In-Reply-To: <wcts7brlugr337mcdfbrz5vkhvjikcaql3pdzgke5ahuuut37v@mgcqyo2umu7w>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Fri, 26 Sep 2025 18:56:19 +0200
+X-Gm-Features: AS18NWDruDib3lxkmBnMwisbhI6jtN_YtNKGNRjNW1-ckH59RRm0Bu1PSqLse0I
+Message-ID: <CAGxU2F6pZ7Bp53M3fTpSGDQYnrfxrttQc5bDmQLQX0cseW2A_Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 0/9] vsock: add namespace support to vhost-vsock
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, 
+	Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, berrange@redhat.com, 
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 9/26/25 12:17 AM, D. Wythe wrote:
-> When a module registers a struct_ops, the struct_ops type and its
-> corresponding map_value type ("bpf_struct_ops_") may reside in different
-> btf objects, here are four possible case:
-> 
-> +--------+---------------+-------------+---------------------------------+
-> |        |bpf_struct_ops_| xxx_ops     |                                 |
-> +--------+---------------+-------------+---------------------------------+
-> | case 0 | btf_vmlinux   | bft_vmlinux | be used and reg only in vmlinux |
+On Fri, 26 Sept 2025 at 15:53, Stefano Garzarella <sgarzare@redhat.com> wrote:
+>
+> Hi Bobby,
+>
+> On Tue, Sep 16, 2025 at 04:43:44PM -0700, Bobby Eshleman wrote:
+> >This series adds namespace support to vhost-vsock and loopback. It does
+> >not add namespaces to any of the other guest transports (virtio-vsock,
+> >hyperv, or vmci).
+>
+> Thanks for this new series and the patience!
+> I've been a bit messed up after KVM Forum between personal stuff and
+> other things. I'm starting to review and test today, so between this
+> afternoon and Monday I hope to send you all my comments.
 
-s/bft/btf/
+Okay, I reviewed most of them (I'll do the selftest patches on Monday)
+and I think we are near :-)
 
-> +--------+---------------+-------------+---------------------------------+
-> | case 1 | btf_vmlinux   | mod_btf     | INVALID                         |
-> +--------+---------------+-------------+---------------------------------+
-> | case 2 | mod_btf       | btf_vmlinux | reg in mod but be used both in  |
-> |        |               |             | vmlinux and mod.                |
-> +--------+---------------+-------------+---------------------------------+
-> | case 3 | mod_btf       | mod_btf     | be used and reg only in mod     |
-> +--------+---------------+-------------+---------------------------------+
-> 
-> Currently we figure out the mod_btf by searching with the struct_ops type,
-> which makes it impossible to figure out the mod_btf when the struct_ops
-> type is in btf_vmlinux while it's corresponding map_value type is in
-> mod_btf (case 2).
-> 
-> The fix is to use the corresponding map_value type ("bpf_struct_ops_")
-> as the lookup anchor instead of the struct_ops type to figure out the
-> `btf` and `mod_btf` via find_ksym_btf_id(), and then we can locate
-> the kern_type_id via btf__find_by_name_kind() with the `btf` we just
-> obtained from find_ksym_btf_id().
-> 
-> With this change the lookup obtains the correct btf and mod_btf for case 2,
-> preserves correct behavior for other valid cases, and still fails as
-> expected for the invalid scenario (case 1).
-> 
-> Fixes: 590a00888250 ("bpf: libbpf: Add STRUCT_OPS support")
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> Acked-by: Andrii Nakryiko <andrii@kernel.org>
-> ---
->   tools/lib/bpf/libbpf.c | 37 ++++++++++++++++++-------------------
->   1 file changed, 18 insertions(+), 19 deletions(-)
-> 
-> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
-> index 5161c2b39875..a93eed660404 100644
-> --- a/tools/lib/bpf/libbpf.c
-> +++ b/tools/lib/bpf/libbpf.c
-> @@ -1018,35 +1018,34 @@ find_struct_ops_kern_types(struct bpf_object *obj, const char *tname_raw,
->   	const struct btf_member *kern_data_member;
->   	struct btf *btf = NULL;
->   	__s32 kern_vtype_id, kern_type_id;
-> -	char tname[256];
-> +	char tname[256], stname[256];
->   	__u32 i;
->   
->   	snprintf(tname, sizeof(tname), "%.*s",
->   		 (int)bpf_core_essential_name_len(tname_raw), tname_raw);
->   
-> -	kern_type_id = find_ksym_btf_id(obj, tname, BTF_KIND_STRUCT,
-> -					&btf, mod_btf);
-> -	if (kern_type_id < 0) {
-> -		pr_warn("struct_ops init_kern: struct %s is not found in kernel BTF\n",
-> -			tname);
-> -		return kern_type_id;
-> -	}
-> -	kern_type = btf__type_by_id(btf, kern_type_id);
-> +	snprintf(stname, sizeof(stname), "%s%.*s", STRUCT_OPS_VALUE_PREFIX,
-> +		 (int)strlen(tname), tname);
+Just a general suggestion, please spend more time on commit description.
+All of them should explain better the reasoning behind. This it will
+simplify the review, but also future debug.
 
-nit. strlen(tname) should not be needed. Others lgtm.
-
-Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
-
+Thanks and have a nice weekend!
+Stefano
 
 
