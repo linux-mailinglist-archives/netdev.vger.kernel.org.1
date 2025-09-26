@@ -1,142 +1,167 @@
-Return-Path: <netdev+bounces-226645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36370BA385F
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 13:45:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F66BA3869
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 13:46:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 645ED7A548D
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 11:44:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B26D328035
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 11:46:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC89A2BDC2B;
-	Fri, 26 Sep 2025 11:45:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DD02DC798;
+	Fri, 26 Sep 2025 11:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hyWpuq3T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ePS03jgo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746B01C8629;
-	Fri, 26 Sep 2025 11:45:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B8B2DC784
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 11:46:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758887140; cv=none; b=qlWlpYFSddE1frP91y7ufzsc+/W0w6ujIYMB6Z10UNPJFMr0SAZQSiJEs0+DqZk2mSvopu6vHfEphGGKbTfs9FRXbbdBfJKJ3bujQmF9ahZHd18evqs7rIjhZ7cISnQ/SxsLOzCxrRWpmHmIw9VIoYYTOwmdXQqa3CDZfIr9+CI=
+	t=1758887162; cv=none; b=OljJD7k/XnIEJqCRAaexS/ls4uzB8FEIuMaPtY74m32Uw3/+0k2+OXDZekjweE4opD8Y7XOfXE973m91wCcOe+Cm4blIZy5MGhYRobsr10Op+sAHnCojINbOSf3HQ03xXyDDulf4p7QU4gJTvTnpg8HKe/o1zRUi5JxSstp28sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758887140; c=relaxed/simple;
-	bh=3p/zksHoTQfao3BPvqFX4RMOp4cSxk0GEr/+msJfFRE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q3SBJX8jflN9hqgCjJ07heMiDRVNNBPHhbZeUACeJMaevXwpsvhSUOV6yTrnO8IbzU0Nfgz0YXGX/7DS9X5HZ1CYwK87a/+kRbKHMQEpi5qcdmcSnh7wD3xlDgvC/NUVT2v45yAFKmOsIYvvo9tjspuJV9FjjO+QnYYB0Mw4XrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hyWpuq3T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8DB4C4CEF4;
-	Fri, 26 Sep 2025 11:45:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758887139;
-	bh=3p/zksHoTQfao3BPvqFX4RMOp4cSxk0GEr/+msJfFRE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hyWpuq3TyODWW5FSWDcR6mPPW6c11FJrxyoey2lMUD/yZ0UFSEYHAiFAk/xp7WG9A
-	 CeLM0BjMD24Y1L4FfgGtadPYCUvhCKwQ9KHWQio5BYvBEHKEwTwGe6NgFTNL89IQRN
-	 i2BjaCst9Au5sGPgjgod/q2qXjZKPHW0cz9Pp+8E4VbUGd81sV+RXRfiS0RB/hjplq
-	 FjVmZvvrGNfB6fE74uL3xd2o0RiegodV+9X9znJyYr6ej5YKnENCcRYw3r14kPAvGq
-	 5rFohfxbDzVNLSUo6ehNbbV1OL2e08w+ztgk6whnYtcTO48zZAPeI4Xqnlf6LYM+FU
-	 YE/0qZjgKYs2g==
-Message-ID: <fdb8a364-a12d-4c1f-9591-9dac3e27b321@kernel.org>
-Date: Fri, 26 Sep 2025 13:45:29 +0200
+	s=arc-20240116; t=1758887162; c=relaxed/simple;
+	bh=1id3B6Wi8UowOcZ+9wbUIN5SOAeHkmeYMI59q8iHO5g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hSD0fxEGlu3gA1xc3UJbahX4TvOjo9XWW3NNpFnQ2E8yuWLN9BPo3owvFpKqYJmxgNosssu2/0MbhiaSXne2xdkjCPuWRkXfOAec9rZUTKVp7gqDVKRJ05mWquxIR66707wxfuevE/iuM427qqoZR1y1pZD/LokADTi4geguLHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ePS03jgo; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-46e430494ccso593295e9.1
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 04:46:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758887159; x=1759491959; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WkRDFqbG55HD/5PHsPObmdh+Ov28CTpaGeY2bB6QWYU=;
+        b=ePS03jgodCHcncw6WdQZN97PFUkWxHq37GAd30XqRk4VEJoIJRQ2uMoCR64F50xUKF
+         k89OFyAVcAimFUApqNSsDTTXVMnH+BeuVBjSUiQl8/8QXNM0EYavxKwM50ugiiDd+NLb
+         lM+420BVEJSxyYqNYibfWXSsE995hYieW86zH4/De0VUm8ByI9441jcAlT43shGqq9T4
+         aX+P/6PN59HRmHIgCc8yQ9PN7VBQnW0nQvz9zFX74mBGa5ey9NKIXYyOZGYGpVkjGE09
+         0uCLv3rWZB7LlgRZkxmCDtZjg01SWg8Kj1rHpDFEjv2xBE4Mbc4S6Op3vSsWQeZo/W04
+         kdAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758887159; x=1759491959;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WkRDFqbG55HD/5PHsPObmdh+Ov28CTpaGeY2bB6QWYU=;
+        b=vtlOZzlyyKEAFDiiqQbrASG8vjD8hp6NZr+YXL/pyiR0dhjxGIeJ0rz3u5Gg4ktFMm
+         ldRFeKD1rKWBPyg5cCtX0QxdLX2Gc7MoaOryAl/o2nOHB1yRSVE/hv4OP2+Veelsly9G
+         fXzAw2dc+ZvQ1/BKJzg+T9iIrKEYGaQBncCqKI5zN9+DDq4x1JzVnXfOJj34veNPO0hm
+         9loWIx0fTHsX+rtLPGKLr+a4tje+IpifjO+Efc28+Pp5OeI/t6t7Hm9TUAf1HvjQbMOK
+         J261lbt1BLZiQHbbQt/YanRQNx7N2qLWwJxq2uLf3qzHQX9/HC4gjlmxpfDDYrdNdRRk
+         kiaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVNVLKYL6s15eckNmJSI25F8HnrcTZvl9HXV5beKx0pQB+2At/29SuT8EYXn1qDqza7byQxGZM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyw62Wtb4q082uW0VxI+eb8tgegwPuVac6thtb4+tWOweuXHWes
+	sc8JNmbClFnDRNFLqWtoCOru6JHoja80QO9E+3ks9+lZeYwlVHK28RYe
+X-Gm-Gg: ASbGnct26iQ8oMVS38KnyvQoa0yFXFva+KeFDAjEuLF3hrx9vJTDQ7ijLTmKsByEBiA
+	SgndLhNOuZiNMhu0UPFyLhcoWCEfh3f3iABX0n6aeW0h8GqjJkUYRZWubAq6YIBQiG4nxS1b97m
+	gRZdcgWwaVALHbr0JUDMPbaCHu28FUwxeqVRz0Qgq8Sn40yPBVxuuEDGXgbXKHT4bhW2HISlU3q
+	eFZwfg5IjOr6cWCXZ8UJIs9BMwmlOLrfHmb+sRB/egJRp877hDxxk9bW1SqpXxT9O6fTr296qPA
+	1+3t+X1pN7lKuFc4HoLQ0TCoE1m09hiuibiOcOtDzgk3vBbVYpOsrs3W7TXb8rSZZh8BZIocg52
+	HppiIf6BLaAVb+i/FflV7423o1o2E37/NqJdoZIpivqfDWkfo1zSyIMVadeuhHN0K
+X-Google-Smtp-Source: AGHT+IEPTFDb685fmiqtI/zbxG32d7v3MRP+VRk71KQ8OOHsQCWx3c0SFbrsAeMCnBPznWcIWNgGnA==
+X-Received: by 2002:a05:600d:15a:20b0:46e:1e31:8d06 with SMTP id 5b1f17b1804b1-46e329f62b4mr74383735e9.16.1758887158355;
+        Fri, 26 Sep 2025 04:45:58 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e33105e0bsm37380245e9.5.2025.09.26.04.45.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Sep 2025 04:45:58 -0700 (PDT)
+Date: Fri, 26 Sep 2025 12:45:55 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>
+Cc: andrii@kernel.org, eddyz87@gmail.com, ast@kernel.org,
+ daniel@iogearbox.net, martin.lau@linux.dev, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+ matttbe@kernel.org, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
+ linux@jordanrome.com, ameryhung@gmail.com, toke@redhat.com,
+ houtao1@huawei.com, emil@etsalapatis.com, yatsenko@meta.com,
+ isolodrai@meta.com, a.s.protopopov@gmail.com, dxu@dxuuu.xyz,
+ memxor@gmail.com, vmalik@redhat.com, bigeasy@linutronix.de, tj@kernel.org,
+ gregkh@linuxfoundation.org, paul@paul-moore.com,
+ bboscaccy@linux.microsoft.com, James.Bottomley@HansenPartnership.com,
+ mrpre@163.com, jakub@cloudflare.com, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kernel-mentees@lists.linuxfoundation.org, skhan@linuxfoundation.org,
+ david.hunter.linux@gmail.com
+Subject: Re: [PATCH] selftests/bpf: Add -Wsign-compare C compilation flag
+Message-ID: <20250926124555.009bfcd6@pumpkin>
+In-Reply-To: <20250924162408.815137-1-mehdi.benhadjkhelifa@gmail.com>
+References: <20250924162408.815137-1-mehdi.benhadjkhelifa@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC bpf-next v2 0/5] Add the the capability to load HW RX
- checsum in eBPF programs
-To: Jakub Sitnicki <jakub@cloudflare.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- linux-kselftest@vger.kernel.org, kernel-team <kernel-team@cloudflare.com>
-References: <20250925-bpf-xdp-meta-rxcksum-v2-0-6b3fe987ce91@kernel.org>
- <87bjmy508n.fsf@cloudflare.com> <aNUb2rB8QAJj-aUX@lore-desk>
- <87tt0q3ik9.fsf@cloudflare.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <87tt0q3ik9.fsf@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
+On Wed, 24 Sep 2025 17:23:49 +0100
+Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com> wrote:
+
+> -Change all the source files and the corresponding headers 
+> to having matching sign comparisons.
+
+'Fixing' -Wsign-compare by adding loads of casts doesn't seem right.
+The only real way is to change all the types to unsigned ones.
+But it is of questionable benefit and make the code harder to read.
+
+Consider the following:
+	int x = read(fd, buf, len);
+	if (x < 0)
+		return -1;
+	if (x > sizeof (struct fubar))
+		return -1;
+That will generate a 'sign-compare' error, but min(x, sizeof (struct fubar))
+doesn't generate an error because the compiler knows 'x' isn't negative.
+
+A well known compiler also rejects:
+	unsigned char a;
+	unsigned int b;
+	if (b > a)
+		return;
+because 'a' is promoted to 'signed int' before it does the check.
+
+So until the compilers start looking at the known domain of the value
+(not just the type) I enabling -Wsign-compare' is pretty pointless.
+
+As a matter of interest did you actually find any bugs?
+
+	David
 
 
-On 25/09/2025 12.58, Jakub Sitnicki wrote:
-> On Thu, Sep 25, 2025 at 12:39 PM +02, Lorenzo Bianconi wrote:
->>> On Thu, Sep 25, 2025 at 11:30 AM +02, Lorenzo Bianconi wrote:
->>>> Introduce bpf_xdp_metadata_rx_checksum() kfunc in order to load the HW
->>>> RX cheksum results in the eBPF program binded to the NIC.
->>>> Implement xmo_rx_checksum callback for veth and ice drivers.
->>>
->>> What are going to do with HW RX checksum once XDP prog can access it?
->>
->> I guess there are multiple use-cases for bpf_xdp_metadata_rx_checksum()
->> kfunc. The first the I have in mind is when packets are received by an af_xdp
->> application. In this case I think we currently do not have any way to check if
->> the packet checksum is correct, right?
->> I think Jesper has other use-cases in mind, I will let him comment
->> here.
 > 
-> Can you share more details on what the AF_XDP application would that
-> info?
-
-Today the AF_XDP application need to verify the packet checksum, as it
-gets raw xdp_frame packets directly from hardware (no layer in-between
-checked this).  Getting the RX-checksum validation from hardware info
-will be very useful for AF_XDP, as it can avoid doing this in software.
-
-
-> Regarding the use cases that Jesper is trying to unlock, as things stand
-> we don't have a way, or an agreement on how to inject/propagate even the
-> already existing NIC hints back into the network stack.
+> Signed-off-by: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>
+> ---
+> As suggested by the TODO, -Wsign-compare was added to the C compilation
+> flags for the selftests/bpf/Makefile and all corresponding files in
+> selftests and a single file under tools/lib/bpf/usdt.bpf.h have been
+> carefully changed to account for correct sign comparisons either by
+> explicit casting or changing the variable type.Only local variables
+> and variables which are in limited scope have been changed in cases
+> where it doesn't break the code.Other struct variables or global ones 
+> have left untouched to avoid other conflicts and opted to explicit 
+> casting in this case.This change will help avoid implicit type 
+> conversions and have predictable behavior.
 > 
-
-This patchset have its own merits and shouldn't be connected with my
-use-case of (optionally) including hardware offloads in the xdp_frame.
-Sure, I obviously also want this RX-checksum added, but this patchset is
-useful on it's own.
-
-> Hence my question - why do we want to expose another NIC hint to XDP
-> that we can't consume in any useful way yet?
+> I have already compiled all bpf tests with no errors as well as the
+> kernel and have ran all the selftests with no obvious side effects.
+> I would like to know if it's more convinient to have all changes as
+> a single patch like here or if it needs to be divided in some way 
+> and sent as a patch series.
 > 
-
-Well here *are* useful ways to use this RX-checksum info on its own.
-See my explanation of the DDoS use-case here[1] in other email.
-
-Cloudflare actually also have a concrete use-case for needing this.
-Our XDP based Unimog[2] load-balancer (and DDoS) encapsulate all
-packets when they are XDP_TX forwarded. The encap receiving NIC lacking
-inner-packet checksum validation make us loose this hardware offload.
-This would allow us to save some checksum validation or even just DDOS 
-drop based on hardware checksum validation prior to encap (as in [1]).
-
---Jesper
-
-  [1] 
-https://lore.kernel.org/all/0608935c-1c1c-4374-a058-bc78d114c630@kernel.org/
-
-  [2] https://blog.cloudflare.com/unimog-cloudflares-edge-load-balancer/
-
+> Best Regards,
+> Mehdi Ben Hadj Khelifa
+...
 
