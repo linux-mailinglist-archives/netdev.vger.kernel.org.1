@@ -1,80 +1,100 @@
-Return-Path: <netdev+bounces-226770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26825BA4FD9
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 21:48:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58E8EBA4FDF
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 21:50:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67C131B21E30
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 19:49:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17BFD321F77
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 19:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA9E22737E8;
-	Fri, 26 Sep 2025 19:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C00281504;
+	Fri, 26 Sep 2025 19:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="k/AcasrE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BD90N6Ry"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F145D1C28E;
-	Fri, 26 Sep 2025 19:48:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44957280308;
+	Fri, 26 Sep 2025 19:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758916133; cv=none; b=o4eMEhu2yM+hr8QqaDUmTS+4x6kr3PI5/5GGb7gwjOtlcHiC76p1SG1PuxHhEllD+utHWLAj9J0X6A0KWzDRGr+MaRDN1Fj6AAxhBSxz7njIQATFKtBSV/uvLV3Sv7XhADQnZ1Q/hRC4b3l5pO+zeBu7aJgiDCMIKrsOE7yztZA=
+	t=1758916215; cv=none; b=DzEu9rEtHky0O9c6/EmpX98dDTdJA8xL2gnbEMxkwMjCGkKyjvdTpU4Wo/PHwAf2Uf6d6oqSXkJVBjAh/3Aw7qweEN+07wuyNxSFddVw/wy5OVCRDjnnUkCPuiGZahEz1DBMO6cxjRIDWiUhfvPJZtUMvvFVEQAFlq+PuYacCUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758916133; c=relaxed/simple;
-	bh=FhdheiCx6y9dWrnfxpFizwfAVKjgxQ/Tk8JnwiOYYgg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dxi/5dPCzMhM11YzKXiRhT4Wmy73zkJX5Uzqv9Zw+SJ2OKd1oxZxtTImpfDRuFz5cM1gGBctjXgvit/+OCU3QcNRzGpUnEaDGyLz4opIxecjn+MdqV/KhvGIRJYv2hNLQ/kCAkP+OH6B9GBFLdmHqWaVOYMyMOF+ACXqH6tMCnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=k/AcasrE; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <13ddb0d3-7441-43d9-b8e4-2c8f4acf99bf@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758916129;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x0Gc7fMzAGdSTtjRNVq2wPxOldQCzIe6qbC4MgXh/4E=;
-	b=k/AcasrEqK3rmtG3Oxhq/hAbbTdrOP4nuhApX/CTj4BA3UfQf4jA2YDVWyAkcTIRfbGJIW
-	UsNsDhPaAMrH0AZo8FGFvq7HofijniQgxIoyIE5K0qS2L/wjZ3XN/uk739pNhG0SWEX4d6
-	ZdblEH5JZ+NgVT3NbIatm/yvMguF+UM=
-Date: Fri, 26 Sep 2025 12:48:34 -0700
+	s=arc-20240116; t=1758916215; c=relaxed/simple;
+	bh=jbqfYO7LUYlssd2poqpVXDaCMPuZwPS8Lp58xLAuLXY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=jNVthGQN+pXLxmNoEfp+3amcwk5oHKA/Cb1L0TdCpt8D8t+dRMl5yrxSxki6NrTVHI2cxOFDS5dOE0uxlaGIRvoMHLjET1tILUGqCrCff1ChcgAPix6DoPGb8iss6ZXWDA5XRBSm/sJZy/C5/0m4iC2xvIv4M1fNZSjx2XUAaw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BD90N6Ry; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDEB1C4CEF4;
+	Fri, 26 Sep 2025 19:50:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758916213;
+	bh=jbqfYO7LUYlssd2poqpVXDaCMPuZwPS8Lp58xLAuLXY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BD90N6Ryx9yYAjKUDF15q7bFLe8x1kcG2ze9J8zXb5kSOzYrTNzPJkJHmskb5nCkG
+	 8ivdByzir5dKPwiALp+aFgv7pJVybId2W2WGuFAW0JRyYPnKnQjss94sI70q3LS4jU
+	 HPn8C8gqpZdESk61pEPi7wj/259HM5aa0zAo9Mu75k5jk5ouRTUdkNrP+jOpMgWykz
+	 mSc4mMO/ih8PUIclSj8yhgUvyvqpRFk05+/PzrwjzIah7OFC6DPmnz1Aw7tWEwi9yd
+	 HYO2i5rxGdVbtfTQz9JTOeRmHac6389CM5u8VoLblYG2xrjr6q4Af209Kh8xyr3f1l
+	 O7xZ9O32m/4JA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4998C39D0C3F;
+	Fri, 26 Sep 2025 19:50:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 bpf-next 0/3] xsk: refactors around generic xmit side
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
- ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- netdev@vger.kernel.org, magnus.karlsson@intel.com, stfomichev@gmail.com,
- kerneljasonxing@gmail.com
-References: <20250925160009.2474816-1-maciej.fijalkowski@intel.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20250925160009.2474816-1-maciej.fijalkowski@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/2] scripts/coccinelle: Symbolic error names
+ script
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175891620925.36020.4383105129946487821.git-patchwork-notify@kernel.org>
+Date: Fri, 26 Sep 2025 19:50:09 +0000
+References: <1758192227-701925-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1758192227-701925-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, Julia.Lawall@inria.fr,
+ nicolas.palix@imag.fr, richardcochran@gmail.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, cocci@inria.fr, gal@nvidia.com
 
-On 9/25/25 9:00 AM, Maciej Fijalkowski wrote:
-> this small patchset is about refactoring code around xsk_build_skb() as
-> it became pretty heavy. Generic xmit is a bit hard to follow so here are
-> three clean ups to start with making this code more friendly.
+Hello:
 
-Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Hi Jakub, the bpf-next/net tree is currently empty for the upcoming merge 
-window. Could you help by taking it directly to the net-next tree?
-or I can also take it to bpf-next/master.
+On Thu, 18 Sep 2025 13:43:45 +0300 you wrote:
+> Hi,
+> 
+> This small series by Gal adds a new coccinelle script that spots
+> potential transitions to symbolic error names in print functions, and
+> then uses it in mlx5 driver.
+> 
+> Regards,
+> Tariq
+> 
+> [...]
 
-Thanks,
-Martin
+Here is the summary with links:
+  - [net-next,1/2] scripts/coccinelle: Find PTR_ERR() to %pe candidates
+    https://git.kernel.org/netdev/net-next/c/57c49d235572
+  - [net-next,2/2] net/mlx5: Use %pe format specifier for error pointers
+    https://git.kernel.org/netdev/net-next/c/b89cd87b77d4
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
