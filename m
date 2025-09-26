@@ -1,105 +1,238 @@
-Return-Path: <netdev+bounces-226657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02F99BA3AEF
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 14:50:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C4EABA3B32
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 14:52:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 553F2189414C
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 12:51:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDAB616D02B
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 12:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D962F7471;
-	Fri, 26 Sep 2025 12:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C6D2F5A12;
+	Fri, 26 Sep 2025 12:52:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GLoQJGl1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vHqj4+wR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360962F6593;
-	Fri, 26 Sep 2025 12:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B5E2F5479
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 12:52:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758891006; cv=none; b=HZCUWW129ZF/ExghEMd9Vpd4jUtj4bkSpc85f8ag4WCONsLjj5ktqRnCT3xFaGi5rmwTH3DZUtCo+DcQ+WVXnFhSbJMVvI2H2cYMWNUT494qlOAWUuxY7uCFxFz3djkMXrSIVWSZlwN1JgkBtPoNBclUyNl0RzW4FdLM3EAfzUg=
+	t=1758891149; cv=none; b=Tfqw1z2Lm05KDk/QHVrpNngFVcK/AHG+Eb4+QKqia+w1aT9+fZgt93AjDSQIzzy5sb7TyNTWdgbPpaIkZb/zuDM3bi25RhCuRIpErvmzKB3lAi8K8eUp0cAD+i99rmy7IUYD/RZHRk/lbHB9MIE+QzxezZYACynCMDiBwvYKXTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758891006; c=relaxed/simple;
-	bh=023QJFGZmApyCBXIrm0J5kNm+LMuusbuLoFq4ytIvfI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FaduaESsoA3GEVwKtUqleDQuEUKBbBNBXaHozZMuxHvUdEqG6u1P1J44MUYKAPVJstz1I8ogw6YN/rE3OPWWHZW9n4pKggDeCsUdrLTO190Y1FprRharu1As6Qb423WJaaid3ec82XLbKL66bjtxAw7c3xSTiEwkxrDjZXdFgC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GLoQJGl1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49FBFC113CF;
-	Fri, 26 Sep 2025 12:50:02 +0000 (UTC)
+	s=arc-20240116; t=1758891149; c=relaxed/simple;
+	bh=bgmghckL4Ny0c8O8U8NCksUJHOretkGWrQoDWo8CmCU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dOGrc4H1U4mJB984SjEI559sHuUWA2LTqiWJQWuwMEOKV1g/OMLMIZpwprbYJgXDsAc+JRlYhI0RYPXDtbiS3pqWNeePjPzDjZ5kU0/mWvSZY6/Xlv2Xq9SS7CXB7/Gy6vmHelAc4edOPodfkLYACvwikpAb6y9WXJT7mCQ79rY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vHqj4+wR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC4AEC4CEF7
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 12:52:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758891005;
-	bh=023QJFGZmApyCBXIrm0J5kNm+LMuusbuLoFq4ytIvfI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GLoQJGl1cRrhWUs8qJO1wGZZwpBwYPcAKoQ/PmgIERSKgIk5UvotPcmUCwS7mhyg+
-	 rMtCLpNbueAqWVqerO2EkgfLtIQBo9KJkMQbRIy/b/181hVNECb5Dmvy/SR/FYwlcn
-	 wTWkpEVZOvfzCmU4fhBaezd3laOI50/muQGii50+4icMQdypZkMOXtKn+Ng3XxLQfq
-	 VvgdUWg37vomdeVgNXp81zcmMmBcNiHUk4958xXxDYtCuNa93DisazI+lySdFQBjnd
-	 BaU3WjarkDJ4nCvN9RpmiWmeuE+IROwUQ/rrtxNmBTIe394CiXOmwtV524HdbNPWq6
-	 uG05D4QYsHlsg==
-Date: Fri, 26 Sep 2025 13:49:59 +0100
-From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>, Maor Gottlieb <maorg@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>,
-	Akiva Goldberger <agoldberger@nvidia.com>
-Subject: Re: [PATCH net-next] net/mlx5: Expose uar access and odp page fault
- counters
-Message-ID: <aNaL90oj8vyq9-A9@horms.kernel.org>
-References: <1758797130-829564-1-git-send-email-tariqt@nvidia.com>
+	s=k20201202; t=1758891148;
+	bh=bgmghckL4Ny0c8O8U8NCksUJHOretkGWrQoDWo8CmCU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=vHqj4+wRee6jMZl9gdXuxdOCbNcdfwxLIBJPN9qkSxXacaLbOaLoO6V1ditvke3M4
+	 E4jpL/WNPawAO4OHCE4yEb6sP8Kh6pWg4ahWQR/6RODVgcE9xpTyjkQCSTjoMKkKSB
+	 L/yEONl4GvSUNYayTbqSFw88HuXqTUAqP814loaQ8fHW+iREsqKMKyNrNsjffyblDX
+	 HRPaYSO/QzMJiapTKtCGuXUPyJvBl3mlk6l88Hl1HxswUdoV3FpUbK3YCWqLzZvLVM
+	 8k0yjZlYGVpfjAjDXnZRVjTBPkd2K61MPVU/yuIRsxQLBDpdOxaO0KHkJ9Jj9qXPu2
+	 ASWlPfep9hd9Q==
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-330d1565844so1537616fac.1
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 05:52:28 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVSEqfPsucIG0rFIYwOJnMMubFCaVRklDr5S6nufVSUP0bg7l6Uk+7ZSHuT2DdDLznUKaeWmlc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzi9VOffCC/avJgCgbAmqJipmpPU9E/1k0f9GhSfxTpRvS7GXDD
+	rkpgw2xJ6UAgeOfdh2qmRlv6xwK0SuOBYFrCdueqaX+jIojZVJBGT5CvvWM2O6ZU+NauwP2gIt6
+	vIJ7Q06bRQTg7kdK6xQ70M2MEWBnvnCY=
+X-Google-Smtp-Source: AGHT+IFyJsbtEL/QZxEFMzNMFhjejHmQrKAGHJ2m+Cy67pO650FZ5XV0FAPVcpNkLn5AmmxpCHNcXhCPX9zROUcktt4=
+X-Received: by 2002:a05:6871:79a3:b0:35c:cfec:df79 with SMTP id
+ 586e51a60fabf-36c4698a0f9mr1307306fac.51.1758891148064; Fri, 26 Sep 2025
+ 05:52:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1758797130-829564-1-git-send-email-tariqt@nvidia.com>
+References: <20250924074602.266292-1-sakari.ailus@linux.intel.com>
+ <CAJZ5v0hSy9zQd6cP9B4QPSZi-6ughmkW=VoEBV-0MbUr2xcaAQ@mail.gmail.com> <aNZ9fbh8eLiPAJzR@kekkonen.localdomain>
+In-Reply-To: <aNZ9fbh8eLiPAJzR@kekkonen.localdomain>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Fri, 26 Sep 2025 14:52:17 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0gQ9vnT+Z8zryEausp-2xX7HocoBgwmiptxg7BGiU9C8g@mail.gmail.com>
+X-Gm-Features: AS18NWDCqPA72v4-2y8V5lEmAid_UEthjaXRBCWFUzQ_Nsh-1l_6LWsoqBtdmRQ
+Message-ID: <CAJZ5v0gQ9vnT+Z8zryEausp-2xX7HocoBgwmiptxg7BGiU9C8g@mail.gmail.com>
+Subject: Re: [PATCH v2 00/16] Align availability checks on fwnode child node enumeration
+To: Sakari Ailus <sakari.ailus@linux.intel.com>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>, linux-acpi@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-input@vger.kernel.org, 
+	linux-leds@vger.kernel.org, linux-media@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-spi@vger.kernel.org, 
+	Len Brown <lenb@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Danilo Krummrich <dakr@kernel.org>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+	Daniel Scally <djrscally@gmail.com>, Heikki Krogerus <heikki.krogerus@linux.intel.com>, 
+	Javier Carrasco <javier.carrasco@wolfvision.net>, 
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>, Lee Jones <lee@kernel.org>, 
+	Pavel Machek <pavel@kernel.org>, Matthias Fend <matthias.fend@emfend.at>, 
+	Chanwoo Choi <cw00.choi@samsung.com>, Krzysztof Kozlowski <krzk@kernel.org>, 
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>, 
+	Paul Elder <paul.elder@ideasonboard.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Mark Brown <broonie@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, 
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 25, 2025 at 01:45:30PM +0300, Tariq Toukan wrote:
-> From: Akiva Goldberger <agoldberger@nvidia.com>
-> 
-> Add three counters to vnic health reporter:
-> bar_uar_access, odp_local_triggered_page_fault, and
-> odp_remote_triggered_page_fault.
-> 
-> - bar_uar_access
->     number of WRITE or READ access operations to the UAR on the PCIe
->     BAR.
-> - odp_local_triggered_page_fault
->     number of locally-triggered page-faults due to ODP.
-> - odp_remote_triggered_page_fault
->     number of remotly-triggered page-faults due to ODP.
-> 
-> Example access:
->     $ devlink health diagnose pci/0000:08:00.0 reporter vnic
-> 	vNIC env counters:
-> 	total_error_queues: 0 send_queue_priority_update_flow: 0
-> 	comp_eq_overrun: 0 async_eq_overrun: 0 cq_overrun: 0
-> 	invalid_command: 0 quota_exceeded_command: 0
-> 	nic_receive_steering_discard: 0 icm_consumption: 1032
-> 	bar_uar_access: 1279 odp_local_triggered_page_fault: 20
-> 	odp_remote_triggered_page_fault: 34
-> 
-> Signed-off-by: Akiva Goldberger <agoldberger@nvidia.com>
-> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Hi Sakari,
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+On Fri, Sep 26, 2025 at 1:48=E2=80=AFPM Sakari Ailus
+<sakari.ailus@linux.intel.com> wrote:
+>
+> Hi Rafael,
+>
+> On Wed, Sep 24, 2025 at 12:52:12PM +0200, Rafael J. Wysocki wrote:
+> > Hi Sakari,
+> >
+> > On Wed, Sep 24, 2025 at 9:46=E2=80=AFAM Sakari Ailus
+> > <sakari.ailus@linux.intel.com> wrote:
+> > >
+> > > Hello everyone,
+> > >
+> > > Historically the fwnode property API has enumerated only available de=
+vice
+> > > nodes on OF whereas on ACPI, also nodes that haven't been present in =
+the
+> > > system have been provided. Both OF and ACPI have similar concepts of =
+node
+> > > availbility, on OF it's the "status" property present on device nodes=
+ and
+> > > on ACPI the _STA object evaluates to device present, enabled and
+> > > functional bits, of which the present and functional bits are current=
+ly
+> > > being used to determine whether to enumerate a device.
+> > >
+> > > Two additional functions, fwnode_get_next_available_child_node() and
+> > > fwnode_for_each_available_child_node(), have been provided to enumera=
+te
+> > > the available nodes only on ACPI, whereas on OF the implementation ha=
+s
+> > > been the same on the non-available variants. The motivation for provi=
+ding
+> > > these has very likely been to provide fwnode variants of the similarl=
+y
+> > > named functions but the difference isn't justifiable from API consist=
+ency
+> > > viewpoint.
+> > >
+> > > This set switches the users away from the "available" fwnode API func=
+tions
+> > > and later on removes them, aligning the functionality on all fwnode
+> > > backends.
+> > >
+> > > since v1:
+> > >
+> > > - Move patch "ACPI: property: Make acpi_get_next_subnode() static" as
+> > >   first.
+> > >
+> > > - Add missing parentheses and kernel-doc Return: section in
+> > >   acpi_get_next_present_subnode() documentation and move the Return
+> > >   section: of fwnode_graph_get_endpoint_by_id() to the end of the
+> > >   documentation section (new patch for the latter).
+> > >
+> > > - Use device_get_next_child_node() instead of fwnode_get_next_child_n=
+ode()
+> > >   in flash LED driver drivers.
+> > >
+> > > - Rework iterating port nodes in acpi_graph_get_next_endpoint() as
+> > >   suggested by Andy (new patch).
+> >
+> > I think that you really have four series here, or rather two series, a
+> > collection of patches depending on them, and a follow-up cleanup.
+> >
+> > > Sakari Ailus (16):
+> > >   ACPI: property: Make acpi_get_next_subnode() static
+> > >   ACPI: property: Use ACPI functions in acpi_graph_get_next_endpoint(=
+)
+> > >     only
+> > >   ACPI: property: Rework acpi_graph_get_next_endpoint()
+> > >   ACPI: property: Return present device nodes only on fwnode interfac=
+e
+> >
+> > So the above is one series, focused on ACPI property changes.
+> >
+> > They can go in via ACPI as soon as everyone is happy with them.  I
+> > think I can push them for 6.18 if that helps to process the other
+> > patches.
+>
+> If it's an option, that would be nice. But see below.
+>
+> >
+> > >   property: Move Return: section of fwnode_graph_get_endpoint_by_id()
+> > >     down
+> > >   property: Drop DEVICE_DISABLED flag in
+> > >     fwnode_graph_get_endpoint_by_id()
+> > >   property: Drop DEVICE_DISABLED flag in
+> > >     fwnode_graph_get_endpoint_count()
+> >
+> > The above patches are another series that doesn't depend on the first
+> > one AFAICS and can go in via driver core.
+>
+> Agreed.
+>
+> >
+> > >   property: Document that fwnode API returns available nodes
+> > >   driver core: Use fwnode_for_each_child_node() instead
+> > >   net: lan966x: Use fwnode_for_each_child_node() instead
+> > >   Input: touch-overlay - Use fwnode_for_each_child_node() instead
+> > >   media: thp7312: Use fwnode_for_each_child_node() instead
+> > >   leds: Use fwnode_for_each_child_node() instead
+> > >   leds: Use fwnode_get_next_child_node() instead
+> >
+> > The above can go in via respective subsystem trees when the ACPI
+> > property series gets in (I'm not sure if/how they depend on the second
+> > series).
+> >
+> > And the following one is a follow-up cleanup getting rid of code that
+> > would be redundant going forward.
+> >
+> > >   property: Drop functions operating on "available" child nodes
+> > >   spi: cadence: Remove explicit device node availability check
+> >
+> > Does the spi change depend on the previous patch?
+>
+> There's really only one dependency, apart from the direct dependency of
+> fwnode_get_next_available_child_node() /
+> fwnode_for_each_available_child_node() definitions removed in the second
+> last patch: fwnode_get_next_child_node() and fwnode_for_each_child_node()
+> may still return non-available nodes before the last of the ACPI patches =
+in
+> the set. So if the ACPI patches aren't merged but the rest are,
+> non-available nodes could be returned.
+>
+> How about:
+>
+> 1. Merge the ACPI patches to 6.18.
+>
+> 2. Merge the rest, apart from the second last patch, for 6.19.
+>
+> 3. Once everything else is in, merge the last patch. Could wait for 6.20.
 
-...
+Sounds good.
+
+> Perhaps I should split the series in three sets?
+
+That would help I think.
+
+> I'll send an update on the ACPI patches soon, to address a comment relate=
+d
+> to them.
+
+OK
+
+Thanks!
 
