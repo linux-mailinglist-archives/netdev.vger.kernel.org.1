@@ -1,155 +1,164 @@
-Return-Path: <netdev+bounces-226741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76006BA4A1E
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:30:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 256DBBA4A4A
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:33:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65A3C7BCE98
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:27:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5101B1778CB
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD93B261B8C;
-	Fri, 26 Sep 2025 16:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 886632EB842;
+	Fri, 26 Sep 2025 16:31:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aJkel49m"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSvoFIns"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A4E23F27B
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 16:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B572FCC13
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 16:31:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758904124; cv=none; b=YqZCHmSi7saq3TaJ30LAtVH8GFosyJSnGMiOUTDh9u+6bVaiI9e12w3vT1pNt56L0RWwkPa99yZA5SSgGt691Mg18DjkJQU5TTN6S2xLns8gfKoPiD9hSlpxUe7ZdMR5/94QBpkKIePN1QQq83v3+yRht1Wp+eB2Siv60bz4G7k=
+	t=1758904299; cv=none; b=CtVbLtetFzLt3x57wdcqJk2OcmH5ePfatu/zoewA9xOyHZ43fhNtdVZ+6jtjvXhzfjj6uXXbH2pjWB5U4mLAGTnxp9ap8BV/uMknxqyMceZZRITstkPixZ5yRUzz80B/oBjB0dt84TX6V8v2Ru8mvE2yxoh2Ud1s4nOJ3TSjyNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758904124; c=relaxed/simple;
-	bh=advGB0s4cY+Eij/iD8U4Na+qAHs8pdRd6nx34nKFrFA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M2XnSomYmXtat68a7VYRmOVnOVL2wtDlCP4zxiqg+JiSuWL7xlYEXek7DPKIAS0V0YMie9uhXjqaUqKTIgvnHCKUyrgqPOcJA5EE0uC6bmlucD2Xsufpl7jkl19DxWN9pYkqJqLyInpU47ZtkkLAyeqynrPahqeEGZQ7e1KcviU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aJkel49m; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1758904299; c=relaxed/simple;
+	bh=KyIgAIxM0qzJNyrH1RWLJvoc6grH8XPidN8Kgedl2v8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=BFXhnHljrwc0JQwd8i+y/EyJXqKxrafFuLXm2Q/TfUOU1f90kreUmcrTmCc9YQ++s7GBTl+VGBCHGp/5uF6XO/RCgUrTuOkpQP7FnvhypmeSPrxp0MBJ8Lmd5ApUkpa3GkuTLYoWqYcl/PPXhYNAd8WRQaOGo4aaQN7oeXHyEqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nSvoFIns; arc=none smtp.client-ip=209.85.128.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-330631e534eso2408306a91.0
-        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 09:28:43 -0700 (PDT)
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-73b4e3d0756so32280697b3.3
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 09:31:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758904122; x=1759508922; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=17SdlbsrW/H1oAGhyPo1vRPjIhKSOB2gzK7KjETew8g=;
-        b=aJkel49m22/7RXgjQEiTwgVHHdEqo3rlyx0C0kk9t74ov7a+RFJoDRRrKG75NswkZs
-         /llklE2NCccXLqnG3WZAqgoxVPoZ/w5FqM1Tik6EOIsbhBCAXLXm12ewCag2fbBn6pB4
-         mbdZNpPAcGYQ/rkAg1TRbWZavykJB/ZxaEy7iefU4YxCZBLOXTiExMGkdBFl+HmdSZ7P
-         HX++vjTw/PLTShLl/bx1KJNetNyZjYspQusDSZEiaJDJc3/1ajd2xhi5jNhOfcHBMgJi
-         VPHi8YrmKsySExBGfPPGG7FUAdhQdUHcXXFljZPsKr1qvbPrdNPsBfNe3g+pNlEdkm/n
-         AuoA==
+        d=gmail.com; s=20230601; t=1758904297; x=1759509097; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JlXCqcp4O5lDJ89rheJ6jBvAKlTWM57IAWl7u/6lrJM=;
+        b=nSvoFInsgros12W2dpIeNOPbL1XIT+RBSmR9p2GADv1J4W+QH2XrwzWPeo2qrKl9oN
+         n34ybXcO4erBHhRcJ6cxkRiH5n85kLcLJsuLzp5Y+Q1AEnJm/Fy+TNSD0g5QpAT932gH
+         Ggjf4PhQlnQjXu0xvhUzcT61MAStNQ0J82iO1u0YkRkpyrQDsFIUFLHOwi9oSKQ/zeDe
+         4EwtKVa4OVjp96Q7Nie3KqJ4LK2wOuexaxIms1Of/sawKB7i8BUul/pqfF5+dRuKawe9
+         L2uia2FXdznPaTgZT6t9Xzz5SQ9lEK6YyiQ6+XPTZJps2xl/QzDoZf70QlNPm1XhDALL
+         TMNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758904122; x=1759508922;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=17SdlbsrW/H1oAGhyPo1vRPjIhKSOB2gzK7KjETew8g=;
-        b=iGHCuCZ3aOiDCivTZBNqYE6z1KMovOBwmMmimAcHMnTjfVnqGskLgV1XVLZwE2NcO6
-         KiLnZDGm+a32C3aeOeh5RG6ctKGYlzBo/b6HD0BTDDYkCbR8vOumWhClultkv7D7XUJR
-         6SIwDVAgEWxIy5p/Wns5fVMuif+myVegJ7qzHUwsO2MnA5M4gEeEdK2PfG4skFc033Ka
-         jvrLISLgmedVzkcRzxku9KI6XYOW0K5zqNssKMekMs1PzmT2v9K9tJtA+Q9SdDpTwZs6
-         b8nLcJuzwMuk0rQ9MPS5Hi00ON+0C7kFga+0Hp7TYg+COIGt4fEUT/rtnY3td/u8OBgk
-         w61Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU79+L67S0jpkTJRpBx2JWtRcOATDwcZl3mOj86hSn4NDloU8ncbgWSVisbeXKECVWstm3eBbo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYHeTiIjTgaS7sIO0pmy1zDECcIIRzHDLdI1EKdrcb3E84PmqK
-	TAn3XhvBBx4FvbyqyOARbECpBKDgbaeVziGWhIBH9MEnvq0X8OHt1Sz4cJNJDo3t9Sh7OLZzxRE
-	g+UNee9E/gaIgTKvzi8B6cfyuDBZQRo8=
-X-Gm-Gg: ASbGncsr0Ob5sy9u34EPdZdudM/zrWXbzXDWj+0PFPrfsEFOK6ODtvHkBiHDwm7DMm4
-	QNVvDmRgn2lRcup2+VK3VHsw6LzW8Us5D9ceFffVntHAd7WfMSY0MBP+LW5wCsfNmv5mUqyv792
-	fCEy1teqwjUdX7ksjNYSRc8y75HlA/s0K8mHI++ECq1PTpT+Ux0ansmAvSBkPCzjMC0NdgAxpYT
-	xN6FZsosxhkOUzlJ9h8FJghBm1Q5xdpSDRSF7Mc9xACR2frJiM=
-X-Google-Smtp-Source: AGHT+IFP1pZQQc/fe1s5lC9WTMOccd345qaOrvak7xLKmHiYtcellclXpMJlF7A8FJF338xuOE/Uc1mneQkNtUiDrKk=
-X-Received: by 2002:a17:90b:4a01:b0:32b:6eed:d203 with SMTP id
- 98e67ed59e1d1-3342a2b126emr9404474a91.24.1758904122505; Fri, 26 Sep 2025
- 09:28:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758904297; x=1759509097;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JlXCqcp4O5lDJ89rheJ6jBvAKlTWM57IAWl7u/6lrJM=;
+        b=J6MS9kPvcbimMZim0Lvtn08Ib28MRxxJNlN2SVKItuJMGNRu1Er0UMDhNUK4l5bRjf
+         +o/zHTt0SONZkkLNK+vuIl6ADOWe6e2ostUpeoiGlwaBV9S13QZMVPBRYjN0QB/Lj0Kk
+         +684J3+kP4Mc3XUS2JcBmI900+RbnO9qFK5i1L3T2WEUaZoOeuc7ULThZDp+qs5TFTbY
+         q3fZaAqFZk+6vh0IUug0dg7CUnq39tWvcHIn5ay9eTKVGX2EzcVahuUKhB8WVH8BUr2d
+         ZvNegK42ou8/xe2nNmN3XyreKN/3Czu1+Cj8POVtZwNsPmfwO9H77d27Z4KDM9jpRRWM
+         ojaA==
+X-Gm-Message-State: AOJu0YxCQxh2Y3LjR6hUvYtMmhDYs5oPHjY6hQSRO3eDw8K03SSMFcBG
+	vYoR/ErJO9lH1gJwj0efzwfj5X5oGExBSnpFfSsZSwM7z8J1yYn6+SFjkQK4X3/i
+X-Gm-Gg: ASbGncsAkF5W421WJ9z/ZdmfJE05AeHIbUUM6cwNRbz6O5k1kRErHtuWxkOef9y4fb/
+	07qbZibA9Cfo80s9pqRvRs8LHx7Bb6dae17W4eN/Jb6z85gAxDwzinybMQUDCsmbMoTphz5d28H
+	F16DGnV9oyl1F006N43K8cL+CbMeihhCEXKvyafzyb6NKwwWyI3mvgDgVin7i4E820FzECrW9ky
+	mwTNScUbCoCyMyJLTnnW6J381f1qVGcSLbZd+KckVRwpuTD6m7o1T5hJylRT5Gz2pf/+sJCuHNL
+	jgmA+C6dLTGNAUohW4fvdyKhJabddt0UvcMuQQycg3MgU8RDxSPpB36hg1NypiZIlvYhjnlxeKV
+	OlFoyCFIajsoCVvpi7JSXcw==
+X-Google-Smtp-Source: AGHT+IHLAOwZtKUjfY6PvnBzBbjrOGiLNSxJKSjdJ+qMor7UEuBJ1lHtFVCmE2wktnsfIJhA6x/ESQ==
+X-Received: by 2002:a53:bb88:0:b0:615:14:8320 with SMTP id 956f58d0204a3-6361a873d23mr7191618d50.34.1758904296400;
+        Fri, 26 Sep 2025 09:31:36 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:46::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-765c7ac669fsm11661537b3.58.2025.09.26.09.31.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Sep 2025 09:31:35 -0700 (PDT)
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Subject: [PATCH net-next v4 0/2] net: devmem: improve cpu cost of RX token
+ management
+Date: Fri, 26 Sep 2025 09:31:32 -0700
+Message-Id: <20250926-scratch-bobbyeshleman-devmem-tcp-token-upstream-v4-0-39156563c3ea@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250922131148.1917856-1-mmyangfl@gmail.com> <20250922131148.1917856-3-mmyangfl@gmail.com>
- <aNQvW54sk3EzmoJp@shell.armlinux.org.uk> <fe6a4073-eed0-499d-89ee-04559967b420@lunn.ch>
- <aNREByX9-8VtbH0n@shell.armlinux.org.uk> <CAAXyoMPmwvxsk0vMD5aUvx9ajbeAENtengzUgBteV_CFJoqXWg@mail.gmail.com>
- <f7d78131-7425-487f-a8bb-ed747dd9a194@lunn.ch>
-In-Reply-To: <f7d78131-7425-487f-a8bb-ed747dd9a194@lunn.ch>
-From: Yangfl <mmyangfl@gmail.com>
-Date: Sat, 27 Sep 2025 00:28:05 +0800
-X-Gm-Features: AS18NWC4VpC0VraXX2b7ElF7Q9xckDyqxA2rIp_ujgdQGGcV--mnzBcfmdWMe7A
-Message-ID: <CAAXyoMM3QG+zWJQ8tAgZfb4R62APgBaqaKDR=151R7+rzzakCw@mail.gmail.com>
-Subject: Re: [PATCH net-next v11 2/5] net: phy: introduce PHY_INTERFACE_MODE_REVSGMII
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Simon Horman <horms@kernel.org>, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOS/1mgC/5XOTW7DIBCG4atErDsVYHCgq96j6oKfSY1asAUUJ
+ Yp89yJWVndefhrpeedJCuaAhbxdniRjCyWsqQ/xciFuMekLIfi+CadcUsU1FJdNdQvY1doHluU
+ Ho0ngsUWMUN0Gdf3GBL9bqRlNBK65RXYVXtKJdHXLeAv3UfwgCSskvFfy2S9LKHXNj/FKY+M+q
+ pry09XGgILXYmaztlJK+h6xmle3xpFq/MAzdp7nnXeK+uskrRdy+sdPB57P5/mp81QJK2brjVK
+ 3A7/v+x//QnhrtQEAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ Willem de Bruijn <willemb@google.com>, Neal Cardwell <ncardwell@google.com>, 
+ David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Stanislav Fomichev <sdf@fomichev.me>, Mina Almasry <almasrymina@google.com>, 
+ Bobby Eshleman <bobbyeshleman@meta.com>
+X-Mailer: b4 0.13.0
 
-On Sat, Sep 27, 2025 at 12:09=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote=
-:
->
-> > > > How does the databook describe reverse SGMII? How does it differ fr=
-om
-> > > > SGMII?
-> > >
-> > > It doesn't describe "reverse SGMII". Instead, it describes:
-> > >
-> > > 1. The TC bit in the MAC configuration register, which makes the bloc=
-k
-> > >    transmit the speed and duplex from the MAC configuration register
-> > >    over RGMII, SGMII or SMII links (only, not 1000base-X.)
-> > >
-> > > 2. The SGMIIRAL bit in the PCS control register, which switches where
-> > >    the SGMII rate adapter layer takes its speed configuration from -
-> > >    either the incoming in-band tx_config_reg[15:0] word, or from the
-> > >    MAC configuration register. It is explicitly stated for this bit
-> > >    that it is for back-to-back MAC links, and as it's specific to
-> > >    SGMII, that means a back-to-back SGMII MAC link.
-> > >
-> > > Set both these bits while the MAC is configured for SGMII mode, and
-> > > you have a stmmac MAC which immitates a SGMII PHY as far as the
-> > > in-band tx_config_reg[15:0] word is concerned.
-> >
-> > So any conclusion? Should I go on with REV*MII, or wait for (or write
-> > it myself) reverse-mode flag?
->
-> Sorry, i'm missing some context here.
->
-> Why do you actually need REVSGMII, or at least the concept?
->
-> REVMII is used when you connect one MAC to another. You need to
-> indicate one ends needs to play the PHY role. This is generally when
-> you connect a host MAC to an Ethernet switch, and you want the switch
-> to play the PHY role.
->
-> Now consider SGMII, when connecting a host MAC to a switch. Why would
-> you even use SGMII, 1000BaseX is the more logical choice. You don't
-> want the link to run at 100Mbps, or 10Mbps. The link between the host
-> and the switch should run as fast as possible. And 1000BaseX is
-> symmetrical, you don't need a REV concept.
->
-> Also, in these cases, stmmmac is on the host, not the switch, so it
-> will have the host role, leaving the switch to play 'PHY'. I'm not
-> sure you could even embedded stmmac in a switch, where it might want
-> to play 'PHY', because stmmac is software driven, where as a switch is
-> all hardware.
->
-> So the hardware supports reverse SGMII, but it is not clear to me why
-> you would want to use it.
->
->         Andrew
->
+This series improves the CPU cost of RX token management by replacing
+the xarray allocator with an niov array and a uref field in niov.
 
-Cause I couldn't make 1000BaseX work with qca-ssdk, so I can only
-confirm and test REVSGMII mode on my device.
+Improvement is ~5% per RX user thread.
+
+Two other approaches were tested, but with no improvement. Namely, 1)
+using a hashmap for tokens and 2) keeping an xarray of atomic counters
+but using RCU so that the hotpath could be mostly lockless. Neither of
+these approaches proved better than the simple array in terms of CPU.
+
+Running with a NCCL workload is still TODO, but I will follow up on this
+thread with those results when done.
+
+Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+---
+Changes in v4:
+- rebase to net-next
+- Link to v3: https://lore.kernel.org/r/20250926-scratch-bobbyeshleman-devmem-tcp-token-upstream-v3-0-084b46bda88f@meta.com
+
+Changes in v3:
+- make urefs per-binding instead of per-socket, reducing memory
+  footprint
+- fallback to cleaning up references in dmabuf unbind if socket
+  leaked tokens
+- drop ethtool patch
+- Link to v2: https://lore.kernel.org/r/20250911-scratch-bobbyeshleman-devmem-tcp-token-upstream-v2-0-c80d735bd453@meta.com
+
+Changes in v2:
+- net: ethtool: prevent user from breaking devmem single-binding rule
+  (Mina)
+- pre-assign niovs in binding->vec for RX case (Mina)
+- remove WARNs on invalid user input (Mina)
+- remove extraneous binding ref get (Mina)
+- remove WARN for changed binding (Mina)
+- always use GFP_ZERO for binding->vec (Mina)
+- fix length of alloc for urefs
+- use atomic_set(, 0) to initialize sk_user_frags.urefs
+- Link to v1:
+https://lore.kernel.org/r/20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-0-d946169b5550@meta.com
+
+---
+Bobby Eshleman (2):
+      net: devmem: rename tx_vec to vec in dmabuf binding
+      net: devmem: use niov array for token management
+
+ include/net/netmem.h     |  1 +
+ include/net/sock.h       |  4 +--
+ net/core/devmem.c        | 46 +++++++++++++++---------
+ net/core/devmem.h        |  4 +--
+ net/core/sock.c          | 34 ++++++++++++------
+ net/ipv4/tcp.c           | 94 +++++++++++-------------------------------------
+ net/ipv4/tcp_ipv4.c      | 18 ++--------
+ net/ipv4/tcp_minisocks.c |  2 +-
+ 8 files changed, 82 insertions(+), 121 deletions(-)
+---
+base-commit: 203e3beb73e53584ca90bc2a6d8240b9b12b9bcf
+change-id: 20250829-scratch-bobbyeshleman-devmem-tcp-token-upstream-292be174d503
+
+Best regards,
+-- 
+Bobby Eshleman <bobbyeshleman@meta.com>
+
 
