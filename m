@@ -1,242 +1,332 @@
-Return-Path: <netdev+bounces-226750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C993BA4B4C
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:48:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59322BA4B6A
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:53:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33C661B273ED
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:48:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05A2D2A575C
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:53:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFFC73064B9;
-	Fri, 26 Sep 2025 16:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81352308F0E;
+	Fri, 26 Sep 2025 16:53:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="ASM74b+F"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pzn5Hg1U"
 X-Original-To: netdev@vger.kernel.org
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011068.outbound.protection.outlook.com [52.101.57.68])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2CAA30649E;
-	Fri, 26 Sep 2025 16:47:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758905269; cv=fail; b=spQ6iT2CJ3Wt4dUoBSNLxRChUMVsJLkHfcdkz8v9xx8oIvlvhyNPs34uA6SlTVOZ/2Z3mzzEds3eZNoDkzUb7dJrFXxXUJ19Z1SdZ+m+drUowLtQkE7q56/A60xOuMTQHEbvS1ZNMhUQMZFIFNk56JWgcaYytg4wEYJV1lp0VEs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758905269; c=relaxed/simple;
-	bh=WUs7rE0Agf77eoBg34lVDN+LGyvuAYiEcfB+2qWsU2I=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=P9hZ+Db0eIojb9VT7vKXEHFcctf76WBdSpVbhLvCXGjQx3pJYcX3FdEY9Vs5EhpbVRFNMutqoG3wdbqZ8a15y1q2iCBWz3tGLqBBhUNuDP6XeBvGIuv4Nnu2Cn0CpDUjJ5CotckUP0BW3Ma7AeuHX09B2SMnZrPmOWaWXxqiOBM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=ASM74b+F; arc=fail smtp.client-ip=52.101.57.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tMw2+ihVJx8axcgEZF5McRrTHw+GA5VU0rHTdqsmnusVGwDBmOXphcoDHPCNjgkSBntv2kZOl6C1hWQKqrNP8JUsZTK4811YkUQ/SyAycedzMcWtv26IAS570Z0TnRih3G6ndW41HFNEN+JX5Urzx+PyorgvW2CLakbPxdIxyXLmAteYhS0ZKWmQ5vzIWPru8i7dw+jkOr2KkoJ4mer46f2ufmaSRNflCF4TdCkWWjfyyh2e9tMBGwhMd8s8tMAwn7jiaF3S0dmAsFCeTIN0hPF+V+opFSVs4NXCMOFNX2R7cNp0/VXqXecnUoxssVlrLivN2IJPIRvKkzaezKp0Gw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ut1Uv7e/hO5bPmHa+B9rNjrEa0C0obWESBpOH/MnuWo=;
- b=ODp5vifhL17fuLoaszTPCA6YL2DwkU+1sXVmHaY0aH5EcNkVm1HUFGGOROuJtq5UvnpQ/8to0PHf83YC/S1JJMxS+fXH19SLSvPxztcJACQaJBTVrASo+dQACKekMEwevmidu+mO3YZ/CJtL7cjLOlckQgMqyeDQSk7LyefUAdTavKkJrIBeWT7h7zfaPXaYd5kqtHd4MR/OxYxNyaFk2vx2hzhQDeRGX3huJzzgwp5L1jX3NYuXpVQjvuzORFMDaQoAd77lEmhdES/Cm6VWP1OFUPtYL+sadLBCb8WaMDrcAyNJDkUlLAdcLNLNysrkglsmed/yqqbQIJtLOPhdvQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
- dkim=pass header.d=altera.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ut1Uv7e/hO5bPmHa+B9rNjrEa0C0obWESBpOH/MnuWo=;
- b=ASM74b+FaL2Nr/0gx0vAbw3bZYj+vw9tqatmUhqk9C/MvOR0RCGg9aCU0NeEUAHbjDuSwp1ptZIUEFh3YU82HzL3GTc2wsKkdqO0ASMg5CHnp3R0aojWrA2qffgNkGWwbyQT50RaSAAuTx2lby0I2mjEbWnvhBXli3t6AfEAewK74azIuiKSwMTESbQTw0UJq0Tzz0PUBOrx/WLdYKGrur+YqiYzdWOEdboPAfSoWhk/WxerbkcK4GBfIgxU6O754ra6uR4tmnnmFvYT5L0L39i++SGNzr3gYIHq+6fEqnfQeBbpkxWB4J0/+81OWKQji0/K+NcM/FG4j2RF5r3rBg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=altera.com;
-Received: from DM6PR03MB5371.namprd03.prod.outlook.com (2603:10b6:5:24c::21)
- by LV3PR03MB7753.namprd03.prod.outlook.com (2603:10b6:408:27e::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.10; Fri, 26 Sep
- 2025 16:47:44 +0000
-Received: from DM6PR03MB5371.namprd03.prod.outlook.com
- ([fe80::8d3c:c90d:40c:7076]) by DM6PR03MB5371.namprd03.prod.outlook.com
- ([fe80::8d3c:c90d:40c:7076%4]) with mapi id 15.20.9160.010; Fri, 26 Sep 2025
- 16:47:43 +0000
-Message-ID: <1e82455f-5668-41fd-bebb-0a0f7139cc3f@altera.com>
-Date: Fri, 26 Sep 2025 22:17:32 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] net: stmmac: Consider Tx VLAN offload tag
- length for maxSDU
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Rohan G Thomas via B4 Relay
- <devnull+rohan.g.thomas.altera.com@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <Jose.Abreu@synopsys.com>,
- Rohan G Thomas <rohan.g.thomas@intel.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Matthew Gerlach <matthew.gerlach@altera.com>,
- "Ng, Boon Khai" <boon.khai.ng@altera.com>
-References: <20250915-qbv-fixes-v2-0-ec90673bb7d4@altera.com>
- <20250915-qbv-fixes-v2-2-ec90673bb7d4@altera.com>
- <20250917154920.7925a20d@kernel.org> <20250917155412.7b2af4f1@kernel.org>
- <a914f668-95b2-4e6d-bd04-01932fe0fe48@altera.com>
- <20250924160535.12c14ae9@kernel.org>
- <157d21fc-4745-4fa3-b7b1-b9f33e2e926e@altera.com>
- <20250925185230.62b4e2a5@kernel.org>
-Content-Language: en-US
-From: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
-In-Reply-To: <20250925185230.62b4e2a5@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MA0PR01CA0121.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:11d::11) To DM6PR03MB5371.namprd03.prod.outlook.com
- (2603:10b6:5:24c::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0439307AF9
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 16:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758905596; cv=none; b=PFMcGRnFmeT9NsJwkZPPHGEHOdeTH5Xbx+Izl1RrRNfjCT6D7hyL6ENScWQpz9hQ8bi2J99znQWMmKqvN9wLKbp+tXf7jcv6g9eeuN89Jkvlcp5DWE7YtmXJZAoR6ppsjrSjcefdFazeHfbvQTNAXT7MVrnXkC1P26SKHDRwXTY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758905596; c=relaxed/simple;
+	bh=V8Lz4Idvu8x0IrJBFobzlRMrWGjnlLpDYLeqriHkxC0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V9RoPfuw8jK2JcdxDKjlc0oJVBEgj+70KLRTEpHGSAc1TG2oLewUwozTQSPECV2blf6z4ebh8Hu8qVky3yknZGavWPVt7WOAXU1OvJjycLrdu1dTHQV1Sp7oAMO+0iCppDxzcCfdlnnIhEMkXEu7QymfC9VMWcwWKvaOANsSku8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pzn5Hg1U; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758905593;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F6ERqWdcM/YJpLfSOtqH+tcv4QvhRwOVTuKYDDboR0Q=;
+	b=Pzn5Hg1UXEixrDuBcSud1iN66R4CzN4lWXj0/9wLhjhl3q4JnPGOrwD3hr31L5yHbO05ja
+	+RxGdAFantcwvRpjWUwoljnh534TFzQqS9X5OQvb3xuHA2kdzJRuinLGxHvvKGfmkVQ+iH
+	+7d1ddEkIdkiR+ZRXauEhzKJK5Ja4Kc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-6-POjhVg4mNey5PUGRnKnMGQ-1; Fri, 26 Sep 2025 12:53:10 -0400
+X-MC-Unique: POjhVg4mNey5PUGRnKnMGQ-1
+X-Mimecast-MFC-AGG-ID: POjhVg4mNey5PUGRnKnMGQ_1758905589
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-46dee484548so14952075e9.2
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 09:53:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758905589; x=1759510389;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F6ERqWdcM/YJpLfSOtqH+tcv4QvhRwOVTuKYDDboR0Q=;
+        b=KFFA9URF4bJ7vNDWEK/rfsrkRc2CT7XKW1K3ss1jEh5A/pQAsQYhlLvZqcH7YIYfqA
+         7tpzai/z16vsd+zsHlFnZakBE8CjfLlIHvYhgMbjXq/HfntmsxbtLT1Pqmta9L8Fpq+r
+         HbkE8t/zJ4z7tW+CciXGGvAebf8bAGRhuwTPdFg+ZTdLTsPqFZ8ucfJuyBhpGDwf+cPm
+         MCiu9fBbLqn5hIpl06Yg8lmVXPLnEoyfIs24SOR+lMPttAAFKyvNJByD3AcN11/cuWUg
+         6BW8JSDF9j/7PGrwMsWqyBdMtJmlrK4UtBh09ehlJ9Q5IdDQ4l+uKOsnw6ZmdCtd7xuH
+         C+fg==
+X-Forwarded-Encrypted: i=1; AJvYcCVVm5X/IMWULYRzMqLtbuRLxS5ZjH7Qn+xFUNCrLcizqUa7QA6SPfcrhILVz+ebvq6r7etlvBU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWybUQcGU1ry/4nsG0EiUDPEcMgVAYegTKWx9gevzYjaAp8/LH
+	KiMBG8CSXQXW7IjAXmb/BSzD4Ddj21WDlAwiZn1dS7vdAWeobdK/Ht6rnYnTz/8xrFPOWcp+Ovo
+	iLgzMDHa9kx0v2OqpIaJQb5ZBtFTLGpXdG+a8IqGW0jo/6JXIzUbIoQsSoQ==
+X-Gm-Gg: ASbGncsU4/mV74aayr24/GecX/uacycvX692LpGAmaLABRwEiP2GQf+Ghuzawa3WHvg
+	ovKdrCA8n2vZjov7kSN1AjhWro2EPy3f0IokUuApmk0Nzly1GFUqbXC4tV1zjp+r5qr5WeLTw6v
+	7Gbwiu0/oFx1luBUwiGej7q0dtcBcMK+yKV47Q6+AUTVB1FLtD71ejOEastXRpW7ewJ6YuOCEwk
+	HCQUiVq/GUgxJVPEr8U6aFZlfvH+pEPKW0TZC0fNpIEi43Mb5GtXBGIT4y74DhXPINbcPmdPirQ
+	45okDn9ujPGZ12cwU+BxpFq3OubeKuXX7qyzVlv3
+X-Received: by 2002:a05:600c:4689:b0:46e:32f5:2d4b with SMTP id 5b1f17b1804b1-46e32f52ec4mr70647425e9.37.1758905588916;
+        Fri, 26 Sep 2025 09:53:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH3BkULf3Lwx+2tbUTcS+B/aKr41qUaW8DLeBacXymSbzz/oDdFVZkAI/iUyC8ROZYaR/clmg==
+X-Received: by 2002:a05:600c:4689:b0:46e:32f5:2d4b with SMTP id 5b1f17b1804b1-46e32f52ec4mr70647105e9.37.1758905588424;
+        Fri, 26 Sep 2025 09:53:08 -0700 (PDT)
+Received: from sgarzare-redhat ([5.77.94.69])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc86c5958sm7652818f8f.57.2025.09.26.09.53.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Sep 2025 09:53:07 -0700 (PDT)
+Date: Fri, 26 Sep 2025 18:52:54 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v6 6/9] vhost/vsock: add netns support
+Message-ID: <4dpdqwdzxk7rkp6c5us6gkzf67ni2j4ekl2aggab66whpfyne3@f4clvj5iilmm>
+References: <20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com>
+ <20250916-vsock-vmtest-v6-6-064d2eb0c89d@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR03MB5371:EE_|LV3PR03MB7753:EE_
-X-MS-Office365-Filtering-Correlation-Id: 559d73b5-1685-4ff2-7ebf-08ddfd1c69c7
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VXBpTEErRkZrOVp3L2wzcC9QTVFsWjJXUW1uZ0kvNTFNUk9tZ2ViY2Q5c0JU?=
- =?utf-8?B?K2pUN2xsUERTL3F4WEQ3cm9QWHBvRVh0eUY0Y2JVd3ZHaXpROU5MWGUxMkp3?=
- =?utf-8?B?Sk1LWUROVlhFWGN3WEc0YVVJS3RnVmhrT1RPbVhwbFJsREFibVFreWE0U2p1?=
- =?utf-8?B?WlhmKzhYR3hMRFB3YnpmUEhucU5HYVdNUFJNLzVJMGkvVzJ5dC94ZU4rUFp6?=
- =?utf-8?B?L2ZZY3c5bGtRQmlGNnRnamdrM0gxenY5YTRWQ1IvWlRYNCtnc1BMalFZaWVT?=
- =?utf-8?B?OWphTE5EOFFMU3RDZjh5VC9ZeGt1WEs2WmhPRldRVmFMMUREcm01UkM3azlF?=
- =?utf-8?B?SHhNNEhzUys3NlBjTGVVcFBVMTNBOFdmR0RQcVNpOFNEZUk3eDIrK21rTWlH?=
- =?utf-8?B?ZU5kREhiVFRlc00xYWl1VG1pU1NKUGc2VStLWExOdXEwT2UzT3BhRTdJYTh3?=
- =?utf-8?B?a2x4aDN1a1ljRnQ3dFU4UGdEVHdkVEVmcFV3QWtZM0lqS2ZnV1Y1U0RPZ2Vz?=
- =?utf-8?B?ejlQOFM2RzdVS0lkWFQ0WWZKRnNFSlVobStIQ2JqbW9mK3I0M1V2c2JyZGIr?=
- =?utf-8?B?VEVWVEVCT3hTaHRRTUZKTEZ6dDIvS2VCVDIzSTdndDNXKzZZQUFrWFdnUzVL?=
- =?utf-8?B?S0NDaEZlMjEybVk3U2JPSmF2NXpEOWhCSW1PUmFFd1FEMTgxdXFiTlpLZHBB?=
- =?utf-8?B?dEM2K2ZJelNjTEo0NGhjQU80dmxIUW5WNFE4VFlUL1c2OWR1M20vb0ZjVGwv?=
- =?utf-8?B?SndyNzdsUjJlbWNGZm9DMWRIbUJWb1hpcXN4TkxhUmFJenR0K1ZLbnNUQ2xr?=
- =?utf-8?B?a282WHFrNDJNR3ZObGttV1llNzE5RTJ4cUxBQnEwYlFpNm84RjhESDVRY3Fy?=
- =?utf-8?B?Ym5WcjcxaXd1TTdCOExtTmJXeTJnNzhRSzhIMXQycTNzRjZnWWtSd1IyNEVK?=
- =?utf-8?B?MjJLNEk2d2piZi9IUkd0N1ZtOTZ6SmxqQllGWDViQ0xKRUpUMTlaWGgvM0pu?=
- =?utf-8?B?WG13VytKWlF6S3U0dUlnMyt0L2V6d3hxa0NVUGZ1VkRuVENPQ3hRZG9jcU9U?=
- =?utf-8?B?dzR5bkRtbEs0Z2Z3TnRkUHJwRXIxMnArcGVNUTVqOE9sVXhoOExKNnRxeG5N?=
- =?utf-8?B?Vm9OZGVCaUxaYTZ1OVdUNmRFakliNmVuR0xSR2dUNVV1Z3lFb3BlV1A0VW5z?=
- =?utf-8?B?WGdPR3FjUnZaRlNHMVpIQkhoSy9RK2l0VUJDVGYrV3FNZDZWbzJHQ3ZQMFUr?=
- =?utf-8?B?cDYvTStVcXBVOUN3ZW1SMWw1UGtlMkxpVTY5dlVKM1pORGVISFFiNjhweG5q?=
- =?utf-8?B?cndGR2FxWTBhWmlnYWZyZ2VQeWEzWGMyaVZmV3RNVEY0TVRCVmN4SWkvMG9i?=
- =?utf-8?B?ajVINW1SSFFGeGszS2tWT2ZGdnJaUGp6L05XNXdlUUVTdGs2RXhSTHJmWTA1?=
- =?utf-8?B?Z3Q5d0N5M3ptTHAxTytXdndvbEhhTGlmd0tiRFRIclgxYjA5TXlDaXRjUVQv?=
- =?utf-8?B?SVkzcFhlL3orcnF5NmhZODZVYStZZDRLWlFDSTMyWjlIUXF1bXNBdmVFS2s3?=
- =?utf-8?B?MmVzdkRFRGkyL1hidFB2UjVOUHg1MlByUStFVHA1b0hzcmNrZlkzdWc2Zmxy?=
- =?utf-8?B?akUzb2N6Y2tRY3lnK1VHVlVIQ1pjV2FYaHIzMml2ZTUwTlJsdGgvWlYyd0RJ?=
- =?utf-8?B?SVVkMGc3eHlDRnBZdFdUcnViVUF0M1JQb1Y4WUZLYWFscUFyTWwvekFudzlN?=
- =?utf-8?B?TTFiVXhYeDNEdEJBV0xTOGVEdElCYVJ5L3NkdGFQRU5WYUtLOHJKbVp1Tklx?=
- =?utf-8?B?YVVQWjY4VzBuRkQ2cTQ1clhzWEN1d0tuS0IrTzd4ZlUzbk0yaGZOUVRFakpI?=
- =?utf-8?B?cngvb2RKQ2FOYlQrSk4wcEdURVpRY1pqZGZmcnFRT1Y0cmEvMFMwTHhZM2JS?=
- =?utf-8?Q?cU57qh3UqyFs38Sv1OxUodzeYILnUgCe?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR03MB5371.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bm9qWUVKcWRqbFFrSkFaVGtKcVE1U1o1VUZjby9RZ1JaMnJNQ1N2TWJhT0Fj?=
- =?utf-8?B?UG9OeXBnd1dzWjl5RnpzRGxOdFAzT1R2Z1dudUxMSnJoMU1ncDRYbzVIVDlI?=
- =?utf-8?B?Nm9BZ0dJdTJsVU5VR2J2bDBVSkthT3pWWC9IOXRTR2tZNlV1eVNVS1RUMERM?=
- =?utf-8?B?a3g2WEt6c1lKNDNBdG1WSlJobk96cncxSVZiR1V2cG14Y0tZUWMyUUxSUmRW?=
- =?utf-8?B?MVhiVTBBU245NzdzNWVWMDVnMUpJNEZYejJKM0hYaW9JdXMxVzhaVkdZMU9K?=
- =?utf-8?B?K2RiQ1Q0UFlRZ1pKaXB4cEd3RXVKY0NxNEc3RHg3bThWaDhoTkVPa0hyL1Jq?=
- =?utf-8?B?UDJjNFJDSk1yWGlXNldJcEtoQTY2RzFQb2IwSTQ1YmxRayt4QzRlR2tSL0xj?=
- =?utf-8?B?OFdmMW04bHdLcUZsQjN4OVEreWFBUllYQSthZ3k2bTRTZDBpeGpmMkdoNTgx?=
- =?utf-8?B?WE84eXBlQW9WMUJBSGRDN0ZMTkdOUmQvNlZvYy9Kd2ZKU3J3dERKZVNSUGN1?=
- =?utf-8?B?OHNVcHowSnlUWHU1RGNBWWlOWU5WQTA4WFRkejdrcVJrVWtTN2RMK3hvTnh5?=
- =?utf-8?B?ZFphdGdXL1pqRk5jY2gvSTlhWmFIV1FYSXJyNFU1TVVGNzZTSFFkVTVvMCtl?=
- =?utf-8?B?a0Yxa045TDU0K2FlQm9BL2wzajg4bjhjV2plTWNGK3ZsRDJGRlVtaVNXajkr?=
- =?utf-8?B?RjVIR1RHdzZOVlN4WGdpam85OFpXSktxeEN1NU9Ca25FbG9hd1VyUGVQWWVL?=
- =?utf-8?B?Q3ViQ0lkNmlRdUZUMm9IQzNjc3RqU0Z3SFhSVExLOVZIREdtY09qOXBrNUM5?=
- =?utf-8?B?blU5MmVuN0dDMWhGQUVwekVOSWdNblAyVEFEWVE2bWE0MnlwbHRBZ3hOK25B?=
- =?utf-8?B?dGNvMFJ0cXdIZVVpTVFFVkFjWlVkTlR5alR5Nk1zSnhWd0pZWHNLcWcvUTdq?=
- =?utf-8?B?c2kwRUt6VmpQY1o5ZC81UHRWa090dmNpZ0FMc3UwOU0zZW5Wcm1ZVmhGamEy?=
- =?utf-8?B?Q2d2cnA1OVlkUFNpOU5QdnhDV2xiSmY4WTUrWkk1bjlDZnlrZmw2eUhOVjVE?=
- =?utf-8?B?L2hDSVY1RkZsWHJyd2dmMHlYc0NCZVRPdFRzWEl2UC9xVzVFS0EwblVoaVZ1?=
- =?utf-8?B?WHhCbG9TNzkxVDNsMndSbGhDdENWVk1XeGxqTDNEK05wRUJoL21tSXBDMDBN?=
- =?utf-8?B?eTRnTm4rcFpSTzltaHdTZCtxUWlkb1V0RE9RdVYxQnRENjBkQ0JlbnVrVWVW?=
- =?utf-8?B?V2hVODl6MG5rVTNWeXNXcXN4OGN2VGhnTjN5VlBHK3B4dXlMVkI0Vm1mQlor?=
- =?utf-8?B?Q0h6Vk1aZXc2NG4zYkx1QTZHNEZlNjYxYVY4ZXFnZ3l1cG9NNGd5MzFEQmJY?=
- =?utf-8?B?RlBVeWZmNElnd2pUSHNQS2taOGhjSWJXWWpFT2ZIQ1dQU3hrZHVqWXZLUFBo?=
- =?utf-8?B?QzFYZnd0dys5Q3BFL3ZZdXc3WVpNMi9FSVI5U051bk82MCtYU2NwY2M0cHM4?=
- =?utf-8?B?ZEpPZlNFMGRHUmFCbHRXTzR2WUlyYlVrV2NkTGRTRFN0cldFVGgvQk5nbm9E?=
- =?utf-8?B?cEdPcTlQa3h0eUZuQmhodDlJZWtoeXpuNzJPVUd4aVdYWHNwRmxYK29wMHBk?=
- =?utf-8?B?RW1aL3ZQM280bkMvQ2NpOGd0SDJObzlKODN2N2Q1T1JuOVRHdGJneTVPak1m?=
- =?utf-8?B?Z0RnbDF0WmhoMU9GeHo0REV4Y3FKcEpwNWFFVElZN0xMdGdtbnpxMEI3amFY?=
- =?utf-8?B?bGpJTUNydkg1eFFEWWErQ2lqYk80VEozM0w0dkR1YTNKZTBrSisyR0Y2MWFN?=
- =?utf-8?B?c2lIcktNaExWQ2dna1ovVTU4ODRRNXd6V0REMWxaQWZaSVo2MGRaalk0VG51?=
- =?utf-8?B?bG5tREsvdUs0b0daOWJYSVg5bzV3RTBINHd4SkcyVlJ1YTlFd3BsdnJEanAv?=
- =?utf-8?B?eE1LVHRad1NLTXNxSGVhYnlkWTVxNTdRdkx5SXd2alJkaTVicGRRSmtKRWs5?=
- =?utf-8?B?aWU0Q0VXZjNwVGtIaE5IaEY3Q25nYWpVOUdHTXpKZm1VRzBYdUF1b3BXVThl?=
- =?utf-8?B?ODI1NEp6ZTlaMkNaaHN4M3R2ZkxOMWlBU0pSSkpCVnBZQVlGWWEvYythM3Ri?=
- =?utf-8?B?V0Q4VEN4VjRsR1lqdG5zbm1xUzFHNGYraDREZm5IUzBKQ1B2a0VHa3AzYjd2?=
- =?utf-8?B?Qmc9PQ==?=
-X-OriginatorOrg: altera.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 559d73b5-1685-4ff2-7ebf-08ddfd1c69c7
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR03MB5371.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2025 16:47:43.7839
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HJh3r3jG6zHA5ckryx7s564Ttf/1rJTnWQHpmF9D7w19iZceN0TUwleA3FqIPg201XRY/YYu2vR4geDdV3SpjkbikAEVhKYDmOsIn8sD+jo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR03MB7753
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250916-vsock-vmtest-v6-6-064d2eb0c89d@meta.com>
 
-Hi Jakub,
+On Tue, Sep 16, 2025 at 04:43:50PM -0700, Bobby Eshleman wrote:
+>From: Bobby Eshleman <bobbyeshleman@meta.com>
+>
+>Add the ability to isolate vsock flows using namespaces.
+>
+>The VM, via the vhost_vsock struct, inherits its namespace from the
+>process that opens the vhost-vsock device. vhost_vsock lookup functions
+>are modified to take into account the mode (e.g., if CIDs are matching
+>but modes don't align, then return NULL).
+>
+>vhost_vsock now acquires a reference to the namespace.
+>
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>
+>---
+>Changes in v5:
+>- respect pid namespaces when assigning namespace to vhost_vsock
+>---
+> drivers/vhost/vsock.c | 74 +++++++++++++++++++++++++++++++++++++++++++++------
+> 1 file changed, 66 insertions(+), 8 deletions(-)
+>
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index 34adf0cf9124..1aabe9f85503 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -46,6 +46,11 @@ static DEFINE_READ_MOSTLY_HASHTABLE(vhost_vsock_hash, 8);
+> struct vhost_vsock {
+> 	struct vhost_dev dev;
+> 	struct vhost_virtqueue vqs[2];
+>+	struct net *net;
+>+	netns_tracker ns_tracker;
+>+
+>+	/* The ns mode at the time vhost_vsock was created */
+>+	enum vsock_net_mode orig_net_mode;
+>
+> 	/* Link to global vhost_vsock_hash, writes use vhost_vsock_mutex */
+> 	struct hlist_node hash;
+>@@ -64,10 +69,40 @@ static u32 vhost_transport_get_local_cid(void)
+> 	return VHOST_VSOCK_DEFAULT_HOST_CID;
+> }
+>
+>+/* Return true if the namespace net can access the vhost_vsock vsock.
+>+ * Otherwise, return false.
+>+ *
+>+ * If the netns is the same, it doesn't matter if it is local or global. The
+>+ * vsock sockets within a namespace can always communicate.
+>+ *
+>+ * If the netns is different, then we need to check if the current namespace
+>+ * mode is global and if the namespace mode at the time of the vhost_vsock
+>+ * being created is global. If so, then we allow it. By checking the namespace
+>+ * mode at the time of the vhost_vsock's creation we allow the flow to continue
+>+ * working even if the namespace mode changes to "local" in the middle of a
+>+ * socket's lifetime. If we used the current namespace mode instead, then any
+>+ * socket that was alive prior to the mode change would suddenly fail.
+>+ */
+>+static bool vhost_vsock_net_check_mode(struct net *net,
+>+				       struct vhost_vsock *vsock,
+>+				       bool check_global)
+>+{
+>+	if (net_eq(net, vsock->net))
+>+		return true;
+>+
+>+	return check_global &&
+>+	       (vsock_net_mode(net) == VSOCK_NET_MODE_GLOBAL &&
+>+	        vsock->orig_net_mode == VSOCK_NET_MODE_GLOBAL);
+>+}
+>+
+> /* Callers that dereference the return value must hold vhost_vsock_mutex or the
+>  * RCU read lock.
+>+ *
+>+ * If check_global is true, evaluate the vhost_vsock namespace and namespace
+>+ * net argument as matching if they are both in global mode.
+>  */
+>-static struct vhost_vsock *vhost_vsock_get(u32 guest_cid)
+>+static struct vhost_vsock *vhost_vsock_get(u32 guest_cid, struct net *net,
+>+					   bool check_global)
+> {
+> 	struct vhost_vsock *vsock;
+>
+>@@ -78,9 +113,9 @@ static struct vhost_vsock *vhost_vsock_get(u32 guest_cid)
+> 		if (other_cid == 0)
+> 			continue;
+>
+>-		if (other_cid == guest_cid)
+>+		if (other_cid == guest_cid &&
+>+		    vhost_vsock_net_check_mode(net, vsock, check_global))
+> 			return vsock;
+>-
+> 	}
+>
+> 	return NULL;
+>@@ -272,13 +307,14 @@ static int
+> vhost_transport_send_pkt(struct sk_buff *skb)
+> {
+> 	struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
+>+	struct net *net = virtio_vsock_skb_net(skb);
+> 	struct vhost_vsock *vsock;
+> 	int len = skb->len;
+>
+> 	rcu_read_lock();
+>
+> 	/* Find the vhost_vsock according to guest context id  */
+>-	vsock = vhost_vsock_get(le64_to_cpu(hdr->dst_cid));
+>+	vsock = vhost_vsock_get(le64_to_cpu(hdr->dst_cid), net, true);
+> 	if (!vsock) {
+> 		rcu_read_unlock();
+> 		kfree_skb(skb);
+>@@ -305,7 +341,7 @@ vhost_transport_cancel_pkt(struct vsock_sock *vsk)
+> 	rcu_read_lock();
+>
+> 	/* Find the vhost_vsock according to guest context id  */
+>-	vsock = vhost_vsock_get(vsk->remote_addr.svm_cid);
+>+	vsock = vhost_vsock_get(vsk->remote_addr.svm_cid, sock_net(sk_vsock(vsk)), true);
+> 	if (!vsock)
+> 		goto out;
+>
+>@@ -462,11 +498,12 @@ static struct virtio_transport vhost_transport = {
+>
+> static bool vhost_transport_seqpacket_allow(struct vsock_sock *vsk, u32 remote_cid)
+> {
+>+	struct net *net = sock_net(sk_vsock(vsk));
+> 	struct vhost_vsock *vsock;
+> 	bool seqpacket_allow = false;
+>
+> 	rcu_read_lock();
+>-	vsock = vhost_vsock_get(remote_cid);
+>+	vsock = vhost_vsock_get(remote_cid, net, true);
+>
+> 	if (vsock)
+> 		seqpacket_allow = vsock->seqpacket_allow;
+>@@ -526,6 +563,8 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
+> 			continue;
+> 		}
+>
+>+		virtio_vsock_skb_set_net(skb, vsock->net);
+>+		virtio_vsock_skb_set_orig_net_mode(skb, vsock->orig_net_mode);
 
-On 9/26/2025 7:22 AM, Jakub Kicinski wrote:
-> On Thu, 25 Sep 2025 16:33:21 +0530 G Thomas, Rohan wrote:
->> While testing 802.1AD with XGMAC hardware using a simple ping test, I
->> observed an unexpected behavior: the hardware appears to insert an
->> additional 802.1Q CTAG with VLAN ID 0. Despite this, the ping test
->> functions correctly.
->>
->> Here’s a snapshot from the pcap captured at the remote end. Outer VLAN
->> tag used is 100 and inner VLAN tag used is 200.
->>
->> Frame 1: 110 bytes on wire (880 bits), 110 bytes captured (880 bits)
->> Ethernet II, Src: <src> (<src>), Dst: <dst> (<dst>)
->> IEEE 802.1ad, ID: 100
->> 802.1Q Virtual LAN, PRI: 0, DEI: 0, ID: 0(unexpected)
->> 802.1Q Virtual LAN, PRI: 0, DEI: 0, ID: 200
->> Internet Protocol Version 4, Src: 192.168.4.10, Dst: 192.168.4.11
->> Internet Control Message Protocol
-> 
-> And the packet arrives at the driver with only the .1Q ID 200 pushed?
+In virtio_transport_common.c we do this in the alloc_skb function, can 
+we do the same also here?
+
+And maybe also in the virtio_transport.c (i.e. in virtio_vsock_rx_fill() 
+or adding a wrapper around virtio_vsock_alloc_linear_skb()).
+
+> 		total_len += sizeof(*hdr) + skb->len;
+>
+> 		/* Deliver to monitoring devices all received packets */
+>@@ -652,10 +691,14 @@ static void vhost_vsock_free(struct vhost_vsock *vsock)
+>
+> static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
+> {
+>+
+> 	struct vhost_virtqueue **vqs;
+> 	struct vhost_vsock *vsock;
+>+	struct net *net;
+> 	int ret;
+>
+>+	net = current->nsproxy->net_ns;
+>+
+> 	/* This struct is large and allocation could fail, fall back to vmalloc
+> 	 * if there is no other way.
+> 	 */
+>@@ -669,6 +712,12 @@ static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
+> 		goto out;
+> 	}
+>
+>+	vsock->net = get_net_track(net, &vsock->ns_tracker, GFP_KERNEL);
+>+
+>+	/* Cache the mode of the namespace so that if that netns mode changes,
+>+	 * the vhost_vsock will continue to function as expected. */
+>+	vsock->orig_net_mode = vsock_net_mode(net);
+>+
+> 	vsock->guest_cid = 0; /* no CID assigned yet */
+> 	vsock->seqpacket_allow = false;
+>
+>@@ -707,8 +756,16 @@ static void vhost_vsock_reset_orphans(struct sock *sk)
+> 	 * executing.
+> 	 */
+>
+>+	/* DELETE ME:
+
+mmm, to be deleted, right? :-)
+
+>+	 *
+>+	 * for each connected socket:
+>+	 *	vhost_vsock = vsock_sk(sk)
+>+	 *
+>+	 *	find the peer
+>+	 */
+>+
+> 	/* If the peer is still valid, no need to reset connection */
+>-	if (vhost_vsock_get(vsk->remote_addr.svm_cid))
+>+	if (vhost_vsock_get(vsk->remote_addr.svm_cid, sock_net(sk), false))
+
+Can we add a comment here to explain why `check_global` is false?
+
+Thanks,
+Stefano
+
+> 		return;
+>
+> 	/* If the close timeout is pending, let it expire.  This avoids races
+>@@ -753,6 +810,7 @@ static int vhost_vsock_dev_release(struct inode *inode, struct file *file)
+> 	virtio_vsock_skb_queue_purge(&vsock->send_pkt_queue);
+>
+> 	vhost_dev_cleanup(&vsock->dev);
+>+	put_net_track(vsock->net, &vsock->ns_tracker);
+> 	kfree(vsock->dev.vqs);
+> 	vhost_vsock_free(vsock);
+> 	return 0;
+>@@ -779,7 +837,7 @@ static int vhost_vsock_set_cid(struct vhost_vsock *vsock, u64 guest_cid)
+>
+> 	/* Refuse if CID is already in use */
+> 	mutex_lock(&vhost_vsock_mutex);
+>-	other = vhost_vsock_get(guest_cid);
+>+	other = vhost_vsock_get(guest_cid, vsock->net, true);
+> 	if (other && other != vsock) {
+> 		mutex_unlock(&vhost_vsock_mutex);
+> 		return -EADDRINUSE;
+>
+>-- 
+>2.47.3
 >
 
-Yes, the packet arrives the driver with only 802.1Q ID.
-
-[  210.192912] stmmaceth 10830000.ethernet eth0: >>> frame to be 
-transmitted:
-[  210.192917] len = 46 byte, buf addr: 0x0000000067c78222
-[  210.192923] 00000000: xx xx xx xx xx xx xx xx xx xx xx xx 81 00 00 c8
-[  210.192928] 00000010: 08 06 00 01 08 00 06 04 00 02 46 9b 06 1b 5b b6
-[  210.192931] 00000020: c0 a8 04 0a c8 a3 62 0e d7 04 c0 a8 04 0b
-> Indeed, that looks like a problem with the driver+HW interaction.
-> IDK what the right terminology is but IIRC VLAN 0 is not a real VLAN,
-> just an ID reserved for frames that don't have a VLAN ID but want to
-> use the priority field. Which explains why it "works", receiver just
-> ignores that tag. But it's definitely not correct because switches
-> on the network will no see the real C-TAG after the S-TAG is stripped.
-
-Yes, we are trying to figure out the right configuration for the driver
-so that the right tag is inserted by the driver for double and single
-VLANs. Based on the register configuration options for MAC_VLAN_Incl and
-MAC_Inner_VLAN_Incl registers and descriptor configuration options
-available, the hardware may not support simultaneous offloading of STAG
-for 802.1AD double-tagged packets and CTAG for 802.1Q single-tagged
-packets. If that is the case disable STAG insertion offloading may be
-the right approach.
-
-Best Regards,
-Rohan
 
