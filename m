@@ -1,397 +1,299 @@
-Return-Path: <netdev+bounces-226765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70BBABA4E5E
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 20:32:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A82C8BA4EA6
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 20:45:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00DC66285CA
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:32:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 337FD3B257E
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:45:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6A9C2F83AC;
-	Fri, 26 Sep 2025 18:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785B827B331;
+	Fri, 26 Sep 2025 18:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="leemcH/d"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b5tuwHLb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88DB11E49F;
-	Fri, 26 Sep 2025 18:32:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEBC419CD1B
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 18:45:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758911530; cv=none; b=u6JmHqzU9c9GfZr5mWuGEY67HWTIUDYB0hRLCXUc2pg+sz4FNYiwYOQHiFy68NardT+tiiEUgKouawtvSqG52hzNqs2aTv/avkz1UofhxaKNAs79ScXuzAhKUqROeUkaz8rLC1PF3Sq1qQDWJ+9IgA6bgKhx36GoEpF3XoZhfs8=
+	t=1758912336; cv=none; b=QhhZErTr1wJy1AV0ru6NPShWUfQ88zd0ldI/btPBv5iwvnQe07n7shZF4UC92QV+5LMa0LJ2ijvumR92Sl2gMwt/Wv06O80A409MPJGtxHDMY4G+9o3uKiVG+obQ9k3wcW/lblCLfXwZ7oct5LlEEMbmAnUkTybPl9xZ89doWDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758911530; c=relaxed/simple;
-	bh=HHb3PYPRZqcGwa2oDar0OGgY5SRFk/y52NOpVGOEYFM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A/+YlALlOyyjDRkGYO4pFikzRv5VGseUuG8Z7Kfxiq04vZLYjSbDkYQeTD2i87sgITGrUwt7helg4YWy5yuG8hdz2nCthcoUKNo/mAK/X+Lzr6oCA0es5qHAvwT7HLxBO3Tdgi9ryEdrNC8bn2RY6iaOzUkQ59WrbMDwZyu5pp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=leemcH/d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7D55C4CEF4;
-	Fri, 26 Sep 2025 18:32:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758911530;
-	bh=HHb3PYPRZqcGwa2oDar0OGgY5SRFk/y52NOpVGOEYFM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=leemcH/dDtJt1EuPjMDmoh5lEkceYUgozl1tpO3F027UvvbZDuIohOZGvQDBMz/C7
-	 0nO8VraVePP71Id9JgW93RvZwLK8A2cOb5fIjn4ITfdi7QdDV1HG53UeRlIW1mXqO6
-	 Lt7IsoQgiRY9j1vVRy+aNJJJb01miIxcy/Fx4Nj1wROj8ccR2Z4B96t94DFxBBR0wR
-	 /B5sGws9ExOM0grqQQrM6Ytl6PWC4owd3M8ezZFutrfQHW3Cc9OWWQGNRsferI0O4Z
-	 sRaDuc4J7zCC4qUgVyAs+cKYOdcNMNRtBpLwQMOEFXeQ55jiWyVKR4Rohc8JXZ+M56
-	 FxKFpCRq5+OJA==
-Date: Fri, 26 Sep 2025 11:32:08 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman
- <horms@kernel.org>, david decotigny <decot@googlers.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
- calvin@wbinvd.org, kernel-team@meta.com, jv@jvosburgh.net
-Subject: Re: [PATCH net v5 4/4] selftest: netcons: add test for netconsole
- over bonded interfaces
-Message-ID: <20250926113208.07fa0b2f@kernel.org>
-In-Reply-To: <w33kl7gd5b4yrakxkg5cnkwgvvzdz6jgwzmwmxyrrf3nxvyspn@3354jtfl26vu>
-References: <20250918-netconsole_torture-v5-0-77e25e0a4eb6@debian.org>
-	<20250918-netconsole_torture-v5-4-77e25e0a4eb6@debian.org>
-	<20250919174901.1a6062d7@kernel.org>
-	<w33kl7gd5b4yrakxkg5cnkwgvvzdz6jgwzmwmxyrrf3nxvyspn@3354jtfl26vu>
+	s=arc-20240116; t=1758912336; c=relaxed/simple;
+	bh=Qn3dKHpLNKvEuHaXefHzfNlFAZYIwti/Y+04qxDydM4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ufUImKX3MJVYo9W0p5tgPUZxYtVzGIkpOHye7CzOEV4aULU5ZmbSGfVQic9EAHi5iM2SmNGpjSAeW69sR8Lby1x9FTvAJPzs5vUaUMP5mai2W3sEKNPqDMCpTKe8fDlB81ziiftuAqWBF5uN0QK+h1e2ArHelx5qUw/KqBeLeMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b5tuwHLb; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758912335; x=1790448335;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Qn3dKHpLNKvEuHaXefHzfNlFAZYIwti/Y+04qxDydM4=;
+  b=b5tuwHLb+fNpfM8LTmYX8wA1a9mamEH5rz9nCj0kZwFzkYO0zJJifvYl
+   fhmElkt2Ys747B4FMOatid61brzYfIk4ZqCMfF3/bfHhqNw/ghZxo4/P2
+   Lh0Hjb997qM/7BARaAiH7mFIX65M0bZl1rkwJTyBA8z4vaco8HKSGsKvg
+   Bu2MuMHx8gyGnZfkmW+O/wZhl69ZLw7n0689REbnmcsmQ/QdCa/gwoAlE
+   aLNKwgrEJ63urOl5kOf9fAg8TAClzhYM8kwA4aD2smZc0kjh+rV5UFx3A
+   ilomYVTiTwRkCBI/zVFdoWyOQSXPcCA15GPbR2l/WBi2uP+kJn3L2H2qR
+   w==;
+X-CSE-ConnectionGUID: gioZvIzGShe9lNVwR2tb+Q==
+X-CSE-MsgGUID: M7IzKjinSGaAIzSnY+3FeA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11565"; a="71935984"
+X-IronPort-AV: E=Sophos;i="6.18,295,1751266800"; 
+   d="scan'208";a="71935984"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2025 11:45:34 -0700
+X-CSE-ConnectionGUID: B2/Gn5ZOSFy5/FH4hWbuWg==
+X-CSE-MsgGUID: Nywi0fwyRfC1kqy3opj2QQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,295,1751266800"; 
+   d="scan'208";a="214825821"
+Received: from unknown (HELO fedora.jf.intel.com) ([10.166.244.151])
+  by orviesa001.jf.intel.com with ESMTP; 26 Sep 2025 11:45:33 -0700
+From: Madhu Chittim <madhu.chittim@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	aleksander.lobakin@intel.com,
+	horms@kernel.org,
+	sridhar.samudrala@intel.com
+Subject: [PATCH iwl-next v5] idpf: add support for IDPF PCI programming interface
+Date: Fri, 26 Sep 2025 11:45:33 -0700
+Message-ID: <20250926184533.1872683-1-madhu.chittim@intel.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri, 26 Sep 2025 07:06:50 -0700 Breno Leitao wrote:
-> > Since the bonding tests can't run on real HW it can't live directly in
-> > tools/testing/selftests/drivers/net/ we need to move it to either the
-> > netdevsim group or the bonding group.  
-> 
-> Are you talking abouttools/testing/selftests/drivers/net/bonding as the
-> bonding group?
-> 
-> With the changed above, this is how the selftest looks like now:
-> 
-> Author: Breno Leitao <leitao@debian.org>
-> Date:   Wed Sep 17 01:46:26 2025 -0700
-> 
->     selftest: netcons: add test for netconsole over bonded interfaces
->     
->     This patch adds a selftest that verifies netconsole functionality
->     over bonded network interfaces using netdevsim. It sets up two bonded
->     interfaces acting as transmit (TX) and receive (RX) ends, placed in
->     separate network namespaces. The test sends kernel log messages and
->     verifies that they are properly received on the bonded RX interfaces
->     with both IPv4 and IPv6, and using basic and extended netconsole
->     formats.
->     
->     This patchset aims to test a long-standing netpoll are where netpoll has
->     multiple users. (in this case netconsole and bonding). A similar
->     selftest has been discussed in [1] and [2].
->     
->     This test also try to enable bonding and netpoll at the same time, and
->     make sure that it fails.
->     
->     Link: https://lore.kernel.org/all/20250905-netconsole_torture-v3-0-875c7febd316@debian.org/ [1]
->     Link: https://lore.kernel.org/lkml/96b940137a50e5c387687bb4f57de8b0435a653f.1404857349.git.decot@googlers.com/ [2]
->     Signed-off-by: Breno Leitao <leitao@debian.org>
-> 
-> diff --git a/tools/testing/selftests/drivers/net/bonding/Makefile b/tools/testing/selftests/drivers/net/bonding/Makefile
-> index 3462783ed3aca..d7fb239c02814 100644
-> --- a/tools/testing/selftests/drivers/net/bonding/Makefile
-> +++ b/tools/testing/selftests/drivers/net/bonding/Makefile
-> @@ -8,6 +8,7 @@ TEST_PROGS := \
->  	dev_addr_lists.sh \
->  	mode-1-recovery-updelay.sh \
->  	mode-2-recovery-updelay.sh \
-> +	netcons_over_bonding.sh \
->  	bond_options.sh \
->  	bond-eth-type-change.sh \
->  	bond_macvlan_ipvlan.sh \
+From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
 
-Do we need to add the netcons lib to TEST_INCLUDES  ?
+At present IDPF supports only 0x1452 and 0x145C as PF and VF device IDs
+on our current generation hardware. Future hardware exposes a new set of
+device IDs for each generation. To avoid adding a new device ID for each
+generation and to make the driver forward and backward compatible,
+make use of the IDPF PCI programming interface to load the driver.
 
-> diff --git a/tools/testing/selftests/drivers/net/bonding/config b/tools/testing/selftests/drivers/net/bonding/config
-> index 4d16a69ffc650..c9e609ff5b5dd 100644
-> --- a/tools/testing/selftests/drivers/net/bonding/config
-> +++ b/tools/testing/selftests/drivers/net/bonding/config
-> @@ -10,3 +10,8 @@ CONFIG_NET_CLS_MATCHALL=m
->  CONFIG_NET_SCH_INGRESS=y
->  CONFIG_NLMON=y
->  CONFIG_VETH=y
-> +CONFIG_NETDEVSIM=m
-> +CONFIG_CONFIGFS_FS=y
-> +CONFIG_NETCONSOLE=m
-> +CONFIG_NETCONSOLE_DYNAMIC=y
-> +CONFIG_NETCONSOLE_EXTENDED_LOG=y
+Write and read the VF_ARQBAL mailbox register to find if the current
+device is a PF or a VF.
 
-For the config options some approximation of alphabetical sort is good.
-Adding at the end increases the risk of cherry-pick / merge conflicts
-dramatically.
+PCI SIG allocated a new programming interface for the IDPF compliant
+ethernet network controller devices. It can be found at:
+https://members.pcisig.com/wg/PCI-SIG/document/20113
+with the document titled as 'PCI Code and ID Assignment Revision 1.16'
+or any latest revisions.
 
-> +function enable_netpoll_on_enslaved_iface() {
-> +	echo 0 > "${NETCONS_PATH}"/enabled
-> +
-> +	# At this stage, BOND_TX1_IF is enslaved to BONDTX_IF, and linked to
-> +	# BOND_RX1_IF inside the namespace.
-> +	echo "${BOND_TX1_IF}" > "${NETCONS_PATH}"/dev_name
-> +
-> +	# This should fail with the following message in dmesg:
-> +	# netpoll: netconsole: ethX is a slave device, aborting
-> +	set +e
-> +	echo 1 > "${NETCONS_PATH}"/enabled
-> +	set -e
-> +
-> +	if [ "$(cat "${NETCONS_PATH}/enabled")" -eq 1 ]
-> +	then
-> +		echo "netpoll: Bonding and netpoll cannot co-exists. Test failed." >&2
-> +		exit "${ksft_fail}"
-> +
+Tested this patch by doing a simple driver load/unload on Intel IPU E2000
+hardware which supports 0x1452 and 0x145C device IDs and new hardware
+which supports the IDPF PCI programming interface.
 
-nit: extra nl
+Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+Signed-off-by: Madhu Chittim <madhu.chittim@intel.com>
+---
+v5:
+- Removed use of resource_set_range
+- ioremap only the register which we would like write and read back
+- Renamed function from idpf_is_vf_device to idpf_get_device_type and
+  moved it idpf_main.c as it is not specific to VF
+- idpf_get_device_type now returns device type
 
-> +	fi
-> +}
+v4:
+- add testing info
+- use resource_size_t instead of long
+- add error statement for ioremap failure
 
-> +# Test #3
-> +# Detach the interface from a bonding interface and attach netpoll again
-> +delete_bond_and_reenable_target
-> +echo "test #3: Able to attach to an unbound interface. Test passed." >&2
+v3:
+- reworked logic to avoid gotos
 
-Do we need a fouth case? Enable netpoll on an interface and then try to
-enslave it while netpoll is active, then try to enable netpoll on the
-bond?
+v2:
+- replace *u8 with *bool in idpf_is_vf_device function parameter
+- use ~0 instead of 0xffffff in PCI_DEVICE_CLASS parameter
 
-And possibly a couple of cases where we set up netpoll on the bond
-first, then we add to bond (success and fail case).
+ drivers/net/ethernet/intel/idpf/idpf.h      |   1 +
+ drivers/net/ethernet/intel/idpf/idpf_main.c | 105 ++++++++++++++++----
+ 2 files changed, 89 insertions(+), 17 deletions(-)
 
-> +cleanup_bond
-> +trap - EXIT
-> +exit "${EXIT_STATUS}"
-> diff --git a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-> index 9b5ef8074440c..4862d025b7c74 100644
-> --- a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-> +++ b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-> @@ -28,17 +28,24 @@ NETCONS_PATH="${NETCONS_CONFIGFS}"/"${TARGET}"
->  # NAMESPACE will be populated by setup_ns with a random value
->  NAMESPACE=""
->  
-> -# IDs for netdevsim
-> +# IDs for netdevsim. We either use NSIM_DEV_{1,2}_ID for standard test
-> +# or NSIM_BOND_{T,R}X_{1,2} for the bonding tests. Not both at the
-> +# same time.
->  NSIM_DEV_1_ID=$((256 + RANDOM % 256))
->  NSIM_DEV_2_ID=$((512 + RANDOM % 256))
-> +NSIM_BOND_TX_1=$((768 + RANDOM % 256))
-> +NSIM_BOND_TX_2=$((1024 + RANDOM % 256))
-> +NSIM_BOND_RX_1=$((1280 + RANDOM % 256))
-> +NSIM_BOND_RX_2=$((1536 + RANDOM % 256))
->  NSIM_DEV_SYS_NEW="/sys/bus/netdevsim/new_device"
-> +NSIM_DEV_SYS_LINK="/sys/bus/netdevsim/link_device"
-> +NSIM_DEV_SYS_DEL="/sys/bus/netdevsim/del_device"
->  
->  # Used to create and delete namespaces
->  source "${LIBDIR}"/../../../../net/lib.sh
->  
->  # Create netdevsim interfaces
->  create_ifaces() {
-> -
->  	echo "$NSIM_DEV_2_ID" > "$NSIM_DEV_SYS_NEW"
->  	echo "$NSIM_DEV_1_ID" > "$NSIM_DEV_SYS_NEW"
->  	udevadm settle 2> /dev/null || true
-> @@ -54,7 +61,6 @@ create_ifaces() {
->  }
->  
->  link_ifaces() {
-> -	local NSIM_DEV_SYS_LINK="/sys/bus/netdevsim/link_device"
->  	local SRCIF_IFIDX=$(cat /sys/class/net/"$SRCIF"/ifindex)
->  	local DSTIF_IFIDX=$(cat /sys/class/net/"$DSTIF"/ifindex)
->  
-> @@ -96,6 +102,33 @@ function select_ipv4_or_ipv6()
->  	fi
->  }
->  
-> +# Create 4 netdevsim interfaces. Two of them will be bound to TX bonding iface
-> +# and the other two will be bond to the RX interface (on the other namespace)
-> +function create_ifaces_bond() {
-> +	echo "$NSIM_BOND_TX_1" > "$NSIM_DEV_SYS_NEW"
-> +	echo "$NSIM_BOND_TX_2" > "$NSIM_DEV_SYS_NEW"
-> +	echo "$NSIM_BOND_RX_1" > "$NSIM_DEV_SYS_NEW"
-> +	echo "$NSIM_BOND_RX_2" > "$NSIM_DEV_SYS_NEW"
-> +	udevadm settle 2> /dev/null || true
-> +
-> +	local BOND_TX1=/sys/bus/netdevsim/devices/netdevsim"$NSIM_BOND_TX_1"
-> +	local BOND_TX2=/sys/bus/netdevsim/devices/netdevsim"$NSIM_BOND_TX_2"
-> +	local BOND_RX1=/sys/bus/netdevsim/devices/netdevsim"$NSIM_BOND_RX_1"
-> +	local BOND_RX2=/sys/bus/netdevsim/devices/netdevsim"$NSIM_BOND_RX_2"
-> +
-> +	# TX
-> +	BOND_TX1_IF=$(find "$BOND_TX1"/net -maxdepth 1 -type d ! \
-> +		-path "$BOND_TX1"/net -exec basename {} \; | grep -v net)
-> +	BOND_TX2_IF=$(find "$BOND_TX2"/net -maxdepth 1 -type d ! \
-> +		-path "$BOND_TX2"/net -exec basename {} \; | grep -v net)
-> +
-> +	# RX
-> +	BOND_RX1_IF=$(find "$BOND_RX1"/net -maxdepth 1 -type d ! \
-> +		-path "$BOND_RX1"/net -exec basename {} \; | grep -v net)
-> +	BOND_RX2_IF=$(find "$BOND_RX2"/net -maxdepth 1 -type d ! \
-> +		-path "$BOND_RX2"/net -exec basename {} \; | grep -v net)
-> +}
-> +
->  function set_network() {
->  	local IP_VERSION=${1:-"ipv4"}
->  
-> @@ -180,8 +213,6 @@ function disable_release_append() {
->  }
->  
->  function do_cleanup() {
-> -	local NSIM_DEV_SYS_DEL="/sys/bus/netdevsim/del_device"
-> -
->  	# Delete netdevsim devices
->  	echo "$NSIM_DEV_2_ID" > "$NSIM_DEV_SYS_DEL"
->  	echo "$NSIM_DEV_1_ID" > "$NSIM_DEV_SYS_DEL"
-> @@ -193,14 +224,26 @@ function do_cleanup() {
->  	echo "${DEFAULT_PRINTK_VALUES}" > /proc/sys/kernel/printk
->  }
->  
-> -function cleanup() {
-> +function cleanup_netcons() {
->  	# delete netconsole dynamic reconfiguration
-> -	echo 0 > "${NETCONS_PATH}"/enabled
-> +	# do not fail if the target is already disabled
-> +	if [[ ! -d "${NETCONS_PATH}" ]]
-> +	then
-> +		# in some cases this is called before netcons path is created
-> +		return
-> +	fi
-> +	if [[ $(cat "${NETCONS_PATH}"/enabled) != 0 ]]
-> +	then
-> +		echo 0 > "${NETCONS_PATH}"/enabled || true
-> +	fi
->  	# Remove all the keys that got created during the selftest
->  	find "${NETCONS_PATH}/userdata/" -mindepth 1 -type d -delete
->  	# Remove the configfs entry
->  	rmdir "${NETCONS_PATH}"
-> +}
->  
-> +function cleanup() {
-> +	cleanup_netcons
->  	do_cleanup
->  }
->  
-> @@ -377,3 +420,105 @@ function wait_for_port() {
->  	# more frequently on IPv6
->  	sleep 1
->  }
-> +
-> +# netdevsim link BOND_TX to BOND_RX interfaces
-> +function link_ifaces_bond() {
-> +	local BOND_TX1_IFIDX
-> +	local BOND_TX2_IFIDX
-> +	local BOND_RX1_IFIDX
-> +	local BOND_RX2_IFIDX
-> +
-> +	BOND_TX1_IFIDX=$(cat /sys/class/net/"$BOND_TX1_IF"/ifindex)
-> +	BOND_TX2_IFIDX=$(cat /sys/class/net/"$BOND_TX2_IF"/ifindex)
-> +	BOND_RX1_IFIDX=$(cat /sys/class/net/"$BOND_RX1_IF"/ifindex)
-> +	BOND_RX2_IFIDX=$(cat /sys/class/net/"$BOND_RX2_IF"/ifindex)
-> +
-> +	exec {NAMESPACE_FD}</var/run/netns/"${NAMESPACE}"
-> +	exec {INITNS_FD}</proc/self/ns/net
-> +
-> +	# Bind the dst interfaces to namespace
-> +	ip link set "${BOND_RX1_IF}" netns "${NAMESPACE}"
-> +	ip link set "${BOND_RX2_IF}" netns "${NAMESPACE}"
-> +
-> +	# Linking TX ifaces to the RX ones (on the other namespace}
-> +	echo "${INITNS_FD}:$BOND_TX1_IFIDX $NAMESPACE_FD:$BOND_RX1_IFIDX"  \
-> +		> "$NSIM_DEV_SYS_LINK"
-> +	echo "${INITNS_FD}:$BOND_TX2_IFIDX $NAMESPACE_FD:$BOND_RX2_IFIDX"  \
-> +		> "$NSIM_DEV_SYS_LINK"
-> +}
-> +
-> +# Create "bond_tx_XX" and "bond_rx_XX" interfaces, and set DSTIF and SRCIF with
-> +# the bonding interfaces
-> +function setup_bonding_ifaces() {
-> +	local RAND=$(( RANDOM % 100 ))
-> +	BONDTX_IF="bond_tx_$RAND"
-> +	BONDRX_IF="bond_rx_$RAND"
-> +
-> +	if ! ip link add "${BONDTX_IF}" type bond mode balance-rr
-> +	then
-> +		echo "Failed to create bond TX interface. Is CONFIG_BONDING set?" >&2
-> +		# only clean nsim ifaces and namespace. Nothing else has been
-> +		# initialized
-> +		cleanup_bond_nsim
-> +		trap - EXIT
-> +		exit "${ksft_skip}"
-> +	fi
-> +	ip link set "${BOND_TX1_IF}" down
-> +	ip link set "${BOND_TX2_IF}" down
-> +
-> +	ip link set "${BOND_TX1_IF}" master "${BONDTX_IF}"
-> +	ip link set "${BOND_TX2_IF}" master "${BONDTX_IF}"
-> +	ip link set "${BONDTX_IF}" up
-> +
-> +	# now create the RX bonding iface
-> +	ip netns exec "${NAMESPACE}" \
-> +		ip link add "${BONDRX_IF}" type bond mode balance-rr
-> +	ip netns exec "${NAMESPACE}" \
-> +		ip link set "${BOND_RX1_IF}" down
-> +	ip netns exec "${NAMESPACE}" \
-> +		ip link set "${BOND_RX2_IF}" down
-> +
-> +	ip netns exec "${NAMESPACE}" \
-> +		ip link set "${BOND_RX1_IF}" master "${BONDRX_IF}"
-> +	ip netns exec "${NAMESPACE}" \
-> +		ip link set "${BOND_RX2_IF}" master "${BONDRX_IF}"
-> +	ip netns exec "${NAMESPACE}" \
-> +		ip link set "${BONDRX_IF}" up
-> +	ip netns exec "${NAMESPACE}" \
-> +		ip link set "${BOND_RX1_IF}" up
-> +	ip netns exec "${NAMESPACE}" \
-> +		ip link set "${BOND_RX2_IF}" up
-> +
-> +}
-> +
-> +# Clean up netdevsim ifaces created for bonding test
-> +function cleanup_bond_nsim() {
-> +	echo "$NSIM_BOND_TX_1" > "$NSIM_DEV_SYS_DEL"
-> +	echo "$NSIM_BOND_TX_2" > "$NSIM_DEV_SYS_DEL"
-> +	echo "$NSIM_BOND_RX_1" > "$NSIM_DEV_SYS_DEL"
-> +	echo "$NSIM_BOND_RX_2" > "$NSIM_DEV_SYS_DEL"
-> +	cleanup_all_ns
-> +}
-> +
-> +# cleanup tests that use bonding interfaces
-> +function cleanup_bond() {
-> +	cleanup_netcons
-> +
-> +	# Delete TX ifaces
-> +	ip link set "${BONDTX_IF}" down  2> /dev/null|| true
-> +	ip link set "${BOND_TX1_IF}" down || true
-> +	ip link set "${BOND_TX2_IF}" down || true
-> +	ip link delete "${BONDTX_IF}" type bond  2> /dev/null || true
-> +
-> +	# Delete RX ifaces
-> +	ip netns exec "${NAMESPACE}" \
-> +		ip link set "${BONDRX_IF}" down || true
-> +	ip netns exec "${NAMESPACE}" \
-> +		ip link set "${BOND_RX1_IF}" down || true
-> +	ip netns exec "${NAMESPACE}" \
-> +		ip link set "${BOND_RX2_IF}" down || true
-> +	ip netns exec "${NAMESPACE}" \
-> +		ip link delete "${BONDRX_IF}" type bond  || true
-> +
-> +	cleanup_bond_nsim
-> +}
-> 
-> 
+diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+index 8cfc68cbfa06..bdabea45e81f 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf.h
++++ b/drivers/net/ethernet/intel/idpf/idpf.h
+@@ -1005,6 +1005,7 @@ void idpf_mbx_task(struct work_struct *work);
+ void idpf_vc_event_task(struct work_struct *work);
+ void idpf_dev_ops_init(struct idpf_adapter *adapter);
+ void idpf_vf_dev_ops_init(struct idpf_adapter *adapter);
++int idpf_get_device_type(struct pci_dev *pdev);
+ int idpf_intr_req(struct idpf_adapter *adapter);
+ void idpf_intr_rel(struct idpf_adapter *adapter);
+ u16 idpf_get_max_tx_hdr_size(struct idpf_adapter *adapter);
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
+index 8c46481d2e1f..f1af7dadf179 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_main.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
+@@ -3,15 +3,93 @@
+ 
+ #include "idpf.h"
+ #include "idpf_devids.h"
++#include "idpf_lan_vf_regs.h"
+ #include "idpf_virtchnl.h"
+ 
+ #define DRV_SUMMARY	"Intel(R) Infrastructure Data Path Function Linux Driver"
+ 
++#define IDPF_NETWORK_ETHERNET_PROGIF				0x01
++#define IDPF_CLASS_NETWORK_ETHERNET_PROGIF			\
++	(PCI_CLASS_NETWORK_ETHERNET << 8 | IDPF_NETWORK_ETHERNET_PROGIF)
++#define IDPF_VF_TEST_VAL		0xfeed0000u
++
+ MODULE_DESCRIPTION(DRV_SUMMARY);
+ MODULE_IMPORT_NS("LIBETH");
+ MODULE_IMPORT_NS("LIBETH_XDP");
+ MODULE_LICENSE("GPL");
+ 
++/**
++ * idpf_get_device_type - Helper to find if it is a VF or PF device
++ * @pdev: PCI device information struct
++ *
++ * Return: PF/VF or -%errno on failure.
++ */
++int idpf_get_device_type(struct pci_dev *pdev)
++{
++	void __iomem *addr;
++	int ret;
++
++	addr = ioremap(pci_resource_start(pdev, 0) + VF_ARQBAL, 4);
++	if (!addr) {
++		pci_err(pdev, "Failed to allocate BAR0 mbx region\n");
++		return -EIO;
++	}
++
++	writel(IDPF_VF_TEST_VAL, addr);
++	if (readl(addr) == IDPF_VF_TEST_VAL)
++		ret = IDPF_DEV_ID_VF;
++	else
++		ret = IDPF_DEV_ID_PF;
++
++	iounmap(addr);
++
++	return ret;
++}
++
++/**
++ * idpf_dev_init - Initialize device specific parameters
++ * @adapter: adapter to initialize
++ * @ent: entry in idpf_pci_tbl
++ *
++ * Return: %0 on success, -%errno on failure.
++ */
++static int idpf_dev_init(struct idpf_adapter *adapter,
++			 const struct pci_device_id *ent)
++{
++	int ret;
++
++	if (ent->class == IDPF_CLASS_NETWORK_ETHERNET_PROGIF) {
++		ret = idpf_get_device_type(adapter->pdev);
++		switch (ret) {
++		case IDPF_DEV_ID_VF:
++			idpf_vf_dev_ops_init(adapter);
++			adapter->crc_enable = true;
++			break;
++		case IDPF_DEV_ID_PF:
++			idpf_dev_ops_init(adapter);
++			break;
++		default:
++			return ret;
++		}
++
++		return 0;
++	}
++
++	switch (ent->device) {
++	case IDPF_DEV_ID_PF:
++		idpf_dev_ops_init(adapter);
++		break;
++	case IDPF_DEV_ID_VF:
++		idpf_vf_dev_ops_init(adapter);
++		adapter->crc_enable = true;
++		break;
++	default:
++		return -ENODEV;
++	}
++
++	return 0;
++}
++
+ /**
+  * idpf_remove - Device removal routine
+  * @pdev: PCI device information struct
+@@ -165,21 +243,6 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	adapter->req_tx_splitq = true;
+ 	adapter->req_rx_splitq = true;
+ 
+-	switch (ent->device) {
+-	case IDPF_DEV_ID_PF:
+-		idpf_dev_ops_init(adapter);
+-		break;
+-	case IDPF_DEV_ID_VF:
+-		idpf_vf_dev_ops_init(adapter);
+-		adapter->crc_enable = true;
+-		break;
+-	default:
+-		err = -ENODEV;
+-		dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
+-			ent->device);
+-		goto err_free;
+-	}
+-
+ 	adapter->pdev = pdev;
+ 	err = pcim_enable_device(pdev);
+ 	if (err)
+@@ -259,11 +322,18 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	/* setup msglvl */
+ 	adapter->msg_enable = netif_msg_init(-1, IDPF_AVAIL_NETIF_M);
+ 
++	err = idpf_dev_init(adapter, ent);
++	if (err) {
++		dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
++			ent->device);
++		goto destroy_vc_event_wq;
++	}
++
+ 	err = idpf_cfg_hw(adapter);
+ 	if (err) {
+ 		dev_err(dev, "Failed to configure HW structure for adapter: %d\n",
+ 			err);
+-		goto err_cfg_hw;
++		goto destroy_vc_event_wq;
+ 	}
+ 
+ 	mutex_init(&adapter->vport_ctrl_lock);
+@@ -284,7 +354,7 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 	return 0;
+ 
+-err_cfg_hw:
++destroy_vc_event_wq:
+ 	destroy_workqueue(adapter->vc_event_wq);
+ err_vc_event_wq_alloc:
+ 	destroy_workqueue(adapter->stats_wq);
+@@ -304,6 +374,7 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ static const struct pci_device_id idpf_pci_tbl[] = {
+ 	{ PCI_VDEVICE(INTEL, IDPF_DEV_ID_PF)},
+ 	{ PCI_VDEVICE(INTEL, IDPF_DEV_ID_VF)},
++	{ PCI_DEVICE_CLASS(IDPF_CLASS_NETWORK_ETHERNET_PROGIF, ~0)},
+ 	{ /* Sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(pci, idpf_pci_tbl);
+-- 
+2.51.0
 
 
