@@ -1,401 +1,249 @@
-Return-Path: <netdev+bounces-226626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76E19BA320F
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 11:26:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D2A5BA3248
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 11:28:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93827189F093
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 09:26:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C5DE1BC1C6D
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 09:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E87272814;
-	Fri, 26 Sep 2025 09:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3E1F29D29D;
+	Fri, 26 Sep 2025 09:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KRsYtMXc"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="K1WE57YQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013014.outbound.protection.outlook.com [40.93.201.14])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012016.outbound.protection.outlook.com [52.101.48.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F1B2264D3
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 09:25:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED471A9FA4;
+	Fri, 26 Sep 2025 09:27:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.16
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758878758; cv=fail; b=fz5g1BpJdZsWGH1xG4UJIu+N7E3NZ4MNAz3mcpxxNdAcm3PnxfU2zKpc8Ed29reTBejSgdKZgqwdYqUgoDHkPmm60wnK6AVEMPrQ5WY4+rTBzusSsanbp/esgmMpyR8ZC4up05T+1F+hljb0QJIze7tAAQEaUl/ZkieO+LtAioY=
+	t=1758878864; cv=fail; b=ZJL5mqzwqCoUz/g9JRi83n5iBzadex0s7+io1yBGrA5stQGf2ML7Vdl9KIzorxTheaohq0WnsCq6iOm5u6VRqsUpYT/8SrQC98FhVnQZRHcdvY2dMO/Xgj0cuaY+lLs8axNSWJSpK2UbSygoho1IHMs1NUOiA0JiGRaZYs2Jr0g=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758878758; c=relaxed/simple;
-	bh=/nqO/s0QFHq6c5e6bw8mUJ2ZHd0j5vJQQVEK/twRpFg=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=ud5tMazBK8Vy1F6qQvaleoT/GH/jbYCzmm/0+DO9ut/bygVgNrbty6T5mJCusqIYDyNYxjpNMgxPPdb9ShuSWiTwvafHDEdYdJUIPqXZi7WhgGxifxS8ByHtX2EQxC1Sn0/L1uusVe4eQjJuLMwuA+i+BlYC9kD+cwnRd6ghnKw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KRsYtMXc; arc=fail smtp.client-ip=40.93.201.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1758878864; c=relaxed/simple;
+	bh=1LEzfDRsk/T8ZYHdL5euOSyrfLB6cOKWLaFl0ffjvlE=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=F8+S0xpEQD5w281Ou4cDtPp16nQBwCYCAxgWFXvSTVqrfCLpYj8rPGpAas83zwNC+Cwv3/yTcr2XdnyT1LbPwqkQCQqgXwYhgwD310zA+9LpixLJdfczsl33nsxAkmxD1eaum+36C8+othAKicWmVm2lvblCAp4eCPARhLwTguk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=K1WE57YQ; arc=fail smtp.client-ip=52.101.48.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yA9YU56SqXIk+OtbcbmNDgTcYOoQBiA4SASCWnBcWsQ3omCNGVj3UDq/cNyhDn1WN784c+/8FCmli+vs5vwBbGstdmgUkuuo5wo0T1pYDiS07+8jhSPlSBQ0LJPqAg/xpOYL4Yh/97OMUAI3Hdfrj6LaBCFnR3d5KxvA0qks0HVW0ej0JJqhz9vphE4R2OHAZHjN2r6LV+WJX6WbYrg9xtxk1oN73n9TVFHbEWTyIR2OJFs8wsKNxMnH/UDYHQZ/saYIawZENvn7Hja0wwaF7OODLzWiL+00NSqVFZtu9eThQIW9OEBtcd9+Sf02nmT9HCcfCmq+4c4o2hiKusG5uw==
+ b=bNwFOz6Mz1d7owqAdJum68gLgPEXvO8BYMbqcLjfrGKKhpuEU6RN1ipzsmMk1b933yxVOhwUc+nNQUWMT6cvL1ro257FrRJ9H3o4dAHiz7Dlfman16SJYibdQ6GVXAeJ67leo15j9OmGwnJFHRyNr/QP+5EfW5kXV5fr2MH65mBnYX1kGWsN4oW5iqs+Q5pwlSPfqF22zqEr1Z3ITOmfMZ6bIc8g9X/O8+KuYGITvE6QdRrK0iAt06OM5kmcpQ5R6rHokINbeNtoekhbgm8lhZhdaM0LC57GlaPkXL+l48z3xvKA1ohXizn/uK07gfye2Q38EEYGo1A0pZK2CUsE7A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=x1P4IJxq5htp83a4U4+2MYJSRUtG012ToMRl9beykAQ=;
- b=B9I4FYVquRFIrYRIN40R8MFb5W4P6bvPaf9B9fqVt+pZuRokJ3bzqX0jPH7IpeRWHKpZhQ3FW/oiGKnIvg7uWSxh03XlD1zCjKaRPhGUb62xXVxwt3hS9TOnnv6nZx7EmgwLsO11YVM0tMlIYpdQgUHL97OGE86Jhwp/K4kKghNjDtff67dgSzLv/8IzLtec168Dv+Bm2xfpgJWwI/SibFprsfeJ3SktSx4+99A5OCW/lSBK3rCUnZa4xQugwCL+4rFRJdW4JijOe7rWL5t3T/TTGNbNcMen+Z0flePGbnzTk2AKjKBMykNW/Od83XHYAlWroS09V+OOXe50nPGT1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=GsMS7JRX1CXPmn9/eRR7u7IQXAc5SRxZ0yuQavrd3VQ=;
+ b=IodKPV0gHCHXkDg4TCm5HNnKtkCO5gBuLriFiUZ90QoCMISeoFnDDelBjCLVxT85DwMaOVECaHdMHJB/ZkGVBn4BzsYjxpPF2ZqnmE1V0g4kuhN+93DyzfRggDuyRukl6EukartguUM2skc2k6t42T+LHlHdu1UUVPH0KJ0YNw4/3g/NWS+y2QZkPk+cqkSMP4kmBnkOtF9j79s302vnffIuYTIXEATG+qsSTwhz8Jh4zR/CbA5bsiM9rjNklHFd+vvUTdccBbcpGuhcwqlB4WjATVwyShOJ2m94IVK1gbdKEjPxbxSmbp1UulvB6Ia9QRPsI+6Er123wqPIWq4Urg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=x1P4IJxq5htp83a4U4+2MYJSRUtG012ToMRl9beykAQ=;
- b=KRsYtMXc5Ajq5IDP+w3HtnwIrhTs/dnPP2nNH6MzA7LN6dTLN3FA2yKf2/qYq+WyDiob/HtWFoooTroYTNx4Amhp/AWEtsZ5hNAF6TKhzOWBShP58/EjS8bzT3zn9CPG5iBCdKJWju7hXxbHczA7OpaSeKkK4lGTh0chIbaV0Hlend9hFEvlv6T2NObJxQQvu+n3tDhT3iX3oTGoqCNaBlvK5hF5ckxpFHObzJLhfKQ345xaH+xHj79YMCvxmX1zRt6+45o09ktuGL1dm4t4sX+e/0naItV7tQD4M0K1PY9ERD0BsRSNq8/AbD1IhleXqPm2V70jpyOBWb5p9OEiWA==
-Received: from SJ0PR03CA0121.namprd03.prod.outlook.com (2603:10b6:a03:33c::6)
- by DS7PR12MB8321.namprd12.prod.outlook.com (2603:10b6:8:ec::17) with
+ bh=GsMS7JRX1CXPmn9/eRR7u7IQXAc5SRxZ0yuQavrd3VQ=;
+ b=K1WE57YQj0IrXcf4Yeowi9KGnyExU+i0YtkYqfxdPcIOAaaYbWZ9sWLV3AcxP7tFFE25nim+Yx7BtNM2DeG7DsKh3jWcqU0iGhvwaTOd0dOh1adHqu1WcrIzXg/qQMQ9Ukf5S020sU/ky8sTOXZnLNQUnhKKZOgg6+nXFmq03nQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by IA0PR12MB7603.namprd12.prod.outlook.com (2603:10b6:208:439::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.10; Fri, 26 Sep
- 2025 09:25:51 +0000
-Received: from SJ5PEPF00000206.namprd05.prod.outlook.com
- (2603:10b6:a03:33c:cafe::8a) by SJ0PR03CA0121.outlook.office365.com
- (2603:10b6:a03:33c::6) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9160.10 via Frontend Transport; Fri,
- 26 Sep 2025 09:25:51 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ5PEPF00000206.mail.protection.outlook.com (10.167.244.39) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9160.9 via Frontend Transport; Fri, 26 Sep 2025 09:25:51 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Fri, 26 Sep
- 2025 02:25:32 -0700
-Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 26 Sep
- 2025 02:25:24 -0700
-References: <20250924194959.2845473-1-daniel.zahka@gmail.com>
- <20250924194959.2845473-6-daniel.zahka@gmail.com>
-User-agent: mu4e 1.8.14; emacs 30.2
-From: Petr Machata <petrm@nvidia.com>
-To: Daniel Zahka <daniel.zahka@gmail.com>
-CC: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan
-	<shuah@kernel.org>, Willem de Bruijn <willemb@google.com>, Breno Leitao
-	<leitao@debian.org>, Petr Machata <petrm@nvidia.com>, Yuyang Huang
-	<yuyanghuang@google.com>, Xiao Liang <shaw.leon@gmail.com>, Carolina Jubran
-	<cjubran@nvidia.com>, Donald Hunter <donald.hunter@gmail.com>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next 5/9] selftests: drv-net: psp: add basic data
- transfer and key rotation tests
-Date: Fri, 26 Sep 2025 11:15:15 +0200
-In-Reply-To: <20250924194959.2845473-6-daniel.zahka@gmail.com>
-Message-ID: <87frc9woqk.fsf@nvidia.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.11; Fri, 26 Sep
+ 2025 09:27:41 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.9137.018; Fri, 26 Sep 2025
+ 09:27:41 +0000
+Message-ID: <a98cc504-c35a-4271-8e62-a2e0473738f9@amd.com>
+Date: Fri, 26 Sep 2025 10:27:36 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 18/20] sfc: create cxl region
+Content-Language: en-US
+To: Jonathan Cameron <jonathan.cameron@huawei.com>,
+ alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
+References: <20250918091746.2034285-1-alejandro.lucero-palau@amd.com>
+ <20250918091746.2034285-19-alejandro.lucero-palau@amd.com>
+ <20250918160325.00005261@huawei.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <20250918160325.00005261@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0133.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:193::12) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF00000206:EE_|DS7PR12MB8321:EE_
-X-MS-Office365-Filtering-Correlation-Id: ed7d256b-f5d2-4b51-cddb-08ddfcdeaf9a
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|IA0PR12MB7603:EE_
+X-MS-Office365-Filtering-Correlation-Id: 47919d9a-d128-4d2a-6efb-08ddfcdef0dd
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|7416014|376014;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?REjMs/QXzFGYfpN8tZDCsEE/KD6kLVtJxY+zuHeQquH0NwXP85RF1HVj1qTE?=
- =?us-ascii?Q?13MLLiMtn7dVQVM0xtyxcus8EWk8yz1BGglUwnJEOYeLvdSnkRjFu4xiL50d?=
- =?us-ascii?Q?8VWUTkp08EihrLJNOxmZ8PypIrSDgB6/++AbIqEiD8EtuJkGogT2DJK8LK9A?=
- =?us-ascii?Q?+/qQdrHHw7DmjfMdyNQERHOUrk7IQV44qJBJeP9yg+8//J6bUPUCaU5rcYUa?=
- =?us-ascii?Q?vcuffatNFOyt9jCdf+63KdxD8wnSFA2N45yqxpRp3gPp2LgclTTXBv7nFl5L?=
- =?us-ascii?Q?AXFG/HT8FKEL1ODzl4tyMqLbePEaXLZndrXMInCIdUZXGaqbaVv2iFrW6jTG?=
- =?us-ascii?Q?Qj0D6HCX/F6ENMsVWfVmXj1oil4thFJgEks8G4P/lYSTrFyhlGwObxks6RoC?=
- =?us-ascii?Q?FoWI6uplxewEgSom/yUorIPcCKZc/cQ+bryHAXDc9s67zNjq1GpjlQLBJzb/?=
- =?us-ascii?Q?jKyUhAwI1WqEd0uPeZ63LdY5oFJhNRK9ydDih2/l50YPzNoHk/rivTwk8CI3?=
- =?us-ascii?Q?ZjtAPqHmzrtUbxOKyxVk0sFJWnEZTXTNYCJsgPv18OBnV4rGwwPTKidxj+mX?=
- =?us-ascii?Q?RA5KlxgUtWXRqMjESyPFJ5knSjbRrNPALxAmSDqmdqBkMs+ZAxYbuP1e1pX+?=
- =?us-ascii?Q?4XJJyC73kGjSzwYo/FgbmZ5cW5RhwWLl5HzE6Ucbl9K1EIDQYgDnkG857657?=
- =?us-ascii?Q?eU8fHy6TEP58YTqv8x/JcQjozBVpEZ1gJihkDWamt/+y1jgUyNnSLx3IQTRM?=
- =?us-ascii?Q?NkAOke/b4H5DM1sR2eZqVFTOPrxPv4YvUwZPQIJdW9+ax7Cr0dFEQqnQeEYa?=
- =?us-ascii?Q?bClyKPWmARU3IZkcXQPojnKmakXKEjiJKplQUyGsXj3Uqn6cW8QxKelnn2jB?=
- =?us-ascii?Q?AE3Eyi+WaKUDKVJoOKBNOt+8YCd2fbnvBjT9W11upbD361xYOHZtCWnkxj/J?=
- =?us-ascii?Q?yhHILFJphelIB0t1gXMJh7vmHgNkGkrX1qTOmMQqM6odFwlcpxi5DMTGGwpz?=
- =?us-ascii?Q?AQoXUZROL0inlZKjuaixpl5qYjRGspabx7+Zq84SWE3fS2ejWSzkL/UAAQEq?=
- =?us-ascii?Q?vYl3aMm6aOdNT1VX683b22aGKxg4uYHKQiUdu3/hL10ZtPc92cPIP7NrWGzd?=
- =?us-ascii?Q?++rJj2fJJXYHfREgTIRd2HCxS0Ren4hJKMxO+wmdm3QPz9yq44dwg4tPya5I?=
- =?us-ascii?Q?s9we+8ykQfYdf2mDE+8whbZrSYa+1FIpC6Q2Lx5FQIs1ijWKs5ez64ThhX6R?=
- =?us-ascii?Q?9ZYVvtL8459yjJ2LnODWBmj6s9YB51fSYq6Wqb80x9mrbnQGeUMWMA7wMqd2?=
- =?us-ascii?Q?zuha7VUfNqNal3+42h18aVQae+o4DZp8M7wk8L2iqpz7gDLl0lO7KxmejONS?=
- =?us-ascii?Q?oss8Ro5AnBQpcSTLXbBjNpdwJ27Yu2W7fbJ5R6MBAIqOp2duP6ZrUgEnXoF+?=
- =?us-ascii?Q?nhX+PrCUqShZQuyoKKXK+Cq6oljQ+7u8Bb2bsjXZMhNFuBI/QaGI3LOA4SO6?=
- =?us-ascii?Q?4Z0fXckI8Gu7PFqm9fKBv3iIM1x8/P05yQCAu141Owe+YW6Tyww1hvpOP+d5?=
- =?us-ascii?Q?So3ehIbq8V3ucfPElSo=3D?=
+	=?utf-8?B?dU1JYXMvK0dKMnQzajZCcnFtUWsvSHkzUmE0b3MyV3R4YzE4U0Vid0FXVGY1?=
+ =?utf-8?B?M0xrRzMwRGlqZUovMWlWTEpWRkRzcVNLUW1PM1Z5SlNFMlMzdGlaZGZza1ZK?=
+ =?utf-8?B?S1BKSkx3enBxTXNyOTY2QmZTdk5PY0h0YXhSK1ltU0ZGYjI1REE5VGFmVnVH?=
+ =?utf-8?B?eWhRQ1B2aUVQUElGclJCUkZUbmp4a3RQcElxMmpOLzhmRTBFclZwS2Z6S1Jo?=
+ =?utf-8?B?ZVRCbFJqcG4wZzNxQlJJU1R5czJYbzdpSjFYK2U3djQ4SzMyejUvVzRnQmJV?=
+ =?utf-8?B?ZWpWUnU2T0xRSklHR20xdTNDWElRUzBVL1RnNjZuNm9tY3QzR1NqUWo3bmZP?=
+ =?utf-8?B?KzdlZ3Y2blI4RUxqMDMwcit3d1lsYmlOQ1BhT2h1OGpCNCtDWTFwdDJKRWxV?=
+ =?utf-8?B?cklPTWdtb1MrQS9zcVlXOWdwWFZXZGdWYWxEbjI1OUVHTkRzOEplb0c2Z3hs?=
+ =?utf-8?B?U0pnUWY0dWtZRGRoM1dsNlpGOUpTcEFLRW4zR1V5ZzJqekVXK2xTalU3VDMy?=
+ =?utf-8?B?WjZuODNYMnl3clRNcVVtWE55Ukx2aS9HVy9mTTdpRUQwM2wxV1ZWZzVDSEFC?=
+ =?utf-8?B?OWliMTloaTJBUjJ1TTFUbnkrSU5TajJJQ2QwUklpSWY5L3hQUWhCbFMyZ2RW?=
+ =?utf-8?B?K1l2VW5IV3FVY1dhdmhwdlBoV0FpanJFbTV6THdTcnpQSk8zU2pDb2NTaU1j?=
+ =?utf-8?B?N29jZ2xLNmpFQ2hKV2lQd2lhS2xsUGJPR3RLaDdUd3BwUFhoaUFqVm13L2NW?=
+ =?utf-8?B?bWVLK1AydDlOZ05kQ2NLeXdLNFNoNkFOWnpmakZGN2lnQ1MrcmlBUkZodXlQ?=
+ =?utf-8?B?ZGM4UmRpdUpmVzE4ZXpYemlUMFliQmJablg3dWduYTNXU3lMK1hzVDY0OVZj?=
+ =?utf-8?B?NGFWRHVyV0F4cTNaYnBjSlZ3SXVNR09qSDloeHA0QWM4Ylc0ejlPdzJzbzgx?=
+ =?utf-8?B?RDBScDZFRFdBTVMvUlZVSVJGNEhPaWJZa0dGNUlNTEkvTi90VEVTTllvNUFh?=
+ =?utf-8?B?N1VMTnZSamkzdWx6bHRiT0tuTy9oaXRjc2xMY1VFQUtQcVRkTzNjNnlLeCtv?=
+ =?utf-8?B?bTNtSThqdGNtK1BiTHl0YTNGei95SytoeDIxUFdmZWlWbVVvamMvNTBmKzNs?=
+ =?utf-8?B?SEloQmxSd3lNZUl5elM1WXQ0ZEV3dUxxQnFMQllwUHJLZ0xhcGFXNFJvbFF1?=
+ =?utf-8?B?Zi83K3krWFFCcGlOa2tPZVJmQTlEaTN2SlR6N2Y5VUlXNWlRU0lSVGJoNW1t?=
+ =?utf-8?B?SjQ0UDNEazhQaithQ2NXcEZSTjUzTFhSRmQ0aEx4aVB1TS9IVDdYcWdiSnJS?=
+ =?utf-8?B?NUp3OXJhNGpkWWh0UmlpVlZVdFZpM1lCN21IbS9ndFc2TXBNMW9BeVdNU05E?=
+ =?utf-8?B?WEU1ZWRGN2ZpbUJRNnA1bzV1Tnh5djNhOU1uem41Rmx3TzVOeDRTeEFHeWwv?=
+ =?utf-8?B?NXJiaU96NlBIY3J1QldDRnh6T0w5c2YvYmhEM0tKdDkyTzFiRHh2QlNsaXBI?=
+ =?utf-8?B?ckJVNmVEeGl6Z3FNMCtsanZWRGdHMExEZlR5TXh4NEVGcXdId1pYS0dVc0N6?=
+ =?utf-8?B?WXMzZjczV01nZHlIVXk1UUJtWHBKeVYzc1lDaXF1ZVNKeGhGMDNXVTNvZmZz?=
+ =?utf-8?B?cDVEdTEvRjd4aVdHZityK0lvRFNwdjJlY09RVTBDT1dZemlyQUE5SFB0QjFU?=
+ =?utf-8?B?c2krRkh6VGkrZ3JWZHVaaXlXWEQ1ZXJIaXZGcHNDZVRNWFlqYnhVOVNOMHZO?=
+ =?utf-8?B?ZGdhRHJTRm1rMGRKYnRneHVVSnBtbjgySEZPZGtjNmpXTlNscENBZkhFZTJm?=
+ =?utf-8?B?SzZKcTBVNEE5M1J6OVJXY2dzSkZxQ2tOcGo5ek9QMDhBTXZGODZsNUdsMkFS?=
+ =?utf-8?B?eHVRZnV4QlROVkh4TWFpamVmTThDNE1xdVY5QzBWVERZa3Q2TzJuVG5sejBj?=
+ =?utf-8?Q?+vLs4X61JdQ=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(7416014)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2025 09:25:51.4250
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dUdGelBMWUlHbmR1K1VYeXNUdTBXYWZJSWpqVDA4MHFZYnVPeXRNWjVCbExW?=
+ =?utf-8?B?WFFjSFhjVER4MDl6cXloYlM3REhrendpcTJQVjBmUy9TcVdjUXg5eEtJMVhK?=
+ =?utf-8?B?dDcvNEc0Q0FZTlJUaUpxaFlscklzcUJPNUJxRVRLYWc0VzV1MFpKMDhGbm91?=
+ =?utf-8?B?S25TSHJtWTJzMFdYei82ZU1WcHowcERPTEtNNUNYaTdJYXNzbWpuRGQ0YzZy?=
+ =?utf-8?B?WENiMGZVSk9YL0dPcDNUSXk4cW9kbEFhRGdXQkUzTlE5NVZoZkx3NVFpK3F0?=
+ =?utf-8?B?QTgvODFSVnhvd095eVZBb2REZlNkVUVxQUczWWFNazBMUkFOaG84eGZVampG?=
+ =?utf-8?B?YTVhRkVIejV4UCtGVVJBdTl6eS9WY0VZZzI3SDNuU2M1bmFPY21TTk02SFI1?=
+ =?utf-8?B?dG5zR250L1hnUDNCTUVXTlZTd2pXUVNWSGI1ekFpYmpCWjVzYjJIekY3a2Nq?=
+ =?utf-8?B?UHk4MUZBNncyZ0hiWUt3NzhOTVR0azgrZEFZbTlFNVZGZjNIbWpnZ0RYaXI2?=
+ =?utf-8?B?TUQzVndkdjZDbkxrZ2NnL3dzalIyMjNOTmE3aXdXdWgreG5qenpnNk42Rll4?=
+ =?utf-8?B?cHBjWHZVNlZMeGNtbyt0U3hJVnRLaUJQak5yTkp0ZWpTcWlXL3kxb1I3c3pY?=
+ =?utf-8?B?MTl4NEJuUUIrUG5EdEZxMVFSWXpteXBmcy80MGZzYkNpQ1ZtTFBqUVFYVmx3?=
+ =?utf-8?B?NnV3cytHRkp0WjMwRWFJMXUwV3Y5WGFLU2dFWGhhc0YzVVptNFVjd2ZoZHNC?=
+ =?utf-8?B?VHExc2ZkV3BPOXY4ZzAxQ0RVcjFPL254RHRzQ0tTdGFEV0R3b1FHSU1Pakln?=
+ =?utf-8?B?Vy9zeGlHeUVWM1JzRGQrOHVqaVkrR083cHlETmNwMmxqS3ZjbDlEbTlRTDY4?=
+ =?utf-8?B?Rzl2STV6VEVvZ20zVlZaRGxpSVBYYlU4QTdFbEVua1BReEtPNmNHZU1BV3l1?=
+ =?utf-8?B?L3A5ajF4b3VmV2VQKzVtRFhCb0ZWakxsMGxSUGh4WU9Ta1I1ODRWQkVNTmVQ?=
+ =?utf-8?B?VDRXdkowYmFDcmFObmZSZzVJN0thVkJzRDFnM0ExWE1tMEt4Q3FnY1hFTU0r?=
+ =?utf-8?B?TjlseXRzYTNIY013eXoza3RqaDBvdjJYZ3R3Z28ySXo1RElFUjlOS3ZieS8r?=
+ =?utf-8?B?L3RtTUtHSFpSYTVvUDhWSHhWRENaNFhvOTNYbHZhUnpzeHNnMjRtVngrRyt3?=
+ =?utf-8?B?U0F0bnNyeUh2aVE2LzVrbk8rU0hzaTlOQVVHTDRVQjRaRUhJTGNjeTdsd3o3?=
+ =?utf-8?B?cm9DZDRFVENIai9hRi9sNFRnS0tHcXpEcndBbnJMTUxkcHVJcko2ZVlMMG1r?=
+ =?utf-8?B?RGxsS3YvaTJpZEZnVVFUOGh3MDY5UXdFYjlMU3d6Q2RJN3JxT1VhaldXZHlJ?=
+ =?utf-8?B?QWNMa3dxTTkwTDFLbStWWWpqKy9wbzVrRW5Cbjc0MFNsK2FMNitIOE1PWmNS?=
+ =?utf-8?B?ZGEyZnFJa0FqdDIzWGFKcUFkZy9BM0RZL2FzcG5GWkJWVUNPSFJCWDc4bmNS?=
+ =?utf-8?B?NVNtRCtnWFlPaVZmYkRiM2ZtcUZWTUpqZDhQSWJjNG9vdGRIZkQwSDlVWTRD?=
+ =?utf-8?B?elV3T3lFNkF4NmY3S1JacjNoZXBlRmorOUZDRnFmRU9mRGNPNDhsQk40OTZ2?=
+ =?utf-8?B?U1VwVWdFWW1yanVBZXVvcnNmbzQxZUNzSDZIcHMraHN3ZVYvSXFIUmw2ejV1?=
+ =?utf-8?B?bWh2K1k2QlZYNEhCbVpVanNXcjlYa3BxOHoyQ0pOSFVBYURzMHNBWVRXVE55?=
+ =?utf-8?B?VkN0bTYzZ28yazR5T3BxaEJlQm1iZkVPRmV4SC9SQ1RsNlp6RkpTWTZDMkVl?=
+ =?utf-8?B?dFNhbG9QVWZpaFJBcWo5a3UrN0J5YTd1eFY0cjNNR2pYMnR4aHBmT2hkLzlo?=
+ =?utf-8?B?NmgzWWc4RHJhL3BKQm0vMWNoNE1rZGFySTFWUFg1NE8rMHJ4dzhyWTFkUFRi?=
+ =?utf-8?B?VTdFUlNFbjY5cFMrMm5TOGVpa1FMMEovT1FULy9hWGhxS3lGRUlhTllML3VC?=
+ =?utf-8?B?eDhDSlovRXF3RG96S3RiaU9ueFFPT0ZVcXRKeWxLNk1yUSsreVNzVTRvSjVa?=
+ =?utf-8?B?YWdra1c1a3g5dzhhSmZOMnJWYnNqRTVYK29xZ3dLVGhRcE5RbmRRSWlTcGJQ?=
+ =?utf-8?Q?V1tHhemJ4IvfISGHNWTN+lx9H?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47919d9a-d128-4d2a-6efb-08ddfcdef0dd
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2025 09:27:41.2596
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ed7d256b-f5d2-4b51-cddb-08ddfcdeaf9a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF00000206.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8321
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: G16rqyMUYB/V7kyWF2RIWRKKOC9IruT/24QP3itDYokD8sxlokhBAve9P59pYRGe+Bb/DWbBRlzfJSp/Q5nhzQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7603
 
 
-Daniel Zahka <daniel.zahka@gmail.com> writes:
-
-> From: Jakub Kicinski <kuba@kernel.org>
+On 9/18/25 16:03, Jonathan Cameron wrote:
+> On Thu, 18 Sep 2025 10:17:44 +0100
+> <alejandro.lucero-palau@amd.com> wrote:
 >
-> Add basic tests for sending data over PSP and making sure that key
-> rotation toggles the MSB of the spi.
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> Use cxl api for creating a region using the endpoint decoder related to
+>> a DPA range.
+>>
+>> Add a callback for unwinding sfc cxl initialization when the endpoint port
+>> is destroyed by potential cxl_acpi or cxl_mem modules removal.
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> ---
+>>   drivers/cxl/core/core.h            |  5 -----
+>>   drivers/net/ethernet/sfc/efx_cxl.c | 22 ++++++++++++++++++++++
+>>   include/cxl/cxl.h                  |  8 ++++++++
+>>   3 files changed, 30 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/cxl/core/core.h b/drivers/cxl/core/core.h
+>> index c4dddbec5d6e..83abaca9f418 100644
+>> --- a/drivers/cxl/core/core.h
+>> +++ b/drivers/cxl/core/core.h
+>> @@ -14,11 +14,6 @@ extern const struct device_type cxl_pmu_type;
+>>   
+>>   extern struct attribute_group cxl_base_attribute_group;
+>>   
+>> -enum cxl_detach_mode {
+>> -	DETACH_ONLY,
+>> -	DETACH_INVALIDATE,
+>> -};
+> Seems like a stray move that should have been in the earlier patch.
 >
-> Deploy PSP responder on the remote end. We also need a healthy dose
-> of common helpers for setting up the connections, assertions and
-> interrogating socket state on the Python side.
+>> -
+>>   #ifdef CONFIG_CXL_REGION
+>>   extern struct device_attribute dev_attr_create_pmem_region;
+>>   extern struct device_attribute dev_attr_create_ram_region;
+>> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+>> index 4461b7a4dc2c..85490afc7930 100644
+>> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+>> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+>> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+>> index dbacefff8d60..e82f94921b5b 100644
+>> --- a/include/cxl/cxl.h
+>> +++ b/include/cxl/cxl.h
+>> @@ -282,4 +282,12 @@ struct cxl_region *cxl_create_region(struct cxl_root_decoder *cxlrd,
+>>   				     struct cxl_endpoint_decoder **cxled,
+>>   				     int ways, void (*action)(void *),
+>>   				     void *data);
+>> +enum cxl_detach_mode {
+>> +	DETACH_ONLY,
+>> +	DETACH_INVALIDATE,
+>> +};
+>> +
+>> +int cxl_decoder_detach(struct cxl_region *cxlr,
+>> +		       struct cxl_endpoint_decoder *cxled, int pos,
+>> +		       enum cxl_detach_mode mode);
+> Is this change in the right patch?  It's not a code move here
+> as there isn't a declaration of this being removed.
+> I'd rather expect this in patch 16, along with removal of the declaration currently
+> in core/core.h
+
+
+Yes, you are right. I'll move it there.
+
+
+Thanks!
+
+
 >
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
-> ---
->  tools/testing/selftests/drivers/net/psp.py | 200 ++++++++++++++++++++-
->  1 file changed, 192 insertions(+), 8 deletions(-)
->
-> diff --git a/tools/testing/selftests/drivers/net/psp.py b/tools/testing/selftests/drivers/net/psp.py
-> index 965e456836d2..b4f8a32ccbbb 100755
-> --- a/tools/testing/selftests/drivers/net/psp.py
-> +++ b/tools/testing/selftests/drivers/net/psp.py
-> @@ -3,9 +3,94 @@
->  
->  """Test suite for PSP capable drivers."""
->  
-> -from lib.py import ksft_run, ksft_exit
-> -from lib.py import ksft_true, ksft_eq
-> +import fcntl
-> +import socket
-> +import struct
-> +import termios
-> +import time
-> +
-> +from lib.py import ksft_run, ksft_exit, ksft_pr
-> +from lib.py import ksft_true, ksft_eq, ksft_ne, KsftSkipEx
->  from lib.py import NetDrvEpEnv, PSPFamily, NlError
-> +from lib.py import bkg, rand_port, wait_port_listen
-> +
-> +
-> +def _get_outq(s):
-> +    one = b'\0' * 4
-> +    outq = fcntl.ioctl(s.fileno(), termios.TIOCOUTQ, one)
-> +    return struct.unpack("I", outq)[0]
-> +
-> +
-> +def _send_with_ack(cfg, msg):
-> +    cfg.comm_sock.send(msg)
-> +    response = cfg.comm_sock.recv(4)
-> +    if response != b'ack\0':
-> +        raise Exception("Unexpected server response", response)
-> +
-> +
-> +def _remote_read_len(cfg):
-> +    cfg.comm_sock.send(b'read len\0')
-> +    return int(cfg.comm_sock.recv(1024)[:-1].decode('utf-8'))
-> +
-> +
-> +def _make_psp_conn(cfg, version=0, ipver=None):
-> +    _send_with_ack(cfg, b'conn psp\0' + struct.pack('BB', version, version))
-> +    remote_addr = cfg.remote_addr_v[ipver] if ipver else cfg.remote_addr
-> +    s = socket.create_connection((remote_addr, cfg.comm_port), )
-> +    return s
-> +
-> +
-> +def _close_conn(cfg, s):
-> +    _send_with_ack(cfg, b'data close\0')
-> +    s.close()
-> +
-> +
-> +def _close_psp_conn(cfg, s):
-> +    _close_conn(cfg, s)
-> +
-> +
-> +def _spi_xchg(s, rx):
-> +    s.send(struct.pack('I', rx['spi']) + rx['key'])
-> +    tx = s.recv(4 + len(rx['key']))
-> +    return {
-> +        'spi': struct.unpack('I', tx[:4])[0],
-> +        'key': tx[4:]
-> +    }
-> +
-> +
-> +def _send_careful(cfg, s, rounds):
-> +    data = b'0123456789' * 200
-> +    for i in range(rounds):
-> +        n = 0
-> +        retries = 0
-> +        while True:
-> +            try:
-> +                n += s.send(data[n:], socket.MSG_DONTWAIT)
-> +                if n == len(data):
-> +                    break
-> +            except BlockingIOError:
-> +                time.sleep(0.05)
-> +
-> +            retries += 1
-> +            if retries > 10:
-> +                rlen = _remote_read_len(cfg)
-> +                outq = _get_outq(s)
-> +                report = f'sent: {i * len(data) + n} remote len: {rlen} outq: {outq}'
-> +                if retries > 10:
-
-This is always true at this point.
-
-> +                    raise Exception(report)
-> +
-> +    return len(data) * rounds
-> +
-> +
-> +def _check_data_rx(cfg, exp_len):
-> +    read_len = -1
-> +    for _ in range(30):
-> +        cfg.comm_sock.send(b'read len\0')
-> +        read_len = int(cfg.comm_sock.recv(1024)[:-1].decode('utf-8'))
-> +        if read_len == exp_len:
-> +            break
-> +        time.sleep(0.01)
-> +    ksft_eq(read_len, exp_len)
->  
->  #
->  # Test cases
-> @@ -38,6 +123,75 @@ def dev_get_device_bad(cfg):
->      ksft_true(raised)
->  
->  
-> +def dev_rotate(cfg):
-> +    """ Test key rotation """
-> +    rot = cfg.pspnl.key_rotate({"id": cfg.psp_dev_id})
-> +    ksft_eq(rot['id'], cfg.psp_dev_id)
-> +    rot = cfg.pspnl.key_rotate({"id": cfg.psp_dev_id})
-> +    ksft_eq(rot['id'], cfg.psp_dev_id)
-> +
-> +
-> +def dev_rotate_spi(cfg):
-> +    """ Test key rotation and SPI check """
-> +    top_a = top_b = 0
-> +    with socket.socket(socket.AF_INET6, socket.SOCK_STREAM) as s:
-> +        assoc_a = cfg.pspnl.rx_assoc({"version": 0,
-> +                                     "dev-id": cfg.psp_dev_id,
-> +                                     "sock-fd": s.fileno()})
-> +        top_a = assoc_a['rx-key']['spi'] >> 31
-> +        s.close()
-> +    rot = cfg.pspnl.key_rotate({"id": cfg.psp_dev_id})
-> +    with socket.socket(socket.AF_INET6, socket.SOCK_STREAM) as s:
-> +        ksft_eq(rot['id'], cfg.psp_dev_id)
-> +        assoc_b = cfg.pspnl.rx_assoc({"version": 0,
-> +                                    "dev-id": cfg.psp_dev_id,
-> +                                    "sock-fd": s.fileno()})
-> +        top_b = assoc_b['rx-key']['spi'] >> 31
-> +        s.close()
-> +    ksft_ne(top_a, top_b)
-> +
-> +
-> +def _data_basic_send(cfg, version, ipver):
-> +    """ Test basic data send """
-> +    # Version 0 is required by spec, don't let it skip
-> +    if version:
-> +        name = cfg.pspnl.consts["version"].entries_by_val[version].name
-> +        if name not in cfg.psp_supported_versions:
-> +            with socket.socket(socket.AF_INET6, socket.SOCK_STREAM) as s:
-> +                with ksft_raises(NlError) as cm:
-> +                    cfg.pspnl.rx_assoc({"version": version,
-> +                                        "dev-id": cfg.psp_dev_id,
-> +                                        "sock-fd": s.fileno()})
-> +                ksft_eq(cm.exception.nl_msg.error, -95)
-> +            raise KsftSkipEx("PSP version not supported", name)
-> +
-> +    s = _make_psp_conn(cfg, version, ipver)
-> +
-> +    rx_assoc = cfg.pspnl.rx_assoc({"version": version,
-> +                                   "dev-id": cfg.psp_dev_id,
-> +                                   "sock-fd": s.fileno()})
-> +    rx = rx_assoc['rx-key']
-> +    tx = _spi_xchg(s, rx)
-> +
-> +    cfg.pspnl.tx_assoc({"dev-id": cfg.psp_dev_id,
-> +                        "version": version,
-> +                        "tx-key": tx,
-> +                        "sock-fd": s.fileno()})
-> +
-> +    data_len = _send_careful(cfg, s, 100)
-> +    _check_data_rx(cfg, data_len)
-> +    _close_psp_conn(cfg, s)
-> +
-> +
-> +def psp_ip_ver_test_builder(name, test_func, psp_ver, ipver):
-> +    """Build test cases for each combo of PSP version and IP version"""
-> +    def test_case(cfg):
-> +        cfg.require_ipver(ipver)
-> +        test_case.__name__ = f"{name}_v{psp_ver}_ip{ipver}"
-> +        test_func(cfg, psp_ver, ipver)
-> +    return test_case
-> +
-> +
->  def main() -> None:
->      with NetDrvEpEnv(__file__) as cfg:
->          cfg.pspnl = PSPFamily()
-> @@ -55,12 +209,42 @@ def main() -> None:
->                  versions = info['psp-versions-ena']
->                  cfg.pspnl.dev_set({"id": cfg.psp_dev_id,
->                                     "psp-versions-ena": info['psp-versions-cap']})
-> -
-> -        ksft_run(globs=globals(), case_pfx={"dev_"},
-> -                 args=(cfg, ), skip_all=(cfg.psp_dev_id is None))
-> -
-> -        if versions is not None:
-> -            cfg.pspnl.dev_set({"id": cfg.psp_dev_id, "psp-versions-ena": versions})
-> +            cfg.psp_supported_versions = info['psp-versions-cap']
-> +
-> +        # Set up responder and communication sock
-> +        responder = cfg.remote.deploy("psp_responder")
-> +
-> +        cfg.comm_port = rand_port()
-> +        try:
-> +            with bkg(responder + f" -p {cfg.comm_port}", host=cfg.remote, exit_wait=True) as srv:
-> +                wait_port_listen(cfg.comm_port, host=cfg.remote)
-> +
-> +                cfg.comm_sock = socket.create_connection((cfg.remote_addr,
-> +                                                          cfg.comm_port), timeout=1)
-> +
-> +                cases = [
-> +                    psp_ip_ver_test_builder(
-> +                        "data_basic_send", _data_basic_send, version, ipver
-> +                    )
-> +                    for version in range(0, 4)
-> +                    for ipver in ("4", "6")
-> +                ]
-> +                ksft_run(cases = cases, globs=globals(), case_pfx={"dev_", "data_"},
-> +                         args=(cfg, ), skip_all=(cfg.psp_dev_id is None))
-> +                cfg.comm_sock.send(b"exit\0")
-> +                cfg.comm_sock.close()
-> +
-> +            if versions is not None:
-> +                cfg.pspnl.dev_set({"id": cfg.psp_dev_id, "psp-versions-ena": versions})
-> +
-> +        finally:
-> +            if srv.stdout or srv.stderr:
-> +                ksft_pr("")
-> +                ksft_pr(f"Responder logs ({srv.ret}):")
-> +            if srv.stdout:
-> +                ksft_pr("STDOUT:\n#  " + srv.stdout.strip().replace("\n", "\n#  "))
-> +            if srv.stderr:
-> +                ksft_pr("STDERR:\n#  " + srv.stderr.strip().replace("\n", "\n#  "))
->      ksft_exit()
-
+>>   #endif /* __CXL_CXL_H__ */
 
