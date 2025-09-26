@@ -1,131 +1,280 @@
-Return-Path: <netdev+bounces-226585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22897BA25B5
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 06:03:05 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FDB1BA25E2
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 06:09:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC700385742
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 04:03:04 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D36494E0281
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 04:09:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4ED71D6187;
-	Fri, 26 Sep 2025 04:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SQDOMMaN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7AD6269D18;
+	Fri, 26 Sep 2025 04:09:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3257718DF8D
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 04:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE991534EC;
+	Fri, 26 Sep 2025 04:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758859381; cv=none; b=cmDRNz1elSbvnfHJDSc41rBSy4wyJZJ/yNxdWsdyYDAOKjgCK2G0JbRh2sh7zheS6xV4JwteVgAFfxQFedNJ8DOm5XmZ4QWJhmKDW3WpxeaUGFyJUqZ/09bNU7Smh+lyLxmTwOHrLKCeFptPBE9IElifghVJ5nvr0XwzOst2DLE=
+	t=1758859788; cv=none; b=qz2GAKhs/qZIIoMH9d2xkZ2Xz7aQ1BFLh2GpS8x/srs1dHzqq5X3h6Mw6p3lxwqtmdNSfW+XPMp7p++lQO2G8VK2rFyR7QrKdg025Erf2GsvCGmBs2dQR81+Kbxs27YyUNVKgM6UQmqQ6ZUSh5tMzTNe2V512HSmdTEv9gCrwjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758859381; c=relaxed/simple;
-	bh=+BjSD4n2cVq2pFB8mpK7sVp1EBc2XSr3oTlQo0E6yes=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CVCjkIeUgRKdW/BK8uOsLSTu7f4dbIw7/Xcyf3+LnMhPdEtlVIGUSMmTNGb1Mwu8nf/ge0aHuSGS1Y9UKrhLe53lhK1+tmSN3kol159QvRxg1L5NKJSaeFG2ENx/wF3FHXrMh8o87np/OYI92ILE9fIgxzBkcItviyta4Eq6vdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SQDOMMaN; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-62fa062a1abso2456658a12.2
-        for <netdev@vger.kernel.org>; Thu, 25 Sep 2025 21:02:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758859378; x=1759464178; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CTCUDZtLCId+TTYn2SSBMEZX1xtUVEdcX0YfJJ4Avjw=;
-        b=SQDOMMaNB2K8c/KA0S3sexB2+N6io7by0h83jZHEWHQPMhlI5ZShp+fdi3bJBft1CN
-         VPl2/hP/dMD9FEklOcmD0hc/IRi9GcOs6SKKxSD4ZM99Ydvg6UWQTb4nDkQAtPIc4eQL
-         9f0cY8WzMxrBFGbMklJGx9Xq8fBXUHfBoYqpVz6g1r/DtDAKQ9VApmMYiM69ctqFha5j
-         Ei5n57M+GurmSRiQBoK95iPuHES2cXtRXuHVhFPUkegQCLUs796fy2VbnxKoWjYkERG5
-         jQi9CqOD9xWfs8ydYiwWvUv3qQIgNMPd4qd6WqXNbs7Fs/trOk+DNF8LfzQCaXoFThUN
-         TODg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758859378; x=1759464178;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CTCUDZtLCId+TTYn2SSBMEZX1xtUVEdcX0YfJJ4Avjw=;
-        b=DhUe9F0GdqoA9Exja/+Mo6b36X+v+ykEBbVSXy4EcBoV1CNBkiMUji0kuG6k0F3lVo
-         yHUEE5tNQcEcjplp4wWcKcrl2jJXuIdwGJRQi7ZbffyJT6KphIqp0MNfhowh2tVD+iwC
-         YqbF1cpAi+P0CROCVMxalkXQMC8SkkH8TZd0S7bX7XJbCxAjIWRJYRExOQwA9Bm6ZPmC
-         K0kLBaP7Dg9L/1BfYg8PMp9sUkknLnyBHXEcRgZYgAJvrcEMPFqRugsOVF5UQ58h5p4o
-         9uyaRkw4p0TQxpPjwzrQN6iK+IdkP1A8JxQXog578UK06Wvyl/YWYS3Mf/AFdWBPNaol
-         1LJw==
-X-Forwarded-Encrypted: i=1; AJvYcCWOp+BjD5EsK9bgV7oUlTkib+6XNnYMilwZ64eYxIAzl8S9Q6iKg0UKUVgM3KUQUCVjbHjaKio=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyVmF03iEyVqDr+DymMSAopVxAxznNjONgRrZgUGDnpx88BB8v
-	mLs2do3iE8MQa6VRbyEbwm8Xqi9/KnjhiZV0uNXHklYLZX3yihV+m1xHQOTQQDckb6KnpiCADE7
-	kyL7sWuXOuxGXZ/PcnR1+XfzLQLLbAy5ZHrSvNMhO
-X-Gm-Gg: ASbGncs5F0bjHxWAgvYVrl7NdwZ64KgvXKqd/8mElCHpjxq1KsDbJKPgsEUWsOHgF6d
-	r/PfH5vXkhQKcZ2caQXXAVTisoAPXl+43rcGkvC5SfxaIhG/3IpVJqEWjxYsXJy+R2VytwL/AcI
-	yG0pZRwFpjgbO23pYGGhMGFH2HZ3sDp4rc3jh4SxaTMv9UjPaevxeAaAbfwEHMbti3YPQtPXof0
-	cLXtw7HfS9zXji5WipVkKRA1XhnBefgNy3alaDiOImFXmg=
-X-Google-Smtp-Source: AGHT+IGzYNatQWB9vaoTJvVl+6ugXIaQiHU0Pj3mW9DlNJzFZlhvXShkZBeX9wWCYJbU93EgEPw/3sU24CM2G5JD3Vc=
-X-Received: by 2002:a05:6402:268f:b0:634:a85c:8c9c with SMTP id
- 4fb4d7f45d1cf-634a85c8e1dmr3418962a12.12.1758859378359; Thu, 25 Sep 2025
- 21:02:58 -0700 (PDT)
+	s=arc-20240116; t=1758859788; c=relaxed/simple;
+	bh=KUA2IGS6uDePpaDgjKtY+mufgYMIZvorHbb4OY2Ul+s=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=OgOd1tt8MQQwrqN7qpYYjcwszybAxxpquOSDMScpdwR4deSzOdYPnq/xCuyGnBksN3KM9JlcGv0PdmoHHBwlu8qCuR3MgbBSbqpcZRZyhveeOx9KJgTatTawrFQ70bSmX6cAyzEjgfnROzu3gwQGROjC3bzUscg4nwyn9BDDZh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c2dff70000001609-4b-68d60e79f221
+From: Byungchul Park <byungchul@sk.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: kernel_team@skhynix.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	almasrymina@google.com,
+	hawk@kernel.org,
+	toke@redhat.com,
+	asml.silence@gmail.com
+Subject: [PATCH net-next v3] netmem: replace __netmem_clear_lsb() with netmem_to_nmdesc()
+Date: Fri, 26 Sep 2025 12:54:23 +0900
+Message-Id: <20250926035423.51210-1-byungchul@sk.com>
+X-Mailer: git-send-email 2.17.1
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupnluLIzCtJLcpLzFFi42LhesuzULeS71qGwd7Huharf1RYzFm1jdFi
+	zvkWFounxx6xW+xp385s8aj/BJvFhW19rBaXd81hszi2QMzi2+k3jBaXDj9iceD22LLyJpPH
+	zll32T0WbCr12LSqk83j/b6rbB6fN8kFsEVx2aSk5mSWpRbp2yVwZVw9+4yxoNWq4srEk+wN
+	jP0GXYycHBICJhKtk66zwtiXZk1jAbHZBNQlbtz4yQxiiwhYSTRsXAdkc3EwC9xnlHhy6Swb
+	SEJYIFJi86MTYA0sAqoSW+7dARvEK2AqsfDYLiaIofISqzccAGuWEPjLKvHq6052iISkxMEV
+	N1gmMHIvYGRYxSiUmVeWm5iZY6KXUZmXWaGXnJ+7iREYTMtq/0TvYPx0IfgQowAHoxIP7wOv
+	qxlCrIllxZW5hxglOJiVRHh377uSIcSbklhZlVqUH19UmpNafIhRmoNFSZzX6Ft5ipBAemJJ
+	anZqakFqEUyWiYNTqoHRqmtvpYQq094zPSWOyxi4l/mud3rWYZCrxxb7YeaJ72ZCH7doHBIp
+	a3b7nnbrgIb03x51zfkG3Ss8NPYtsXEyvHyq1S6y8uPMRKULXFtbhD+7Lb6iayVYq/f52SrD
+	9Akpk21Nb8Tm9OpkxD1JjNwUFH950lej2s/aNZOLNPfmLVRIaLcX51diKc5INNRiLipOBADu
+	DwbSIgIAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrGJMWRmVeSWpSXmKPExsXC5WfdrFvJdy3D4MZsBYvVPyos5qzaxmgx
+	53wLi8XTY4/YLfa0b2e2eNR/gs3i8NyTrBYXtvWxWlzeNYfN4tgCMYtvp98wWlw6/IjFgcdj
+	y8qbTB47Z91l91iwqdRj06pONo/3+66yeSx+8YHJ4/MmuQD2KC6blNSczLLUIn27BK6Mq2ef
+	MRa0WlVcmXiSvYGx36CLkZNDQsBE4tKsaSwgNpuAusSNGz+ZQWwRASuJho3rgGwuDmaB+4wS
+	Ty6dZQNJCAtESmx+dAKsgUVAVWLLvTusIDavgKnEwmO7mCCGykus3nCAeQIjxwJGhlWMIpl5
+	ZbmJmTmmesXZGZV5mRV6yfm5mxiBobGs9s/EHYxfLrsfYhTgYFTi4X3gdTVDiDWxrLgy9xCj
+	BAezkgjv7n1XMoR4UxIrq1KL8uOLSnNSiw8xSnOwKInzeoWnJggJpCeWpGanphakFsFkmTg4
+	pRoYbyZv+5HxX2TOhBt8Nn8tXkhprmbhYRCQY/GrvqSYKjC1RsZl8tHJ9yfYWBZMCt01i8XP
+	cbvBsrLJTQsu+E8VfTq1JvWVa9Iyn+opEtumlIlwWfUbvPqTnPH+kahchvXcWyqmEx16fH/8
+	fmlzbOX29DPHPEPZFA4cnVj/c/VXhZSATwbrTFNnK7EUZyQaajEXFScCAK5kY18JAgAA
+X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250925021628.886203-1-xuanqiang.luo@linux.dev>
- <20250925021628.886203-2-xuanqiang.luo@linux.dev> <CAAVpQUDNiOyfUz5nwW+v7oZ-EvR0Pf82yD0S2Wsq+LEO2Y2hhA@mail.gmail.com>
- <5d7904e8-977e-499c-b877-901facac5dea@linux.dev>
-In-Reply-To: <5d7904e8-977e-499c-b877-901facac5dea@linux.dev>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 25 Sep 2025 21:02:45 -0700
-X-Gm-Features: AS18NWDYsn78Bu12GQIVmp_9veTEscznJ6kjuQeiT5VVyEn2z2oyKFLTttikLIo
-Message-ID: <CAAVpQUAi2TLyODdvK=EAh0OyL_ZzLQWA_XrrQaspXTNdEmapWA@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 1/3] rculist: Add hlist_nulls_replace_rcu()
- and hlist_nulls_replace_init_rcu()
-To: luoxuanqiang <xuanqiang.luo@linux.dev>
-Cc: edumazet@google.com, "Paul E. McKenney" <paulmck@kernel.org>, kerneljasonxing@gmail.com, 
-	davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org, 
-	Xuanqiang Luo <luoxuanqiang@kylinos.cn>, Frederic Weisbecker <frederic@kernel.org>, 
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 25, 2025 at 8:23=E2=80=AFPM luoxuanqiang <xuanqiang.luo@linux.d=
-ev> wrote:
-[...]
-> >> +{
-> >> +       struct hlist_nulls_node *next =3D old->next;
-> >> +
-> >> +       WRITE_ONCE(new->next, next);
-> >> +       WRITE_ONCE(new->pprev, old->pprev);
-> >> +       rcu_assign_pointer(*(struct hlist_nulls_node __rcu **)new->ppr=
-ev, new);
-> > nit: define hlist_nulls_prev_rcu() like hlist_nulls_next_rcu().
->
-> I'm wondering if defining a macro called hlist_nulls_prev_rcu() might
-> be controversial, since it should actually be getting the prev->next
-> rather than the prev itself.
+Changes from RFC v2:
+	1. Add a Reviewed-by tag (Thanks to Mina)
+	2. Rebase on main branch as of Sep 22
 
-See hlist_add_before_rcu() for an example:
+Changes from RFC:
+	1. Optimize the implementation of netmem_to_nmdesc to use less
+	   instructions (feedbacked by Pavel)
 
-    rcu_assign_pointer(hlist_pprev_rcu(n), n);
+--->8---
+From 01d23fc4b20c369a2ecf29dc92319d55a4e63aa2 Mon Sep 17 00:00:00 2001
+From: Byungchul Park <byungchul@sk.com>
+Date: Tue, 29 Jul 2025 19:34:12 +0900
+Subject: [PATCH net-next v3] netmem: replace __netmem_clear_lsb() with netmem_to_nmdesc()
 
-You can define hlist_nulls_pprev_rcu() and use it alike.
+Now that we have struct netmem_desc, it'd better access the pp fields
+via struct netmem_desc rather than struct net_iov.
 
-    rcu_assign_pointer(hlist_nulls_pprev_rcu(new), new);
+Introduce netmem_to_nmdesc() for safely converting netmem_ref to
+netmem_desc regardless of the type underneath e.i. netmem_desc, net_iov.
 
+While at it, remove __netmem_clear_lsb() and make netmem_to_nmdesc()
+used instead.
 
-[...]
-> However, I noticed that in the definition of hlist_pprev_rcu(), it direct=
-ly
-> uses pprev:
->
-> #define hlist_pprev_rcu(node)    (*((struct hlist_node __rcu **)((node)->=
-pprev)))
+Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
+Signed-off-by: Byungchul Park <byungchul@sk.com>
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+---
+ include/net/netmem.h   | 66 +++++++++++++++++++++---------------------
+ net/core/netmem_priv.h | 16 +++++-----
+ 2 files changed, 41 insertions(+), 41 deletions(-)
 
-Note it dereferences *((node)->pprev).  The macro is not to iterate the
-lengthy cast.
+diff --git a/include/net/netmem.h b/include/net/netmem.h
+index f7dacc9e75fd..651e2c62d1dd 100644
+--- a/include/net/netmem.h
++++ b/include/net/netmem.h
+@@ -247,6 +247,23 @@ static inline unsigned long netmem_pfn_trace(netmem_ref netmem)
+ 	return page_to_pfn(netmem_to_page(netmem));
+ }
+ 
++/* XXX: How to extract netmem_desc from page must be changed, once
++ * netmem_desc no longer overlays on page and will be allocated through
++ * slab.
++ */
++#define __pp_page_to_nmdesc(p)	(_Generic((p),				\
++	const struct page * :	(const struct netmem_desc *)(p),	\
++	struct page * :		(struct netmem_desc *)(p)))
++
++/* CAUTION: Check if the page is a pp page before calling this helper or
++ * know it's a pp page.
++ */
++#define pp_page_to_nmdesc(p)						\
++({									\
++	DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));		\
++	__pp_page_to_nmdesc(p);						\
++})
++
+ /**
+  * __netmem_to_nmdesc - unsafely get pointer to the &netmem_desc backing
+  * @netmem
+@@ -265,42 +282,25 @@ static inline struct netmem_desc *__netmem_to_nmdesc(netmem_ref netmem)
+ 	return (__force struct netmem_desc *)netmem;
+ }
+ 
+-/* __netmem_clear_lsb - convert netmem_ref to struct net_iov * for access to
+- * common fields.
+- * @netmem: netmem reference to extract as net_iov.
+- *
+- * All the sub types of netmem_ref (page, net_iov) have the same pp, pp_magic,
+- * dma_addr, and pp_ref_count fields at the same offsets. Thus, we can access
+- * these fields without a type check to make sure that the underlying mem is
+- * net_iov or page.
++/* netmem_to_nmdesc - convert netmem_ref to struct netmem_desc * for
++ * access to common fields.
++ * @netmem: netmem reference to get netmem_desc.
+  *
+- * The resulting value of this function can only be used to access the fields
+- * that are NET_IOV_ASSERT_OFFSET'd. Accessing any other fields will result in
+- * undefined behavior.
++ * All the sub types of netmem_ref (netmem_desc, net_iov) have the same
++ * pp, pp_magic, dma_addr, and pp_ref_count fields via netmem_desc.
+  *
+- * Return: the netmem_ref cast to net_iov* regardless of its underlying type.
++ * Return: the pointer to struct netmem_desc * regardless of its
++ * underlying type.
+  */
+-static inline struct net_iov *__netmem_clear_lsb(netmem_ref netmem)
++static inline struct netmem_desc *netmem_to_nmdesc(netmem_ref netmem)
+ {
+-	return (struct net_iov *)((__force unsigned long)netmem & ~NET_IOV);
+-}
++	void *p = (void *)((__force unsigned long)netmem & ~NET_IOV);
+ 
+-/* XXX: How to extract netmem_desc from page must be changed, once
+- * netmem_desc no longer overlays on page and will be allocated through
+- * slab.
+- */
+-#define __pp_page_to_nmdesc(p)	(_Generic((p),				\
+-	const struct page * :	(const struct netmem_desc *)(p),	\
+-	struct page * :		(struct netmem_desc *)(p)))
++	if (netmem_is_net_iov(netmem))
++		return &((struct net_iov *)p)->desc;
+ 
+-/* CAUTION: Check if the page is a pp page before calling this helper or
+- * know it's a pp page.
+- */
+-#define pp_page_to_nmdesc(p)						\
+-({									\
+-	DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));		\
+-	__pp_page_to_nmdesc(p);						\
+-})
++	return __pp_page_to_nmdesc((struct page *)p);
++}
+ 
+ /**
+  * __netmem_get_pp - unsafely get pointer to the &page_pool backing @netmem
+@@ -320,12 +320,12 @@ static inline struct page_pool *__netmem_get_pp(netmem_ref netmem)
+ 
+ static inline struct page_pool *netmem_get_pp(netmem_ref netmem)
+ {
+-	return __netmem_clear_lsb(netmem)->pp;
++	return netmem_to_nmdesc(netmem)->pp;
+ }
+ 
+ static inline atomic_long_t *netmem_get_pp_ref_count_ref(netmem_ref netmem)
+ {
+-	return &__netmem_clear_lsb(netmem)->pp_ref_count;
++	return &netmem_to_nmdesc(netmem)->pp_ref_count;
+ }
+ 
+ static inline bool netmem_is_pref_nid(netmem_ref netmem, int pref_nid)
+@@ -390,7 +390,7 @@ static inline bool netmem_is_pfmemalloc(netmem_ref netmem)
+ 
+ static inline unsigned long netmem_get_dma_addr(netmem_ref netmem)
+ {
+-	return __netmem_clear_lsb(netmem)->dma_addr;
++	return netmem_to_nmdesc(netmem)->dma_addr;
+ }
+ 
+ void get_netmem(netmem_ref netmem);
+diff --git a/net/core/netmem_priv.h b/net/core/netmem_priv.h
+index cd95394399b4..23175cb2bd86 100644
+--- a/net/core/netmem_priv.h
++++ b/net/core/netmem_priv.h
+@@ -5,19 +5,19 @@
+ 
+ static inline unsigned long netmem_get_pp_magic(netmem_ref netmem)
+ {
+-	return __netmem_clear_lsb(netmem)->pp_magic & ~PP_DMA_INDEX_MASK;
++	return netmem_to_nmdesc(netmem)->pp_magic & ~PP_DMA_INDEX_MASK;
+ }
+ 
+ static inline void netmem_or_pp_magic(netmem_ref netmem, unsigned long pp_magic)
+ {
+-	__netmem_clear_lsb(netmem)->pp_magic |= pp_magic;
++	netmem_to_nmdesc(netmem)->pp_magic |= pp_magic;
+ }
+ 
+ static inline void netmem_clear_pp_magic(netmem_ref netmem)
+ {
+-	WARN_ON_ONCE(__netmem_clear_lsb(netmem)->pp_magic & PP_DMA_INDEX_MASK);
++	WARN_ON_ONCE(netmem_to_nmdesc(netmem)->pp_magic & PP_DMA_INDEX_MASK);
+ 
+-	__netmem_clear_lsb(netmem)->pp_magic = 0;
++	netmem_to_nmdesc(netmem)->pp_magic = 0;
+ }
+ 
+ static inline bool netmem_is_pp(netmem_ref netmem)
+@@ -27,13 +27,13 @@ static inline bool netmem_is_pp(netmem_ref netmem)
+ 
+ static inline void netmem_set_pp(netmem_ref netmem, struct page_pool *pool)
+ {
+-	__netmem_clear_lsb(netmem)->pp = pool;
++	netmem_to_nmdesc(netmem)->pp = pool;
+ }
+ 
+ static inline void netmem_set_dma_addr(netmem_ref netmem,
+ 				       unsigned long dma_addr)
+ {
+-	__netmem_clear_lsb(netmem)->dma_addr = dma_addr;
++	netmem_to_nmdesc(netmem)->dma_addr = dma_addr;
+ }
+ 
+ static inline unsigned long netmem_get_dma_index(netmem_ref netmem)
+@@ -43,7 +43,7 @@ static inline unsigned long netmem_get_dma_index(netmem_ref netmem)
+ 	if (WARN_ON_ONCE(netmem_is_net_iov(netmem)))
+ 		return 0;
+ 
+-	magic = __netmem_clear_lsb(netmem)->pp_magic;
++	magic = netmem_to_nmdesc(netmem)->pp_magic;
+ 
+ 	return (magic & PP_DMA_INDEX_MASK) >> PP_DMA_INDEX_SHIFT;
+ }
+@@ -57,6 +57,6 @@ static inline void netmem_set_dma_index(netmem_ref netmem,
+ 		return;
+ 
+ 	magic = netmem_get_pp_magic(netmem) | (id << PP_DMA_INDEX_SHIFT);
+-	__netmem_clear_lsb(netmem)->pp_magic = magic;
++	netmem_to_nmdesc(netmem)->pp_magic = magic;
+ }
+ #endif
+
+base-commit: 312e6f7676e63bbb9b81e5c68e580a9f776cc6f0
+-- 
+2.17.1
+
 
