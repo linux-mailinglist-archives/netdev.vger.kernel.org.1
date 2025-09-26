@@ -1,190 +1,167 @@
-Return-Path: <netdev+bounces-226628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DA3ABA3275
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 11:33:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 138EDBA3332
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 11:41:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 283C41C01DC9
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 09:33:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B165F1707B5
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 09:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C575D26CE1A;
-	Fri, 26 Sep 2025 09:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D02C279912;
+	Fri, 26 Sep 2025 09:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nZ1fV2E2";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="EfONZrTv";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nZ1fV2E2";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="EfONZrTv"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="BROowLmg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2325A19FA8D
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 09:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C35226C391
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 09:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758879204; cv=none; b=ZK2uUGhLjx1vRn0IeEjDr4GGMaQY2mcLuocn7dgl8n19PptPPuzM68+JfWEvwkB3YmWxNQsHGuSxK85CEpvsW/8AtASQ7ebrkg8+boLDwDH7Ii5ST2tTkj7VgeePeUIrXke4flS3T/Otwm+MotC3Shft8uPEqhSHLq/HArr1R/g=
+	t=1758879657; cv=none; b=NjaydJ/fvSldECOvFCpT6bjZcw2I/I4e8z5b6v4X4J/NPO1YNqqERM5aOmmHUGXR+peuy6+YnXcFjDW/Ga7ZHQCYJVEK+04JdAFz6frMH4coyhjrc0N0Q6fE9v7q3FEgq3QgLNbgfA1GsI6bvM000GjRPE4p2nJw95lAZ4f1agg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758879204; c=relaxed/simple;
-	bh=TMTQ7Z9t7o1+Q0EfMTLRm3oubpFIbGUUFt3GS8HbWYo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZBgdqSsaQ6ZnYeFmuQtaemrR9HZDPrWLEn2YIks8riiybQnSbLkKXfOQ/q+FNfAUejrpVJfsItXe5hq+SkvVw3CVTK8dwcWdy1clMbS4H+M1/UdX0IGJijoUTeqCgmOHBMLSNBL4KzLZ3Pk/A4ppd6KWTdca/twd36+5S43XytQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nZ1fV2E2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=EfONZrTv; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nZ1fV2E2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=EfONZrTv; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id A9A1926884;
-	Fri, 26 Sep 2025 09:33:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1758879200; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yRWOgU8RkNPZY+bGmbwmSuayO560FHt4po00ioHjtSQ=;
-	b=nZ1fV2E2qj9VyVLq7sPJXoFfeehQ6d3iB/giQeWxBcR94O2Gp4gmLpqDHFd8pGAuZeRnnc
-	mBiiIluRKm3yBFGtuxngTgquOw6rj9iarFDE+FKg3xd4EV/zMD53/HVD6569TQP706wwbR
-	7Dfv5kGQR8CdnO+tTaaeA/Bsm6LQIhQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1758879200;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yRWOgU8RkNPZY+bGmbwmSuayO560FHt4po00ioHjtSQ=;
-	b=EfONZrTvWNlItVlkSsbvIZbDnAdGmxyDFwUFLbXbI0MZywZ4WyIFGfGaabd+owUvtuCCSF
-	ISFdGWsCmsjJTIDw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=nZ1fV2E2;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=EfONZrTv
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1758879200; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yRWOgU8RkNPZY+bGmbwmSuayO560FHt4po00ioHjtSQ=;
-	b=nZ1fV2E2qj9VyVLq7sPJXoFfeehQ6d3iB/giQeWxBcR94O2Gp4gmLpqDHFd8pGAuZeRnnc
-	mBiiIluRKm3yBFGtuxngTgquOw6rj9iarFDE+FKg3xd4EV/zMD53/HVD6569TQP706wwbR
-	7Dfv5kGQR8CdnO+tTaaeA/Bsm6LQIhQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1758879200;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yRWOgU8RkNPZY+bGmbwmSuayO560FHt4po00ioHjtSQ=;
-	b=EfONZrTvWNlItVlkSsbvIZbDnAdGmxyDFwUFLbXbI0MZywZ4WyIFGfGaabd+owUvtuCCSF
-	ISFdGWsCmsjJTIDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 417701373E;
-	Fri, 26 Sep 2025 09:33:20 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id XRjKDOBd1mjYCwAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Fri, 26 Sep 2025 09:33:20 +0000
-Message-ID: <9289aa3e-86d3-4300-8213-4edb112943f2@suse.de>
-Date: Fri, 26 Sep 2025 11:33:11 +0200
+	s=arc-20240116; t=1758879657; c=relaxed/simple;
+	bh=hdjeidLy/DTrwYPbRgReEbCf5/OAikiJ4kB5bloN8qw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=vAQ8ST5W03FJOXs8ishdYZY0dtQYXvPggOs36GKfXCaJy56KkinG4WBYpxOAgQ8fqeKKUqDVBO9uovI11IobkKRLEoAkJTMaSj+SCHnpQivrdFAKvK3nprlKuTEdkUHhRfWvWmT1RIjwii/P2JtkMCb86+f2S/xV9ygFRTOBiWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=BROowLmg; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b3164978f11so358717966b.3
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 02:40:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1758879654; x=1759484454; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bfnGggrEWUuSTcwCWFUw26kUzRfzuZNMtwAcFeMvGfk=;
+        b=BROowLmgTfCcQJHxOizONg6zOnEhIdQVO+xyKtbf8C7tJNdZ5IjIOsvkhy/LkgpED0
+         NxGiz69OP3KNRTwAdcVIciCylWcx1TmF97gFyGjYf9iB1UKRDGuz2BFOLx+98iS8YNa0
+         vnNKEa0L/bNfOTM4GMZSGsKcJ7BWyQNQ0ioep6vX/qhPmqPcD4ikkw8sg5nc1f1X3Vyd
+         7iEYKaaoBtvMbh+tTGVzGF10APHArdWyTCb09eV0w4huxdyg5wuH1FC9jzDKHj59A5sl
+         bZ+vFBdTH6rhqSKEZZLIpK32WH8M4Ae0qLgEn8rZrwNcKtzYljDe20qkS89BoFCJ2IuV
+         envw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758879654; x=1759484454;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bfnGggrEWUuSTcwCWFUw26kUzRfzuZNMtwAcFeMvGfk=;
+        b=LRkcGaxgqRpa3mJhIQlzLjGZcrpIEPQtp+Ff1XbAO7TEVvTnRzzYivUJBAcfxNbVYq
+         mJdNzqKjUcz4NW/ea8Y5phOrMw44Y425pQFlhZrxmeEGTA5Cusw4yokZkgWCy3yPgMEr
+         y9/UeKkpqw6zJ2A9HU+LZYIfnPM2ANfK092Hp5ODWeWms0IjL83emKt1NnRSZX7r3+Sh
+         SQS5/suJXtd3Mq+nsaGr5eXonaczuw+9U+TRd2eP3OpzVEtXuytKYNWgtFwJpKRNG/a8
+         WXh4NJS+sp/CqIYQARWuW/rAz0/4kHOp6hau9lQJAJv3/Wo452qbqURy+MSxYG+HAtV7
+         RO8A==
+X-Forwarded-Encrypted: i=1; AJvYcCXSUucdVV8PfExFrRG3HJ41YBB6qthfs+MK/qyefcg1TV51xWeI93XNXLYD86Z/7kHnXTweiKs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyV4p6Y0AFovCa2N/dJLzvkGvKKmLPm0lT0fLWeRzJHq/E71eO9
+	1+Q7TRpsVocUrYw0wwF7wZ9E2O0RrdzKPgCgvRB058kTSkgAxHhX1Fd8+XA6tZ/UfTA=
+X-Gm-Gg: ASbGnctx53BKQ+8MqmxNEcjj6NsIU2sZaLe4SP2lTLE3LsdbLGz3tu/vurdW6mQOi6d
+	eQOVIr5TdN2abtij3WXnqo8TwAkFIk32kB/QC6BckjQYz2pXbhpLgZAwY7+2KiKVvdOOprAPOhy
+	HjOFHey3pqq0epK6tWERtUgNIZgS7TbArV2r887Kt8soV25QiWBDdcE3fjwFkMo85TuyUvZwn1W
+	CJteezxEn5Tm+wZKc2IDUlenW45J16fIVMTPFtKTXnc5CVTOj3eeBDcB4G1yJlHDEgsNStVw29R
+	C0VjHa11csRflmCPo0VC+s4P9pvJBgUUqTstKeAXQohrBM66W3NYDZjvLLgNIfBVdFXv4PlsTCA
+	5WXvad+ryC588i4A=
+X-Google-Smtp-Source: AGHT+IEx87dvLbs8zYXX1kmFHzSkQDWXCcEaHIBwECYQqOzBzrboZ8xaGC921BePUzyI0T1ED/vkEQ==
+X-Received: by 2002:a17:907:3e21:b0:b34:99e3:3a88 with SMTP id a640c23a62f3a-b34bbccf844mr658946166b.58.1758879653689;
+        Fri, 26 Sep 2025 02:40:53 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac6:d677:2432::39b:a2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b37b3b46ba0sm131571766b.2.2025.09.26.02.40.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Sep 2025 02:40:52 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Michal Kubiak <michal.kubiak@intel.com>,
+  <intel-wired-lan@lists.osuosl.org>,  <maciej.fijalkowski@intel.com>,
+  <aleksander.lobakin@intel.com>,  <larysa.zaremba@intel.com>,
+  <netdev@vger.kernel.org>,  <przemyslaw.kitszel@intel.com>,
+  <pmenzel@molgen.mpg.de>,  <anthony.l.nguyen@intel.com>,
+ kernel-team@cloudflare.com
+Subject: Re: [PATCH iwl-next v3 0/3] ice: convert Rx path to Page Pool
+In-Reply-To: <182d8f19-aca7-482e-8983-3806ebb837ba@intel.com> (Jacob Keller's
+	message of "Thu, 25 Sep 2025 10:22:16 -0700")
+References: <20250925092253.1306476-1-michal.kubiak@intel.com>
+	<877bxm4zzk.fsf@cloudflare.com>
+	<182d8f19-aca7-482e-8983-3806ebb837ba@intel.com>
+Date: Fri, 26 Sep 2025 11:40:51 +0200
+Message-ID: <87plbd361o.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next] net/hsr: add protocol version to fill_info
- output
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: =?UTF-8?B?SsOhbiBWw6FjbGF2?= <jvaclav@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-References: <20250922093743.1347351-3-jvaclav@redhat.com>
- <20250923170604.6c629d90@kernel.org>
- <CAEQfnk3Ft4ke3UXS60WMYH8M6WsLgH=D=7zXmkcr3tx0cdiR_g@mail.gmail.com>
- <20250924164041.3f938cab@kernel.org>
- <c39e6626-02db-4a83-9f77-3d661f63ac0e@suse.de>
- <20250925190012.58e1b3b1@kernel.org>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20250925190012.58e1b3b1@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: A9A1926884
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	MID_RHS_MATCH_FROM(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Score: -4.51
+Content-Type: text/plain
 
-
-
-On 9/26/25 4:00 AM, Jakub Kicinski wrote:
-> On Thu, 25 Sep 2025 10:37:38 +0200 Fernando Fernandez Mancera wrote:
->>> I'm not very familiar with HSR or PRP. But The PRP_V1 which has value
->>> of 3 looks like a kernel-internal hack. Or does the protocol actually
->>> specify value 3 to mean PRP?
+On Thu, Sep 25, 2025 at 10:22 AM -07, Jacob Keller wrote:
+> On 9/25/2025 2:56 AM, Jakub Sitnicki wrote:
+>> On Thu, Sep 25, 2025 at 11:22 AM +02, Michal Kubiak wrote:
+>>> This series modernizes the Rx path in the ice driver by removing legacy
+>>> code and switching to the Page Pool API. The changes follow the same
+>>> direction as previously done for the iavf driver, and aim to simplify
+>>> buffer management, improve maintainability, and prepare for future
+>>> infrastructure reuse.
 >>>
->>> I don't think there's anything particularly wrong with the code.
->>> The version is for HSR because PRP only has one version, there's no
->>> ambiguity.
+>>> An important motivation for this work was addressing reports of poor
+>>> performance in XDP_TX mode when IOMMU is enabled. The legacy Rx model
+>>> incurred significant overhead due to per-frame DMA mapping, which
+>>> limited throughput in virtualized environments. This series eliminates
+>>> those bottlenecks by adopting Page Pool and bi-directional DMA mapping.
 >>>
->>> But again, I'm just glancing at the code I could be wrong..
->>>    
->>
->> No you are right, this is a hack made to integrate PRP with HSR driver.
->> PRP does not have a version other than PRP_V1 therefore it does not make
->> much sense to configure it. Having said that, I think it's weird to
->> report HSR_VERSION 3 but fail when configuring it.
->>
->> IMHO HSR_VERSION should be hidden for PRP or it should be possible to
->> configure it to "3" (which now that you say it, it looks weird).
-> 
-> I think we're in agreement then? i was suggesting:
-> 
-> --- a/net/hsr/hsr_netlink.c
-> +++ b/net/hsr/hsr_netlink.c
-> @@ -166,6 +166,8 @@ static int hsr_fill_info(struct sk_buff *skb, const struct net_device *dev)
->   		goto nla_put_failure;
->   	if (hsr->prot_version == PRP_V1)
->   		proto = HSR_PROTOCOL_PRP;
-> +	else if (nla_put_u8(skb, IFLA_HSR_VERSION, hsr->prot_version))
-> +		goto nla_put_failure;
->   	if (nla_put_u8(skb, IFLA_HSR_PROTOCOL, proto))
->   		goto nla_put_failure;
-> 
-> This will not report the HSR version if prot is PRP
+>>> The first patch removes the legacy Rx path, which relied on manual skb
+>>> allocation and header copying. This path has become obsolete due to the
+>>> availability of build_skb() and the increasing complexity of supporting
+>>> features like XDP and multi-buffer.
+>>>
+>>> The second patch drops the page splitting and recycling logic. While
+>>> once used to optimize memory usage, this logic introduced significant
+>>> complexity and hotpath overhead. Removing it simplifies the Rx flow and
+>>> sets the stage for Page Pool adoption.
+>>>
+>>> The final patch switches the driver to use the Page Pool and libeth
+>>> APIs. It also updates the XDP implementation to use libeth_xdp helpers
+>>> and optimizes XDP_TX by avoiding per-frame DMA mapping. This results in
+>>> a significant performance improvement in virtualized environments with
+>>> IOMMU enabled (over 5x gain in XDP_TX throughput). In other scenarios,
+>>> performance remains on par with the previous implementation.
+>>>
+>>> This conversion also aligns with the broader effort to modularize and
+>>> unify XDP support across Intel Ethernet drivers.
+>>>
+>>> Tested on various workloads including netperf and XDP modes (PASS, DROP,
+>>> TX) with and without IOMMU. No regressions observed.
+>> 
+>> Will we be able to have 256 B of XDP headroom after this conversion?
+>> 
+>> Thanks,
+>> -jkbs
+>
+> We should. The queues are configured through libeth, and set the xdp
+> field if its enabled on that ring:
+>
+>> @@ -622,8 +589,14 @@ static unsigned int ice_get_frame_sz(struct ice_rx_ring *rx_ring)
+>>   */
+>>  static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+>>  {
+>> +	struct libeth_fq fq = {
+>> +		.count		= ring->count,
+>> +		.nid		= NUMA_NO_NODE,
+>> +		.xdp		= ice_is_xdp_ena_vsi(ring->vsi),
+>> +		.buf_len	= LIBIE_MAX_RX_BUF_LEN,
+>> +	};
+>
+>
+> If .xdp is set, then the libeth Rx configuration reserves
+> LIBETH_XDP_HEADROOM, which is XDP_PACKET_HEADROOM aligned to
+> NET_SKB_PAD, + an extra NET_IP_ALIGN, which results in 258 bytes of
+> headroom reserved.
 
-Looks good to me. Jan could you send a v3? Thanks!
+That's great news. We've been observing a growing adoption of custom XDP
+metadata ([1], [2]) at Cloudflare, so the current 192B of headroom in
+ICE was limiting.
+
+[1] https://docs.ebpf.io/linux/helper-function/bpf_xdp_adjust_meta/
+[2] https://docs.kernel.org/networking/xdp-rx-metadata.html#af-xdp
 
