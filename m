@@ -1,95 +1,72 @@
-Return-Path: <netdev+bounces-226781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CA09BA529B
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 23:10:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D74CDBA52B6
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 23:11:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5DE067A8A37
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 21:08:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3709E1BC4167
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 21:11:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE77284B58;
-	Fri, 26 Sep 2025 21:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A03CE27875C;
+	Fri, 26 Sep 2025 21:10:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HnYp7GlO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cyj4QKfF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61578834;
-	Fri, 26 Sep 2025 21:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70613286D4B
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 21:10:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758921011; cv=none; b=LgtTBUqskmMr28mUc3LXhEs7YUd+g5eYWw7WP+K0B47S/Wq46bkU/YOxs7CGB0iU20XPRaGuDtFVIN/ZoQUYg4IBG3S30p9mgHQr9UKllSgAbqOjbQQ7ZN1MK+QCMmljfCiP++HbCwEzY/tc4PVRb9l/Oxff2d15anABMFWCkfg=
+	t=1758921057; cv=none; b=oMdxZyYWRvDNDstgPdMzkxdWkPS39Ag+uD0Twy95OOupSHEqE5L/TtEvVxW4qQKdpIlsmf7Ygg+3h8Jchura/FX5/kkCr87PvGPued12wly6reEXfv5wpxOpIIg+lHVGNtf8crwx/oiUZUI1JKHY2u88qbY38At9B332wrwuUMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758921011; c=relaxed/simple;
-	bh=RZ9HdT/IrQyoxMK3r2oqrAQedDK6FkLdEup2Y9J5Pks=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eC/XbE4xDgSa0+dEM1pHPQhXfYASEQiuBcNxVMNfyiyY/cSE8qTTfGM//5eUh6CaJ1g4Omc/FACknY4q/8cWKhhfs8yVAF55FLo5CoKIz3z6krq3y/3qByBgDcVioWd0O7Me+TfisiHA3eLt2+789G0Vr7arvwHwjSkA7retuJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HnYp7GlO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41461C4CEF4;
-	Fri, 26 Sep 2025 21:10:11 +0000 (UTC)
+	s=arc-20240116; t=1758921057; c=relaxed/simple;
+	bh=p5oRqBgqCR+joVJDXbhCchcosdQfUHzYVWqwFK03VAg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J8QEkMddaG9NYWw6BQERb0MeFtfnraFhLWH8a2ItaK6nUmoCefNtzHjnGzxtXCPl55sjNNd28cipxRMCBKR7B0VAXR9r1gDj3v46fjHwEM88CIrfEjN4GdoNbpCBCDCcUWivGgSYMqB5tN4kKczD0p04Ud/JFpdTqc9GWNUqUWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cyj4QKfF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90A9FC4CEF4;
+	Fri, 26 Sep 2025 21:10:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758921011;
-	bh=RZ9HdT/IrQyoxMK3r2oqrAQedDK6FkLdEup2Y9J5Pks=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HnYp7GlOdCehftOf+USsNpxP4OKt9On5CuqDc7vCK2F07emKeWvqty4TqOPA7URdU
-	 TGce5HNwgwLR39joavBgM343nGRprYjuCatCd9pGvopX1+n3daHHCQvsSWPvcK/EK3
-	 AWDFltNnZUtJuNKDuv4oWhbdU1sVMXsRwPYdkatZUidQ0HM3SCZh86HqGyAGvqtAMv
-	 qO48lbGp04QKgxKfmFSf6ksb8pAdVySByvadUhf5btY8DzPgum67LtCMqruIDgYJ/l
-	 HM8y8wX4Q9TakZ0TZ5PigfWp5myk3J5uHc4aLUapUtTsPW011yEfrSIui3nANrOH9f
-	 HerN13wgopfDA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC2939D0C3F;
-	Fri, 26 Sep 2025 21:10:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1758921057;
+	bh=p5oRqBgqCR+joVJDXbhCchcosdQfUHzYVWqwFK03VAg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Cyj4QKfF8XM1K3u7WHhr4eNHcT9zVnlzk4R1a3LnFQYfKaDptYfFqcsp5DNkcMwyW
+	 hUxy0WkKmTPkclflHERkApXuQr/22bS3eA7iFuLfJ7ZSZUXOUMxteYRl+iDGbUOJk5
+	 KfPhLecFNq0KjrC/RyOSTStYU7PSMNXVARR3ZTgneaZ3evqV54u86quSRpPRqKZWqP
+	 p9eefFybdhRE4HMS2xYRDcdag4hGXOv3l9RoJk2mieW8RDlyHGE49Vpj84eBlacRsI
+	 GV2wesPiC20JSlUgFLd3N1Kin5EjIUCwHXoKyUzSd2TPqFDwl+hRlzOysRpKIncIzH
+	 FNfeOJJzO76mA==
+Date: Fri, 26 Sep 2025 14:10:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Mohsin Bashir <mohsin.bashr@gmail.com>, netdev@vger.kernel.org,
+ alexanderduyck@fb.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kernel-team@meta.com, pabeni@redhat.com,
+ vadim.fedorenko@linux.dev
+Subject: Re: [PATCH net-next] eth: fbnic: Add support to read lane count
+Message-ID: <20250926141055.1c0c52d3@kernel.org>
+In-Reply-To: <20250925101642.GD836419@horms.kernel.org>
+References: <20250924184445.2293325-1-mohsin.bashr@gmail.com>
+	<20250925101642.GD836419@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/1] selftests: drv-net: Reload pkt pointer after
- calling filter_udphdr
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175892100651.59026.11406625421598531145.git-patchwork-notify@kernel.org>
-Date: Fri, 26 Sep 2025 21:10:06 +0000
-References: <20250925161452.1290694-1-ameryhung@gmail.com>
-In-Reply-To: <20250925161452.1290694-1-ameryhung@gmail.com>
-To: Amery Hung <ameryhung@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, kuba@kernel.org,
- alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
- martin.lau@kernel.org, stfomichev@gmail.com, kernel-team@meta.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 25 Sep 2025 09:14:52 -0700 you wrote:
-> Fix a verification failure. filter_udphdr() calls bpf_xdp_pull_data(),
-> which will invalidate all pkt pointers. Therefore, all ctx->data loaded
-> before filter_udphdr() cannot be used. Reload it to prevent verification
-> errors.
+On Thu, 25 Sep 2025 11:16:42 +0100 Simon Horman wrote:
+> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>  
 > 
-> The error may not appear on some compiler versions if they decide to
-> load ctx->data after filter_udphdr() when it is first used.
-> 
-> [...]
+> It's not not entirely clear to me why Jakub's tag is here.
 
-Here is the summary with links:
-  - [net-next,1/1] selftests: drv-net: Reload pkt pointer after calling filter_udphdr
-    https://git.kernel.org/netdev/net-next/c/11ae737efea1
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Internal review FWIW. Since reviews than internally don't count
+for much upstream I opted for using SoB. Probably also wrong but shrug.
 
