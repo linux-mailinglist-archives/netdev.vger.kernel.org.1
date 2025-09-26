@@ -1,169 +1,161 @@
-Return-Path: <netdev+bounces-226603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCE3FBA2CDC
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 09:34:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7D14BA2D7B
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 09:41:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D99761C0135F
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 07:34:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08E6C1C02037
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 07:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5238926E6E1;
-	Fri, 26 Sep 2025 07:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE5A28724C;
+	Fri, 26 Sep 2025 07:41:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Tha4Fn6e"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="g8RsWeaJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767ED18FC86
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 07:34:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18EF9287512
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 07:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758872042; cv=none; b=dvUGolnl6uPzMQJweynpE3la/3W4qrnwU87yNS0UAqgx/8q9cQvPOFVmttyM9y769H9MlEjP0MBlFnDHJUgobjbGaBLq5OmxOf4a3NuZxSHKLzG5GEO8qoX+L9LwqulrF0gMAddN2JUAUGevw3CiX+G4/LjPY+9KM+KNIjwWiDU=
+	t=1758872490; cv=none; b=lcwuOfPA7SChw24GD5WSwz0m52khVjBiN9SXxW9OZD/neJql0r8O4AuBKB8f0dnpMEEkIN1mq9dKd1Zx5HRyDZl++yCNnsh+TX0Oxdg5uEzdninAHSBZH1hwcYWSc/mnk6oOihPWgQH/if49sr1MWxTmOtPNW6RHzUmhKgQ43Ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758872042; c=relaxed/simple;
-	bh=43+arxHIZZPcm1CwK9O5ILMH9H6gVenccJ0NbaovTm4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H6SRTzZ1NA7wXXo7hqfDaS44VwMQQbnYfTwyDY/nDauOliRsaDtwYIEihtWbwQXqo6CGsyCaVaD5xRbhAXrzCkl3FgDLLZL/NlK9xaHzrYApcavIHUnB0O9nUMdw0cU9MPuoLPMtyoDQ1YuZT0Byagu1SWwog5TGxhXmxJWDXEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Tha4Fn6e; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-57bf9bb803dso4017e87.1
-        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 00:34:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758872038; x=1759476838; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EBZhJSbHuJVNYFNQx8sDjlGQJWDTuWRThogwStulwmo=;
-        b=Tha4Fn6ejp20uDxclEfPDzw7NIK1NBymvBn/1fEXlS31N+IyNhpxOEDSZqumUw0fQ8
-         RpnCI9yZnTwSheTVTPhHrjJ+Smjk5vN91MSQ20+5L+CH8rTPG1BN7D6G0ORpliffEFTs
-         BDrj4E8OqIY5aeLqwAjGbE5D7eL/MO5Lp/0h3tKfQUEqqdSmCTanftApbqGc/yGhJsNM
-         TcGAwLqVvdEsl3g/uibutE6t/9b3XtjTsSuPS6RdBZjbb6ijc2FEckqqrY9GErUxe57F
-         Ev/4rJ88RMxQLg6Pp2OOaPDbWYwWuGi9RWZo9IO0fgtwcDzkkA4V7cfT+RWB17SFnX0Q
-         DQGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758872038; x=1759476838;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EBZhJSbHuJVNYFNQx8sDjlGQJWDTuWRThogwStulwmo=;
-        b=ucM1Awh0vPBOOxHPvG041KLk0E6QzAWb5XfQ0GRYkaZUwCCGdCmtYuAwPMT+DrSROw
-         Co4fyS+V6jyxscIU420gi3UeuGYHI0SbmJ/e91RceoHq0DdXVIgnL2Fc/dKGF6Xye9uf
-         ZqXtBY18KstymPGD3BmRZmkDqCdWH0njhpvI20Jn0CHHcJBudYyVjzQLhwK07vRIX8OJ
-         /WMTijwXD6Uypv9NIukqbGjIFtHZQLlVr/g/tqhzH7EnTFa5MFNutcQGNAa5tmiNHjdX
-         R+6GPjTQY11pAr44Y19demTfLOEMfXj0ynTXPJPM0JGdrMIl7owbSWka83pzaWaiTUd2
-         pYIg==
-X-Forwarded-Encrypted: i=1; AJvYcCVf0g9xmwesYY+Op8ugZ8QPULRAyjg7M04g3AjpJ292Gpik6+LkGXdFPpbkC8SJiwqhMlLaoGw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmDvsnzP0hhQ9OTfQ2Wi3FXfnIJ3QL7Ere50V0/hK9nmJLtNXD
-	mNF6fE2lue6L6shY87Sy3igtUTkNiZcvsAtOOEjfETdPhnQe/+PWFS45300CxcVcEp5qspADUMd
-	8hDViH+T/TR0nHkDJYAYdfSATjxvIFZEi0nPsujMs
-X-Gm-Gg: ASbGncuA3CJ9V65XwgPxRcI1X3LseKiyTJ5bWgIcbsGAGpz7fJ0XH4n72JC37rrqpFr
-	sntnL78V9VpkuchEOXrfwos61dB3VRpBqm8UAKVJtSiw+N79SXKCrbziX3VTVMtGDn6sfc1HEkS
-	qfH4ypjWmzkIaUv6/lOmaIfFjtDdJEe3dUU8XEjndYne0jsU8EFnexag71AHTiyjTS1bG9KAyxt
-	WD1yOehNliZhOnJvRhhgeFhRUn3wua+VzLDU2wyu4F6xms=
-X-Google-Smtp-Source: AGHT+IG0I1cuFdB5NzE00N0rhpCLOpSuSGU9Q2QmiolE+hhpYTRAWFN4+R73lM2EIdTtEteIap5lRAfNxHQuKEHssf4=
-X-Received: by 2002:ac2:5ded:0:b0:57b:f611:f918 with SMTP id
- 2adb3069b0e04-58438d03dfamr209489e87.3.1758872038112; Fri, 26 Sep 2025
- 00:33:58 -0700 (PDT)
+	s=arc-20240116; t=1758872490; c=relaxed/simple;
+	bh=XKnmpEFbAIkenV7ye0e02CyHbk+8pgm7HNkp+OCTXvM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rC58ZaOWZOTF0+CHnuvbW7YLcT/92XwP1H2CCZWs4bx13LX4Yxv45kMm+5jyzhxz3ehCQCwuK0s2CgxIrC//7NTcUUsEfjliTHhVSOrg1Fzg2FJXiJ64dZp9S7aKnLKNJYvQtmz72+efDFAlN3+4iNLY+qbt9baIRq7HT3wNpGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=g8RsWeaJ; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758872485;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nwLDs1VdJ7tuosh4qKhCK24Eiz7nHBYQa6JTSvGhv5c=;
+	b=g8RsWeaJvQIwscNvX9ICsKKV2MxB79uikXdHbZzVLt3auUspsmrBTw0/l3JdMmqhR+Uj50
+	1WwrrhGlHaDE3FfbbREMSRY/AAael4j9ZsbgQO1rhMr6Nt4fivlEPEz3N0AqRB1rVQ0476
+	oQDL5mgCkN6t/w4AxNPQ5Q/M0yCcbVY=
+From: xuanqiang.luo@linux.dev
+To: edumazet@google.com,
+	kuniyu@google.com,
+	"Paul E. McKenney" <paulmck@kernel.org>
+Cc: kerneljasonxing@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	Xuanqiang Luo <luoxuanqiang@kylinos.cn>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>
+Subject: [PATCH net-next v7 0/3] net: Avoid ehash lookup races
+Date: Fri, 26 Sep 2025 15:40:30 +0800
+Message-Id: <20250926074033.1548675-1-xuanqiang.luo@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250924060843.2280499-1-tavip@google.com> <20250924170914.20aac680@kernel.org>
- <CAGWr4cQCp4OwF8ESCk4QtEmPUCkhgVXZitp5esDc++rgxUhO8A@mail.gmail.com>
- <aNUObDuryXVFJ1T9@boxer> <20250925191219.13a29106@kernel.org>
-In-Reply-To: <20250925191219.13a29106@kernel.org>
-From: Octavian Purdila <tavip@google.com>
-Date: Fri, 26 Sep 2025 00:33:46 -0700
-X-Gm-Features: AS18NWC04uq5PgWIZ1vcjFQEJzvryXi-17sPAp4VHgGoES1fwf9NPZmqEHUgz1Y
-Message-ID: <CAGWr4cSiVDTUDfqAsHrsu1TRbumDf-rUUP=Q9PVajwUTHf2bYg@mail.gmail.com>
-Subject: Re: [PATCH net] xdp: use multi-buff only if receive queue supports
- page pool
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, horms@kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me, 
-	ahmed.zaki@intel.com, aleksander.lobakin@intel.com, toke@redhat.com, 
-	lorenzo@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com, 
-	Kuniyuki Iwashima <kuniyu@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Sep 25, 2025 at 7:12=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu, 25 Sep 2025 11:42:04 +0200 Maciej Fijalkowski wrote:
-> > On Thu, Sep 25, 2025 at 12:53:53AM -0700, Octavian Purdila wrote:
-> > > On Wed, Sep 24, 2025 at 5:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.o=
-rg> wrote:
-> > > >
-> > > > On Wed, 24 Sep 2025 06:08:42 +0000 Octavian Purdila wrote:
-> >  [...]
-> > > >
-> > > > This can also happen on veth, right? And veth re-stamps the Rx queu=
-es.
-> >
-> > What do you mean by 're-stamps' in this case?
-> >
-> > >
-> > > I am not sure if re-stamps will have ill effects.
-> > >
-> > > The allocation and deallocation for this issue happens while
-> > > processing the same packet (receive skb -> skb_pp_cow_data ->
-> > > page_pool alloc ... __bpf_prog_run ->  bpf_xdp_adjust_tail).
-> > >
-> > > IIUC, if the veth re-stamps the RX queue to MEM_TYPE_PAGE_POOL
-> > > skb_pp_cow_data will proceed to allocate from page_pool and
-> > > bpf_xdp_adjust_tail will correctly free from page_pool.
-> >
-> > netif_get_rxqueue() gives you a pointer the netstack queue, not the dri=
-ver
-> > one. Then you take the xdp_rxq from there. Do we even register memory
-> > model for these queues? Or am I missing something here.
-> >
+From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-Ah, yes, you are right. So my comment in the commit message about
-TUN/TAP registering a page shared memory model is wrong. But I think
-the fix is still correct for the reported syzkaller issue. From
-bpf_prog_run_generic_xdp:
+After replacing R/W locks with RCU in commit 3ab5aee7fe84 ("net: Convert
+TCP & DCCP hash tables to use RCU / hlist_nulls"), a race window emerged
+during the switch from reqsk/sk to sk/tw.
 
-        rxqueue =3D netif_get_rxqueue(skb);
-        xdp_init_buff(xdp, frame_sz, rxq: &rxqueue->xdp_rxq);
+Now that both timewait sock (tw) and full sock (sk) reside on the same
+ehash chain, it is appropriate to introduce hlist_nulls replace
+operations, to eliminate the race conditions caused by this window.
 
-So xdp_buff's rxq is set to the netstack queue for the generic XDP
-hook. And adding the check in netif_skb_check_for_xdp based on the
-netstack queue should be correct, right?
+Before this series of patches, I previously sent another version of the
+patch, attempting to avoid the issue using a lock mechanism. However, it
+seems there are some problems with that approach now, so I've switched to
+the "replace" method in the current patches to resolve the issue.
+For details, refer to:
+https://lore.kernel.org/netdev/20250903024406.2418362-1-xuanqiang.luo@linux.dev/
 
-> > We're in generic XDP hook where driver specifics should not matter here
-> > IMHO.
->
-> Well, IDK how helpful the flow below would be but:
->
-> veth_xdp_xmit() -> [ptr ring] -> veth_xdp_rcv() -> veth_xdp_rcv_one()
->                                                                |
->                             | xdp_convert_frame_to_buff()   <-'
->     ( "re-stamps" ;) ->     | xdp->rxq =3D &rq->xdp_rxq;
->   can eat frags but now rxq | bpf_prog_run_xdp()
->          is veth's          |
->
-> I just glanced at the code so >50% changes I'm wrong, but that's what
-> I meant.
+Before I encountered this type of issue recently, I found there had been
+several historical discussions about it. Therefore, I'm adding this
+background information for those interested to reference:
+1. https://lore.kernel.org/lkml/20230118015941.1313-1-kerneljasonxing@gmail.com/
+2. https://lore.kernel.org/netdev/20230606064306.9192-1-duanmuquan@baidu.com/
 
-Thanks for the clarification, I thought that "re-stamps" means the:
+---
 
-    xdp->rxq->mem.type =3D frame->mem_type;
+Changes:
+  v7:
+    * Patch1
+	* Fix the checkpatch complaints.
+	* Introduces hlist_nulls_pprev_rcu() to replace
+	  (*((struct hlist_nulls_node __rcu __force **)(node)->pprev)).
+	* Use next->pprev instead of new->next->pprev.
+    * Patch2
+	* Remove else if in inet_ehash_insert(), use if instead.
+    * Patch3
+	* Fix legacy comment style issues in
+	  inet_twsk_hashdance_schedule().
 
-from veth_xdp_rcv_one in the XDP_TX/XDP_REDIRECT cases.
+  v6: https://lore.kernel.org/all/20250925021628.886203-1-xuanqiang.luo@linux.dev/
+    * Patch 1
+        * Send and CC to the RCU maintainers.
+    * Patch 3
+        * Remove the unused function inet_twsk_add_node_rcu() and variable
+          ehead fix build warnings.
 
-And yes, now I think the same issue can happen because veth sets the
-memory model to MEM_TYPE_PAGE_SHARED but veth_convert_skb_to_xdp_buff
-calls skb_pp_cow_data that uses page_pool for allocations. I'll try to
-see if I can adapt the syzkaller repro to trigger it for confirmation.
+  v5: https://lore.kernel.org/all/20250924015034.587056-1-xuanqiang.luo@linux.dev/
+    * Patch 1
+        * Rename __hlist_nulls_replace_rcu() to hlist_nulls_replace_rcu()
+          and update the description of hlist_nulls_replace_init_rcu().
+    * Patch 2
+        * Remove __sk_nulls_replace_node_init_rcu() and inline it into
+          sk_nulls_replace_node_init_rcu().
+        * Use DEBUG_NET_WARN_ON_ONCE() instead of WARN_ON().
+    * Patch 3
+        * Move smp_wmb() after setting the refcount.
+
+  v4: https://lore.kernel.org/all/20250920105945.538042-1-xuanqiang.luo@linux.dev/
+    * Patch 1
+        * Use WRITE_ONCE() for ->next in __hlist_nulls_replace_rcu(), and
+          add why in the commit message.
+        * Remove the node hash check in hlist_nulls_replace_init_rcu() to
+          avoid redundancy. Also remove the return value, as it serves no
+          purpose in this patch series.
+    * Patch 3
+        * Remove the check of hlist_nulls_replace_init_rcu() return value
+          in inet_twsk_hashdance_schedule() as it is unnecessary.
+          Thanks to Kuni for clarifying this.
+
+  v3: https://lore.kernel.org/all/20250916103054.719584-1-xuanqiang.luo@linux.dev/
+    * Add more background information on this type of issue to the letter
+      cover.
+
+  v2: https://lore.kernel.org/all/20250916064614.605075-1-xuanqiang.luo@linux.dev/
+    * Patch 1
+        * Use WRITE_ONCE() to initialize old->pprev.
+    * Patch 2&3
+        * Optimize sk hashed check. Thanks Kuni for pointing it out!
+
+  v1: https://lore.kernel.org/all/20250915070308.111816-1-xuanqiang.luo@linux.dev/
+
+Xuanqiang Luo (3):
+  rculist: Add hlist_nulls_replace_rcu() and
+    hlist_nulls_replace_init_rcu()
+  inet: Avoid ehash lookup race in inet_ehash_insert()
+  inet: Avoid ehash lookup race in inet_twsk_hashdance_schedule()
+
+ include/linux/rculist_nulls.h | 59 +++++++++++++++++++++++++++++++++++
+ include/net/sock.h            | 14 +++++++++
+ net/ipv4/inet_hashtables.c    |  8 +++--
+ net/ipv4/inet_timewait_sock.c | 35 +++++++--------------
+ 4 files changed, 91 insertions(+), 25 deletions(-)
+
+-- 
+2.25.1
+
 
