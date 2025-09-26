@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-226815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B78A5BA55A2
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 00:40:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA805BA55AE
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 00:40:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7778F3833EB
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 22:40:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 035ED3BEDF4
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 22:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A817A279DD3;
-	Fri, 26 Sep 2025 22:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8762275B16;
+	Fri, 26 Sep 2025 22:40:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sVUuqNPI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k3OjYO4b"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AA015278E;
-	Fri, 26 Sep 2025 22:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAAC015278E;
+	Fri, 26 Sep 2025 22:40:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758926412; cv=none; b=Qgh8PedZWXXHSXaQc+vf63eVC9B+i8K1dsLqHZ5J0kQsII/Sn+CYUMPtJaPLNoL603tqCNf9c9DoUCZaEW4Kq4Z2jiD/rPyI6UBtA4Gj4yZd/nndS0ZIH0gejAoLqBldQTKyF2MbSDWDG419RfY3N+nsGkjLhQw33UdWt9xplV8=
+	t=1758926417; cv=none; b=n+gM6IrMEctDAhOKOQT+bbVTU6gTNpvj0tzx83KkQ2/a/7Ltc9O3e0VkZIieZGUVX6y57+spgnRHRf/kLWdan89X4ST6EYCSLhXOCrY05TwJzlW+tCJ4LxkvQYrXg1Ey1uMGkC9tSidbx5LtCLAgHxYcGIz0Q8594593YHcvrrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758926412; c=relaxed/simple;
-	bh=6sLDQBafqAscBpqWVedo/j/pnvSvSK0EgOm4sn/zlFU=;
+	s=arc-20240116; t=1758926417; c=relaxed/simple;
+	bh=eQzc4Q0h8XcaMlb4UGs79EVBMhAKWd5o8JWig9NItxc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Jf2ofCvccp+5WnKb51suZDuboKRXnBP0JnQ48wxBWO2HKpKpdeGUMqBdS8aGvbOCNJG2AE2pZ4NYHm4zkpg2TPzQF54DzyvGt2rO5mRkG5qUcuSDpAfUJVk/QiswVQfZREl7U2n8WtAteHQ8tp2dvjufMHjx0Yppm4QzY11yXqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sVUuqNPI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16554C4CEF4;
-	Fri, 26 Sep 2025 22:40:12 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Krosy4wAbowRjYrvR1eV8rOk2XBWbXmDa4Wc0IlYqT8qbZilKyuRSy9QElQMc4C4t//9Z1u29IZe4qManxTimiBTBUSxqB0cyI/wA2UtCdFvPPozSR3ZB1A6052JdmdOOxiUwx4qo17rpZTeIDbePwI6LPrg+36buoLPjIUXt/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k3OjYO4b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 463C1C4CEF4;
+	Fri, 26 Sep 2025 22:40:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758926412;
-	bh=6sLDQBafqAscBpqWVedo/j/pnvSvSK0EgOm4sn/zlFU=;
+	s=k20201202; t=1758926417;
+	bh=eQzc4Q0h8XcaMlb4UGs79EVBMhAKWd5o8JWig9NItxc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sVUuqNPIADbRIQSHs0+A7NNEEpK4hfl4E63wOBhQILnvf2s3EISix+K7WLty0E2Jn
-	 Y15rE6JFspEuClwmbrbkULcp3mWD0MPaJxSYd7siPOepkUQuXqAkRsLczcjJGySjf7
-	 dumbHBTBNLxH4h7/OZsMS1GSqd1lGZ5PCWZdJ9PUWO19IVRay0vJSRHDyhfaVGTYqQ
-	 eBqCvFkQ1oKXR5POd6mawM8fmAg6CNf0U7FtsqCxqYCn26kDwDQwEehrdaHOwyoIM6
-	 GULO7zr7/4oh7fzo4UB6Eb/8C+m8b9QniQ8o6EeFKRd/5ZKThadHrM/DnOx3VjJ5fY
-	 HK8ZMJ/QHsSaA==
+	b=k3OjYO4bvtorKORglOqzOEqc9et3Yd+ac2k7qLnCcJBr/PLZ/Z/7WFpZ9t87s34An
+	 4fK7BzJZwVPCeW9Bro2olyZZjHeuC1eJXjmzmInMfGwo6F9APCflZwkJ+1+ridvlCx
+	 zv/EutcYQhy2dWslIkpNOWHONVFY/na8OWJwkiI1vXtQqjWokNPiMDNtIQlfrPmNTx
+	 Y95SmmT6nE7aweTaXLaIc1aix3LwqrwnsBitGDlwdM9wyNL82EpNeQxhT3BuSKU5K7
+	 QPUu4MaT0UqDNH4egGjx0r6lsOylmfSt8BbDB8D4eCZZRDQ964BOxB66rF/6MNNzha
+	 Q94BkiZwZ4eXg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D9239D0C3F;
-	Fri, 26 Sep 2025 22:40:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEEA39D0C3F;
+	Fri, 26 Sep 2025 22:40:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] ptp: Add a upper bound on max_vclocks
+Subject: Re: [PATCH v2] selftest: net: Fix error message if empty variable
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175892640700.83117.7979066365485641926.git-patchwork-notify@kernel.org>
-Date: Fri, 26 Sep 2025 22:40:07 +0000
-References: <20250925155908.5034-1-viswanathiyyappan@gmail.com>
-In-Reply-To: <20250925155908.5034-1-viswanathiyyappan@gmail.com>
-To: I Viswanath <viswanathiyyappan@gmail.com>
-Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev,
- david.hunter.linux@gmail.com,
- syzbot+94d20db923b9f51be0df@syzkaller.appspotmail.com
+ <175892641224.83117.18217809973759169577.git-patchwork-notify@kernel.org>
+Date: Fri, 26 Sep 2025 22:40:12 +0000
+References: <20250925132832.9828-1-alessandro.zanni87@gmail.com>
+In-Reply-To: <20250925132832.9828-1-alessandro.zanni87@gmail.com>
+To: Alessandro Zanni <alessandro.zanni87@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 25 Sep 2025 21:29:08 +0530 you wrote:
-> syzbot reported WARNING in max_vclocks_store.
+On Thu, 25 Sep 2025 15:28:23 +0200 you wrote:
+> Fix to avoid cases where the `res` shell variable is
+> empty in script comparisons.
+> The comparison has been modified into string comparison to
+> handle other possible values the variable could assume.
 > 
-> This occurs when the argument max is too large for kcalloc to handle.
-> 
-> Extend the guard to guard against values that are too large for
-> kcalloc
+> The issue can be reproduced with the command:
+> make kselftest TARGETS=net
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v3] ptp: Add a upper bound on max_vclocks
-    https://git.kernel.org/netdev/net/c/e9f35294e18d
+  - [v2] selftest: net: Fix error message if empty variable
+    https://git.kernel.org/netdev/net-next/c/81dcfdd21dbd
 
 You are awesome, thank you!
 -- 
