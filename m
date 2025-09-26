@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-226595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60166BA270B
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 07:30:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B044BA2708
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 07:30:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 704071C03C8F
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 05:31:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D4B11C03C22
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 05:31:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF06F278E5D;
-	Fri, 26 Sep 2025 05:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A8142773FE;
+	Fri, 26 Sep 2025 05:30:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="GRQ7JVUm"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="N+t0Qq/5"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2D121C9EA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A34521E091
 	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 05:30:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758864646; cv=none; b=ZYe942w15fO3dIMHeVU8Z7LSnLCtMmx+8CyqyjveD9xLAjR6NNHKoVnCTl0BsHI5T0+FipHazGNlXxgx6Iona8l+Cju+Gwj2eMGaxIQKbhRNCloyWjerm06IqWZQzF5YbMUFw+EWnKnfKuc3Td7n7dp8KQBgncEsKFqEGN/U0uE=
+	t=1758864645; cv=none; b=n8rsjRO0yd2YFwv/jIU1/leWbG7ekKcGpUR57U+lWnzxLNvXUcabnekj1K92Gppzis9JnBT8dREgwM/0AUM5sxEYCTfIRxEVri8OJNiFTrNlgUAn5iYIVo3XBBVqfqYUycQv61JyEVXD7GfJLCOC2bX3dvpKsK4mhG16T2PFpSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758864646; c=relaxed/simple;
-	bh=v1+46vy/5bTQXF1JLi3RYjUId+NFzwhKxg7SxH1m5gA=;
+	s=arc-20240116; t=1758864645; c=relaxed/simple;
+	bh=e8j1xOYIY4wKg7OHrCKZ4ZZZ2fHLQmJEhrsqZCD0yl0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tBTtsLHBV1bPGpHmQXSi8oCzuyW/vr8Jc7HY+bJOSDRaaX+I3+fN27jp2uVckc9ZxoKQmG9epvq+lFZKxo4o/3SkRRokNE8kbI6aAwc7c1WhuHYiajx/F5TMvMN2NM7AD2bCYJH3qc9LMerjxnsdpZmAT75P57xl2T1vPkxz+x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=GRQ7JVUm; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=CxlI+zwWmwHB/QuepDWo9anmJXh45RP+33xwT5j3Ax+BEeGsmnAigZULKfgscnELI/y6SCy4zESOqJ0Q30BTKEQLB7tqMPYxiGBKwAw/liz4hYUUlbPm9A6z1rRMJ0oyyhyubvi/C1q0OOCM/ftmqISkB/NOMHHj/j4e7r4lSDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=N+t0Qq/5; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 5EE5E208BA;
+	by mx1.secunet.com (Postfix) with ESMTP id 8505E208A2;
 	Fri, 26 Sep 2025 07:30:36 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XIekwHkEX5RO; Fri, 26 Sep 2025 07:30:35 +0200 (CEST)
+ with ESMTP id BRut1hz1UCm4; Fri, 26 Sep 2025 07:30:36 +0200 (CEST)
 Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 53E88208A2;
+	by mx1.secunet.com (Postfix) with ESMTPS id EA539208B5;
 	Fri, 26 Sep 2025 07:30:35 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 53E88208A2
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com EA539208B5
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1758864635;
-	bh=cxcALqtzNzps0CxGQXUEXC+3d/O29jk6shSAojiHGgY=;
+	s=202301; t=1758864636;
+	bh=unmvt9ys5atahR+Z4soQ9iesE7BgRtk3RTP3vtMslJQ=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=GRQ7JVUm4sUz1D3hX3/FsJcoDlAQCQfSGvQFctJhAVEpiF/UdTutdDdPxfBHAnSie
-	 j6a1V5p7mjPylGtnmgmdEKU9ZBLLKoxKKpVkNGlN/GNgQpDHkCaWud+rySo2MrRSp3
-	 wzgEFvPCqdNL/ghnVGEQsRvjI7lgUds0o+zqV5Djn7E4YhzY33lgkcUImr5Z/+Ngmk
-	 M+RMuFTvDiZ8oGVtt5h5pBJTxyoter3+lNF6/jmnT2jsepcMD1ljaIs8LoCVKn3tkh
-	 0NDI4phL8rbcQx7ihfxasGiRSTFwv+HQSCqMB36ZNzvGDxDvXUKc03lOw7ihnod9dW
-	 4XV98g9NwQJDg==
+	b=N+t0Qq/5gUkH6A1dA6AWzhv7oSczmJWLSuPNdhYyBW7LppcocI5DWrP/G309LgAcL
+	 3qJIMolfW5x8JcTpLHLTlneOEm5pZ7jIZRAxa91wvvpvhb6aQTRGvSF7dyefpsDz2i
+	 XU+CTLNpHSzC+ZvaSH5m3o2Q34J9Xqe1Vb+ynqv0qw/zfnQKmadQOF68s7KVDrhhR8
+	 GUCISFod2ZpFEoWYj70TJdILKFi7iq6njtc+atB87mLd3ZhB6/+0Km2kvn8fmpWQk9
+	 XNTm98m88hWF/quLPU5AdYfNFFx8pDOMNIXq8N0cSitjsnoqb84WMiXwfWXPN90TGE
+	 C9eGiNM3pWIxw==
 Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Fri, 26 Sep
- 2025 07:30:34 +0200
-Received: (nullmailer pid 2242261 invoked by uid 1000);
+ 2025 07:30:35 +0200
+Received: (nullmailer pid 2242264 invoked by uid 1000);
 	Fri, 26 Sep 2025 05:30:33 -0000
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 1/2] net: ipv6: fix field-spanning memcpy warning in AH output
-Date: Fri, 26 Sep 2025 07:30:09 +0200
-Message-ID: <20250926053025.2242061-2-steffen.klassert@secunet.com>
+Subject: [PATCH 2/2] xfrm: xfrm_user: use strscpy() for alg_name
+Date: Fri, 26 Sep 2025 07:30:10 +0200
+Message-ID: <20250926053025.2242061-3-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250926053025.2242061-1-steffen.klassert@secunet.com>
 References: <20250926053025.2242061-1-steffen.klassert@secunet.com>
@@ -76,117 +76,80 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
  EXCH-01.secunet.de (10.32.0.171)
 
-From: Charalampos Mitrodimas <charmitro@posteo.net>
+From: Miguel García <miguelgarciaroman8@gmail.com>
 
-Fix field-spanning memcpy warnings in ah6_output() and
-ah6_output_done() where extension headers are copied to/from IPv6
-address fields, triggering fortify-string warnings about writes beyond
-the 16-byte address fields.
+Replace the strcpy() calls that copy the canonical algorithm name into
+alg_name with strscpy() to avoid potential overflows and guarantee NULL
+termination.
 
-  memcpy: detected field-spanning write (size 40) of single field "&top_iph->saddr" at net/ipv6/ah6.c:439 (size 16)
-  WARNING: CPU: 0 PID: 8838 at net/ipv6/ah6.c:439 ah6_output+0xe7e/0x14e0 net/ipv6/ah6.c:439
+Destination is alg_name in xfrm_algo/xfrm_algo_auth/xfrm_algo_aead
+(size CRYPTO_MAX_ALG_NAME).
 
-The warnings are false positives as the extension headers are
-intentionally placed after the IPv6 header in memory. Fix by properly
-copying addresses and extension headers separately, and introduce
-helper functions to avoid code duplication.
+Tested in QEMU (BusyBox/Alpine rootfs):
+ - Added ESP AEAD (rfc4106(gcm(aes))) and classic ESP (sha256 + cbc(aes))
+ - Verified canonical names via ip -d xfrm state
+ - Checked IPComp negative (unknown algo) and deflate path
 
-Reported-by: syzbot+01b0667934cdceb4451c@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=01b0667934cdceb4451c
-Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
+Signed-off-by: Miguel García <miguelgarciaroman8@gmail.com>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/ipv6/ah6.c | 50 +++++++++++++++++++++++++++++++-------------------
- 1 file changed, 31 insertions(+), 19 deletions(-)
+ net/xfrm/xfrm_user.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/net/ipv6/ah6.c b/net/ipv6/ah6.c
-index eb474f0987ae..95372e0f1d21 100644
---- a/net/ipv6/ah6.c
-+++ b/net/ipv6/ah6.c
-@@ -46,6 +46,34 @@ struct ah_skb_cb {
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 684239018bec..010c9e6638c0 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -593,7 +593,7 @@ static int attach_one_algo(struct xfrm_algo **algpp, u8 *props,
+ 	if (!p)
+ 		return -ENOMEM;
  
- #define AH_SKB_CB(__skb) ((struct ah_skb_cb *)&((__skb)->cb[0]))
+-	strcpy(p->alg_name, algo->name);
++	strscpy(p->alg_name, algo->name);
+ 	*algpp = p;
+ 	return 0;
+ }
+@@ -620,7 +620,7 @@ static int attach_crypt(struct xfrm_state *x, struct nlattr *rta,
+ 	if (!p)
+ 		return -ENOMEM;
  
-+/* Helper to save IPv6 addresses and extension headers to temporary storage */
-+static inline void ah6_save_hdrs(struct tmp_ext *iph_ext,
-+				 struct ipv6hdr *top_iph, int extlen)
-+{
-+	if (!extlen)
-+		return;
-+
-+#if IS_ENABLED(CONFIG_IPV6_MIP6)
-+	iph_ext->saddr = top_iph->saddr;
-+#endif
-+	iph_ext->daddr = top_iph->daddr;
-+	memcpy(&iph_ext->hdrs, top_iph + 1, extlen - sizeof(*iph_ext));
-+}
-+
-+/* Helper to restore IPv6 addresses and extension headers from temporary storage */
-+static inline void ah6_restore_hdrs(struct ipv6hdr *top_iph,
-+				    struct tmp_ext *iph_ext, int extlen)
-+{
-+	if (!extlen)
-+		return;
-+
-+#if IS_ENABLED(CONFIG_IPV6_MIP6)
-+	top_iph->saddr = iph_ext->saddr;
-+#endif
-+	top_iph->daddr = iph_ext->daddr;
-+	memcpy(top_iph + 1, &iph_ext->hdrs, extlen - sizeof(*iph_ext));
-+}
-+
- static void *ah_alloc_tmp(struct crypto_ahash *ahash, int nfrags,
- 			  unsigned int size)
- {
-@@ -301,13 +329,7 @@ static void ah6_output_done(void *data, int err)
- 	memcpy(ah->auth_data, icv, ahp->icv_trunc_len);
- 	memcpy(top_iph, iph_base, IPV6HDR_BASELEN);
+-	strcpy(p->alg_name, algo->name);
++	strscpy(p->alg_name, algo->name);
+ 	x->ealg = p;
+ 	x->geniv = algo->uinfo.encr.geniv;
+ 	return 0;
+@@ -649,7 +649,7 @@ static int attach_auth(struct xfrm_algo_auth **algpp, u8 *props,
+ 	if (!p)
+ 		return -ENOMEM;
  
--	if (extlen) {
--#if IS_ENABLED(CONFIG_IPV6_MIP6)
--		memcpy(&top_iph->saddr, iph_ext, extlen);
--#else
--		memcpy(&top_iph->daddr, iph_ext, extlen);
--#endif
--	}
-+	ah6_restore_hdrs(top_iph, iph_ext, extlen);
+-	strcpy(p->alg_name, algo->name);
++	strscpy(p->alg_name, algo->name);
+ 	p->alg_key_len = ualg->alg_key_len;
+ 	p->alg_trunc_len = algo->uinfo.auth.icv_truncbits;
+ 	memcpy(p->alg_key, ualg->alg_key, (ualg->alg_key_len + 7) / 8);
+@@ -684,7 +684,7 @@ static int attach_auth_trunc(struct xfrm_algo_auth **algpp, u8 *props,
+ 	if (!p)
+ 		return -ENOMEM;
  
- 	kfree(AH_SKB_CB(skb)->tmp);
- 	xfrm_output_resume(skb->sk, skb, err);
-@@ -378,12 +400,8 @@ static int ah6_output(struct xfrm_state *x, struct sk_buff *skb)
- 	 */
- 	memcpy(iph_base, top_iph, IPV6HDR_BASELEN);
+-	strcpy(p->alg_name, algo->name);
++	strscpy(p->alg_name, algo->name);
+ 	if (!p->alg_trunc_len)
+ 		p->alg_trunc_len = algo->uinfo.auth.icv_truncbits;
  
-+	ah6_save_hdrs(iph_ext, top_iph, extlen);
- 	if (extlen) {
--#if IS_ENABLED(CONFIG_IPV6_MIP6)
--		memcpy(iph_ext, &top_iph->saddr, extlen);
--#else
--		memcpy(iph_ext, &top_iph->daddr, extlen);
--#endif
- 		err = ipv6_clear_mutable_options(top_iph,
- 						 extlen - sizeof(*iph_ext) +
- 						 sizeof(*top_iph),
-@@ -434,13 +452,7 @@ static int ah6_output(struct xfrm_state *x, struct sk_buff *skb)
- 	memcpy(ah->auth_data, icv, ahp->icv_trunc_len);
- 	memcpy(top_iph, iph_base, IPV6HDR_BASELEN);
+@@ -714,7 +714,7 @@ static int attach_aead(struct xfrm_state *x, struct nlattr *rta,
+ 	if (!p)
+ 		return -ENOMEM;
  
--	if (extlen) {
--#if IS_ENABLED(CONFIG_IPV6_MIP6)
--		memcpy(&top_iph->saddr, iph_ext, extlen);
--#else
--		memcpy(&top_iph->daddr, iph_ext, extlen);
--#endif
--	}
-+	ah6_restore_hdrs(top_iph, iph_ext, extlen);
- 
- out_free:
- 	kfree(iph_base);
+-	strcpy(p->alg_name, algo->name);
++	strscpy(p->alg_name, algo->name);
+ 	x->aead = p;
+ 	x->geniv = algo->uinfo.aead.geniv;
+ 	return 0;
 -- 
 2.43.0
 
