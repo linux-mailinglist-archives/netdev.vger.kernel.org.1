@@ -1,94 +1,70 @@
-Return-Path: <netdev+bounces-226763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80C73BA4E16
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 20:21:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2674ABA4E28
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 20:24:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFD97188E424
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:21:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D9D4561DB3
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:24:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E26730C101;
-	Fri, 26 Sep 2025 18:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8481A30CD93;
+	Fri, 26 Sep 2025 18:24:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sCNEVMwL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OyClwdZh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67EE915278E;
-	Fri, 26 Sep 2025 18:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CEB32FFDDC;
+	Fri, 26 Sep 2025 18:24:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758910812; cv=none; b=cebDyHmVar6kDYhlkGkFRxUCSLfiGhT5j9pfzU9qDsWL15pb65EyFVthfWW9r8YY8BX2OIW6cvbMSPyDlbvIUiFdNJOVrg/NBfibBJwN38HBZ0tUFLKVL63CkwGVQ/kkM5roNtMKGRUOIWCZrfRxe09rBJqJANM3P4bVoDhgaNY=
+	t=1758911048; cv=none; b=jovVJwvsepdLFD1t2msUoXgqL1MDYh/8k7/MasijrmdQnfqsUoOQ/vIXIIZlm5lCHyHiuvcfKz8LsFdKn8YbCp6K82xvBSPK70x/PtyykDTDGGU8nkT5V6wniSHThiu8N5VeG8HQMNLK3sxPU8ie50YHHM5a1TSn8SJSar7rF9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758910812; c=relaxed/simple;
-	bh=8KjxtYBneSqhs2aSNS2njRCWZWfxPB5tyfunMXkN940=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ExukHQedG9Mzjj0VnN2OsPcjlARmRcZ/EnfNbIJkxABHRcoF2FVJCYXqhWiV1MnQGlgAmyQxUYFVWImZh2K9qFmYN0iWwK56q2cFpwrrPezs94XDRTo7oAs0fJroe99n35YyWVhBqz5b8m9nBQfuM3zo2eGdpoJHHjPsv9v0/5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sCNEVMwL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3D19C4CEF4;
-	Fri, 26 Sep 2025 18:20:11 +0000 (UTC)
+	s=arc-20240116; t=1758911048; c=relaxed/simple;
+	bh=AIkk3EyX5ht9YW2ATcSunMpPHItGJY1wTEjeAZxFQF8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dvotr8sQ1jfU/w4Ixf3KgVhQRWE50yLthXlT4sh2rnIr327ZOtA5KGwHDHa+SS/xxyorPebjGSFOPBq6caYj8F0sMzBRjmbWQwxfHq4C0yJJiI4KArG0MlrtowTTZm57ApeWUqTXz2ws6z8QEh9cqEKSlpmDUDRjF7FuXbvcLig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OyClwdZh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ECE1C4CEF5;
+	Fri, 26 Sep 2025 18:24:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758910811;
-	bh=8KjxtYBneSqhs2aSNS2njRCWZWfxPB5tyfunMXkN940=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sCNEVMwLZ/y6hiB4JFUljjc5Ibber6pwkRZqZ2gMPvrqL5K4gdXpay/voT7RFMac+
-	 SL210rq6Jxb8JHeqSydUDzsPnatFkkH2uJsZJcuIFZRHJG8Ni7lPSFYAanCexE/Zzp
-	 gPgpLvIXwRMdW7fsGdXOiB41gHFPRPBric85paUZbLkgaym3/AlVL1xxk7t+D6pYZA
-	 YEi7jaTUKO5rRGoH/im8S3qDrnM1gx2tXkkoOPTBsv2g3LtdtGb3Prmsb3PtJgy5lS
-	 kDl5ydynl+8oY9IvFwrRRz4+jx6RvPKmOc3169NgYTTTf3Ilt3kfDBwX3rPwSKTTww
-	 91W2UkO3wNdbA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713F839D0C3F;
-	Fri, 26 Sep 2025 18:20:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1758911048;
+	bh=AIkk3EyX5ht9YW2ATcSunMpPHItGJY1wTEjeAZxFQF8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OyClwdZhVTwUlnaEK99ytqgZc9q86MZePKBjY23EFc5t/1Uy7JEbWOZIfF9/7e9qu
+	 WR3Dot649NLU/sOJIKeoT9Semyd/Se0X382TrzFtVlE8Gz5sI/+WeKYV8q9NrURUva
+	 37gQiOdOvAugk4rBZkfDIauxV4PrDAUG8HsAZZihymY55HpGPiaMBeU9jcaWcMm/0P
+	 7EsFwxJCKKcThJJCBuI1kww/ZN1ZyLHv0rJv2w3+HBGdDwH41wem/ckfU/h7tQr6RT
+	 H2VUUjkpLWHgyw2HGI5DjBUM08//QfdCzkerLrqHtGVj6T/dcWdQSeCqV5F4BHu8J+
+	 PYwWDuCcsXKjw==
+Date: Fri, 26 Sep 2025 11:24:06 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Haofeng Li <920484857@qq.com>
+Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Haofeng Li <13266079573@163.com>, Haofeng Li
+ <lihaofeng@kylinos.cn>
+Subject: Re: [PATCH] net: ynl: return actual error code in ynl_exec_dump()
+Message-ID: <20250926112406.1d92c89d@kernel.org>
+In-Reply-To: <tencent_16B08FED03C970A0B8F75F16AE3D7A2F3305@qq.com>
+References: <tencent_16B08FED03C970A0B8F75F16AE3D7A2F3305@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next 1/1] selftests/bpf: Test changing packet data
- from
- kfunc
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175891080717.14535.11599362718566307637.git-patchwork-notify@kernel.org>
-Date: Fri, 26 Sep 2025 18:20:07 +0000
-References: <20250926164142.1850176-1-ameryhung@gmail.com>
-In-Reply-To: <20250926164142.1850176-1-ameryhung@gmail.com>
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com,
- andrii@kernel.org, daniel@iogearbox.net, martin.lau@kernel.org,
- kernel-team@meta.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 26 Sep 2025 17:58:20 +0800 Haofeng Li wrote:
+> Return the real error code 'err' instead of hardcoded -1 in the error
+> path of ynl_exec_dump(). This provides better error information to
+> callers for debugging and error handling.
 
-This patch was applied to bpf/bpf-next.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
-
-On Fri, 26 Sep 2025 09:41:42 -0700 you wrote:
-> bpf_xdp_pull_data() is the first kfunc that changes packet data. Make
-> sure the verifier clear all packet pointers after calling packet data
-> changing kfunc.
-> 
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
->  tools/testing/selftests/bpf/progs/verifier_sock.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-
-Here is the summary with links:
-  - [bpf-next,1/1] selftests/bpf: Test changing packet data from kfunc
-    https://git.kernel.org/bpf/bpf-next/c/991e555efffd
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Do you have a realistic example that can happen today? This is not
+kernel code the error is always -1, and the details are in errno.
 
