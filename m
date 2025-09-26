@@ -1,630 +1,214 @@
-Return-Path: <netdev+bounces-226708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C41ABA4565
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 17:04:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9EAEBA45AD
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 17:08:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10BD717D236
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 15:03:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF1FD3BA9A1
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 15:08:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D51214A64;
-	Fri, 26 Sep 2025 15:03:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A0881EF38C;
+	Fri, 26 Sep 2025 15:08:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T1pAtvRL"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kAQCGGwP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010000.outbound.protection.outlook.com [40.93.198.0])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D1011FBE87
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 15:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758898983; cv=none; b=Jame3JF/Y7UUoyNykJaIpz1ALUaekXv/5sgkp4LIgbiB7V4BBPc04ZgbpDtX8+/5+plpwk5BvZcVTRiQO1KeZg35GRrT8/YbeLS3lKlxRa6K9YC+Sls/RwaHP6zuUeAX7TnT+OvEn5DTjo/HughYTfE6mCJ9lejSPbT2wkioJOk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758898983; c=relaxed/simple;
-	bh=6/uR3WEy+jnB3S0iD+gtnGVpojDLROYCEct8n2VUiP4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=oJihVAhM5sLb1xUu+VuDFUZJYOHcDsmDF/FWIEmPTb/soQTtTYt/gHlzrHXzDzATCT1xv/CUR/0UE/wpvvGlmOVp/Cbcb2LsENvOm8+liGPcXu2B91kruUzXanhF3uc+LP1+SMUwSowjZIk7tOSI+c3/euQyCeuXNEudd+QFzzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T1pAtvRL; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-71d603a269cso21800497b3.1
-        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 08:03:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758898980; x=1759503780; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2gbkDr3WiAXPeKPcYqAsq8bhq6pe+Lv1O12W/lPTimk=;
-        b=T1pAtvRLTAH6s6SstnEcYjH3EErAYyks/jjz1Laa+bQechxr7opHoQA7Miga9O7LgX
-         IW7QGp4mPNJpYcyEYO5K/wLCyGtsyLlFPOQctjLSMUHLKLo/qugTvUh8RHENINkixDk8
-         ua914jkce763PSl8cPS+Y3A82xE7r4TKiiSgQ43zGkgL1amxJ2QmThFCAkQZD/Hni5S0
-         wTEYDwMX4WD4FZx3B+xzHuX35Cw1cfe5d6s3wgRxQhg/2HdAd5Pla8X6bl5zwooWt+pR
-         +qmPh2x1rZrenSUTDvuUGs0PpHKWAW4pIK7qYbpTHFEKwUToypeE6/M0L2ARr2vu/864
-         GK6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758898980; x=1759503780;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2gbkDr3WiAXPeKPcYqAsq8bhq6pe+Lv1O12W/lPTimk=;
-        b=ndmpi4yhCZ8Np//kTu73fFDIo+oIdGw+A0vFXfHVIjT5h8AvEHql3+X+OYVuZv9T/a
-         02qVhptK0IME3/3kypyvIqInXMGv1C2MWB4iRr49J34UL25qjIrRVrV15ENfg2Pd+9Xf
-         Cn0jDBU2pdpHY86F8Re0Vdb2kxbpOJ7a/1C50SZBm4Lcza6B1iDmX8ihdiHFILld/KOG
-         y1BjfiiIcpUz9B8NsKjElxB0D61w4MvGPNl2DcVaFRummEaH7w80fsFTzJM5SZoW7HxY
-         ZV9uwdCdElx/mlbtSQto5DsfpEn46Il0TgZna4CNp6ZB32TVeWa2PLzWLkePQxCdStHm
-         XJcA==
-X-Gm-Message-State: AOJu0YzseSX1GCZvRQR9b//dTM+s5bburvIZxYk0HmlbtL/XJeb9bVZT
-	smFLdc4pBUiYMv3ub3fiywTgwgh7J6d2ZyOzvv4QeEMxUeWE8idKfdHv
-X-Gm-Gg: ASbGnct8s6TnCOrWxlLPzGjdAYmz1Z8inCRSYE/K29smrKhzkfPGlE5eVrMrDYR2/fG
-	ZzKtRSBdlEFbcJ5ALRTWi86Ss2jmt2lrwDhyD2TCmYerVFIgXCgsuKSu+9+Olz6bx5WaOTSf6uL
-	/+RBcoiG2O9LyrdsMLMFBbpJX+rSZ+oJ8CDu5flqSr+TAAeLpgpyZooT8RV0DRyza37u8j2o+MY
-	4kJkYruuuPVNEgRfRa3GbNuTckQbl+OjMLj/l5cgCb2eYmZNnxeCwMDv14YHaIWaHAhHwN0aJnL
-	GDr5qnE7o/5Zh15+sdEDF+I5KHt2j3KuiqzXpG0hKzrIVaVDIRRuzoYwkEu4jMXQRra7PX7/KLZ
-	vpvlr30M09eqqBluLcFsNrSfKjUlxQI3g
-X-Google-Smtp-Source: AGHT+IEQUonaybOUDkaT888XsdJ/MQ9QTAzvbRfmoZqDcoNZRoPArcbQcwhudig+gMTdt0QAKHEIUA==
-X-Received: by 2002:a05:690c:9c0d:b0:734:81fb:8ba0 with SMTP id 00721157ae682-763fb38cd62mr79991167b3.19.1758898979700;
-        Fri, 26 Sep 2025 08:02:59 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:41::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-765bd127c3fsm11472217b3.20.2025.09.26.08.02.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Sep 2025 08:02:58 -0700 (PDT)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Fri, 26 Sep 2025 08:02:54 -0700
-Subject: [PATCH net-next v3 2/2] net: devmem: use niov array for token
- management
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99641FAC34
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 15:08:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.0
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758899319; cv=fail; b=ENnrLyraE+HmVA5VcSgQ1viqqTr1W0PAgokMrhUfbztEWU8wHTKBFOELWGJhGe+yzM2O0cAFG04CaKR1k4NQqWBAmMnt738pd4JiajZYSbNlg+tnDzz4AcFCOFhDnNOBZo78EHknnBlcJBUvpOAQzgZdfW3fQKG1QcBIX74Vn+Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758899319; c=relaxed/simple;
+	bh=kOGSRdY7OxAdVKRRFataOoHekELYi1Ai9LX6tSQGVAM=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=I5VSpXvTPpATxy8ecMIDxo5IR2oCf/KmZ9xku/QvqfqI8WtIt+LXhFEeZEUaflJ10e0d8GjCoOY30gO6FXAVpSke7B29vCRC6gIyRFnXEvfJwkBKms085hqnwZ4GvQQywgg2SwRrSleSdsaan+ZCQfK+4LmNjqSaR51ssvF1k88=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kAQCGGwP; arc=fail smtp.client-ip=40.93.198.0
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hqYii2jnj+LeBYWKe6JkVlfKmHwq92tAqxw/tzWz1VGvwh8Z5CkGVO937fM0p1zaKTOPqG8hfEHRR0WJRsB4q/MD8T2TVPNE9EOu/JnX+jjBVEtFju+uHxYxbNLB/RVxNRnmWXtN3+btdOo1Vxt+aafOW/IchabZlWwwPCsg01mVXFE1Zh2NkUJLnke1cyxevi6AJ6ca5ClNWj2NFzXnjbcyYKMBe2qKupgzNnB8F5L3LQ0t8k3gEst0Wj6qypIr8zXsBtC2rMmzik/v91g+1bhgaW6alcn3fF1uVdluwN6x7CjSJY7YJj1+y/eUU3TKEmMb4NL8z15+Oq18+Q01LQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cmff/H7DMCVaKlCWUwdSbcckX+MQt/9C77iwhcew03A=;
+ b=YNPCGUjnO8dHGo1pblFVoSPWa44hxSge0EFchBci40t30CGVTm3WZ9WmVe2aIf5qnPbrvfafKq1VMBTl8XAbj0+gUK7sYFWPQD/exdNtn583t3nuFF+bo3rdSwbGdykq2lzlcgxplEAhw6Za8GX6bLBtFo4aYGIETZeODGrP5D6U8si6N3tXA7g1L6adKXQMYLi+d/pkVBh6oNMLIjgCgr5Knq5tr/q3DcQnM2jly90OugON2uGbsOuW+TD8RBHk9sqeAWaPQ0cIzi2UVMvPd7co7SuglMxC+QF+pYswh9DA64/B/RP+KxX7H3U7qIh0rnZbhjPmJBgtQd/cJYUuzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cmff/H7DMCVaKlCWUwdSbcckX+MQt/9C77iwhcew03A=;
+ b=kAQCGGwPRRDixkYdN8yje74qgk5YlKddMLFWFBuDvCj5zldtIshgaSsU0uNczyaglbadOrugS89NPBm8ADzQP8T5TNqprE68aeO9AjCRHk6XtEuDVczxxeashjkHMmlT3N0G+kamWHKZLRyZALCnsk2v7zBv92uoczZILZkkZcR7PmFd4xc5a1TgBA5I+K9jdfIVhMFzo2Mz/trFtaMxJrelATY+ONAqHe93y3LmUgH7HIO70Z8hHBpvmZU0qObz0pPyNKiJjA1MuBNyVzdyaDrGlpgkn89EQtxwKgBBPnp2JHRkYQ87zATuj9vjlvr5k8a5XBis8we/aSVccqE6uw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MW4PR12MB7309.namprd12.prod.outlook.com (2603:10b6:303:22f::17)
+ by MW4PR12MB7468.namprd12.prod.outlook.com (2603:10b6:303:212::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.11; Fri, 26 Sep
+ 2025 15:08:35 +0000
+Received: from MW4PR12MB7309.namprd12.prod.outlook.com
+ ([fe80::ea00:2082:ce2d:74c]) by MW4PR12MB7309.namprd12.prod.outlook.com
+ ([fe80::ea00:2082:ce2d:74c%4]) with mapi id 15.20.9160.008; Fri, 26 Sep 2025
+ 15:08:35 +0000
+Message-ID: <3b3a8537-22f4-46c3-9142-78a00e65d43c@nvidia.com>
+Date: Fri, 26 Sep 2025 10:08:32 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 01/11] virtio-pci: Expose generic device
+ capability operations
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, alex.williamson@redhat.com, pabeni@redhat.com,
+ virtualization@lists.linux.dev, parav@nvidia.com, shshitrit@nvidia.com,
+ yohadt@nvidia.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, jgg@ziepe.ca, kevin.tian@intel.com,
+ kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com,
+ Yishai Hadas <yishaih@nvidia.com>
+References: <20250923141920.283862-1-danielj@nvidia.com>
+ <20250923141920.283862-2-danielj@nvidia.com>
+ <CACGkMEtkqhvsP1-b8zBnrFZwnK3LvEO4GBN52rxzdbOXJ3J7Qw@mail.gmail.com>
+ <20250924021637-mutt-send-email-mst@kernel.org>
+ <CACGkMEuWRUANBCkeE5r+7+wob3nr-Mrnce_kLRHbpeF0OT_45Q@mail.gmail.com>
+ <20250926023237-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Dan Jurgens <danielj@nvidia.com>
+In-Reply-To: <20250926023237-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM6PR02CA0160.namprd02.prod.outlook.com
+ (2603:10b6:5:332::27) To MW4PR12MB7309.namprd12.prod.outlook.com
+ (2603:10b6:303:22f::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250926-scratch-bobbyeshleman-devmem-tcp-token-upstream-v3-2-084b46bda88f@meta.com>
-References: <20250926-scratch-bobbyeshleman-devmem-tcp-token-upstream-v3-0-084b46bda88f@meta.com>
-In-Reply-To: <20250926-scratch-bobbyeshleman-devmem-tcp-token-upstream-v3-0-084b46bda88f@meta.com>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- Willem de Bruijn <willemb@google.com>, Neal Cardwell <ncardwell@google.com>, 
- David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Stanislav Fomichev <sdf@fomichev.me>, Mina Almasry <almasrymina@google.com>, 
- Bobby Eshleman <bobbyeshleman@meta.com>
-X-Mailer: b4 0.13.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR12MB7309:EE_|MW4PR12MB7468:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9f9386fe-a077-4cb1-ccae-08ddfd0e903a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?UGF2VCsrQU1NdCthdjcyMkVyeTQ4SHFQU1QraU5tM3c3WTNNZ0J1WFlySkhC?=
+ =?utf-8?B?cE5OQmVqNDFzVmNWbzFHaFd0ZWV5cDFtWVV1ZnZ5WmpVWnFUeHNjZ3VPdlNO?=
+ =?utf-8?B?UUl4dExIMFFWb08xakFDRkhwQkU3bENFOEo2L254Rzk3ZVpabUg2RXBGelJ4?=
+ =?utf-8?B?amVrWFcxRmljb1dhME4yMUxybC90WnBnKzJQLzBOU0o4RUFYVFp1bkpyTUpy?=
+ =?utf-8?B?SjlPakxIaXVub1BKNW5ZNTg4QnU4ZmliTFdWZittZmcrUTRUSStwQldjSWpP?=
+ =?utf-8?B?dlE2TzRxR3RKWlMvMUUrcisxTE5kNnl0Q3FKQklnc2JObUMxSnRZNGkwaWlF?=
+ =?utf-8?B?T1JxL3l0TE1VZkZNTXRqVUt4MFAvSjhZNnFHYWtSYTRQR1BqbmFjMkFyWmNt?=
+ =?utf-8?B?MDZsSUh4MGQvalM0VXc4blFKM0pVdkhkTGJnZEEwWmEyeW9Odi93ZG1VVFMw?=
+ =?utf-8?B?MG1OV25xRWozR3l6Ym5hM2VTNHhkRVpPb012QzcyV0x5WThRYVl2bCtzQWJ3?=
+ =?utf-8?B?RDhQa3ZocVJmdXFqTlJrNXVjWHNiU0pEWmh1dmovaVZqYmIyUXVKa3VxOExk?=
+ =?utf-8?B?bjNyUlo2eGcrWDgwK1l1cGFQNFNrbFNEYi9FQUxjRUJobFp5UlBzcmNwSWJQ?=
+ =?utf-8?B?bUpseURDS3BTZnlsT2FqSm1FdkhQS0NZSHJ4THJxeHRidHlsYlhDcVY2R21l?=
+ =?utf-8?B?V212YnpicWs4R0NsTFRLUFhuSUFoTHFmeHdIdktHOW9nSS8xdi8rREdmUkFV?=
+ =?utf-8?B?dDN6UXNLcXdtaUF4K1k5allRUURsRFdoMGJyaTY2cWN3UDQzQ0NSVGFCUnZP?=
+ =?utf-8?B?Q0xOc1BKeTlCL0F2M09jamJwVkV6eHlwYVBEVEU0WDR5MjZTaE9BdTNFTDlj?=
+ =?utf-8?B?d0o4clhiM3I3NWoxU3JtdGFBNE9zTURRSWFGeFV1bjNETUxRaTVhbS9JNDlq?=
+ =?utf-8?B?cEdqN1RjS2VkRU5Mb2dEVnFvV290ZXJHNU5IUzNMQmFoa1p2N2FiV21uV0VY?=
+ =?utf-8?B?QnVQSE5icXZrc1h0T1ZIaVQzbk94UmZJekZWNnBLV2dFb1VUd3hHYWFaSWRq?=
+ =?utf-8?B?RTVIelg0V2NYR0liQVRaVVhmYkczU0QwYmtINnZmaFVWazlITSs1ZTEwYkp2?=
+ =?utf-8?B?dDlQb2l3SlB5bXkvSHlEK1ozT05BOFFhNGlwMFhQWUYvUEhrdXg0N2NnN3g2?=
+ =?utf-8?B?YlNja3Zwakg4NXpuYTV4Z1ZnTFhLNWlZNC8xbzM0VHdHTEZwZXVaRUI0VFNv?=
+ =?utf-8?B?a3praXQrRCtHN0RaY2lid0FwaVlIRlZYRUQrRXYxd2wxUzJXSFhiKzVDRWVQ?=
+ =?utf-8?B?OXUrbHNOeklqdWFGU2xjMkRxaG90YUIrYk8wb05KT1VXeWRuU1lWSi9qR1gx?=
+ =?utf-8?B?UkhZL0VVVmRYb3RLMXZ0TGtUYmFETUNNSGM5L0NoU3dTejlhbDFOakJxSGxQ?=
+ =?utf-8?B?ZGJZMzcyRkFidysrUEtxdFRjd29PZTBhRzN2SllPZDk2dUVPRXIxK1NxWEda?=
+ =?utf-8?B?bTRuZnp0dUNENjVwWW1MZ0VYYjIvSnU5UFdYTGZOeDBZZVpsc0c4WExKZnU1?=
+ =?utf-8?B?Y0ZWRXU5OWNLUkR5bE5pSnI3clRrbGxmSFlSbVlQU25ZUXpIdXBVS2dWelQ5?=
+ =?utf-8?B?TVhLVjVsTXNzRkRKZDI3b3BTZC9UcEhRdE5WZ1VZR0FaT0t0VXA2Tm03UVRN?=
+ =?utf-8?B?ZG1qcmNOeEg0ZzlIeFpyWXdTdU14VFJidjE5bDA4ZzVxcDVxRDJkYXpscUk4?=
+ =?utf-8?B?ZkRqTGF5b2YzM0xYZXo2OGhhUytLVHRXcWxpWDJwbmdiaEpvd3BaSm1JZDZu?=
+ =?utf-8?B?RmF2bkw3MmtZdUYwZjVHMEwwcTE1RzlKWnRJV1VLYmZSWDZmZkxaYVFyQ1Ra?=
+ =?utf-8?B?ckxGYitWU0F2cTVhNFpQSmtOYWdNd3AraGl0VS9IUys3RkMram1jYWxvUnJJ?=
+ =?utf-8?Q?PiZ7jGqVGITuN6+iAV2ZE8zFTjHMhwzJ?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WGZ1K251dFpxZE95c1NyYXczY3ZCajFhSHBhbVNaT1VzZko2RzFaNFZ4OXU4?=
+ =?utf-8?B?RmY3TVJ0dlF1aFFYS2RYZjczdFZOY1RsMFRaNkpFaHUrTVZxQnkzOUhnK0ti?=
+ =?utf-8?B?UFVtdmJ3bHFBaU1tNjg0cG54RkdWS1l1cW1zclkxQWxURUVnNVp4REtsQStx?=
+ =?utf-8?B?REJzRk1rREpsSDVwREFVQy9pOVRBTVVnS3p0bG53SlpWTlNDMXc1RTdheTZO?=
+ =?utf-8?B?QXplTzVpQTNEME91VCsyck5jVWZPZk9vejNUR0ppWk1JdmZGeGdFcjZTRjQz?=
+ =?utf-8?B?Wkx4Z0Z5Rkl5TWpObDA5T1hJZ3IyM0diL01LYml1Q1FkalF4TmVPZHNYZFZa?=
+ =?utf-8?B?OEIyc0wrMlZKOE9kdEgzNDF3MCtFZFZybnVacmRXeVlDZXh6a1lQeEhnL2cz?=
+ =?utf-8?B?OVdFYWRTazZhbWVhcW5XQ2Fod0ZrN0J6OTEzZ2ZhckhxMkU1L2pJbmZVN0l5?=
+ =?utf-8?B?OFlWaXVhSUhJaGplcFpVVC9VWGM0OTJGUXRoditvV0pIajJiRWlETklWVTFF?=
+ =?utf-8?B?S0JQT3NsclZaTW9FWnRNWW1uYjVzOGlJeFNhbkxsWDZFWGk2dUtyc0l5ZVdE?=
+ =?utf-8?B?Zzh1Z2sweDZPUE56bDd5Y1Job2dFN2JIbC9JRHNKcjBxcjkyYmJkTGhzZHla?=
+ =?utf-8?B?b1ExNUhhNHpNTEVpZVhrYlVLc1RISWpOTVlRRjlqektzMU5HZGUwMTNmYVVM?=
+ =?utf-8?B?b0Y4TmJOKzJTRWZLOGZkNm10aFFiYmY3NzJRTkZYV2ZHeDhqNDRUQVlXdnNj?=
+ =?utf-8?B?ZmxzNjVKeURNeUJyZ3ZzYkMyUEsrUXowWnN1akoyeFJiVVJhalVBeW5RcjZH?=
+ =?utf-8?B?czJCNXhRSko5Y1JTNDl5OVNZSWlSZ2pWREJISTA2SVpOU2FOdFJ4Zi9LTmgy?=
+ =?utf-8?B?V1U3WnNCS2s1RnBjME9nTjhTd2hQNzZGanFBR0JoUlZVRVNKbjBPLzhBWVB1?=
+ =?utf-8?B?M2puWGhDdVM5UDJZSlNnUlRvVlZaT1Q2TksrOVFxYllsRll6T3J3UnZwZSs5?=
+ =?utf-8?B?cnBDdDJwbGh4akhZWEdOdElEYzhTM0ZCSTE1K2lIazhDaWo1R2lFZkhDODQ1?=
+ =?utf-8?B?OWpvd0VRaE1uVitUd09IZnJIajlzQkpycTY0WUNyaTluai9FaWNzQUNkZU1w?=
+ =?utf-8?B?VkZVOTVVNUJBNjAzRGlBSURveEp5d2FNRmpZekJheG9oeDZmbzRGa3JqbkZp?=
+ =?utf-8?B?SCt0eEdXZkhzdnM5cm14VUVpekUzWCsxSjVOeTJaRkozOVNQT3lUa1hwUjRV?=
+ =?utf-8?B?SnlqM280NGh1dmZ5cHg0QlJsQUFxeEUrQ1NUUGx4QkxaRXNwSCtRVUJzVlBi?=
+ =?utf-8?B?eW1MUjFoc0RnL3FHYlI5a0RWdk83bzdPZVNPbXZkMUxrb0FUNEJGMGVqYkc1?=
+ =?utf-8?B?NEJ4SzJob1o0K2wrdm1pbU4zOERtb0swZ0hKWlRqd0FnT21KWGJST3lvMUFL?=
+ =?utf-8?B?YWZjRHUyY1ZtUUdWRSsza1hGRWxrME9jUGU3em5ZV2NlVkx4ZG9uKzZKdUpP?=
+ =?utf-8?B?OExKUlg1cEFiL04zQ2R1WFdHTmxHdWFTUTZDOUREbGVPcWwxMDdQbnBlL3hJ?=
+ =?utf-8?B?N2JZRFFJbTR0NDA3OUR5ckQ0aWhVM0dXd1o0eFlvQ3BzUUdBRmtxQ3NwMUs4?=
+ =?utf-8?B?bndOMzJDTVlDNm80Z1lNVk0yeUtlbEdoYm0rNWYwaU5yTDNHNVdJRVU3MmRO?=
+ =?utf-8?B?UFE3OVJnK2lWcC94Y3VOQnFQWnBCempDTUhsVk9NZ2ZnSjkvVDZTdzArUDA3?=
+ =?utf-8?B?Tm9SL2tPQ1Avc1J0UmhvKzl5V2pFTEZDWXlrY2d5c056a1FxNFA4dTJoMXNL?=
+ =?utf-8?B?U3Ivc1FJSUtDRnUvcVd4NHJIRnRiMCt1Sm5KcStDMTY0bmhyYmJaOGp0LzVL?=
+ =?utf-8?B?STNhdFVLS20wV1BzRjc0alRuKyt6c1NzMHNISzJwQ2RKZnM4RHFtbGlEQ05j?=
+ =?utf-8?B?c2lZOHpuR0pPZlVRK2NaUU5ldHhjcnJySEdWYUJlY0xvK0lUcTdTeVpZQ0lu?=
+ =?utf-8?B?eFhvR01oZ3VzWGI3V2NpZFBXVC96Q2FkdHpwQVg4RnhnOXhxOFBJNCtWUGx6?=
+ =?utf-8?B?SFdJUTZvRnVqcFVVeDZKY1JUSVpkcGxHbms2Mm52NmZuSkMrT0Y4aHoycitO?=
+ =?utf-8?Q?MyuPPRJfRZPjtuyll7GWRyeVh?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f9386fe-a077-4cb1-ccae-08ddfd0e903a
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7309.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2025 15:08:34.9873
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5+lM+pHQkFTpW0EhUaN8aKdARB3uTVh8bFUHk3BBS+7cyBxu+S3ZBsY3GofiVMwmInd3R+jW8IFmhQNPYLcDQw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7468
 
-From: Bobby Eshleman <bobbyeshleman@meta.com>
+On 9/26/25 9:26 AM, Michael S. Tsirkin wrote:
+> On Fri, Sep 26, 2025 at 12:55:11PM +0800, Jason Wang wrote:
+>>>> Looking at this, it's nothing admin virtqueue specific, I wonder why
+>>>> it is not part of virtio_config_ops.
+>>>>
+>>>> Thanks
+>>>
+>>> cap things are admin commands. But what I do not get is why they
+>>> need to be callbacks.
+>>>
+>>> The only thing about admin commands that is pci specific is finding
+>>> the admin vq.
+>>
+>> I think we had a discussion to decide to separate admin commands from
+>> the admin vq.
+>>
+>> Thanks
+> 
+> If what you are saying is that core should expose APIs to
+> submit admin commands, not to access admin vq, I think I agree.
+> 
 
-Improve CPU performance of devmem token management by using page offsets
-as dmabuf tokens and using them for direct array access lookups instead
-of xarray lookups. Consequently, the xarray can be removed. The result
-is an average 5% reduction in CPU cycles spent by devmem RX user
-threads.
+Quick overview of what I did, to not waste a v4 if you don't agree.
+Added config_ops->admin_cmd_exec. virtio_pci_modern registers
+virtio_pci_modern_admin_cmd_exec to it.
 
-This patch changes the meaning of tokens. Tokens previously referred to
-unique fragments of pages. In this patch tokens instead represent
-references to pages, not fragments. Because of this, multiple tokens may
-refer to the same page and so have identical value (e.g., two small
-fragments may coexist on the same page). The token and offset pair that
-the user receives uniquely identifies fragments if needed.  This assumes
-that the user is not attempting to sort / uniq the token list using
-tokens alone.
+Moved the logic that had been in virtio_pci_modern for building the
+commands and returning the data to a new file file virtio_admin_commands.c.
 
-A new restriction is added to the implementation: devmem RX sockets
-cannot switch dmabuf bindings. In practice, this is often a symptom of
-invalid configuration as a flow would have to be steered to a different
-queue or device where there is a different binding, which is generally
-bad for TCP flows. This restriction is necessary because the 32-bit
-dmabuf token does not have enough bits to represent both the pages in a
-large dmabuf and also a binding or dmabuf ID. For example, a system with
-8 NICs and 32 queues requires 8 bits for a binding / queue ID (8 NICs *
-32 queues == 256 queues total == 2^8), which leaves only 24 bits for
-dmabuf pages (2^24 * 4096 / (1<<30) == 64GB). This is insufficient for
-the device and queue numbers on many current systems or systems that may
-need larger GPU dmabufs (as for hard limits, my current H100 has 80GB
-GPU memory per device).
-
-Using kperf[1] with 4 flows and workers, this patch improves receive
-worker CPU util by ~4.9% with slightly better throughput.
-
-Before, mean cpu util for rx workers ~83.6%:
-
-Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle
-Average:       4    2.30    0.00   79.43    0.00    0.65    0.21    0.00    0.00    0.00   17.41
-Average:       5    2.27    0.00   80.40    0.00    0.45    0.21    0.00    0.00    0.00   16.67
-Average:       6    2.28    0.00   80.47    0.00    0.46    0.25    0.00    0.00    0.00   16.54
-Average:       7    2.42    0.00   82.05    0.00    0.46    0.21    0.00    0.00    0.00   14.86
-
-After, mean cpu util % for rx workers ~78.7%:
-
-Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle
-Average:       4    2.61    0.00   73.31    0.00    0.76    0.11    0.00    0.00    0.00   23.20
-Average:       5    2.95    0.00   74.24    0.00    0.66    0.22    0.00    0.00    0.00   21.94
-Average:       6    2.81    0.00   73.38    0.00    0.97    0.11    0.00    0.00    0.00   22.73
-Average:       7    3.05    0.00   78.76    0.00    0.76    0.11    0.00    0.00    0.00   17.32
-
-Mean throughput improves, but falls within a standard deviation (~45GB/s
-for 4 flows on a 50GB/s NIC, one hop).
-
-This patch adds an atomic to net_iov to count the number of outstanding
-user references (uref) and tracks them via binding->vec. The
-pp_ref_count is only incremented / decremented when uref goes from zero
-to one or from one to zero, to avoid adding more atomic overhead. If a
-user fails to refill and closes before returning all tokens, the binding
-will finish the uref release when unbound. pp_ref_count cannot be used
-directly becuase when the binding performs cleanup it does not know how
-many pp_ref_count references are due to socket users.
-
-[1]: https://github.com/facebookexperimental/kperf
-
-Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
----
-Changes in v3:
-- make urefs per-binding instead of per-socket, reducing memory
-  footprint
-- fallback to cleaning up references in dmabuf unbind if socket leaked
-  tokens
-- drop ethtool patch
-
-Changes in v2:
-- always use GFP_ZERO for binding->vec (Mina)
-- remove WARN for changed binding (Mina)
-- remove extraneous binding ref get (Mina)
-- remove WARNs on invalid user input (Mina)
-- pre-assign niovs in binding->vec for RX case (Mina)
-- use atomic_set(, 0) to initialize sk_user_frags.urefs
-- fix length of alloc for urefs
----
- include/net/netmem.h     |  1 +
- include/net/sock.h       |  4 +--
- net/core/devmem.c        | 34 ++++++++++++------
- net/core/devmem.h        |  2 +-
- net/core/sock.c          | 38 ++++++++++++++------
- net/ipv4/tcp.c           | 94 +++++++++++-------------------------------------
- net/ipv4/tcp_ipv4.c      | 18 ++--------
- net/ipv4/tcp_minisocks.c |  2 --
- 8 files changed, 78 insertions(+), 115 deletions(-)
-
-diff --git a/include/net/netmem.h b/include/net/netmem.h
-index f7dacc9e75fd..be6bc69c2f5a 100644
---- a/include/net/netmem.h
-+++ b/include/net/netmem.h
-@@ -116,6 +116,7 @@ struct net_iov {
- 	};
- 	struct net_iov_area *owner;
- 	enum net_iov_type type;
-+	atomic_t uref;
- };
- 
- struct net_iov_area {
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 1e7f124871d2..e51ae567c121 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -350,7 +350,7 @@ struct sk_filter;
-   *	@sk_scm_rights: flagged by SO_PASSRIGHTS to recv SCM_RIGHTS
-   *	@sk_scm_unused: unused flags for scm_recv()
-   *	@ns_tracker: tracker for netns reference
--  *	@sk_user_frags: xarray of pages the user is holding a reference on.
-+  *	@sk_devmem_binding: the devmem binding used by the socket
-   *	@sk_owner: reference to the real owner of the socket that calls
-   *		   sock_lock_init_class_and_name().
-   */
-@@ -573,7 +573,7 @@ struct sock {
- #endif
- 	struct rcu_head		sk_rcu;
- 	netns_tracker		ns_tracker;
--	struct xarray		sk_user_frags;
-+	struct net_devmem_dmabuf_binding	*sk_devmem_binding;
- 
- #if IS_ENABLED(CONFIG_PROVE_LOCKING) && IS_ENABLED(CONFIG_MODULES)
- 	struct module		*sk_owner;
-diff --git a/net/core/devmem.c b/net/core/devmem.c
-index b4c570d4f37a..865d8dee539f 100644
---- a/net/core/devmem.c
-+++ b/net/core/devmem.c
-@@ -11,6 +11,7 @@
- #include <linux/genalloc.h>
- #include <linux/mm.h>
- #include <linux/netdevice.h>
-+#include <linux/skbuff_ref.h>
- #include <linux/types.h>
- #include <net/netdev_queues.h>
- #include <net/netdev_rx_queue.h>
-@@ -120,6 +121,7 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
- 	struct netdev_rx_queue *rxq;
- 	unsigned long xa_idx;
- 	unsigned int rxq_idx;
-+	int i;
- 
- 	xa_erase(&net_devmem_dmabuf_bindings, binding->id);
- 
-@@ -142,6 +144,20 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
- 		__net_mp_close_rxq(binding->dev, rxq_idx, &mp_params);
- 	}
- 
-+	for (i = 0; i < binding->dmabuf->size / PAGE_SIZE; i++) {
-+		struct net_iov *niov;
-+		netmem_ref netmem;
-+
-+		niov = binding->vec[i];
-+
-+		if (!net_is_devmem_iov(niov))
-+			continue;
-+
-+		netmem = net_iov_to_netmem(niov);
-+		while (atomic_dec_and_test(&niov->uref))
-+			WARN_ON_ONCE(!napi_pp_put_page(netmem));
-+	}
-+
- 	net_devmem_dmabuf_binding_put(binding);
- }
- 
-@@ -230,14 +246,12 @@ net_devmem_bind_dmabuf(struct net_device *dev,
- 		goto err_detach;
- 	}
- 
--	if (direction == DMA_TO_DEVICE) {
--		binding->vec = kvmalloc_array(dmabuf->size / PAGE_SIZE,
--					      sizeof(struct net_iov *),
--					      GFP_KERNEL);
--		if (!binding->vec) {
--			err = -ENOMEM;
--			goto err_unmap;
--		}
-+	binding->vec = kvmalloc_array(dmabuf->size / PAGE_SIZE,
-+				      sizeof(struct net_iov *),
-+				      GFP_KERNEL | __GFP_ZERO);
-+	if (!binding->vec) {
-+		err = -ENOMEM;
-+		goto err_unmap;
- 	}
- 
- 	/* For simplicity we expect to make PAGE_SIZE allocations, but the
-@@ -291,10 +305,10 @@ net_devmem_bind_dmabuf(struct net_device *dev,
- 			niov = &owner->area.niovs[i];
- 			niov->type = NET_IOV_DMABUF;
- 			niov->owner = &owner->area;
-+			atomic_set(&niov->uref, 0);
- 			page_pool_set_dma_addr_netmem(net_iov_to_netmem(niov),
- 						      net_devmem_get_dma_addr(niov));
--			if (direction == DMA_TO_DEVICE)
--				binding->vec[owner->area.base_virtual / PAGE_SIZE + i] = niov;
-+			binding->vec[owner->area.base_virtual / PAGE_SIZE + i] = niov;
- 		}
- 
- 		virtual += len;
-diff --git a/net/core/devmem.h b/net/core/devmem.h
-index 2ada54fb63d7..d4eb28d079bb 100644
---- a/net/core/devmem.h
-+++ b/net/core/devmem.h
-@@ -61,7 +61,7 @@ struct net_devmem_dmabuf_binding {
- 
- 	/* Array of net_iov pointers for this binding, sorted by virtual
- 	 * address. This array is convenient to map the virtual addresses to
--	 * net_iovs in the TX path.
-+	 * net_iovs.
- 	 */
- 	struct net_iov **vec;
- 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 9a8290fcc35d..08d865ba04ea 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -87,6 +87,7 @@
- 
- #include <linux/unaligned.h>
- #include <linux/capability.h>
-+#include <linux/dma-buf.h>
- #include <linux/errno.h>
- #include <linux/errqueue.h>
- #include <linux/types.h>
-@@ -151,6 +152,7 @@
- #include <uapi/linux/pidfd.h>
- 
- #include "dev.h"
-+#include "devmem.h"
- 
- static DEFINE_MUTEX(proto_list_mutex);
- static LIST_HEAD(proto_list);
-@@ -1082,6 +1084,7 @@ sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
- 	struct dmabuf_token *tokens;
- 	int ret = 0, num_frags = 0;
- 	netmem_ref netmems[16];
-+	struct net_iov *niov;
- 
- 	if (!sk_is_tcp(sk))
- 		return -EBADF;
-@@ -1100,34 +1103,47 @@ sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
- 		return -EFAULT;
- 	}
- 
--	xa_lock_bh(&sk->sk_user_frags);
- 	for (i = 0; i < num_tokens; i++) {
- 		for (j = 0; j < tokens[i].token_count; j++) {
-+			struct net_iov *niov;
-+			unsigned int token;
-+			netmem_ref netmem;
-+
-+			token = tokens[i].token_start + j;
-+			if (token >= sk->sk_devmem_binding->dmabuf->size / PAGE_SIZE)
-+				break;
-+
- 			if (++num_frags > MAX_DONTNEED_FRAGS)
- 				goto frag_limit_reached;
--
--			netmem_ref netmem = (__force netmem_ref)__xa_erase(
--				&sk->sk_user_frags, tokens[i].token_start + j);
-+			niov = sk->sk_devmem_binding->vec[token];
-+			netmem = net_iov_to_netmem(niov);
- 
- 			if (!netmem || WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
- 				continue;
- 
-+			if (atomic_dec_if_positive(&sk->sk_user_frags.urefs[token])
-+						< 0)
-+				continue;
-+
- 			netmems[netmem_num++] = netmem;
- 			if (netmem_num == ARRAY_SIZE(netmems)) {
--				xa_unlock_bh(&sk->sk_user_frags);
--				for (k = 0; k < netmem_num; k++)
--					WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
-+				for (k = 0; k < netmem_num; k++) {
-+					niov = netmem_to_net_iov(netmems[k]);
-+					if (atomic_dec_and_test(&niov->uref))
-+						WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
-+				}
- 				netmem_num = 0;
--				xa_lock_bh(&sk->sk_user_frags);
- 			}
- 			ret++;
- 		}
- 	}
- 
- frag_limit_reached:
--	xa_unlock_bh(&sk->sk_user_frags);
--	for (k = 0; k < netmem_num; k++)
--		WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
-+	for (k = 0; k < netmem_num; k++) {
-+		niov = netmem_to_net_iov(netmems[k]);
-+		if (atomic_dec_and_test(&niov->uref))
-+			WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
-+	}
- 
- 	kvfree(tokens);
- 	return ret;
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 40b774b4f587..813d73f23c87 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -261,6 +261,7 @@
- #include <linux/memblock.h>
- #include <linux/highmem.h>
- #include <linux/cache.h>
-+#include <linux/dma-buf.h>
- #include <linux/err.h>
- #include <linux/time.h>
- #include <linux/slab.h>
-@@ -475,7 +476,7 @@ void tcp_init_sock(struct sock *sk)
- 
- 	set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
- 	sk_sockets_allocated_inc(sk);
--	xa_init_flags(&sk->sk_user_frags, XA_FLAGS_ALLOC1);
-+	sk->sk_devmem_binding = NULL;
- }
- EXPORT_IPV6_MOD(tcp_init_sock);
- 
-@@ -2386,68 +2387,6 @@ static int tcp_inq_hint(struct sock *sk)
- 	return inq;
- }
- 
--/* batch __xa_alloc() calls and reduce xa_lock()/xa_unlock() overhead. */
--struct tcp_xa_pool {
--	u8		max; /* max <= MAX_SKB_FRAGS */
--	u8		idx; /* idx <= max */
--	__u32		tokens[MAX_SKB_FRAGS];
--	netmem_ref	netmems[MAX_SKB_FRAGS];
--};
--
--static void tcp_xa_pool_commit_locked(struct sock *sk, struct tcp_xa_pool *p)
--{
--	int i;
--
--	/* Commit part that has been copied to user space. */
--	for (i = 0; i < p->idx; i++)
--		__xa_cmpxchg(&sk->sk_user_frags, p->tokens[i], XA_ZERO_ENTRY,
--			     (__force void *)p->netmems[i], GFP_KERNEL);
--	/* Rollback what has been pre-allocated and is no longer needed. */
--	for (; i < p->max; i++)
--		__xa_erase(&sk->sk_user_frags, p->tokens[i]);
--
--	p->max = 0;
--	p->idx = 0;
--}
--
--static void tcp_xa_pool_commit(struct sock *sk, struct tcp_xa_pool *p)
--{
--	if (!p->max)
--		return;
--
--	xa_lock_bh(&sk->sk_user_frags);
--
--	tcp_xa_pool_commit_locked(sk, p);
--
--	xa_unlock_bh(&sk->sk_user_frags);
--}
--
--static int tcp_xa_pool_refill(struct sock *sk, struct tcp_xa_pool *p,
--			      unsigned int max_frags)
--{
--	int err, k;
--
--	if (p->idx < p->max)
--		return 0;
--
--	xa_lock_bh(&sk->sk_user_frags);
--
--	tcp_xa_pool_commit_locked(sk, p);
--
--	for (k = 0; k < max_frags; k++) {
--		err = __xa_alloc(&sk->sk_user_frags, &p->tokens[k],
--				 XA_ZERO_ENTRY, xa_limit_31b, GFP_KERNEL);
--		if (err)
--			break;
--	}
--
--	xa_unlock_bh(&sk->sk_user_frags);
--
--	p->max = k;
--	p->idx = 0;
--	return k ? 0 : err;
--}
--
- /* On error, returns the -errno. On success, returns number of bytes sent to the
-  * user. May not consume all of @remaining_len.
-  */
-@@ -2456,14 +2395,11 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
- 			      int remaining_len)
- {
- 	struct dmabuf_cmsg dmabuf_cmsg = { 0 };
--	struct tcp_xa_pool tcp_xa_pool;
- 	unsigned int start;
- 	int i, copy, n;
- 	int sent = 0;
- 	int err = 0;
- 
--	tcp_xa_pool.max = 0;
--	tcp_xa_pool.idx = 0;
- 	do {
- 		start = skb_headlen(skb);
- 
-@@ -2510,8 +2446,12 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
- 		 */
- 		for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
- 			skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
-+			struct net_devmem_dmabuf_binding *binding;
- 			struct net_iov *niov;
- 			u64 frag_offset;
-+			size_t size;
-+			size_t len;
-+			u32 token;
- 			int end;
- 
- 			/* !skb_frags_readable() should indicate that ALL the
-@@ -2544,13 +2484,21 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
- 					      start;
- 				dmabuf_cmsg.frag_offset = frag_offset;
- 				dmabuf_cmsg.frag_size = copy;
--				err = tcp_xa_pool_refill(sk, &tcp_xa_pool,
--							 skb_shinfo(skb)->nr_frags - i);
--				if (err)
-+
-+				binding = net_devmem_iov_binding(niov);
-+
-+				if (!sk->sk_devmem_binding)
-+					sk->sk_devmem_binding = binding;
-+
-+				if (sk->sk_devmem_binding != binding) {
-+					err = -EFAULT;
- 					goto out;
-+				}
-+
-+				token = net_iov_virtual_addr(niov) >> PAGE_SHIFT;
-+				dmabuf_cmsg.frag_token = token;
- 
- 				/* Will perform the exchange later */
--				dmabuf_cmsg.frag_token = tcp_xa_pool.tokens[tcp_xa_pool.idx];
- 				dmabuf_cmsg.dmabuf_id = net_devmem_iov_binding_id(niov);
- 
- 				offset += copy;
-@@ -2563,8 +2511,8 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
- 				if (err)
- 					goto out;
- 
--				atomic_long_inc(&niov->pp_ref_count);
--				tcp_xa_pool.netmems[tcp_xa_pool.idx++] = skb_frag_netmem(frag);
-+				if (atomic_inc_return(&niov->uref) == 1)
-+					atomic_long_inc(&niov->pp_ref_count);
- 
- 				sent += copy;
- 
-@@ -2574,7 +2522,6 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
- 			start = end;
- 		}
- 
--		tcp_xa_pool_commit(sk, &tcp_xa_pool);
- 		if (!remaining_len)
- 			goto out;
- 
-@@ -2592,7 +2539,6 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
- 	}
- 
- out:
--	tcp_xa_pool_commit(sk, &tcp_xa_pool);
- 	if (!sent)
- 		sent = err;
- 
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 1e58a8a9ff7a..0afa5461de33 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -87,6 +87,9 @@
- #include <crypto/hash.h>
- #include <linux/scatterlist.h>
- 
-+#include <linux/dma-buf.h>
-+#include "../core/devmem.h"
-+
- #include <trace/events/tcp.h>
- 
- #ifdef CONFIG_TCP_MD5SIG
-@@ -2526,25 +2529,10 @@ static void tcp_md5sig_info_free_rcu(struct rcu_head *head)
- }
- #endif
- 
--static void tcp_release_user_frags(struct sock *sk)
--{
--#ifdef CONFIG_PAGE_POOL
--	unsigned long index;
--	void *netmem;
--
--	xa_for_each(&sk->sk_user_frags, index, netmem)
--		WARN_ON_ONCE(!napi_pp_put_page((__force netmem_ref)netmem));
--#endif
--}
--
- void tcp_v4_destroy_sock(struct sock *sk)
- {
- 	struct tcp_sock *tp = tcp_sk(sk);
- 
--	tcp_release_user_frags(sk);
--
--	xa_destroy(&sk->sk_user_frags);
--
- 	trace_tcp_destroy_sock(sk);
- 
- 	tcp_clear_xmit_timers(sk);
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index d1c9e4088646..4e8ea73daab7 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -639,8 +639,6 @@ struct sock *tcp_create_openreq_child(const struct sock *sk,
- 
- 	__TCP_INC_STATS(sock_net(sk), TCP_MIB_PASSIVEOPENS);
- 
--	xa_init_flags(&newsk->sk_user_frags, XA_FLAGS_ALLOC1);
--
- 	return newsk;
- }
- EXPORT_SYMBOL(tcp_create_openreq_child);
-
--- 
-2.47.3
-
+That file has the 5 functions needed for cap and object creation.
 
