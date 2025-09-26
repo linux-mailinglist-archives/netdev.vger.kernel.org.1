@@ -1,238 +1,176 @@
-Return-Path: <netdev+bounces-226658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C4EABA3B32
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 14:52:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52522BA3B70
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 14:56:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDAB616D02B
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 12:52:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A62A67A6B27
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 12:54:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C6D2F5A12;
-	Fri, 26 Sep 2025 12:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253CD2D6E5C;
+	Fri, 26 Sep 2025 12:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vHqj4+wR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AIwrH/Fw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B5E2F5479
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 12:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E797F1EEE6;
+	Fri, 26 Sep 2025 12:55:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758891149; cv=none; b=Tfqw1z2Lm05KDk/QHVrpNngFVcK/AHG+Eb4+QKqia+w1aT9+fZgt93AjDSQIzzy5sb7TyNTWdgbPpaIkZb/zuDM3bi25RhCuRIpErvmzKB3lAi8K8eUp0cAD+i99rmy7IUYD/RZHRk/lbHB9MIE+QzxezZYACynCMDiBwvYKXTQ=
+	t=1758891353; cv=none; b=ccKFpmC41e6+ESMURPKBkfQvlP/SiUjM0gjXwZMtBRSoJEDU32hWk3zfT8aukuuSooiaP+fkog+j+Oh7VbQUtys9QyTZoAbSUVkftPpROAAxqJgWRqblQBx6EzOtzmDu7cwqZRrycdptOS+9wZ/m4mHzfgpwPBZzTSc6sZ5plb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758891149; c=relaxed/simple;
-	bh=bgmghckL4Ny0c8O8U8NCksUJHOretkGWrQoDWo8CmCU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dOGrc4H1U4mJB984SjEI559sHuUWA2LTqiWJQWuwMEOKV1g/OMLMIZpwprbYJgXDsAc+JRlYhI0RYPXDtbiS3pqWNeePjPzDjZ5kU0/mWvSZY6/Xlv2Xq9SS7CXB7/Gy6vmHelAc4edOPodfkLYACvwikpAb6y9WXJT7mCQ79rY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vHqj4+wR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC4AEC4CEF7
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 12:52:28 +0000 (UTC)
+	s=arc-20240116; t=1758891353; c=relaxed/simple;
+	bh=duSa904xzX7uTYjxszUBwrwGR3o5pCjjI0NEhThlExo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KgtKXyTThTK0SGoNKfMFrG9VeY42o5Mu9EUb2gG7T+tLcNxcJ4RH+Maa0NrmNBcmw8bGa0GoErPSEGEcRpLAYs1xUeyQFqTfGH+Mc59iU/oUzZuVq5C8FIWXX4Z95PYm+OHDRMvgx0KltCrBbDM88vcJAZZQReWg+qPgzkmYldQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AIwrH/Fw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 467C7C4CEF4;
+	Fri, 26 Sep 2025 12:55:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758891148;
-	bh=bgmghckL4Ny0c8O8U8NCksUJHOretkGWrQoDWo8CmCU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=vHqj4+wRee6jMZl9gdXuxdOCbNcdfwxLIBJPN9qkSxXacaLbOaLoO6V1ditvke3M4
-	 E4jpL/WNPawAO4OHCE4yEb6sP8Kh6pWg4ahWQR/6RODVgcE9xpTyjkQCSTjoMKkKSB
-	 L/yEONl4GvSUNYayTbqSFw88HuXqTUAqP814loaQ8fHW+iREsqKMKyNrNsjffyblDX
-	 HRPaYSO/QzMJiapTKtCGuXUPyJvBl3mlk6l88Hl1HxswUdoV3FpUbK3YCWqLzZvLVM
-	 8k0yjZlYGVpfjAjDXnZRVjTBPkd2K61MPVU/yuIRsxQLBDpdOxaO0KHkJ9Jj9qXPu2
-	 ASWlPfep9hd9Q==
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-330d1565844so1537616fac.1
-        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 05:52:28 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVSEqfPsucIG0rFIYwOJnMMubFCaVRklDr5S6nufVSUP0bg7l6Uk+7ZSHuT2DdDLznUKaeWmlc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzi9VOffCC/avJgCgbAmqJipmpPU9E/1k0f9GhSfxTpRvS7GXDD
-	rkpgw2xJ6UAgeOfdh2qmRlv6xwK0SuOBYFrCdueqaX+jIojZVJBGT5CvvWM2O6ZU+NauwP2gIt6
-	vIJ7Q06bRQTg7kdK6xQ70M2MEWBnvnCY=
-X-Google-Smtp-Source: AGHT+IFyJsbtEL/QZxEFMzNMFhjejHmQrKAGHJ2m+Cy67pO650FZ5XV0FAPVcpNkLn5AmmxpCHNcXhCPX9zROUcktt4=
-X-Received: by 2002:a05:6871:79a3:b0:35c:cfec:df79 with SMTP id
- 586e51a60fabf-36c4698a0f9mr1307306fac.51.1758891148064; Fri, 26 Sep 2025
- 05:52:28 -0700 (PDT)
+	s=k20201202; t=1758891352;
+	bh=duSa904xzX7uTYjxszUBwrwGR3o5pCjjI0NEhThlExo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AIwrH/FwH+7LYFdACvS1oqcYl+azT3xaZoOGIaQZlPbaYUtrM/14fw9uvvPM2LUMa
+	 U0T10X4/wNwuq2T2+KbyQlPSJiqfX9/UZJF9HhbVQ9kKHH757ekObZGQsjnxhSJTM2
+	 ORYD1PKdQC63B5kujlklKMPuaVbagyRm5dfu1rnfBFP30KeTsNwizF2pnEZHRKnSu9
+	 /7FQRL1GJhqUq7gnAV3GvyU+h2kL/qQ1LfT3PctsoMjLFqbJhQ13ZHaH63Er7O2c7v
+	 JwHzUYVGcQLk684+s9sJN+WY/iPaGIfn7Cv1iNaOdRpOq2K2fXO1bR44fIbLlfnMKz
+	 4wJ4ZVHvY4Ssw==
+Date: Fri, 26 Sep 2025 14:55:50 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, linux-kselftest@vger.kernel.org,
+	kernel-team <kernel-team@cloudflare.com>
+Subject: Re: [PATCH RFC bpf-next v2 0/5] Add the the capability to load HW RX
+ checsum in eBPF programs
+Message-ID: <aNaNVl13LV_HWbP3@lore-desk>
+References: <20250925-bpf-xdp-meta-rxcksum-v2-0-6b3fe987ce91@kernel.org>
+ <87bjmy508n.fsf@cloudflare.com>
+ <aNUb2rB8QAJj-aUX@lore-desk>
+ <87tt0q3ik9.fsf@cloudflare.com>
+ <fdb8a364-a12d-4c1f-9591-9dac3e27b321@kernel.org>
+ <87ldm12zoq.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250924074602.266292-1-sakari.ailus@linux.intel.com>
- <CAJZ5v0hSy9zQd6cP9B4QPSZi-6ughmkW=VoEBV-0MbUr2xcaAQ@mail.gmail.com> <aNZ9fbh8eLiPAJzR@kekkonen.localdomain>
-In-Reply-To: <aNZ9fbh8eLiPAJzR@kekkonen.localdomain>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Fri, 26 Sep 2025 14:52:17 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0gQ9vnT+Z8zryEausp-2xX7HocoBgwmiptxg7BGiU9C8g@mail.gmail.com>
-X-Gm-Features: AS18NWDCqPA72v4-2y8V5lEmAid_UEthjaXRBCWFUzQ_Nsh-1l_6LWsoqBtdmRQ
-Message-ID: <CAJZ5v0gQ9vnT+Z8zryEausp-2xX7HocoBgwmiptxg7BGiU9C8g@mail.gmail.com>
-Subject: Re: [PATCH v2 00/16] Align availability checks on fwnode child node enumeration
-To: Sakari Ailus <sakari.ailus@linux.intel.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, linux-acpi@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-input@vger.kernel.org, 
-	linux-leds@vger.kernel.org, linux-media@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-spi@vger.kernel.org, 
-	Len Brown <lenb@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Danilo Krummrich <dakr@kernel.org>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	Daniel Scally <djrscally@gmail.com>, Heikki Krogerus <heikki.krogerus@linux.intel.com>, 
-	Javier Carrasco <javier.carrasco@wolfvision.net>, 
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>, Lee Jones <lee@kernel.org>, 
-	Pavel Machek <pavel@kernel.org>, Matthias Fend <matthias.fend@emfend.at>, 
-	Chanwoo Choi <cw00.choi@samsung.com>, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Laurent Pinchart <laurent.pinchart@ideasonboard.com>, 
-	Paul Elder <paul.elder@ideasonboard.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
-	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Mark Brown <broonie@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="+8nn4MSiO0Z4/+w5"
+Content-Disposition: inline
+In-Reply-To: <87ldm12zoq.fsf@cloudflare.com>
+
+
+--+8nn4MSiO0Z4/+w5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Hi Sakari,
+> On Fri, Sep 26, 2025 at 01:45 PM +02, Jesper Dangaard Brouer wrote:
+> > On 25/09/2025 12.58, Jakub Sitnicki wrote:
+> >> On Thu, Sep 25, 2025 at 12:39 PM +02, Lorenzo Bianconi wrote:
+> >>>> On Thu, Sep 25, 2025 at 11:30 AM +02, Lorenzo Bianconi wrote:
+> >>>>> Introduce bpf_xdp_metadata_rx_checksum() kfunc in order to load the=
+ HW
+> >>>>> RX cheksum results in the eBPF program binded to the NIC.
+> >>>>> Implement xmo_rx_checksum callback for veth and ice drivers.
+> >>>>
+> >>>> What are going to do with HW RX checksum once XDP prog can access it?
+> >>>
+> >>> I guess there are multiple use-cases for bpf_xdp_metadata_rx_checksum=
+()
+> >>> kfunc. The first the I have in mind is when packets are received by a=
+n af_xdp
+> >>> application. In this case I think we currently do not have any way to=
+ check if
+> >>> the packet checksum is correct, right?
+> >>> I think Jesper has other use-cases in mind, I will let him comment
+> >>> here.
+> >> Can you share more details on what the AF_XDP application would that
+> >> info?
+> >
+> > Today the AF_XDP application need to verify the packet checksum, as it
+> > gets raw xdp_frame packets directly from hardware (no layer in-between
+> > checked this).  Getting the RX-checksum validation from hardware info
+> > will be very useful for AF_XDP, as it can avoid doing this in software.
+> >
+> >
+> >> Regarding the use cases that Jesper is trying to unlock, as things sta=
+nd
+> >> we don't have a way, or an agreement on how to inject/propagate even t=
+he
+> >> already existing NIC hints back into the network stack.
+> >>=20
+> >
+> > This patchset have its own merits and shouldn't be connected with my
+> > use-case of (optionally) including hardware offloads in the xdp_frame.
+> > Sure, I obviously also want this RX-checksum added, but this patchset is
+> > useful on it's own.
+> >
+> >> Hence my question - why do we want to expose another NIC hint to XDP
+> >> that we can't consume in any useful way yet?
+> >>=20
+> >
+> > Well here *are* useful ways to use this RX-checksum info on its own.
+> > See my explanation of the DDoS use-case here[1] in other email.
+> >
+> > Cloudflare actually also have a concrete use-case for needing this.
+> > Our XDP based Unimog[2] load-balancer (and DDoS) encapsulate all
+> > packets when they are XDP_TX forwarded. The encap receiving NIC lacking
+> > inner-packet checksum validation make us loose this hardware offload.
+> > This would allow us to save some checksum validation or even just DDOS =
+drop
+> > based on hardware checksum validation prior to encap (as in [1]).
+>=20
+> Thanks for filling in the blanks, Jesper. That's the context that I was
+> missing.
+>=20
+> Lorenzo, this motivaton seems worth including in the cover letter.
 
-On Fri, Sep 26, 2025 at 1:48=E2=80=AFPM Sakari Ailus
-<sakari.ailus@linux.intel.com> wrote:
->
-> Hi Rafael,
->
-> On Wed, Sep 24, 2025 at 12:52:12PM +0200, Rafael J. Wysocki wrote:
-> > Hi Sakari,
-> >
-> > On Wed, Sep 24, 2025 at 9:46=E2=80=AFAM Sakari Ailus
-> > <sakari.ailus@linux.intel.com> wrote:
-> > >
-> > > Hello everyone,
-> > >
-> > > Historically the fwnode property API has enumerated only available de=
-vice
-> > > nodes on OF whereas on ACPI, also nodes that haven't been present in =
-the
-> > > system have been provided. Both OF and ACPI have similar concepts of =
-node
-> > > availbility, on OF it's the "status" property present on device nodes=
- and
-> > > on ACPI the _STA object evaluates to device present, enabled and
-> > > functional bits, of which the present and functional bits are current=
-ly
-> > > being used to determine whether to enumerate a device.
-> > >
-> > > Two additional functions, fwnode_get_next_available_child_node() and
-> > > fwnode_for_each_available_child_node(), have been provided to enumera=
-te
-> > > the available nodes only on ACPI, whereas on OF the implementation ha=
-s
-> > > been the same on the non-available variants. The motivation for provi=
-ding
-> > > these has very likely been to provide fwnode variants of the similarl=
-y
-> > > named functions but the difference isn't justifiable from API consist=
-ency
-> > > viewpoint.
-> > >
-> > > This set switches the users away from the "available" fwnode API func=
-tions
-> > > and later on removes them, aligning the functionality on all fwnode
-> > > backends.
-> > >
-> > > since v1:
-> > >
-> > > - Move patch "ACPI: property: Make acpi_get_next_subnode() static" as
-> > >   first.
-> > >
-> > > - Add missing parentheses and kernel-doc Return: section in
-> > >   acpi_get_next_present_subnode() documentation and move the Return
-> > >   section: of fwnode_graph_get_endpoint_by_id() to the end of the
-> > >   documentation section (new patch for the latter).
-> > >
-> > > - Use device_get_next_child_node() instead of fwnode_get_next_child_n=
-ode()
-> > >   in flash LED driver drivers.
-> > >
-> > > - Rework iterating port nodes in acpi_graph_get_next_endpoint() as
-> > >   suggested by Andy (new patch).
-> >
-> > I think that you really have four series here, or rather two series, a
-> > collection of patches depending on them, and a follow-up cleanup.
-> >
-> > > Sakari Ailus (16):
-> > >   ACPI: property: Make acpi_get_next_subnode() static
-> > >   ACPI: property: Use ACPI functions in acpi_graph_get_next_endpoint(=
-)
-> > >     only
-> > >   ACPI: property: Rework acpi_graph_get_next_endpoint()
-> > >   ACPI: property: Return present device nodes only on fwnode interfac=
-e
-> >
-> > So the above is one series, focused on ACPI property changes.
-> >
-> > They can go in via ACPI as soon as everyone is happy with them.  I
-> > think I can push them for 6.18 if that helps to process the other
-> > patches.
->
-> If it's an option, that would be nice. But see below.
->
-> >
-> > >   property: Move Return: section of fwnode_graph_get_endpoint_by_id()
-> > >     down
-> > >   property: Drop DEVICE_DISABLED flag in
-> > >     fwnode_graph_get_endpoint_by_id()
-> > >   property: Drop DEVICE_DISABLED flag in
-> > >     fwnode_graph_get_endpoint_count()
-> >
-> > The above patches are another series that doesn't depend on the first
-> > one AFAICS and can go in via driver core.
->
-> Agreed.
->
-> >
-> > >   property: Document that fwnode API returns available nodes
-> > >   driver core: Use fwnode_for_each_child_node() instead
-> > >   net: lan966x: Use fwnode_for_each_child_node() instead
-> > >   Input: touch-overlay - Use fwnode_for_each_child_node() instead
-> > >   media: thp7312: Use fwnode_for_each_child_node() instead
-> > >   leds: Use fwnode_for_each_child_node() instead
-> > >   leds: Use fwnode_get_next_child_node() instead
-> >
-> > The above can go in via respective subsystem trees when the ACPI
-> > property series gets in (I'm not sure if/how they depend on the second
-> > series).
-> >
-> > And the following one is a follow-up cleanup getting rid of code that
-> > would be redundant going forward.
-> >
-> > >   property: Drop functions operating on "available" child nodes
-> > >   spi: cadence: Remove explicit device node availability check
-> >
-> > Does the spi change depend on the previous patch?
->
-> There's really only one dependency, apart from the direct dependency of
-> fwnode_get_next_available_child_node() /
-> fwnode_for_each_available_child_node() definitions removed in the second
-> last patch: fwnode_get_next_child_node() and fwnode_for_each_child_node()
-> may still return non-available nodes before the last of the ACPI patches =
-in
-> the set. So if the ACPI patches aren't merged but the rest are,
-> non-available nodes could be returned.
->
-> How about:
->
-> 1. Merge the ACPI patches to 6.18.
->
-> 2. Merge the rest, apart from the second last patch, for 6.19.
->
-> 3. Once everything else is in, merge the last patch. Could wait for 6.20.
+ack, I will do.
 
-Sounds good.
+Regards,
+Lorenzo
 
-> Perhaps I should split the series in three sets?
 
-That would help I think.
+--+8nn4MSiO0Z4/+w5
+Content-Type: application/pgp-signature; name=signature.asc
 
-> I'll send an update on the ACPI patches soon, to address a comment relate=
-d
-> to them.
+-----BEGIN PGP SIGNATURE-----
 
-OK
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaNaNVgAKCRA6cBh0uS2t
+rL3XAQD8GN9wvWAXagWwB1Sz8I/terYM2elqSFXzjHbVzB4I9gD+K7WMUCpKHc20
+3uWnZNrOOHV0R5Qjh7lK1nf04Gg9kQk=
+=UrqH
+-----END PGP SIGNATURE-----
 
-Thanks!
+--+8nn4MSiO0Z4/+w5--
 
