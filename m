@@ -1,176 +1,111 @@
-Return-Path: <netdev+bounces-226659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52522BA3B70
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 14:56:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65E03BA3BA1
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 14:58:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A62A67A6B27
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 12:54:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20AEA6237C4
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 12:58:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253CD2D6E5C;
-	Fri, 26 Sep 2025 12:55:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8D6D2EC0AB;
+	Fri, 26 Sep 2025 12:58:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AIwrH/Fw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gscfe2+X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E797F1EEE6;
-	Fri, 26 Sep 2025 12:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2192D6E5C
+	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 12:58:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758891353; cv=none; b=ccKFpmC41e6+ESMURPKBkfQvlP/SiUjM0gjXwZMtBRSoJEDU32hWk3zfT8aukuuSooiaP+fkog+j+Oh7VbQUtys9QyTZoAbSUVkftPpROAAxqJgWRqblQBx6EzOtzmDu7cwqZRrycdptOS+9wZ/m4mHzfgpwPBZzTSc6sZ5plb8=
+	t=1758891494; cv=none; b=HAvGaD7gflAkOAuSC18KQ8WbKj/N36yED0mKQmymTjXGQyCEuy52n8zbUc8COAB/T4BjxSct5+GIpTSWct0dxFVue9sx70KpxAKblC2PoXLHMDWM5vGa+bCIqxVqUAUaxNdnFk+HU5Ic5ZhQoDZTBOb9h+oNrdNbSaQxaUv8xYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758891353; c=relaxed/simple;
-	bh=duSa904xzX7uTYjxszUBwrwGR3o5pCjjI0NEhThlExo=;
+	s=arc-20240116; t=1758891494; c=relaxed/simple;
+	bh=9aoozeymCtilt+qkHUzPEFhKKMah5TAuvXJod7umpVA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KgtKXyTThTK0SGoNKfMFrG9VeY42o5Mu9EUb2gG7T+tLcNxcJ4RH+Maa0NrmNBcmw8bGa0GoErPSEGEcRpLAYs1xUeyQFqTfGH+Mc59iU/oUzZuVq5C8FIWXX4Z95PYm+OHDRMvgx0KltCrBbDM88vcJAZZQReWg+qPgzkmYldQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AIwrH/Fw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 467C7C4CEF4;
-	Fri, 26 Sep 2025 12:55:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758891352;
-	bh=duSa904xzX7uTYjxszUBwrwGR3o5pCjjI0NEhThlExo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AIwrH/FwH+7LYFdACvS1oqcYl+azT3xaZoOGIaQZlPbaYUtrM/14fw9uvvPM2LUMa
-	 U0T10X4/wNwuq2T2+KbyQlPSJiqfX9/UZJF9HhbVQ9kKHH757ekObZGQsjnxhSJTM2
-	 ORYD1PKdQC63B5kujlklKMPuaVbagyRm5dfu1rnfBFP30KeTsNwizF2pnEZHRKnSu9
-	 /7FQRL1GJhqUq7gnAV3GvyU+h2kL/qQ1LfT3PctsoMjLFqbJhQ13ZHaH63Er7O2c7v
-	 JwHzUYVGcQLk684+s9sJN+WY/iPaGIfn7Cv1iNaOdRpOq2K2fXO1bR44fIbLlfnMKz
-	 4wJ4ZVHvY4Ssw==
-Date: Fri, 26 Sep 2025 14:55:50 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	netdev@vger.kernel.org, bpf@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, linux-kselftest@vger.kernel.org,
-	kernel-team <kernel-team@cloudflare.com>
-Subject: Re: [PATCH RFC bpf-next v2 0/5] Add the the capability to load HW RX
- checsum in eBPF programs
-Message-ID: <aNaNVl13LV_HWbP3@lore-desk>
-References: <20250925-bpf-xdp-meta-rxcksum-v2-0-6b3fe987ce91@kernel.org>
- <87bjmy508n.fsf@cloudflare.com>
- <aNUb2rB8QAJj-aUX@lore-desk>
- <87tt0q3ik9.fsf@cloudflare.com>
- <fdb8a364-a12d-4c1f-9591-9dac3e27b321@kernel.org>
- <87ldm12zoq.fsf@cloudflare.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IpNy6NpQSjUB355tgboZVDCqO3+9Kodg5b0XY1PZvRWvJsqGM0p74i5oDH2wfUuMEQRd1to9UAcjmoA8/3h12ht/qCd0tE9vgm8TZHkhpOjTHRzbPueyoBaRurEAaekfbG4hmDUot/ePEiHLjlUrJk3ClfFYW+gZZ/3nPmX/FGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gscfe2+X; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-71d71bcac45so20803907b3.0
+        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 05:58:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758891492; x=1759496292; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3+s3+W287EF3WpdqRLN76J6wag+8qKpJsyHBGGlUi1g=;
+        b=gscfe2+XBCM7xT6mTvQGtus2atdlgYyTujEw3HJjNn3mR3wOKmbM1EmnJ8WsPl8Jtf
+         4I8dVgCGEoXIWn2VKFpjWSxUfK8r0NHrWdlgf43Uz22OnlZ590zeg24dSQh4X+6A2kC+
+         M8mfgqa6hJ9+WUltj696cnJ7rcJruBk+2FYvrQywL/b1JbH17xnCEsmZK7s7jvunQ9TL
+         IchRVAOQMiGhlF4+PVeozBdpeIajMk5i27Gm1YJCUQt+3GKg0/2j6ZIG6z1TUY66dDkK
+         wi95ee0R/tW1t/r1VhsNvvG1vndVCKfCFUepRaa8VY5mF266c1ouEJMbKl7+bG45u1dC
+         zbMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758891492; x=1759496292;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3+s3+W287EF3WpdqRLN76J6wag+8qKpJsyHBGGlUi1g=;
+        b=rMVaMpKVqpd86Oc3JIJEpdK+nIAcPtdWn+cm5ESdhdR7tJZPCUxexoWMaNX11Z6C/n
+         o/k9tcsSLYlGwzzGRxbCFRAUhijFmP1ueJdGdstYCbCkvpGlqlMlCIOxTCotaiD5TEkY
+         ovQFmn3AcHH3TdMoBZXcN1Kk6IYri65x2wUrc1XADPwqMMY7avC4Z0sCKMyJOZdPQzHs
+         8B2ozQtn9tqTO0ZF8ftZzDiKrHwpiFYxY3m0OxUqfXd2YS5f2EvtdRQmkkomLQyRkHlc
+         5U70oY+iiElPMSlAB1JokANVQTuOAbdvQ9utg31a9NDNZRYHtJyA51g9YD0y7m4zxMbJ
+         vycg==
+X-Forwarded-Encrypted: i=1; AJvYcCVjpx7ta0/p9VgNfzka+T95yBQpoG/PUed8+HGKkmoju7zFK6TlyjZjqcxIqc/2iuGDvqWZxpA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1xUA2JM0Kifxwg1BEptgAZbim2pVn2zFTTWeSHoiWfNCtmj4E
+	NiQujSs1fQ30FP+kn1DChqkb6ZR+GYEHRmmNX26ghvTdVNMumj0kAPAc
+X-Gm-Gg: ASbGnctVSL7RMG1UGTEblgcuA+qRLBNID3fWBIKuOG5YJ0eT0ZyjVbIL45GD6HPzNxg
+	r7JuQIhzY7anizSIqtnVwqOBn5xrw2q6WpVV0MrTrS53lQ5HnV5iqNUq0zzf67WkGk38QE3wfV2
+	5e/HqQNF/VdBQrg49mR6ueP2CB9FJVqjNBntcCqT5zWgX8IMfMkdU5HomeSGYSrQl894o1XB/w+
+	jGG+MkAWA1ZS+wq3zhn7Rxchp+6t5TRZQBw0AYkUbm/3e4/PAXUOcWuanT8+8T0z8AjR94CCN+p
+	lvfnVBUvYqyx/c3d7VHI3jXyplej26LwUiiQMIzyo/+Z8p6qk9O+U4smB65kYyO0bUglLKEoMpP
+	WeHMzEiH9adZvvcUWZj0640UudC0KiQ0XcN8c19tdBQ==
+X-Google-Smtp-Source: AGHT+IGLIvAM19ntk8+Lddvjl2AdkR8Dpz1fEGG8f6oAy2PmwyG5FhSovK+XEHlRkEKZ9R+AN8qtiw==
+X-Received: by 2002:a0d:d081:0:b0:74f:5366:86ba with SMTP id 00721157ae682-763fa430ad4mr57737817b3.12.1758891491815;
+        Fri, 26 Sep 2025 05:58:11 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-765bd407b84sm10951587b3.21.2025.09.26.05.58.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Sep 2025 05:58:11 -0700 (PDT)
+Date: Fri, 26 Sep 2025 05:58:08 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: I Viswanath <viswanathiyyappan@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com,
+	syzbot+94d20db923b9f51be0df@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v3] ptp: Add a upper bound on max_vclocks
+Message-ID: <aNaN4DtuP0QJZVus@hoboy.vegasvil.org>
+References: <20250925155908.5034-1-viswanathiyyappan@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="+8nn4MSiO0Z4/+w5"
-Content-Disposition: inline
-In-Reply-To: <87ldm12zoq.fsf@cloudflare.com>
-
-
---+8nn4MSiO0Z4/+w5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250925155908.5034-1-viswanathiyyappan@gmail.com>
 
-> On Fri, Sep 26, 2025 at 01:45 PM +02, Jesper Dangaard Brouer wrote:
-> > On 25/09/2025 12.58, Jakub Sitnicki wrote:
-> >> On Thu, Sep 25, 2025 at 12:39 PM +02, Lorenzo Bianconi wrote:
-> >>>> On Thu, Sep 25, 2025 at 11:30 AM +02, Lorenzo Bianconi wrote:
-> >>>>> Introduce bpf_xdp_metadata_rx_checksum() kfunc in order to load the=
- HW
-> >>>>> RX cheksum results in the eBPF program binded to the NIC.
-> >>>>> Implement xmo_rx_checksum callback for veth and ice drivers.
-> >>>>
-> >>>> What are going to do with HW RX checksum once XDP prog can access it?
-> >>>
-> >>> I guess there are multiple use-cases for bpf_xdp_metadata_rx_checksum=
-()
-> >>> kfunc. The first the I have in mind is when packets are received by a=
-n af_xdp
-> >>> application. In this case I think we currently do not have any way to=
- check if
-> >>> the packet checksum is correct, right?
-> >>> I think Jesper has other use-cases in mind, I will let him comment
-> >>> here.
-> >> Can you share more details on what the AF_XDP application would that
-> >> info?
-> >
-> > Today the AF_XDP application need to verify the packet checksum, as it
-> > gets raw xdp_frame packets directly from hardware (no layer in-between
-> > checked this).  Getting the RX-checksum validation from hardware info
-> > will be very useful for AF_XDP, as it can avoid doing this in software.
-> >
-> >
-> >> Regarding the use cases that Jesper is trying to unlock, as things sta=
-nd
-> >> we don't have a way, or an agreement on how to inject/propagate even t=
-he
-> >> already existing NIC hints back into the network stack.
-> >>=20
-> >
-> > This patchset have its own merits and shouldn't be connected with my
-> > use-case of (optionally) including hardware offloads in the xdp_frame.
-> > Sure, I obviously also want this RX-checksum added, but this patchset is
-> > useful on it's own.
-> >
-> >> Hence my question - why do we want to expose another NIC hint to XDP
-> >> that we can't consume in any useful way yet?
-> >>=20
-> >
-> > Well here *are* useful ways to use this RX-checksum info on its own.
-> > See my explanation of the DDoS use-case here[1] in other email.
-> >
-> > Cloudflare actually also have a concrete use-case for needing this.
-> > Our XDP based Unimog[2] load-balancer (and DDoS) encapsulate all
-> > packets when they are XDP_TX forwarded. The encap receiving NIC lacking
-> > inner-packet checksum validation make us loose this hardware offload.
-> > This would allow us to save some checksum validation or even just DDOS =
-drop
-> > based on hardware checksum validation prior to encap (as in [1]).
->=20
-> Thanks for filling in the blanks, Jesper. That's the context that I was
-> missing.
->=20
-> Lorenzo, this motivaton seems worth including in the cover letter.
+On Thu, Sep 25, 2025 at 09:29:08PM +0530, I Viswanath wrote:
+> syzbot reported WARNING in max_vclocks_store.
+> 
+> This occurs when the argument max is too large for kcalloc to handle.
+> 
+> Extend the guard to guard against values that are too large for
+> kcalloc
+> 
+> Reported-by: syzbot+94d20db923b9f51be0df@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=94d20db923b9f51be0df
+> Tested-by: syzbot+94d20db923b9f51be0df@syzkaller.appspotmail.com
+> Fixes: 73f37068d540 ("ptp: support ptp physical/virtual clocks conversion")
+> Signed-off-by: I Viswanath <viswanathiyyappan@gmail.com>
 
-ack, I will do.
-
-Regards,
-Lorenzo
-
-
---+8nn4MSiO0Z4/+w5
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaNaNVgAKCRA6cBh0uS2t
-rL3XAQD8GN9wvWAXagWwB1Sz8I/terYM2elqSFXzjHbVzB4I9gD+K7WMUCpKHc20
-3uWnZNrOOHV0R5Qjh7lK1nf04Gg9kQk=
-=UrqH
------END PGP SIGNATURE-----
-
---+8nn4MSiO0Z4/+w5--
+Acked-by: Richard Cochran <richardcochran@gmail.com>
 
