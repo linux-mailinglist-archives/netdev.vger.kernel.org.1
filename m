@@ -1,130 +1,172 @@
-Return-Path: <netdev+bounces-226753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0684BA4B8F
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:56:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6B3CBA4BA9
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 18:59:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1564C1C229D9
-	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:57:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80C204A2F1F
+	for <lists+netdev@lfdr.de>; Fri, 26 Sep 2025 16:59:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE89308F16;
-	Fri, 26 Sep 2025 16:56:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7DFE30B539;
+	Fri, 26 Sep 2025 16:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CoWTEHTR"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="zPmry0cB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5233A1D86DC
-	for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 16:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BCC730597F;
+	Fri, 26 Sep 2025 16:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758905795; cv=none; b=c1asUdmlchnCuMfelcVxoBErGFmLQN9v1Xuk8gs1M04jj4zDO4WNM+PCvnJeTlDmyKvsKHxP2MRbbjzs6AlNuC7cg84L9sr6GiAr9ah/uVKtYhIt+8E2VGK6CCOFfE2176dllhOZ5bxy6WQJ80MdfrNeQFl0y4+j4dzCa2Y3kNQ=
+	t=1758905944; cv=none; b=Yr8fkLGha7rT3QW33QAjr3UhDAPoC1Q4NcziFFSbUAISUYVycV2DMKrx2poeQNN/RWq2UsMAiQfHuhI2fNqqcLe8yQA2Yh3MIgY0hATuja4iczmUDPW64SQTxUcAzdtlYeYSHPfz+5FE9EELNbOSlrDFyOBXPUABu0+ZYtMfjIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758905795; c=relaxed/simple;
-	bh=pXbsgR7Ss1aZW3LlfLUf8FaVnZ9Gf2yLcMLB47EnsOc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JFNeaeXn2bwPbTnKAtzyHh6/vo8j5CDpgEv3WB37quNHTIzk8DBggHDxEgr2K9P6ItZKSyuUTRg6dWi75m8gOUvzH3yEHfWr7PJ2jzNRKA70bBPnKT0K6FeOdkJgCreIXFqTOm0Qq4uI6j/wh3wqz1Ce25oomXFkyUMbeR6ty5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CoWTEHTR; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758905793;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pXbsgR7Ss1aZW3LlfLUf8FaVnZ9Gf2yLcMLB47EnsOc=;
-	b=CoWTEHTRcUr2vMLRYOgll24MCESPKgM8YVcuHG9vO4n8ybwBQdad2WOyTL1s8zgs8CEJB7
-	dDdb8fbUXISwP1V3+6VltuYIkqZQ65Wt0bKsQgfBk0F02MOky+7aGE+o+goREUyQFaGMq/
-	uAugh4RoT+k0yyiIakXVFC+fwU3Os3I=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-92-0BTyj1FmMaaYVenxEw2o2w-1; Fri, 26 Sep 2025 12:56:32 -0400
-X-MC-Unique: 0BTyj1FmMaaYVenxEw2o2w-1
-X-Mimecast-MFC-AGG-ID: 0BTyj1FmMaaYVenxEw2o2w_1758905791
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-32ee4998c50so2133398a91.3
-        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 09:56:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758905791; x=1759510591;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pXbsgR7Ss1aZW3LlfLUf8FaVnZ9Gf2yLcMLB47EnsOc=;
-        b=oNiLXS24KOQylut6o5RE5mJblFB7qrGbAGAPHIRb7gqATogvJvKffvTcgVUHpULbTU
-         N2Y6QN7F5lte/FOJVh5ftFglJGaaO8zLO0GIXiAq5/A55DXXHoM6Tn4MYzZRyPxuQmd8
-         zNs2aMuxhqYwr+6FC1K5dK4x6QVVwqRbCUhVqeS5nsNvt8oMAInguAqKaHTyZuXqZBY3
-         XAL1e5/1FYywwzoAaWu88HvAupEON+dGaBNZypAOZFnUOmoNI5W8Z+U5ZtGdN/mesKPv
-         QPK5d9Mtn30R7zwWQpkXBfBNYudC1UvG9jVhRxJQVXc3fExx8ZkAjZZmU9hfUnSJlm2D
-         0ZhA==
-X-Forwarded-Encrypted: i=1; AJvYcCWX479v9ljZG6MZeBgIvgZDqz7ClPxGECOGkM1csZth1SHafGbd17ohIycfu/VdkAuj31Rt68s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9jvsMRhhWiafcXpyt/x7NqjltOmHhpl1fQVidozGNpBWwHplr
-	Cn1eBJStEcI99/Tx1a9ZuLANxP0vRta94vSha7hpOIfozdpZhaEVeYd6XQKLqqLneOmyeC86Tq0
-	nFy31iu31bzFqeoiS+B+MtkRHjMqnZaynUNC9XMLBQbgDeK0+2T1UkdXrFZcwEqCMlYMHkHU2Oa
-	rpnq1mOIrM+T/1CQALxR7cL9VXqpxYp3tF
-X-Gm-Gg: ASbGncs/+ar1c6RdN7bN4yEEQO9mOWuTDQ8yx+mSR6wmn+1PCNEq1uNje30PGcVRg7u
-	dyDdO6ZigKYtO7La2X57qx2DjcDcobf00b30p0FNNjFe7GpueTW93x0zlx5ftPEndh1fEPmUkNZ
-	/nvLj0J1WC0Tru8d0i
-X-Received: by 2002:a17:90b:1c8e:b0:330:6d2f:1b5d with SMTP id 98e67ed59e1d1-3342a2e3a0amr9010759a91.26.1758905790894;
-        Fri, 26 Sep 2025 09:56:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHe/T2nb02ygPzWQlJc91OzCWfWy7tzKbeCqK0AzZtfTw4rJhgRJgzOCPPd+wuatdh/bS3alm4U9h9urtacQQ4=
-X-Received: by 2002:a17:90b:1c8e:b0:330:6d2f:1b5d with SMTP id
- 98e67ed59e1d1-3342a2e3a0amr9010727a91.26.1758905790446; Fri, 26 Sep 2025
- 09:56:30 -0700 (PDT)
+	s=arc-20240116; t=1758905944; c=relaxed/simple;
+	bh=Nv1y1fToKCLS5D56SGWW3Fu02+TSW9GRhBBGCOoj1CY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=L21c4xznzSwn8GBal+LEJ4pV8mLybURe7prtjrRzIba9W+jll5q8JWzPkLhQ/nAdCEKGrVD81Vcu1K8smFwnGISg2tCdy0Yvg/LGM+SJorZE5CF6VJrRXBqd+mSlSrnSUVAhOlwVZ0TrGQcRvtfwJwH5OgkZYc/nXuNfOfPm6Gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=zPmry0cB; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 58QGwqoq1724430;
+	Fri, 26 Sep 2025 11:58:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1758905932;
+	bh=I+fvoCdpVjcpW6UNDPo2u0wUq3wToFlQcHSjQljHVmc=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=zPmry0cBQUeAHT8RLuJArVnm2ZntV5ECbGa/ln5JQhEw3Zz9drcNLP3yK/M2hZvTp
+	 FBk+5XfIN6xTdvygI6Y0dZ6jZM8c7tYLxvpO8vVxmfdnGz2LLMGYb2jSFZj6BBMToc
+	 xHhzpbs46h779CU+nnRpAJvjEgvKW/Fqd5HefI28=
+Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
+	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 58QGwq3q3562496
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Fri, 26 Sep 2025 11:58:52 -0500
+Received: from DLEE208.ent.ti.com (157.170.170.97) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Fri, 26
+ Sep 2025 11:58:52 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE208.ent.ti.com
+ (157.170.170.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Fri, 26 Sep 2025 11:58:52 -0500
+Received: from [10.249.139.123] ([10.249.139.123])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 58QGwm3w1617584;
+	Fri, 26 Sep 2025 11:58:48 -0500
+Message-ID: <08a13fb0-dd12-491e-98af-ef67d55cc403@ti.com>
+Date: Fri, 26 Sep 2025 22:28:47 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com> <wcts7brlugr337mcdfbrz5vkhvjikcaql3pdzgke5ahuuut37v@mgcqyo2umu7w>
-In-Reply-To: <wcts7brlugr337mcdfbrz5vkhvjikcaql3pdzgke5ahuuut37v@mgcqyo2umu7w>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Fri, 26 Sep 2025 18:56:19 +0200
-X-Gm-Features: AS18NWDruDib3lxkmBnMwisbhI6jtN_YtNKGNRjNW1-ckH59RRm0Bu1PSqLse0I
-Message-ID: <CAGxU2F6pZ7Bp53M3fTpSGDQYnrfxrttQc5bDmQLQX0cseW2A_Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 0/9] vsock: add namespace support to vhost-vsock
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, 
-	Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, berrange@redhat.com, 
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: netcp: Fix crash in error path when DMA channel open
+ fails
+To: Simon Horman <horms@kernel.org>
+CC: Nishanth Menon <nm@ti.com>,
+        =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?=
+	<u.kleine-koenig@baylibre.com>,
+        Paolo Abeni <pabeni@redhat.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Andrew Lunn <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <s-vadapalli@ti.com>
+References: <20250926150853.2907028-1-nm@ti.com>
+ <aNa7rEQLJreJF58p@horms.kernel.org>
+ <ef2bd666-f320-4dc5-b7ae-d12c0487c284@ti.com>
+ <aNbCgK76kQqhcQY2@horms.kernel.org>
+Content-Language: en-US
+From: Siddharth Vadapalli <s-vadapalli@ti.com>
+In-Reply-To: <aNbCgK76kQqhcQY2@horms.kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Fri, 26 Sept 2025 at 15:53, Stefano Garzarella <sgarzare@redhat.com> wrote:
->
-> Hi Bobby,
->
-> On Tue, Sep 16, 2025 at 04:43:44PM -0700, Bobby Eshleman wrote:
-> >This series adds namespace support to vhost-vsock and loopback. It does
-> >not add namespaces to any of the other guest transports (virtio-vsock,
-> >hyperv, or vmci).
->
-> Thanks for this new series and the patience!
-> I've been a bit messed up after KVM Forum between personal stuff and
-> other things. I'm starting to review and test today, so between this
-> afternoon and Monday I hope to send you all my comments.
+On 26/09/25 10:12 PM, Simon Horman wrote:
+> On Fri, Sep 26, 2025 at 09:57:02PM +0530, Siddharth Vadapalli wrote:
+>> On 26/09/25 9:43 PM, Simon Horman wrote:
+>>> On Fri, Sep 26, 2025 at 10:08:53AM -0500, Nishanth Menon wrote:
+>>>> When knav_dma_open_channel() fails in netcp_setup_navigator_resources(),
+>>>> the rx_channel field is set to an ERR_PTR value. Later, when
+>>>> netcp_free_navigator_resources() is called in the error path, it attempts
+>>>> to close this invalid channel pointer, causing a crash.
+>>>>
+>>>> Add a check for ERR values to handle the failure scenario.
+>>>>
+>>>> Fixes: 84640e27f230 ("net: netcp: Add Keystone NetCP core driver")
+>>>> Signed-off-by: Nishanth Menon <nm@ti.com>
+>>>> ---
+>>>>
+>>>> Seen on kci log for k2hk: https://dashboard.kernelci.org/log-viewer?itemId=ti%3A2eb55ed935eb42c292e02f59&org=ti&type=test&url=http%3A%2F%2Ffiles.kernelci.org%2F%2Fti%2Fmainline%2Fmaster%2Fv6.17-rc7-59-gbf40f4b87761%2Farm%2Fmulti_v7_defconfig%2BCONFIG_EFI%3Dy%2BCONFIG_ARM_LPAE%3Dy%2Bdebug%2Bkselftest%2Btinyconfig%2Fgcc-12%2Fbaseline-nfs-boot.nfs-k2hk-evm.txt.gz
+>>>>
+>>>>    drivers/net/ethernet/ti/netcp_core.c | 2 +-
+>>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/ti/netcp_core.c b/drivers/net/ethernet/ti/netcp_core.c
+>>>> index 857820657bac..4ff17fd6caae 100644
+>>>> --- a/drivers/net/ethernet/ti/netcp_core.c
+>>>> +++ b/drivers/net/ethernet/ti/netcp_core.c
+>>>> @@ -1549,7 +1549,7 @@ static void netcp_free_navigator_resources(struct netcp_intf *netcp)
+>>>>    {
+>>>>    	int i;
+>>>> -	if (netcp->rx_channel) {
+>>>> +	if (!IS_ERR(netcp->rx_channel)) {
+>>>>    		knav_dma_close_channel(netcp->rx_channel);
+>>>>    		netcp->rx_channel = NULL;
+>>>>    	}
+>>>
+>>> Hi Nishanth,
+>>>
+>>> Thanks for your patch.
+>>>
+>>> I expect that netcp_txpipe_close() has a similar problem too.
+>>>
+>>> But I also think that using IS_ERR is not correct, because it seems to me
+>>> that there are also cases where rx_channel can be NULL.
+>>
+>> Could you please clarify where rx_channel is NULL? rx_channel is set by
+>> invoking knav_dma_open_channel().
+> 
+> Hi Siddharth,
+> 
+> I am assuming that when netcp_setup_navigator_resources() is called, at
+> least for the first time, that netcp->rx_channel is NULL. So any of the
+> occurrence of 'goto fail' in that function before the call to
+> knav_dma_open_channel().
 
-Okay, I reviewed most of them (I'll do the selftest patches on Monday)
-and I think we are near :-)
+I missed this. Thank you for pointing this out.
 
-Just a general suggestion, please spend more time on commit description.
-All of them should explain better the reasoning behind. This it will
-simplify the review, but also future debug.
+> 
+>> Also, please refer to:
+>> https://github.com/torvalds/linux/commit/5b6cb43b4d62
+>> which specifically points out that knav_dma_open_channel() will not return
+>> NULL so the check for NULL isn't required.
+>>>
+>>> I see that on error knav_dma_open_channel() always returns ERR_PTR(-EINVAL)
+>>> (open coded as (void *)-EINVAL) on error. So I think a better approach
+>>> would be to change knav_dma_open_channel() to return NULL, and update callers
+>>> accordingly.
+>>
+>> The commit referred to above made changes to the driver specifically due to
+>> the observation that knav_dma_open_channel() never returns NULL. Modifying
+>> knav_dma_open_channel() to return NULL will effectively result in having to
+>> undo the changes made by the commit.
+> 
+> I wasn't aware of that patch. But my observation is that the return value
+> of knav_dma_open_channel() is still not handled correctly. E.g. the bug
+> your patch is fixing.  And I'm proposing an alternate approach which I feel
+> will be less error-prone.
 
-Thanks and have a nice weekend!
-Stefano
-
+Ok. If I understand correctly, you are proposing that the 'error codes' 
+returned by knav_dma_open_channel() should be turned into a dev_err() 
+print for the user and knav_dma_open_channel() should always return NULL 
+in case of failure and a pointer to the channel in case of success. Is 
+that right?
 
