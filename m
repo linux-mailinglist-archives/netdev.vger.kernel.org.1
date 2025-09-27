@@ -1,180 +1,95 @@
-Return-Path: <netdev+bounces-226845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F01D0BA596F
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 08:00:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F398DBA5A6A
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 09:49:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADA687AC22F
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 05:58:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB55F7A4F75
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 07:47:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FBEF14B08A;
-	Sat, 27 Sep 2025 06:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3555C2D2494;
+	Sat, 27 Sep 2025 07:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b="vp4vvn4d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us.padl.com (us.padl.com [216.154.215.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA1919A2A3
-	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 06:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E1A2D2483
+	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 07:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.154.215.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758952823; cv=none; b=gSWOUb5XkgVDFoOtjZjbhOltoUPvJiSRxI3/UpBIa7eZEKKLec4o3KSM8M7XsGSFSwsjxiNgUVra/tvUQ7e34IVPvkITUasU3SXQpA3fLgRTBfxM74/K2alxB3CPQc7/Adq46741S7bPWpBfBHyWFP/RYreGK+MtmA55Qhl7Rzc=
+	t=1758959358; cv=none; b=XAVdkpCzVRHMfWloalYire6xw09y4MShEeKxr41XFt7tX5jwbQbqvzW5jyFPFJOrBXV/tgbs4AThOvxL1MrF7IvXOntCRqGbZDMtQv1KPr7pp81arcK6x8Wl2xGSDhed3DfWU0MJ/ru24skIvtH8CI9O2nRi6tpy7WrQhBFpG/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758952823; c=relaxed/simple;
-	bh=FVQqXZ6vvoXNmyMYata7NERxIppVX1MU+bw6AFoO/xc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=AbfDwteUzPAZNnl3P1nBvSvhkeXqJbk9ZapZC9vcMYO4UKQQIr5MNsJ+M29vOnzeIqbYg4xouHRkUb3Tk0me6sXQywKh9vHan5uIfBUT1fxyVAgucOx96Iqda562AoN7YId8AxorSgIkqIfWKm3JhwCRKk48VdlJgNREejpklQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-4257ae42790so43088775ab.1
-        for <netdev@vger.kernel.org>; Fri, 26 Sep 2025 23:00:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758952821; x=1759557621;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QWqloIokgAjTlc/Iwy59kZ1QnAzpWW7VXmqR0dpPQns=;
-        b=nULrp/bIgnZWWoyG5V5yKGCeWIk7mLXqMZ6eTPWRYOpSjm01QxANBzseIC8Pmv7gBX
-         wKqocFnNczizx6/AnXuB7l1mhgMM1OqxxoENtgB+21Yy4flIZMfm4AseRjnyIlqO0yGJ
-         iLR0J8pTF+mYpxwsHDIAZNM1QJDb1PSAjISg+q2qR52j297gLlK5dTEg0q7GMNRfcl/4
-         yFyB1knkVXqJAzr5dhMAdY3vHrHOrAeMOTiehmKSGIQXoW4Q6YY0co1PdlQxNgQAvcii
-         RDhTfbMbbx6pNr6q7+LLl7oV+qpcH6HJuzVjGhLH7d3jUOkEJ2qmDP13vtq/DPnbfo7E
-         9Eiw==
-X-Forwarded-Encrypted: i=1; AJvYcCWfPYxPGjZxaWeumKBw7O99QMYjsnH3dbJNz3NzkO31qHpAbOtPdpIQEdPEqkfEWN2922lMuK4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8xzIWhBeF2Ho5pNBZQJraSw33mC6El1ZVcZTFz4SVTbUXUqnD
-	m/ZSCOVgdRCX8w34AWEqPsnugzwtNA0SkUmVnSmQGq1XMYV59vZfTOAyV6LIxXbJLlI+Nch/Akw
-	JpZfk+kAPUM/dARybaB8vctwiCS5BxBNWO7gweoamWqCUHwJXtkZaLGeOejE=
-X-Google-Smtp-Source: AGHT+IHe74HBd6XEftIHGctkYHXJNu2pVLYANpsk/N72/KgZxq1RUrUa6XMWAdCTD7RhQCvIKhavXgVuoTBzps71NWqb/YQd/ADv
+	s=arc-20240116; t=1758959358; c=relaxed/simple;
+	bh=cM2LE/IjK2+fVUeGLy4ZX9AFIw8HGEeNVYsybOBvAP8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dlLOqicVPf8w8ceJGeU9zTbTddxlcaqcscArUDJ+shjHEpxUovA4L+qc7icj6v5Ffy8VUQ4TxXRhMBOFWLpgGVflZtdrQHwMvREttAPr53grBTE0F3R9B5gV4wPG47wbsLsw+9aoPy8TmtXqm7n8XveEA6VOm7G96GRhBotWXNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=vp4vvn4d; arc=none smtp.client-ip=216.154.215.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=padl.com
+Received: from auth (localhost [127.0.0.1]) by us.padl.com (8.14.7/8.14.7) with ESMTP id 58R77w88026773
+	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Sat, 27 Sep 2025 08:08:06 +0100
+DKIM-Filter: OpenDKIM Filter v2.11.0 us.padl.com 58R77w88026773
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
+	t=1758956891; bh=wsU+nWQB/1rUdndDZxvRlD/wK09rDEdcWidV7DKcsxU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=vp4vvn4dlX4Nrm5ghrg7d0XFogeQ1tyzVmeCpu5x1n7QMQh4D2+5H5/GTMvWUrfBT
+	 dKsTiq1Yvpa4KBlOhhCp0Y58+RB72Rp+qrd0Zn101yWBYcstM0TTWiUhylI2vEPJaM
+	 WgJSakwKSslEkria5aslpgiRIs50bMzg9z22xhWQ8bxdggF2uoksxRx9fl01pQ6aJn
+	 nytcDOQFEUAVWtC/O1FNdtJJksqNZjCdRVwiTcEtDfFYgvpqlJGt0zYv+U5bx+MbI7
+	 HcUs6Hf5f3rSzsl5yRC+8h4iVH+bYrARNGOVnn8SHQFAfJs0eE8Zb8VF4Yn30qsZaF
+	 +0csv5zyJI3MA==
+From: Luke Howard <lukeh@padl.com>
+To: netdev@vger.kernel.org
+Cc: andrew@lunn.ch, vladimir.oltean@nxp.com, kieran@sienda.com,
+        jcschroeder@gmail.com, max@huntershome.org,
+        Luke Howard <lukeh@padl.com>
+Subject: [RFC net-next 0/5] net: dsa: mv88e6xxx: support for 802.1Qav
+Date: Sat, 27 Sep 2025 17:07:03 +1000
+Message-ID: <20250927070724.734933-1-lukeh@padl.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:218f:b0:405:5e08:a3e4 with SMTP id
- e9e14a558f8ab-425955c5585mr136861695ab.1.1758952820978; Fri, 26 Sep 2025
- 23:00:20 -0700 (PDT)
-Date: Fri, 26 Sep 2025 23:00:20 -0700
-In-Reply-To: <20250926-scratch-bobbyeshleman-devmem-tcp-token-upstream-v4-0-39156563c3ea@meta.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68d77d74.a00a0220.102ee.000e.GAE@google.com>
-Subject: [syzbot ci] Re: net: devmem: improve cpu cost of RX token management
-From: syzbot ci <syzbot+ci88b77c4aee0f7057@syzkaller.appspotmail.com>
-To: almasrymina@google.com, bobbyeshleman@gmail.com, bobbyeshleman@meta.com, 
-	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, kuniyu@google.com, 
-	linux-kernel@vger.kernel.org, ncardwell@google.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sdf@fomichev.me, willemb@google.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot ci has tested the following series
+Add hardware offloaded 802.1Qav support to conforming Marvell switches.
 
-[v4] net: devmem: improve cpu cost of RX token management
-https://lore.kernel.org/all/20250926-scratch-bobbyeshleman-devmem-tcp-token-upstream-v4-0-39156563c3ea@meta.com
-* [PATCH net-next v4 1/2] net: devmem: rename tx_vec to vec in dmabuf binding
-* [PATCH net-next v4 2/2] net: devmem: use niov array for token management
+Tested with 88E6341 and 88E6352 switch chips.
 
-and found the following issue:
-general protection fault in sock_devmem_dontneed
+Luke Howard (5):
+  net: dsa: mv88e6xxx: add num_tx_queues to chip info structure
+  net: dsa: mv88e6xxx: add MV88E6XXX_G1_ATU_CTL_MAC_AVB setter
+  net: dsa: mv88e6xxx: MQPRIO support
+  net: dsa: mv88e6xxx: CBS support
+  dt-bindings: net: dsa: mv88e6xxx: add mv88e6xxx-avb-mode property
 
-Full report is available here:
-https://ci.syzbot.org/series/b8209bd4-e9f0-4c54-bad3-613e8431151b
+ .../bindings/net/dsa/marvell,mv88e6xxx.yaml   |  25 +
+ drivers/net/dsa/mv88e6xxx/Makefile            |   3 +-
+ drivers/net/dsa/mv88e6xxx/avb.c               | 663 ++++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/avb.h               | 244 +++++++
+ drivers/net/dsa/mv88e6xxx/chip.c              | 308 +++++++-
+ drivers/net/dsa/mv88e6xxx/chip.h              |  81 +++
+ drivers/net/dsa/mv88e6xxx/global1.c           |   9 +-
+ drivers/net/dsa/mv88e6xxx/global1.h           |  47 +-
+ drivers/net/dsa/mv88e6xxx/global1_atu.c       |  17 +
+ drivers/net/dsa/mv88e6xxx/global2.h           |  14 +-
+ drivers/net/dsa/mv88e6xxx/global2_avb.c       | 205 +++++-
+ drivers/net/dsa/mv88e6xxx/port.c              |   9 +
+ drivers/net/dsa/mv88e6xxx/port.h              |   2 +
+ include/linux/platform_data/mv88e6xxx.h       |   1 +
+ 14 files changed, 1607 insertions(+), 21 deletions(-)
+ create mode 100644 drivers/net/dsa/mv88e6xxx/avb.c
+ create mode 100644 drivers/net/dsa/mv88e6xxx/avb.h
 
-***
+-- 
+2.43.0
 
-general protection fault in sock_devmem_dontneed
-
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      dc1dea796b197aba2c3cae25bfef45f4b3ad46fe
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/b4d90fd9-9fbe-4e17-8fc0-3d6603df09da/config
-C repro:   https://ci.syzbot.org/findings/ce81b3c3-3db8-4643-9731-cbe331c65fdb/c_repro
-syz repro: https://ci.syzbot.org/findings/ce81b3c3-3db8-4643-9731-cbe331c65fdb/syz_repro
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 1 UID: 0 PID: 5996 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:sock_devmem_dontneed+0x372/0x920 net/core/sock.c:1113
-Code: 48 44 8b 20 44 89 74 24 54 45 01 f4 48 8b 44 24 60 42 80 3c 28 00 74 08 48 89 df e8 e8 5a c9 f8 4c 8b 33 4c 89 f0 48 c1 e8 03 <42> 80 3c 28 00 74 08 4c 89 f7 e8 cf 5a c9 f8 4d 8b 3e 4c 89 f8 48
-RSP: 0018:ffffc90002a1fac0 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffff88810a8ab710 RCX: 1ffff11023002f45
-RDX: ffff88801b339cc0 RSI: 0000000000002000 RDI: 0000000000000000
-RBP: ffffc90002a1fc50 R08: ffffc90002a1fbdf R09: 0000000000000000
-R10: ffffc90002a1fb60 R11: fffff52000543f7c R12: 0000000000f07000
-R13: dffffc0000000000 R14: 0000000000000000 R15: ffff88810a8ab710
-FS:  000055556f85a500(0000) GS:ffff8881a3c3d000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00002000000a2000 CR3: 0000000024516000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- sk_setsockopt+0x682/0x2dc0 net/core/sock.c:1304
- do_sock_setsockopt+0x11b/0x1b0 net/socket.c:2340
- __sys_setsockopt net/socket.c:2369 [inline]
- __do_sys_setsockopt net/socket.c:2375 [inline]
- __se_sys_setsockopt net/socket.c:2372 [inline]
- __x64_sys_setsockopt+0x13f/0x1b0 net/socket.c:2372
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fea0438ec29
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffd04a8f368 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 00007fea045d5fa0 RCX: 00007fea0438ec29
-RDX: 0000000000000050 RSI: 0000000000000001 RDI: 0000000000000003
-RBP: 00007fea04411e41 R08: 0000000000000010 R09: 0000000000000000
-R10: 00002000000a2000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fea045d5fa0 R14: 00007fea045d5fa0 R15: 0000000000000005
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:sock_devmem_dontneed+0x372/0x920 net/core/sock.c:1113
-Code: 48 44 8b 20 44 89 74 24 54 45 01 f4 48 8b 44 24 60 42 80 3c 28 00 74 08 48 89 df e8 e8 5a c9 f8 4c 8b 33 4c 89 f0 48 c1 e8 03 <42> 80 3c 28 00 74 08 4c 89 f7 e8 cf 5a c9 f8 4d 8b 3e 4c 89 f8 48
-RSP: 0018:ffffc90002a1fac0 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffff88810a8ab710 RCX: 1ffff11023002f45
-RDX: ffff88801b339cc0 RSI: 0000000000002000 RDI: 0000000000000000
-RBP: ffffc90002a1fc50 R08: ffffc90002a1fbdf R09: 0000000000000000
-R10: ffffc90002a1fb60 R11: fffff52000543f7c R12: 0000000000f07000
-R13: dffffc0000000000 R14: 0000000000000000 R15: ffff88810a8ab710
-FS:  000055556f85a500(0000) GS:ffff8881a3c3d000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00002000000a2000 CR3: 0000000024516000 CR4: 00000000000006f0
-----------------
-Code disassembly (best guess):
-   0:	48                   	rex.W
-   1:	44 8b 20             	mov    (%rax),%r12d
-   4:	44 89 74 24 54       	mov    %r14d,0x54(%rsp)
-   9:	45 01 f4             	add    %r14d,%r12d
-   c:	48 8b 44 24 60       	mov    0x60(%rsp),%rax
-  11:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1)
-  16:	74 08                	je     0x20
-  18:	48 89 df             	mov    %rbx,%rdi
-  1b:	e8 e8 5a c9 f8       	call   0xf8c95b08
-  20:	4c 8b 33             	mov    (%rbx),%r14
-  23:	4c 89 f0             	mov    %r14,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	4c 89 f7             	mov    %r14,%rdi
-  34:	e8 cf 5a c9 f8       	call   0xf8c95b08
-  39:	4d 8b 3e             	mov    (%r14),%r15
-  3c:	4c 89 f8             	mov    %r15,%rax
-  3f:	48                   	rex.W
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
