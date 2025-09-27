@@ -1,60 +1,64 @@
-Return-Path: <netdev+bounces-226847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C3DDBA5A12
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 09:08:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D51E6BA5A1C
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 09:21:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF6AA2A4268
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 07:08:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EB844C6904
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 07:21:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F57283FE1;
-	Sat, 27 Sep 2025 07:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9081029E10F;
+	Sat, 27 Sep 2025 07:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b="yFhIyI8P"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mboxify.com header.i=@mboxify.com header.b="sKhmHb+h"
 X-Original-To: netdev@vger.kernel.org
-Received: from us.padl.com (us.padl.com [216.154.215.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-108-mta9.mxroute.com (mail-108-mta9.mxroute.com [136.175.108.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3FD27A928
-	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 07:08:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.154.215.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D08129D267
+	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 07:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.175.108.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758956919; cv=none; b=D5UYlfu+131LlO/xcdcTfuokRGn/lCA75UrfKl4IFIg9Pdj+fI0w8r9p473qEdXawZGaXwxVRwv3Mx3a7XrsV+8HNq8+7Hk6UQ8z1qWs9z+dwpKaCkbjzJx0S+CmWWJnZHEYo0qawJpqRi+dmDx511PzmFsnFScGclhP52CZvoI=
+	t=1758957660; cv=none; b=N43JlWRDoovvqJWSB5ATPzroOaHHZYagLJkQ8N12O6kvPI/GHjwm4HbyddO8R/Na8Xz7X1S1YU8Srot4YVrXEYorZPIpB739r8YlElDYi3ptYPJyw+Ol4MZkMc90xuvnOO/cxapPlvvxOW6nZjNSiKz6mqwtT1ZM+O3hmEPV/n0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758956919; c=relaxed/simple;
-	bh=GwYSL2nkCPuXZjnbJ/Os6l0os5/AtWZPUF/Fmhz9cuw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z5S0pchjuibDBHHxwHzNPPM29QiQjoNxYa4EkNpOrux441HyK1TiFbomvmWDydndfLTiMh36OauvPu95uLgqC6cjs3Oe/yLIXopsBmnYu/zpsWPS/eYE8qPcevMpmERXgghaHPNSk/DUjTrcfc8eGyVxIplX1ZsVPoGQ6tHSuNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=yFhIyI8P; arc=none smtp.client-ip=216.154.215.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=padl.com
-Received: from auth (localhost [127.0.0.1]) by us.padl.com (8.14.7/8.14.7) with ESMTP id 58R77w8D026773
-	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Sat, 27 Sep 2025 08:08:24 +0100
-DKIM-Filter: OpenDKIM Filter v2.11.0 us.padl.com 58R77w8D026773
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
-	t=1758956907; bh=dOJBIXw/tOw/nsGtimWEqRJNXsqsJvPEuj661JVrIY0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=yFhIyI8PHNftmWt0/2GD1qMLDByMfy1xWsTLirR1epD8ry+0UShs90Ux7q8dRpMPd
-	 QhPCoz19fkatui6VlqQHNsq+3YTjd96FDR1yEQjEBP6A9GZxrYOY45kQdr+Fj61toH
-	 fwe9GRnLcX8oOEc5cvMLtu2mUBR+Sg5y+5THKV9NGsozdSCAJuhW8AEkoHRlvcQVX5
-	 3xXhmnZIFDPHYsZKj0IDCiIkWoo+hNgf2zmyid4f/Xba51FrGn4exRKCmtUAGsVBvD
-	 D41+94WplMBKGHULqG4fWg86WiDLC6Ked0tRNifCneicT01leFuCd0qU4lT3PIhs1b
-	 r8qTzesXbUSlg==
-From: Luke Howard <lukeh@padl.com>
-To: netdev@vger.kernel.org
-Cc: andrew@lunn.ch, vladimir.oltean@nxp.com, kieran@sienda.com,
-        jcschroeder@gmail.com, max@huntershome.org,
-        Luke Howard <lukeh@padl.com>
-Subject: [RFC net-next 5/5] dt-bindings: net: dsa: mv88e6xxx: add mv88e6xxx-avb-mode property
-Date: Sat, 27 Sep 2025 17:07:08 +1000
-Message-ID: <20250927070724.734933-6-lukeh@padl.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250927070724.734933-1-lukeh@padl.com>
-References: <20250927070724.734933-1-lukeh@padl.com>
+	s=arc-20240116; t=1758957660; c=relaxed/simple;
+	bh=xgYxOpaT/Iobs1BrJfegcD18K53mxzzZ1+TaiJteypg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=coG40M0uIeK8prL/6M+5SZ6YP8eVxrPRyEw/QKpTKZL3WsScgDoZL9BOEsylYLPISihrOJpnevvEjSWu3PFCOjlHQ5MO1JZ4CEBxjmc07OZFil5DjcXIsFr/t+AyUbaVc2nm1qx+PE+VBaaXM4lefDFl8DctMiAbXZXY3bUXvxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mboxify.com; spf=pass smtp.mailfrom=mboxify.com; dkim=pass (2048-bit key) header.d=mboxify.com header.i=@mboxify.com header.b=sKhmHb+h; arc=none smtp.client-ip=136.175.108.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mboxify.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mboxify.com
+Received: from filter006.mxroute.com ([136.175.111.3] filter006.mxroute.com)
+ (Authenticated sender: mN4UYu2MZsgR)
+ by mail-108-mta9.mxroute.com (ZoneMTA) with ESMTPSA id 1998a0723ff000c244.006
+ for <netdev@vger.kernel.org>
+ (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+ Sat, 27 Sep 2025 07:15:47 +0000
+X-Zone-Loop: 4907d34813e86061ab8010c6dd9a2ef533c48af7be25
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mboxify.com
+	; s=x; h=Content-Transfer-Encoding:MIME-Version:Date:Subject:Cc:To:From:
+	Sender:Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:
+	References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:
+	List-Owner:List-Archive; bh=ifFTIe/bJAX4sMNv6aWG1MK5yvIqxjIeJ9DcYQN9/j0=; b=s
+	KhmHb+hiGBbIozrrJ5ug8TR9V0EHC3kpqdRZ6Nb3ax5pYvVC6D6sZW2E79jOmlVs+ilJ4hOVtDqLq
+	DpritBOt+m06vM2FPg1vICFVcQB7doSbZ87cv/CyCjuxiCZYLBDetZrx6UOyaiBAHedLaWhnx/UZX
+	mb9lDcEbyFGnap6wDTdumpKztE5qYGu9tyA7nVWmmBgpM0eVR+UrxGzstxnPLfhhNHTw8gY7vJMOR
+	15ZIsdnvnWwy6gXyiN73Sc7mm5i9i6ciuhLJ59EoCz0kvgMuyHG54BjmQnTjDcqdj+sncZEDLoDxe
+	xLd1i79VUlBlCo5mkqKzqvzDybY/wReag==;
+From: Bo Sun <bo@mboxify.com>
+To: sgoutham@marvell.com,
+	gakula@marvell.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bo Sun <bo@mboxify.com>
+Subject: [PATCH 0/2] octeontx2: fix bitmap leaks in PF and VF
+Date: Sat, 27 Sep 2025 15:15:03 +0800
+Message-Id: <20250927071505.915905-1-bo@mboxify.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,53 +66,18 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Authenticated-Id: bo@mboxify.com
 
-Add the vendor-specific marvell,mv88e6xxx-avb-mode property for adding
-stricter handling of frames with non-AVB frame priorities and destination
-addresses.
+Two small patches that free the AF_XDP bitmap in the PF and VF
+remove paths.  Both carry the same Fixes tag and should go to
+stable.
 
-Signed-off-by: Luke Howard <lukeh@padl.com>
----
- .../bindings/net/dsa/marvell,mv88e6xxx.yaml   | 25 +++++++++++++++++++
- 1 file changed, 25 insertions(+)
+Bo Sun (2):
+  octeontx2-vf: fix bitmap leak
+  octeontx2-pf: fix bitmap leak
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
-index 19f15bdd1c976..33d0cf5f21d5b 100644
---- a/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
-@@ -97,6 +97,31 @@ properties:
-     required:
-       - compatible
- 
-+  marvell,mv88e6xxx-avb-mode:
-+    description: Marvell MV88E6xxx that support Audio Video Bridging/Time
-+      Sensitive Networking (AVB/TSN) traffic prioritization can have ports
-+      ports configured in one of several modes. These modes control the
-+      handling of frames with non-AVB frame priorities and destination
-+      addresses.
-+    oneOf:
-+      - enum:
-+          - 0
-+          - 1
-+          - 2
-+      - description: |
-+        0: Standard Mode: frames with a priority that is mapped to an AVB
-+           traffic class (TC) are considered as AVB frames. Others frames
-+           are considered Legacy (non-AVB).
-+        1: Enhanced: frames with a priority that is mapped to an AVB TC
-+           and for which there is a static FDB or MDB entry are
-+           considered as AVB frames. Those with an AVB TC but no FDB or
-+	   MDB entry will be dropped. To avoid conflict with other multicast
-+           protocols, only AVTP (91:e0:f0) destination addresses are
-+           considered to be AVB multicast addresses.
-+        2: Secure: as for Enhanced, but also require the FDB or MDB entry
-+           to have its source port's bit set to one. In this mode, all
-+	   frames with an AVTP destination address must be valid AVB frames.
-+
- allOf:
-   - $ref: dsa.yaml#/$defs/ethernet-ports
- 
--- 
-2.43.0
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 1 +
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c | 1 +
+ 2 files changed, 2 insertions(+)
 
 
