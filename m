@@ -1,292 +1,96 @@
-Return-Path: <netdev+bounces-226902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0DE8BA6082
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 16:22:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7A94BA609A
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 16:29:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F02B0383960
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 14:22:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B0FE17D1A7
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 14:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8745D2E266C;
-	Sat, 27 Sep 2025 14:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 219F12DF15D;
+	Sat, 27 Sep 2025 14:29:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ph3kTDa3"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hDINF7oU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43AD2253A0
-	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 14:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E39E288C27
+	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 14:29:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758982952; cv=none; b=jb0JQDocnoDcLrXRxaeQn36jQxi4gq1YpuoZ9BiIth43L8AcUqyz4BhzxKt7EMqZHT2JeKEhOo+BbUx32eGNp4tNoJsEW4r1fjuXjinT7iO7y/vI7qskmG+Ggd7QonwxreFIqhhTS6WFNFRW0c489rsh2vDb35EBFgGJNievg0s=
+	t=1758983363; cv=none; b=Vo0Dy+aT1In+EIuhFHEJ1lBPdpb/g21w/4VOOLmxnK1JDPr4sGv1N0LLwg0MRSFb/jvMXZSrcJjJRDAb+pDvQaK3kAq72GenApqlg2cgpoRG6cVsj19pVf5vpY4dMJyLd4UK/tebVsj+puE8xsK2aQ3Ch2ToDr+CldmhSMEk0Yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758982952; c=relaxed/simple;
-	bh=2fIBwTIAdKpwRItFyJzhDhGr+KGeVYoEgNwbRczrq5Q=;
-	h=Message-ID:Date:MIME-Version:From:To:Subject:Cc:Content-Type; b=YQmuA7X8dDzJivu3JuZKjEjOR9ATy7ISf+x7y1Dhm7sa7zMlZGhUuyWwbprr1JuPRNPUU4QEUmH6imKYRU5UyfzBI7qi3AoPHLQtUvlZpvM6js5X5ZwLNpy37y+fleP+pAfxIs5/n82xJvhoCUvHT/7kTNUtVSaBwi5J7HOJPj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ph3kTDa3; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3ee1381b835so2666078f8f.1
-        for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 07:22:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758982948; x=1759587748; darn=vger.kernel.org;
-        h=cc:autocrypt:subject:to:content-language:from:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2fIBwTIAdKpwRItFyJzhDhGr+KGeVYoEgNwbRczrq5Q=;
-        b=Ph3kTDa3ejAQ9tkdFRPyyaH/VI43uCllqNZBiWzEqH5/MGsdtmI4I8zQsFD8opzVsF
-         WtEyYnixZBXryD/Kns7d/Zi+Bb57JZcr+t5Saib74BZYylGz9hW12ZwzFEUObr2Tc1x8
-         vHf56weCDXBygAoAnb11ENMWJpIDa7BORS4zAAOs3ZaIjSenv2ALp8+1SkK2JyH1WfFS
-         xfge6om6PKJMmyA6p+ZFC99l8XwQreQTEjAJzxi13ba5MzyQR+8FdDFUZDOi/i7BaE7+
-         hQQMacFY5KtbipI2khLykKosD320KomJO8Jb2nGFKkFEji+TlmTb59rh6SwrfXqbfJcr
-         oK2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758982948; x=1759587748;
-        h=cc:autocrypt:subject:to:content-language:from:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=2fIBwTIAdKpwRItFyJzhDhGr+KGeVYoEgNwbRczrq5Q=;
-        b=bWJdgTA07Tm/6zplxz0TpW9nmALhpZTzsvEUrDsSlQp7JZLB8oxuyGvERkIjB2Cx2c
-         Z3dw/l7ImWTu5zwBHwdmkvCTiopI4M1zgCEQwzvBx22kSlLekIljyjGXfXI7mfSYrxWd
-         KJ3pGWWEz3l35hietdrQ0GgfBDwWnOeSoP3DtE0T8+7KcDYQ0lbvu3uvK4a5Zyz4X3nc
-         Wf9Wn0aXmLmq/6QB6x7xUNtfxnP0CC7daQwvnnrLwSadd0PMX3QjCz7pjlmuQ088TRAb
-         bmQPYQkUbGTd4F2eO65S+x2NUd619RUrq4hYntXASDHixnYU3VHml3373OwvAnLJoY4L
-         k0VQ==
-X-Forwarded-Encrypted: i=1; AJvYcCULrpOaC8RgLBOHOJwxZoGLMkytdGz7Nxm1e7CUQquckmK8qDFrqCqtng78ZxqXDh01O8IJs84=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzokQd2rQmwxFoOedaczI3q/2sraDEPx+MI8dSlLjjpnUD5BIkg
-	79p7tIDCuU1KqJp0osL9cjUWSPM8Q6D3WhpcliLYN6b6SJkaeN5Cd26E
-X-Gm-Gg: ASbGncs8W2pvRCN53BR0wBifpVvKaMMZ0xg65xxzXyz3dGNNx4CL/QcpnR0VFt7vN9h
-	+I3hcURMHJnI+6Sw+pcCsJrthkiwCrRY97v6Gg2c6MHOOyY5cwZq2wUNBDVslNE4A9ly3aEPSGo
-	zMW7ngjME+LsAk/OXthYzw6eHUvDGTYm1PvvQFJFA3UnICY8J5TDXGd4DQZ8g0QAdJZdKbLbWpj
-	KvQkk2lNDFlUXnsacstyX0/VtVvs7UFfHBrwDre7NBR1XfvZE9LqgbWKIjwzdBOirOUfNzOBAcO
-	XO1oLj+jbeMICHGz+aezEpc17dStf6wE2MUqAQTofCpr6MeJ0TFuVjTHRQz0r0KiSG0HPZgo3gg
-	FSOU633egSBeqfl6cHj9ZbnqbDZQcjJs6Xa1bNiN4zt6sE2LaNSE=
-X-Google-Smtp-Source: AGHT+IEpOOtUsXy1a2J8cAC10855T8BcYAtnqNdNrhFnYjaT6Sw0kAWyfa3Zxp9LbAWmQT2R4aOT0A==
-X-Received: by 2002:a05:6000:2304:b0:3ec:d926:329c with SMTP id ffacd0b85a97d-40e4dabefffmr10800578f8f.56.1758982947778;
-        Sat, 27 Sep 2025 07:22:27 -0700 (PDT)
-Received: from [192.168.1.201] ([87.254.0.133])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-40fb9d26ef7sm11287422f8f.26.2025.09.27.07.22.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Sep 2025 07:22:26 -0700 (PDT)
-Message-ID: <52c76446-117d-4953-9b33-32199f782b90@gmail.com>
-Date: Sat, 27 Sep 2025 15:21:37 +0100
+	s=arc-20240116; t=1758983363; c=relaxed/simple;
+	bh=NzSPLJfOtDzJYHcO4YuDFLcYnFyYcvWzyWXyplW5yQI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ghFdiZsbzFWlpBp4/tdqytUH8WE7aV+PmhT4fs8Bw63zOT8yfIBg850hQYN0sE5bWIPJXbPUnJqflzMOs0MzTBT9O7teBxk4sNT9ADphjop8TbdtYpI2/MUUETstplnhTbWn3HsNAeGPeEBw9442pilTAksmc3OgkF8279RgNg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hDINF7oU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8B+JXfHJVtb+Ab1wHa0uuSShQ5lAvDzsXh/tt0MffY4=; b=hDINF7oUnEZhzoFVytLqKemS1S
+	BngU4E5TdKVg0yEFRkfWueE4XlZFFHMUABZorOVUyHWs12kpq7o+WY9uyzRO+1/jes+B8xF+nznOe
+	fNWeZbeoweOSlGqwzy1vXgOMeEz3A8zV3aIStpfbqd5pOOfSVzo7U3SIOk8rhj1N/MwM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v2VvD-009dsr-A5; Sat, 27 Sep 2025 16:29:11 +0200
+Date: Sat, 27 Sep 2025 16:29:11 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Luke Howard <lukeh@padl.com>
+Cc: netdev@vger.kernel.org, vladimir.oltean@nxp.com, kieran@sienda.com,
+	jcschroeder@gmail.com, max@huntershome.org
+Subject: Re: [RFC net-next 2/5] net: dsa: mv88e6xxx: add
+ MV88E6XXX_G1_ATU_CTL_MAC_AVB setter
+Message-ID: <48a760f2-323f-4448-9d18-9fe651471cdb@lunn.ch>
+References: <20250927070724.734933-1-lukeh@padl.com>
+ <20250927070724.734933-3-lukeh@padl.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: "Colin King (gmail)" <colin.i.king@gmail.com>
-Content-Language: en-US
-To: =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- virtualization@lists.linux.dev, kvm@vger.kernel.org,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: re: vduse: add vq group support
-Autocrypt: addr=colin.i.king@gmail.com; keydata=
- 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
- FVPMkxl2UyaayDvhrO9kNXvl1SKCpdzCMQ==
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------UP5kxYwVcrdQMC9dvc243P9G"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250927070724.734933-3-lukeh@padl.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------UP5kxYwVcrdQMC9dvc243P9G
-Content-Type: multipart/mixed; boundary="------------niaEsC8j9PJOksJIc3X3icG2";
- protected-headers="v1"
-From: "Colin King (gmail)" <colin.i.king@gmail.com>
-To: =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- virtualization@lists.linux.dev, kvm@vger.kernel.org,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Message-ID: <52c76446-117d-4953-9b33-32199f782b90@gmail.com>
-Subject: re: vduse: add vq group support
+On Sat, Sep 27, 2025 at 05:07:05PM +1000, Luke Howard wrote:
+> Add accessors for the MACAVB bit, which controls whether certain ATU bits cause
+> the entry to be interpreted as AVB or NRL (non-rate-limiting) entries. This is
+> necessary on switches such as the 88E6352 and 88E6240 that support both AVB and
+> NRL ATU entries.
+> 
+> Signed-off-by: Luke Howard <lukeh@padl.com>
+> ---
+>  drivers/net/dsa/mv88e6xxx/global1.h     |  2 ++
+>  drivers/net/dsa/mv88e6xxx/global1_atu.c | 17 +++++++++++++++++
+>  2 files changed, 19 insertions(+)
+> 
+> diff --git a/drivers/net/dsa/mv88e6xxx/global1.h b/drivers/net/dsa/mv88e6xxx/global1.h
+> index 3dbb7a1b8fe11..74be4c485ab10 100644
+> --- a/drivers/net/dsa/mv88e6xxx/global1.h
+> +++ b/drivers/net/dsa/mv88e6xxx/global1.h
+> @@ -112,6 +112,7 @@
+>  /* Offset 0x0A: ATU Control Register */
+>  #define MV88E6XXX_G1_ATU_CTL		0x0a
+>  #define MV88E6XXX_G1_ATU_CTL_LEARN2ALL	0x0008
+> +#define MV88E6XXX_G1_ATU_CTL_MAC_AVB	0x8000
+>  #define MV88E6161_G1_ATU_CTL_HASH_MASK	0x0003
 
---------------niaEsC8j9PJOksJIc3X3icG2
-Content-Type: multipart/mixed; boundary="------------UeCn0MP0PaDM7niHeJ6H0PT2"
+nitpick: The sorting in this file suggests that they are sorted
+highest bits to lowest bits. So MAC_AVB should be before LEARN2ALL.
 
---------------UeCn0MP0PaDM7niHeJ6H0PT2
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
 
-SGksDQoNClN0YXRpYyBhbmFseXNpcyBvbiBsaW51eC1uZXh0IGhhcyBmb3VuZCBhbiBpc3N1
-ZSB3aXRoIHRoZSBmb2xsb3dpbmcgY29tbWl0Og0KDQpjb21taXQgZmZjMzYzNGI2Njk2NzQ0
-NWYzMzY4YzNiNTNhNDJiY2NjNTJiMmM3Zg0KQXV0aG9yOiBFdWdlbmlvIFDDqXJleiA8ZXBl
-cmV6bWFAcmVkaGF0LmNvbT4NCkRhdGU6ICAgVGh1IFNlcCAyNSAxMToxMzozMiAyMDI1ICsw
-MjAwDQoNCiAgICAgdmR1c2U6IGFkZCB2cSBncm91cCBzdXBwb3J0DQoNCg0KVGhpcyBpc3N1
-ZSBpcyBhcyBmb2xsb3dzIGluIGZ1bmN0aW9uIHZob3N0X3ZkcGFfdnJpbmdfaW9jdDoNCg0K
-ICAgICAgICAgY2FzZSBWSE9TVF9WRFBBX0dFVF9WUklOR19HUk9VUDogew0KICAgICAgICAg
-ICAgICAgICB1NjQgZ3JvdXA7DQoNCiAgICAgICAgICAgICAgICAgaWYgKCFvcHMtPmdldF92
-cV9ncm91cCkNCiAgICAgICAgICAgICAgICAgICAgICAgICByZXR1cm4gLUVPUE5PVFNVUFA7
-DQogICAgICAgICAgICAgICAgIHMuaW5kZXggPSBpZHg7DQogICAgICAgICAgICAgICAgIGdy
-b3VwID0gb3BzLT5nZXRfdnFfZ3JvdXAodmRwYSwgaWR4KTsNCiAgICAgICAgICAgICAgICAg
-aWYgKGdyb3VwID49IHZkcGEtPm5ncm91cHMgfHwgZ3JvdXAgPiBVMzJfTUFYIHx8IGdyb3Vw
-IDwgMCkNCiAgICAgICAgICAgICAgICAgICAgICAgICByZXR1cm4gLUVJTzsNCiAgICAgICAg
-ICAgICAgICAgZWxzZSBpZiAoY29weV90b191c2VyKGFyZ3AsICZzLCBzaXplb2YocykpKQ0K
-ICAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiAtRUZBVUxUOw0KICAgICAgICAgICAg
-ICAgICBzLm51bSA9IGdyb3VwOw0KICAgICAgICAgICAgICAgICByZXR1cm4gMDsNCiAgICAg
-ICAgIH0NCg0KDQpUaGUgY29weV90b191c2VyIG9mIHN0cnVjdCBzIGlzIGNvcHlpbmcgYSBw
-YXJ0aWFsbHkgaW5pdGlhbGl6ZWQgc3RydWN0IA0KcywgZmllbGQgcy5udW0gY29udGFpbnMg
-Z2FyYmFnZSBkYXRhIGZyb20gdGhlIHN0YWNrIGFuZCB0aGlzIGlzIGJlaW5nIA0KY29waWVk
-IGJhY2sgdG8gdXNlciBzcGFjZS4gRmllbGQgcy5udW0gc2hvdWxkIGJlIGFzc2lnbmVkIHNv
-bWUgdmFsdWUgDQpiZWZvcmUgdGhlIGNvcHlfdG9fdXNlciBjYWxsIHRvIGF2b2lkIHVuaW5p
-dGlhbGl6ZWQgZGF0YSBmcm9tIHRoZSBzdGFjayANCmJlaW5nIGxlYWtlZCB0byB1c2VyIHNw
-YWNlLg0KDQpDb2xpbg0KDQo=
---------------UeCn0MP0PaDM7niHeJ6H0PT2
-Content-Type: application/pgp-keys; name="OpenPGP_0x68C287DFC6A80226.asc"
-Content-Disposition: attachment; filename="OpenPGP_0x68C287DFC6A80226.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+    Andrew
 
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsFNBE6TJCgBEACo6nMNvy06zNKj5tiwDsXXS+LhT+LwtEsy9EnraKYXAf2xwazc
-ICSjX06efanlyhB0figzQO0n/tP7BcfMVNG7n1+DC71mSyRK1ZERcG1523ajvdZO
-xbBCTvTitYOy3bjs+LXKqeVMhK3mRvdTjjmVpWnWqJ1LL+Hn12ysDVVfkbtuIm2N
-oaSEC8Ae8LSSyCMecd22d9PnLR4UeFgrWEkQsqROq6ZDJT9pBLGe1ZS0pVGhkRyB
-P9GP65oPev39SmfAx9R92SYJygCy0pPvBMWKvEZS/7bpetPNx6l2xu9UvwoeEbpz
-UvH26PHO3DDAv0ynJugPCoxlGPVf3zcfGQxy3otydNTWkP6Wh3Q85m+AlifgKZud
-jZLrO6c+fAw/jFu1UMjNuyhgShtFU7NvEzL3RqzFf9O1qM2muj83IeFQ1FZ65QAi
-CdTa3npz1vHc7N4uEQBUxyXgXfCI+A5yDnjHwzU0Y3RYS52TA3nfa08yLGPLTf5w
-yAREkFYou20vh5vRvPASoXx6auVf1MuxokDShVhxLpryBnlKCobs4voxN54BUO7m
-zuERXN8kadsxGFzItAyfKYzEiJrpUB1yhm78AecDyiPlMjl99xXk0zs9lcKriaBy
-VUv/NsyJFQj/kmdxox3XHi9K29kopFszm1tFiDwCFr/xumbZcMY17Yi2bQARAQAB
-zSdDb2xpbiBJYW4gS2luZyA8Y29saW4uaS5raW5nQGdtYWlsLmNvbT7CwZEEEwEI
-ADsCGwMFCwkIBwMFFQoJCAsFFgIDAQACHgECF4AWIQRwYtqk8AG5xmFnAM9owoff
-xqgCJgUCY8GcawIZAQAKCRBowoffxqgCJtd/EACIWcaxfVt/MH4qqo5ELsjCFPVp
-+RhVpQDWy8v9Np2YbTcZ4AY2Zj4Pq/HrZ3F/Bh02v85C6mNv8BDTKev6Qcq3BYw0
-iqw6/xLNvRcSFHM81mQI9xtnAWIWfI9k5hpX19QooPIIP3GOMdMc1uRUGTxTgTFA
-AsAswRY3kMzo6k7arQnUs9zbiZ9SmS43qWOIxzGnvneekHHDAcomc/oho7kgj6rK
-p/f9qRrhForkgVQwdj6iBlW934yRXzeFVF3wr7Lk5GQNIEkJiNQPZs54ojBS/Kx6
-3UTLT1HgOp6UY9RPEi9wubmUR+J6YjLRZMr5PCcA86EYmRoysnnJ8Q/SlBVD8npp
-GVEcuvrbH3MBfhmwOPDc3RyLkEtKfSTB92k1hsmRkx9zkyuUzhcSnqQnpWGJD+xt
-KHvcHRT7Uxaa+SDwUDM36BjkyVcZQy8c+Is2jA55uwNgPpiA7n82pTeT+FRGd+7i
-CLQHaryu6FO6DNDv09RbPBjIiC/q814aeKJaSILP1ld9/PEBrLPdm+6lG6OKOt9D
-DV6jPmfR96FydjxcmI1cgZVgPomSxv2JB1erOggB8rmX4hhWYsVQl1AXZs3LdEpJ
-6clmCPspn/ufZxHslgR9/WR1EvPMQc8XtssF55p8ehRIcVSXDRcMFr3ZuqMTXcL6
-8YbDmv5OGS95O1Gs4c0iQ29saW4gS2luZyA8Y29saW4ua2luZ0B1YnVudHUuY29t
-PsLBdwQTAQgAIQUCTwq47wIbAwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgAAKCRBo
-woffxqgCJo1bD/4gPIQ0Muy5TGHqTQ/bSiQ9oWjS5rAQvsrsVwcm2Ka7Uo8LzG8e
-grZrYieJxn3Qc22b98TiT6/5+sMa3XxhxBZ9FvALve175NPOz+2pQsAV88tR5NWk
-5YSzhrpzi7+klkWEVAB71hKFZcT0qNlDSeg9NXfbXOyCVNPDJQJfrtOPEuutuRuU
-hrXziaRchqmlhmszKZGHWybmPWnDQEAJdRs2Twwsi68WgScqapqd1vq2+5vWqzUT
-JcoHrxVOnlBq0e0IlbrpkxnmxhfQ+tx/Sw9BP9RITgOEFh6tf7uwly6/aqNWMgFL
-WACArNMMkWyOsFj8ouSMjk4lglT96ksVeCUfKqvCYRhMMUuXxAe+q/lxsXC+6qok
-Jlcd25I5U+hZ52pz3A+0bDDgIDXKXn7VbKooJxTwN1x2g3nsOLffXn/sCsIoslO4
-6nbr0rfGpi1YqeXcTdU2Cqlj2riBy9xNgCiCrqrGfX7VCdzVwpQHyNxBzzGG6JOm
-9OJ2UlpgbbSh6/GJFReW+I62mzC5VaAoPgxmH38g0mA8MvRT7yVpLep331F3Inmq
-4nkpRxLd39dgj6ejjkfMhWVpSEmCnQ/Tw81z/ZCWExFp6+3Q933hGSvifTecKQlO
-x736wORwjjCYH/A3H7HK4/R9kKfL2xKzD+42ejmGqQjleTGUulue8JRtpM1AQ29s
-aW4gSWFuIEtpbmcgKEludGVsIENvbGluIElhbiBLaW5nIGtleSkgPGNvbGluLmtp
-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
-=3DQKm6
------END PGP PUBLIC KEY BLOCK-----
-
---------------UeCn0MP0PaDM7niHeJ6H0PT2--
-
---------------niaEsC8j9PJOksJIc3X3icG2--
-
---------------UP5kxYwVcrdQMC9dvc243P9G
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEEcGLapPABucZhZwDPaMKH38aoAiYFAmjX8vEFAwAAAAAACgkQaMKH38aoAibl
-tQ/+JR6EYEZVjrMaKvRhqX+ESldrtOXt4cAlOJFgfk6pBzueaLd3Bricu72HiP42MD7/ibOoRVRY
-J/1nmxWue6Maumxle5f7kYqKySF4jLg5GduRuG4Fif8h1vtiu+UBGxJhACOYhgrVgvSJo95cdpPi
-t0LBE949VgxR4ctRlPNB6wRH5ZAzqGMjsob5NQFoSAI6y3aWnU57/J2a6WfO1BlkuCHcVmJ9r6GS
-KRhN+J4GgyrZ3tX5G9EwucrDR5rwn11t6Cvyr3rpSwyYzvkBeY68qtVTH4HRID2PE8Z+yPFzDj7F
-sLNAPqX+99yKnhERwnLWoLwW7rl9R9gxyisYXYT18JUCb53npsH5ZmFtZrAh4DwfsMbXFFZrveJ8
-vb+oB2+578hWI4N8LpES7C2f5f8T5/QLZeWNNP4i3khgOi3npSkh+wpFTxl2eZRhoEYCx/wO8E1W
-+yii1zO47b6AefoYhQuhwqhyj2x1y3s4TBKO8rz0LOawWSddpqgGASRpu3y34F8nKccD82iNIGsh
-yLcmaCqbFtzl50QE52IZmRjmRcZIk9Tx9gSEJIzXqaMfb0k2pPjSPAQJ80BKTgrL6e9gUcN2RAyr
-urg2SlRvWDM9qxXe4uMT4pAmamz7Z0cTVdr5cp+yLEd7fJ1M1jDYnLYelNN4OmtAABP+NBW9NRsi
-gB0=
-=PJW8
------END PGP SIGNATURE-----
-
---------------UP5kxYwVcrdQMC9dvc243P9G--
+---
+pw-bot: cr
 
