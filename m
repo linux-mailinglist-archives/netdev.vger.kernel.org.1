@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-226931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 973BDBA638E
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 23:30:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B075BA6391
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 23:30:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6F6C3B1023
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 21:30:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6228B173A87
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 21:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C784C238C10;
-	Sat, 27 Sep 2025 21:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51E2A23ABBB;
+	Sat, 27 Sep 2025 21:30:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OjasZhl1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q5LWfvf3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539A6223DE8
-	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 21:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EA5235354
+	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 21:30:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759008636; cv=none; b=iqijFmw2vInyusNKNntSTD6CWf9boBtIo9eQR9Hb908MxAKkK1ZRHstBd87LuckDxGsXgi5IuSHUlkNlfFdaEDxxTWZEMtPd3Jy8ONoJyZAYvBgdDEPFSpU+tGctIJAGnfUMxvIK3qBXOBnJWOFxPgl56IKdFomHfd7v6do0qnw=
+	t=1759008638; cv=none; b=DkBu1PYZfdkHp9s9i1UjCiZ3TbGnAUXo05Hs37npSXVjsG5dtBkxTdGOxEExgqUkwVOhYZZrb7GSpkhDclQa3yDiQxRgfsCxJHYCh8iFY+SiLwzEEVejyd7C6toi0nrBjnGZpIFCogubUTJhwZ8NHlNA2R03MD0YivWrjvhEkfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759008636; c=relaxed/simple;
-	bh=IHfLMvPIye+XUMncQyp/RntpjuU+hUIacAJapZKNWFI=;
+	s=arc-20240116; t=1759008638; c=relaxed/simple;
+	bh=KxjaAIDZZf2A2h8ePiyhIhTjc603LM8uiI5YJypkHTs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Fvccz2FM3eCP9/LEMrZ4vejnFXt7DhtgvO4KYyd53qQvdQRPgdRGcdLdiI6KFg8vHJ6cZTnYi5nVV81cv1/fb7RTrFwUTYFltUTgNHlfCYjLP2Er9QY9HZw5hb4MQlm4kCMBDXBXWUwBVvSJIhbq316+wxlFoo48Qh2ww9irtqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OjasZhl1; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=j/BrcD6nohD75hBTUN3nt47C7+gR/LGkyRXrVLA+5xaiUEs+fzE1P18+6acdL89euPhaSl+OC3c99eeD5P11WlmcFUopGWLi3sCScnvSGJKql8DMgL0Eb6u8itSCrIyNkUsdGiRTZ/jFnQvG1BiUTUm+1F08Ij7QdJq3QpDCUGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q5LWfvf3; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b59682541d5so1341486a12.0
-        for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 14:30:35 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-783c3400b5dso2822b3a.1
+        for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 14:30:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759008634; x=1759613434; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1759008636; x=1759613436; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gFrnFbH7ZTDl3V8aU1/VRzeqEcPfP4MQnyoc/PUFyqU=;
-        b=OjasZhl17ULKhLw1MFGbAhbv57FVsqTSFqnYx9QEDO9KAIddf8r6hxG2/6/wvNwdBg
-         G8/zr2O0aaBisvsS8hwXbx47fcX8uFWNe2j5pYKsm/fxjBroygsI6cu30AP/draEff0y
-         PeB4zjFkMV2CJfOdwqYOk4C5VtPaTt9W+qs8Euc1Sl6NtYIeB4W5gQCZl82KuGPX0iXf
-         bpoo5G9f9LkZKfPzDdclkaSHZGUiRx5vYO73PA4LW/2eK9XTny9r8GnNDiikLwINSAXN
-         JlMJOysT0/1KTP8rkD6c5dz05UDE+P7NbrPsINCTee1h/B62T6skLu8NyymwxwCi+iv8
-         updQ==
+        bh=O7KuXyZGE6u0baMZ3zeIqZUHqO6jDnWQx2pjE6NLSHs=;
+        b=Q5LWfvf3yVKeFXvBZA5R3eTCM0uf5M8XBJeFUGfrI+2Hc39FEQN6+3Ii27ZJdfx+3u
+         eChnHBXM8fmLCApv8KUA8Xv4cBUtKfne7FeqAfdic7eY7nREmMxCY21Sz3/zsZcT8U82
+         C5JSR4Au9fae3DhqyHrZcs1jj5i8qSvLxbMmrxyx/YuyLH+H4DEPAcQOrY1jyOmLhnDA
+         ggg0yPVKDXFicQul6nYsnL3s/O3tHU7gmVXYv3oMqVHUF+odasKlEeKiXAxTT0lDr0oX
+         jIZp0CgVeJ+GlTUUgg8xtJIFfDegIZYAbEzdvoZ2+J7aFbtMX+LUgHcx6lwfJ5XajGp2
+         CilQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759008634; x=1759613434;
+        d=1e100.net; s=20230601; t=1759008636; x=1759613436;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gFrnFbH7ZTDl3V8aU1/VRzeqEcPfP4MQnyoc/PUFyqU=;
-        b=i0GqeL2JQbNpk+w4Z9/sVW6iaRuzokDR8Oy553hUrIpcNI1ynk0A6SVzcochUaavH4
-         JxueaZ5uF4r5KBh6MRUB3hN300l2jlyk/i5NleHtMexFDNJw7gS667uvubqYCtinWqZY
-         9nemkP+j3KeSawIg3ckCUIDU/pNwlzy8o3QbMGt2brQIJcM9EesPJ6SlaY51Wh3J+cOc
-         M+4wHz9/trBxCJ+BFghC6gao+QKLzA3+/Om3XvZnIEdaYUJK8zi4K1o3eKBSnDRkLANE
-         u5SjwSU0RCUXmf+qYkgSKeGESHpprCT7KYKTDnNTV4AUJ26rO92mBEiJ8lkmMVgbzLq4
-         HAIw==
-X-Forwarded-Encrypted: i=1; AJvYcCV6t8hnkxei29wYcGQ+2hplNxber6CMqnpHUQU9CQMmBanTxob08J1gLXR7tWnB3kdsxnBffns=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyu6tbyJOigl54c8fmm4EdjM/Ty/o1h+JbhWN0/nS/v15smfPUU
-	b8i0oWMD3brpvKhPozSsOO/e885sFbZXRhFDTVg7tWqEqJSwjbnmyCyTbWbtV9viovCNMiqbxoZ
-	BXg8wbg==
-X-Google-Smtp-Source: AGHT+IGd1tIlcsiCZIfG0ebuWla4Ana407wRA8pe450999eu3ZGQMIhpVNIc2umyyEX3LBn6Zr1ifdrf6Xg=
-X-Received: from pffj24.prod.google.com ([2002:a62:b618:0:b0:781:1ca9:e250])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:4324:b0:2c6:85b9:1e0d
- with SMTP id adf61e73a8af0-2e7c95a4a47mr14969945637.21.1759008634565; Sat, 27
- Sep 2025 14:30:34 -0700 (PDT)
-Date: Sat, 27 Sep 2025 21:29:39 +0000
+        bh=O7KuXyZGE6u0baMZ3zeIqZUHqO6jDnWQx2pjE6NLSHs=;
+        b=XDf32Wqm0mT/DyU9OH0zq3FvAwxU9039DTMMnKPx1LIREXGbAnswNSv16K7f7p95xC
+         ifszH9aEYT1m+q2hG72wj0cU8Iy6bH7X+SvdR/PWElI17bK5UrXxO+IxN36hqIXoLMSP
+         zFgrumaKEdnK6j1ljDoHfjcirUtzTL1m2R+viBeY84sUPFN1BgFUQhyQDeY7f9Zse7wg
+         NgBCTkX3SN/vriCV40vKD5wWMBg/GlyYp19mDNML89a3tZ+xnrf36mrksdJcapRMbbKC
+         +fo3xxGBrvPka0ihpC7XQub0dgZ/QA93QJdC6v9eMKz1Nyt1zpjXcG2JNtt1lmVp3yHs
+         8I/g==
+X-Forwarded-Encrypted: i=1; AJvYcCXQ6L2QiADaOGNUD7LRR8iuo1EWLd28QIZG/LP2y6SA13R5O8J7TL5+yPQo2Jh1iNSVNcznCgo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yym09fIQ9gnuLveOb7whalXaltRw28tTmRfoogZjaFXlo+WWk/R
+	PXDrin5i6P3qnFfiGovQ5PlmVJx+augQLkfnWBncw5rOq/aN5hUkijnMIKzrnDkFCLRMyI/v2D/
+	lY1CTwA==
+X-Google-Smtp-Source: AGHT+IEBJgNc8ZFC8GxLr/LOK3K9G2q6uGFOMR19V2Ve4I3YK6w7ns2uXE0vcm0lGWh1u1qykbWce9VeRrE=
+X-Received: from pfde21.prod.google.com ([2002:aa7:8c55:0:b0:77c:b486:d17e])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:e92:b0:2f9:f9ad:cc47
+ with SMTP id adf61e73a8af0-2f9f9adccf4mr7146759637.14.1759008636073; Sat, 27
+ Sep 2025 14:30:36 -0700 (PDT)
+Date: Sat, 27 Sep 2025 21:29:40 +0000
 In-Reply-To: <20250927213022.1850048-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250927213022.1850048-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.51.0.536.g15c5d4f767-goog
-Message-ID: <20250927213022.1850048-2-kuniyu@google.com>
-Subject: [PATCH v2 net-next 01/13] selftest: packetdrill: Set ktap_set_plan
- properly for single protocol test.
+Message-ID: <20250927213022.1850048-3-kuniyu@google.com>
+Subject: [PATCH v2 net-next 02/13] selftest: packetdrill: Require explicit setsockopt(TCP_FASTOPEN).
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -84,42 +83,45 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-The cited commit forgot to update the ktap_set_plan call.
+To enable TCP Fast Open on a server, net.ipv4.tcp_fastopen must
+have 0x2 (TFO_SERVER_ENABLE), and we need to do either
 
-ktap_set_plan sets the number of tests (KSFT_NUM_TESTS), which must
-match the number of executed tests (KTAP_CNT_PASS + KTAP_CNT_SKIP +
-KTAP_CNT_XFAIL) in ktap_finished.
+  1. Call setsockopt(TCP_FASTOPEN) for the socket
+  2. Set 0x400 (TFO_SERVER_WO_SOCKOPT1) additionally to net.ipv4.tcp_fastopen
 
-Otherwise, the selftest exit()s with 1.
+The default.sh sets 0x70403 so that each test does not need setsockopt().
+(0x1 is TFO_CLIENT_ENABLE, and 0x70000 is ...???)
 
-Let's adjust KSFT_NUM_TESTS based on supported protocols.
+However, some tests overwrite net.ipv4.tcp_fastopen without
+TFO_SERVER_WO_SOCKOPT1 and forgot setsockopt(TCP_FASTOPEN).
 
-While at it, misalignment is fixed up.
+For example, pure-syn-data.pkt [0] tests non-TFO servers unintentionally,
+except in the first scenario.
 
-Fixes: a5c10aa3d1ba ("selftests/net: packetdrill: Support single protocol test.")
+To prevent such an accident, let's require explicit setsockopt().
+
+TFO_CLIENT_ENABLE is necessary for
+tcp_syscall_bad_arg_fastopen-invalid-buf-ptr.pkt.
+
+Link: https://github.com/google/packetdrill/blob/bfc96251310f/gtests/net/tcp/fastopen/server/opt34/pure-syn-data.pkt #[0]
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- tools/testing/selftests/net/packetdrill/ksft_runner.sh | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tools/testing/selftests/net/packetdrill/defaults.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/packetdrill/ksft_runner.sh b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-index 0ae6eeeb1a8e..3fa7c7f66caf 100755
---- a/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-+++ b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-@@ -48,11 +48,11 @@ elif [[ ! "$ip_versions" =~ ^ipv[46]$ ]]; then
- fi
+diff --git a/tools/testing/selftests/net/packetdrill/defaults.sh b/tools/testing/selftests/net/packetdrill/defaults.sh
+index 1095a7b22f44..34fcafefa344 100755
+--- a/tools/testing/selftests/net/packetdrill/defaults.sh
++++ b/tools/testing/selftests/net/packetdrill/defaults.sh
+@@ -51,7 +51,7 @@ sysctl -q net.ipv4.tcp_pacing_ss_ratio=200
+ sysctl -q net.ipv4.tcp_pacing_ca_ratio=120
+ sysctl -q net.ipv4.tcp_notsent_lowat=4294967295 > /dev/null 2>&1
  
- ktap_print_header
--ktap_set_plan 2
-+ktap_set_plan $(echo $ip_versions | wc -w)
+-sysctl -q net.ipv4.tcp_fastopen=0x70403
++sysctl -q net.ipv4.tcp_fastopen=0x3
+ sysctl -q net.ipv4.tcp_fastopen_key=a1a1a1a1-b2b2b2b2-c3c3c3c3-d4d4d4d4
  
- for ip_version in $ip_versions; do
- 	unshare -n packetdrill ${ip_args[$ip_version]} ${optargs[@]} $script > /dev/null \
--	    && ktap_test_pass $ip_version || $failfunc $ip_version
-+		&& ktap_test_pass $ip_version || $failfunc $ip_version
- done
- 
- ktap_finished
+ sysctl -q net.ipv4.tcp_syncookies=1
 -- 
 2.51.0.536.g15c5d4f767-goog
 
