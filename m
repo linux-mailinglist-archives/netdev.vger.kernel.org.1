@@ -1,87 +1,95 @@
-Return-Path: <netdev+bounces-226825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88C44BA56E0
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 02:41:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57DB6BA56E9
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 02:50:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49767326A57
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 00:41:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92EA31C00996
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 00:50:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 090211D63E6;
-	Sat, 27 Sep 2025 00:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5641D61BB;
+	Sat, 27 Sep 2025 00:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gUxvY52P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fLYKMFIe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC307282E1;
-	Sat, 27 Sep 2025 00:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650961547F2;
+	Sat, 27 Sep 2025 00:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758933680; cv=none; b=TG5veg4dR+FcR1I5Qn6m6OZDV2dLAlXxe7dbYuDJxAaZsn6EV5vV4dktnfdJNUQaLgXBAOTcT3zLHs6lkdT5FL4StsErbb8u68FSt4IgkxhYMWAprOIkTIgJFdBQIXUs7KihXz53CT1pGBzChYhpHnSxFOMm5Oa5e++GL6C6+OM=
+	t=1758934212; cv=none; b=HkZmC3oE2/Kjlqz8g1YwJ4Eeia90SX5iOzkURe3h8OX+szhT+QkJcxa7uCOApKm2WLwsPcMmMXS0Me98tT2GcgHrIOJHA6s67k+r1kSbIhbALDGOe7EpPCfV+rGRE7pvmUvkOTZTFzL+VIwcUSS5unIx+qeRLPr2TiZ6ZB68tTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758933680; c=relaxed/simple;
-	bh=g5wTDCdkm3VSKuvWD/nVJLosXsdzTuSUkxk7ig06G1s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fhEBoaC2x1nUvy+x3BijKRI8/Day+54v7XC44eqxmr4Ii9GvnBTTHKgGlC8JzHtS8br+d6il1GzHPG6VL1mjo5q1ZwDro1rRr7XkUA4C2lpYFhESE8AV1+a1yuCbxHzPKlIQqp8wQjhOyPz2/nkh41XHoggahV8wfbDrfrIFz8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gUxvY52P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 886A7C4CEF4;
-	Sat, 27 Sep 2025 00:41:19 +0000 (UTC)
+	s=arc-20240116; t=1758934212; c=relaxed/simple;
+	bh=Xbe9ASBuOGk7KLtVQvp/E0YWO8f6x1bVH2QJvW2rd/s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=taS5iY5eIh0Kh37iIhZDj2o3jT1qRm/o99te13yzSjMEbNZixlN5AYVt7EkbQOvDG8brjpf/HfQC27T5z3IeBFgksC15lst/bH5AJtjEhX9jelxxaoTFH0u7j12HqILNLP8vDzDbaFjkg6+5PnElDW6lQo02efa+jV6OM+nXUPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fLYKMFIe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2CCBC4CEF4;
+	Sat, 27 Sep 2025 00:50:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758933680;
-	bh=g5wTDCdkm3VSKuvWD/nVJLosXsdzTuSUkxk7ig06G1s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gUxvY52P2ChIDgRfp15cahlHnhYPmWDcS4EjNqQtUPZQt6w+kZVK/ahEnvtBxLLW4
-	 e9vu9m2OpUpb5yINGjZIJNCXOcR4BhfXYX8U9OBLXXCQdmJid0zBM9F1GLnHBm3Sc/
-	 gFLFFBwDH2glgqyCvuuJn3atl0PfZ7Rbn8VyDksJX4ZkQcpvYrwTYybYCYGQfUeFAZ
-	 0ScdHjwj49rJ2thZLAk4Bm4GASGcFtrh6pKnoNPSeb79S7Cf2Y5T8+fHt9dqxk6rb1
-	 E/X4ez/ai13eqL+oWaJca3y6UB0bgmHtqmW0ns2gqysftVBocBxVMb9JbDZSu06R/S
-	 qBiUApX0Zz21A==
-Date: Fri, 26 Sep 2025 17:41:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, Donald Hunter
- <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
- KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
- Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH RFC bpf-next v2 1/5] netlink: specs: Add XDP RX checksum
- capability to XDP metadata specs
-Message-ID: <20250926174118.23a054a7@kernel.org>
-In-Reply-To: <0608935c-1c1c-4374-a058-bc78d114c630@kernel.org>
-References: <20250925-bpf-xdp-meta-rxcksum-v2-0-6b3fe987ce91@kernel.org>
-	<20250925-bpf-xdp-meta-rxcksum-v2-1-6b3fe987ce91@kernel.org>
-	<0608935c-1c1c-4374-a058-bc78d114c630@kernel.org>
+	s=k20201202; t=1758934211;
+	bh=Xbe9ASBuOGk7KLtVQvp/E0YWO8f6x1bVH2QJvW2rd/s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fLYKMFIef30W+ZRXSUVot6T9Ck3pYdXZvyDkKVIEg8EocQ79NduS4PX33nN6jAfxJ
+	 m17tTfLsfAfKzSgEGiV7snt0SfiJj1XFH0MIEjIq2uny2kQvSKoce7UDAzZxfZtreS
+	 QEUdiIZtQY43GBPVyAmHvcndr75QsaGPO7nJ5lp5G1JjQ/Tjd89Xr18pZ/6ZOuxwOe
+	 AwHkA0BlnsE73D+hSzZv3xheYX2BnrXIEnT2PxvZrjEy4jaGQwP7yKERxCrl8Roc4n
+	 rnCsoTscGseMWfiIlrSZzsIWl59k9DOkbT+PSit19j0KbfwqCGD6jGXJoQ+2AcY4ht
+	 qp99KoApgPeFw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 342F939D0C3F;
+	Sat, 27 Sep 2025 00:50:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] vhost: vringh: Fix copy_to_iter return value check
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175893420700.108864.10199269230355246073.git-patchwork-notify@kernel.org>
+Date: Sat, 27 Sep 2025 00:50:07 +0000
+References: 
+ <cd637504a6e3967954a9e80fc1b75e8c0978087b.1758723310.git.mst@redhat.com>
+In-Reply-To: 
+ <cd637504a6e3967954a9e80fc1b75e8c0978087b.1758723310.git.mst@redhat.com>
+To: Michael S. Tsirkin <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, zhangjiao2@cmss.chinamobile.com,
+ jasowang@redhat.com, eperezma@redhat.com, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org
 
-On Fri, 26 Sep 2025 11:53:25 +0200 Jesper Dangaard Brouer wrote:
-> What do people think: Do we leave it as an exercise to the BPF-developer
-> to deduct hardware detected a wrong/failed checksum, as that is possible
-> as described above.  Or do we introduce a CHECKSUM_FAILED?
+Hello:
 
-I vote we leave it unless someone has a strong use case for FAILED.
-Checksumming and dropping packets should be pretty cheap, it's not
-worth complicating the stack with another option.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 25 Sep 2025 02:04:08 -0400 you wrote:
+> The return value of copy_to_iter can't be negative, check whether the
+> copied length is equal to the requested length instead of checking for
+> negative values.
+> 
+> Cc: zhang jiao <zhangjiao2@cmss.chinamobile.com>
+> Link: https://lore.kernel.org/all/20250910091739.2999-1-zhangjiao2@cmss.chinamobile.com
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] vhost: vringh: Fix copy_to_iter return value check
+    https://git.kernel.org/netdev/net/c/439263376c2c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
