@@ -1,145 +1,193 @@
-Return-Path: <netdev+bounces-226875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26E8FBA5C53
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 11:28:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B2A3BA5C65
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 11:32:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDCAD4C0245
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 09:28:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43CEC1B21831
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 09:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8942C3274;
-	Sat, 27 Sep 2025 09:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FC2298CC9;
+	Sat, 27 Sep 2025 09:32:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4D5qdahZ"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="R4QtR28W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-pf1-f226.google.com (mail-pf1-f226.google.com [209.85.210.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D87F18DB26
-	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 09:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9758227A915
+	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 09:32:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758965312; cv=none; b=ql/RbyW5OMz6rWTw9kfzT1ozEf/tPgo8H6++y185mMxI7SJQ6cVhUTVKSey3U2ISsKeg/SmU6GjGL3QrhXfjKvGWD1E5uSqG/WNCl2JvFmDjIufQQcDnpoykKl9tKXh3HyuOsyhELJegxQFspN7VLpzkW3M8olLoyY0LKoz6CxI=
+	t=1758965575; cv=none; b=qATNWlmTd/9MWl/L94UauhNfQitRwKP6qJ9wMj7LzxTgmHrMTOJCxblrtaMbxeTqIhE5znh6SaZDi1zS0kytMSlr1YXL6yVZkwHkGyN1pfL4WaYnSoZpayVEtLyYu5Gdx0FBPVANQTdvq7gyWT8g3V7OmTHblNC8Av8EdD5KDjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758965312; c=relaxed/simple;
-	bh=rcmDYtlLpSDEofowEkwBjp5a3ZQ+jqCnG3TKSi0pgfc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nb7a13xruoVGgtHlBcYc0JHuJHTQ18cvMi2aIfldQuJAZ9zm/Mn7cFZklMzS4MMqwRrY/IcdEEd14FAQ/iKxMfpZfDDQO6iSBFYf70qSMYPyEo+FqM0H+DZa+q/BToYdqNSR1egUxEB1ikC5iItoDCNBv4tyqN08Rgo3V+JxoHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4D5qdahZ; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4dfc05dec2fso985871cf.3
-        for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 02:28:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758965309; x=1759570109; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rka+a5FlfdtP6zxHcwLemDDeKFOYe+tH/66MfpNM3QA=;
-        b=4D5qdahZErA/WqZjqzFVhAOZJfXo1HWJy4iSDfVWZvrjmBUg5CVYmJ2s8LfKi9PxZg
-         ur7FHVxkzXOaYlspEk0SVoV4qjoFI6u9vyL5UNrNGlMDwbxeRu6ZeTljrkDSb/bwaHa/
-         jF8rVmsQ0qNOhA1urYOQS2GwoSPkPg1m4aehO4uL5qTx339OB9lcPMr23JwLMpVI0x63
-         ZEkRD3ZPvyaLOQ7hr0m+gxIlcapockHTIN/j+6YspUhai7KAuZzBb5vz01gXowx/j8iZ
-         U0zxIEQzqWnsLHgMRl3952EzScEB+ek86mJDB3B8WJ251YoWaiC/65HsDga8zzXOYHSe
-         z1hw==
+	s=arc-20240116; t=1758965575; c=relaxed/simple;
+	bh=2CpYa9QTCtXR/h7Nws5qEahu7IgBybMRxBMna7Um2/g=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MQUd+FX9T8mr9XiMas3oL9L01qXv9VAJeyp0vqC1nAmdBiSp2ckdontmgIOxCVbsdh6ONmQA504mYK92kd+ZeCRqPyoJK4rDSjBrP+ZnEHgj1SQPq0t4y/OimiC+fjrK1XpnGeoE9UMe8pqi6P9q5LfZgx4keduJRVO1Dx41jHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=R4QtR28W; arc=none smtp.client-ip=209.85.210.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f226.google.com with SMTP id d2e1a72fcca58-77f1f29a551so4013059b3a.3
+        for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 02:32:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758965309; x=1759570109;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rka+a5FlfdtP6zxHcwLemDDeKFOYe+tH/66MfpNM3QA=;
-        b=p0XlxD2oICeXczTlNNjA6bWJL7kUMpQX/hzKJIPMcsuXTKdqOHmoWoac/F1HzXkx2B
-         6J1koll9wVD45q8GbToYa8yuLJx1eMhSBKSx+u/YAdeZuO49lFYn0XCAJtQ35mhm6vDe
-         hl7RbAforRX+dCbSE09D1GRsDsuUR8yVHWaa/oMGEelAR1MhSXkucv0vEiJUWXKnURxL
-         coQT3zsWcKFG6ozGlCiwBatBuKlaUnUVPQlzfjpHqQF0FlZrcuEor3EKB4Oit0tV7ZJn
-         DwaZlLKX+ayIgnE72fTrwGJzmZDixSNggT2i/KrchvM1m9upY1uG0r6rHGXmFKvm+XIb
-         /FQA==
-X-Forwarded-Encrypted: i=1; AJvYcCVo6xMxtGjkF17kwpdfQ/etYSCBQSrCZbg6hGrvGrsiqCCM2eK2e/QkXqf5oyB/s47PrLZBfoM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFsjN+fxBsIGD8ieMvs6i+XY5jNc6BzGdctPzYwP+gW+uSKHKf
-	5z+LZfT/PRpt2u/UWGxi332jd0rBuciA/l9d1qpOOU3bLL+wM95RAIG+gzKZYHgIOfagAjqnSiH
-	hVA/hGp4VlbqDWg==
-X-Google-Smtp-Source: AGHT+IH9wGic6tntILObc3TB3bHf6yk36j9DH3Vzh/EaWWJRNjIzXE5QQ2srXRhEcjtwhhy8klaBBehPWF3u8g==
-X-Received: from qtnz8.prod.google.com ([2002:ac8:4548:0:b0:4ce:12a7:aaca])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:5c16:b0:4b7:8d26:5068 with SMTP id d75a77b69052e-4da4782dab8mr166794371cf.17.1758965309343;
- Sat, 27 Sep 2025 02:28:29 -0700 (PDT)
-Date: Sat, 27 Sep 2025 09:28:27 +0000
+        d=1e100.net; s=20230601; t=1758965573; x=1759570373;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uUGqO867qPXqCU9nRxWJmcotzVKjlhhUCRR7OPbF9cU=;
+        b=VJG9xLFWQdhkSE2FWDOcp/dqHZZXtOfqZwcLY18wH32OIN0sZ4JEwWfj9l/AohsA5f
+         NcjHleqQR8uVP3+6xcKM/BgrOQVj71vcvEj9DBy/xfYeqXkfvJoxRIVRLMcv/CUtZTBd
+         TFaSs+folqC8duQGv2UxmrsIvpnD1w20VGt6WCFcvDK/ZCfYqqWAE5/GsDroLFGLVsal
+         ajsiENHNZv7d7VKUOpWDiDH2xfsfEg6LDD8397+AcP3CEpc2BReVtP+4ifXiQIs+FcY5
+         /FbBf/ucn5h95ZOKK9VLAK+9AJQBwr/MFKd+f+Id49qnxPgQhS6f1X9RW3i+QSKmwf/2
+         UxHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWCkmdO9Yei6XyxOMVMi34VWKToJF/2Bi8TNoA/reLKBAdsMT0wlhyZdZ5j8+8aAM1s4qKzNAw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNy4+38R1vxvrYMHlVlCw6+cjpPMlsVc0JmHGKehWTaQ5r/YQ6
+	RLQwx+2ydAjYNuyr9OUTRQNxHVjPpluEsU5R52lU1/PbTEdHKvklJxS6jVL/W19Z5r91MYnErn/
+	8CubBVU9Agpj6MJlQ1G7fvugFy46DhX1KJLzVSfmfSksKDrWjZq7FSf8hTNqxJIk5r+Tn2S1yHp
+	cftBa5VmBHhQYKQ8LumhMIW+/VndZyuHN6wB4O0YRHZPOsaY0ZcHsJgJxVRo4V8a3YjW+u6n3my
+	bBf/hUk6ltb6Q==
+X-Gm-Gg: ASbGncv/UEQWxd9lfEB1Zw4wEfZaLjIGuo3xw6Bw7NPtsWJAi5FNrt/zzwUDXijxvTT
+	RGJUQqEvTKucQ7huPq7oIBahqVwbq4yNnDqBISxl6XQMQrAEx6XRbvp02TjrrtS9I5u8XorBnK9
+	s9Hoh8eJlKyzH8GFKB7ushixrEqGYt/eO0mtOOQ8q2vWQmBnJB4W7WqLpn8kHNHymEVVyyKa3t0
+	1tv/oP07QShYzObu5sTzSOp65LPTP/Bj9IauSWfxPkaE/Ihtu6NaEnGS2e6urodI31lDvh/8ZOi
+	q++NiHOH86Y3oPd2TsW9nmj5jwgu10oIJuSMAhDQyoVm5T6asXOsvyRha74nQ0WdZ2YsmUerafo
+	UOhxuMMkNJVoUwXBmjUsjyfSeNGlLt15H+Z55hqYoCLHWCUvKezohvO2XllTZmewQSrLOLA9sCE
+	YuSQ==
+X-Google-Smtp-Source: AGHT+IGKkBFrkQ/gPX+xZO6QDSSW3GM3C5XhWuYVlmJXcIC9gSKB1ZXB2liZ7V1lDS8EqoSlBF1ic2LX1K2q
+X-Received: by 2002:a05:6a00:1954:b0:77c:d54b:8c86 with SMTP id d2e1a72fcca58-780fcc98268mr10758610b3a.0.1758965572818;
+        Sat, 27 Sep 2025 02:32:52 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-121.dlp.protect.broadcom.com. [144.49.247.121])
+        by smtp-relay.gmail.com with ESMTPS id d2e1a72fcca58-781023da629sm342006b3a.1.2025.09.27.02.32.52
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 27 Sep 2025 02:32:52 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-77f2e48a829so4819786b3a.3
+        for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 02:32:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1758965571; x=1759570371; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uUGqO867qPXqCU9nRxWJmcotzVKjlhhUCRR7OPbF9cU=;
+        b=R4QtR28WkusylttaY7suFYqSs9Y0tBYX9KmtmsHr646O/NduWPHKK42SP+NJ4odQZ/
+         /eRpJnQCaRGgk1w3obiUV4E43j02SMislM3RBMEpU4AU6DkF3o4mEtZt1IAKJ65QAhbn
+         K3EjuUL6nP+wbmxW27Qxil/PS8+Wz8uH3vTME=
+X-Forwarded-Encrypted: i=1; AJvYcCW8VFrIKHepJ5aoVlrmTl0WYMQdQqR++YGofoO2iOTHMSjRSrtYT1AaiGvZo3zB70EQXwFw5Xk=@vger.kernel.org
+X-Received: by 2002:a05:6a00:3e13:b0:776:1de4:aee6 with SMTP id d2e1a72fcca58-780fcec2c91mr9196689b3a.16.1758965571065;
+        Sat, 27 Sep 2025 02:32:51 -0700 (PDT)
+X-Received: by 2002:a05:6a00:3e13:b0:776:1de4:aee6 with SMTP id d2e1a72fcca58-780fcec2c91mr9196670b3a.16.1758965570669;
+        Sat, 27 Sep 2025 02:32:50 -0700 (PDT)
+Received: from PC-MID-R740.dhcp.broadcom.net ([192.19.234.250])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-78105a81540sm6109940b3a.14.2025.09.27.02.32.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Sep 2025 02:32:50 -0700 (PDT)
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+To: jgg@ziepe.ca,
+	michael.chan@broadcom.com
+Cc: dave.jiang@intel.com,
+	saeedm@nvidia.com,
+	Jonathan.Cameron@huawei.com,
+	davem@davemloft.net,
+	corbet@lwn.net,
+	edumazet@google.com,
+	gospo@broadcom.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	selvin.xavier@broadcom.com,
+	leon@kernel.org,
+	kalesh-anakkur.purayil@broadcom.com,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>
+Subject: [PATCH net-next v4 0/5]  bnxt_fwctl: fwctl for Broadcom Netxtreme devices
+Date: Sat, 27 Sep 2025 02:39:25 -0700
+Message-Id: <20250927093930.552191-1-pavan.chebbi@broadcom.com>
+X-Mailer: git-send-email 2.39.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.536.g15c5d4f767-goog
-Message-ID: <20250927092827.2707901-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: use skb->len instead of skb->truesize in tcp_can_ingest()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-Some applications are stuck to the 20th century and still use
-small SO_RCVBUF values.
+Introducing bnxt_fwctl which follows along Jason's work [1].
+It is an aux bus driver that enables fwctl for Broadcom
+NetXtreme 574xx, 575xx and 576xx series chipsets by using
+bnxt driver's capability to talk to devices' firmware.
 
-After the blamed commit, we can drop packets especially
-when using LRO/hw-gro enabled NIC and small MSS (1500) values.
+The first patch moves the ULP definitions to a common place
+inside include/linux/bnxt/. The second and third patches
+refactor and extend the existing bnxt aux bus functions to
+be able to add more than one auxiliary device. The last three
+patches create an additional bnxt aux device, add bnxt_fwctl,
+and the documentation.
 
-LRO/hw-gro NIC pack multiple segments into pages, allowing
-tp->scaling_ratio to be set to a high value.
+[1] https://lore.kernel.org/netdev/0-v5-642aa0c94070+4447f-fwctl_jgg@nvidia.com/
 
-Whenever the receive queue gets full, we can receive a small packet
-filling RWIN, but with a high skb->truesize, because most NIC use 4K page
-plus sk_buff metadata even when receiving less than 1500 bytes of payload.
+v4: In patch #4, added the missing kfree on error for response
+buffer. Improved documentation in patch #5 based on comments
+from Dave.
 
-Even if we refine how tp->scaling_ratio is estimated,
-we could have an issue at the start of the flow, because
-the first round of packets (IW10) will be sent based on
-the initial tp->scaling_ratio (1/2)
+v3: Addressed the review comments as below
+Patch #1: Removed redundant common.h [thanks Saeed]
+Patch #2 and #3 merged into a single patch [thanks Jonathan]
+Patch #3: Addressed comments from Jonathan
+Patch #4 and #5: Addressed comments from Jonathan and Dave
 
-Relax tcp_can_ingest() to use skb->len instead of skb->truesize,
-allowing the peer to use final RWIN, assuming a 'perfect'
-scaling_ratio of 1.
+v2: In patch #5, fixed a sparse warning where a __le16 was
+degraded to an integer. Also addressed kdoc warnings for
+include/uapi/fwctl/bnxt.h in the same patch.
 
-Fixes: 1d2fbaad7cd8 ("tcp: stronger sk_rcvbuf checks")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/tcp_input.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+v1: https://lore.kernel.org/netdev/20250922090851.719913-1-pavan.chebbi@broadcom.com/
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 79d5252ed6cc1a24ec898f4168d47c39c6e92fe1..0a2511ce34db27a512a2f4d1a12e45069a2c12d3 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -5086,12 +5086,23 @@ static int tcp_prune_queue(struct sock *sk, const struct sk_buff *in_skb);
- 
- /* Check if this incoming skb can be added to socket receive queues
-  * while satisfying sk->sk_rcvbuf limit.
-+ *
-+ * In theory we should use skb->truesize, but this can cause problems
-+ * when applications use too small SO_RCVBUF values.
-+ * When LRO / hw gro is used, the socket might have a high tp->scaling_ratio,
-+ * allowing RWIN to be close to available space.
-+ * Whenever the receive queue gets full, we can receive a small packet
-+ * filling RWIN, but with a high skb->truesize, because most NIC use 4K page
-+ * plus sk_buff metadata even when receiving less than 1500 bytes of payload.
-+ *
-+ * Note that we use skb->len to decide to accept or drop this packet,
-+ * but sk->sk_rmem_alloc is the sum of all skb->truesize.
-  */
- static bool tcp_can_ingest(const struct sock *sk, const struct sk_buff *skb)
- {
--	unsigned int new_mem = atomic_read(&sk->sk_rmem_alloc) + skb->truesize;
-+	unsigned int rmem = atomic_read(&sk->sk_rmem_alloc);
- 
--	return new_mem <= sk->sk_rcvbuf;
-+	return rmem + skb->len <= sk->sk_rcvbuf;
- }
- 
- static int tcp_try_rmem_schedule(struct sock *sk, const struct sk_buff *skb,
+The following are changes since commit fec734e8d564d55fb6bd4909ae2e68814d21d0a1:
+  Merge tag 'riscv-for-linus-v6.17-rc8' of git://git.kernel.org/pub/scm/linux/kernel/git/riscv/linux
+and are available in the git repository at:
+  https://github.com/pavanchebbi/linux/tree/bnxt_fwctl_v4
+
+Pavan Chebbi (5):
+  bnxt_en: Move common definitions to include/linux/bnxt/
+  bnxt_en: Refactor aux bus functions to be more generic
+  bnxt_en: Create an aux device for fwctl
+  bnxt_fwctl: Add bnxt fwctl device
+  bnxt_fwctl: Add documentation entries
+
+ .../userspace-api/fwctl/bnxt_fwctl.rst        |  78 +++
+ Documentation/userspace-api/fwctl/fwctl.rst   |   1 +
+ Documentation/userspace-api/fwctl/index.rst   |   1 +
+ MAINTAINERS                                   |   6 +
+ drivers/fwctl/Kconfig                         |  11 +
+ drivers/fwctl/Makefile                        |   1 +
+ drivers/fwctl/bnxt/Makefile                   |   4 +
+ drivers/fwctl/bnxt/main.c                     | 454 ++++++++++++++++++
+ drivers/infiniband/hw/bnxt_re/debugfs.c       |   2 +-
+ drivers/infiniband/hw/bnxt_re/main.c          |   2 +-
+ drivers/infiniband/hw/bnxt_re/qplib_fp.c      |   2 +-
+ drivers/infiniband/hw/bnxt_re/qplib_res.h     |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  30 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  12 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |   2 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   4 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 245 +++++++---
+ .../bnxt_ulp.h => include/linux/bnxt/ulp.h    |  22 +-
+ include/uapi/fwctl/bnxt.h                     |  64 +++
+ include/uapi/fwctl/fwctl.h                    |   1 +
+ 21 files changed, 858 insertions(+), 88 deletions(-)
+ create mode 100644 Documentation/userspace-api/fwctl/bnxt_fwctl.rst
+ create mode 100644 drivers/fwctl/bnxt/Makefile
+ create mode 100644 drivers/fwctl/bnxt/main.c
+ rename drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h => include/linux/bnxt/ulp.h (87%)
+ create mode 100644 include/uapi/fwctl/bnxt.h
+
 -- 
-2.51.0.536.g15c5d4f767-goog
+2.39.1
 
 
