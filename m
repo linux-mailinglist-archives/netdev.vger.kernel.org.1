@@ -1,103 +1,91 @@
-Return-Path: <netdev+bounces-226823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DCA6BA56B6
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 02:30:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 677ACBA56CC
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 02:35:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F6631C070B1
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 00:30:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E38D387110
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 00:35:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB6E181CFA;
-	Sat, 27 Sep 2025 00:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D3081D514E;
+	Sat, 27 Sep 2025 00:35:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hS66Wh6i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O2AiDi3P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A0114BFA2
-	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 00:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF854282E1;
+	Sat, 27 Sep 2025 00:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758933018; cv=none; b=GTiLpGOriuhER5DFMvF8ZdseQUp82bHzV/B16xGCZJH6Bg0SacrzzW61YBV0thgTPPMOpXuAai69f6yH3r5synB0ws3oNdordKBgrLQTOiJ/pnQfuY+h/oWNUUcLR8TZsgK5fnBRA1eY8W/WmTAdBa9p0wdLXseXd2h2jvmK+Gg=
+	t=1758933342; cv=none; b=YCKDKjeF72pZ5XFQJVhSLZP4aGaf2NhV+qLyMgPzq2qIhR3Pe66E86UvXvSunw4r90Azc99jcdGxDAGWe6RyNTuEovwJiklu2czTjmslfbwYr55h9g9Bzx/NXIJqA3CZ0fWkU4X29UJCcIPduepJA8H0B7dh01Oti9zQenZNlm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758933018; c=relaxed/simple;
-	bh=6EiJYD1fzmZHH30HLXdNxSDvlWGhXwaTFNLrNBgc5qc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JTv85A4Lc7s64HLGhf+qMO+DvfEwXoxEOSMG6k1LDur/8MChehvMw/Qz9CrhULd9pxM6DwaFPgSffBKHX3+p/8oiSgU4QefN7ywisxKNSIUiRDthxIJ/sLxhjdNV3DTCqnntMcLAr8kJzsjNfqj7+9rMaNRbQHlUiuAazEawwOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hS66Wh6i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1512DC4CEF4;
-	Sat, 27 Sep 2025 00:30:18 +0000 (UTC)
+	s=arc-20240116; t=1758933342; c=relaxed/simple;
+	bh=6LZQOG26MoTzz2WiVd7VfoJ2nPId6GoJXe3Q2HKktN8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Pccx/P6vRjfEsYtc2YcBUe3XMT8wsI4bPbFvEJcuBQQIbWOShHw+mqxlKaImAg5r8jkZyl7B5wDyUSuQmWjnRm64emC4iQksG2pgsLLcFHod6RgcKCXmqdlA6mf5Xlboe62IeRUW870S8Ai588yTZGWPBsL309/TasnxcwBni1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O2AiDi3P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 512A2C4CEF4;
+	Sat, 27 Sep 2025 00:35:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758933018;
-	bh=6EiJYD1fzmZHH30HLXdNxSDvlWGhXwaTFNLrNBgc5qc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hS66Wh6i90h4B72SausFbqs1e/hVEJEpJBQvtnDWbOO2VfUSwznLfrWGbCfzOPBLu
-	 Q4JSYHaSSLItMWxBJuiW0Xk48vE5ngicvzmtS+Ai2rUTcYTr5XM+W4S2BY9eaaEVap
-	 /0VsurqLY1pwZTpAI7MLHteEcnt/ok/1zLJC24OrmthowpYOmCYRJ8fHWCXJYcG1xW
-	 3pzo8GtPCWZm2vbV19+anj+gcCcjQy+2rMJTjTgh5IFym1FQkA6D8UKKMuUCdGSmEH
-	 HgL6S7gUQAZDv++XobNczHkJw4LhqOUZc4NZHPSqxqbFJTTYGr3hIUzon7bEycNBgV
-	 NDKgQyggNclDA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E1939D0C3F;
-	Sat, 27 Sep 2025 00:30:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1758933341;
+	bh=6LZQOG26MoTzz2WiVd7VfoJ2nPId6GoJXe3Q2HKktN8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=O2AiDi3PUCkALX6/ryb+c/2gTaAulq08805GgjYhgjLQWuQ+HZuvS5hV3bXoze4qa
+	 KeHqxqXMToSklYCbuntu1G89K5uD0aF8uX3CLl08p5oIdTKwlh7TTL0YlR5mBJ5Tq8
+	 AjG0OkjH3t/8TmQs06naA4DMQ4vggNelv1NdAox+4zEyzMtvfMbfG7+2ROqa3LLS+S
+	 2YmDqubGDpnUwmIyGJ51Vd5kkZnJT42Bk/Q7jSTgGP1MlcLssfFMtd4cB5McpWCLBF
+	 M1Gavgvd78hMrmrjB8JNTeeJwFlFPPTE5rurZA/M54dU0HLr8gEBvb3baC5WVCoMF3
+	 P89DHt3ATZwxg==
+Date: Fri, 26 Sep 2025 17:35:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>, Donald Hunter
+ <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
+ Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH RFC bpf-next v2 1/5] netlink: specs: Add XDP RX checksum
+ capability to XDP metadata specs
+Message-ID: <20250926173539.17403e94@kernel.org>
+In-Reply-To: <0608935c-1c1c-4374-a058-bc78d114c630@kernel.org>
+References: <20250925-bpf-xdp-meta-rxcksum-v2-0-6b3fe987ce91@kernel.org>
+	<20250925-bpf-xdp-meta-rxcksum-v2-1-6b3fe987ce91@kernel.org>
+	<0608935c-1c1c-4374-a058-bc78d114c630@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6 0/5] add FEC bins histogram report via ethtool
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175893301325.104870.1559335505983005241.git-patchwork-notify@kernel.org>
-Date: Sat, 27 Sep 2025 00:30:13 +0000
-References: <20250924124037.1508846-1-vadim.fedorenko@linux.dev>
-In-Reply-To: <20250924124037.1508846-1-vadim.fedorenko@linux.dev>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: kuba@kernel.org, andrew@lunn.ch, michael.chan@broadcom.com,
- pavan.chebbi@broadcom.com, tariqt@nvidia.com, gal@nvidia.com,
- intel-wired-lan@lists.osuosl.org, donald.hunter@gmail.com,
- cjubran@nvidia.com, aleksandr.loktionov@intel.com, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 24 Sep 2025 12:40:32 +0000 you wrote:
-> IEEE 802.3ck-2022 defines counters for FEC bins and 802.3df-2024
-> clarifies it a bit further. Implement reporting interface through as
-> addition to FEC stats available in ethtool. NetDevSim driver has simple
-> implementation as an example while mlx5 has much more complex solution.
+On Fri, 26 Sep 2025 11:53:25 +0200 Jesper Dangaard Brouer wrote:
+> > + * In case of success, ``cksum_meta`` contains the hw computed checksum value
+> > + * for ``XDP_CHECKSUM_COMPLETE`` or the ``csum_level`` for
+> > + * ``XDP_CHECKSUM_UNNECESSARY``. It is set to 0 for ``XDP_CHECKSUM_NONE`` and
+> > + * ``XDP_CHECKSUM_PARTIAL``.
+> > + *  
 > 
-> The example query is the same as usual FEC statistics while the answer
-> is a bit more verbose:
-> 
-> [...]
+> It is very important that we explain the meaning of XDP_CHECKSUM_NONE.
+> As I hinted in other email, this also covers the non-existing FAIL case.
 
-Here is the summary with links:
-  - [net-next,v6,1/5] ethtool: add FEC bins histogram report
-    https://git.kernel.org/netdev/net-next/c/cc2f08129925
-  - [net-next,v6,2/5] net/mlx5e: Don't query FEC statistics when FEC is disabled
-    https://git.kernel.org/netdev/net-next/c/6b81b8a0b197
-  - [net-next,v6,3/5] net/mlx5e: Add logic to read RS-FEC histogram bin ranges from PPHCR
-    https://git.kernel.org/netdev/net-next/c/44907e7c8fd0
-  - [net-next,v6,4/5] net/mlx5e: Report RS-FEC histogram statistics via ethtool
-    https://git.kernel.org/netdev/net-next/c/ca80036839eb
-  - [net-next,v6,5/5] selftests: net-drv: stats: sanity check FEC histogram
-    https://git.kernel.org/netdev/net-next/c/ed3d74a75411
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Good idea, perhaps we should add this to the big comment about
+checksums in skbuff.h and point to that? Avoid the duplication?
 
