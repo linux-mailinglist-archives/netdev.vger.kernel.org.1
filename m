@@ -1,160 +1,109 @@
-Return-Path: <netdev+bounces-226907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78A8EBA60E5
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 17:12:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4384BA6101
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 17:34:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBCDD1B23055
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 15:12:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E2AE4A3EE8
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 15:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1301F27604E;
-	Sat, 27 Sep 2025 15:12:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 607332E0B79;
+	Sat, 27 Sep 2025 15:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CsnDsSrp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fZnKgDOm"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7572B1DE4FB
-	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 15:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CAAF4C9D
+	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 15:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758985932; cv=none; b=RNb7vNWiOC4XHumDKiu9voXioqmzUgj1oHZGUh0TfiC6tIH/GiPHVgQ5r1mdMFrkUbwfiIuYtL9PFNAEXIbmuzX3712E9R+IiOzOYIEqIsGdg739g7IhvitWeTn0T+OI5oFMUAg5XDGTqHHWrDcpmIK0sbBUhkVZmXZSlP7bp8M=
+	t=1758987286; cv=none; b=rSHMonbfmT8h6mcJMHyFpEsa/fRGAumQnWD+CDIRYadLcs2n+jNaxUGWEOeqgOwI77aQrHn0MkND8Oy3J40cBW6Tk5PXayj/QQYDt5BomwAParFTOvduVnu9g2wSMWpnOoHwiHMlGJmgPq/b4ZSWfdyVSvKn71p6yL/dRKTogIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758985932; c=relaxed/simple;
-	bh=Vy0k2mVWMp4wo9S3xuYBoahUJ2vO3N8E/kmrgUh07AI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fKUwfqNJ5tUNb91FjSSfBPc7w9GC1gTGrtwWRbxxl7O4VlD57ITXaMvRMTerIBRQeuOFD2f/piWol1OB3fzoLvVRDLOCSRGKvLHNkoRfJFmn4IB3Y4FRDkXexu9EtTDtFfzVml9EdznI2XToFOZYp5OhA5cs+z6/Y8QPEPi0HVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CsnDsSrp; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Q236Oh2TS2khj+FBBddn1YvNfYvK9uxAQSeoEwEhBvc=; b=CsnDsSrptyjNwbdUG6HW9DPRwI
-	Grj9AaO7d7ZDfmR+uNgSZl4Vgw55epL5qfPMsXRuAQm19S0CozFr69r1ulQmsnumqgnBr4yqa3FzF
-	p+VK2+aqNtpU2eSdsYikVJF5NN499iq/l31b6w4sDv78cfNqDAjbgjhYdrMI2dsQMEk8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1v2Wak-009dzr-Bs; Sat, 27 Sep 2025 17:12:06 +0200
-Date: Sat, 27 Sep 2025 17:12:06 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Luke Howard <lukeh@padl.com>
-Cc: netdev@vger.kernel.org, vladimir.oltean@nxp.com, kieran@sienda.com,
-	jcschroeder@gmail.com, max@huntershome.org
-Subject: Re: [RFC net-next 3/5] net: dsa: mv88e6xxx: MQPRIO support
-Message-ID: <79953e8f-a744-457b-b6b8-fa7147d1cbf5@lunn.ch>
-References: <20250927070724.734933-1-lukeh@padl.com>
- <20250927070724.734933-4-lukeh@padl.com>
+	s=arc-20240116; t=1758987286; c=relaxed/simple;
+	bh=1NyzohdQmVFa2JZ1JpySWMhbjvJCfx19LHiQMzBXbeE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OsRRleSZnJYksn0VihHEE3WRodfwZBgy0gQ+q0hyPxYrx01/q0OS2yfwTr85RelhRuXy2A8mWjDN8M1oX6x1M7XbXMIGSeTApWH2s/y9E+Wi0Mf77GIYOwYrfD/rRc2bgHLq5XQ1q/UP/kBOjy3p8u59z3JP6WIgOfTngQr0BD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fZnKgDOm; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-3682ac7f33fso38048431fa.0
+        for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 08:34:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758987283; x=1759592083; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1NyzohdQmVFa2JZ1JpySWMhbjvJCfx19LHiQMzBXbeE=;
+        b=fZnKgDOmNO2+q7SF65F9Gc738TakS4nJA3T9Evx8SbZ4DhWVrMtKdhxRMqTn4ejzFf
+         gXRI+n9NTRaKEG2WPjSyw4e3Q+fJcfj3ob4YGMgR6eZW+0IuI5CWqgqWhkOZmy/sqfuh
+         o82ZaZ8146fFIvYWVUu58cntuMAMOdZ785G8NUMP6/kOOs+rGM7Wxz6iiVYBsLlVzea2
+         CFdxnYmRPErVbT1dsn7xzMZs0pOZE6X5cQWyijmBjNsGWycEuvxPNMhIkd+59F7e0ZP3
+         CEA79gCYvLr48wBG3TaOx2Zs3T4CM8gLJibVcA0UyZ8ijnNeGwM/FiRaE2md1yuGq0Q0
+         4BtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758987283; x=1759592083;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1NyzohdQmVFa2JZ1JpySWMhbjvJCfx19LHiQMzBXbeE=;
+        b=e5AVrDbdjogLIwUpoWqqoUkJA+yroTi9GlcfstEuail6xTDcT39Cf16PIRu77+GvAU
+         csglJJfI+0iXJ+zrstcRbLSUHebuXtv70M+85dFJ2hUXM7I/2zqBNmRg5m5VeBTz97Lw
+         XiGYfZMPRyWcUZeSVYG4A8XYy62eaz8YRk4lX5ChiQPrm2AeJxvK9hL/aj+J6iBoSXd2
+         48T44RrS0iCNPsGnggcSnVGu8y7FOHaVFWHowcE8a9X7TaE/tbzzE+XDpYdI8CrHrLbt
+         Z+EhjpyO8xk+Iqp7IcBdGDXqJ2DdAH92rt0LAGilEfg00GUD907ZvlTTwZaFha5IuPE2
+         sW8A==
+X-Forwarded-Encrypted: i=1; AJvYcCUgHyHJpFTHzfLEMRNqCECF7PpOkYpbaoHhR/0FZi8ONHbRpeXvEBYk41rJv9Y9aNeXUGOMEEA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxams0dEwbZqc41cluPnk1OMJlfzwMnQgcGMuMztz8dN/YZdX4G
+	jMDBibXBmkiGRCffAnEsBvyzwFh4EFDiOPJ+ynYDdx/W7tEfi5H2otDHDHi/rKMd6nQ7nDt9OOP
+	R959pvfWq3v0uEr2FXw82mJqBTtikZX4=
+X-Gm-Gg: ASbGncs1Na8yxlqoI8kJkub97TGDLutWGS7JsbOaw/xVEV5m5LKJ/1U9wKJgGxtC+uY
+	1gaCmmoVIINKRK0zUyqK9rDhIe+RBNQcknRbx2UFBR2iaQWj8x0TDUv44OIt4vR+Mlvjlg4MT4/
+	CC5+sZtlQ2pkg1bacWJzfUofmELLoZiJTWN6hgmEcGe8unwyO2tYwK0v049uqpk39M3FnvFQRXh
+	xnhkrkzvowXKQCo
+X-Google-Smtp-Source: AGHT+IFIV8oIu6Oj1Pp1lnbMHoF9GdCsUDzDv0uNr9W3DhIQe/zD2dAbhVOoRTo8GVxP6GDf0o+SLlO/CQEr38ubHyQ=
+X-Received: by 2002:a2e:bcd0:0:b0:36b:9ecc:cb5a with SMTP id
+ 38308e7fff4ca-36fb24aa72fmr33790481fa.22.1758987282373; Sat, 27 Sep 2025
+ 08:34:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250927070724.734933-4-lukeh@padl.com>
+References: <20250925145124.500357-1-luiz.dentz@gmail.com> <20250926144343.5b2624f6@kernel.org>
+In-Reply-To: <20250926144343.5b2624f6@kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sat, 27 Sep 2025 11:34:30 -0400
+X-Gm-Features: AS18NWB27mOMiB1EngWQFWE_xBLp4JBJePuK0Mn4tVah9yp5rIMATLFfal63ZDM
+Message-ID: <CABBYNZJEJ2U_w8CN5h65nvRMvm2wWHHRng2J8x1Cpwd8YL4f-w@mail.gmail.com>
+Subject: Re: [GIT PULL] bluetooth-next 2025-09-25
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> +/* MQPRIO helpers */
-> +
-> +/* Set the AVB global policy limit registers. Caller must acquired register
-> + * lock.
+Hi Jakub,
 
-No where else in this driver is this assumption about the register
-lock documented. If you forget it, the low level read/write functions
-will tell you. So i don't think it adds value.
+On Fri, Sep 26, 2025 at 5:43=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 25 Sep 2025 10:51:24 -0400 Luiz Augusto von Dentz wrote:
+> > bluetooth-next pull request for net-next:
+>
+> I'm getting a conflict when pulling this. Looks like it's based on
+> the v1 of the recent net PR rather than the reworked version?
+>
+> Sorry for the delay
 
-> + *
-> + * @param chip		Marvell switch chip instance
-> + * @param hilimit	Maximum frame size allowed for AVB Class A frames
-> + *
-> + * @return		0 on success, or a negative error value otherwise
-> + */
+Should I rebase it again?
 
-kerneldoc wants a : after return. 
 
-> +static int mv88e6xxx_avb_set_hilimit(struct mv88e6xxx_chip *chip, u16 hilimit)
-> +{
-> +	u16 data;
-> +	int err;
-> +
-> +	if (hilimit > MV88E6XXX_AVB_CFG_HI_LIMIT_MASK)
-> +		return -EINVAL;
-
-Does it make sense to check it against the MTU? Does it matter if it
-is bigger than the MTU?
-
-> +/* Set the AVB global policy OUI filter registers. Caller must acquire register
-> + * lock.
-> + *
-> + * @param chip		Marvell switch chip instance
-> + * @param addr		The AVB OUI to load
-> + *
-> + * @return		0 on success, or a negative error value otherwise
-> + */
-> +static int mv88e6xxx_avb_set_oui(struct mv88e6xxx_chip *chip,
-> +				 const unsigned char *addr)
-
-Maybe be a bit more specific with the documentation of addr. You pass
-a 6 byte address, not a 3 byte OUI. So "The AVB OUI to load" is not
-quite correct. It is more like, "Use the OUI from this MAC address."
-I've not looked at the big picture, but i was woundering if it makes
-more sense to pass an actual OUI? But that is not something we tend to
-do in the kernel.
-
-> +static inline u16 mv88e6352_avb_pri_map_to_reg(const struct mv88e6xxx_avb_priority_map map[])
-> +{
-> +	return MV88E6352_AVB_CFG_AVB_HI_FPRI_SET(map[MV88E6XXX_AVB_TC_HI].fpri) |
-> +		MV88E6352_AVB_CFG_AVB_HI_QPRI_SET(map[MV88E6XXX_AVB_TC_HI].qpri) |
-> +		MV88E6352_AVB_CFG_AVB_LO_FPRI_SET(map[MV88E6XXX_AVB_TC_LO].fpri) |
-> +		MV88E6352_AVB_CFG_AVB_LO_QPRI_SET(map[MV88E6XXX_AVB_TC_LO].qpri);
-> +}
-> +
-> +static int mv88e6352_qav_map_fpri_qpri(u8 fpri, u8 qpri, void *reg)
-> +{
-> +	mv88e6352_g1_ieee_pri_set(fpri, qpri, (u16 *)reg);
-> +	return 0;
-
-Blank line before the return please.
-
-> + *	- because the Netlink API has no way to distinguish between FDB/MDB
-> + *	  entries managed by SRP from those that are not, the
-> + *	  "marvell,mv88e6xxx-avb-mode" device tree property controls whether
-> + *	  a FDB or MDB entry is required in order for AVB frames to egress.
-
-We probably need to think about this. What about other devices which
-require this? Would it be better to extend the netlink API to pass
-some sort of owner? If i remember correctly, routes passed by netlink
-can indicate which daemon is responsible for it, quagga, zebra, bgp
-etc.
-
-> + *	  To avoid breaking static IP MDB entries, only multicast addresses
-> + *	  with OUI prefix of 91:e0:ff (IEEE 1722 Annex D) will have the AVB
-> + *	  flag set on their ATU entry.
-
-This probably answers my question bellow.
-
-> +/* The MAAP address range is 91:E0:F0:00:00:00 thru 91:E0:F0:00:FF:FF
-> + * (IEEE 1722 Annex D)
-> + */
-> +static const u8 eth_maap_mcast_addr_base[ETH_ALEN] __aligned(2) = {
-> +	0x91, 0xe0, 0xf0, 0x00, 0x00, 0x00
-> +};
-> +
-> +static inline bool ether_addr_is_maap_mcast(const u8 *addr)
-> +{
-> +	u8 mask[ETH_ALEN] = { 0xff, 0xff, 0xff, 0xff, 0x00, 0x00 };
-> +
-> +	return ether_addr_equal_masked(addr, eth_maap_mcast_addr_base, mask);
-> +}
-
-Since these are part of a standard, i assume other drivers will need
-it as well? These should probably be somewhere common.
-
+--=20
+Luiz Augusto von Dentz
 
