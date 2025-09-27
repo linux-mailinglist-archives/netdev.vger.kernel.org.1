@@ -1,245 +1,136 @@
-Return-Path: <netdev+bounces-226881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65D45BA5C76
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 11:33:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4334FBA5CA4
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 11:41:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D2CF1B21910
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 09:33:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33DE4323701
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 09:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2527F2D5C8B;
-	Sat, 27 Sep 2025 09:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB5E2D73A6;
+	Sat, 27 Sep 2025 09:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="fqmTYUJv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ip6ypAWS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f98.google.com (mail-pj1-f98.google.com [209.85.216.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C65283FF0
-	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 09:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA9E224B09;
+	Sat, 27 Sep 2025 09:40:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758965604; cv=none; b=AwW74RWWLRZSP/vrJp2e5VUZ7u5Wk5/tCCUtoCShOv6uk37aKq4gqUQHdJiBqtA/C2zxN7HvrYXWA38J5Dp1JaECUzv/L0qJAYSJQpr9aApApibPlUm74j+bdG010scmQKKd5ETK5RnIBiIYaQcvybO37W4ig2VqPN8Ab9zD4BE=
+	t=1758966058; cv=none; b=AX3oo7yB9SIvGu5GdLtvUXEgxSUSfqTHHHrwPBtWkTAvh3ohN4kbLh84QD07nk0CVBFCvJX83ENL93ou12SStId7TdCFKFGWff8o7o87yNkzu0OalsCEaOztswDJxCJGyCgErZzH9Lh+FyUa95/s9/5y6aFVzWY+NKMIVOLf2LI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758965604; c=relaxed/simple;
-	bh=Gww0sVZuLcq6Q4gChl5SQLZo5TRoUXgPnFtlZrXpn/0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=onhnPW3NRFnSSL+agus8v7PGcExcAj67L5zHOwEpmhY0QxGBckrwHc8lRbM9GhHZxJTYJjXcevm7ggT9nTkB/a2LxlizI0orYea7tjuInl2OrbBLqxpTEkbTeOVTW7GiR0qbcxjOaH/Pw5Z1/f0pwu93UXc8qSgmI7sGp6uQgPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=fqmTYUJv; arc=none smtp.client-ip=209.85.216.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f98.google.com with SMTP id 98e67ed59e1d1-3352018e050so2412351a91.2
-        for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 02:33:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758965601; x=1759570401;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a3G0XyljyRUSkwB9ChatPpegoOeqG70xuyfwuuJZ0lc=;
-        b=rP7lZxfyIRDOAx7Q4gE0wqvjcS1uGq997qK8Tj5l59i5zPcbS8TDAZL3lEsA32O3vl
-         lDmDd7j8a8TJQGz4H1rib9RDMhJl0q2BrVLta6KeKFQxvEKHJWJ/Cd6y6OYp5BavgiOs
-         jPXHu+bj6l6QX/lumTw5Ed/L9EWcqIJlAz1h/0KQLEjBtrE04Orfe42IFqsWIyBbfdSN
-         5kLgpSyiY2CSnGvExM9u50tPs06V89XQCQtYE1k5twtWHXNnm39o9kC+khCSopjSQhWv
-         Fdt5At8t9a8KO/4zRsOszzJdBd3znPF2xeA1I6Q+EzxJZvRGJl0OfR9tjmBhIPpYHwjq
-         Ofrg==
-X-Forwarded-Encrypted: i=1; AJvYcCU/R9wkOsdOBZr3mHCoobTd36RZ5XgAh8PUDtxPsWH66xNkulqjnvNlV8ip918ZnnRBNTFPUx8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyawB96T+Tet2QZd3s29lvmsAGP1tyKcko28J3fFkT8cJmWe7Vm
-	Cc5K7e35njoY8VOD0zKapaZwW5xQWZgIwm46d6ieTC3E1BEOUZdR2penWUU8jar8cEl/M9aj43P
-	FWP1BxacMw2a7J0v76+g2R3Cuowir0+jF8KpMmj3LW/1ntPJZZvsj/ozxswYJpp+0fBmB1xma1r
-	iay+qtw1M9X2b40UwES9pYda9oHwZC49heC2QlxugduZdgGPY+9P0jHjFYEJVNSSYMyG06brqAa
-	lxnCsWWX1LuOg==
-X-Gm-Gg: ASbGncvK0Fx2KiCO3ijahLhx0I9QcTQWeq6oB3s0BY/KifRZuolFUSfLpEEoDkPM7ia
-	V943O4OVBmxks+FQSe0ahX47KYJ1eil6CF2vs1Hhrt93l3UAery+EFGf1hL6KW64mM1/ej8FIGD
-	67T5S1nJm+b0uxqG8e8ei6WdhRhbmqNnV+RBclzI0pJvUGdY8tw2aOLQC7sXvDwsfcyJyGLr/WQ
-	JVHhiLbeW65ivIx6ggNcG3gGOPDmPaZXY6fbBAbgDaFy/M/WQIDPidJL1I/kjxQ5fEEQbdcgbDY
-	BB4GzEBhksT2zhJ+1jgqCA17do2n1bbVveh6BFAe1gCRaq8REDLqCBG56VawyYa3KDq/f08OKRy
-	HhwFSyA6+MLmXhdPqqWvF1lVoB/RWm6fq8jPCBxX4k8LKk0Es5IXbpdddDpGanyJaUagEDPPygo
-	y1Vw==
-X-Google-Smtp-Source: AGHT+IEhNQXe/Gj3dJxT6spGf0ebFfzWZRjBcSjLXqtNSgpnFeuxv3TLgolmsf6mOh23PP/ktgab4RTsErSk
-X-Received: by 2002:a17:90a:da84:b0:32b:355a:9de with SMTP id 98e67ed59e1d1-3342a2f0152mr9948867a91.32.1758965600808;
-        Sat, 27 Sep 2025 02:33:20 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-3346d96a701sm424378a91.0.2025.09.27.02.33.20
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 27 Sep 2025 02:33:20 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-7811e063dceso1019134b3a.2
-        for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 02:33:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1758965599; x=1759570399; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a3G0XyljyRUSkwB9ChatPpegoOeqG70xuyfwuuJZ0lc=;
-        b=fqmTYUJvbNbeIsbXjG9OVUq6eEexfs30APQ8inV96tTO9Xe/aNelLTH2yhMIYlarwJ
-         nKC86LtS0Em/aL7PHDYH18mYsD6W6s4ixyymkL5g2tYfdjNgOc4aDBQ+QOzvStKOQhHO
-         rov9xmjb+q9aGjjqUHmpOU0WJs5SalxYYnEIM=
-X-Forwarded-Encrypted: i=1; AJvYcCV62Lmnlj92+/jkTFsQTuOYHkaB8W1p/T1zNiUvIWiaHqfJrclfbkzKsIXT0xolD+g6qBpG/GU=@vger.kernel.org
-X-Received: by 2002:a05:6a00:2e89:b0:782:2f62:7059 with SMTP id d2e1a72fcca58-7822f628144mr356115b3a.22.1758965599018;
-        Sat, 27 Sep 2025 02:33:19 -0700 (PDT)
-X-Received: by 2002:a05:6a00:2e89:b0:782:2f62:7059 with SMTP id d2e1a72fcca58-7822f628144mr356087b3a.22.1758965598594;
-        Sat, 27 Sep 2025 02:33:18 -0700 (PDT)
-Received: from PC-MID-R740.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-78105a81540sm6109940b3a.14.2025.09.27.02.33.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Sep 2025 02:33:18 -0700 (PDT)
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-To: jgg@ziepe.ca,
-	michael.chan@broadcom.com
-Cc: dave.jiang@intel.com,
-	saeedm@nvidia.com,
-	Jonathan.Cameron@huawei.com,
-	davem@davemloft.net,
-	corbet@lwn.net,
-	edumazet@google.com,
-	gospo@broadcom.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	selvin.xavier@broadcom.com,
-	leon@kernel.org,
-	kalesh-anakkur.purayil@broadcom.com,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: [PATCH net-next v4 5/5] bnxt_fwctl: Add documentation entries
-Date: Sat, 27 Sep 2025 02:39:30 -0700
-Message-Id: <20250927093930.552191-6-pavan.chebbi@broadcom.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20250927093930.552191-1-pavan.chebbi@broadcom.com>
-References: <20250927093930.552191-1-pavan.chebbi@broadcom.com>
+	s=arc-20240116; t=1758966058; c=relaxed/simple;
+	bh=dt+DecOx3QZJzbvvA3hprtLoaSDazDHK/AaHDq9Jc1I=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=OSXitCA1eEPGxwtDIWPVoLN8LVeP87EjqRv/dE0zvDkG4GYizUW4h2QWGmVkk2uaJQQzuKcTNUc7KkH9hyhxRLhoMAbQTSLRY6DXmObHzYwL/fStIyKFRe05lGllGM0bsTsyEgMr1+qY+A5iNj7lsQw1EzCEtewQlPVpKmd1LyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ip6ypAWS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C283EC4CEF8;
+	Sat, 27 Sep 2025 09:40:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758966057;
+	bh=dt+DecOx3QZJzbvvA3hprtLoaSDazDHK/AaHDq9Jc1I=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Ip6ypAWS9p3RmzQnOrceVx+weMajQ4YgomFbO4LYYP27tFldc78k6i7K9WXmRpVkw
+	 lMvf/NzF2oSzNY9cvbZGFihwbb6uTbFogWERBWaX9fzUv/xoR/oKG6IFydEQMasZy+
+	 vqEOPUgNISkgHg27zxQiIxJ85lm4tHZECkda41/fX2NpP/GnFC9Jotl0O87rEIm63W
+	 HfAHpFB6PUSUbuv0Q3pw4NbDTp6BO8Y86woYu/0FdBQS/t4elxXgQHjgJ9ZyGV+jJ9
+	 4AaO9kAX3aHayM80Yv29Lxy+HL74V7KTuKslHD3tvnGW5cLsY1pzKY3INJIfRPGw8g
+	 0Mblg9CzU4oSw==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next 0/8] mptcp: receive path improvement
+Date: Sat, 27 Sep 2025 11:40:36 +0200
+Message-Id: <20250927-net-next-mptcp-rcv-path-imp-v1-0-5da266aa9c1a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABSx12gC/zWMQQqEMAwAvyI5G9CguPUr4qHE7JqD3dAWEcS/W
+ wQPc5jDzAlJokqCsTohyq5J/6FIW1fAqw8/QV2KAzXUN44GDJILR8bNMhtG3tF8XlE3w9bR8mH
+ q2PEA5WBRvno89wneEObrugH8HVOydwAAAA==
+X-Change-ID: 20250927-net-next-mptcp-rcv-path-imp-192d8c24c9c7
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2508; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=dt+DecOx3QZJzbvvA3hprtLoaSDazDHK/AaHDq9Jc1I=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDKub5QO3nWhVaNtww71nepfbpa7z+VZzCDUlCKldn9aS
+ Oc8W6UJHaUsDGJcDLJiiizSbZH5M59X8ZZ4+VnAzGFlAhnCwMUpABNxX8HI8H5r2/o8nn2Tb3hd
+ 9P4969wab8/QkoPbBbq8VT86/5v9cxojw/2O2zNaXBw1OTUPsK3V4mUoiHA26269ddVvzz5r6d8
+ zuQA=
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-Add bnxt_fwctl to the driver and fwctl documentation pages.
+This series includes several changes to the MPTCP RX path. The main
+goals are improving the RX performances, and increase the long term
+maintainability.
 
-Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
-Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Some changes reflects recent(ish) improvements introduced in the TCP
+stack: patch 1, 2 and 3 are the MPTCP counter part of SKB deferral free
+and auto-tuning improvements. Note that patch 3 could possibly fix
+additional issues, and overall such patch should protect from similar
+issues to arise in the future.
+
+Patches 4-7 are aimed at introducing the socket backlog usage which will
+be done in a later series to process the packets received by the
+different subflows while the msk socket is owned.
+
+Patch 8 is not related to the RX path, but it contains additional tests
+for new features recently introduced in net-next.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- .../userspace-api/fwctl/bnxt_fwctl.rst        | 78 +++++++++++++++++++
- Documentation/userspace-api/fwctl/fwctl.rst   |  1 +
- Documentation/userspace-api/fwctl/index.rst   |  1 +
- 3 files changed, 80 insertions(+)
- create mode 100644 Documentation/userspace-api/fwctl/bnxt_fwctl.rst
+Notes:
+ - Sorry for sending this series that late, we had quite a few patches
+   to upstream during this cycle. This is the last batch, and it has
+   been heavily tested the last 2 weeks.
+ - If there are some issues with some patches, but not with 1-3, it
+   would be nice, if possible, if these 3 first patches can be accepted,
+   to reduce the recently introduced gap with TCP.
+ - Patches can be grouped like this if needed: 1-3, 4-5, 6-7, 8. 6-7 are
+   preparing the ground for future on-going work, they can be dropped if
+   there are issues with them.
 
-diff --git a/Documentation/userspace-api/fwctl/bnxt_fwctl.rst b/Documentation/userspace-api/fwctl/bnxt_fwctl.rst
-new file mode 100644
-index 000000000000..7cf2b65ea34b
---- /dev/null
-+++ b/Documentation/userspace-api/fwctl/bnxt_fwctl.rst
-@@ -0,0 +1,78 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=================
-+fwctl bnxt driver
-+=================
-+
-+:Author: Pavan Chebbi
-+
-+Overview
-+========
-+
-+BNXT driver makes a fwctl service available through an auxiliary_device.
-+The bnxt_fwctl driver binds to this device and registers itself with the
-+fwctl subsystem.
-+
-+The bnxt_fwctl driver is agnostic to the device firmware internals. It
-+uses the Upper Layer Protocol (ULP) conduit provided by bnxt to send
-+HardWare Resource Manager (HWRM) commands to firmware.
-+
-+These commands can query or change firmware driven device configurations
-+and read/write registers that are useful for debugging.
-+
-+bnxt_fwctl User API
-+===================
-+
-+Each RPC request contains a message request structure (HWRM input),
-+its length, optional request timeout, and dma buffers' information
-+if the command needs any DMA. The request is then put together with
-+the request data and sent through bnxt's message queue to the firmware,
-+and the results are returned to the caller.
-+
-+A typical user application can send a FWCTL_INFO command using ioctl()
-+to discover bnxt_fwctl's RPC capabilities as shown below:
-+
-+        ioctl(fd, FWCTL_INFO, &fwctl_info_msg);
-+
-+where fwctl_info_msg (of type struct fwctl_info) describes bnxt_info_msg
-+(of type struct fwctl_info_bnxt) as shown below:
-+
-+        size = sizeof(fwctl_info_msg);
-+        flags = 0;
-+        device_data_len = sizeof(bnxt_info_msg);
-+        out_device_data = (__aligned_u64)&bnxt_info_msg;
-+
-+The uctx_caps of bnxt_info_msg represents the capabilities as described
-+in fwctl_bnxt_commands of include/uapi/fwctl/bnxt.h
-+
-+The FW RPC itself, FWCTL_RPC can be sent using ioctl() as:
-+
-+        ioctl(fd, FWCTL_RPC, &fwctl_rpc_msg);
-+
-+where fwctl_rpc_msg (of type struct fwctl_rpc) encapsulates fwctl_rpc_bnxt
-+(see bnxt_rpc_msg below). fwctl_rpc_bnxt members are set up as per the
-+requirements of specific HWRM commands described in include/linux/bnxt/hsi.h.
-+An example for HWRM_VER_GET is shown below:
-+
-+        struct fwctl_rpc_bnxt bnxt_rpc_msg;
-+        struct hwrm_ver_get_output resp;
-+        struct fwctl_rpc fwctl_rpc_msg;
-+        struct hwrm_ver_get_input req;
-+
-+        req.req_type = HWRM_VER_GET;
-+        req.hwrm_intf_maj = HWRM_VERSION_MAJOR;
-+        req.hwrm_intf_min = HWRM_VERSION_MINOR;
-+        req.hwrm_intf_upd = HWRM_VERSION_UPDATE;
-+        req.cmpl_ring = -1;
-+        req.target_id = -1;
-+
-+        bnxt_rpc_msg.req_len = sizeof(req);
-+        bnxt_rpc_msg.num_dma = 0;
-+        bnxt_rpc_msg.req = (__aligned_u64)&req;
-+
-+        fwctl_rpc_msg.size = sizeof(fwctl_rpc_msg);
-+        fwctl_rpc_msg.scope = FWCTL_RPC_DEBUG_READ_ONLY;
-+        fwctl_rpc_msg.in_len = sizeof(bnxt_rpc_msg) + sizeof(req);
-+        fwctl_rpc_msg.out_len = sizeof(resp);
-+        fwctl_rpc_msg.in = (__aligned_u64)&bnxt_rpc_msg;
-+        fwctl_rpc_msg.out = (__aligned_u64)&resp;
-diff --git a/Documentation/userspace-api/fwctl/fwctl.rst b/Documentation/userspace-api/fwctl/fwctl.rst
-index a74eab8d14c6..826817bfd54d 100644
---- a/Documentation/userspace-api/fwctl/fwctl.rst
-+++ b/Documentation/userspace-api/fwctl/fwctl.rst
-@@ -148,6 +148,7 @@ area resulting in clashes will be resolved in favour of a kernel implementation.
- fwctl User API
- ==============
- 
-+.. kernel-doc:: include/uapi/fwctl/bnxt.h
- .. kernel-doc:: include/uapi/fwctl/fwctl.h
- .. kernel-doc:: include/uapi/fwctl/mlx5.h
- .. kernel-doc:: include/uapi/fwctl/pds.h
-diff --git a/Documentation/userspace-api/fwctl/index.rst b/Documentation/userspace-api/fwctl/index.rst
-index 316ac456ad3b..8062f7629654 100644
---- a/Documentation/userspace-api/fwctl/index.rst
-+++ b/Documentation/userspace-api/fwctl/index.rst
-@@ -10,5 +10,6 @@ to securely construct and execute RPCs inside device firmware.
-    :maxdepth: 1
- 
-    fwctl
-+   bnxt_fwctl
-    fwctl-cxl
-    pds_fwctl
+---
+Matthieu Baerts (NGI0) (1):
+      selftests: mptcp: join: validate new laminar endp
+
+Paolo Abeni (7):
+      mptcp: leverage skb deferral free
+      tcp: make tcp_rcvbuf_grow() accessible to mptcp code
+      mptcp: rcvbuf auto-tuning improvement
+      mptcp: introduce the mptcp_init_skb helper
+      mptcp: remove unneeded mptcp_move_skb()
+      mptcp: factor out a basic skb coalesce helper
+      mptcp: minor move_skbs_to_msk() cleanup
+
+ include/net/tcp.h                               |   1 +
+ net/ipv4/tcp_input.c                            |   2 +-
+ net/mptcp/protocol.c                            | 187 ++++++++++++------------
+ net/mptcp/protocol.h                            |   4 +-
+ tools/testing/selftests/net/mptcp/mptcp_join.sh |  69 +++++++++
+ tools/testing/selftests/net/mptcp/pm_nl_ctl.c   |   9 ++
+ 6 files changed, 177 insertions(+), 95 deletions(-)
+---
+base-commit: 1493c18fe8696bfc758a97130a485fc4e08387f5
+change-id: 20250927-net-next-mptcp-rcv-path-imp-192d8c24c9c7
+
+Best regards,
 -- 
-2.39.1
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
