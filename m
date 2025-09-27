@@ -1,78 +1,82 @@
-Return-Path: <netdev+bounces-226930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80414BA638B
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 23:30:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 973BDBA638E
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 23:30:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37D6A3AF57D
-	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 21:30:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6F6C3B1023
+	for <lists+netdev@lfdr.de>; Sat, 27 Sep 2025 21:30:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD9CC21B9C8;
-	Sat, 27 Sep 2025 21:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C784C238C10;
+	Sat, 27 Sep 2025 21:30:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tHytXqIS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OjasZhl1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17D767E0E4
-	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 21:30:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539A6223DE8
+	for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 21:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759008635; cv=none; b=pGgaEnxA7Hcd/prOP8MSezBnZrmJu2MIgwT65jNk+mjMc7oi9mRtNBhBt8zS64AW8JMN2EYU/9lxNRSuzNdAJEkozh+mwnzT3k933b4+IQWt0Q0ycfJ6L7fDrWZeAhd5/8fOsCz548oz+6Gy9+Dd7zZCjr9fMeZ54EjxYbkopGc=
+	t=1759008636; cv=none; b=iqijFmw2vInyusNKNntSTD6CWf9boBtIo9eQR9Hb908MxAKkK1ZRHstBd87LuckDxGsXgi5IuSHUlkNlfFdaEDxxTWZEMtPd3Jy8ONoJyZAYvBgdDEPFSpU+tGctIJAGnfUMxvIK3qBXOBnJWOFxPgl56IKdFomHfd7v6do0qnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759008635; c=relaxed/simple;
-	bh=D+9zFc0FFoHf5i3SDZseWsG59qM1dbdarCJr1SL9x3Q=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qVUN1O6z7573OFYu73XZ3lHVonGAXxinC/C62F9l+k/1A8sPVLfMcS6jQ25gPasRaF5Qv91LOsJoTS+BB1AlgJrwbYZp3+Npaz0Q6qPDKHjnLtOi5I0WKCWlcY/2xNNnT9tiTneiiA9NZPhit5Xj9UHJPf5IWRb3qcNnDizGmPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tHytXqIS; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1759008636; c=relaxed/simple;
+	bh=IHfLMvPIye+XUMncQyp/RntpjuU+hUIacAJapZKNWFI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Fvccz2FM3eCP9/LEMrZ4vejnFXt7DhtgvO4KYyd53qQvdQRPgdRGcdLdiI6KFg8vHJ6cZTnYi5nVV81cv1/fb7RTrFwUTYFltUTgNHlfCYjLP2Er9QY9HZw5hb4MQlm4kCMBDXBXWUwBVvSJIhbq316+wxlFoo48Qh2ww9irtqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OjasZhl1; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3307af9b595so3022312a91.0
-        for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 14:30:33 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b59682541d5so1341486a12.0
+        for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 14:30:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759008633; x=1759613433; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0nwgYmz3uaXt9rqXGWzHMbVbyGCGN0oxg8g37oSU8zk=;
-        b=tHytXqISzdo/ju6WGbNFtkoGFCEt5JQZxTX2KvtecCaHDrTqunOwWurXWlCDiEVb3g
-         +RVuaeY5fL9fBPMq98h1j4nG5KHQolPRgK+HcJeTn98vemfXwvVouY6mv9RJRZ/drdtE
-         19ALM1Aj0S9qpZ4h8PvpKBxo0QSpBjZuCbBwXVfBjKwKEQ2QVqdT9DyL3Voy5RfFcr5w
-         XuXkOaJz6Nq2/NVkyY7wKEBsRoHxovqpJ93yxXMOH0tMAvQcbtztSmn8abGdbwPAJ4f7
-         ccqnGpHeR+YqpYS3uLvw2SmJzt4wIe+lQWw0SoKvl2gc8svhunwtmqSUZNyAler8KthS
-         xCqw==
+        d=google.com; s=20230601; t=1759008634; x=1759613434; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gFrnFbH7ZTDl3V8aU1/VRzeqEcPfP4MQnyoc/PUFyqU=;
+        b=OjasZhl17ULKhLw1MFGbAhbv57FVsqTSFqnYx9QEDO9KAIddf8r6hxG2/6/wvNwdBg
+         G8/zr2O0aaBisvsS8hwXbx47fcX8uFWNe2j5pYKsm/fxjBroygsI6cu30AP/draEff0y
+         PeB4zjFkMV2CJfOdwqYOk4C5VtPaTt9W+qs8Euc1Sl6NtYIeB4W5gQCZl82KuGPX0iXf
+         bpoo5G9f9LkZKfPzDdclkaSHZGUiRx5vYO73PA4LW/2eK9XTny9r8GnNDiikLwINSAXN
+         JlMJOysT0/1KTP8rkD6c5dz05UDE+P7NbrPsINCTee1h/B62T6skLu8NyymwxwCi+iv8
+         updQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759008633; x=1759613433;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0nwgYmz3uaXt9rqXGWzHMbVbyGCGN0oxg8g37oSU8zk=;
-        b=QNvytf+1QWllTYeQ/UYCEiovq80OuVqlOEGW2Fg+EQBGVU6DI5oC0UvtL9uEM2Rlvy
-         P/VoCEwa1Cd9CudvcHajW683HMeoEatDzdSNPflD9tUA1bsxFpZCcg3VG9E7xH94PKSi
-         6WafXAow7BrlkJm1nHbQ68lsHMIVEjQnDpDvpkfC2+se2fk/CNqMmTkEpRc6LVq/U31v
-         62q411Sxgr8QncDBId7SbVWStVcylw7y0KHBxAwMsnCWqqYW9k/tkzjaJSHiflbLYR6z
-         vJFikRwznIaZHuhrHkUKnHLvF9GvBvucf+jutPpNb21MCw3TGWUeb5CrLmjYGGuhRzfy
-         BpOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUXwed2m91hZNqkFlH+xJjpOvJocMi2mWujhcPRhVNRyre7a6kwntqsKd+O4a9jT1gyNCKLfoI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+XFuz4x+ZiJAR9/H/oxKiXujZ2EuBeajpkXlAuXuLAWCr+em3
-	Z4LlNyNzdyCoqschyW+BbXmX59Xi+QFgNSqts0ZFKK2NMcUQ4go+CrQL1EYoZfPaEKGcmRxhjcO
-	i31yyfQ==
-X-Google-Smtp-Source: AGHT+IGMyrceBHk2j4E6fofUmrMKBlwxCdS/4qeTP9uJfxMchYKhjx5bLGAPsauBcHzpr5QxHdO4+IvGDOg=
-X-Received: from pjbnm6.prod.google.com ([2002:a17:90b:19c6:b0:330:5945:699e])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a49:b0:32b:a332:7a0a
- with SMTP id 98e67ed59e1d1-3342a242c7cmr11090702a91.1.1759008633011; Sat, 27
- Sep 2025 14:30:33 -0700 (PDT)
-Date: Sat, 27 Sep 2025 21:29:38 +0000
+        d=1e100.net; s=20230601; t=1759008634; x=1759613434;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gFrnFbH7ZTDl3V8aU1/VRzeqEcPfP4MQnyoc/PUFyqU=;
+        b=i0GqeL2JQbNpk+w4Z9/sVW6iaRuzokDR8Oy553hUrIpcNI1ynk0A6SVzcochUaavH4
+         JxueaZ5uF4r5KBh6MRUB3hN300l2jlyk/i5NleHtMexFDNJw7gS667uvubqYCtinWqZY
+         9nemkP+j3KeSawIg3ckCUIDU/pNwlzy8o3QbMGt2brQIJcM9EesPJ6SlaY51Wh3J+cOc
+         M+4wHz9/trBxCJ+BFghC6gao+QKLzA3+/Om3XvZnIEdaYUJK8zi4K1o3eKBSnDRkLANE
+         u5SjwSU0RCUXmf+qYkgSKeGESHpprCT7KYKTDnNTV4AUJ26rO92mBEiJ8lkmMVgbzLq4
+         HAIw==
+X-Forwarded-Encrypted: i=1; AJvYcCV6t8hnkxei29wYcGQ+2hplNxber6CMqnpHUQU9CQMmBanTxob08J1gLXR7tWnB3kdsxnBffns=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyu6tbyJOigl54c8fmm4EdjM/Ty/o1h+JbhWN0/nS/v15smfPUU
+	b8i0oWMD3brpvKhPozSsOO/e885sFbZXRhFDTVg7tWqEqJSwjbnmyCyTbWbtV9viovCNMiqbxoZ
+	BXg8wbg==
+X-Google-Smtp-Source: AGHT+IGd1tIlcsiCZIfG0ebuWla4Ana407wRA8pe450999eu3ZGQMIhpVNIc2umyyEX3LBn6Zr1ifdrf6Xg=
+X-Received: from pffj24.prod.google.com ([2002:a62:b618:0:b0:781:1ca9:e250])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:4324:b0:2c6:85b9:1e0d
+ with SMTP id adf61e73a8af0-2e7c95a4a47mr14969945637.21.1759008634565; Sat, 27
+ Sep 2025 14:30:34 -0700 (PDT)
+Date: Sat, 27 Sep 2025 21:29:39 +0000
+In-Reply-To: <20250927213022.1850048-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250927213022.1850048-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.51.0.536.g15c5d4f767-goog
-Message-ID: <20250927213022.1850048-1-kuniyu@google.com>
-Subject: [PATCH v2 net-next 00/13] selftest: packetdrill: Import TFO server tests.
+Message-ID: <20250927213022.1850048-2-kuniyu@google.com>
+Subject: [PATCH v2 net-next 01/13] selftest: packetdrill: Set ktap_set_plan
+ properly for single protocol test.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -80,121 +84,42 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-The series imports 15 TFO server tests from google/packetdrill and
-adds 2 more tests.
+The cited commit forgot to update the ktap_set_plan call.
 
-The repository has two versions of tests for most scenarios; one uses
-the non-experimental option (34), and the other uses the experimental
-option (255) with 0xF989.
+ktap_set_plan sets the number of tests (KSFT_NUM_TESTS), which must
+match the number of executed tests (KTAP_CNT_PASS + KTAP_CNT_SKIP +
+KTAP_CNT_XFAIL) in ktap_finished.
 
-Basically, we only import the non-experimental version of tests, and
-for the experimental option, tcp_fastopen_server_experimental_option.pkt
-is added.
+Otherwise, the selftest exit()s with 1.
 
+Let's adjust KSFT_NUM_TESTS based on supported protocols.
 
-The following tests are not (yet) imported:
+While at it, misalignment is fixed up.
 
-  * icmp-baseline.pkt
-  * simple1.pkt / simple2.pkt / simple3.pkt
+Fixes: a5c10aa3d1ba ("selftests/net: packetdrill: Support single protocol test.")
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ tools/testing/selftests/net/packetdrill/ksft_runner.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-The former is completely covered by icmp-before-accept.pkt.
-
-The later's delta is the src/dst IP pair to generate a different
-cookie, but supporting dualstack requires churn in ksft_runner.sh,
-so defered to future series.  Also, sockopt-fastopen-key.pkt covers
-the same function.
-
-
-The following tests have the experimental version only, so converted
-to the non-experimental option:
-
-  * client-ack-dropped-then-recovery-ms-timestamps.pkt
-  * sockopt-fastopen-key.pkt
-
-
-For the imported tests, these common changes are applied.
-
-  * Add SPDX header
-  * Adjust path to default.sh
-  * Adjust sysctl w/ set_sysctls.py
-  * Use TFO_COOKIE instead of a raw hex value
-  * Use SOCK_NONBLOCK for socket() not to block accept()
-  * Add assertions for TCP state if commented
-  * Remove unnecessary delay (e.g. +0.1 setsockopt(SO_REUSEADDR), etc)
-
-
-With this series, except for simple{1,2,3}.pkt, we can remove TFO server
-tests in google/packetdrill.
-
-
-Changes:
-  v2:
-    * Add patch 1 for icmp-before-accept.pkt.
-    * Patch 2:
-      * Keep TFO_CLIENT_ENABLE for
-        tcp_syscall_bad_arg_fastopen-invalid-buf-ptr.pkt.
-
-  v1: https://lore.kernel.org/netdev/20250926212929.1469257-1-kuniyu@google.com/
-
-
-Kuniyuki Iwashima (13):
-  selftest: packetdrill: Set ktap_set_plan properly for single protocol
-    test.
-  selftest: packetdrill: Require explicit setsockopt(TCP_FASTOPEN).
-  selftest: packetdrill: Define common TCP Fast Open cookie.
-  selftest: packetdrill: Import TFO server basic tests.
-  selftest: packetdrill: Add test for TFO_SERVER_WO_SOCKOPT1.
-  selftest: packetdrill: Add test for experimental option.
-  selftest: packetdrill: Import opt34/fin-close-socket.pkt.
-  selftest: packetdrill: Import opt34/icmp-before-accept.pkt.
-  selftest: packetdrill: Import opt34/reset-* tests.
-  selftest: packetdrill: Import opt34/*-trigger-rst.pkt.
-  selftest: packetdrill: Refine
-    tcp_fastopen_server_reset-after-disconnect.pkt.
-  selftest: packetdrill: Import sockopt-fastopen-key.pkt
-  selftest: packetdrill: Import
-    client-ack-dropped-then-recovery-ms-timestamps.pkt
-
- .../selftests/net/packetdrill/defaults.sh     |  3 +-
- .../selftests/net/packetdrill/ksft_runner.sh  |  8 +-
- ..._fastopen_server_basic-cookie-not-reqd.pkt | 32 ++++++++
- ...cp_fastopen_server_basic-no-setsockopt.pkt | 21 ++++++
- ...fastopen_server_basic-non-tfo-listener.pkt | 26 +++++++
- ...cp_fastopen_server_basic-pure-syn-data.pkt | 50 +++++++++++++
- .../tcp_fastopen_server_basic-rw.pkt          | 23 ++++++
- ...tcp_fastopen_server_basic-zero-payload.pkt | 26 +++++++
- ...ck-dropped-then-recovery-ms-timestamps.pkt | 46 ++++++++++++
- ...cp_fastopen_server_experimental_option.pkt | 37 ++++++++++
- .../tcp_fastopen_server_fin-close-socket.pkt  | 30 ++++++++
- ...tcp_fastopen_server_icmp-before-accept.pkt | 49 ++++++++++++
- ...tcp_fastopen_server_reset-after-accept.pkt | 37 ++++++++++
- ...cp_fastopen_server_reset-before-accept.pkt | 32 ++++++++
- ...en_server_reset-close-with-unread-data.pkt | 32 ++++++++
- ...p_fastopen_server_reset-non-tfo-socket.pkt | 37 ++++++++++
- ...p_fastopen_server_sockopt-fastopen-key.pkt | 74 +++++++++++++++++++
- ...pen_server_trigger-rst-listener-closed.pkt | 21 ++++++
- ...fastopen_server_trigger-rst-reconnect.pkt} | 10 ++-
- ..._server_trigger-rst-unread-data-closed.pkt | 23 ++++++
- 20 files changed, 611 insertions(+), 6 deletions(-)
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_basic-cookie-not-reqd.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_basic-no-setsockopt.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_basic-non-tfo-listener.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_basic-pure-syn-data.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_basic-rw.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_basic-zero-payload.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_client-ack-dropped-then-recovery-ms-timestamps.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_experimental_option.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_fin-close-socket.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_icmp-before-accept.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_reset-after-accept.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_reset-before-accept.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_reset-close-with-unread-data.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_reset-non-tfo-socket.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_sockopt-fastopen-key.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_trigger-rst-listener-closed.pkt
- rename tools/testing/selftests/net/packetdrill/{tcp_fastopen_server_reset-after-disconnect.pkt => tcp_fastopen_server_trigger-rst-reconnect.pkt} (66%)
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_fastopen_server_trigger-rst-unread-data-closed.pkt
-
+diff --git a/tools/testing/selftests/net/packetdrill/ksft_runner.sh b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
+index 0ae6eeeb1a8e..3fa7c7f66caf 100755
+--- a/tools/testing/selftests/net/packetdrill/ksft_runner.sh
++++ b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
+@@ -48,11 +48,11 @@ elif [[ ! "$ip_versions" =~ ^ipv[46]$ ]]; then
+ fi
+ 
+ ktap_print_header
+-ktap_set_plan 2
++ktap_set_plan $(echo $ip_versions | wc -w)
+ 
+ for ip_version in $ip_versions; do
+ 	unshare -n packetdrill ${ip_args[$ip_version]} ${optargs[@]} $script > /dev/null \
+-	    && ktap_test_pass $ip_version || $failfunc $ip_version
++		&& ktap_test_pass $ip_version || $failfunc $ip_version
+ done
+ 
+ ktap_finished
 -- 
 2.51.0.536.g15c5d4f767-goog
 
