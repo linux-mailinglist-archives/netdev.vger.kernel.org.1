@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-226984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71E64BA6C65
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 10:59:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B77CFBA6C7A
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 10:59:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1382F3B581E
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 08:59:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05BA33BDEEE
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 08:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A38062C027D;
-	Sun, 28 Sep 2025 08:59:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4984F2BF011;
+	Sun, 28 Sep 2025 08:59:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FJSx76mj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aHdaB0Iz"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD32213236;
-	Sun, 28 Sep 2025 08:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D252BF00A;
+	Sun, 28 Sep 2025 08:59:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759049950; cv=none; b=N+boKL/AwRfCAqbTOiCjTPN0BRkKCdzQ2FseJm8ZYcXOK65VM59Z4+TaQSS1R+K6E92C6SfPee2VEbrjnL88otY1OueMoYg+1BuolKofWy4sUnonlly7T6KMhmrjm+fcTx8OqcOFkGmsuf5fdL9s3X+qpiNZo9LUcuqA27WbSgo=
+	t=1759049961; cv=none; b=FM/vchsDrlSMAXLy0e7bqUo5ZEJblzHF0AQrpV1+/LnkK5WR1vjQf+7BHt3BByEyaSu/DpdN4FLQpKgYcc03JMn4nTR6+C3yxAvJ73tdNiRYjR4CVlBlpA/KmsioRDNAwF4rqAyxW2wAgcUIErXycP9NujLuV5JMADyzEU0GrMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759049950; c=relaxed/simple;
-	bh=sltJehwGmgNGNkXehUDxNoleo8qQh6YQJ9OKkJ9KvnM=;
+	s=arc-20240116; t=1759049961; c=relaxed/simple;
+	bh=7xTnRXG0VOxNuO0hi/wTWjNgiWGT5a1unwsIKyZI9tw=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=TImqSQo9amtpJmj0B3AjxPnTwOBZd+EXPmXySyponrBIkMh9Alp76c4fThmwYGOFTB3cl43gcaWRTSOU1gd/LA1l4qSELQ0GrXEnq8TJ5q/nZqSNSR4fmRiGQmsOAic11/xPMycsQSzXPgr6WkRibngZApbk+uu32QK6dG1vs80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FJSx76mj; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=meP5d9HhO0cEC28Uq632ZqxSWCZ0D4Y1nhuJ9136iWyOZOueQBQ+w4Ljlv+ndpTtJ2mFcpksjLiYDoMPUyeg7elZB/3cTx63jaHcoUl320vI8e3+BZi9in1cu+13rW3plvuQCEL4QqBVcO3+RGoJlTc0KAkauDYLPSrtn58+fi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aHdaB0Iz; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,22 +37,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=dRHUASpZNpL3VRyQX74pzizWthRGiNuqvRODSjFvKBc=; b=FJSx76mj23T79CLUxd3KbBKvJL
-	rnM5mlqwn4ussFrt7nROV+s/Aim8RZblq2mqVDi1UlaQTZjYGycszBu0LdXKJdtARbKg7eMZsqTrs
-	78iUYJ9rMzgkcAkzIYk7mvbBxTfBnLirjERnvtpN2t1nc2oADPylLIXoEf7JzNGAuLLEaxNiSPrnc
-	5HgFlScs7M6ljpdVDEDRnHedDLeKFZL+yrD2dbU8l/GfPSwLlQidYkX1wuJFaFEpUXPj25ERXUiJ3
-	gfn9JXFIJE9uORGTpJaQvNEzGTsSuHZSdSJxBRbRfTmAPybyLLuPKsuofUP4ZUJOayDzuuhOVw6zq
-	fuOzqM5Q==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:36008 helo=rmk-PC.armlinux.org.uk)
+	bh=mV9Xx0e2xiFAQKlX3WQG8ifo/vHNogs8i5Upjp7iN6U=; b=aHdaB0IzQK+eNrGguUy4O73kcv
+	CmaePoFrti0sL3Dv+J6nXqGKjuPsvZxUlDHYCiX3Ly9x0DeDLDltjmt2EbQHk97YxibEVcekwXZn8
+	eAkPoWrv0ZtG82b/7WRVSLJsQO8H46L4T7FEzVrH0iQw6iqVp2HX+MEq1Fx8qSo+fXB9bBQNKD/QE
+	3lRLlZRwxlOYWIxShkgHLeI83HLVn5m5UXqOlXx3eVhZULpizg40WedWAbyiML8nFhEI6ojrOvnJ9
+	L79gR3bA5G93Qg3E8smKShafWqFF83wy7CyaKLTtxsadJnKrSTYciwyksa1VdXAS6LjriXtG6z9O6
+	xKjhWK7w==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:36018 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1v2nFE-000000005Ak-27a8;
-	Sun, 28 Sep 2025 09:59:00 +0100
+	id 1v2nFJ-000000005Ay-1nKn;
+	Sun, 28 Sep 2025 09:59:06 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1v2nFD-00000007jXP-0fX2;
-	Sun, 28 Sep 2025 09:58:59 +0100
+	id 1v2nFI-00000007jXV-1BYa;
+	Sun, 28 Sep 2025 09:59:04 +0100
 In-Reply-To: <aNj4HY_mk4JDsD_D@shell.armlinux.org.uk>
 References: <aNj4HY_mk4JDsD_D@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -80,7 +80,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Rob Herring <robh@kernel.org>,
 	Simon Horman <horms@kernel.org>,
 	Tristram Ha <Tristram.Ha@microchip.com>
-Subject: [PATCH RFC net-next 2/6] net: phy: add phy_may_wakeup()
+Subject: [PATCH RFC net-next 3/6] net: phylink: add phylink managed MAC
+ Wake-on-Lan support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,85 +91,208 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1v2nFD-00000007jXP-0fX2@rmk-PC.armlinux.org.uk>
+Message-Id: <E1v2nFI-00000007jXV-1BYa@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Sun, 28 Sep 2025 09:58:59 +0100
+Date: Sun, 28 Sep 2025 09:59:04 +0100
 
-Add phy_may_wakeup() which uses the driver model's device_may_wakeup()
-when the PHY driver has marked the device as wakeup capable in the
-driver model, otherwise use phy_drv_wol_enabled().
-
-Replace the sites that used to call phy_drv_wol_enabled() with this
-as checking the driver model will be more efficient than checking the
-WoL state.
-
-Export phy_may_wakeup() so that phylink can use it.
+Add core phylink Wake-on-Lan support.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/phy/phy_device.c | 14 ++++++++++++--
- include/linux/phy.h          |  9 +++++++++
- 2 files changed, 21 insertions(+), 2 deletions(-)
+ drivers/net/phy/phylink.c | 77 +++++++++++++++++++++++++++++++++++++--
+ include/linux/phylink.h   | 26 +++++++++++++
+ 2 files changed, 99 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 01269b865f5e..4c8df9f02eb3 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -251,6 +251,16 @@ static bool phy_drv_wol_enabled(struct phy_device *phydev)
- 	return wol.wolopts != 0;
- }
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 9d7799ea1c17..9a3783e719bc 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -93,6 +93,9 @@ struct phylink {
+ 	u8 sfp_port;
  
-+bool phy_may_wakeup(struct phy_device *phydev)
-+{
-+	/* If the PHY is using driver-model based wakeup, use that state. */
-+	if (phy_can_wakeup(phydev))
-+		return device_may_wakeup(&phydev->mdio.dev);
+ 	struct eee_config eee_cfg;
 +
-+	return phy_drv_wol_enabled(phydev);
-+}
-+EXPORT_SYMBOL_GPL(phy_may_wakeup);
-+
- static void phy_link_change(struct phy_device *phydev, bool up)
- {
- 	struct net_device *netdev = phydev->attached_dev;
-@@ -302,7 +312,7 @@ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
- 	/* If the PHY on the mido bus is not attached but has WOL enabled
- 	 * we cannot suspend the PHY.
- 	 */
--	if (!netdev && phy_drv_wol_enabled(phydev))
-+	if (!netdev && phy_may_wakeup(phydev))
- 		return false;
++	u32 wolopts_mac;
++	u8 wol_sopass[SOPASS_MAX];
+ };
  
- 	/* PHY not attached? May suspend if the PHY has not already been
-@@ -1909,7 +1919,7 @@ int phy_suspend(struct phy_device *phydev)
- 	if (phydev->suspended || !phydrv)
- 		return 0;
- 
--	phydev->wol_enabled = phy_drv_wol_enabled(phydev) ||
-+	phydev->wol_enabled = phy_may_wakeup(phydev) ||
- 			      (netdev && netdev->ethtool->wol_enabled);
- 	/* If the device has WOL enabled, we cannot suspend the PHY */
- 	if (phydev->wol_enabled && !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 7f6758198948..2292ee9a93c0 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1391,6 +1391,15 @@ static inline bool phy_can_wakeup(struct phy_device *phydev)
- 	return device_can_wakeup(&phydev->mdio.dev);
- }
- 
-+/**
-+ * phy_may_wakeup() - indicate whether PHY has driver model wakeup is enabled
-+ * @phydev: The phy_device struct
+ #define phylink_printk(level, pl, fmt, ...) \
+@@ -2575,11 +2578,17 @@ EXPORT_SYMBOL_GPL(phylink_rx_clk_stop_unblock);
+  *   can also bring down the link between the MAC and PHY.
+  * - If Wake-on-Lan is active, but being handled by the MAC, the MAC
+  *   still needs to receive packets, so we can not bring the link down.
 + *
-+ * Returns: true/false depending on the PHY driver's device_set_wakeup_enabled()
-+ * setting.
-+ */
-+bool phy_may_wakeup(struct phy_device *phydev);
-+
- void phy_resolve_aneg_pause(struct phy_device *phydev);
- void phy_resolve_aneg_linkmode(struct phy_device *phydev);
++ * Note: when phylink managed Wake-on-Lan is in use, @mac_wol is ignored.
++ * (struct phylink_mac_ops.mac_set_wol populated.)
+  */
+ void phylink_suspend(struct phylink *pl, bool mac_wol)
+ {
+ 	ASSERT_RTNL();
  
++	if (phylink_mac_supports_wol(pl))
++		mac_wol = !!pl->wolopts_mac;
++
+ 	if (mac_wol && (!pl->netdev || pl->netdev->ethtool->wol_enabled)) {
+ 		/* Wake-on-Lan enabled, MAC handling */
+ 		mutex_lock(&pl->state_mutex);
+@@ -2673,6 +2682,17 @@ void phylink_resume(struct phylink *pl)
+ }
+ EXPORT_SYMBOL_GPL(phylink_resume);
+ 
++static bool phylink_mac_supports_wol(struct phylink *pl)
++{
++	return !!pl->mac_ops->mac_wol_set;
++}
++
++static bool phylink_phy_supports_wol(struct phylink *pl,
++				     struct phy_device *phydev)
++{
++	return phydev && (pl->config->wol_phy_legacy || phy_can_wakeup(phydev));
++}
++
+ /**
+  * phylink_ethtool_get_wol() - get the wake on lan parameters for the PHY
+  * @pl: a pointer to a &struct phylink returned from phylink_create()
+@@ -2689,8 +2709,21 @@ void phylink_ethtool_get_wol(struct phylink *pl, struct ethtool_wolinfo *wol)
+ 	wol->supported = 0;
+ 	wol->wolopts = 0;
+ 
+-	if (pl->phydev)
+-		phy_ethtool_get_wol(pl->phydev, wol);
++	if (phylink_mac_supports_wol(pl)) {
++		if (phylink_phy_supports_wol(pl, pl->phydev))
++			phy_ethtool_get_wol(pl->phydev, wol);
++
++		/* Where the MAC augments the WoL support, merge its support and
++		 * current configuration.
++		 */
++		wol->supported |= pl->config->wol_mac_support;
++		wol->wolopts |= pl->wolopts_mac;
++		memcpy(wol->sopass, pl->wol_sopass, sizeof(wol->sopass));
++	} else {
++		/* Legacy */
++		if (pl->phydev)
++			phy_ethtool_get_wol(pl->phydev, wol);
++	}
+ }
+ EXPORT_SYMBOL_GPL(phylink_ethtool_get_wol);
+ 
+@@ -2707,12 +2740,48 @@ EXPORT_SYMBOL_GPL(phylink_ethtool_get_wol);
+  */
+ int phylink_ethtool_set_wol(struct phylink *pl, struct ethtool_wolinfo *wol)
+ {
++	struct ethtool_wolinfo w;
+ 	int ret = -EOPNOTSUPP;
++	bool changed;
++	u32 wolopts;
+ 
+ 	ASSERT_RTNL();
+ 
+-	if (pl->phydev)
+-		ret = phy_ethtool_set_wol(pl->phydev, wol);
++	if (phylink_mac_supports_wol(pl)) {
++		wolopts = wol->wolopts;
++
++		if (phylink_phy_supports_wol(pl, pl->phydev)) {
++			ret = phy_ethtool_set_wol(pl->phydev, wol);
++			if (ret != 0 && ret != -EOPNOTSUPP)
++				return ret;
++
++			phy_ethtool_get_wol(pl->phydev, &w);
++
++			/* Any Wake-on-Lan modes which the PHY is handling
++			 * should not be passed on to the MAC.
++			 */
++			wolopts &= ~w.wolopts;
++		}
++
++		wolopts &= pl->config->wol_mac_support;
++		changed = pl->wolopts_mac != wolopts;
++		if (wolopts & WAKE_MAGICSECURE)
++			changed |= !!memcmp(wol->sopass, pl->wol_sopass,
++					    sizeof(wol->sopass));
++		memcpy(pl->wol_sopass, wol->sopass, sizeof(pl->wol_sopass));
++
++		if (changed) {
++			ret = pl->mac_ops->mac_wol_set(pl->config, wolopts,
++						       wol->sopass);
++			if (!ret)
++				pl->wolopts_mac = wolopts;
++		} else {
++			ret = 0;
++		}
++	} else {
++		if (pl->phydev)
++			ret = phy_ethtool_set_wol(pl->phydev, wol);
++	}
+ 
+ 	return ret;
+ }
+diff --git a/include/linux/phylink.h b/include/linux/phylink.h
+index 9af0411761d7..59cb58b29d1d 100644
+--- a/include/linux/phylink.h
++++ b/include/linux/phylink.h
+@@ -156,6 +156,8 @@ enum phylink_op_type {
+  * @lpi_capabilities: MAC speeds which can support LPI signalling
+  * @lpi_timer_default: Default EEE LPI timer setting.
+  * @eee_enabled_default: If set, EEE will be enabled by phylink at creation time
++ * @wol_phy_legacy: Use Wake-on-Lan with PHY even if phy_can_wakeup() is false
++ * @wol_mac_support: Bitmask of MAC supported %WAKE_* options
+  */
+ struct phylink_config {
+ 	struct device *dev;
+@@ -173,6 +175,10 @@ struct phylink_config {
+ 	unsigned long lpi_capabilities;
+ 	u32 lpi_timer_default;
+ 	bool eee_enabled_default;
++
++	/* Wake-on-Lan support */
++	bool wol_phy_legacy;
++	u32 wol_mac_support;
+ };
+ 
+ void phylink_limit_mac_speed(struct phylink_config *config, u32 max_speed);
+@@ -188,6 +194,7 @@ void phylink_limit_mac_speed(struct phylink_config *config, u32 max_speed);
+  * @mac_link_up: allow the link to come up.
+  * @mac_disable_tx_lpi: disable LPI.
+  * @mac_enable_tx_lpi: enable and configure LPI.
++ * @mac_wol_set: configure Wake-on-Lan settings at the MAC.
+  *
+  * The individual methods are described more fully below.
+  */
+@@ -211,6 +218,9 @@ struct phylink_mac_ops {
+ 	void (*mac_disable_tx_lpi)(struct phylink_config *config);
+ 	int (*mac_enable_tx_lpi)(struct phylink_config *config, u32 timer,
+ 				 bool tx_clk_stop);
++
++	int (*mac_wol_set)(struct phylink_config *config, u32 wolopts,
++			   const u8 *sopass);
+ };
+ 
+ #if 0 /* For kernel-doc purposes only. */
+@@ -440,6 +450,22 @@ void mac_disable_tx_lpi(struct phylink_config *config);
+  */
+ int mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
+ 		      bool tx_clk_stop);
++
++/**
++ * mac_wol_set() - configure the Wake-on-Lan parameters
++ * @config: a pointer to a &struct phylink_config.
++ * @wolopts: Bitmask of %WAKE_* flags for enabled Wake-On-Lan modes.
++ * @sopass: SecureOn(tm) password; meaningful only for %WAKE_MAGICSECURE
++ *
++ * Enable the specified Wake-on-Lan options at the MAC. Options that the
++ * PHY can handle will have been removed from @wolopts.
++ *
++ * The presence of this method enables phylink-managed WoL support.
++ *
++ * Returns: 0 on success.
++ */
++int (*mac_wol_set)(struct phylink_config *config, u32 wolopts,
++		   const u8 *sopass);
+ #endif
+ 
+ struct phylink_pcs_ops;
 -- 
 2.47.3
 
