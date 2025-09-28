@@ -1,257 +1,114 @@
-Return-Path: <netdev+bounces-226968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3669BBA6890
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 07:55:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8408ABA68D4
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 08:19:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA267179F1D
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 05:55:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B1D417BBFA
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 06:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97A04298CDE;
-	Sun, 28 Sep 2025 05:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C2B2550DD;
+	Sun, 28 Sep 2025 06:19:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BFpktTt4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VP4pDlUU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9994B18C03F
-	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 05:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08DB17C91
+	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 06:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759038931; cv=none; b=SSmRum8bcjX4Um+JoYDlPy71T/Q4okH92b1z448CuGKKTaiK/Ndo6LBAK5WPhTZN2evjkAbQ1c1qD3BICnWzHzhSD62GBjHANuUcX6moUHPNHVu1OAkHIXekazKoAjoh/Fl3OtB2n0Q5PbKywds1eUYId2tZF43u7poqUQJttVw=
+	t=1759040351; cv=none; b=MkHSyrqyLdvg20xn9ivjOn93NYMLZcKypIhUJdMgdwtkEUgCyOk+P/MEkpEz27jtqpY7LVCD/x3s+BxNHEDuaJjEPiWOTtUIV/c/Gs9UfjN5tRr95/kWxLrZkPEoficWjtEKvyAh6ysJT5buIO8mRmJBepyW+rJo3a7r5spvBfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759038931; c=relaxed/simple;
-	bh=8UCptSI2ZG/4mvMhdSTPqfjdDnupyxw2bvzPaWLpTvM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gSdOKun58mayDEU9KInM9btcc//1fbJn9uBm7q/p5BmEUVy6kHhEUnC9De+YXZf+EN3WxigtG69PqiWcm6/Q8nybAcmKXROiFtp+yQXW9p54sJZ1MtfWYujBKQUQptX79WkqgThZPIlKU7fKEEr8rILp5iybc6HmpWG9xkAVjNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BFpktTt4; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-46e37d6c21eso22507265e9.0
-        for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 22:55:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759038928; x=1759643728; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fPowmCqSrL/N5W4KD70hzfpEFu0AHeqGugDdiPQkQ+A=;
-        b=BFpktTt48EabahLVpP6BOOugaz/6fDi7oDfA22g4JQKTNpWqmyE7mpxG3T7VCofEyn
-         LB1Vk0mMAkqkFerrmQ7RHxkMtwpbPuOptF95P3WT3qM3IZJgDQpUgR0pXt6i7ZNnUMTB
-         09rayFSUES7IrZZI78cJlkvgepJjqki3c3hb6QzbweFiuHy8vGGM0flV0uQcer7vSBou
-         GszWoAeZ8JiK0qB/dXJiPQK4o/z1pEgy2MBSskOA3bu8G4J4VMYbNdAsytLvlahpBS/p
-         iQ0SORUVP7YIXbbcspSplYQLO/+LgodLR4xcz1/f2iJkwQi2BmEOQwRXGxZP98Kq/gAk
-         yelQ==
+	s=arc-20240116; t=1759040351; c=relaxed/simple;
+	bh=FHSh68POuZci0soOBMqYretNIENx6qAcTuhOTMHoj+s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tT3tWD1lHduBm1vhrtkHpV88osld77Qem8sHxiguFnmmjQq8LWwlrcnX/kMnnFPTHSij/TLY2NyKj9NR5iRNs2DeylzwGliqvL1VXU3kMcEjdsFoSomOOnwshftMpqbMJ7dPu7S1VmHy1kO68jSWhO+P27XVqKWU9EZzLgCEGBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VP4pDlUU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759040348;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FHSh68POuZci0soOBMqYretNIENx6qAcTuhOTMHoj+s=;
+	b=VP4pDlUUZMZzNSuvClhZcCENbwTPgnRm/gkvcu0TYPMoui6gib3Z6bZHtbRQVtLi83OyG8
+	pkR4eaSi8QhTTqqdm4bm7OUzARrayysJ4Qy7kGQAEFOvnonDNLujpIPFjZR2zl8xzsX+8R
+	J7a61DNwYLYGC6d6C6N5ZuvG7shRar0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-86-aOybh8_UN5yA-9Nbg7LEcg-1; Sun, 28 Sep 2025 02:19:06 -0400
+X-MC-Unique: aOybh8_UN5yA-9Nbg7LEcg-1
+X-Mimecast-MFC-AGG-ID: aOybh8_UN5yA-9Nbg7LEcg_1759040345
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3ee13e43dd9so1681959f8f.1
+        for <netdev@vger.kernel.org>; Sat, 27 Sep 2025 23:19:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759038928; x=1759643728;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fPowmCqSrL/N5W4KD70hzfpEFu0AHeqGugDdiPQkQ+A=;
-        b=gc3lfJiXqbKjC6zo4qFlYLpszaIy9TKIExO0hFt99SUERJKJk4kYZwD6e4p8yFXsut
-         1O9R6MmONYRLm9E7zAN9vAY9ILrWFt+KxqANlV1nizr3RzbwtXJQu1a3LzSz4T4zWr9b
-         5N4ks1WWT53jri0vbIUmVXDlnQRVxyF4LjME/Noj0697igzfqYwW2evRWu0EEuO0qH68
-         6HG0KrSjLRDQsAaxkvbMTXmZ8YgOqEiY8kBzS34jqBGRBDxKGtNfj0ncpMKTRU9ZRtS1
-         cdrCdkUgZrd6PxicWHSuw5oa0u88A3/26LHJ8cw7Gp6ILS7uQUIUIpUKcCvEGL6fa6Zo
-         tQHw==
-X-Forwarded-Encrypted: i=1; AJvYcCViGB9oDl5K7EDYv5r+Hx6unRBcaLG68SQQ4UIm3QMtUOkgaETuMNOB1Fxp9PKvYUQusrgg3l0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywxwlf5tY/LebPJMepsd8qbE3WILQl/R9Nx568afs/Wr09nbHN8
-	p0tIY5HUwk7f7syFtX4XCyVOYc35x4Zee69FO7GWgE0keBSou+UIAc4t
-X-Gm-Gg: ASbGncveyz3fNedohOAwZzjEhJZGjJpN4t/dSuvyX4ZR5WIrRW9UaZ2DOqkv+6sebge
-	rDVQP//KaFJung3S4q77OK4ZOGP/fDDKqXmOWM+isNV+8i/RG0jRCsuymHbS04pSkn6gYcd8mzs
-	LqqV33vC3ssMh2ezo6NaxmJnaKcUA7/jLPp5GHyxX6Td/6j1iMUQOyV7QDCCT1tfLgQ9jTpwmby
-	VcjunbshtUuPFEG/ol35sy+3oFK+eAF2Emfly9t2Gzblap9gyrPbtuleu6d0cf8nksu4i5Ramrh
-	ZWdJ/oVtZC0tjvbDexyXfjE7NRjT9Ky5XzNhoYmMdLb13b4cd8ORasnFdv4xh+i1t6KFO85OVNV
-	chwKmlW1yj1bFf94csIhvgLOu3HBG8jp+lNvCyPBWaqqTYFDXhfmTl/Wt
-X-Google-Smtp-Source: AGHT+IHM4m0m8ZpyngATgru8cfGxZwwbEPYp3rvD/aDrVe9bRE92H+oCzL4NKnHYUkxDCBcJph9MNg==
-X-Received: by 2002:a05:600c:1c92:b0:46e:3dad:31ea with SMTP id 5b1f17b1804b1-46e3dad3310mr87440785e9.17.1759038927610;
-        Sat, 27 Sep 2025 22:55:27 -0700 (PDT)
-Received: from [10.221.203.31] ([165.85.126.96])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e33b562d8sm135602455e9.0.2025.09.27.22.55.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Sep 2025 22:55:27 -0700 (PDT)
-Message-ID: <b8adb2de-1b13-43ec-bd1b-cffbf40ba98e@gmail.com>
-Date: Sun, 28 Sep 2025 08:55:25 +0300
+        d=1e100.net; s=20230601; t=1759040345; x=1759645145;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FHSh68POuZci0soOBMqYretNIENx6qAcTuhOTMHoj+s=;
+        b=Hq13bxTemKwk1BGGsIwmv03gy5a9xIW4vJe34y/6LZkoCgW46I2IyZGlDfJOyQEtIQ
+         Wv2Zno/hK/YNnVxEdl808Rz16TGhHJblWI0hPcyzYsbKw1gDM157xklQfKgoi+gmejpv
+         nFwPZGLn5DAEbohP0Zw3AiHfrA6SS3J5F13yj/dAe21Ju4zC08+VE5XmjXGn1XXMddaA
+         04Wq/Alh8oI6dPKZYbfLCV9GAD9IKSThCLrgV54Pt57PqQzgox7I4MKr9YEwgPUIseqK
+         Rghp/NkX+Qj7OL9YC9JtAFDQ/mLcnnZL9sFe8cFsxM7a5+KHvRsNf4BF+jYHTwG3WZbd
+         WBhQ==
+X-Gm-Message-State: AOJu0Yy/hox+9wY47mSuw6txGe3iPaht61EYhsDET5SHEoMjZ0EiEZTU
+	563SqpYb1lWd7dktQ9Qb27V3s+2g7vkkEkDYn8+wJ6Qk/fLQr0JnyNz+k1UVYAn0+Ek4xg8ShYy
+	xX13323pEl5A3v8pTTXreRFO72LQOpbbRdTWaMI+ooQM4BY1bwjiexsoB0Q==
+X-Gm-Gg: ASbGncvFMlxlC0cUWuhvpohVIPondD7XgDY1X0nebf2qMGQ4VEbx5OolfZx2kCrja9a
+	QvYO0VWh/VZ4gUJNyEHz9HHXgNdot+cTYjwkl0k9VOUg6xnpDt5wGqjUouSclNaUlVn6eTDj+jj
+	rDPy2c3fcEEfWaylvdWuQyDnltTAjww47EswmFp0e1N58kCGe/Qf7rGxV7ER6BFKnkfeUXRkYwo
+	nmF+KQxt1c0ip5Kwix5rUy7/Mh5kOrWNaIwr8kR/SmuvqCLbRxdaFC7HRWUTjPktWRtRPfOHVtw
+	shy/TnjRgH5UyWDl7y+4sbhEbgUuijw/
+X-Received: by 2002:a05:6000:2f87:b0:3e9:2fea:6795 with SMTP id ffacd0b85a97d-40e4b389223mr12613879f8f.53.1759040345051;
+        Sat, 27 Sep 2025 23:19:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEGyAlosu7SLyYtGgUxUn7flP3QvS+gTogdl7QE3/POUYAQejBg7RyfeWxq6205Wv9jdzXgeg==
+X-Received: by 2002:a05:6000:2f87:b0:3e9:2fea:6795 with SMTP id ffacd0b85a97d-40e4b389223mr12613844f8f.53.1759040344431;
+        Sat, 27 Sep 2025 23:19:04 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1515:800:cc29:ccef:c1e8:5fd4])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fe4237f32sm13263126f8f.63.2025.09.27.23.19.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Sep 2025 23:19:03 -0700 (PDT)
+Date: Sun, 28 Sep 2025 02:19:00 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Dan Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, jasowang@redhat.com, alex.williamson@redhat.com,
+	pabeni@redhat.com, virtualization@lists.linux.dev, parav@nvidia.com,
+	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, shameerali.kolothum.thodi@huawei.com,
+	jgg@ziepe.ca, kevin.tian@intel.com, kuba@kernel.org,
+	andrew+netdev@lunn.ch, edumazet@google.com
+Subject: Re: [PATCH net-next v3 11/11] virtio_net: Add get ethtool flow rules
+ ops
+Message-ID: <20250928021714-mutt-send-email-mst@kernel.org>
+References: <20250923141920.283862-1-danielj@nvidia.com>
+ <20250923141920.283862-12-danielj@nvidia.com>
+ <20250925164053-mutt-send-email-mst@kernel.org>
+ <4532bc48-ca59-4f04-a3f4-a66d4be4ac1b@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/1] net/mlx5: Clean up only new IRQ glue on
- request_irq() failure
-To: Pradyumn Rahar <pradyumn.rahar@oracle.com>, shayd@nvidia.com
-Cc: anand.a.khoje@oracle.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, elic@nvidia.com, jacob.e.keller@intel.com,
- kuba@kernel.org, leon@kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, manjunath.b.patil@oracle.com, mbloch@nvidia.com,
- moshe@nvidia.com, netdev@vger.kernel.org, pabeni@redhat.com,
- qing.huang@oracle.com, rajesh.sivaramasubramaniom@oracle.com,
- rama.nichanamatlu@oracle.com, rohit.sajan.kumar@oracle.com,
- saeedm@nvidia.com, tariqt@nvidia.com
-References: <d9bea817-279c-4024-9bff-c258371b3de7@nvidia.com>
- <20250923062823.89874-1-pradyumn.rahar@oracle.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250923062823.89874-1-pradyumn.rahar@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4532bc48-ca59-4f04-a3f4-a66d4be4ac1b@nvidia.com>
 
+On Sat, Sep 27, 2025 at 11:39:28PM -0500, Dan Jurgens wrote:
+> As a practical matter I can't imagine a rules within 3 orders of
+> magnitude of 2B.
 
+Thinking about malicious devices here - virtio is commonly used with
+CoCo. I don't specifically ask to validate everything if bugs are
+not exploitable. Just that you keep this usecase in mind.
 
-On 23/09/2025 9:28, Pradyumn Rahar wrote:
-> The mlx5_irq_alloc() function can inadvertently free the entire rmap
-> and end up in a crash[1] when the other threads tries to access this,
-> when request_irq() fails due to exhausted IRQ vectors. This commit
-> modifies the cleanup to remove only the specific IRQ mapping that was
-> just added.
-> 
-> This prevents removal of other valid mappings and ensures precise
-> cleanup of the failed IRQ allocation's associated glue object.
-> 
-> Note: This error is observed when both fwctl and rds configs are enabled.
-> 
-> [1]
-> mlx5_core 0000:05:00.0: Successfully registered panic handler for port 1
-> mlx5_core 0000:05:00.0: mlx5_irq_alloc:293:(pid 66740): Failed to
-> request irq. err = -28
-> infiniband mlx5_0: mlx5_ib_test_wc:290:(pid 66740): Error -28 while
-> trying to test write-combining support
-> mlx5_core 0000:05:00.0: Successfully unregistered panic handler for port 1
-> mlx5_core 0000:06:00.0: Successfully registered panic handler for port 1
-> mlx5_core 0000:06:00.0: mlx5_irq_alloc:293:(pid 66740): Failed to
-> request irq. err = -28
-> infiniband mlx5_0: mlx5_ib_test_wc:290:(pid 66740): Error -28 while
-> trying to test write-combining support
-> mlx5_core 0000:06:00.0: Successfully unregistered panic handler for port 1
-> mlx5_core 0000:03:00.0: mlx5_irq_alloc:293:(pid 28895): Failed to
-> request irq. err = -28
-> mlx5_core 0000:05:00.0: mlx5_irq_alloc:293:(pid 28895): Failed to
-> request irq. err = -28
-> general protection fault, probably for non-canonical address
-> 0xe277a58fde16f291: 0000 [#1] SMP NOPTI
-> 
-> RIP: 0010:free_irq_cpu_rmap+0x23/0x7d
-> Call Trace:
->     <TASK>
->     ? show_trace_log_lvl+0x1d6/0x2f9
->     ? show_trace_log_lvl+0x1d6/0x2f9
->     ? mlx5_irq_alloc.cold+0x5d/0xf3 [mlx5_core]
->     ? __die_body.cold+0x8/0xa
->     ? die_addr+0x39/0x53
->     ? exc_general_protection+0x1c4/0x3e9
->     ? dev_vprintk_emit+0x5f/0x90
->     ? asm_exc_general_protection+0x22/0x27
->     ? free_irq_cpu_rmap+0x23/0x7d
->     mlx5_irq_alloc.cold+0x5d/0xf3 [mlx5_core]
->     irq_pool_request_vector+0x7d/0x90 [mlx5_core]
->     mlx5_irq_request+0x2e/0xe0 [mlx5_core]
->     mlx5_irq_request_vector+0xad/0xf7 [mlx5_core]
->     comp_irq_request_pci+0x64/0xf0 [mlx5_core]
->     create_comp_eq+0x71/0x385 [mlx5_core]
->     ? mlx5e_open_xdpsq+0x11c/0x230 [mlx5_core]
->     mlx5_comp_eqn_get+0x72/0x90 [mlx5_core]
->     ? xas_load+0x8/0x91
->     mlx5_comp_irqn_get+0x40/0x90 [mlx5_core]
->     mlx5e_open_channel+0x7d/0x3c7 [mlx5_core]
->     mlx5e_open_channels+0xad/0x250 [mlx5_core]
->     mlx5e_open_locked+0x3e/0x110 [mlx5_core]
->     mlx5e_open+0x23/0x70 [mlx5_core]
->     __dev_open+0xf1/0x1a5
->     __dev_change_flags+0x1e1/0x249
->     dev_change_flags+0x21/0x5c
->     do_setlink+0x28b/0xcc4
->     ? __nla_parse+0x22/0x3d
->     ? inet6_validate_link_af+0x6b/0x108
->     ? cpumask_next+0x1f/0x35
->     ? __snmp6_fill_stats64.constprop.0+0x66/0x107
->     ? __nla_validate_parse+0x48/0x1e6
->     __rtnl_newlink+0x5ff/0xa57
->     ? kmem_cache_alloc_trace+0x164/0x2ce
->     rtnl_newlink+0x44/0x6e
->     rtnetlink_rcv_msg+0x2bb/0x362
->     ? __netlink_sendskb+0x4c/0x6c
->     ? netlink_unicast+0x28f/0x2ce
->     ? rtnl_calcit.isra.0+0x150/0x146
->     netlink_rcv_skb+0x5f/0x112
->     netlink_unicast+0x213/0x2ce
->     netlink_sendmsg+0x24f/0x4d9
->     __sock_sendmsg+0x65/0x6a
->     ____sys_sendmsg+0x28f/0x2c9
->     ? import_iovec+0x17/0x2b
->     ___sys_sendmsg+0x97/0xe0
->     __sys_sendmsg+0x81/0xd8
->     do_syscall_64+0x35/0x87
->     entry_SYSCALL_64_after_hwframe+0x6e/0x0
-> RIP: 0033:0x7fc328603727
-> Code: c3 66 90 41 54 41 89 d4 55 48 89 f5 53 89 fb 48 83 ec 10 e8 0b ed
-> ff ff 44 89 e2 48 89 ee 89 df 41 89 c0 b8 2e 00 00 00 0f 05 <48> 3d 00
-> f0 ff ff 77 35 44 89 c7 48 89 44 24 08 e8 44 ed ff ff 48
-> RSP: 002b:00007ffe8eb3f1a0 EFLAGS: 00000293 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 000000000000000d RCX: 00007fc328603727
-> RDX: 0000000000000000 RSI: 00007ffe8eb3f1f0 RDI: 000000000000000d
-> RBP: 00007ffe8eb3f1f0 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000000
-> R13: 0000000000000000 R14: 00007ffe8eb3f3c8 R15: 00007ffe8eb3f3bc
->     </TASK>
-> ---[ end trace f43ce73c3c2b13a2 ]---
-> RIP: 0010:free_irq_cpu_rmap+0x23/0x7d
-> Code: 0f 1f 80 00 00 00 00 48 85 ff 74 6b 55 48 89 fd 53 66 83 7f 06 00
-> 74 24 31 db 48 8b 55 08 0f b7 c3 48 8b 04 c2 48 85 c0 74 09 <8b> 38 31
-> f6 e8 c4 0a b8 ff 83 c3 01 66 3b 5d 06 72 de b8 ff ff ff
-> RSP: 0018:ff384881640eaca0 EFLAGS: 00010282
-> RAX: e277a58fde16f291 RBX: 0000000000000000 RCX: 0000000000000000
-> RDX: ff2335e2e20b3600 RSI: 0000000000000000 RDI: ff2335e2e20b3400
-> RBP: ff2335e2e20b3400 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 00000000ffffffe4 R12: ff384881640ead88
-> R13: ff2335c3760751e0 R14: ff2335e2e1672200 R15: ff2335c3760751f8
-> FS:  00007fc32ac22480(0000) GS:ff2335e2d6e00000(0000)
-> knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007f651ab54000 CR3: 00000029f1206003 CR4: 0000000000771ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> PKRU: 55555554
-> Kernel panic - not syncing: Fatal exception
-> Kernel Offset: 0x1dc00000 from 0xffffffff81000000 (relocation range:
-> 0xffffffff80000000-0xffffffffbfffffff)
-> kvm-guest: disable async PF for cpu 0
-> 
-> Fixes: 3354822cde5a ("net/mlx5: Use dynamic msix vectors allocation")
-> Signed-off-by: Mohith Kumar Thummaluru<mohith.k.kumar.thummaluru@oracle.com>
-> Tested-by: Mohith Kumar Thummaluru<mohith.k.kumar.thummaluru@oracle.com>
-> Reviewed-by: Moshe Shemesh<moshe@nvidia.com>
-> Signed-off-by: Pradyumn Rahar <pradyumn.rahar@oracle.com>
-> ---
-> v1->v2: removed unnecessary braces from if conditon.
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c | 6 ++----
->   1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-> index 692ef9c2f729..82ada674f8e2 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
-> @@ -324,10 +324,8 @@ struct mlx5_irq *mlx5_irq_alloc(struct mlx5_irq_pool *pool, int i,
->   	free_irq(irq->map.virq, &irq->nh);
->   err_req_irq:
->   #ifdef CONFIG_RFS_ACCEL
-> -	if (i && rmap && *rmap) {
-> -		free_irq_cpu_rmap(*rmap);
-> -		*rmap = NULL;
-> -	}
-> +	if (i && rmap && *rmap)
-> +		irq_cpu_rmap_remove(*rmap, irq->map.virq);
->   err_irq_rmap:
->   #endif
->   	if (i && pci_msix_can_alloc_dyn(dev->pdev))
-
-
-Acked-by: Tariq Toukan <tariqt@nvidia.com>
-
-Thanks.
 
