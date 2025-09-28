@@ -1,115 +1,249 @@
-Return-Path: <netdev+bounces-226976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18316BA6BBD
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 10:45:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 882D9BA6BC0
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 10:45:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDF5B3A20F6
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 08:45:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 249347A6FE7
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 08:43:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7B829B77E;
-	Sun, 28 Sep 2025 08:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F8E13B58B;
+	Sun, 28 Sep 2025 08:45:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wtQCWUcX"
+	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="P91IYOJk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D3186329
-	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 08:45:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2A42BEC3D
+	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 08:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759049115; cv=none; b=QCmim62JC9a/6/0aErHEzNfQvymKLv4YDHrtd+i/769BDuuhBxEie4BK3xvwRsLO7YxbwY8RYBbgExcJbwkTOy2HoFPUpsee0C/Fh476bXP2UycjeSK+jkQg2F4/jQE8Yzl5s8DnlpEdPXhKe/UQYejWTsHoCS4mlBbILHYFx2w=
+	t=1759049121; cv=none; b=HJwDxGlAyMwySGLcJ1G0un/O3aURB95kDx07QbH+La/Zp4pbXiulpxPBrPPRgv2h2xYXJhU5kr2LH8u+l/D3gCg0mL2cLa1NQ0VIuZc2DUH+MrHZx+vgg3r1PWrlGabPH45yhTZzvX7zjGEpPQPWAMKAc38vuAgpfOg53D/mlOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759049115; c=relaxed/simple;
-	bh=j4xe7ngKRRI3HhnwZ/3EYy6CJE5z79oU4vLUZCh2+8U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JHF9/cYtieZgzJIftG37CP3KNOmGWsh6GRnrHHRcVAbxGwpmK8tV9qIwgWdVyplYr45PgukgZuPxvzAzdv10HBftiMPRnj4cCZPBGKZLbgG/aeAsL1TJRjQciR2pWptNUvY9QL2vd+dnPTOSXEkFik20ZVS8SE1RjWwvh+pv/aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wtQCWUcX; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4d9f38478e0so33167011cf.1
-        for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 01:45:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759049112; x=1759653912; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j4xe7ngKRRI3HhnwZ/3EYy6CJE5z79oU4vLUZCh2+8U=;
-        b=wtQCWUcX3IJkVM6ojZWF3EwNWl3dskYyT6LCDGDUuq8n2yNYOOMgARvHy0KrupyqXw
-         TqWTfmQJeMNzhSJzai1FEqLpawUA+klD6/D/h7gGVww1Eai7KyZZRtW20lb2WbpAqzEC
-         DdWkFdN8ul2yocngIAGypwH2GWLjkv5cmwEW94gfEh8Wh5+KWd89mB3Jv9uPRIxiVkb3
-         u+JJNxuff0tlfEPBWqn2fBN/vR+DlbLDlfpaCA1U/5M3/hASxH3KVN+7a5M7slWlNcxc
-         eOyHR9eVEuY7y4m0g3U7oni0WA4vjzImKXN0E/iMB8jl0J3eKNrVgTSKLvr+OcyRQ7qk
-         7ACA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759049112; x=1759653912;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=j4xe7ngKRRI3HhnwZ/3EYy6CJE5z79oU4vLUZCh2+8U=;
-        b=KnL/RJ1/eZJTYNi+nbOi53mtFgRkkfkacMtXfy9EA8J3UaHpsqEH9rKrHfYTwXFtZo
-         9AZuExNB9n6TZND3iZZJehIkB+63FxHKRNMXrG1VaNkApKZY5d6cfnBI86/faZMCQgXO
-         EtmNuFILNDKQ6/IDeRtfdTJYab5eAV/rXG2WE1mL97b+RYcBpinanS3gMw1RG425+WS8
-         FDWVFIvikjMsLjR3InIf8FCsEfsAPxcu2pRXMxxPsvaCnGY6trss3TPvPjoUwPRx3T6U
-         rWkexBpfEKP6beIm9mAkWh/QoLGKV5fDe7Lb8bpbPfu21xMdDkaYPsNyY+cdul/YEVKa
-         vOkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVSop8JtwmTr9TrI4OK0yCrSHDTH7+6PAd8GO8ZpBAIiCXTZx1Hh9kWhbQrbTzbIIIxjF5P5AU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOCNO2slAzIkXFOC2wfC7pOAqQbiJwr60bbd3YeLpK55kBLVxf
-	ybNwHUcookt8LjgL0Q11lnyfv0pwlomDuoGYMULsl3MmyXLhn+tyqR7CXp/f/He77xI1GN94w4A
-	ouLdkIhV3Xubze9Ytlm7OLbIE9y9Zj2KB7FRHSuSt
-X-Gm-Gg: ASbGncuGD4xHGYdn+sc860BM+5hrqeaDqmpZkjrFBhePtGYa3qh6Nl5KmNkME/gRylr
-	TyU70KIxu9vZFAt7cgP+l+MhKc0siOIbHNKECx/GZ2G4lA2Js1C1XopkjEr0E5wNluWWCWhPXLP
-	ItpZz0WTRhMVpomXLHiUFz5AW77DLrB2gUjmI8/BGDi2FTJhmchz6dVeVHRyUYLq3Km8eWgFNvM
-	1L0K5jxYwn/2odlCA==
-X-Google-Smtp-Source: AGHT+IG+KeO4G3gXdiUE7ly7J6qfgpI6jzYYgW4C932CFsk5+KDw7Q5B/BQo6CCkd2GmCV8ddYIXPxLEdXrihv+ZceI=
-X-Received: by 2002:ac8:58c8:0:b0:4b7:8b67:edb9 with SMTP id
- d75a77b69052e-4dacd5261fdmr157649141cf.26.1759049112117; Sun, 28 Sep 2025
- 01:45:12 -0700 (PDT)
+	s=arc-20240116; t=1759049121; c=relaxed/simple;
+	bh=ZUVKLe6F46uF+OsnRxkSG5JX6sgTmN/uQ+y6yqeh2K0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sdL2YLTwhl6ZhBWumTyUGewf7WAnJULvafj+KcCXHqqjuXZ8FAQgxUNgK744Y+QeF0QdOaOZS5rjcPZBUF4xQ2raP2CIPqWlbk9YQKhUjEhX1OevX8VHnVtPQHPasnQphyM/NOkkKfGKxxok6XKfkL6Z41oEjK7FfoG6YOAJR/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=P91IYOJk; arc=none smtp.client-ip=213.160.73.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
+Received: by dvalin.narfation.org (Postfix) id 246D82054D;
+	Sun, 28 Sep 2025 08:45:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
+	s=20121; t=1759049115;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jM7Ox3+Ul4dOIfVByBI3tj0o8LxVWBiiGDPq1t2V7FY=;
+	b=P91IYOJk5Q6yuHqV/tJlwva9JKaGlRMiHSULbqaKZbKROaV3t6vufMNH7avrjFIftjczDl
+	sFYDKaWHVJAcmGfIQ2H0BNwUgOHthtNYhvE2fY1/Zi4yKIRuWlYF7bBH5I3pnxcz5U7Rdy
+	lsTc5Se3ircXO/eh6PS2hbILQXR/M4I=
+From: Sven Eckelmann <sven@narfation.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Simon Wunderlich <sw@simonwunderlich.de>, kuba@kernel.org,
+ davem@davemloft.net, netdev@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org
+Subject:
+ Re: [PATCH net-next 3/4] batman-adv: keep skb crc32 helper local in BLA
+Date: Sun, 28 Sep 2025 10:45:12 +0200
+Message-ID: <2878689.BEx9A2HvPv@sven-desktop>
+In-Reply-To: <20250927205552.GD9798@quark>
+References:
+ <20250916122441.89246-1-sw@simonwunderlich.de>
+ <20250916122441.89246-4-sw@simonwunderlich.de> <20250927205552.GD9798@quark>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250926151304.1897276-1-edumazet@google.com> <20250926151304.1897276-4-edumazet@google.com>
- <CAAVpQUDiGuCtUzXeJw0004VxDHFketF7J+Xu6tqEod_o=3r7Kg@mail.gmail.com>
-In-Reply-To: <CAAVpQUDiGuCtUzXeJw0004VxDHFketF7J+Xu6tqEod_o=3r7Kg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 28 Sep 2025 01:45:00 -0700
-X-Gm-Features: AS18NWBisJx1VR2RhverWDLVFmdnvTW6irtx8ZNUcQGSN-jXCoHiuVXkVCI2owQ
-Message-ID: <CANn89iJ9=dv2=itEKAyhBVY6edkYRLCuGLbgt_vMNpohNU00rQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] net: add NUMA awareness to skb_attempt_defer_free()
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="nextPart15571232.tv2OnDr8pf";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
 
-On Sat, Sep 27, 2025 at 1:28=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
-m> wrote:
->
-> On Fri, Sep 26, 2025 at 8:13=E2=80=AFAM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > Instead of sharing sd->defer_list & sd->defer_count with
-> > many cpus, add one pair for each NUMA node.
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+--nextPart15571232.tv2OnDr8pf
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
+From: Sven Eckelmann <sven@narfation.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Date: Sun, 28 Sep 2025 10:45:12 +0200
+Message-ID: <2878689.BEx9A2HvPv@sven-desktop>
+In-Reply-To: <20250927205552.GD9798@quark>
+MIME-Version: 1.0
 
-> > -static void skb_defer_free_flush(struct softnet_data *sd)
-> > +struct skb_defer_node __percpu *skb_defer_nodes;
->
-> seems this is unused, given it's close to the end of cycle
-> maybe this can be fixed up while applying ? :)
+On Saturday, 27 September 2025 22:55:52 CEST Eric Biggers wrote:
+> Hi,
+> 
+> On Tue, Sep 16, 2025 at 02:24:40PM +0200, Simon Wunderlich wrote:
+> > +static __be32 batadv_skb_crc32(struct sk_buff *skb, u8 *payload_ptr)
+> > +{
+> > +	unsigned int to = skb->len;
+> > +	unsigned int consumed = 0;
+> > +	struct skb_seq_state st;
+> > +	unsigned int from;
+> > +	unsigned int len;
+> > +	const u8 *data;
+> > +	u32 crc = 0;
+> > +
+> > +	from = (unsigned int)(payload_ptr - skb->data);
+> > +
+> > +	skb_prepare_seq_read(skb, from, to, &st);
+> > +	while ((len = skb_seq_read(consumed, &data, &st)) != 0) {
+> > +		crc = crc32c(crc, data, len);
+> > +		consumed += len;
+> > +	}
+> > +
+> > +	return htonl(crc);
+> > +}
+> 
+> Has using skb_crc32c() been considered here?
 
-Good catch, I moved it to net_hotdata but forgot to remove this leftover.
+No. At the time this was written (v3.8), skb_crc32c (v6.16) didnt exist. Also 
+its predecessor __skb_checksum only started its existence in v3.13. And no one 
+noticed it as candidate to replace batadv_skb_crc32 with
 
-Will send a V2.
+And this patch here was just moving the function between two places - so not 
+introducing new code.
 
-Thanks.
+Do you want to submit a patch to integrate your new function in batman-adv? I 
+only performed a quick-and-dirty test to see if it returns the same results 
+and it seemed to do its job fine.
+
+diff --git c/net/batman-adv/Kconfig w/net/batman-adv/Kconfig
+index c299e2bc..58c408b7 100644
+--- c/net/batman-adv/Kconfig
++++ w/net/batman-adv/Kconfig
+@@ -35,6 +35,7 @@ config BATMAN_ADV_BLA
+ 	bool "Bridge Loop Avoidance"
+ 	depends on BATMAN_ADV && INET
+ 	select CRC16
++	select NET_CRC32C
+ 	default y
+ 	help
+ 	  This option enables BLA (Bridge Loop Avoidance), a mechanism
+diff --git c/net/batman-adv/bridge_loop_avoidance.c w/net/batman-adv/bridge_loop_avoidance.c
+index b992ba12..eef40b6f 100644
+--- c/net/batman-adv/bridge_loop_avoidance.c
++++ w/net/batman-adv/bridge_loop_avoidance.c
+@@ -12,7 +12,6 @@
+ #include <linux/compiler.h>
+ #include <linux/container_of.h>
+ #include <linux/crc16.h>
+-#include <linux/crc32.h>
+ #include <linux/err.h>
+ #include <linux/errno.h>
+ #include <linux/etherdevice.h>
+@@ -1585,45 +1584,11 @@ int batadv_bla_init(struct batadv_priv *bat_priv)
+ 	return 0;
+ }
+ 
+-/**
+- * batadv_skb_crc32() - calculate CRC32 of the whole packet and skip bytes in
+- *  the header
+- * @skb: skb pointing to fragmented socket buffers
+- * @payload_ptr: Pointer to position inside the head buffer of the skb
+- *  marking the start of the data to be CRC'ed
+- *
+- * payload_ptr must always point to an address in the skb head buffer and not to
+- * a fragment.
+- *
+- * Return: big endian crc32c of the checksummed data
+- */
+-static __be32 batadv_skb_crc32(struct sk_buff *skb, u8 *payload_ptr)
+-{
+-	unsigned int to = skb->len;
+-	unsigned int consumed = 0;
+-	struct skb_seq_state st;
+-	unsigned int from;
+-	unsigned int len;
+-	const u8 *data;
+-	u32 crc = 0;
+-
+-	from = (unsigned int)(payload_ptr - skb->data);
+-
+-	skb_prepare_seq_read(skb, from, to, &st);
+-	while ((len = skb_seq_read(consumed, &data, &st)) != 0) {
+-		crc = crc32c(crc, data, len);
+-		consumed += len;
+-	}
+-
+-	return htonl(crc);
+-}
+-
+ /**
+  * batadv_bla_check_duplist() - Check if a frame is in the broadcast dup.
+  * @bat_priv: the bat priv with all the mesh interface information
+  * @skb: contains the multicast packet to be checked
+- * @payload_ptr: pointer to position inside the head buffer of the skb
+- *  marking the start of the data to be CRC'ed
++ * @payload_offset: offset in the skb, marking the start of the data to be CRC'ed
+  * @orig: originator mac address, NULL if unknown
+  *
+  * Check if it is on our broadcast list. Another gateway might have sent the
+@@ -1638,16 +1603,18 @@ static __be32 batadv_skb_crc32(struct sk_buff *skb, u8 *payload_ptr)
+  * Return: true if a packet is in the duplicate list, false otherwise.
+  */
+ static bool batadv_bla_check_duplist(struct batadv_priv *bat_priv,
+-				     struct sk_buff *skb, u8 *payload_ptr,
++				     struct sk_buff *skb, int payload_offset,
+ 				     const u8 *orig)
+ {
+ 	struct batadv_bcast_duplist_entry *entry;
+ 	bool ret = false;
++	int payload_len;
+ 	int i, curr;
+ 	__be32 crc;
+ 
+ 	/* calculate the crc ... */
+-	crc = batadv_skb_crc32(skb, payload_ptr);
++	payload_len = skb->len - payload_offset;
++	crc = htonl(skb_crc32c(skb, payload_offset, payload_len, 0));
+ 
+ 	spin_lock_bh(&bat_priv->bla.bcast_duplist_lock);
+ 
+@@ -1727,7 +1694,7 @@ static bool batadv_bla_check_duplist(struct batadv_priv *bat_priv,
+ static bool batadv_bla_check_ucast_duplist(struct batadv_priv *bat_priv,
+ 					   struct sk_buff *skb)
+ {
+-	return batadv_bla_check_duplist(bat_priv, skb, (u8 *)skb->data, NULL);
++	return batadv_bla_check_duplist(bat_priv, skb, 0, NULL);
+ }
+ 
+ /**
+@@ -1745,12 +1712,10 @@ bool batadv_bla_check_bcast_duplist(struct batadv_priv *bat_priv,
+ 				    struct sk_buff *skb)
+ {
+ 	struct batadv_bcast_packet *bcast_packet;
+-	u8 *payload_ptr;
+ 
+ 	bcast_packet = (struct batadv_bcast_packet *)skb->data;
+-	payload_ptr = (u8 *)(bcast_packet + 1);
+ 
+-	return batadv_bla_check_duplist(bat_priv, skb, payload_ptr,
++	return batadv_bla_check_duplist(bat_priv, skb, sizeof(*bcast_packet),
+ 					bcast_packet->orig);
+ }
+ 
+
+Regards,
+	Sven
+--nextPart15571232.tv2OnDr8pf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCaNj1mAAKCRBND3cr0xT1
+y5DIAQDuvVj4HaKlvbXTdpeXUycI3OUfV9GO4+sBWl2SsCPocgD/QH0XR1Po0lGU
+NHIZEee3ff9REwUiuSxuBTzCr8noDQA=
+=bykD
+-----END PGP SIGNATURE-----
+
+--nextPart15571232.tv2OnDr8pf--
+
+
+
 
