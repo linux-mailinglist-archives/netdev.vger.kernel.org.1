@@ -1,197 +1,115 @@
-Return-Path: <netdev+bounces-226975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3624CBA6B91
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 10:40:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18316BA6BBD
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 10:45:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69C80189A92B
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 08:40:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDF5B3A20F6
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 08:45:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B892BE7DD;
-	Sun, 28 Sep 2025 08:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7B829B77E;
+	Sun, 28 Sep 2025 08:45:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dGNReM+r"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wtQCWUcX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F6A225791;
-	Sun, 28 Sep 2025 08:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D3186329
+	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 08:45:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759048807; cv=none; b=aScr0aFCSyvB8o9ml5nVeiHR+ZsMRDpbB1jO3wT4zt9NdC4hUiAuf+Z9RmwBvBiDoiDP7jbljmmKB9qg6+rg6N7P23/74HQCUZmdC0vMMx/j4nU6BGXH5ZaWLmdVFRiSjXXsUI2UXMWjcf7S1VcD55GS809ob5/M4SXi1ZKllsU=
+	t=1759049115; cv=none; b=QCmim62JC9a/6/0aErHEzNfQvymKLv4YDHrtd+i/769BDuuhBxEie4BK3xvwRsLO7YxbwY8RYBbgExcJbwkTOy2HoFPUpsee0C/Fh476bXP2UycjeSK+jkQg2F4/jQE8Yzl5s8DnlpEdPXhKe/UQYejWTsHoCS4mlBbILHYFx2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759048807; c=relaxed/simple;
-	bh=UAiDtMls/7PB7c4FD/jtapLq39n9wPN/G9K9tg8xa6U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ba/kW5ttVU1s5u88h8iaYpw+WqG8w646pSCOYwQmINxb2XNwVh4tkKBa/0muf1MdZFY4YvS3kzte75TKSYvZQCemG6CUaefvxQHchKn+VhxOVoDlwxfe3UX8RLVi3NGxJnVoRc2lRUN1sCGLAfxyJaDGar8hBn0eWn1wvJeAJrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dGNReM+r; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58RLKCJv018156;
-	Sun, 28 Sep 2025 08:40:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=26dBy+
-	6fvtP4nix+qumgkSsprwt5d+Cgeccq0M1JqCc=; b=dGNReM+r2Kz/zB7fb25my+
-	Ab8p3MFptjmNW0KYL7RwH3PpQnWX3+i2ClnyQdWfs5W9EeFbsIj7TTuenp5sZa7A
-	XLvQBvF6qvDxI9TGUQalbFCgbcRtrPiU1zmzeZykcEy4WbV3WhE2shyz7qom7+zm
-	9Xk1IeFtkuA0w0RfdxhKU3wxbz0Ravmd6hqqbJ1XkNXnvn2TRgAMWamWfWlqtDgL
-	9oKNjyiODvwdXOrce6prr4K5jVo0JHeJ+L9AClKifKMCfxga2to+/Y/VTJ5MnNhk
-	u0022j52AmDusD/DGjKa3zLIXmd2IEO8/05HPnXUHujw/ThbK9L1XGNtZwcpDjVw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49e7n7cxtg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 28 Sep 2025 08:40:00 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58S8dxZE024613;
-	Sun, 28 Sep 2025 08:39:59 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49e7n7cxtd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 28 Sep 2025 08:39:59 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58S3FPmR024198;
-	Sun, 28 Sep 2025 08:39:58 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 49evy0rsdh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 28 Sep 2025 08:39:58 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58S8ds7O18022900
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 28 Sep 2025 08:39:54 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 79E4D20043;
-	Sun, 28 Sep 2025 08:39:54 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9B6B520040;
-	Sun, 28 Sep 2025 08:39:53 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.87.130.219])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Sun, 28 Sep 2025 08:39:53 +0000 (GMT)
-Date: Sun, 28 Sep 2025 10:39:51 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Dust Li <dust.li@linux.alibaba.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        Simon
- Horman <horms@kernel.org>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Sidraya
- Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu
- <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH net-next v3 1/2] net/smc: make wr buffer count
- configurable
-Message-ID: <20250928103951.6464dfd3.pasic@linux.ibm.com>
-In-Reply-To: <aNiXQ_UfG9k-f9-n@linux.alibaba.com>
-References: <20250921214440.325325-1-pasic@linux.ibm.com>
-	<20250921214440.325325-2-pasic@linux.ibm.com>
-	<7cc2df09-0230-40cb-ad4f-656b0d1d785b@redhat.com>
-	<20250925132540.74091295.pasic@linux.ibm.com>
-	<20250928005515.61a57542.pasic@linux.ibm.com>
-	<aNiXQ_UfG9k-f9-n@linux.alibaba.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1759049115; c=relaxed/simple;
+	bh=j4xe7ngKRRI3HhnwZ/3EYy6CJE5z79oU4vLUZCh2+8U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JHF9/cYtieZgzJIftG37CP3KNOmGWsh6GRnrHHRcVAbxGwpmK8tV9qIwgWdVyplYr45PgukgZuPxvzAzdv10HBftiMPRnj4cCZPBGKZLbgG/aeAsL1TJRjQciR2pWptNUvY9QL2vd+dnPTOSXEkFik20ZVS8SE1RjWwvh+pv/aY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wtQCWUcX; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4d9f38478e0so33167011cf.1
+        for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 01:45:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759049112; x=1759653912; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j4xe7ngKRRI3HhnwZ/3EYy6CJE5z79oU4vLUZCh2+8U=;
+        b=wtQCWUcX3IJkVM6ojZWF3EwNWl3dskYyT6LCDGDUuq8n2yNYOOMgARvHy0KrupyqXw
+         TqWTfmQJeMNzhSJzai1FEqLpawUA+klD6/D/h7gGVww1Eai7KyZZRtW20lb2WbpAqzEC
+         DdWkFdN8ul2yocngIAGypwH2GWLjkv5cmwEW94gfEh8Wh5+KWd89mB3Jv9uPRIxiVkb3
+         u+JJNxuff0tlfEPBWqn2fBN/vR+DlbLDlfpaCA1U/5M3/hASxH3KVN+7a5M7slWlNcxc
+         eOyHR9eVEuY7y4m0g3U7oni0WA4vjzImKXN0E/iMB8jl0J3eKNrVgTSKLvr+OcyRQ7qk
+         7ACA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759049112; x=1759653912;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j4xe7ngKRRI3HhnwZ/3EYy6CJE5z79oU4vLUZCh2+8U=;
+        b=KnL/RJ1/eZJTYNi+nbOi53mtFgRkkfkacMtXfy9EA8J3UaHpsqEH9rKrHfYTwXFtZo
+         9AZuExNB9n6TZND3iZZJehIkB+63FxHKRNMXrG1VaNkApKZY5d6cfnBI86/faZMCQgXO
+         EtmNuFILNDKQ6/IDeRtfdTJYab5eAV/rXG2WE1mL97b+RYcBpinanS3gMw1RG425+WS8
+         FDWVFIvikjMsLjR3InIf8FCsEfsAPxcu2pRXMxxPsvaCnGY6trss3TPvPjoUwPRx3T6U
+         rWkexBpfEKP6beIm9mAkWh/QoLGKV5fDe7Lb8bpbPfu21xMdDkaYPsNyY+cdul/YEVKa
+         vOkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVSop8JtwmTr9TrI4OK0yCrSHDTH7+6PAd8GO8ZpBAIiCXTZx1Hh9kWhbQrbTzbIIIxjF5P5AU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOCNO2slAzIkXFOC2wfC7pOAqQbiJwr60bbd3YeLpK55kBLVxf
+	ybNwHUcookt8LjgL0Q11lnyfv0pwlomDuoGYMULsl3MmyXLhn+tyqR7CXp/f/He77xI1GN94w4A
+	ouLdkIhV3Xubze9Ytlm7OLbIE9y9Zj2KB7FRHSuSt
+X-Gm-Gg: ASbGncuGD4xHGYdn+sc860BM+5hrqeaDqmpZkjrFBhePtGYa3qh6Nl5KmNkME/gRylr
+	TyU70KIxu9vZFAt7cgP+l+MhKc0siOIbHNKECx/GZ2G4lA2Js1C1XopkjEr0E5wNluWWCWhPXLP
+	ItpZz0WTRhMVpomXLHiUFz5AW77DLrB2gUjmI8/BGDi2FTJhmchz6dVeVHRyUYLq3Km8eWgFNvM
+	1L0K5jxYwn/2odlCA==
+X-Google-Smtp-Source: AGHT+IG+KeO4G3gXdiUE7ly7J6qfgpI6jzYYgW4C932CFsk5+KDw7Q5B/BQo6CCkd2GmCV8ddYIXPxLEdXrihv+ZceI=
+X-Received: by 2002:ac8:58c8:0:b0:4b7:8b67:edb9 with SMTP id
+ d75a77b69052e-4dacd5261fdmr157649141cf.26.1759049112117; Sun, 28 Sep 2025
+ 01:45:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: c6gA6HzoJG_m__DF3vzOC0Er79P5vPYZ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTI3MDAyNSBTYWx0ZWRfX0Iym0TzM4LUD
- 7wRlax0L/QwIwSUsS5j6N6/ArlJa1Q9kFKUbdGOcc/g/g3mtH+hEB59Uiky3WvZgMLj1x9osgvc
- Afl9mG5VU4gb8Ps9Fc1F0EG8PsImEV+IvYSqhW9mUym1JK+XMDsZ0g5x4LQTS9r84bs2g6GIXzS
- axOeoVboDQ86kwcjFHPj+YvOpWGY6lTIjcgT33RgLImJ5jBdSjos8P555sXKP79zR8vCf+OYNHG
- gnYQ1ocWRp0wkdPnXHWXDB56pnOauS1xZtW8ecLMpkdklvDUV/ROYargbWz36ChRgf9clG9LBU2
- DtkHSaijjTCd8PcRNLIKI3vojNpNNAEw9T37W2QzyF8QmNzAyIQ4ffg+WFtevUOJQj7Nk/Up/XK
- sS8M3FGfllCwgWOZzOKyJZbxHvFTrw==
-X-Proofpoint-GUID: P1hxPPalkpptVuof-Jso_qIsXcbYFFNG
-X-Authority-Analysis: v=2.4 cv=T7qBjvKQ c=1 sm=1 tr=0 ts=68d8f460 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=SRrdq9N9AAAA:8 a=LpznLg-6pxwcTV0XsXIA:9
- a=CjuIK1q_8ugA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-28_04,2025-09-26_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0
- clxscore=1015 suspectscore=0 bulkscore=0 phishscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2509150000 definitions=main-2509270025
+References: <20250926151304.1897276-1-edumazet@google.com> <20250926151304.1897276-4-edumazet@google.com>
+ <CAAVpQUDiGuCtUzXeJw0004VxDHFketF7J+Xu6tqEod_o=3r7Kg@mail.gmail.com>
+In-Reply-To: <CAAVpQUDiGuCtUzXeJw0004VxDHFketF7J+Xu6tqEod_o=3r7Kg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 28 Sep 2025 01:45:00 -0700
+X-Gm-Features: AS18NWBisJx1VR2RhverWDLVFmdnvTW6irtx8ZNUcQGSN-jXCoHiuVXkVCI2owQ
+Message-ID: <CANn89iJ9=dv2=itEKAyhBVY6edkYRLCuGLbgt_vMNpohNU00rQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: add NUMA awareness to skb_attempt_defer_free()
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 28 Sep 2025 10:02:43 +0800
-Dust Li <dust.li@linux.alibaba.com> wrote:
+On Sat, Sep 27, 2025 at 1:28=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
+m> wrote:
+>
+> On Fri, Sep 26, 2025 at 8:13=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > Instead of sharing sd->defer_list & sd->defer_count with
+> > many cpus, add one pair for each NUMA node.
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-> >Unfortunately I don't quite understand why qp_attr.cap.max_send_wr is 3
-> >times the number of send WR buffers we allocate. My understanding
-> >is that qp_attr.cap.max_send_wr is about the number of send WQEs.  
-> 
-> We have at most 2 RDMA Write for 1 RDMA send. So 3 times is necessary.
-> That is explained in the original comments. Maybe it's better to keep it.
-> 
-> ```
-> .cap = {
->                 /* include unsolicited rdma_writes as well,
->                  * there are max. 2 RDMA_WRITE per 1 WR_SEND
->                  */
+> > -static void skb_defer_free_flush(struct softnet_data *sd)
+> > +struct skb_defer_node __percpu *skb_defer_nodes;
+>
+> seems this is unused, given it's close to the end of cycle
+> maybe this can be fixed up while applying ? :)
 
-But what are "the unsolicited" rdma_writes? I have heard of
-unsolicited receive, where the data is received without
-consuming a WR previously put on the RQ on the receiving end, but
-the concept of unsolicited rdma_writes eludes me completely.
+Good catch, I moved it to net_hotdata but forgot to remove this leftover.
 
-I guess what you are trying to say, and what I understand is
-that we first put the payload into the RMB of the remote, which
-may require up 2 RDMA_WRITE operations, probably because we may
-cross the end (and start) of the array that hosts the circular
-buffer, and then we send a CDC message to update the cursor.
+Will send a V2.
 
-For the latter a  ib_post_send() is used in smc_wr_tx_send()
-and AFAICT it consumes a WR from wr_tx_bufs. For the former
-we consume a single wr_tx_rdmas which and each wr_tx_rdmas
-has 2 WR allocated.
-
-And all those WRs need a WQE. So I guess now I do understand
-SMC_WR_BUF_CNT, but I find the comment still confusing like
-hell because of these unsolicited rdma_writes.
-
-Thank you for the explanation! It was indeed helpful! Let
-me try to come up with a better comment -- unless somebody
-manages to explain "unsolicited rdma_writes" to me.
-
->         .max_send_wr = SMC_WR_BUF_CNT * 3,
->         .max_recv_wr = SMC_WR_BUF_CNT * 3,
->         .max_send_sge = SMC_IB_MAX_SEND_SGE,
->         .max_recv_sge = lnk->wr_rx_sge_cnt,
->         .max_inline_data = 0,
-> },
-> ```
-> 
-> >I assume that qp_attr.cap.max_send_wr == qp_attr.cap.max_recv_wr
-> >is not something we would want to preserve.  
-> 
-> IIUC, RDMA Write won't consume any RX wqe on the receive side, so I think
-> the .max_recv_wr can be SMC_WR_BUF_CNT if we don't use RDMA_WRITE_IMM.
-
-Maybe we don't want to assume somebody else (another implementation)
-would not use immediate data. I'm not sure. But I don't quite understand
-the why the relationship between the send and the receive side either.
-
-Regards,
-Halil
+Thanks.
 
