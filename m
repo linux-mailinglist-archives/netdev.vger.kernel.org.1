@@ -1,153 +1,99 @@
-Return-Path: <netdev+bounces-227005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6458BA6DC3
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 11:32:41 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 179DCBA6DFF
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 11:41:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7F727A1B86
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 09:30:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BA7574E05F0
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 09:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 434592D877F;
-	Sun, 28 Sep 2025 09:32:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="S66go+d7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F3C2D6636;
+	Sun, 28 Sep 2025 09:41:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08A42D062F;
-	Sun, 28 Sep 2025 09:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A80E1298CA4
+	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 09:41:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759051954; cv=none; b=Hf5I2F1O13wExh7vpPHN7YhYlCDb4XxphU3D4ztkaBYYL8HapCDVOFXHcOxYwjfCR4ZE13oC++ethW1GLUjIZJ2ct0RObcZcawJHyZ1vy6zyvjMU+nL2tkvCVAiG/uNg89ohKJx56wiL6LMRiuO+jiN7EGnWUcbvk/HCheWoB3o=
+	t=1759052473; cv=none; b=Q9F1sw9l2FxypSFl+RmIIL0UxWKEnvFNZX+QHft+fkENw5L5wDbWMzO1CQCKJmO9web5a10Hh0czTM72rqn8vj7p7GjgxuFpKGGRc+CTrn5DjIjBIdAJgi2Tsit9EBRwVfbEY0y27beH1LVHY3f9GyUo6ME389ojkIjhzVFtCiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759051954; c=relaxed/simple;
-	bh=SKwtz4qWqhPcESQg87ojaWvLmwrEotTfIBGcnSoeTbk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KRJ9yXHIgoMdMJnoXnKwho6oG1gGeDXiAPaYiCLXRL7yHoWuKi+KFzCjtrXDFlRSToJsEuf+agCLttdbwbmwKGcx+6FsQ9R2QJh8yu4ZfjUJ17bf/LF47V0ZEzo0/YxctAwhuqGqLZuZEiq5zj2ODLkjb5+k+oxPNBokcX0AdtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=S66go+d7; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=W4obhf2MMc+kaVAeVoHPf3nhTo/bKPGOyQwVk/dKIYA=; b=S66go+d73VUiXXPjRKdmdmphgX
-	fJSp4bLxi+AG0GdEXOovkaskpY4ph3IFxoWPlkw5KBlq8BCDaujWApl2reNhtFcjbYdO8NWLTAu/V
-	4jlVxRjWuwXjBlWuN3blTKJRXUGJbIfujGydt2dCgCZIEqmEkDAd9oVT2mOQqCO7ldr59MR2+/rov
-	sr5t7sQXGdcwWelHGX0LbcInHhXBZQG2QvKhdOThbQMeHV3+YdBNo41m0p+mCXk2XnC/CvR06IZBL
-	hFHJHJHKFipbKSUM63/MTC3uqDEN9slMfDkAUlhX2C3f/dSobUTyU4JBwRkEJg+QyoR0+8N3pw81V
-	7G/ljcAg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60784)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1v2nlZ-000000005RS-1C6u;
-	Sun, 28 Sep 2025 10:32:25 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1v2nlU-000000002Si-1OQ2;
-	Sun, 28 Sep 2025 10:32:20 +0100
-Date: Sun, 28 Sep 2025 10:32:20 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	s=arc-20240116; t=1759052473; c=relaxed/simple;
+	bh=zxWj32avZExS1tw2SyLgeX/kHceIkgtpT+OeM0Jy7U0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HyLzpQmWwU1aEIxRZ2BlsKOrUzOmaNPPbpCyTx7hPMA7DsCjgBYPinnRv+UUWnBkOuVswgTGS4y9ofT8ABnZ6U4rbBCiOivjLVHCQOZheXA+5qrdmd3t96w4VdHdHXlYJZWR/jmkwJc7KGF/GuUcaiwR5vO249d6Q3PFomG2KcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=15.184.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: zesmtpgz1t1759052370t05b9b0ad
+X-QQ-Originating-IP: hbfx45qwpWhSZhdgNkzIvzLUjqNnqkgceTV5/v+S7Ok=
+Received: from lap-jiawenwu.trustnetic.com ( [115.220.225.164])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sun, 28 Sep 2025 17:39:27 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 17010562721259606880
+EX-QQ-RecipientCnt: 10
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Christophe Roullier <christophe.roullier@foss.st.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Tristram Ha <Tristram.Ha@microchip.com>
-Subject: Re: [PATCH RFC net-next 3/6] net: phylink: add phylink managed MAC
- Wake-on-Lan support
-Message-ID: <aNkApFc9wsnabXFW@shell.armlinux.org.uk>
-References: <aNj4HY_mk4JDsD_D@shell.armlinux.org.uk>
- <E1v2nFI-00000007jXV-1BYa@rmk-PC.armlinux.org.uk>
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next 0/3] TXGBE feat new AML firmware
+Date: Sun, 28 Sep 2025 17:39:20 +0800
+Message-Id: <20250928093923.30456-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1v2nFI-00000007jXV-1BYa@rmk-PC.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: N/EN6P+BmEafCy/1keUGfUTmpgzKdOsNFzEHxHvbeJwdsrucTfoOkA/Z
+	UL4EVtwVjtDBttXnSA9kht38FOWDUlTDdWgK4WcyBV5OMaJYQb5PX0FqxdZZaWBebHiI/7G
+	Tt6IJUyB3UNESPnf2Z0DU3WGvF/YlubiBsu9NJATJstnSFej40Dh73njxA6RDvXGoD1uQ7+
+	pt9AQ3CvEX0j4s3A1rt9qIQxKOeQctJnuzil09JAB/hxcwkQpERFG8u42JrMgA9VTc1lo8l
+	+rOESJMjuMVFtj66SKgY76PmDJsleL2Wfe4LDCCVWG/EC9Xb+0bvyl0hYy0AtWCyuHuF4ir
+	pf3Vw2yKVEVdmnqgkQFSV4o8rPnWRD6CA8q1+ZhYOEZO/EkHQlDQQaKfEzH1s377fsHZ6PX
+	mFN6hwxnUT7NeFtxsfpb040Ecyw707zpdR5Hgxp2Sv3nRLl0J6ojJEBrD8fbt7Ukiksc++3
+	kL+6EvFziFkb2302rO7WEzgjnDjzC/zfx54YhzSp04sUBDqwqICQyUZD6DVEmjep3Q9rB0g
+	giAndqKrYgV6YDPEgLKTLlQrK8kyB06WLObB5ReVYr9YEJUL3/lh+NKKlJVILUzskZ+tniP
+	9MeAAd4/Xww77PpMAu9XLFcCbkkbRgwa3i3TspU8pvk+W0S5hV9yf8GVWy8bboAnPsVx/6c
+	QHwwmozyFEEcbyrv67g2yc9Pt3dH+ksUbIMEUw7Sr7Q8JEKUYEnPePc7JKC1s0kbu56ByND
+	Iwbw2wSZhLOvzESbP5dnLz+Yn/8e8j4YDhJKBCHWvnKvYvw9uWpLdQrCRJNHuftlivBNewg
+	+tvaYZHIJXhhVdDbH8g9vFe0vwlffSEB2Olz4avNopsy34Jf98FrFP2zYK2kV5CATiD3jbK
+	GlcHxnmiSsv7ksNvnT5hltWSSyWULpAVtjieRz+sYbO1MIDeepclEc1/xbjXNI5Y9Mh6eA9
+	TbeW/JLa4VggLupFPjG9esqu+fe0H2NXr+ZY8p+2vDFqB9rEu8Mh91aH41HquIZXnxfAiPf
+	rcGVGCWAqCGw7XuBXu2IuHEdPUWT6hV8r1wvu+0A==
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+X-QQ-RECHKSPAM: 0
 
-On Sun, Sep 28, 2025 at 09:59:04AM +0100, Russell King (Oracle) wrote:
-> Add core phylink Wake-on-Lan support.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  drivers/net/phy/phylink.c | 77 +++++++++++++++++++++++++++++++++++++--
->  include/linux/phylink.h   | 26 +++++++++++++
->  2 files changed, 99 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> index 9d7799ea1c17..9a3783e719bc 100644
-> --- a/drivers/net/phy/phylink.c
-> +++ b/drivers/net/phy/phylink.c
-> @@ -93,6 +93,9 @@ struct phylink {
->  	u8 sfp_port;
->  
->  	struct eee_config eee_cfg;
-> +
-> +	u32 wolopts_mac;
-> +	u8 wol_sopass[SOPASS_MAX];
->  };
->  
->  #define phylink_printk(level, pl, fmt, ...) \
-> @@ -2575,11 +2578,17 @@ EXPORT_SYMBOL_GPL(phylink_rx_clk_stop_unblock);
->   *   can also bring down the link between the MAC and PHY.
->   * - If Wake-on-Lan is active, but being handled by the MAC, the MAC
->   *   still needs to receive packets, so we can not bring the link down.
-> + *
-> + * Note: when phylink managed Wake-on-Lan is in use, @mac_wol is ignored.
-> + * (struct phylink_mac_ops.mac_set_wol populated.)
->   */
->  void phylink_suspend(struct phylink *pl, bool mac_wol)
->  {
->  	ASSERT_RTNL();
->  
-> +	if (phylink_mac_supports_wol(pl))
-> +		mac_wol = !!pl->wolopts_mac;
-> +
->  	if (mac_wol && (!pl->netdev || pl->netdev->ethtool->wol_enabled)) {
->  		/* Wake-on-Lan enabled, MAC handling */
->  		mutex_lock(&pl->state_mutex);
-> @@ -2673,6 +2682,17 @@ void phylink_resume(struct phylink *pl)
->  }
->  EXPORT_SYMBOL_GPL(phylink_resume);
->  
-> +static bool phylink_mac_supports_wol(struct phylink *pl)
-> +{
-> +	return !!pl->mac_ops->mac_wol_set;
-> +}
-> +
-> +static bool phylink_phy_supports_wol(struct phylink *pl,
-> +				     struct phy_device *phydev)
-> +{
-> +	return phydev && (pl->config->wol_phy_legacy || phy_can_wakeup(phydev));
-> +}
-> +
+The firmware of AML devices are redesigned to adapt to more PHY
+interfaces. Optimize the driver to be compatible with the new firmware.
 
-Yes, these need to be earlier.
+Jiawen Wu (3):
+  net: txgbe: expend SW-FW mailbox buffer size to identify QSFP module
+  net: txgbe: optimize the flow to setup PHY for AML devices
+  net: txgbe: rename txgbe_get_phy_link()
+
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  2 -
+ .../net/ethernet/wangxun/txgbe/txgbe_aml.c    | 54 ++++++-------------
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  5 +-
+ 3 files changed, 20 insertions(+), 41 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.48.1
+
 
