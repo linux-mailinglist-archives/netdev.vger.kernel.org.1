@@ -1,225 +1,112 @@
-Return-Path: <netdev+bounces-227033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 155E1BA7548
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 19:19:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEC4FBA75B4
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 19:48:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B813A178303
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 17:19:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F35A3B8E07
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 17:48:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B11771FFC6D;
-	Sun, 28 Sep 2025 17:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5B5254841;
+	Sun, 28 Sep 2025 17:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XUdIQ+bT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qb0zuWnG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7F91E51FA
-	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 17:18:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C4D253932
+	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 17:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759079903; cv=none; b=CJs/hk6amzMX+pjAFCaur7OJN+mTFQ7DCW2cOfTD1Hp/s2eZIZn/xgCEGkxmFlADwerkShvxyYZSTu26PoeUUgI0VnsJDOTfmFLp/I72unf7MAZLDIZnJvoQ+okMHxN5e4ScmjRj0e/bCWxB4l6KfWdsgqS4LaQ9xGR4YzUBi2Q=
+	t=1759081685; cv=none; b=jCsSfLHCScn6qLq/DTUK6QRTX92CyduFLFA4bx0nnwrNvovQY2Ud/XdAikk2FmXwLrDjmN7J5nMFcJpaGdTM9MDu9VthBK/kHFgGh96jShS0XNFLbk366FZQjxBxP0b+2QN1DDnu7QNgqBrqCHnyGqFpvC847+tSt6bwptmQZBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759079903; c=relaxed/simple;
-	bh=x2yexiXIy45u2otga7DM9/2C/G9c+BzLFnUMgiFDWgA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f00usU7luo3lfpu2Gky6mXuXnCdryg83DrkPmcYCd3sEddyzXHm9UKWywTz14r7xT9rc3RnZLPpLnu0FN/ZB4yiZuD9SDyDoB/BUwW7w1UwxSz9aXoTq+nU//8TdLoRHxjacGIroBrISHQfjLRtgDLYXObIR1ryEnVJvBNoU0fI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XUdIQ+bT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0912C4CEF0;
-	Sun, 28 Sep 2025 17:18:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759079902;
-	bh=x2yexiXIy45u2otga7DM9/2C/G9c+BzLFnUMgiFDWgA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XUdIQ+bTKFjbZ0ndk8QdFvHlmV0dDZkpCWLPHS+5L11iAohcBvkHfhTbai+eicon3
-	 OaMI57rilM0czp+x3dM9Vn/TACAUvrHjmyiDtEcDhBQy10iQV/sDbZuFI6bG56XLCm
-	 4L2YOgOVSl07P+U74FUx1RZNVH1NE0Tfp3BZhGrl34nax4Qls15rULw8pT9yj0SGEJ
-	 WmnGohB/zEidAYYaCmRtlBP4cTsBorfa0p1WOcaKTGoDEK4ZUddM1aHInpM1PV6gAV
-	 qRgUxlDkAJe0W1aFJNEX/kRAGoG5AsHeNK/NDDrGeX6yFJOeoH46bfUeVuLiKoc2yf
-	 AOJYlTl/9hgqw==
-Date: Sun, 28 Sep 2025 10:17:03 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Sven Eckelmann <sven@narfation.org>
-Cc: Simon Wunderlich <sw@simonwunderlich.de>, kuba@kernel.org,
-	davem@davemloft.net, netdev@vger.kernel.org,
-	b.a.t.m.a.n@lists.open-mesh.org
-Subject: Re: [PATCH net-next 3/4] batman-adv: keep skb crc32 helper local in
- BLA
-Message-ID: <20250928171703.GA6416@sol>
-References: <20250916122441.89246-1-sw@simonwunderlich.de>
- <20250916122441.89246-4-sw@simonwunderlich.de>
- <20250927205552.GD9798@quark>
- <2878689.BEx9A2HvPv@sven-desktop>
+	s=arc-20240116; t=1759081685; c=relaxed/simple;
+	bh=bb144XaT3ozq0w1qVMTiSOGlsjiwTNHYJ14plQdks2w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sqqu/H04to7LgibgJbF5EC6XWEFaXvEDnoeHkTqr8D2JctpPYw5V2JYEwnCORjdd7ej2NylS9xQjFEWwPGvWrBkzkg82fEq+S882qMgxuNMcDRT4nFkg2ILSvxzsPUtZCNXDMvZe/DPV68BVlXl54niof9YbjPxycxAR6AULKr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qb0zuWnG; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b5526b7c54eso2359160a12.0
+        for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 10:48:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759081682; x=1759686482; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=bb144XaT3ozq0w1qVMTiSOGlsjiwTNHYJ14plQdks2w=;
+        b=Qb0zuWnG7QsrX/EU9TbJnVXw4X5o8e31mNf+on9sXdE1YI5XWKrRTWkEjS7IM+9RVW
+         uechN8gGX5DTdFPKQjG+mzpbae0lYH+ScjU7crsVuW5yOZ0RMpM30ev9cYR6cmj8AfoF
+         ywfs/kfzrjRChzNR4vaRfotI9XMCcZ/zSTWccbByOnWDZUNPE/QDzvpcc3jTIwAPHVFt
+         nzGcOwB3vIZCZNmAMZ2xS+nNJ0kuD7ZbRW6f77tLn8vBiqqWkE55buYvHvRa2jsn3BFP
+         QS9h3/i3xvQ7kr+uhwC8wqFD5mItEKAE+JW9WogderX7yim21ES9H1W6rLcPK5rDW8TR
+         prcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759081682; x=1759686482;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bb144XaT3ozq0w1qVMTiSOGlsjiwTNHYJ14plQdks2w=;
+        b=wWd2m44qMcztavziFn6Z1Kj+XXDy5qw86WN/Mr0FSh1WfbKw7m8k1Y9+4HUP5vuzLw
+         oacxEBKpTNjPUMrO5MNbcOgSlU0KfCQcySAMvzk8LOGi2TlvArgLAZ/B34yhNHi6P4Kd
+         SKA8pgs7cMfhP9OvXz6kKXkwoxEv60wsKsqyvtlnhWTzvw4QZXnVr8MeeOQhzLROskpO
+         RzoOYxFDDlCqfeAQ+O21yabOAsQFFy92yQp8Sm6BaMmonp+/2RAUPqAOcz2aprDcjKJO
+         rZ6g89B2vwCyIZC0aZBY33NFZ2rnSmOjbdxxv19W7tuPiA7vIiJQBvnyMHr4KmhJM+HP
+         USXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWtCk3djYXrfi9xDvq/h3gL1cVXj7GHe3wJnqF8Skfrajm8zLA66msgRNoLHcUDYqFROM6gFyI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwD623LIw1mrp11V+WcdFQn4VZKPs9yjkwWxA2PFThYfCuUfvxq
+	kkhEm6siX3DLBIFl0DUX69Vdt47DfFen3pS5EBf1nJ54+JwRRwDIDa/kM4P1DEvwcn8OvK5l26z
+	Z26dYKIfbnMIHT+X4qxcybVo4DWctfcQ=
+X-Gm-Gg: ASbGnctB6uamVg+2duAxOabWHdNf0FUUOWgOaFfIhk7jhiVd/6xEzG3LWYgQPgsetLl
+	LWsBRsNtYY0rNXNQXm8KwQOOrz1Ls+ytgGfpCZvUMN7WvFlx5gXREcA7MJBswfFNbdFKS6/Vp2k
+	/DtMEbJlt6rDLZgnARHQ9/dplmF24AsxddvQqC9LZIWbrkBO4lmqgG5jqre202BI98gsbI/K0vq
+	EWLs5I6KO59Hqu16wQ=
+X-Google-Smtp-Source: AGHT+IGIhTRX0vPWXRnKGbM7/t9PfWgMfG3icRhXm/bikRRYDgSLLR3zWm4hL7da1xUZ+6JNLVBVdbp7N1oWnUBqBMY=
+X-Received: by 2002:a17:902:cf0d:b0:27d:69bd:cc65 with SMTP id
+ d9443c01a7336-27ed4a96a83mr141161955ad.45.1759081681919; Sun, 28 Sep 2025
+ 10:48:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2878689.BEx9A2HvPv@sven-desktop>
+References: <CAOprWosSvBmORh9NKk-uxoWZpD6zdnF=dODS-uxVnTDjmofL6g@mail.gmail.com>
+ <20250919-lurking-agama-of-genius-96b832-mkl@pengutronix.de>
+ <CAOprWott046xznChj7JBNmVw3Z65uOC1_bqTbVB=LA+YBw7TTQ@mail.gmail.com>
+ <20250922-eccentric-rustling-gorilla-d2606f-mkl@pengutronix.de> <CAOprWoucfBm_BZOwU+qzo3YrpDE+f-x4YKNDS6phtOD2hvjsGg@mail.gmail.com>
+In-Reply-To: <CAOprWoucfBm_BZOwU+qzo3YrpDE+f-x4YKNDS6phtOD2hvjsGg@mail.gmail.com>
+From: Alexander Shiyan <eagle.alexander923@gmail.com>
+Date: Sun, 28 Sep 2025 20:47:49 +0300
+X-Gm-Features: AS18NWDPKklTiLrxKFeYvofRAgeM8OwBQfBPUfJA357z4XaPxxHtrQTv3DSxvMw
+Message-ID: <CAP1tNvTD2uhK79VB_PT0JByv_VVy245WH-3a1ZaG1-Khw5_vaw@mail.gmail.com>
+Subject: Re: Possible race condition of the rockchip_canfd driver
+To: Andrea Daoud <andreadaoud6@gmail.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Heiko Stuebner <heiko@sntech.de>, 
+	Elaine Zhang <zhangqing@rock-chips.com>, kernel@pengutronix.de, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, Sep 28, 2025 at 10:45:12AM +0200, Sven Eckelmann wrote:
-> On Saturday, 27 September 2025 22:55:52 CEST Eric Biggers wrote:
-> > Hi,
-> > 
-> > On Tue, Sep 16, 2025 at 02:24:40PM +0200, Simon Wunderlich wrote:
-> > > +static __be32 batadv_skb_crc32(struct sk_buff *skb, u8 *payload_ptr)
-> > > +{
-> > > +	unsigned int to = skb->len;
-> > > +	unsigned int consumed = 0;
-> > > +	struct skb_seq_state st;
-> > > +	unsigned int from;
-> > > +	unsigned int len;
-> > > +	const u8 *data;
-> > > +	u32 crc = 0;
-> > > +
-> > > +	from = (unsigned int)(payload_ptr - skb->data);
-> > > +
-> > > +	skb_prepare_seq_read(skb, from, to, &st);
-> > > +	while ((len = skb_seq_read(consumed, &data, &st)) != 0) {
-> > > +		crc = crc32c(crc, data, len);
-> > > +		consumed += len;
-> > > +	}
-> > > +
-> > > +	return htonl(crc);
-> > > +}
-> > 
-> > Has using skb_crc32c() been considered here?
-> 
-> No. At the time this was written (v3.8), skb_crc32c (v6.16) didnt exist. Also 
-> its predecessor __skb_checksum only started its existence in v3.13. And no one 
-> noticed it as candidate to replace batadv_skb_crc32 with
-> 
-> And this patch here was just moving the function between two places - so not 
-> introducing new code.
-> 
-> Do you want to submit a patch to integrate your new function in batman-adv? I 
-> only performed a quick-and-dirty test to see if it returns the same results 
-> and it seemed to do its job fine.
-> 
-> diff --git c/net/batman-adv/Kconfig w/net/batman-adv/Kconfig
-> index c299e2bc..58c408b7 100644
-> --- c/net/batman-adv/Kconfig
-> +++ w/net/batman-adv/Kconfig
-> @@ -35,6 +35,7 @@ config BATMAN_ADV_BLA
->  	bool "Bridge Loop Avoidance"
->  	depends on BATMAN_ADV && INET
->  	select CRC16
-> +	select NET_CRC32C
->  	default y
->  	help
->  	  This option enables BLA (Bridge Loop Avoidance), a mechanism
-> diff --git c/net/batman-adv/bridge_loop_avoidance.c w/net/batman-adv/bridge_loop_avoidance.c
-> index b992ba12..eef40b6f 100644
-> --- c/net/batman-adv/bridge_loop_avoidance.c
-> +++ w/net/batman-adv/bridge_loop_avoidance.c
-> @@ -12,7 +12,6 @@
->  #include <linux/compiler.h>
->  #include <linux/container_of.h>
->  #include <linux/crc16.h>
-> -#include <linux/crc32.h>
->  #include <linux/err.h>
->  #include <linux/errno.h>
->  #include <linux/etherdevice.h>
-> @@ -1585,45 +1584,11 @@ int batadv_bla_init(struct batadv_priv *bat_priv)
->  	return 0;
->  }
->  
-> -/**
-> - * batadv_skb_crc32() - calculate CRC32 of the whole packet and skip bytes in
-> - *  the header
-> - * @skb: skb pointing to fragmented socket buffers
-> - * @payload_ptr: Pointer to position inside the head buffer of the skb
-> - *  marking the start of the data to be CRC'ed
-> - *
-> - * payload_ptr must always point to an address in the skb head buffer and not to
-> - * a fragment.
-> - *
-> - * Return: big endian crc32c of the checksummed data
-> - */
-> -static __be32 batadv_skb_crc32(struct sk_buff *skb, u8 *payload_ptr)
-> -{
-> -	unsigned int to = skb->len;
-> -	unsigned int consumed = 0;
-> -	struct skb_seq_state st;
-> -	unsigned int from;
-> -	unsigned int len;
-> -	const u8 *data;
-> -	u32 crc = 0;
-> -
-> -	from = (unsigned int)(payload_ptr - skb->data);
-> -
-> -	skb_prepare_seq_read(skb, from, to, &st);
-> -	while ((len = skb_seq_read(consumed, &data, &st)) != 0) {
-> -		crc = crc32c(crc, data, len);
-> -		consumed += len;
-> -	}
-> -
-> -	return htonl(crc);
-> -}
-> -
->  /**
->   * batadv_bla_check_duplist() - Check if a frame is in the broadcast dup.
->   * @bat_priv: the bat priv with all the mesh interface information
->   * @skb: contains the multicast packet to be checked
-> - * @payload_ptr: pointer to position inside the head buffer of the skb
-> - *  marking the start of the data to be CRC'ed
-> + * @payload_offset: offset in the skb, marking the start of the data to be CRC'ed
->   * @orig: originator mac address, NULL if unknown
->   *
->   * Check if it is on our broadcast list. Another gateway might have sent the
-> @@ -1638,16 +1603,18 @@ static __be32 batadv_skb_crc32(struct sk_buff *skb, u8 *payload_ptr)
->   * Return: true if a packet is in the duplicate list, false otherwise.
->   */
->  static bool batadv_bla_check_duplist(struct batadv_priv *bat_priv,
-> -				     struct sk_buff *skb, u8 *payload_ptr,
-> +				     struct sk_buff *skb, int payload_offset,
->  				     const u8 *orig)
->  {
->  	struct batadv_bcast_duplist_entry *entry;
->  	bool ret = false;
-> +	int payload_len;
->  	int i, curr;
->  	__be32 crc;
->  
->  	/* calculate the crc ... */
-> -	crc = batadv_skb_crc32(skb, payload_ptr);
-> +	payload_len = skb->len - payload_offset;
-> +	crc = htonl(skb_crc32c(skb, payload_offset, payload_len, 0));
->  
->  	spin_lock_bh(&bat_priv->bla.bcast_duplist_lock);
->  
-> @@ -1727,7 +1694,7 @@ static bool batadv_bla_check_duplist(struct batadv_priv *bat_priv,
->  static bool batadv_bla_check_ucast_duplist(struct batadv_priv *bat_priv,
->  					   struct sk_buff *skb)
->  {
-> -	return batadv_bla_check_duplist(bat_priv, skb, (u8 *)skb->data, NULL);
-> +	return batadv_bla_check_duplist(bat_priv, skb, 0, NULL);
->  }
->  
->  /**
-> @@ -1745,12 +1712,10 @@ bool batadv_bla_check_bcast_duplist(struct batadv_priv *bat_priv,
->  				    struct sk_buff *skb)
->  {
->  	struct batadv_bcast_packet *bcast_packet;
-> -	u8 *payload_ptr;
->  
->  	bcast_packet = (struct batadv_bcast_packet *)skb->data;
-> -	payload_ptr = (u8 *)(bcast_packet + 1);
->  
-> -	return batadv_bla_check_duplist(bat_priv, skb, payload_ptr,
-> +	return batadv_bla_check_duplist(bat_priv, skb, sizeof(*bcast_packet),
->  					bcast_packet->orig);
->  }
+Hello.
 
-It looks like you're already most of the way there, so I suggest you
-send the patch.  Thanks!
+> > > Could you please let me know how to check whether my RK3568 is v2 or v3?
+> >
+> > Alexander Shiyan (Cc'ed) reads the information from an nvmem cell:
+> >
+> > | https://github.com/MacroGroup/barebox/blob/macro/arch/arm/boards/diasom-rk3568/board.c#L239-L257
+> >
+> > The idea is to fixup the device tree in the bootloader depending on the
+> > SoC revision, so that the CAN driver uses only the needed workarounds.
+> >
+>
+> Thanks, it is not easy to correlate this because I am currently not using
+> barebox. I'll try this later.
 
-- Eric
+I think this can be done from the userspace.
+Build the driver as a module, get the SoC version, then modprobe it
+with an alias for the desired version.
 
