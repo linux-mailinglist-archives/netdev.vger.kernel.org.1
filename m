@@ -1,153 +1,124 @@
-Return-Path: <netdev+bounces-226964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6EA6BA66AE
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 05:06:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E382BBA6799
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 06:14:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48D1F189CA84
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 03:06:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F9563BE55E
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 04:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C091F1302;
-	Sun, 28 Sep 2025 03:06:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Qul7CtBJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1548283C93;
+	Sun, 28 Sep 2025 04:14:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F319819CC0A;
-	Sun, 28 Sep 2025 03:05:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C355259CA7
+	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 04:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759028762; cv=none; b=bFVKtYZbuYNZV/FJHZa766XZ/DmfG6w98mDk1okuuG+7yGnr2W7RnIaHGnBZWqZsX9AQkcoLgKS89RUJyEQ9g/nIncmNQAsXMDUctb1YT4ZTEQIX4A9lHWI2UF3Dpon2dkmk64R1lTiWSqLd1oqXLzlGfPc5fCrmXUECQJxxGBw=
+	t=1759032853; cv=none; b=OLKV+x7mAZrUFlqSFydMcqf3Saam81HPMryQd3ex7VYi21+S9HD4vxi1JqLowkUkcSnn9NRbiCl5mo+KDwaP4t53pd4SkAIEWgzAovyTT2GhArYPm9fpUPOjJOFIavofA/jPZw2e9gfigbxl5qnh5BgkGVqzG0JD5KBcnMrrRUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759028762; c=relaxed/simple;
-	bh=6sGNYBzLgO0w5bLjfboufglxKETar7+C3OCrRc81MvQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sadI7vzO36H2k5bcMkMnNOiZ+wbwz/tfmbiHZSVXJlKmRKfSMYx8e1uZYLV7ARdSdfep1vG6MTwFFLLHbNdGTZHsKijafNDx3MEIPfWh0g0jRrzucHLVpIuuTgleCsJckHnDvjEtZvcxbG7UWGMLYxL6AOjrhlgPhW1vNwBBqBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Qul7CtBJ; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1759028747; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=cL9x2decLDwPNVgIuERgCGP0LyHtqq3UXa3rvBQC5SQ=;
-	b=Qul7CtBJWdZyZud0wrgvhowe8YfPN7MHBo6QIuQrut/Ue/gnzV9avGUeiWHx8wd8/Ue1F/KfsEsov4T0fXqKCJtIdFJU6U3I9IgDLtsuggE8C3BO08CgKlNuI2uneyy5DYG/SkvSVzWNzqyYPu1Ty5vH4CrizWtddd8m78ZH7U8=
-Received: from 30.221.115.89(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WowxfSo_1759028745 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sun, 28 Sep 2025 11:05:46 +0800
-Message-ID: <24a398b3-e3e5-4b0d-8ed7-cd86f3e661eb@linux.alibaba.com>
-Date: Sun, 28 Sep 2025 11:05:45 +0800
+	s=arc-20240116; t=1759032853; c=relaxed/simple;
+	bh=y9XPrygVkvrvj5jc2G1ohBjEg9VObB8Uku9bZzZeT1M=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=MdglVgt8Q2EkZSazmVt/3CAawBYG6LIRy7zemlmytfXpeCA3VXYKqeG0QiPmUJjq3k/lFa8vTYCEgCU/irUAnZqFZo03vORaUVLJU7L6B6xnuh4wsSbt0wveuXq+kFGjc/NRECU9hu8s0I/yCB3MErYyHj6sPK644NQPz1nlW9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.243.244.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
+X-QQ-mid: esmtpgz15t1759032722t95dc91ec
+X-QQ-Originating-IP: wtgkOpjai5lM4bsLynqd4CfmHnJQxRlu4V99vGM4cj4=
+Received: from smtpclient.apple ( [111.204.182.99])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sun, 28 Sep 2025 12:11:59 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 14202726352972744390
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/2] net/smc: make wr buffer count
- configurable
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, "D. Wythe" <alibuda@linux.alibaba.com>,
- Dust Li <dust.li@linux.alibaba.com>, Sidraya Jayagond
- <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
- Mahanta Jambigi <mjambigi@linux.ibm.com>, Tony Lu
- <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-s390@vger.kernel.org
-References: <20250921214440.325325-1-pasic@linux.ibm.com>
- <20250921214440.325325-2-pasic@linux.ibm.com>
- <1aa764d0-0613-499e-bc44-52e70602b661@linux.alibaba.com>
- <20250926121249.687b519d.pasic@linux.ibm.com>
- <20250926123028.2130fa49.pasic@linux.ibm.com>
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-In-Reply-To: <20250926123028.2130fa49.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [net-next v8 0/3] add broadcast_neighbor for no-stacking
+ networking arch
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+In-Reply-To: <aNNWDcvO6aCG94Qe@fedora>
+Date: Sun, 28 Sep 2025 12:11:49 +0800
+Cc: netdev@vger.kernel.org,
+ Jay Vosburgh <jv@jvosburgh.net>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Steven Rostedt <rostedt@goodmis.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Zengbing Tu <tuzengbing@didiglobal.com>,
+ Liang Li <liali@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <9409D921-76FA-4A49-9E39-7F47DCB2B486@bamaicloud.com>
+References: <cover.1751031306.git.tonghao@bamaicloud.com>
+ <aNNWDcvO6aCG94Qe@fedora>
+To: Hangbin Liu <liuhangbin@gmail.com>
+X-Mailer: Apple Mail (2.3826.700.81)
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: OWhN4QRntHSGV91MZYOaiPenNSWX3d23xMFbwWpv5gCxJNZrDpTw7TsW
+	6/iNEqEy974I+nb6nEo7BjKdPDSFF5hLEyQAS/6GBM/WjO7QY+7dt2vgFntCNCL1LOpJu0U
+	6zellHZVjSrQE7yzWvwx2V3yqHHnJp9NhkM/oosyGxif1xhEtHouEB0Fc2u9X78qqK7/+hs
+	6LDQzmaRpl8UVK/OysibK+xAYNn7LOEB77ktz717xxhgLsxaWm6arO3I4sZFmi+qQASkT+s
+	d5yfLuxI6DgIyHuBsUmY2ZDEccS9Pc266BbdA5Kww7a08iJxrKr2XYTlmeABm2atn8Bkavl
+	u0NpGvq89tcZ0lCPSlNLkG+WCBhW6XT1TTovprJDzWPp07uChCpc4oXQcuSy/QOznqcva8F
+	XueNJd3NVrblWHY3l/TJ3SxVC2nEAvk+DOcwWFPBGAj2uS7soabD251h+EcWW/9wki2cDaP
+	kIb6jr1KjPvVj9vW8qGVbmMBV0JXY/E17cF6PfShegdNDCrWOWfZcO12cw2ra/mQ01HmGue
+	6NxDmywmZr48hGwXCQHnQQNvw6FPYv+GMEkE0WEg8CwPyGs+5yh9LiagC6TJZy2tBQ9kAwl
+	Ga3uNtfUIX/v3jqzXINaSWZHtHaLzyWfz4seQE7eZ3IcgSokWnwZz+7AcYy0cm5AD5uN+hl
+	+Y9S0uqxmB7I0zq1AX5jF4e5Ak7NevgPJFxK/YgUXymcaqkj8uU7EGGDz0iHn5cme8BEC4F
+	Vk9P9kHcv+QN6ikhTJR01AZxir8qxdzMNU3CeqzQkV+qctV+lwyGOn4d0XLBBTgBU/1MEjw
+	lbRkBoozqHRVdZxE9tKrndeb5/+mUtRmA+/i6aYtIdsqYMJUWEr0gcO6l+E/Af+k9/7+xyz
+	0d6k4Hz+E7o/YHkSTArZId7eoMYQbex8PsIxN0dBDUaG9qsQxj8hEZaCJ+9VD5zyGDMe40g
+	TOSPV2ylLaCj+mis7Zgr0W36bMiuVLfQtRsi8fLDcD6OCvJtZmhuTqprP
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+X-QQ-RECHKSPAM: 0
 
 
 
-在 2025/9/26 18:30, Halil Pasic 写道:
-> On Fri, 26 Sep 2025 12:12:49 +0200
-> Halil Pasic <pasic@linux.ibm.com> wrote:
-> 
->> On Fri, 26 Sep 2025 10:44:00 +0800
->> Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
->>
->>>
->>> Notice that the ratio of smcr_max_recv_wr to smcr_max_send_wr is set to 3:1, with the
->>> intention of ensuring that the peer QP's smcr_max_recv_wr is three times the local QP's
->>> smcr_max_send_wr and the local QP's smcr_max_recv_wr is three times the peer QP's
->>> smcr_max_send_wr, rather than making the local QP's smcr_max_recv_wr three times its own
->>> smcr_max_send_wr. The purpose of this design is to guarantee sufficient receive WRs on
->>> the side to receive incoming data when peer QP doing RDMA sends. Otherwise, RNR (Receiver
->>> Not Ready) may occur, leading to poor performance(RNR will drop the packet and retransmit
->>> happens in the transport layer of the RDMA).  
-> 
-> Sorry this was sent accidentally by the virtue of unintentionally
-> pressing the shortcut for send while trying to actually edit! 
-> 
->>
->> Thank you Guangguan! I think we already had that discussion. 
-> 
-> Please have a look at this thread
-> https://lore.kernel.org/all/4c5347ff-779b-48d7-8234-2aac9992f487@linux.ibm.com/
-> 
-> I'm aware of this, but I think this problem needs to be solved on
-> a different level.
-> 
-Oh, I see. Sorry for missing the previous discussion.
-
-BTW, the RNR counter is the file like '/sys/class/infiniband/mlx5_0/ports/1/hw_counters/rnr_nak_retry_err'.
-
->>>
->>> Let us guess a scenario that have multiple hosts, and the multiple hosts have different
->>> smcr_max_send_wr and smcr_max_recv_wr configurations, mesh connections between these hosts.
->>> It is difficult to ensure that the smcr_max_recv_wr/smcr_max_send_wr is 3:1 on the connected
->>> QPs between these hosts, and it may even be hard to guarantee the smcr_max_recv_wr > smcr_max_send_wr
->>> on the connected QPs between these hosts.  
->>
->>
->> It is not difficult IMHO. You just leave the knobs alone and you have
-> [..]
-> 
-> It is not difficult IMHO. You just leave the knobs alone and you have
-> 3:1 per default. If tuning is attempted that needs to be done carefully.
-> At least with SMC-R V2 there is this whole EID business, as well so it
-> is reasonable to assume that the environment can be tuned in a coherent
-> fashion. E.g. whoever is calling the EID could call use smcr_max_recv_wr:=32
-> and smcr_max_send_wr:=96. 
-> 
->>>
->>> Therefore, I believe that if these values are made configurable, additional mechanisms must be
->>> in place to prevent RNR from occurring. Otherwise we need to carefully configure smcr_max_recv_wr
->>> and smcr_max_send_wr, or ensure that all hosts capable of establishing SMC-R connections are configured
->>> smcr_max_recv_wr and smcr_max_send_wr with the same values.  
->>
-> 
-> I'm in favor of adding such mechanisms on top of this. Do you have
-> something particular in mind? Unfortunately I'm not knowledgeable enough
-> in the area to know what mechanisms you may mean. But I guess it is
-> patches welcome as always! Currently I would encourage to users
-> to tune carefully. 
-> 
-
-AFAIK, flow control is a usual way, maybe credit-based flow control is enough. Credit means the valid
-counts of receive wr can be used. The receiver counts the credit every time post_recv, and advertises
-credits to the connected sender at a certain frequency. The sender counts the credits advertised from
-peer. The sender consumes a credit everytime post_send wr which will consume a receive wr in the receiver,
-if have enough credits to consume. Otherwise the sender should hang the wr and should wait for the credits
-advertised from peer. 
-
-But this requires support at the SMC-R protocol level. And this also can be addressed as an enhancement.
-I do not known if someone from Dust Li's team or someone from IBM has interests to pick this up.
-
-Regards,
-Guangguan Wang
+> On Sep 24, 2025, at 10:23, Hangbin Liu <liuhangbin@gmail.com> wrote:
+>=20
+> On Fri, Jun 27, 2025 at 09:49:27PM +0800, Tonghao Zhang wrote:
+>> For no-stacking networking arch, and enable the bond mode 4(lacp) in
+>> datacenter, the switch require arp/nd packets as session =
+synchronization.
+>> More details please see patch.
+>=20
+> Hi Tonghao,
+>=20
+> Our engineer has a question about this feature. Since the switch =
+requires
+> ARP/ND packets for session synchronization, do we also need to send =
+IGMP
+> join/leave messages to the switch for synchronization?
+Hello, I'm very sorry for replying to your question so late. In fact, =
+the non-stacking network architecture disables the multicast function to =
+prevent the server from learning other server real mac addresses. This =
+architecture uses the arp proxy. To better answer your question, I post =
+a blog:
+=
+https://huatuo.tech/blog/2025-09-26-some-thoughts-on-non-stacking-network-=
+architecture/
+>=20
+> Thanks
+> Hangbin
+>=20
 
 
