@@ -1,807 +1,205 @@
-Return-Path: <netdev+bounces-227028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62F73BA7452
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 17:46:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11A5DBA746B
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 18:00:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 775CA189917F
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 15:46:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90810179FCE
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 16:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 389341C8611;
-	Sun, 28 Sep 2025 15:46:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D1A221F03;
+	Sun, 28 Sep 2025 16:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PGLmgckB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N16VP0Pg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6302F4A01
-	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 15:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87412223DE7
+	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 16:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759074375; cv=none; b=GLzukMVOK6fpkhoFgrnbQMHNkX5YXjD3+FDp4nVjfMGI+nSPvVwWims9qAdyN3G65fJdRXflJkeJxnri2BOKgv82q44Bzot62b0Q3SBbpMPnaBqPIX29oYOvn+Wi+sMQ13dRJG7ukhIWV5HrosTfTItpsRaBJ+3r5TkAs1FjQHE=
+	t=1759075220; cv=none; b=KUwQoefdTkWAY19Hu6ocymM24WRGVa4T2yHN3vYgNEAfKUQO8nBJ04luHvqvRhmHEzrb4cOFkQKw+AO0HiBS4V2UZJPG18AdMF2ORst098UwrSSGXg98N7DbaFy5BuzfE/Mnu0agyx7zEdSs9qT1OfnovcPhLsnVSgqflXnYSJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759074375; c=relaxed/simple;
-	bh=UmyvdpPrPgHT6K96gUk/VoxRIbnOo0SJnr+aoRgqijs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=OykZ5Qm8v8wNwwMs98ZB5jnugmmQoIl1aHG3HWvZVmcJQ/W0/zRoFQZO8zPI98fQf03q/eMXFe7TthFs50hWOlUwqphG/uIMSPV6CdC1w17YrxwK+5ZZkK3ZTC9oASFFKdgzyFMV3sNEo/Vk0jqm+5LaopOOAMzj7gPMJp7SUb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PGLmgckB; arc=none smtp.client-ip=209.85.221.42
+	s=arc-20240116; t=1759075220; c=relaxed/simple;
+	bh=qS/T0bA5Nab7JjhSU/T0oHF4h9/VtZyfnVkiF2bOXak=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=nbo7h4/4q5g1fN8N7oS5X7eUStiL6Ynj1bSYKdg+PbVr72xHdWpRTlYRiONh9rMagNBvYJqs7yMFgXLfogr64V6Bsd1z31uYoJVuQU3a61SVohjiizjX0zF6jsqHVpX4rPxCu+oBBuP9LzbWecVmncOM+V5kSlRqwpbEFYwj5b4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N16VP0Pg; arc=none smtp.client-ip=209.85.222.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3e8ef75b146so2661273f8f.0
-        for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 08:46:11 -0700 (PDT)
+Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-8e3d93c0626so2676231241.0
+        for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 09:00:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759074370; x=1759679170; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xBdAwa4mJeZWl0SX7ni0y5dLBMpXHonhDDbW8aRGlso=;
-        b=PGLmgckBroqQBOE00EIzLOrsVMwi5PBsc+r59RSvbSr+QEqa+aopWzgbbNdZAQ6k2Y
-         SVr8xGcy7BDbBpJjt6GZzCyts/iaEEBJWStu7UWglfjp+OoYlvS3lgzfwY4E/8XmbeRY
-         f+j8V2LM9gynuRMR8DiMfvp71q8xDraX2I18923wt0atgsIjWyG7jgPgyk2DeXwR9AcW
-         cFz+XX5Vpbwlao71ei3A9sDhovn86fxto+02EUfI8QDxHZvXb2jlxt/cPT8bnj32lW2M
-         sEZDlDuCRg3hpG7wdDQDRc8Q91dvHRrXeZcudJrsorDCH2ZnGAj8GKihT4XMN5i7rqAc
-         q9/Q==
+        d=gmail.com; s=20230601; t=1759075217; x=1759680017; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AQij3aadeY0LAW28lv4eYbkkFZan9y9iCIkzV96eR0E=;
+        b=N16VP0PgjuSntLiIcRJVugJiBjkYaU92I8ppxc40S86eFz/6EFb30t+djUm3kyPm6X
+         acEv2YH8SiBxb84L+1AmP1O4xEptEFSghnzcfx1fxD8/9VOi3CJMnJ37aR6KTmbz8/U1
+         KnCeVpU4VoJazGfeD2bcfeiayHhKw7BTxOmwGqa5iksBEGq2GSu/2kaG9b0bfZY50X/s
+         Ra+3hGQHNguWsT0Gq4OFGjcI87RtHCa9xbcmCvA8sNSmpAFL7ePhEcy19kF3Cv6N4q/z
+         hVlIw8SYGG3ufZdB88uLWjTySM59xng10gwfEVZ1Q8M96XeNXHq+/jSekEcLGCY9TfWf
+         L7Wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759074370; x=1759679170;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xBdAwa4mJeZWl0SX7ni0y5dLBMpXHonhDDbW8aRGlso=;
-        b=TH5L93pKoR3obj5yywxmcs0uDqXO8X57m4zBk7wjbeEAD7GGDDNnZ0FZ4d3bvNYSVg
-         i6obPccL699KleHavjl7sbSqKo0Q6J9JTnPEKyyaMe5op+UuK2tmEWq8Ama/16QPm6jU
-         VLXGJtmrYXZHwx0f87+Z+XW6F1zM6l4wUueGJ0cvCpbiAeiHZPcsJ8Yu4H4iboYRUnUE
-         w7nHvpkNfc9uMB8PKTsVQivYp/oZZjStIcVwP5kzrGjqmLKcFrTPDpdzHt+lIVNneo9V
-         HBt7H1ZYORBSF8MSX494Oc3bu5v6p/QAUJZie/64nU2MG4LIp3F/3khPIyaAVQ9381Pd
-         OIUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXcUBz7CiFgACxtQJfyMuMk1HW736T0kJ4YQu693NOchXBdWNv1suMzUwT36JdBzHDI4YG+NfM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLdlUUubM+/8rpcPPwIYBf3lq3uMvmLZyXKy2cTYVDg9ti/owb
-	xjxIXIG0gPUQHrJBFpZZ6yIWeZt4Vb0Vu9GL2ViuPEiYz36sEgSkLjd5
-X-Gm-Gg: ASbGncsiYb7TYdLqIv2STTBX25nrn//DoeMKah1E/Ul5PU5ULTpxuMDSu21xdlUMsRU
-	j6b8Wp6J7r3K6K1hqq4zSrKehvvVugMerbuLC0D/m639ede/lXxA5jQED3EiDByVFnERYQHQ7y2
-	UjqXizk5Ol+O4f1h320ho2+pAfFLbYDtuKPqnENm3PB01/Xv6XYk7ejfa2EnDTuEOmeV2UTz8Az
-	PMm38g7YORn4V8Xnsmt5M79oyiQywytojnk5PJ2WAW882dU76beAxMxoTY6327Q3cMlIjl0F7QC
-	UTNywCUPxr+CMGNvETA0FTwHaYCH9JncfYGPBX5eVujXjRi7a/aNE6BFF5sdIcbLzxh5NnJxswf
-	pPUG7EOHGxOj4NOorxiI1aE8T0gNnc8IH1OIZ82OmRJ4J0N7nInLmfbM=
-X-Google-Smtp-Source: AGHT+IHCHP411fvTjMB31lRgmhHNBE0RYV45mxYGlvvVm6j/TTbV23GjZ7jjN99E4pEOLG3NsfKiIQ==
-X-Received: by 2002:a05:6000:2585:b0:3fd:eb15:77a with SMTP id ffacd0b85a97d-40e46514bd9mr10454949f8f.6.1759074369253;
-        Sun, 28 Sep 2025 08:46:09 -0700 (PDT)
-Received: from localhost.localdomain ([62.48.188.50])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb871d051sm15161360f8f.14.2025.09.28.08.46.08
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 28 Sep 2025 08:46:08 -0700 (PDT)
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: torvalds@linux-foundation.org
-Cc: bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@kernel.org,
-	peterz@infradead.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	mingo@kernel.org,
-	jolsa@kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] BPF changes for 6.18
-Date: Sun, 28 Sep 2025 16:46:06 +0100
-Message-Id: <20250928154606.5773-1-alexei.starovoitov@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+        d=1e100.net; s=20230601; t=1759075217; x=1759680017;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=AQij3aadeY0LAW28lv4eYbkkFZan9y9iCIkzV96eR0E=;
+        b=fY17HeIuQmsCYRE7wtsoPyJV7LKKYJnlmRPOAZjR1fw3BL3c7KejriOL16mb4GHrHY
+         36zcrIP+OcOQOo3BWnuskcj1yhk1HsvJdHMqokXL92EMs81ebJ9kOuXZUA5oLsFDTWAS
+         N31fNcCZPUc+CqTBZGCDTQS5lNchpmq6TvWH0Cr8EwRNu3HQ2CrHkJxMSod60DPEkkEk
+         RRFnqpo/jTOja7I16jgYaVxkIKw+nPa4iH0in3ZeSATOOJKhdqdVQzAJs3ygbxynHcsO
+         FtVlBM5sRZJK3aUnxU1GUIA78bCDFFwLo6EKG+ysvjBtCwZDOVJpoaaoG3cjOOQearDI
+         NkOw==
+X-Gm-Message-State: AOJu0YxziGqAjtk1ZZyfyocRiSbY+JWgk6V8hzzU3/6x1/xj4z2rpEew
+	R3EdTMtRPkjo4+8R3LEYwNN0jVnfEyWPYO4F6W+KiZ7BE7bRpVf3YUoH
+X-Gm-Gg: ASbGnctwhCojx7ASsMuRMxc+GP+wHZr8glDrsuxf98LUBtmNwXNbNbTJjn7bJu4cQM6
+	qj5wMH/zY7HcejzbDCvQMnVjtFIRMouiaP02R/KOKh7QaB8mzVUkh6k4qAH86pa8///+umr3bEb
+	8mFYrUDIBiL21zsuP2exD5EzzOKrgbJVTTO+VG+HwWkYU/fTX8e403vkN9IEUaQYLLgGfv9Sb62
+	qTo8TtLKewuhdShbl3Hw5bV7+0gvGNO4fqLSgwj3+4ugch3UbzFn16RovV9/3PVN7D4KePN8Bk5
+	LQZ2SO4vRwpon069onDdHhUKjndP06YicW5vxFlExHhgP8LqS7S8juZ+tIINXQoknh4SHwNvJXK
+	zANg8QVOTX+hA/q3cHCA0J1CWMwLzmwR8DDORdga7AIY6UTsB+gRPJuMbxg391Pine30AawLn8C
+	IMuHiBNt2qMaQKbVk=
+X-Google-Smtp-Source: AGHT+IF1U+3kTmlbysfzmndYvyQ7HgwEMnwNp44lzddu4VE3gWj4a/8VkEfWQHbq0trE/hmDz9Vw1g==
+X-Received: by 2002:a05:6102:41ab:b0:596:9fd8:9268 with SMTP id ada2fe7eead31-5bae22fa7e0mr2488741137.8.1759075217265;
+        Sun, 28 Sep 2025 09:00:17 -0700 (PDT)
+Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
+        by smtp.gmail.com with UTF8SMTPSA id 71dfb90a1353d-54beddbc629sm1831374e0c.24.2025.09.28.09.00.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Sep 2025 09:00:16 -0700 (PDT)
+Date: Sun, 28 Sep 2025 12:00:15 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ petrm@nvidia.com, 
+ willemb@google.com, 
+ shuah@kernel.org, 
+ daniel.zahka@gmail.com, 
+ linux-kselftest@vger.kernel.org, 
+ Jakub Kicinski <kuba@kernel.org>
+Message-ID: <willemdebruijn.kernel.2e2661b9a8ae9@gmail.com>
+In-Reply-To: <20250927225420.1443468-1-kuba@kernel.org>
+References: <20250927225420.1443468-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v3 0/8] psp: add a kselftest suite and netdevsim
+ implementation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+Jakub Kicinski wrote:
+> Add a basic test suite for drivers that support PSP. Also, add a PSP
+> implementation in the netdevsim driver.
+> 
+> The netdevsim implementation does encapsulation and decapsulation of
+> PSP packets, but no crypto.
+> 
+> The tests cover the basic usage of the uapi, and demonstrate key
+> exchange and connection setup. The tests and netdevsim support IPv4
+> and IPv6. Here is an example run on a system with a CX7 NIC.
+> 
+>     TAP version 13
+>     1..28
+>     ok 1 psp.data_basic_send_v0_ip4
+>     ok 2 psp.data_basic_send_v0_ip6
+>     ok 3 psp.data_basic_send_v1_ip4
+>     ok 4 psp.data_basic_send_v1_ip6
+>     ok 5 psp.data_basic_send_v2_ip4 # SKIP ('PSP version not supported', 'hdr0-aes-gmac-128')
+>     ok 6 psp.data_basic_send_v2_ip6 # SKIP ('PSP version not supported', 'hdr0-aes-gmac-128')
+>     ok 7 psp.data_basic_send_v3_ip4 # SKIP ('PSP version not supported', 'hdr0-aes-gmac-256')
+>     ok 8 psp.data_basic_send_v3_ip6 # SKIP ('PSP version not supported', 'hdr0-aes-gmac-256')
+>     ok 9 psp.data_mss_adjust_ip4
+>     ok 10 psp.data_mss_adjust_ip6
+>     ok 11 psp.dev_list_devices
+>     ok 12 psp.dev_get_device
+>     ok 13 psp.dev_get_device_bad
+>     ok 14 psp.dev_rotate
+>     ok 15 psp.dev_rotate_spi
+>     ok 16 psp.assoc_basic
+>     ok 17 psp.assoc_bad_dev
+>     ok 18 psp.assoc_sk_only_conn
+>     ok 19 psp.assoc_sk_only_mismatch
+>     ok 20 psp.assoc_sk_only_mismatch_tx
+>     ok 21 psp.assoc_sk_only_unconn
+>     ok 22 psp.assoc_version_mismatch
+>     ok 23 psp.assoc_twice
+>     ok 24 psp.data_send_bad_key
+>     ok 25 psp.data_send_disconnect
+>     ok 26 psp.data_stale_key
+>     ok 27 psp.removal_device_rx # XFAIL Test only works on netdevsim
+>     ok 28 psp.removal_device_bi # XFAIL Test only works on netdevsim
+>     # Totals: pass:22 fail:0 xfail:2 xpass:0 skip:4 error:0
+>     # 
+>     # Responder logs (0):
+>     # STDERR:
+>     #  Set PSP enable on device 1 to 0x3
+>     #  Set PSP enable on device 1 to 0x0
+> 
+> v3:
+>  - fix netdevsim bugs
+>  - rework the skipping
+>  - use errno
+>  - remove duplicated condition
+> v2: https://lore.kernel.org/20250925211647.3450332-1-daniel.zahka@gmail.com
+>   - fix pylint warnings
+>   - insert CONFIG_INET_PSP in alphebetical order
+>   - use branch to skip all tests
+>   - fix compilation error when CONFIG_INET_PSP is not set
+> v1: https://lore.kernel.org/20250924194959.2845473-1-daniel.zahka@gmail.com
+> 
+> Jakub Kicinski (8):
+>   netdevsim: a basic test PSP implementation
+>   selftests: drv-net: base device access API test
+>   selftests: drv-net: add PSP responder
+>   selftests: drv-net: psp: add basic data transfer and key rotation
+>     tests
+>   selftests: drv-net: psp: add association tests
+>   selftests: drv-net: psp: add connection breaking tests
+>   selftests: drv-net: psp: add test for auto-adjusting TCP MSS
+>   selftests: drv-net: psp: add tests for destroying devices
+> 
+>  drivers/net/netdevsim/Makefile                |   4 +
+>  tools/testing/selftests/drivers/net/Makefile  |  10 +
+>  drivers/net/netdevsim/netdevsim.h             |  27 +
+>  drivers/net/netdevsim/netdev.c                |  43 +-
+>  drivers/net/netdevsim/psp.c                   | 225 +++++++
+>  net/core/skbuff.c                             |   1 +
+>  .../selftests/drivers/net/psp_responder.c     | 483 ++++++++++++++
+>  .../testing/selftests/drivers/net/.gitignore  |   1 +
+>  tools/testing/selftests/drivers/net/config    |   1 +
+>  .../drivers/net/hw/lib/py/__init__.py         |   4 +-
+>  .../selftests/drivers/net/lib/py/__init__.py  |   4 +-
+>  .../selftests/drivers/net/lib/py/env.py       |   4 +
+>  tools/testing/selftests/drivers/net/psp.py    | 627 ++++++++++++++++++
+>  .../testing/selftests/net/lib/py/__init__.py  |   2 +-
+>  tools/testing/selftests/net/lib/py/ksft.py    |  10 +
+>  tools/testing/selftests/net/lib/py/ynl.py     |   5 +
+>  16 files changed, 1440 insertions(+), 11 deletions(-)
+>  create mode 100644 drivers/net/netdevsim/psp.c
+>  create mode 100644 tools/testing/selftests/drivers/net/psp_responder.c
+>  create mode 100755 tools/testing/selftests/drivers/net/psp.py
+
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+
+Great both for coverage and as an example device implementation,
+thanks.
 
-Hi Linus,
-
-The following changes since commit e59a039119c3ec241228adf12dca0dd4398104d0:
-
-  Merge tag 's390-6.17-4' of git://git.kernel.org/pub/scm/linux/kernel/git/s390/linux (2025-09-11 08:46:30 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/bpf-next-6.18
-
-for you to fetch changes up to 4ef77dd584cfd915526328f516fec59e3a54d66e:
-
-  libbpf: Replace AF_ALG with open coded SHA-256 (2025-09-28 04:25:31 -0700)
-
-----------------------------------------------------------------
-Note, there is a trivial conflict between tip and bpf-next trees:
-in kernel/events/uprobes.c between commit:
-  4363264111e12 ("uprobe: Do not emulate/sstep original instruction when ip is changed")
-from the bpf-next tree and commit:
-  ba2bfc97b4629 ("uprobes/x86: Add support to optimize uprobes")
-from the tip tree:
-https://lore.kernel.org/all/aNVMR5rjA2geHNLn@sirena.org.uk/
-since Jiri's two separate uprobe/bpf related patch series landed
-in different trees. One was mostly uprobe. Another was mostly bpf.
-
-Other than that the main changes are:
-
-- Support pulling non-linear xdp data with bpf_xdp_pull_data() kfunc
-  (Amery Hung).
-  Applied as a stable branch in bpf-next and net-next trees.
-
-- Support reading skb metadata via bpf_dynptr (Jakub Sitnicki).
-  Also a stable branch in bpf-next and net-next trees.
-
-- Enforce expected_attach_type for tailcall compatibility
-  (Daniel Borkmann)
-
-- Replace path-sensitive with path-insensitive live stack analysis
-  in the verifier (Eduard Zingerman).
-  This is a significant change in the verification logic. More details,
-  motivation, long term plans are in the cover letter/merge commit.
-
-- Support signed BPF programs (KP Singh).
-  This is another major feature that took years to materialize.
-  Algorithm details are in the cover letter/marge commit.
-
-- Add support for may_goto instruction to s390 JIT (Ilya Leoshkevich)
-
-- Add support for may_goto instruction to arm64 JIT (Puranjay Mohan)
-
-- Fix USDT SIB argument handling in libbpf (Jiawei Zhao)
-
-- Allow uprobe-bpf program to change context registers (Jiri Olsa)
-
-- Support signed loads from BPF arena (Kumar Kartikeya Dwivedi
-  and Puranjay Mohan)
-
-- Allow access to union arguments in tracing programs (Leon Hwang)
-
-- Optimize rcu_read_lock() + migrate_disable() combination
-  where it's used in BPF subsystem (Menglong Dong)
-
-- Introduce bpf_task_work_schedule*() kfuncs to schedule
-  deferred execution of BPF callback in the context of
-  a specific task using the kernel’s task_work infrastructure
-  (Mykyta Yatsenko)
-
-- Enforce RCU protection for KF_RCU_PROTECTED kfuncs
-  (Kumar Kartikeya Dwivedi)
-
-- Add stress test for rqspinlock in NMI
-  (Kumar Kartikeya Dwivedi)
-
-- Improve the precision of tnum multiplier verifier operation
-  (Nandakumar Edamana)
-
-- Use tnums to improve is_branch_taken() logic (Paul Chaignon)
-
-- Add support for atomic operations in arena in riscv JIT (Pu Lehui)
-
-- Report arena faults to BPF error stream (Puranjay Mohan)
-
-- Search for tracefs at /sys/kernel/tracing first in bpftool
-  (Quentin Monnet)
-
-- Add bpf_strcasecmp() kfunc (Rong Tao)
-
-- Support lookup_and_delete_elem command in BPF_MAP_STACK_TRACE
-  (Tao Chen)
-
-Signed-off-by: Alexei Starovoitov <ast@kernel.org>
-----------------------------------------------------------------
-Alan Maguire (1):
-      selftests/bpf: More open-coded gettid syscall cleanup
-
-Alexei Starovoitov (19):
-      Merge branch 'task-local-data'
-      Merge branch 'bpf-use-vrealloc-in-bpf_patch_insn_data'
-      Merge branch 'bpf-introduce-and-use-rcu_read_lock_dont_migrate'
-      Merge branch 's390-bpf-add-s390-jit-support-for-timed-may_goto'
-      Merge branch 'bpf-arm64-support-for-timed-may_goto'
-      Merge branch 'selftests-bpf-benchmark-all-symbols-for-kprobe-multi'
-      Merge branch 'selftests-bpf-introduce-experimental-bpf_in_interrupt'
-      Merge branch 'bpf-replace-wq-users-and-add-wq_percpu-to-alloc_workqueue-users'
-      Merge git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf after rc5
-      Merge branch 'bpf-report-arena-faults-to-bpf-streams'
-      Merge branch 'remove-use-of-current-cgns-in-bpf_cgroup_from_id'
-      Merge branch 'update-kf_rcu_protected'
-      Merge branch 'bpf-replace-path-sensitive-with-path-insensitive-live-stack-analysis'
-      Merge branch 'signed-bpf-programs'
-      Merge branch 'bpf-introduce-deferred-task-context-execution'
-      Merge branch 'signed-loads-from-arena'
-      Merge branch 'bpf-allow-union-argument-in-trampoline-based-programs'
-      Merge branch 'riscv-bpf-fix-uninitialized-symbol-retval_off'
-      Merge branch 'uprobe-bpf-allow-to-change-app-registers-from-uprobe-registers'
-
-Amery Hung (19):
-      bpf: Allow syscall bpf programs to call non-recur helpers
-      selftests/bpf: Introduce task local data
-      selftests/bpf: Test basic task local data operations
-      selftests/bpf: Test concurrent task local data key creation
-      bpf: Allow struct_ops to get map id by kdata
-      selftests/bpf: Add multi_st_ops that supports multiple instances
-      selftests/bpf: Test multi_st_ops and calling kfuncs from different programs
-      selftests/bpf: Copy test_kmods when installing selftest
-      bpf: Clear pfmemalloc flag when freeing all fragments
-      bpf: Allow bpf_xdp_shrink_data to shrink a frag from head and tail
-      bpf: Support pulling non-linear xdp data
-      bpf: Clear packet pointers after changing packet data in kfuncs
-      bpf: Make variables in bpf_prog_test_run_xdp less confusing
-      bpf: Support specifying linear xdp packet data size for BPF_PROG_TEST_RUN
-      selftests/bpf: Test bpf_xdp_pull_data
-      selftests: drv-net: Pull data before parsing headers
-      bpf: Emit struct bpf_xdp_sock type in vmlinux BTF
-      selftests/bpf: Test changing packet data from global functions with a kfunc
-      selftests/bpf: Test changing packet data from kfunc
-
-Andrea Righi (1):
-      bpf: Mark kfuncs as __noclone
-
-Andrii Nakryiko (2):
-      Merge branch 'libbpf-fix-reuse-of-devmap'
-      Merge branch 'libbpf-fix-usdt-sib-argument-handling-causing-unrecognized-register-error'
-
-Anton Protopopov (1):
-      bpf: Add a verbose message when the BTF limit is reached
-
-Chenghao Duan (1):
-      riscv: bpf: Fix uninitialized symbol 'retval_off'
-
-Cryolitia PukNgae (1):
-      libbpf: Add documentation to version and error API functions
-
-D. Wythe (1):
-      libbpf: Fix error when st-prefix_ops and ops from differ btf
-
-Daniel Borkmann (2):
-      bpf: Enforce expected_attach_type for tailcall compatibility
-      selftests/bpf: Add test case for different expected_attach_type
-
-Eduard Zingerman (17):
-      bpf: removed unused 'env' parameter from is_reg64 and insn_has_def32
-      bpf: use realloc in bpf_patch_insn_data
-      bpf: potential double-free of env->insn_aux_data
-      bpf: dont report verifier bug for missing bpf_scc_visit on speculative path
-      selftests/bpf: trigger verifier.c:maybe_exit_scc() for a speculative state
-      bpf: bpf_verifier_state->cleaned flag instead of REG_LIVE_DONE
-      bpf: use compute_live_registers() info in clean_func_state
-      bpf: remove redundant REG_LIVE_READ check in stacksafe()
-      bpf: declare a few utility functions as internal api
-      bpf: compute instructions postorder per subprogram
-      bpf: callchain sensitive stack liveness tracking using CFG
-      bpf: enable callchain sensitive stack liveness tracking
-      bpf: signal error if old liveness is more conservative than new
-      bpf: disable and remove registers chain based liveness
-      bpf: table based bpf_insn_successors()
-      selftests/bpf: __not_msg() tag for test_loader framework
-      selftests/bpf: test cases for callchain sensitive live stack tracking
-
-Eric Biggers (2):
-      bpf: Use sha1() instead of sha1_transform() in bpf_prog_calc_tag()
-      libbpf: Replace AF_ALG with open coded SHA-256
-
-Feng Yang (2):
-      bpf: Replace kvfree with kfree for kzalloc memory
-      selftests/bpf: Fix the issue where the error code is 0
-
-Fushuai Wang (1):
-      bpf: Replace get_next_cpu() with cpumask_next_wrap()
-
-Hengqi Chen (5):
-      selftests/bpf: Use vmlinux.h for BPF programs
-      bpf, arm64: Remove duplicated bpf_flush_icache()
-      riscv, bpf: Remove duplicated bpf_flush_icache()
-      riscv, bpf: Sign extend struct ops return values properly
-      bpf, arm64: Call bpf_jit_binary_pack_finalize() in bpf_jit_free()
-
-Ilya Leoshkevich (10):
-      s390/bpf: Do not write tail call counter into helper and kfunc frames
-      s390/bpf: Write back tail call counter for BPF_PSEUDO_CALL
-      s390/bpf: Write back tail call counter for BPF_TRAMP_F_CALL_ORIG
-      selftests/bpf: Clobber a lot of registers in tailcall_bpf2bpf_hierarchy tests
-      s390/bpf: Use direct calls and jumps where possible
-      s390/bpf: Add s390 JIT support for timed may_goto
-      selftests/bpf: Add a missing newline to the "bad arch spec" message
-      selftests/bpf: Add __arch_s390x macro
-      selftests/bpf: Enable timed may_goto verifier tests on s390x
-      selftests/bpf: Remove may_goto tests from DENYLIST.s390x
-
-Jakub Sitnicki (10):
-      bpf: Add dynptr type for skb metadata
-      bpf: Enable read/write access to skb metadata through a dynptr
-      selftests/bpf: Cover verifier checks for skb_meta dynptr type
-      selftests/bpf: Pass just bpf_map to xdp_context_test helper
-      selftests/bpf: Parametrize test_xdp_context_tuntap
-      selftests/bpf: Cover read access to skb metadata via dynptr
-      selftests/bpf: Cover write access to skb metadata via dynptr
-      selftests/bpf: Cover read/write to skb metadata at an offset
-      selftests/bpf: Cover metadata access from a modified skb clone
-      bpf: Return an error pointer for skb metadata when CONFIG_NET=n
-
-Jiapeng Chong (2):
-      bpf: Remove duplicate crypto/sha2.h header
-      bpftool: Remove duplicate string.h header
-
-Jiawei Zhao (3):
-      libbpf: Fix USDT SIB argument handling causing unrecognized register error
-      selftests/bpf: Enrich subtest_basic_usdt case in selftests to cover SIB handling logic
-      libbpf: Remove unused args in parse_usdt_note
-
-Jiayuan Chen (1):
-      selftests/bpf: Fix incorrect array size calculation
-
-Jiri Olsa (6):
-      bpf: Allow uprobe program to change context registers
-      uprobe: Do not emulate/sstep original instruction when ip is changed
-      selftests/bpf: Add uprobe context registers changes test
-      selftests/bpf: Add uprobe context ip register change test
-      selftests/bpf: Add kprobe write ctx attach test
-      selftests/bpf: Add kprobe multi write ctx attach test
-
-KP Singh (12):
-      bpf: Update the bpf_prog_calc_tag to use SHA256
-      bpf: Implement exclusive map creation
-      libbpf: Implement SHA256 internal helper
-      libbpf: Support exclusive map creation
-      selftests/bpf: Add tests for exclusive maps
-      bpf: Return hashes of maps in BPF_OBJ_GET_INFO_BY_FD
-      bpf: Move the signature kfuncs to helpers.c
-      bpf: Implement signature verification for BPF programs
-      libbpf: Update light skeleton for signing
-      libbpf: Embed and verify the metadata hash in the loader
-      bpftool: Add support for signing BPF programs
-      selftests/bpf: Enable signature verification for some lskel tests
-
-Kumar Kartikeya Dwivedi (6):
-      bpf: Do not limit bpf_cgroup_from_id to current's namespace
-      selftests/bpf: Add a test for bpf_cgroup_from_id lookup in non-root cgns
-      bpf: Enforce RCU protection for KF_RCU_PROTECTED
-      selftests/bpf: Add tests for KF_RCU_PROTECTED
-      bpf, x86: Add support for signed arena loads
-      selftests/bpf: Add stress test for rqspinlock in NMI
-
-Leon Hwang (5):
-      selftests/bpf: Introduce experimental bpf_in_interrupt()
-      selftests/bpf: Add case to test bpf_in_interrupt()
-      selftests/bpf: Skip timer_interrupt case when bpf_timer is not supported
-      bpf: Allow union argument in trampoline based programs
-      selftests/bpf: Add union argument tests using fexit programs
-
-Li Jun (1):
-      bpf: Standardize function declaration style
-
-Magnus Karlsson (1):
-      MAINTAINERS: Delete inactive maintainers from AF_XDP
-
-Marco Crivellari (3):
-      bpf: replace use of system_wq with system_percpu_wq
-      bpf: replace use of system_unbound_wq with system_dfl_wq
-      bpf: WQ_PERCPU added to alloc_workqueue users
-
-Martin KaFai Lau (7):
-      Merge branch 'allow-struct_ops-to-create-map-id-to'
-      Merge git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
-      Merge branch 'add-a-dynptr-type-for-skb-metadata-for-tc-bpf'
-      Merge branch 'bpf-next/skb-meta-dynptr' into 'bpf-next/master'
-      Merge branch 'bpf-next/skb-meta-dynptr' into 'bpf-next/master'
-      Merge branch 'add-kfunc-bpf_xdp_pull_data'
-      Merge branch 'bpf-next/xdp_pull_data' into 'bpf-next/master'
-
-Matt Bobrowski (1):
-      bpf/selftests: Fix test_tcpnotify_user
-
-Matt Fleming (1):
-      selftests/bpf: Add LPM trie microbenchmarks
-
-Menglong Dong (10):
-      rcu: add rcu_read_lock_dont_migrate()
-      bpf: use rcu_read_lock_dont_migrate() for bpf_cgrp_storage_free()
-      bpf: use rcu_read_lock_dont_migrate() for bpf_inode_storage_free()
-      bpf: use rcu_read_lock_dont_migrate() for bpf_iter_run_prog()
-      bpf: use rcu_read_lock_dont_migrate() for bpf_task_storage_free()
-      bpf: use rcu_read_lock_dont_migrate() for bpf_prog_run_array_cg()
-      bpf: use rcu_read_lock_dont_migrate() for trampoline.c
-      selftests/bpf: move get_ksyms and get_addrs to trace_helpers.c
-      selftests/bpf: skip recursive functions for kprobe_multi
-      selftests/bpf: add benchmark testing for kprobe-multi-all
-
-Mykyta Yatsenko (13):
-      libbpf: Export bpf_object__prepare symbol
-      selftests/bpf: Add BPF program dump in veristat
-      bpf: refactor special field-type detection
-      bpf: extract generic helper from process_timer_func()
-      bpf: htab: extract helper for freeing special structs
-      bpf: verifier: permit non-zero returns from async callbacks
-      bpf: bpf task work plumbing
-      bpf: extract map key pointer calculation
-      bpf: task work scheduling kfuncs
-      selftests/bpf: BPF task work scheduling tests
-      selftests/bpf: add bpf task work stress tests
-      selftests/bpf: Task_work selftest cleanup fixes
-      selftests/bpf: Fix flaky bpf_cookie selftest
-
-Nandakumar Edamana (2):
-      bpf: Improve the general precision of tnum_mul
-      bpf: Add selftest to check the verifier's abstract multiplication
-
-Paul Chaignon (6):
-      bpf: Tidy verifier bug message
-      bpf: Use tnums for JEQ/JNE is_branch_taken logic
-      selftests/bpf: Tests for is_scalar_branch_taken tnum logic
-      bpf: Explicitly check accesses to bpf_sock_addr
-      selftests/bpf: Move macros to bpf_misc.h
-      selftests/bpf: Test accesses to ctx padding
-
-Pu Lehui (10):
-      riscv, bpf: Extract emit_stx() helper
-      riscv, bpf: Extract emit_st() helper
-      riscv, bpf: Extract emit_ldx() helper
-      riscv: Separate toolchain support dependency from RISCV_ISA_ZACAS
-      riscv, bpf: Add rv_ext_enabled macro for runtime detection extentsion
-      riscv, bpf: Add Zacas instructions
-      riscv, bpf: Optimize cmpxchg insn with Zacas support
-      riscv, bpf: Add ex_insn_off and ex_jmp_off for exception table handling
-      riscv, bpf: Add support arena atomics for RV64
-      selftests/bpf: Enable arena atomics tests for RV64
-
-Puranjay Mohan (10):
-      bpf, arm64: Add JIT support for timed may_goto
-      selftests/bpf: Enable timed may_goto tests for arm64
-      bpf: arm64: simplify exception table handling
-      bpf: core: introduce main_prog_aux for stream access
-      bpf: Report arena faults to BPF stderr
-      selftests: bpf: introduce __stderr and __stdout
-      selftests: bpf: use __stderr in stream error tests
-      selftests/bpf: Add tests for arena fault reporting
-      bpf, arm64: Add support for signed arena loads
-      selftests: bpf: Add tests for signed loads from arena
-
-Qianfeng Rong (2):
-      bpf: Remove redundant __GFP_NOWARN
-      bpf: Replace kvfree with kfree for kzalloc memory
-
-Quentin Monnet (2):
-      bpftool: Search for tracefs at /sys/kernel/tracing first
-      bpftool: Add bash completion for program signing options
-
-Ricardo B. Marlière (3):
-      selftests/bpf: Fix bpf_prog_detach2 usage in test_lirc_mode2
-      selftests/bpf: Upon failures, exit with code 1 in test_xsk.sh
-      selftests/bpf: Fix count write in testapp_xdp_metadata_copy()
-
-Rong Tao (2):
-      bpf: add bpf_strcasecmp kfunc
-      selftests/bpf: Test kfunc bpf_strcasecmp
-
-Saket Kumar Bhaskar (1):
-      selftests/bpf: Fix arena_spin_lock selftest failure
-
-Shubham Sharma (1):
-      selftests/bpf: Fix typos and grammar in test sources
-
-Tao Chen (10):
-      bpftool: Add bpf_token show
-      bpftool: Add bpftool-token manpage
-      bpftool: Add bash completion for token argument
-      bpf: Remove migrate_disable in kprobe_multi_link_prog_run
-      bpf: Remove preempt_disable in bpf_try_get_buffers
-      bpftool: Add HELP_SPEC_OPTIONS in token.c
-      bpftool: Fix UAF in get_delegate_value
-      bpf: Add lookup_and_delete_elem for BPF_MAP_STACK_TRACE
-      selftests/bpf: Refactor stacktrace_map case with skeleton
-      selftests/bpf: Add stacktrace map lookup_and_delete_elem test case
-
-Thomas Weißschuh (1):
-      bpf: Don't use %pK through printk
-
-Tiezhu Yang (1):
-      selftests/bpf: Remove entries from config.{arch} already present in config
-
-Tom Stellard (1):
-      bpftool: Fix -Wuninitialized-const-pointer warnings with clang >= 21
-
-Vincent Li (1):
-      bpftool: Add kernel.kptr_restrict hint for no instructions
-
-Yonghong Song (1):
-      selftests/bpf: Fix selftest verifier_arena_large failure
-
-Yuan Chen (2):
-      bpftool: Refactor kernel config reading into common helper
-      bpftool: Add CET-aware symbol matching for x86_64 architectures
-
-Yureka Lilian (2):
-      libbpf: Fix reuse of DEVMAP
-      selftests/bpf: Add test for DEVMAP reuse
-
- CREDITS                                            |   6 +
- Documentation/bpf/kfuncs.rst                       |  19 +-
- Documentation/bpf/verifier.rst                     | 264 -------
- MAINTAINERS                                        |   2 -
- arch/arm64/net/Makefile                            |   2 +-
- arch/arm64/net/bpf_jit_comp.c                      | 127 ++-
- arch/arm64/net/bpf_timed_may_goto.S                |  40 +
- arch/riscv/Kconfig                                 |   1 -
- arch/riscv/include/asm/cmpxchg.h                   |   6 +-
- arch/riscv/kernel/setup.c                          |   1 +
- arch/riscv/net/bpf_jit.h                           |  70 +-
- arch/riscv/net/bpf_jit_comp64.c                    | 569 +++++---------
- arch/s390/net/Makefile                             |   2 +-
- arch/s390/net/bpf_jit_comp.c                       | 148 ++--
- arch/s390/net/bpf_timed_may_goto.S                 |  45 ++
- arch/x86/net/bpf_jit_comp.c                        | 125 ++-
- crypto/asymmetric_keys/pkcs7_verify.c              |   1 +
- include/linux/bpf.h                                |  73 +-
- include/linux/bpf_verifier.h                       |  65 +-
- include/linux/btf.h                                |   2 +-
- include/linux/cgroup.h                             |   1 +
- include/linux/filter.h                             |  17 +-
- include/linux/rcupdate.h                           |  14 +
- include/linux/tnum.h                               |   6 +
- include/linux/verification.h                       |   1 +
- include/net/xdp.h                                  |   5 +
- include/net/xdp_sock_drv.h                         |  21 +-
- include/uapi/linux/bpf.h                           |  22 +
- kernel/bpf/Kconfig                                 |   2 +-
- kernel/bpf/Makefile                                |   2 +-
- kernel/bpf/arena.c                                 |  30 +
- kernel/bpf/arraymap.c                              |  21 +-
- kernel/bpf/bpf_cgrp_storage.c                      |   6 +-
- kernel/bpf/bpf_inode_storage.c                     |   6 +-
- kernel/bpf/bpf_iter.c                              |   6 +-
- kernel/bpf/bpf_lru_list.c                          |  10 +-
- kernel/bpf/bpf_struct_ops.c                        |  12 +
- kernel/bpf/bpf_task_storage.c                      |   6 +-
- kernel/bpf/btf.c                                   |  99 ++-
- kernel/bpf/cgroup.c                                |  11 +-
- kernel/bpf/core.c                                  |  60 +-
- kernel/bpf/cpumap.c                                |   2 +-
- kernel/bpf/devmap.c                                |   2 +-
- kernel/bpf/hashtab.c                               |  43 +-
- kernel/bpf/helpers.c                               | 612 ++++++++++++++-
- kernel/bpf/liveness.c                              | 733 +++++++++++++++++
- kernel/bpf/local_storage.c                         |   2 +-
- kernel/bpf/log.c                                   |  30 +-
- kernel/bpf/memalloc.c                              |   2 +-
- kernel/bpf/stackmap.c                              |  16 +-
- kernel/bpf/syscall.c                               | 125 ++-
- kernel/bpf/tnum.c                                  |  63 +-
- kernel/bpf/trampoline.c                            |  18 +-
- kernel/bpf/verifier.c                              | 869 ++++++++++-----------
- kernel/cgroup/cgroup.c                             |  24 +-
- kernel/events/core.c                               |   4 +
- kernel/events/uprobes.c                            |   7 +
- kernel/trace/bpf_trace.c                           | 201 +----
- net/bpf/test_run.c                                 |  59 +-
- net/core/filter.c                                  | 210 ++++-
- tools/bpf/bpftool/Documentation/bpftool-gen.rst    |  13 +-
- tools/bpf/bpftool/Documentation/bpftool-prog.rst   |  14 +-
- tools/bpf/bpftool/Documentation/bpftool-token.rst  |  64 ++
- tools/bpf/bpftool/Makefile                         |   6 +-
- tools/bpf/bpftool/bash-completion/bpftool          |  37 +-
- tools/bpf/bpftool/btf_dumper.c                     |   2 +-
- tools/bpf/bpftool/cgroup.c                         |   4 +
- tools/bpf/bpftool/common.c                         |  93 +++
- tools/bpf/bpftool/feature.c                        |  86 +-
- tools/bpf/bpftool/gen.c                            |  68 +-
- tools/bpf/bpftool/link.c                           |  54 +-
- tools/bpf/bpftool/main.c                           |  29 +-
- tools/bpf/bpftool/main.h                           |  21 +
- tools/bpf/bpftool/prog.c                           |  33 +-
- tools/bpf/bpftool/sign.c                           | 211 +++++
- tools/bpf/bpftool/token.c                          | 210 +++++
- tools/bpf/bpftool/tracelog.c                       |  11 +-
- tools/include/uapi/linux/bpf.h                     |  22 +
- tools/lib/bpf/bpf.c                                |   6 +-
- tools/lib/bpf/bpf.h                                |   5 +-
- tools/lib/bpf/bpf_gen_internal.h                   |   2 +
- tools/lib/bpf/gen_loader.c                         |  47 ++
- tools/lib/bpf/libbpf.c                             | 213 ++++-
- tools/lib/bpf/libbpf.h                             |  52 +-
- tools/lib/bpf/libbpf.map                           |   3 +
- tools/lib/bpf/libbpf_internal.h                    |   4 +
- tools/lib/bpf/skel_internal.h                      |  76 +-
- tools/lib/bpf/usdt.bpf.h                           |  44 +-
- tools/lib/bpf/usdt.c                               |  72 +-
- tools/testing/selftests/bpf/.gitignore             |   1 +
- tools/testing/selftests/bpf/DENYLIST.s390x         |   1 -
- tools/testing/selftests/bpf/Makefile               |  43 +-
- tools/testing/selftests/bpf/bench.c                |  22 +-
- tools/testing/selftests/bpf/bench.h                |   1 +
- .../selftests/bpf/benchs/bench_lpm_trie_map.c      | 555 +++++++++++++
- tools/testing/selftests/bpf/benchs/bench_sockmap.c |   5 +-
- tools/testing/selftests/bpf/benchs/bench_trigger.c |  61 ++
- .../selftests/bpf/benchs/run_bench_trigger.sh      |   4 +-
- tools/testing/selftests/bpf/bpf_experimental.h     |  54 ++
- tools/testing/selftests/bpf/bpf_kfuncs.h           |   3 +
- tools/testing/selftests/bpf/bpf_util.h             |   3 +
- tools/testing/selftests/bpf/cgroup_helpers.c       |  20 +
- tools/testing/selftests/bpf/cgroup_helpers.h       |   1 +
- tools/testing/selftests/bpf/config                 |   1 +
- tools/testing/selftests/bpf/config.aarch64         |  12 -
- tools/testing/selftests/bpf/config.ppc64el         |   1 -
- tools/testing/selftests/bpf/config.riscv64         |   1 -
- tools/testing/selftests/bpf/config.s390x           |  11 -
- tools/testing/selftests/bpf/config.x86_64          |   5 -
- tools/testing/selftests/bpf/network_helpers.c      |   2 +-
- tools/testing/selftests/bpf/prog_tests/align.c     | 178 ++---
- .../selftests/bpf/prog_tests/arena_spin_lock.c     |  13 +
- tools/testing/selftests/bpf/prog_tests/atomics.c   |  10 +-
- .../selftests/bpf/prog_tests/attach_probe.c        |  28 +
- .../testing/selftests/bpf/prog_tests/bpf_cookie.c  |   3 +-
- tools/testing/selftests/bpf/prog_tests/btf_dump.c  |   2 +-
- .../selftests/bpf/prog_tests/cgroup_xattr.c        |   2 +-
- .../testing/selftests/bpf/prog_tests/cgrp_kfunc.c  |  71 ++
- tools/testing/selftests/bpf/prog_tests/dynptr.c    |   2 +
- tools/testing/selftests/bpf/prog_tests/fd_array.c  |   2 +-
- .../selftests/bpf/prog_tests/fentry_fexit.c        |  15 +-
- .../testing/selftests/bpf/prog_tests/fentry_test.c |   9 +-
- .../testing/selftests/bpf/prog_tests/fexit_test.c  |   9 +-
- .../testing/selftests/bpf/prog_tests/kernel_flag.c |   2 +-
- .../selftests/bpf/prog_tests/kprobe_multi_test.c   | 247 +-----
- tools/testing/selftests/bpf/prog_tests/map_excl.c  |  54 ++
- .../selftests/bpf/prog_tests/module_attach.c       |   2 +-
- .../bpf/prog_tests/pinning_devmap_reuse.c          |  50 ++
- .../bpf/prog_tests/prog_tests_framework.c          | 125 +++
- .../testing/selftests/bpf/prog_tests/reg_bounds.c  |   4 +-
- .../selftests/bpf/prog_tests/res_spin_lock.c       |  16 +
- tools/testing/selftests/bpf/prog_tests/spin_lock.c |  12 +-
- .../selftests/bpf/prog_tests/stacktrace_build_id.c |   2 +-
- .../bpf/prog_tests/stacktrace_build_id_nmi.c       |   2 +-
- .../selftests/bpf/prog_tests/stacktrace_map.c      |  71 +-
- .../bpf/prog_tests/stacktrace_map_raw_tp.c         |   4 +-
- .../selftests/bpf/prog_tests/stacktrace_map_skip.c |   2 +-
- tools/testing/selftests/bpf/prog_tests/stream.c    | 131 ++--
- .../selftests/bpf/prog_tests/string_kfuncs.c       |   1 +
- .../selftests/bpf/prog_tests/task_local_data.h     | 386 +++++++++
- .../selftests/bpf/prog_tests/task_work_stress.c    | 130 +++
- .../prog_tests/test_struct_ops_id_ops_mapping.c    |  74 ++
- .../bpf/prog_tests/test_task_local_data.c          | 297 +++++++
- .../selftests/bpf/prog_tests/test_task_work.c      | 157 ++++
- .../selftests/bpf/prog_tests/test_veristat.c       |  44 +-
- tools/testing/selftests/bpf/prog_tests/timer.c     |  34 +
- .../selftests/bpf/prog_tests/tracing_struct.c      |  29 +
- tools/testing/selftests/bpf/prog_tests/uprobe.c    | 156 +++-
- tools/testing/selftests/bpf/prog_tests/usdt.c      |  83 +-
- tools/testing/selftests/bpf/prog_tests/verifier.c  |   4 +
- .../bpf/prog_tests/xdp_context_test_run.c          | 222 +++++-
- .../selftests/bpf/prog_tests/xdp_devmap_attach.c   |  31 +-
- .../selftests/bpf/prog_tests/xdp_pull_data.c       | 179 +++++
- tools/testing/selftests/bpf/progs/arena_atomics.c  |   9 +-
- .../testing/selftests/bpf/progs/arena_spin_lock.c  |   5 +-
- tools/testing/selftests/bpf/progs/bpf_cc_cubic.c   |   2 +-
- tools/testing/selftests/bpf/progs/bpf_dctcp.c      |   2 +-
- tools/testing/selftests/bpf/progs/bpf_misc.h       |  24 +
- tools/testing/selftests/bpf/progs/bpf_test_utils.h |  18 +
- .../selftests/bpf/progs/cgroup_read_xattr.c        |   2 +-
- .../selftests/bpf/progs/cgrp_kfunc_success.c       |  12 +
- tools/testing/selftests/bpf/progs/dynptr_fail.c    | 258 ++++++
- tools/testing/selftests/bpf/progs/dynptr_success.c |  55 ++
- .../selftests/bpf/progs/exceptions_assert.c        |  34 +-
- .../selftests/bpf/progs/freplace_connect_v4_prog.c |   2 +-
- .../selftests/bpf/progs/iters_state_safety.c       |   6 +-
- .../selftests/bpf/progs/iters_task_failure.c       |   4 +-
- tools/testing/selftests/bpf/progs/iters_testmod.c  |  46 ++
- .../selftests/bpf/progs/iters_testmod_seq.c        |   6 +-
- .../testing/selftests/bpf/progs/kprobe_write_ctx.c |  22 +
- tools/testing/selftests/bpf/progs/loop1.c          |   7 +-
- tools/testing/selftests/bpf/progs/loop2.c          |   7 +-
- tools/testing/selftests/bpf/progs/loop3.c          |   7 +-
- tools/testing/selftests/bpf/progs/loop6.c          |  21 +-
- tools/testing/selftests/bpf/progs/lpm_trie.h       |  30 +
- tools/testing/selftests/bpf/progs/lpm_trie_bench.c | 230 ++++++
- tools/testing/selftests/bpf/progs/lpm_trie_map.c   |  19 +
- tools/testing/selftests/bpf/progs/map_excl.c       |  34 +
- .../selftests/bpf/progs/mem_rdonly_untrusted.c     |   4 +-
- tools/testing/selftests/bpf/progs/rbtree_search.c  |   2 +-
- .../{test_stacktrace_map.c => stacktrace_map.c}    |   2 +
- tools/testing/selftests/bpf/progs/stream.c         | 158 ++++
- .../selftests/bpf/progs/string_kfuncs_failure1.c   |   6 +
- .../selftests/bpf/progs/string_kfuncs_failure2.c   |   1 +
- .../selftests/bpf/progs/string_kfuncs_success.c    |   5 +
- .../bpf/progs/struct_ops_id_ops_mapping1.c         |  59 ++
- .../bpf/progs/struct_ops_id_ops_mapping2.c         |  59 ++
- .../selftests/bpf/progs/struct_ops_kptr_return.c   |   2 +-
- .../selftests/bpf/progs/struct_ops_refcounted.c    |   2 +-
- .../bpf/progs/tailcall_bpf2bpf_hierarchy1.c        |   3 +
- .../bpf/progs/tailcall_bpf2bpf_hierarchy2.c        |   3 +
- .../bpf/progs/tailcall_bpf2bpf_hierarchy3.c        |   3 +
- .../bpf/progs/tailcall_bpf2bpf_hierarchy_fentry.c  |   3 +
- .../selftests/bpf/progs/task_local_data.bpf.h      | 237 ++++++
- tools/testing/selftests/bpf/progs/task_work.c      | 107 +++
- tools/testing/selftests/bpf/progs/task_work_fail.c |  96 +++
- .../testing/selftests/bpf/progs/task_work_stress.c |  73 ++
- .../selftests/bpf/progs/test_cls_redirect.c        |   6 +-
- .../selftests/bpf/progs/test_cls_redirect_dynptr.c |   2 +-
- tools/testing/selftests/bpf/progs/test_overhead.c  |   5 +-
- .../selftests/bpf/progs/test_pinning_devmap.c      |  20 +
- .../selftests/bpf/progs/test_task_local_data.c     |  65 ++
- .../selftests/bpf/progs/test_tcp_hdr_options.c     |   5 +-
- .../selftests/bpf/progs/test_tcpnotify_kern.c      |   1 -
- tools/testing/selftests/bpf/progs/test_uprobe.c    |  38 +
- tools/testing/selftests/bpf/progs/test_usdt.c      |  31 +
- .../selftests/bpf/progs/test_xdp_devmap_tailcall.c |  29 +
- tools/testing/selftests/bpf/progs/test_xdp_meta.c  | 419 ++++++++++
- .../selftests/bpf/progs/test_xdp_pull_data.c       |  48 ++
- .../testing/selftests/bpf/progs/timer_interrupt.c  |  48 ++
- tools/testing/selftests/bpf/progs/tracing_struct.c |  33 +
- tools/testing/selftests/bpf/progs/trigger_bench.c  |  12 +
- .../testing/selftests/bpf/progs/uretprobe_stack.c  |   4 +-
- .../selftests/bpf/progs/verifier_arena_large.c     |   1 +
- .../testing/selftests/bpf/progs/verifier_bounds.c  |  79 +-
- .../selftests/bpf/progs/verifier_bpf_fastcall.c    |  27 +-
- tools/testing/selftests/bpf/progs/verifier_ctx.c   |  32 +-
- .../selftests/bpf/progs/verifier_global_ptr_args.c |   4 +-
- tools/testing/selftests/bpf/progs/verifier_ldsx.c  | 178 ++++-
- .../selftests/bpf/progs/verifier_live_stack.c      | 294 +++++++
- .../testing/selftests/bpf/progs/verifier_loops1.c  |  21 +
- .../testing/selftests/bpf/progs/verifier_map_ptr.c |   7 +-
- .../selftests/bpf/progs/verifier_may_goto_1.c      |  38 +-
- tools/testing/selftests/bpf/progs/verifier_mul.c   |  38 +
- .../selftests/bpf/progs/verifier_precision.c       |  16 +-
- .../selftests/bpf/progs/verifier_scalar_ids.c      |  12 +-
- tools/testing/selftests/bpf/progs/verifier_sock.c  |  48 +-
- .../selftests/bpf/progs/verifier_spill_fill.c      |  40 +-
- .../bpf/progs/verifier_subprog_precision.c         |   6 +-
- .../testing/selftests/bpf/progs/verifier_var_off.c |   6 +-
- tools/testing/selftests/bpf/test_kmods/Makefile    |   2 +-
- .../selftests/bpf/test_kmods/bpf_test_rqspinlock.c | 209 +++++
- .../testing/selftests/bpf/test_kmods/bpf_testmod.c | 155 ++++
- .../testing/selftests/bpf/test_kmods/bpf_testmod.h |   6 +
- .../selftests/bpf/test_kmods/bpf_testmod_kfunc.h   |   4 +
- tools/testing/selftests/bpf/test_lirc_mode2_user.c |   2 +-
- tools/testing/selftests/bpf/test_loader.c          | 300 +++++--
- tools/testing/selftests/bpf/test_progs.c           |  13 +
- tools/testing/selftests/bpf/test_progs.h           |  17 +
- tools/testing/selftests/bpf/test_sockmap.c         |   2 +-
- tools/testing/selftests/bpf/test_tcpnotify_user.c  |  20 +-
- tools/testing/selftests/bpf/test_xsk.sh            |   2 +
- tools/testing/selftests/bpf/testing_helpers.c      |  14 +-
- tools/testing/selftests/bpf/testing_helpers.h      |   1 +
- tools/testing/selftests/bpf/trace_helpers.c        | 234 ++++++
- tools/testing/selftests/bpf/trace_helpers.h        |   3 +
- tools/testing/selftests/bpf/verifier/bpf_st_mem.c  |   4 +-
- tools/testing/selftests/bpf/verifier/calls.c       |   8 +-
- tools/testing/selftests/bpf/verify_sig_setup.sh    |  11 +-
- tools/testing/selftests/bpf/veristat.c             |  56 +-
- tools/testing/selftests/bpf/xdping.c               |   2 +-
- tools/testing/selftests/bpf/xsk.h                  |   4 +-
- tools/testing/selftests/bpf/xskxceiver.c           |  14 +-
- tools/testing/selftests/net/lib/xdp_native.bpf.c   |  89 ++-
- 254 files changed, 11830 insertions(+), 2794 deletions(-)
- create mode 100644 arch/arm64/net/bpf_timed_may_goto.S
- create mode 100644 arch/s390/net/bpf_timed_may_goto.S
- create mode 100644 kernel/bpf/liveness.c
- create mode 100644 tools/bpf/bpftool/Documentation/bpftool-token.rst
- create mode 100644 tools/bpf/bpftool/sign.c
- create mode 100644 tools/bpf/bpftool/token.c
- create mode 100644 tools/testing/selftests/bpf/benchs/bench_lpm_trie_map.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/map_excl.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/pinning_devmap_reuse.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/task_local_data.h
- create mode 100644 tools/testing/selftests/bpf/prog_tests/task_work_stress.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/test_struct_ops_id_ops_mapping.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/test_task_work.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/xdp_pull_data.c
- create mode 100644 tools/testing/selftests/bpf/progs/bpf_test_utils.h
- create mode 100644 tools/testing/selftests/bpf/progs/kprobe_write_ctx.c
- create mode 100644 tools/testing/selftests/bpf/progs/lpm_trie.h
- create mode 100644 tools/testing/selftests/bpf/progs/lpm_trie_bench.c
- create mode 100644 tools/testing/selftests/bpf/progs/lpm_trie_map.c
- create mode 100644 tools/testing/selftests/bpf/progs/map_excl.c
- rename tools/testing/selftests/bpf/progs/{test_stacktrace_map.c => stacktrace_map.c} (98%)
- create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_id_ops_mapping1.c
- create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_id_ops_mapping2.c
- create mode 100644 tools/testing/selftests/bpf/progs/task_local_data.bpf.h
- create mode 100644 tools/testing/selftests/bpf/progs/task_work.c
- create mode 100644 tools/testing/selftests/bpf/progs/task_work_fail.c
- create mode 100644 tools/testing/selftests/bpf/progs/task_work_stress.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_pinning_devmap.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_task_local_data.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_xdp_devmap_tailcall.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_xdp_pull_data.c
- create mode 100644 tools/testing/selftests/bpf/progs/timer_interrupt.c
- create mode 100644 tools/testing/selftests/bpf/progs/verifier_live_stack.c
- create mode 100644 tools/testing/selftests/bpf/progs/verifier_mul.c
- create mode 100644 tools/testing/selftests/bpf/test_kmods/bpf_test_rqspinlock.c
+I'll leave a few minor comments inline, but nothing that really needs
+a respin and/or cannot be a minor fixup later.
 
