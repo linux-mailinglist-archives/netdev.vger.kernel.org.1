@@ -1,177 +1,165 @@
-Return-Path: <netdev+bounces-226973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFF61BA6A5D
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 09:50:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0A0FBA6AD7
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 10:22:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A428C3A6A49
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 07:50:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D175177DCD
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 08:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD872293C44;
-	Sun, 28 Sep 2025 07:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7A32BE7A7;
+	Sun, 28 Sep 2025 08:22:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="ekcqcMPH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="oKHHqryO"
 X-Original-To: netdev@vger.kernel.org
-Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930AAF4F1
-	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 07:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C78221554;
+	Sun, 28 Sep 2025 08:22:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759045819; cv=none; b=DA/qcxR5FFRX8NhAQx3L6PbsjiuHk+vp7VWGdUZ0kSVfbAPA0ePRI/tldL9IzZV0gKQphT85MmoRQ8axk3RGMXCuZN19nacsdiKUyyyvcCJvcKCw4aHhVSohX0h8RLGH0Ii4afuDkJ25/CmRKGgrNVNWTCGfUl5xzixcSRtseJY=
+	t=1759047726; cv=none; b=HiPdSRyujKyv3FJw/kXoBWdlvRE5eQb4WcSnZbBs7Ds3wvCTzqGosok+DVjqbJPPVHnsH5YdLyjArZkyeMOY9/9rdIYXspjgzG6lvG+CZX8ttZx8vdfGzvic8SbrT7BUV6wBYPjMnKjWLadWTzIl/r6fwaZTTxnqcpoERPplr9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759045819; c=relaxed/simple;
-	bh=8zwhdAT5sii4bC3jrrsmTyH+Ny/08hZ1oE+9IrhKlcs=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=icmytWWA7KaiGa6a0QSY5/TpwSAfdl0WRLSS+oUXmMwlcALJvD4NLEqW3v1C0RmoyIbuiTirqC7BfvNDZCcaqFVrEuR9WHSjGgP531HCRDzqVzJuH+c9alYL9kCxQvgmkB7IzK4IfetKZZB4AuhO5K5/c0LqhrVYlxOt+CtV48M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=ekcqcMPH; arc=none smtp.client-ip=213.160.73.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
-Received: by dvalin.narfation.org (Postfix) id 3FB6020EC2;
-	Sun, 28 Sep 2025 07:50:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1759045813;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nB0ZMVuZr2JHPPFgW1Unq44brdPP7xx9CNItiimsCZU=;
-	b=ekcqcMPHOzkYt3yXGhY+atCZe4Fxp+CdJHlsxTeIy0aQUXuBVXcXwOxD2zOurkhatIz2s4
-	1z+QLSbxDdzMQryNlk266z/etCO2Y0aGwOHeAivfGPybBmD22gn/a5gCZ/1ZOrme6Mypwa
-	rhDc2qexHPAzdbHRo7lpml6ibf6EtXU=
-From: Sven Eckelmann <sven@narfation.org>
-To: Marek Lindner <marek.lindner@mailbox.org>,
- Simon Wunderlich <sw@simonwunderlich.de>,
- Antonio Quartulli <antonio@mandelbit.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, b.a.t.m.a.n@lists.open-mesh.org,
- Network Development <netdev@vger.kernel.org>,
- Linus =?UTF-8?B?TMO8c3Npbmc=?= <linus.luessing@c0d3.blue>,
- Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Subject:
- Re: unregister_netdevice: waiting for batadv_slave_0 to become free. Usage
- count = 2
-Date: Sun, 28 Sep 2025 09:50:02 +0200
-Message-ID: <2450943.NG923GbCHz@sven-desktop>
-In-Reply-To: <9f999251-8132-414e-9ea1-f83ecc41dfdd@I-love.SAKURA.ne.jp>
-References:
- <e50546d9-f86f-426b-9cd3-d56a368d56a8@I-love.SAKURA.ne.jp>
- <2754825.KlZ2vcFHjT@sven-desktop>
- <9f999251-8132-414e-9ea1-f83ecc41dfdd@I-love.SAKURA.ne.jp>
+	s=arc-20240116; t=1759047726; c=relaxed/simple;
+	bh=i2PZensdRzslR5Rb1unZYUP8j0DSbwhJ1xZrEK0zdjY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V0ZV5UBuLf5KfDCZCdQbLH1ntznLuJi8ZlsvfJGQ3Mj5IH/0G7W7pKgQB5Z9Zxqqvl6Qmqij5TR0GMb5oLf1ekABv9Jh5oo5qJoKYY5Qp70Jmb4S38UUqS1De8eVzCGUjKtDwhqbHNwmZCFFFQ/Yj0eAmDxhpuUVMbDbxGbRLuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=oKHHqryO; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=h4AdV+djV+yTy0JX/TnMvSNKHPhRFNpLrO26oQgiLoA=; b=oKHHqryOllCf4DGRx+mmOcOyYq
+	qlL7l2DsPeXL7X9WQUyqSYuEtoQn4MyLneUOunlCH98RltxCZi4tAe6eaGjSBFD8c8C5WxbG4RbgQ
+	71qVakVU13nw89eu/EaWEEzCptoyRj321RKwY0HCjwsUfaBCohb0GsMexIBpixwfh/iGlDvRCM+tg
+	0EuVurCzgNP9xRX45J8KIo7ZcYNWb4o3rCf6ERoS7W27eiDbW1VcnmPKWjeTIHfN/eMRaJcvgBx6d
+	ClmeBe0V5/qeQ3LXj984L1UvWEHENh6jDupX0gbWL6us97wJUkbdq84/koUNhOy+ryxJffEPe1Dh8
+	9gwUPoOg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49782)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v2mfE-0000000057R-3ezc;
+	Sun, 28 Sep 2025 09:21:48 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v2mfA-000000002QE-1riS;
+	Sun, 28 Sep 2025 09:21:44 +0100
+Date: Sun, 28 Sep 2025 09:21:44 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Gatien Chevallier <gatien.chevallier@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Christophe Roullier <christophe.roullier@foss.st.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Tristram Ha <Tristram.Ha@microchip.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/4] net: stmmac: stm32: add WoL from PHY
+ support
+Message-ID: <aNjwGHrefA5j3dOp@shell.armlinux.org.uk>
+References: <20250917-wol-smsc-phy-v2-0-105f5eb89b7f@foss.st.com>
+ <20250917-wol-smsc-phy-v2-2-105f5eb89b7f@foss.st.com>
+ <aMriVDAgZkL8DAdH@shell.armlinux.org.uk>
+ <aNbUdweqsCKAKJKl@shell.armlinux.org.uk>
+ <a318f055-059b-44a4-af28-2ffd80a779e6@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart879527330.0ifERbkFSE";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a318f055-059b-44a4-af28-2ffd80a779e6@broadcom.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
---nextPart879527330.0ifERbkFSE
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Sven Eckelmann <sven@narfation.org>
-Date: Sun, 28 Sep 2025 09:50:02 +0200
-Message-ID: <2450943.NG923GbCHz@sven-desktop>
-MIME-Version: 1.0
+On Fri, Sep 26, 2025 at 12:05:19PM -0700, Florian Fainelli wrote:
+> I like the direction this is going, we could probably take one step further
+> and extract the logic present in bcmgenet_wol.c and make those helper
+> functions for other drivers to get the overlay of PHY+MAC WoL
+> options/password consistent across all drivers. What do you think?
 
-On Sunday, 28 September 2025 03:06:05 CEST Tetsuo Handa wrote:
-> Thank you for responding quickly.
-> 
-> On 2025/09/28 2:21, Sven Eckelmann wrote:
-> > The question would now be: what is the actual problem? 
-> 
-> Sorry, my explanation was not clear enough.
+The logic I've implemented is fairly similar, but with one difference:
+I'm always storing the sopass, which means in the wol_get method I
+don't have to be concerned with the sopass returned by the PHY.
+This should be fine, unless the PHY was already configured for WoL
+magicsecure, and in that case we'll return a zero SOPASS but indicating
+WAKE_MAGICSECURE which probably isn't great.
 
-It was long and contained a lot of things - but not what the actual problem is. 
-It is necessary to read a lot of inline calltraces with subclauses - and then 
-by reading between the lines, we must figure out what you actually wanted to 
-say.
+So, my new get_wol logic is:
 
-It is no problem to not know the underlying problem. But all these absolute 
-statements, accusations and overly detailed statement made me think that I am 
-just too stupid to get it and you must be right.
+        if (phylink_mac_supports_wol(pl)) {
+                if (phylink_phy_supports_wol(pl, pl->phydev))
+                        phy_ethtool_get_wol(pl->phydev, wol);
 
-> What I thought as a problem is the difference between
-> 
-> 	netlink_device_change(&nlmsg, sock, "batadv_slave_0", true, "batadv0", 0, 0);
-> 	//netlink_device_change(&nlmsg, sock, "batadv_slave_0", true, 0, &macaddr, ETH_ALEN);
-> 
-> and
-> 
-> 	netlink_device_change(&nlmsg, sock, "batadv_slave_0", false, "batadv0", 0, 0);
-> 	netlink_device_change(&nlmsg, sock, "batadv_slave_0", true, 0, &macaddr, ETH_ALEN);
-> 
-> . The former makes hard_iface->if_status == BATADV_IF_ACTIVE while the latter makes
-> hard_iface->if_status == BATADV_IF_TO_BE_ACTIVATED (because batadv_iv_ogm_schedule_buff()
-> is not called).
-> 
-> This difference makes operations that depend on hard_iface->if_status == BATADV_IF_ACTIVE
-> impossible to work properly. You can confirm this difference using diff show below.
+                /* Where the MAC augments the WoL support, merge its support and
+                 * current configuration.
+                 */
+                if (~wol->wolopts & pl->wolopts_mac & WAKE_MAGICSECURE)
+                        memcpy(wol->sopass, pl->wol_sopass,
+                               sizeof(wol->sopass));
 
-This is again (in my opinion) this kind of (odd) absolute statement again. 
-"impossible to work properly" - this sounds like BATADV_IF_TO_BE_ACTIVATED is 
-an state which you cannot escape. And that functions/operations depend on 
-BATADV_IF_ACTIVE. Both statements are not really true. 
+                wol->supported |= pl->config->wol_mac_support;
+                wol->wolopts |= pl->wolopts_mac;
 
-BATADV_IF_TO_BE_ACTIVATED is a transient state and some algorithm depending 
-code is responsible to automatically get it in the BATADV_IF_ACTIVE state. 
-This is somewhat important here because the first time I read your second 
-mail, I was under the impression that something in the reproducer showed that 
-the state would be stuck. I searched rather hard in the code but couldn't find 
-the reason for this. Only much later, I decided to ignore all this and look 
-what the reproducer is actually doing. And also ignore commit 9e6b5648bbc4 
-("batman-adv: Fix duplicated OGMs on NETDEV_UP") - because it was impossible 
-for me to reproduce it on this commit.
+with:
 
-And regarding the functions/operations which "impossible to work properly": 
-called functions must "work properly" independent of the state. Just what 
-they are doing as work can be different depending on the state. But maybe this 
-is a case of "glass is half full" vs "glass is half empty".
+static bool phylink_mac_supports_wol(struct phylink *pl)
+{
+        return !!pl->mac_ops->mac_wol_set;
+}
 
-The problem is therefore that some function broke this "promise". Your second 
-mail (and the patch) was then basically saying "BATADV_IF_TO_BE_ACTIVATED" must 
-not exist and we must directly go to BATADV_IF_ACTIVE. (Even if this is in my 
-opinion not the right statement) it never said why it must not exist and what 
-broke because of "BATADV_IF_TO_BE_ACTIVATED".
+static bool phylink_phy_supports_wol(struct phylink *pl,
+                                     struct phy_device *phydev)
+{
+        return phydev && (pl->config->wol_phy_legacy || phy_can_wakeup(phydev));
+}
 
-The inline calltraces with detailed statements in subclauses make it 
-harder to digest. Some small high level statements like 
+static inline bool phy_can_wakeup(struct phy_device *phydev)
+{
+        return device_can_wakeup(&phydev->mdio.dev);
+}
 
-"I don't know exactly what the underlying problem is but skipping 
-BATADV_IF_TO_BE_ACTIVATED in batadv_hardif_activate_interface() seems to work 
-around the problem. I suspect that some function is not handling 
-BATADV_IF_TO_BE_ACTIVATED correctly. Maybe some kind of race condition between 
-switching to BATADV_IF_ACTIVE and executing some specific code. Here are my 
-detailed notes:"
+This is to cope with PHYs that respond to phy_ethtool_get_wol()
+reporting that they support WoL but have no capability to actually wake
+the system up. MACs can choose whether to override that by setting
+phylink_config->wol_phy_legacy.
 
-would have helped me not to get stuck too long in the interpretation of 
-paragraphs. But at the same time, would have given a lot of pointers in the 
-right direction. But maybe I would have been stuck anyway - no idea.
+Much like taking this logic away from MAC driver authors, I think we
+need to take the logic around "can this PHY actually wake-up the
+system" away from the PHY driver author. I believe every driver that
+supports WoL with the exception of realtek and broadcom.c reports that
+WoL is supported and accepts set_wol() even when they're not capable
+of waking the system. e.g. bcm_phy_get_wol():
 
-Anyway, I hope we found the problem now and thanks for the help.
+        wol->supported = BCM54XX_WOL_SUPPORTED_MASK;
+        wol->wolopts = 0;
 
-Regards,
-	Sven
---nextPart879527330.0ifERbkFSE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
+with no prior checks. This is why the "phylink_phy_supports_wol()"
+logic above is necessary, otherwise implementing this "use either
+the PHY or MAC" logic will break stuff.
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCaNjoqgAKCRBND3cr0xT1
-y9m2AP9zRfPoLfv/wRBSat2mfNow7negQymlLIHciFrlhp2rtwEAnyVyDoxTT9i5
-5s8TyBYZJG6NFxFWKvIkbuasC+XR5Q4=
-=t2sP
------END PGP SIGNATURE-----
-
---nextPart879527330.0ifERbkFSE--
-
-
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
