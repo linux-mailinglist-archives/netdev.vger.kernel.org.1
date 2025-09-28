@@ -1,121 +1,142 @@
-Return-Path: <netdev+bounces-227014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E16BEBA6E08
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 11:41:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 955C0BA6E4D
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 11:51:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A2471898DDC
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 09:41:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0729A1898D97
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 09:51:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 542942D97BC;
-	Sun, 28 Sep 2025 09:41:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773A82D837C;
+	Sun, 28 Sep 2025 09:51:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ewWGVe3W"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CA52D94B6
-	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 09:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C2E248F51
+	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 09:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759052489; cv=none; b=cvnvHLZoKaiKUhelZ6zM/HBDacTKZrZCiKMEoSi6qgIUYS6j79Pikmx+SJQrCwBg+Tc3ZIRgU5Sm0JK8YEODATCgmiJZST+aqcTDEAWk6kPh8USLdOp7/amzW90VUqLF2wKI1mP+Ly3GvMpmCOPc6ugIR/4YhcLaev9gQvrzEX0=
+	t=1759053075; cv=none; b=nd/IFdVNkBVAxg7wyq3cyXsuGJEA1GoZ9AjpRSasGgqemT1qzuSBEJ21GGhdZ44E6xRya2VTO5qqePh5PK6oUDTK8QLq0TdyZtmexssskcuRel5m9j7iB5GoWc0ORqdQzdR/qHz/uUJXZc1v0msMCUfWZ9jf5Ea5GsTaN0QKRDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759052489; c=relaxed/simple;
-	bh=Egggm009o9ydsBPYkkTMiLNXjMsxR3MW0UWUMx0t3fE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CFSNuHKfw1yYibQASUcysypk/DXcJv0Z/0d3x6YoKCypDW0YABcqwrlfcNEsRlWG/HL7wZavqjoj4v9GGE7diNaLxI8P18rmZtBmv2jhe1D/dfgDyudNmrkZS/6V0VWac6Sn9VNgUcPxz4QczFHGFUa/tu5lt8XqU5mOEcJddIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.169.211.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: zesmtpgz1t1759052378t180050c8
-X-QQ-Originating-IP: DLdCGOK+JfJ4nPQvNeRfYVVJmj11ybUjOrsC8eZ1BDc=
-Received: from lap-jiawenwu.trustnetic.com ( [115.220.225.164])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 28 Sep 2025 17:39:37 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 18066968773018638031
-EX-QQ-RecipientCnt: 10
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1759053075; c=relaxed/simple;
+	bh=sH7BY+yftEWOmV5+CBFuciiemI+6cPg5ETATp6icdQg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oeTX5/UE2BTYC3znk5yvg5jD85QUdSvXFZTrP7OnVe4CuBvs8IQM5nTOgz7ZNr5Pz7eXRcGZiEuoYnOnyAfrX7lgneIUROO/q0mRCTcd+GbBO//Zo8SdPAimEmKrlcIu4Tt6I6oT1rR4v6I0hf3Vfkfd+HKja7LAHGPRwSdyLbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ewWGVe3W; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=FI12eMvVoMJL57V5n681dIivJzNSe8NDLqayNDsDEV8=; b=ewWGVe3WYPeMRiN/NVirmpuIFn
+	VNow/t8OKcBqaRs3Z+r9CI8s8QZ63573Im23f+mZ54IMdO3nuQfxU7K2YXc6PkcDbLOqmCptGDrFY
+	wTg8Xpd/K6Vwjh8K+N0q+ti4ZX0TF5kgAYwqmVkJTdyk0+Nu+uNbc2qzNgm31rgvRaW7mHSaeNyqg
+	W7TZW7UfnZMqU4WMCpFifh/MOVjRz1TVBzSrFWI4Ufzagw1KWjHlipLCk6wwPNWrWGIcWD4zXCo0K
+	JLmIp5hyeAupXDI5D2ZWCaofLvdBbFq27Ivceud4qGpI25I2M6HO62uT/8Lke7ZiJXP1kDXfWI+9W
+	KpuaJy3Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35958)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v2o3i-000000005Xk-0wml;
+	Sun, 28 Sep 2025 10:51:10 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v2o3g-000000002Tl-1QDe;
+	Sun, 28 Sep 2025 10:51:08 +0100
+Date: Sun, 28 Sep 2025 10:51:08 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next 3/3] net: txgbe: rename txgbe_get_phy_link()
-Date: Sun, 28 Sep 2025 17:39:23 +0800
-Message-Id: <20250928093923.30456-4-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20250928093923.30456-1-jiawenwu@trustnetic.com>
-References: <20250928093923.30456-1-jiawenwu@trustnetic.com>
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Subject: Re: [PATCH RFC net-next 11/20] net: dsa: mv88e6xxx: split out EXTTS
+ pin setup
+Message-ID: <aNkFDGQwm-qkgkvV@shell.armlinux.org.uk>
+References: <aMxDh17knIDhJany@shell.armlinux.org.uk>
+ <E1uzIbk-00000006n06-0a3X@rmk-PC.armlinux.org.uk>
+ <eabf052b-02a0-4440-b0f7-c831d9ebaa23@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: MH85Y1C9n92PxIdxquD1sjfGIWO5Jl8E+JFnIvTxguJ/wWcpb14NyLHN
-	XT6V6OCNd62cKwNCKk5jfWAoIBmAQYrfeP9te2ltdJ089Do+/9wF/ikGloICF1qImO04saN
-	ezs/IndBUu8xokzv6poVBqZ3ojyUvW57YFB4HxsLv0TlzGNVeDt82QeN7oZmdgNwSF7dtHZ
-	nvZo2q2sIR+ONd4NS53+zReOK9x8r9eLfcAzqGuI77yf5BXxyJ3oBTYkinF1PQUrY4xSOuB
-	l4TEjYszMRT8JE5EYU3K58zfw5Y6Aew4G4ZjMXx0bdiqlupSWRM6QPNdD20RWDGInuws05G
-	EQVWLVPU0bx/BDAY//ZspOPDJhdYQokNip2TFb/2okcO+pCbUCe1hNZXJfCnGLE4iB9JLHN
-	+F4IhVzMxSJZ0EX8znxGEdVxzYSqabDtdOHM1svNTMSdHHdlIUNpA7TgLuHfVJq2B7yXi+J
-	VfKGrbxGfyHexJgl9U8pC0iZQU/sUU+SVd9JIEhY0Iqtzmq0gGlHQU4IBh3yczwlSsiHOFW
-	tImwE5LQmZyuQ+bOE4qSlcsBPqNwyLs8ia1g3OVbBKsMBrNuee0aPsBqe8W+FK50wajhteP
-	b5Hhi4VTm2mFrLGORA2Hh5LEsdn/5oMxeI6Tw+GU5RgBTKUoTtUx3SocoarV2MbdZ7GtUfc
-	/uuRYvw6DkEmGLwuMfL5Job+OcFyJUUr2fHAE8QJOh1nUEK0mse2soVBW+ltcCFQqKCb+5N
-	zoMmT+mDGZViejhsC9lyEDSy0Wmm43fJG4IcjZzQHSu+3IwS2WTS0WsTcXZxNU7cz33bEMI
-	O0n0AjFCcIxwR+n48kz2iU/1ILent0KCcvD5Fs2Y9t6wqcZUyxIH/ioZz3qVxo1UHAy1SuX
-	3KAot8aCu6XCJrSL1kjJvH/WX0KJd5zjOGL1OM2kLxlBntSmZ5GrAdjy4M5ig5VJ8ZEkfl2
-	vA12d/97mPa+te3/Cha8AKHKEO0P7Xal9AZc5K20CCRV0bEc5DtCGS3eA3HiKUWoN86GV59
-	YWsqruIhdnvGbIttGTRQJmBvBwxTE95/y1r/cyKHhFY6iFKGvhyWwZRSxJbxWIjKBNRIL5C
-	wkVNLqIP2fO
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eabf052b-02a0-4440-b0f7-c831d9ebaa23@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-The function txgbe_get_phy_link() is more appropriately named
-txgbe_get_mac_link(), since it reads the link status from the MAC
-register.
+On Thu, Sep 18, 2025 at 10:59:07PM +0200, Andrew Lunn wrote:
+> >  static const struct mv88e6xxx_cc_coeffs *
+> >  mv88e6xxx_cc_coeff_get(struct mv88e6xxx_chip *chip)
+> >  {
+> > @@ -352,27 +366,18 @@ static int mv88e6352_ptp_enable_extts(struct mv88e6xxx_chip *chip,
+> >  		return -EBUSY;
+> >  
+> >  	mv88e6xxx_reg_lock(chip);
+> > +	err = mv88e6352_ptp_pin_setup(chip, pin, PTP_PF_EXTTS, on);
+> >  
+> > -	if (on) {
+> > -		func = MV88E6352_G2_SCRATCH_GPIO_PCTL_EVREQ;
+> > -
+> > -		err = mv88e6352_set_gpio_func(chip, pin, func, true);
+> > -		if (err)
+> > -			goto out;
+> > -
+> > +	if (!on) {
+> 
+> Inverting the if () makes this a little bit harder to review. But it
+> does remove a goto. I probably would of kept the code in the same
+> order. But:
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+It's not the goto, but:
 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-index 1da92431c324..35eebdb07761 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-@@ -118,7 +118,7 @@ static void txgbe_get_link_capabilities(struct wx *wx, int *speed, int *duplex)
- 	*duplex = *speed == SPEED_UNKNOWN ? DUPLEX_HALF : DUPLEX_FULL;
- }
- 
--static void txgbe_get_phy_link(struct wx *wx, int *speed)
-+static void txgbe_get_mac_link(struct wx *wx, int *speed)
- {
- 	u32 status;
- 
-@@ -234,7 +234,7 @@ static void txgbe_get_link_state(struct phylink_config *config,
- 	struct wx *wx = phylink_to_wx(config);
- 	int speed;
- 
--	txgbe_get_phy_link(wx, &speed);
-+	txgbe_get_mac_link(wx, &speed);
- 	state->link = speed != SPEED_UNKNOWN;
- 	state->speed = speed;
- 	state->duplex = state->link ? DUPLEX_FULL : DUPLEX_UNKNOWN;
+	if (on && !err) {
+                schedule_delayed_work(&chip->tai_event_work,
+                                      TAI_EVENT_WORK_INTERVAL);
+
+                err = mv88e6352_config_eventcap(chip, rising);
+	} else if (!on) {
+                /* Always cancel the work, even if an error occurs */
+                cancel_delayed_work_sync(&chip->tai_event_work);
+	}
+
+would be the alternative, which is IMHO less readable, and more
+error-prone. However, there is an issue that if
+mv88e6352_config_eventcap() returns an error, we leave the work
+scheduled. So maybe:
+
+	if (on && !err) {
+                schedule_delayed_work(&chip->tai_event_work,
+                                      TAI_EVENT_WORK_INTERVAL);
+
+                err = mv88e6352_config_eventcap(chip, rising);
+	}
+
+	if (!on || err) {
+                /* Always cancel the work, even if an error occurs */
+                cancel_delayed_work_sync(&chip->tai_event_work);
+	}
+
+which is more difficult to get one's head around.
+
 -- 
-2.48.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
