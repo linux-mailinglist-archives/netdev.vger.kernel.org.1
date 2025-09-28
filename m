@@ -1,571 +1,216 @@
-Return-Path: <netdev+bounces-227024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2321BA713B
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 15:51:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFE43BA7168
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 16:16:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B7DD94E0349
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 13:51:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6615D3B5F39
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 14:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3607E1D130E;
-	Sun, 28 Sep 2025 13:51:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0EE1F462C;
+	Sun, 28 Sep 2025 14:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oj2uaTpB"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="qWLpetk1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.15.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106FC4C98
-	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 13:51:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B42185B67;
+	Sun, 28 Sep 2025 14:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759067487; cv=none; b=LRJZhNTSJDrxMI84P6lFU8KghAj9p35fpgWG59btXncopggNWNFDpfuy4X/1dHFgf0ROqBgYDKewE3Xi2W81DE+1ib3GWr5ye/+Q72UedVhccW4mJGId+kybWefB3Yhj+07DWkN36y3mZYOfXcTuRyi9tHPZsJUH/tMpdtyiXcA=
+	t=1759068980; cv=none; b=hqu79oz1CIsDSUS0Ik9y2uldSN8OrEaChfjf8OvpBMVrjYvhraaTE7FnZTI7ay/yv/Ch4ay9cMMvaDCY8DLjOhgIW/s9F1slaxgIOUUwfT8zg4nYSfjeHa98+BS/lPp+HfM3D/FmFWYaPDq5okVpj6IGSAUsEudnuMe0t+9KTX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759067487; c=relaxed/simple;
-	bh=WNHLuj1DVHQxL8XSb9h/Jbhkhrfyh2r/EZ0IDKG0dFE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fr6RWjxwHTbsTE+jT8yPOOEo7iHuP6MFKCRovRg+mh/ZC57Bdp+zN1vmGSPy8cLUbJ09bKsu/hznbVQG4PwyM4zdQyfLYkp6i9v1w86e2zJ5Kh+WRRFDcEbQdMZXB2010s+KuU9MNhaquvuJVc3aUlc7rmdAnhqZnMvTgOIY/WQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oj2uaTpB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8913FC4CEF0
-	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 13:51:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759067486;
-	bh=WNHLuj1DVHQxL8XSb9h/Jbhkhrfyh2r/EZ0IDKG0dFE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Oj2uaTpBZOFKHDq98vKONbtdzd3/gZyZgkOFSpLdLbns0gU3/zt7HIL0J4m+ptljT
-	 2J84KQkmZvV/1k0B2QwWye/QsRfVoziBpB7rF/visVB1OKOhvFW1LxCs/KNnJPLgaa
-	 K4ola5ZCj+O5cSzQSL8pnX1CY/LoX+XGWmq749fndFlS+8s3azJMFqQovAF0qyJkgO
-	 2/13zWAS3OUAm7BBWzilvzJ1Ps9Lsy9Wm6Pftlp0jAqg3y1fYSWSLyGTrcInCY7db0
-	 pNUgzHiS1Vx5FBb68W8bpCVreES5R/psD2sPyMudR1c751IeWm8XKt/VvjP4Zq/9+I
-	 wT+EbcvP3TIlQ==
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-581b92e680bso4661209e87.0
-        for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 06:51:26 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzrLCl8xPF2Vx/bnF7q3BtcRsh99kCqB/sbgzkSZgReQz4EOFNd
-	fpuTux0jOQfMACNxM31rF5/9bGukThjUw0SyiWAFXa45nXjmP2CGTSNLbECreGcsy4nqSalKV6S
-	I1KDL37BPwqa3Ww+ZThKInEPBTstkdEw=
-X-Google-Smtp-Source: AGHT+IHtT8s7cf/Igz8hDJnDvLNiLkhl/WbUwA/+Y2ICnmrB7rPUSVrDdwURQn4q3xiCMVY/Fuc9FfNyP80aB+9Mq2g=
-X-Received: by 2002:a05:6512:10c3:b0:579:5d8e:1629 with SMTP id
- 2adb3069b0e04-5857f272139mr1856031e87.12.1759067484817; Sun, 28 Sep 2025
- 06:51:24 -0700 (PDT)
+	s=arc-20240116; t=1759068980; c=relaxed/simple;
+	bh=AcVJZ3zjTGDdL14Tw7LuQrtPZgPW/ebeShaSrL2ipR8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QoJfxcziM+H0+Z3Uk9nkCCLtt/C/VblgCrWoFa8iUwbl4rJnyY6KN/UJjDyX9eE/lsdgQBAT+ql9T2pO9S+z0OW8cpEAyRLdD7YdejicKZaUNBni8Gd3NfrxKTh6bzIkPLrvOS7DdtO3UCX2acFPKN6fSsX0SepW1ZH+xwpc3pA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=qWLpetk1; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1759068967; x=1759673767; i=markus.elfring@web.de;
+	bh=AcVJZ3zjTGDdL14Tw7LuQrtPZgPW/ebeShaSrL2ipR8=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=qWLpetk1NOdGaf834cP6bUAVVXFqBWk7p79h8VsWG+rMBT72O5Bv3ZigEEmNtFKV
+	 jMaAd2xrXQ84vKBBNU6caX4n7t+3Bsk8SP/LJAI8OHifh4z0Z0BgauwRQD10fRg1f
+	 jlgdq0KQWgv1W7JlTdHoleFzrUeq/0pVuHL3WplNzwi6Towj0vqVz9sRCDhc3Xgae
+	 XCilKeizePykF6FAbgB7Uh74SjUSWpm2U0sfymlJT8eV+k/L8UijxNTRUdXk8XOuP
+	 OOc0jyet1l+rvi3zWPKgpYee4joYQwue67BcociliLSYbfhOB51cMCAWhgNsT+UlK
+	 aL1FrLD57fdNC5wY2w==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.69.189]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MqZMK-1uYGT13572-00qilt; Sun, 28
+ Sep 2025 16:16:07 +0200
+Message-ID: <5b8b05c8-91db-40a2-8aff-c6e214b1202f@web.de>
+Date: Sun, 28 Sep 2025 16:16:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250925225322.13013-1-ebiggers@kernel.org>
-In-Reply-To: <20250925225322.13013-1-ebiggers@kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Sun, 28 Sep 2025 15:51:13 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXE00UdJD+exgg+4NK+g6x+qvSCqN=TO2ew8UFO0F1MqqA@mail.gmail.com>
-X-Gm-Features: AS18NWAeKR4H_FwiHH_ngz_9Q65HWf3Eq6IyXvNYiRIO1X02TTEPMN-QdoCgOkY
-Message-ID: <CAMj1kXE00UdJD+exgg+4NK+g6x+qvSCqN=TO2ew8UFO0F1MqqA@mail.gmail.com>
-Subject: Re: [PATCH iproute2-next] lib/bpf_legacy: Use userspace SHA-1 code
- instead of AF_ALG
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org, Stephen Hemminger <stephen@networkplumber.org>, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [cocci] [PATCH net-next 1/2] scripts/coccinelle: Find PTR_ERR()
+ to %pe candidates
+To: Gal Pressman <gal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ cocci@inria.fr, Alexei Lazar <alazar@nvidia.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
+ Mark Bloch <mbloch@nvidia.com>, Nicolas Palix <nicolas.palix@imag.fr>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Saeed Mahameed <saeedm@nvidia.com>
+References: <1758192227-701925-1-git-send-email-tariqt@nvidia.com>
+ <1758192227-701925-2-git-send-email-tariqt@nvidia.com>
+ <48a8dbb8-adf1-475e-897d-7369e2c3f6eb@web.de>
+ <48228618-083b-4cdb-b7df-aa9b7ff0ce92@nvidia.com>
+ <8b0034a7-f63b-4a98-a812-69b988dd3785@web.de>
+ <7d46a1d1-f205-4751-9f7d-6a219be04801@nvidia.com>
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <7d46a1d1-f205-4751-9f7d-6a219be04801@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:0hatDYEYy2uD29QN3EaTBTxU5tOZ6ZzrC5GplzxlKO1EXaS/LXk
+ wOxwomn9HNCRV8/CAKUNk3V473/donib2HWXdP9U+DaiKTBXcI/8HRRbDitvM2ak8deQQfC
+ B2pqx+kHnv9qLO/oGNZnhaBbkvZkaVazKppZV+65sxD4/zkl6hCi/7Qsw+b5ExD7OK1o5O2
+ j2HWjmR1BqaT70uYtC/wA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:Z4NZJCk4/dw=;dA3orOOxN1X2hVgjehhdf9uVwzt
+ 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
+ 03S+Q==
 
-On Fri, 26 Sept 2025 at 00:54, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> Add a basic SHA-1 implementation to lib/, and make lib/bpf_legacy.c use
-> it to calculate the SHA-1 digest of BPF objects instead of the previous
-> AF_ALG-based code.  This eliminates the dependency on the kernel config
-> options CONFIG_CRYPTO_USER_API_HASH and CONFIG_CRYPTO_SHA1.
->
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+>>>>> +virtual context
+>>>>> +virtual org
+>>>>> +virtual report
+>>>>
+>>>> The restriction on the support for three operation modes will need fu=
+rther development considerations.
+>>>
+>>> I don't understand what you mean?
+>>
+>> The development status might be unclear for the handling of a varying n=
+umber of operation modes
+>> by coccicheck rules, isn't it?
+>=20
+> I'm sorry, I still don't understand what you mean (the problem is likely
+> on my side).
 
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
-
-Perhaps -in case the maintainer is not convinced- add a paragraph to
-the commit log explaining that using AF_ALG to invoke the kernel's
-software SHA1 implementation is a terrible idea, and should have never
-existed in this form in the first place? (AF_ALG's original purpose
-was to expose h/w crypto accelerators to user space but we
-accidentally ended up exposing kernel software implementations that
-should simply execute in user space entirely)
+The development status is evolving somehow.
 
 
-> ---
->  include/bpf_util.h          |   5 --
->  include/sha1.h              |  18 ++++++
->  include/uapi/linux/if_alg.h |  61 --------------------
->  lib/Makefile                |   2 +-
->  lib/bpf_legacy.c            | 109 +++++++++---------------------------
->  lib/sha1.c                  | 108 +++++++++++++++++++++++++++++++++++
->  6 files changed, 154 insertions(+), 149 deletions(-)
->  create mode 100644 include/sha1.h
->  delete mode 100644 include/uapi/linux/if_alg.h
->  create mode 100644 lib/sha1.c
->
-> diff --git a/include/bpf_util.h b/include/bpf_util.h
-> index 8951a5e8..e1b8d327 100644
-> --- a/include/bpf_util.h
-> +++ b/include/bpf_util.h
-> @@ -12,11 +12,10 @@
->  #include <linux/bpf.h>
->  #include <linux/btf.h>
->  #include <linux/filter.h>
->  #include <linux/magic.h>
->  #include <linux/elf-em.h>
-> -#include <linux/if_alg.h>
->
->  #include "utils.h"
->  #include "bpf_scm.h"
->
->  #define BPF_ENV_UDS    "TC_BPF_UDS"
-> @@ -38,14 +37,10 @@
->  # define TRACEFS_MAGIC 0x74726163
->  #endif
->
->  #define TRACE_DIR_MNT  "/sys/kernel/tracing"
->
-> -#ifndef AF_ALG
-> -# define AF_ALG                38
-> -#endif
-> -
->  #ifndef EM_BPF
->  # define EM_BPF                247
->  #endif
->
->  struct bpf_cfg_ops {
-> diff --git a/include/sha1.h b/include/sha1.h
-> new file mode 100644
-> index 00000000..4a2ed513
-> --- /dev/null
-> +++ b/include/sha1.h
-> @@ -0,0 +1,18 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +/*
-> + * SHA-1 message digest algorithm
-> + *
-> + * Copyright 2025 Google LLC
-> + */
-> +#ifndef __SHA1_H__
-> +#define __SHA1_H__
-> +
-> +#include <linux/types.h>
-> +#include <stddef.h>
-> +
-> +#define SHA1_DIGEST_SIZE 20
-> +#define SHA1_BLOCK_SIZE 64
-> +
-> +void sha1(const __u8 *data, size_t len, __u8 out[SHA1_DIGEST_SIZE]);
-> +
-> +#endif /* __SHA1_H__ */
-> diff --git a/include/uapi/linux/if_alg.h b/include/uapi/linux/if_alg.h
-> deleted file mode 100644
-> index 0824fbc0..00000000
-> --- a/include/uapi/linux/if_alg.h
-> +++ /dev/null
-> @@ -1,61 +0,0 @@
-> -/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
-> -/*
-> - * if_alg: User-space algorithm interface
-> - *
-> - * Copyright (c) 2010 Herbert Xu <herbert@gondor.apana.org.au>
-> - *
-> - * This program is free software; you can redistribute it and/or modify it
-> - * under the terms of the GNU General Public License as published by the Free
-> - * Software Foundation; either version 2 of the License, or (at your option)
-> - * any later version.
-> - *
-> - */
-> -
-> -#ifndef _LINUX_IF_ALG_H
-> -#define _LINUX_IF_ALG_H
-> -
-> -#include <linux/types.h>
-> -
-> -struct sockaddr_alg {
-> -       __u16   salg_family;
-> -       __u8    salg_type[14];
-> -       __u32   salg_feat;
-> -       __u32   salg_mask;
-> -       __u8    salg_name[64];
-> -};
-> -
-> -/*
-> - * Linux v4.12 and later removed the 64-byte limit on salg_name[]; it's now an
-> - * arbitrary-length field.  We had to keep the original struct above for source
-> - * compatibility with existing userspace programs, though.  Use the new struct
-> - * below if support for very long algorithm names is needed.  To do this,
-> - * allocate 'sizeof(struct sockaddr_alg_new) + strlen(algname) + 1' bytes, and
-> - * copy algname (including the null terminator) into salg_name.
-> - */
-> -struct sockaddr_alg_new {
-> -       __u16   salg_family;
-> -       __u8    salg_type[14];
-> -       __u32   salg_feat;
-> -       __u32   salg_mask;
-> -       __u8    salg_name[];
-> -};
-> -
-> -struct af_alg_iv {
-> -       __u32   ivlen;
-> -       __u8    iv[];
-> -};
-> -
-> -/* Socket options */
-> -#define ALG_SET_KEY                    1
-> -#define ALG_SET_IV                     2
-> -#define ALG_SET_OP                     3
-> -#define ALG_SET_AEAD_ASSOCLEN          4
-> -#define ALG_SET_AEAD_AUTHSIZE          5
-> -#define ALG_SET_DRBG_ENTROPY           6
-> -#define ALG_SET_KEY_BY_KEY_SERIAL      7
-> -
-> -/* Operations */
-> -#define ALG_OP_DECRYPT                 0
-> -#define ALG_OP_ENCRYPT                 1
-> -
-> -#endif /* _LINUX_IF_ALG_H */
-> diff --git a/lib/Makefile b/lib/Makefile
-> index 0ba62942..ee1e2e87 100644
-> --- a/lib/Makefile
-> +++ b/lib/Makefile
-> @@ -4,11 +4,11 @@ include ../config.mk
->  CFLAGS += -fPIC
->
->  UTILOBJ = utils.o utils_math.o rt_names.o ll_map.o ll_types.o ll_proto.o ll_addr.o \
->         inet_proto.o namespace.o json_writer.o json_print.o json_print_math.o \
->         names.o color.o bpf_legacy.o bpf_glue.o exec.o fs.o cg_map.o \
-> -       ppp_proto.o bridge.o
-> +       ppp_proto.o bridge.o sha1.o
->
->  ifeq ($(HAVE_ELF),y)
->  ifeq ($(HAVE_LIBBPF),y)
->  UTILOBJ += bpf_libbpf.o
->  endif
-> diff --git a/lib/bpf_legacy.c b/lib/bpf_legacy.c
-> index c8da4a3e..c4b1d5de 100644
-> --- a/lib/bpf_legacy.c
-> +++ b/lib/bpf_legacy.c
-> @@ -27,18 +27,19 @@
->
->  #include <sys/types.h>
->  #include <sys/stat.h>
->  #include <sys/un.h>
->  #include <sys/vfs.h>
-> +#include <sys/mman.h>
->  #include <sys/mount.h>
-> -#include <sys/sendfile.h>
->  #include <sys/resource.h>
->
->  #include <arpa/inet.h>
->
->  #include "utils.h"
->  #include "json_print.h"
-> +#include "sha1.h"
->
->  #include "bpf_util.h"
->  #include "bpf_elf.h"
->  #include "bpf_scm.h"
->
-> @@ -1178,11 +1179,10 @@ struct bpf_elf_ctx {
->         int                     sec_btf;
->         char                    license[ELF_MAX_LICENSE_LEN];
->         enum bpf_prog_type      type;
->         __u32                   ifindex;
->         bool                    verbose;
-> -       bool                    noafalg;
->         struct bpf_elf_st       stat;
->         struct bpf_hash_entry   *ht[256];
->         char                    *log;
->         size_t                  log_size;
->  };
-> @@ -1306,76 +1306,32 @@ static int bpf_obj_pin(int fd, const char *pathname)
->         attr.bpf_fd = fd;
->
->         return bpf(BPF_OBJ_PIN, &attr, sizeof(attr));
->  }
->
-> -static int bpf_obj_hash(const char *object, uint8_t *out, size_t len)
-> +static int bpf_obj_hash(int fd, const char *object, __u8 out[SHA1_DIGEST_SIZE])
->  {
-> -       struct sockaddr_alg alg = {
-> -               .salg_family    = AF_ALG,
-> -               .salg_type      = "hash",
-> -               .salg_name      = "sha1",
-> -       };
-> -       int ret, cfd, ofd, ffd;
->         struct stat stbuff;
-> -       ssize_t size;
-> -
-> -       if (!object || len != 20)
-> -               return -EINVAL;
-> -
-> -       cfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
-> -       if (cfd < 0)
-> -               return cfd;
-> +       void *data;
->
-> -       ret = bind(cfd, (struct sockaddr *)&alg, sizeof(alg));
-> -       if (ret < 0)
-> -               goto out_cfd;
-> -
-> -       ofd = accept(cfd, NULL, 0);
-> -       if (ofd < 0) {
-> -               ret = ofd;
-> -               goto out_cfd;
-> +       if (fstat(fd, &stbuff) < 0) {
-> +               fprintf(stderr, "Error doing fstat: %s\n", strerror(errno));
-> +               return -1;
->         }
-> -
-> -       ffd = open(object, O_RDONLY);
-> -       if (ffd < 0) {
-> -               fprintf(stderr, "Error opening object %s: %s\n",
-> -                       object, strerror(errno));
-> -               ret = ffd;
-> -               goto out_ofd;
-> +       if ((size_t)stbuff.st_size != stbuff.st_size) {
-> +               fprintf(stderr, "Object %s is too big\n", object);
-> +               return -EFBIG;
->         }
-> -
-> -       ret = fstat(ffd, &stbuff);
-> -       if (ret < 0) {
-> -               fprintf(stderr, "Error doing fstat: %s\n",
-> +       data = mmap(NULL, stbuff.st_size, PROT_READ, MAP_SHARED, fd, 0);
-> +       if (data == MAP_FAILED) {
-> +               fprintf(stderr, "Error mapping object %s: %s\n", object,
->                         strerror(errno));
-> -               goto out_ffd;
-> -       }
-> -
-> -       size = sendfile(ofd, ffd, NULL, stbuff.st_size);
-> -       if (size != stbuff.st_size) {
-> -               fprintf(stderr, "Error from sendfile (%zd vs %zu bytes): %s\n",
-> -                       size, stbuff.st_size, strerror(errno));
-> -               ret = -1;
-> -               goto out_ffd;
-> +               return -1;
->         }
-> -
-> -       size = read(ofd, out, len);
-> -       if (size != len) {
-> -               fprintf(stderr, "Error from read (%zd vs %zu bytes): %s\n",
-> -                       size, len, strerror(errno));
-> -               ret = -1;
-> -       } else {
-> -               ret = 0;
-> -       }
-> -out_ffd:
-> -       close(ffd);
-> -out_ofd:
-> -       close(ofd);
-> -out_cfd:
-> -       close(cfd);
-> -       return ret;
-> +       sha1(data, stbuff.st_size, out);
-> +       munmap(data, stbuff.st_size);
-> +       return 0;
->  }
->
->  static void bpf_init_env(void)
->  {
->         struct rlimit limit = {
-> @@ -1812,16 +1768,10 @@ static int bpf_maps_attach_all(struct bpf_elf_ctx *ctx)
->  {
->         int i, j, ret, fd, inner_fd, inner_idx, have_map_in_map = 0;
->         const char *map_name;
->
->         for (i = 0; i < ctx->map_num; i++) {
-> -               if (ctx->maps[i].pinning == PIN_OBJECT_NS &&
-> -                   ctx->noafalg) {
-> -                       fprintf(stderr, "Missing kernel AF_ALG support for PIN_OBJECT_NS!\n");
-> -                       return -ENOTSUP;
-> -               }
-> -
->                 map_name = bpf_map_fetch_name(ctx, i);
->                 if (!map_name)
->                         return -EIO;
->
->                 fd = bpf_map_attach(map_name, ctx, &ctx->maps[i],
-> @@ -2867,35 +2817,36 @@ static void bpf_get_cfg(struct bpf_elf_ctx *ctx)
->
->  static int bpf_elf_ctx_init(struct bpf_elf_ctx *ctx, const char *pathname,
->                             enum bpf_prog_type type, __u32 ifindex,
->                             bool verbose)
->  {
-> -       uint8_t tmp[20];
-> +       __u8 tmp[SHA1_DIGEST_SIZE];
->         int ret;
->
->         if (elf_version(EV_CURRENT) == EV_NONE)
->                 return -EINVAL;
->
->         bpf_init_env();
->
->         memset(ctx, 0, sizeof(*ctx));
->         bpf_get_cfg(ctx);
->
-> -       ret = bpf_obj_hash(pathname, tmp, sizeof(tmp));
-> -       if (ret)
-> -               ctx->noafalg = true;
-> -       else
-> -               hexstring_n2a(tmp, sizeof(tmp), ctx->obj_uid,
-> -                             sizeof(ctx->obj_uid));
-> -
->         ctx->verbose = verbose;
->         ctx->type    = type;
->         ctx->ifindex = ifindex;
->
->         ctx->obj_fd = open(pathname, O_RDONLY);
-> -       if (ctx->obj_fd < 0)
-> +       if (ctx->obj_fd < 0) {
-> +               fprintf(stderr, "Error opening object %s: %s\n", pathname,
-> +                       strerror(errno));
->                 return ctx->obj_fd;
-> +       }
-> +
-> +       ret = bpf_obj_hash(ctx->obj_fd, pathname, tmp);
-> +       if (ret)
-> +               return ret;
-> +       hexstring_n2a(tmp, sizeof(tmp), ctx->obj_uid, sizeof(ctx->obj_uid));
->
->         ctx->elf_fd = elf_begin(ctx->obj_fd, ELF_C_READ, NULL);
->         if (!ctx->elf_fd) {
->                 ret = -EINVAL;
->                 goto out_fd;
-> @@ -3257,16 +3208,10 @@ bool iproute2_is_pin_map(const char *libbpf_map_name, char *pathname)
->         const char *map_name, *tmp;
->         unsigned int pinning;
->         int i, ret = 0;
->
->         for (i = 0; i < ctx->map_num; i++) {
-> -               if (ctx->maps[i].pinning == PIN_OBJECT_NS &&
-> -                   ctx->noafalg) {
-> -                       fprintf(stderr, "Missing kernel AF_ALG support for PIN_OBJECT_NS!\n");
-> -                       return false;
-> -               }
-> -
->                 map_name = bpf_map_fetch_name(ctx, i);
->                 if (!map_name) {
->                         return false;
->                 }
->
-> diff --git a/lib/sha1.c b/lib/sha1.c
-> new file mode 100644
-> index 00000000..1aa8fd83
-> --- /dev/null
-> +++ b/lib/sha1.c
-> @@ -0,0 +1,108 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * SHA-1 message digest algorithm
-> + *
-> + * Copyright 2025 Google LLC
-> + */
-> +
-> +#include <arpa/inet.h>
-> +#include <string.h>
-> +
-> +#include "sha1.h"
-> +#include "utils.h"
-> +
-> +static const __u32 sha1_K[4] = { 0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC,
-> +                                0xCA62C1D6 };
-> +
-> +static inline __u32 rol32(__u32 v, int bits)
-> +{
-> +       return (v << bits) | (v >> (32 - bits));
-> +}
-> +
-> +#define round_up(a, b) (((a) + (b) - 1) & ~((b) - 1))
-> +
-> +#define SHA1_ROUND(i, a, b, c, d, e)                                           \
-> +       do {                                                                   \
-> +               if ((i) >= 16)                                                 \
-> +                       w[i] = rol32(w[(i) - 16] ^ w[(i) - 14] ^ w[(i) - 8] ^  \
-> +                                            w[(i) - 3],                       \
-> +                                    1);                                       \
-> +               e += w[i] + rol32(a, 5) + sha1_K[(i) / 20];                    \
-> +               if ((i) < 20)                                                  \
-> +                       e += (b & (c ^ d)) ^ d;                                \
-> +               else if ((i) < 40 || (i) >= 60)                                \
-> +                       e += b ^ c ^ d;                                        \
-> +               else                                                           \
-> +                       e += (c & d) ^ (b & (c ^ d));                          \
-> +               b = rol32(b, 30);                                              \
-> +               /* The new (a, b, c, d, e) is the old (e, a, b, c, d). */      \
-> +       } while (0)
-> +
-> +#define SHA1_5ROUNDS(i)                                                        \
-> +       do {                                                                   \
-> +               SHA1_ROUND((i) + 0, a, b, c, d, e);                            \
-> +               SHA1_ROUND((i) + 1, e, a, b, c, d);                            \
-> +               SHA1_ROUND((i) + 2, d, e, a, b, c);                            \
-> +               SHA1_ROUND((i) + 3, c, d, e, a, b);                            \
-> +               SHA1_ROUND((i) + 4, b, c, d, e, a);                            \
-> +       } while (0)
-> +
-> +#define SHA1_20ROUNDS(i)                                                       \
-> +       do {                                                                   \
-> +               SHA1_5ROUNDS((i) + 0);                                         \
-> +               SHA1_5ROUNDS((i) + 5);                                         \
-> +               SHA1_5ROUNDS((i) + 10);                                        \
-> +               SHA1_5ROUNDS((i) + 15);                                        \
-> +       } while (0)
-> +
-> +static void sha1_blocks(__u32 h[5], const __u8 *data, size_t nblocks)
-> +{
-> +       while (nblocks--) {
-> +               __u32 a = h[0];
-> +               __u32 b = h[1];
-> +               __u32 c = h[2];
-> +               __u32 d = h[3];
-> +               __u32 e = h[4];
-> +               __u32 w[80];
-> +               int i;
-> +
-> +               memcpy(w, data, SHA1_BLOCK_SIZE);
-> +               for (i = 0; i < 16; i++)
-> +                       w[i] = ntohl(w[i]);
-> +               SHA1_20ROUNDS(0);
-> +               SHA1_20ROUNDS(20);
-> +               SHA1_20ROUNDS(40);
-> +               SHA1_20ROUNDS(60);
-> +
-> +               h[0] += a;
-> +               h[1] += b;
-> +               h[2] += c;
-> +               h[3] += d;
-> +               h[4] += e;
-> +               data += SHA1_BLOCK_SIZE;
-> +       }
-> +}
-> +
-> +/* Calculate the SHA-1 message digest of the given data. */
-> +void sha1(const __u8 *data, size_t len, __u8 out[SHA1_DIGEST_SIZE])
-> +{
-> +       __u32 h[5] = { 0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476,
-> +                      0xC3D2E1F0 };
-> +       const __be64 bitcount = htonll((__u64)len * 8);
-> +       __u8 final_data[2 * SHA1_BLOCK_SIZE] = { 0 };
-> +       size_t final_len = len % SHA1_BLOCK_SIZE;
-> +       int i;
-> +
-> +       sha1_blocks(h, data, len / SHA1_BLOCK_SIZE);
-> +
-> +       memcpy(final_data, data + len - final_len, final_len);
-> +       final_data[final_len] = 0x80;
-> +       final_len = round_up(final_len + 9, SHA1_BLOCK_SIZE);
-> +       memcpy(&final_data[final_len - 8], &bitcount, 8);
-> +
-> +       sha1_blocks(h, final_data, final_len / SHA1_BLOCK_SIZE);
-> +
-> +       for (i = 0; i < ARRAY_SIZE(h); i++)
-> +               h[i] = htonl(h[i]);
-> +       memcpy(out, h, SHA1_DIGEST_SIZE);
-> +}
->
-> base-commit: afceddf61037440628a5612f15a6eaefd28d9fd3
-> --
-> 2.51.0
->
+> Do you want me to change anything?
+
+You would like to achieve further software refinements.
+Did you notice remaining open issues from public information sources?
+
+
+>>>>> +p << r.p;
+>>>>> +@@
+>>>>> +coccilib.org.print_todo(p[0], "WARNING: Consider using %pe to print=
+ PTR_ERR()")
+>>>>
+>>>> I suggest to reconsider the implementation detail once more
+>>>> if the SmPL asterisk functionality fits really to the operation modes=
+ =E2=80=9Corg=E2=80=9D and =E2=80=9Creport=E2=80=9D.
+>>>>
+>>>> The operation mode =E2=80=9Ccontext=E2=80=9D can usually work also wi=
+thout an extra position variable,
+>>>> can't it?
+>>>
+>>> Can you please explain?
+>>
+>> Are you aware of data format requirements here?
+>=20
+> Apparently not, I'll be glad to learn.
+
+Each =E2=80=9Coperation mode=E2=80=9D is connected with a known data forma=
+t.
+The corresponding software documentation is probably still improvable.
+Can you determine data format distinctions from published coccicheck scrip=
+ts
+(and related development discussions)?
+
+Regards,
+Markus
 
