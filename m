@@ -1,301 +1,156 @@
-Return-Path: <netdev+bounces-226981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-226982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2368CBA6BD8
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 10:49:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 09C68BA6C32
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 10:56:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17FFC17D515
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 08:49:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B683617D5D1
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 08:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78122BE035;
-	Sun, 28 Sep 2025 08:49:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72292BEFEB;
+	Sun, 28 Sep 2025 08:56:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d9CM0cWJ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="oZuzW/vI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15D932BF007
-	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 08:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11895220F29;
+	Sun, 28 Sep 2025 08:56:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759049383; cv=none; b=p1HJ096by8EOYuwoZOU2un0qFDjSFPGPvVrGNLpXKwBN+nAaihbj1bBGtZaBNqM7L32sLsLnAVA/t3Iw5IW2kKtNL4uqfKHLw6bIzjlXLu/WPsYUu4qfqwN93vKDUD6ovdLouvTYd5t23BkyAQm0wxm3+MPc+gbCCN5gFL7w7N0=
+	t=1759049772; cv=none; b=FQP+wbovwwppCNaAxgoSgBucT6uNlSC/UEK84fQqzQ8KXX6RHePugPkHbjiJw5oNQCBhgAR6AtH8IhAeGQiGkPkJODUCcprmv+lngsD9yE3WxmpX95UFngxHMmcoc2St6KHwQ1Ov/tdltXnOKsQYJgfcLRuEEP4SWbButwHJxJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759049383; c=relaxed/simple;
-	bh=DFli9u4ZbMbWp1sRqJUF1ftdgohd99Hcmv0FcEv56cg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nAO8ZCRCLnDlFISQWmaeoXkl0Dbfq+AhjTfvREwLHXgYL5Q97WJPMp70f2oVwvk9xihCyVHO3drfYSpfBua9EZ0OiASUWXvKty6Z0cw6oEKsyM3kj0fsaD1RVpX3mRnBJ9n5pX1QIRfe2A7XCKCwKJapX8Qn0wVqEjihDW+dG+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d9CM0cWJ; arc=none smtp.client-ip=209.85.219.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-78e30eaca8eso110263836d6.2
-        for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 01:49:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759049381; x=1759654181; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PP3ipZbNRR+jPBDyd3OAXIDoqJFW7O5Mf85yGxDNXrQ=;
-        b=d9CM0cWJC7DA3xMVG4Q1VZH8HxY/dtdRwVfjTVLHqoVaehQEe8FxtCd8qHYgZDwcIr
-         zZcjsE4T+uyQO8jG+rCy/s90atP3tM7Ad0MwGj8kBQODZBAhAO1EjuGJZ/7imHyLR9q8
-         hQO15tUb4IBSL5iPg3dv5QQ6c9bpaHd2OlbdXlu9DXrnn/AnVQEl/DpQ04E6RYqFAQ9z
-         UtMGongxGw5wDJ2FVWo0dMcNa7Jg8s1MWwzhVW5YLc0URd6f5BHosc/zB9YTtrYCxYNn
-         9TeGxOGsv9WAoTEtSZ0IR+ra1cS3Q4lgYNO9+ruff2AVUu96lk5MaIgdln/4TvlBJvkq
-         7YlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759049381; x=1759654181;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PP3ipZbNRR+jPBDyd3OAXIDoqJFW7O5Mf85yGxDNXrQ=;
-        b=cXCTl4YECqf8lI32AIG6+pdWX4BQ1Dz9rRX9TNcbPNGs0DQtKhi0QOHkj5Cla8l1ef
-         lHgrhlYlX4VD0mmiPQ+uEpu2cfLyhKlHTwoeN/ZpjWhkdHP9rwcVxD8V4L3i8HlBJFNd
-         qhGG9j1heO/ikitkcIcouPkEZhCHSJ8s/1l3W6VEFhnqnOMXdrmZhmtIVK61Ke/ANljm
-         mzXwde4HwmjgC5R1xBQ/voZxAnEX+/0OjRosHegyl6YYZFzmmTWaeXvece2S68+vnjv9
-         MZmPV+Ooq6ttgewFgQwJ+s0kFCrCF+6vbGdkC2eNFOZ7JdYCsG+AJyE8IBKhTanhil/E
-         yNLg==
-X-Forwarded-Encrypted: i=1; AJvYcCXSmvgWa5xCsqJ01tVC8n930tVTWMD+TKh12RsQmWMUls2w8fiWtE6/tpfkiUN4Wa6nAsSOUUM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhiQzd8bgvHTGmUOJl+unuIH1W46QH08WrFAivkWTP4JSx/UX/
-	Q0ZvWMbPR3/rFIc1pGt2b3vsoBLaqAPWpxn0qoUXD0Wis9Q4QQ9ITq6NR3xlzwaXl6tPpx7c2jg
-	XFD1NnjP1O9g8Hg==
-X-Google-Smtp-Source: AGHT+IGgFF/uS0L+nAhSz4wlMRqmCeVD9w86nyFuYWKAK3OssFEYTYJb8ntnazOUEVpIYwTgmZXW1vEDYMOo8Q==
-X-Received: from qvad18.prod.google.com ([2002:a0c:f112:0:b0:7fb:ddb1:1bce])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:e44:b0:787:982:2953 with SMTP id 6a1803df08f44-7fc2fd7a8damr173345056d6.29.1759049380952;
- Sun, 28 Sep 2025 01:49:40 -0700 (PDT)
-Date: Sun, 28 Sep 2025 08:49:34 +0000
-In-Reply-To: <20250928084934.3266948-1-edumazet@google.com>
+	s=arc-20240116; t=1759049772; c=relaxed/simple;
+	bh=zzOVLn5rlREiZoVWqS+rg67a+p96DEH6adbwrj/aG44=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ntsmLhrh1T9aDJh2x+3jo3g0lPgVNqbc0s+Nu/hGxeUPF6h2z3f78ogfvqNvRR7zPhnUBHippDoCzHPogRG5k53BtTluM5ojVX4n03geLYPMIQRs1RiZ//0R3XbQTjkDEr5twjcCuWgdf/34FQWL5+Ts5j8pIwHh1hAfiwGV24Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=oZuzW/vI; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=eaEshSke7WWsFjbgjKG91woJG61C7g3CnfzoHwJbTuA=; b=oZuzW/vIzUPgZYfnMIHlje/k9/
+	W6/8bkTFGJGj6A70h1Qv4oljN7MCn5VGdznOvEhJ0Ouf26iOZParIaKSaw+kOvwEtwUncHnH56IeM
+	fCVFx/jpMWQje9yB0HJzWM2I+0xii4aqCTkELyDZ+ZN10PWMsQq3N0rghTPiLfTbN0V0gFVAzJFXp
+	Ozpy7EFJtSN03M21ToYmNXJSiSdCi4BeTZPv3OyVsx9nweswCO+7fyhvAveQZtcC3BJiy06PIceBY
+	drZ0PIJAX+j8MQYy5bX5PehiEqi+pIsHclH1VU0DHLCpFw9fqF6fvdPWex+0l5YEEl+02hAjChCR1
+	5HqI/vOw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54172)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v2nCL-0000000059y-1F6D;
+	Sun, 28 Sep 2025 09:56:01 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v2nCH-000000002RM-2cRk;
+	Sun, 28 Sep 2025 09:55:57 +0100
+Date: Sun, 28 Sep 2025 09:55:57 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Gatien Chevallier <gatien.chevallier@foss.st.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Christophe Roullier <christophe.roullier@foss.st.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Tristram Ha <Tristram.Ha@microchip.com>
+Subject: [PATCH RFC net-next 0/6] net: add phylink managed WoL and convert
+ stmmac
+Message-ID: <aNj4HY_mk4JDsD_D@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250928084934.3266948-1-edumazet@google.com>
-X-Mailer: git-send-email 2.51.0.536.g15c5d4f767-goog
-Message-ID: <20250928084934.3266948-4-edumazet@google.com>
-Subject: [PATCH v2 net-next 3/3] net: add NUMA awareness to skb_attempt_defer_free()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Jason Xing <kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Instead of sharing sd->defer_list & sd->defer_count with
-many cpus, add one pair for each NUMA node.
+Hi,
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
----
-v2: remove skb_defer_nodes leftover in net/core/dev.c,
-    its final location is in net_hotdata (Kuniyuki feedback)
+This experimental series is implementing the thoughts of Andrew,
+Florian and myself in an attempt to improve the quality of Wake-on-Lan
+(WoL) implementations.
 
- include/linux/netdevice.h |  4 ----
- include/net/hotdata.h     |  7 +++++++
- net/core/dev.c            | 35 +++++++++++++++++++++++------------
- net/core/dev.h            |  2 +-
- net/core/skbuff.c         | 11 ++++++-----
- 5 files changed, 37 insertions(+), 22 deletions(-)
+This changes nothing for MAC drivers that do not wish to participate in
+this, but if they do, then they gain the benefit of phylink configuring
+WoL at the point closest to the media as possible.
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 5c9aa16933d197f70746d64e5f44cae052d9971c..d1a687444b275d45d105e336d2ede264fd310f1b 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3536,10 +3536,6 @@ struct softnet_data {
- 
- 	struct numa_drop_counters drop_counters;
- 
--	/* Another possibly contended cache line */
--	struct llist_head	defer_list ____cacheline_aligned_in_smp;
--	atomic_long_t		defer_count;
--
- 	int			defer_ipi_scheduled ____cacheline_aligned_in_smp;
- 	call_single_data_t	defer_csd;
- };
-diff --git a/include/net/hotdata.h b/include/net/hotdata.h
-index fda94b2647ffa242c256c95ae929d9ef25e54f96..4acec191c54ab367ca12fff590d1f8c8aad64651 100644
---- a/include/net/hotdata.h
-+++ b/include/net/hotdata.h
-@@ -2,10 +2,16 @@
- #ifndef _NET_HOTDATA_H
- #define _NET_HOTDATA_H
- 
-+#include <linux/llist.h>
- #include <linux/types.h>
- #include <linux/netdevice.h>
- #include <net/protocol.h>
- 
-+struct skb_defer_node {
-+	struct llist_head	defer_list;
-+	atomic_long_t		defer_count;
-+} ____cacheline_aligned_in_smp;
-+
- /* Read mostly data used in network fast paths. */
- struct net_hotdata {
- #if IS_ENABLED(CONFIG_INET)
-@@ -30,6 +36,7 @@ struct net_hotdata {
- 	struct rps_sock_flow_table __rcu *rps_sock_flow_table;
- 	u32			rps_cpu_mask;
- #endif
-+	struct skb_defer_node __percpu *skb_defer_nodes;
- 	int			gro_normal_batch;
- 	int			netdev_budget;
- 	int			netdev_budget_usecs;
-diff --git a/net/core/dev.c b/net/core/dev.c
-index fb67372774de10b0b112ca71c7c7a13819c2325b..a64cef2c537e98ee87776e6f8d3ca3d98f0711b3 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -5180,8 +5180,9 @@ static void napi_schedule_rps(struct softnet_data *sd)
- 	__napi_schedule_irqoff(&mysd->backlog);
- }
- 
--void kick_defer_list_purge(struct softnet_data *sd, unsigned int cpu)
-+void kick_defer_list_purge(unsigned int cpu)
- {
-+	struct softnet_data *sd = &per_cpu(softnet_data, cpu);
- 	unsigned long flags;
- 
- 	if (use_backlog_threads()) {
-@@ -6715,18 +6716,24 @@ bool napi_complete_done(struct napi_struct *n, int work_done)
- }
- EXPORT_SYMBOL(napi_complete_done);
- 
--static void skb_defer_free_flush(struct softnet_data *sd)
-+static void skb_defer_free_flush(void)
- {
- 	struct llist_node *free_list;
- 	struct sk_buff *skb, *next;
-+	struct skb_defer_node *sdn;
-+	int node;
- 
--	if (llist_empty(&sd->defer_list))
--		return;
--	atomic_long_set(&sd->defer_count, 0);
--	free_list = llist_del_all(&sd->defer_list);
-+	for_each_node(node) {
-+		sdn = this_cpu_ptr(net_hotdata.skb_defer_nodes) + node;
-+
-+		if (llist_empty(&sdn->defer_list))
-+			continue;
-+		atomic_long_set(&sdn->defer_count, 0);
-+		free_list = llist_del_all(&sdn->defer_list);
- 
--	llist_for_each_entry_safe(skb, next, free_list, ll_node) {
--		napi_consume_skb(skb, 1);
-+		llist_for_each_entry_safe(skb, next, free_list, ll_node) {
-+			napi_consume_skb(skb, 1);
-+		}
- 	}
- }
- 
-@@ -6854,7 +6861,7 @@ static void __napi_busy_loop(unsigned int napi_id,
- 		if (work > 0)
- 			__NET_ADD_STATS(dev_net(napi->dev),
- 					LINUX_MIB_BUSYPOLLRXPACKETS, work);
--		skb_defer_free_flush(this_cpu_ptr(&softnet_data));
-+		skb_defer_free_flush();
- 		bpf_net_ctx_clear(bpf_net_ctx);
- 		local_bh_enable();
- 
-@@ -7713,7 +7720,7 @@ static void napi_threaded_poll_loop(struct napi_struct *napi)
- 			local_irq_disable();
- 			net_rps_action_and_irq_enable(sd);
- 		}
--		skb_defer_free_flush(sd);
-+		skb_defer_free_flush();
- 		bpf_net_ctx_clear(bpf_net_ctx);
- 		local_bh_enable();
- 
-@@ -7755,7 +7762,7 @@ static __latent_entropy void net_rx_action(void)
- 	for (;;) {
- 		struct napi_struct *n;
- 
--		skb_defer_free_flush(sd);
-+		skb_defer_free_flush();
- 
- 		if (list_empty(&list)) {
- 			if (list_empty(&repoll)) {
-@@ -12989,7 +12996,6 @@ static int __init net_dev_init(void)
- 		sd->cpu = i;
- #endif
- 		INIT_CSD(&sd->defer_csd, trigger_rx_softirq, sd);
--		init_llist_head(&sd->defer_list);
- 
- 		gro_init(&sd->backlog.gro);
- 		sd->backlog.poll = process_backlog;
-@@ -12999,6 +13005,11 @@ static int __init net_dev_init(void)
- 		if (net_page_pool_create(i))
- 			goto out;
- 	}
-+	net_hotdata.skb_defer_nodes =
-+		 __alloc_percpu(sizeof(struct skb_defer_node) * nr_node_ids,
-+				__alignof__(struct skb_defer_node));
-+	if (!net_hotdata.skb_defer_nodes)
-+		goto out;
- 	if (use_backlog_threads())
- 		smpboot_register_percpu_thread(&backlog_threads);
- 
-diff --git a/net/core/dev.h b/net/core/dev.h
-index d6b08d435479b2ba476b1ddeeaae1dce6ac875a2..900880e8b5b4b9492eca23a4d9201045e6bf7f74 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -357,7 +357,7 @@ static inline void napi_assert_will_not_race(const struct napi_struct *napi)
- 	WARN_ON(READ_ONCE(napi->list_owner) != -1);
- }
- 
--void kick_defer_list_purge(struct softnet_data *sd, unsigned int cpu);
-+void kick_defer_list_purge(unsigned int cpu);
- 
- #define XMIT_RECURSION_LIMIT	8
- 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 22d9dba0e433cf67243a5b7dda77e61d146baf50..03ed51050efe81b582c2bad147afecce3a7115e1 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -7184,9 +7184,9 @@ static void kfree_skb_napi_cache(struct sk_buff *skb)
-  */
- void skb_attempt_defer_free(struct sk_buff *skb)
- {
-+	struct skb_defer_node *sdn;
- 	unsigned long defer_count;
- 	int cpu = skb->alloc_cpu;
--	struct softnet_data *sd;
- 	unsigned int defer_max;
- 	bool kick;
- 
-@@ -7200,14 +7200,15 @@ nodefer:	kfree_skb_napi_cache(skb);
- 	DEBUG_NET_WARN_ON_ONCE(skb_dst(skb));
- 	DEBUG_NET_WARN_ON_ONCE(skb->destructor);
- 
--	sd = &per_cpu(softnet_data, cpu);
-+	sdn = per_cpu_ptr(net_hotdata.skb_defer_nodes, cpu) + numa_node_id();
-+
- 	defer_max = READ_ONCE(net_hotdata.sysctl_skb_defer_max);
--	defer_count = atomic_long_inc_return(&sd->defer_count);
-+	defer_count = atomic_long_inc_return(&sdn->defer_count);
- 
- 	if (defer_count >= defer_max)
- 		goto nodefer;
- 
--	llist_add(&skb->ll_node, &sd->defer_list);
-+	llist_add(&skb->ll_node, &sdn->defer_list);
- 
- 	/* Send an IPI every time queue reaches half capacity. */
- 	kick = (defer_count - 1) == (defer_max >> 1);
-@@ -7216,7 +7217,7 @@ nodefer:	kfree_skb_napi_cache(skb);
- 	 * if we are unlucky enough (this seems very unlikely).
- 	 */
- 	if (unlikely(kick))
--		kick_defer_list_purge(sd, cpu);
-+		kick_defer_list_purge(cpu);
- }
- 
- static void skb_splice_csum_page(struct sk_buff *skb, struct page *page,
+We first need to solve the problem that the multitude of PHY drivers
+report their device supports WoL, but are not capable of waking the
+system. Correcting this is fundamental to choosing where WoL should be
+enabled - a mis-reported WoL support can render WoL completely
+ineffective.
+
+The only PHY drivers which uses the driver model's wakeup support is
+drivers/net/phy/broadcom.c, and until recently, realtek. This means
+we have the opportunity for PHY drivers to be _correctly_ converted
+to use this method of signalling wake-up capability only when they can
+actually wake the system, and thus providing a way for phylink to
+know whether to use PHY-based WoL at all.
+
+However, a PHY driver not implementing that logic doesn't become a
+blocker to MACs wanting to convert. In full, the logic is:
+
+- phylink supports a flag, wol_phy_legacy, which forces phylink to use
+  the PHY-based WoL even if the MDIO device is not marked as wake-up
+  capable.
+
+- when wol_phy_legacy is not set, we check whether the PHY MDIO device
+  is wake-up capable. If it is, we offer the WoL request to the PHY.
+
+- if neither wol_phy_legacy is set, or the PHY is not wake-up capable,
+  we do not offer the WoL request to the PHY.
+
+In both cases, after setting any PHY based WoL, we remove the options
+that the PHY now reports are enabled from the options mask, and offer
+these (if any) to the MAC. The mac will get a "mac_set_wol()" method
+call when any settings change.
+
+Phylink mainatains the WoL state for the MAC, so there's no need for
+a "mac_get_wol()" method. There may be the need to set the initial
+state but this is not supported at present.
+
+I've also added support for doing the PHY speed-up/speed-down at
+suspend/resume time depending on the WoL state, which takes another
+issue from the MAC authors.
+
+Lastly, with phylink now having the full picture for WoL, the
+"mac_wol" argument for phylink_suspend() becomes redundant, and for
+MAC drivers that implement mac_set_wol(), the value passed becomes
+irrelevant.
+
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h       | 11 +--
+ .../net/ethernet/stmicro/stmmac/stmmac_ethtool.c   | 31 +-------
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  | 45 ++++++-----
+ .../net/ethernet/stmicro/stmmac/stmmac_platform.c  |  4 +-
+ drivers/net/phy/phy_device.c                       | 14 +++-
+ drivers/net/phy/phylink.c                          | 89 +++++++++++++++++++++-
+ include/linux/phy.h                                | 21 +++++
+ include/linux/phylink.h                            | 28 +++++++
+ 8 files changed, 179 insertions(+), 64 deletions(-)
+
 -- 
-2.51.0.536.g15c5d4f767-goog
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
