@@ -1,142 +1,137 @@
-Return-Path: <netdev+bounces-227015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 955C0BA6E4D
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 11:51:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5437ABA6F38
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 12:33:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0729A1898D97
-	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 09:51:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B1303BCD5C
+	for <lists+netdev@lfdr.de>; Sun, 28 Sep 2025 10:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773A82D837C;
-	Sun, 28 Sep 2025 09:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B6A2DCF7D;
+	Sun, 28 Sep 2025 10:33:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ewWGVe3W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ud20ASVs"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C2E248F51
-	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 09:51:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18432DAFD2
+	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 10:33:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759053075; cv=none; b=nd/IFdVNkBVAxg7wyq3cyXsuGJEA1GoZ9AjpRSasGgqemT1qzuSBEJ21GGhdZ44E6xRya2VTO5qqePh5PK6oUDTK8QLq0TdyZtmexssskcuRel5m9j7iB5GoWc0ORqdQzdR/qHz/uUJXZc1v0msMCUfWZ9jf5Ea5GsTaN0QKRDg=
+	t=1759055603; cv=none; b=O+ecHk2ID6QEnnDQv0IPOIdI1Lc1NqlTvZ7X3L1cmZ3w6j3t9tn3hYTJtr2XMVzJ1JYLNp5dUWNjyPWWX9g4GCpmpkrUsWiQsbqvuMxrPMwmMDl9Et03lX1LG7g1wqLP6kxFvA4Zra6TTfoJH/64kuLf0GKYRldF0z04UK3wrYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759053075; c=relaxed/simple;
-	bh=sH7BY+yftEWOmV5+CBFuciiemI+6cPg5ETATp6icdQg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oeTX5/UE2BTYC3znk5yvg5jD85QUdSvXFZTrP7OnVe4CuBvs8IQM5nTOgz7ZNr5Pz7eXRcGZiEuoYnOnyAfrX7lgneIUROO/q0mRCTcd+GbBO//Zo8SdPAimEmKrlcIu4Tt6I6oT1rR4v6I0hf3Vfkfd+HKja7LAHGPRwSdyLbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ewWGVe3W; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=FI12eMvVoMJL57V5n681dIivJzNSe8NDLqayNDsDEV8=; b=ewWGVe3WYPeMRiN/NVirmpuIFn
-	VNow/t8OKcBqaRs3Z+r9CI8s8QZ63573Im23f+mZ54IMdO3nuQfxU7K2YXc6PkcDbLOqmCptGDrFY
-	wTg8Xpd/K6Vwjh8K+N0q+ti4ZX0TF5kgAYwqmVkJTdyk0+Nu+uNbc2qzNgm31rgvRaW7mHSaeNyqg
-	W7TZW7UfnZMqU4WMCpFifh/MOVjRz1TVBzSrFWI4Ufzagw1KWjHlipLCk6wwPNWrWGIcWD4zXCo0K
-	JLmIp5hyeAupXDI5D2ZWCaofLvdBbFq27Ivceud4qGpI25I2M6HO62uT/8Lke7ZiJXP1kDXfWI+9W
-	KpuaJy3Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35958)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1v2o3i-000000005Xk-0wml;
-	Sun, 28 Sep 2025 10:51:10 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1v2o3g-000000002Tl-1QDe;
-	Sun, 28 Sep 2025 10:51:08 +0100
-Date: Sun, 28 Sep 2025 10:51:08 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Subject: Re: [PATCH RFC net-next 11/20] net: dsa: mv88e6xxx: split out EXTTS
- pin setup
-Message-ID: <aNkFDGQwm-qkgkvV@shell.armlinux.org.uk>
-References: <aMxDh17knIDhJany@shell.armlinux.org.uk>
- <E1uzIbk-00000006n06-0a3X@rmk-PC.armlinux.org.uk>
- <eabf052b-02a0-4440-b0f7-c831d9ebaa23@lunn.ch>
+	s=arc-20240116; t=1759055603; c=relaxed/simple;
+	bh=W1P4GzY1bC9YgmxJ2fNnWAboDU4JuIT0DBDqxALFX0M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Xp2wELqHfaP/5OOe2X1u7l6sFWWJR9WWl6u+qxrvEGA3IDxWmR4u5E2fgOgbwK6Wl2Gix4Qsapr2yDzUapkJdsoCgyVS3SPE7K1J7a2y4WUOUOMISZM0JVhfavKIbGipVq2V2KQluujDNydVS8yuUw4VIWFALGsaSHlt8+iGHNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ud20ASVs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53515C2BC9E
+	for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 10:33:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759055603;
+	bh=W1P4GzY1bC9YgmxJ2fNnWAboDU4JuIT0DBDqxALFX0M=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=ud20ASVsnYuE5kNMszyEQpSoR0Bq4bejcUKHOUGjiL35VMUaD5yL3aWJSfDAcC6Td
+	 gZvVM+w5J+fLJk+M+cm+C5F6V8+n4QeTYvqpgUamaRejIQgk3V0BlYAFNlqYQL24Bc
+	 DWcQUU6VEeKpDUxZxLhye5/BzKyKh/wIMTJhcQ4gOf6DwgjgyJduc9FxYI2tEQHU8G
+	 Smimz0KWLOn1bqbGAIREMMYENc9PlF8rWaED7GAKDBcxtwEhefJidnd2amv8AtvhLY
+	 P0w6Rw13h6lhC3C6zgIAqhb2YGn56pNaWFWlqBEqDnFrzkyAsiQ1FYLlftVUlNnfCZ
+	 N4zqSVcCig0bw==
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-30cce86052cso2861610fac.1
+        for <netdev@vger.kernel.org>; Sun, 28 Sep 2025 03:33:23 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUJM4ZFLsvrG6Qy5dGMV0UtE3AbRDASFywyBwUVZeI3YC34BJPBV8gdDsH0Lhgv1Z7/69JbgHo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrW1Wn+YM0Noa9ZUx3amHx2si3ivScr5o2zAhYmts0aHnCsAgW
+	yEpSznySyLB0G9/cz+nrjwe1x1sBhJDqOpXMarrajpNwJVJKfuRaR8AkKXXGmkhxuX/K7ZuIk9N
+	WoXBHL4rKmZO0M2SFq0fjfePb9Acv4yM=
+X-Google-Smtp-Source: AGHT+IHHkBehFxa/bp8CnX34GBVpEV5VAfmAS0oqHk9Wg6vhKkRCMfTaIXQ9hfF+1UwB0EGnwQh5Kq0MuUSpqvkAupk=
+X-Received: by 2002:a05:6870:a118:b0:315:b618:d6be with SMTP id
+ 586e51a60fabf-35ef20c8e8fmr6297578fac.51.1759055602481; Sun, 28 Sep 2025
+ 03:33:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eabf052b-02a0-4440-b0f7-c831d9ebaa23@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250916044735.2316171-1-dolinux.peng@gmail.com>
+ <20250916044735.2316171-2-dolinux.peng@gmail.com> <03ad08d9-4510-19fb-bbad-652159308119@huawei.com>
+In-Reply-To: <03ad08d9-4510-19fb-bbad-652159308119@huawei.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Sun, 28 Sep 2025 12:33:11 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0ix+taHWpKAeYsNBQMoxG6f7E9vyO=yqjrh5_AnjrXZbg@mail.gmail.com>
+X-Gm-Features: AS18NWDE1zAXVuNiUSbLmdX4xI4485zsbYvsUyBO0gNsC9FdVLBA2B2bjlgQB_4
+Message-ID: <CAJZ5v0ix+taHWpKAeYsNBQMoxG6f7E9vyO=yqjrh5_AnjrXZbg@mail.gmail.com>
+Subject: Re: [PATCH v3 01/14] ACPI: APEI: Remove redundant rcu_read_lock/unlock()
+ in spin_lock
+To: Hanjun Guo <guohanjun@huawei.com>, pengdonglin <dolinux.peng@gmail.com>
+Cc: tj@kernel.org, tony.luck@intel.com, jani.nikula@linux.intel.com, 
+	ap420073@gmail.com, jv@jvosburgh.net, freude@linux.ibm.com, bcrl@kvack.org, 
+	trondmy@kernel.org, longman@redhat.com, kees@kernel.org, 
+	bigeasy@linutronix.de, hdanton@sina.com, paulmck@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev, 
+	linux-nfs@vger.kernel.org, linux-aio@kvack.org, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	intel-gfx@lists.freedesktop.org, linux-wireless@vger.kernel.org, 
+	linux-acpi@vger.kernel.org, linux-s390@vger.kernel.org, 
+	cgroups@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	pengdonglin <pengdonglin@xiaomi.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 18, 2025 at 10:59:07PM +0200, Andrew Lunn wrote:
-> >  static const struct mv88e6xxx_cc_coeffs *
-> >  mv88e6xxx_cc_coeff_get(struct mv88e6xxx_chip *chip)
-> >  {
-> > @@ -352,27 +366,18 @@ static int mv88e6352_ptp_enable_extts(struct mv88e6xxx_chip *chip,
-> >  		return -EBUSY;
-> >  
-> >  	mv88e6xxx_reg_lock(chip);
-> > +	err = mv88e6352_ptp_pin_setup(chip, pin, PTP_PF_EXTTS, on);
-> >  
-> > -	if (on) {
-> > -		func = MV88E6352_G2_SCRATCH_GPIO_PCTL_EVREQ;
-> > -
-> > -		err = mv88e6352_set_gpio_func(chip, pin, func, true);
-> > -		if (err)
-> > -			goto out;
-> > -
-> > +	if (!on) {
-> 
-> Inverting the if () makes this a little bit harder to review. But it
-> does remove a goto. I probably would of kept the code in the same
-> order. But:
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+On Sat, Sep 27, 2025 at 5:22=E2=80=AFAM Hanjun Guo <guohanjun@huawei.com> w=
+rote:
+>
+> On 2025/9/16 12:47, pengdonglin wrote:
+> > From: pengdonglin <pengdonglin@xiaomi.com>
+> >
+> > Since commit a8bb74acd8efe ("rcu: Consolidate RCU-sched update-side fun=
+ction definitions")
+> > there is no difference between rcu_read_lock(), rcu_read_lock_bh() and
+> > rcu_read_lock_sched() in terms of RCU read section and the relevant gra=
+ce
+> > period. That means that spin_lock(), which implies rcu_read_lock_sched(=
+),
+> > also implies rcu_read_lock().
+> >
+> > There is no need no explicitly start a RCU read section if one has alre=
+ady
+> > been started implicitly by spin_lock().
+> >
+> > Simplify the code and remove the inner rcu_read_lock() invocation.
+> >
+> > Cc: "Rafael J. Wysocki" <rafael@kernel.org>
+> > Cc: Tony Luck <tony.luck@intel.com>
+> > Cc: Hanjun Guo <guohanjun@huawei.com>
+> > Signed-off-by: pengdonglin <pengdonglin@xiaomi.com>
+> > Signed-off-by: pengdonglin <dolinux.peng@gmail.com>
+> > ---
+> >   drivers/acpi/apei/ghes.c | 2 --
+> >   1 file changed, 2 deletions(-)
+> >
+> > diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+> > index a0d54993edb3..97ee19f2cae0 100644
+> > --- a/drivers/acpi/apei/ghes.c
+> > +++ b/drivers/acpi/apei/ghes.c
+> > @@ -1207,12 +1207,10 @@ static int ghes_notify_hed(struct notifier_bloc=
+k *this, unsigned long event,
+> >       int ret =3D NOTIFY_DONE;
+> >
+> >       spin_lock_irqsave(&ghes_notify_lock_irq, flags);
+> > -     rcu_read_lock();
+> >       list_for_each_entry_rcu(ghes, &ghes_hed, list) {
+> >               if (!ghes_proc(ghes))
+> >                       ret =3D NOTIFY_OK;
+> >       }
+> > -     rcu_read_unlock();
+> >       spin_unlock_irqrestore(&ghes_notify_lock_irq, flags);
+> >
+> >       return ret;
+>
+> Reviewed-by: Hanjun Guo <guohanjun@huawei.com>
 
-It's not the goto, but:
-
-	if (on && !err) {
-                schedule_delayed_work(&chip->tai_event_work,
-                                      TAI_EVENT_WORK_INTERVAL);
-
-                err = mv88e6352_config_eventcap(chip, rising);
-	} else if (!on) {
-                /* Always cancel the work, even if an error occurs */
-                cancel_delayed_work_sync(&chip->tai_event_work);
-	}
-
-would be the alternative, which is IMHO less readable, and more
-error-prone. However, there is an issue that if
-mv88e6352_config_eventcap() returns an error, we leave the work
-scheduled. So maybe:
-
-	if (on && !err) {
-                schedule_delayed_work(&chip->tai_event_work,
-                                      TAI_EVENT_WORK_INTERVAL);
-
-                err = mv88e6352_config_eventcap(chip, rising);
-	}
-
-	if (!on || err) {
-                /* Always cancel the work, even if an error occurs */
-                cancel_delayed_work_sync(&chip->tai_event_work);
-	}
-
-which is more difficult to get one's head around.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Applied as 6.18 material, thanks!
 
