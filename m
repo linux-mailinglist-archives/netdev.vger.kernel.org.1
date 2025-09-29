@@ -1,223 +1,177 @@
-Return-Path: <netdev+bounces-227207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 262E4BAA3E9
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 19:58:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6090CBAA440
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 20:15:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64EF07A3A53
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 17:56:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4A1C189E62B
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 18:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 181E7224245;
-	Mon, 29 Sep 2025 17:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C8D7225A29;
+	Mon, 29 Sep 2025 18:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LkX8GLM7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SDAFYIph"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E99D221739
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 17:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248EF21A444;
+	Mon, 29 Sep 2025 18:15:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759168688; cv=none; b=sB0oJxwZosbtnykG4ACZqIvGorbVIzaJb/wMVFYfINgCbvUhqqoBrLYr76bVtgtiIfK6e38gycxFDVd/M8w18NLkjkjw1d5xSF3lb4kEtcJJgeLly1/cSNvJEyLa0OSLaWKfkPJrF7WzJWxgDzRPQfL+qBGqCHgD9xkX2gqNmME=
+	t=1759169734; cv=none; b=l04NEd3JHlhypqEnRokDqiEtq5YJqrP2YAT1UTurmHpxalecLoFfjZh2s4d9/tRMLrI/jlbEZ9b6v4/0YT6kZnqPZ6B83TQEoEwkA7DxSR8L58EcJXVT5yDGj/yoaO5w4eGP7nMmCkiPDD1NhBGC8dx0O0s5yGGuyfuZ1+4XOVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759168688; c=relaxed/simple;
-	bh=IHNM4NzgxnMmFEI01G6PNqPKsxoRpwq01Yb96j8WtNY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=hyguBFM1+15dU4QdiVyP5VHQ74RoP5VTbCCdDwHHYiN/ibtAXrR6SCWQtfoSLfDE41TObgHlfjl+uoU97nCxj7Fa+anMxcQovmQi+BVLQZOElKO+4+G/fw39/lb6RuLC9e4h542aLgQzl4hoAh7RiciN8ulX6auGbJyWh6Oluf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LkX8GLM7; arc=none smtp.client-ip=209.85.221.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-54c0a10990fso1063162e0c.2
-        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 10:58:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759168684; x=1759773484; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E908RI2gAqiHDeoOAT4Wxeq827Q7LIlIthXPPeqIu0Y=;
-        b=LkX8GLM7m6ne5HW13zQelx3bju8VBtaWvcEbOoeo3G6TTmSLORGikHAOjeDvff++/X
-         0NHMmTycJkxxKouyvTYsi8vlt4WmjR5+a5HdpJp28tK8YohNBrRGQD7pClWyYCbN4i9X
-         mRbHtRwMY6mpgVwgKmaCR1eTZw+w2FXediTFaIF0WkQiXuvMAKqejPTQtc98OMquqoMn
-         Dt++bjnYtU50bLpFrueLGnrI0bEBhN6OTbHG9449TWhQyHj9tad83XHHO3K8cTYT3Al9
-         VzQYgvUMykXxiajVKByDhk3NN/PgtoYPOOUM7G03gg8MXQSX8RkHKZVhegP2oylxGvu0
-         borA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759168684; x=1759773484;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=E908RI2gAqiHDeoOAT4Wxeq827Q7LIlIthXPPeqIu0Y=;
-        b=d2+XisI4XVa/CZrJfIH5dZsSeZ9qe8LNIXN3Y3xGOeMKvW4hdrP68Pgnv7efbR1lrs
-         5DbH7jiwddOpFX7Zvurwvd8KUSWIS2oMaitY5nr0MZ0OkXjsBmlvQ0l/sJ+zMxFAHhhl
-         bBSDAc4DSyDAp9gfmEQdznpflQU/Jnzg8syrcMZK7NUdv3khsmAE5q0gRjYbM6paaGNp
-         yBHR1uRAs2IaTi3+0eCkh02jVI0yJIqNjLuuaKkVqIVz8dsidMeIQm6I4plr0njldbqN
-         GQhBJfkszXM4N2Hr18vnL1ZybYmUM5o2D+2AEJCW/BEUAv5pqvA4k5cGvllW6ykVto8f
-         n1tw==
-X-Gm-Message-State: AOJu0Yxal5CYjAuwEDmkmK4pr7pFfx41xSuUzmhNEN7i3rTqVrq+aV75
-	3Tmfbrj207Cn8OOqJIGSRpuBWwgcEvMBG8aXEhEPBeshlVr0bfXxK5z1
-X-Gm-Gg: ASbGnctFOq46wjbsYBKRRStnhIeCmr+J5O1Xe2c0J6NO/YKy8gkjxr/1FxRIESb/4B7
-	D1/N0PhEOWCaUCvueA2xe5HRRRISjAdLRXdqkJ6Jkn1iLX3Ke+C6maQ8+Ndj638O900UeZrKo4Q
-	Ezjo9/AtFYT4KCDkI12jhI5x6PDbL3QVztjNcAxOYdHzP8YL6H5N0qumRVPhXJcE81viYmSmm5l
-	0JuJHrTYZoS0ozaU+jZeKsBCCXA3lcY1QCddIzEwG0EBRMECqwrsifsAGKtM58tPxRe/5uu7Ji1
-	DWkJyv0OuXRSsWN1BcEeKgNCS2+y1AjNfyIgx1kGwUE3Kg0S11+WoSsk6MusD/X2fTn+3F75/nk
-	6slOfz5L3PfgHd91IwmXXCWViEe01xDw/8o4+SgqrS4JKZgh8PuH/9Z9cqizZwqSSL+2qoqUtvj
-	2fPpYB
-X-Google-Smtp-Source: AGHT+IGafwY5OqbBwbdedlnM684zSTSo0B+nKhBzZY2UTklcPWu1hk4PiOcg/kKTTuj5OpcgO90zPg==
-X-Received: by 2002:a05:6122:c95:b0:53c:6d68:1cdc with SMTP id 71dfb90a1353d-54bea1f5fcemr6937065e0c.14.1759168684281;
-        Mon, 29 Sep 2025 10:58:04 -0700 (PDT)
-Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
-        by smtp.gmail.com with UTF8SMTPSA id a1e0cc1a2514c-916db3be313sm2499211241.20.2025.09.29.10.58.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Sep 2025 10:58:03 -0700 (PDT)
-Date: Mon, 29 Sep 2025 13:58:02 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Sidharth Seela <sidharthseela@gmail.com>, 
- antonio@openvpn.net, 
- sd@queasysnail.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- horms@kernel.org, 
- shuah@kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- kernelxing@tencent.com, 
- nathan@kernel.org, 
- nick.desaulniers+lkml@gmail.com, 
- morbo@google.com, 
- justinstitt@google.com
-Cc: netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- llvm@lists.linux.dev, 
- david.hunter.linux@gmail.com, 
- Sidharth Seela <sidharthseela@gmail.com>
-Message-ID: <willemdebruijn.kernel.321e70874e73c@gmail.com>
-In-Reply-To: <20250929160230.36941-2-sidharthseela@gmail.com>
-References: <20250929160230.36941-2-sidharthseela@gmail.com>
-Subject: Re: [PATCH v2] net: Fix uninit character pointer and return values
+	s=arc-20240116; t=1759169734; c=relaxed/simple;
+	bh=zC355LrRhw1ZCM5krQ79qqLfXJJUjscY5MxNMlqmmo4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QcQ5Ab4nAZFdmhmF2j5Tm2mTVyu+2zYSIVVCvTPqk5HfHFJGiKHiq1uEWOUWf0jitARUGltz6JzvpCRk0tdWzJIAInWojRi917rPJUsUxsiNS9A5WJZHoKUfjUQJ6FkVeYiuQH8vwfXqhyuOgE2CQK9LdAfgksj3mTgOFXf52m4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SDAFYIph; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04411C4CEF4;
+	Mon, 29 Sep 2025 18:15:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759169733;
+	bh=zC355LrRhw1ZCM5krQ79qqLfXJJUjscY5MxNMlqmmo4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SDAFYIphPNEzGhR6zd/9iF4gsKeWoKz3R8La1TPfy4g+9cmX9wI0BnuEeGZA6b9N7
+	 stA0juiOGyH4PDNU894HTnPPOosL20sAdiD4qDiRvrHilFJ+lDHvDuKLuf7+afliwF
+	 zXMsHv6BJwL8ezfKl+ReCj4wF0d7Z5Xzq0StlMAQomV+h41LTRqB31TRJI/bAtf1A7
+	 kX47ElrKWQfNtrd75EkWSiuctbG1xcfYOIuGc8zC4r8oRUM8LyMtXst7Awjf6cXP4D
+	 ClvwQEpa83NCSAkZnTuOEurOPzvK9NqBE+HVxK6KmhALquSFFpMcVT3Gh28caWbnJr
+	 TicJLa41JlIfA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	alazar@nvidia.com,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH net] Revert "net/mlx5e: Update and set Xon/Xoff upon MTU set"
+Date: Mon, 29 Sep 2025 11:15:29 -0700
+Message-ID: <20250929181529.1848157-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Reminder: use the net prefix: [PATCH net v2]
+This reverts commit ceddedc969f0532b7c62ca971ee50d519d2bc0cb.
 
-Sidharth Seela wrote:
-> Fix uninitialized character pointer, and functions that return
-> undefined values. These issues were caught by running clang using LLVM=1
-> option; and are as follows:
-> --
-> ovpn-cli.c:1587:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
->  1587 |         if (!sock) {
->       |             ^~~~~
-> ovpn-cli.c:1635:9: note: uninitialized use occurs here
->  1635 |         return ret;
->       |                ^~~
-> ovpn-cli.c:1587:2: note: remove the 'if' if its condition is always false
->  1587 |         if (!sock) {
->       |         ^~~~~~~~~~~~
->  1588 |                 fprintf(stderr, "cannot allocate netlink socket\n");
->       |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->  1589 |                 goto err_free;
->       |                 ~~~~~~~~~~~~~~
->  1590 |         }
->       |         ~
-> ovpn-cli.c:1584:15: note: initialize the variable 'ret' to silence this warning
->  1584 |         int mcid, ret;
->       |                      ^
->       |                       = 0
-> ovpn-cli.c:2107:7: warning: variable 'ret' is used uninitialized whenever switch case is taken [-Wsometimes-uninitialized]
->  2107 |         case CMD_INVALID:
->       |              ^~~~~~~~~~~
-> ovpn-cli.c:2111:9: note: uninitialized use occurs here
->  2111 |         return ret;
->       |                ^~~
-> ovpn-cli.c:1939:12: note: initialize the variable 'ret' to silence this warning
->  1939 |         int n, ret;
->       |                   ^
->       |
-> --
-> so_txtime.c:210:3: warning: variable 'reason' is used uninitialized whenever switch default is taken [-Wsometimes-uninitialized]
->   210 |                 default:
->       |                 ^~~~~~~
-> so_txtime.c:219:27: note: uninitialized use occurs here
->   219 |                         data[ret - 1], tstamp, reason);
->       |                                                ^~~~~~
-> so_txtime.c:177:21: note: initialize the variable 'reason' to silence this warning
->   177 |                 const char *reason;
->       |                                   ^
->       |
+Commit in question breaks the mapping of PGs to pools for some SKUs.
+Specifically multi-host NICs seem to be shipped with a custom buffer
+configuration which maps the lossy PG to pool 4. But the bad commit
+overrides this with pool 0 which does not have sufficient buffer space
+reserved. Resulting in ~40% packet loss. The commit also breaks BMC /
+OOB connection completely (100% packet loss).
 
-My previous response accidentally left a state comment. The main
-feedback still held:
+Revert, similarly to commit 3fbfe251cc9f ("Revert "net/mlx5e: Update and
+set Xon/Xoff upon port speed set""). The breakage is exactly the same,
+the only difference is that quoted commit would break the NIC immediately
+on boot, and the currently reverted commit only when MTU is changed.
 
-This default case calls error() and exits the program, so this cannot
-happen.
+Note: "good" kernels do not restore the configuration, so downgrade isn't
+enough to recover machines. A NIC power cycle seems to be necessary to
+return to a healthy state (or overriding the relevant registers using
+a custom patch).
 
-> --
-> Fixes: 959bc330a439 ("testing/selftests: add test tool and scripts for ovpn module")
-> ovpn module")
-> Fixes: ca8826095e4d4 ("selftests/net: report etf errors correctly")
-> 
-> Signed-off-by: Sidharth Seela <sidharthseela@gmail.com>
-> 
-> v2:
-> 	- Use subsystem name "net".
-> 	- Add fixes tags.
-> 	- Remove txtimestamp fix as default case calls error.
-> 	- Assign constant error string instead of NULL.
-> --
+Fixes: ceddedc969f0 ("net/mlx5e: Update and set Xon/Xoff upon MTU set")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: saeedm@nvidia.com
+CC: leon@kernel.org
+CC: tariqt@nvidia.com
+CC: mbloch@nvidia.com
+CC: alazar@nvidia.com
+CC: linux-rdma@vger.kernel.org
+---
+ .../mellanox/mlx5/core/en/port_buffer.h         | 12 ------------
+ .../net/ethernet/mellanox/mlx5/core/en_main.c   | 17 +----------------
+ 2 files changed, 1 insertion(+), 28 deletions(-)
 
-End the commit with the Signed-off-by block. Either move changelog
-above that, or below three (not two) dashes.
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/port_buffer.h b/drivers/net/ethernet/mellanox/mlx5/core/en/port_buffer.h
+index 66d276a1be83..f4a19ffbb641 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/port_buffer.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/port_buffer.h
+@@ -66,23 +66,11 @@ struct mlx5e_port_buffer {
+ 	struct mlx5e_bufferx_reg  buffer[MLX5E_MAX_NETWORK_BUFFER];
+ };
  
-> diff --git a/tools/testing/selftests/net/ovpn/ovpn-cli.c b/tools/testing/selftests/net/ovpn/ovpn-cli.c
-> index 9201f2905f2c..20d00378f34a 100644
-> --- a/tools/testing/selftests/net/ovpn/ovpn-cli.c
-> +++ b/tools/testing/selftests/net/ovpn/ovpn-cli.c
-> @@ -1581,7 +1581,7 @@ static int ovpn_listen_mcast(void)
->  {
->  	struct nl_sock *sock;
->  	struct nl_cb *cb;
-> -	int mcid, ret;
-> +	int mcid, ret = -1;
->  
->  	sock = nl_socket_alloc();
->  	if (!sock) {
-> @@ -1936,7 +1936,7 @@ static int ovpn_run_cmd(struct ovpn_ctx *ovpn)
->  {
->  	char peer_id[10], vpnip[INET6_ADDRSTRLEN], laddr[128], lport[10];
->  	char raddr[128], rport[10];
-> -	int n, ret;
-> +	int n, ret = -1;
->  	FILE *fp;
->  
->  	switch (ovpn->cmd) {
-> diff --git a/tools/testing/selftests/net/so_txtime.c b/tools/testing/selftests/net/so_txtime.c
-> index 8457b7ccbc09..5bf3c483069b 100644
-> --- a/tools/testing/selftests/net/so_txtime.c
-> +++ b/tools/testing/selftests/net/so_txtime.c
-> @@ -174,7 +174,7 @@ static int do_recv_errqueue_timeout(int fdt)
->  	msg.msg_controllen = sizeof(control);
->  
->  	while (1) {
-> -		const char *reason;
-> +		const char *reason = "unknown errno";
->  
->  		ret = recvmsg(fdt, &msg, MSG_ERRQUEUE);
->  		if (ret == -1 && errno == EAGAIN)
-> -- 
-> 2.47.3
-> 
-
+-#ifdef CONFIG_MLX5_CORE_EN_DCB
+ int mlx5e_port_manual_buffer_config(struct mlx5e_priv *priv,
+ 				    u32 change, unsigned int mtu,
+ 				    struct ieee_pfc *pfc,
+ 				    u32 *buffer_size,
+ 				    u8 *prio2buffer);
+-#else
+-static inline int
+-mlx5e_port_manual_buffer_config(struct mlx5e_priv *priv,
+-				u32 change, unsigned int mtu,
+-				void *pfc,
+-				u32 *buffer_size,
+-				u8 *prio2buffer)
+-{
+-	return 0;
+-}
+-#endif
+ 
+ int mlx5e_port_query_buffer(struct mlx5e_priv *priv,
+ 			    struct mlx5e_port_buffer *port_buffer);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 15eded36b872..21bb88c5d3dc 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -49,7 +49,6 @@
+ #include "en.h"
+ #include "en/dim.h"
+ #include "en/txrx.h"
+-#include "en/port_buffer.h"
+ #include "en_tc.h"
+ #include "en_rep.h"
+ #include "en_accel/ipsec.h"
+@@ -3041,11 +3040,9 @@ int mlx5e_set_dev_port_mtu(struct mlx5e_priv *priv)
+ 	struct mlx5e_params *params = &priv->channels.params;
+ 	struct net_device *netdev = priv->netdev;
+ 	struct mlx5_core_dev *mdev = priv->mdev;
+-	u16 mtu, prev_mtu;
++	u16 mtu;
+ 	int err;
+ 
+-	mlx5e_query_mtu(mdev, params, &prev_mtu);
+-
+ 	err = mlx5e_set_mtu(mdev, params, params->sw_mtu);
+ 	if (err)
+ 		return err;
+@@ -3055,18 +3052,6 @@ int mlx5e_set_dev_port_mtu(struct mlx5e_priv *priv)
+ 		netdev_warn(netdev, "%s: VPort MTU %d is different than netdev mtu %d\n",
+ 			    __func__, mtu, params->sw_mtu);
+ 
+-	if (mtu != prev_mtu && MLX5_BUFFER_SUPPORTED(mdev)) {
+-		err = mlx5e_port_manual_buffer_config(priv, 0, mtu,
+-						      NULL, NULL, NULL);
+-		if (err) {
+-			netdev_warn(netdev, "%s: Failed to set Xon/Xoff values with MTU %d (err %d), setting back to previous MTU %d\n",
+-				    __func__, mtu, err, prev_mtu);
+-
+-			mlx5e_set_mtu(mdev, params, prev_mtu);
+-			return err;
+-		}
+-	}
+-
+ 	params->sw_mtu = mtu;
+ 	return 0;
+ }
+-- 
+2.51.0
 
 
