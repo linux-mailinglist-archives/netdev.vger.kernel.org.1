@@ -1,312 +1,185 @@
-Return-Path: <netdev+bounces-227069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0915BA7C79
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 03:51:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7422BA7CE4
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 04:34:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1C391892FA2
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 01:51:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A35F33C1099
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 02:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09FAA1FBEA6;
-	Mon, 29 Sep 2025 01:51:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7727B1F37C5;
+	Mon, 29 Sep 2025 02:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CHzHYqLg"
+	dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b="AuDKCRbJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3942F2E;
-	Mon, 29 Sep 2025 01:51:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+Received: from zg8tmty1ljiyny4xntuumtyw.icoremail.net (zg8tmty1ljiyny4xntuumtyw.icoremail.net [165.227.155.160])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1429D86347;
+	Mon, 29 Sep 2025 02:34:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=165.227.155.160
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759110669; cv=none; b=SoFvXURs8zOzIDuJ+LpeYgWdlEW5eNRiUkFttN58Fbsi0Z41UeW0DMFWwN5avhaj34uMZCCTlpwB8d5Dapqzfdq3Ype1lLK0WlYoiNaGl0IXlnV/ce9izQfWbTpprRWRYaUIIpUdax6/0J81xLYZeKAqPffPKZCElac3+yyo65o=
+	t=1759113286; cv=none; b=ZnRke1jgzzDuWcS6DcAuMxKwabYRlE+VflZz0elDHJoRhjjoCxX0QbGWfL5hTwyP/Ggvg8Z9CIc0f+o3cssL7JSDMxV9nIMQ28IwOBdmW/SgqT/3gfd5G3yDVF8bzqw+gh7yVpb6kzideK5JusCIERZNqLx79WL3MAqPI9JzoSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759110669; c=relaxed/simple;
-	bh=QPLiG3/EaSBK7ty8Ofz3g15Hll54Bo9Sr+73BNfJa6Q=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ipQL0wEwn4h6gCK+O/56ookfEgeUtlE7+9QwT4laJx/jAZV9N+4rZ8VVw/tVNTsEi/ikDb2x+myV52GlmyAQYG7OnCCzRyhCYUPnmaetnv3r5hVs1DtmnB9JUfOOqgo/mvREUoG0Rlh0Uo9h9EJHN16xSA/G+0R5R/xMtl3lYOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CHzHYqLg; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1759110654; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=9aorilP5lRAQIaWXx/azi+eQ3upGhw4CPgjfhTO+Sro=;
-	b=CHzHYqLgqUtZ+U8hRZFXvzMFo2FAC3SIlCnHPN1KGU8M2Iqmot7mm8NVV9U6O9Jx7oJ3C7yZUqv5QG41ROZI8cCA/k/4tUTVJVD4jsgBpPnlys+bACeKN3zzMJuZ/Otd9PZufNQkS091+XOV7WodKgCfw7yHsVsvFD4qZU2YDIs=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WozqZKo_1759110652 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 29 Sep 2025 09:50:53 +0800
-Date: Mon, 29 Sep 2025 09:50:52 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Halil Pasic <pasic@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Guangguan Wang <guangguan.wang@linux.alibaba.com>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org
-Subject: Re: [PATCH net-next v5 2/2] net/smc: handle -ENOMEM from
- smc_wr_alloc_link_mem gracefully
-Message-ID: <aNnl_CfV0EvIujK0@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20250929000001.1752206-1-pasic@linux.ibm.com>
- <20250929000001.1752206-3-pasic@linux.ibm.com>
+	s=arc-20240116; t=1759113286; c=relaxed/simple;
+	bh=2Ho7cC/QIRp0Nf1M5vwKTw1qpgnUTOb+pHhtsLDR8lM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GEbEMDRP2C0cRaNX083mEqQq91KTSX5QVfJIZ9i3BExBotStdF57Ys7IQoWFiQQ3Zc7rHYB2+c5azejAQ+rgQ2Q6IMBboOjsTYwy3OwjUo627PlQ6/3nVUuPh7HSCAnedGfbQ1lnBhYdF0BNd2m2QscBcwmM8my/JnDygtyiOTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=AuDKCRbJ; arc=none smtp.client-ip=165.227.155.160
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mails.tsinghua.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-Id:MIME-Version:Content-Transfer-Encoding; bh=2PWa4
+	RDVbm9vqx+uSESMnuoRp/E021uZvmdOICI1JZM=; b=AuDKCRbJo2MrJA/oaslrz
+	Pct0ChJRTFVXwY4JA1ast7/hXJ8/+wypN4/SjcxmxIBbrG07QntOVXXhY5OSdqQw
+	019DFXcUsZ9sIw1BnCiBOU0S5AfzHtiRG54qGOneNUyPmyik0nJdWtdaJdiS0RZf
+	8iqqVWdFWu+KqvnzGVUnLA=
+Received: from estar-Super-Server.. (unknown [103.233.162.254])
+	by web3 (Coremail) with SMTP id ygQGZQBHBdwz8NloXfvAAQ--.28309S2;
+	Mon, 29 Sep 2025 10:34:28 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: netdev@vger.kernel.org
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH v2 RESEND] net/dccp: validate Reset/Close/CloseReq in DCCP_REQUESTING
+Date: Mon, 29 Sep 2025 10:34:19 +0800
+Message-Id: <20250929023419.3751973-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250929000001.1752206-3-pasic@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygQGZQBHBdwz8NloXfvAAQ--.28309S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxGrWktFyUurWxWF1xtw1kXwb_yoWrGF17pa
+	4xKFZIkr1UJFyxtFnayw4DXr15Cr4kAryfGFnFqry8ZF1DJryfZ39IkrWjvry5CFZ3C342
+	g3y7WFWrCr47Ja7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvm14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26r
+	xl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVAC
+	Y4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1DMcIj6I8E87Iv67AKxVWUJV
+	W8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI2
+	0VAGYxC7MxkIecxEwVAFwVW8JwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJV
+	W8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF
+	1VAFwI0_Jrv_JF1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6x
+	IIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvE
+	x4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnU
+	UI43ZEXa7VUb5CztUUUUU==
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAgAAAWjZFuDq-QAAsT
 
-On 2025-09-29 02:00:01, Halil Pasic wrote:
->Currently if a -ENOMEM from smc_wr_alloc_link_mem() is handled by
->giving up and going the way of a TCP fallback. This was reasonable
->before the sizes of the allocations there were compile time constants
->and reasonably small. But now those are actually configurable.
->
->So instead of giving up, keep retrying with half of the requested size
->unless we dip below the old static sizes -- then give up! In terms of
->numbers that means we give up when it is certain that we at best would
->end up allocating less than 16 send WR buffers or less than 48 recv WR
->buffers. This is to avoid regressions due to having fewer buffers
->compared the static values of the past.
->
->Please note that SMC-R is supposed to be an optimisation over TCP, and
->falling back to TCP is superior to establishing an SMC connection that
->is going to perform worse. If the memory allocation fails (and we
->propagate -ENOMEM), we fall back to TCP.
->
->Preserve (modulo truncation) the ratio of send/recv WR buffer counts.
->
->Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
->Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
->Reviewed-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
->Reviewed-by: Sidraya Jayagond <sidraya@linux.ibm.com>
->---
-> Documentation/networking/smc-sysctl.rst |  8 ++++--
-> net/smc/smc_core.c                      | 34 +++++++++++++++++--------
-> net/smc/smc_core.h                      |  2 ++
-> net/smc/smc_wr.c                        | 28 ++++++++++----------
-> 4 files changed, 46 insertions(+), 26 deletions(-)
->
->diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/networking/smc-sysctl.rst
->index 5de4893ef3e7..4a5b4c89bc97 100644
->--- a/Documentation/networking/smc-sysctl.rst
->+++ b/Documentation/networking/smc-sysctl.rst
->@@ -85,7 +85,9 @@ smcr_max_send_wr - INTEGER
-> 
-> 	Please be aware that all the buffers need to be allocated as a physically
-> 	continuous array in which each element is a single buffer and has the size
->-	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails we give up much
->+	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails, we keep retrying
->+	with half of the buffer count until it is ether successful or (unlikely)
->+	we dip below the old hard coded value which is 16 where we give up much
-> 	like before having this control.
-> 
-> 	Default: 16
->@@ -103,7 +105,9 @@ smcr_max_recv_wr - INTEGER
-> 
-> 	Please be aware that all the buffers need to be allocated as a physically
-> 	continuous array in which each element is a single buffer and has the size
->-	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails we give up much
->+	of SMC_WR_BUF_SIZE (48) bytes. If the allocation fails, we keep retrying
->+	with half of the buffer count until it is ether successful or (unlikely)
->+	we dip below the old hard coded value which is 16 where we give up much
-> 	like before having this control.
-> 
-> 	Default: 48
->diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
->index be0c2da83d2b..e4eabc83719e 100644
->--- a/net/smc/smc_core.c
->+++ b/net/smc/smc_core.c
->@@ -810,6 +810,8 @@ int smcr_link_init(struct smc_link_group *lgr, struct smc_link *lnk,
-> 	lnk->clearing = 0;
-> 	lnk->path_mtu = lnk->smcibdev->pattr[lnk->ibport - 1].active_mtu;
-> 	lnk->link_id = smcr_next_link_id(lgr);
->+	lnk->max_send_wr = lgr->max_send_wr;
->+	lnk->max_recv_wr = lgr->max_recv_wr;
-> 	lnk->lgr = lgr;
-> 	smc_lgr_hold(lgr); /* lgr_put in smcr_link_clear() */
-> 	lnk->link_idx = link_idx;
->@@ -836,27 +838,39 @@ int smcr_link_init(struct smc_link_group *lgr, struct smc_link *lnk,
-> 	rc = smc_llc_link_init(lnk);
-> 	if (rc)
-> 		goto out;
->-	rc = smc_wr_alloc_link_mem(lnk);
->-	if (rc)
->-		goto clear_llc_lnk;
-> 	rc = smc_ib_create_protection_domain(lnk);
-> 	if (rc)
->-		goto free_link_mem;
->-	rc = smc_ib_create_queue_pair(lnk);
->-	if (rc)
->-		goto dealloc_pd;
->+		goto clear_llc_lnk;
->+	do {
->+		rc = smc_ib_create_queue_pair(lnk);
->+		if (rc)
->+			goto dealloc_pd;
->+		rc = smc_wr_alloc_link_mem(lnk);
->+		if (!rc)
->+			break;
->+		else if (rc != -ENOMEM) /* give up */
->+			goto destroy_qp;
->+		/* retry with smaller ... */
->+		lnk->max_send_wr /= 2;
->+		lnk->max_recv_wr /= 2;
->+		/* ... unless droping below old SMC_WR_BUF_SIZE */
->+		if (lnk->max_send_wr < 16 || lnk->max_recv_wr < 48)
->+			goto destroy_qp;
->+		smc_ib_destroy_queue_pair(lnk);
->+	} while (1);
->+
-> 	rc = smc_wr_create_link(lnk);
-> 	if (rc)
->-		goto destroy_qp;
->+		goto free_link_mem;
-> 	lnk->state = SMC_LNK_ACTIVATING;
-> 	return 0;
-> 
->+free_link_mem:
->+	smc_wr_free_link_mem(lnk);
-> destroy_qp:
-> 	smc_ib_destroy_queue_pair(lnk);
-> dealloc_pd:
-> 	smc_ib_dealloc_protection_domain(lnk);
->-free_link_mem:
->-	smc_wr_free_link_mem(lnk);
-> clear_llc_lnk:
-> 	smc_llc_link_clear(lnk, false);
-> out:
->diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
->index 8d06c8bb14e9..5c18f08a4c8a 100644
->--- a/net/smc/smc_core.h
->+++ b/net/smc/smc_core.h
->@@ -175,6 +175,8 @@ struct smc_link {
-> 	struct completion	llc_testlink_resp; /* wait for rx of testlink */
-> 	int			llc_testlink_time; /* testlink interval */
-> 	atomic_t		conn_cnt; /* connections on this link */
->+	u16			max_send_wr;
->+	u16			max_recv_wr;
+DCCP sockets in DCCP_REQUESTING state do not check the sequence number
+or acknowledgment number for incoming Reset, CloseReq, and Close packets.
 
-Here, you've moved max_send_wr/max_recv_wr from the link group to individual links.
-This means we can now have different max_send_wr/max_recv_wr values on two
-different links within the same link group.
+As a result, an attacker can send a spoofed Reset packet while the client
+is in the requesting state. The client will accept the packet without
+verification and immediately close the connection, causing a denial of
+service (DoS) attack.
 
-Since in Alibaba we doesn't use multi-link configurations, we haven't tested
-this scenario. Have you tested the link-down handling process in a multi-link
-setup?
+This patch moves the processing of Reset, Close, and CloseReq packets
+into dccp_rcv_request_sent_state_process() and validates the ack number
+before accepting them.
 
-Otherwise, the patch looks good to me.
+This fix should apply to stable versions *only* in Linux 5.x and 6.x.
+Note that DCCP was removed in Linux 6.16, so this patch is only relevant
+for older versions. We tested it on Ubuntu 24.04 LTS (Linux 6.8) and
+it worked as expected.
 
-Best regards,
-Dust
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Cc: stable@vger.kernel.org
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+---
+ net/dccp/input.c | 54 ++++++++++++++++++++++++++++--------------------
+ 1 file changed, 32 insertions(+), 22 deletions(-)
 
-> };
-> 
-> /* For now we just allow one parallel link per link group. The SMC protocol
->diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
->index 883fb0f1ce43..5feafa98ab1a 100644
->--- a/net/smc/smc_wr.c
->+++ b/net/smc/smc_wr.c
->@@ -547,9 +547,9 @@ void smc_wr_remember_qp_attr(struct smc_link *lnk)
-> 		    IB_QP_DEST_QPN,
-> 		    &init_attr);
-> 
->-	lnk->wr_tx_cnt = min_t(size_t, lnk->lgr->max_send_wr,
->+	lnk->wr_tx_cnt = min_t(size_t, lnk->max_send_wr,
-> 			       lnk->qp_attr.cap.max_send_wr);
->-	lnk->wr_rx_cnt = min_t(size_t, lnk->lgr->max_recv_wr,
->+	lnk->wr_rx_cnt = min_t(size_t, lnk->max_recv_wr,
-> 			       lnk->qp_attr.cap.max_recv_wr);
-> }
-> 
->@@ -741,51 +741,51 @@ int smc_wr_alloc_lgr_mem(struct smc_link_group *lgr)
-> int smc_wr_alloc_link_mem(struct smc_link *link)
-> {
-> 	/* allocate link related memory */
->-	link->wr_tx_bufs = kcalloc(link->lgr->max_send_wr,
->+	link->wr_tx_bufs = kcalloc(link->max_send_wr,
-> 				   SMC_WR_BUF_SIZE, GFP_KERNEL);
-> 	if (!link->wr_tx_bufs)
-> 		goto no_mem;
->-	link->wr_rx_bufs = kcalloc(link->lgr->max_recv_wr, link->wr_rx_buflen,
->+	link->wr_rx_bufs = kcalloc(link->max_recv_wr, link->wr_rx_buflen,
-> 				   GFP_KERNEL);
-> 	if (!link->wr_rx_bufs)
-> 		goto no_mem_wr_tx_bufs;
->-	link->wr_tx_ibs = kcalloc(link->lgr->max_send_wr,
->+	link->wr_tx_ibs = kcalloc(link->max_send_wr,
-> 				  sizeof(link->wr_tx_ibs[0]), GFP_KERNEL);
-> 	if (!link->wr_tx_ibs)
-> 		goto no_mem_wr_rx_bufs;
->-	link->wr_rx_ibs = kcalloc(link->lgr->max_recv_wr,
->+	link->wr_rx_ibs = kcalloc(link->max_recv_wr,
-> 				  sizeof(link->wr_rx_ibs[0]),
-> 				  GFP_KERNEL);
-> 	if (!link->wr_rx_ibs)
-> 		goto no_mem_wr_tx_ibs;
->-	link->wr_tx_rdmas = kcalloc(link->lgr->max_send_wr,
->+	link->wr_tx_rdmas = kcalloc(link->max_send_wr,
-> 				    sizeof(link->wr_tx_rdmas[0]),
-> 				    GFP_KERNEL);
-> 	if (!link->wr_tx_rdmas)
-> 		goto no_mem_wr_rx_ibs;
->-	link->wr_tx_rdma_sges = kcalloc(link->lgr->max_send_wr,
->+	link->wr_tx_rdma_sges = kcalloc(link->max_send_wr,
-> 					sizeof(link->wr_tx_rdma_sges[0]),
-> 					GFP_KERNEL);
-> 	if (!link->wr_tx_rdma_sges)
-> 		goto no_mem_wr_tx_rdmas;
->-	link->wr_tx_sges = kcalloc(link->lgr->max_send_wr, sizeof(link->wr_tx_sges[0]),
->+	link->wr_tx_sges = kcalloc(link->max_send_wr, sizeof(link->wr_tx_sges[0]),
-> 				   GFP_KERNEL);
-> 	if (!link->wr_tx_sges)
-> 		goto no_mem_wr_tx_rdma_sges;
->-	link->wr_rx_sges = kcalloc(link->lgr->max_recv_wr,
->+	link->wr_rx_sges = kcalloc(link->max_recv_wr,
-> 				   sizeof(link->wr_rx_sges[0]) * link->wr_rx_sge_cnt,
-> 				   GFP_KERNEL);
-> 	if (!link->wr_rx_sges)
-> 		goto no_mem_wr_tx_sges;
->-	link->wr_tx_mask = bitmap_zalloc(link->lgr->max_send_wr, GFP_KERNEL);
->+	link->wr_tx_mask = bitmap_zalloc(link->max_send_wr, GFP_KERNEL);
-> 	if (!link->wr_tx_mask)
-> 		goto no_mem_wr_rx_sges;
->-	link->wr_tx_pends = kcalloc(link->lgr->max_send_wr,
->+	link->wr_tx_pends = kcalloc(link->max_send_wr,
-> 				    sizeof(link->wr_tx_pends[0]),
-> 				    GFP_KERNEL);
-> 	if (!link->wr_tx_pends)
-> 		goto no_mem_wr_tx_mask;
->-	link->wr_tx_compl = kcalloc(link->lgr->max_send_wr,
->+	link->wr_tx_compl = kcalloc(link->max_send_wr,
-> 				    sizeof(link->wr_tx_compl[0]),
-> 				    GFP_KERNEL);
-> 	if (!link->wr_tx_compl)
->@@ -906,7 +906,7 @@ int smc_wr_create_link(struct smc_link *lnk)
-> 		goto dma_unmap;
-> 	}
-> 	smc_wr_init_sge(lnk);
->-	bitmap_zero(lnk->wr_tx_mask, lnk->lgr->max_send_wr);
->+	bitmap_zero(lnk->wr_tx_mask, lnk->max_send_wr);
-> 	init_waitqueue_head(&lnk->wr_tx_wait);
-> 	rc = percpu_ref_init(&lnk->wr_tx_refs, smcr_wr_tx_refs_free, 0, GFP_KERNEL);
-> 	if (rc)
->-- 
->2.48.1
+diff --git a/net/dccp/input.c b/net/dccp/input.c
+index 2cbb757a8..0b1ffb044 100644
+--- a/net/dccp/input.c
++++ b/net/dccp/input.c
+@@ -397,21 +397,22 @@ static int dccp_rcv_request_sent_state_process(struct sock *sk,
+ 	 *	     / * Response processing continues in Step 10; Reset
+ 	 *		processing continues in Step 9 * /
+ 	*/
++	struct dccp_sock *dp = dccp_sk(sk);
++
++	if (!between48(DCCP_SKB_CB(skb)->dccpd_ack_seq,
++				dp->dccps_awl, dp->dccps_awh)) {
++		dccp_pr_debug("invalid ackno: S.AWL=%llu, "
++					"P.ackno=%llu, S.AWH=%llu\n",
++					(unsigned long long)dp->dccps_awl,
++			(unsigned long long)DCCP_SKB_CB(skb)->dccpd_ack_seq,
++					(unsigned long long)dp->dccps_awh);
++		goto out_invalid_packet;
++	}
++
+ 	if (dh->dccph_type == DCCP_PKT_RESPONSE) {
+ 		const struct inet_connection_sock *icsk = inet_csk(sk);
+-		struct dccp_sock *dp = dccp_sk(sk);
+-		long tstamp = dccp_timestamp();
+-
+-		if (!between48(DCCP_SKB_CB(skb)->dccpd_ack_seq,
+-			       dp->dccps_awl, dp->dccps_awh)) {
+-			dccp_pr_debug("invalid ackno: S.AWL=%llu, "
+-				      "P.ackno=%llu, S.AWH=%llu\n",
+-				      (unsigned long long)dp->dccps_awl,
+-			   (unsigned long long)DCCP_SKB_CB(skb)->dccpd_ack_seq,
+-				      (unsigned long long)dp->dccps_awh);
+-			goto out_invalid_packet;
+-		}
+ 
++		long tstamp = dccp_timestamp();
+ 		/*
+ 		 * If option processing (Step 8) failed, return 1 here so that
+ 		 * dccp_v4_do_rcv() sends a Reset. The Reset code depends on
+@@ -496,6 +497,13 @@ static int dccp_rcv_request_sent_state_process(struct sock *sk,
+ 		}
+ 		dccp_send_ack(sk);
+ 		return -1;
++	} else if (dh->dccph_type == DCCP_PKT_RESET) {
++		dccp_rcv_reset(sk, skb);
++		return 0;
++	} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {
++		return dccp_rcv_closereq(sk, skb);
++	} else if (dh->dccph_type == DCCP_PKT_CLOSE) {
++		return dccp_rcv_close(sk, skb);
+ 	}
+ 
+ out_invalid_packet:
+@@ -658,17 +666,19 @@ int dccp_rcv_state_process(struct sock *sk, struct sk_buff *skb,
+ 	 *		Set TIMEWAIT timer
+ 	 *		Drop packet and return
+ 	 */
+-	if (dh->dccph_type == DCCP_PKT_RESET) {
+-		dccp_rcv_reset(sk, skb);
+-		return 0;
+-	} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {	/* Step 13 */
+-		if (dccp_rcv_closereq(sk, skb))
+-			return 0;
+-		goto discard;
+-	} else if (dh->dccph_type == DCCP_PKT_CLOSE) {		/* Step 14 */
+-		if (dccp_rcv_close(sk, skb))
++	if (sk->sk_state != DCCP_REQUESTING) {
++		if (dh->dccph_type == DCCP_PKT_RESET) {
++			dccp_rcv_reset(sk, skb);
+ 			return 0;
+-		goto discard;
++		} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {	/* Step 13 */
++			if (dccp_rcv_closereq(sk, skb))
++				return 0;
++			goto discard;
++		} else if (dh->dccph_type == DCCP_PKT_CLOSE) {		/* Step 14 */
++			if (dccp_rcv_close(sk, skb))
++				return 0;
++			goto discard;
++		}
+ 	}
+ 
+ 	switch (sk->sk_state) {
+-- 
+2.34.1
+
 
