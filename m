@@ -1,93 +1,150 @@
-Return-Path: <netdev+bounces-227100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97C4ABA84A1
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 09:46:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A754BA8504
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 09:49:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51AB61684C8
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 07:46:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B7FC189CD3D
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 07:49:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1E92AEE1;
-	Mon, 29 Sep 2025 07:46:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZQIvOdPR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CEC925B1E0;
+	Mon, 29 Sep 2025 07:48:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C168D2AD16;
-	Mon, 29 Sep 2025 07:46:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBACB2248B9;
+	Mon, 29 Sep 2025 07:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759131972; cv=none; b=iGdX0xoVVduvraG/Bpxz8j5ALykV1tJI5YBSfC2obsJrctoKmlzQ58V5KzOC+gwNFU27L2asdrySDkg40VftI2w/WpGQ8QBG/BpSnXO+8EK/Zb4TOtpP3fLmZPt1lGN6V68fJxHWBRfOv2LTs6I5k8EBFMHg5LlPJNLo+2/HJtE=
+	t=1759132134; cv=none; b=eTjYKx5gsC9ROoO8ZwO1MT/HGwO/Ez806ogbuEA5w8G6+k6EHRkyPy4JBc32AHQWsDfM7pObaTvE9pr0mb6zXF5o9AktfQr6SCAAr8VjU8XnqAIPXuQz9fl1NQhG9zShypkuVxOZViAIa8BjYlyPOWX77VjRxDB3FYmuXFUq3g8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759131972; c=relaxed/simple;
-	bh=zyXlfmidRAM1ua1ng8Wkw3W+HAJOLmaX8U2jJhQxs6s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jni947wJ2IAI75M3InxnpCzdAH7erb5l14zn6ljg9fFllVQ9ciau3G4Lr3NAZ7OnQ4thhsLfxZBrUo5fkC3eML4WAxyIfuL0hWV2oUfHHFkkFxY3F2ZYCtzfJAw+c9bPOMwQsqoJ7dnfGqTUVtzu2GwaKPE9W8iWzEkAoSV/xJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZQIvOdPR; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id C7A06C8EC65;
-	Mon, 29 Sep 2025 07:45:43 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 6CE6D606AE;
-	Mon, 29 Sep 2025 07:46:01 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 673B1102F183C;
-	Mon, 29 Sep 2025 09:45:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1759131960; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=r5PWs7B59tRb4M2bO2nxcrF0rvvVbxQdUU3EETzQvU8=;
-	b=ZQIvOdPRiS28WneCM/jUw0bI25tnniX1zqCjbXrN6ez7wh8pBSCTHDutI8juEQzvZIaIVR
-	tlFZpUi8szUikhfwzKE67XslboIzOeSfgiJqMKz1byo+VBWnRD07G2/peL4N6evxnJtu9r
-	kgw9oQljy//skWfINwr7vAFdSk8Ucz5MiwfpTV72eLGUuVcKgpgXvmsxkAUJePtJYUnIgk
-	Uor0ddmfE1BeGviy3S5z32mA0KSYkGx9f8YEOiwhW1J7GodDpnzphpIzhmqNqRxQQ8z/jT
-	NMtaSuoSV4C81QnYDjVZcFd+zSEWhEtJnZqZ2ihCTRu8EGi2ayp66cHnfZoNDA==
-Date: Mon, 29 Sep 2025 09:45:52 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3] net: wan: framer: Add version sysfs attribute for
- the Lantiq PEF2256 framer
-Message-ID: <20250929094552.5f035bca@bootlin.com>
-In-Reply-To: <77a27941d6924b1009df0162ed9f0fa07ed6e431.1758726302.git.christophe.leroy@csgroup.eu>
-References: <77a27941d6924b1009df0162ed9f0fa07ed6e431.1758726302.git.christophe.leroy@csgroup.eu>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1759132134; c=relaxed/simple;
+	bh=0Y6gG69mX438DbkyUV1S5oLqHKgCc2R3/5usi/QhoHA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iK5Qj22ZITE2w3ycfldY+wRK4F8r7I7M9FwuXLFWOZLcznFSLL10KIFLEbrQhiIH56+M3EX+HwlMHAcMK6DB+aJATtaYqPDMFS2HnkcKNunwIM5ogAmQx5MaYTnsEchWoAc5Bv2kTza4enf0KWKifGF4MN+fIvmWYvj126WVmLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c45ff70000001609-64-68da39dd678a
+Date: Mon, 29 Sep 2025 16:48:40 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel_team@skhynix.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, almasrymina@google.com,
+	hawk@kernel.org, toke@redhat.com, asml.silence@gmail.com
+Subject: Re: [PATCH net-next v3] netmem: replace __netmem_clear_lsb() with
+ netmem_to_nmdesc()
+Message-ID: <20250929074840.GA19203@system.software.com>
+References: <20250926035423.51210-1-byungchul@sk.com>
+ <aNau1UuLdO296pJf@horms.kernel.org>
+ <20250929014619.GA20562@system.software.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250929014619.GA20562@system.software.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrLLMWRmVeSWpSXmKPExsXC9ZZnke49y1sZBpevs1qs/lFhMWfVNkaL
+	OedbWCyeHnvEbrGnfTuzxaP+E2wWF7b1sVpc3jWHzeLYAjGLb6ffMFpcOvyIxYHbY8vKm0we
+	O2fdZfdYsKnUY9OqTjaP9/uusnl83iQXwBbFZZOSmpNZllqkb5fAlbHi3Du2grPCFS3z7rM2
+	MP7h62Lk4JAQMJG41Z/XxcgJZj662sUCYrMIqEr8PHeEEcRmE1CXuHHjJzOILSKgLHF2bgtT
+	FyMXB7PAd0aJq3v/sIEkhAXiJTauessEYvMKWEjM3tMDViQk0MUoseX8ThaIhKDEyZlPwGxm
+	AS2JG/9eMoEcwSwgLbH8HwdImFPAUuJwyzKwOaJAyw5sOw42R0LgMpvEru9tzBCXSkocXHGD
+	ZQKjwCwkY2chGTsLYewCRuZVjEKZeWW5iZk5JnoZlXmZFXrJ+bmbGIGRsKz2T/QOxk8Xgg8x
+	CnAwKvHwJtjfzBBiTSwrrsw9xCjBwawkwlu3+UaGEG9KYmVValF+fFFpTmrxIUZpDhYlcV6j
+	b+UpQgLpiSWp2ampBalFMFkmDk6pBsakJYGiwpM/p65Ytuz6wrdbSlxNZJISbBhy1gV5HTq2
+	retEpQ6jfunBVyzXPsp4uoZ+2nvg9kuh3c0WLYsmrjZf+2jnpu/POVemSmu+V7deF3r6lcXE
+	L+8ehsyVFmRgEF73KeAB66wJB3ZnC/aVt9Tk9HP9TbRL0iuz74zik25TcLu3s6FI4poSS3FG
+	oqEWc1FxIgCDB3zVgAIAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrKLMWRmVeSWpSXmKPExsXC5WfdrHvX8laGwYrTlharf1RYzFm1jdFi
+	zvkWFounxx6xW+xp385s8aj/BJvF4bknWS0ubOtjtbi8aw6bxbEFYhbfTr9htLh0+BGLA4/H
+	lpU3mTx2zrrL7rFgU6nHplWdbB7v911l81j84gOTx+dNcgHsUVw2Kak5mWWpRfp2CVwZK869
+	Yys4K1zRMu8+awPjH74uRk4OCQETiUdXu1hAbBYBVYmf544wgthsAuoSN278ZAaxRQSUJc7O
+	bWHqYuTiYBb4zihxde8fNpCEsEC8xMZVb5lAbF4BC4nZe3rAioQEuhgltpzfyQKREJQ4OfMJ
+	mM0soCVx499LoCIOIFtaYvk/DpAwp4ClxOGWZWBzRIGWHdh2nGkCI+8sJN2zkHTPQuhewMi8
+	ilEkM68sNzEzx1SvODujMi+zQi85P3cTIzCwl9X+mbiD8ctl90OMAhyMSjy8CfY3M4RYE8uK
+	K3MPMUpwMCuJ8NZtvpEhxJuSWFmVWpQfX1Sak1p8iFGag0VJnNcrPDVBSCA9sSQ1OzW1ILUI
+	JsvEwSnVwKi3+5qw1kttp/dhL/g3ff9wWkj79L7r7tyl2sv+NRzaekyj+0F4TobR/MjEt9cO
+	/J9oUZGzkeuE+o0FFT2bdmsqTtm3yOQXm5t+2fzfzz/nh+ezWesycST/L2Uye1XqqCfa8pYh
+	Rnf+hr9ONhzqxw8GdAay5Gvc/2Is16mqctt53cub+kG3jymxFGckGmoxFxUnAgATHIaVaAIA
+	AA==
+X-CFilter-Loop: Reflected
 
-Hi Christophe,
-
-On Wed, 24 Sep 2025 17:06:47 +0200
-Christophe Leroy <christophe.leroy@csgroup.eu> wrote:
-
-> Lantiq PEF2256 framer has some little differences in behaviour
-> depending on its version.
+On Mon, Sep 29, 2025 at 10:46:19AM +0900, Byungchul Park wrote:
+> On Fri, Sep 26, 2025 at 04:18:45PM +0100, Simon Horman wrote:
+> > On Fri, Sep 26, 2025 at 12:54:23PM +0900, Byungchul Park wrote:
+> > > Changes from RFC v2:
+> > >       1. Add a Reviewed-by tag (Thanks to Mina)
+> > >       2. Rebase on main branch as of Sep 22
+> > >
+> > > Changes from RFC:
+> > >       1. Optimize the implementation of netmem_to_nmdesc to use less
+> > >          instructions (feedbacked by Pavel)
+> > >
+> > > --->8---
+> > > >From 01d23fc4b20c369a2ecf29dc92319d55a4e63aa2 Mon Sep 17 00:00:00 2001
+> > > From: Byungchul Park <byungchul@sk.com>
+> > > Date: Tue, 29 Jul 2025 19:34:12 +0900
+> > > Subject: [PATCH net-next v3] netmem: replace __netmem_clear_lsb() with netmem_to_nmdesc()
+> > >
+> > > Now that we have struct netmem_desc, it'd better access the pp fields
+> > > via struct netmem_desc rather than struct net_iov.
+> > >
+> > > Introduce netmem_to_nmdesc() for safely converting netmem_ref to
+> > > netmem_desc regardless of the type underneath e.i. netmem_desc, net_iov.
+> > >
+> > > While at it, remove __netmem_clear_lsb() and make netmem_to_nmdesc()
+> > > used instead.
+> > >
+> > > Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
+> > > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > > Reviewed-by: Mina Almasry <almasrymina@google.com>
+> > 
+> > Hi Byungchul,
+> > 
+> > Some process issues from my side.
+> > 
+> > 1. The revision information, up to including the '--->8---' line above
+> >    should be below the scissors ('---') below.
+> > 
+> >    This is so that it is available to reviewers, appears in mailing
+> >    list archives, and so on. But is not included in git history.
 > 
-> Add a sysfs attribute to allow user applications to know the
-> version.
+> Ah yes.  Thank you.  Lemme check.
 > 
-> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> ---
+> > 2. Starting the patch description with a 'From: ' line is fine.
+> >    But 'Date:" and 'Subject:' lines don't belong there.
+> > 
+> >    Perhaps 1 and 2 are some sort of tooling error?
+> > 
+> > 3. Unfortunately while this patch is targeted at net-next,
+> >    it doesn't apply cleanly there.
+> 
+> I don't understand why.  Now I just rebased on the latest 'main' and it
+> works well.  What should I check else?
 
-Acked-by: Herve Codina <herve.codina@bootlin.com>
+I think 1 and 2 ends in 3.  I will fix it and resend it after the merge
+window.
 
-Best regards,
-Hervé
+	Byungchul
+
+> > When you repost, be sure to observe the 24h rule.
+> 
+> Thanks!
+> 
+> 	Byungchul
+> 
+> > Link: https://docs.kernel.org/process/maintainer-netdev.html
+> > 
+> > --
+> > pw-bot: changes-requested
+> > 
+> > ...
 
