@@ -1,127 +1,201 @@
-Return-Path: <netdev+bounces-227194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FA6FBA9EB0
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 18:01:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4037DBA9EDD
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 18:03:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C64361921EB5
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 16:01:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 239441922972
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 16:03:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E0830C34D;
-	Mon, 29 Sep 2025 16:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 737ED30CB3E;
+	Mon, 29 Sep 2025 16:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LNaRV2DX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WIEdNKCJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E74B1F5847
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 16:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B046930C624
+	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 16:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759161663; cv=none; b=e6IK+ulsS6/KuHxN96Gp46aCw3uap0euda7CG4q7R7KMOrkJOpGd5PAuBkE5JmrU7IvALEXYAFst+SzUgc13pdqfOzU263yCvA0UYhj1Fo//wRnh+x7jU6V95wo3q08yVyaH4h3ti+fZM8sXPb8SE5/lECxb7AJMFWj4n2/FyLA=
+	t=1759161795; cv=none; b=NgpyCisI2UEFZzU4Ty4L7Tokbc/gX+fKeGQI/7+3zqQkLVAWeaGFVy+tuPj0b7dFM1KvEeCP47qmgTVriIJxhRvvznaHF32F8sS+WFmTly332WW9diNcFdevDW/rHFbMnXBqxgE3mHS0wMIHhewg3i6uuoCTZWxklShwNzhZJ08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759161663; c=relaxed/simple;
-	bh=rvJzaJvHn4ysl0SarKojQPWkHG0cHul95/d7suros2Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bHxaYlXmPXi94Kafh5GeXA2u7L8jWEJostILx6bHsfTr2qq1/m34vnxkIdD/ThKO8m9NN8v/ssbwLNRTTLchbaFRnShdv1RXj7U/HDq0Pj16mRGEdhjUonplwl+L/b0HQHxc8rZXLbo5NmAeYT/Vgi2wZP/1T9fHlmxS4i4Wt+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LNaRV2DX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759161660;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rvJzaJvHn4ysl0SarKojQPWkHG0cHul95/d7suros2Y=;
-	b=LNaRV2DXAy3qAqa7MrJNS5Jbzyj/+EdIz+zilGrOcP0+zjaeIqs7os96RRspzyWBo12erE
-	HStGwFZzEhu30pQ5X2+qqut/vmE+/DZa5v1wcTX8WdHFFJVrLJuR/KMIGNcpBLBu84cAT5
-	z0UnVGIvo6FbyWQDY8ZScZ/0rmWOcnA=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-530-9E-7Pp4cPxOd4v_A1aaxBw-1; Mon, 29 Sep 2025 12:00:57 -0400
-X-MC-Unique: 9E-7Pp4cPxOd4v_A1aaxBw-1
-X-Mimecast-MFC-AGG-ID: 9E-7Pp4cPxOd4v_A1aaxBw_1759161656
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b07d13a7752so566173966b.3
-        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 09:00:56 -0700 (PDT)
+	s=arc-20240116; t=1759161795; c=relaxed/simple;
+	bh=1jkw+7EvuIa/Han8qcxFLmMTXaJYMq7ZJC5YxwM3xL0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HvjU8ZKBCmj5wJG7uxMKy+aCgeABsh8WfmAAlNX9jp8Dl3Xc61g+nMn//BETugg+JUElFbsDb1OnYJCtys6KdTZF2AhMgW9Hx5RDmztOFAY2HAHMcNBrfoIhEkKf4Chw8To/+Dtxz8YIwR+3tFi6wLcyZDZcRjCZaf2rYwDjD5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WIEdNKCJ; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-77f1f29a551so6401348b3a.3
+        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 09:03:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759161793; x=1759766593; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KefHEpASHlImKTlDtTejqsu/vtIp51mWF2HZGf1Fkyo=;
+        b=WIEdNKCJukuVi1h9DOdGQ8/Muw/4sk1r+sFqcwhZkzSs/T7nS0Z5rIDRn0aJ6QR4nD
+         L/ujvWnbM0exKAO889chaTUy8tlRN6IsN3nWEnANfXUV0O+wt6pJH7+L7wjJKiVQxVEV
+         etiSJTLGdU3bIKYBrO5CitRoAZ+zhm9sET7i9OoMMxIkzQ31xC+s3zWMH3SZgFr6yhnn
+         RkNGWUtxM1lrAPY8Rc4pCk6z/GF8x4C2rrkOyin9DU+vHh+X0hNrVbpVkV2oNWC4WeYS
+         7cxdtiNjT0m1NveXp8MgDzScEXYM3IQEuAjTCdAtwFxaQmZlEWn8XD+AV4r+J20HiGYg
+         NOcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759161656; x=1759766456;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rvJzaJvHn4ysl0SarKojQPWkHG0cHul95/d7suros2Y=;
-        b=X+S63QFrbC/o300hslTx6FGgAURF+cGNH4PiWqs/8ElTCJPAdLDi97+iFvI9L0jbYB
-         HfZQ3aOvZH31kr0r30vTiK4ZGiWdZJ+1T0luSHEoN5C3qwcXy+d8hEE265FCKkFwvBIM
-         JGs2W90PIsqW+vgLrDP0nBj923sN/V3/m1/XKHFU6oeOhk6aAgske0U0AIBX5B3vLAbb
-         s9ygkK8NfJjHEFChqsJzQsm86T2xBjm2kd3LaVskvKO96XPA7ZCWV+jsRmcvF3I/LVRg
-         fZdYhhYtfZm8QbmvsU1+6G5Amtmalec9K03r9Yn1cMO37sYoNsFiQa9pRYfHQ+Q68GhP
-         zmiw==
-X-Forwarded-Encrypted: i=1; AJvYcCWFBJBnCLcIqpUbHyAiN57+gaaWHBvfQVixAQTXOKztJZb0J520JvRaz64dBrNN93v4IjtHjTc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiecF/2xn+qWLTl2AfFGZr8yuhGYjxBQtM75evJFVXulXzJ9VO
-	0Y/G4ZiEvinViAAW8dkUwq5Kgun0tSwAn7kt9fkBK5UDjTuZ3LwuYERPfteIDkFL+jjh5Aq2SNd
-	Sq3Z/yGZbbtlbBZBwPlWT6vMlc4qN20APRQm9InYvpkl4Y/JNoDT9RVMfBlD/D4nUBLss9BWAxW
-	iEWyYrpfb8lgTRUDrbyOrqMSJKMGFJ+gh/
-X-Gm-Gg: ASbGnctM77/RoRrLBYjN/uxjhoJ81WLnyNzTBIFF7UKZg3XgxK8UwjZuNYCcpKuqvfi
-	xM1vCrYDEnxmDrZlTfTIC7vkxw+hky9J78b7Dor/McFyc0qgDo/fGIY6lWVy5iwgK3HofBKzgFF
-	pWE6VYwR1fYM9+HAuDf4E8Ng==
-X-Received: by 2002:a17:907:3e9f:b0:b3b:d772:719b with SMTP id a640c23a62f3a-b3bd781ba71mr843425566b.41.1759161655729;
-        Mon, 29 Sep 2025 09:00:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6hzu6lwEjjnhGnHFD8M9ofM8ojrlvCKKGBmnqXaS/KCPAQ0khSQKd+hnPIMyAHKH3zg+/WlTMjm+XtQu+5y0=
-X-Received: by 2002:a17:907:3e9f:b0:b3b:d772:719b with SMTP id
- a640c23a62f3a-b3bd781ba71mr843420566b.41.1759161655326; Mon, 29 Sep 2025
- 09:00:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759161793; x=1759766593;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KefHEpASHlImKTlDtTejqsu/vtIp51mWF2HZGf1Fkyo=;
+        b=Go+S/K3gMQ2vr+u7t6V70ugCzo8QLdprpt+2oMSWSAOpS0W0BWOvngJ4ptPsoriApx
+         pqcyTYxb87Wawoc3fcLXSrf4NsRHx7VcKQOBB90cOBDLRHeI4FoShux4Gm5JGD48ilQ5
+         9ar8c6n1DSpw7LPRhpHETywWPK82ZIC6p/TuNK2vl3RrY2KI9CmOA7qnn+Rn5EFER8EI
+         z1ycBDBHTFIsrbUarPD6YWmxANNxU9OGcAP9mHIvxSE913OhxQ997MOJLzPllHPlqd2I
+         EA3zjWWd3OH9nLJdPges247k3rmJR3yIVJuARda8l1TkXFy1Vxvpf+ovIilfN09rUHt0
+         +KXw==
+X-Gm-Message-State: AOJu0YwP41jRRXNMQJQkOsl2iFZWusHsr4RJhvHo09pRj0buZ5D95hnE
+	pB3gEaw0Hqh0Vccw9zJ1u5o2oXwCCvtOf+GSXmmYyi0BdE6KEK96OLj7
+X-Gm-Gg: ASbGncuwcLp3JBdofBoVSDI81dCv4FbMuPiq0B+LxGJOBX0QtEQ9yQfhEtYomT3UzUA
+	b4N/RfDns9+BMoNLj++m7J9WjMtSo+4SWkWeAEWl0HeSAF1AuHebawN3tBJJmBrzWKZ1ujcb034
+	bjCjDYR436jF2UrR+HSA/YT4coWd3kTZguVh26F9FZIKs5P3bT3EYOlPR3X7PcDPoLe4POafoZv
+	g5yimGLkvY98Qlc9sIhYimnxyRiHSQ6gmT8dVE97KIhCHamjToopnzbX4mdiLJmiQKNzH6KQhZa
+	ef7wXjEVjQjIviZOrL/IThA/JtPNGiMo+1gKwWA0sP+C29FJ5XcaEmVPACYL9YJz9bkIExz+Ki1
+	D+sVkQMODJsUaTPZUKYoY/0Q3XZNM
+X-Google-Smtp-Source: AGHT+IFLs3m9GZxE68Q18gbvy+0afYHaST+CDXcgc2TlSHRuYVzEECyokcNZHk3sUQVFmBJDY053zw==
+X-Received: by 2002:a05:6a20:9150:b0:248:4d59:93d5 with SMTP id adf61e73a8af0-2e7d72637famr22343288637.55.1759161792642;
+        Mon, 29 Sep 2025 09:03:12 -0700 (PDT)
+Received: from y740.local ([2401:4900:1f30:25ff:36cb:10ee:ba03:839f])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b57c55a0ca2sm11504525a12.42.2025.09.29.09.03.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Sep 2025 09:03:12 -0700 (PDT)
+From: Sidharth Seela <sidharthseela@gmail.com>
+To: antonio@openvpn.net,
+	sd@queasysnail.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	kernelxing@tencent.com,
+	nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com,
+	morbo@google.com,
+	justinstitt@google.com
+Cc: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev,
+	david.hunter.linux@gmail.com,
+	Sidharth Seela <sidharthseela@gmail.com>
+Subject: [PATCH v2] net: Fix uninit character pointer and return values
+Date: Mon, 29 Sep 2025 21:32:31 +0530
+Message-ID: <20250929160230.36941-2-sidharthseela@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cd637504a6e3967954a9e80fc1b75e8c0978087b.1758664002.git.mst@redhat.com>
- <CACGkMEtU9YSuJhuHCk=RZ2wyPbb+zYp05jdGp1rtpJx8iRDpXg@mail.gmail.com>
-In-Reply-To: <CACGkMEtU9YSuJhuHCk=RZ2wyPbb+zYp05jdGp1rtpJx8iRDpXg@mail.gmail.com>
-From: Lei Yang <leiyang@redhat.com>
-Date: Tue, 30 Sep 2025 00:00:18 +0800
-X-Gm-Features: AS18NWC2orrPAiafpnWLj0PiUo6H6ktFe9pH1En2rWhE1VkgRlQKrFKPhSd3Jgc
-Message-ID: <CAPpAL=z9GZKTDETJVEpq1aop8q1Rgn7VaXbV_S4_y-nsVfzpxQ@mail.gmail.com>
-Subject: Re: [PATCH] vhost: vringh: Fix copy_to_iter return value check
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org, 
-	zhang jiao <zhangjiao2@cmss.chinamobile.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Tested this patch with virtio-net regression tests, everything works fine.
+Fix uninitialized character pointer, and functions that return
+undefined values. These issues were caught by running clang using LLVM=1
+option; and are as follows:
+--
+ovpn-cli.c:1587:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+ 1587 |         if (!sock) {
+      |             ^~~~~
+ovpn-cli.c:1635:9: note: uninitialized use occurs here
+ 1635 |         return ret;
+      |                ^~~
+ovpn-cli.c:1587:2: note: remove the 'if' if its condition is always false
+ 1587 |         if (!sock) {
+      |         ^~~~~~~~~~~~
+ 1588 |                 fprintf(stderr, "cannot allocate netlink socket\n");
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1589 |                 goto err_free;
+      |                 ~~~~~~~~~~~~~~
+ 1590 |         }
+      |         ~
+ovpn-cli.c:1584:15: note: initialize the variable 'ret' to silence this warning
+ 1584 |         int mcid, ret;
+      |                      ^
+      |                       = 0
+ovpn-cli.c:2107:7: warning: variable 'ret' is used uninitialized whenever switch case is taken [-Wsometimes-uninitialized]
+ 2107 |         case CMD_INVALID:
+      |              ^~~~~~~~~~~
+ovpn-cli.c:2111:9: note: uninitialized use occurs here
+ 2111 |         return ret;
+      |                ^~~
+ovpn-cli.c:1939:12: note: initialize the variable 'ret' to silence this warning
+ 1939 |         int n, ret;
+      |                   ^
+      |
+--
+so_txtime.c:210:3: warning: variable 'reason' is used uninitialized whenever switch default is taken [-Wsometimes-uninitialized]
+  210 |                 default:
+      |                 ^~~~~~~
+so_txtime.c:219:27: note: uninitialized use occurs here
+  219 |                         data[ret - 1], tstamp, reason);
+      |                                                ^~~~~~
+so_txtime.c:177:21: note: initialize the variable 'reason' to silence this warning
+  177 |                 const char *reason;
+      |                                   ^
+      |
+--
+Fixes: 959bc330a439 ("testing/selftests: add test tool and scripts for ovpn module")
+ovpn module")
+Fixes: ca8826095e4d4 ("selftests/net: report etf errors correctly")
 
-Tested-by: Lei Yang <leiyang@redhat.com>
+Signed-off-by: Sidharth Seela <sidharthseela@gmail.com>
 
-On Wed, Sep 24, 2025 at 8:54=E2=80=AFAM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> On Wed, Sep 24, 2025 at 5:48=E2=80=AFAM Michael S. Tsirkin <mst@redhat.co=
-m> wrote:
-> >
-> > The return value of copy_to_iter can't be negative, check whether the
-> > copied length is equal to the requested length instead of checking for
-> > negative values.
-> >
-> > Cc: zhang jiao <zhangjiao2@cmss.chinamobile.com>
-> > Link: https://lore.kernel.org/all/20250910091739.2999-1-zhangjiao2@cmss=
-.chinamobile.com
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >
-> >
->
-> Acked-by: Jason Wang <jasowang@redhat.com>
->
-> Thanks
->
->
+v2:
+	- Use subsystem name "net".
+	- Add fixes tags.
+	- Remove txtimestamp fix as default case calls error.
+	- Assign constant error string instead of NULL.
+--
+
+diff --git a/tools/testing/selftests/net/ovpn/ovpn-cli.c b/tools/testing/selftests/net/ovpn/ovpn-cli.c
+index 9201f2905f2c..20d00378f34a 100644
+--- a/tools/testing/selftests/net/ovpn/ovpn-cli.c
++++ b/tools/testing/selftests/net/ovpn/ovpn-cli.c
+@@ -1581,7 +1581,7 @@ static int ovpn_listen_mcast(void)
+ {
+ 	struct nl_sock *sock;
+ 	struct nl_cb *cb;
+-	int mcid, ret;
++	int mcid, ret = -1;
+ 
+ 	sock = nl_socket_alloc();
+ 	if (!sock) {
+@@ -1936,7 +1936,7 @@ static int ovpn_run_cmd(struct ovpn_ctx *ovpn)
+ {
+ 	char peer_id[10], vpnip[INET6_ADDRSTRLEN], laddr[128], lport[10];
+ 	char raddr[128], rport[10];
+-	int n, ret;
++	int n, ret = -1;
+ 	FILE *fp;
+ 
+ 	switch (ovpn->cmd) {
+diff --git a/tools/testing/selftests/net/so_txtime.c b/tools/testing/selftests/net/so_txtime.c
+index 8457b7ccbc09..5bf3c483069b 100644
+--- a/tools/testing/selftests/net/so_txtime.c
++++ b/tools/testing/selftests/net/so_txtime.c
+@@ -174,7 +174,7 @@ static int do_recv_errqueue_timeout(int fdt)
+ 	msg.msg_controllen = sizeof(control);
+ 
+ 	while (1) {
+-		const char *reason;
++		const char *reason = "unknown errno";
+ 
+ 		ret = recvmsg(fdt, &msg, MSG_ERRQUEUE);
+ 		if (ret == -1 && errno == EAGAIN)
+-- 
+2.47.3
 
 
