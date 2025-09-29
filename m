@@ -1,103 +1,118 @@
-Return-Path: <netdev+bounces-227178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93634BA9851
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 16:19:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69EBCBA985D
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 16:20:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EB4C3BCD54
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 14:19:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B048E189353F
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 14:20:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5A83090FF;
-	Mon, 29 Sep 2025 14:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55410304BAF;
+	Mon, 29 Sep 2025 14:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SbxDFyue"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="migt2gP7"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67721D86D6
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 14:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950FF126C17
+	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 14:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759155547; cv=none; b=U93HPkGVYC4GknlndU/171AES2ayGA8TFYPerlktOXpycSraf6ueBkXWkACbqQhFB1FHE9uKWvaV4102WliPv6CH5suEIkdZycmQ82aUUG083nXEU5OO+Hl1yp7LbXwPBUcWw/WDpeiQkw2VCSCOBHR5CnMh/+KExUB3EUIs5VU=
+	t=1759155627; cv=none; b=WhNiFrzYtpIW7MnTsVUcOpi0hCmVeI+eCPeE/c6Zzfi3UyEWjx8Rcdxusx2iJu4jpPJqnMCsO60GIjbGXqSz0Rk+JRdPRvZVzmQgf0am5n6sfxDYFI0QfOCtbx082l436lbmpgRPgjCYM65LPwyWvnkb3r2VjmgAxjBfDQzWVNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759155547; c=relaxed/simple;
-	bh=Cqa9Uzqm9/s5VXEeXfESLlelcJ7lJBixKsxsE328zas=;
+	s=arc-20240116; t=1759155627; c=relaxed/simple;
+	bh=9e2ic1wvWE8WehJ3kuMdIIYPcBrUXcQZlimQJDH4mOk=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=nEkiOueMERDc2Md20UuzNlzGBzj9rI9akYzA1x4bp+p6levnU+qbLCxuQf+/gTJdRXnD7pvdAhHjuAQvXL8+u07O2mZNXFr5AffA3vt0xfKzSf+wgdHQq1i8bFJAgy8pDicfyICTOV419NSWttXjwZ5WNGW0a02/wZ/kg8bgGBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SbxDFyue; arc=none smtp.client-ip=209.85.222.48
+	 Mime-Version:Content-Type; b=iZuWwdkq0qiFAHpqdPn+OXSshLWhgWWH078KZwebuo0TezoyRy5Rnfmaj2u0GIvNB/RdwPZ1oHNskstifjcSJgxYOIZVsMMnKlAozTeOpg7xyw9zQNx+uegJTmhiiRxKAqxpFBLgdib8/7apiaixLN5Ead4KztlNdxG7vQZr4Zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=migt2gP7; arc=none smtp.client-ip=209.85.222.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-89018ea5625so1719567241.0
-        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 07:19:04 -0700 (PDT)
+Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-8eafd5a7a23so2454636241.1
+        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 07:20:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759155543; x=1759760343; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1759155624; x=1759760424; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8f8mS2/PsiKtRfA+cy/Ijq5MGOVS0C89p6V4QtDT26M=;
-        b=SbxDFyueq+KFFxSnkeFszRWccwAMQyhNg3Ea8luK9S9Y1BM1SnkRcFKJsj889eM4xa
-         bk2pz2/GrRIOP3Szuuz/199N8jbKGx5AX5d8jQYNhk7eYEOOhmrlARwyakUvu52Uk/0s
-         +ykcPzlLMdTEQbR01LvqtP15Kl9wEm2KrmzoiL2KIU4ztsjwYdSWMCRoFtBQflkDqxU3
-         F+m9pZL7zuqckzC+dNsrlYoMPVAkaZEHEx497NVmB+kLrvxZ+uFHM0TqygZ1XLwQhFIp
-         UWGodqtaZge83fUexSHcJrmJ4M5epTko/U4SuXfRtg4H2+lVPpvZ3tA9laP/eSMgLsQD
-         EiGw==
+        bh=W46uqCXD/DYO2PsPrvcdafdEqjimB/+hIZDXBFn2C/g=;
+        b=migt2gP7GWj2JTQdTzSijFdUfLmym/CdjD2yBM7RMm9Ys2Iub+1GmA9yByytm23g40
+         hRTqJpeXVCM/lsHhKnOYnwUdX32Y63CJAG84G6bOQhiHSRXKY4xH3jlDD50Eoe/Vs34/
+         zcrT81NarET/9WgLk6FJN4vEOHMZy+xQaD6oEm8zDdySWShnjNl0u+xuEMidVjjw5l1J
+         O3lwJCP2y17x3mXs9W6NbodFvRnS/y49X/J+6k51a8wKpJETDfYG1iIAktkyTRfcYHJd
+         cb3Lbp05axpR2c+jTW2l5XSe6L/l4EYu1qFiBYkqjW32piEWd6D5XCOJvcabOBm3TLGH
+         itEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759155543; x=1759760343;
+        d=1e100.net; s=20230601; t=1759155624; x=1759760424;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=8f8mS2/PsiKtRfA+cy/Ijq5MGOVS0C89p6V4QtDT26M=;
-        b=svlOWGClsuCsHyb9YAyFXImOAbel5anjqcEwJ8tggkbVONlR4PXR/mLkt3/nZVECQy
-         WmiGpFCVmii6ZI4qMxYpCst9WIrfUaCFMZ15uLwGfFDTjtc2ML1kyZWmNv3mT4tnAjEn
-         RgpYj70p0D+48O95t84MjIGvCuSz2LpE6xwLFDSPIt2wb5i49uH0rYLAMOLduP5WnTo4
-         DDwQBWvvVP2nulVL8x+SoZBnE5yizsrgd8C4GTX44yDBRNpkiB/ukx97swJW5L4PfW6s
-         PdDPIVcNGp5OwY5JSVzgD+jHDb+AZQ0NfFxsdQA5l4oiHGC0cVD2dRgs2aAqN6k/ME+N
-         GSSA==
-X-Gm-Message-State: AOJu0Yy7LFlAZLfmrP2vi5nBiVeLmfGDcfoc68QSifJZ6i1ONGyOIdVg
-	B7SFGTANBLopAxCBwD+usbmczOsRpwmY3gIQryvae3Tgwfn7DAJhZ/Cm
-X-Gm-Gg: ASbGncuPfxGwZjWEg9+iKCE2EmnMud2alhY02VVxTzFIFe5C4t53A+A4S/d0JeL1/R5
-	GV8VWgC3YXw4No/4P/zXsP8FNW2zr4sBtl2AnEowi+/RzhVcBVQ44N0DiLC1Pz/wS7SVi3jXM4t
-	ToIxdNbYpVFw2R6GP41C5BjJRpCVQeFqG3Ajh2tAU843TfvpjhjRJduowFlwAkZ/j1NS/RVjcZR
-	Co5BwwWjDlsfd1BGLHZJaHtEdiUWnruNFoJFhWPuoNCUpAo5LLJ+thg6ltgA2ZznCRsfYN16zC7
-	jmnTSG4nbWj2YH4pu/9cBYpoM9UmUR5R8usPsCcMXmNeprvNIgc3r0OPW//yurpHfStZtwrI4hd
-	JK3AWWje1SGX4tTuLAmeHBWbbci1LFm26DNBq7gnYmXIR90Fn5i940fmpU+bab8FYL+s6ra5dkU
-	qJDQCM
-X-Google-Smtp-Source: AGHT+IHbGRPyI3TBsvsm/JH3bGpt2g5z5CYtKK6z0SBXiM2oKnumeml9UIrNcgYboy1D+yW+DlMLlA==
-X-Received: by 2002:a05:6122:3117:b0:545:eb6c:c6bb with SMTP id 71dfb90a1353d-54bea300520mr5569540e0c.12.1759155543420;
-        Mon, 29 Sep 2025 07:19:03 -0700 (PDT)
+        bh=W46uqCXD/DYO2PsPrvcdafdEqjimB/+hIZDXBFn2C/g=;
+        b=Gnd6GJ+NZ03RsWbe7ABk6F+lvqGu9LeMDEsxgySFxUmQ9Sivr756/a49AQdk9E8c3f
+         ZSY8ItSyuYFz5WLSfALgUf58yiERrkzo8Mj1/hNtOkdB8zh6lLra8KQiA8+NXJaIa7sv
+         0MfSvhIXZ5DpQR+wBHYyTV6n9n/V5cdPMcXDUT/i388gtZTFiBCay2NOnInckixLszns
+         Pn3X4VkgoNEddo5ifQV8cwuLLwRpoaCxbMkdX9nDbX6zh0KJ0t1dwg38cp1WXAPHg2di
+         kbYqwtilejm388v+yHFJ8RDSRIQX9aLcBMakv/iAxIStpQ+BsQNvgT+BPMLvrak8ZoVA
+         LddQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXG73a3yyRiXoDNO7EWlDSanYjJfYpV4AbeSxRbnvguB8D0fVc8x8HinGDpuHp5d1KhlNct/Gs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0TvQht7CYwKMWGo4v9TgDHLj5xS1XfGWC311vZEdVdpXcscTj
+	EoUkEkFrd+FOguy74d9hlvCXng1KusZq5T+TbXfMUak8DYcVdoyjwpvH
+X-Gm-Gg: ASbGncvAVwniA5htPyQK10lwnoOLn6vpP7Qx71xakhrtbqbse567Aa6ZtozLSwaqZad
+	U60C6cfQuQTYXXhE34zoEbRuJezoyCiDP1Ly406Rb4z8OLZYJC1IIsDdl0QgGyjyuYab6Yy82NJ
+	80I91qvGfG6U9bU7OQ4RMWHLy6s5WmNK4KrPOpXepSVr7zEB428YWduKj7Wej8OJ3gQdLPlUweW
+	RN9e/sdH8Yuc6Okk3Ivy/NNeTmwmH7rW2/wayG85RerxlvkNEGFtfciYZvJnYXN4XyHUffQXNlb
+	TPI0D2dwg8Fwii35++yzuK87LptlaIavt6CvIbJ65eNAcC195QMGAhM0wvzc5JRMrgTu3wwFG4b
+	KXR1yGpH4HpfyVqJ3/5Dhk1yLFgHHkjbBvu5C4VQIkuyQF61kU4lGG/ztLI59fVPj0WsKyg==
+X-Google-Smtp-Source: AGHT+IF9dM2rIldZLZnID4vwmKumarCAuGUMYuEholINlwbv/TDctLyEWMXb6Vz/4VzFzzqqhWBosA==
+X-Received: by 2002:a05:6102:418a:b0:599:8390:ca2 with SMTP id ada2fe7eead31-5ced2e12255mr484114137.9.1759155624152;
+        Mon, 29 Sep 2025 07:20:24 -0700 (PDT)
 Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
-        by smtp.gmail.com with UTF8SMTPSA id 71dfb90a1353d-54c0c1ff0c0sm1330558e0c.11.2025.09.29.07.19.01
+        by smtp.gmail.com with UTF8SMTPSA id ada2fe7eead31-5ae302ee7f1sm3417497137.2.2025.09.29.07.20.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Sep 2025 07:19:01 -0700 (PDT)
-Date: Mon, 29 Sep 2025 10:19:01 -0400
+        Mon, 29 Sep 2025 07:20:23 -0700 (PDT)
+Date: Mon, 29 Sep 2025 10:20:23 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Sidharth Seela <sidharthseela@gmail.com>, 
- antonio@openvpn.net, 
- sd@queasysnail.net, 
+To: Ilya Maximets <i.maximets@ovn.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Aaron Conole <aconole@redhat.com>, 
+ Eelco Chaudron <echaudro@redhat.com>
+Cc: i.maximets@ovn.org, 
+ davem@davemloft.net, 
  edumazet@google.com, 
  kuba@kernel.org, 
- pabeni@redhat.com, 
  horms@kernel.org, 
+ corbet@lwn.net, 
+ saeedm@nvidia.com, 
+ tariqt@nvidia.com, 
+ mbloch@nvidia.com, 
+ leon@kernel.org, 
+ dsahern@kernel.org, 
+ ncardwell@google.com, 
+ ecree.xilinx@gmail.com, 
+ Richard Gobert <richardbgobert@gmail.com>, 
+ kuniyu@google.com, 
  shuah@kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- kernelxing@tencent.com, 
- nathan@kernel.org, 
- nick.desaulniers+lkml@gmail.com, 
- morbo@google.com, 
- justinstitt@google.com
-Cc: netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
+ sdf@fomichev.me, 
+ aleksander.lobakin@intel.com, 
+ florian.fainelli@broadcom.com, 
+ alexander.duyck@gmail.com, 
  linux-kernel@vger.kernel.org, 
- llvm@lists.linux.dev, 
- Sidharth Seela <sidharthseela@gmail.com>
-Message-ID: <willemdebruijn.kernel.a37b90bf9586@gmail.com>
-In-Reply-To: <20250929114356.25261-2-sidharthseela@gmail.com>
-References: <20250929114356.25261-2-sidharthseela@gmail.com>
-Subject: Re: [PATCH] selftest:net: Fix uninit pointers and return values
+ linux-net-drivers@amd.com, 
+ netdev@vger.kernel.org, 
+ willemdebruijn.kernel@gmail.com
+Message-ID: <willemdebruijn.kernel.3a470e4b61d3@gmail.com>
+In-Reply-To: <2da082ad-c30e-4f91-8055-43cf63a5abe4@ovn.org>
+References: <20250916144841.4884-1-richardbgobert@gmail.com>
+ <20250916144841.4884-5-richardbgobert@gmail.com>
+ <c557acda-ad4e-4f07-a210-99c3de5960e2@redhat.com>
+ <84aea541-7472-4b38-b58d-2e958bde4f98@gmail.com>
+ <d88f374a-07ff-46ff-aa04-a205c2d85a4c@gmail.com>
+ <dd89dc81-6c1b-4753-9682-9876c18acffc@redhat.com>
+ <2da082ad-c30e-4f91-8055-43cf63a5abe4@ovn.org>
+Subject: Re: [PATCH net-next v6 4/5] net: gro: remove unnecessary df checks
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -108,138 +123,83 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-[PATCH net]
-
-and a Fixes tag
-
-Sidharth Seela wrote:
-> Fix uninitialized character pointers, and functions that return
-> undefined values. These issues were caught by running clang using LLVM=1
-> option; and are as follows:
-> --
-> ovpn-cli.c:1587:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
->  1587 |         if (!sock) {
->       |             ^~~~~
-> ovpn-cli.c:1635:9: note: uninitialized use occurs here
->  1635 |         return ret;
->       |                ^~~
-> ovpn-cli.c:1587:2: note: remove the 'if' if its condition is always false
->  1587 |         if (!sock) {
->       |         ^~~~~~~~~~~~
->  1588 |                 fprintf(stderr, "cannot allocate netlink socket\n");
->       |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->  1589 |                 goto err_free;
->       |                 ~~~~~~~~~~~~~~
->  1590 |         }
->       |         ~
-> ovpn-cli.c:1584:15: note: initialize the variable 'ret' to silence this warning
->  1584 |         int mcid, ret;
->       |                      ^
->       |                       = 0
-> ovpn-cli.c:2107:7: warning: variable 'ret' is used uninitialized whenever switch case is taken [-Wsometimes-uninitialized]
->  2107 |         case CMD_INVALID:
->       |              ^~~~~~~~~~~
-> ovpn-cli.c:2111:9: note: uninitialized use occurs here
->  2111 |         return ret;
->       |                ^~~
-> ovpn-cli.c:1939:12: note: initialize the variable 'ret' to silence this warning
->  1939 |         int n, ret;
->       |                   ^
-
-These two look legitimate.
-
->       |
-> --
-> txtimestamp.c:240:2: warning: variable 'tsname' is used uninitialized whenever switch default is taken [-Wsometimes-uninitialized]
->   240 |         default:
-
-Does not need a fix. The default statement calls error() which exits the program.
-
->       |         ^~~~~~~
-> txtimestamp.c:244:20: note: uninitialized use occurs here
->   244 |         __print_timestamp(tsname, &tss->ts[0], tskey, payload_len);
->       |                           ^~~~~~
-> txtimestamp.c:220:20: note: initialize the variable 'tsname' to silence this warning
->   220 |         const char *tsname;
->       |                           ^
->       |                            = NULL
-> --
-> so_txtime.c:210:3: warning: variable 'reason' is used uninitialized whenever switch default is taken [-Wsometimes-uninitialized]
->   210 |                 default:
->       |                 ^~~~~~~
-
-Same.
-
-> so_txtime.c:219:27: note: uninitialized use occurs here
->   219 |                         data[ret - 1], tstamp, reason);
->       |                                                ^~~~~~
-> so_txtime.c:177:21: note: initialize the variable 'reason' to silence this warning
->   177 |                 const char *reason;
->       |                                   ^
->       |
-> --
+Ilya Maximets wrote:
+> On 9/25/25 12:15 PM, Paolo Abeni wrote:
+> > Adding the OVS maintainers for awareness..
+> > 
+> > On 9/22/25 10:19 AM, Richard Gobert wrote:
+> >> Richard Gobert wrote:
+> >>> Paolo Abeni wrote:
+> >>>> On 9/16/25 4:48 PM, Richard Gobert wrote:
+> >>>>> Currently, packets with fixed IDs will be merged only if their
+> >>>>> don't-fragment bit is set. This restriction is unnecessary since
+> >>>>> packets without the don't-fragment bit will be forwarded as-is even
+> >>>>> if they were merged together. The merged packets will be segmented
+> >>>>> into their original forms before being forwarded, either by GSO or
+> >>>>> by TSO. The IDs will also remain identical unless NETIF_F_TSO_MANGLEID
+> >>>>> is set, in which case the IDs can become incrementing, which is also fine.
+> >>>>>
+> >>>>> Note that IP fragmentation is not an issue here, since packets are
+> >>>>> segmented before being further fragmented. Fragmentation happens the
+> >>>>> same way regardless of whether the packets were first merged together.
+> >>>>
+> >>>> I agree with Willem, that an explicit assertion somewhere (in
+> >>>> ip_do_fragmentation?!?) could be useful.
+> >>>>
+> >>>
+> >>> As I replied to Willem, I'll mention ip_finish_output_gso explicitly in the
+> >>> commit message.
+> >>>
+> >>> Or did you mean I should add some type of WARN_ON assertion that ip_do_fragment isn't
+> >>> called for GSO packets?
+> >>>
+> >>>> Also I'm not sure that "packets are segmented before being further
+> >>>> fragmented" is always true for the OVS forwarding scenario.
+> >>>>
+> >>>
+> >>> If this is really the case, it is a bug in OVS. Segmentation is required before
+> >>> fragmentation as otherwise GRO isn't transparent and fragments will be forwarded
+> >>> that contain data from multiple different packets. It's also probably less efficient,
+> >>> if the segment size is smaller than the MTU. I think this should be addressed in a
+> >>> separate patch series.
+> >>>
+> >>> I'll also mention OVS in the commit message.
+> >>>
+> >>
+> >> I looked into it, and it seems that you are correct. Looks like fragmentation
+> >> can occur without segmentation in the OVS forwarding case. As I said, this is
+> >> a bug since generated fragments may contain data from multiple packets. Still,
+> >> this can already happen for packets with incrementing IDs and nothing special
+> >> in particular will happen for the packets discussed in this patch. This should
+> >> be fixed in a separate patch series, as do all other cases where ip_do_fragment
+> >> is called directly without segmenting the packets first.
+> > 
+> > TL;DR: apparently there is a bug in OVS segmentation/fragmentation code:
+> > OVS can do fragmentation of GSO packets without segmenting them
+> > beforehands, please see the threads under:
+> > 
+> > https://lore.kernel.org/netdev/20250916144841.4884-5-richardbgobert@gmail.com/
+> > 
+> > for the whole discussion.
 > 
-> Signed-off-by: Sidharth Seela <sidharthseela@gmail.com>
-
-Agreed on all the occurrences and the ovpn fixes.
-
-> ---
+> Hmm.  Thanks for pointing that out.  It does seem like OVS will fragment
+> GSO packets without segmenting them first in case MRU of that packet is
+> larger than the MTU of the destination port.  In practice though, MRU of
+> a GSO packet should not exceed path MTU in a general case.  I suppose it
+> can still happen in some corner cases, e.g. if MTU suddenly changed, in
+> which case the packet should probably be dropped instead of re-fragmenting.
 > 
-> diff --git a/tools/testing/selftests/net/ovpn/ovpn-cli.c b/tools/testing/selftests/net/ovpn/ovpn-cli.c
-> index 9201f2905f2c..20d00378f34a 100644
-> --- a/tools/testing/selftests/net/ovpn/ovpn-cli.c
-> +++ b/tools/testing/selftests/net/ovpn/ovpn-cli.c
-> @@ -1581,7 +1581,7 @@ static int ovpn_listen_mcast(void)
->  {
->  	struct nl_sock *sock;
->  	struct nl_cb *cb;
-> -	int mcid, ret;
-> +	int mcid, ret = -1;
->  
->  	sock = nl_socket_alloc();
->  	if (!sock) {
-> @@ -1936,7 +1936,7 @@ static int ovpn_run_cmd(struct ovpn_ctx *ovpn)
->  {
->  	char peer_id[10], vpnip[INET6_ADDRSTRLEN], laddr[128], lport[10];
->  	char raddr[128], rport[10];
-> -	int n, ret;
-> +	int n, ret = -1;
->  	FILE *fp;
->  
->  	switch (ovpn->cmd) {
-> diff --git a/tools/testing/selftests/net/so_txtime.c b/tools/testing/selftests/net/so_txtime.c
-> index 8457b7ccbc09..b76df1efc2ef 100644
-> --- a/tools/testing/selftests/net/so_txtime.c
-> +++ b/tools/testing/selftests/net/so_txtime.c
-> @@ -174,7 +174,7 @@ static int do_recv_errqueue_timeout(int fdt)
->  	msg.msg_controllen = sizeof(control);
->  
->  	while (1) {
-> -		const char *reason;
-> +		const char *reason = NULL;
-
-Since reason is a string that's printed, better to initialize it to a
-string. Preferably in the case statement, e.g., "unknown errno".
-
->  
->  		ret = recvmsg(fdt, &msg, MSG_ERRQUEUE);
->  		if (ret == -1 && errno == EAGAIN)
-> diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
-> index dae91eb97d69..bcc14688661d 100644
-> --- a/tools/testing/selftests/net/txtimestamp.c
-> +++ b/tools/testing/selftests/net/txtimestamp.c
-> @@ -217,7 +217,7 @@ static void print_timestamp_usr(void)
->  static void print_timestamp(struct scm_timestamping *tss, int tstype,
->  			    int tskey, int payload_len)
->  {
-> -	const char *tsname;
-> +	const char *tsname = NULL;
->  
->  	validate_key(tskey, tstype);
->  
-> -- 
-> 2.47.3
+> I also looked through other parts of the kernel and it seems like GSO
+> packets are not fragmented after being segmented in other places like
+> the br-netfilter code.  Which suggests that MRU supposed to be smaller
+> than MTU and so the fragmentation is not necessary, otherwise the packets
+> will be dropped.
 > 
+> Does that sound correct or am I missing some cases here?
+
+One of the discussed cases is where a packet is transformed from
+IPv4 to IPv6, e.g., with a BPF program. Similar would be tunnel encap.
+Or just forwarding between devices with different MTU.
 
 
 
