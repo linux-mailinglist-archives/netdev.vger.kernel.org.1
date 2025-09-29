@@ -1,116 +1,93 @@
-Return-Path: <netdev+bounces-227099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86521BA8480
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 09:44:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97C4ABA84A1
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 09:46:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C7B33A8D45
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 07:44:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51AB61684C8
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 07:46:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6702C08C8;
-	Mon, 29 Sep 2025 07:44:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1E92AEE1;
+	Mon, 29 Sep 2025 07:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PvKEk3aw"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZQIvOdPR"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5E12C0287
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 07:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C168D2AD16;
+	Mon, 29 Sep 2025 07:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759131856; cv=none; b=Ypx0Rl5EeIVSyXUxB731DvkY0LzF2iH/QqDLiPJyB1NaaWw2aoJBa8UY69oanNXrR4PaSbhPx8im1dCGS6aocE3w7/8qHiAUVVRGEE1L0yxiDWUKizMc4fljfIPTlWQXXCgvv+PciD6ytG5D9ZZ7pZ0igc9VluA2pOSg5P2Js2k=
+	t=1759131972; cv=none; b=iGdX0xoVVduvraG/Bpxz8j5ALykV1tJI5YBSfC2obsJrctoKmlzQ58V5KzOC+gwNFU27L2asdrySDkg40VftI2w/WpGQ8QBG/BpSnXO+8EK/Zb4TOtpP3fLmZPt1lGN6V68fJxHWBRfOv2LTs6I5k8EBFMHg5LlPJNLo+2/HJtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759131856; c=relaxed/simple;
-	bh=UO5a/mgA//lW4Bj0rdNV2tU7VgeDI3Ae/7NdugpEQIg=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=co1jXgIY2dpvY1wFVRgmZ01IO3534AieNl7fkSlHYIEusHuTTq6rEDwfAQjKT8icAx6iIJLmcUbbNP3G/Xp5A9jx3RtI8zrSak+9Rm0gLMWngCQjM2wckE+XAjf5l95QdyIqiaQQrDYx+LEZQVFO6LF2F+yjUQ+LwPWdP5C6xVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PvKEk3aw; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=AZ7xCl2wQqwqFo37e1wZWKGTGABfy99i1vqF6wtYlaY=; b=PvKEk3awO1om3h6K37Kd+aGVTP
-	3iH+zwB8JaNnXrRJKI5aFojaxxzNwuDmpEqKWgXPpGymWoLYxDbwvLw8lcujRbLN/+Bh0DyvDV+WA
-	tIIuIKzguIB76P7Arlqz+cjxipozoPL/s37GvxgzOeu2bME+KzXPtrpfWustiAknfkSm3ZRVp+Y8x
-	QVKh16WjpClYRLRwuUxcLF1N+VPKEgsXtM+U1CPAZos7pLV21Eml+NnF4f5HO3cHtQwgsS2GXd69P
-	EQsj31cl9lzbLFr+k8gApPoPe1Rryr/sxrY6uLeQ+q4ww25s3y/4rd017e470tvbFI4b/T1N9rGJ+
-	7jRUoHeg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:51940 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1v38Y8-000000006KV-2uOd;
-	Mon, 29 Sep 2025 08:43:56 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1v38Y7-00000008UCQ-3w27;
-	Mon, 29 Sep 2025 08:43:55 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Furong Xu <0x1207@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: [PATCH net-next] net: stmmac: remove stmmac_hw_setup() excess
- documentation parameter
+	s=arc-20240116; t=1759131972; c=relaxed/simple;
+	bh=zyXlfmidRAM1ua1ng8Wkw3W+HAJOLmaX8U2jJhQxs6s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jni947wJ2IAI75M3InxnpCzdAH7erb5l14zn6ljg9fFllVQ9ciau3G4Lr3NAZ7OnQ4thhsLfxZBrUo5fkC3eML4WAxyIfuL0hWV2oUfHHFkkFxY3F2ZYCtzfJAw+c9bPOMwQsqoJ7dnfGqTUVtzu2GwaKPE9W8iWzEkAoSV/xJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZQIvOdPR; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id C7A06C8EC65;
+	Mon, 29 Sep 2025 07:45:43 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 6CE6D606AE;
+	Mon, 29 Sep 2025 07:46:01 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 673B1102F183C;
+	Mon, 29 Sep 2025 09:45:53 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1759131960; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=r5PWs7B59tRb4M2bO2nxcrF0rvvVbxQdUU3EETzQvU8=;
+	b=ZQIvOdPRiS28WneCM/jUw0bI25tnniX1zqCjbXrN6ez7wh8pBSCTHDutI8juEQzvZIaIVR
+	tlFZpUi8szUikhfwzKE67XslboIzOeSfgiJqMKz1byo+VBWnRD07G2/peL4N6evxnJtu9r
+	kgw9oQljy//skWfINwr7vAFdSk8Ucz5MiwfpTV72eLGUuVcKgpgXvmsxkAUJePtJYUnIgk
+	Uor0ddmfE1BeGviy3S5z32mA0KSYkGx9f8YEOiwhW1J7GodDpnzphpIzhmqNqRxQQ8z/jT
+	NMtaSuoSV4C81QnYDjVZcFd+zSEWhEtJnZqZ2ihCTRu8EGi2ayp66cHnfZoNDA==
+Date: Mon, 29 Sep 2025 09:45:52 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3] net: wan: framer: Add version sysfs attribute for
+ the Lantiq PEF2256 framer
+Message-ID: <20250929094552.5f035bca@bootlin.com>
+In-Reply-To: <77a27941d6924b1009df0162ed9f0fa07ed6e431.1758726302.git.christophe.leroy@csgroup.eu>
+References: <77a27941d6924b1009df0162ed9f0fa07ed6e431.1758726302.git.christophe.leroy@csgroup.eu>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1v38Y7-00000008UCQ-3w27@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Mon, 29 Sep 2025 08:43:55 +0100
+X-Last-TLS-Session-Version: TLSv1.3
 
-The kernel build bot reports:
+Hi Christophe,
 
-Warning: drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:3438 Excess function parameter 'ptp_register' description in 'stmmac_hw_setup'
+On Wed, 24 Sep 2025 17:06:47 +0200
+Christophe Leroy <christophe.leroy@csgroup.eu> wrote:
 
-Fix it.
+> Lantiq PEF2256 framer has some little differences in behaviour
+> depending on its version.
+> 
+> Add a sysfs attribute to allow user applications to know the
+> version.
+> 
+> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> ---
 
-Reported-by: kernel test robot <lkp@intel.com>
-Fixes: 98d8ea566b85 ("net: stmmac: move timestamping/ptp init to stmmac_hw_setup() caller")
-Closes: https://lore.kernel.org/oe-kbuild-all/202509290927.svDd6xuw-lkp@intel.com/
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 1 -
- 1 file changed, 1 deletion(-)
+Acked-by: Herve Codina <herve.codina@bootlin.com>
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index be064f240895..650d75b73e0b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -3400,7 +3400,6 @@ static void stmmac_safety_feat_configuration(struct stmmac_priv *priv)
- /**
-  * stmmac_hw_setup - setup mac in a usable state.
-  *  @dev : pointer to the device structure.
-- *  @ptp_register: register PTP if set
-  *  Description:
-  *  this is the main function to setup the HW in a usable state because the
-  *  dma engine is reset, the core registers are configured (e.g. AXI,
--- 
-2.47.3
-
+Best regards,
+Hervé
 
