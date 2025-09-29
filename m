@@ -1,191 +1,112 @@
-Return-Path: <netdev+bounces-227190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61D66BA9D2B
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 17:43:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53773BA9E76
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 17:58:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18B4F17523A
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 15:43:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DFD13A48D6
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 15:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E56830C0E4;
-	Mon, 29 Sep 2025 15:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB6F30C104;
+	Mon, 29 Sep 2025 15:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FCR94bK2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZWJBQvKT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C6630BBA5;
-	Mon, 29 Sep 2025 15:43:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E7030C0F2
+	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 15:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759160593; cv=none; b=mOTJjNO1iwkLS+HES/c6YbT7PhVGqL3lypJ8wm/QbjMXZTQc5Ylz3tUR42UjAOd4ey+F2SHcXkNWUyMatA9gGdJxNbTnmvf5+7iPEOc+K28O/IVUxOPzbDKnxiSaSmmFqTLWphsmxQdMKFz2r9VxIvh2zjNQdSkoqdaWDk0NoMY=
+	t=1759161530; cv=none; b=hYOf4VWOW2Ic07g60vvbCPuoB+Gqw69E4VwWliu6G4kDDHp3W/fHL+N+1l2+uyLmAkYqNy8mcdOabNAtZIwrFm4N9PK+rzryWH11AQxvyFFiLg5Y1+9MOYmUjNVAgvPRL2ULw5FW/lLbEZV6x6KCsPNAC5i3IgYVZcgK8bY4G8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759160593; c=relaxed/simple;
-	bh=5q8LLF4ag2MVwttfhWyI7ecDLzD9/dPboJQ0VHDhT3A=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=obHtX7hg+ilaLgLCtZvD52phHFAaSx6nA6LY546BESu8htOkL6Onc5MsLQmoEa4yBksFqfKLdtzABWCY6wXP6MLtmaeV4bu7jKRV9M3VQLOMHQLoyXh2CeOgbtkH9XRQya3rPE6ZAvn/OuxeNum8z1AT86Vwv6OAhG5DNiILkPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FCR94bK2; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id AF3CDC02448;
-	Mon, 29 Sep 2025 15:42:51 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 3B17B606AE;
-	Mon, 29 Sep 2025 15:43:09 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9E9D3102F1A0C;
-	Mon, 29 Sep 2025 17:43:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1759160588; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=S1PdaIvO7vK9SB7Z0ERMuEoy98E+U47D3nVJtH+4Aqk=;
-	b=FCR94bK24e1NoOiyF+A/RbIyOW+tTMUG3y4g3og4gWZyyXJaS00FXRsl39dlwRgRIZ/k3J
-	AK+mywa0BxPUY+nCP8IMpGuJ95/GUwJs+cTfjUrCT054gC1lsqpsr4VR9ARrrcD8fX2MaS
-	rbc1p1yzzUEDmIx25+WiAWcBf9q7i3oorfLutoPa3rGXJdTqJRA+1DplYKRG2MRKmzc4/b
-	St12Emjl4h3HuzabkOq9MNbLCJ19bjikzYM0ykLd7aoWBe3I3bFacn4PYd5Cb2wI3ydGg/
-	9fUqOIui11YZn1Aa2IoZiu+Qm638BxPUI/njFLpoL2j73b04aDsJUWBfMkpEbg==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Michael Turquette <mturquette@baylibre.com>,  Stephen Boyd
- <sboyd@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
- Dooley <conor+dt@kernel.org>,  Linus Walleij <linus.walleij@linaro.org>,
-  Richard Cochran <richardcochran@gmail.com>,  Gregory CLEMENT
- <gregory.clement@bootlin.com>,  Marek =?utf-8?Q?Beh=C3=BAn?=
- <kabel@kernel.org>,
-  linux-clk@vger.kernel.org,  devicetree@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  linux-gpio@vger.kernel.org,
-  netdev@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: pinctrl: Convert
- marvell,armada-3710-(sb|nb)-pinctrl to DT schema
-In-Reply-To: <20250924223528.2956771-1-robh@kernel.org> (Rob Herring's message
-	of "Wed, 24 Sep 2025 17:35:24 -0500")
-References: <20250924223528.2956771-1-robh@kernel.org>
-User-Agent: mu4e 1.12.7; emacs 30.2
-Date: Mon, 29 Sep 2025 17:43:04 +0200
-Message-ID: <87ms6di7sn.fsf@bootlin.com>
+	s=arc-20240116; t=1759161530; c=relaxed/simple;
+	bh=KP5kx0VRuRBxNT9JPTkeTOUgylYmXovvWpGXUsY+dqk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gHzddW5bDGDf8FfzZvkWxeq4TQnxd+e5Sy4gWgb/IuvV6Hl4HP3wEwI2imZ0p8lQbKnueaxhbmh8Gw85diNhFAPtVM1hgHhpGTW7IP7DqKWWiujRC/if+TkZokCYOgh/CvIslmiHWdh+NT74MpNAuptQ6C3vv1HHct+ZINFiuok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZWJBQvKT; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b41870fef44so39264066b.3
+        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 08:58:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759161528; x=1759766328; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KP5kx0VRuRBxNT9JPTkeTOUgylYmXovvWpGXUsY+dqk=;
+        b=ZWJBQvKT9Qc5PmNyldyHZaLCt3fwNojyu977328l5tFx8x1FT10gVhl8DQFhgpBpuW
+         wKoP8TajHfA3LEezjyvdudvDtyJpPLd4nQ1l6EP3rMvjgRT97rWShu2jP6YgeH+jMSiT
+         jZGaBmt3cPJneNkKbaLPDm/T6/JnehPZQNrw0DV/+8/BVclpkEUyexlc1wjjMhl8OX+c
+         /JNPJQD4vKsVnFs+StQM92uXQWiyG2+KlJVF+8Fwd+Yg/b6SSUnbiDnUC+4bwW+U1pSh
+         4rDQpya8OMl10l91QqpUNLfYXD2bEYp8XZQ+Qh25jHzLL9NnCZ5RcRJcAbVMJFDBzaNO
+         /SGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759161528; x=1759766328;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KP5kx0VRuRBxNT9JPTkeTOUgylYmXovvWpGXUsY+dqk=;
+        b=RGoIpL9nkzKJ9KgdmlS3rnHmPb+mF2FCUh5y6oTokFGxD5AKKVfqS1bHdSiOljKFVS
+         Em6NTeBwNGJlHDa3DzLWFFjFOU2xLuSHpPcKbsJW5ZpbLiXC9e5s8ngsY0zkz/VE5l7x
+         i5scbtjtM1AYC/VtJJ/PZlBTPz8RCq4Ii5h2ZmYOr2IlA7R8NyOvQ1WQp626Hkh+Wf/7
+         Nrh/t4aFXL/wuon+gssyO75Q5jP0NEslhfz62/So5XIvrDBfSFwZfonfReLH2T4tTh3x
+         7v3ZENWTv4fgYHtZPO/dDnWbo2R6ib/+XG9ytpYemhTeqXRkFD48mLbkeSMKapVHn8F9
+         JG5g==
+X-Forwarded-Encrypted: i=1; AJvYcCU131qRCIcuuvsFQ29U2wymu0fxL8Pk20TTSccXmlWkffUm6CXcbEgtHpl3+nPATVDi8wAQHhM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzp6R7F/8wkPzSFttRGghSiTcmrVNRHO8eNW1LRPQnbyLDQ3sGe
+	ARc6Vr+6K+hv2UZ9Gl+W0UqxBHw1t61DOkh3PoypDp/FTtacCpU2cELuf9szDOhUucUe0KmFK6E
+	ROuOswU9RDhW+8GAm3Gsg7Yo2Lhy9BP8=
+X-Gm-Gg: ASbGnctFWXgs9Dsc5uv9ScszHr955vLGHbkNWMstUWG51PvO4KvL693vAjn+Chw6/1J
+	akDzRFfYO/qq1AmNh0W1BFR+O9QGZhXriMh35MO8S16oQxywiwAciESD3z1nisIbO1P5WO0XFKU
+	PIhKNvyZpaKaXDuutyw2NrSyvj4FfTX5n5NXorGd9grndXC4QE2+4rGJqnXmG17Ptg7Rj88jBxY
+	EbS4ryMmtbmAcFrO0setFD2rJQmyEZnvW0CMvVMuw==
+X-Google-Smtp-Source: AGHT+IEyCADO6J8WiEBVdrcDX+0EvoZzPtvlyZ0fcAEpiz0fGzu77FQXIwzegr8XJ0+/55shLRsQasieeKC3kMA42EI=
+X-Received: by 2002:a17:907:9706:b0:b3f:6e5:256 with SMTP id
+ a640c23a62f3a-b3f06e527cemr412737666b.32.1759161527436; Mon, 29 Sep 2025
+ 08:58:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20250929114356.25261-2-sidharthseela@gmail.com> <willemdebruijn.kernel.a37b90bf9586@gmail.com>
+In-Reply-To: <willemdebruijn.kernel.a37b90bf9586@gmail.com>
+From: Sidharth Seela <sidharthseela@gmail.com>
+Date: Mon, 29 Sep 2025 21:28:36 +0530
+X-Gm-Features: AS18NWCgnPycz7t2entTrmTu5YC-DafC0Q0uYk2zgNL_KC7OWEjNYY7xyUDcjPI
+Message-ID: <CAJE-K+C9_En-QWYrTJmMH-H8CP_1wgpREjFst1ybiE-bJtF13g@mail.gmail.com>
+Subject: Re: [PATCH] selftest:net: Fix uninit pointers and return values
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: antonio@openvpn.net, sd@queasysnail.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, 
+	kernelxing@tencent.com, nathan@kernel.org, nick.desaulniers+lkml@gmail.com, 
+	morbo@google.com, justinstitt@google.com, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
 
-On 24/09/2025 at 17:35:24 -05, "Rob Herring (Arm)" <robh@kernel.org> wrote:
+On Mon, Sep 29, 2025 at 7:49=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+> [PATCH net]
+> and a Fixes tag
+Thankyou, I'll add that.
 
-> Convert the marvell,armada3710-(sb|nb)-pinctrl binding to DT schema
-> format. The binding includes the "marvell,armada-3700-xtal-clock"
-> subnode which is simple enough to include here.
->
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> ---
->  .../bindings/clock/armada3700-xtal-clock.txt  |  29 ---
->  .../marvell,armada-3710-xb-pinctrl.yaml       | 122 +++++++++++
->  .../pinctrl/marvell,armada-37xx-pinctrl.txt   | 195 ------------------
->  3 files changed, 122 insertions(+), 224 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/clock/armada3700-xt=
-al-clock.txt
->  create mode 100644 Documentation/devicetree/bindings/pinctrl/marvell,arm=
-ada-3710-xb-pinctrl.yaml
->  delete mode 100644 Documentation/devicetree/bindings/pinctrl/marvell,arm=
-ada-37xx-pinctrl.txt
->
-> diff --git a/Documentation/devicetree/bindings/clock/armada3700-xtal-cloc=
-k.txt b/Documentation/devicetree/bindings/clock/armada3700-xtal-clock.txt
-> deleted file mode 100644
-> index 4c0807f28cfa..000000000000
-> --- a/Documentation/devicetree/bindings/clock/armada3700-xtal-clock.txt
-> +++ /dev/null
-> @@ -1,29 +0,0 @@
-> -* Xtal Clock bindings for Marvell Armada 37xx SoCs
-> -
-> -Marvell Armada 37xx SoCs allow to determine the xtal clock frequencies by
-> -reading the gpio latch register.
-> -
-> -This node must be a subnode of the node exposing the register address
-> -of the GPIO block where the gpio latch is located.
-> -See Documentation/devicetree/bindings/pinctrl/marvell,armada-37xx-pinctr=
-l.txt
-> -
-> -Required properties:
-> -- compatible : shall be one of the following:
-> -	"marvell,armada-3700-xtal-clock"
-> -- #clock-cells : from common clock binding; shall be set to 0
-> -
-> -Optional properties:
-> -- clock-output-names : from common clock binding; allows overwrite defau=
-lt clock
-> -	output names ("xtal")
-> -
-> -Example:
-> -pinctrl_nb: pinctrl-nb@13800 {
-> -	compatible =3D "armada3710-nb-pinctrl", "syscon", "simple-mfd";
-> -	reg =3D <0x13800 0x100>, <0x13C00 0x20>;
-> -
-> -	xtalclk: xtal-clk {
-> -		compatible =3D "marvell,armada-3700-xtal-clock";
-> -		clock-output-names =3D "xtal";
-> -		#clock-cells =3D <0>;
-> -	};
-> -};
-> diff --git a/Documentation/devicetree/bindings/pinctrl/marvell,armada-371=
-0-xb-pinctrl.yaml b/Documentation/devicetree/bindings/pinctrl/marvell,armad=
-a-3710-xb-pinctrl.yaml
-> new file mode 100644
-> index 000000000000..c4d09d8720bd
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/pinctrl/marvell,armada-3710-xb-pi=
-nctrl.yaml
-> @@ -0,0 +1,122 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/pinctrl/marvell,armada-3710-xb-pinctr=
-l.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Marvell Armada 37xx SoC pin and gpio controller
-> +
-> +maintainers:
-> +  - Gregory CLEMENT <gregory.clement@bootlin.com>
-> +  - Marek Beh=C3=BAn <kabel@kernel.org>
-> +  - Miquel Raynal <miquel.raynal@bootlin.com>
-> +
-> +description: >
-> +  Each Armada 37xx SoC come with two pin and gpio controller one for the=
- south
-> +  bridge and the other for the north bridge.
+> Does not need a fix. The default statement calls error() which exits the =
+program.
+> Same.
+Yes, you are correct.
 
-As I think you'll send a v2 because of the robot complaint, maybe you
-could rephrase a bit to ease the reading:
-
-"...two pin/gpio controllers, one for..."
-
-> +
-> +  Inside this set of register the gpio latch allows exposing some config=
-uration
-> +  of the SoC and especially the clock frequency of the xtal. Hence, this=
- node is
-> +  a represent as syscon allowing sharing the register between multiple h=
-ardware
-
-represented as a?
-
-> +  block.
-
-blocks?
-
-
-The rest looks fine, so:
-
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
-
+> Agreed on all the occurrences and the ovpn fixes.
+Alright, I'll send v2, with improvements and a changelog.
+--=20
 Thanks,
-Miqu=C3=A8l
+Sidharth Seela
+www.realtimedesign.org
 
