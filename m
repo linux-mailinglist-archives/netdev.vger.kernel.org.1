@@ -1,129 +1,144 @@
-Return-Path: <netdev+bounces-227107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67741BA861A
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 10:22:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62BC6BA8649
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 10:27:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D0FD188CB28
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 08:23:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24E563A3790
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 08:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948CD26E6FF;
-	Mon, 29 Sep 2025 08:22:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF0026D4C3;
+	Mon, 29 Sep 2025 08:27:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA9526CE37
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 08:22:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA59266B52
+	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 08:27:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759134159; cv=none; b=sQG4T/p+i03mh2SCieB5T3cVrhz085RckV4NRsR0SNByOwG8rTltaYlIjf1KiQRXBzTmt7dJZ4z6dCzzk5r9haV91Jk/mevZFKv3mVXLYK2nFfeJ5wmIw5ABQb1CyOTqbzQeCUbrztNWb2hMiM101yBQORkgGL9aEa20Uzgrpz0=
+	t=1759134436; cv=none; b=GvLhWdUJiHOALnRwndMlNUJ4yzhsxReb2Y+6bDwBgFHaWJgkWPQ7vBupkSCa7YwC2xWnuvcN52S5uoC0EzmhMuTyIyFvxb73RtnT8uChBEDdRxDH/fGkP49v5tjv7gnjJ3RrKq6hJ+4EXqp4fftKCe4RdEM+4QDNxdWclkyr/M8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759134159; c=relaxed/simple;
-	bh=bvzJU8w4wT8IzHIL9JzpE0ujLPMRWcw0FiYpZ5vOfww=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pC8iIh4Mm4JEI1E8O8e1b9S/DVVV8YAIy9A1vGMwOhW4qgIw3cThMv05odcloMNDqlv+QhY6IOk+EP4dicNuz9Bw48i1KaNO6MsO/vm9xUYFS4yL+P/Nmt6NgskO/k6V4sOKKbl0U4vaoFvYNntErYXMInU6sswo0IJKCPWJ0Ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1v399G-0005Da-TJ; Mon, 29 Sep 2025 10:22:18 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1v399E-0012s9-1s;
-	Mon, 29 Sep 2025 10:22:16 +0200
-Received: from pengutronix.de (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 3786047C36C;
-	Mon, 29 Sep 2025 08:22:16 +0000 (UTC)
-Date: Mon, 29 Sep 2025 10:22:15 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Andrea Daoud <andreadaoud6@gmail.com>
-Cc: Heiko Stuebner <heiko@sntech.de>, 
-	Elaine Zhang <zhangqing@rock-chips.com>, kernel@pengutronix.de, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Alexander Shiyan <eagle.alexander923@gmail.com>
-Subject: Re: Possible race condition of the rockchip_canfd driver
-Message-ID: <20250929-curvy-cicada-of-sufficiency-a7f464-mkl@pengutronix.de>
-References: <CAOprWosSvBmORh9NKk-uxoWZpD6zdnF=dODS-uxVnTDjmofL6g@mail.gmail.com>
- <20250919-lurking-agama-of-genius-96b832-mkl@pengutronix.de>
- <CAOprWott046xznChj7JBNmVw3Z65uOC1_bqTbVB=LA+YBw7TTQ@mail.gmail.com>
- <20250922-eccentric-rustling-gorilla-d2606f-mkl@pengutronix.de>
- <CAOprWoucfBm_BZOwU+qzo3YrpDE+f-x4YKNDS6phtOD2hvjsGg@mail.gmail.com>
+	s=arc-20240116; t=1759134436; c=relaxed/simple;
+	bh=3wEnJJupgz1SJm2E9By0j/0oQe0EV3tSedp0jhNUmw0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S4OxB36oh68gDuVVkXIEfRocYRM9NAwN+CvRlnCuCpKFWKh7kUVJw5iZaRuBKQQumtfbVeI2Cu2G7QZ7RJWxJ33cho1gHbLP8s5vNJo1JK1zw0Xw0CWxjgmAA6oTwJNkaBGSFfRaTCoktSUzSf9/hFpFwNDk0+CY4bcKBfZk9/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.217.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-58d377d786bso3101712137.1
+        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 01:27:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759134430; x=1759739230;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vjEe7O8j7KCrjhzBmS059atyR4bTunLk3aQjDHMi0Mg=;
+        b=r7W0CHt5i0UW5Bh41Aq5tTYExc4k7L0BKXUVGXNuMEw4q06E9uKZhamtfbOi3rmSx0
+         1Ei3WF906BKH9N+hj8fUaT94HQPWmo6YpgVhGXuFoVvqhyRz1lUt05VkQKFsRB7Hlsgm
+         K/DhI/FU0ktsaImhLFaLy25pho1UJE11qJHS25gzHGKU1hTNoGRmIt8NQauEQHXqSwSU
+         3Izia5J6TbQgSR3CqQ7B1Go2+YpzRIu9Ro/3aOYd7V1eizhH97/X1TdMVxdDP5qj+ggi
+         XM0buOS1Q8NvbfSM8qv1CG9vXTz3V/Syalhy8Y4yYjHu3ObAwZFt2yuPk0oaBJNNAjyC
+         SpMA==
+X-Forwarded-Encrypted: i=1; AJvYcCU6E9winmve+2lu8x/0mWOq08OYEJsXsY205tvyxZhExmKPV+DJcQonF5H2r70w0grqqI3hfZw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDnQ+bfc6Gmo9WpHtXcGkcXbozJ9/g1zclxOYxs2JLROspVgD3
+	fIxQkuFtDRDLcbHdX1NPUT43rKB9Fj0kRTg0J5wLNz0+yyk3eq2eUYUw9ZETDSuL
+X-Gm-Gg: ASbGncs9JDrnoiW9MBFSxn1v9suU7VidTiirJIne/vMQ6+lOPTis+23dRLMYw8dPb+Q
+	exugeA3iedN7wFwyNq4zsRvggVXvGY3outtFMd6yEXIC1g7jAALbE1p7RuRqgGQdBKswwCWIMA7
+	VZM9WTheVfXPOh3DnW3/qj9lURTqhMUZw6s9lj/gNPc5gzDfU9UZTogpwrZk39xCLPo30MUyQIq
+	9c3zB1AZlReTDu4l8BFpkNG9lLacObQItaVywEswimLDthlGs0ZljTkXB4Tpj8WEol+T4pVxAyK
+	BW1EFMX4bIxtSRwiG/jYQyCb3yGLEoxr6ANXrnzRKYTXJol2xSXH6RJkLwfW+204bw6zgwUb/kc
+	o/XsULSUc52AKPsq4UwtoF7WbcyIAej++xbrqMfJ8C0KxJZFhYsxHt/k4m1HQ8UhCJjzPoag=
+X-Google-Smtp-Source: AGHT+IEKgPtiigQEjBto9Ak+v0KQIrI2M8b0rGjDtd7WbL73xL5Fu/dAa6AmXVzmX11iWYoxYDlBfw==
+X-Received: by 2002:a05:6102:b03:b0:5a8:4256:1f14 with SMTP id ada2fe7eead31-5acd94bd965mr6174918137.35.1759134430049;
+        Mon, 29 Sep 2025 01:27:10 -0700 (PDT)
+Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com. [209.85.222.54])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-916dadfe156sm2211492241.19.2025.09.29.01.27.09
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Sep 2025 01:27:09 -0700 (PDT)
+Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-890190d9f89so2192740241.2
+        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 01:27:09 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVgpU3Jnqphww8YP2C+wr9ZTYn8g29WUjOswGHSUEZjyrbTovNDvY8THkbuQOYYwsSzZJnJuV4=@vger.kernel.org
+X-Received: by 2002:a05:6102:d90:b0:5a4:420c:6f94 with SMTP id
+ ada2fe7eead31-5accbcdfbdfmr6816724137.4.1759134429370; Mon, 29 Sep 2025
+ 01:27:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="kcxxquzapiv75lfm"
-Content-Disposition: inline
-In-Reply-To: <CAOprWoucfBm_BZOwU+qzo3YrpDE+f-x4YKNDS6phtOD2hvjsGg@mail.gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-
-
---kcxxquzapiv75lfm
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
+References: <cover.1756998732.git.geert+renesas@glider.be> <ee4def57eb68dd2c32969c678ea916d2233636ed.1756998732.git.geert+renesas@glider.be>
+ <082d5554-7dae-4ff4-bbbe-853268865025@lunn.ch> <CAMuHMdU96u41ESayKOa9Z+fy2EvLCbKSNg256N5XZMJMB+9W6A@mail.gmail.com>
+ <c1f6fb82-9188-48ed-9763-712afa71c481@lunn.ch> <20250905184103.GA1887882@ragnatech.se>
+ <CAMuHMdU=Q6AZcryj1ZBGW+5F+iYvZCL=Eg0yPw0B4jnczmA8nw@mail.gmail.com>
+In-Reply-To: <CAMuHMdU=Q6AZcryj1ZBGW+5F+iYvZCL=Eg0yPw0B4jnczmA8nw@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 29 Sep 2025 10:26:57 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdW7+F-VdNw+LLCs_WPUsFVNnbsCT-wompswecEmipmhqA@mail.gmail.com>
+X-Gm-Features: AS18NWC4L73fMvbY7JVbl7jU9THAB7wi-kzKLyAei1Oc0zvFvsC0lPY-ku9gbpA
+Message-ID: <CAMuHMdW7+F-VdNw+LLCs_WPUsFVNnbsCT-wompswecEmipmhqA@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/3] sh_eth: Convert to DEFINE_SIMPLE_DEV_PM_OPS()
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, linux-sh@vger.kernel.org, 
+	Markus Schneider-Pargmann <msp@baylibre.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: Possible race condition of the rockchip_canfd driver
-MIME-Version: 1.0
 
-On 28.09.2025 00:26:59, Andrea Daoud wrote:
-> > Alexander Shiyan (Cc'ed) reads the information from an nvmem cell:
+On Mon, 8 Sept 2025 at 16:36, Geert Uytterhoeven <geert@linux-m68k.org> wro=
+te:
+> On Fri, 5 Sept 2025 at 20:41, Niklas S=C3=B6derlund
+> <niklas.soderlund@ragnatech.se> wrote:
+> > On 2025-09-05 13:57:05 +0200, Andrew Lunn wrote:
+> > > > You cannot enter system sleep without CONFIG_PM_SLEEP, so enabling
+> > > > WoL would be pointless.
+> > >
+> > > Yet get_wol will return WoL can be used, and set_wol will allow you t=
+o
+> > > configure it. It seems like EOPNOTSUPP would be better.
 > >
-> > | https://github.com/MacroGroup/barebox/blob/macro/arch/arm/boards/dias=
-om-rk3568/board.c#L239-L257
+> > Out of curiosity. Are you suggesting a compile time check/construct for
+> > CONFIG_PM_SLEEP be added in the driver itself, or in ethtool_set_wol()
+> > and ethtool_get_wol() in net/ethtool/ioctl.c to complement the
 > >
-> > The idea is to fixup the device tree in the bootloader depending on the
-> > SoC revision, so that the CAN driver uses only the needed workarounds.
->=20
-> Thanks, it is not easy to correlate this because I am currently not using
-> barebox. I'll try this later.
+> >     if (!dev->ethtool_ops->get_wol || !dev->ethtool_ops->set_wol)
+> >         return -EOPNOTSUPP;
+> >
+> > checks already there? To always return EOPNOTSUPP if PM_SLEEP is not
+> > selected?
+>
+> Iff we want to go that route, I'd vote for handling it in common code.
+> Still, there is no guarantee that WoL will actually work, as on
+> some systems it may depend on the firmware, too.  E.g. on ARM
+> systems with PSCI, the SoC may be powered down during s2ram, so
+> there is no guarantee that any of the wake-up sources shown in
+> /sys/kernel/debug/wakeup_sources can actually wake up the system.
+> I tried having a mechanism to describe that in DT, but it was rejected.
 
-The most important information in this code is where the SoC revision is
-located: there is a separate nvmem cell for this. You can read out the
-information once manually and change your device tree accordingly.
+(oops, forgot to press "send" in an old draft)
 
-regards,
-Marc
+Discovering commit af8dbf9c6aa8972f ("schemas: wakeup-source:
+Possibility for system states") in dt-schema.git, there seems to
+be hope!
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+Gr{oetje,eeting}s,
 
---kcxxquzapiv75lfm
-Content-Type: application/pgp-signature; name="signature.asc"
+                        Geert
 
------BEGIN PGP SIGNATURE-----
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
 
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmjaQbQACgkQDHRl3/mQ
-kZzG/QgAket73QctCSBYEFyXMkmAapZL5ozqRJ4nTbFGZ2D4bxX6sYSf72hYfyk7
-irJ+U0i4XYPuRkFvswbR5TLLqnz+Miz2yB1TbhRiD0h8ChLKgZEKZtnrEXm8Inxn
-QzEg3x5x6tYQytolcXFHKzIM9FBXGnZB+pSQxXXoLPo+O6E9wmHc6l1BJe1fhJNi
-vn1G7zQsFQXxU2e3Mm4j9mi8iCG9k++0f6I1t+hVEg11egn/i3hgs2jpIbKW1uv4
-z76o7HAvN7Rdehs+E4VZu91g95TcNfVBJrvFb9HrDST0JG8I0w0GdQtc0ixKkl/5
-lXTDJ7pB+WBJmn4iGNmH3CXFgbx2TA==
-=CV6U
------END PGP SIGNATURE-----
-
---kcxxquzapiv75lfm--
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
