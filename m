@@ -1,125 +1,183 @@
-Return-Path: <netdev+bounces-227201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 687DFBAA045
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 18:31:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CCA2BAA0A0
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 18:51:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 247633AB6B7
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 16:31:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E82A19219A8
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 16:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F72130BBA7;
-	Mon, 29 Sep 2025 16:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003F730CDB0;
+	Mon, 29 Sep 2025 16:50:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ig8KDxvO"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="vPVgo5Fq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8AE2FAC17
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 16:31:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162DF30CB30
+	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 16:50:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759163511; cv=none; b=oKNa1Srl0KoRcKznt2jGYxui7Ch4tXcAuxP5nRaiYrI6FCRmaNa4Qw5bqulai87uTuj7AC2MPijXNzG7vgNJS4cv8F3BeTy22O4MH+WL9L2SKkob4Qm9rPuY+u9QxOq6LElJb6YrjJBJr9pHkjgCyDHwDsLQFe7Y55hydYqqe9o=
+	t=1759164650; cv=none; b=FbVFjjACqxU/VZ+/QvnXy4N4Gnmv25v8RqEd69Luak0QtkE7FplRIa019Z6DNUj6zVy+hyx3YZgaEWDhTouGdmPpBNTZ2iu9XqpEQDVIPZ8KCkmNO2iySmTO7a5SjRfrg1e1fVr3ZBiwgOEA33lnd5mDBYeFhnWsZPiv2X60dxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759163511; c=relaxed/simple;
-	bh=nTErp6MjM2H9FJt5b0VdfDXyFtxk1zguj9gOTg/Op1s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vj78WFPqW3BL8cTCYBFykucp5fClvMi0KbIaASpDTFJVqHn2g96yBCEX4gscBq4RWOJidQPdnWGAkyh3an74ILw7AoS83+M1TpUSQ4ipofLd5jgNwCVspJOUmZ4NGzDdJxdnPTjDayPoBLzqDeY9zOHxcjPQG4qE86xs7pOG+7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ig8KDxvO; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-3383ac4d130so428976a91.2
-        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 09:31:49 -0700 (PDT)
+	s=arc-20240116; t=1759164650; c=relaxed/simple;
+	bh=5Q2xOvfMdTjmz8hxrekbXb5rsF5C4DN8K5+LbrteSr0=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=cRWUdBdx+izfErImv2p6ZdTMmO7Ro9qB87oyA/EznBDdGd2E1En7eaihoquTqiyyY3Xy+9X18huqk6ND2vGWVNhENirytuTeTTyxWcMAUB7v2SGKOEXUJEVJ2a1xnnCc0J88ogYt/bSzR30+EObk0He89ViEA5FRVMIOJB7Zt0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=vPVgo5Fq; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-85cee530df9so534425385a.3
+        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 09:50:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759163509; x=1759768309; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lka4+ZyxLfYllS696TYLXMts9dTS83swxEi3cmvk4F4=;
-        b=ig8KDxvOg2N8ygrGO+MRxh/HOl/sue8Haw+ylPPuB564h0nVSAKa/bjPrWHhmt3Cdv
-         ZDTdp+QyLn/lykIBpJI8m43f7p9M98JyyboaHFGYLXSnsP45JCmAIPFv/QTMSJZIqU0k
-         CITqCeurdTd/d4Ap/ArWbYIXhmD83GU6JPvRsx4bNWC8PGkxIAYApmH01ybIM2303SJ+
-         5njQ8AbGw9ry2Q82uy76+b/9OEfIvOIiHQ0WKhM2UPBB9VDBrMLd061fSreNT7eE0VHs
-         lDHX2Bjnd6ZRRQWN42EEhI+AyaSBxKraXS+96NBtvIOAc2tY3TC/dFD2SCwr0XJUSOdC
-         GAtg==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1759164648; x=1759769448; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rG394syCGnKx0XDysCoczuuw4zocqTc1DdnqDW+XMzw=;
+        b=vPVgo5FqcjQHwT7R7TTREXIAb1fR+AMCH1FqrbXDamsTd3rX1UXnbr625ZrXRqoDJb
+         JDi1duIXgDjOzU3kU6avaLlDJf5wTrnPcwUnYp/lUdex8YHA8b1fK8DmVeluiTkbNiJ1
+         OBj63Cr7s3UUaL9BkVegRuhpjU2i26TnReGKpxIQLeBdyChkvIWxKKvro5wYbxhIxzbd
+         3RvhCPzIPA/OcgKMcIN28WJJ41dqCc/+r+9mCVqFiCIzglX5qE3ev9u4WcU4MPbWrGub
+         F+U/DdN3B4hNmogIT5t9f/Y7KKI28OHXWqQKWFZequnwwX8l+URoJ7k8ghXteh2EJCaZ
+         aOqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759163509; x=1759768309;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lka4+ZyxLfYllS696TYLXMts9dTS83swxEi3cmvk4F4=;
-        b=gccWX+yAlu+ZDrD5r7rl/DAWDUIxYMymV1T3G9gZbPtK9TpC66c/pfHoBfyTyctUCp
-         luD+yPxZoFPcr4dHrFr23C4gxtO3MZ+DSZu7F2dYcVIZVT72CZzuRxwDX4CAQ4ayQF/n
-         5YNzHR+KIrU8MxVMNTZk3hdDO5T2D3AP1vJfglvP0H9ouWnoVpywTcFntAslJNQb29q5
-         pKEuJIYIv1N816c0a2KCHu96gqzTpkNZrtmw3s4dMJ2olIdJsFHuz2/B2Hrfy21YwR/c
-         xVGyA7oc54K8QuLttuwqWAlrgtW+x54rPj8lbC378pRu3jRd1SBA4SkvKNLexFLlKqtK
-         mujA==
-X-Forwarded-Encrypted: i=1; AJvYcCXEy4IX2aZsZvZ32soyNfMUTHALFAwPStDZZ287Pimz6N10S76prBvSj0SVa4eawvnJRcc6RMs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyJoeQlxKrBbidfTrK4OCIYq+2HylF2SI91p98J1qTozxinjlH
-	QLrEc9wvhRRX53rg/wO3umO3c1qpcj4bUWf5dBvTa4yo1wMTEM6asPHT
-X-Gm-Gg: ASbGncuwtbqDJBisUWnAHd0HzGHQhbDdSTVip0lAd6jYvrBPQExbNMf1TgFeFgAGFiA
-	nKa4GlTpMIQ73epqsnPdOMe0obguoxOh5Jsr+J7L0rxkm8zonZtaM+k5i52cyXmlMBDvVV+Rq2/
-	nIgSPUfdRDumHes7b9aoGrv2AUJffqQOunzXTKgggE8Vz+ZFSKDWGQzWrc5wZAcVLyMjDf496Uw
-	pgFezOI2JxWkMn7j3ks4pf7o3JY/D8sDl5jCHN65vYnrk5hfEjgcBnc2oM7CQnfkVYn1BBtVOXn
-	zyBcbvIYqOqXxunMOb6opC6XjWLw/hSqyjAAkkCuQRVu/pJYcTkLwM2/NzYF5Lqpe/8MUJ8IBjL
-	ZHeMjYf8yBWpU+ePHCds8OczNXphYgvhQ4H2CmCzEyvAbPlMN2Ixi
-X-Google-Smtp-Source: AGHT+IEZeT16n1Qx68AceriYoS2m5DQH3UD7/ggp2pq32iz566aW/AJGDTJkg6J0/p2eGeMqMpos2Q==
-X-Received: by 2002:a17:90b:350c:b0:330:6c04:a72b with SMTP id 98e67ed59e1d1-3342a2498f2mr18362711a91.3.1759163508737;
-        Mon, 29 Sep 2025 09:31:48 -0700 (PDT)
-Received: from kforge.gk.pfsense.com ([103.70.166.143])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3341bd90327sm17674419a91.3.2025.09.29.09.31.44
+        d=1e100.net; s=20230601; t=1759164648; x=1759769448;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rG394syCGnKx0XDysCoczuuw4zocqTc1DdnqDW+XMzw=;
+        b=q1dXHHhOsSnEvoE4AK6WYJgNRczO8ZnpdkJFupBHAOBy8vp8znJ1hhsojdafuMV/o4
+         CUgFvU4N3wTnQSlAKIe5N4Vpi27/DqWOIGJAvFsiVbi8Moyxs4CxYaIVSwwiKz+0saGh
+         dAx+GZjVyVExllLjTe3M7VEzGyeVBAdzMeZP7/07KrXXxWihJOxizZAFlaWuJGM9tDZB
+         I3q8RGuzkfOqqZWdty17dALuQyqFMaJpI3UoFMXKvKYS9y1NnuyDC2sGH+snucea7iCV
+         cYTfg6leCsisXh55KFz+6ZK9Hot0/JwP450fRXG6ODBlYfHnIK8L/SC6cA+I2hFj6bQO
+         8y8A==
+X-Gm-Message-State: AOJu0YzyDwqNyPR+iojhwR19ORG/TuHnnecX+ZGKfKxSOGaQVepo/Os+
+	1m5WMZ+jG2d4iNZM5J2+VTVcGrCyCertK+V/bjX6S0rYFh4rqhOlDEijyRtqJ17cczux/B9BIHg
+	RKvSSaRE=
+X-Gm-Gg: ASbGncvvvq+Qncnm8+pRCI5kTwbVQYgTLr2xnwa21VHzzz9tkey8xr1gEyLg6doqna9
+	HScoZr+8gFsn+nvi0Sdde1E285trqMGZWWyUqc7vLcB+GyPYEkeA5S2ugOPHm49xJFOZJ0diEkL
+	fH5QISY7zqvkrxcg5EQkYQJ8cyDyYL71xYL/MDOLxnnBIuZHIW+XFkCsTI0ie2Hjub8oqUQi+5+
+	HQgqAYph4PMnUoY1lZDCIk6PCUnGTq297CjUEhmo2vxW6z4OfzUiCcRCeS2T4LxRmAI1s4kPfhB
+	VlMsIyH15C7fYheln70aHnltq0wsPP8vvLnzKUiduv+8hhHDopaHqISCqgQKWUx+IulJdQvsdxj
+	MJJjnKpAk0hvnqVZHQ6EYXK/2GCk3X+022UuP9KQyQkbApmzVblYXe3gNazOIAK8DrF6vmDVFIn
+	qufa41e4iNNg==
+X-Google-Smtp-Source: AGHT+IFtpTTQQS4wIIalrzsOu2PHj7oAyNJ7M+sRO7DWvxFYq3rs6N6gK4hnVQhHjV/RVpQZ9TSUjQ==
+X-Received: by 2002:a05:620a:2809:b0:7f9:7000:f7c2 with SMTP id af79cd13be357-85ae94c6a11mr2215347785a.66.1759164647863;
+        Mon, 29 Sep 2025 09:50:47 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4db03cb1744sm80358951cf.0.2025.09.29.09.50.47
+        for <netdev@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Sep 2025 09:31:48 -0700 (PDT)
-From: Gopi Krishna Menon <krishnagopi487@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org
-Cc: Gopi Krishna Menon <krishnagopi487@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	david.hunter.linux@gmail.com,
-	skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev
-Subject: [PATCH net-next] selftests/net: add tcp_port_share to .gitignore
-Date: Mon, 29 Sep 2025 22:01:38 +0530
-Message-ID: <20250929163140.122383-1-krishnagopi487@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Mon, 29 Sep 2025 09:50:47 -0700 (PDT)
+Date: Mon, 29 Sep 2025 09:50:42 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Subject: [ANNOUNCE] iproute2 6.17 release
+Message-ID: <20250929095042.48200315@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Add the tcp_port_share test binary to .gitignore to avoid
-accidentally staging the build artifact.
+This is the regular release of iproute2 corresponding to the 6.17 kernel.
 
-Fixes: 8a8241cdaa34 ("selftests/net: Test tcp port reuse after unbinding
-a socket")
-Signed-off-by: Gopi Krishna Menon <krishnagopi487@gmail.com>
----
- tools/testing/selftests/net/.gitignore | 1 +
- 1 file changed, 1 insertion(+)
+Download:
+    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.17.0.tar.gz
 
-diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
-index 3d4b4a53dfda..439101b518ee 100644
---- a/tools/testing/selftests/net/.gitignore
-+++ b/tools/testing/selftests/net/.gitignore
-@@ -52,6 +52,7 @@ tap
- tcp_fastopen_backup_key
- tcp_inq
- tcp_mmap
-+tcp_port_share
- tfo
- timestamping
- tls
--- 
-2.43.0
+Repository for current release
+    https://github.com/shemminger/iproute2.git
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
+
+And future release (net-next):
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
+
+Contributions:
+
+Andrea Claudi (1):
+      tc: gred: fix debug print
+
+Anton Moryakov (3):
+      misc: ss.c: fix logical error in main function
+      misc: fix memory leak in ifstat.c
+      ip: ipmaddr.c: Fix possible integer underflow in read_igmp()
+
+Ben Hutchings (2):
+      color: Assume background is dark if unknown
+      color: Do not use dark blue in dark-background palette
+
+Carolina Jubran (2):
+      Add support for 'tc-bw' attribute in devlink-rate
+      devlink: Update TC bandwidth parsing
+
+Chia-Yu Chang (3):
+      Move get_float() from ip/iplink_can.c to lib/utils.c
+      Add get_float_min_max() in lib/utils.c
+      tc: add dualpi2 scheduler module
+
+David Ahern (8):
+      Update kernel headers
+      Update kernel headers
+      Update kernel headers
+      Update kernel headers
+      Update kernel headers
+      Update kernel headers
+      Update email address
+      Add tc entry to MAINTAINERS file
+
+Eric Biggers (1):
+      man8: ip-sr: Document that passphrase must be high-entropy
+
+Fabian Pfitzner (3):
+      bridge: move mcast querier dumping code into a shared function
+      bridge: dump mcast querier per vlan
+      bridge: refactor bridge mcast querier function
+
+Ido Schimmel (3):
+      ip ntable: Add support for "mcast_reprobes" parameter
+      ip neigh: Add support for "extern_valid" flag
+      bridge: fdb: Add support for FDB activity notification control
+
+Jean Thomas (1):
+      ip: filter by group before printing
+
+Joseph Huang (2):
+      bridge: mdb: Support offload failed flag
+      iplink_bridge: Add mdb_offload_fail_notification
+
+Lieuwe Rooijakkers (1):
+      man8: tc: fix incorrect long FORMAT identifier for json
+
+Matthieu Baerts (NGI0) (1):
+      mptcp: fix event attributes type
+
+Nicolas Dichtel (1):
+      ip: display the 'netns-immutable' property
+
+Petr Machata (5):
+      ip: ipstats: Iterate all xstats attributes
+      ip: ip_common: Drop ipstats_stat_desc_xstats::inner_max
+      lib: bridge: Add a module for bridge-related helpers
+      ip: iplink_bridge: Support bridge VLAN stats in `ip stats'
+      ip: VXLAN: Add support for IFLA_VXLAN_MC_ROUTE
+
+Stanislav Fomichev (1):
+      ip: support setting multiple features
+
+Stephen Hemminger (5):
+      uapi: update kernel headers
+      rdma: fix minor style issue
+      ip: fix minor style issue
+      uapi: update to 6.17
+      v6.17.0
+
+Vincent Mailhol (1):
+      iplink_can: fix coding style for pointer format
 
 
