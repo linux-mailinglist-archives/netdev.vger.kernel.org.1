@@ -1,181 +1,191 @@
-Return-Path: <netdev+bounces-227189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5010BA9CEB
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 17:31:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61D66BA9D2B
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 17:43:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 860A03BA209
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 15:31:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18B4F17523A
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 15:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2F7A30ACF1;
-	Mon, 29 Sep 2025 15:31:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E56830C0E4;
+	Mon, 29 Sep 2025 15:43:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MweA0EAR"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FCR94bK2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4850C3090C9
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 15:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C6630BBA5;
+	Mon, 29 Sep 2025 15:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759159862; cv=none; b=rCU17fEEglA5fI2lz1/OU+kk73WLD69cKKIYPrx1uRDDI2uSPIzTbnEacg6e9RCEkdWMva/HBSrnZjNQfVe6Z44ChyRsxUj5r5jpmWZwaDE/Od8/jvrKzcv9Q32TsrC0hYeoCWBCRi00pDkGqNDcuo8DdX8z0TtjxqpHk/zcGno=
+	t=1759160593; cv=none; b=mOTJjNO1iwkLS+HES/c6YbT7PhVGqL3lypJ8wm/QbjMXZTQc5Ylz3tUR42UjAOd4ey+F2SHcXkNWUyMatA9gGdJxNbTnmvf5+7iPEOc+K28O/IVUxOPzbDKnxiSaSmmFqTLWphsmxQdMKFz2r9VxIvh2zjNQdSkoqdaWDk0NoMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759159862; c=relaxed/simple;
-	bh=ABwM0eGVQ7WQM24CLNELoH9xGXewKt4+TlK7a0k4I7E=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=e4VtJ4+6oW9o8m456qmVzUtU8Hr6b5TKNkPE9maKkbMo+a+e6FznoNU2tOR+Bw9Ge5D7oFOmcMyXxbSngE45/1EmtS3BWLxKkvWvb0QK5PJExwW2K7A/Tp/pj6iBtv+yVfSzWSqpqwRz0jE1kOxe5AVmlg+k4bHxvpaC/rwP8Ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MweA0EAR; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759159862; x=1790695862;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ABwM0eGVQ7WQM24CLNELoH9xGXewKt4+TlK7a0k4I7E=;
-  b=MweA0EARt4OiIcx4OIVbNquFT7qqB1xaDVyZJls+0sxUhFMM2F6sJZmu
-   hQMgRlqBz8fsG5WNYiPs5s3HNrjM9kChZmlOiLzaiuu0SjDn00MfQlW0K
-   7jUYAbhdARTfWQhIN5CtWwy+zrEnkuNE2lNlZvX+idKJIg3wltFqvmr6z
-   6YPsfUxrluxvnFOLEnxXnKrrIleWYEqgd3TIh6vd2+bc6cs/i4OaGkUkt
-   q2AkuoCK8z4p/VUqF3BL6UtlJDpgPoMy4BnqmZsJH8Oj4FvPfeQ3Duf0N
-   N03gjW5OjYbJhRWVZp6uOh+39Tc+UXGEZrRchZ1djx2Le92USrQQR+bLg
-   w==;
-X-CSE-ConnectionGUID: KYlh5LSBRE6auyQ1MOL2lQ==
-X-CSE-MsgGUID: +OOJrRa5S/aQxiaw5OI2dQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11568"; a="71650111"
-X-IronPort-AV: E=Sophos;i="6.18,301,1751266800"; 
-   d="scan'208";a="71650111"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2025 08:30:59 -0700
-X-CSE-ConnectionGUID: bYpCuTx4SXmxry8ZwD7tLA==
-X-CSE-MsgGUID: ohGdYomQRiGnqPnwTNjFOw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,301,1751266800"; 
-   d="scan'208";a="178072611"
-Received: from gklab-003-001.igk.intel.com ([10.91.173.48])
-  by orviesa007.jf.intel.com with ESMTP; 29 Sep 2025 08:30:57 -0700
-From: Grzegorz Nitka <grzegorz.nitka@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	Arkadiusz Kubalewski <Arkadiusz.kubalewski@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH v2 iwl-net] ice: fix destination CGU for dual complex E825
-Date: Mon, 29 Sep 2025 17:29:05 +0200
-Message-Id: <20250929152905.2947520-1-grzegorz.nitka@intel.com>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1759160593; c=relaxed/simple;
+	bh=5q8LLF4ag2MVwttfhWyI7ecDLzD9/dPboJQ0VHDhT3A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=obHtX7hg+ilaLgLCtZvD52phHFAaSx6nA6LY546BESu8htOkL6Onc5MsLQmoEa4yBksFqfKLdtzABWCY6wXP6MLtmaeV4bu7jKRV9M3VQLOMHQLoyXh2CeOgbtkH9XRQya3rPE6ZAvn/OuxeNum8z1AT86Vwv6OAhG5DNiILkPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FCR94bK2; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id AF3CDC02448;
+	Mon, 29 Sep 2025 15:42:51 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 3B17B606AE;
+	Mon, 29 Sep 2025 15:43:09 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9E9D3102F1A0C;
+	Mon, 29 Sep 2025 17:43:05 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1759160588; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=S1PdaIvO7vK9SB7Z0ERMuEoy98E+U47D3nVJtH+4Aqk=;
+	b=FCR94bK24e1NoOiyF+A/RbIyOW+tTMUG3y4g3og4gWZyyXJaS00FXRsl39dlwRgRIZ/k3J
+	AK+mywa0BxPUY+nCP8IMpGuJ95/GUwJs+cTfjUrCT054gC1lsqpsr4VR9ARrrcD8fX2MaS
+	rbc1p1yzzUEDmIx25+WiAWcBf9q7i3oorfLutoPa3rGXJdTqJRA+1DplYKRG2MRKmzc4/b
+	St12Emjl4h3HuzabkOq9MNbLCJ19bjikzYM0ykLd7aoWBe3I3bFacn4PYd5Cb2wI3ydGg/
+	9fUqOIui11YZn1Aa2IoZiu+Qm638BxPUI/njFLpoL2j73b04aDsJUWBfMkpEbg==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Michael Turquette <mturquette@baylibre.com>,  Stephen Boyd
+ <sboyd@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
+ Dooley <conor+dt@kernel.org>,  Linus Walleij <linus.walleij@linaro.org>,
+  Richard Cochran <richardcochran@gmail.com>,  Gregory CLEMENT
+ <gregory.clement@bootlin.com>,  Marek =?utf-8?Q?Beh=C3=BAn?=
+ <kabel@kernel.org>,
+  linux-clk@vger.kernel.org,  devicetree@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  linux-gpio@vger.kernel.org,
+  netdev@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: pinctrl: Convert
+ marvell,armada-3710-(sb|nb)-pinctrl to DT schema
+In-Reply-To: <20250924223528.2956771-1-robh@kernel.org> (Rob Herring's message
+	of "Wed, 24 Sep 2025 17:35:24 -0500")
+References: <20250924223528.2956771-1-robh@kernel.org>
+User-Agent: mu4e 1.12.7; emacs 30.2
+Date: Mon, 29 Sep 2025 17:43:04 +0200
+Message-ID: <87ms6di7sn.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On dual complex E825, only complex 0 has functional CGU (Clock
-Generation Unit), powering all the PHYs.
-SBQ (Side Band Queue) destination device 'cgu' in current implementation
-points to CGU on current complex and, in order to access primary CGU
-from the secondary complex, the driver should use 'cgu_peer' as
-a destination device in read/write CGU registers operations.
+On 24/09/2025 at 17:35:24 -05, "Rob Herring (Arm)" <robh@kernel.org> wrote:
 
-Define new 'cgu_peer' (15) as RDA (Remote Device Access) client over
-SB-IOSF interface and use it as device target when accessing CGU from
-secondary complex.
+> Convert the marvell,armada3710-(sb|nb)-pinctrl binding to DT schema
+> format. The binding includes the "marvell,armada-3700-xtal-clock"
+> subnode which is simple enough to include here.
+>
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+>  .../bindings/clock/armada3700-xtal-clock.txt  |  29 ---
+>  .../marvell,armada-3710-xb-pinctrl.yaml       | 122 +++++++++++
+>  .../pinctrl/marvell,armada-37xx-pinctrl.txt   | 195 ------------------
+>  3 files changed, 122 insertions(+), 224 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/clock/armada3700-xt=
+al-clock.txt
+>  create mode 100644 Documentation/devicetree/bindings/pinctrl/marvell,arm=
+ada-3710-xb-pinctrl.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/pinctrl/marvell,arm=
+ada-37xx-pinctrl.txt
+>
+> diff --git a/Documentation/devicetree/bindings/clock/armada3700-xtal-cloc=
+k.txt b/Documentation/devicetree/bindings/clock/armada3700-xtal-clock.txt
+> deleted file mode 100644
+> index 4c0807f28cfa..000000000000
+> --- a/Documentation/devicetree/bindings/clock/armada3700-xtal-clock.txt
+> +++ /dev/null
+> @@ -1,29 +0,0 @@
+> -* Xtal Clock bindings for Marvell Armada 37xx SoCs
+> -
+> -Marvell Armada 37xx SoCs allow to determine the xtal clock frequencies by
+> -reading the gpio latch register.
+> -
+> -This node must be a subnode of the node exposing the register address
+> -of the GPIO block where the gpio latch is located.
+> -See Documentation/devicetree/bindings/pinctrl/marvell,armada-37xx-pinctr=
+l.txt
+> -
+> -Required properties:
+> -- compatible : shall be one of the following:
+> -	"marvell,armada-3700-xtal-clock"
+> -- #clock-cells : from common clock binding; shall be set to 0
+> -
+> -Optional properties:
+> -- clock-output-names : from common clock binding; allows overwrite defau=
+lt clock
+> -	output names ("xtal")
+> -
+> -Example:
+> -pinctrl_nb: pinctrl-nb@13800 {
+> -	compatible =3D "armada3710-nb-pinctrl", "syscon", "simple-mfd";
+> -	reg =3D <0x13800 0x100>, <0x13C00 0x20>;
+> -
+> -	xtalclk: xtal-clk {
+> -		compatible =3D "marvell,armada-3700-xtal-clock";
+> -		clock-output-names =3D "xtal";
+> -		#clock-cells =3D <0>;
+> -	};
+> -};
+> diff --git a/Documentation/devicetree/bindings/pinctrl/marvell,armada-371=
+0-xb-pinctrl.yaml b/Documentation/devicetree/bindings/pinctrl/marvell,armad=
+a-3710-xb-pinctrl.yaml
+> new file mode 100644
+> index 000000000000..c4d09d8720bd
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/pinctrl/marvell,armada-3710-xb-pi=
+nctrl.yaml
+> @@ -0,0 +1,122 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/pinctrl/marvell,armada-3710-xb-pinctr=
+l.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Marvell Armada 37xx SoC pin and gpio controller
+> +
+> +maintainers:
+> +  - Gregory CLEMENT <gregory.clement@bootlin.com>
+> +  - Marek Beh=C3=BAn <kabel@kernel.org>
+> +  - Miquel Raynal <miquel.raynal@bootlin.com>
+> +
+> +description: >
+> +  Each Armada 37xx SoC come with two pin and gpio controller one for the=
+ south
+> +  bridge and the other for the north bridge.
 
-This problem has been identified when working on recovery clock
-enablement [1]. In existing implementation for E825 devices, only PF0,
-which is clock owner, is involved in CGU configuration, thus the
-problem was not exposed to the user.
+As I think you'll send a v2 because of the robot complaint, maybe you
+could rephrase a bit to ease the reading:
 
-[1] https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20250905150947.871566-1-grzegorz.nitka@intel.com/
+"...two pin/gpio controllers, one for..."
 
-Fixes: e2193f9f9ec9 ("ice: enable timesync operation on 2xNAC E825 devices")
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <Arkadiusz.kubalewski@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
-v1->v2:
-- rebased
-- fixed code style coomments (skipped redundant 'else', improved
-  'Return'
-  description in function doc-string)
----
- drivers/net/ethernet/intel/ice/ice_common.c  | 26 ++++++++++++++++++--
- drivers/net/ethernet/intel/ice/ice_sbq_cmd.h |  1 +
- 2 files changed, 25 insertions(+), 2 deletions(-)
+> +
+> +  Inside this set of register the gpio latch allows exposing some config=
+uration
+> +  of the SoC and especially the clock frequency of the xtal. Hence, this=
+ node is
+> +  a represent as syscon allowing sharing the register between multiple h=
+ardware
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index eb6abf452b05..a2a8e4cfa01f 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -6382,6 +6382,28 @@ u32 ice_get_link_speed(u16 index)
- 	return ice_aq_to_link_speed[index];
- }
- 
-+/**
-+ * ice_get_dest_cgu - get destination CGU dev for given HW
-+ * @hw: pointer to the HW struct
-+ *
-+ * Get CGU client id for CGU register read/write operations.
-+ *
-+ * Return: CGU device id to use in SBQ transactions.
-+ */
-+static enum ice_sbq_dev_id ice_get_dest_cgu(struct ice_hw *hw)
-+{
-+	/* On dual complex E825 only complex 0 has functional CGU powering all
-+	 * the PHYs.
-+	 * SBQ destination device cgu points to CGU on a current complex and to
-+	 * access primary CGU from the secondary complex, the driver should use
-+	 * cgu_peer as a destination device.
-+	 */
-+	if (hw->mac_type == ICE_MAC_GENERIC_3K_E825 && ice_is_dual(hw) &&
-+	    !ice_is_primary(hw))
-+		return ice_sbq_dev_cgu_peer;
-+	return ice_sbq_dev_cgu;
-+}
-+
- /**
-  * ice_read_cgu_reg - Read a CGU register
-  * @hw: Pointer to the HW struct
-@@ -6396,8 +6418,8 @@ u32 ice_get_link_speed(u16 index)
- int ice_read_cgu_reg(struct ice_hw *hw, u32 addr, u32 *val)
- {
- 	struct ice_sbq_msg_input cgu_msg = {
-+		.dest_dev = ice_get_dest_cgu(hw),
- 		.opcode = ice_sbq_msg_rd,
--		.dest_dev = ice_sbq_dev_cgu,
- 		.msg_addr_low = addr
- 	};
- 	int err;
-@@ -6428,8 +6450,8 @@ int ice_read_cgu_reg(struct ice_hw *hw, u32 addr, u32 *val)
- int ice_write_cgu_reg(struct ice_hw *hw, u32 addr, u32 val)
- {
- 	struct ice_sbq_msg_input cgu_msg = {
-+		.dest_dev = ice_get_dest_cgu(hw),
- 		.opcode = ice_sbq_msg_wr,
--		.dest_dev = ice_sbq_dev_cgu,
- 		.msg_addr_low = addr,
- 		.data = val
- 	};
-diff --git a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-index 183dd5457d6a..21bb861febbf 100644
---- a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-@@ -50,6 +50,7 @@ enum ice_sbq_dev_id {
- 	ice_sbq_dev_phy_0	= 0x02,
- 	ice_sbq_dev_cgu		= 0x06,
- 	ice_sbq_dev_phy_0_peer	= 0x0D,
-+	ice_sbq_dev_cgu_peer	= 0x0F,
- };
- 
- enum ice_sbq_msg_opcode {
+represented as a?
 
-base-commit: 32228c42b96884ecb91bd420d8a8fddaece24df5
--- 
-2.39.3
+> +  block.
 
+blocks?
+
+
+The rest looks fine, so:
+
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+
+Thanks,
+Miqu=C3=A8l
 
