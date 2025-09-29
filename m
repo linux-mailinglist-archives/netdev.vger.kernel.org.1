@@ -1,67 +1,45 @@
-Return-Path: <netdev+bounces-227067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13976BA7C17
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 03:29:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC4ECBA7C61
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 03:46:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97A883A7B85
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 01:29:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D8D31886679
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 01:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8635C1E7C38;
-	Mon, 29 Sep 2025 01:28:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="PPo2Qs1y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6C461F30A9;
+	Mon, 29 Sep 2025 01:46:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644312110;
-	Mon, 29 Sep 2025 01:28:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 609A117736;
+	Mon, 29 Sep 2025 01:46:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759109337; cv=none; b=Dw1b8kfMuJ8B5j29LoCQc25x9cXp5hm7m6Rl3exwLIOjrZ7Go4ILLO7XumRq3sBFoLnxh5btGWR6Jg9Ccaqp8QN2V3ca5sgnG9YaK7si9bE++HNTwAl6RS0gFRb5QCeJpOz+BnRWgjmdipmx6hdZ6KO7UtodJHAEIsuNUZ+maeQ=
+	t=1759110399; cv=none; b=mK60Z2/2vN6m2QnzOOAmEfCdEzF6k5jS2HtLfF8Pix+Fb2ztFV4GmMSUbirCtbqcoXguFd+GMnc/eUQIznMhWZuF8i1tkFrT9g8wdYzetM4URSb5oF8+7D764cL2ATErKXFs1S1pwZBBGTk7YhZb9CXcYYnz2SiACae8IGDvmtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759109337; c=relaxed/simple;
-	bh=EmrVUjt1B7D3/886Y65cqPufs0zQ3UHheF0eHCWdCF8=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PsbiIl5M6OrkFdQ2ccZW66BhWYfXaA4SYG2fDEfwrL9b+7lDqUnMoRoFKaV/yLISFrL3c3WNLqZMRdpMa3CSjFPIbUVnUhF45PkqGmdECQaGcGhz6Sj8vc/VAtQmNNwC5krcPDnatSEOg2tbfqx9EF/YwXhGHwfKbWHQ+OwEQ9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=PPo2Qs1y; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1759109330; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=295nRhO9MYqzL4GtE97bjEtpjgYaFIkVbxp0RokEeP0=;
-	b=PPo2Qs1y20JQG6bUGvr5Vt87YI+06Tcp3cDnFrJ4GVLOSmo0g7ImKnTNv0b1tKxBqHOeIrjlT/Z/Oq4HXK32mnoIEAEjNUSH0MlHHniR/0U8OVjGBTI7uS5Y1DTGhnE534PhrmQOvp5fwPkQI4nXKwfx1c0jo8d6iWK3/rXHfPk=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WozpMtJ_1759109329 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 29 Sep 2025 09:28:50 +0800
-Date: Mon, 29 Sep 2025 09:28:49 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Halil Pasic <pasic@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Guangguan Wang <guangguan.wang@linux.alibaba.com>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org
-Subject: Re: [PATCH net-next v5 1/2] net/smc: make wr buffer count
- configurable
-Message-ID: <aNng0d1YGP7K0C6z@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20250929000001.1752206-1-pasic@linux.ibm.com>
- <20250929000001.1752206-2-pasic@linux.ibm.com>
+	s=arc-20240116; t=1759110399; c=relaxed/simple;
+	bh=M+C4ALP2XPsI/NhnAy+5Jv44vhN7LY3whPEnUNwIqxw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gf+kH+YXuOkWIByPejq/WfPbt/vce6vU947YQtzZkiVr4DkhHm1Z5uTOHiv+LiQegWrcnUoAGa48DNYH3rhyUqnccOFTHnC01097gLLJhxZa6YBuMuZjmS5c0vyYF6n9OndclYwmgfhwGXGSjFXzdn2xz5M/oIDNWcPaCxr7FlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c2dff70000001609-28-68d9e4f0d952
+Date: Mon, 29 Sep 2025 10:46:19 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel_team@skhynix.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, almasrymina@google.com,
+	hawk@kernel.org, toke@redhat.com, asml.silence@gmail.com
+Subject: Re: [PATCH net-next v3] netmem: replace __netmem_clear_lsb() with
+ netmem_to_nmdesc()
+Message-ID: <20250929014619.GA20562@system.software.com>
+References: <20250926035423.51210-1-byungchul@sk.com>
+ <aNau1UuLdO296pJf@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,24 +48,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250929000001.1752206-2-pasic@linux.ibm.com>
+In-Reply-To: <aNau1UuLdO296pJf@horms.kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrDLMWRmVeSWpSXmKPExsXC9ZZnke6HJzczDB4dF7VY/aPCYs6qbYwW
+	c863sFg8PfaI3WJP+3Zmi0f9J9gsLmzrY7W4vGsOm8WxBWIW306/YbS4dPgRiwO3x5aVN5k8
+	ds66y+6xYFOpx6ZVnWwe7/ddZfP4vEkugC2KyyYlNSezLLVI3y6BK+P3TqmCNYIVv9sfMDcw
+	HubtYuTkkBAwkei5s5URxp6xZTcbiM0ioCqx48YVJhCbTUBd4saNn8wgtoiAssTZuS1AcS4O
+	ZoHvjBJX9/4BaxAWiJfYuOotWAOvgIXE3D3TWUFsIYFoiUPn97NAxAUlTs58AmYzC2hJ3Pj3
+	EqieA8iWllj+jwMkzClgIHHl2gywkaJAuw5sOw62S0LgDJvE+88T2SEOlZQ4uOIGywRGgVlI
+	xs5CMnYWwtgFjMyrGIUy88pyEzNzTPQyKvMyK/SS83M3MQLjYFntn+gdjJ8uBB9iFOBgVOLh
+	TbC/mSHEmlhWXJl7iFGCg1lJhLdu840MId6UxMqq1KL8+KLSnNTiQ4zSHCxK4rxG38pThATS
+	E0tSs1NTC1KLYLJMHJxSDYzRtg76T8s0WhYta2RRLnPgnpRzjfOtzc0jTAXXr29gLDolOsN9
+	ytmJjhut4y4yvdF3s/mxS8zWQVunsX3qpt37DGvl2a7qiBmXSnzzariVuyRgx5qkywyFZ2+Y
+	pi3u+vHzqg/LpM5lqjpcFxkPxv/jFZ61KSSj1t/1uIzuH3EvkfBJ04O3piixFGckGmoxFxUn
+	AgAsr/WyfwIAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrMLMWRmVeSWpSXmKPExsXC5WfdrPvhyc0Mgw3b2S1W/6iwmLNqG6PF
+	nPMtLBZPjz1it9jTvp3Z4lH/CTaLw3NPslpc2NbHanF51xw2i2MLxCy+nX7DaHHp8CMWBx6P
+	LStvMnnsnHWX3WPBplKPTas62Tze77vK5rH4xQcmj8+b5ALYo7hsUlJzMstSi/TtErgyfu+U
+	KlgjWPG7/QFzA+Nh3i5GTg4JAROJGVt2s4HYLAKqEjtuXGECsdkE1CVu3PjJDGKLCChLnJ3b
+	AhTn4mAW+M4ocXXvH7AGYYF4iY2r3oI18ApYSMzdM50VxBYSiJY4dH4/C0RcUOLkzCdgNrOA
+	lsSNfy+B6jmAbGmJ5f84QMKcAgYSV67NABspCrTrwLbjTBMYeWch6Z6FpHsWQvcCRuZVjCKZ
+	eWW5iZk5pnrF2RmVeZkVesn5uZsYgUG9rPbPxB2MXy67H2IU4GBU4uFNsL+ZIcSaWFZcmXuI
+	UYKDWUmEt27zjQwh3pTEyqrUovz4otKc1OJDjNIcLErivF7hqQlCAumJJanZqakFqUUwWSYO
+	TqkGRuaMc/Nka/7d3Zo8/6iI7P3nW/9EPHxlfucEP+Oc5ee2xLEv++mhPs3yiX+1CFv12Wu9
+	XCujvjF+nv/Zdua1DtV3qlde/DzceFspbMvq3O3fay+xfHgRHMOwakW+n4r95mfTjv/IEQjM
+	lZ/UlfMtsv6PhBSb9Vt+FzntJXf8Jyy2r1TTFv/n66TEUpyRaKjFXFScCAB4WJT+ZgIAAA==
+X-CFilter-Loop: Reflected
 
-On 2025-09-29 02:00:00, Halil Pasic wrote:
->Think SMC_WR_BUF_CNT_SEND := SMC_WR_BUF_CNT used in send context and
->SMC_WR_BUF_CNT_RECV := 3 * SMC_WR_BUF_CNT used in recv context. Those
->get replaced with lgr->max_send_wr and lgr->max_recv_wr respective.
->
->Please note that although with the default sysctl values
->qp_attr.cap.max_send_wr ==  qp_attr.cap.max_recv_wr is maintained but
->can not be assumed to be generally true any more. I see no downside to
->that, but my confidence level is rather modest.
->
->Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
->Reviewed-by: Sidraya Jayagond <sidraya@linux.ibm.com>
+On Fri, Sep 26, 2025 at 04:18:45PM +0100, Simon Horman wrote:
+> On Fri, Sep 26, 2025 at 12:54:23PM +0900, Byungchul Park wrote:
+> > Changes from RFC v2:
+> >       1. Add a Reviewed-by tag (Thanks to Mina)
+> >       2. Rebase on main branch as of Sep 22
+> >
+> > Changes from RFC:
+> >       1. Optimize the implementation of netmem_to_nmdesc to use less
+> >          instructions (feedbacked by Pavel)
+> >
+> > --->8---
+> > >From 01d23fc4b20c369a2ecf29dc92319d55a4e63aa2 Mon Sep 17 00:00:00 2001
+> > From: Byungchul Park <byungchul@sk.com>
+> > Date: Tue, 29 Jul 2025 19:34:12 +0900
+> > Subject: [PATCH net-next v3] netmem: replace __netmem_clear_lsb() with netmem_to_nmdesc()
+> >
+> > Now that we have struct netmem_desc, it'd better access the pp fields
+> > via struct netmem_desc rather than struct net_iov.
+> >
+> > Introduce netmem_to_nmdesc() for safely converting netmem_ref to
+> > netmem_desc regardless of the type underneath e.i. netmem_desc, net_iov.
+> >
+> > While at it, remove __netmem_clear_lsb() and make netmem_to_nmdesc()
+> > used instead.
+> >
+> > Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > Reviewed-by: Mina Almasry <almasrymina@google.com>
+> 
+> Hi Byungchul,
+> 
+> Some process issues from my side.
+> 
+> 1. The revision information, up to including the '--->8---' line above
+>    should be below the scissors ('---') below.
+> 
+>    This is so that it is available to reviewers, appears in mailing
+>    list archives, and so on. But is not included in git history.
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+Ah yes.  Thank you.  Lemme check.
 
-Best regards,
-Dust
+> 2. Starting the patch description with a 'From: ' line is fine.
+>    But 'Date:" and 'Subject:' lines don't belong there.
+> 
+>    Perhaps 1 and 2 are some sort of tooling error?
+> 
+> 3. Unfortunately while this patch is targeted at net-next,
+>    it doesn't apply cleanly there.
 
+I don't understand why.  Now I just rebased on the latest 'main' and it
+works well.  What should I check else?
+
+> When you repost, be sure to observe the 24h rule.
+
+Thanks!
+
+	Byungchul
+
+> Link: https://docs.kernel.org/process/maintainer-netdev.html
+> 
+> --
+> pw-bot: changes-requested
+> 
+> ...
 
