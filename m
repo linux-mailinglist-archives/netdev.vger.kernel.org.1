@@ -1,123 +1,130 @@
-Return-Path: <netdev+bounces-227110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF7CBA8703
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 10:45:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA71BA8796
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 10:54:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 118CE1890FBE
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 08:45:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8652189D297
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 08:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC64418DB01;
-	Mon, 29 Sep 2025 08:45:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 808EA27A900;
+	Mon, 29 Sep 2025 08:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ST/ESEZu"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fLzKwbiJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1585E219A89
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 08:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E089227C150
+	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 08:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759135524; cv=none; b=jE2GmXdCmhmdGrBhQ2v64SLID7tijcnx1USWHy9BbbiK2tTBvcfc8VwPe3lxLNtld8DTG7m/c5Dig+mZwp/yePpL/yMwc2tiVn93zTQEo6aBhUdB6eUSf3pCwpj2DJnUgVFJsHIc+kx0z+2oyRIAm+LwnntJWsb+7aEnDdCW5Uk=
+	t=1759136079; cv=none; b=ZjQ3uYpFwyZ+lxV1TQlXwatv6fhiPX0Oe+nHHKKUbx13ypMr9XSmX1bc5WoAbTm42NkGyiwyI3R+q/mkMTfTN4RzazV6EpKLF2HGr+AB8NqvalRrsCo3bt+3msLwivdlOZRa64DIbN/W8aDGHVGLcn6RgA55AcUw8yleXkfn4lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759135524; c=relaxed/simple;
-	bh=JA5RcchFYlhuPWUk0QU0LXC1hOJDFmGNvkc+GbXI3SE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UmvifkCX6e3vpddqbo2bH5dGA8MmU7pkjbu4HztFldjNHeL02agy+vSYZjpVVWRgpP7xdKS3CybWLe7lk2tIylFlukx0ux533/kJLhhw131nCi1u9vQIN73RuSuNmMAyyQL3JZne741aeRXCunMIRA4f1/pSoPMqCYwQaJuUjWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ST/ESEZu; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-62fbfeb097eso6184449a12.2
-        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 01:45:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1759135520; x=1759740320; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JzgdahQX7CpJGFCwerveyZDbQ9cci5T/X+7S64lDTAg=;
-        b=ST/ESEZuHtRKND2eHFIjgGbniHnBJ819SB+lliLLxqNrGtp+6ifk8tyMBZC/Pxjoqz
-         4sD9SJ2PExnnhlkcdMH3KDN9Qgb0gcleKb8XK2POebZyb6ILKdkhcWo9s9uFKOIkuvAG
-         tG7yNaGmPmhhZ19qg9YlG/gPRm5e3nBiZzmLTgybtOk/Bl3XerCQKHxJD9hxPF0qSVON
-         T+3nGi921CFFNsvpc5P2zyQRnd7mvCgb9aX9YHO0wcInxs+hXgKcHlYCOMlLL2B3Aj8L
-         SBmM+PrTpgdpRpM4N9ZPTfmQ21bQiXgw/+Vzo8Ry76crmlgQF/4GofqMavj7hrS3P3XZ
-         dQ6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759135520; x=1759740320;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JzgdahQX7CpJGFCwerveyZDbQ9cci5T/X+7S64lDTAg=;
-        b=mmDgcyE4Tw6XTki0Ify2J7pRHXFdlTg4Qv6f/yXna89+UAT/fZovBL+Rk0FPr0chVP
-         +T+V+yN4Ydhi/oti0CuCikzQTQ8Hqj9tTn73P1i/2mamhurQzEumEnAaVGIO6BRQjPfl
-         39gKNDZrPlJVg/nS5da1Kr+3j605WDKTOp3kSTfePpSRQF3YzBPFYrdK3gbG1TqfeaF4
-         63bf9avuZ4kYDOQg0bVkruVb8wSqPL1pH8/s50zEoK8j5cpFzGy57X+Rui5l5BKg+kGY
-         jB8HLlsFAV6pIR3RukNazxprjuXeNlgv4kUlkQqUJX0CPYeYFoCRYD76dNCxtInphDRC
-         275g==
-X-Forwarded-Encrypted: i=1; AJvYcCU/s+VN+fbw9Pe4N5VXX51RuAp7ojOn2iv0sMMt3+5t24mbBjExA+HkyKbZzaec0MAxjmzr0SM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxu4+zt4mhQnBHyXuXRjbhMOfLyjR3xRFS+R8ehd6HukQAj3Tk1
-	wNDOlmMhfdePKTKTpNW9gdmxp9AaTqJ3OYbkX8+YYRf7C0rVIY1Si2qbMQirdypzOTw=
-X-Gm-Gg: ASbGnctGgm0YoG1P6z/L4s5k6RQD6N2UrBWMvTL4Jjn3zKllQBCU8udX+WddmhE3mFC
-	tfvYr4JDKlqU6QkgScJCIrcUT2MgONizFatVgQ7yxpiVXwIXLlhRhfdQ+BFHSZ3WYNtMr13MXGG
-	EUCFAaZmtWmaf5Suiqjqu721yuy4V+LiK+mWpc/av5nr94RRXUH2OkIzv2Xff/szDl5bHojyNX2
-	WYd3YdqTGgvEqd5iN3kbvS4N562ODe1iMvxV6kDN6KgvXuUHEpmCIj3P+6Sth28Dth065A3/iDf
-	TsUu1pynOWOyZa9hWIXOLNDP54c2zoeWV0aJbH3cbjUMe8NegaadagDLatvGpC6DY3oJw8WVeOi
-	rL2LDN8M/t+1eae9dX6ZVGagaZWDAWPYIM3iXdkrrU9/oBvzs5mV8T2Iu3M99nXKScfTLt/NYI6
-	PxSQ==
-X-Google-Smtp-Source: AGHT+IEv4AziFZ1Nh8lMEPO0Ww5j1EhMHxyQUOxBTv+gGU/fjEeiR6fpWcDmVWpjseN1umlDr3eTdA==
-X-Received: by 2002:a17:907:7b9e:b0:b04:6546:347e with SMTP id a640c23a62f3a-b34baf43cd6mr1653315966b.51.1759135520413;
-        Mon, 29 Sep 2025 01:45:20 -0700 (PDT)
-Received: from ?IPV6:2001:a61:13a1:1:4136:3ce:cdaa:75d2? ([2001:a61:13a1:1:4136:3ce:cdaa:75d2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b3545a98300sm862948966b.106.2025.09.29.01.45.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Sep 2025 01:45:20 -0700 (PDT)
-Message-ID: <c9e14156-6b98-4eda-8b31-154f89030244@suse.com>
-Date: Mon, 29 Sep 2025 10:45:19 +0200
+	s=arc-20240116; t=1759136079; c=relaxed/simple;
+	bh=Zqp95AP5FuY0HO263rujhdXBmN6MJWaosQoBJxJweLc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FtaDBbmJdXw2mA3yJuY6gRuouSqu3NnphaGwk/JgbdhD+5QiaL6W/J6I3x3FKNL/PsFZDwLCZF+2oa2OVzDzgmm0l2rDSgbvfTYmgKIUz7MFUtN1Pe8UYkVtc1ThYfPfQM1hzp1UP/kmVgQRtDfYsAYh55zw0lIeHG8zFsII1AI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=fLzKwbiJ; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58T8JQbF004934;
+	Mon, 29 Sep 2025 08:54:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=HJ4BAeArtSthrSkhbCoYegCpynWwL
+	UqgJr3scPxRVho=; b=fLzKwbiJ8bb9oRD/svukc1Jaee0ReN8HVuiInl0RNaaBW
+	x45JSrBMMC6p09M3kp5rbgWB1WJlweOEhF9tyS+VERIDcrHE6y2lAHvThxcG8uqq
+	UUuCeLp62tlE9x2xMgTmb9va11pZ+VQRL2tkJiFl85KnAlTrnXJ3dx2JLnTlsZQE
+	OKxg+yXNczHhFSXPOdyNw6umuw6bf1Kmn2vJEKJ+WR46lFOjrDsFGm/Ox++c069M
+	NGVqv2PWC2L6Qh6XN+16BX302+PNaKas8DB4KK/RJsqlW2Mny6VE1WD4/i9ICGZi
+	5pVzzt2FJW3QysNLXqQgEcSExqbHw5GOEEoMBOPPw==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49fpge02au-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Sep 2025 08:54:22 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 58T8XqNk000643;
+	Mon, 29 Sep 2025 08:54:22 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 49e6c658ad-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Sep 2025 08:54:22 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 58T8s6CT026011;
+	Mon, 29 Sep 2025 08:54:21 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 49e6c6589w-1;
+	Mon, 29 Sep 2025 08:54:21 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: kuniyu@google.com, sdf@fomichev.me, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        horms@kernel.org, netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com
+Subject: [PATCH v2 net-next] net: rtnetlink: fix typo in rtnl_unregister_all() comment
+Date: Mon, 29 Sep 2025 01:54:12 -0700
+Message-ID: <20250929085418.49200-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] net: usb: support quirks in usbnet
-To: yicongsrfy@163.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org
-Cc: marcan@marcan.st, pabeni@redhat.com, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, yicong@kylinos.cn
-References: <20250928014631.2832243-1-yicongsrfy@163.com>
- <20250928014631.2832243-2-yicongsrfy@163.com>
-Content-Language: en-US
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <20250928014631.2832243-2-yicongsrfy@163.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-29_03,2025-09-29_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0
+ mlxlogscore=999 malwarescore=0 phishscore=0 bulkscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2509150000 definitions=main-2509290086
+X-Authority-Analysis: v=2.4 cv=SqmdKfO0 c=1 sm=1 tr=0 ts=68da493e b=1 cx=c_pps
+ a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
+ a=yJojWOMRYYMA:10 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=bxyK71KjYNt0ltEmN1AA:9
+ cc=ntf awl=host:12090
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTI5MDA4MCBTYWx0ZWRfX1AMWHHXVrHWw
+ fB0UCCfAS3CLKxfneofVQZDMWZAJiAMp2ox6GQ2jmdmWi6Sy6b0M/3oUOF4DFOR/kIgRI1Y8xE6
+ /aIvjySMxJBAoj8hZZ6qqtz7RBYF4ly8BozjAnSUqLT45pobUaqVgfkt38HFrE7dcBGDkMeLL1z
+ KqzgAilkdfcusZx3/KtUdTv8SETLAkBVDao7hpZ4rlmFYu/HYa89Q/6YulIBvUclnZLz5lSHxcB
+ Jx2QpbmCp4Fe8Qy6MjRXI3PGF4u47R/CWHPM258xSSkUz62u+y2KCv2MKsl6az1mIJLMUrO4ESi
+ voSNPk8btnQMMM2jbVWXHmbZP0USaOzazEBunmZ7uv74JvfA/VrjiJphrsOFVccWebbrikNcm3O
+ 5z+E6CevXGOChck+0LcTVOBrP3pMqmBbzjXmIgHb8tTKi732YfU=
+X-Proofpoint-GUID: ZtsOS9jO_Y6bvyfrnnqwnZ_KbLy08j-w
+X-Proofpoint-ORIG-GUID: ZtsOS9jO_Y6bvyfrnnqwnZ_KbLy08j-w
 
-Hi,
+Corrected "rtnl_unregster()" -> "rtnl_unregister()" in the
+  documentation comment of "rtnl_unregister_all()"
 
-On 28.09.25 03:46, yicongsrfy@163.com wrote:
-> From: Yi Cong <yicong@kylinos.cn>
-> 
-> Some vendors' USB network interface controllers (NICs) may be compatible
-> with multiple drivers.
-And here is the basic problem. This issue is not an issue specific to
-usbnet. It arises everywhere we have a specific and a general
-driver. Hence it ought to be solved in generic way in usbcore.
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+v1 -> v2
+Drop change for "bugwards compatibility" as Jakub comment. 
+Added Reviewed-by: Simon Horman
+Rephrase commit subject
+https://lore.kernel.org/all/20250913105728.3988422-1-alok.a.tiwari@oracle.com/
+---
+ net/core/rtnetlink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Nor can we do this with a simple list of devices, as we cannot
-assume that the more specific driver is compiled in all systems.
-An unconditional quirk is acceptable _only_ if usbnet would
-not work.
-
-Please get in contact with the core USB developers. The problem
-needs to be solved, but this is not a solution.
-
-	Regards
-		Oliver
-
-Nacked-by: Oliver Neukum <oneukum@suse.com>
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index d9e68ca84926..8040ff7c356e 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -478,7 +478,7 @@ static int rtnl_unregister(int protocol, int msgtype)
+  * rtnl_unregister_all - Unregister all rtnetlink message type of a protocol
+  * @protocol : Protocol family or PF_UNSPEC
+  *
+- * Identical to calling rtnl_unregster() for all registered message types
++ * Identical to calling rtnl_unregister() for all registered message types
+  * of a certain protocol family.
+  */
+ void rtnl_unregister_all(int protocol)
+-- 
+2.50.1
 
 
