@@ -1,169 +1,223 @@
-Return-Path: <netdev+bounces-227206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C67A4BAA2BD
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 19:29:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 262E4BAA3E9
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 19:58:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 029123A9BD6
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 17:29:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64EF07A3A53
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 17:56:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5F230C10B;
-	Mon, 29 Sep 2025 17:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 181E7224245;
+	Mon, 29 Sep 2025 17:58:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qdwLl96+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LkX8GLM7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D3D2FD7DD
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 17:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E99D221739
+	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 17:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759166936; cv=none; b=c23azi2TOpVF0cWr4omUSATXvq7F5slmD2SC7OrevdjtmFhWslnoGudb+aYc/UnQtsz1sq62OHrqUF61PX+Cp2wnUU3+gHpPzlChZLt0P/3qL7GesiD+uw4rPLOM9oI+b24dcoaC7CYHUk2WDoCyBR03eze4He6hkRoQR/UsdEg=
+	t=1759168688; cv=none; b=sB0oJxwZosbtnykG4ACZqIvGorbVIzaJb/wMVFYfINgCbvUhqqoBrLYr76bVtgtiIfK6e38gycxFDVd/M8w18NLkjkjw1d5xSF3lb4kEtcJJgeLly1/cSNvJEyLa0OSLaWKfkPJrF7WzJWxgDzRPQfL+qBGqCHgD9xkX2gqNmME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759166936; c=relaxed/simple;
-	bh=TU1+KKcikkkLjZS/wSy3MRVptcZvum7r3LS6KuJtDTc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UcnwHyJs4CXpHjCI1LsIp76X7F+BG7LgEA/9RMoDRyY0PJJilmnqiN8mnFhhLtOnXjp2wAYUCZGVCsHWxxMdUZNpi+wZqiXXBeB/kZ7je0XsJ+yeTFOtFA0Xyodx8PvJ16T/jaaXJuW0ydqpizHuSlXjW3yykTyro9Al0ywUoX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qdwLl96+; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-57abcb8a41eso602e87.1
-        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 10:28:53 -0700 (PDT)
+	s=arc-20240116; t=1759168688; c=relaxed/simple;
+	bh=IHNM4NzgxnMmFEI01G6PNqPKsxoRpwq01Yb96j8WtNY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=hyguBFM1+15dU4QdiVyP5VHQ74RoP5VTbCCdDwHHYiN/ibtAXrR6SCWQtfoSLfDE41TObgHlfjl+uoU97nCxj7Fa+anMxcQovmQi+BVLQZOElKO+4+G/fw39/lb6RuLC9e4h542aLgQzl4hoAh7RiciN8ulX6auGbJyWh6Oluf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LkX8GLM7; arc=none smtp.client-ip=209.85.221.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-54c0a10990fso1063162e0c.2
+        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 10:58:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759166932; x=1759771732; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1759168684; x=1759773484; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xhKpPku9iPtRnpJMr9y5imP2rZWCpDDnfk1JiYa7Yr0=;
-        b=qdwLl96+TF/Z5rbKvLRYUrChe64682ulE7cHcjKn4i2xSSqMCGgXKlXSVyrHbpWTaw
-         soLotDpOwq/5z7ZccSbMhm5i+2+W3dE+AogCjspuWN+cLeLDdf8VfEkHGXsMbYa3aEri
-         hTi7tpU84WFcB2PkWh9D4TKZjOsBrM84IXA49JdhyF16GVFun40/CRwJ1wGd2P5Hkdrw
-         gteA4taIyzNCueVGiH4NUDOmtE7sqlkEs2AQQ2x1Tqefj/QHEzP7PhcyKloaGv8XJFyj
-         r+6HV/4IIwuiByHcpMeUJoYJXmKKlFEXHAqCFgp8tNvTyDy5NL/uxZMZPJwunFD4V5ur
-         Rzyg==
+        bh=E908RI2gAqiHDeoOAT4Wxeq827Q7LIlIthXPPeqIu0Y=;
+        b=LkX8GLM7m6ne5HW13zQelx3bju8VBtaWvcEbOoeo3G6TTmSLORGikHAOjeDvff++/X
+         0NHMmTycJkxxKouyvTYsi8vlt4WmjR5+a5HdpJp28tK8YohNBrRGQD7pClWyYCbN4i9X
+         mRbHtRwMY6mpgVwgKmaCR1eTZw+w2FXediTFaIF0WkQiXuvMAKqejPTQtc98OMquqoMn
+         Dt++bjnYtU50bLpFrueLGnrI0bEBhN6OTbHG9449TWhQyHj9tad83XHHO3K8cTYT3Al9
+         VzQYgvUMykXxiajVKByDhk3NN/PgtoYPOOUM7G03gg8MXQSX8RkHKZVhegP2oylxGvu0
+         borA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759166932; x=1759771732;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xhKpPku9iPtRnpJMr9y5imP2rZWCpDDnfk1JiYa7Yr0=;
-        b=AcqTaUT8rdIh7xM/IfNrMXJ2czYdo227SAXZyRZJOTPnbczZ3MQ55XdPqvGRPErdyA
-         1+qUszDjy3HM3DHTxk8+HPevDZ6RwDhpFYQeHUC4Qj/FjingioXITJp8uLz1mkr7fdPr
-         F+6S5akgplZry55ZOOZMobu2dtT/mj+a+3N5IV5v/CznDvvNCZUC0taRS0N7pd/ivJj/
-         m1NzJvXLp2E5zYUWBW4AltpN1a7fGAnnfJMm+rhNP8frdW16tcWrclPeKFHw49G63EuN
-         O/obUTjLqqRVN2Qm63H/5Hrlj/1OtNP6hWhQ43fLiwiA3fu95D65nfhnpHqN+c/rLaJH
-         BGbg==
-X-Forwarded-Encrypted: i=1; AJvYcCWXB1TrtCU+58P5T18fJBrAe1a4XEweMtiitOYVANhXsYD2mytagUd4XKcFn0C4UdP+PgNXvlI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyR9XtzqdWYUGXuw998bz7uQbPFv761csmSQWH0ZNRJErijg5Hw
-	miPfiCnrU19MGp+6b042um7V0QOgNL+XsggDNcqBGAAxqhJ+uxNxMLmh/dKHeoBsaSM7xIQ0ewu
-	oPcG0t0KVGISc7kYLz38pguOvRN9q3YGNeH4IF9vh
-X-Gm-Gg: ASbGnctwUARuFoqe0v/P0/lf1JYN9AVfV2GQQYlSn0dDhuhJgEpNwCl1GwvV2RZu/iD
-	iECptcQheoQoZuAR5cXnB6AgiySN1XykW2JN6gpcfrQmLUtffsDoxxYp8+0VjRAa7MtNdDLsL1l
-	yP7gzed/85ITU5nl4LTxVrbBV9H4mCSUvJvTotKrmMwo0fqHHTa+h1XMcWsEtQo5DBvfQmWgsd1
-	RXEyivAx91qubQfoqMHCI3bIoyYQN6SYJ67w2KgEJSjnd9nuddAlOg=
-X-Google-Smtp-Source: AGHT+IF99d/3kb3Gk5B+kwnd34oyoZWkh3LmdLYeV5VseYbT35wyGBmZXsSZRWmJJqcSu7tB1vRN/cw05D0b8aZfkW4=
-X-Received: by 2002:ac2:533c:0:b0:579:fbe5:4467 with SMTP id
- 2adb3069b0e04-58a70558192mr34157e87.4.1759166931717; Mon, 29 Sep 2025
- 10:28:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759168684; x=1759773484;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=E908RI2gAqiHDeoOAT4Wxeq827Q7LIlIthXPPeqIu0Y=;
+        b=d2+XisI4XVa/CZrJfIH5dZsSeZ9qe8LNIXN3Y3xGOeMKvW4hdrP68Pgnv7efbR1lrs
+         5DbH7jiwddOpFX7Zvurwvd8KUSWIS2oMaitY5nr0MZ0OkXjsBmlvQ0l/sJ+zMxFAHhhl
+         bBSDAc4DSyDAp9gfmEQdznpflQU/Jnzg8syrcMZK7NUdv3khsmAE5q0gRjYbM6paaGNp
+         yBHR1uRAs2IaTi3+0eCkh02jVI0yJIqNjLuuaKkVqIVz8dsidMeIQm6I4plr0njldbqN
+         GQhBJfkszXM4N2Hr18vnL1ZybYmUM5o2D+2AEJCW/BEUAv5pqvA4k5cGvllW6ykVto8f
+         n1tw==
+X-Gm-Message-State: AOJu0Yxal5CYjAuwEDmkmK4pr7pFfx41xSuUzmhNEN7i3rTqVrq+aV75
+	3Tmfbrj207Cn8OOqJIGSRpuBWwgcEvMBG8aXEhEPBeshlVr0bfXxK5z1
+X-Gm-Gg: ASbGnctFOq46wjbsYBKRRStnhIeCmr+J5O1Xe2c0J6NO/YKy8gkjxr/1FxRIESb/4B7
+	D1/N0PhEOWCaUCvueA2xe5HRRRISjAdLRXdqkJ6Jkn1iLX3Ke+C6maQ8+Ndj638O900UeZrKo4Q
+	Ezjo9/AtFYT4KCDkI12jhI5x6PDbL3QVztjNcAxOYdHzP8YL6H5N0qumRVPhXJcE81viYmSmm5l
+	0JuJHrTYZoS0ozaU+jZeKsBCCXA3lcY1QCddIzEwG0EBRMECqwrsifsAGKtM58tPxRe/5uu7Ji1
+	DWkJyv0OuXRSsWN1BcEeKgNCS2+y1AjNfyIgx1kGwUE3Kg0S11+WoSsk6MusD/X2fTn+3F75/nk
+	6slOfz5L3PfgHd91IwmXXCWViEe01xDw/8o4+SgqrS4JKZgh8PuH/9Z9cqizZwqSSL+2qoqUtvj
+	2fPpYB
+X-Google-Smtp-Source: AGHT+IGafwY5OqbBwbdedlnM684zSTSo0B+nKhBzZY2UTklcPWu1hk4PiOcg/kKTTuj5OpcgO90zPg==
+X-Received: by 2002:a05:6122:c95:b0:53c:6d68:1cdc with SMTP id 71dfb90a1353d-54bea1f5fcemr6937065e0c.14.1759168684281;
+        Mon, 29 Sep 2025 10:58:04 -0700 (PDT)
+Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
+        by smtp.gmail.com with UTF8SMTPSA id a1e0cc1a2514c-916db3be313sm2499211241.20.2025.09.29.10.58.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Sep 2025 10:58:03 -0700 (PDT)
+Date: Mon, 29 Sep 2025 13:58:02 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Sidharth Seela <sidharthseela@gmail.com>, 
+ antonio@openvpn.net, 
+ sd@queasysnail.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ shuah@kernel.org, 
+ willemdebruijn.kernel@gmail.com, 
+ kernelxing@tencent.com, 
+ nathan@kernel.org, 
+ nick.desaulniers+lkml@gmail.com, 
+ morbo@google.com, 
+ justinstitt@google.com
+Cc: netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ llvm@lists.linux.dev, 
+ david.hunter.linux@gmail.com, 
+ Sidharth Seela <sidharthseela@gmail.com>
+Message-ID: <willemdebruijn.kernel.321e70874e73c@gmail.com>
+In-Reply-To: <20250929160230.36941-2-sidharthseela@gmail.com>
+References: <20250929160230.36941-2-sidharthseela@gmail.com>
+Subject: Re: [PATCH v2] net: Fix uninit character pointer and return values
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250926035423.51210-1-byungchul@sk.com> <aNau1UuLdO296pJf@horms.kernel.org>
- <20250929014619.GA20562@system.software.com>
-In-Reply-To: <20250929014619.GA20562@system.software.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 29 Sep 2025 10:28:39 -0700
-X-Gm-Features: AS18NWAe7i2Wt2VA7cP32l13mdSbxortudnDpG4vSLEkGRbB2jnfYA_HeBXsCYE
-Message-ID: <CAHS8izOK=Y1TWyA6XV05d9i3D8xnhGcX2R-sZBYJXiVsE-RM9w@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] netmem: replace __netmem_clear_lsb() with netmem_to_nmdesc()
-To: Byungchul Park <byungchul@sk.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kernel_team@skhynix.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, hawk@kernel.org, toke@redhat.com, 
-	asml.silence@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Sep 28, 2025 at 6:46=E2=80=AFPM Byungchul Park <byungchul@sk.com> w=
-rote:
->
-> On Fri, Sep 26, 2025 at 04:18:45PM +0100, Simon Horman wrote:
-> > On Fri, Sep 26, 2025 at 12:54:23PM +0900, Byungchul Park wrote:
-> > > Changes from RFC v2:
-> > >       1. Add a Reviewed-by tag (Thanks to Mina)
-> > >       2. Rebase on main branch as of Sep 22
-> > >
-> > > Changes from RFC:
-> > >       1. Optimize the implementation of netmem_to_nmdesc to use less
-> > >          instructions (feedbacked by Pavel)
-> > >
-> > > --->8---
-> > > >From 01d23fc4b20c369a2ecf29dc92319d55a4e63aa2 Mon Sep 17 00:00:00 20=
-01
-> > > From: Byungchul Park <byungchul@sk.com>
-> > > Date: Tue, 29 Jul 2025 19:34:12 +0900
-> > > Subject: [PATCH net-next v3] netmem: replace __netmem_clear_lsb() wit=
-h netmem_to_nmdesc()
-> > >
-> > > Now that we have struct netmem_desc, it'd better access the pp fields
-> > > via struct netmem_desc rather than struct net_iov.
-> > >
-> > > Introduce netmem_to_nmdesc() for safely converting netmem_ref to
-> > > netmem_desc regardless of the type underneath e.i. netmem_desc, net_i=
-ov.
-> > >
-> > > While at it, remove __netmem_clear_lsb() and make netmem_to_nmdesc()
-> > > used instead.
-> > >
-> > > Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
-> > > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > > Reviewed-by: Mina Almasry <almasrymina@google.com>
-> >
-> > Hi Byungchul,
-> >
-> > Some process issues from my side.
-> >
-> > 1. The revision information, up to including the '--->8---' line above
-> >    should be below the scissors ('---') below.
-> >
-> >    This is so that it is available to reviewers, appears in mailing
-> >    list archives, and so on. But is not included in git history.
->
-> Ah yes.  Thank you.  Lemme check.
->
-> > 2. Starting the patch description with a 'From: ' line is fine.
-> >    But 'Date:" and 'Subject:' lines don't belong there.
-> >
-> >    Perhaps 1 and 2 are some sort of tooling error?
-> >
-> > 3. Unfortunately while this patch is targeted at net-next,
-> >    it doesn't apply cleanly there.
->
-> I don't understand why.  Now I just rebased on the latest 'main' and it
-> works well.  What should I check else?
->
-> > When you repost, be sure to observe the 24h rule.
->
-> Thanks!
->
+Reminder: use the net prefix: [PATCH net v2]
 
-Additionally net-next is closed:
+Sidharth Seela wrote:
+> Fix uninitialized character pointer, and functions that return
+> undefined values. These issues were caught by running clang using LLVM=1
+> option; and are as follows:
+> --
+> ovpn-cli.c:1587:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+>  1587 |         if (!sock) {
+>       |             ^~~~~
+> ovpn-cli.c:1635:9: note: uninitialized use occurs here
+>  1635 |         return ret;
+>       |                ^~~
+> ovpn-cli.c:1587:2: note: remove the 'if' if its condition is always false
+>  1587 |         if (!sock) {
+>       |         ^~~~~~~~~~~~
+>  1588 |                 fprintf(stderr, "cannot allocate netlink socket\n");
+>       |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>  1589 |                 goto err_free;
+>       |                 ~~~~~~~~~~~~~~
+>  1590 |         }
+>       |         ~
+> ovpn-cli.c:1584:15: note: initialize the variable 'ret' to silence this warning
+>  1584 |         int mcid, ret;
+>       |                      ^
+>       |                       = 0
+> ovpn-cli.c:2107:7: warning: variable 'ret' is used uninitialized whenever switch case is taken [-Wsometimes-uninitialized]
+>  2107 |         case CMD_INVALID:
+>       |              ^~~~~~~~~~~
+> ovpn-cli.c:2111:9: note: uninitialized use occurs here
+>  2111 |         return ret;
+>       |                ^~~
+> ovpn-cli.c:1939:12: note: initialize the variable 'ret' to silence this warning
+>  1939 |         int n, ret;
+>       |                   ^
+>       |
+> --
+> so_txtime.c:210:3: warning: variable 'reason' is used uninitialized whenever switch default is taken [-Wsometimes-uninitialized]
+>   210 |                 default:
+>       |                 ^~~~~~~
+> so_txtime.c:219:27: note: uninitialized use occurs here
+>   219 |                         data[ret - 1], tstamp, reason);
+>       |                                                ^~~~~~
+> so_txtime.c:177:21: note: initialize the variable 'reason' to silence this warning
+>   177 |                 const char *reason;
+>       |                                   ^
+>       |
 
-https://lore.kernel.org/netdev/20250928212617.7e0cbfe4@kernel.org/
+My previous response accidentally left a state comment. The main
+feedback still held:
 
-Changes targetting net-next need to be sent after the re-open. RFC is
-always welcome.
+This default case calls error() and exits the program, so this cannot
+happen.
+
+> --
+> Fixes: 959bc330a439 ("testing/selftests: add test tool and scripts for ovpn module")
+> ovpn module")
+> Fixes: ca8826095e4d4 ("selftests/net: report etf errors correctly")
+> 
+> Signed-off-by: Sidharth Seela <sidharthseela@gmail.com>
+> 
+> v2:
+> 	- Use subsystem name "net".
+> 	- Add fixes tags.
+> 	- Remove txtimestamp fix as default case calls error.
+> 	- Assign constant error string instead of NULL.
+> --
+
+End the commit with the Signed-off-by block. Either move changelog
+above that, or below three (not two) dashes.
+ 
+> diff --git a/tools/testing/selftests/net/ovpn/ovpn-cli.c b/tools/testing/selftests/net/ovpn/ovpn-cli.c
+> index 9201f2905f2c..20d00378f34a 100644
+> --- a/tools/testing/selftests/net/ovpn/ovpn-cli.c
+> +++ b/tools/testing/selftests/net/ovpn/ovpn-cli.c
+> @@ -1581,7 +1581,7 @@ static int ovpn_listen_mcast(void)
+>  {
+>  	struct nl_sock *sock;
+>  	struct nl_cb *cb;
+> -	int mcid, ret;
+> +	int mcid, ret = -1;
+>  
+>  	sock = nl_socket_alloc();
+>  	if (!sock) {
+> @@ -1936,7 +1936,7 @@ static int ovpn_run_cmd(struct ovpn_ctx *ovpn)
+>  {
+>  	char peer_id[10], vpnip[INET6_ADDRSTRLEN], laddr[128], lport[10];
+>  	char raddr[128], rport[10];
+> -	int n, ret;
+> +	int n, ret = -1;
+>  	FILE *fp;
+>  
+>  	switch (ovpn->cmd) {
+> diff --git a/tools/testing/selftests/net/so_txtime.c b/tools/testing/selftests/net/so_txtime.c
+> index 8457b7ccbc09..5bf3c483069b 100644
+> --- a/tools/testing/selftests/net/so_txtime.c
+> +++ b/tools/testing/selftests/net/so_txtime.c
+> @@ -174,7 +174,7 @@ static int do_recv_errqueue_timeout(int fdt)
+>  	msg.msg_controllen = sizeof(control);
+>  
+>  	while (1) {
+> -		const char *reason;
+> +		const char *reason = "unknown errno";
+>  
+>  		ret = recvmsg(fdt, &msg, MSG_ERRQUEUE);
+>  		if (ret == -1 && errno == EAGAIN)
+> -- 
+> 2.47.3
+> 
 
 
-
---=20
-Thanks,
-Mina
 
