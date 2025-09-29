@@ -1,57 +1,59 @@
-Return-Path: <netdev+bounces-227217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8797BAA655
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 20:59:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B756BAA670
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 21:04:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D6F7192062E
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 18:59:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F19217815A
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 19:04:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E3A2221F39;
-	Mon, 29 Sep 2025 18:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72AD0225403;
+	Mon, 29 Sep 2025 19:04:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B8+JzZAH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A8All/fI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED344273F9
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 18:59:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADACDF6C;
+	Mon, 29 Sep 2025 19:04:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759172373; cv=none; b=O1aug7OQfspH30X8d4HpjJHkffyWZGZyOgSxt8aCMNHu2ukiVXRown+3LJgVz5aAjYL/WvKeFae8N9UFFHgUJpjZXEMQji/1Z+kY8lSABkka/z05qDTv0cHWvqq0p4v3mmKbV/QFj1EknKW0Wl1JSdRz9AF0Rrs6vtGgcL/lGYs=
+	t=1759172679; cv=none; b=ZNES3lIPtpIoEJPtPsV+6N5dkUpGErhrigdIAw6T4OSOlNrZaBpy4aCZcSRcg+nmGLF9TTwc0o+Q2sGFju7KFDkxCWk3v/j2PE9O9A1iO+MmyiywNQF1O6EmyASdAFKZkYL+94gvk1kUVFdGBTTsGifVSCUMXITPfB85U1xy6BY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759172373; c=relaxed/simple;
-	bh=Ik7paXHQoL8nXJ243MBED5YSnAKgJqIx9caZBVg4mwM=;
+	s=arc-20240116; t=1759172679; c=relaxed/simple;
+	bh=qCJ8wA/pIJzOSjjkfs6DawqqEI09XjRR6If8AcAlD24=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h366mLHUEmiNrnm1kbQKPqgY/51NvYlU50Hpjg9rY1xXxqNsKgyJqC1EhJVi+iXw7OkYTvPD0L5GuW4K4ez6xDOqnixtORBZ43CoKCf8BpppHpT2iULRVvtO33TbOqKaWN6WI9zlC2zO645SyJzTvypbS868cPgd9WMtLICHD0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B8+JzZAH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E91AC4CEF4;
-	Mon, 29 Sep 2025 18:59:32 +0000 (UTC)
+	 MIME-Version:Content-Type; b=dUeaBKemmxkZqTsS8/Rq1/G9zrAxyqceQKMeAIAmqvdmBFWxVNGY+1O/kmRgu+UmpuAZq+21D7rpe0C278cgLjmo2trfxW6KUnbn1QXPdqJc4LW+eQDBzhpaa8w6DyeeFKa4Lyh9A5yCP4z2dPxmkI0vtbEfFpjFgx1F2uoLKbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A8All/fI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E4F0C4CEF4;
+	Mon, 29 Sep 2025 19:04:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759172372;
-	bh=Ik7paXHQoL8nXJ243MBED5YSnAKgJqIx9caZBVg4mwM=;
+	s=k20201202; t=1759172678;
+	bh=qCJ8wA/pIJzOSjjkfs6DawqqEI09XjRR6If8AcAlD24=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=B8+JzZAH+FQG2ZexkE1rR0q2qe4EeUW7/mUQqbkQQIE19q7bUVNsLzbe3NQ/Iaf0Q
-	 v8DgvBVZFR81kIqyt4C80b+kJuJpxYogab88zaAYQ89VF4nd8qKiiWYssYq5m/brV6
-	 vgnIvcL60ne2Ax/KWJIVy3c5CUQzOs0y2+KeBSGfoQNNh0DRUcwicpqPvwTrGEHNtT
-	 zmnkRIe9UrQ9NxZtTtLMlWnYBhzDficlN6pJvn0/pf6GhRJZVG5bZYYSyLO3ulyJFu
-	 RGOISBqLvBlBVsKP6dtdximXEw8e1HA3huznoXl86IMSg5tFth6MTGr6AvOYzhaUOr
-	 aGX77MMhK/Y7A==
-Date: Mon, 29 Sep 2025 11:59:31 -0700
+	b=A8All/fIbvEBkdZPCmgSJsO0qHTseRmw0DxaQBimtqXlHvcI9lTj2dJac996592c3
+	 aZWZPA4IzHQtoHMgsQz+z109oVufT1h/IBygXUxjslerQZOpvVM/3p4H3cfhFyO3kW
+	 R64s7tvxJrA0Y+5kVquyE3FNsEETrLwc49htU2fzWy9pTulT+Yu34Mz7hs0+wgU2kD
+	 XcjnNZgbH3cl7HMtSKFCJRO4ZsUdbCROwaIze8qUvTK8WnWzZvaFaFcZcRUbH7VOje
+	 Z6HtMItHUZhpvdKwkEx77mgwbJmeMkJ1CQ3uZSs6xqD39790zCBvazhKmIC2f7kVV0
+	 erBlF93FLOUPg==
+Date: Mon, 29 Sep 2025 12:04:37 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org, horms@kernel.org,
- intel-wired-lan@lists.osuosl.org, Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [PATCH net-next] ixgbe: fix typos and docstring inconsistencies
-Message-ID: <20250929115931.1d01a48b@kernel.org>
-In-Reply-To: <20250929124427.79219-1-alok.a.tiwari@oracle.com>
-References: <20250929124427.79219-1-alok.a.tiwari@oracle.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ petrm@nvidia.com, willemb@google.com, shuah@kernel.org,
+ daniel.zahka@gmail.com, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v3 0/8] psp: add a kselftest suite and
+ netdevsim implementation
+Message-ID: <20250929120437.3eb28d75@kernel.org>
+In-Reply-To: <willemdebruijn.kernel.2e2661b9a8ae9@gmail.com>
+References: <20250927225420.1443468-1-kuba@kernel.org>
+	<willemdebruijn.kernel.2e2661b9a8ae9@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,13 +63,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 29 Sep 2025 05:44:01 -0700 Alok Tiwari wrote:
-> Corrected function and variable name typos in comments and docstrings:
->  ixgbe_write_ee_hostif_X550 -> ixgbe_write_ee_hostif_data_X550
->  ixgbe_get_lcd_x550em -> ixgbe_get_lcd_t_x550em
->  "Determime" -> "Determine"
->  "point to hardware structure" -> "pointer to hardware structure"
->  "To turn on the LED" -> "To turn off the LED"
+On Sun, 28 Sep 2025 12:00:15 -0400 Willem de Bruijn wrote:
+> I'll leave a few minor comments inline, but nothing that really needs
+> a respin and/or cannot be a minor fixup later.
 
-Hi Jake, looks trivial. Ack for us to take it directly to net-next now?
+I'd obviously prefer to have the tests merged in the same release 
+as the code. And there's no time to respin since net-next closed. 
+I'll defer to Paolo's impartial judgment :)
 
