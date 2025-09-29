@@ -1,649 +1,121 @@
-Return-Path: <netdev+bounces-227093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5FE4BA8227
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 08:34:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3A1ABA8359
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 09:02:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F31516B600
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 06:34:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EADA189BE79
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 07:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F782BE638;
-	Mon, 29 Sep 2025 06:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7A211684B0;
+	Mon, 29 Sep 2025 07:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ewgzxMXa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MFQ8Q31n"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3B7929D270;
-	Mon, 29 Sep 2025 06:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DFE5635
+	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 07:02:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759127658; cv=none; b=FKz+fqijRVi61gnY5qmq8+BRTmp1bdcTDIEkaz9Woa8LktGFVNS+O2J9yXHkStMzAHulgApgqXKsH52hBOCRwV4F62TeRR7d6KCUXc+2V0tfpqs2XUOfvo3wKYvWeE8V0damuE/qwB7UM4ZifAGqwH185aiZhnnZfZQAlfRHUPw=
+	t=1759129357; cv=none; b=WA0Kd6+2HM5w+31TbtyQP/eaFCKjy+ds1BtmzTi+SBrQwWw70uy5q/i7nIa1R/QRFLbUr2D/UCElIdCPfLmlM6dTeVvHWABgOyskyAq5657k7DzmMl0ERwp5M6OGOb+jYj50750ZYDeoC6e4pKXh206qKArgl3qnxsJFD9PU1z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759127658; c=relaxed/simple;
-	bh=3rxWPceWMtMyVNdJXjQOL6Cf58RP7HYnG/0O1S30ITM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZBcRKdnuE9JONzK7Zyq0rI8DeXVpqRPlgxUcU7eMpjyLOR6fncxwIeoG5OTzBu92NT39nkF3o/21w1F+slXWN2RvIkk2aD2sMCKEbFhz0FBKQesy3gLsveiFE6BcwGIchqJMM2ZmgHo/1f7ZVNIJqEzDW7cK4tS6KqpOxq7aDfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ewgzxMXa; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1759127648; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=tiH+3KSqfWhZ7acFTgKq8mjWRL7o5/46OZtZb0IFNqw=;
-	b=ewgzxMXamUWpevg9axGfSZb6+iQGaiHCeT41dUv3lUAAKNgsSv8iX0ApAeflgIjQXhNUkHhI3R1rpIw9GPZkLg27+CQ1JjGZo+RrB0eZwlgyiW3U9HBeIL6KvGFNFKu449/Iyla9vn4TtCE3dNUEAQsZUFttSGt0RMAKzSZ7M6g=
-Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Wp07vaz_1759127646 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 29 Sep 2025 14:34:06 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-To: ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	pabeni@redhat.com,
-	song@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	yhs@fb.com,
-	edumazet@google.com,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	jolsa@kernel.org,
-	mjambigi@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	wintera@linux.ibm.com,
-	dust.li@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com
-Cc: bpf@vger.kernel.org,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	sidraya@linux.ibm.com,
-	jaka@linux.ibm.com
-Subject: [PATCH bpf-next v3 3/3] bpf/selftests: add selftest for bpf_smc_hs_ctrl
-Date: Mon, 29 Sep 2025 14:34:00 +0800
-Message-ID: <20250929063400.37939-4-alibuda@linux.alibaba.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20250929063400.37939-1-alibuda@linux.alibaba.com>
-References: <20250929063400.37939-1-alibuda@linux.alibaba.com>
+	s=arc-20240116; t=1759129357; c=relaxed/simple;
+	bh=CFa2o+Qi7bcL/SyPD0GyO6/ru0OqQo4csLh4goJ0HJs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qQ3zH/kaNZd+fV1TrQSlGJOiULD8ApRJHoEyV86hWr4AiHxSFLyfXHpnvcVmq/P9V2H08lj/5iX9VS2G6sCEx3njqfNfCYxavjpb41dunyPv0DKywNdtZCg42o5RFM3bidiQNOBNr9XnfGgQTjdcx3xGnYa6gPrfcg1N3gqLixc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MFQ8Q31n; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-57a59124323so4390757e87.2
+        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 00:02:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759129354; x=1759734154; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+idRAXHi7Bt2G/h4yU81t4RO8kpF2kCatHGuxrQQntI=;
+        b=MFQ8Q31n17Uu3Crsw4B3wmMhprihatGi1DC7+6RUI4MLg3RbukZnlBLk612aSrM/VD
+         L0w6BCE8lHELjdDRcNJ7N2O8TdLwbHmTCUqiH9I9KcCpq3D413Yb3c0O9dWJ/qIp9oVq
+         5qjECDeuAjTNZji7bJpk3vAzn0JFcI3w8pVJW0BIJiXFQ5Zw3sfcPSYEvN4SgBKCFNwD
+         8oS6/ut7sooBc1PlWXWc40B4jgTzJO7CNX2bA9wcMP6hK2bJR2QEEcByX1cUAV7catmI
+         6KNxQrYxSuaUP3lzG1z/BRkSDQc6kYMGW/GSCncxJs+JbfPr9CUWygdcj3FQUHKp+QK9
+         J+Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759129354; x=1759734154;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+idRAXHi7Bt2G/h4yU81t4RO8kpF2kCatHGuxrQQntI=;
+        b=t2T7dhSvdFSAnzaoZAJGC7FOSuZkmDg875ulAuX3zKz9uvB8EDs9icmjZKqGFeoHty
+         7K1uhKbsQqNFoivkV904EZtQ8tNVVlL2XUtvSr85kXHb8/cSdXmVRy2Q01tOAfsMZO7Q
+         0PtLjYNPiLkqPKgXuWSasP0K/psQNsS7hJ+Izy7/EFSQnU2XRnJdgyP+CCN6p+QzAoto
+         nmaKeQhkT9OPXF7xm+DuklmH97YLGE6xp+397iltG4pR+Z4T8hB8eDThRL/ZV20cRVp3
+         ZINk/tUuCWY+Q9DBaPrCV4Z2EJu1euMoOmaBjwYsT1wAAWg5RZEO8HMSSXbWZURDNJFp
+         PBfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX8SFEBZbJ9oTLAWyYYFW5IAuUjeLy/8H0gF9RVl3CdFZQ+o8MKZgoIq0No23alhWeHQvdcoxI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLJxa1d0kFLNgfxCw63LXMsSERR7IhjdWcig5QEXzN6kdgHjsD
+	3s6YnXoM0o6fZ8m1W4BnCb8aFSXwXG9JUA4x9mH7NAewz/BGepfGuv6i
+X-Gm-Gg: ASbGncvcrbD0dR/mMczATZZMnaInwL4+TLgEhT1W3fSIXGsEb5SDosK6xNyIwjp5b+8
+	AVS6DpNXUNOTd0i7hHxl/k9hKMLCLEYn6Qn3qHVkFSYE3ZSQblq3h6IE7o8NrhSl9kOknUT0EA7
+	S12DW+YHaWouWz7sAGtEYyTK5zYV9zMQm5U1NsZMKdXovrZybE94p+Hor7hxO5p7KSS77fJFeq2
+	nVnhVZFcDJdAgiHKSuaTHLV3J4Hflq8vGE+SVOMYjHk8Y7EAqtsgTlhGTpsO3uQLeYx2aWZf9Ge
+	0SX4sHn6V575Uw6ZACgExQJ59F9yC8JJBSW9Lo2M+V5Q1ohvLN1gQMJyuILi5J+6gpkOyHNG0ym
+	XnNjJ3KACd6tDyYdsiZX86WV/jc/oqy8WIFS6HSbduWghPUKZoQ==
+X-Google-Smtp-Source: AGHT+IFPtrPQZPiy1ca2nxjQmwhnlaRMgJecjRwG32UKoNgKoyGvorgS/CknEXOO1FbjA770ZE+WNQ==
+X-Received: by 2002:a05:6512:b1c:b0:57a:c67b:beda with SMTP id 2adb3069b0e04-582d12f13a9mr5332385e87.16.1759129353877;
+        Mon, 29 Sep 2025 00:02:33 -0700 (PDT)
+Received: from foxbook (bfe191.neoplus.adsl.tpnet.pl. [83.28.42.191])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-58671254012sm1430460e87.62.2025.09.29.00.02.31
+        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
+        Mon, 29 Sep 2025 00:02:32 -0700 (PDT)
+Date: Mon, 29 Sep 2025 09:02:29 +0200
+From: Michal Pecio <michal.pecio@gmail.com>
+To: yicongsrfy@163.com
+Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, marcan@marcan.st, pabeni@redhat.com,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org, yicong@kylinos.cn
+Subject: Re: [PATCH v2 1/3] Revert "net: usb: ax88179_178a: Bind only to
+ vendor-specific interface"
+Message-ID: <20250929090229.2fa33931.michal.pecio@gmail.com>
+In-Reply-To: <20250929053145.3113394-2-yicongsrfy@163.com>
+References: <20250928212351.3b5828c2@kernel.org>
+	<20250929053145.3113394-1-yicongsrfy@163.com>
+	<20250929053145.3113394-2-yicongsrfy@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-This tests introduces a tiny smc_hs_ctrl for filtering SMC connections
-based on IP pairs, and also adds a realistic topology model to verify it.
+On Mon, 29 Sep 2025 13:31:43 +0800, yicongsrfy@163.com wrote:
+> From: Yi Cong <yicong@kylinos.cn>
+> 
+> This reverts commit c67cc4315a8e605ec875bd3a1210a549e3562ddc.
+> 
+> Currently, in the Linux kernel, USB NIC with ASIX chips use the cdc_ncm
+> driver.
 
-Also, we can only use SMC loopback under CI test, so an additional
-configuration needs to be enabled.
+Only those with a CDC configuration. Mine doesn't have any.
 
-Follow the steps below to run this test.
+> However, this driver lacks functionality and performs worse than
+> the vendor's proprietary driver.
 
-make -C tools/testing/selftests/bpf
-cd tools/testing/selftests/bpf
-sudo ./test_progs -t smc
+Is this reason to revert a commit which prevents the vendor driver
+binding to CDC or other unwanted interfaces?
 
-Results shows:
-Summary: 1/1 PASSED, 0 SKIPPED, 0 FAILED
+The original commit assumed that the vendor driver will never need
+to bind to them. What has changed?
 
-Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-Tested-by: Saket Kumar Bhaskar <skb99@linux.ibm.com>
-Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
----
- tools/testing/selftests/bpf/config            |   4 +
- .../selftests/bpf/prog_tests/test_bpf_smc.c   | 396 ++++++++++++++++++
- tools/testing/selftests/bpf/progs/bpf_smc.c   | 117 ++++++
- 3 files changed, 517 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
- create mode 100644 tools/testing/selftests/bpf/progs/bpf_smc.c
+Isn't it a regression?
 
-diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-index 70b28c1e653e..9a0cee79fc23 100644
---- a/tools/testing/selftests/bpf/config
-+++ b/tools/testing/selftests/bpf/config
-@@ -123,3 +123,7 @@ CONFIG_XDP_SOCKETS=y
- CONFIG_XFRM_INTERFACE=y
- CONFIG_TCP_CONG_DCTCP=y
- CONFIG_TCP_CONG_BBR=y
-+CONFIG_INFINIBAND=y
-+CONFIG_SMC=y
-+CONFIG_SMC_HS_CTRL_BPF=y
-+CONFIG_SMC_LO=y
-\ No newline at end of file
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c b/tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
-new file mode 100644
-index 000000000000..ccf68aefa6fd
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
-@@ -0,0 +1,396 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <test_progs.h>
-+#include <linux/genetlink.h>
-+#include "network_helpers.h"
-+#include "bpf_smc.skel.h"
-+
-+#ifndef IPPROTO_SMC
-+#define IPPROTO_SMC 256
-+#endif
-+
-+#define CLIENT_IP			"127.0.0.1"
-+#define SERVER_IP			"127.0.1.0"
-+#define SERVER_IP_VIA_RISK_PATH	"127.0.2.0"
-+
-+#define SERVICE_1	80
-+#define SERVICE_2	443
-+#define SERVICE_3	8443
-+
-+#define TEST_NS	"bpf_smc_netns"
-+
-+static struct netns_obj *test_netns;
-+
-+struct smc_policy_ip_key {
-+	__u32  sip;
-+	__u32  dip;
-+};
-+
-+struct smc_policy_ip_value {
-+	__u8	mode;
-+};
-+
-+#if defined(__s390x__)
-+/* s390x has default seid  */
-+static bool setup_ueid(void) { return true; }
-+static void cleanup_ueid(void) {}
-+#else
-+enum {
-+	SMC_NETLINK_ADD_UEID = 10,
-+	SMC_NETLINK_REMOVE_UEID
-+};
-+
-+enum {
-+	SMC_NLA_EID_TABLE_UNSPEC,
-+	SMC_NLA_EID_TABLE_ENTRY,    /* string */
-+};
-+
-+struct msgtemplate {
-+	struct nlmsghdr n;
-+	struct genlmsghdr g;
-+	char buf[1024];
-+};
-+
-+#define GENLMSG_DATA(glh)	((void *)(NLMSG_DATA(glh) + GENL_HDRLEN))
-+#define GENLMSG_PAYLOAD(glh)	(NLMSG_PAYLOAD(glh, 0) - GENL_HDRLEN)
-+#define NLA_DATA(na)		((void *)((char *)(na) + NLA_HDRLEN))
-+#define NLA_PAYLOAD(len)	((len) - NLA_HDRLEN)
-+
-+#define SMC_GENL_FAMILY_NAME	"SMC_GEN_NETLINK"
-+#define SMC_BPFTEST_UEID	"SMC-BPFTEST-UEID"
-+
-+static uint16_t smc_nl_family_id = -1;
-+
-+static int send_cmd(int fd, __u16 nlmsg_type, __u32 nlmsg_pid,
-+		    __u16 nlmsg_flags, __u8 genl_cmd, __u16 nla_type,
-+		    void *nla_data, int nla_len)
-+{
-+	struct nlattr *na;
-+	struct sockaddr_nl nladdr;
-+	int r, buflen;
-+	char *buf;
-+
-+	struct msgtemplate msg = {0};
-+
-+	msg.n.nlmsg_len = NLMSG_LENGTH(GENL_HDRLEN);
-+	msg.n.nlmsg_type = nlmsg_type;
-+	msg.n.nlmsg_flags = nlmsg_flags;
-+	msg.n.nlmsg_seq = 0;
-+	msg.n.nlmsg_pid = nlmsg_pid;
-+	msg.g.cmd = genl_cmd;
-+	msg.g.version = 1;
-+	na = (struct nlattr *)GENLMSG_DATA(&msg);
-+	na->nla_type = nla_type;
-+	na->nla_len = nla_len + 1 + NLA_HDRLEN;
-+	memcpy(NLA_DATA(na), nla_data, nla_len);
-+	msg.n.nlmsg_len += NLMSG_ALIGN(na->nla_len);
-+
-+	buf = (char *)&msg;
-+	buflen = msg.n.nlmsg_len;
-+	memset(&nladdr, 0, sizeof(nladdr));
-+	nladdr.nl_family = AF_NETLINK;
-+
-+	while ((r = sendto(fd, buf, buflen, 0, (struct sockaddr *)&nladdr,
-+			   sizeof(nladdr))) < buflen) {
-+		if (r > 0) {
-+			buf += r;
-+			buflen -= r;
-+		} else if (errno != EAGAIN) {
-+			return -1;
-+		}
-+	}
-+	return 0;
-+}
-+
-+static bool get_smc_nl_family_id(void)
-+{
-+	struct sockaddr_nl nl_src;
-+	struct msgtemplate msg;
-+	struct nlattr *nl;
-+	int fd, ret;
-+	pid_t pid;
-+
-+	fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
-+	if (!ASSERT_OK_FD(fd, "nl_family socket"))
-+		return false;
-+
-+	pid = getpid();
-+
-+	memset(&nl_src, 0, sizeof(nl_src));
-+	nl_src.nl_family = AF_NETLINK;
-+	nl_src.nl_pid = pid;
-+
-+	ret = bind(fd, (struct sockaddr *)&nl_src, sizeof(nl_src));
-+	if (!ASSERT_OK(ret, "nl_family bind"))
-+		goto fail;
-+
-+	ret = send_cmd(fd, GENL_ID_CTRL, pid,
-+		       NLM_F_REQUEST, CTRL_CMD_GETFAMILY,
-+		       CTRL_ATTR_FAMILY_NAME, (void *)SMC_GENL_FAMILY_NAME,
-+		       strlen(SMC_GENL_FAMILY_NAME));
-+	if (!ASSERT_OK(ret, "nl_family query"))
-+		goto fail;
-+
-+	ret = recv(fd, &msg, sizeof(msg), 0);
-+	if (!ASSERT_FALSE(msg.n.nlmsg_type == NLMSG_ERROR || ret < 0 ||
-+			  !NLMSG_OK(&msg.n, ret), "nl_family response"))
-+		goto fail;
-+
-+	nl = (struct nlattr *)GENLMSG_DATA(&msg);
-+	nl = (struct nlattr *)((char *)nl + NLA_ALIGN(nl->nla_len));
-+	if (!ASSERT_EQ(nl->nla_type, CTRL_ATTR_FAMILY_ID, "nl_family nla type"))
-+		goto fail;
-+
-+	smc_nl_family_id = *(uint16_t *)NLA_DATA(nl);
-+	close(fd);
-+	return true;
-+fail:
-+	close(fd);
-+	return false;
-+}
-+
-+static bool smc_ueid(int op)
-+{
-+	struct sockaddr_nl nl_src;
-+	struct msgtemplate msg;
-+	struct nlmsgerr *err;
-+	char test_ueid[32];
-+	int fd, ret;
-+	pid_t pid;
-+
-+	/* UEID required */
-+	memset(test_ueid, '\x20', sizeof(test_ueid));
-+	memcpy(test_ueid, SMC_BPFTEST_UEID, strlen(SMC_BPFTEST_UEID));
-+	fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
-+	if (!ASSERT_OK_FD(fd, "ueid socket"))
-+		return false;
-+
-+	pid = getpid();
-+	memset(&nl_src, 0, sizeof(nl_src));
-+	nl_src.nl_family = AF_NETLINK;
-+	nl_src.nl_pid = pid;
-+
-+	ret = bind(fd, (struct sockaddr *)&nl_src, sizeof(nl_src));
-+	if (!ASSERT_OK(ret, "ueid bind"))
-+		goto fail;
-+
-+	ret = send_cmd(fd, smc_nl_family_id, pid,
-+		       NLM_F_REQUEST | NLM_F_ACK, op, SMC_NLA_EID_TABLE_ENTRY,
-+		       (void *)test_ueid, sizeof(test_ueid));
-+	if (!ASSERT_OK(ret, "ueid cmd"))
-+		goto fail;
-+
-+	ret = recv(fd, &msg, sizeof(msg), 0);
-+	if (!ASSERT_FALSE(ret < 0 ||
-+			  !NLMSG_OK(&msg.n, ret), "ueid response"))
-+		goto fail;
-+
-+	if (msg.n.nlmsg_type == NLMSG_ERROR) {
-+		err = NLMSG_DATA(&msg);
-+		switch (op) {
-+		case SMC_NETLINK_REMOVE_UEID:
-+			if (!ASSERT_FALSE((err->error && err->error != -ENOENT),
-+					  "ueid remove"))
-+				goto fail;
-+			break;
-+		case SMC_NETLINK_ADD_UEID:
-+			if (!ASSERT_OK(err->error, "ueid add"))
-+				goto fail;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+	close(fd);
-+	return true;
-+fail:
-+	close(fd);
-+	return false;
-+}
-+
-+static bool setup_ueid(void)
-+{
-+	/* get smc nl id */
-+	if (!get_smc_nl_family_id())
-+		return false;
-+	/* clear old ueid for bpftest */
-+	smc_ueid(SMC_NETLINK_REMOVE_UEID);
-+	/* smc-loopback required ueid */
-+	return smc_ueid(SMC_NETLINK_ADD_UEID);
-+}
-+
-+static void cleanup_ueid(void)
-+{
-+	smc_ueid(SMC_NETLINK_REMOVE_UEID);
-+}
-+#endif /* __s390x__ */
-+
-+static bool setup_netns(void)
-+{
-+	test_netns = netns_new(TEST_NS, true);
-+	if (!ASSERT_OK_PTR(test_netns, "open net namespace"))
-+		goto fail_netns;
-+
-+	if (!ASSERT_OK(system("ip addr add 127.0.1.0/8 dev lo"),
-+		       "add server node"))
-+		goto fail_ip;
-+
-+	if (!ASSERT_OK(system("ip addr add 127.0.2.0/8 dev lo"),
-+		       "server via risk path"))
-+		goto fail_ip;
-+
-+	return true;
-+fail_ip:
-+	netns_free(test_netns);
-+fail_netns:
-+	return false;
-+}
-+
-+static void cleanup_netns(void)
-+{
-+	netns_free(test_netns);
-+	remove_netns(TEST_NS);
-+}
-+
-+static bool setup_smc(void)
-+{
-+	if (!setup_ueid())
-+		return false;
-+
-+	if (!setup_netns())
-+		goto fail_netns;
-+
-+	return true;
-+fail_netns:
-+	cleanup_ueid();
-+	return false;
-+}
-+
-+static int set_client_addr_cb(int fd, void *opts)
-+{
-+	const char *src = (const char *)opts;
-+	struct sockaddr_in localaddr;
-+
-+	localaddr.sin_family = AF_INET;
-+	localaddr.sin_port = htons(0);
-+	localaddr.sin_addr.s_addr = inet_addr(src);
-+	return !ASSERT_OK(bind(fd, &localaddr, sizeof(localaddr)), "client bind");
-+}
-+
-+static void run_link(const char *src, const char *dst, int port)
-+{
-+	struct network_helper_opts opts = {0};
-+	int server, client;
-+
-+	server = start_server_str(AF_INET, SOCK_STREAM, dst, port, NULL);
-+	if (!ASSERT_OK_FD(server, "start service_1"))
-+		return;
-+
-+	opts.proto = IPPROTO_TCP;
-+	opts.post_socket_cb = set_client_addr_cb;
-+	opts.cb_opts = (void *)src;
-+
-+	client = connect_to_fd_opts(server, &opts);
-+	if (!ASSERT_OK_FD(client, "start connect"))
-+		goto fail_client;
-+
-+	close(client);
-+fail_client:
-+	close(server);
-+}
-+
-+static void block_link(int map_fd, const char *src, const char *dst)
-+{
-+	struct smc_policy_ip_value val = { .mode = /* block */ 0 };
-+	struct smc_policy_ip_key key = {
-+		.sip = inet_addr(src),
-+		.dip = inet_addr(dst),
-+	};
-+
-+	bpf_map_update_elem(map_fd, &key, &val, BPF_ANY);
-+}
-+
-+/*
-+ * This test describes a real-life service topology as follows:
-+ *
-+ *                             +-------------> service_1
-+ *            link 1           |                     |
-+ *   +--------------------> server                   |  link 2
-+ *   |                         |                     V
-+ *   |                         +-------------> service_2
-+ *   |        link 3
-+ *  client -------------------> server_via_unsafe_path -> service_3
-+ *
-+ * Among them,
-+ * 1. link-1 is very suitable for using SMC.
-+ * 2. link-2 is not suitable for using SMC, because the mode of this link is
-+ *    kind of short-link services.
-+ * 3. link-3 is also not suitable for using SMC, because the RDMA link is
-+ *    unavailable and needs to go through a long timeout before it can fallback
-+ *    to TCP.
-+ * To achieve this goal, we use a customized SMC ip strategy via smc_hs_ctrl.
-+ */
-+static void test_topo(void)
-+{
-+	struct bpf_smc *skel;
-+	int rc, map_fd;
-+
-+	skel = bpf_smc__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "bpf_smc__open_and_load"))
-+		return;
-+
-+	rc = bpf_smc__attach(skel);
-+	if (!ASSERT_OK(rc, "bpf_smc__attach"))
-+		goto fail;
-+
-+	map_fd = bpf_map__fd(skel->maps.smc_policy_ip);
-+	if (!ASSERT_OK_FD(map_fd, "bpf_map__fd"))
-+		goto fail;
-+
-+	/* Mock the process of transparent replacement, since we will modify
-+	 * protocol to ipproto_smc accropding to it via
-+	 * fmod_ret/update_socket_protocol.
-+	 */
-+	system("sysctl -w net.smc.hs_ctrl=linkcheck");
-+
-+	/* Configure ip strat */
-+	block_link(map_fd, CLIENT_IP, SERVER_IP_VIA_RISK_PATH);
-+	block_link(map_fd, SERVER_IP, SERVER_IP);
-+
-+	/* should go with smc */
-+	run_link(CLIENT_IP, SERVER_IP, SERVICE_1);
-+	/* should go with smc fallback */
-+	run_link(SERVER_IP, SERVER_IP, SERVICE_2);
-+
-+	ASSERT_EQ(skel->bss->smc_cnt, 2, "smc count");
-+	ASSERT_EQ(skel->bss->fallback_cnt, 1, "fallback count");
-+
-+	/* should go with smc */
-+	run_link(CLIENT_IP, SERVER_IP, SERVICE_2);
-+
-+	ASSERT_EQ(skel->bss->smc_cnt, 3, "smc count");
-+	ASSERT_EQ(skel->bss->fallback_cnt, 1, "fallback count");
-+
-+	/* should go with smc fallback */
-+	run_link(CLIENT_IP, SERVER_IP_VIA_RISK_PATH, SERVICE_3);
-+
-+	ASSERT_EQ(skel->bss->smc_cnt, 4, "smc count");
-+	ASSERT_EQ(skel->bss->fallback_cnt, 2, "fallback count");
-+
-+fail:
-+	bpf_smc__destroy(skel);
-+}
-+
-+void test_bpf_smc(void)
-+{
-+	if (!setup_smc()) {
-+		printf("setup for smc test failed, test SKIP:\n");
-+		test__skip();
-+		return;
-+	}
-+
-+	if (test__start_subtest("topo"))
-+		test_topo();
-+
-+	cleanup_ueid();
-+	cleanup_netns();
-+}
-diff --git a/tools/testing/selftests/bpf/progs/bpf_smc.c b/tools/testing/selftests/bpf/progs/bpf_smc.c
-new file mode 100644
-index 000000000000..3f1c41108b46
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/bpf_smc.c
-@@ -0,0 +1,117 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include "vmlinux.h"
-+
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+#include "bpf_tracing_net.h"
-+
-+char _license[] SEC("license") = "GPL";
-+
-+enum {
-+	BPF_SMC_LISTEN	= 10,
-+};
-+
-+struct smc_sock___local {
-+	struct sock sk;
-+	struct smc_sock *listen_smc;
-+	bool use_fallback;
-+} __attribute__((preserve_access_index));
-+
-+int smc_cnt = 0;
-+int fallback_cnt = 0;
-+
-+SEC("fentry/smc_release")
-+int BPF_PROG(bpf_smc_release, struct socket *sock)
-+{
-+	/* only count from one side (client) */
-+	if (sock->sk->__sk_common.skc_state == BPF_SMC_LISTEN)
-+		return 0;
-+	smc_cnt++;
-+	return 0;
-+}
-+
-+SEC("fentry/smc_switch_to_fallback")
-+int BPF_PROG(bpf_smc_switch_to_fallback, struct smc_sock___local *smc)
-+{
-+	/* only count from one side (client) */
-+	if (smc && !smc->listen_smc)
-+		fallback_cnt++;
-+	return 0;
-+}
-+
-+/* go with default value if no strat was found */
-+bool default_ip_strat_value = true;
-+
-+struct smc_policy_ip_key {
-+	__u32	sip;
-+	__u32	dip;
-+};
-+
-+struct smc_policy_ip_value {
-+	__u8	mode;
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_HASH);
-+	__uint(key_size, sizeof(struct smc_policy_ip_key));
-+	__uint(value_size, sizeof(struct smc_policy_ip_value));
-+	__uint(max_entries, 128);
-+	__uint(map_flags, BPF_F_NO_PREALLOC);
-+} smc_policy_ip SEC(".maps");
-+
-+static bool smc_check(__u32 src, __u32 dst)
-+{
-+	struct smc_policy_ip_value *value;
-+	struct smc_policy_ip_key key = {
-+		.sip = src,
-+		.dip = dst,
-+	};
-+
-+	value = bpf_map_lookup_elem(&smc_policy_ip, &key);
-+	return value ? value->mode : default_ip_strat_value;
-+}
-+
-+SEC("fmod_ret/update_socket_protocol")
-+int BPF_PROG(smc_run, int family, int type, int protocol)
-+{
-+	struct task_struct *task;
-+
-+	if (family != AF_INET && family != AF_INET6)
-+		return protocol;
-+
-+	if ((type & 0xf) != SOCK_STREAM)
-+		return protocol;
-+
-+	if (protocol != 0 && protocol != IPPROTO_TCP)
-+		return protocol;
-+
-+	task = bpf_get_current_task_btf();
-+	/* Prevent from affecting other tests */
-+	if (!task || !task->nsproxy->net_ns->smc.hs_ctrl)
-+		return protocol;
-+
-+	return IPPROTO_SMC;
-+}
-+
-+SEC("struct_ops/bpf_smc_set_tcp_option_cond")
-+int BPF_PROG(bpf_smc_set_tcp_option_cond, const struct tcp_sock *tp,
-+	     struct inet_request_sock *ireq)
-+{
-+	return smc_check(ireq->req.__req_common.skc_daddr,
-+			 ireq->req.__req_common.skc_rcv_saddr);
-+}
-+
-+SEC("struct_ops/bpf_smc_set_tcp_option")
-+int BPF_PROG(bpf_smc_set_tcp_option, struct tcp_sock *tp)
-+{
-+	return smc_check(tp->inet_conn.icsk_inet.sk.__sk_common.skc_rcv_saddr,
-+			 tp->inet_conn.icsk_inet.sk.__sk_common.skc_daddr);
-+}
-+
-+SEC(".struct_ops.link")
-+struct smc_hs_ctrl  linkcheck = {
-+	.name		= "linkcheck",
-+	.syn_option	= (void *)bpf_smc_set_tcp_option,
-+	.synack_option	= (void *)bpf_smc_set_tcp_option_cond,
-+};
--- 
-2.45.0
-
+Regards,
+Michal
 
