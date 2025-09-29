@@ -1,127 +1,123 @@
-Return-Path: <netdev+bounces-227109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A05ABBA868B
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 10:36:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FF7CBA8703
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 10:45:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F8407A8B87
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 08:34:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 118CE1890FBE
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 08:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DEC923958A;
-	Mon, 29 Sep 2025 08:36:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC64418DB01;
+	Mon, 29 Sep 2025 08:45:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UtvnSds9"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ST/ESEZu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB07E171CD
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 08:36:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1585E219A89
+	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 08:45:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759134970; cv=none; b=IlFq4DrRWYB6SjhQ/7VtL9j9m/QBrkVqF09XkUqku/Po3cDwHD3FxqgHSQXnregIwNkAQDMkRMWAWFkakGQJCbFVwcZrftgNSjTl77Pwpip8DN4jnuMQDaJTdH4NZeQFY2gSkHPo04xfbfDX/ZL3FWovEMPxcR45dn+ErtqFmkY=
+	t=1759135524; cv=none; b=jE2GmXdCmhmdGrBhQ2v64SLID7tijcnx1USWHy9BbbiK2tTBvcfc8VwPe3lxLNtld8DTG7m/c5Dig+mZwp/yePpL/yMwc2tiVn93zTQEo6aBhUdB6eUSf3pCwpj2DJnUgVFJsHIc+kx0z+2oyRIAm+LwnntJWsb+7aEnDdCW5Uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759134970; c=relaxed/simple;
-	bh=1tJsthNTFxuulixaTwySRyl9aKQCA8pi83MgtzQQI0I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q62Y9HYcvscSraeBV6wx3dhUMciIWOfF2wjn3oDWWTJLAno1gwPoKP9GtiskSAoPtUOCtPZfpcifAhP2uUfj1lX5V/oSbt1056bhDUh2FvIdC6r3qGIO+vDZe0gq6jUntgImDitdBXOH8vRvl1uLrLHPQElo+bJY4zQtnZlQNfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UtvnSds9; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-77f67ba775aso5210728b3a.3
-        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 01:36:08 -0700 (PDT)
+	s=arc-20240116; t=1759135524; c=relaxed/simple;
+	bh=JA5RcchFYlhuPWUk0QU0LXC1hOJDFmGNvkc+GbXI3SE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UmvifkCX6e3vpddqbo2bH5dGA8MmU7pkjbu4HztFldjNHeL02agy+vSYZjpVVWRgpP7xdKS3CybWLe7lk2tIylFlukx0ux533/kJLhhw131nCi1u9vQIN73RuSuNmMAyyQL3JZne741aeRXCunMIRA4f1/pSoPMqCYwQaJuUjWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ST/ESEZu; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-62fbfeb097eso6184449a12.2
+        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 01:45:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759134968; x=1759739768; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RIGzfdB+V9pyAns690pgb5kkLaM1R48k/DR5PXW0P3s=;
-        b=UtvnSds9oABPbuSmuSqASf1k3+Ejtb1K27Pfmn14chq1IWrTTjRtPsm8yhcQh4MQ5C
-         yvc4r4MwqkTYUI1nqstpsHFzB93M1xR1ZhcsdjkNM2s/2h9WzXBjlQkIGXxbcd0L97MW
-         x4+SxdYHTywxvdyPthKfrZRWqx1U7kTHAe/2UcV6I/JkpYXDlBDYjorurLoXhRiGsNCM
-         wncNsOs1BgSWe2B26HQi6E569vmLDTsPQVUcKbMiftp78pAaId4/pPJ+YW+feW1+eidr
-         HvkPwnrSsNJzhkfZMr5Mf5ydAWYsClGX5Y8owSZ9bq6473kvJgYk2/Sb71//WYcNj/X3
-         Mekg==
+        d=suse.com; s=google; t=1759135520; x=1759740320; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JzgdahQX7CpJGFCwerveyZDbQ9cci5T/X+7S64lDTAg=;
+        b=ST/ESEZuHtRKND2eHFIjgGbniHnBJ819SB+lliLLxqNrGtp+6ifk8tyMBZC/Pxjoqz
+         4sD9SJ2PExnnhlkcdMH3KDN9Qgb0gcleKb8XK2POebZyb6ILKdkhcWo9s9uFKOIkuvAG
+         tG7yNaGmPmhhZ19qg9YlG/gPRm5e3nBiZzmLTgybtOk/Bl3XerCQKHxJD9hxPF0qSVON
+         T+3nGi921CFFNsvpc5P2zyQRnd7mvCgb9aX9YHO0wcInxs+hXgKcHlYCOMlLL2B3Aj8L
+         SBmM+PrTpgdpRpM4N9ZPTfmQ21bQiXgw/+Vzo8Ry76crmlgQF/4GofqMavj7hrS3P3XZ
+         dQ6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759134968; x=1759739768;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RIGzfdB+V9pyAns690pgb5kkLaM1R48k/DR5PXW0P3s=;
-        b=fSBHmcXSHIk6Ykguvo3VVl18Tkr+Uu6IfPuyg6HMGviGwJ+FUrIr6XLFAn1Gd47FCp
-         EjkM0CTknItJghTUWHdTokytHiDKlMV3ypkO/D2cbfo9tvUsAEFoZX5VPl5T8N+Mtamx
-         2FplWgbpOpeXnsTdLvhoxiIejAHChvzF3jaPIeVzHU5lT1oOT5zmTWAOBQnBeKfh8eEb
-         3pGUIW6vP/4FjyZss1MFvjDeOfbr4igMT0K3jyfCOneFjgM71LZ4qwRfmXsNQsyZqUEi
-         qKqFpJOc14Zfbwofqk4Z6+kBP3e3Kluvnxe1dVWRscp01qieUZLgWtlhFufxNpZ3vLyg
-         vwYw==
-X-Gm-Message-State: AOJu0YzGP5O1rQeB9NuLT2cEDR50e3AVwVxvIEm20uBDe0jgOJxTv4HH
-	fPfA1z5/NhQk22oErtvIG5RI5PI4pCfjAVhSCCY33MPHGBa8k+8NYDI/MftOhb97
-X-Gm-Gg: ASbGncszcMmXpKgxXNOfSxQz4cAmobLRJS/UzX40Y4u0mFcb4BPhLC+7T6HAL4Mxl/p
-	Z1GSRPZE+hF/cu1IqMHhUUrpRqZzZKr2iJam8AszueqKftDDNYymnEPwr+Gn5Eh85eH/xAjbbVf
-	cWAKzEFRryjIGf8AovUVkVT8IlQMjOWx7bauYF3Smi8GX+PKBvd16dhuJWIfIzWR7cVAIsfA1Ve
-	GyHOCU3/ptIDkK3KT6CUq2d2NkhuPNKIW02Jt97dOYVCep8TdpI4f7fgXY8BtwzlZ6dEguH3ieM
-	7C2Er+5RfSDW0MpmioqWZBN3rav4g1Rxe7w8p5HEalrtgAOkKNArpyW2L5OTmeLrngvs/81K/9o
-	kr2O4rMnsWagLYV/jqfpUJiSqk+CcBMXUXJLZqwSo4is410MG
-X-Google-Smtp-Source: AGHT+IEBXeC8QChdhKkFQSOA23Do47Xl2rsDmjO7Rcbucm3kuxVzlun+rAn62Em+CesP1FVaFf+3Cw==
-X-Received: by 2002:a05:6a00:170b:b0:781:1b4c:75fb with SMTP id d2e1a72fcca58-7811b4c7931mr12954083b3a.18.1759134968131;
-        Mon, 29 Sep 2025 01:36:08 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-78102b22f5fsm10661729b3a.53.2025.09.29.01.36.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Sep 2025 01:36:07 -0700 (PDT)
-Date: Mon, 29 Sep 2025 08:35:59 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Tonghao Zhang <tonghao@bamaicloud.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Zengbing Tu <tuzengbing@didiglobal.com>,
-	Liang Li <liali@redhat.com>
-Subject: Re: [net-next v8 0/3] add broadcast_neighbor for no-stacking
- networking arch
-Message-ID: <aNpE74KD9jxSo4Ei@fedora>
-References: <cover.1751031306.git.tonghao@bamaicloud.com>
- <aNNWDcvO6aCG94Qe@fedora>
- <9409D921-76FA-4A49-9E39-7F47DCB2B486@bamaicloud.com>
+        d=1e100.net; s=20230601; t=1759135520; x=1759740320;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JzgdahQX7CpJGFCwerveyZDbQ9cci5T/X+7S64lDTAg=;
+        b=mmDgcyE4Tw6XTki0Ify2J7pRHXFdlTg4Qv6f/yXna89+UAT/fZovBL+Rk0FPr0chVP
+         +T+V+yN4Ydhi/oti0CuCikzQTQ8Hqj9tTn73P1i/2mamhurQzEumEnAaVGIO6BRQjPfl
+         39gKNDZrPlJVg/nS5da1Kr+3j605WDKTOp3kSTfePpSRQF3YzBPFYrdK3gbG1TqfeaF4
+         63bf9avuZ4kYDOQg0bVkruVb8wSqPL1pH8/s50zEoK8j5cpFzGy57X+Rui5l5BKg+kGY
+         jB8HLlsFAV6pIR3RukNazxprjuXeNlgv4kUlkQqUJX0CPYeYFoCRYD76dNCxtInphDRC
+         275g==
+X-Forwarded-Encrypted: i=1; AJvYcCU/s+VN+fbw9Pe4N5VXX51RuAp7ojOn2iv0sMMt3+5t24mbBjExA+HkyKbZzaec0MAxjmzr0SM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxu4+zt4mhQnBHyXuXRjbhMOfLyjR3xRFS+R8ehd6HukQAj3Tk1
+	wNDOlmMhfdePKTKTpNW9gdmxp9AaTqJ3OYbkX8+YYRf7C0rVIY1Si2qbMQirdypzOTw=
+X-Gm-Gg: ASbGnctGgm0YoG1P6z/L4s5k6RQD6N2UrBWMvTL4Jjn3zKllQBCU8udX+WddmhE3mFC
+	tfvYr4JDKlqU6QkgScJCIrcUT2MgONizFatVgQ7yxpiVXwIXLlhRhfdQ+BFHSZ3WYNtMr13MXGG
+	EUCFAaZmtWmaf5Suiqjqu721yuy4V+LiK+mWpc/av5nr94RRXUH2OkIzv2Xff/szDl5bHojyNX2
+	WYd3YdqTGgvEqd5iN3kbvS4N562ODe1iMvxV6kDN6KgvXuUHEpmCIj3P+6Sth28Dth065A3/iDf
+	TsUu1pynOWOyZa9hWIXOLNDP54c2zoeWV0aJbH3cbjUMe8NegaadagDLatvGpC6DY3oJw8WVeOi
+	rL2LDN8M/t+1eae9dX6ZVGagaZWDAWPYIM3iXdkrrU9/oBvzs5mV8T2Iu3M99nXKScfTLt/NYI6
+	PxSQ==
+X-Google-Smtp-Source: AGHT+IEv4AziFZ1Nh8lMEPO0Ww5j1EhMHxyQUOxBTv+gGU/fjEeiR6fpWcDmVWpjseN1umlDr3eTdA==
+X-Received: by 2002:a17:907:7b9e:b0:b04:6546:347e with SMTP id a640c23a62f3a-b34baf43cd6mr1653315966b.51.1759135520413;
+        Mon, 29 Sep 2025 01:45:20 -0700 (PDT)
+Received: from ?IPV6:2001:a61:13a1:1:4136:3ce:cdaa:75d2? ([2001:a61:13a1:1:4136:3ce:cdaa:75d2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b3545a98300sm862948966b.106.2025.09.29.01.45.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Sep 2025 01:45:20 -0700 (PDT)
+Message-ID: <c9e14156-6b98-4eda-8b31-154f89030244@suse.com>
+Date: Mon, 29 Sep 2025 10:45:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9409D921-76FA-4A49-9E39-7F47DCB2B486@bamaicloud.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] net: usb: support quirks in usbnet
+To: yicongsrfy@163.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org
+Cc: marcan@marcan.st, pabeni@redhat.com, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, yicong@kylinos.cn
+References: <20250928014631.2832243-1-yicongsrfy@163.com>
+ <20250928014631.2832243-2-yicongsrfy@163.com>
+Content-Language: en-US
+From: Oliver Neukum <oneukum@suse.com>
+In-Reply-To: <20250928014631.2832243-2-yicongsrfy@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Sep 28, 2025 at 12:11:49PM +0800, Tonghao Zhang wrote:
+Hi,
+
+On 28.09.25 03:46, yicongsrfy@163.com wrote:
+> From: Yi Cong <yicong@kylinos.cn>
 > 
-> 
-> > On Sep 24, 2025, at 10:23, Hangbin Liu <liuhangbin@gmail.com> wrote:
-> > 
-> > On Fri, Jun 27, 2025 at 09:49:27PM +0800, Tonghao Zhang wrote:
-> >> For no-stacking networking arch, and enable the bond mode 4(lacp) in
-> >> datacenter, the switch require arp/nd packets as session synchronization.
-> >> More details please see patch.
-> > 
-> > Hi Tonghao,
-> > 
-> > Our engineer has a question about this feature. Since the switch requires
-> > ARP/ND packets for session synchronization, do we also need to send IGMP
-> > join/leave messages to the switch for synchronization?
-> Hello, I'm very sorry for replying to your question so late. In fact, the non-stacking network architecture disables the multicast function to prevent the server from learning other server real mac addresses. This architecture uses the arp proxy. To better answer your question, I post a blog:
-> https://huatuo.tech/blog/2025-09-26-some-thoughts-on-non-stacking-network-architecture/
+> Some vendors' USB network interface controllers (NICs) may be compatible
+> with multiple drivers.
+And here is the basic problem. This issue is not an issue specific to
+usbnet. It arises everywhere we have a specific and a general
+driver. Hence it ought to be solved in generic way in usbcore.
 
-Thanks for your explanation.
+Nor can we do this with a simple list of devices, as we cannot
+assume that the more specific driver is compiled in all systems.
+An unconditional quirk is acceptable _only_ if usbnet would
+not work.
 
-Regards
-Hangbin
+Please get in contact with the core USB developers. The problem
+needs to be solved, but this is not a solution.
+
+	Regards
+		Oliver
+
+Nacked-by: Oliver Neukum <oneukum@suse.com>
+
 
