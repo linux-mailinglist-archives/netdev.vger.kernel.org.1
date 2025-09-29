@@ -1,116 +1,105 @@
-Return-Path: <netdev+bounces-227119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC55BA8A1A
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 11:32:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB5D8BA8AAD
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 11:38:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AADC16663B
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 09:32:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21AB93A7F7E
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 09:36:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8BF32C21E5;
-	Mon, 29 Sep 2025 09:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="aroyKRwE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EC4C286D6B;
+	Mon, 29 Sep 2025 09:36:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14BF288C27;
-	Mon, 29 Sep 2025 09:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C3F2356B9;
+	Mon, 29 Sep 2025 09:36:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759138241; cv=none; b=WSQ1Ruc1hZTz+Jn6kT3CmVO7seP+5sK7WVTCP77BEaozCzZ9I2A+3nBccmR0+wWguD27ZxCVOkF6pEB8ztezZLcrULC/2VIYkZ9onxKn9zZGeZDoEw6or5+vh9lvJH6dC0Y7kAJmvmQTApS9/toGaNB1Fhqmks9ZqmdzNG80y7U=
+	t=1759138569; cv=none; b=q4uGXvKCCbC3mb0JrXB5HX+IdkuWFZBudFKjd1BQVwOD7cxSnbxcrP65iA4B9Tr+V6Vla9fTHcne0zVCwEdKYVhqpcXWCRtd6Y/IqCKeT6xv7fMrbpsGOSFmqe7aUT8hoAuOUNv+A+uQu7RwrPgcaOZS+temgIzru2LFRbSw5F4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759138241; c=relaxed/simple;
-	bh=qwTP3TYBFqj3Ognvf2JD6IFPhugLfyw+AeXRkf4akbE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rD1jDJ73Lw6lttA+PqgA1pR9MbvskzmTaoB63XVb0Hz3zH4nSGr+IzC68N6UpTJ39Q+nluqDRbYMTCqSw9pXw14yKWh6B1WmCLmhSvgHpl5lqCl9Sew+2198kHGfhDXwXGpwyNsoCi9EN33IDUDfBb9XXJt2ztdQ65S0tstrccc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=aroyKRwE; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=L5
-	hfgvg0tHb6OJZAY54Dxllt6cuKoaHL0ON0QGJWaP0=; b=aroyKRwEcJbIhId4nd
-	0rrzThLXpN9xfemCffCRxuUqXk7NGxdh+eSQqPaMRCWzlXGqeANdGz0LhzHCO58m
-	yXHmgknM07+M3R9cbYG8t46igap9EWgEEHZMX36OvLaH3MhyxwOzilG41yXz0mW1
-	deoqJ4fCQ/jjice+MJUS3ZPxo=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wBnBDyGUdpo8ve1Aw--.23868S2;
-	Mon, 29 Sep 2025 17:29:44 +0800 (CST)
-From: yicongsrfy@163.com
-To: oneukum@suse.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-usb@vger.kernel.org,
-	marcan@marcan.st,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	yicong@kylinos.cn
-Subject: Re: [PATCH 2/2] net: usb: support quirks in usbnet
-Date: Mon, 29 Sep 2025 17:29:42 +0800
-Message-Id: <20250929092942.3164571-1-yicongsrfy@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <c9e14156-6b98-4eda-8b31-154f89030244@suse.com>
-References: <c9e14156-6b98-4eda-8b31-154f89030244@suse.com>
+	s=arc-20240116; t=1759138569; c=relaxed/simple;
+	bh=m75fy5agr4nOm6ZswHP3z9cSx6nGu66GnnEkQoJbIQ4=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=i/bx7sjMzRO951nQ8WPwxPTludGED1+SGnsfB4GQ6hyOjSfr1vSoefp0+aU8ZMjAyf03a8H6hNBmOZ0agiljxHrRZqgWO3Lb202V7L/MFnY9tWfcYM8i77qgwNikeaPXzfByQnS3KFkYpteQWH1SM45/vrsMfvHRhSl8IixiJ24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cZwxJ3JLrz6L550;
+	Mon, 29 Sep 2025 17:33:56 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 82E111402F5;
+	Mon, 29 Sep 2025 17:36:03 +0800 (CST)
+Received: from localhost (10.47.64.220) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 29 Sep
+ 2025 10:36:01 +0100
+Date: Mon, 29 Sep 2025 10:35:58 +0100
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Sakari Ailus <sakari.ailus@linux.intel.com>
+CC: <linux-acpi@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-input@vger.kernel.org>, <linux-leds@vger.kernel.org>,
+	<linux-media@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-spi@vger.kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, "Len
+ Brown" <lenb@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Danilo Krummrich <dakr@kernel.org>, Andy Shevchenko
+	<andriy.shevchenko@linux.intel.com>, Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>, Javier Carrasco
+	<javier.carrasco@wolfvision.net>, Dmitry Torokhov
+	<dmitry.torokhov@gmail.com>, Lee Jones <lee@kernel.org>, Pavel Machek
+	<pavel@kernel.org>, Matthias Fend <matthias.fend@emfend.at>, Chanwoo Choi
+	<cw00.choi@samsung.com>, Krzysztof Kozlowski <krzk@kernel.org>, "Laurent
+ Pinchart" <laurent.pinchart@ideasonboard.com>, Paul Elder
+	<paul.elder@ideasonboard.com>, Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Mark Brown
+	<broonie@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+	<mingo@kernel.org>
+Subject: Re: [PATCH v2 04/16] ACPI: property: Return present device nodes
+ only on fwnode interface
+Message-ID: <20250929103558.000033bf@huawei.com>
+In-Reply-To: <20250924074602.266292-5-sakari.ailus@linux.intel.com>
+References: <20250924074602.266292-1-sakari.ailus@linux.intel.com>
+	<20250924074602.266292-5-sakari.ailus@linux.intel.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBnBDyGUdpo8ve1Aw--.23868S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Aw48Gw4UJF4kXryDZrWDurg_yoW8GFWDpF
-	s5WFWFgF1jq3yrGr1UAwnrua4rtws7Wa1vgr93tw1DXwn8ZrWqqr1xKF4avF9rCrn3Jw42
-	yrWq934rWFy3Z3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UzWl9UUUUU=
-X-CM-SenderInfo: p1lf00xjvuw5i6rwjhhfrp/1tbiUB3X22jaT2NHZQAAs9
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500012.china.huawei.com (7.191.174.4) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Mon, 29 Sep 2025 10:45:19 +0200, Oliver Neukum <oneukum@suse.com> wrote:
+On Wed, 24 Sep 2025 10:45:50 +0300
+Sakari Ailus <sakari.ailus@linux.intel.com> wrote:
 
-> On 28.09.25 03:46, yicongsrfy@163.com wrote:
-> > From: Yi Cong <yicong@kylinos.cn>
-> >
-> > Some vendors' USB network interface controllers (NICs) may be compatible
-> > with multiple drivers.
-> And here is the basic problem. This issue is not an issue specific to
-> usbnet. It arises everywhere we have a specific and a general
-> driver. Hence it ought to be solved in generic way in usbcore.
->
-> Nor can we do this with a simple list of devices, as we cannot
-> assume that the more specific driver is compiled in all systems.
-> An unconditional quirk is acceptable _only_ if usbnet would
-> not work.
->
-> Please get in contact with the core USB developers. The problem
-> needs to be solved, but this is not a solution.
+> fwnode_graph_get_next_subnode() may return fwnode backed by ACPI device
+> nodes and there has been no check these devices are present in the system,
+> unlike there has been on fwnode OF backend. In order to provide consistent
+> behaviour towards callers, add a check for device presence by introducing
+> a new function acpi_get_next_present_subnode(), used as the
+> get_next_child_node() fwnode operation that also checks device node
+> presence.
+> 
+> Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
 
-Thank you for your reply!
+I think this is fine because of the bit in the ACPI spec that says all
+bits are set if _STA is missing.   It seems much less likely we'll see
+problems with hardware disappearing because _STA is there but says
+the device isn't present.
 
-Should I add the AX88179 chip information into the `usb_quirk_list`
-in `drivers/usb/core/quirks.c`? (Of course, it will also include a
- check for whether `CONFIG_USB_NET_AX88179_178A` is enabled.)
+Always a regression risk though :(
 
-This way, `usbnet_probe` can detect the blacklisted information.
-
-usbnet_probe (...)
-{
-	...
-	info = (const struct driver_info *) prod->driver_info;
-	if (!info) {
-		dev_dbg (&udev->dev, "blacklisted by %s\n", name);
-		return -ENODEV;
-	}
-	...
-}
-
-From an implementation standpoint, this approach is indeed cleaner
-and simpler than my current solution.
-Is the method mentioned above an appropriate approach?
-
+With the formatting changes Laurent asked for
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 
