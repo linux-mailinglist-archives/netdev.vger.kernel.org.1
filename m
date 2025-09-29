@@ -1,123 +1,125 @@
-Return-Path: <netdev+bounces-227200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20E85BA9FEF
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 18:17:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 687DFBAA045
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 18:31:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E12913C2FB9
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 16:17:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 247633AB6B7
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 16:31:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8BA830C117;
-	Mon, 29 Sep 2025 16:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F72130BBA7;
+	Mon, 29 Sep 2025 16:31:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kTo96j4D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ig8KDxvO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B366308F35
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 16:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8AE2FAC17
+	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 16:31:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759162622; cv=none; b=CfHevhA6Rqqh26tOzpmlzamX9m+2S//6VDsdTRZ5bosl7WWq1qIo4yR6VE+Ru7Z4LoRbSPV5CqxkZtFqjzug6tljJnC6dikZoqzZ9amK3RAIWEB68ZCJ1R9UN2Vc0Xs6jgrlwDKoEZeLA3pRrv+z7noILtG/nazAb4SiIkl5cZU=
+	t=1759163511; cv=none; b=oKNa1Srl0KoRcKznt2jGYxui7Ch4tXcAuxP5nRaiYrI6FCRmaNa4Qw5bqulai87uTuj7AC2MPijXNzG7vgNJS4cv8F3BeTy22O4MH+WL9L2SKkob4Qm9rPuY+u9QxOq6LElJb6YrjJBJr9pHkjgCyDHwDsLQFe7Y55hydYqqe9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759162622; c=relaxed/simple;
-	bh=qq5Q8e7Te10C8Wo9eDCpNyBThP8X8+Pc+4FkCD7R3Mk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KBPnqII5ow/sbJHwxqnN2TJgTgujE/JsEPDVVuEcFnV2isJV8tW0KagdK5mOaUIzJVkuc+fYJWDqPUIKD7lB1DRYehFcNYDPo713IZ5VIiRjci5IXq+r7vLa3CT/oi2TMxN8taAwzd5pef7hrGpHlnN1fsncUAGorTI1PM+IvTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kTo96j4D; arc=none smtp.client-ip=209.85.128.171
+	s=arc-20240116; t=1759163511; c=relaxed/simple;
+	bh=nTErp6MjM2H9FJt5b0VdfDXyFtxk1zguj9gOTg/Op1s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vj78WFPqW3BL8cTCYBFykucp5fClvMi0KbIaASpDTFJVqHn2g96yBCEX4gscBq4RWOJidQPdnWGAkyh3an74ILw7AoS83+M1TpUSQ4ipofLd5jgNwCVspJOUmZ4NGzDdJxdnPTjDayPoBLzqDeY9zOHxcjPQG4qE86xs7pOG+7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ig8KDxvO; arc=none smtp.client-ip=209.85.216.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-749399349ddso60347617b3.3
-        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 09:17:00 -0700 (PDT)
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-3383ac4d130so428976a91.2
+        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 09:31:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759162620; x=1759767420; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cKzIOAQG3VSXuePCJFysarRmV4K2U53AVIYmuNypgnQ=;
-        b=kTo96j4DFA7uLW1dNpzrSrUjcx5ffqcP5RZjeACYzjLZwWSSw7Mj6BDJHtW36/BZbv
-         f5+f2mn0yxwapQvW0O0CNpv9LFfU7UhCkuX3X0nIeh3tSR23sBpdchwDYcFun/dQs2KZ
-         2iT28Lx6mAS8UjDVF2bPNZnAdg6+IJTIO33TCMs6INKsO7Reh65Vs9IVfeH30QWjM77j
-         sDo44HguQkpTVE2bQkkYTf0HqIuOWjqOUq1Hy0aQzPuGPHh/F8+VaEX3d9iHEeUoKkV3
-         GL5SanhpnuhwplHiJmx+5aCIb2skDi2KW5LaS2NPcB2svlz+9DUncNuvJsmER7cIh84N
-         Kwjw==
+        d=gmail.com; s=20230601; t=1759163509; x=1759768309; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lka4+ZyxLfYllS696TYLXMts9dTS83swxEi3cmvk4F4=;
+        b=ig8KDxvOg2N8ygrGO+MRxh/HOl/sue8Haw+ylPPuB564h0nVSAKa/bjPrWHhmt3Cdv
+         ZDTdp+QyLn/lykIBpJI8m43f7p9M98JyyboaHFGYLXSnsP45JCmAIPFv/QTMSJZIqU0k
+         CITqCeurdTd/d4Ap/ArWbYIXhmD83GU6JPvRsx4bNWC8PGkxIAYApmH01ybIM2303SJ+
+         5njQ8AbGw9ry2Q82uy76+b/9OEfIvOIiHQ0WKhM2UPBB9VDBrMLd061fSreNT7eE0VHs
+         lDHX2Bjnd6ZRRQWN42EEhI+AyaSBxKraXS+96NBtvIOAc2tY3TC/dFD2SCwr0XJUSOdC
+         GAtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759162620; x=1759767420;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cKzIOAQG3VSXuePCJFysarRmV4K2U53AVIYmuNypgnQ=;
-        b=HVWw+PFbX/JwiQ1VrDePKnusAiBxfnzp0+gS6EkrJh4oUkIIAgLLx24R+r3uZZXGZ1
-         3eO5KAMyKAyBwG7dLtXSnqARz4mmBA5hrFKbxGu7BtEv1EIF0HB0kjZqOJpOzoX0g/ED
-         E+cVjxj2pmXDNcsZK9RfuA4hW9je+ROT3r7jStCVjow66gSXV5yzQx6P/g+EdaP0FqbH
-         VcYuXn2d9LtMeHHMPg/zI8G0lM2pOKKIdwNNILp9SG8eKVuPAGlpBs4FTIVfkUsMMTgT
-         PDyuztkjvrCX/sxQoIlK44Htskv/4i7boGoqlkohMOYYfus6Cx+7qlMdAmHVAvFRGC6T
-         Q9Jw==
-X-Forwarded-Encrypted: i=1; AJvYcCXLwzABOUT8ez3kviuoQxyGAKopQXUKbEdgBfSqpMfo8ha+nAxiXn6G3FTlP0KYq125MAKEel4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTi0d1y3R9sLJW0doZG7SreY4yA9aAqFlilXD1GL/4giEBQSJX
-	Nk6ULaHxiBMuqxhl2itS6KXzX08Gz2ag+fjw+R6cazQzw52A9WJs13Fk
-X-Gm-Gg: ASbGncvdc9EWOZUH8lGeflUTKP4oBW9Q0oojFMZuYDC8Zlrn//B/Wyp1xlHWwSC5Kp9
-	FfePhLGc/25SCJs2TB9wEjPM1t3sU6dExfr0bmmowtQ/PT9xVxDG0ygSn5c+JCbcJ0qezSwGyjW
-	ieBnWJVDPUkvz3JeVfdTYafPj0TqVkX2jPJjoCff+S/RkjExbnOgHL3YZQ6Y0i/7/LuSLIuD6o+
-	ggJcxSnyKT96zOgaU0rDmm4d5004EEN7adkZ0rVA1o2bJZ4w51M0fX6EtGL/D16R+KWFZZ1oyfq
-	vAMZ2jzesa6yzaNn+VDxRGpGZQJWA+YCwj+P23K30mxMTZ1P31y8+B0AEMhIUHsDRP73XJg66vd
-	LFitDG5NpjLi1V/avTPRieKBhlysKkpktuhMaYGo88YkoRqouEEeB8ztcQ3dHkyvSMw==
-X-Google-Smtp-Source: AGHT+IHu+j81jqxT8WdCqypyIMYi8bUERDK1Od/FPtKQre70kkWgVYXAP03ywVWVYKUxZcJ1PFX0Dw==
-X-Received: by 2002:a05:690e:23d5:b0:633:adac:db35 with SMTP id 956f58d0204a3-6361a72af2fmr13975034d50.3.1759162611159;
-        Mon, 29 Sep 2025 09:16:51 -0700 (PDT)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:11::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-636d5b1d847sm2712547d50.9.2025.09.29.09.16.49
+        d=1e100.net; s=20230601; t=1759163509; x=1759768309;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lka4+ZyxLfYllS696TYLXMts9dTS83swxEi3cmvk4F4=;
+        b=gccWX+yAlu+ZDrD5r7rl/DAWDUIxYMymV1T3G9gZbPtK9TpC66c/pfHoBfyTyctUCp
+         luD+yPxZoFPcr4dHrFr23C4gxtO3MZ+DSZu7F2dYcVIZVT72CZzuRxwDX4CAQ4ayQF/n
+         5YNzHR+KIrU8MxVMNTZk3hdDO5T2D3AP1vJfglvP0H9ouWnoVpywTcFntAslJNQb29q5
+         pKEuJIYIv1N816c0a2KCHu96gqzTpkNZrtmw3s4dMJ2olIdJsFHuz2/B2Hrfy21YwR/c
+         xVGyA7oc54K8QuLttuwqWAlrgtW+x54rPj8lbC378pRu3jRd1SBA4SkvKNLexFLlKqtK
+         mujA==
+X-Forwarded-Encrypted: i=1; AJvYcCXEy4IX2aZsZvZ32soyNfMUTHALFAwPStDZZ287Pimz6N10S76prBvSj0SVa4eawvnJRcc6RMs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyJoeQlxKrBbidfTrK4OCIYq+2HylF2SI91p98J1qTozxinjlH
+	QLrEc9wvhRRX53rg/wO3umO3c1qpcj4bUWf5dBvTa4yo1wMTEM6asPHT
+X-Gm-Gg: ASbGncuwtbqDJBisUWnAHd0HzGHQhbDdSTVip0lAd6jYvrBPQExbNMf1TgFeFgAGFiA
+	nKa4GlTpMIQ73epqsnPdOMe0obguoxOh5Jsr+J7L0rxkm8zonZtaM+k5i52cyXmlMBDvVV+Rq2/
+	nIgSPUfdRDumHes7b9aoGrv2AUJffqQOunzXTKgggE8Vz+ZFSKDWGQzWrc5wZAcVLyMjDf496Uw
+	pgFezOI2JxWkMn7j3ks4pf7o3JY/D8sDl5jCHN65vYnrk5hfEjgcBnc2oM7CQnfkVYn1BBtVOXn
+	zyBcbvIYqOqXxunMOb6opC6XjWLw/hSqyjAAkkCuQRVu/pJYcTkLwM2/NzYF5Lqpe/8MUJ8IBjL
+	ZHeMjYf8yBWpU+ePHCds8OczNXphYgvhQ4H2CmCzEyvAbPlMN2Ixi
+X-Google-Smtp-Source: AGHT+IEZeT16n1Qx68AceriYoS2m5DQH3UD7/ggp2pq32iz566aW/AJGDTJkg6J0/p2eGeMqMpos2Q==
+X-Received: by 2002:a17:90b:350c:b0:330:6c04:a72b with SMTP id 98e67ed59e1d1-3342a2498f2mr18362711a91.3.1759163508737;
+        Mon, 29 Sep 2025 09:31:48 -0700 (PDT)
+Received: from kforge.gk.pfsense.com ([103.70.166.143])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3341bd90327sm17674419a91.3.2025.09.29.09.31.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Sep 2025 09:16:50 -0700 (PDT)
-Date: Mon, 29 Sep 2025 09:16:48 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>,
-	Mina Almasry <almasrymina@google.com>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v4 2/2] net: devmem: use niov array for token
- management
-Message-ID: <aNqw8CAVjas0vvGm@devvm11784.nha0.facebook.com>
-References: <20250926-scratch-bobbyeshleman-devmem-tcp-token-upstream-v4-0-39156563c3ea@meta.com>
- <20250926-scratch-bobbyeshleman-devmem-tcp-token-upstream-v4-2-39156563c3ea@meta.com>
- <20250926162245.5bc89cfa@kernel.org>
+        Mon, 29 Sep 2025 09:31:48 -0700 (PDT)
+From: Gopi Krishna Menon <krishnagopi487@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org
+Cc: Gopi Krishna Menon <krishnagopi487@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	david.hunter.linux@gmail.com,
+	skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linux.dev
+Subject: [PATCH net-next] selftests/net: add tcp_port_share to .gitignore
+Date: Mon, 29 Sep 2025 22:01:38 +0530
+Message-ID: <20250929163140.122383-1-krishnagopi487@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250926162245.5bc89cfa@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 26, 2025 at 04:22:45PM -0700, Jakub Kicinski wrote:
-> On Fri, 26 Sep 2025 09:31:34 -0700 Bobby Eshleman wrote:
-> > @@ -2530,8 +2466,12 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
-> >  		 */
-> >  		for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
-> >  			skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
-> > +			struct net_devmem_dmabuf_binding *binding;
-> >  			struct net_iov *niov;
-> >  			u64 frag_offset;
-> > +			size_t size;
-> > +			size_t len;
-> 
-> unused variables here
-> 
+Add the tcp_port_share test binary to .gitignore to avoid
+accidentally staging the build artifact.
 
-Got it, will update after window opens.
+Fixes: 8a8241cdaa34 ("selftests/net: Test tcp port reuse after unbinding
+a socket")
+Signed-off-by: Gopi Krishna Menon <krishnagopi487@gmail.com>
+---
+ tools/testing/selftests/net/.gitignore | 1 +
+ 1 file changed, 1 insertion(+)
 
-Best,
-Bobby
+diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
+index 3d4b4a53dfda..439101b518ee 100644
+--- a/tools/testing/selftests/net/.gitignore
++++ b/tools/testing/selftests/net/.gitignore
+@@ -52,6 +52,7 @@ tap
+ tcp_fastopen_backup_key
+ tcp_inq
+ tcp_mmap
++tcp_port_share
+ tfo
+ timestamping
+ tls
+-- 
+2.43.0
+
 
