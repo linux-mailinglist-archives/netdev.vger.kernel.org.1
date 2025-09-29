@@ -1,118 +1,180 @@
-Return-Path: <netdev+bounces-227226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31421BAA9EF
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 23:10:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A117BAA9FB
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 23:14:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 701841895664
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 21:10:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E57FA189BEA5
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 21:14:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A1D258ECB;
-	Mon, 29 Sep 2025 21:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E8F425228B;
+	Mon, 29 Sep 2025 21:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bNzW64kw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LyaZ7L+D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D6D2512E6
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 21:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFD22BAF9
+	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 21:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759180224; cv=none; b=aRAQ1iPtUmuz0njgxVFH/VnOA/mrogrzlF72KGlE/jeZ8rjw3RruCdT1SjAs80GRQyJCPRh9j24haNvzo5MqQzHyF2YoDIdO6z2C3h/jiCv37mgGTSHlF8P7ZpFHDjOk3YOEJPI25vIkB1qvvu8eMsJtmC5v+noIxQ2tWfjVA6o=
+	t=1759180449; cv=none; b=AZsEg4lmOGnQZdBc2WyDaua2BNVxEJzCZMwUb6svc8xbw8EWKWYF7vcjsD//n30luoTD7m99qQufZ4qufMLrs9gGy1Xqe/FK2xeEfUiZNIzawM0+Emu4e6cWzDByVTWWOKld4L/dvfG+UXv4z1CaCMFHZB5Ch+xrs+NfstNqRMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759180224; c=relaxed/simple;
-	bh=PnNLfDHqst5vd6hrb/TK0HQlW3cZh7E8xmcGWIkSs4U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sc+9ITeuqYlpuadRm+sxPenUqy8ECsNV1qg9Z0Tx74w1+MOGxZFR2BRFXW2f5KdHprOvZDQhvyN2CIZM/UcXJUT+as1TKKEwFV5c1Gzoms4tdcGRXn55TU+rcDD2art96D7/ZpG5uT3EoYjpFDab36EOZrH1Ch4J11LGCdtM8IM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bNzW64kw; arc=none smtp.client-ip=209.85.208.53
+	s=arc-20240116; t=1759180449; c=relaxed/simple;
+	bh=Ynh5t1oq+BGC5ayEleKfAh77OocncN7vunfZBZxFxdQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fWikBdiZfk6BxRwM1RqCSnOqA2ce4TcPYnuTpVsEwPfx/KjqsrliSEBfwcChqGiHAhYoKBYZQOWYrfGWf+YWwZhFCFVuvMBcmINwhzKrGNY4Gwxxg2Uq1XhfQB2NPgVG1dfBm9j4x21mRI5vq8OwsRcWpj0AuTtbDKRVXTbElcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LyaZ7L+D; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-62fc28843ecso7083789a12.1
-        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 14:10:21 -0700 (PDT)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-26e68904f0eso51684165ad.0
+        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 14:14:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759180220; x=1759785020; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PnNLfDHqst5vd6hrb/TK0HQlW3cZh7E8xmcGWIkSs4U=;
-        b=bNzW64kwbZdLoiCXBuNIKK+v5tbJpTqExvDDCFPrkP7sMK90AF9hZtMGVWEjmRuo7h
-         2hbXiBxMxNHuHZUij7i0cI+b3Oh2j4PxM5SZiy9F3a8NgmrtaF2yXWM5qQ8yb8qmdpsw
-         kYs03kwZUlDwfDgaQPBHJULnvFW/drSJ/uhuhaBaTKannWQn50ehWCj+GMAgR828qYFh
-         X4N6y1woELjh5uFcL8tZBDHuWwQeqPNH9c64YXV/HtYlLLQv+VSj+hJHlpivIOTMzCqc
-         xJQzcjFr54S7wqsY4YH+XeUawl905JKvvjnuUdjMsuFjOcUqyqxeIBR3yLMH8Dtv3cb3
-         kAhA==
+        d=gmail.com; s=20230601; t=1759180447; x=1759785247; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qPMfvOFUo6Dm7WbBf/aklHipttbPQuSYzlg3rBgSq2c=;
+        b=LyaZ7L+D176EL9Dua5/7Z2elCRae9ogEebkyI+b3WveGWfF/UIdIOLDA56JlblBh5f
+         zyq+g+L+rXgR1PADVuzvh5aYKxN+NLOk5Zq+23+O1AZqoHjhqRjm4xVKbT1N2LY3HDHW
+         Vol5xvefJY+j8w2csno0LhOv2+XIVld2GwZPBw0fmXRAkKwHt8nSHtxFEFHaJPWv6wZ4
+         IpII/zvREvtUGYCYr+wvoA0npa+/41tzXJgQult+KIhIdiRrdqYLzrbnDSGO+rIDsJWC
+         kPqGtl6yIv5POCtHY3IkqBeJZLl6b+14ivwKSRbLSdZD2UIZTC0xQlmZ1Nyk3LQNL/hM
+         Abzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759180220; x=1759785020;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PnNLfDHqst5vd6hrb/TK0HQlW3cZh7E8xmcGWIkSs4U=;
-        b=oF8BvUWLZKSPISljHddG8H0a2eBElS8OBzKJHSMFtgHLpLQz61rR5c/i8yvvNPrGmf
-         Kyc9W0Lt08NStPftRKUqcwucfGA4fwrEXluGfFKvDd0LIzfB50iZ9v8V+x+x1RgTZWSw
-         4AcvcRqG2BWE1X1jsWagopfu3VQUuDqZq5UVm04c+3oYRye8TWJS/DjIWVg9t5/z7cWJ
-         8Sup+TCxuaX+rTv1Zzj+MzN60UNtrDza9PC7kFbep9QXZAUCH1QLd/Nd6j7T84TiNCqn
-         ZXqkYYHDBoY5qcSr1yzH9uG1Cg2hOK+vz8nt+ezvkjnz4hG3d6JQUqzxi9CLPDdDlhzP
-         BIMw==
-X-Forwarded-Encrypted: i=1; AJvYcCVcTVLNzV6WLvUvUp+btLw3ntsVyIKDbdn0AcMKI0BAyjAqxBLISQV1H6JzbJt6BBEGjOeT7wQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXBf8LOrLMYiK8ZZQisU8NfmtziHHGL0qeV7QSUD9JPVJU6JQZ
-	4csb2fQ3dTEtuu40fCOTdn8Jk2iHh4VrlcPsbKlGCTdR+1d14UJLSEK2OXMo4wQZoyjH4+IEqWY
-	TpUcjxpXoFEIrmuTVVqcGUuMMfEaAbpE=
-X-Gm-Gg: ASbGncsWAvUmwSgwqREwkK6MMV0E460nM/syT2gkzVlGFQhdh3SxwrkTFgJ71/xcmy0
-	D1PjQotWqgex5kw4U5v0wpNAhFA5Cl16zVtka2S6vVUIEsOiFfzVhNBl+cH7wArdu3wuOyTzPN2
-	/M+JcnNo17G9dOuKABTmLGbHi/tj4EqDrZXRX0b5EvDf7T6tLhU4W1vUmznt8F5iFImpw7b4+PK
-	VjLQ/7qx5Di78kpXlEfOV/93kDgywnEOIRnkTjBV4OlFNQxNB6/
-X-Google-Smtp-Source: AGHT+IH6lV5eV1Kt4fx4PJQ/xnpUMkEAkksSmL0ApQf1NYE5kHd4rYc4X1ZnoqKFvlP4C5fI0NBai3/kdLcOSzqbyko=
-X-Received: by 2002:a17:907:7289:b0:b43:5c22:7e62 with SMTP id
- a640c23a62f3a-b435c227f87mr12156466b.50.1759180220317; Mon, 29 Sep 2025
- 14:10:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759180447; x=1759785247;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qPMfvOFUo6Dm7WbBf/aklHipttbPQuSYzlg3rBgSq2c=;
+        b=I02Ud1ccY8V/oWOswFX7cgnSAAu5+pLrI9kLpUAL9/IZeNiBPv4YU5nc+t2OSiymKt
+         vUmYCdRYDZ262FSQwtnDtJqPKtfHUa8GnuXP8egoFCBy58oCP3hGTdB2g7hlZPTH4xib
+         Vm1USFOivOCdWdfZP8neI+qX+dBBYbSbErynpnLhKTO65nvysB94N+9ZpOLn21IJ0Z9w
+         rCfBp/OQMVbk64fS/U/0fWBNNrnxLHjcuqIB6UWm5+X+5yOB0Trcj175yG5i1rVWrARb
+         07ajjqwxpQZrVWjfd0zaCtXStVujg20hZfbYn3lQj5HjYMhW5+ooXS6kc9B6PIwjo4NA
+         T1WA==
+X-Gm-Message-State: AOJu0Ywsum4+dD5TOQnF9mZKXKHGCumyZMp5Pa2NIbQzqZY8WrQsWCDg
+	ZSKNc1TLmrOlVn4Vq1oI6DDaeYnzQ9K/y2H45O/8Uh6po/Jw68NlC0/f
+X-Gm-Gg: ASbGncs61d4pwpB7tFPp/NWsoIyPuMo0vzh+VGTUA6wDB61EkOOObAUVDcULqhIifhE
+	aTHlB/gndGzZ2gLW6pFnCAvAQkisKvLf6UCYQkP70WQXgoODGx0SXzR9OuTHU5qUjd1RS1LplDN
+	vtNoqLhWZ8cOhCV0HvXqLMR5ALH9+DQaDX5M3v9zk9yWXbOYHP7zwQo8uC7sA1m4c2jiHyQ4/pf
+	Zcu+9/tdH96lk/nyfe5B2wmaPyEtRA9zg99ZSu0YrsXni34TwI3+fc6q8M0zvnUTrdOv1O4xE+L
+	wAibnCu5tBv4pf6GFaCJxL8xZKKQTWXn+fmHuC2JcrV5vM7LFuq6K4lIAMeQ8cMEr4WuBwcWBRn
+	rWCM9ajOGvrpnh9zt/BPUx5w1vHkt
+X-Google-Smtp-Source: AGHT+IG0ZHDqFJrZOvYs432O3Vs3qhLTPiCHHRZ6amJmNF+g4TGNvnUA39X9wjADrt/48NlD7oC1jQ==
+X-Received: by 2002:a17:903:90d:b0:268:baa6:94ba with SMTP id d9443c01a7336-27ed4ab65b8mr155433085ad.53.1759180446950;
+        Mon, 29 Sep 2025 14:14:06 -0700 (PDT)
+Received: from y740.local ([2401:4900:1f31:e91f:2d6d:e8a8:f2d7:94ae])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-27ed69b12cdsm137943045ad.115.2025.09.29.14.14.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Sep 2025 14:14:06 -0700 (PDT)
+From: Sidharth Seela <sidharthseela@gmail.com>
+To: antonio@openvpn.net,
+	sd@queasysnail.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	kernelxing@tencent.com,
+	nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com,
+	morbo@google.com,
+	justinstitt@google.com
+Cc: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev,
+	Sidharth Seela <sidharthseela@gmail.com>
+Subject: [PATCH net v3] selftest:net: Fix uninit return values
+Date: Tue, 30 Sep 2025 02:42:42 +0530
+Message-ID: <20250929211241.55701-2-sidharthseela@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250929160230.36941-2-sidharthseela@gmail.com> <willemdebruijn.kernel.321e70874e73c@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.321e70874e73c@gmail.com>
-From: Sidharth Seela <sidharthseela@gmail.com>
-Date: Tue, 30 Sep 2025 02:40:08 +0530
-X-Gm-Features: AS18NWCEmn2M-D5zHU0jlR919m1nzZwmzKwrlDEi5S-4Vw12GrNcqqXAq1DzRds
-Message-ID: <CAJE-K+B0xssX5TCwxyUwGu=vGMR1u-7r-3wDiMvs4GnqCkYUqA@mail.gmail.com>
-Subject: Re: [PATCH v2] net: Fix uninit character pointer and return values
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: antonio@openvpn.net, sd@queasysnail.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, 
-	kernelxing@tencent.com, nathan@kernel.org, nick.desaulniers+lkml@gmail.com, 
-	morbo@google.com, justinstitt@google.com, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev, david.hunter.linux@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 29, 2025 at 11:28=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Reminder: use the net prefix: [PATCH net v2]
-Oh I thought you meant me to change the subsytem in the subject.
-Changing.
+Fix functions that return undefined values. These issues were caught by
+running clang using LLVM=1 option; and are as follows:
+--
+ovpn-cli.c:1587:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+ 1587 |         if (!sock) {
+      |             ^~~~~
+ovpn-cli.c:1635:9: note: uninitialized use occurs here
+ 1635 |         return ret;
+      |                ^~~
+ovpn-cli.c:1587:2: note: remove the 'if' if its condition is always false
+ 1587 |         if (!sock) {
+      |         ^~~~~~~~~~~~
+ 1588 |                 fprintf(stderr, "cannot allocate netlink socket\n");
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1589 |                 goto err_free;
+      |                 ~~~~~~~~~~~~~~
+ 1590 |         }
+      |         ~
+ovpn-cli.c:1584:15: note: initialize the variable 'ret' to silence this warning
+ 1584 |         int mcid, ret;
+      |                      ^
+      |                       = 0
+ovpn-cli.c:2107:7: warning: variable 'ret' is used uninitialized whenever switch case is taken [-Wsometimes-uninitialized]
+ 2107 |         case CMD_INVALID:
+      |              ^~~~~~~~~~~
+ovpn-cli.c:2111:9: note: uninitialized use occurs here
+ 2111 |         return ret;
+      |                ^~~
+ovpn-cli.c:1939:12: note: initialize the variable 'ret' to silence this warning
+ 1939 |         int n, ret;
+      |                   ^
+      |
+--
+Fixes: 959bc330a439 ("testing/selftests: add test tool and scripts for ovpn module")
+ovpn module")
 
-> My previous response accidentally left a state comment. The main
-> feedback still held:
-> This default case calls error() and exits the program, so this cannot
-> happen.
-Alright, I thought error() is like perror(). After checking man pages, the
-status being non-zero leads to exit(). So yes, it makes sense now, the
-switch case, either loads up a value in the 'reason' or exits().
+v3:
+	- Use prefix net.
+	- Remove so_txtime fix as default case calls error().
+	- Changelog before sign-off.
+	- Three dashes after sign-off
 
-> End the commit with the Signed-off-by block. Either move changelog
-> above that, or below three (not two) dashes.
-Alright, Thank you for taking the time to reply. Sending w/ changes.
+v2:
+	- Use subsystem name "net".
+	- Add fixes tags.
+	- Remove txtimestamp fix as default case calls error.
+	- Assign constant error string instead of NULL.
 
---=20
-Thanks,
-Sidharth Seela
-www.realtimedesign.org
+Signed-off-by: Sidharth Seela <sidharthseela@gmail.com>
+---
+
+diff --git a/tools/testing/selftests/net/ovpn/ovpn-cli.c b/tools/testing/selftests/net/ovpn/ovpn-cli.c
+index 9201f2905f2c..20d00378f34a 100644
+--- a/tools/testing/selftests/net/ovpn/ovpn-cli.c
++++ b/tools/testing/selftests/net/ovpn/ovpn-cli.c
+@@ -1581,7 +1581,7 @@ static int ovpn_listen_mcast(void)
+ {
+ 	struct nl_sock *sock;
+ 	struct nl_cb *cb;
+-	int mcid, ret;
++	int mcid, ret = -1;
+ 
+ 	sock = nl_socket_alloc();
+ 	if (!sock) {
+@@ -1936,7 +1936,7 @@ static int ovpn_run_cmd(struct ovpn_ctx *ovpn)
+ {
+ 	char peer_id[10], vpnip[INET6_ADDRSTRLEN], laddr[128], lport[10];
+ 	char raddr[128], rport[10];
+-	int n, ret;
++	int n, ret = -1;
+ 	FILE *fp;
+ 
+ 	switch (ovpn->cmd) {
+-- 
+2.47.3
+
 
