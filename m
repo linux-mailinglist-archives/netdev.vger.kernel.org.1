@@ -1,94 +1,116 @@
-Return-Path: <netdev+bounces-227098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 189C7BA83F0
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 09:30:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86521BA8480
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 09:44:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CBAC1887927
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 07:30:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C7B33A8D45
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 07:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1BE2C0263;
-	Mon, 29 Sep 2025 07:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6702C08C8;
+	Mon, 29 Sep 2025 07:44:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="BgW8nD5W"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PvKEk3aw"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712602AEE1;
-	Mon, 29 Sep 2025 07:29:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5E12C0287
+	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 07:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759131000; cv=none; b=sPbLFw1vgE+HXpwRtzN6EkEvFFD0W4edYeiT0EG/UuDjjq4VDV1pd5jGaUI0pux+50dLZq60glHPvGyZAmoWY6y3t134jxOBgfGuj6Jojfnu/vybB0uFSR9KWG55vCV8yrCaFvseH6q0HDtoweSwkqh9mP1L8DWizGunsgxrwhM=
+	t=1759131856; cv=none; b=Ypx0Rl5EeIVSyXUxB731DvkY0LzF2iH/QqDLiPJyB1NaaWw2aoJBa8UY69oanNXrR4PaSbhPx8im1dCGS6aocE3w7/8qHiAUVVRGEE1L0yxiDWUKizMc4fljfIPTlWQXXCgvv+PciD6ytG5D9ZZ7pZ0igc9VluA2pOSg5P2Js2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759131000; c=relaxed/simple;
-	bh=O28Rc/w9Fl4JFrzquNNJBvSX8v/hQ6DnpTrNiyIwY0c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HyCDnhYqFOYlwaLDZo+1EQ0+s52x/Q1KruNHg794yiZE9VO55VrJVRKCG2d00orPROYWoE4q26MKHsHM2RdK2Tivg6gUfUik1rzg1tAcD/pHmrEEOjl9EkVN6BiBVhvTkii8gCUGPbKwfN8CSZaTDlKF7V8FgNQbeWjPWhEUnOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=BgW8nD5W; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=O2
-	8Rc/w9Fl4JFrzquNNJBvSX8v/hQ6DnpTrNiyIwY0c=; b=BgW8nD5WkNzoKoB8F+
-	48orKPPBZ6bV8PWAshXUtDfi2UC3D74XQ51RnfnN6f7LkkQqUQggNAARwfc4wYCe
-	Cy9bzBsNcDv5pNxFZSQhWuvoIVJhm3bS0mgJ9k48z4/NnLzz7qZN5x3WKWaGg09C
-	21+/yW+fmP9I73I/y9Jwn0KvM=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wD3J6U9Ndpojl23Aw--.62685S2;
-	Mon, 29 Sep 2025 15:29:02 +0800 (CST)
-From: yicongsrfy@163.com
-To: michal.pecio@gmail.com,
-	oneukum@suse.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org
-Cc: marcan@marcan.st,
-	pabeni@redhat.com,
-	linux-usb@vger.kernel.org,
+	s=arc-20240116; t=1759131856; c=relaxed/simple;
+	bh=UO5a/mgA//lW4Bj0rdNV2tU7VgeDI3Ae/7NdugpEQIg=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=co1jXgIY2dpvY1wFVRgmZ01IO3534AieNl7fkSlHYIEusHuTTq6rEDwfAQjKT8icAx6iIJLmcUbbNP3G/Xp5A9jx3RtI8zrSak+9Rm0gLMWngCQjM2wckE+XAjf5l95QdyIqiaQQrDYx+LEZQVFO6LF2F+yjUQ+LwPWdP5C6xVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PvKEk3aw; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=AZ7xCl2wQqwqFo37e1wZWKGTGABfy99i1vqF6wtYlaY=; b=PvKEk3awO1om3h6K37Kd+aGVTP
+	3iH+zwB8JaNnXrRJKI5aFojaxxzNwuDmpEqKWgXPpGymWoLYxDbwvLw8lcujRbLN/+Bh0DyvDV+WA
+	tIIuIKzguIB76P7Arlqz+cjxipozoPL/s37GvxgzOeu2bME+KzXPtrpfWustiAknfkSm3ZRVp+Y8x
+	QVKh16WjpClYRLRwuUxcLF1N+VPKEgsXtM+U1CPAZos7pLV21Eml+NnF4f5HO3cHtQwgsS2GXd69P
+	EQsj31cl9lzbLFr+k8gApPoPe1Rryr/sxrY6uLeQ+q4ww25s3y/4rd017e470tvbFI4b/T1N9rGJ+
+	7jRUoHeg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:51940 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1v38Y8-000000006KV-2uOd;
+	Mon, 29 Sep 2025 08:43:56 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1v38Y7-00000008UCQ-3w27;
+	Mon, 29 Sep 2025 08:43:55 +0100
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Furong Xu <0x1207@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	netdev@vger.kernel.org,
-	yicong@kylinos.cn
-Subject: Re: [PATCH v2 2/3] net: usb: support quirks in usbnet
-Date: Mon, 29 Sep 2025 15:29:01 +0800
-Message-Id: <20250929072901.3137322-1-yicongsrfy@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250929091153.4c769e44.michal.pecio@gmail.com>
-References: <20250929091153.4c769e44.michal.pecio@gmail.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: [PATCH net-next] net: stmmac: remove stmmac_hw_setup() excess
+ documentation parameter
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3J6U9Ndpojl23Aw--.62685S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrZryxWr17GF45tw48JF48Crg_yoW3Arg_u3
-	4Dur93Aa1Utr18Wa15Gr1093sxKa10grn5Za4DJFZayFy7KFn5GF4vgFy3AFn3Jr4Fkanx
-	urWrtan2qrsagjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUjbo2UUUUUU==
-X-CM-SenderInfo: p1lf00xjvuw5i6rwjhhfrp/xtbBFAzX22jaLzCf7AAAsK
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1v38Y7-00000008UCQ-3w27@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Mon, 29 Sep 2025 08:43:55 +0100
 
-On Mon, 29 Sep 2025 09:11:53 +0200, Michal Pecio <michal.pecio@gmail.com> wrote:
->
-> On Mon, 29 Sep 2025 13:31:44 +0800, yicongsrfy@163.com wrote:
-> > From: Yi Cong <yicong@kylinos.cn>
-> >
-> > To resolve these issues, introduce a *quirks* mechanism into the usbnet
-> > module. By adding chip-specific identification within the generic usbnet
-> > framework, we can skip the usbnet probe process for devices that require a
-> > dedicated driver.
->
-> And if the vendor driver is not available then the device won't work at
-> all, for a completely artificial reason. We have had such problems.
->
-> At the very least, this should check if CONFIG_AX88179 is enabled.
+The kernel build bot reports:
 
-Thank you for your suggestion!
-I will add the CONFIG_AX88179 configuration check in
-the next version of the patch.
+Warning: drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:3438 Excess function parameter 'ptp_register' description in 'stmmac_hw_setup'
+
+Fix it.
+
+Reported-by: kernel test robot <lkp@intel.com>
+Fixes: 98d8ea566b85 ("net: stmmac: move timestamping/ptp init to stmmac_hw_setup() caller")
+Closes: https://lore.kernel.org/oe-kbuild-all/202509290927.svDd6xuw-lkp@intel.com/
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index be064f240895..650d75b73e0b 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -3400,7 +3400,6 @@ static void stmmac_safety_feat_configuration(struct stmmac_priv *priv)
+ /**
+  * stmmac_hw_setup - setup mac in a usable state.
+  *  @dev : pointer to the device structure.
+- *  @ptp_register: register PTP if set
+  *  Description:
+  *  this is the main function to setup the HW in a usable state because the
+  *  dma engine is reset, the core registers are configured (e.g. AXI,
+-- 
+2.47.3
 
 
