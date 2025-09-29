@@ -1,144 +1,106 @@
-Return-Path: <netdev+bounces-227074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8EDBBA7F32
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 07:03:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 732B9BA7FF3
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 07:32:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D48C3C1CDA
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 05:03:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99614179C9A
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 05:32:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F511F4C99;
-	Mon, 29 Sep 2025 05:03:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA9CC299943;
+	Mon, 29 Sep 2025 05:32:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="DyqJ9dX3"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="jxmtlTy5"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.12.53.23])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169FD625
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 05:03:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.12.53.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FBBD2853EF;
+	Mon, 29 Sep 2025 05:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759122184; cv=none; b=OwTZDhzPPFoxTovJNj1QXkcaOubeqyqfWF402LQp5JsLyLtQqQfZcQbc1n1MSVFdRZjaPNwrqO2qLMGytswfb4aG4sXSJroV8u20RsfrEXhuUnMxW1a4RUcfTDJG0dZEJP4juCqY3hwZnnkgY47sfceVX3QoSXln8gHGpFcXXmQ=
+	t=1759123958; cv=none; b=m4ED2ZALFo2/b5VnlYckZRBvtZWycUrYpKoBFh6VicGnQI9jj/2hlCx4w4YQ59yQxPBlsCcmh6Zpu2OpAB/cvYOpHUu3nUzvoMGedbiIjLfHdccqJ9KI6uYF+R1K4dVsBU56CXE2+2maqR2/aqfEfATeQcqIpO5rP3+zZRJR/2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759122184; c=relaxed/simple;
-	bh=9RtmrqLl4OsG5OfVurd6x+pTP4CwV48jW9053XidXzw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PSpYzCkg1XiWNrK9g7aA+TM2AFOiXuU9315BxQ2BR+Axp5hh/u+rTtIXT3YUBReYEYHffGj6Z9qf264Vg6TrMFHvVqrVd4a7I+6NKV6IDpgkedTit/ajKyeiAmXGcoQuSia2hwSNtYIZ8rzcX37bheBswlsN2JHN/D5w3mWGNMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=DyqJ9dX3; arc=none smtp.client-ip=52.12.53.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1759122183; x=1790658183;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=gux8W3ZBN+MYVxb+id5CwdVsDMzRv/bmekYOhi19hos=;
-  b=DyqJ9dX3+fL8i66IXAu2E/E95F462kQIervh6PVpC0BIwWIPxi/99ogj
-   yzkSvgRz0HP32Q2AZRQUN1L8Goels84hjE2Loyc5J6wnzEKxNRC06R+bq
-   ESG7vXONEOwkXNv65k2laywMks9BDu5XlRYt4wIH2T5L0DwvQ1uDGHPxR
-   1ikyd5AW6kVqUeJ7ABwK1ZhtySu7JyfrshkRVSHz5U1jO4fyScWDbYRVm
-   X1QF41tyBmwIVw+TXXCQJLbA+wylS6HbUqyvbELaIy38STTzbdkiRpIUf
-   svZT1XHNe6XkQ6HL2DPKtztQKd3hjhGFzpzIPMob+GnZ8FtXwB9WKmRnL
-   g==;
-X-CSE-ConnectionGUID: /wAOxDc/TsacZPWxLE2DxA==
-X-CSE-MsgGUID: lbKaKWU8S2eqA3XjIgtfaQ==
-X-IronPort-AV: E=Sophos;i="6.18,300,1751241600"; 
-   d="scan'208";a="3792729"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2025 05:03:00 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:61829]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.10.83:2525] with esmtp (Farcaster)
- id 62fbb8f5-e843-44e7-9630-3542c2b5b895; Mon, 29 Sep 2025 05:03:00 +0000 (UTC)
-X-Farcaster-Flow-ID: 62fbb8f5-e843-44e7-9630-3542c2b5b895
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Mon, 29 Sep 2025 05:02:58 +0000
-Received: from b0be8375a521.amazon.com (10.37.244.10) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Mon, 29 Sep 2025 05:02:56 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <netdev@vger.kernel.org>
-CC: Shay Agroskin <shayagr@amazon.com>, Arthur Kiyanovski
-	<akiyano@amazon.com>, David Arinzon <darinzon@amazon.com>, Saeed Bishara
-	<saeedb@amazon.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rosen Penev
-	<rosenp@gmail.com>, Kohei Enju <enjuk@amazon.com>, Sameeh Jubran
-	<sameehj@amazon.com>, <kohei.enju@gmail.com>
-Subject: [PATCH net v1] net: ena: return 0 in ena_get_rxfh_key_size() when RSS hash key is not configurable
-Date: Mon, 29 Sep 2025 14:02:22 +0900
-Message-ID: <20250929050247.51680-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1759123958; c=relaxed/simple;
+	bh=d118q319CrrpOr6XHYXy0i+KhU2/dDwgMXrzsHt3YLs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Szr8ngO5YgiC7HvhPAjJTCg56dn4FbDRjG2bFnyiV9PYuYI68w83OlbAzPmZL0fFfRNNx+Bl7zKuLuiJO9A+eJrXpLhlKxK1JpOfAUUw1TtifzMPy5YRVMFlrgfFMflGWyoPMFg0VJ4ekRAQNaJ8JqDB4ZswPv5CQEdjO+TCO3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=jxmtlTy5; arc=none smtp.client-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version:
+	Content-Type; bh=qwx46OjxT4hzDy7PYeqYaZncgd9MREv4oHX5XIKHA6U=;
+	b=jxmtlTy5gq2AQuaQJotNNM8oXGMjsOpLHCxE3SuvKUgdc+GOk1UZVvhBVJHxGQ
+	DB1p5P9M+524ae98tIstKlOdhb5qOkMBoNfXrCnbWGvIArbOVVyVNA4TUa/AEBVP
+	v9Bs6fcfM/EE7ieIMsklSowWCYj4lyDS2FBqSOG4/Vji4=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp2 (Coremail) with SMTP id PSgvCgB3p9vDGdpoadHeAQ--.6422S2;
+	Mon, 29 Sep 2025 13:31:47 +0800 (CST)
+From: yicongsrfy@163.com
+To: oneukum@suse.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org
+Cc: marcan@marcan.st,
+	pabeni@redhat.com,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	yicong@kylinos.cn
+Subject: [PATCH v2 0/3] ax88179 driver optimization
+Date: Mon, 29 Sep 2025 13:31:42 +0800
+Message-Id: <20250929053145.3113394-1-yicongsrfy@163.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20250928212351.3b5828c2@kernel.org>
+References: <20250928212351.3b5828c2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC001.ant.amazon.com (10.13.139.223) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+X-CM-TRANSID:PSgvCgB3p9vDGdpoadHeAQ--.6422S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrKrykGr4fCryfAry7Cry5XFb_yoWDKFg_uw
+	nIg347Ar1UWFy5XFWUGr4avryakay0g397ZasIq345X342qFn8Zr4vqr1fW3Z7GF4jvFnr
+	CwnFyF1Fqr9FgjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUbcyZUUUUUU==
+X-CM-SenderInfo: p1lf00xjvuw5i6rwjhhfrp/xtbBFA3X22jaEB7g0wADsZ
 
-In EC2 instances where the RSS hash key is not configurable, ethtool
-shows bogus RSS hash key since ena_get_rxfh_key_size() unconditionally
-returns ENA_HASH_KEY_SIZE.
+From: Yi Cong <yicong@kylinos.cn>
 
-Commit 6a4f7dc82d1e ("net: ena: rss: do not allocate key when not
-supported") added proper handling for devices that don't support RSS
-hash key configuration, but ena_get_rxfh_key_size() has been unchanged.
+This series of patches first reverts the previous changes to allow
+the vendor-specific driver to be loaded, then fixes the issues
+related to the vendor driver.
 
-When the RSS hash key is not configurable, return 0 instead of
-ENA_HASH_KEY_SIZE to clarify getting the value is not supported.
+Yi Cong (3):
+  Revert "net: usb: ax88179_178a: Bind only to vendor-specific
+    interface"
+  net: usb: support quirks in usbnet
+  net: usb: ax88179_178a: add USB device driver for config selection
 
-Tested on m5 instance families.
+ drivers/net/usb/ax88179_178a.c  | 98 +++++++++++++++++++++++++++------
+ drivers/net/usb/cdc_ncm.c       |  2 +-
+ drivers/net/usb/usbnet.c        | 14 +++++
+ drivers/net/usb/usbnet_quirks.h | 39 +++++++++++++
+ include/linux/usb/usbnet.h      |  2 +
+ 5 files changed, 138 insertions(+), 17 deletions(-)
+ create mode 100644 drivers/net/usb/usbnet_quirks.h
 
-Without patch:
- # ethtool -x ens5 | grep -A 1 "RSS hash key"
- RSS hash key:
- 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
+Changes since v1:
+- Patch 1: Revert "net: usb: ax88179_178a: Bind only to
+ vendor-specific interface"(No changes)
+- Patch 2: net: usb: support quirks in usbnet (Correct the description of
+ usbnet_quirks.h and modify the code style)
+- Patch 3: net: usb: ax88179_178a: add USB device driver for
+ config selection (New patch)
 
-With patch:
- # ethtool -x ens5 | grep -A 1 "RSS hash key"
- RSS hash key:
- Operation not supported
-
-Fixes: 6a4f7dc82d1e ("net: ena: rss: do not allocate key when not supported")
-Signed-off-by: Kohei Enju <enjuk@amazon.com>
----
-I considered two possible commits for the Fixes: tag:
-- 1738cd3ed342 ("net: ena: Add a driver for Amazon Elastic Network Adapters (ENA)")
-- 6a4f7dc82d1e ("net: ena: rss: do not allocate key when not supported")
-
-and then chose 6a4f7dc82d1e as it introduced the condition where
-rss->hash_key could be NULL. However I'm not so attached to the choice,
-so please let me know if you prefer a different approach.
----
- drivers/net/ethernet/amazon/ena/ena_ethtool.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/amazon/ena/ena_ethtool.c b/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-index a81d3a7a3bb9..fe3479b84a1f 100644
---- a/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-@@ -865,7 +865,10 @@ static u32 ena_get_rxfh_indir_size(struct net_device *netdev)
- 
- static u32 ena_get_rxfh_key_size(struct net_device *netdev)
- {
--	return ENA_HASH_KEY_SIZE;
-+	struct ena_adapter *adapter = netdev_priv(netdev);
-+	struct ena_rss *rss = &adapter->ena_dev->rss;
-+
-+	return rss->hash_key ? ENA_HASH_KEY_SIZE : 0;
- }
- 
- static int ena_indirection_table_set(struct ena_adapter *adapter,
--- 
-2.48.1
+--
+2.25.1
 
 
