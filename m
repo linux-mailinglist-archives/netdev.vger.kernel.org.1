@@ -1,205 +1,638 @@
-Return-Path: <netdev+bounces-227179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69EBCBA985D
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 16:20:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C20ABA986C
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 16:21:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B048E189353F
-	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 14:20:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CF707A5243
+	for <lists+netdev@lfdr.de>; Mon, 29 Sep 2025 14:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55410304BAF;
-	Mon, 29 Sep 2025 14:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8878C304BB8;
+	Mon, 29 Sep 2025 14:21:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="migt2gP7"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="OWTjUzq0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950FF126C17
-	for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 14:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459C11E8329;
+	Mon, 29 Sep 2025 14:21:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759155627; cv=none; b=WhNiFrzYtpIW7MnTsVUcOpi0hCmVeI+eCPeE/c6Zzfi3UyEWjx8Rcdxusx2iJu4jpPJqnMCsO60GIjbGXqSz0Rk+JRdPRvZVzmQgf0am5n6sfxDYFI0QfOCtbx082l436lbmpgRPgjCYM65LPwyWvnkb3r2VjmgAxjBfDQzWVNc=
+	t=1759155703; cv=none; b=cAR2gC3vHBrdGsrfl23AhE7d8loLBLWdDAbpdMEv6McqwNYCLEbhcrUll+chARuEksjAjrncC1rTWzstkk87JUJaNbHE2TJZwhxYyljiIfCNb/0uDq8bVZMXeUifA2CLornqjQ53x3tjazkmgrWhM0uAOyRzX+JJuVmghB6vk84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759155627; c=relaxed/simple;
-	bh=9e2ic1wvWE8WehJ3kuMdIIYPcBrUXcQZlimQJDH4mOk=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=iZuWwdkq0qiFAHpqdPn+OXSshLWhgWWH078KZwebuo0TezoyRy5Rnfmaj2u0GIvNB/RdwPZ1oHNskstifjcSJgxYOIZVsMMnKlAozTeOpg7xyw9zQNx+uegJTmhiiRxKAqxpFBLgdib8/7apiaixLN5Ead4KztlNdxG7vQZr4Zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=migt2gP7; arc=none smtp.client-ip=209.85.222.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-8eafd5a7a23so2454636241.1
-        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 07:20:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759155624; x=1759760424; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W46uqCXD/DYO2PsPrvcdafdEqjimB/+hIZDXBFn2C/g=;
-        b=migt2gP7GWj2JTQdTzSijFdUfLmym/CdjD2yBM7RMm9Ys2Iub+1GmA9yByytm23g40
-         hRTqJpeXVCM/lsHhKnOYnwUdX32Y63CJAG84G6bOQhiHSRXKY4xH3jlDD50Eoe/Vs34/
-         zcrT81NarET/9WgLk6FJN4vEOHMZy+xQaD6oEm8zDdySWShnjNl0u+xuEMidVjjw5l1J
-         O3lwJCP2y17x3mXs9W6NbodFvRnS/y49X/J+6k51a8wKpJETDfYG1iIAktkyTRfcYHJd
-         cb3Lbp05axpR2c+jTW2l5XSe6L/l4EYu1qFiBYkqjW32piEWd6D5XCOJvcabOBm3TLGH
-         itEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759155624; x=1759760424;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=W46uqCXD/DYO2PsPrvcdafdEqjimB/+hIZDXBFn2C/g=;
-        b=Gnd6GJ+NZ03RsWbe7ABk6F+lvqGu9LeMDEsxgySFxUmQ9Sivr756/a49AQdk9E8c3f
-         ZSY8ItSyuYFz5WLSfALgUf58yiERrkzo8Mj1/hNtOkdB8zh6lLra8KQiA8+NXJaIa7sv
-         0MfSvhIXZ5DpQR+wBHYyTV6n9n/V5cdPMcXDUT/i388gtZTFiBCay2NOnInckixLszns
-         Pn3X4VkgoNEddo5ifQV8cwuLLwRpoaCxbMkdX9nDbX6zh0KJ0t1dwg38cp1WXAPHg2di
-         kbYqwtilejm388v+yHFJ8RDSRIQX9aLcBMakv/iAxIStpQ+BsQNvgT+BPMLvrak8ZoVA
-         LddQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXG73a3yyRiXoDNO7EWlDSanYjJfYpV4AbeSxRbnvguB8D0fVc8x8HinGDpuHp5d1KhlNct/Gs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0TvQht7CYwKMWGo4v9TgDHLj5xS1XfGWC311vZEdVdpXcscTj
-	EoUkEkFrd+FOguy74d9hlvCXng1KusZq5T+TbXfMUak8DYcVdoyjwpvH
-X-Gm-Gg: ASbGncvAVwniA5htPyQK10lwnoOLn6vpP7Qx71xakhrtbqbse567Aa6ZtozLSwaqZad
-	U60C6cfQuQTYXXhE34zoEbRuJezoyCiDP1Ly406Rb4z8OLZYJC1IIsDdl0QgGyjyuYab6Yy82NJ
-	80I91qvGfG6U9bU7OQ4RMWHLy6s5WmNK4KrPOpXepSVr7zEB428YWduKj7Wej8OJ3gQdLPlUweW
-	RN9e/sdH8Yuc6Okk3Ivy/NNeTmwmH7rW2/wayG85RerxlvkNEGFtfciYZvJnYXN4XyHUffQXNlb
-	TPI0D2dwg8Fwii35++yzuK87LptlaIavt6CvIbJ65eNAcC195QMGAhM0wvzc5JRMrgTu3wwFG4b
-	KXR1yGpH4HpfyVqJ3/5Dhk1yLFgHHkjbBvu5C4VQIkuyQF61kU4lGG/ztLI59fVPj0WsKyg==
-X-Google-Smtp-Source: AGHT+IF9dM2rIldZLZnID4vwmKumarCAuGUMYuEholINlwbv/TDctLyEWMXb6Vz/4VzFzzqqhWBosA==
-X-Received: by 2002:a05:6102:418a:b0:599:8390:ca2 with SMTP id ada2fe7eead31-5ced2e12255mr484114137.9.1759155624152;
-        Mon, 29 Sep 2025 07:20:24 -0700 (PDT)
-Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
-        by smtp.gmail.com with UTF8SMTPSA id ada2fe7eead31-5ae302ee7f1sm3417497137.2.2025.09.29.07.20.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Sep 2025 07:20:23 -0700 (PDT)
-Date: Mon, 29 Sep 2025 10:20:23 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Ilya Maximets <i.maximets@ovn.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Aaron Conole <aconole@redhat.com>, 
- Eelco Chaudron <echaudro@redhat.com>
-Cc: i.maximets@ovn.org, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- horms@kernel.org, 
- corbet@lwn.net, 
- saeedm@nvidia.com, 
- tariqt@nvidia.com, 
- mbloch@nvidia.com, 
- leon@kernel.org, 
- dsahern@kernel.org, 
- ncardwell@google.com, 
- ecree.xilinx@gmail.com, 
- Richard Gobert <richardbgobert@gmail.com>, 
- kuniyu@google.com, 
- shuah@kernel.org, 
- sdf@fomichev.me, 
- aleksander.lobakin@intel.com, 
- florian.fainelli@broadcom.com, 
- alexander.duyck@gmail.com, 
- linux-kernel@vger.kernel.org, 
- linux-net-drivers@amd.com, 
- netdev@vger.kernel.org, 
- willemdebruijn.kernel@gmail.com
-Message-ID: <willemdebruijn.kernel.3a470e4b61d3@gmail.com>
-In-Reply-To: <2da082ad-c30e-4f91-8055-43cf63a5abe4@ovn.org>
-References: <20250916144841.4884-1-richardbgobert@gmail.com>
- <20250916144841.4884-5-richardbgobert@gmail.com>
- <c557acda-ad4e-4f07-a210-99c3de5960e2@redhat.com>
- <84aea541-7472-4b38-b58d-2e958bde4f98@gmail.com>
- <d88f374a-07ff-46ff-aa04-a205c2d85a4c@gmail.com>
- <dd89dc81-6c1b-4753-9682-9876c18acffc@redhat.com>
- <2da082ad-c30e-4f91-8055-43cf63a5abe4@ovn.org>
-Subject: Re: [PATCH net-next v6 4/5] net: gro: remove unnecessary df checks
+	s=arc-20240116; t=1759155703; c=relaxed/simple;
+	bh=bsiZWK+t8jHf9WvX8LalU0yGIyJxcJM68PRbIZFr2D4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZgJaEAV16hpGpCUH1HTsHW94NQBjvYh5s2lmPybfhwdjB47qu6VdnVreXf3MeVpZmrl8R108KDRZUOg/p8aFe9eUTC9AP7asoAkaDgmSfIG63WDjLcUv2ZVDC2zxgbHlVklg+1mXOmycH1S6A/yvqodaNxywuz1MLYTXbFV9Pmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=OWTjUzq0; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1759155690; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=FkcnFCtQ0f2lI113k/WzyZSzFaNtmxgsUVeEjQdhJIg=;
+	b=OWTjUzq01F2p1EO45F3dumyoOv2hEgtaCSigayuy5rUGpjF6cCsjnE85G/OrXCTCidZcIuv4DVgetPP6GWHI09Qzgu5rwTknH2Jwfct7ynz7QpKyqyjIe6uUfCV252EEDzoE9yYzATN3/7tdD3FHLwrK2CGNDvu3beOZRzR+K/g=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Wp5sGqR_1759155687 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 29 Sep 2025 22:21:27 +0800
+Date: Mon, 29 Sep 2025 22:21:27 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+	pabeni@redhat.com, song@kernel.org, sdf@google.com,
+	haoluo@google.com, yhs@fb.com, edumazet@google.com,
+	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
+	mjambigi@linux.ibm.com, wenjia@linux.ibm.com, wintera@linux.ibm.com,
+	tonylu@linux.alibaba.com, guwen@linux.alibaba.com
+Cc: bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	netdev@vger.kernel.org, sidraya@linux.ibm.com, jaka@linux.ibm.com
+Subject: Re: [PATCH bpf-next v3 2/3] net/smc: bpf: Introduce generic hook for
+ handshake flow
+Message-ID: <aNqV5zmFbLk0MmlM@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20250929063400.37939-1-alibuda@linux.alibaba.com>
+ <20250929063400.37939-3-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250929063400.37939-3-alibuda@linux.alibaba.com>
 
-Ilya Maximets wrote:
-> On 9/25/25 12:15 PM, Paolo Abeni wrote:
-> > Adding the OVS maintainers for awareness..
-> > 
-> > On 9/22/25 10:19 AM, Richard Gobert wrote:
-> >> Richard Gobert wrote:
-> >>> Paolo Abeni wrote:
-> >>>> On 9/16/25 4:48 PM, Richard Gobert wrote:
-> >>>>> Currently, packets with fixed IDs will be merged only if their
-> >>>>> don't-fragment bit is set. This restriction is unnecessary since
-> >>>>> packets without the don't-fragment bit will be forwarded as-is even
-> >>>>> if they were merged together. The merged packets will be segmented
-> >>>>> into their original forms before being forwarded, either by GSO or
-> >>>>> by TSO. The IDs will also remain identical unless NETIF_F_TSO_MANGLEID
-> >>>>> is set, in which case the IDs can become incrementing, which is also fine.
-> >>>>>
-> >>>>> Note that IP fragmentation is not an issue here, since packets are
-> >>>>> segmented before being further fragmented. Fragmentation happens the
-> >>>>> same way regardless of whether the packets were first merged together.
-> >>>>
-> >>>> I agree with Willem, that an explicit assertion somewhere (in
-> >>>> ip_do_fragmentation?!?) could be useful.
-> >>>>
-> >>>
-> >>> As I replied to Willem, I'll mention ip_finish_output_gso explicitly in the
-> >>> commit message.
-> >>>
-> >>> Or did you mean I should add some type of WARN_ON assertion that ip_do_fragment isn't
-> >>> called for GSO packets?
-> >>>
-> >>>> Also I'm not sure that "packets are segmented before being further
-> >>>> fragmented" is always true for the OVS forwarding scenario.
-> >>>>
-> >>>
-> >>> If this is really the case, it is a bug in OVS. Segmentation is required before
-> >>> fragmentation as otherwise GRO isn't transparent and fragments will be forwarded
-> >>> that contain data from multiple different packets. It's also probably less efficient,
-> >>> if the segment size is smaller than the MTU. I think this should be addressed in a
-> >>> separate patch series.
-> >>>
-> >>> I'll also mention OVS in the commit message.
-> >>>
-> >>
-> >> I looked into it, and it seems that you are correct. Looks like fragmentation
-> >> can occur without segmentation in the OVS forwarding case. As I said, this is
-> >> a bug since generated fragments may contain data from multiple packets. Still,
-> >> this can already happen for packets with incrementing IDs and nothing special
-> >> in particular will happen for the packets discussed in this patch. This should
-> >> be fixed in a separate patch series, as do all other cases where ip_do_fragment
-> >> is called directly without segmenting the packets first.
-> > 
-> > TL;DR: apparently there is a bug in OVS segmentation/fragmentation code:
-> > OVS can do fragmentation of GSO packets without segmenting them
-> > beforehands, please see the threads under:
-> > 
-> > https://lore.kernel.org/netdev/20250916144841.4884-5-richardbgobert@gmail.com/
-> > 
-> > for the whole discussion.
+On 2025-09-29 14:33:59, D. Wythe wrote:
+>The introduction of IPPROTO_SMC enables eBPF programs to determine
+>whether to use SMC based on the context of socket creation, such as
+>network namespaces, PID and comm name, etc.
+>
+>As a subsequent enhancement, to introduce a new generic hook that
+>allows decisions on whether to use SMC or not at runtime, including
+>but not limited to local/remote IP address or ports.
+>
+>User can write their own implememtion via bpf_struct_ops now to choose
+>whether to use SMC or not before TCP 3rd handshake to be comleted.
+>
+>Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+
+Looks good to me, thanks for continuing to work on this!
+
+Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+
+Best regards,
+Dust
+
+
+>---
+> include/net/netns/smc.h |   3 +
+> include/net/smc.h       |  53 ++++++++++++++++
+> net/ipv4/tcp_output.c   |  36 +++++++----
+> net/smc/Kconfig         |  10 +++
+> net/smc/Makefile        |   1 +
+> net/smc/af_smc.c        |  10 +++
+> net/smc/smc_hs_bpf.c    | 137 ++++++++++++++++++++++++++++++++++++++++
+> net/smc/smc_hs_bpf.h    |  31 +++++++++
+> net/smc/smc_sysctl.c    |  91 ++++++++++++++++++++++++++
+> 9 files changed, 358 insertions(+), 14 deletions(-)
+> create mode 100644 net/smc/smc_hs_bpf.c
+> create mode 100644 net/smc/smc_hs_bpf.h
+>
+>diff --git a/include/net/netns/smc.h b/include/net/netns/smc.h
+>index fc752a50f91b..d66bfd392254 100644
+>--- a/include/net/netns/smc.h
+>+++ b/include/net/netns/smc.h
+>@@ -17,6 +17,9 @@ struct netns_smc {
+> #ifdef CONFIG_SYSCTL
+> 	struct ctl_table_header		*smc_hdr;
+> #endif
+>+#if IS_ENABLED(CONFIG_SMC_HS_CTRL_BPF)
+>+	struct smc_hs_ctrl __rcu	*hs_ctrl;
+>+#endif /* CONFIG_SMC_HS_CTRL_BPF */
+> 	unsigned int			sysctl_autocorking_size;
+> 	unsigned int			sysctl_smcr_buf_type;
+> 	int				sysctl_smcr_testlink_time;
+>diff --git a/include/net/smc.h b/include/net/smc.h
+>index db84e4e35080..d599f8a74043 100644
+>--- a/include/net/smc.h
+>+++ b/include/net/smc.h
+>@@ -18,6 +18,8 @@
+> #include "linux/ism.h"
 > 
-> Hmm.  Thanks for pointing that out.  It does seem like OVS will fragment
-> GSO packets without segmenting them first in case MRU of that packet is
-> larger than the MTU of the destination port.  In practice though, MRU of
-> a GSO packet should not exceed path MTU in a general case.  I suppose it
-> can still happen in some corner cases, e.g. if MTU suddenly changed, in
-> which case the packet should probably be dropped instead of re-fragmenting.
+> struct sock;
+>+struct tcp_sock;
+>+struct inet_request_sock;
 > 
-> I also looked through other parts of the kernel and it seems like GSO
-> packets are not fragmented after being segmented in other places like
-> the br-netfilter code.  Which suggests that MRU supposed to be smaller
-> than MTU and so the fragmentation is not necessary, otherwise the packets
-> will be dropped.
+> #define SMC_MAX_PNETID_LEN	16	/* Max. length of PNET id */
 > 
-> Does that sound correct or am I missing some cases here?
-
-One of the discussed cases is where a packet is transformed from
-IPv4 to IPv6, e.g., with a BPF program. Similar would be tunnel encap.
-Or just forwarding between devices with different MTU.
-
-
+>@@ -97,4 +99,55 @@ struct smcd_dev {
+> 	u8 going_away : 1;
+> };
+> 
+>+#define SMC_HS_CTRL_NAME_MAX 16
+>+
+>+enum {
+>+	/* ops can be inherit from init_net */
+>+	SMC_HS_CTRL_FLAG_INHERITABLE = 0x1,
+>+
+>+	SMC_HS_CTRL_ALL_FLAGS = SMC_HS_CTRL_FLAG_INHERITABLE,
+>+};
+>+
+>+struct smc_hs_ctrl {
+>+	/* private */
+>+
+>+	struct list_head list;
+>+	struct module *owner;
+>+
+>+	/* public */
+>+
+>+	/* unique name */
+>+	char name[SMC_HS_CTRL_NAME_MAX];
+>+	int flags;
+>+
+>+	/* Invoked before computing SMC option for SYN packets.
+>+	 * We can control whether to set SMC options by returning various value.
+>+	 * Return 0 to disable SMC, or return any other value to enable it.
+>+	 */
+>+	int (*syn_option)(struct tcp_sock *tp);
+>+
+>+	/* Invoked before Set up SMC options for SYN-ACK packets
+>+	 * We can control whether to respond SMC options by returning various
+>+	 * value. Return 0 to disable SMC, or return any other value to enable
+>+	 * it.
+>+	 */
+>+	int (*synack_option)(const struct tcp_sock *tp,
+>+			     struct inet_request_sock *ireq);
+>+};
+>+
+>+#if IS_ENABLED(CONFIG_SMC_HS_CTRL_BPF)
+>+#define smc_call_hsbpf(init_val, sk, func, ...) ({		\
+>+	typeof(init_val) __ret = (init_val);			\
+>+	struct smc_hs_ctrl *ctrl;				\
+>+	rcu_read_lock();					\
+>+	ctrl = rcu_dereference(sock_net(sk)->smc.hs_ctrl);	\
+>+	if (ctrl && ctrl->func)					\
+>+		__ret = ctrl->func(__VA_ARGS__);		\
+>+	rcu_read_unlock();					\
+>+	__ret;							\
+>+})
+>+#else
+>+#define smc_call_hsbpf(init_val, sk, ...)  ({ (void)(sk); (init_val); })
+>+#endif /* CONFIG_SMC_HS_CTRL_BPF */
+>+
+> #endif	/* _SMC_H */
+>diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+>index caf11920a878..e4ee138044d3 100644
+>--- a/net/ipv4/tcp_output.c
+>+++ b/net/ipv4/tcp_output.c
+>@@ -39,6 +39,7 @@
+> 
+> #include <net/tcp.h>
+> #include <net/mptcp.h>
+>+#include <net/smc.h>
+> #include <net/proto_memory.h>
+> 
+> #include <linux/compiler.h>
+>@@ -764,34 +765,41 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
+> 	mptcp_options_write(th, ptr, tp, opts);
+> }
+> 
+>-static void smc_set_option(const struct tcp_sock *tp,
+>+static void smc_set_option(struct tcp_sock *tp,
+> 			   struct tcp_out_options *opts,
+> 			   unsigned int *remaining)
+> {
+> #if IS_ENABLED(CONFIG_SMC)
+>-	if (static_branch_unlikely(&tcp_have_smc)) {
+>-		if (tp->syn_smc) {
+>-			if (*remaining >= TCPOLEN_EXP_SMC_BASE_ALIGNED) {
+>-				opts->options |= OPTION_SMC;
+>-				*remaining -= TCPOLEN_EXP_SMC_BASE_ALIGNED;
+>-			}
+>+	struct sock *sk = &tp->inet_conn.icsk_inet.sk;
+>+
+>+	if (static_branch_unlikely(&tcp_have_smc) && tp->syn_smc) {
+>+		tp->syn_smc = !!smc_call_hsbpf(1, sk, syn_option, tp);
+>+		/* re-check syn_smc */
+>+		if (tp->syn_smc &&
+>+		    *remaining >= TCPOLEN_EXP_SMC_BASE_ALIGNED) {
+>+			opts->options |= OPTION_SMC;
+>+			*remaining -= TCPOLEN_EXP_SMC_BASE_ALIGNED;
+> 		}
+> 	}
+> #endif
+> }
+> 
+> static void smc_set_option_cond(const struct tcp_sock *tp,
+>-				const struct inet_request_sock *ireq,
+>+				struct inet_request_sock *ireq,
+> 				struct tcp_out_options *opts,
+> 				unsigned int *remaining)
+> {
+> #if IS_ENABLED(CONFIG_SMC)
+>-	if (static_branch_unlikely(&tcp_have_smc)) {
+>-		if (tp->syn_smc && ireq->smc_ok) {
+>-			if (*remaining >= TCPOLEN_EXP_SMC_BASE_ALIGNED) {
+>-				opts->options |= OPTION_SMC;
+>-				*remaining -= TCPOLEN_EXP_SMC_BASE_ALIGNED;
+>-			}
+>+	const struct sock *sk = &tp->inet_conn.icsk_inet.sk;
+>+
+>+	if (static_branch_unlikely(&tcp_have_smc) && tp->syn_smc && ireq->smc_ok) {
+>+		ireq->smc_ok = !!smc_call_hsbpf(1, sk, synack_option,
+>+						tp, ireq);
+>+		/* re-check smc_ok */
+>+		if (ireq->smc_ok &&
+>+		    *remaining >= TCPOLEN_EXP_SMC_BASE_ALIGNED) {
+>+			opts->options |= OPTION_SMC;
+>+			*remaining -= TCPOLEN_EXP_SMC_BASE_ALIGNED;
+> 		}
+> 	}
+> #endif
+>diff --git a/net/smc/Kconfig b/net/smc/Kconfig
+>index ba5e6a2dd2fd..67edeb927e19 100644
+>--- a/net/smc/Kconfig
+>+++ b/net/smc/Kconfig
+>@@ -33,3 +33,13 @@ config SMC_LO
+> 	  of architecture or hardware.
+> 
+> 	  if unsure, say N.
+>+
+>+config SMC_HS_CTRL_BPF
+>+	bool "Generic eBPF hook for SMC handshake flow"
+>+	depends on SMC && BPF_SYSCALL
+>+	default y
+>+	help
+>+	  SMC_HS_CTRL_BPF enables support to register generic eBPF hook for SMC
+>+	  handshake flow, which offer much greater flexibility in modifying the behavior
+>+	  of the SMC protocol stack compared to a complete kernel-based approach. Select
+>+	  this option if you want filtring the handshake process via eBPF programs.
+>diff --git a/net/smc/Makefile b/net/smc/Makefile
+>index 60f1c87d5212..57b919434df4 100644
+>--- a/net/smc/Makefile
+>+++ b/net/smc/Makefile
+>@@ -7,3 +7,4 @@ smc-y += smc_cdc.o smc_tx.o smc_rx.o smc_close.o smc_ism.o smc_netlink.o smc_sta
+> smc-y += smc_tracepoint.o smc_inet.o
+> smc-$(CONFIG_SYSCTL) += smc_sysctl.o
+> smc-$(CONFIG_SMC_LO) += smc_loopback.o
+>+smc-$(CONFIG_SMC_HS_CTRL_BPF) += smc_hs_bpf.o
+>diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>index e0e48f24cd61..ecc6499b05fa 100644
+>--- a/net/smc/af_smc.c
+>+++ b/net/smc/af_smc.c
+>@@ -59,6 +59,7 @@
+> #include "smc_sysctl.h"
+> #include "smc_loopback.h"
+> #include "smc_inet.h"
+>+#include "smc_hs_bpf.h"
+> 
+> static DEFINE_MUTEX(smc_server_lgr_pending);	/* serialize link group
+> 						 * creation on server
+>@@ -3609,8 +3610,17 @@ static int __init smc_init(void)
+> 		pr_err("%s: smc_inet_init fails with %d\n", __func__, rc);
+> 		goto out_ulp;
+> 	}
+>+	rc = bpf_smc_hs_ctrl_init();
+>+	if (rc) {
+>+		pr_err("%s: bpf_smc_hs_ctrl_init fails with %d\n", __func__,
+>+		       rc);
+>+		goto out_inet;
+>+	}
+>+
+> 	static_branch_enable(&tcp_have_smc);
+> 	return 0;
+>+out_inet:
+>+	smc_inet_exit();
+> out_ulp:
+> 	tcp_unregister_ulp(&smc_ulp_ops);
+> out_lo:
+>diff --git a/net/smc/smc_hs_bpf.c b/net/smc/smc_hs_bpf.c
+>new file mode 100644
+>index 000000000000..4aa6d38da122
+>--- /dev/null
+>+++ b/net/smc/smc_hs_bpf.c
+>@@ -0,0 +1,137 @@
+>+// SPDX-License-Identifier: GPL-2.0-only
+>+/*
+>+ *  Shared Memory Communications over RDMA (SMC-R) and RoCE
+>+ *
+>+ *  Generic hook for SMC handshake flow.
+>+ *
+>+ *  Copyright IBM Corp. 2016
+>+ *  Copyright (c) 2025, Alibaba Inc.
+>+ *
+>+ *  Author: D. Wythe <alibuda@linux.alibaba.com>
+>+ */
+>+
+>+#include <linux/bpf_verifier.h>
+>+#include <linux/bpf.h>
+>+#include <linux/btf.h>
+>+#include <linux/rculist.h>
+>+
+>+#include "smc_hs_bpf.h"
+>+
+>+static DEFINE_SPINLOCK(smc_hs_ctrl_list_lock);
+>+static LIST_HEAD(smc_hs_ctrl_list);
+>+
+>+static int smc_hs_ctrl_reg(struct smc_hs_ctrl *ctrl)
+>+{
+>+	int ret = 0;
+>+
+>+	spin_lock(&smc_hs_ctrl_list_lock);
+>+	/* already exist or duplicate name */
+>+	if (smc_hs_ctrl_find_by_name(ctrl->name))
+>+		ret = -EEXIST;
+>+	else
+>+		list_add_tail_rcu(&ctrl->list, &smc_hs_ctrl_list);
+>+	spin_unlock(&smc_hs_ctrl_list_lock);
+>+	return ret;
+>+}
+>+
+>+static void smc_hs_ctrl_unreg(struct smc_hs_ctrl *ctrl)
+>+{
+>+	spin_lock(&smc_hs_ctrl_list_lock);
+>+	list_del_rcu(&ctrl->list);
+>+	spin_unlock(&smc_hs_ctrl_list_lock);
+>+
+>+	/* Ensure that all readers to complete */
+>+	synchronize_rcu();
+>+}
+>+
+>+struct smc_hs_ctrl *smc_hs_ctrl_find_by_name(const char *name)
+>+{
+>+	struct smc_hs_ctrl *ctrl;
+>+
+>+	list_for_each_entry_rcu(ctrl, &smc_hs_ctrl_list, list) {
+>+		if (strcmp(ctrl->name, name) == 0)
+>+			return ctrl;
+>+	}
+>+	return NULL;
+>+}
+>+
+>+static int __smc_bpf_stub_set_tcp_option(struct tcp_sock *tp) { return 1; }
+>+static int __smc_bpf_stub_set_tcp_option_cond(const struct tcp_sock *tp,
+>+					      struct inet_request_sock *ireq)
+>+{
+>+	return 1;
+>+}
+>+
+>+static struct smc_hs_ctrl __smc_bpf_hs_ctrl = {
+>+	.syn_option	= __smc_bpf_stub_set_tcp_option,
+>+	.synack_option	= __smc_bpf_stub_set_tcp_option_cond,
+>+};
+>+
+>+static int smc_bpf_hs_ctrl_init(struct btf *btf) { return 0; }
+>+
+>+static int smc_bpf_hs_ctrl_reg(void *kdata, struct bpf_link *link)
+>+{
+>+	return smc_hs_ctrl_reg(kdata);
+>+}
+>+
+>+static void smc_bpf_hs_ctrl_unreg(void *kdata, struct bpf_link *link)
+>+{
+>+	smc_hs_ctrl_unreg(kdata);
+>+}
+>+
+>+static int smc_bpf_hs_ctrl_init_member(const struct btf_type *t,
+>+				       const struct btf_member *member,
+>+				       void *kdata, const void *udata)
+>+{
+>+	const struct smc_hs_ctrl *u_ctrl;
+>+	struct smc_hs_ctrl *k_ctrl;
+>+	u32 moff;
+>+
+>+	u_ctrl = (const struct smc_hs_ctrl *)udata;
+>+	k_ctrl = (struct smc_hs_ctrl *)kdata;
+>+
+>+	moff = __btf_member_bit_offset(t, member) / 8;
+>+	switch (moff) {
+>+	case offsetof(struct smc_hs_ctrl, name):
+>+		if (bpf_obj_name_cpy(k_ctrl->name, u_ctrl->name,
+>+				     sizeof(u_ctrl->name)) <= 0)
+>+			return -EINVAL;
+>+		return 1;
+>+	case offsetof(struct smc_hs_ctrl, flags):
+>+		if (u_ctrl->flags & ~SMC_HS_CTRL_ALL_FLAGS)
+>+			return -EINVAL;
+>+		k_ctrl->flags = u_ctrl->flags;
+>+		return 1;
+>+	default:
+>+		break;
+>+	}
+>+
+>+	return 0;
+>+}
+>+
+>+static const struct bpf_func_proto *
+>+bpf_smc_hs_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
+>+{
+>+	return bpf_base_func_proto(func_id, prog);
+>+}
+>+
+>+static const struct bpf_verifier_ops smc_bpf_verifier_ops = {
+>+	.get_func_proto		= bpf_smc_hs_func_proto,
+>+	.is_valid_access	= bpf_tracing_btf_ctx_access,
+>+};
+>+
+>+static struct bpf_struct_ops bpf_smc_hs_ctrl_ops = {
+>+	.name		= "smc_hs_ctrl",
+>+	.init		= smc_bpf_hs_ctrl_init,
+>+	.reg		= smc_bpf_hs_ctrl_reg,
+>+	.unreg		= smc_bpf_hs_ctrl_unreg,
+>+	.cfi_stubs	= &__smc_bpf_hs_ctrl,
+>+	.verifier_ops	= &smc_bpf_verifier_ops,
+>+	.init_member	= smc_bpf_hs_ctrl_init_member,
+>+	.owner		= THIS_MODULE,
+>+};
+>+
+>+int bpf_smc_hs_ctrl_init(void)
+>+{
+>+	return register_bpf_struct_ops(&bpf_smc_hs_ctrl_ops, smc_hs_ctrl);
+>+}
+>diff --git a/net/smc/smc_hs_bpf.h b/net/smc/smc_hs_bpf.h
+>new file mode 100644
+>index 000000000000..f5f1807c079e
+>--- /dev/null
+>+++ b/net/smc/smc_hs_bpf.h
+>@@ -0,0 +1,31 @@
+>+/* SPDX-License-Identifier: GPL-2.0 */
+>+/*
+>+ *  Shared Memory Communications over RDMA (SMC-R) and RoCE
+>+ *
+>+ *  Generic hook for SMC handshake flow.
+>+ *
+>+ *  Copyright IBM Corp. 2016
+>+ *  Copyright (c) 2025, Alibaba Inc.
+>+ *
+>+ *  Author: D. Wythe <alibuda@linux.alibaba.com>
+>+ */
+>+
+>+#ifndef __SMC_HS_CTRL
+>+#define __SMC_HS_CTRL
+>+
+>+#include <net/smc.h>
+>+
+>+/* Find hs_ctrl by the target name, which required to be a c-string.
+>+ * Return NULL if no such ctrl was found,otherwise, return a valid ctrl.
+>+ *
+>+ * Note: Caller MUST ensure it's was invoked under rcu_read_lock.
+>+ */
+>+struct smc_hs_ctrl *smc_hs_ctrl_find_by_name(const char *name);
+>+
+>+#if IS_ENABLED(CONFIG_SMC_HS_CTRL_BPF)
+>+int bpf_smc_hs_ctrl_init(void);
+>+#else
+>+static inline int bpf_smc_hs_ctrl_init(void) { return 0; }
+>+#endif /* CONFIG_SMC_HS_CTRL_BPF */
+>+
+>+#endif /* __SMC_HS_CTRL */
+>diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
+>index 2fab6456f765..918516734468 100644
+>--- a/net/smc/smc_sysctl.c
+>+++ b/net/smc/smc_sysctl.c
+>@@ -12,12 +12,14 @@
+> 
+> #include <linux/init.h>
+> #include <linux/sysctl.h>
+>+#include <linux/bpf.h>
+> #include <net/net_namespace.h>
+> 
+> #include "smc.h"
+> #include "smc_core.h"
+> #include "smc_llc.h"
+> #include "smc_sysctl.h"
+>+#include "smc_hs_bpf.h"
+> 
+> static int min_sndbuf = SMC_BUF_MIN_SIZE;
+> static int min_rcvbuf = SMC_BUF_MIN_SIZE;
+>@@ -30,6 +32,69 @@ static int links_per_lgr_max = SMC_LINKS_ADD_LNK_MAX;
+> static int conns_per_lgr_min = SMC_CONN_PER_LGR_MIN;
+> static int conns_per_lgr_max = SMC_CONN_PER_LGR_MAX;
+> 
+>+#if IS_ENABLED(CONFIG_SMC_HS_CTRL_BPF)
+>+static int smc_net_replace_smc_hs_ctrl(struct net *net, const char *name)
+>+{
+>+	struct smc_hs_ctrl *ctrl = NULL;
+>+
+>+	rcu_read_lock();
+>+	/* null or empty name ask to clear current ctrl */
+>+	if (name && name[0]) {
+>+		ctrl = smc_hs_ctrl_find_by_name(name);
+>+		if (!ctrl) {
+>+			rcu_read_unlock();
+>+			return -EINVAL;
+>+		}
+>+		/* no change, just return */
+>+		if (ctrl == rcu_dereference(net->smc.hs_ctrl)) {
+>+			rcu_read_unlock();
+>+			return 0;
+>+		}
+>+		if (!bpf_try_module_get(ctrl, ctrl->owner)) {
+>+			rcu_read_unlock();
+>+			return -EBUSY;
+>+		}
+>+	}
+>+	/* xhcg old ctrl with the new one atomically */
+>+	ctrl = unrcu_pointer(xchg(&net->smc.hs_ctrl, RCU_INITIALIZER(ctrl)));
+>+	/* release old ctrl */
+>+	if (ctrl)
+>+		bpf_module_put(ctrl, ctrl->owner);
+>+
+>+	rcu_read_unlock();
+>+	return 0;
+>+}
+>+
+>+static int proc_smc_hs_ctrl(const struct ctl_table *ctl, int write,
+>+			    void *buffer, size_t *lenp, loff_t *ppos)
+>+{
+>+	struct net *net = container_of(ctl->data, struct net, smc.hs_ctrl);
+>+	char val[SMC_HS_CTRL_NAME_MAX];
+>+	const struct ctl_table tbl = {
+>+		.data = val,
+>+		.maxlen = SMC_HS_CTRL_NAME_MAX,
+>+	};
+>+	struct smc_hs_ctrl *ctrl;
+>+	int ret;
+>+
+>+	rcu_read_lock();
+>+	ctrl = rcu_dereference(net->smc.hs_ctrl);
+>+	if (ctrl)
+>+		memcpy(val, ctrl->name, sizeof(ctrl->name));
+>+	else
+>+		val[0] = '\0';
+>+	rcu_read_unlock();
+>+
+>+	ret = proc_dostring(&tbl, write, buffer, lenp, ppos);
+>+	if (ret)
+>+		return ret;
+>+
+>+	if (write)
+>+		ret = smc_net_replace_smc_hs_ctrl(net, val);
+>+	return ret;
+>+}
+>+#endif /* CONFIG_SMC_HS_CTRL_BPF */
+>+
+> static struct ctl_table smc_table[] = {
+> 	{
+> 		.procname       = "autocorking_size",
+>@@ -99,6 +164,15 @@ static struct ctl_table smc_table[] = {
+> 		.extra1		= SYSCTL_ZERO,
+> 		.extra2		= SYSCTL_ONE,
+> 	},
+>+#if IS_ENABLED(CONFIG_SMC_HS_CTRL_BPF)
+>+	{
+>+		.procname	= "hs_ctrl",
+>+		.data		= &init_net.smc.hs_ctrl,
+>+		.mode		= 0644,
+>+		.maxlen		= SMC_HS_CTRL_NAME_MAX,
+>+		.proc_handler	= proc_smc_hs_ctrl,
+>+	},
+>+#endif /* CONFIG_SMC_HS_CTRL_BPF */
+> };
+> 
+> int __net_init smc_sysctl_net_init(struct net *net)
+>@@ -109,6 +183,16 @@ int __net_init smc_sysctl_net_init(struct net *net)
+> 	table = smc_table;
+> 	if (!net_eq(net, &init_net)) {
+> 		int i;
+>+#if IS_ENABLED(CONFIG_SMC_HS_CTRL_BPF)
+>+		struct smc_hs_ctrl *ctrl;
+>+
+>+		rcu_read_lock();
+>+		ctrl = rcu_dereference(init_net.smc.hs_ctrl);
+>+		if (ctrl && ctrl->flags & SMC_HS_CTRL_FLAG_INHERITABLE &&
+>+		    bpf_try_module_get(ctrl, ctrl->owner))
+>+			rcu_assign_pointer(net->smc.hs_ctrl, ctrl);
+>+		rcu_read_unlock();
+>+#endif /* CONFIG_SMC_HS_CTRL_BPF */
+> 
+> 		table = kmemdup(table, sizeof(smc_table), GFP_KERNEL);
+> 		if (!table)
+>@@ -139,6 +223,9 @@ int __net_init smc_sysctl_net_init(struct net *net)
+> 	if (!net_eq(net, &init_net))
+> 		kfree(table);
+> err_alloc:
+>+#if IS_ENABLED(CONFIG_SMC_HS_CTRL_BPF)
+>+	smc_net_replace_smc_hs_ctrl(net, NULL);
+>+#endif /* CONFIG_SMC_HS_CTRL_BPF */
+> 	return -ENOMEM;
+> }
+> 
+>@@ -148,6 +235,10 @@ void __net_exit smc_sysctl_net_exit(struct net *net)
+> 
+> 	table = net->smc.smc_hdr->ctl_table_arg;
+> 	unregister_net_sysctl_table(net->smc.smc_hdr);
+>+#if IS_ENABLED(CONFIG_SMC_HS_CTRL_BPF)
+>+	smc_net_replace_smc_hs_ctrl(net, NULL);
+>+#endif /* CONFIG_SMC_HS_CTRL_BPF */
+>+
+> 	if (!net_eq(net, &init_net))
+> 		kfree(table);
+> }
+>-- 
+>2.45.0
 
