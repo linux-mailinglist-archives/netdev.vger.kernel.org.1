@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-227258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69AB9BAAE45
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 03:30:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26749BAAE4B
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 03:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02F5A19233D0
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 01:30:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80FA01923436
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 01:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A851A9F94;
-	Tue, 30 Sep 2025 01:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 650D71EE02F;
+	Tue, 30 Sep 2025 01:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vLbHj/cF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1gzQPr5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01AEF1C01;
-	Tue, 30 Sep 2025 01:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D301EA7CC
+	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 01:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759195823; cv=none; b=D1mC+pZQFcEiF+LPz152AJQ0N+jDbJxpI/8fRJHQBzgujz3T7BWNo1UpyDCgv/LmculBtX3fk3NhojXUEkvjQ8QZezCu0domGsYNY4B2vKU/+avahle0TG1jl6gQ+ft4C0qEJ8HI7uaNJ5Aqbjm6KPhM1nEKWwWJlFd7WfhUMSk=
+	t=1759195824; cv=none; b=QtJFiYVUKWXiFsPw1hNP15y4WnxLjTLp/2dJEvjqE1jPYef376l9rgATD9vaeJHvHju77nAtNK1tGoUkXEMYsH0DcaRcjKT5MhuLc3/kdSbkgjXwDhLuR3SM/yecNVYBgHnNrfMkPK+NjTqJWRMcfzDX9HQ5SqrUXPlEbi6Jehs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759195823; c=relaxed/simple;
-	bh=+m6a0mJNIZHUGPK68kjgVgfdAf1S+2tcQrltC6ZN/Zw=;
+	s=arc-20240116; t=1759195824; c=relaxed/simple;
+	bh=VtvyU0ixMqi/qruYisc1vzq7y3t1EmWZwXUfpU35u5E=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hTbrzZzvXIybigXUcx0mCC5eNM7YP+xXIq5uk6PDlqLRck4j6dtyFsE7BlnnI1lHT+uSP/jNCa7PHHtQ8mbScKtxMHsdA+Q4TCCER+wARoxSFYuTCTRiCU/XUIf2Qs/Qkj+TfCczUIt+oRxQuX0LQmDQ8pYWYW4sARLTt34UUWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vLbHj/cF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8883FC4CEF4;
-	Tue, 30 Sep 2025 01:30:22 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Q0cOZDNzReeg90BKFYPoOWSOcHQEwUulp60N0AmOJ2J5AEk6ZI8yL6wUp+9QSQvMsvL6JpEzOS49lQ8NIXPXdxjEkCUYsiPZJT/L1N5e6GcFFZyoJAcZz7VnYKy+K3GrThF0gRm8/gDihmtm8oprG8fqD13Gdj5qDEKr2lUBP38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M1gzQPr5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13A29C4CEF4;
+	Tue, 30 Sep 2025 01:30:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759195822;
-	bh=+m6a0mJNIZHUGPK68kjgVgfdAf1S+2tcQrltC6ZN/Zw=;
+	s=k20201202; t=1759195824;
+	bh=VtvyU0ixMqi/qruYisc1vzq7y3t1EmWZwXUfpU35u5E=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=vLbHj/cFj7INjTUa3aDf/2Ntdldg+kPhUcp5L4EtGtLfXP97ig+ADc/redJFuyWHS
-	 RI4Vuzrc0txVVy746eWEUL2SGo6ssgwT0bWlDvpqWM1GZ+2aD6sRP9WuKwQb5DhteS
-	 +JG2MUxOBKq8cA35OKvGGx5h6v0bw7WLbVKJ4uEVNYF3lVQWYRt6N69sjDsIqsC7nw
-	 s94MuiGMVkUj5R/y+DYQ8eM/Zn63cK5SxvrkRGUnjU0mRRzEuPz95UT7ZWoR24FqA5
-	 fv94x56hJ8ZxVZk29uzj8tMJeGNhWG99SVpDqnCdjKEls0EUbVaDuOKe0AArz+2h08
-	 Veh5r/tzDrQAQ==
+	b=M1gzQPr5zxvy9RmC0yNkQpcpjyNYMypFzME4F+6FPjDFguY+LPBlaMTYBHem9wqEP
+	 +dFXl40zvwsVD0+JiOIdlL+JYtfFpLRMAiFNHhACeCNTMa7yacaPQz+A/r/rfXRoVW
+	 s3JJfPVfuv7FhM0h6SAAslgw1aqcrzilF7nqsfhxalwwE18cFfXlGyKkB02ByPqt2E
+	 JJPdHCCZKxC4lkuFxNuhM34BksxfeEvu2OsNbV+7CLG2lj/Dw93+tCHZ+FiUWHaTkb
+	 5ZAPD7VzRjn0xBZW4Ao3vR/yCfp5+rN4ICYntLaOi09rUdilXWve95bSoRIAHgw8E1
+	 Ouk72NQy8Y2AA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3458639D0C1A;
-	Tue, 30 Sep 2025 01:30:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE01539D0C1A;
+	Tue, 30 Sep 2025 01:30:18 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,57 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/8] mptcp: receive path improvement
+Subject: Re: [PATCH net-next] tcp: use skb->len instead of skb->truesize in
+ tcp_can_ingest()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175919581600.1779167.13357618344128087599.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Sep 2025 01:30:16 +0000
-References: 
- <20250927-net-next-mptcp-rcv-path-imp-v1-0-5da266aa9c1a@kernel.org>
-In-Reply-To: 
- <20250927-net-next-mptcp-rcv-path-imp-v1-0-5da266aa9c1a@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: martineau@kernel.org, geliang@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- ncardwell@google.com, kuniyu@google.com, dsahern@kernel.org,
- shuah@kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+ <175919581725.1779167.8436912665882904953.git-patchwork-notify@kernel.org>
+Date: Tue, 30 Sep 2025 01:30:17 +0000
+References: <20250927092827.2707901-1-edumazet@google.com>
+In-Reply-To: <20250927092827.2707901-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ ncardwell@google.com, willemb@google.com, kuniyu@google.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 27 Sep 2025 11:40:36 +0200 you wrote:
-> This series includes several changes to the MPTCP RX path. The main
-> goals are improving the RX performances, and increase the long term
-> maintainability.
+On Sat, 27 Sep 2025 09:28:27 +0000 you wrote:
+> Some applications are stuck to the 20th century and still use
+> small SO_RCVBUF values.
 > 
-> Some changes reflects recent(ish) improvements introduced in the TCP
-> stack: patch 1, 2 and 3 are the MPTCP counter part of SKB deferral free
-> and auto-tuning improvements. Note that patch 3 could possibly fix
-> additional issues, and overall such patch should protect from similar
-> issues to arise in the future.
+> After the blamed commit, we can drop packets especially
+> when using LRO/hw-gro enabled NIC and small MSS (1500) values.
+> 
+> LRO/hw-gro NIC pack multiple segments into pages, allowing
+> tp->scaling_ratio to be set to a high value.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/8] mptcp: leverage skb deferral free
-    https://git.kernel.org/netdev/net-next/c/9aa59323f270
-  - [net-next,2/8] tcp: make tcp_rcvbuf_grow() accessible to mptcp code
-    https://git.kernel.org/netdev/net-next/c/a7556779745c
-  - [net-next,3/8] mptcp: rcvbuf auto-tuning improvement
-    https://git.kernel.org/netdev/net-next/c/e118cdc34dd1
-  - [net-next,4/8] mptcp: introduce the mptcp_init_skb helper
-    https://git.kernel.org/netdev/net-next/c/9a0afe0db467
-  - [net-next,5/8] mptcp: remove unneeded mptcp_move_skb()
-    https://git.kernel.org/netdev/net-next/c/c4ebc4ee4e75
-  - [net-next,6/8] mptcp: factor out a basic skb coalesce helper
-    https://git.kernel.org/netdev/net-next/c/68c7af988bd1
-  - [net-next,7/8] mptcp: minor move_skbs_to_msk() cleanup
-    https://git.kernel.org/netdev/net-next/c/59701b187003
-  - [net-next,8/8] selftests: mptcp: join: validate new laminar endp
-    https://git.kernel.org/netdev/net-next/c/c912f935a5c7
+  - [net-next] tcp: use skb->len instead of skb->truesize in tcp_can_ingest()
+    https://git.kernel.org/netdev/net-next/c/f017c1f768b6
 
 You are awesome, thank you!
 -- 
