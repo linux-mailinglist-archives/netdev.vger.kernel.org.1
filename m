@@ -1,89 +1,99 @@
-Return-Path: <netdev+bounces-227276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81C53BAB93C
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 07:54:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12B88BABA55
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 08:18:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96ABF16BD68
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 05:54:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1A831C2CFD
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 06:18:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264EC289E30;
-	Tue, 30 Sep 2025 05:51:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 974B428504D;
+	Tue, 30 Sep 2025 06:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mboxify.com header.i=@mboxify.com header.b="LsYxfqX+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mboxify.com header.i=@mboxify.com header.b="XmN0k7TC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-108-mta23.mxroute.com (mail-108-mta23.mxroute.com [136.175.108.23])
+Received: from mail-108-mta196.mxroute.com (mail-108-mta196.mxroute.com [136.175.108.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53630288510
-	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 05:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.175.108.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3DF7216E32
+	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 06:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.175.108.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759211493; cv=none; b=aurERTcPJ6eDd7kJc/3eBKoW/HAT6r4TrSRdR4YRnwuh1a/LEIUgKoQ5++JRzwhzFm+oopTNdLh+8BPR/eEZScre9nbsLySJrcczxKoStnZRLC92hC4FHX1/XS+SjdgxeQ+ck/B6p6Nmi1BcGUvvsrntoixZwcbptc2CkIqQgLA=
+	t=1759213083; cv=none; b=az8Xv0MpvfFRH0Ivc328A1bg3Ik5CSz8+EsoV5K3tIHY44mSH+ZhsVTxGDUX5UETbNKdvVFbGyEwF50j2SL/DYX0J3MKKK161c6OLOMhuY7EFw34grkXM7Hn/7MV3TEccFu5yeMcDR0kd9byuT/Lbh4QdzVnEXPBKb34P13U2Ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759211493; c=relaxed/simple;
-	bh=kpQ8m1r9WsaQRTfb3mvBz37kYspPRr26oZ0VIk79zO0=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=sHjiy3h/aSUo4IsWKVEwxjtJ7PK04vMLrPzCj4F7pFPTh09jluVJ5hjzwwnO2WjyIZ21Z2e/uNoKCs11UuyotUg5HfFBw0ULPVQQuaGtMC7F//kh2a2rVKojBwJhOZ/dd2Q9gNgeT6i4AowAk+dGqUQotCDqU/CvJXzMuyPHVhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mboxify.com; spf=pass smtp.mailfrom=mboxify.com; dkim=pass (2048-bit key) header.d=mboxify.com header.i=@mboxify.com header.b=LsYxfqX+; arc=none smtp.client-ip=136.175.108.23
+	s=arc-20240116; t=1759213083; c=relaxed/simple;
+	bh=b5DWgboimi+Z9IOjMt/S61PYPrKVOLaxU4eF70I8Q/I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZMDT77pJBk2lOANe2GibhNfFQq/8PLDzgoh/WQWC5xXPBC6blVYnasJi1ZdRArCMKmAtly+MbSVJDtAXQnsOZvtXP6BiPALd5SAzGS0m/7FXcZApKcmdB1FrR7Ose8iL5CvAKOpWz46U27eD2RjPdilDMIfDWExePiOFUzOGhyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mboxify.com; spf=pass smtp.mailfrom=mboxify.com; dkim=pass (2048-bit key) header.d=mboxify.com header.i=@mboxify.com header.b=XmN0k7TC; arc=none smtp.client-ip=136.175.108.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mboxify.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mboxify.com
 Received: from filter006.mxroute.com ([136.175.111.3] filter006.mxroute.com)
  (Authenticated sender: mN4UYu2MZsgR)
- by mail-108-mta23.mxroute.com (ZoneMTA) with ESMTPSA id 19999284be5000c244.007
+ by mail-108-mta196.mxroute.com (ZoneMTA) with ESMTPSA id 1999940a21d000c244.00e
  for <netdev@vger.kernel.org>
  (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
- Tue, 30 Sep 2025 05:46:18 +0000
-X-Zone-Loop: dd16f27bcdb870aa919c63617a97c28f0be9340f0e6f
+ Tue, 30 Sep 2025 06:12:53 +0000
+X-Zone-Loop: 00adc8df9a83dce2c94f9daf328d873c3f622cfbb1a5
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mboxify.com
-	; s=x; h=Content-Transfer-Encoding:Content-Type:References:In-Reply-To:
-	Subject:Cc:To:From:Date:MIME-Version:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=gUtR5fYZV2rNyiv6PpzTdc7VzKFWiIJdpqFAx5fRTus=; b=LsYxfqX+DHmPACBm1jbfP6yS+p
-	7VlZv0L5MAztyjmon7MSu5rhEVKDnzeKKpK9/GIERAIiFWWgIS82CjY8rrGUK3AcRBKfQkTJguJ+B
-	Zf+mBZ/O5QQ0f04rrpHLRGoCg1wvIFOahYag7Yv3gWe9TXuvNNjqaC+m5Ig3T09zA9GYVO0vzcazp
-	RITtyLleYtdDyoTOMgiJNWwz17yXTFF++XI9Gs0tHo5u3vZVz1G+23QS//DyYvx9Ib6QpbVtltUpU
-	NllNOaR9shrazWGEyHw2fFhJMzIfzDzqPS6Q2AGOadhmI/aAq9P3H17p0kKGkGlfe4luo2W3D72Ed
-	OPwHLBEA==;
+	; s=x; h=Content-Transfer-Encoding:MIME-Version:Date:Subject:Cc:To:From:
+	Sender:Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:
+	References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:
+	List-Owner:List-Archive; bh=ggyaZpFvuFFen4mjD46MTVdtGASkVmZ5LRYKR76W8pA=; b=X
+	mN0k7TCymPClVf/7PgCtBL9oyaQ/mw3NHDDc907E8tkFV6OYA7tLvj7E4HxB+5Pv2mf0jyRNFlJRe
+	LITZwyP73sdmLlBdROT7kcDiDTjf4AjKdDZ81CmIYBrVgXcwBqcwsuuJHwF92WnpXZcwy1x07q6hQ
+	lsPvf29u75xl9fcue0+nffDzAq6oiT7OUMrbUaRbz/NrSxQKF0Na4lZ0Htsny9WjIOaGzPjrAQ8z6
+	/X2bqFUSOMY/HKmAMu7BpxcjMwkkhHKQQFN6n6wHimibwrasenR/Pt/wgxyM70Z/YQ9+wnsCMqmLv
+	ogVBVk0nLJ9F0khbeuZlO4/tvcK4FvRng==;
+From: Bo Sun <bo@mboxify.com>
+To: sgoutham@marvell.com,
+	gakula@marvell.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: sbhatta@marvell.com,
+	hkelam@marvell.com,
+	horms@kernel.org,
+	bbhushan2@marvell.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	sumang@marvell.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bo Sun <bo@mboxify.com>
+Subject: [PATCH net v2 0/2] octeontx2: fix bitmap leaks in PF and VF
+Date: Tue, 30 Sep 2025 14:12:34 +0800
+Message-ID: <20250930061236.31359-1-bo@mboxify.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 30 Sep 2025 13:46:17 +0800
-From: Bo Sun <bo@mboxify.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, sgoutham@marvell.com,
- gakula@marvell.com, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] octeontx2-vf: fix bitmap leak
-In-Reply-To: <20250929185359.52e3f120@kernel.org>
-References: <20250927071505.915905-1-bo@mboxify.com>
- <20250927071505.915905-2-bo@mboxify.com> <aNpbZkQZxa3HkrJj@horms.kernel.org>
- <0bb6cec0e6bcf22a43bfff4b0813b201@mboxify.com>
- <20250929185359.52e3f120@kernel.org>
-Message-ID: <cc8461fadd0ced4e7f4ec33334d5aee7@mboxify.com>
-X-Sender: bo@mboxify.com
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
 Content-Transfer-Encoding: 8bit
 X-Authenticated-Id: bo@mboxify.com
 
-On 2025-09-30 09:53, Jakub Kicinski wrote:
-> On Mon, 29 Sep 2025 22:49:54 +0800 Bo Sun wrote:
->> I’ll resend v2 for the net tree with the correct subject prefix.
-> 
-> Since you promised a v2 - could you also make sure you CC the people
-> who signed off on the bad change? get_maintainer will point them out.
-> Unless you know their address will bounce, in which case please mention
-> that in the cover letter.
+Two small patches that free the AF_XDP bitmap in the PF and VF
+remove paths.  Both carry the same Fixes tag and should go to
+stable.
 
-Sure, I’ll CC all sign-off authors and everyone get_maintainer lists in 
-v2.
+Changes in v2:
+- Add correct [PATCH net v2] subject prefix
+- CC the sign-off authors that introduced the leak and everyone
+  returned by scripts/get_maintainer.pl
+
+Bo Sun (2):
+  octeontx2-vf: fix bitmap leak
+  octeontx2-pf: fix bitmap leak
+
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 1 +
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+-- 
+2.50.1 (Apple Git-155)
+
 
