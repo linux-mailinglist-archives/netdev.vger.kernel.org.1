@@ -1,125 +1,125 @@
-Return-Path: <netdev+bounces-227341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 806EFBACBC3
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 13:56:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90FC6BACBCC
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 13:57:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 398D13B1DB2
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 11:56:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1998718887E6
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 11:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37FF026A0E7;
-	Tue, 30 Sep 2025 11:56:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283382EBBAB;
+	Tue, 30 Sep 2025 11:57:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nbM1X5UC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JlSu87lr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EEF723D288;
-	Tue, 30 Sep 2025 11:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A59526A0E7
+	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 11:57:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759233414; cv=none; b=ejmjrwIiCqTsJpipXStLEFED6W0MMljdTPexU81g+UJLKuS8s+CH71klc+EW18YX3qzNhheXBPyzzcXpRN85eVAJ5OUSKFZtxhSGDRhebEcujswPRsbKc0/Kdok37gm6gmvo7w2phx0UqwTUrr/2MgyHYxzEZOshCdNYC1DsfIg=
+	t=1759233455; cv=none; b=lBB/f2mUWtfzt+p6WYkwBBX2wjMgPVBa21LXWlNJIJwHHfAxXv/go0ZXFDsdQ+kyq9CEWXeHAq9wnqSt4OHnu759eJ356w18uT4cyNCBY+EjobwMkSfJmOsYdkU9eAs5vDYuXudInm0KUK0UmO1yO2F6yetIJxzwOz4CCOG/RnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759233414; c=relaxed/simple;
-	bh=rVEH3heWQ9CYRYUOy9sPRsybw/cgSFigHuULmvEsgIk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jeASQwMLR/A+85yXFbIfcakcjMjioPUplYy8SW86TVZSNWR59/oN3BDKbhOgQPF2Adcp2hdnoOr0+2FsLOjDlFvRvP6KMyBhp1ZQfBPcCKOMlvIY20gjoMT36Omw3Zx1c/wc9eZGIGLzE3poWghB2fiDdabyp/M6T9kxJLJps7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nbM1X5UC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15489C4CEF0;
-	Tue, 30 Sep 2025 11:56:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759233413;
-	bh=rVEH3heWQ9CYRYUOy9sPRsybw/cgSFigHuULmvEsgIk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nbM1X5UCOwCMtc5gSaozPLdjbuYKjdj4qoWN8L9+ohY6oyfmeWyC+g6oE7BVMp/GP
-	 0yVOGQMN6ZNUKmTFTRzV69wY8e+Uv1IvFQa5YfQQb35b0fpLS5xQ5brgtvVIAxIM/i
-	 Lbg/BXoROC9RqSox211SoamyQcuRRDIcvkVXFX3JBXBJfax2/oziZD5WC4BrBk5cY/
-	 8nl5DLyBetQegq1ls234yG+v3EYB2gjdBYlAXTMjIY6EcLU9DHokO5fNT7gb1ZNLl8
-	 ZZzL3gumC7yjdoDcwwPEZiWMr7L2O4IaiNCrKAMbdLeKe/It5OauunNzdZLxjFYLPU
-	 7HnexeEs0je5A==
-Date: Tue, 30 Sep 2025 13:56:50 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2 1/3] dt-bindings: net: airoha: npu: Add
- AN7583 support
-Message-ID: <aNvFgkV-8YCnnfaP@lore-desk>
-References: <20250927-airoha-npu-7583-v2-0-e12fac5cce1f@kernel.org>
- <20250927-airoha-npu-7583-v2-1-e12fac5cce1f@kernel.org>
- <157578d3-c06f-4621-b707-ca4208d18807@redhat.com>
+	s=arc-20240116; t=1759233455; c=relaxed/simple;
+	bh=kqh94AtRdnvNOtGrMAnDMgdoDLSE5h0RhP/RH4pYhF4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VHUONVjPhOynQFpcxuN3nGyTpdbHNUpf45+N8fJDkpi5n4c3CeD4LL2vitYkNw1eU05Jx58X3LjYNdYqF9DCKZxwDDCDYZcQBTKWZEQx5U292Y7nu/E/ChNJKQIUw/kO7HbzKqu9tqqWMClbrLvCAc+hcnIN9KavOznGzbwCwgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JlSu87lr; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b3b27b50090so534627066b.0
+        for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 04:57:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759233452; x=1759838252; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kqh94AtRdnvNOtGrMAnDMgdoDLSE5h0RhP/RH4pYhF4=;
+        b=JlSu87lrBGp51zsJOfS9Gtmj29SnA4ufqCSxSgHLG/eerN4NAGR0zwFC7Vn0rRPmGr
+         lfVXhT4I5SLzKGbFeyhTPLIki5kJryEdq6lqeZibAhgb/goZkpLkO5idZrqNj4Xwdfgq
+         n+J68h9pG26lJcNOrEZGolrcmJLF9TTGyevKASMmtAi7VMutSl5dHEyFdjTzleVzU65i
+         65v/+tpc7UINF+ghDj6DUn5uXatBBuk0K//EfbskD7pdUD/kdH/BNThSVtsYM6dltJbl
+         dX4q52N9EaeEAY+hgi65d7EiMBoHYHnpAA/RyB9R5iKlBmHHEbuH4+rhyjaafxJtyF2I
+         UwYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759233452; x=1759838252;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kqh94AtRdnvNOtGrMAnDMgdoDLSE5h0RhP/RH4pYhF4=;
+        b=AfpQjZcopOgbT7eswYH3XUg2AZjlcAq2IlT+KfrgsaG5EE1hlY7lglrgQVSAK0w6QH
+         clMPGoBF3ieuUq+NHgUJpAQKjEiBROx+CAeD0XmNNuSh6/+2zdVp6Y6r7svGCLyeQbbu
+         Z4inD4jY7HX4lDCPb+j77E4BOZf3F0QaMdkb3vI8iRKvudPIrsAtX8jyYgb33GU6rKaX
+         V+/K4e+7GMCAJ9PDBvds00Uz6o0o8ZNJfwtzgkMvPrXszBIY+m1/1p8098GWGMu7Udkc
+         b5sQllic88/8B9wPAUMkh/WKgEHatN9WwirMG8kPWQtti45074L6eCFB3j0kAp8fZUQJ
+         NLPw==
+X-Forwarded-Encrypted: i=1; AJvYcCU5qMMuq2EEC4ABaiAC4y10dp0oFvx+2aqlbLGaF1027sCkC4wqPK1y8cppqXuyML6Zrjwf7l8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzCe9C0cVZfmpVg6JILB0tnjbzTkbHyKhCXcR1cPYE4dLOSFXB
+	ueot1xbXa5bd/v4dRoUwXqaOzNhfAcjIVvdeJxr1B87vzun4WscWdMWqoaLTFXvCKFrLtbi/3Oz
+	fbFx9ZroLr0PmbCJTo2cgxT5MDjfObD0=
+X-Gm-Gg: ASbGncsvSmZLtGQLak2+BGcfKdkqSbyMV9QbxMttQCXRjpbtDDFmM3VSU5l/BfxuHHP
+	ogRmAbAFBr+4eP5RkkcC5pddv18kmscHWfOv/YQcwrw6hs1Em4dWc4S1ybIHHhv4AqoKkR8ihHP
+	+hMi4V5YK+tD6irU+K3MabbaD12sqDF+QeYbNsI2ngv3Dv3kvCO9yFuMfiWjjK00XPJOKyA55+o
+	9Zy26QXhZO540bFhQTdTLu0STY+0831fMRu/eujr2fP95QieV+LgyPMd/3coVr2GL7G6QCy4r5A
+X-Google-Smtp-Source: AGHT+IFMtK7lQG2C6CXy0BdUz73VA5EZWA5GWFM67vubKVCmaj1C4S2cfo3XpGObqlbGqLwQb0CID+MEAVyWsVhI3os=
+X-Received: by 2002:a17:907:1c95:b0:b46:1db9:cb7c with SMTP id
+ a640c23a62f3a-b461db9dc6cmr76159766b.33.1759233451417; Tue, 30 Sep 2025
+ 04:57:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="GI8sOrmB41LyVA3t"
-Content-Disposition: inline
-In-Reply-To: <157578d3-c06f-4621-b707-ca4208d18807@redhat.com>
-
-
---GI8sOrmB41LyVA3t
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20250930100656.80420-2-sidharthseela@gmail.com> <a21498ff-4dd0-4b3a-9b2e-9b932b5925ad@openvpn.net>
+In-Reply-To: <a21498ff-4dd0-4b3a-9b2e-9b932b5925ad@openvpn.net>
+From: Sidharth Seela <sidharthseela@gmail.com>
+Date: Tue, 30 Sep 2025 17:27:20 +0530
+X-Gm-Features: AS18NWCxdvM572oUhIGZSez5YvvgrvAB2_xyu9_VKgGBmy-3EY7uowJXb-VjjF4
+Message-ID: <CAJE-K+BrTdtXTF6VgRzen=YVmuUgU8ktu_36nXqc2vTF=u_vLw@mail.gmail.com>
+Subject: Re: [PATCH net v4] selftest:net: Fix uninit return values
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: sd@queasysnail.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, 
+	willemdebruijn.kernel@gmail.com, kernelxing@tencent.com, nathan@kernel.org, 
+	nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-> On 9/27/25 4:03 PM, Lorenzo Bianconi wrote:
-> > Introduce AN7583 NPU support to Airoha EN7581 NPU device-tree bindings.
-> >=20
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> >  Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml | 1 +
-> >  1 file changed, 1 insertion(+)
-> >=20
-> > diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-npu.ya=
-ml b/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
-> > index c7644e6586d329d8ec2f0a0d8d8e4f4490429dcc..59c57f58116b568092446e6=
-cfb7b6bd3f4f47b82 100644
-> > --- a/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
-> > +++ b/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
-> > @@ -18,6 +18,7 @@ properties:
-> >    compatible:
-> >      enum:
-> >        - airoha,en7581-npu
-> > +      - airoha,an7583-npu
-> > =20
-> >    reg:
-> >      maxItems: 1
-> >=20
->=20
-> This needs ack from the DT maintainer and we are finalizing the net-next
-> PR right now. Let's defer this series to the next cycle, thanks!
->=20
-> Paolo
->=20
+On Tue, Sep 30, 2025 at 4:50=E2=80=AFPM Antonio Quartulli <antonio@openvpn.=
+net> wrote:
+> Hi,
+> Thanks a lot for fixing this - I hadn't see the warnings with gcc.
 
-ack, fine. I will repost during next cycle.
+I am glad, thankyou.
 
-Regards,
-Lorenzo
+> ret goes uninitialized only under the "if (!sock)" condition, therefore
+> I'd rather assign ret a meaningful value instead of -1.
 
---GI8sOrmB41LyVA3t
-Content-Type: application/pgp-signature; name=signature.asc
+Yes, you are right.
 
------BEGIN PGP SIGNATURE-----
+> How about adding "err =3D -ENOMEM;" directly inside the if block?
+> Same here.
+> ret goes uninitialized only under the "CMD_INVALID" case.
+> How about adding "ret =3D -EINVAL;" inside the affected case?
+> Both values are returned by ovpn_run_cmd() and then printed as
+> strerror(-ret).
+> If we blindly use -1 we will get "Operation not permitted" which will
+> confuse the user IMHO.
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaNvFggAKCRA6cBh0uS2t
-rGOXAQD9aWmnKC+UFDiJtMtXqtAOebHLNu9HuxT+1kz7pSHUVgD/bEjQtex8chJk
-Le7FZ5a+eHigvNV2TMN3TurtWfqGbgc=
-=u+lc
------END PGP SIGNATURE-----
+Alright, understood, Thank you.
 
---GI8sOrmB41LyVA3t--
+Sending in the changes in v5.
+
+
+--=20
+Thanks,
+Sidharth Seela
+www.realtimedesign.org
 
