@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-227273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29617BAAF1B
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 04:01:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2687BAB03F
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 04:30:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AD8374E2049
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 02:01:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E94D53A333A
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 02:30:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433EC2248B9;
-	Tue, 30 Sep 2025 02:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636F2211A09;
+	Tue, 30 Sep 2025 02:30:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OCNRapFB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MdVYcakK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF1B223DD6
-	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 02:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69C181AA8;
+	Tue, 30 Sep 2025 02:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759197628; cv=none; b=ZZM3XkHYD4dakjDFFiZHSHuSTf2i/qfO3RvZghr5NDLPgI7ntFdwEFkKKDZE3UzigSqIXaSovSL9vyPjsbXn0bGitx+oHizz+2jDVvdsBd5fi5yyty0HRrizsWmQTZcNJQunPndCsGL9Fkv+OZ07aHRAvIfZdY8XkLIUdWG18sg=
+	t=1759199417; cv=none; b=JQnJjBHHeJr9DJqwfwRUV8q8uM644cbILcUdpy5L32gr9dUgEFkH5IQ1VFglgLF3PAZNqR2SvonYUuukIlmMFDAFqmFLtkaB3AzIBiv5ZXYuYdluqysVV1g37Fov1TpL+86L+QrPzLSgOfrgZJpYRfxR9abtTnceVUpw6Rfu2Bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759197628; c=relaxed/simple;
-	bh=r2SHYFrcUFIZfSRfIG042SXPAw55FPb1NYT4hakUlZU=;
+	s=arc-20240116; t=1759199417; c=relaxed/simple;
+	bh=Ht1p0FijMGCD0vYj9M7j5kUbf1+ug2GQLDYNV7EWcog=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HNeB9HK3Qo/aXBXuvMc0QeOmHGnwexX8YZk675up1NJ22Ut3tqvbio/et5wIUQNw4W+8YAAidV9E/MtGF4WAAPakUVlmvERyTt25cJ0ueqzGEZpDKbbEQFepi1Dzkwidu9UVmvOi+CU2NHFyiXxAH8ZmU2PpRkC/NBK0/vfbhX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OCNRapFB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A363C4CEF4;
-	Tue, 30 Sep 2025 02:00:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=goZyNaJW7eMxBF9vNFpraxNDKeQT/jFLwG2BsVyB+FgrxdhvUgqftfB4H4kMrP5vJgad0AGVNM/Gpcgcjjan9945VTx7F3RM7mt+TXBnJbSwzHcnCKKkiQOhKECTr8w2XHhas7b06RQrf/6nYhJ4n5+lZMVyNa0kq5SHI1guoaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MdVYcakK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56D27C4CEF5;
+	Tue, 30 Sep 2025 02:30:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759197627;
-	bh=r2SHYFrcUFIZfSRfIG042SXPAw55FPb1NYT4hakUlZU=;
+	s=k20201202; t=1759199416;
+	bh=Ht1p0FijMGCD0vYj9M7j5kUbf1+ug2GQLDYNV7EWcog=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OCNRapFBl9LNEBFYco2lY/ZCai5OeRtqIU+CdV9q7+q/U57RrnWtTQzZe0k5/iLvK
-	 JthHBiZkjxrvpTGoiM9UelfcowEW9vI6xVApYbPVm1fHmWYaSwfIQK5nXP7to+0rIB
-	 CcQA3LmSMKer+ySmMgfeU/TCgbFLMDuGPOKYO+nv9APIoN2yCzGLgkhdFYMxdTp6ux
-	 4RbBBEwNL9FS9Noc3xOFfmlVENgsvDCr1P0lmgI0fH8rUHVAJz6WnRKL+9BGslJizS
-	 8hv8vSmvBN66jGIrrcclYa1aXIbYGeQue/bEWFwuejdp62V6VU3caXCCPeo5hU7PA4
-	 yjz2fLN2wpBlA==
+	b=MdVYcakKr7CluRlh9gRtO5GJVtOKaWs07GpjLugW+gj1JI6I2PFfK3+d0F7/kI7uz
+	 XdlyxQ2S0lkVtBuGNHcqStBEs2ihrzIBdBBWfk2dLucR83CbuL1s28Y7zaSyLYlt7r
+	 XwCtDCLVFiyG66bdhoMiUalfx8F2Q2X9oKO47CCSvbF8rjTduJvoa72+Zs6FN8GVHk
+	 UscyTmvO7Vyc2zgGX6FzJjdmDD2Z7L9kN+DdmFR5qpokpPCMZVmQUjRmk/2bh9RDQi
+	 sfNdZ3B1fCbgARHv8Oc9fAbJ9zY/wK2CEut7gbpNBzbt6BHvGiFSGUfejvhoL3zbkJ
+	 HPL+GLT+YTmsA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3412239D0C1A;
-	Tue, 30 Sep 2025 02:00:22 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEEE39D0C1A;
+	Tue, 30 Sep 2025 02:30:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: stmmac: remove stmmac_hw_setup() excess
- documentation parameter
+Subject: Re: [PATCH net-next v2 0/3] dpll: add phase offset averaging factor
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175919762074.1786573.3483201535680526845.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Sep 2025 02:00:20 +0000
-References: <E1v38Y7-00000008UCQ-3w27@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1v38Y7-00000008UCQ-3w27@rmk-PC.armlinux.org.uk>
-To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- 0x1207@gmail.com, kuba@kernel.org, hayashi.kunihiko@socionext.com,
- linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
- netdev@vger.kernel.org, pabeni@redhat.com, richardcochran@gmail.com
+ <175919940976.1796190.7452350875867616355.git-patchwork-notify@kernel.org>
+Date: Tue, 30 Sep 2025 02:30:09 +0000
+References: <20250927084912.2343597-1-ivecera@redhat.com>
+In-Reply-To: <20250927084912.2343597-1-ivecera@redhat.com>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev,
+ arkadiusz.kubalewski@intel.com, jiri@resnulli.us, corbet@lwn.net,
+ donald.hunter@gmail.com, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ Prathosh.Satish@microchip.com, chuck.lever@oracle.com,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, mschmidt@redhat.com,
+ poros@redhat.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 29 Sep 2025 08:43:55 +0100 you wrote:
-> The kernel build bot reports:
+On Sat, 27 Sep 2025 10:49:09 +0200 you wrote:
+> For some hardware, the phase shift may result from averaging previous values
+> and the newly measured value. In this case, the averaging is controlled by
+> a configurable averaging factor.
 > 
-> Warning: drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:3438 Excess function parameter 'ptp_register' description in 'stmmac_hw_setup'
-> 
-> Fix it.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Fixes: 98d8ea566b85 ("net: stmmac: move timestamping/ptp init to stmmac_hw_setup() caller")
-> Closes: https://lore.kernel.org/oe-kbuild-all/202509290927.svDd6xuw-lkp@intel.com/
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Add new device level attribute phase-offset-avg-factor, appropriate
+> callbacks and implement them in zl3073x driver.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: stmmac: remove stmmac_hw_setup() excess documentation parameter
-    https://git.kernel.org/netdev/net-next/c/6d3728d424a2
+  - [net-next,v2,1/3] dpll: add phase-offset-avg-factor device attribute to netlink spec
+    https://git.kernel.org/netdev/net-next/c/a680581f6a13
+  - [net-next,v2,2/3] dpll: add phase_offset_avg_factor_get/set callback ops
+    https://git.kernel.org/netdev/net-next/c/e28d5a68b651
+  - [net-next,v2,3/3] dpll: zl3073x: Allow to configure phase offset averaging factor
+    https://git.kernel.org/netdev/net-next/c/9363b4837659
 
 You are awesome, thank you!
 -- 
