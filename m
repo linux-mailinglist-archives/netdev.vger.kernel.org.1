@@ -1,126 +1,127 @@
-Return-Path: <netdev+bounces-227302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D1D8BAC1B1
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 10:45:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20B94BAC1B7
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 10:46:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D74333B8DDC
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 08:45:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A4E4189E2F4
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 08:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6AA2F4A15;
-	Tue, 30 Sep 2025 08:45:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D55C2BD034;
+	Tue, 30 Sep 2025 08:46:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RgxLDkOG"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DL2u5X7f"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929E42F49EB
-	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 08:45:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4472853EF
+	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 08:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759221933; cv=none; b=kPzkePRzvWBB3mX/p2dwJpxxkPBYXvIzN2MlpEMWCPrNu/WX0tcVY7Xdue2/BuH7D9L+XIpu/s27ElVcrXT81gKDHpWYO1tm2nodT+cxroEfk0g/s1T0QihEqTsA+AEL5dm/+ZN7mKhx91cb8ZDgLUOfzFn3uOGc2IBAvD/udFU=
+	t=1759222007; cv=none; b=stgM0kpdbm2jmBgSjbn8XyGT+gwFnLnDrhJR8Djy+4N7jSlscOLjmjnoP3RGD/KLau5dUDowJJOxCbnFOPA5A0N4vActVqPXmza+/LCSKL0EaHBXsaogJGJHJleG1DrHwPh0eObJx0Q0tek9r4J4FWsdDIP+6OEoMu8xVYNWk7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759221933; c=relaxed/simple;
-	bh=akTONfhlc6noSXEuTwrjzlpLffmAM+CkZ+vcVOLFT7U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QAdw2U8eTzxWcp8Nek0nL/YXXnaU8enzQo32sqF3KneC/z6lLTS2eE5YmESSFFdV/9XE7iMQ6kuWGD1KctQSoR0Mdz2XuFYW+uiGB2Onk9bq72Yp0N8ouGwqEmfOrPFfhmqbMtVgFv+AkrvVD5NH/uS756icyHAL4V/4aLfaEJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RgxLDkOG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759221929;
+	s=arc-20240116; t=1759222007; c=relaxed/simple;
+	bh=kNodwE8ISdOsR62lgF1hpuhR9iqoNPi98sJfxdnumgM=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=s5V1gUCjB6IBg/N9bAclXrWmBdmILsV9ptALaWo+TFsNTE61nK14153AFnx68sC6MLqn4GxvH8Lq7fN6r6bqCJH88hXwBALeviq+AYkpjshk6QjwNhtM0JMLgGlqaq/SKhqUkb9sfP+rXlGrEG4tOlKwlDIaMt0cj50dZMpLgd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DL2u5X7f; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1759222001;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I0eGafpXn10hIE2BMjDxL8LFlIDcwprmVgIo5sjkkOc=;
-	b=RgxLDkOGzvv3CWnvjMluJuP9yWgUoHiWjoIalke864VdN9x35Qdc6CaF9CdYWotiNnW/ZZ
-	hcx0zFXqXuJKWdliIN6o54AMgBDRdso2wObBaYaRxuruuAFk8yLQn0ghW2ZaEDGqMikI1f
-	MDI4t57z0NmXkXxlVKzUYj6ILHN81Rs=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-384-Fkc0qT7qOQG2pWN6qS6z2g-1; Tue, 30 Sep 2025 04:45:28 -0400
-X-MC-Unique: Fkc0qT7qOQG2pWN6qS6z2g-1
-X-Mimecast-MFC-AGG-ID: Fkc0qT7qOQG2pWN6qS6z2g_1759221927
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-46e407c600eso23414855e9.3
-        for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 01:45:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759221927; x=1759826727;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I0eGafpXn10hIE2BMjDxL8LFlIDcwprmVgIo5sjkkOc=;
-        b=wcHxD/B7pObUww4IFuSAqlv/ZenTY4yptGLx8qAEGeZLMlT3+8iIMFNZmIUcRIZNxg
-         sV1rEhMi1xQSJHhXKoC1BgtJUDdnI8/AptVdt9JzImXLsWvb5WGKoNPLJsnzKjggMLq5
-         +kGqvm3A7jsCrfm9NbZwzWfuQwiC8TIddPA0DqCCHQi8EVKFm5R+xb/zrwFOrwhh4wuu
-         5sZ50Ctas0A/7XhryF7Zp0PbpGqBF8Ke9PkPmUTUHOkYC42JKedG3t0NFUs/F4uq/FPj
-         VR/dC+aMXZ2rZbw4H+1YmKEY9pumQEGQO1RrjFbZtcaYvekN3DXtVpXSBIhjBSYf5tRD
-         6hGw==
-X-Gm-Message-State: AOJu0YyBwxU8Vw3uIKxUMtAgmyesv/UN91WJ5WLJU1It4LogsxgJesFp
-	OtUBodHceho+cqsL2Ks9QbGBA9JvdiQpSwqGwFhBjbTjkXo9e1g870+PUHpNh+PfH2mAFKHUtgV
-	URb651R0Sx7MN2ATauG+xDRmZGls35llO/O0QRDY69hCrB6f7juXu9jbh5Q==
-X-Gm-Gg: ASbGncso0vfE9YeLt5QBSznDTXAJ5k3fQVPltPCgG8q1V4HNSTKxl8TxUu1+cpvPRKc
-	SG/WFwhR9p5vgH6y+qLgI9NbiQD2tU5VFjdzoDELd/3Z7LpWMG8+evh7Xl17+oD6y1yVFDAyPpO
-	jFMx8Si8byXtH9MkfHHkHXxRv7R1amd0cxV7FvAHIdi0DWOEdchESyAAV55v56QSPEBT+M84502
-	+Met4mEEnRlaVjaZgAJWxdP/9XkemwmtQ/jrKCH4/g9Lm76Ga/EWaK2qW+FWq67fmpXwXvPIvBC
-	RDv/bzsnRUXFsWQgGAF1kSKAPJ53ukxdRuEHbB28Jvi6z4/OL8zCKHZMBwpkbntk7U1l2Jc+cYF
-	WxZGMykI8YZ+JQcjiGg==
-X-Received: by 2002:a05:6000:288a:b0:3ea:c893:95c6 with SMTP id ffacd0b85a97d-40e43b08daemr16176953f8f.18.1759221926874;
-        Tue, 30 Sep 2025 01:45:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGRKeCg7YnGTHgNrPoON/pDG0wzo+V+MgKB/0TsB17QowrUPCybnWt3H7zBthCuTUQFXwPeXQ==
-X-Received: by 2002:a05:6000:288a:b0:3ea:c893:95c6 with SMTP id ffacd0b85a97d-40e43b08daemr16176925f8f.18.1759221926486;
-        Tue, 30 Sep 2025 01:45:26 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc7e2bf35sm21915958f8f.53.2025.09.30.01.45.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Sep 2025 01:45:25 -0700 (PDT)
-Message-ID: <54234daf-ace1-4369-baea-eab94fcea74b@redhat.com>
-Date: Tue, 30 Sep 2025 10:45:24 +0200
+	 to:to:cc:cc; bh=j5AcYdvJFrn+nCGCLPaED2CyHb1mgyd2csHm8RlZh3k=;
+	b=DL2u5X7f0y2WjRKJPPtgDwkXH3jygPQkflOzbURaKgaKj+y704/p8VoNAgc2LZno+nSEJZ
+	Uka6vYFxpcUVDYhyAFbh9v9mcDtHhk35DBWA6DLNVmqUjLYgOoxNkFpkqhIf7tOcpGMP7g
+	wq6krYDC91EkcpgXsTmsnm6ix8Jb/K4=
+From: Zqiang <qiang.zhang@linux.dev>
+To: kuba@kernel.org,
+	horms@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com
+Cc: qiang.zhang@linux.dev,
+	netdev@vger.kernel.org
+Subject: [PATCH] usbnet: Fix using smp_processor_id() in preemptible code warnings
+Date: Tue, 30 Sep 2025 16:46:36 +0800
+Message-Id: <20250930084636.5835-1-qiang.zhang@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] atm: Fix the cleanup on alloc_mpc failure in
- atm_mpoa_mpoad_attach
-To: Deepak Sharma <deepak.sharma.472935@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, horms@kernel.org, pwn9uin@gmail.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com,
- skhan@linuxfoundation.org,
- syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com,
- syzbot+07b635b9c111c566af8b@syzkaller.appspotmail.com
-References: <20250925204251.232473-1-deepak.sharma.472935@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250925204251.232473-1-deepak.sharma.472935@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 9/25/25 10:42 PM, Deepak Sharma wrote:
-> diff --git a/net/atm/mpc.c b/net/atm/mpc.c
-> index f6b447bba329..4f67ad1d6bef 100644
-> --- a/net/atm/mpc.c
-> +++ b/net/atm/mpc.c
-> @@ -804,7 +804,7 @@ static int atm_mpoa_mpoad_attach(struct atm_vcc *vcc, int arg)
->  		/* This lets us now how our LECs are doing */
->  		err = register_netdevice_notifier(&mpoa_notifier);
->  		if (err < 0) {
-> -			timer_delete(&mpc_timer);
-> +			timer_delete_sync(&mpc_timer);
+Syzbot reported the following warning:
 
-AFAICS the mpc_timer can rearm itself, so this the above is not enough
-and you should use timer_shutdown_sync() instead.
+BUG: using smp_processor_id() in preemptible [00000000] code: dhcpcd/2879
+caller is usbnet_skb_return+0x74/0x490 drivers/net/usb/usbnet.c:331
+CPU: 1 UID: 0 PID: 2879 Comm: dhcpcd Not tainted 6.15.0-rc4-syzkaller-00098-g615dca38c2ea #0 PREEMPT(voluntary)
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:120
+ check_preemption_disabled+0xd0/0xe0 lib/smp_processor_id.c:49
+ usbnet_skb_return+0x74/0x490 drivers/net/usb/usbnet.c:331
+ usbnet_resume_rx+0x4b/0x170 drivers/net/usb/usbnet.c:708
+ usbnet_change_mtu+0x1be/0x220 drivers/net/usb/usbnet.c:417
+ __dev_set_mtu net/core/dev.c:9443 [inline]
+ netif_set_mtu_ext+0x369/0x5c0 net/core/dev.c:9496
+ netif_set_mtu+0xb0/0x160 net/core/dev.c:9520
+ dev_set_mtu+0xae/0x170 net/core/dev_api.c:247
+ dev_ifsioc+0xa31/0x18d0 net/core/dev_ioctl.c:572
+ dev_ioctl+0x223/0x10e0 net/core/dev_ioctl.c:821
+ sock_do_ioctl+0x19d/0x280 net/socket.c:1204
+ sock_ioctl+0x42f/0x6a0 net/socket.c:1311
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl fs/ioctl.c:892 [inline]
+ __x64_sys_ioctl+0x190/0x200 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Thanks,
+The usbnet_skb_return() can be invoked in preemptible task-context,
+this commit therefore use get_cpu_ptr/put_cpu_ptr() instead of
+this_cpu_ptr() to get stats64 pointer.
 
-Paolo
+Fixes: 43daa96b166c ("usbnet: Stop RX Q on MTU change")
+Link: https://lore.kernel.org/all/681607f0.a70a0220.254cdc.001a.GAE@google.com/T/
+Signed-off-by: Zqiang <qiang.zhang@linux.dev>
+---
+ drivers/net/usb/usbnet.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index 511c4154cf74..89f79a0bdc43 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -328,7 +328,7 @@ static void __usbnet_status_stop_force(struct usbnet *dev)
+  */
+ void usbnet_skb_return (struct usbnet *dev, struct sk_buff *skb)
+ {
+-	struct pcpu_sw_netstats *stats64 = this_cpu_ptr(dev->net->tstats);
++	struct pcpu_sw_netstats *stats64;
+ 	unsigned long flags;
+ 	int	status;
+ 
+@@ -341,10 +341,12 @@ void usbnet_skb_return (struct usbnet *dev, struct sk_buff *skb)
+ 	if (skb->protocol == 0)
+ 		skb->protocol = eth_type_trans (skb, dev->net);
+ 
++	stats64 = get_cpu_ptr(dev->net->tstats);
+ 	flags = u64_stats_update_begin_irqsave(&stats64->syncp);
+ 	u64_stats_inc(&stats64->rx_packets);
+ 	u64_stats_add(&stats64->rx_bytes, skb->len);
+ 	u64_stats_update_end_irqrestore(&stats64->syncp, flags);
++	put_cpu_ptr(stats64);
+ 
+ 	netif_dbg(dev, rx_status, dev->net, "< rx, len %zu, type 0x%x\n",
+ 		  skb->len + sizeof (struct ethhdr), skb->protocol);
+-- 
+2.17.1
 
 
