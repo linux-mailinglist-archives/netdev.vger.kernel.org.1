@@ -1,186 +1,125 @@
-Return-Path: <netdev+bounces-227320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19AF0BAC5C6
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 11:47:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87D52BAC609
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 11:57:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E7471927612
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 09:47:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 053E4167B48
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 09:57:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C4CF2F5485;
-	Tue, 30 Sep 2025 09:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E70DE2F7AB1;
+	Tue, 30 Sep 2025 09:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lBXDFWtl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vv2wVNJN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E8A23C4FA
-	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 09:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230752F5337
+	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 09:57:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759225640; cv=none; b=Qq3dmm/5mbfq5CMkYvoeDUTADStooVsHUl7zw5rqIflkt5CamlRkIJIX0oFykqOHQt5cKT7CCPtNEGbaKI5k+jjmLv895kMLPNJ1/jD70IV7wZ2++zby/Fl8SI4J8a/6BlTibTvDuKWr4iQCiHb7vkw/j7lBOehyCt44kHoB1e0=
+	t=1759226235; cv=none; b=OsJt9K0yfo3BbPnqzdAs1PbeyCjFkv4tHUQns7C6xAJAUD9M+ufq+L8TDIi/ASBs/Uapvbll/5uuP00EZg/x7m0ArNU6MUb+0oT5eLnRP9jbOmReyENmFiPh7p4WHh4rIL2gJeYTJMgteqAnTaqWVXqmBvx8HaSYpktfOlvPYwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759225640; c=relaxed/simple;
-	bh=R5eUE/k7fr9cPxgmyCPHZN28u/hmGz9eGDjEvMGrQ/M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cOA4Lrw/GpbzUMVsIS0it/g+nm6t8tjzMieFqP5W28a+Uxv0hUfiwpGqEpRUVB97A8d1zOuG+Gqm08JtSoKciTqS8aJ2kRlR0AOfOEHkuJz5LXj2dPV4pj1wSM8yRrVJELpOBRVInZBL5UrrM7aofQZxKp0d/VMeX9iFw/ft5ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lBXDFWtl; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b3d196b7eeeso431373466b.0
-        for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 02:47:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759225635; x=1759830435; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PECcxxgPrslWjdZF9hdrPJ/fNitPu9//arKK4RLmCMk=;
-        b=lBXDFWtl0SxDVRlNV0oUs5xYYDnrTRoxwGRi+j/gKn9CVI/GoOp4xyeX2HhlbFpXI/
-         805LkdqYeGdZS03sl6pdUAfiOBaTznDQvjx10IrnB+MY0v/rMdMz7WFMngZJDwd5hrUP
-         MIdbb6dtbvudk6sWUEEUIMBGAlsXuhR6tVophqRMd8NUKEPK7dS3/5yPflw6fKLo2Lhe
-         DaDQFX9xhPvvMotCtmye/4jsG+5YecE3gDaIslKxLadWjuNk2OsyqiVnob+7J1ogyTTP
-         GZXMGVJwWLa+QgWeLNkw+5oXN7iZxeWEud2pTMNWBkPQaH73v+E+gH/XGg8cGHyRSdfx
-         sFcA==
+	s=arc-20240116; t=1759226235; c=relaxed/simple;
+	bh=Iby0dCV1k5FoMaSlf23PqKFSrLsu46FnHbptNvkg3QU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=um6oEgGwdwPrHaujCoicZKdzXfvDugPr2SzHANbQbmjId33hDn+4BCnTWMZ72szI6pg5eIngj3U6Ot3YePvLFsZzDDpDCTRA9uUoIH3n6QylGN+ErGt4EszmL/QN006Rd6DlYyUOEXfU4AsWokGT6hUjn/L9GsUnMYDkh5NKKr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vv2wVNJN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759226233;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=srAu9efQeLkOrSNZBhuxJ9qVZjhUw1Qf2FT+xE0jzg8=;
+	b=Vv2wVNJN973bhc28s50aMJBdMfeCsCLRnJ0VMRKZLV+l99P6q0f0xf/SXy3O9a8O6nA6mS
+	Ttms9zIgj9wuW44h6fCPc1aiG9Ph1eUunQOAfSADUd2b/w8HBUcYHdcbJmrkF7dvDmPxqK
+	8p9AcjSC5FeXbgtrHmzeWcnkDSUdmJI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-256-Lx18fENoPeygAxhOQiF-DA-1; Tue, 30 Sep 2025 05:57:11 -0400
+X-MC-Unique: Lx18fENoPeygAxhOQiF-DA-1
+X-Mimecast-MFC-AGG-ID: Lx18fENoPeygAxhOQiF-DA_1759226230
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-401dbafbcfaso3911441f8f.1
+        for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 02:57:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759225635; x=1759830435;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PECcxxgPrslWjdZF9hdrPJ/fNitPu9//arKK4RLmCMk=;
-        b=fznpv24P6p+i256ikdc1d1uLHk9JtBivJrsYtlWdHG6JI5Dj3AMAP/UjTmAFeRMIkl
-         bqtb0WhRf9DBwr2pK+i2my8VNnKLad9RBcDciAXkP9Di8WSzNChtYMMpSZV3sWWZmLHO
-         aaExwaJ9LK4fNhegFyQf6yZNW6atrcZonIJVLCU4B3kdXi7WbzAyuhdn1U+gESub7O82
-         iKpQlrQbhQuBiJAPpCXRKmEa5eVyc4ThHNVC7FYX//QONV1Z3iQZKxaAz3W+vUkMmZHd
-         aEY28luE1eZB8zO07aVZeWzSQb8XfivwJYrHAdautTYrH2WG8yScqt+JT5GMJ0T/m0Cw
-         r+fQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUc30l1SxvhxgjR831IZnM2DIEWB+itIOeLjz1dBgqCh/zB+BQe10QebrxSvz49ZDnqpHZmifY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyWPo664TFol4x/Bxx9EzCUFmSc8uI9NlHHyA+7n1cnw8uFrOk
-	9CVsSzkIejxkaT10Bi37fJYQFRaaZdzrQ/qzdvCjBrPXyy1flisHChfC0I0sStNt1Dh9ivinm9a
-	wIVDJ74XgiAG1WEl6klsbPFAcskOTys0=
-X-Gm-Gg: ASbGncs3n3nxGco8BBcfWVva7u+OWRukmUkbIl0H85jsqR/wVCkxYSdA4p/KqXiwOYd
-	w1LgqqRt2cbZhz/HqGA3EurB95UNjsX8HYOl5KVl/Mc2XOddGyjF/ng09gNWePjYsP3teVxdvfl
-	aNyqdJkQQayl4dRDJEDvj7jFOtUZNreS3ve+ivR/2Od0AxVwoxQ0/tRijcesL26DYYBKSKnQlaJ
-	8yjJg4QdWcTIYko1pHBSw7pN8Alo4CaNgVLvogc1N69UFl/PzdwUPX46CI33xk=
-X-Google-Smtp-Source: AGHT+IHgrTWmNMFFHnfd0lj5oNhgsomsQpL15DJSD0/eU20JCLwROv8mnCSGOX61iu8gWXio0owIt1z4w1bbdeC1XZM=
-X-Received: by 2002:a17:906:730c:b0:b41:27ca:6701 with SMTP id
- a640c23a62f3a-b4127d9aeccmr487703866b.24.1759225635179; Tue, 30 Sep 2025
- 02:47:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759226229; x=1759831029;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=srAu9efQeLkOrSNZBhuxJ9qVZjhUw1Qf2FT+xE0jzg8=;
+        b=YRITRvinMhSqAtT3yv9Gy+JZVxdpZZUVSMlpWKfGLypEiqEZdIqOIX8LYKTsZWM6Gl
+         mYdQqL7/Vh2msdH6RnAvBJi40sbihlYIMOee68Nhrn2ks5tFfQuaA9RP/tfHwL8Lqh7E
+         PkkFU1H1Ipp9dXkpPb7hd8WFE02jyzxj1IktuAj4QEs+Hb8Yru4bI0LyXUDc15saO7SM
+         Pt0xpci8g/45kwWgjXgbvtfwSX9db9VLaJp+nAxOZhVNkwn8aEkMwYsjS5dcVEdKN/WI
+         Bu8mp2QbchaGE5xfdgefqaOOwM1c9C/qKxR4RtBIrK4or6qwG6NOdy8ta1O6kvDtV/+1
+         TxKA==
+X-Forwarded-Encrypted: i=1; AJvYcCWPFkbW6nm5RSGeiqWPINyouCbuvXk2W1qbZRV/y6vrR1NCnFR8Npg7Yd38ZrxxHZNrP3ykThk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLavue1EpXngLFTypPkkbtus1FQWv19kQPImCWA3NxPR6kpgqr
+	pl4/CS1knTkUSpbCEGEHp5/wwhAXZcPYxoHrPgJfY+fsEFqOXjZui2DdLXxu7HFlpvTjEn/9y4z
+	g8kDmDijyO6Bpy0OTdbZa+hYY5hWppTYWjlllbJnwD89YuXodnGUPfhvH+g==
+X-Gm-Gg: ASbGncuJEHZ3QeJ25FE+6MDEbO425FOSmoiLmDiAIZvJda+BeJ5eMeVigPlDuJfww66
+	+rrbnBHRJ5zZo5VyVDTZcYLAHY0sX6b6biMRmYBL5jicRjayT+wcFBnc9joBzyalLQ+ggOvho+z
+	cEdgIgQkFCIeeLsykcqu0EbpGIVjj4Q19CSOHnf4THBlYWH36wOJ18hqwUjm55wEkkdqSBs1vX4
+	vdPOpPxZhLBUAyyeab9Rv9N9S0STCny+FiQJSW1K6NapHVXulIZCdZ/TrplmJkcA10pgKbr61wI
+	uig1hfELiCXgCA3ARSsrqP04UzbBLVigftv6NrNYgFBpwjqW9PF8+JVD4z+7o2TJBRlfXjVlSIE
+	tMSggOwNsx+gJ6xKaHQ==
+X-Received: by 2002:adf:eb8f:0:b0:3e2:4a3e:d3e5 with SMTP id ffacd0b85a97d-41358755409mr11327877f8f.22.1759226229579;
+        Tue, 30 Sep 2025 02:57:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHRvdEuxPGd1K1hL6v0AssJUCVO28oQVmR6eHnpL1I8WvLYCEWr5PTILGebhv46wh47Za/SKg==
+X-Received: by 2002:adf:eb8f:0:b0:3e2:4a3e:d3e5 with SMTP id ffacd0b85a97d-41358755409mr11327863f8f.22.1759226229159;
+        Tue, 30 Sep 2025 02:57:09 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb8811946sm21856303f8f.18.2025.09.30.02.57.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Sep 2025 02:57:08 -0700 (PDT)
+Message-ID: <65e53548-2d68-464a-87bd-909f360cdb1c@redhat.com>
+Date: Tue, 30 Sep 2025 11:57:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250929211241.55701-2-sidharthseela@gmail.com> <aNueLn3Wy-2X_GeE@horms.kernel.org>
-In-Reply-To: <aNueLn3Wy-2X_GeE@horms.kernel.org>
-From: Sidharth Seela <sidharthseela@gmail.com>
-Date: Tue, 30 Sep 2025 15:17:02 +0530
-X-Gm-Features: AS18NWCrQTE6adq-xMOBGkCFzYdqRGqDir_x8mhokUn4KGXncQ46nLQvKyPQ23k
-Message-ID: <CAJE-K+AeEYkAN8wX3FbBCbQMGTDsueA-YiC4w_qi+TZgUzkS-w@mail.gmail.com>
-Subject: Re: [PATCH net v3] selftest:net: Fix uninit return values
-To: Simon Horman <horms@kernel.org>
-Cc: antonio@openvpn.net, sd@queasysnail.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, 
-	willemdebruijn.kernel@gmail.com, kernelxing@tencent.com, nathan@kernel.org, 
-	nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: wan: hd64572: validate RX length before skb
+ allocation and copy
+To: Guangshuo Li <lgs201920130244@gmail.com>, Krzysztof Halasa
+ <khc@pm.waw.pl>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: stable@vger.kernel.org
+References: <20250926104941.1990062-1-lgs201920130244@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250926104941.1990062-1-lgs201920130244@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 30, 2025 at 2:39=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
-te:
-> Hi,
->
-> I don't want to block progress.
-> But there are some format problems with the commit message.
->
-> Locally, git truncates the commit message at the line above ('--').
-> Which, omits a lot of useful information.
-> Most critically your Signed-off-by line.
->
-> There is also another '--' below. Just above the fixes tag.
-> Which would cause a similar problem.
->
-> And the v2/v3 information should go below the scissors ('---'),
-> below your signed-off by line.
->
-> Maybe the maintainers can fix this when applying,
-> given how close we are to the pull for v6.18-rc1.
-> And that I believe there has already been some
-> discussion of this patch with the maintainers.
->
-> > ovpn-cli.c:1587:6: warning: variable 'ret' is used uninitialized whenev=
-er 'if' condition is true [-Wsometimes-uninitialized]
-> >  1587 |         if (!sock) {
-> >       |             ^~~~~
-> > ovpn-cli.c:1635:9: note: uninitialized use occurs here
-> >  1635 |         return ret;
-> >       |                ^~~
-> > ovpn-cli.c:1587:2: note: remove the 'if' if its condition is always fal=
-se
-> >  1587 |         if (!sock) {
-> >       |         ^~~~~~~~~~~~
-> >  1588 |                 fprintf(stderr, "cannot allocate netlink socket=
-\n");
-> >       |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~
-> >  1589 |                 goto err_free;
-> >       |                 ~~~~~~~~~~~~~~
-> >  1590 |         }
-> >       |         ~
-> > ovpn-cli.c:1584:15: note: initialize the variable 'ret' to silence this=
- warning
-> >  1584 |         int mcid, ret;
-> >       |                      ^
-> >       |                       =3D 0
-> > ovpn-cli.c:2107:7: warning: variable 'ret' is used uninitialized whenev=
-er switch case is taken [-Wsometimes-uninitialized]
-> >  2107 |         case CMD_INVALID:
-> >       |              ^~~~~~~~~~~
-> > ovpn-cli.c:2111:9: note: uninitialized use occurs here
-> >  2111 |         return ret;
-> >       |                ^~~
-> > ovpn-cli.c:1939:12: note: initialize the variable 'ret' to silence this=
- warning
-> >  1939 |         int n, ret;
-> >       |                   ^
-> >       |
-> > --
-> > Fixes: 959bc330a439 ("testing/selftests: add test tool and scripts for =
-ovpn module")
-> > ovpn module")
-> >
-> > v3:
-> >       - Use prefix net.
-> >       - Remove so_txtime fix as default case calls error().
-> >       - Changelog before sign-off.
-> >       - Three dashes after sign-off
-> >
-> > v2:
-> >       - Use subsystem name "net".
-> >       - Add fixes tags.
-> >       - Remove txtimestamp fix as default case calls error.
-> >       - Assign constant error string instead of NULL.
-> >
-> > Signed-off-by: Sidharth Seela <sidharthseela@gmail.com>
-> > ---
-> >
->
-> This is where the v2/v3 information should go.
->
-> ...
 
-Thankyou Simon, I didn't know that double hyphen would cause
-an issue. Although I need a logical separator between commit message
-and warning log, may I ask what could be used instead?
 
---=20
+On 9/26/25 12:49 PM, Guangshuo Li wrote:
+> The driver trusts the RX descriptor length and uses it directly for
+> dev_alloc_skb(), memcpy_fromio(), and skb_put() without any bounds
+> checking. If the descriptor gets corrupted or otherwise contains an
+> invalid value, 
+
+Why/how? Is the H/W known to corrupt the descriptors? If so please point
+that out in the commit message.
+Otherwise, if this is intended to protect vs generic memory corruption
+inside the kernel caused by S/W bug, please look for such corruption
+root cause instead.
+
 Thanks,
-Sidharth Seela
-www.realtimedesign.org
+
+Paolo
+
 
