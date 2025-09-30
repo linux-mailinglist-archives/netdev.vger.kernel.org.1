@@ -1,118 +1,141 @@
-Return-Path: <netdev+bounces-227279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 078BDBABA61
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 08:18:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8242BABBFC
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 09:07:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA5863B78B7
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 06:18:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9D163201F6
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 07:06:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956A528489F;
-	Tue, 30 Sep 2025 06:18:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741B12C0281;
+	Tue, 30 Sep 2025 07:05:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mboxify.com header.i=@mboxify.com header.b="RiEAj8n1"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="pBiRx12f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-108-mta19.mxroute.com (mail-108-mta19.mxroute.com [136.175.108.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184022820AC
-	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 06:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.175.108.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82AFE2BE029;
+	Tue, 30 Sep 2025 07:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759213104; cv=none; b=RZYL2HxO/iX+XamwiRXQtzI9clWjBpXAWrc7eG5pI5UxfWk/nO8piNHpZh+mIcEHdmc21jK/EBpwX/z1+82Zh1OwHNgEvsci2cxlK2++wvBDufEY+y4vycjZZoANPNLI8/ZzUQJUOE04x2VLB0OmrIO3lArddHtwkyordP0Xgm8=
+	t=1759215924; cv=none; b=EHQoGFEZgO4jZf0JkNRvdkEM1rjjUS8aE/jYiz728SwH+gthE4Zs0UOsu/wXKyF4GbVwSNhJI6UPM4Vdz+wFE2l2UXTK+XUT2vW1+P23Qym/eSIuSYIR3zW++LxlbaX2ojE/kAVkVmTI7NdFh9l6PBj0K6P/q4jl9OvkV4B0qeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759213104; c=relaxed/simple;
-	bh=iTIyUmMwogLjx6J4uwkS7qq4zRHdgk+CzEH6UASouPQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YlN4tYbNKzEzMjSWc2pKoj70iPyu3TO7ri8j3pwvudRHmdl0vdOWsQWPD3uT7mMGz2NLnpA3cW21iNTpA98Ya4X9inkJNLOlnwNi/EQO0GBKjF+Pc6NOiFz6iyX5eXz0JEqSNtE97QGXnJzhZr+OV5xcBhQ0we5igjFdKlDRZ3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mboxify.com; spf=pass smtp.mailfrom=mboxify.com; dkim=pass (2048-bit key) header.d=mboxify.com header.i=@mboxify.com header.b=RiEAj8n1; arc=none smtp.client-ip=136.175.108.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mboxify.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mboxify.com
-Received: from filter006.mxroute.com ([136.175.111.3] filter006.mxroute.com)
- (Authenticated sender: mN4UYu2MZsgR)
- by mail-108-mta19.mxroute.com (ZoneMTA) with ESMTPSA id 1999940e3ea000c244.00e
- for <netdev@vger.kernel.org>
- (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
- Tue, 30 Sep 2025 06:13:10 +0000
-X-Zone-Loop: 5bb3f2edcf459a966dd156098927f8f999c75ab2ab56
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mboxify.com
-	; s=x; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Date:
-	Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=XE4oTWPSDq1xZF1cjbUhrR4nwFe0BvbSHj5iVns/uvg=; b=RiEAj8n1yc5j7h6W3MR5smM7Ug
-	jix76IubG7NWB+ocwsyH5SL3KoRAA0wlK0JVAYJ0zBVzRWchhbynVaYFhGErvQN53ybtAlqRtfnGV
-	84xT5OWYAyHSVw7qDSJbYkVkpbw6YkrCjXFkMMnS4h6r7YgG/WBc6Hca+0eViNnxTJW2gTlzGiXsC
-	6LMYIxJSPGsfMmyfElWesBqfttfob4Q8069RGe3ojNicbjZjScvEyPmKwbvAp9zClxSRr3pmGYwlS
-	g8yNJn8IrUcAVthekmSJSs7JPnIJbB4mZ/PmWDJQT+G4T7hSsKP+HIY4Nussi45nnMqpnq/Ylt4dd
-	qN933lSg==;
-From: Bo Sun <bo@mboxify.com>
-To: sgoutham@marvell.com,
-	gakula@marvell.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: sbhatta@marvell.com,
-	hkelam@marvell.com,
-	horms@kernel.org,
-	bbhushan2@marvell.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	sumang@marvell.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bo Sun <bo@mboxify.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net v2 2/2] octeontx2-pf: fix bitmap leak
-Date: Tue, 30 Sep 2025 14:12:36 +0800
-Message-ID: <20250930061236.31359-3-bo@mboxify.com>
-In-Reply-To: <20250930061236.31359-1-bo@mboxify.com>
-References: <20250930061236.31359-1-bo@mboxify.com>
+	s=arc-20240116; t=1759215924; c=relaxed/simple;
+	bh=RVWIeUkqMhG5Kuuus/6/Lb4aIRpKpAT0yru+IaDq92o=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jX/ls/C+qwenQLaLFwKLZCxkIDk2crODayWnJhH/0ZkVgt5mXR846R1Ak0jdxQUR9rRSs7lVBcRakLzhPITtzmkGnmzXADgopqUuUrUapsup7UwQGqyvKjyCDFA8OV0Jb70YHYEUEz1phS+iccTp4nnbM5SFoVX1WDfe2fGmhYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=pBiRx12f; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1759215922; x=1790751922;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=RVWIeUkqMhG5Kuuus/6/Lb4aIRpKpAT0yru+IaDq92o=;
+  b=pBiRx12f33Vvsr1N3HEwfEaXnCfNBARF+j+9NOexpsxa3swBNrLtLgOp
+   4UxFnS3UpbrjW6ln4HFIzmR52MAUZA+5pXKmwFYSz3P94XBzaEhOzMBec
+   UvAZswwwpupdKZiMpRWwSTjGZ2PFWBvLh0lYsi68HG+6yc3vp4Xxtymoo
+   UsLCn9VHKqclupGZa/UwvMj2chyEMxDBaVnWi/8y3n7j4qwDA/FOa9TFQ
+   W3lmx44iAPsUE23YuJ9AEBfvxC8c5MTGxHobmnj1sohFcyaV1moZf+pkL
+   doPIQd4OoEey0mwis/97x9svfNI6/Ze6D+UKjHwHgHxR3EuV/OANj+HhY
+   w==;
+X-CSE-ConnectionGUID: 5WG/H9VdR6ySuaTWDfYMLA==
+X-CSE-MsgGUID: nnjcQvgfSz2wbCL28bXkBg==
+X-IronPort-AV: E=Sophos;i="6.18,303,1751266800"; 
+   d="scan'208";a="47665541"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Sep 2025 00:05:21 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Tue, 30 Sep 2025 00:04:40 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Tue, 30 Sep 2025 00:04:40 -0700
+Date: Tue, 30 Sep 2025 09:03:59 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <vladimir.oltean@nxp.com>,
+	<vadim.fedorenko@linux.dev>, <rosenp@gmail.com>,
+	<christophe.jaillet@wanadoo.fr>, <steen.hegelund@microchip.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v3 2/2] phy: mscc: Fix PTP for VSC8574 and VSC8572
+Message-ID: <20250930070359.sjeqsgluwyt23ry2@DEN-DL-M31836.microchip.com>
+References: <20250929091302.106116-1-horatiu.vultur@microchip.com>
+ <20250929091302.106116-3-horatiu.vultur@microchip.com>
+ <aNqKuzlxWwcANiK7@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Id: bo@mboxify.com
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <aNqKuzlxWwcANiK7@shell.armlinux.org.uk>
 
-The bitmap allocated with bitmap_zalloc() in otx2_probe() was not
-released in otx2_remove(). Unbinding and rebinding the driver therefore
-triggers a kmemleak warning:
+The 09/29/2025 14:33, Russell King (Oracle) wrote:
 
-    unreferenced object (size 8):
-      backtrace:
-        bitmap_zalloc
-        otx2_probe
+Hi Russell,
 
-Call bitmap_free() in the remove path to fix the leak.
+> 
+> On Mon, Sep 29, 2025 at 11:13:02AM +0200, Horatiu Vultur wrote:
+> > The PTP initialization is two-step. First part are the function
+> > vsc8584_ptp_probe_once() and vsc8584_ptp_probe() at probe time which
+> > initialize the locks, queues, creates the PTP device. The second part is
+> > the function vsc8584_ptp_init() at config_init() time which initialize
+> > PTP in the HW.
+> 
+> So, to summarise, you register the PTP clock at probe time? At that
+> point, you get a /dev/ptp* device. Is that device functional without
+> the config_init() initialisation?
 
-Fixes: efabce290151 ("octeontx2-pf: AF_XDP zero copy receive support")
-Cc: stable@vger.kernel.org
+That is correct. I register the PTP clock at probe time.
+It is not fully functional, for example calling "phc_ctl /dev/ptp0 get", I
+always get "clock time is 0.000000000 or Thu Jan  1 00:00:00 1970"
 
-Signed-off-by: Bo Sun <bo@mboxify.com>
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 1 +
- 1 file changed, 1 insertion(+)
+# phc_ctl /dev/ptp0 get
+phc_ctl[414.412]: clock time is 0.000000000 or Thu Jan  1 00:00:00 1970
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index 5027fae0aa77..e808995703cf 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -3542,6 +3542,7 @@ static void otx2_remove(struct pci_dev *pdev)
- 	otx2_disable_mbox_intr(pf);
- 	otx2_pfaf_mbox_destroy(pf);
- 	pci_free_irq_vectors(pf->pdev);
-+	bitmap_free(pf->af_xdp_zc_qidx);
- 	pci_set_drvdata(pdev, NULL);
- 	free_netdev(netdev);
- }
+# phc_ctl /dev/ptp0 get
+phc_ctl[418.453]: clock time is 0.000000000 or Thu Jan  1 00:00:00 1970
+
+Then after setting up, I can see the time increasing:
+
+# phc_ctl /dev/ptp0 get
+phc_ctl[511.841]: clock time is 2.232610928 or Thu Jan  1 00:00:02 1970
+
+# phc_ctl /dev/ptp0 get
+phc_ctl[515.113]: clock time is 5.504853240 or Thu Jan  1 00:00:05 1970
+
+> 
+> I would hope it is, because one of the fundamental concepts in kernel
+> programming is... don't publish devices to userspace that are not
+> completely ready for operation.
+> 
+> Conversely, don't tear down a published device without first
+> unpublishing it from userspace.
+
+Thanks for reminding me about this. Unfortunately, the same behaviour is for
+all the devices that this driver is covering. So, then maybe I would
+need to create a patch in the future to change this to have the correct
+behaviour.
+
+> 
+> Thanks.
+> 
+> --
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
 -- 
-2.50.1 (Apple Git-155)
-
+/Horatiu
 
