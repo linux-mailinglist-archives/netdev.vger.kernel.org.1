@@ -1,94 +1,72 @@
-Return-Path: <netdev+bounces-227379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584ECBADF93
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 17:50:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85A20BAE305
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 19:31:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5C6B188F018
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 15:50:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4670916E06F
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 17:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CBD03081B2;
-	Tue, 30 Sep 2025 15:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 115C31F5434;
+	Tue, 30 Sep 2025 17:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hdu5JwgL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MJjW2OaF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B512032D;
-	Tue, 30 Sep 2025 15:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CD2381BA
+	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 17:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759247415; cv=none; b=dsYjcVatawVcAF5YLQVIz6PEu49xeln2R5iRA3a2EWf3YgSWFuqJKh2RUAmbSiNALP27G316YdPOR+mRzrAUpPdIwUIC4YpA4lBQI2y0ar563enKCEf3Q4g8pM493mkK7dBPeCcvom67KAKHCRRpdNMnAPWbvzDvXV7QdOrsHlo=
+	t=1759253422; cv=none; b=dId8hvj1tcSr6oH28wVSo/D9M3BcRkanPpfBkpzEZqfBXF2bHKW+ggAADFK4wGnXDcQZeK2LUEmiu1AieOXZyBxmMuLJmD8JRO9ymvfhlpiQU9+S5lUhfqzMxM+HHSTsyvlrt6iX3hfrgZe8+t4C2CKxh6A3HgIZu8vZqDX8lXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759247415; c=relaxed/simple;
-	bh=ODDGAeANZJXMXsw5dIQyCYdhwt8Qovd/AateS2IGK/0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cXAjEzZt5CvUq4luOVOnXJo3xIpQNvgFY5GjlETo2xJOg4SjhRj8ijLiilscNQeIXvXONqlNUSO4G/9gyre4x2VAUV3sVQqVKCbbyK8OrUSOkCA8Qb+F9tJ0BfVnlvSibR2cUpsnsVUjs5GImJTSV7++1KsDIdobWExToJF1yDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hdu5JwgL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65EDAC4CEF0;
-	Tue, 30 Sep 2025 15:50:13 +0000 (UTC)
+	s=arc-20240116; t=1759253422; c=relaxed/simple;
+	bh=UEiITu5ojLhKvcyc75YZjFh80OX1gQbnlUYXdE4rxdQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JsaDbTirv/zskx70sjZHAn3jF3I7Wxjuxiyv+vRyUyUNC17ry9X/ToRnLezJmG3UZbYEYPLtedAUY6J+krItILus0MJZlMWbDvD9EY1rBFoX1JaO0hS39nQXI/ddH7S8nB5yDN4/hn84eV9SG+i68bKTPInA+0cN/fzwRUcFKkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MJjW2OaF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38F1DC4CEF0;
+	Tue, 30 Sep 2025 17:30:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759247413;
-	bh=ODDGAeANZJXMXsw5dIQyCYdhwt8Qovd/AateS2IGK/0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hdu5JwgLl7ax9srC1bfQhbI6JjgAcJyKYjhaKrijDC4Qpzzwcdzd7w+03D87RRKgP
-	 ohx4ZNhxCoZhpAsVYdvUyVJbj9A8dlqdTX85Y9pWd0gATfVz5PBdxQfK1sbpWAq2Go
-	 F6hXX9Uk3FiJ8w0+YWFaf/K7zVCa/9BH2HeRIou2UamE40VJJcmqdQn69YH/u3z3o2
-	 vRuRC8td8MVq5Xq7Y6YHASknrpfHAU8QM2hHpVW6VQ4tcc2iHFgoSZEf/fTaJLivfJ
-	 2pS1YAf7hLj9OVKN+Yh32UXnHg8SXpxV49LjCzcKqo6G7+u8KP6a8/7lOTKUoSXFPJ
-	 NxX1/zKVOxtXw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD9C39D0C1A;
-	Tue, 30 Sep 2025 15:50:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1759253420;
+	bh=UEiITu5ojLhKvcyc75YZjFh80OX1gQbnlUYXdE4rxdQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MJjW2OaFsgHweaZH+7LdqLvBJhyH6Nsl909V1vIQQry15tICZ5eJqYu6dRfsbrZYD
+	 FeOErlISC8NYM+k2Z0tn+wNalshAjOXFsRH+uv4ylsHy/I5E60ayMFx2eyEdJUnuiZ
+	 ENTHcGf37V1dLTyHu4oCk2JySO7uWg/UgO1XdyPr/ElRK9trHaFDuWEfufRx5qyI+w
+	 9aGW3w36subQgzDOQEW8h1LcW0MS4RvXmtXF0o+3/lSrq5452rkg8LoE/pGZpuZSUC
+	 FcxxT08lD6GVHtO7LB+sxp23xghohBGAY6eDnu0wyUFQRUTgj1lThcoOdnMHAILnuv
+	 KTncqGxgLRd6w==
+Date: Tue, 30 Sep 2025 10:30:18 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Zqiang <qiang.zhang@linux.dev>
+Cc: horms@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH] usbnet: Fix using smp_processor_id() in preemptible
+ code warnings
+Message-ID: <20250930103018.74d5f85b@kernel.org>
+In-Reply-To: <20250930084636.5835-1-qiang.zhang@linux.dev>
+References: <20250930084636.5835-1-qiang.zhang@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests/net: add tcp_port_share to .gitignore
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175924740628.2029424.4176185982748581739.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Sep 2025 15:50:06 +0000
-References: <20250929163140.122383-1-krishnagopi487@gmail.com>
-In-Reply-To: <20250929163140.122383-1-krishnagopi487@gmail.com>
-To: Gopi Krishna Menon <krishnagopi487@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, david.hunter.linux@gmail.com,
- skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 30 Sep 2025 16:46:36 +0800 Zqiang wrote:
+> The usbnet_skb_return() can be invoked in preemptible task-context,
+> this commit therefore use get_cpu_ptr/put_cpu_ptr() instead of
+> this_cpu_ptr() to get stats64 pointer.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 29 Sep 2025 22:01:38 +0530 you wrote:
-> Add the tcp_port_share test binary to .gitignore to avoid
-> accidentally staging the build artifact.
-> 
-> Fixes: 8a8241cdaa34 ("selftests/net: Test tcp port reuse after unbinding
-> a socket")
-> Signed-off-by: Gopi Krishna Menon <krishnagopi487@gmail.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] selftests/net: add tcp_port_share to .gitignore
-    https://git.kernel.org/netdev/net-next/c/03faea846671
-
-You are awesome, thank you!
+We also call netif_rx() which historically wanted to be in bh context.
+I think that disabling bh in usbnet_resume_rx() may be a better idea.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
