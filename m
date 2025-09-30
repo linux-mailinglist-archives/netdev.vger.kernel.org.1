@@ -1,89 +1,60 @@
-Return-Path: <netdev+bounces-227361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 099B1BAD19C
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 15:47:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23941BAD1B9
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 15:56:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDF81172F9E
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 13:47:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC46E3C6A00
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 13:56:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D951F0E24;
-	Tue, 30 Sep 2025 13:47:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1CAE239E67;
+	Tue, 30 Sep 2025 13:56:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SHUio128"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="B9gonMAe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B259F1E0DFE
-	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 13:47:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7C01CA84;
+	Tue, 30 Sep 2025 13:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759240055; cv=none; b=sFebpyPYVe84JrJzsYz9EKW0pI9OHCDoKqod1rDexDrJMo9QRyVxL0AWV2HvfgX/jKpPXVM0A07Z74B6ecsJ9roQhLKgZaAk5hqWCbAto+qwuNde/3SrkkZpJXijqdtqyuzWt8mkfIZA4PTH7iPfRVgWpoVcFYCI4NAqA+53qLU=
+	t=1759240603; cv=none; b=Mc/ZzWnenfsIrUHigimLHSi2XtQ3f4yDuEYonujmxcHcd2t6Go92xGO21D1c98WSRFsR4BAKtBEx/Ie5HLYE2MUWx9RNr6vxVujWDrg9DPJcsEWMOUB7kZRMa43ju3Mg9g6xfn8BPZrqRsLqOaZA/B/RnSw7kPt9Molmn8llkRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759240055; c=relaxed/simple;
-	bh=djWJ3WSoFOE7AAiVgSgO9kaO15CNySawak1vG1iZbXE=;
+	s=arc-20240116; t=1759240603; c=relaxed/simple;
+	bh=TP6Oq2U6AKFnwcT/5zuCHKSTlZBlk5VG/u3nYGA/P0U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QabpBYcxZtqNOMHd5iCv2ruRa/2t5Y1w9gLGjSFVMYclqceEtOvyddec/NTwpWVrpQG55MMEylg3YkP02vGD5moq+WlYTJlxk7Yv4jMu/iiCrl5tZq+Jt4iug+m27YYYebyYB1m+q7QeglFFFYp1Ij9vtgVpF94MkC0BPW2NqeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SHUio128; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-267facf9b58so43802575ad.2
-        for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 06:47:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759240053; x=1759844853; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2jMdofcUVGSrS6vDNWwFHz9+M//WqgG/7b80iTTRoas=;
-        b=SHUio128k4MsO7mMYdmR73ahK2lbAeQy2BHje44Q+2yqb1I/TCEh82WJd3R6ZpnSRI
-         AO+D+Lc9O6OnedZuLnAyn4+QSHtkDz/8nyJgEGrVN7VLqMM21cVqJGbqDIeYX0No9upA
-         XhjIyL7INFwK3qE0sAXP3EfIA0fopYJ1WrXzY6g7NByGb8DI6wVxIxBGpcY+l3bPtG0a
-         HAP7aj9XtA1C9X3ThZ/cNWoyhUeSoQiRNEoXAjqpfnyDuacJucsyTSRkyMFurxpcjFub
-         OaYjifuHBLI/Fh66m91isRKkp6VSc+XpQexOBRjVMHOe0yFP4TizK2uJXaI/vhd9RA0L
-         iPFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759240053; x=1759844853;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2jMdofcUVGSrS6vDNWwFHz9+M//WqgG/7b80iTTRoas=;
-        b=B/WAJlk0SZh/LnHtOoyUec2pbA0lMjEW35hWJiCMaM6IXNEL65e4ueX7RI6+kac1m1
-         NvKvwds/FKW8epAkJHDb6bBO/2Ctv20aO9tb9+kTaed5MmoGam+F/f+WelbKZXufV36r
-         GyNdX/9op3M4PZ/RuNAo/rOOGl2rcP0J8CKebq8pcAodRwkbEOBTFMHj5fdz6MSl0GoW
-         akw1kLYWT59BurdGRkW08WrMgV/O0cLoZBIKllSnbkGGPVIg6ZIPNq6H+YbxFi+Wa6XI
-         HzTyu3+ijdixGJECTyNZLfdfZ0gZJwXC83vC1GXLIYY0DDob7SzpDvSVzF99XQdNg4z9
-         uE1w==
-X-Forwarded-Encrypted: i=1; AJvYcCW6OIq2A8ByCHnEFVZhg+2r71yi5D25kLQ70VQIJBUs7zEeSG78EEupNTDm1dA3Tbqlfv8AYRY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzBEb8REtOjWMRgGzPCjQJ3ColhZpWUK1awpbV7y1HbLRvdXLm
-	ySRK+7I0nCFDK1Ly55w/btZPCQCtiGZt0kssCS/Vx2eTpecqDjoUWb7G
-X-Gm-Gg: ASbGncsBaGKrEdj/azSluJSJ/5hrqcE8ImgYRi+4ZCNUbI3gDNeeQzMDbr7XU9NLdgG
-	xGwy4C9PyL5x1QmTDcsgeCp9lcX5w2NZ8x44d10evT/nnRLNUmVgrmE0bH16LnF8du+fB2Vor7m
-	deiFZ+H2jbyvAw4IhJkR65o+5hriq2TPm4XBHP2ijkdfrpq7azggYcKBxYmZw58d5vw0ZSsWf+i
-	tGlyTkcyvwtPjQrN9uboparJFpe4iGiuYzEvqkiJbcsYnRIpu1vF6nEASbdFIKIbp62kYoE4vEE
-	bzltwivNQ1vaWMHQsJc0MyktJ+IvJ48gGviyPHyqOC8W7Gi7i6/xXTw1LGWbgo5YPbl80+UWD9P
-	PdUOUK/rdqf61Zasj8bqcARWkmJFcCeRSdT4ytBPIAAp2c2/k50/XhqFUwvsC
-X-Google-Smtp-Source: AGHT+IESYq35TAQFLeBWF4OxglXdXWfZV95e+sPc0Kl6L4WvW4KjgdJME1j4/hRI2m+l8euIgk7tPg==
-X-Received: by 2002:a17:902:f650:b0:24e:81d2:cfda with SMTP id d9443c01a7336-27ed4946b7bmr211097935ad.0.1759240052489;
-        Tue, 30 Sep 2025 06:47:32 -0700 (PDT)
-Received: from localhost ([103.70.166.143])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-281fd60835bsm99535715ad.19.2025.09.30.06.47.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Sep 2025 06:47:31 -0700 (PDT)
-Date: Tue, 30 Sep 2025 19:17:29 +0530
-From: Gopi Krishna Menon <krishnagopi487@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, david.hunter.linux@gmail.com, 
-	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev
-Subject: Re: [PATCH net-next] selftests/net: add tcp_port_share to .gitignore
-Message-ID: <nebdn6xrcevewtcv6hbumf5tdh4p4patujhdojc7hn2yppwil6@jqbfz7q2ljth>
-References: <20250929163140.122383-1-krishnagopi487@gmail.com>
- <aNucABvb0PvBtCxr@horms.kernel.org>
- <aNuci8Y9ZO9pd0Ua@horms.kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CtQA6rWC2LKGEOxUVnVYFCgxp2XsA6WyTHTHx/3bhmhr68189oxH7LdXRz7ac0My96tkYTndTMDmNImhw00SNBRn7QB+6rVmRsvGm4MUqeX2PQrgu0hhtEiZpqtjPVwBHV1Hz6e37rK/0DkJ5/n08tN2c7g7Y58hCBkm6HItNbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=B9gonMAe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4422BC4CEF0;
+	Tue, 30 Sep 2025 13:56:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1759240602;
+	bh=TP6Oq2U6AKFnwcT/5zuCHKSTlZBlk5VG/u3nYGA/P0U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B9gonMAeWq6OgRaTq7yvEz9/mWGQdHrdWR16/jBi8dkJwmIOAmnbNK4SNyo0pKmiS
+	 lgBHbx6BIoDi5ybEZcoOEp3aStHhXzWFDom8QwnTlkRTT6WdWeZg6MKJbsgcAZOM3W
+	 KBkHcTq4KJs9CXkkVQSvK7GLHcUUE59FYo9skucc=
+Date: Tue, 30 Sep 2025 15:56:39 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: David Brownell <david-b@pacbell.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lubomir Rintel <lkundrak@v3.sk>,
+	Christian Heusel <christian@heusel.eu>,
+	Greg Kroah-Hartman <gregkh@suse.de>, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] rndis_host: Check for integer overflows in
+ rndis_rx_fixup()
+Message-ID: <2025093055-awoke-facedown-64d5@gregkh>
+References: <aNvOh3f2B5g0eeRC@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,52 +63,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aNuci8Y9ZO9pd0Ua@horms.kernel.org>
+In-Reply-To: <aNvOh3f2B5g0eeRC@stanley.mountain>
 
-On Tue, Sep 30, 2025 at 10:02:03AM +0100, Simon Horman wrote:
-
-> On Tue, Sep 30, 2025 at 09:59:44AM +0100, Simon Horman wrote:
-> > On Mon, Sep 29, 2025 at 10:01:38PM +0530, Gopi Krishna Menon wrote:
-> > > Add the tcp_port_share test binary to .gitignore to avoid
-> > > accidentally staging the build artifact.
-> > > 
-> > > Fixes: 8a8241cdaa34 ("selftests/net: Test tcp port reuse after unbinding
-> > > a socket")
-> > 
-> > I'm not entirely sure this qualifies for a fixes tag.
-> > It is user-visible. It's probably annoying.
-> > But I'm not sure it's a bug.
-
-Hi Simon, thanks for the review. I also feel that Fixes tag is not
-required for this change. I added it based on this earlier
-commit(7ae495a537d1):
-https://lore.kernel.org/all/20250307031356.368350-1-willemdebruijn.kernel@gmail.com
-but other commits similar in nature dont have the fixes tag, therefore I
-will remove it in v2. 
-
+On Tue, Sep 30, 2025 at 03:35:19PM +0300, Dan Carpenter wrote:
+> The "data_offset" and "data_len" values come from received skb->data so
+> we don't trust them.  They are u32 types. Check that the "data_offset +
+> data_len + 8" addition does not have an integer overflow.
 > 
-> Also, FTR, fixes tag's shouldn't be line wrapped.
-> 
-> > > Signed-off-by: Gopi Krishna Menon <krishnagopi487@gmail.com>
-> > > ---
-> > >  tools/testing/selftests/net/.gitignore | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > 
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> > 
-> > I notice that tools/testing/selftests/kexec/test_kexec_jump
-> > is in a similar state. Do you plan to send a patch to address
-> > that too?
-> > 
-> > ..
+> Fixes: 64e049102d3d ("[PATCH] USB: usbnet (8/9) module for RNDIS devices")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  drivers/net/usb/rndis_host.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 
-This has been already addressed and will be in 6.18-rc1 I believe:
-https://lore.kernel.org/all/faf206d8-ccd8-48b5-8e7e-d596ddbbcbb6@linuxfoundation.org/
+David has passed away many years ago, odd that this was sent to him
+given that get_maintainers.pl doesn't show it :(
 
-> 
-> Please note that net-next is now closed.
-> 
-> So if you do respin, please wait for it to re-open once v6.18-rc1 has been
-> released. About two weeks from now.
-Noted, I will send a v2 for this patch when net-next will be reopened.
+> diff --git a/drivers/net/usb/rndis_host.c b/drivers/net/usb/rndis_host.c
+> index 7b3739b29c8f..913aca6ff434 100644
+> --- a/drivers/net/usb/rndis_host.c
+> +++ b/drivers/net/usb/rndis_host.c
+> @@ -513,8 +513,9 @@ int rndis_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
+>  		data_len = le32_to_cpu(hdr->data_len);
+>  
+>  		/* don't choke if we see oob, per-packet data, etc */
+> -		if (unlikely(msg_type != RNDIS_MSG_PACKET || skb->len < msg_len
+> -				|| (data_offset + data_len + 8) > msg_len)) {
+> +		if (unlikely(msg_type != RNDIS_MSG_PACKET || skb->len < msg_len ||
+> +				size_add(data_offset, data_len) > U32_MAX - 8 ||
+> +				(data_offset + data_len + 8) > msg_len)) {
+
+Nice, I missed this in my old audit of this code (there's still lots of
+other types of these bugs in this codebase, remember the rndis standard
+says "there is no security", and should never be used by untrusted
+devices.)
+
+But will this work?  If size_add(x, y) wraps, it will return SIZE_MAX,
+which we hope is bigger than (U32_MAX - 8)?  That feels fragile.
+
+Then we do:
+	skb_pull(skb, 8 + data_offset);
+so if data_offset was huge, that doesn't really do anything, and then we
+treat data_len independent of data_offset.  So even if that check
+overflowed, I don't think anything "real" will happen here except a
+packet is dropped.
+
+or am I missing something elsewhere in this function?
+
+thanks,
+
+greg k-h
 
