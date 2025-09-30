@@ -1,127 +1,229 @@
-Return-Path: <netdev+bounces-227317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AF52BAC457
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 11:27:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42BA8BAC560
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 11:42:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0337248108E
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 09:27:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E91F048419A
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 09:42:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95DCA279DCA;
-	Tue, 30 Sep 2025 09:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LhS+iovK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68E6301038;
+	Tue, 30 Sep 2025 09:37:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 052702BD034
-	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 09:27:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1217D2F7475;
+	Tue, 30 Sep 2025 09:37:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759224448; cv=none; b=WpYtcEJ5vDX6I+kzbdmm6lsVL0NIQJvdKkpsiwIHrl+VrzuAJJF3dkttAEA4nRJCH1IwyGRwnwvsWEqj7ZtkwISJdYQoL9L4Dsa/q6IrCM5eQr5GiUhqRXnabbGlR7TJND/NdNUG0EtzdGHAeoGsRsjL4qGhYh1CiuFezN2lGQQ=
+	t=1759225070; cv=none; b=uaPLcH8K+SC98t5A/3iavWxgpnS6u/uEfQVJjTwfWFEr8XqnqQ+eMCy1ETg+uSLNiOLivIVJ8ZjOnOaXhs70T8MO8EA+rErsDKaH88qF6cMrfBvM/q1e8tM4Ox2Zb4zmUPhVo3cmXE6Sn7dkh3RTcGGhiSqzsfaZhUXouGdGv2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759224448; c=relaxed/simple;
-	bh=Yy9rsILfkCrVG1hatgRp/esDRroCQxId/1gXctS+x5s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Iu95Kkuqa5C5yIcCvWOFk5ffIXFXgBHpVsY1x8eTvuDgTNF1b356w7cskEG8Zz0dahcVqLvq0QXnNgu4vyenL/s7PsXyxqCd2uzplu13Ecl2IVoieCKY+tg3DsHrr7lWsCiJvc0hpEUsXWUTAvfoLEN4EUxup1ICMY1M+3t2AbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LhS+iovK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759224446;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vhIhQ7Pc439Kte7+kbL4E23pxh4Cb2bhE5vgknWcd/c=;
-	b=LhS+iovKjChgpvH542PgNQuFy6StuJMnFS+ENoIa6CGLe4EJVk+Dns8T49HQL5Cu5PBmNv
-	qTRQtU2UEY0pW6RK+isUgG7VwGKJYk6C1ctOP88u4KTUfa5HxoBE3BYEi/Qng71QAR55gT
-	3bwZT8MdmXM16c03ja5X2vJDayixIpM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-661-sfYF5VIRMpaUsa-e8Nia6A-1; Tue, 30 Sep 2025 05:27:24 -0400
-X-MC-Unique: sfYF5VIRMpaUsa-e8Nia6A-1
-X-Mimecast-MFC-AGG-ID: sfYF5VIRMpaUsa-e8Nia6A_1759224443
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46e4fa584e7so13127115e9.0
-        for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 02:27:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759224443; x=1759829243;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vhIhQ7Pc439Kte7+kbL4E23pxh4Cb2bhE5vgknWcd/c=;
-        b=gqGnuQUXkBMPRmoceKk0t2AsqFkSUT9jcH0SaRD0CRA7BdsEswT5y8b+iXggwKn4iy
-         nvPtZlueU2ZVcBv5Z7vZkmh8LA+AqqtBxCA1s4ch6ks+fa1NzEeqncA8ZbB7Ns8q2H9/
-         VTo25UkExqR3ht1dYhW8esg7iiGYvy1CmSmCgJzTii5PLfOUfksm4kjo5awdl5MMSS1I
-         kCqiVD8OKVb3YyCLFy7r3Pl2TmNZYpb/PsT3kxaMPbCN5290IIfU8i70t+Q8JN/NG6lI
-         uWOKSfE4c1ijM4gkZbQDb4X8VT/bM2c6+jupV3tjizBMp2Y9mGQMw8DAmmht1UrUmGt5
-         y9Gw==
-X-Forwarded-Encrypted: i=1; AJvYcCX23AV6tnfHC31bd8u9qGQjTxAhjFfMU7NoEYLy65iHLmvl6nesEtic9LpoAFUk/ApHB4uGNZ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtcaSoDkKzwZ1Fjxpzunv9ZEhWegQ47WlW6DtsYmXNz/EPvjaq
-	2DeFu8pwQPoB2xdBSQd/biHKhh12vj4nVxkziMu77DkX4PwsO5l4ov1l9L3B65eauxmmOXuLs5D
-	ZHErlQefeOJ2cLcIuTPMrtZ1wpc3/gaOEAjKthC7AUVlCPe11FFbbQ6VAfg==
-X-Gm-Gg: ASbGncvpd+ozcnCdbC720aG49C+SQyVO500/8wqiR+Q+M3S1nz7b6iLB8VFXbnAchrF
-	UMiTBTuJIStqdjzeSSzyq6ediRgsJfYwxuC+GkvMGIOs8lmdglH4Do9hDjGtVMnpbPzMf2jGgYV
-	5ECKuPib0rDbm5apzMkESJepOzu25jy1AP/uJU3E6dDk1QcASARW/xooWDU6458sD+IdTED95k3
-	/wl6Tb6JV3FZApAH/FgzOjy9ABReHlwcvkFHm+axsANXCTB/f2tKKhtFXiTMzM851IrXoX22R96
-	kfx7u/xP+WZCagU6eRockt2MSSM/BckdBoOm5PJt7q913dY+OeMjt5TYzjYZD1DvW1av0tcPnyw
-	A7UHXBe7NNoay66wgEw==
-X-Received: by 2002:a05:600c:1d89:b0:46e:4925:c74f with SMTP id 5b1f17b1804b1-46e4925cb9dmr95025615e9.20.1759224443083;
-        Tue, 30 Sep 2025 02:27:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHyrYLqjJuBzJIHajHdtgs/fUkc/rxcVHHrAN28ev0rPW/mh9TSEk3RCtEV8V90gd7i1h46JA==
-X-Received: by 2002:a05:600c:1d89:b0:46e:4925:c74f with SMTP id 5b1f17b1804b1-46e4925cb9dmr95025345e9.20.1759224442723;
-        Tue, 30 Sep 2025 02:27:22 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb8811946sm21749722f8f.18.2025.09.30.02.27.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Sep 2025 02:27:22 -0700 (PDT)
-Message-ID: <2c1b5e2b-9488-4a0c-b0eb-c29527d618ec@redhat.com>
-Date: Tue, 30 Sep 2025 11:27:20 +0200
+	s=arc-20240116; t=1759225070; c=relaxed/simple;
+	bh=sB8QpoW7apk3wRrBGS7LSxK6IdeSDh3bKJHWIzEyZ5A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NnWI+/lmT3YJSDhoi9rpFUy6EKdE4snfQckPOFnKnX83/eP/PR8DtJBtYGANgQKif0EmoKzKQ3NHcJabp6owK580vVf2modZznL4fpbcawOVxEzoXhRUNFznzhAgyw0sz3nOtSAUOR88ohJ9297Yzhr86zTbBXxc8uPefYDIO7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 440671424;
+	Tue, 30 Sep 2025 02:37:38 -0700 (PDT)
+Received: from bogus (e133711.arm.com [10.1.196.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2978D3F59E;
+	Tue, 30 Sep 2025 02:37:45 -0700 (PDT)
+Date: Tue, 30 Sep 2025 10:37:42 +0100
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: Adam Young <admiyo@amperemail.onmicrosoft.com>
+Cc: Jassi Brar <jassisinghbrar@gmail.com>,
+	Adam Young <admiyo@os.amperecomputing.com>,
+	Sudeep Holla <sudeep.holla@arm.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] Revert "mailbox/pcc: support mailbox management of the
+ shared buffer"
+Message-ID: <20250930-little-numbat-of-justice-e8a3da@sudeepholla>
+References: <20250926153311.2202648-1-sudeep.holla@arm.com>
+ <2ef6360e-834f-474d-ac4d-540b8f0c0f79@amperemail.onmicrosoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 0/7] bonding: Extend arp_ip_target format to
- allow for a list of vlan tags.
-To: Hangbin Liu <haliu@redhat.com>
-Cc: David Wilder <wilder@us.ibm.com>, netdev@vger.kernel.org,
- jv@jvosburgh.net, pradeeps@linux.vnet.ibm.com, pradeep@us.ibm.com,
- i.maximets@ovn.org, amorenoz@redhat.com, stephen@networkplumber.org,
- horms@kernel.org, kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
-References: <20250930012857.2270721-1-wilder@us.ibm.com>
- <6be07cb6-7dab-4125-b9e5-0bd4c42235fe@redhat.com> <aNuNwyRb5nEsAy-z@fedora>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <aNuNwyRb5nEsAy-z@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2ef6360e-834f-474d-ac4d-540b8f0c0f79@amperemail.onmicrosoft.com>
 
-On 9/30/25 9:58 AM, Hangbin Liu wrote:
-> On Tue, Sep 30, 2025 at 09:21:30AM +0200, Paolo Abeni wrote:
->> ## Form letter - net-next-closed
->>
->> The merge window for v6.18 has begun and therefore net-next is closed
->> for new drivers, features, code refactoring and optimizations. We are
->> currently accepting bug fixes only.
->>
->> Please repost when net-next reopens after June 8th.
->>
->> RFC patches sent for review only are obviously welcome at any time.
->>
+On Mon, Sep 29, 2025 at 01:11:23PM -0400, Adam Young wrote:
+> I posted a patch that addresses a few of these issues.  Here is a top level
+> description of the isse
 > 
-> I guess you mean after October 13th[1].
+> The correct way to use the mailbox API would be to allocate a buffer for the
+> message,write the message to that buffer, and pass it in to
+> mbox_send_message.  The abstraction is designed to then provide sequential
+> access to the shared resource in order to send the messages in order.  The
+> existing PCC Mailbox implementation violated this abstraction.  It requires
+> each individual driver re-implement all of the sequential ordering to access
+> the shared buffer.
+> 
 
-Whoops, bad C&P here while writing the form letter. Thanks for catching
-it! To be more accurate: after Oct 12th.
+Please, let us keep the avoiding duplication as a separate topic atleast for
+the discussion. We can take care of it even before merging if you prefer that
+way but we need to explore what other drivers can use it. Otherwise it is
+not yet duplication right ?
 
-/P
+> Why? Because they are all type 2 drivers, and the shared buffer is 64bits in
+> length:  32bits for signature, 16 bits for command, 16 bits for status.  It
+> would be execessive to kmalloc a buffer of this size.
+> 
 
+Sure, if there is only and first driver needing large buffers, it is still
+not duplication yet. I agree it can be moved to PCC, but lets start with
+you client driver code first and then take it from there.
+
+> This shows the shortcoming of the mailbox API.  The mailbox API assumes that
+> there is a large enough buffer passed in to only provide a void * pointer to
+> the message.  Since the value is small enough to fit into a single register,
+> it the mailbox abstraction could provide an implementation that stored a
+> union of a void * and word.  With that change, all of the type 2
+> implementations could have their logic streamlined and moved into the PCC
+> mailbox.
+> 
+
+No, it is left to the client driver interpretation as it clearly varies even
+within PCC type 1-5. Again, let us start with client driver code and see how
+to standardise later. I agree with PCC being standard, there is scope for
+avoiding duplication, but we will get to know that only if you first present
+it with the client driver code and we can then see how and what to make
+generic.
+
+> However, I am providing an implementation for a type3/type4 based driver,
+> and I do need the whole managmenet of the message buffer. IN addition, I
+> know of at least one other subsystem (MPAM) that will benefit from a type3
+> implementation.
+> 
+
+Don't even go there. It is much bigger beast with all sorts of things to
+consider. Now that you have mentioned that, I am interested more to look
+at MPAM driver usage as well before merging anything as generic as I know
+MPAM is not so trivial. You pulled that topic into this, sorry 😉.
+
+> On 9/26/25 11:33, Sudeep Holla wrote:
+> > This reverts commit 5378bdf6a611a32500fccf13d14156f219bb0c85.
+> > 
+> > Commit 5378bdf6a611 ("mailbox/pcc: support mailbox management of the shared buffer")
+> > attempted to introduce generic helpers for managing the PCC shared memory,
+> > but it largely duplicates functionality already provided by the mailbox
+> > core and leaves gaps:
+> > 
+> > 1. TX preparation: The mailbox framework already supports this via
+> >    ->tx_prepare callback for mailbox clients. The patch adds
+> >    pcc_write_to_buffer() and expects clients to toggle pchan->chan.manage_writes,
+> >    but no drivers set manage_writes, so pcc_write_to_buffer() has no users.
+> 
+> tx prepare is insufficient, as it does not provide access to the type3
+> flags.  IN addition, it forces the user to manage the buffer memory
+> directly.  WHile this is a necessary workaround for type 2 non extended
+> memory regions, it does not make sense for a managed resource like the
+> mailbox.
+> 
+
+Sorry if I am slow in understanding but I still struggle why tx_prepare won't
+work for you. Please don't jump to solve 2 problems at the same time as it
+just adds more confusion. Let us see if and how to make tx_prepare work for
+your driver. And then we can look at standardising it as a helper function
+that can be use in all the PCC mailbox client drivers if we can do that.
+
+You are just adding parallel and optional APIs just to get your driver
+working here. I am not against standardising to avoid duplication which
+is your concern(very valid) but doen't need to be solved by adding another
+API when the existing APIs already provides mechanism to do that.
+
+If you need information about the PCC type3/4, we can explore that as well.
+
+> You are correct that the manage_writes flag can be removed, but if (and only
+> if) we limit the logic to type 3 or type 4 drivers.  I have made that change
+> in a follow on patch:
+> 
+
+OK, but I would like to start fresh reverting this patch.
+
+> > 2. RX handling: Data reception is already delivered through
+> >     mbox_chan_received_data() and client ->rx_callback. The patch adds an
+> >     optional pchan->chan.rx_alloc, which again has no users and duplicates
+> >     the existing path.
+> 
+> The change needs to go in before there are users. The patch series that
+> introduced this change requires this or a comparable callback mechanism.
+> 
+
+Not always necessary. Yes if it is agreed to get the user merged. But I am
+now questioning why you need it when you do have rx_callback.
+
+> However, the reviewers have shown that there is a race condition if the
+> callback is provided to the PCC  mailbox Channel, and thus I have provided a
+> patch which moves this callback up to the Mailbox API.
+
+Sorry if I have missed it. Can you please point me to the race condition in
+question. I am interested to know more details.
+
+> This change, which is obviosuly not required when returning a single byte,
+> is essential when dealing with larger buffers, such as those used by network
+> drivers.
+> 
+
+I assume it can't be beyond the shmem area anyways. That can be read from the
+rx_callback. Again I haven't understood your reasoning as why the allocation
+and copy can't be part of rx_callback.
+
+> > 
+> > 3. Completion handling: While adding last_tx_done is directionally useful,
+> >     the implementation only covers Type 3/4 and fails to handle the absence
+> >     of a command_complete register, so it is incomplete for other types.
+> 
+> Applying it to type 2 and earlier would require a huge life of rewriting
+> code that is both  multi architecture (CPPC)  and on esoteric hardware
+> (XGene) and thus very hard to test. 
+
+True but you have changed the generic code which could break Type1/2 PCC.
+I am not sure if it is tested yet.
+
+> While those drivers should make better use of  the mailbox mechanism,
+> stopping the type 3 drivers from using this approach  stops an effort to
+> provide a common implementation base. That should happen in future patches,
+> as part of reqorking the type 2 drivers. 
+
+No you need to take care to apply your changes only for Type3/4 so that
+Type1/2 is unaffected. You can expect to break and someone else to fix
+the breakage later.
+
+> Command Complete is part of the PCC specification for type 3 drivers.
+>
+
+Agreed, that's not the argument. The check is done unconditionally. I will
+send the patch once we agree to revert this change and start fresh. And each
+feature handled separately instead of mixing 3 different things in one patch.
+
+> > 
+> > Given the duplication and incomplete coverage, revert this change. Any new
+> > requirements should be addressed in focused follow-ups rather than bundling
+> > multiple behavioral changes together.
+> 
+> I am willing to break up the previous work into multiple steps, provided the
+> above arguments you provided are not going to prevent them from getting
+> merged.  Type 3/4 drivers can and should make use of the Mailbox
+> abstraction. Doing so can lay the ground work for making the type 2 drivers
+> share a common implementation of the shared buffer management.
+>
+
+Sure. Lets revert this patch and start discussing your individual requirements
+in individual patches and check why tx_prepare and rx_callback can't work for
+you. Please share the client driver code changes you tried when checking
+tx_prepare and rx_callback as well so that we can see why it can't work.
+
+-- 
+Regards,
+Sudeep
 
