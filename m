@@ -1,148 +1,120 @@
-Return-Path: <netdev+bounces-227375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A19BCBAD48E
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 16:51:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3147BAD6A4
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 17:00:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D5C7177B6F
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 14:51:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 899394A3ED2
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 14:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6945E2264AB;
-	Tue, 30 Sep 2025 14:51:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F11372FFDE6;
+	Tue, 30 Sep 2025 14:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YPUpBDJH"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CFF303CB7;
-	Tue, 30 Sep 2025 14:51:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A87199939
+	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 14:58:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759243873; cv=none; b=XQUhQAZQbdO6V35XkA500ylPQ8Md4oMR9Qm3/fJZMBmUGm/XjiyWWzP23uUUFeG/80bc/ET8lqXHS0C5xuB0JdZl0NADQ86IOnRB1vfg0B/3WWLGSGlrFW7k+rvNIgFCdmFrTCq0aNlWSXp1WCe9Vb2XxkL37jZMkHkNIKYd6Yc=
+	t=1759244316; cv=none; b=bWz8Z0ljHsdRpzFVI886UJgY+S2xZL8LvHnNWlG6qkCXnQUzQ81xhp4IIv1vMgUFWPy0Y6u1G2aqikMYQgN95t1f4lpK35dcCMq11kISkSI6m+2TnqM80YWRgrRI9C9O22VGINRQMVK2oT6aq+rfV9UrO1rezYFVIKY+M/e/O8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759243873; c=relaxed/simple;
-	bh=x2kQmEmlvu1QcOpR7fef9c1vKRVV+9sgNhD0vk7sTK0=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cwa/R4voz/qxDdd5DWWk4TwmeIynKBQn/Z/ai1+ut9geHcv9vVrwS5+RmNP7vDsyMmAw7s0NXkYyAugGYT5u3LQUdPHNRx6G6XblLC4syQstCheYNkYHF9DaQUkuBySiCxCTnppV7hSHqvi0+mKGBzkd0lowerdziOrVNAYG/4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cbgsF3Mxkz6M4YG;
-	Tue, 30 Sep 2025 22:48:01 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7289E140276;
-	Tue, 30 Sep 2025 22:51:08 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 30 Sep
- 2025 15:51:07 +0100
-Date: Tue, 30 Sep 2025 15:51:05 +0100
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Alejandro Lucero Palau <alucerop@amd.com>
-CC: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>, <edward.cree@amd.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <dave.jiang@intel.com>
-Subject: Re: [PATCH v18 20/20] sfc: support pio mapping based on cxl
-Message-ID: <20250930155105.00001463@huawei.com>
-In-Reply-To: <26134b86-1481-451f-9337-70769ec9e792@amd.com>
-References: <20250918091746.2034285-1-alejandro.lucero-palau@amd.com>
-	<20250918091746.2034285-21-alejandro.lucero-palau@amd.com>
-	<20250918160832.00001ed7@huawei.com>
-	<26134b86-1481-451f-9337-70769ec9e792@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1759244316; c=relaxed/simple;
+	bh=+Cv04hXie9pY5t+rS6VTb4NEvQMis80rh95/j5M/3Z4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=T29DQy1bHBm2XLQQUuE85wzPSGUEhtFYUKOYEsG2ucVPiczjp9IXNYXp6TduoM9f+xXeo71+MqLVNyruCH/djGM0mVVR7MhYd40eBC2d2Q+gU7A2OG+aRhiFvA8G1YRsn/7/UuVSaYDXshK06W9wG+Gwwtf6F4jPyp4uDxhKtf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YPUpBDJH; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id F34F91A0FE6;
+	Tue, 30 Sep 2025 14:58:29 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id C0FD9606E4;
+	Tue, 30 Sep 2025 14:58:29 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 86CBB102F17E4;
+	Tue, 30 Sep 2025 16:58:19 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1759244309; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=ZtixQfXh2RNBNsi9rC4zcpKRdA5LL7GRjttgvrRwt6g=;
+	b=YPUpBDJH0FiT0B9vXEKuBmUcyaXIQAmY0AMlq2YEvx4DUwlWcAY4OOkBhR4EKQrCL3UgTP
+	vlUjk2aou2wMfPs/XIcgun/AdaULEZc+16bS6RCzGYJfsjNZVuRZooBAy/wkbn5s/W34YH
+	4O65KoO8EYlBggTe+tvjjygt9patwxitWMQOqc/nXsZgDuBfZORddQi5PtartnPLnC0z7l
+	SyEbztEtwBaKGBcqrevu4XwSRsLf6rlOSVMwwMzpN3NfWPY4A/giCzCKhxDwvHBvV4JZEM
+	PwK/5cCSKrbtGw9N52guUI2M/DTxlzqE1aQL4XIFFlwJ9J3vWN+52PZHlGG/sA==
+Date: Tue, 30 Sep 2025 16:58:17 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, kernel@pengutronix.de, Dent
+ Project <dentproject@linuxfoundation.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 0/3] Preserve PSE PD692x0 configuration across
+ reboots
+Message-ID: <20250930165817.2e3e756d@kmaincent-XPS-13-7390>
+In-Reply-To: <89ed50ab-07da-4514-b240-ed3d05400e91@redhat.com>
+References: <20250930-feature_pd692x0_reboot_keep_conf-v1-0-620dce7ee8a2@bootlin.com>
+	<89ed50ab-07da-4514-b240-ed3d05400e91@redhat.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Fri, 26 Sep 2025 10:47:27 +0100
-Alejandro Lucero Palau <alucerop@amd.com> wrote:
+On Tue, 30 Sep 2025 16:40:51 +0200
+Paolo Abeni <pabeni@redhat.com> wrote:
 
-> On 9/18/25 16:08, Jonathan Cameron wrote:
-> > A few trivial things inline.
-> >  
-> >> diff --git a/drivers/net/ethernet/sfc/ef10.c b/drivers/net/ethernet/sfc/ef10.c
-> >> index 47349c148c0c..7bc854e2d22a 100644
-> >> --- a/drivers/net/ethernet/sfc/ef10.c
-> >> +++ b/drivers/net/ethernet/sfc/ef10.c
-> >> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> >> index 85490afc7930..3dde59003cd9 100644
-> >> --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> >> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> >> @@ -11,16 +11,23 @@
-> >>   
-> >>   #include "net_driver.h"
-> >>   #include "efx_cxl.h"
-> >> +#include "efx.h"
-> >>   
-> >>   #define EFX_CTPIO_BUFFER_SIZE	SZ_256M
-> >>   
-> >>   static void efx_release_cxl_region(void *priv_cxl)
-> >>   {
-> >>   	struct efx_probe_data *probe_data = priv_cxl;
-> >> +	struct efx_nic *efx = &probe_data->efx;
-> >>   	struct efx_cxl *cxl = probe_data->cxl;
-> >>   
-> >> +	/* Next avoid contention with efx_cxl_exit() */
-> >>   	probe_data->cxl_pio_initialised = false;
-> >> +
-> >> +	/* Next makes cxl-based piobus to no be used */
-> >> +	efx_ef10_disable_piobufs(efx);
-> >>   	iounmap(cxl->ctpio_cxl);
-> >> +  
-> > Avoid extra white space changes. Perhaps push to earlier patch.  
-> 
-> 
-> I'll fix the spaces. Not sure what you mean with the second part of your 
-> comment, but if I understand it right, I think those changes should be 
-> added in this patch, just when the final functionality is added.
+> On 9/30/25 11:12 AM, Kory Maincent wrote:
+> > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> >=20
+> > Previously, the driver would always reconfigure the PSE hardware on
+> > probe, causing a port matrix reflash that resulted in temporary power
+> > loss to all connected devices. This change maintains power continuity
+> > by preserving existing configuration when the PSE has been previously
+> > initialized.
+> >=20
+> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> > ---
+> > Kory Maincent (3):
+> >       net: pse-pd: pd692x0: Replace __free macro with explicit kfree ca=
+lls
+> >       net: pse-pd: pd692x0: Separate configuration parsing from hardware
+> > setup net: pse-pd: pd692x0: Preserve PSE configuration across reboots
+> >=20
+> >  drivers/net/pse-pd/pd692x0.c | 155
+> > +++++++++++++++++++++++++++++++------------ 1 file changed, 112
+> > insertions(+), 43 deletions(-) =20
+>=20
+> ## Form letter - net-next-closed
+>=20
+> The merge window for v6.18 has begun and therefore net-next is closed
+> for new drivers, features, code refactoring and optimizations. We are
+> currently accepting bug fixes only.
+>=20
+> Please repost when net-next reopens after October 12th.
+>=20
+> RFC patches sent for review only are obviously welcome at any time.
 
-Just the white space.  If you want that move it to where that iounmap() is
-added.  This is just a patch cleanliness thing.
+Oops sorry that is totally true and I forgot that we have entered the merge
+window. Sorry for the noise :/
 
-> 
-> 
-> FWIW, I have decided to drop this driver callback as Dan did not like 
-> it, and after realizing those Dan's patches this patchset relies on fix 
-> most of the problem this callback tried to address.
-> 
-> 
-> >>   	cxl_put_root_decoder(cxl->cxlrd);
-> >>   }
-> >>   
-> >> @@ -30,6 +37,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
-> >>   	struct pci_dev *pci_dev = efx->pci_dev;
-> >>   	resource_size_t max_size;
-> >>   	struct efx_cxl *cxl;
-> >> +	struct range range;
-> >>   	u16 dvsec;
-> >>   	int rc;
-> >>   
-> >> @@ -133,17 +141,34 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
-> >>   					    &probe_data);
-> >>   	if (IS_ERR(cxl->efx_region)) {
-> >>   		pci_err(pci_dev, "CXL accel create region failed");
-> >> -		cxl_dpa_free(cxl->cxled);
-> >>   		rc = PTR_ERR(cxl->efx_region);
-> >> -		goto err_decoder;
-> >> +		goto err_dpa;  
-> > Why do we now need to call cxl_dpa_free() and didn't previously here? That
-> > seems like a probably bug in earlier patch.  
-> 
-> 
-> I think you misread it. We were calling cxl_dpa_free already, just 
-> moving it to a goto label here.
-> 
-Indeed.  Needed more coffee that day (or less, can't remember which ;)
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
