@@ -1,144 +1,102 @@
-Return-Path: <netdev+bounces-227311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40A19BAC2E0
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 11:09:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B131BAC306
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 11:13:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0B07171B7A
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 09:09:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC0441886A00
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 09:14:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF302EC574;
-	Tue, 30 Sep 2025 09:09:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D2F2F49E0;
+	Tue, 30 Sep 2025 09:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ovgb9sSn"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Mh2MCzVl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10672147FB;
-	Tue, 30 Sep 2025 09:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1D586323;
+	Tue, 30 Sep 2025 09:13:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759223348; cv=none; b=AKL2nwZsg7jy3s9Jg+pW9q6Q0wcrQufVGm2YN2woZ4fqMgRM8607QyNvg0nqRdPIoPtDYmTkqGhKI2TJEmu3EM3SzRzK+pjlfjOR6rAdX2/NJUQp0+/sf4UlHIUxvKhWkakkjNB8NL3hLW/WcPXxQjqgx9NMu6qCd+JXlTnFwgk=
+	t=1759223621; cv=none; b=ggVutB2SHweObuVni8QVcfnFeZFxP0PSnjld59ZPtPF9gKs7w57U/LcxfvMexuAajV79kJxN21he/YfohFiPb+MOVVY1/Hm0ykelNZcBA3F4wVkDmKTjx5jXtKPebo8tueMwlZKguP72cPQPPzMBTo8pXYPXSOVTghUs40L8vUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759223348; c=relaxed/simple;
-	bh=1TypGX/cTzJD9kx3Mbj0TYYoI7zzRjlYiUdYBg+4JVw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QmU+hthOoSlALI1bVpRrW6QHdaVBrMQlWS1fVAoHecYmWrV00I/oe720nvMud6AR02rmiVAitoAb4EJ9qFB00aqLvd/qJyFAx+tVVfnPgbv6nr1rWI0J3aG7zBAGiAN/gLoNQxMcXHmVanMAhHYte3zbMDlB2dem0Fe3YzlRvtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ovgb9sSn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F021C4CEF0;
-	Tue, 30 Sep 2025 09:09:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759223347;
-	bh=1TypGX/cTzJD9kx3Mbj0TYYoI7zzRjlYiUdYBg+4JVw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ovgb9sSntYNrTvjX2qMv+VyzZhVdHH9hRwOaZ5rztICEHlaG+rVq3Jk3watrult+Z
-	 SnuXOlpTYIYJEt1ikl6yiBA5ZwFVqcJSVoJN84hGILw0VFUcc5slaqeJn7iJBvkujE
-	 Dj6IX5vXrm/gMgg5ET/q02XjaDClI6LiPsVJe4E4lxNjrhwWDbQEfoExIw1wwXqeDX
-	 Bcs1yJTt1cvXGXkiIAvmeFSOfHExVPDysBMquZP71kjVjzOiaTDTzrSAlH88fEnOeB
-	 MzRUC4BgmBCcOHBGccvaQ4emYBAV3IU+lbR1wFpwb6y1RwFTlY8fsyZm7QbG+1H/zN
-	 vfcLGGCVev8dg==
-Date: Tue, 30 Sep 2025 10:09:02 +0100
-From: Simon Horman <horms@kernel.org>
-To: Sidharth Seela <sidharthseela@gmail.com>
-Cc: antonio@openvpn.net, sd@queasysnail.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
-	willemdebruijn.kernel@gmail.com, kernelxing@tencent.com,
-	nathan@kernel.org, nick.desaulniers+lkml@gmail.com,
-	morbo@google.com, justinstitt@google.com, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: Re: [PATCH net v3] selftest:net: Fix uninit return values
-Message-ID: <aNueLn3Wy-2X_GeE@horms.kernel.org>
-References: <20250929211241.55701-2-sidharthseela@gmail.com>
+	s=arc-20240116; t=1759223621; c=relaxed/simple;
+	bh=NN+fb9rKpSA4avJKgQugSE3d42y1taClRO2GdeIvn1M=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=IHDfbkbzOMxMk+BCT0wHyUigcb0WwP2eEWzQxJOvTRN4IKp7l4KLo0dw3/jSE9avy+EOSAMtdyPy//xU9d4QWxtTD4oIBouqUzHz/yF8N+u9e9URPuHS7dOT9Kts9sGRxXWsxYVD5/Gks/sLNnZ8dZJPRyeeloy2A29WkDt8UMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Mh2MCzVl; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 2EB82C02461;
+	Tue, 30 Sep 2025 09:13:14 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id CD8ED606E4;
+	Tue, 30 Sep 2025 09:13:31 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 71DF4102F17B1;
+	Tue, 30 Sep 2025 11:13:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1759223611; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=l3vyZUYrRuAL1PVDLkE6rONUtsTXIL9lBFx0fhy6A7g=;
+	b=Mh2MCzVlKeIm5FBehjHAJhRNQ0Vv7Hwf9AkJmB9+TsPTna0iUbcumDWwyWCz7tUhYTrSVn
+	qjSnKH/b7w5wjClD1vShxhGOtrRpgObInO5zo2wy/mQmd+YvkVu674gFlYmp6kOEYMSq2g
+	W56KO6DqfXeW3smJaBUVtBzhzUyhnSMEwGXhbsElnIzhYLO7V4j58TaykEGcPfGJmcCJnV
+	VQir4muuplXesS/bCmhhGzS1vAgyH12A3+Yq50rtvaUivKxBQ0JauGXfDZK04PE8n4lym1
+	r+hLo7I6dnZ2/cL51f2tFalUzT607p+ej4g6LdU1t2cMFT78wTGKniVwxUT88Q==
+From: Kory Maincent <kory.maincent@bootlin.com>
+Subject: [PATCH net-next 0/3] Preserve PSE PD692x0 configuration across
+ reboots
+Date: Tue, 30 Sep 2025 11:12:59 +0200
+Message-Id: <20250930-feature_pd692x0_reboot_keep_conf-v1-0-620dce7ee8a2@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250929211241.55701-2-sidharthseela@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIABuf22gC/x3NwQoCIRRG4VcZ7jrBkcm4vUqE2MxvXQIVtRCGe
+ fek5bc5Z6eKIqh0nXYq+EqVFAfm00Try8cnlGzDZLQ5azasAnz7FLi8WTZdu4JHSs29gezWFIO
+ y7JntYi8LzzQyuSBI/y9uFNFURG90P44fAXB0B3wAAAA=
+To: Oleksij Rempel <o.rempel@pengutronix.de>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, kernel@pengutronix.de, 
+ Dent Project <dentproject@linuxfoundation.org>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>
+X-Mailer: b4 0.15-dev-8cb71
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Tue, Sep 30, 2025 at 02:42:42AM +0530, Sidharth Seela wrote:
-> Fix functions that return undefined values. These issues were caught by
-> running clang using LLVM=1 option; and are as follows:
-> --
+From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Hi,
+Previously, the driver would always reconfigure the PSE hardware on
+probe, causing a port matrix reflash that resulted in temporary power
+loss to all connected devices. This change maintains power continuity
+by preserving existing configuration when the PSE has been previously
+initialized.
 
-I don't want to block progress.
-But there are some format problems with the commit message.
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
+Kory Maincent (3):
+      net: pse-pd: pd692x0: Replace __free macro with explicit kfree calls
+      net: pse-pd: pd692x0: Separate configuration parsing from hardware setup
+      net: pse-pd: pd692x0: Preserve PSE configuration across reboots
 
-Locally, git truncates the commit message at the line above ('--').
-Which, omits a lot of useful information.
-Most critically your Signed-off-by line.
+ drivers/net/pse-pd/pd692x0.c | 155 +++++++++++++++++++++++++++++++------------
+ 1 file changed, 112 insertions(+), 43 deletions(-)
+---
+base-commit: cebc5f8eed2c9ad0e048d6a68c3fac92a6020509
+change-id: 20250929-feature_pd692x0_reboot_keep_conf-69a996467491
 
-There is also another '--' below. Just above the fixes tag.
-Which would cause a similar problem.
+Best regards,
+-- 
+Köry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
-And the v2/v3 information should go below the scissors ('---'),
-below your signed-off by line.
-
-Maybe the maintainers can fix this when applying,
-given how close we are to the pull for v6.18-rc1.
-And that I believe there has already been some
-discussion of this patch with the maintainers.
-
-> ovpn-cli.c:1587:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
->  1587 |         if (!sock) {
->       |             ^~~~~
-> ovpn-cli.c:1635:9: note: uninitialized use occurs here
->  1635 |         return ret;
->       |                ^~~
-> ovpn-cli.c:1587:2: note: remove the 'if' if its condition is always false
->  1587 |         if (!sock) {
->       |         ^~~~~~~~~~~~
->  1588 |                 fprintf(stderr, "cannot allocate netlink socket\n");
->       |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->  1589 |                 goto err_free;
->       |                 ~~~~~~~~~~~~~~
->  1590 |         }
->       |         ~
-> ovpn-cli.c:1584:15: note: initialize the variable 'ret' to silence this warning
->  1584 |         int mcid, ret;
->       |                      ^
->       |                       = 0
-> ovpn-cli.c:2107:7: warning: variable 'ret' is used uninitialized whenever switch case is taken [-Wsometimes-uninitialized]
->  2107 |         case CMD_INVALID:
->       |              ^~~~~~~~~~~
-> ovpn-cli.c:2111:9: note: uninitialized use occurs here
->  2111 |         return ret;
->       |                ^~~
-> ovpn-cli.c:1939:12: note: initialize the variable 'ret' to silence this warning
->  1939 |         int n, ret;
->       |                   ^
->       |
-> --
-> Fixes: 959bc330a439 ("testing/selftests: add test tool and scripts for ovpn module")
-> ovpn module")
-> 
-> v3:
-> 	- Use prefix net.
-> 	- Remove so_txtime fix as default case calls error().
-> 	- Changelog before sign-off.
-> 	- Three dashes after sign-off
-> 
-> v2:
-> 	- Use subsystem name "net".
-> 	- Add fixes tags.
-> 	- Remove txtimestamp fix as default case calls error.
-> 	- Assign constant error string instead of NULL.
-> 
-> Signed-off-by: Sidharth Seela <sidharthseela@gmail.com>
-> ---
-> 
-
-This is where the v2/v3 information should go.
-
-...
 
