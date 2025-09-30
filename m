@@ -1,120 +1,136 @@
-Return-Path: <netdev+bounces-227358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6E37BAD145
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 15:33:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DAFBBAD169
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 15:40:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 703111923504
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 13:34:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AC767A5D64
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 13:39:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F2B303A0D;
-	Tue, 30 Sep 2025 13:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78080303A28;
+	Tue, 30 Sep 2025 13:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lKHl+h23"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WqQh4WIK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE023303C93
-	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 13:33:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF76B21D590
+	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 13:40:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759239226; cv=none; b=BFyvXiaulLCdGiq0MJ8DulHZApqs3P1T4MQLpVGAaJQbRQ8A1u9VKUnNGdMXwMJPxBgsNRzU2H3nMSC5h7Ak0ra2+WM9ocA1H1icgBTCBvDkzcphaUpIo6ydukVE0q25sO8z+CmRtAKUH1ijXjwFIWvFrwLrKsAe1r+IOiC5guw=
+	t=1759239642; cv=none; b=OcBY4maOjefCA4fQLo1Y+ts4/vtze7qFSxHqHjLGCBCGEsBQ1n2+/yl9aJqnGCzx7pJaIhrvT9WtlS/TazW6qt85SXqxdrqXdik1kkNtK0C5ZPdS3E7xxMwMGMUZ5jPILxL+L4GdTl4olTIpJ/VEsCYlvgwipKJsjyxVGlpUwKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759239226; c=relaxed/simple;
-	bh=CUHSymEOsx6QYL2fbPXy3esCdme3Q/bVDiY03oECVro=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VQFSfGGHf+bIzjsb3EDbt/vmZV+jmgOlbG3aeNfLWtILZT6UCIOGUv+icplqOP5PrHFJ9Bz3s4TxX4wlPRDoikTeBy8mjdD6P6u8CCBDHHhxp9hAXr8nPPJvHC5TqRAXePMRVgNcagerTmYm+UkcVGD88VTbgM/f+WZkoMkajzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lKHl+h23; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-57f1b88354eso6269421e87.1
-        for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 06:33:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759239223; x=1759844023; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CUHSymEOsx6QYL2fbPXy3esCdme3Q/bVDiY03oECVro=;
-        b=lKHl+h23rdLUl5FWmqRV+eieKEkckSZLzE/7/EoWYuo58gANB3+TIIowY6Pwj7E45x
-         O3sQON5/H+fytgonGL8w5xtYqw5C0vmW/fuaFcX2DpgQgHz/rVfgAoI5B7rSFIveHSKU
-         8bugT8iPyFpFdNIWs0WW6SCDWlDP30Vi11H27OY3iRHNxxFAdcPAJ26Sw4nieMSB2bug
-         ntS6CjpP83JsXt9DIoW8qR6Ohz9PdZ4dfWq2iRkhRe7jxb2M2HVukrVp5oM5455SQPId
-         ZEuPLikVnJgc6yQe9nA2aLdjF6qnF717yir3E2V2CwzXlhLwGp00tIAC82l2g6pahyHx
-         STmw==
+	s=arc-20240116; t=1759239642; c=relaxed/simple;
+	bh=hb7TMarqWXO178DpdiX/rXmmKCvnKm0TOcmJL56yQh4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qDWqOLXJTUDsZokgZTOqA4Z8hU4Od3dWyfEcLyrEuQ4M/tR+uWrn8n4NA2qO8AKu//Bh7tksD1aduAjasSbkp7mFNawY1OWoL679qoK/X2+5bvG4WL2WgNGnRKkES7q6ScNJp6w2SsMA9lrjCPdb2RVh0B94yDQm5TuF7bAYGgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WqQh4WIK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759239639;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Yc1pUt9y2hsw8mhswnVLM/oUyK615tOMdAOq5LgQ9VE=;
+	b=WqQh4WIK6AG6oMTpraTmpoiug2u3o7G4SESct+a0c9FoVOruC1aYMfzcGIaO9ubdTWbPjY
+	loeBwd/Vnmp01bqtPkeP1Jx9XsgAvPUzOEe0JPp+AID4h7Uvaf+qxJxW3qtWEU56/wHehm
+	25iLJ7h5RHuK+hvEOsBO4hPuKzoELe8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-532-EuisKrR1NjyE31SaR9WNiA-1; Tue, 30 Sep 2025 09:40:37 -0400
+X-MC-Unique: EuisKrR1NjyE31SaR9WNiA-1
+X-Mimecast-MFC-AGG-ID: EuisKrR1NjyE31SaR9WNiA_1759239636
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3ecdd80ea44so4266823f8f.1
+        for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 06:40:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759239223; x=1759844023;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CUHSymEOsx6QYL2fbPXy3esCdme3Q/bVDiY03oECVro=;
-        b=Lb9dyxsGZI6e/cjr9kEyIaxmg2v6D8NFF3BNyTS5G2ibi8XEjc8c+s/Pc/orAXBOBt
-         ey8l0ngKj8ik4hnXcuQ3cA6/Q3yyfgsR2r63GfWlr4cbN0ZOS+MSgR1IXmR2g/Zi/+yA
-         US1h9JQmHZGFRbCP6c8/Tbv2Cj+8hpE0U99ZESvHyVz5MRdNui++/gOjlPQ33QPo7I9x
-         Qpsj2PYhi8CPdawUKZAJRmBsylQmOiWu3Gijbo9BnCPlofH590DumCLsS0VQBcIJykQV
-         XuKLloiS0YXD7UXWs4wyaMPkfddbbSugdkpiHhAcRh08fyXieY8llKGDc2kqDB9YWlAt
-         DsDA==
-X-Forwarded-Encrypted: i=1; AJvYcCUTe5hkHsaYevLQ3E0kmd40rbSW8LTBO9iGVvy15qc/bP1NWPZ8GoPG9EyJPvRz4CDBUNFFzZA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzesJL1vx8NUkdn1jteuZveKv74aFtVWvO6GM4e9XIj3kqg6Kq
-	l1mX+WvVhgbT8YQewxpgDdWTbj6KZe5boXnKcDLyRSPHTbU/SGxRlXUU6UgqgYvvOg9AW3QvdIB
-	tN/6FuvWETkhKxOE9w4QE1rAzkjviFnU=
-X-Gm-Gg: ASbGncvwDT//Iw0wk4ryGLr0/VPaFnN4JUwn53WFt/pOhcXqnsCaOUIbC0jBKUvRHGS
-	pjZ0namWXH8sjMCWDM9NafK/fVViHSpRCK5kP0X0Gap0uRKn1YE2VNtOzAUUboleb7RcgdcgTto
-	zyc8pTT35TDeJC5aM8nT0LoUrXyRaO2AIt79UZVAG89yTXJJuAivnGC378FUZfChof87flH+Mne
-	9Vfo5sdO2qxCz3/hPbZqiQJE5x7JIK00E80G2Z4+325nWgTa/RwhRONSXheP7+WOv/dSOptJQFt
-X-Google-Smtp-Source: AGHT+IHklcHPlmAmlLHJfII82jQFE7nA1C/gtspMIjp1MvgO1gKErD/Bs5XD5EbGRk/fHn+Fmc9Tezs5wGtRpvXmEgo=
-X-Received: by 2002:a05:6512:114a:b0:57e:6aef:3ffc with SMTP id
- 2adb3069b0e04-582d073fab8mr7062564e87.4.1759239222574; Tue, 30 Sep 2025
- 06:33:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759239636; x=1759844436;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yc1pUt9y2hsw8mhswnVLM/oUyK615tOMdAOq5LgQ9VE=;
+        b=fMuJj4iSK5Nlwe6uCGeKD6KAFfryq3TQ8fQLWTY/GIjNMr7Qgb6CcTzNN5cQhqqPAS
+         +biiVL6QRg0Z8T28JwAzyL/0nUFGzHL62rWFGWrdIrBqZa3VtvmaE/AIwSKL82r07xEC
+         AYdg6viL8p+iUejHhbT3WzA4HnztgOh5M49PgCf8d5JE7AxMzV2nhm7VhWjL7CS42bDx
+         LdXTVJnOyJ8pYyCzta1EuQUX76EwtfKbXfYEI4UeQMytkDHz53VPMP3k4hy1ToAzEaG6
+         /w/zQthyxHmMwR6FnTOQA6MNvpv3qCHEsfu6r2hK4E9Igxx3pH1EmIt5ucCfRgDIOmhk
+         haZg==
+X-Forwarded-Encrypted: i=1; AJvYcCWQJEzBJSWTIMzH6StkX5kWmWFubQjzn44TQq7RIy7FgX1Mq+bvL7KpNRKp7TKEiyzyIOh7/P0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzF5U6rIc0fJ29jTAcaTI6/Aww3K+lZEhj845u+Q6PNhBFgSkjV
+	HA89vtTCh7hv3kirG03FxXHKZxH656F8jb/FrupoqjPJFJR2UFe7GBcAawcaD28tuNXu/XptY2w
+	x5RVBXwxcOCmbHMKc9LgfmeHmWBwSUJ5MU1NQR9JauCuyyDRZ0HSsPqP1Wg==
+X-Gm-Gg: ASbGnctMnfxgLdPQ9TGPH5HBwbiT7Wfqbu2ScP7AT1jXjotV3yyyI+L05QV+tg86nfA
+	jxNYyLHqhySASAngImU9RMR3V85cT3+eyQp985LFG4NJ9pVm/IH/e4OloHuqFm+20dLSLzGSyNx
+	AT5PObn/mvgl0YuT7JEgzQrH6THX+wH26wzOj7QXDVPoVpWwyEQkxDhTgSrr2GigY++rpx/IJyx
+	tdXTEUt9+gw4DsArgduXgQ8NXF7Aj1IZhPyWFz+GhNfzJEwW8NY649cIk/0S6YyLOufjm2AWuYO
+	s8j0zipaYB+7Tjskj1YKqy3a/yJWgh2wWS7hdECYdvQnjcb6k+tr4Qb3kpQNaBs91eG0Z4LXVKS
+	sTucB61Q5XFboJMlZ+A==
+X-Received: by 2002:a05:6000:3102:b0:3fc:54ff:edbb with SMTP id ffacd0b85a97d-42410d42821mr4360742f8f.9.1759239636223;
+        Tue, 30 Sep 2025 06:40:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFK1fIV99U75p9fIG0T9bgbW2kRrus2xjFJNs0OgF8YVoLPSJiOafXYnVsiEwLidRiRgrEggQ==
+X-Received: by 2002:a05:6000:3102:b0:3fc:54ff:edbb with SMTP id ffacd0b85a97d-42410d42821mr4360711f8f.9.1759239635732;
+        Tue, 30 Sep 2025 06:40:35 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb985e080sm22686562f8f.24.2025.09.30.06.40.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Sep 2025 06:40:35 -0700 (PDT)
+Message-ID: <a0006002-32c5-4595-a66f-258d4d17d52a@redhat.com>
+Date: Tue, 30 Sep 2025 15:40:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250925204251.232473-1-deepak.sharma.472935@gmail.com> <54234daf-ace1-4369-baea-eab94fcea74b@redhat.com>
-In-Reply-To: <54234daf-ace1-4369-baea-eab94fcea74b@redhat.com>
-From: Deepak Sharma <deepak.sharma.472935@gmail.com>
-Date: Tue, 30 Sep 2025 19:03:31 +0530
-X-Gm-Features: AS18NWABMwr4GHfH6IVP_7STi5E4UNpJ7XZKnoK6x2LnyMMJxfQrcgjTzeg1wv8
-Message-ID: <CABbzaOUQC_nshtuZaNJk48JiuYOY0pPxK9i3fW=SsTsFM1Sk9w@mail.gmail.com>
-Subject: Re: [PATCH net v2] atm: Fix the cleanup on alloc_mpc failure in atm_mpoa_mpoad_attach
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	horms@kernel.org, pwn9uin@gmail.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kernel-mentees@lists.linux.dev, 
-	david.hunter.linux@gmail.com, skhan@linuxfoundation.org, 
-	syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com, 
-	syzbot+07b635b9c111c566af8b@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 1/1] Documentation: net: add flow control
+ guide and document ethtool API
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+ f.fainelli@gmail.com, maxime.chevallier@bootlin.com,
+ kory.maincent@bootlin.com, lukma@denx.de, corbet@lwn.net,
+ donald.hunter@gmail.com, vadim.fedorenko@linux.dev, jiri@resnulli.us,
+ vladimir.oltean@nxp.com, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux@armlinux.org.uk,
+ Divya.Koppera@microchip.com, sd@queasysnail.net, sdf@fomichev.me
+References: <20250924120241.724850-1-o.rempel@pengutronix.de>
+ <175921920651.1883014.4986159833879484611.git-patchwork-notify@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <175921920651.1883014.4986159833879484611.git-patchwork-notify@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 30, 2025 at 2:15=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
-> AFAICS the mpc_timer can rearm itself, so this the above is not enough
-> and you should use timer_shutdown_sync() instead.
+Hello,
 
-Hi,
+On 9/30/25 10:00 AM, patchwork-bot+netdevbpf@kernel.org wrote:
+> This patch was applied to netdev/net-next.git (main)
+> by Paolo Abeni <pabeni@redhat.com>:
+> 
+> On Wed, 24 Sep 2025 14:02:41 +0200 you wrote:
+>> Introduce a new document, flow_control.rst, to provide a comprehensive
+>> guide on Ethernet Flow Control in Linux. The guide explains how flow
+>> control works, how autonegotiation resolves pause capabilities, and how
+>> to configure it using ethtool and Netlink.
+>>
+>> In parallel, document the pause and pause-stat attributes in the
+>> ethtool.yaml netlink spec. This enables the ynl tool to generate
+>> kernel-doc comments for the corresponding enums in the UAPI header,
+>> making the C interface self-documenting.
+>>
+>> [...]
 
-As I understand it, `timer_shutdown_sync` will prevent any further
-re-arming of the timer. I think this is not what we want here; since even i=
-f
-we somehow fail to allocate our first MPOA client object on our first
-ioctl call,
-and hence end up wanting to disarm the timer, maybe on next call we can
-allocate it successfully, and we would want that caches are processed
-(which are processed for every time out). So we still want it to be
-possible that
-we can re-arm it.
+I'm sorry for the mess and confusion. This should not have been applied.
+PEBKAC here. I'm reverting it.
 
-And as I understand, `timer_delete_sync` will wait for the callback to
-finish, so
-deleting the timer after that should do the job
+/P
 
-Thanks,
-
-Deepak
 
