@@ -1,93 +1,88 @@
-Return-Path: <netdev+bounces-227248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 285E7BAADDF
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 03:22:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 536FCBAAE15
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 03:27:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE27E188CF31
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 01:22:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0679D1C2612
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 01:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56CD72153ED;
-	Tue, 30 Sep 2025 01:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 919A91D5170;
+	Tue, 30 Sep 2025 01:27:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TMvTJHUi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N1NxS9N1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311B4214A8B
-	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 01:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F31C10785;
+	Tue, 30 Sep 2025 01:27:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759195262; cv=none; b=NsOa1exIYiStu27pzjsy6zNiwOA0F7Sa3Lu7jsgt0hTo9Vp0KXeYkv876ESM9YUjyuHY0z0sFCgvhFPAhYBF+kBSJKCrSxIapiR88Yfy09eoc7+GAYDyO3mdH6XOQrhpowHA4h2wigF0A16CGr/XBbxRP0HrRtkc9FXyxicA2qQ=
+	t=1759195627; cv=none; b=R8pjtRDQHqcLWHIf78BhoKpKijmIeFuLd4HtCUbSi7YqKDE2dGTPwVYgKFsIdNCQDW2TRfaK/fmk4QvUBEmysIsT6v+vecvazchKPaBix6WLHTPMkYJy+wKIWjXQ7rywavftfPBSVQdD998sXmfWs/9fs6zL2fvNraPD4njnhnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759195262; c=relaxed/simple;
-	bh=fLUsM9GPDt1kKZtHy7PgFzrkLXKp0dB6S3Jcb2lSGow=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HP/Kpyx89urF/z3NJX2n1bud8heXNbOVKlBA5QiqTdRlmlQZPnqrFkfbMpFbZTM6U2XiZhEUtfJ0p2iHOfx1ZYhizpflvwT0yO9DaiBXpJwxbHM/70DbiVFYoHrVs5z/GlGDQ21zVOyNG74oJyuKfFIvTwELC9gTCFDfBItrR+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TMvTJHUi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C152C4CEF4;
-	Tue, 30 Sep 2025 01:21:02 +0000 (UTC)
+	s=arc-20240116; t=1759195627; c=relaxed/simple;
+	bh=Mvs1TVjMABo2r4RhATfzwiftFD6X2sa6qX9zEuFViic=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QAbye7QfofjDUNnGjV90uj/Oy1w0l5rJGvVPGAaeXmgN1jIapdhvAhrKfz75wxTaFi5vHfO1JZskzCSmRBu6CDtEvWLoQWogR8i7VwYsRFqiFAIamBuipQwz27jIqRvcXxxuU6mOxM9lkqsdTHtIS1DaLKkn9bG0wHM5T2uVHIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N1NxS9N1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50AF6C4CEF4;
+	Tue, 30 Sep 2025 01:27:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759195262;
-	bh=fLUsM9GPDt1kKZtHy7PgFzrkLXKp0dB6S3Jcb2lSGow=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TMvTJHUixeiCHwYeOsEkLHCXSygxsveFE3fzRd/Npmsn2Ti9qfBTIjp+IQbctQAkI
-	 BB8yAxyr0ZDJn0a15+z+NaCYktINYuLXoFgxUSrzhwnMrQQBOg2+H7YqbWvEtkrjB1
-	 B14U7oe8Laf/Rze8Zcn6W0PupP1uG/YpJh9x8wi//JC6SVEiPkhQdszlYak1jroGSh
-	 /Q8ItUMW8MNXsTi2oWg/PbcT2DdUKQfjNhIupDy6uCqc0TOuXaYUcJiQySsC6FkGGt
-	 Mcmpkf7yycqz0nLJOGJUKItZOCTRTVtKp6GOr9lvw9zCuFXVvwWoAgzSdKcS8iU/O6
-	 cHiKEHvv9g9Gw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC1B39D0C1A;
-	Tue, 30 Sep 2025 01:20:56 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1759195627;
+	bh=Mvs1TVjMABo2r4RhATfzwiftFD6X2sa6qX9zEuFViic=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=N1NxS9N113Mh+6DVlwM2aSjlu9XRdS2eFJvot/SAODRnqPyhbGXnBp6rkRt7zhF1Q
+	 pndzQVqv1z0dwJzVkV+IUZLNNwAiY/VE2ijaLbzQVELao5ElJ2fNbi1JDduFn55ceM
+	 r2JT9IufcOrZHGr7+6ieZrga57dvqpf4UybD+a8cW9AOGm8fGoA7aS4MhLmNa1HinA
+	 C7vYHJTCOMNOvGijXvMp/l+kFE0FdGpz3iskyyHrtx5GPVdIjvJngKBQNLBu0G9fK6
+	 VgVhSLJhis+2+OuyXhVxXzK2Vbk97CAeRbHGZjuc5lXEGylJTdSRyhzjlJbQQQIUKX
+	 nv+TXZa8+O+yw==
+Date: Mon, 29 Sep 2025 18:27:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima
+ <kuniyu@google.com>, David Ahern <dsahern@kernel.org>, Shuah Khan
+ <shuah@kernel.org>, netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 0/8] mptcp: receive path improvement
+Message-ID: <20250929182705.1583702f@kernel.org>
+In-Reply-To: <20250927-net-next-mptcp-rcv-path-imp-v1-0-5da266aa9c1a@kernel.org>
+References: <20250927-net-next-mptcp-rcv-path-imp-v1-0-5da266aa9c1a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ixgbe: fix typos and docstring inconsistencies
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175919525524.1775912.18040158539252294729.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Sep 2025 01:20:55 +0000
-References: <20250929124427.79219-1-alok.a.tiwari@oracle.com>
-In-Reply-To: <20250929124427.79219-1-alok.a.tiwari@oracle.com>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, horms@kernel.org,
- intel-wired-lan@lists.osuosl.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 29 Sep 2025 05:44:01 -0700 you wrote:
-> Corrected function and variable name typos in comments and docstrings:
->  ixgbe_write_ee_hostif_X550 -> ixgbe_write_ee_hostif_data_X550
->  ixgbe_get_lcd_x550em -> ixgbe_get_lcd_t_x550em
->  "Determime" -> "Determine"
->  "point to hardware structure" -> "pointer to hardware structure"
->  "To turn on the LED" -> "To turn off the LED"
+On Sat, 27 Sep 2025 11:40:36 +0200 Matthieu Baerts (NGI0) wrote:
+> This series includes several changes to the MPTCP RX path. The main
+> goals are improving the RX performances, and increase the long term
+> maintainability.
 > 
-> [...]
+> Some changes reflects recent(ish) improvements introduced in the TCP
+> stack: patch 1, 2 and 3 are the MPTCP counter part of SKB deferral free
+> and auto-tuning improvements. Note that patch 3 could possibly fix
+> additional issues, and overall such patch should protect from similar
+> issues to arise in the future.
+> 
+> Patches 4-7 are aimed at introducing the socket backlog usage which will
+> be done in a later series to process the packets received by the
+> different subflows while the msk socket is owned.
+> 
+> Patch 8 is not related to the RX path, but it contains additional tests
+> for new features recently introduced in net-next.
 
-Here is the summary with links:
-  - [net-next] ixgbe: fix typos and docstring inconsistencies
-    https://git.kernel.org/netdev/net-next/c/96ccc93744f8
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Could be a coincidence but we got 3 simult_flows.sh flakes since this
+was posted. Previous one was 20+ days ago:
+https://netdev.bots.linux.dev/contest.html?ld_cnt=250&pw-pass=n&pass=0&test=simult-flows-sh
 
