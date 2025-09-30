@@ -1,60 +1,59 @@
-Return-Path: <netdev+bounces-227372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49D45BAD3AA
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 16:43:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39BD7BAD413
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 16:48:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 853BC7A0F81
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 14:42:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A30F482865
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 14:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D492253FC;
-	Tue, 30 Sep 2025 14:43:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C946C3043C8;
+	Tue, 30 Sep 2025 14:47:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F9EE201017;
-	Tue, 30 Sep 2025 14:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8BE2032D;
+	Tue, 30 Sep 2025 14:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759243432; cv=none; b=R1Ykf9omYCsUu+xSGbG34NC9Q5BkwClN/gocLkBhYQq3LV80kf8iS+A7wm/6P8HnIdbVlovhU9ogeqcaWW580juawBq+9TQjOvX0pjasFOZtG/Eo8FvGfU7EWXmKd/TjNA9RQs2eFCT6Ud/6Z32Vf/pEqaMEpQqlpMI013o/3AM=
+	t=1759243646; cv=none; b=KS+Fewb6Ditpk5qlKpb78KAlm4yfpsOj6k+XQLAtpb9fP9UfhEY7qM6Pfd3aC7WqKYEnyCs0jasSecpINLqYYUx5qb5j2Tf8t4swp6u8LZq/JX2VcGuiwmhZbrJ0IBePLz2c6/PIvrwybhjQjH32RAN4a4FKo0VKYvNOJobcu30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759243432; c=relaxed/simple;
-	bh=RvJXQw/yH73lc7t/zKcG3rvawnBc6JRBzvYD2iOM0cI=;
+	s=arc-20240116; t=1759243646; c=relaxed/simple;
+	bh=wBn3HeWAMo8n4FTUS1A7CqoJBnLIN4H3P06LOhms7Zg=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZFg5T6bnWoxmm9tau4Wk/qcLBm+rCCcjTgT5d+2sy2fOOnDCV6Pqe9Vhl/6TmXWGss2pgVFmsQdeThg9p8qzAyRm44EmIb9SiyQkkHdI1EZY+EHn3OjkZRHj1Kmbbdns9Z7hhBU4iTYLB8QTRi3sNDfvG9AXdFAnxh/ItkVRD+o=
+	 MIME-Version:Content-Type; b=Afxx+RbwueTla+BCb3tj3KoO4WPfmn76iz5lrfpquIvnuZVfwDtYs0vZm0ffdcqADP0mVfsoxw/yp4RbariSrdtQfRu5nvGGPP/fvVLIU56F+bS5wqcbudf3Lew2w+5oukFtkbB0mdOjm8QnXciT0Rdv4BWz+PMUC7khMDC7GcI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cbghh2XtCz6M4Xb;
-	Tue, 30 Sep 2025 22:40:36 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cbgmv0x63z6M4mZ;
+	Tue, 30 Sep 2025 22:44:15 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 54DA41402ED;
-	Tue, 30 Sep 2025 22:43:43 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 1E4061402F5;
+	Tue, 30 Sep 2025 22:47:22 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 30 Sep
- 2025 15:43:42 +0100
-Date: Tue, 30 Sep 2025 15:43:40 +0100
+ 2025 15:47:21 +0100
+Date: Tue, 30 Sep 2025 15:47:19 +0100
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Alejandro Lucero Palau <alucerop@amd.com>
 CC: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
 	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>, <edward.cree@amd.com>,
 	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <dave.jiang@intel.com>, "Alison Schofield"
-	<alison.schofield@intel.com>
-Subject: Re: [PATCH v18 01/20] cxl: Add type2 device basic support
-Message-ID: <20250930154340.000005f7@huawei.com>
-In-Reply-To: <ee5d4ff7-da7b-4caa-b723-b4b5a09bfc39@amd.com>
+	<edumazet@google.com>, <dave.jiang@intel.com>
+Subject: Re: [PATCH v18 09/20] cxl: Define a driver interface for HPA free
+ space enumeration
+Message-ID: <20250930154719.000000fd@huawei.com>
+In-Reply-To: <989dd1bf-adcd-4bd4-82fc-0497d615667a@amd.com>
 References: <20250918091746.2034285-1-alejandro.lucero-palau@amd.com>
-	<20250918091746.2034285-2-alejandro.lucero-palau@amd.com>
-	<20250918115512.00007a02@huawei.com>
-	<7d80a32f-149c-4812-8827-71befdaae924@amd.com>
-	<ee5d4ff7-da7b-4caa-b723-b4b5a09bfc39@amd.com>
+	<20250918091746.2034285-10-alejandro.lucero-palau@amd.com>
+	<20250918153503.00004800@huawei.com>
+	<989dd1bf-adcd-4bd4-82fc-0497d615667a@amd.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,80 +61,109 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
  dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Mon, 29 Sep 2025 11:21:33 +0100
+On Wed, 24 Sep 2025 17:16:14 +0100
 Alejandro Lucero Palau <alucerop@amd.com> wrote:
 
-> On 9/23/25 12:21, Alejandro Lucero Palau wrote:
+> On 9/18/25 15:35, Jonathan Cameron wrote:
+> > On Thu, 18 Sep 2025 10:17:35 +0100
+> > <alejandro.lucero-palau@amd.com> wrote:
+> >  
+> >> From: Alejandro Lucero <alucerop@amd.com>
+> >>
+> >> CXL region creation involves allocating capacity from Device Physical Address
+> >> (DPA) and assigning it to decode a given Host Physical Address (HPA). Before
+> >> determining how much DPA to allocate the amount of available HPA must be
+> >> determined. Also, not all HPA is created equal, some HPA targets RAM, some
+> >> targets PMEM, some is prepared for device-memory flows like HDM-D and HDM-DB,
+> >> and some is HDM-H (host-only).
+> >>
+> >> In order to support Type2 CXL devices, wrap all of those concerns into
+> >> an API that retrieves a root decoder (platform CXL window) that fits the
+> >> specified constraints and the capacity available for a new region.
+> >>
+> >> Add a complementary function for releasing the reference to such root
+> >> decoder.
+> >>
+> >> Based on https://lore.kernel.org/linux-cxl/168592159290.1948938.13522227102445462976.stgit@dwillia2-xfh.jf.intel.com/
+> >>
+> >> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> >> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>  
+> > Either I was half asleep or a few things have snuck in.
 > >
-> > On 9/18/25 11:55, Jonathan Cameron wrote: =20
-> >> On Thu, 18 Sep 2025 10:17:27 +0100
-> >> alejandro.lucero-palau@amd.com wrote:
-> >> =20
-> >>> From: Alejandro Lucero <alucerop@amd.com>
-> >>>
-> >>> Differentiate CXL memory expanders (type 3) from CXL device=20
-> >>> accelerators
-> >>> (type 2) with a new function for initializing cxl_dev_state and a mac=
-ro
-> >>> for helping accel drivers to embed cxl_dev_state inside a private
-> >>> struct.
-> >>>
-> >>> Move structs to include/cxl as the size of the accel driver private
-> >>> struct embedding cxl_dev_state needs to know the size of this struct.
-> >>>
-> >>> Use same new initialization with the type3 pci driver.
-> >>>
-> >>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> >>> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> >>> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-> >>> Reviewed-by: Alison Schofield <alison.schofield@intel.com> =20
-> >> =20
-> >>> diff --git a/Documentation/driver-api/cxl/theory-of-operation.rst=20
-> >>> b/Documentation/driver-api/cxl/theory-of-operation.rst
-> >>> index 257f513e320c..ab8ebe7722a9 100644
-> >>> --- a/Documentation/driver-api/cxl/theory-of-operation.rst
-> >>> +++ b/Documentation/driver-api/cxl/theory-of-operation.rst
-> >>> @@ -347,6 +347,9 @@ CXL Core
-> >>> =A0 .. kernel-doc:: drivers/cxl/cxl.h
-> >>> =A0=A0=A0=A0 :internal:
-> >>> =A0 +.. kernel-doc:: include/cxl/cxl.h
-> >>> +=A0=A0 :internal:
-> >>> + =20
-> >> Smells like a merge conflict issue given same entry is already there.
-> >> =20
-> >
-> > Yes, I'll fix it.
-> >
-> >
-> > Thanks
-> > =20
->=20
-> Hi Jonathan,
->=20
->=20
-> When double-checking for v19, I am not sure what you meant here. It=20
-> seems my answer was in "automatic mode" since there is no duplicate=20
-> entry at all.
->=20
->=20
-> Note there is one line for another file with same name but different=20
-> path. We discussed the file name for public cxl API for type2 drivers=20
-> time ago, so I think this should not be a problem.
->=20
+> > See below.
+> >  
+> >> +
+> >> +/**
+> >> + * cxl_get_hpa_freespace - find a root decoder with free capacity per constraints
+> >> + * @endpoint: the endpoint requiring the HPA  
+> > The parameter seems to have changed.  Make sure to point scripts/kernel-doc at each
+> > file to check for stuff like this.  
+> 
+> 
+> OK.
+> 
+> 
+> >  
+> >> + * @interleave_ways: number of entries in @host_bridges
+> >> + * @flags: CXL_DECODER_F flags for selecting RAM vs PMEM, and Type2 device
+> >> + * @max_avail_contig: output parameter of max contiguous bytes available in the
+> >> + *		      returned decoder
+> >> + *
+> >> + * Returns a pointer to a struct cxl_root_decoder
+> >> + *
+> >> + * The return tuple of a 'struct cxl_root_decoder' and 'bytes available given
+> >> + * in (@max_avail_contig))' is a point in time snapshot. If by the time the
+> >> + * caller goes to use this root decoder's capacity the capacity is reduced then
+> >> + * caller needs to loop and retry.
+> >> + *
+> >> + * The returned root decoder has an elevated reference count that needs to be
+> >> + * put with cxl_put_root_decoder(cxlrd).
+> >> + */
+> >> +struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_memdev *cxlmd,
+> >> +					       int interleave_ways,
+> >> +					       unsigned long flags,
+> >> +					       resource_size_t *max_avail_contig)
+> >> +{
+> >> +	struct cxl_root *root __free(put_cxl_root) = NULL;  
+> > Nope to this.  See the stuff in cleanup.h on why not.  
+> 
+> 
+> I guess you mean to declare the pointer later on when assigned to the 
+> object instead of a default NULL, as you point out later.
 
-Indeed. Misread on my part.
+yes.
 
->=20
->=20
-> > =20
-> >>> =A0 .. kernel-doc:: drivers/cxl/acpi.c
-> >>> =A0=A0=A0=A0 :identifiers: add_cxl_resources =20
-> >> =20
->=20
+> 
+> After reading the cleanup file, it is not clear to me if this is really 
+> needed since there is no lock involved in that example for a potential bug.
+> 
+
+Do it anyway. It's not about bugs today, but about fragile code patterns that
+may break later without it being obvious.
+
+> 
+> >> +	struct cxl_port *endpoint = cxlmd->endpoint;
+> >> +	struct cxlrd_max_context ctx = {
+> >> +		.host_bridges = &endpoint->host_bridge,
+> >> +		.flags = flags,
+> >> +	};
+> >> +	struct cxl_port *root_port;
+> >> +
+> >> +	if (!endpoint) {
+> >> +		dev_dbg(&cxlmd->dev, "endpoint not linked to memdev\n");
+> >> +		return ERR_PTR(-ENXIO);
+> >> +	}
+> >> +
+> >> +	root  = find_cxl_root(endpoint);  
+> > extra space, but should be
+> > 	struct cxl_root *root __free(put_cxl_root) = find_cxl_root(endpoint);
+> > anyway.
+> >  
+
 
 
