@@ -1,219 +1,200 @@
-Return-Path: <netdev+bounces-227233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95C96BAAC53
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 02:02:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C378FBAAC59
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 02:05:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C89671C02CE
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 00:02:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E7F017EC49
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 00:05:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971BD4C9D;
-	Tue, 30 Sep 2025 00:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 814F638D;
+	Tue, 30 Sep 2025 00:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TEUJlpie"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yk8H/caq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9AA3D6F
-	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 00:02:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E6F1804A
+	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 00:05:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759190524; cv=none; b=rHA/L8ZRT8xliPPhBKoCRA+9kMK7vWHV/73qzslLXfdzSA8j9bSen8iPS7YzhQx3TunRSJUJYAYTf+kTZU2r1wPfQlojl2SzClnFytvKDilIfDi9c9Glp69WazC3/o2Lhp09oWUIYHUdw2FfNaEF1cf8oYj/QlQ29n3cw/p32e0=
+	t=1759190708; cv=none; b=Vuzxqc8j87x7RNXKvzmGZq9xGD40AFnqS8nui0AU6GcAh0e0hiw/oj8edtte2cdIa5rRIVqLV9sMHti1Rs8C+VV1fuxOvFCQfoZ1eat84VvZJdS9+nI836LWXgfL0CKDJWFICjcNJDS3AeAtRT9DB1hTa72be2NfyGWn2Yova0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759190524; c=relaxed/simple;
-	bh=3AVIRJP0nqO+qELyFtR/A5Yl/+5NLyaw3x+oly8XPm0=;
+	s=arc-20240116; t=1759190708; c=relaxed/simple;
+	bh=eqf16crL2XW08zq3x3lWA9vUBQ8Q2HiZK/siA2rTqhk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OyxW6IwTBcaTihpp+FPqt6s+3qkaswTuPH6iA3cqXGF5JP9GKBVN8I8ut9RCDPesiZ4vJJH2aZo7i4v3j7wJxMOmjZ3JmuBWkkmw/CZGkqLFAdL2vwR4DI9llkqN2a9Yi2ln8fc0qvGi8TGzRIOs6BeIXKWRO51R3mmRsbYrgsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TEUJlpie; arc=none smtp.client-ip=209.85.160.179
+	 To:Cc:Content-Type; b=qroO2yVpuK+wzUmlh8ic44Uskuv5YHlvS45sOcJMBx5DZJljJMy5uGzM1bt+11Ed43ri/u6HsZmlS3bkL5PnkbG3qk29KkCZniB3u22UmYHg9mzNpkoj5d8tnCssJA3xRS6yaQPjoaGcLs+WgH22F/twMRX8s3Sl3hsXcWkx7tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yk8H/caq; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4df3fabe9c2so71941cf.1
-        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 17:02:02 -0700 (PDT)
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-587bdad8919so3880e87.0
+        for <netdev@vger.kernel.org>; Mon, 29 Sep 2025 17:05:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759190522; x=1759795322; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1759190705; x=1759795505; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9F+loMYCYWrOcpIXdqB3UxC6d0dMHaZJx1ouukFllGU=;
-        b=TEUJlpiejqa1+V8rV1T8wJ0C3nE0QSigfePW9yJtw1WihafH/TJ66gDMd5b88NcQ91
-         2f8boJ/Pti5W8IzlPAYRsDTuzA8lFrXVqK91W36Qlm6qIFT0T4c5xqWKaYKXgMsTLuaB
-         7PzXk0VqhvBQdUTN7FniUzrUtUMdVCOSfp4725igMf8OmVg6cnDL7vIu/bnVte8SgMOl
-         Txo0HANQIiz8lJlsIp/KsVECp2zSaXQ4claKckyITb4PGEBrTvChptxVcel2bHZJLJOp
-         lzWF4R1ERvOCNL/uC/wF0qnH8MxIbpZ7shxF+GUfoLgP0sfY0H2kHB03IGuqcJKGwys1
-         gXHA==
+        bh=qTFYa5j3Us4Va0xzYEn1WzVmgM5S4ZHh6Nsw7evNDJg=;
+        b=yk8H/caqqSj4he5vGTvMni0yvh+krjvYdQrkAGjt1VTjziEXk8bsHG4nrUWi/6i0av
+         qOrBH6fujCpI2kA6tlhCopfgIMWKMUlIysUTh5cidJAxsDwEhk+Q5eoopZIqJgxoNa/D
+         9dqDd+6OW6NvrU611AOSqeLsGc9WXh0dVkFMw6GeP/YfBEEAg5zlmmJP82xi3pxvzvgy
+         nRcaxG0wPhOU8WdAZ4h/bGjz50AmBgLOs3wGBONdng55TpySJRt9+ahg+1NK5hTvytU5
+         RWhtRxzLNVBaJO4y7HNIpeFZ9DpzSyEjiK71h/kCd8gsHqjmvueWDNbP1GHw2HPEVZT+
+         uTPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759190522; x=1759795322;
+        d=1e100.net; s=20230601; t=1759190705; x=1759795505;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9F+loMYCYWrOcpIXdqB3UxC6d0dMHaZJx1ouukFllGU=;
-        b=LKCRt+Kz5ZGdv/fTKaJ2J5kqMrAaKPgRaUuCrMqpVDBP8gM5yeb3utzNC8z2YqtSgd
-         MfVGkgCd8r4npmwkxM5/enkDygoWVtfr7Mf9xOK4eHyy+WHivr7WzvmSeg9bx8AtJEo8
-         ENsSkXytOZbiXujAhn6OxgxZG3iV6BU0J5ceS3GyK6Li9augcMNF1v3kw/xsZ4urj/6u
-         AxAgvBiFQnoxy7oEdt6kURDdR1z1IUlnFI59/UugNJEx1o4H1fzZFPaVkLm6k9uo9Dpl
-         HNyRVyVDi6dUhu6zrD53e04B7xCcVm/4mEfgEI0tFfO8OKabzVp06G+cT3KoofXjgUKl
-         V7SQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUS+HOPnNenICCFTcj9MtNJj3KSG+7aPpV51i3JlwMTPVXhW2M+fJ0yWsYUZ07UI+r591yYsi0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5BPmWCf1OPdjZDs0rpJSHlnOtM5XYbrccg3EFur1ztGtY5FIn
-	xht+FRZ2dWeucrZbWEq1oGW66YHXtPLzn1bVelMxjjYdW9GNtbX7s275lBbG5b31qB6rkgq9wBk
-	wkYk0kqLnr7WSkLGgOup/mfXjYUEzywDdarSGbwng
-X-Gm-Gg: ASbGncuAmD+huYNpxr4GMoitYiu/gcZ2PO0hY1UvE1SHZ8Q8/7ecwzpTtIMCpkCNn/+
-	nOfqnLcd48Ps3Hpj1plB2++Tnimpy9E/Rp6mnHAHq9Vh3vl3SJ3Cb2I6TEeDAShspB+TgDZtFoR
-	MO48u7vSve9yViTWg2oev+aLB1Ge9JBp294KqeFiT+BFfyUnD7ZnNWlSHVWJyGACEg0oeHQ/EXr
-	XsgqCdYCZhXTTShwG1mircz8v/Bz0ZBRIQZH+EITSxgMQa9UBcHF/qhJZ48a/SYbzYUb+JT
-X-Google-Smtp-Source: AGHT+IHyFixTMv37JFGgdfgR3NetprEXaidZPluXal7gyPyVZujOxk/XFuZfwHbPtOO0KW2caMWqJjNIRb8Wpqa75y8=
-X-Received: by 2002:a05:622a:106:b0:4b3:19b2:d22 with SMTP id
- d75a77b69052e-4e2f7ee12aemr1919421cf.13.1759190521092; Mon, 29 Sep 2025
- 17:02:01 -0700 (PDT)
+        bh=qTFYa5j3Us4Va0xzYEn1WzVmgM5S4ZHh6Nsw7evNDJg=;
+        b=nbgjz+tPi9dnk7DZoxC94o0ktSqdPAbPAGEKjTlCZ1mhGe26BK6el4YMZHEYjvH6Ak
+         7F3N2KP+JC5WaSkH6/9uwYRo6CiS/mQYLqXN37JfXK3FPx1Iu5k7IarAiU3G2xtcPi45
+         S6ix8KV1SOrm7pd6RlPx3U6KlLMvDknElV81CDqOFJG8SUWre3aY4iOct3jkHTC17uN6
+         1T0z1vbOklbUf/wSxbPINPdA5NBxtM92032kwxu/IzVPZNhUzclIaoT1kOfHLbaXJKtt
+         so6l+SiiNn1ld44IXijXsqpzDeI68E2JKfSZBEMLSrp1tMBKdZaF91dl8LoPMIKze4ej
+         Ybtg==
+X-Forwarded-Encrypted: i=1; AJvYcCVbJn5+awoQMvfwe2QV2Qxg/Qp7clF/6LuZCrVdOdiBLEOKimERw4nx0kTRIi5AwqyOS6Y2xWM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMiHqt/jgZtFCVxeHWc1N4a01F6FPgFBl6Jv9pFMseLoapEODq
+	TNXBH5mBUZw1lFqa+VDru2FVOmu4w/ne2pnR85ejGlXLedOWDOjW8BxJ67Xg1uR4jSekeimAmlc
+	dKNlxruKgtymIaRBma7bZKVXZ7wHc1wBjd5rVX6c2
+X-Gm-Gg: ASbGncvx0z9UzQ8vqbt9YkYeyRT9gpJFApPTvDtHAMK1vAXqhkjAQAn4fCByWokbesC
+	f10ZBICA9QM5JWSuUsMOROL7bjxp++O/25iizyNxS4Qs7EbRQPclOldEkBE2wqnDn2wRdO8T+aI
+	nWsWqFfnSJtX8+KerB4fd+mWOPRnWSufmRl0l218/eie9XgMrEuv34igd9buon4y6k8llrzcphB
+	fE50qNZl4Y4+HmPeH/oKEyXeT0tC7lH5YGypc2X6r5RZ85dIseRpY5TZHN1qfKWgCIDAB1SCL9U
+	uFk=
+X-Google-Smtp-Source: AGHT+IGIu6ZfUFC6831kj/kQZIrUVyEtrf6F1rhZW2LGImkBg3bJpbAXTgFFPJ3huPmnaWNhKXDuheNSSUczIVpSXDs=
+X-Received: by 2002:ac2:43ad:0:b0:579:78f4:9c37 with SMTP id
+ 2adb3069b0e04-58a96682e41mr102373e87.7.1759190704260; Mon, 29 Sep 2025
+ 17:05:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250924060843.2280499-1-tavip@google.com> <20250924170914.20aac680@kernel.org>
- <CAGWr4cQCp4OwF8ESCk4QtEmPUCkhgVXZitp5esDc++rgxUhO8A@mail.gmail.com>
- <aNUObDuryXVFJ1T9@boxer> <20250925191219.13a29106@kernel.org>
- <CAGWr4cSiVDTUDfqAsHrsu1TRbumDf-rUUP=Q9PVajwUTHf2bYg@mail.gmail.com>
- <aNZ33HRt+SxltbcP@boxer> <20250926124010.4566617b@kernel.org>
-In-Reply-To: <20250926124010.4566617b@kernel.org>
-From: Octavian Purdila <tavip@google.com>
-Date: Mon, 29 Sep 2025 17:01:49 -0700
-X-Gm-Features: AS18NWBuATz_lr0JYRD9JYPmM_LItRpBbCQQJlPRqJq-XgoqeJytNn1U8iu8TfU
-Message-ID: <CAGWr4cSwEbuSPEJp6=-8gRbD7O-pOqzn_1fXPxWv-ZX3b7NX_w@mail.gmail.com>
-Subject: Re: [PATCH net] xdp: use multi-buff only if receive queue supports
- page pool
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, horms@kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me, 
-	ahmed.zaki@intel.com, aleksander.lobakin@intel.com, toke@redhat.com, 
-	lorenzo@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com, 
-	Kuniyuki Iwashima <kuniyu@google.com>
+References: <20250926113841.376461-1-toke@redhat.com>
+In-Reply-To: <20250926113841.376461-1-toke@redhat.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 29 Sep 2025 17:04:51 -0700
+X-Gm-Features: AS18NWBo6Spv6pqHnyjBYozErlOOQW4NN9hFr99N2o7oXA_HCtzRJ7sGtISz6UA
+Message-ID: <CAHS8izMsRq4tfx8603R3HLKPYGqEsLqvPH8qfENFnzeB5Ja8AA@mail.gmail.com>
+Subject: Re: [PATCH net] page_pool: Fix PP_MAGIC_MASK to avoid crashing on
+ some 32-bit arches
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@redhat.com>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, 
+	Michal Hocko <mhocko@suse.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Helge Deller <deller@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-mm@kvack.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 26, 2025 at 12:40=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
+On Fri, Sep 26, 2025 at 4:40=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <t=
+oke@redhat.com> wrote:
 >
-> On Fri, 26 Sep 2025 13:24:12 +0200 Maciej Fijalkowski wrote:
-> > On Fri, Sep 26, 2025 at 12:33:46AM -0700, Octavian Purdila wrote:
-> > > On Thu, Sep 25, 2025 at 7:12=E2=80=AFPM Jakub Kicinski <kuba@kernel.o=
-rg> wrote:
-> > > Ah, yes, you are right. So my comment in the commit message about
-> > > TUN/TAP registering a page shared memory model is wrong. But I think
-> > > the fix is still correct for the reported syzkaller issue. From
-> > > bpf_prog_run_generic_xdp:
-> > >
-> > >         rxqueue =3D netif_get_rxqueue(skb);
-> > >         xdp_init_buff(xdp, frame_sz, rxq: &rxqueue->xdp_rxq);
-> > >
-> > > So xdp_buff's rxq is set to the netstack queue for the generic XDP
-> > > hook. And adding the check in netif_skb_check_for_xdp based on the
-> > > netstack queue should be correct, right?
-> >
-> > Per my limited understanding your change is making skb_cow_data_for_xdp=
-()
-> > a dead code as I don't see mem model being registered for these stack
-> > queues - netif_alloc_rx_queues() only calls xdp_rxq_info_reg() and
-> > mem.type defaults to MEM_TYPE_PAGE_SHARED as it's defined as 0, which
-> > means it's never going to be MEM_TYPE_PAGE_POOL.
+> Helge reported that the introduction of PP_MAGIC_MASK let to crashes on
+> boot on his 32-bit parisc machine. The cause of this is the mask is set
+> too wide, so the page_pool_page_is_pp() incurs false positives which
+> crashes the machine.
 >
-> Hah, that's a great catch, how did I miss that..
+> Just disabling the check in page_pool_is_pp() will lead to the page_pool
+> code itself malfunctioning; so instead of doing this, this patch changes
+> the define for PP_DMA_INDEX_BITS to avoid mistaking arbitrary kernel
+> pointers for page_pool-tagged pages.
 >
-> The reason for the cow is that frags can be shared, we are not allowed
-> to modify them. It's orthogonal.
+> The fix relies on the kernel pointers that alias with the pp_magic field
+> always being above PAGE_OFFSET. With this assumption, we can use the
+> lowest bit of the value of PAGE_OFFSET as the upper bound of the
+> PP_DMA_INDEX_MASK, which should avoid the false positives.
 >
-
-Could we use the same hack that you mention below (declare rxq on the
-stack and fill in the mem info there) for do_xdp_generic?
-
-@@ -5442,7 +5448,10 @@ int do_xdp_generic(const struct bpf_prog
-*xdp_prog, struct sk_buff **pskb)
-        struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
-
-        if (xdp_prog) {
--               struct xdp_buff xdp;
-+               struct xdp_rxq_info rxq =3D {};
-+               struct xdp_buff xdp =3D {
-+                       .rxq =3D &rxq,
-+               };
-                u32 act;
-                int err;
-
-and then explicitly set the mem type:
-
-@@ -5331,14 +5332,19 @@ u32 bpf_prog_run_generic_xdp(struct sk_buff
-*skb, struct xdp_buff *xdp,
-        return act;
- }
-
--static int
--netif_skb_check_for_xdp(struct sk_buff **pskb, const struct bpf_prog *prog=
+> Because we cannot rely on PAGE_OFFSET always being a compile-time
+> constant, nor on it always being >0, we fall back to disabling the
+> dma_index storage when there are no bits available. This leaves us in
+> the situation we were in before the patch in the Fixes tag, but only on
+> a subset of architecture configurations. This seems to be the best we
+> can do until the transition to page types in complete for page_pool
+> pages.
+>
+> Link: https://lore.kernel.org/all/aMNJMFa5fDalFmtn@p100/
+> Fixes: ee62ce7a1d90 ("page_pool: Track DMA-mapped pages and unmap them wh=
+en destroying the pool")
+> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> ---
+> Sorry for the delay on getting this out. I have only compile-tested it,
+> since I don't have any hardware that triggers the original bug. Helge, I'=
+m
+> hoping you can take it for a spin?
+>
+>  include/linux/mm.h   | 18 +++++------
+>  net/core/page_pool.c | 76 ++++++++++++++++++++++++++++++--------------
+>  2 files changed, 62 insertions(+), 32 deletions(-)
+>
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index 1ae97a0b8ec7..28541cb40f69 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -4159,14 +4159,13 @@ int arch_lock_shadow_stack_status(struct task_str=
+uct *t, unsigned long status);
+>   * since this value becomes part of PP_SIGNATURE; meaning we can just us=
+e the
+>   * space between the PP_SIGNATURE value (without POISON_POINTER_DELTA), =
+and the
+>   * lowest bits of POISON_POINTER_DELTA. On arches where POISON_POINTER_D=
+ELTA is
+> - * 0, we make sure that we leave the two topmost bits empty, as that gua=
+rantees
+> - * we won't mistake a valid kernel pointer for a value we set, regardles=
+s of the
+> - * VMSPLIT setting.
+> + * 0, we use the lowest bit of PAGE_OFFSET as the boundary if that value=
+ is
+> + * known at compile-time.
+>   *
+> - * Altogether, this means that the number of bits available is constrain=
+ed by
+> - * the size of an unsigned long (at the upper end, subtracting two bits =
+per the
+> - * above), and the definition of PP_SIGNATURE (with or without
+> - * POISON_POINTER_DELTA).
+> + * If the value of PAGE_OFFSET is not known at compile time, or if it is=
+ too
+> + * small to leave some bits available above PP_SIGNATURE, we define the =
+number
+> + * of bits to be 0, which turns off the DMA index tracking altogether (s=
+ee
+> + * page_pool_register_dma_index()).
+>   */
+>  #define PP_DMA_INDEX_SHIFT (1 + __fls(PP_SIGNATURE - POISON_POINTER_DELT=
+A))
+>  #if POISON_POINTER_DELTA > 0
+> @@ -4175,8 +4174,9 @@ int arch_lock_shadow_stack_status(struct task_struc=
+t *t, unsigned long status);
+>   */
+>  #define PP_DMA_INDEX_BITS MIN(32, __ffs(POISON_POINTER_DELTA) - PP_DMA_I=
+NDEX_SHIFT)
+>  #else
+> -/* Always leave out the topmost two; see above. */
+> -#define PP_DMA_INDEX_BITS MIN(32, BITS_PER_LONG - PP_DMA_INDEX_SHIFT - 2=
 )
-+static int netif_skb_check_for_xdp(struct sk_buff **pskb,
-+                                  const struct bpf_prog *prog,
-+                                  struct xdp_rxq_info *rxq)
- {
-        struct sk_buff *skb =3D *pskb;
-        int err, hroom, troom;
-+       struct page_pool *pool;
+> +/* Constrain to the lowest bit of PAGE_OFFSET if known; see above. */
+> +#define PP_DMA_INDEX_BITS ((__builtin_constant_p(PAGE_OFFSET) && PAGE_OF=
+FSET > PP_SIGNATURE) ? \
+> +                             MIN(32, __ffs(PAGE_OFFSET) - PP_DMA_INDEX_S=
+HIFT) : 0)
 
-        local_lock_nested_bh(&system_page_pool.bh_lock);
--       err =3D skb_cow_data_for_xdp(this_cpu_read(system_page_pool.pool),
-pskb, prog);
-+       pool =3D this_cpu_read(system_page_pool.pool);
-+       err =3D skb_cow_data_for_xdp(pool, pskb, prog);
-+       rxq->mem.type =3D MEM_TYPE_PAGE_POOL;
-+       rxq->mem.id =3D pool->xdp_mem_id;
-        local_unlock_nested_bh(&system_page_pool.bh_lock);
-        if (!err)
-                return 0;
+Do you have to watch out for an underflow of __ffs(PAGE_OFFSET) -
+PP_DMA_INDEX_SHIFT (at which point we'll presumably use 32 here
+instead of the expected 0)? Or is that guaranteed to be positive for
+some reason I'm not immediately grasping.
 
-
-> > IMHO that single case where we rewrite skb to memory backed by page poo=
-l
-> > should have it reflected in mem.type so __xdp_return() potentially used=
- in
-> > bpf helpers could act correctly.
-> >
-> > > > Well, IDK how helpful the flow below would be but:
-> > > >
-> > > > veth_xdp_xmit() -> [ptr ring] -> veth_xdp_rcv() -> veth_xdp_rcv_one=
-()
-> > > >                                                                |
-> > > >                             | xdp_convert_frame_to_buff()   <-'
-> > > >     ( "re-stamps" ;) ->     | xdp->rxq =3D &rq->xdp_rxq;
-> > > >   can eat frags but now rxq | bpf_prog_run_xdp()
-> > > >          is veth's          |
-> > > >
-> > > > I just glanced at the code so >50% changes I'm wrong, but that's wh=
-at
-> > > > I meant.
-> > >
-> > > Thanks for the clarification, I thought that "re-stamps" means the:
-> > >
-> > >     xdp->rxq->mem.type =3D frame->mem_type;
-> > >
-> > > from veth_xdp_rcv_one in the XDP_TX/XDP_REDIRECT cases.
-> > >
-> > > And yes, now I think the same issue can happen because veth sets the
-> > > memory model to MEM_TYPE_PAGE_SHARED but veth_convert_skb_to_xdp_buff
-> > > calls skb_pp_cow_data that uses page_pool for allocations. I'll try t=
-o
-> > > see if I can adapt the syzkaller repro to trigger it for confirmation=
-.
-> >
-> > That is a good catch.
->
-> FWIW I think all calls to xdp_convert_frame_to_buff() must come with
-> the hack that cpu_map_bpf_prog_run_xdp() is doing today. Declare rxq
-> on the stack and fill in the mem info there. I wonder if we should add
-> something to the API (xdp_convert_frame_to_buff()) to make sure people
-> don't forget to do this..
+--=20
+Thanks,
+Mina
 
