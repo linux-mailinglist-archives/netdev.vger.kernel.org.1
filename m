@@ -1,88 +1,251 @@
-Return-Path: <netdev+bounces-227249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 536FCBAAE15
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 03:27:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D6B9DBAAE2D
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 03:29:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0679D1C2612
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 01:27:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8756A1C2F03
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 01:29:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 919A91D5170;
-	Tue, 30 Sep 2025 01:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91761DE4F1;
+	Tue, 30 Sep 2025 01:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N1NxS9N1"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bLRQ8Z3P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F31C10785;
-	Tue, 30 Sep 2025 01:27:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DDD2F4A
+	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 01:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759195627; cv=none; b=R8pjtRDQHqcLWHIf78BhoKpKijmIeFuLd4HtCUbSi7YqKDE2dGTPwVYgKFsIdNCQDW2TRfaK/fmk4QvUBEmysIsT6v+vecvazchKPaBix6WLHTPMkYJy+wKIWjXQ7rywavftfPBSVQdD998sXmfWs/9fs6zL2fvNraPD4njnhnY=
+	t=1759195769; cv=none; b=duKpWiJn1CUtyjhKPqZACcfpj9mU+PPCaOia1doe6GTAaWdv7SswHSoVJ737S4X3zZhWaiiwuDJFesVwH/uOkMdYhmVVh8Igp3Yz57esVwrcOwfimiqUbigeTjOqsjpDD2q5SBZJpx4qUzTQNoawjUcb+iTmEGlDP0rlq7+BveE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759195627; c=relaxed/simple;
-	bh=Mvs1TVjMABo2r4RhATfzwiftFD6X2sa6qX9zEuFViic=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QAbye7QfofjDUNnGjV90uj/Oy1w0l5rJGvVPGAaeXmgN1jIapdhvAhrKfz75wxTaFi5vHfO1JZskzCSmRBu6CDtEvWLoQWogR8i7VwYsRFqiFAIamBuipQwz27jIqRvcXxxuU6mOxM9lkqsdTHtIS1DaLKkn9bG0wHM5T2uVHIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N1NxS9N1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50AF6C4CEF4;
-	Tue, 30 Sep 2025 01:27:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759195627;
-	bh=Mvs1TVjMABo2r4RhATfzwiftFD6X2sa6qX9zEuFViic=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=N1NxS9N113Mh+6DVlwM2aSjlu9XRdS2eFJvot/SAODRnqPyhbGXnBp6rkRt7zhF1Q
-	 pndzQVqv1z0dwJzVkV+IUZLNNwAiY/VE2ijaLbzQVELao5ElJ2fNbi1JDduFn55ceM
-	 r2JT9IufcOrZHGr7+6ieZrga57dvqpf4UybD+a8cW9AOGm8fGoA7aS4MhLmNa1HinA
-	 C7vYHJTCOMNOvGijXvMp/l+kFE0FdGpz3iskyyHrtx5GPVdIjvJngKBQNLBu0G9fK6
-	 VgVhSLJhis+2+OuyXhVxXzK2Vbk97CAeRbHGZjuc5lXEGylJTdSRyhzjlJbQQQIUKX
-	 nv+TXZa8+O+yw==
-Date: Mon, 29 Sep 2025 18:27:05 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima
- <kuniyu@google.com>, David Ahern <dsahern@kernel.org>, Shuah Khan
- <shuah@kernel.org>, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 0/8] mptcp: receive path improvement
-Message-ID: <20250929182705.1583702f@kernel.org>
-In-Reply-To: <20250927-net-next-mptcp-rcv-path-imp-v1-0-5da266aa9c1a@kernel.org>
-References: <20250927-net-next-mptcp-rcv-path-imp-v1-0-5da266aa9c1a@kernel.org>
+	s=arc-20240116; t=1759195769; c=relaxed/simple;
+	bh=IBdn3FFSWnG2f86phHclcLfx531NekpeTlY6Z2Yytw4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hrDy0XPGLoJOyWVktZUVn32QriQkntavH9UBdlIjMF9lAB8zQWIN4hRvvVNeW/i3krLLCOJ85cTeVIDdyVTEQEW/7caWVw5dWwLz2YHRVXll5t9ahARFtjjEasDdBYgSH0LHFrxCF1kogamOfLWCnHhPAXweAaysyykd4gG2Rvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bLRQ8Z3P; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58TKAFZf021100;
+	Tue, 30 Sep 2025 01:29:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=HStQFd92R52W1BuPVWMP7GtMaWGwkLrV080Fvc+fw
+	FM=; b=bLRQ8Z3P1p+R7wIdEkqZGa8627X0OjvZjGe+pSG+bSQ1WneMElkA8lpTN
+	mnQpo24BCXH1mX8rAqkOLsKMsIkSf7kH3f1NsRu6xkBFyBHoKY+Ov+Z5iYp+HqbX
+	XHHdwc4p58LNYnvjFMreG+pqP0LvQ+rs/tKAy8OKWbkLv/bPpUAw3tNWOpArwGz0
+	ruz6xTQl51SWHPWfNt9Tv+Wl/MwGwWe4EaanVtCYnajrgjgyf8cYhdM82zDueBCr
+	ma5f3Z/1ffk3h6u2p8gc1enU3/Z1RBlsvmyPIOuIXZJrV8RAvpRTJZiqkc53xjYW
+	RqNElIdmuNNDYaxjR4PKMLywCPU2A==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49e6bhdkws-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Sep 2025 01:29:05 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58U1T5jE028659;
+	Tue, 30 Sep 2025 01:29:05 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49e6bhdkwq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Sep 2025 01:29:05 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58TLZRrB024163;
+	Tue, 30 Sep 2025 01:29:04 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 49evy10paj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Sep 2025 01:29:04 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58U1T2O732637472
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 30 Sep 2025 01:29:02 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0A28C58056;
+	Tue, 30 Sep 2025 01:29:02 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A7DD258052;
+	Tue, 30 Sep 2025 01:29:01 +0000 (GMT)
+Received: from localhost (unknown [9.61.4.160])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 30 Sep 2025 01:29:01 +0000 (GMT)
+From: David Wilder <wilder@us.ibm.com>
+To: netdev@vger.kernel.org
+Cc: jv@jvosburgh.net, wilder@us.ibm.com, pradeeps@linux.vnet.ibm.com,
+        pradeep@us.ibm.com, i.maximets@ovn.org, amorenoz@redhat.com,
+        haliu@redhat.com, stephen@networkplumber.org, horms@kernel.org,
+        kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+        edumazet@google.com
+Subject: [PATCH net-next v11 0/7] bonding: Extend arp_ip_target format to allow for a list of vlan tags.
+Date: Mon, 29 Sep 2025 18:27:06 -0700
+Message-ID: <20250930012857.2270721-1-wilder@us.ibm.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=Se/6t/Ru c=1 sm=1 tr=0 ts=68db3261 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=_9dExB9TU08cRdUV:21 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8
+ a=R5gRUO9LV5Qi41pJStYA:9 a=zY0JdQc1-4EAyPf5TuXT:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTI3MDAxMCBTYWx0ZWRfXz65RI/GY7feB
+ +K3dBzDJSY2d/N47mRKRLk4y81GdVIReofuvuSlSXZeN9FOb/QuknEIv+2grTdoBZRlg23JiWmR
+ FU05SwKXWa4IQ70AYA8oioyDthKE4RR41lJpaPrbpTIPm4IJwqhXVr6eDqiZEJ6doZudXzxv4lF
+ rf8CWcpzlYU6yE1mrM8xHPEOXC79lOqxPlzrvxkRpII7m5F9wBya8iv0GNMrMg0XbijDF2tpoHA
+ XkoCKcCBjJruytZB11KOSW1wvzz3u450cmaXKJa5LtkdECkBNe72bh5Ifx4z4U9KWumS2GuhcQy
+ S5ywUTxIHj6oDf2fVQ3m8lQPLSnmWAfcIHKnd6g2rtVEJm1uZFAkbUO21DpWAAY28byURPQmgWB
+ QyVfKyLxZQwRTOYGU/XID2MtBuSbwA==
+X-Proofpoint-GUID: TzD7EGrJA7U4CUw4VU91BNrBW9v-669q
+X-Proofpoint-ORIG-GUID: GgGbT-PNLy2muDufSMIv4ZQOqoGjqYga
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-29_08,2025-09-29_04,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 malwarescore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0
+ clxscore=1015 phishscore=0 priorityscore=1501 adultscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2509150000 definitions=main-2509270010
 
-On Sat, 27 Sep 2025 11:40:36 +0200 Matthieu Baerts (NGI0) wrote:
-> This series includes several changes to the MPTCP RX path. The main
-> goals are improving the RX performances, and increase the long term
-> maintainability.
-> 
-> Some changes reflects recent(ish) improvements introduced in the TCP
-> stack: patch 1, 2 and 3 are the MPTCP counter part of SKB deferral free
-> and auto-tuning improvements. Note that patch 3 could possibly fix
-> additional issues, and overall such patch should protect from similar
-> issues to arise in the future.
-> 
-> Patches 4-7 are aimed at introducing the socket backlog usage which will
-> be done in a later series to process the packets received by the
-> different subflows while the msk socket is owned.
-> 
-> Patch 8 is not related to the RX path, but it contains additional tests
-> for new features recently introduced in net-next.
+The current implementation of the arp monitor builds a list of vlan-tags by
+following the chain of net_devices above the bond. See bond_verify_device_path().
+Unfortunately, with some configurations, this is not possible. One example is
+when an ovs switch is configured above the bond.
 
-Could be a coincidence but we got 3 simult_flows.sh flakes since this
-was posted. Previous one was 20+ days ago:
-https://netdev.bots.linux.dev/contest.html?ld_cnt=250&pw-pass=n&pass=0&test=simult-flows-sh
+This change extends the "arp_ip_target" parameter format to allow for a list of
+vlan tags to be included for each arp target. This new list of tags is optional
+and may be omitted to preserve the current format and process of discovering
+vlans.
+
+The new format for arp_ip_target is:
+arp_ip_target ipv4-address[vlan-tag\...],...
+
+For example:
+arp_ip_target 10.0.0.1[10/20]
+arp_ip_target 10.0.0.1[] (used to disable vlan discovery)
+
+Changes since V10
+Thanks Paolo:
+- 1/7 Changed the layout of struct bond_arp_target to reduce size of the struct.
+- 3/7 Fixed format 'size-num' -> 'size - num'
+- 7/7 Updated selftest (bond-arp-ip-target.sh). Removed sleep 10 in check_failure_count().
+      Added call to tc to verify arp probes are reaching the target interface. Then I verify that
+      the Link Failure counts are not increasing over "time".  Arp probes are sent every 100ms,
+      two missed probes will trigger a Link failure. A one second wait between checking counts
+      should be be more than sufficient.  This speeds up the execution of the test.
+
+Thanks Nikolay:
+- 4/7 In bond_option_arp_ip_targets_clear() I changed the definition of empty_target to empty_target = {}.
+-     bond_validate_tags() now verifies input is a multiple of sizeof(struct bond_vlan_tag).
+      Updated VID validity check to use: !tags->vlan_id || tags->vlan_id >= VLAN_VID_MASK) as suggested.
+-     In bond_option_arp_ip_targets_set() removed the redundant length check of target.target_ip.
+-     Added kfree(target.tags) when bond_option_arp_ip_target_add() results in an error.
+-     Removed the caching of struct bond_vlan_tag returned by bond_verify_device_path(), Nikolay
+      pointed out that caching tags prevented the detection of VLAN configuration changes. 
+      Added a kfree(tags) for tags allocated in bond_verify_device_path().
+
+Jay, Nikolay and I had a discussion regarding locking when adding, deleting or changing vlan tags.
+Jay pointed out that user supplied tags that are stashed in the bond configuration and can only be
+changed via user space this can be done safely in an RCU manner as netlink always operates with RTNL
+held. If user space provided tags and then replumbs things, it'll be on user space to update the tags
+in a safe manor.  
+
+I was concerned about changing options on a configured bond,  I found that attempting to change
+a bonds configuration (using "ip set") will abort the attempt to make a change if the bond's state is
+"UP" or has slaves configured. Therefor the configuration and operational side of a bond is separated.
+I agree with Jay that the existing locking scheme is sufficient.
+
+Change since V9
+Fix kdoc build error.
+
+Changes since V8:
+Moved the #define BOND_MAX_VLAN_TAGS from patch 6 to patch 3.
+Thanks Simon for catching the bisection break.
+
+Changes since V7:
+These changes should eliminate the CI failures I have been seeing.
+1) patch 2, changed type of bond_opt_value.extra_len to size_t.
+2) Patch 4, added bond_validate_tags() to validate the array of bond_vlan_tag provided by
+ the user.
+
+Changes since V6:
+1) I made a number of changes to fix the failure seen in the
+kernel CI.  I am still unable to reproduce the this failure, hopefully I
+have fixed it.  These change are in patch #4 to functions:
+bond_option_arp_ip_targets_clear() and
+bond_option_arp_ip_targets_set()
+
+Changes since V5: Only the last 2 patches have changed since V5.
+1) Fixed sparse warning in bond_fill_info().
+2) Also in bond_fill_info() I resolved data.addr uninitialized when if condition is not met.
+Thank you Simon for catching this. Note: The change is different that what I shared earlier.
+3) Fixed shellcheck warnings in test script: Blocked source warning, Ignored specific unassigned
+references and exported ALL_TESTS to resolve a reference warning.
+
+Changes since V4:
+1)Dropped changes to proc and sysfs APIs to bonding.  These APIs 
+do not need to be updated to support new functionality.  Netlink
+and iproute2 have been updated to do the right thing, but the
+other APIs are more or less frozen in the past.
+
+2)Jakub reported a warning triggered in bond_info_seq_show() during
+testing.  I was unable to reproduce this warning or identify
+it with code inspection.  However, all my changes to bond_info_seq_show()
+have been dropped as unnecessary (see above).
+Hopefully this will resolve the issue. 
+
+3)Selftest script has been updated based on the results of shellcheck.
+Two unresolved references that are not possible to resolve are all
+that remain.
+
+4)A patch was added updating bond_info_fill()
+to support "ip -d show <bond-device>" command.
+
+The inclusion of a list of vlan tags is optional. The new logic
+preserves both forward and backward compatibility with the kernel
+and iproute2 versions.
+
+Changes since V3:
+1) Moved the parsing of the extended arp_ip_target out of the kernel and into
+   userspace (ip command). A separate patch to iproute2 to follow shortly.
+2) Split up the patch set to make review easier.
+
+Please see iproute changes in a separate posting.
+
+Thank you for your time and reviews.
+
+Signed-off-by: David Wilder <wilder@us.ibm.com>
+
+David Wilder (7):
+  bonding: Adding struct bond_arp_target
+  bonding: Adding extra_len field to struct bond_opt_value.
+  bonding: arp_ip_target helpers.
+  bonding: Processing extended arp_ip_target from user space.
+  bonding: Update to bond_arp_send_all() to use supplied vlan tags
+  bonding: Update for extended arp_ip_target format.
+  bonding: Selftest and documentation for the arp_ip_target parameter.
+
+ Documentation/networking/bonding.rst          |  11 +
+ drivers/net/bonding/bond_main.c               |  48 ++--
+ drivers/net/bonding/bond_netlink.c            |  35 ++-
+ drivers/net/bonding/bond_options.c            | 140 +++++++++---
+ drivers/net/bonding/bond_procfs.c             |   4 +-
+ drivers/net/bonding/bond_sysfs.c              |   4 +-
+ include/net/bond_options.h                    |  29 ++-
+ include/net/bonding.h                         |  61 +++++-
+ .../selftests/drivers/net/bonding/Makefile    |   3 +-
+ .../drivers/net/bonding/bond-arp-ip-target.sh | 205 ++++++++++++++++++
+ 10 files changed, 464 insertions(+), 76 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/bonding/bond-arp-ip-target.sh
+
+-- 
+2.50.1
+
 
