@@ -1,50 +1,56 @@
-Return-Path: <netdev+bounces-227267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E4B1BAAEBD
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 03:50:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65092BAAEC6
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 03:52:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5E07D4E0685
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 01:50:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FC4D169174
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 01:52:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF351FE471;
-	Tue, 30 Sep 2025 01:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F2d+73AK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818F21A9FAB;
+	Tue, 30 Sep 2025 01:52:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C653A1F0E39;
-	Tue, 30 Sep 2025 01:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542F120B22;
+	Tue, 30 Sep 2025 01:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759197042; cv=none; b=Jws9YHEb4+yR/Vg8+9LD8Vvhij/yxXU6T+MUzN5pQcMqyWc8Ez73esMAoVwYd6jL+wq01LSYTm25OkDsPDYSNE/t2o/cPA6s9Sf9mWc/FupCvpmbRFZ7NgNs7rlsa/4M1Omv/NlSQVpHCbwRCQQ4Ut4oI6o6FTy8y32DbdJ1iZI=
+	t=1759197124; cv=none; b=vDtaJ9Zct//zUxwZ/YPIn5bFXwyeDuuMfO1CVckWbxpyQLqJh75TgOXGQQddokZpO12M6BL5Ett/Xa9vahKqHFRvdBcKiHjK3aILEJHIlnhw/yGJ9E5JQJ4iWPZliBkvzCXAAuZgKv4NGUtkuJFzJQBcuMC6Lfdn3hqPFzSqu+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759197042; c=relaxed/simple;
-	bh=fmcYjWJAnGdhbsMUxYEUP6vCOJjyb2KhW72GCar/ySs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pJrYtKRQ6hl5c/acXdwai31hYQJzySBPN4n2rb+1pzgoU+rHUelnjdhqE/nCezQa6uMXfyzgESohGh4qoLa7W9sATN+TTkakm9gS7YWDZTkCm8hLoacv9AbMC5QeLpRwZV6+GfSkef1Anj4BfnPP9xxsdIjIgpg9IR0jVBt/xH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F2d+73AK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F8F6C4CEF4;
-	Tue, 30 Sep 2025 01:50:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759197042;
-	bh=fmcYjWJAnGdhbsMUxYEUP6vCOJjyb2KhW72GCar/ySs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=F2d+73AKmrnqDc7leXgfFj8Ctj5ugwep7vPk45YGtVuyDgqU2H/TyHTucnswLXSq2
-	 Wkjv07XWjUdSg/DBJ56ecR4SRsYSfNGm67CWRMgIaQX+rWDhBy62n1peZyw2ZFWn3a
-	 tOHo8qlPPBsN/mnWLSIdrjLzQBkUqJQhPgCbJ4LccSzWKOfMYdBAIxgY2UAJ2USNXA
-	 Lhrer1U2Pwa/D1szx7USSgVbnWT2HPoVkWCkmFnTgT5z4f8gPOVfeEVhS3nWXdWfMG
-	 USbIerc7boAKmG9Q2iIYUtSF6dD2jYOzWSHoExc6KgGteHuEHt1E17ovQMzeY4w2oX
-	 26aCfJqcn8kDg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADFB39D0C1A;
-	Tue, 30 Sep 2025 01:50:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1759197124; c=relaxed/simple;
+	bh=tVEldp/5VrBGQPwzo4l8dsB69fJuysfXQTe7HYA876A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ato6Pm0MVHJp30pINnBBckTKlevzdFUqj91XxxqETg71Ct/1NOwKhO8FDmFZgxHmoT6yl7NBtwyj5TJ89KSm44evy2JopqdJtvgdTJrLKKEgW0yXiw+bkJqqmrEg4013b6/MxKdIe+ayLNKf1+q5brzOg1GrtPzQb5DgVcmWygg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from DESKTOP-L0HPE2S (unknown [124.16.141.245])
+	by APP-05 (Coremail) with SMTP id zQCowAAXtg+nN9toIWUcCQ--.31124S2;
+	Tue, 30 Sep 2025 09:51:36 +0800 (CST)
+From: Haotian Zhang <vulab@iscas.ac.cn>
+To: Jacob Keller <jacob.e.keller@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haotian Zhang <vulab@iscas.ac.cn>
+Subject: [PATCH v2] ice: ice_adapter: release xa entry on adapter allocation failure
+Date: Tue, 30 Sep 2025 09:51:25 +0800
+Message-ID: <20250930015125.617-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.50.1.windows.1
+In-Reply-To: <20250929024855.2037-1-vulab@iscas.ac.cn>
+References: <20250929024855.2037-1-vulab@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,48 +58,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: stmmac: Convert open-coded register
- polling
- to helper macro
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175919703549.1783832.10169355846256119327.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Sep 2025 01:50:35 +0000
-References: <20250927081036.10611-1-0x1207@gmail.com>
-In-Reply-To: <20250927081036.10611-1-0x1207@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, xfr@outlook.com, horms@kernel.org
+X-CM-TRANSID:zQCowAAXtg+nN9toIWUcCQ--.31124S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uryUtrWxuw1DJF18Wr1xZrb_yoW8XF4rpr
+	4kJrWxCr40qr4vga1kZa1xZryUua1rKr98KF4rJwnxuFZxJw1jqry5tryjgFs5C39Yg3ZF
+	q3Wqyw15Z34DAw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9I14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxV
+	WxJr0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2Wl
+	Yx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbV
+	WUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7Cj
+	xVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
+	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
+	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
+	IYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBgsBA2jbHlldZAAAsC
 
-Hello:
+When ice_adapter_new() fails, the reserved XArray entry created by
+xa_insert() is not released. This causes subsequent insertions at
+the same index to return -EBUSY, potentially leading to
+NULL pointer dereferences.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Release the reserved entry with xa_release() when adapter allocation
+fails to prevent this issue.
 
-On Sat, 27 Sep 2025 16:10:36 +0800 you wrote:
-> Drop the open-coded register polling routines.
-> Use readl_poll_timeout_atomic() in atomic state.
-> 
-> Also adjust the delay time to 10us which seems more reasonable.
-> 
-> Tested on NXP i.MX8MP and ROCKCHIP RK3588 boards,
-> the break condition was met right after the first polling,
-> no delay involved at all.
-> So the 10us delay should be long enough for most cases.
-> 
-> [...]
+Fixes: 0f0023c649c7 ("ice: do not init struct ice_adapter more times than needed")
+Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Haotian Zhang <vulab@iscas.ac.cn>
 
-Here is the summary with links:
-  - [net-next,v2] net: stmmac: Convert open-coded register polling to helper macro
-    https://git.kernel.org/netdev/net-next/c/9dd4e022bfff
+---
+Changes in v2:
+  - Instead of checking the return value of xa_store(), fix the real bug
+    where a failed ice_adapter_new() would leave a stale entry in the
+    XArray.
+  - Use xa_release() to clean up the reserved entry, as suggested by
+    Jacob Keller.
+---
+ drivers/net/ethernet/intel/ice/ice_adapter.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
+index b53561c34708..9eb100b11439 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adapter.c
++++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
+@@ -110,8 +110,10 @@ struct ice_adapter *ice_adapter_get(struct pci_dev *pdev)
+ 			return ERR_PTR(err);
+ 
+ 		adapter = ice_adapter_new(pdev);
+-		if (!adapter)
++		if (!adapter) {
++			xa_release(&ice_adapters, index);
+ 			return ERR_PTR(-ENOMEM);
++		}
+ 		xa_store(&ice_adapters, index, adapter, GFP_KERNEL);
+ 	}
+ 	return adapter;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.50.1.windows.1
 
 
