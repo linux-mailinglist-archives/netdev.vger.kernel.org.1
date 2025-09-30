@@ -1,185 +1,131 @@
-Return-Path: <netdev+bounces-227314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7163BBAC339
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 11:14:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17D4BBAC3B2
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 11:17:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54A4A7A4742
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 09:12:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E674321636
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 09:17:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26FD2F60D6;
-	Tue, 30 Sep 2025 09:13:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9DC42F6194;
+	Tue, 30 Sep 2025 09:16:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gcpm6JUC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LkQTqxgI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACC32F546D;
-	Tue, 30 Sep 2025 09:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13CC724A076
+	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 09:16:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759223624; cv=none; b=FFcbokt+5l2fP0lC8BqZ4a/ufQwOD/9+VdmE9eEnxpM0m1AawVRtb7gPaj3iX4Et1T61thn8ArewdQDqBcRo0hDyYd5/H02S5/d7SiPRT9KcKRDZf9TjvgPBOgGMYMNDBxISSX38fA4RyuUvhZxLnq2IJFyJNOIAZG8fLBXvl9k=
+	t=1759223769; cv=none; b=uCcMikjk9eD2/RFP18Wl+d9zMTxNn5x5/7OY5aHqzKhDd4n3TVdWzCljFTm28YR74GaFHw06okUo1AkhUutxL1ns70fr82kw6gVSWXtalfVAGx6V8QsEvNOzgl/XsdVRYr8GBzFq/aPQL9Pu8i2JH0ZhPFcVQqNcc05Uk+V0S0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759223624; c=relaxed/simple;
-	bh=RXiNSsaLBFvnwtGUyw4I9dI1476goIIzvGRvfaz60TY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=cRUGWxxpox5A2zjDG+2VGzYNy1630gLWkdUw6qKd+G9+LgQIFTyz+lbkcSNWEgOSuz+DTG818O67HVX9NW9Fcm/SwDj0bLEgO0K/13lmLSzY2/55QBsg47oYq5Xam7tlE6xUFZXp/Tg8W6Qj/Cj36O0iLRSNg77DWsj+OSeV16Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gcpm6JUC; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 7DA644E40DCB;
-	Tue, 30 Sep 2025 09:13:35 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 52353606E4;
-	Tue, 30 Sep 2025 09:13:35 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DD9FE102F17B4;
-	Tue, 30 Sep 2025 11:13:33 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1759223614; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=IAlSFBW3wt+5q5wx1Fjlx3+q6drrWVIVS7BvJiZpmkM=;
-	b=gcpm6JUCxXt5NlcFCzH09r8vcbxzuLtw9FaNip2dNi16dgly80S5/uIPDTaVxg6I6fOucU
-	xiGEdeo9jTMdwimynDsHen9upPUW/BWwP27HksbczjPEUe0KA77oknZWCZqXdo7/yx8jWj
-	9deczNH8BXUj/DsKcnRpUbeuKeXNQCPH5wHZqmoi+dtb9nBNlQt8z5hPYeNqije41dgmc4
-	uwLu3bZC2yvkP0broaS93ijDsCdw5QXeutHDNPrRjC45+uaMAYSEhnuLzxNHgTMD4wkNGy
-	idfEaWM7Pz8YVfw+LsoTZOdPhiI1dekhAnL3I52iBTEFepkPgI16mq1yZmP/Bw==
-From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Tue, 30 Sep 2025 11:13:02 +0200
-Subject: [PATCH net-next 3/3] net: pse-pd: pd692x0: Preserve PSE
- configuration across reboots
+	s=arc-20240116; t=1759223769; c=relaxed/simple;
+	bh=DhVxX6nOFn/AJnMi25R+uMYpH2MejrrzwYzAdY7Psec=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JIp9eoMAd2qsQ6230tBbIS3E3hDVy9Ew+oq1dCXFpzDr+3HmrQKNy45MOCqb+XV1aGO13zLHaHRgPDyqBJveaXI7zGXGG0jd35hp+DMVLAGR1Nr1kL+EGFjkxYihCyaiAgYpnPX9WTgVZ9LLwBuZoHvgbBjC/RVRQ+L4k6X9Z+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LkQTqxgI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759223765;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5mzLW36l3vHTN0xGG7e1jWdQ3WYx1BRHAB26zy8eZkI=;
+	b=LkQTqxgIhwdpZbsWv35ulst7BFzko5Hw7MmL9g/Zm4dvhrXsd2D8CZPnMBw3bEgKEZSfh5
+	h+a1oMQ7AuuEpqbNdFydscd12/60RxUFJ5UlNVKuj5KQ4bcZ9MbEJAJN6B53HNcB8gWVVj
+	7FmaIsozkp37AsBBXPLlI1KNwqwilZM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-662-iDoCgkyzNXSp5oYbCkKHVQ-1; Tue, 30 Sep 2025 05:16:04 -0400
+X-MC-Unique: iDoCgkyzNXSp5oYbCkKHVQ-1
+X-Mimecast-MFC-AGG-ID: iDoCgkyzNXSp5oYbCkKHVQ_1759223763
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3f3c118cbb3so3693331f8f.3
+        for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 02:16:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759223763; x=1759828563;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5mzLW36l3vHTN0xGG7e1jWdQ3WYx1BRHAB26zy8eZkI=;
+        b=TpmbRl2Tyqm4ziaxIHLpr7YHicSmGKgZzbkh/4fVAyTVche75lHRbOtNTNPgf+Fw+b
+         4xmIcj1YzUm46Usd4gWjZUYenebPaCHg3pakd/y1jdntvUi1XM9OCfulp8h3VS+cyjzu
+         AuOcRsK/mWPQ87Ma8Ka9Ruxdp9gqsBbxvTGboe2vlbx8l5w26HZ1YZ6/tDCicYzRyKSh
+         M05BkT0D2IcqJqRHBZKwjO3/beWp2JEeTHhz2FEPRSCW+iX4HcHZ9nMwxI+Y4NXdcnQX
+         E+tAEYFJYtlD4IFBMHWmBwHzqoDDScgNhn+quysfu1y4xjklIFW27d+0l2IooO1WvCXr
+         k2cA==
+X-Forwarded-Encrypted: i=1; AJvYcCVRPwfrpLGmrHUnlcNH3CUHXNr/MHNYfXPWeyE0MsqAPziVjRkScMXotiIKl6V8DuLq12yMSIQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2PNBsBRH+js3qf7UiO12mLcvL3tdSYsvBXu9SGaONbslYMmoU
+	K3e8sTLrKZKY7+YdtQTCv1DyfeJBZl6DrZ8rFlqAcet1GBSkwA13aRBOQW4tYjT8KYcGOOtJT9G
+	3A9MMh9ybrUberDdkjJu7UX8fgcVMfISCkEpYdAnzRxjwysVvNiH1iDVONQ==
+X-Gm-Gg: ASbGncuUFTi/lyEVL8JN8XZB0QImOpmE/rD+NkQwBEnXaKj531Tgl/Nn233RhwcnEEa
+	5WNEfY/LCdeXflW3w95RWWuaTlkFFOduH4di9novbhjmmysNa2Xtqrl1exjKgdB6GWc91zTLVCw
+	pr46zO3RLIp70Q9RBgST/xzUsHTf7Hd/R6oohV1xjVutbhPob/cINp8HKv8oVFvUTCnrTPc2WjS
+	WB7nLFe66MSczNlQ5df/exoOhurLgRbOBAk3Di9taMN5MORho5pdj8JTjXLas1hFvEkhBgHho6h
+	ao1X+/K2TW3tUlXZUQ/dV+JJ6lFeJY60+ojs+4CjJi4696jf8NfIo172OaMTSFM+HSBOg7zzNwN
+	pHhN2VkxWVrTe+iizlw==
+X-Received: by 2002:a5d:64e8:0:b0:3ff:17ac:a34b with SMTP id ffacd0b85a97d-40e499acbf7mr18158161f8f.42.1759223762677;
+        Tue, 30 Sep 2025 02:16:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEPJYHsMgzyYX8n1S+NMBgDuxjdaGhUBWCQvgO9dlxbt4WgqHiEtGqYpfzNw/zyFhzKp+42mA==
+X-Received: by 2002:a5d:64e8:0:b0:3ff:17ac:a34b with SMTP id ffacd0b85a97d-40e499acbf7mr18158140f8f.42.1759223762234;
+        Tue, 30 Sep 2025 02:16:02 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc82f2965sm21712072f8f.55.2025.09.30.02.16.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Sep 2025 02:16:01 -0700 (PDT)
+Message-ID: <f64b89b1-d01c-41d6-9158-e7c14d236d2d@redhat.com>
+Date: Tue, 30 Sep 2025 11:16:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 1/3] rculist: Add hlist_nulls_replace_rcu()
+ and hlist_nulls_replace_init_rcu()
+To: xuanqiang.luo@linux.dev, edumazet@google.com, kuniyu@google.com,
+ "Paul E. McKenney" <paulmck@kernel.org>
+Cc: kerneljasonxing@gmail.com, davem@davemloft.net, kuba@kernel.org,
+ netdev@vger.kernel.org, Xuanqiang Luo <luoxuanqiang@kylinos.cn>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>
+References: <20250926074033.1548675-1-xuanqiang.luo@linux.dev>
+ <20250926074033.1548675-2-xuanqiang.luo@linux.dev>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250926074033.1548675-2-xuanqiang.luo@linux.dev>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250930-feature_pd692x0_reboot_keep_conf-v1-3-620dce7ee8a2@bootlin.com>
-References: <20250930-feature_pd692x0_reboot_keep_conf-v1-0-620dce7ee8a2@bootlin.com>
-In-Reply-To: <20250930-feature_pd692x0_reboot_keep_conf-v1-0-620dce7ee8a2@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, kernel@pengutronix.de, 
- Dent Project <dentproject@linuxfoundation.org>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>
-X-Mailer: b4 0.15-dev-8cb71
-X-Last-TLS-Session-Version: TLSv1.3
 
-From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+On 9/26/25 9:40 AM, xuanqiang.luo@linux.dev wrote:
+> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+> 
+> Add two functions to atomically replace RCU-protected hlist_nulls entries.
+> 
+> Keep using WRITE_ONCE() to assign values to ->next and ->pprev, as
+> mentioned in the patch below:
+> commit efd04f8a8b45 ("rcu: Use WRITE_ONCE() for assignments to ->next for
+> rculist_nulls")
+> commit 860c8802ace1 ("rcu: Use WRITE_ONCE() for assignments to ->pprev for
+> hlist_nulls")
+> 
+> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-Detect when PSE hardware is already configured (user byte == 42) and
-skip hardware initialization to prevent power interruption to connected
-devices during system reboots.
+This deserves explicit ack from RCU maintainers.
 
-Previously, the driver would always reconfigure the PSE hardware on
-probe, causing a port matrix reflash that resulted in temporary power
-loss to all connected devices. This change maintains power continuity
-by preserving existing configuration when the PSE has been previously
-initialized.
+Since we are finalizing the net-next PR, I suggest to defer this series
+to the next cycle, to avoid rushing such request.
 
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
- drivers/net/pse-pd/pd692x0.c | 35 ++++++++++++++++++++++++++++++++---
- 1 file changed, 32 insertions(+), 3 deletions(-)
+Thanks,
 
-diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
-index 782b1abf94cb..134435e90073 100644
---- a/drivers/net/pse-pd/pd692x0.c
-+++ b/drivers/net/pse-pd/pd692x0.c
-@@ -30,6 +30,8 @@
- #define PD692X0_FW_MIN_VER	5
- #define PD692X0_FW_PATCH_VER	5
- 
-+#define PD692X0_USER_BYTE	42
-+
- enum pd692x0_fw_state {
- 	PD692X0_FW_UNKNOWN,
- 	PD692X0_FW_OK,
-@@ -80,6 +82,7 @@ enum {
- 	PD692X0_MSG_GET_PORT_PARAM,
- 	PD692X0_MSG_GET_POWER_BANK,
- 	PD692X0_MSG_SET_POWER_BANK,
-+	PD692X0_MSG_SET_USER_BYTE,
- 
- 	/* add new message above here */
- 	PD692X0_MSG_CNT
-@@ -103,6 +106,7 @@ struct pd692x0_priv {
- 	bool last_cmd_key;
- 	unsigned long last_cmd_key_time;
- 
-+	bool cfg_saved;
- 	enum ethtool_c33_pse_admin_state admin_state[PD692X0_MAX_PIS];
- 	struct regulator_dev *manager_reg[PD692X0_MAX_MANAGERS];
- 	int manager_pw_budget[PD692X0_MAX_MANAGERS];
-@@ -193,6 +197,12 @@ static const struct pd692x0_msg pd692x0_msg_template_list[PD692X0_MSG_CNT] = {
- 		.key = PD692X0_KEY_CMD,
- 		.sub = {0x07, 0x0b, 0x57},
- 	},
-+	[PD692X0_MSG_SET_USER_BYTE] = {
-+		.key = PD692X0_KEY_PRG,
-+		.sub = {0x41, PD692X0_USER_BYTE},
-+		.data = {0x4e, 0x4e, 0x4e, 0x4e,
-+			 0x4e, 0x4e, 0x4e, 0x4e},
-+	},
- };
- 
- static u8 pd692x0_build_msg(struct pd692x0_msg *msg, u8 echo)
-@@ -1233,6 +1243,15 @@ static void pd692x0_managers_free_pw_budget(struct pd692x0_priv *priv)
- 	}
- }
- 
-+static int
-+pd692x0_save_user_byte(struct pd692x0_priv *priv)
-+{
-+	struct pd692x0_msg msg, buf;
-+
-+	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_USER_BYTE];
-+	return pd692x0_sendrecv_msg(priv, &msg, &buf);
-+}
-+
- static int pd692x0_setup_pi_matrix(struct pse_controller_dev *pcdev)
- {
- 	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
-@@ -1268,9 +1287,16 @@ static int pd692x0_setup_pi_matrix(struct pse_controller_dev *pcdev)
- 	if (ret)
- 		goto err_managers_req_pw;
- 
--	ret = pd692x0_hw_conf_init(priv);
--	if (ret)
--		goto err_managers_req_pw;
-+	/* Do not init the conf if it is already saved */
-+	if (!priv->cfg_saved) {
-+		ret = pd692x0_hw_conf_init(priv);
-+		if (ret)
-+			goto err_managers_req_pw;
-+
-+		ret = pd692x0_save_user_byte(priv);
-+		if (ret)
-+			goto err_managers_req_pw;
-+	}
- 
- 	pd692x0_of_put_managers(priv, manager);
- 	kfree(manager);
-@@ -1793,6 +1819,9 @@ static int pd692x0_i2c_probe(struct i2c_client *client)
- 		}
- 	}
- 
-+	if (buf.data[2] == PD692X0_USER_BYTE)
-+		priv->cfg_saved = true;
-+
- 	priv->np = dev->of_node;
- 	priv->pcdev.nr_lines = PD692X0_MAX_PIS;
- 	priv->pcdev.owner = THIS_MODULE;
-
--- 
-2.43.0
+Paolo
 
 
