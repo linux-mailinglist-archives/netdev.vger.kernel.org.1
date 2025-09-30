@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-227289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 265A8BABF5B
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 10:08:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19882BABF67
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 10:09:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D77E16360B
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 08:08:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8B33174916
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 08:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8332F3C16;
-	Tue, 30 Sep 2025 08:08:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68522EBDE3;
+	Tue, 30 Sep 2025 08:09:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="FH4LbkZf"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="bQUJTnEc"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180562E9751;
-	Tue, 30 Sep 2025 08:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B2027A114;
+	Tue, 30 Sep 2025 08:08:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759219713; cv=none; b=PJaZurhSm64clLfqa4CgH8khTyfBpvcyZ4oZG6PJu5nXkIdSAfz+3eY8cpmyBZVHJ9toK/giucC8upF9a9vU0JFHBA8WZnZQIak2mx8e1koWN0pd9Rb9uNLolsEUGRbdncanR3+2SJTeCLkf3DftjlgDZnK89PZ1WhG5c0g71Mg=
+	t=1759219741; cv=none; b=QQx+ivJ5HYF1IkvEGEmAwtVIqAuczFE3C+A0wXbA9E45A0keHaew+0XbrYLqSiINqkVUMTWaNpWCPaYZZJ/93pNeX9suOAWmdeuGp7ZIqtQREkVQE62BFnZKSLZ3qEhl75chapDHI7JqTCNusMJDiqjW8w4te6aJ7OwAvXUzI/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759219713; c=relaxed/simple;
-	bh=Zl2vQyHXHwEKneFtSe3nmzTPa5fj4Gc5H0bEyI/g58M=;
+	s=arc-20240116; t=1759219741; c=relaxed/simple;
+	bh=A8hSnozwrZ6u84etwYiLlGN46MNAswFgw/kuE4h2a5k=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HmHDyp+XrEhgCIuOzTiX4ro9OFm7tUIO2wm/FW26aPIiv/rOb1m1O/Ha5H9xoWHBWEpFktywpRAhbALZM8qqfiqYfrcF+LBoo3RgZF4nxyQ137e0rVSQEySVpgftu+jy+6Ew0wUZu51dLZpOXq4jEMash1sJC4NNyc8O7dZDBKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=FH4LbkZf; arc=none smtp.client-ip=220.197.31.2
+	 MIME-Version; b=Sja5NK2Qh2BtlZ3jLnp5jKbVekPvQYw+vfV1O59TVsqRhxZhMCpiiNerqieUpAL6Y9pAT15uk7l+uX2eFbHMnnsgeofam6+fVYpagFerRyNxr+DvaMEyOmGueDxPx6t38IuOZH64zqF0ghV27FmUHAtsNH9omfMFyqA/MYTHcBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=bQUJTnEc; arc=none smtp.client-ip=220.197.31.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version:
-	Content-Type; bh=AJEDwP6GBAKTUpkc+kWWJAcmMiCJ3mfiYjqw7FWgEQg=;
-	b=FH4LbkZfmYC7w0Nf/hfsr3ve+5e7B7f1vwxI0qdNzbON1My7jlPDh2XNAZvYeS
-	eMi4Z7lxUWOFaA6BHb0bAjTb8hd6Y34NGqjvfvR/ZP4yFuVwP9/Rsuzkcr2AnGrn
-	94fGQzZrptKddia3G85V8TQWEo+Uu9twCR4T5MVT2sNgc=
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=gp
+	UbwNbQnfvLoVX63WNhLorivcOQ+ivqwrrVHACGIpM=; b=bQUJTnEccSa3Wd1yIT
+	yHFMiEjlzivZEIUFjwJFwHIeNZFmpU8bwL9cO0fO2ce0gLJPJq8URZSUjJgiFrmj
+	kgQAelnzdyAQ0ZLLPB3rJplHKz4NL/gK+yYIAXNm+NWFDr1nEb5ygNL1vTbtLAPf
+	UxNb1RCbjdpNYi5hfYWXf4JGE=
 Received: from localhost.localdomain (unknown [])
-	by gzsmtp4 (Coremail) with SMTP id PygvCgC3N+Gvj9towMZUAg--.26308S3;
-	Tue, 30 Sep 2025 16:07:13 +0800 (CST)
+	by gzsmtp4 (Coremail) with SMTP id PygvCgC3N+Gvj9towMZUAg--.26308S4;
+	Tue, 30 Sep 2025 16:07:15 +0800 (CST)
 From: yicongsrfy@163.com
 To: oneukum@suse.com,
 	andrew+netdev@lunn.ch
@@ -51,9 +51,9 @@ Cc: davem@davemloft.net,
 	netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	yicong@kylinos.cn
-Subject: [PATCH v4 2/3] net: usb: support quirks in cdc_ncm
-Date: Tue, 30 Sep 2025 16:07:08 +0800
-Message-Id: <20250930080709.3408463-2-yicongsrfy@163.com>
+Subject: [PATCH v4 3/3] net: usb: ax88179_178a: add USB device driver for config selection
+Date: Tue, 30 Sep 2025 16:07:09 +0800
+Message-Id: <20250930080709.3408463-3-yicongsrfy@163.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250930080709.3408463-1-yicongsrfy@163.com>
 References: <5a3b2616-fcfd-483a-81a4-34dd3493a97c@suse.com>
@@ -64,164 +64,133 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PygvCgC3N+Gvj9towMZUAg--.26308S3
-X-Coremail-Antispam: 1Uf129KBjvJXoW3XFWkXrWDXr1fWr45Ar45GFg_yoW7CFWrpa
-	1YkFZYyrsrGw15Ja4xJr48uFWrXw4vy3yUG347GasxZ39ay3Z5tr1Ut3yFvF9rtr4rX3Wa
-	vF1UW3yjgr45A3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j42NtUUUUU=
-X-CM-SenderInfo: p1lf00xjvuw5i6rwjhhfrp/xtbBFBHY22jbjuYa4AAAsn
+X-CM-TRANSID:PygvCgC3N+Gvj9towMZUAg--.26308S4
+X-Coremail-Antispam: 1Uf129KBjvJXoWxCw4DWryxGF48tw1rXw18Krg_yoW5Kw47pF
+	4qgF90krW7JF4fJrs3JrWkZFy5Zan2k3yv9ryxK3Wa9r93A3s7t3WkKry5AF1DGrW8WF12
+	ya1UJa13uF4UGr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jx5rcUUUUU=
+X-CM-SenderInfo: p1lf00xjvuw5i6rwjhhfrp/xtbBzR3Y22jbjJBdjgAAsv
 
 From: Yi Cong <yicong@kylinos.cn>
 
-Some vendors' USB network interface controllers (NICs) may be compatible
-with multiple drivers.
+A similar reason was raised in commit ec51fbd1b8a2 ("r8152: add USB
+device driver for config selection"):
+Linux prioritizes probing non-vendor-specific configurations.
 
-I consulted with relevant vendors. Taking the AX88179 chip as an example,
-NICs based on this chip may be used across various OS—for instance,
-cdc_ncm is used on macOS, while ax88179_178a.ko is the intended driver
-on Linux (despite a previous patch having disabled it).
-Therefore, the firmware must support multiple protocols.
+Referring to the implementation of this patch, cfgselect is also
+used for ax88179 to override the default configuration selection.
 
-Currently, both cdc_ncm and ax88179_178a coexist in the Linux kernel.
-Supporting both drivers simultaneously leads to the following issues:
-
-1. Inconsistent driver loading order during reboot stress testing:
-   The order in which drivers are loaded can vary across reboots,
-   potentially resulting in the unintended driver being loaded. For
-   example:
-[    4.239893] cdc_ncm 2-1:2.0: MAC-Address: c8:a3:62:ef:99:8e
-[    4.239897] cdc_ncm 2-1:2.0: setting rx_max = 16384
-[    4.240149] cdc_ncm 2-1:2.0: setting tx_max = 16384
-[    4.240583] cdc_ncm 2-1:2.0 usb0: register 'cdc_ncm' at usb-
-xxxxx:00-1, CDC NCM, c8:a3:62:ef:99:8e
-[    4.240627] usbcore: registered new interface driver cdc_ncm
-[    4.240908] usbcore: registered new interface driver ax88179_178a
-
-In this case, network connectivity functions, but the cdc_ncm driver is
-loaded instead of the expected ax88179_178a.
-
-2. Similar issues during cable plug/unplug testing:
-   The same race condition can occur when reconnecting the USB device:
-[   79.879922] usb 4-1: new SuperSpeed USB device number 3 using xhci_hcd
-[   79.905168] usb 4-1: New USB device found, idVendor=0b95, idProduct=
-1790, bcdDevice= 2.00
-[   79.905185] usb 4-1: New USB device strings: Mfr=1, Product=2,
-SerialNumber=3
-[   79.905191] usb 4-1: Product: AX88179B
-[   79.905198] usb 4-1: Manufacturer: ASIX
-[   79.905201] usb 4-1: SerialNumber: 00EF998E
-[   79.915215] ax88179_probe, bConfigurationValue:2
-[   79.952638] cdc_ncm 4-1:2.0: MAC-Address: c8:a3:62:ef:99:8e
-[   79.952654] cdc_ncm 4-1:2.0: setting rx_max = 16384
-[   79.952919] cdc_ncm 4-1:2.0: setting tx_max = 16384
-[   79.953598] cdc_ncm 4-1:2.0 eth0: register 'cdc_ncm' at usb-0000:04:
-00.2-1, CDC NCM (NO ZLP), c8:a3:62:ef:99:8e
-[   79.954029] cdc_ncm 4-1:2.0 eth0: unregister 'cdc_ncm' usb-0000:04:
-00.2-1, CDC NCM (NO ZLP)
-
-At this point, the network becomes unusable.
-
-To resolve these issues, introduce a *quirks* mechanism into the usbnet
-module. By adding chip-specific identification within the generic usbnet
-framework, we can skip the usbnet probe process for devices that require a
-dedicated driver.
-
-v2: Correct the description of usbnet_quirks.h and modify the code style
-v3: Add checking whether the CONFIG_USB_NET_AX88179_178A is enabled
-v4: Move quirks from usbnet.ko to cdc_ncm.ko
+v2: fix warning from checkpatch
 
 Signed-off-by: Yi Cong <yicong@kylinos.cn>
 ---
- drivers/net/usb/cdc_ncm.c        | 15 +++++++++++-
- drivers/net/usb/cdc_ncm_quirks.h | 41 ++++++++++++++++++++++++++++++++
- 2 files changed, 55 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/usb/cdc_ncm_quirks.h
+ drivers/net/usb/ax88179_178a.c | 70 ++++++++++++++++++++++++++++++++--
+ 1 file changed, 67 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/usb/cdc_ncm.c b/drivers/net/usb/cdc_ncm.c
-index 5d123df0a866..fc8416af3f11 100644
---- a/drivers/net/usb/cdc_ncm.c
-+++ b/drivers/net/usb/cdc_ncm.c
-@@ -54,6 +54,8 @@
- #include <linux/usb/cdc.h>
- #include <linux/usb/cdc_ncm.h>
+diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
+index 29cbe9ddd610..f2e86b9256dc 100644
+--- a/drivers/net/usb/ax88179_178a.c
++++ b/drivers/net/usb/ax88179_178a.c
+@@ -14,6 +14,7 @@
+ #include <uapi/linux/mdio.h>
+ #include <linux/mdio.h>
  
-+#include "cdc_ncm_quirks.h"
-+
- #if IS_ENABLED(CONFIG_USB_NET_CDC_MBIM)
- static bool prefer_mbim = true;
- #else
-@@ -2114,10 +2116,21 @@ static const struct usb_device_id cdc_devs[] = {
- };
- MODULE_DEVICE_TABLE(usb, cdc_devs);
++#define MODULENAME "ax88179_178a"
+ #define AX88179_PHY_ID				0x03
+ #define AX_EEPROM_LEN				0x100
+ #define AX88179_EEPROM_MAGIC			0x17900b95
+@@ -1713,6 +1714,14 @@ static int ax88179_stop(struct usbnet *dev)
+ 	return 0;
+ }
  
-+static int cdc_ncm_probe(struct usb_interface *intf, const struct usb_device_id *prod)
++static int ax88179_probe(struct usb_interface *intf, const struct usb_device_id *i)
 +{
-+	/* Should it be ignored? */
-+	if (unlikely(cdc_ncm_ignore(intf))) {
-+		dev_dbg(&intf->dev, "cdc_ncm ignore this device!\n");
++	if (intf->cur_altsetting->desc.bInterfaceClass != USB_CLASS_VENDOR_SPEC)
++		return -ENODEV;
++
++	return usbnet_probe(intf, i);
++}
++
+ static const struct driver_info ax88179_info = {
+ 	.description = "ASIX AX88179 USB 3.0 Gigabit Ethernet",
+ 	.bind = ax88179_bind,
+@@ -1941,9 +1950,9 @@ static const struct usb_device_id products[] = {
+ MODULE_DEVICE_TABLE(usb, products);
+ 
+ static struct usb_driver ax88179_178a_driver = {
+-	.name =		"ax88179_178a",
++	.name =		MODULENAME,
+ 	.id_table =	products,
+-	.probe =	usbnet_probe,
++	.probe =	ax88179_probe,
+ 	.suspend =	ax88179_suspend,
+ 	.resume =	ax88179_resume,
+ 	.reset_resume =	ax88179_resume,
+@@ -1952,7 +1961,62 @@ static struct usb_driver ax88179_178a_driver = {
+ 	.disable_hub_initiated_lpm = 1,
+ };
+ 
+-module_usb_driver(ax88179_178a_driver);
++static int ax88179_cfgselector_probe(struct usb_device *udev)
++{
++	struct usb_host_config *c;
++	int i, num_configs;
++
++	/* The vendor mode is not always config #1, so to find it out. */
++	c = udev->config;
++	num_configs = udev->descriptor.bNumConfigurations;
++	for (i = 0; i < num_configs; (i++, c++)) {
++		struct usb_interface_descriptor	*desc = NULL;
++
++		if (!c->desc.bNumInterfaces)
++			continue;
++		desc = &c->intf_cache[0]->altsetting->desc;
++		if (desc->bInterfaceClass == USB_CLASS_VENDOR_SPEC)
++			break;
++	}
++
++	if (i == num_configs)
++		return -ENODEV;
++
++	if (usb_set_configuration(udev, c->desc.bConfigurationValue)) {
++		dev_err(&udev->dev, "Failed to set configuration %d\n",
++			c->desc.bConfigurationValue);
 +		return -ENODEV;
 +	}
 +
-+	return usbnet_probe(intf, prod);
++	return 0;
 +}
 +
- static struct usb_driver cdc_ncm_driver = {
- 	.name = "cdc_ncm",
- 	.id_table = cdc_devs,
--	.probe = usbnet_probe,
-+	.probe = cdc_ncm_probe,
- 	.disconnect = usbnet_disconnect,
- 	.suspend = usbnet_suspend,
- 	.resume = usbnet_resume,
-diff --git a/drivers/net/usb/cdc_ncm_quirks.h b/drivers/net/usb/cdc_ncm_quirks.h
-new file mode 100644
-index 000000000000..e5ae2265b1d7
---- /dev/null
-+++ b/drivers/net/usb/cdc_ncm_quirks.h
-@@ -0,0 +1,41 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * A collection of chip information to be ignored
-+ */
-+
-+#ifndef __CDC_NCM_IGNORE_H__
-+#define __CDC_NCM_IGNORE_H__
-+
-+#include <linux/usb.h>
-+
-+/* cdc_ncm_ignore_list:
-+ * Chip info which already support int vendor specific driver,
-+ * and then should be ignored in generic cdc_ncm
-+ */
-+static const struct usb_device_id cdc_ncm_ignore_list[] = {
-+#if IS_ENABLED(CONFIG_USB_NET_AX88179_178A)
-+	/* Chips already support in ax88179_178a.c */
-+	{ USB_DEVICE(0x0b95, 0x1790) },
-+	{ USB_DEVICE(0x0b95, 0x178a) },
-+	{ USB_DEVICE(0x04b4, 0x3610) },
-+	{ USB_DEVICE(0x2001, 0x4a00) },
-+	{ USB_DEVICE(0x0df6, 0x0072) },
-+	{ USB_DEVICE(0x04e8, 0xa100) },
-+	{ USB_DEVICE(0x17ef, 0x304b) },
-+	{ USB_DEVICE(0x050d, 0x0128) },
-+	{ USB_DEVICE(0x0930, 0x0a13) },
-+	{ USB_DEVICE(0x0711, 0x0179) },
-+	{ USB_DEVICE(0x07c9, 0x000e) },
-+	{ USB_DEVICE(0x07c9, 0x000f) },
-+	{ USB_DEVICE(0x07c9, 0x0010) },
-+	/* End of support in ax88179_178a.c */
-+#endif
-+
-+	{ } /*END*/
++static struct usb_device_driver ax88179_cfgselector_driver = {
++	.name =		MODULENAME "-cfgselector",
++	.probe =	ax88179_cfgselector_probe,
++	.id_table =	products,
++	.generic_subclass = 1,
++	.supports_autosuspend = 1,
 +};
 +
-+static inline bool cdc_ncm_ignore(struct usb_interface *intf)
++static int __init ax88179_driver_init(void)
 +{
-+	return !!usb_match_id(intf, cdc_ncm_ignore_list);
++	int ret;
++
++	ret = usb_register_device_driver(&ax88179_cfgselector_driver, THIS_MODULE);
++	if (ret)
++		return ret;
++	return usb_register(&ax88179_178a_driver);
 +}
-+#endif
++
++static void __exit ax88179_driver_exit(void)
++{
++	usb_deregister(&ax88179_178a_driver);
++	usb_deregister_device_driver(&ax88179_cfgselector_driver);
++}
++
++module_init(ax88179_driver_init);
++module_exit(ax88179_driver_exit);
+ 
+ MODULE_DESCRIPTION("ASIX AX88179/178A based USB 3.0/2.0 Gigabit Ethernet Devices");
+ MODULE_LICENSE("GPL");
 -- 
 2.25.1
 
