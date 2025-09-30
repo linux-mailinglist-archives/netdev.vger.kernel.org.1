@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-227313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFBE1BAC32A
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 11:14:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7163BBAC339
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 11:14:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A5923B6014
-	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 09:14:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54A4A7A4742
+	for <lists+netdev@lfdr.de>; Tue, 30 Sep 2025 09:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CE522F5A31;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26FD2F60D6;
 	Tue, 30 Sep 2025 09:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ruqBwZN9"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gcpm6JUC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928DE2E9EA1
-	for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 09:13:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACC32F546D;
+	Tue, 30 Sep 2025 09:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759223624; cv=none; b=LxZOXGNNPOvUyAXx/sWtrlb/HFNcJby4DxyQnebr7ULUl1X8XIXeo9Fs4yywY3PWCNUVxNj829raV1C6gCYgSoNwMxr73qTT5mCWnpZ0v0aEALQF+JnojAwTojdFpewT5ikHsIzzUpnSMjC9wmSU+ywmtVp9a/Z6iH1NJB77ldY=
+	t=1759223624; cv=none; b=FFcbokt+5l2fP0lC8BqZ4a/ufQwOD/9+VdmE9eEnxpM0m1AawVRtb7gPaj3iX4Et1T61thn8ArewdQDqBcRo0hDyYd5/H02S5/d7SiPRT9KcKRDZf9TjvgPBOgGMYMNDBxISSX38fA4RyuUvhZxLnq2IJFyJNOIAZG8fLBXvl9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1759223624; c=relaxed/simple;
-	bh=tNsziVE5jYmSzOlHEZMMW4TRI1XMUGMM9Y7NuVWByXU=;
+	bh=RXiNSsaLBFvnwtGUyw4I9dI1476goIIzvGRvfaz60TY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=MyGQqfLoTQH8fuQjntabjPMTpFm/All/Gu4XMwF3HyxitC3sZTNASDoGzF2PIIJNHQ+XeX0SfHmM3SFqcHlbD4TWhCae/ArJHvzy+/z4i3YuIJA5VCYAnkRlaTjeySHEB2OGYhqC1ggHPbYgcQMsegZP1Qgu5vQs/1XA+9MMU9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ruqBwZN9; arc=none smtp.client-ip=185.246.85.4
+	 In-Reply-To:To:Cc; b=cRUGWxxpox5A2zjDG+2VGzYNy1630gLWkdUw6qKd+G9+LgQIFTyz+lbkcSNWEgOSuz+DTG818O67HVX9NW9Fcm/SwDj0bLEgO0K/13lmLSzY2/55QBsg47oYq5Xam7tlE6xUFZXp/Tg8W6Qj/Cj36O0iLRSNg77DWsj+OSeV16Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gcpm6JUC; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 6C01A4E40D7F;
-	Tue, 30 Sep 2025 09:13:34 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 7DA644E40DCB;
+	Tue, 30 Sep 2025 09:13:35 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 43848606E4;
-	Tue, 30 Sep 2025 09:13:34 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B64D3102F17CE;
-	Tue, 30 Sep 2025 11:13:32 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 52353606E4;
+	Tue, 30 Sep 2025 09:13:35 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DD9FE102F17B4;
+	Tue, 30 Sep 2025 11:13:33 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1759223613; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1759223614; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=tJvJirWplQIw8ej0XBKEq1dHZhTM0oTZfWGk4430Hpw=;
-	b=ruqBwZN9ywNk8NKIl8a6vtVSXcXJVNY075CCbyN0rmt5Q9QuLOBx4BHFRwNiB1xIEEWOXY
-	A59SwWps2FSQt12yLH620eXLaSoNS0JpwI+/6TQy5CXdRCHtUJN/L7R2yaPBAAs31FQlx7
-	uZ9SQwe2nT67Yd9O6XKu0g5VLW/wUdL53zpTzO03TFGyrk7sFJyWuOFcJDUXjziZlxRQrf
-	Hsbac2/K4ivZMmesM68M8ezI9LYaI970IxQvLrNPmWqrRQZVT9F6//0uJHD2cDJi9ci2vV
-	1IGVc/i7Umx5K0PHx+qxMjl3tWnX54JcSvWUs93sRRbWq+hnaF4eSg3ZH1E2FA==
+	bh=IAlSFBW3wt+5q5wx1Fjlx3+q6drrWVIVS7BvJiZpmkM=;
+	b=gcpm6JUCxXt5NlcFCzH09r8vcbxzuLtw9FaNip2dNi16dgly80S5/uIPDTaVxg6I6fOucU
+	xiGEdeo9jTMdwimynDsHen9upPUW/BWwP27HksbczjPEUe0KA77oknZWCZqXdo7/yx8jWj
+	9deczNH8BXUj/DsKcnRpUbeuKeXNQCPH5wHZqmoi+dtb9nBNlQt8z5hPYeNqije41dgmc4
+	uwLu3bZC2yvkP0broaS93ijDsCdw5QXeutHDNPrRjC45+uaMAYSEhnuLzxNHgTMD4wkNGy
+	idfEaWM7Pz8YVfw+LsoTZOdPhiI1dekhAnL3I52iBTEFepkPgI16mq1yZmP/Bw==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Tue, 30 Sep 2025 11:13:01 +0200
-Subject: [PATCH net-next 2/3] net: pse-pd: pd692x0: Separate configuration
- parsing from hardware setup
+Date: Tue, 30 Sep 2025 11:13:02 +0200
+Subject: [PATCH net-next 3/3] net: pse-pd: pd692x0: Preserve PSE
+ configuration across reboots
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,7 +60,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250930-feature_pd692x0_reboot_keep_conf-v1-2-620dce7ee8a2@bootlin.com>
+Message-Id: <20250930-feature_pd692x0_reboot_keep_conf-v1-3-620dce7ee8a2@bootlin.com>
 References: <20250930-feature_pd692x0_reboot_keep_conf-v1-0-620dce7ee8a2@bootlin.com>
 In-Reply-To: <20250930-feature_pd692x0_reboot_keep_conf-v1-0-620dce7ee8a2@bootlin.com>
 To: Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -75,289 +75,109 @@ X-Last-TLS-Session-Version: TLSv1.3
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Cache the port matrix configuration in driver private data to enable
-PSE controller reconfiguration. This refactoring separates device tree
-parsing from hardware configuration application, allowing settings to be
-reapplied without reparsing the device tree.
+Detect when PSE hardware is already configured (user byte == 42) and
+skip hardware initialization to prevent power interruption to connected
+devices during system reboots.
 
-This refactoring is a prerequisite for preserving PSE configuration
-across reboots to prevent power disruption to connected devices.
+Previously, the driver would always reconfigure the PSE hardware on
+probe, causing a port matrix reflash that resulted in temporary power
+loss to all connected devices. This change maintains power continuity
+by preserving existing configuration when the PSE has been previously
+initialized.
 
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- drivers/net/pse-pd/pd692x0.c | 115 ++++++++++++++++++++++++++++---------------
- 1 file changed, 76 insertions(+), 39 deletions(-)
+ drivers/net/pse-pd/pd692x0.c | 35 ++++++++++++++++++++++++++++++++---
+ 1 file changed, 32 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
-index 055e925c853e..782b1abf94cb 100644
+index 782b1abf94cb..134435e90073 100644
 --- a/drivers/net/pse-pd/pd692x0.c
 +++ b/drivers/net/pse-pd/pd692x0.c
-@@ -85,6 +85,11 @@ enum {
- 	PD692X0_MSG_CNT
- };
+@@ -30,6 +30,8 @@
+ #define PD692X0_FW_MIN_VER	5
+ #define PD692X0_FW_PATCH_VER	5
  
-+struct pd692x0_matrix {
-+	u8 hw_port_a;
-+	u8 hw_port_b;
-+};
++#define PD692X0_USER_BYTE	42
 +
- struct pd692x0_priv {
- 	struct i2c_client *client;
- 	struct pse_controller_dev pcdev;
-@@ -101,6 +106,8 @@ struct pd692x0_priv {
+ enum pd692x0_fw_state {
+ 	PD692X0_FW_UNKNOWN,
+ 	PD692X0_FW_OK,
+@@ -80,6 +82,7 @@ enum {
+ 	PD692X0_MSG_GET_PORT_PARAM,
+ 	PD692X0_MSG_GET_POWER_BANK,
+ 	PD692X0_MSG_SET_POWER_BANK,
++	PD692X0_MSG_SET_USER_BYTE,
+ 
+ 	/* add new message above here */
+ 	PD692X0_MSG_CNT
+@@ -103,6 +106,7 @@ struct pd692x0_priv {
+ 	bool last_cmd_key;
+ 	unsigned long last_cmd_key_time;
+ 
++	bool cfg_saved;
  	enum ethtool_c33_pse_admin_state admin_state[PD692X0_MAX_PIS];
  	struct regulator_dev *manager_reg[PD692X0_MAX_MANAGERS];
  	int manager_pw_budget[PD692X0_MAX_MANAGERS];
-+	int nmanagers;
-+	struct pd692x0_matrix *port_matrix;
+@@ -193,6 +197,12 @@ static const struct pd692x0_msg pd692x0_msg_template_list[PD692X0_MSG_CNT] = {
+ 		.key = PD692X0_KEY_CMD,
+ 		.sub = {0x07, 0x0b, 0x57},
+ 	},
++	[PD692X0_MSG_SET_USER_BYTE] = {
++		.key = PD692X0_KEY_PRG,
++		.sub = {0x41, PD692X0_USER_BYTE},
++		.data = {0x4e, 0x4e, 0x4e, 0x4e,
++			 0x4e, 0x4e, 0x4e, 0x4e},
++	},
  };
  
- /* Template list of communication messages. The non-null bytes defined here
-@@ -809,11 +816,6 @@ struct pd692x0_manager {
- 	int nports;
- };
- 
--struct pd692x0_matrix {
--	u8 hw_port_a;
--	u8 hw_port_b;
--};
--
- static int
- pd692x0_of_get_ports_manager(struct pd692x0_priv *priv,
- 			     struct pd692x0_manager *manager,
-@@ -903,7 +905,8 @@ pd692x0_of_get_managers(struct pd692x0_priv *priv,
+ static u8 pd692x0_build_msg(struct pd692x0_msg *msg, u8 echo)
+@@ -1233,6 +1243,15 @@ static void pd692x0_managers_free_pw_budget(struct pd692x0_priv *priv)
  	}
- 
- 	of_node_put(managers_node);
--	return nmanagers;
-+	priv->nmanagers = nmanagers;
-+	return 0;
- 
- out:
- 	for (i = 0; i < nmanagers; i++) {
-@@ -963,8 +966,7 @@ pd692x0_register_manager_regulator(struct device *dev, char *reg_name,
- 
- static int
- pd692x0_register_managers_regulator(struct pd692x0_priv *priv,
--				    const struct pd692x0_manager *manager,
--				    int nmanagers)
-+				    const struct pd692x0_manager *manager)
- {
- 	struct device *dev = &priv->client->dev;
- 	size_t reg_name_len;
-@@ -975,7 +977,7 @@ pd692x0_register_managers_regulator(struct pd692x0_priv *priv,
- 	 */
- 	reg_name_len = strlen(dev_name(dev)) + 23;
- 
--	for (i = 0; i < nmanagers; i++) {
-+	for (i = 0; i < priv->nmanagers; i++) {
- 		static const char * const regulators[] = { "vaux5", "vaux3p3" };
- 		struct regulator_dev *rdev;
- 		char *reg_name;
-@@ -1008,10 +1010,14 @@ pd692x0_register_managers_regulator(struct pd692x0_priv *priv,
  }
  
- static int
--pd692x0_conf_manager_power_budget(struct pd692x0_priv *priv, int id, int pw)
-+pd692x0_conf_manager_power_budget(struct pd692x0_priv *priv, int id)
- {
- 	struct pd692x0_msg msg, buf;
--	int ret, pw_mW = pw / 1000;
-+	int ret, pw_mW;
-+
-+	pw_mW = priv->manager_pw_budget[id] / 1000;
-+	if (!pw_mW)
-+		return 0;
- 
- 	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_POWER_BANK];
- 	msg.data[0] = id;
-@@ -1032,11 +1038,11 @@ pd692x0_conf_manager_power_budget(struct pd692x0_priv *priv, int id, int pw)
- }
- 
- static int
--pd692x0_configure_managers(struct pd692x0_priv *priv, int nmanagers)
-+pd692x0_req_managers_pw_budget(struct pd692x0_priv *priv)
- {
- 	int i, ret;
- 
--	for (i = 0; i < nmanagers; i++) {
-+	for (i = 0; i < priv->nmanagers; i++) {
- 		struct regulator *supply = priv->manager_reg[i]->supply;
- 		int pw_budget;
- 
-@@ -1053,7 +1059,18 @@ pd692x0_configure_managers(struct pd692x0_priv *priv, int nmanagers)
- 			return ret;
- 
- 		priv->manager_pw_budget[i] = pw_budget;
--		ret = pd692x0_conf_manager_power_budget(priv, i, pw_budget);
-+	}
-+
-+	return 0;
-+}
-+
 +static int
-+pd692x0_configure_managers(struct pd692x0_priv *priv)
++pd692x0_save_user_byte(struct pd692x0_priv *priv)
 +{
-+	int i, ret;
++	struct pd692x0_msg msg, buf;
 +
-+	for (i = 0; i < priv->nmanagers; i++) {
-+		ret = pd692x0_conf_manager_power_budget(priv, i);
- 		if (ret < 0)
- 			return ret;
- 	}
-@@ -1101,10 +1118,9 @@ pd692x0_set_port_matrix(const struct pse_pi_pairset *pairset,
- 
- static int
- pd692x0_set_ports_matrix(struct pd692x0_priv *priv,
--			 const struct pd692x0_manager *manager,
--			 int nmanagers,
--			 struct pd692x0_matrix port_matrix[PD692X0_MAX_PIS])
-+			 const struct pd692x0_manager *manager)
- {
-+	struct pd692x0_matrix *port_matrix = priv->port_matrix;
- 	struct pse_controller_dev *pcdev = &priv->pcdev;
- 	int i, ret;
- 
-@@ -1117,7 +1133,7 @@ pd692x0_set_ports_matrix(struct pd692x0_priv *priv,
- 	/* Update with values for every PSE PIs */
- 	for (i = 0; i < pcdev->nr_lines; i++) {
- 		ret = pd692x0_set_port_matrix(&pcdev->pi[i].pairset[0],
--					      manager, nmanagers,
-+					      manager, priv->nmanagers,
- 					      &port_matrix[i]);
- 		if (ret) {
- 			dev_err(&priv->client->dev,
-@@ -1126,7 +1142,7 @@ pd692x0_set_ports_matrix(struct pd692x0_priv *priv,
- 		}
- 
- 		ret = pd692x0_set_port_matrix(&pcdev->pi[i].pairset[1],
--					      manager, nmanagers,
-+					      manager, priv->nmanagers,
- 					      &port_matrix[i]);
- 		if (ret) {
- 			dev_err(&priv->client->dev,
-@@ -1139,9 +1155,9 @@ pd692x0_set_ports_matrix(struct pd692x0_priv *priv,
- }
- 
- static int
--pd692x0_write_ports_matrix(struct pd692x0_priv *priv,
--			   const struct pd692x0_matrix port_matrix[PD692X0_MAX_PIS])
-+pd692x0_write_ports_matrix(struct pd692x0_priv *priv)
- {
-+	struct pd692x0_matrix *port_matrix = priv->port_matrix;
- 	struct pd692x0_msg msg, buf;
- 	int ret, i;
- 
-@@ -1166,13 +1182,32 @@ pd692x0_write_ports_matrix(struct pd692x0_priv *priv,
- 	return 0;
- }
- 
-+static int pd692x0_hw_conf_init(struct pd692x0_priv *priv)
-+{
-+	int ret;
-+
-+	/* Is PD692x0 ready to be configured? */
-+	if (priv->fw_state != PD692X0_FW_OK &&
-+	    priv->fw_state != PD692X0_FW_COMPLETE)
-+		return 0;
-+
-+	ret = pd692x0_configure_managers(priv);
-+	if (ret)
-+		return ret;
-+
-+	ret = pd692x0_write_ports_matrix(priv);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
++	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_USER_BYTE];
++	return pd692x0_sendrecv_msg(priv, &msg, &buf);
 +}
 +
- static void pd692x0_of_put_managers(struct pd692x0_priv *priv,
--				    struct pd692x0_manager *manager,
--				    int nmanagers)
-+				    struct pd692x0_manager *manager)
- {
- 	int i, j;
- 
--	for (i = 0; i < nmanagers; i++) {
-+	for (i = 0; i < priv->nmanagers; i++) {
- 		for (j = 0; j < manager[i].nports; j++)
- 			of_node_put(manager[i].port_node[j]);
- 		of_node_put(manager[i].node);
-@@ -1201,48 +1236,50 @@ static void pd692x0_managers_free_pw_budget(struct pd692x0_priv *priv)
  static int pd692x0_setup_pi_matrix(struct pse_controller_dev *pcdev)
  {
  	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
--	struct pd692x0_matrix port_matrix[PD692X0_MAX_PIS];
-+	struct pd692x0_matrix *port_matrix;
- 	struct pd692x0_manager *manager;
--	int ret, nmanagers;
--
--	/* Should we flash the port matrix */
--	if (priv->fw_state != PD692X0_FW_OK &&
--	    priv->fw_state != PD692X0_FW_COMPLETE)
--		return 0;
-+	int ret;
+@@ -1268,9 +1287,16 @@ static int pd692x0_setup_pi_matrix(struct pse_controller_dev *pcdev)
+ 	if (ret)
+ 		goto err_managers_req_pw;
  
- 	manager = kcalloc(PD692X0_MAX_MANAGERS, sizeof(*manager), GFP_KERNEL);
- 	if (!manager)
- 		return -ENOMEM;
- 
-+	port_matrix = devm_kcalloc(&priv->client->dev, PD692X0_MAX_PIS,
-+				   sizeof(*port_matrix), GFP_KERNEL);
-+	if (!port_matrix) {
-+		ret = -ENOMEM;
-+		goto err_free_manager;
-+	}
-+	priv->port_matrix = port_matrix;
+-	ret = pd692x0_hw_conf_init(priv);
+-	if (ret)
+-		goto err_managers_req_pw;
++	/* Do not init the conf if it is already saved */
++	if (!priv->cfg_saved) {
++		ret = pd692x0_hw_conf_init(priv);
++		if (ret)
++			goto err_managers_req_pw;
 +
- 	ret = pd692x0_of_get_managers(priv, manager);
- 	if (ret < 0)
- 		goto err_free_manager;
++		ret = pd692x0_save_user_byte(priv);
++		if (ret)
++			goto err_managers_req_pw;
++	}
  
--	nmanagers = ret;
--	ret = pd692x0_register_managers_regulator(priv, manager, nmanagers);
-+	ret = pd692x0_register_managers_regulator(priv, manager);
- 	if (ret)
- 		goto err_of_managers;
- 
--	ret = pd692x0_configure_managers(priv, nmanagers);
-+	ret = pd692x0_req_managers_pw_budget(priv);
- 	if (ret)
- 		goto err_of_managers;
- 
--	ret = pd692x0_set_ports_matrix(priv, manager, nmanagers, port_matrix);
-+	ret = pd692x0_set_ports_matrix(priv, manager);
- 	if (ret)
- 		goto err_managers_req_pw;
- 
--	ret = pd692x0_write_ports_matrix(priv, port_matrix);
-+	ret = pd692x0_hw_conf_init(priv);
- 	if (ret)
- 		goto err_managers_req_pw;
- 
--	pd692x0_of_put_managers(priv, manager, nmanagers);
-+	pd692x0_of_put_managers(priv, manager);
+ 	pd692x0_of_put_managers(priv, manager);
  	kfree(manager);
- 	return 0;
- 
- err_managers_req_pw:
- 	pd692x0_managers_free_pw_budget(priv);
- err_of_managers:
--	pd692x0_of_put_managers(priv, manager, nmanagers);
-+	pd692x0_of_put_managers(priv, manager);
- err_free_manager:
- 	kfree(manager);
- 	return ret;
-@@ -1647,7 +1684,7 @@ static enum fw_upload_err pd692x0_fw_poll_complete(struct fw_upload *fwl)
- 		return FW_UPLOAD_ERR_FW_INVALID;
+@@ -1793,6 +1819,9 @@ static int pd692x0_i2c_probe(struct i2c_client *client)
+ 		}
  	}
  
--	ret = pd692x0_setup_pi_matrix(&priv->pcdev);
-+	ret = pd692x0_hw_conf_init(priv);
- 	if (ret < 0) {
- 		dev_err(&client->dev, "Error configuring ports matrix (%pe)\n",
- 			ERR_PTR(ret));
++	if (buf.data[2] == PD692X0_USER_BYTE)
++		priv->cfg_saved = true;
++
+ 	priv->np = dev->of_node;
+ 	priv->pcdev.nr_lines = PD692X0_MAX_PIS;
+ 	priv->pcdev.owner = THIS_MODULE;
 
 -- 
 2.43.0
