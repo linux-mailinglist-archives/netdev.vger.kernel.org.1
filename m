@@ -1,78 +1,81 @@
-Return-Path: <netdev+bounces-227493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47BFABB110C
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 17:27:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEB9FBB1286
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 17:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01269173205
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 15:27:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7D634A7E26
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 15:44:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F301267AF1;
-	Wed,  1 Oct 2025 15:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E55126E71F;
+	Wed,  1 Oct 2025 15:43:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pu4enX6d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QUo/NYvy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6603646BF;
-	Wed,  1 Oct 2025 15:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790141FCCF8
+	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 15:43:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759332459; cv=none; b=Rzgm/kc0RY0Ec7qlAxVjjC+rSPHURUoOaSFAP+a7VFfnsqF+6C0mipq7zLDDF59EYwFWZIwDbEwiO84KsSQN4jyGI5yGNF79rCNVUapdugtSkE2s6aoO40y/NanQUNsuhNUiuPXxAWuZJWTqeYxRA/oriZLYK4urgEL+4ZELPhA=
+	t=1759333438; cv=none; b=UCVm9tc8Ftp2zTvxloTupLtJE1Iv5Gxd33i3oBulUQM80eLc0YQJYnxdBOFaP+gCUyB4VPWyTMSuSEVLV9VD5IE5DKCWOcdYslWruOrzeQXLY3TwKILPmuOYH15z5R4EaHph3iZvaLl7DqgrHUF4ig6tuj88JPsedI+208ckBbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759332459; c=relaxed/simple;
-	bh=WSnH7IirEGJGNs84RjsFq16wwx+I0W29kMdUTi2XFJ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N64D85e8HKab2Cz0TEP50vCwcQ8RwhaPordYQTCvoOadaTO7XWtcbRKZa3e3oLP3KhJzGKsuEjeWmqRIruuShnNiBbOBdyedtCNE3YztVySHb4EGrM96WdjECAXd7bghcJohTOGyMPVQWU3lEOCvl3DPyfI49xNVduK81jsGfrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pu4enX6d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BE78C4CEF1;
-	Wed,  1 Oct 2025 15:27:38 +0000 (UTC)
+	s=arc-20240116; t=1759333438; c=relaxed/simple;
+	bh=0FjaBLp0dpdaIUjdsYa5N7xObF6Jj6Zej+/l9PeTTFU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eSBzqtZUAZQX/IIzde0NOFtNT8cM4noJx3tGFRsv4aBfWIUnKHRb7GNlnPQIM9yZaW6kK9QHwrk1leDFREYhzKJhHhi1LemahBjHvxE3bErTMVBmOoiBiBZXmrGrJewhm5s12d/xcLGGEJ4aLPagrLEwJTcqyFNWUthbA0UioGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QUo/NYvy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED794C4CEF1;
+	Wed,  1 Oct 2025 15:43:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759332458;
-	bh=WSnH7IirEGJGNs84RjsFq16wwx+I0W29kMdUTi2XFJ8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Pu4enX6dS1gvR/srZivHLGWxbO9VgiRozQUowZ++wJV6t2j0DAxyAkbpYgcuENuVa
-	 wywAPOr+nVUTsZQmw9oG36xTQByDLOm6vAOIiQSK97B8KPDEYVOJZcLxGI9tZzPv06
-	 gKRbYVs2BWs4RXBdcqYuaetsH+xw19x4K1jobEfR36xDlpd3ZiI0kEmL6KY/Hlq1gO
-	 keLWJZdUk3SioAGljxyIPGRcZQ900Plr743doGNIvJic48R5YSku5wfGy3E6FxVvTg
-	 QUZd/SuKjaf5nT+gbO8xgDCp+OvYRboftpwPfqqPefqUl05YhzYInweaXLtqy4uFZv
-	 ze3SQ4geb6gSA==
-Date: Wed, 1 Oct 2025 08:27:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Octavian Purdila <tavip@google.com>, <davem@davemloft.net>,
- <edumazet@google.com>, <pabeni@redhat.com>, <horms@kernel.org>,
- <ast@kernel.org>, <daniel@iogearbox.net>, <hawk@kernel.org>,
- <john.fastabend@gmail.com>, <sdf@fomichev.me>, <kuniyu@google.com>,
- <aleksander.lobakin@intel.com>, <toke@redhat.com>, <lorenzo@kernel.org>,
- <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
- <syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com>
-Subject: Re: [PATCH net v2] xdp: update mem type when page pool is used for
- generic XDP
-Message-ID: <20251001082737.23f5037f@kernel.org>
-In-Reply-To: <aN091c4VZRtZwZDZ@boxer>
-References: <20251001074704.2817028-1-tavip@google.com>
-	<aN091c4VZRtZwZDZ@boxer>
+	s=k20201202; t=1759333438;
+	bh=0FjaBLp0dpdaIUjdsYa5N7xObF6Jj6Zej+/l9PeTTFU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QUo/NYvy4edVIFlngPRGMBTo3I/nXh1GHvulMs54p+zyrbtN+QV9WepZZuTVwX7cn
+	 gOa4X09GobHbSZf0FtxcPjGSGahRJIydO2CNrV2UYLd+DHyaWNBBIVzYC8/gujcPEg
+	 0wwoEfLuwv/BcDnON143SFR2h+2qi++dy88wdSnZDSDU1zhmkYExpASY0D6BsBDbXq
+	 qEPWdVx/pSVLNeDQ09m8nNPM5WUJxt+fgK6hww1etRDCdFbmdaEIgEiU2xRUFQ9Q2j
+	 1shDXHrTDz39BnY66gsXvhW6MrAIlF6w5Q1LF/fZJAatkn7c3wauI0S/MRgWxAiEio
+	 4ZjwYJhdbE/Tg==
+Date: Wed, 1 Oct 2025 16:43:54 +0100
+From: Simon Horman <horms@kernel.org>
+To: Sreedevi Joshi <sreedevi.joshi@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH v2 iwl-net 1/2] idpf: fix memory leak of flow steer list
+ on rmmod
+Message-ID: <aN1MOnqvkl7nZxZ7@horms.kernel.org>
+References: <20250930212352.2263907-1-sreedevi.joshi@intel.com>
+ <20250930212352.2263907-2-sreedevi.joshi@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250930212352.2263907-2-sreedevi.joshi@intel.com>
 
-On Wed, 1 Oct 2025 16:42:29 +0200 Maciej Fijalkowski wrote:
-> Here we piggy back on sk_buff::pp_recycle setting as it implies underlying
-> memory is backed by page pool.
+On Tue, Sep 30, 2025 at 04:23:51PM -0500, Sreedevi Joshi wrote:
+> The flow steering list maintains entries that are added and removed as
+> ethtool creates and deletes flow steering rules. Module removal with active
+> entries causes memory leak as the list is not properly cleaned up.
+> 
+> Prevent this by iterating through the remaining entries in the list and
+> freeing the associated memory during module removal. Add a spinlock
+> (flow_steer_list_lock) to protect the list access from multiple threads.
+> 
+> Fixes: ada3e24b84a0 ("idpf: add flow steering support")
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Sreedevi Joshi <sreedevi.joshi@intel.com>
 
-skb->pp_recycle means that if the pages of the skb came from a pp then
-the skb is holding a pp reference not a full page reference on those
-pages. It does not mean that all pages of an skb came from pp.
-In practice it may be equivalent, especially here. But I'm slightly
-worried that checking pp_recycle will lead to confusion..
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
