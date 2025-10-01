@@ -1,175 +1,140 @@
-Return-Path: <netdev+bounces-227470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFF2ABB02B2
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 13:32:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5955BB03F0
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 13:54:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F3AA2A32D4
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 11:32:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FB8B1896E66
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 11:54:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD812D0627;
-	Wed,  1 Oct 2025 11:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h2+f/SDI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A97A2E54A1;
+	Wed,  1 Oct 2025 11:54:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F333F2C08D0
-	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 11:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86F82522BE;
+	Wed,  1 Oct 2025 11:54:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759318327; cv=none; b=fkbvuW+EwYzF6UMqvPT2P2UjzuBgrdnBylKrPxrD1VTMLsyhvLh+V8NdTVJaIa2/N74vvhs0WEn+Y5h6/W0HkW+hM4sU5c8dbpaQFwHEZdWxHlK6R4iP2aVYQYsIfDQWpbopipm8lTys+QXYSNYTtytHQ5DfxBXkq+LdPml5RPI=
+	t=1759319662; cv=none; b=NETzgbbi2q7SxCnBRFIzEQVE113FFIvuwDfOPanCMDQGOMO37yyBk3G1FLsR79ttcfMKChKVbxSfsa+Xs8tib5e8CSsNo1yjDxj8IdQk3hN3LtIutqsqYN5DZrqJIWNEQPB+IRjptUfD/G6BHsAJK3piJJ+tb4nNFWtiautSaqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759318327; c=relaxed/simple;
-	bh=E8TP+jTXRnR5ypNl9rTKJR9W/tHyfS8KQ+ykqiS8ARQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=a46PTPYKIL5Ph9pacigHGhX/VCPBHhrT6W7kJdi2LxY6J5AdYCXq3aBV4aLRTX1pDyNUiWvPD3WxbMbLCFv9Dv9gPKcH5t4jKu8Zr/BH1aiWTLL7y6ecKa+W6bh7Kfu0oUKbgziznggQd2cklr/BaRgeOYG3TQWDRFhTAcDx9iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h2+f/SDI; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759318324;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=iJSRuteQOX9gctlwdxDghNzdOhBrLQto5XenHeU3Vv8=;
-	b=h2+f/SDI1lFKzHj2ZfTwofW0QajYgPX4oS0J/GF+mmXbdq+mQcy/x8xt4Gqdc3iQchcYgG
-	s3K3t7iiVK/JiU590XAwmaopfOdDG+eXE9wSrcxE0yQtp1FbB1K5ks2qPH7oeQUCb0jHjv
-	ksiHdp5DHH9BQE1G9ew9RZZgQ45xMtQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-571-PeUefWixPFq_tPb3yrCIRA-1; Wed, 01 Oct 2025 07:32:02 -0400
-X-MC-Unique: PeUefWixPFq_tPb3yrCIRA-1
-X-Mimecast-MFC-AGG-ID: PeUefWixPFq_tPb3yrCIRA_1759318322
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46e2d845ebeso49910265e9.1
-        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 04:32:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759318322; x=1759923122;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iJSRuteQOX9gctlwdxDghNzdOhBrLQto5XenHeU3Vv8=;
-        b=uCRK/IhR8MWsxsJ/oZkJOi6iBjmgHf91qKpbMa0Lrj/+dGOCd16fjvsWx4/2XV4RCA
-         D39K7f323FEa6Z5XNV5dMNNFSw/dIErBsWzAysCAC1FmaCy+xxD/tkbfmVgJSIlRxtnn
-         r3LIVx60OptVW9lUuhVWlYZNFYB9qc/7aoCfCcp9e1Rgbvo+Iar7EJEM+gnSnPfSIvBe
-         T7rNc+OZ8dYqoUQMj1AJepH0NRfgYUFGM1y6r0J+jK+NI+1T0g23toph0uP9aXQcU99P
-         2JJ1VrcTIEtV91lo+i8MUwIDJL4iJEf9lDHUvojK3UEfF/psgxg/wROHe5BP1xB+eQBm
-         rdHw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxho2X0iDWgtlsp3Qx+8eVjtGC5TWfHJKsX9dWNFVni96U5WwO6bH7LrcPiS0yFCKvx1iWDts=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoSwS7ya9DaU/NcSTuurRPQpREniixZqGlm41r3UBvc2LY/qe7
-	GaUDjF1F9LFcuBzJVRcaU32sSP+KR0b4XySfAm+MPqpeVAE9x4dvCKGx0EQA4pt8nbZK+rgr4wX
-	N67wQRNGH0s4RI3CLpR3RYw3+QFvREKeEOuAFOY5WksMlpkmVtDj1z6pTCA==
-X-Gm-Gg: ASbGnct4OndJ2lGBZvir0I7H36ByZGZSCjxO/ugqGYFQi/rCt1S3v1CT9aKBNVYYZIp
-	mAYUC57Qmg1ZqwxhPqLT0YOtLli0F0HzjrJo0n4gpXy8AdNd82qCJZKgK01srWqNCgp3rCju3ge
-	6fF5XkgYGSVEmwQ4iq0NFIr1TD245E+vsbx1GvWmylgHaJWZFkUU/N0C6AeViYCUO28BCEX6sO6
-	VTzws9P6Okmo1FMv0Z8HsJtZaHy7PaLUNW+KGhTx51jQAT54+YkDYKVGnfdm34xq9+88hLkG+0E
-	xWtRMvojYIGa6DBNFDNIdVtljShDCys/7/F4IMA=
-X-Received: by 2002:a05:600c:45d0:b0:45c:b6fa:352e with SMTP id 5b1f17b1804b1-46e612bc7f7mr25101335e9.18.1759318321586;
-        Wed, 01 Oct 2025 04:32:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGstrQbPl2ux574MZQ5paDC88d3YGXhrfcZSAq6ToKm0J+thPm2S97lL7iQ8LvaDhELHu4bFA==
-X-Received: by 2002:a05:600c:45d0:b0:45c:b6fa:352e with SMTP id 5b1f17b1804b1-46e612bc7f7mr25100985e9.18.1759318320967;
-        Wed, 01 Oct 2025 04:32:00 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1518:6900:b69a:73e1:9698:9cd3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e619c3b75sm34870125e9.7.2025.10.01.04.31.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Oct 2025 04:32:00 -0700 (PDT)
-Date: Wed, 1 Oct 2025 07:31:58 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	jasowang@redhat.com, leiyang@redhat.com, mst@redhat.com,
-	rongqianfeng@vivo.com, sgarzare@redhat.com,
-	sheng.zhao@bytedance.com, zhangjiao2@cmss.chinamobile.com,
-	zhao.xichao@vivo.com
-Subject: [GIT PULL] virtio,vhost: fixes, cleanups
-Message-ID: <20251001073158-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1759319662; c=relaxed/simple;
+	bh=dn/RO9C44OLTk3vcWX+GfhcDgE79GFNrEnVQCO2pM1g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l9GPT6kCCQ9t4u6VkzPN0r9cv3sJejC13+u5Pc49DiJZVuJqlJmxhOWMSZ102y/dNyPoGEIE6i9lhpcnWoaSHbxpbdDQloqrVV5XBqurDKThzmqQ8/ZaooykE3lJuoiRzpzR53DvzT5ddV7dN6A/0C7FXP7PK9izMsSgUBm8NSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from DESKTOP-L0HPE2S (unknown [111.225.242.229])
+	by APP-01 (Coremail) with SMTP id qwCowAA3j6FHFt1og8oGCg--.6039S2;
+	Wed, 01 Oct 2025 19:53:45 +0800 (CST)
+From: Haotian Zhang <vulab@iscas.ac.cn>
+To: Jacob Keller <jacob.e.keller@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haotian Zhang <vulab@iscas.ac.cn>
+Subject: [PATCH v3] ice: ice_adapter: release xa entry on adapter allocation failure
+Date: Wed,  1 Oct 2025 19:53:36 +0800
+Message-ID: <20251001115336.1707-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowAA3j6FHFt1og8oGCg--.6039S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uryUtrWfWFyDAw13ZFy8Grg_yoW8KrWrpr
+	4DJry0yr40qrsYgr4DZF4xZryUua1fKrZ8KF4rJwnxuFZxJw1jvry5try7KFZ5A39agas8
+	Xa1DZw1UZw1DAw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBgsCA2jc2sWFEAABsz
 
-The following changes since commit e5f0a698b34ed76002dc5cff3804a61c80233a7a:
+When ice_adapter_new() fails, the reserved XArray entry created by
+xa_insert() is not released. This causes subsequent insertions at
+the same index to return -EBUSY, potentially leading to
+NULL pointer dereferences.
 
-  Linux 6.17 (2025-09-28 14:39:22 -0700)
+Reorder the operations as suggested by Przemek Kitszel:
+1. Check if adapter already exists (xa_load)
+2. Reserve the XArray slot (xa_reserve)
+3. Allocate the adapter (ice_adapter_new)
+4. Store the adapter (xa_store)
 
-are available in the Git repository at:
+Fixes: 0f0023c649c7 ("ice: do not init struct ice_adapter more times than needed")
+Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Haotian Zhang <vulab@iscas.ac.cn>
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+---
+Changes in v3:
+  - Reorder xa_load/xa_reserve/ice_adapter_new/xa_store calls as
+    suggested by Przemek Kitszel, instead of just adding xa_release().
+Changes in v2:
+  - Instead of checking the return value of xa_store(), fix the real bug
+    where a failed ice_adapter_new() would leave a stale entry in the
+    XArray.
+  - Use xa_release() to clean up the reserved entry, as suggested by
+    Jacob Keller.
+---
+ drivers/net/ethernet/intel/ice/ice_adapter.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-for you to fetch changes up to ed9f3ab9f3d3655e7447239cac80e4e0388faea8:
-
-  virtio-vdpa: Drop redundant conversion to bool (2025-10-01 07:24:55 -0400)
-
-----------------------------------------------------------------
-virtio,vhost: fixes, cleanups
-
-Just fixes and cleanups this time around.  The mapping cleanups are
-preparing the ground for new features, though.
-In order patches were almost there but I feel they didn't
-spend enough time in next yet.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Jason Wang (9):
-      virtio_ring: constify virtqueue pointer for DMA helpers
-      virtio_ring: switch to use dma_{map|unmap}_page()
-      virtio: rename dma helpers
-      virtio: introduce virtio_map container union
-      virtio_ring: rename dma_handle to map_handle
-      virtio: introduce map ops in virtio core
-      vdpa: support virtio_map
-      vdpa: introduce map ops
-      vduse: switch to use virtio map API instead of DMA API
-
-Michael S. Tsirkin (1):
-      vhost: vringh: Fix copy_to_iter return value check
-
-Qianfeng Rong (1):
-      virtio_balloon: Remove redundant __GFP_NOWARN
-
-Sheng Zhao (1):
-      vduse: Use fixed 4KB bounce pages for non-4KB page size
-
-Xichao Zhao (1):
-      virtio-vdpa: Drop redundant conversion to bool
-
-zhang jiao (1):
-      vhost: vringh: Modify the return value check
-
- drivers/net/virtio_net.c                 |  28 +-
- drivers/vdpa/Kconfig                     |   8 +-
- drivers/vdpa/alibaba/eni_vdpa.c          |   5 +-
- drivers/vdpa/ifcvf/ifcvf_main.c          |   5 +-
- drivers/vdpa/mlx5/core/mr.c              |   4 +-
- drivers/vdpa/mlx5/net/mlx5_vnet.c        |  15 +-
- drivers/vdpa/octeon_ep/octep_vdpa_main.c |   6 +-
- drivers/vdpa/pds/vdpa_dev.c              |   5 +-
- drivers/vdpa/solidrun/snet_main.c        |   8 +-
- drivers/vdpa/vdpa.c                      |   5 +-
- drivers/vdpa/vdpa_sim/vdpa_sim.c         |   4 +-
- drivers/vdpa/vdpa_user/iova_domain.c     | 132 ++++++---
- drivers/vdpa/vdpa_user/iova_domain.h     |   7 +-
- drivers/vdpa/vdpa_user/vduse_dev.c       |  79 +++---
- drivers/vdpa/virtio_pci/vp_vdpa.c        |   5 +-
- drivers/vhost/vdpa.c                     |   6 +-
- drivers/vhost/vringh.c                   |  14 +-
- drivers/virtio/virtio_balloon.c          |   2 +-
- drivers/virtio/virtio_ring.c             | 459 +++++++++++++++++++------------
- drivers/virtio/virtio_vdpa.c             |  22 +-
- include/linux/vdpa.h                     |  25 +-
- include/linux/virtio.h                   |  46 +++-
- include/linux/virtio_config.h            |  72 +++++
- include/linux/virtio_ring.h              |   7 +-
- 24 files changed, 635 insertions(+), 334 deletions(-)
+diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
+index b53561c34708..0a8a48cd4bce 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adapter.c
++++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
+@@ -99,19 +99,21 @@ struct ice_adapter *ice_adapter_get(struct pci_dev *pdev)
+ 
+ 	index = ice_adapter_xa_index(pdev);
+ 	scoped_guard(mutex, &ice_adapters_mutex) {
+-		err = xa_insert(&ice_adapters, index, NULL, GFP_KERNEL);
+-		if (err == -EBUSY) {
+-			adapter = xa_load(&ice_adapters, index);
++		adapter = xa_load(&ice_adapters, index);
++		if (adapter) {
+ 			refcount_inc(&adapter->refcount);
+ 			WARN_ON_ONCE(adapter->index != ice_adapter_index(pdev));
+ 			return adapter;
+ 		}
++		err = xa_reserve(&ice_adapters, index, GFP_KERNEL);
+ 		if (err)
+ 			return ERR_PTR(err);
+ 
+ 		adapter = ice_adapter_new(pdev);
+-		if (!adapter)
++		if (!adapter) {
++			xa_release(&ice_adapters, index);
+ 			return ERR_PTR(-ENOMEM);
++		}
+ 		xa_store(&ice_adapters, index, adapter, GFP_KERNEL);
+ 	}
+ 	return adapter;
+-- 
+2.50.1.windows.1
 
 
