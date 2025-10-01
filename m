@@ -1,109 +1,81 @@
-Return-Path: <netdev+bounces-227417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB740BAEE16
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 02:30:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0D92BAEE3D
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 02:34:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 830A1194455B
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 00:31:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A5D91884771
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 00:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A4161E0B86;
-	Wed,  1 Oct 2025 00:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2025B1A76BC;
+	Wed,  1 Oct 2025 00:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ggMZxZvA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hWO98+OG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 577C01DF25C;
-	Wed,  1 Oct 2025 00:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5BE19CC3E
+	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 00:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759278626; cv=none; b=JMZenIK4Lm2hd26t1owvZNk1AlzIpNduHSkAmkS/k5hZFh3gibjoKLjyT9xQbFw0/VH1KhbrHDu3XmJRajZ30RROj0o2kkczHrWCGcElEOmD0FNr0wVL2ADn8ZXM4/pqxjzCHMu+VwAK+yvT1t985cOyTswqXN9v0vBDrDxTx24=
+	t=1759278862; cv=none; b=m5aZLCx3lrKaoTR2EgO+Iucg17WP1XfLUWq2IzxGzuLAV00aoEDpWpZTVzFJwL/6KTBoGgToNxpTVuufxqM/OA/WiX6xrDSvD70atcY1CZFc0DCb8tH6Y0n8ru/EpeYs595yvzKrbMH1A5l5dOdqpYZav70+AVR4UMI7UiG3d68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759278626; c=relaxed/simple;
-	bh=0fQVWwUWkMLw33UpF2OAmId1Q2Rfqf5COyBi7cgwMjk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BV6urRKehuCUb5qmS6PhCmCjGkIYjEwrJ94hNbKlzlCpHUbg3XKy7j9QErQUK5Zg1Xlrg9OyVGqVVaJeTzZSGQGz2AAoUOjl+LoRDwzM8YHxuYvKBJQnAmsllkF+JkoVRNp3r4tGPkckluRLIgVvyBXvcvwdPqkPYcHrzLAwwvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ggMZxZvA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D725DC116C6;
-	Wed,  1 Oct 2025 00:30:25 +0000 (UTC)
+	s=arc-20240116; t=1759278862; c=relaxed/simple;
+	bh=8KMYC+aqD38IQHhaB3PrP42uGO7mpBLEdJrJNawB9s4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tVMv81oFztnKzk5X4ziJnrb1tOv7lROVvE+rZH39Fzm+OouQOb15b8hI2Th8wAysbqJIqw0FH5aYRkav00vUZBzpcA/0gq9MzyphOtBb+uH9cuHGShfchejGKAmgA1CMMEh7+PCHnrHUGdDS96NAmMl2ke65wefxH5zLBpTz1WU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hWO98+OG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51258C113D0;
+	Wed,  1 Oct 2025 00:34:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759278625;
-	bh=0fQVWwUWkMLw33UpF2OAmId1Q2Rfqf5COyBi7cgwMjk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ggMZxZvAdqGwXcKzbUBeVmq6kYQUo6N6wv4YaBXSVcZkd0PWTE7TFXLcN41hQ5u62
-	 eIbMgt8c6zAH0elSzu62Yr7Re+vHbOzVk4ABqKmbyuvdnIvPwEf9BWx6AtJeobox1m
-	 C+L2GM3/rh2zzwmY/Avrl5o4a8njn8Ymvl7GBKPY5qQWdXHOXbDQJOrrEvebLZjR1o
-	 VYj8KTa/+28xLsMy4gYmcFG4HdE+bqYMC+LJq+GD5x6aVLlI55gzJhnJuXht3rtc7q
-	 BGtdsQZoXifnHkeGnT6QLk1Ol0aI4ZpERr5X379G5hQEzWM18+8MCugodLaKBw7eMy
-	 iGXPwOfa0jxHw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACAB39D0C1A;
-	Wed,  1 Oct 2025 00:30:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1759278861;
+	bh=8KMYC+aqD38IQHhaB3PrP42uGO7mpBLEdJrJNawB9s4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hWO98+OGkrzGoAVU6ZBjkH7qmpM9RpTOmn20sI8HvvFfy3ggeY04ThaTt25lGq1Uo
+	 hC1osn2hISi0l2N1z4JmgJU3rpT5teWt3fOPKUW9/CKrA9Ip+9FmhMMs5a/r9i6m03
+	 Azs5wZkaAUEpABVX2ZvkjWgpFmitzHtn5hTujdIdZmA5slQ+K8m4/v71XJnJ/Yy2ol
+	 dzl60PT/GBC6OTr/tp6rvPIF/XGFE/yrUFodEmONe/O8ZnhY6VesV6FNmvb3+XxWE9
+	 nFjHQap3D/2Kx0PhhndqtbVNnmcAcvjXs6nLYf3Ko96jZC+R5hFg9lpppIIzmxwfHL
+	 wVouTkzvLfEpg==
+Date: Tue, 30 Sep 2025 17:34:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Wilder <wilder@us.ibm.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v12 0/7] bonding: Extend arp_ip_target format
+ to allow for a list of vlan tags.
+Message-ID: <20250930173420.24fcc12c@kernel.org>
+In-Reply-To: <20250930233849.2871027-1-wilder@us.ibm.com>
+References: <20250930233849.2871027-1-wilder@us.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V6] net/mlx5: Improve write-combining test
- reliability for ARM64 Grace CPUs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175927861849.2249992.11585338388238905826.git-patchwork-notify@kernel.org>
-Date: Wed, 01 Oct 2025 00:30:18 +0000
-References: <1759093688-841357-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1759093688-841357-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: catalin.marinas@arm.com, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- saeedm@nvidia.com, leon@kernel.org, mbloch@nvidia.com,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, gal@nvidia.com, leonro@nvidia.com,
- jgg@nvidia.com, michaelgur@nvidia.com, moshe@nvidia.com, will@kernel.org,
- agordeev@linux.ibm.com, akpm@linux-foundation.org, borntraeger@linux.ibm.com,
- bp@alien8.de, dave.hansen@linux.intel.com, gerald.schaefer@linux.ibm.com,
- gor@linux.ibm.com, hca@linux.ibm.com, hpa@zytor.com, justinstitt@google.com,
- linux-s390@vger.kernel.org, llvm@lists.linux.dev, mingo@redhat.com,
- morbo@google.com, nathan@kernel.org, ndesaulniers@google.com,
- salil.mehta@huawei.com, svens@linux.ibm.com, tglx@linutronix.de,
- x86@kernel.org, yisen.zhuang@huawei.com, arnd@arndb.de, leonro@mellanox.com,
- linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- mark.rutland@arm.com, michaelgur@mellanox.com, patches@lists.linux.dev,
- schnelle@linux.ibm.com, shaojijie@huawei.com, horms@kernel.org,
- phaddad@nvidia.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 29 Sep 2025 00:08:08 +0300 you wrote:
-> From: Patrisious Haddad <phaddad@nvidia.com>
+On Tue, 30 Sep 2025 16:38:00 -0700 David Wilder wrote:
+> The current implementation of the arp monitor builds a list of vlan-tags by
+> following the chain of net_devices above the bond. See bond_verify_device_path().
+> Unfortunately, with some configurations, this is not possible. One example is
+> when an ovs switch is configured above the bond.
 > 
-> Write combining is an optimization feature in CPUs that is frequently
-> used by modern devices to generate 32 or 64 byte TLPs at the PCIe level.
-> These large TLPs allow certain optimizations in the driver to HW
-> communication that improve performance. As WC is unpredictable and
-> optional the HW designs all tolerate cases where combining doesn't
-> happen and simply experience a performance degradation.
-> 
-> [...]
+> This change extends the "arp_ip_target" parameter format to allow for a list of
+> vlan tags to be included for each arp target. This new list of tags is optional
+> and may be omitted to preserve the current format and process of discovering
+> vlans.
 
-Here is the summary with links:
-  - [net-next,V6] net/mlx5: Improve write-combining test reliability for ARM64 Grace CPUs
-    https://git.kernel.org/netdev/net-next/c/fd8c8216648c
+Please read:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
 
-You are awesome, thank you!
+You're reposting this too soon in more than one way - there should be
+at least 24h between postings. What's more net-next is closed right now
+and Paolo told you this in his reply on v11.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: defer
 
