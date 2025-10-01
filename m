@@ -1,164 +1,147 @@
-Return-Path: <netdev+bounces-227448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83672BAF9DF
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 10:28:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5173FBAFA4E
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 10:31:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16183189E49C
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 08:29:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1BCF1885643
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 08:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2073127FB31;
-	Wed,  1 Oct 2025 08:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7BF27EFFE;
+	Wed,  1 Oct 2025 08:31:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CV4CTV0X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MqFrzzrq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7237C27B35D
-	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 08:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07AEC266B6F
+	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 08:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759307335; cv=none; b=OfSDmbExdf02auumcMIkUGKZQoAOFkYnc6ogTl4AX9i178uyVKniMK1tDrORh2Nn7uu+aZUXWvK421+64qzn2Hrub+FiITun1YwRUwXrko5ij3K8EpMgVjpwUhD7N2ENwwFYzQBSjpJgEjBYdwLMPpgUBdS6UCGKX7QxxDexBpE=
+	t=1759307502; cv=none; b=cxiKIihZMLn+m6IWzvAckN5MeNOkMyKQDEMkT7Q5P3W/CbWTWom8LzkaMpin/FeaGkq/PleS418mDmdLjjsGVsrtPLiduT5u6lVwBEkLR5a+mX99gNgiOVAHT2uZ22uZchtZqZSnPXSpVUJzQKGuSvw8z6kkcdkCjLSEVabyGL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759307335; c=relaxed/simple;
-	bh=mAs5jC88keGuTS1kfSau2lPlyfOYPIVe4bEKVDeisl8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BAMQ4W9GI/5lbGaTFYsnEWej7c8RJSRxbJ9iId6/w82zhqdxN0eilX75a26FHSIyayMp2qPHu7xIfOKu6jyQFTAW+gZ4bLc0HkiSPZ15nMDScMjvkmx1nCevRGBJ/FVX/9Vm50zLCffRDETeF1d/Fn3NdoIoUhBNBua/Dek8zpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CV4CTV0X; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759307332;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TH59Sw29O2jzr1UeKiMhScDg0sFiTxNL4gz8DMwSkfs=;
-	b=CV4CTV0X58bYu9fP/YaC+3zEZj6a058H985Prml/CoXCp6vojHQ0je7NOXFdROFJniQLsR
-	WKTfKXdFAZldsNSOUfhixhUAkq9k6W2aNy1wm9TKx+Z3C80QeSuVByOMz/2pl7gmwrXj2S
-	QlpG/RhbKr2D+v5qRsvaC5LLLm/vFCI=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-194-eXVo8rnqPTOIa_x0sF5dyw-1; Wed, 01 Oct 2025 04:28:51 -0400
-X-MC-Unique: eXVo8rnqPTOIa_x0sF5dyw-1
-X-Mimecast-MFC-AGG-ID: eXVo8rnqPTOIa_x0sF5dyw_1759307330
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-6339aa08acfso1099911a12.0
-        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 01:28:50 -0700 (PDT)
+	s=arc-20240116; t=1759307502; c=relaxed/simple;
+	bh=wlepJl/FDglC7Iq5FuOQ6VBskFRpNf8YuU3NftOhPfw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MTOYTJJ7IptSJM+MJ49iNosXmmcg5Z6vQufKxSuafQzQdnSgVsng/wEibOrD1OnDDW7L8zZ5S5NESsGHJvmDCrVz35okqQqv2YpQe1l2kChOiTGM/jm3DGuJMDi6jyxbMnB4rFcKu5S/0qrmDpgEKaqTuSXDdrqE+CNx2skWq0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MqFrzzrq; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-780fc3b181aso4176334b3a.2
+        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 01:31:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759307500; x=1759912300; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q/BnQS5ICJGbt/butX83RKxPPfruJQzobXgxFKJ0MdI=;
+        b=MqFrzzrqmvEAtBO2NWim8lp+Ze+0Ee79O/9eg0AO4pUbTq8PqWgK+ANvRTn4S4uEYj
+         JDINeU+D9kJQ4vREinXqSKtO9xj7E18HjNDNU9Wa9mQxTRE0VdTLx8A01Imfpdv4lSrk
+         BQlIcuIhUwpyBSpD/bqso0LEqr4DVaLLHKgl/KHbtZkTyHAc6OfAJpCy8FqXaB/dA/Um
+         bhwJoUOL2T8+cUpHluIsA6U6n9NzH05hwyJIKujlpWdQ0hGj3c4kdi6mFiftJLY7rR97
+         RzI4tbUBuQh+SawbQGvJpXzMWP+MrxVRrtKh2QDGzDOY+0eJ5zUPvPXmG2CmIvdqN2kd
+         lp3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759307330; x=1759912130;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TH59Sw29O2jzr1UeKiMhScDg0sFiTxNL4gz8DMwSkfs=;
-        b=AVlIfy7e7JF50Qau/xNolma6ENQJL0jBy6yKVqBU3JHUkfbkxAjUizmXDT4IScz3Rc
-         /HcXLheMedH2C9vTbdB2Tv2zpZKGy8r5xUCK7oprggHwCVlYm6ZUq5iQD8IrfyJJbFNp
-         6yvgE4pTJyHTgk+C4Sl4Gll6DMuHi3U7v4IIFwLyCd3YQFEv6nW2HJkR35cCv9Wa8i32
-         n5uvbodJ6e2crSTw2Rx70n7X3IYGvZIzjnJAdYY16L29/8Fv1qR3E8DqRQt6xJ+3sFpj
-         fmQnFvI8pv6gkwNbv+b5c9U15GygPeyWBZeOVxoEIqiOLR8FBxTZxDJN/mWyo5uZNE5j
-         paFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVFVcv+Kforg2arTsaL81PQFGUmIG3mA5oQj/ib/b+B7dqLH0H5n6UQtXjiJjgBm+g8gRdClGk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz00+GB+DIGJmg8U+f6obe4Vz6XyJtrsPRcB/VoLTI999uwT06r
-	1eNC3vwLHQ3C2QyvnvwNQyoInlVqkOcjNUQ4F0oW9Z6G3tcgpaljO6+98vROBWPSsRDhZTO3hsG
-	v3hb7tHJy8OX6BEytJjjTqEfdoHLemEyGc9ATabivyuilA091ScpeAE7kNw==
-X-Gm-Gg: ASbGncvbjzogPP4U9+z9Zq5WyOVlwftWEqf23AA5wMuS45tXBeedl7zCkPBjjnrPTpU
-	7hnvKIeo+pzmJb049SEBxrz9gxOfGuXqsyLFbqXrnqV7b6jiQYc1mX4cZtWF2q++W8uJFw77Dnr
-	SpvYMntOfY9QjzSjZKMlpg+oE7ddmGMHMCXxqAKPZDvfUSOFUOc7wvh/qVhD0Fs4zurowCgOXFj
-	kvBa7h8kA+Bo8+RJ+cF6hUIsAvWlRrRfkZDLn0+bazF0vFW6D1cQo6xVCX3w8mY9PJiX5q7rUYG
-	fMbIIDIFqgUicjRB+Ai5czXe3V7q0D7TC3qArNq5YM0Kk84XKd1PkaOm7LHTYO4Ouuymrk/a
-X-Received: by 2002:a05:6402:1e8e:b0:636:6e11:2fd1 with SMTP id 4fb4d7f45d1cf-63678ba63f9mr3429910a12.4.1759307329889;
-        Wed, 01 Oct 2025 01:28:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEj+PdPhsJi8Z+hoZrTRC6U/N/PUjMCvkDv55wnRbOMIuFkZ+Ix/bmpUxPMb7w+6Ds4kpGBRQ==
-X-Received: by 2002:a05:6402:1e8e:b0:636:6e11:2fd1 with SMTP id 4fb4d7f45d1cf-63678ba63f9mr3429889a12.4.1759307329463;
-        Wed, 01 Oct 2025 01:28:49 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63662dc0a3csm2990346a12.48.2025.10.01.01.28.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Oct 2025 01:28:48 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id AF4DF2779AF; Wed, 01 Oct 2025 10:28:47 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Helge Deller <deller@gmx.de>, Andrew Morton <akpm@linux-foundation.org>,
- David Hildenbrand <david@redhat.com>, Lorenzo Stoakes
- <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, Suren
- Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, Jakub Kicinski <kuba@kernel.org>, Mina
- Almasry <almasrymina@google.com>, linux-parisc
- <linux-parisc@vger.kernel.org>
-Cc: stable@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, linux-mm@kvack.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net v2] page_pool: Fix PP_MAGIC_MASK to avoid crashing
- on some 32-bit arches
-In-Reply-To: <03029eb0-921a-4e45-ab23-3cb958199085@gmx.de>
-References: <20250930114331.675412-1-toke@redhat.com>
- <03029eb0-921a-4e45-ab23-3cb958199085@gmx.de>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 01 Oct 2025 10:28:47 +0200
-Message-ID: <873483m3eo.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1759307500; x=1759912300;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q/BnQS5ICJGbt/butX83RKxPPfruJQzobXgxFKJ0MdI=;
+        b=wHiwlGRAwBoheVTaIwfwlR7M7EV2KAPoxEIQUfTgTfaIaOjZ1SpZt97qlwFwxmJgqi
+         B9pLCAa/VA/lPF8w+bX32rubVZU0iBKP/GpEjizKZYrutW26QSG0rhCt7Z0/6uOs1mCk
+         JbWdKiApMDbVeAyTrwiO/Udbu9Nmd7Jvs7PifK8DY5iGsXgravqp33FNHpHYsITs9TKh
+         NW4Y2vM976wJ2AkASU4//Q4sVhhtmC46z42fZCtqx07j/XKoZ+y0HCMUFPTs6rU4ZG2N
+         +84ISzC+aKaG+Gn+01uS1looMSRIW1pmiG04308IhQoHxC5ecamqSV+AS3CrjPdU5PRv
+         OM4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVN1Igdi5mIxLgPk2T9+ZHpE8LaQujcEoV/Qe73PZszgFNwJ8rC4Futb5TJ1CpC9V8s3mNNav0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyONakF93P/X2mqeTLRboKbZzgDLXBueJzt3MMmkTuArow+/Evo
+	IQuzUR+3UBxodtGZc1DGYM/9QR2oEAJYPsKZHcbSzWlbH1rYteGg5AOP
+X-Gm-Gg: ASbGncu8BK7PSZqzMWDLi65IQYvPh01IHGZOsSF+EfWce3/CqYcmlJnxXSvBC1YG9zQ
+	fgWm879vULAkiiiYmqq5Mpf5gL4KJFtbJ2PMTXNYIYsSu/ADujB8oQFGzwdJZJXAJrMPw6eQiEx
+	0XHy0I3Y/reIDlbRh8tKZ391J95V9fGKKkr9thZyu4u7mkgz7w8x/yTaet+cRXnQ3OzY8DPKef6
+	Ebk8JeAF3sosIDqWpyXKLrJvj2rtGi3thb11mooqWR9xNvHtE71uazQmbRVQAp/MzJCVZa81CUd
+	jm0FX+doNZOA2HCl5m7H9u2K+Wo0XOcih9XK89cwQKJcNuIT8G5IP0t+uLLE06U+R+Nfq/272c9
+	8Zyin3L0iuRkyhQ9awk540P+vs8jHC46nlvqR5b6OtqsXxGcZR0JOae3/uNjaJpU8MtFDaerkdT
+	H/omEu
+X-Google-Smtp-Source: AGHT+IGKzyuHahUxvEYMTvpgcvyvBiorHG33cuSCeL+2u5gG6jYyCteWnCT8fMENWTmD8XlLl3NMWw==
+X-Received: by 2002:a05:6a20:72a7:b0:30a:267b:b9e8 with SMTP id adf61e73a8af0-321e43a2022mr3642212637.36.1759307500186;
+        Wed, 01 Oct 2025 01:31:40 -0700 (PDT)
+Received: from [10.0.2.15] ([157.50.93.46])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b57c55bdefesm15501448a12.49.2025.10.01.01.31.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Oct 2025 01:31:39 -0700 (PDT)
+Message-ID: <7cc900dd-a49a-4f37-88e9-6794e92fc7d4@gmail.com>
+Date: Wed, 1 Oct 2025 14:01:24 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: usb: lan78xx: Fix lost EEPROM read timeout
+ error(-ETIMEDOUT) in lan78xx_read_raw_eeprom
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, Thangaraj.S@microchip.com,
+ Rengarajan.S@microchip.com, UNGLinuxDriver@microchip.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ syzbot+62ec8226f01cb4ca19d9@syzkaller.appspotmail.com
+References: <20250930084902.19062-1-bhanuseshukumar@gmail.com>
+ <20250930173950.5d7636e2@kernel.org>
+ <5f936182-6a69-4d9a-9cec-96ec93aab82a@gmail.com>
+ <aNzbgjlz_J_GwQSt@pengutronix.de>
+ <e956c670-a6f5-474c-bed5-2891bb04d7d5@gmail.com>
+ <aNzlNkUKEFs0GFdL@pengutronix.de>
+Content-Language: en-US
+From: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
+In-Reply-To: <aNzlNkUKEFs0GFdL@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Helge Deller <deller@gmx.de> writes:
+On 01/10/25 13:54, Oleksij Rempel wrote:
+> On Wed, Oct 01, 2025 at 01:40:56PM +0530, Bhanu Seshu Kumar Valluri wrote:
+>> On 01/10/25 13:12, Oleksij Rempel wrote:
+>>> Hi,
+>>>
+>>> On Wed, Oct 01, 2025 at 10:07:21AM +0530, Bhanu Seshu Kumar Valluri wrote:
+>>>> On 01/10/25 06:09, Jakub Kicinski wrote:
+>>>>> On Tue, 30 Sep 2025 14:19:02 +0530 Bhanu Seshu Kumar Valluri wrote:
+>>>>>> +	if (dev->chipid == ID_REV_CHIP_ID_7800_) {
+>>>>>> +		int rc = lan78xx_write_reg(dev, HW_CFG, saved);
+>>>>>> +		/* If USB fails, there is nothing to do */
+>>>>>> +		if (rc < 0)
+>>>>>> +			return rc;
+>>>>>> +	}
+>>>>>> +	return ret;
+>>>>>
+>>>>> I don't think you need to add and handle rc here separately?
+>>>>> rc can only be <= so save the answer to ret and "fall thru"?
+>>>>
+>>>> The fall thru path might have been reached with ret holding EEPROM read timeout
+>>>> error status. So if ret is used instead of rc it might over write the ret with 0 when 
+>>>> lan78xx_write_reg returns success and timeout error status would be lost.
+>>>
+>>> Ack, I see. It may happen if communication with EEPROM will fail. The same
+>>> would happen on write path too. Is it happened with real HW or it is
+>>> some USB emulation test? For me it is interesting why EEPROM is timed
+>>> out.
+>>
+>> The sysbot's log with message "EEPROM read operation timeout" confirms that EEPROM read
+>> timeout occurring. I tested the same condition on EVB-LAN7800LC by simulating 
+>> timeout during probe.
+> 
+> Do you simulating timeout during probe by modifying the code, or it is
+> real HW issue?
+> 
 
-> On 9/30/25 13:43, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> Helge reported that the introduction of PP_MAGIC_MASK let to crashes on
->> boot on his 32-bit parisc machine. The cause of this is the mask is set
->> too wide, so the page_pool_page_is_pp() incurs false positives which
->> crashes the machine.
->>=20
->> Just disabling the check in page_pool_is_pp() will lead to the page_pool
->> code itself malfunctioning; so instead of doing this, this patch changes
->> the define for PP_DMA_INDEX_BITS to avoid mistaking arbitrary kernel
->> pointers for page_pool-tagged pages.
->>=20
->> The fix relies on the kernel pointers that alias with the pp_magic field
->> always being above PAGE_OFFSET. With this assumption, we can use the
->> lowest bit of the value of PAGE_OFFSET as the upper bound of the
->> PP_DMA_INDEX_MASK, which should avoid the false positives.
->>=20
->> Because we cannot rely on PAGE_OFFSET always being a compile-time
->> constant, nor on it always being >0, we fall back to disabling the
->> dma_index storage when there are not enough bits available. This leaves
->> us in the situation we were in before the patch in the Fixes tag, but
->> only on a subset of architecture configurations. This seems to be the
->> best we can do until the transition to page types in complete for
->> page_pool pages.
->>=20
->> v2:
->> - Make sure there's at least 8 bits available and that the PAGE_OFFSET
->>    bit calculation doesn't wrap
->>=20
->> Link: https://lore.kernel.org/all/aMNJMFa5fDalFmtn@p100/
->> Fixes: ee62ce7a1d90 ("page_pool: Track DMA-mapped pages and unmap them w=
-hen destroying the pool")
->> Cc: stable@vger.kernel.org # 6.15+
->> Tested-by: Helge Deller <deller@gmx.de>
->> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
->> ---
->>   include/linux/mm.h   | 22 +++++++------
->>   net/core/page_pool.c | 76 ++++++++++++++++++++++++++++++--------------
->>   2 files changed, 66 insertions(+), 32 deletions(-)
->
-> I tested this v2 patch (the former tested-by was for v1), and v2
-> works too:
->
-> Tested-by: Helge Deller <deller@gmx.de>
+On my real hardware timeout didn't occur. So I simulated it once by modifying the code
+to confirm the BUG. The BUG has occurred confirming syzbot finding.
 
-Great, thank you for re-testing! :)
-
--Toke
-
+Thanks. 
 
