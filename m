@@ -1,140 +1,112 @@
-Return-Path: <netdev+bounces-227471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5955BB03F0
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 13:54:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25735BB041A
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 13:57:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FB8B1896E66
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 11:54:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8F6C3B1493
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 11:57:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A97A2E54A1;
-	Wed,  1 Oct 2025 11:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929132E7653;
+	Wed,  1 Oct 2025 11:57:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86F82522BE;
-	Wed,  1 Oct 2025 11:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8299B274FDB;
+	Wed,  1 Oct 2025 11:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759319662; cv=none; b=NETzgbbi2q7SxCnBRFIzEQVE113FFIvuwDfOPanCMDQGOMO37yyBk3G1FLsR79ttcfMKChKVbxSfsa+Xs8tib5e8CSsNo1yjDxj8IdQk3hN3LtIutqsqYN5DZrqJIWNEQPB+IRjptUfD/G6BHsAJK3piJJ+tb4nNFWtiautSaqc=
+	t=1759319848; cv=none; b=MZ07TgK2VB3ZcljetljKz6dCQgWDVTeoZnaVuHJW6hW01+r7TG7YCaBQHHeyT6YeGMRyoxfYEy06U2bErIBZCDKGN8ur1XafiEuQeskmEL6U+o8ZhClwiAnf2YLcbyOfRtd8ooYhsLI5F8Oxu3zHJBnV+NbwXhcYCJM6nIJzCmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759319662; c=relaxed/simple;
-	bh=dn/RO9C44OLTk3vcWX+GfhcDgE79GFNrEnVQCO2pM1g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l9GPT6kCCQ9t4u6VkzPN0r9cv3sJejC13+u5Pc49DiJZVuJqlJmxhOWMSZ102y/dNyPoGEIE6i9lhpcnWoaSHbxpbdDQloqrVV5XBqurDKThzmqQ8/ZaooykE3lJuoiRzpzR53DvzT5ddV7dN6A/0C7FXP7PK9izMsSgUBm8NSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from DESKTOP-L0HPE2S (unknown [111.225.242.229])
-	by APP-01 (Coremail) with SMTP id qwCowAA3j6FHFt1og8oGCg--.6039S2;
-	Wed, 01 Oct 2025 19:53:45 +0800 (CST)
-From: Haotian Zhang <vulab@iscas.ac.cn>
-To: Jacob Keller <jacob.e.keller@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Haotian Zhang <vulab@iscas.ac.cn>
-Subject: [PATCH v3] ice: ice_adapter: release xa entry on adapter allocation failure
-Date: Wed,  1 Oct 2025 19:53:36 +0800
-Message-ID: <20251001115336.1707-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
+	s=arc-20240116; t=1759319848; c=relaxed/simple;
+	bh=BF5vlaRfBBcfg/QLrCOwGmvV/0Gv2eCviQVuNLH0MU8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XvInywDM9YdYBWyJ6MPNdXeCI1UIp1sjpWvhQHRWr0n4Dq/Dv38dGC/0H+dPilD9lhQGgw1BJ7rFwyoEyqHvHD25MtvUp0IN8GgBandc1ZFQ5TJ0Rs7L53bbaPYnTySgQ+AATtu3xEM8yHF1iIIj1pIM/4Pj2fnODhfgyN3pUs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AEE3516F2;
+	Wed,  1 Oct 2025 04:57:17 -0700 (PDT)
+Received: from bogus (e133711.arm.com [10.1.196.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8CC993F66E;
+	Wed,  1 Oct 2025 04:57:24 -0700 (PDT)
+Date: Wed, 1 Oct 2025 12:57:21 +0100
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: Adam Young <admiyo@amperemail.onmicrosoft.com>
+Cc: Jassi Brar <jassisinghbrar@gmail.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Adam Young <admiyo@os.amperecomputing.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] Revert "mailbox/pcc: support mailbox management of the
+ shared buffer"
+Message-ID: <20251001-masterful-benevolent-dolphin-a3fbea@sudeepholla>
+References: <20250926153311.2202648-1-sudeep.holla@arm.com>
+ <2ef6360e-834f-474d-ac4d-540b8f0c0f79@amperemail.onmicrosoft.com>
+ <CABb+yY2Uap0ePDmsy7x14mBJO9BnTcCKZ7EXFPdwigt5SO1LwQ@mail.gmail.com>
+ <0f48a2b3-50c4-4f67-a8f6-853ad545bb00@amperemail.onmicrosoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAA3j6FHFt1og8oGCg--.6039S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uryUtrWfWFyDAw13ZFy8Grg_yoW8KrWrpr
-	4DJry0yr40qrsYgr4DZF4xZryUua1fKrZ8KF4rJwnxuFZxJw1jvry5try7KFZ5A39agas8
-	Xa1DZw1UZw1DAw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBgsCA2jc2sWFEAABsz
+In-Reply-To: <0f48a2b3-50c4-4f67-a8f6-853ad545bb00@amperemail.onmicrosoft.com>
 
-When ice_adapter_new() fails, the reserved XArray entry created by
-xa_insert() is not released. This causes subsequent insertions at
-the same index to return -EBUSY, potentially leading to
-NULL pointer dereferences.
+On Wed, Oct 01, 2025 at 01:25:42AM -0400, Adam Young wrote:
+> 
+> On 9/29/25 20:19, Jassi Brar wrote:
+> > On Mon, Sep 29, 2025 at 12:11 PM Adam Young
+> > <admiyo@amperemail.onmicrosoft.com> wrote:
+> > > I posted a patch that addresses a few of these issues.  Here is a top
+> > > level description of the isse
+> > > 
+> > > 
+> > > The correct way to use the mailbox API would be to allocate a buffer for
+> > > the message,write the message to that buffer, and pass it in to
+> > > mbox_send_message.  The abstraction is designed to then provide
+> > > sequential access to the shared resource in order to send the messages
+> > > in order.  The existing PCC Mailbox implementation violated this
+> > > abstraction.  It requires each individual driver re-implement all of the
+> > > sequential ordering to access the shared buffer.
+> > > 
+> > > Why? Because they are all type 2 drivers, and the shared buffer is
+> > > 64bits in length:  32bits for signature, 16 bits for command, 16 bits
+> > > for status.  It would be execessive to kmalloc a buffer of this size.
+> > > 
+> > > This shows the shortcoming of the mailbox API.  The mailbox API assumes
+> > > that there is a large enough buffer passed in to only provide a void *
+> > > pointer to the message.  Since the value is small enough to fit into a
+> > > single register, it the mailbox abstraction could provide an
+> > > implementation that stored a union of a void * and word.
+> > > 
+> > Mailbox api does not make assumptions about the format of message
+> > hence it simply asks for void*.
+> > Probably I don't understand your requirement, but why can't you pass the pointer
+> > to the 'word' you want to use otherwise?
+> > 
+> > -jassi
+> The mbox_send_message call will then take the pointer value that you give it
+> and put it in a ring buffer.  The function then returns, and the value may
+> be popped off the stack before the message is actually sent.  In practice we
+> don't see this because much of the code that calls it is blocking code, so
+> the value stays on the stack until it is read.  Or, in the case of the PCC
+> mailbox, the value is never read or used.  But, as the API is designed, the
+> memory passed into to the function should expect to live longer than the
+> function call, and should not be allocated on the stack.
 
-Reorder the operations as suggested by Przemek Kitszel:
-1. Check if adapter already exists (xa_load)
-2. Reserve the XArray slot (xa_reserve)
-3. Allocate the adapter (ice_adapter_new)
-4. Store the adapter (xa_store)
+I’m still not clear on what exactly you are looking for. Let’s look at
+mbox_send_message(). It adds the provided data pointer to the queue, and then
+passes the same pointer to tx_prepare() just before calling send_data(). This
+is what I’ve been pointing out that you can obtain the buffer pointer there and
+use it to update the shared memory in the client driver.
 
-Fixes: 0f0023c649c7 ("ice: do not init struct ice_adapter more times than needed")
-Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Haotian Zhang <vulab@iscas.ac.cn>
-
----
-Changes in v3:
-  - Reorder xa_load/xa_reserve/ice_adapter_new/xa_store calls as
-    suggested by Przemek Kitszel, instead of just adding xa_release().
-Changes in v2:
-  - Instead of checking the return value of xa_store(), fix the real bug
-    where a failed ice_adapter_new() would leave a stale entry in the
-    XArray.
-  - Use xa_release() to clean up the reserved entry, as suggested by
-    Jacob Keller.
----
- drivers/net/ethernet/intel/ice/ice_adapter.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
-index b53561c34708..0a8a48cd4bce 100644
---- a/drivers/net/ethernet/intel/ice/ice_adapter.c
-+++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
-@@ -99,19 +99,21 @@ struct ice_adapter *ice_adapter_get(struct pci_dev *pdev)
- 
- 	index = ice_adapter_xa_index(pdev);
- 	scoped_guard(mutex, &ice_adapters_mutex) {
--		err = xa_insert(&ice_adapters, index, NULL, GFP_KERNEL);
--		if (err == -EBUSY) {
--			adapter = xa_load(&ice_adapters, index);
-+		adapter = xa_load(&ice_adapters, index);
-+		if (adapter) {
- 			refcount_inc(&adapter->refcount);
- 			WARN_ON_ONCE(adapter->index != ice_adapter_index(pdev));
- 			return adapter;
- 		}
-+		err = xa_reserve(&ice_adapters, index, GFP_KERNEL);
- 		if (err)
- 			return ERR_PTR(err);
- 
- 		adapter = ice_adapter_new(pdev);
--		if (!adapter)
-+		if (!adapter) {
-+			xa_release(&ice_adapters, index);
- 			return ERR_PTR(-ENOMEM);
-+		}
- 		xa_store(&ice_adapters, index, adapter, GFP_KERNEL);
- 	}
- 	return adapter;
 -- 
-2.50.1.windows.1
-
+Regards,
+Sudeep
 
