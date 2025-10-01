@@ -1,162 +1,136 @@
-Return-Path: <netdev+bounces-227468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04543BB01DA
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 13:17:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52E7EBB0204
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 13:22:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65229188E0D3
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 11:17:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11CDA3B80A4
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 11:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF0492C0290;
-	Wed,  1 Oct 2025 11:17:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AFD62C325A;
+	Wed,  1 Oct 2025 11:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b="idQyanWl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iXdYR8BM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx13.kaspersky-labs.com (mx13.kaspersky-labs.com [91.103.66.164])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E88D15C158;
-	Wed,  1 Oct 2025 11:17:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.103.66.164
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5F72522BE
+	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 11:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759317429; cv=none; b=anIhLDEku3Q30pp5x80/XkG3/+Aag/wegNzGj9l1rczdfD+STvSffW/NhiJGMwRM7btagGNBV67dLFlS339fm6e0z9c2LkWLQJXihpVTpwj7OYK7Ibcba+Pxd6/7dEhY1kjMSEH967ibJ7papXFOA/5LRc+U+hbs1HKqphPPL5k=
+	t=1759317729; cv=none; b=UHakK60tr6vscl7hWUyYZnYQee6fUddQ+UN44d/r9kjJo2fK8620phrPYyj0qKVNQhPvOdKTX5BG+/aj+xaHnZ2shlyekq4Hq7IB+RqiLmgzOA7LWOXU2n3Skzq92JQuUbturFJr118iDzMIS8pFXrNGmoGoiUT6RF+EiSS/N8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759317429; c=relaxed/simple;
-	bh=niZcM15/aM2MHoBvHoPHQLRuvWK0disCzNRRmfsO2Rk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sUBBeRld8x1F6j10H1sY2mQUGQc88sOrGYECuxhyyvDOIf6ouKpVYeZF7FpxVgpTKLfBCgtoJqxPVtMrmDXsTx0OXBqS1WAUzaWtvSh8eCH9PdDEIXcA5RR/5kJUDsaely3OBH9mhqd9fIdlEMEoCR5VNvFCziy5fWhSonra+FU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com; spf=pass smtp.mailfrom=kaspersky.com; dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b=idQyanWl; arc=none smtp.client-ip=91.103.66.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaspersky.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-	s=mail202505; t=1759317425;
-	bh=zDsXdTX+O9NGT9chMSJOKcjuCs1HpuSIsAqYU7ZmRWc=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=idQyanWl32Fu0h+kd6dqIXG+6U1iE9f4xkV0jHmVOIQc6DVET9dyx7ihZKeDpflEy
-	 2Cptu0WOSgzoQWJLQ7pFUgQki0LioIB7hy8hLa7gsWIDhfnxqWwbukFh4UWzRJ5Q4d
-	 E2dEPdWqMUOo+NLlrvOAcHJn602SJcDSHOhK5W67L+5P+HgP68Bvh4+qHVEUzXG2lS
-	 /PgfZ4PpYaU6+3DZ+m2n4vx2uVWrXTGz5aaTCpJdLbmSZ4P284ULiWRWHzB3hkdzL8
-	 n7+qN3M1LR9/iX/iFdmdf9Gu5MJytCOaVVhi03ClkSogzBvjYJ5AdHySLdG0DZ0z2w
-	 lh8j3ban4iFxA==
-Received: from relay13.kaspersky-labs.com (localhost [127.0.0.1])
-	by relay13.kaspersky-labs.com (Postfix) with ESMTP id 105C43E1F09;
-	Wed,  1 Oct 2025 14:17:05 +0300 (MSK)
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-	by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 089FB3E2127;
-	Wed,  1 Oct 2025 14:17:02 +0300 (MSK)
-Received: from zhigulin-p.avp.ru (10.16.104.190) by HQMAILSRV2.avp.ru
- (10.64.57.52) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.36; Wed, 1 Oct
- 2025 14:17:02 +0300
-From: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>
-To: Ayush Sawal <ayush.sawal@chelsio.com>
-CC: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Leon Romanovsky <leon@kernel.org>, Steffen Klassert
-	<steffen.klassert@secunet.com>, Cosmin Ratiu <cratiu@nvidia.com>, Zhu Yanjun
-	<yanjun.zhu@linux.dev>, Harsh Jain <harsh@chelsio.com>, Atul Gupta
-	<atul.gupta@chelsio.com>, Herbert Xu <herbert@gondor.apana.org.au>, Ganesh
- Goudar <ganeshgr@chelsio.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: [PATCH] net: fix potential use-after-free in ch_ipsec_xfrm_add_state() callback
-Date: Wed, 1 Oct 2025 14:16:43 +0300
-Message-ID: <20251001111646.806130-1-Pavel.Zhigulin@kaspersky.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1759317729; c=relaxed/simple;
+	bh=MHUSi4P/U4csGmhflVuOc3gtRv4O4p5QklistO68IOQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MvksM7OsLb87vmAPzXVVNUI/NLKNt0LK+rdYs8EFvGXWyixC5X6gv6cDBMF8KVzVC1VmnSlk7v3/q41reR0CQKArRKWbc0yq9AkEBtePdacBE4si7SQ4Xz9EwmrexZU5owWVq8yy771OA4Tz2ewqC+g83VU6K3GdFX5AUYJZ93M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iXdYR8BM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759317726;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ql3BeV8zLppnm7zJzsQP4NuOCJwg+ayk79UQ80gXYqg=;
+	b=iXdYR8BMmDBxquLWQGAE/DAvT49wRvs8MiQqLoQ0z1aWy3r4p3iPN5no0t4a28QdFSCTZI
+	SyCv+OXZLw5hG0bAWEihz1eFx9D1Ms4ft/4Y56EXGUT1H18zGscclT5u5kZluC0CpfYpGw
+	ni5teKlvJSlIRHZIK3EXXEyGBeMjNiM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-26-PBHDh7Q8MOShcGkJaWEaxA-1; Wed, 01 Oct 2025 07:22:05 -0400
+X-MC-Unique: PBHDh7Q8MOShcGkJaWEaxA-1
+X-Mimecast-MFC-AGG-ID: PBHDh7Q8MOShcGkJaWEaxA_1759317724
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3f3c118cbb3so4541702f8f.3
+        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 04:22:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759317724; x=1759922524;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ql3BeV8zLppnm7zJzsQP4NuOCJwg+ayk79UQ80gXYqg=;
+        b=dNVWitc5je5XceF+ZxzCBNDOgU7UGvGgDVPQ/4Q4Sc6812hAh+COHHhBHelnp3JNZf
+         YGaXIyFYRXwU1MENpiIvguUynkqBo8NprqZg79g1oW4XavXjbt77bQyGBKv+B+We4TJb
+         jtEGmaGrFZLm1xthS4wsIZi8eS3RgS2Zmv9Q6s7VGsOjJ97aNEjLqqgtvcj6x5ALnIU7
+         A1grIcn7wHQ2PAD9UYvzzRnG/cCFCePYh8uezUFoAAZBUGozCWKzlbjQ9oZv2d1k0jdx
+         4HcnFtNreW2xu03/T/UBVtXS0lleyKaP7Fs5eHUYW/pc03UrAn6/IxwR4lHLIVNorQzU
+         byng==
+X-Forwarded-Encrypted: i=1; AJvYcCVrdZFx6721+mYMYSUvF3/SWQDUCYfsGbVj2IHjCNWih0oTydQe++Yrzrkg4I5TmMw2VjFpYTk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaVSAibxwP9ZA4Ioy/v4F8qAjtCD55rrE8ZiA34bWpPTRnT5Nj
+	zLh4gSvHWxXZPSFRDqCtdC77/Rb3cO9j3dyXzMrv/2+jj7Pjey9ywqq7IfvjuctRGZ+T6ftQkj7
+	33XxxUQRMNc8nDclv0q8WDyH4r/XjllpcPyTrs+S62kVbaVuWhLTHzzcMSg==
+X-Gm-Gg: ASbGncs08v4kwVnIwF6izihzwkkCZ6yIfAj8CyoqV3w1MdiS+lNp3sGZ7GONk4CGMkg
+	+eDg/JZT58Extb2XtiqLDI4NCErOt3AkiiGqhGkZyH4B/PBXArZKARldTBsGlGcIxaoDJnm594o
+	ltmJbegv0rv5GAP1UfcpNBn7/CUrTEgII8B74dS5SYq7b3ULke0UZnSow6Joxx5JBA7xqCRs0ig
+	vRFf4fWPjYQ/CKit2slJtT22uZAGyfmz6AW6J/WjmHVfsLMrgepUh0JTX7BSnXeftXWtBaS14y0
+	JTX0cHzrCnK9axaCka+3ulItVP8jlFdpkn2oGkg=
+X-Received: by 2002:a05:6000:1a8e:b0:3ec:a019:3936 with SMTP id ffacd0b85a97d-42557816dadmr2479670f8f.55.1759317723712;
+        Wed, 01 Oct 2025 04:22:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE2YMfWSirAsieLM5wvLlIAO/DtCA3N6PuMAY/Nmj+lVBGtH+Oqh6a2oWTtM5/KVZ/v7RwKwA==
+X-Received: by 2002:a05:6000:1a8e:b0:3ec:a019:3936 with SMTP id ffacd0b85a97d-42557816dadmr2479627f8f.55.1759317723082;
+        Wed, 01 Oct 2025 04:22:03 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1518:6900:b69a:73e1:9698:9cd3])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb89fb264sm27105223f8f.20.2025.10.01.04.22.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Oct 2025 04:22:02 -0700 (PDT)
+Date: Wed, 1 Oct 2025 07:22:00 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: patchwork-bot+netdevbpf@kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
+	zhangjiao2@cmss.chinamobile.com, jasowang@redhat.com,
+	eperezma@redhat.com, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH net] vhost: vringh: Fix copy_to_iter return value check
+Message-ID: <20251001071456-mutt-send-email-mst@kernel.org>
+References: <cd637504a6e3967954a9e80fc1b75e8c0978087b.1758723310.git.mst@redhat.com>
+ <175893420700.108864.10199269230355246073.git-patchwork-notify@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: HQMAILSRV2.avp.ru (10.64.57.52) To HQMAILSRV2.avp.ru
- (10.64.57.52)
-X-KSE-ServerInfo: HQMAILSRV2.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 10/01/2025 11:10:03
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 196735 [Oct 01 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.11
-X-KSE-AntiSpam-Info: Envelope from: Pavel.Zhigulin@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 68 0.3.68
- 1da783151ba96b73e1c53137281aec6cc92e0a0f
-X-KSE-AntiSpam-Info: {Tracking_cluster_exceptions}
-X-KSE-AntiSpam-Info: {Tracking_real_kaspersky_domains}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: zhigulin-p.avp.ru:5.0.1,7.1.1;kaspersky.com:5.0.1,7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: {Tracking_white_helo}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 10/01/2025 11:11:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 10/1/2025 10:17:00 AM
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/10/01 07:34:00 #27871058
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 52
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <175893420700.108864.10199269230355246073.git-patchwork-notify@kernel.org>
 
-In ch_ipsec_xfrm_add_state() there is not check of try_module_get
-return value. It is very unlikely, but try_module_get() could return
-false value, which could cause use-after-free error.
+On Sat, Sep 27, 2025 at 12:50:07AM +0000, patchwork-bot+netdevbpf@kernel.org wrote:
+> Hello:
+> 
+> This patch was applied to netdev/net.git (main)
+> by Jakub Kicinski <kuba@kernel.org>:
+> 
+> On Thu, 25 Sep 2025 02:04:08 -0400 you wrote:
+> > The return value of copy_to_iter can't be negative, check whether the
+> > copied length is equal to the requested length instead of checking for
+> > negative values.
+> > 
+> > Cc: zhang jiao <zhangjiao2@cmss.chinamobile.com>
+> > Link: https://lore.kernel.org/all/20250910091739.2999-1-zhangjiao2@cmss.chinamobile.com
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > 
+> > [...]
+> 
+> Here is the summary with links:
+>   - [net] vhost: vringh: Fix copy_to_iter return value check
+>     https://git.kernel.org/netdev/net/c/439263376c2c
+> 
+> You are awesome, thank you!
+> -- 
+> Deet-doot-dot, I am a bot.
+> https://korg.docs.kernel.org/patchwork/pwbot.html
+> 
 
-This fix adds checking the result of try_module_get call
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+It's probably stable material. Does netdev still have a separate
+stable process? I'm not sure I remember.
 
-Fixes: 6dad4e8ab3ec ("chcr: Add support for Inline IPSec")
-Signed-off-by: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>
----
- .../net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c b/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
-index ecd9a0bd5e18..3a5277630afa 100644
---- a/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
-+++ b/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
-@@ -35,6 +35,8 @@
-  *	Atul Gupta (atul.gupta@chelsio.com)
-  */
-
-+#include "asm-generic/errno-base.h"
-+#include "linux/compiler.h"
- #define pr_fmt(fmt) "ch_ipsec: " fmt
-
- #include <linux/kernel.h>
-@@ -301,7 +303,8 @@ static int ch_ipsec_xfrm_add_state(struct net_device *dev,
- 		sa_entry->esn = 1;
- 	ch_ipsec_setkey(x, sa_entry);
- 	x->xso.offload_handle = (unsigned long)sa_entry;
--	try_module_get(THIS_MODULE);
-+	if (unlikely(!try_module_get(THIS_MODULE)))
-+		res = -ENODEV;
- out:
- 	return res;
- }
---
-2.43.0
+-- 
+MST
 
 
