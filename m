@@ -1,172 +1,180 @@
-Return-Path: <netdev+bounces-227434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0262FBAF456
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 08:41:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C32DBAF605
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 09:21:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B00174E171B
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 06:41:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 486983B2286
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 07:21:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADBE926F2B2;
-	Wed,  1 Oct 2025 06:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6939121E0BE;
+	Wed,  1 Oct 2025 07:21:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZWX+ABg4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QcnIQXbp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1297726F289
-	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 06:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B423F1D61B7
+	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 07:21:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759300879; cv=none; b=NPrkSOC/xbw3/ypn4sCHfnWoL+/bUSQIQyokxdGij5B8YkXyuGtDBkMzj7rH9n06fP6yULItBsy+EYK7H34l6Q5OseR0egUIFUo93FX5mRPGAvaWOk6o7cdWWjvdjr5rlgI9xw3cJ8Ueh8vGye0JvryTvVSWlG0DuFiHAiehDWY=
+	t=1759303277; cv=none; b=GGKor9skl+PYyPWUBTpb4tZ39lZetSPm3yRk+mZwsFSI4ok5tp73q/Nk+LmN4h4VthIceqP92sL/05jHL3p94ts1oGPGgglQ9OfccgKwBjDyY8ANZCSmLQvsC0l9eFeTsgC455f+19G+m7GYfNLC7QybXf4Az+z5XH3HEGkzukg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759300879; c=relaxed/simple;
-	bh=733alPMo5xFF1kelhQ3Sbdb4fpf2EA/GpXViQ8Pcwmw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k1vY5QMDjjiUiDYIV/LGVHaNSDlKvuyiTQFLiI+sXoSVEfloedm9oX4S2sUN/rNubH3O+375ayL8t7TrWlJoLDJDPE//aM/b1IqJRwJmjrn87I1wR+G4U49IDrso3qy3lvHmEzDZUoeMNyAeidNQT2xk7o9QKi0CZCE7Nh/Kvoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZWX+ABg4; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-76e4fc419a9so7007592b3a.0
-        for <netdev@vger.kernel.org>; Tue, 30 Sep 2025 23:41:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759300877; x=1759905677; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TEMQeJoNXQ2TFdkyWQlMH+1Sa/KHapB9H0jMKRUjLZ4=;
-        b=ZWX+ABg4nWMA2O/c46iJplcfFDpQF7ifKgy3NUfab5IXYjLz+D87L9hXG43nfrjEMx
-         O+FF4dCwF4aSIKJUMB/xoGyKZoQXs27YFlMBrUQcJ064oABojyxYAUuLlaNcX2g54+ke
-         NtkP+gJVXjR3HkdLLZ1Si2Y7KKp2HIk1fsMS8Qh3yP9ymbRrzA35Qd0eukbpv2w7IIWu
-         yoq2s82x5mIeS2eSLTjwXiIcnKnwVoEN/Huin2d019qoD0D0s4Bd1Jz2Dls71himwDdj
-         mZ2fKwidBIthHyLhQ2Fys030ujc1zZXODSQLZNSm1kuyn6WMA2KdK/LWF6sw9faLn8ca
-         mgBQ==
+	s=arc-20240116; t=1759303277; c=relaxed/simple;
+	bh=ZchBe3UVZFcajzAfPm5iupGhaT45ZKDAxK04VZzhIoA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZSD7xfSCbhrS171t/Uqn3jZ+cVfD5tsTgfdBNtskFlMxSfCsKkLxza1W01BSyDAFeo9BAmkHSQsDzfSP2NML/s2aZwdRv634Z3d6jgU4Y0md7i+xRMxeXI3py7cLGekquFyGDTfYmGwfG15osUlbsTxpysdtut+nnTQvmn7U63k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QcnIQXbp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759303274;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S6TphmWVV7btIJvjp1CTjxC8F2bt+sldx5I/c4TiGGc=;
+	b=QcnIQXbpCqa3QuGfqc4LTZ8GIpfHs/Pm5KZBIfi24tc2rfSsgskY8NmNRBU6Nc7rYHlZ8J
+	2SmPMOV59rEommb0W5rz0GNP3K6LUI21Nnp6RZfBHGwC32VYRMAtu2hG+DGK/2H9ckDvrs
+	zTNR15kwE2CWrpyXNEcUPQZ/Po5NURM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-546-4QEDxcmgPIupayZS0ITCGw-1; Wed, 01 Oct 2025 03:21:13 -0400
+X-MC-Unique: 4QEDxcmgPIupayZS0ITCGw-1
+X-Mimecast-MFC-AGG-ID: 4QEDxcmgPIupayZS0ITCGw_1759303272
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3f384f10762so4244670f8f.3
+        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 00:21:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759300877; x=1759905677;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TEMQeJoNXQ2TFdkyWQlMH+1Sa/KHapB9H0jMKRUjLZ4=;
-        b=XUSms+sQYDjeQFQoi2o8cfdtr/cphzanfc2yvZ8cZ091K5t5lkSY1IHmVOBQcqX4hc
-         QH445xu3UDMYMr2l2DLvukrUD/61bk2RJ0/vUbb1HSw5xOemovFi50IFsKxRh76/L5ty
-         bYAc5M2fbso+YrFgjqQy/WLqGPhr4IHo4xrhbFBt1OXscDQIcr8FLCpAGF5IBgXytarU
-         X4iDfH1W9uhSOVk8ad2U6oBZElCG2JfOE4N6T/nBJGBeehD+cLnwc0/i1Yp1jNkvsc4k
-         /p3HUZndi79ZWqM3Fd/JQcKxq/IOXfLg0JiNttfkSAEdO9WKMw+wiVN2YBcO8vp2zL/d
-         x2Ow==
-X-Gm-Message-State: AOJu0YxCzx9uzL6vIm0ZPPM28Y6jkNony9OB2iSIuIv2KjzoHQppG9gR
-	oo2wNprYLK4dN8w3i1COErficKIM66Nc8013pnh624YZNSbfTWzodT8X
-X-Gm-Gg: ASbGncsTL5t/rvaJwNk1bQtwsWzn/xIqtnTWDNGE+jyCu3QZ4M1lvMQaqP9q/RJ7BAS
-	N1giv08R1BGKqhjtpgGbceumkWL+G4l+ZaNqlERh4aOUCOOSKgyW2MeWhnJiqBIJdMGiW5zNMbr
-	UlIc5hIRxqd5+echgWGXT3i701rQPLOepC3Sb6MErAujlpzDqokGu5qKSVgcrS+alnrFzfnKSDu
-	8MtLIHFR8LbcYqpwEU8fDn+7ZDaUjfu0CU95MWDjOWor+KIEWyhh32zwe7S9OJJSWniGKTE2Q0C
-	EMSMcA6fFjBgPEYAKtg1aYKfKzlvdYHfwOJJsLw/wXC39OwfqBwM1e0NLC5Dlu7NsjyQwGqDa7A
-	PXbpfLVY/mDiwg29q6swMaRT6BHA/WgIsEEV/toSGGt+qEt0vLW0K+GYcgCSMyJfKIDHTfrFAL5
-	I=
-X-Google-Smtp-Source: AGHT+IGO+/qpAj+fCORSmpzdGC/N4PpiP9VbFEiETHa8mmm7lLl7X7Do145SUj6rnWisCtK+VJZf/g==
-X-Received: by 2002:a05:6a21:2703:b0:324:6e84:d16e with SMTP id adf61e73a8af0-3246e850bb7mr1305773637.43.1759300877200;
-        Tue, 30 Sep 2025 23:41:17 -0700 (PDT)
-Received: from ti-am64x-sdk.. ([157.50.94.151])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-78126ae02dasm10351914b3a.21.2025.09.30.23.41.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Sep 2025 23:41:16 -0700 (PDT)
-From: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jon Maloy <jmaloy@redhat.com>,
-	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	skhan@linuxfoundation.org,
-	david.hunter.linux@gmail.com,
-	bhanuseshukumar@gmail.com
-Subject: [PATCH] net: doc: Fix typos in docs
-Date: Wed,  1 Oct 2025 12:11:02 +0530
-Message-Id: <20251001064102.42296-1-bhanuseshukumar@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1759303272; x=1759908072;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S6TphmWVV7btIJvjp1CTjxC8F2bt+sldx5I/c4TiGGc=;
+        b=oIq9CxESMLMb4OtRHkwcBMFLqaomVzPwQb9mpBhnM5YvOzGA2aIGwWmRo4U/kcwJLq
+         BOzDEL8UlJRNXxLPvMX57q1Z1l6wih3vE8doGLP8M8p8cqtE71n04AJf9DDeifVVPrhL
+         IzmomO1ITG80Bzls6wq2wpYlP8BiVm2kA1g32JRal1seTaasNIyZ4vtynQAZSiwQ4YUS
+         xYCbY13qJa96btns8YPshHZOxhj++VRdfWHeYhHYvccUvOexa6Lto6E4ZMZ8vSdZnu0v
+         Kpmy2jOeozzwnrq3D1tZs8B72NHWftsi6pIbv0LCEXBv07++WQ2h/w1vLfLKNiNIpUgF
+         /TeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXBBh6X4QJlWH+uK0zNazaVtzRKL3w3mBBuw1Jt9IYdNwV0+Ibdxl+ct10+YYSq7v7AqmFZ41I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3ZlbWLI0v9XsmCICkaN3rdGqpIU6rJ17CD6O7Evn/t+vP/+NU
+	X1F9HVMXgyjKfE14hnrRu9QJt4IRAkT0fYdixm1j1M8LH4urmouMlqaiFhhSELIHewoTbRUDu3+
+	a6P14QW9Nxpd+BuzMMncEd+9z5+IpO0QM7acCHhL2fLJLg8PNDVmQf84mgQ==
+X-Gm-Gg: ASbGncsvDp7Kgtp/9N3ytnL45QXnG71S8OhGtE0YcD6txQWNGBHlGXvWSbvKMlHrK7q
+	PJ9ZwKFZRFx+lLXdBR3wL4Putw2krjdLptRH/ZgnpehpmK5TK3QiiVUJr1e0IYwNs72MjlNwvv+
+	ehwSh2k127pX3aR/OE/hRIOPj6vYiAj2xZgaW0Vp2GPkLa61kbmzPX9pWM5OUoFWuNKMeqCshwO
+	uhgTFAb5ilch3/TrW2bsANNYRJWocyftaOyqUIS+foV54iSTDILqhUr5vs0uVt4/iR82eR7CrNf
+	xqGeiNO9irGlSmbnUrGFy3ogyuUNsF2YMpnUh2YyMzhpiNc9mEcDE5ZNw7rISwv0zr9+rBsyKyK
+	5rnz3z5/5qZUtDHyGhw==
+X-Received: by 2002:a05:6000:2dc3:b0:410:3a4f:12c8 with SMTP id ffacd0b85a97d-425577f0588mr1793505f8f.20.1759303271980;
+        Wed, 01 Oct 2025 00:21:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFL9Aoaglcvmq0NJZa7kQLBpIJUntR5wIckFB4bSle6etuGPxOt3URwof3q3OmopFDd6P6LuQ==
+X-Received: by 2002:a05:6000:2dc3:b0:410:3a4f:12c8 with SMTP id ffacd0b85a97d-425577f0588mr1793475f8f.20.1759303271534;
+        Wed, 01 Oct 2025 00:21:11 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb72fb729sm25151903f8f.6.2025.10.01.00.21.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Oct 2025 00:21:10 -0700 (PDT)
+Message-ID: <acad498b-06e6-4639-b389-ef954e4c6abc@redhat.com>
+Date: Wed, 1 Oct 2025 09:21:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 2/2] net/smc: handle -ENOMEM from
+ smc_wr_alloc_link_mem gracefully
+To: Halil Pasic <pasic@linux.ibm.com>, Dust Li <dust.li@linux.alibaba.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ "D. Wythe" <alibuda@linux.alibaba.com>,
+ Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang
+ <wenjia@linux.ibm.com>, Mahanta Jambigi <mjambigi@linux.ibm.com>,
+ Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+ Guangguan Wang <guangguan.wang@linux.alibaba.com>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20250929000001.1752206-1-pasic@linux.ibm.com>
+ <20250929000001.1752206-3-pasic@linux.ibm.com>
+ <aNnl_CfV0EvIujK0@linux.alibaba.com>
+ <20250929112251.72ab759d.pasic@linux.ibm.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250929112251.72ab759d.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Fix typos in doc comments.
+On 9/29/25 11:22 AM, Halil Pasic wrote:
+> On Mon, 29 Sep 2025 09:50:52 +0800
+> Dust Li <dust.li@linux.alibaba.com> wrote:
+> 
+>>> @@ -175,6 +175,8 @@ struct smc_link {
+>>> 	struct completion	llc_testlink_resp; /* wait for rx of testlink */
+>>> 	int			llc_testlink_time; /* testlink interval */
+>>> 	atomic_t		conn_cnt; /* connections on this link */
+>>> +	u16			max_send_wr;
+>>> +	u16			max_recv_wr;  
+>>
+>> Here, you've moved max_send_wr/max_recv_wr from the link group to individual links.
+>> This means we can now have different max_send_wr/max_recv_wr values on two
+>> different links within the same link group.
+> 
+> Only if allocations fail. Please notice that the hunk:
+> 
+> --- a/net/smc/smc_core.c
+> +++ b/net/smc/smc_core.c
+> @@ -810,6 +810,8 @@ int smcr_link_init(struct smc_link_group *lgr, struct smc_link *lnk,
+>  	lnk->clearing = 0;
+>  	lnk->path_mtu = lnk->smcibdev->pattr[lnk->ibport - 1].active_mtu;
+>  	lnk->link_id = smcr_next_link_id(lgr);
+> +	lnk->max_send_wr = lgr->max_send_wr;
+> +	lnk->max_recv_wr = lgr->max_recv_wr;
+> 
+> initializes the link values with the values from the lgr which are in
+> turn picked up form the systctls at lgr creation time. I have made an
+> effort to keep these values the same for each link, but in case the
+> allocation fails and we do back off, we can end up with different values
+> on the links. 
+> 
+> The alternative would be to throw in the towel, and not create
+> a second link if we can't match what worked for the first one.
+> 
+>>
+>> Since in Alibaba we doesn't use multi-link configurations, we haven't tested
+>> this scenario. Have you tested the link-down handling process in a multi-link
+>> setup?
+>>
+> 
+> Mahanta was so kind to do most of the testing on this. I don't think
+> I've tested this myself. @Mahanta: Would you be kind to give this a try
+> if it wasn't covered in the past? The best way is probably to modify
+> the code to force such a scenario. I don't think it is easy to somehow
+> trigger in the wild.
+> 
+> BTW I don't expect any problems. I think at worst the one link would
+> end up giving worse performance than the other, but I guess that can
+> happen for other reasons as well (like different HW for the two links).
+> 
+> But I think getting some sort of a query interface which would tell
+> us how much did we end up with down the road would be a good idea anyway.
+> 
+> And I hope we can switch to vmalloc down the road as well, which would
+> make back off less likely.
 
-Signed-off-by: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
----
- include/linux/phy.h | 4 ++--
- net/tipc/crypto.c   | 2 +-
- net/tipc/topsrv.c   | 4 ++--
- 3 files changed, 5 insertions(+), 5 deletions(-)
+Unfortunately we are closing the net-next PR right now and I would
+prefer such testing being reported explicitly. Let's defer this series
+to the next cycle: please re-post when net-next will reopen after Oct 12th.
 
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index bb45787d8684..de786fc2169b 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -292,7 +292,7 @@ static inline const char *phy_modes(phy_interface_t interface)
-  *
-  * Description: maps RGMII supported link speeds into the clock rates.
-  * This can also be used for MII, GMII, and RMII interface modes as the
-- * clock rates are indentical, but the caller must be aware that errors
-+ * clock rates are identical, but the caller must be aware that errors
-  * for unsupported clock rates will not be signalled.
-  *
-  * Returns: clock rate or negative errno
-@@ -514,7 +514,7 @@ enum phy_state {
-  * struct phy_c45_device_ids - 802.3-c45 Device Identifiers
-  * @devices_in_package: IEEE 802.3 devices in package register value.
-  * @mmds_present: bit vector of MMDs present.
-- * @device_ids: The device identifer for each present device.
-+ * @device_ids: The device identifier for each present device.
-  */
- struct phy_c45_device_ids {
- 	u32 devices_in_package;
-diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
-index ea5bb131ebd0..751904f10aab 100644
---- a/net/tipc/crypto.c
-+++ b/net/tipc/crypto.c
-@@ -1797,7 +1797,7 @@ int tipc_crypto_xmit(struct net *net, struct sk_buff **skb,
-  * @b: bearer where the message has been received
-  *
-  * If the decryption is successful, the decrypted skb is returned directly or
-- * as the callback, the encryption header and auth tag will be trimed out
-+ * as the callback, the encryption header and auth tag will be trimmed out
-  * before forwarding to tipc_rcv() via the tipc_crypto_rcv_complete().
-  * Otherwise, the skb will be freed!
-  * Note: RX key(s) can be re-aligned, or in case of no key suitable, TX
-diff --git a/net/tipc/topsrv.c b/net/tipc/topsrv.c
-index ffe577bf6b51..ebe993ebcd48 100644
---- a/net/tipc/topsrv.c
-+++ b/net/tipc/topsrv.c
-@@ -57,7 +57,7 @@
-  * @conn_idr: identifier set of connection
-  * @idr_lock: protect the connection identifier set
-  * @idr_in_use: amount of allocated identifier entry
-- * @net: network namspace instance
-+ * @net: network namespace instance
-  * @awork: accept work item
-  * @rcv_wq: receive workqueue
-  * @send_wq: send workqueue
-@@ -83,7 +83,7 @@ struct tipc_topsrv {
-  * @sock: socket handler associated with connection
-  * @flags: indicates connection state
-  * @server: pointer to connected server
-- * @sub_list: lsit to all pertaing subscriptions
-+ * @sub_list: list to all pertaing subscriptions
-  * @sub_lock: lock protecting the subscription list
-  * @rwork: receive work item
-  * @outqueue: pointer to first outbound message in queue
--- 
-2.34.1
+Thanks,
+
+Paolo
 
 
