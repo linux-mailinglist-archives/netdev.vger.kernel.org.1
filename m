@@ -1,87 +1,80 @@
-Return-Path: <netdev+bounces-227445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B28EBAF8B8
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 10:06:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E50FBAF8D6
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 10:11:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BCAF188654F
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 08:06:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA6A33C5AEC
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 08:11:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8223A27147D;
-	Wed,  1 Oct 2025 08:06:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B865B2773DC;
+	Wed,  1 Oct 2025 08:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RYFQvCgB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Abgo5lh/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE81D26A1AF
-	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 08:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E8F18FDAF
+	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 08:11:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759305967; cv=none; b=kJsQBeZJ1Xl6fqB86JMxxAXdCXSZB7i7W30Wm3HfmzjeZQIN+cWWiONcFGveVYUq3d6S/i3g2cTmIjnwyNQMW69co/O76AerLX2PlPA1HRQefwleFlhyTr0NLX5uXae4ARfZZrEg9qqbzMp12qukPlAQa+H7jNVXvx9VDHamibc=
+	t=1759306270; cv=none; b=svsqANklLmt3/LAIteEzQ/jsnATmcghBTGrWLRSquqmo2dM+yLFClqRJfMo7YosLPCktPXdseKjqRFlDZpZ1Y64zxC1JhVjW3iRs81t/VAOWKXNyjiivRyFwzeJsQDUMRmBAzxw+TVGWI9KMnD3kRFUjkogbXQUBcW0M2umQE9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759305967; c=relaxed/simple;
-	bh=5haNAEiXLgQzh1JAlqW9TjWwiFhiqV+0nJNKffjfNHQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=aCWpGitnJaTrf01SW2cdQ0mGL+j3lxGQOqiM1fJggYiaWLfpWPnjGF2qmuFWWvRHW9kDe9Qx1oc6ZTsmhjgpzIyJH1s18J5hvvyzx/7NOeY5RAYIXZXmaCdQ56YDvZgCUaxDD7qYCGsefznHfx+YPanJslwa1/vZZIuXvFTkUnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RYFQvCgB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759305963;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CTb+HR144WzaCHAGjWTq7YSgDtzJUyYbacPJ6jqxs7k=;
-	b=RYFQvCgBjvCWTmhmfO/Zp0FOLy7LUsBpTSlTXh554mEkorTULdlw9ZIY2hjQRR6//lwhQ7
-	b46x26+aN6YKsm2iGaYeG/abR7LdruBNYFtKQJSjSHaO0MJ+7CaeNaqVZktiLcWOVb677G
-	26CrlheO5qw8Ze+v+OfeyI81cVq/fng=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-383-n7GeJAtcNb6uHFMhuGMqEg-1; Wed, 01 Oct 2025 04:06:01 -0400
-X-MC-Unique: n7GeJAtcNb6uHFMhuGMqEg-1
-X-Mimecast-MFC-AGG-ID: n7GeJAtcNb6uHFMhuGMqEg_1759305961
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-46b303f6c9cso49179765e9.2
-        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 01:06:01 -0700 (PDT)
+	s=arc-20240116; t=1759306270; c=relaxed/simple;
+	bh=k+98mlzkrp2RKhBDwIPjhFLJEPpjV7PkE1WVmkbrgf4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z1cGLUJkthttde2B/DWMgObQOkR+5ykmjcOMSfBoypeeAVq5fpagvGRd5+pNpsMzZvMHuUba5DR2M8NpY9tu4XVz5ue1+241ZHtB9Nrd35JzHsorbzgPwfGYsoJhSmFlUcs6ZbXm9gCfg886wbJq5O1s6KCJ+oztm4l+XOabfWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Abgo5lh/; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-781010ff051so4793483b3a.0
+        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 01:11:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759306268; x=1759911068; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9sp3cgB81mX5j3kEpDMGkvj6tFo6ebH1h3lg6uJz188=;
+        b=Abgo5lh/JCCIIue5wdaD9BskXSeuDy8PRlNm1hDR209mYk/UtT/Uj0pTBC9Mfc152x
+         48Xp1WVnUe6AUwbO063ozdnTX1QL/9vaiiFj+ABlkdlAII439wy16D4kgPZG2r2isW/x
+         0og96lgLCugtrfp238+GVdiOjc9JNnZOgzXv7yd8+AVdW5ANGMXIewo/VPc+IDwnongB
+         HYvI5KHv3gMPmcUs223YrbTO+c9qKuD+LTNDmRuyCCpbVoyX1S/nPithBGbS7dqaSWsb
+         32ZoE2xW+Z1CphlsV9YdLvyhN0RgMJt7XTkLAWMKrAMB59M+aVYUNVwBV0nQmVxWeSNK
+         DD8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759305960; x=1759910760;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1759306268; x=1759911068;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CTb+HR144WzaCHAGjWTq7YSgDtzJUyYbacPJ6jqxs7k=;
-        b=dibw1APXjahCUYGbTWGFMZgv42a+PPYlsS4/b/4oPRdr91jGg2FSFspL+TuI5HCb+O
-         7vR47Fj5zHBIl7LeQUUIuzj7+dgmcxtTNqkPXLPbAW56utyfVJ5RROVfLoujX2V1fC+A
-         isM3Cgo7sj1wbOsy3rOk0TCPiPu8iZW4NJsSzzS3CN9K5peJQ5kW7ApOEODTnYrs5aKL
-         C4KMWO/L7wLTZlFIfksKpfpF1SZ1F5JcoHkPmZ8yTQF70DnwzFtAaFPq9pX99ymADcWE
-         UHCpz5kwZfLxab0BYB50dHyoJyM0LPxP+coBZpVy5/IQ892kdsZY6P9seOeG7NvXdWjg
-         ZHvA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfPBfhtuT38lNzkxGDbU3NLefAsNcCXpuHMueBqvlKogvUmFQYJQX1VMnl5Zl5eUEqNgrVJ+U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5E3vvd1iQ40vVEEQIJJbS/Pij5aZe1zD+ZOqBZaVKvjqBLtVJ
-	ou8Q1aumSxd5Zv0105nmRfukRCd6lTFbd3Gjdpvp0w1Mf23oBh7KcE2EaxJfdX+r9KL4JLc3Q05
-	Fu36TuTy8YOHpehdpBsTTXU3iysp+YFGJ4/W83nc4TItEViV76Zjdap8glA==
-X-Gm-Gg: ASbGncsm9uu/ytJKmqciy5GJDtJpChdtItklMnM4bMeQIk0zmW5a59ZgkuURNCJGaSC
-	vyVUvsO+EqzTtvtYakW3uhawSkHxzrTLYTTzNQU5j47+CdkLfjt9bJaMEpfe3Xa5kWNljJLNZGZ
-	zYZS6kjPeR1J7fxwjnsBZeypIT5YhPghZXMCGM6b8IUIixi33SMtxEte2sTMjmhnGUmCTZIAdDL
-	xvfpgCAAv8QA9KIwqa27bGtITReaYZlD75p1X7Kukk/omJWMgp2kEdpNQK0FpNWzDcvzLS1b4Tb
-	E9vBMdvTPzN3U1xDA6pdyQ5wmVj4a+11J0TMV+n/tuakvy915mO/X4z/yuybNG7P67DlomIH40X
-	TisLjOdsnt9Tfp9uUtQ==
-X-Received: by 2002:a05:600c:a404:b0:46e:6339:79d1 with SMTP id 5b1f17b1804b1-46e63397ae5mr11782805e9.5.1759305960537;
-        Wed, 01 Oct 2025 01:06:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFK0k0YsqKjJ0KQb6IWjzPtVVlPN29UZlYbY/QuFx9mxVtSijrKT1lChFjdgZCBijgjZoxIGg==
-X-Received: by 2002:a05:600c:a404:b0:46e:6339:79d1 with SMTP id 5b1f17b1804b1-46e63397ae5mr11782525e9.5.1759305960082;
-        Wed, 01 Oct 2025 01:06:00 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e5c44bd75sm30723575e9.4.2025.10.01.01.05.58
+        bh=9sp3cgB81mX5j3kEpDMGkvj6tFo6ebH1h3lg6uJz188=;
+        b=oernXxNOWe8LvNabQvT/ty1FIu6o2ryiCpekoUlcOWUEIBrQlbUbk0qsTGcV2l7yR6
+         0ssjA1Sc3gPCAdNTVTRuCqQ0xqdpsJw942J9OkseevHsn4gsM/tPr1wjgOES4ZmPa3Zl
+         Ej0oXAtagukyFROf2ONe08YFGXABzNsWc591kUDxe83ufzi0G8q3KyGgeTgT2oJ9yFSi
+         XEqjP7tP4sghekCoDAQl1B9RmkqmgrbIPFeAOnZbCdpv0pvWhBBOEwUFnjPoDhpJJxGu
+         cvE9xm7ysIydGGO9hi+I+UL4Kdhl/urjPi+UPXDw7d/KjV+92Mf9jaBj1IErZtWExH0y
+         mi8A==
+X-Forwarded-Encrypted: i=1; AJvYcCVlKuq1egD72NihJeK/MlqbtrdnUOkuGGIvY+10vBpCUbjsc4Hy2lxNcclboMRTyavXFKMYjMg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxpzz3nOhYM6zoTOAXpcdx4Em6UO9qC/beXqPCQmapsibKXG/bK
+	h/ohRNJeiILPMEPmptycO5KupjmOpk8dGGBI/aLxSPJEEkB+q/k4JhmV
+X-Gm-Gg: ASbGncuC8yD/Bmla7HSqwN6oDQM3xxjH+/hhM9Gx0Ls2QQncPF1ZKOfZCSPOse6FsHK
+	g2GmdUnt8AMS0Awtfisu6Gs2mp2Fx2UctkEbk0xmlwV3aJtbEKVSqD/qF7MG7W4baICy3DCwMim
+	BZDYj0n/JSAJoT8NCY2MQBprx5MHWAxafqCfuk2k1FNsAcl+l5CtfgaX7bitjRIu5+1OLGhHNRm
+	sbVzmLf+/B23D+21oGVMgxlBXSD9ckE6c0KSAr2iPUv76aKF+HxqG8sm67Nfm2acTdk4Mp/4+Qj
+	zdFMNqWd6Nf39GGSk3FxlbTDY4rluJ65aJyF9/lbd3Jt7FLoG7WtuCSs7xzHa93gAqfb/hcp1Lp
+	xRJ7xgvmu3U//8wbA5L9SiCyyJjy03Jtc+hJlsuYbNcKpIfyCrakTjKPFgbrCAizpAqq8/g==
+X-Google-Smtp-Source: AGHT+IHupIF/aqS/uN1p6eF0m90zcA2AmdFfz6VwfCnH2eMPOA8mf1cKet57vjwVNF8IksMnMrnXfQ==
+X-Received: by 2002:a17:903:9ce:b0:272:1320:121f with SMTP id d9443c01a7336-28e7f332d05mr39109295ad.27.1759306268561;
+        Wed, 01 Oct 2025 01:11:08 -0700 (PDT)
+Received: from [10.0.2.15] ([157.50.93.46])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3399c0b24eesm2038496a91.1.2025.10.01.01.11.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Oct 2025 01:05:59 -0700 (PDT)
-Message-ID: <02355e42-9b63-4ea5-a75f-0f4e20323379@redhat.com>
-Date: Wed, 1 Oct 2025 10:05:58 +0200
+        Wed, 01 Oct 2025 01:11:08 -0700 (PDT)
+Message-ID: <e956c670-a6f5-474c-bed5-2891bb04d7d5@gmail.com>
+Date: Wed, 1 Oct 2025 13:40:56 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,63 +82,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 2/2] net: stmmac: Add support for Allwinner
- A523 GMAC200
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Chen-Yu Tsai <wens@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
- Jernej Skrabec <jernej@kernel.org>, Samuel Holland <samuel@sholland.org>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
- linux-kernel@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
- Jernej Skrabec <jernej.skrabec@gmail.com>
-References: <20250925191600.3306595-1-wens@kernel.org>
- <20250925191600.3306595-3-wens@kernel.org>
- <20250929180804.3bd18dd9@kernel.org> <20250930172022.3a6dd03e@kernel.org>
- <d5aaff54-04dd-4631-847c-a2e9bd5ad038@redhat.com>
+Subject: Re: [PATCH] net: usb: lan78xx: Fix lost EEPROM read timeout
+ error(-ETIMEDOUT) in lan78xx_read_raw_eeprom
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, Thangaraj.S@microchip.com,
+ Rengarajan.S@microchip.com, UNGLinuxDriver@microchip.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ syzbot+62ec8226f01cb4ca19d9@syzkaller.appspotmail.com
+References: <20250930084902.19062-1-bhanuseshukumar@gmail.com>
+ <20250930173950.5d7636e2@kernel.org>
+ <5f936182-6a69-4d9a-9cec-96ec93aab82a@gmail.com>
+ <aNzbgjlz_J_GwQSt@pengutronix.de>
 Content-Language: en-US
-In-Reply-To: <d5aaff54-04dd-4631-847c-a2e9bd5ad038@redhat.com>
+From: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
+In-Reply-To: <aNzbgjlz_J_GwQSt@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/1/25 9:25 AM, Paolo Abeni wrote:
-> On 10/1/25 2:20 AM, Jakub Kicinski wrote:
->> On Mon, 29 Sep 2025 18:08:04 -0700 Jakub Kicinski wrote:
->>> On Fri, 26 Sep 2025 03:15:59 +0800 Chen-Yu Tsai wrote:
->>>> The Allwinner A523 SoC family has a second Ethernet controller, called
->>>> the GMAC200 in the BSP and T527 datasheet, and referred to as GMAC1 for
->>>> numbering. This controller, according to BSP sources, is fully
->>>> compatible with a slightly newer version of the Synopsys DWMAC core.
->>>> The glue layer around the controller is the same as found around older
->>>> DWMAC cores on Allwinner SoCs. The only slight difference is that since
->>>> this is the second controller on the SoC, the register for the clock
->>>> delay controls is at a different offset. Last, the integration includes
->>>> a dedicated clock gate for the memory bus and the whole thing is put in
->>>> a separately controllable power domain.  
->>>
->>> Hi Andrew, does this look good ?
->>>
->>> thread: https://lore.kernel.org/20250925191600.3306595-3-wens@kernel.org
->>
->> Adding Heiner and Russell, in case Andrew is AFK.
->>
->> We need an ack from PHY maintainers, the patch seems to be setting
->> delays regardless of the exact RMII mode. I don't know these things..
+On 01/10/25 13:12, Oleksij Rempel wrote:
+> Hi,
 > 
-> The net-next PR is upon us, let's defer even this series to the next cycle.
+> On Wed, Oct 01, 2025 at 10:07:21AM +0530, Bhanu Seshu Kumar Valluri wrote:
+>> On 01/10/25 06:09, Jakub Kicinski wrote:
+>>> On Tue, 30 Sep 2025 14:19:02 +0530 Bhanu Seshu Kumar Valluri wrote:
+>>>> +	if (dev->chipid == ID_REV_CHIP_ID_7800_) {
+>>>> +		int rc = lan78xx_write_reg(dev, HW_CFG, saved);
+>>>> +		/* If USB fails, there is nothing to do */
+>>>> +		if (rc < 0)
+>>>> +			return rc;
+>>>> +	}
+>>>> +	return ret;
+>>>
+>>> I don't think you need to add and handle rc here separately?
+>>> rc can only be <= so save the answer to ret and "fall thru"?
+>>
+>> The fall thru path might have been reached with ret holding EEPROM read timeout
+>> error status. So if ret is used instead of rc it might over write the ret with 0 when 
+>> lan78xx_write_reg returns success and timeout error status would be lost.
 > 
-> @Chen-Yu Tsai: please re-post it when net-next will reopen after Oct
-> 12th, thanks!
+> Ack, I see. It may happen if communication with EEPROM will fail. The same
+> would happen on write path too. Is it happened with real HW or it is
+> some USB emulation test? For me it is interesting why EEPROM is timed
+> out.
 
-To be clear: given Russell's ack I'm applying the series now, no need to
-repost.
+The sysbot's log with message "EEPROM read operation timeout" confirms that EEPROM read
+timeout occurring. I tested the same condition on EVB-LAN7800LC by simulating 
+timeout during probe.
 
-Thanks,
-
-Paolo
+Thanks. 
 
 
