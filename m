@@ -1,123 +1,162 @@
-Return-Path: <netdev+bounces-227467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55580BB015C
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 13:06:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04543BB01DA
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 13:17:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E92B1C6B33
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 11:06:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65229188E0D3
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 11:17:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D701D2C2361;
-	Wed,  1 Oct 2025 11:06:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF0492C0290;
+	Wed,  1 Oct 2025 11:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Akor9YPt"
+	dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b="idQyanWl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx13.kaspersky-labs.com (mx13.kaspersky-labs.com [91.103.66.164])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663EA2BE04F
-	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 11:06:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E88D15C158;
+	Wed,  1 Oct 2025 11:17:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.103.66.164
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759316772; cv=none; b=IK4FnQOOjyMDsL8BlRtNtxhd6XedX6CHOOIFzhbOmG0UJvyMSQ0WaOBvjV7nuddlh8JE9ayhKEW3VtyacdKsQ9VgmdTMv/ijBa71sg+D2pua/x5mBdYmQNcg3ucI2YHjjlrEVxVdEDgx28AyVkZEYcevKi5rdkyIJysgrIiwCZU=
+	t=1759317429; cv=none; b=anIhLDEku3Q30pp5x80/XkG3/+Aag/wegNzGj9l1rczdfD+STvSffW/NhiJGMwRM7btagGNBV67dLFlS339fm6e0z9c2LkWLQJXihpVTpwj7OYK7Ibcba+Pxd6/7dEhY1kjMSEH967ibJ7papXFOA/5LRc+U+hbs1HKqphPPL5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759316772; c=relaxed/simple;
-	bh=H2FvDp5EcW5NNwgMTtH+nhDevA4wTd/GB7ppsb/tDGQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IFiJpEY5xmw4AMAzgSrtIh8iS4Xyu99vbxl2sKkb2m3cqmc5txU1FZV0OLDSQ7gI7eqjCjhb+3tRp9WTGMxQU0zhlx/mCNjKJ1EAVMuBo4IDsSvHc56mea+tJkeD0n41AgYY2IyLYrJNBlrt1HhuGJCAfm9S8K5yviPpQ7QTIJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Akor9YPt; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-27eed7bdfeeso12996735ad.0
-        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 04:06:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759316771; x=1759921571; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OUTO1WZObRKjcF69kojRq6rqV5jRn37FuLlY5Jot1Vo=;
-        b=Akor9YPtCbnFgIpY+2/lC+Fi5SbPMPnQl/Dzrz1D6kgFgK6ahwjzsw7Nm79T5J01q6
-         MhBAUvOi4aYmhJ4ltNkfqDBnqAqZY4l8ZFKpjoZMuBoNx+N14DC5zf/MrvyLnj4qGH6g
-         vOcWSPAlb9uP7XszURDmyvABQzr7wjzvxwPiBYWD0XDqchxanudwVdhU61u+0T7/0EnC
-         DBhbi1X2lv0ijHqJ4bVE3mRDXWfKTVXgv2om/DcxbxvAwnCeP5POE9378iB2BB+fRlEg
-         UR10WOf5tz93pBedy/8JHUlA1WTr8ERPFhSj88W2hQReYbGI8/yJeKk5XFGP5U47Gk8I
-         GHKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759316771; x=1759921571;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OUTO1WZObRKjcF69kojRq6rqV5jRn37FuLlY5Jot1Vo=;
-        b=taxLkfxTLVldRDSRPvSjmyc8ANzAyUflD+oa5QavC4eVQc8EvvHGT/m7Z1+ToKrUmR
-         VorYpeOE+e3eSoVD30mL3J54Rm9/rseqUINQE0YieWDrRD7dTraMar4vAJevA8INHFW8
-         ueo4CO0sp9QhcLJ5taZqw+vQOHJAnAUIjT1ImZieG8cBEXV8Tv2YdSjza4wnBEGjMTeK
-         ncYHiW9Oiqrp/Ctd8lKuFLDhlDJnbEHWZxiWjhQ5nljE9v88HPcAbjRFSxlknDqg/Y93
-         ErSZBzOweincUDRSLI61iZMrh0dBnXr+tzumchV8J4cKAvauIyKUwq8NUeEmeUMxMZoS
-         PA8w==
-X-Gm-Message-State: AOJu0YxPglPNdiG+oGS99RLDbJiSa+NHMCYDVFQayJSJJVa1OTsZzZ7z
-	h3N3qrsSfI/Q8jg6wunqwlfTddCKGBIIJJ+7ZMoKuD9CNpUULRwwCIP7Ukb5dkOl
-X-Gm-Gg: ASbGncvZrEnGbOtZrrot2/4pQoPjZTYA94QAYfvOfiMVzGUm7QbAO4jxHK1VHO+d0r4
-	k3G7Ddc2Mkl98XCeF2uWMX25a1bmGWz+zUAjtigqHV//LbiYWSJPB7UDJPof4AG8uhcOlsX1g30
-	Fso9PI6BGQGCInIZ+P8pmKp/s+umj0qdCDYhrbBG/CH7HQ/97EFAwZRtc0IMSV0I5gqYoqrPyJf
-	AsBLDrG0uhYz0Ce9DBJ9E06/I7WQK0UccFMamw5COJi98vV+qilMOycTgTsu9UfRCOJw27rPqI7
-	PgXgMwfPBUm0328NvRvKT/XQ07fIGAiAF9mRDPxVapHXgpsAkxEusvIyt/z+DnUOu6T3U6q4mcr
-	KUWSXFs0K2vAKevxoVz4sTZd4sExGlmP0jhBZIhKSCANvDJiTeK5a4GXtaUKv/N9S9hHsyg==
-X-Google-Smtp-Source: AGHT+IG1IDj8iyRkR3Qp/J2mbmh1w//edaVdXzT4iefYbJRU8w1dPyNhwk4JZHL6+GK7spNE7nI9Yg==
-X-Received: by 2002:a17:903:1904:b0:26e:7ac9:9d3 with SMTP id d9443c01a7336-28d170e948amr95641775ad.18.1759316770491;
-        Wed, 01 Oct 2025 04:06:10 -0700 (PDT)
-Received: from [10.0.2.15] ([157.50.93.46])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-27ed6aca043sm181403015ad.138.2025.10.01.04.06.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Oct 2025 04:06:10 -0700 (PDT)
-Message-ID: <20f92e3d-dd20-4f37-854b-17d96efe92e4@gmail.com>
-Date: Wed, 1 Oct 2025 16:35:57 +0530
+	s=arc-20240116; t=1759317429; c=relaxed/simple;
+	bh=niZcM15/aM2MHoBvHoPHQLRuvWK0disCzNRRmfsO2Rk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sUBBeRld8x1F6j10H1sY2mQUGQc88sOrGYECuxhyyvDOIf6ouKpVYeZF7FpxVgpTKLfBCgtoJqxPVtMrmDXsTx0OXBqS1WAUzaWtvSh8eCH9PdDEIXcA5RR/5kJUDsaely3OBH9mhqd9fIdlEMEoCR5VNvFCziy5fWhSonra+FU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com; spf=pass smtp.mailfrom=kaspersky.com; dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b=idQyanWl; arc=none smtp.client-ip=91.103.66.164
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaspersky.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+	s=mail202505; t=1759317425;
+	bh=zDsXdTX+O9NGT9chMSJOKcjuCs1HpuSIsAqYU7ZmRWc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=idQyanWl32Fu0h+kd6dqIXG+6U1iE9f4xkV0jHmVOIQc6DVET9dyx7ihZKeDpflEy
+	 2Cptu0WOSgzoQWJLQ7pFUgQki0LioIB7hy8hLa7gsWIDhfnxqWwbukFh4UWzRJ5Q4d
+	 E2dEPdWqMUOo+NLlrvOAcHJn602SJcDSHOhK5W67L+5P+HgP68Bvh4+qHVEUzXG2lS
+	 /PgfZ4PpYaU6+3DZ+m2n4vx2uVWrXTGz5aaTCpJdLbmSZ4P284ULiWRWHzB3hkdzL8
+	 n7+qN3M1LR9/iX/iFdmdf9Gu5MJytCOaVVhi03ClkSogzBvjYJ5AdHySLdG0DZ0z2w
+	 lh8j3ban4iFxA==
+Received: from relay13.kaspersky-labs.com (localhost [127.0.0.1])
+	by relay13.kaspersky-labs.com (Postfix) with ESMTP id 105C43E1F09;
+	Wed,  1 Oct 2025 14:17:05 +0300 (MSK)
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+	by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 089FB3E2127;
+	Wed,  1 Oct 2025 14:17:02 +0300 (MSK)
+Received: from zhigulin-p.avp.ru (10.16.104.190) by HQMAILSRV2.avp.ru
+ (10.64.57.52) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.36; Wed, 1 Oct
+ 2025 14:17:02 +0300
+From: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>
+To: Ayush Sawal <ayush.sawal@chelsio.com>
+CC: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Leon Romanovsky <leon@kernel.org>, Steffen Klassert
+	<steffen.klassert@secunet.com>, Cosmin Ratiu <cratiu@nvidia.com>, Zhu Yanjun
+	<yanjun.zhu@linux.dev>, Harsh Jain <harsh@chelsio.com>, Atul Gupta
+	<atul.gupta@chelsio.com>, Herbert Xu <herbert@gondor.apana.org.au>, Ganesh
+ Goudar <ganeshgr@chelsio.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: [PATCH] net: fix potential use-after-free in ch_ipsec_xfrm_add_state() callback
+Date: Wed, 1 Oct 2025 14:16:43 +0300
+Message-ID: <20251001111646.806130-1-Pavel.Zhigulin@kaspersky.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: doc: Fix typos in docs
-To: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "tipc-discussion@lists.sourceforge.net"
- <tipc-discussion@lists.sourceforge.net>,
- "linux-kernel-mentees@lists.linuxfoundation.org"
- <linux-kernel-mentees@lists.linuxfoundation.org>,
- "skhan@linuxfoundation.org" <skhan@linuxfoundation.org>,
- "david.hunter.linux@gmail.com" <david.hunter.linux@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Jon Maloy <jmaloy@redhat.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20251001064102.42296-1-bhanuseshukumar@gmail.com>
- <GV1P189MB198840D92F47A423791FF803C6E6A@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-Content-Language: en-US
-From: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
-In-Reply-To: <GV1P189MB198840D92F47A423791FF803C6E6A@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: HQMAILSRV2.avp.ru (10.64.57.52) To HQMAILSRV2.avp.ru
+ (10.64.57.52)
+X-KSE-ServerInfo: HQMAILSRV2.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 10/01/2025 11:10:03
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 196735 [Oct 01 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.11
+X-KSE-AntiSpam-Info: Envelope from: Pavel.Zhigulin@kaspersky.com
+X-KSE-AntiSpam-Info: LuaCore: 68 0.3.68
+ 1da783151ba96b73e1c53137281aec6cc92e0a0f
+X-KSE-AntiSpam-Info: {Tracking_cluster_exceptions}
+X-KSE-AntiSpam-Info: {Tracking_real_kaspersky_domains}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: zhigulin-p.avp.ru:5.0.1,7.1.1;kaspersky.com:5.0.1,7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: {Tracking_white_helo}
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 10/01/2025 11:11:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 10/1/2025 10:17:00 AM
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/10/01 07:34:00 #27871058
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 52
 
-On 01/10/25 15:58, Tung Quang Nguyen wrote:
->>  * @server: pointer to connected server
->> - * @sub_list: lsit to all pertaing subscriptions
->> + * @sub_list: list to all pertaing subscriptions
-> Replace "pertaing" with "pertaining"
-> 
-v2 patch is sent fixing the "pertaing" spelling.
+In ch_ipsec_xfrm_add_state() there is not check of try_module_get
+return value. It is very unlikely, but try_module_get() could return
+false value, which could cause use-after-free error.
 
-Thanks.
->>  * @sub_lock: lock protecting the subscription list
->>  * @rwork: receive work item
->>  * @outqueue: pointer to first outbound message in queue
->> --
->> 2.34.1
->>
-> 
+This fix adds checking the result of try_module_get call
+
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+Fixes: 6dad4e8ab3ec ("chcr: Add support for Inline IPSec")
+Signed-off-by: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>
+---
+ .../net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c b/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
+index ecd9a0bd5e18..3a5277630afa 100644
+--- a/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
++++ b/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
+@@ -35,6 +35,8 @@
+  *	Atul Gupta (atul.gupta@chelsio.com)
+  */
+
++#include "asm-generic/errno-base.h"
++#include "linux/compiler.h"
+ #define pr_fmt(fmt) "ch_ipsec: " fmt
+
+ #include <linux/kernel.h>
+@@ -301,7 +303,8 @@ static int ch_ipsec_xfrm_add_state(struct net_device *dev,
+ 		sa_entry->esn = 1;
+ 	ch_ipsec_setkey(x, sa_entry);
+ 	x->xso.offload_handle = (unsigned long)sa_entry;
+-	try_module_get(THIS_MODULE);
++	if (unlikely(!try_module_get(THIS_MODULE)))
++		res = -ENODEV;
+ out:
+ 	return res;
+ }
+--
+2.43.0
+
 
