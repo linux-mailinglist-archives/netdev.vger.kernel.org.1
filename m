@@ -1,126 +1,180 @@
-Return-Path: <netdev+bounces-227457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20674BAFDB9
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 11:29:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4C83BAFE2A
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 11:38:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CA4214E271F
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 09:29:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 578BE1C77DA
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 09:38:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A74402D9ED1;
-	Wed,  1 Oct 2025 09:29:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998A92D97A1;
+	Wed,  1 Oct 2025 09:38:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TVBaEkyI"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZSXykRCi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE052D7DFC
-	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 09:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB5B278150;
+	Wed,  1 Oct 2025 09:38:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759310965; cv=none; b=hfyZGYYUpOUtPk5DZaKr66EkybNAS1h/vYEq/qvcndEXhUrEGl4+R//IrXyQ5QgbveWi0mJta6vbyR6VGYApvu/6e918aIyJ9Er/J6U6baOAHws4Ic/6JAhdlrJH7TerS8TU/PoRnO71SCbLGLChEMKSpu+ELMorN3w/0bh5ZTQ=
+	t=1759311495; cv=none; b=ELZTFnKh4t1jmkWXNY5jzf/DUfQrCntBGkqwWFHlZLiPvXGkWxUKNCkBzZJ9QIuZUIRKXJvSS6E1lMCWIyZsmE8oeZDgzjknue/HXq0xooPjtgn2+mAdaHO8NVAVGty4Cv+RJmBhSIGJfOclIn3R8QKQfWLuvrtxU3KaxGB73/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759310965; c=relaxed/simple;
-	bh=eWhaWIh1Ch5W+HrhvE/7nWxIJ4BqD2s5kUI/3gBmyEA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C7Nc2LknkDmr0r0SnDQu8Q8w4LeoFid3GrfFBxQ2v2PO+7q3018QL237wvIWl/DJrqQofA7V8O7hiwJD/ysFiKoPQeD4+hY51b8HekjbbijyS8Smm/BAsA4Tz1xTI8xaS0g+5fxvSB3jjQ0WtTzJfYQNk5imG1bYoR9y3IemjHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TVBaEkyI; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-414f48bd785so3911615f8f.1
-        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 02:29:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759310961; x=1759915761; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eWhaWIh1Ch5W+HrhvE/7nWxIJ4BqD2s5kUI/3gBmyEA=;
-        b=TVBaEkyIVsWpPgc25PthN0dgMizQ6ejHVgbgY4cBzyNmtAMFUxALL2/XSvvKJkBJsb
-         nDMVrtUeFd3OpEfW3EoEcn7zKGgKwSzKK6TBOSXbDglCX4YaAdh419jxyWs9gSIew1u7
-         br3pPtBGPK+11HqzUpIOPf0//hSkV2Qmie5YLPhJ5K/5BYBVZH17YsA1yhe0dQRlNJti
-         Rp26I6LcqZUn5saUboAhSALCKrU0y0bvtQl3gk/xIzSlF6laY9r6Y6+h2zODmLkxIDEm
-         Yul6SYPIAC96/iUa230+xFVkC1Ne7w6ghfm0lj7XZyxe0v7vCRrHZWnlBDr0k3Plu8Ci
-         C4KQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759310961; x=1759915761;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eWhaWIh1Ch5W+HrhvE/7nWxIJ4BqD2s5kUI/3gBmyEA=;
-        b=leb24IOm0fBszK8qmr3jHRBjmoTBYt+BA/P9P7jN1WRxbY9BKFrgNl4DkPbFPpAgE7
-         e3OY01j4GrHOnQBs4r01aTWZVM4/lnW0Z9dT0+7oOIIlbj9HacRZxeHrmCO9jfuVL9KN
-         NBGgs9xrVoK3SjsfS8gcBoNivNMM9298zOvHxRwbQeBNAD3/Dc4GL6k0+Je24cm7L8UD
-         wZ3goqZmNP3mK8Q/x0Va48YZX2UjZk3B1sqQb7/2jfbqOoKHf8tiCUC4bC2hnFT12CKC
-         V8ZNYy5UucbdgOFKhNbLqEJ9Js7BHs+L4KfOL89Nv5r1XSMENFjFUPuDQQOpemANZa1S
-         +Tpw==
-X-Forwarded-Encrypted: i=1; AJvYcCXIa1iqgh+cXGTDHBIQ2PmpvmFPCFUctDYS62indlvSa8kJBDp/x4l2dGYxoM1iKPjTU8+r948=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8dvicGMRmSnzX/N4MOzyKbHfepSVGI0kfijaW4m+zuNaMGJbe
-	4mQdwVEXpUBFGqb6hFlNF6qVOig8xT2SSGkIoJJi+azdfUlZ45mWmoT7IG0sOBGrQextvo8CFqL
-	ZmDuBlfxNzglHiLsS6Az9xjf7w/rl+DqguHyBdeAl
-X-Gm-Gg: ASbGncsTg5vrc8vO4rvkGOHN9kQponkNFsNLLSImNI99/IrwMvyNJhJlEouoS9wcKMs
-	zyTL0o0N7+IOAC70LzMr6qrohaCNl+uK3fb10HE2ib5k0zu6ASVjonOiT2ZyynS3JjQT/okYTUj
-	mQDrLFk1hFZcQXWB6OnKnL7DHOfD3HsvgRmHx427v8yvWsKr12WjymJA0RxOSzRTrZIIP+0OWY/
-	VQxlQCkHC2Hn6eQ814FHF4sVDsmMUgYABiPdMg9u1n7t/20XmqueLQtPJ1rq6OzxlJj
-X-Google-Smtp-Source: AGHT+IEGTvzQBJ51h7EDzxRa/Kisf+BfY+7cpvTrlEhl/iMUN4+q2HPEwsb4ysW4cM34kR4mPUadGwVDBMTe2U90ivY=
-X-Received: by 2002:a05:6000:610:b0:408:9c48:e27b with SMTP id
- ffacd0b85a97d-42557820c81mr2042096f8f.62.1759310960773; Wed, 01 Oct 2025
- 02:29:20 -0700 (PDT)
+	s=arc-20240116; t=1759311495; c=relaxed/simple;
+	bh=HBNLnWqag4y3UT0dBQ5pPCBHzHPEBNk+pQGMnJzp98M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k0iRpTWV373bGnNgCaAJ6gIroMZN+7qKgn2WNRwH/ZZcKqvbflXcziIZb1um1UyqjowRa43QuevFoLkg3AqTtj6SOQAiyS4njqpMWXutnkA5f3wxZ2Sop6UgAi/HLAGS6VuaMJfsXgSgEOrK+pvegzc7SnBBrY0wItIzxpF9T44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZSXykRCi; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5916Y4DL008978;
+	Wed, 1 Oct 2025 09:38:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=dZJ4bR
+	wYxvI8Llc1XXA1o+1TApcKPXxvoY49BSpv3gI=; b=ZSXykRCiCDi9qSn/D4pq0Y
+	H8vOXkVzvAt8+L3rfNy7XVF9JOkvzOKQf/TrxsOVXhGBOeHFrr54mRCqX2H9bbBj
+	xuHyF+oNuvPK/SdpIy8q8rXR8dnXe8txGh3gLLyfpWeGgGxA++jGFq+T51FM+AV4
+	cqy+uKtMd+tLcgMAEN9dnIauaMt+v6kptdJ48d7fiTx9pvv46qUe6eumgb9teeZC
+	6bex0+24uKEpseR6JOjIBzv/IOP0mu9gX/RzqdOZnfOa2uSP9HlpLbT1uJrhQUkq
+	15usyxINfaLSKu2YMs0ImDCRvqSqEhy74vwjPsI37lgp0x73e3d2nyhQ0Nsgm70Q
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49e5bqx33q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 01 Oct 2025 09:37:59 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5919bx4m022819;
+	Wed, 1 Oct 2025 09:37:59 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49e5bqx33k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 01 Oct 2025 09:37:59 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5915aJdN024191;
+	Wed, 1 Oct 2025 09:37:58 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 49evy17rhc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 01 Oct 2025 09:37:58 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5919bsY456951258
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 1 Oct 2025 09:37:54 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6E50120043;
+	Wed,  1 Oct 2025 09:37:54 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 54E1D20040;
+	Wed,  1 Oct 2025 09:37:53 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.111.14.128])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Wed,  1 Oct 2025 09:37:53 +0000 (GMT)
+Date: Wed, 1 Oct 2025 11:37:51 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Dust Li <dust.li@linux.alibaba.com>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>,
+        Simon Horman <horms@kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Sidraya Jayagond
+ <sidraya@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        Mahanta
+ Jambigi <mjambigi@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen
+ Gu <guwen@linux.alibaba.com>,
+        Guangguan Wang
+ <guangguan.wang@linux.alibaba.com>,
+        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org, Halil Pasic
+ <pasic@linux.ibm.com>
+Subject: Re: [PATCH net-next v5 2/2] net/smc: handle -ENOMEM from
+ smc_wr_alloc_link_mem gracefully
+Message-ID: <20251001113751.17e9eb31.pasic@linux.ibm.com>
+In-Reply-To: <acad498b-06e6-4639-b389-ef954e4c6abc@redhat.com>
+References: <20250929000001.1752206-1-pasic@linux.ibm.com>
+	<20250929000001.1752206-3-pasic@linux.ibm.com>
+	<aNnl_CfV0EvIujK0@linux.alibaba.com>
+	<20250929112251.72ab759d.pasic@linux.ibm.com>
+	<acad498b-06e6-4639-b389-ef954e4c6abc@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com> <20250925-core-cstr-cstrings-v2-19-78e0aaace1cd@gmail.com>
-In-Reply-To: <20250925-core-cstr-cstrings-v2-19-78e0aaace1cd@gmail.com>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Wed, 1 Oct 2025 11:29:08 +0200
-X-Gm-Features: AS18NWCOfBcX2Vbfhr-fnk5GPcApSeOL4C5SAm45sMYmzlcHM8gTiQQ5VZSiyfk
-Message-ID: <CAH5fLggd09hodiDAdNRy6aXK9ANCP==YSJwy-GMbhNAAMm731A@mail.gmail.com>
-Subject: Re: [PATCH v2 19/19] rust: regulator: replace `kernel::c_str!` with C-Strings
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Breno Leitao <leitao@debian.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	Alexandre Courbot <acourbot@nvidia.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, nouveau@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
-	linux-clk@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTI2MDIxNCBTYWx0ZWRfX1CiPGiYSFxCl
+ dtfuqyNFp79/kJN6zzDiBVaozb4Afu+yvcTwZCUN2ps38P6Gmg4gxRVDx7J9P6VAlQ+HzZDofLt
+ 3NK1gy7CSW770Lkum/PzF849jmJ4V0FzDVruuhZ/tp5ORiN1uthfT/vTQAAX6uIj8MMGwQYNv0p
+ 13UAF0VJxYnp4F/uhK2KWoPywIftxkI3AiY+kAXhkyTNgRleNj7hSUyqSW974a7E0mmZaMwSmCY
+ Q2Y4e+k0O70KVVVmxAXr7riLIt199TbN5VoBJlymXg14GhhT40yHuegPss/ISjh5ege7TfMTZGZ
+ 0rL1eebJhzS0H6NeWGSjvNXII4/4Tj1y3QEoxaXnP1No4TOV5ov4VFHZ1rHpCydrUW2tkyCmDb2
+ 9yppB6HEURyOvlNsYQ+GgXCTsrM0TQ==
+X-Proofpoint-GUID: SwTTiudnV0p8FOOkMonpK7JmQkDqDN08
+X-Authority-Analysis: v=2.4 cv=LLZrgZW9 c=1 sm=1 tr=0 ts=68dcf677 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=kj9zAlcOel0A:10 a=x6icFKpwvdMA:10 a=20KFwNOVAAAA:8 a=SWeHzL2Wsuba8V6tri8A:9
+ a=CjuIK1q_8ugA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-ORIG-GUID: fAL13DQhW0VQgaJcTSECik-HboFRYs-M
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-01_02,2025-09-29_04,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 impostorscore=0 bulkscore=0 malwarescore=0 suspectscore=0
+ clxscore=1015 priorityscore=1501 phishscore=0 lowpriorityscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2509150000 definitions=main-2509260214
 
-On Thu, Sep 25, 2025 at 3:56=E2=80=AFPM Tamir Duberstein <tamird@gmail.com>=
- wrote:
->
-> C-String literals were added in Rust 1.77. Replace instances of
-> `kernel::c_str!` with C-String literals where possible.
->
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+On Wed, 1 Oct 2025 09:21:09 +0200
+Paolo Abeni <pabeni@redhat.com> wrote:
 
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> >>
+> >> Since in Alibaba we doesn't use multi-link configurations, we haven't tested
+> >> this scenario. Have you tested the link-down handling process in a multi-link
+> >> setup?
+> >>  
+> > 
+> > Mahanta was so kind to do most of the testing on this. I don't think
+> > I've tested this myself. @Mahanta: Would you be kind to give this a try
+> > if it wasn't covered in the past? The best way is probably to modify
+> > the code to force such a scenario. I don't think it is easy to somehow
+> > trigger in the wild.
+> > 
+> > BTW I don't expect any problems. I think at worst the one link would
+> > end up giving worse performance than the other, but I guess that can
+> > happen for other reasons as well (like different HW for the two links).
+> > 
+> > But I think getting some sort of a query interface which would tell
+> > us how much did we end up with down the road would be a good idea anyway.
+> > 
+> > And I hope we can switch to vmalloc down the road as well, which would
+> > make back off less likely.  
+> 
+> Unfortunately we are closing the net-next PR right now and I would
+> prefer such testing being reported explicitly. Let's defer this series
+> to the next cycle: please re-post when net-next will reopen after Oct 12th.
+
+Than you Paolo! Will do! I have talked to Mahanta yesterday about this,
+and he has done some testing in the meanwhile, but I'm not sure he
+covered everything he wanted. And he is out for the week (today and
+tomorrow is public holiday in his geography).
+
+Regards,
+Halil
 
