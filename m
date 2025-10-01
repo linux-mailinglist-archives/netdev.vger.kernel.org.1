@@ -1,169 +1,141 @@
-Return-Path: <netdev+bounces-227509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8DCEBB19EA
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 21:34:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E08DBB1ACC
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 22:23:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD1FF4C45F5
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 19:34:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01F2218933B7
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 20:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66538283FDD;
-	Wed,  1 Oct 2025 19:34:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA392F0666;
+	Wed,  1 Oct 2025 20:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j7UGNvZl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JHDsK5EQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815F3266B52
-	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 19:34:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9A52EC572
+	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 20:23:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759347277; cv=none; b=eU3ygHMvVdC1ZepmyvuyEDq94W/mFDIuk9Qe9qb2EbhvpZEUg5kwAKDfAaUAbOb+CFxbu0DJY5EDmLgOMb7D8jBEi0dVuh4aSa7cWF483yjQEHy2jCEX7/0IreswAvwO0uObJm0VhHeqcH9sKWQb2VS1o8ZbfQf/FjnsWillvwk=
+	t=1759350200; cv=none; b=KQfTNKtdkGHCVItsRC/JolBVYsqdvdQXbMDE7ukuxGPUM1bysoZloi/43Z9l9vI1AU/u7v+HEZqcxTqnalTKyT696TjiESzpS1Q2giqTjBqQqlam1kkKE8Jh1IoVOLwkTFNC5eSZoEm4/qAnQu7lVuKgwU7ygfsK/Pm0owegh9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759347277; c=relaxed/simple;
-	bh=+wEp8FY6k12SfpSslWhDOvNvg6MIJv1cyH/QabovNSU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PiASayNq0/PH27UGumQKLRYYB8ck1xbzfrJuQ6s2mAeXr+fn3be+Q9NHuamwawOYCx8X7edGLZvegsYAjpMFfGjTBWXYIocISDSdOjtKcm6EQD8IyNyLn2EUvlnrOfcN4OMNpstqzOQRXT/b0ktmbcubkK3/d0aGrDbm+ID3zyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j7UGNvZl; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-57a960fe78fso212936e87.2
-        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 12:34:35 -0700 (PDT)
+	s=arc-20240116; t=1759350200; c=relaxed/simple;
+	bh=sDgjk+ktzv45pAziz/W/rEGBe9ilvei4D3+TtKwEeiI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=icOrVWNc2CD6Ul0Idb5qe8B2KBz4CMXdTy/OrMpdEjQqaSk3HpjJU+7j5HbP7WkHtSFzOAMgzMsPvbNeGKXAs9w+ufaIKTKIP9cuuJIrUeoZwkyOEEyasvUqZ6juShfH8Q90kE1iLOXa1hxvU96tSzdU+Q22kQEhtquraxtL9t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JHDsK5EQ; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7811a02316bso266382b3a.3
+        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 13:23:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759347273; x=1759952073; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NYGG+lQD3/n82ZybzPGOHt5VupK6X05JQl8tmLzMiy8=;
-        b=j7UGNvZlvFv0zCpSyswVkWRelJDR5oebGmWpy6ogZT1khZGBf2f6dVQJj18pIYc9mh
-         7yp3Iey3ks6iKpDWkMWCd8EjhebYtLiuZDYwiSiB3kwvLjcb2mdriWjPVAuo5FpyZnjK
-         ZgQYvaADetPT/3ar/FhKu+6HuKOM06VKOD2bfijzXgqp6VMjO6G8zqKBdpWme+lyYAaM
-         rN8owzoKfwafQYpiFkRwC7lGzEOshxmrzzuM3khlfuIatTzBrluJBU2Oe7idsktYlP5I
-         Pe+8DZr+Bace6qGWlzO0T0ltudo3xiPu4WEu58MOOdQTSSbzVu3j0LZxRTuBV34OI+rV
-         qETQ==
+        d=gmail.com; s=20230601; t=1759350198; x=1759954998; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=sDgjk+ktzv45pAziz/W/rEGBe9ilvei4D3+TtKwEeiI=;
+        b=JHDsK5EQA9BHU/k8SMTE81k07bDQYTd1EBvpaebK/gOi3/UEMH3D9fN2epj4eyHVpQ
+         rHYPe5TeI91ZAyIi1fj06HInjed3SNKEOCECtaXs0Q1iGkMyZ1r8TVhpkOZZM70zo0Cr
+         29Bn8dNCBUhYaBm2LW1enKIZLgMHnIg2t6qsH0HZfpy9bzZ0zXtdaA0R68Uk4r+4Wwg/
+         n6UfTK8HJ9NEy2yIFsEsequfy4tUssjETMH4zVrG7vpptlO1fG95wyQovm9VFk8RJRIV
+         0rHJgBH4RhbA4QY7EJEesrF/QV1LEnZUdNb54v1G6ymeqMg78KcsZYqF4+Vxxjdxe6Ae
+         3BsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759347273; x=1759952073;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NYGG+lQD3/n82ZybzPGOHt5VupK6X05JQl8tmLzMiy8=;
-        b=TkcG+zz6oTvPoq1nRCF0ReVmFdBCWH/NzY8UdXn3cuCpzpKYw1Juprbiumfb/G0Oov
-         myFttuQplZZjTlyyDQX0ejJ1ZZ0TG0p8LEbona50DK015QRgGkaNmkHjjej80bhpWZNq
-         /cecPd2e6ShKDZitA3vSjaIt174/tVsyULJEMBDDx/Cb6+aCxRGjQLkCvJbfAZzHc9Ct
-         vH3VmHONWFFfxMbFrkJtR0qVJx0rqJJ8RHbCAx8sLHCLXnfs2VlAlV35De5sPyAAiH1f
-         3U5usymx2jZxv+ORl3d3v25fLuWn3pRO/lTDox24GlS2krwRfABIXvurgk68hEU/qSCK
-         vDcw==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ5JtdNj57lS9r1sKdsBH1yoa7DA8rzPFckqjgU/eieSLXzEZdINsMcr2mWs8jgTD59PGaXVY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoVGKX/MYOXFKnzKWa1lHeClQSYQ1WR65fVB8uWpLp0UTg7BId
-	tM4Ly3Msz9i1cGEpseOQYpH68LvFeCIXbyzv/U73SZhgYNRqOPACrpI7+NCINuZzEkqnGp0ka1G
-	if6LlANae/UQ5bd/qoneyK+NfMy2E9E37JkqM4Nvz
-X-Gm-Gg: ASbGnct2yBwTlAJAmcrQlO7N8v8ZI3/aTZk8Opjrk2P5OzmmK9RtbsEeUms0GR6//xL
-	chSl1wfaPWl4lm5sHOvL0PeONI/MjVUQpJiQepkNs50/dH5MYdrndVkoKTucB3aWyJCadEosA37
-	/9x760KUpmmW+/B1mBDW/q/KZnUT2yvtsXU7HpnVh1DYi5C8OUEGFR5CwIlgxHrJZNSiYwfLbje
-	mrVdO7FUs19t7RR8et9hsRdb1mowb1ZyaowICsWz1ZF3owMmLr0S4bS02CAeNEl5w2tx5jiT46O
-	9EpSh7FOkjXuMyLN823s3Bqv4czcqwD2puAjVb4=
-X-Google-Smtp-Source: AGHT+IHnRQ/s9GcZH3c204Eq/Il7SAaUBkw5oQvc/Wn1TIw4EjxfGtQQeUYVyUlWabWoTVOH6yWkf29rnk01/N7RnHs=
-X-Received: by 2002:ac2:498c:0:b0:58b:13d:7cf3 with SMTP id
- 2adb3069b0e04-58b013d7f38mr103390e87.33.1759347273325; Wed, 01 Oct 2025
- 12:34:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759350198; x=1759954998;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sDgjk+ktzv45pAziz/W/rEGBe9ilvei4D3+TtKwEeiI=;
+        b=dl9bpud/lP8E7z/zVBzo+FYhyVM5hOm0PhLTUHmbcHFkEeCAhqpfCOsoG6Tl6zC0ZV
+         trmnOu3Q383GGFviwcJsccuvSWlYCkV0DOSIIxUi7KQ7i/+e8vdTaL4Uujw6hq5OJqHA
+         OK2/J25mq5k2JILrn4Bi2Ty0SYIGBmzMixj9Ix87HVxgya6EtZCEsXdjVU/SF94Easil
+         s8D/oPCehozZpu/L7K32+BzqoyICNrHIhROeDEBVKkNks7/sqrHG7IH8IHtunEgrjDh6
+         2DG73B3FYW3RvwGIHQeFDCi+BTI6imeW/l1j2cd9JaA3KswiCvNB1XcQ9lS3remsRBAA
+         edkw==
+X-Forwarded-Encrypted: i=1; AJvYcCVwGG3hV/7ERmIrrHc5921DBY+JhomS0uKBckTiL9G8QW993r9qVf+Dg7kDJS10qs4YhTkCtPc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzq0IfC7fuVCFZwfoPtHh13r3WYXiPm9jRBZoaz1OtCY0Jx3tYK
+	Orp+mynsoFg0s5eqdL/y4drVanRGCmrROa/E5Bh4Kv42sDCx8hCCeAsX
+X-Gm-Gg: ASbGnctVD7Kb8AIjdkWrM/STOl20YfTK2Myp685WTL9Rsl/UCOY9AWIqT+QVxBcNZsu
+	BYdv230Fhso9cEW/yIvJyH8yEBQ23Hlngez3xdhMNYWED6BRNCIouGH0UViuMyHtuxh2IbqINwF
+	NSaGkioxuB0UavHpoKgLfNbyXIKfl/RosgZ8EKzw7zWfLH+no1fbqdV7NG9EB0jmVfGJEVEyPT6
+	42wa3UKWvy+W94AbIfJY4UJ08QaEpFFkSyVZEnwzYE9rJCzBLfZL5SFPVDkGPDsP9PSKIVtj0QN
+	QCN8f65lgCKieP56C/A5aqn1Z3d5CmnmWCx81CEKAkpiznXx7/fuG/tpS306lBjGfGL7s74xvCh
+	1UuacjxBqPXe/9BSVtjoQMo0kGBqgM0n6Z+Z8tu6RQ96qk05ODi1wp4RsiOTWLuMKqVhUqa8=
+X-Google-Smtp-Source: AGHT+IEzLJ6xMI4TZdMZ4T+zFjMdd8zd+FBTLRL34IcHix6v7TwCxHpmo0m7KR94VG++00tXP6UsNg==
+X-Received: by 2002:a05:6a00:8d3:b0:776:138a:ec97 with SMTP id d2e1a72fcca58-78af4176ab3mr5284861b3a.28.1759350197746;
+        Wed, 01 Oct 2025 13:23:17 -0700 (PDT)
+Received: from ?IPv6:2a03:83e0:115c:1:1ed4:e17:bedc:abbb? ([2620:10d:c090:500::6:420a])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-78b01f9dae7sm531831b3a.9.2025.10.01.13.23.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Oct 2025 13:23:17 -0700 (PDT)
+Message-ID: <fbbeeee096dc14332c50b1086b2089f1b2f496d9.camel@gmail.com>
+Subject: Re: [PATCH] selftests/bpf: Add -Wsign-compare C compilation flag
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>, 
+	andrii@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ martin.lau@linux.dev, 	song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, 	kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, 	shuah@kernel.org, matttbe@kernel.org,
+ martineau@kernel.org, geliang@kernel.org, 	davem@davemloft.net,
+ kuba@kernel.org, hawk@kernel.org, linux@jordanrome.com, 
+	ameryhung@gmail.com, toke@redhat.com, houtao1@huawei.com,
+ emil@etsalapatis.com, 	yatsenko@meta.com, isolodrai@meta.com,
+ a.s.protopopov@gmail.com, dxu@dxuuu.xyz, 	memxor@gmail.com,
+ vmalik@redhat.com, bigeasy@linutronix.de, tj@kernel.org, 
+	gregkh@linuxfoundation.org, paul@paul-moore.com,
+ bboscaccy@linux.microsoft.com, 	James.Bottomley@HansenPartnership.com,
+ mrpre@163.com, jakub@cloudflare.com
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev, 	linux-kernel-mentees@lists.linuxfoundation.org,
+ skhan@linuxfoundation.org, 	david.hunter.linux@gmail.com
+Date: Wed, 01 Oct 2025 13:23:13 -0700
+In-Reply-To: <20250924162408.815137-1-mehdi.benhadjkhelifa@gmail.com>
+References: <20250924162408.815137-1-mehdi.benhadjkhelifa@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251001102223.1b8e9702@kernel.org> <20251001185310.33321-1-kuniyu@google.com>
- <20251001122618.4cf31f3b@kernel.org>
-In-Reply-To: <20251001122618.4cf31f3b@kernel.org>
-From: Willem de Bruijn <willemb@google.com>
-Date: Wed, 1 Oct 2025 15:33:56 -0400
-X-Gm-Features: AS18NWCHCX9z_oDRuAmV-J_ufTDSlBj18YHd0wjT7wBjnJP25mJiwaEwNG7PNEk
-Message-ID: <CA+FuTSfnOzbZrztVYX26M6xAd5Y-hP0=Ek7svJpDUSLKApK0aQ@mail.gmail.com>
-Subject: Re: deadlocks on pernet_ops_rwsem
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>, edumazet@google.com, fw@strlen.de, 
-	netdev@vger.kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 1, 2025 at 3:26=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Wed,  1 Oct 2025 18:50:22 +0000 Kuniyuki Iwashima wrote:
-> > From: Jakub Kicinski <kuba@kernel.org>
-> > Date: Wed, 1 Oct 2025 10:22:23 -0700
-> > > To be clear -- AFAICT lockdep misses this.
-> > >
-> > > The splat is from the "stuck task" checker.
-> > >
-> > > 2 min wait to load a module during test init would definitely be a si=
-gn
-> > > of something going sideways.. but I think it's worse than that, these
-> > > time out completely and we kill the VM. I think the modprobe is truly
-> > > stuck here.
-> > >
-> > > In one of the splats lockdep was able to say:
-> > >
-> > > [ 4302.448228][   T44] INFO: task modprobe:31634 <writer> blocked on =
-an rw-semaphore likely owned by task kworker/u16:0:12 <reader>
-> > >
-> > > but most are more useless:
-> > >
-> > > [ 4671.090728][   T44] INFO: task modprobe:2342 is blocked on an rw-s=
-emaphore, but the owner is not found.
-> > >
-> > > (?!?)
-> >
-> > Even when it caught the possible owner, lockdep seems confused :/
-> >
-> >
-> > [ 4302.448228][   T44] INFO: task modprobe:31634 <writer> blocked on an=
- rw-semaphore likely owned by task kworker/u16:0:12 <reader>
-> >
-> > modprobe:31634 seems to be blocked by kworker/u16:0:12,
-> >
-> >
-> > [ 4302.449035][   T44] task:kworker/u16:0   state:R  running task     s=
-tack:26368 pid:12    tgid:12    ppid:2      task_flags:0x4208060 flags:0x00=
-004000
-> > [ 4302.449872][   T44] Workqueue: netns cleanup_net
-> > ...
-> > [ 4302.460889][   T44] Showing all locks held in the system:
-> > [ 4302.461368][   T44] 4 locks held by kworker/u16:0/12:
-> >
-> > but no lock shows up here for kworker/u16:0/12,
-> >
-> >
-> > [ 4302.461597][   T44] 2 locks held by kworker/u18:0/36:
-> > [ 4302.461926][   T44]  #0: ffff8880010d9d48 ((wq_completion)events_unb=
-ound){+.+.}-{0:0}, at: process_one_work+0x7e5/0x1650
-> > [ 4302.462429][   T44]  #1: ffffc9000028fd40 ((work_completion)(&sub_in=
-fo->work)){+.+.}-{0:0}, at: process_one_work+0xded/0x1650
-> > [ 4302.463011][   T44] 1 lock held by khungtaskd/44:
-> > [ 4302.463261][   T44]  #0: ffffffffb7b83f80 (rcu_read_lock){....}-{1:3=
-}, at: debug_show_all_locks+0x36/0x260
-> > [ 4302.463717][   T44] 1 lock held by modprobe/31634:
-> > [ 4302.463982][   T44]  #0: ffffffffb8270430 (pernet_ops_rwsem){++++}-{=
-4:4}, at: register_pernet_subsys+0x1a/0x40
-> >
-> > and modprobe/31634 is holding pernet_ops_rwsem ???
-> >
-> >
-> > Was there any update on packages (especially qemu?) used by
-> > CI around 2025-09-18 ?
->
-> No updates according to the logs. First hit was on Thursday so I thought
-> maybe it came from Linus. But looking at the branches we fast forwarded
-> 2025-09-18--21-00 and there were 2 hits earlier that day (2025-09-18--03-=
-00,
-> 2025-09-18--15-00)
+On Wed, 2025-09-24 at 17:23 +0100, Mehdi Ben Hadj Khelifa wrote:
+> -Change all the source files and the corresponding headers=20
+> to having matching sign comparisons.
+>=20
+> Signed-off-by: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>
+> ---
+> As suggested by the TODO, -Wsign-compare was added to the C compilation
+> flags for the selftests/bpf/Makefile and all corresponding files in
+> selftests and a single file under tools/lib/bpf/usdt.bpf.h have been
+> carefully changed to account for correct sign comparisons either by
+> explicit casting or changing the variable type.Only local variables
+> and variables which are in limited scope have been changed in cases
+> where it doesn't break the code.Other struct variables or global ones=20
+> have left untouched to avoid other conflicts and opted to explicit=20
+> casting in this case.This change will help avoid implicit type=20
+> conversions and have predictable behavior.
+>=20
+> I have already compiled all bpf tests with no errors as well as the
+> kernel and have ran all the selftests with no obvious side effects.
+> I would like to know if it's more convinient to have all changes as
+> a single patch like here or if it needs to be divided in some way=20
+> and sent as a patch series.
+>=20
+> Best Regards,
+> Mehdi Ben Hadj Khelifa
+> ---
 
-Is there a good SHA1 around the time of the earliest report?
+I don't understand why this change is necessary.
+Have you found any bugs while doing this conversion?
 
-There do not seem to be any recent changes to rwsem, let alone
-specifically to pernet_ops_rwsem.
+[...]
 
