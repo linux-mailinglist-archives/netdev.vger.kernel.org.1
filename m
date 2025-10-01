@@ -1,112 +1,253 @@
-Return-Path: <netdev+bounces-227472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25735BB041A
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 13:57:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2112CBB0490
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 14:11:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8F6C3B1493
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 11:57:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98243188A476
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 12:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929132E7653;
-	Wed,  1 Oct 2025 11:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9D482E11DD;
+	Wed,  1 Oct 2025 12:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QZ6zN0RS"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8299B274FDB;
-	Wed,  1 Oct 2025 11:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759319848; cv=none; b=MZ07TgK2VB3ZcljetljKz6dCQgWDVTeoZnaVuHJW6hW01+r7TG7YCaBQHHeyT6YeGMRyoxfYEy06U2bErIBZCDKGN8ur1XafiEuQeskmEL6U+o8ZhClwiAnf2YLcbyOfRtd8ooYhsLI5F8Oxu3zHJBnV+NbwXhcYCJM6nIJzCmI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759319848; c=relaxed/simple;
-	bh=BF5vlaRfBBcfg/QLrCOwGmvV/0Gv2eCviQVuNLH0MU8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XvInywDM9YdYBWyJ6MPNdXeCI1UIp1sjpWvhQHRWr0n4Dq/Dv38dGC/0H+dPilD9lhQGgw1BJ7rFwyoEyqHvHD25MtvUp0IN8GgBandc1ZFQ5TJ0Rs7L53bbaPYnTySgQ+AATtu3xEM8yHF1iIIj1pIM/4Pj2fnODhfgyN3pUs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AEE3516F2;
-	Wed,  1 Oct 2025 04:57:17 -0700 (PDT)
-Received: from bogus (e133711.arm.com [10.1.196.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8CC993F66E;
-	Wed,  1 Oct 2025 04:57:24 -0700 (PDT)
-Date: Wed, 1 Oct 2025 12:57:21 +0100
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Adam Young <admiyo@amperemail.onmicrosoft.com>
-Cc: Jassi Brar <jassisinghbrar@gmail.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Adam Young <admiyo@os.amperecomputing.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] Revert "mailbox/pcc: support mailbox management of the
- shared buffer"
-Message-ID: <20251001-masterful-benevolent-dolphin-a3fbea@sudeepholla>
-References: <20250926153311.2202648-1-sudeep.holla@arm.com>
- <2ef6360e-834f-474d-ac4d-540b8f0c0f79@amperemail.onmicrosoft.com>
- <CABb+yY2Uap0ePDmsy7x14mBJO9BnTcCKZ7EXFPdwigt5SO1LwQ@mail.gmail.com>
- <0f48a2b3-50c4-4f67-a8f6-853ad545bb00@amperemail.onmicrosoft.com>
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D81537E9;
+	Wed,  1 Oct 2025 12:11:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759320674; cv=fail; b=YA8DcTbvuTKp8iZrWDjIiOSMV7i8r/waNDUrUagir7ITcAdELnyBinJQqQtqHFvj0FB9JCgArbzV/d6VyaxsQ7vYXxwkRaePxjKcBV8B3VO7TPOAgUqzAXnPvx51gctGz+JFkXtJMm2a/8/k5bWXt+ggY7fLbZOO9zfsBLJE/P4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759320674; c=relaxed/simple;
+	bh=Re6peXDW7hfXtC6xTGyISSkVvEcANdsxebGefsiNEn0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XCrNt2INEIXrne3POJYU5aVoXlb5DijK+MU/ZInivjZkCe9VABb4KoAcCjQVtwxqhfwqbSyGWI/GsW4cLRoPAWSeA3o6PS0TNXv8LioOMAC/WbptFYr+zoTgnlJmvsKV7ohqd8kW5V9vw5LV1jLZbR8ZZ+aVtA9LP40RVE3NeXE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QZ6zN0RS; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1759320672; x=1790856672;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Re6peXDW7hfXtC6xTGyISSkVvEcANdsxebGefsiNEn0=;
+  b=QZ6zN0RSeoXhtNKQAIJNdtrSCSVgKkBmR/YYHQEKsyid+gvHgKJDkTZ9
+   CA+jP+KHYvZ+5Ryxg0fGaTOu9DywuOF51o1fkfdThPD24t1zmHVQQ49BI
+   3zeZHi8G3QjUn0OYv0vwbvN4fphMhfeANjaGXQtjtM9r7dhrNvpdvWC3R
+   DDdI4Xkpvqr2sXFupiyejJQDVaYI6XsMh5nRGkyRsEamjKYVrmVhSGfN3
+   rhxLGitFa1jWmEDIXDSe8xUPrVQaxQFNEQjobjMyrB73C9CnFqJjVSZKt
+   gtgluj3FSH/kpUiP9onhOUGMxauxwZj9Jp94J08dhcYO9qhYzTbfFo6fu
+   Q==;
+X-CSE-ConnectionGUID: 4nfzrWN1S+64ZP9/pjnh7Q==
+X-CSE-MsgGUID: y14J6fK8RBGNh+6jWc1ObA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="61551435"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="61551435"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2025 05:11:11 -0700
+X-CSE-ConnectionGUID: AFYL71BOQCyQVetIq2PTKg==
+X-CSE-MsgGUID: J5TbuQ4LQFqVDNIkNX9BuQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,306,1751266800"; 
+   d="scan'208";a="178576605"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2025 05:11:12 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 1 Oct 2025 05:11:11 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Wed, 1 Oct 2025 05:11:11 -0700
+Received: from CH4PR04CU002.outbound.protection.outlook.com (40.107.201.3) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 1 Oct 2025 05:11:10 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=M2mpyf/D2Gp0+Mrg+BKeji4mxIxIGP1UJX1nP0LLCKrmx5OiSCxZJ2hlOHIU/a8aTBlzxaHgpPKtbvSJrS5uRHaP/u29h8ltH/WtSc101EGjMRvyBtDaFP0hCsXUmOmSh33JwT7WHl3Nk1+EYtUfareVXZie4/dAYSO1l7k0gprOTA1XkSxDfReDoynrL0eIsbaWrpZJouiPeTP98Wulx3TUh5OhPsfqyy7z2ewzxSWtfKFDog4iOb5vBg9wInVR0HLI4FWQfdWvrlqms12XgHrCafSHbcvic8SjCyTLGjWZkgVHKfSGTBGf7tkv7SCEt0TGI1o8sFJx70W2yaHS3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Hy5BOKXC/Z2CWYAAhlkS6Sq14+S3XgROQj+ZpLXgsUM=;
+ b=MQS7q9qmhmzPlcFuqAqhu2HgJ7opjd2sReBpyHWHt1Wod0vRGW68jNKU2qiC+QRMGRQXoI6BJIQhQNrivmIbngq9llaY6h0Ba/AIiqRWV06+rk3EU3wo4j5IswkmJZPdS8LBpzQ38RgV4rN3mSwfam6quZ15/wjVtlWKaZTvUK+9kwWxrf4N2TGh2RWW86yAWhGodsvUjjMcEK0cSFWcYCY01H5KxTJdG/fgLTRAo2v4cAthACbxZhvRjCbXfv6JLOdMErYVoVX/w3xXjPvF3nalSr4uE44DMDuRl+5eVsc+aHVu85XTluqyHt12J/M0lVvm2n4NNkNvRh2Zi6KR4Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by CY8PR11MB7393.namprd11.prod.outlook.com (2603:10b6:930:84::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.18; Wed, 1 Oct
+ 2025 12:11:07 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9137.018; Wed, 1 Oct 2025
+ 12:11:07 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Haotian Zhang <vulab@iscas.ac.cn>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH v3] ice: ice_adapter: release xa entry
+ on adapter allocation failure
+Thread-Topic: [Intel-wired-lan] [PATCH v3] ice: ice_adapter: release xa entry
+ on adapter allocation failure
+Thread-Index: AQHcMsojc+alFDpS0EKTLmJTbkNxKLStMyEg
+Date: Wed, 1 Oct 2025 12:11:07 +0000
+Message-ID: <IA3PR11MB8986E04DF6C3B1DF2CA823B5E5E6A@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20251001115336.1707-1-vulab@iscas.ac.cn>
+In-Reply-To: <20251001115336.1707-1-vulab@iscas.ac.cn>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|CY8PR11MB7393:EE_
+x-ms-office365-filtering-correlation-id: 79bc670e-16b5-42af-8e41-08de00e39a14
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700021;
+x-microsoft-antispam-message-info: =?us-ascii?Q?M/HtW2EkOmz+CnJghVI4iXvaPPYnKNzdDOGzCZLf09WdPh9R2Ew0emj1UQD8?=
+ =?us-ascii?Q?O3O2/UvVWU9cgvpCGZtN1uXQqVh7TKBjSzanPMAytI1repBcfoxTBKOK6LJl?=
+ =?us-ascii?Q?wTZRYKECuYMrrpOZU0Jzd+dakpdwfU6QVsrBZ8aYUhbFbW5YjnucOJU+3Yo2?=
+ =?us-ascii?Q?TzfnFqkHnBNNJBJZPbgp5G3nlGw8XFt8E3sb5F/EIJajAgthhzH7DlGPhgcL?=
+ =?us-ascii?Q?UkXI4ZJVKPH52qY/IsqWQ5ZvL0Zhbkp5HWGIDTWn9/7zx/p6adAE8X91yf/V?=
+ =?us-ascii?Q?LUAks2one+8Z8Pvr73CBaryoqUTljA+KOv+HMau0J7LM/KxRKpO1nM9vozyw?=
+ =?us-ascii?Q?OMaCfYhwI2qY+RB7vWac4nHO0srugje4md5ms9nnyQEJ7Ay2wIyBB0zAm44N?=
+ =?us-ascii?Q?uFK+9F2t48jmHOSmF0mWRFNyeRVBAsXZhNL3AgQz7S0fXMX0o/rQy2sCi8JH?=
+ =?us-ascii?Q?XZN/59WgfDGK7HH3lBQzP0RiLYAHjTLRdu1/xYHcQ3xo30WAWUYxelwfNssb?=
+ =?us-ascii?Q?vMd3MV9wVHIxJjny5U4Gyf4ZFIPeWSzpJ7EXReSxuvO/OEypl7/rZ3sH6iil?=
+ =?us-ascii?Q?qX3+kraeH+GNUYI/s79AOu3FxJB86TjhTxMwS+JFJckzwHHYzYWuGCkVy2cc?=
+ =?us-ascii?Q?sYbltfQAqoaJOHIEG9sxOz4Ufd+4ujts0l93JQoK3VSrBQJ4Dh3SE5HsUiNa?=
+ =?us-ascii?Q?6MkxYNEEeAyfl6FBtLzfmZXrDG/+9rVMD7W9K84mW3/Rt1mEEQn1ylHz8Fzn?=
+ =?us-ascii?Q?ctIlzVUhtz8dtzPlNMrbxwkj2V3XDVCMbGAb1ZJZq3otjWoJ7rieA159+OIB?=
+ =?us-ascii?Q?iaKnpDAPNHY/8q3bKCqpYfKu2G6umG5x5YL/3t33hixX6iDTUtjXmDd0Wy4u?=
+ =?us-ascii?Q?T7swBGOfTjDqxU4f/BisGwUCTKVq02QrpoejqcJxiW9CqssTkoGGWVA0sblH?=
+ =?us-ascii?Q?pIY2Jjlyt+eU8T/Vjk70bd0lIZWSHofDxIk0sq7EEtsHUEfC4yR6yXGPkKP1?=
+ =?us-ascii?Q?B/6E2mneyC+kup/4SYUX9mhTCKwfaQLKnVmjZFYr1gVehfICHYstAQURs8g7?=
+ =?us-ascii?Q?rNn3ycvIGV4LwAbKH/5B6VuhEadsPhDoSk53atHtpeUlVHebFijTsvES/VxC?=
+ =?us-ascii?Q?iNYHYhp/BT+eBn0lAYmS8NGiYUWxI3pckfM42uxkc60d6inIq22qBhPV0rYF?=
+ =?us-ascii?Q?hi+B6qv0JAQdD1U+bB3S02PagTq/7TcixBHMTRogaLpbwkGP9R4HKICZMJes?=
+ =?us-ascii?Q?DEBPkWedxwLzFKYGcIvP8PpzxNmxtRssnOdXXVfbe+YlQxKKFZaUeI8GqYuW?=
+ =?us-ascii?Q?rpmUy/DD+Xhntk7K8Q+Q5QR+IJLuyaklsC9eKLUkDyBkRhw7kKaw8NLnRuov?=
+ =?us-ascii?Q?A+BWBoSyPkGK0p2QqULJYdRGzDb34jKHN8mxyvyHXPjwm0lmcvrSWsWZQO3U?=
+ =?us-ascii?Q?OcBZMIaCxD7We8LpBQVVw5MaQRghosUWlZVdnHGXHu24i/zzAZTnlnG3ztuF?=
+ =?us-ascii?Q?bvhKibt7C47Ybo6egpXQ/bj6kbNTzZSWWs8t?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?8IBmivUlZBtLMlFCMrkZK/6C9uorkBEY/A50LnIOP0K+AKWNR0WmY4XrSHsE?=
+ =?us-ascii?Q?0l5odtueQy6JbVsXpktU2mpLrDfghsdQY8tKhfn4j7DfD4baUtcdoKIy0K0c?=
+ =?us-ascii?Q?5RJWmUwaTM/JCZCTAIBMg+WmUsBD0UdU3fNOD+9s4WZpWS+3acyc7BpPHsL1?=
+ =?us-ascii?Q?G99Nry/WcNaZsW4y2K26xVMQ1J63FMJmSeMFTx9paf/CYWpqx6+NBfacJoHn?=
+ =?us-ascii?Q?RC2dAjmNo3CC92ShsBzc2Kl42oahlnqWmpVLlIub59/HdMEv495wgCvo9blV?=
+ =?us-ascii?Q?f417UB1nEEqpWkmx8fBsdS0SwqNCWyOdTX47aGGbXDAMszjPA4LE5DTn+C7A?=
+ =?us-ascii?Q?FfaSM+CALzDHBQhvRMpvetxyFZe8m1RpnLaW2ugkMQFImnYndSPFHYW7WnLe?=
+ =?us-ascii?Q?MxaYFmSR+Pd/buw0TGkhFK3Yu/h8VJgy+aCadQmoBj1zev2C1kyPGzFYsDgf?=
+ =?us-ascii?Q?ZBbLN4XQ+1TxRe/kq9p504oAk4jz1VnLOsS8/xgU8/Qt2hUiv58wcxhCt5R1?=
+ =?us-ascii?Q?2q0JryTMWkbdeTT8CxJgl8Yxb2KGpMHV9x8vcAx1IMPmVLL0r9bdFSEserja?=
+ =?us-ascii?Q?uqd69/dXaDjaAeDI1Y/zcis7ADVoYnuSOTspd/mOjs8gyfh5X4iAIfRH/Hnh?=
+ =?us-ascii?Q?kygC5t29rkJ4k1QUcpDJHKrluqQJ8T/Zuj7tg0SpPVpQIlp8mLoa4no2tivC?=
+ =?us-ascii?Q?RnPYLuvfa7U7dsN73LiW8gmWEFDBB9uzgc0Q8f8KfB2JTnOdmqQOnoat2Hx7?=
+ =?us-ascii?Q?51V8FEXSHFZ43twzVcr+rSvZn7LXt/ytgh+B7QDEcLIHeZYf4WWTfoxW0oSh?=
+ =?us-ascii?Q?9j/U0QkMftWd4ZeODuPWQzR4aEqqYFy+GtaFoTb2B4wySU4FLhxJSXbFbN51?=
+ =?us-ascii?Q?AYr7fj0rvd51kMXbYLV0StiZNhu7+P1ot9+RNF4Rl2BXxbxaIqZjlOMDRZAt?=
+ =?us-ascii?Q?g1jRbwEyRBuT6TlvDgZ2dMaUd8bDwByKxhttQ0XABa2O9QKGyPy0L30rntyx?=
+ =?us-ascii?Q?q6RL0wHZcFRwEqwnNrZVvbu8HL1+yceBfgjJk3y1VciK2/rEtLaVaykhG1M/?=
+ =?us-ascii?Q?+bNwLhnqtGdfStcwpVCG15IKcjU1Tc7NDNYe9BE+rncid3l8fgf0vAA6XXzK?=
+ =?us-ascii?Q?6H7OTDft6bhXy5a7BF1Hs6FIH2uuDWhemaFZj89lvgVRhswzu9SkYhXD0X+G?=
+ =?us-ascii?Q?fz0KHO6yTsInTtnp2k+iTumjxOt91EjozsIY5rVCABx9PJVD+IOq/4n5lVuz?=
+ =?us-ascii?Q?sloM7BMBTuepn36902dup3Fa6r68JOVZPbEy0kVAShw2s5YAAucgXvGFapig?=
+ =?us-ascii?Q?QdPv/30dAinQ74EgKm3nM3dl2HQS5EoQ+Pb1HIXJREiUhFsllcni1iLEzC/+?=
+ =?us-ascii?Q?RzE+I4d2xgez3CdGfQqiES5NwMqjZwmxBYQE5+2B4t1/KRn3CbHPaNSTe5EE?=
+ =?us-ascii?Q?zLCbW4LxJd60BOokeGO/9gxrrCGoE9t/5NOP/i5JDO2Gg+Q1zTdtI2aRVnZK?=
+ =?us-ascii?Q?yuzV9UyW/QTPrCGCgSB+8QA/A15XeaTEjxobKOygzPlG+ADEtCqgp2gk1kqP?=
+ =?us-ascii?Q?UY0xzC9zQ+GuBJHJUq596gNsZlZkRc81R83Jwpz9XNFJmhjO7MtNp9ySyqQk?=
+ =?us-ascii?Q?Zg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0f48a2b3-50c4-4f67-a8f6-853ad545bb00@amperemail.onmicrosoft.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 79bc670e-16b5-42af-8e41-08de00e39a14
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Oct 2025 12:11:07.5755
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 95h5/zHCfr4LEUwTRwQgFsHloxyGc8InaAZFdcoJa++mk7tnf2gcg8euBc3Wk6qx+Qr2vfkRshnVg2R1ecjLSLbYZ8bDu9FyMr0yz1xn5Fk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7393
+X-OriginatorOrg: intel.com
 
-On Wed, Oct 01, 2025 at 01:25:42AM -0400, Adam Young wrote:
-> 
-> On 9/29/25 20:19, Jassi Brar wrote:
-> > On Mon, Sep 29, 2025 at 12:11 PM Adam Young
-> > <admiyo@amperemail.onmicrosoft.com> wrote:
-> > > I posted a patch that addresses a few of these issues.  Here is a top
-> > > level description of the isse
-> > > 
-> > > 
-> > > The correct way to use the mailbox API would be to allocate a buffer for
-> > > the message,write the message to that buffer, and pass it in to
-> > > mbox_send_message.  The abstraction is designed to then provide
-> > > sequential access to the shared resource in order to send the messages
-> > > in order.  The existing PCC Mailbox implementation violated this
-> > > abstraction.  It requires each individual driver re-implement all of the
-> > > sequential ordering to access the shared buffer.
-> > > 
-> > > Why? Because they are all type 2 drivers, and the shared buffer is
-> > > 64bits in length:  32bits for signature, 16 bits for command, 16 bits
-> > > for status.  It would be execessive to kmalloc a buffer of this size.
-> > > 
-> > > This shows the shortcoming of the mailbox API.  The mailbox API assumes
-> > > that there is a large enough buffer passed in to only provide a void *
-> > > pointer to the message.  Since the value is small enough to fit into a
-> > > single register, it the mailbox abstraction could provide an
-> > > implementation that stored a union of a void * and word.
-> > > 
-> > Mailbox api does not make assumptions about the format of message
-> > hence it simply asks for void*.
-> > Probably I don't understand your requirement, but why can't you pass the pointer
-> > to the 'word' you want to use otherwise?
-> > 
-> > -jassi
-> The mbox_send_message call will then take the pointer value that you give it
-> and put it in a ring buffer.  The function then returns, and the value may
-> be popped off the stack before the message is actually sent.  In practice we
-> don't see this because much of the code that calls it is blocking code, so
-> the value stays on the stack until it is read.  Or, in the case of the PCC
-> mailbox, the value is never read or used.  But, as the API is designed, the
-> memory passed into to the function should expect to live longer than the
-> function call, and should not be allocated on the stack.
 
-I’m still not clear on what exactly you are looking for. Let’s look at
-mbox_send_message(). It adds the provided data pointer to the queue, and then
-passes the same pointer to tx_prepare() just before calling send_data(). This
-is what I’ve been pointing out that you can obtain the buffer pointer there and
-use it to update the shared memory in the client driver.
 
--- 
-Regards,
-Sudeep
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Haotian Zhang
+> Sent: Wednesday, October 1, 2025 1:54 PM
+> To: Keller, Jacob E <jacob.e.keller@intel.com>; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>; David S . Miller
+> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; intel-
+> wired-lan@lists.osuosl.org; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org; Haotian Zhang <vulab@iscas.ac.cn>
+> Subject: [Intel-wired-lan] [PATCH v3] ice: ice_adapter: release xa
+> entry on adapter allocation failure
+>=20
+> When ice_adapter_new() fails, the reserved XArray entry created by
+> xa_insert() is not released. This causes subsequent insertions at
+> the same index to return -EBUSY, potentially leading to
+> NULL pointer dereferences.
+>=20
+> Reorder the operations as suggested by Przemek Kitszel:
+> 1. Check if adapter already exists (xa_load)
+> 2. Reserve the XArray slot (xa_reserve)
+> 3. Allocate the adapter (ice_adapter_new)
+> 4. Store the adapter (xa_store)
+>=20
+> Fixes: 0f0023c649c7 ("ice: do not init struct ice_adapter more times
+> than needed")
+> Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Haotian Zhang <vulab@iscas.ac.cn>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+
+>=20
+> ---
+> Changes in v3:
+>   - Reorder xa_load/xa_reserve/ice_adapter_new/xa_store calls as
+>     suggested by Przemek Kitszel, instead of just adding xa_release().
+> Changes in v2:
+>   - Instead of checking the return value of xa_store(), fix the real
+> bug
+>     where a failed ice_adapter_new() would leave a stale entry in the
+>     XArray.
+>   - Use xa_release() to clean up the reserved entry, as suggested by
+>     Jacob Keller.
+> ---
+
+...
+
+> --
+> 2.50.1.windows.1
+
 
