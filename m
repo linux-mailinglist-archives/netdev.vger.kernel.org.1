@@ -1,215 +1,345 @@
-Return-Path: <netdev+bounces-227486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15E4ABB0E7D
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 17:00:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62AF7BB0F7C
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 17:10:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5E5E2A77D2
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 14:59:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03814188A1DF
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 15:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E076277813;
-	Wed,  1 Oct 2025 14:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HWjXeuua"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288C2309DCF;
+	Wed,  1 Oct 2025 15:03:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013064.outbound.protection.outlook.com [40.93.196.64])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEAE268690;
-	Wed,  1 Oct 2025 14:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759330525; cv=fail; b=suWDviXezJEBs81EWvRZKgeaYnWHS/EAQ0YbfniVA+d4gwNqjczQJ8to/Iq08E4w5U3eEihOVY97IefDOJ0V3X/RfLK/cRruE9yFBIpTTSumeaS5AmIck+4LiGnTZ2lG9T1I97Zbp/IiwR6wfftrsxg11/Qs/4L/ew095X5hLbg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759330525; c=relaxed/simple;
-	bh=kt8TZXqA17uHL6M2TVz1a8yp+K+cvLffatuRj9EUZtk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=TjpbVQ7bkmxXL9fU79RYQC0thVg0J5AXK1RzQBFs1hPT2czFM4SOBe3NTC2PgKaiTwiejqRAYA4S41z7KCJje+96gGBpHHSS3Zk1qjr0S3QP6V0L6/anP37Sw8asyteeNi2lNEsD3yEu9S0WXJmE9JG/XmeiuHoAQNhmNds9B0M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HWjXeuua; arc=fail smtp.client-ip=40.93.196.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=s17deeI3XKTFUjeeqkPBne6HxnLfcafDcRcNCIf6L48zbiA3aMkWX0bzJ6r5DbHci+cnIL1MDKbZRM6ZMzeT1mz708WhyKz+WERSP6cdLbK7GQ62Q0TeUFmHTCqI621pFYrNDCjX3Ixf/H1I4vqKDWIjwSSK05kmY5APtlfCTAaRPyMwJDEgrT+3qNPglDu8bcRrtbyGiW3+nYBg8gCM9UWCH0dbcfuE7gFFzIjynpH9kGg0AXxZT3sfxTa19bzsTtSTI5PvAA+Kqa+LJl4ACMwmOKEayJbctHI3QqkdzMO4uaKx6E1WflVCxuimVlJHSuI+Y7Vy4ZEL2f5vDL9Xwg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zEvSda5lta/Myu6xOwJVEsqfiTBLkYZ9WnycBg8br6c=;
- b=Wv9QQzmNTipLcWT5EDQux4h2+jYTF1sp88cPdZJVwz4dnaZ2Dd2kd76ziPYeKigyrBmCcureYHroPsn+iPhOvOQ2D1LL7rRTH6A4IDnwEIofsYSK79og/Dl6x1XyuyhDze6BLs5+GXr5d/KoDquXev4Pq69bFipcExx54OEcs43YJGkPx/mJgDqHS0e1CMygdgOvRqQdsmZaVmCz6x+i+ojE4jnwpND4vqd4zlh99F4TSYp1Udby73KzowXw8YIl4WIuXgmLIEdTRfUMpLyzqDwB6ULqkFeG79s4/ZkT1QvVyDo1paMXDtmZ9kChAQ++R9JcQrMGSnuoy4IwSFj8WA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zEvSda5lta/Myu6xOwJVEsqfiTBLkYZ9WnycBg8br6c=;
- b=HWjXeuuamWcJYWV4OrXwAT/KsTlwNg7o+UYiEdBj0gEF8YgMdC1YMm+fYb1vj7IptWHLD1bBmTehMx1SAJDAfQGpyRgWutjc78lYFhX37STxFkm6yBPWwCtEQ3Zb96FuGBGMjZO3/7oe3oRQZLDJAE2dnRGxeig3Om3Purrs6TkFKJTWsx14DG3VDddqObqGNybgR7K4K1q5YBX0a50EDDfRpBBQmZa4u7R8BNWpuDR/Op0QiyoLwjsV2UlYERrurz6xSFQjbt1VZkL27Z5qbSkvd6PkEfI9lzxd48+2VLdZ+IxNk4Ss/QzDH6ZVXwZvLm8BsxUwTJ0nsQAGBN0Ewg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from PH7PR12MB5757.namprd12.prod.outlook.com (2603:10b6:510:1d0::13)
- by PH7PR12MB8124.namprd12.prod.outlook.com (2603:10b6:510:2ba::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.18; Wed, 1 Oct
- 2025 14:55:16 +0000
-Received: from PH7PR12MB5757.namprd12.prod.outlook.com
- ([fe80::f012:300c:6bf4:7632]) by PH7PR12MB5757.namprd12.prod.outlook.com
- ([fe80::f012:300c:6bf4:7632%2]) with mapi id 15.20.9160.015; Wed, 1 Oct 2025
- 14:55:16 +0000
-Date: Wed, 1 Oct 2025 11:55:14 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Michael Guralnik <michaelgur@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>, Will Deacon <will@kernel.org>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Justin Stitt <justinstitt@google.com>, linux-s390@vger.kernel.org,
-	llvm@lists.linux.dev, Ingo Molnar <mingo@redhat.com>,
-	Bill Wendling <morbo@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Leon Romanovsky <leonro@mellanox.com>, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Jijie Shao <shaojijie@huawei.com>, Simon Horman <horms@kernel.org>,
-	Patrisious Haddad <phaddad@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net-next V6] net/mlx5: Improve write-combining test
- reliability for ARM64 Grace CPUs
-Message-ID: <20251001145514.GC3024065@nvidia.com>
-References: <1759093688-841357-1-git-send-email-tariqt@nvidia.com>
- <651ee9fe-706e-4471-a71b-e7a12b42cc3e@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <651ee9fe-706e-4471-a71b-e7a12b42cc3e@redhat.com>
-X-ClientProxiedBy: BL1P221CA0038.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:208:5b5::9) To PH7PR12MB5757.namprd12.prod.outlook.com
- (2603:10b6:510:1d0::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D85309DA4
+	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 15:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759331021; cv=none; b=bJPoOQIqzAQJBMNO41J3IDjR46hRCR73h9pXZq/Ffi2Wz1s/XmogTUlsbxgPrmAQAbDKpV7bBqF498U9wvLbmOJ823Tr82EB0bPdk9tjMu8JC/BsjcCKQay7/5h1LVSzofiOhubQbsAxC6/QE60110x9ouar+D8EG1eDu49+7F4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759331021; c=relaxed/simple;
+	bh=VV+8wUgDYr5X+tXxkkvnXd95o0HO905MOBR6+9M7c3g=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ooUqnefQnDSbQ2V1cKFGoXuka0COe4Mq1kEjSB0NJ3hzvkbHc3QpLmiSfkjL8E1yPyK3WfYUuM4Ccv2IYBKzsj9dT+9pXKvtvXMwenFXHKpDr7ipjjfCzBiVmG8paKFr2RpPyz4kz2GrCzfgHpp8MOHYbP8QmDd/e6lHD6SzLgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ccJ5618mCz6K8x5;
+	Wed,  1 Oct 2025 23:00:26 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id A30EE140114;
+	Wed,  1 Oct 2025 23:03:34 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 1 Oct
+ 2025 16:03:33 +0100
+Date: Wed, 1 Oct 2025 16:03:32 +0100
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+CC: <jgg@ziepe.ca>, <michael.chan@broadcom.com>, <dave.jiang@intel.com>,
+	<saeedm@nvidia.com>, <davem@davemloft.net>, <corbet@lwn.net>,
+	<edumazet@google.com>, <gospo@broadcom.com>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<selvin.xavier@broadcom.com>, <leon@kernel.org>,
+	<kalesh-anakkur.purayil@broadcom.com>
+Subject: Re: [PATCH net-next v4 4/5] bnxt_fwctl: Add bnxt fwctl device
+Message-ID: <20251001160332.00000bbf@huawei.com>
+In-Reply-To: <20250927093930.552191-5-pavan.chebbi@broadcom.com>
+References: <20250927093930.552191-1-pavan.chebbi@broadcom.com>
+	<20250927093930.552191-5-pavan.chebbi@broadcom.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5757:EE_|PH7PR12MB8124:EE_
-X-MS-Office365-Filtering-Correlation-Id: 18102bbe-057b-4625-6cb7-08de00fa8861
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ZxEoaGuo/Tu34gNiB8jtNwYodSsFCcqc1UJmVAhzeNAOjGg1lAZkNx0vWlU0?=
- =?us-ascii?Q?8vrwAP+7nm2ELU79e6Y3trfBCx6jEovb3krh0mYE1eFygKS/MOyCnzQ9iFwF?=
- =?us-ascii?Q?K8T2tKSsmTG1XO7Olcgu2x1kbAPqDIr58cOFQviBSIohRj6dpm/ebNSSEMoo?=
- =?us-ascii?Q?NCGj6by+wCs15Zh/7vylbeqdJOCb9bBmkBZP9GOctUBkEg4Nf3ZUxKrQebms?=
- =?us-ascii?Q?0dC8tFQlntKHDbRRIXim1tK9FR4TQCLaVRBf34CPhm687P7QB+1AOftdzeeH?=
- =?us-ascii?Q?N5ZGFoQRpkcJ54y1nhmVFq2tyeToVKA7n4aNqsnx/xdqDMmIPnGbUp/S5Ae8?=
- =?us-ascii?Q?4AXUoQ53U2jW30wGvpxexzEJhYN6dtqQwfzgWeb5Y1o2GC8ctRAichEXrn75?=
- =?us-ascii?Q?IgRW+AOr3MKJAefW5SjUicH88rYmOFBu97OIjiH0CQjIvZjpQnNg3PM90Kl3?=
- =?us-ascii?Q?d7S2SRbTL688Qcn8zqD9NNfdbuzLxY/yTd7pRjhXRCvIzl4RdPHFAH6/t88z?=
- =?us-ascii?Q?mxmkkj/k5Gfuz2lT2tRr8BOGwXGM6RnwMlGBhM+5jMUN+lIO2fqjOFba3u7Y?=
- =?us-ascii?Q?pBSgyi5sQW4TgZfUZ5GPLJRCUMxYTyZyK6Dqu1RpZD9ZGQykhfJPgyi/tnRP?=
- =?us-ascii?Q?NtcKZ/08XASjqNFfXUqNzn8w8WlJPXdh7RolYYNfpy91Lv1rddSyhI2wfd+B?=
- =?us-ascii?Q?tyTys3xxBwvKtTzQaCdiw0a7CEO53R/KmH3E/G+EH1UXyxdfemxR6uyuDaQa?=
- =?us-ascii?Q?uq+IIQeitJ6xNKClui2CCKFiJB955NxC9uxGcHXk4ongVgflW9ndzf4CSKrM?=
- =?us-ascii?Q?2LFJ8+0+qiutfuZlw9h5QFtJzsy2GsEeu0kNqb+VL/Zvx2eO+DUsTpYpxsaA?=
- =?us-ascii?Q?Fwx6QMd2vVBx+LnNd/0SXAKqCaeGX4tuTbksHtic2mBkjjsrz0+unu5qG/ZI?=
- =?us-ascii?Q?fkY0m214u5y8ntlffxuQc44sV+fD3VbvCun+L2HJJmv856TZHyMEgKkrY8hp?=
- =?us-ascii?Q?naO2VE5fSJ08eytrl+cXEwhuM3o8Y2bPlYgEMn+0kS0NdnelKXQ6iKhZ/wXq?=
- =?us-ascii?Q?+WTpG2Be9Sbv8doXkQcKSbcjOKgowscZb3MCKLRbfKrloLiEV99UnVmVQtEj?=
- =?us-ascii?Q?5bjkucrgME6WCj0hLvITLxGkp8TwgXYcfLPFWGqbnFBxd3GJyIMkl5SZjVmA?=
- =?us-ascii?Q?GRW3M6FmTCQclPcxuPmNxBqS6qxEw3/d9SA3B9T/JkXRi+ZUYrcAZk1Y7T3a?=
- =?us-ascii?Q?2zvOD+t94dW3yUO9qPNfCj5oIudQbyoR0D8r1QgxDwKWKYgC9WKqqFK441pN?=
- =?us-ascii?Q?A4zkmn89j4dTwtMYt0QfVq5WqzOQpl2jxo1VYxOAivlTkKlF5e6B5ZniK58K?=
- =?us-ascii?Q?N8GNJKdlaP+ixhJsvXv7SNRraaQhEU5g5GML9UZ03dLcaodS2+u549Z3LZ0U?=
- =?us-ascii?Q?FFOrrLAQkDaotxKjFfrJQrq3NWLuulec?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5757.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?rI+WKn7IVvyHWAv1xbkZfMR8xop4JClEqNTRDh5vUy/cL4+KbZwTCSNCOkTw?=
- =?us-ascii?Q?dWeOhYaWmtJAGvlfnhNy+Xw2dVE8MZ5dxFvWmVwt31JbfNtaMthNgCn6r/Ug?=
- =?us-ascii?Q?z7WfuNnzyyg38yWhUkMfL+veTz9CSXJ/Wqm3efxWdkeSjIzMWdIoBu5dhS4A?=
- =?us-ascii?Q?fODJ1wijrfIAdXHb+a+owU+0xaebbyWt2am15btoI8gYRpGjg9oNgesepPsD?=
- =?us-ascii?Q?aNa4UgxTjHjmf6hVigmad8YS9hzxtdwwvWV79FB2zSVv7SxfKopgH+IoN9/4?=
- =?us-ascii?Q?HJfIjuvlkHdL+2q1i6YstsGe/bSkIe+QeYPU5MByMuWl/8X5utV/VSg0sO9p?=
- =?us-ascii?Q?xXSDsjsA16mJIWV9tZnY5IgM5MdTf+H/t/AtMW8lmxpWqoM42xf7J/Cs3T5z?=
- =?us-ascii?Q?d0dOMRAgr5ozpO2YuWIyik5T2dPxRMDwzE7x89I5ww7a4QNcrvs8lvmF6QDM?=
- =?us-ascii?Q?wrIy/edyxo2LaxmZT4XcrPVh5S44AGGJ/1fDYTEPnHwdrRT0d8CL69oUjyY4?=
- =?us-ascii?Q?MmuHth5oelgdqZk3AZWJqGQzibpplzEA7/7TUppXHdpGBsI7hNbGGyUodf2z?=
- =?us-ascii?Q?MvAPu/y5IpZKIaawjSUQL7M3+iRt1sgip+IDkqEzNx/rCc4MjFuQBzYUQ+3u?=
- =?us-ascii?Q?Nji3cH/nX9jwN5eAl5S7mMfNAtf+JayjbIIfaUtfQT1tP7rJeq4A/dLGg+91?=
- =?us-ascii?Q?Gk8af9ykqh9ttc4dzFNkgJRMaQKCZFroWcWjCQ8st+RF++jb0AJYCeZ7BmkD?=
- =?us-ascii?Q?Y49fQFejEEnvpLmNE+zIUcNTVKAIvXrYpfUBS/EiQfQVsRPiuB1SovPBvqE8?=
- =?us-ascii?Q?S9onBm5Mk6kru3+hixCCSl7+mzKIeYIVYk+d5ug70U+1rAAOj+ryewvRV1Tv?=
- =?us-ascii?Q?CVjVZjDxI555IrfTSV7b93R8rYHW32WgMPKfLuxvM2zGTKZjOto5hK922/Ec?=
- =?us-ascii?Q?R8+KqfaLqn/O+cKCNrMwkf2XuNKrFZ0wBaZtOtTgaus6cTPkuBbBuHqC4fz9?=
- =?us-ascii?Q?StUwlDeAIoQyX2fffx2aUYevdX88gRTd1pinfGcnHWPII7DTl2gbtkK3bVaf?=
- =?us-ascii?Q?6pBfArgqABK+44Mau2HZ3ZDeaeTd80RsFLmpY96CIECPCGPIB/IoeGPk/+Bz?=
- =?us-ascii?Q?kHJrIUxyltXw9OFe9dsURKq8rQP/JjLStgTbbxx/FKlYB0Xylf6IReu6q6/u?=
- =?us-ascii?Q?aiR5wDDgCnzd4m+WukxHnVo8DV8VhVNDN/9/Ink/Q8RPHluMPgFnny3Kun8q?=
- =?us-ascii?Q?GIcLOXyRFawXXSirlbEMaw+RKNAvVXaWDVf9PlBIn4qJoiKJnyRemAYn9ZFV?=
- =?us-ascii?Q?WFB0CbP9l0QvkpzVBmUu1x4JFJR14BNnrsptp9FblmvT8EB2W4R+xILk07vT?=
- =?us-ascii?Q?2MhWqR1z5RAkljmjleoLImFZV5aVIuRkaewfqBcUGEtFGX5rukcfABrPsDem?=
- =?us-ascii?Q?AFTkH/0H4AQah3coh6snJnKV/4IJk9JEh0+26TQzBd+pkumB2PLQLz8+8VHR?=
- =?us-ascii?Q?hXciXbnecgk9WSWjCThF7zVMXkhCU2yAidw4DzKnIgKDz9BFS+GXNeYtflCR?=
- =?us-ascii?Q?hgnv6iGlcvE2Mf0Lvxlu+oGUJsf0MLzUJF2773yW?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 18102bbe-057b-4625-6cb7-08de00fa8861
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5757.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Oct 2025 14:55:16.6019
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: URQannyL54K7HA6IikBOV2i7EG7u8Zs8xyXUceGiY+nf6BVaM2Q8ss+YULQTd8n/
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8124
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Wed, Oct 01, 2025 at 11:28:09AM +0200, Paolo Abeni wrote:
+On Sat, 27 Sep 2025 02:39:29 -0700
+Pavan Chebbi <pavan.chebbi@broadcom.com> wrote:
 
-> > +static void mlx5_iowrite64_copy(struct mlx5_wc_sq *sq, __be32 mmio_wqe[16],
-> > +				size_t mmio_wqe_size, unsigned int offset)
-> > +{
-> > +#if IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && IS_ENABLED(CONFIG_ARM64)
-> > +	if (cpu_has_neon()) {
-> > +		kernel_neon_begin();
-> > +		asm volatile
-> > +		(".arch_extension simd;\n\t"
+> Create bnxt_fwctl device. This will bind to bnxt's aux device.
+> On the upper edge, it will register with the fwctl subsystem.
+> It will make use of bnxt's ULP functions to send FW commands.
 > 
-> Here I'm observing build errors with aarch64-linux-gnu-gcc 12.1.1
-> 20220507 (Red Hat Cross 12.1.1-1):
+> Also move 'bnxt_aux_priv' definition required by bnxt_fwctl
+> from bnxt.h to ulp.h.
+> 
+> Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
+> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-> /tmp/cchqHdeI.s: Assembler messages:
-> /tmp/cchqHdeI.s:746: Error: unknown architectural extension `simd;'
+A few minor things inline.
 
-This is a binutils error not gcc.. What is the binutils version?
+J
+> diff --git a/drivers/fwctl/Kconfig b/drivers/fwctl/Kconfig
+> index b5583b12a011..203b6ebb06fc 100644
+> --- a/drivers/fwctl/Kconfig
+> +++ b/drivers/fwctl/Kconfig
+> @@ -29,5 +29,16 @@ config FWCTL_PDS
+>  	  to access the debug and configuration information of the AMD/Pensando
+>  	  DSC hardware family.
+>  
+> +	  If you don't know what to do here, say N.
+> +
+> +config FWCTL_BNXT
+> +	tristate "bnxt control fwctl driver"
+> +	depends on BNXT
+> +	help
+> +	  BNXT provides interface for the user process to access the debug and
+> +	  configuration registers of the Broadcom NIC hardware family
 
-2.30 is the lowest that v6.16 supports..
+Full stop missing.
 
-Jason
+> +	  This will allow configuration and debug tools to work out of the box on
+> +	  mainstream kernel.
+> +
+>  	  If you don't know what to do here, say N.
+>  endif
+
+> diff --git a/drivers/fwctl/bnxt/main.c b/drivers/fwctl/bnxt/main.c
+> new file mode 100644
+> index 000000000000..397b85671bab
+> --- /dev/null
+> +++ b/drivers/fwctl/bnxt/main.c
+
+> +
+> +static int bnxt_fw_setup_input_dma(struct bnxtctl_dev *bnxt_dev,
+> +				   struct device *dev,
+> +				   int num_dma,
+> +				   struct fwctl_dma_info_bnxt *msg,
+> +				   struct bnxt_fw_msg *fw_msg)
+> +{
+> +	u8 i, num_allocated = 0;
+> +	void *dma_ptr;
+> +	int rc = 0;
+
+The compiler should be able to figure out that rc is always set in paths to where
+it is used.   If not fair enough leaving this.
+
+> +
+> +	for (i = 0; i < num_dma; i++) {
+> +		if (msg->len == 0 || msg->len > MAX_DMA_MEM_SIZE) {
+> +			rc = -EINVAL;
+> +			goto err;
+> +		}
+> +		bnxt_dev->dma_virt_addr[i] = dma_alloc_coherent(dev->parent,
+> +								msg->len,
+> +								&bnxt_dev->dma_addr[i],
+> +								GFP_KERNEL);
+> +		if (!bnxt_dev->dma_virt_addr[i]) {
+> +			rc = -ENOMEM;
+> +			goto err;
+> +		}
+> +		num_allocated++;
+> +		if (msg->dma_direction == DEVICE_WRITE) {
+> +			if (copy_from_user(bnxt_dev->dma_virt_addr[i],
+> +					   u64_to_user_ptr(msg->data),
+> +					   msg->len)) {
+> +				rc = -EFAULT;
+> +				goto err;
+> +			}
+> +		}
+> +		dma_ptr = fw_msg->msg + msg->offset;
+> +
+> +		if ((PTR_ALIGN(dma_ptr, 8) == dma_ptr) &&
+> +		    msg->offset < fw_msg->msg_len) {
+> +			__le64 *dmap = dma_ptr;
+> +
+> +			*dmap = cpu_to_le64(bnxt_dev->dma_addr[i]);
+> +		} else {
+> +			rc = -EINVAL;
+> +			goto err;
+> +		}
+> +		msg += 1;
+> +	}
+> +
+> +	return 0;
+> +err:
+> +	for (i = 0; i < num_allocated; i++)
+> +		dma_free_coherent(dev->parent,
+> +				  msg->len,
+> +				  bnxt_dev->dma_virt_addr[i],
+> +				  bnxt_dev->dma_addr[i]);
+> +
+> +	return rc;
+> +}
+> +
+> +static void *bnxtctl_fw_rpc(struct fwctl_uctx *uctx,
+> +			    enum fwctl_rpc_scope scope,
+> +			    void *in, size_t in_len, size_t *out_len)
+> +{
+> +	struct bnxtctl_dev *bnxtctl =
+> +		container_of(uctx->fwctl, struct bnxtctl_dev, fwctl);
+> +	struct bnxt_aux_priv *bnxt_aux_priv = bnxtctl->aux_priv;
+> +	struct fwctl_dma_info_bnxt *dma_buf = NULL;
+> +	struct device *dev = &uctx->fwctl->dev;
+> +	struct fwctl_rpc_bnxt *msg = in;
+> +	struct bnxt_fw_msg rpc_in;
+> +	int i, rc, err = 0;
+> +
+> +	rpc_in.msg = kzalloc(msg->req_len, GFP_KERNEL);
+> +	if (!rpc_in.msg)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	if (copy_from_user(rpc_in.msg, u64_to_user_ptr(msg->req),
+> +			   msg->req_len)) {
+> +		dev_dbg(dev, "Failed to copy in_payload from user\n");
+> +		err = -EFAULT;
+> +		goto free_msg_out;
+> +	}
+> +
+> +	if (!bnxtctl_validate_rpc(bnxt_aux_priv->edev, &rpc_in, scope)) {
+> +		err = -EPERM;
+> +		goto free_msg_out;
+> +	}
+> +
+> +	rpc_in.msg_len = msg->req_len;
+> +	rpc_in.resp = kzalloc(*out_len, GFP_KERNEL);
+> +	if (!rpc_in.resp) {
+> +		err = -ENOMEM;
+> +		goto free_msg_out;
+> +	}
+> +
+> +	rpc_in.resp_max_len = *out_len;
+> +	if (!msg->timeout)
+> +		rpc_in.timeout = DFLT_HWRM_CMD_TIMEOUT;
+> +	else
+> +		rpc_in.timeout = msg->timeout;
+> +
+> +	if (msg->num_dma) {
+> +		if (msg->num_dma > MAX_NUM_DMA_INDICATIONS) {
+> +			dev_err(dev, "DMA buffers exceed the number supported\n");
+> +			err = -EINVAL;
+> +			goto free_msg_out;
+> +		}
+> +
+> +		dma_buf = kcalloc(msg->num_dma, sizeof(*dma_buf), GFP_KERNEL);
+> +		if (!dma_buf) {
+> +			err = -ENOMEM;
+> +			goto free_msg_out;
+> +		}
+> +
+> +		if (copy_from_user(dma_buf, u64_to_user_ptr(msg->payload),
+> +				   msg->num_dma * sizeof(*dma_buf))) {
+> +			dev_dbg(dev, "Failed to copy payload from user\n");
+> +			err = -EFAULT;
+> +			goto free_dmabuf_out;
+> +		}
+> +
+> +		rc = bnxt_fw_setup_input_dma(bnxtctl, dev, msg->num_dma,
+> +					     dma_buf, &rpc_in);
+> +		if (rc) {
+If there is a strong reason to override the value of rc rather than returning
+that I'd add a comment.
+
+> +			err = -EIO;
+> +			goto free_dmabuf_out;
+> +		}
+> +	}
+> +
+> +	rc = bnxt_send_msg(bnxt_aux_priv->edev, &rpc_in);
+> +	if (rc) {
+> +		err = -EIO;
+Likewise here.
+
+Overall I'd just use a single rc variable rather than having separate one for err.
+
+> +		goto free_dma_out;
+> +	}
+> +
+> +	for (i = 0; i < msg->num_dma; i++) {
+> +		if (dma_buf[i].dma_direction == DEVICE_READ) {
+> +			if (copy_to_user(u64_to_user_ptr(dma_buf[i].data),
+> +					 bnxtctl->dma_virt_addr[i],
+> +					 dma_buf[i].len)) {
+> +				dev_dbg(dev, "Failed to copy resp to user\n");
+> +				err = -EFAULT;
+> +				break;
+> +			}
+> +		}
+> +	}
+> +free_dma_out:
+> +	for (i = 0; i < msg->num_dma; i++)
+> +		dma_free_coherent(dev->parent, dma_buf[i].len,
+> +				  bnxtctl->dma_virt_addr[i],
+> +				  bnxtctl->dma_addr[i]);
+> +free_dmabuf_out:
+> +	kfree(dma_buf);
+> +free_msg_out:
+> +	kfree(rpc_in.msg);
+> +
+> +	if (err) {
+> +		kfree(rpc_in.resp);
+> +		return ERR_PTR(err);
+> +	}
+> +
+> +	return rpc_in.resp;
+> +}
+
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> index ea1d10c50da6..a7bca802a3e7 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> @@ -2075,12 +2075,6 @@ struct bnxt_fw_health {
+>  #define BNXT_FW_IF_RETRY		10
+>  #define BNXT_FW_SLOT_RESET_RETRY	4
+>  
+
+Can you drop the linux/auxiliary_bus.h include given I think this
+is the only use in here?
+
+> -struct bnxt_aux_priv {
+> -	struct auxiliary_device aux_dev;
+> -	struct bnxt_en_dev *edev;
+> -	int id;
+> -};
+> -
+>  enum board_idx {
+>  	BCM57301,
+>  	BCM57302,
+
+> diff --git a/include/uapi/fwctl/bnxt.h b/include/uapi/fwctl/bnxt.h
+> new file mode 100644
+> index 000000000000..a4686a45eb35
+> --- /dev/null
+> +++ b/include/uapi/fwctl/bnxt.h
+> @@ -0,0 +1,64 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + * Copyright (c) 2025, Broadcom Corporation
+> + */
+> +
+> +#ifndef _UAPI_FWCTL_BNXT_H_
+> +#define _UAPI_FWCTL_BNXT_H_
+> +
+> +#include <linux/types.h>
+> +
+> +#define MAX_DMA_MEM_SIZE		0x10000 /*64K*/
+> +#define DFLT_HWRM_CMD_TIMEOUT		500
+> +#define DEVICE_WRITE			0
+> +#define DEVICE_READ			1
+> +
+> +enum fwctl_bnxt_commands {
+> +	FWCTL_BNXT_QUERY_COMMANDS = 0,
+> +	FWCTL_BNXT_SEND_COMMAND
+
+Maybe there will be more commands in future. So add a trailing comma.
+General convention is always do this unless it is a terminating entry
+that is just there to count the elements above.
+
+> +};
+
+
+
+
 
