@@ -1,107 +1,95 @@
-Return-Path: <netdev+bounces-227414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2836BBAED5E
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 02:02:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E172FBAEDDA
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 02:20:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0A284A7AE8
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 00:02:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A09AD3A6F53
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 00:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989D1C13B;
-	Wed,  1 Oct 2025 00:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6DDD17A306;
+	Wed,  1 Oct 2025 00:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ksftohVl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uTXWjDD5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE013FFD;
-	Wed,  1 Oct 2025 00:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745E22CCC5;
+	Wed,  1 Oct 2025 00:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759276919; cv=none; b=Sbx/1SU7bfbYt+FsrWdigQVFB4FbSc/bAsKFos7vIvPG+htAGRzuoMZ6FWbBuetVjrmY6stW8NB24oegcL6LVCrT80fpejKi5YvcPlfXa8XYHaMbL65gUYUFNGlzGqVQoSIZj4tS4zIvdJNQyXzyJQEgwfHXglaLHX+4vbaACOE=
+	t=1759278024; cv=none; b=J5XEJJyDqIuVtyQt4Hx1+R5jDJqf60eX+7pn8kDHiVn1ZDretpsPEj3lmw5Gg2dFVyl+d/ri95hu0uJcsEV8XEjssmlfENlIYX4d2fprBOCfuYxJb3Jfp4+NRKjmo+tCU7KPobj9fi49YOEH5cYE+CycDMNChTq6wRlcuhMkauI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759276919; c=relaxed/simple;
-	bh=3y68Tqy6cDtlcmDOr/T5Y/n7dmVkzFZcMAywC6/1zAo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EaBGHTp7aQTCowQILQrKUthgKsb+dZq0RdRYGHcEXJ75xsenpVtp82yFcM3Hi6abzCwdLxoqCciIThj6v6zRFn4fRVQsKQjX6Hjd2V7IeuND7jvlAa6x7JSXShrmCyTveslUX0mehI9ISF6IVg2VXoARRc8xdBD3aUsEj9O4B1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ksftohVl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD063C113D0;
-	Wed,  1 Oct 2025 00:01:58 +0000 (UTC)
+	s=arc-20240116; t=1759278024; c=relaxed/simple;
+	bh=m26ff45+YZIuIweKTgqVfUP8TSAnLz2buJEY7gdOkpw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p11uZCc0fjkdB42N5IM9EoJzj+lUey905sjg0VGB3ZOiEr+erB8kCThD7qVkf9Uh6glFpb1ba8FZ6xgKo/6xp+zXAocoXdZ8qfwC+nOG8PEPSPVW2h1vt1WIxjzVlIzkt94YnXPh1nnubX1lIHpSSuYoPnBuN4P+iC0bQyijVBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uTXWjDD5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A99EC113D0;
+	Wed,  1 Oct 2025 00:20:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759276919;
-	bh=3y68Tqy6cDtlcmDOr/T5Y/n7dmVkzFZcMAywC6/1zAo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ksftohVl2Qo0dLrp1wRNv9/74o1Fs7lEIRefjQh7LKdfvCLUMg9xMh1ELfqzluFRi
-	 qsENQ2370Fzn0agVtBXxyPDE3Zb0sknD/K0DnzraIyszsT6PwomnKkQVAFjZB4RAbG
-	 f0WWr3hw8EZlihgHXFMr0EcrJSfUQrxCKSLiFBM50iwiryha4eDBX7cC0c0u4Smb+M
-	 g2mg5N2i+VED0wcsKCG+/wkoMwOSkZQjyWXNVov94eNZKaWnpLYE8vrXVaoWH1SYZW
-	 HqweboEtW61q7LNtIDeEt4mfkkga0AiDYtNv35UcHtsD6HOfCp7xR5t4D4klBB4W7W
-	 2DaB5l93yFmFw==
-Date: Wed, 1 Oct 2025 00:01:57 +0000
-From: Wei Liu <wei.liu@kernel.org>
-To: Mukesh Rathor <mrathor@linux.microsoft.com>
-Cc: dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-	linux-input@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org,
-	linux-arch@vger.kernel.org, virtualization@lists.linux.dev,
-	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
-	jikos@kernel.org, bentiss@kernel.org, kys@microsoft.com,
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-	dmitry.torokhov@gmail.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bhelgaas@google.com,
-	James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
-	gregkh@linuxfoundation.org, deller@gmx.de, arnd@arndb.de,
-	sgarzare@redhat.com, horms@kernel.org
-Subject: Re: [PATCH v2 0/2] Fix CONFIG_HYPERV and vmbus related anamoly
-Message-ID: <aNxvde1KTtLeZEKy@liuwe-devbox-ubuntu-v2.lamzopl0uupeniq2etz1fddiyg.xx.internal.cloudapp.net>
-References: <20250915234604.3256611-1-mrathor@linux.microsoft.com>
+	s=k20201202; t=1759278024;
+	bh=m26ff45+YZIuIweKTgqVfUP8TSAnLz2buJEY7gdOkpw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uTXWjDD51MSeKOJohAhYHujiMKU3dMzHwPFwjMZCmZDPDtaKT/YGz0LPNp2Kc1FCJ
+	 qlCeE8zlY9NPC5tLrrFH6RJ+0BGIMqF84MJW45OLrxv50itI4hawITmuMdNbTXqDmX
+	 GBQH0tWqmJxTI8QCZ6bzVNJUQCXpz9qcgcN5zeLF8a1fdyzuGrnhQWxfnqoXXjHmQq
+	 dhCCuQklmO3GXCAUniqSLjGvKrCQDsM8s2tEiZ7rxl92QIA/jvJmdICrMWihvcDgwR
+	 Ln2m/wcXYJw6+YtM8Z+1e/ADU8dvhJiE9PjMazyW6R91j1az7ROl1xGilxZce/bWpa
+	 IxSQvIQGPXeoA==
+Date: Tue, 30 Sep 2025 17:20:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Chen-Yu Tsai <wens@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec
+ <jernej@kernel.org>, Samuel Holland <samuel@sholland.org>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+ Jernej Skrabec <jernej.skrabec@gmail.com>
+Subject: Re: [PATCH net-next v8 2/2] net: stmmac: Add support for Allwinner
+ A523 GMAC200
+Message-ID: <20250930172022.3a6dd03e@kernel.org>
+In-Reply-To: <20250929180804.3bd18dd9@kernel.org>
+References: <20250925191600.3306595-1-wens@kernel.org>
+	<20250925191600.3306595-3-wens@kernel.org>
+	<20250929180804.3bd18dd9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250915234604.3256611-1-mrathor@linux.microsoft.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 15, 2025 at 04:46:02PM -0700, Mukesh Rathor wrote:
-> At present, drivers/Makefile will subst =m to =y for CONFIG_HYPERV
-> for hv subdir. Also, drivers/hv/Makefile replaces =m to =y to build in
-> hv_common.c that is needed for the drivers. Moreover, vmbus driver is
-> built if CONFIG_HYPER is set, either loadable or builtin.
+On Mon, 29 Sep 2025 18:08:04 -0700 Jakub Kicinski wrote:
+> On Fri, 26 Sep 2025 03:15:59 +0800 Chen-Yu Tsai wrote:
+> > The Allwinner A523 SoC family has a second Ethernet controller, called
+> > the GMAC200 in the BSP and T527 datasheet, and referred to as GMAC1 for
+> > numbering. This controller, according to BSP sources, is fully
+> > compatible with a slightly newer version of the Synopsys DWMAC core.
+> > The glue layer around the controller is the same as found around older
+> > DWMAC cores on Allwinner SoCs. The only slight difference is that since
+> > this is the second controller on the SoC, the register for the clock
+> > delay controls is at a different offset. Last, the integration includes
+> > a dedicated clock gate for the memory bus and the whole thing is put in
+> > a separately controllable power domain.  
 > 
-> This is not a good approach. CONFIG_HYPERV is really an umbrella
-> config that encompasses builtin code and various other things and not
-> a dedicated config option for VMBus. VMBus should really have a config
-> option just like CONFIG_HYPERV_BALLOON etc. This small series introduces
-> CONFIG_HYPERV_VMBUS to build VMBus driver and make that distinction
-> explicit. With that CONFIG_HYPERV could be changed to bool.
+> Hi Andrew, does this look good ?
 > 
-> For now, hv_common.c is left as is to reduce conflicts for upcoming
-> patches, but once merges are mostly done, that and some others should
-> be moved to virt/hyperv directory.
-> 
-> V2:
->  o rebased on hyper-next: commit 553d825fb2f0 
->         ("x86/hyperv: Switch to msi_create_parent_irq_domain()")
-> 
-> V1:
->  o Change subject from hyper-v to "Drivers: hv:"
->  o Rewrite commit messages paying attention to VMBus and not vmbus
->  o Change some wordings in Kconfig
->  o Make new VMBUS config option default to HYPERV option for a smoother
->    transition
-> 
-> Mukesh Rathor (2):
->   Driver: hv: Add CONFIG_HYPERV_VMBUS option
+> thread: https://lore.kernel.org/20250925191600.3306595-3-wens@kernel.org
 
-I changed Driver to Drivers and applied both patches. Thanks.
+Adding Heiner and Russell, in case Andrew is AFK.
+
+We need an ack from PHY maintainers, the patch seems to be setting
+delays regardless of the exact RMII mode. I don't know these things..
 
