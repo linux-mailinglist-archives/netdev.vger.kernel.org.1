@@ -1,94 +1,92 @@
-Return-Path: <netdev+bounces-227469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52E7EBB0204
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 13:22:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFF2ABB02B2
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 13:32:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11CDA3B80A4
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 11:22:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F3AA2A32D4
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 11:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AFD62C325A;
-	Wed,  1 Oct 2025 11:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD812D0627;
+	Wed,  1 Oct 2025 11:32:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iXdYR8BM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h2+f/SDI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5F72522BE
-	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 11:22:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F333F2C08D0
+	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 11:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759317729; cv=none; b=UHakK60tr6vscl7hWUyYZnYQee6fUddQ+UN44d/r9kjJo2fK8620phrPYyj0qKVNQhPvOdKTX5BG+/aj+xaHnZ2shlyekq4Hq7IB+RqiLmgzOA7LWOXU2n3Skzq92JQuUbturFJr118iDzMIS8pFXrNGmoGoiUT6RF+EiSS/N8o=
+	t=1759318327; cv=none; b=fkbvuW+EwYzF6UMqvPT2P2UjzuBgrdnBylKrPxrD1VTMLsyhvLh+V8NdTVJaIa2/N74vvhs0WEn+Y5h6/W0HkW+hM4sU5c8dbpaQFwHEZdWxHlK6R4iP2aVYQYsIfDQWpbopipm8lTys+QXYSNYTtytHQ5DfxBXkq+LdPml5RPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759317729; c=relaxed/simple;
-	bh=MHUSi4P/U4csGmhflVuOc3gtRv4O4p5QklistO68IOQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MvksM7OsLb87vmAPzXVVNUI/NLKNt0LK+rdYs8EFvGXWyixC5X6gv6cDBMF8KVzVC1VmnSlk7v3/q41reR0CQKArRKWbc0yq9AkEBtePdacBE4si7SQ4Xz9EwmrexZU5owWVq8yy771OA4Tz2ewqC+g83VU6K3GdFX5AUYJZ93M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iXdYR8BM; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1759318327; c=relaxed/simple;
+	bh=E8TP+jTXRnR5ypNl9rTKJR9W/tHyfS8KQ+ykqiS8ARQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=a46PTPYKIL5Ph9pacigHGhX/VCPBHhrT6W7kJdi2LxY6J5AdYCXq3aBV4aLRTX1pDyNUiWvPD3WxbMbLCFv9Dv9gPKcH5t4jKu8Zr/BH1aiWTLL7y6ecKa+W6bh7Kfu0oUKbgziznggQd2cklr/BaRgeOYG3TQWDRFhTAcDx9iA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h2+f/SDI; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759317726;
+	s=mimecast20190719; t=1759318324;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ql3BeV8zLppnm7zJzsQP4NuOCJwg+ayk79UQ80gXYqg=;
-	b=iXdYR8BMmDBxquLWQGAE/DAvT49wRvs8MiQqLoQ0z1aWy3r4p3iPN5no0t4a28QdFSCTZI
-	SyCv+OXZLw5hG0bAWEihz1eFx9D1Ms4ft/4Y56EXGUT1H18zGscclT5u5kZluC0CpfYpGw
-	ni5teKlvJSlIRHZIK3EXXEyGBeMjNiM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=iJSRuteQOX9gctlwdxDghNzdOhBrLQto5XenHeU3Vv8=;
+	b=h2+f/SDI1lFKzHj2ZfTwofW0QajYgPX4oS0J/GF+mmXbdq+mQcy/x8xt4Gqdc3iQchcYgG
+	s3K3t7iiVK/JiU590XAwmaopfOdDG+eXE9wSrcxE0yQtp1FbB1K5ks2qPH7oeQUCb0jHjv
+	ksiHdp5DHH9BQE1G9ew9RZZgQ45xMtQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-26-PBHDh7Q8MOShcGkJaWEaxA-1; Wed, 01 Oct 2025 07:22:05 -0400
-X-MC-Unique: PBHDh7Q8MOShcGkJaWEaxA-1
-X-Mimecast-MFC-AGG-ID: PBHDh7Q8MOShcGkJaWEaxA_1759317724
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3f3c118cbb3so4541702f8f.3
-        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 04:22:04 -0700 (PDT)
+ us-mta-571-PeUefWixPFq_tPb3yrCIRA-1; Wed, 01 Oct 2025 07:32:02 -0400
+X-MC-Unique: PeUefWixPFq_tPb3yrCIRA-1
+X-Mimecast-MFC-AGG-ID: PeUefWixPFq_tPb3yrCIRA_1759318322
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46e2d845ebeso49910265e9.1
+        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 04:32:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759317724; x=1759922524;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ql3BeV8zLppnm7zJzsQP4NuOCJwg+ayk79UQ80gXYqg=;
-        b=dNVWitc5je5XceF+ZxzCBNDOgU7UGvGgDVPQ/4Q4Sc6812hAh+COHHhBHelnp3JNZf
-         YGaXIyFYRXwU1MENpiIvguUynkqBo8NprqZg79g1oW4XavXjbt77bQyGBKv+B+We4TJb
-         jtEGmaGrFZLm1xthS4wsIZi8eS3RgS2Zmv9Q6s7VGsOjJ97aNEjLqqgtvcj6x5ALnIU7
-         A1grIcn7wHQ2PAD9UYvzzRnG/cCFCePYh8uezUFoAAZBUGozCWKzlbjQ9oZv2d1k0jdx
-         4HcnFtNreW2xu03/T/UBVtXS0lleyKaP7Fs5eHUYW/pc03UrAn6/IxwR4lHLIVNorQzU
-         byng==
-X-Forwarded-Encrypted: i=1; AJvYcCVrdZFx6721+mYMYSUvF3/SWQDUCYfsGbVj2IHjCNWih0oTydQe++Yrzrkg4I5TmMw2VjFpYTk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaVSAibxwP9ZA4Ioy/v4F8qAjtCD55rrE8ZiA34bWpPTRnT5Nj
-	zLh4gSvHWxXZPSFRDqCtdC77/Rb3cO9j3dyXzMrv/2+jj7Pjey9ywqq7IfvjuctRGZ+T6ftQkj7
-	33XxxUQRMNc8nDclv0q8WDyH4r/XjllpcPyTrs+S62kVbaVuWhLTHzzcMSg==
-X-Gm-Gg: ASbGncs08v4kwVnIwF6izihzwkkCZ6yIfAj8CyoqV3w1MdiS+lNp3sGZ7GONk4CGMkg
-	+eDg/JZT58Extb2XtiqLDI4NCErOt3AkiiGqhGkZyH4B/PBXArZKARldTBsGlGcIxaoDJnm594o
-	ltmJbegv0rv5GAP1UfcpNBn7/CUrTEgII8B74dS5SYq7b3ULke0UZnSow6Joxx5JBA7xqCRs0ig
-	vRFf4fWPjYQ/CKit2slJtT22uZAGyfmz6AW6J/WjmHVfsLMrgepUh0JTX7BSnXeftXWtBaS14y0
-	JTX0cHzrCnK9axaCka+3ulItVP8jlFdpkn2oGkg=
-X-Received: by 2002:a05:6000:1a8e:b0:3ec:a019:3936 with SMTP id ffacd0b85a97d-42557816dadmr2479670f8f.55.1759317723712;
-        Wed, 01 Oct 2025 04:22:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE2YMfWSirAsieLM5wvLlIAO/DtCA3N6PuMAY/Nmj+lVBGtH+Oqh6a2oWTtM5/KVZ/v7RwKwA==
-X-Received: by 2002:a05:6000:1a8e:b0:3ec:a019:3936 with SMTP id ffacd0b85a97d-42557816dadmr2479627f8f.55.1759317723082;
-        Wed, 01 Oct 2025 04:22:03 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759318322; x=1759923122;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iJSRuteQOX9gctlwdxDghNzdOhBrLQto5XenHeU3Vv8=;
+        b=uCRK/IhR8MWsxsJ/oZkJOi6iBjmgHf91qKpbMa0Lrj/+dGOCd16fjvsWx4/2XV4RCA
+         D39K7f323FEa6Z5XNV5dMNNFSw/dIErBsWzAysCAC1FmaCy+xxD/tkbfmVgJSIlRxtnn
+         r3LIVx60OptVW9lUuhVWlYZNFYB9qc/7aoCfCcp9e1Rgbvo+Iar7EJEM+gnSnPfSIvBe
+         T7rNc+OZ8dYqoUQMj1AJepH0NRfgYUFGM1y6r0J+jK+NI+1T0g23toph0uP9aXQcU99P
+         2JJ1VrcTIEtV91lo+i8MUwIDJL4iJEf9lDHUvojK3UEfF/psgxg/wROHe5BP1xB+eQBm
+         rdHw==
+X-Forwarded-Encrypted: i=1; AJvYcCUxho2X0iDWgtlsp3Qx+8eVjtGC5TWfHJKsX9dWNFVni96U5WwO6bH7LrcPiS0yFCKvx1iWDts=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoSwS7ya9DaU/NcSTuurRPQpREniixZqGlm41r3UBvc2LY/qe7
+	GaUDjF1F9LFcuBzJVRcaU32sSP+KR0b4XySfAm+MPqpeVAE9x4dvCKGx0EQA4pt8nbZK+rgr4wX
+	N67wQRNGH0s4RI3CLpR3RYw3+QFvREKeEOuAFOY5WksMlpkmVtDj1z6pTCA==
+X-Gm-Gg: ASbGnct4OndJ2lGBZvir0I7H36ByZGZSCjxO/ugqGYFQi/rCt1S3v1CT9aKBNVYYZIp
+	mAYUC57Qmg1ZqwxhPqLT0YOtLli0F0HzjrJo0n4gpXy8AdNd82qCJZKgK01srWqNCgp3rCju3ge
+	6fF5XkgYGSVEmwQ4iq0NFIr1TD245E+vsbx1GvWmylgHaJWZFkUU/N0C6AeViYCUO28BCEX6sO6
+	VTzws9P6Okmo1FMv0Z8HsJtZaHy7PaLUNW+KGhTx51jQAT54+YkDYKVGnfdm34xq9+88hLkG+0E
+	xWtRMvojYIGa6DBNFDNIdVtljShDCys/7/F4IMA=
+X-Received: by 2002:a05:600c:45d0:b0:45c:b6fa:352e with SMTP id 5b1f17b1804b1-46e612bc7f7mr25101335e9.18.1759318321586;
+        Wed, 01 Oct 2025 04:32:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGstrQbPl2ux574MZQ5paDC88d3YGXhrfcZSAq6ToKm0J+thPm2S97lL7iQ8LvaDhELHu4bFA==
+X-Received: by 2002:a05:600c:45d0:b0:45c:b6fa:352e with SMTP id 5b1f17b1804b1-46e612bc7f7mr25100985e9.18.1759318320967;
+        Wed, 01 Oct 2025 04:32:00 -0700 (PDT)
 Received: from redhat.com ([2a0d:6fc0:1518:6900:b69a:73e1:9698:9cd3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb89fb264sm27105223f8f.20.2025.10.01.04.22.01
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e619c3b75sm34870125e9.7.2025.10.01.04.31.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Oct 2025 04:22:02 -0700 (PDT)
-Date: Wed, 1 Oct 2025 07:22:00 -0400
+        Wed, 01 Oct 2025 04:32:00 -0700 (PDT)
+Date: Wed, 1 Oct 2025 07:31:58 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: patchwork-bot+netdevbpf@kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
-	zhangjiao2@cmss.chinamobile.com, jasowang@redhat.com,
-	eperezma@redhat.com, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH net] vhost: vringh: Fix copy_to_iter return value check
-Message-ID: <20251001071456-mutt-send-email-mst@kernel.org>
-References: <cd637504a6e3967954a9e80fc1b75e8c0978087b.1758723310.git.mst@redhat.com>
- <175893420700.108864.10199269230355246073.git-patchwork-notify@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	jasowang@redhat.com, leiyang@redhat.com, mst@redhat.com,
+	rongqianfeng@vivo.com, sgarzare@redhat.com,
+	sheng.zhao@bytedance.com, zhangjiao2@cmss.chinamobile.com,
+	zhao.xichao@vivo.com
+Subject: [GIT PULL] virtio,vhost: fixes, cleanups
+Message-ID: <20251001073158-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,40 +95,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <175893420700.108864.10199269230355246073.git-patchwork-notify@kernel.org>
+X-Mutt-Fcc: =sent
 
-On Sat, Sep 27, 2025 at 12:50:07AM +0000, patchwork-bot+netdevbpf@kernel.org wrote:
-> Hello:
-> 
-> This patch was applied to netdev/net.git (main)
-> by Jakub Kicinski <kuba@kernel.org>:
-> 
-> On Thu, 25 Sep 2025 02:04:08 -0400 you wrote:
-> > The return value of copy_to_iter can't be negative, check whether the
-> > copied length is equal to the requested length instead of checking for
-> > negative values.
-> > 
-> > Cc: zhang jiao <zhangjiao2@cmss.chinamobile.com>
-> > Link: https://lore.kernel.org/all/20250910091739.2999-1-zhangjiao2@cmss.chinamobile.com
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > 
-> > [...]
-> 
-> Here is the summary with links:
->   - [net] vhost: vringh: Fix copy_to_iter return value check
->     https://git.kernel.org/netdev/net/c/439263376c2c
-> 
-> You are awesome, thank you!
-> -- 
-> Deet-doot-dot, I am a bot.
-> https://korg.docs.kernel.org/patchwork/pwbot.html
-> 
+The following changes since commit e5f0a698b34ed76002dc5cff3804a61c80233a7a:
 
+  Linux 6.17 (2025-09-28 14:39:22 -0700)
 
-It's probably stable material. Does netdev still have a separate
-stable process? I'm not sure I remember.
+are available in the Git repository at:
 
--- 
-MST
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to ed9f3ab9f3d3655e7447239cac80e4e0388faea8:
+
+  virtio-vdpa: Drop redundant conversion to bool (2025-10-01 07:24:55 -0400)
+
+----------------------------------------------------------------
+virtio,vhost: fixes, cleanups
+
+Just fixes and cleanups this time around.  The mapping cleanups are
+preparing the ground for new features, though.
+In order patches were almost there but I feel they didn't
+spend enough time in next yet.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Jason Wang (9):
+      virtio_ring: constify virtqueue pointer for DMA helpers
+      virtio_ring: switch to use dma_{map|unmap}_page()
+      virtio: rename dma helpers
+      virtio: introduce virtio_map container union
+      virtio_ring: rename dma_handle to map_handle
+      virtio: introduce map ops in virtio core
+      vdpa: support virtio_map
+      vdpa: introduce map ops
+      vduse: switch to use virtio map API instead of DMA API
+
+Michael S. Tsirkin (1):
+      vhost: vringh: Fix copy_to_iter return value check
+
+Qianfeng Rong (1):
+      virtio_balloon: Remove redundant __GFP_NOWARN
+
+Sheng Zhao (1):
+      vduse: Use fixed 4KB bounce pages for non-4KB page size
+
+Xichao Zhao (1):
+      virtio-vdpa: Drop redundant conversion to bool
+
+zhang jiao (1):
+      vhost: vringh: Modify the return value check
+
+ drivers/net/virtio_net.c                 |  28 +-
+ drivers/vdpa/Kconfig                     |   8 +-
+ drivers/vdpa/alibaba/eni_vdpa.c          |   5 +-
+ drivers/vdpa/ifcvf/ifcvf_main.c          |   5 +-
+ drivers/vdpa/mlx5/core/mr.c              |   4 +-
+ drivers/vdpa/mlx5/net/mlx5_vnet.c        |  15 +-
+ drivers/vdpa/octeon_ep/octep_vdpa_main.c |   6 +-
+ drivers/vdpa/pds/vdpa_dev.c              |   5 +-
+ drivers/vdpa/solidrun/snet_main.c        |   8 +-
+ drivers/vdpa/vdpa.c                      |   5 +-
+ drivers/vdpa/vdpa_sim/vdpa_sim.c         |   4 +-
+ drivers/vdpa/vdpa_user/iova_domain.c     | 132 ++++++---
+ drivers/vdpa/vdpa_user/iova_domain.h     |   7 +-
+ drivers/vdpa/vdpa_user/vduse_dev.c       |  79 +++---
+ drivers/vdpa/virtio_pci/vp_vdpa.c        |   5 +-
+ drivers/vhost/vdpa.c                     |   6 +-
+ drivers/vhost/vringh.c                   |  14 +-
+ drivers/virtio/virtio_balloon.c          |   2 +-
+ drivers/virtio/virtio_ring.c             | 459 +++++++++++++++++++------------
+ drivers/virtio/virtio_vdpa.c             |  22 +-
+ include/linux/vdpa.h                     |  25 +-
+ include/linux/virtio.h                   |  46 +++-
+ include/linux/virtio_config.h            |  72 +++++
+ include/linux/virtio_ring.h              |   7 +-
+ 24 files changed, 635 insertions(+), 334 deletions(-)
 
 
