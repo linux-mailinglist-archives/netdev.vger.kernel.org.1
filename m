@@ -1,128 +1,159 @@
-Return-Path: <netdev+bounces-227523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA5A7BB2125
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 01:33:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 370B2BB213A
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 01:38:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45D4F19C44D2
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 23:33:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A08E119C5AB3
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 23:38:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546342820A5;
-	Wed,  1 Oct 2025 23:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 997B326B0BC;
+	Wed,  1 Oct 2025 23:38:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rT9TYikp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PluDTP0j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281213594A;
-	Wed,  1 Oct 2025 23:33:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 100A423B60A
+	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 23:37:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759361590; cv=none; b=tkAEegDCMto6RfyIYxtCpeIgoCRkGnay2h7twQ+ZcmD48/I4BlOpSXwB2Z63Uqy+Y+CqGnBYAgv5MWQAKdDJcEMAb7W8ba0Ytkczp03HSNdULQG098lOWmtXVoTLRkOwxElVMOILrMrbkkXYG8YMIGaDk/3nQaKLEo0nn5gVhf0=
+	t=1759361880; cv=none; b=VwmO6i0GOl+AreTPBr+x6Tn79tn0K6BFaZKekTDYRzHIubiwOtA+uvNvyqmKXxp1Mf1CpQQgSZ/00YhQG2h+fXO0W7zhFAo25rZAFnPR571uBIvPVYAsE1TQZ8mIjyNsCdnZ7RWast1iadqb7XqU79RvfM+A80vNajYP90s0lOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759361590; c=relaxed/simple;
-	bh=nxjPZTH2cboLxbGeiqKY+KyNbeP3fDF19+MMfWultYc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JkmtjCT90EPvVu20QjeS1BbVEQQlFF6X/xaIFY5Wd3V5fxOXcUCrzt5f5PYthO9d+lq78jwAGUVHx2SQifESI8bAtktn49Sa7GSREQShniXftvgsHAlzkNRsADxWZwZkbuJUt2ZDwOnmQBWaSUW17NxGZEH8L6ZkZi16hrItmFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rT9TYikp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CC82C4CEF1;
-	Wed,  1 Oct 2025 23:33:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759361586;
-	bh=nxjPZTH2cboLxbGeiqKY+KyNbeP3fDF19+MMfWultYc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rT9TYikpnEFDxMjYQQWZZR4Ir7wV22Zs3w1t2MoF5lCYuLy0mDTXYoILShTNUw29l
-	 PcHuvYLkLYMsPhNIk+e0JnttkxbVrIZGQ3LdD1uWusS0T/GoBS0tf14P17U6mlVtSp
-	 8I/LP2CmDq9VamgT9bWizCFm8SjA0BO9OFvmwDg+1mYgO97iOrsWtjCFhnfohycu8i
-	 hgGj9jrwi2gTjMJzIhPFtPacaH23qhoglsaWQ+gx8tW1CP727a0almdHSjbkJKgSVE
-	 Y84DV0bR0qpFjrdUvhyhMvf8UrVhR0EEakpqUs+QiQo+RaKtcC/HFayf9tks4B0SNG
-	 /BC1RlTkDKawA==
-Date: Wed, 1 Oct 2025 16:33:04 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Network Development <netdev@vger.kernel.org>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	bpf <bpf@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH iproute2-next v2] lib/bpf_legacy: Use userspace SHA-1
- code instead of AF_ALG
-Message-ID: <20251001233304.GB2760@quark>
-References: <20250929194648.145585-1-ebiggers@kernel.org>
- <CAADnVQKKQEjZjz21e_639XkttoT4NvXYxUb8oTQ4X7hZKYLduQ@mail.gmail.com>
+	s=arc-20240116; t=1759361880; c=relaxed/simple;
+	bh=/YJyWVc70DsYNkENqsjV3BVENXgCeiYbvOJ2kGJtCZM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KyDu2LKvblX3uf73ci4jfjTVXjIVkbaLLw4yfsKfFS/dceXyssLIgmxCefQmGThEX87EJtVZeCdgdGFtSKiNgpLnQ5IJ+S+f1vQv9ZQHs+fx4xNYDwUdXoRHNlKzNodGQ4nk3ATOOz7mLMSZBu0+J9SgRLAcZIG2BfYFsSqJ8KQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PluDTP0j; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-28e538b5f23so3476365ad.3
+        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 16:37:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759361878; x=1759966678; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fawE0McOsv/LkcXHlBVgxtKf5QfaxJEVJNmSqn6topU=;
+        b=PluDTP0jBaUr5drkA22g0eFJ/yiG2o/nWug3rreY5u1oq6TX4WRTXps87HBWze99Rb
+         UkjQIbJ6IvGOhwu23AU/AmT/IzZnlSSNr2vUyXK0XP4RrFEtiIhP1VR42uSQSh8fmGc2
+         2YeAFBpmwu0ChO/E2dEpKXZNYR9OZJHx/mfIQVukc2bOrjmqpBSpxJOVZQaoWMVQF3Qn
+         4i9L2g+c8cW3nkFSsbF5ZkCitZ5cYgQSYArM2zHYd1mKPNzB8UuDUNKe9sI5KhssX9Pi
+         JzxqllRS4LEYQjKv1D6D5QkSQvv8UMrZ239KgKalhy+Ju3YgOaTVQE+/BxGtUyXzFkC5
+         5V9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759361878; x=1759966678;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fawE0McOsv/LkcXHlBVgxtKf5QfaxJEVJNmSqn6topU=;
+        b=Nr8KuIqz9WqHalYWxaWRqVs9sgqDVRqQ1JmDDSSnSFtvmycFhRU7FEpIxxy3MUFybC
+         aDCkXVAqTbsfPOXW2qD+vOxANvJpRIlXC4ySOlWJ+LlW5++BG9rK9LTp8g/0ZGfbVqid
+         HvDK4/y9cpbdT2Dj4niMlHeZXfdZwl4eo2E9r6c9Oe2I9OVjshLKsL50WOrepLwfxaVT
+         njfigkJEj6fN+tM6xABU/LjxCgsLsXjPwM/PS+soFR8AeD/GrnHSzIAYt/zIjYZjP1/s
+         LdyV+V3Fw/QLh1Lew8plZA03XCBiAc42eg9jq81DRt2/9wT8KPJ4zkAf5qBEkNjdkjk2
+         vPVg==
+X-Forwarded-Encrypted: i=1; AJvYcCU+x1Xv+qwWDNQzASeqI1ZJUcbxI5bPj08TJDPwUexpGvkbgOaR/CndOr75X+vTOeGRsnjCm4M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzM+5bXPizB9CnVCk+BTXcIT1Mkani/bwxOrb6754g6ethlyrm0
+	FJZypw/vjUWVS6rwLw35PMxPNT0NNb8CMU+BnRWHagZ2zH1DJ4o9GvceRyqJtTvNWGSlb45Zma4
+	alfgqeQ==
+X-Google-Smtp-Source: AGHT+IHcL5vhgpHMnYaKcCkcW4ne/4hSZUL+vIxzOxmHOa0MVEZjTY0wMs8SBME3EZtdNpCrh6s3uGzl/Cg=
+X-Received: from pjboi16.prod.google.com ([2002:a17:90b:3a10:b0:329:d461:9889])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1b63:b0:267:a942:788c
+ with SMTP id d9443c01a7336-28e7f2a152bmr63990295ad.1.1759361878314; Wed, 01
+ Oct 2025 16:37:58 -0700 (PDT)
+Date: Wed,  1 Oct 2025 23:37:54 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQKKQEjZjz21e_639XkttoT4NvXYxUb8oTQ4X7hZKYLduQ@mail.gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.618.g983fd99d29-goog
+Message-ID: <20251001233755.1340927-1-kuniyu@google.com>
+Subject: [PATCH v1 net] tcp: Don't call reqsk_fastopen_remove() in tcp_conn_request().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	syzkaller <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Oct 01, 2025 at 03:59:31PM -0700, Alexei Starovoitov wrote:
-> On Mon, Sep 29, 2025 at 12:48 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > Add a basic SHA-1 implementation to lib/, and make lib/bpf_legacy.c use
-> > it to calculate SHA-1 digests instead of the previous AF_ALG-based code.
-> >
-> > This eliminates the dependency on AF_ALG, specifically the kernel config
-> > options CONFIG_CRYPTO_USER_API_HASH and CONFIG_CRYPTO_SHA1.
-> >
-> > Over the years AF_ALG has been very problematic, and it is also not
-> > supported on all kernels.  Escalating to the kernel's privileged
-> > execution context merely to calculate software algorithms, which can be
-> > done in userspace instead, is not something that should have ever been
-> > supported.  Even on kernels that support it, the syscall overhead of
-> > AF_ALG means that it is often slower than userspace code.
-> 
-> Help me understand the crusade against AF_ALG.
-> Do you want to deprecate AF_ALG altogether or when it's used for
-> sha-s like sha1 and sha256 ?
+syzbot reported the splat below in tcp_conn_request(). [0]
 
-Altogether, when possible.  AF_ALG has been (and continues to be)
-incredibly problematic, for both security and maintainability.
+If a listener is close()d while a TFO socket is being processed in
+tcp_conn_request(), inet_csk_reqsk_queue_add() does not set reqsk->sk
+and calls inet_child_forget(), which calls tcp_disconnect() for the
+TFO socket.
 
-> I thought the main advantage of going through the kernel is that
-> the kernel might have an optimized implementation for a specific
-> architecture, while the open coded C version is generic.
-> The cost of syscall and copies in/out is small compared
-> to actual math, especially since compilers might not be smart enough
-> to use single asm insn for rol32() C function.
+After the cited commit, tcp_disconnect() calls reqsk_fastopen_remove(),
+where reqsk_put() is called due to !reqsk->sk.
 
-Not for small amounts of data, since syscalls are expensive these days.
+Then, reqsk_fastopen_remove() in tcp_conn_request() decrements the
+last req->rsk_refcnt and frees reqsk, and __reqsk_free() at the
+drop_and_free label causes the refcount underflow for the listener
+and double-free of the reqsk.
 
-(Aren't BPF programs usually fairly small?)
+Let's remove reqsk_fastopen_remove() in tcp_conn_request().
 
-BTW, both gcc and clang reliably lower rol32() to a single instruction.
+Note that other callers make sure tp->fastopen_rsk is not NULL.
 
-> sha1/256 are simple enough in plain C, but other crypto/hash
-> could be complex and the kernel may have HW acceleration for them.
-> CONFIG_CRYPTO_USER_API_HASH has been there forever and plenty
-> of projects have code to use that. Like qemu, stress-ng, ruby.
-> python and rust have standard binding for af_alg too.
-> If the kernel has optimized and/or hw accelerated crypto, I see an appeal
-> to alway use AF_ALG when it's available.
+[0]:
+refcount_t: underflow; use-after-free.
+WARNING: CPU: 12 PID: 5563 at lib/refcount.c:28 refcount_warn_saturate (lib/refcount.c:28)
+Modules linked in:
+CPU: 12 UID: 0 PID: 5563 Comm: syz-executor Not tainted syzkaller #0 PREEMPT(full)
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+RIP: 0010:refcount_warn_saturate (lib/refcount.c:28)
+Code: ab e8 8e b4 98 ff 0f 0b c3 cc cc cc cc cc 80 3d a4 e4 d6 01 00 75 9c c6 05 9b e4 d6 01 01 48 c7 c7 e8 df fb ab e8 6a b4 98 ff <0f> 0b e9 03 5b 76 00 cc 80 3d 7d e4 d6 01 00 0f 85 74 ff ff ff c6
+RSP: 0018:ffffa79fc0304a98 EFLAGS: 00010246
+RAX: d83af4db1c6b3900 RBX: ffff9f65c7a69020 RCX: d83af4db1c6b3900
+RDX: 0000000000000000 RSI: 00000000ffff7fff RDI: ffffffffac78a280
+RBP: 000000009d781b60 R08: 0000000000007fff R09: ffffffffac6ca280
+R10: 0000000000017ffd R11: 0000000000000004 R12: ffff9f65c7b4f100
+R13: ffff9f65c7d23c00 R14: ffff9f65c7d26000 R15: ffff9f65c7a64ef8
+FS:  00007f9f962176c0(0000) GS:ffff9f65fcf00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000000180 CR3: 000000000dbbe006 CR4: 0000000000372ef0
+Call Trace:
+ <IRQ>
+ tcp_conn_request (./include/linux/refcount.h:400 ./include/linux/refcount.h:432 ./include/linux/refcount.h:450 ./include/net/sock.h:1965 ./include/net/request_sock.h:131 net/ipv4/tcp_input.c:7301)
+ tcp_rcv_state_process (net/ipv4/tcp_input.c:6708)
+ tcp_v6_do_rcv (net/ipv6/tcp_ipv6.c:1670)
+ tcp_v6_rcv (net/ipv6/tcp_ipv6.c:1906)
+ ip6_protocol_deliver_rcu (net/ipv6/ip6_input.c:438)
+ ip6_input (net/ipv6/ip6_input.c:500)
+ ipv6_rcv (net/ipv6/ip6_input.c:311)
+ __netif_receive_skb (net/core/dev.c:6104)
+ process_backlog (net/core/dev.c:6456)
+ __napi_poll (net/core/dev.c:7506)
+ net_rx_action (net/core/dev.c:7569 net/core/dev.c:7696)
+ handle_softirqs (kernel/softirq.c:579)
+ do_softirq (kernel/softirq.c:480)
+ </IRQ>
 
-Well, userspace programs that want accelerated crypto routines without
-incorporating them themselves should just use a userspace library that
-has them.  It's not hard.
+Fixes: 45c8a6cc2bcd ("tcp: Clear tcp_sk(sk)->fastopen_rsk in tcp_disconnect().")
+Reported-by: syzkaller <syzkaller@googlegroups.com>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ net/ipv4/tcp_input.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-But iproute2 should be fine with just the generic C code.
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 71b76e98371a..e0057e5aaaf8 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -7264,7 +7264,6 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
+ 				    &foc, TCP_SYNACK_FASTOPEN, skb);
+ 		/* Add the child socket directly into the accept queue */
+ 		if (!inet_csk_reqsk_queue_add(sk, req, fastopen_sk)) {
+-			reqsk_fastopen_remove(fastopen_sk, req, false);
+ 			bh_unlock_sock(fastopen_sk);
+ 			sock_put(fastopen_sk);
+ 			goto drop_and_free;
+-- 
+2.51.0.618.g983fd99d29-goog
 
-As for why AF_ALG support keeps showing up in different programs, it's
-mainly just a misunderstanding.  But I think you're also overestimating
-how often it's used.  Your 5 examples were 4 bindings (not users), and 1
-user where it's disabled by default.
-
-There are Linux systems where it's only iproute2 that's blocking
-CONFIG_CRYPTO_USER_API_HASH from being disabled.  This patch is really
-valuable on such systems.
-
-- Eric
 
