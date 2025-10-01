@@ -1,95 +1,106 @@
-Return-Path: <netdev+bounces-227415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E172FBAEDDA
-	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 02:20:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAB1DBAEE07
+	for <lists+netdev@lfdr.de>; Wed, 01 Oct 2025 02:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A09AD3A6F53
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 00:20:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 849413AA357
+	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 00:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6DDD17A306;
-	Wed,  1 Oct 2025 00:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 190911A3BD7;
+	Wed,  1 Oct 2025 00:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uTXWjDD5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PWZ2TRDK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745E22CCC5;
-	Wed,  1 Oct 2025 00:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA131A239D;
+	Wed,  1 Oct 2025 00:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759278024; cv=none; b=J5XEJJyDqIuVtyQt4Hx1+R5jDJqf60eX+7pn8kDHiVn1ZDretpsPEj3lmw5Gg2dFVyl+d/ri95hu0uJcsEV8XEjssmlfENlIYX4d2fprBOCfuYxJb3Jfp4+NRKjmo+tCU7KPobj9fi49YOEH5cYE+CycDMNChTq6wRlcuhMkauI=
+	t=1759278625; cv=none; b=FKGIkUyzoFkiRv33V4xyybbfus+WRIKu8Ibi4wib8YlbyfAhNfKSB3fkaHSA2qBTKbkrjfp+I/PaoOGkwI3skqD6gEARw/L9BjUYCCgdiCLXSFTjKTb+tNVowUTd4GXJf9VG1LWyTuyQgisdm6utHFvrDTx/HGKzGqH23hESGoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759278024; c=relaxed/simple;
-	bh=m26ff45+YZIuIweKTgqVfUP8TSAnLz2buJEY7gdOkpw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p11uZCc0fjkdB42N5IM9EoJzj+lUey905sjg0VGB3ZOiEr+erB8kCThD7qVkf9Uh6glFpb1ba8FZ6xgKo/6xp+zXAocoXdZ8qfwC+nOG8PEPSPVW2h1vt1WIxjzVlIzkt94YnXPh1nnubX1lIHpSSuYoPnBuN4P+iC0bQyijVBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uTXWjDD5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A99EC113D0;
-	Wed,  1 Oct 2025 00:20:23 +0000 (UTC)
+	s=arc-20240116; t=1759278625; c=relaxed/simple;
+	bh=wZItWX+x0LGbQwKnFknuuh0aq7XRTSoTBsr985DKURE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=HnEIqXTenKTmUs0l1bWE21yGwkWYHvwVbG8knH4vv6aCaSaaAi3xwBoNz2AHJrw56ZUfmYe3zGtFNANL08gudNc4yeabtpnpw9T71AtPnD5bCwuUJkEQOrYolLr5EpdOApQpnHLuv3HNj6Yd8tLF/kZMKWndXyqhPSjihXItNoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PWZ2TRDK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50CBEC113D0;
+	Wed,  1 Oct 2025 00:30:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759278024;
-	bh=m26ff45+YZIuIweKTgqVfUP8TSAnLz2buJEY7gdOkpw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uTXWjDD51MSeKOJohAhYHujiMKU3dMzHwPFwjMZCmZDPDtaKT/YGz0LPNp2Kc1FCJ
-	 qlCeE8zlY9NPC5tLrrFH6RJ+0BGIMqF84MJW45OLrxv50itI4hawITmuMdNbTXqDmX
-	 GBQH0tWqmJxTI8QCZ6bzVNJUQCXpz9qcgcN5zeLF8a1fdyzuGrnhQWxfnqoXXjHmQq
-	 dhCCuQklmO3GXCAUniqSLjGvKrCQDsM8s2tEiZ7rxl92QIA/jvJmdICrMWihvcDgwR
-	 Ln2m/wcXYJw6+YtM8Z+1e/ADU8dvhJiE9PjMazyW6R91j1az7ROl1xGilxZce/bWpa
-	 IxSQvIQGPXeoA==
-Date: Tue, 30 Sep 2025 17:20:22 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Chen-Yu Tsai <wens@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec
- <jernej@kernel.org>, Samuel Holland <samuel@sholland.org>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
- linux-kernel@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
- Jernej Skrabec <jernej.skrabec@gmail.com>
-Subject: Re: [PATCH net-next v8 2/2] net: stmmac: Add support for Allwinner
- A523 GMAC200
-Message-ID: <20250930172022.3a6dd03e@kernel.org>
-In-Reply-To: <20250929180804.3bd18dd9@kernel.org>
-References: <20250925191600.3306595-1-wens@kernel.org>
-	<20250925191600.3306595-3-wens@kernel.org>
-	<20250929180804.3bd18dd9@kernel.org>
+	s=k20201202; t=1759278624;
+	bh=wZItWX+x0LGbQwKnFknuuh0aq7XRTSoTBsr985DKURE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PWZ2TRDKhu+KQDsk8mHHExZ2PbJkbKUDH/KkDvKq80Fp4CUd0UI2UXmrAmUc66XuA
+	 HjGNXQY7q5aP3HJgFOebBxIh0EmzdvzkNr6EAt0TLMKQjHLND4rtUdNtFUU4Qegokq
+	 u/701e51tZoG0k8tDUDO3qxQbkuBk4qoPc+ABXmRcLNKNJPkD1z2t0w1job4Uve7f0
+	 COWXtA4PdcoX4oTQy+72v80DR5QkiS+ggzFBOJGBusMOgDS2vLnoZ5QgI1/lSdA0G8
+	 +m1ofqTa8U1YGZf80iiJ7qbY2vk/1FS0cx2dy61lJ5Amq4UgSMgvk4F+Gq0qwms6qA
+	 cABynDoVZWbVg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C4039D0C1A;
+	Wed,  1 Oct 2025 00:30:18 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next V2 0/7] net/mlx5: misc changes 2025-09-28
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175927861725.2249992.6200051562471636595.git-patchwork-notify@kernel.org>
+Date: Wed, 01 Oct 2025 00:30:17 +0000
+References: <1759094723-843774-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1759094723-843774-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
+ moshe@nvidia.com
 
-On Mon, 29 Sep 2025 18:08:04 -0700 Jakub Kicinski wrote:
-> On Fri, 26 Sep 2025 03:15:59 +0800 Chen-Yu Tsai wrote:
-> > The Allwinner A523 SoC family has a second Ethernet controller, called
-> > the GMAC200 in the BSP and T527 datasheet, and referred to as GMAC1 for
-> > numbering. This controller, according to BSP sources, is fully
-> > compatible with a slightly newer version of the Synopsys DWMAC core.
-> > The glue layer around the controller is the same as found around older
-> > DWMAC cores on Allwinner SoCs. The only slight difference is that since
-> > this is the second controller on the SoC, the register for the clock
-> > delay controls is at a different offset. Last, the integration includes
-> > a dedicated clock gate for the memory bus and the whole thing is put in
-> > a separately controllable power domain.  
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 29 Sep 2025 00:25:16 +0300 you wrote:
+> Hi,
 > 
-> Hi Andrew, does this look good ?
+> This series contains misc enhancements to the mlx5 driver.
 > 
-> thread: https://lore.kernel.org/20250925191600.3306595-3-wens@kernel.org
+> Find V1 here:
+> https://lore.kernel.org/all/1758531671-819655-1-git-send-email-tariqt@nvidia.com/
+> 
+> [...]
 
-Adding Heiner and Russell, in case Andrew is AFK.
+Here is the summary with links:
+  - [net-next,V2,1/7] net/mlx5: HWS, Generalize complex matchers
+    https://git.kernel.org/netdev/net-next/c/906154caa7d3
+  - [net-next,V2,2/7] net/mlx5e: Prevent entering switchdev mode with inconsistent netns
+    https://git.kernel.org/netdev/net-next/c/06fdc45f16c3
+  - [net-next,V2,3/7] net/mlx5: Improve QoS error messages with actual depth values
+    https://git.kernel.org/netdev/net-next/c/33dbaa54ef43
+  - [net-next,V2,4/7] net/mlx5e: Remove unused mdev param from RSS indir init
+    https://git.kernel.org/netdev/net-next/c/a3f69641cbbc
+  - [net-next,V2,5/7] net/mlx5e: Introduce mlx5e_rss_init_params
+    https://git.kernel.org/netdev/net-next/c/fc92cddd7a83
+  - [net-next,V2,6/7] net/mlx5e: Introduce mlx5e_rss_params for RSS configuration
+    https://git.kernel.org/netdev/net-next/c/c40a94ccfdc7
+  - [net-next,V2,7/7] net/mlx5e: Use extack in set rxfh callback
+    https://git.kernel.org/netdev/net-next/c/a833538d1d8d
 
-We need an ack from PHY maintainers, the patch seems to be setting
-delays regardless of the exact RMII mode. I don't know these things..
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
