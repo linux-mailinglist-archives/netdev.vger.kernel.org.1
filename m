@@ -1,231 +1,127 @@
-Return-Path: <netdev+bounces-227608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F09BBB34F8
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 10:48:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6159BB3688
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 11:12:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7A2246087D
-	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 08:44:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9187F176699
+	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 09:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112F32F7ABA;
-	Thu,  2 Oct 2025 08:41:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81392ECD01;
+	Thu,  2 Oct 2025 09:12:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Lc/6wD/n";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="tcHAxREc";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Lc/6wD/n";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="tcHAxREc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hJypa9EG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1982DD5EF
-	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 08:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDB72FBE1C
+	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 09:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759394470; cv=none; b=fU4e2jQZ0/GPKZq7dTjd/ncMx3apIDWAUx0GSJgaX0P9HIJUlhyhGMLdKxMBTbTotbbGllgNa3h4KoexF2v90iuA4dSubDZlyAdh7y8QoJ/fjY8BpT5YlZoBC7x5GL9OmrCFTVqk/5S4cavtu44PA3yLiHJno0Yw1RMf1VhDTKk=
+	t=1759396351; cv=none; b=lup35S6EZmrnZAbT85a/GzAZ3XabhXKzIbNonpzuR5X0ipKv0Mv6ZOYCinq2AIux7OekQp9tdUkktXqLlebEkfhP8KkcXUPofXoIcCGcgU+XAJVTzrFN24jXXmXDUBWwELofCbefPfFl7NY40m0wWn3tGvfhmwZJocmeBOtT+Ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759394470; c=relaxed/simple;
-	bh=/E6rhITb/cjoI1ukvXjl3cvtzThBqqtGQTWZo1ZqgVw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=atUm7nYydP2nrE4q2iw9BU6qDt+dHfcXqTgcSKNPqqXomNdH5hCo0TCqX/LZ7GMry9xLSmJ1jQ/iGw2uS8V+eG8jGUpA9KLeBJecLTLY/1hQaXJz0ov0PV1J3fh6oFwjxr2qGDFpbofi+ytA3+0U5qLGPWJXrRxd9CS19GLQLAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Lc/6wD/n; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=tcHAxREc; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Lc/6wD/n; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=tcHAxREc; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 822D81F74C;
-	Thu,  2 Oct 2025 08:41:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1759394464; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eH9XbwduDIGri+NeNAU5ni9kwX6UbbeLjDQ6VnltoGs=;
-	b=Lc/6wD/ntXWlBNi5/ZRhd/7YAZ8sznPJBX5RHRHKfwGfFA7B1tTT3QywcSDV1sOk0siYjH
-	R6hTmmAXBQb5d50njznYKxwYtXyLHanI1MbzPdd8LE2n2yQwo3SWXoEcpG3z9stQ7qfbpm
-	x4wQvipkO62kRiyy+xPyT3Whtjqjc5U=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1759394464;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eH9XbwduDIGri+NeNAU5ni9kwX6UbbeLjDQ6VnltoGs=;
-	b=tcHAxREcGQBo6JX8Gtg5ds/wKcoNyYsuRu/FipYhTxV6aRrGhQF7GO85yTn7yHDEWd2ZQa
-	dfY0rdGFcBMCunAg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1759394464; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eH9XbwduDIGri+NeNAU5ni9kwX6UbbeLjDQ6VnltoGs=;
-	b=Lc/6wD/ntXWlBNi5/ZRhd/7YAZ8sznPJBX5RHRHKfwGfFA7B1tTT3QywcSDV1sOk0siYjH
-	R6hTmmAXBQb5d50njznYKxwYtXyLHanI1MbzPdd8LE2n2yQwo3SWXoEcpG3z9stQ7qfbpm
-	x4wQvipkO62kRiyy+xPyT3Whtjqjc5U=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1759394464;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eH9XbwduDIGri+NeNAU5ni9kwX6UbbeLjDQ6VnltoGs=;
-	b=tcHAxREcGQBo6JX8Gtg5ds/wKcoNyYsuRu/FipYhTxV6aRrGhQF7GO85yTn7yHDEWd2ZQa
-	dfY0rdGFcBMCunAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6F4EF13A85;
-	Thu,  2 Oct 2025 08:41:04 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id REPWGqA63mjbWgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 02 Oct 2025 08:41:04 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 15965A0A56; Thu,  2 Oct 2025 10:40:56 +0200 (CEST)
-Date: Thu, 2 Oct 2025 10:40:56 +0200
-From: Jan Kara <jack@suse.cz>
-To: Byungchul Park <byungchul@sk.com>
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com, 
-	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org, 
-	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, mingo@redhat.com, 
-	peterz@infradead.org, will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org, 
-	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com, 
-	johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu, willy@infradead.org, 
-	david@fromorbit.com, amir73il@gmail.com, gregkh@linuxfoundation.org, 
-	kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org, 
-	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com, sj@kernel.org, 
-	jglisse@redhat.com, dennis@kernel.org, cl@linux.com, penberg@kernel.org, 
-	rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org, linux-block@vger.kernel.org, 
-	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org, 
-	dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org, 
-	dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com, 
-	hamohammed.sa@gmail.com, harry.yoo@oracle.com, chris.p.wilson@intel.com, 
-	gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com, boqun.feng@gmail.com, 
-	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com, yeoreum.yun@arm.com, 
-	netdev@vger.kernel.org, matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net, 
-	catalin.marinas@arm.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org, gustavo@padovan.org, 
-	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de, lorenzo.stoakes@oracle.com, 
-	Liam.Howlett@oracle.com, rppt@kernel.org, surenb@google.com, mcgrof@kernel.org, 
-	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com, paulmck@kernel.org, 
-	frederic@kernel.org, neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com, 
-	josh@joshtriplett.org, urezki@gmail.com, mathieu.desnoyers@efficios.com, 
-	jiangshanlai@gmail.com, qiang.zhang@linux.dev, juri.lelli@redhat.com, 
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, bsegall@google.com, mgorman@suse.de, 
-	vschneid@redhat.com, chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com, 
-	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org, anna@kernel.org, 
-	kees@kernel.org, bigeasy@linutronix.de, clrkwllms@kernel.org, 
-	mark.rutland@arm.com, ada.coupriediaz@arm.com, kristina.martsenko@arm.com, 
-	wangkefeng.wang@huawei.com, broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk, 
-	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com, yuzhao@google.com, 
-	baolin.wang@linux.alibaba.com, usamaarif642@gmail.com, joel.granados@kernel.org, 
-	richard.weiyang@gmail.com, geert+renesas@glider.be, tim.c.chen@linux.intel.com, 
-	linux@treblig.org, alexander.shishkin@linux.intel.com, lillian@star-ark.net, 
-	chenhuacai@kernel.org, francesco@valla.it, guoweikang.kernel@gmail.com, link@vivo.com, 
-	jpoimboe@kernel.org, masahiroy@kernel.org, brauner@kernel.org, 
-	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com, andrii@kernel.org, 
-	wangfushuai@baidu.com, linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org, rcu@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH v17 30/47] fs/jbd2: use a weaker annotation in journal
- handling
-Message-ID: <bmthlv2tsd76mgzaoy5gspzdkved6le5xv23xjsc3yafkhrsgh@vvmjdwygm7gn>
-References: <20251002081247.51255-1-byungchul@sk.com>
- <20251002081247.51255-31-byungchul@sk.com>
+	s=arc-20240116; t=1759396351; c=relaxed/simple;
+	bh=RcmqH2hasCTaFwdsE15p4QyVlD2841+fk/eWY30INW8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y3JcQIYRLf5KrTcpzFo2UyAfvBZe9EP+Z8ZZbdzkYAL/Fuw7r/I5V1xeoQZEasW+EqfyPCoHAaG9aspzAraGgKISX7vah3purgJYmXWK82pg+XQVvperuLvwU1wKqbAUl8oKIHXCPtKdpaJvqq8gL7MeaOJUNJ1g9GyTiklCryM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hJypa9EG; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-57bc9775989so738351e87.1
+        for <netdev@vger.kernel.org>; Thu, 02 Oct 2025 02:12:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759396348; x=1760001148; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SqNzjYH5xlRPvKllO+jZgkU+xZgzkgDqg5jPD9MUtBQ=;
+        b=hJypa9EGu2ug5HTSvzHbjgDgACV+06oTvhx4gGfjGCmkIiYmZ1xyIR+ggSKmyh6LGa
+         iq51Bkvt6auQSDX0dMvP/NXrGsBecjWWxl/ZUrn/rm/c88ENc/z2DH4Qeiaij1LKMgiS
+         khkFvyNY3+S//Inb6VpaKjzo0DMvky4tkH8Rs6NbSZnBl/LlzfV6BxfcQEPBfKfRVWGD
+         cKLiI3pdtS4qqM6xFkH6QzQX2mFE3B8pngsQHKu0KKn6uGh9DVy2L73C7hEp6hvLrfN/
+         OoFXHKkb7Hf1dgtTThxrZy2V9Bb1nMS1h3v2mgJC1pPZV3TSFyYAWLCFSmAuUZE7fjYZ
+         kRJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759396348; x=1760001148;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SqNzjYH5xlRPvKllO+jZgkU+xZgzkgDqg5jPD9MUtBQ=;
+        b=aWpZTVBNRUhCoxMJd1qTeipu/8Zgz++HbND69HMSpmifo9SUF4c/ch09EBOydomDnb
+         lUnLWUpCIHYHTnyIjjaFEk0kSDggk8iLUgGlyYjGakjsIpMn/3Nenc7AJ3vmcVhRnA78
+         OnQ50JrPArGlcQDCKLB7CzEHCWlparrYgoj4UtHx4bEv7xt1GE38yWgNtgIOcezn3+If
+         wiFUbvRJmnhfUaWTyYfQbmDKo8eDEqnUDG0f0ObXD1bS9901vesh+ti2Ln4bMGH+6ni/
+         PG1Fi08PdymZbDpK5FL6QuhWFmXQbzqJTFSfnLZcghprkyEVJZX9mu8RZSOHN68/61im
+         r3Mw==
+X-Forwarded-Encrypted: i=1; AJvYcCV9LerNgezPYc14w+0bOsK43WKG6eErQ+c+GdhhSachZ3YjeGSwKhtGOZ+7fTwpk1ON5h+PZcw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzks06nM1KppwiRL9um5NvfdFsRtHQCRdYvdRxYXbB51fG4CWjR
+	P1EqCnOdzWcGzA5qgO4TnNpqoLl0gqpkl/trvI3JJ3l8+hllafBNHZRa
+X-Gm-Gg: ASbGncuL2fx3in7Cfu4iJ3SCvhYttfGLZBH38Tf+HjvlXmiWEAqhayJqfj74aV24Bqf
+	1pUFCLqTvCwLaoU+wsQ+WdQPJgAsSII9ojt/4aY920tOlGXr1vI0vKnUDPYcZqW8ArA6cjkw8xE
+	LYHSE5gg2mo28YhNn7aJf5JGjkG6kDKacZvtf6lvJ7gUYH4qpJ/MlnCt+ZlYi0A5i9DSSR6MNdz
+	KbBeD1mCiNXNvTA+lF/wiB+jVmINO1MpKa5/DmqcGUNkC1Y5Inn3ewOhhOh2CmgUNHGbF/lG//7
+	uUuXkiY/Et1u2IwEUSta5HzCs49aCg6G60LDKOLC5txIpZK0YKK8a0RrvPS/HCEnAawW4jBk8QR
+	Qm/xBHWxttR6NI4QYNjCMG8Bbe+o9hVv0mfTVeQtkFIDjQsLlHHUeNAIh83iraT/S1iX17Y8121
+	2SR7KPtApKUF0JBNcRbT5PVnwCdYmxO3gKm9gJPeHu
+X-Google-Smtp-Source: AGHT+IHmqauzbTKWvBhZLJdCPvoDD7qhBbz8dS6RzJZSNgA9ON9JkpJXzzCBzfbtFuPX9cZ/Tbb5Hw==
+X-Received: by 2002:a05:6512:3da5:b0:57b:c798:9edf with SMTP id 2adb3069b0e04-58af9f4ee42mr2234249e87.56.1759396347888;
+        Thu, 02 Oct 2025 02:12:27 -0700 (PDT)
+Received: from localhost.localdomain (broadband-109-173-93-221.ip.moscow.rt.ru. [109.173.93.221])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-58b01135b77sm661206e87.38.2025.10.02.02.12.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Oct 2025 02:12:27 -0700 (PDT)
+From: Alexandr Sapozhnkiov <alsp705@gmail.com>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Michael Chan <mchan@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexandr Sapozhnikov <alsp705@gmail.com>,
+	netdev@vger.kernel.org,
+	lvc-project@linuxtesting.org
+Subject: [PATCH] fix uninit value using in tg3_setup_fiber_mii_phy()
+Date: Thu,  2 Oct 2025 12:12:23 +0300
+Message-ID: <20251002091224.11-1-alsp705@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251002081247.51255-31-byungchul@sk.com>
-X-Spamd-Result: default: False [-0.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	FORGED_RECIPIENTS(2.00)[m:torvalds@linux-foundation.org,m:adilger.kernel@dilger.ca,m:peterz@infradead.org,m:will@kernel.org,m:tglx@linutronix.de,m:rostedt@goodmis.org,m:joel@joelfernandes.org,m:sashal@kernel.org,m:daniel.vetter@ffwll.ch,m:duyuyang@gmail.com,m:johannes.berg@intel.com,m:tj@kernel.org,m:willy@infradead.org,m:david@fromorbit.com,m:amir73il@gmail.com,m:kernel-team@lge.com,m:linux-mm@kvack.org,m:akpm@linux-foundation.org,m:mhocko@kernel.org,m:minchan@kernel.org,m:hannes@cmpxchg.org,m:vdavydov.dev@gmail.com,m:sj@kernel.org,m:dennis@kernel.org,m:cl@linux.com,m:penberg@kernel.org,m:rientjes@google.com,m:jlayton@kernel.org,m:dan.j.williams@intel.com,m:hch@infradead.org,m:djwong@kernel.org,m:rodrigosiqueiramelo@gmail.com,m:melissa.srw@gmail.com,m:hamohammed.sa@gmail.com,m:chris.p.wilson@intel.com,m:gwan-gyeong.mun@intel.com,m:max.byungchul.park@gmail.com,m:boqun.feng@gmail.com,m:yunseong.kim@ericsson.com,m:ysk@kzalloc.com,m:yeoreum.yun@arm.com,m:matthew.brost@intel.com,m:her0g
- yugyu@gmail.com,m:catalin.marinas@arm.com,m:bp@alien8.de,m:dave.hansen@linux.intel.com,m:x86@kernel.org,m:luto@kernel.org,m:sumit.semwal@linaro.org,m:christian.koenig@amd.com,m:andi.shyti@kernel.org,m:arnd@arndb.de,m:rppt@kernel.org,m:surenb@google.com,m:mcgrof@kernel.org,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:paulmck@kernel.org,m:frederic@kernel.org,m:neeraj.upadhyay@kernel.org,m:josh@joshtriplett.org,m:urezki@gmail.com,m:mathieu.desnoyers@efficios.com,m:jiangshanlai@gmail.com,m:qiang.zhang@linux.dev,m:vincent.guittot@linaro.org,m:dietmar.eggemann@arm.com,m:bsegall@google.com,s:linux-arm-kernel@lists.infradead.org,s:linaro-mm-sig@lists.linaro.org,s:linux-rt-devel@lists.linux.dev,s:ziy@nvidia.com,s:Dai.Ngo@oracle.com,s:okorniev@redhat.com,s:oleg@redhat.com,s:lillian@star-ark.net,s:tom@talpey.com,s:linux@treblig.org,s:francesco@valla.it,s:linux-arch@vger.kernel.org,s:linux-doc@vger.kernel.org,s:linux-i2c@vger.kernel.org,s:linux-media@vger.kernel.org,s:linux-modules@vger.ke
- rnel.org,s:linux-nfs@vger.kernel.org,s:rcu@vger.kernel.org,s:link@vivo.com];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ARC_NA(0.00)[];
-	TAGGED_RCPT(0.00)[renesas];
-	FREEMAIL_CC(0.00)[vger.kernel.org,skhynix.com,linux-foundation.org,opensource.wdc.com,dilger.ca,redhat.com,infradead.org,kernel.org,linutronix.de,goodmis.org,joelfernandes.org,ffwll.ch,gmail.com,intel.com,mit.edu,fromorbit.com,linuxfoundation.org,lge.com,kvack.org,cmpxchg.org,linux.com,google.com,suse.cz,vflare.org,toxicpanda.com,lists.freedesktop.org,oracle.com,ericsson.com,kzalloc.com,arm.com,lwn.net,alien8.de,linux.intel.com,zytor.com,linaro.org,padovan.org,amd.com,arndb.de,suse.com,nvidia.com,joshtriplett.org,efficios.com,linux.dev,suse.de,brown.name,talpey.com,huawei.com,amazon.co.uk,linux.alibaba.com,glider.be,treblig.org,star-ark.net,valla.it,vivo.com,baidu.com,lists.infradead.org,lists.linaro.org,lists.linux.dev];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLzt4hq9gcka5b6gad13h5baos)];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[150];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.com:email,sk.com:email]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -0.30
+Content-Transfer-Encoding: 8bit
 
-On Thu 02-10-25 17:12:30, Byungchul Park wrote:
-> jbd2 journal handling code doesn't want jbd2_might_wait_for_commit()
-> to be placed between start_this_handle() and stop_this_handle().  So it
-> marks the region with rwsem_acquire_read() and rwsem_release().
-> 
-> However, the annotation is too strong for that purpose.  We don't have
-> to use more than try lock annotation for that.
-> 
-> rwsem_acquire_read() implies:
-> 
->    1. might be a waiter on contention of the lock.
->    2. enter to the critical section of the lock.
-> 
-> All we need in here is to act 2, not 1.  So trylock version of
-> annotation is sufficient for that purpose.  Now that dept partially
-> relies on lockdep annotaions, dept interpets rwsem_acquire_read() as a
-> potential wait and might report a deadlock by the wait.
-> 
-> Replace it with trylock version of annotation.
-> 
-> Signed-off-by: Byungchul Park <byungchul@sk.com>
+From: Alexandr Sapozhnikov <alsp705@gmail.com>
 
-Indeed. Feel free to add:
+There is a way when we go to the goto fiber_setup_done label 
+and the condition current_link_up && current_duplex == DUPLEX_FULL 
+is met, then the tg3_setup_flow_control() function is executed with 
+undefined values of local_adv and remote_adv.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-								Honza
+Signed-off-by: Alexandr Sapozhnikov <alsp705@gmail.com>
+---
+ drivers/net/ethernet/broadcom/tg3.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> ---
->  fs/jbd2/transaction.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/fs/jbd2/transaction.c b/fs/jbd2/transaction.c
-> index c7867139af69..b4e65f51bf5e 100644
-> --- a/fs/jbd2/transaction.c
-> +++ b/fs/jbd2/transaction.c
-> @@ -441,7 +441,7 @@ static int start_this_handle(journal_t *journal, handle_t *handle,
->  	read_unlock(&journal->j_state_lock);
->  	current->journal_info = handle;
->  
-> -	rwsem_acquire_read(&journal->j_trans_commit_map, 0, 0, _THIS_IP_);
-> +	rwsem_acquire_read(&journal->j_trans_commit_map, 0, 1, _THIS_IP_);
->  	jbd2_journal_free_transaction(new_transaction);
->  	/*
->  	 * Ensure that no allocations done while the transaction is open are
-> -- 
-> 2.17.1
-> 
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index 1589a49b876c..1fa61328c1b9 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -5802,7 +5802,7 @@ static int tg3_setup_fiber_mii_phy(struct tg3 *tp, bool force_reset)
+ 	u32 current_speed = SPEED_UNKNOWN;
+ 	u8 current_duplex = DUPLEX_UNKNOWN;
+ 	bool current_link_up = false;
+-	u32 local_adv, remote_adv, sgsr;
++	u32 local_adv = 0, remote_adv = 0, sgsr;
+ 
+ 	if ((tg3_asic_rev(tp) == ASIC_REV_5719 ||
+ 	     tg3_asic_rev(tp) == ASIC_REV_5720) &&
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.43.0
+
 
