@@ -1,68 +1,67 @@
-Return-Path: <netdev+bounces-227634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32E04BB4513
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 17:27:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A329BB4519
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 17:27:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 275EB7AFE62
-	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 15:25:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC84219E24A1
+	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 15:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D901C5F37;
-	Thu,  2 Oct 2025 15:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 402AA1D8DFB;
+	Thu,  2 Oct 2025 15:26:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3238F1A2387
-	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 15:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E3A1ACEDC
+	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 15:26:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759418803; cv=none; b=tLLo4xwrQtrx0y9VdD70W9ybDYT/RFCI82yaBHsvwbLtBj9ZvAIchjOdz7sJLOlJcXBo2IJKs0HLGgVmqdW+lNgAUIHiy7OMZFGa4tMzbQxbzfolBRdmT1aFTA8Hdyjp4O+QL2Mm7Jt8NxBt4kx1H5Q6mR7fO+sA873D5cfnqow=
+	t=1759418804; cv=none; b=LD77NVYySCi2sEX9patjzBUmRDr9RVxGPhadIs/opPGadkmvVa+iKmsbHOZ2ku9bHuX7gSmW5iuqdPuvRzKgrcS/dE5JGWx5nxUkOtdFc8tkLJw+LLOfRUoIWzeYnwGZXTzaE7w9e33+2VoGH1gBMn596K5N1tuEVYH3RJkVvj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759418803; c=relaxed/simple;
-	bh=+RzgxlXhvAjihAWHcJSiVhsrURV2de8MPdHHcOWTs/g=;
+	s=arc-20240116; t=1759418804; c=relaxed/simple;
+	bh=Z86lLnI5Tm3fzb69918VDPeWt3usJ2k/s66dsD2rV1E=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=gWKCrmPWsXeHrP+eCumsvSfyXm31lQe9Uc0z6ME3WNgpq2QjICSF4pXi8uxuMqTCZ0V8ojaAGMhQP6dgxhL0VMYLvpgGSuEi/diJRxKete8OaHiCCQY2rh61uSW9wAx+ZoNx7v6V33grv/K55koIYMv9Jz5aQf+E0kw6K0rKFNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.42
+	 In-Reply-To:To:Cc; b=tMwziS+9Y0+GzWO32qwikzjT9pg1/tePEagng/nofdtT6w6i2DW1Oxry4gQFrWcKbq2hvw1v7/b4c/BE5a3mDyCwrkuLdZBc67ou6Zy7JOJq965xlwF9XcOMfjAk/RhSYqxPH/YnwWmDZbnAQ61aW2xuAqzThlZKRCVW0gFmj84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-628f29d68ecso2674305a12.3
-        for <netdev@vger.kernel.org>; Thu, 02 Oct 2025 08:26:40 -0700 (PDT)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-637dbabdb32so2036860a12.2
+        for <netdev@vger.kernel.org>; Thu, 02 Oct 2025 08:26:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759418799; x=1760023599;
+        d=1e100.net; s=20230601; t=1759418801; x=1760023601;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1CR8vj1NdfmaZYiunLULz9OPZOynQvbneaWGWn09HLE=;
-        b=e+D8E7A5Cy5XSUAR9k1b/o4Wvu2HjgiaG8F7JEFMuF7i6KhW2oPITfHURwu8pM8s3j
-         yTOPmCAAxSWsPaMp32p6G8xwXxjGHKS9/wfr3Jrv+K2TG3xE3sGFjiJ8qcW7xgemZK35
-         O2WH1+FJRVVbuFaBkqlKdUFmKWTSrKkYQMNiL/IBhGGfeU1JVDOrvlCwZfSIRe9viMCs
-         wMDsjl6W3QuLiR3f2HF3sCUxkO8pw6JxicTILOgYA50WAhzLOaYvrZqcNa5DP0z23/3I
-         LAMm1gOB5HfCBL8WHuQiB6vvauAsa0sfYVEOUQ3MV2OE0BYJ9nXUevG7R2pLyyVef/n7
-         bvxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWR+G3pIHRuQObyCV8xBdt1pJAudbLZ5uVBVVZdt6/JFxZYWN77OZJRlHdyk6QVYnqORezbxqg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6S7RuOFKNC5BGkMMSaJ1zA/gca2C996qRtXfdwSfA1cHNMu+F
-	419Tu2psv85TqOuwGMDVMfhs7GafyaR1qXuEgYFhPV8KBMUi9ttvrkeX
-X-Gm-Gg: ASbGncvsNzUcg2/E1XdyQkfzW/uWvBZbuGHEckzzWVrDQ9GZbDInqy1p+8kfJ5gjWvO
-	nlyDlObaBBPbZaCIt4etMHCfLKU2WCh4v0Zfw7BGaqcWTtiFTc8HYtnWMC8IdXMhmEHtS6FU7iD
-	4EMKSNWeuv5sXtXyNaY5vUfGe89Zz6HiFbUpHqA3aAQVb72FuRWyoGdedWkeXOq3r5vzXXxLFcp
-	zCe2+EGo+DY2RANmXiQaJvp1zCh1NzLZhyaVVNB2LvyTyI/g5R/9P0M6vOPbwjY/FK/Fq6W7oJj
-	vnA1cv4o+E4V36K6g3a7/HCuKeO789wOMcJy5UopBIZZBwWwir1c/XnuBP4JDq4mklSJjfypUAq
-	XtvqGn2Ub9Zkg3LSh4U5wJiDMp6JkejzuCAC3
-X-Google-Smtp-Source: AGHT+IGQezPxxiQ+1Z3VIlbAcwk+ye5bVV2z7QZN3w4RqsN7m5DXUIPTwn71y7T68heiqIIoL/CKuw==
-X-Received: by 2002:a05:6402:2793:b0:638:66b1:e5b3 with SMTP id 4fb4d7f45d1cf-63866b1e788mr564378a12.9.1759418799104;
-        Thu, 02 Oct 2025 08:26:39 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:1::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63788110530sm2065860a12.38.2025.10.02.08.26.38
+        bh=fV7gueGwrkVggKjpKT46wk+Vba2utbQt9f8Z8d2dnHs=;
+        b=X7zl3w3QIwS/WyBDTFzCgrpqOfiZZ4Ugo8W2FZjbq3/M4j9nJmWwO//niJl91Hnw5J
+         46+I7LLgadQi+6MGrbg9Ww61Dy9lX/p5W1XaX5X1SIlc+dibsPaBNMc79pzqQtD7mrJC
+         Iyxtwqx+iAnLUDExDeNbEex+a05O7nGWZesUHVJkGzVT+1chH8VZU937D6OkRkkcxrsI
+         413p/vTBDuoSTjJIqVp3v7/l0m/KT0J51iPbHxETr6yxk+G5yzFzY7Pzkt57O+uD4deg
+         BnDLAHdHNNl1wcSuN+TWaEXzkdnwZPNgEsiYVJBvue5gNF+s6iotw5on88EdSRiak4O+
+         0KUg==
+X-Forwarded-Encrypted: i=1; AJvYcCUtmWbu8L9pwcoa617J23PGye35T5kjIQPrD1LIU6maUj4dapNWTuR8RDE4LkYRsszEFAEhWBg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAGVLwg4ZAG1QGEGHtHTwv6jOSTkqQt2vmopgXa49aiVVF/nKc
+	vZvMECAi9qmQqn2rxOpmoVG3avheToLeZjYd0qae3YWbeYOtwo/k2tYE
+X-Gm-Gg: ASbGncvOdJWzxr3oNcHdZGeDx5CE0XGyflH/G2kDb4QdBELXoI3MnIdfjwtF+PM3XrI
+	KoVZneqffu8cHCxfn2NA32T0vJpgiQ+MUFGpbp4Pql7qcmj8oLOuJLLaSV8828yML2xbmSumAj0
+	zXoXLZMjWMVo+mKAQhzrNqtqNYkLymNlNheXnBL+OAEL5hmyaGYAK0Stb4P83ykH6Ljzwt4AKOL
+	5jn7PL15a17Q1T3gUzMnW5Z9BFdTcLIqpaykJq80gpQt17cf4KYDx5iZb1VY60Jg5kGQzxsWKge
+	OLBfWEAs8Gy0Z5GrWOwcsdsCipiU2WGvj5RgXvbuqQzBpaH4cnjpq4wjCuZFqvCjFRaa+nQfr7W
+	wUlu3BfPZEs1gr5zNcYIU6/bAixzKBtyfjkZhDQ==
+X-Google-Smtp-Source: AGHT+IHu4WE80t/90uYDNyDhdDM+IRvgxuoF7rHrcmkwwOikdOlCR5zfrTQPjaAV6zMrz5FIvlZlJA==
+X-Received: by 2002:a17:907:728e:b0:b3d:73e1:d809 with SMTP id a640c23a62f3a-b46ea414aefmr989484766b.48.1759418800558;
+        Thu, 02 Oct 2025 08:26:40 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:73::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b4869c4e613sm217854966b.81.2025.10.02.08.26.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Oct 2025 08:26:38 -0700 (PDT)
+        Thu, 02 Oct 2025 08:26:40 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
-Date: Thu, 02 Oct 2025 08:26:25 -0700
-Subject: [PATCH net v6 1/4] net: netpoll: fix incorrect refcount handling
- causing incorrect cleanup
+Date: Thu, 02 Oct 2025 08:26:26 -0700
+Subject: [PATCH net v6 2/4] selftest: netcons: refactor target creation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251002-netconsole_torture-v6-1-543bf52f6b46@debian.org>
+Message-Id: <20251002-netconsole_torture-v6-2-543bf52f6b46@debian.org>
 References: <20251002-netconsole_torture-v6-0-543bf52f6b46@debian.org>
 In-Reply-To: <20251002-netconsole_torture-v6-0-543bf52f6b46@debian.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -82,95 +81,94 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
  calvin@wbinvd.org, kernel-team@meta.com, calvin@wbinvd.org, 
- jv@jvosburgh.net, Breno Leitao <leitao@debian.org>, stable@vger.kernel.org
+ jv@jvosburgh.net, Breno Leitao <leitao@debian.org>
 X-Mailer: b4 0.15-dev-dd21f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2686; i=leitao@debian.org;
- h=from:subject:message-id; bh=+RzgxlXhvAjihAWHcJSiVhsrURV2de8MPdHHcOWTs/g=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBo3pmsL95LlY0VMP3W1luaxEiZHoPub6VfwaOQ4
- YbUFtc3yImJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaN6ZrAAKCRA1o5Of/Hh3
- baV0D/4r9TaEEvP77fTxZxdf0o0lCYQADBftm/XrTNtv1i0HqMi+xC9/hc+w1My4OpLHKGUashN
- 5yl2EVbjC8lP7AnP8Y1TRX8JvAERoE8qlj+PxeqRUDFKQZUSdrVIyo3hZoHpJ8xsfZCFsdd2MsA
- vV8REz1OkI1fGPJp3/8t5DEn+wSeNAsej2T34BMarJvJf5Az1PmObDgqdlyxO/17LfU3ps3iNc/
- Fns/L4fNn5TJlTAUS6OAqUgrw12vgApt283suPX5nvM2QIq3xm1Kq95HLrBRp4GNZwRYoSJd4Mx
- VC5f5Cr528QhBH+t5y9z7GcSBN991R8ejK7tZ8CWBSDj/82pCTdGlx+M6zBwAztheaqlIYVrTKL
- nCKxFFSN+OpA9LSD+Vh+5JLazleDzRw1U5IIpSR9jqEiHFoUJAFymWfYoKLM7ZHsZi2iA6ptskk
- dYDUhe6pDjna7MqvlJMuYZy+JV+bSNiyqMxyi3uDkXjFHdNYxpj8UBtQ5mtNVO7nzCJu05+jTS5
- cckHZJTyCqZKtmORZz+InyXov1PRHlx/mzyZDfH9snHjuzB6NzVtOXp7nXLJkSnGbN+gYwbjyjC
- Q3evFzvFqHJ9F8vHhoWTeAdHXkM66w4C2l7Mt7Fa7MpGtEvnUCDQdJ9uQ7QuKYk19FMsKgTB2Z5
- e9+sDOF7uivC4hQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2493; i=leitao@debian.org;
+ h=from:subject:message-id; bh=Z86lLnI5Tm3fzb69918VDPeWt3usJ2k/s66dsD2rV1E=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBo3pmspZB8YD2VU7zArjltNHoR3Lv5JL4ulcLK/
+ 0QwucYTe+CJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaN6ZrAAKCRA1o5Of/Hh3
+ bQu3EACLUz67wGRPN9BfvCvd4welZkaPX5R64wU0e0JPLIx8IybZT4DThQgjZo+SHbCPnOyyPev
+ ci4ZZlxLvQY4DX3zszY5Hj9mgzp87uLLiP3U76hnN8sKyVemm4b/JOmIxlYBkHmRzBozg/3BIdf
+ M/zs9uXms2MrN5+lkmoN9+d6hyA/fmULTbHc2nH3ZRI2VJsembz116cS2ncRS1Df00uSRZrvt0d
+ XCrlOLp/Rj3oUD8wDWzBE6ou7D8RLTS5TKLlZh+GxiRiBnUk4ycTfVu7tenhr/16hseDacUDnr8
+ +eyro2kmx3Ipi5gdesBRat4P7xzhiIuIkNYvNPUc0bnUiD75e2XSdBOk9kNofP4i1oisZcU8pMX
+ QaQVX0mVWr4URMEkJTgOSU6it8h2vsVmQCZgKdnJAHZ5s293JNNuzjGHXuLsmvg5mJDRP/lp2jQ
+ rmSrW4caPmcJpPSFFTBkkKF/1dFHCfBx5gX3Z/9Dvv/xdGJx/kB1CBLG+JfQybzTuKzZom7g2xV
+ UjxMbgw9yk/XNOKu+02TMxwBhdZeQwEgf5xefelb5sMfUAE/0dQUUE6SoL+LgDLxZuAfkGerS7i
+ +xnCrjc34r35cViwnYkLXkMwz7VhF82gBaoTm+n6I8zi+pakdwjeBX+lACJc+LFmVMxMP3DNmci
+ 1+VcNwkEQj2XmLw==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-commit efa95b01da18 ("netpoll: fix use after free") incorrectly
-ignored the refcount and prematurely set dev->npinfo to NULL during
-netpoll cleanup, leading to improper behavior and memory leaks.
+Extract the netconsole target creation from create_dynamic_target(), by
+moving it from create_dynamic_target() into a new helper function. This
+enables other tests to use the creation of netconsole targets with
+arbitrary parameters and no sleep.
 
-Scenario causing lack of proper cleanup:
+The new helper will be utilized by forthcoming torture-type selftests
+that require dynamic target management.
 
-1) A netpoll is associated with a NIC (e.g., eth0) and netdev->npinfo is
-   allocated, and refcnt = 1
-   - Keep in mind that npinfo is shared among all netpoll instances. In
-     this case, there is just one.
-
-2) Another netpoll is also associated with the same NIC and
-   npinfo->refcnt += 1.
-   - Now dev->npinfo->refcnt = 2;
-   - There is just one npinfo associated to the netdev.
-
-3) When the first netpolls goes to clean up:
-   - The first cleanup succeeds and clears np->dev->npinfo, ignoring
-     refcnt.
-     - It basically calls `RCU_INIT_POINTER(np->dev->npinfo, NULL);`
-   - Set dev->npinfo = NULL, without proper cleanup
-   - No ->ndo_netpoll_cleanup() is either called
-
-4) Now the second target tries to clean up
-   - The second cleanup fails because np->dev->npinfo is already NULL.
-     * In this case, ops->ndo_netpoll_cleanup() was never called, and
-       the skb pool is not cleaned as well (for the second netpoll
-       instance)
-  - This leaks npinfo and skbpool skbs, which is clearly reported by
-    kmemleak.
-
-Revert commit efa95b01da18 ("netpoll: fix use after free") and adds
-clarifying comments emphasizing that npinfo cleanup should only happen
-once the refcount reaches zero, ensuring stable and correct netpoll
-behavior.
-
-Cc: <stable@vger.kernel.org> # 3.17.x
-Cc: Jay Vosburgh <jv@jvosburgh.net>
-Fixes: efa95b01da18 ("netpoll: fix use after free")
 Signed-off-by: Breno Leitao <leitao@debian.org>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- net/core/netpoll.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh | 30 +++++++++++++++++++-----------
+ 1 file changed, 19 insertions(+), 11 deletions(-)
 
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index 60a05d3b7c249..f4a0023428265 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -814,6 +814,10 @@ static void __netpoll_cleanup(struct netpoll *np)
- 	if (!npinfo)
- 		return;
- 
-+	/* At this point, there is a single npinfo instance per netdevice, and
-+	 * its refcnt tracks how many netpoll structures are linked to it. We
-+	 * only perform npinfo cleanup when the refcnt decrements to zero.
-+	 */
- 	if (refcount_dec_and_test(&npinfo->refcnt)) {
- 		const struct net_device_ops *ops;
- 
-@@ -823,8 +827,7 @@ static void __netpoll_cleanup(struct netpoll *np)
- 
- 		RCU_INIT_POINTER(np->dev->npinfo, NULL);
- 		call_rcu(&npinfo->rcu, rcu_cleanup_netpoll_info);
--	} else
--		RCU_INIT_POINTER(np->dev->npinfo, NULL);
-+	}
- 
- 	skb_pool_flush(np);
+diff --git a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
+index 8e1085e896472..9b5ef8074440c 100644
+--- a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
++++ b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
+@@ -113,31 +113,39 @@ function set_network() {
+ 	configure_ip
  }
+ 
+-function create_dynamic_target() {
+-	local FORMAT=${1:-"extended"}
++function _create_dynamic_target() {
++	local FORMAT="${1:?FORMAT parameter required}"
++	local NCPATH="${2:?NCPATH parameter required}"
+ 
+ 	DSTMAC=$(ip netns exec "${NAMESPACE}" \
+ 		 ip link show "${DSTIF}" | awk '/ether/ {print $2}')
+ 
+ 	# Create a dynamic target
+-	mkdir "${NETCONS_PATH}"
++	mkdir "${NCPATH}"
+ 
+-	echo "${DSTIP}" > "${NETCONS_PATH}"/remote_ip
+-	echo "${SRCIP}" > "${NETCONS_PATH}"/local_ip
+-	echo "${DSTMAC}" > "${NETCONS_PATH}"/remote_mac
+-	echo "${SRCIF}" > "${NETCONS_PATH}"/dev_name
++	echo "${DSTIP}" > "${NCPATH}"/remote_ip
++	echo "${SRCIP}" > "${NCPATH}"/local_ip
++	echo "${DSTMAC}" > "${NCPATH}"/remote_mac
++	echo "${SRCIF}" > "${NCPATH}"/dev_name
+ 
+ 	if [ "${FORMAT}" == "basic" ]
+ 	then
+ 		# Basic target does not support release
+-		echo 0 > "${NETCONS_PATH}"/release
+-		echo 0 > "${NETCONS_PATH}"/extended
++		echo 0 > "${NCPATH}"/release
++		echo 0 > "${NCPATH}"/extended
+ 	elif [ "${FORMAT}" == "extended" ]
+ 	then
+-		echo 1 > "${NETCONS_PATH}"/extended
++		echo 1 > "${NCPATH}"/extended
+ 	fi
+ 
+-	echo 1 > "${NETCONS_PATH}"/enabled
++	echo 1 > "${NCPATH}"/enabled
++
++}
++
++function create_dynamic_target() {
++	local FORMAT=${1:-"extended"}
++	local NCPATH=${2:-"$NETCONS_PATH"}
++	_create_dynamic_target "${FORMAT}" "${NCPATH}"
+ 
+ 	# This will make sure that the kernel was able to
+ 	# load the netconsole driver configuration. The console message
 
 -- 
 2.47.3
