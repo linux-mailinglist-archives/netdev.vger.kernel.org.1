@@ -1,203 +1,171 @@
-Return-Path: <netdev+bounces-227618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92212BB3B05
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 12:49:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE14FBB3B55
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 12:57:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C05E14E06D7
-	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 10:49:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DD4B326E2C
+	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 10:57:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 572C030C619;
-	Thu,  2 Oct 2025 10:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BA930DD31;
+	Thu,  2 Oct 2025 10:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iy5Kc4OU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RO6SeJ0o"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2550130CB51;
-	Thu,  2 Oct 2025 10:49:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6024E149C7B;
+	Thu,  2 Oct 2025 10:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759402150; cv=none; b=XDNNWJuIn5kqXT6yuuuzommM5R4/RzpN2PKJn8xGEhJllWTKX+J0BNktJPwdqGvR3qImDVTj3MNE4t/Dji7DMtBXe6B3tTF0H6bxQRpqJa0S6JlrBZeG15qJomawzQZFIrEYmEh+9Rxnp93R0QYQ3BLhPsvW3lFz6VhZg+ZWVwY=
+	t=1759402635; cv=none; b=lc8N/Xp15vsKOGaGgQWLLq9cXNgKumIJhFYR7vbJTbAPtsQdlRWMbpGJYVc/36qGfOgnd6X2EABwdREBSttABDBWruF6MFv4UKWw15wDqkMfh6/HY+pbf3VvSqA6j4bZQu2Tx660O/OVWmCWnJ4CHxz71yob+uumFQGwWV1uDcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759402150; c=relaxed/simple;
-	bh=vjJ1Rya9Mo3Jc56kDyT2su4XqfOWp9kP825cCI/KYwo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ecMlXoqb0QUYotTUzbxJCdjOVdbzvM6MKselS5YKyDl1ltGp5guYTdfTnSpxcaJ4zHNcVZRFKqB0CX1F/uu+lsgiEiu3NmqTl9or4eZtHMsW/E5gJJZOqyfpHjz+qvec1iyUUy3LfGSTwvZ5yG9hL0+B2R2MlmdVWTVjzjOlWP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iy5Kc4OU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ECEEC4CEFB;
-	Thu,  2 Oct 2025 10:49:03 +0000 (UTC)
+	s=arc-20240116; t=1759402635; c=relaxed/simple;
+	bh=vb4CJXKjIP8Ior4EgVx6Qi8NH8Wh5PpPMwKXojQW4/U=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=uO1p1uSwoB52lSBcM8grV8ZDcHcC3AGhWvW1pb8zCtD9UVF+ZSPTP7dbk/x6XCCKE0GTZQETta9In3kJqSjb9kN/Iiyo+5PDjjOVM3tDHHssiWShPmAlZbIcjPrHmPEMALCJcNhzF+XKBLminvDBDx2AQ9IljuqT/v6QyUZjKGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RO6SeJ0o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20C8EC4CEF4;
+	Thu,  2 Oct 2025 10:57:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759402149;
-	bh=vjJ1Rya9Mo3Jc56kDyT2su4XqfOWp9kP825cCI/KYwo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Iy5Kc4OUSDvCPkJdoLRn3Zn8ew4Ky+ieK5tlqzHnyqnNW+rU5wVUfseVVQ7qGvCvC
-	 Up0Cm8Ie8vOye4incvQN1mvtCtjueoSQU/pNY8rU+A0SbzIHxcpQBkR4Z2Jxa9q8QJ
-	 Fkyvzvvb9XY3y4ubdpzeZSQl0IP8Kww5ahGY/Gii3DfaQcobTPdk5fgwIx0vv5mKAY
-	 lcdQhPslx92CQ20X6nAvhzKbMZqfvEflM3aIhlZDIOYt0w+wCWksXNrnoCnxNtvpOp
-	 6sSu/15NXKKsGMcKhExDpLqIh1rfiY1I1ovBZnf1OPA4hQREuEUwghJ9VUoS6fUjM/
-	 8BcW7bWFre3OQ==
-Message-ID: <138fe27b-7ed1-4065-827c-01e6df483153@kernel.org>
-Date: Thu, 2 Oct 2025 12:48:59 +0200
+	s=k20201202; t=1759402635;
+	bh=vb4CJXKjIP8Ior4EgVx6Qi8NH8Wh5PpPMwKXojQW4/U=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=RO6SeJ0oDKP/joEVdAhI9Kz2e9Ehx5wQ9Qu+ObcPKA7gNobEfB0qzbPFZcEBiumGA
+	 YSd3A+tnNNrHY+Kq9iwm8VA7F8Lj8PGWx0LdhzMzjYn7TsrXo4F9/v7ukIhFLWdQAf
+	 bjKbhMBda9XNIZSEfSozSymndNk7239ZTu0klIwPxAZQBQ66LZuheLsBnNG9sKCit8
+	 Z1a45lHwT8tPdonddNJXOZrvwn0dvFWbCgTVhASU/6Nn+hftydyOyxe2b1sfB8wzQF
+	 eTzQN2v+DGSa9MmK8gH1wUYOsEVdMKg+4tb6E36GF6TXHK7DKV5IumFKKSe7LNT/eD
+	 vkt7NY2z7L9uA==
+Message-ID: <1a71398e-637f-4aa5-b4c6-0d3502a62a0c@kernel.org>
+Date: Thu, 2 Oct 2025 12:57:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net] selftests: net: unify the Makefile formats
-Content-Language: en-GB, fr-BE
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org, jv@jvosburgh.net,
- olteanv@gmail.com, jiri@resnulli.us, mst@redhat.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, eperezma@redhat.com, kuniyu@google.com,
- martineau@kernel.org, pablo@netfilter.org, kadlec@netfilter.org,
- fw@strlen.de, antonio@openvpn.net, allison.henderson@oracle.com,
- petrm@nvidia.com, razor@blackwall.org, idosch@nvidia.com,
- linux-kselftest@vger.kernel.org, mptcp@lists.linux.dev,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org, davem@davemloft.net
-References: <20251002013034.3176961-1-kuba@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20251002013034.3176961-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: 6.17 crashes in ipv6 code when booted fips=1 [was: [GIT PULL] Crypto
+ Update for 6.17]
+From: Jiri Slaby <jirislaby@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ Vegard Nossum <vegard.nossum@oracle.com>, netdev@vger.kernel.org,
+ Eric Biggers <ebiggers@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+References: <aIirh_7k4SWzE-bF@gondor.apana.org.au>
+ <05b7ef65-37bb-4391-9ec9-c382d51bae4d@kernel.org>
+ <aN5GO1YLO_yXbMNH@gondor.apana.org.au>
+ <562363e8-ea90-4458-9f97-1b1cb433c863@kernel.org>
+ <8bb5a196-7d55-4bdb-b890-709f918abad0@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <8bb5a196-7d55-4bdb-b890-709f918abad0@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Jakub,
-
-On 02/10/2025 03:30, Jakub Kicinski wrote:
-> We get a significant number of conflicts between net and net-next
-> because of selftests Makefile changes. People tend to append new
-> test cases at the end of the Makefile when there's no clear sort
-> order. Sort all networking selftests Makefiles, use the following
-> format:
+On 02. 10. 25, 12:13, Jiri Slaby wrote:
+> On 02. 10. 25, 12:05, Jiri Slaby wrote:
+>> On 02. 10. 25, 11:30, Herbert Xu wrote:
+>>> On Thu, Oct 02, 2025 at 10:10:41AM +0200, Jiri Slaby wrote:
+>>>> On 29. 07. 25, 13:07, Herbert Xu wrote:
+>>>>> Vegard Nossum (1):
+>>>>>         crypto: testmgr - desupport SHA-1 for FIPS 140
+>>>>
+>>>> Booting 6.17 with fips=1 crashes with this commit -- see below.
+>>>>
+>>>> The crash is different being on 6.17 (below) and on the commit --
+>>>> 9d50a25eeb05c45fef46120f4527885a14c84fb2.
+>>>>
+>>>> 6.17 minus that one makes it work again.
+>>>>
+>>>> Any ideas?
+>>>
+>>> The purpose of the above commit is to remove the SHA1 algorithm
+>>> if you boot with fips=1.  As net/ipv6/seg6_hmac.c depends on the
+>>> sha1 algorithm, it will obviously fail if SHA1 isn't there.
+>>
+>> Ok, but I don't immediately see what is one supposed to do to boot 
+>> 6.17 distro (openSUSE) kernel with fips=1 then?
 > 
->  VAR_NAME := \
-> 	 entry1 \
-> 	 entry2 \
-> 	 entry3 \
->  # end of VAR_NAME
+> Now I do, in the context you write, I see inet6_init()'s fail path is 
+> broken. The two backtraces show:
+> [    2.381371][    T1]  ip6_mr_cleanup+0x43/0x50
+> [    2.382321][    T1]  inet6_init+0x365/0x3d0
 > 
-> Some Makefiles are already pretty close to this.
+> and
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> I think we need to apply this during the merge window, otherwise
-> the conflicts will be crazy.
+> [    2.420857][    T1]  proto_unregister+0x93/0x100
+> [    2.420857][    T1]  inet6_init+0x3a2/0x3d0
+> 
+> I am looking what exactly, but this is rather for netdev@
 
-Thank you for having sorted these files to reduce future conflicts
-between net and net-next! (Hopefully this will not cause too much
-troubles when backporting some patches to stable versions, but I guess
-new tests will rarely be backported.)
+More functions from the fail path are not ready to unroll and resurrect 
+from the failure.
 
-(...)
+Anyway, cherry-picking this -next commit onto 6.17 works as well (the 
+code uses now crypto_lib's sha1, not crypto's):
+commit 095928e7d80186c524013a5b5d54889fa2ec1eaa
+Author: Eric Biggers <ebiggers@kernel.org>
+Date:   Sat Aug 23 21:36:43 2025 -0400
 
-> diff --git a/tools/testing/selftests/net/mptcp/Makefile b/tools/testing/selftests/net/mptcp/Makefile
-> index 4c7e51336ab2..e3a8dbdc71cd 100644
-> --- a/tools/testing/selftests/net/mptcp/Makefile
-> +++ b/tools/testing/selftests/net/mptcp/Makefile
-> @@ -4,13 +4,31 @@ top_srcdir = ../../../../..
->  
->  CFLAGS += -Wall -Wl,--no-as-needed -O2 -g -I$(top_srcdir)/usr/include $(KHDR_INCLUDES)
->  
-> -TEST_PROGS := mptcp_connect.sh mptcp_connect_mmap.sh mptcp_connect_sendfile.sh \
-> -	      mptcp_connect_checksum.sh pm_netlink.sh mptcp_join.sh diag.sh \
-> -	      simult_flows.sh mptcp_sockopt.sh userspace_pm.sh
-> +TEST_PROGS := \
-> +	mptcp_connect.sh \
-> +	mptcp_connect_mmap.sh \
-> +	mptcp_connect_sendfile.sh \
-> +	mptcp_connect_checksum.sh \
-> +	pm_netlink.sh \
-> +	mptcp_join.sh \
-> +	diag.sh \
-> +	simult_flows.sh \
-> +	mptcp_sockopt.sh \
-> +	userspace_pm.sh \
-> +# end of TEST_GEN_FILES
+     ipv6: sr: Use HMAC-SHA1 and HMAC-SHA256 library functions
 
-Strange, I think all other blocks are OK in this patch, except this one:
-the order is the same as before (so not sorted by alphabetical order),
-and the last line is not "# end of TEST_PROGS" as expected.
 
-I'm sure this detail can be fixed when applying the patch, or with an
-extra one if that's easier, instead of sending a v2 and delaying this
-type of patch.
+I don't know what to do next -- should it be put into 6.17 stable later 
+and we are done?
 
-Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
->  
-> -TEST_GEN_FILES = mptcp_connect pm_nl_ctl mptcp_sockopt mptcp_inq mptcp_diag
-> +TEST_GEN_FILES := \
-> +	mptcp_connect \
-> +	mptcp_diag \
-> +	mptcp_inq \
-> +	mptcp_sockopt \
-> +	pm_nl_ctl \
-> +# end of TEST_GEN_FILES
->  
-> -TEST_FILES := mptcp_lib.sh settings
-> +TEST_FILES := \
-> +	mptcp_lib.sh \
-> +	settings \
-> +# end of TEST_FILES
->  
->  TEST_INCLUDES := ../lib.sh $(wildcard ../lib/sh/*.sh)
-
-(...)
-
-Cheers,
-Matt
+thanks,
 -- 
-Sponsored by the NGI0 Core fund.
+js
+suse labs
 
 
