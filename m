@@ -1,166 +1,104 @@
-Return-Path: <netdev+bounces-227621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E18AABB3BAC
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 13:21:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A61ABB3BDA
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 13:27:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9538C3C6B80
-	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 11:21:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B785E19217BD
+	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 11:28:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A7730F95A;
-	Thu,  2 Oct 2025 11:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F128930F552;
+	Thu,  2 Oct 2025 11:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="C0l0h4hj"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Oy1O6G9J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C848B30FC30
-	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 11:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48029149C6F;
+	Thu,  2 Oct 2025 11:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759404096; cv=none; b=cfCZnkpuv81VPg+6YjbjZA6xmNS0Mg3ZyYfc/RGXfd6FBDiqBGaduXMOaqRxj6lPIOMY8gHpwAy1j7HpXj2vIggd7RBtntxiEb2LP5qqyzupanuO40u4ZCJnu8cbM3pwRjzmdR54Bcs94onaoGQVI6J0YKll6vp2NyEjET1H3hA=
+	t=1759404462; cv=none; b=nugT9BmGw90JlyIN3aufkhMXIB2d3YdnL2Kf/YKjDZt+owHXnEDDfvkc8eP1KwK2nw211x0fW057g8HeMA8g5dIMN0nF29E77MYwBMHFn1DX0nEr8Zai75EeVBIFIel+NLBlWYEBlg9f9/aScFwSrAlLoANAMHZNzj5BAyxrMe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759404096; c=relaxed/simple;
-	bh=3cxRSFnxztdEl/3oe3MZqyfMjZ9kLl6iWNxsJEA9qnw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W7m3qeFVQOLlhAEJCHFSD9P6IeVGc06EdVo3gwvAzoZZz4H3hzTxxYkyRadfT4UnhW1H7KENnJ8SGj71aDpZJexc6trmILVSFFZl7xbvQedCv5RhAxwd9kWQZ5yhAZ4XjnKv8MHmNSF8UrGtyl9nCl72APKtGA/+k8ao94RmZBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=C0l0h4hj; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-42421b1514fso411439f8f.2
-        for <netdev@vger.kernel.org>; Thu, 02 Oct 2025 04:21:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1759404093; x=1760008893; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=esegZxLK+U9QQi38ZxjBs00HRaUbGD3FZCXde5Cjxmo=;
-        b=C0l0h4hjCBWvZNRD/PrT79yQ8iTIJKY+t6c1b8RuAGfpBm1gHPhjSZFbPhilWfRges
-         usgC6lJ5afzqFQvhVPPftd5HtT0WlKxth8wi9rJtARxScTI68PZuqP504IFtsIXphpk/
-         8ocwGXjugBUvaUxvsyRCZV1ZJG7bdn76Sr1f8l32lIWY9UCltur8zSw9ptYqr1VRTUL9
-         j4UMT0fdJtnjlBQdqn70C+LW0GdXzKlFgn5frkadwCpi+31crs71RWT5do86Go3B5Wql
-         cEp6H4DdUuOV8vQIi1dJJa7UokBaov6MHpORqoKr6lnE7NKGJqgFK7OgazPlMi9j97BV
-         ueXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759404093; x=1760008893;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=esegZxLK+U9QQi38ZxjBs00HRaUbGD3FZCXde5Cjxmo=;
-        b=qC0LdvWTihfTHd36wKXkW9im7gXndJqdWR+QBqzawpKOaadcF6jT1KhJRAv++6iJEm
-         wp+/oaluWdIblo7fNs20tVS0HsV5JOxkS+gmNVaUzkbh7TdHMkeMc22SxSf/2czCGuIP
-         vjy8ixNJzs0jnDazVVpw2hn58/v8slX6xkl0K5UI9fHNaFubp8YM9cOeQi97E87AyNzu
-         UA6f9JAUHTthwRoe3x9TIY3gQM1YsUEZmr5G4LK/DzcITVIo5ciBcIowWFehcXYCvMTM
-         i7e+5/yMT0NTTlZM6WKuPw83EtbCoUxxKtF2ZWqvRB3FFMPqSLKuiXJVw63QIB+TzH5y
-         Ptlw==
-X-Gm-Message-State: AOJu0Yy3c+Vg9tVf6WD9iBS/YAkcU5TswsYvY86tIk4o/FH1aJLrFHmL
-	g9rYGU5jDaOcf5MeGmYkKebx0+jylkNxBQeUrLzMitHe7UfG5LGSwUJ4ijpLGLb7MuCqsLBP6MV
-	MLhwsEh6fN6FxNXRAAFZaCL6a67Bs46A+C+k9++gs2zmc301otRQ=
-X-Gm-Gg: ASbGncvdMBtZoyDy3SYkJT4kIoEdYI6ZYJvaa7w2rU5JK3tefACA4rpWQiGdgrEsNHy
-	CYKpeoDXJ4CggQhiXy14SoF0dN1EVAYdgraSGmogW58FQ03LN9tzhtRqlCFiImA9mKoa9r7VQJm
-	rhZy+SHnyvNpkwnI4H45r4mB88Hp3W9m5Ew08J/NuMYrV8vdQ6eSAo/eL6w4n2Et2eUeD1gNZjF
-	Q7wNRIXdxL06XVI4sjBzjj/66S5rlpL3XaJcHo6aq0XcYuzYSAlRw3hFFccZmJ0yvXEw0IelbAD
-	QRT/uApA8B3+ZyhpLxm/z0asfHRkSJyqol5YMIxKeoGd2i6dvMyzxsQv+DjIXpbjtP13jF0vnbc
-	+9lS5beRBLbBXnxB8YuDmSTTcQW2kKEL3yYzixBkZmvOlTUfDAbZoDk3T+2CGfGii/XabNEQJP5
-	WRN/pBXvo76g==
-X-Google-Smtp-Source: AGHT+IGTNHfoolP7+ES6We+KAQbTbUt0PMziY5xH2uTnyMl7liaQQ0xnKzGrdwuUKABeYW6vjPRNyQ==
-X-Received: by 2002:a05:6000:400a:b0:3e5:394d:10bb with SMTP id ffacd0b85a97d-4255780b19cmr4417882f8f.41.1759404093053;
-        Thu, 02 Oct 2025 04:21:33 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:9bfe:b0f3:b629:60c8? ([2001:67c:2fbc:1:9bfe:b0f3:b629:60c8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4255d8e970esm3214763f8f.35.2025.10.02.04.21.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Oct 2025 04:21:32 -0700 (PDT)
-Message-ID: <8aac2981-4c90-45d3-841a-1447aca3931f@openvpn.net>
-Date: Thu, 2 Oct 2025 13:21:31 +0200
+	s=arc-20240116; t=1759404462; c=relaxed/simple;
+	bh=Egm0T8cSzPyrQsOMXP9uiDZImB/BFusEsrwgMevPWwo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bes8zn0hwApUBD7LlAwiZWf6x6glbjUz7FFtRg2sdUecDk8Hp2DeyQwUhW7FEUAlbY6uaGk3KqrFM7r4zPOxSxDd5kzmGFWHg43MiE7OGQs/yiWSs8nkfNWBoea1EHA9GjDwXRX59imlk08IxWX1ne4HbBslv69C/tteJVkuBDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Oy1O6G9J; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:MIME-Version:References:
+	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
+	reply-to; bh=NKN2jJAcUQAltvUw4+OVLkUL2lRdIIFnP1PmgDZHiEA=; b=Oy1O6G9Jjea8PF9g
+	DzEESfzU4hlh5I2toehR4D1F4aqJQNjGC6kDTak9Cl2GOvB0Va7LTDUKHY3FTG2PTwKQxwEVEMNvK
+	YC9C4vYN7bQ8uG5eY2CSZoa8vI+5/I9+qZDKcy/byXJw4yH0CmO8GB3o6a/a6mIEMyDDXzHLc7GRj
+	iFtelG5yarOpEG9o9yz0zxM2nt76cZtF3B2KELYig5ehUuJdpKrqKnhxjsyeHeKLellGhGwvYI7m7
+	qCAn++lIGHuVlyrQV1QemhxVZPvkG55b1AIn8sXMoiv7j3yYUNHy4V48WtQAdfNv/xwzdb2z7f8HF
+	buGP6wd3E0GSNM9+6w==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1v4HT9-00A0Pp-1F;
+	Thu, 02 Oct 2025 19:27:32 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 02 Oct 2025 19:27:31 +0800
+Date: Thu, 2 Oct 2025 19:27:31 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Jiri Slaby <jirislaby@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Vegard Nossum <vegard.nossum@oracle.com>, netdev@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: Re: 6.17 crashes in ipv6 code when booted fips=1 [was: [GIT PULL]
+ Crypto Update for 6.17]
+Message-ID: <aN5ho_VTClL5ai8l@gondor.apana.org.au>
+References: <aIirh_7k4SWzE-bF@gondor.apana.org.au>
+ <05b7ef65-37bb-4391-9ec9-c382d51bae4d@kernel.org>
+ <aN5GO1YLO_yXbMNH@gondor.apana.org.au>
+ <562363e8-ea90-4458-9f97-1b1cb433c863@kernel.org>
+ <8bb5a196-7d55-4bdb-b890-709f918abad0@kernel.org>
+ <1a71398e-637f-4aa5-b4c6-0d3502a62a0c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] selftests: net: unify the Makefile formats
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org, jv@jvosburgh.net,
- olteanv@gmail.com, jiri@resnulli.us, mst@redhat.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, eperezma@redhat.com, kuniyu@google.com,
- matttbe@kernel.org, martineau@kernel.org, pablo@netfilter.org,
- kadlec@netfilter.org, fw@strlen.de, allison.henderson@oracle.com,
- petrm@nvidia.com, razor@blackwall.org, idosch@nvidia.com,
- linux-kselftest@vger.kernel.org, mptcp@lists.linux.dev,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-References: <20251002013034.3176961-1-kuba@kernel.org>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <20251002013034.3176961-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1a71398e-637f-4aa5-b4c6-0d3502a62a0c@kernel.org>
 
-On 02/10/2025 03:30, Jakub Kicinski wrote:
-> We get a significant number of conflicts between net and net-next
-> because of selftests Makefile changes. People tend to append new
-> test cases at the end of the Makefile when there's no clear sort
-> order. Sort all networking selftests Makefiles, use the following
-> format:
+On Thu, Oct 02, 2025 at 12:57:11PM +0200, Jiri Slaby wrote:
+>
+> Anyway, cherry-picking this -next commit onto 6.17 works as well (the code
+> uses now crypto_lib's sha1, not crypto's):
+> commit 095928e7d80186c524013a5b5d54889fa2ec1eaa
+> Author: Eric Biggers <ebiggers@kernel.org>
+> Date:   Sat Aug 23 21:36:43 2025 -0400
 > 
->   VAR_NAME := \
-> 	 entry1 \
-> 	 entry2 \
-> 	 entry3 \
->   # end of VAR_NAME
+>     ipv6: sr: Use HMAC-SHA1 and HMAC-SHA256 library functions
 > 
-> Some Makefiles are already pretty close to this.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> I don't know what to do next -- should it be put into 6.17 stable later and
+> we are done?
 
-for the ovpn bits:
+Yes that works too.  But it's basically the same as reverting
+the patch from Vegard since it makes the code use SHA1 again
+even though we told it not too.
 
-Acked-by: Antonio Quartulli <antonio@openvpn.net>
+Perhaps we should just revert Vegard's change? Since it's kind
+of pointless now that people are just using the underlying SHA1
+algorithm directly through lib/crypto.
 
+Cheers,
 -- 
-Antonio Quartulli
-OpenVPN Inc.
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
