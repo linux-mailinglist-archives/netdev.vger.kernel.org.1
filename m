@@ -1,106 +1,100 @@
-Return-Path: <netdev+bounces-227551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86216BB2BFB
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 09:55:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2784BB2C4B
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 10:06:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCDD23C38C2
-	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 07:55:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2F8D18967A1
+	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 08:06:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DBB12D320E;
-	Thu,  2 Oct 2025 07:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74F702D1F68;
+	Thu,  2 Oct 2025 08:06:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E072D239B;
-	Thu,  2 Oct 2025 07:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22F427281D
+	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 08:06:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759391704; cv=none; b=oKV6+CnJzrtrj5tAM7FPryL5bbeVN7baGkmTumNZS+W4rdBde2SbtBFNNALSXnM/+TlVBdKfjApcHZLIXn9LuIrgFnaGVOqaMQhxUc8PTMPG5VNBOI5tlwnDkNTZ2CMGyAxfetHmSIIZaNCV6FR/QCYA9sHdR855j4E7fmY8Frk=
+	t=1759392365; cv=none; b=X3ArPp1eoYRBeLGsAGus0p4Q43KTqYhSjhSAbg1ZRgYCp/7g7PLFIwziMi+pJdoJ/FpR2vLTv0fYhclVtcmkQI24eiHfhxgXhofV9oYu4JwHz7zxwLy6qnOgtlKRkHntECbqKTq4tYKX6SB4BJt2h6YDBgENgrbJCQ0+amsOH5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759391704; c=relaxed/simple;
-	bh=xXHP/WK5yRRpU2UsD3sbFAGoRGxEXGuWI7BYMSJQPs4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UUtxWKDCkDdA940NCj9GIHbuGERQDfnsUhugJP93mIEkxull+YMHRNSDmzTMCE/TvIG5oIRUIWixBW0s3zk+fOtio6d5vCQQVhaNRMsWifPZRLcVgkUmtpBf+9U9t98qFDxiPoOhHRgOZ5kgKMOEYBUNSM1GNlAYozLc0nA8uQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 9FA7D6032B; Thu,  2 Oct 2025 09:55:00 +0200 (CEST)
-Date: Thu, 2 Oct 2025 09:55:00 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 nf-next 2/2] netfilter: nf_flow_table_core: teardown
- direct xmit when destination changed
-Message-ID: <aN4v1DB2S-AWTXAR@strlen.de>
-References: <20250925182623.114045-1-ericwouds@gmail.com>
- <20250925182623.114045-3-ericwouds@gmail.com>
+	s=arc-20240116; t=1759392365; c=relaxed/simple;
+	bh=H2f+b7bYF80DwF/uu1GLXQLAHJtRAh3KzgqzNeXWvjg=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=sVqv9w2moRHCx/6ACB0GmPhM94WLqxv+ZHutTGaQJRatzQxQgSn4kDrbn8J73tyivaS2VQEqtiJV6QvukaatFeaBjY/RfviighBEl66t7ZvbvryvoFvDbA2aY5+YBIQ7SijplwPfsB8JecHYeXYHN7KVq22Suio10IHQSAz7UoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-4297610aacaso9850395ab.3
+        for <netdev@vger.kernel.org>; Thu, 02 Oct 2025 01:06:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759392363; x=1759997163;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xwnfbejvU/0snnp4jupt0tXVwPkfHCODhEws6EOmv98=;
+        b=uT960NL+BmzsrQqKv025WWlJiTKCAUAvv07qrnwXbkeFvfNC8nCGlc53vdW74RZ8eZ
+         U5vUN4/qSohlsiKdshsdJHgYpG++sRAwmJ91VH7QTw8HEJO1Fsk/Qvpbs5t5Xo1Igvag
+         k7hiprv8qCYRHXZXokRGtd+yjm3i3t9w7IUxGcSf1NGahNGcpAVCpfDM4GJC3OlcCz3a
+         Rpe+7E1ssb8L9aZYVHvwHtjAGji+Iws775v0mSZA0bkhKj2Twbjo42hK9tuXD90D1/Vf
+         dpC3g7uPWopMP5YFds7JI4zQh8mUReB0CLIxolVkwHeKE5ranL+Zovwl6tStKZDLk2sz
+         jRmg==
+X-Forwarded-Encrypted: i=1; AJvYcCV9s5PuV7xGPdEmBVM7Aq2hQKJc8JdeM7vUhRhlm8LOytO36ijXgs12NFjCf71dMJxuU5GrYg8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhSS4hd8wJ2BMkA6dH5wyQwL2/srtSJZNRzezAcp6PuFHtbY9r
+	ZpP2BTnFVRvdDThqdFGTvxIu5xtk7O8pH1OaiCAoZb2dhfMN3N4IW+ZwLZIwdP+3asUMwc+NwA/
+	ZUYixeESHb/nqiUVHFFyHIA7VGqBzBN/H9T3ZyTFEEhN84nlLYUzIPGecmqQ=
+X-Google-Smtp-Source: AGHT+IG32w4FLuxtEn6BlB7z8u28oSCKGQTynJTLuVTKOUpIoywYs5HwgY0t0PbJ60WEHPtN7CF3apR6QCzLf8Rr1gSx8kZ1hHQR
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250925182623.114045-3-ericwouds@gmail.com>
+X-Received: by 2002:a05:6e02:3521:b0:42d:84ec:b5da with SMTP id
+ e9e14a558f8ab-42d84ecb8ecmr54089555ab.10.1759392363003; Thu, 02 Oct 2025
+ 01:06:03 -0700 (PDT)
+Date: Thu, 02 Oct 2025 01:06:02 -0700
+In-Reply-To: <68dd8c99.a00a0220.102ee.0061.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68de326a.050a0220.25d7ab.0780.GAE@google.com>
+Subject: Re: [syzbot] [fs?] WARNING in copy_mnt_ns
+From: syzbot <syzbot+e0f8855a87443d6a2413@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, anna-maria@linutronix.de, 
+	anna.schumaker@oracle.com, bodonnel@redhat.com, brauner@kernel.org, 
+	cgroups@vger.kernel.org, cyphar@cyphar.com, davem@davemloft.net, 
+	edumazet@google.com, frederic@kernel.org, hannes@cmpxchg.org, 
+	horms@kernel.org, jack@suse.cz, jlayton@kernel.org, joel.granados@kernel.org, 
+	kuba@kernel.org, kuniyu@google.com, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mawupeng1@huawei.com, mkoutny@suse.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, rostedt@goodmis.org, 
+	sd@queasysnail.net, syzkaller-bugs@googlegroups.com, tglx@linutronix.de, 
+	tj@kernel.org, viro@zeniv.linux.org.uk
+Content-Type: text/plain; charset="UTF-8"
 
-Eric Woudstra <ericwouds@gmail.com> wrote:
-> +static void nf_flow_table_do_cleanup_addr(struct nf_flowtable *flow_table,
-> +					  struct flow_offload *flow, void *data)
-> +{
-> +	struct flow_cleanup_data *cud = data;
-> +
-> +	if ((flow->tuplehash[0].tuple.xmit_type == FLOW_OFFLOAD_XMIT_DIRECT &&
-> +	     flow->tuplehash[0].tuple.out.ifidx == cud->ifindex &&
-> +	     flow->tuplehash[0].tuple.out.bridge_vid == cud->vid &&
-> +	     ether_addr_equal(flow->tuplehash[0].tuple.out.h_dest, cud->addr)) ||
-> +	    (flow->tuplehash[1].tuple.xmit_type == FLOW_OFFLOAD_XMIT_DIRECT &&
-> +	     flow->tuplehash[1].tuple.out.ifidx == cud->ifindex &&
-> +	     flow->tuplehash[1].tuple.out.bridge_vid == cud->vid &&
-> +	     ether_addr_equal(flow->tuplehash[1].tuple.out.h_dest, cud->addr))) {
+syzbot has bisected this issue to:
 
-I think it would be better to have a helper for this, so
-it boils down to:
-if (__nf_flow_table_do_cleanup_addr(flow->tuplehash[0]) ||
-    __nf_flow_table_do_cleanup_addr(flow->tuplehash[1]))
+commit be5f21d3985f00827e09b798f7a07ebd6dd7f54a
+Author: Christian Brauner <brauner@kernel.org>
+Date:   Wed Sep 17 10:28:08 2025 +0000
 
-(thats assuming we can go forward with the full walk.)
+    ns: add ns_common_free()
 
-> +static int nf_flow_table_switchdev_event(struct notifier_block *unused,
-> +					 unsigned long event, void *ptr)
-> +{
-> +	struct flow_switchdev_event_work *switchdev_work;
-> +	struct switchdev_notifier_fdb_info *fdb_info;
-> +
-> +	if (event != SWITCHDEV_FDB_DEL_TO_DEVICE)
-> +		return NOTIFY_DONE;
-> +
-> +	switchdev_work = kzalloc(sizeof(*switchdev_work), GFP_ATOMIC);
-> +	if (WARN_ON(!switchdev_work))
-> +		return NOTIFY_BAD;
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=135eeee2580000
+start commit:   50c19e20ed2e Merge tag 'nolibc-20250928-for-6.18-1' of git..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=10deeee2580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=175eeee2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8f1ac8502efee0ee
+dashboard link: https://syzkaller.appspot.com/bug?extid=e0f8855a87443d6a2413
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1374b858580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15602092580000
 
-No WARN_ON here.  GFP_ATOMIC can fail, which then gives a splat.
-But there is nothing that could be done about it for either reporter
-or developer.
+Reported-by: syzbot+e0f8855a87443d6a2413@syzkaller.appspotmail.com
+Fixes: be5f21d3985f ("ns: add ns_common_free()")
 
-So, how much of a problem is this?
-If its fine to ignore the notification, then remove the WARN_ON.
-If its not ok, then you have to explore alternatives that do not depend
-on successful allocation.
-
-Can the invalided output port be detected from packet path similar to
-how stale dsts get handled?
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
