@@ -1,810 +1,240 @@
-Return-Path: <netdev+bounces-227655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05C53BB4F00
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 20:50:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7F5ABB4F46
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 21:00:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B0993A9464
-	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 18:50:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A957325409
+	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 19:00:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86BAA27815D;
-	Thu,  2 Oct 2025 18:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92961274B26;
+	Thu,  2 Oct 2025 19:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="A6+uUV1n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nd8jOs9L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4325.protonmail.ch (mail-4325.protonmail.ch [185.70.43.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B72012C544
-	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 18:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC7A255F28
+	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 19:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759431034; cv=none; b=D5VbjoPSCMnUrDpBqX7F3l2/8PuNW4QgraACytbJbE1e1ZfaOg6V5/wQUFOKYPxXK+867NGOncVHg2TFTz/Jv6QZExuia/eB8pE+vIBRhCVxF6kdFIGf6TvCTaq7zXA4XJhPptWPKJsmigPBfa6mvOJgG63Ep6Yi+eQd/Ow1J60=
+	t=1759431654; cv=none; b=cq0mSIk46PpOS9CMXAhI2Xveg08dzAhrC5Lk3zCrXwjZOat8NiRjkTpuDMxclyaHAHTLZhUi0AzZK6Pud/JsldRXRh89xzZEaLSfE7VSxRd0ol/a6xtCJaz1/E0saigm9Z6z7E98dDxkAsgoh0hprK667kg15YBSpIaGoAMEIns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759431034; c=relaxed/simple;
-	bh=cuHNoaoQA/mYdX1NkFEm1CO6fGng6aG/zV5xSrLtLBQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=HJ5fjQc8FVKa/Uq4QJNrrt7rs2gT843orqTapn5Cfi/3nuM8uIlIecRCWZmldXuik8ttmDMMOZK2Urh7TmvI5yaErepTjt5cH5DSKdHCqt/ovmhAcXbFnr9xG0XeHeaA9bpCO7rHjJF59dS15bu8Kbnmn23QCJc0xVT+zk81eMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=A6+uUV1n; arc=none smtp.client-ip=185.70.43.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1759431023; x=1759690223;
-	bh=OP1dpDq9XetQX//ukKFyQdJPDdo74hX57NwwRzRrkzY=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=A6+uUV1ntdMGpuj+iwe1+SG8TMPGxK1+rXQMMYSNRRqLMPtFtn3Lm8ffIYmMCvohD
-	 8QOIBEQJFS7NMROsMbbPMCLC3Qa+/BYRSlTN9r4DztDOkk0wWNt8K2xQtX8XdLeRkf
-	 F4unXv/zoLVckiyD+DUkXStRHi2BaxxZIh5Nlsjc/fZcNV7rdBL5XmHmzAizQgmo01
-	 +Cl6Zzmagb0T05BzXGkVwASjvs/RpxzjPwen7dadYYDHkv1QI3aDGsggheYbfklZ2h
-	 V6LCttbp9J1p17+H5SgvQ8941V9pOY7na7ihF16a+bVT2uzz8fCcihDjm5+SpAyb0l
-	 YEznL9gGDdVnw==
-Date: Thu, 02 Oct 2025 18:50:17 +0000
-To: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-From: "Remy D. Farley" <one-d-wide@protonmail.com>
-Cc: "Remy D. Farley" <one-d-wide@protonmail.com>
-Subject: [PATCH] doc/netlink: Expand nftables specification
-Message-ID: <20251002184950.1033210-1-one-d-wide@protonmail.com>
-Feedback-ID: 59017272:user:proton
-X-Pm-Message-ID: f08317cb0d8c4ba3703a9c91c195a490821181af
+	s=arc-20240116; t=1759431654; c=relaxed/simple;
+	bh=HdRM6QtSEu6oISwiLRqfnMz+LiKeMqQ1/pBIxbMP6TM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lpxjgB/ooPjgztkNHOgB2ZqxxhEJyqw+ngBre9UxHq7VFmwC7odACXGSG4+sjAENAFscKuKdujGCGsYz8TPbrm8Pd4keypKUecclD6MiCr8gPvkggAjXvIOl1hzUxhPx+SsQsk6sqhyLuv3y7Snr8qwp8KU/fpsZaL5KlbtZE/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nd8jOs9L; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-46e3cdc1a6aso9952365e9.1
+        for <netdev@vger.kernel.org>; Thu, 02 Oct 2025 12:00:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759431651; x=1760036451; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u6fOaFPX2oAXf2qf/MzKaSamzMn6vecX7vKZ+f0WXRk=;
+        b=Nd8jOs9LmfZos29FOCxMlZejNqkZstiaNoGsS2kxj5kRpcHOM9+HMVvBxTapHaZyQ4
+         01E1MSfcixlF7b/bVw4Bfhz9g4kV7eC5oE6vHs0EK0+9By2NdPXkSi1q7n3WCpMcgHPI
+         B4+iMVq3bVOocKFxp/4UGdwFVFffpWMuvVhKMOo+iLBwMWAaSnYLOQNeRq+k5jjBHCn7
+         iGalhbV4UVfcGkpgc1g7dixm+w/V2PZwnrYZHlESiFge1X8bo/RF6LCOgTToYh/5NKHY
+         KJJaxh+VJPDdFFmVtIUriBz8TqCbemTUJjhdjtQtDCmtGCM0amGJKo3xPJrVPTYSaWeb
+         ClEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759431651; x=1760036451;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u6fOaFPX2oAXf2qf/MzKaSamzMn6vecX7vKZ+f0WXRk=;
+        b=FDWKyxfvsZc916YOsHJE6tZ0aPO0dU5UVTdOQuW3UAtuzl48MCmk9GG/kALQf5qi9n
+         ymCqwRGgevTb4UKBuNrRrDFC90RlvE9KkBS6l6c5kZhto/jlv0Vj00xxSQrirwCKdC2h
+         6t/DTWKDbQ8vsBvgdGYTKsOjj2Dy3g2oWHENlG3s7EQ5ofpvzfZRjz7RmsQ2u9l8PVTl
+         Nszhw8DOnrI1dCWEx4IDM+r8AKWhSmWMRz9GcTdMGKdQkuPGf7aaMmdm9Lo4WGlP5vXI
+         o2sa6zaWYmA2lrdoMb6vSbuSWPdYThRV2IFfxVSVvZm5lrUZy9P2RyLB3h51CRGHz2d/
+         XzAg==
+X-Forwarded-Encrypted: i=1; AJvYcCVkaTNPXVKnBsGQixQCQbOhpTZfTbr/wGYlmMTfmC81PeLGqyHK2Iq2HUQ9EDURpEtPX0KqMOI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqxbeZ/15bmVkjf3JCvkAKdn1mR+8SpJulbEH3tC2LBv8eJJHN
+	kAOXxCZSZFh5308u2X8d5kITwTUh+rrImUwORD/lfiHWFw49MuBUa1rA
+X-Gm-Gg: ASbGnctIaodR/N1R09F8ebzdPzErAUT7Yzn98QoQmpS81DP43vq8R3c+9gFrjcQtcj/
+	Y6KzADUDFAirZ6jLIUlBu+BbQHJ7gSVBfhPq5wwpZFyNFK3oyTj2lQGYgur7NVwHmoyOCfe1CFx
+	HkQv62+1sIaSQOHKAPUnNwNPY+lrnYEwA+r98qr3NGeKFQQ2dVDCMEz9Ble1fv0Z4pctS4o4Vcb
+	KtCKw1iW7yDtDFQKj7+35+3u+4O9+xQVHpW+Ja4EPIiyml9QourPfisbEJ3Yz7mn/JFIgwNQzMj
+	Jr6jQGLaewWTgYc5mUCIikGAHxsZVFyE4xM67ALAHewL5EOD3oIOLime4VXOAyXlM4UCw2IHtKb
+	WODlbPGvLCzlN5mycWzTIVlu/DWES1zMHigBFS0Z1HnpdoR4rMo7vbn3AKLm5LaSwDiixQBMBXx
+	zjs816NSKqkQq8
+X-Google-Smtp-Source: AGHT+IGaoHiZFJpX7P4fpJ5gN/YctPtIRaA4HuaLp2YmDRoVlK6rbZNidGIsWnYJjI0Td812wrRW+w==
+X-Received: by 2002:a05:600c:83ca:b0:45d:5c71:769d with SMTP id 5b1f17b1804b1-46e70c5cef4mr4217145e9.8.1759431650257;
+        Thu, 02 Oct 2025 12:00:50 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e6918bb06sm51107905e9.8.2025.10.02.12.00.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Oct 2025 12:00:49 -0700 (PDT)
+Date: Thu, 2 Oct 2025 20:00:47 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>
+Cc: andrii@kernel.org, eddyz87@gmail.com, ast@kernel.org,
+ daniel@iogearbox.net, martin.lau@linux.dev, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+ matttbe@kernel.org, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
+ linux@jordanrome.com, ameryhung@gmail.com, toke@redhat.com,
+ houtao1@huawei.com, emil@etsalapatis.com, yatsenko@meta.com,
+ isolodrai@meta.com, a.s.protopopov@gmail.com, dxu@dxuuu.xyz,
+ memxor@gmail.com, vmalik@redhat.com, bigeasy@linutronix.de, tj@kernel.org,
+ gregkh@linuxfoundation.org, paul@paul-moore.com,
+ bboscaccy@linux.microsoft.com, James.Bottomley@HansenPartnership.com,
+ mrpre@163.com, jakub@cloudflare.com, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kernel-mentees@lists.linuxfoundation.org, skhan@linuxfoundation.org,
+ david.hunter.linux@gmail.com
+Subject: Re: [PATCH] selftests/bpf: Add -Wsign-compare C compilation flag
+Message-ID: <20251002200047.2b9f9ef9@pumpkin>
+In-Reply-To: <e3a0d8ff-d03d-4854-bf04-8ff8265b0257@gmail.com>
+References: <20250924162408.815137-1-mehdi.benhadjkhelifa@gmail.com>
+	<20250926124555.009bfcd6@pumpkin>
+	<e3a0d8ff-d03d-4854-bf04-8ff8265b0257@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Getting out changes I've accumulated while making nftables spec to work wit=
-h
-Rust netlink-bindings. Hopefully, this will be useful upstream.
+On Mon, 29 Sep 2025 17:03:29 +0100
+Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com> wrote:
 
-This patch:
+> On 9/26/25 12:45 PM, David Laight wrote:
+> > On Wed, 24 Sep 2025 17:23:49 +0100
+> > Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com> wrote:
+> >   
+> >> -Change all the source files and the corresponding headers
+> >> to having matching sign comparisons.  
+> 
+> Hi david,
+> sorry for the late reply.
+> 
+> > 'Fixing' -Wsign-compare by adding loads of casts doesn't seem right.
+> > The only real way is to change all the types to unsigned ones.  
+> The last v3 did only do that with no casting as it was suggested by 
+> David too.
+> 
+> > Consider the following:
+> > 	int x = read(fd, buf, len);
+> > 	if (x < 0)
+> > 		return -1;
+> > 	if (x > sizeof (struct fubar))
+> > 		return -1;
+> > That will generate a 'sign-compare' error, but min(x, sizeof (struct fubar))
+> > doesn't generate an error because the compiler knows 'x' isn't negative.  
+> 
+>   Yes,-Wsign-compare does add errors with -Werror enabled in that case 
+> and many other cases where the code is perfectly fine which is one of 
+> it's drawbacks.
+> Also I though that because of GCC/Clang heuristics 
+> sometimes min() suppress the warning not because that the compiler knows 
+> that x isn't negative.I'm probably wrong here.
 
-- Adds missing byte order annotations.
-- Fills out attributes in some operations.
-- Replaces non-existent "name" attribute with todo comment.
-- Adds some missing sub-messages (and associated attributes).
-- Adds (copies over) documentation for some attributes / enum entries.
-- Adds "getcompat" operation defined in nft_compat.c .
+That sentence doesn't make sense.
+The statically_true() test in min() uses the 'value' tracking done by modern
+versions of gcc and clang.
+This means it can let signed types be promoted to unsigned ones because the
+compiler knows the value isn't negative.
+OTOH -Wsign-compare is a much older warning and is only based on the types.
 
-Signed-off-by: Remy D. Farley <one-d-wide@protonmail.com>
----
- Documentation/netlink/specs/nftables.yaml | 433 ++++++++++++++++++++--
- 1 file changed, 408 insertions(+), 25 deletions(-)
+> > A well known compiler also rejects:
+> > 	unsigned char a;
+> > 	unsigned int b;
+> > 	if (b > a)
+> > 		return;
+> > because 'a' is promoted to 'signed int' before it does the check.  
+> 
+> In my knowledge,compilers don't necessarily reject the above code by 
+> default. Since -Wall in GCC includes -Wsign-compare but -Wall in clang 
+> doesn't, doing -Wall -Werror for clang compiler won't trigger an error 
+> in the case above not even a warning.My changes are to make those 
+> comparisons produce an error since the -Werror flag is already enabled 
+> in the Makefile.
 
-diff --git a/Documentation/netlink/specs/nftables.yaml b/Documentation/netl=
-ink/specs/nftables.yaml
-index 2ee10d92d..fac0cf483 100644
---- a/Documentation/netlink/specs/nftables.yaml
-+++ b/Documentation/netlink/specs/nftables.yaml
-@@ -66,9 +66,22 @@ definitions:
-     name: bitwise-ops
-     type: enum
-     entries:
--      - bool
-+      -
-+        name: mask-xor # aka bool (old name)
-+        doc: |
-+          mask-and-xor operation used to implement NOT, AND, OR and XOR bo=
-olean operations
-+            dreg =3D (sreg & mask) ^ xor
-+          with these mask and xor values:
-+                    mask    xor
-+            NOT:    1       1
-+            OR:     ~x      x
-+            XOR:    1       x
-+            AND:    x       0
-       - lshift
-       - rshift
-+      - and
-+      - or
-+      - xor
-   -
-     name: cmp-ops
-     type: enum
-@@ -225,14 +238,216 @@ definitions:
-       - icmp-unreach
-       - tcp-rst
-       - icmpx-unreach
-+  -
-+    # Defined in include/linux/netfilter/nf_tables.h
-+    name: payload-base
-+    type: enum
-+    entries:
-+      - link-layer-header
-+      - network-header
-+      - transport-header
-+      - inner-header
-+      - tun-header
-+  -
-+    # Defined in include/linux/netfilter/nf_tables.h
-+    name: range-ops
-+    doc: Range operator
-+    type: enum
-+    entries:
-+      - eq
-+      - neq
-+  -
-+    # Defined in include/linux/netfilter/nf_tables.h
-+    name: registers
-+    doc: |
-+      nf_tables registers.
-+      nf_tables used to have five registers: a verdict register and four d=
-ata
-+      registers of size 16. The data registers have been changed to 16 reg=
-isters
-+      of size 4. For compatibility reasons, the NFT_REG_[1-4] registers st=
-ill
-+      map to areas of size 16, the 4 byte registers are addressed using
-+      NFT_REG32_00 - NFT_REG32_15.
-+    type: enum
-+    entries:
-+      - reg_verdict
-+      - reg_1
-+      - reg_2
-+      - reg_3
-+      - reg_4
-+      -
-+        name: reg32_00
-+        value: 8
-+      - reg32_01
-+      - reg32_02
-+      - reg32_03
-+      - reg32_04
-+      - reg32_05
-+      - reg32_06
-+      - reg32_07
-+      - reg32_08
-+      - reg32_09
-+      - reg32_10
-+      - reg32_11
-+      - reg32_12
-+      - reg32_13
-+      - reg32_14
-+      - reg32_15
-+  -
-+    # Defined in include/linux/netfilter/nf_tables.h
-+    name: numgen-types
-+    type: enum
-+    entries:
-+      - incremental
-+      - random
-+  -
-+    name: log-level
-+    doc: nf_tables log levels
-+    type: enum
-+    entries:
-+      -
-+        name: emerg
-+        doc: system is unusable
-+      -
-+        name: alert
-+        doc: action must be taken immediately
-+      -
-+        name: crit
-+        doc: critical conditions
-+      -
-+        name: err
-+        doc: error conditions
-+      -
-+        name: warning
-+        doc: warning conditions
-+      -
-+        name: notice
-+        doc: normal but significant condition
-+      -
-+        name: info
-+        doc: informational
-+      -
-+        name: debug
-+        doc: debug-level messages
-+      -
-+        name: audit
-+        doc: enabling audit logging
-+  -
-+    # Defined in include/uapi/linux/netfilter/nf_log.h
-+    name: log-flags
-+    doc: nf_tables log flags
-+    type: flags
-+    entries:
-+      -=20
-+        name: tcpseq
-+        doc: Log TCP sequence numbers
-+      -
-+        name: tcpopt
-+        doc: Log TCP options
-+      -
-+        name: ipopt
-+        doc: Log IP options
-+      -
-+        name: uid
-+        doc: Log UID owning local socket
-+      -
-+        name: nflog
-+        doc: Unsupported, don't reuse
-+      -
-+        name: macdecode
-+        doc: Decode MAC header
-=20
- attribute-sets:
-   -
--    name: empty-attrs
-+    # Defined in include/linux/netfilter/nf_tables.h
-+    name: log-attrs
-+    doc: log expression netlink attributes
-     attributes:
-+      # Mentioned in nft_log_init()
-       -
--        name: name
-+        name: group
-+        doc: netlink group to send messages to
-+        type: u16
-+        byte-order: big-endian
-+      -
-+        name: prefix
-+        doc: prefix to prepend to log messages
-         type: string
-+      -
-+        name: snaplen
-+        doc: length of payload to include in netlink message
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: qthreshold
-+        doc: queue threshold
-+        type: u16
-+        byte-order: big-endian
-+      -
-+        name: level
-+        doc: log level
-+        type: u32
-+        enum: log-level
-+        byte-order: big-endian
-+      -
-+        name: flags
-+        doc: logging flags
-+        type: u32
-+        enum: log-flags
-+        byte-order: big-endian
-+
-+  -
-+    # Defined in include/linux/netfilter/nf_tables.h
-+    name: numgen-attrs
-+    doc: nf_tables number generator expression netlink attributes
-+    attributes:
-+      -
-+        name: dreg
-+        doc: destination register
-+        type: u32
-+        enum: registers
-+      -
-+        name: modulus
-+        doc: maximum counter value
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: type
-+        doc: operation type
-+        type: u32
-+        byte-order: big-endian
-+        enum: numgen-types
-+      -
-+        name: offset
-+        doc: offset to be added to the counter
-+        type: u32
-+        byte-order: big-endian
-+  -
-+    # Defined in net/netfilter/nft_range.c
-+    name: range-attrs
-+    attributes:
-+      -
-+        name: sreg
-+        doc: source register of data to compare
-+        type: u32
-+        byte-order: big-endian
-+        enum: registers
-+      -
-+        name: op
-+        doc: cmp operation
-+        type: u32
-+        byte-order: big-endian
-+        enum: range-ops
-+        checks:
-+          max: 256
-+      -
-+        name: from-data
-+        doc: data range from
-+        type: nest
-+        nested-attributes: data-attrs
-+      -
-+        name: to-data
-+        doc: data range to
-+        type: nest
-+        nested-attributes: data-attrs
-   -
-     name: batch-attrs
-     attributes:
-@@ -371,9 +586,11 @@ attribute-sets:
-       -
-         name: bytes
-         type: u64
-+        byte-order: big-endian
-       -
-         name: packets
-         type: u64
-+        byte-order: big-endian
-   -
-     name: rule-attrs
-     attributes:
-@@ -443,15 +660,18 @@ attribute-sets:
-         selector: name
-         doc: type specific data
-   -
-+    # Mentioned in nft_parse_compat() in net/netfilter/nft_compat.c
-     name: rule-compat-attrs
-     attributes:
-       -
-         name: proto
--        type: binary
-+        type: u32
-+        byte-order: big-endian
-         doc: numeric value of the handled protocol
-       -
-         name: flags
--        type: binary
-+        type: u32
-+        byte-order: big-endian
-         doc: bitmask of flags
-   -
-     name: set-attrs
-@@ -814,6 +1034,7 @@ attribute-sets:
-         type: nest
-         nested-attributes: data-attrs
-   -
-+    # Defined as nft_data_attributes in include/linux/netfilter/nf_tables.=
-h
-     name: data-attrs
-     attributes:
-       -
-@@ -829,25 +1050,31 @@ attribute-sets:
-     attributes:
-       -
-         name: code
-+        doc: nf_tables verdict
-         type: u32
-         byte-order: big-endian
-         enum: verdict-code
-       -
-         name: chain
-+        doc: jump target chain name
-         type: string
-       -
-         name: chain-id
-+        doc: jump target chain ID
-         type: u32
-+        byte-order: big-endian # Accessed in nft_chain_lookup_byid
-   -
-     name: expr-counter-attrs
-     attributes:
-       -
-         name: bytes
-         type: u64
-+        byte-order: big-endian
-         doc: Number of bytes
-       -
-         name: packets
-         type: u64
-+        byte-order: big-endian
-         doc: Number of packets
-       -
-         name: pad
-@@ -982,38 +1209,51 @@ attribute-sets:
-         enum: nat-range-flags
-         enum-as-flags: true
-   -
-+    # Defined as nft_payload_attributes in include/linux/netfilter/nf_tabl=
-es.h
-     name: expr-payload-attrs
-+    doc: nf_tables payload expression netlink attributes
-     attributes:
-       -
-         name: dreg
-+        doc: destination register to load data into
-         type: u32
-         byte-order: big-endian
-+        enum: registers
-       -
-         name: base
-+        doc: payload base
-         type: u32
-+        enum: payload-base
-         byte-order: big-endian
-       -
-         name: offset
-+        doc: payload offset relative to base
-         type: u32
-         byte-order: big-endian
-       -
-         name: len
-+        doc: payload length
-         type: u32
-         byte-order: big-endian
-       -
-         name: sreg
-+        doc: source register to load data from
-         type: u32
-         byte-order: big-endian
-+        enum: registers
-       -
-         name: csum-type
-+        doc: checksum type
-         type: u32
-         byte-order: big-endian
-       -
-         name: csum-offset
-+        doc: checksum offset relative to base
-         type: u32
-         byte-order: big-endian
-       -
-         name: csum-flags
-+        doc: checksum flags
-         type: u32
-         byte-order: big-endian
-   -
-@@ -1079,6 +1319,61 @@ attribute-sets:
-         type: u32
-         byte-order: big-endian
-         doc: id of object map
-+  -
-+    # Defined as nft_target_attributes in include/uapi/linux/netfilter/nf_=
-tables_compat.h
-+    name: compat-target-attrs
-+    attributes:
-+      -
-+        name: name
-+        type: string
-+        checks:
-+          max-len: 32
-+      -
-+        name: rev
-+        type: u32
-+        byte-order: big-endian
-+        checks:
-+          max: 255
-+      -
-+        name: info
-+        type: binary
-+  -
-+    # Defined as nft_match_attributes in include/uapi/linux/netfilter/nf_t=
-ables_compat.h
-+    name: compat-match-attrs
-+    attributes:
-+      -
-+        name: name
-+        type: string
-+        checks:
-+          max-len: 32
-+      -
-+        name: rev
-+        type: u32
-+        byte-order: big-endian
-+        checks:
-+          max: 255
-+      -
-+        name: info
-+        type: binary
-+  -
-+    # Defined in include/uapi/linux/netfilter/nf_tables_compat.h
-+    name: compat-attrs
-+    attributes:
-+      -
-+        name: name
-+        type: string
-+        checks:
-+          max-len: 32
-+      -
-+        name: rev
-+        type: u32
-+        byte-order: big-endian
-+        checks:
-+          max: 255
-+      -
-+        name: type
-+        type: u32
-+        byte-order: big-endian
-=20
- sub-messages:
-   -
-@@ -1132,6 +1427,19 @@ sub-messages:
-       -
-         value: tproxy
-         attribute-set: expr-tproxy-attrs
-+      -
-+        value: match
-+        attribute-set: compat-match-attrs
-+      -
-+        value: range
-+        attribute-set: range-attrs
-+      -
-+        value: numgen
-+        attribute-set: numgen-attrs
-+      -
-+        value: log
-+        attribute-set: log-attrs
-+      # There're more to go: grep -A10 nft_expr_type and look for .name\s*=
-=3D\s*"..."
-   -
-     name: obj-data
-     formats:
-@@ -1145,6 +1453,26 @@ sub-messages:
- operations:
-   enum-model: directional
-   list:
-+    -
-+      # Defined as nfnl_compat_subsys in net/netfilter/nft_compat.c
-+      name: getcompat
-+      attribute-set: compat-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xb00
-+          attributes:
-+            - name
-+            - rev
-+            - type
-+        reply:
-+          value: 0xb00
-+          attributes:
-+            - name
-+            - rev
-+            - type
-+      dump:
-+        reply:
-     -
-       name: batch-begin
-       doc: Start a batch of operations
-@@ -1188,11 +1516,18 @@ operations:
-         request:
-           value: 0xa01
-           attributes:
--            - name
-+            # TODO:
-         reply:
-           value: 0xa00
-+          attributes:
-+            # TODO:
-+      dump:
-+        reply:
-           attributes:
-             - name
-+            - use
-+            - handle
-+            - flags
-     -
-       name: deltable
-       doc: Delete an existing table.
-@@ -1239,6 +1574,18 @@ operations:
-           value: 0xa03
-           attributes:
-             - name
-+      dump:
-+        reply:
-+          attributes:
-+            - table
-+            - name
-+            - handle
-+            - hook
-+            - policy
-+            - type
-+            - counters
-+            - id
-+            - use
-     -
-       name: delchain
-       doc: Delete an existing chain.
-@@ -1270,7 +1617,11 @@ operations:
-         request:
-           value: 0xa06
-           attributes:
--            - name
-+            - table
-+            - chain
-+            - expressions
-+            - compat
-+        reply:
-     -
-       name: getrule
-       doc: Get / dump rules.
-@@ -1280,11 +1631,23 @@ operations:
-         request:
-           value: 0xa07
-           attributes:
--            - name
-+            # TODO:
-         reply:
-           value: 0xa06
-           attributes:
--            - name
-+            # TODO:
-+      dump:
-+        request:
-+          attributes:
-+            - table
-+            - chain
-+        reply:
-+          attributes:
-+            - table
-+            - chain
-+            - handle
-+            - position
-+            - expressions
-     -
-       name: getrule-reset
-       doc: Get / dump rules and reset stateful expressions.
-@@ -1294,11 +1657,13 @@ operations:
-         request:
-           value: 0xa19
-           attributes:
--            - name
-+            # TODO:
-         reply:
-           value: 0xa06
-           attributes:
--            - name
-+            # TODO:
-+      dump:
-+        reply:
-     -
-       name: delrule
-       doc: Delete an existing rule.
-@@ -1308,7 +1673,7 @@ operations:
-         request:
-           value: 0xa08
-           attributes:
--            - name
-+            # TODO:
-     -
-       name: destroyrule
-       doc: |
-@@ -1319,7 +1684,7 @@ operations:
-         request:
-           value: 0xa1c
-           attributes:
--            - name
-+            # TODO:
-     -
-       name: newset
-       doc: Create a new set.
-@@ -1329,7 +1694,7 @@ operations:
-         request:
-           value: 0xa09
-           attributes:
--            - name
-+            # TODO:
-     -
-       name: getset
-       doc: Get / dump sets.
-@@ -1339,11 +1704,17 @@ operations:
-         request:
-           value: 0xa0a
-           attributes:
--            - name
-+            # TODO:
-         reply:
-           value: 0xa09
-           attributes:
--            - name
-+            # TODO:
-+      dump:
-+        request:
-+          attributes:
-+            - table
-+        reply:
-+          # TODO:
-     -
-       name: delset
-       doc: Delete an existing set.
-@@ -1374,7 +1745,7 @@ operations:
-         request:
-           value: 0xa0c
-           attributes:
--            - name
-+            # TODO:
-     -
-       name: getsetelem
-       doc: Get / dump set elements.
-@@ -1384,11 +1755,13 @@ operations:
-         request:
-           value: 0xa0d
-           attributes:
--            - name
-+            # TODO:
-         reply:
-           value: 0xa0c
-           attributes:
--            - name
-+            # TODO:
-+      dump:
-+        reply:
-     -
-       name: getsetelem-reset
-       doc: Get / dump set elements and reset stateful expressions.
-@@ -1398,11 +1771,13 @@ operations:
-         request:
-           value: 0xa21
-           attributes:
--            - name
-+            # TODO:
-         reply:
-           value: 0xa0c
-           attributes:
--            - name
-+            # TODO:
-+      dump:
-+        reply:
-     -
-       name: delsetelem
-       doc: Delete an existing set element.
-@@ -1412,7 +1787,7 @@ operations:
-         request:
-           value: 0xa0e
-           attributes:
--            - name
-+            # TODO:
-     -
-       name: destroysetelem
-       doc: Delete an existing set element with destroy semantics.
-@@ -1422,7 +1797,7 @@ operations:
-         request:
-           value: 0xa1e
-           attributes:
--            - name
-+            # TODO:
-     -
-       name: getgen
-       doc: Get / dump rule-set generation.
-@@ -1432,11 +1807,15 @@ operations:
-         request:
-           value: 0xa10
-           attributes:
--            - name
-+            # TODO:
-         reply:
-           value: 0xa0f
-           attributes:
--            - name
-+            - id
-+            - proc-pid
-+            - proc-name
-+      dump:
-+        reply:
-     -
-       name: newobj
-       doc: Create a new stateful object.
-@@ -1461,6 +1840,8 @@ operations:
-           value: 0xa12
-           attributes:
-             - name
-+      dump:
-+        reply:
-     -
-       name: delobj
-       doc: Delete an existing stateful object.
-@@ -1505,6 +1886,8 @@ operations:
-           value: 0xa16
-           attributes:
-             - name
-+      dump:
-+        reply:
-     -
-       name: delflowtable
-       doc: Delete an existing flow table.
---=20
-2.49.0
+This isn't about whether -Wsign-compare is enabled or not (or even what
+the option is called).
+It is about whether the compiler's 'sign-compare' warning triggers for that code.
+The one that detects the warning/error isn't gcc or clang but is probably
+used far more than clang.
 
+> 
+> > So until the compilers start looking at the known domain of the value
+> > (not just the type) I enabling -Wsign-compare' is pretty pointless.  
+> 
+> I agree that enabling -Wsign-compare is pretty noisy. But it does have 
+> some usefulness. Take for example this code:
+> 	int n = -5;
+> 	for (unsigned i = 0; i < n; i++) {
+>      	// ...
+> 	}
+> Since this is valid code by the compiler, it will allow it but n here is 
+> promoted to an unsigned which converts -5 to being 4294967291 thus 
+> making the loop run more than what was desired.of course,here the 
+> example is much easy to follow and variables are very well set but the 
+> point is that these could cause issues when hidden inside a lot of macro 
+> code.
+
+There is plenty of broken code out there.
+It isn't hard to find places where explicit casts make things worse.
+The problem is that, even for the above example, the -5 could come from
+way earlier up the code.
+If you 'fix' the warning by changing it to 'i < (unsigned)n' the code is
+still just as likely to be buggy.
+
+> 
+> > As a matter of interest did you actually find any bugs?  
+>
+> No,I have not found any bug related to the current state of code in bpf 
+> selftests but It works as a prevention mechanism for future bugs.Rather 
+> than wait until something breaks in future code.
+
+That's what I expected...
+
+> > 	David
+> >   
+> 
+> Thank you for your time David.I would appreciate if you suggest on how I 
+> can have a useful patch on this or if I should drop this.
+> Best Regards,
+> Mehdi
+> >   
+> >>
+> >> Signed-off-by: Mehdi Ben Hadj Khelifa <mehdi.benhadjkhelifa@gmail.com>
+> >> ---
+> >> As suggested by the TODO, -Wsign-compare was added to the C compilation
+> >> flags for the selftests/bpf/Makefile and all corresponding files in
+> >> selftests and a single file under tools/lib/bpf/usdt.bpf.h have been
+> >> carefully changed to account for correct sign comparisons either by
+> >> explicit casting or changing the variable type.Only local variables
+> >> and variables which are in limited scope have been changed in cases
+> >> where it doesn't break the code.Other struct variables or global ones
+> >> have left untouched to avoid other conflicts and opted to explicit
+> >> casting in this case.This change will help avoid implicit type
+> >> conversions and have predictable behavior.
+> >>
+> >> I have already compiled all bpf tests with no errors as well as the
+> >> kernel and have ran all the selftests with no obvious side effects.
+> >> I would like to know if it's more convinient to have all changes as
+> >> a single patch like here or if it needs to be divided in some way
+> >> and sent as a patch series.
+> >>
+> >> Best Regards,
+> >> Mehdi Ben Hadj Khelifa  
+> > ...  
+> 
 
 
