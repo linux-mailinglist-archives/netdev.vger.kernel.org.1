@@ -1,134 +1,193 @@
-Return-Path: <netdev+bounces-227658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62DD2BB4F98
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 21:18:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB608BB4FC2
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 21:24:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E959326026
-	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 19:18:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DFEE7A274F
+	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 19:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B792E280332;
-	Thu,  2 Oct 2025 19:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794A0283146;
+	Thu,  2 Oct 2025 19:24:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EO7j57o7"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="Zqt9h4U2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19DD82765D0
-	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 19:17:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E6F42741BC;
+	Thu,  2 Oct 2025 19:24:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759432680; cv=none; b=br50ZTB6glTEWBlIBg1DMg3IXnM7k1CZrZarUmV8MhJg5bE4wLf9QJb1hNnh5aN4iwP1rsC8cHvlTulRrTHUnPvqrnsTAdhJ1SyLDBLBm4NXllxW7qN0aptoUk2EOjcPsFubWOZ61PrpCQWRkYUEApJ/TvjVdo1QxKEVBAH4aA0=
+	t=1759433053; cv=none; b=AWQd/+3bwH3t2qLflGV06OZsRtDrqr93DjYo4eBKM8ZAX1Cqv35cNQbvy4SSRxs3ZbENZIALruVxy+flezVkmjwskbrzDRChMzhzSPbOOw0eAyr3bxh19IWMvcpoFpJRAcXy99Wbc2NdOfB2XbDpH7oHviyM73gLR5h6E8SIZoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759432680; c=relaxed/simple;
-	bh=HD7F2OR8UwgY3zfHvXuxLFAhWFLNpYZsjIBAz0CZ8bU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mf20S9O6uWAgrZXzeJInhhPaud5f7lNHu5lJj+P5C/+Rs4gI9qGEylWFT7U2W3V212vk3QHaqGwQRS0ocLQw7BKp1nzaqMsBiY2Gzbia3zId0IMikJwOBpM9u2zQfaWxzU17pnmZQ6XVfTdC3m3Y5z8lEst/YinFGPWDhl98ics=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EO7j57o7; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-57e03279bfeso1842201e87.0
-        for <netdev@vger.kernel.org>; Thu, 02 Oct 2025 12:17:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759432677; x=1760037477; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AsacFhY688kmCw3ljgQ3LXTxUKBAt2jIe9uHSGes4ZU=;
-        b=EO7j57o7Gws+ObC7jH87VyIIiZFVqer40BH+nCO2xcD4HXJIrBUR/6uTJhbw4uOdYp
-         b0OUCY9DWIwL84pDF/9TrJ4aJcv3oEtBwE4Vl+gtdPHNsVV/CoOf6ZYVQbMWhk+mkwTm
-         qLeDf9OLa6ljcODm7XlxoZwCZh1gJz+T1tGdpi7zWvKcloZVFE+IY5k0cZy7ZFn+uhqp
-         oiWzFksbg7L5ecJT0MuEHm+ZSnpGkTAi5kSBA5gkKNqqtt31/Gb6eSAB4lbKCwHc8N8M
-         0vG35nMlp4OzjN9WiDsaDK0LLmKiSl0Tzy2ZBGHYxwWj8gkoWfG9xoHfBEt3iJhOUFuC
-         351g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759432677; x=1760037477;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AsacFhY688kmCw3ljgQ3LXTxUKBAt2jIe9uHSGes4ZU=;
-        b=arna4m0FhFc3GQ1DZG69G78mJ572zQSU1G146yrlTRKqpurEcuThIfYyUjyqS7fQVb
-         X+5F6mbKdwedHr1c2xg2u+ZNbouneRXdgZy0tNKPzRT/0HVRxOLD12Oj2D0bQ1+gsNyd
-         sOYGMPbxGGRyCLXRvN2hTQD2z7/TQ1ZPmH06CvncwV7EhFeo8VV9EB+Ik/4/aoYZ0r6K
-         K0OwvJ0Wws29+2HrqdtTKiC9EAldcJP0umDdnkXtfgl/q/zt6DXXf7skilcKnKfkEzn6
-         uVB5Kr00E4xmAPeDOKOgQPJ9qtyavaqsZszbG6rS2MlYjG9X8/BY8LjeSzcoUDgD0GZB
-         t55w==
-X-Forwarded-Encrypted: i=1; AJvYcCWQPM2tXsSgOpAxUNBQcFbViZohCtD8es/yOGGKzsQh9HdZyUOg5/n8R4IKaORjeX+Hw33M3mY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdXAzXGIdh+Re3ynC2eYChcmx/A3GImnDAb3Zh1YpKTtH0UV5o
-	5LfENxlQxDm/XvO5hmO8PMPZ8CdRzDMn212Ay8fyI0irCllx9+KVuG3P1eF1ydDTnmWLLz4lARg
-	1OK8tpnawPsOLQngrNHN+e3iSgCyZrWc=
-X-Gm-Gg: ASbGnctDNn9B26S9CDXU5NmbE3G+3QQcniKyJpvq4tj5NqT5GOZ9EfDHzlILNfuTaPD
-	MavEqXf8U7tr4PV6xBQXGI21VWsA1ByS6DBTJgsRI9w2EcrDddNxt9SNXiU1sQmulSxz+cG3K6H
-	yuDQlYenBp59tyMcQiy863tYxYXwaRZKvJ3LUbwSoN0ydAzKZdNWg33+WwL9hcMQnynM6MKjWK4
-	ofHVvwi/7I1oms0YKhINGeouTwQtFJpjRYYOyCZ
-X-Google-Smtp-Source: AGHT+IGanUA39EeWKN2bZPtr0nUYeSv1bV/nDDv933ayERP1FnFpJQ+koLjBOu9GVv+5Vty1qF8hdQd7PyFPxH3EVIc=
-X-Received: by 2002:a05:6512:3d18:b0:57e:9c14:ac06 with SMTP id
- 2adb3069b0e04-58b00be6121mr1327212e87.27.1759432676972; Thu, 02 Oct 2025
- 12:17:56 -0700 (PDT)
+	s=arc-20240116; t=1759433053; c=relaxed/simple;
+	bh=qAdp32i582ExBrsWXpfpit6C88dqWGnBtUXQoqBtx2A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q9H+TPy/Q65SpD1I2bzGI77ULvGRWhhrg1ofN0Ut5/zIcuQAz1Ew66ointd0QkMmwENkHQr4Ol7WUjolBELAKduuTg9sUYLK+2InVokcOoAu0fJRp7eUKVgZG08Kn6Ql5ZqZp1ul7+DOdUMnRN997oHH/2ulfhDTy1TusOXjPxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=Zqt9h4U2; arc=none smtp.client-ip=151.80.46.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
+	s=mail2022; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=dWwMMcLkwkyvrz6dAbQjbLSghWCEq8qJYvwgikKkCVY=; b=Zqt9h4U22O0t8XLEOWioKT2XvF
+	Eo1FAd3MgRlVIk6bFn6UYsjPb3RvDGEVL7H8lmCpgCGFYOOVPWLryLlYLB6UEG3xDBg5QYdzlxhLv
+	0gDuiXfbCv1LGB6U4dirIhxafXhGFOHYMyVVZOpVR7IWNSZWbfwQ4WP/IxNOyZOpUt4WCRgsliI0q
+	Psk2JUBDR0PfH1KVoVnEF11PNjUYQrxob/i6R2kktZRZXHGTrAAroBJUS6/SVLq3ZTc6nwNCfjYOf
+	gL/XFcPE4NOdqnSc1ZkOPMYj5VwNoVqfrBZyB7faXq3PIvr4J9KYLQRTOrRevOCwioTTTzwREynEj
+	wLCWy5CQ==;
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97.1)
+	(envelope-from <phil@nwl.cc>)
+	id 1v4OuD-0000000044w-2tE2;
+	Thu, 02 Oct 2025 21:23:57 +0200
+Date: Thu, 2 Oct 2025 21:23:57 +0200
+From: Phil Sutter <phil@nwl.cc>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	shuah@kernel.org, jv@jvosburgh.net, olteanv@gmail.com,
+	jiri@resnulli.us, mst@redhat.com, jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, kuniyu@google.com,
+	matttbe@kernel.org, martineau@kernel.org, pablo@netfilter.org,
+	kadlec@netfilter.org, fw@strlen.de, antonio@openvpn.net,
+	allison.henderson@oracle.com, petrm@nvidia.com, razor@blackwall.org,
+	idosch@nvidia.com, linux-kselftest@vger.kernel.org,
+	mptcp@lists.linux.dev, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: Re: [PATCH net] selftests: net: unify the Makefile formats
+Message-ID: <aN7RTSbXDA32J8D2@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+	jv@jvosburgh.net, olteanv@gmail.com, jiri@resnulli.us,
+	mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, kuniyu@google.com, matttbe@kernel.org,
+	martineau@kernel.org, pablo@netfilter.org, kadlec@netfilter.org,
+	fw@strlen.de, antonio@openvpn.net, allison.henderson@oracle.com,
+	petrm@nvidia.com, razor@blackwall.org, idosch@nvidia.com,
+	linux-kselftest@vger.kernel.org, mptcp@lists.linux.dev,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+References: <20251002013034.3176961-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251001183320.83221-1-ariel.dalessandro@collabora.com> <175943240204.235529.17735630695826458855.robh@kernel.org>
-In-Reply-To: <175943240204.235529.17735630695826458855.robh@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 2 Oct 2025 15:17:44 -0400
-X-Gm-Features: AS18NWA5rZuFqYFfCwp3TG9bhDZUCFaj7OWEGaE1URKJYiu9zd8yZE2o0Vq7Fmo
-Message-ID: <CABBYNZKSFCes1ag0oiEptKpifb=gqLt1LQ+mdvF8tYRj8uDDuQ@mail.gmail.com>
-Subject: Re: [PATCH v3] dt-bindings: net: Convert Marvell 8897/8997 bindings
- to DT schema
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: "Ariel D'Alessandro" <ariel.dalessandro@collabora.com>, andrew+netdev@lunn.ch, 
-	conor+dt@kernel.org, kernel@collabora.com, krzk+dt@kernel.org, 
-	angelogioacchino.delregno@collabora.com, kuba@kernel.org, 
-	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	davem@davemloft.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, edumazet@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251002013034.3176961-1-kuba@kernel.org>
 
-Hi,
+Hi Jakub,
 
-On Thu, Oct 2, 2025 at 3:14=E2=80=AFPM Rob Herring (Arm) <robh@kernel.org> =
-wrote:
->
->
-> On Wed, 01 Oct 2025 15:33:20 -0300, Ariel D'Alessandro wrote:
-> > Convert the existing text-based DT bindings for Marvell 8897/8997
-> > (sd8897/sd8997) bluetooth devices controller to a DT schema.
-> >
-> > While here, bindings for "usb1286,204e" (USB interface) are dropped fro=
-m
-> > the DT   schema definition as these are currently documented in file [0=
-].
-> >
-> > [0] Documentation/devicetree/bindings/net/btusb.txt
-> >
-> > Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-> > ---
-> >  .../net/bluetooth/marvell,sd8897-bt.yaml      | 79 ++++++++++++++++++
-> >  .../devicetree/bindings/net/btusb.txt         |  2 +-
-> >  .../bindings/net/marvell-bt-8xxx.txt          | 83 -------------------
-> >  3 files changed, 80 insertions(+), 84 deletions(-)
-> >  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mar=
-vell,sd8897-bt.yaml
-> >  delete mode 100644 Documentation/devicetree/bindings/net/marvell-bt-8x=
-xx.txt
-> >
->
-> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
->
-> You'll probably have to resend this after rc1.
+On Wed, Oct 01, 2025 at 06:30:33PM -0700, Jakub Kicinski wrote:
+> We get a significant number of conflicts between net and net-next
+> because of selftests Makefile changes. People tend to append new
+> test cases at the end of the Makefile when there's no clear sort
+> order. Sort all networking selftests Makefiles, use the following
+> format:
+> 
+>  VAR_NAME := \
+> 	 entry1 \
+> 	 entry2 \
+> 	 entry3 \
+>  # end of VAR_NAME
 
-In that case I'd like to have a Fixes tag so I can remember to send it
-as rc1 is tagged.
+A potential problem with this format is loss of context with long lists.
+While I don't think it will cause incorrect conflict resolutions,
+appending via '+=' may ease reviews of patches:
 
---=20
-Luiz Augusto von Dentz
+VAR_NAME :=
+VAR_NAME += entry1
+VAR_NAME += entry2
+VAR_NAME += entry3
+
+No trailing comment needed this way. Downside is '?=' can't be used.
+
+> Some Makefiles are already pretty close to this.
+
+Which is a point to stick with it.
+
+[...]
+> diff --git a/tools/testing/selftests/drivers/net/netdevsim/Makefile b/tools/testing/selftests/drivers/net/netdevsim/Makefile
+> index 07b7c46d3311..daf51113c827 100644
+> --- a/tools/testing/selftests/drivers/net/netdevsim/Makefile
+> +++ b/tools/testing/selftests/drivers/net/netdevsim/Makefile
+> @@ -1,6 +1,7 @@
+>  # SPDX-License-Identifier: GPL-2.0+ OR MIT
+>  
+> -TEST_PROGS = devlink.sh \
+> +TEST_PROGS := \
+
+Maybe irrelevant, but assignment type changes should be avoided IMO
+(there are more cases like this one).
+
+> +	devlink.sh \
+>  	devlink_in_netns.sh \
+>  	devlink_trap.sh \
+>  	ethtool-coalesce.sh \
+> @@ -17,5 +18,6 @@ TEST_PROGS = devlink.sh \
+>  	psample.sh \
+>  	tc-mq-visibility.sh \
+>  	udp_tunnel_nic.sh \
+> +# end of TEST_PROGS
+>  
+>  include ../../../lib.mk
+
+[...]
+> diff --git a/tools/testing/selftests/drivers/net/virtio_net/Makefile b/tools/testing/selftests/drivers/net/virtio_net/Makefile
+> index 7ec7cd3ab2cc..868ece3fea1f 100644
+> --- a/tools/testing/selftests/drivers/net/virtio_net/Makefile
+> +++ b/tools/testing/selftests/drivers/net/virtio_net/Makefile
+> @@ -1,15 +1,12 @@
+>  # SPDX-License-Identifier: GPL-2.0+ OR MIT
+>  
+> -TEST_PROGS = basic_features.sh \
+> -        #
+> +TEST_PROGS = basic_features.sh
+> 
+> -TEST_FILES = \
+> -        virtio_net_common.sh \
+> -        #
+> +TEST_FILES = virtio_net_common.sh
+
+These seem intentional, so change to the syntax as proposed?
+
+[...]
+> diff --git a/tools/testing/selftests/net/lib/Makefile b/tools/testing/selftests/net/lib/Makefile
+> index 88c4bc461459..ce795bc0a1af 100644
+> --- a/tools/testing/selftests/net/lib/Makefile
+> +++ b/tools/testing/selftests/net/lib/Makefile
+> @@ -5,12 +5,16 @@ CFLAGS += -I../../../../../usr/include/ $(KHDR_INCLUDES)
+>  # Additional include paths needed by kselftest.h
+>  CFLAGS += -I../../
+>  
+> -TEST_FILES := ../../../../../Documentation/netlink/specs
+> -TEST_FILES += ../../../../net/ynl
+> +TEST_FILES := \
+> +	../../../../net/ynl \
+> +	../../../../../Documentation/netlink/specs \
+> +# end of TEST_FILES
+>  
+> -TEST_GEN_FILES += csum
+> -TEST_GEN_FILES += $(patsubst %.c,%.o,$(wildcard *.bpf.c))
+> -TEST_GEN_FILES += xdp_helper
+> +TEST_GEN_FILES := \
+> +	$(patsubst %.c,%.o,$(wildcard *.bpf.c)) \
+> +	csum \
+> +	xdp_helper \
+> +# end of TEST_GEN_FILES
+
+This one is interesting, the old code appended only, new code might
+overwrite existing content.
+
+Cheers, Phil
 
