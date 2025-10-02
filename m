@@ -1,187 +1,182 @@
-Return-Path: <netdev+bounces-227525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD121BB214F
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 01:43:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72CA8BB21E8
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 02:17:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46E03189F582
-	for <lists+netdev@lfdr.de>; Wed,  1 Oct 2025 23:43:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45EB37B2776
+	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 00:15:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0377C296BA8;
-	Wed,  1 Oct 2025 23:43:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CBB12AD20;
+	Thu,  2 Oct 2025 00:17:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="scckct6a"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YlXnyBpT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D380A14A4CC
-	for <netdev@vger.kernel.org>; Wed,  1 Oct 2025 23:43:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D3D134BD;
+	Thu,  2 Oct 2025 00:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759362194; cv=none; b=l+Xv3R4ArejFxeJTRxMv6IFHhhhVG8aC0Lc2q0+vyNm5rjkENxv++uAI5sJfbJkYWxnIpZ2mcyMWmHaM5DldxuAkJcUdfys9wfjBfShwKxOGV+psF0Z1JCGRR8YEf1gspeMZMwc0wueaVQAWQYTZJeo9bjj0YTxMr0W895VFPYo=
+	t=1759364233; cv=none; b=FV/jETd7CwWBijIZdiWko5MMCGNDIKJqV4CGOPnLD7Sad23oSqzF8rAhHjSgHU9seUR//2eqy1XH1AUJxbpWqoKAPMei9SL68y47pj5KTgqL2YDpY+fVwueQb2cUsiZwyCXy4Hs9EMyOO11SyJMhSP+6rktEi6yzgULXU942laE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759362194; c=relaxed/simple;
-	bh=vyjoln4eYYYMZ1JnvwBpD0Tkw30iYhwJlUAsxIuXILo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jCFoJ4M8II5l0qk3EdO1r4I4p1Lszbvuty19goM2n9jPnfLMgHXvCoiFJ1FUlRj2eBKzg6KnyqRNEsjrgP8KOHRJeULzMmDpSjQPIemAj7C142XoQST5FS6WvQMEBV+oxaqPKoKG8DRjn5C9iE74Dwj8UosPRhQa4QmvIoz2BUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=scckct6a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05E89C4CEF1;
-	Wed,  1 Oct 2025 23:43:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759362193;
-	bh=vyjoln4eYYYMZ1JnvwBpD0Tkw30iYhwJlUAsxIuXILo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=scckct6avEXBu+hGoo6bn+zvZAJIZ7Ha8g0TK0Qs3BDOMa54Vdmv6YB5M1ZEhtQAt
-	 206JFKbC086ykfISpzxjVJtZs0YIzJJ8gcsbsFmbbPT1y9vQIxTOAvI05Dw0+JtV8G
-	 ZGaZnyMQHx7X5TiceB9hdsrScpznaQpEobFyH85U+tvZSLTRasGtDbAKule70T3zGY
-	 IrSBR3HQmWbkCEkpOUwWuve0fVDoXCGcofvlx6WLg2RWDWXBowPZkFVQVSi/gDz9UA
-	 ZOHEc5yW35Y882pKIUsvzPrNrC603n954G+TZxJZDDgNHQfKAZz/CYm4CBF5FkVKPn
-	 V15aFt4/qfAvQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	petrm@nvidia.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net] selftests: drv-net: make linters happy with our imports
-Date: Wed,  1 Oct 2025 16:43:08 -0700
-Message-ID: <20251001234308.2895998-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1759364233; c=relaxed/simple;
+	bh=qDzFaanVpi5FMCY6mdFJbc771cYhK6nwd1MnoMmHsV8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mQUyELGil3C6/ZWyc0OFTKGV59/6KDJsrdMGmzONu3yvPTP+A1kl4BFZ8g/azblU2GT2kl2iYg+yV4EyOFVe2xXl2/kQPJdYpmX7uAgDV023qOkBE7PJuKiHzBVbiQhlY4KpcN4U4GiZ9685CxbL+pdkXRzoVvBMIRCh1j/Xmoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YlXnyBpT; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1759364232; x=1790900232;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=qDzFaanVpi5FMCY6mdFJbc771cYhK6nwd1MnoMmHsV8=;
+  b=YlXnyBpTK7vgKC9jXnzLVdqqHVDEZU2FUm+NwlXVXggm95FWcskVxEeJ
+   HkGnwGkDHqALjUZznVgleOJGO1FKDNQjt5GlZ9d9ylqiy52hXXcZM08CC
+   0MsNUlzWYhQI4CdcSWkTJJxvjqVC48aEo5qhsH0sAkoR20KET0kn/goLk
+   LmXQ555UrAOXfDCl+pk6ZiXSyhxzv2or98zPIlg6SCZ+8Yep3rzYzUy7y
+   d27/r1SIpTZdWrUuyawFuOeIJX/uTRZYaNTpE5nsh7zL2bU6J74CdyMA1
+   l/pl+uNVhj4vhTT80M5j2i/lZcmYv4uZ3RrQwsKc+1ZxryZw7XlI85mYk
+   g==;
+X-CSE-ConnectionGUID: KGR/sO+fRyqvZm7kL80aVg==
+X-CSE-MsgGUID: +Qbe4B3aRhesuqD1Hp6DrA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11569"; a="61561585"
+X-IronPort-AV: E=Sophos;i="6.18,308,1751266800"; 
+   d="scan'208";a="61561585"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2025 17:17:10 -0700
+X-CSE-ConnectionGUID: qWs7ETUsRMaf/ns0UnvGaw==
+X-CSE-MsgGUID: YyVV10piTe2UZTY0KPBv9Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,308,1751266800"; 
+   d="scan'208";a="184105711"
+Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2025 17:17:09 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net 0/8] Intel Wired LAN Driver Updates 2025-10-01 (idpf,
+ ixgbe, ixgbevf)
+Date: Wed, 01 Oct 2025 17:14:10 -0700
+Message-Id: <20251001-jk-iwl-net-2025-10-01-v1-0-49fa99e86600@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANTD3WgC/x2M0QpAQBBFf0XzbGp3CvEr8iBmGbS0K5T8u+Hxn
+ O65N0QOwhGq5IbAh0RZvYJNE+jG1g+M0isDGcqsMRanGeVc0POOn0NrUG1JXU9tTrlzBWi7BXZ
+ y/b816Baa53kBJuq1TmwAAAA=
+X-Change-ID: 20251001-jk-iwl-net-2025-10-01-92cd2a626ff7
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Emil Tantilov <emil.s.tantilov@intel.com>, 
+ Pavan Kumar Linga <pavan.kumar.linga@intel.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Sridhar Samudrala <sridhar.samudrala@intel.com>, 
+ Phani Burra <phani.r.burra@intel.com>, 
+ Piotr Kwapulinski <piotr.kwapulinski@intel.com>, 
+ Simon Horman <horms@kernel.org>, Radoslaw Tyl <radoslawx.tyl@intel.com>, 
+ Jedrzej Jagielski <jedrzej.jagielski@intel.com>, 
+ Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Cc: Anton Nadezhdin <anton.nadezhdin@intel.com>, 
+ Konstantin Ilichev <konstantin.ilichev@intel.com>, 
+ Milena Olech <milena.olech@intel.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
+ Samuel Salin <Samuel.salin@intel.com>, 
+ Chittim Madhu <madhu.chittim@intel.com>, 
+ Joshua Hay <joshua.a.hay@intel.com>, 
+ Andrzej Wilczynski <andrzejx.wilczynski@intel.com>, stable@vger.kernel.org, 
+ Rafal Romanowski <rafal.romanowski@intel.com>, 
+ Koichiro Den <den@valinux.co.jp>, Rinitha S <sx.rinitha@intel.com>, 
+ Paul Menzel <pmenzel@molgen.mpg.de>
+X-Mailer: b4 0.15-dev-cbe0e
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3087;
+ i=jacob.e.keller@intel.com; h=from:subject:message-id;
+ bh=qDzFaanVpi5FMCY6mdFJbc771cYhK6nwd1MnoMmHsV8=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhoy7R+rN7f8ecspX1Qx53i0vu2zxXVu1WfzOQSY1Syy7n
+ 0xwf7Swo5SFQYyLQVZMkUXBIWTldeMJYVpvnOVg5rAygQxh4OIUgIlM38/wm21/5ZlfmTcEIk1n
+ nKnJb/jDLsv8PuHXhXWZVx7dfv9c35yRYWbWpO2eXxxy9GR3WkqIXOGadWCG7IG5jctN9PK9t08
+ XZQAA
+X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
+ fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 
-Linters are still not very happy with our __init__ files,
-which was pointed out in recent review (see Link).
+For idpf:
+Milena fixes a memory leak in the idpf reset logic when the driver resets
+with an outstanding Tx timestamp.
 
-We have previously started importing things one by one to
-make linters happy with the test files (which import from __init__).
-But __init__ file itself still makes linters unhappy.
+Emil fixes a race condition in idpf_vport_stop() by using
+test_and_clear_bit() to ensure we execute idpf_vport_stop() once.
 
-To clean it up I believe we must completely remove the wildcard
-imports, and assign the imported modules to __all__.
+For ixgbe and ixgbevf:
+Jedrzej fixes an issue with reporting link speed on E610 VFs.
 
-hds.py needs to be fixed because it seems to be importing
-the Python standard random from lib.net.
+Jedrzej also fixes the VF mailbox API incompatibilities caused by the
+confusion with API v1.4, v1.5, and v1.6. The v1.4 API introduced IPSEC
+offload, but this was only supported on Linux hosts. The v1.5 API
+introduced a new mailbox API which is necessary to resolve issues on ESX
+hosts. The v1.6 API introduced a new link management API for E610. Jedrzej
+introduces a new v1.7 API with a feature negotiation which enables properly
+checking if features such as IPSEC or the ESX mailbox APIs are supported.
+This resolves issues with compatibility on different hosts, and aligns the
+API across hosts instead of having Linux require custom mailbox API
+versions for IPSEC offload.
 
-We can't use ksft_pr() / ktap_result() in case importing
-from net.lib fails. Linters complain that those helpers
-themselves may not have been imported.
+Koichiro fixes a KASAN use-after-free bug in ixgbe_remove().
 
-Link: https://lore.kernel.org/9d215979-6c6d-4e9b-9cdd-39cff595866e@redhat.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
-Sending a fix for the driver's __init__.py first, if this is okay
-with everyone I'll convert the rest. I'm not super confident 'cause
-my Python isn't properly learned.
+Emil Tantilov (2):
+      idpf: convert vport state to bitmap
+      idpf: fix possible race in idpf_vport_stop()
 
-Sending for net, even tho its not a real fix. I think that getting
-it applied during the merge window may be okay? No strong prefence.
-I'm slightly worried that merging it in net-next after the MW will
-leave us with a release cycle full of merge conflicts.
+Jedrzej Jagielski (4):
+      ixgbevf: fix getting link speed data for E610 devices
+      ixgbe: handle IXGBE_VF_GET_PF_LINK_STATE mailbox operation
+      ixgbevf: fix mailbox API compatibility by negotiating supported features
+      ixgbe: handle IXGBE_VF_FEATURES_NEGOTIATE mbox cmd
+
+Koichiro Den (1):
+      ixgbe: fix too early devlink_free() in ixgbe_remove()
+
+Milena Olech (1):
+      idpf: cleanup remaining SKBs in PTP flows
+
+ drivers/net/ethernet/intel/idpf/idpf.h             |  12 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.h       |  15 ++
+ drivers/net/ethernet/intel/ixgbevf/defines.h       |   1 +
+ drivers/net/ethernet/intel/ixgbevf/ixgbevf.h       |   7 +
+ drivers/net/ethernet/intel/ixgbevf/mbx.h           |   8 +
+ drivers/net/ethernet/intel/ixgbevf/vf.h            |   1 +
+ drivers/net/ethernet/intel/idpf/idpf_ethtool.c     |  10 +-
+ drivers/net/ethernet/intel/idpf/idpf_lib.c         |  23 ++-
+ drivers/net/ethernet/intel/idpf/idpf_ptp.c         |   3 +
+ .../net/ethernet/intel/idpf/idpf_singleq_txrx.c    |   2 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c        |   2 +-
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c    |   4 +-
+ .../net/ethernet/intel/idpf/idpf_virtchnl_ptp.c    |   1 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c      |   3 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c     |  79 +++++++++
+ drivers/net/ethernet/intel/ixgbevf/ipsec.c         |  10 ++
+ drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c  |  34 +++-
+ drivers/net/ethernet/intel/ixgbevf/vf.c            | 182 +++++++++++++++++----
+ 18 files changed, 335 insertions(+), 62 deletions(-)
 ---
- tools/testing/selftests/drivers/net/hds.py    |  3 +-
- .../selftests/drivers/net/lib/py/__init__.py  | 43 ++++++++++++++-----
- 2 files changed, 34 insertions(+), 12 deletions(-)
+base-commit: daa26ea63c6f848159821cd9b3cbe47cddbb0a1c
+change-id: 20251001-jk-iwl-net-2025-10-01-92cd2a626ff7
 
-diff --git a/tools/testing/selftests/drivers/net/hds.py b/tools/testing/selftests/drivers/net/hds.py
-index a2011474e625..c4fe049e9baa 100755
---- a/tools/testing/selftests/drivers/net/hds.py
-+++ b/tools/testing/selftests/drivers/net/hds.py
-@@ -3,11 +3,12 @@
- 
- import errno
- import os
-+import random
- from typing import Union
- from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_raises, KsftSkipEx
- from lib.py import CmdExitFailure, EthtoolFamily, NlError
- from lib.py import NetDrvEnv
--from lib.py import defer, ethtool, ip, random
-+from lib.py import defer, ethtool, ip
- 
- 
- def _get_hds_mode(cfg, netnl) -> str:
-diff --git a/tools/testing/selftests/drivers/net/lib/py/__init__.py b/tools/testing/selftests/drivers/net/lib/py/__init__.py
-index 2a645415c4ca..e6c070f32f51 100644
---- a/tools/testing/selftests/drivers/net/lib/py/__init__.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/__init__.py
-@@ -1,5 +1,13 @@
- # SPDX-License-Identifier: GPL-2.0
- 
-+"""
-+Driver test environment.
-+NetDrvEnv and NetDrvEpEnv are the main environment classes.
-+Former is for local host only tests, latter creates / connects
-+to a remote endpoint. See NIPA wiki for more information about
-+running and writing driver tests.
-+"""
-+
- import sys
- from pathlib import Path
- 
-@@ -8,26 +16,39 @@ KSFT_DIR = (Path(__file__).parent / "../../../..").resolve()
- try:
-     sys.path.append(KSFT_DIR.as_posix())
- 
--    from net.lib.py import *
--
-     # Import one by one to avoid pylint false positives
-+    from net.lib.py import NetNS, NetNSEnter, NetdevSimDev
-     from net.lib.py import EthtoolFamily, NetdevFamily, NetshaperFamily, \
-         NlError, RtnlFamily, DevlinkFamily, PSPFamily
-     from net.lib.py import CmdExitFailure
-     from net.lib.py import bkg, cmd, bpftool, bpftrace, defer, ethtool, \
-         fd_read_timeout, ip, rand_port, tool, wait_port_listen, wait_file
--    from net.lib.py import fd_read_timeout
-     from net.lib.py import KsftSkipEx, KsftFailEx, KsftXfailEx
-     from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
-         ksft_setup
-     from net.lib.py import ksft_eq, ksft_ge, ksft_in, ksft_is, ksft_lt, \
-         ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt, ksft_not_none
--except ModuleNotFoundError as e:
--    ksft_pr("Failed importing `net` library from kernel sources")
--    ksft_pr(str(e))
--    ktap_result(True, comment="SKIP")
--    sys.exit(4)
- 
--from .env import *
--from .load import *
--from .remote import Remote
-+    __all__ = ["NetNS", "NetNSEnter", "NetdevSimDev",
-+               "EthtoolFamily", "NetdevFamily", "NetshaperFamily",
-+               "NlError", "RtnlFamily", "DevlinkFamily", "PSPFamily",
-+               "CmdExitFailure",
-+               "bkg", "cmd", "bpftool", "bpftrace", "defer", "ethtool",
-+               "fd_read_timeout", "ip", "rand_port", "tool",
-+               "wait_port_listen", "wait_file",
-+               "KsftSkipEx", "KsftFailEx", "KsftXfailEx",
-+               "ksft_disruptive", "ksft_exit", "ksft_pr", "ksft_run",
-+               "ksft_setup",
-+               "ksft_eq", "ksft_ge", "ksft_in", "ksft_is", "ksft_lt",
-+               "ksft_ne", "ksft_not_in", "ksft_raises", "ksft_true", "ksft_gt",
-+               "ksft_not_none", "ksft_not_none"]
-+
-+    from .env import NetDrvEnv, NetDrvEpEnv
-+    from .load import GenerateTraffic
-+    from .remote import Remote
-+
-+    __all__ += ["NetDrvEnv", "NetDrvEpEnv", "GenerateTraffic", "Remote"]
-+except ModuleNotFoundError as e:
-+    print("Failed importing `net` library from kernel sources")
-+    print(str(e))
-+    sys.exit(4)
--- 
-2.51.0
+Best regards,
+--  
+Jacob Keller <jacob.e.keller@intel.com>
 
 
