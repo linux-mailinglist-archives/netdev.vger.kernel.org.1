@@ -1,142 +1,145 @@
-Return-Path: <netdev+bounces-227650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA0C4BB4C0B
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 19:53:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FB00BB4D70
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 20:07:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C75B321548
-	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 17:53:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A6E5189E826
+	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 18:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64EAE26E71F;
-	Thu,  2 Oct 2025 17:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEEF2273803;
+	Thu,  2 Oct 2025 18:06:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LRdTQj5H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MQSeBeVC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9739725C6F9
-	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 17:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486DC272E63
+	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 18:06:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759427610; cv=none; b=nzy+5ilBCb+WlshfwWmWWiuoCkuV6SriQWtI3Rv1jtN+KK+IcwE8U82UN8JRxY9tt8ljUCv61H3zqCYABzL72VBJ578Le3JSaWz4ngUoXFhc+QVp9/YcWXecwgApCE7WWBsvMAdhUZQnrimbHiqd8+o4ihr1Xj0CGpKTiHtRlpU=
+	t=1759428408; cv=none; b=FBDh7zo0uh1D/BzVbUlv0TEvz+liEEVgoe3d9ld/q5dgZCgB1YQfdCU9TLGrsE3DV2puj2NP01rvQqttyb7u15cOjZTYZnnF05aMSq8XvlmewJk/qODmw21jwHNwKfecBzx012kcw3p8rYQqXMWytjBMCgzgC4eRfRXglgCJDNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759427610; c=relaxed/simple;
-	bh=lYlR9JAkY6eonM9QwEMKfhCQRHt2uu3QYqSTTamIBdo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FeEV+S36cMAUghShfqgQe7RYS0AyY6zNUcaHlBiAxfqEKXGYW1zZX/qo2fl+KW8ARTM9N7/eVhlTIUcaKWvlYQeDbOJzCmc12nJmNwZAgBQ+fdzz8n1wtwfgEwPweKXByAS4N0HbQCHyF0PkjRc3+FI7PsgXchMMSf/iUpjDTKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LRdTQj5H; arc=none smtp.client-ip=209.85.221.54
+	s=arc-20240116; t=1759428408; c=relaxed/simple;
+	bh=0TvBx+bBoyxxks6of1f+mQcu0jvRrKaAXsF7UrPsagw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=PnbiwyvbmTUCBm5WQMQf8VeBpoLxh8gTO4J6mA6/0jiSgV6WnbgVs8+c1LnfEWGKSpO3DKpQeeiu0KGlde9TjweDxpbDb4R/aAdJzmbM+ANxkd7agxcMKLbhecGPxni3o0SXuXHRcPD8xDBHygZC9mQeHW3slvTIBm5t442GluY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MQSeBeVC; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-42420c7de22so816802f8f.1
-        for <netdev@vger.kernel.org>; Thu, 02 Oct 2025 10:53:28 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-781010ff051so1046638b3a.0
+        for <netdev@vger.kernel.org>; Thu, 02 Oct 2025 11:06:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759427607; x=1760032407; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jaxQ5nlkJBoLX0kDXGvJ6XBK66v+3iFsoex1hiWJ05Q=;
-        b=LRdTQj5HA57YVY7NqSsaSHUE9ezVXfVkKiA3tx4sIG7YPF3d+j3ltMzh9hU7u0Lo+v
-         zs+y0nRiwOGSD0ALpJq61LnvsdOv9kJplLXDi0AhjWMUM1u88fIYWDmjzLA9orpdKeZD
-         THAoAu+3KbIGNaLEYA4aKNcVcy78ngRuQRTdEurCD6yvjcbr8WKEuOG8NdEA5HUUQWGl
-         pVv0BWSYfj0ZXbfAiSIcKRRWZA8ZOYLhqfSR6679FCMS9tb4+/6KNANJjge0du1wtWlS
-         ff94Rcj4eW7l4j7UxSTKtmLdRlUEAoCd5zzn+/jrx1Au+XG+k1cUxzBmHtuwM48YcD2g
-         U9rA==
+        d=gmail.com; s=20230601; t=1759428406; x=1760033206; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NaRlW9cRulPCQvMjfuOQg+XDpvDBCH22Dz56ia8tBLk=;
+        b=MQSeBeVCQPEpQDmmZdCVyxTaZbD++Oiavks7RXVcU0gpxgWjXoI+l/Cg3pvhQTwjKD
+         3INUtH+CHlf38nLbMW4iXU2407I0paJfsGwgoHyJs01wIsGh1cMEAaDOSmIT4jbK92q1
+         H9lX4BtXO+FmSBUUtmDTkmJD3pcRTSC+yI/Re3i3CskzyYCzjn6hjzMiEMM8fsTXaYV1
+         qrEO/iXQJ+RKI2J6ZID7EcjpRKW+u3BZouHlcgJomE7pEEgoYfphgaDnqRwdsMDhhprt
+         p02wW1lkEmZY5QzMc5sqPrWLnvYNAPxzR6BjaN/7CbTRiz0h34hWjqxQSW7GuLPi2gpP
+         OwuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759427607; x=1760032407;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jaxQ5nlkJBoLX0kDXGvJ6XBK66v+3iFsoex1hiWJ05Q=;
-        b=NpcFAxex2dpsY78T2LawL2z6DqnHNacOBKp2FE5HRR3NKUmVC2jnOuW66g4eKGX520
-         crLdqop2AwNZUaGUmbnWht6X7cTmGFiSJX6Om4ypDGiIQaCwXvpu0a10X/n+QvCmJ4GF
-         laL1JHHkkrfR2rNzf041IHuY97nTb7kkxFoiym2KJtT4TCa06QXuaqrn/hTsKiXakluE
-         LTim+IAJcpPl52HigCZi5+8249nAmjmNQ7SQvGJiyOASrbCLcKkE2d5aEG51qhpSZGO0
-         JamliUDyjgkyGyiojAO18Q4hmiYPen3SPhFPmhg0nsFp8pEAT/heekIrT6Up6y+wGuOz
-         JpNw==
-X-Gm-Message-State: AOJu0YwlLHWsDpv6OvWTvM94yA2bfSR0JrmLmFhkT4TO9d4rGA32T92g
-	9BlQAZAGIaqbvh3xy8bJAafivRYhU2W299nkMrkGkcP8XeXLO7F5Y3a/A96SG95zrsXiTmfD6ve
-	bbvmypf/S3ea8UGX5wGlewSBlawXfpuE=
-X-Gm-Gg: ASbGncsvKxlM33AfRX9iiAfGA8J4BISTxB8jt5TH5rZjXR15aSX5Ro8C+JPFAet3w66
-	Y261mrwDOpEfZVmHQv2T8aEPvZ+tKEE+20hWBuPCoD8ZjGVrRHUkWPbMcRHsj2L74zwfLlRBpfj
-	fOtG0bUAEImYhNSRiBjCCVtykmWZ88dvTDMR6elU1fgYvDk1cgAk+zITrxjKMHmogh3zah7tjfs
-	FozZ3WGnetGwCAOaphi53p5LnamYibtIet/CeK11w/N5Xk=
-X-Google-Smtp-Source: AGHT+IGUdaUJJ5Am0eJaFvkFzR87l/n/eveNeYR/SWSgPBWRcduqOdb2zPykXRgYMPLLpVYYFEtMNgr6Gvw1FOwxbKQ=
-X-Received: by 2002:a5d:5d87:0:b0:40d:86d8:a180 with SMTP id
- ffacd0b85a97d-425671362a3mr143408f8f.20.1759427606568; Thu, 02 Oct 2025
- 10:53:26 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759428406; x=1760033206;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NaRlW9cRulPCQvMjfuOQg+XDpvDBCH22Dz56ia8tBLk=;
+        b=gt/+au3w4LL0jay5NXPtwU8mUFtAgdNPDSlD6nHjIPkjKulwD7CIlSK9k0z2MMKeag
+         k3LP9I4/uldPaDtPHBLjVr+tq6nY77DP+UCwtTVVMC3IJIC+8zcsP5IC2aE6ONui+e8C
+         3PIBkYr1XMO25teJcjjxtWphHWcOqHShGCDqvHykHyDHcsZdoZvs20oA2kkDHmY2D1Q3
+         Uceh8RdICEpH6vB1rK91hrdtplDpXIBZPqoqo0Sp5qs6OcUb4Oz42RHnyWRR4kRPDcIG
+         ZoW+DnsJ6f4tXy4e1ffE3muZgXEeahYqRbqV/BYAQfEE/zwIJFpJKI86tW+bkWqqjdOs
+         Qccw==
+X-Gm-Message-State: AOJu0YyZKFLQemsX8hxgSOZd2L70FWgIQiSHA3LwK4NDnzIBqnY5gFA9
+	z6Yhi8uEnWjRJuVRMxTHcPbhvqBpSVp+C3nysdaEcn96VsEI27fvE+h7/WBQDbWd
+X-Gm-Gg: ASbGnct1EMtLkX8vEP2q4ZVIX4V+gu3BIexuNRedLsvoB5m4wDOswEDZ6kp0WM7M7dW
+	XpM+l1Lu8ytNaP/9rPWn/3AZI8PYzG2lWNwHfJT00S88HJgVR3gql9+l8YEEkUHIgPezn+mkpO4
+	hE1Jqw30/9tk+1IjXePwQK/yDEIrK+hPXF6MLySC/X2Z6TBNTt3OVXk1wZOSGQz/qWhwrpEcw77
+	guhXMdJEw1KvhC7OriNpQ6LPL+KCAyjIXZrnkwyFNk/z5NWP+rZiwymfpzTMkdXVWrkeTnDqSYf
+	DlhxEzQxB8FSolo73QATwn8mTCkPjoVm4Lld+EZRwdQ7aMlGrecBfYV2fdb4+IMtA7mH47q+FuM
+	51zfFusAOwNmjOni4sOwBHbjiby9VI7b09bVPT9DyVOjYdLxNUrdqibSdlljnPqBwNg4z4JxiJy
+	DCBHh+qKh9/HvYi+Ts/pUFTg3cSFMBWJ0G/98Y8uNRf5pDj8agkw==
+X-Google-Smtp-Source: AGHT+IHbfrpRJoegzbMifEbArQe0pmEL/MKe7nEOBYzWsJyc2a7fn7nnLBoWsEfmGWDetHChWeFyqw==
+X-Received: by 2002:a05:6a00:14d3:b0:781:16de:cc1a with SMTP id d2e1a72fcca58-78c98cf1261mr679991b3a.32.1759428406466;
+        Thu, 02 Oct 2025 11:06:46 -0700 (PDT)
+Received: from crl-3.node2.local ([125.63.65.162])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-78b01fb281bsm2728075b3a.37.2025.10.02.11.06.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Oct 2025 11:06:45 -0700 (PDT)
+From: Kriish Sharma <kriish.sharma2006@gmail.com>
+To: khc@pm.waw.pl,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kriish Sharma <kriish.sharma2006@gmail.com>
+Subject: [PATCH] drivers/net/wan/hdlc_ppp: fix potential null pointer in ppp_cp_event logging
+Date: Thu,  2 Oct 2025 18:05:41 +0000
+Message-Id: <20251002180541.1375151-1-kriish.sharma2006@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250929194648.145585-1-ebiggers@kernel.org> <CAADnVQKKQEjZjz21e_639XkttoT4NvXYxUb8oTQ4X7hZKYLduQ@mail.gmail.com>
- <20251001233304.GB2760@quark> <CAADnVQL=zs-n1s-0emSuDmpfnU7QzMFo+92D3b4tqa3sG+uiQw@mail.gmail.com>
- <20251002173630.GD1697@sol>
-In-Reply-To: <20251002173630.GD1697@sol>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 2 Oct 2025 10:53:13 -0700
-X-Gm-Features: AS18NWCbGcuZ8Cebik8lq4lHKUH7KbCo2CuA-1gvo_9eRy3exLlbGTVyNK97Dds
-Message-ID: <CAADnVQKTvXWQ72iBaAvCsDumq834t7f_0Vjy+Vz-8zaYtnupwA@mail.gmail.com>
-Subject: Re: [PATCH iproute2-next v2] lib/bpf_legacy: Use userspace SHA-1 code
- instead of AF_ALG
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Network Development <netdev@vger.kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, 
-	bpf <bpf@vger.kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Ard Biesheuvel <ardb@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 2, 2025 at 10:37=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
-wrote:
->
-> On Thu, Oct 02, 2025 at 10:12:12AM -0700, Alexei Starovoitov wrote:
-> > On Wed, Oct 1, 2025 at 4:33=E2=80=AFPM Eric Biggers <ebiggers@kernel.or=
-g> wrote:
-> > >
-> > > On Wed, Oct 01, 2025 at 03:59:31PM -0700, Alexei Starovoitov wrote:
-> > > > On Mon, Sep 29, 2025 at 12:48=E2=80=AFPM Eric Biggers <ebiggers@ker=
-nel.org> wrote:
-> > > > >
-> > > > > Add a basic SHA-1 implementation to lib/, and make lib/bpf_legacy=
-.c use
-> > > > > it to calculate SHA-1 digests instead of the previous AF_ALG-base=
-d code.
-> > > > >
-> > > > > This eliminates the dependency on AF_ALG, specifically the kernel=
- config
-> > > > > options CONFIG_CRYPTO_USER_API_HASH and CONFIG_CRYPTO_SHA1.
-> > > > >
-> > > > > Over the years AF_ALG has been very problematic, and it is also n=
-ot
-> > > > > supported on all kernels.  Escalating to the kernel's privileged
-> > > > > execution context merely to calculate software algorithms, which =
-can be
-> > > > > done in userspace instead, is not something that should have ever=
- been
-> > > > > supported.  Even on kernels that support it, the syscall overhead=
- of
-> > > > > AF_ALG means that it is often slower than userspace code.
-> > > >
-> > > > Help me understand the crusade against AF_ALG.
-> > > > Do you want to deprecate AF_ALG altogether or when it's used for
-> > > > sha-s like sha1 and sha256 ?
-> > >
-> > > Altogether, when possible.  AF_ALG has been (and continues to be)
-> > > incredibly problematic, for both security and maintainability.
-> >
-> > Could you provide an example of a security issue with AF_ALG ?
-> > Not challenging the statement. Mainly curious what is going
-> > to understand it better and pass the message.
->
-> It's a gold mine for attackers looking to exploit the kernel.  Here are
-> some examples from the CVE list when searching for "AF_ALG":
+Fixes warnings observed during compilation with -Wformat-overflow:
 
-Ohh. I see. That made it very concrete. Thanks!
+drivers/net/wan/hdlc_ppp.c: In function ‘ppp_cp_event’:
+drivers/net/wan/hdlc_ppp.c:353:17: warning: ‘%s’ directive argument is null [-Wformat-overflow=]
+  353 |                 netdev_info(dev, "%s down\n", proto_name(pid));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+drivers/net/wan/hdlc_ppp.c:342:17: warning: ‘%s’ directive argument is null [-Wformat-overflow=]
+  342 |                 netdev_info(dev, "%s up\n", proto_name(pid));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Acked-by: Alexei Starovoitov <ast@kernel.org>
+Introduce local variable `pname` and fallback to "unknown" if proto_name(pid)
+returns NULL.
+
+Fixes: 262858079afd ("Add linux-next specific files for 20250926")
+Signed-off-by: Kriish Sharma <kriish.sharma2006@gmail.com>
+---
+ drivers/net/wan/hdlc_ppp.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/wan/hdlc_ppp.c b/drivers/net/wan/hdlc_ppp.c
+index 7496a2e9a282..f3b3fa8d46fd 100644
+--- a/drivers/net/wan/hdlc_ppp.c
++++ b/drivers/net/wan/hdlc_ppp.c
+@@ -339,7 +339,9 @@ static void ppp_cp_event(struct net_device *dev, u16 pid, u16 event, u8 code,
+ 		ppp_tx_cp(dev, pid, CP_CODE_REJ, ++ppp->seq, len, data);
+ 
+ 	if (old_state != OPENED && proto->state == OPENED) {
+-		netdev_info(dev, "%s up\n", proto_name(pid));
++		const char *pname = proto_name(pid);
++
++		netdev_info(dev, "%s up\n", pname ? pname : "unknown");
+ 		if (pid == PID_LCP) {
+ 			netif_dormant_off(dev);
+ 			ppp_cp_event(dev, PID_IPCP, START, 0, 0, 0, NULL);
+@@ -350,7 +352,9 @@ static void ppp_cp_event(struct net_device *dev, u16 pid, u16 event, u8 code,
+ 		}
+ 	}
+ 	if (old_state == OPENED && proto->state != OPENED) {
+-		netdev_info(dev, "%s down\n", proto_name(pid));
++		const char *pname = proto_name(pid);
++
++		netdev_info(dev, "%s down\n", pname ? pname : "unknown");
+ 		if (pid == PID_LCP) {
+ 			netif_dormant_on(dev);
+ 			ppp_cp_event(dev, PID_IPCP, STOP, 0, 0, 0, NULL);
+-- 
+2.34.1
+
 
