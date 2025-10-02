@@ -1,117 +1,148 @@
-Return-Path: <netdev+bounces-227548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56F3BBB2A34
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 08:41:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4715BB2A8F
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 09:07:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E82F19C321E
-	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 06:42:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C78E188940E
+	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 07:07:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6BA288C9D;
-	Thu,  2 Oct 2025 06:41:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DTfJ1Ep8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 549EC1E1A3B;
+	Thu,  2 Oct 2025 07:07:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A797263B
-	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 06:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF58EA59
+	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 07:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759387305; cv=none; b=NieU3940BR9GXd5WsiKRFQlcbCNRwdLnu7nzUrQL4yWjo8RkNLpFNr2QnS+kAwn9VzGGy9UskqbjvY0IdOXZUy3LfZKP61WlltkNZaLWa/Wk0l9ROH+2Olzkb4lxgiTmkfH+gaRyG5RwLmNS57ib/lDUHchxI1eNc40GONhyalA=
+	t=1759388844; cv=none; b=Pad4f/0P7Pci737szP54ty04Ox2ivpzGUsnz9hFWvhJzlWGjrdQzBYJ/r7PiA9+JXsMdVhKJj/O6HYyHZPcRAvC9PNaKlSG3TNF7eEr6M9t2hJprWVg9GuJW0cgnZAbjFnlpeAwV2UKZ7JNs4Ysx2yNOuWgTvFyOyWVgjCjYYiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759387305; c=relaxed/simple;
-	bh=VUXUphGUUWqou5aaq4XfiZb9dsE4kKbQ2+2wpdwOM8M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AErB2+qXjbYCHG5H8llFDWVr83/3Yq32s91Jhg+D5IVBtiwMK4RuuB1eO/ec6yam2SH43zBFjzI7kOJMatWyj8tlC/ILMC9XryDadxddMDZJt0VrMZHLodO/f9vk6V5hvd2X4TbDfwzq6IJ38Ya5uw2CQiA+r2Dx3Y8dp762joQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DTfJ1Ep8; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4da72b541f8so7350041cf.1
-        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 23:41:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759387303; x=1759992103; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t2DUgbJikXrEOV8M55fv6hQUu21OkhwEGcUgtuD381w=;
-        b=DTfJ1Ep8QzOVR10ZPRnshCQAcdd0y4G1eh65Vp6JEZesv/GcjBAljTDZeoTSkKlU5h
-         m1AuQt4dTT0IRmFYO9JrgBJoBbrywjUpTWsE/qp4L9HyFNxe8mBX4dbd27vcnFKrdnr4
-         d9+zSa6P8veYxrZuuisjcJPTuBBwV/xja0f4Dn7S0kVE9VfQzMBwjXZCGLekN+c1kpSp
-         09kRf5nAsQraVSlEfoJDPt60HNLDSVFI/Gm3yIquNptMxVxlWUCRLjs8X4Y4PWO98kzK
-         zWtw149OucAS3n3dA2tjOVllhf4+jDk4/obsi6VMRKFrLlCPe4dXNmcFj8Wo0Y61/tQB
-         bZHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759387303; x=1759992103;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t2DUgbJikXrEOV8M55fv6hQUu21OkhwEGcUgtuD381w=;
-        b=pwUYGObcjX0xs3d2/AntshhEXo62QrxHE2HvfGyjFmSAle+xLUbGQsdkTyImew4F6R
-         bDwfSdaJlLZ1g6JEsaQVca0iyzKyBO8XIWMuG8FE1dRTRN36sYH6M6xQI3y+5CGgMoPF
-         /Th2NaUpjsYZUnAjd0WH6RI/oBSZiWB1Smn9EvMc3zpJqYUvDDpb18CWBrd4PrRGdHJK
-         u3EtPlPSX4my1MiYsx+nCsvUBvguu6JaQdH6jWaZmR2y7o/l1tLHLTcbwQKdjPBvpTTZ
-         PKQedahamGXu8mCUdwI03tK4NAuDWxlQi68qPPqMJiTL811gkEGBE6qRXimJig/6qK4m
-         q69g==
-X-Forwarded-Encrypted: i=1; AJvYcCV2U8tRbPLmIc/qSFBckuLP5fEnL4IPVe3nUb3XmHBPeY6yTYF1jUAC1wkKde2iVXhVwJj18C8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpsAfBynp/14ryewOI7+p6maj4LF+ICNrkJG6yLIc8DIu0ReQI
-	tun/jqSc00rf8nCQ3AfJo0SZts0kLPI+ZhElQgXO9Zfhj5WzSbY/65+7Q4vAXuBA7ZnVox+L3SM
-	n7ZvkspC2Q49LdU/mUIKDOy+tNCm8dFc59rp4lQl/
-X-Gm-Gg: ASbGncvSRYfu1BHbywL6SeSpFh7Tq2ay/L7dgG4un02L94qrn3/Gh7iM+nDipTt6Hxg
-	oStVD9A7A/Uw6Qt5uqBLxya4u0xX8gvre5JvbRjvIWec7vlih9U7PbFo6jY9XuJKvAje32COHc4
-	CLKgN5NUyfQrpPH2XEB0zrL8iLmv+tU4/KWx+HxZMnIQeGqxfxZCHf2rv/mhGFE1NtLy7S1+Mfi
-	2Ar1qSET0ITs1LhCVmceNlrkiF4mcna1u8k0ptPUMOpYmJA
-X-Google-Smtp-Source: AGHT+IEO8RvO6Wo/N0jb/UTNus7k/WzY3pqBh7wvsxvtKacpNIUcX1TdeQDKJimIXTKFJTJ5BV4rbtvBuQpJSNpE7Ac=
-X-Received: by 2002:a05:622a:65c1:b0:4e4:f4cf:23b9 with SMTP id
- d75a77b69052e-4e4f4cf27c5mr40251961cf.73.1759387302738; Wed, 01 Oct 2025
- 23:41:42 -0700 (PDT)
+	s=arc-20240116; t=1759388844; c=relaxed/simple;
+	bh=3mjrPKAz4c+KE+in1OXYMJVsP3rIqSikUVXvPk0p5Mw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gRcNjbnSAzrjnLujs9+sPoi6vHlVlUedx4Gj631OLjQ6cfO6QXWR51p1h7saihXWcyYXmkWC73Pv/E5EjGV5sw9tGWscU6nnp6+xhA+ZLoMPuVjNiGN5YHs1xqCr5xew3V5qh5gm8ZRnKXRQ3QE6IC7KKI+gtW+sL0m8gHQuaBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.212] (p5dc550fa.dip0.t-ipconnect.de [93.197.80.250])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 693E86028F34B;
+	Thu, 02 Oct 2025 09:06:26 +0200 (CEST)
+Message-ID: <c86bccd6-9e9e-4355-8e3b-81df181d3c44@molgen.mpg.de>
+Date: Thu, 2 Oct 2025 09:06:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251001022426.2592750-1-kuba@kernel.org> <CAAVpQUCZNhW7zvFrL-kmfkks=u0RtOBW+a-R3BxtqHjt0aud7w@mail.gmail.com>
-In-Reply-To: <CAAVpQUCZNhW7zvFrL-kmfkks=u0RtOBW+a-R3BxtqHjt0aud7w@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 1 Oct 2025 23:41:31 -0700
-X-Gm-Features: AS18NWCsy2SQBlC5crbUKj8M0mr0Lxtf5qv98RsZi8F6uPy28od0qPZxdZ7lWCc
-Message-ID: <CANn89i+9vHQEx4NFSdPGNn-LtM+rxaizcuh=0BtP3EYVQr73KQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: psp: don't assume reply skbs will have a socket
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, netdev@vger.kernel.org, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	ncardwell@google.com, daniel.zahka@gmail.com, willemb@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next] ixgbe: avoid redundant call to
+ ixgbe_non_sfp_link_config()
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+ Jacob E Keller <jacob.e.keller@intel.com>, Simon Horman <horms@kernel.org>,
+ Alok Tiwari <alok.a.tiwari@oracle.com>,
+ Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Cc: Anthony L Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
+References: <20250924193403.360122-1-alok.a.tiwari@oracle.com>
+ <20250925102329.GE836419@horms.kernel.org>
+ <a7b1bc0a-26f0-4256-b52f-3580711be98f@intel.com>
+ <PH0PR11MB59024649641B7ACB09ACD402F01AA@PH0PR11MB5902.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <PH0PR11MB59024649641B7ACB09ACD402F01AA@PH0PR11MB5902.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 1, 2025 at 11:28=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
-m> wrote:
->
-> On Tue, Sep 30, 2025 at 7:24=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > Rx path may be passing around unreferenced sockets, which means
-> > that skb_set_owner_edemux() may not set skb->sk and PSP will crash:
-> >
-> >   KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017=
-]
-> >   RIP: 0010:psp_reply_set_decrypted (./include/net/psp/functions.h:132 =
-net/psp/psp_sock.c:287)
-> >     tcp_v6_send_response.constprop.0 (net/ipv6/tcp_ipv6.c:979)
-> >     tcp_v6_send_reset (net/ipv6/tcp_ipv6.c:1140 (discriminator 1))
-> >     tcp_v6_do_rcv (net/ipv6/tcp_ipv6.c:1683)
-> >     tcp_v6_rcv (net/ipv6/tcp_ipv6.c:1912)
-> >
-> > Fixes: 659a2899a57d ("tcp: add datapath logic for PSP with inline key e=
-xchange")
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
->
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Dear Alok, dear Simon, dear Jake, dear Jedrzej,
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+
+Thank you for your patch and review.
+
+Am 30.09.25 um 10:33 schrieb Jagielski, Jedrzej:
+> From: Keller, Jacob E
+> Sent: Tuesday, September 30, 2025 1:04 AM
+>> On 9/25/2025 3:23 AM, Simon Horman wrote:
+>>> On Wed, Sep 24, 2025 at 12:33:54PM -0700, Alok Tiwari wrote:
+>>>> ixgbe_non_sfp_link_config() is called twice in ixgbe_open()
+>>>> once to assign its return value to err and again in the
+>>>> conditional check. This patch uses the stored err value
+>>>> instead of calling the function a second time. This avoids
+>>>> redundant work and ensures consistent error reporting.
+
+Using 75/75 characters per line would save a line.
+
+Also, following up on the discussion, resending the patch with a 
+comment, that calling this twice was not done intentionally would be great.
+
+>>>> Also fix a small typo in the ixgbe_remove() comment:
+>>>> "The could be caused" -> "This could be caused".
+
+Personally I prefer separate patches for such things, making reverting 
+easier.
+
+>>>> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+>>>> ---
+>>>>   drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 4 ++--
+>>>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+>>>> index 90d4e57b1c93..39ef604af3eb 100644
+>>>> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+>>>> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+>>>> @@ -7449,7 +7449,7 @@ int ixgbe_open(struct net_device *netdev)
+>>>>   					 adapter->hw.link.link_info.link_cfg_err);
+>>>>   
+>>>>   		err = ixgbe_non_sfp_link_config(&adapter->hw);
+>>>> -		if (ixgbe_non_sfp_link_config(&adapter->hw))
+>>>> +		if (err)
+>>>>   			e_dev_err("Link setup failed, err %d.\n", err);
+>>>>   	}
+>>>>   
+>>>
+>>> I am wondering if there is some intended side-effect of
+>>> calling ixgbe_non_sfp_link_config() twice.
+>>>
+>>
+>> Good question.
+>>
+>> It looks like this was introduced by 4600cdf9f5ac ("ixgbe: Enable link
+>> management in E610 device") which added the calls to ixgbe_open. Of
+>> interest, we do also call this function in ixgbe_up_complete which is
+>> called by ixgbe_open, but only if ixgbe_is_sfp() is false. Not sure why
+>> E610 needs special casing here.
+>>
+>> I don't see a reason we need two calls, it looks redundant, and even if
+>> it has some necessary side effect.. that should at least deserve a
+>> comment explaining why.
+>>
+>> Hopefully someone from the ixgbe team can pipe in and explain or ACK
+>> this change.
+> 
+> Thanks for your vigilance! :) but i am afraid there is no reason for
+> having it doubled here
+> 
+> Unfortunately it looks like it has been introduced by mistake
+> and is indeed redundant.
+> 
+> Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+
+With the comments above addressed:
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
