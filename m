@@ -1,184 +1,143 @@
-Return-Path: <netdev+bounces-227534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F5C3BB221A
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 02:18:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E62FBB2334
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 03:03:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5795319C365B
-	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 00:19:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4229E7AD344
+	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 01:01:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352C71DB34C;
-	Thu,  2 Oct 2025 00:17:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA12F25776;
+	Thu,  2 Oct 2025 01:02:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HxDMVcXm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0IU2CV5s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2841E19644B;
-	Thu,  2 Oct 2025 00:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 482C8EEBA
+	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 01:02:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759364239; cv=none; b=avCTbiZLN+VDeShsiKrzkfBu38aT8+XZGwTR8KMIut8d9/R1A4g2l6IKlv3vjEjO/ido3NWC3BdmC85by4PJbYWwVyKD4V0Td1s8emNVju+B0Pn5BKOslZBIWH3WRcqrPzrYxxEPNTXl+MYxsgrQj9kWWU1+Y6c2SJlyYIT9tQQ=
+	t=1759366974; cv=none; b=H5dc9HUEYmN7MRQGYUoiS09iVNGR8KvwSAyG4iRf09gft8uIA/Y9hdJTpJL2Sr+tpMKAx14Rf78AVERa+6vdTUViGQE3EQEeAhdBgOELpIoJx3NYInjCx8VTtBC2I/CtYsX/LJ3P0OH4ThLuQGVIyvzqqbK/rr1qMuFKINe4oJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759364239; c=relaxed/simple;
-	bh=2JhPnI8+IM65d83TQ7q4iLukhBoa+KxAgEa1700xAQU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Vuy0VxZMNxv1dxGCxZQ7QSn0XlzR276uCpe/14uDfZD4h0+q64v7GuuqUADkPwVBXti1IsvIYVlHH3W4Hl/zRfYbvswbT7Nk+MbxtfDhmfNVx+mOtpj//7opHhI2pyzH6kvHvqTk3fwCZnUFao1uZfGNcjK/Sfa4qYwiiYuRFew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HxDMVcXm; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759364237; x=1790900237;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=2JhPnI8+IM65d83TQ7q4iLukhBoa+KxAgEa1700xAQU=;
-  b=HxDMVcXmY2UKXs8nss37pyDp4NaU2HEea7HhMQ8aZBMACWDsOpcsKYXa
-   JRSOE38se5E0cYUpZh0tkyAi9Zy35jL4u2weERBR4HzLpuDSlwFTIrohY
-   cMVzVH02ySoWQ2IEkV2/IZldevV/qpnnJo954VV0kot8BGm1kd5eLqyIq
-   etwWl0sWSqee5F55mcPGdp0i+Lp5jTUeMzKRFAUjmKmDkOTABQRLSvdF1
-   2IrtU6jhpXfgYB+IM8XTmkjKFe2rcAvYtk6wihNQRIAbuIF89zRos/JVc
-   +4p448PzLdsNMceOu2bsCtbarxHvLZdmdIY/247fBB4JPsQudYItjPvQd
-   g==;
-X-CSE-ConnectionGUID: IKabezU/SlST0dokG5Ekag==
-X-CSE-MsgGUID: 81aRdEPkTW+LvR6tLgom5w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11569"; a="61561629"
-X-IronPort-AV: E=Sophos;i="6.18,308,1751266800"; 
-   d="scan'208";a="61561629"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2025 17:17:11 -0700
-X-CSE-ConnectionGUID: p0EquOS+QH2za9TtScfVvA==
-X-CSE-MsgGUID: 5mdtHNk7RhC9y85/v4u1yw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,308,1751266800"; 
-   d="scan'208";a="184105734"
-Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2025 17:17:09 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Wed, 01 Oct 2025 17:14:18 -0700
-Subject: [PATCH net 8/8] ixgbe: fix too early devlink_free() in
- ixgbe_remove()
+	s=arc-20240116; t=1759366974; c=relaxed/simple;
+	bh=fJCwtgPNSFcKZik/xWzuJ2Nl9DLm4510nRoTtppN+sE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sDyR1gTqfQyVlS3QXEdJP/5R8WS0C3wdpwTugQ1UzsO8VbVJGY0hxE8LHwSg84ndwNiMin1CKAgSlRqT6uZxGsQ2w8Fr3vl/RuaPqcYlOxYvARcuMlUzhWSqwIX+LUjtSs5Otwzb7/pJZo1nhbhS176+AZthMKv2gWCw7mFcNoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0IU2CV5s; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4de66881569so230911cf.0
+        for <netdev@vger.kernel.org>; Wed, 01 Oct 2025 18:02:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759366972; x=1759971772; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tBSLRY4fID/cBiXqIe6h5ynAijHxdNPdDw4ZDrWAVg0=;
+        b=0IU2CV5sj5hPfnBH2FVtwOIbgIdQUoYdtcCFPwpBrJ10zV/5kuT72lUi+fx/SrJPv6
+         Kswxx202dz+07bb2iSREeC2PVRfT0XHW+tYTs7Y+YLnkWrsCmwcJqoiDQOWpuz+GhbjJ
+         6m184GmROfBvUVBj4FhfwMkA2ZbEJmEwAcDAmO5VF4OSMROCXCIywjqApxYBvOXPuatL
+         lQEcrn1RI8Rl4e61tKFu/29JIAhk828YPDSTuNBRGFEt/o2HuF94YmGIF53f3lTvmeD/
+         hxbCkoHBJ5nN6TVmJ3yiOPsbyP4RMJ3UZ+O+z2Q4m7e4EpYmVasgNhZaodb68380hY6o
+         CzUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759366972; x=1759971772;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tBSLRY4fID/cBiXqIe6h5ynAijHxdNPdDw4ZDrWAVg0=;
+        b=wLkVd12LEOs5SbkRDAFD3ztDC8T+73B/uyDaRVZVwZ6I64nLylioRs+lDxG7FVMLQ9
+         eZyGpNoy0Zkcbl238vtDyW5SQPkcNZXdJ41VOJ7JhFjTdKFMHQNsU3zyBzVmCU7j2yyz
+         z2qbI377QUHXH35J2ry2rCbCrz4gdeHIDb4UhsDxlvbSwBZ9rp14+8n/ZjgS2utqTWX5
+         /3E3LhJ4uk84pjANYEI40tyKJrHVOiHXuut1pJLGTUe1vhKPO2hSYJ7j85wmmA9poTV6
+         /FtArMXZPG+gUKiaO4qiyi8KrLsSPYb5qcWlw+aJuDuKv28VLauQFcHlZACCBFvPOilm
+         2vwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXZpC6jEwpXao0dqSAnOTHnyo6DQDrH5AGPu4cIPUXabp6F2FZuuasWrA9n4LwprNFof4TPRDo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxN3UBLU/RvcyIfz4CHmon33En5Xg8d9cgV7MU0x2RgH9l3/TxZ
+	Eif82v34zSRrJZvhVBIL8mFpiQH0rpO/q8enBmHPmdGiw9NrzeqES59OJF2TSVhfnnM0EF0snuT
+	QbURzaLr6Wup8vyAAjhDi9Q9tG5mxp5vxTk5EzUZR
+X-Gm-Gg: ASbGncvYVRbPMHU6zRY+T8Y3o65gaN3uyN99i8Lu0MspyV6NudqXEt1DqtxHtelwqv0
+	IPS+kpQ2Dp7qwYu914Itx1Vm/4W0i0VJmwO8A09x75ee+cV3x0J5iU9zJeiHXWnY546YxTjUB6n
+	UJEgmMBbzo0V2UpT42+5+uf3K18nuWoE7gkYx36BjEM3XAZqPC6G2aICS85+x+Nxfg0fFZ3SYSH
+	Kv7OGcmlKmdI5aGSzS1vHIU7OO+BUC6/0/2LFlSEgvhuCUyU6tBOxqJkO4W3nt7TC3j29w=
+X-Google-Smtp-Source: AGHT+IFKtuOO3BtBnInFtghLuT5oaAytbfqlQqxfSONe+I5mErf4jp5CofBK43lV+XX895cBXqbbRtKUWjZVcfWVw4Q=
+X-Received: by 2002:ac8:5d0b:0:b0:4b4:979d:8764 with SMTP id
+ d75a77b69052e-4e56c85df41mr1485761cf.19.1759366971654; Wed, 01 Oct 2025
+ 18:02:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251001-jk-iwl-net-2025-10-01-v1-8-49fa99e86600@intel.com>
-References: <20251001-jk-iwl-net-2025-10-01-v1-0-49fa99e86600@intel.com>
-In-Reply-To: <20251001-jk-iwl-net-2025-10-01-v1-0-49fa99e86600@intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Emil Tantilov <emil.s.tantilov@intel.com>, 
- Pavan Kumar Linga <pavan.kumar.linga@intel.com>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Sridhar Samudrala <sridhar.samudrala@intel.com>, 
- Phani Burra <phani.r.burra@intel.com>, 
- Piotr Kwapulinski <piotr.kwapulinski@intel.com>, 
- Simon Horman <horms@kernel.org>, Radoslaw Tyl <radoslawx.tyl@intel.com>, 
- Jedrzej Jagielski <jedrzej.jagielski@intel.com>, 
- Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Cc: Anton Nadezhdin <anton.nadezhdin@intel.com>, 
- Konstantin Ilichev <konstantin.ilichev@intel.com>, 
- Milena Olech <milena.olech@intel.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
- Koichiro Den <den@valinux.co.jp>, Rinitha S <sx.rinitha@intel.com>, 
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
- Paul Menzel <pmenzel@molgen.mpg.de>
-X-Mailer: b4 0.15-dev-cbe0e
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2539;
- i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=aSMnYiD0CCq3nJNv4SE/LMIAQM/f6FoQSAZXNloPTO8=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhoy7R1qrTfSdjKq1i38FP7y73WavZ1zR4f8JzK9qKxTfm
- D9Vf/a4o5SFQYyLQVZMkUXBIWTldeMJYVpvnOVg5rAygQxh4OIUgInMeMLIML3b7cSXTSvcHj4o
- nizm33f+/IY/i4oXMJ2Oibyy6MHx61wM//T2XpXSFFa/ssX0UPm600WJ+y+78CivKby9yWXil68
- bVBgB
-X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
- fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
+References: <20251001074704.2817028-1-tavip@google.com> <5af7b3b9-3ee1-4ef6-8431-72b40445eacd@linux.dev>
+In-Reply-To: <5af7b3b9-3ee1-4ef6-8431-72b40445eacd@linux.dev>
+From: Octavian Purdila <tavip@google.com>
+Date: Wed, 1 Oct 2025 18:02:40 -0700
+X-Gm-Features: AS18NWDZeq6U-ZXXr8a17ILJl2kRgvXE7gR_7txM0W8s-hT-w__IrWCljO_KFB4
+Message-ID: <CAGWr4cQ6g5xw_iJK2KbyTbSszsf2gacUZ9v0wKAVWnyBAYz9nA@mail.gmail.com>
+Subject: Re: [PATCH net v2] xdp: update mem type when page pool is used for
+ generic XDP
+To: Ihor Solodrai <ihor.solodrai@linux.dev>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, horms@kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me, kuniyu@google.com, 
+	aleksander.lobakin@intel.com, maciej.fijalkowski@intel.com, toke@redhat.com, 
+	lorenzo@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com, 
+	Kernel Team <kernel-team@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Koichiro Den <den@valinux.co.jp>
+On Wed, Oct 1, 2025 at 1:26=E2=80=AFPM Ihor Solodrai <ihor.solodrai@linux.d=
+ev> wrote:
+>
+> Hi Octavian,
+>
 
-Since ixgbe_adapter is embedded in devlink, calling devlink_free()
-prematurely in the ixgbe_remove() path can lead to UAF. Move devlink_free()
-to the end.
+Hi Ihor,
 
-KASAN report:
+> This patch seems to be causing a null pointer dereference.
+> See a splat caught by BPF CI below.
+>
+> You might be able to reproduce with:
+>
+> cd tools/testing/selftests/bpf
+> make test_progs
+> # in kernel with this patch
+> ./test_progs -t xdp_veth
+>
+> Reverting this commit mitigates the failure:
+> https://github.com/linux-netdev/testing-bpf-ci/commit/9e1eab63cd1bcbe37e2=
+05856f7ff7d1ad49669f5
+>
+> Could you please take a look?
+>
 
- BUG: KASAN: use-after-free in ixgbe_reset_interrupt_capability+0x140/0x180 [ixgbe]
- Read of size 8 at addr ffff0000adf813e0 by task bash/2095
- CPU: 1 UID: 0 PID: 2095 Comm: bash Tainted: G S  6.17.0-rc2-tnguy.net-queue+ #1 PREEMPT(full)
- [...]
- Call trace:
-  show_stack+0x30/0x90 (C)
-  dump_stack_lvl+0x9c/0xd0
-  print_address_description.constprop.0+0x90/0x310
-  print_report+0x104/0x1f0
-  kasan_report+0x88/0x180
-  __asan_report_load8_noabort+0x20/0x30
-  ixgbe_reset_interrupt_capability+0x140/0x180 [ixgbe]
-  ixgbe_clear_interrupt_scheme+0xf8/0x130 [ixgbe]
-  ixgbe_remove+0x2d0/0x8c0 [ixgbe]
-  pci_device_remove+0xa0/0x220
-  device_remove+0xb8/0x170
-  device_release_driver_internal+0x318/0x490
-  device_driver_detach+0x40/0x68
-  unbind_store+0xec/0x118
-  drv_attr_store+0x64/0xb8
-  sysfs_kf_write+0xcc/0x138
-  kernfs_fop_write_iter+0x294/0x440
-  new_sync_write+0x1fc/0x588
-  vfs_write+0x480/0x6a0
-  ksys_write+0xf0/0x1e0
-  __arm64_sys_write+0x70/0xc0
-  invoke_syscall.constprop.0+0xcc/0x280
-  el0_svc_common.constprop.0+0xa8/0x248
-  do_el0_svc+0x44/0x68
-  el0_svc+0x54/0x160
-  el0t_64_sync_handler+0xa0/0xe8
-  el0t_64_sync+0x1b0/0x1b8
+Thanks for the report, it looks like dev needs to be set in
+xdp_rxq_info. The following fix works me:
 
-Fixes: a0285236ab93 ("ixgbe: add initial devlink support")
-Signed-off-by: Koichiro Den <den@valinux.co.jp>
-Tested-by: Rinitha S <sx.rinitha@intel.com>
-Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 365c43ffc9c1..85b52c28660b 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -5449,7 +5449,9 @@ int do_xdp_generic(const struct bpf_prog
+*xdp_prog, struct sk_buff **pskb)
+        struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 6218bdb7f941..86b9caece104 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -12091,7 +12091,6 @@ static void ixgbe_remove(struct pci_dev *pdev)
- 
- 	devl_port_unregister(&adapter->devlink_port);
- 	devl_unlock(adapter->devlink);
--	devlink_free(adapter->devlink);
- 
- 	ixgbe_stop_ipsec_offload(adapter);
- 	ixgbe_clear_interrupt_scheme(adapter);
-@@ -12127,6 +12126,8 @@ static void ixgbe_remove(struct pci_dev *pdev)
- 
- 	if (disable_dev)
- 		pci_disable_device(pdev);
-+
-+	devlink_free(adapter->devlink);
- }
- 
- /**
+        if (xdp_prog) {
+-               struct xdp_rxq_info rxq =3D {};
++               struct xdp_rxq_info rxq =3D {
++                       .dev =3D (*pskb)->dev,
++               };
+                struct xdp_buff xdp =3D {
+                        .rxq =3D &rxq,
+                };
 
--- 
-2.51.0.rc1.197.g6d975e95c9d7
-
+But probably Maciej approach is better.
 
