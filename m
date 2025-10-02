@@ -1,256 +1,150 @@
-Return-Path: <netdev+bounces-227644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B038CBB48CB
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 18:33:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89C4CBB49A3
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 18:57:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63744168E9B
-	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 16:33:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49FA53C1393
+	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 16:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C75B0261B9C;
-	Thu,  2 Oct 2025 16:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89202265CAD;
+	Thu,  2 Oct 2025 16:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WX+tRdOo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zjAZRLEt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F93C1E3DCF
-	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 16:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C6723E342
+	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 16:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759422835; cv=none; b=MUb/MaPvvXuinq5J8f0WhCKdUHSwU4wZbwVeMeh8qffH/qDn54ScBb+Zodrit/g7DNcK/MqUTBgYZqTExEutZHiUO7s8RGcOAmpjvjVMXvpeIKiKj3Ga6mhWz/IO6LmsriWjWQtyBu4hZ83lxDg2bPTHYv7ZixLrvDGlWG7FovU=
+	t=1759424245; cv=none; b=cWRM+t9GoMOnwAhdhSaos7DZi11nqDAJEgyuM6OG+HNKy915CPftM3uGMrQjc7dUF+grU7c7CrUGVoC3D3dtRwrDkJkeyV3P+lClCJLTF4gpsJ3lvai8j30gyOYjdCQFBP7QS/euRpMZ/hP1AN5k5UrPKPcl/dH0vZYEuYnO2r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759422835; c=relaxed/simple;
-	bh=zUsGNXp4QJMzq1MLf4iEvgk5tgIN3duC9LmqJCNfesQ=;
+	s=arc-20240116; t=1759424245; c=relaxed/simple;
+	bh=jvWWU7DsWnVlMM93MPOLc8HvjqVRGQld8Uw+STzCBxg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X+D8py0m+mxaZrvQ05tuFnHKM2hoDVx7qksBtsPtcsvdkmLBrqWqmyFuL7xamTdEHceTYxRdDpV0JsMXDjWPhWuEC3BzDsC3AveVAYstpfrlmBhixEvPW0ASDYe9Yeqs+upZ29nrjKeCVkn8wPAhpL9PsJvlM7/5efh/pJh/l9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WX+tRdOo; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-330b0bb4507so1255712a91.3
-        for <netdev@vger.kernel.org>; Thu, 02 Oct 2025 09:33:54 -0700 (PDT)
+	 To:Cc:Content-Type; b=q3F4qLeEMa8a66ku7gnqZUR6HqYfG/XGOiJzblY93/GxZjwUMLJC83+LQ9SND3OcMuknoMuUgvc3LVyYJZ330T5i5zsA7KD1yrCZSClcrYsUV+0qHPOqmKpXIIV+3MbxPp50YUJKYfo+FHTegoFD1szHC06soxgBNnfL6EpQ2f4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zjAZRLEt; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4df3fabe9c2so6211cf.1
+        for <netdev@vger.kernel.org>; Thu, 02 Oct 2025 09:57:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759422833; x=1760027633; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1759424242; x=1760029042; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jof7laRiTqrKkCMc9l/uQGXsUkRpLxL+KnAjdmADKPo=;
-        b=WX+tRdOolcsV550ywqixeOk/57imETEazI/pdRB1IbLb1covyNDwTddzB2VshhsNFD
-         wLA8VAIc+hxo+LreJPfURF+XxcF/4fnna6srjsRE2UCxik5ubPbrG2zGQUQk4+qZECcA
-         Hkg/jmHIgPYEhwATZjnyhiGpY2r4ZILO4SbSDhjv1Walm9kO4sEn4p2LYqyOMT5wDSqo
-         m4AJIEXuuAi0JpaoMdUBj5cEpkBkB2NFRLIqRLHEqVI3uPfXyDTr/vRlXpCEZGd8DvJL
-         mFaSw1mA6EV1+Jcy/d7DkTkO8IJUUS1OiCwR2DhN774DvYC9b2S/cp9ywbwTISJHTSa8
-         bmqQ==
+        bh=NCGLM/GqGQA83nrxpNHfKddD9nhib5D0cyLH7C8UUk0=;
+        b=zjAZRLEt09tZEIzsxAJb27wM2GXdGADV5HjgVzs439YM/NwNHxqmPrb941upzw6w1T
+         lO9Ai4hGIXvFTDt9k+GXbZFZ1eZfPUXYYISYYoenYscj/GoifPnovlp/PC6bPNr6ofpd
+         9VkJgUbAKh5RTr6G/8pfO0PbH+49a+n8vC7x4aWfDBFKBIl/goGe7DD3IVA4Gz2hj5iB
+         VyQNSEiDkfDWL7YH0DUmPuFm8RIgdCVTDUEQmELua60EfZBYmkNFtEBtthA27RfJjDod
+         CQFxrNobQ3qS7c1DuUr5nfqO6WqXTAFHFbn2XtUSZVG0wzZAaQq0GLNw6sKQu4wDCe0w
+         sOsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759422833; x=1760027633;
+        d=1e100.net; s=20230601; t=1759424242; x=1760029042;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jof7laRiTqrKkCMc9l/uQGXsUkRpLxL+KnAjdmADKPo=;
-        b=s6Zjm/Ds9HyTBvW+5UffKkl1VAN7EHgcYXaCDRswjUQwB4gyly2K7h1+m0JqmMSvP3
-         xBAzxtZOYzBHiYcvdzSGY/mcq5KF+JiptdIaRRDUke/CR4P8U9e/H6Fj+hhZ0ZZkentf
-         MQuHmiXam62xSdqkFf7QnPBCAYcICA5JL4BMgI9iHip0jiVj+0GFgHZ6Jc8BKTZ3/xam
-         bh3PSyfd+UYDhwBwUIlDMT9v6j7przrsh9RwXCxTALdLVsbZ7oQWQ/NYTxsobyTrc614
-         pMW1mawrkMMk25qUY6Q5ja039BoUrw95erNYskjQub8JfipgPVpwSInNNqzn57zSoqz7
-         mZtg==
-X-Forwarded-Encrypted: i=1; AJvYcCX6fA0Y5pzYjC6WZAXTxsqMgI2byBSYnrllQ6wY9LwB4af4fAcWFyN49MW0yPi+uI9K4kKkdvg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyggnreYTzFSqMOxlnwFtlJMSwg+f/DcO24UDihSrOjGNIq7f54
-	TNmMJ+qPe9JfEShxJ2Nwn1WjnFSnpsk9mtEE6n/A3LWOXfXAReuAwRD2buDqx2ynYg3tV79PP8I
-	2jh6ZRitWEfI3OL9EeELk9VgI1B9oIU0=
-X-Gm-Gg: ASbGncullEJLSNJ6EAePrttWFJNv9R7YLyohf+cTRISPXrmZyBrS+9mx1bWDOdwlqzi
-	7pI6xwbGOsBzxrll+MSQd6sb8liYQdP4eY9lfctnFEnJoO6zyVoMzm/g9oV760qlyE41i8ik3B6
-	HwMZAoOllz2nkqejntu3GNSFzSvek0ncGR/jgPt5VioY3LxhFLEzaNexSZz63uKG3mnStf6T0OI
-	xNs+DxaOCLTeaMAxYxUH6NNXrCBxKY=
-X-Google-Smtp-Source: AGHT+IERdKml9VYdmwJMWlyh1h6bg1EtMlosf0TdXjw/KcUOIXsRzGSEXkiHfvDN1G2Aq4dfWj2nPc3NDHo7Cex+kKE=
-X-Received: by 2002:a17:90a:e7d0:b0:330:6d2f:1b5d with SMTP id
- 98e67ed59e1d1-339a6f5b61amr9601685a91.26.1759422833496; Thu, 02 Oct 2025
- 09:33:53 -0700 (PDT)
+        bh=NCGLM/GqGQA83nrxpNHfKddD9nhib5D0cyLH7C8UUk0=;
+        b=DHZGNqKuyVPTF0+oxlXQ9mAB9v7RAgtYlpHnSeseRhdvSl6KouYL4uXOzItLxrjLdy
+         BC9atwnJMhxWlVClDKsh9otvRyiup7Spnvw7x5HKLuGAwarBd70QSsLPm+7wSIb5M5lc
+         nJMiEzsDmfcxKJE/eIbJ9jcSjBpknjLtJ1JMw7LhXK58g43qNbv1D8X9Hbbpx1Wad2hK
+         mXtF5TWfdpfu7037cWyLNb6VfDFEGBbIycvACRC117R/Vu6jL3GboweE+SMf8NRDEPZz
+         aVPhq2y+cyeBDjCIrnlOSzrkJg4UFYPaHJH0n8aUeeo6uweDIKSdp4AEZP4Miknj0Mz0
+         IYPA==
+X-Forwarded-Encrypted: i=1; AJvYcCVRi/8nEkgywpTq/RHXGFDlKnDEZ+dVGE0bPCFx0wzONH97TTBfcGZPLBcdC+L9RDY//ahu3FY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9KEbmCdjgjwv4e/FLhqqUtkWu3MsTVTc0tnBgcdI1FlLQZRLf
+	qfdGFZNP6jxxGZgZJW0TPL5rD0fCNco+cqMlmXbFbq4GIaR8mCTzUkQlE/xmHeUgEueoYpQJxMA
+	GRhVW9molgp4P1iaGxEyQyLsekwbGJdsO6pH95LHj
+X-Gm-Gg: ASbGncv5VuUPYTJ4Y3Mx42viOuQ90rJrBsNlz+uflCX5CcUz3Qn9/Ys/9eNkYfPhsMW
+	Y6dSwPvWrZq7pJf94MywQqCIme1/hpbC6gGA3crSH/bRTJBvmmC86tf4XfBUXO96E3eOsapTUxU
+	WCS4gu+Z8RSm62HDZXmW9d8tZ2EJONupibe7tvYoBFJpdgj2rkMfzG7WyeLx3ExZ6/SF+qWWV7c
+	aj95QzTLtjOnWVORCrSDZH+NtWzOL1BZifBvu4+Kx0hK7wl
+X-Google-Smtp-Source: AGHT+IGjSO8rMfuq7KqxiCPuz/RJu/+p2b9lnog0dTmqYYsEOQWVKbG/Nu2mGxt55MxB++Fj2wSpOxT30Ug2gJcEr7U=
+X-Received: by 2002:a05:622a:15cd:b0:4e4:ec1f:6a79 with SMTP id
+ d75a77b69052e-4e56c773eccmr5849651cf.3.1759424242000; Thu, 02 Oct 2025
+ 09:57:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250815110401.2254214-2-dtatulea@nvidia.com> <20250815110401.2254214-8-dtatulea@nvidia.com>
-In-Reply-To: <20250815110401.2254214-8-dtatulea@nvidia.com>
-From: ChaosEsque Team <chaosesqueteam@gmail.com>
-Date: Thu, 2 Oct 2025 12:38:50 -0400
-X-Gm-Features: AS18NWAZmI1ZNkM_0sg1UW1Qgy80TTExwOLB3IyIYO5zs9gB-CLNFF0SCAa73sM
-Message-ID: <CALC8CXeXUGGujKjZbzCTXa5iyrk5XGWaCXTvtQODu+HCEDOYmw@mail.gmail.com>
-Subject: Re: [RFC net-next v3 6/7] net: devmem: pre-read requested rx queues
- during bind
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: almasrymina@google.com, asml.silence@gmail.com, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	cratiu@nvidia.com, tariqt@nvidia.com, parav@nvidia.com, 
-	Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251001074704.2817028-1-tavip@google.com> <aN091c4VZRtZwZDZ@boxer>
+ <20251001082737.23f5037f@kernel.org> <aN17pc5/ZBQednNi@boxer>
+ <CAGWr4cSMme5B-bMc+maKccoYxgVeVKaXk7Eh=SOM7jX3Du5Rkw@mail.gmail.com> <aN51q5TeJV5R5x04@boxer>
+In-Reply-To: <aN51q5TeJV5R5x04@boxer>
+From: Octavian Purdila <tavip@google.com>
+Date: Thu, 2 Oct 2025 09:57:10 -0700
+X-Gm-Features: AS18NWC16cinXwsgu8fwX0n2Ewjv30s8MT_D81INJP7YSjIl2xdKZMz7Ce2P6_M
+Message-ID: <CAGWr4cTKgcrWKcNchdo6OKbKFTNaNc+jfPoKf+_qb+9W-nJT3g@mail.gmail.com>
+Subject: Re: [PATCH net v2] xdp: update mem type when page pool is used for
+ generic XDP
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, horms@kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me, kuniyu@google.com, 
+	aleksander.lobakin@intel.com, toke@redhat.com, lorenzo@kernel.org, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Mina sounds like a girls name. Do you DOMINATE her?
+On Thu, Oct 2, 2025 at 5:54=E2=80=AFAM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> On Wed, Oct 01, 2025 at 06:15:25PM -0700, Octavian Purdila wrote:
+> > On Wed, Oct 1, 2025 at 12:06=E2=80=AFPM Maciej Fijalkowski
+> > <maciej.fijalkowski@intel.com> wrote:
+> > >
+> > > On Wed, Oct 01, 2025 at 08:27:37AM -0700, Jakub Kicinski wrote:
+> > > > On Wed, 1 Oct 2025 16:42:29 +0200 Maciej Fijalkowski wrote:
+> > > > > Here we piggy back on sk_buff::pp_recycle setting as it implies u=
+nderlying
+> > > > > memory is backed by page pool.
+> > > >
+> > > > skb->pp_recycle means that if the pages of the skb came from a pp t=
+hen
+> > > > the skb is holding a pp reference not a full page reference on thos=
+e
+> > > > pages. It does not mean that all pages of an skb came from pp.
+> > > > In practice it may be equivalent, especially here. But I'm slightly
+> > > > worried that checking pp_recycle will lead to confusion..
+> > >
+> > > Mmm ok - maybe that's safer and straight-forward?
+> > >
+> > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > index 93a25d87b86b..7707a95ca8ed 100644
+> > > --- a/net/core/dev.c
+> > > +++ b/net/core/dev.c
+> > > @@ -5269,6 +5269,9 @@ u32 bpf_prog_run_generic_xdp(struct sk_buff *sk=
+b, struct xdp_buff *xdp,
+> > >         orig_bcast =3D is_multicast_ether_addr_64bits(eth->h_dest);
+> > >         orig_eth_type =3D eth->h_proto;
+> > >
+> > > +       xdp->rxq->mem.type =3D page_pool_page_is_pp(virt_to_page(xdp-=
+>data)) ?
+> > > +               MEM_TYPE_PAGE_POOL : MEM_TYPE_PAGE_SHARED;
+> > > +
+> > >         act =3D bpf_prog_run_xdp(xdp_prog, xdp);
+> > >
+> > >         /* check if bpf_xdp_adjust_head was used */
+> > >
+> > > As you know we do not have that kind of granularity within xdp_buff w=
+here
+> > > we could distinguish the memory provider per linear part and each fra=
+g...
+> >
+> > LGTM, based on my limited understanding. I can also confirm the syz
+> > repro no longer crashes with this patch.
+>
+> Would you be OK with me submitting this fix and giving you the proper
+> credit?
 
-On Fri, Aug 15, 2025 at 7:09=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.com=
-> wrote:
->
-> Instead of reading the requested rx queues after binding the buffer,
-> read the rx queues in advance in a bitmap and iterate over them when
-> needed.
->
-> This is a preparation for fetching the DMA device for each queue.
->
-> This patch has no functional changes.
->
-> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-> ---
->  net/core/netdev-genl.c | 76 +++++++++++++++++++++++++++---------------
->  1 file changed, 49 insertions(+), 27 deletions(-)
->
-> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> index 3e2d6aa6e060..3e990f100bf0 100644
-> --- a/net/core/netdev-genl.c
-> +++ b/net/core/netdev-genl.c
-> @@ -869,17 +869,50 @@ int netdev_nl_qstats_get_dumpit(struct sk_buff *skb=
-,
->         return err;
->  }
->
-> -int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
-> +static int netdev_nl_read_rxq_bitmap(struct genl_info *info,
-> +                                    unsigned long *rxq_bitmap)
->  {
->         struct nlattr *tb[ARRAY_SIZE(netdev_queue_id_nl_policy)];
-> +       struct nlattr *attr;
-> +       int rem, err =3D 0;
-> +       u32 rxq_idx;
-> +
-> +       nla_for_each_attr_type(attr, NETDEV_A_DMABUF_QUEUES,
-> +                              genlmsg_data(info->genlhdr),
-> +                              genlmsg_len(info->genlhdr), rem) {
-> +               err =3D nla_parse_nested(
-> +                       tb, ARRAY_SIZE(netdev_queue_id_nl_policy) - 1, at=
-tr,
-> +                       netdev_queue_id_nl_policy, info->extack);
-> +               if (err < 0)
-> +                       return err;
-> +
-> +               if (NL_REQ_ATTR_CHECK(info->extack, attr, tb, NETDEV_A_QU=
-EUE_ID) ||
-> +                   NL_REQ_ATTR_CHECK(info->extack, attr, tb, NETDEV_A_QU=
-EUE_TYPE))
-> +                       return -EINVAL;
-> +
-> +               if (nla_get_u32(tb[NETDEV_A_QUEUE_TYPE]) !=3D NETDEV_QUEU=
-E_TYPE_RX) {
-> +                       NL_SET_BAD_ATTR(info->extack, tb[NETDEV_A_QUEUE_T=
-YPE]);
-> +                       return -EINVAL;
-> +               }
-> +
-> +               rxq_idx =3D nla_get_u32(tb[NETDEV_A_QUEUE_ID]);
-> +
-> +               bitmap_set(rxq_bitmap, rxq_idx, 1);
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
-> +{
->         struct net_devmem_dmabuf_binding *binding;
->         u32 ifindex, dmabuf_fd, rxq_idx;
->         struct netdev_nl_sock *priv;
->         struct net_device *netdev;
-> +       unsigned long *rxq_bitmap;
->         struct device *dma_dev;
->         struct sk_buff *rsp;
-> -       struct nlattr *attr;
-> -       int rem, err =3D 0;
-> +       int err =3D 0;
->         void *hdr;
->
->         if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_DEV_IFINDEX) ||
-> @@ -922,37 +955,22 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, str=
-uct genl_info *info)
->                 goto err_unlock;
->         }
->
-> +       rxq_bitmap =3D bitmap_alloc(netdev->num_rx_queues, GFP_KERNEL);
-> +       if (!rxq_bitmap) {
-> +               err =3D -ENOMEM;
-> +               goto err_unlock;
-> +       }
-> +       netdev_nl_read_rxq_bitmap(info, rxq_bitmap);
-> +
->         dma_dev =3D netdev_queue_get_dma_dev(netdev, 0);
->         binding =3D net_devmem_bind_dmabuf(netdev, dma_dev, DMA_FROM_DEVI=
-CE,
->                                          dmabuf_fd, priv, info->extack);
->         if (IS_ERR(binding)) {
->                 err =3D PTR_ERR(binding);
-> -               goto err_unlock;
-> +               goto err_rxq_bitmap;
->         }
->
-> -       nla_for_each_attr_type(attr, NETDEV_A_DMABUF_QUEUES,
-> -                              genlmsg_data(info->genlhdr),
-> -                              genlmsg_len(info->genlhdr), rem) {
-> -               err =3D nla_parse_nested(
-> -                       tb, ARRAY_SIZE(netdev_queue_id_nl_policy) - 1, at=
-tr,
-> -                       netdev_queue_id_nl_policy, info->extack);
-> -               if (err < 0)
-> -                       goto err_unbind;
-> -
-> -               if (NL_REQ_ATTR_CHECK(info->extack, attr, tb, NETDEV_A_QU=
-EUE_ID) ||
-> -                   NL_REQ_ATTR_CHECK(info->extack, attr, tb, NETDEV_A_QU=
-EUE_TYPE)) {
-> -                       err =3D -EINVAL;
-> -                       goto err_unbind;
-> -               }
-> -
-> -               if (nla_get_u32(tb[NETDEV_A_QUEUE_TYPE]) !=3D NETDEV_QUEU=
-E_TYPE_RX) {
-> -                       NL_SET_BAD_ATTR(info->extack, tb[NETDEV_A_QUEUE_T=
-YPE]);
-> -                       err =3D -EINVAL;
-> -                       goto err_unbind;
-> -               }
-> -
-> -               rxq_idx =3D nla_get_u32(tb[NETDEV_A_QUEUE_ID]);
-> -
-> +       for_each_set_bit(rxq_idx, rxq_bitmap, netdev->num_rx_queues) {
->                 err =3D net_devmem_bind_dmabuf_to_queue(netdev, rxq_idx, =
-binding,
->                                                       info->extack);
->                 if (err)
-> @@ -966,6 +984,8 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struc=
-t genl_info *info)
->         if (err)
->                 goto err_unbind;
->
-> +       bitmap_free(rxq_bitmap);
-> +
->         netdev_unlock(netdev);
->
->         mutex_unlock(&priv->lock);
-> @@ -974,6 +994,8 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struc=
-t genl_info *info)
->
->  err_unbind:
->         net_devmem_unbind_dmabuf(binding);
-> +err_rxq_bitmap:
-> +       bitmap_free(rxq_bitmap);
->  err_unlock:
->         netdev_unlock(netdev);
->  err_unlock_sock:
-> --
-> 2.50.1
->
->
+Yes, of course, thank you!
 
