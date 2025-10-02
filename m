@@ -1,110 +1,53 @@
-Return-Path: <netdev+bounces-227603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 295CBBB33BF
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 10:42:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50F7DBB34D3
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 10:47:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84D20189D769
-	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 08:41:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6CDD4C7B92
+	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 08:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599ED2FC873;
-	Thu,  2 Oct 2025 08:24:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="i5+HKGpb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D374A2FE07D;
+	Thu,  2 Oct 2025 08:25:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC45E2D46DA;
-	Thu,  2 Oct 2025 08:24:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45B82F90CD;
+	Thu,  2 Oct 2025 08:25:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759393492; cv=none; b=FG1uUYWxwWOE7JW2qXI15uYPFlyk5sJSGrH/xeRv2OHpGlMr7pP2QvAJDDyzNGqY201GlFTYT5qadDXvWWY9b6tGE+E+LBX0reL5Nej40d+pC35prINKj8SClq2ert5OG1/3EAg1wkWkithQdrTyGhPh5es0vjmF1gBc5k7SwwQ=
+	t=1759393514; cv=none; b=Pqg4GKTHRqJ2XVVIcUcRsHzNm96FVRJRsTF5YSctvnyvsvEeXHv42IELqCTUOyzJu3HlloyldUrtUw/xdXnNEsE67nNpw5h+wUc3UHn+RwyrgJ22Zf1ivtzMYwLZceB9vPFF8wgVrCAewvH1zax/LyFfpILIbdx83GNp/shT2u0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759393492; c=relaxed/simple;
-	bh=EGta/OBizNM09PGf6rEuH2ZEVwPb5dGKC+KMXznpC2w=;
+	s=arc-20240116; t=1759393514; c=relaxed/simple;
+	bh=nWxfZQR7Ozg/B1MyeK9GV94SrsxFI8TSyB/bZm6voY4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qkgpazbu6iD0LhzA4OXGZZtmgo2tseuTqBGzg5oTt1DpZH1n91jz8DTZcQqc4Wro+jXKxQogwoVReuBrz1gHMkzhqOsj+gnMHzJwHu0k8BsfkQvvEtJUHNl7kirmz1rpMm+9va4RiM2wdcrw29UlOlBTfurF4r81lk+lAjj6THE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=i5+HKGpb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60A32C4CEF4;
-	Thu,  2 Oct 2025 08:24:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1759393491;
-	bh=EGta/OBizNM09PGf6rEuH2ZEVwPb5dGKC+KMXznpC2w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i5+HKGpbYKH37uF6UEmHuZtFQv6O5ZG1HxMQr8kvde7omSAD+zel/Z4+s6JwdJrZv
-	 Ur3S6DldaheLi+GEdKKHX1ZJ+iRyil+oU4pwd+w36q87VybbM/v+qrAgAFV69+RNbv
-	 WsN8AOHH246elLsfI0Z+lVr0mIU6QpnW71c2yL1s=
-Date: Thu, 2 Oct 2025 10:24:41 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Byungchul Park <byungchul@sk.com>
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
-	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
-	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
-	amir73il@gmail.com, kernel-team@lge.com, linux-mm@kvack.org,
-	akpm@linux-foundation.org, mhocko@kernel.org, minchan@kernel.org,
-	hannes@cmpxchg.org, vdavydov.dev@gmail.com, sj@kernel.org,
-	jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-	ngupta@vflare.org, linux-block@vger.kernel.org,
-	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
-	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-	djwong@kernel.org, dri-devel@lists.freedesktop.org,
-	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
-	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
-	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
-	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
-	yeoreum.yun@arm.com, netdev@vger.kernel.org,
-	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
-	catalin.marinas@arm.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, luto@kernel.org,
-	sumit.semwal@linaro.org, gustavo@padovan.org,
-	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
-	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
-	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
-	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
-	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
-	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
-	qiang.zhang@linux.dev, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
-	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
-	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
-	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
-	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
-	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
-	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
-	yuzhao@google.com, baolin.wang@linux.alibaba.com,
-	usamaarif642@gmail.com, joel.granados@kernel.org,
-	richard.weiyang@gmail.com, geert+renesas@glider.be,
-	tim.c.chen@linux.intel.com, linux@treblig.org,
-	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
-	chenhuacai@kernel.org, francesco@valla.it,
-	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
-	masahiroy@kernel.org, brauner@kernel.org,
-	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
-	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
-	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH v17 01/47] llist: move llist_{head,node} definition to
- types.h
-Message-ID: <2025100230-grafted-alias-22a2@gregkh>
-References: <20251002081247.51255-1-byungchul@sk.com>
- <20251002081247.51255-2-byungchul@sk.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cRt5fRdSvEmgOzZZ3OF88WvKZnhj4SY5HmbjcJwJPxaNx2WUX6Zx9ZPSGGZO5zm7AGjM+hL32g1eQM4o9NManuvRUSqT5ncCvA4CZ3c47fySbf/N49zSbjDskDvPwEjLfOPtpbCN+x8bAy7s3jhd7prf+zllg/6LNlJVXoIa2EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 2A3E460532; Thu,  2 Oct 2025 10:25:11 +0200 (CEST)
+Date: Thu, 2 Oct 2025 10:25:10 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>, netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org, bridge@lists.linux.dev
+Subject: Re: [PATCH v15 nf-next 3/3] netfilter: nft_chain_filter: Add bridge
+ double vlan and pppoe
+Message-ID: <aN425i3sBuYiC5D5@strlen.de>
+References: <20250925183043.114660-1-ericwouds@gmail.com>
+ <20250925183043.114660-4-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -113,21 +56,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251002081247.51255-2-byungchul@sk.com>
+In-Reply-To: <20250925183043.114660-4-ericwouds@gmail.com>
 
-On Thu, Oct 02, 2025 at 05:12:01PM +0900, Byungchul Park wrote:
-> llist_head and llist_node can be used by some other header files.  For
-> example, dept for tracking dependencies uses llist in its header.  To
-> avoid header dependency, move them to types.h.
+Eric Woudstra <ericwouds@gmail.com> wrote:
+> This adds the capability to evaluate 802.1ad, QinQ, PPPoE and PPPoE-in-Q
+> packets in the bridge filter chain.
 
-If you need llist in your code, then include llist.h.  Don't force all
-types.h users to do so as there is not a dependency in types.h for
-llist.h.
+Same comment as previous patch, this needs to explain the why, not the what.
 
-This patch shouldn't be needed as you are hiding "header dependency" for
-other files.
+nft_do_chain_bridge() passes all packets to the interpreter, so the
+above statement is not correct either, you can already filter on all of
+these packet types.  This exposes NFT_PKTINFO_L4PROTO etc, which is
+different than what this commit message says.
 
-thanks,
+I also vaguely remember I commented that this changes (breaks?) existing
+behaviour for a rule like "tcp dport 22 accept" which may now match e.g.
+a PPPoE packet.
 
-greg k-h
+Pablo, whats your take on this?  Do we need a new NFPROTO_BRIDGE
+expression that can munge (populate) nft_pktinfo with the l4 data?
+
+That would move this off to user policy (config) land.
+
+(or extend nft_meta_bridge, doesn't absolutely require a brand new expression).
+
+> +static inline int nft_set_bridge_pktinfo(struct nft_pktinfo *pkt,
+> +					 struct sk_buff *skb,
+> +					 const struct nf_hook_state *state,
+> +					 __be16 *proto)
+
+This is only called from one .c file and unless this gets changed later
+this should reside in that .c file (without inline keyword).
 
