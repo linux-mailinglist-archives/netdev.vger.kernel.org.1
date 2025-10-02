@@ -1,157 +1,119 @@
-Return-Path: <netdev+bounces-227624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3E4DBB3CA3
-	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 13:40:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 226E1BB3CE2
+	for <lists+netdev@lfdr.de>; Thu, 02 Oct 2025 13:46:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 628CD3A63B8
-	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 11:40:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3AD01895E7C
+	for <lists+netdev@lfdr.de>; Thu,  2 Oct 2025 11:46:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20AA130FC38;
-	Thu,  2 Oct 2025 11:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80CB22ACF3;
+	Thu,  2 Oct 2025 11:46:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TW1/86Ro"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="GWgWwShS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A95921F582B;
-	Thu,  2 Oct 2025 11:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E7D21770C
+	for <netdev@vger.kernel.org>; Thu,  2 Oct 2025 11:46:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759405199; cv=none; b=VBFcsD4jIuOusMdbL1d7J1dx1d411HMDRxChvH8jotp5wpZzGGU7iQiJ4xrapz+yv2pqmSkH7GG5faO4cc7FdP6lfrIm+ZJDxlkxaJNrhkwzYYJtRZr7dqotIm5EjIkXuO/2Dx9TArKTJqcMTDXuMnC96OQGXIHFhKF48QNS+DI=
+	t=1759405569; cv=none; b=qhrVpFsZO8zcmJaVasuhqFM9OEyjDbml+e6ueT13FRtVlO6/FltSouBzZQlmbKhRw3Pu6Y2Ysq9o9VDPwXChxgeL6bnnBa8DJjFnaVOCTeXkIcTE6tK0Jzsrdha7fpqaNsZfNt/IzSrVF9E5BMEW5xWjto7kOJh5w1mQQqA0Bu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759405199; c=relaxed/simple;
-	bh=AqM4M+MGYM63wBzkJdjM+deX6L3r76MLEIOrwOOOwJs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I5xXjLHQECGHfFW7wtUoGDHJLYZjJdthnESF+9CC29YB5TQsPRe5booLuXRpPU+TmFNw7hiYt3CpIqkd5KqXA8N0pwaCpJRuy2UHrDvsLJahNrpHZrU4iAMoutz4SVvEC235Di78niwzs9fVzo5AH9UAkKOC7ZlyLpxBVBFd50U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TW1/86Ro; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB65CC4CEF4;
-	Thu,  2 Oct 2025 11:39:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759405199;
-	bh=AqM4M+MGYM63wBzkJdjM+deX6L3r76MLEIOrwOOOwJs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TW1/86RoVUn8qaQrgHMvsQvcXg86d9INUtwu3WmMM1sNr7Nnhsdu5LGDe4wj5Nmcd
-	 h3ahbC+1P18XctdTn5Su30qTYLkv7UarZVkeP70mkiGhbyiaB4Tf6m6FHeWhLlYVJv
-	 LhShOrKMSXkpVSMXLKYov1x2dryfuR3xlR/mL6dZWVfYhX3Zictu/5mKj4LvKtKxkm
-	 Ma7bsVvTVvu3F16nnUTBVa3mDEJ/xjXtgVjwBY+8URYSBCdEXXcChHc80acWuzep8i
-	 mXGvMQLTMLWWC7+zGhRkCVamXaRa0GZJHQuGz3SNFpxw4WC4iKaqKbkQ2SmMMevhe3
-	 M2PF47W5eCD9A==
-Date: Thu, 2 Oct 2025 12:39:31 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Byungchul Park <byungchul@sk.com>
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
-	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
-	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
-	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
-	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-	ngupta@vflare.org, linux-block@vger.kernel.org,
-	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
-	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-	djwong@kernel.org, dri-devel@lists.freedesktop.org,
-	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
-	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
-	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
-	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
-	yeoreum.yun@arm.com, netdev@vger.kernel.org,
-	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
-	catalin.marinas@arm.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, luto@kernel.org,
-	sumit.semwal@linaro.org, gustavo@padovan.org,
-	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
-	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
-	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
-	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
-	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
-	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
-	qiang.zhang@linux.dev, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
-	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
-	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
-	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
-	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
-	kevin.brodsky@arm.com, dwmw@amazon.co.uk, shakeel.butt@linux.dev,
-	ast@kernel.org, ziy@nvidia.com, yuzhao@google.com,
-	baolin.wang@linux.alibaba.com, usamaarif642@gmail.com,
-	joel.granados@kernel.org, richard.weiyang@gmail.com,
-	geert+renesas@glider.be, tim.c.chen@linux.intel.com,
-	linux@treblig.org, alexander.shishkin@linux.intel.com,
-	lillian@star-ark.net, chenhuacai@kernel.org, francesco@valla.it,
-	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
-	masahiroy@kernel.org, brauner@kernel.org,
-	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
-	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
-	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH v17 09/47] arm64, dept: add support
- CONFIG_ARCH_HAS_DEPT_SUPPORT to arm64
-Message-ID: <a7f41101-d80a-4cee-ada5-9c591321b1d7@sirena.org.uk>
-References: <20251002081247.51255-1-byungchul@sk.com>
- <20251002081247.51255-10-byungchul@sk.com>
+	s=arc-20240116; t=1759405569; c=relaxed/simple;
+	bh=cyIdpxNubhuvyduiL9ujFYBh9Qvgfd9olUvMSZ6MOH8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UvQcjN1PV18gu1JRGu1+soi2s6qSjA4RtrRIwzMRxI9auUw34RYg7szBKlETQ/3lOm7lbHPWZTW5SxvjnvksD1YC9HzDPVF0/1fRkfi+T5VBa3x2VGpIC9LhzE3Mm3bnXIW+mBIg2bXAZRdhKn3nvmXqFlbPZNswVbYRrmnX3rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=GWgWwShS; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-628f29d68ecso2169089a12.3
+        for <netdev@vger.kernel.org>; Thu, 02 Oct 2025 04:46:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1759405565; x=1760010365; darn=vger.kernel.org;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nnAbOpa9GWwA8Mzz91fJKN8c6IvbEOIGgFBBZyPX5NA=;
+        b=GWgWwShSwP65Pw8gqOM5pzOnnI7zSm7KGg9RtF5gk7R+suKm1VUruMZdEtgO1bTX+O
+         /IhQ9IYjeQMrEToOT95pS7qxspr1i0Ibgob6O1Ju79CET8jIYYql3t1itmM8/MwxGLQb
+         vjx6JhbnlvObf+S/4Wbs9DWMbzdAmo753lIpwQXVvTqk4hzEyI6p1kzvgsXewu1bvWNq
+         9BNjy+nOTQqiKFRHNjdRrrbD1kj4e1EsjwmtXKgA525lByyl7FPo+cihGk4KyC/UUnBO
+         PQ8kFQMvq7gZTlHZ5gbmdeZ03kqz2FDsSLITBgcje++2gw0KKbxDWD9xLZMipeudfiB7
+         7VTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759405565; x=1760010365;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nnAbOpa9GWwA8Mzz91fJKN8c6IvbEOIGgFBBZyPX5NA=;
+        b=W2ab3nXzaS/bau7a59jaDEuh82NHxPHkdCpxxkvkVx55ufhD8Dnnk4QRF4py/n5IPW
+         WioTwyqmfhhEzakLEi8TobtCVK8LNDr23xn6kS5Pnb390EooOmLsSiUz8eOCqtBe3c/9
+         d4UUrmss9+kWxUlLir0kuTSw18bl9x1xx48SB52l69wG2XulzDlGAkKHxflxiLIzNtug
+         wi8jYBEnukxaaxF7CyFr3/AkSDWATNFT4H/F0glDMYAjDrQr/WsJ3aOipH3+BpDv+LMK
+         5f3RvBWt5B15lD1Gg0kmvgtHQt0fKmD2JokxfNoLU2gm4325NizoqErsirb1OBmPp/4Z
+         PRYA==
+X-Gm-Message-State: AOJu0YxEVxfmO96Q7yoRckatUxhhohlembeKdjytFuKYThKt1uqwXtd/
+	w0de6+GkHnnltXwtulMxNYGkJTdcloIgx1jXzxYuIOdduBxTChpeiqjH+UgM63L/Xk0=
+X-Gm-Gg: ASbGnctZQkjTaiqTwXCLrna72pz9JuEx8AwGAZHwVnQmz2ACkK6bjpDLz6G62OPodkm
+	UHpk3SU0d2puCrQ1jTZfONjHUvZ+oaxPX79e50RLzJHvL75iEqJWuVtAN0yJBcyKE+5qiX8eWya
+	plXQyiWhyOu82SSZcPTshNQR09wjk3vPtIeOyTyYVrAVS/7thScRYf2ILJ/BOXQdnFsegOp55iR
+	4RZW4D28iXhaAr9Tdy7TLIC0XgofwfW1Zmq5u/6jbndvgv/Nt7DlIL0sI+XH+5odN+dsbFGakq9
+	CP6jqAbKi5PmOGdv569RB4WhT/Dk96hAKMjoFTZ7eR4uZUyXfgK3s/vyWJpIhF12tohX+IP4n4Q
+	NMXXXr0YDKcFiG3H0SUfPywvcahBvsJSeT2ZG5w==
+X-Google-Smtp-Source: AGHT+IGkuWTBkQWQsXWA2WSywVPtCOF6XTskC6I1+kyLAhpousf+DMtrvWH/4v50S+KzgF58+1ViHg==
+X-Received: by 2002:a17:907:948f:b0:b30:2f6b:448f with SMTP id a640c23a62f3a-b46e6816e14mr873905666b.25.1759405564608;
+        Thu, 02 Oct 2025 04:46:04 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac6:d677:2dc::49:1c8])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b4869b57f0asm187094166b.77.2025.10.02.04.46.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Oct 2025 04:46:03 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya
+ <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad
+ <hkelam@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>
+Cc: netdev@vger.kernel.org
+Subject: marvell/octeontx2: XDP vs skb headroom reservation
+Date: Thu, 02 Oct 2025 13:46:02 +0200
+Message-ID: <87h5wh34sl.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="KmVT2ZbmJlsEn2vS"
-Content-Disposition: inline
-In-Reply-To: <20251002081247.51255-10-byungchul@sk.com>
-X-Cookie: idleness, n.:
+Content-Type: text/plain
 
+Hi,
 
---KmVT2ZbmJlsEn2vS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm auditing calls to skb_metadata_set() in drivers and something seems
+off in oceontx2. I may be completely misreading the code. I'm a total
+stranger to that driver.
 
-On Thu, Oct 02, 2025 at 05:12:09PM +0900, Byungchul Park wrote:
-> dept needs to notice every entrance from user to kernel mode to treat
-> every kernel context independently when tracking wait-event dependencies.
-> Roughly, system call and user oriented fault are the cases.
->=20
-> Make dept aware of the entrances of arm64 and add support
-> CONFIG_ARCH_HAS_DEPT_SUPPORT to arm64.
+It would seem that there is a difference between the amount of headroom
+that the driver reserves for the XDP buffer vs the skb that is built
+from on that buffer, while the two should match.
 
-The description of what needs to be tracked probably needs some
-tightening up here, it's not clear to me for example why exceptions for
-mops or the vector extensions aren't included here, or what the
-distinction is with error faults like BTI or GCS not being tracked?
+In the receive handler we have:
 
---KmVT2ZbmJlsEn2vS
-Content-Type: application/pgp-signature; name="signature.asc"
+otx2_rcv_pkt_handler
+  otx2_xdp_rcv_pkt_handler if pfvf->xdp_prog
+    xdp_prepare_buff(..., OTX2_HEAD_ROOM, ...)
+      where OTX2_HEAD_ROOM = OTX2_ALIGN = 128
+  skb = napi_get_frags
+    napi_alloc_skb
+      skb_reserve(NET_SKB_PAD + NET_IP_ALIGN)
+        where NET_SKB_PAD = 64, NET_IP_ALIGN = 0 on x86
+  napi_gro_frags
 
------BEGIN PGP SIGNATURE-----
+There are no other calls to skb_reserve there, so we seem to have a
+mismatch. 128B of headroom in XDP buff, and only 64B of headroom in skb
+head.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjeZHIACgkQJNaLcl1U
-h9C/NQf6AxgZ6UzPOMzfmL9NSrLltWX75xfq7wx8SUKs1A6RFEWCR/s8jeaJZeCx
-834KNHe3AuR4JVKLLGCZS/c26uVb8ee5itMM53Hv9CN8sQFUNuw/xdO1WCQVmZOI
-pHaKeDBxXVnmeBO3uxS+3ITFDSNIPz6DOUAhqdFLhC6EhioGurq1dr8EtQu0aL3A
-CqG9/M48cKPZRG7a1vLkqKbg8o15SYytfgXtl1kBey51IR89HXUZA4xdNc1CP0Sf
-t2jQUg9ne/qxFnWt0CZEL+07IEC/enVs8gcO+mSpVX1r8yRDs496wZ29z7TjDaXB
-8wuHMVCoKqwssyLsusjOjgef5XgKoQ==
-=Ipx4
------END PGP SIGNATURE-----
+Again, I could be totally wrong about this, I'm not familiar with the
+driver, but I thought you might want to double check this.
 
---KmVT2ZbmJlsEn2vS--
+Thanks,
+-jkbs
 
