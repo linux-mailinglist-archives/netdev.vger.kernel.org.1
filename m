@@ -1,99 +1,154 @@
-Return-Path: <netdev+bounces-227729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE3FCBB641E
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 10:45:17 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 008ACBB6493
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 11:02:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E12519E36D8
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 08:45:40 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A0E70344B2D
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 09:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07BFA274646;
-	Fri,  3 Oct 2025 08:45:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5E1927F4D5;
+	Fri,  3 Oct 2025 09:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fcNAhzBY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5115C26F2AE
-	for <netdev@vger.kernel.org>; Fri,  3 Oct 2025 08:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E7C27B33E
+	for <netdev@vger.kernel.org>; Fri,  3 Oct 2025 09:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759481113; cv=none; b=U4escgMnGO6E23jmHbPvjwzqLj/vwQFcdAmHX4loCRqpMqMzCVaBPzUISw6wZFwcu8BUsXTqoN8ZdHUV9GHAUX6nsEKL1CH7e06qiLG498PJv9E+FcocnoYZnm0Hza5z3rI8X7McVTDvDe8/WAd1/y57/WKYnRkoTzylff1B/cQ=
+	t=1759482135; cv=none; b=Tq7ia6K/3RXf4GTNh1YLfR6494YxI/0GhDlGVDPlZns/qjNP5GvpVwBQ8rPF48Q0sKVk1P27lBm+NcKDVdOvz8csjudO31a/fdzIAN1DjxoA9qqcEQ9Lr3CfLbUx72YnWWqVxSIjkVcWh/WOnnK4pvUew7mQgdX5p4Tdkg29cRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759481113; c=relaxed/simple;
-	bh=YB1ghMEOeQ5JFYWeY2ps8djFxf5/HuRtlXBeq/CH+jo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BA+rMgWoQN4XHWM4UubKM+rOMSTSfCUAqqRF7HsS0a8dcJecKIdOazxHs+jQy7KxJfTvyS5AjsmTTiqFHC6CR3XXg7dr2+PwOGukZp+Hm3njuEfFbaIlXTkkPqj6NjBO34UeepP3O7pO+HEPNe4UrO/wlP1J5RrKWZ+FD11p0OE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1759482135; c=relaxed/simple;
+	bh=AoJlu/aMSVaAZ99yWts3jw8DSv4BPd3kziHUYPKMSy8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=buzBcd+QjWcp4t4UN4XOXPSRCsVsVG1aR43Ds0C7lJL1AVOZT3CT8edHdZ/cXfKHFitAZ5q/YMW5supvRCf+8tR6T7owRWWogSdFOzlLWMo9jO6UUw2+WHXBJmO4XJNU4vcECpRps7yPRwrMGnBBtJb/g+xE4GW8pUOUPfLIgt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fcNAhzBY; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-61a8c134533so4300487a12.3
-        for <netdev@vger.kernel.org>; Fri, 03 Oct 2025 01:45:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759481110; x=1760085910;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-b57bf560703so1473445a12.2
+        for <netdev@vger.kernel.org>; Fri, 03 Oct 2025 02:02:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759482133; x=1760086933; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lNchDiEzIDmBEztmo8oZmioyYgfq18ckj4ZJE8yTj5I=;
-        b=bJfQr4d2VbPAwmwrC6FgtGSv+ep2T7Z13nS18SOp6AgA6Z3QHh+ofgwP6AAy7n5Uwd
-         U9ivfD+pfpKAc7cWj0KPg3srtkGSpSU5RoTkSRenkWh5n2lF1KQ0m+2XJi1fb5oaOXCJ
-         +qdjO5mbe697DTo91v7Oh0HOI0y6Vozz5eHzRFEwAJbpmkB8MNmbEeO3C7n5oJ8wU/Q6
-         QXqzJBYCYk2ZOh57aC9Ip+qUk/Ayl7iNlpf1jK6+HAQjOuvHYMFCIb7XEt21hrpHF7YS
-         3Deu2AeMk6lg96t2qkZieSFu9dnYWGEgFJBo2BXmubPcOloXknfH8qW+jMpo69ZfULGD
-         vThg==
-X-Forwarded-Encrypted: i=1; AJvYcCVe3OghLoiNydloz/k0Ptw2Sd7H3AD/3KXMgUuYNGd0MkTO9qXJUQjOcBOnqSQyZoaVPpACSv0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE3SQSzspDLF0LVNxt7iSb+K83qvJbBkzhtInQdFdoqRhNtg9W
-	NpUi/v7LQNpQgvXDUW4ZlJ6kmzb/p7YxSQ6cs5SQPb5Oyf+rglC1H7oU
-X-Gm-Gg: ASbGncvWpVzx3OWW8XSKkQm7UxlMk2V/WURgc+2VHcY+703RlnEou+EzGTGqloSQa7T
-	A+kmvxLBZXulgjhbJmQzKt0VFy86SYjBXDEuDkIDDPJj8/WqnCTcKHF3gAqf1s+pV8eNFZ9ozCh
-	BzJLrBDEqBpym0bIia7qAbrECJvTWo4FcGrepIMI4HDwMKEbSuzQoEeOEWNItPlBDvQ4wbhKYbO
-	EBuicIc2f7qWbhTt8jUQbCkHDoCAA/pxeutQAya4BZ3C6TQ+R3YNcjRgUjwbq3Ix4M+0CG5jOz6
-	A1r1PnwCAw7EfklNqEy/pXp6RbfcLToC7oiS9aMj/hlxtOC+WMDeMJ/JaP9LpARaC8n1/owSnAi
-	G2vX5eZ/yoIK3Q2j4pAAS0JEXNop3ymOQ8ap08w==
-X-Google-Smtp-Source: AGHT+IGjw0zmq2CU/sdA/VkxJILpqI/TtLALso31v4P2kiwd0BksUPICZg/6K3fI5iB1htfz3dZPgQ==
-X-Received: by 2002:a05:6402:5347:10b0:634:5297:e3b3 with SMTP id 4fb4d7f45d1cf-63939c509b6mr1714584a12.38.1759481110436;
-        Fri, 03 Oct 2025 01:45:10 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:74::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6378811f14bsm3554826a12.45.2025.10.03.01.45.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Oct 2025 01:45:09 -0700 (PDT)
-Date: Fri, 3 Oct 2025 01:45:06 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Simon Horman <horms@kernel.org>, david decotigny <decot@googlers.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, calvin@wbinvd.org, 
-	kernel-team@meta.com, jv@jvosburgh.net, stable@vger.kernel.org
-Subject: Re: [PATCH net v6 0/4] net: netpoll: fix memory leak and add
- comprehensive selftests
-Message-ID: <s4lrro6msmvu3xtxbrwk3njvmh4vrtk6tmpis4c5q5cbmojuuc@pig4xhrvhoxq>
-References: <20251002-netconsole_torture-v6-0-543bf52f6b46@debian.org>
+        bh=uxqa+yDgpnoAEXzNRro9y4z3jhhmxVoLzlhoWTC4v1g=;
+        b=fcNAhzBYGprF+w7OrvPgpI6+3AHoVTOujVRnua+vOHxFya+cMqyXUN9VYEjzpEYGND
+         a3uv6hKTg01ezVLPbE0IluL45Xs+BhWRdIXGMN+ThBRsEtT8smHcMJ9T7E7WXs+aDBeI
+         u5hND0PTPGyCoOEByaenbmQQlIhfVqcMKAeC3h2QeAuspyqQytAmkWWtX3RH9wKLR9+O
+         ji8l5zRI3I+aurRLPTg+9NLEEy3CRDxP+AFisfRPRS7Y6xg6uk4qQmpNYUtL11XVWvmr
+         axUH4OSxnIHkjULZrLNQUKFkgGWEg2BbIkD+NIAmnMYu4r2m+H4u8U7JSzfvYul9z8Or
+         oZfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759482133; x=1760086933;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uxqa+yDgpnoAEXzNRro9y4z3jhhmxVoLzlhoWTC4v1g=;
+        b=f/dG1sGo2RSXss6navz09JTn21twxNfiJS3qLcPBePSfL81eu1oWLoun6FIdZWnAEh
+         XMBkCyZnhrh6CUlKWQvYtd8JBkkN8NpKotyoD57Uj8XILNJGyqLW3Py6tYQKzxIwJIRC
+         H4jMeRgm4FGnftJfv6z6rp9bimzT9EAkc5JOWnlgl2aeKwnRX/e0lpGnNm+38BaJMEmy
+         x9zqYaUV+zmbnO72xcsTIioP26mCOYKNY0BM0+QkRTcfvBVKLnpew3mAQZZtO0K8i3oJ
+         IKrWKY7/TKLBcgIfgBTv2CgZizKAjvJ5ANoInT8bFgxD1UcWmTqYz/0rTmtV05490xL3
+         Uu5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWFHmBXf2kfR/15769/Yt2VeReE6BQZ7zilIhVAytB0PFKPnwBcUxGI+Nbl/1ksb1OB8Cha7V4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxXh2pXD0BleR3uSh05znE5l1K36hMFuvYVkxu039qkRTjmEs4
+	rE6GzsaRQlOIUGbMqDnVZ+5cP4OMg6KogEJNoYocuNsEs8++NrvltMUguQW6/u31wwyGqi+dckf
+	7M2pYhIfiGrzRCUQJJqGgkzMG3VE8dr4=
+X-Gm-Gg: ASbGncs0bR9V3LoDwFPBRZ9Mul6622HYbqINH0oNYlAygS7iCft9WAnuSsL1h63pcmd
+	zGKitZAeeBltyR2sD6BTVunvUcYnAutN4fGoVWrmxU78/eYoKf/z6m7WpJmByk3YkDEl0pWo8DB
+	QuHjhoQH4Jd8ziLAr5kATv8Gc4aRdoUaRQAAic8qO7mXPo3I4izrVSIxrMPaQKSatnxxK//rlN8
+	CQ/PY0GVlF3AVnLHXDZctSvErqh91ojz9mIU/5Ia9AFQLeqoGiktjnU+4p0bj+OCC2Tgq4FNV3T
+	byEr2oYI5V1TXRSI
+X-Google-Smtp-Source: AGHT+IF+VuyebhfbDmuKwaQz9VO+LNpTaCKzPPtkSI3ZEy/4ghCU+AOuEMJ/tznlAQcxgIL+aISACabvQO9QzaBnXr4=
+X-Received: by 2002:a17:903:1ad0:b0:25e:78db:4a0d with SMTP id
+ d9443c01a7336-28e9a5ff449mr32573585ad.36.1759482133330; Fri, 03 Oct 2025
+ 02:02:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251002-netconsole_torture-v6-0-543bf52f6b46@debian.org>
+References: <20251002180541.1375151-1-kriish.sharma2006@gmail.com> <20251003083312.GC2878334@horms.kernel.org>
+In-Reply-To: <20251003083312.GC2878334@horms.kernel.org>
+From: Kriish Sharma <kriish.sharma2006@gmail.com>
+Date: Fri, 3 Oct 2025 14:32:02 +0530
+X-Gm-Features: AS18NWDDuPPIIeehTgoFw-nQ8yC7s8iWiZZdHg0YLrQUfA3dlujVeUboCKThj8Q
+Message-ID: <CAL4kbRN=ktZc8fkcjo90GM2EBgCVt_xVmSGVQuM8gE2qV3ZJKw@mail.gmail.com>
+Subject: Re: [PATCH] drivers/net/wan/hdlc_ppp: fix potential null pointer in
+ ppp_cp_event logging
+To: Simon Horman <horms@kernel.org>
+Cc: khc@pm.waw.pl, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 02, 2025 at 08:26:24AM -0700, Breno Leitao wrote:
-> Fix a memory leak in netpoll and introduce netconsole selftests that
-> expose the issue when running with kmemleak detection enabled.
-> 
-> This patchset includes a selftest for netpoll with multiple concurrent
-> users (netconsole + bonding), which simulates the scenario from test[1]
-> that originally demonstrated the issue allegedly fixed by commit
-> efa95b01da18 ("netpoll: fix use after free") - a commit that is now
-> being reverted.
-> 
-> Sending this to "net" branch because this is a fix, and the selftest
-> might help with the backports validation.
+Hi Simon,
 
-This is conflicting with `net` tree. Rebasing and resending.
+Thanks for the review and guidance.
+I=E2=80=99ll prepare a v2 targeting the net tree, updating the patch subjec=
+t
+and incorporating the suggested changes.
+
+On Fri, Oct 3, 2025 at 2:03=E2=80=AFPM Simon Horman <horms@kernel.org> wrot=
+e:
+>
+> On Thu, Oct 02, 2025 at 06:05:41PM +0000, Kriish Sharma wrote:
+> > Fixes warnings observed during compilation with -Wformat-overflow:
+> >
+> > drivers/net/wan/hdlc_ppp.c: In function =E2=80=98ppp_cp_event=E2=80=99:
+> > drivers/net/wan/hdlc_ppp.c:353:17: warning: =E2=80=98%s=E2=80=99 direct=
+ive argument is null [-Wformat-overflow=3D]
+> >   353 |                 netdev_info(dev, "%s down\n", proto_name(pid));
+> >       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > drivers/net/wan/hdlc_ppp.c:342:17: warning: =E2=80=98%s=E2=80=99 direct=
+ive argument is null [-Wformat-overflow=3D]
+> >   342 |                 netdev_info(dev, "%s up\n", proto_name(pid));
+> >       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >
+> > Introduce local variable `pname` and fallback to "unknown" if proto_nam=
+e(pid)
+> > returns NULL.
+> >
+> > Fixes: 262858079afd ("Add linux-next specific files for 20250926")
+> > Signed-off-by: Kriish Sharma <kriish.sharma2006@gmail.com>
+>
+> Hi Kriish,
+>
+> As it looks like there will be another revision of this patch,
+> I have a few minor points on process for your consideration.
+>
+> As a fix for Networking code present in the net tree this should probably
+> be targeted at the net tree. That means it should apply cleanly to that
+> tree (I assume it does). And the target tree should be denoted in the
+> subject.  Like this:
+>
+> Subject: [PATCh net] ...
+>
+> This is as opposed to non-fix patches which, generally, are targeted
+> at the net-nex tree.
+>
+> Specifying the target tree helps land patches in the right place
+> for CI. And helps the maintainers too.
+>
+> Also, git history isn't consistent here, but I would suggest
+> that a more succinct prefix is appropriate for this patch.
+> Perhaps 'hdlc_ppp:'
+>
+> I.e.: Subject: [PATCH net] hdlc_ppp: ...
+>
+> For more in process for networking patches please see:
+> https://docs.kernel.org/process/maintainer-netdev.html
+>
+> Thanks!
+>
+> ...
 
