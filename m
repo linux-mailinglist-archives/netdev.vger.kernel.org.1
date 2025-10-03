@@ -1,201 +1,146 @@
-Return-Path: <netdev+bounces-227822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 412E8BB8597
-	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 00:53:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D7FEBB85EB
+	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 01:10:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDCF119E0536
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 22:53:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2698919E20B9
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 23:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ABD42701C4;
-	Fri,  3 Oct 2025 22:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A963826738D;
+	Fri,  3 Oct 2025 23:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CUH0a1YH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IYGevoed"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB9B13A3ED
-	for <netdev@vger.kernel.org>; Fri,  3 Oct 2025 22:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B116EED8;
+	Fri,  3 Oct 2025 23:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759531996; cv=none; b=HJw59Lu2vl7seuYfjaHzebR7iFQlAxyMIY2YdlkgtQbFgYqywUc905vuzFgShHBmyT5LyEjr56h8A4+yHeC0R3Wj9sMuit0kxhDEMlpfhssv8fXIiUju0s2S8b2DuanvM5/EXpAII/VFFRpGzC9zp6RAQNxqto5hy5NWdaSVmLw=
+	t=1759533028; cv=none; b=Cs28uCO4iP00eNbIIFpoTud7I7dz8wA69xoX5pCdxZ1oRDlps07OdQRpju5njS7ofUOr8xn+x4iqdvjdEwXnLzKmwAYAGQnhDgbJO3F2v6ppfgkat5lU+PdYbE05dONtXmcp1cZvPc/eEtsGFiiVqHqWHR0CHGeh2cJe2iTAzsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759531996; c=relaxed/simple;
-	bh=DvlBmsIvgfiVCanPO77FQzU1xYuL4fBwyxIdWdKyYQA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ctP4DVb7VRPf6bVjMx0s27Y8V08GXt/ZUcC1SISsRxMepHIF3SvNyCA+pKBiJyBV3ATd6wYsi5XDJCy1g6xjMx+TLgWfMtlUQegSou3hJ7uwR9sbY5JWCb9dBqsuvt9i8BR4jwt9G10NgLmxDWy10VrYDpnZuVKn8ZONwnogOWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CUH0a1YH; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1759531985;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Fd2uz4n+Xauzdqb6GLQJ9QAKZShShP+/btvZE9A7J4M=;
-	b=CUH0a1YHkRRmpoa4EycYhM1UYU5NLDT2qHwtBL+O9DZx/in2tRze99D62/SRqnIT/wacrc
-	0Jf4qmVFMQuffxdMEeCdr2PgLCIsojqxd/f7BNJuB0A6FRmgF2xlAUxajmE3aPRF+NxWuH
-	ZcpLc1fGZoL7zSiIYzQz7g39A/OTrMQ=
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-To: mkubecek@suse.cz
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org
-Subject: [PATCH ethtool-next] netlink: fec: add errors histogram statistics
-Date: Fri,  3 Oct 2025 22:52:53 +0000
-Message-ID: <20251003225253.3291333-1-vadim.fedorenko@linux.dev>
+	s=arc-20240116; t=1759533028; c=relaxed/simple;
+	bh=DGCFwTHdzwoyUt2airE4UfS1rzXskWvCAT/NjTMw5kE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=I1AwhSmaXQcu6wfbThbn4c8PUF3z8/LYht0nlr2gZWESpnTZQ5b0E5g5FvMDBTqke6x9IWSpfAJAghNfIpiiCSqJy7vyEioNTy27ywu/YRs3CHk1BlIGsOepQGtdD0gtrQNxWeFdWMsQ/Yexi28J2wmtm697c//splw662zGFnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IYGevoed; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67DB2C4CEF5;
+	Fri,  3 Oct 2025 23:10:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759533028;
+	bh=DGCFwTHdzwoyUt2airE4UfS1rzXskWvCAT/NjTMw5kE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IYGevoedU4k5uOJYbDIBOhb/iK0EXt0Z6nffEeR0L2BMMVKZcuNgKfFEWbyeXTWcl
+	 wx0nhCJn0UgqXoRPi2HYfgLME59iR+CYHKONpFO/+6JN+0WL4NVnhG49HJauxrG1NP
+	 BkZI6RCihoMunUgTJbiYGp5xWsK1r7xDdhNKnucyMxmUWrxMB3jxFQoHkes1Mf9Qwo
+	 50HVYqdNzgQ6UpjGpYLaKNanM8cAxABVFBIVNdRpdRkwWGytgO1mGb5cUmEI7b1wW4
+	 0rtFlNMiVbG8v5XH92Gb3CnkUpBnLMXxgbBXBQEnWGW4yIozQl4iL8KcLAvaHqMdKX
+	 lwfHN8r46ZpZg==
+Date: Fri, 3 Oct 2025 16:10:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, ilias.apalodimas@linaro.org, toke@redhat.com,
+ lorenzo@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com,
+ andrii@kernel.org, stfomichev@gmail.com, aleksander.lobakin@intel.com
+Subject: Re: [PATCH bpf 2/2] veth: update mem type in xdp_buff
+Message-ID: <20251003161026.5190fcd2@kernel.org>
+In-Reply-To: <20251003140243.2534865-3-maciej.fijalkowski@intel.com>
+References: <20251003140243.2534865-1-maciej.fijalkowski@intel.com>
+	<20251003140243.2534865-3-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Linux 6.18 has FEC errors histogram statistics API added. Add support
-for extra attributes in ethtool.
+On Fri,  3 Oct 2025 16:02:43 +0200 Maciej Fijalkowski wrote:
+> +	xdp_update_mem_type(xdp);
+> +
+>  	act = bpf_prog_run_xdp(xdp_prog, xdp);
 
- # ethtool -I --show-fec eni8np1
-FEC parameters for eni8np1:
-Supported/Configured FEC encodings: None
-Active FEC encoding: None
-Statistics:
-  corrected_blocks: 123
-  uncorrectable_blocks: 4
-  fec_bit_err_0: 445 [ per_lane:  125, 120, 100, 100 ]
-  fec_bit_err_1_to_3: 12
-  fec_bit_err_4_to_7: 2
+The new helper doesn't really express what's going on. Developers
+won't know what are we updating mem_type() to, and why. Right?
 
- # ethtool -j -I --show-fec eni8np1
-[ {
-        "ifname": "eni8np1",
-        "config": [ "None" ],
-        "active": [ "None" ],
-        "statistics": {
-            "corrected_blocks": {
-                "total": 123
-            },
-            "uncorrectable_blocks": {
-                "total": 4
-            },
-            "hist": [ {
-                    "bin_low": 0,
-                    "bin_high": 0,
-                    "total": 445,
-                    "lanes": [ 125,120,100,100 ]
-                },{
-                    "bin_low": 1,
-                    "bin_high": 3,
-                    "total": 12
-                },{
-                    "bin_low": 4,
-                    "bin_high": 7,
-                    "total": 2
-                } ]
-        }
-    } ]
+My thinking was that we should try to bake the rxq into "conversion"
+APIs, draft diff below, very much unfinished and I'm probably missing
+some cases but hopefully gets the point across:
 
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
----
- netlink/fec.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
-
-diff --git a/netlink/fec.c b/netlink/fec.c
-index ed100d7..32f7ca7 100644
---- a/netlink/fec.c
-+++ b/netlink/fec.c
-@@ -44,6 +44,64 @@ fec_mode_walk(unsigned int idx, const char *name, bool val, void *data)
- 	print_string(PRINT_ANY, NULL, " %s", name);
- }
+diff --git a/include/net/xdp.h b/include/net/xdp.h
+index aa742f413c35..e7f75d551d8f 100644
+--- a/include/net/xdp.h
++++ b/include/net/xdp.h
+@@ -384,9 +384,21 @@ struct sk_buff *xdp_build_skb_from_frame(struct xdp_frame *xdpf,
+ 					 struct net_device *dev);
+ struct xdp_frame *xdpf_clone(struct xdp_frame *xdpf);
  
-+static void fec_show_hist_bin(const struct nlattr *hist)
++/* Initialize rxq struct on the stack for processing @frame.
++ * Not necessary when processing in context of a driver which has a real rxq,
++ * and passes it to xdp_convert_frame_to_buff().
++ */
++static inline
++void xdp_rxq_prep_on_stack(const struct xdp_frame *frame,
++			   struct xdp_rxq_info *rxq)
 +{
-+	const struct nlattr *tb[ETHTOOL_A_FEC_HIST_MAX + 1] = {};
-+	DECLARE_ATTR_TB_INFO(tb);
-+	unsigned int i, lanes, bin_high, bin_low;
-+	uint64_t val, *vals;
-+	int ret;
-+
-+	ret = mnl_attr_parse_nested(hist, attr_cb, &tb_info);
-+	if (ret < 0)
-+		return;
-+
-+	if (!tb[ETHTOOL_A_FEC_HIST_BIN_LOW] || !tb[ETHTOOL_A_FEC_HIST_BIN_HIGH])
-+		return;
-+
-+	bin_high = mnl_attr_get_u32(tb[ETHTOOL_A_FEC_HIST_BIN_HIGH]);
-+	bin_low  = mnl_attr_get_u32(tb[ETHTOOL_A_FEC_HIST_BIN_LOW]);
-+	/* Bin value is uint, so it may be u32 or u64 depeding on the value */
-+	if (mnl_attr_validate(tb[ETHTOOL_A_FEC_HIST_BIN_VAL], MNL_TYPE_U32) < 0)
-+		val = mnl_attr_get_u64(tb[ETHTOOL_A_FEC_HIST_BIN_VAL]);
-+	else
-+		val = mnl_attr_get_u32(tb[ETHTOOL_A_FEC_HIST_BIN_VAL]);
-+
-+	if (is_json_context()) {
-+		print_u64(PRINT_JSON, "bin_low", NULL, bin_low);
-+		print_u64(PRINT_JSON, "bin_high", NULL, bin_high);
-+		print_u64(PRINT_JSON, "total", NULL, val);
-+	} else {
-+		printf("  fec_bit_err_%d", bin_low);
-+		if (bin_low != bin_high)
-+			printf("_to_%d", bin_high);
-+		printf(": %" PRIu64, val);
-+	}
-+	if (!tb[ETHTOOL_A_FEC_HIST_BIN_VAL_PER_LANE]) {
-+		if (!is_json_context())
-+			print_nl();
-+		return;
-+	}
-+
-+	vals = mnl_attr_get_payload(tb[ETHTOOL_A_FEC_HIST_BIN_VAL_PER_LANE]);
-+	lanes = mnl_attr_get_payload_len(tb[ETHTOOL_A_FEC_HIST_BIN_VAL_PER_LANE]) / 8;
-+	if (is_json_context())
-+		open_json_array("lanes", "");
-+	else
-+		printf(" [ per_lane:");
-+	for (i = 0; i < lanes; i++) {
-+		if (is_json_context())
-+			print_u64(PRINT_JSON, NULL, NULL, *vals++);
-+		else
-+			printf("%s %" PRIu64, i ? "," : "", *vals++);
-+	}
-+
-+	if (is_json_context())
-+		close_json_array("");
-+	else
-+		printf(" ]\n");
++	rxq->dev = xdpf->dev_rx;
++	/* TODO: report queue_index to xdp_rxq_info */
 +}
 +
- static int fec_show_stats(const struct nlattr *nest)
+ static inline
+ void xdp_convert_frame_to_buff(const struct xdp_frame *frame,
+-			       struct xdp_buff *xdp)
++			       struct xdp_buff *xdp, struct xdp_rxq_info *rxq)
  {
- 	const struct nlattr *tb[ETHTOOL_A_FEC_STAT_MAX + 1] = {};
-@@ -108,6 +166,20 @@ static int fec_show_stats(const struct nlattr *nest)
- 
- 		close_json_object();
- 	}
+ 	xdp->data_hard_start = frame->data - frame->headroom - sizeof(*frame);
+ 	xdp->data = frame->data;
+@@ -394,6 +406,22 @@ void xdp_convert_frame_to_buff(const struct xdp_frame *frame,
+ 	xdp->data_meta = frame->data - frame->metasize;
+ 	xdp->frame_sz = frame->frame_sz;
+ 	xdp->flags = frame->flags;
 +
-+	if (tb[ETHTOOL_A_FEC_STAT_HIST]) {
-+		const struct nlattr *attr;
++	rxq->mem.type = xdpf->mem_type;
++}
 +
-+		open_json_array("hist", "");
-+		mnl_attr_for_each_nested(attr, nest) {
-+			if (mnl_attr_get_type(attr) == ETHTOOL_A_FEC_STAT_HIST) {
-+				open_json_object(NULL);
-+				fec_show_hist_bin(attr);
-+				close_json_object();
-+			}
-+		}
-+		close_json_array("");
-+	}
- 	close_json_object();
++/* Initialize an xdp_buff from an skb.
++ *
++ * Note: if skb has frags skb_cow_data_for_xdp() must be called first,
++ * or caller must otherwise guarantee that the frags come from a page pool
++ */
++static inline
++void xdp_convert_skb_to_buff(const struct xdp_frame *frame,
++			     struct xdp_buff *xdp, struct xdp_rxq_info *rxq)
++{
++	// copy the init_buff / prep_buff here
++
++	rxq->mem.type = MEM_TYPE_PAGE_POOL; /* see note above the function */
+ }
  
- 	return 0;
--- 
-2.47.3
+ static inline
+diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
+index 703e5df1f4ef..60ba15bbec59 100644
+--- a/kernel/bpf/cpumap.c
++++ b/kernel/bpf/cpumap.c
+@@ -193,11 +193,8 @@ static int cpu_map_bpf_prog_run_xdp(struct bpf_cpu_map_entry *rcpu,
+ 		u32 act;
+ 		int err;
+ 
+-		rxq.dev = xdpf->dev_rx;
+-		rxq.mem.type = xdpf->mem_type;
+-		/* TODO: report queue_index to xdp_rxq_info */
+-
+-		xdp_convert_frame_to_buff(xdpf, &xdp);
++		xdp_rxq_prep_on_stack(xdpf, &rxq);
++		xdp_convert_frame_to_buff(xdpf, &xdp, &rxq);
+ 
+ 		act = bpf_prog_run_xdp(rcpu->prog, &xdp);
+ 		switch (act) {
 
 
