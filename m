@@ -1,179 +1,162 @@
-Return-Path: <netdev+bounces-227706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8327CBB5C26
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 03:46:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD99DBB5C86
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 04:01:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 579A64E92BA
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 01:46:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49CBE19E0043
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 02:01:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7762427FD75;
-	Fri,  3 Oct 2025 01:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55E7229993A;
+	Fri,  3 Oct 2025 02:01:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7923770B;
-	Fri,  3 Oct 2025 01:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A141487D1
+	for <netdev@vger.kernel.org>; Fri,  3 Oct 2025 02:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759456013; cv=none; b=O3b7FxoCka5EHoqpWtJS4gCxNU8HneSSaZ96M5bqso40y0SCcrCTDvwXPOnhCkXVOlQSUSpL3QYvqwBtrTjlfWVNE87qMkJ6Ay8helyrRyymJauT5Tvszh/mmq6JoO0Z7ABu7tCEObe8Bm3Sd8hqpBSgWA01o9whDnabcKBUy00=
+	t=1759456887; cv=none; b=AmM66SWX4FIl5pq300yaDoZYCCwdFbnaOQmSBfEEtR7fKpuHsfG3uOOwFF6R+coIYzJcE/Owiz4wLZjQ2t7g/uesh+efe2AkQ1/DIFN3iiBQT3x5HIhzSjQYUNxFRWuuoqF37CB5SKIAAghe/ahA3D2IaA3zY5VjVrPRiVgspn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759456013; c=relaxed/simple;
-	bh=qSeKLacpwTszi2nIGhZR51FDuj9AbbAKRr2JI/VVMs8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RiLUbylOq6rqiVEx/3zKDidJwUsOlKZ4KjLJE+eUxmIqlsDJW3IEMRXQFJvGpbSShOBdDVjTE1/ajOldpYZEDHu0DoKERAattu+PRrhLSImijSXiBoguZqnMzH5JCpVk+zrGiF2SW/3FWLnYechxH6qTBXnknh3qfID/F8FICLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c45ff70000001609-82-68df2b066d8f
-Date: Fri, 3 Oct 2025 10:46:41 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
-	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
-	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
-	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
-	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-	ngupta@vflare.org, linux-block@vger.kernel.org,
-	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
-	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-	djwong@kernel.org, dri-devel@lists.freedesktop.org,
-	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
-	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
-	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
-	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
-	yeoreum.yun@arm.com, netdev@vger.kernel.org,
-	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
-	catalin.marinas@arm.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, luto@kernel.org,
-	sumit.semwal@linaro.org, gustavo@padovan.org,
-	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
-	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
-	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
-	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
-	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
-	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
-	qiang.zhang@linux.dev, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
-	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
-	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
-	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
-	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
-	kevin.brodsky@arm.com, dwmw@amazon.co.uk, shakeel.butt@linux.dev,
-	ast@kernel.org, ziy@nvidia.com, yuzhao@google.com,
-	baolin.wang@linux.alibaba.com, usamaarif642@gmail.com,
-	joel.granados@kernel.org, richard.weiyang@gmail.com,
-	geert+renesas@glider.be, tim.c.chen@linux.intel.com,
-	linux@treblig.org, alexander.shishkin@linux.intel.com,
-	lillian@star-ark.net, chenhuacai@kernel.org, francesco@valla.it,
-	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
-	masahiroy@kernel.org, brauner@kernel.org,
-	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
-	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
-	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH v17 09/47] arm64, dept: add support
- CONFIG_ARCH_HAS_DEPT_SUPPORT to arm64
-Message-ID: <20251003014641.GF75385@system.software.com>
-References: <20251002081247.51255-1-byungchul@sk.com>
- <20251002081247.51255-10-byungchul@sk.com>
- <a7f41101-d80a-4cee-ada5-9c591321b1d7@sirena.org.uk>
+	s=arc-20240116; t=1759456887; c=relaxed/simple;
+	bh=8Y9Zd8cX3gcaUQdOiOPrBV36+MV24/YVHihfRjj2q48=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=L7Wpf5An1+T5NN0U/4mYQATP6CHMoYSLo3vpqtNUpeymr2byVGOO2LOWN3fFTydhGERf91WIrOlEiB7t16xPXH92rUxAVfM0y2XWZjV6fapjPZChFNvJgLZX93r7+G57l891oxlYX2cDIb06jj9wmmgaWhBTWSGEQx4799jzKBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-42d8a33a27aso43263625ab.2
+        for <netdev@vger.kernel.org>; Thu, 02 Oct 2025 19:01:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759456884; x=1760061684;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8VXCwbgzxAMA+OjC0S2OE89DRe7vm2C3ZDHpdhAqaX4=;
+        b=CJmYZ2br0Er6CzrL/58TfGI7c+Bn4cMTrxFr2fSHVmCYFgXIJWXt+CDuxJ1IMhRrV2
+         1588Oz16saZwv/+eFQMXvujOalshxSSEVdkytGEq8BseZkFKHWikkwTj00XYewhlcDv0
+         gOGB5LjnRjsqQ8A1gqVbHEfvd6mZWO3ceLmtwvxFeB0KClrgs1w1oqAqqfkXXhzgCWxd
+         2EMpLkU0lfhHnMvJZnepNbxrbfYAwUV3MQPpvMxHaVUl2Sln+8uRTygwsdkkenr0gW+q
+         UoweJj/AvCmKTw1zWAGtRh/icz3ciJtsLgP3ApwsyI/p0rpZ9YmkM3I7dDwl6kacBoRj
+         eMoA==
+X-Forwarded-Encrypted: i=1; AJvYcCVPnuIejnAdVYkNfdG7GPfuBnSHQQjFcfIWgg6rg7lwmaRi6AAbkoNpErKFRKUWFncwR8+mTlc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoVdDn7y5tP5Y0V975YX8rBFdju71ncHTG3PaIzGPFP3n2MLTA
+	hNdgJK2ATb+omqLEOhYqgWyb61HcvbzT7etEhvrfALIjL662w0JK5TSASVpjE0QdWWvAluIuXj0
+	5YsbfANbRaQoLB6NPX6MbMnj09nYywV9RW2kqD0+3tuq+mWqWJsuUXoEt3f8=
+X-Google-Smtp-Source: AGHT+IFPzIxFdGnr15vQCKRbd9V4cLt9iQIXQtZx0F1xc4ALwCCx1lDzlWbG4sxU24XA6rUHLwfzONJvCbVpdaha1+2C0D0/0wM2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a7f41101-d80a-4cee-ada5-9c591321b1d7@sirena.org.uk>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0yTZxTH87zPe6PhTR4rzEf5Vk2MGLwnnhiybMuMT0SNFz4YjdEqb2wD
-	5VKQCcmy4rxCZbiJl1ZMQa2VgppiDGbgEDZMizpmlDSzVBAF2aRMhSIiKC/GzG+/nPM/v3M+
-	HBnr7wmzZHNmnmrNNGYYRB2vG4itSpLmPzYt6joqwciYE0PNtSIOTvYX8TDotiNw9DolGD+R
-	DpXdnRieXz2E4FprGIG/vESEyFURXPsaBahw/ozgRIWPB69v7eS0CM6TP3Jw51yIh1ZvnwRD
-	D7o5qLH3YvD1dAjQ+Pd8aK1/woHNOSJAd1dQgGhpAgTLniGojVSJ8G/UjeF+k4uDVtcX8Op8
-	lIfbR5s4uDAUwXDXeU+AUOk/PFzwDAjQ56jgoGX4BQeBztcS/HLfJULgbYCDA/ZRCZxFpQgO
-	/x7FMPbmjAi14x3oq0Ws5mwNYi0vBjF7O/xQZI1RF88CVZQdu5vEbjg6Jeby7WF1nkR2rqGf
-	Y77qIyILdTSIrNJWjtlZ/wZWd/4H9miiB6+nW3TJaWqGOV+1Lvxyh870174xKfuObm97+SBn
-	QxGpGMkyJcto2/vNxShmCkOe56LGPJlD6561TbFI5tJgcBRrHEdm04cjjXwx0smYVCbQiwNX
-	BK0xnWyn7y494DSnQoAO1Zu1jJ6cRvTm8WZeyyhkGvWffjrFmCTS4ET/VB6TSc+ErJVjyNc0
-	XBLiNI6f3NV0/TaneSgJx9DBm7/xHw+dSW95gnwZIo7PtI7PtI7/tS6Eq5HenJlvMZozli0w
-	FWSa9y7YlWXxockvc3//bms9etW+qRkRGRliFZYdNukFY35ugaUZURkb4pQdnpBJr6QZCwpV
-	a9Z2654MNbcZJci8YYayJPpdmp7sNuap6aqarVo/dTk5ZpYNbRvNWzl793+/upOvuP+MpH5b
-	8NPFw08blNQZyTnrnEqkvv0bL79mBVoT4P32CWUUW4S5S1Pb08KH/khZbd/S5/DcsG2c15Kz
-	/EDs5bKUU4m6XfuHV/S+ZMv9O697K3pWLrFsLnTZDz5ylJRHU0iOd2BOfNLM8ZTjY7R6uiys
-	2thn4HNNxsWJ2Jpr/ADqIHiCYQMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTZxTH8zz3lWZ3u1aIN+CyrZOYQVCILjm+ZNmyZNwsmWHJ1MQPkwav
-	trwU0moHJou82NigbrWjEFp1FWNF6KADIVRTJKgQRIQKKpFCwVSEyMsyCwRLYS2JmV9Ofuf5
-	///nOR8OS8jDVDyr1hyXtBplroKWkbJ9e8pS6GS/KrXFmAhPSzpIWAgaSbjY6KTB2FRNwUBD
-	PQL/ghHBUshGgMG9RkLY3MVAcHmEgTVPF4JKr5kA580SDG9cqzS8vvsvAstEgIaq6RIS5h3n
-	EFgnbQxM30+HWf9tCtZGX2F4tjiDwBFYxRDoOIMgXJkDf9Y00xDq6yegyjKA4MrEKAFTroh4
-	s2sMgae2lIaXphYCBgMfwtDCPA09lrM0zHovYphz0WAv9VBwyWZGUHa1kYbKS00kuMdvMeB9
-	vYLBV2nGUN/0A/gdkyT0mmpwZL+I6+9NYKsqw5EyhcHy120My446Bh5e9ZHgKE4EW98gBS9q
-	rQysTKTBmj0fuupfMTD6u4WEhtl+6msLEpcMv5FiXXMrFg2Pw7TovOxEYuitGYnBa2WEaDBF
-	2rsz84R4uvkX8VrvDC2+XXhCi55FOyk+qBHEC30pots6yoin258zGbsPyfYekXLVekm7/atM
-	mcpbGmIKHsoKByzzuBjNMeUohhX4nYKvdoqOMslvEZpf9q4zzW8VhoeXiSjH8p8LT5Y8ZDmS
-	sQR/JUG4PttIRYWN/GFh5cYQLkcsy/EgBNvUUY+cr0ZCe0UnGfVw/AahpzqwzgSfJAyvTq/7
-	CT4yZ5WNPsfw3whjZ304ynGRvzpau7EJcdb30tb30tb/03ZE1KFYtUafp1TnfrlNl6Mq0qgL
-	t2Xl5zWhyFE6fl250IaCg+mdiGeR4gNOLBhTySmlXleU14kEllDEcpm1PpWcO6IsOilp8w9r
-	T+RKuk6UwJKKTdz3B6VMOX9MeVzKkaQCSftOxWxMfDFqeZBR6jB+tHmLr15+NEt/p8HlDtt/
-	SjgkFQZZf9a32VW70j499dgg9CyW/xg+9kf+uYz9Ns62nNJgfBTXbmoVXPFtk4/G732h43I8
-	3rRPKkq2nk8t1uMDId+I0zxEfZcdY01N/vmf4ObCz3xSardbM3C+JVG93ZQxt+tj247LhILU
-	qZRpSYRWp/wPOciOgZADAAA=
-X-CFilter-Loop: Reflected
+X-Received: by 2002:a05:6e02:1d8a:b0:40e:a0e1:2f61 with SMTP id
+ e9e14a558f8ab-42e7ad849d3mr15854935ab.26.1759456884660; Thu, 02 Oct 2025
+ 19:01:24 -0700 (PDT)
+Date: Thu, 02 Oct 2025 19:01:24 -0700
+In-Reply-To: <68b9e0db.050a0220.192772.000f.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68df2e74.050a0220.1696c6.003a.GAE@google.com>
+Subject: Re: [syzbot] [usb?] [net?] KMSAN: uninit-value in lan78xx_reset
+From: syzbot <syzbot+62ec8226f01cb4ca19d9@syzkaller.appspotmail.com>
+To: Rengarajan.S@microchip.com, Thangaraj.S@microchip.com, 
+	UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch, andrew@lunn.ch, 
+	bhanuseshukumar@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, o.rempel@pengutronix.de, pabeni@redhat.com, 
+	rengarajan.s@microchip.com, syzkaller-bugs@googlegroups.com, 
+	thangaraj.s@microchip.com, unglinuxdriver@microchip.com, 
+	viswanathiyyappan@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Oct 02, 2025 at 12:39:31PM +0100, Mark Brown wrote:
-> On Thu, Oct 02, 2025 at 05:12:09PM +0900, Byungchul Park wrote:
-> > dept needs to notice every entrance from user to kernel mode to treat
-> > every kernel context independently when tracking wait-event dependencies.
-> > Roughly, system call and user oriented fault are the cases.
-> > 
-> > Make dept aware of the entrances of arm64 and add support
-> > CONFIG_ARCH_HAS_DEPT_SUPPORT to arm64.
-> 
-> The description of what needs to be tracked probably needs some
-> tightening up here, it's not clear to me for example why exceptions for
-> mops or the vector extensions aren't included here, or what the
-> distinction is with error faults like BTI or GCS not being tracked?
+syzbot has found a reproducer for the following issue on:
 
-Thanks for the feedback but I'm afraid I don't get you.  Can you explain
-in more detail with example?
+HEAD commit:    7f7072574127 Merge tag 'kbuild-6.18-1' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15dc1ee2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3efb3c89344fb053
+dashboard link: https://syzkaller.appspot.com/bug?extid=62ec8226f01cb4ca19d9
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14731214580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17ca65cd980000
 
-JFYI, pairs of wait and its event need to be tracked to see if each
-event can be prevented from being reachable by other waits like:
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/cf1acf3bcd3b/disk-7f707257.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7447ff07b887/vmlinux-7f707257.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/16ebb9562804/bzImage-7f707257.xz
 
-   context X				context Y
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+62ec8226f01cb4ca19d9@syzkaller.appspotmail.com
 
-   lock L
-   ...
-   initiate event A context		start toward event A
-   ...					...
-   wait A // wait for event A and	lock L // wait for unlock L and
-          // prevent unlock L		       // prevent event A
-   ...					...
-   unlock L				unlock L
-					...
-					event A
+usb 1-1: New USB device found, idVendor=0424, idProduct=7850, bcdDevice= 0.00
+usb 1-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+usb 1-1: Product: syz
+usb 1-1: Manufacturer: syz
+usb 1-1: SerialNumber: syz
+lan78xx 1-1:1.0 (unnamed net_device) (uninitialized): EEPROM read operation timeout
+=====================================================
+BUG: KMSAN: uninit-value in lan78xx_read_eeprom drivers/net/usb/lan78xx.c:1095 [inline]
+BUG: KMSAN: uninit-value in lan78xx_init_mac_address drivers/net/usb/lan78xx.c:1937 [inline]
+BUG: KMSAN: uninit-value in lan78xx_reset+0x999/0x2cd0 drivers/net/usb/lan78xx.c:3241
+ lan78xx_read_eeprom drivers/net/usb/lan78xx.c:1095 [inline]
+ lan78xx_init_mac_address drivers/net/usb/lan78xx.c:1937 [inline]
+ lan78xx_reset+0x999/0x2cd0 drivers/net/usb/lan78xx.c:3241
+ lan78xx_bind+0x711/0x1690 drivers/net/usb/lan78xx.c:3766
+ lan78xx_probe+0x225c/0x3310 drivers/net/usb/lan78xx.c:4707
+ usb_probe_interface+0xd23/0x1460 drivers/usb/core/driver.c:396
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x4d4/0xdc0 drivers/base/dd.c:659
+ __driver_probe_device+0x268/0x380 drivers/base/dd.c:801
+ driver_probe_device+0x70/0x8b0 drivers/base/dd.c:831
+ __device_attach_driver+0x4ee/0x950 drivers/base/dd.c:959
+ bus_for_each_drv+0x3e0/0x680 drivers/base/bus.c:462
+ __device_attach+0x3c8/0x5c0 drivers/base/dd.c:1031
+ device_initial_probe+0x33/0x40 drivers/base/dd.c:1080
+ bus_probe_device+0x3ba/0x5e0 drivers/base/bus.c:537
+ device_add+0x12a9/0x1c10 drivers/base/core.c:3689
+ usb_set_configuration+0x3493/0x3b70 drivers/usb/core/message.c:2210
+ usb_generic_driver_probe+0xfc/0x290 drivers/usb/core/generic.c:250
+ usb_probe_device+0x38a/0x690 drivers/usb/core/driver.c:291
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x4d4/0xdc0 drivers/base/dd.c:659
+ __driver_probe_device+0x268/0x380 drivers/base/dd.c:801
+ driver_probe_device+0x70/0x8b0 drivers/base/dd.c:831
+ __device_attach_driver+0x4ee/0x950 drivers/base/dd.c:959
+ bus_for_each_drv+0x3e0/0x680 drivers/base/bus.c:462
+ __device_attach+0x3c8/0x5c0 drivers/base/dd.c:1031
+ device_initial_probe+0x33/0x40 drivers/base/dd.c:1080
+ bus_probe_device+0x3ba/0x5e0 drivers/base/bus.c:537
+ device_add+0x12a9/0x1c10 drivers/base/core.c:3689
+ usb_new_device+0x1062/0x20f0 drivers/usb/core/hub.c:2694
+ hub_port_connect drivers/usb/core/hub.c:5566 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5706 [inline]
+ port_event drivers/usb/core/hub.c:5870 [inline]
+ hub_event+0x54e0/0x7620 drivers/usb/core/hub.c:5952
+ process_one_work kernel/workqueue.c:3263 [inline]
+ process_scheduled_works+0xb91/0x1d80 kernel/workqueue.c:3346
+ worker_thread+0xedf/0x1590 kernel/workqueue.c:3427
+ kthread+0xd5c/0xf00 kernel/kthread.c:463
+ ret_from_fork+0x233/0x380 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
 
-I meant things like this need to be tracked.
+Local variable sig.i.i created at:
+ lan78xx_read_eeprom drivers/net/usb/lan78xx.c:1092 [inline]
+ lan78xx_init_mac_address drivers/net/usb/lan78xx.c:1937 [inline]
+ lan78xx_reset+0x77e/0x2cd0 drivers/net/usb/lan78xx.c:3241
+ lan78xx_bind+0x711/0x1690 drivers/net/usb/lan78xx.c:3766
 
-	Byungchul
+CPU: 0 UID: 0 PID: 5106 Comm: kworker/0:2 Not tainted syzkaller #0 PREEMPT(none) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+Workqueue: usb_hub_wq hub_event
+=====================================================
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
