@@ -1,225 +1,249 @@
-Return-Path: <netdev+bounces-227757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C77EBB6AC0
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 14:36:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 564B1BB6AB7
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 14:36:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 570234EBFF3
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 12:36:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0226742392D
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 12:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0E22EFD9F;
-	Fri,  3 Oct 2025 12:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="J+kQcRdz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE86B2EDD74;
+	Fri,  3 Oct 2025 12:36:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1122EF662;
-	Fri,  3 Oct 2025 12:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED17C2EDD58
+	for <netdev@vger.kernel.org>; Fri,  3 Oct 2025 12:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759494991; cv=none; b=nQwUvXYUcwfeXIcHe7keWVb5cK07wBcw8yvdxSFDcrTa8czwLKc1XBk6553IlST3/x4YYQezesiclXXebERRPqY3GAqpxAbZkbT+qiewSNmk3Yb3ARaI/mjLJGUqFXQrgzmUMNTH8cjxbsz6/8SblpiP1JjvZVb2bGjkrzUr6t8=
+	t=1759494988; cv=none; b=NI344OSNngm0RbxAiA9tEx+eb0ZQjHOLuvar7MC+D7p9xByxXTvqyBzT9lWRGCykKyO54jk9Km4F7h5p9elwysyEHTgDqUdWmduGnqZeVFl/uXIBNgeQLev9nO6A9lq5Phcb5sjrsC0hZ9UWretJfONu7FWACHgLoKsDQNSxvq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759494991; c=relaxed/simple;
-	bh=RC9HyGQ6QSohaeISaCdw19nbbVwsVyT87/EVmTYnn1g=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=nhS7rvhv2dM2B0f86VjfKb35Di/gyaa9FOvk5dKT0Yk27o1BZmsYNDKlRQ6XDc4tdNJgLlxIlJcrc6h8IoJP4falSwMVHkS6kosFg6wUKkaA7W8mxPCiT65zrbCb9UjaDYJWJNx3tOGv0CePiGFJDXSRMAwO9Fg4MMnfxQEXlNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=J+kQcRdz; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1759494989; x=1791030989;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:to:cc;
-  bh=RC9HyGQ6QSohaeISaCdw19nbbVwsVyT87/EVmTYnn1g=;
-  b=J+kQcRdzwsg73gYsiCCPQHT+W2xJ2GsczE3HKdCi6HSETXy70CsHELzt
-   e8DgtoDSQASDPtpxdlQlSjA1HavOAY18Sk7nicyHDoWJKKVFGTuxEfwpe
-   EnMYC4ltv45PGI4eM8N8Ng5gpXjLr4mLj9LoER/PxSORIlgioshouBMf7
-   MceeYSuKE5glmZNAnH/KHfYsLzakXTO+muzYKOwJa51JzvUAIICeYifMf
-   jZW1T8fj3a3syu5ygjNJQ2y4cxTr3rz5SzocGRTeqa3HrJcYEsqx1Vgjz
-   xtiHVvfJDEpZkO5IgLoOILgbLAcslFjMUJ0DeSws3YtGS3M2vm41K7SCg
-   g==;
-X-CSE-ConnectionGUID: 0nDMz/hwSCOo3uHbo/xgMA==
-X-CSE-MsgGUID: JVDXOMwZQtaJThf3BLML/A==
-X-IronPort-AV: E=Sophos;i="6.18,312,1751266800"; 
-   d="scan'208";a="278678034"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Oct 2025 05:36:23 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Fri, 3 Oct 2025 05:36:02 -0700
-Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Fri, 3 Oct 2025 05:36:00 -0700
-From: Daniel Machon <daniel.machon@microchip.com>
-Date: Fri, 3 Oct 2025 14:35:59 +0200
-Subject: [PATCH net] net: sparx5/lan969x: fix flooding configuration on
- bridge join/leave
+	s=arc-20240116; t=1759494988; c=relaxed/simple;
+	bh=97/QPeIM5ZpfDMeD/GwkZZTuKP9MmcOyHIHKKJMBdhc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=d09LxH9Ne9dZj9QVpNo1W9cYIK1PyY3hqTUIW1/LEnFroWVwJXgLSA/Kxrhd8AhvldLDi0YYwwSbsGYUHsVZxiijbs3R4yZWZ6P9JnOownLCT4l8ST71gkfhvpAYe5VuOfXj761zF0Mhc8CqQd9wxZKZp1yV1mVhG4Ftb9XgpSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-42eaf43998bso8989195ab.3
+        for <netdev@vger.kernel.org>; Fri, 03 Oct 2025 05:36:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759494986; x=1760099786;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=emQMY+NBClx28AnDJBfSwmxL4rlqBlzxd5y+572udsg=;
+        b=p3L+UaYYRQhdhieTL6FKC2C/+Ql+Z+I8Mz95Sl747kg1BrzEB46AuficNgUapWmM7+
+         ZeAoau7rDHlkmnFxhFq1soqKOAs1zpeU3/TnQHbNPe7d7cgClGuYpErUZi3q5JGUFb6z
+         UvJj66Ar/B5s5AmCXM86dTx9xxUC6y7uO74piLGfNZ9HizB4d6eYiwlX1WsObQkS7pjU
+         8J1EIyHzhCBRrT700Wu4rno2LbMX5wLbyq7Q+vOESc5G2dJuGgySbD7qOifp1ed/chWT
+         6Pnrak9saE2sKGN2q1a+U6E14gGanZcWsOSDrzcggm/vCoZNywL3IHVBggezL8NWcjU+
+         p5XQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXx7sgZsWXEpsjtwOgKhrkDx5vN2OWi3Y4MRD7d1ro86Mc4+hSYvgHvP/muehEmRzqQ13VK/Ak=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGN8h+r7Hoids7KHFRmQuw3X0sWSjYnOwSmq+your0pNcPX3NY
+	EupGcxEsKZx5l+eJf7JfhxByR1q1qAdS9RQHj0fKxFys+qMiHM4QmFA9y/ee7C1wn8cogXH22qi
+	wqW/EPk8bc2aq4/HtWv3FEnxgi0sxUVUcX/KA8aeVsY2y+twY+pI32QiE+ik=
+X-Google-Smtp-Source: AGHT+IF/N946G7ih/QJNT9h1L5L+MVsNDmho1laEdm0bUECBdT+KUJQSHclCYZjoga6zggTyySR33Y10hW/is6CWczVq41exr0dL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-ID: <20251003-fix-flood-fwd-v1-1-48eb478b2904@microchip.com>
-X-B4-Tracking: v=1; b=H4sIAC7D32gC/x2M0QrCMBAEf6XsswdpS631V8SHNLnYA71IIiqU/
- rtXH2fZmRWVi3DFuVlR+C1Vshq0hwZh8XpjkmiMznVD61xPSb6U7jlHSp9I/cTpNMYjT2OAOc/
- Cdvj3LlB+4Wrj7CvTXLyGZU89vCi27QdxuJLkewAAAA==
-To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<UNGLinuxDriver@microchip.com>
-CC: Steen Hegelund <steen.hegelund@microchip.com>, <jacob.e.keller@intel.com>,
-	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>
-X-Mailer: b4 0.14-dev
+X-Received: by 2002:a05:6e02:1648:b0:423:fce3:9255 with SMTP id
+ e9e14a558f8ab-42e7ad7b08dmr30510035ab.23.1759494986119; Fri, 03 Oct 2025
+ 05:36:26 -0700 (PDT)
+Date: Fri, 03 Oct 2025 05:36:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68dfc34a.050a0220.1696c6.0041.GAE@google.com>
+Subject: [syzbot] [wireless?] KASAN: slab-out-of-bounds Read in ieee80211_ie_split_ric
+From: syzbot <syzbot+8c46f153d4b6c8093075@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-The sparx5 driver programs UC/MC/BC flooding in sparx5_update_fwd() by
-unconditionally applying bridge_fwd_mask to all flood PGIDs. Any bridge
-topology change that triggers sparx5_update_fwd() (for example enslaving
-another port) therefore reinstalls flooding in hardware for already
-bridged ports, regardless of their per-port flood flags.
+Hello,
 
-This results in clobbering of the flood masks, and desynchronization
-between software and hardware: the bridge still reports “flood off” for
-the port, but hardware has flooding enabled due to unconditional PGID
-reprogramming.
+syzbot found the following issue on:
 
-Steps to reproduce:
+HEAD commit:    012ea489aeda Merge branch 'net-macb-various-fixes'
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=130d7f12580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4d8792ecb6308d0f
+dashboard link: https://syzkaller.appspot.com/bug?extid=8c46f153d4b6c8093075
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
 
-    $ ip link add br0 type bridge
-    $ ip link set br0 up
-    $ ip link set eth0 master br0
-    $ ip link set eth0 up
-    $ bridge link set dev eth0 flood off
-    $ ip link set eth1 master br0
-    $ ip link set eth1 up
+Unfortunately, I don't have any reproducer for this issue yet.
 
-At this point, flooding is silently re-enabled for eth0. Software still
-shows “flood off” for eth0, but hardware has flooding enabled.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/cb0af64f5007/disk-012ea489.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c014e9dda3de/vmlinux-012ea489.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f8328e9c7c14/bzImage-012ea489.xz
 
-To fix this, flooding is now set explicitly during bridge join/leave,
-through sparx5_port_attr_bridge_flags():
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8c46f153d4b6c8093075@syzkaller.appspotmail.com
 
-    On bridge join, UC/MC/BC flooding is enabled by default.
+==================================================================
+BUG: KASAN: slab-out-of-bounds in skip_ie net/wireless/util.c:2013 [inline]
+BUG: KASAN: slab-out-of-bounds in ieee80211_ie_split_ric+0x8fa/0x950 net/wireless/util.c:-1
+Read of size 1 at addr ffff8880538220c1 by task syz.0.2592/15438
 
-    On bridge leave, UC/MC/BC flooding is disabled.
+CPU: 1 UID: 0 PID: 15438 Comm: syz.0.2592 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xca/0x240 mm/kasan/report.c:482
+ kasan_report+0x118/0x150 mm/kasan/report.c:595
+ skip_ie net/wireless/util.c:2013 [inline]
+ ieee80211_ie_split_ric+0x8fa/0x950 net/wireless/util.c:-1
+ ieee80211_ie_split include/net/cfg80211.h:9461 [inline]
+ cfg80211_sme_get_conn_ies net/wireless/sme.c:529 [inline]
+ cfg80211_sme_connect net/wireless/sme.c:586 [inline]
+ cfg80211_connect+0x10bb/0x21a0 net/wireless/sme.c:1527
+ cfg80211_mgd_wext_connect+0x4b0/0x610 net/wireless/wext-sme.c:57
+ cfg80211_wext_siwessid+0xc4/0x160 net/wireless/wext-compat.c:1412
+ ioctl_standard_iw_point+0x686/0xd40 net/wireless/wext-core.c:865
+ ioctl_standard_call+0xaf/0x1b0 net/wireless/wext-core.c:1050
+ wireless_process_ioctl net/wireless/wext-core.c:-1 [inline]
+ wext_ioctl_dispatch+0xee/0x410 net/wireless/wext-core.c:1014
+ wext_handle_ioctl+0x100/0x1c0 net/wireless/wext-core.c:1075
+ sock_ioctl+0x15f/0x790 net/socket.c:1291
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:598 [inline]
+ __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:584
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fda6dd8eec9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fda6ec55038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007fda6dfe5fa0 RCX: 00007fda6dd8eec9
+RDX: 0000200000000040 RSI: 0000000000008b1a RDI: 0000000000000004
+RBP: 00007fda6de11f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fda6dfe6038 R14: 00007fda6dfe5fa0 R15: 00007ffd700ba618
+ </TASK>
 
-    sparx5_update_fwd() no longer touches the flood PGIDs, clobbering
-    the flood masks, and desynchronizing software and hardware.
+Allocated by task 11663:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:388 [inline]
+ __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:405
+ kasan_kmalloc include/linux/kasan.h:260 [inline]
+ __do_kmalloc_node mm/slub.c:4376 [inline]
+ __kmalloc_node_track_caller_noprof+0x271/0x4e0 mm/slub.c:4395
+ kmemdup_noprof+0x2b/0x70 mm/util.c:138
+ kmemdup_noprof include/linux/fortify-string.h:765 [inline]
+ cfg80211_wext_siwgenie+0x1ad/0x320 net/wireless/wext-sme.c:322
+ ioctl_standard_iw_point+0x686/0xd40 net/wireless/wext-core.c:865
+ ioctl_standard_call+0xaf/0x1b0 net/wireless/wext-core.c:1050
+ wireless_process_ioctl net/wireless/wext-core.c:-1 [inline]
+ wext_ioctl_dispatch+0xee/0x410 net/wireless/wext-core.c:1014
+ wext_handle_ioctl+0x100/0x1c0 net/wireless/wext-core.c:1075
+ sock_ioctl+0x15f/0x790 net/socket.c:1291
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:598 [inline]
+ __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:584
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-    Initialization of the flooding PGIDs have been moved to
-    sparx5_start(). This is required as flooding PGIDs defaults to
-    0x3fffffff in hardware and the initialization was previously handled
-    in sparx5_update_fwd(), which was removed.
+The buggy address belongs to the object at ffff8880538220c0
+ which belongs to the cache kmalloc-8 of size 8
+The buggy address is located 0 bytes to the right of
+ allocated 1-byte region [ffff8880538220c0, ffff8880538220c1)
 
-With this change, user-configured flooding flags persist across bridge
-updates and are no longer overridden by sparx5_update_fwd().
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff888053822e40 pfn:0x53822
+flags: 0xfff00000000200(workingset|node=0|zone=1|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 00fff00000000200 ffff88801a441500 ffffea0001b2fad0 ffffea00014e9f10
+raw: ffff888053822e40 0000000000800068 00000000f5000000 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 11644, tgid 11643 (syz.4.1506), ts 186114687557, free_ts 185745645903
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x240/0x2a0 mm/page_alloc.c:1851
+ prep_new_page mm/page_alloc.c:1859 [inline]
+ get_page_from_freelist+0x21e4/0x22c0 mm/page_alloc.c:3858
+ __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5148
+ alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2416
+ alloc_slab_page mm/slub.c:2492 [inline]
+ allocate_slab+0x8a/0x370 mm/slub.c:2660
+ new_slab mm/slub.c:2714 [inline]
+ ___slab_alloc+0xbeb/0x1420 mm/slub.c:3901
+ __slab_alloc mm/slub.c:3992 [inline]
+ __slab_alloc_node mm/slub.c:4067 [inline]
+ slab_alloc_node mm/slub.c:4228 [inline]
+ __do_kmalloc_node mm/slub.c:4375 [inline]
+ __kmalloc_node_track_caller_noprof+0x2f8/0x4e0 mm/slub.c:4395
+ kvasprintf+0xdc/0x190 lib/kasprintf.c:25
+ kobject_set_name_vargs+0x61/0x110 lib/kobject.c:274
+ kobject_add_varg lib/kobject.c:368 [inline]
+ kobject_init_and_add+0xdd/0x190 lib/kobject.c:457
+ netdev_queue_add_kobject net/core/net-sysfs.c:1995 [inline]
+ netdev_queue_update_kobjects+0x249/0x6c0 net/core/net-sysfs.c:2054
+ register_queue_kobjects net/core/net-sysfs.c:2117 [inline]
+ netdev_register_kobject+0x258/0x310 net/core/net-sysfs.c:2360
+ register_netdevice+0x126c/0x1ae0 net/core/dev.c:11206
+ bond_newlink+0x60/0xb0 drivers/net/bonding/bond_netlink.c:590
+ rtnl_newlink_create+0x310/0xb00 net/core/rtnetlink.c:3825
+ __rtnl_newlink net/core/rtnetlink.c:3942 [inline]
+ rtnl_newlink+0x16d6/0x1c70 net/core/rtnetlink.c:4057
+page last free pid 11632 tgid 11632 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1395 [inline]
+ __free_frozen_pages+0xbc4/0xd30 mm/page_alloc.c:2895
+ pagetable_free include/linux/mm.h:2898 [inline]
+ pagetable_dtor_free include/linux/mm.h:2996 [inline]
+ __tlb_remove_table+0x2d2/0x3b0 include/asm-generic/tlb.h:220
+ __tlb_remove_table_free mm/mmu_gather.c:227 [inline]
+ tlb_remove_table_rcu+0x85/0x100 mm/mmu_gather.c:290
+ rcu_do_batch kernel/rcu/tree.c:2605 [inline]
+ rcu_core+0xca8/0x1770 kernel/rcu/tree.c:2861
+ handle_softirqs+0x283/0x870 kernel/softirq.c:579
+ __do_softirq kernel/softirq.c:613 [inline]
+ invoke_softirq kernel/softirq.c:453 [inline]
+ __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:680
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1050 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1050
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
 
-Fixes: d6fce5141929 ("net: sparx5: add switching support")
-Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+Memory state around the buggy address:
+ ffff888053821f80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff888053822000: 06 fc fc fc 06 fc fc fc fa fc fc fc fa fc fc fc
+>ffff888053822080: fa fc fc fc 05 fc fc fc 01 fc fc fc 00 fc fc fc
+                                           ^
+ ffff888053822100: 00 fc fc fc 00 fc fc fc 05 fc fc fc 05 fc fc fc
+ ffff888053822180: 05 fc fc fc 05 fc fc fc 05 fc fc fc fa fc fc fc
+==================================================================
+
+
 ---
- drivers/net/ethernet/microchip/sparx5/sparx5_main.c      |  5 +++++
- drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c | 12 ++++++++++++
- drivers/net/ethernet/microchip/sparx5/sparx5_vlan.c      | 10 ----------
- 3 files changed, 17 insertions(+), 10 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-index 74ad1d73b465..40b1bfc600a7 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-@@ -708,6 +708,11 @@ static int sparx5_start(struct sparx5 *sparx5)
- 	/* Init masks */
- 	sparx5_update_fwd(sparx5);
- 
-+	/* Init flood masks */
-+	for (int pgid = sparx5_get_pgid(sparx5, PGID_UC_FLOOD);
-+	     pgid <= sparx5_get_pgid(sparx5, PGID_BCAST); pgid++)
-+		sparx5_pgid_clear(sparx5, pgid);
-+
- 	/* CPU copy CPU pgids */
- 	spx5_wr(ANA_AC_PGID_MISC_CFG_PGID_CPU_COPY_ENA_SET(1), sparx5,
- 		ANA_AC_PGID_MISC_CFG(sparx5_get_pgid(sparx5, PGID_CPU)));
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c b/drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c
-index bc9ecb9392cd..0a71abbd3da5 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c
-@@ -176,6 +176,7 @@ static int sparx5_port_bridge_join(struct sparx5_port *port,
- 				   struct net_device *bridge,
- 				   struct netlink_ext_ack *extack)
- {
-+	struct switchdev_brport_flags flags = {0};
- 	struct sparx5 *sparx5 = port->sparx5;
- 	struct net_device *ndev = port->ndev;
- 	int err;
-@@ -205,6 +206,11 @@ static int sparx5_port_bridge_join(struct sparx5_port *port,
- 	 */
- 	__dev_mc_unsync(ndev, sparx5_mc_unsync);
- 
-+	/* Enable uc/mc/bc flooding */
-+	flags.mask = BR_FLOOD | BR_MCAST_FLOOD | BR_BCAST_FLOOD;
-+	flags.val = flags.mask;
-+	sparx5_port_attr_bridge_flags(port, flags);
-+
- 	return 0;
- 
- err_switchdev_offload:
-@@ -215,6 +221,7 @@ static int sparx5_port_bridge_join(struct sparx5_port *port,
- static void sparx5_port_bridge_leave(struct sparx5_port *port,
- 				     struct net_device *bridge)
- {
-+	struct switchdev_brport_flags flags = {0};
- 	struct sparx5 *sparx5 = port->sparx5;
- 
- 	switchdev_bridge_port_unoffload(port->ndev, NULL, NULL, NULL);
-@@ -234,6 +241,11 @@ static void sparx5_port_bridge_leave(struct sparx5_port *port,
- 
- 	/* Port enters in host more therefore restore mc list */
- 	__dev_mc_sync(port->ndev, sparx5_mc_sync, sparx5_mc_unsync);
-+
-+	/* Disable uc/mc/bc flooding */
-+	flags.mask = BR_FLOOD | BR_MCAST_FLOOD | BR_BCAST_FLOOD;
-+	flags.val = 0;
-+	sparx5_port_attr_bridge_flags(port, flags);
- }
- 
- static int sparx5_port_changeupper(struct net_device *dev,
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_vlan.c b/drivers/net/ethernet/microchip/sparx5/sparx5_vlan.c
-index d42097aa60a0..494782871903 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_vlan.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_vlan.c
-@@ -167,16 +167,6 @@ void sparx5_update_fwd(struct sparx5 *sparx5)
- 	/* Divide up fwd mask in 32 bit words */
- 	bitmap_to_arr32(mask, sparx5->bridge_fwd_mask, SPX5_PORTS);
- 
--	/* Update flood masks */
--	for (port = sparx5_get_pgid(sparx5, PGID_UC_FLOOD);
--	     port <= sparx5_get_pgid(sparx5, PGID_BCAST); port++) {
--		spx5_wr(mask[0], sparx5, ANA_AC_PGID_CFG(port));
--		if (is_sparx5(sparx5)) {
--			spx5_wr(mask[1], sparx5, ANA_AC_PGID_CFG1(port));
--			spx5_wr(mask[2], sparx5, ANA_AC_PGID_CFG2(port));
--		}
--	}
--
- 	/* Update SRC masks */
- 	for (port = 0; port < sparx5->data->consts->n_ports; port++) {
- 		if (test_bit(port, sparx5->bridge_fwd_mask)) {
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
----
-base-commit: 07fdad3a93756b872da7b53647715c48d0f4a2d0
-change-id: 20251003-fix-flood-fwd-39ef87d6e97c
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Best regards,
--- 
-Daniel Machon <daniel.machon@microchip.com>
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
