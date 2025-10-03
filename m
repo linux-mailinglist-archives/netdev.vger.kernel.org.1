@@ -1,139 +1,711 @@
-Return-Path: <netdev+bounces-227817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED6F9BB7F94
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 21:24:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C3B8BB827D
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 22:57:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C898B4E2F62
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 19:24:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B64583B4487
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 20:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F66222127B;
-	Fri,  3 Oct 2025 19:24:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0252571BA;
+	Fri,  3 Oct 2025 20:57:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="BbOerJCy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oPTEV3rc"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3021CD15;
-	Fri,  3 Oct 2025 19:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490E2221264;
+	Fri,  3 Oct 2025 20:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759519449; cv=none; b=ikP3qzbJGwkgQ9kCClJaix9hyp1vDfsm0p76gC+y0dXxE3GvU9fg9zCd6OtNAJaiBYRmkdCMY/DO4VTX6lJs1rn8msoBgx5LKdBWWUx/fseLTsmrW7sQ9ywiQVFdeMCRUpsVEx/mNIAwqPVXjCQoaONR6hRD7OFWUga4PSEUycM=
+	t=1759525061; cv=none; b=oNaO2wl4n1+rEeXU9sEzAycSxWw86TT2HFXUoFqe8HrTnBNzFXraH461+dxVlV4mNmofyaIKFgMk9REkq8WnXRfBwjzEVP/K3gfaycCCswQz39eLp1Lv0ZCbNRlDE/zdWaZesAjGhcnrXxzc2ukbGIPgCbG+PukcMKlfNKoRgco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759519449; c=relaxed/simple;
-	bh=56VSLS2VlGSOben/JtMQvJrP5v2Yl2PSVueoKr9MCtU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KrXP/PA9HslnvAF4vLJnY6uk4vsxMGLDeYhCb3IOTi4OVrweWXohp1rprGgmwHHLNm6DBLTBTMUZz7sZmxHQY9iyxFg5Wff3AtKOZQVV7AWjj1243XWNNauWYtfHyqWzMID6pKsqw49qnQPecHixpFDg9lCUbhhHtat1kX/9tjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=BbOerJCy; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=9PXuoo318fq1CcfElZH622V33pk+DRAH3Sxiejf9rrs=; b=BbOerJCyLKgrz27BDaY2RrWt3d
-	AD66V1qm7geNqjOjnPqtScHSO0qmO9p6vLlTcxMB88q3zWylwUnAi6u37ySK7nBdDsIYrHPuaS4cK
-	MxLWQUj1D+zHdqRE05xoO2d7BlA882uXh+CRCd/tmMCJsNi3QzTknMGEh90VTPKcUVLSpuEMsYxD3
-	5dceZK/t1WuQMLPMy61Ojf+DfC7hElgR4FEq0JqxN2ub7UmQQNkjMukRg6pMbjxlOxVwMZxf8xOBj
-	xzficWS79wFJZjkkZvOYnkeu+xPCq6XP3ulvSIW1MB2rV64K8VJW416LiamYAjCX3bLA/2KEX5hmq
-	nGTMkryA==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1v4lNp-0006Lz-2R;
-	Fri, 03 Oct 2025 21:24:01 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1v4lNo-000Gpc-2x;
-	Fri, 03 Oct 2025 21:24:01 +0200
-Message-ID: <1587bfe1-8672-4677-b76e-ab516e5c52c5@iogearbox.net>
-Date: Fri, 3 Oct 2025 21:24:00 +0200
+	s=arc-20240116; t=1759525061; c=relaxed/simple;
+	bh=repfiGxh0uBEbAwntWKMavT38FNb7ANrRUXZEfcL8Vg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FRq97Zd8JuFEzg1+Orasxxc8bGPuD+tZZZti9dHBkMv+M/WhoR+Lvty3cmhA5gS9wEfFUSCLrkWhZeEBzge24oAikSzDVv2gYCFiEthK85uTa5i4Sjs3LWSHKmbTnehCAePQl3pqmYY0XRxReIxCUz7UqyQhbYmBco5BQenM9cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oPTEV3rc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1045C4CEF5;
+	Fri,  3 Oct 2025 20:57:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759525060;
+	bh=repfiGxh0uBEbAwntWKMavT38FNb7ANrRUXZEfcL8Vg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=oPTEV3rc3CyRV47kxXJ3FhFyP2qwnAXzQOPeIMfftjx3wQhn6luN7tA8pkLESjx/O
+	 Pkmk5kG/hwJ4XAp+gQW8JT8ILnStP/u91ow31UulmV/wnSNuhOVcSSlTpJOtZfdLVd
+	 jBRqfErPkSFVhgHlHRsy6dEvPgacckruI1yUFv29dKZvAkX96rZr97XBhL1GlEhJ2k
+	 NA3bPxTOUX+oTLQIBWA4yiZlA1pA2H4cm66m+sm9qgo9sKUfVuCD4ekaV3qIIrtzJG
+	 8COXWE/KsNjwTVieOnbI2swjieV4PTRLmgu1A+T0y1SBN+pVhHflcDxQxLZVjetOzL
+	 /Kl2BI3uV6wlQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Phil Sutter <phil@nwl.cc>,
+	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+	Florian Westphal <fw@strlen.de>,
+	Antonio Quartulli <antonio@openvpn.net>,
+	jv@jvosburgh.net,
+	shuah@kernel.org,
+	kuniyu@google.com,
+	martineau@kernel.org,
+	geliang@kernel.org,
+	pablo@netfilter.org,
+	kadlec@netfilter.org,
+	sd@queasysnail.net,
+	razor@blackwall.org,
+	idosch@nvidia.com,
+	yongwang@nvidia.com,
+	jiri@resnulli.us,
+	danishanwar@ti.com,
+	linux-kselftest@vger.kernel.org,
+	mptcp@lists.linux.dev,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: [PATCH net repost] selftests: net: sort configs
+Date: Fri,  3 Oct 2025 13:57:36 -0700
+Message-ID: <20251003205736.1019673-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf] bpf: Fix metadata_dst leak
- __bpf_redirect_neigh_v{4,6}
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- Yusuke Suzuki <yusuke.suzuki@isovalent.com>,
- Julian Wiedmann <jwi@isovalent.com>, Martin KaFai Lau
- <martin.lau@kernel.org>, Jordan Rife <jrife@google.com>
-References: <20251003073418.291171-1-daniel@iogearbox.net>
- <20251003090235.09521adc@kernel.org>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <20251003090235.09521adc@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: Clear (ClamAV 1.0.9/27780/Thu Oct  2 04:58:32 2025)
+Content-Transfer-Encoding: 8bit
 
-On 10/3/25 6:02 PM, Jakub Kicinski wrote:
-> On Fri,  3 Oct 2025 09:34:18 +0200 Daniel Borkmann wrote:
->> Cilium has a BPF egress gateway feature which forces outgoing K8s Pod
->> traffic to pass through dedicated egress gateways which then SNAT the
->> traffic in order to interact with stable IPs outside the cluster.
-> 
-> Nice! The warning Stan added at work?
+Sort config files for networking selftests. This should help us
+avoid merge conflicts between net and net-next. patchwork check
+will be added to prevent new issues.
 
-We should add CONFIG_DEBUG_NET to our Cilium CI test kernels actually.
-The memory leak was observed on AWS nodes with the above Cilium config,
-so bpftrace came to the rescue in the end.
+Acked-by: Phil Sutter <phil@nwl.cc>
+Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Acked-by: Florian Westphal <fw@strlen.de>
+Acked-by: Antonio Quartulli <antonio@openvpn.net>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+repost after the PR made the tree designation correct
+v1: https://lore.kernel.org/20251002015245.3209033-1-kuba@kernel.org
 
-Thanks,
-Daniel
+CC: jv@jvosburgh.net
+CC: shuah@kernel.org
+CC: kuniyu@google.com
+CC: martineau@kernel.org
+CC: geliang@kernel.org
+CC: pablo@netfilter.org
+CC: kadlec@netfilter.org
+CC: sd@queasysnail.net
+CC: razor@blackwall.org
+CC: idosch@nvidia.com
+CC: yongwang@nvidia.com
+CC: jiri@resnulli.us
+CC: danishanwar@ti.com
+CC: linux-kselftest@vger.kernel.org
+CC: mptcp@lists.linux.dev
+CC: netfilter-devel@vger.kernel.org
+CC: coreteam@netfilter.org
+---
+ .../selftests/drivers/net/bonding/config      |   8 +-
+ tools/testing/selftests/drivers/net/config    |   2 +-
+ tools/testing/selftests/net/af_unix/config    |   2 +-
+ tools/testing/selftests/net/config            | 140 +++++++++---------
+ tools/testing/selftests/net/forwarding/config |  34 ++---
+ tools/testing/selftests/net/hsr/config        |   4 +-
+ tools/testing/selftests/net/mptcp/config      |  48 +++---
+ tools/testing/selftests/net/netfilter/config  |  58 ++++----
+ tools/testing/selftests/net/ovpn/config       |  12 +-
+ .../testing/selftests/net/packetdrill/config  |   4 +-
+ tools/testing/selftests/net/tcp_ao/config     |   2 +-
+ 11 files changed, 157 insertions(+), 157 deletions(-)
+
+diff --git a/tools/testing/selftests/drivers/net/bonding/config b/tools/testing/selftests/drivers/net/bonding/config
+index e5b7a8db4dfa..6bb290abd48b 100644
+--- a/tools/testing/selftests/drivers/net/bonding/config
++++ b/tools/testing/selftests/drivers/net/bonding/config
+@@ -1,17 +1,17 @@
+ CONFIG_BONDING=y
+ CONFIG_BRIDGE=y
+ CONFIG_DUMMY=y
++CONFIG_INET_ESP=y
++CONFIG_INET_ESP_OFFLOAD=y
+ CONFIG_IPV6=y
+-CONFIG_MACVLAN=y
+ CONFIG_IPVLAN=y
++CONFIG_MACVLAN=y
+ CONFIG_NET_ACT_GACT=y
+ CONFIG_NET_CLS_FLOWER=y
+ CONFIG_NET_CLS_MATCHALL=m
++CONFIG_NETDEVSIM=m
+ CONFIG_NET_SCH_INGRESS=y
+ CONFIG_NLMON=y
+ CONFIG_VETH=y
+ CONFIG_VLAN_8021Q=m
+-CONFIG_INET_ESP=y
+-CONFIG_INET_ESP_OFFLOAD=y
+ CONFIG_XFRM_USER=m
+-CONFIG_NETDEVSIM=m
+diff --git a/tools/testing/selftests/drivers/net/config b/tools/testing/selftests/drivers/net/config
+index 601431248d5b..77ccf83d87e0 100644
+--- a/tools/testing/selftests/drivers/net/config
++++ b/tools/testing/selftests/drivers/net/config
+@@ -3,8 +3,8 @@ CONFIG_DEBUG_INFO_BTF=y
+ CONFIG_DEBUG_INFO_BTF_MODULES=n
+ CONFIG_INET_PSP=y
+ CONFIG_IPV6=y
+-CONFIG_NETDEVSIM=m
+ CONFIG_NETCONSOLE=m
+ CONFIG_NETCONSOLE_DYNAMIC=y
+ CONFIG_NETCONSOLE_EXTENDED_LOG=y
++CONFIG_NETDEVSIM=m
+ CONFIG_XDP_SOCKETS=y
+diff --git a/tools/testing/selftests/net/af_unix/config b/tools/testing/selftests/net/af_unix/config
+index 37368567768c..b5429c15a53c 100644
+--- a/tools/testing/selftests/net/af_unix/config
++++ b/tools/testing/selftests/net/af_unix/config
+@@ -1,3 +1,3 @@
+-CONFIG_UNIX=y
+ CONFIG_AF_UNIX_OOB=y
++CONFIG_UNIX=y
+ CONFIG_UNIX_DIAG=m
+diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
+index d548611e2698..1e1f253118f5 100644
+--- a/tools/testing/selftests/net/config
++++ b/tools/testing/selftests/net/config
+@@ -1,130 +1,130 @@
+-CONFIG_USER_NS=y
+-CONFIG_NET_NS=y
++CONFIG_AMT=m
++CONFIG_BAREUDP=m
+ CONFIG_BONDING=m
+ CONFIG_BPF_SYSCALL=y
+-CONFIG_TEST_BPF=m
+-CONFIG_NUMA=y
+-CONFIG_RPS=y
+-CONFIG_SYSFS=y
+-CONFIG_PROC_SYSCTL=y
+-CONFIG_NET_VRF=y
+-CONFIG_NET_L3_MASTER_DEV=y
+-CONFIG_IPV6=y
+-CONFIG_IPV6_MULTIPLE_TABLES=y
+-CONFIG_VETH=y
+-CONFIG_NET_IPVTI=y
+-CONFIG_IPV6_VTI=y
+-CONFIG_DUMMY=y
+-CONFIG_BRIDGE_VLAN_FILTERING=y
+ CONFIG_BRIDGE=y
++CONFIG_BRIDGE_VLAN_FILTERING=y
++CONFIG_CAN=m
++CONFIG_CAN_DEV=m
++CONFIG_CAN_VXCAN=m
++CONFIG_CRYPTO_ARIA=y
+ CONFIG_CRYPTO_CHACHA20POLY1305=m
++CONFIG_CRYPTO_SHA1=y
++CONFIG_CRYPTO_SM4_GENERIC=y
+ CONFIG_DEBUG_INFO_BTF=y
+ CONFIG_DEBUG_INFO_BTF_MODULES=n
+-CONFIG_VLAN_8021Q=y
++CONFIG_DUMMY=y
+ CONFIG_GENEVE=m
+ CONFIG_IFB=y
+ CONFIG_INET_DIAG=y
+ CONFIG_INET_ESP=y
+ CONFIG_INET_ESP_OFFLOAD=y
+-CONFIG_CRYPTO_SHA1=y
+-CONFIG_NET_FOU=y
+-CONFIG_NET_FOU_IP_TUNNELS=y
+-CONFIG_NETFILTER=y
+-CONFIG_NETFILTER_ADVANCED=y
+-CONFIG_NETFILTER_XTABLES_LEGACY=y
+-CONFIG_NF_CONNTRACK=m
+-CONFIG_IPV6_MROUTE=y
+-CONFIG_IPV6_SIT=y
+-CONFIG_NF_NAT=m
++CONFIG_IP6_NF_FILTER=m
+ CONFIG_IP6_NF_IPTABLES=m
+ CONFIG_IP6_NF_IPTABLES_LEGACY=m
+-CONFIG_IP_NF_IPTABLES=m
+-CONFIG_IP_NF_IPTABLES_LEGACY=m
+ CONFIG_IP6_NF_MANGLE=m
+-CONFIG_IP6_NF_FILTER=m
++CONFIG_IP6_NF_MATCH_RPFILTER=m
+ CONFIG_IP6_NF_NAT=m
+ CONFIG_IP6_NF_RAW=m
+-CONFIG_IP_NF_MANGLE=m
++CONFIG_IP6_NF_TARGET_REJECT=m
+ CONFIG_IP_NF_FILTER=m
++CONFIG_IP_NF_IPTABLES=m
++CONFIG_IP_NF_IPTABLES_LEGACY=m
++CONFIG_IP_NF_MANGLE=m
++CONFIG_IP_NF_MATCH_RPFILTER=m
+ CONFIG_IP_NF_NAT=m
+ CONFIG_IP_NF_RAW=m
+ CONFIG_IP_NF_TARGET_REJECT=m
+-CONFIG_IP6_NF_TARGET_REJECT=m
+ CONFIG_IP_NF_TARGET_TTL=m
++CONFIG_IP_SCTP=m
++CONFIG_IPV6=y
+ CONFIG_IPV6_GRE=m
++CONFIG_IPV6_ILA=m
++CONFIG_IPV6_IOAM6_LWTUNNEL=y
++CONFIG_IPV6_MROUTE=y
++CONFIG_IPV6_MULTIPLE_TABLES=y
++CONFIG_IPV6_RPL_LWTUNNEL=y
+ CONFIG_IPV6_SEG6_LWTUNNEL=y
++CONFIG_IPV6_SIT=y
++CONFIG_IPV6_VTI=y
++CONFIG_IPVLAN=m
++CONFIG_KALLSYMS=y
++CONFIG_L2TP=m
+ CONFIG_L2TP_ETH=m
+ CONFIG_L2TP_IP=m
+-CONFIG_L2TP=m
+ CONFIG_L2TP_V3=y
+ CONFIG_MACSEC=m
+ CONFIG_MACVLAN=y
+ CONFIG_MACVTAP=y
+ CONFIG_MPLS=y
++CONFIG_MPLS_IPTUNNEL=m
++CONFIG_MPLS_ROUTING=m
+ CONFIG_MPTCP=y
+-CONFIG_NF_TABLES=m
+-CONFIG_NF_TABLES_IPV6=y
+-CONFIG_NF_TABLES_IPV4=y
+-CONFIG_NFT_NAT=m
+-CONFIG_NETFILTER_XT_MATCH_LENGTH=m
+-CONFIG_NETFILTER_XT_TARGET_HL=m
+-CONFIG_NETFILTER_XT_NAT=m
+ CONFIG_NET_ACT_CSUM=m
+ CONFIG_NET_ACT_CT=m
+ CONFIG_NET_ACT_GACT=m
++CONFIG_NET_ACT_MIRRED=m
+ CONFIG_NET_ACT_PEDIT=m
++CONFIG_NET_ACT_TUNNEL_KEY=m
+ CONFIG_NET_CLS_BASIC=m
+ CONFIG_NET_CLS_BPF=m
++CONFIG_NET_CLS_FLOWER=m
+ CONFIG_NET_CLS_MATCHALL=m
+ CONFIG_NET_CLS_U32=m
+-CONFIG_NET_IPGRE_DEMUX=m
++CONFIG_NETDEVSIM=m
++CONFIG_NET_DROP_MONITOR=m
++CONFIG_NETFILTER=y
++CONFIG_NETFILTER_ADVANCED=y
++CONFIG_NETFILTER_XTABLES_LEGACY=y
++CONFIG_NETFILTER_XT_MATCH_LENGTH=m
++CONFIG_NETFILTER_XT_MATCH_POLICY=m
++CONFIG_NETFILTER_XT_NAT=m
++CONFIG_NETFILTER_XT_TARGET_HL=m
++CONFIG_NET_FOU=y
++CONFIG_NET_FOU_IP_TUNNELS=y
+ CONFIG_NET_IPGRE=m
++CONFIG_NET_IPGRE_DEMUX=m
+ CONFIG_NET_IPIP=y
++CONFIG_NET_IPVTI=y
++CONFIG_NETKIT=y
++CONFIG_NET_L3_MASTER_DEV=y
++CONFIG_NET_NS=y
++CONFIG_NET_PKTGEN=m
++CONFIG_NET_SCH_ETF=m
++CONFIG_NET_SCH_FQ=m
+ CONFIG_NET_SCH_FQ_CODEL=m
+ CONFIG_NET_SCH_HTB=m
+-CONFIG_NET_SCH_FQ=m
+-CONFIG_NET_SCH_ETF=m
++CONFIG_NET_SCH_INGRESS=m
+ CONFIG_NET_SCH_NETEM=y
+ CONFIG_NET_SCH_PRIO=m
+-CONFIG_NFT_COMPAT=m
++CONFIG_NET_VRF=y
++CONFIG_NF_CONNTRACK=m
+ CONFIG_NF_CONNTRACK_OVS=y
+ CONFIG_NF_FLOW_TABLE=m
++CONFIG_NF_NAT=m
++CONFIG_NF_TABLES=m
++CONFIG_NF_TABLES_IPV4=y
++CONFIG_NF_TABLES_IPV6=y
++CONFIG_NFT_COMPAT=m
++CONFIG_NFT_NAT=m
++CONFIG_NUMA=y
+ CONFIG_OPENVSWITCH=m
+ CONFIG_OPENVSWITCH_GENEVE=m
+ CONFIG_OPENVSWITCH_GRE=m
+ CONFIG_OPENVSWITCH_VXLAN=m
++CONFIG_PROC_SYSCTL=y
+ CONFIG_PSAMPLE=m
++CONFIG_RPS=y
++CONFIG_SYSFS=y
+ CONFIG_TCP_MD5SIG=y
+ CONFIG_TEST_BLACKHOLE_DEV=m
+-CONFIG_KALLSYMS=y
++CONFIG_TEST_BPF=m
+ CONFIG_TLS=m
+ CONFIG_TRACEPOINTS=y
+-CONFIG_NET_DROP_MONITOR=m
+-CONFIG_NETDEVSIM=m
+-CONFIG_MPLS_ROUTING=m
+-CONFIG_MPLS_IPTUNNEL=m
+-CONFIG_NET_SCH_INGRESS=m
+-CONFIG_NET_CLS_FLOWER=m
+-CONFIG_NET_ACT_TUNNEL_KEY=m
+-CONFIG_NET_ACT_MIRRED=m
+-CONFIG_BAREUDP=m
+-CONFIG_IPV6_IOAM6_LWTUNNEL=y
+-CONFIG_CRYPTO_SM4_GENERIC=y
+-CONFIG_AMT=m
+ CONFIG_TUN=y
++CONFIG_USER_NS=y
++CONFIG_VETH=y
++CONFIG_VLAN_8021Q=y
+ CONFIG_VXLAN=m
+-CONFIG_IP_SCTP=m
+-CONFIG_NETFILTER_XT_MATCH_POLICY=m
+-CONFIG_CRYPTO_ARIA=y
+ CONFIG_XFRM_INTERFACE=m
+ CONFIG_XFRM_USER=m
+-CONFIG_IP_NF_MATCH_RPFILTER=m
+-CONFIG_IP6_NF_MATCH_RPFILTER=m
+-CONFIG_IPVLAN=m
+-CONFIG_CAN=m
+-CONFIG_CAN_DEV=m
+-CONFIG_CAN_VXCAN=m
+-CONFIG_NETKIT=y
+-CONFIG_NET_PKTGEN=m
+-CONFIG_IPV6_ILA=m
+-CONFIG_IPV6_RPL_LWTUNNEL=y
+diff --git a/tools/testing/selftests/net/forwarding/config b/tools/testing/selftests/net/forwarding/config
+index 18fd69d8d937..ce64518aaa11 100644
+--- a/tools/testing/selftests/net/forwarding/config
++++ b/tools/testing/selftests/net/forwarding/config
+@@ -1,24 +1,23 @@
+-CONFIG_BRIDGE=m
+-CONFIG_VLAN_8021Q=m
+-CONFIG_BRIDGE_VLAN_FILTERING=y
+-CONFIG_BRIDGE_IGMP_SNOOPING=y
+-CONFIG_NET_L3_MASTER_DEV=y
+-CONFIG_IPV6_MULTIPLE_TABLES=y
+-CONFIG_NET_VRF=m
+ CONFIG_BPF_SYSCALL=y
++CONFIG_BRIDGE=m
++CONFIG_BRIDGE_IGMP_SNOOPING=y
++CONFIG_BRIDGE_VLAN_FILTERING=y
+ CONFIG_CGROUP_BPF=y
+ CONFIG_DUMMY=m
+-CONFIG_IPV6=y
+-CONFIG_IPV6_GRE=m
+-CONFIG_IPV6_MROUTE=y
+-CONFIG_IPV6_MROUTE_MULTIPLE_TABLES=y
+-CONFIG_IPV6_PIMSM_V2=y
+ CONFIG_IP_MROUTE=y
+ CONFIG_IP_MROUTE_MULTIPLE_TABLES=y
+ CONFIG_IP_PIMSM_V1=y
+ CONFIG_IP_PIMSM_V2=y
++CONFIG_IPV6=y
++CONFIG_IPV6_GRE=m
++CONFIG_IPV6_MROUTE=y
++CONFIG_IPV6_MROUTE_MULTIPLE_TABLES=y
++CONFIG_IPV6_MULTIPLE_TABLES=y
++CONFIG_IPV6_PIMSM_V2=y
+ CONFIG_MACVLAN=m
++CONFIG_NAMESPACES=y
+ CONFIG_NET_ACT_CT=m
++CONFIG_NET_ACT_GACT=m
+ CONFIG_NET_ACT_MIRRED=m
+ CONFIG_NET_ACT_MPLS=m
+ CONFIG_NET_ACT_PEDIT=m
+@@ -27,29 +26,30 @@ CONFIG_NET_ACT_SAMPLE=m
+ CONFIG_NET_ACT_SKBEDIT=m
+ CONFIG_NET_ACT_TUNNEL_KEY=m
+ CONFIG_NET_ACT_VLAN=m
++CONFIG_NET_CLS_BASIC=m
+ CONFIG_NET_CLS_FLOWER=m
+ CONFIG_NET_CLS_MATCHALL=m
+-CONFIG_NET_CLS_BASIC=m
+ CONFIG_NET_EMATCH=y
+ CONFIG_NET_EMATCH_META=m
++CONFIG_NETFILTER=y
+ CONFIG_NET_IPGRE=m
+ CONFIG_NET_IPGRE_DEMUX=m
+ CONFIG_NET_IPIP=m
++CONFIG_NET_L3_MASTER_DEV=y
++CONFIG_NET_NS=y
+ CONFIG_NET_SCH_ETS=m
+ CONFIG_NET_SCH_INGRESS=m
+-CONFIG_NET_ACT_GACT=m
+ CONFIG_NET_SCH_PRIO=m
+ CONFIG_NET_SCH_RED=m
+ CONFIG_NET_SCH_TBF=m
+ CONFIG_NET_TC_SKB_EXT=y
+ CONFIG_NET_TEAM=y
+ CONFIG_NET_TEAM_MODE_LOADBALANCE=y
+-CONFIG_NETFILTER=y
++CONFIG_NET_VRF=m
+ CONFIG_NF_CONNTRACK=m
+ CONFIG_NF_FLOW_TABLE=m
+ CONFIG_NF_TABLES=m
+ CONFIG_VETH=m
+-CONFIG_NAMESPACES=y
+-CONFIG_NET_NS=y
++CONFIG_VLAN_8021Q=m
+ CONFIG_VXLAN=m
+ CONFIG_XFRM_USER=m
+diff --git a/tools/testing/selftests/net/hsr/config b/tools/testing/selftests/net/hsr/config
+index 555a868743f0..205cc4d3d64b 100644
+--- a/tools/testing/selftests/net/hsr/config
++++ b/tools/testing/selftests/net/hsr/config
+@@ -1,6 +1,6 @@
++CONFIG_BRIDGE=y
++CONFIG_HSR=y
+ CONFIG_IPV6=y
+ CONFIG_NET_SCH_NETEM=m
+-CONFIG_HSR=y
+ CONFIG_VETH=y
+-CONFIG_BRIDGE=y
+ CONFIG_VLAN_8021Q=m
+diff --git a/tools/testing/selftests/net/mptcp/config b/tools/testing/selftests/net/mptcp/config
+index 968d440c03fe..59051ee2a986 100644
+--- a/tools/testing/selftests/net/mptcp/config
++++ b/tools/testing/selftests/net/mptcp/config
+@@ -1,36 +1,36 @@
+-CONFIG_KALLSYMS=y
+-CONFIG_MPTCP=y
+-CONFIG_IPV6=y
+-CONFIG_MPTCP_IPV6=y
+ CONFIG_INET_DIAG=m
+ CONFIG_INET_MPTCP_DIAG=m
+-CONFIG_VETH=y
+-CONFIG_NET_SCH_NETEM=m
+-CONFIG_SYN_COOKIES=y
++CONFIG_IP6_NF_FILTER=m
++CONFIG_IP6_NF_TARGET_REJECT=m
++CONFIG_IP_ADVANCED_ROUTER=y
++CONFIG_IP_MULTIPLE_TABLES=y
++CONFIG_IP_NF_FILTER=m
++CONFIG_IP_NF_MANGLE=m
++CONFIG_IP_NF_TARGET_REJECT=m
++CONFIG_IPV6=y
++CONFIG_IPV6_MULTIPLE_TABLES=y
++CONFIG_KALLSYMS=y
++CONFIG_MPTCP=y
++CONFIG_MPTCP_IPV6=y
++CONFIG_NET_ACT_CSUM=m
++CONFIG_NET_ACT_PEDIT=m
++CONFIG_NET_CLS_ACT=y
++CONFIG_NET_CLS_FW=m
+ CONFIG_NETFILTER=y
+ CONFIG_NETFILTER_ADVANCED=y
+ CONFIG_NETFILTER_NETLINK=m
+-CONFIG_NF_TABLES=m
+-CONFIG_NFT_COMPAT=m
+ CONFIG_NETFILTER_XTABLES=m
+ CONFIG_NETFILTER_XTABLES_LEGACY=y
+ CONFIG_NETFILTER_XT_MATCH_BPF=m
+ CONFIG_NETFILTER_XT_MATCH_LENGTH=m
+ CONFIG_NETFILTER_XT_MATCH_STATISTIC=m
+ CONFIG_NETFILTER_XT_TARGET_MARK=m
+-CONFIG_NF_TABLES_INET=y
+-CONFIG_NFT_TPROXY=m
+-CONFIG_NFT_SOCKET=m
+-CONFIG_IP_ADVANCED_ROUTER=y
+-CONFIG_IP_MULTIPLE_TABLES=y
+-CONFIG_IP_NF_FILTER=m
+-CONFIG_IP_NF_MANGLE=m
+-CONFIG_IP_NF_TARGET_REJECT=m
+-CONFIG_IP6_NF_TARGET_REJECT=m
+-CONFIG_IPV6_MULTIPLE_TABLES=y
+-CONFIG_IP6_NF_FILTER=m
+-CONFIG_NET_ACT_CSUM=m
+-CONFIG_NET_ACT_PEDIT=m
+-CONFIG_NET_CLS_ACT=y
+-CONFIG_NET_CLS_FW=m
+ CONFIG_NET_SCH_INGRESS=m
++CONFIG_NET_SCH_NETEM=m
++CONFIG_NF_TABLES=m
++CONFIG_NF_TABLES_INET=y
++CONFIG_NFT_COMPAT=m
++CONFIG_NFT_SOCKET=m
++CONFIG_NFT_TPROXY=m
++CONFIG_SYN_COOKIES=y
++CONFIG_VETH=y
+diff --git a/tools/testing/selftests/net/netfilter/config b/tools/testing/selftests/net/netfilter/config
+index 305e46b819cb..12ce61fa15a8 100644
+--- a/tools/testing/selftests/net/netfilter/config
++++ b/tools/testing/selftests/net/netfilter/config
+@@ -1,77 +1,80 @@
+ CONFIG_AUDIT=y
+ CONFIG_BPF_SYSCALL=y
+ CONFIG_BRIDGE=m
+-CONFIG_NETFILTER_XTABLES_LEGACY=y
+-CONFIG_BRIDGE_NF_EBTABLES_LEGACY=m
+ CONFIG_BRIDGE_EBT_BROUTE=m
+ CONFIG_BRIDGE_EBT_IP=m
+ CONFIG_BRIDGE_EBT_REDIRECT=m
+ CONFIG_BRIDGE_EBT_T_FILTER=m
+ CONFIG_BRIDGE_NETFILTER=m
+ CONFIG_BRIDGE_NF_EBTABLES=m
++CONFIG_BRIDGE_NF_EBTABLES_LEGACY=m
+ CONFIG_BRIDGE_VLAN_FILTERING=y
+ CONFIG_CGROUP_BPF=y
+-CONFIG_DUMMY=m
+-CONFIG_INET_ESP=m
+ CONFIG_CRYPTO_SHA1=m
+-CONFIG_IP_NF_MATCH_RPFILTER=m
+-CONFIG_IP6_NF_MATCH_RPFILTER=m
+-CONFIG_IP_NF_IPTABLES=m
+-CONFIG_IP_NF_IPTABLES_LEGACY=m
++CONFIG_DUMMY=m
++CONFIG_INET_DIAG=m
++CONFIG_INET_ESP=m
++CONFIG_INET_SCTP_DIAG=m
++CONFIG_IP6_NF_FILTER=m
+ CONFIG_IP6_NF_IPTABLES=m
+ CONFIG_IP6_NF_IPTABLES_LEGACY=m
+-CONFIG_IP_NF_NAT=m
+-CONFIG_IP_NF_FILTER=m
+-CONFIG_IP6_NF_FILTER=m
+-CONFIG_IP_NF_RAW=m
++CONFIG_IP6_NF_MATCH_RPFILTER=m
+ CONFIG_IP6_NF_RAW=m
++CONFIG_IP_NF_FILTER=m
++CONFIG_IP_NF_IPTABLES=m
++CONFIG_IP_NF_IPTABLES_LEGACY=m
++CONFIG_IP_NF_MATCH_RPFILTER=m
++CONFIG_IP_NF_NAT=m
++CONFIG_IP_NF_RAW=m
+ CONFIG_IP_SCTP=m
++CONFIG_IPV6=y
++CONFIG_IPV6_MULTIPLE_TABLES=y
+ CONFIG_IP_VS=m
+ CONFIG_IP_VS_PROTO_TCP=y
+ CONFIG_IP_VS_RR=m
+-CONFIG_IPV6=y
+-CONFIG_IPV6_MULTIPLE_TABLES=y
+ CONFIG_MACVLAN=m
+ CONFIG_NAMESPACES=y
+ CONFIG_NET_CLS_U32=m
+-CONFIG_NET_L3_MASTER_DEV=y
+-CONFIG_NET_NS=y
+-CONFIG_NET_SCH_NETEM=m
+-CONFIG_NET_SCH_HTB=m
+-CONFIG_NET_IPIP=m
+-CONFIG_NET_VRF=y
+ CONFIG_NETFILTER=y
+ CONFIG_NETFILTER_ADVANCED=y
+ CONFIG_NETFILTER_NETLINK=m
+ CONFIG_NETFILTER_NETLINK_QUEUE=m
+ CONFIG_NETFILTER_SYNPROXY=m
+ CONFIG_NETFILTER_XTABLES=m
+-CONFIG_NETFILTER_XT_NAT=m
++CONFIG_NETFILTER_XTABLES_LEGACY=y
+ CONFIG_NETFILTER_XT_MATCH_CONNTRACK=m
+ CONFIG_NETFILTER_XT_MATCH_STATE=m
+ CONFIG_NETFILTER_XT_MATCH_STRING=m
++CONFIG_NETFILTER_XT_NAT=m
+ CONFIG_NETFILTER_XT_TARGET_REDIRECT=m
++CONFIG_NET_IPIP=m
++CONFIG_NET_L3_MASTER_DEV=y
++CONFIG_NET_NS=y
++CONFIG_NET_PKTGEN=m
++CONFIG_NET_SCH_HTB=m
++CONFIG_NET_SCH_NETEM=m
++CONFIG_NET_VRF=y
+ CONFIG_NF_CONNTRACK=m
+-CONFIG_NF_CONNTRACK_PROCFS=y
+ CONFIG_NF_CONNTRACK_EVENTS=y
+ CONFIG_NF_CONNTRACK_FTP=m
+ CONFIG_NF_CONNTRACK_MARK=y
++CONFIG_NF_CONNTRACK_PROCFS=y
+ CONFIG_NF_CONNTRACK_ZONES=y
+ CONFIG_NF_CT_NETLINK=m
+ CONFIG_NF_CT_PROTO_SCTP=y
+ CONFIG_NF_FLOW_TABLE=m
++CONFIG_NF_FLOW_TABLE_INET=m
+ CONFIG_NF_LOG_IPV4=m
+ CONFIG_NF_LOG_IPV6=m
+ CONFIG_NF_NAT=m
+-CONFIG_NF_NAT_REDIRECT=y
+ CONFIG_NF_NAT_MASQUERADE=y
++CONFIG_NF_NAT_REDIRECT=y
+ CONFIG_NF_TABLES=m
+ CONFIG_NF_TABLES_BRIDGE=m
+ CONFIG_NF_TABLES_INET=y
+ CONFIG_NF_TABLES_IPV4=y
+ CONFIG_NF_TABLES_IPV6=y
+ CONFIG_NF_TABLES_NETDEV=y
+-CONFIG_NF_FLOW_TABLE_INET=m
+ CONFIG_NFT_BRIDGE_META=m
+ CONFIG_NFT_COMPAT=m
+ CONFIG_NFT_CT=m
+@@ -90,12 +93,9 @@ CONFIG_NFT_QUOTA=m
+ CONFIG_NFT_REDIR=m
+ CONFIG_NFT_SYNPROXY=m
+ CONFIG_NFT_TPROXY=m
++CONFIG_TUN=m
+ CONFIG_VETH=m
+ CONFIG_VLAN_8021Q=m
+ CONFIG_VXLAN=m
+-CONFIG_XFRM_USER=m
+ CONFIG_XFRM_STATISTICS=y
+-CONFIG_NET_PKTGEN=m
+-CONFIG_TUN=m
+-CONFIG_INET_DIAG=m
+-CONFIG_INET_SCTP_DIAG=m
++CONFIG_XFRM_USER=m
+diff --git a/tools/testing/selftests/net/ovpn/config b/tools/testing/selftests/net/ovpn/config
+index 71946ba9fa17..42699740936d 100644
+--- a/tools/testing/selftests/net/ovpn/config
++++ b/tools/testing/selftests/net/ovpn/config
+@@ -1,10 +1,10 @@
+-CONFIG_NET=y
+-CONFIG_INET=y
+-CONFIG_STREAM_PARSER=y
+-CONFIG_NET_UDP_TUNNEL=y
+-CONFIG_DST_CACHE=y
+ CONFIG_CRYPTO=y
+ CONFIG_CRYPTO_AES=y
+-CONFIG_CRYPTO_GCM=y
+ CONFIG_CRYPTO_CHACHA20POLY1305=y
++CONFIG_CRYPTO_GCM=y
++CONFIG_DST_CACHE=y
++CONFIG_INET=y
++CONFIG_NET=y
++CONFIG_NET_UDP_TUNNEL=y
+ CONFIG_OVPN=m
++CONFIG_STREAM_PARSER=y
+diff --git a/tools/testing/selftests/net/packetdrill/config b/tools/testing/selftests/net/packetdrill/config
+index 0237ed98f3c0..c4a19a785521 100644
+--- a/tools/testing/selftests/net/packetdrill/config
++++ b/tools/testing/selftests/net/packetdrill/config
+@@ -1,6 +1,6 @@
+-CONFIG_IPV6=y
+-CONFIG_HZ_1000=y
+ CONFIG_HZ=1000
++CONFIG_HZ_1000=y
++CONFIG_IPV6=y
+ CONFIG_NET_NS=y
+ CONFIG_NET_SCH_FIFO=y
+ CONFIG_NET_SCH_FQ=y
+diff --git a/tools/testing/selftests/net/tcp_ao/config b/tools/testing/selftests/net/tcp_ao/config
+index 3605e38711cb..971cb6fa2d63 100644
+--- a/tools/testing/selftests/net/tcp_ao/config
++++ b/tools/testing/selftests/net/tcp_ao/config
+@@ -1,8 +1,8 @@
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_RMD160=y
+ CONFIG_CRYPTO_SHA1=y
+-CONFIG_IPV6_MULTIPLE_TABLES=y
+ CONFIG_IPV6=y
++CONFIG_IPV6_MULTIPLE_TABLES=y
+ CONFIG_NET_L3_MASTER_DEV=y
+ CONFIG_NET_VRF=y
+ CONFIG_TCP_AO=y
+-- 
+2.51.0
+
 
