@@ -1,364 +1,177 @@
-Return-Path: <netdev+bounces-227722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3BE6BB600D
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 08:56:26 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E25EBB61F3
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 09:04:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 554B83C6E82
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 06:56:22 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 97ED94E7278
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 07:03:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC252221282;
-	Fri,  3 Oct 2025 06:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F320F2264B7;
+	Fri,  3 Oct 2025 07:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="aMjNO8Aj";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="PNYMaREd"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YkaidwBv"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-b4-smtp.messagingengine.com (flow-b4-smtp.messagingengine.com [202.12.124.139])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6AB6FBF;
-	Fri,  3 Oct 2025 06:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7752A22D4E9
+	for <netdev@vger.kernel.org>; Fri,  3 Oct 2025 07:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759474575; cv=none; b=MB7jrvbCUOe5nbIEukNBcocHsRAtoCMAMvtVuNyrrKF6GsRBbI2Hzi9s8oZgt1L41zVsuaf4GRyYvo+D5YFX2JhLQTd7KNk30qPstOpE3ZaHvWOmztYWXe+F3cCAPWv6LGdZFH5bGQPD0oifQ3AE/1Rts2BTtCtmdX4IKKEgHeg=
+	t=1759475021; cv=none; b=d4AZxLurWlPl09lmwTjwIcz9OZOjs5CU7TWZZjrzKHpJILaEUvgEbghA18rY1C/iCoocqxKQprAkvRpnx9tff7w9Ub37iHjz/xjI9kyIMvjpiEjI5hNQ0bWgcezVpc7+aS/unPlddKTq/4ILtluHVod9h+MWsFyiTtLKyrJ2PMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759474575; c=relaxed/simple;
-	bh=VsY56m5kSuveBNBUNSkmOpL9Gd42blVivMz56qhfGfQ=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=a6io9gre06xe/zyNQk1QLhmROFn3dMe6gExIFxhEbCnphs63D5lkpDX6yRGldZFEV/bhZrU2m15gq0su1+xJMM24wHiVEO63zXTe5HNwG3TwhVK9FsAmLhlLPr8QLG3vmA+j5QpKpfT6gMUS8hRJS52CcfnGS6cwQEga06hdS8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=aMjNO8Aj; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=PNYMaREd; arc=none smtp.client-ip=202.12.124.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailflow.stl.internal (Postfix) with ESMTP id C4B9A130000D;
-	Fri,  3 Oct 2025 02:56:07 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-10.internal (MEProxy); Fri, 03 Oct 2025 02:56:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
-	1759474567; x=1759481767; bh=j+Jw5iNM6nGAnWO3sjaDIDEUdkjo7ZX+LLz
-	qd/P1hYw=; b=aMjNO8AjVn+sj0yKUl+VzgbYszqPNGJNtAPbUQGn88a5UP2eiqs
-	R5yiWdKir92SSE469eXj/b+AHudi0OVXOIY6cS5YPi4E1B06RLjJ+yZPq4inyozE
-	Q+B2H/gKkTXrrQ2uYPkaRXH7k9U3Y58+RCC7RD56mFR5x5KoRAcvgQv9tL7Zpc+/
-	9N6venAGi7v2ylACMFGp9jJlqUne0QvLZGDqcm3MhRqSBzJwu12eGO57hRoA4sro
-	NgXvxEQkBwxT5LSMI5KUZlWIDFBwzR+gvhw0a1r/a6Ty5zl4GCufIIlts3fIye4p
-	JrHYaG8ko/FiP2kNmiy/58lOphRDKpSPmnw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1759474567; x=
-	1759481767; bh=j+Jw5iNM6nGAnWO3sjaDIDEUdkjo7ZX+LLzqd/P1hYw=; b=P
-	NYMaREdofJEjMxoqFbSBZZKryi4ZwnfANONgeT2a1dj37Y+FNVWf603dzC5NuApe
-	8PxvyO6Q6DBCiVJrM8k6zEMwDy/cTTk1TtsSqwegcfRU11nONgZXR4em3KQPmyim
-	OI2gDy6Ogzt7ifj6Ked0HHw1xR170gEX2viFcftT+WOsW+lFe503bLpkWDvr4Z7s
-	cukyNO+ucMr7L3wCcGGdohDGSTdNWryH23xV6KBGaW3B+CI6PeIG9IouSZuBOKBC
-	dKquqjsLUyCcaEnlM82UDPgSN/S1V02Qz83CuSnTbFMrLbBbQ9AXPWab7L0GXpjN
-	gaLZmR2+e/ZuDrFlmXzew==
-X-ME-Sender: <xms:gnPfaMkIJPG7oVHmiGGRa0CpjJx7RohXVYjkJGIiEh2iOGlLIXvz7Q>
-    <xme:gnPfaL7yl9NUDnF6WrW14T4q-2gvfr53xNr0E_QiaHexrYaF0oruSqWMxAHBv_X-7
-    he83VGHvZW4PzWgKOTeAohnaiAhTYeXu9Rhj5h50nInJJpCUvI>
-X-ME-Received: <xmr:gnPfaKZHZu3YD6tKEjPzMoNoGzkIMDN3Z50sJg_3-6-KPUiHJtc04hN2x1QY170mpQr7__pL7KtyMY1QmrIBnneKxaREGagaO6Gn7NBgViHv>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdekkedvfecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpegtgfgghffvvefujghffffkrhesthejredttddtjeenucfhrhhomheppfgvihhluehr
-    ohifnhcuoehnvghilhgssehofihnmhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpe
-    duteefhfduveehvdefueefvdffkeevkefgtdefgffgkeehjeeghfetiefhgffgleenucev
-    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnvghilhgsse
-    hofihnmhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedugeelpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehhphgrseiihihtohhrrdgtohhmpdhrtghpthhtoheplhhinh
-    hksehvihhvohdrtghomhdprhgtphhtthhopehrtghusehvghgvrhdrkhgvrhhnvghlrdho
-    rhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
-    hpthhtoheplhhinhhugidqnhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphht
-    thhopehlihhnuhigqdhmohguuhhlvghssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
-    hpthhtoheplhhinhhugidqmhgvughirgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
-    gtphhtthhopehlihhnuhigqdhiuggvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:gnPfaG0eLIXy_hVmmU0ah6RiWYe432JzyxABI3_ZePEgQyvaESbQMg>
-    <xmx:gnPfaFi8VKDei6hK_Kzm4HvejB1DcIxxW5AGQspQu-BZ0cfQX60vkQ>
-    <xmx:gnPfaNiFoyBB5wKfL7gCcU3cs9PS5_p6fTSHi4mNminIEilZsHOtZA>
-    <xmx:gnPfaDgIFdYh7LlGgsMY4-Bc3EDv7jElWaw_NOfwLw-Yk1w7kum8UQ>
-    <xmx:h3PfaFqY121yl6e12RmJDdKdPbf2ATm6GquMeKQ2MvsNf-5FbRc2NBdT>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 3 Oct 2025 02:55:17 -0400 (EDT)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	s=arc-20240116; t=1759475021; c=relaxed/simple;
+	bh=WEpgQwj5ysHGdY0rQpoWHB2WE/mYExXO0H1/EEC7tEs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K3XyLyoXUud+yip7gd2iTS5Qs9ZoSOD/YRIre9WTvuCfZsnfkhxwWo2JYVJcXSBTz6SYfpjI8Fg001OkcdrNLq5GsP/4SQ8BiUwYJJZ2jgj2+UEdgPAru4DLs0hkAehvhWzwL/J/pu5aFUKSudmAW9VB1dv6NEROq9bE90A6qFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YkaidwBv; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 78A76C00D89;
+	Fri,  3 Oct 2025 07:03:14 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 71D77606EB;
+	Fri,  3 Oct 2025 07:03:32 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 16AE5102F1C04;
+	Fri,  3 Oct 2025 09:03:15 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1759475011; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=FIGOkgiLU7D/zQZYWWPQIOlv2gbvyN0XXDYNmcnPLZw=;
+	b=YkaidwBv1N46IA0tJRY4HE2I7lMFOupu995GkT/PlqQEVgC3/qFlKwsugBFg8jrKrVop0B
+	nUSTE+9SN/6IZPufDRM+/WdHJ2aCXXKZ802RDtyXLqsbrBkjuMAGtcbVnWpDrXIRyjikqe
+	XhVXqkpD6fMt9856Np4b/bJHpx0LsCW32biKs7AV/HmW6KYe2T1kKCiyAwYfMqFnYe8o+g
+	INs5iwf67mTPmCCYpxYEcvu8vzdvqODGMYWIeeDY1ThqqteQZ477ygLMyJ9v8Yxh8MCWd1
+	LM8MmkF7axyYFyAJsysgqYrtBQxRRjBET4pRS1VabtH1cCv/eIptXJmAaKAW+A==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+Subject: [PATCH net] net: mdio: mdio-i2c: Hold the i2c bus lock during smbus transactions
+Date: Fri,  3 Oct 2025 09:03:06 +0200
+Message-ID: <20251003070311.861135-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Byungchul Park" <byungchul@sk.com>
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
- torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
- linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
- linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
- will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
- joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
- duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
- tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
- amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
- linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
- minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
- sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
- penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
- ngupta@vflare.org, linux-block@vger.kernel.org, josef@toxicpanda.com,
- linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org,
- dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
- dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
- melissa.srw@gmail.com, hamohammed.sa@gmail.com, harry.yoo@oracle.com,
- chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
- max.byungchul.park@gmail.com, boqun.feng@gmail.com, longman@redhat.com,
- yunseong.kim@ericsson.com, ysk@kzalloc.com, yeoreum.yun@arm.com,
- netdev@vger.kernel.org, matthew.brost@intel.com, her0gyugyu@gmail.com,
- corbet@lwn.net, catalin.marinas@arm.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- luto@kernel.org, sumit.semwal@linaro.org, gustavo@padovan.org,
- christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
- lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, rppt@kernel.org,
- surenb@google.com, mcgrof@kernel.org, petr.pavlu@suse.com,
- da.gomez@kernel.org, samitolvanen@google.com, paulmck@kernel.org,
- frederic@kernel.org, neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com,
- josh@joshtriplett.org, urezki@gmail.com, mathieu.desnoyers@efficios.com,
- jiangshanlai@gmail.com, qiang.zhang@linux.dev, juri.lelli@redhat.com,
- vincent.guittot@linaro.org, dietmar.eggemann@arm.com, bsegall@google.com,
- mgorman@suse.de, vschneid@redhat.com, chuck.lever@oracle.com,
- okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
- trondmy@kernel.org, anna@kernel.org, kees@kernel.org,
- bigeasy@linutronix.de, clrkwllms@kernel.org, mark.rutland@arm.com,
- ada.coupriediaz@arm.com, kristina.martsenko@arm.com,
- wangkefeng.wang@huawei.com, broonie@kernel.org, kevin.brodsky@arm.com,
- dwmw@amazon.co.uk, shakeel.butt@linux.dev, ast@kernel.org,
- ziy@nvidia.com, yuzhao@google.com, baolin.wang@linux.alibaba.com,
- usamaarif642@gmail.com, joel.granados@kernel.org,
- richard.weiyang@gmail.com, geert+renesas@glider.be,
- tim.c.chen@linux.intel.com, linux@treblig.org,
- alexander.shishkin@linux.intel.com, lillian@star-ark.net,
- chenhuacai@kernel.org, francesco@valla.it, guoweikang.kernel@gmail.com,
- link@vivo.com, jpoimboe@kernel.org, masahiroy@kernel.org,
- brauner@kernel.org, thomas.weissschuh@linutronix.de, oleg@redhat.com,
- mjguzik@gmail.com, andrii@kernel.org, wangfushuai@baidu.com,
- linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
- linux-i2c@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-modules@vger.kernel.org, rcu@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH v17 28/47] dept: add documentation for dept
-In-reply-to: <20251002081247.51255-29-byungchul@sk.com>
-References: <20251002081247.51255-1-byungchul@sk.com>,
- <20251002081247.51255-29-byungchul@sk.com>
-Date: Fri, 03 Oct 2025 16:55:14 +1000
-Message-id: <175947451487.247319.6809470356431942803@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Thu, 02 Oct 2025, Byungchul Park wrote:
-> This document describes the concept and APIs of dept.
-> 
+When accessing an MDIO register using single-byte smbus accesses, we have to
+perform 2 consecutive operations targeting the same address,
+first accessing the MSB then the LSB of the 16 bit register:
 
-Thanks for the documentation.  I've been trying to understand it.
+  read_1_byte(addr); <- returns MSB of register at address 'addr'
+  read_1_byte(addr); <- returns LSB
 
+Some PHY devices present in SFP such as the Broadcom 5461 don't like
+seeing foreign i2c transactions in-between these 2 smbus accesses, and
+will return the MSB a second time when trying to read the LSB :
 
-> +How DEPT works
-> +--------------
-> +
-> +Let's take a look how DEPT works with the 1st example in the section
-> +'Limitation of lockdep'.
-> +
-> +   context X	   context Y	   context Z
-> +
-> +		   mutex_lock A
-> +   folio_lock B
-> +		   folio_lock B <- DEADLOCK
-> +				   mutex_lock A <- DEADLOCK
-> +				   folio_unlock B
-> +		   folio_unlock B
-> +		   mutex_unlock A
-> +				   mutex_unlock A
-> +
-> +Adding comments to describe DEPT's view in terms of wait and event:
-> +
-> +   context X	   context Y	   context Z
-> +
-> +		   mutex_lock A
-> +		   /* wait for A */
-> +   folio_lock B
-> +   /* wait for A */
-> +   /* start event A context */
-> +
-> +		   folio_lock B
-> +		   /* wait for B */ <- DEADLOCK
-> +		   /* start event B context */
-> +
-> +				   mutex_lock A
-> +				   /* wait for A */ <- DEADLOCK
-> +				   /* start event A context */
-> +
-> +				   folio_unlock B
-> +				   /* event B */
-> +		   folio_unlock B
-> +		   /* event B */
-> +
-> +		   mutex_unlock A
-> +		   /* event A */
-> +				   mutex_unlock A
-> +				   /* event A */
-> +
+  read_1_byte(addr); <- returns MSB
 
-I can't see the value of the above section.
-The first section with no comments is useful as it is easy to see the
-deadlock being investigate.  The section below is useful as it add
-comments to explain how DEPT sees the situation.  But the above section,
-with some but not all of the comments, does seem (to me) to add anything
-useful.
+  	i2c_transaction_for_other_device_on_the_bus();
 
-> +Adding more supplementary comments to describe DEPT's view in detail:
-> +
-> +   context X	   context Y	   context Z
-> +
-> +		   mutex_lock A
-> +		   /* might wait for A */
-> +		   /* start to take into account event A's context */
+  read_1_byte(addr); <- returns MSB again
 
-What do you mean precisely by "context".
-You use the word in the heading "context X  context Y  context Z"
-so it seems like "context" means "task" or "process".  But then as I
-read on, I think - maybe it means something else.  If it does, then you
-should use different words.  Maybe "task X ..." in the heading.
+Given the already fragile nature of accessing PHYs/SFPs with single-byte
+smbus accesses, it's safe to say that this Broadcom PHY may not be the
+only one acting like this.
 
-If the examples that follow It seems that the "context" for event A
-starts at "mutex lock A" when it (possibly) waits for a mutex and ends
-at "mutex unlock A" - which are both in the same process.  Clearly
-various other events that happen between these two points in the same
-process could be seen as the "context" for event A.
+Let's therefore hold the i2c bus lock while performing our smbus
+transactions to avoid interleaved accesses.
 
-However event B starts in "context X" with "folio_lock B" and ends in
-"context Z" or "context Y" with "folio_unlock B".  Is that right?
+Fixes: d4bd3aca33c2 ("net: mdio: mdio-i2c: Add support for single-byte SMBus operations")
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+ drivers/net/mdio/mdio-i2c.c | 39 ++++++++++++++++++++++++-------------
+ 1 file changed, 25 insertions(+), 14 deletions(-)
 
-My question then is: how do you decide which, of all the event in all
-the processes in all the system, between the start[S] and the end[E] are
-considered to be part of the "context" of event A.
+diff --git a/drivers/net/mdio/mdio-i2c.c b/drivers/net/mdio/mdio-i2c.c
+index 53e96bfab542..ed20352a589a 100644
+--- a/drivers/net/mdio/mdio-i2c.c
++++ b/drivers/net/mdio/mdio-i2c.c
+@@ -116,17 +116,23 @@ static int smbus_byte_mii_read_default_c22(struct mii_bus *bus, int phy_id,
+ 	if (!i2c_mii_valid_phy_id(phy_id))
+ 		return 0;
+ 
+-	ret = i2c_smbus_xfer(i2c, i2c_mii_phy_addr(phy_id), 0,
+-			     I2C_SMBUS_READ, reg,
+-			     I2C_SMBUS_BYTE_DATA, &smbus_data);
++	i2c_lock_bus(i2c, I2C_LOCK_SEGMENT);
++
++	ret = __i2c_smbus_xfer(i2c, i2c_mii_phy_addr(phy_id), 0,
++			       I2C_SMBUS_READ, reg,
++			       I2C_SMBUS_BYTE_DATA, &smbus_data);
+ 	if (ret < 0)
+-		return ret;
++		goto unlock;
+ 
+ 	val = (smbus_data.byte & 0xff) << 8;
+ 
+-	ret = i2c_smbus_xfer(i2c, i2c_mii_phy_addr(phy_id), 0,
+-			     I2C_SMBUS_READ, reg,
+-			     I2C_SMBUS_BYTE_DATA, &smbus_data);
++	ret = __i2c_smbus_xfer(i2c, i2c_mii_phy_addr(phy_id), 0,
++			       I2C_SMBUS_READ, reg,
++			       I2C_SMBUS_BYTE_DATA, &smbus_data);
++
++unlock:
++	i2c_unlock_bus(i2c, I2C_LOCK_SEGMENT);
++
+ 	if (ret < 0)
+ 		return ret;
+ 
+@@ -147,17 +153,22 @@ static int smbus_byte_mii_write_default_c22(struct mii_bus *bus, int phy_id,
+ 
+ 	smbus_data.byte = (val & 0xff00) >> 8;
+ 
+-	ret = i2c_smbus_xfer(i2c, i2c_mii_phy_addr(phy_id), 0,
+-			     I2C_SMBUS_WRITE, reg,
+-			     I2C_SMBUS_BYTE_DATA, &smbus_data);
++	i2c_lock_bus(i2c, I2C_LOCK_SEGMENT);
++
++	ret = __i2c_smbus_xfer(i2c, i2c_mii_phy_addr(phy_id), 0,
++			       I2C_SMBUS_WRITE, reg,
++			       I2C_SMBUS_BYTE_DATA, &smbus_data);
+ 	if (ret < 0)
+-		return ret;
++		goto unlock;
+ 
+ 	smbus_data.byte = val & 0xff;
+ 
+-	ret = i2c_smbus_xfer(i2c, i2c_mii_phy_addr(phy_id), 0,
+-			     I2C_SMBUS_WRITE, reg,
+-			     I2C_SMBUS_BYTE_DATA, &smbus_data);
++	ret = __i2c_smbus_xfer(i2c, i2c_mii_phy_addr(phy_id), 0,
++			       I2C_SMBUS_WRITE, reg,
++			       I2C_SMBUS_BYTE_DATA, &smbus_data);
++
++unlock:
++	i2c_unlock_bus(i2c, I2C_LOCK_SEGMENT);
+ 
+ 	return ret < 0 ? ret : 0;
+ }
+-- 
+2.49.0
 
-I think it would help me if you defined what a "context" is earlier.
-What sorts of things appear in a context?
-
-Thanks,
-NeilBrown
-
-
-> +		   /* 1 */
-> +   folio_lock B
-> +   /* might wait for B */
-> +   /* start to take into account event B's context */
-> +   /* 2 */
-> +
-> +		   folio_lock B
-> +		   /* might wait for B */ <- DEADLOCK
-> +		   /* start to take into account event B's context */
-> +		   /* 3 */
-> +
-> +				   mutex_lock A
-> +				   /* might wait for A */ <- DEADLOCK
-> +				   /* start to take into account
-> +				      event A's context */
-> +				   /* 4 */
-> +
-> +				   folio_unlock B
-> +				   /* event B that's been valid since 2 */
-> +		   folio_unlock B
-> +		   /* event B that's been valid since 3 */
-> +
-> +		   mutex_unlock A
-> +		   /* event A that's been valid since 1 */
-> +
-> +				   mutex_unlock A
-> +				   /* event A that's been valid since 4 */
-> +
-> +Let's build up dependency graph with this example. Firstly, context X:
-> +
-> +   context X
-> +
-> +   folio_lock B
-> +   /* might wait for B */
-> +   /* start to take into account event B's context */
-> +   /* 2 */
-> +
-> +There are no events to create dependency. Next, context Y:
-> +
-> +   context Y
-> +
-> +   mutex_lock A
-> +   /* might wait for A */
-> +   /* start to take into account event A's context */
-> +   /* 1 */
-> +
-> +   folio_lock B
-> +   /* might wait for B */
-> +   /* start to take into account event B's context */
-> +   /* 3 */
-> +
-> +   folio_unlock B
-> +   /* event B that's been valid since 3 */
-> +
-> +   mutex_unlock A
-> +   /* event A that's been valid since 1 */
-> +
-> +There are two events. For event B, folio_unlock B, since there are no
-> +waits between 3 and the event, event B does not create dependency. For
-> +event A, there is a wait, folio_lock B, between 1 and the event. Which
-> +means event A cannot be triggered if event B does not wake up the wait.
-> +Therefore, we can say event A depends on event B, say, 'A -> B'. The
-> +graph will look like after adding the dependency:
-> +
-> +   A -> B
-> +
-> +   where 'A -> B' means that event A depends on event B.
-> +
-> +Lastly, context Z:
-> +
-> +   context Z
-> +
-> +   mutex_lock A
-> +   /* might wait for A */
-> +   /* start to take into account event A's context */
-> +   /* 4 */
-> +
-> +   folio_unlock B
-> +   /* event B that's been valid since 2 */
-> +
-> +   mutex_unlock A
-> +   /* event A that's been valid since 4 */
-> +
-> +There are also two events. For event B, folio_unlock B, there is a
-> +wait, mutex_lock A, between 2 and the event - remind 2 is at a very
-> +start and before the wait in timeline. Which means event B cannot be
-> +triggered if event A does not wake up the wait. Therefore, we can say
-> +event B depends on event A, say, 'B -> A'. The graph will look like
-> +after adding the dependency:
-> +
-> +    -> A -> B -
-> +   /           \
-> +   \           /
-> +    -----------
-> +
-> +   where 'A -> B' means that event A depends on event B.
-> +
-> +A new loop has been created. So DEPT can report it as a deadlock. For
-> +event A, mutex_unlock A, since there are no waits between 4 and the
-> +event, event A does not create dependency. That's it.
-> +
-> +CONCLUSION
-> +
-> +DEPT works well with any general synchronization mechanisms by focusing
-> +on wait, event and its context.
-> +
 
