@@ -1,156 +1,172 @@
-Return-Path: <netdev+bounces-227789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2118BB72F9
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 16:33:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBA7EBB7344
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 16:37:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6894019E6A87
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 14:33:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8044D4A0DB8
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 14:37:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4F2347DD;
-	Fri,  3 Oct 2025 14:33:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fgtkU7tp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3815623D7EE;
+	Fri,  3 Oct 2025 14:37:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155B015E8B
-	for <netdev@vger.kernel.org>; Fri,  3 Oct 2025 14:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8396139E;
+	Fri,  3 Oct 2025 14:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759501981; cv=none; b=S8+g0WzvKzSeBJ43dm8nQJZnv2c0YAvUwGXKbsK9scxuJkDFmf3568gSAUClfYIoqmnQsALT8SJJ+CLB1dV0dalnPbR5s0m9iXDuu525XVRgne38kHYCKtSxM8pFttp0WT64cf6FiMVRY5TR3ta2/8m1RfU98g06xNlAmkClOrA=
+	t=1759502235; cv=none; b=D25l0+KTvICCJwZbCyV10c5Guqp9obZqZxtoAUTm32L3Fc6cPiY7wUspKmW8nRXHssjNpZVrs8+d86fPEo7KYY07ioRQa8UkJ6bnEoWG9tofdcUdWcHotaZ2WfDfxbcG4FA22Bbfo4eb9p7DcGdK0Yi5LBjjdd75CfNwjIFNXCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759501981; c=relaxed/simple;
-	bh=ArI0GMic8uk/1kAkM79WN6gznjdosKe4PSqQZ8k9PK0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FXXACoBVGX7/2j63dvnlEB3X25tejJbWfoERfrVNnwR87/qLpOExx1l3X0RvIW26mbCmAonW0vV4o4utPNqAFAbQVvqWFcVmCCbvTAN8WCEIuwR3qhIXFgEZcwuKnnFFe2tfD1sssckkzBg8YMUhMwOsmVy7FFx4kTMysMnsA/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fgtkU7tp; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-36a6a39752bso25289211fa.0
-        for <netdev@vger.kernel.org>; Fri, 03 Oct 2025 07:32:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759501978; x=1760106778; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1mxBl+91XREs3rrt+Mm+HGe169ZpfgbUuMF9IKmnb3I=;
-        b=fgtkU7tp8t9FJx+n6MdmpSaI96wKnMB946Ia6juEpMapqFaiDzBKU6Myu/l99TPONl
-         X5NzYAznh9OzpsvyXuK+O8vHNGlTTUQ1WjUPFWSSi1o3O4pVptvRrU7M0ADp7xg313qo
-         Go50Y9Q+75bf4JbHAzc72ujOQu5a5jJUpSrzrR3PA09KstyJbTEkjzZNOvf5fBxYqROX
-         5v8IYWSutFofAk1ESXC42mRAIHRn3kXhGopqySi46gJwiXHBTy6/rvHRwNdFwxLx1PN+
-         M4zyU0ka9hzeLELILZOgUcgvH3jnrvBJJn/8HxfwzfpX0Iloz7Z9St9zi8x8iRLHF+7d
-         r6Pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759501978; x=1760106778;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1mxBl+91XREs3rrt+Mm+HGe169ZpfgbUuMF9IKmnb3I=;
-        b=DYmDj33tRgzMHWnSohYPrIwzaf3yygjmew7bqtix98LXZKrZuZaBPxIcdj0jIoMsZ4
-         s+7W4FflMNuu110+lSvR5QJTONkd1ZrPwYaochsVjXQbJXJBHScOTTaNQI5PaIATNxjy
-         7ztoqW3C7kM/CtEmFjtfxrJshA2Kbwt5milKroO2mYWe2KI7Ld4NN8NM/Ynkv3zLMg7C
-         hMr82v7du1FvgWiIEGpqYikMoV4D4GrteJSIDDkQm07ncPBA+immBPjlq7u+S5e7vwXa
-         z5i24FxV9S0P4xgcwXvuhxhvhKwsi+CHEz0f1uucTrnkJs4qOXqyXGWOLGWZRhSyUHx1
-         jELg==
-X-Forwarded-Encrypted: i=1; AJvYcCW4NnTR5XvJ6fH7YHOUuR1q9PIInlR84N0y6iyCi2RimUw5wxskWjDkDqupaUhPWAy+cMRA6rQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9p75GZvfMQVlFaqy1tZf2d86O3LkAsISeUoSFhVhIblbDKOCh
-	T74hlGLtkzJlFoEDSBNJjhU1szW3oeF0mZeW0BzgPCdGEfxDL7zCl1lj5GgaFF/RNQVJoQ82/op
-	0mV1L9tJHT/WVgrhpmcUBbX0kPE+KV5s=
-X-Gm-Gg: ASbGncviRJCesn40tEb7xk7VCSstJevvmpkl/eTYcsOmf3JCeMpZ/o0Rl1h+/k1uUNb
-	KE/oQSXgKIZ3UOwjU7/EiTpjjupZxQDxX1XYR0GopkPFfKiD8YOECD9KJNxqeFslSoHwNXBlcG5
-	FIlrm6oUWm5IfRnlkF8+44gFwL50BxvfFFElSc2ReYUKjXlDV2WumTfsxf+QOVDY14HCw1e3Lv2
-	T0SJDeJawL7+BAHGA2CWkc4nvLmVxQv7uSE9zvc
-X-Google-Smtp-Source: AGHT+IHMEYf9LUvT+7M4GPywBvEmEbLwMBFLFIBedNHzqtzmaPYWYwMrkMOiqneX0J3Yyd6PeW5sBlD7r5kNWSSHALo=
-X-Received: by 2002:a05:651c:a07:b0:372:950f:2aff with SMTP id
- 38308e7fff4ca-374c37eb5d7mr10596021fa.27.1759501977328; Fri, 03 Oct 2025
- 07:32:57 -0700 (PDT)
+	s=arc-20240116; t=1759502235; c=relaxed/simple;
+	bh=ify0TfiFKa3Hes8KZtJjaG2GeXYqffaYoF8Y5oCDXXg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U6cE2diKRDWdmOgbZp5W0Q018xpyzLFAzYyIbMQ/ZEyxi2OrmtuIgrcpmDS1WC4dIZ0EcSNlZhka4rqrK/hq8gdn21NR1WGbNKUeXG6kAXxetZi8vqANffhmh6hqZZA5Of4sQnEwaQT26qoqUf1ika7R7wrW2QvHdd6TilZUPwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09D741A9A;
+	Fri,  3 Oct 2025 07:37:04 -0700 (PDT)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8693C3F5A1;
+	Fri,  3 Oct 2025 07:36:47 -0700 (PDT)
+Date: Fri, 3 Oct 2025 15:36:42 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Byungchul Park <byungchul@sk.com>
+Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
+	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
+	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
+	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+	ngupta@vflare.org, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
+	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+	djwong@kernel.org, dri-devel@lists.freedesktop.org,
+	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
+	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
+	yeoreum.yun@arm.com, netdev@vger.kernel.org,
+	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
+	catalin.marinas@arm.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, luto@kernel.org,
+	sumit.semwal@linaro.org, gustavo@padovan.org,
+	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
+	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
+	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
+	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
+	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
+	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
+	qiang.zhang@linux.dev, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
+	clrkwllms@kernel.org, ada.coupriediaz@arm.com,
+	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
+	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
+	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
+	yuzhao@google.com, baolin.wang@linux.alibaba.com,
+	usamaarif642@gmail.com, joel.granados@kernel.org,
+	richard.weiyang@gmail.com, geert+renesas@glider.be,
+	tim.c.chen@linux.intel.com, linux@treblig.org,
+	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+	chenhuacai@kernel.org, francesco@valla.it,
+	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
+	masahiroy@kernel.org, brauner@kernel.org,
+	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
+	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
+	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev
+Subject: Re: [PATCH v17 09/47] arm64, dept: add support
+ CONFIG_ARCH_HAS_DEPT_SUPPORT to arm64
+Message-ID: <aN_fel4Rpqz6TPsD@J2N7QTR9R3>
+References: <20251002081247.51255-1-byungchul@sk.com>
+ <20251002081247.51255-10-byungchul@sk.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251001183320.83221-1-ariel.dalessandro@collabora.com>
- <175943240204.235529.17735630695826458855.robh@kernel.org>
- <CABBYNZKSFCes1ag0oiEptKpifb=gqLt1LQ+mdvF8tYRj8uDDuQ@mail.gmail.com> <CAL_Jsq+Y6uuyiRo+UV-nz+TyjQzxx4H12auHHy6RdsLtThefhA@mail.gmail.com>
-In-Reply-To: <CAL_Jsq+Y6uuyiRo+UV-nz+TyjQzxx4H12auHHy6RdsLtThefhA@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 3 Oct 2025 10:32:44 -0400
-X-Gm-Features: AS18NWAxN1IhfgHRDQEAVNRk-gv2qRra_zfz_DZsOprYcJI8wwK8KzxwPe_vG4Y
-Message-ID: <CABBYNZKxGNXS2m7_VAf1d_Ci3uW4xG2NamXZ0UVaHvKvHi07Jg@mail.gmail.com>
-Subject: Re: [PATCH v3] dt-bindings: net: Convert Marvell 8897/8997 bindings
- to DT schema
-To: Rob Herring <robh@kernel.org>
-Cc: "Ariel D'Alessandro" <ariel.dalessandro@collabora.com>, andrew+netdev@lunn.ch, 
-	conor+dt@kernel.org, kernel@collabora.com, krzk+dt@kernel.org, 
-	angelogioacchino.delregno@collabora.com, kuba@kernel.org, 
-	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	davem@davemloft.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, edumazet@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251002081247.51255-10-byungchul@sk.com>
 
-Hi Rob,
+On Thu, Oct 02, 2025 at 05:12:09PM +0900, Byungchul Park wrote:
+> dept needs to notice every entrance from user to kernel mode to treat
+> every kernel context independently when tracking wait-event dependencies.
+> Roughly, system call and user oriented fault are the cases.
+> 
+> Make dept aware of the entrances of arm64 and add support
+> CONFIG_ARCH_HAS_DEPT_SUPPORT to arm64.
+> 
+> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> ---
+>  arch/arm64/Kconfig          | 1 +
+>  arch/arm64/kernel/syscall.c | 7 +++++++
+>  arch/arm64/mm/fault.c       | 7 +++++++
+>  3 files changed, 15 insertions(+)
+> 
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index e9bbfacc35a6..a8fab2c052dc 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -281,6 +281,7 @@ config ARM64
+>  	select USER_STACKTRACE_SUPPORT
+>  	select VDSO_GETRANDOM
+>  	select VMAP_STACK
+> +	select ARCH_HAS_DEPT_SUPPORT
+>  	help
+>  	  ARM 64-bit (AArch64) Linux support.
+>  
+> diff --git a/arch/arm64/kernel/syscall.c b/arch/arm64/kernel/syscall.c
+> index c442fcec6b9e..bbd306335179 100644
+> --- a/arch/arm64/kernel/syscall.c
+> +++ b/arch/arm64/kernel/syscall.c
+> @@ -7,6 +7,7 @@
+>  #include <linux/ptrace.h>
+>  #include <linux/randomize_kstack.h>
+>  #include <linux/syscalls.h>
+> +#include <linux/dept.h>
+>  
+>  #include <asm/debug-monitors.h>
+>  #include <asm/exception.h>
+> @@ -96,6 +97,12 @@ static void el0_svc_common(struct pt_regs *regs, int scno, int sc_nr,
+>  	 * (Similarly for HVC and SMC elsewhere.)
+>  	 */
+>  
+> +	/*
+> +	 * This is a system call from user mode.  Make dept work with a
+> +	 * new kernel mode context.
+> +	 */
+> +	dept_update_cxt();
 
-On Fri, Oct 3, 2025 at 9:38=E2=80=AFAM Rob Herring <robh@kernel.org> wrote:
->
-> On Thu, Oct 2, 2025 at 2:18=E2=80=AFPM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi,
-> >
-> > On Thu, Oct 2, 2025 at 3:14=E2=80=AFPM Rob Herring (Arm) <robh@kernel.o=
-rg> wrote:
-> > >
-> > >
-> > > On Wed, 01 Oct 2025 15:33:20 -0300, Ariel D'Alessandro wrote:
-> > > > Convert the existing text-based DT bindings for Marvell 8897/8997
-> > > > (sd8897/sd8997) bluetooth devices controller to a DT schema.
-> > > >
-> > > > While here, bindings for "usb1286,204e" (USB interface) are dropped=
- from
-> > > > the DT   schema definition as these are currently documented in fil=
-e [0].
-> > > >
-> > > > [0] Documentation/devicetree/bindings/net/btusb.txt
-> > > >
-> > > > Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
-> > > > ---
-> > > >  .../net/bluetooth/marvell,sd8897-bt.yaml      | 79 +++++++++++++++=
-+++
-> > > >  .../devicetree/bindings/net/btusb.txt         |  2 +-
-> > > >  .../bindings/net/marvell-bt-8xxx.txt          | 83 ---------------=
-----
-> > > >  3 files changed, 80 insertions(+), 84 deletions(-)
-> > > >  create mode 100644 Documentation/devicetree/bindings/net/bluetooth=
-/marvell,sd8897-bt.yaml
-> > > >  delete mode 100644 Documentation/devicetree/bindings/net/marvell-b=
-t-8xxx.txt
-> > > >
-> > >
-> > > Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-> > >
-> > > You'll probably have to resend this after rc1.
-> >
-> > In that case I'd like to have a Fixes tag so I can remember to send it
-> > as rc1 is tagged.
->
-> A Fixes tag is not appropriate for a conversion to DT schema.
+As Mark Brown pointed out in his replies, this patch is missing a whole
+bunch of cases and does not work correctly as-is.
 
-Ok, but then how do you justify merging it for an RC? Or I'm
-misunderstanding and that should just be merged to bluetooth-next and
-wait for the next merge window? In that case I can just merge it right
-away.
+As Dave Hansen pointed out on the x86 patch, you shouldn't do this
+piecemeal in architecture code, and should instead work with the
+existing context tracking, e.g. by adding logic to
+enter_from_user_mode() and exit_to_user_mode(), or by reusing some
+existing context tracking logic that's called there.
 
-> Rob
-
-
-
---=20
-Luiz Augusto von Dentz
+Mark.
 
