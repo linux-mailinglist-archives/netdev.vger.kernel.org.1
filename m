@@ -1,85 +1,112 @@
-Return-Path: <netdev+bounces-227727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF7ABB63A3
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 10:17:37 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B34FBB63CA
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 10:33:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0B003BDD00
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 08:17:36 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3544C344204
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 08:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99274228CA9;
-	Fri,  3 Oct 2025 08:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 399EC2417C5;
+	Fri,  3 Oct 2025 08:33:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sjJpwBHQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SQ1PXroa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F39A8C1F;
-	Fri,  3 Oct 2025 08:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECAC2BD03;
+	Fri,  3 Oct 2025 08:33:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759479453; cv=none; b=QhUcP8sW6balveo3fXoo3o7TVyqv+iDR/aBF8yKPko1io7eev5FT+sqQ7YZlsBjcjzEOmBu+0j6DPyTQkX7yNjDLoOIiDijoFvHrATZ8GryEgbirWJ28jEybbUImsD5wWKJ/0x0FvPgyrOuVTHgntSu0qelHPwzAY+wUSNqiPmw=
+	t=1759480397; cv=none; b=EP8ZAbFiMNeHeMgFRRFwqfB1+uhHxCM2ZbI/xEBvxCcN87VeTM/sr/iZmdviy/7uVPVWRii0/ebkVYO5OncDuYKTpxz/YyXed2E8jubGW0iwI6E9ZXFhH0rGzUWkldeCJMdTloFoOXH/u+qWulRAWzYN8dTh0K66ri+hE0hRmkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759479453; c=relaxed/simple;
-	bh=iBCFNMMyNV4Rxo6BSgm5yEWsJ3CMCwo7Q9j7QSQ9aHw=;
+	s=arc-20240116; t=1759480397; c=relaxed/simple;
+	bh=cORH82os7Z9vzzZCaQBVNa1x9LozJi7fooVgSs75mTQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cpr6dXlgEMvequMaLvUtZyf1dBuStvNmEfO8z+sOH2PgHh+i0DrTj4nhaoEQcznF9imhPvEOR+WtjxHW1j0+JoIEg+nZZFp14XMDBTlVaLu6slWvgz7Y0x7oC6dNuWAjSVBdCjmNf9QjzJVAj1Lk4dwYA6HuLbvP8MBONWmbxNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sjJpwBHQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68662C4CEF5;
-	Fri,  3 Oct 2025 08:17:31 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=CScLOQF/uqiiTl1JQdR62Y22pgEISWfcncVX8KeQeoF70a8F3Hm+Fkby4OjcoJTgVcRSuk1/pAvwa2RwA9tR8gnCsC8EQwigEsTFA+HIXIQ7TRWRtkmjPcWpjmdbB5Bh91qvLXJMS2P34WZz0yu5E/rGulz9xI6hRL8Dql5lHrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SQ1PXroa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1FC3C4CEF9;
+	Fri,  3 Oct 2025 08:33:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759479453;
-	bh=iBCFNMMyNV4Rxo6BSgm5yEWsJ3CMCwo7Q9j7QSQ9aHw=;
+	s=k20201202; t=1759480396;
+	bh=cORH82os7Z9vzzZCaQBVNa1x9LozJi7fooVgSs75mTQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sjJpwBHQ2PPJDhnVMXsFpEk2IHhuK+r5fTD8vKh6QR1RhdBOfL2Q2/42gmOsba/Zy
-	 lenOkNHG6kMtSVQPCAy0gDup9tND6pSEHPjtYEZ73HT7l1AycJOf8VPheedh1giDME
-	 aL4mac2PVFAl4hfwv8gnuRDMvN6BQ9VLjsITFFUtx3a7X6OdTHd5S3/WFxzCrrBKGZ
-	 hsXjyfRuGFFRc6EgQjaCxWMX64aJ3+QM+6Kun3X0D60gAmzDdInXj7o8Iof6veLt+t
-	 KzD7axWIYvdQkrdIXKyh1xBXgUUk69KW3Rw6217LatiI9TA/ge/mPYwSSoZRI+JVw+
-	 Jm9Hki9aebF1w==
-Date: Fri, 3 Oct 2025 09:17:29 +0100
+	b=SQ1PXroaGgADmdHPvR6Bx0A+QiAGMragM1LfMaNVbMMkSFgjhxqTrZuHo54PcvGvI
+	 lE63uBHlij11MK0Cmq+WhJ44EO8gVd4ztJogz4uy+jO+SH6mkAgaiL5g4Ft1OVZK51
+	 I6qNHYVurwj1KEiAkKqtAJ9VUC77rLq0AVkO5t59DAhhOuli5hcFV53FgcbRZxzm7i
+	 eTVVeSD7wYnJtYhTGB5LaQpNV++Ke7s+oGl1yRWUqHdOIhClz1DYo9SXu0ZKegBPlW
+	 8phXvT6tdyFbUR/wSHlZkjRDlgh4JyK2O9psj2mSMYkt7UTHDnP4TT0O5DCK1Vwv86
+	 DC2USA1jVuYwQ==
+Date: Fri, 3 Oct 2025 09:33:12 +0100
 From: Simon Horman <horms@kernel.org>
-To: Yeounsu Moon <yyyynoom@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+To: Kriish Sharma <kriish.sharma2006@gmail.com>
+Cc: khc@pm.waw.pl, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: dlink: use dev_kfree_skb_any instead of
- dev_kfree_skb
-Message-ID: <20251003081729.GB2878334@horms.kernel.org>
-References: <20251003022300.1105-1-yyyynoom@gmail.com>
+Subject: Re: [PATCH] drivers/net/wan/hdlc_ppp: fix potential null pointer in
+ ppp_cp_event logging
+Message-ID: <20251003083312.GC2878334@horms.kernel.org>
+References: <20251002180541.1375151-1-kriish.sharma2006@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251003022300.1105-1-yyyynoom@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251002180541.1375151-1-kriish.sharma2006@gmail.com>
 
-On Fri, Oct 03, 2025 at 11:23:00AM +0900, Yeounsu Moon wrote:
-> Replace `dev_kfree_skb()` with `dev_kfree_skb_any()` in `start_xmit()`
-> which can be called from hard irq context (netpoll) and from other
-> contexts.
+On Thu, Oct 02, 2025 at 06:05:41PM +0000, Kriish Sharma wrote:
+> Fixes warnings observed during compilation with -Wformat-overflow:
 > 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
-> Tested-on: D-Link DGE-550T Rev-A3
+> drivers/net/wan/hdlc_ppp.c: In function ‘ppp_cp_event’:
+> drivers/net/wan/hdlc_ppp.c:353:17: warning: ‘%s’ directive argument is null [-Wformat-overflow=]
+>   353 |                 netdev_info(dev, "%s down\n", proto_name(pid));
+>       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> drivers/net/wan/hdlc_ppp.c:342:17: warning: ‘%s’ directive argument is null [-Wformat-overflow=]
+>   342 |                 netdev_info(dev, "%s up\n", proto_name(pid));
+>       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> Introduce local variable `pname` and fallback to "unknown" if proto_name(pid)
+> returns NULL.
+> 
+> Fixes: 262858079afd ("Add linux-next specific files for 20250926")
+> Signed-off-by: Kriish Sharma <kriish.sharma2006@gmail.com>
 
-Hi,
+Hi Kriish,
 
-I am curious to know why this problem has come up now.
-Or more to the point, why it has not come up since the cited commit
-was made, 20 years ago.
+As it looks like there will be another revision of this patch,
+I have a few minor points on process for your consideration.
 
-I am also curious to know how the problem was found.
-By inspection? Through testing? Other?
+As a fix for Networking code present in the net tree this should probably
+be targeted at the net tree. That means it should apply cleanly to that
+tree (I assume it does). And the target tree should be denoted in the
+subject.  Like this:
+
+Subject: [PATCh net] ...
+
+This is as opposed to non-fix patches which, generally, are targeted
+at the net-nex tree.
+
+Specifying the target tree helps land patches in the right place
+for CI. And helps the maintainers too.
+
+Also, git history isn't consistent here, but I would suggest
+that a more succinct prefix is appropriate for this patch.
+Perhaps 'hdlc_ppp:'
+
+I.e.: Subject: [PATCH net] hdlc_ppp: ...
+
+For more in process for networking patches please see:
+https://docs.kernel.org/process/maintainer-netdev.html
+
+Thanks!
 
 ...
 
