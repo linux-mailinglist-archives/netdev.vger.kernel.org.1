@@ -1,169 +1,198 @@
-Return-Path: <netdev+bounces-227793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16DB5BB755B
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 17:36:46 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E776BB75D9
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 17:47:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0565480CAD
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 15:36:44 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7D25A34696B
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 15:47:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DBF127FB05;
-	Fri,  3 Oct 2025 15:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6500A1487D1;
+	Fri,  3 Oct 2025 15:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="dO9Pcu01"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="qlYiUHkF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [217.72.192.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2D91F5846;
-	Fri,  3 Oct 2025 15:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B44AB1C6B4;
+	Fri,  3 Oct 2025 15:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759505802; cv=none; b=SQY3Sre7rIqdzjneUqbE/v2DI4ztzsG5+xFa3uCCF4OmmzR7BJ4TI6ogwYK9d+7Gt3XJXO23MQ0dG88WBCmTek6IZwX4ELl4aGvyyzrrGN3+M5336oO3Y3GiMRD8Rx/RIwVYlHuNdn08Wz0akq5TSTgkDit7dbdmE0TjKvplCEk=
+	t=1759506446; cv=none; b=W87+3zHm9TEdmq2uXo4+GudTHGp+cswJZQInLEVMYCGrclfUOcuxwjzFyE3WAHsOnY1QynR3FQRYQCPlkqq+KmBSnNBK1abGj82rubuerEkpy6MsxMA1v0lgYaT8QLiU3zBTbOFf9eqPhVXxpp0kqzJBBQ/WlotsqXtw6KXBqN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759505802; c=relaxed/simple;
-	bh=bYPyaONfd7BB2jZ8laR+STd/TArlmcbZgT04Vq/FeUA=;
-	h=Message-ID:Date:MIME-Version:To:References:Subject:From:Cc:
-	 In-Reply-To:Content-Type; b=frEfIek/+PEJfdHoDUB6g68EmcK/UYwDJHSd5xX8aWCXyO/0DGcVWMjLIV00sq6rRzqhdBljuSxYIdyDA7j9gJ6Dv7j3A4wXR2FFZ6avSQBkhGT9SniVxI2meVQ41dEBK8nkbwuCmnRcbbVB9PYFhiY2lpZwFeYESlwJM8+em/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=dO9Pcu01; arc=none smtp.client-ip=217.72.192.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1759505782; x=1760110582; i=markus.elfring@web.de;
-	bh=bYPyaONfd7BB2jZ8laR+STd/TArlmcbZgT04Vq/FeUA=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:References:
-	 Subject:From:Cc:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=dO9Pcu01ALZfDKXENdvYLbwmXJSHGbgrTPpGwDvCWG2AhxsUnPQmBtzh1RlTSvSs
-	 TH/ZMPXO+Qdb+RvdfCGrJadDr6aX3ALq0TmvuO1QdRFRLCGomBZdUv0maTz5Rmy+w
-	 /zqltT07/dAaN7W3KbZ9hVn/o2O6DoGYbmSjZ+DiMnyr45a4z+6i7iEh7qDPb/67R
-	 kKRHj3QkLoeHylA5G759KkxzXoFsNVBUrWE6cPIW7Q7PEEAasvILY6D/70ZaazRbc
-	 ETbRf+hmEdlLc9RsxMGvTychS55zq5lmV3ySdGysZGlVFf1J6PlYE1pmMJTr7iCk+
-	 m28YDyblpw1PxJ13KA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.69.196]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MFayq-1v5EBU2gZi-002as8; Fri, 03
- Oct 2025 17:36:22 +0200
-Message-ID: <a6e99e68-3964-40f4-8512-44f16bd058ee@web.de>
-Date: Fri, 3 Oct 2025 17:36:20 +0200
+	s=arc-20240116; t=1759506446; c=relaxed/simple;
+	bh=QeOdkk/HPd8F+lWj3osQlyj0903mD8z9jFN3xWQIL0E=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=AHWrUFac4qmjwypit5su/bpU2DwvBUoGgcDkeHldsqwIfWMvgNc0onaW5wIXC3wQei1wLJ2RBWDAP/H2V1Pw1yUF+zkIBIp3vXeJNXuz6ZXkVYKK/ArIwbGI2tu/5bZTQb8Q+NWt+dd/KaLigW2Go/7JH4yDYtKZ2pi3oXaBUUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=qlYiUHkF; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1231)
+	id 474EB211C261; Fri,  3 Oct 2025 08:47:24 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 474EB211C261
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1759506444;
+	bh=pXrCFoiP29LJ+ofNopBlzkuBSlGEqfHo1NT4ymmIUKA=;
+	h=Date:From:To:Subject:From;
+	b=qlYiUHkFqtHJubOJCMK9OZoof82SUso7n1G2o6BzLuNsUoh4LxrK3sJlRHhNNxZiq
+	 hAJbqFA//t+eVjeE2c9F3Wh6qE+zdJYbSx/dxYPPZgpLWCUmcLfdjmhjZFem+jK/KO
+	 hnej7hLI1LKUWaQOTHaSrr8TeoUByWwaAmJ2FlzI=
+Date: Fri, 3 Oct 2025 08:47:24 -0700
+From: Aditya Garg <gargaditya@linux.microsoft.com>
+To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ernis@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	gargaditya@microsoft.com, gargaditya@linux.microsoft.com,
+	ssengar@linux.microsoft.com
+Subject: [PATCH net-next] net: mana: Linearize SKB if TX SGEs exceeds
+ hardware limit
+Message-ID: <20251003154724.GA15670@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Xin Long <lucien.xin@gmail.com>, Alexandr Sapozhnikov
- <alsp705@gmail.com>, linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
- lvc-project@linuxtesting.org
-References: <CADvbK_frvOEC4-UbuYixCu2RbQuAOQLmTsi5-sGnO8_+ZSpT8A@mail.gmail.com>
-Subject: Re: [PATCH] net/sctp: fix a null dereference in sctp_disposition
- sctp_sf_do_5_1D_ce()
-Content-Language: en-GB, de-DE
-From: Markus Elfring <Markus.Elfring@web.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CADvbK_frvOEC4-UbuYixCu2RbQuAOQLmTsi5-sGnO8_+ZSpT8A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:mzvHYJrvuTFBecbRBQD+ii42JZVHXMNQQeTibEJzNMqaw/9twi0
- l2SW7vY3txojAqSlx2XKr6PYzIzhjvCqNv/FhYOC1WkEOkJ0ikTpzZ7DPVDI9WFLwpstpAd
- rKZRFXNeGK+WhyVTKrJo+9o8R7IpqFnhRmZmP4oNTmyn09CHWOR4doWlScIzPkhmQz8H149
- hykTb6sTvlt8Ks7p5ySqQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:SBPcf4lK+j0=;VxiIWI6q1tnugqdIYm6KJvOONSn
- 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
- zJQusrGJWueL09iv41U3SF7n4/8r1hVq4SU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-=E2=80=A6
-> > and sctp_ulpevent_make_authkey() returns 0, then the variable
-> > ai_ev remains zero and the zero will be dereferenced
-> > in the sctp_ulpevent_free() function.
-=E2=80=A6
-> Fixes: 30f6ebf65bc4 ("sctp: add SCTP_AUTH_NO_AUTH type for
-> AUTHENTICATION_EVENT")
-=E2=80=A6
+The MANA hardware supports a maximum of 30 scatter-gather entries (SGEs)
+per TX WQE. In rare configurations where MAX_SKB_FRAGS + 2 exceeds this
+limit, the driver drops the skb. Add a check in mana_start_xmit() to
+detect such cases and linearize the SKB before transmission.
 
-See also:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/submitting-patches.rst?h=3Dv6.17#n145
+Return NETDEV_TX_BUSY only for -ENOSPC from mana_gd_post_work_request(),
+send other errors to free_sgl_ptr to free resources and record the tx
+drop.
 
-Regards,
-Markus
+Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
+Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 26 +++++++++++++++----
+ include/net/mana/gdma.h                       |  8 +++++-
+ include/net/mana/mana.h                       |  1 +
+ 3 files changed, 29 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index f4fc86f20213..22605753ca84 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -20,6 +20,7 @@
+ 
+ #include <net/mana/mana.h>
+ #include <net/mana/mana_auxiliary.h>
++#include <linux/skbuff.h>
+ 
+ static DEFINE_IDA(mana_adev_ida);
+ 
+@@ -289,6 +290,19 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ 	cq = &apc->tx_qp[txq_idx].tx_cq;
+ 	tx_stats = &txq->stats;
+ 
++	BUILD_BUG_ON(MAX_TX_WQE_SGL_ENTRIES != MANA_MAX_TX_WQE_SGL_ENTRIES);
++	#if (MAX_SKB_FRAGS + 2 > MANA_MAX_TX_WQE_SGL_ENTRIES)
++		if (skb_shinfo(skb)->nr_frags + 2 > MANA_MAX_TX_WQE_SGL_ENTRIES) {
++			netdev_info_once(ndev,
++					 "nr_frags %d exceeds max supported sge limit. Attempting skb_linearize\n",
++					 skb_shinfo(skb)->nr_frags);
++			if (skb_linearize(skb)) {
++				netdev_warn_once(ndev, "Failed to linearize skb\n");
++				goto tx_drop_count;
++			}
++		}
++	#endif
++
+ 	pkg.tx_oob.s_oob.vcq_num = cq->gdma_id;
+ 	pkg.tx_oob.s_oob.vsq_frame = txq->vsq_frame;
+ 
+@@ -402,8 +416,6 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ 		}
+ 	}
+ 
+-	WARN_ON_ONCE(pkg.wqe_req.num_sge > MAX_TX_WQE_SGL_ENTRIES);
+-
+ 	if (pkg.wqe_req.num_sge <= ARRAY_SIZE(pkg.sgl_array)) {
+ 		pkg.wqe_req.sgl = pkg.sgl_array;
+ 	} else {
+@@ -438,9 +450,13 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ 
+ 	if (err) {
+ 		(void)skb_dequeue_tail(&txq->pending_skbs);
++		mana_unmap_skb(skb, apc);
+ 		netdev_warn(ndev, "Failed to post TX OOB: %d\n", err);
+-		err = NETDEV_TX_BUSY;
+-		goto tx_busy;
++		if (err == -ENOSPC) {
++			err = NETDEV_TX_BUSY;
++			goto tx_busy;
++		}
++		goto free_sgl_ptr;
+ 	}
+ 
+ 	err = NETDEV_TX_OK;
+@@ -1606,7 +1622,7 @@ static int mana_move_wq_tail(struct gdma_queue *wq, u32 num_units)
+ 	return 0;
+ }
+ 
+-static void mana_unmap_skb(struct sk_buff *skb, struct mana_port_context *apc)
++void mana_unmap_skb(struct sk_buff *skb, struct mana_port_context *apc)
+ {
+ 	struct mana_skb_head *ash = (struct mana_skb_head *)skb->head;
+ 	struct gdma_context *gc = apc->ac->gdma_dev->gdma_context;
+diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+index 57df78cfbf82..67fab1a5f382 100644
+--- a/include/net/mana/gdma.h
++++ b/include/net/mana/gdma.h
+@@ -489,6 +489,8 @@ struct gdma_wqe {
+ #define MAX_TX_WQE_SIZE 512
+ #define MAX_RX_WQE_SIZE 256
+ 
++#define MANA_MAX_TX_WQE_SGL_ENTRIES 30
++
+ #define MAX_TX_WQE_SGL_ENTRIES	((GDMA_MAX_SQE_SIZE -			   \
+ 			sizeof(struct gdma_sge) - INLINE_OOB_SMALL_SIZE) / \
+ 			sizeof(struct gdma_sge))
+@@ -591,6 +593,9 @@ enum {
+ /* Driver can self reset on FPGA Reconfig EQE notification */
+ #define GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE BIT(17)
+ 
++/* Driver supports linearizing the skb when num_sge exceeds hardware limit */
++#define GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE BIT(20)
++
+ #define GDMA_DRV_CAP_FLAGS1 \
+ 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
+ 	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
+@@ -599,7 +604,8 @@ enum {
+ 	 GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP | \
+ 	 GDMA_DRV_CAP_FLAG_1_DYNAMIC_IRQ_ALLOC_SUPPORT | \
+ 	 GDMA_DRV_CAP_FLAG_1_SELF_RESET_ON_EQE | \
+-	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE)
++	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE | \
++	 GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE)
+ 
+ #define GDMA_DRV_CAP_FLAGS2 0
+ 
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 0921485565c0..330e1bb088bb 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -580,6 +580,7 @@ int mana_set_bw_clamp(struct mana_port_context *apc, u32 speed,
+ void mana_query_phy_stats(struct mana_port_context *apc);
+ int mana_pre_alloc_rxbufs(struct mana_port_context *apc, int mtu, int num_queues);
+ void mana_pre_dealloc_rxbufs(struct mana_port_context *apc);
++void mana_unmap_skb(struct sk_buff *skb, struct mana_port_context *apc);
+ 
+ extern const struct ethtool_ops mana_ethtool_ops;
+ extern struct dentry *mana_debugfs_root;
+-- 
+2.34.1
+
 
