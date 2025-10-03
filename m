@@ -1,192 +1,174 @@
-Return-Path: <netdev+bounces-227747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58589BB68A2
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 13:33:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48397BB6914
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 13:57:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 818BB4E32B9
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 11:33:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0A58486A5A
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 11:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA382EBDCA;
-	Fri,  3 Oct 2025 11:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lFzKRkRA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC419283FF7;
+	Fri,  3 Oct 2025 11:57:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F32527EC99;
-	Fri,  3 Oct 2025 11:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA96A27281D
+	for <netdev@vger.kernel.org>; Fri,  3 Oct 2025 11:57:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759491220; cv=none; b=PCztNRJGzLy2NUIwoOLg01XTAv1rbIGtDCFvul92yK6tjt/e/7ISwWFbyIuZ3Hm2wbhaLHb4iw/iUSAM6+dpiBgDy4/XAtwTu8xB/TlXnVZBpBKAwnt1Kdqvyfom2wYNdRZVmJjtYGLM+T/nqwiCbvLWc9L2FDYE5CZ4QcU8ZWM=
+	t=1759492642; cv=none; b=EpnPwVkzEHcAknSO99XFvcgHi2Bd/ZTTLNC8GpAHoSoayOu8CmjxDNFEG7nJJ4wEPK+PdS6hAvokjcOU4CkY5+CoeM+r3Lk677ervm7UmBlQTA+7WrrwMcOEaAOnY9hJQV5CZ3vMoU9Vb2z0qSFUGQJSTcFHBF38W340OxBpwtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759491220; c=relaxed/simple;
-	bh=8JvzZz+MrzjUmB/qmn12k1T1z8wI8NEqkWeYCArS4nA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RnZaFvAfyHdSfOhsi4zZO7HXEiqZ2z5JEhvwYIXKpeLTEPPEEXgkjdhswYZbOoRbbG0vI7lh5oUb3Wn3ol2puwzP7WwkfmmBQ7/Z9owv59PQsYgiqxh96PhXpd/qfsP+fv5K7qaVIPp8zPLV9dnq3BdpJfG1p+aibtaQLoNdFwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lFzKRkRA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23B48C4CEF5;
-	Fri,  3 Oct 2025 11:33:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759491219;
-	bh=8JvzZz+MrzjUmB/qmn12k1T1z8wI8NEqkWeYCArS4nA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lFzKRkRAagp0TVhUdTwIsW0EPgf7xwe5vUnZsgItAsbqWLbYcv7v2Q3oCdo6pdbpH
-	 TxK4cHFxGzDDbQDQTmmTAALXtRce7awXslf/w51ZRllOlHQfykkv/S85tSAEJm9jFJ
-	 GYwvA6uugwAlC/eFWM7ehADw13/t37TYV5luOUQD7lDrfqGG54YTKnaTyEWvTdRb0c
-	 orc+Nn8y24EKqDs+XjojdkthXLkOB/CpwUkMKq+3hkvcz1Knd27dZO22vw3HIZH/oz
-	 KeJJqGDMye/t+diEqfyZzsugo6eKkklnr+1Zd5LuUfHG/pa69kR/h1070kPLMeXwGn
-	 kaCdIbmTIMmYw==
-Date: Fri, 3 Oct 2025 12:33:03 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Byungchul Park <byungchul@sk.com>
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
-	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
-	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
-	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
-	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-	ngupta@vflare.org, linux-block@vger.kernel.org,
-	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
-	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-	djwong@kernel.org, dri-devel@lists.freedesktop.org,
-	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
-	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
-	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
-	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
-	yeoreum.yun@arm.com, netdev@vger.kernel.org,
-	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
-	catalin.marinas@arm.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, luto@kernel.org,
-	sumit.semwal@linaro.org, gustavo@padovan.org,
-	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
-	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
-	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
-	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
-	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
-	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
-	qiang.zhang@linux.dev, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
-	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
-	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
-	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
-	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
-	kevin.brodsky@arm.com, dwmw@amazon.co.uk, shakeel.butt@linux.dev,
-	ast@kernel.org, ziy@nvidia.com, yuzhao@google.com,
-	baolin.wang@linux.alibaba.com, usamaarif642@gmail.com,
-	joel.granados@kernel.org, richard.weiyang@gmail.com,
-	geert+renesas@glider.be, tim.c.chen@linux.intel.com,
-	linux@treblig.org, alexander.shishkin@linux.intel.com,
-	lillian@star-ark.net, chenhuacai@kernel.org, francesco@valla.it,
-	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
-	masahiroy@kernel.org, brauner@kernel.org,
-	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
-	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
-	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH v17 09/47] arm64, dept: add support
- CONFIG_ARCH_HAS_DEPT_SUPPORT to arm64
-Message-ID: <b69ab7d0-ba5e-4d22-88ef-53e0ebf07869@sirena.org.uk>
-References: <20251002081247.51255-1-byungchul@sk.com>
- <20251002081247.51255-10-byungchul@sk.com>
- <a7f41101-d80a-4cee-ada5-9c591321b1d7@sirena.org.uk>
- <20251003014641.GF75385@system.software.com>
+	s=arc-20240116; t=1759492642; c=relaxed/simple;
+	bh=h6er2ckpwVF7GuNqAHxEQy4OA/+J1C6yr4ND2RJuFwM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=fyHduCaghZd3g70g/MG1brJHG5HCr3rrh5d1o6KM9JpSnLBB7Qz5+eVKCdN1y41514vJVrA14hJTCU2HQ5bEZU4IO/UQ4SdM0zIRqh/mjKCRLyTWh53vuJfM7pmqxFBqqG0eETn9AMv0ETftPGf5C/z/2IyVFlz5Oz9poZN+CV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b3e25a4bfd5so431848066b.2
+        for <netdev@vger.kernel.org>; Fri, 03 Oct 2025 04:57:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759492639; x=1760097439;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Z/RwV8Q4hBWil9Gk7UQBXPk1Pu4CPKtI2/nJ64HEYjA=;
+        b=PzDAOakEkjchqBAsR4I7Cousa9tVgCD5U7/sBC8YeNyl+vORA0e6o+h/wb2mgoTolL
+         MF6mu4m4RkbsMcd6+MSvWAq3h2sf2pPGf7xXGbGyqB7dWez3Xx93W2UV2ON5RhJ90zHu
+         vImHgwDjJl1JYnc1o+L+TTmIhngd/+dRFeUFdY3grK+3CttTTBunpbzPE2WZSETtuPpq
+         r12sKnbUvFrOXfZCev9K6fPaqqvOsOvjf8mFPsYHNNLl/AchVdvx1Arl9DDgzWjKfNwQ
+         j1poRB5rUcwJBZ7IKqfVFSX8sz/fOR/IiSfhsQ6os9twB/1fqu/w4sk66sR//kia6VDB
+         NpOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWQa2LLcJ3goEEs7JFulpkEKsR/N0ADdCZZiGYrWKXq8OMjdlQ4Fnl4F//t6+Ho/CmnNDOUHhs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgK6gRN788Djm1qwt+gMPl42J8u/Nb6VFNo8DNdmfDdQ19ygMA
+	4dQM6myU5N6nxrxAUNoTc2TzmF0gfzL9oyFfeuVXX7dXLn9Yo6efnZ65NRg+aw==
+X-Gm-Gg: ASbGncsh1Lk0PhcYLXTr8+6FhhVZJG4lMi85JOhflIM7ttuVfI64ItJoM6P27AUXyfn
+	9WjIevNy73HyyKw2fFwqpqye1GK+hSTToA4WoeMdQOVcdV+zgbfIYqFqccKTVweEhhgAGmcUHIE
+	0U1f7xwShygn8jKpclcHUIngyzapKxTlUMEV0NhHbXt69B/Q88PQy9OWTDqCVUYhRaSZcottTX/
+	m6tOv0SN2wmnJ2tiWGKu0ouPmMTpxkBwMNl2QXOa1RozGdzmFtgbguM6an7hFB9iuEuxKi6AQj5
+	CBJ6B/HfvKO0VUwbbmBfeKCpAFkBbRuppz0D7OBufP+yACesD7JilsGtYS6iVEg/cU87uNdgZ6/
+	13UZ05V7oDe2o3Y6LRWuWU5yg9UN8h+2uqYSiJmoudkaFU3Q=
+X-Google-Smtp-Source: AGHT+IEBrRSxx7/yWNcZNy8YRDCLrMWcGHLTzaM2/PNk5nSyIVA/cP+iPZEBnhkQGX8ARqi8DjEZGg==
+X-Received: by 2002:a17:907:3ea1:b0:b0f:4ae:c83 with SMTP id a640c23a62f3a-b49c4498ba6mr344101166b.63.1759492638759;
+        Fri, 03 Oct 2025 04:57:18 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:1::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b486970a684sm421586966b.52.2025.10.03.04.57.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Oct 2025 04:57:18 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net v7 0/4] net: netpoll: fix memory leak and add
+ comprehensive selftests
+Date: Fri, 03 Oct 2025 04:57:11 -0700
+Message-Id: <20251003-netconsole_torture-v7-0-aa92fcce62a9@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="CPEOfhRT6FsWLRqF"
-Content-Disposition: inline
-In-Reply-To: <20251003014641.GF75385@system.software.com>
-X-Cookie: hangover, n.:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABe632gC/33QzUrEMBQF4FcJWc+Vm/+0K99DRJL0ZiYgjaS1K
+ EPfXexCKq2uD3zncO58olZo4j2780ZLmUodec/chfF0C+OVoAy8Z1yiNNihhJHmVMepvtLLXNv
+ 83gh8TlJlDCl0Hb8w/tYol48NfeIjzfz5wvitTHNtn1vRIrboP3MRIABVsmit6Tx1jwPFEsaH2
+ q6bt8i9oU8NCQjGOUODGZKy9mCovWFODQUI3pnkMsVBiaOhd4Zwp4YGBAwmquizF4kOhtkb/tQ
+ wgOAcSUMYNMXjDvtjCPzjU/v9h1YxG5lt1L+NdV2/AHrD85kOAgAA
+X-Change-ID: 20250902-netconsole_torture-8fc23f0aca99
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
+ david decotigny <decot@googlers.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
+ calvin@wbinvd.org, kernel-team@meta.com, calvin@wbinvd.org, 
+ jv@jvosburgh.net, Breno Leitao <leitao@debian.org>, stable@vger.kernel.org
+X-Mailer: b4 0.15-dev-dd21f
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2814; i=leitao@debian.org;
+ h=from:subject:message-id; bh=h6er2ckpwVF7GuNqAHxEQy4OA/+J1C6yr4ND2RJuFwM=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBo37odxqpA+Bf5hgG25++y6b8FaPNRtqZCUr/ay
+ 00v+QBdVMWJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaN+6HQAKCRA1o5Of/Hh3
+ bRkNEACIT6uj/iC4elMIBuLj5AIVM8ML+EhKcTH/EJDXfFAWwVViRTCJYYOwnKP114T/phZVedn
+ ARbxrO/CAiuVV/KE4XX5cov3N0oD0IixD4b6+Pzyi1FxdRMbpsJ1C6pZx5kwXm75/rf21BS0vkM
+ Lv08oYaIKrbtotGthCuEWjSWLpu3lUV5xAjd4VmZrYrXncXsCNOs0nUEknpjLmy2cobwDY0gOox
+ m9bJPSVKK4EFGhjdAoM5FECpO6CXpWUbik4nenqtTJrnZNQtdEbBIyEJcW1a5nhZUwVB3cZz8Yd
+ NOfuGIkACRF64A3sfOx2uayTHJpPY8eDNmIub1P13fIJEPhb2QZ5qNWkb9aliVM0xj3QcYAhaKK
+ RXkrlLDyoXgOWF2GC3Ehi+MoCYLR8EinZaegb411cBoljTaSTEULI3D98XZYmIk0J+IHgwdjnCG
+ O8g6ixgqTYN58QS989ZXvjL/b/Qpw3D0Rt8xct2GcmJeNRNwqokkfJP5iPNHIBfLcztq+NhhrQ4
+ W2shjO7Hj8wqHJ/xlX37LZeK0yUYJH213IpE1Jx1DikKB7IDl8ozxlsrmk04Tjt2XsoQ3bE/zzH
+ mufB1QtG301tMBRR0aek0m5VTNrTwwT8MbhGaJEHygNKBhoDDzWIvkiH+8Utnf1r10ixPMxfXCI
+ JYl5qYFAhntecAQ==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
+Fix a memory leak in netpoll and introduce netconsole selftests that
+expose the issue when running with kmemleak detection enabled.
 
---CPEOfhRT6FsWLRqF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patchset includes a selftest for netpoll with multiple concurrent
+users (netconsole + bonding), which simulates the scenario from test[1]
+that originally demonstrated the issue allegedly fixed by commit
+efa95b01da18 ("netpoll: fix use after free") - a commit that is now
+being reverted.
 
-On Fri, Oct 03, 2025 at 10:46:41AM +0900, Byungchul Park wrote:
-> On Thu, Oct 02, 2025 at 12:39:31PM +0100, Mark Brown wrote:
-> > On Thu, Oct 02, 2025 at 05:12:09PM +0900, Byungchul Park wrote:
-> > > dept needs to notice every entrance from user to kernel mode to treat
-> > > every kernel context independently when tracking wait-event dependenc=
-ies.
-> > > Roughly, system call and user oriented fault are the cases.
+Sending this to "net" branch because this is a fix, and the selftest
+might help with the backports validation.
 
-> > > Make dept aware of the entrances of arm64 and add support
-> > > CONFIG_ARCH_HAS_DEPT_SUPPORT to arm64.
+Link: https://lore.kernel.org/lkml/96b940137a50e5c387687bb4f57de8b0435a653f.1404857349.git.decot@googlers.com/ [1]
 
-> > The description of what needs to be tracked probably needs some
-> > tightening up here, it's not clear to me for example why exceptions for
-> > mops or the vector extensions aren't included here, or what the
-> > distinction is with error faults like BTI or GCS not being tracked?
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Changes in v7:
+- Rebased on top of `net`
+- Link to v6: https://lore.kernel.org/r/20251002-netconsole_torture-v6-0-543bf52f6b46@debian.org
 
-> Thanks for the feedback but I'm afraid I don't get you.  Can you explain
-> in more detail with example?
+Changes in v6:
+- Expand the tests even more and some small fixups
+- Moved the test to bonding selftests
+- Link to v5: https://lore.kernel.org/r/20250918-netconsole_torture-v5-0-77e25e0a4eb6@debian.org
 
-Your commit log says we need to track every entrance from user mode to
-kernel mode but the code only adds tracking to syscalls and some memory
-faults.  The exception types listed above (and some others) also result
-in entries to the kernel from userspace.
+Changes in v5:
+- Set CONFIG_BONDING=m in selftests/drivers/net/config.
+- Link to v4: https://lore.kernel.org/r/20250917-netconsole_torture-v4-0-0a5b3b8f81ce@debian.org
 
-> JFYI, pairs of wait and its event need to be tracked to see if each
-> event can be prevented from being reachable by other waits like:
+Changes in v4:
+- Added an additional selftest to test multiple netpoll users in
+  parallel
+- Link to v3: https://lore.kernel.org/r/20250905-netconsole_torture-v3-0-875c7febd316@debian.org
 
->    context X				context Y
->=20
->    lock L
->    ...
->    initiate event A context		start toward event A
->    ...					...
->    wait A // wait for event A and	lock L // wait for unlock L and
->           // prevent unlock L		       // prevent event A
->    ...					...
->    unlock L				unlock L
-> 					...
-> 					event A
+Changes in v3:
+- This patchset is a merge of the fix and the selftest together as
+  recommended by Jakub.
 
-> I meant things like this need to be tracked.
+Changes in v2:
+- Reuse the netconsole creation from lib_netcons.sh. Thus, refactoring
+  the create_dynamic_target() (Jakub)
+- Move the "wait" to after all the messages has been sent.
+- Link to v1: https://lore.kernel.org/r/20250902-netconsole_torture-v1-1-03c6066598e9@debian.org
 
-I don't think that's at all clear from the above context, and the
-handling for some of the above exception types (eg, the vector
-extensions) includes taking locks.
+---
+Breno Leitao (4):
+      net: netpoll: fix incorrect refcount handling causing incorrect cleanup
+      selftest: netcons: refactor target creation
+      selftest: netcons: create a torture test
+      selftest: netcons: add test for netconsole over bonded interfaces
 
---CPEOfhRT6FsWLRqF
-Content-Type: application/pgp-signature; name="signature.asc"
+ net/core/netpoll.c                                 |   7 +-
+ tools/testing/selftests/drivers/net/Makefile       |   1 +
+ .../testing/selftests/drivers/net/bonding/Makefile |   2 +
+ tools/testing/selftests/drivers/net/bonding/config |   4 +
+ .../drivers/net/bonding/netcons_over_bonding.sh    | 221 +++++++++++++++++++++
+ .../selftests/drivers/net/lib/sh/lib_netcons.sh    | 188 ++++++++++++++++--
+ .../selftests/drivers/net/netcons_torture.sh       | 127 ++++++++++++
+ 7 files changed, 530 insertions(+), 20 deletions(-)
+---
+base-commit: 7ae421cf78bd795513ec3a7d7ef7ac9437693e23
+change-id: 20250902-netconsole_torture-8fc23f0aca99
 
------BEGIN PGP SIGNATURE-----
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjftG4ACgkQJNaLcl1U
-h9AJAwf9GUZ8nquWa7D1no47c5NWSm5cMwwvmTjDaPtYC52seNgxT47rqiAa032b
-rbQuOcdIvbMOoRrk3oOjch4rbo2VSgw1bzxKncoUyWrQ1rw9rhdfmdQpZZSbT1XQ
-ZE3VcLNDV3bfjO2GU8cTjiUDwM29qIeTSzCIn9ubfHcuEvoaYes1/BrQYAwB6ghQ
-7LjwZANFGJdatftOLPlVL8kKM/B5H6eSUlr8bUS9hlZE2g39/1LLb9UexVvnMj8u
-6gPRXHiHF5Vzad2FqVmWKt4F1F39CJ4g1c624zJiIGAWP9iBONB8dIyQPlTmK4U7
-mnXQy7USXtlxU+Xw5RCO9fy5x0Ahxw==
-=LMdg
------END PGP SIGNATURE-----
-
---CPEOfhRT6FsWLRqF--
 
