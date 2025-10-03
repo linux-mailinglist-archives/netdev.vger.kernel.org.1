@@ -1,60 +1,57 @@
-Return-Path: <netdev+bounces-227796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80776BB76A5
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 17:55:33 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6C24BB76EB
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 18:02:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 397E63AD91E
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 15:55:32 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 11730344ED1
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 16:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5773328D850;
-	Fri,  3 Oct 2025 15:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C270C29D26D;
+	Fri,  3 Oct 2025 16:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OEPoFUGw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AcipUX24"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DFA728D82A;
-	Fri,  3 Oct 2025 15:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99615292B4B;
+	Fri,  3 Oct 2025 16:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759506929; cv=none; b=JFMSntRlyb+ZUqHoteOI6GmR0cQsxscyDF8hBIOj+xeioe07ZOjhBVQZ/Of+yMOw7hp/a0NOvAcHSTFegcQ3oGeaw4DPwYR6XgnHRd3CZZHoUQGxlEkg5AyWd9uO/7m2ndKohPGuVZdzGP7u/kyPZtC60h+BWJtT2syEW/LAN/k=
+	t=1759507357; cv=none; b=AHbRNqemQtqE3s13ACCpQWYtc9U1nJWSNI0kUM4xjqW5l8FYWhD+hUeTQIls849XdvWoaWs8xgYjUoXQtA03Yy8O3qcI6mIzJ8zbCbFrbc/PcEHUjf7MxoysCN33cNtED+cHVN57gp/T0txcQUEebJ3SpaaQ0cauo02j3utIMrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759506929; c=relaxed/simple;
-	bh=Co2oBsOIbM6BDzLDTygJTO1DpFTpPCVsSSuNKjDRJwk=;
+	s=arc-20240116; t=1759507357; c=relaxed/simple;
+	bh=TnRqdPXkHOd250dQe1+zF4SMpWvnQW0AZqlPMfQKUCQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GQr8DjmkzTIosRC16NMDTS85K7m0xVIq8klH7dklsp7VdFvvNPn8ludNrBqzp65q2gFxu9RkKtX28Wl/xfDAMvHz8BcbFQbmcml2X8lTOJelX5dPI74KGsIRNDAMRompM3KJFCX82qosjgRXiOmXVX0+30Elz1g/8FvkJ8cCmfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OEPoFUGw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 543FDC4CEFB;
-	Fri,  3 Oct 2025 15:55:28 +0000 (UTC)
+	 MIME-Version:Content-Type; b=o74aOaKS/NApg372OS9sk7t0ObkO2Hc2n1kN7eZpGlQPKUtYkG9KyYtXIPP9k4RhhILFza9c1YYXOu8fXbQZMPpr9+V7bvvpQfEchfGOmmKe8okAmzHgaV4YrQPEctlCLe6ITDo5iT2zqb/Ioi2t83Zuph0jmPEsKbY2QCDg6r0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AcipUX24; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF988C4CEF5;
+	Fri,  3 Oct 2025 16:02:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759506928;
-	bh=Co2oBsOIbM6BDzLDTygJTO1DpFTpPCVsSSuNKjDRJwk=;
+	s=k20201202; t=1759507357;
+	bh=TnRqdPXkHOd250dQe1+zF4SMpWvnQW0AZqlPMfQKUCQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OEPoFUGwCoC7KQbt+WUWygx/z1Fv3jGhkXAnIp5w9S3QYo1KOqalyeCBYlMi7wmI6
-	 YAgHDmYQpzvwljt9EXOw7gJtCfaF+BycS3NDu+hkJbl8JIRacotblEnmgrYQFSVqDP
-	 TzSjjCkawzkQk+AfJo6pYsik/KRu9NK5CVclhC9TDn0T14T6qfT6qrIoTrNr9GDRVR
-	 d1+EELP+Gqbd4BTWYPbZ5i4JWwL6NhUx5w9dBsasSbWg9+JuNunzVwpdVLw6qIbsk5
-	 5cwOFYbQGDtKFFhUdpHezNqb4eoIz7/EHl9FGNGKPwepELYVAQFc0F2icaPv6WXYXD
-	 tnH6BEayoMGEg==
-Date: Fri, 3 Oct 2025 08:55:27 -0700
+	b=AcipUX24Keh/3XCAOENF4a8xnMv2DEnMURqsAI4dV56nM2gdlv8WrKsJk584/Fyos
+	 ikSXeQQM/krq8EE3UPrI7uqWUaALQVm368fPlhWkkD9yNK0QSDXOKvxmJZJhFiJYlV
+	 0fJERoo0zB0YXGFah1RVQ8Zjs535jIzmFoj6WwLN789+e68Pk4Cl5E/Mz2rwwHguvY
+	 tMaZG0eob1yrT4l36ir9ihESgbfd8Zaw3F5KZjzpsudX+0ldjHe5tEQSbCfsNOifsP
+	 EkeKxZKV16cUv4uiuhCtpDeX+Pi1qmFNkuPVFkXN0LGyo3+NfjmPJSDyqBzwaoQiRi
+	 7mVpkrJoRK8Uw==
+Date: Fri, 3 Oct 2025 09:02:35 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Yeounsu Moon" <yyyynoom@gmail.com>
-Cc: "Simon Horman" <horms@kernel.org>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] net: dlink: handle dma_map_single() failure
- properly
-Message-ID: <20251003085527.2edb69f7@kernel.org>
-In-Reply-To: <DD8ORNMB155Q.1JK8F13D9FLNR@gmail.com>
-References: <20251002152638.1165-1-yyyynoom@gmail.com>
-	<20251003094424.GF2878334@horms.kernel.org>
-	<DD8ORNMB155Q.1JK8F13D9FLNR@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, Yusuke Suzuki
+ <yusuke.suzuki@isovalent.com>, Julian Wiedmann <jwi@isovalent.com>, Martin
+ KaFai Lau <martin.lau@kernel.org>, Jordan Rife <jrife@google.com>
+Subject: Re: [PATCH bpf] bpf: Fix metadata_dst leak
+ __bpf_redirect_neigh_v{4,6}
+Message-ID: <20251003090235.09521adc@kernel.org>
+In-Reply-To: <20251003073418.291171-1-daniel@iogearbox.net>
+References: <20251003073418.291171-1-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,8 +61,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 03 Oct 2025 21:29:23 +0900 Yeounsu Moon wrote:
-> If an immediate change is required, I can submit a v2;
+On Fri,  3 Oct 2025 09:34:18 +0200 Daniel Borkmann wrote:
+> Cilium has a BPF egress gateway feature which forces outgoing K8s Pod
+> traffic to pass through dedicated egress gateways which then SNAT the
+> traffic in order to interact with stable IPs outside the cluster.
 
-Please do
+Nice! The warning Stan added at work?
+
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
