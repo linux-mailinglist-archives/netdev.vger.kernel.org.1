@@ -1,86 +1,194 @@
-Return-Path: <netdev+bounces-227802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15DD4BB7989
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 18:45:28 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61E2EBB79AA
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 18:48:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE3CF1B211DB
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 16:45:50 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3D0034ED92A
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 16:48:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ED912D239B;
-	Fri,  3 Oct 2025 16:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66E0C2D0618;
+	Fri,  3 Oct 2025 16:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OG+5R6Ky"
 X-Original-To: netdev@vger.kernel.org
-Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B34D1DFDE;
-	Fri,  3 Oct 2025 16:45:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9A12F2D;
+	Fri,  3 Oct 2025 16:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759509921; cv=none; b=TwkH4dAC9BpLJkQaPOClDNtnDPLuidxrEzjP+9sQnlXmK8S4ojKsMAtPwmi5ejPcCTsVZsvzTqAHfqZJINbRKdaYJODnql6viCC8qmZpzjS06/kJvqTt12UKEHtb4roJYd6vSKG4vhhPIz1NvLiL2zfOhA213cyatRYE1P+fUJA=
+	t=1759510077; cv=none; b=VplliXCk5v7FtmGJM+XxysnQ5a3wS2BiMlyMtCmhxqQ/EfsbAX4rQWut/LbxfTY0l29FlzuMU9d0ruzAk47+x71U4exejj+0M3fPw3GRL+lF6ts4xeo2g/MtBrhVw6dkIUYHcutHB7KNvmFNpetDMZWAyHEyLcIFEqDtY8vqzMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759509921; c=relaxed/simple;
-	bh=dssgCzltttWWVbtDuxXyHlgcBj3U4zXAPU0QQmfapf0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EE/zFoBMAYWKX9ARW0jzbFqr9yIaTAtvCWUiJ/upGfzMH7/57oVz7jfF0RKaK1spqTVF/Es7ttmryZ440GJU5FIQH/kehXIRL4oum+OMDN3/JHjfHk/JuLpUk8noREr1PHOw3fqIs/44fkBQPmWdtzykhS/fpfd8wzbaWuVjtXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-	by vmicros1.altlinux.org (Postfix) with ESMTP id 5C5AC72C8CC;
-	Fri,  3 Oct 2025 19:45:11 +0300 (MSK)
-Received: by imap.altlinux.org (Postfix, from userid 705)
-	id 4F2B736D070F; Fri,  3 Oct 2025 19:45:11 +0300 (MSK)
-Date: Fri, 3 Oct 2025 19:45:11 +0300
-From: Michael Shigorin <mike@altlinux.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Michael Shigorin <mike@altlinux.ru>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Tor Vic <torvic9@mailbox.org>, Kexy Biscuit <kexybiscuit@aosc.io>,
-	jeffbai@aosc.io, gregkh@linuxfoundation.org, wangyuli@uniontech.com,
-	aospan@netup.ru, conor.dooley@microchip.com,
-	ddrokosov@sberdevices.ru, dmaengine@vger.kernel.org,
-	dushistov@mail.ru, fancer.lancer@gmail.com, geert@linux-m68k.org,
-	hoan@os.amperecomputing.com, ink@jurassic.park.msu.ru,
-	linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-hwmon@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-iio@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-spi@vger.kernel.org, manivannan.sadhasivam@linaro.org,
-	mattst88@gmail.com, netdev@vger.kernel.org, nikita@trvn.ru,
-	ntb@lists.linux.dev, patches@lists.linux.dev,
-	richard.henderson@linaro.org, s.shtylyov@omp.ru, serjk@netup.ru,
-	shc_work@mail.ru, tsbogend@alpha.franken.de, v.georgiev@metrotek.ru,
-	wsa+renesas@sang-engineering.com, xeb@mail.ru
-Subject: Re: what about CoC?
-Message-ID: <20251003164511.GK7291@imap.altlinux.org>
-References: <a08dc31ab773604d8f206ba005dc4c7a@aosc.io>
- <20241023080935.2945-2-kexybiscuit@aosc.io>
- <124c1b03-24c9-4f19-99a9-6eb2241406c2@mailbox.org>
- <CAHk-=whNGNVnYHHSXUAsWds_MoZ-iEgRMQMxZZ0z-jY4uHT+Gg@mail.gmail.com>
- <20241024095339.GA32487@imap.altlinux.org>
- <20251001101148.GA30625@imap.altlinux.org>
- <87371abc-e43f-4afb-83d0-b9a04fc015c0@intel.com>
+	s=arc-20240116; t=1759510077; c=relaxed/simple;
+	bh=otmERlClzolN8mUoFuTa4n83njOLMnfkoinD/EqhGTE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Prkx4afKnpjV8kV9I5WYctQI+LkDWG7t9PsBvIddFjUv08Kf+CqHtzJUDx8YtNJvdyz03zETQyM5P9hoXOOrZLHfkhSbu9NkfBTgCBj9jgjjaN7hrGLjZqlTikA5+di5DzzKdmXAqiFQPueDU1h4X0lwe8pZVTKfOdxJGLlVmKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OG+5R6Ky; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E335C4CEF5;
+	Fri,  3 Oct 2025 16:47:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759510076;
+	bh=otmERlClzolN8mUoFuTa4n83njOLMnfkoinD/EqhGTE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OG+5R6Kyf4A+BT7GNoxzdb5BlsSxflY8vvwn+bX02cA0GL2tshMQCT7Frp1GMmXeK
+	 WCVzKCvd9OnCxF8gVQURdAgTAaym8bDS2B4DfiZfZepO43wdQhY+hZiwBiUlolCm+v
+	 6ugJoxwq0J6E+QZ1WIUCa1YHxrUxO51wn8lJsA+4SMJ39G8cFgwTqfWHiXwRWzXAEL
+	 DQbvH7WQMqiX7MFeurH+6hGuQlDBZJODJnEwC4l2K6roMvdbqXy17hX5P91ZWfLaIA
+	 542WnxKMf5A312pUB1DHEvPvool+5+88bZUumTVJgyWW0kScgjFsFJ8uVYOnX4F1MO
+	 NC/O2SY1rJ+UQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	petrm@nvidia.com,
+	shuah@kernel.org,
+	daniel.zahka@gmail.com,
+	willemb@google.com,
+	linux-kselftest@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net repost] selftests: drv-net: make linters happy with our imports
+Date: Fri,  3 Oct 2025 09:47:48 -0700
+Message-ID: <20251003164748.860042-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87371abc-e43f-4afb-83d0-b9a04fc015c0@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Fri, Oct 03, 2025 at 05:48:40PM +0200, Alexander Lobakin wrote:
-> It's about companies that sponsor the war or are a part of it.
+Linters are still not very happy with our __init__ files,
+which was pointed out in recent review (see Link).
 
-So ban Intel.
+We have previously started importing things one by one to
+make linters happy with the test files (which import from __init__).
+But __init__ file itself still makes linters unhappy.
 
+To clean it up I believe we must completely remove the wildcard
+imports, and assign the imported modules to __all__.
+
+hds.py needs to be fixed because it seems to be importing
+the Python standard random from lib.net.
+
+We can't use ksft_pr() / ktap_result() in case importing
+from net.lib fails. Linters complain that those helpers
+themselves may not have been imported.
+
+Link: https://lore.kernel.org/9d215979-6c6d-4e9b-9cdd-39cff595866e@redhat.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ - resend after net-next PR was merged
+v1: https://lore.kernel.org/20251001234308.2895998-1-kuba@kernel.org
+
+Sending a fix for the driver's __init__.py first, if this is okay
+with everyone I'll convert the rest. I'm not super confident 'cause
+my Python isn't properly learned.
+
+Sending for net, even tho its not a real fix. I think that getting
+it applied during the merge window may be okay? No strong prefence.
+I'm slightly worried that merging it in net-next after the MW will
+leave us with a release cycle full of merge conflicts.
+---
+ tools/testing/selftests/drivers/net/hds.py    |  3 +-
+ .../selftests/drivers/net/lib/py/__init__.py  | 43 ++++++++++++++-----
+ 2 files changed, 34 insertions(+), 12 deletions(-)
+
+diff --git a/tools/testing/selftests/drivers/net/hds.py b/tools/testing/selftests/drivers/net/hds.py
+index a2011474e625..c4fe049e9baa 100755
+--- a/tools/testing/selftests/drivers/net/hds.py
++++ b/tools/testing/selftests/drivers/net/hds.py
+@@ -3,11 +3,12 @@
+ 
+ import errno
+ import os
++import random
+ from typing import Union
+ from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_raises, KsftSkipEx
+ from lib.py import CmdExitFailure, EthtoolFamily, NlError
+ from lib.py import NetDrvEnv
+-from lib.py import defer, ethtool, ip, random
++from lib.py import defer, ethtool, ip
+ 
+ 
+ def _get_hds_mode(cfg, netnl) -> str:
+diff --git a/tools/testing/selftests/drivers/net/lib/py/__init__.py b/tools/testing/selftests/drivers/net/lib/py/__init__.py
+index 2a645415c4ca..e6c070f32f51 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/__init__.py
++++ b/tools/testing/selftests/drivers/net/lib/py/__init__.py
+@@ -1,5 +1,13 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
++"""
++Driver test environment.
++NetDrvEnv and NetDrvEpEnv are the main environment classes.
++Former is for local host only tests, latter creates / connects
++to a remote endpoint. See NIPA wiki for more information about
++running and writing driver tests.
++"""
++
+ import sys
+ from pathlib import Path
+ 
+@@ -8,26 +16,39 @@ KSFT_DIR = (Path(__file__).parent / "../../../..").resolve()
+ try:
+     sys.path.append(KSFT_DIR.as_posix())
+ 
+-    from net.lib.py import *
+-
+     # Import one by one to avoid pylint false positives
++    from net.lib.py import NetNS, NetNSEnter, NetdevSimDev
+     from net.lib.py import EthtoolFamily, NetdevFamily, NetshaperFamily, \
+         NlError, RtnlFamily, DevlinkFamily, PSPFamily
+     from net.lib.py import CmdExitFailure
+     from net.lib.py import bkg, cmd, bpftool, bpftrace, defer, ethtool, \
+         fd_read_timeout, ip, rand_port, tool, wait_port_listen, wait_file
+-    from net.lib.py import fd_read_timeout
+     from net.lib.py import KsftSkipEx, KsftFailEx, KsftXfailEx
+     from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
+         ksft_setup
+     from net.lib.py import ksft_eq, ksft_ge, ksft_in, ksft_is, ksft_lt, \
+         ksft_ne, ksft_not_in, ksft_raises, ksft_true, ksft_gt, ksft_not_none
+-except ModuleNotFoundError as e:
+-    ksft_pr("Failed importing `net` library from kernel sources")
+-    ksft_pr(str(e))
+-    ktap_result(True, comment="SKIP")
+-    sys.exit(4)
+ 
+-from .env import *
+-from .load import *
+-from .remote import Remote
++    __all__ = ["NetNS", "NetNSEnter", "NetdevSimDev",
++               "EthtoolFamily", "NetdevFamily", "NetshaperFamily",
++               "NlError", "RtnlFamily", "DevlinkFamily", "PSPFamily",
++               "CmdExitFailure",
++               "bkg", "cmd", "bpftool", "bpftrace", "defer", "ethtool",
++               "fd_read_timeout", "ip", "rand_port", "tool",
++               "wait_port_listen", "wait_file",
++               "KsftSkipEx", "KsftFailEx", "KsftXfailEx",
++               "ksft_disruptive", "ksft_exit", "ksft_pr", "ksft_run",
++               "ksft_setup",
++               "ksft_eq", "ksft_ge", "ksft_in", "ksft_is", "ksft_lt",
++               "ksft_ne", "ksft_not_in", "ksft_raises", "ksft_true", "ksft_gt",
++               "ksft_not_none", "ksft_not_none"]
++
++    from .env import NetDrvEnv, NetDrvEpEnv
++    from .load import GenerateTraffic
++    from .remote import Remote
++
++    __all__ += ["NetDrvEnv", "NetDrvEpEnv", "GenerateTraffic", "Remote"]
++except ModuleNotFoundError as e:
++    print("Failed importing `net` library from kernel sources")
++    print(str(e))
++    sys.exit(4)
 -- 
-Michael Shigorin
-...хотя вырусь не поймёт даже почему
+2.51.0
+
 
