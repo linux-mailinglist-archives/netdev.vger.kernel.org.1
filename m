@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-227811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0242DBB7D1D
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 20:00:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF41ABB7D32
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 20:01:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE44819E5F7C
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 18:00:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CE574A50AD
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 18:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A3FF2DE6F3;
-	Fri,  3 Oct 2025 18:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BADE52DF13D;
+	Fri,  3 Oct 2025 18:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MrGBwjGL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TlHGidax"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F912DCF71;
-	Fri,  3 Oct 2025 18:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91AE42DF128;
+	Fri,  3 Oct 2025 18:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759514421; cv=none; b=osF6IXCrSEGGr7nlq7TQRfaVbptrnzaErM9EeAUAuIyb2bZLOCYfnYxXAxQiDEaXK3akmFAE0Iam437deW/d4UQkVmZGO1Sy9+8QjsdtlQmHVLm73hlE+aAL6Xy7h0t4lzDgQUfBZI6TEOdqGnY9wcZaQY0hpcZXqC1qEhIgwyE=
+	t=1759514423; cv=none; b=cs3dOIh9x7Sy0V9EThDma/0V0N3p1fqm7u1yUjd9U0103OoAMRswynBsZxsG6JUmIpD1zoex0YhEP4JUft/oggmWZt+556bclkPtHlu1F3G+mM15qEbVXWKU3xQen+9WoOCwvq4mkaewsJ+6a3vpTA7BKnZcuhMRF2Nx/Z5VyaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759514421; c=relaxed/simple;
-	bh=yfWkw1eJRdgMFAVUHp1HPAsHB8VP3RjWjRR3B4uC/OY=;
+	s=arc-20240116; t=1759514423; c=relaxed/simple;
+	bh=GecTde0LWdZKHylj78jeHskxHfBTpN0ZQIUAes50qz4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=d5lqUqJJAMHEiDzeGyJRGOfRdOdf/lNS+zmQPSAYGdKKT7FmdZaBha+TXBPsEIhEnkodHhUZZWzw9WKN9F6XusV3E7N+4Ednv79734s8UgdphWYCOuKIDgENKHgJDbuY1xjOce9ZQJr6g19Es3eFJc8MNSyMVq6guDbcw+6l4FQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MrGBwjGL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1908C4CEFB;
-	Fri,  3 Oct 2025 18:00:20 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Bzge0wqnb7SwDdUx87zWYVgOjjYV1k/BumLJ+Ij76f5g8RWotYsBGyeWOlCprDcwzDouKgrwj0MCLj8yC1Zm8uqcV6rEDLoFz6nOHGZywdc68CihBBxanpYWtKijvXRSdSyRobXzL1gLqRcrWjH1N+Lmq3i//4X9BVhhtz9rB4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TlHGidax; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF8D7C4CEFF;
+	Fri,  3 Oct 2025 18:00:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759514420;
-	bh=yfWkw1eJRdgMFAVUHp1HPAsHB8VP3RjWjRR3B4uC/OY=;
+	s=k20201202; t=1759514421;
+	bh=GecTde0LWdZKHylj78jeHskxHfBTpN0ZQIUAes50qz4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MrGBwjGLfR4uMhLcJU9FA7rJWOo9z+BxdF32WHyKTnoLKpGJqPnqQCovQJHJqiL8l
-	 rODHXEI/2yZ7f8KNY9PL3c4QJWmOoXZIDxZPRnOxUVyqF7sdTKN4F0nZFNIH9NusAk
-	 RZ1qNUJZLT3Xwmlg5T/0VOulGeVvN8EiP3Q5r5SCGGIBB7P7C3amviTLyoDZWxR9Wx
-	 i2YKAgqFuuiAK5f7DS2kH6noWdN9djKA2eeMWVVme1NFRn17xT4ox1aN57HaGxnwc2
-	 B+CE/80W4LEXoteTY62N1Y0MS4g//4fcJ43DFbmTLn3mQE48rD4n3FkZKJgMVVtsJ6
-	 YIaUpilhEHBTQ==
+	b=TlHGidaxC6KWNp2mHI0e3FgjafWc/rSwWp6jU2CpUkczW7MOxLVXjo4RnUCmeual3
+	 ajne2os+ekU1DZ7lSitPB1RGqiZO2ZPA5+xZQr4aQDqtFN7qsb08UfZGg0sgfUCcdz
+	 gKtmGRB671jO2XFm41VEWFfU2jZw+ugm6/2zoE8K4JoAC4IrszJicYjYWDpgOgSgQf
+	 XMN6zmgj2up75DXC7OpMvj70RJJvsR70lmHry6wUTsbkLZriwIie4GCP2UDXqTlZ9l
+	 HiItgW3RZNlkMJwuhyYeomXVgIUjm+gWA3oNA0YbYFcUOmQ9gfPEz4wudimdsk2+OU
+	 +/+DYppCJnqMw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E1F39D0C1A;
-	Fri,  3 Oct 2025 18:00:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70EEA39D0C1A;
+	Fri,  3 Oct 2025 18:00:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/mlx4: prevent potential use after free in
- mlx4_en_do_uc_filter()
+Subject: Re: [PATCH] net: usb: lan78xx: Fix lost EEPROM read timeout
+ error(-ETIMEDOUT) in lan78xx_read_raw_eeprom
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175951441174.20895.398410972294228091.git-patchwork-notify@kernel.org>
-Date: Fri, 03 Oct 2025 18:00:11 +0000
-References: <aNvMHX4g8RksFFvV@stanley.mountain>
-In-Reply-To: <aNvMHX4g8RksFFvV@stanley.mountain>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: yanb@mellanox.com, tariqt@nvidia.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- amirv@mellanox.com, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+ <175951441326.20895.16161652671675865420.git-patchwork-notify@kernel.org>
+Date: Fri, 03 Oct 2025 18:00:13 +0000
+References: <20250930084902.19062-1-bhanuseshukumar@gmail.com>
+In-Reply-To: <20250930084902.19062-1-bhanuseshukumar@gmail.com>
+To: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
+Cc: Thangaraj.S@microchip.com, Rengarajan.S@microchip.com,
+ UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ o.rempel@pengutronix.de, netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ syzbot+62ec8226f01cb4ca19d9@syzkaller.appspotmail.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 30 Sep 2025 15:25:01 +0300 you wrote:
-> Print "entry->mac" before freeing "entry".  The "entry" pointer is
-> freed with kfree_rcu() so it's unlikely that we would trigger this
-> in real life, but it's safer to re-order it.
+On Tue, 30 Sep 2025 14:19:02 +0530 you wrote:
+> Syzbot reported read of uninitialized variable BUG with following call stack.
 > 
-> Fixes: cc5387f7346a ("net/mlx4_en: Add unicast MAC filtering")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> lan78xx 8-1:1.0 (unnamed net_device) (uninitialized): EEPROM read operation timeout
+> =====================================================
+> BUG: KMSAN: uninit-value in lan78xx_read_eeprom drivers/net/usb/lan78xx.c:1095 [inline]
+> BUG: KMSAN: uninit-value in lan78xx_init_mac_address drivers/net/usb/lan78xx.c:1937 [inline]
+> BUG: KMSAN: uninit-value in lan78xx_reset+0x999/0x2cd0 drivers/net/usb/lan78xx.c:3241
+>  lan78xx_read_eeprom drivers/net/usb/lan78xx.c:1095 [inline]
+>  lan78xx_init_mac_address drivers/net/usb/lan78xx.c:1937 [inline]
+>  lan78xx_reset+0x999/0x2cd0 drivers/net/usb/lan78xx.c:3241
+>  lan78xx_bind+0x711/0x1690 drivers/net/usb/lan78xx.c:3766
+>  lan78xx_probe+0x225c/0x3310 drivers/net/usb/lan78xx.c:4707
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net/mlx4: prevent potential use after free in mlx4_en_do_uc_filter()
-    https://git.kernel.org/netdev/net/c/4f0d91ba7281
+  - net: usb: lan78xx: Fix lost EEPROM read timeout error(-ETIMEDOUT) in lan78xx_read_raw_eeprom
+    https://git.kernel.org/netdev/net/c/49bdb63ff644
 
 You are awesome, thank you!
 -- 
