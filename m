@@ -1,75 +1,91 @@
-Return-Path: <netdev+bounces-227734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28B22BB6643
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 11:40:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA6C1BB6652
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 11:42:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D6A9C4E8FD7
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 09:40:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AF831892ACF
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 09:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E64A32C08A2;
-	Fri,  3 Oct 2025 09:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5AF62D77FA;
+	Fri,  3 Oct 2025 09:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ejrUzvIH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ei2bkIgx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB30219309C;
-	Fri,  3 Oct 2025 09:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAAC81E3DCF;
+	Fri,  3 Oct 2025 09:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759484451; cv=none; b=s/g65nJ6dRtrp0t9tRuU7S4yNF63BOlbowBhNbWNfMz8bsSlGLqPfVa/mUGE3Xv0LK1D+nO9UvdD08p9EC5KV3YoHK7Eq1ocdgOwTRBrAzF1bqDOCrYPwJwZR/nAnH85o+B0x/TSrIXRjfm6fzecl2m5IoeXzqeqDBINkw4ERyg=
+	t=1759484571; cv=none; b=QeoUVAAAYTNP4N1V9T1++yC4NK3dizGmQOA23k8gQawiBXCLBaQMDFMoiDUlK5r0mYYl61aLi+ohyeRxR0tRINqo7zRjyPRaCSmVCwNBVYHxuui8RqucIx5c2jSVEaWTpm5OJsVUN5VxosDNvPA7BozzkqRoQlfW8cm/Ao1PzEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759484451; c=relaxed/simple;
-	bh=xYS7ueSgv/ypF2IM289RgL4t+AIcFcxwlcqRZhQR5O8=;
+	s=arc-20240116; t=1759484571; c=relaxed/simple;
+	bh=Oe0J/JeKTrP4JnYPa6S9YEkL0yL3pUJeT7isznOUIoA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uve0QHgITHpEE9JD/PzFoJrA7iRty298WTHvDl6uMtzrdj1CuWB2ezwRlNn+Zdw+09Hb0VTWEFY2lQKnih6f/hDQJFQRRqvpKtaRCMrKdlFMtLaM2f2Sgk6UmhtfMor+eSiFzZHPDbnnDwnfC/dm5tTHVNpJB2WUyBNyXusJwLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ejrUzvIH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7666C4CEF5;
-	Fri,  3 Oct 2025 09:40:49 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=IJhdUgSUd1kJNi+4GmCAzYDk7n3VxpcHpYeZX7zR9TC9WDobCjTLHcQCa3HFHFjhV+sWfT2iLxAWk/EK7oVJBMA9Waueek9uWIUlKracTrWXoscBi9yLE2zlK29WFUHKHlvw+1bLBcG9mdIiClBHRQ5xyWwEvT79b1rDZceMtEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ei2bkIgx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 942A3C4CEF5;
+	Fri,  3 Oct 2025 09:42:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759484451;
-	bh=xYS7ueSgv/ypF2IM289RgL4t+AIcFcxwlcqRZhQR5O8=;
+	s=k20201202; t=1759484571;
+	bh=Oe0J/JeKTrP4JnYPa6S9YEkL0yL3pUJeT7isznOUIoA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ejrUzvIH70X6vDVLLjQfTpJ8s9SkyxmGgK/9xD7P8bxYHgVM3+UgBRyw389jACa/B
-	 +WTY2U3bjWSLKzguhd1sOIXiByXec83eAPsaI7fLnf/3bFW6ZXXO7V9eDTUHG7gkpx
-	 UWZDGzfPxojYPyUD9QnOUvUSg34wj8ffNuA2HyOJXi39t3MHj/opM5sCArTZXlAeYB
-	 WVjfhfuf562yIfqwBVQzDG1hO0UD778UnG7MutAExDArl4TOKDXi+FBdm1yczgIxN+
-	 02XOtGkMWq0j6ftEwI0/VlpS8ImiOVn68IoIsWjxHzegxBIDMcfb9IIRJdCx08LRao
-	 p6Oap2MpdtUaw==
-Date: Fri, 3 Oct 2025 10:40:47 +0100
+	b=ei2bkIgx+kcs9Ly8bUY4IjFeU0A/vkfp+9f0OPhLuVDcK/fKXqGTzpW9evlD1MSiL
+	 lh+H3xF4VHIxArO3AcjEc88MAr7PszjmLLp+UukbdupxnkT7JX6POBivNMEj3UmbAh
+	 uJuv8mwzmnkIssnhVvpn6g3N/RVKPg+EDtK6JptQ/Oj2P9B5IKznhW2SefKInsijgo
+	 pgD1GTWr9ecJE1xKMYoUe7zVHkurRtQtLFCm+hLbrpXFpSp2RgKRdXiNPFqN/qbEiJ
+	 7F/AtGVDpdxpP/Ypndkfn8IIVpCIDu/KwVxuyipMHRHEdcHjB/HsmobtPYZCVhn0Ne
+	 2N5sva5hVkmtA==
+Date: Fri, 3 Oct 2025 10:42:47 +0100
 From: Simon Horman <horms@kernel.org>
-To: Kriish Sharma <kriish.sharma2006@gmail.com>
-Cc: khc@pm.waw.pl, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] drivers/net/wan/hdlc_ppp: fix potential null pointer in
- ppp_cp_event logging
-Message-ID: <20251003094047.GD2878334@horms.kernel.org>
-References: <20251002180541.1375151-1-kriish.sharma2006@gmail.com>
- <20251003083312.GC2878334@horms.kernel.org>
- <CAL4kbRN=ktZc8fkcjo90GM2EBgCVt_xVmSGVQuM8gE2qV3ZJKw@mail.gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+	Yusuke Suzuki <yusuke.suzuki@isovalent.com>,
+	Julian Wiedmann <jwi@isovalent.com>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Jordan Rife <jrife@google.com>
+Subject: Re: [PATCH bpf] bpf: Fix metadata_dst leak
+ __bpf_redirect_neigh_v{4,6}
+Message-ID: <20251003094247.GE2878334@horms.kernel.org>
+References: <20251003073418.291171-1-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL4kbRN=ktZc8fkcjo90GM2EBgCVt_xVmSGVQuM8gE2qV3ZJKw@mail.gmail.com>
+In-Reply-To: <20251003073418.291171-1-daniel@iogearbox.net>
 
-On Fri, Oct 03, 2025 at 02:32:02PM +0530, Kriish Sharma wrote:
-> Hi Simon,
+On Fri, Oct 03, 2025 at 09:34:18AM +0200, Daniel Borkmann wrote:
+> Cilium has a BPF egress gateway feature which forces outgoing K8s Pod
+> traffic to pass through dedicated egress gateways which then SNAT the
+> traffic in order to interact with stable IPs outside the cluster.
 > 
-> Thanks for the review and guidance.
-> I’ll prepare a v2 targeting the net tree, updating the patch subject
-> and incorporating the suggested changes.
+> The traffic is directed to the gateway via vxlan tunnel in collect md
+> mode. A recent BPF change utilized the bpf_redirect_neigh() helper to
+> forward packets after the arrival and decap on vxlan, which turned out
+> over time that the kmalloc-256 slab usage in kernel was ever-increasing.
+> 
+> The issue was that vxlan allocates the metadata_dst object and attaches
+> it through a fake dst entry to the skb. The latter was never released
+> though given bpf_redirect_neigh() was merely setting the new dst entry
+> via skb_dst_set() without dropping an existing one first.
+> 
+> Fixes: b4ab31414970 ("bpf: Add redirect_neigh helper as redirect drop-in")
+> Reported-by: Yusuke Suzuki <yusuke.suzuki@isovalent.com>
+> Reported-by: Julian Wiedmann <jwi@isovalent.com>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Cc: Martin KaFai Lau <martin.lau@kernel.org>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Jordan Rife <jrife@google.com>
 
-Thanks!
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
