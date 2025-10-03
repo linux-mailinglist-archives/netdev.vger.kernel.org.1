@@ -1,200 +1,124 @@
-Return-Path: <netdev+bounces-227781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B428CBB7051
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 15:32:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB969BB707F
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 15:38:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 223C94EBA3D
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 13:32:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A09948329D
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 13:38:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4B401C6B4;
-	Fri,  3 Oct 2025 13:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A818C1DC994;
+	Fri,  3 Oct 2025 13:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VTKAuHmt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GZNpsvWG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E48F34BA39
-	for <netdev@vger.kernel.org>; Fri,  3 Oct 2025 13:32:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F7E145A05
+	for <netdev@vger.kernel.org>; Fri,  3 Oct 2025 13:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759498363; cv=none; b=Tu8XdjX8eBaLEyZFqme4svDFNhSgZTbI98lSn8dmh8t6N4J3EP2Cb65+oHYdF3GSFDURdkPEszTBK43Acgw/+6aV17bJnH0E3fTL9LRCkXPR9STW4F3Au3Run2fkrZR3cy5paMxblM3Bpqdo/7aNAAtcZ1MUBmfa2t9cx3ZprLE=
+	t=1759498683; cv=none; b=M/CzVXOBj1AihfYtABM/+IHLike7+4YsOFxvV+ge7d1Jniwd4hyUppPsyC/EaQrzMkNeA1aZpy8AEV5e7chJufOLTxDRCPC3NsIaUkCTHteOwp6L7VQfAPGMoV5UnEqjjnoxd3eqOnaGgHvD07bXS92qDt70xeUkJma6iYfYbZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759498363; c=relaxed/simple;
-	bh=V1j7kJok6RKhJUiQdks/9FehDZjEU//ZdqIxE1faU2I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TZkpo0fovbwh30B4Rc2oysCQnDQ3MY87j3W+HgueQpr3u//RLpsKVMY1O9+AfbYM+9FNp5LroPMEr+F+E8JGnKYaF0IomE7RiPAuakeAHJmA82a5bI+YxXZPzHPS/mL8h1zt26RVZ0+E6DarQaDIih/uNbQGiyTPtWlIw9ka6Vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VTKAuHmt; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 65965C00D99;
-	Fri,  3 Oct 2025 13:32:21 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5F5E460683;
-	Fri,  3 Oct 2025 13:32:39 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 58A1C102F1C20;
-	Fri,  3 Oct 2025 15:32:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1759498357; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=iozFpFYaZKSD23+QEqnOpovnNuv86N9KGqCqWElkBuQ=;
-	b=VTKAuHmtxgyujEaNC8Ewq/1KOAAytiXK67xNcu2yreVBKKikYyOTsbf7c3YclMTtFnythb
-	FlUIxfeSiqWd+DfYgU5qr/PFU2trrQcO+x6wH+DftiQHcNUejrK5S63vPviYOvOWOFexdM
-	kzPZqL6SszQ2S8gVPtH0ly9/T8mBDwpSUQt57Qy/AIdcAFhM5QOe4GbuoLhRxeAswfTkyM
-	KGcpHMTKo+MAtzPW4zuLPZdIhxY/Irgihbm7TtV/L4MHX3ygnaWk033IGQbxe+vw1yCGgx
-	qkrDHZh3/ChQRmplaxDCnnIeV+D9v5DRUzuhqOj2R2F9XGoR1Jlgv1bfBbd60g==
-Message-ID: <269f9150-8977-4862-b6c1-7a8f94776c59@bootlin.com>
-Date: Fri, 3 Oct 2025 15:32:15 +0200
+	s=arc-20240116; t=1759498683; c=relaxed/simple;
+	bh=2pmyEop6Zijxc9PO1JLBitmHPv8GpcEmMMIj4ht1oUQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HAluZDoQcZuDTnF9qD5OkifrHS/odD1w3P4WckNu5JVUVVsvKKRzUx1SAjP+7CiQsxQRvY6SPVjS+/nnXqrslP5FMUWzTS7kSV4psZqAlI+NtQHkFBSvrhYuhRU2oOhaehfrWaQsA4sVSZL68MehrDzkfq/zB3Aos3021voPKzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GZNpsvWG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CB2BC4AF09
+	for <netdev@vger.kernel.org>; Fri,  3 Oct 2025 13:38:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759498683;
+	bh=2pmyEop6Zijxc9PO1JLBitmHPv8GpcEmMMIj4ht1oUQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=GZNpsvWG+NWIn7O/yvfTHV1s6evBcvlhFsmkOt5jeFeV+co/Rfk4bYvu2k129Auyq
+	 LgKcKI/wn259mKalCxbKqx3JtgNwJ3qJxwoQfE77Fdsfo+9kHO/78sMvm7OW8uTUOH
+	 e7QgLRk64J+ydxC5awDZlBLHHSuReP8bARSUNh+QXbVraa8Y6f5Wv5d8W9MwnIUJ1P
+	 jL2awPmKc3HNLJGS4qkDrOqR6fWMGnuFZoYogKL1i8oAwtGmzv18USvJdsJZ/oY6Wt
+	 hETD29Lz+c9w4bSG1E+zcWHKa6ZyW7wv+4dkw61k+NlOG2nNWWtZWQ9nxHW4LpID5b
+	 0kt+/gZl7iB9w==
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b07e3a77b72so569749166b.0
+        for <netdev@vger.kernel.org>; Fri, 03 Oct 2025 06:38:03 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUI/uvE8szVogv6J4/Aju1VnAKzIRIGeBsOnwafzH9mV2xFCprBTm+30U3lmvD9XZbRN5yK9Jo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgMphiZb0CXvJvcGY9wp5OAWyjp02i9VQVHCug4/m+Z84xTsuA
+	jHtfxKnR35+3QCjwicV2ltTgkEyXrZWv6n7Ea9nx/27zrI11SFDKLcXQsZp2jpuz5d3z7GiodJ8
+	OSz8mRCI5OfdGMEzpu4idP+E+7a6MfQ==
+X-Google-Smtp-Source: AGHT+IFfN6sSJIriH9Ll5BV1c1HgV9f2BYxa3Ss/f40JFYNyE+Fo873QiRh98/8opdRwv/J+A2EYfUUUK5pmVOC4e1g=
+X-Received: by 2002:a17:907:7206:b0:b40:7305:b93d with SMTP id
+ a640c23a62f3a-b49c128064emr438127966b.2.1759498681661; Fri, 03 Oct 2025
+ 06:38:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next v2 0/19] net: stmmac: experimental PCS
- conversion
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Abhishek Chauhan <quic_abchauha@quicinc.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Alexis Lothore <alexis.lothore@bootlin.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Boon Khai Ng <boon.khai.ng@altera.com>,
- Choong Yong Liang <yong.liang.choong@linux.intel.com>,
- Daniel Machon <daniel.machon@microchip.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
- Furong Xu <0x1207@gmail.com>, Huacai Chen <chenhuacai@kernel.org>,
- Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>,
- "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
- Jisheng Zhang <jszhang@kernel.org>, Kees Cook <kees@kernel.org>,
- Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
- Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
- Ley Foon Tan <leyfoon.tan@starfivetech.com>,
- linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Oleksij Rempel <o.rempel@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>,
- Rohan G Thomas <rohan.g.thomas@altera.com>,
- Shenwei Wang <shenwei.wang@nxp.com>, Simon Horman <horms@kernel.org>,
- Song Yoong Siang <yoong.siang.song@intel.com>,
- Swathi K S <swathi.ks@samsung.com>, Tiezhu Yang <yangtiezhu@loongson.cn>,
- Vinod Koul <vkoul@kernel.org>, Vladimir Oltean <olteanv@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Yu-Chun Lin <eleanor15x@gmail.com>
-References: <aNj8U4xPJ0JepmZs@shell.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <aNj8U4xPJ0JepmZs@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+References: <20251001183320.83221-1-ariel.dalessandro@collabora.com>
+ <175943240204.235529.17735630695826458855.robh@kernel.org> <CABBYNZKSFCes1ag0oiEptKpifb=gqLt1LQ+mdvF8tYRj8uDDuQ@mail.gmail.com>
+In-Reply-To: <CABBYNZKSFCes1ag0oiEptKpifb=gqLt1LQ+mdvF8tYRj8uDDuQ@mail.gmail.com>
+From: Rob Herring <robh@kernel.org>
+Date: Fri, 3 Oct 2025 08:37:50 -0500
+X-Gmail-Original-Message-ID: <CAL_Jsq+Y6uuyiRo+UV-nz+TyjQzxx4H12auHHy6RdsLtThefhA@mail.gmail.com>
+X-Gm-Features: AS18NWA85pWm_cEAdPpLk9qTIKFIIE56dO54pRBpeMMRWMqKc4pJeIF8bKT_Mng
+Message-ID: <CAL_Jsq+Y6uuyiRo+UV-nz+TyjQzxx4H12auHHy6RdsLtThefhA@mail.gmail.com>
+Subject: Re: [PATCH v3] dt-bindings: net: Convert Marvell 8897/8997 bindings
+ to DT schema
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "Ariel D'Alessandro" <ariel.dalessandro@collabora.com>, andrew+netdev@lunn.ch, 
+	conor+dt@kernel.org, kernel@collabora.com, krzk+dt@kernel.org, 
+	angelogioacchino.delregno@collabora.com, kuba@kernel.org, 
+	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	davem@davemloft.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, edumazet@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Russell,
+On Thu, Oct 2, 2025 at 2:18=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi,
+>
+> On Thu, Oct 2, 2025 at 3:14=E2=80=AFPM Rob Herring (Arm) <robh@kernel.org=
+> wrote:
+> >
+> >
+> > On Wed, 01 Oct 2025 15:33:20 -0300, Ariel D'Alessandro wrote:
+> > > Convert the existing text-based DT bindings for Marvell 8897/8997
+> > > (sd8897/sd8997) bluetooth devices controller to a DT schema.
+> > >
+> > > While here, bindings for "usb1286,204e" (USB interface) are dropped f=
+rom
+> > > the DT   schema definition as these are currently documented in file =
+[0].
+> > >
+> > > [0] Documentation/devicetree/bindings/net/btusb.txt
+> > >
+> > > Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+> > > ---
+> > >  .../net/bluetooth/marvell,sd8897-bt.yaml      | 79 +++++++++++++++++=
++
+> > >  .../devicetree/bindings/net/btusb.txt         |  2 +-
+> > >  .../bindings/net/marvell-bt-8xxx.txt          | 83 -----------------=
+--
+> > >  3 files changed, 80 insertions(+), 84 deletions(-)
+> > >  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/m=
+arvell,sd8897-bt.yaml
+> > >  delete mode 100644 Documentation/devicetree/bindings/net/marvell-bt-=
+8xxx.txt
+> > >
+> >
+> > Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> >
+> > You'll probably have to resend this after rc1.
+>
+> In that case I'd like to have a Fixes tag so I can remember to send it
+> as rc1 is tagged.
 
-On 28/09/2025 11:13, Russell King (Oracle) wrote:
-> This series is radical - it takes the brave step of ripping out much of
-> the existing PCS support code and throwing it all away.
-> 
-> I have discussed the introduction of the STMMAC_FLAG_HAS_INTEGRATED_PCS
-> flag with Bartosz Golaszewski, and the conclusion I came to is that
-> this is to workaround the breakage that I've been going on about
-> concerning the phylink conversion for the last five or six years.
-> 
-> The problem is that the stmmac PCS code manipulates the netif carrier
-> state, which confuses phylink.
-> 
-> There is a way of testing this out on the Jetson Xavier NX platform as
-> the "PCS" code paths can be exercised while in RGMII mode - because
-> RGMII also has in-band status and the status register is shared with
-> SGMII. Testing this out confirms my long held theory: the interrupt
-> handler manipulates the netif carrier state before phylink gets a
-> look-in, which means that the mac_link_up() and mac_link_down() methods
-> are never called, resulting in the device being non-functional.
-> 
-> Moreover, on dwmac4 cores, ethtool reports incorrect information -
-> despite having a full-duplex link, ethtool reports that it is
-> half-dupex.
-> 
-> Thus, this code is completely broken - anyone using it will not have
-> a functional platform, and thus it doesn't deserve to live any longer,
-> especially as it's a thorn in phylink.
-> 
-> Rip all this out, leaving just the bare bones initialisation in place.
-> 
-> However, this is not the last of what's broken. We have this hw->ps
-> integer which is really not descriptive, and the DT property from
-> which it comes from does little to help understand what's going on.
-> Putting all the clues together:
-> 
-> - early configuration of the GMAC configuration register for the
->    speed.
-> - setting the SGMII rate adapter layer to take its speed from the
->    GMAC configuration register.
-> 
-> Lastly, setting the transmit enable (TE) bit, which is a typo that puts
-> the nail in the coffin of this code. It should be the transmit
-> configuration (TC) bit. Given that when the link comes up, phylink
-> will call mac_link_up() which will overwrite the speed in the GMAC
-> configuration register, the only part of this that is functional is
-> changing where the SGMII rate adapter layer gets its speed from,
-> which is a boolean.
-> 
->  From what I've found so far, everyone who sets the snps,ps-speed
-> property which configures this mode also configures a fixed link,
-> so the pre-configuration is unnecessary - the link will come up
-> anyway.
-> 
-> So, this series rips that out the preconfiguration as well, and
-> replaces hw->ps with a boolean hw->reverse_sgmii_enable flag.
-> 
-> We then move the sole PCS configuration into a phylink_pcs instance,
-> which configures the PCS control register in the same way as is done
-> during the probe function.
-> 
-> Thus, we end up with much easier and simpler conversion to phylink PCS
-> than previous attempts.
-> 
-> Even so, this still results in inband mode always being enabled at the
-> moment in the new .pcs_config() method to reflect what the probe
-> function was doing. The next stage will be to change that to allow
-> phylink to correctly configure the PCS. This needs fixing to allow
-> platform glue maintainers who are currently blocked to progress.
-> 
-> Please note, however, that this has not been tested with any SGMII
-> platform.
-> 
-> I've tried to get as many people into the Cc list with get_maintainers,
-> I hope that's sufficient to get enough eyeballs on this.
-> 
-> v2: numerous changes, too many to have kept track of, sorry. As one can
-> see, the series has more than doubled in size. Some are not up to
-> mainline submission quality, but I've included them as they give the
-> full picture. b4 may be able to do a better job at identifying the
-> differences between the two series than I could ever do.
+A Fixes tag is not appropriate for a conversion to DT schema.
 
-I'm not sure if you're interested in a proper Tested-by tag at that 
-point, but I tested that series on socfpga with :
-
-  - 1 instance using RGMII, w/ a ksz9031 PHY, and it works well, traffic 
-flows, ethtool seems to report correct data
-
-  - 1 instance that has the Lynx PCS (DMA_HW_FEATURE[30:28] == 0)
-
-This also works perfectly, switching between SGMII/1000BaseX dynamically 
-by hotswapping SFP modules works well, no regression found at a first 
-glance.
-
-I haven't had time t take a deep look at the code itself, but at least 
-it works :)
-
-Thanks,
-
-Maxime
-
+Rob
 
