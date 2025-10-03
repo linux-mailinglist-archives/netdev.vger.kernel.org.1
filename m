@@ -1,137 +1,97 @@
-Return-Path: <netdev+bounces-227719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E66BBB5F39
-	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 07:36:41 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EFEEBB5FD3
+	for <lists+netdev@lfdr.de>; Fri, 03 Oct 2025 08:43:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0AD733442ED
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 05:36:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 80C104E1890
+	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 06:43:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AD191F63CD;
-	Fri,  3 Oct 2025 05:36:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="DJJvW5PE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30FB6212566;
+	Fri,  3 Oct 2025 06:43:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+Received: from ni.piap.pl (ni.piap.pl [195.187.100.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED95E1A5BA2;
-	Fri,  3 Oct 2025 05:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718AB46B5;
+	Fri,  3 Oct 2025 06:43:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.187.100.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759469793; cv=none; b=rtNKLmSypczk0h9djJUz7lt3Qra6ECXkQk+nw2WXqUaLPBP0AUVnhy5IRD2E3gNXdjF6LkfkdTT+xQ+5UDqWkKvPPIbOw50ZQhU0hq2gcB5OFWSaLY28xZ+jwdcZhJs3dWNQvhe3n/oHeOhyKc9LgghuomyYty/6Ib3/fruuqNU=
+	t=1759473796; cv=none; b=C8nXvHRoxJeE01HbY+737hq4WVl4VU4pSJ1J48cbyY7MsXqXwbQ5dIurls58PlorWzrpduP0Hl02AfU4UYP4tXaRoprtRzvMT9eK39UOdLDz/AoFgGlhZAr/kSK9PahSYtzURYmZ8ZS1NTq9gaozxACSPNfSLSh/t1M31rrbaGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759469793; c=relaxed/simple;
-	bh=a8KKfmO7Q1+fCiH5/Q5b5jERee1SMGRdbVJvu3pT/CM=;
+	s=arc-20240116; t=1759473796; c=relaxed/simple;
+	bh=0cB5I9OcBsrAyHHeP2qTFCp9rOKySUcatAIE98vMy40=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LizQXEAxEkp1Ul2PtZiiPzjdMfp0Pssni7P7o/Cuw95NH8ZfDlderSdWQQ/l7/D/vUqQRzyvfDUKA7Oz4KwhuwyjRPWGE4KfHLPE46f+BR0weyfy0DucIha8mEbcyb21Jl/EpHSSqhS3WRBLjuWqLQN2mn9esiBzesbl7UbPCqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=DJJvW5PE; arc=none smtp.client-ip=45.79.88.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 8220940B15
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1759469781; bh=JviM4x86VTg42/9SFICWditZ8FIZ0/vFiF+DDrtEZ08=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=DJJvW5PEMB1qs5Mtek/16g/JnmPt9CmJjE7Uu3yDxuMEd8dQGsOFFsNLXsMYe/EdC
-	 iqEOpfl74zoy2btKntuyskCwXHqb1QziA6gqsLHxEos6514SBiNUgTVTh6gAssbIFt
-	 mX0BfVGqYx99AlSQq50SEso4ByHi4Wl2mDMA1817AOvP7lbGnzuly4lQeWJfoyqsoJ
-	 fHAPdXQvq24AdjQRv5e/AHScCdcLFYjnzQVUHebL1fqlqYQpg1LU1Hw/wr1mqYSMiH
-	 4CDJUKP9Sf0cYHlz89pRZA5pRuDslmiTfDPZXkFMif3dyV2LD6r3xNxo4MP4lnuwWu
-	 2OkTVnFdIVO3g==
-Received: from localhost (mdns.lwn.net [45.79.72.68])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 8220940B15;
-	Fri,  3 Oct 2025 05:36:19 +0000 (UTC)
-From: Jonathan Corbet <corbet@lwn.net>
-To: Byungchul Park <byungchul@sk.com>, linux-kernel@vger.kernel.org
-Cc: kernel_team@skhynix.com, torvalds@linux-foundation.org,
- damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
- adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, mingo@redhat.com,
- peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
- rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
- daniel.vetter@ffwll.ch, duyuyang@gmail.com, johannes.berg@intel.com,
- tj@kernel.org, tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
- amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
- linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
- minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
- sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
- penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
- ngupta@vflare.org, linux-block@vger.kernel.org, josef@toxicpanda.com,
- linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org,
- dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
- dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
- melissa.srw@gmail.com, hamohammed.sa@gmail.com, harry.yoo@oracle.com,
- chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
- max.byungchul.park@gmail.com, boqun.feng@gmail.com, longman@redhat.com,
- yunseong.kim@ericsson.com, ysk@kzalloc.com, yeoreum.yun@arm.com,
- netdev@vger.kernel.org, matthew.brost@intel.com, her0gyugyu@gmail.com,
- catalin.marinas@arm.com, bp@alien8.de, dave.hansen@linux.intel.com,
- x86@kernel.org, hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org,
- gustavo@padovan.org, christian.koenig@amd.com, andi.shyti@kernel.org,
- arnd@arndb.de, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
- rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
- petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
- paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
- joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
- mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
- qiang.zhang@linux.dev, juri.lelli@redhat.com, vincent.guittot@linaro.org,
- dietmar.eggemann@arm.com, bsegall@google.com, mgorman@suse.de,
- vschneid@redhat.com, chuck.lever@oracle.com, neil@brown.name,
- okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
- trondmy@kernel.org, anna@kernel.org, kees@kernel.org,
- bigeasy@linutronix.de, clrkwllms@kernel.org, mark.rutland@arm.com,
- ada.coupriediaz@arm.com, kristina.martsenko@arm.com,
- wangkefeng.wang@huawei.com, broonie@kernel.org, kevin.brodsky@arm.com,
- dwmw@amazon.co.uk, shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
- yuzhao@google.com, baolin.wang@linux.alibaba.com, usamaarif642@gmail.com,
- joel.granados@kernel.org, richard.weiyang@gmail.com,
- geert+renesas@glider.be, tim.c.chen@linux.intel.com, linux@treblig.org,
- alexander.shishkin@linux.intel.com, lillian@star-ark.net,
- chenhuacai@kernel.org, francesco@valla.it, guoweikang.kernel@gmail.com,
- link@vivo.com, jpoimboe@kernel.org, masahiroy@kernel.org,
- brauner@kernel.org, thomas.weissschuh@linutronix.de, oleg@redhat.com,
- mjguzik@gmail.com, andrii@kernel.org, wangfushuai@baidu.com,
- linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
- linux-i2c@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-modules@vger.kernel.org, rcu@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH v17 28/47] dept: add documentation for dept
-In-Reply-To: <20251002081247.51255-29-byungchul@sk.com>
-References: <20251002081247.51255-1-byungchul@sk.com>
- <20251002081247.51255-29-byungchul@sk.com>
-Date: Thu, 02 Oct 2025 23:36:16 -0600
-Message-ID: <87ldlssg1b.fsf@trenco.lwn.net>
+	 MIME-Version:Content-Type; b=N6XtGehzIpfi850fY4wTBzHdtoCA2b0ShDga6tPV8DXpQ+Ug66lh1iTeeOyOLcnzZJRBYJjQSt7G9ceXklhSaEs98sbUloPa9sOrieJaV1so2kJCWwmuM39K6j2/y9HOtRSPZOlWfopXvfW85ZSVQ5PYNepG6RoAQbSg2ZYaDKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=piap.pl; spf=pass smtp.mailfrom=piap.pl; arc=none smtp.client-ip=195.187.100.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=piap.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=piap.pl
+Received: from t19.piap.pl (OSB1819.piap.pl [10.0.9.19])
+	by ni.piap.pl (Postfix) with ESMTPS id 4D211C3EEAD7;
+	Fri,  3 Oct 2025 08:34:01 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ni.piap.pl 4D211C3EEAD7
+From: =?utf-8?Q?Krzysztof_Ha=C5=82asa?= <khalasa@piap.pl>
+To: Kriish Sharma <kriish.sharma2006@gmail.com>
+Cc: khc@pm.waw.pl,  andrew+netdev@lunn.ch,  davem@davemloft.net,
+  edumazet@google.com,  kuba@kernel.org,  pabeni@redhat.com,
+  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] drivers/net/wan/hdlc_ppp: fix potential null pointer in
+ ppp_cp_event logging
+In-Reply-To: <20251002180541.1375151-1-kriish.sharma2006@gmail.com> (Kriish
+	Sharma's message of "Thu, 2 Oct 2025 18:05:41 +0000")
+References: <20251002180541.1375151-1-kriish.sharma2006@gmail.com>
+Sender: khalasa@piap.pl
+Date: Fri, 03 Oct 2025 08:34:01 +0200
+Message-ID: <m3o6qotrxi.fsf@t19.piap.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Byungchul Park <byungchul@sk.com> writes:
+Hi Kriish,
 
-> This document describes the concept and APIs of dept.
+Kriish Sharma <kriish.sharma2006@gmail.com> writes:
+
+> Fixes warnings observed during compilation with -Wformat-overflow:
 >
-> Signed-off-by: Byungchul Park <byungchul@sk.com>
-> ---
->  Documentation/dependency/dept.txt     | 735 ++++++++++++++++++++++++++
->  Documentation/dependency/dept_api.txt | 117 ++++
->  2 files changed, 852 insertions(+)
->  create mode 100644 Documentation/dependency/dept.txt
->  create mode 100644 Documentation/dependency/dept_api.txt
+> drivers/net/wan/hdlc_ppp.c: In function =E2=80=98ppp_cp_event=E2=80=99:
+> drivers/net/wan/hdlc_ppp.c:353:17: warning: =E2=80=98%s=E2=80=99 directiv=
+e argument is null [-Wformat-overflow=3D]
+>   353 |                 netdev_info(dev, "%s down\n", proto_name(pid));
+>       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> drivers/net/wan/hdlc_ppp.c:342:17: warning: =E2=80=98%s=E2=80=99 directiv=
+e argument is null [-Wformat-overflow=3D]
+>   342 |                 netdev_info(dev, "%s up\n", proto_name(pid));
+>       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As already suggested, this should be in RST; you're already 95% of the
-way there.  Also, please put it under Documentation/dev-tools; we don't
-need another top-level directory for this.
+It appears proto_name(pid) never returns NULL there. Despite actually
+saying "return NULL", that's right :-)
 
-Thanks,
+Perhaps you should change it to return "LCP" by default instead, and
+not only on PID_LCP? It should silence the compiler.
 
-jon
+This ppp_cp_event() is called in a few places:
+- ppp_cp_parse_cr()
+- ppp_rx()
+- ppp_timer() (with a known protocol, though)
+- and others, with PID_LCP.
+
+Now, before printing proto_name(pid), ppp_cp_event() does
+proto =3D get_proto(pid), and dereferences it :-)
+
+The pid seems to always come from ppp_rx(). Fortunately it's checked
+at start, and it case of an unknown proto it goes straight to rx_error.
+--=20
+Krzysztof "Chris" Ha=C5=82asa
+
+Sie=C4=87 Badawcza =C5=81ukasiewicz
+Przemys=C5=82owy Instytut Automatyki i Pomiar=C3=B3w PIAP
+Al. Jerozolimskie 202, 02-486 Warszawa
 
