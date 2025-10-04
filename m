@@ -1,183 +1,274 @@
-Return-Path: <netdev+bounces-227843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86520BB87A1
-	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 03:13:04 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B206EBB87BA
+	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 03:25:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 312194C3E12
-	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 01:13:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 69AD54E04B1
+	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 01:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956B81DC9B1;
-	Sat,  4 Oct 2025 01:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6155C13AD3F;
+	Sat,  4 Oct 2025 01:25:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HEu+/A1T"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uzdGLc7v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E5E19ABDE;
-	Sat,  4 Oct 2025 01:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ADB73BB5A
+	for <netdev@vger.kernel.org>; Sat,  4 Oct 2025 01:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759540311; cv=none; b=qAUC6XeL07v9mTJ5fcnvL7qwe3mP04RQxw1bUtcN9Z2JQDrwXyL+saponYtHX03UWwsnwgPi4ocib6uJXJUv+bLpkvxELy4jsFiIW9uR+Vur+Cw6sQz/c/7iZZddupMe9aHZz8ewR/O/fq5E+zMkHEllo/Ic9y1F4AN8Jk642NI=
+	t=1759541109; cv=none; b=pumIWQQYvRkJyD5cG5vuP0+66f5NOqxXmzYyC3PECsuuJtL/8OOl2cNhRSo09u3ktxZSfMOrsWQZOIsftnNyYvq2Eselr18Vr9xIRuw6NAkYOB4Lu/OUIkouK/Yac4jmsysuHajszhGUq0/SnsaLoBMTf7ucKUZH4ZwmcDSUAqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759540311; c=relaxed/simple;
-	bh=rZZepSYfDiUzsD7VqNluWBfF+i3UxghvOp7/jfoABGM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dbFZLpyJNOoszG3n1aAaPtIwPwagshkk7GCfueHk3oJM2uMaiSpYFqC8I3iPpPWM/8KDrNiQ6TpUSgGkBo6KPZxQ5APNjErIjgIdthg3jQ3jqks+nc0QX48KT/lsy698Pjo9QuejccDpZfOelVvhRWN/qjCVeCPAprkMTEHeAmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HEu+/A1T; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759540309; x=1791076309;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=rZZepSYfDiUzsD7VqNluWBfF+i3UxghvOp7/jfoABGM=;
-  b=HEu+/A1TAsNRIhwMZkAzJYQlGYqLxxF7C+f6npOV4Bjv4KTEBDdMBq13
-   8DRIO+KiDUxlB3n10hIlR6s3Sp2zS+jKdWgmG2SKIrP2s2CPves3pRHeq
-   L4d1knM5dYW39qXyrDUx1joo+weURJ+KrUfw/nKfptcokapfmbQ0JHCw/
-   evJYDX5uNPJ9gLmwCPx5DYKRh2CjsnzDZ6wDPoNPyJJZ3C8INfhqtGMLQ
-   xAPdSlNai0ettIS6hMpSU3cLrN5pfQJDN29rHoapOmSKuQZ1ejV0WeTb+
-   nnskKlNZIVI2yZ0ajO3KJRuE+y5hnWeAlmGnjP+4zywFaaJLfBGeph2ed
-   A==;
-X-CSE-ConnectionGUID: T1hSJBKDRCqd1aRi346NaA==
-X-CSE-MsgGUID: dQQ9PIDIRKCwd9yIkSHtwQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="65650047"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="65650047"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2025 18:11:43 -0700
-X-CSE-ConnectionGUID: iycJbPhkQiGswpMTEukUiw==
-X-CSE-MsgGUID: LWNwNC2MSMGW1d7Zd8uotQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,314,1751266800"; 
-   d="scan'208";a="178543217"
-Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2025 18:11:43 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Fri, 03 Oct 2025 18:09:49 -0700
-Subject: [PATCH net v2 6/6] ixgbe: fix too early devlink_free() in
- ixgbe_remove()
+	s=arc-20240116; t=1759541109; c=relaxed/simple;
+	bh=+To9qhjGZdWqvjUJUjoLEc2FFSywFbjQYQhvvHv1UpM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gRv5TuIlWvnjJIgzbF1eajAt7Z325AVfAbDbroZDm289mA/DHv/4R4Vyt7YCvQ2Dtj71yFa9+S/gb7p5NUW4m5i4Xr3M5D+egzhPOlooDDGp60QvOJh71jXpGE/VZYx2X/ZQy60bCUKYU57F3xOP1mGFrtVnz7dXCqao5bqsEEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uzdGLc7v; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4de66881569so185551cf.0
+        for <netdev@vger.kernel.org>; Fri, 03 Oct 2025 18:25:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759541106; x=1760145906; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/g4bxCs/sd8CpCoj1f+doQE0G5h0wdZMgsM/YAEitD8=;
+        b=uzdGLc7vYgCyiiYfUq4bBya68ncUQ7iZskGmXSDjy0fkiVCYrqRrCwrlPpRYMzJwnC
+         yPAJyIRUMpWR82VMD2Tk7QYT7/lAGYOAqmO0ieyK3fG8tK2r8RI5KwtBotwdtRQjpqap
+         xMWoeT/Vb+O3K2zzo/xXK3LXAVAf5Ka+lEPgrUES4DoGKO6a3Rb63IwVBpPOAKfVVYJh
+         Egjd/dsqaD4KyyuHMdCr0jrLvVVfSFI4e5XNZMZibH3v9653GTMWYsqC9nmhyohB+JAT
+         QGYPRBjdGbd6RU1P2PZbStj6UDKNCo+yQ14dNJKRc9TdDb/kC1B0/2a/xakxIMFL9LnV
+         ZDhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759541106; x=1760145906;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/g4bxCs/sd8CpCoj1f+doQE0G5h0wdZMgsM/YAEitD8=;
+        b=SklnkqMgXVa4qmu/UD3ludUoBMQYtazixa13IBwjq3Fi5PWUsuvt+PNQqJ4rPbwSed
+         OCJ5eZJkd4ZmRZNxUd33TUmzBSuTp0H5nLVqtH795aSzq/04v1RCYmcL0q5AiwrzM9ZT
+         Cb7XImF1CE7jvscejxFwt3WfDvRgd82uJl53zSECjzuG4lVgWm5gVVgq4WL8LeX0SuMV
+         xJGu9PHaOALh/JS5hNuxaGcClh640syu/frBFqlwrjFNB3wrHfDDjXMVpSggOy0wc8tQ
+         0R/LTHZ31DRUxHGbuGcMgsloej3/ZXRBpdaI4e/feLn4P94JtHY4fNcx7xMIlwvMosjs
+         EecQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXiHAsQkrNUe6J+c/sGVWWnNeOCI9MyJReDcQYW50sy9dYzf+uXSIQ+/JXhdWpOD7zKwlk0Cbs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxIIm9Dy4mhaaiVeast/C5djOcy0xnFkqyadpHI49eQukCyce7
+	6XBPxk9UyPRPn7OSeYHUjeeLOmZPoEsQsB1KL+QK61tGJ071TBdWGTT1eCX9YqRQxgyetL4w6my
+	+cvV58hEQM8vwPiRi/XZqfs4K/9uHj874N0ZISZ0C
+X-Gm-Gg: ASbGncvqZ3QGfYT9NQ+DGc73Z6C0dSSAUl9i2VTTiUy+5BwYU2h9oj7mkBgbWDHbV0V
+	t24Xl1rMCZG4PIXtpLUoeqPybmT0mLe0iukrKGl8EURMXYj/SZSezVJom54Vcj9ZYnbTaTbYy7k
+	IX+7C0g8Su5pfl1S5iVQmZUMhIDJZN5RyoZKkGHJTRtvCIHCHiTnA+HmyHRLCmJ0FH+jygqKP6K
+	CIrrP7mQ4NWBarh8mzGb/NSkvbhyXWMDX1g2JPaJIHl5d4ZpazH6cHTFzy5dXTaVxDOiT2arBXm
+	2vSTqVcEeT4eHvrd
+X-Google-Smtp-Source: AGHT+IH2lS/4Gy0WrVP8+Bx/RqT5XU/9tkO3Gb8fEzLTaF0NnczqJC1FzN6tNPYC6gtkL0hMiwKuBPp65QCF9s0yMdA=
+X-Received: by 2002:a05:622a:1444:b0:4b7:a72f:55d9 with SMTP id
+ d75a77b69052e-4e5821d9f66mr2188601cf.13.1759541105852; Fri, 03 Oct 2025
+ 18:25:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251003-jk-iwl-net-2025-10-01-v2-6-e59b4141c1b5@intel.com>
-References: <20251003-jk-iwl-net-2025-10-01-v2-0-e59b4141c1b5@intel.com>
-In-Reply-To: <20251003-jk-iwl-net-2025-10-01-v2-0-e59b4141c1b5@intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Emil Tantilov <emil.s.tantilov@intel.com>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Sridhar Samudrala <sridhar.samudrala@intel.com>, 
- Phani Burra <phani.r.burra@intel.com>, 
- Piotr Kwapulinski <piotr.kwapulinski@intel.com>, 
- Simon Horman <horms@kernel.org>, Radoslaw Tyl <radoslawx.tyl@intel.com>, 
- Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Cc: Anton Nadezhdin <anton.nadezhdin@intel.com>, 
- Konstantin Ilichev <konstantin.ilichev@intel.com>, 
- Milena Olech <milena.olech@intel.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
- Koichiro Den <den@valinux.co.jp>, Rinitha S <sx.rinitha@intel.com>, 
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
- Paul Menzel <pmenzel@molgen.mpg.de>
-X-Mailer: b4 0.15-dev-cbe0e
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2595;
- i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=uPUFa5XRwwizNw3cq6xE4VL/A1dp66wRXQlgd3W4V14=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhowHJX4v3KJ4HugVTAnnnh4+rbD6dsVmY9Ny3lPLTkkpO
- c+W2JfSUcrCIMbFICumyKLgELLyuvGEMK03znIwc1iZQIYwcHEKwETUixn+hzzk251/Ide93aq6
- pPNTu+FKa669fU025pu01pRw7nbnZ2R48IvNbI+p2NSf8X7z54sKOXZxGe0RTvL0q+Mp38sueI8
- VAA==
-X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
- fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
+References: <CA+suKw5OhWLJe_7uth4q=qxVpsD4qpwGRENORwA=beNLpiDuwg@mail.gmail.com>
+In-Reply-To: <CA+suKw5OhWLJe_7uth4q=qxVpsD4qpwGRENORwA=beNLpiDuwg@mail.gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Fri, 3 Oct 2025 21:24:49 -0400
+X-Gm-Features: AS18NWCQxxjtgSMyPF9xqMmn1Zy4-359N_8BGDZpkrSXUpWR_gst5dfQXbAuVXs
+Message-ID: <CADVnQy=Bm2oNE7Ra7aiA2AQGcMUPjHcmhvQsp+ubvncU2YeN2A@mail.gmail.com>
+Subject: Re: TCP sender stuck despite receiving ACKs from the peer
+To: Christoph Schwarz <cschwarz@arista.com>
+Cc: edumazet@google.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Koichiro Den <den@valinux.co.jp>
+On Fri, Oct 3, 2025 at 8:29=E2=80=AFPM Christoph Schwarz <cschwarz@arista.c=
+om> wrote:
+>
+> Hi,
+>
+> tldr; we believe there might be an issue with the TCP stack of the Linux =
+kernel 5.10 that causes TCP connections to get stuck when they encounter a =
+certain pattern of retransmissions and delayed and/or lost ACKs. We gathere=
+d extensive evidence supporting this theory, but we need help confirming it=
+ and further narrowing down the problem. Please read on if you find this in=
+teresting.
+>
+> Background: We have an application where multiple clients concurrently do=
+wnload large files (~900 MB) from an HTTP server. Both server and clients r=
+un on a Linux with kernel 5.10.165
+>
+> We observed that occasionally one or more of those downloads get stuck, i=
+.e. download a portion of the file and then stop making any progress. In th=
+is state, ss shows a large (2 MB-ish) Send-Q on the server side, while Recv=
+-Q on the client is zero, i.e. there is data to send, but it is just not ma=
+king it across.
+>
+> We ran tcpdump on the server on one of the stuck connections and noticed =
+that the server is retransmitting the same packet over and over again. The =
+client ACK's each retransmission immediately, but the server doesn't seem t=
+o care. This goes on until either an application timeout hits, or (with app=
+lication timeouts disabled) the kernel eventually closes the connection aft=
+er ~15 minutes, which we believe is due to having exhausted the maximum num=
+ber of retransmissions (tcp_retries2).
+>
+> We can reproduce this problem with selective ACK enabled or disabled, rul=
+ing out any direct connection to it.
+>
+> Example:
+>
+> 11:20:04.676418 02:1c:a7:00:00:01 > 02:1c:a7:00:00:04, ethertype IPv4 (0x=
+0800), length 1514: 127.2.0.1.3102 > 127.2.0.4.46598: Flags [.], seq 138089=
+6424:1380897872, ack 2678783744, win 500, options [nop,nop,TS val 217589851=
+4 ecr 3444405317], length 1448
+> 11:20:04.676525 02:1c:a7:00:00:04 > 02:1c:a7:00:00:01, ethertype IPv4 (0x=
+0800), length 78: 127.2.0.4.46598 > 127.2.0.1.3102: Flags [.], ack 13810195=
+04, win 24567, options [nop,nop,TS val 3444986302 ecr 2175317524,nop,nop,sa=
+ck 1 {1380896424:1380897872}], length 0
+> ...
+> (this pattern continues, with incremental backoff, until either applicati=
+on level timeout hits, or maximum number of retransmissions is exceeded)
+>
+> The packet that the sender keeps sending is apparently a retransmission, =
+with the client ACK'ing a sequence number further ahead.
+>
+> The next thing we tried is if we can bring such a connection out of the p=
+roblem state by manually constructing and injecting ACKs, and indeed this i=
+s possible. As long as we keep ACKing the right edge of the retransmitted p=
+acket(s), the server will send more packets that are further ahead in the s=
+tream. If we ACK larger seqnos, such as the one the the client TCP stack is=
+ using, the server doesn't react. But if we continue to ACKs the right edge=
+s of retransmitted packets, then eventually the connection recovers and the=
+ download resumes and finishes successfully.
+>
+> At this point it is evident that the server is ignoring ACKs above a cert=
+ain seqno. We just don't know what this seqno is.
+>
+> With some more hacks, we extracted snd_nxt from a socket in the problem s=
+tate:
+>    sz =3D sizeof(tqi->write_seq);
+>    if (getsockopt(fd, SOL_TCP, TCP_QUEUE_SEQ, &tqi->write_seq, &sz))
+>       return false;
+>
+>    // SIOCOUTQNSD: tp->write_seq - tp->snd_nxt
+>    int write_seq__snd_nxt;
+>    if (ioctl(fd, SIOCOUTQNSD, &write_seq__snd_nxt) =3D=3D -1)
+>       return false;
+>    tqi->snd_nxt =3D tqi->write_seq - write_seq__snd_nxt;
+>
+> Then we cross-referenced the so acquired snd_nxt with the seqno that the =
+client is ACK'ing and surprise, the seqno is LARGER than snd_nxt.
+>
+> We now have a suspicion why the sender is ignoring the ACKs. The followin=
+g is very old code in tcp_ack that ignores all ACKs for data the the server=
+ hasn't sent yet:
+> /* If the ack includes data we haven't sent yet, discard
+> * this segment (RFC793 Section 3.9).
+> */
+> if (after(ack, tp->snd_nxt))
+> return -1;
+>
+> To verify this theory, we added additional trace instructions to tcp_rcv_=
+established and tcp_ack, then reproduced the issue once more while taking a=
+ packet capture on the server. This experiment confirmed the theory.
+>
+>   <...>-10864   [002] .... 56338.066092: tcp_rcv_established: tcp_rcv_est=
+ablished(2874212, 3102->33240) ack_seq=3D1678664094 after snd_nxt=3D1678609=
+070
+>   <...>-10864   [002] .... 56338.066093: tcp_ack: tcp_ack(2874212, 3102->=
+33240, 16640): ack=3D1678664094, ack_seq=3D308986386, prior_snd_una=3D16786=
+06174, snd_nxt=3D1678609070, high_seq=3D1678606174
+>   <...>-10864   [002] .... 56338.066093: tcp_ack: tcp_ack(2874212), exit2=
+=3D-1
+>
+> The traces show that in this instance, the client is ACK'ing 1678664094 w=
+hich is greater than snd_nxt 1678609070. tcp_ack then returns at the place =
+indicated above without processing the ACK.
+>
+> From the packet capture of this instance, we reconstructed the timeline o=
+f events happening before the connections entered the problem state. This w=
+as with SACK disabled.
+>
+> 1. the HTTP download starts, and all seems fine, with the server sending =
+TCP segments of 1448 bytes in each packet and the client ACKing them.
+> 2. at some point, the server decides to retransmit certain packets. When =
+it does, it retransmits 45 consecutive packets, starting at a certain seque=
+nce number. The first thing to note is that this is not the oldest unacknow=
+ledged sequence number. There are in fact 88 older, unacknowledged packets =
+before the first retransmitted one. This retransmission happens 0.000078 se=
+conds after the initial transmission (according to timestamps in the packet=
+ capture)
+> 3. the server retransmits the same 45 packets for a second time, 0.000061=
+ seconds after the first retransmission.
+> 4. ACKs arrive that cover receipt of all data up to, but not including, t=
+hose 45 packets. For the purpose of the following events, let those packets=
+ be numbered 1 through 45
+> 5. the server retransmits packet 1 for the third time
+> 6. multiple ACKs arrive covering packets 2 through 41
+> 7. the server retransmits packet 2
+> 8. two ACKs arrive for packet 41
+> 9. the server retransmits packet 1
+> 10. an ACK arrives for packet 41
+> 11. steps 9. and 10. repeat with incremental backoff. The connection is s=
+tuck at this point
+>
+> From the kernel traces, we can tell the sender's state as follows:
+> snd_nxt =3D packet 3
+> high_seq and prior_snd_una =3D packet 1
+>
+> At this point, the sender believes it sent only packets 1 and 2, but the =
+peer received more packets, up to packet 41. Packets 42 through 45 seem to =
+have been lost.
+>
+> This is where we need help:
+> 1. why did the retransmission of the 45 packets start so shortly after th=
+e initial transmission?
+> 2. why were there two retransmissions?
+> 3. why did retransmission not start at the oldest unacknowledged packet, =
+given that SACK was disabled?
+> 4. is this possible given the sequence of events, that snd_nxt and high_s=
+eq were reset in step 5. or 6. and what would be the reason for it?
+> 5. does this look like a bug in the TCP stack?
+> 6. any advice how we can further narrow this down?
+>
+> thank you,
+> Chris
 
-Since ixgbe_adapter is embedded in devlink, calling devlink_free()
-prematurely in the ixgbe_remove() path can lead to UAF. Move devlink_free()
-to the end.
+Thanks for the report!
 
-KASAN report:
+A few thoughts:
 
- BUG: KASAN: use-after-free in ixgbe_reset_interrupt_capability+0x140/0x180 [ixgbe]
- Read of size 8 at addr ffff0000adf813e0 by task bash/2095
- CPU: 1 UID: 0 PID: 2095 Comm: bash Tainted: G S  6.17.0-rc2-tnguy.net-queue+ #1 PREEMPT(full)
- [...]
- Call trace:
-  show_stack+0x30/0x90 (C)
-  dump_stack_lvl+0x9c/0xd0
-  print_address_description.constprop.0+0x90/0x310
-  print_report+0x104/0x1f0
-  kasan_report+0x88/0x180
-  __asan_report_load8_noabort+0x20/0x30
-  ixgbe_reset_interrupt_capability+0x140/0x180 [ixgbe]
-  ixgbe_clear_interrupt_scheme+0xf8/0x130 [ixgbe]
-  ixgbe_remove+0x2d0/0x8c0 [ixgbe]
-  pci_device_remove+0xa0/0x220
-  device_remove+0xb8/0x170
-  device_release_driver_internal+0x318/0x490
-  device_driver_detach+0x40/0x68
-  unbind_store+0xec/0x118
-  drv_attr_store+0x64/0xb8
-  sysfs_kf_write+0xcc/0x138
-  kernfs_fop_write_iter+0x294/0x440
-  new_sync_write+0x1fc/0x588
-  vfs_write+0x480/0x6a0
-  ksys_write+0xf0/0x1e0
-  __arm64_sys_write+0x70/0xc0
-  invoke_syscall.constprop.0+0xcc/0x280
-  el0_svc_common.constprop.0+0xa8/0x248
-  do_el0_svc+0x44/0x68
-  el0_svc+0x54/0x160
-  el0t_64_sync_handler+0xa0/0xe8
-  el0t_64_sync+0x1b0/0x1b8
+(1) For the trace you described in detail, would it be possible to
+place the binary .pcap file on a server somewhere and share the URL
+for the file? This will be vastly easier to diagnose if we can see the
+whole trace, and use visualization tools, etc. The best traces are
+those that capture the SYN and SYN/ACK, so we can see the option
+negotiation. (If the trace is large, keep in mind that usually
+analysis only requires the headers; tcpdump with "-s 120" is usually
+sufficient.)
 
-Fixes: a0285236ab93 ("ixgbe: add initial devlink support")
-Signed-off-by: Koichiro Den <den@valinux.co.jp>
-Tested-by: Rinitha S <sx.rinitha@intel.com>
-Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+(2) After that, would it be possible to try this test with a newer
+kernel? You mentioned this is with kernel version 5.10.165, but that's
+more than 2.5 years old at this point, and it's possible the bug has
+been fixed since then.  Could you please try this test with the newest
+kernel that is available in your distribution? (If you are forced to
+use 5.10.x on your distribution, note that even with 5.10.x there is
+v5.10.245, which was released yesterday.)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 6218bdb7f941..86b9caece104 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -12091,7 +12091,6 @@ static void ixgbe_remove(struct pci_dev *pdev)
- 
- 	devl_port_unregister(&adapter->devlink_port);
- 	devl_unlock(adapter->devlink);
--	devlink_free(adapter->devlink);
- 
- 	ixgbe_stop_ipsec_offload(adapter);
- 	ixgbe_clear_interrupt_scheme(adapter);
-@@ -12127,6 +12126,8 @@ static void ixgbe_remove(struct pci_dev *pdev)
- 
- 	if (disable_dev)
- 		pci_disable_device(pdev);
-+
-+	devlink_free(adapter->devlink);
- }
- 
- /**
+(3) If this bug is still reproducible with a recent kernel, would it
+be possible to gather .pcap traces from both client and server,
+including SYN and SYN/ACK? Sometimes it can be helpful to see the
+perspective of both ends, especially if there are middleboxes
+manipulating the packets in some way.
 
--- 
-2.51.0.rc1.197.g6d975e95c9d7
+Thanks!
 
+Best regards,
+neal
 
