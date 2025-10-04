@@ -1,100 +1,172 @@
-Return-Path: <netdev+bounces-227836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5350BB8764
-	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 03:04:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D246CBB8774
+	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 03:12:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73E174C2648
-	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 01:04:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66EF119C523A
+	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 01:12:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F2A128373;
-	Sat,  4 Oct 2025 01:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8CBC54652;
+	Sat,  4 Oct 2025 01:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d4dK1s6h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFC1D2FB
-	for <netdev@vger.kernel.org>; Sat,  4 Oct 2025 01:04:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4B4339A8;
+	Sat,  4 Oct 2025 01:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759539845; cv=none; b=cu0D/rcjCig8cdF9+RUe8TKoeD9ncpdQPob4DJu5T1v9rz0WqEDrYI1zZ5upHRbPn3NhMp2jsQ1ttA7a24bhLZ+OvMbUXnO+gs07VdFzYmvOdJGgXmuD5jqgT+eTQMoHRoKARyRkmgJ4qv8VKzalH1voIxmE9Xu7RgtZG3821zI=
+	t=1759540305; cv=none; b=jPcpYSs3l8mIMpWUajZupmYKFB03f9eIcm+OrG3nSrj+12uYqi5PZHXc3Mc5QuhrDDl4QvcvN7XKFdB0cxXhGwNjmT8AE5G/iAZCIgkAIB0XkIZeV+U6sklIjRosdp8cPpsfelisDdrtM1Mw8MpkSH23FIAT/fsJ1c7mPseGdak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759539845; c=relaxed/simple;
-	bh=SOcgETh5xeubM838LXHr8nv9pfekOTux79h+0vKGLd0=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=HbMWl+Atha4iu/VVTBPo4uqPkONW6DRocgfKPylGZxwgoS+RwQHNpY01UyQQtVGlSekdoaWHfYj9ntkXnA14PbOMTsWtHa21rC+Sm7na4cIQJRwMrDaaGs4xJ89sjmcxMwDFMEpLP7zGTYrxwiGuH1Pfl7HCwbUEjK+qQRwp+kA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-42e74499445so28937495ab.3
-        for <netdev@vger.kernel.org>; Fri, 03 Oct 2025 18:04:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759539843; x=1760144643;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HBSZwqSDmh1BSWgw4JtT806Jg7bQjBuA+gVX18qZT4E=;
-        b=nsJag/6G8vtnZ8G0aGpwB5yqTOUf6vPme/r3ahBa5s5tOc61OzMbQdgzQ8Fj4ofRrM
-         fgpHcEpXxfkUfQwUtH99FMHt5zr9zxchSNLxqvcF4TEkKuZUZKngbQHeMVSgI2lEAQZd
-         9kSRL6D05FMCT89kCKNZ0Wb/26kfWMZNT8u0oEs1q4b53seh36zgR9PNRDwg5I8ggHaV
-         wTodD+xdcQInBb5vXMw0xvd6HYkEkSOusvEENp9iuB0zEk0V84YIMNz/zSkARynfN5u4
-         t3WCaYcEz7Kx6ZdYfXF90FnbRen9a4snhlK0C3dzOSXIp73W2RXwTjX97QFb0JWV/clQ
-         gE8g==
-X-Forwarded-Encrypted: i=1; AJvYcCUR+QFSJNYb7vx6QsS/N5VrRuq3vRBLJqIqsPEZng8uSYVD5jmg0WvXW3sJDssct4j1ASAU+Co=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxD83ANYYCIqYiLotJ/1hpcsXBwJRmxCtLj3FNxE3ey610dzWAZ
-	0SRVyWCPef3hqL9uh4t4lXuGA/ZgVN8+yZ8eW9kqFiQAPU4rYwGkp/fBgny4REk3t5kYu69Dy4q
-	PHTIV0TWzzf/hism+lOQaALYQUAiI0Tr837pZgXrBs/FDF8f7iNC6DEJobYA=
-X-Google-Smtp-Source: AGHT+IG5JM3/o6FGfsB9hA9pW+iiPTtSAdodFWPBkviXe5k4KQ+1mesDPtmy+8ZNmTIw34B4iexXbVyss3CJ246tUdhyhjSRaavg
+	s=arc-20240116; t=1759540305; c=relaxed/simple;
+	bh=bBclfd7/cZYUQQnneA4t6jaFujfjXiOWpFnfZwVOuI4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=NUzfr4mLgKEoC3myfyXLjqOt/xANjXk+e6pkPdDWNp7FrVm9b3EzuFwzKGero3VT44BWta8iarN9uZjKc6B9/Z1wpbMukjXHfRrSdRb8LUA+JZMxVFC00pbb9a60yW5j2JP7oYuToDVOAPoI/fzpjiAjWUdq6hvAbIUnMifL87s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d4dK1s6h; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1759540304; x=1791076304;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=bBclfd7/cZYUQQnneA4t6jaFujfjXiOWpFnfZwVOuI4=;
+  b=d4dK1s6hzCSq+9/tZmV1BQ1Fi7fcrKe2TNjEcZmsjWn2SrlFSNyOGVbt
+   aMXShFWByTa8TKf7ls0YoJfGT/LCTA1ah1ybP92u8LNHO/I7IaV44LHZO
+   H49esQb7H4PzfPSCOnNQFe8GIRF5Bz5WA+M0dMWAqCsn5Y39HhV8LpFTB
+   zWRVxggTVyQsjZfzTCDJYWzWVHkYzoLr6dvP2TNVG73nGfBnM1Cs12jD/
+   8Fp3JsF3dML4haWaSmumb5suC+cHFVfZZL9tdk15QWEekJDRGRcSTOhqI
+   9UD4U927+wS+uIniBYo0ECWl8y8Vp9UgKasGNRY9gvR9XGUCLI5m5sf+H
+   w==;
+X-CSE-ConnectionGUID: ZtgN6B++RpOFPBhbDo5lqw==
+X-CSE-MsgGUID: QueNR9YuT16EbV9r3+cQTQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="65650002"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="65650002"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2025 18:11:43 -0700
+X-CSE-ConnectionGUID: XCXsbnPRRWKwQ8fYhM9Nng==
+X-CSE-MsgGUID: ZJ0rSX+MQB+JKO+Pt0hOmw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,314,1751266800"; 
+   d="scan'208";a="178543200"
+Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2025 18:11:43 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net v2 0/6] Intel Wired LAN Driver Updates 2025-10-01
+ (idpf, ixgbe, ixgbevf)
+Date: Fri, 03 Oct 2025 18:09:43 -0700
+Message-Id: <20251003-jk-iwl-net-2025-10-01-v2-0-e59b4141c1b5@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:ca0d:0:b0:42e:6e3a:3075 with SMTP id
- e9e14a558f8ab-42e7ad84876mr59415045ab.21.1759539843090; Fri, 03 Oct 2025
- 18:04:03 -0700 (PDT)
-Date: Fri, 03 Oct 2025 18:04:03 -0700
-In-Reply-To: <68c6c3b1.050a0220.2ff435.0382.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68e07283.a00a0220.102ee.0118.GAE@google.com>
-Subject: Re: [syzbot] [fs?] kernel BUG in qlist_free_all (2)
-From: syzbot <syzbot+8715dd783e9b0bef43b1@syzkaller.appspotmail.com>
-To: bigeasy@linutronix.de, boqun.feng@gmail.com, bp@alien8.de, 
-	brauner@kernel.org, clrkwllms@kernel.org, dave.hansen@linux.intel.com, 
-	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, hpa@zytor.com, jack@suse.cz, kprateek.nayak@amd.com, 
-	kuba@kernel.org, kuniyu@google.com, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev, luto@kernel.org, 
-	mingo@redhat.com, ncardwell@google.com, neil@brown.name, 
-	netdev@vger.kernel.org, pabeni@redhat.com, peterz@infradead.org, 
-	rostedt@goodmis.org, ryotkkr98@gmail.com, syzkaller-bugs@googlegroups.com, 
-	tglx@linutronix.de, viro@zeniv.linux.org.uk, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANlz4GgC/4WNTQ7CIBCFr9LM2jEDURRX3sN0QdrBjlZqgFRN0
+ 7uLXMDl+97fAomjcIJTs0DkWZJMoQi9aaAbXLgySl80aNJ7RaTwdkd5jRg444+hIizU6q7Xzmj
+ j/QFK9xnZy7vuXqBkoS1wkJSn+Klfs6rWn9lZIeHOemctH40hOkvIPG676QHtuq5fQFd7678AA
+ AA=
+X-Change-ID: 20251001-jk-iwl-net-2025-10-01-92cd2a626ff7
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Emil Tantilov <emil.s.tantilov@intel.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Sridhar Samudrala <sridhar.samudrala@intel.com>, 
+ Phani Burra <phani.r.burra@intel.com>, 
+ Piotr Kwapulinski <piotr.kwapulinski@intel.com>, 
+ Simon Horman <horms@kernel.org>, Radoslaw Tyl <radoslawx.tyl@intel.com>, 
+ Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Cc: Anton Nadezhdin <anton.nadezhdin@intel.com>, 
+ Konstantin Ilichev <konstantin.ilichev@intel.com>, 
+ Milena Olech <milena.olech@intel.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
+ Samuel Salin <Samuel.salin@intel.com>, 
+ Andrzej Wilczynski <andrzejx.wilczynski@intel.com>, stable@vger.kernel.org, 
+ Rafal Romanowski <rafal.romanowski@intel.com>, 
+ Koichiro Den <den@valinux.co.jp>, Rinitha S <sx.rinitha@intel.com>, 
+ Paul Menzel <pmenzel@molgen.mpg.de>
+X-Mailer: b4 0.15-dev-cbe0e
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2662;
+ i=jacob.e.keller@intel.com; h=from:subject:message-id;
+ bh=bBclfd7/cZYUQQnneA4t6jaFujfjXiOWpFnfZwVOuI4=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhowHJZ49GfvPx0jUa8da911alq95NGmmbvRj4zdOiZvuv
+ NFYfyCpo5SFQYyLQVZMkUXBIWTldeMJYVpvnOVg5rAygQxh4OIUgInkzGT4n9jLwdTzR6rc5+Hx
+ k5M2xLtO/C60dtaG9ZNsLmowfJK9dJ6R4Xvc2pXTf+m2Gk88s8pKgmX5kt0zPGa8qujvf62yMtt
+ UhRkA
+X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
+ fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 
-syzbot has bisected this issue to:
+For idpf:
+Milena fixes a memory leak in the idpf reset logic when the driver resets
+with an outstanding Tx timestamp.
 
-commit 3253cb49cbad4772389d6ef55be75db1f97da910
-Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Date:   Thu Sep 4 14:25:25 2025 +0000
+For ixgbe and ixgbevf:
+Jedrzej fixes an issue with reporting link speed on E610 VFs.
 
-    softirq: Allow to drop the softirq-BKL lock on PREEMPT_RT
+Jedrzej also fixes the VF mailbox API incompatibilities caused by the
+confusion with API v1.4, v1.5, and v1.6. The v1.4 API introduced IPSEC
+offload, but this was only supported on Linux hosts. The v1.5 API
+introduced a new mailbox API which is necessary to resolve issues on ESX
+hosts. The v1.6 API introduced a new link management API for E610. Jedrzej
+introduces a new v1.7 API with a feature negotiation which enables properly
+checking if features such as IPSEC or the ESX mailbox APIs are supported.
+This resolves issues with compatibility on different hosts, and aligns the
+API across hosts instead of having Linux require custom mailbox API
+versions for IPSEC offload.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17566a7c580000
-start commit:   7f7072574127 Merge tag 'kbuild-6.18-1' of git://git.kernel..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=14d66a7c580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=10d66a7c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b78ebc06b51acd7e
-dashboard link: https://syzkaller.appspot.com/bug?extid=8715dd783e9b0bef43b1
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16ba76e2580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17741ee2580000
+Koichiro fixes a KASAN use-after-free bug in ixgbe_remove().
 
-Reported-by: syzbot+8715dd783e9b0bef43b1@syzkaller.appspotmail.com
-Fixes: 3253cb49cbad ("softirq: Allow to drop the softirq-BKL lock on PREEMPT_RT")
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+Changes in v2:
+- Drop Emil's idpf_vport_open race fix for now.
+- Add my signature.
+- Link to v1: https://lore.kernel.org/r/20251001-jk-iwl-net-2025-10-01-v1-0-49fa99e86600@intel.com
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+---
+Jedrzej Jagielski (4):
+      ixgbevf: fix getting link speed data for E610 devices
+      ixgbe: handle IXGBE_VF_GET_PF_LINK_STATE mailbox operation
+      ixgbevf: fix mailbox API compatibility by negotiating supported features
+      ixgbe: handle IXGBE_VF_FEATURES_NEGOTIATE mbox cmd
+
+Koichiro Den (1):
+      ixgbe: fix too early devlink_free() in ixgbe_remove()
+
+Milena Olech (1):
+      idpf: cleanup remaining SKBs in PTP flows
+
+ drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.h       |  15 ++
+ drivers/net/ethernet/intel/ixgbevf/defines.h       |   1 +
+ drivers/net/ethernet/intel/ixgbevf/ixgbevf.h       |   7 +
+ drivers/net/ethernet/intel/ixgbevf/mbx.h           |   8 +
+ drivers/net/ethernet/intel/ixgbevf/vf.h            |   1 +
+ drivers/net/ethernet/intel/idpf/idpf_ptp.c         |   3 +
+ .../net/ethernet/intel/idpf/idpf_virtchnl_ptp.c    |   1 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c      |   3 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c     |  79 +++++++++
+ drivers/net/ethernet/intel/ixgbevf/ipsec.c         |  10 ++
+ drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c  |  34 +++-
+ drivers/net/ethernet/intel/ixgbevf/vf.c            | 182 +++++++++++++++++----
+ 12 files changed, 310 insertions(+), 34 deletions(-)
+---
+base-commit: daa26ea63c6f848159821cd9b3cbe47cddbb0a1c
+change-id: 20251001-jk-iwl-net-2025-10-01-92cd2a626ff7
+
+Best regards,
+--  
+Jacob Keller <jacob.e.keller@intel.com>
+
 
