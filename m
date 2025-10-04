@@ -1,58 +1,77 @@
-Return-Path: <netdev+bounces-227871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF0DEBB9045
-	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 18:48:56 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03983BB905A
+	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 18:56:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 999003BEAFC
-	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 16:48:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A78804E3D34
+	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 16:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 660A3280A20;
-	Sat,  4 Oct 2025 16:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE17328136B;
+	Sat,  4 Oct 2025 16:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FugQS3mk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WXDHV94w"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3920B1F0E3E;
-	Sat,  4 Oct 2025 16:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 822A123183F;
+	Sat,  4 Oct 2025 16:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759596533; cv=none; b=FatDsNpAsXYcnVKpzZv9Kxp5oqHhhZPrI2/tSuLb8PvgsMG0hK2HRtHt3ltE6Uu2h8IETHSoO+MVIK/gWUsFv7hhVMr0hFwo4NmtlgT8y68pFv6ltuA6Ek462D2vVAWBwu6rSjJV7z2LnxWwREwE9y3OUc5zngnlJozeYQxTMHw=
+	t=1759596992; cv=none; b=kj1nrTMujxXs6Rzq79zeQTxGqfqdG4joBzk9vPibVslTLp7gc2BjJJBQ45Stl7Lt2p0jMKP8yoytowBBkjBddMEIbGenpzuKkNeFCSETc15H1Sk2UP7Rh5HVs2R1LN89wIRLcAWGidplTyMlS1NivhqxbJNERadwoFufrJeGBFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759596533; c=relaxed/simple;
-	bh=1z0p50CsmcXRod4I++SMuzSJspd1KqMg8y7FgNT2J3w=;
+	s=arc-20240116; t=1759596992; c=relaxed/simple;
+	bh=GbSS2s6Tqj5av7SjOR8btii8CxGfihWeGED030TOZPo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oTfW95M/TktznE2HVi9j8gDM5mimArN7F1832Q4A2lw8L1XxQr+8IeiCSwvJk5b+1TcoUbIJp25Jox61EoWaAyr+NcmPecwUAl/JylHuLU4Yzdg6RfAfrE08brqnrJ9VGUTR4oLFTezVcxGjA6gdbPLOcIAKj8wK2/amcu5Jtrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FugQS3mk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 095AEC4CEF1;
-	Sat,  4 Oct 2025 16:48:49 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=qDG+7ZAoyYtBJ603+CCtden60Ou6ywsMfBkYMGhW7qnxhk30ct9m+FZ8mpqQstHr94MZ29VK4T0xX9UDKSEVK14fUTKxEXxm/a3pKSNAXTOTVbh0cuohMqWdcb+4On5v/VSaWrDh6wj8/TM/x1o2rBbYnOvo9mA+TeW6hQsURQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WXDHV94w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E561C4CEF1;
+	Sat,  4 Oct 2025 16:56:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759596532;
-	bh=1z0p50CsmcXRod4I++SMuzSJspd1KqMg8y7FgNT2J3w=;
+	s=k20201202; t=1759596992;
+	bh=GbSS2s6Tqj5av7SjOR8btii8CxGfihWeGED030TOZPo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FugQS3mkAg245aTA1vIyom40FBV4rDSw+Rfyt6in9+HIla0GqTnYwQSAdZiXl9mBH
-	 trZXaATS+YJC2jb8U/iJvmQ84AVNcMNK9AcDQqdPV2UokcL/NGKF7Z5Fi6ncF3q/LA
-	 doGnRJly9u+KUBCdvKeg445TY39UyJ2ygDBb3OtKCU/4Gli7TgBsuF/SgnK3n2gyuN
-	 Z8miq6lAW5YJUc4I0Fo6dAy826cO5GufPWFqsrwyIQML/Xm35k5QbS4yahodlPOssf
-	 c2ygJjpE9j0v+i5k5Z5cLb/cU9S9HNyMRxdCt7/zHimkumJwJ6qeZApZz6gpPUv8c7
-	 hNWgBbULQea4A==
-Date: Sat, 4 Oct 2025 17:48:47 +0100
+	b=WXDHV94wJQliGkoUtEzGfwy23uaflGx2iPTuCo317pN41QuZ0nrgwvFgZ9Xbl/jzb
+	 BTlr8E2XBPit3Ic5rHDZXOs+YV2FIsG7Bhg2Op8lYbtCIVQSVw/rTJq3X9JbjUic/4
+	 Tw8ZNadti46rbO/rdrr30lmf/poX5WQY7xSghT4pN0i/Y9FpZQaR8Lvj76A0cHG5df
+	 /MCcTKQ2hHicmUufhxRbPMmQFFeNSSodwUMMiSYBxct3qUzSWKPjNpysZ1Tg1feQyF
+	 6IXjgqYNj/OXx6Ev3O8VxEmU5vSWxO5NbAodV6HXF/p2HJW9xoKII4Q4dCWvJS68U1
+	 kW4XTNskf2LJA==
+Date: Sat, 4 Oct 2025 17:56:23 +0100
 From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, bpf@vger.kernel.org,
-	shuah@kernel.org, joe@dama.to, willemb@google.com, sdf@fomichev.me,
-	almasrymina@google.com, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net 9/9] selftests: drv-net: pp_alloc_fail: add necessary
- optoins to config
-Message-ID: <20251004164847.GM3060232@horms.kernel.org>
-References: <20251003233025.1157158-1-kuba@kernel.org>
- <20251003233025.1157158-10-kuba@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Emil Tantilov <emil.s.tantilov@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Phani Burra <phani.r.burra@intel.com>,
+	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+	Radoslaw Tyl <radoslawx.tyl@intel.com>,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Anton Nadezhdin <anton.nadezhdin@intel.com>,
+	Konstantin Ilichev <konstantin.ilichev@intel.com>,
+	Milena Olech <milena.olech@intel.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Samuel Salin <Samuel.salin@intel.com>,
+	Andrzej Wilczynski <andrzejx.wilczynski@intel.com>,
+	stable@vger.kernel.org,
+	Rafal Romanowski <rafal.romanowski@intel.com>,
+	Koichiro Den <den@valinux.co.jp>, Rinitha S <sx.rinitha@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: Re: [PATCH net v2 0/6] Intel Wired LAN Driver Updates 2025-10-01
+ (idpf, ixgbe, ixgbevf)
+Message-ID: <20251004165623.GN3060232@horms.kernel.org>
+References: <20251003-jk-iwl-net-2025-10-01-v2-0-e59b4141c1b5@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,14 +80,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251003233025.1157158-10-kuba@kernel.org>
+In-Reply-To: <20251003-jk-iwl-net-2025-10-01-v2-0-e59b4141c1b5@intel.com>
 
-On Fri, Oct 03, 2025 at 04:30:25PM -0700, Jakub Kicinski wrote:
-> Add kernel config for error injection as needed by pp_alloc_fail.py
+On Fri, Oct 03, 2025 at 06:09:43PM -0700, Jacob Keller wrote:
+> For idpf:
+> Milena fixes a memory leak in the idpf reset logic when the driver resets
+> with an outstanding Tx timestamp.
 > 
-> Fixes: 9da271f825e4 ("selftests: drv-net-hw: add test for memory allocation failures with page pool")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> For ixgbe and ixgbevf:
+> Jedrzej fixes an issue with reporting link speed on E610 VFs.
+> 
+> Jedrzej also fixes the VF mailbox API incompatibilities caused by the
+> confusion with API v1.4, v1.5, and v1.6. The v1.4 API introduced IPSEC
+> offload, but this was only supported on Linux hosts. The v1.5 API
+> introduced a new mailbox API which is necessary to resolve issues on ESX
+> hosts. The v1.6 API introduced a new link management API for E610. Jedrzej
+> introduces a new v1.7 API with a feature negotiation which enables properly
+> checking if features such as IPSEC or the ESX mailbox APIs are supported.
+> This resolves issues with compatibility on different hosts, and aligns the
+> API across hosts instead of having Linux require custom mailbox API
+> versions for IPSEC offload.
+> 
+> Koichiro fixes a KASAN use-after-free bug in ixgbe_remove().
+> 
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> ---
+> Changes in v2:
+> - Drop Emil's idpf_vport_open race fix for now.
+> - Add my signature.
+> - Link to v1: https://lore.kernel.org/r/20251001-jk-iwl-net-2025-10-01-v1-0-49fa99e86600@intel.com
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Hi Jake,
 
+Maybe I'm missing something simple here.
+
+But this series doesn't seem to apply to net due to the presence of
+commit 7a5a03869801 ("idpf: add HW timestamping statistics")
 
