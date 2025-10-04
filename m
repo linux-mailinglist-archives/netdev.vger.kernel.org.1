@@ -1,266 +1,308 @@
-Return-Path: <netdev+bounces-227834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD1DCBB86D6
-	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 01:43:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B043BB875B
+	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 02:58:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E198E4ED60A
-	for <lists+netdev@lfdr.de>; Fri,  3 Oct 2025 23:43:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9E414C2414
+	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 00:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B70276059;
-	Fri,  3 Oct 2025 23:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBA741C69D;
+	Sat,  4 Oct 2025 00:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="LS/kmKKz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I8bfSafv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD654258EF0;
-	Fri,  3 Oct 2025 23:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759534994; cv=none; b=iW7nzliuSpLg6J6KtQG/YxrD0domJaH0TEU7ietI+cJx7V7KhK2tnycTzMQNqWVctVJbVK+oaKUCeLwW2LIwJ78cMNcASQLQWw7jgRLZSKRRl7XLCumov1Z51evFLfvs7ywq2LijT9VzMM6eugPRKlFT7WPYJqRzN+3wqPrXQ3o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759534994; c=relaxed/simple;
-	bh=47AvyOWPHlbSO2un6BzmIJP/MkBr9VZmNYEfPDKfDN8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FTKnnu0egf179OMw/nu3H7Wrp/p+a+eEt31qRLsqQ1GyoqXUz0eUcR/cH3Wj+2lL6k1z9ISNIvsyg9nVflCh56Wau271ZO0HYp9CJMVbtEAoQySkbhIaDGFJqK0OBpesPVDvuKThO6a4quQBNjUuGXOlgRinsEauQEn2bwK1bZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=LS/kmKKz; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 593NHFL5006553;
-	Fri, 3 Oct 2025 23:42:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=/DePuG+339Tf3yEfFPTR5CHQ4Z9q/
-	o+eWd6Rq4seq/Y=; b=LS/kmKKz+pQO30foMCZezQrzHSdbmNGMuPQ8fyrmjK8X7
-	C8FKd8I4L+kOPryKPt+x7hXaXa8A6ATQHxtdOoqweEcgm7fDacsVMVFsBie8DNTX
-	q1lp40sE0KSMGaL9NRzOIbk5a5f6uPK6o9dWX4WN7nRy+cvBsBWtS7C3r2vQ5b2I
-	Z/5gpzVwMJsHEfmQzAfXJ/a8IpoK5WBleSXc/BGEZaK2lYU8Q3r0a7Zl3vbEJ075
-	wFfyc45w+dMX7p3ugv62Q93wUFeUCf3tAL+vEPHjpIRkYL9UkeP0rDKa90zprKji
-	Ed4jQUxPGy7SmlZXkNe0DeUsZyKW9DWTHAnj60U0A==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49jqryr0r3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 03 Oct 2025 23:42:37 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 593Ncm1u029705;
-	Fri, 3 Oct 2025 23:42:36 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 49hw1g42ea-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 03 Oct 2025 23:42:36 +0000
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 593NgZcL009324;
-	Fri, 3 Oct 2025 23:42:35 GMT
-Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 49hw1g42dx-1;
-	Fri, 03 Oct 2025 23:42:35 +0000
-From: Yifei Liu <yifei.l.liu@oracle.com>
-To: davem@davemloft.net, kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org
-Cc: yifei.l.liu@oracle.com, netdev@vger.kernel.org, stable@vger.kernel.org
-Subject: [PATCH Linux-5.15.y Linux-5.10.y Linux-5.4.y 1/1] udp: Fix memory accounting leak.
-Date: Fri,  3 Oct 2025 16:42:06 -0700
-Message-ID: <20251003234206.3392808-1-yifei.l.liu@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A3BEADC;
+	Sat,  4 Oct 2025 00:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759539532; cv=fail; b=DvFK4RNyW990WHj5YhPPJqhjHXWmtZr2MAPWDr5POAx4hrtUzukwGaVGhSc+OzClOljI6ThJY3Xelgs10B15McFaYaAG8Y1vn0a7DLZQGHnBe+e1VyWqfKjlxkKy4tyQ+2EhdXFz0U40YfIihgxN9P/B8CREt+DMegfgE/7qNqg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759539532; c=relaxed/simple;
+	bh=RBt91yDEEESJAiIOaD8JAIuStiCA8UC5KyFY2v1DrA4=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=V6934Ir0vrM83AfuvT5Tx4uOM1437MMCwRkD8GquLEOR12tuByuhwQhM3duvDFoE5D8pn/7i9sOFx/SuJCWUsDutl6+cgEdHxgojeUH709VsEiVH3I+wU/XmG6jCQZVYLRyKv7oNtvN9FfyLjIGkcfuI0zzVEWcVEzhZbIDsMoY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I8bfSafv; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1759539530; x=1791075530;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:mime-version;
+  bh=RBt91yDEEESJAiIOaD8JAIuStiCA8UC5KyFY2v1DrA4=;
+  b=I8bfSafvDXE+2uL7SPPWUKWbAsNoPj1DbQJIMiq3GxcdOY+y6CFVB3oG
+   epl+bvjv9RHYcF7ikbimfRT+YEOTTrL70OpMjU3mJplsrgeTsjenjY75T
+   P8laRwwOH2FSD/33BrL2VW6OgmvIwkOyN5uE4Ge+c2XHF8gwuEJKjPPC7
+   8bXJm817NDUwZHb7GhCNDFvYq1BbKSCHC5LsloGNVDTr+FEwYcwSzAHpz
+   o1eXklJSyNhjEXu00c5a7qxzooESLZFJ2tydWWQ1X9GRc1rMtUKXF25x1
+   BPwiAkIMlftJ6Sr4AH05ZORFP6ZowZB8JdMy7WOZgIdp4eJytO9HtL1Sj
+   Q==;
+X-CSE-ConnectionGUID: lxlT4NSpQViy3gMZYvkjQw==
+X-CSE-MsgGUID: 5hiOSspbQw24h8f0Cmn6NA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11571"; a="79468220"
+X-IronPort-AV: E=Sophos;i="6.18,314,1751266800"; 
+   d="asc'?scan'208";a="79468220"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2025 17:58:49 -0700
+X-CSE-ConnectionGUID: BsE+DgTlSL6ulByb5tH+dw==
+X-CSE-MsgGUID: YntsCPRpR0G0YidxGJwswA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,314,1751266800"; 
+   d="asc'?scan'208";a="184691316"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2025 17:58:48 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 3 Oct 2025 17:58:47 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Fri, 3 Oct 2025 17:58:47 -0700
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.34)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 3 Oct 2025 17:58:47 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=T8pqTVw4GCSpO4t7F+V9PBPhfIHDMtGOCo7FtisRB87Ef9OULcfzUh2p0n0quyx1mZIUla4srhf38bj2m4W25dCJKMqHvu+5SrWdzyWFZDjEkHo5C3vOpVvLKMR9BDQx7v6I+Fq5WlPNZXJhzIT3J9atBVqGXQkpeBWkHDZ4b9Ty1Wts+7Dcx/QyWqBUTpofuMofjATTDckPihmKfKwRRAnL7n6q9kq9bAVy4nG/L7w+IS/K31MTiu7KUPsZXNYQ8fLKJvNpArIc2c6Xpj7fEPniHe6xxzKbaKSTPHD26mk9VZHnx6cR6D+kT4HytRDJx+sq5U3g5Db26+M0gil/Xw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RBt91yDEEESJAiIOaD8JAIuStiCA8UC5KyFY2v1DrA4=;
+ b=VzDUEjR53RkEaGCII96ntE5TTZUJbyhJnJ+YTRl6yVo7wTOOT8Saia97vWNLKpwQyrPRg4mBXapfxzDkNajz+oKLJP/OweZAG4YJ8OuzZexN9Hy23nHK7adWcJFzjsH+UL2BBS/+ON0if86MD0FfyubXvPQLVI6AuUQLFYJUD9sW67mK71BG1b3HnAR/vPb24NdN3tmc/34fK1M7MTZ6TjoBxZ89AI82uETw0crOr/qd9G+vDyUGF2mQ2DUNwmauCASIkZmzJ1pyMiqA+x6TVXP2FGGXZmwP+F4x9is15MIudJLU7zXSANAQ9a23DDUKdwONaFRpWiMMTmnNNMDYog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by PH7PR11MB5983.namprd11.prod.outlook.com (2603:10b6:510:1e2::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9182.16; Sat, 4 Oct
+ 2025 00:58:41 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3%4]) with mapi id 15.20.9182.015; Sat, 4 Oct 2025
+ 00:58:41 +0000
+Message-ID: <41c29f93-06d0-4211-87d5-d9ba232a8af0@intel.com>
+Date: Fri, 3 Oct 2025 17:58:37 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 0/8] Intel Wired LAN Driver Updates 2025-10-01 (idpf,
+ ixgbe, ixgbevf)
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Emil
+ Tantilov <emil.s.tantilov@intel.com>, Pavan Kumar Linga
+	<pavan.kumar.linga@intel.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Willem de Bruijn <willemb@google.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>, "Phani Burra"
+	<phani.r.burra@intel.com>, Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+	Simon Horman <horms@kernel.org>, Radoslaw Tyl <radoslawx.tyl@intel.com>,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>, Mateusz Polchlopek
+	<mateusz.polchlopek@intel.com>, Anton Nadezhdin <anton.nadezhdin@intel.com>,
+	Konstantin Ilichev <konstantin.ilichev@intel.com>, Milena Olech
+	<milena.olech@intel.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Aleksandr Loktionov
+	<aleksandr.loktionov@intel.com>, Samuel Salin <Samuel.salin@intel.com>,
+	Chittim Madhu <madhu.chittim@intel.com>, Joshua Hay <joshua.a.hay@intel.com>,
+	Andrzej Wilczynski <andrzejx.wilczynski@intel.com>, <stable@vger.kernel.org>,
+	Rafal Romanowski <rafal.romanowski@intel.com>, Koichiro Den
+	<den@valinux.co.jp>, Rinitha S <sx.rinitha@intel.com>, Paul Menzel
+	<pmenzel@molgen.mpg.de>
+References: <20251001-jk-iwl-net-2025-10-01-v1-0-49fa99e86600@intel.com>
+ <20251003104224.59777107@kernel.org>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <20251003104224.59777107@kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="------------96EDbU6sWthWZt04r9Luv1Sz"
+X-ClientProxiedBy: MW4PR04CA0166.namprd04.prod.outlook.com
+ (2603:10b6:303:85::21) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-03_07,2025-10-02_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0
- suspectscore=0 mlxscore=0 bulkscore=0 mlxlogscore=999 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2509150000 definitions=main-2510030200
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDAzMDE5NCBTYWx0ZWRfX4RxWkJtPUIHY
- Y4VwGVuhxSauiVkPaTl0LNUzVqnfbo0VjfhDRGTFsaeXI8WhkTgS3nqUWhLMdwvn37JQC+enVrc
- ziizAd9hTLA0F1x6Fkw+nIbQuIggiIf46Xcwv5CKoVHUzj7FgCCPXUVTkX4P5/gG0jKO5EGcHBb
- /IcVIe3h9SNTgqQZLkh/DDe8jSV3IQi7y6ttZIYU3w6f5mUB1F17WB9i1dTbGHzgpnoTrFIgLOD
- kAWkYzOEidXtTgLUQ/fvZm6zmQO2IMIa7toPfShYDcfRfzbIhpRxvFK6m6nZnYY+mUVWlHXc1Ii
- xQ+AUYuSoD5qNVK2/DNt/NNHn+akQkuwfpt8w8Ain95Azw9DzvQyNyCHqd6HH1Yv9Iy4bU0DuJ3
- vuhptY6fRtuyvkcsrnREb72jCg0+bKU38tTwJLVu8fmnsujaB9k=
-X-Proofpoint-GUID: WnhGTLLVrTQ3JvnAkMxPgwhJafu5U9ug
-X-Proofpoint-ORIG-GUID: WnhGTLLVrTQ3JvnAkMxPgwhJafu5U9ug
-X-Authority-Analysis: v=2.4 cv=TdSbdBQh c=1 sm=1 tr=0 ts=68e05f6d b=1 cx=c_pps
- a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
- a=x6icFKpwvdMA:10 a=bC-a23v3AAAA:8 a=vggBfdFIAAAA:8 a=1XWaLZrsAAAA:8
- a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=0J9PpQkizUzvAjNcVFoA:9
- a=FO4_E8m0qiDe52t0p3_H:22 cc=ntf awl=host:13625
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH7PR11MB5983:EE_
+X-MS-Office365-Filtering-Correlation-Id: 45dc5b7c-cbf5-4d60-7697-08de02e128b8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?cHhJK2lmOXFoZG9HeGRtQzVkTzdwZ0NVLy9xMGxCcmhVR21zc2xOaU91aGdE?=
+ =?utf-8?B?Y01JZUdodE5QbTY5YlAyTWVhbFc4VENZanc0QlFYaExmWDZIRG04WTFQM1F2?=
+ =?utf-8?B?Um1xV09JQkpNR1cvZHNwbXJnaGQweGFRK0xpNHdzb1h4RytORWJqWWV2akZR?=
+ =?utf-8?B?YkM5aktSaFFoblpmVkQ0aXl6V0VUZDZBUGNMQ2R3TitBRUZ6TnBTSDA2eVVk?=
+ =?utf-8?B?cG1SWmtiVnJGZVBuVHVTcmdRckxjUkZsSy9WaVpoM3lNQnE1Z1daMWVDVUtx?=
+ =?utf-8?B?Ulk0RE11ZVlkRlliTElWdURqVUNxMFVmMkZNWGtyQ3k3bmQyblBTOFZFY0x3?=
+ =?utf-8?B?eDFyR2lIaGdaZTc3dVRuVko2MHFQL2dLNXVCdGs4TlVqMTZqVjFIRkFpaE1H?=
+ =?utf-8?B?bkpVOEEyWmUvamRaSUxVdGdYWVJMRHovNG9jYVQ4QVFTcC9XUHBUdGRLT1ZZ?=
+ =?utf-8?B?MnFyVEZodXhiZWhhRVVIcEREd014ODVMVk9zeWU1YnM5RitOalhESi9WWVNW?=
+ =?utf-8?B?Y1pBbFNoVzVleGNJVEoyZVcxWnlhQnZtdGVnMlNUWEpoMU5tMGsvT0pYUWc1?=
+ =?utf-8?B?SzlVMVBjd2ZQdVM2T29laFBiNXFvSHJnSWpFdUlqU3d4elZEdjJMYXRlNG1i?=
+ =?utf-8?B?S200UDA1OG1yZ0E1UU52YlpyeWNWRDY2SHlrcFZTSXlwNm5YclJhYWM2U1dY?=
+ =?utf-8?B?bHNlUExuQTVKazhzbm5BNEF3dlNIVENwckt5RWlUUm1JbGlTTEMwbHNrYnQy?=
+ =?utf-8?B?MlVTR1FvMVNoSnN2bVJkaEVUUjNVaTFnVUd5MEpmVnBlY0UxcVNPeTdXOFRm?=
+ =?utf-8?B?Smp0WmN6RHhtWWtjZklwbE1ZMXk0VXdINzZET2VXSktkbHlYdndDTFB6Qi92?=
+ =?utf-8?B?bm14Qnlrb05ScUdmbkxGcExjcThiV2Juc0tLK2hCYXREUTRmMFovdjNtdTZz?=
+ =?utf-8?B?UzJmQmxXcTRHdzRNNnlNbEpIVjdhTzdnNVNWa2VwQU1MRnlpWExDQ0xaWktk?=
+ =?utf-8?B?ek5XWVVTbEdPdTF3dnl4OHV0V2pmSDYxZzJtOTR4bkhocUUzbmdVWkpUczUy?=
+ =?utf-8?B?bk0xNVhYZlVWR3pBVlAxZ2wrbEFyMEVUS0c2a0xnYSttOUxtUk1DN2pNZFZR?=
+ =?utf-8?B?UnJKcDRmQTRmV0hVazNOM2NML3QyUWxCb3hVaW9VYWpPSGxIdTZvMm92UGd1?=
+ =?utf-8?B?cVlOdGdIRm5XYWRITTA2Qmo3WHRkcEhFdUJkenMra014UlozM25RSE5RaWU0?=
+ =?utf-8?B?dG45encvK2p1bDZJc1lkQzFGQzRmZWtNSnVFYTRGRDNhTmZTS0hwQ2ZreEU0?=
+ =?utf-8?B?ZEhwQSt6UFRWb1JjODRydDkrY29kVEZaUUpMcDJQSVY0dDNRNHlrQ0U5S3g4?=
+ =?utf-8?B?ZDBYRWxURm5xdE5qenlqTVk1c2RQSDVLek5pWU1NbkFFeTM4TjBvL2w3SDdP?=
+ =?utf-8?B?VnlNR3F0Q3dPOGFsWFdnZkE3TXpvYVNhc3lrK0t1M1cwZEo0TjQ1b1FRdmJN?=
+ =?utf-8?B?eFlONDFjbmp2NWtEOUNJUllHbmc1VHBmZjk0c1Z5Ulc0NzhLK0JERTB3MUpj?=
+ =?utf-8?B?WmFzQ0s5bUpndEF1N2lGWVZRQlZKKzVlQlJQTTNXeVNvcVNrWkFTeitVRmhZ?=
+ =?utf-8?B?ZmpqOG1TdDk4b0hzQXUzc3hRODlBaVdiUm83WTFYZ1ZyK1lwTU5yVHV3d1FO?=
+ =?utf-8?B?cjUrM2dQeGltZUFxZ0pSbFU1aXBjcTRTeFJuL1liTTlzTUN0NFBOY2xrYStK?=
+ =?utf-8?B?M0N6aWhIT0VocDdBK0FhWHl1TlU2aWN0VUhjR29mT1FoazJ5a0xFYXRRNWIv?=
+ =?utf-8?B?S0k2WUMrcTNSUjYwbHF4SDRBOGNHaUdaMjFoUW1nSXRidjYxTzhMamJnejQr?=
+ =?utf-8?B?Y2hqTDlNaW10YTJsUU5sd1RaNVNpdmg5Y2dGb1VFT0pZN0ZiVCtpSHl5eG96?=
+ =?utf-8?Q?5ge4/Ck/CxOFLcHHnWaCad2T8/taQhW9?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZWxjY2VUakxOQUI4MU9mcE5uWFNmQ3NJRzV5M1hsMk1DTzBRSGFrcVFjTFNR?=
+ =?utf-8?B?RHBMZzFSYUZJT0dxbEtUYXJZeXBraUpmVlVyb0dYM2JjU1NJS3JkUzN3Q0d1?=
+ =?utf-8?B?QzdFYU9TaWxvdnUyRThnejZHbGJFNjl5c2RTMEFQNVVnQmZRc28rVzNmNkEr?=
+ =?utf-8?B?ZGpKV0tYZDdCSGIvRUNLbmNpd1h6VnFTSHBCODVqUFJzemh6TjNDUzIrN0ds?=
+ =?utf-8?B?c2FmU2d6ZEZhaFJMZUhCRjVUc3lXVHR0cUtBQ0V3cTQzUngzeGdFY0lXZ21u?=
+ =?utf-8?B?Y0NEYzhVTDk5WDN1Y2lEUTZSRGZrNWIzTXRHUVJ4U2cySit3TkZ3a0RmUnJ0?=
+ =?utf-8?B?WmIvcTFwY21FRE9xdksweFRyT3paS2ZHTjREcitBZFUxVlFhSkIycWRxMEN5?=
+ =?utf-8?B?cmdKVzJUMitJdVVOTzJJblByTEVwVlpaaCttZ0doWFJlSlExUWEzdEdHY3pj?=
+ =?utf-8?B?Z3hYMC9KTFFQMGdkN0dOQUgvWVJaTTZpdEpMT2JVRUJOVzAyYTVVd1RzZmti?=
+ =?utf-8?B?Y3ZucDdRMnBRVEthNmMvK3RwT3RkOFkvUzd6WkQ0WVNqdDN2ZUpIMlBlc01x?=
+ =?utf-8?B?MWlmcWhwT0NFZ2FyQjAzVjFDSzlZQllOOCtYKzBDU3VYUGhHR2QwV0lGSnpE?=
+ =?utf-8?B?aGprS09vL0JQVUdYMXcxYndTYXgwUk9WalI1UmdNMDdYczdZTXRDV3lBcVor?=
+ =?utf-8?B?aGNjcC9xWW9hN3lHRDI3K0JUdFU2MDVZcVlXR01YZmZ6YWc4TmttWkVISExt?=
+ =?utf-8?B?TzNmbzUvcnpUMWVWWU9nMFdjbm9NZENPbU5Kem5iY05qUVB1N3RBZk55NnBv?=
+ =?utf-8?B?MFFFZWgzbXFJcThIQVRrRFlCeGJXUXlOT2U0eFZjQ3NINzJrTnRYbStnR1Qz?=
+ =?utf-8?B?QjdjSGxhSVNyWjBXQjNzR2RCTURNKzJpc08wOWVqWnBvNzJqY2w1ZUt2SGxJ?=
+ =?utf-8?B?SS9rWnlVclpqWnRkeE1OTnA3RXdUSjJVRVVyb2s0Z2RJZ3dGa00yUG4rditr?=
+ =?utf-8?B?RGNIcHArSDZqd3pwSkdLSXhjNm1WVFpxSkVkNyszRTNjOCtuQU5wZTlvT3FJ?=
+ =?utf-8?B?bzNNb3llY0RBMFRtdFl1b0lpTHJCU25QQm1jMko4bFB4SllQam0vOXc0RFhp?=
+ =?utf-8?B?dUc2dkV3S2V4bDQ4WTUvZXcvZTB5clhTVFRkOTdjVXZWM2RaeFRmNVRRNmlG?=
+ =?utf-8?B?ZkRDYVdrRXVLNTJkd0kwdGp4L29rTitHZm9lNXVvUkdIeHdnYmFYaEJCTi9Y?=
+ =?utf-8?B?cmtlNUVpWkcxL1ZLWE4xQ3Joc0N4NHJrcXRiR2VoNU00UmwvcHNaN1A0WUYr?=
+ =?utf-8?B?a3hYSXlxa1ZQRVh2RFE0VzVWekJIUk9UTC9DR1k1a2hoZ3Y3YVhlM00zNVBm?=
+ =?utf-8?B?VDROVnF0eVFabmk0ZllEN0FSUlY1SUM1VkhGbGdiMlRhOFBnOHJFMVdqRFFt?=
+ =?utf-8?B?OGovSTNxNmhNVmhIeHQvODNlR3NMUlhFN0Rxd1hKYzcvOGw5UWwzSHpUeWZx?=
+ =?utf-8?B?bVRYbk1IMXdMajNKNktubUM4VjBZdkxWM3RkM3VVeTRjRUEydDBJZUZKMHZQ?=
+ =?utf-8?B?WHhlYzhWZ0d6V0owZ3ZEc0hWbHhsSmc4M1J3QjIyN05CSXJEbU82NmlVMWg0?=
+ =?utf-8?B?RFQyTTViS2N4cloyaitZcjlVektlWG0zL2gwVnFCeHNqdzJNdEtKd3l0ZUEv?=
+ =?utf-8?B?U296OHdNdzllOGNNM0NlYXF4Wnp3RHlyNG5laHM2bkVzbGJxSmVid3o2WE8r?=
+ =?utf-8?B?V2xuL0tkNEhhWEp2Ylltd2laRkRZa0FTY29MQ0lTYXhxWHQ3RGREc1VHU0Nw?=
+ =?utf-8?B?c01EZFhwVVljK3M3NjA1S01rSi9odk5pZGk4NGozTW55cUtPbm53NjVmdHY1?=
+ =?utf-8?B?c04xRnNmelBybExVUTVVMUFURExEd0xHYk1iVXVMUHFPREF6bzdYWG9lNDdh?=
+ =?utf-8?B?N2xUV2NzdXNYRFV1cFM2THQrbGVSZXB5ZCtaMHN6OEFLRTAzM0ZnTkV5cXZz?=
+ =?utf-8?B?TFl2U211c3Bwb3RBTHQydDhSaXBRaDAzZEY5clVPd2ZxM3d5SlR2ZlE3eFBq?=
+ =?utf-8?B?ZmgwOS9NMGxpT1JOcHozVUtGRUR2V0IvN3Nsdllmd3JYTEJLelFMMitEbDQx?=
+ =?utf-8?B?YVpSODNoTzhpOW1idlBVV1F2UE1LUHUxbVhJY1pHTnpDUy9uOXUwNU1Vckd6?=
+ =?utf-8?B?dUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45dc5b7c-cbf5-4d60-7697-08de02e128b8
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Oct 2025 00:58:41.6780
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6uLrUD3LMqbPT/7GCrZ8yGATC/7wp7Rq+sAXFgeGluz0MMGfUL2PdkSU10OGuYXknn5cOSQaURIzKXYC0iaHM30n8YYH8My8j8wR0XTl2S4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5983
+X-OriginatorOrg: intel.com
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
+--------------96EDbU6sWthWZt04r9Luv1Sz
+Content-Type: multipart/mixed; boundary="------------Azm0zU53o60pvhlQNB5qML1T";
+ protected-headers="v1"
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Emil Tantilov <emil.s.tantilov@intel.com>,
+ Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Willem de Bruijn <willemb@google.com>,
+ Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Phani Burra <phani.r.burra@intel.com>,
+ Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+ Simon Horman <horms@kernel.org>, Radoslaw Tyl <radoslawx.tyl@intel.com>,
+ Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+ Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+ Anton Nadezhdin <anton.nadezhdin@intel.com>,
+ Konstantin Ilichev <konstantin.ilichev@intel.com>,
+ Milena Olech <milena.olech@intel.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ Samuel Salin <Samuel.salin@intel.com>,
+ Chittim Madhu <madhu.chittim@intel.com>, Joshua Hay
+ <joshua.a.hay@intel.com>, Andrzej Wilczynski
+ <andrzejx.wilczynski@intel.com>, stable@vger.kernel.org,
+ Rafal Romanowski <rafal.romanowski@intel.com>,
+ Koichiro Den <den@valinux.co.jp>, Rinitha S <sx.rinitha@intel.com>,
+ Paul Menzel <pmenzel@molgen.mpg.de>
+Message-ID: <41c29f93-06d0-4211-87d5-d9ba232a8af0@intel.com>
+Subject: Re: [PATCH net 0/8] Intel Wired LAN Driver Updates 2025-10-01 (idpf,
+ ixgbe, ixgbevf)
+References: <20251001-jk-iwl-net-2025-10-01-v1-0-49fa99e86600@intel.com>
+ <20251003104224.59777107@kernel.org>
+In-Reply-To: <20251003104224.59777107@kernel.org>
 
-[ Upstream commit df207de9d9e7a4d92f8567e2c539d9c8c12fd99d ]
+--------------Azm0zU53o60pvhlQNB5qML1T
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Matt Dowling reported a weird UDP memory usage issue.
 
-Under normal operation, the UDP memory usage reported in /proc/net/sockstat
-remains close to zero.  However, it occasionally spiked to 524,288 pages
-and never dropped.  Moreover, the value doubled when the application was
-terminated.  Finally, it caused intermittent packet drops.
 
-We can reproduce the issue with the script below [0]:
+On 10/3/2025 10:42 AM, Jakub Kicinski wrote:
+> On Wed, 01 Oct 2025 17:14:10 -0700 Jacob Keller wrote:
+>> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+>=20
+> We need your sign-off on the patches.
+> Sorry for not noticing earlier.
 
-  1. /proc/net/sockstat reports 0 pages
+Argh. Apologies for missing that. I'll resend the ones besides the idpf
+fix you commented on.
 
-    # cat /proc/net/sockstat | grep UDP:
-    UDP: inuse 1 mem 0
+Thanks,
+Jake
 
-  2. Run the script till the report reaches 524,288
+--------------Azm0zU53o60pvhlQNB5qML1T--
 
-    # python3 test.py & sleep 5
-    # cat /proc/net/sockstat | grep UDP:
-    UDP: inuse 3 mem 524288  <-- (INT_MAX + 1) >> PAGE_SHIFT
+--------------96EDbU6sWthWZt04r9Luv1Sz
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-  3. Kill the socket and confirm the number never drops
+-----BEGIN PGP SIGNATURE-----
 
-    # pkill python3 && sleep 5
-    # cat /proc/net/sockstat | grep UDP:
-    UDP: inuse 1 mem 524288
+wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaOBxPQUDAAAAAAAKCRBqll0+bw8o6MiA
+AQD8aNuu38FKtMqph2Vrrxf2jf7nfEvGS3DTzxrBGlaX1gEA2p5Z3rmD7GeoCS1LizrcnH7AvRg4
+Q4VwscgxPs1XyQk=
+=W8Rj
+-----END PGP SIGNATURE-----
 
-  4. (necessary since v6.0) Trigger proto_memory_pcpu_drain()
-
-    # python3 test.py & sleep 1 && pkill python3
-
-  5. The number doubles
-
-    # cat /proc/net/sockstat | grep UDP:
-    UDP: inuse 1 mem 1048577
-
-The application set INT_MAX to SO_RCVBUF, which triggered an integer
-overflow in udp_rmem_release().
-
-When a socket is close()d, udp_destruct_common() purges its receive
-queue and sums up skb->truesize in the queue.  This total is calculated
-and stored in a local unsigned integer variable.
-
-The total size is then passed to udp_rmem_release() to adjust memory
-accounting.  However, because the function takes a signed integer
-argument, the total size can wrap around, causing an overflow.
-
-Then, the released amount is calculated as follows:
-
-  1) Add size to sk->sk_forward_alloc.
-  2) Round down sk->sk_forward_alloc to the nearest lower multiple of
-      PAGE_SIZE and assign it to amount.
-  3) Subtract amount from sk->sk_forward_alloc.
-  4) Pass amount >> PAGE_SHIFT to __sk_mem_reduce_allocated().
-
-When the issue occurred, the total in udp_destruct_common() was 2147484480
-(INT_MAX + 833), which was cast to -2147482816 in udp_rmem_release().
-
-At 1) sk->sk_forward_alloc is changed from 3264 to -2147479552, and
-2) sets -2147479552 to amount.  3) reverts the wraparound, so we don't
-see a warning in inet_sock_destruct().  However, udp_memory_allocated
-ends up doubling at 4).
-
-Since commit 3cd3399dd7a8 ("net: implement per-cpu reserves for
-memory_allocated"), memory usage no longer doubles immediately after
-a socket is close()d because __sk_mem_reduce_allocated() caches the
-amount in udp_memory_per_cpu_fw_alloc.  However, the next time a UDP
-socket receives a packet, the subtraction takes effect, causing UDP
-memory usage to double.
-
-This issue makes further memory allocation fail once the socket's
-sk->sk_rmem_alloc exceeds net.ipv4.udp_rmem_min, resulting in packet
-drops.
-
-To prevent this issue, let's use unsigned int for the calculation and
-call sk_forward_alloc_add() only once for the small delta.
-
-Note that first_packet_length() also potentially has the same problem.
-
-[0]:
-from socket import *
-
-SO_RCVBUFFORCE = 33
-INT_MAX = (2 ** 31) - 1
-
-s = socket(AF_INET, SOCK_DGRAM)
-s.bind(('', 0))
-s.setsockopt(SOL_SOCKET, SO_RCVBUFFORCE, INT_MAX)
-
-c = socket(AF_INET, SOCK_DGRAM)
-c.connect(s.getsockname())
-
-data = b'a' * 100
-
-while True:
-    c.send(data)
-
-Fixes: f970bd9e3a06 ("udp: implement memory accounting helpers")
-Reported-by: Matt Dowling <madowlin@amazon.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Link: https://patch.msgid.link/20250401184501.67377-3-kuniyu@amazon.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-(cherry picked from commit df207de9d9e7a4d92f8567e2c539d9c8c12fd99d)
-[Yifei: resolve minor conflicts and fix CVE-2025-22058]
-Signed-off-by: Yifei Liu <yifei.l.liu@oracle.com>
----
- net/ipv4/udp.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
-
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 51a12fa486b6..3ebd5765fb9f 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1459,12 +1459,12 @@ static bool udp_skb_has_head_state(struct sk_buff *skb)
- }
- 
- /* fully reclaim rmem/fwd memory allocated for skb */
--static void udp_rmem_release(struct sock *sk, int size, int partial,
--			     bool rx_queue_lock_held)
-+static void udp_rmem_release(struct sock *sk, unsigned int size,
-+			     int partial, bool rx_queue_lock_held)
- {
- 	struct udp_sock *up = udp_sk(sk);
- 	struct sk_buff_head *sk_queue;
--	int amt;
-+	unsigned int amt;
- 
- 	if (likely(partial)) {
- 		up->forward_deficit += size;
-@@ -1484,10 +1484,8 @@ static void udp_rmem_release(struct sock *sk, int size, int partial,
- 	if (!rx_queue_lock_held)
- 		spin_lock(&sk_queue->lock);
- 
--
--	sk->sk_forward_alloc += size;
--	amt = (sk->sk_forward_alloc - partial) & ~(SK_MEM_QUANTUM - 1);
--	sk->sk_forward_alloc -= amt;
-+	amt = (size + sk->sk_forward_alloc - partial) & ~(PAGE_SIZE - 1);
-+	sk->sk_forward_alloc += size - amt;
- 
- 	if (amt)
- 		__sk_mem_reduce_allocated(sk, amt >> SK_MEM_QUANTUM_SHIFT);
-@@ -1671,7 +1669,7 @@ EXPORT_SYMBOL_GPL(skb_consume_udp);
- 
- static struct sk_buff *__first_packet_length(struct sock *sk,
- 					     struct sk_buff_head *rcvq,
--					     int *total)
-+					     unsigned int *total)
- {
- 	struct sk_buff *skb;
- 
-@@ -1704,8 +1702,8 @@ static int first_packet_length(struct sock *sk)
- {
- 	struct sk_buff_head *rcvq = &udp_sk(sk)->reader_queue;
- 	struct sk_buff_head *sk_queue = &sk->sk_receive_queue;
-+	unsigned int total = 0;
- 	struct sk_buff *skb;
--	int total = 0;
- 	int res;
- 
- 	spin_lock_bh(&rcvq->lock);
--- 
-2.50.1
-
+--------------96EDbU6sWthWZt04r9Luv1Sz--
 
