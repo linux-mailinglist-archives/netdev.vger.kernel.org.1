@@ -1,119 +1,124 @@
-Return-Path: <netdev+bounces-227872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03983BB905A
-	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 18:56:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC1C2BB90F9
+	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 20:27:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A78804E3D34
-	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 16:56:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71A64189F4B3
+	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 18:27:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE17328136B;
-	Sat,  4 Oct 2025 16:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD9762222B4;
+	Sat,  4 Oct 2025 18:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WXDHV94w"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wismer.xyz header.i=@wismer.xyz header.b="CHkfoke4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out8.tophost.ch (out8.tophost.ch [46.232.182.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 822A123183F;
-	Sat,  4 Oct 2025 16:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F553594B;
+	Sat,  4 Oct 2025 18:27:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.232.182.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759596992; cv=none; b=kj1nrTMujxXs6Rzq79zeQTxGqfqdG4joBzk9vPibVslTLp7gc2BjJJBQ45Stl7Lt2p0jMKP8yoytowBBkjBddMEIbGenpzuKkNeFCSETc15H1Sk2UP7Rh5HVs2R1LN89wIRLcAWGidplTyMlS1NivhqxbJNERadwoFufrJeGBFA=
+	t=1759602429; cv=none; b=jXbYgiG1jzh7GTStq8RRjczsMIKDJxSOW2FBHswrVGDn+By3IGBydsxWT5BybgqJfKMiv2EYUMnjHsQwXwC2RSU45sF37yWu9hu+sJRcwDSUS82BRT6I/vDv1/X5KHkb6P32OSK1/jUswS1qnThSGj289s8Z7bhzPNOXwbpu97o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759596992; c=relaxed/simple;
-	bh=GbSS2s6Tqj5av7SjOR8btii8CxGfihWeGED030TOZPo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qDG+7ZAoyYtBJ603+CCtden60Ou6ywsMfBkYMGhW7qnxhk30ct9m+FZ8mpqQstHr94MZ29VK4T0xX9UDKSEVK14fUTKxEXxm/a3pKSNAXTOTVbh0cuohMqWdcb+4On5v/VSaWrDh6wj8/TM/x1o2rBbYnOvo9mA+TeW6hQsURQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WXDHV94w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E561C4CEF1;
-	Sat,  4 Oct 2025 16:56:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759596992;
-	bh=GbSS2s6Tqj5av7SjOR8btii8CxGfihWeGED030TOZPo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WXDHV94wJQliGkoUtEzGfwy23uaflGx2iPTuCo317pN41QuZ0nrgwvFgZ9Xbl/jzb
-	 BTlr8E2XBPit3Ic5rHDZXOs+YV2FIsG7Bhg2Op8lYbtCIVQSVw/rTJq3X9JbjUic/4
-	 Tw8ZNadti46rbO/rdrr30lmf/poX5WQY7xSghT4pN0i/Y9FpZQaR8Lvj76A0cHG5df
-	 /MCcTKQ2hHicmUufhxRbPMmQFFeNSSodwUMMiSYBxct3qUzSWKPjNpysZ1Tg1feQyF
-	 6IXjgqYNj/OXx6Ev3O8VxEmU5vSWxO5NbAodV6HXF/p2HJW9xoKII4Q4dCWvJS68U1
-	 kW4XTNskf2LJA==
-Date: Sat, 4 Oct 2025 17:56:23 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	s=arc-20240116; t=1759602429; c=relaxed/simple;
+	bh=aaAL1ZjE8/RUjANNkQ756JVzAIKsnpo5g0LdUIMWjXI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=orUBvbTlr2cAcRWPRFqmvT1WiFBhk+Tuovq78xOt9h280E1Pxe4JWvo31vnU3PczPq39HxO9i3PGVYAFzePFu+IIhzyU2JZYiC+pFIH6pXaGQ5RrWC/6NV4G6syu/K8hViFxD7peeaHQ6ao0Z8traLTjSYS6BF1BguZ6i8OpoXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wismer.xyz; spf=pass smtp.mailfrom=wismer.xyz; dkim=pass (2048-bit key) header.d=wismer.xyz header.i=@wismer.xyz header.b=CHkfoke4; arc=none smtp.client-ip=46.232.182.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wismer.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wismer.xyz
+Received: from srv125.tophost.ch ([194.150.248.5])
+	by filter2.tophost.ch with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <thomas@wismer.xyz>)
+	id 1v56cT-007JBN-Ua; Sat, 04 Oct 2025 20:04:36 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=wismer.xyz;
+	s=default; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=LlyG1IJXvba9MKr6Z3HkiagOcCNkkc+YhGxvzBHtazc=; b=CHkfoke4MqfPlxp1l/OQguJQuV
+	hLQrFP+/jyjK0PcR9cAkdCpzEbWvSWpYAPeI5bSGOxT7Ae72At9VG5kHUTgIySEtzhN2PXCFpnVAF
+	0EHRAQViY4QTKY3gmjnx9hGKKEBi6U0t4BYAxZ7pGfMZ74EBMwwhiMzJ9Wl/sTUchKhuH6QPQWI3e
+	xPLRyYhZ3WoFMFOP7KFyUMsTx9XDDO0YogHVnBr/Ztscs7znC7JT2qojnPypzLxem0PtiXjiQgeCL
+	1VRorXsKqvSnpuO+YOlkSAt4ZoEELVuIBCF4NIY/dIqgnbyjPqpJvCVRi1ZY7IqzBsOU8x1NNPXfF
+	nldKA5Ug==;
+Received: from 82-220-106-230.ftth.solnet.ch ([82.220.106.230]:60199 helo=pavilion.lan)
+	by srv125.tophost.ch with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <thomas@wismer.xyz>)
+	id 1v56cT-00000001wpX-2KK3;
+	Sat, 04 Oct 2025 20:04:31 +0200
+From: Thomas Wismer <thomas@wismer.xyz>
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kory Maincent <kory.maincent@bootlin.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Emil Tantilov <emil.s.tantilov@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Phani Burra <phani.r.burra@intel.com>,
-	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	Radoslaw Tyl <radoslawx.tyl@intel.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Anton Nadezhdin <anton.nadezhdin@intel.com>,
-	Konstantin Ilichev <konstantin.ilichev@intel.com>,
-	Milena Olech <milena.olech@intel.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Samuel Salin <Samuel.salin@intel.com>,
-	Andrzej Wilczynski <andrzejx.wilczynski@intel.com>,
-	stable@vger.kernel.org,
-	Rafal Romanowski <rafal.romanowski@intel.com>,
-	Koichiro Den <den@valinux.co.jp>, Rinitha S <sx.rinitha@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: Re: [PATCH net v2 0/6] Intel Wired LAN Driver Updates 2025-10-01
- (idpf, ixgbe, ixgbevf)
-Message-ID: <20251004165623.GN3060232@horms.kernel.org>
-References: <20251003-jk-iwl-net-2025-10-01-v2-0-e59b4141c1b5@intel.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Thomas Wismer <thomas@wismer.xyz>,
+	Thomas Wismer <thomas.wismer@scs.ch>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] net: pse-pd: Add TPS23881B support
+Date: Sat,  4 Oct 2025 20:03:47 +0200
+Message-ID: <20251004180351.118779-2-thomas@wismer.xyz>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251003-jk-iwl-net-2025-10-01-v2-0-e59b4141c1b5@intel.com>
+Content-Transfer-Encoding: 8bit
+X-Get-Message-Sender-Via: srv125.tophost.ch: authenticated_id: thomas@wismer.xyz
+X-Authenticated-Sender: srv125.tophost.ch: thomas@wismer.xyz
+X-Spampanel-Domain: smtpout.tophost.ch
+X-Spampanel-Username: 194.150.248.5
+Authentication-Results: tophost.ch; auth=pass smtp.auth=194.150.248.5@smtpout.tophost.ch
+X-Spampanel-Outgoing-Class: unsure
+X-Spampanel-Outgoing-Evidence: Combined (0.50)
+X-Recommended-Action: accept
+X-Filter-ID: 9kzQTOBWQUFZTohSKvQbgI7ZDo5ubYELi59AwcWUnuV5syPzpWv16mXo6WqDDpKEChjzQ3JIZVFF
+ 8HV60IETFiu2SmbhJN1U9FKs8X3+Nt208ASTx3o2OZ4zYnDmkLm5Mv/tafLC72ko3Lqe/Da7zGRu
+ tVdZdUk4la24/lWb/vyrAP5R/Cae/ZemygD++WnmCtmoQhY2xrBb8C+tWUvqrqBKsSdhvd/J5sX5
+ daZjkYsG4jVZi5Tfop5qjCZejidXzthz0vNkOX8Em4cj6D/wdR983ISMXlZYfkTQnVvsLb89W7vD
+ 6C469DIPe8wH3iOJ3xyMg3et4b3PQUopDmbZCssYHNuxAmlPRpR5yzngsxCROUzReCS8EpKh0It9
+ L25JS816nuiE0t5pG6MLXGczoanVmeCF7bI0BP7dENKtPTBPq+vGO3Vx+SwwWschmkdvs376y2A4
+ OBi1/UyqO7jQnnICeA+KlS7G8xqewTcs6w6HLg3eq1lKkYVFbZT99AeINpdbOTIWFiLv1jhppNXa
+ xS6MN8xFxlxHZge6OlcoYA//qN5p5dmu6xjQN9nmCfj7VmpmZJyx9iy0UVkVD75IgLollI+8fg4q
+ Ktu8I/h2Z0dHZM6qE0STp2v0JiRE8jhamJNIkblvt3tmDvgtmN4H4BUM9bndab3XlnlqHqi4QKnn
+ k14/ADuPHCWFyNV2T+avjL9wVRCXwYDpBqMLHNY9B2Ak8LmqWByQuE4NgLCNvMovQedDpDK2Sljn
+ CNAO7NpcpxuVcnpyy186dygqpmiD9OtONQZ4S919qVAB9i6zlzTjcVXthHorhNpu23mgOZsC6pUL
+ aCdNIXkTykmnK/9/QX3JlnOAYOwvgs4sv7ykOBxKEjX2P24wm2Xm0Zxro1P7++DuIQUs/5JJj4C/
+ n4CILsmQ0SO9CeLTQh8bH8PiEW+tX7qDfij/psJ5Sv6V58b1kyiK9aRmotIe5mkuhQ50hdHxL8fL
+ MkT6TDHnwvPD+cRl6DbasrEImAe+fJfqFuhNsSc9CgHJcMu7KTfBvyswr4sEMysPur9wmiDBurOy
+ 6iQJ5124E1ny/UQRZHHLkqd13aH9Eyp21gmT7cyCAVA5VIwTo2sAmG9WZnbp9bHNxXxTu3T2QkkX
+ krzDq9owtXIcExAHlwca76VdLw2GWIYs+ljrnXdo8M1GW0TnoMpI3UJ+pvlHhV6a5QjptwQBGybQ
+ vv1ToHZWNpcnifjzWnmjtnV75K45oykd3VjIUdJS/eyxyfnoc8x6re2H7v/VN3foTPbrWOwDJFM1
+ LKpMibQ88o0ORb/rEGGznznyI8PFeRBLZ0Kc+vvfWass5t8K0zA0uhq/IGZ0cCvl49xdmzHJuw==
+X-Report-Abuse-To: spam@filter1.tophost.ch
+X-Complaints-To: abuse@filter1.tophost.ch
 
-On Fri, Oct 03, 2025 at 06:09:43PM -0700, Jacob Keller wrote:
-> For idpf:
-> Milena fixes a memory leak in the idpf reset logic when the driver resets
-> with an outstanding Tx timestamp.
-> 
-> For ixgbe and ixgbevf:
-> Jedrzej fixes an issue with reporting link speed on E610 VFs.
-> 
-> Jedrzej also fixes the VF mailbox API incompatibilities caused by the
-> confusion with API v1.4, v1.5, and v1.6. The v1.4 API introduced IPSEC
-> offload, but this was only supported on Linux hosts. The v1.5 API
-> introduced a new mailbox API which is necessary to resolve issues on ESX
-> hosts. The v1.6 API introduced a new link management API for E610. Jedrzej
-> introduces a new v1.7 API with a feature negotiation which enables properly
-> checking if features such as IPSEC or the ESX mailbox APIs are supported.
-> This resolves issues with compatibility on different hosts, and aligns the
-> API across hosts instead of having Linux require custom mailbox API
-> versions for IPSEC offload.
-> 
-> Koichiro fixes a KASAN use-after-free bug in ixgbe_remove().
-> 
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> ---
-> Changes in v2:
-> - Drop Emil's idpf_vport_open race fix for now.
-> - Add my signature.
-> - Link to v1: https://lore.kernel.org/r/20251001-jk-iwl-net-2025-10-01-v1-0-49fa99e86600@intel.com
+This patch series aims at adding support for the TI TPS23881B PoE
+PSE controller.
 
-Hi Jake,
+---
+Thomas Wismer (3):
+  net: pse-pd: tps23881: Fix current measurement scaling
+  net: pse-pd: tps23881: Add support for TPS23881B
+  dt-bindings: pse-pd: ti,tps23881: Add TPS23881B
 
-Maybe I'm missing something simple here.
+ .../bindings/net/pse-pd/ti,tps23881.yaml      |  1 +
+ drivers/net/pse-pd/tps23881.c                 | 67 ++++++++++++++-----
+ 2 files changed, 53 insertions(+), 15 deletions(-)
 
-But this series doesn't seem to apply to net due to the presence of
-commit 7a5a03869801 ("idpf: add HW timestamping statistics")
+-- 
+2.43.0
+
 
