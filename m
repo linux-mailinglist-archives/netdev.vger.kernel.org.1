@@ -1,118 +1,136 @@
-Return-Path: <netdev+bounces-227848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 212E8BB8B92
-	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 11:28:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 151C5BB8C0D
+	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 11:38:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7EE1234704D
-	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 09:28:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB7A83C3D8B
+	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 09:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F141425A2A5;
-	Sat,  4 Oct 2025 09:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D977E26B955;
+	Sat,  4 Oct 2025 09:38:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XFIjcC4P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TTCkgvrl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C796322A4DA;
-	Sat,  4 Oct 2025 09:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16411DF271;
+	Sat,  4 Oct 2025 09:38:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759570116; cv=none; b=n4ohGTPnbXW7dzW4glAUmbQO/r6JZ8vWHMJ8auq2A57v7hcm8U8/fmtX+AkBL0oHLDVd3q5FDrnJ+1jRIiYzgP2SkCdBxLQ4KkfxqBSGx9XZrVFUM8NK8PSBvOu+1hSti5beHkZjVixBj/bz2Y1FVQLRw4oYOZT4Tbst+aWjWsk=
+	t=1759570692; cv=none; b=mc3bT6hoFgSxJ1jyUcGB9KmSEdG417t6qdhsULwJw1cLZQ8ObUg1OqJp8nGMdgIaZWBd3m6AClC9Jdm53HzA8mKIud6KDOH+qQ/K+KF1aexViCmnZeP88CAAwdZTuYbpAAxipx8Di4RCLEppsnN+0+sGtq5M3nGqVK4VV5nWdBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759570116; c=relaxed/simple;
-	bh=tXSdGLKEgFkWWOgWzyr7SPiWmc6rtEPxhddbzExB3sY=;
+	s=arc-20240116; t=1759570692; c=relaxed/simple;
+	bh=8AaVzDBT+1bpRZBYJICFy/qqpG/gyV2sedJWv3ZgPNk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BbPriHGPCRrHeCJzJnVD2/wVSFNHqJirKe9aSU2oiLE81W6CWJQqE5kVNAWrb5d8xRqtHefai43xFhwobL4Cw7G2NYq4v0HOLV4fD0IN7GK82S57cjdiAvrdL8NrbvelicZFvsvPZtT6MbsmYXZGM/1cYHgt3S64BIw5U8Cj04A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XFIjcC4P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D72F9C4CEF1;
-	Sat,  4 Oct 2025 09:28:33 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=WZcJBSglpuvTwRk4Y3VBHM6p0xedytMaIUGbAo0q+1RsNKFPtAHkk6DFGqwYjQAp3RUbApOs3rx4luLxlkF8n4yEXmf64xg2oVF+GFjP9BGKWD0E/QX8IhLh9dTH2HqGvXewRN4L+KD+zleSYNMHXQ66wiBSHuIcDEYsZQLc3uw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TTCkgvrl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A9B0C4CEF1;
+	Sat,  4 Oct 2025 09:38:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759570116;
-	bh=tXSdGLKEgFkWWOgWzyr7SPiWmc6rtEPxhddbzExB3sY=;
+	s=k20201202; t=1759570692;
+	bh=8AaVzDBT+1bpRZBYJICFy/qqpG/gyV2sedJWv3ZgPNk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XFIjcC4P7wdEySIshhYn7XmL311iWKwUAsnj/Mz9zZdtsqr/i3sH3GyFL9X45qHOC
-	 lOdgnPGa7HbXDHS4DupvYZwO5xJtIWEZNdfqz7k0QZC6iAeZzJI3ISw7RWf2yjOdy/
-	 G3DP53ICpW+bw78oY5he2kKSPvI9uI07lCsHxWWG3VSXVfRF3rJisxBNLalt+4+SXj
-	 arJXP28gjH0gPsXa7YJP8vfaU8UZ7whwzaB1szMMyVB6qJxkn5ZVDQbxHC6g/eIC7i
-	 jEmBEQx9uB/K3DZ63Knt8sn/Nd6blSygL/VvGVR3CBJHNOXrAfjqKZ4XHSqp2a7xLF
-	 osOuCEFr25qXw==
-Date: Sat, 4 Oct 2025 10:28:31 +0100
+	b=TTCkgvrl9xw5RjwQhfqko5gOWy8dAHRYCS0qSk6UGgkitfLA+eEkx/ci1Kn3ZUaLX
+	 qiJYzGB75OaZAgZJZcXh84wexRJmF8eZKVYU/zId3/wcPxJdLdjXm4m9sGlWTN6Ej9
+	 Y0Fn0223gDqdjh+DVlFRflNmunoUtwNA91/5UClkkpEtB4u/nkfI4ftoNdyQyyRGVZ
+	 fzJgPXC3dBafQUgbkqG+UDoQnHKcsLlgROir9oFIe2A4bmYByp529erglzZ91xdjUu
+	 NKw4meXUSvzBmyXdomB7cvTfPQUEisApMpVKKp+9m1Tb9/ujvEIGqBHLl0IKdm0DV2
+	 ZAUE8ELsRbFIg==
+Date: Sat, 4 Oct 2025 10:38:05 +0100
 From: Simon Horman <horms@kernel.org>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com,
-	Steen Hegelund <steen.hegelund@microchip.com>,
-	jacob.e.keller@intel.com, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: sparx5/lan969x: fix flooding configuration on
- bridge join/leave
-Message-ID: <20251004092831.GA3060232@horms.kernel.org>
-References: <20251003-fix-flood-fwd-v1-1-48eb478b2904@microchip.com>
+To: Aditya Garg <gargaditya@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com,
+	shradhagupta@linux.microsoft.com, ernis@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	gargaditya@microsoft.com, ssengar@linux.microsoft.com
+Subject: Re: [PATCH net-next] net: mana: Linearize SKB if TX SGEs exceeds
+ hardware limit
+Message-ID: <20251004093805.GB3060232@horms.kernel.org>
+References: <20251003154724.GA15670@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251003-fix-flood-fwd-v1-1-48eb478b2904@microchip.com>
+In-Reply-To: <20251003154724.GA15670@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 
-On Fri, Oct 03, 2025 at 02:35:59PM +0200, Daniel Machon wrote:
-> The sparx5 driver programs UC/MC/BC flooding in sparx5_update_fwd() by
-> unconditionally applying bridge_fwd_mask to all flood PGIDs. Any bridge
-> topology change that triggers sparx5_update_fwd() (for example enslaving
-> another port) therefore reinstalls flooding in hardware for already
-> bridged ports, regardless of their per-port flood flags.
+On Fri, Oct 03, 2025 at 08:47:24AM -0700, Aditya Garg wrote:
+> The MANA hardware supports a maximum of 30 scatter-gather entries (SGEs)
+> per TX WQE. In rare configurations where MAX_SKB_FRAGS + 2 exceeds this
+> limit, the driver drops the skb. Add a check in mana_start_xmit() to
+> detect such cases and linearize the SKB before transmission.
 > 
-> This results in clobbering of the flood masks, and desynchronization
-> between software and hardware: the bridge still reports “flood off” for
-> the port, but hardware has flooding enabled due to unconditional PGID
-> reprogramming.
+> Return NETDEV_TX_BUSY only for -ENOSPC from mana_gd_post_work_request(),
+> send other errors to free_sgl_ptr to free resources and record the tx
+> drop.
 > 
-> Steps to reproduce:
+> Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
+> Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+> ---
+>  drivers/net/ethernet/microsoft/mana/mana_en.c | 26 +++++++++++++++----
+>  include/net/mana/gdma.h                       |  8 +++++-
+>  include/net/mana/mana.h                       |  1 +
+>  3 files changed, 29 insertions(+), 6 deletions(-)
 > 
->     $ ip link add br0 type bridge
->     $ ip link set br0 up
->     $ ip link set eth0 master br0
->     $ ip link set eth0 up
->     $ bridge link set dev eth0 flood off
->     $ ip link set eth1 master br0
->     $ ip link set eth1 up
-> 
-> At this point, flooding is silently re-enabled for eth0. Software still
-> shows “flood off” for eth0, but hardware has flooding enabled.
-> 
-> To fix this, flooding is now set explicitly during bridge join/leave,
-> through sparx5_port_attr_bridge_flags():
-> 
->     On bridge join, UC/MC/BC flooding is enabled by default.
-> 
->     On bridge leave, UC/MC/BC flooding is disabled.
-> 
->     sparx5_update_fwd() no longer touches the flood PGIDs, clobbering
->     the flood masks, and desynchronizing software and hardware.
-> 
->     Initialization of the flooding PGIDs have been moved to
->     sparx5_start(). This is required as flooding PGIDs defaults to
->     0x3fffffff in hardware and the initialization was previously handled
->     in sparx5_update_fwd(), which was removed.
-> 
-> With this change, user-configured flooding flags persist across bridge
-> updates and are no longer overridden by sparx5_update_fwd().
-> 
-> Fixes: d6fce5141929 ("net: sparx5: add switching support")
-> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index f4fc86f20213..22605753ca84 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> @@ -20,6 +20,7 @@
+>  
+>  #include <net/mana/mana.h>
+>  #include <net/mana/mana_auxiliary.h>
+> +#include <linux/skbuff.h>
+>  
+>  static DEFINE_IDA(mana_adev_ida);
+>  
+> @@ -289,6 +290,19 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+>  	cq = &apc->tx_qp[txq_idx].tx_cq;
+>  	tx_stats = &txq->stats;
+>  
+> +	BUILD_BUG_ON(MAX_TX_WQE_SGL_ENTRIES != MANA_MAX_TX_WQE_SGL_ENTRIES);
+> +	#if (MAX_SKB_FRAGS + 2 > MANA_MAX_TX_WQE_SGL_ENTRIES)
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Hi Aditya,
 
+I see that Eric has made a more substantial review of this patch,
+so please follow his advice.
+
+But I wanted to add something to keep in mind for the future: I if the #if
+/ #else used here can be replaced by a simple if() statement, then that
+would be preferable.  The advantage being that it improves compile
+coverage.  And, as these are all constants, I would expect the compiler to
+optimise away any unused code.
+
+N.B: I did not check, so please consider this more of a general statement
+
+> +		if (skb_shinfo(skb)->nr_frags + 2 > MANA_MAX_TX_WQE_SGL_ENTRIES) {
+> +			netdev_info_once(ndev,
+> +					 "nr_frags %d exceeds max supported sge limit. Attempting skb_linearize\n",
+> +					 skb_shinfo(skb)->nr_frags);
+> +			if (skb_linearize(skb)) {
+> +				netdev_warn_once(ndev, "Failed to linearize skb\n");
+> +				goto tx_drop_count;
+> +			}
+> +		}
+> +	#endif
+> +
+>  	pkg.tx_oob.s_oob.vcq_num = cq->gdma_id;
+>  	pkg.tx_oob.s_oob.vsq_frame = txq->vsq_frame;
+>  
+
+...
 
