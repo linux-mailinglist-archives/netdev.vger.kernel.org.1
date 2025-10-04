@@ -1,154 +1,118 @@
-Return-Path: <netdev+bounces-227847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4FD2BB89CE
-	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 07:51:29 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 212E8BB8B92
+	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 11:28:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5CC5E4E140B
-	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 05:51:28 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7EE1234704D
+	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 09:28:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31AB51F2BAD;
-	Sat,  4 Oct 2025 05:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F141425A2A5;
+	Sat,  4 Oct 2025 09:28:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YStNZktC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XFIjcC4P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B7EEEAB;
-	Sat,  4 Oct 2025 05:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C796322A4DA;
+	Sat,  4 Oct 2025 09:28:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759557084; cv=none; b=Gs8ggND15e4zEJUNgzyu0exP8WxnaIAyKMxbCaTB5SIGPX+jM66U2DuyQ9lbPouShZv28Avmk0swLANlfvuaSQmQT4dcudHyS7TJxRFGAzvoREqZQnCRZPQNDxUvlhfZV5IWZ1DK8Z2Ayd7DQ2chy+/2IMnC5NviDmzAyAiV3ls=
+	t=1759570116; cv=none; b=n4ohGTPnbXW7dzW4glAUmbQO/r6JZ8vWHMJ8auq2A57v7hcm8U8/fmtX+AkBL0oHLDVd3q5FDrnJ+1jRIiYzgP2SkCdBxLQ4KkfxqBSGx9XZrVFUM8NK8PSBvOu+1hSti5beHkZjVixBj/bz2Y1FVQLRw4oYOZT4Tbst+aWjWsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759557084; c=relaxed/simple;
-	bh=+ulMRQuWFPPzjvhYpoF92z0JmF/KhdQh5Tgtm1C3T+s=;
+	s=arc-20240116; t=1759570116; c=relaxed/simple;
+	bh=tXSdGLKEgFkWWOgWzyr7SPiWmc6rtEPxhddbzExB3sY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u6stxNqMLjpdbCR+1IDcJeGaVc0XO+ru6teFE6mXRSYg6IY0u+TYRxYocwrnFlfpQhffoZ2wZR6w6aPUzGOPmq2UzYEj2NVwCNZP5JC4ouAK1YZ+XDaaqLCavs3ZNWT+Y5r80DIE7STOAmIGo9v0Iml0PZi7n/sxEstS5Tr5xFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YStNZktC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1427BC4CEF1;
-	Sat,  4 Oct 2025 05:51:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1759557083;
-	bh=+ulMRQuWFPPzjvhYpoF92z0JmF/KhdQh5Tgtm1C3T+s=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=BbPriHGPCRrHeCJzJnVD2/wVSFNHqJirKe9aSU2oiLE81W6CWJQqE5kVNAWrb5d8xRqtHefai43xFhwobL4Cw7G2NYq4v0HOLV4fD0IN7GK82S57cjdiAvrdL8NrbvelicZFvsvPZtT6MbsmYXZGM/1cYHgt3S64BIw5U8Cj04A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XFIjcC4P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D72F9C4CEF1;
+	Sat,  4 Oct 2025 09:28:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759570116;
+	bh=tXSdGLKEgFkWWOgWzyr7SPiWmc6rtEPxhddbzExB3sY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YStNZktCjlbmFsf9lI8VoKsUcnp1Wg5iVi9uJGTY264UuGLDVRsVREFo7LyOBQyTT
-	 Q7TereM+sySk4DeWjFWDCw69zrR7Lb0HxqbhTYqFoJcoWtwsXFUfS7heeEOW/9Z3Bq
-	 +dJWq9TvaYXD0VjbHGaJ2W856zgMxV/tmtXIr1Co=
-Date: Sat, 4 Oct 2025 07:51:20 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
-Cc: Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+	b=XFIjcC4P7wdEySIshhYn7XmL311iWKwUAsnj/Mz9zZdtsqr/i3sH3GyFL9X45qHOC
+	 lOdgnPGa7HbXDHS4DupvYZwO5xJtIWEZNdfqz7k0QZC6iAeZzJI3ISw7RWf2yjOdy/
+	 G3DP53ICpW+bw78oY5he2kKSPvI9uI07lCsHxWWG3VSXVfRF3rJisxBNLalt+4+SXj
+	 arJXP28gjH0gPsXa7YJP8vfaU8UZ7whwzaB1szMMyVB6qJxkn5ZVDQbxHC6g/eIC7i
+	 jEmBEQx9uB/K3DZ63Knt8sn/Nd6blSygL/VvGVR3CBJHNOXrAfjqKZ4XHSqp2a7xLF
+	 osOuCEFr25qXw==
+Date: Sat, 4 Oct 2025 10:28:31 +0100
+From: Simon Horman <horms@kernel.org>
+To: Daniel Machon <daniel.machon@microchip.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, khalid@kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	skhan@linuxfoundation.org, david.hunter.linux@gmail.com,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: usb: lan78xx: Fix lost EEPROM write timeout
- error(-ETIMEDOUT) in lan78xx_write_raw_eeprom
-Message-ID: <2025100407-devalue-overarch-afe0@gregkh>
-References: <20251004040722.82882-1-bhanuseshukumar@gmail.com>
+	UNGLinuxDriver@microchip.com,
+	Steen Hegelund <steen.hegelund@microchip.com>,
+	jacob.e.keller@intel.com, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: sparx5/lan969x: fix flooding configuration on
+ bridge join/leave
+Message-ID: <20251004092831.GA3060232@horms.kernel.org>
+References: <20251003-fix-flood-fwd-v1-1-48eb478b2904@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251004040722.82882-1-bhanuseshukumar@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251003-fix-flood-fwd-v1-1-48eb478b2904@microchip.com>
 
-On Sat, Oct 04, 2025 at 09:37:22AM +0530, Bhanu Seshu Kumar Valluri wrote:
-> The function lan78xx_write_raw_eeprom failed to properly propagate EEPROM
-> write timeout errors (-ETIMEDOUT). In the timeout  fallthrough path, it first
-> attempted to restore the pin configuration for LED outputs and then
-> returned only the status of that restore operation, discarding the
-> original timeout error saved in ret.
+On Fri, Oct 03, 2025 at 02:35:59PM +0200, Daniel Machon wrote:
+> The sparx5 driver programs UC/MC/BC flooding in sparx5_update_fwd() by
+> unconditionally applying bridge_fwd_mask to all flood PGIDs. Any bridge
+> topology change that triggers sparx5_update_fwd() (for example enslaving
+> another port) therefore reinstalls flooding in hardware for already
+> bridged ports, regardless of their per-port flood flags.
 > 
-> As a result, callers could mistakenly treat EEPROM write operation as
-> successful even though the EEPROM write had actually timed out with no
-> or partial data write.
+> This results in clobbering of the flood masks, and desynchronization
+> between software and hardware: the bridge still reports “flood off” for
+> the port, but hardware has flooding enabled due to unconditional PGID
+> reprogramming.
 > 
-> To fix this, handle errors in restoring the LED pin configuration separately.
-> If the restore succeeds, return any prior EEPROM write timeout error saved
-> in ret to the caller.
+> Steps to reproduce:
 > 
-> Suggested-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> Fixes: 8b1b2ca83b20 ("net: usb: lan78xx: Improve error handling in EEPROM and OTP operations")
-> Signed-off-by: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
-> ---
->  Note:
->  The patch is compiled and tested.
->  The patch was suggested by Oleksij Rempel while reviewing a fix to a bug
->  found by syzbot earlier.
->  The review mail chain where this fix was suggested is given below.
->  https://lore.kernel.org/all/aNzojoXK-m1Tn6Lc@pengutronix.de/
+>     $ ip link add br0 type bridge
+>     $ ip link set br0 up
+>     $ ip link set eth0 master br0
+>     $ ip link set eth0 up
+>     $ bridge link set dev eth0 flood off
+>     $ ip link set eth1 master br0
+>     $ ip link set eth1 up
 > 
->  drivers/net/usb/lan78xx.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
+> At this point, flooding is silently re-enabled for eth0. Software still
+> shows “flood off” for eth0, but hardware has flooding enabled.
 > 
-> diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-> index d75502ebbc0d..5ccbe6ae2ebe 100644
-> --- a/drivers/net/usb/lan78xx.c
-> +++ b/drivers/net/usb/lan78xx.c
-> @@ -1174,10 +1174,13 @@ static int lan78xx_write_raw_eeprom(struct lan78xx_net *dev, u32 offset,
->  	}
->  
->  write_raw_eeprom_done:
-> -	if (dev->chipid == ID_REV_CHIP_ID_7800_)
-> -		return lan78xx_write_reg(dev, HW_CFG, saved);
-> -
-> -	return 0;
-> +	if (dev->chipid == ID_REV_CHIP_ID_7800_) {
-> +		int rc = lan78xx_write_reg(dev, HW_CFG, saved);
-> +		/* If USB fails, there is nothing to do */
-> +		if (rc < 0)
-> +			return rc;
-> +	}
-> +	return ret;
->  }
->  
->  static int lan78xx_read_raw_otp(struct lan78xx_net *dev, u32 offset,
-> -- 
-> 2.34.1
+> To fix this, flooding is now set explicitly during bridge join/leave,
+> through sparx5_port_attr_bridge_flags():
 > 
+>     On bridge join, UC/MC/BC flooding is enabled by default.
 > 
+>     On bridge leave, UC/MC/BC flooding is disabled.
+> 
+>     sparx5_update_fwd() no longer touches the flood PGIDs, clobbering
+>     the flood masks, and desynchronizing software and hardware.
+> 
+>     Initialization of the flooding PGIDs have been moved to
+>     sparx5_start(). This is required as flooding PGIDs defaults to
+>     0x3fffffff in hardware and the initialization was previously handled
+>     in sparx5_update_fwd(), which was removed.
+> 
+> With this change, user-configured flooding flags persist across bridge
+> updates and are no longer overridden by sparx5_update_fwd().
+> 
+> Fixes: d6fce5141929 ("net: sparx5: add switching support")
+> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 
-Hi,
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-a patch that has triggered this response.  He used to manually respond
-to these common problems, but in order to save his sanity (he kept
-writing the same thing over and over, yet to different people), I was
-created.  Hopefully you will not take offence and will fix the problem
-in your patch and resubmit it so that it can be accepted into the Linux
-kernel tree.
-
-You are receiving this message because of the following common error(s)
-as indicated below:
-
-- You have marked a patch with a "Fixes:" tag for a commit that is in an
-  older released kernel, yet you do not have a cc: stable line in the
-  signed-off-by area at all, which means that the patch will not be
-  applied to any older kernel releases.  To properly fix this, please
-  follow the documented rules in the
-  Documentation/process/stable-kernel-rules.rst file for how to resolve
-  this.
-
-If you wish to discuss this problem further, or you have questions about
-how to resolve this issue, please feel free to respond to this email and
-Greg will reply once he has dug out from the pending patches received
-from other developers.
-
-thanks,
-
-greg k-h's patch email bot
 
