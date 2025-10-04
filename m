@@ -1,143 +1,154 @@
-Return-Path: <netdev+bounces-227846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D99DBB8971
-	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 06:29:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A4FD2BB89CE
+	for <lists+netdev@lfdr.de>; Sat, 04 Oct 2025 07:51:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 14A0C4E1900
-	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 04:29:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5CC5E4E140B
+	for <lists+netdev@lfdr.de>; Sat,  4 Oct 2025 05:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A431B040B;
-	Sat,  4 Oct 2025 04:29:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31AB51F2BAD;
+	Sat,  4 Oct 2025 05:51:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sAjewFjN"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YStNZktC"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4DDC2E0
-	for <netdev@vger.kernel.org>; Sat,  4 Oct 2025 04:29:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B7EEEAB;
+	Sat,  4 Oct 2025 05:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759552157; cv=none; b=uNlR+3IQg8jpcy4PcyD0CtiGNnebswy01nJ/wA5Q15EGpYlB++qGTT34wfvshlnk9gOBur/2s5F+xR29NaMoSPRgGhK8c35iHMb5TobvHV0nIOoveVdwLKJPUngJrpvrJUypY0EPCjVYsuG8a3pCZSMb+v2BL3mYqk4/8qIwK7A=
+	t=1759557084; cv=none; b=Gs8ggND15e4zEJUNgzyu0exP8WxnaIAyKMxbCaTB5SIGPX+jM66U2DuyQ9lbPouShZv28Avmk0swLANlfvuaSQmQT4dcudHyS7TJxRFGAzvoREqZQnCRZPQNDxUvlhfZV5IWZ1DK8Z2Ayd7DQ2chy+/2IMnC5NviDmzAyAiV3ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759552157; c=relaxed/simple;
-	bh=o2gOUdkDkW3TAW6ZvlWhSCeqfIezE8LGcNQsK02imjw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Afy8d6BPsXPtkI3LaFl1ETwlSjBQtM12h5jeIAly4TtPaFMtYypPklqYrWcec8R5VsGcxCLJTdMUNnxyITR+DM+fDw1EvSjB1P38wPw89mh+SKtQIMKluNOsgisEWeUlryOGw6WsHun5OqB5yKyZekqJ2VZlcJccnHwcxWk+DIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sAjewFjN; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f0cef998-0d49-4a52-b1b8-2f89b81d4b07@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1759552152;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MOXqTi3/xjR6jvJihYLZ1BSE1oIrotvd0WAQLFqtFts=;
-	b=sAjewFjNbjUBCsyTgWte7SAJEDrWTBj8yH58lHyFZtPKBnwEFIwy9x2Piq3ZIaV+RJxfZ2
-	Beh30fPkept/b3Jl84rbQT9E/Ds+U2rwn92ZdV9gUb085DAmH9bGTzJkC+yGh5zsPnurbP
-	b3r2SOs3iG7ipCOVqMxBRRlOiVRrT/U=
-Date: Fri, 3 Oct 2025 21:28:51 -0700
+	s=arc-20240116; t=1759557084; c=relaxed/simple;
+	bh=+ulMRQuWFPPzjvhYpoF92z0JmF/KhdQh5Tgtm1C3T+s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u6stxNqMLjpdbCR+1IDcJeGaVc0XO+ru6teFE6mXRSYg6IY0u+TYRxYocwrnFlfpQhffoZ2wZR6w6aPUzGOPmq2UzYEj2NVwCNZP5JC4ouAK1YZ+XDaaqLCavs3ZNWT+Y5r80DIE7STOAmIGo9v0Iml0PZi7n/sxEstS5Tr5xFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YStNZktC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1427BC4CEF1;
+	Sat,  4 Oct 2025 05:51:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1759557083;
+	bh=+ulMRQuWFPPzjvhYpoF92z0JmF/KhdQh5Tgtm1C3T+s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YStNZktCjlbmFsf9lI8VoKsUcnp1Wg5iVi9uJGTY264UuGLDVRsVREFo7LyOBQyTT
+	 Q7TereM+sySk4DeWjFWDCw69zrR7Lb0HxqbhTYqFoJcoWtwsXFUfS7heeEOW/9Z3Bq
+	 +dJWq9TvaYXD0VjbHGaJ2W856zgMxV/tmtXIr1Co=
+Date: Sat, 4 Oct 2025 07:51:20 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
+Cc: Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, khalid@kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org,
+	skhan@linuxfoundation.org, david.hunter.linux@gmail.com,
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: usb: lan78xx: Fix lost EEPROM write timeout
+ error(-ETIMEDOUT) in lan78xx_write_raw_eeprom
+Message-ID: <2025100407-devalue-overarch-afe0@gregkh>
+References: <20251004040722.82882-1-bhanuseshukumar@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] net: fix potential use-after-free in
- ch_ipsec_xfrm_add_state() callback
-To: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>,
- Ayush Sawal <ayush.sawal@chelsio.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Leon Romanovsky <leon@kernel.org>,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Cosmin Ratiu <cratiu@nvidia.com>, Harsh Jain <harsh@chelsio.com>,
- Atul Gupta <atul.gupta@chelsio.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Ganesh Goudar <ganeshgr@chelsio.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- lvc-project@linuxtesting.org
-References: <20251001111646.806130-1-Pavel.Zhigulin@kaspersky.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20251001111646.806130-1-Pavel.Zhigulin@kaspersky.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251004040722.82882-1-bhanuseshukumar@gmail.com>
 
-
-在 2025/10/1 4:16, Pavel Zhigulin 写道:
-> In ch_ipsec_xfrm_add_state() there is not check of try_module_get
-> return value. It is very unlikely, but try_module_get() could return
-> false value, which could cause use-after-free error.
->
-> This fix adds checking the result of try_module_get call
->
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
->
-> Fixes: 6dad4e8ab3ec ("chcr: Add support for Inline IPSec")
-> Signed-off-by: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>
+On Sat, Oct 04, 2025 at 09:37:22AM +0530, Bhanu Seshu Kumar Valluri wrote:
+> The function lan78xx_write_raw_eeprom failed to properly propagate EEPROM
+> write timeout errors (-ETIMEDOUT). In the timeout  fallthrough path, it first
+> attempted to restore the pin configuration for LED outputs and then
+> returned only the status of that restore operation, discarding the
+> original timeout error saved in ret.
+> 
+> As a result, callers could mistakenly treat EEPROM write operation as
+> successful even though the EEPROM write had actually timed out with no
+> or partial data write.
+> 
+> To fix this, handle errors in restoring the LED pin configuration separately.
+> If the restore succeeds, return any prior EEPROM write timeout error saved
+> in ret to the caller.
+> 
+> Suggested-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Fixes: 8b1b2ca83b20 ("net: usb: lan78xx: Improve error handling in EEPROM and OTP operations")
+> Signed-off-by: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
 > ---
->   .../net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c b/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
-> index ecd9a0bd5e18..3a5277630afa 100644
-> --- a/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
-> +++ b/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
-> @@ -35,6 +35,8 @@
->    *	Atul Gupta (atul.gupta@chelsio.com)
->    */
->
-> +#include "asm-generic/errno-base.h"
-> +#include "linux/compiler.h"
->   #define pr_fmt(fmt) "ch_ipsec: " fmt
->
->   #include <linux/kernel.h>
-> @@ -301,7 +303,8 @@ static int ch_ipsec_xfrm_add_state(struct net_device *dev,
->   		sa_entry->esn = 1;
->   	ch_ipsec_setkey(x, sa_entry);
->   	x->xso.offload_handle = (unsigned long)sa_entry;
-> -	try_module_get(THIS_MODULE);
-> +	if (unlikely(!try_module_get(THIS_MODULE)))
+>  Note:
+>  The patch is compiled and tested.
+>  The patch was suggested by Oleksij Rempel while reviewing a fix to a bug
+>  found by syzbot earlier.
+>  The review mail chain where this fix was suggested is given below.
+>  https://lore.kernel.org/all/aNzojoXK-m1Tn6Lc@pengutronix.de/
+> 
+>  drivers/net/usb/lan78xx.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+> index d75502ebbc0d..5ccbe6ae2ebe 100644
+> --- a/drivers/net/usb/lan78xx.c
+> +++ b/drivers/net/usb/lan78xx.c
+> @@ -1174,10 +1174,13 @@ static int lan78xx_write_raw_eeprom(struct lan78xx_net *dev, u32 offset,
+>  	}
+>  
+>  write_raw_eeprom_done:
+> -	if (dev->chipid == ID_REV_CHIP_ID_7800_)
+> -		return lan78xx_write_reg(dev, HW_CFG, saved);
+> -
+> -	return 0;
+> +	if (dev->chipid == ID_REV_CHIP_ID_7800_) {
+> +		int rc = lan78xx_write_reg(dev, HW_CFG, saved);
+> +		/* If USB fails, there is nothing to do */
+> +		if (rc < 0)
+> +			return rc;
+> +	}
+> +	return ret;
+>  }
+>  
+>  static int lan78xx_read_raw_otp(struct lan78xx_net *dev, u32 offset,
+> -- 
+> 2.34.1
+> 
+> 
 
-The function try_module_get() fails (returns false) only if the module 
-is in the process of being
+Hi,
 
-unloaded (i.e., module_refcount can’t be increased because the state is 
-GOING
+This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
+a patch that has triggered this response.  He used to manually respond
+to these common problems, but in order to save his sanity (he kept
+writing the same thing over and over, yet to different people), I was
+created.  Hopefully you will not take offence and will fix the problem
+in your patch and resubmit it so that it can be accepted into the Linux
+kernel tree.
 
-or UNFORMED). Otherwise, it succeeds and increments the refcount.
+You are receiving this message because of the following common error(s)
+as indicated below:
 
-When the function ch_ipsec_xfrm_add_state is called, the kernel module 
-cannot be in the GOING
+- You have marked a patch with a "Fixes:" tag for a commit that is in an
+  older released kernel, yet you do not have a cc: stable line in the
+  signed-off-by area at all, which means that the patch will not be
+  applied to any older kernel releases.  To properly fix this, please
+  follow the documented rules in the
+  Documentation/process/stable-kernel-rules.rst file for how to resolve
+  this.
 
-or UNFORMED state. In other words, within this function, it is not 
-possible for try_module_get to fail.
+If you wish to discuss this problem further, or you have questions about
+how to resolve this issue, please feel free to respond to this email and
+Greg will reply once he has dug out from the pending patches received
+from other developers.
 
-I am not sure if this check is strictly necessary, but as a defensive 
-programming measure, it still makes sense.
+thanks,
 
-Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
-
-Zhu Yanjun
-
-
-> +		res = -ENODEV;
->   out:
->   	return res;
->   }
-> --
-> 2.43.0
->
--- 
-Best Regards,
-Yanjun.Zhu
-
+greg k-h's patch email bot
 
