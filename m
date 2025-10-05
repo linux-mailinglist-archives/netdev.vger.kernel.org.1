@@ -1,199 +1,120 @@
-Return-Path: <netdev+bounces-227898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DCC6BBCC8B
-	for <lists+netdev@lfdr.de>; Sun, 05 Oct 2025 23:29:25 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64277BBCDCD
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 01:17:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7DFB5346983
-	for <lists+netdev@lfdr.de>; Sun,  5 Oct 2025 21:29:24 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1992C346FB5
+	for <lists+netdev@lfdr.de>; Sun,  5 Oct 2025 23:17:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8470283C97;
-	Sun,  5 Oct 2025 21:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A94621F428C;
+	Sun,  5 Oct 2025 23:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z7ggeLPm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="inzZ60nb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B7A1DB95E
-	for <netdev@vger.kernel.org>; Sun,  5 Oct 2025 21:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 331821E47A8
+	for <netdev@vger.kernel.org>; Sun,  5 Oct 2025 23:17:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759699761; cv=none; b=YJEgVAmeA6ij4rX3iMrbGBdFF2u1yvhuH+sxF8hBvvTuOcaBRhZLWY/oNFpnr5ITd+bgzBGq4ln/pFU9FULQEYsAah0LJ3MhHV0DD9rNXu2Er5+RZt0sUuDJ77p2zrTzfKvmfJhHiI8gnVVSV3zbM8vAezFVmm7pn59Rq2td2Uc=
+	t=1759706229; cv=none; b=SG5OD5384ilrcsbPtF4aUhdaJP6zw8I30Fwc9YIE++yyJ7o7x0wO2lL9o5y3rJREYBN+CE1riD1hI1fMo1sPF50QM2yMa4o5uRud6C5wmmJUe0TCkJPObH9fVrAAvj805quJ3E8R7MUbLA/0fa6Hw3utKMZKvRZdANlq3bSZ5Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759699761; c=relaxed/simple;
-	bh=jwBiU8rBJyfy0hIrN+9UdEqQBiAEMFjI/OXJALXj3EI=;
+	s=arc-20240116; t=1759706229; c=relaxed/simple;
+	bh=KrrXqdXW2fhh4Fjd5JBDFKjxV94MvA7vO/p8Trro7Ko=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pz3ft5tY22vG2t45wevxLippv6EUsOW2puDP8ucS3u0qvXMBNgj+6bacX8wp3B8yAkxbgs+zP6NlNUD5PaNBBZC19ss2tiJqVv37CDcnMA7LYJvYljzTY7mTGKK/HetINENaPTqdn9eVe+6VcsLFS6did4MbxC8JKFMNnlaqWrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z7ggeLPm; arc=none smtp.client-ip=209.85.160.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-30cce8c3afaso2536427fac.1
-        for <netdev@vger.kernel.org>; Sun, 05 Oct 2025 14:29:19 -0700 (PDT)
+	 To:Cc:Content-Type; b=CjbFvgTe4Dqq3ekNRANxsDQrzManyJH0aRkg4jVmyRyft9uvH7HRQtkfd670n2SpJWmXrVC/FOhLzOcus1+wKtJqUfY9N99K/l6YHeFgVuKzNNdCvPrfvmGeLsJorVUDUfOZGJ9XoAt+OGfRwvb952CZBnJNpwsENjGGs2f4fKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=inzZ60nb; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b609a32a9b6so2818326a12.2
+        for <netdev@vger.kernel.org>; Sun, 05 Oct 2025 16:17:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759699759; x=1760304559; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1759706227; x=1760311027; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6o2TOg0k6IWIl8VdR4B9mf3AL58I4LVgFxkfcM+WkCU=;
-        b=Z7ggeLPmy5hFyDBsUr/hZ45CpjeZ+kMWm/Ei+n3+pkwQ2GUZJmPfMuuCnVvvIt5KEc
-         gACVlfwQV4AVszshRh3r/YeUmh9X8mGFn+MiZAaHWtKxk7IXitnOy1ZXnjorqs25WyNU
-         OX9zsxAchl4hiTnWruqChCMG9TAv+5sCMxDm5qB9POTkyE6jkvHZlECG/1cnomQo6FRv
-         3xKjCIMdK77vALFQLym7fuyMw8r42HMP77/7CUtHXwE9f3AyGeJgJrSS6VTHGF7djrAA
-         AmaURLVNpHr0gXnbVjNOiQBmY13jZyMamHcf+ldG2i3F8xRvOhLTVVGcmPKNJ0QXcnzh
-         4YoQ==
+        bh=KrrXqdXW2fhh4Fjd5JBDFKjxV94MvA7vO/p8Trro7Ko=;
+        b=inzZ60nbFVpCYTyCN6csdwDDz0uC/bNwUbKtWAZZ4Z46EiXVtD7kCyqZBF/ZT2xks1
+         nYCjFoBaGBySunFRzR3FWpQlxTLYy/J8r9o1xmDeFCZmJiU/RhE66WI3Cx/5/RNY6Uhu
+         B7mjDIFsH1zOLYApBEJDBbux+/YpjR4q9DoQa9C/e/7n2pgHaOR+45INwYOUT+IS46wv
+         PPLyL41KRZlqRJIDuVyfc93nZTYVrTU/MJIldvs6/PjeV5box++PuX6hBaS9v/4ghGx6
+         Ylk4onIL663ntB4lO1YNuHjxl32GU6poXL2ZeLN4BRStk4BW0hKBsisDv8RQfx0V+0Y3
+         ssEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759699759; x=1760304559;
+        d=1e100.net; s=20230601; t=1759706227; x=1760311027;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6o2TOg0k6IWIl8VdR4B9mf3AL58I4LVgFxkfcM+WkCU=;
-        b=rkcZsMkIlMPdpROLtu9edOTTYy3VB7onHkCTXtR04vEAlKZ3K0eHLnqN/eB2CClWtw
-         NBlaZpsRZT8tLlbeYwK2mGjvh0tPYEX09XFB9LlBWEltFnE2ZdDSwXfUzTeCirlweu1v
-         X61y80WFpn5VT3FiMFDxVrTmw7xpCNoudfU/d5myHExP/jCw6mU6Rs0pby85bNXCf0Ll
-         0ojBnI4qfjT1yy7adKTi6GnOzqCuuVgAZcHqDZ60Ca19E9ScYfTcqiXj52FYBYM6kFW8
-         VQFrV9KwaGVTNoxFgbAmP+eNHJLxcbMczMfoR06hfGiOr9Tx8O/ZcJxfzbVAx42ECdBG
-         yXVw==
-X-Forwarded-Encrypted: i=1; AJvYcCWmZkH90HfLn4Jcp1Da1ixmNtMBT3Vl7gdLI8Gr+3xwFfapXaMzAI/STOz7m2Qz12loMDIVhbI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8hWyFhgh5GOo9Lu99PZx1e7La355VE9oLQP0qa8bfF3CRmbOP
-	Vh4lWnq9LcBdbyhQHaaBtPknAL2rjqAUlRECTeDQHJqDD3r2QNUgkAuC0ir3cgwVMwFwrJVT5Qr
-	uhWMh1pOONmhzTRT4tOKrVz5ljiNNPcs=
-X-Gm-Gg: ASbGncsJ4G45NIykcqbDjBirolZPkyVZsXb6aDvusfWTS9oz3ko7nbFy49iQmE8bsLk
-	My2KHsZQkHS705bY+Z+kqahC3HSC/1Q017fUqbUq9koWu6eDxUODzm8xn2RijehoiwB7nhMRhYY
-	jBOGaSmBXkN4K6SQbozq++JWVrFgM//yBAE0BEhlT3bHiN6UF0Sui+Vdg6pog5Rrh/LP8VWcV3r
-	7YxLjWTiz3pQXoFnq4JvGYRMlZQ+WnVcaIe/0tuTtA=
-X-Google-Smtp-Source: AGHT+IHSD/taCi9Ux6T9oOEN+76qc9NZsXUV4XRYcCBn5g+09Kgy6Q5JWqCYduGZS5k+iG7g7Y9+SQg61aT7cbUXawM=
-X-Received: by 2002:a05:6871:5823:b0:3a5:81b0:8339 with SMTP id
- 586e51a60fabf-3b1018ad4acmr5552603fac.31.1759699759141; Sun, 05 Oct 2025
- 14:29:19 -0700 (PDT)
+        bh=KrrXqdXW2fhh4Fjd5JBDFKjxV94MvA7vO/p8Trro7Ko=;
+        b=Wtpith8Fe6cuvkdlFeUl8RgWuPwrG8Xme8uEim9LvpIg2qMYzvelgx1spGqinkmS7w
+         EKlxNnTJcAGfneHXgLBvQasNZ1t1DIK+rxjbcR0mclh+UV8Z7Spmpd8YbYx81wDNqHzA
+         3GR2XAIHffpuYB7BMgKNy8EqDAvPN1fv1hKuxKnMfch7Yz128ayoYpZKm0Kys0Ql5DCM
+         Azw8usYtAPd3HQnYBRq13zd6QNSToPFINPaflR1hdMvarE1cRC9dOreb8XP4xTHyVA2Z
+         CWpnMhEWmBSBiLyd3Vdsjz79LvClna7Eeba1+ikX6DDbis7qxuzrqZw/xzdExsJLcNvC
+         Dcaw==
+X-Forwarded-Encrypted: i=1; AJvYcCX0QRvS5ms4L5cbbFEiciMJ+4jU4AJRzFYBRpyFyA/moZa3/gitUXPstx3TgP37bhy3EwYJpXs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwO6POi7cD+FDug7qnWZCww4bTueADtvf+maQ45KXYEKq/9joVY
+	zi5xxTvenAcKlg0HmXmbAo/AWz24vyG+8eXlHIDd4UbP5qNMlGpOAGu+IQS9UMRNIV29Si0ip7l
+	mI4bcZu6zTocF0JKZ5nfSNsct2Cprp/FnQ+RNbGCp
+X-Gm-Gg: ASbGnctZNyikqmQkMXo1aOlqGdToktiRAvASIX8dTjeu0F4y0l0APc08c5MGsW0w9LV
+	CALq192Ez423taiQeKzri8exjF0gmiJA9DdEPaMJUL4kXcVN6Tb2DxP5NQ/hrtdTQpEtar6TpIU
+	iVSodo3q7tUWQlOM6ORSJCx7949cD3nuT9YUgEd0N5EGY6sRIFcNZfE/PUICAhZAmlrFRc4gD1R
+	wkaT7YR+Cbk1BAEiJO+uOItuzWJKkxGpqRfgqPvgaiUqEuKA6VtTwU/CU+GfgnpELh+B8w=
+X-Google-Smtp-Source: AGHT+IFo20lh5Y3E61hV0VnnIgR/RLR4gBNddl0+XR01WWF8xQmrc2UwjGAnXB7q6fiGWr/LY0TKPeNtfPDA1u4rEpE=
+X-Received: by 2002:a17:902:cf04:b0:267:99bf:6724 with SMTP id
+ d9443c01a7336-28e9a61a8c0mr132924505ad.31.1759706227210; Sun, 05 Oct 2025
+ 16:17:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250926153311.2202648-1-sudeep.holla@arm.com>
- <2ef6360e-834f-474d-ac4d-540b8f0c0f79@amperemail.onmicrosoft.com>
- <CABb+yY2Uap0ePDmsy7x14mBJO9BnTcCKZ7EXFPdwigt5SO1LwQ@mail.gmail.com>
- <0f48a2b3-50c4-4f67-a8f6-853ad545bb00@amperemail.onmicrosoft.com>
- <CABb+yY1w-e3+s6WT2b7Ro9x9mUbtMajQOL0-Q+EHvAYAttmyaA@mail.gmail.com> <3c3d61f2-a754-4a44-a04d-54167b313aec@amperemail.onmicrosoft.com>
-In-Reply-To: <3c3d61f2-a754-4a44-a04d-54167b313aec@amperemail.onmicrosoft.com>
-From: Jassi Brar <jassisinghbrar@gmail.com>
-Date: Sun, 5 Oct 2025 16:29:08 -0500
-X-Gm-Features: AS18NWATM3rjVCftataNysY7UQuMLs5RrQDj0NVCBPWbbYhYtZsdg0yjDMjBqRU
-Message-ID: <CABb+yY2-CQj=S6FYaOq=78EuQCnpKFUqFSJV+NHdLBjS-txnAw@mail.gmail.com>
-Subject: Re: [PATCH] Revert "mailbox/pcc: support mailbox management of the
- shared buffer"
-To: Adam Young <admiyo@amperemail.onmicrosoft.com>
-Cc: Sudeep Holla <sudeep.holla@arm.com>, Adam Young <admiyo@os.amperecomputing.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251003184119.2526655-1-edumazet@google.com>
+In-Reply-To: <20251003184119.2526655-1-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Sun, 5 Oct 2025 16:16:55 -0700
+X-Gm-Features: AS18NWBbkHc1D2W-GvtGBKo2yWq6bGfUNmmlbZufB56Uoic-O6plmnDjTVgV3mQ
+Message-ID: <CAAVpQUAcJZ76Q87zTSBuBTS733-h2jC0qNN5rh2F7hoaFaOMLA@mail.gmail.com>
+Subject: Re: [PATCH net] tcp: take care of zero tp->window_clamp in tcp_set_rcvlowat()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 2, 2025 at 6:17=E2=80=AFPM Adam Young
-<admiyo@amperemail.onmicrosoft.com> wrote:
+On Fri, Oct 3, 2025 at 11:41=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
+> Some applications (like selftests/net/tcp_mmap.c) call SO_RCVLOWAT
+> on their listener, before accept().
 >
-> On 10/1/25 16:32, Jassi Brar wrote:
-> > On Wed, Oct 1, 2025 at 12:25=E2=80=AFAM Adam Young
-> > <admiyo@amperemail.onmicrosoft.com> wrote:
-> >>
-> >> On 9/29/25 20:19, Jassi Brar wrote:
-> >>> On Mon, Sep 29, 2025 at 12:11=E2=80=AFPM Adam Young
-> >>> <admiyo@amperemail.onmicrosoft.com> wrote:
-> >>>> I posted a patch that addresses a few of these issues.  Here is a to=
-p
-> >>>> level description of the isse
-> >>>>
-> >>>>
-> >>>> The correct way to use the mailbox API would be to allocate a buffer=
- for
-> >>>> the message,write the message to that buffer, and pass it in to
-> >>>> mbox_send_message.  The abstraction is designed to then provide
-> >>>> sequential access to the shared resource in order to send the messag=
-es
-> >>>> in order.  The existing PCC Mailbox implementation violated this
-> >>>> abstraction.  It requires each individual driver re-implement all of=
- the
-> >>>> sequential ordering to access the shared buffer.
-> >>>>
-> >>>> Why? Because they are all type 2 drivers, and the shared buffer is
-> >>>> 64bits in length:  32bits for signature, 16 bits for command, 16 bit=
-s
-> >>>> for status.  It would be execessive to kmalloc a buffer of this size=
-.
-> >>>>
-> >>>> This shows the shortcoming of the mailbox API.  The mailbox API assu=
-mes
-> >>>> that there is a large enough buffer passed in to only provide a void=
- *
-> >>>> pointer to the message.  Since the value is small enough to fit into=
- a
-> >>>> single register, it the mailbox abstraction could provide an
-> >>>> implementation that stored a union of a void * and word.
-> >>>>
-> >>> Mailbox api does not make assumptions about the format of message
-> >>> hence it simply asks for void*.
-> >>> Probably I don't understand your requirement, but why can't you pass =
-the pointer
-> >>> to the 'word' you want to use otherwise?
-> >>>
-> >> The mbox_send_message call will then take the pointer value that you
-> >> give it and put it in a ring buffer.  The function then returns, and t=
-he
-> >> value may be popped off the stack before the message is actually sent.
-> >> In practice we don't see this because much of the code that calls it i=
-s
-> >> blocking code, so the value stays on the stack until it is read.  Or, =
-in
-> >> the case of the PCC mailbox, the value is never read or used.  But, as
-> >> the API is designed, the memory passed into to the function should
-> >> expect to live longer than the function call, and should not be
-> >> allocated on the stack.
-> >>
-> > Mailbox api doesn't dictate the message format, so it simply accepts th=
-e message
-> > pointer from the client and passes that to the controller driver. The
-> > message, pointed
-> > to by the submitted pointer, should be available to the controller
-> > driver until transmitted.
-> > So yes, the message should be allocated either not on stack or, if on s=
-tack, not
-> > popped until tx_done. You see it as a "shortcoming" because your
-> > message is simply
-> > a word that you want to submit and be done with.
+> This has an unfortunate effect on wscale selection in
+> tcp_select_initial_window() during 3WHS.
 >
-> Yes.  There seems to be little value in doing a kmalloc for a single
-> word, but without that, the pointer needs to point to memory that lives
-> until the mailbox API is done with it, and that forces it to be a
-> blocking call.
+> For instance, tcp_mmap was negotiating wscale 4, regardless
+> of tcp_rmem[2] and sysctl_rmem_max.
 >
-> This is a  real shortcoming, as it means the that the driver must
-> completely deal with one message before the next one comes in, forcing
-> it to implement its own locking, and reducing the benefit of  the
-> Mailbox API.  the CPPC code in particular suffers from the  need to keep
-> track if reads and writes are  interleaved: this is where an API like
-> Mailbox should provide a big benefit.
+> Do not change tp->window_clamp if it is zero
+> or bigger than our computed value.
 >
-> If the mailbox API could  deal with single words of data (whatever fits
-> in a register) you could instead store that value in the ring buffer,
-> and then the mailbox API could be fire-and-forget for small messages.
+> Zero value is special, it allows tcp_select_initial_window()
+> to enable autotuning.
 >
-> I was able to get a prototype working that casts the  uint64 to void *
-> before calling mbox_send_message, and casts the  void * mssg to uint64
-> inside a modified  send_data function.  This is kinda gross, but it does
-> work. Nothing checks if these are valid pointers.
+> Note that SO_RCVLOWAT use on listener is probably not wise,
+> because tp->scaling_ratio has a default value, possibly wrong.
 >
-Even if you pass a pointer to data, what validates that it points to
-the correct message?
+> Fixes: d1361840f8c5 ("tcp: fix SO_RCVLOWAT and RCVBUF autotuning")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-API doesn't care what you submit to the controller driver - it may be a poi=
-nter
-to data or data itself.  Some drivers (ex MHU) do that, and that is
-how you could do it.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
--jassi
+Thanks!
 
