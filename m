@@ -1,157 +1,191 @@
-Return-Path: <netdev+bounces-227883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 006AEBB9416
-	for <lists+netdev@lfdr.de>; Sun, 05 Oct 2025 07:22:53 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD661BB9487
+	for <lists+netdev@lfdr.de>; Sun, 05 Oct 2025 10:12:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AB47F4E11BF
-	for <lists+netdev@lfdr.de>; Sun,  5 Oct 2025 05:22:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 248794E274F
+	for <lists+netdev@lfdr.de>; Sun,  5 Oct 2025 08:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 576C81DF73A;
-	Sun,  5 Oct 2025 05:22:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RCWjjr87"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8151F0E29;
+	Sun,  5 Oct 2025 08:12:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC75A28E9
-	for <netdev@vger.kernel.org>; Sun,  5 Oct 2025 05:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B758821
+	for <netdev@vger.kernel.org>; Sun,  5 Oct 2025 08:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759641770; cv=none; b=UnpUFkaZtkbDbz9q6CaDBRt1IBAy91eBG40GUizMaFGAPaSxjYHJcG5JjtdoRAAhX5XLSTs8Xw8Puin9Gv2PvQrKlVyqhFbo2x6TZr7Jjuxr+qKGZpxRkP2kHS/AJgy/FDjq9BynvWwm1bA7VTWtrDd3Ho5Gbs+kAvQUZOQ4Vkk=
+	t=1759651957; cv=none; b=hjwB/Sp7Hg0++iZF6HITTL+l1CAhGEGlTMEXYAQbMeb+Dk+YhIBM2hSUeHboPf8TrVMchJY56NLndeT4cVVs7zcDOTDSDKdXQGUzoxgnlUAjx/wfGrjHh3yY2lMAefqYLcItO2vxYo90aBHS2IoxKPCoufYZSv0U+9t1h6KTDxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759641770; c=relaxed/simple;
-	bh=dqOi+MY78NsDOxDex+3RbETGEFiqYs1aaeXItxShAr8=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:From:Subject:Cc:
-	 References:In-Reply-To; b=ffJJPGm9pu/KcCbB6k7ip+C/Lsoev8Ktb3EIDLyjUrlwKpB4VZEx/ZLdsHTIRS/zxSiU2fz9KlxhsDMhPdNSyZVYDp5TdoqzRSjTOL9U/83IacTRKNjnwN3/kSKZoOjQvPjBnviiUfXOztqOEA48OEH++8QeoCdksqo9n3EdQsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RCWjjr87; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-339d53f4960so632644a91.3
-        for <netdev@vger.kernel.org>; Sat, 04 Oct 2025 22:22:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759641767; x=1760246567; darn=vger.kernel.org;
-        h=in-reply-to:references:cc:subject:from:to:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bl4f3lUngLx4Rr2JAATJH0JKZYoNdISvwmWY0T8sTHM=;
-        b=RCWjjr87Rd2vecWCLnN6OxdPX0L0CntqhpnvNF8n/L6XNeqr6PerncDQbc36owty6Y
-         5Osm00lgc5ASi4057sq5KWPpKYQPNdNPb31RnsoCevJT2M/Dy97CMkYJmngJUMoZtWjH
-         xuZHdMc2NGxiAPznXuhH2rvWPlrJrIWsBJFAi8KOyKnjFLCmV/ax7wgcc3Y6lNrQo7eO
-         O5fTRm3AII7Nzcn/7MoK2aMqjHVSrBgAgT6Kg6nyoppGhvrSUc3qNBArCFKJbWBxMGwk
-         AvUwGEKPHO7pwsKN58gTLin2qX/eq6NnGKv8Z0qUEnpN9RPY1U9d+mLTxk1e+hbQcgpz
-         46vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759641767; x=1760246567;
-        h=in-reply-to:references:cc:subject:from:to:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bl4f3lUngLx4Rr2JAATJH0JKZYoNdISvwmWY0T8sTHM=;
-        b=uzVLKutR0JJ7XLaUk4y5ycIXxDGCB1K/7rHpNBQyvBZEN8c4ZudEtd58v06CIJuE6N
-         +8sWpBvZ+hdAzoMgioYubCrDSGApJDuRE8hmRLesc1fSUuT8yONnbpe1Rf1DJIaMRNG5
-         l466kVHfxvuD8dcieI2ecr5sv61nz46dKb+sMzmy9Q5TS3XPq842RwCZOViFpAgbSf8c
-         vXx/SPyij7X1AynM7LBB1EgpBeWrOy1DCe12W806DJRN81RocEhXQLQueVvaU1y+EPTs
-         TZz7+OHoO/dJIG0dgBAHZr6WhERvy5+z8sgjYEmsyD0aXca9vI7ZCxkBTgHPRlcCgagL
-         b6gQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW4GmxGPmOh7N5Wci2H6ZAGERdycPH+uilIU400frNlEb6uOpTBMeZXX6SwLCd9vkQ/vuXUaHU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzj5BgSQ8+/qLNW6p4M12DzHfUEohTbfRldsJe2vQyuxMIJ0meZ
-	UcQYXaBdaAgEdd+6qC2OalzYPdIiiY7bjNVRhwZFBtNeSh2JsLdeSNwj
-X-Gm-Gg: ASbGnctZebh+IJuTRULhkDXQUbDTPMWY27U+9G1jZGCx5JoRhyveaVgEj/G9F1QBgln
-	+j7MG2MqE7I38fbR6rW7+sxJP5VzK3nJu5ND1A59W0kSK2Bm8weRXJGSz5OhSwqh1XZW3TK7f3f
-	pqAAnYFbNP3gRcdp3poL5ZbSkFMZbNyTIJAOUkbSioHY58yOF7GNLBE5d2Kiz0UtlPMLJBRVznU
-	ulqTwcXkKQQrHgOsfRdYwwNnmcQu0Tqwje2CdG1mjF8VjmqXGRIudXf/p3eaxJSRqZENh4Jbz8j
-	cvAl+k/hLbMJTk8t1Hx3zxHeCZHR0DN/ehegpNlm2yuHpw2xEhS/offBE2Aw0jWnstSffSaABJe
-	7GvgH4tAZrIOELNo2v2QZa9usXFudtWKgkrh4+oPlAOI=
-X-Google-Smtp-Source: AGHT+IFRMPV/2tU3v8ACGpBhtXjHmMDZIjexNHZU5hi30zMXqAgqm8rywJTqpp3BUVdjaLbyzhqfkA==
-X-Received: by 2002:a17:90b:1642:b0:338:3789:6c60 with SMTP id 98e67ed59e1d1-339c27b5af3mr9660501a91.36.1759641766902;
-        Sat, 04 Oct 2025 22:22:46 -0700 (PDT)
-Received: from localhost ([175.204.162.54])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-339c4a0d50esm6732991a91.2.2025.10.04.22.22.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 04 Oct 2025 22:22:46 -0700 (PDT)
+	s=arc-20240116; t=1759651957; c=relaxed/simple;
+	bh=4AExFuaMq6f1QZpxPNj/dyNQEBY3IJ5HVdQ/MVV1ZL8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HnfytgL18/NjxS56gBiSpTu/xCotvag5YYYtSzmhr0UKwEXhRoXa7BxZgYSxkPfFucXw5Y6QyOCStJChhBBlFrwJ47UF869eltIGBJdFEVZHoVvIcJOtW5/IGLv3KTWnh/XFymXwWUe5lrUxRj/DjVJUjA1QFxUsuQ6UgF6ztlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1v5Jqh-0000xV-Ru; Sun, 05 Oct 2025 10:12:07 +0200
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1v5Jqe-0022Kc-2k;
+	Sun, 05 Oct 2025 10:12:04 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.98.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1v5Jqe-0000000Cs7z-3CsR;
+	Sun, 05 Oct 2025 10:12:04 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Hubert=20Wi=C5=9Bniewski?= <hubert.wisniewski.25632@gmail.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	stable@vger.kernel.org,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Lukas Wunner <lukas@wunner.de>,
+	Russell King <linux@armlinux.org.uk>,
+	Xu Yang <xu.yang_2@nxp.com>,
+	linux-usb@vger.kernel.org
+Subject: [PATCH net v3 1/1] net: usb: asix: hold PM usage ref to avoid PM/MDIO + RTNL deadlock
+Date: Sun,  5 Oct 2025 10:12:03 +0200
+Message-ID: <20251005081203.3067982-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date: Sun, 05 Oct 2025 14:22:43 +0900
-Message-Id: <DDA4Y2GRUHD4.1DFHX01NOJYCB@gmail.com>
-To: "Simon Horman" <horms@kernel.org>
-From: "Yeounsu Moon" <yyyynoom@gmail.com>
-Subject: Re: [PATCH net] net: dlink: handle dma_map_single() failure
- properly
-Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-X-Mailer: aerc 0.20.1
-References: <20251002152638.1165-1-yyyynoom@gmail.com>
- <20251003094424.GF2878334@horms.kernel.org>
-In-Reply-To: <20251003094424.GF2878334@horms.kernel.org>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello Simon.
+Prevent USB runtime PM (autosuspend) for AX88772* in bind.
 
-I'm currenly re-writing the code as you suggested. I think `alloc_list()`=
-=20
-can easily adopt the `goto` pattern, but for others functions, it's not=20
-that straightforward.
+usbnet enables runtime PM (autosuspend) by default, so disabling it via
+the usb_driver flag is ineffective. On AX88772B, autosuspend shows no
+measurable power saving with current driver (no link partner, admin
+up/down). The ~0.453 W -> ~0.248 W drop on v6.1 comes from phylib powering
+the PHY off on admin-down, not from USB autosuspend.
 
-My question is whether a style combining `goto`, `continue`, and `break`
-would be acceptable in this context:
+The real hazard is that with runtime PM enabled, ndo_open() (under RTNL)
+may synchronously trigger autoresume (usb_autopm_get_interface()) into
+asix_resume() while the USB PM lock is held. Resume paths then invoke
+phylink/phylib and MDIO, which also expect RTNL, leading to possible
+deadlocks or PM lock vs MDIO wake issues.
 
-```c
-	if (np->cur_rx - np->old_rx >=3D RX_RING_SIZE) {
-		printk(KERN_INFO "Try to recover rx ring exhausted...\n");
-		/* Re-allocate skbuffs to fill the descriptor ring */
-		for (; np->cur_rx - np->old_rx > 0; np->old_rx++) {
-			struct sk_buff *skb;
-			dma_addr_t addr;
-			entry =3D np->old_rx % RX_RING_SIZE;
-			/* Dropped packets don't need to re-allocate */
-			if (np->rx_skbuff[entry])
-				goto fill_entry;
+To avoid this, keep the device runtime-PM active by taking a usage
+reference in ax88772_bind() and dropping it in unbind(). A non-zero PM
+usage count blocks runtime suspend regardless of userspace policy
+(.../power/control - pm_runtime_allow/forbid), making this approach
+robust against sysfs overrides.
 
-			skb =3D netdev_alloc_skb_ip_align(dev, np->rx_buf_sz);
-			if (skb =3D=3D NULL)
-				goto out_clear_fraginfo;
+Holding a runtime-PM usage ref does not affect system-wide suspend;
+system sleep/resume callbacks continue to run as before.
 
-			addr =3D dma_map_single(&np->pdev->dev, skb->data,
-					      np->rx_buf_sz,
-					      DMA_FROM_DEVICE);
-			if (dma_mapping_error(&np->pdev->dev, addr))
-				goto out_kfree_skb;
+Fixes: 4a2c7217cd5a ("net: usb: asix: ax88772: manage PHY PM from MAC")
+Reported-by: Hubert Wiśniewski <hubert.wisniewski.25632@gmail.com>
+Closes: https://lore.kernel.org/all/DCGHG5UJT9G3.2K1GHFZ3H87T0@gmail.com
+Tested-by: Hubert Wiśniewski <hubert.wisniewski.25632@gmail.com>
+Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+Closes: https://lore.kernel.org/all/b5ea8296-f981-445d-a09a-2f389d7f6fdd@samsung.com
+Cc: stable@vger.kernel.org
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+changes v3
+- update comments and commit message
+changes v2:
+- Switch from pm_runtime_forbid()/allow() to pm_runtime_get_noresume()/put()
+  as suggested by Alan Stern, to block autosuspend robustly.
+- Reword commit message to clarify the actual deadlock condition
+  (autoresume under RTNL) as pointed out by Oliver Neukum.
+- Keep explanation in commit message, shorten in-code comment.
 
-			np->rx_skbuff[entry] =3D skb;
-			np->rx_ring[entry].fraginfo =3D cpu_to_le64(addr);
-fill_entry:
-			np->rx_ring[entry].fraginfo |=3D
-			    cpu_to_le64((u64)np->rx_buf_sz << 48);
-			np->rx_ring[entry].status =3D 0;
-			continue;
+Link to the measurement results:
+https://lore.kernel.org/all/aMkPMa650kfKfmF4@pengutronix.de/
+---
+ drivers/net/usb/asix_devices.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-out_kfree_skb:
-			dev_kfree_skb_irq(skb);
-out_clear_fraginfo:
-			np->rx_ring[entry].fraginfo =3D 0;
-			printk(KERN_INFO
-			       "%s: Still unable to re-allocate Rx skbuff.#%d\n"
-			       , dev->name, entry);
-			break;
-		} /* end for */
-	} /* end if */
-	spin_unlock_irqrestore (&np->rx_lock, flags);
-	np->timer.expires =3D jiffies + next_tick;
-	add_timer(&np->timer);
-}
-```
+diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
+index 792ddda1ad49..85bd5d845409 100644
+--- a/drivers/net/usb/asix_devices.c
++++ b/drivers/net/usb/asix_devices.c
+@@ -625,6 +625,21 @@ static void ax88772_suspend(struct usbnet *dev)
+ 		   asix_read_medium_status(dev, 1));
+ }
+ 
++/* Notes on PM callbacks and locking context:
++ *
++ * - asix_suspend()/asix_resume() are invoked for both runtime PM and
++ *   system-wide suspend/resume. For struct usb_driver the ->resume()
++ *   callback does not receive pm_message_t, so the resume type cannot
++ *   be distinguished here.
++ *
++ * - The MAC driver must hold RTNL when calling phylink interfaces such as
++ *   phylink_suspend()/resume(). Those calls will also perform MDIO I/O.
++ *
++ * - Taking RTNL and doing MDIO from a runtime-PM resume callback (while
++ *   the USB PM lock is held) is fragile. Since autosuspend brings no
++ *   measurable power saving here, we block it by holding a PM usage
++ *   reference in ax88772_bind().
++ */
+ static int asix_suspend(struct usb_interface *intf, pm_message_t message)
+ {
+ 	struct usbnet *dev = usb_get_intfdata(intf);
+@@ -919,6 +934,13 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
+ 	if (ret)
+ 		goto initphy_err;
+ 
++	/* Keep this interface runtime-PM active by taking a usage ref.
++	 * Prevents runtime suspend while bound and avoids resume paths
++	 * that could deadlock (autoresume under RTNL while USB PM lock
++	 * is held, phylink/MDIO wants RTNL).
++	 */
++	pm_runtime_get_noresume(&intf->dev);
++
+ 	return 0;
+ 
+ initphy_err:
+@@ -948,6 +970,8 @@ static void ax88772_unbind(struct usbnet *dev, struct usb_interface *intf)
+ 	phylink_destroy(priv->phylink);
+ 	ax88772_mdio_unregister(priv);
+ 	asix_rx_fixup_common_free(dev->driver_priv);
++	/* Drop the PM usage ref taken in bind() */
++	pm_runtime_put(&intf->dev);
+ }
+ 
+ static void ax88178_unbind(struct usbnet *dev, struct usb_interface *intf)
+@@ -1600,6 +1624,11 @@ static struct usb_driver asix_driver = {
+ 	.resume =	asix_resume,
+ 	.reset_resume =	asix_resume,
+ 	.disconnect =	usbnet_disconnect,
++	/* usbnet enables autosuspend by default (supports_autosuspend=1).
++	 * We keep runtime-PM active for AX88772* by taking a PM usage
++	 * reference in ax88772_bind() (pm_runtime_get_noresume()) and
++	 * dropping it in unbind(), which effectively blocks autosuspend.
++	 */
+ 	.supports_autosuspend = 1,
+ 	.disable_hub_initiated_lpm = 1,
+ };
+-- 
+2.47.3
 
-Or is there any better way to handle errors here?
-I'd appreciate your guidance.
 
