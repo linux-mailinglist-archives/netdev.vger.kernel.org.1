@@ -1,144 +1,129 @@
-Return-Path: <netdev+bounces-227915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A989BBD5F6
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 10:43:40 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E2E4BBD672
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 11:01:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23F951891D5B
-	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 08:44:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EE2294E8464
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 09:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D279261B9B;
-	Mon,  6 Oct 2025 08:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA43C2652A6;
+	Mon,  6 Oct 2025 09:01:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cJ8YUCzB"
+	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="WrJ2cpU8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911203BB5A
-	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 08:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC0C25785F;
+	Mon,  6 Oct 2025 09:00:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.244.183.115
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759740216; cv=none; b=Mu7vVaWWoGfxzsA83vB4hscmyj+5ZP6r/YfhUbmsZoWBsydabf8RlMoVubOqOS/pAo2Xp8Mw/tHxiocyIk//lQ0SctSpyElQg5PPwzeUca9D6EjKZbiT27hEocvnjSlm7n8xUTe4FesDQmRQGoF717nJb764YUbOrvEn4HjJfZU=
+	t=1759741260; cv=none; b=IqH6EmQuZust5dvOqCqeJY0nYigQFQcgkB0dz64Bjl8sE9sNAhrZLUIGt3D7COGLe5GKazNRdZ6UZ9n1rzrHZba1Ns2TcSOXP1c6g9t+jrn+pdPjh/Ygh/6e+3beveIoASFhVjmLX+Iq9ffJlR9Cf9Gj1H5ICvKUlkin26RX7VY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759740216; c=relaxed/simple;
-	bh=0rqNTIzuAUmGUZmDFajGT6N8yRPrwxMpdo1LXU+gh4k=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=rE4S0y41cE6lrv9XBXqdGuApLzuEsmqDPQJK6QIS36w3FR2jbgT7QabqZgjEJ84yTk3/JEPB1htQIyPsfqtyU9P9uhsC9PNFW9zehpSehThefIpejwNaIyT5G5a+Oe22OXQ5wVbXGySNug47mi2TnywtFQloMnKbCw2DgkSdcG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cJ8YUCzB; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-27c369f898fso54160875ad.3
-        for <netdev@vger.kernel.org>; Mon, 06 Oct 2025 01:43:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1759740214; x=1760345014; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=XbkOLsSeEc4de19QVHiox7c6UUo78PKyegeBXplGkhg=;
-        b=cJ8YUCzBb5G9PfkgAPSMa4Iy5wp8EC8wwtX5dLd6yab9UyLYGfLtlB13fZ8tkOPFCj
-         SsafTvLDf8M7ksnNllYQlRCCChJ5rrr0dDGXTAb0Ujq2BYRjhlDiWNEyOKNWN7t5mtzf
-         oyKYAh525eoDu59Xd/ecekpQkJUuh0Uzbz5rrcSnAyvVda3GKVch8xj5XeQfGGqDTuq2
-         wGgq82HHwMo8gpuB+CEk5x9Ri3FmQY4vlAHAcQ3gaa/mXcc471cdwegDcl6PFUGx2axn
-         pRprrRAUGmyvYb+BE0GTSVrGay2gZa+hhYgmHtMAzg/PRe2Pydl6H7cUB+jJwS/WbZq8
-         3rIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759740214; x=1760345014;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XbkOLsSeEc4de19QVHiox7c6UUo78PKyegeBXplGkhg=;
-        b=shlxIp6nEmBY77sGh3qe5I608e+/9FZJJJlR+IKLW7fFqURwp5e0fzf0mvTb4EeoLv
-         CWpDKlE6Cdw08guWBiU9jqz7mpUYY6M9F/brS/m7MtL6YaOwbITBvgsjL3lbfZQ6NmQ2
-         r9aZq9OGM8D01UaJhvaJ3ufCr50sh4+OWX9F4CTfuRwDvLGMkuTHfT9swmvHgcMwl0mu
-         NpdU1ghphs3LwN7eTMu8qU1yrKHWsQ8z/H0hucEvMfQgd5BP1KgeYwWs3aDz8e0clpiJ
-         Wgyj0EHTDHE/grvykiZ1eimKGNS8YAIx1fwS4pBFRXD7mtOSB0aqF9Mji24nt9pMsCeP
-         cq/g==
-X-Forwarded-Encrypted: i=1; AJvYcCXd5pPBBbjJ3/4QAAtTjASjKNW3RsutawtXa/vOqus/lzCuzlLfvtz/rj/poEfebA7dOhARgGg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKU08ONK/8X71wjJ7NEn9PQVk/wov8KYqi/deZTd+GsDnzHOTd
-	61oP1+ks93ejsdFhnt1DGu+XcIaKnTMrhLdOMYQVO2CbhM27oBYcr3K34EF5IeFrxOHYUw+6lT5
-	SvVbTUXSRmmt16o9A629SD569I8hGQV+CiT2HrqvOyA==
-X-Gm-Gg: ASbGncuWP6Md6Xfucw8gRTU0jWfCOhNNR/SvRKcrZO1Lwud8ZbHMnW9GAv7wglytXR/
-	DX5MF/YEuLctkxj30QbCU8OlfEwcxe1bq1sF5tSwe5ynzdmbFPeIOUCoc0ij26sQSW8mg7j/Zc8
-	1jy5y2QNAGh0tCduqgOzNU2cO78AtJ74GzycUbINNZqlORPR9uPAXNVQUIpqYkPt/KJGOxDkEtR
-	bPrh3azajQnSwxRuwXCpsSJSUvaYXS6m6sc1cADHF03feiN8NRZFuEAJ9W8IURyIayA1X/f5anT
-	eXWTnDJ6X6jpM4krxC9uuNoIVpArpMp8XI5AoPlUxbR/0g==
-X-Google-Smtp-Source: AGHT+IG70fTPRSenFkY+h0Ci4bsOWclGRtd5+NQm5QtlMXDZUWAfWyV7v3HpmAz+QpEftxA1fNt3+ZAYzqOOG5usHHU=
-X-Received: by 2002:a17:903:2f4c:b0:27e:d4a8:56ad with SMTP id
- d9443c01a7336-28e9a6a2eb6mr138892325ad.61.1759740213842; Mon, 06 Oct 2025
- 01:43:33 -0700 (PDT)
+	s=arc-20240116; t=1759741260; c=relaxed/simple;
+	bh=3yL/MhIsstwXpp2kQreRg3k8ycTGLBAeFgRtPXuUXJk=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=HD+fvEL+MsTVZOXO/N+8diQYaNmTOZUuk/gJqtX3x7z2sOfxQRYTOOUPXOTHKnuuBOQLeViHtmokPYnvuzPQHXt+/1trYrfvkrhHjYxm23qTkDcfETvhPEiCcNmluLjgvOZ1mA3itD7VNKp+4pVWoriY/ADpbEUSVHtv6tFfCA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=WrJ2cpU8; arc=none smtp.client-ip=91.244.183.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infotecs.ru
+Received: from mx0.infotecs-nt (localhost [127.0.0.1])
+	by mx0.infotecs.ru (Postfix) with ESMTP id BE5BF111B77C;
+	Mon,  6 Oct 2025 11:53:17 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru BE5BF111B77C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
+	t=1759740798; bh=K//1oiUz0yl4wjuaNs+08F7DIiqQSpK/jGrr8MbB2P4=;
+	h=From:To:CC:Subject:Date:From;
+	b=WrJ2cpU8NKL7cB7l5/5n4nbRDTy8frsC0wYWG/eMrZZ8ecgw5+0GXMZsrOidpzUW3
+	 CIkdvBPyBefibpobjX6c+/HzKB9nf9v5NTa1f1rpR+lQ/StbwUMf8Sb78b6FxcQ5d4
+	 mIVMPW2pqlVrDKQ9qmothE5GkRjNySUKgX89RmUg=
+Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
+	by mx0.infotecs-nt (Postfix) with ESMTP id BB16230FC54C;
+	Mon,  6 Oct 2025 11:53:17 +0300 (MSK)
+From: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
+To: Magnus Karlsson <magnus.karlsson@intel.com>
+CC: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Stanislav Fomichev
+	<sdf@fomichev.me>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "Jesper Dangaard
+ Brouer" <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, "Song
+ Yoong Siang" <yoong.siang.song@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: [PATCH net] xsk: Fix overflow in descriptor validation@@
+Thread-Topic: [PATCH net] xsk: Fix overflow in descriptor validation@@
+Thread-Index: AQHcNp6oT200QhNWsUqu3koqEXW7oA==
+Date: Mon, 6 Oct 2025 08:53:17 +0000
+Message-ID: <20251006085316.470279-1-Ilia.Gavrilov@infotecs.ru>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Mon, 6 Oct 2025 14:13:22 +0530
-X-Gm-Features: AS18NWA6yLhMUIQR5RWLa0LAv-ggCbP2Rb4RY4ONcT6ZxSvFVMy57u3jDGKEbJ4
-Message-ID: <CA+G9fYsZvF1f25x10oL=Gs=+f_AFmaUFtUT8Qs1bXugEaJeoMA@mail.gmail.com>
-Subject: next-20250102: arm64: gcc-8-defconfig: Assembler messages: Error:
- unknown architectural extension `simd;'
-To: linux-rdma@vger.kernel.org, Netdev <netdev@vger.kernel.org>, 
-	Linux ARM <linux-arm-kernel@lists.infradead.org>, 
-	open list <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org, 
-	Linux Regressions <regressions@lists.linux.dev>
-Cc: Ard Biesheuvel <ardb@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Patrisious Haddad <phaddad@nvidia.com>, Michael Guralnik <michaelgur@nvidia.com>, 
-	Moshe Shemesh <moshe@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, Anders Roxell <anders.roxell@linaro.org>, 
-	Ben Copeland <benjamin.copeland@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+X-KLMS-Rule-ID: 5
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2025/10/06 07:29:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2025/10/06 03:07:00 #27884785
+X-KLMS-AntiVirus-Status: Clean, skipped
 
-The arm64 defconfig builds failed on the Linux next-20251002 tag build due
-to following build warnings / errors with gcc-8 toolchain.
+The desc->len value can be set up to U32_MAX. If umem tx_metadata_len
+option is also set, then the value of the expression
+'desc->len + pool->tx_metadata_len' can overflow and validation
+of the incorrect descriptor will be successfully passed.
+This can lead to a subsequent chain of arithmetic overflows
+in the xsk_build_skb() function and incorrect sk_buff allocation.
 
-* arm64, build
-  - gcc-8-defconfig
+Found by InfoTeCS on behalf of Linux Verification Center
+(linuxtesting.org) with SVACE.
 
-First seen on next-20251002
-Good: next-20250929
-Bad: next-20251002..next-20251003
+Fixes: 341ac980eab9 ("xsk: Support tx_metadata_len")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
+---
+ net/xdp/xsk_queue.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Regression Analysis:
-- New regression? yes
-- Reproducibility? yes
-
-Build regression: next-20250102: arm64: gcc-8-defconfig: Assembler
-messages: Error: unknown architectural extension `simd;'
-
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-
-### Build error log
-/tmp/cclfMnj9.s: Assembler messages:
-/tmp/cclfMnj9.s:656: Error: unknown architectural extension `simd;'
-make[8]: *** [scripts/Makefile.build:287:
-drivers/net/ethernet/mellanox/mlx5/core/wc.o] Error 1
-
-Suspecting commit,
-$ git blame -L 269 drivers/net/ethernet/mellanox/mlx5/core/wc.c
-fd8c8216648cd8 (Patrisious Haddad 2025-09-29 00:08:08 +0300 269)
-         (".arch_extension simd;\n\t"
-fd8c8216648cd net/mlx5: Improve write-combining test reliability for
-ARM64 Grace CPUs
-
-## Source
-* Kernel version: 6.17.0
-* Git tree: https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
-* Git commit: 47a8d4b89844f5974f634b4189a39d5ccbacd81c
-* Architectures: arm64
-* Toolchains: gcc-8
-* Kconfigs: defconfig
-
-## Build
-* Build log: https://storage.tuxsuite.com/public/linaro/lkft/builds/33YUHcFKTLSBTOxNIJqF9vJqcxt/build.log
-* Build details:
-https://regressions.linaro.org/lkft/linux-next-master/next-20251003/build/gcc-8-defconfig/
-* Build plan: https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/builds/33YUHcFKTLSBTOxNIJqF9vJqcxt
-* Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/33YUHcFKTLSBTOxNIJqF9vJqcxt/
-* Kernel config:
-https://storage.tuxsuite.com/public/linaro/lkft/builds/33YUHcFKTLSBTOxNIJqF9vJqcxt/config
-
---
-Linaro LKFT
+diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
+index f16f390370dc..b206a8839b39 100644
+--- a/net/xdp/xsk_queue.h
++++ b/net/xdp/xsk_queue.h
+@@ -144,7 +144,7 @@ static inline bool xp_aligned_validate_desc(struct xsk_=
+buff_pool *pool,
+ 					    struct xdp_desc *desc)
+ {
+ 	u64 addr =3D desc->addr - pool->tx_metadata_len;
+-	u64 len =3D desc->len + pool->tx_metadata_len;
++	u64 len =3D (u64)desc->len + pool->tx_metadata_len;
+ 	u64 offset =3D addr & (pool->chunk_size - 1);
+=20
+ 	if (!desc->len)
+@@ -165,7 +165,7 @@ static inline bool xp_unaligned_validate_desc(struct xs=
+k_buff_pool *pool,
+ 					      struct xdp_desc *desc)
+ {
+ 	u64 addr =3D xp_unaligned_add_offset_to_addr(desc->addr) - pool->tx_metad=
+ata_len;
+-	u64 len =3D desc->len + pool->tx_metadata_len;
++	u64 len =3D (u64)desc->len + pool->tx_metadata_len;
+=20
+ 	if (!desc->len)
+ 		return false;
+--=20
+2.39.5
 
