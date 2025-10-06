@@ -1,128 +1,109 @@
-Return-Path: <netdev+bounces-227900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5985FBBCE09
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 01:35:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2FE8BBD02F
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 05:54:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3E84D4E4B13
-	for <lists+netdev@lfdr.de>; Sun,  5 Oct 2025 23:35:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A95C61892356
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 03:55:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97E61DF75A;
-	Sun,  5 Oct 2025 23:35:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ecSn6Kes"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD4819049B;
+	Mon,  6 Oct 2025 03:54:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3D33FC7
-	for <netdev@vger.kernel.org>; Sun,  5 Oct 2025 23:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511C378C9C;
+	Mon,  6 Oct 2025 03:54:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759707304; cv=none; b=N4QTGBu3kTfCIbFY9aZzT40Cbp1Gf1mzzEPk8X94OZ2Wg4luBwOrLenPJl4qCr19V3NvhoGDSkJ7G9izjJM7E6kz7dkfl5i/Uq4gJATyzKgQsO2+BmgY12VR/bRvGvAdGq9iY8IttmFtHk7879FM9k074FqX65rRBjO4iy5jix8=
+	t=1759722895; cv=none; b=M0zHqZTZGSsY6gRMp1/GsZMnZ5tudQTE0TapJH/MvkpDq693imlj0Vq70sXYxgMCoZDTswfO8XhpIwpvqmtGEvhr6KOO4ashr1QNIGXZHXTP4Hyjhc/qSaQ3ex0joXEVF/fxDpIhfOKOXg7oBlCyC4C/k94MHHblUu8h/ZGb82I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759707304; c=relaxed/simple;
-	bh=xotqYMZ9YU+BENzKLK/pOhIYZLLAFb3btLyE5+SSasE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I43wpiv2P4DTnbTCagTaSGExJpzUwURFTbWSKxoO1b5HOVbVfAO8nJ7Srxcbt1uz7EQRC17+8La/I06DWfzyxc3IUhjSPm4QQgQ7mDPK0oj8mbnRFI4qqJiTsQXvkjcYFoxQ0HjXDMZznm8UOC/s6h09vQ9mAaMpybS36Q+Gr80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ecSn6Kes; arc=none smtp.client-ip=209.85.160.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-3ac1ad95537so2697659fac.2
-        for <netdev@vger.kernel.org>; Sun, 05 Oct 2025 16:35:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759707302; x=1760312102; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HhShwqm3gQjPZCNm6kW8lvYi/GZrLquVLhihvLMlVd0=;
-        b=ecSn6KeseTrlyh5GyU5g50WqJ0S4/KrTpup3frDgO9iFoTX05SaojjQb2H2p5lP58F
-         tXjdrkO2kXy0CvDIHWM4+4/pbmuxkLlvaf/P6IEgeLgL4vuB5Qe8iJHr7LFPk05qvYjk
-         Ebt1VaXycGCoA3Hx85m0wZ4CoslgecLtnLzzXqqjKu6owCBosXYCXpFr1NZt8nwsd16A
-         PMIR4hdFF2xgTAg8nwQtDW6jWeCsu5YXTdw3mZzflrYUqXOLqHV6QaKLFKB0T+jw5DI9
-         qjtLXJTDJnNmFftRXeh8ECY/3qUmZdln40a7sSGfSFMuyFBhRfjan9+wNrRbWMaSvvrs
-         Ovfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759707302; x=1760312102;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HhShwqm3gQjPZCNm6kW8lvYi/GZrLquVLhihvLMlVd0=;
-        b=WiJ1ibVUIKpDAMtr4GegKca7KOaUSgaRzxQ4N0OKjCyHAIkkqhri7ch60WLbjPetlc
-         P+PNy3zFtNc5n3W/Wma/t2qUzTEw17l7zxVEWVwkhaftxOITtEWT+u+IBHuXaU+NyDuE
-         hCBw7XDmducNANlbjedHZ/Aqd6cEgC29E18cUf9JPcArk8KS4J7IpqfbC6Bpxk35e46M
-         zt6IM5tFmiYXCXY/3/t1WzIDNAuStu+dhGiliFIjsNXNvtr+aSTYV0ozLIHOyWvrVKGR
-         nUg0+jq7ef70zK98BDDggQt6SMBcgVWJC7yfC8dQIgsiHRFsE4d2bpqWI1zsPejASPil
-         Akkg==
-X-Forwarded-Encrypted: i=1; AJvYcCXUtiDG0d11jyORAmpdJIOyWVMvtFFB37naw+3rGqqgSlGVP6pr640CF5mZgwv5tN7SQyeMrAo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yydu+4RJz6rf8NllRQ8MGuvJ7zLdTiYTphtAv3Zefp0Dde4Hc7u
-	sYfZL69GeFrcpGSEWGAkQ8awTYIeTW7gLgZa5XLMUoLQiO3IUf1/LPwbD4hGEMrqAReWccI6heh
-	Xg/ui98zYDNtHkM5whmNNhFokJGIJqC4=
-X-Gm-Gg: ASbGnct9PuC0lwm7FM8LpEBsC8ul4+AfSTJMjHg+vhbBTky/c1LilVR/zZmWDM/SncB
-	OHiputjToLpOZOuLeFoaTiRVgsNROlL+SaPQs0YeCDWHSK6AJ7JzzVGaoUULbmUAj+liVGwjn+Y
-	BmmwG7PRIEwuqXVRKmqneZQPrv+jjeaYkGQvVElmx4PJ6CqAjC3cMFWJDxuBrM/rYBhfK8NqSxN
-	wWIh5d8YIw9GxXRjhUufQLAC89QCt+U
-X-Google-Smtp-Source: AGHT+IHNBEUFJrzq7L+vyOQnFIA/X6Ux7K/Ubqa/yHibi5O0wEDjYIV/UxBlQ3Ph6gNT9/IRlo4z4Kw4f4yFvUQoZ90=
-X-Received: by 2002:a05:6871:522a:b0:2a3:832e:5492 with SMTP id
- 586e51a60fabf-3b1019a23c2mr6009274fac.25.1759707302293; Sun, 05 Oct 2025
- 16:35:02 -0700 (PDT)
+	s=arc-20240116; t=1759722895; c=relaxed/simple;
+	bh=gqLcQ7RqXkovZeXFiaAwJnyASFvXFRIXCS/zaEP80gg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GhdRUZFb+XZKnIJOTR5Y3B6al9+CcrEfvPRXTTLeV2E9MPlwSOASYgZbm+EXuzWvrbWLWnOG7GcsIXJi9KchpwoPECp0LgPq5B2kDHD+os62qwfuoOOMDaGVvuJ1nPjbC2poX19B+4sGpbRT+peT2T5PUDEqw3Rpmc0Exal30B4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 786a6412a26711f0a38c85956e01ac42-20251006
+X-CID-CACHE: Type:Local,Time:202510061127+08,HitQuantity:1
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.3,REQID:4024681a-9057-48ca-acb3-5b95a563ea86,IP:0,UR
+	L:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-25
+X-CID-META: VersionHash:f1326cf,CLOUDID:fba4adf866208d8802773314a9dcaa41,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:nil,UR
+	L:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,S
+	PR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 786a6412a26711f0a38c85956e01ac42-20251006
+X-User: lilinmao@kylinos.cn
+Received: from llmserver.local [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <lilinmao@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1154822787; Mon, 06 Oct 2025 11:49:33 +0800
+From: lilinmao <lilinmao@kylinos.cn>
+To: hkallweit1@gmail.com,
+	nic_swsd@realtek.com
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Linmao Li <lilinmao@kylinos.cn>
+Subject: [PATCH] r8169: fix packet truncation after S4 resume on RTL8168H/RTL8111H
+Date: Mon,  6 Oct 2025 11:49:08 +0800
+Message-Id: <20251006034908.2290579-1-lilinmao@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250925190027.147405-1-admiyo@os.amperecomputing.com>
- <20250925190027.147405-2-admiyo@os.amperecomputing.com> <5dacc0c7-0399-4363-ba9c-944a95afab20@amperemail.onmicrosoft.com>
-In-Reply-To: <5dacc0c7-0399-4363-ba9c-944a95afab20@amperemail.onmicrosoft.com>
-From: Jassi Brar <jassisinghbrar@gmail.com>
-Date: Sun, 5 Oct 2025 18:34:51 -0500
-X-Gm-Features: AS18NWAFTrUrjHeUPhL2GLVdXXxvEsjDWhS5snu-HQnkYOkoSt4zyImcUMAWSss
-Message-ID: <CABb+yY3T6LdPoGysNAyNr_EgCAcq2Vxz3V1ReDgF_fGYcqRrbw@mail.gmail.com>
-Subject: Re: [PATCH net-next v29 1/3] mailbox: add callback function for rx
- buffer allocation
-To: Adam Young <admiyo@amperemail.onmicrosoft.com>
-Cc: Adam Young <admiyo@os.amperecomputing.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Jeremy Kerr <jk@codeconstruct.com.au>, 
-	Matt Johnston <matt@codeconstruct.com.au>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Sudeep Holla <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Huisong Li <lihuisong@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sun, Oct 5, 2025 at 12:13=E2=80=AFAM Adam Young
-<admiyo@amperemail.onmicrosoft.com> wrote:
->
-> Jassi, this one needs your attention specifically.
->
-> Do you have an issue with adding this callback?  I think it will add an
-> important ability to the receive path for the mailbox API: letting the
-> client driver specify how to allocate the memory that the message is
-> coming in.  For general purpose mechanisms like PCC, this is essential:
-> the mailbox cannot know all of the different formats that the drivers
-> are going to require.  For example, the same system might have MPAM
-> (Memory Protection) and MCTP (Network Protocol) driven by the same PCC
-> Mailbox.
->
-Looking at the existing code, I am not even sure if rx_alloc() is needed at=
- all.
+From: Linmao Li <lilinmao@kylinos.cn>
 
-Let me explain...
-1) write_response, via rx_alloc, is basically asking the client to
-allocate a buffer of length parsed from the pcc header in shmem.
-2) write_response is called from isr and even before the
-mbox_chan_received_data() call.
+After resume from S4 (hibernate), RTL8168H/RTL8111H truncates incoming
+packets. Packet captures show messages like "IP truncated-ip - 146 bytes
+missing!".
 
-Why can't you get rid of write_response() and simply call
-    mbox_chan_received_data(chan, pchan->chan.shmem)
-for the client to allocate and memcpy_fromio itself?
-Ideally, the client should have the buffer pre-allocated and only have
-to copy the data into it, but even if not it will still not be worse
-than what you currently have.
+The issue is caused by RxConfig not being properly re-initialized after
+resume. Re-initializing the RxConfig register before the chip
+re-initialization sequence avoids the truncation and restores correct
+packet reception.
 
--jassi
+This follows the same pattern as commit ef9da46ddef0 ("r8169: fix data
+corruption issue on RTL8402").
+
+Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
+---
+ drivers/net/ethernet/realtek/r8169_main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 9c601f271c02..4b0ac73565ea 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -4994,8 +4994,9 @@ static int rtl8169_resume(struct device *device)
+ 	if (!device_may_wakeup(tp_to_dev(tp)))
+ 		clk_prepare_enable(tp->clk);
+ 
+-	/* Reportedly at least Asus X453MA truncates packets otherwise */
+-	if (tp->mac_version == RTL_GIGA_MAC_VER_37)
++	/* Some chip versions may truncate packets without this initialization */
++	if (tp->mac_version == RTL_GIGA_MAC_VER_37 ||
++	    tp->mac_version == RTL_GIGA_MAC_VER_46)
+ 		rtl_init_rxcfg(tp);
+ 
+ 	return rtl8169_runtime_resume(device);
+-- 
+2.25.1
+
 
