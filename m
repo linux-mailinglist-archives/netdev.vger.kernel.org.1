@@ -1,119 +1,85 @@
-Return-Path: <netdev+bounces-227960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5AD3BBE187
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 14:50:41 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3815BBE199
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 14:55:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A70DF1896FD9
-	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 12:51:04 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B6AF34E447A
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 12:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A1A5283C8E;
-	Mon,  6 Oct 2025 12:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B5E1EC01B;
+	Mon,  6 Oct 2025 12:55:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lEn2B4uw"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kjAcDW8X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D2423184A;
-	Mon,  6 Oct 2025 12:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA3D199237
+	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 12:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759755038; cv=none; b=Cf8zttqeEPs8KZCAypz13o6kObVNTX6A9uKmmjGU3YZhYYVPjQzoHzeHn22w9OdE4ZuvPO/5TxWDieFSPbY9a7oLE7n/XXGJqvqygpZMmVsPfXy1+Hc1UmlO+NaWg0vGWXwtFv7MLnmGiUJiON9rFJd2aSP/fIbbBWOcmLRA0Rc=
+	t=1759755335; cv=none; b=YiZ2AMHBjEp6ej1bDhmF4nhWgkorqGGb84iaeQhkt9gbh6LuZmA71xunbEOsTwgQPjeNQIbRHy4R8l7iMDXM/9ZGVlQGvPw0p1HAqrRa4sY3eOWP+PkQyJspJN9NOcjrgB1ctY6nntP3iwGWlbYnZOu5/RR0BUgB7k/CYkfKjDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759755038; c=relaxed/simple;
-	bh=kYiKWQmzMbtUkllnAm349wrPB8WGu76wtpaFtalnQlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TK2t9zmKJtSX/iHdZXvigxQZ1uxNsXSYs6WcHKPpmfsViSdh6PU4YZ0IaInaDH1vHhtncDSvZNKvWy2RlnGl4a5VS2a5urf8kaSYyUwp4nrPTaNPjwyFQT2HNMFAX8Doe7fm3B6k86qcHTphWBjDIAiE9DcJJYw5k0wNuTbAtEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lEn2B4uw; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 4144EC085C8;
-	Mon,  6 Oct 2025 12:50:15 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 72AA8606B7;
-	Mon,  6 Oct 2025 12:50:33 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0EDC2102F1D5F;
-	Mon,  6 Oct 2025 14:50:30 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1759755032; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=HcH66wMM4eQ4Whyz8ULRoHgYEmdhg12oyr1b9VLT23k=;
-	b=lEn2B4uwQ9/yNySE7aT/KZZc9y/3R29djf1x3iSE7eHt2m9b5f2WvDpP73Wgg+dvFVhzz+
-	xXT8N0ASk7bj7ODV70wxxuOrZ15c/ee7FfgY945NAEbEDtG5oOVcq1QQN69H//NlbyAmZf
-	6EvjYFPHxQ6zkLIa79fgqDZlIYfw2arHqQhkxxPaS0wmiLiDEJ2un14DbV+Y+9qusYIJkf
-	0f2LICmx8q/OK40MymvJkhqVM9rfj6huaPY/jSoB4F2Rnh9yz1kyCmnU20D5gj9EYi4qV8
-	IQUquvyAeLp/L+ToTdRtZjk3zvWeq+fvRynQUGIGBuAe4ENT3KHfqxtcyubVpg==
-Date: Mon, 6 Oct 2025 14:50:29 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Thomas Wismer <thomas@wismer.xyz>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Thomas Wismer <thomas.wismer@scs.ch>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] net: pse-pd: tps23881: Fix current measurement
- scaling
-Message-ID: <20251006144911.702fed49@kmaincent-XPS-13-7390>
-In-Reply-To: <20251004180351.118779-4-thomas@wismer.xyz>
-References: <20251004180351.118779-2-thomas@wismer.xyz>
-	<20251004180351.118779-4-thomas@wismer.xyz>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1759755335; c=relaxed/simple;
+	bh=K+DTEbaga8u67QDTCN1KtKkJg4l3lW06F/m1RcQHKV4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bjXDKZPiWGPpQl65OGxR5Ekv4PoGFZ4qYCmHanjIT7L4BFujiDnF3T2VlnVH1o65rfCpxeJ+o0Pxxc79a87igEyaWilmX8k5bF3s45R/QHEmqWKKJIzoeEYqbvD9mMSNW2bW8nWVBu8C4w1lLrKRoOykdrwXByBOOt9yKHS8KW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kjAcDW8X; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <ea0c839e-d0a7-450d-abd7-0a787804b415@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1759755330;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GOT2f+EOgnxJglkhi0yG44lmilb8ArnG4GdJrsCBkGM=;
+	b=kjAcDW8Xrf7XfBc9w2/U+YgBkeYoI+EqQ0b/IZL6p1WE3RCRDyJZTVa4LwUfO0tg+W+0Sp
+	z36skjmvquJG/YtsLoSY5KOSH/LBB+/g4ame0vzWVJbN7uJ6jONpgOimpH0sSyDH8VK8Mn
+	MLQGlmJpZYdNQmAXMnBFpk5U0Ry9fg4=
+Date: Mon, 6 Oct 2025 13:55:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Subject: Re: [PATCH ethtool-next] netlink: tsconfig: add HW time stamping
+ configuration
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: mkubecek@suse.cz, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+References: <20251004202715.9238-1-vadim.fedorenko@linux.dev>
+ <20251006144512.003d4d13@kmaincent-XPS-13-7390>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20251006144512.003d4d13@kmaincent-XPS-13-7390>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat,  4 Oct 2025 20:03:49 +0200
-Thomas Wismer <thomas@wismer.xyz> wrote:
+On 06/10/2025 13:45, Kory Maincent wrote:
+> On Sat,  4 Oct 2025 20:27:15 +0000
+> Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
+> 
+>> The kernel supports configuring HW time stamping modes via netlink
+>> messages, but previous implementation added support for HW time stamping
+>> source configuration. Add support to configure TX/RX time stamping.
+> 
+> For the information, I didn't add this support because it kind of conflict with
+> ptp4l which is already configuring this. So if you set it with ethtool, running
+> ptp4l will change it. I am not really a PTP user so maybe I missed cases where
+> we need these hwtstamp config change without using ptp4l.
 
-> From: Thomas Wismer <thomas.wismer@scs.ch>
->=20
-> The TPS23881 improves on the TPS23880 with current sense resistors reduced
-> from 255 mOhm to 200 mOhm. This has a direct impact on the scaling of the
-> current measurement. However, the latest TPS23881 data sheet from May 2023
-> still shows the scaling of the TPS23880 model.
-
-Didn't know that. Where did you get that new current step value if it's not
-from the datasheet?
-
-Also as the value reported was wrong maybe we need a fix tag here and send =
-it
-to net instead of net-next.
-=20
-> Signed-off-by: Thomas Wismer <thomas.wismer@scs.ch>
-> ---
->  drivers/net/pse-pd/tps23881.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
-> index 63f8f43062bc..b724b222ab44 100644
-> --- a/drivers/net/pse-pd/tps23881.c
-> +++ b/drivers/net/pse-pd/tps23881.c
-> @@ -62,7 +62,7 @@
->  #define TPS23881_REG_SRAM_DATA	0x61
-> =20
->  #define TPS23881_UV_STEP	3662
-> -#define TPS23881_NA_STEP	70190
-> +#define TPS23881_NA_STEP	89500
->  #define TPS23881_MW_STEP	500
->  #define TPS23881_MIN_PI_PW_LIMIT_MW	2000
-> =20
+Well, it's more about ability to configure HW time stamping by users.
+Running software will potentially change the configuration anyways, but
+it maybe helpful to test different HW configurations without changing
+the software itself.
 
 
-
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
