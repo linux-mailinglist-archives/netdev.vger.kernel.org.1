@@ -1,78 +1,174 @@
-Return-Path: <netdev+bounces-227995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E054BBEDBF
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 19:55:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E1D0BBEDDF
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 19:58:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7000F189AD13
-	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 17:55:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 164AE189B27D
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 17:58:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE2162D8789;
-	Mon,  6 Oct 2025 17:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C68A2D47E9;
+	Mon,  6 Oct 2025 17:58:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YVBibZdm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iZpwPKNe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89B172D6E4B
-	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 17:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE122C374B
+	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 17:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759773308; cv=none; b=TjtQNxWKKHSiVshSVnUdsqjAGF9eDulobtTWgZz6/246oQXk56nB40TV/GaLEfh1HgZREcZMdHQu16le82nY2xv1NDQwhwZV+RfDs1dtHVYkMroEiYRFXva151EMAylylKkhYxPl6j8U/ZuvttPPxMlSy0PUL37w/Jtm7RVL0Fw=
+	t=1759773507; cv=none; b=HCiOIqzqtlfQxQdwdxWCxNY7UeULD6cXs+5wt0wmpalS8r44a3PMUa3t8SvcIktJwVqi+bbijmuMFm3iFnnaux23zFkDJ+WWyy2NMA5+6dldAy+NDJvDTtUXi5k/PJdKcr77U2fzYADiasD7oPALV0QHSJOFa+FUKnKuliEmY8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759773308; c=relaxed/simple;
-	bh=JuGaA7BF6zBP+b+TjShk1ikztH8dCKjQPcPmVvj/tW8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BcD6lV7R2J46ozZQDYWOedN+gF8Sb96VcwQyTaL3OtpHAXe5bF897I7ZnnOf9bBonJ/OCO55INnmbayrp1vYrH4bxBJoOV5XfkJ0M4vDmpItQlGGoQEJXqShTrkHOJLOIJPaZcy3OZqbqCxySM3t+Cbv/hAo46HFAcdm4op9yV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YVBibZdm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1511C4CEF5;
-	Mon,  6 Oct 2025 17:55:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759773304;
-	bh=JuGaA7BF6zBP+b+TjShk1ikztH8dCKjQPcPmVvj/tW8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YVBibZdmiR+8epRFT6MyHPAzZS2yxp3i60eVkacSZeXNzQTUwVAZ74rE88jyWUrIB
-	 l+/H+csO0OVDKaATTy7IC+iwT96TUzjk8r9rZt5mQuGlXQ5vKDNcv3qgpJkdwnb6fK
-	 ldiyWaE7LGL/3hCSytsy+IIOO1mgAnH8086VdgBvSgPKFlcCJnvavveBbpYCwxBSTC
-	 embhOZ68S6NRupgwEdR+IJyfiNtas3Z6GebcmGhdoF3mo3joF47P6K6EVr3GkAj2Rw
-	 84u/QGhtYMi6WeCss1t/AeKHn+nW4ClcyEZIi+BPPUo2SSyQYwe5oTk5/hMWD/dwh5
-	 ZKQX1v4BsAcHA==
-Date: Mon, 6 Oct 2025 10:55:03 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, mkubecek@suse.cz,
- netdev@vger.kernel.org
-Subject: Re: [PATCH ethtool-next] netlink: tsconfig: add HW time stamping
- configuration
-Message-ID: <20251006105503.6ca81618@kernel.org>
-In-Reply-To: <20251006144512.003d4d13@kmaincent-XPS-13-7390>
-References: <20251004202715.9238-1-vadim.fedorenko@linux.dev>
-	<20251006144512.003d4d13@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1759773507; c=relaxed/simple;
+	bh=2s6Vu9HptHi8brHsjOwU+GMEtg9JzaHeZrmyolZdHTw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Rkjj0iqIYkIf/S10rMhGu+AesVtIDP+Y3QIdZGsjjdoLtMlndvqJOe6ElwHu0RddHgGKlrfv7Wh8p9K9IfwMlM3SxYHVA+QSwu/hpkEUHz5rzrnjY22l9k4EycKA/nWI6iepLNaLbzg622t2uRo4h+HeGMqgp7RbyvD14I8rM4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iZpwPKNe; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3ed20bdfdffso4495537f8f.2
+        for <netdev@vger.kernel.org>; Mon, 06 Oct 2025 10:58:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759773504; x=1760378304; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zKxK+k9ZFezA+8toT2ywb+Xvx0zuZRB0gEIi60pQ7VA=;
+        b=iZpwPKNe78itT4K6u4fVSo45Govxcj1vKKc/UZUQ7229KcbuG9SrOvjFn0jQO2/5lc
+         jwPgwe6t4hbAOK8xE+gzjdfKKMObKU6O+fuIsmq2+KlzikhfnzSxhAGiefKcYo40h+PB
+         xEvZmxbCZlAH1FAxVZwsuLbOn+l3SQZ+4W15wtDTBsHpUSUAaGdVY9Xy1JZSMqr2OVYN
+         ekjI+QftQNs+sYnA0Myyi8ju5dnE1B9+MVFVETFAp+zHMFyW8LVBkv5w5SaGiAgFqeVe
+         TES8sX0skb73GIBpc6Sj8Cvtnmv8oHTxEVu42fPlYv9Kb7bI/AL8IXjSQnkls6vMmwFd
+         uvmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759773504; x=1760378304;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zKxK+k9ZFezA+8toT2ywb+Xvx0zuZRB0gEIi60pQ7VA=;
+        b=BTETE7CkPjz8WCHe7wJpcYb4p0wOV/RBcOHr7UF9j1cwWWSaglu3UZ4RSc1Yr6h8Rw
+         VD0fgaRJ6/9bsS47VarTfJoKXUJ3tf5scb7fHYqM4eDe/4wXSPxnk2wAHDQUPGJU+X20
+         g5IVustpZn2AepR6bsoRIXpG+4yh25l0xJCBkz6i/PqT0hwIKBzMIa7R+TXYAtDMc47w
+         /mmF8dycN8yWpgPWKFvi0Px0xDxdwTZny/7RBVWqWwc/koB3xMk8YYyeJmeDP8hECNNn
+         wUNN0ZSO+wVxmOQD6kmXtKzP+AZdO+s2TMKEdSoH0nR9+oSBab5xt0q3/tnjrwe3DD0j
+         ftPw==
+X-Forwarded-Encrypted: i=1; AJvYcCVR0dZk0I+ba7V5UF30CIQqiVY+7ywPnEqgk0OeYoW/KRQfNl3hjnk8pQn0TCqDfH4m9FMTxyo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykaWevZVv4sBIsjWYhorr898OvwtKZH0S5r9rzkcKSsCfwUhe/
+	ZVfw6Ht9zts1IcBNCkL1srHfupmDu6moqx1GK2f/bQaZHcCQBsnHD33/aRngZSq0MAD/bqWhBqP
+	9HIMkhGIxgBgAypcHCqW5xPmWxVzZXFU=
+X-Gm-Gg: ASbGncvTsy6bUIPeg4gopqWqljy/Uw+rqxtbRWTyuEtukT4sDuzY/b+9ZqQrN+2zwac
+	pxJ1xbvW0gVwI4+riZ4/HmJIRaFRHNO9jP9l/ZeipqXUDYKwyOzsB5TemmaUrjaauD6j9gdSVGJ
+	edkc5FNhMMwa7gf6zamZpKx9AXM+xHlRsNZ29WMMGhSA3ISsOruFrt0e3GCqfyovstaiZkhpDvZ
+	OrrTKG+7wz34Ctyof0eZNUGuWb5MUDArFrP9O6R0cme3IM=
+X-Google-Smtp-Source: AGHT+IGT0dSpLfnfyfjod9omKoyiyTcAY2yOBoOWW+TYGnj4Belx84a3Q71GSObGJ6Adqi3U0Env7kYnPVVnhWkVmsk=
+X-Received: by 2002:a05:6000:2210:b0:3ec:98fb:d767 with SMTP id
+ ffacd0b85a97d-425671c6c47mr8516177f8f.58.1759773503651; Mon, 06 Oct 2025
+ 10:58:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20251002225356.1505480-1-ameryhung@gmail.com> <20251002225356.1505480-7-ameryhung@gmail.com>
+ <CAADnVQ+X1Otu+hrBeCq6Zr9vAaH5vGU42s6jLdBiDiLQcwpj4Q@mail.gmail.com> <CAMB2axOUU5J4Ec=tuBDYePzucw1QQLciFWC01=eVQdPOhT1BGQ@mail.gmail.com>
+In-Reply-To: <CAMB2axOUU5J4Ec=tuBDYePzucw1QQLciFWC01=eVQdPOhT1BGQ@mail.gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 6 Oct 2025 10:58:10 -0700
+X-Gm-Features: AS18NWCAlGzhw7oHjjmeZwDMW3kKguKo4hJhbaF1CEn3QC9R__3vT8fh7YTG-Uw
+Message-ID: <CAADnVQ+=F5SkoRA4LU+JE+u87TLFp-mTS4bv+u9MUST2+CX8AA@mail.gmail.com>
+Subject: Re: [RFC PATCH bpf-next v2 06/12] bpf: Change local_storage->lock and
+ b->lock to rqspinlock
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Martin KaFai Lau <martin.lau@kernel.org>, KP Singh <kpsingh@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, Song Liu <song@kernel.org>, Hao Luo <haoluo@google.com>, 
+	Kernel Team <kernel-team@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 6 Oct 2025 14:45:12 +0200 Kory Maincent wrote:
-> > The kernel supports configuring HW time stamping modes via netlink
-> > messages, but previous implementation added support for HW time stamping
-> > source configuration. Add support to configure TX/RX time stamping.  
-> 
-> For the information, I didn't add this support because it kind of conflict with
-> ptp4l which is already configuring this. So if you set it with ethtool, running
-> ptp4l will change it. I am not really a PTP user so maybe I missed cases where
-> we need these hwtstamp config change without using ptp4l.
+On Fri, Oct 3, 2025 at 3:03=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wro=
+te:
+>
+> On Thu, Oct 2, 2025 at 4:37=E2=80=AFPM Alexei Starovoitov
+> <alexei.starovoitov@gmail.com> wrote:
+> >
+> > On Thu, Oct 2, 2025 at 3:54=E2=80=AFPM Amery Hung <ameryhung@gmail.com>=
+ wrote:
+> > >
+> > >         bpf_selem_free_list(&old_selem_free_list, false);
+> > >         if (alloc_selem) {
+> > >                 mem_uncharge(smap, owner, smap->elem_size);
+> > > @@ -791,7 +812,7 @@ void bpf_local_storage_destroy(struct bpf_local_s=
+torage *local_storage)
+> > >          * when unlinking elem from the local_storage->list and
+> > >          * the map's bucket->list.
+> > >          */
+> > > -       raw_spin_lock_irqsave(&local_storage->lock, flags);
+> > > +       while (raw_res_spin_lock_irqsave(&local_storage->lock, flags)=
+);
+> >
+> > This pattern and other while(foo) doesn't make sense to me.
+> > res_spin_lock will fail only on deadlock or timeout.
+> > We should not spin, since retry will likely produce the same
+> > result. So the above pattern just enters into infinite spin.
+>
+> I only spin in destroy() and map_free(), which cannot deadlock with
+> itself or each other. However, IIUC, a head waiter that detects
+> deadlock will cause other queued waiters to also return -DEADLOCK. I
+> think they should be able to make progress with a retry.
 
-FWIW I sometimes enable Rx timestamping (from whatever chrony uses
-to ALL) to measure burstiness of incoming traffic when debugging
-application packet loss. Would be quite useful to have the ability
-to configure this in ethtool.
+If it's in map_free() path then why are we taking the lock at all?
+There are supposed to be no active users of it.
+If there are users and we actually need that lock then the deadlock
+is possible and retrying will deadlock the same way.
+I feel AI explained it better:
+"
+raw_res_spin_lock_irqsave() can return -ETIMEDOUT (after 250ms) or
+-EDEADLK. Both are non-zero, so the while() loop continues. The commit
+message says "it cannot deadlock with itself or
+bpf_local_storage_map_free", but:
+
+1. If -ETIMEDOUT is returned because the lock holder is taking too long,
+   retrying immediately won't help. The timeout means progress isn't
+   being made, and spinning in a retry loop without any backoff or
+   limit will prevent other work from proceeding.
+
+2. If -EDEADLK is returned, it means the deadlock detector found a
+   cycle. Retrying immediately without any state change won't break the
+   deadlock cycle.
+"
+
+> Or better if
+> rqspinlock does not force queued waiters to exit the queue if it is
+> deadlock not timeout.
+
+If a deadlock is detected, it's the same issue for all waiters.
+I don't see the difference between timeout and deadlock.
+Both are in the "do-not-retry" category.
+Both mean that there is a bug somewhere.
+
+> >
+> > If it should never fail in practice then pr_warn_once and goto out
+> > leaking memory. Better yet defer to irq_work and cleanup there.
+>
+> Hmm, both functions are already called in some deferred callbacks.
+> Even if we defer the cleanup again, they still need to grab locks and
+> still might fail, no?
+
+If it's a map destroy path and we waited for RCU GP, there shouldn't be
+a need to take a lock.
+The css_free_rwork_fn() -> bpf_cgrp_storage_free() path
+is currently implemented like it's similar to:
+bpf_cgrp_storage_delete() which needs a lock.
+But bpf_cgrp_storage_free() doesn't have to.
+In css_free_rwork_fn() no prog or user space
+should see 'cgrp' pointer, since we're about to kfree(cgrp); it.
+I could be certainly missing something.
 
