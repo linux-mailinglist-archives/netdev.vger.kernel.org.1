@@ -1,152 +1,174 @@
-Return-Path: <netdev+bounces-227972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26BB0BBE477
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 16:08:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C30FBBE47A
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 16:09:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D14823B69DE
-	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 14:08:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F004E3B67BB
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 14:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 414B52D3228;
-	Mon,  6 Oct 2025 14:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5184D29B8C2;
+	Mon,  6 Oct 2025 14:09:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NEqmC/38"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YdoOKr1l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5849283FE5
-	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 14:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66211B5EC8
+	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 14:09:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759759699; cv=none; b=cwJsC1QBFwIfc97Xe+hgXTHMkKhF6SzFdy3YD5+G62dGguwXArH3SNM9J9AgvM98ezLIfzrFswXHBkOVe0RmP5CAwHK3J3j9eFNXQWmpGaASNTzRdjTD6kPWUnf2v8YGlIHJrnjKm7v6ePMF4DjMtQbDJTYNjdjRuQx5en9sqA0=
+	t=1759759765; cv=none; b=PbDuTC37DCpJDHGk6V1Uh42W0N3QZGOXqXv0ONPy/IjBOov842G+0RaB68Sdsp+KgjthccPFt+RxzeLth45Tj7xSURscP/DAlntpptF+VfNU4UDrlA4Cz+CO5g/vz+MUrOTpKloST4fWGA4NTVCVEAW3r7r+CGJxmtBJHRQFjh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759759699; c=relaxed/simple;
-	bh=vUAsxRSr+jWgaAglz0wKq5QwGRqqLj1lm4Fs6vdBFI4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DcV7IRYMSKGPW3RVc+RGUpig/wu5ePpFR5S4V82lPy1qOroGoqmTg+RXOFmf1DG3dr//w26y+1kt2OxM6WACFW/2hGcEXYgMSr6rW/jiG489eQDinclgSweodGnxSSBEBM6uBgSxpctAkZT/Js+iFz4P97PKkQ5MaO11Pln7EcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NEqmC/38; arc=none smtp.client-ip=209.85.161.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-64e58fb2789so2185553eaf.0
-        for <netdev@vger.kernel.org>; Mon, 06 Oct 2025 07:08:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759759695; x=1760364495; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9euP7FGBJ3Mnsaw5UhcopJybLIQRG3ne8ZMpXXyWR7k=;
-        b=NEqmC/380vhFlMkNg86zK6SU3CAqZGwo8lk0sx1eDlXcBTbgY13tvd8x7DNr10z8aj
-         pgBH+hDcbr+2Zq4i9EyAblD/6iRONQyogICEE5ARz5wHcRRJjU32bDvallenDCxN+pqn
-         pXA/bBJ3radSyCXWaozriCdnd0yERiOLPRqefNrRsiAvEooT8x+kw9Qztxw7mctfsFGI
-         ta12nzAEF+//gBcUYslAyXyJ3txEv8W8pTHcBgQ54Un1kZqZUpmXn/CMFhgB41ao3Ytx
-         12fd63ASYx5qyFJkV6VIPS0n54Q6w+9yUG6jGOYYNjm6bA9yBIti25To885k1teh9MdG
-         Jdtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759759695; x=1760364495;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9euP7FGBJ3Mnsaw5UhcopJybLIQRG3ne8ZMpXXyWR7k=;
-        b=FxPfJROb1VBMOxuUit+Ulqg8pPL8jMSw4u0rRIFvi00SQPn8QSUhIZZaGEIlW5sP0e
-         aW/ispw8Az2k9kVVjutsnzkhhcgdbK9SoUUT1aAkfLzR+XuNrmsE6r8l4ud3i1eOrYdp
-         YpvjX7oj9zieQgSyflO9if0z/i7YSx6FM/QHUeRLQGRSpRT2pJnslZjlIP/20Ek+YaZ5
-         xsdhS2Bps4u6ydO1QjkcZ7TF7TBMrKnSGciehEiAxjBIxxaNz6Ew9krhJzLo1rhUrfPG
-         t+q3yPUhJgdjuObrKWPHu45F2f0Cebg1uK5WCVPIkhzDm4Az2Wfq3UcMWd1jskRAYz5X
-         gbTw==
-X-Forwarded-Encrypted: i=1; AJvYcCUsFFItlV3EWrJjwv6dRL2ke3LBxQAKi5iA38sytXUzjayb2wT2KUCh8eEKnmUgzHfRW/ogXmo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCD71z2Fcz9gKwkOSKOQMKQtT6jIttfXBzF/upJyilk23IKa7V
-	U4BIKEKHDLeE3bzXLUvFr0HA79r2nvZDRYelJVNsm6KTgLTl4aT7y51f3zUDMpWr7OyWQ+F5z/0
-	3ToQUup8pzZZMmDRR1wr17qb9/23wKUg=
-X-Gm-Gg: ASbGncs6+OGBwn9o2P6FD3TJCHQ9esNjNmY9zi/4kLQDwTOWu6n4ZEWOJjQ2BlnwvQA
-	GVusZ8IYeS1fvhatEMaCKfH39DDVjL6nPqwQnT//oyo7Oc5/1LjDv8Dt0KV1bLAu26pZywGPKOI
-	v/2PmTgadJYUfx6rAQRSmDObvwCmt5SII/ZU7gXpVZmb7FrUIHVMBGNZHHUVe1O2IYrLZ0zLL93
-	Ob/VVO3Bsk5FLZaGs/qYo8AfQ3WXCJTOmSAzUi0G/O7/10PW9VDbRU1C9AxCrttE8JJFXsM
-X-Google-Smtp-Source: AGHT+IG9G9DF1YnmrpmfqFP+MFypKlh0tyC8fDD+ikO8KOviGTb+AZDk2RURQyCBPwlv9r2dMfpxzay33ZISfubXUZ0=
-X-Received: by 2002:a05:6871:7a5:b0:31d:8964:b4aa with SMTP id
- 586e51a60fabf-3b0f3d1d438mr6629829fac.6.1759759695419; Mon, 06 Oct 2025
- 07:08:15 -0700 (PDT)
+	s=arc-20240116; t=1759759765; c=relaxed/simple;
+	bh=Z2sG1ZMUE0N4JZiSEpyBe9xibv11tF9EmXkPsIFrvL8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s6SQXNTlICqBezRbn4OeCXwtwhtivZf/dbNAntrAfgWwKymgK4FBkXCYKj26zwbBwPJi6xDPtmWZsKIoUjlm/iyEwceGpDlEEp7qzW2cWxci/9UJJlkB0ATJUFkZSclrze4nGydfR5TxOiTY1/R4yBfEOyit5NZvndzUoIUPlpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YdoOKr1l; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1759759763; x=1791295763;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Z2sG1ZMUE0N4JZiSEpyBe9xibv11tF9EmXkPsIFrvL8=;
+  b=YdoOKr1lDH7y6z36Klg4RpCgj0iw6+eMc/42Tg280b7ZUliwgpgnhl2p
+   SXaJmPop/MYr6QzTjjXQCAn4AeS9B6rrbfq8G1GxwjPdzyu3mhSCk3Vgz
+   5VJzqdlrkuFauPgb8Q6wzdQTBKVAlqQqMqCSXDM9wFIkuyHBt6pchdBlr
+   SWuHNI5LFBFckovPKPmNrBEFtyEagYJIdoANWrZc8nSCKrtWOe5xXFxjx
+   r0Oz0gOiBZmRLm5VckSgAjQV4Q5ZB1mr8URfFb5h9DaPjMntLI21/FocM
+   MUhsQMTANggSOnxF3zKDW+Iy1UbE/Z/fl4n82kj3zJ4Ub5I0TsiJanFZy
+   Q==;
+X-CSE-ConnectionGUID: qyukwfwuQiWs0/jF//V/Wg==
+X-CSE-MsgGUID: M69H/TZpSrKkt+Va2TUEdQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11574"; a="72607823"
+X-IronPort-AV: E=Sophos;i="6.18,320,1751266800"; 
+   d="scan'208";a="72607823"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2025 07:09:20 -0700
+X-CSE-ConnectionGUID: rjmKuUTFRG+ePe5bpyMt4g==
+X-CSE-MsgGUID: fsifdfJ1RHa7Pk0Bqht0Bw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,320,1751266800"; 
+   d="scan'208";a="183912201"
+Received: from hlagrand-mobl1.ger.corp.intel.com (HELO [10.245.102.40]) ([10.245.102.40])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2025 07:09:16 -0700
+Message-ID: <0a2efa67-0fb0-458a-970e-8957fffe63a0@linux.intel.com>
+Date: Mon, 6 Oct 2025 16:09:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251002184950.1033210-1-one-d-wide@protonmail.com> <m25xcssae1.fsf@gmail.com>
-In-Reply-To: <m25xcssae1.fsf@gmail.com>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Mon, 6 Oct 2025 15:08:04 +0100
-X-Gm-Features: AS18NWAVLzQxyb6mWjCm7Ybf0iTs2SE7mbGAFrLTnPv58cwUnJ-50UvOrDz_UO4
-Message-ID: <CAD4GDZyvO-Uw73hRRhcu7ZSuhXR_XmpTzx_GVyO5qFVukov4dA@mail.gmail.com>
-Subject: Re: [PATCH] doc/netlink: Expand nftables specification
-To: "Remy D. Farley" <one-d-wide@protonmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1 0/3] igb/igc/ixgbe: use
+ EOPNOTSUPP instead of ENOTSUPP
+To: Kohei Enju <enjuk@amazon.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Auke Kok <auke-jan.h.kok@intel.com>, Jeff Garzik <jgarzik@redhat.com>,
+ Sasha Neftin <sasha.neftin@intel.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, kohei.enju@gmail.com
+References: <20251006123741.43462-1-enjuk@amazon.com>
+Content-Language: pl, en-US
+From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+In-Reply-To: <20251006123741.43462-1-enjuk@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 6 Oct 2025 at 09:29, Donald Hunter <donald.hunter@gmail.com> wrote:
->
-> "Remy D. Farley" <one-d-wide@protonmail.com> writes:
->
-> > Getting out changes I've accumulated while making nftables spec to work with
-> > Rust netlink-bindings. Hopefully, this will be useful upstream.
-> >
-> > This patch:
-> >
-> > - Adds missing byte order annotations.
-> > - Fills out attributes in some operations.
-> > - Replaces non-existent "name" attribute with todo comment.
-> > - Adds some missing sub-messages (and associated attributes).
-> > - Adds (copies over) documentation for some attributes / enum entries.
-> > - Adds "getcompat" operation defined in nft_compat.c .
->
-> Can you run
->
->     yamllint Documentation/netlink/specs
->
-> The patch adds several errors and warnings.
->
-> Cheers!
+On 2025-10-06 2:35 PM, Kohei Enju wrote:
+> This series fixes inconsistent errno usage in igb/igc/ixgbe. The drivers
+> return -ENOTSUPP instead of -EOPNOTSUPP in specific ethtool and PTP
+> functions, therefore userland programs would get "Unknown error 524".
+> 
+> Use -EOPNOTSUPP instead of -ENOTSUPP to fix the issue.
+> 
+> This series covers all incorrect usage of ENOTSUPP in Intel ethernet
+> drivers except the one in iavf, which should be targeted for iwl-next in
+> a separate series since it's just a comment. [1]
+> 
+> For igb and igc, I used a simple reproducer for testing [2] on I350 and
+> I226-V respectively.
+> Without this series:
+>   # strace -e ioctl ./errno-repro
+>   ioctl(3, SIOCETHTOOL, 0x7ffcde13cec0)   = -1 ENOTSUPP (Unknown error 524)
+> 
+> With this series:
+>   # strace -e ioctl ./errno-repro
+>   ioctl(3, SIOCETHTOOL, 0x7ffd69a28c40)   = -1 EOPNOTSUPP (Operation not supported)
+> 
+> For ixgbe, I used the testptp for testing on 82599ES.
+> Without this series:
+>   # strace -e ioctl ./testptp -d /dev/ptp1 -P 1
+>   ioctl(3, PTP_ENABLE_PPS, 0x1)           = -1 ENOTSUPP (Unknown error 524)
+> 
+> With this series:
+>   # strace -e ioctl ./testptp -d /dev/ptp1 -P 1
+>   ioctl(3, PTP_ENABLE_PPS, 0x1)           = -1 EOPNOTSUPP (Operation not supported)
+> 
+> [1]
+>   $ grep -nrI ENOTSUPP .
+>   ./igc/igc_ethtool.c:813:  return -ENOTSUPP;
+>   ./igb/igb_ethtool.c:2284: return -ENOTSUPP;
+>   ./ixgbe/ixgbe_ptp.c:644:  return -ENOTSUPP;
+>   ./iavf/iavf_main.c:2966:           * if the error isn't -ENOTSUPP
+> 
+> [2]
+>   #include <sys/ioctl.h>
+>   #include <net/if.h>
+>   #include <string.h>
+>   #include <unistd.h>
+>   #include <linux/sockios.h>
+>   #include <linux/ethtool.h>
+>   
+>   int main() {
+>       int sock = socket(AF_INET, SOCK_DGRAM, 0);
+>       struct ethtool_gstrings gstrings = {};
+>       struct ifreq ifr;
+>       int ret;
+>   
+>       gstrings.cmd = ETHTOOL_GSTRINGS;
+>       gstrings.string_set = ETH_SS_WOL_MODES;
+>   
+>       ifr.ifr_data = (char*)&gstrings;
+>       strcpy(ifr.ifr_name, "enp4s0");
+>   
+>       ret = ioctl(sock, SIOCETHTOOL, &ifr);
+>   
+>       close(sock);
+>       return ret;
+>   }
+> 
+> Kohei Enju (3):
+>    igb: use EOPNOTSUPP instead of ENOTSUPP in igb_get_sset_count()
+>    igc: use EOPNOTSUPP instead of ENOTSUPP in
+>      igc_ethtool_get_sset_count()
+>    ixgbe: use EOPNOTSUPP instead of ENOTSUPP in
+>      ixgbe_ptp_feature_enable()
+> 
+>   drivers/net/ethernet/intel/igb/igb_ethtool.c | 2 +-
+>   drivers/net/ethernet/intel/igc/igc_ethtool.c | 2 +-
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c | 2 +-
+>   3 files changed, 3 insertions(+), 3 deletions(-)
 
-Can you also use the nftables schema with the python cli, or at least run:
+Nice write-up and reproduction steps!
 
-./tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/nftables.yaml
+For the series:
 
-(This is something we should automate as part of make -C tools/net/ynl)
+Reviewed-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
 
-The spec has a lot of schema errors to resolve. You'll also need
-changes to the netlink-raw.yaml schema because it is missing the 'max'
-check.
+Thanks,
+Dawid
 
-diff --git a/Documentation/netlink/netlink-raw.yaml
-b/Documentation/netlink/netlink-raw.yaml
-index 246fa07bccf6..9cb3cc78a0af 100644
---- a/Documentation/netlink/netlink-raw.yaml
-+++ b/Documentation/netlink/netlink-raw.yaml
-@@ -19,6 +19,12 @@ $defs:
-     type: [ string, integer ]
-     pattern: ^[0-9A-Za-z_-]+( - 1)?$
-     minimum: 0
-+  len-or-limit:
-+    # literal int, const name, or limit based on fixed-width type
-+    # e.g. u8-min, u16-max, etc.
-+    type: [ string, integer ]
-+    pattern: ^[0-9A-Za-z_-]+$
-+    minimum: 0
-
- # Schema for specs
- title: Protocol
-@@ -270,7 +276,10 @@ properties:
-                     type: string
-                   min:
-                     description: Min value for an integer attribute.
--                    type: integer
-+                    $ref: '#/$defs/len-or-limit'
-+                  max:
-+                    description: Max value for an integer attribute.
-+                    $ref: '#/$defs/len-or-limit'
-                   min-len:
-                     description: Min length for a binary attribute.
-                     $ref: '#/$defs/len-or-define'
 
