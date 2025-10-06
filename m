@@ -1,141 +1,113 @@
-Return-Path: <netdev+bounces-228017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 342CFBBF181
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 21:30:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F3479BBF18A
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 21:31:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A655C4E13FE
-	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 19:30:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D1E694E22FE
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 19:31:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10DEC1A9FA4;
-	Mon,  6 Oct 2025 19:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98FC01A83F7;
+	Mon,  6 Oct 2025 19:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="hlmgABmo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yNoKA4KK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89C63208
-	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 19:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B846EEDE
+	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 19:31:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759779011; cv=none; b=VCYFO5FWkYrQwKz0eTzK+ss719TJ3Smtj7kMY8QscZ9jCQsFfqa+BZvaoCmsfrMwgn+BNZURoWB61nc8AhwIjHkq5QJPqcTv3hLTEmRwpZomB/XKaZvmNW91YbeEsTCKdWYEAm+i+RQliiQ5Ygye0OJFI1O9+yyEvFp0HVRKlzw=
+	t=1759779068; cv=none; b=XXL0d7NKjVes9TyB/IwXTOU4YLXWcdHMGgDW8ykR2o2vxxXDpnwt43QjWQIg5e/OQScMr8U4PR1JDqzhaf2ZEhlKpmTMoZUhxeds9zeXMD9D2YRtS4gJuXfKHcZbtvjCvPv2T9Ievpro58WpoR2ii8aVdCLXeqH+QvR0tUfsjAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759779011; c=relaxed/simple;
-	bh=oJtnpIg+R+qK4oiapz5pJH9B6d0O7u0uKM9fGnb29to=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AICxqX/JBR7jzc6WDdvBXhl9XzjJ1dmRt9nDyCGTctxtlMC7JBLoMPoR2l3fqGZ8qi+gpGpSVuh0kjW1PpvlSf3ipMyRvsNoD8w8wvWDGaA8R3zdWWacOQvjraLkFifctIJ2KhmLO/Cp0o4JDKbwFXyAoFlRV2sEBQwFa59jNAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=hlmgABmo; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b48d8deafaeso1104980966b.1
-        for <netdev@vger.kernel.org>; Mon, 06 Oct 2025 12:30:08 -0700 (PDT)
+	s=arc-20240116; t=1759779068; c=relaxed/simple;
+	bh=B264UE+siYOOF03S6Rq/Ksnv16F7Wcyt8/lnsmRwce8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mjWfTvA/hIQ04kk0pklBeAf6Xz4rY5XZt+m29NroFjjNRJcBcKDziZf+qaMowJmdl8vWRPMTWOtjPuhaDnevET/Oq19UbfMLMBRd65p87nsAEeXVzyyWnqsDsKUPO4y8OZqww1YTKIyhAv5ZVjB0IajPn10kLVKfjBUpj56n6gQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yNoKA4KK; arc=none smtp.client-ip=209.85.160.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4df80d0d4aaso84909201cf.2
+        for <netdev@vger.kernel.org>; Mon, 06 Oct 2025 12:31:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1759779007; x=1760383807; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fx1K28q8EZoOq6NcrsSqSFqNryQpu7AB3eVtIUWzySE=;
-        b=hlmgABmoliRHyqK3HeIKpf0pPJTok2vWg+xZMjTqGfKcIKDIILM7NmP1oe6XY5i/z1
-         3fLN8N59zjAKXqhwNLzqv4rYpLLBA7Sw1WqgudU2TIpmRFe3S7c43nbdPkPtzm9BcKV3
-         vQSGHn+TI2LaeHUXKU2TN+FnDdeoiso9+VDx8=
+        d=google.com; s=20230601; t=1759779066; x=1760383866; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rNdRvap89ID50VX7ju9SZ9t1Ke/o82spySdIkUQDxZo=;
+        b=yNoKA4KKTfRaQWlkPC3QOkRhpuEOa3Q/Cr3A4cEa/KHG6Yk0ltwZluAF6sCMwYt/uw
+         PNEJFcg0jj9af/9gneca6VAM8QTawzVVKxzIZfbD626uHrsenLJeiIu+PbtVszDTvRJ9
+         YM/Gf663GV24aPFcUxo31Y1pwTOVMhaOx/qpr5CPiU9vLgejw3Vz0447GB/HaIMxHkJy
+         fqpE9RnUyBqUzuUJztOoUOtUbPEeX6u+5zPvZkoNr/KK8AdyD027Dy547KBeeeRGNwkl
+         AU0TBPphTy9AMKCPQMxf0OI8x6gulBqfxnavWch3KbuUYqmPifoSS5GMdv8xos6Eg/mT
+         hiZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759779007; x=1760383807;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fx1K28q8EZoOq6NcrsSqSFqNryQpu7AB3eVtIUWzySE=;
-        b=dboxz/3Fi2Sjp59LKV0krJKB7jllUgBQNb1NwgISeW0ObuZ7Gv7MMys6oegnox0BFy
-         VcQqB0Nm/LYjNvej9hGsEZA+uAXnJdPfl1N/VIc03MqU/2NPOHoZmuQ5HLKycMwB2j5/
-         foj4AgAwiixm2fCIoLfm6xlEhYQcrC8vJNAhZ15ov257P9v/9s5vCeBORdDUgUeBCpBz
-         +9TAXtaIZTUzLTmW6nT8KuBnTjBnbwjfXHvZBjxjEmu4rsaZKEVdZWad9XztaUlf7hcD
-         u/T7SG1jZPI/d0Eynw5mTKXuc1Pk61VNzdi6HKcngaJ9O13rSuuNU7nGVIr0nM43WJJr
-         IgEw==
-X-Forwarded-Encrypted: i=1; AJvYcCXOnNXxpzjFoeVFO7bKbFe0dDWVZIrKg7rcYhCp8AA3dzD8bx4jA3XxAj8oKoU6LcRQV6pm+RQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJM3a0f/2e+j3z8g+wt+2IEghoDor5mLwe2XX+stksm4XQ9ic6
-	RJJ/oleJiOGSiHRcQtNaTlDNaLCxlMIWe+Y7K7DQuQLLlaBiN/4BvWHdSOKg8DSggKAdPv8ONrU
-	4uMDNeoI=
-X-Gm-Gg: ASbGncufbDY4dIMtqLjaTgN6uEGJ4gRxQgKm35k1MJ/qlBHYiv8D2EJcLFlYff52yv8
-	SZnlV3g3rwMGDxgZMcBkEdRHVrQPOrvN7NeQQ5RxozNUTv5SV7AvnwofcQMy12N4q7BxwU01E65
-	g+Q6tNJKD36/SbpzjgvanHb6SG1Qf1gid8++kODqkceKhgYJI4c/8hCI7SB8cTJWOUuxo58IXaN
-	3OymSQUWtZWXy3LtLeX2MsZa/XLViR3MeeJXwBGx8DzRMrCE9F6VrYl8+LJm9ZnYDK/gTrFlwAU
-	J0Nf1EYpUfMJCUXZqxonpnUa8/7za8oVDQPogUusV0RMIQe3osQvOQkfLd8qCSjJujCh8kzlaVl
-	4MM7+mq9eEK+PZzE0SyE6x6iKjNtZa7WEtTvI89k/HqjOPvh814P1TdlST5vZVRBq6/Wvj6d74Y
-	s8y4KqMCCXMzr9vnuUbg5JyRfbweDLBFY=
-X-Google-Smtp-Source: AGHT+IG5a2JoB6MPALuGu/sxJ7xG4xlsOI956yhNYLfwsMrziOKcdpDwwoXsX4S0GUsZbzmigwPUxg==
-X-Received: by 2002:a17:907:9702:b0:b45:66f6:6a16 with SMTP id a640c23a62f3a-b49c5273641mr1435817066b.65.1759779006564;
-        Mon, 06 Oct 2025 12:30:06 -0700 (PDT)
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com. [209.85.208.45])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b486970b32bsm1234610466b.50.2025.10.06.12.30.04
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Oct 2025 12:30:04 -0700 (PDT)
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-634a3327ff7so10988597a12.1
-        for <netdev@vger.kernel.org>; Mon, 06 Oct 2025 12:30:04 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXFe1OMq/a0ByYTZ501hDxIOCgsXjL9bkZzO0qrSNzASr+Bpw9Qi773dMlZlXUt2p4eVh3dWxc=@vger.kernel.org
-X-Received: by 2002:a05:6402:3508:b0:634:bdde:d180 with SMTP id
- 4fb4d7f45d1cf-639348de6a9mr15286102a12.10.1759779004368; Mon, 06 Oct 2025
- 12:30:04 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759779066; x=1760383866;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rNdRvap89ID50VX7ju9SZ9t1Ke/o82spySdIkUQDxZo=;
+        b=n8Mb8Z/zDp3uxcau6GcYqOPaLsHGtBlAnoOzIGAtBfxZ4Dih0EvIHMG1CAkulziczE
+         oHftBUUkCeheRaMjvhMVKhoNFrJY4n7z9PQUOBLCKpF/qwLUJ2heAodmEzdaFxdZNXqQ
+         BE/XIbSuaE4cCN0nibBuW48aPHWJ3C2Xij+IdorAK+ScL9+9RwOIpJdqsVaIJoH3Zcxo
+         1wDpd08ZVwy6nUdCGW7ZwhRB48yGpvAlaiOHfVbiAYHNPSHSFafs/ZYjZ3AJFaBQwLVa
+         oMTKim3tbuQxO8ZaDzHgyxeLbJ67tHHuLEr2JC+mwM2CHsr9v9xX4exK1TMXD+4Nls8d
+         /jOA==
+X-Forwarded-Encrypted: i=1; AJvYcCWMZyecRH/snTJsOgWQjbJYbfYJQRAyvauhWPQStJ/qEqNlNoje4UQazUvA7p98C2mNYU1KUOk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykCGDF/EbMnpQ5fxN44YNi8cc9NY+YhAEm/GnpkCBJAlpfdfy8
+	wl5y1vuGwjjn/x7lqG4xRBT6KRtIsxn7+Ly0ZkhlpJ4XSYlfmPDWpj6uFYZ+wXKOLt7+tSUZfWk
+	fjNeiYxU222R/UA==
+X-Google-Smtp-Source: AGHT+IFvayjUiJfllaehnI8cfvvmovlVx3M5UkHMYXVCBppG/RbUNSUFRla4PWE2pPzLhe5MhahI0pbry6SgYA==
+X-Received: from qtmr8.prod.google.com ([2002:ac8:4248:0:b0:4b5:ffbe:2eff])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:5c0e:b0:4d2:db77:a652 with SMTP id d75a77b69052e-4e576a40fa3mr182598401cf.8.1759779065802;
+ Mon, 06 Oct 2025 12:31:05 -0700 (PDT)
+Date: Mon,  6 Oct 2025 19:30:58 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <aIirh_7k4SWzE-bF@gondor.apana.org.au> <05b7ef65-37bb-4391-9ec9-c382d51bae4d@kernel.org>
- <aN5GO1YLO_yXbMNH@gondor.apana.org.au> <562363e8-ea90-4458-9f97-1b1cb433c863@kernel.org>
- <8bb5a196-7d55-4bdb-b890-709f918abad0@kernel.org> <1a71398e-637f-4aa5-b4c6-0d3502a62a0c@kernel.org>
- <f31dbb22-0add-481c-aee0-e337a7731f8e@oracle.com> <20251002172310.GC1697@sol>
- <2981dc1d-287f-44fc-9f6f-a9357fb62dbf@oracle.com> <CAHk-=wjcXn+uPu8h554YFyZqfkoF=K4+tFFtXHsWNzqftShdbQ@mail.gmail.com>
- <3b1ff093-2578-4186-969a-3c70530e57b7@oracle.com> <CAHk-=whzJ1Bcx5Yi5JC57pLsJYuApTwpC=WjNi28GLUv7HPCOQ@mail.gmail.com>
- <e1dc974a-eb36-4090-8d5f-debcb546ccb7@oracle.com>
-In-Reply-To: <e1dc974a-eb36-4090-8d5f-debcb546ccb7@oracle.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Mon, 6 Oct 2025 12:29:47 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wj7TAP8fD42m_eaHE23ywfp7Y2ciqeGC=ULsKbuVTdMrg@mail.gmail.com>
-X-Gm-Features: AS18NWDFEycobIg3uvQ3ZOEKPRIEa2VRgJ-r9kp-mkVxA6gr2b-Ogc2Dp8E1ZOA
-Message-ID: <CAHk-=wj7TAP8fD42m_eaHE23ywfp7Y2ciqeGC=ULsKbuVTdMrg@mail.gmail.com>
-Subject: Re: 6.17 crashes in ipv6 code when booted fips=1 [was: [GIT PULL]
- Crypto Update for 6.17]
-To: Vegard Nossum <vegard.nossum@oracle.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, netdev@vger.kernel.org, 
-	Jakub Kicinski <kuba@kernel.org>, "Theodore Ts'o" <tytso@mit.edu>, "nstange@suse.de" <nstange@suse.de>, 
-	"Wang, Jay" <wanjay@amazon.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.618.g983fd99d29-goog
+Message-ID: <20251006193103.2684156-1-edumazet@google.com>
+Subject: [PATCH RFC net-next 0/5] net: optimize TX throughput and efficiency
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 6 Oct 2025 at 12:12, Vegard Nossum <vegard.nossum@oracle.com> wrote:
->
-> Yes, thank you, I've already acknowledged that my patch caused boot
-> failures and I apologize for that unintentional breakage. Why does this
-> mean we should throw fips=1 in the bin, though?
+In this series, I replace the busylock spinlock we have in
+__dev_queue_xmit() and use lockless list (llist) to reduce
+spinlock contention to the minimum.
 
-That's not what I actually ever said.
+Idea is that only one cpu might spin on the qdisc spinlock,
+while others simply add their skb in the llist.
 
-I said "as long as it's that black-and-white". You entirely ignored that part.
+After this series, we get a 300 % (4x) improvement on heavy TX workloads,
+sending twice the number of packets per second, for half the cpu cycles.
 
-THAT was my point. I don't think it makes much sense to treat this as
-some kind of absolute on/off switch.
+Eric Dumazet (5):
+  net: add add indirect call wrapper in skb_release_head_state()
+  net/sched: act_mirred: add loop detection
+  Revert "net/sched: Fix mirred deadlock on device recursion"
+  net: sched: claim one cache line in Qdisc
+  net: dev_queue_xmit() llist adoption
 
-So I would suggest that "fips=1" mean that we'd *WARN* about use of
-things like this that FIPS says should be off the table in 2031.
+ include/linux/netdevice_xmit.h |  9 +++-
+ include/net/sch_generic.h      | 23 ++++-----
+ net/core/dev.c                 | 91 ++++++++++++++++++----------------
+ net/core/skbuff.c              |  4 +-
+ net/sched/act_mirred.c         | 62 +++++++++--------------
+ net/sched/sch_generic.c        |  7 ---
+ 6 files changed, 93 insertions(+), 103 deletions(-)
 
-The whole "disable it entirely" was a mistake. That's obvious in
-hindsight. So let's *learn* from that mistake and stop doing that.
+-- 
+2.51.0.618.g983fd99d29-goog
 
-If somebody is in a situation where they really need to disable SHA1,
-I think they should hard-disable it and just make sure it doesn't get
-compiled in at all.
-
-But for the foreseeable immediate future, the reasonable thing to do
-is AT MOST to warn about fips rules, not break things.
-
-Because the black-and-white thing is obviously broken. One boot
-failure was enough - we're *NOT* doubling down on that mistake.
-
-                Linus
 
