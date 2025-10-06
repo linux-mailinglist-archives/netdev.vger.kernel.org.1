@@ -1,159 +1,72 @@
-Return-Path: <netdev+bounces-228010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68371BBF08A
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 20:56:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B8F8BBF0A5
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 20:58:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21C183A330D
-	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 18:56:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FB94188FAE3
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 18:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEFF02DCC1C;
-	Mon,  6 Oct 2025 18:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E6B02DCF4B;
+	Mon,  6 Oct 2025 18:58:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="E7+aom7i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VOQsp/2l"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58374186284;
-	Mon,  6 Oct 2025 18:55:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53CFF2DCC1C;
+	Mon,  6 Oct 2025 18:58:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759776959; cv=none; b=sl0mIS0Qsyihg7IObiMtFN31Gkbwa8stB8RwXa5SLCdfJQW5mvG81nYv9NRBgHmQpct54goojbI50VMsGRKxcPi/m+supgJ1NbXYxjGJ/njDQubitFcUOaFIIuUPsRyAowkkttyVUmpNG40H7mU1EVEH0beywA9VsvxOawU6N74=
+	t=1759777094; cv=none; b=J+wWBG3wXKt+pkefy+rd5sIua1xD7B29yzJ3M5KE1kwfGLDAB/z/xlQfnbHfkuec8rLuSB+RVBs0pYUMBzd/ACvwZUE2TL8wVixKROKj+cRJ47h6xllrkT8GttqvU1OiMdoawwHZyWOlJEtyPO9nKeT0ZRqZOh1NrTYnwDUVcy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759776959; c=relaxed/simple;
-	bh=NeO5M1g+CzpVBBZQ4Gkp2EgJHk7iaNVsdWR81NyG55w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=DKNuagUmAV/3gvZ61aPaNUFCaAYHZ1JGKyt0DXC2e5ylfxfjdwn3fKFekvwK2n1MMQTbSzZD9/mlhVnX8Fucm9TM2+JGXJxuXq4pkMRxoXd+wTfp3/jKWg/3ipKu6uuDaHj8/wSzB3Gev24kT9J+jA+rr+l/Zy5u6WT9aCHJDjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=E7+aom7i; arc=none smtp.client-ip=198.47.23.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
-	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 596It2SX4119639;
-	Mon, 6 Oct 2025 13:55:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1759776902;
-	bh=f6pZT5lucgMcs99wvMibFb9xDLLP+hxuIJ4a3foUSyk=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=E7+aom7iEB0KO+84LbOgCmjQEvWalHvTBxZspZXJNuIHfYKoIkaEgSNVC1Ud1VvDw
-	 FW0KnpoiqnJ3w+jyQjkEm8kgXbllSgAY2O4SDpM4jq+TEnPgkR8lUOFLD0EFtZ41OT
-	 lVvVHRj2FBwtxJzi8tdV0kS+dzu9H3CyWndZKQy0=
-Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
-	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 596It219128164
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Mon, 6 Oct 2025 13:55:02 -0500
-Received: from DFLE204.ent.ti.com (10.64.6.62) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Mon, 6
- Oct 2025 13:55:01 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE204.ent.ti.com
- (10.64.6.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Mon, 6 Oct 2025 13:55:01 -0500
-Received: from [10.249.131.66] ([10.249.131.66])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 596IsrfM3895037;
-	Mon, 6 Oct 2025 13:54:54 -0500
-Message-ID: <53cbd465-6925-4003-a13b-11fa1034819d@ti.com>
-Date: Tue, 7 Oct 2025 00:24:53 +0530
+	s=arc-20240116; t=1759777094; c=relaxed/simple;
+	bh=EQ4uWkwOsXFtr6Jl8rn1Zux/nZscRyE5FJm9/x9kpzI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cAwIq6YWpzZS3YRb38zGeJRzPSPyNPEGrf4O2fH6b+xxAMbSa8gxmPodSjyH3TrIugmJPvPFb35qeBidoy432aqAF+LfjP8aQxdkAzo09n0hjJjPStcUiP3cKAXWkJYNDJBz39bImeFZwPiQRgq01+v4GCi6nOx6Xrr3F92ztjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VOQsp/2l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 599C0C4CEF5;
+	Mon,  6 Oct 2025 18:58:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759777093;
+	bh=EQ4uWkwOsXFtr6Jl8rn1Zux/nZscRyE5FJm9/x9kpzI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VOQsp/2l5x5ZrGCDguSo9tX2p51COFjg9UTdLx2Lp8SVWRfRDTMVLfL9LFwky32O7
+	 kTjgOrJokHiTSmmJ08ZWRkyeRe5C1JopFxIvXKYtDYxXpzHDC9ayE50zPhdOlX60Wo
+	 OyE8m9xBKaVfOzrxB2GlNtUgiOozdFsMKgJPBLLLEu5MM5HCsglH6dws6Yc4dXYjFU
+	 zsnBm20oPHQo+anO29UgtmxvE8O4KZddZaW44zXcNK3GKhTr5McA+1WfyNdGvOjY4D
+	 7Ko6MW8K2+Avqzb84OsV0/YZHR1QVwJVbcINzHzeHm/CqXi0bxaCyus6/FTDsHYaup
+	 JfoUIsCs7X1+A==
+Date: Mon, 6 Oct 2025 11:58:12 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, James Chapman
+ <jchapman@katalix.com>, regressions@lists.linux.dev
+Subject: Re: Kernel panics trying to set up L2TP VPN
+ (`__xfrm_state_destroy+0x6e/0x80`)
+Message-ID: <20251006115812.7408e8e9@kernel.org>
+In-Reply-To: <b353f7e5-c32a-4f91-acbc-2b7aaa64c28f@molgen.mpg.de>
+References: <b353f7e5-c32a-4f91-acbc-2b7aaa64c28f@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/6] net: ti: icssg-prueth: Add functions to
- create and destroy Rx/Tx queues
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <namcao@linutronix.de>, <jacob.e.keller@intel.com>,
-        <christian.koenig@amd.com>, <sumit.semwal@linaro.org>,
-        <sdf@fomichev.me>, <john.fastabend@gmail.com>, <hawk@kernel.org>,
-        <daniel@iogearbox.net>, <ast@kernel.org>, <pabeni@redhat.com>,
-        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
-        <linaro-mm-sig@lists.linaro.org>, <dri-devel@lists.freedesktop.org>,
-        <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, <danishanwar@ti.com>
-References: <20250901100227.1150567-1-m-malladi@ti.com>
- <20250901100227.1150567-2-m-malladi@ti.com>
- <20250903174847.5d8d1c9f@kernel.org>
-Content-Language: en-US
-From: "Malladi, Meghana" <m-malladi@ti.com>
-In-Reply-To: <20250903174847.5d8d1c9f@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Hi Jakub,
+On Mon, 6 Oct 2025 08:37:06 +0200 Paul Menzel wrote:
+> #regzbot introduced: v6.17..070a542f08ac
 
-On 9/4/2025 6:18 AM, Jakub Kicinski wrote:
-> On Mon, 1 Sep 2025 15:32:22 +0530 Meghana Malladi wrote:
->>   	if (!emac->xdpi.prog && !prog)
->>   		return 0;
->>   
->> -	WRITE_ONCE(emac->xdp_prog, prog);
->> +	if (netif_running(emac->ndev)) {
->> +		prueth_destroy_txq(emac);
->> +		prueth_destroy_rxq(emac);
->> +	}
->> +
->> +	old_prog = xchg(&emac->xdp_prog, prog);
->> +	if (old_prog)
->> +		bpf_prog_put(old_prog);
->> +
->> +	if (netif_running(emac->ndev)) {
->> +		ret = prueth_create_rxq(emac);
-> 
-> shutting the device down and freeing all rx memory for reconfig is not
-> okay. If the system is low on memory the Rx buffer allocations may fail
-> and system may drop off the network. You must either pre-allocate or
-> avoid freeing the memory, and just restart the queues.
+Nothing obvious in this range. Could you bisect?
 
-So I have been working on trying to address this comment and maintain 
-parity with the existing support provided by this series but looks like 
-I might be missing something which is causing some regressions.
-
-I am facing an issue with zero copy Rx, where there is some active 
-traffic being received by the DUT (running in copy mode - default state)
-and I switch to zero copy mode using AF-XDP_example [1], I am not able 
-to receive any packets because I observe that the napi_rx_poll is not 
-getting scheduled for whatever reason, ending up draining the rx 
-descriptors and leading to memory leak. But if I first switch from copy 
-to zero copy mode and then try sending traffic I am able to receive 
-traffic on long runs without any failure or crash. I am not able to 
-figure out why is this happening, so sharing my changes [2] on top of 
-this series, which I made to address your comment. I am wondering if you 
-could have a look and give me some pointers here. Thank you.
-
-[1] https://github.com/xdp-project/bpf-examples/tree/main/AF_XDP-example
-
-[2] 
-https://gist.github.com/MeghanaMalladiTI/4c1cb106aee5bef4489ab372938d62d9
-
-> 
->> +		if (ret) {
->> +			netdev_err(emac->ndev, "Failed to create RX queue: %d\n", ret);
->> +			return ret;
->> +		}
->> +
->> +		ret = prueth_create_txq(emac);
->> +		if (ret) {
->> +			netdev_err(emac->ndev, "Failed to create TX queue: %d\n", ret);
->> +			prueth_destroy_rxq(emac);
->> +			emac->xdp_prog = NULL;
->> +			return ret;
->> +		}
->> +	}
->>   
->>   	xdp_attachment_setup(&emac->xdpi, bpf);
-
--- 
-Thanks,
-Meghana Malladi
-
+On xfrm side only c829aab21ed55 stands out but it's not too complex
+either.
 
