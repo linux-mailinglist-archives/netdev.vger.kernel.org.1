@@ -1,84 +1,90 @@
-Return-Path: <netdev+bounces-227999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC9AABBEE46
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 20:12:19 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3C51BBEF19
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 20:27:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3E95C4F0675
-	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 18:12:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D809D4F0CE8
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 18:26:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3877527FB05;
-	Mon,  6 Oct 2025 18:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46A092D77FA;
+	Mon,  6 Oct 2025 18:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TvkBE1bj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gWbRb0bn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06956242D69;
-	Mon,  6 Oct 2025 18:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DAA027FB05;
+	Mon,  6 Oct 2025 18:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759774334; cv=none; b=kgRmErIYcx01EYVK5Udd5SmkBC2BVS9NcYnbMLrGGy4ACsMzSPKG6mFGAbAQmiMwQKKFCPjMlSFT2JyUADL9J4kRrE6ySXIje+PpnfuqfziVEjnokLqO3vpHl96+gaTh0u0ILnzQSuBneaayPLXZcTC+9zaDvU6upJqZRdsf0yA=
+	t=1759774816; cv=none; b=W+RnP17EsqAOg3ool98QH8/KPh8SS8KWtsWx0SF+EopHj5U+2x717b0/AN6fjCWXxKKicgVT/vZDWizG3+q5aakyVXn7KwLX6rQa2rIjalktYHvraPBG59e2ZzIEgIiwupI3KOdV84FGyTTQvryC5aycQ390lSmVNPuI5dDrFpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759774334; c=relaxed/simple;
-	bh=yqfM60pd3vm0k6dr2xJzKfQX6Cf8X1W6EHsDOhRCN1A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OVg0qnAMaYJdqmEnmMMBUPQg5LGiVgvudHnZGP7r6K2gkErAnIKRlZXj9yIrdiqq8Rbx4nbYHw3WUIVVM48ls/o0TFi7rWj8fq+RnELgnTQ2hUoTr6W9u3kRpt2lgL8xSVwepscZ0GKTyFK2o2UkJj9or9kLc792Yu3bPB1DQNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TvkBE1bj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5826C4CEF5;
-	Mon,  6 Oct 2025 18:12:12 +0000 (UTC)
+	s=arc-20240116; t=1759774816; c=relaxed/simple;
+	bh=W5BrOOPRRKzFIbtAk/yy2aIvw1AczkIB0liTrN13Hkg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=L4KKDQn2FU2LvCROY9hRlPl+5jviDsXWXxCqxZWsJYnaJhU8f3/YQ+B1fw9LxPslqWYDJd6M6VjM3QO44j3Mv4XgrHsEvMDt7dcLyGJN7/9k5uj2SlBt4AZYLBWyrk+i60cYo5uYdxIgu5nJPM+ux8TRP86m4NQKigCR/YS7YOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gWbRb0bn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A112C4CEF5;
+	Mon,  6 Oct 2025 18:20:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759774333;
-	bh=yqfM60pd3vm0k6dr2xJzKfQX6Cf8X1W6EHsDOhRCN1A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TvkBE1bjzN2mieHNShs7LCJeqhNu7ZzmJSwLGlDbdWlJz7CjWpw6JApMMklud+WHp
-	 d9+eEe76G3Dsnv2zlNRz6emhDmjsWcaBNJbB3VQBUdL1Dw8m3uRNqS44zwj3R7l5tA
-	 hatTwdpJgjoBmHJzzsrhpq0sCU0l82xYRaBucuovTqpRJILmZm60I3q+i8Mw6F6jAS
-	 tfNphq3mgb0uecQc1gxjan499QOHPmiAMAj2u4QJOjxd6QkqwyqejBHqJb53KRV89o
-	 kZsVQVJfDMqCHMc37zuBLsZAIPajmZsGqFGwAxAwy49x3FzgmwnS6cm3RM6BpeTMpP
-	 /OVm3LAqfg2TA==
-Date: Mon, 6 Oct 2025 11:12:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: I Viswanath <viswanathiyyappan@gmail.com>
-Cc: Thangaraj.S@microchip.com, Rengarajan.S@microchip.com,
- UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org,
- skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev,
- david.hunter.linux@gmail.com
-Subject: Re: [PATCH net] net: usb: lan78xx: fix use of improperly
- initialized dev->chipid in lan78xx_reset
-Message-ID: <20251006111211.28f018bc@kernel.org>
-In-Reply-To: <20251001131409.155650-1-viswanathiyyappan@gmail.com>
-References: <20251001131409.155650-1-viswanathiyyappan@gmail.com>
+	s=k20201202; t=1759774815;
+	bh=W5BrOOPRRKzFIbtAk/yy2aIvw1AczkIB0liTrN13Hkg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gWbRb0bnAs36W8jphHw0cdPVlU7iYFKVAPzNydI1oVrmdLhFNnf2FtgIH2nRIgZkx
+	 Lp53MCJleXtHytE+tkqwt5OROIUSeEI1+rtzXaBrdwlz50Oi+g3m4oAS78YQcZiTV/
+	 8je7I3PIT7atYggbs/ZPTR4UFplY49ifeLchKC1L/+pu3RFnp64pe8eBB1AXsavctb
+	 d4P0mAperyBBfgUu49w08yspROo62L8K48uWQ7SEo0T2wznF2N3eSMZHOiTPfmh66T
+	 +EzblvErwCd8NE0XNE8nRfE6MoxTjfjwfDk9k5GONaUnogbXHj3aeSWJJSV0xpogw7
+	 79QGxOvMwIYRQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F8639D0C1A;
+	Mon,  6 Oct 2025 18:20:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: wwan: t7xx: add support for HP DRMR-H01
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175977480526.1504508.15952755336365237817.git-patchwork-notify@kernel.org>
+Date: Mon, 06 Oct 2025 18:20:05 +0000
+References: <20251002024841.5979-1-sammy.hsu@wnc.com.tw>
+In-Reply-To: <20251002024841.5979-1-sammy.hsu@wnc.com.tw>
+To: SAMMY HSU <zelda3121@gmail.com>
+Cc: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
+ haijun.liu@mediatek.com, ricardo.martinez@linux.intel.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, sammy.hsu@wnc.com.tw
 
-On Wed,  1 Oct 2025 18:44:09 +0530 I Viswanath wrote:
-> dev->chipid is used in lan78xx_init_mac_address before it's initialized:
-> 
-> lan78xx_reset() {
->     lan78xx_init_mac_address()
->         lan78xx_read_eeprom()
->             lan78xx_read_raw_eeprom() <- dev->chipid is used here
-> 
->     dev->chipid = ... <- dev->chipid is initialized correctly here
-> }
-> 
-> Reorder initialization so that dev->chipid is set before calling
-> lan78xx_init_mac_address().
+Hello:
 
-We need a Fixes tag
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu,  2 Oct 2025 10:48:41 +0800 you wrote:
+> add support for HP DRMR-H01 (0x03f0, 0x09c8)
+> 
+> Signed-off-by: Sammy Hsu <sammy.hsu@wnc.com.tw>
+> ---
+>  drivers/net/wwan/t7xx/t7xx_pci.c | 1 +
+>  1 file changed, 1 insertion(+)
+
+Here is the summary with links:
+  - net: wwan: t7xx: add support for HP DRMR-H01
+    https://git.kernel.org/netdev/net/c/370e98728bda
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
