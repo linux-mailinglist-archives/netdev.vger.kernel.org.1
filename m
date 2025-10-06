@@ -1,174 +1,80 @@
-Return-Path: <netdev+bounces-227996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E1D0BBEDDF
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 19:58:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8534EBBEE0A
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 20:03:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 164AE189B27D
-	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 17:58:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 477983B14A2
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 18:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C68A2D47E9;
-	Mon,  6 Oct 2025 17:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A51B2367BA;
+	Mon,  6 Oct 2025 18:03:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iZpwPKNe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JQyGCy5P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE122C374B
-	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 17:58:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00489846F;
+	Mon,  6 Oct 2025 18:03:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759773507; cv=none; b=HCiOIqzqtlfQxQdwdxWCxNY7UeULD6cXs+5wt0wmpalS8r44a3PMUa3t8SvcIktJwVqi+bbijmuMFm3iFnnaux23zFkDJ+WWyy2NMA5+6dldAy+NDJvDTtUXi5k/PJdKcr77U2fzYADiasD7oPALV0QHSJOFa+FUKnKuliEmY8g=
+	t=1759773800; cv=none; b=J4VQDXDR1jgu2/fBffDblieZTmmR//NxLoYzuRAlDjZ1iNBoIYFb58giBcoypkoFIne+L+Sn6y5bKxPGHkBKrs3lACFTyyejrT4kE9tsicqdwrm3qA65MBrSwet+f7vTPt0ya+G16JdRWIghF83BlrxV6asyr93/BvtcATWIHBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759773507; c=relaxed/simple;
-	bh=2s6Vu9HptHi8brHsjOwU+GMEtg9JzaHeZrmyolZdHTw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rkjj0iqIYkIf/S10rMhGu+AesVtIDP+Y3QIdZGsjjdoLtMlndvqJOe6ElwHu0RddHgGKlrfv7Wh8p9K9IfwMlM3SxYHVA+QSwu/hpkEUHz5rzrnjY22l9k4EycKA/nWI6iepLNaLbzg622t2uRo4h+HeGMqgp7RbyvD14I8rM4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iZpwPKNe; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3ed20bdfdffso4495537f8f.2
-        for <netdev@vger.kernel.org>; Mon, 06 Oct 2025 10:58:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759773504; x=1760378304; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zKxK+k9ZFezA+8toT2ywb+Xvx0zuZRB0gEIi60pQ7VA=;
-        b=iZpwPKNe78itT4K6u4fVSo45Govxcj1vKKc/UZUQ7229KcbuG9SrOvjFn0jQO2/5lc
-         jwPgwe6t4hbAOK8xE+gzjdfKKMObKU6O+fuIsmq2+KlzikhfnzSxhAGiefKcYo40h+PB
-         xEvZmxbCZlAH1FAxVZwsuLbOn+l3SQZ+4W15wtDTBsHpUSUAaGdVY9Xy1JZSMqr2OVYN
-         ekjI+QftQNs+sYnA0Myyi8ju5dnE1B9+MVFVETFAp+zHMFyW8LVBkv5w5SaGiAgFqeVe
-         TES8sX0skb73GIBpc6Sj8Cvtnmv8oHTxEVu42fPlYv9Kb7bI/AL8IXjSQnkls6vMmwFd
-         uvmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759773504; x=1760378304;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zKxK+k9ZFezA+8toT2ywb+Xvx0zuZRB0gEIi60pQ7VA=;
-        b=BTETE7CkPjz8WCHe7wJpcYb4p0wOV/RBcOHr7UF9j1cwWWSaglu3UZ4RSc1Yr6h8Rw
-         VD0fgaRJ6/9bsS47VarTfJoKXUJ3tf5scb7fHYqM4eDe/4wXSPxnk2wAHDQUPGJU+X20
-         g5IVustpZn2AepR6bsoRIXpG+4yh25l0xJCBkz6i/PqT0hwIKBzMIa7R+TXYAtDMc47w
-         /mmF8dycN8yWpgPWKFvi0Px0xDxdwTZny/7RBVWqWwc/koB3xMk8YYyeJmeDP8hECNNn
-         wUNN0ZSO+wVxmOQD6kmXtKzP+AZdO+s2TMKEdSoH0nR9+oSBab5xt0q3/tnjrwe3DD0j
-         ftPw==
-X-Forwarded-Encrypted: i=1; AJvYcCVR0dZk0I+ba7V5UF30CIQqiVY+7ywPnEqgk0OeYoW/KRQfNl3hjnk8pQn0TCqDfH4m9FMTxyo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykaWevZVv4sBIsjWYhorr898OvwtKZH0S5r9rzkcKSsCfwUhe/
-	ZVfw6Ht9zts1IcBNCkL1srHfupmDu6moqx1GK2f/bQaZHcCQBsnHD33/aRngZSq0MAD/bqWhBqP
-	9HIMkhGIxgBgAypcHCqW5xPmWxVzZXFU=
-X-Gm-Gg: ASbGncvTsy6bUIPeg4gopqWqljy/Uw+rqxtbRWTyuEtukT4sDuzY/b+9ZqQrN+2zwac
-	pxJ1xbvW0gVwI4+riZ4/HmJIRaFRHNO9jP9l/ZeipqXUDYKwyOzsB5TemmaUrjaauD6j9gdSVGJ
-	edkc5FNhMMwa7gf6zamZpKx9AXM+xHlRsNZ29WMMGhSA3ISsOruFrt0e3GCqfyovstaiZkhpDvZ
-	OrrTKG+7wz34Ctyof0eZNUGuWb5MUDArFrP9O6R0cme3IM=
-X-Google-Smtp-Source: AGHT+IGT0dSpLfnfyfjod9omKoyiyTcAY2yOBoOWW+TYGnj4Belx84a3Q71GSObGJ6Adqi3U0Env7kYnPVVnhWkVmsk=
-X-Received: by 2002:a05:6000:2210:b0:3ec:98fb:d767 with SMTP id
- ffacd0b85a97d-425671c6c47mr8516177f8f.58.1759773503651; Mon, 06 Oct 2025
- 10:58:23 -0700 (PDT)
+	s=arc-20240116; t=1759773800; c=relaxed/simple;
+	bh=JfT+OvQluLlH5pIHQb9J60KQSfNDPS/YlsCoOl6VnGI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lOCdPtRILpghd176+UfBKrMu6ipFNu6lB6cWdYrHEGbZWufulmE1EJTJoCZ2j8mJdAnteJy00CHEtl3Dru4BkxkGB1cuDNrE5r4jAP9C7PA+lS6G1MWLVYzQLwyyG0vhJ230Dt8HfqLnykUPpZJlG5OAVsffDfM8dzzffYzr5pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JQyGCy5P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A742BC4CEF5;
+	Mon,  6 Oct 2025 18:03:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759773799;
+	bh=JfT+OvQluLlH5pIHQb9J60KQSfNDPS/YlsCoOl6VnGI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JQyGCy5PcoWmN3Cxt+jzQ1uv0PQF6ViJ3BHL0EloYR/AfMz+9uu/1Stna8q1DUOw3
+	 1e+uoA+R4OdJE71Caxoq6ronE/OR5OKDg94cZKAvN7i6/0EnDLuz2uiP1O5wbxwgKm
+	 HmTk/1ezmdXCiMMnT7QK8uRO3w9fs+V9oQSRVRXnJN/M9Tm5JnwtVdfo+llUDIc8rV
+	 Wb3D/Q9CJMDhCbYzhZdLO+ME3uYHTSNrpRmg/rrax8QJ0DUzDkRHap8JboLS3CrW5u
+	 NyM89RL+jBCmmecK7X7G4ZVGCirnEg/DVljbw3pWahBcRJ+i/NNBpb9JCRTCJ+jAI1
+	 LNfUpVb2JR/0Q==
+Date: Mon, 6 Oct 2025 11:03:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Zhu Yanjun <yanjun.zhu@linux.dev>
+Cc: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>, Ayush Sawal
+ <ayush.sawal@chelsio.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Leon Romanovsky <leon@kernel.org>, Steffen
+ Klassert <steffen.klassert@secunet.com>, Cosmin Ratiu <cratiu@nvidia.com>,
+ Harsh Jain <harsh@chelsio.com>, Atul Gupta <atul.gupta@chelsio.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Ganesh Goudar
+ <ganeshgr@chelsio.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+Subject: Re: [PATCH] net: fix potential use-after-free in
+ ch_ipsec_xfrm_add_state() callback
+Message-ID: <20251006110317.39d08275@kernel.org>
+In-Reply-To: <f0cef998-0d49-4a52-b1b8-2f89b81d4b07@linux.dev>
+References: <20251001111646.806130-1-Pavel.Zhigulin@kaspersky.com>
+	<f0cef998-0d49-4a52-b1b8-2f89b81d4b07@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251002225356.1505480-1-ameryhung@gmail.com> <20251002225356.1505480-7-ameryhung@gmail.com>
- <CAADnVQ+X1Otu+hrBeCq6Zr9vAaH5vGU42s6jLdBiDiLQcwpj4Q@mail.gmail.com> <CAMB2axOUU5J4Ec=tuBDYePzucw1QQLciFWC01=eVQdPOhT1BGQ@mail.gmail.com>
-In-Reply-To: <CAMB2axOUU5J4Ec=tuBDYePzucw1QQLciFWC01=eVQdPOhT1BGQ@mail.gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 6 Oct 2025 10:58:10 -0700
-X-Gm-Features: AS18NWCAlGzhw7oHjjmeZwDMW3kKguKo4hJhbaF1CEn3QC9R__3vT8fh7YTG-Uw
-Message-ID: <CAADnVQ+=F5SkoRA4LU+JE+u87TLFp-mTS4bv+u9MUST2+CX8AA@mail.gmail.com>
-Subject: Re: [RFC PATCH bpf-next v2 06/12] bpf: Change local_storage->lock and
- b->lock to rqspinlock
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Martin KaFai Lau <martin.lau@kernel.org>, KP Singh <kpsingh@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Song Liu <song@kernel.org>, Hao Luo <haoluo@google.com>, 
-	Kernel Team <kernel-team@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 3, 2025 at 3:03=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wro=
-te:
->
-> On Thu, Oct 2, 2025 at 4:37=E2=80=AFPM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
-> >
-> > On Thu, Oct 2, 2025 at 3:54=E2=80=AFPM Amery Hung <ameryhung@gmail.com>=
- wrote:
-> > >
-> > >         bpf_selem_free_list(&old_selem_free_list, false);
-> > >         if (alloc_selem) {
-> > >                 mem_uncharge(smap, owner, smap->elem_size);
-> > > @@ -791,7 +812,7 @@ void bpf_local_storage_destroy(struct bpf_local_s=
-torage *local_storage)
-> > >          * when unlinking elem from the local_storage->list and
-> > >          * the map's bucket->list.
-> > >          */
-> > > -       raw_spin_lock_irqsave(&local_storage->lock, flags);
-> > > +       while (raw_res_spin_lock_irqsave(&local_storage->lock, flags)=
-);
-> >
-> > This pattern and other while(foo) doesn't make sense to me.
-> > res_spin_lock will fail only on deadlock or timeout.
-> > We should not spin, since retry will likely produce the same
-> > result. So the above pattern just enters into infinite spin.
->
-> I only spin in destroy() and map_free(), which cannot deadlock with
-> itself or each other. However, IIUC, a head waiter that detects
-> deadlock will cause other queued waiters to also return -DEADLOCK. I
-> think they should be able to make progress with a retry.
+On Fri, 3 Oct 2025 21:28:51 -0700 Zhu Yanjun wrote:
+> When the function ch_ipsec_xfrm_add_state is called, the kernel module 
+> cannot be in the GOING or UNFORMED state.
 
-If it's in map_free() path then why are we taking the lock at all?
-There are supposed to be no active users of it.
-If there are users and we actually need that lock then the deadlock
-is possible and retrying will deadlock the same way.
-I feel AI explained it better:
-"
-raw_res_spin_lock_irqsave() can return -ETIMEDOUT (after 250ms) or
--EDEADLK. Both are non-zero, so the while() loop continues. The commit
-message says "it cannot deadlock with itself or
-bpf_local_storage_map_free", but:
+That was my intuition as well, but on a quick look module state is set
+to GOING before ->exit() is called. So this function can in fact fail
+to acquire a reference.
 
-1. If -ETIMEDOUT is returned because the lock holder is taking too long,
-   retrying immediately won't help. The timeout means progress isn't
-   being made, and spinning in a retry loop without any backoff or
-   limit will prevent other work from proceeding.
-
-2. If -EDEADLK is returned, it means the deadlock detector found a
-   cycle. Retrying immediately without any state change won't break the
-   deadlock cycle.
-"
-
-> Or better if
-> rqspinlock does not force queued waiters to exit the queue if it is
-> deadlock not timeout.
-
-If a deadlock is detected, it's the same issue for all waiters.
-I don't see the difference between timeout and deadlock.
-Both are in the "do-not-retry" category.
-Both mean that there is a bug somewhere.
-
-> >
-> > If it should never fail in practice then pr_warn_once and goto out
-> > leaking memory. Better yet defer to irq_work and cleanup there.
->
-> Hmm, both functions are already called in some deferred callbacks.
-> Even if we defer the cleanup again, they still need to grab locks and
-> still might fail, no?
-
-If it's a map destroy path and we waited for RCU GP, there shouldn't be
-a need to take a lock.
-The css_free_rwork_fn() -> bpf_cgrp_storage_free() path
-is currently implemented like it's similar to:
-bpf_cgrp_storage_delete() which needs a lock.
-But bpf_cgrp_storage_free() doesn't have to.
-In css_free_rwork_fn() no prog or user space
-should see 'cgrp' pointer, since we're about to kfree(cgrp); it.
-I could be certainly missing something.
+Could you share your exact analysis?
 
