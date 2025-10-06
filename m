@@ -1,65 +1,57 @@
-Return-Path: <netdev+bounces-227994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EF4BBBED1C
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 19:30:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E054BBEDBF
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 19:55:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 236164EC315
-	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 17:30:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7000F189AD13
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 17:55:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61E2E238178;
-	Mon,  6 Oct 2025 17:30:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE2162D8789;
+	Mon,  6 Oct 2025 17:55:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gxEdPzaa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YVBibZdm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED0219ABD8;
-	Mon,  6 Oct 2025 17:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89B172D6E4B
+	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 17:55:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759771816; cv=none; b=qLGUYh5XXSCXrC4bh2ukFsETlZ0PclEmgyd9ef1e0cc4heVu/5CpOMjNZbYxXY9sUPLASrMTH7Nr68i7NF+nXCVfUjX6/PB5hGjIZP6Vx9j2ZQBxKmlLnCp/RrvYRCOqT7jNfIaGpndUtGMXB7UjrNz3AgZBlWBsKHUOFK4hMMQ=
+	t=1759773308; cv=none; b=TjtQNxWKKHSiVshSVnUdsqjAGF9eDulobtTWgZz6/246oQXk56nB40TV/GaLEfh1HgZREcZMdHQu16le82nY2xv1NDQwhwZV+RfDs1dtHVYkMroEiYRFXva151EMAylylKkhYxPl6j8U/ZuvttPPxMlSy0PUL37w/Jtm7RVL0Fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759771816; c=relaxed/simple;
-	bh=rWN6jto2RHp+3FusQV0xt+2Au+Nnsz5tLgY5xTBytlM=;
+	s=arc-20240116; t=1759773308; c=relaxed/simple;
+	bh=JuGaA7BF6zBP+b+TjShk1ikztH8dCKjQPcPmVvj/tW8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pQem9i+E7Q1yHZjxcdNFlBK/s3ynfx0iVoyNg3ozZ9ac0m1wkx4qBf5qor8y/YiPwUWGzUWuQMJgm7t7XSM0SfImv8KbSKhJLdiYYZ1Omxb26Btn10gzXwVoWrQmG0yGCA3XYGkMYriPUmqTcBiiMs8mhld6/72NWSLhmnD4VSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gxEdPzaa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BBF9C4CEF5;
-	Mon,  6 Oct 2025 17:30:13 +0000 (UTC)
+	 MIME-Version:Content-Type; b=BcD6lV7R2J46ozZQDYWOedN+gF8Sb96VcwQyTaL3OtpHAXe5bF897I7ZnnOf9bBonJ/OCO55INnmbayrp1vYrH4bxBJoOV5XfkJ0M4vDmpItQlGGoQEJXqShTrkHOJLOIJPaZcy3OZqbqCxySM3t+Cbv/hAo46HFAcdm4op9yV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YVBibZdm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1511C4CEF5;
+	Mon,  6 Oct 2025 17:55:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759771814;
-	bh=rWN6jto2RHp+3FusQV0xt+2Au+Nnsz5tLgY5xTBytlM=;
+	s=k20201202; t=1759773304;
+	bh=JuGaA7BF6zBP+b+TjShk1ikztH8dCKjQPcPmVvj/tW8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gxEdPzaaYpi98i/RUy5nqwFo5gHyjKethtBdLCNHcu6zg4/DpWjAnn0CvUPskipQO
-	 CoBEr9yWw/MGvrefx/TuHX0BzFQVFNA0UcSL0yLzYo6Ar8oDqWzi9i3vgPnb2SO/Kt
-	 ST7SBqMCW/t9pWuYRY45/umve1Mq5FFMab5/95fVAiB/dbJ2MxeID7ZPxHavXVYzsw
-	 mFoJhKKkDr9vaGoXlKN09uQT8loxrk/FdrZoeuZ4QpleRT7MFaAEpO4bT69YenTtyJ
-	 emoIrlcJbv+eECHr2P1LiW12WqkHh4MB3+9yzxDFEwI0gsYj1PqJgoUifPF9RCpXfU
-	 rb/mdQqB+di+w==
-Date: Mon, 6 Oct 2025 10:30:12 -0700
+	b=YVBibZdmiR+8epRFT6MyHPAzZS2yxp3i60eVkacSZeXNzQTUwVAZ74rE88jyWUrIB
+	 l+/H+csO0OVDKaATTy7IC+iwT96TUzjk8r9rZt5mQuGlXQ5vKDNcv3qgpJkdwnb6fK
+	 ldiyWaE7LGL/3hCSytsy+IIOO1mgAnH8086VdgBvSgPKFlcCJnvavveBbpYCwxBSTC
+	 embhOZ68S6NRupgwEdR+IJyfiNtas3Z6GebcmGhdoF3mo3joF47P6K6EVr3GkAj2Rw
+	 84u/QGhtYMi6WeCss1t/AeKHn+nW4ClcyEZIi+BPPUo2SSyQYwe5oTk5/hMWD/dwh5
+	 ZKQX1v4BsAcHA==
+Date: Mon, 6 Oct 2025 10:55:03 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
- <pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>, "Antonio
- Quartulli" <antonio@openvpn.net>, "Matthieu Baerts (NGI0)"
- <matttbe@kernel.org>, Allison Henderson <allison.henderson@oracle.com>,
- <shuah@kernel.org>, <jv@jvosburgh.net>, <olteanv@gmail.com>,
- <jiri@resnulli.us>, <mst@redhat.com>, <jasowang@redhat.com>,
- <xuanzhuo@linux.alibaba.com>, <eperezma@redhat.com>, <kuniyu@google.com>,
- <martineau@kernel.org>, <pablo@netfilter.org>, <kadlec@netfilter.org>,
- <fw@strlen.de>, <razor@blackwall.org>, <idosch@nvidia.com>,
- <linux-kselftest@vger.kernel.org>, <mptcp@lists.linux.dev>,
- <netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>
-Subject: Re: [PATCH net v2] selftests: net: unify the Makefile formats
-Message-ID: <20251006103012.0493a4b4@kernel.org>
-In-Reply-To: <87o6qkcnol.fsf@nvidia.com>
-References: <20251003210127.1021918-1-kuba@kernel.org>
-	<87o6qkcnol.fsf@nvidia.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, mkubecek@suse.cz,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH ethtool-next] netlink: tsconfig: add HW time stamping
+ configuration
+Message-ID: <20251006105503.6ca81618@kernel.org>
+In-Reply-To: <20251006144512.003d4d13@kmaincent-XPS-13-7390>
+References: <20251004202715.9238-1-vadim.fedorenko@linux.dev>
+	<20251006144512.003d4d13@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,30 +61,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 6 Oct 2025 11:40:59 +0200 Petr Machata wrote:
-> > We get a significant number of conflicts between net and net-next
-> > because of selftests Makefile changes. People tend to append new
-> > test cases at the end of the Makefile when there's no clear sort
-> > order. Sort all networking selftests Makefiles, use the following
-> > format:  
+On Mon, 6 Oct 2025 14:45:12 +0200 Kory Maincent wrote:
+> > The kernel supports configuring HW time stamping modes via netlink
+> > messages, but previous implementation added support for HW time stamping
+> > source configuration. Add support to configure TX/RX time stamping.  
 > 
-> If we see weird errors in CI, it might be because tests now run in a
-> different order and previously masked missed cleanups are now exposed.
+> For the information, I didn't add this support because it kind of conflict with
+> ptp4l which is already configuring this. So if you set it with ethtool, running
+> ptp4l will change it. I am not really a PTP user so maybe I missed cases where
+> we need these hwtstamp config change without using ptp4l.
 
-Yes, sorry. I enabled the check before merging this so there's probably
-some transient false positives. Which is fine, the pw checks are for
-maintainers? :)
-
-> > diff --git a/tools/testing/selftests/drivers/net/dsa/Makefile b/tools/testing/selftests/drivers/net/dsa/Makefile
-> > index cd6817fe5be6..699e3565d735 100644
-> > --- a/tools/testing/selftests/drivers/net/dsa/Makefile
-> > +++ b/tools/testing/selftests/drivers/net/dsa/Makefile
-> > @@ -9,11 +9,13 @@ TEST_PROGS = bridge_locked_port.sh \  
-> 
-> This should have the header converted as well:
-> 
-> TEST_PROGS := \
-> 	bridge_locked_port.sh \
-
-Ack, let me fix when applying.
+FWIW I sometimes enable Rx timestamping (from whatever chrony uses
+to ALL) to measure burstiness of incoming traffic when debugging
+application packet loss. Would be quite useful to have the ability
+to configure this in ethtool.
 
