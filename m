@@ -1,126 +1,145 @@
-Return-Path: <netdev+bounces-228024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5394BBF1CF
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 21:39:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFEA5BBF1F3
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 21:45:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9936834B498
-	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 19:39:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CFB6189B32A
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 19:46:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B22B823D7E6;
-	Mon,  6 Oct 2025 19:39:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C36253B40;
+	Mon,  6 Oct 2025 19:45:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A36nYUK+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f2dAtET+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2287E215F5C
-	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 19:39:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F411A4F12
+	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 19:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759779550; cv=none; b=ZaiO3sfsmOjiccyGQ65MBecDv054Vp0T02NdBRTfe0iZ3g1jqlHJNVZ1tMnr+DA+ddYOJY2Mk0gqdRLvP3FWVAHlhwBhXbUE8171WfO8HspMNMqkY7msdXq9mCuYbLVwOSmO+FhW0wfpIBDMv8p6amHq7odGd2Yx/sgTDEA0R3A=
+	t=1759779953; cv=none; b=RLpbbio+D2zkCUOs8v7nx0IyeVEBM1tZNYcmGQbixhWOPXXnbdWnHz7ZdHNj0A1otU/vWL0HbnUhlRiGEybep5U6hrE4uul0fxlkjKTfD4e0GV6/GJUP3/3WQytcik/3ex8KlpLH7GAe1ctaVmtGx2PyG1HvxAym86UQtn/7w0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759779550; c=relaxed/simple;
-	bh=8NnvCwxXFYrb2eeT9L1TzNbphG1m9VKlU9TVZvha8u4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UOLsNjWDkZLklSCUso31AatlTwjP7iCX93mUbNZHkwVK/Na8ejzA19ZVO7yjRA3vuvRlP+k4cAyeQD0k7F87H8qWN2fqDVpKJJXBdF89egK+m3uVXvI6nm1oXwz29CHNkIwpb7/FrI8sIDaxsKSYzL5YYYiR2vK/r8Au4EjV/gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A36nYUK+; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4da3019b6b6so49852771cf.3
-        for <netdev@vger.kernel.org>; Mon, 06 Oct 2025 12:39:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759779548; x=1760384348; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lsNd+WFo5daOEVQEUGVa/XJKJwpYI4DKaFcUkLpF5uo=;
-        b=A36nYUK+NnN8ACNbyYHeHJxjMI7DPOvE5svnlUUrNO1bzuGEIXT/LIQCxr9ZfRp7b/
-         ggelqk6fAhDGy+qg83j8peqEXNpqHAVaRJSCFZvNKhYTm5lPpHw38z+Cqi+UOMRasULj
-         FU89LC8V5JxCBq8W9/hvuidA3nQNBBJYkG13cH3Jwvv9Ts6h1X5CWm7s4jzPcF415Cij
-         38NF9dO5YQJUwu1nqbi1yrD0sJL941a0Zo5ukj7fjBzgwP1xyOFJvWiYon6fFfy+OKTl
-         hj7xcmt2BMppHs0DvCM09aIr1QXJBN/jF+7j9dQkWQ62GcKSa8q/Fu26LO6P69swwRZt
-         9bjw==
+	s=arc-20240116; t=1759779953; c=relaxed/simple;
+	bh=x+ftkWY5fwkw39EHN2Kyi0GJJnaTzx3hijkVj7JP2MY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HuyGyyAvA1BRxkbS0Qlff6wkFh3hvHGzFaVcZoEfaQZnLGIhzE3eT6gJfoT6A2AFuyS8eb8ll//K44X4yWhmEvRvrC3WRzGPlNNFYojMLzDdMVvedNaeE7x8/04E7EzVNIKBFTFrhsKfwlHMuEb4IhcOaPfR+lPa7kQti7mp1i0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f2dAtET+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759779950;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bww/a9+3wdLbRI/iBMrrt7lr6xjDvm4RQk8ELkL6obs=;
+	b=f2dAtET+41bKdgS56/rKt9e6pQVacBrpFtZgNHV+PpO3rfoufDIbwMFtOwe60IFw2Kphpj
+	s1e8iGALXFhVU3zMEcOhxs2v2dajDsROm5WH7ihx1viBdrJetOybhu4M4zb5I9kdppcgYX
+	CX5LLgQt6UtaMIRA85F5Dsq4qcxaFyY=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-349--0teK6r2OXeHuegdUJxoyg-1; Mon, 06 Oct 2025 15:45:49 -0400
+X-MC-Unique: -0teK6r2OXeHuegdUJxoyg-1
+X-Mimecast-MFC-AGG-ID: -0teK6r2OXeHuegdUJxoyg_1759779949
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-78f3a8ee4d8so100565466d6.1
+        for <netdev@vger.kernel.org>; Mon, 06 Oct 2025 12:45:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759779548; x=1760384348;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lsNd+WFo5daOEVQEUGVa/XJKJwpYI4DKaFcUkLpF5uo=;
-        b=qn74NVfhCoAqoXrGj3sM+5lS0e0312EgTotQ1Sh1kf/1BZOotpz73ANeO0KRaPof+6
-         f8ayw0P8WLLlyvmd6txFwCdSgzEP7tErSjrWaHW6VS+nIvIIZkYVZD35RR+Q2875eHsZ
-         h2QMlq7xNPESFE+qXxJIGGLEVHAW5m3re02qS5RrnfeccuuqcondfLXo8i1GycUtCp/V
-         TB1D67SIdWQfMu0Luw1D5x3JJtdF3njW2god5kcR/7jXW3VYCbvSaHf3YO/Z6lfH52go
-         /vRlqU0MVRTeNGfAMmY70mRpitMAhL3B00jAuNe8VFqlcRdHjxf/PYkcxy3MhO2I/HC1
-         yp0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWpsUTXZ36BxQmOzRXJX2vco+eF3zVUQMCZs1iGiibWTXOluCINXZWGC/Dse9OnNvpGbxpD18E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxo6T4Szx7F0hSZYMlADRCAQgrjq/+1gx4Br2RlEAuKt6jloD/Z
-	qn+grZmzkoLO/u+Eqczu55GxRC84XBNIhc94SewjniE1/Ne9uZJZXa7P0eBTRHa6irJnOlZKBax
-	BxkbHQVzGBWFZJTJ1uoKD1z44eo2u/JNTReagCiJi
-X-Gm-Gg: ASbGncswYnq3NI8ciChU3YUwvTVoQTZdmc/xE1+MeEoGq5FuyoC3ixxHk//m28xFAzA
-	9JAXCFdVM3n/g96m5P1P/yTCWz9aJQuyPUkW2fpEEhxSBjReqsKorARVpVdd/V+L0coNGO4nDwk
-	pgHB8kerR+2MbqifDcwnSkooF/rd1BuDnja9A+KOpQDYNuctCm9fwcNzMwO7gPM7JhE2f8vuj0r
-	m97am6zg8MPrdGwWrCkMPMRQ0/WXCepzFBY
-X-Google-Smtp-Source: AGHT+IEtOW0pmO9Mlev1TknSRJ9buDcC4Z9vzyuOoSlC22KMrLQIT/182wPD2YuP83eTBEAQRq5Pd8XhP7L9SiFElus=
-X-Received: by 2002:a05:622a:124b:b0:4e0:a152:6feb with SMTP id
- d75a77b69052e-4e576a469c4mr165842711cf.12.1759779547415; Mon, 06 Oct 2025
- 12:39:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759779949; x=1760384749;
+        h=mime-version:user-agent:content-transfer-encoding:organization
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Bww/a9+3wdLbRI/iBMrrt7lr6xjDvm4RQk8ELkL6obs=;
+        b=ihxR1hW1GEGhJ1AZv9j+hRkR1gnegkOMZ0RB6vfR4MUarfzWardG/lj4evqwjlfnsB
+         pfflcRngjllEa0IoJZ6YcE8xIv+wD2s4PJdler2hGyeiVyWLJiab0zgh7O4hkza7d7x0
+         xN+kqUV3eKBD+1ePtSLkbuqes9fAGCiuEl/g6URGGarHAls+sRTYrkvDWlYukKObH3jd
+         TarnLadPjgFIJDHuWfOdxl3iKF0YOFHPg3MD19pMOu4TPmGlybW0puonJDd0FZdMuan8
+         Vao9uD5kLdZKXX8ssbNvELg8MAupjaQnKHeISggROYtWhdmc7hTqRJFN3KALrcA/o13J
+         Pdiw==
+X-Forwarded-Encrypted: i=1; AJvYcCV/PAELZGPQGaUQ1wpeT7/zqby5MXN/82QCtBapYx0Rrj1jEVDDrmLqq1DqN5b+I5A1IZM9BUc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1KiswCC9oiIoF0EMr1aajS/+82Mj2F2CgTokX6/AJZnKRbnIp
+	RRP1gWMrLOoIYhVU6Yn9wbjQcrbHlRq4C+7fwCb+OJ4XuqskVED+zWx3oa+CRK1NKzvyGJNuz1M
+	X05e1klv7JwtFzeZpxPKDgNe9IGJeWkwZ61oV7R4K5xmC4ZHaE4d8ra931Q==
+X-Gm-Gg: ASbGncstTNnsveADHFDfKDaWSJs+v2hXv/rQ1U5S8E2V/oiR5Ue84QzqOwQTaY9nqvb
+	APeHGYUZ91hC6QNmEZR2cJ7BctDkSqB6n30XbqcPkfioSArw4yx5nxqmIhHxS6AtNAJwx2qWrJd
+	NjZI0mfLluPUpX5kMs/kodCF9q0Qh6uPvvLXozWoNdpeE57XgqPUqkVvDIlfwiWCE5TXY8kgOvv
+	Gr70BrC4UvulUC0+oVZzhCTfxRkhlbFZLvH2rfR6bvL9f0d29ZB8Lqx59zyKRhgqZHvxOcFo4lP
+	kaFg4gdnuTLjGzUoATD03JL4ZDxwR4UEFVPHUORa
+X-Received: by 2002:a05:6214:2465:b0:820:a83:eb04 with SMTP id 6a1803df08f44-879dc799aa2mr132540616d6.20.1759779948793;
+        Mon, 06 Oct 2025 12:45:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHY1TaTfi2eevE1f8zq7Sc6pe4IW7SS1PPzrteUKIgFuyF3z0hFZTwxqNXjqadsyaHbu1ADIw==
+X-Received: by 2002:a05:6214:2465:b0:820:a83:eb04 with SMTP id 6a1803df08f44-879dc799aa2mr132540316d6.20.1759779948323;
+        Mon, 06 Oct 2025 12:45:48 -0700 (PDT)
+Received: from m8.users.ipa.redhat.com ([2603:7000:9400:fe80::318])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-878bd783bb7sm125065946d6.41.2025.10.06.12.45.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Oct 2025 12:45:47 -0700 (PDT)
+Message-ID: <0acd44b257938b927515034dd3954e2d36fc65ac.camel@redhat.com>
+Subject: Re: 6.17 crashes in ipv6 code when booted fips=1 [was: [GIT PULL]
+ Crypto Update for 6.17]
+From: Simo Sorce <simo@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>, Vegard Nossum
+ <vegard.nossum@oracle.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Jiri Slaby	
+ <jirislaby@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, "David S.
+ Miller" <davem@davemloft.net>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List
+ <linux-crypto@vger.kernel.org>, netdev@vger.kernel.org, Jakub Kicinski
+ <kuba@kernel.org>, Theodore Ts'o	 <tytso@mit.edu>, "nstange@suse.de"
+ <nstange@suse.de>, "Wang, Jay"	 <wanjay@amazon.com>
+Date: Mon, 06 Oct 2025 15:45:46 -0400
+In-Reply-To: <20251006192622.GA1546808@google.com>
+References: <562363e8-ea90-4458-9f97-1b1cb433c863@kernel.org>
+	 <8bb5a196-7d55-4bdb-b890-709f918abad0@kernel.org>
+	 <1a71398e-637f-4aa5-b4c6-0d3502a62a0c@kernel.org>
+	 <f31dbb22-0add-481c-aee0-e337a7731f8e@oracle.com>
+	 <20251002172310.GC1697@sol>
+	 <2981dc1d-287f-44fc-9f6f-a9357fb62dbf@oracle.com>
+	 <CAHk-=wjcXn+uPu8h554YFyZqfkoF=K4+tFFtXHsWNzqftShdbQ@mail.gmail.com>
+	 <3b1ff093-2578-4186-969a-3c70530e57b7@oracle.com>
+	 <CAHk-=whzJ1Bcx5Yi5JC57pLsJYuApTwpC=WjNi28GLUv7HPCOQ@mail.gmail.com>
+	 <e1dc974a-eb36-4090-8d5f-debcb546ccb7@oracle.com>
+	 <20251006192622.GA1546808@google.com>
+Organization: Red Hat
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251006193103.2684156-1-edumazet@google.com> <20251006193103.2684156-2-edumazet@google.com>
-In-Reply-To: <20251006193103.2684156-2-edumazet@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 6 Oct 2025 12:38:54 -0700
-X-Gm-Features: AS18NWAp6kcI-5n1nXurlWyv6vtHpgKQBgnM5wgdOLr4TEbzVNikDo96MFw7roM
-Message-ID: <CANn89i+J4aHWWsOVBhUVz6qqX8_O7zzjZOvDKCfD7NAiBrQpVg@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next 1/5] net: add add indirect call wrapper in skb_release_head_state()
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 6, 2025 at 12:31=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> While stress testing UDP senders on a host with expensive indirect
-> calls, I found cpus processing TX completions where showing
-> a very high cost (20%) in sock_wfree() due to
-> CONFIG_MITIGATION_RETPOLINE=3Dy.
->
-> Take care of TCP and UDP TX destructors and use INDIRECT_CALL_3() macro.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  net/core/skbuff.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index bc12790017b0b5c0be99f8fb9d362b3730fa4eb0..c9c06f9a8d6085f8d0907b412=
-e050a60c835a6e8 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -1136,7 +1136,9 @@ void skb_release_head_state(struct sk_buff *skb)
->         skb_dst_drop(skb);
->         if (skb->destructor) {
->                 DEBUG_NET_WARN_ON_ONCE(in_hardirq());
-> -               skb->destructor(skb);
-> +               INDIRECT_CALL_3(skb->destructor,
-> +                               tcp_wfree, __sock_wfree, sock_wfree,
-> +                               skb);
+On Mon, 2025-10-06 at 19:26 +0000, Eric Biggers wrote:
+> On Mon, Oct 06, 2025 at 09:11:41PM +0200, Vegard Nossum wrote:
+> > The fact is that fips=3D1 is not useful if it doesn't actually result
+> > something that complies with the standard; the only purpose of fips=3D1=
+ is
+> > to allow the kernel to be used and certified as a FIPS module.
+>=20
+> Don't all the distros doing this actually carry out-of-tree patches to
+> fix up some things required for certification that upstream has never
+> done?  So that puts the upstream fips=3D1 support in an awkward place,
+> where it's always been an unfinished (and undocumented) feature.
 
-This will probably not compile well with  "# CONFIG_INET is not set".
+FWIW downstream patching, at least until recently, has been minimal.
+The upstream behavior has been good enough to be representative of the
+behavior you would expect from a certified binary.
 
-I will fix this when submitting the non RFC verson.
+Note: this may change going forward, but I am confident that as issues
+arise people will propose upstream patches to keep it as close as
+possible within acceptable parameters for upstream behavior.
+
+--=20
+Simo Sorce
+Distinguished Engineer
+RHEL Crypto Team
+Red Hat, Inc
+
 
