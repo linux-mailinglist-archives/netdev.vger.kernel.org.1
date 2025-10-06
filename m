@@ -1,85 +1,113 @@
-Return-Path: <netdev+bounces-227961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3815BBE199
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 14:55:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60DBCBBE1A8
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 15:00:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B6AF34E447A
-	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 12:55:37 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5BFC04E5A2A
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 13:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B5E1EC01B;
-	Mon,  6 Oct 2025 12:55:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4E8728489E;
+	Mon,  6 Oct 2025 13:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kjAcDW8X"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PF395J+j"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA3D199237
-	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 12:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B66534BA3F;
+	Mon,  6 Oct 2025 13:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759755335; cv=none; b=YiZ2AMHBjEp6ej1bDhmF4nhWgkorqGGb84iaeQhkt9gbh6LuZmA71xunbEOsTwgQPjeNQIbRHy4R8l7iMDXM/9ZGVlQGvPw0p1HAqrRa4sY3eOWP+PkQyJspJN9NOcjrgB1ctY6nntP3iwGWlbYnZOu5/RR0BUgB7k/CYkfKjDA=
+	t=1759755609; cv=none; b=hE8DeBIezZTVQkWd1NBc8a5rn348kODfF1GkuKolYiliIYoHZcroyaZmfRVHXFYxH3euBC9tS/6q/0CP4oBYTYh7AxsR/E15Xz5KLnz+WfBSr4QvhbE58QWYTUlEi9pDwWYXHlPgo2N8rdX7fqkHvnrAuOWbM8itZmb5iFxdrR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759755335; c=relaxed/simple;
-	bh=K+DTEbaga8u67QDTCN1KtKkJg4l3lW06F/m1RcQHKV4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bjXDKZPiWGPpQl65OGxR5Ekv4PoGFZ4qYCmHanjIT7L4BFujiDnF3T2VlnVH1o65rfCpxeJ+o0Pxxc79a87igEyaWilmX8k5bF3s45R/QHEmqWKKJIzoeEYqbvD9mMSNW2bW8nWVBu8C4w1lLrKRoOykdrwXByBOOt9yKHS8KW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kjAcDW8X; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ea0c839e-d0a7-450d-abd7-0a787804b415@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1759755330;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GOT2f+EOgnxJglkhi0yG44lmilb8ArnG4GdJrsCBkGM=;
-	b=kjAcDW8Xrf7XfBc9w2/U+YgBkeYoI+EqQ0b/IZL6p1WE3RCRDyJZTVa4LwUfO0tg+W+0Sp
-	z36skjmvquJG/YtsLoSY5KOSH/LBB+/g4ame0vzWVJbN7uJ6jONpgOimpH0sSyDH8VK8Mn
-	MLQGlmJpZYdNQmAXMnBFpk5U0Ry9fg4=
-Date: Mon, 6 Oct 2025 13:55:24 +0100
+	s=arc-20240116; t=1759755609; c=relaxed/simple;
+	bh=ZXpSi9q9F5BjRkTG31nLlX1zalzXYWg6ibtx+OI6e3U=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HjxAgxIsltTr18eO+DMw34haA76BUNcsYfby90a7e53/iTtSez0jPNGRxuSAjwSHEyrAFdDR9tu0891t22g8Za4IYKvPGKGIfPpICk/3GPirHd8z9kNyJr/H0BFPUc1FbTr96u6gS0SvnIt+DEmOq1ZheU+X+Xe0Ay9k6bmtiKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PF395J+j; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 2FBC24E40F1C;
+	Mon,  6 Oct 2025 13:00:04 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id E2014606B7;
+	Mon,  6 Oct 2025 13:00:03 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7AB58102F1D61;
+	Mon,  6 Oct 2025 15:00:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1759755603; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=ETS/CXHgTMRay5Bo8kJAmJVx/WmDhXe3DP4ABIDVz14=;
+	b=PF395J+jaQQ1TNCkRf+ecRUn+0mvw0jrUhQ1ikOnyBUo1BKjXRGTtB7zemmzF9qXXE62n8
+	X1twQEaK3ewlMgKtY+LkZJyA9jgh3IxApAw6qeajh0yqrRXgTmMEwd4D/0lY/gUS0qeLrd
+	wRsvzSM9HNylV5Zz9LKguJdf0Faz0ygQnjO4UktOcq2NBLPORHGgyyQjaJ7OAu+xXwMmC6
+	nA0tEaIwUhvrB7uKcZ+fnoC4BVxJS4Por13cgFYi47gzVQOV9s8L0Q7p+RlJ0GfPNTYezI
+	LJ+uWo6B+FQWkndnaB3BASOHHtKHSIBpi7poH9KhHwGwWDbKxRvLh6kUKxKCcg==
+Date: Mon, 6 Oct 2025 14:59:59 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Thomas Wismer <thomas@wismer.xyz>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Thomas Wismer <thomas.wismer@scs.ch>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] net: pse-pd: Add TPS23881B support
+Message-ID: <20251006145959.2358c9f0@kmaincent-XPS-13-7390>
+In-Reply-To: <20251004180351.118779-2-thomas@wismer.xyz>
+References: <20251004180351.118779-2-thomas@wismer.xyz>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH ethtool-next] netlink: tsconfig: add HW time stamping
- configuration
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: mkubecek@suse.cz, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-References: <20251004202715.9238-1-vadim.fedorenko@linux.dev>
- <20251006144512.003d4d13@kmaincent-XPS-13-7390>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20251006144512.003d4d13@kmaincent-XPS-13-7390>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On 06/10/2025 13:45, Kory Maincent wrote:
-> On Sat,  4 Oct 2025 20:27:15 +0000
-> Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
-> 
->> The kernel supports configuring HW time stamping modes via netlink
->> messages, but previous implementation added support for HW time stamping
->> source configuration. Add support to configure TX/RX time stamping.
-> 
-> For the information, I didn't add this support because it kind of conflict with
-> ptp4l which is already configuring this. So if you set it with ethtool, running
-> ptp4l will change it. I am not really a PTP user so maybe I missed cases where
-> we need these hwtstamp config change without using ptp4l.
+On Sat,  4 Oct 2025 20:03:47 +0200
+Thomas Wismer <thomas@wismer.xyz> wrote:
 
-Well, it's more about ability to configure HW time stamping by users.
-Running software will potentially change the configuration anyways, but
-it maybe helpful to test different HW configurations without changing
-the software itself.
+> This patch series aims at adding support for the TI TPS23881B PoE
+> PSE controller.
+
+First you are missing net-next prefix in the patches subject. Like that:
+[PATCH net-next 2/3] net: pse-pd: tps23881: Add support for TPS23881B
+
+See:
+https://elixir.bootlin.com/linux/v6.17.1/source/Documentation/process/maint=
+ainer-netdev.rst#L9
+
+The merge window for v6.18 has begun and therefore net-next is closed
+for new drivers, features, code refactoring and optimizations. We are
+currently accepting bug fixes only.
+
+Please repost when net-next reopens after October 12th.
+
+Only patch 1 which is a fix can be posted during the merge window.
+=20
+> ---
+> Thomas Wismer (3):
+>   net: pse-pd: tps23881: Fix current measurement scaling
+>   net: pse-pd: tps23881: Add support for TPS23881B
+>   dt-bindings: pse-pd: ti,tps23881: Add TPS23881B
+>=20
+>  .../bindings/net/pse-pd/ti,tps23881.yaml      |  1 +
+>  drivers/net/pse-pd/tps23881.c                 | 67 ++++++++++++++-----
+>  2 files changed, 53 insertions(+), 15 deletions(-)
+>=20
 
 
+
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
