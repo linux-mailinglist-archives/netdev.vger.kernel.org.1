@@ -1,65 +1,97 @@
-Return-Path: <netdev+bounces-227901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-227902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2FE8BBD02F
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 05:54:59 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0951BBBD15C
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 07:43:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A95C61892356
-	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 03:55:22 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 253EF3450BB
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 05:43:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD4819049B;
-	Mon,  6 Oct 2025 03:54:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC32C248891;
+	Mon,  6 Oct 2025 05:43:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ut29Izpw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511C378C9C;
-	Mon,  6 Oct 2025 03:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386681A9F80
+	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 05:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759722895; cv=none; b=M0zHqZTZGSsY6gRMp1/GsZMnZ5tudQTE0TapJH/MvkpDq693imlj0Vq70sXYxgMCoZDTswfO8XhpIwpvqmtGEvhr6KOO4ashr1QNIGXZHXTP4Hyjhc/qSaQ3ex0joXEVF/fxDpIhfOKOXg7oBlCyC4C/k94MHHblUu8h/ZGb82I=
+	t=1759729411; cv=none; b=JPdfJD22nWKNRp+mVIVVr7cPnkVnMqSScVfw4udWKUgNU9bGHg/Y7qeQTPU8wvXyySm4F1a/DIb20oa6uUeX6zP+KJwABnNuQnPrimozFz+dPU+Bk3NfqUxwqpnkq4FRpUF0jp5PwIecCutejiqOWn21vAZPj7w5IDAr+SYyh6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759722895; c=relaxed/simple;
-	bh=gqLcQ7RqXkovZeXFiaAwJnyASFvXFRIXCS/zaEP80gg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GhdRUZFb+XZKnIJOTR5Y3B6al9+CcrEfvPRXTTLeV2E9MPlwSOASYgZbm+EXuzWvrbWLWnOG7GcsIXJi9KchpwoPECp0LgPq5B2kDHD+os62qwfuoOOMDaGVvuJ1nPjbC2poX19B+4sGpbRT+peT2T5PUDEqw3Rpmc0Exal30B4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 786a6412a26711f0a38c85956e01ac42-20251006
-X-CID-CACHE: Type:Local,Time:202510061127+08,HitQuantity:1
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.3,REQID:4024681a-9057-48ca-acb3-5b95a563ea86,IP:0,UR
-	L:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-25
-X-CID-META: VersionHash:f1326cf,CLOUDID:fba4adf866208d8802773314a9dcaa41,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:nil,UR
-	L:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,S
-	PR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 786a6412a26711f0a38c85956e01ac42-20251006
-X-User: lilinmao@kylinos.cn
-Received: from llmserver.local [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <lilinmao@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1154822787; Mon, 06 Oct 2025 11:49:33 +0800
-From: lilinmao <lilinmao@kylinos.cn>
-To: hkallweit1@gmail.com,
-	nic_swsd@realtek.com
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Linmao Li <lilinmao@kylinos.cn>
-Subject: [PATCH] r8169: fix packet truncation after S4 resume on RTL8168H/RTL8111H
-Date: Mon,  6 Oct 2025 11:49:08 +0800
-Message-Id: <20251006034908.2290579-1-lilinmao@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1759729411; c=relaxed/simple;
+	bh=RE+zGZ8yF4o1w8jWuzVSUSVxDNM3CJztkem+rcfkWWw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i05VUJPypvwQ5oK9TCvD0khQDkDxaFDU0dQ/GdnYKmkv5e6FWYGJWMvt+YPNr+dRpTuK1GvlqekL3eWJh7lyTos5xobvtahYRt0EPVoQHKgLjn46uMWaoK80+m3Aq/qOtrg8DJczZiVoR6AaGatqhUV3X245M9tKrYhMlUsDsk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ut29Izpw; arc=none smtp.client-ip=209.85.214.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-269639879c3so41648995ad.2
+        for <netdev@vger.kernel.org>; Sun, 05 Oct 2025 22:43:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759729409; x=1760334209; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UeAUDJn0BeGNQx3vn077OGP4xs5barO9XuqG13SWPJU=;
+        b=Ut29IzpwbyB3AnjvP2qVIJ0/q4dqUGJL1md0vwMxedDAkrjOnEbwQg84xBD3tRGWUh
+         exinCSEajTz7Ham1ToXtgS0y1939/95+GAIpjg9gPHvnWcEdTjE3N4tej6Dp+O470yBP
+         GcONRIeitkhdPIuATeXN8rRfKFA+XsuRaS3clXxfELOUSmNk88w9Gh0dzZQsyyDs3mTw
+         6MAo6+YKyT9dAaLGiWIkiLIV0jxNLW4ZVDLIt2+mWenKqGDp81/hYpopAxgyZq7clUZY
+         Hd6fW5zVQRq++pPjh+mCfBaVrzgwoTRe0rJ8IU/zdkil6wJHUlv4j0XyzdUE9DY2pjv5
+         S+bQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759729409; x=1760334209;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UeAUDJn0BeGNQx3vn077OGP4xs5barO9XuqG13SWPJU=;
+        b=CabYoNschNXQlSNXXIubcviVDk3FNEWCBkgY41fTeGa9KhSVHIQa8pV/LTRaOqMj1F
+         k3Dydikot4hT5kEqlNBrD2iH4w5LXeXeIxurVh4R+Oil9jPcPWlsgRcPqEmwuS9Qy/Re
+         3WHLtS7eMRSTzayQucmIv+EZFFbpawS7CAiE5xvVFNotbe6Z4mS4QXeIjwO/KXdtQOdo
+         x9Th6bCGevC53pbgtF12UWpngtzrebJbkWo0vHbroO80hSAy9bP5+S5nof3hLlogwj5r
+         0YnlSCV9t6JRCWVBiZK3iY3lQmfdvdQ9skTGpi+M3AsyRUkI7IM5GStIyBUy7J0uVMiH
+         0NfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWtUwWuOUg31rAGpZOz81qqYZCxw62Ej5NxMA9KI4O6OT6cB4egsTe05TqL7KBI/7Td7cpudSM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzI57lCACSaaBH1ScHO/f0EqqaUuFixm7FqfNuHOZKvWoSfcULN
+	KUy7WL10hUYna9eiAyj/FSmgqOKZg/vhRrmfxFLrHhe7GnszLY7MgZYv
+X-Gm-Gg: ASbGnct3t4E4GrQDk9+vJdA2/xj4BpK2kzAQ6Kgjdngzsl7eNz/qAHsqNsx3YkTisVg
+	n95bLVZTis+UIocOk23cM0tc0lwS75+JUM5/mQgJuVnNGX7r8/8I/5BO+TtEiZ9EminnVFpNwLc
+	dJmvuNGPukSJtz9cxdjD0JBy7ooih8hpOsuRgeJhA++uBTxN3786Mb6YdxrSQfHZueC6XyY52yw
+	BbeSy1o6Q0Gtd5yi289I3ha1JdymOLIusW+mbRb/fJJP5VZhj85JXQYO9m7P3PRBEIztT9xN0dM
+	jbc8O0Uhgt7E/FvvyvAChr+l1eXkGzprwOsnaJg4/MkeWuo62+6QV/hdRAXlf08qi4QtvRXUVXH
+	KOgNImu/lYhcUb5LbBQ8WmmBJd0vf+H96XG0dvDkQPZtc5kIFTzPIkcGxZShNP+Au/cRCVErQdf
+	NrowcKEkQALn4QmGhwp0QhMC0=
+X-Google-Smtp-Source: AGHT+IEgWCXbq557PGaex/0bq+zmROsO2U11LOaA2gdlP8UhSWMYUL72C92P/f2n/UgOF18aD+TRlw==
+X-Received: by 2002:a17:903:2c10:b0:265:89c:251b with SMTP id d9443c01a7336-28e9a68fdfdmr122698305ad.29.1759729409388;
+        Sun, 05 Oct 2025 22:43:29 -0700 (PDT)
+Received: from chandna.localdomain ([182.77.76.69])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-28e8d125ed2sm119549815ad.35.2025.10.05.22.43.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Oct 2025 22:43:28 -0700 (PDT)
+From: Sahil Chandna <chandna.linuxkernel@gmail.com>
+To: ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	john.fastabend@gmail.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: david.hunter.linux@gmail.com,
+	skhan@linuxfoundation.org,
+	khalid@kernel.org,
+	Sahil Chandna <chandna.linuxkernel@gmail.com>,
+	syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
+Subject: [PATCH] bpf: test_run: Fix timer mode initialization to NO_MIGRATE mode
+Date: Mon,  6 Oct 2025 11:13:20 +0530
+Message-ID: <20251006054320.159321-1-chandna.linuxkernel@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,42 +100,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Linmao Li <lilinmao@kylinos.cn>
+By default, the timer mode is being initialized to `NO_PREEMPT`.
+This disables preemption and forces execution in atomic context.
+This can cause issue with PREEMPT_RT when calling spin_lock_bh() due
+to sleeping nature of the lock.
+...
+BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:48
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 6107, name: syz.0.17
+preempt_count: 1, expected: 0
+RCU nest depth: 1, expected: 1
+Preemption disabled at:
+[<ffffffff891fce58>] bpf_test_timer_enter+0xf8/0x140 net/bpf/test_run.c:42
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ __might_resched+0x44b/0x5d0 kernel/sched/core.c:8957
+ __rt_spin_lock kernel/locking/spinlock_rt.c:48 [inline]
+ rt_spin_lock+0xc7/0x2c0 kernel/locking/spinlock_rt.c:57
+ spin_lock_bh include/linux/spinlock_rt.h:88 [inline]
+ __sock_map_delete net/core/sock_map.c:421 [inline]
+ sock_map_delete_elem+0xb7/0x170 net/core/sock_map.c:452
+ bpf_prog_2c29ac5cdc6b1842+0x43/0x4b
+ bpf_dispatcher_nop_func include/linux/bpf.h:1332 [inline]
+...
+Change initialization to NO_MIGRATE mode to prevent this.
 
-After resume from S4 (hibernate), RTL8168H/RTL8111H truncates incoming
-packets. Packet captures show messages like "IP truncated-ip - 146 bytes
-missing!".
-
-The issue is caused by RxConfig not being properly re-initialized after
-resume. Re-initializing the RxConfig register before the chip
-re-initialization sequence avoids the truncation and restores correct
-packet reception.
-
-This follows the same pattern as commit ef9da46ddef0 ("r8169: fix data
-corruption issue on RTL8402").
-
-Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
+Reported-by: syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=1f1fbecb9413cdbfbef8
+Tested-by: syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
+Signed-off-by: Sahil Chandna <chandna.linuxkernel@gmail.com>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ net/bpf/test_run.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 9c601f271c02..4b0ac73565ea 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -4994,8 +4994,9 @@ static int rtl8169_resume(struct device *device)
- 	if (!device_may_wakeup(tp_to_dev(tp)))
- 		clk_prepare_enable(tp->clk);
- 
--	/* Reportedly at least Asus X453MA truncates packets otherwise */
--	if (tp->mac_version == RTL_GIGA_MAC_VER_37)
-+	/* Some chip versions may truncate packets without this initialization */
-+	if (tp->mac_version == RTL_GIGA_MAC_VER_37 ||
-+	    tp->mac_version == RTL_GIGA_MAC_VER_46)
- 		rtl_init_rxcfg(tp);
- 
- 	return rtl8169_runtime_resume(device);
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index 4a862d605386..daf966dfed69 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -1368,7 +1368,7 @@ int bpf_prog_test_run_flow_dissector(struct bpf_prog *prog,
+ 				     const union bpf_attr *kattr,
+ 				     union bpf_attr __user *uattr)
+ {
+-	struct bpf_test_timer t = { NO_PREEMPT };
++	struct bpf_test_timer t = { NO_MIGRATE };
+ 	u32 size = kattr->test.data_size_in;
+ 	struct bpf_flow_dissector ctx = {};
+ 	u32 repeat = kattr->test.repeat;
+@@ -1436,7 +1436,7 @@ int bpf_prog_test_run_flow_dissector(struct bpf_prog *prog,
+ int bpf_prog_test_run_sk_lookup(struct bpf_prog *prog, const union bpf_attr *kattr,
+ 				union bpf_attr __user *uattr)
+ {
+-	struct bpf_test_timer t = { NO_PREEMPT };
++	struct bpf_test_timer t = { NO_MIGRATE };
+ 	struct bpf_prog_array *progs = NULL;
+ 	struct bpf_sk_lookup_kern ctx = {};
+ 	u32 repeat = kattr->test.repeat;
 -- 
-2.25.1
+2.50.1
 
 
