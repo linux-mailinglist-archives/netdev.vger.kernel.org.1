@@ -1,83 +1,105 @@
-Return-Path: <netdev+bounces-228001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B16EBBEEC9
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 20:21:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 641C2BBEF4F
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 20:29:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 35C104F0A6E
-	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 18:21:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4B5BB4F216A
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 18:28:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3E82DF156;
-	Mon,  6 Oct 2025 18:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4026B2DE6F1;
+	Mon,  6 Oct 2025 18:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FccwG3B8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="upTwnuUy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4958A2DF142;
-	Mon,  6 Oct 2025 18:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F562D979F
+	for <netdev@vger.kernel.org>; Mon,  6 Oct 2025 18:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759774867; cv=none; b=KypNwVhXIBfsJyLjQh5Z5Fwj7w1bifFeNsoXhpf8ExtzsoBjx7oQzjanoHJMta7Klkfg5z4YkGIYtFAzplbGifJyNb9sWPgDnZQZLmacl2effRdjFttzMXDK9PWxXUI5ueeWuSWbOAmzpYDq8EwXae/+rcRiH+Ed+I0zgIbKFEc=
+	t=1759775291; cv=none; b=ahTsDWco0dnQy7jfIBX2yYYNJrYoIANV2Tx6k+imoCGAyrWG2MuOWxlJoud66ZmF7lECALG1IBNjqTeMnVd7nLqwh5CgfKQxjv1rLobOXf/o3J21wQR4ZjWeoHoiB++pHmKQPtbQ/BveX0+Ru4UUcY1ajb+ocYf/edc0MYdE/V0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759774867; c=relaxed/simple;
-	bh=0y6fRGLPsaAkHRl+rStXh6yawp7KVV4geyZJxkKo8CQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XfvM1/4eizAWf5S7gWX4lMeLhB6qx+Fb02bGMaVycqp8afl6XZmi8SzsaxI/O7/W10L5rLalF5qQNPmPOPzi8n2mEZCg3EASdfFBt6Z8eOlOQIEsuCRVa3X4LXfqGMBFmi2yvRGcE8IgklhosoO0gUsU3b/pSxF8g07rblSPTDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FccwG3B8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42551C4CEF5;
-	Mon,  6 Oct 2025 18:21:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759774867;
-	bh=0y6fRGLPsaAkHRl+rStXh6yawp7KVV4geyZJxkKo8CQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FccwG3B8+HOUanbCPO507Hv5bliRw14wU9HMwJW/HqGu2qd3yjeX2WH/p/qu/x2dC
-	 AN6VGxFNP3XuRdPzHasQEpJaTvd8Qb0mj7F04MqLqDUa+ouPQfDj4WzCW3hGGq1U2U
-	 jb0XkGlE9lmM3H9IwdHf2VEK4ixxlDMTkUc599xJekL721Z/Nt3bz90I4TIIqACkCB
-	 weZwHEG/jV4CLMk/DLLJOkrjHcl7ounQ/Vi1w1EGk81pFcO52NHov1NXb0Vk81BvzQ
-	 f225eHW9mx9rExIRiMuzXMaudHGK10BVHWr8OkcEbJ5UNvKPZ6nIrnVYqmQflM09gk
-	 xh+Cb+X6/XuCA==
-Date: Mon, 6 Oct 2025 11:21:05 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Saeed Mahameed <saeedm@nvidia.com>
-Cc: Arnd Bergmann <arnd@kernel.org>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Patrisious
- Haddad <phaddad@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, Michael
- Guralnik <michaelgur@nvidia.com>, Arnd Bergmann <arnd@arndb.de>, Naresh
- Kamboju <naresh.kamboju@linaro.org>, Nathan Chancellor <nathan@kernel.org>,
- Simon Horman <horms@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>, Yishai
- Hadas <yishaih@nvidia.com>, Maor Gottlieb <maorg@nvidia.com>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net/mlx5: fix pre-2.40 binutils assembler error
-Message-ID: <20251006112105.3fb129f6@kernel.org>
-In-Reply-To: <20251006115640.497169-1-arnd@kernel.org>
-References: <20251006115640.497169-1-arnd@kernel.org>
+	s=arc-20240116; t=1759775291; c=relaxed/simple;
+	bh=WRwgJ3oEqoJZKzzCY24fJsymFYMZ2aXCzOoCEKjLVBk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fB9Q26ssmvYqhWilf/Gvol7hy6AdeZKDe1Di8GK5iysBVJeZcTLnw12AEijMdn7xdNG8WG2n2BbaEA9GEB/M1pHQOugQKSh3TbzIWvheswylc3GM8fWzEQkssfn0Zgn0mrgw5LOrBkZFBkFsSxPkbJiK4mWk5bATgP+GdKwsl6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=upTwnuUy; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <31ec0460-ddbb-49b0-977c-25fafc5b8242@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1759775276;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fCG+pWwci9CbUyXhUlqJsoQtEiaYQVMbs4I6FSZousY=;
+	b=upTwnuUyjJkK4JNli/doziRePFnkHs/eSSOgcp6co2VlVUcOQvhGXFe/MHMA+dgk8U3yyf
+	EjjTQ80D1Ixm+OIaAHXkj2gcf03d7j8vO7EaLk0+3HocrMP1cDNdbcRJWQPkTh0umy/Y79
+	t7CELvPfKAN0VZukaLC+oHFzsDQh1hM=
+Date: Mon, 6 Oct 2025 11:27:49 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH] net: fix potential use-after-free in
+ ch_ipsec_xfrm_add_state() callback
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>,
+ Ayush Sawal <ayush.sawal@chelsio.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Leon Romanovsky <leon@kernel.org>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Cosmin Ratiu <cratiu@nvidia.com>, Harsh Jain <harsh@chelsio.com>,
+ Atul Gupta <atul.gupta@chelsio.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, Ganesh Goudar <ganeshgr@chelsio.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org
+References: <20251001111646.806130-1-Pavel.Zhigulin@kaspersky.com>
+ <f0cef998-0d49-4a52-b1b8-2f89b81d4b07@linux.dev>
+ <20251006110317.39d08275@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Yanjun.Zhu" <yanjun.zhu@linux.dev>
+In-Reply-To: <20251006110317.39d08275@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon,  6 Oct 2025 13:56:34 +0200 Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Old binutils versions require a slightly stricter syntax for the .arch_extension
-> directive and fail with the extra semicolon:
-> 
-> /tmp/cclfMnj9.s:656: Error: unknown architectural extension `simd;'
-> 
-> Drop the semicolon to make it work with all supported toolchain version.
 
-Saeed, could you ack? I think we should get this merged quickly since
-it's a build fix.
+On 10/6/25 11:03 AM, Jakub Kicinski wrote:
+> On Fri, 3 Oct 2025 21:28:51 -0700 Zhu Yanjun wrote:
+>> When the function ch_ipsec_xfrm_add_state is called, the kernel module
+>> cannot be in the GOING or UNFORMED state.
+> That was my intuition as well, but on a quick look module state is set
+> to GOING before ->exit() is called. So this function can in fact fail
+> to acquire a reference.
+>
+> Could you share your exact analysis?
+
+I delved into this function ch_ipsec_xfrm_add_state.
+
+Yes — your understanding is correct:
+
+When a module begins unloading, the kernel sets its state to GOING 
+before invoking its ->exit() method.
+
+Any concurrent call to try_module_get() will fail after this point.
+
+So try_module_get() can return false, even though it’s extremely rare.
+
+Ignoring that failure means continuing to use data that may already be 
+in teardown, creating a use-after-free hazard.
+
+This commit properly closes that race window.
+
+Yanjun.Zhu
+
 
