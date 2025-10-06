@@ -1,93 +1,159 @@
-Return-Path: <netdev+bounces-228009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 564E2BBF027
-	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 20:45:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68371BBF08A
+	for <lists+netdev@lfdr.de>; Mon, 06 Oct 2025 20:56:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E8183AC04F
-	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 18:45:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21C183A330D
+	for <lists+netdev@lfdr.de>; Mon,  6 Oct 2025 18:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81B472D6E66;
-	Mon,  6 Oct 2025 18:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEFF02DCC1C;
+	Mon,  6 Oct 2025 18:55:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1/z2Ce7n"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="E7+aom7i"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B769B231836;
-	Mon,  6 Oct 2025 18:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58374186284;
+	Mon,  6 Oct 2025 18:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759776301; cv=none; b=hY0iwjEKsPBLaoOkTIp1omo4Qk0Zr3g7RlN1j4mMsolxx9iuV2+Yn6b6zvdZkMbIVVa4219eSbuURj01N28HvagPMHbExiuPEAWj1eR3U6wBgO8EB6cJ8nxQ7A2c+ruE6h50om+KlXLq7dIDQUMJB7Iu6ajwUZVFQkNZHx767I8=
+	t=1759776959; cv=none; b=sl0mIS0Qsyihg7IObiMtFN31Gkbwa8stB8RwXa5SLCdfJQW5mvG81nYv9NRBgHmQpct54goojbI50VMsGRKxcPi/m+supgJ1NbXYxjGJ/njDQubitFcUOaFIIuUPsRyAowkkttyVUmpNG40H7mU1EVEH0beywA9VsvxOawU6N74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759776301; c=relaxed/simple;
-	bh=iuThHOm/7N3impVFIA5MVRJKAz+NUKSTJHWmLJJOhlU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hm1WooajC0SC8G8o//k75eA5zc5A/gGgU5dVUZe7dhVTrhI4HOJhUhd3w7NI4DgsW8Nj6IEUe0BPfUvqJ6DRKOio3VvLHrhFu2ZE4CA1iNRfGqWC9EM4tk1hA4uvdkHFJfS2PYytLeqBCgysVhYdj1V7Adu3EzkS+DEnrA4cW8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1/z2Ce7n; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zKTfTbBc9rMSSrbbgMKMOx5WxTKfjwTxiQRv+5DFwcA=; b=1/z2Ce7nxrBK2h0TtFLAyAPPes
-	eq27beYsKptU1kd5ddEf+nqHtbcc1VP+CkG+1H3WS9CG5mYpkZB+U+7NtXyQc0tjZQm8iTkeY2Kj0
-	ypwb+2+pQQNsastUQkDVTI41eRSdN1EnCAKxLVkzHPhHAPpRoSGoKVpRXcY204ZwOel4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1v5qCR-00AJbp-4K; Mon, 06 Oct 2025 20:44:43 +0200
-Date: Mon, 6 Oct 2025 20:44:43 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Divya.Koppera@microchip.com
-Cc: josef@raschen.org, Arun.Ramadoss@microchip.com,
-	UNGLinuxDriver@microchip.com, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: microchip_t1: LAN887X: Fix device init issues.
-Message-ID: <5f74c41e-15cd-40f3-8fb2-fa636f169d70@lunn.ch>
-References: <20250925205231.67764-1-josef@raschen.org>
- <3e2ea3a1-6c5e-4427-9b23-2c07da09088d@lunn.ch>
- <6ac94be0-5017-49cd-baa3-cea959fa1e0d@raschen.org>
- <0737ef75-b9ac-4979-8040-a3f1a83e974e@lunn.ch>
- <fbe66b6d-2517-4a6b-8bd2-ec6d94b8dc8e@raschen.org>
- <DS7PR11MB6102D0B2985344C770AEC293E2E4A@DS7PR11MB6102.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1759776959; c=relaxed/simple;
+	bh=NeO5M1g+CzpVBBZQ4Gkp2EgJHk7iaNVsdWR81NyG55w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=DKNuagUmAV/3gvZ61aPaNUFCaAYHZ1JGKyt0DXC2e5ylfxfjdwn3fKFekvwK2n1MMQTbSzZD9/mlhVnX8Fucm9TM2+JGXJxuXq4pkMRxoXd+wTfp3/jKWg/3ipKu6uuDaHj8/wSzB3Gev24kT9J+jA+rr+l/Zy5u6WT9aCHJDjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=E7+aom7i; arc=none smtp.client-ip=198.47.23.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 596It2SX4119639;
+	Mon, 6 Oct 2025 13:55:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1759776902;
+	bh=f6pZT5lucgMcs99wvMibFb9xDLLP+hxuIJ4a3foUSyk=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=E7+aom7iEB0KO+84LbOgCmjQEvWalHvTBxZspZXJNuIHfYKoIkaEgSNVC1Ud1VvDw
+	 FW0KnpoiqnJ3w+jyQjkEm8kgXbllSgAY2O4SDpM4jq+TEnPgkR8lUOFLD0EFtZ41OT
+	 lVvVHRj2FBwtxJzi8tdV0kS+dzu9H3CyWndZKQy0=
+Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
+	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 596It219128164
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Mon, 6 Oct 2025 13:55:02 -0500
+Received: from DFLE204.ent.ti.com (10.64.6.62) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Mon, 6
+ Oct 2025 13:55:01 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE204.ent.ti.com
+ (10.64.6.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Mon, 6 Oct 2025 13:55:01 -0500
+Received: from [10.249.131.66] ([10.249.131.66])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 596IsrfM3895037;
+	Mon, 6 Oct 2025 13:54:54 -0500
+Message-ID: <53cbd465-6925-4003-a13b-11fa1034819d@ti.com>
+Date: Tue, 7 Oct 2025 00:24:53 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DS7PR11MB6102D0B2985344C770AEC293E2E4A@DS7PR11MB6102.namprd11.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/6] net: ti: icssg-prueth: Add functions to
+ create and destroy Rx/Tx queues
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <namcao@linutronix.de>, <jacob.e.keller@intel.com>,
+        <christian.koenig@amd.com>, <sumit.semwal@linaro.org>,
+        <sdf@fomichev.me>, <john.fastabend@gmail.com>, <hawk@kernel.org>,
+        <daniel@iogearbox.net>, <ast@kernel.org>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+        <linaro-mm-sig@lists.linaro.org>, <dri-devel@lists.freedesktop.org>,
+        <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>, <danishanwar@ti.com>
+References: <20250901100227.1150567-1-m-malladi@ti.com>
+ <20250901100227.1150567-2-m-malladi@ti.com>
+ <20250903174847.5d8d1c9f@kernel.org>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <20250903174847.5d8d1c9f@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-> phy_sanitize_settings() is supposed to pick the least supported
-> speed from the supported list when speed is not initialized.
+Hi Jakub,
 
-What makes you think it should pick the slowest speed? The kdoc for
-the function is:
+On 9/4/2025 6:18 AM, Jakub Kicinski wrote:
+> On Mon, 1 Sep 2025 15:32:22 +0530 Meghana Malladi wrote:
+>>   	if (!emac->xdpi.prog && !prog)
+>>   		return 0;
+>>   
+>> -	WRITE_ONCE(emac->xdp_prog, prog);
+>> +	if (netif_running(emac->ndev)) {
+>> +		prueth_destroy_txq(emac);
+>> +		prueth_destroy_rxq(emac);
+>> +	}
+>> +
+>> +	old_prog = xchg(&emac->xdp_prog, prog);
+>> +	if (old_prog)
+>> +		bpf_prog_put(old_prog);
+>> +
+>> +	if (netif_running(emac->ndev)) {
+>> +		ret = prueth_create_rxq(emac);
+> 
+> shutting the device down and freeing all rx memory for reconfig is not
+> okay. If the system is low on memory the Rx buffer allocations may fail
+> and system may drop off the network. You must either pre-allocate or
+> avoid freeing the memory, and just restart the queues.
 
-/**
- * phy_sanitize_settings - make sure the PHY is set to supported speed and duplex
- * @phydev: the target phy_device struct
- *
- * Description: Make sure the PHY is set to supported speeds and
- *   duplexes.  Drop down by one in this order:  1000/FULL,
- *   1000/HALF, 100/FULL, 100/HALF, 10/FULL, 10/HALF.
+So I have been working on trying to address this comment and maintain 
+parity with the existing support provided by this series but looks like 
+I might be missing something which is causing some regressions.
 
-So it should pick 1000Full if available. If not it will try 1000Half,
-if not 100Full etc.
+I am facing an issue with zero copy Rx, where there is some active 
+traffic being received by the DUT (running in copy mode - default state)
+and I switch to zero copy mode using AF-XDP_example [1], I am not able 
+to receive any packets because I observe that the napi_rx_poll is not 
+getting scheduled for whatever reason, ending up draining the rx 
+descriptors and leading to memory leak. But if I first switch from copy 
+to zero copy mode and then try sending traffic I am able to receive 
+traffic on long runs without any failure or crash. I am not able to 
+figure out why is this happening, so sharing my changes [2] on top of 
+this series, which I made to address your comment. I am wondering if you 
+could have a look and give me some pointers here. Thank you.
 
-And the comment is actually a bit out of date. It will actually start
-from 800G Full, 400G Full, 200G Full, 100G Full, not that anybody does
-Copper at these speeds.
+[1] https://github.com/xdp-project/bpf-examples/tree/main/AF_XDP-example
 
-	Andrew
+[2] 
+https://gist.github.com/MeghanaMalladiTI/4c1cb106aee5bef4489ab372938d62d9
+
+> 
+>> +		if (ret) {
+>> +			netdev_err(emac->ndev, "Failed to create RX queue: %d\n", ret);
+>> +			return ret;
+>> +		}
+>> +
+>> +		ret = prueth_create_txq(emac);
+>> +		if (ret) {
+>> +			netdev_err(emac->ndev, "Failed to create TX queue: %d\n", ret);
+>> +			prueth_destroy_rxq(emac);
+>> +			emac->xdp_prog = NULL;
+>> +			return ret;
+>> +		}
+>> +	}
+>>   
+>>   	xdp_attachment_setup(&emac->xdpi, bpf);
+
+-- 
+Thanks,
+Meghana Malladi
+
 
