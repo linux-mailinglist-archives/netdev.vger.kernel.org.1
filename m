@@ -1,97 +1,97 @@
-Return-Path: <netdev+bounces-228072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 280E9BC0C8A
-	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 10:53:59 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC12BBC0CD5
+	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 11:00:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 10EB84E2A96
-	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 08:53:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 35AB34E2B73
+	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 09:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257E62D5946;
-	Tue,  7 Oct 2025 08:53:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9D62D3EE0;
+	Tue,  7 Oct 2025 09:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GHLhGfkR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i+kmPj8Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310AC34BA37;
-	Tue,  7 Oct 2025 08:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21EA525FA0A;
+	Tue,  7 Oct 2025 09:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759827235; cv=none; b=PUnUS1vQVwKJRVkQiRFb5IweNCJAnzdSIkCzWliq60iGv1YDCvINVY8/JHMqg/knoqEfCrNWCb5ZJBPkJ4FEEqaPCOLWmp3QhQdCDh0bHFa1AHLccO07bJkN4mHWjbH4QrNEZUqm5ZBuVeAx4NcqjMoBUIe12FRFyZmUsmvbzfg=
+	t=1759827617; cv=none; b=AL7fh+PVs9g4iMRyeHYlGc56q4/+EbSDQ6GdO3EU7Iadb3MyE5VS6T/Pf0bLWBfseYdMEp52Q/asa8UOKRUGQLVOJBY91rp1nDOSbSyoQCUQuQyYG31HS4wJx8AoMZdPOndsSceLm2R4qft7yXY3A2xcRtcxbrmfKK3G3Hz5q10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759827235; c=relaxed/simple;
-	bh=XerKFp3BmqnvlTwBJQ6Zv8BKIXwHk/GvCTpWSyoLDRY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a2xBG6HzSZ6ABXxwiVIP9YPNHiAEU5BOKF/j2MpCbvpRYKc4EsaGd0MRNrxEW1vgenhbLpnG3xKuOUPcs3i+dqMzt49cTteXhov4bCnNdnOzWUwcevpU510Bb2YF5i+5HDdRrPJcKqwmo19ZqGa3p9pwtPNhiuRf3dr1qKArg5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GHLhGfkR; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id ED6E11A11B2;
-	Tue,  7 Oct 2025 08:53:42 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id C1DF2606EB;
-	Tue,  7 Oct 2025 08:53:42 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E2187102F2134;
-	Tue,  7 Oct 2025 10:53:32 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1759827222; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=L2vWVeKOdRdTQKfeaPNnzY9dsfHHhSGnt4F8bj2CIkA=;
-	b=GHLhGfkR/r96R3YD9a64i4hWRspHMoKWhMTi4xlU4KqiObY5tsNcahLviKzB2EljsdqUyL
-	7N9vQ4oiZUYj9WJi7oJot9wcAs50Z2hxbFtwF9doNzE66zFsxXrOh3g9guZJk3DuotrWYR
-	7UFu/OwPgAM6OMBmU+jVcs8FF5swN4KQ6eVCbhhAuG5MuWEHgxcxpu4DR9trp2BopCUqVa
-	aDhxYXf+O9E3HXPXxcSailhc4A39m2fjMoXSE9tqBpsGM35Kv5YNpKVljR8R7NQTTXNQD6
-	ZJRs7uM4KQPN5VcWCpZCInZTcPnMm1KqWaSHet2H8ngU1BOoBv9f2Ma0QCV+4w==
-Date: Tue, 7 Oct 2025 10:53:31 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Thomas Wismer <thomas@wismer.xyz>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Thomas Wismer <thomas.wismer@scs.ch>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: pse-pd: tps23881: Fix current measurement
- scaling
-Message-ID: <20251007105331.70f03fc9@kmaincent-XPS-13-7390>
-In-Reply-To: <20251006204029.7169-2-thomas@wismer.xyz>
-References: <20251006204029.7169-2-thomas@wismer.xyz>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1759827617; c=relaxed/simple;
+	bh=3bEjxxbLlRz2SL9DcgL5La+6IXRtFYGl8rSV52XWn3s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=glGhMLhSptrIiaNrC+IFpcxmg+CRh6m8BBsa3Kjt59yp+V7RmfgyWi2vCZAXOon9c5v30Hxtb8s8DvXsI9PjL+ZlkIlzPChMQV2UkPZyWYXe2YoyFvVSeG/1lvFLAhBIH2Y5GGWMS27GAYc6QIMvHvBxVTWNjkV9NJykVPT2hf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i+kmPj8Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5BE7C4CEF1;
+	Tue,  7 Oct 2025 09:00:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759827616;
+	bh=3bEjxxbLlRz2SL9DcgL5La+6IXRtFYGl8rSV52XWn3s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=i+kmPj8QuUNfHD0j7GTVYkyYTntHx03rFuYsSViTNzU6ZrWHBmdZt4gth/T7sRugQ
+	 utAZAAb4zLt0GmNc3MmqKB3g/p1zuGTHOxI3fMNkbvC+LMqCQzpS6IoEbTUQxTSOxi
+	 YxOMeKWCH+0DPlgnip4JDLocClq7FULDEkaL2tlRp9C5HntWZyXWpyp7HVT+/ZqF2j
+	 rBJeAaMnO/HzTDwNcpSxdpXMHToU/e8pMwMCZfqL+QHeSp/Jfige6RIPmbynrsEWK2
+	 HymOkY22psuvhKz93tquryJr1qzht2nuOECLV8Sl2mmMwFcn3uYRIcxh/1YOyInxr5
+	 MaFBgL92oKNlA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FED39EFA5B;
+	Tue,  7 Oct 2025 09:00:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: mdio: mdio-i2c: Hold the i2c bus lock during
+ smbus
+ transactions
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175982760601.1816219.15728598756858423622.git-patchwork-notify@kernel.org>
+Date: Tue, 07 Oct 2025 09:00:06 +0000
+References: <20251003070311.861135-1-maxime.chevallier@bootlin.com>
+In-Reply-To: <20251003070311.861135-1-maxime.chevallier@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, andrew@lunn.ch, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, linux@armlinux.org.uk, hkallweit1@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, f.fainelli@gmail.com,
+ kory.maincent@bootlin.com, horms@kernel.org, romain.gantois@bootlin.com,
+ kabel@kernel.org
 
-On Mon,  6 Oct 2025 22:40:29 +0200
-Thomas Wismer <thomas@wismer.xyz> wrote:
+Hello:
 
-> From: Thomas Wismer <thomas.wismer@scs.ch>
->=20
-> The TPS23881 improves on the TPS23880 with current sense resistors reduced
-> from 255 mOhm to 200 mOhm. This has a direct impact on the scaling of the
-> current measurement. However, the latest TPS23881 data sheet from May 2023
-> still shows the scaling of the TPS23880 model.
->=20
-> Fixes: 7f076ce3f1733 ("net: pse-pd: tps23881: Add support for power limit=
- and
-> measurement features") Signed-off-by: Thomas Wismer <thomas.wismer@scs.ch>
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Acked-by: Kory Maincent <kory.maincent@bootlin.com>
+On Fri,  3 Oct 2025 09:03:06 +0200 you wrote:
+> When accessing an MDIO register using single-byte smbus accesses, we have to
+> perform 2 consecutive operations targeting the same address,
+> first accessing the MSB then the LSB of the 16 bit register:
+> 
+>   read_1_byte(addr); <- returns MSB of register at address 'addr'
+>   read_1_byte(addr); <- returns LSB
+> 
+> [...]
 
-Thank you!
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Here is the summary with links:
+  - [net] net: mdio: mdio-i2c: Hold the i2c bus lock during smbus transactions
+    https://git.kernel.org/netdev/net/c/4dc8b26a3ac2
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
