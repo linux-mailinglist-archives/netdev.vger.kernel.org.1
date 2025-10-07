@@ -1,175 +1,97 @@
-Return-Path: <netdev+bounces-228071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77B13BC0C58
-	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 10:47:15 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 280E9BC0C8A
+	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 10:53:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5997A4E33B8
-	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 08:47:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 10EB84E2A96
+	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 08:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A000121B9D2;
-	Tue,  7 Oct 2025 08:47:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257E62D5946;
+	Tue,  7 Oct 2025 08:53:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kOc9IjYS"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GHLhGfkR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E0C230BCC
-	for <netdev@vger.kernel.org>; Tue,  7 Oct 2025 08:47:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310AC34BA37;
+	Tue,  7 Oct 2025 08:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759826830; cv=none; b=WuxvinsmDuqaUGcIkOVI/brm5Zfmurp2fqWqP/lSSmB8hXhltzSxSa19gC0jK0dMN+hPMdL6KbH0Z9/jkthQYKHxtDvxbswOhZH8TIy8wbXPXxYIEBehf8Mo4yZFHOWfdaDJLxD9+gb+C/8WJTm39FXevvgEXi6GGiKX31j+O8c=
+	t=1759827235; cv=none; b=PUnUS1vQVwKJRVkQiRFb5IweNCJAnzdSIkCzWliq60iGv1YDCvINVY8/JHMqg/knoqEfCrNWCb5ZJBPkJ4FEEqaPCOLWmp3QhQdCDh0bHFa1AHLccO07bJkN4mHWjbH4QrNEZUqm5ZBuVeAx4NcqjMoBUIe12FRFyZmUsmvbzfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759826830; c=relaxed/simple;
-	bh=rm+bKLovVtUaqFIYZA7goACgyL+LzuY61ao1WTueUFU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IqZtgRIuUwWFKnGbj8f9pI6c+8caUmMqRfDagVINYuv6Ztw2MllRPLEndSu8Gi2xkfQV8JuAjkKwCdiTEbXYiAP3mms1AkKCGEdGpJcVtZlSgkufEimhUNM7qVrwKVRwVIM295cgogyF/GdFbgBZEXwztXgECpPlTAVtH8cBQ6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kOc9IjYS; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b3e9d633b78so890837266b.1
-        for <netdev@vger.kernel.org>; Tue, 07 Oct 2025 01:47:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759826826; x=1760431626; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WB2grswrUvHVm6dDCjSHe44Kq5peu1fx6ZOaRQMhfes=;
-        b=kOc9IjYSdbgeAZ22QObJRaZJxFNcOeOjkdtYtIBpNJZ1fKijvWKGtVCHLUgUO/3Aoz
-         d29RzVsqffoX0za1bFqieW8+4d3YURzxpUt8qCbR+H3uD3ZPupmiePTDfqBqTmeLQ3F1
-         R/L0NQrBstPb2x+8Y/Zt6xeBgxXo9kCKIUMqX0Bv8eqIem9niw1bvd5o7QeV2iI62B5k
-         otdq8Z6mckkfd4OnWowedmuQifLqX3Kbl20zeIWGsy4IeQ0K7JGR8Cwd/6F5HSf0LqXp
-         Th5qGL4tvBNG2xdbeTeh4eIAGW1PLASeWyGnWNzvDOOU9ewmjnBAy+8riFG/2IfY2tNc
-         9htA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759826826; x=1760431626;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WB2grswrUvHVm6dDCjSHe44Kq5peu1fx6ZOaRQMhfes=;
-        b=N6aLPgaqeCTdk9kboy0fqgOwyHpdqKc30OlCJyTMZVI9QttpK+1865RrZsWraQmWRq
-         CuVNBkFBD/4x7nDbFZmX8e/A1RQzjSODWXQosmqdLZAySREfK7GjcrArteAkgynJx9Dt
-         XAEEwiIfPyJJqIGOtTWwzW0ez6rdjQaiWFwulIAMILsusv6Ap2zTmlZGvFvihMiNmvaI
-         fHVxeH1toSlc+k3eI0v+KEWgHv2yj1PVTV/0xAYTcWOxbTy1ssUtYcyfGloSGZDuMIVd
-         o34+1AjHNzLFJMb/61mjEetf4wYQ5AS2WzrJ6O7hXvPj2RAWjL7AYfW29Ksj9NSqhrop
-         qADA==
-X-Forwarded-Encrypted: i=1; AJvYcCXO7PBC0ay0hQ7QtE0j9Y141mCi3jLMU/kKwIq8aAdBwjd0pVF/cgYnYOzhB9Njdd8UJceOVmI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKW0LBqHjz3jKMiSfbUzilSL1TFLfez2I637AGbF+NhjsQ0lJC
-	I6gGGn6z3762kwohzvb1Kaao4hzLD8kZw0mZfPu8sCS9c6wOlpLqVvtw
-X-Gm-Gg: ASbGncsolDf3Trr8RJennWiY533e9I7riDn8yxOYxNg3xDJHmBFuuGNl3rKFbbcO5cV
-	RV43J82/oXdExXNXIlAl0mGyeK4/7hE//QSSzNUYcgEs5UAkpGlxdi9+FycwzRtDfmILkkc99eM
-	BL+NK0u/78L1W1LLYz7wSaTZWti42iKOEPNgPhsd8R8dy0QRu/gqS2ViJDZ81LTgOt8NQBpqto8
-	fhQnEO6Z7/6Q96axmVEeZTa/3UlYBXMrCqKWiXxWofIkAGVAap5XM8Ooc0xA1xFfRk/CQ+7FQbp
-	MblanbHXZAkE7CXNoPqDvesMJmlAoxhnKMyPR+uum2Fa7LqES1nyWxvp4AcKMY3SqEvyMwrrjf3
-	t9NFAMlS34hQFsBtg+89zewl26TzMr8JE3QECTB1AWAmZhDQA5xiM2ah29mLj5zN4D8+WGZuIfa
-	YH6dDUT959g8sNAHDsvHD/s+CfRVtG7dbOwnAWPtQsp/TRl2o3McLejnwOZEDKKj8GbkquyeSIy
-	ZL4mjb7YC5ehYeC5UEmDooe
-X-Google-Smtp-Source: AGHT+IF7h6k8lPFDkNeA/iUAYR/ai7IDjOraNrySsDbHdhxC28f4NjLFCx3wh4KD7aln3iNwlTiNWw==
-X-Received: by 2002:a17:906:2689:b0:b4f:f1b9:b02e with SMTP id a640c23a62f3a-b4ff1b9e0e5mr116537266b.31.1759826825706;
-        Tue, 07 Oct 2025 01:47:05 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b48652aa040sm1327470266b.20.2025.10.07.01.47.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Oct 2025 01:47:05 -0700 (PDT)
-Message-ID: <346ffcf3-cf42-4227-96c5-84d37837c09f@gmail.com>
-Date: Tue, 7 Oct 2025 10:47:04 +0200
+	s=arc-20240116; t=1759827235; c=relaxed/simple;
+	bh=XerKFp3BmqnvlTwBJQ6Zv8BKIXwHk/GvCTpWSyoLDRY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=a2xBG6HzSZ6ABXxwiVIP9YPNHiAEU5BOKF/j2MpCbvpRYKc4EsaGd0MRNrxEW1vgenhbLpnG3xKuOUPcs3i+dqMzt49cTteXhov4bCnNdnOzWUwcevpU510Bb2YF5i+5HDdRrPJcKqwmo19ZqGa3p9pwtPNhiuRf3dr1qKArg5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GHLhGfkR; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id ED6E11A11B2;
+	Tue,  7 Oct 2025 08:53:42 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id C1DF2606EB;
+	Tue,  7 Oct 2025 08:53:42 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E2187102F2134;
+	Tue,  7 Oct 2025 10:53:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1759827222; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=L2vWVeKOdRdTQKfeaPNnzY9dsfHHhSGnt4F8bj2CIkA=;
+	b=GHLhGfkR/r96R3YD9a64i4hWRspHMoKWhMTi4xlU4KqiObY5tsNcahLviKzB2EljsdqUyL
+	7N9vQ4oiZUYj9WJi7oJot9wcAs50Z2hxbFtwF9doNzE66zFsxXrOh3g9guZJk3DuotrWYR
+	7UFu/OwPgAM6OMBmU+jVcs8FF5swN4KQ6eVCbhhAuG5MuWEHgxcxpu4DR9trp2BopCUqVa
+	aDhxYXf+O9E3HXPXxcSailhc4A39m2fjMoXSE9tqBpsGM35Kv5YNpKVljR8R7NQTTXNQD6
+	ZJRs7uM4KQPN5VcWCpZCInZTcPnMm1KqWaSHet2H8ngU1BOoBv9f2Ma0QCV+4w==
+Date: Tue, 7 Oct 2025 10:53:31 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Thomas Wismer <thomas@wismer.xyz>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Thomas Wismer <thomas.wismer@scs.ch>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: pse-pd: tps23881: Fix current measurement
+ scaling
+Message-ID: <20251007105331.70f03fc9@kmaincent-XPS-13-7390>
+In-Reply-To: <20251006204029.7169-2-thomas@wismer.xyz>
+References: <20251006204029.7169-2-thomas@wismer.xyz>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 nf-next 0/2] flow offload teardown when layer 2 roaming
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>,
- netfilter-devel@vger.kernel.org, netdev@vger.kernel.org
-References: <20250925182623.114045-1-ericwouds@gmail.com>
- <aN4uKod5GFKry2yL@strlen.de>
-From: Eric Woudstra <ericwouds@gmail.com>
-Content-Language: en-US
-In-Reply-To: <aN4uKod5GFKry2yL@strlen.de>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
+On Mon,  6 Oct 2025 22:40:29 +0200
+Thomas Wismer <thomas@wismer.xyz> wrote:
 
+> From: Thomas Wismer <thomas.wismer@scs.ch>
+>=20
+> The TPS23881 improves on the TPS23880 with current sense resistors reduced
+> from 255 mOhm to 200 mOhm. This has a direct impact on the scaling of the
+> current measurement. However, the latest TPS23881 data sheet from May 2023
+> still shows the scaling of the TPS23880 model.
+>=20
+> Fixes: 7f076ce3f1733 ("net: pse-pd: tps23881: Add support for power limit=
+ and
+> measurement features") Signed-off-by: Thomas Wismer <thomas.wismer@scs.ch>
 
-On 10/2/25 9:47 AM, Florian Westphal wrote:
-> Eric Woudstra <ericwouds@gmail.com> wrote:
->> This patch-set can be reviewed separately from my submissions concerning
->> the bridge-fastpath.
->>
->> In case of a bridge in the forward-fastpath or bridge-fastpath the fdb is
->> used to create the tuple. In case of roaming at layer 2 level, for example
->> 802.11r, the destination device is changed in the fdb.
->                ~~~~~~~~~~~~~~~~~~
-> 
-> destination device == output port to use for xmit?
-> 
+Acked-by: Kory Maincent <kory.maincent@bootlin.com>
 
-Indeed. It is the bridge-port that is being changed for the same
-combination of vid and address. In the tuple it is the output port for xmit.
-
->> The destination
->> device of a direct transmitting tuple is no longer valid and traffic is
->> send to the wrong destination. Also the hardware offloaded fastpath is not
->> valid anymore.
-> 
-> Can you outline/summarize the existing behaviour for sw bridge, without
-> flowtable offload being in the mix here?
-> 
-> What is the existing behaviour without flowtable but bridge hw offload in place?
-> What mechanism corrects the output port in these cases?
-> 
-
-What is comes down to is br_fdb_update(), when an existing fdb entry is
-found for the vid/address combination. When it appears on a different
-bridge port then stored in the fdb entry, the fdb entry is modified.
-
-Also br_switchdev_fdb_notify(br, fdb, RTM_DELNEIGH) is called so that
-drivers can remove bridge hw offload. This is what I also want to listen
-for, as it is the only message that holds to old bridge-port.
-
-Listening in particular when it is called from br_fdb_update(), but it
-can be debated if we should respond to all of these calls, or only when
-called from br_fdb_update(). If we want to narrow it down, may need to
-add an "updating" flag to:
-
-struct switchdev_notifier_fdb_info {
-	struct switchdev_notifier_info info; /* must be first */
-	const unsigned char *addr;
-	u16 vid;
-	u8 added_by_user:1,
-	   is_local:1,
-	   locked:1,
-	   offloaded:1;
-+	   updating:1;
-};
-
-Or something similar.
-
->> This flowentry needs to be torn down asap.
-> 
->> Changes in v4:
->> - Removed patch "don't follow fastpath when marked teardown".
->> - Use a work queue to process the event.
-> 
-> Full walk of flowtable is expensive, how many events
-> are expected to be generated?
-> 
-> Having a few thousands of fdb updates trigger one flowtable
-> walk each seems like a non-starter?
-
-Indeed, this would be an argument to narrow it down. Fully walking
-through the flowtable, only when an fdb entry's bridge-port is being
-updated.
-
+Thank you!
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
