@@ -1,273 +1,144 @@
-Return-Path: <netdev+bounces-228128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B817BC2351
-	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 19:00:47 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8691BC2366
+	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 19:04:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 468233A9FBF
-	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 17:00:46 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 850C534F5A9
+	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 17:04:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6181E835D;
-	Tue,  7 Oct 2025 17:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E342E6CC9;
+	Tue,  7 Oct 2025 17:04:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fBe+1HPw"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="xh7gM6Q6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA5B13D521
-	for <netdev@vger.kernel.org>; Tue,  7 Oct 2025 17:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751D22DF130;
+	Tue,  7 Oct 2025 17:04:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759856442; cv=none; b=VkGUvYnYzZis71GJoMscaDn1hZcaN20OOYlFOx7JPMqvU72GnPNYev2NLc5rHh7EShWISmqBVr84Z/gzPR0gvtZ4fQRYhGjQ6RFdC5E0ci8YpJXSr+q5DEBlTWiFXpb/6M/5tO2uFmYdkWQtMTguJmZRN8f2GhFII8EPAgNBAvk=
+	t=1759856648; cv=none; b=fufuZF68veXn5Fzi4zrZYgFGojFv0nY5TV4D3Kz/XG8sCGF9ppniADOcuTkxz8EOCIbMthV2bQe5vDQ/G+4INapfeu1UQQuyIpVi/LZCySmlCAYW6f8wqm3NBzGESHrs0paIj/u6KSINwCzGsJdszp7bI5GUdcJ95PufCQ34xdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759856442; c=relaxed/simple;
-	bh=rXWQjNSy1vP89PAn1bfL5mZZUhr3rO9NsXeUs7rIPVE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qR09DRH4jtVrIVqbQEOVW8m3X5TupBo+WMdw8FStECqho42xUMOk2jEMNYCKfY6u+soQdOiILPgJMYAhc2H9c20cXBiVI4KdHyD5iJciOnshLosnWXlp2ubPcnP7T86nLx2gsm61tIbfSgVgmHOOf5voYhL+sH/stCrFNwjKKSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fBe+1HPw; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3ee12332f3dso5735704f8f.2
-        for <netdev@vger.kernel.org>; Tue, 07 Oct 2025 10:00:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759856438; x=1760461238; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ym4ACn/vcSY7ocN8OqBZ0n11ubn4K6E18ID3rdWF4w8=;
-        b=fBe+1HPwzak354DizhUpQMy+opMr60WBNotG8JOKMXGwKLWCKGza/Y0vFcCF4kQXRH
-         e6ueKs4yTJ+kQqaR4eJHQSsJb//BD0Wj1Q5csFm/GRHuYrlCDdeb8TMAIs7scle/KKJo
-         9RS0nx5oUwMimbwpRu7Hvl6L6iXFFgCCiXtpUQe00ImhWq4gRGhPK3qkx/aUBqWvqNiu
-         C4QaVE4x0kql0B9ugOFtyT+NL8CUqpMbfzSidfDe1MgfOM+2dUYkqCc6rF7J9Mf2Ptkj
-         Tiy3fY9VeLdp/3YqXT+sflrFdQYfhdWHeBKKqVUUOnlVQeJMAn3bnXeOqAJZ5RGg8m78
-         ulhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759856438; x=1760461238;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ym4ACn/vcSY7ocN8OqBZ0n11ubn4K6E18ID3rdWF4w8=;
-        b=kr591PHFQ69MMPkYoO6OBG3R8nhHmRQ4Qn16NE0S4Fk4Qej/0uw9FxQgz91KTJt2e/
-         JwrhAULc1yNNBbTMmveJpvPYMaUQZ6NqiG40Y1Ps+OiYql1vzVrUAFyQBB5x44BQES1G
-         YYPXphjOzxnnIVNvkpi39vB5wz6w21/wv6xmmJiy9e5mXcEupHvzJHuAyK4I09Lyck67
-         wHVVEJa3l0c+VDyT08sn2i+KJpSiX/nlbVurpT1wDmqawctN1+i1umwIOUQQymmO5Tsc
-         V22NFaHvRwCvINUAZdD+Oe+qVDcOzrOzyrddl37AQmb2fwLt87kFHIq50BKrYu/IQfVN
-         vBJw==
-X-Gm-Message-State: AOJu0YyT/CnAVUSJCq0SaIu2poqp76N6d8sDo0Cl1aCN9dHWQZL4tcGj
-	HgpmIJ6SQKDZNH0JThFZVnT7sYRpUNS8HajHu/rKeuU8bkU1nzMhDaQ5EzSx8ITXEw+d4tDuGiJ
-	F34jFWVM+Gcc/fw6wziUrq9SpAOCoagwD87eQ
-X-Gm-Gg: ASbGncvc2OL8Xpn3OzMndk5oHUoOx4eNU+iEMj5fwPnotofVG5EzRNnpLmxoCWtwGOa
-	DOkDplw91YM7Z+4Zg//USZvVYBm0QKZod4dQMPC+j8KVILwYo6tyTiwa1potWr61s+TTFjfRzmD
-	ZtyWPGcKqDL5qCUXxruNydrJ9UCvtBrJvUK0l9JeFfwLNUngws25rUnyWrz4RHO1ShqG63xIC0n
-	DYPU4lqY1Rwo1JGJNJGRKeo2QqMPJ8D
-X-Google-Smtp-Source: AGHT+IEZc4GDIOJHK1wn5+XQ2MUXZlQkKowMXBC0E8B9jeS2NGwXFd0nrX+D1w3NacTQUdJ94hPVUZALFtaDPlRqQNM=
-X-Received: by 2002:a05:6000:2c0b:b0:3ff:17ac:a347 with SMTP id
- ffacd0b85a97d-4266e7e11c4mr23903f8f.27.1759856438010; Tue, 07 Oct 2025
- 10:00:38 -0700 (PDT)
+	s=arc-20240116; t=1759856648; c=relaxed/simple;
+	bh=TmecqJ+5qwk2sM9mRz944u6sKOHgNyAjItlrrCFK1Zk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KDu06F276BsqLFOXtslBWg1gI56uFuosCpX/HUA8YT9w9dW+LnzBgxR9Xx6Lv4l04eU/h5W1IQzLFqPHGaibpRflvtsUjb1DxLhFtReWR6nxOM2dDbVVF+NqWUHQBqTFNo6O+xzPgA2pnyLBNxSMpxCfMfKZStwMRZS+EfArHk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=xh7gM6Q6; arc=none smtp.client-ip=103.168.172.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.phl.internal (Postfix) with ESMTP id 65B74EC032F;
+	Tue,  7 Oct 2025 13:04:05 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Tue, 07 Oct 2025 13:04:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1759856645; x=1759943045; bh=yQkaBhKJ2SJ4QYCh3VzMHRHO23fODnHWxAa
+	UeH65jcc=; b=xh7gM6Q6ZwfKs/4QtlLtvRHBRkX9F50eqQwvpqbq1CdFwevs5IM
+	rRSEm5hgfrRLqjnpXUMNqi+yGtzb2DDDaDS88kIyMF4YYYEAE3/+JzN94CaSaDi1
+	2bRPHZSc1ZOjyWNpZiOHqtSC96VN4FRQbvWtFptS/Y41dis663koel+cZgY3gNdN
+	nCoHf6EQphA95trhDWDJ57pBN8pQYcdh98PQNIEsu6hvb21+SRuNhNcbkoQccb40
+	EGiePpnoZ3k9OvLdv6ly8ZgSej34tVtrIu/w9qabgrYAg1f5xaW4/25IRBI5XBR0
+	Vby+9+Ued1XbLZkaNQqKK3Vmp5N0LBUO4QQ==
+X-ME-Sender: <xms:BUjlaDyagWRNFGGu3nDQpPtAbnAyk1sKH8hU6t1zR8FE-pAs8dgGQw>
+    <xme:BUjlaOWUhaPrWPPu2XLYaO5qzeD30G9zKICfBCTHgnQp4pKqSYvMzZ1a4kKFkVIUI
+    Abn-90s_-jomFFmQY9x7A7Hi-eBCwtBhEhYiz6NIB-7DL-uYw>
+X-ME-Received: <xmr:BUjlaH_739i5izQvXBI8ccUefZMoTStMlZMmUpr4nS7sx6WuWJ2FplIAy-nVJvDqppg6k-6S6ykJiu6V2Jm9Y0Ru>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddutddtleejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcuufgt
+    hhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrthhtvg
+    hrnhephefhtdejvdeiffefudduvdffgeetieeigeeugfduffdvffdtfeehieejtdfhjeek
+    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
+    curfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhn
+    sggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggvmh
+    gvthhrihhouhhsiiesphhrohhtohhnrdhmvgdprhgtphhtthhopeifihhllhgvmhguvggs
+    rhhuihhjnhdrkhgvrhhnvghlsehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmh
+    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtg
+    hpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihes
+    rhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpd
+    hrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:BUjlaJumaGeVRqaOnzlQnCz0WPrlwsNtNH9H4LCmA0PWawHhmyysjQ>
+    <xmx:BUjlaP2a4qFbzTUghm0rgfQ6JOBXGHi6ZSje1y37GnBlGAg16vnldg>
+    <xmx:BUjlaGRcaY75CuUivNPiEh67vXCgwBcMCJ3uSapErPpamCFkmSAACA>
+    <xmx:BUjlaLfwiLm6XZFMXudeucZyZ4eYJS1e3OnLWoDojrH4I-yLcpb4JA>
+    <xmx:BUjlaAabPBhwIDuUh4TsEPfRnyvEmWH2Fyj5JwdQDrPRl2LUvozNXM_o>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 7 Oct 2025 13:04:04 -0400 (EDT)
+Date: Tue, 7 Oct 2025 20:04:01 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Dmitry <demetriousz@proton.me>, willemdebruijn.kernel@gmail.com
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: ipv6: respect route prfsrc and fill empty
+ saddr before ECMP hash
+Message-ID: <aOVIAWAxpWto8ETd@shredder>
+References: <20251005-ipv6-set-saddr-to-prefsrc-before-hash-to-stabilize-ecmp-v1-1-d43b6ef00035@proton.me>
+ <aOPEYwnyGnMQCp-f@shredder>
+ <MZruGuax8jyrCcZTXAVhH0AaAMOZ-2Gcj5VeZO8xy8wS9FqwA3EMhPFpHLZs67FAKCu6z3GpEVeArSX2qGdSUqsysI-0o13dKK1ZmUhK_l0=@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CA+V-a8tWytDVmsk-PK23e4gChXH0pMDR9cKc_xEO4WXpNtr3eA@mail.gmail.com>
-In-Reply-To: <CA+V-a8tWytDVmsk-PK23e4gChXH0pMDR9cKc_xEO4WXpNtr3eA@mail.gmail.com>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Tue, 7 Oct 2025 18:00:11 +0100
-X-Gm-Features: AS18NWA3CoeVQkz908Z8HvCmJPrmSkqybX3sqr1XSi1vdYVk2WT1UvI8bJuIO3o
-Message-ID: <CA+V-a8tsPGJMru-ui4t_Bd_0+be2eBFU-2O=nGM2rrRL6ja1sA@mail.gmail.com>
-Subject: Re: CPU stalls with CONFIG_PREEMPT_RT enabled on next-20251006
- (Renesas RZ/G2L & RZ/G3E)
-To: netdev <netdev@vger.kernel.org>
-Cc: Linux-Renesas <linux-renesas-soc@vger.kernel.org>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MZruGuax8jyrCcZTXAVhH0AaAMOZ-2Gcj5VeZO8xy8wS9FqwA3EMhPFpHLZs67FAKCu6z3GpEVeArSX2qGdSUqsysI-0o13dKK1ZmUhK_l0=@proton.me>
 
-Hi All,
+On Mon, Oct 06, 2025 at 06:31:10PM +0000, Dmitry wrote:
+> If the 5-tuple is not changed, then both the hash and the outgoing interface
+> (OIF) should remain consistent, which is not the case. Only with the fix does it
+> respect the configured SRC and produce a consistent, correct 5-tuple with the
+> proper hash.
+> 
+> Therefore, in my opinion, this should be fixed.
 
-On Tue, Oct 7, 2025 at 5:40=E2=80=AFPM Lad, Prabhakar
-<prabhakar.csengg@gmail.com> wrote:
->
-> Hi All,
->
-> With CONFIG_PREEMPT_RT enabled, I=E2=80=99m observing CPU stalls from the=
- Rx
-> path on two different drivers across Renesas platforms.
->
-Just to update I managed to replicate this issue on a different path
-on R/ZV2H which uses the STMMAC driver (Logs [3]).
+Note that even if the hash is consistent throughout the lifetime of the
+socket, it is still possible for packets to be routed out of different
+interfaces. This can happen, for example, if one of the nexthop devices
+loses its carrier. This will change the hash thresholds in the ECMP
+group and can cause packets to egress a different interface even if the
+current one is not the one that went down. Obviously packets can also
+change paths due to changes in other routers between you and the
+destination. A network design that results in connections being severed
+every time a flow is routed differently seems fragile to me.
 
-> The first case is on the RZ/G3E SoC using the STMMAC driver:
-> -----x-----x------x------x------x------x------x------x------x------x-----=
--x------x------x
-> [  173.505971] rcu: INFO: rcu_preempt self-detected stall on CPU
-> [  173.506014] rcu: 0-....: (2 GPs behind)
-> idle=3Dde74/1/0x4000000000000000 softirq=3D0/0 fqs=3D2178 rcuc=3D5257
-> jiffies(starved)
-> [  173.506077] rcu: (t=3D5250 jiffies g=3D2757 q=3D79 ncpus=3D4)
-> [  173.506118] CPU: 0 UID: 0 PID: 290 Comm: irq/107-eth0 Not tainted
-> 6.17.0-next-20251006-00001-gaef898d60052 #19 PREEMPT_RT
-> [  173.506163] Hardware name: Renesas SMARC EVK version 2 based on
-> r9a09g047e57 (DT)
-> [  173.506182] pstate: 40400005 (nZcv daif +PAN -UAO -TCO -DIT -SSBS BTYP=
-E=3D--)
-> [  173.506217] pc : rt_spin_lock+0x40/0x190
-> [  173.506280] lr : stmmac_tx_clean.constprop.0+0x80/0x7a8
-> [  173.506323] sp : ffff800082883a40
-> [  173.506338] x29: ffff800082883a60 x28: ffff0000c1eb0a80 x27: ffff80008=
-2883c18
-> [  173.506397] x26: ffff80007a330000 x25: ffff800082883c00 x24: ffff80008=
-173a000
-> [  173.506447] x23: 00000000ffff8479 x22: 0000000000000003 x21: 000000000=
-0000003
-> [  173.506497] x20: ffff0000c1eb8580 x19: ffff0000c1eb8580 x18: 000000000=
-0000001
-> [  173.506545] x17: ffff0000c004f800 x16: 0000000000000bfe x15: 000000000=
-0000000
-> [  173.506593] x14: 0000767bd1d30308 x13: 00000000000003f8 x12: 000000000=
-0000000
-> [  173.506641] x11: 0000000000000000 x10: 0000000000000000 x9 : 000000000=
-00013c0
-> [  173.506687] x8 : ffff800082883c88 x7 : 0000000000000000 x6 : 000000000=
-0000000
-> [  173.506734] x5 : 0000000000000480 x4 : ffff0000c1eb0000 x3 : ffff80008=
-2883b67
-> [  173.506781] x2 : ffff0000c1eb8598 x1 : ffff0000c1f21140 x0 : 000000000=
-0000000
-> [  173.506829] Call trace:
-> [  173.506843]  rt_spin_lock+0x40/0x190 (P)
-> [  173.506905]  stmmac_tx_clean.constprop.0+0x80/0x7a8
-> [  173.506948]  stmmac_napi_poll_tx+0x6c/0x154
-> [  173.506989]  __napi_poll.constprop.0+0x38/0x188
-> [  173.507041]  net_rx_action+0x118/0x264
-> [  173.507088]  handle_softirqs.isra.0+0xe4/0x1ec
-> [  173.507149]  __local_bh_enable_ip+0xc4/0x128
-> [  173.507186]  irq_forced_thread_fn+0x48/0x60
-> [  173.507240]  irq_thread+0x188/0x31c
-> [  173.507292]  kthread+0x12c/0x210
-> [  173.507337]  ret_from_fork+0x10/0x20
->
-> The second case is on the RZ/G2L SoC using the RAVB driver:
-> -----x-----x------x------x------x------x------x------x------x------x-----=
--x------x------x
-> [   70.821322] rcu: INFO: rcu_preempt self-detected stall on CPU
-> [   70.821351] rcu: 0-....: (4970 ticks this GP)
-> idle=3De2c4/1/0x4000000000000000 softirq=3D0/0 fqs=3D2622 rcuc=3D5112
-> jiffies(starved)
-> [   70.821366] rcu: (t=3D5250 jiffies g=3D6729 q=3D98 ncpus=3D2)
-> [   70.821382] CPU: 0 UID: 0 PID: 101 Comm: irq/45-11c20000 Not
-> tainted 6.17.0-next-20251006-00001-gaef898d60052 #19 PREEMPT_RT
-> [   70.821392] Hardware name: Renesas SMARC EVK based on r9a07g044l2 (DT)
-> [   70.821397] pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYP=
-E=3D--)
-> [   70.821404] pc : rt_spin_trylock+0x44/0xd8
-> [   70.821426] lr : try_charge_memcg+0xd0/0x7a0
-> [   70.821442] sp : ffff8000820cb3e0
-> [   70.821445] x29: ffff8000820cb430 x28: 0000000000000001 x27: 000000000=
-0000800
-> [   70.821459] x26: 0000000000000000 x25: ffff00000bda1140 x24: ffff80008=
-185f3e0
-> [   70.821469] x23: 0000000000000040 x22: ffff00000cc7e800 x21: ffff80008=
-167e600
-> [   70.821479] x20: 0000000000000820 x19: 0000000000000002 x18: 000000000=
-0000000
-> [   70.821489] x17: ffff000009c3e580 x16: 00000000000003f6 x15: 000000000=
-000000c
-> [   70.821498] x14: 0000000000000000 x13: 0000000000000014 x12: ffff00000=
-bdba800
-> [   70.821508] x11: ffff00000bda8000 x10: 0000000000005114 x9 : 000000000=
-0000000
-> [   70.821517] x8 : ffff8000820cb588 x7 : 0000000000000000 x6 : 000000000=
-0000000
-> [   70.821526] x5 : 0000000000000000 x4 : ffff00000bda1140 x3 : ffff00007=
-ddda618
-> [   70.821536] x2 : ffff00000bda1140 x1 : ffff00000bda1140 x0 : 000000000=
-0000001
-> [   70.821546] Call trace:
-> [   70.821550]  rt_spin_trylock+0x44/0xd8 (P)
-> [   70.821564]  mem_cgroup_sk_charge+0x2c/0x80
-> [   70.821572]  __sk_mem_raise_allocated+0x1cc/0x380
-> [   70.821584]  __sk_mem_schedule+0x3c/0x60
-> [   70.821592]  tcp_try_rmem_schedule+0x88/0x48c
-> [   70.821603]  tcp_data_queue+0x2b0/0xe1c
-> [   70.821611]  tcp_rcv_established+0x3bc/0xba0
-> [   70.821619]  tcp_v4_do_rcv+0x1ec/0x2b8
-> [   70.821630]  tcp_v4_rcv+0x954/0xf20
-> [   70.821640]  ip_protocol_deliver_rcu+0x38/0x1a0
-> [   70.821648]  ip_local_deliver_finish+0x90/0x120
-> [   70.821654]  ip_local_deliver+0x7c/0x124
-> [   70.821661]  ip_rcv+0x74/0x128
-> [   70.821667]  __netif_receive_skb_core.constprop.0+0x928/0x11b0
-> [   70.821679]  __netif_receive_skb_list_core+0xe8/0x210
-> [   70.821688]  netif_receive_skb_list_internal+0x1dc/0x2d0
-> [   70.821697]  napi_complete_done+0x80/0x1bc
-> [   70.821705]  ravb_poll+0x170/0x1e4
-> [   70.821715]  __napi_poll.constprop.0+0x38/0x188
-> [   70.821723]  net_rx_action+0x118/0x264
-> [   70.821732]  handle_softirqs.isra.0+0xe4/0x1ec
-> [   70.821746]  __local_bh_enable_ip+0xc4/0x128
-> [   70.821753]  irq_forced_thread_fn+0x48/0x60
-> [   70.821765]  irq_thread+0x188/0x31c
-> [   70.821775]  kthread+0x12c/0x210
-> [   70.821785]  ret_from_fork+0x10/0x20
->
+If you still want to address the issue, then I believe that the correct
+way to do it would be to align tcp_v6_connect() with tcp_v4_connect().
+I'm not sure why they differ, but the IPv4 version will first do a route
+lookup to determine the source address, then allocate a source port and
+only when all the parameters are known it will do a final route lookup
+and cache the result in the socket. IPv6 on the other hand, does a
+single route lookup with an unknown source address and an unknown source
+port.
 
-[3] The third case is on the RZ/V2H SoC using the STMMAC driver:
------x-----x------x------x------x------x------x------x------x------x------x=
-------x------x
-[   62.140291] audit: type=3D1334 audit(1748544553.272:34): prog-id=3D26 op=
-=3DUNLOAD
-[   62.140347] audit: type=3D1334 audit(1748544553.272:35): prog-id=3D25 op=
-=3DUNLOAD
-[   93.215241] rcu: INFO: rcu_preempt self-detected stall on CPU
-[   93.215283] rcu: 0-....: (5337 ticks this GP)
-idle=3D8a44/1/0x4000000000000000 softirq=3D0/0 fqs=3D1817 rcuc=3D5425
-jiffies(starved)
-[   93.215346] rcu: (t=3D5250 jiffies g=3D2757 q=3D101 ncpus=3D4)
-[   93.215387] CPU: 0 UID: 0 PID: 302 Comm: irq/114-eth0 Not tainted
-6.17.0-next-20251006-00001-gaef898d60052 #19 PREEMPT_RT
-[   93.215432] Hardware name: Renesas RZ/V2H EVK Board based on
-r9a09g057h44 (DT)
-[   93.215451] pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=
-=3D--)
-[   93.215487] pc : rt_spin_lock+0x40/0x190
-[   93.215550] lr : stmmac_napi_check+0x124/0x1e0
-[   93.215604] sp : ffff800083353c70
-[   93.215618] x29: ffff800083353c90 x28: ffff80008173e1a0 x27: ffff0000c0f=
-99cab
-[   93.215678] x26: ffff0000c206e800 x25: ffff0000c0f99cac x24: ffff0000c26=
-2a238
-[   93.215730] x23: 0000000000000000 x22: ffff0000c2629e40 x21: 00000000000=
-00008
-[   93.215780] x20: ffff0000c2629c40 x19: ffff0000c262a238 x18: 00000000000=
-00001
-[   93.215830] x17: ffff0000c004f800 x16: 0000000000000bfa x15: 00000000000=
-00000
-[   93.215879] x14: 00002d68a20f4c12 x13: 0000000000000050 x12: 00000000000=
-00000
-[   93.215928] x11: 0000000000000000 x10: 0000000000000000 x9 : 00000000000=
-013c0
-[   93.215976] x8 : 00000000000011c0 x7 : 00000000000015c0 x6 : 00000000000=
-00000
-[   93.216023] x5 : ffff0000c2629e40 x4 : ffff0000c2629e50 x3 : 00000000000=
-00030
-[   93.216071] x2 : ffff0000c262a250 x1 : ffff0000c264a280 x0 : 00000000000=
-00000
-[   93.216121] Call trace:
-[   93.216136]  rt_spin_lock+0x40/0x190 (P)
-[   93.216198]  stmmac_napi_check+0x124/0x1e0
-[   93.216255]  stmmac_interrupt+0x94/0x160
-[   93.216295]  irq_thread_fn+0x2c/0xb0
-[   93.216348]  irq_forced_thread_fn+0x34/0x60
-[   93.216399]  irq_thread+0x188/0x31c
-[   93.216452]  kthread+0x12c/0x210
-[   93.216496]  ret_from_fork+0x10/0x20
+This is explained in the comment above ip_route_connect_init() and
+Willem also explained it here:
 
-Cheers,
-Prabhakar
+https://lore.kernel.org/all/20250424143549.669426-2-willemdebruijn.kernel@gmail.com/
+
+Willem, do you happen to know why tcp_v6_connect() only performs a
+single route lookup?
+
+Link to the original patch:
+
+https://lore.kernel.org/netdev/20251005-ipv6-set-saddr-to-prefsrc-before-hash-to-stabilize-ecmp-v1-1-d43b6ef00035@proton.me/
+
+Thanks
 
