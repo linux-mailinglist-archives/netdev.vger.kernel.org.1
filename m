@@ -1,82 +1,95 @@
-Return-Path: <netdev+bounces-228077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC4E3BC0EA9
-	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 11:50:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8F90BC0ECD
+	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 11:52:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8F6E3C55FC
-	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 09:49:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E07B11881F3B
+	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 09:52:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D717A2877EA;
-	Tue,  7 Oct 2025 09:49:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A179B2222A1;
+	Tue,  7 Oct 2025 09:51:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kk0mX2po"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Dnwj/8Pa";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Z0OLcOkB";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Dnwj/8Pa";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Z0OLcOkB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F0A221FA4
-	for <netdev@vger.kernel.org>; Tue,  7 Oct 2025 09:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078751991D4
+	for <netdev@vger.kernel.org>; Tue,  7 Oct 2025 09:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759830558; cv=none; b=c06xcLO62M+LVyKC7hsyDVjC1H5U+QF0FGgndtJfhLMvmTmwU4XgbhVDlk5BqY8KX4L173JAoeUt6epr2eokQSjOVX0OXRyOYcqyBoqocKpYo+PV0bb8bpLOO1XM2Z37bnMioVpmoGEuxsttGT61Fclq2d/glYCrfeeZEUhhujQ=
+	t=1759830695; cv=none; b=px9ciygVo4DbOtIc62+UocP8KiQYMqWg/1j1cJ4EuhwKMeTmIXG2a4YZk9Xvlg/E2bwk1NKdAJkA5Hdl/Utg5X9BmlRHBVRLl/0ZhAj6atLHZ+n4AB05qasj9kAvETvYOrw8sqJCjdbJnbttX2bGFAmN1yPVyFbNTN7Y0jiO70M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759830558; c=relaxed/simple;
-	bh=ANui7nSl/Xkn2ryxgPBWTRhh5bFK2D731iJyqedJeoI=;
+	s=arc-20240116; t=1759830695; c=relaxed/simple;
+	bh=N4TqPLvCylts6kJn1Yyifs5XQBQjcyPhMM9Gq/YcQ0g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AOtcbb3QyCMNfutQMhieuvYZwscYENqfa68YJvJqYQim8f0TOEnMdJI0UmQniHFC518JzYE95hAh/1tadqOGcq17KJ2sAAZ0IohWwO0bY4gSAgEyldtRQYla9y9V+mG/dTcvt9xzuioVDl0m1ZyaX9KSJZ5mxC03ZrWJthrF7+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kk0mX2po; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-afcb7ae6ed0so1010996866b.3
-        for <netdev@vger.kernel.org>; Tue, 07 Oct 2025 02:49:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759830555; x=1760435355; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0ueLJVSJGp+dH7ceTx92kybEsYvh5wShqzWyQZKOf6c=;
-        b=Kk0mX2poGQA2CWwjSFblfgjNFKZBEagFMVfqQLdG0MdzCAszip7pWWdYxUR5DgxtFT
-         JBG6g/vSM6XKV8WCQhD06GaLdYmODIIW/lbzhkPwuTMVFaMNUB1rsRySjga9FThcPXZ3
-         xLwKXo3GectAcbOEtSGBoPwjlZFGGIz3gIkPYiaw1/Gsdra4Ld2pllhPSNWeDjSPUPE/
-         l5fdNCXTCt3wYVfZ0vweXq+e1fGEzuB0GVGk800OypkBo5+DO1inBFXVMjElVGqEyJy9
-         ZAUdFMc/s8haZOHH0Z5LnHs39sKOjvGub5u2qf0TGXBVJN1lWb3sZbquU2UyfsjS5I+G
-         AzWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759830555; x=1760435355;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0ueLJVSJGp+dH7ceTx92kybEsYvh5wShqzWyQZKOf6c=;
-        b=EoQ/0bELTTy5FxRFkP6ireN+ZT+BA3sPFAEpNLQIoGED23IeYZnR7ILPlhfMH5F5YW
-         VX5SAO1jk5/cKqb5oJqP1DvamO5PEz5Eh5mRaK7sRQtP3Z3b4hleb5KgVhp4F43ihvyy
-         xjmxPt7dawu7dI2gpInLa1/+oviyGIs9GOzsIcZn5JCVBpFCDp0lS/5xBsufrhTHdxMh
-         MPSamwgyg/nj5qp88b99ByiiOxc7zcFgdvnxdZn+vUqwwHbB0TOlGKS/Zte2J0KtXFA5
-         M2ztCMBW2W3MfS93R5gVX8//oa2J6/FVkfOAfMeX6k54d4JHPpnJW3ZaCEs6X41nNeTa
-         k1gw==
-X-Forwarded-Encrypted: i=1; AJvYcCXIIiVxPsedi4jokmaXuZfDKF4h6HfYc9RT/sJXJW23E5V0atdQjS0Ckx4ajUcMRsjnkIjRhZg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDiWx1i7Fnzjsp4pb1MFG2tVtusMr7vzw/PvDudpOPBYIelwf3
-	1ZIkB7HWItw54FHQvnfvm+2/PN2z54qu6JYO+MAmkrMH7Uo5vmTM/8PB
-X-Gm-Gg: ASbGncvlGha4V9oKxZL3g5M4l5u6tX0TSXbLQ+cjYMK5myyazk3klzUxQrnHTTWvCCB
-	9iSZcDFD4xpz4IkjNs1XVp+YqH8y1jjX9zpb+SpzBMkAzF2aNgPZd34wASEneTjlX1p79nRxUYe
-	eyd55qqz5XjtHKpgisR2bj3kdU2P4F6Cbyxg0N9Pf1aipUVHFxZ4ED0iFldYEnMZTqp/e1BO8cF
-	ipYKM3XHFVOw8mrTHso3hnXBmm53+lOY1n9EZnxsdhCdHBAv3vKZQVsmW7pz7yO3PEOJuZLRJp6
-	78Z/pbaXx5FbJm9YMIRd4TM0U2+tV49iVZxSPiq+iUBdrqvvTlMs8SW/5+PQatB8APCdt/C9LIU
-	+YCB78URKOykjPcb0dX3nd+fnUmvXvTrqWwm99KKsfIXmC8Z9YrpoUqIxxKGIFtRUcKRkbaMrWE
-	+xUmcGITSZ7xIoMlymiklxHQstJHkmBI8ysuNkrBOZRlE61/b4B9sJfSNKHwye/qDTMjjkfpJ6S
-	Heb6lvFBnk0kJ57fKKvUld2
-X-Google-Smtp-Source: AGHT+IHdNBmo5UGL2aStNRTSljzwJlK0kWlaY3a8GMcFcknx+xKS+ZYnKBtQkBIZn2wOkHQpRft7Cg==
-X-Received: by 2002:a17:907:d78a:b0:b3e:babd:f257 with SMTP id a640c23a62f3a-b49c1d60ce8mr2043921466b.10.1759830554682;
-        Tue, 07 Oct 2025 02:49:14 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b486a177c9csm1357244066b.89.2025.10.07.02.49.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Oct 2025 02:49:14 -0700 (PDT)
-Message-ID: <5b332473-b552-489c-acd6-d0b67a1df098@gmail.com>
-Date: Tue, 7 Oct 2025 11:49:13 +0200
+	 In-Reply-To:Content-Type; b=N0aRIrBVv0pYOUdJjC0uUWEgnXrf9hP4RgLFW9GySuJA6n6wn4g75z3FSLdP5MC8uz2YctIvkCQkZj2r8QV/800vBPtoCLknvMbM6TpM4VUwH0NrQDqLm0e9HM3IndipgWsfSPscX4ZimB8vJZBRdGshovOvlij1VZnEgCtq4Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Dnwj/8Pa; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Z0OLcOkB; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Dnwj/8Pa; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Z0OLcOkB; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 268BE1F7B7;
+	Tue,  7 Oct 2025 09:51:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1759830692; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7hXPaqmmq2s2Y3lyXsf2ahFy73j+9/j9vaK8FcUsZ9k=;
+	b=Dnwj/8PaBsqiZdcg3fy/YHJKs9ngFLes8ErwGbAKwBpxAxGkosdYZcymQbd2ezu+WTVvOh
+	e1QpViuPhxgMQQ4yLfD/FrYUHHj4gsPvzEilFDUTCJLS2DVWJQMLmx6rWp5rZxeiOdx6Gy
+	SZDjIITrSeI0cg8Lu+FveuMjro5lrDI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1759830692;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7hXPaqmmq2s2Y3lyXsf2ahFy73j+9/j9vaK8FcUsZ9k=;
+	b=Z0OLcOkBD4fuK/FQWLJqP2gC9h+WJ8a+X/Fg7IIduo2zVzsSLl3DRthWmTP8ohtMoNqrsO
+	Iz2K8LoWU5mRJQDA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1759830692; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7hXPaqmmq2s2Y3lyXsf2ahFy73j+9/j9vaK8FcUsZ9k=;
+	b=Dnwj/8PaBsqiZdcg3fy/YHJKs9ngFLes8ErwGbAKwBpxAxGkosdYZcymQbd2ezu+WTVvOh
+	e1QpViuPhxgMQQ4yLfD/FrYUHHj4gsPvzEilFDUTCJLS2DVWJQMLmx6rWp5rZxeiOdx6Gy
+	SZDjIITrSeI0cg8Lu+FveuMjro5lrDI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1759830692;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7hXPaqmmq2s2Y3lyXsf2ahFy73j+9/j9vaK8FcUsZ9k=;
+	b=Z0OLcOkBD4fuK/FQWLJqP2gC9h+WJ8a+X/Fg7IIduo2zVzsSLl3DRthWmTP8ohtMoNqrsO
+	Iz2K8LoWU5mRJQDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id F2F1013AAC;
+	Tue,  7 Oct 2025 09:51:31 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id n320OqPi5Gi2VgAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 07 Oct 2025 09:51:31 +0000
+Message-ID: <8e5a3ff3-d17a-488f-97fb-3904684edb47@suse.de>
+Date: Tue, 7 Oct 2025 11:51:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,76 +97,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 nf-next 2/2] netfilter: nf_flow_table_core: teardown
- direct xmit when destination changed
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>,
- netfilter-devel@vger.kernel.org, netdev@vger.kernel.org
-References: <20250925182623.114045-1-ericwouds@gmail.com>
- <20250925182623.114045-3-ericwouds@gmail.com> <aN4v1DB2S-AWTXAR@strlen.de>
-From: Eric Woudstra <ericwouds@gmail.com>
+Subject: Re: [PATCH] nvme/tcp: handle tls partially sent records in
+ write_space()
+To: Wilfred Mallawa <wilfred.opensource@gmail.com>,
+ linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+ John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Sabrina Dubroca <sd@queasysnail.net>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20251007004634.38716-2-wilfred.opensource@gmail.com>
+ <0bf649d5-112f-42a8-bc8d-6ef2199ed19d@suse.de>
+ <339cbb66fbcd78d639d0d8463a3a67daf089f40d.camel@gmail.com>
 Content-Language: en-US
-In-Reply-To: <aN4v1DB2S-AWTXAR@strlen.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <339cbb66fbcd78d639d0d8463a3a67daf089f40d.camel@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_TLS_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_RCPT(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,kernel.dk,lst.de,grimberg.me,gmail.com,queasysnail.net,davemloft.net,google.com,redhat.com];
+	FREEMAIL_TO(0.00)[gmail.com,lists.infradead.org,vger.kernel.org];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spam-Score: -2.80
 
+On 10/7/25 11:24, Wilfred Mallawa wrote:
+> On Tue, 2025-10-07 at 07:19 +0200, Hannes Reinecke wrote:
+>> On 10/7/25 02:46, Wilfred Mallawa wrote:
+>>> From: Wilfred Mallawa <wilfred.mallawa@wdc.com>
+>>>
+>>
+> [...]
+>> I wonder: Do we really need to check for a partially assembled
+>> record,
+>> or wouldn't it be easier to call queue->write_space() every time
+>> here?
+>> We sure would end up with executing the callback more often, but if
+>> no
+>> data is present it shouldn't do any harm.
+>>
+>> IE just use
+>>
+>> if (nvme_tcp_queue_tls(queue)
+>>       queue->write_space(sk);
+> 
+> Hey Hannes,
+> 
+> This was my initial approach, but I figured using
+> tls_is_partially_sent_record() might be slightly more efficient. But if
+> we think that's negligible, happy to go with this approach (omitting
+> the partial record check).
+> 
+Please do.
+Performance testing on NVMe-TCP is notoriously tricky, so for now we
+really should not assume anything here.
+And it's making the patch _vastly_ simpler, _and_ we don't have to
+involve the networking folks here.
+We have a similar patch for the data_ready() function in nvmet_tcp(),
+and that seemed to work, too.
+Nit: we don't unset the 'NOSPACE' flag there. Can you check if that's
+really required? And, if it is, fixup nvmet_tcp() to unset it?
+Or, if not, modify your patch to not clear it?
 
+Cheers,
 
-On 10/2/25 9:55 AM, Florian Westphal wrote:
-> Eric Woudstra <ericwouds@gmail.com> wrote:
->> +static void nf_flow_table_do_cleanup_addr(struct nf_flowtable *flow_table,
->> +					  struct flow_offload *flow, void *data)
->> +{
->> +	struct flow_cleanup_data *cud = data;
->> +
->> +	if ((flow->tuplehash[0].tuple.xmit_type == FLOW_OFFLOAD_XMIT_DIRECT &&
->> +	     flow->tuplehash[0].tuple.out.ifidx == cud->ifindex &&
->> +	     flow->tuplehash[0].tuple.out.bridge_vid == cud->vid &&
->> +	     ether_addr_equal(flow->tuplehash[0].tuple.out.h_dest, cud->addr)) ||
->> +	    (flow->tuplehash[1].tuple.xmit_type == FLOW_OFFLOAD_XMIT_DIRECT &&
->> +	     flow->tuplehash[1].tuple.out.ifidx == cud->ifindex &&
->> +	     flow->tuplehash[1].tuple.out.bridge_vid == cud->vid &&
->> +	     ether_addr_equal(flow->tuplehash[1].tuple.out.h_dest, cud->addr))) {
-> 
-> I think it would be better to have a helper for this, so
-> it boils down to:
-> if (__nf_flow_table_do_cleanup_addr(flow->tuplehash[0]) ||
->     __nf_flow_table_do_cleanup_addr(flow->tuplehash[1]))
-> 
-> (thats assuming we can go forward with the full walk.)
-> 
->> +static int nf_flow_table_switchdev_event(struct notifier_block *unused,
->> +					 unsigned long event, void *ptr)
->> +{
->> +	struct flow_switchdev_event_work *switchdev_work;
->> +	struct switchdev_notifier_fdb_info *fdb_info;
->> +
->> +	if (event != SWITCHDEV_FDB_DEL_TO_DEVICE)
->> +		return NOTIFY_DONE;
->> +
->> +	switchdev_work = kzalloc(sizeof(*switchdev_work), GFP_ATOMIC);
->> +	if (WARN_ON(!switchdev_work))
->> +		return NOTIFY_BAD;
-> 
-> No WARN_ON here.  GFP_ATOMIC can fail, which then gives a splat.
-> But there is nothing that could be done about it for either reporter
-> or developer.
-> 
-> So, how much of a problem is this?
-> If its fine to ignore the notification, then remove the WARN_ON.
-> If its not ok, then you have to explore alternatives that do not depend
-> on successful allocation.
-> 
-> Can the invalided output port be detected from packet path similar to
-> how stale dsts get handled?
-
-The flow needs to be torn down, when a wifi-client moves to another
-bridge-port. Both old and new bridge-ports themselves are unchanged.
-And in case of the flow being hardware offloaded, the flow also needs to
-be torn down.
-
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
