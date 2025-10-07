@@ -1,95 +1,142 @@
-Return-Path: <netdev+bounces-228144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B00BBC2EAE
-	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 01:04:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79D12BC2EE8
+	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 01:27:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CB473E2136
-	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 23:04:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DCAB19A1F1F
+	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 23:27:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46DD22579E;
-	Tue,  7 Oct 2025 23:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA3B259C9A;
+	Tue,  7 Oct 2025 23:27:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DCngyiup"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S8CajmAf"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7152C9D;
-	Tue,  7 Oct 2025 23:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235C7235C01;
+	Tue,  7 Oct 2025 23:27:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759878253; cv=none; b=KWOSrVnZdj9uDfoCR9lok3zsQi5wR1Nre4B+eipT2XVTuQYTdC/zLMZSEvHIGZEONaikGT3IfNwe2RY8HYcpJlHaejGYXE7GYNVujqNKxX2BwYmTtpynI6PoDmT5swuuTfJ3M/j0zgGE2zhEhQojy2K5dDcnkiT0mZLuWOrquIA=
+	t=1759879627; cv=none; b=YaDBRZbQOT4HnVG2ozuEBhQEzn5W8HS0CjqPLAH4UoiYAf8dRgtYX79Fao4ebusFWL1xghW8b8qUpiiQiveBSTF0liYIsDbmCNcSITHKmMZhvlfbexZy4PrI1O5c5jvi5ViBtb21G8J5D+eWokjBoOm171ghAg/mo/CfacqYXNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759878253; c=relaxed/simple;
-	bh=DmUNTt2axIlkGHXADv0e0jYWiAffbGEyg+3VV08bliI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MahMRskcaPSEIEbe8jDn9HiHsU1zXBJU4mo32SVbm7t3ydHKYsEL0plnnv9aaghA422YRfjOswrqtmuJbTemXwXu3oF3M8OkqcEMdZUPc/gUNGdEFpP/JCFbrKGo6c+9hw/o2UKmbtl44jkTRKITf5lL+AZe5HKMBI9ULp6sg/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DCngyiup; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=jjt4KaYIhQgBbXhm7vy589MatOwIZ9D3kuIG0kfCUOM=; b=DC
-	ngyiupqM2UyYTfa53W8065E5uQ2/NKEtnoSg5vGRbN2i8CGRZRHEevgAOd+xc3XzETU+cJZTSEGKd
-	GQAWGo3iYV0bp2OX4plngHz2u8lMAxatVPDGJqg6eEjYMRiCI71nztYHb6lLZJLD8MlIpxMg44tRd
-	eMP1ZTbEn5utNns=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1v6Giz-00AOkx-Cv; Wed, 08 Oct 2025 01:04:05 +0200
-Date: Wed, 8 Oct 2025 01:04:05 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Cc: netdev <netdev@vger.kernel.org>,
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>
-Subject: Re: CPU stalls with CONFIG_PREEMPT_RT enabled on next-20251006
- (Renesas RZ/G2L & RZ/G3E)
-Message-ID: <5ac7ca4a-a85f-4611-92d6-fa1e26ee1c65@lunn.ch>
-References: <CA+V-a8tWytDVmsk-PK23e4gChXH0pMDR9cKc_xEO4WXpNtr3eA@mail.gmail.com>
- <dd6d8632-7102-4ebc-92e6-f566683f4a33@lunn.ch>
- <CA+V-a8v89b0Mg8ZX6nabNV8bMEan3EkonVhhHCb4t1GNxaxqrg@mail.gmail.com>
+	s=arc-20240116; t=1759879627; c=relaxed/simple;
+	bh=CaUXBZMISbzNhTMO0YWfXfkTC2QagyAT/MAcDC++FeQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TjkPG1zVz0FK2yAvmc78/C0rCy4JMFDU6HJ8o6yXiG6vkVQ1IQPYrM5IJRu9NwzqFuqFk/FoFWGIs6Rj+L/swxXeqVPcgL/vlT43wXDZutWuwGUu7hIM7MJeJ3WLUQCspfO1mVEiPHjT75BI2sLqON4JQmoI08CfXFlt3wB1+Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S8CajmAf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C122C4CEF1;
+	Tue,  7 Oct 2025 23:27:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759879625;
+	bh=CaUXBZMISbzNhTMO0YWfXfkTC2QagyAT/MAcDC++FeQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=S8CajmAf0ZHhErOJHTIVdQoZ9hHeSqr4IuXHqg3albYqq9pgAgkaC62FNRpjqUwOh
+	 ALyG0Z0xsWOwYDZVKFIg7+sG9ENCf0fLJT72OGrXtArkWQwe/ZagPBUZJblCUHvelz
+	 F2O+HkyjoAMSFSczWesuT3JkZguGaGAN6RILVxBkYJ9rcE8QoYWgF3fgi3WdA7ac9d
+	 JEp7cqC+Sc7nN7vinmCkL/ScJkeoBuZ4xv55ejqeLvoDz/C/3uDfarieVRv/06r1+D
+	 ZcL7RNhwE39CuWNhTD/g+Eh09u7flfK8JSvDfF+GzXVsl60ABriJLKBAceewLWkF6V
+	 vLjNTYgisLJUQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	bpf@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net v2 0/9] eth: fbnic: fix XDP_TX and XDP vs qstats
+Date: Tue,  7 Oct 2025 16:26:44 -0700
+Message-ID: <20251007232653.2099376-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+V-a8v89b0Mg8ZX6nabNV8bMEan3EkonVhhHCb4t1GNxaxqrg@mail.gmail.com>
 
-On Tue, Oct 07, 2025 at 10:40:59PM +0100, Lad, Prabhakar wrote:
-> Hi Andrew,
-> 
-> On Tue, Oct 7, 2025 at 7:30 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > On Tue, Oct 07, 2025 at 05:40:09PM +0100, Lad, Prabhakar wrote:
-> > > Hi All,
-> > >
-> > > With CONFIG_PREEMPT_RT enabled, I’m observing CPU stalls from the Rx
-> > > path on two different drivers across Renesas platforms.
-> >
-> > Do you have lockdep/CONFIG_PROVE_LOCKING enabled? Is this a deadlock?
-> > Something else is already holding the lock?
-> >
-> I am using the ARM64 default defconfig with RT_PREEMPT enabled.
-> 
-> CONFIG_LOCKDEP_SUPPORT=y
-> # CONFIG_PROVE_LOCKING is not set
-> 
-> I need to check if it's a deadlock, but from the looks of it does
-> definitely look like something is already holding the lock.
+Fix XDP_TX hangs and adjust the XDP statistics to match the definition
+of qstats. The three problems are somewhat distinct.
 
-Once you enable CONFIG_PROVE_LOCKING it should tell you about the
-deadlock, a stack trace of the other locking path involved etc.
+XDP_TX hangs is a simple coding bug (patch 1).
 
-	Andrew
+The accounting of XDP packets is all over the place. Fix it to obey
+qstat rules (packets seen by XDP always counted as Rx packets).
+Patch 2 fixes the basic accounting, patch 3 touches up saving
+the stats when rings are freed.
+
+Patch 6 corrects reporting of alloc_fail stats which prevented
+the pp_alloc_fail test from passing.
+
+Patches 4, 5, 7, 8, 9 add or fix related test cases.
+
+v2:
+ - [patch 2] remove now unnecessary byte adjustment
+ - [patch 8] use seen_fails more
+v1: https://lore.kernel.org/20251003233025.1157158-1-kuba@kernel.org
+
+Testing on fbnic below:
+
+ $ ./tools/testing/selftests/drivers/net/hw/pp_alloc_fail.py
+ TAP version 13
+ 1..1
+ fbnic-err: bad MMIO read address 0x80074
+ fbnic-err: bad MMIO read address 0x80074
+ # Seen: pkts:20605 fails:40 (pass thrs:12)
+ # ethtool -G change retval: success
+ ok 1 pp_alloc_fail.test_pp_alloc
+ # Totals: pass:1 fail:0 xfail:0 xpass:0 skip:0 error:0
+
+ $ ./tools/testing/selftests/drivers/net/xdp.py
+ TAP version 13
+ 1..13
+ ok 1 xdp.test_xdp_native_pass_sb
+ ok 2 xdp.test_xdp_native_pass_mb
+ ok 3 xdp.test_xdp_native_drop_sb
+ ok 4 xdp.test_xdp_native_drop_mb
+ ok 5 xdp.test_xdp_native_tx_sb
+ ok 6 xdp.test_xdp_native_tx_mb
+ # Failed run: pkt_sz 2048, offset 1. Last successful run: pkt_sz 1024, offset 256. Reason: Adjustment failed
+ ok 7 xdp.test_xdp_native_adjst_tail_grow_data
+ ok 8 xdp.test_xdp_native_adjst_tail_shrnk_data
+ # Failed run: pkt_sz 512, offset -256. Last successful run: pkt_sz 512, offset -128. Reason: Adjustment failed
+ ok 9 xdp.test_xdp_native_adjst_head_grow_data
+ # Failed run: pkt_sz (2048) > HDS threshold (1536) and offset 64 > 48
+ ok 10 xdp.test_xdp_native_adjst_head_shrnk_data
+ ok 11 xdp.test_xdp_native_qstats_pass
+ ok 12 xdp.test_xdp_native_qstats_drop
+ ok 13 xdp.test_xdp_native_qstats_tx
+ # Totals: pass:13 fail:0 xfail:0 xpass:0 skip:0 error:0
+
+Jakub Kicinski (9):
+  eth: fbnic: fix missing programming of the default descriptor
+  eth: fbnic: fix accounting of XDP packets
+  eth: fbnic: fix saving stats from XDP_TX rings on close
+  selftests: drv-net: xdp: rename netnl to ethnl
+  selftests: drv-net: xdp: add test for interface level qstats
+  eth: fbnic: fix reporting of alloc_failed qstats
+  selftests: drv-net: fix linter warnings in pp_alloc_fail
+  selftests: drv-net: pp_alloc_fail: lower traffic expectations
+  selftests: drv-net: pp_alloc_fail: add necessary optoins to config
+
+ .../net/ethernet/meta/fbnic/fbnic_netdev.h    |  1 +
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  7 ++
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |  6 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.c   |  8 ++
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    | 23 ++++-
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 74 +++++++++-----
+ tools/testing/selftests/drivers/net/hw/config |  4 +
+ .../selftests/drivers/net/hw/pp_alloc_fail.py | 36 ++++---
+ tools/testing/selftests/drivers/net/xdp.py    | 99 +++++++++++++++++--
+ 9 files changed, 209 insertions(+), 49 deletions(-)
+
+-- 
+2.51.0
+
 
