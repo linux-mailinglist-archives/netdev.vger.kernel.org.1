@@ -1,87 +1,82 @@
-Return-Path: <netdev+bounces-228070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 332CCBC0BF8
-	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 10:42:43 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77B13BC0C58
+	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 10:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFDA9188C545
-	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 08:43:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5997A4E33B8
+	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 08:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62C672D47F6;
-	Tue,  7 Oct 2025 08:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A000121B9D2;
+	Tue,  7 Oct 2025 08:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BD0lMbSc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kOc9IjYS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E73E2D3A7B
-	for <netdev@vger.kernel.org>; Tue,  7 Oct 2025 08:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E0C230BCC
+	for <netdev@vger.kernel.org>; Tue,  7 Oct 2025 08:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759826513; cv=none; b=XVap4RTCCpioTpSksEvtp4foNONhl6jG8x2aw/3Lt/4scMrJzKzawu91hOqrlH7Hvm2BqlTEdi6uY/4u3ghvUDdON9g6LX9zeaAIiADA+qJS5+MZG1CYBqljCqykv1gHlGR1H6qecLRUFHAxj36VsqKV0YdGwBUvZ5X3ck7/dio=
+	t=1759826830; cv=none; b=WuxvinsmDuqaUGcIkOVI/brm5Zfmurp2fqWqP/lSSmB8hXhltzSxSa19gC0jK0dMN+hPMdL6KbH0Z9/jkthQYKHxtDvxbswOhZH8TIy8wbXPXxYIEBehf8Mo4yZFHOWfdaDJLxD9+gb+C/8WJTm39FXevvgEXi6GGiKX31j+O8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759826513; c=relaxed/simple;
-	bh=N7osgbXR/Nb02nCTiJ+ibSI+O2czeqyHA6JbTI2aH0c=;
+	s=arc-20240116; t=1759826830; c=relaxed/simple;
+	bh=rm+bKLovVtUaqFIYZA7goACgyL+LzuY61ao1WTueUFU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U+skgKk96fFBXPEKwBie6GxW/upT2bAFQML2mDvf9OQqd3lCSgw3XBFpGIPumhV5b71TjjzhMI7o7R3mG1g7OxsF0zxyfY5JSxwYCExAlOi+/KNJLV8rAFHvOi39KQbI8Hi6e5U+Icgn9YCuCi6s1LfRlsxD1fAALAXkuLyzHoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BD0lMbSc; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759826510;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N7osgbXR/Nb02nCTiJ+ibSI+O2czeqyHA6JbTI2aH0c=;
-	b=BD0lMbScysGJBz0GrUafq96/xFv3l/JUid3Gm318KFJpnh9VtJOhY/6RF9Js7+Ean6tsKr
-	BaTF1fRONuulbTJcVRwDHxgHPDJLsZ7EVxZSnIPkuouK9RRLDNPTqO+ncxgfzdn4OqDrO8
-	nlvkEmYG+F2BrrrEXOQx/aThbpU2n+A=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-356-Kko4YgVuMsuS6RTV_IOVug-1; Tue, 07 Oct 2025 04:41:49 -0400
-X-MC-Unique: Kko4YgVuMsuS6RTV_IOVug-1
-X-Mimecast-MFC-AGG-ID: Kko4YgVuMsuS6RTV_IOVug_1759826508
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-4256fae4b46so1834828f8f.0
-        for <netdev@vger.kernel.org>; Tue, 07 Oct 2025 01:41:49 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=IqZtgRIuUwWFKnGbj8f9pI6c+8caUmMqRfDagVINYuv6Ztw2MllRPLEndSu8Gi2xkfQV8JuAjkKwCdiTEbXYiAP3mms1AkKCGEdGpJcVtZlSgkufEimhUNM7qVrwKVRwVIM295cgogyF/GdFbgBZEXwztXgECpPlTAVtH8cBQ6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kOc9IjYS; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b3e9d633b78so890837266b.1
+        for <netdev@vger.kernel.org>; Tue, 07 Oct 2025 01:47:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759826826; x=1760431626; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WB2grswrUvHVm6dDCjSHe44Kq5peu1fx6ZOaRQMhfes=;
+        b=kOc9IjYSdbgeAZ22QObJRaZJxFNcOeOjkdtYtIBpNJZ1fKijvWKGtVCHLUgUO/3Aoz
+         d29RzVsqffoX0za1bFqieW8+4d3YURzxpUt8qCbR+H3uD3ZPupmiePTDfqBqTmeLQ3F1
+         R/L0NQrBstPb2x+8Y/Zt6xeBgxXo9kCKIUMqX0Bv8eqIem9niw1bvd5o7QeV2iI62B5k
+         otdq8Z6mckkfd4OnWowedmuQifLqX3Kbl20zeIWGsy4IeQ0K7JGR8Cwd/6F5HSf0LqXp
+         Th5qGL4tvBNG2xdbeTeh4eIAGW1PLASeWyGnWNzvDOOU9ewmjnBAy+8riFG/2IfY2tNc
+         9htA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759826508; x=1760431308;
-        h=content-transfer-encoding:in-reply-to:from:content-language
+        d=1e100.net; s=20230601; t=1759826826; x=1760431626;
+        h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N7osgbXR/Nb02nCTiJ+ibSI+O2czeqyHA6JbTI2aH0c=;
-        b=GXhrTCMcX9GBePQu4vwbkhl5LOGQR8JSvNC0ERZMCfFW5T2/Dq9BoKQI2DFV1T18o6
-         +ThZ5yyRg3DYqcgFOtg35W1DPeNI4JadThdi6W0pHWnm5s57v+ul1a+pQxx87GCfymoF
-         xta5UjA+kuj3VwP320a5Hf7nx3n8ro2nyB5w1yL9/bU294xrTvZ7htNYZwurQNqf1DBv
-         aZWfEqTgUsMR3g8o50p0cPq4bwz2PLLWnDEp4HX4vRN5YvPoLuLQc7BqGhf/Bi4kttkP
-         zddRP/MzFJQIjhUKPBNl7gpcAheeAx8CfG8brkg+g4YXvRMMiZUfwTNt4aLSAcmuZ6Fl
-         3Wtg==
-X-Forwarded-Encrypted: i=1; AJvYcCX/DTTWnvvV9w7X8r3/OAae9CDjK8DgPstFmqS/wksvfmxCWiSBig3REnSU6eBfuQd0Ls/RaQY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx98w6FfOIaHNM7UZrXnGKGNh/vfiVcSB1ulxwd8CP7kS+ArYbp
-	/pS19TFI3hK5n7NztG4YfAxb64bi1zJGQm9vzYluwNqXb0R0j4+zmeK8K8UXggnwZ9qFWBjy5hz
-	YK2ar6yMym8qpcXV0Ncuhd0oa49Z8dhcLrpOSXYoVWkg1GeqbSUHj/ihEzldqXNGsZw==
-X-Gm-Gg: ASbGncuyjAgLjYwue4363XUvWryGviPMdb2AYVlRlqQD4L5CU0t2lZq+sSCWDHnrEBJ
-	33/hHI3uxdvSJ30CWdDmn4cZOIkFwg8mPII/PaAy7OJDxq+RYFaxK1KgfPOs76beBVhhU44+jSd
-	gQ4x2PEhpG239aQKJsYOTW8KrE1uNtTvqvQLQtUVZUESqnqt3Mw0eXePTit/NGVC5zNZrZVy1Ul
-	CqtX+wwIY+hh9xE9ENj59MEBl9ATS3wGWAN/zaj+JJexB8P+/yKtb024d0b+yVmkexY9Lu5+Ijv
-	E5p0nyBTiHJ7rpiWQw6XCclyXqqTELKnO1SNExO5RTpO+ajIQHW0lKhnKw74hvy+0VQikwOtxqK
-	4GRTHGlzuRf653bdFWw==
-X-Received: by 2002:a05:6000:1884:b0:408:d453:e40c with SMTP id ffacd0b85a97d-4256714d755mr10312700f8f.25.1759826508134;
-        Tue, 07 Oct 2025 01:41:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHSxdfixPGpLhL9XW+jR32nQk9zCoNallfAtZ7SneV9aO6UUhophTTA8FHKS9scyKLuEpDDBg==
-X-Received: by 2002:a05:6000:1884:b0:408:d453:e40c with SMTP id ffacd0b85a97d-4256714d755mr10312680f8f.25.1759826507682;
-        Tue, 07 Oct 2025 01:41:47 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4255d8f0170sm25156532f8f.49.2025.10.07.01.41.46
+        bh=WB2grswrUvHVm6dDCjSHe44Kq5peu1fx6ZOaRQMhfes=;
+        b=N6aLPgaqeCTdk9kboy0fqgOwyHpdqKc30OlCJyTMZVI9QttpK+1865RrZsWraQmWRq
+         CuVNBkFBD/4x7nDbFZmX8e/A1RQzjSODWXQosmqdLZAySREfK7GjcrArteAkgynJx9Dt
+         XAEEwiIfPyJJqIGOtTWwzW0ez6rdjQaiWFwulIAMILsusv6Ap2zTmlZGvFvihMiNmvaI
+         fHVxeH1toSlc+k3eI0v+KEWgHv2yj1PVTV/0xAYTcWOxbTy1ssUtYcyfGloSGZDuMIVd
+         o34+1AjHNzLFJMb/61mjEetf4wYQ5AS2WzrJ6O7hXvPj2RAWjL7AYfW29Ksj9NSqhrop
+         qADA==
+X-Forwarded-Encrypted: i=1; AJvYcCXO7PBC0ay0hQ7QtE0j9Y141mCi3jLMU/kKwIq8aAdBwjd0pVF/cgYnYOzhB9Njdd8UJceOVmI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKW0LBqHjz3jKMiSfbUzilSL1TFLfez2I637AGbF+NhjsQ0lJC
+	I6gGGn6z3762kwohzvb1Kaao4hzLD8kZw0mZfPu8sCS9c6wOlpLqVvtw
+X-Gm-Gg: ASbGncsolDf3Trr8RJennWiY533e9I7riDn8yxOYxNg3xDJHmBFuuGNl3rKFbbcO5cV
+	RV43J82/oXdExXNXIlAl0mGyeK4/7hE//QSSzNUYcgEs5UAkpGlxdi9+FycwzRtDfmILkkc99eM
+	BL+NK0u/78L1W1LLYz7wSaTZWti42iKOEPNgPhsd8R8dy0QRu/gqS2ViJDZ81LTgOt8NQBpqto8
+	fhQnEO6Z7/6Q96axmVEeZTa/3UlYBXMrCqKWiXxWofIkAGVAap5XM8Ooc0xA1xFfRk/CQ+7FQbp
+	MblanbHXZAkE7CXNoPqDvesMJmlAoxhnKMyPR+uum2Fa7LqES1nyWxvp4AcKMY3SqEvyMwrrjf3
+	t9NFAMlS34hQFsBtg+89zewl26TzMr8JE3QECTB1AWAmZhDQA5xiM2ah29mLj5zN4D8+WGZuIfa
+	YH6dDUT959g8sNAHDsvHD/s+CfRVtG7dbOwnAWPtQsp/TRl2o3McLejnwOZEDKKj8GbkquyeSIy
+	ZL4mjb7YC5ehYeC5UEmDooe
+X-Google-Smtp-Source: AGHT+IF7h6k8lPFDkNeA/iUAYR/ai7IDjOraNrySsDbHdhxC28f4NjLFCx3wh4KD7aln3iNwlTiNWw==
+X-Received: by 2002:a17:906:2689:b0:b4f:f1b9:b02e with SMTP id a640c23a62f3a-b4ff1b9e0e5mr116537266b.31.1759826825706;
+        Tue, 07 Oct 2025 01:47:05 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b48652aa040sm1327470266b.20.2025.10.07.01.47.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Oct 2025 01:41:46 -0700 (PDT)
-Message-ID: <d8fb2384-66bb-473a-a020-1bd816b5766c@redhat.com>
-Date: Tue, 7 Oct 2025 10:41:45 +0200
+        Tue, 07 Oct 2025 01:47:05 -0700 (PDT)
+Message-ID: <346ffcf3-cf42-4227-96c5-84d37837c09f@gmail.com>
+Date: Tue, 7 Oct 2025 10:47:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,40 +84,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] drivers/net/wan/hdlc_ppp: fix potential null pointer in
- ppp_cp_event logging
-To: Kriish Sharma <kriish.sharma2006@gmail.com>,
- =?UTF-8?Q?Krzysztof_Ha=C5=82asa?= <khalasa@piap.pl>
-Cc: khc@pm.waw.pl, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251002180541.1375151-1-kriish.sharma2006@gmail.com>
- <m3o6qotrxi.fsf@t19.piap.pl>
- <CAL4kbROGfCnLhYLCptND6Ni2PGJfgZzM+2kjtBhVcvy3jLHtfQ@mail.gmail.com>
+Subject: Re: [PATCH v4 nf-next 0/2] flow offload teardown when layer 2 roaming
+To: Florian Westphal <fw@strlen.de>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>,
+ netfilter-devel@vger.kernel.org, netdev@vger.kernel.org
+References: <20250925182623.114045-1-ericwouds@gmail.com>
+ <aN4uKod5GFKry2yL@strlen.de>
+From: Eric Woudstra <ericwouds@gmail.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAL4kbROGfCnLhYLCptND6Ni2PGJfgZzM+2kjtBhVcvy3jLHtfQ@mail.gmail.com>
+In-Reply-To: <aN4uKod5GFKry2yL@strlen.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/3/25 8:43 AM, Kriish Sharma wrote:
-> Thanks for the clarification.
-> I can update proto_name() to return "LCP" by default instead of NULL,
-> which should silence the compiler without changing behavior.
-> I can send another patch for this if you'd like.
 
-If v2 is not ready yet, I think it would be better returning "unknown"
-instead of "LCP" when the protocol id is actually unknown.
 
-In the current code base, such case is unexpected/impossible, but the
-compiler force us to handle it anyway. I think we should avoid hiding
-the unexpected event.
+On 10/2/25 9:47 AM, Florian Westphal wrote:
+> Eric Woudstra <ericwouds@gmail.com> wrote:
+>> This patch-set can be reviewed separately from my submissions concerning
+>> the bridge-fastpath.
+>>
+>> In case of a bridge in the forward-fastpath or bridge-fastpath the fdb is
+>> used to create the tuple. In case of roaming at layer 2 level, for example
+>> 802.11r, the destination device is changed in the fdb.
+>                ~~~~~~~~~~~~~~~~~~
+> 
+> destination device == output port to use for xmit?
+> 
 
-Assuming all the code paths calling proto_name() ensure the pid is a
-valid one, you should possibly add a WARN_ONCE() on the default case.
+Indeed. It is the bridge-port that is being changed for the same
+combination of vid and address. In the tuple it is the output port for xmit.
 
-Thanks,
+>> The destination
+>> device of a direct transmitting tuple is no longer valid and traffic is
+>> send to the wrong destination. Also the hardware offloaded fastpath is not
+>> valid anymore.
+> 
+> Can you outline/summarize the existing behaviour for sw bridge, without
+> flowtable offload being in the mix here?
+> 
+> What is the existing behaviour without flowtable but bridge hw offload in place?
+> What mechanism corrects the output port in these cases?
+> 
 
-Paolo
+What is comes down to is br_fdb_update(), when an existing fdb entry is
+found for the vid/address combination. When it appears on a different
+bridge port then stored in the fdb entry, the fdb entry is modified.
+
+Also br_switchdev_fdb_notify(br, fdb, RTM_DELNEIGH) is called so that
+drivers can remove bridge hw offload. This is what I also want to listen
+for, as it is the only message that holds to old bridge-port.
+
+Listening in particular when it is called from br_fdb_update(), but it
+can be debated if we should respond to all of these calls, or only when
+called from br_fdb_update(). If we want to narrow it down, may need to
+add an "updating" flag to:
+
+struct switchdev_notifier_fdb_info {
+	struct switchdev_notifier_info info; /* must be first */
+	const unsigned char *addr;
+	u16 vid;
+	u8 added_by_user:1,
+	   is_local:1,
+	   locked:1,
+	   offloaded:1;
++	   updating:1;
+};
+
+Or something similar.
+
+>> This flowentry needs to be torn down asap.
+> 
+>> Changes in v4:
+>> - Removed patch "don't follow fastpath when marked teardown".
+>> - Use a work queue to process the event.
+> 
+> Full walk of flowtable is expensive, how many events
+> are expected to be generated?
+> 
+> Having a few thousands of fdb updates trigger one flowtable
+> walk each seems like a non-starter?
+
+Indeed, this would be an argument to narrow it down. Fully walking
+through the flowtable, only when an fdb entry's bridge-port is being
+updated.
 
 
