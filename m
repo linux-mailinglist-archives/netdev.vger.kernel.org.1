@@ -1,239 +1,179 @@
-Return-Path: <netdev+bounces-228060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDCD2BC04AB
-	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 08:01:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42646BC04C9
+	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 08:09:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AE7684E0232
-	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 06:01:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2A0F84E1714
+	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 06:09:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8471D155389;
-	Tue,  7 Oct 2025 06:01:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67AD31E7C23;
+	Tue,  7 Oct 2025 06:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="X4Uko+vn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZyjVX0Xx"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010015.outbound.protection.outlook.com [52.101.201.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E83D35959;
-	Tue,  7 Oct 2025 06:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759816883; cv=fail; b=WI7R8r7yJMKIqRcE5NJxcT01AW9k+aaGCyipVyrpGR9k/7pBl+yJfBbrngGR44VSpdSblre+s9leLXoqOLe4V/6epVn13KTrM+jBmE98xf4rW1Ny7XAi7tIZVvA5hYDU7b6XLkragRY2js2jKHFIUq6Nb8ZR1uyvbAz/Qbtd7go=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759816883; c=relaxed/simple;
-	bh=rtnrLOHPaaNjhOBU9IqsGTzko2kGw8JItfxgmk405/s=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=TA7TrQeZjJsrElR1E1tVzk2UGWx5KK/ji6FCHiz9glBiM8ioWL5NAXj+sJ+la0y3rhoOyLGKBZR5ubVpjvZ/cw2TCqcFT6K0Ts5utgsufOqnhXuCzHqs5Pvp1W4RX52uVDzg+Sgb4UG3cwcMHAIpxbpEbn7WRR+UQGW9IP/agkA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=X4Uko+vn; arc=fail smtp.client-ip=52.101.201.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sHiMV7e+s6XBxvJ/DAf8iB/VKu/3SI/ltfAyGbt6m72mDH7TdKARx2PCUHaChQ0GcaUtQYAogQhSj2Y6zaAHPp4ptbSJAo+zy6gNKz176MDxIFsEsKvsxj42Gu0rUsPgwBCmCuKbodo0AtpTYGP/XMLvrL+70CpeJgq2XJaRXY6jBUMZZoaQ+yG9JwQ7KOq56AKAxPbZCxglXsSf11Vyt7TMNLru8q20JF0AJkXa/LwCdlmQiua1e5peupklzNyq/6Eab7lNFvMMPNfZkSqNilgCgENPBhIfz/fBo5Ud97cewefgHU7QQ4HdNhPiuAA+JlJCj1WKsxpqiQUkOdwZSw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3rSx1ChL8M8X7F4TvGSEwD6BzchS++sGFd1jDg/l4hw=;
- b=CFRGZXLBtP3kFaFt4+L+UWiJIFXlf6ba5pc7TtBYimkhKeWuyXRuXctCMhnIcACJ+GTr60RLRFkg/QCu7nCopnHYfZQdyAvPnttH85tciwvUiy1S+n0EC7XSAOrMo+Dxh3mY6QFQ+5M3H6Mm+Z2ZDwCtzyeZWszDCp2jmd5kSLocLd1bGfYtlNKTsuaEvZiKBFvIknd4zyF4V6Bx12+3fkrjtJnKuXnEfkhLeeLF5SMS+rc/92bmZAaRmDe5i6oqqNJIZiSYkxNRmOuCRII/q8rMcbHM3fkDVyi5JDJgrsVfzWG/DHz2RZ711SEUtHxDL8X3DIh/HaqHVRhuEgbVow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3rSx1ChL8M8X7F4TvGSEwD6BzchS++sGFd1jDg/l4hw=;
- b=X4Uko+vn3R9xl1IybQCvTa4U1VKS7GR1gftLVEbK3+XZctYjVoVT0qlBJnyZKfhIPZm5PYdB45D51BM486lqmTSqrdPHmadqrs+VNcJsL0BI35Ch/xRpLTzX4MIBwNbQ2CIbrlruCb7dW2jroERhCoVijVzSjrd98UkNZO/Em8543wBE7X14df51ju4ZkDA/B6QP1W1+OGDw46CmM0gNXDBWyF4aMJXw2gecSwi7zoZtQVIDR9aILRp+dAoilwOl7FSsi3en+YVwxqJGy38WYXphpUsUA3lt3zG+Xamlok0JdsJg2ZZhJusmqiAz4dU1BCY5ABf/XdsKR/6So9QcBA==
-Received: from DS7PR11MB6102.namprd11.prod.outlook.com (2603:10b6:8:85::18) by
- CY5PR11MB6414.namprd11.prod.outlook.com (2603:10b6:930:36::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9182.20; Tue, 7 Oct 2025 06:01:13 +0000
-Received: from DS7PR11MB6102.namprd11.prod.outlook.com
- ([fe80::5cb3:77bf:ac73:f559]) by DS7PR11MB6102.namprd11.prod.outlook.com
- ([fe80::5cb3:77bf:ac73:f559%6]) with mapi id 15.20.9182.017; Tue, 7 Oct 2025
- 06:01:13 +0000
-From: <Divya.Koppera@microchip.com>
-To: <andrew@lunn.ch>
-CC: <josef@raschen.org>, <Arun.Ramadoss@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] net: phy: microchip_t1: LAN887X: Fix device init issues.
-Thread-Topic: [PATCH] net: phy: microchip_t1: LAN887X: Fix device init issues.
-Thread-Index:
- AQHcLl6B38r4+cWxO0ijQ23prCCi/LSkctsAgAGIagCAAAYcAIAEkOaAgAXUmyCABR7wgIAAt8+Q
-Date: Tue, 7 Oct 2025 06:01:12 +0000
-Message-ID:
- <DS7PR11MB6102A376A0EF8727DFAF0088E2E0A@DS7PR11MB6102.namprd11.prod.outlook.com>
-References: <20250925205231.67764-1-josef@raschen.org>
- <3e2ea3a1-6c5e-4427-9b23-2c07da09088d@lunn.ch>
- <6ac94be0-5017-49cd-baa3-cea959fa1e0d@raschen.org>
- <0737ef75-b9ac-4979-8040-a3f1a83e974e@lunn.ch>
- <fbe66b6d-2517-4a6b-8bd2-ec6d94b8dc8e@raschen.org>
- <DS7PR11MB6102D0B2985344C770AEC293E2E4A@DS7PR11MB6102.namprd11.prod.outlook.com>
- <5f74c41e-15cd-40f3-8fb2-fa636f169d70@lunn.ch>
-In-Reply-To: <5f74c41e-15cd-40f3-8fb2-fa636f169d70@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS7PR11MB6102:EE_|CY5PR11MB6414:EE_
-x-ms-office365-filtering-correlation-id: 408b16b2-8d2b-4da3-76d9-08de0566eb84
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?KXFNzpHBFWVuKQxx43l9wDJo7InoGlMSrOENBdh39raqJPr5UdFwtHUPQoWQ?=
- =?us-ascii?Q?p8EbC5DvWRS6G9Rd435oAD+ohs8KKllJyblYW9gcAwcMD8syyX5VHN1UmnGU?=
- =?us-ascii?Q?ThdzOwLPRQ51C4VecYl1H4yGOCFsKKhZJMC6TrBy5nmIme6T/OIZskOFfhx2?=
- =?us-ascii?Q?SXeMeXVfv9Pc43BDc/1Ugnv+wUekc5bDykeJxspYuDms60gCtfRDNFzcXk2M?=
- =?us-ascii?Q?yGDDKbC7SR09MMtujcmZrJTVKjt0dVV/nWYvglDYl+cDQVQj8rqmDxUFsZ2I?=
- =?us-ascii?Q?tGhdzxQvzfJReWUAaZoRulHkgqe2W3+2PlvEznevSHmZhokHGf1UpwT21KJn?=
- =?us-ascii?Q?VsgaT4BQF8PYdNFDzZLqv5+BlP1dM9ISAUtmR858oWzmpqMVTyTBifM6ay/t?=
- =?us-ascii?Q?HlEAtCCPOg4wg4hvUgqo5KPPDVKO99gJYT4/rvr/AFRUf7+SIp9lbzaLMXEs?=
- =?us-ascii?Q?XrYabszIk4lqVn9ZndVtEEq65KkAdVvZHbU0MoAvEziQ2Jkur+sGhUfEehlj?=
- =?us-ascii?Q?BmLgTs9fXCHxrOuc3jf8VN0lB1oI+eqI+MRekl7KY1ssEoU//yWfpfOFt9ig?=
- =?us-ascii?Q?yVxW4Pofo046/zK4JB7QcjELnczJDM3bC75Nhik3Uq/0w5EWoyKzs5Naf3QM?=
- =?us-ascii?Q?NsTLLJXZRhjyr3xdViuKw67VrJLbFPRj2vofb8sMcPW+XtlQTnczO6CAk48v?=
- =?us-ascii?Q?OeNcSGMjiqgFiVjL6sK8HrHfkSRREzGyyqo7WlOEJoMmh4y4cHr6a5jSQyrO?=
- =?us-ascii?Q?O2Y/r9ewW9rqwv1d2vXAfKfhAHiNxg6dlk9NxcU9CgPSv0104XuVMm600o3E?=
- =?us-ascii?Q?0OQyPoE+57g0KE6Du36xiuav52k3OU8WcgETw6wTsUAJ8QqwTUeVXJ/duupF?=
- =?us-ascii?Q?7PWyzYnlYx9+XQrIKWNxWPHwvV9MxK42m3t/+rOVMZ215NSS2p9xTAdrjyCt?=
- =?us-ascii?Q?MAKsysGF/KLxKN0NrYK6RnQzqMPHgRCZ+2LSd019qpBzXf5eDm3JOSWc8gmR?=
- =?us-ascii?Q?iNIoyCUZ0PBe9PiOPS//q5nd7PdiUdlURjFRpLg68zjkkfq3lcDnO44VeMbj?=
- =?us-ascii?Q?V7RqG47TsKVw1iuNA71/1DLNocdmIJ3mwsquG7IZnQJiRoRGbGRK8D08ZkE6?=
- =?us-ascii?Q?U/w31cuQsAXHjUp+SM/qPHSnazWwbmz/ljZ7q6iCfiq5OhHBAVCGrtcznIiZ?=
- =?us-ascii?Q?00/jqBz7ckSoL4QGI7xyfChGfTtV+m07c6qOW/RZyuFiFFxqBA1x4u+/9AO8?=
- =?us-ascii?Q?sinxv9ofd5JU7h8l4s3u3ChcZzVjmnrOxXCltKwIUJqQPT2MxkRTaACCdhfz?=
- =?us-ascii?Q?SyN6UVBeNMYostgP5sgkO7PPRHZsJHP5qHQCYBhywCYydGSR5TD7f3DFVn61?=
- =?us-ascii?Q?eeGYONzeBmQPXr4RkNrkmjcJCFQDnRTdn6nQbuCJjFU1yWLVGWa5OmoTssNS?=
- =?us-ascii?Q?K1paPG9eiCwVjSaCBZyd/b3PR+bdZiOu+5jMS8oZ4jVg4BcCWEvbQA=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB6102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?jlm/LfTYfGxf37RrszuSpBJgrLo3iV1NEgQUplXUhkDYKa8sY+sZMHq2BytX?=
- =?us-ascii?Q?zHEA/6bD7Qr1xFNTP9P/X23mTogHCofWd3p1HoSKGJdoje+3UZRt+pz5dvl3?=
- =?us-ascii?Q?P6KYZe2wKwqBXuEEBmFPZC89jOVg4dSVAI+1xD0e/1PkzyUGBaLvRaiDZDJr?=
- =?us-ascii?Q?fwMGaDaGo3luFiFAvlh13z5jRMqz8jpd8XQi+04NklMeyyai1GT1woW0mCEH?=
- =?us-ascii?Q?1q0qosvC43WESgc/JbtNIXFvfq1oIq0rVg6CuWUkRqrFOM+k2gRJqgL6Dn7Z?=
- =?us-ascii?Q?s6CCEcQl4VKKW/yHdq2K6EiWGOj44qM7lhqiZwDMoRPTsG2fqs6ou8GZlPJv?=
- =?us-ascii?Q?m0GgwqPH9mDEtQ9Y4cF59TztpBOymiVi+pNRkInYBhV1ZINsOPXML+sdHO5G?=
- =?us-ascii?Q?LH2gaCKvdnBFGNCFEbTLqPxbU1qPu2k23pAg+kMghO32Ml2diR1d1OzNMpvz?=
- =?us-ascii?Q?AL+JnBihDNeOKBD2ZmKHY/0sCMjEwHjJjrgobEdAKbf83o1mWcPkW+b7Yjei?=
- =?us-ascii?Q?gFXhKeNQ7R9EGltdMcK5IkWSiuZlUlfo4EqNmfyYftq+wk7xh8ayMYGNtb3c?=
- =?us-ascii?Q?DwPVq3L6xmZkYm21aHLN+aP4HPC+PQSF31bdm15O1jzmakizjWuj+MgyT0fY?=
- =?us-ascii?Q?wMarEtbHVXyYHIJASV7umV7Xp62g8hk/jJjkXgwwuOHHgif5WL2BIKl4xsJf?=
- =?us-ascii?Q?Miu35JGuhscESNqs8YCQ8F33/qI5A9vD4TzHHMXISzV1Xd98/7pk3uRjd76M?=
- =?us-ascii?Q?0MUeByrOBpvM+H4x6OYEGJUqnkAKETWiCW5/pA+FOUDUD1xL6RVePvNJSeVZ?=
- =?us-ascii?Q?J3EkL0CMadKjAPk2PeYOPsXI4/k/f0K6hUlRYHUAXZOwmjBDcC4AXH7IRYJW?=
- =?us-ascii?Q?WEwpdYsC76vsbYbgiJMaJmv3UmHQjdoT1YEd3YWol1JctiKu4acN8UjVzR8l?=
- =?us-ascii?Q?oUtYchYcmRbLVhdkgzQhgB6/lI3sRToR7L3u9kDX3y/CF0fNiPTKhV+ddXMr?=
- =?us-ascii?Q?xkU95zYxo2h9PASMRkPq5mA/+fIYXi35Sn3AXonZLHNtSWB3+iETZkxo1rkm?=
- =?us-ascii?Q?eg5D6kkh5qJZClAIYO7Rf6J6WO9lfGwu1CXz5Jxa3uvnmEdX8Xh//+Slluav?=
- =?us-ascii?Q?epuOhUbDEVbFHH2mhwNZCEjLeHm8YApsTa21ZSfsqnNNdemmN4gyTDsCFPQC?=
- =?us-ascii?Q?nUcdqs/JXKU6QrmWBbgJMEbB7u4o1tuz36hYW1VaJryURvcgH0pmOpNU87AB?=
- =?us-ascii?Q?ibHdwQFHj+jXwFkBqt8e0hd56AvIQpIbIlb6dfMnM2ZyRToX53EYNT9lInN6?=
- =?us-ascii?Q?CiwBQwh61bsVkQAJQK/Vn4NTV1TDpUUr8ZLZav/Azz+tZfEbUvY2K6KbVFlU?=
- =?us-ascii?Q?ulGvylB3j8Rb1CuJYc0H9CoWYy1L3Lx8FdPXRwYB4ojaNgvZ9LU0lsRDKsLn?=
- =?us-ascii?Q?ELgnHg+ZX1uoG2PJQewHIadcDMkcZ1tQ5muhnOBGB38zxmIwYMMKlPVY5+xC?=
- =?us-ascii?Q?dNEKIF1U+NEAXms7Gbli0tLdoh2p6Du8XB7ciIuv4++13koR50M/WgSSwxww?=
- =?us-ascii?Q?mFYrpEB7AGQHuNMxBVjyUaUFfqsPU4Op48vI125WF2RXE3cNkgOr5iBMT6aE?=
- =?us-ascii?Q?8w=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D57D273FD;
+	Tue,  7 Oct 2025 06:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759817337; cv=none; b=HqcoRDFze1O8iajtmPazMuZY/XdBAQuB7ashFdLO++IxQYPcWrk8vZBBmqWCKf2FDM6KUdodjt9LmOnU687uJ9ocjsELyQ9M4hId1yrtkvpCJfKQcrK8I310CRWogbrYKzKlwOeKo//u0ABCYQI7SjhonQa7o+TiXd25a2uSh+o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759817337; c=relaxed/simple;
+	bh=vaMq5ngZH7t7l69by25TsKwNJKrKVl7+BNZxPUHPjj0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ihRRVkWnjRMzjHDVd7HpY09qOTsqQV/lk7aV2oR/+Lss9YdVF0b4iu/3VcM7BOHNEOMo+dDNIyw4eNNc+znvwRttE3fXsAT2hMD/iHXZULc2YjNcOG4ZxXq02TbG5ZV6DqspReFXC02m0k2FVSm95GyAHXpmGYiYFGk+D79FnSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZyjVX0Xx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BCC33C4CEF1;
+	Tue,  7 Oct 2025 06:08:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759817336;
+	bh=vaMq5ngZH7t7l69by25TsKwNJKrKVl7+BNZxPUHPjj0=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=ZyjVX0XxlE/mSqnqQrohIPMQpWmxz2ziDjpM8TQomjM7WfRAb2qVCLiZ3lIDqbSF7
+	 /iADAORwxFvxuPQhkBsZcNOFalFFa5LBCt9aZzJgHHJeWvDJLy1fEgTB1TnlQrJ/MO
+	 YWEVT4f5i/Vv9bArzcXIOuZs0brrMFhcWy1IwuVcagsZWqLzwTTIagKHdDdFVOnfDL
+	 5CLcMpS/ilCs+rzBWYCqM2PAwr3sTKnIRqZpVLHjZ8iopQZn2wdT7Qiqsw2zh2x2DL
+	 4IzXXEPZn75Mn9dyGQqxMVQVWLZXbdYwMmUHd5CRo8f4skHbw9HbWnke3J/W6XyOzE
+	 yo2fi10p7HI0g==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8256CCA470;
+	Tue,  7 Oct 2025 06:08:56 +0000 (UTC)
+From: Dmitry Safonov via B4 Relay <devnull+dima.arista.com@kernel.org>
+Date: Tue, 07 Oct 2025 07:08:36 +0100
+Subject: [PATCH] net/ip6_tunnel: Prevent perpetual tunnel growth
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB6102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 408b16b2-8d2b-4da3-76d9-08de0566eb84
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Oct 2025 06:01:12.8942
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bobZvCDWImfcxbaJX1Wemp5Hy/xBKELE1y60Lul59eS/vul66eFDP3RRPUY+kj549hUoEiwg2gcWSNIv5M9XofgFxauZ+x0JoVqeTLsZzm8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6414
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251007-ip6_tunnel-headroom-v1-1-c1287483a592@arista.com>
+X-B4-Tracking: v=1; b=H4sIAGOu5GgC/x3MQQrCMBBA0auUWRtMo1brVURk0oxmoE3KTCxC6
+ d2NLt/i/xWUhEnh2qwgtLByThXtroEhYnqR4VANzrpTa+3Z8Nw9yjslGk0kDJLzZDz23QUd9sc
+ DQi1noSd//tfbvdqjkvGCaYi/V8my4Bh0P6EWEti2L7hx7O2HAAAA
+X-Change-ID: 20251007-ip6_tunnel-headroom-ba968a2a943a
+To: "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Tom Herbert <tom@herbertland.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Florian Westphal <fw@strlen.de>, Francesco Ruggeri <fruggeri05@gmail.com>, 
+ Dmitry Safonov <dima@arista.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1759817335; l=3578;
+ i=dima@arista.com; s=20250521; h=from:subject:message-id;
+ bh=B0Jlh8RDVwjqLnA0Qj6JzNQbbltz7rJFTIJJo5dDy3w=;
+ b=rATwaMJDQEhKExQr2WdFI9D4UGwHdjuQADmB7GCXlGA1fSZX7scBr+wKxxp+SBVqnWDWMGayV
+ dmxe/bVYeiOCEJnrZZl4VmXElsVxhZhTZ6YoSRm8u92KskISZQZFRHN
+X-Developer-Key: i=dima@arista.com; a=ed25519;
+ pk=/z94x2T59rICwjRqYvDsBe0MkpbkkdYrSW2J1G2gIcU=
+X-Endpoint-Received: by B4 Relay for dima@arista.com/20250521 with
+ auth_id=405
+X-Original-From: Dmitry Safonov <dima@arista.com>
+Reply-To: dima@arista.com
 
-Hi Andrew,
+From: Dmitry Safonov <dima@arista.com>
 
-> -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Tuesday, October 7, 2025 12:15 AM
-> To: Divya Koppera - I30481 <Divya.Koppera@microchip.com>
-> Cc: josef@raschen.org; Arun Ramadoss - I17769
-> <Arun.Ramadoss@microchip.com>; UNGLinuxDriver
-> <UNGLinuxDriver@microchip.com>; hkallweit1@gmail.com;
-> linux@armlinux.org.uk; davem@davemloft.net; edumazet@google.com;
-> kuba@kernel.org; pabeni@redhat.com; netdev@vger.kernel.org; linux-
-> kernel@vger.kernel.org
-> Subject: Re: [PATCH] net: phy: microchip_t1: LAN887X: Fix device init iss=
-ues.
->=20
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e
-> content is safe
->=20
-> > phy_sanitize_settings() is supposed to pick the least supported speed
-> > from the supported list when speed is not initialized.
->=20
-> What makes you think it should pick the slowest speed? The kdoc for the
-> function is:
->=20
-> /**
->  * phy_sanitize_settings - make sure the PHY is set to supported speed an=
-d
-> duplex
->  * @phydev: the target phy_device struct
->  *
->  * Description: Make sure the PHY is set to supported speeds and
->  *   duplexes.  Drop down by one in this order:  1000/FULL,
->  *   1000/HALF, 100/FULL, 100/HALF, 10/FULL, 10/HALF.
->=20
-> So it should pick 1000Full if available. If not it will try 1000Half, if =
-not 100Full
-> etc.
->=20
+Similarly to ipv4 tunnel, ipv6 version updates dev->needed_headroom, too.
+While ipv4 tunnel headroom adjustment growth was limited in
+commit 5ae1e9922bbd ("net: ip_tunnel: prevent perpetual headroom growth"),
+ipv6 tunnel yet increases the headroom without any ceiling.
 
-As per code referred below,=20
-if (!match && p->speed <=3D speed)     =3D=3D> This condition will NEVER me=
-et for any supported speed(p->speed), when speed is not initialized(i.e., s=
-peed is -1 and p->speed is 1000 and 100 in lan887x case).
-	/* Candidate */
-	match =3D p;
+Reflect ipv4 tunnel headroom adjustment limit on ipv6 version.
 
-if (!match && !exact)
-	match =3D last;     =3D=3D> As there is no match this condition hits and i=
-.e., the LOWEST speed supported as per above documentation.
+Credits to Francesco Ruggeri, who was originally debugging this issue
+and wrote local Arista-specific patch and a reproducer.
 
-return match;
+Fixes: 8eb30be0352d ("ipv6: Create ip6_tnl_xmit")
+Cc: Florian Westphal <fw@strlen.de>
+Cc: Francesco Ruggeri <fruggeri05@gmail.com>
+Signed-off-by: Dmitry Safonov <dima@arista.com>
+---
+ include/net/ip_tunnels.h | 15 +++++++++++++++
+ net/ipv4/ip_tunnel.c     | 14 --------------
+ net/ipv6/ip6_tunnel.c    |  3 +--
+ 3 files changed, 16 insertions(+), 16 deletions(-)
 
-For reference: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux=
-.git/tree/drivers/net/phy/phy-core.c?h=3Dv6.12.43#n305
+diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
+index 4314a97702eae094f2defc65d914390864c21006..d88532c0fbcd30110e41907722fcaf31ce2e4fda 100644
+--- a/include/net/ip_tunnels.h
++++ b/include/net/ip_tunnels.h
+@@ -611,6 +611,21 @@ struct metadata_dst *iptunnel_metadata_reply(struct metadata_dst *md,
+ int skb_tunnel_check_pmtu(struct sk_buff *skb, struct dst_entry *encap_dst,
+ 			  int headroom, bool reply);
+ 
++static inline void ip_tunnel_adj_headroom(struct net_device *dev,
++					  unsigned int headroom)
++{
++	/* we must cap headroom to some upperlimit, else pskb_expand_head
++	 * will overflow header offsets in skb_headers_offset_update().
++	 */
++	static const unsigned int max_allowed = 512;
++
++	if (headroom > max_allowed)
++		headroom = max_allowed;
++
++	if (headroom > READ_ONCE(dev->needed_headroom))
++		WRITE_ONCE(dev->needed_headroom, headroom);
++}
++
+ int iptunnel_handle_offloads(struct sk_buff *skb, int gso_type_mask);
+ 
+ static inline int iptunnel_pull_offloads(struct sk_buff *skb)
+diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
+index aaeb5d16f0c9a46d90564dc2b6d7fd0a5b33d037..158a30ae7c5f2f1fa39eea7c3d64e36fb5f7551a 100644
+--- a/net/ipv4/ip_tunnel.c
++++ b/net/ipv4/ip_tunnel.c
+@@ -568,20 +568,6 @@ static int tnl_update_pmtu(struct net_device *dev, struct sk_buff *skb,
+ 	return 0;
+ }
+ 
+-static void ip_tunnel_adj_headroom(struct net_device *dev, unsigned int headroom)
+-{
+-	/* we must cap headroom to some upperlimit, else pskb_expand_head
+-	 * will overflow header offsets in skb_headers_offset_update().
+-	 */
+-	static const unsigned int max_allowed = 512;
+-
+-	if (headroom > max_allowed)
+-		headroom = max_allowed;
+-
+-	if (headroom > READ_ONCE(dev->needed_headroom))
+-		WRITE_ONCE(dev->needed_headroom, headroom);
+-}
+-
+ void ip_md_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
+ 		       u8 proto, int tunnel_hlen)
+ {
+diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+index 3262e81223dfc859a06b55087d5dac20f43e6c11..6405072050e0ef7521ca1fdddc4a0252e2159d2a 100644
+--- a/net/ipv6/ip6_tunnel.c
++++ b/net/ipv6/ip6_tunnel.c
+@@ -1257,8 +1257,7 @@ int ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev, __u8 dsfield,
+ 	 */
+ 	max_headroom = LL_RESERVED_SPACE(tdev) + sizeof(struct ipv6hdr)
+ 			+ dst->header_len + t->hlen;
+-	if (max_headroom > READ_ONCE(dev->needed_headroom))
+-		WRITE_ONCE(dev->needed_headroom, max_headroom);
++	ip_tunnel_adj_headroom(dev, max_headroom);
+ 
+ 	err = ip6_tnl_encap(skb, t, &proto, fl6);
+ 	if (err)
 
-> And the comment is actually a bit out of date. It will actually start fro=
-m 800G
-> Full, 400G Full, 200G Full, 100G Full, not that anybody does Copper at th=
-ese
-> speeds.
->=20
+---
+base-commit: c746c3b5169831d7fb032a1051d8b45592ae8d78
+change-id: 20251007-ip6_tunnel-headroom-ba968a2a943a
 
-True.
+Best regards,
+-- 
+Dmitry Safonov <dima@arista.com>
 
-Thanks,
-Divya
 
->         Andrew
 
