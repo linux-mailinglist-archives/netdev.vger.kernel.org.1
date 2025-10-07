@@ -1,170 +1,181 @@
-Return-Path: <netdev+bounces-228062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C407BC04DB
-	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 08:12:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B16BBC05A8
+	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 08:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ACE2E4E623C
-	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 06:12:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A1D4D4E2650
+	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 06:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06573221DAE;
-	Tue,  7 Oct 2025 06:12:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AGbpPTNk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EBED224AF9;
+	Tue,  7 Oct 2025 06:40:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDD221ADCB
-	for <netdev@vger.kernel.org>; Tue,  7 Oct 2025 06:12:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B401DFE12
+	for <netdev@vger.kernel.org>; Tue,  7 Oct 2025 06:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759817541; cv=none; b=KfKJNm9EIL6OPD4LABKgngS92aK1RZvmfFiHUudyCTop6X42Lvdh9caKPVmPjj4tvXhrui/8q+eFdWNBMOn76Cq49ZcFpwPEDLMjEBUG8TQt24+9acjjqVOiwMAeOIjdh5B/Q+o/4Ujd5Sqb13Bhq6H84cQotBSXICFI3b3sg8Q=
+	t=1759819227; cv=none; b=E+/rdYfP1AgLbFsFqeC7a5aG+moP1CG4W7LP0WRUCMQdsIP/ZQQS2lZm6QtPlsVX8FEgT95TnsfJ8j4rkXGXvQCfjo37hiu0iZn8LRqUgCUAo7VJ0ud1ZDFy7CZV2JGuF8JJqMPq2gkONCSacuhVnaxfiAWtNyLfB9uzHD78Jss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759817541; c=relaxed/simple;
-	bh=f/KtZW3rhkYJ2eiCGDLGTJbkYnmihth0V8SUE4SHB04=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZpbHbzb4VfnWKsxGOn2YKVU2V6DzeZGzQz9Pd3wQ/4QcG48nIlvHHlkSi/ZzFltY3mSbRjFxzLpC0jt6nz/k0YeI1K+n4CCkAiJOyGfTeQmnxjJnVzYLpD1q/aT4y3W9U2rNwFU5UKcNKWEOF9ZI0Ic9oHdxduzl9jSfnpT2Dy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AGbpPTNk; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3305c08d9f6so4211344a91.1
-        for <netdev@vger.kernel.org>; Mon, 06 Oct 2025 23:12:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759817539; x=1760422339; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=x039O0NFHGAXzxihdFNNk+CPOWRSSl0ZG6jnY+lkA64=;
-        b=AGbpPTNkK+bPv/uqVFQEeN3njBGhCB4hNTE84OEQz/gZY8TytGQL+jZchJDF6LLJnq
-         fOj+9NUi5z5Yh1kSGuWLNvgVAF55Z+J8n8lAWEzUWNrtEbIWBLEm7xeJ1kfZf9qyh6G3
-         /xaWfllvTLaJ2lX2MeseSd2EXfUVu9AxIDTfd1JFLpDz0HluE6RyD+9cr6o9KtDJ49KE
-         FdG34cnbt5oMOIECOulAkEYW/d0Pa5WHnUmxeaxfcTDAR+mdUhZk2T/g65IUuDoqaC6h
-         hFOxwkzJZYVFfwXKg3zCmVFa/tt6hdytBnmXHpiHH1DAD449c7G1P7QNvvayuLwhdifD
-         R2rg==
+	s=arc-20240116; t=1759819227; c=relaxed/simple;
+	bh=XlOTIbzyJ9ae2wkRAdNrqwCpKp7faZ2gxc/qDolAbPI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=B3uafK8ZnwaX4dfu74K2yWAWFz17sJqrq/WWGI9brGIBEg1+E2V0SaSvAvv6jjreL8Rk9r8zu3hat5MMHUtbL5cT6qmP9CUrjqK1X3wtx+r6hlA69WjOTD02X8LGEoascMiq7xuRCLYVkNFlPIDJqx29FKqjEy2cyIKGgVCsHNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-42f6639fb22so39645345ab.0
+        for <netdev@vger.kernel.org>; Mon, 06 Oct 2025 23:40:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759817539; x=1760422339;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x039O0NFHGAXzxihdFNNk+CPOWRSSl0ZG6jnY+lkA64=;
-        b=f6w1cMm02Nmab1qeJjclVnw3fQ0fFiqcsBgFrQe08b+bfb6Sf0OuOE19krH908NxP2
-         CFSswN+0A59yUsdpj1mr28BTitjFaR4b78LDozK/E5A1OLWlL38K7zuq1NWG2iwqujt9
-         Sru2oZCfm6dcCtokMWrTMfr/EQx71YByLGLbQjHuVdenAgBAAiDFJmDs9Q85QEqxog0M
-         Xv69VE1/HAYNtkATgKV4jwyJMkEH4PI4SylI91e0v/amVmY2Oo8xqboLuvbAlvdOtZ0J
-         L/2iW/Phdl63vt480MmU+OE+WDZ6XwwQ+ZksuFvpin4oHYR+V7uFFZ5IuUHTvCTKz7lz
-         sY1g==
-X-Forwarded-Encrypted: i=1; AJvYcCWCknpYrjIWPnx1f+rN04Rp2uknANCtJmdGJKYLSqEWu3HjYePQGrzaE/dTQoNlCXL6QYrknKE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEcLEsO/+W1t9r8EYhm/iRp69o+S1Y2AJ4jDUCrNbGlf5vPSd6
-	WtAxkX9ob3pCddZ9VkQA4XIo2uI5G2GQ54aXBfHa6WVikMSwAgRrUNyR
-X-Gm-Gg: ASbGncvlR1BnYTZ4duKhr6W1hV7LJpXQmhPnl2VvnygpKRGfG4LuN4I0RZpxp/YWVlD
-	azpZZVqXQ9D+vLO3HldAZwleelSas92KioO0Z8wtNBEoGioF5jFHNT5CIj3ThWevxUUjqxLBI0J
-	a0JCf0VEMAu2wf+Aa11TnM2QOSGnvQiqFF/MndPhCM6WdfUP2iZYkhx7JduVNVOkkxv7JUZjrKP
-	hCib8afwDQJAsQlc8BRPus0alMr3rLxbGSAlhdUWcD80R7C7JLqd97kwFCw+NZcbuus6ZBfv3by
-	LHsxf9cuHE65/VDqUA7zI0SalBkLzh9rkQFW6LauVzYj0QAe2/0iXTpqjRZUupzQ8OWNb9NLwYT
-	yLudTm9vpu3tIG6kA1DnG2n1tprwLEXdYS6ZF6jRNnPcVAFugxv1D6/lvURrHHsAGGAb9Mlqv4S
-	va+g==
-X-Google-Smtp-Source: AGHT+IG2DTQJY2MdHBjlE/ea/em21MmRyqHMhJutkpAPqmAVGyj8WhoqLhe1SRoTVivJMvCIXdKuuw==
-X-Received: by 2002:a17:90b:384f:b0:327:53f0:6368 with SMTP id 98e67ed59e1d1-339eda67866mr2533241a91.2.1759817539087;
-        Mon, 06 Oct 2025 23:12:19 -0700 (PDT)
-Received: from [10.0.2.15] ([14.98.178.155])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-339ee9218ffsm739057a91.4.2025.10.06.23.12.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Oct 2025 23:12:18 -0700 (PDT)
-Message-ID: <e8311311-61bd-4be6-8025-841b84ff4422@gmail.com>
-Date: Tue, 7 Oct 2025 11:42:12 +0530
+        d=1e100.net; s=20230601; t=1759819225; x=1760424025;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZmWH0sFJ81ae4IdRbfRzpAwRmesL9eDv1LLY5X2e6JQ=;
+        b=S1kTqQGjo3LF66HMhrxk4o0VaPyWrwA5MNfok6cQisi3EJbVn3Phentu/KEmeoWqYZ
+         /+AEZAb/WyQoHbgexTkj9vJbWFyomrxk/O+6orwMcXeaFhs3CsAU1exVeOyrpp5lBCvV
+         jAF8qrDmK7zt4pIe+aXSPhHt79wOJRNIZ39VK/Ez1oAr2a6OdjBYJ0rlHdvQxFYGSZy3
+         F7shEoS2mUdUn1GIsaZ/x2/AGtH0jAfDWMY1jJVu3Dni8XPPUYJdPfzC+fvxeTmQM2Ue
+         Wmyb83ikQapZQKkCGUWKKMc03/gXZHbouR7dvG/1U9jywEDxf0RcIZlxQxRPkWuTg7mv
+         F+IA==
+X-Forwarded-Encrypted: i=1; AJvYcCVxY7/A3Zb+EmAG8gZvnTMn81GHCMCBJ9nfIB5UOE8McAd59SLzLzL/RnNVSXtRuo+BJKk7/Lo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAAMjlhDZhhjNE3LwoOtbmSgUe2wIO51iuAVX+EaoYqmv2x7QV
+	1NDq0u4CBUhrR8WhtB3BaCG8xL5WxjzwBfUf8CFckYrtz2MTblhSJQYALM9pzxGCisUBp6dXeBz
+	Mnz9pSjTYLTe+U55dEIkTeYU8IoKDW36TsLRMQf+yYuuHVVsaLZNCoSubOJw=
+X-Google-Smtp-Source: AGHT+IHEceDnSvP7Mgd+2PyErdUwcXrmuHiI9Iqr/mzTkggx/G8u97rfYlYQ8kAvua5X+UpFjIbQHAKncBBlCrwFSJ1JNEKAVESF
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: usb: lan78xx: Fix lost EEPROM write timeout
- error(-ETIMEDOUT) in lan78xx_write_raw_eeprom
-To: Khalid Aziz <khalid@kernel.org>,
- Thangaraj Samynathan <Thangaraj.S@microchip.com>,
- Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
- UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: linux-kernel-mentees@lists.linuxfoundation.org,
- skhan@linuxfoundation.org, david.hunter.linux@gmail.com,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251004040722.82882-1-bhanuseshukumar@gmail.com>
- <866d28f8-616c-4a79-9030-2ebc971e73fd@kernel.org>
-Content-Language: en-US
-From: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
-In-Reply-To: <866d28f8-616c-4a79-9030-2ebc971e73fd@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:19c5:b0:42e:7481:8973 with SMTP id
+ e9e14a558f8ab-42e7ad84488mr189261375ab.20.1759819224982; Mon, 06 Oct 2025
+ 23:40:24 -0700 (PDT)
+Date: Mon, 06 Oct 2025 23:40:24 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68e4b5d8.050a0220.256323.0018.GAE@google.com>
+Subject: [syzbot] [net?] KMSAN: uninit-value in netif_skb_features (4)
+From: syzbot <syzbot+1543a7d954d9c6d00407@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 07/10/25 00:30, Khalid Aziz wrote:
-> On 10/3/25 10:07 PM, Bhanu Seshu Kumar Valluri wrote:
->> The function lan78xx_write_raw_eeprom failed to properly propagate EEPROM
->> write timeout errors (-ETIMEDOUT). In the timeout  fallthrough path, it first
->> attempted to restore the pin configuration for LED outputs and then
->> returned only the status of that restore operation, discarding the
->> original timeout error saved in ret.
->>
->> As a result, callers could mistakenly treat EEPROM write operation as
->> successful even though the EEPROM write had actually timed out with no
->> or partial data write.
->>
->> To fix this, handle errors in restoring the LED pin configuration separately.
->> If the restore succeeds, return any prior EEPROM write timeout error saved
->> in ret to the caller.
->>
->> Suggested-by: Oleksij Rempel <o.rempel@pengutronix.de>
->> Fixes: 8b1b2ca83b20 ("net: usb: lan78xx: Improve error handling in EEPROM and OTP operations")
->> Signed-off-by: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
->> ---
->>   Note:
->>   The patch is compiled and tested.
->>   The patch was suggested by Oleksij Rempel while reviewing a fix to a bug
->>   found by syzbot earlier.
->>   The review mail chain where this fix was suggested is given below.
->>   https://lore.kernel.org/all/aNzojoXK-m1Tn6Lc@pengutronix.de/
->>
->>   drivers/net/usb/lan78xx.c | 11 +++++++----
->>   1 file changed, 7 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
->> index d75502ebbc0d..5ccbe6ae2ebe 100644
->> --- a/drivers/net/usb/lan78xx.c
->> +++ b/drivers/net/usb/lan78xx.c
->> @@ -1174,10 +1174,13 @@ static int lan78xx_write_raw_eeprom(struct lan78xx_net *dev, u32 offset,
->>       }
->>     write_raw_eeprom_done:
->> -    if (dev->chipid == ID_REV_CHIP_ID_7800_)
->> -        return lan78xx_write_reg(dev, HW_CFG, saved);
->> -
->> -    return 0;
->> +    if (dev->chipid == ID_REV_CHIP_ID_7800_) {
->> +        int rc = lan78xx_write_reg(dev, HW_CFG, saved);
->> +        /* If USB fails, there is nothing to do */
->> +        if (rc < 0)
->> +            return rc;
->> +    }
->> +    return ret;
->>   }
->>     static int lan78xx_read_raw_otp(struct lan78xx_net *dev, u32 offset,
-> 
-> You were able to test the change to read eeprom code by forcing a timeout while doing probe on EVB-LAN7800LC. Were you able to test this code change the same way just to make sure callers of the write function handle the new ETIMEDOUT return value correctly?
-> 
-> Thanks,
+Hello,
 
-Hi Khalid,
+syzbot found the following issue on:
 
-This function is only invoked from user's ethtool operations.  The ethtool handles errors returned from the driver callback functions. 
-I tested it with ethtool -E option by forcing a ETIMEDOUT error early in the lan78xx_write_raw_eeprom temporarily. The ethtool 
-reported error with "Cannot set EEPROM data" message. The ethtool version used is 5.16.
+HEAD commit:    e406d57be7bd Merge tag 'mm-nonmm-stable-2025-10-02-15-29' ..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=144ad942580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=50fb29d81ff5a3df
+dashboard link: https://syzkaller.appspot.com/bug?extid=1543a7d954d9c6d00407
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
 
-Regards,
-Bhanu Seshu Kumar Valluri
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/7aa074b1bf56/disk-e406d57b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/4c8a46bed2ec/vmlinux-e406d57b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9ed66e725466/bzImage-e406d57b.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1543a7d954d9c6d00407@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in netif_skb_features+0x115b/0x2160 net/core/dev.c:3825
+ netif_skb_features+0x115b/0x2160 net/core/dev.c:3825
+ validate_xmit_skb+0xb6/0x1d50 net/core/dev.c:3985
+ __dev_queue_xmit+0x23f8/0x5e60 net/core/dev.c:4755
+ dev_queue_xmit include/linux/netdevice.h:3365 [inline]
+ hsr_xmit net/hsr/hsr_forward.c:430 [inline]
+ hsr_forward_do net/hsr/hsr_forward.c:571 [inline]
+ hsr_forward_skb+0x2162/0x3c40 net/hsr/hsr_forward.c:733
+ hsr_handle_frame+0xd6d/0x11a0 net/hsr/hsr_slave.c:81
+ __netif_receive_skb_core+0x2040/0x7150 net/core/dev.c:5966
+ __netif_receive_skb_list_core+0x2f1/0x16b0 net/core/dev.c:6154
+ __netif_receive_skb_list net/core/dev.c:6221 [inline]
+ netif_receive_skb_list_internal+0xee7/0x1530 net/core/dev.c:6312
+ gro_normal_list include/net/gro.h:524 [inline]
+ gro_flush_normal include/net/gro.h:532 [inline]
+ napi_complete_done+0x3fb/0x7d0 net/core/dev.c:6681
+ gro_cell_poll+0x2c9/0x310 net/core/gro_cells.c:66
+ __napi_poll+0xda/0x8a0 net/core/dev.c:7594
+ napi_poll net/core/dev.c:7657 [inline]
+ net_rx_action+0xbc8/0x1c30 net/core/dev.c:7784
+ handle_softirqs+0x169/0x6e0 kernel/softirq.c:622
+ __do_softirq+0x14/0x1b kernel/softirq.c:656
+ do_softirq+0x99/0x100 kernel/softirq.c:523
+ __local_bh_enable_ip+0xa1/0xb0 kernel/softirq.c:450
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ tun_rx_batched+0x889/0x980 drivers/net/tun.c:-1
+ tun_get_user+0x5d60/0x6d70 drivers/net/tun.c:1953
+ tun_chr_write_iter+0x3e9/0x5c0 drivers/net/tun.c:1999
+ new_sync_write fs/read_write.c:593 [inline]
+ vfs_write+0xbdf/0x15d0 fs/read_write.c:686
+ ksys_write fs/read_write.c:738 [inline]
+ __do_sys_write fs/read_write.c:749 [inline]
+ __se_sys_write fs/read_write.c:746 [inline]
+ __x64_sys_write+0x1fb/0x4d0 fs/read_write.c:746
+ x64_sys_call+0x3014/0x3e30 arch/x86/include/generated/asm/syscalls_64.h:2
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4953 [inline]
+ slab_alloc_node mm/slub.c:5245 [inline]
+ kmem_cache_alloc_node_noprof+0x989/0x16b0 mm/slub.c:5297
+ kmalloc_reserve+0x13c/0x4b0 net/core/skbuff.c:579
+ __alloc_skb+0x347/0x7d0 net/core/skbuff.c:670
+ __pskb_copy_fclone+0xcc/0x14d0 net/core/skbuff.c:2164
+ __pskb_copy include/linux/skbuff.h:1447 [inline]
+ hsr_create_tagged_frame+0x32c/0x11b0 net/hsr/hsr_forward.c:340
+ hsr_forward_do net/hsr/hsr_forward.c:-1 [inline]
+ hsr_forward_skb+0x16a4/0x3c40 net/hsr/hsr_forward.c:733
+ hsr_handle_frame+0xd6d/0x11a0 net/hsr/hsr_slave.c:81
+ __netif_receive_skb_core+0x2040/0x7150 net/core/dev.c:5966
+ __netif_receive_skb_list_core+0x2f1/0x16b0 net/core/dev.c:6154
+ __netif_receive_skb_list net/core/dev.c:6221 [inline]
+ netif_receive_skb_list_internal+0xee7/0x1530 net/core/dev.c:6312
+ gro_normal_list include/net/gro.h:524 [inline]
+ gro_flush_normal include/net/gro.h:532 [inline]
+ napi_complete_done+0x3fb/0x7d0 net/core/dev.c:6681
+ gro_cell_poll+0x2c9/0x310 net/core/gro_cells.c:66
+ __napi_poll+0xda/0x8a0 net/core/dev.c:7594
+ napi_poll net/core/dev.c:7657 [inline]
+ net_rx_action+0xbc8/0x1c30 net/core/dev.c:7784
+ handle_softirqs+0x169/0x6e0 kernel/softirq.c:622
+ __do_softirq+0x14/0x1b kernel/softirq.c:656
+
+CPU: 1 UID: 0 PID: 11876 Comm: syz.2.2011 Not tainted syzkaller #0 PREEMPT(none) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
