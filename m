@@ -1,126 +1,125 @@
-Return-Path: <netdev+bounces-228136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89354BC2A58
-	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 22:32:44 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3352BBC2A9B
+	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 22:40:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EB2F189CA0A
-	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 20:33:07 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 93B243475D7
+	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 20:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52D5819E99F;
-	Tue,  7 Oct 2025 20:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506F6225762;
+	Tue,  7 Oct 2025 20:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="V2K1s0vo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VajO108n"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6162F1487F6
-	for <netdev@vger.kernel.org>; Tue,  7 Oct 2025 20:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22153218AB4;
+	Tue,  7 Oct 2025 20:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759869161; cv=none; b=o+Mi2dnX7DOs10gj/D62xg1q5H6d/TBzULF+wcvaytc5G2g3FJVgov27wxKNnA3JNpM36cswBduqT1s3+T0pho5EnRvBR5jp+Y8dUKX0qQz/Pr9aNNFcutUOdflAA+Eb6kF9OvvgP+o+LS4fQojjS45kaEKfrxtCQ8iOpMe1DWU=
+	t=1759869610; cv=none; b=mH9SYJ/DlwsZXHL0pEGBzmAUmQeC1EjBTUXmdsYp+aIy8FWuyr2OfsiVZmcGZ6CZ/8oe/mzftayk0ZetAhvCFgNAkYZpTp186dtyp0LAU3/KPJg8uO+thEF4xF88KW073zKjMMz9Ytx5DZW7q9GYVR9X0ufQLLjkBEdLd8AH7ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759869161; c=relaxed/simple;
-	bh=MaDAMBNMZ92ElfQt2AXzto3HilYnmemTGRvRi2atjTE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TFMRAcYFjy01QWMNnNcZByCnAEde+v/R9C1XbwZhT/+vThaNfCOQeOPMBoPaQsNu2zbRasJbO0YNcKJbHAOx3qttiMnDK2745gllG553H/B/fh2r0NbpFYHJufsePdwKLr0uk75p+fHCa6RMo2uR0ja9lC2lAr1umt2tAyKJQy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=V2K1s0vo; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <854e2fce-9d34-4472-b7b8-f66248f3ff01@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1759869156;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SSm3WRTYj2I+mXI0pIUfdZvEOC3gbO37eKiogl3mO9I=;
-	b=V2K1s0vo0nVK/kO0SiYJwDhq1W8zQz/SvTP2qmZ6UeEl5T9LJRGHQ2L3sy6T871tEuUNXk
-	zKDqy+LjeF0aCxAxj5Ph5Lb/Wq4hLsq3l+iD0klwA9ya8UjYhYwQSYXkbw6YPjtrRSVery
-	BxPg2gVuE6K1jM83YdVPiP1Lbj4NO2E=
-Date: Tue, 7 Oct 2025 13:32:30 -0700
+	s=arc-20240116; t=1759869610; c=relaxed/simple;
+	bh=WjOlGE690Cju9uez8gCAXio7GQ+uSNWuP+sUwijBUsg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZhTWI/me7pXBJNAyfLrwPuPQWjbhq/EMcdw1S8rLPu4Zs6SUYEseqHZ8LWv/9PUbl6VnY3vPAx1HZNSmwH91WHDZFitZiVgfHLaXPrOF+7x7FEJRFyExs/HFrS7nb7dXBE52ZhNz2XDcUgR+UzdxUd/weaMWgfldYeSYJ6OJfLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VajO108n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8621C4CEFE;
+	Tue,  7 Oct 2025 20:40:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759869608;
+	bh=WjOlGE690Cju9uez8gCAXio7GQ+uSNWuP+sUwijBUsg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VajO108nCDRTBoEksmGItunqsCqZy5Mif++sFX3CjQt5cvoQSPN49IDstfKSlgj4K
+	 j6JyjHtVPmxDRH03FrfvTOD8hj3vCbROPEr36y/9584idFEZVi41Hnmrlg31PKNtMH
+	 7e6wQM+yuDpAmrRw/s7EizcNFsGKodn4e1PmA70VmIo6T7kgx4UdIVUslOk8NvJFVm
+	 8oBtoH23DirdYaww93SuTJcHYbZZ6gQYxXYHO/GZZXNxmeCALr+uhJp0aiEoLDKd0Q
+	 yVypmteZz4Tb5TF8Sww4sBzslzx1pw8IFfkfSB6/uOm+8ic/IPJwssc/uyjLvO3+vd
+	 G6UDegOb51FjA==
+Date: Tue, 7 Oct 2025 21:40:03 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Thomas Wismer <thomas@wismer.xyz>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Thomas Wismer <thomas.wismer@scs.ch>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/3] dt-bindings: pse-pd: ti,tps23881: Add TPS23881B
+Message-ID: <20251007-stipulate-replace-1be954b0e7d2@spud>
+References: <20251004180351.118779-2-thomas@wismer.xyz>
+ <20251004180351.118779-8-thomas@wismer.xyz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH bpf-next 00/14] bpf: Efficient socket destruction
-To: Jordan Rife <jordan@jrife.io>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Stanislav Fomichev
- <sdf@fomichev.me>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Aditi Ghag
- <aditi.ghag@isovalent.com>, bpf@vger.kernel.org, netdev@vger.kernel.org,
- Jason Xing <kerneljasonxing@gmail.com>
-References: <20250909170011.239356-1-jordan@jrife.io>
- <80b309fe-6ba0-4ca5-a0b7-b04485964f5d@linux.dev>
- <ilrnfpmoawkbsz2qnyne7haznfjxek4oqeyl7x5cmtds5sdvxe@dy6fs3ej4rbr>
- <df4c8852-f6d1-4278-84d8-441aad1f9994@linux.dev>
- <CABi4-ogK1zaupzpRppGEdM0v+4BSJHbrC4Fg=j1zBSGLbkx1rQ@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <CABi4-ogK1zaupzpRppGEdM0v+4BSJHbrC4Fg=j1zBSGLbkx1rQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-
-On 10/6/25 1:19 PM, Jordan Rife wrote:
-
-> Yeah, this is a bit tricky. I'll have to think a bit more about how
-> this would work. The ETIMEOUT thing would work for TCP, but if I'm
-> trying to extend this to UDP sockets I think you may need an explicit
-> bpf_sock_destroy() call anyway? And if you're making
-> bpf_sock_destroy() work in that context then maybe supporting ETIMEOUT
-> is redundant?
-> 
->> [ Unrelated, but in case it needs a new BPF_SOCK_OPS_*_CB enum. I would mostly
->> freeze any new BPF_SOCK_OPS_*_CB addition and requiring to move the bpf_sock_ops
->> to the struct_ops infrastructure first before adding new ops. ]
-> 
-> Thanks, I'll look into this. One aspect I'm uncertain about is
-> applying this kind of approach to UDP sockets. The BPF_SOCK_OPS_RTO_CB
-> callback provides a convenient place to handle this for TCP, but UDP
-> doesn't exactly have any timeouts where a similar callback makes
-> sense. Instead, you'd need to have something like a callback for UDP
-> that executes on every sendmsg call where you run some logic similar
-> to the code above. This is less ideal, since you need to do extra work
-> on every sendmsg call instead of just when a timeout occurs as with
-
-Yeah, regardless of ETIMEOUT or bpf_sock_destroy(), I think the 
-BPF_SOCK_OPS_RTO_CB is better for TCP because of no overhead on the fastpath msg.
-
-> BPF_SOCK_OPS_RTO_CB, but maybe the extra cost here would be
-> negligible. Combined, I imagine something like this:
-> 
-> switch (op) {
-> case BPF_SOCK_OPS_RTO_CB:
-> case BPF_SOCK_OPS_UDP_SENDMSG_CB:
-Beside the fastpath msg overhead, I hate to say this, no new CB enum can be 
-added. I was hoping the only exception is the pending udp timestamping work but 
-it has been pending for too long, so we have to move on.
-
-The bpf_sock_ops needs to move to struct_ops first. I suspect some of the 
-bpf_sock_destroy() hiccup being faced here is that the running context is only 
-known at runtime as an enum instead of something static that the verifier can 
-help to check the right kfunc to use. Once struct_ops is ready, adding a sendmsg 
-ops will be in general useful.
-
-If TCP is solved with the existing BPF_SOCK_OPS_RTO_CB+ETIMEOUT, the remaining 
-is UDP and it seems you are interested in connected (iirc?) UDP only. It is why 
-I asked how many UDP sockets you may have in production.
-> I think using socket callbacks like BPF_SOCK_OPS_RTO_CB would make for
-> a more elegant solution and wouldn't require as much bookkeeping,
-yeah, if it needs to iterate less, it has to do its own bookkeeping. This patch 
-uses the sock_hash but it can also be done in the bpf list/rb/arena also. The 
-bpf_sock_destroy_might_sleep() should be strict forward. The 
-SEC("syscall")+bpf_sock_destroy_might_sleep could be useful for other use cases 
-also.
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Z9ytksPVlhkGPYpP"
+Content-Disposition: inline
+In-Reply-To: <20251004180351.118779-8-thomas@wismer.xyz>
 
 
+--Z9ytksPVlhkGPYpP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sat, Oct 04, 2025 at 08:03:53PM +0200, Thomas Wismer wrote:
+> From: Thomas Wismer <thomas.wismer@scs.ch>
+>=20
+> Add the TPS23881B I2C power sourcing equipment controller to the list of
+> supported devices.
+
+Missing an explanation for why a fallback compatible is not suitable
+here. Seems like it is, if the only difference is that the firmware is
+not required to be refreshed, provided that loading the non-B firmware
+on a B device would not be problematic.
+
+>=20
+> Signed-off-by: Thomas Wismer <thomas.wismer@scs.ch>
+> ---
+>  Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yam=
+l b/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml
+> index bb1ee3398655..0b3803f647b7 100644
+> --- a/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml
+> +++ b/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml
+> @@ -16,6 +16,7 @@ properties:
+>    compatible:
+>      enum:
+>        - ti,tps23881
+> +      - ti,tps23881b
+> =20
+>    reg:
+>      maxItems: 1
+> --=20
+> 2.43.0
+>=20
+
+--Z9ytksPVlhkGPYpP
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaOV6owAKCRB4tDGHoIJi
+0oFTAQDWK3RLnS1dd804AcyEPm0D/tSzKkHQ49oSwoC2VwaP/QEA7TJUT3vu7/NY
+whEhmbz2E3Fdscuy2U8mlpCMGnk+xQc=
+=Oby5
+-----END PGP SIGNATURE-----
+
+--Z9ytksPVlhkGPYpP--
 
