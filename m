@@ -1,241 +1,195 @@
-Return-Path: <netdev+bounces-228108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5065BC1803
-	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 15:32:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 952F5BC1815
+	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 15:34:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF4813E1846
-	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 13:32:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82C7119A2EB6
+	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 13:34:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 008B32E0B6A;
-	Tue,  7 Oct 2025 13:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F6F2E0405;
+	Tue,  7 Oct 2025 13:34:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="rhxlNvoZ"
+	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="AU79XZ5v"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D411A2E092E;
-	Tue,  7 Oct 2025 13:32:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CF7225785;
+	Tue,  7 Oct 2025 13:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.244.183.115
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759843923; cv=none; b=kci0Vk5tOxMSLuNhVy4DizaV0LOpDJeSq4MEJVOuX3Jibu4A2wcOo5rBsm0QJv50PFqWLNJBUIZV3gBeP6ImeLsTDLDpZshuWxDsj+vGuUVXhL2ps096+jhKy4T9VD9dFbddIBmObs1tJd6WF2egkHjrDNobfOgmOTdsz9SONHA=
+	t=1759844056; cv=none; b=m5gCiDEkDt2qdA8xhYVhj3/3yN01oD9GcIQgLyZ1zQ14xUKiJO9GALVixB87ABrH5yew59YCPtUrgdsSSYr6TvO46F1Ukqj2EW1mfIgPc3TXiOiYYKwCC/NdZu468y4f8iUFZ/Onny9p88M5/VT+rB9Rb21iizDAObqsenvMS/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759843923; c=relaxed/simple;
-	bh=FfvEKzZlnRJCxy/SdHzTPhF8mOYD17or0zzHr1su9Cc=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=pefPyAk0/SfMxSNWLPtKW6VSeBZSh2tN8PIXRNFmriOkDG+Mss8RQ+GxS8cXbFlBYlfM+b+e3JhvG38Wd47+AJMrHb+/UKxTUqbw37PEO5rEhr8EIvltuDxndPHBbwAOZNKJ8ZqwXHxSesPRcLTDZmERMH7lf7w7K9nUhxv76jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=rhxlNvoZ; arc=none smtp.client-ip=162.240.164.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=yA5XHJIh+uwK8m+cFLqO7xuw+2f8PC3Mm/yaRJEXFTs=; b=rhxlNvoZT0teHb0DCJY3mIC6El
-	5Qz1/3Y10Mju3b173o7WcTErbx60ZGETrwUzHkoho84Xkx7xAhqcSAnKgCg1d3DNkHtVwXDH8q5e/
-	pm+xMX7s6U8qBwOH5h/581byBmK/GTIMiedcf4EaOriOwwTc6D804/Jrm5u7Q02NyTQI892E3dX2/
-	uNWR+6kQZIMFhVBerJ3uPHAU5B7BLfi2wWlI3cpICh+nDSZif/lvmx6GrJHRWrkl3eivFibve/Gb7
-	xR/iaxEnvsbQedO1njoUc+nD6r2/n9OqoB6ApyZWtnFVpCaYnWOJ2vetwHpJFj9lZcAd8twP+Rcyv
-	xh1fWUEw==;
-Received: from [122.175.9.182] (port=40538 helo=zimbra.couthit.local)
-	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1v67nF-0000000GaQC-0lW3;
-	Tue, 07 Oct 2025 09:31:53 -0400
-Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id DCE311781E3F;
-	Tue,  7 Oct 2025 19:01:48 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id C05CD1784032;
-	Tue,  7 Oct 2025 19:01:48 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
-	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id L5Rmm5XC9WVq; Tue,  7 Oct 2025 19:01:48 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id 8F08E1781E3F;
-	Tue,  7 Oct 2025 19:01:48 +0530 (IST)
-Date: Tue, 7 Oct 2025 19:01:48 +0530 (IST)
-From: Parvathi Pudi <parvathi@couthit.com>
-To: Md Danish Anwar <a0501179@ti.com>
-Cc: parvathi <parvathi@couthit.com>, andrew+netdev <andrew+netdev@lunn.ch>, 
-	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
-	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
-	danishanwar <danishanwar@ti.com>, rogerq <rogerq@kernel.org>, 
-	pmohan <pmohan@couthit.com>, basharath <basharath@couthit.com>, 
-	afd <afd@ti.com>, linux-kernel <linux-kernel@vger.kernel.org>, 
-	netdev <netdev@vger.kernel.org>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
-	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	krishna <krishna@couthit.com>, mohan <mohan@couthit.com>
-Message-ID: <1064562813.13523.1759843908228.JavaMail.zimbra@couthit.local>
-In-Reply-To: <44ed3d16-a8d2-49f3-a6b4-16d9a14d1cc6@ti.com>
-References: <20251006104908.775891-1-parvathi@couthit.com> <20251006104908.775891-4-parvathi@couthit.com> <44ed3d16-a8d2-49f3-a6b4-16d9a14d1cc6@ti.com>
-Subject: Re: [RFC PATCH net-next v2 3/3] net: ti: icssm-prueth: Adds support
- for ICSSM RSTP switch
+	s=arc-20240116; t=1759844056; c=relaxed/simple;
+	bh=/So3f5v7PZ2PZ715Z7wHDcqmcfeTwR80CmpDQkIF8Kk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ObXZ0aZtFolYcjIsSffyLLFCiXJXP63hTTvXG5RuLZGA5yXHCOkb0FDWjNJmsjuszU7yEjcz9vvqZZmdAI0xCVpsaW3hzew6xvioiSt/eg5VNnyzioI45m2ic7b02g9gKdcDZhYFYEp1GRWdTvzjuirji9PgNaa/ocxILJ+Juoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=AU79XZ5v; arc=none smtp.client-ip=91.244.183.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infotecs.ru
+Received: from mx0.infotecs-nt (localhost [127.0.0.1])
+	by mx0.infotecs.ru (Postfix) with ESMTP id 60BBC111323F;
+	Tue,  7 Oct 2025 16:34:11 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru 60BBC111323F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
+	t=1759844051; bh=/So3f5v7PZ2PZ715Z7wHDcqmcfeTwR80CmpDQkIF8Kk=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=AU79XZ5vsAHDiodBHFxxqEU4sHVV4ed8mBEl1KesOZNxx9ggOB8e4jVR6IISSiadx
+	 YTVUnslvjP88m7wNIY8q6Z6ythifKyjTYGcz20nSmDl8vo3Omoj+lutzq9oPyTaXEw
+	 4suAxumhIcD8m2ugVpg7hp95HQLS6rPE/GA/n4Y0=
+Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
+	by mx0.infotecs-nt (Postfix) with ESMTP id 5D43330DC978;
+	Tue,  7 Oct 2025 16:34:11 +0300 (MSK)
+From: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
+To: Magnus Karlsson <magnus.karlsson@gmail.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>
+CC: Song Yoong Siang <yoong.siang.song@intel.com>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, John Fastabend <john.fastabend@gmail.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Eric Dumazet <edumazet@google.com>,
+	"Stanislav Fomichev" <sdf@fomichev.me>, Simon Horman <horms@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, "bpf@vger.kernel.org"
+	<bpf@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>, Magnus Karlsson <magnus.karlsson@intel.com>,
+	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
+Subject: Re: [lvc-project] [PATCH net] xsk: Fix overflow in descriptor
+ validation@@
+Thread-Topic: [lvc-project] [PATCH net] xsk: Fix overflow in descriptor
+ validation@@
+Thread-Index: AQHcN3w5L4XpvnmUkkmNj/GbVerG77S2ZU8AgAAJv4CAAA3OAA==
+Date: Tue, 7 Oct 2025 13:34:11 +0000
+Message-ID: <914ddb6c-79ca-49c2-82b1-33be1986eff5@infotecs.ru>
+References: <20251006085316.470279-1-Ilia.Gavrilov@infotecs.ru>
+ <c5a1c806-2c4c-47c5-b83a-cb83f93369b4@intel.com>
+ <06da20bf-79f6-4ad7-92cc-75f19685b530@infotecs.ru>
+ <fa7b9dc7-037f-42f7-87e5-19b3d8a3d2c3@intel.com>
+ <CAJ8uoz1wf6cfRN16pdMZuoWMxVLWfywVymB7NffDpp82vp5dLA@mail.gmail.com>
+In-Reply-To: <CAJ8uoz1wf6cfRN16pdMZuoWMxVLWfywVymB7NffDpp82vp5dLA@mail.gmail.com>
+Accept-Language: ru-RU, en-US
+Content-Language: ru-RU
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DEA8A8A3A88BB4498256591FB5CBA537@infotecs.ru>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - GC138 (Linux)/8.8.15_GA_3968)
-Thread-Topic: icssm-prueth: Adds support for ICSSM RSTP switch
-Thread-Index: l8mheEKSJM6Rv+qMUH11fPjpxyfFdQ==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.couthit.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+X-KLMS-Rule-ID: 5
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2025/10/07 12:47:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2025/10/07 12:37:00 #27889104
+X-KLMS-AntiVirus-Status: Clean, skipped
 
-Hi,
-
-> Hi Parvathi,
-> 
-> On 10/6/2025 4:17 PM, Parvathi Pudi wrote:
->> From: Roger Quadros <rogerq@ti.com>
->> 
->> Adds support for RSTP switch mode by enhancing the existing ICSSM dual EMAC
->> driver with switchdev support.
->> 
->> With this patch, the PRU-ICSSM is now capable of operating in switch mode
->> with the 2 PRU ports acting as external ports and the host acting as an
->> internal port. Packets received from the PRU ports will be forwarded to
->> the host (store and forward mode) and also to the other PRU port (either
->> using store and forward mode or via cut-through mode). Packets coming
->> from the host will be transmitted either from one or both of the PRU ports
->> (depending on the FDB decision).
->> 
->> By default, the dual EMAC firmware will be loaded in the PRU-ICSS
->> subsystem. To configure the PRU-ICSS to operate as a switch, a different
->> firmware must to be loaded.
->> 
->> Reviewed-by: Mohan Reddy Putluru <pmohan@couthit.com>
->> Signed-off-by: Roger Quadros <rogerq@ti.com>
->> Signed-off-by: Andrew F. Davis <afd@ti.com>
->> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
->> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
->> ---
-> 
-> [ ... ]>
->> +static void icssm_prueth_change_to_switch_mode(struct prueth *prueth)
->> +{
->> +	bool portstatus[PRUETH_NUM_MACS];
->> +	struct prueth_emac *emac;
->> +	struct net_device *ndev;
->> +	int i, ret;
->> +
->> +	for (i = 0; i < PRUETH_NUM_MACS; i++) {
->> +		emac = prueth->emac[i];
->> +		ndev = emac->ndev;
->> +
->> +		portstatus[i] = netif_running(ndev);
->> +		if (!portstatus[i])
->> +			continue;
->> +
->> +		ret = ndev->netdev_ops->ndo_stop(ndev);
->> +		if (ret < 0) {
->> +			netdev_err(ndev, "failed to stop: %d", ret);
->> +			return;
->> +		}
->> +	}
->> +
->> +	prueth->eth_type = PRUSS_ETHTYPE_SWITCH;
->> +
->> +	for (i = 0; i < PRUETH_NUM_MACS; i++) {
->> +		emac = prueth->emac[i];
->> +		ndev = emac->ndev;
->> +
->> +		if (!portstatus[i])
->> +			continue;
->> +
->> +		ret = ndev->netdev_ops->ndo_open(ndev);
->> +		if (ret < 0) {
->> +			netdev_err(ndev, "failed to start: %d", ret);
->> +			return;
->> +		}
->> +	}
->> +
->> +	dev_info(prueth->dev, "TI PRU ethernet now in Switch mode\n");
->> +}
->> +
->> +static void icssm_prueth_change_to_emac_mode(struct prueth *prueth)
->> +{
->> +	bool portstatus[PRUETH_NUM_MACS];
->> +	struct prueth_emac *emac;
->> +	struct net_device *ndev;
->> +	int i, ret;
->> +
->> +	for (i = 0; i < PRUETH_NUM_MACS; i++) {
->> +		emac = prueth->emac[i];
->> +		ndev = emac->ndev;
->> +
->> +		portstatus[i] = netif_running(ndev);
->> +		if (!portstatus[i])
->> +			continue;
->> +
->> +		ret = ndev->netdev_ops->ndo_stop(ndev);
->> +		if (ret < 0) {
->> +			netdev_err(ndev, "failed to stop: %d", ret);
->> +			return;
->> +		}
->> +	}
->> +
->> +	prueth->eth_type = PRUSS_ETHTYPE_EMAC;
->> +
->> +	for (i = 0; i < PRUETH_NUM_MACS; i++) {
->> +		emac = prueth->emac[i];
->> +		ndev = emac->ndev;
->> +
->> +		if (!portstatus[i])
->> +			continue;
->> +
->> +		ret = ndev->netdev_ops->ndo_open(ndev);
->> +		if (ret < 0) {
->> +			netdev_err(ndev, "failed to start: %d", ret);
->> +			return;
->> +		}
->> +	}
->> +
->> +	dev_info(prueth->dev, "TI PRU ethernet now in Dual EMAC mode\n");
->> +}
-> 
-> 
-> The APIs icssm_prueth_change_to_emac_mode and
-> icssm_prueth_change_to_switch_mode seems identical. Won't it be better
-> to have one function to change modes and which mode to go to passed as
-> function argument.
-> 
->	icssm_prueth_change_mode(prueth,mode);
-> 
-> This will also work seemlessly if you add more modes in future. With
-> current approach you will need to add new APIs
-> icssm_prueth_change_to_xyz_mode()
-> 
-> 
-
-Sure, we will check and modify the code to use a single API,
-icssm_prueth_change_mode() which will take the mode as an argument.
-
-We will address this in the next version.
-
-
-Thanks and Regards,
-Parvathi.
-
+T24gMTAvNy8yNSAxNTo0NCwgTWFnbnVzIEthcmxzc29uIHdyb3RlOg0KPiBPbiBUdWUsIDcgT2N0
+IDIwMjUgYXQgMTQ6MTEsIEFsZXhhbmRlciBMb2Jha2luDQo+IDxhbGVrc2FuZGVyLmxvYmFraW5A
+aW50ZWwuY29tPiB3cm90ZToNCj4+DQo+PiBGcm9tOiBJbGlhIEdhdnJpbG92IDxJbGlhLkdhdnJp
+bG92QGluZm90ZWNzLnJ1Pg0KPj4gRGF0ZTogVHVlLCA3IE9jdCAyMDI1IDExOjE5OjE5ICswMDAw
+DQo+Pg0KPj4+IE9uIDEwLzYvMjUgMTg6MTksIEFsZXhhbmRlciBMb2Jha2luIHdyb3RlOg0KPj4+
+PiBGcm9tOiBJbGlhIEdhdnJpbG92IDxJbGlhLkdhdnJpbG92QGluZm90ZWNzLnJ1Pg0KPj4+PiBE
+YXRlOiBNb24sIDYgT2N0IDIwMjUgMDg6NTM6MTcgKzAwMDANCj4+Pj4NCj4+Pj4+IFRoZSBkZXNj
+LT5sZW4gdmFsdWUgY2FuIGJlIHNldCB1cCB0byBVMzJfTUFYLiBJZiB1bWVtIHR4X21ldGFkYXRh
+X2xlbg0KPj4+Pg0KPj4+PiBJbiB0aGVvcnkuIE5ldmVyIGluIHByYWN0aWNlLg0KPj4+Pg0KPj4+
+DQo+Pj4gSGkgQWxleGFuZGVyLA0KPj4+IFRoYW5rIHlvdSBmb3IgdGhlIHJldmlldy4NCj4+Pg0K
+Pj4+IEl0IHNlZW1zIHRvIG1lIHRoYXQgdGhpcyBwcm9ibGVtIHNob3VsZCBiZSBjb25zaWRlcmVk
+IG5vdCBmcm9tIHRoZSBwb2ludCBvZiB2aWV3IG9mIHByYWN0aWNhbCB1c2UsDQo+Pj4gYnV0IGZy
+b20gdGhlIHBvaW50IG9mIHZpZXcgb2Ygc2VjdXJpdHkuIEFuIGF0dGFja2VyIGNhbiBzZXQgYW55
+IGxlbmd0aCBvZiB0aGUgcGFja2V0IGluIHRoZSBkZXNjcmlwdG9yDQo+Pj4gZnJvbSB0aGUgdXNl
+ciBzcGFjZSBhbmQgZGVzY3JpcHRvciB2YWxpZGF0aW9uIHdpbGwgcGFzcy4NCj4+Pg0KPj4+DQo+
+Pj4+PiBvcHRpb24gaXMgYWxzbyBzZXQsIHRoZW4gdGhlIHZhbHVlIG9mIHRoZSBleHByZXNzaW9u
+DQo+Pj4+PiAnZGVzYy0+bGVuICsgcG9vbC0+dHhfbWV0YWRhdGFfbGVuJyBjYW4gb3ZlcmZsb3cg
+YW5kIHZhbGlkYXRpb24NCj4+Pj4+IG9mIHRoZSBpbmNvcnJlY3QgZGVzY3JpcHRvciB3aWxsIGJl
+IHN1Y2Nlc3NmdWxseSBwYXNzZWQuDQo+Pj4+PiBUaGlzIGNhbiBsZWFkIHRvIGEgc3Vic2VxdWVu
+dCBjaGFpbiBvZiBhcml0aG1ldGljIG92ZXJmbG93cw0KPj4+Pj4gaW4gdGhlIHhza19idWlsZF9z
+a2IoKSBmdW5jdGlvbiBhbmQgaW5jb3JyZWN0IHNrX2J1ZmYgYWxsb2NhdGlvbi4NCj4+Pj4+DQo+
+Pj4+PiBGb3VuZCBieSBJbmZvVGVDUyBvbiBiZWhhbGYgb2YgTGludXggVmVyaWZpY2F0aW9uIENl
+bnRlcg0KPj4+Pj4gKGxpbnV4dGVzdGluZy5vcmcpIHdpdGggU1ZBQ0UuDQo+Pj4+DQo+Pj4+IEkg
+dGhpbmsgdGhlIGdlbmVyYWwgcnVsZSBmb3Igc2VuZGluZyBmaXhlcyBpcyB0aGF0IGEgZml4IG11
+c3QgZml4IGEgcmVhbA0KPj4+PiBidWcgd2hpY2ggY2FuIGJlIHJlcHJvZHVjZWQgaW4gcmVhbCBs
+aWZlIHNjZW5hcmlvcy4NCj4+Pg0KPj4+IEkgYWdyZWUgd2l0aCB0aGF0LCBzbyBJIG1ha2UgYSB0
+ZXN0IHByb2dyYW0gKFBvQykuIFNvbWV0aGluZyBsaWtlIHRoYXQ6DQo+Pj4NCj4+PiAgICAgICBz
+dHJ1Y3QgeGRwX3VtZW1fcmVnIHVtZW1fcmVnOw0KPj4+ICAgICAgIHVtZW1fcmVnLmFkZHIgPSAo
+X191NjQpKHZvaWQgKil1bWVtOw0KPj4+ICAgICAgIC4uLg0KPj4+ICAgICAgIHVtZW1fcmVnLmNo
+dW5rX3NpemUgPSA0MDk2Ow0KPj4+ICAgICAgIHVtZW1fcmVnLnR4X21ldGFkYXRhX2xlbiA9IDE2
+Ow0KPj4+ICAgICAgIHVtZW1fcmVnLmZsYWdzID0gWERQX1VNRU1fVFhfTUVUQURBVEFfTEVOOw0K
+Pj4+ICAgICAgIHNldHNvY2tvcHQoc2ZkLCBTT0xfWERQLCBYRFBfVU1FTV9SRUcsICZ1bWVtX3Jl
+Zywgc2l6ZW9mKHVtZW1fcmVnKSk7DQo+Pj4gICAgICAgLi4uDQo+Pj4NCj4+PiAgICAgICB4c2tf
+cmluZ19wcm9kX19yZXNlcnZlKHRxLCBiYXRjaF9zaXplLCAmaWR4KTsNCj4+Pg0KPj4+ICAgICAg
+IGZvciAoaSA9IDA7IGkgPCBucl9wYWNrZXRzOyArK2kpIHsNCj4+PiAgICAgICAgICAgICAgIHN0
+cnVjdCB4ZHBfZGVzYyAqdHhfZGVzYyA9IHhza19yaW5nX3Byb2RfX3R4X2Rlc2ModHEsIGlkeCAr
+IGkpOw0KPj4+ICAgICAgICAgICAgICAgdHhfZGVzYy0+YWRkciA9IHBhY2tldHNbaV0uYWRkcjsN
+Cj4+PiAgICAgICAgICAgICAgIHR4X2Rlc2MtPmFkZHIgKz0gdW1lbS0+dHhfbWV0YWRhdGFfbGVu
+Ow0KPj4+ICAgICAgICAgICAgICAgdHhfZGVzYy0+b3B0aW9ucyA9IFhEUF9UWF9NRVRBREFUQTsN
+Cj4+PiAgICAgICAgICAgICAgIHR4X2Rlc2MtPmxlbiA9IFVJTlQzMl9NQVg7DQo+Pj4gICAgICAg
+fQ0KPj4+DQo+Pj4gICAgICAgeHNrX3JpbmdfcHJvZF9fc3VibWl0KHRxLCBucl9wYWNrZXRzKTsN
+Cj4+PiAgICAgICAuLi4NCj4+PiAgICAgICBzZW5kdG8oc2ZkLCBOVUxMLCAwLCBNU0dfRE9OVFdB
+SVQsIE5VTEwsIDApOw0KPj4+DQo+Pj4gU2luY2UgdGhlIGNoZWNrIG9mIGFuIGludmFsaWQgZGVz
+Y3JpcHRvciBoYXMgcGFzc2VkLCBrZXJuZWwgdHJ5IHRvIGFsbG9jYXRlDQo+Pj4gYSBza2Igd2l0
+aCBzaXplIG9mICdociArIGxlbiArIHRyJyBpbiB0aGUgc29ja19hbGxvY19zZW5kX3Bza2IoKSBm
+dW5jdGlvbg0KPj4+IGFuZCB0aGlzIGlzIHdoZXJlIHRoZSBuZXh0IG92ZXJmbG93IG9jY3Vycy4N
+Cj4+PiBza2IgYWxsb2NhdGVzIHdpdGggYSBzaXplIG9mIDYzLiBOZXh0IHRoZSBza2JfcHV0KCkg
+aXMgY2FsbGVkLCB3aGljaCBhZGRzIFUzMl9NQVggdG8gc2tiLT50YWlsIGFuZCBza2ItPmVuZC4N
+Cj4+PiBOZXh0IHRoZSBza2Jfc3RvcmVfYml0cygpIHRyaWVzIHRvIGNvcHkgLTEgYnl0ZXMsIGJ1
+dCBmYWlscy4NCj4+Pg0KPj4+ICBfX3hza19nZW5lcmljX3htaXQNCj4+PiAgICAgICB4c2tfYnVp
+bGRfc2tiDQo+Pj4gICAgICAgICAgICAgICBsZW4gPSBkZXNjLT5sZW47IC8vIGZyb20gZGVzY3Jp
+cHRvcg0KPj4+ICAgICAgICAgICAgICAgc29ja19hbGxvY19zZW5kX3NrYiguLi4sIGhyICsgbGVu
+ICsgdHIsIC4uLikgLy8gdGhlIG5leHQgb3ZlcmZsb3cNCj4+PiAgICAgICAgICAgICAgICAgICAg
+ICAgc29ja19hbGxvY19zZW5kX3Bza2INCj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBhbGxvY19za2Jfd2l0aF9mcmFncw0KPj4+ICAgICAgICAgICAgICAgc2tiX3B1dChza2IsIGxl
+bikgIC8vIGxlbiBjYXN0cyB0byBpbnQNCj4+PiAgICAgICAgICAgICAgIHNrYl9zdG9yZV9iaXRz
+KHNrYiwgMCwgYnVmZmVyLCBsZW4pDQo+Pg0KPj4gT2gsIHNvIHlvdSBhY3R1YWxseSBoYXZlIGEg
+cmVwcm8gZm9yIHRoaXMuIFRoaXMgaXMgZ29vZC4gSSBzdWdnZXN0IHlvdQ0KPj4gcmVzdWJtaXR0
+aW5nIHRoZSBwYXRjaCBhbmQgaW5jbHVkZSB0aGlzIHJlcHJvIGluIHRoZSBjb21taXQgbWVzc2Fn
+ZSwgc28NCj4+IHRoYXQgaXQgd2lsbCBiZSBjbGVhciB0aGF0IGl0J3MgYWN0dWFsbHkgcG9zc2li
+bGUgdG8gdHJpZ2dlciB0aGUgcHJvYmxlbQ0KPj4gaW4gdGhlIGtlcm5lbCB1c2luZyBhIG1hbGlj
+aW91cy9icm9rZW4gdXNlcnNwYWNlIGFwcGxpY2F0aW9uLg0KPj4NCg0KSSdsbCBhZGQgdGhlIHJl
+cHJvIGZyb20gdGhpcyBlLW1haWwgaW4gdGhlIG5leHQgcGF0Y2ggdmVyc2lvbiwNCnRoZSBmdWxs
+IHNvdXJjZSBpcyB0b28gbG9uZy4NCg0KPj4gKGFsc28gcGxzIHJlbW92ZSB0aG9zZSBkb3VibGUg
+YEBAYCBmcm9tIHRoZSBzdWJqZWN0IG5leHQgdGltZSkNCj4+DQoNCm9rDQoNCj4+IEknZCBhbHNv
+IGxpa2UgdG8gaGVhciBmcm9tIE1hY2llaiBhbmQvb3Igb3RoZXJzIHdoYXQgdGhleSB0aGluayBh
+Ym91dA0KPj4gdGhpcyBwcm9ibGVtICh0aGF0IHRoZSB1c2Vyc3BhY2UgY2FuIHNldCBwYWNrZXQg
+bGVuIHRvIFUzMl9NQVgpLiBTaG91bGQNCj4+IHdlIGp1c3QgZ28gd2l0aCB0aGlzIHByb3Bvc2Vk
+IHU2NCBwcm9wYWdhdGlvbiBvciBtYXliZSB3ZSBuZWVkIHRvIGxpbWl0DQo+PiB0aGUgbWF4aW11
+bSBsZW5ndGggd2hpY2ggY291bGQgYmUgc2VudCBmcm9tIHRoZSB1c2Vyc3BhY2U/DQo+IA0KPiBJ
+IHByZWZlciB0aGF0IHdlIGRvIG5vdCBzZXQgYSBsaW1pdCBvbiBpdCBhbmQgZ28gd2l0aCB0aGUg
+cHJvcG9zZWQNCj4gc29sdXRpb24gc2luY2UgSSBkbyBub3Qga25vdyB3aGF0IGEgZnV0dXJlIHBy
+b29mIHNpemUgbGltaXQgd291bGQgYmUuDQo+IFNvbWVib2R5IGNvdWxkIGNvbWUgdXAgd2l0aCBh
+IG5ldyB2aXJ0dWFsIGRldmljZSB0aGF0IGNhbiBzZW5kIHJlYWxseQ0KPiBsYXJnZSBwYWNrZXRz
+LCB3aG8ga25vd3MuDQo+IA0KDQpUaGUgbGltaXQgaXMgYWxyZWFkeSBjaGVja2VkIGluIHRoZSB4
+cF9hbGlnbmVkX3ZhbGlkYXRlX2Rlc2MoKSBmdW5jdGlvbjoNCg0Kc3RhdGljIGlubGluZSBib29s
+IHhwX2FsaWduZWRfdmFsaWRhdGVfZGVzYyhzdHJ1Y3QgeHNrX2J1ZmZfcG9vbCAqcG9vbCwNCgkJ
+CQkJICAgIHN0cnVjdCB4ZHBfZGVzYyAqZGVzYykNCnsNCg0KLi4uDQoJaWYgKG9mZnNldCArIGxl
+biA+IHBvb2wtPmNodW5rX3NpemUpDQoJCXJldHVybiBmYWxzZTsNCi4uLg0KfQ0KDQphbmQgcG9v
+bC0+Y2h1bmtfc2l6ZSBjYW4ndCBiZSBtb3JlIHRoYW4gUEFHRV9TSVpFOg0KDQpzdGF0aWMgaW50
+IHhkcF91bWVtX3JlZyhzdHJ1Y3QgeGRwX3VtZW0gKnVtZW0sIHN0cnVjdCB4ZHBfdW1lbV9yZWcg
+Km1yKQ0Kew0KCXUzMiBjaHVua19zaXplID0gbXItPmNodW5rX3NpemUsIGhlYWRyb29tID0gbXIt
+PmhlYWRyb29tOw0KCS4uLg0KDQoJaWYgKGNodW5rX3NpemUgPCBYRFBfVU1FTV9NSU5fQ0hVTktf
+U0laRSB8fCBjaHVua19zaXplID4gUEFHRV9TSVpFKSB7DQoJCS8qIFN0cmljdGx5IHNwZWFraW5n
+IHdlIGNvdWxkIHN1cHBvcnQgdGhpcywgaWY6DQoJCSAqIC0gaHVnZSBwYWdlcywgb3IqDQoJCSAq
+IC0gdXNpbmcgYW4gSU9NTVUsIG9yDQoJCSAqIC0gbWFraW5nIHN1cmUgdGhlIG1lbW9yeSBhcmVh
+IGlzIGNvbnNlY3V0aXZlDQoJCSAqIGJ1dCBmb3Igbm93LCB3ZSBzaW1wbHkgc2F5ICJjb21wdXRl
+ciBzYXlzIG5vIi4NCgkJICovDQoJDQoJCXJldHVybiAtRUlOVkFMOw0KCX0NCgkuLi4NCn0NCg0K
+VGhlIHByb2JsZW0gaXMgZXhhY3RseSB0aGUgb3ZlcmZsb3cuDQoNCj4+IEluIGFueSBjYXNlLCB5
+b3UgcmFpc2VkIGEgZ29vZCB0b3BpYy4NCj4+DQo+Pj4NCj4+Pj4gU3RhdGljIEFuYWx5c2lzIFRv
+b2xzIGhhdmUgbm8gaWRlYSB0aGF0IG5vYm9keSBzZW5kcyA0IEdiIHNpemVkIG5ldHdvcmsNCj4+
+Pj4gcGFja2V0cy4NCj4+Pj4NCj4+Pg0KPj4+IFRoYXQncyByaWdodC4gU3RhdGljIGFuYWx5emVy
+IGlzIG9ubHkgYSB0b29sLCBidXQgaW4gdGhpcyBjYXNlLCB0aGUgb3ZlcmZsb3cNCj4+PiBoaWdo
+bGlnaHRlZCBieSB0aGUgc3RhdGljIGFuYWx5emVyIGNhbiBiZSB1c2VkIGZvciBtYWxpY2lvdXMg
+cHVycG9zZXMuDQo+Pg0KPj4gKzENCj4+DQo+PiBBbHNvIEkgcmVhbGx5IGRvIGhvcGUgSW5mb3Rl
+Y3Mgc3RheWVkIGluZGVwZW5kZW50IGZyb20gdGhlIGdvdnMgYW5kDQo+PiBkb2Vzbid0IHRha2Ug
+cGFydCBpbiBhbnkgZHVhbC1wdXJwb3NlL2dvdi1yZWxhdGVkIHByb2plY3RzLg0KPj4NCj4+IFRo
+YW5rcywNCj4+IE9sZWsNCj4+DQoNCg==
 
