@@ -1,253 +1,181 @@
-Return-Path: <netdev+bounces-228123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E765BC1EDE
-	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 17:27:09 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0CFABC2156
+	for <lists+netdev@lfdr.de>; Tue, 07 Oct 2025 18:18:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC7323BFC39
-	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 15:27:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EEC974EAD8B
+	for <lists+netdev@lfdr.de>; Tue,  7 Oct 2025 16:18:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B13C92E62BF;
-	Tue,  7 Oct 2025 15:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cld1+ciV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9716A2E6CDC;
+	Tue,  7 Oct 2025 16:18:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5862E1EE0
-	for <netdev@vger.kernel.org>; Tue,  7 Oct 2025 15:27:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759850825; cv=fail; b=oNAGIhsqzQmY0EUr2A0L3Krdgz4//+uasIBxeCRXzyKMbuHNgyy8jAp6KXb/8oToyoUvGxTtGaXHn9AbLNWz/80agyuQuCTNJeAd3S1CsEVmAf2yX2HciD4sTDi9MS1ZjKDZx8bTO0CsmDXYzzqOgZU7jN0P7R0DrJlJWRB7bIQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759850825; c=relaxed/simple;
-	bh=3im0AYPeMN2A5sbcvIA273TV9Vi5nZS/sgnTD7mLm38=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=BHBEl2GDJiJj0xtAVFa8ull1csoQ/wRlGbh0KX2IuSCRPumJhsw9973t9qqrV7fHyc9oFVowTCF5foOVToQeS/rSTgYqJ6yl/fkCBYjDuAnDNA1zQ060hoxK3lnd/Xr+yAH23n2VHxhDW7legr06CK9+XLmznInS3ZICs9I2ctU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Cld1+ciV; arc=fail smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759850824; x=1791386824;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=3im0AYPeMN2A5sbcvIA273TV9Vi5nZS/sgnTD7mLm38=;
-  b=Cld1+ciV7Rhp6BFsBk1VKwWdBtMnIBo/0WhBcs5DNFAx1xV0UzBuBcnT
-   PK8LxU0iWeUS9n+kFrAQN+IQaOmByFiPBSHhkxRsRh2ioxSSpCVU73kGq
-   FeJWA96atSbjk0xyqfUAigPVbrWWWeGBtTnFf6t50qpQ6WfCGftE8D1yn
-   1A6Zc8iArlHoCPpiaWVyIxKB1jhRV37YtA3o+ZHkSHgN1nIQVEtwThYT0
-   bw0dVg2/6MJFB1LhoHs0g4fS0oCy81XoWKcENaEjz0fg2dNLJyRa2cBl7
-   KgfqLKnp6szHkipVBTpdDN5lk2gLTA6AWkZqQ3WEdoJOZeqLUIeTqXL/N
-   A==;
-X-CSE-ConnectionGUID: aAvsGNstQQawhpJcHCK0Sg==
-X-CSE-MsgGUID: zCmjKWHWQHWOh6okztlaVQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="61982710"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="61982710"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2025 08:27:01 -0700
-X-CSE-ConnectionGUID: DBG3r0EmTV64CzCZ3+rtTQ==
-X-CSE-MsgGUID: c9XSLK4ATriSTe68Ij/nRw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,321,1751266800"; 
-   d="scan'208";a="210842202"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2025 08:27:01 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 7 Oct 2025 08:26:59 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Tue, 7 Oct 2025 08:26:59 -0700
-Received: from BL0PR03CU003.outbound.protection.outlook.com (52.101.53.25) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 7 Oct 2025 08:26:59 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fT9eOpniySqVYSZ/YNy57W9YHDZz4VdKv/OvGBK1rIj2aRhGvlDm7sJdehbPBJthKKosi4FPtdHx+hAr077FZ0fbmq9T1XZMiCUNJB9ms/s8BZ6w8cM6kxmjK4u68KnF0KZ2MQc7GRBV1gyR7g7RONYsspXSRFfezRL/Fu8KTq9SFXa9TI7xCx34YcfH/0kylYKLFeitmnTR4C6KIwIytV+aS/aHfWOGbaiW+TXBhC7n+ZEIALwMEhNq+pwNxpOftOyylhoC4bm7g/qOLK29J58p51v49ZQJhpbNhio+qc8aqcR5I8EClA6NmCJms6WMvlmV/NkFoJyvDZ6gIPQVwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=akq66twWsZ3zwhyPoKWerv9P3nqZ4unLkoGWmyqqhE8=;
- b=wZ0vnOJ0e2IBqqBhNq0noWpULHKXE2OW/xrjzjEczSV5NylopsEK9Bdcb7RdXGxSj35QStULUdjqqJW18mII+defBGYXXhYVvU4FrpAM3V4BbGsW13XTalZ4Qb1ukzNN6D6+mngqZgvitF+93Iqx3f8aDTMNYZiFQE4LUN35nddIFkvJCAUrlJrxEV5O1jlU9m9shaZvXVA3tb8LbTRbQgER8M/8bCI7Urcg0lLKM1aBidfLmrE989dgpBwq6gzXcTCmg469HJSODRnKHc2PkCEutjFebbhzSGYL9x12SQb/QG+7MYcLkh05Peco/BDi7xkbFJPdH6Jx+xqc6O9UuA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by PH7PR11MB7431.namprd11.prod.outlook.com (2603:10b6:510:273::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9182.20; Tue, 7 Oct
- 2025 15:26:51 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.9203.007; Tue, 7 Oct 2025
- 15:26:51 +0000
-Message-ID: <4e997355-1c76-429b-b67f-2c543fd0853a@intel.com>
-Date: Tue, 7 Oct 2025 17:26:46 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next 1/5] net: add add indirect call wrapper in
- skb_release_head_state()
-To: Eric Dumazet <edumazet@google.com>
-CC: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, "David S . Miller"
-	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jamal Hadi Salim
-	<jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
-	<jiri@resnulli.us>, Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
-	<willemb@google.com>, <netdev@vger.kernel.org>, <eric.dumazet@gmail.com>
-References: <20251006193103.2684156-1-edumazet@google.com>
- <20251006193103.2684156-2-edumazet@google.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20251006193103.2684156-2-edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DU7PR01CA0024.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:50f::26) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA98A1F1518
+	for <netdev@vger.kernel.org>; Tue,  7 Oct 2025 16:18:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759853909; cv=none; b=W5DOqkU4xNvRlGQsId9QHgulTVOZLkRzHZnH5nyv9rqRxBm63lJRdxvodHVbBoslg6wlA+NmDA5wrHVcDz1Etr+dl9dURn1vLkpSxWipdEWq5WiMd4mOYmQL/tOHN6wwfmb0E14MPRBeaLCP8rcVh9Y3PnAQNTzyqcUvegFxoDs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759853909; c=relaxed/simple;
+	bh=/A8IlGR2aPRQk/7uCzF0JMnWO7ZBfWRgr4joBxiC+8w=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=nfooOHGJeCk158aZJpMRFYb1/6CWxOsASYmh2YbSL1iZeDYcG3ObDNbju6AinNYkAPk7zneP8RY1SXGalPht+I8guELQ4NW0OMsjA4orjmyf3+phdTRe6Aw/iTf4ZxHbOS+LJuyW7OXSuAeGbE6/mdK4SqNsAEQoJIqstS2NtoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-42f7c8774f6so15470605ab.0
+        for <netdev@vger.kernel.org>; Tue, 07 Oct 2025 09:18:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759853907; x=1760458707;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lZQxPVH9aOC3z7g2ZE6k7k0QRTdiI3Cxj6W4vp3imfE=;
+        b=GydjMKfGKlC16qTl+rUwaRxp1X6biblZmvlRhTqjp/CXo40yYPvyc+ktNXi+WZCIxR
+         kJCj55Plq/YMNC17+wfACDjHxe3MiQxeBsB66zyn5LNe+fuHzJz/9b5COWusX2dyCfuH
+         G5bOgzPUvLsVx5FeVTsAtNLoLawntE2xBO4SEwc/PJfsL/EtmzpArXjHQjj4DWv4ZoCh
+         OhtVajNb6Jbtv32JAdogXn0vplIbxJHPNjICS4PA4OPj/Isl6Q2Y/lZu+g8GWU7R/xZi
+         wggk4/mn1DLsNGyRON6yFcs+xcHXJWxrAZEWpEWPNy5fraJIV4D52e+V+gNM6QyJg4Hb
+         5qkA==
+X-Forwarded-Encrypted: i=1; AJvYcCX3wxfG9hILdmMyd+0StVG4w0SmEjFwsGkaC43MUVPwTd32xMqHNzFkXU18ayvhZ67VE/PUYTI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwiUuv/gOMRLVBscMACFrXYgO4pDlCdShKVyEdUG1+zmwT4o8D
+	RCdnBjURyAqv+MQccpg35fg3mDHZS86uaWw0XwURm8xVEo4QPFsX/eK+2ZP29ORdwzzJR74iQq9
+	AXdKZL18DoKBzLJ5R3L1y4yV5OrKLiJ+tdNIGjq1lCxw/CJIGBhhdZejM9Ug=
+X-Google-Smtp-Source: AGHT+IFYFag4k6egAe1JboWcm0XVijHFYgmBfoEL7zj+T1IXkXH/oCA1DCyFKaPaVedHkjKv4iGGe0COh+UGJRyYm1971qEF3neH
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|PH7PR11MB7431:EE_
-X-MS-Office365-Filtering-Correlation-Id: fc3da3d9-f9ae-4658-eecb-08de05b5f03f
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7416014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?dEZwTEZ0UGlORHJFaTl2UzdvOFp0dkloV0U0UU5iZnJObXBHQnVxQkRSTENy?=
- =?utf-8?B?WUhoeFVpTEx3bW5XS25uTWNRQmZXSUpsbnpFWlI3UGRLZ0F2U3NXajM4TnJv?=
- =?utf-8?B?WFp0NmNkQkhidnBsaWVjSk5WWXBOVFRaT1NjTnVxMUNXREo2U0YrRU8vYXI5?=
- =?utf-8?B?MlVxV1U2NmhBQkpMVVplTnMxc1oyTGczQ29jcXJTaGZxVzVUT2E4TFAwOWla?=
- =?utf-8?B?SHkzbUVHbkZENW5pMUVLODNPOGtSREVhMlZvTWYvblNOS0MvaFJxaVZvRmtT?=
- =?utf-8?B?Mk9scXNJOTJ6UTFkRnphdldqMHgrOThTUzVkKzJjNGhIVFdxUXZ2MC9pcS9h?=
- =?utf-8?B?YXlHdHB6SDQ0Z1IzWSs3SjdzUnZ5YTY1L2dSQ3JXKzhZbU9HYnNlR1dKVHhu?=
- =?utf-8?B?SzlxZlNvYjE3R2NOYnMzU3hianV3a3RidGtuSXJRUkMzallMWjB0My9DUGtt?=
- =?utf-8?B?MEJnMk95eWZVaEtHSFM0T3lua0JIQ3FKL2M2bmlOWUVXQ1ZJeEc2K0hSdUxD?=
- =?utf-8?B?ZEV0djAyS0s1eGQxZnBSVzR1T00rR2F1RVYrUS82UStlU1FrcDZuZDN3ZE9v?=
- =?utf-8?B?WERReTB3NG1XdlBLM0NvUGUzZ0p1Q3BZT0Z0MndHeXcwcW5OOVY0d2NxSWhZ?=
- =?utf-8?B?WFlqUEFCckliTnlwWFowQ0lqbWFPb29HZW11R2sybjRQTlFLejBLbzltSmJr?=
- =?utf-8?B?bUc4OGN4dnAweDNIdThwSGtmMWdaK2JPWnhac05Cd3JtbzE4dnRSQjNOUmZt?=
- =?utf-8?B?QmVjdmNWSlRGSk9qS0tWckgvazdibmpwQjV1U1RUODk0OXhRNFdTakJsa0FO?=
- =?utf-8?B?RXFPdnBPZG44TXVlS0hITjRCRHkvZElYT3R2VkJqV2dobXRyY29HaWhaQ0h5?=
- =?utf-8?B?ZytnemQrQzdzMGJ3MnVUR28zT1ExL043dXdWQTRLZEFTRzd4dEU2SHdPQ1l2?=
- =?utf-8?B?ZTR4eWxkaXNrMTFsUDlaSjdQanlpZlpQV1dCOTlLTDA5UzJDVHYzNnZucHhJ?=
- =?utf-8?B?aVpxN0ludWFwdXNnNUJWYVpsWjJkc04vK0R6WUNrMk9ITzluc3ljRmxzcmRq?=
- =?utf-8?B?VlFsaXp0TDFvaGh2NjFXajZVSCtIdkxqZ1R1S2FUMjFaZFd1VDF0K2daZFVE?=
- =?utf-8?B?TXVqWmVVVmJqdDd3TXZjVnc0dHkxWGdyVDFmTWwyNnVaaXJJTlB3L0xFWEhR?=
- =?utf-8?B?dFZvOTZScmNKaThwVUN4SHBDMjZkVGJsOEFLUWtKb0tJU0hxNllmY1dBSnQ1?=
- =?utf-8?B?KzZEdXgrMm9DeEFUeDZyQTdrdXczZEhNWHFCYVRMSUFKZUtEaHJGcksxTVVn?=
- =?utf-8?B?UXVkWk1kWWhVZEtOR1JOdUpBMTNwQTVoRnZmN1hCVkNhandBQ2M2U29sbldO?=
- =?utf-8?B?MExiZmY3V2xObFkwS1J6UUdPUHZydkl1cCtMbVNCRVBEd2psblpCM0NISXR3?=
- =?utf-8?B?ODNndGsvdFNucDZrb1dra2ZnWDRCd2kzNUVSY3BVTmxvWFBHVkJnSElkQXN6?=
- =?utf-8?B?bFFvMmJ2M2hCTkw2ZVR1OW5tUjA0QnZqQTBLOGZFbGNYUkpZVWdWMjhjQ25i?=
- =?utf-8?B?UzdpTUZRRTlnUnkrUDhpS2dia2k0NUJYQkdKb2xQM2dNZllaeEF1UGY3Ykth?=
- =?utf-8?B?cVVoditJSnZ3bjBvZnE5b1FRQlNJRkgweEpiQ3VaR3k1em5VelJOaGZ5YWc2?=
- =?utf-8?B?NGR3QUN1SGw2ZFJNWlp4VVRWakxZTkp6YTFpYTR5VTd6VHZUQjNFMmpBelJ3?=
- =?utf-8?B?TFY0Myt6UXlMQVJFb0lqSEpWcGFBQnZMdVVmZ0RNZVNacEMvWGRITnNnR1N5?=
- =?utf-8?B?NnNNaVQxNzNpSEZockRxQ1F4KzUrdnNwT3QvaERrWXV4a3lWUG9tZWNlUmJN?=
- =?utf-8?B?YjhnbTNsV1VHaXFkV1ZiRFhnSnFaK1Q3eDM4bWp2eWtOQURTOUIzS2k5VnRV?=
- =?utf-8?Q?k1ZLVjtfDgTfdTEXsh5TALOfj+/EEaYA?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7416014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YStJeXVGdFp4aVFqaTFZclVBY0xPSENMQ1FvQWZpRVlqN3dzbytIbDJCWDRB?=
- =?utf-8?B?UGFtTW9KUE5IbTYvM05CWHlLaU1yQUo0ZkZlbUdoak11SFhkNy9ZaVRHaW5K?=
- =?utf-8?B?Z0dna011bmM5Y2MxbCtUL0JmaE83YnlPQnVhS2hpcVhON21BU3ZFdm5PV3Nh?=
- =?utf-8?B?Z3hBNXlUNUE5TXZYTVgyZ0hCWXJhVGo2dkl0SDlKaGk0R1cvK29ZSjVZU0ww?=
- =?utf-8?B?TmkyaUUzcWFUQnhWb1BpWG5QMXZCckVtMkJqMWpwYmVhYTR4TFhQeTNiOUpB?=
- =?utf-8?B?VVFLWFpYSTFFZWxGRlk2dXI4enlxL2NFWU9FS1ByZnhaZkZSTTUwSjVQWGx4?=
- =?utf-8?B?MW9Ea213eEZWWUJGMDc3UHlNTHhBazYzaGUxYkViei9ESXpRUFdnVHRoa200?=
- =?utf-8?B?R0dUNEo0enBLMHZ4NzRlMXVXYWlsdGlsSFhmQzRjblV5MVQ4anpMMjA2ODJF?=
- =?utf-8?B?dm92YnJHaS9MTVUrMkFCQ2ZVV0ZWUk5LdHlHL3NuNytuZWx5RXMyWEg5cHBx?=
- =?utf-8?B?NlgzUHN2bWV1amVxeHZqTEIxMFlMekhiOFI2VFIyeExGWkdxZ0xycWVWSGdj?=
- =?utf-8?B?enh0bUJCNVVNWERubURtWlRrS29QTFJyYlBWY29HMlBSR29ZYkdYYU9qUE9X?=
- =?utf-8?B?eWl5QWJvYWs4NHJ2QStIUHJWZEcrUHIwUnBWRGVPSExzdHU3YTVlUTV2RXFU?=
- =?utf-8?B?VkVlT1hzQWhnVWlrMFV2VzIvUmp0ekpMRmk4cnBqVlJsSis0NzNkNGNxN0JC?=
- =?utf-8?B?R0dDbUxKcXJGeFd5bnovTVdWQ1piSTdUVHRoTkRFY0I0Vi9KN3RCdkZMdE1U?=
- =?utf-8?B?aFV5eklkeHJQQVdXNk5lSTRBZDQ2WTRoYjBlMzhoa0lrbHFsa0RCZkVSbkVF?=
- =?utf-8?B?S01DL2h2S2pnckttUjUySEQ5bTE0ZDUvQnNUVXI1cmZrbFQrUlgrQXV6OUdk?=
- =?utf-8?B?ZnpSdzE1L0Q0NnVNS0xIQ0J4NG5jMUhuZTJjdmV2QmVtcXR3VU1PY09Xa25K?=
- =?utf-8?B?NklBYmY4bXVSVTdtM0paa3FTUnlVeE52dVBvNGhQNXczNXNyNXpXLzFGT05B?=
- =?utf-8?B?dlVBQk5lVHVnUDdPU0dRQS9HZ2tMdDZVNHNYdithQmV0UXoyMG1JVk04VU9H?=
- =?utf-8?B?YjlVcHoxajNiY1lKbEVOTVFzWjJZSXNSZnlLUGNPdEtXUWw5K2h4K2kreGdn?=
- =?utf-8?B?anJMTHQwRmc4QVpEb0ZNWSs1VkljRVpWamxRVnY3MmROMThIK0FhY0g1MnNM?=
- =?utf-8?B?aURWR2kwZWU4aG1ieTB2SzNpWEpkWkgvdDA2MnZNOFk1ZFk5Y1pFb2tpWmx3?=
- =?utf-8?B?RXZ5cjVSR1JCL1FGQ0hEQmJGV0MwZlc4SEI2SEtrL0NnUEhKaDAybkdrMmYw?=
- =?utf-8?B?RE9PbFN3RWJFOXdFeTczd1hLd2RVTWdRcGFjNWFLZGtYZ0pOMithR3lDVkll?=
- =?utf-8?B?Ui9ITjBjTmN2VFhTZUJiVHYvSitua1ZTcFZYTk5kUVVtZVN1QzQ1K3RJNFlY?=
- =?utf-8?B?Y1pqU0FHS21SOFFsK3lpVk9wUWdYa1JISE8zTElkV1dyTFdkSlpNeDhmMDlM?=
- =?utf-8?B?eEgwUGt2UjBQN01wMHFodGdWZzlIU2tKZEdoRlpwRG9ZOUcxZDRGUVhwd2Fx?=
- =?utf-8?B?dEhGc09odXkwcGtrNndXNVl3elc0TklJYzNKVkFBbE12a1BuQXRUM0lFN0dL?=
- =?utf-8?B?QU5kekVVS3pNWVN2NDU5elN4Q2p6K0lPaXBLWkk5TmFiNjNPNjVscUhzUTRz?=
- =?utf-8?B?bVBBWVFxbU5NaWFTQnRvaEJHdS9CcUUvcGxFTmljNGRCbnF4NTFRZ1JhK2tn?=
- =?utf-8?B?bVVCZWhydVdXb090eTRhTitmZHBiNWRMWmlBNDdWeEpmY2VLUEZ6MEExVGZ0?=
- =?utf-8?B?MFFnMWFGNW9xZEo3ME5GUHlReWJzVDVKQ3JSUW9tRkZVVlNTRXRnTzhUeE5I?=
- =?utf-8?B?QlVxSnQ5YXk4UnN5NnRibHIxNGFQVnZGNEUvbDZiSVdaajl2QU9HM0cyeEVs?=
- =?utf-8?B?S2ZUZDV5aDlNTjhUcEEza2NGa1Y4Z0FMRnBtT2pqdS94UjBOdWNaRzFwT3Rx?=
- =?utf-8?B?K2hVbnp1a0RDN1RQMEtFZGdTbmxNbG9qYU9kdlJ2QThDNFhBU3hiTW5leXpN?=
- =?utf-8?B?dWJaRDV4QSsxaWtyV3BIZHhLZEdkK25KTXFoV3pGT3RDblF4T2VjWVRYWEd0?=
- =?utf-8?B?RVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc3da3d9-f9ae-4658-eecb-08de05b5f03f
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Oct 2025 15:26:51.4310
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nasGTqC2Z37tOAhA9H3wMFYuiKKic98j9NRR9WfX5Xq9VXM1k6zLMQwlL6/xR5jQY0VA+0PWXTnU0+vx+un/LEZYm/GrZk+o0Pdre2rDSZg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7431
-X-OriginatorOrg: intel.com
+X-Received: by 2002:a05:6e02:1a6d:b0:42e:6e45:e0a3 with SMTP id
+ e9e14a558f8ab-42e7acd296dmr219474365ab.2.1759853906965; Tue, 07 Oct 2025
+ 09:18:26 -0700 (PDT)
+Date: Tue, 07 Oct 2025 09:18:26 -0700
+In-Reply-To: <681c8009.050a0220.654ca.0000.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68e53d52.a00a0220.298cc0.047d.GAE@google.com>
+Subject: Re: [syzbot] [perf?] WARNING in __perf_event_overflow (2)
+From: syzbot <syzbot+2524754f17993441bf66@syzkaller.appspotmail.com>
+To: acme@kernel.org, adrian.hunter@intel.com, 
+	alexander.shishkin@linux.intel.com, irogers@google.com, jolsa@kernel.org, 
+	kan.liang@linux.intel.com, linux-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, mark.rutland@arm.com, mingo@redhat.com, 
+	namhyung@kernel.org, netdev@vger.kernel.org, peterz@infradead.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon,  6 Oct 2025 19:30:59 +0000
+syzbot has found a reproducer for the following issue on:
 
-> While stress testing UDP senders on a host with expensive indirect
-> calls, I found cpus processing TX completions where showing
-> a very high cost (20%) in sock_wfree() due to
-> CONFIG_MITIGATION_RETPOLINE=y.
-> 
-> Take care of TCP and UDP TX destructors and use INDIRECT_CALL_3() macro.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  net/core/skbuff.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index bc12790017b0b5c0be99f8fb9d362b3730fa4eb0..c9c06f9a8d6085f8d0907b412e050a60c835a6e8 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -1136,7 +1136,9 @@ void skb_release_head_state(struct sk_buff *skb)
->  	skb_dst_drop(skb);
->  	if (skb->destructor) {
->  		DEBUG_NET_WARN_ON_ONCE(in_hardirq());
-> -		skb->destructor(skb);
-> +		INDIRECT_CALL_3(skb->destructor,
-> +				tcp_wfree, __sock_wfree, sock_wfree,
-> +				skb);
+HEAD commit:    de7342228b73 bpf: Finish constification of 1st parameter o..
+git tree:       bpf-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=16e75a7c580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1e0e0bf7e51565cd
+dashboard link: https://syzkaller.appspot.com/bug?extid=2524754f17993441bf66
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=167761e2580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16b941e2580000
 
-Not sure, but maybe we could add generic XSk skb destructor here as
-well? Or it's not that important as generic XSk is not the best way to
-use XDP sockets?
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/48d49cec8205/disk-de734222.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/0c197aec9229/vmlinux-de734222.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/7f7872725138/bzImage-de734222.xz
 
-Maciej, what do you think?
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2524754f17993441bf66@syzkaller.appspotmail.com
 
->  	}
->  #if IS_ENABLED(CONFIG_NF_CONNTRACK)
->  	nf_conntrack_put(skb_nfct(skb));
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 6380 at kernel/events/core.c:10369 __perf_event_overflow+0xb3b/0xe40 kernel/events/core.c:10369
+Modules linked in:
+CPU: 1 UID: 0 PID: 6380 Comm: syz.3.105 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+RIP: 0010:__perf_event_overflow+0xb3b/0xe40 kernel/events/core.c:10369
+Code: 08 4c 89 f7 e8 a6 f9 34 00 4d 89 3e e9 bc fa ff ff 48 c7 44 24 40 00 00 00 00 e8 d0 55 cf ff e9 1c fe ff ff e8 c6 55 cf ff 90 <0f> 0b 90 e9 2d ff ff ff e8 b8 55 cf ff 48 c7 c7 a0 fa 73 8b e8 ec
+RSP: 0018:ffffc9000afd74c0 EFLAGS: 00010293
+RAX: ffffffff81efce8a RBX: 1ffff1100b67a3b5 RCX: ffff8880572d0000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc9000afd75d0 R08: ffff88805b3d1b4f R09: 1ffff1100b67a369
+R10: dffffc0000000000 R11: ffffed100b67a36a R12: dffffc0000000000
+R13: ffff88805b3d1900 R14: ffff88805b3d1b48 R15: 0000000000000000
+FS:  00007fd06a42e6c0(0000) GS:ffff888125e27000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 00000000114bc000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ perf_swevent_overflow kernel/events/core.c:10467 [inline]
+ perf_swevent_event+0x2f4/0x5e0 kernel/events/core.c:-1
+ do_perf_sw_event kernel/events/core.c:10607 [inline]
+ ___perf_sw_event+0x4a1/0x700 kernel/events/core.c:10634
+ __perf_sw_event+0xfa/0x1a0 kernel/events/core.c:10646
+ perf_sw_event include/linux/perf_event.h:1596 [inline]
+ do_user_addr_fault+0x12d9/0x1380 arch/x86/mm/fault.c:1283
+ handle_page_fault arch/x86/mm/fault.c:1476 [inline]
+ exc_page_fault+0x82/0x100 arch/x86/mm/fault.c:1532
+ asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
+RIP: 0010:rep_movs_alternative+0x4a/0x90 arch/x86/lib/copy_user_64.S:74
+Code: 35 04 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 8b 06 48 89 07 48 83 c6 08 48 83 c7 08 83 e9 08 74 db 83 f9 08 73 e8 eb c5 <f3> a4 e9 4f 35 04 00 48 8b 06 48 89 07 48 8d 47 08 48 83 e0 f8 48
+RSP: 0018:ffffc9000afd7af0 EFLAGS: 00050202
+RAX: 00007ffffffff001 RBX: 0000000000000060 RCX: 0000000000000060
+RDX: 0000000000000001 RSI: 0000000000000000 RDI: ffffc9000af0d060
+RBP: 0000000000000000 R08: ffffc9000af0d0bf R09: 1ffff920015e1a17
+R10: dffffc0000000000 R11: fffff520015e1a18 R12: ffffc9000af0d060
+R13: dffffc0000000000 R14: ffffc9000af0d060 R15: 0000000000000000
+ copy_user_generic arch/x86/include/asm/uaccess_64.h:126 [inline]
+ raw_copy_from_user arch/x86/include/asm/uaccess_64.h:141 [inline]
+ _inline_copy_from_user include/linux/uaccess.h:178 [inline]
+ _copy_from_user+0x7a/0xb0 lib/usercopy.c:18
+ copy_from_user include/linux/uaccess.h:212 [inline]
+ copy_from_bpfptr_offset include/linux/bpfptr.h:53 [inline]
+ copy_from_bpfptr+0x5c/0x90 include/linux/bpfptr.h:59
+ bpf_prog_load+0xa83/0x19e0 kernel/bpf/syscall.c:2992
+ __sys_bpf+0x507/0x860 kernel/bpf/syscall.c:6134
+ __do_sys_bpf kernel/bpf/syscall.c:6244 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:6242 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6242
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fd06958eec9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fd06a42e038 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007fd0697e5fa0 RCX: 00007fd06958eec9
+RDX: 0000000000000094 RSI: 00002000000000c0 RDI: 0000000000000005
+RBP: 00007fd069611f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fd0697e6038 R14: 00007fd0697e5fa0 R15: 00007ffcf5bcab18
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	35 04 00 66 2e       	xor    $0x2e660004,%eax
+   5:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+   c:	00
+   d:	0f 1f 00             	nopl   (%rax)
+  10:	48 8b 06             	mov    (%rsi),%rax
+  13:	48 89 07             	mov    %rax,(%rdi)
+  16:	48 83 c6 08          	add    $0x8,%rsi
+  1a:	48 83 c7 08          	add    $0x8,%rdi
+  1e:	83 e9 08             	sub    $0x8,%ecx
+  21:	74 db                	je     0xfffffffe
+  23:	83 f9 08             	cmp    $0x8,%ecx
+  26:	73 e8                	jae    0x10
+  28:	eb c5                	jmp    0xffffffef
+* 2a:	f3 a4                	rep movsb %ds:(%rsi),%es:(%rdi) <-- trapping instruction
+  2c:	e9 4f 35 04 00       	jmp    0x43580
+  31:	48 8b 06             	mov    (%rsi),%rax
+  34:	48 89 07             	mov    %rax,(%rdi)
+  37:	48 8d 47 08          	lea    0x8(%rdi),%rax
+  3b:	48 83 e0 f8          	and    $0xfffffffffffffff8,%rax
+  3f:	48                   	rex.W
 
-Thanks,
-Olek
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
