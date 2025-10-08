@@ -1,108 +1,115 @@
-Return-Path: <netdev+bounces-228282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7883BC6637
-	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 20:59:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E49B6BC663D
+	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 20:59:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4FFF33447FF
-	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 18:59:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2F9219E401B
+	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 18:59:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A362C0264;
-	Wed,  8 Oct 2025 18:58:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D08AB2C11CC;
+	Wed,  8 Oct 2025 18:59:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bAWpZV9G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZiTf3N5b"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9472BF007;
-	Wed,  8 Oct 2025 18:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A0B2BF007;
+	Wed,  8 Oct 2025 18:59:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759949939; cv=none; b=ZFaiq871ak1M7AXE0wqcTjXIHJkdPO6FW/N1nwolFgVJh3KhlMfGEZgp7UhAlHYePklzo7sA39VUz1QvG3EVBbSykfudUwaYUQzwxo7dc19fIdOGFoowPC7z9J3nlPaXyXOvO4UFmgMXRn8hN4pRNJEWuZK2IqNyXXrjP5L+cVg=
+	t=1759949949; cv=none; b=LQyiW/8dtwTe63xbcCltblPtJoFvWmrW9mAtOH/bRFAIQS8Y2rif8wK+8m9LVc8TmmfVCAUfR0zySbg7plfudWR80ekI81C2qHUE4WwgDCUYYJbdeaqhzw1H/1qfKGuXxzWEaX1CTQrN4iR3xjDViww//yGbf3i92QlHKW5UR1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759949939; c=relaxed/simple;
-	bh=c+0c4CdEK2kCFfGJq0QIVWU1nPEXnA+v4w5Ud2YK5bw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=jN0vl7lXLTZH4S0niVtdIuIp+/0fLn+zzhoM6jZjaY0MOy/Hnr/sdTMWUFSzNoIqcvRoV5edfyXff/npcZgW6otfDWmqA1NJtHE+fxoM+u6/Xdc96wxz5Kx2yO8g3UXorYm12Grmv2ryFteK3Ku3tCMF/w8u7mfhWjHX2iWFJjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bAWpZV9G; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1759949934;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Vn4CeiQ0r8D1fLDDSKVzE9nFg8D/XnQ/f/O/x7Mav0A=;
-	b=bAWpZV9GgcU6ICDKvxnFP/BX5aTzYHu83vlKFmn8sop/6mwxvNFV4Gbb57/60XhwrsHmN/
-	nlXpscz7x1d1+uEhGdVcRQiOu698MexiqvJR21p2ou7uq7NLluZLTsb/GfbtevazchB6gS
-	50+qEMBoZzXgBXA8fulFj+VYVWDOIHg=
-From: Roman Gushchin <roman.gushchin@linux.dev>
-To: Daniel Sedlak <daniel.sedlak@cdn77.com>
-Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,  Jonathan Corbet
- <corbet@lwn.net>,  Neal Cardwell <ncardwell@google.com>,  Kuniyuki
- Iwashima <kuniyu@google.com>,  David Ahern <dsahern@kernel.org>,  Andrew
- Morton <akpm@linux-foundation.org>,  Shakeel Butt
- <shakeel.butt@linux.dev>,  Yosry Ahmed <yosry.ahmed@linux.dev>,
-  linux-mm@kvack.org,  netdev@vger.kernel.org,  Johannes Weiner
- <hannes@cmpxchg.org>,  Michal Hocko <mhocko@kernel.org>,  Muchun Song
- <muchun.song@linux.dev>,  cgroups@vger.kernel.org,  Tejun Heo
- <tj@kernel.org>,  Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
-  Matyas Hurtik
- <matyas.hurtik@cdn77.com>
-Subject: Re: [PATCH v5] memcg: expose socket memory pressure in a cgroup
-In-Reply-To: <20251007125056.115379-1-daniel.sedlak@cdn77.com> (Daniel
-	Sedlak's message of "Tue, 7 Oct 2025 14:50:56 +0200")
-References: <20251007125056.115379-1-daniel.sedlak@cdn77.com>
-Date: Wed, 08 Oct 2025 11:58:46 -0700
-Message-ID: <87qzvdqkyh.fsf@linux.dev>
+	s=arc-20240116; t=1759949949; c=relaxed/simple;
+	bh=YSyZBJECDSmrU4kIHok2IV023tjoiVhUqQtuyV5mAsY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=LGk9khDvhcwKNcD5nUj5KhMDVwmNf5Shp2yZJRO61obPxqmiQtVEbmsVDbmvYV5HjwSivxwe29j3xct/6WkYzMMf6xoGbaiSfV31YLVmSD/nJ5xBY2R+NPyIOIkxjywph7IFH02JcgV+HoN5cdPLha8b3o2ASR8dUPQA8YIKsKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZiTf3N5b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AD8FC4CEE7;
+	Wed,  8 Oct 2025 18:59:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759949948;
+	bh=YSyZBJECDSmrU4kIHok2IV023tjoiVhUqQtuyV5mAsY=;
+	h=From:Subject:Date:To:Cc:From;
+	b=ZiTf3N5bmDRQblnGI98Td+IDGhGYS28iTdW+07k8RdgdAwbvs1catpyng9lSiedGO
+	 kUaunCWa2JOj8wT0EN/3in20/KXeZ537KLnJeNS+STWSvzABfrIzik22GZhI9kzyFS
+	 uCd6HU3yDOvVAPFEdbDZE3Hv6LpSfHSOqInYG1LhixBXh9t1s+6bz//SrpBeP3Uw3e
+	 znWhSXfNwsw4g0NQnxxT5K8SCM7CjYmI3yn4OaJt5/qYORsRmBUvlEgMmkJDzGO8Be
+	 XBp/ZxloEQQeURChB5qf86kgn4CRrvpJQxA3vkzKfkgTPhkjzrC/zeuoHge4qekLi7
+	 4fTIN6z+3V+aQ==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH 0/2] sunrpc: fix handling of rq_bvec array in svc_rqst
+Date: Wed, 08 Oct 2025 14:58:51 -0400
+Message-Id: <20251008-rq_bvec-v1-0-7f23d32d75e5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGu05mgC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1NDAwML3aLC+KSy1GTdJDOzxLQUg7SUpKQkJaDqgqLUtMwKsEnRsbW1AC2
+ djwJZAAAA
+X-Change-ID: 20251008-rq_bvec-b66afd0fdbbb
+To: Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, 
+ Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ David Howells <dhowells@redhat.com>
+Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=978; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=YSyZBJECDSmrU4kIHok2IV023tjoiVhUqQtuyV5mAsY=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBo5rR01tFFxc/ntjUL5ltP3NUhB3x2sJrDJstMP
+ MC/0kGw+VOJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaOa0dAAKCRAADmhBGVaC
+ FUXnEADGSA/HBvDdXPr07rXYcmcPBFpnhPnB16CLXzsGUrcKjWamHm48ZqU0AKCf7TD4974WZfc
+ PEmdZ9o7P0W1zMfJSueENxhtLEqxdWtEMiIQgdtJ7E4TLdIB9LpMHalmZo3dCSVnhuuAWmKFKcY
+ YVduNkrhQEDKur47t1u5pn3CWUFE+Dh9FzVJCtUBDg3d/hj6v9dgk17Uf76Vv6b/5YR4CN8BL8U
+ dzO35wxsfjVx7EzSTXf+mcAWlugsRyzWd+ik/3WBd8ryZVabj01NaAwVaWFn5RuPz7txHe04PQn
+ mU7PtBVlq0JgBmTVdTw7AWhbY0b9o8fBUtsUlqNkKHuCDM0Cwi6InLpWHxELyUUkZEv/2yiCSxi
+ Z9EjyVlfQGCXKNVwMZMQy3Ldyvh3f73JAC8NnNpKftDzwVk25rnxMSh8LGrZ/F7W34kykFPfHoE
+ KaWDiUd+pcx6igBLHApJlk/qspYwEzIBxJRuTuy2vDKe25VoZZMBEI5s6qA89oXsqO4bPrJx7Bt
+ I7gr7veITqt5Jdj39d5O0QXk76a8SDWOJRB29r3xveP3jMzB30slBlBoPGFRLlAZ/RsOpfFiikD
+ yMRN/UGblPzNr3rq7ndZ7plXg6GacXMtUzAw4N6SIaR3OJX0BYWYxFFBp15LRnw5qhIOpDh2yBj
+ 9KcLQSxexT6vQ1g==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-Daniel Sedlak <daniel.sedlak@cdn77.com> writes:
+I've seen this message pop intermittently on some knfsd servers:
 
-> This patch is a result of our long-standing debug sessions, where it all
-> started as "networking is slow", and TCP network throughput suddenly
-> dropped from tens of Gbps to few Mbps, and we could not see anything in
-> the kernel log or netstat counters.
->
-> Currently, we have two memory pressure counters for TCP sockets [1],
-> which we manipulate only when the memory pressure is signalled through
-> the proto struct [2]. However, the memory pressure can also be signaled
-> through the cgroup memory subsystem, which we do not reflect in the
-> netstat counters. In the end, when the cgroup memory subsystem signals
-> that it is under pressure, we silently reduce the advertised TCP window
-> with tcp_adjust_rcv_ssthresh() to 4*advmss, which causes a significant
-> throughput reduction.
->
-> Keep in mind that when the cgroup memory subsystem signals the socket
-> memory pressure for a given cgroup, it affects all sockets used in that
-> cgroup, including children cgroups.
->
-> This patch exposes a new file for each cgroup in sysfs which is a
-> read-only single value file showing how many microseconds this cgroup
-> contributed to throttling the throughput of network sockets. The file is
-> accessible in the following path.
->
->   /sys/fs/cgroup/**/<cgroup name>/memory.net.throttled_usec
+    rpc-srv/tcp: nfsd: sent 1045870 when sending 1045868 bytes - shutting down socket
 
-Hi Daniel!
+Unfortunately, I've not been able to reproduce this on my own, but I've
+noticed a bug that could cause this.
 
-How this value is going to be used? In other words, do you need an
-exact number or something like memory.events::net_throttled would be
-enough for your case?
+The first patch in this series fixes a bug in rq_bvec handling I noticed
+by inspection. The second patch adds a slot to rq_bvec to account for
+the slot used for the TCP record marker.
 
-Thanks!
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+Jeff Layton (2):
+      sunrpc: account for TCP record marker in rq_bvec array when sending
+      sunrpc: add a slot to rqstp->rq_bvec for TCP record marker
+
+ fs/nfsd/vfs.c        | 6 +++---
+ net/sunrpc/svc.c     | 3 ++-
+ net/sunrpc/svcsock.c | 2 +-
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+---
+base-commit: 177818f176ef904fb18d237d1dbba00c2643aaf2
+change-id: 20251008-rq_bvec-b66afd0fdbbb
+
+Best regards,
+-- 
+Jeff Layton <jlayton@kernel.org>
+
 
