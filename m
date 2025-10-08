@@ -1,128 +1,125 @@
-Return-Path: <netdev+bounces-228199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B70CABC46F3
-	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 12:48:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B767BC47D4
+	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 13:00:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0D99188B357
-	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 10:49:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C66803AB1FA
+	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 11:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2712F3609;
-	Wed,  8 Oct 2025 10:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 477B62F617B;
+	Wed,  8 Oct 2025 11:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jh27gp3r"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="fd1P1mt3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50852EC09B
-	for <netdev@vger.kernel.org>; Wed,  8 Oct 2025 10:48:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F6119D082
+	for <netdev@vger.kernel.org>; Wed,  8 Oct 2025 11:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759920515; cv=none; b=Z2bI1I0SzTug8P7Roza9hkZT6cH96F+SAI3wPYfCecolVULMMyRZ+ZHWf0QOiRZUSdf87FmyeiKuK/EWfqn7xXmNnzWXd3LkKrPlY6eHTLutqMnXxHnmtLaB/3gpbV1vL41WgMamCZU/LDCh6mB604dr2XVLZbDPcCDj6r/hIvM=
+	t=1759921231; cv=none; b=PErlODD0g9tX53JpDiDgXC9+wCvFDKKFwOWZzMTOlKy0z//jbDuyMBDFsPfWGZXP7zbc17GxWmxMZRW3IwFTmFoQbE9R6Zns/TlbqfY7+ziOq1ydq9fZBoMhCN5kFe5iZQrUn+xW8aLcsQ5P/M8B/eweJw9CAOfQ7yOldF8qAN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759920515; c=relaxed/simple;
-	bh=r8JHW7S9t8XtUom2huYwx+1JK/cKzVt5jAQ2jApdSJ4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=R1M59zoB1QxhjKtDLD6WeU6/PNrjO5xmVuP0Emw4PwJbFk15jR+mVqJcqVJBGYOlHleHlsEu7AaYDlxE5e279xOlH/I7xOHbytt+OTctkORBMWQ5yz1cvoPaJp6+JwRqEOvLrEXbTjkJKmY/J9Xa1GU+fytXvu6QRgz/WKoHaNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jh27gp3r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0CA2C4CEF4;
-	Wed,  8 Oct 2025 10:48:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759920515;
-	bh=r8JHW7S9t8XtUom2huYwx+1JK/cKzVt5jAQ2jApdSJ4=;
-	h=From:Date:Subject:To:Cc:From;
-	b=jh27gp3rw022a1h/WWr+t1wM0U5EPs25PS24UudRsvMvW7VuFNgttsy1GgDnKTtOE
-	 fJy2IBNDNmHfBsGgVXOuQhiY/2uVhdRXyxjViLozWaO5OtoeEKYnQVCKAyogH5fWkw
-	 O4L4XaH2//EYfNKzmkmT7znzYUWq5PFSUH2X7hz7TGr0wdeHvdbfqdhH0q/0TXB6M5
-	 Px2bnP5mAsnm0130NIgU98b6Of7kZyGZ1FB0Td96nq92zEog71n0wX8Xg26Oll+B1F
-	 NzioWB/ah65ZPpHNtDTd9tUPpR1QacxVqKJXSdnZ+uFtCkDGtA83RymnbEOHYZhEIn
-	 /BZqFWAU1f/HA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Wed, 08 Oct 2025 12:48:05 +0200
-Subject: [PATCH net] net: mtk: wed: add dma mask limitation and GFP_DMA32
- for device with more than 4GB DRAM
+	s=arc-20240116; t=1759921231; c=relaxed/simple;
+	bh=4rXAjtqrs4KZKZKHHUtMRuXCWdptQ9OEIuUk6kINpaE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WJN/veLjUIcxvBnfa8HiR4Eu8wNpQRWHSgLktAIdO0T/NvxzIQQHhXqeddAYgGFfPo1B3BAazU+bgqZ8FlXA/rs9tGXReDb+zkMr3BWkXF8rB1gWolPrx60nLc1SRPqNFFMveuNzyQip1rY9cVIGy+FZkB8oKpJV9cN8ONy5lVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=fd1P1mt3; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5988HSdX012885;
+	Wed, 8 Oct 2025 04:00:10 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=QlHxTxSIyS+Q8FGsGu9HwK+
+	UiKLU3cElNT+wr3+C9KM=; b=fd1P1mt3iOdEQUgq7mZh07oQBsZx+6aLHYnbiIh
+	Kc8PFvEXLgffd7haOMBrU0pKIDWKXBXDugBRdnNNwtaA7gxQL2Deuy2/sfwv+zKH
+	TZ15IWXuEV0xQGqy9+ZvpI+wnRTcJ6vohx98Gvv/rd3/YZyvCF1B6+0KBdotzWUj
+	bsgVNLivBZ6vLQAMSdrE4e1H8n7C4evP7INBSDY6lfe2bRyH19lhqHVbAFXNn9Sn
+	ED9j+SJ8A4kBidb71UTBBYspyNSJ3zgv7/t5kwugdU27yMIwhJAOWfy0O7dWlUPE
+	epB7W61qR4XC0BHGxwfefHZiE0OtEjgoR4Cp6zPww3azB5w==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 49nmag089a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Oct 2025 04:00:10 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 8 Oct 2025 04:00:18 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Wed, 8 Oct 2025 04:00:18 -0700
+Received: from 5810.caveonetworks.com (unknown [10.29.45.105])
+	by maili.marvell.com (Postfix) with ESMTP id D2D255B6940;
+	Wed,  8 Oct 2025 04:00:05 -0700 (PDT)
+From: Kommula Shiva Shankar <kshankar@marvell.com>
+To: <netdev@vger.kernel.org>, <mst@redhat.com>, <jasowang@redhat.com>,
+        <pabeni@redhat.com>, <xuanzhuo@linux.alibaba.com>
+CC: <virtualization@lists.linux.dev>, <parav@nvidia.com>, <jerinj@marvell.com>,
+        <ndabilpuram@marvell.com>, <sburla@marvell.com>, <schalla@marvell.com>
+Subject: [PATCH v2 net-next  0/3]  virtio_net: Implement VIRTIO_NET_F_OUT_NET_HEADER from virtio spec 1.4
+Date: Wed, 8 Oct 2025 16:30:01 +0530
+Message-ID: <20251008110004.2933101-1-kshankar@marvell.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251008-wed-4g-ram-limitation-v1-1-16fe55e1d042@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAGRB5mgC/x3MQQrDIBBG4avIrDtgE5Ngr1KykPonGYi2qCSF4
- N0rXb7F9y7KSIJMD3VRwiFZ3rHF/abotbm4gsW3pk53g7a95hOezcrJBd4lSHGlCR6N1Zjgre8
- tNftJWOT7/z4potBc6w9l4YGwbAAAAA==
-X-Change-ID: 20250930-wed-4g-ram-limitation-6490e7ed9d39
-To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, Rex Lu <rex.lu@mediatek.com>, 
- Daniel Pawlik <pawlik.dan@gmail.com>, Matteo Croce <teknoraver@meta.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDA4MDA1NSBTYWx0ZWRfX6g1ABL/IOQfp
+ m1LxBG6etT5MeUsHifu89PsHddGQ50msRqDmvo6Rj3yCkcRB4JIn9yAqlIA1dvkMlDcRy1+lcdG
+ IYr+b+/vw0wYycH+uJtKW1JTc+aErd4xVd3w1nn8VZkZa2pr+wbTTcfO5PTF/g9KYX0QHEo4viO
+ ZJ3+158j1tXxFVBv/5zGd//LfSCJPlFkoev+wcDgyaHbmZo2R65KSLslRNNFJPb+wz2vtye8WeQ
+ 5HvOBfHBZ7GZvHXAnkunWqbdSx7PAKsxcf9nw43RgNm+7fk/V3bN2A7IQ6Kps/iRh0MTwclqMQA
+ JLaQxfiophGdQ+31+XIHOyhoca9Znc8lksTJMB+WTHXwL/vMEFgG9KpUIcSjmVpKiemVPtv1weD
+ DhwB6RI/+hPSwBNYGRepYgn/mU8mOg==
+X-Proofpoint-ORIG-GUID: g0_Dqd5nU0TSEfI4ROf9tX-fBDLptDnc
+X-Proofpoint-GUID: g0_Dqd5nU0TSEfI4ROf9tX-fBDLptDnc
+X-Authority-Analysis: v=2.4 cv=ar+/yCZV c=1 sm=1 tr=0 ts=68e6443a cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=x6icFKpwvdMA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=tZkuUt_2NcZHR2g27asA:9
+ a=OBjm3rFKGHvpk9ecZwUJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-08_03,2025-10-06_01,2025-03-28_01
 
-From: Rex Lu <rex.lu@mediatek.com>
+This series implements the VIRTIO_NET_F_OUT_NET_HEADER feature which was introduced in the virtio specification 1.4 recently.
+With this change, segmentation offload functionality now propagates outer IP header offset information to the device/apps running on NIC.
 
-Limit tx/rx buffer address to 32-bit address space for board with more
-than 4GB DRAM.
+The virtio 1.4 spec introduced VIRTIO_NET_F_OUT_NET_HEADER feature[1] to address the performance issue caused by reading packet data
+to determine outer network header offset and to support Inline IPSec functionality,
+where vendor hardware devices need to know the outer network header offset for Inline IPSec acceleration.
 
-Tested-by: Daniel Pawlik <pawlik.dan@gmail.com>
-Tested-by: Matteo Croce <teknoraver@meta.com>
-Signed-off-by: Rex Lu <rex.lu@mediatek.com>
-Co-developed-by: Lorenzo Bianconi <lorenzo@kernel.org>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/mediatek/mtk_wed.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Currently, devices must parse through packet headers to determine the outer network header which impacts performance.
+This patch series implements the outer_nh_offset field in virtio_net_hdr to avoid parsing overhead.
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_wed.c b/drivers/net/ethernet/mediatek/mtk_wed.c
-index 3dbb113b792cf00fb4f89ab20f7e7fa72ecac260..cc3f3380a9980a6525921205dc7adaf321a099ae 100644
---- a/drivers/net/ethernet/mediatek/mtk_wed.c
-+++ b/drivers/net/ethernet/mediatek/mtk_wed.c
-@@ -677,7 +677,7 @@ mtk_wed_tx_buffer_alloc(struct mtk_wed_device *dev)
- 		void *buf;
- 		int s;
- 
--		page = __dev_alloc_page(GFP_KERNEL);
-+		page = __dev_alloc_page(GFP_KERNEL | GFP_DMA32);
- 		if (!page)
- 			return -ENOMEM;
- 
-@@ -800,7 +800,7 @@ mtk_wed_hwrro_buffer_alloc(struct mtk_wed_device *dev)
- 		struct page *page;
- 		int s;
- 
--		page = __dev_alloc_page(GFP_KERNEL);
-+		page = __dev_alloc_page(GFP_KERNEL | GFP_DMA32);
- 		if (!page)
- 			return -ENOMEM;
- 
-@@ -2426,6 +2426,10 @@ mtk_wed_attach(struct mtk_wed_device *dev)
- 	dev->version = hw->version;
- 	dev->hw->pcie_base = mtk_wed_get_pcie_base(dev);
- 
-+	ret = dma_set_mask_and_coherent(hw->dev, DMA_BIT_MASK(32));
-+	if (ret)
-+		return ret;
-+
- 	if (hw->eth->dma_dev == hw->eth->dev &&
- 	    of_dma_is_coherent(hw->eth->dev->of_node))
- 		mtk_eth_set_dma_device(hw->eth, hw->dev);
+This series was tested on ARM platform with virtio-net driver where ~4% performance improvement was measured
+for device applications.
 
----
-base-commit: 07fdad3a93756b872da7b53647715c48d0f4a2d0
-change-id: 20250930-wed-4g-ram-limitation-6490e7ed9d39
+V1 -> V2: Added IPv6 support to outer network header offset feature 
+	  Fixed sparse build warnings
 
-Best regards,
+[1] https://lore.kernel.org/virtio-comment/20250401195655.486230-1-kshankar@marvell.com/
+
+Kommula Shiva Shankar (3):
+  net: implement virtio helper to handle outer nw offset
+  virtio_net: enable outer nw header offset support
+  vhost/net: enable outer nw header offset support
+
+ drivers/net/virtio_net.c        | 23 +++++++++++++++----
+ drivers/vhost/net.c             |  4 ++++
+ include/linux/virtio_net.h      | 40 +++++++++++++++++++++++++++++++++
+ include/uapi/linux/virtio_net.h |  8 +++++++
+ 4 files changed, 71 insertions(+), 4 deletions(-)
+
 -- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+2.48.1
 
 
