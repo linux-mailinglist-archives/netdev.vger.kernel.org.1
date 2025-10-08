@@ -1,130 +1,168 @@
-Return-Path: <netdev+bounces-228179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77B40BC3DDA
-	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 10:37:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75BBBBC3E61
+	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 10:44:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3EFB94E272A
-	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 08:37:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F5513A9CAC
+	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 08:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3948B2F290A;
-	Wed,  8 Oct 2025 08:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F082B2EAB9F;
+	Wed,  8 Oct 2025 08:44:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZUhogL6S"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ktdaglsx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3635E2ECEBB
-	for <netdev@vger.kernel.org>; Wed,  8 Oct 2025 08:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E772EBDDE
+	for <netdev@vger.kernel.org>; Wed,  8 Oct 2025 08:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759912667; cv=none; b=IhAxj3ZanyfqusqsEL07H71GPGqybWsmokrfmhcSv2eKJqs3DHU1qtfGuaQ8Riz9g7zCq4+ie+e1WePPeOvbvKZR1lSchvmhbjOZhG/YHodPVJsvxO0a952Evyd2ljZ5yls7EGpJXQWBwEM09Nysvr5LnMdRNQ9/xgasw7IDzl0=
+	t=1759913071; cv=none; b=GWrPdkaErSEvwyrwPg7V5TaaDBi3SGUr7VP9jmD0Y1KLBpZ062gJwoZBjqktWfl0MuQ7ajtlGvzvVLQj4MbCmXBs7yT3vHYBVNSt7AK4aiOkTbMWDEhOeliWfzANnYR/xwSktZkBMUfGCNtaQ+ywo8Et9MImX9p7JygwQz6DGEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759912667; c=relaxed/simple;
-	bh=ShHijeWsGNvood5q77sTgoz5uBtyWGy3piePyGTcnwI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=MWFZya/aXBGwgL2bMTKzVh4x2IRUYnfbGnVh9X8gg5miHI+5k77zGOIr6hhNWumUT7NHAHQGueCp6NYPY9l8f28uTElnxusiMI1T3k8ImnilHRqMzOf01YJbmj07fsNHJ9guMX9jSlgEvPj2V8VR6ff4DTl+ZwD6wBTBImFsrSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZUhogL6S; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59830PLI007974;
-	Wed, 8 Oct 2025 08:37:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=jakBv5
-	yGt1pyxdDe50tQsxFeV1OpooahSFyyW6cAT6E=; b=ZUhogL6S7r0rzkdAoNmdAl
-	y2REvjSHFJgleufEGQIvjsjNPoyCMtPouX/66Zz9YBKhheZ8+DNwS9GMUTPpcj4L
-	zL/yE/dps7wFrP/DRm0wDlsANa2cPOfoZdLy+ojx8ufFB2LW1alpHvKXPnJpMa/k
-	iheSaANkcAqgAAmlDY4VZLK4l6dnA3jFojRfSySG4Y7/zMrcfARaPNsWaFM4W+SN
-	Gj60Q64jzHi+4iUBd31jefSz42D50eZ0QPHDx4Vih133WmZn2UwXYzg8sZgZ6UzF
-	eaKrsWXV01ePIlKCnQq05JwlHwjaAUUZkT2uIc1FK7IFJOZvGVX6qwAy4a2yLXoQ
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49jt0pkcmm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Oct 2025 08:37:42 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5986b404013206;
-	Wed, 8 Oct 2025 08:37:41 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 49kg4jqdt6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Oct 2025 08:37:41 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5988bcqX34865902
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 8 Oct 2025 08:37:38 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7D1CE2004E;
-	Wed,  8 Oct 2025 08:37:38 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 64D162004B;
-	Wed,  8 Oct 2025 08:37:38 +0000 (GMT)
-Received: from [9.111.198.139] (unknown [9.111.198.139])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  8 Oct 2025 08:37:38 +0000 (GMT)
-Message-ID: <f3d545b7-a77a-4bcc-9231-69dbb99c2199@linux.ibm.com>
-Date: Wed, 8 Oct 2025 10:37:38 +0200
+	s=arc-20240116; t=1759913071; c=relaxed/simple;
+	bh=jQ2r/rcCQFyp8n0GePqoko8xfZQFPXQULeRJ6UtUvkU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CGuQldesBZE/7oBNqNLIUWrVbuqf2O25r+QVs2THk3ThQFe2vuPylBhDVdiOrr/3B800viqdl7Dj+66XibEd3JDZzzCf2LbnA3lEWe2r8GP74B6Nd8eQBZSNrDHavYUDASzL50V6Twkimj2pvwnr11oreRCNUKi6a/AqbdUAoVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ktdaglsx; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4e06163d9e9so72041571cf.3
+        for <netdev@vger.kernel.org>; Wed, 08 Oct 2025 01:44:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759913069; x=1760517869; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xlSjJCs7A1ERmjbEvfSkW/CmM7q/PE2PcmG+9t+wYEo=;
+        b=ktdaglsxeMCjhkJ9+ONSTubAFmm8u9Di0puasIn/s17303NJ3557Pedm2p5Q8pNsZf
+         4iMw1gVGnTnvipne6Ij4jJBdaT1b936xRAi1aZ249OJS69uH6oX6zt23fjllNTgU+Dvs
+         2Fx/sx1XLwnBZ+dGOjtIOVPhcxyTSesq4QPFKA3ls9Vs1EePYDfp2oOaXyF3HhREw6J2
+         i/9iJnSKMJhvkqrH2eOdFinyM44fFRKsNANv34YHdLpFnuGMggZUzTzkaPxMrREmCntd
+         I/SmgPOG2PLAnsJmHhGw/YUe8E+Jn8vOO/K1bEokHw4ARrdMuDqoEisDVZ6ooufHQWFs
+         /gWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759913069; x=1760517869;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xlSjJCs7A1ERmjbEvfSkW/CmM7q/PE2PcmG+9t+wYEo=;
+        b=WmlB3j2WKEt5Lya7BPqGzbJPgCxvJp3kPs6UE7moGtC2F+NmRFqeg+vnQjjd/1Z6jW
+         UY3YzCC4LIb7X7O7OXpJjXKXd+sQtTn7K1NgO2a5VpI+2ClY0Knzw6bu5TWxwOwJcjzN
+         VG2ymBsU+4w5vnFwMeliWt8C9jaMD7o3dIWjDsp1KQgw2xMQva0R6iJgNYEJTt1zYX4l
+         WW4kXsZ9t5ONEqH6z/6jg+xV1YVDjG71IG7Qp+2nYriUJFhZ61jZuIvFAwgIVAZwR1EX
+         kuRI180FAJzxB1HGk1iIKADyicRPyPjLFZwXWOKCEJsKCmM/3wUNR6PNds0La1G3ueOF
+         SIXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXELAiMXQ62auYdOqodvdD6X6oeWvDXze3O8bKViznpGWhnA8OfWiWwE9rGg7Grsh6SNkvkR2M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz91QXTroNtAbGdjsecxtmCwPu+rmgxcRsENGeOs7SOYFY069DS
+	xcfi/B2AGMYIzpI0Au/j5/L2lyJ0PRlTiCih5AOjb1+2YCGpV3ZN/r9/1VUnR0BXAtEiuHRbRSV
+	U4mwjlvAfgUu9JMn4H54BPMOim/CCOjCIqDnFiduI
+X-Gm-Gg: ASbGncsE+GhpygoefoAI+NNeLVG3EJ1B9bQQrD2ea1NH4QloITdOqJ+DbnVl6FievJj
+	K+5rvN6PZKhCn63fqZJoiM3mtmIjfE1HZWIkE7Zh9UXXP/TnkN/UlxXiWL7kXm9tmV1+V57dI+g
+	VYf7BV1/y7up1Bo7y6ulfz7jOafj048rVV60VvKqm08oMJ2q11VImrAuk2ijR9EIT/auEPQYcnG
+	dXoilAN75026sZMw33Pv9NCCDVLrBNBcgA3KlQ7EugQkeUCaAjuF8RF466ZrIeHIWBRqywe56Wp
+	SAU=
+X-Google-Smtp-Source: AGHT+IH6T8Z0phHUrkW2LYomzcuIMTigkC4dYVy2h9gd9Ou0VM87Kj2q+2642RYcQOs3k9cE8zHQiNe+PBbwdD28j0U=
+X-Received: by 2002:ac8:5914:0:b0:4e2:cb29:22c6 with SMTP id
+ d75a77b69052e-4e6ead46a0bmr35675251cf.53.1759913068856; Wed, 08 Oct 2025
+ 01:44:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [ANN] LPC 2025: Networking track CFP
-To: Paolo Abeni <pabeni@redhat.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <537d0492-c2ad-4189-bb87-5d2d4b47bc29@redhat.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <537d0492-c2ad-4189-bb87-5d2d4b47bc29@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=XvT3+FF9 c=1 sm=1 tr=0 ts=68e622d6 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=OGjWj8McAAAA:8 a=gglSMJectvlZH8v_VHoA:9
- a=QEXdDO2ut3YA:10 a=UYjydHh6ynBBc6_pBLvz:22 a=HhbK4dLum7pmb74im6QT:22
- a=poXaRoVlC6wW9_mwW8W4:22 a=pHzHmUro8NiASowvMSCR:22 a=xoEH_sTeL_Rfw54TyV31:22
-X-Proofpoint-ORIG-GUID: S1c3m9xPi5IYij3DHtcisEQnkjfB-hDB
-X-Proofpoint-GUID: S1c3m9xPi5IYij3DHtcisEQnkjfB-hDB
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDA0MDAwOSBTYWx0ZWRfX+eA499O17FZg
- F3U06JKhQQTcBDhV0YrtA6OxJVirieo1TiliXgC2LVmfaf+cOHoq5iV3NYC1ZZemz+qtpx5zQyL
- lDZZr2qsvcmNeVoycXlKLpAzKQ4chKMWQnztfjc7cIzrXjAWpnqFZVdLgETqcVPYNChtKeBxN3n
- MbveBFBuYmzQobcF3bchrS2+eYd7tJuVEfwpiZoPV6g45I56C+ILQSQ9tgPArxn2ip9w7NPnZf8
- IZGr5odO5BJRi1o833B55OzJI7TeV37NavChyUO6OVcL40NDDywT8+RtmQxOARlDW19yvHxs7vG
- /OpVJ5I0IEzybPcJ8SsHQKvWaO3DklUy8Z86J9IYodl4UZmOIipCw6wDLcfJar1chZfaZqMUzxN
- zFFuofZjC5aTcsL/ltzqTCSYtGS7zQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-08_01,2025-10-06_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
- phishscore=0 priorityscore=1501 clxscore=1015 adultscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2509150000 definitions=main-2510040009
+References: <20250925223656.1894710-1-nogikh@google.com> <CAG_fn=U3Rjd_0zfCJE-vuU3Htbf2fRP_GYczdYjJJ1W5o30+UQ@mail.gmail.com>
+In-Reply-To: <CAG_fn=U3Rjd_0zfCJE-vuU3Htbf2fRP_GYczdYjJJ1W5o30+UQ@mail.gmail.com>
+From: Alexander Potapenko <glider@google.com>
+Date: Wed, 8 Oct 2025 10:43:51 +0200
+X-Gm-Features: AS18NWD2m7wRQRTYoE5oa91q74s9ueKa5gBPaHOd5rYELKrxuXExAl7EfwP9pSs
+Message-ID: <CAG_fn=WUGta-paG1BgsGRoAR+fmuCgh3xo=R3XdzOt_-DqSdHw@mail.gmail.com>
+Subject: Re: KMSAN: uninit-value in eth_type_trans
+To: Robin Murphy <robin.murphy@arm.com>, Christoph Hellwig <hch@infradead.org>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Leon Romanovsky <leonro@nvidia.com>, mhklinux@outlook.com
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com, 
+	Aleksandr Nogikh <nogikh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Oct 7, 2025 at 8:51=E2=80=AFAM Alexander Potapenko <glider@google.c=
+om> wrote:
+> Folks, as far as I understand, dma_direct_sync_single_for_cpu() and
+> dma_direct_sync_single_for_device() are the places where we send data
+> to or from the device.
+> Should we add KMSAN annotations to those functions to catch infoleaks
+> and mark data from devices as initialized?
 
+Something along the lines of:
 
-On 24.09.25 10:09, Paolo Abeni wrote:
-> Hi,
-> 
-> We are pleased to announce the (belated) Call for Proposals (CFP) for
-> the Networking track at the 2025 edition of the Linux Plumbers
-> Conference (LPC) which is taking place in Tokyo, Japan,
-> on December 11th - 13th, 2025.
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
+index 0d37da3d95b65..7f59de19c1c87 100644
+--- a/kernel/dma/swiotlb.c
++++ b/kernel/dma/swiotlb.c
+@@ -42,6 +42,7 @@
+ #include <linux/string.h>
+ #include <linux/swiotlb.h>
+ #include <linux/types.h>
++#include <linux/kmsan-checks.h>
+ #ifdef CONFIG_DMA_RESTRICTED_POOL
+ #include <linux/of.h>
+ #include <linux/of_fdt.h>
+@@ -903,10 +904,13 @@ static void swiotlb_bounce(struct device *dev,
+phys_addr_t tlb_addr, size_t size
 
+                        local_irq_save(flags);
+                        page =3D pfn_to_page(pfn);
+-                       if (dir =3D=3D DMA_TO_DEVICE)
++                       if (dir =3D=3D DMA_TO_DEVICE) {
++                               kmsan_check_highmem_page(page, offset, sz);
+                                memcpy_from_page(vaddr, page, offset, sz);
+-                       else
++                       } else {
++                               kmsan_unpoison_memory(vaddr, sz);
+                                memcpy_to_page(page, offset, vaddr, sz);
++                       }
+                        local_irq_restore(flags);
 
-It seems LPC 2025 is already sold out and has a waiting list:
-https://lpc.events/blog/current/
+                        size -=3D sz;
+@@ -915,8 +919,10 @@ static void swiotlb_bounce(struct device *dev,
+phys_addr_t tlb_addr, size_t size
+                        offset =3D 0;
+                }
+        } else if (dir =3D=3D DMA_TO_DEVICE) {
++               kmsan_check_memory(phys_to_virt(orig_addr), size);
+                memcpy(vaddr, phys_to_virt(orig_addr), size);
+        } else {
++               kmsan_unpoison_memory(vaddr, size);
+                memcpy(phys_to_virt(orig_addr), vaddr, size);
+        }
+ }
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-Does anybody have insights wrt the Networking track?
-Are there any reserved tickets?
+should be conceptually right, but according to the comment in
+swiotlb_tbl_map_single()
+(https://elixir.bootlin.com/linux/v6.17.1/source/kernel/dma/swiotlb.c#L1431=
+),
+that function is deliberately copying the buffer to the device, even
+when it is uninitialized - and KMSAN actually started reporting that
+when I applied the above patch.
 
+How should we handle this case?
+Not adding the kmsan_check_memory() calls will solve the problem, but
+there might be real infoleaks that we won't detect.
+We could unpoison the buffer before passing it to
+swiotlb_tbl_map_single() to ignore just the first infoleak on the
+buffer.
+Alternatively, we could require callers to always initialize the
+buffer passed to swiotlb_tbl_map_single().
 
