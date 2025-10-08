@@ -1,113 +1,101 @@
-Return-Path: <netdev+bounces-228277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21226BC6258
-	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 19:32:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1B7FBC643B
+	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 20:18:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E9AB94E32F4
-	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 17:32:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEFE6189EDE2
+	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 18:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FFD42BEC4A;
-	Wed,  8 Oct 2025 17:32:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3300F2BE64F;
+	Wed,  8 Oct 2025 18:17:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JTB1oRfT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GUt9NBVm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C44826FDBF
-	for <netdev@vger.kernel.org>; Wed,  8 Oct 2025 17:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD2D2BDC32;
+	Wed,  8 Oct 2025 18:17:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759944728; cv=none; b=Z4jMEdXjXJnh6A7Gjpx9h+1l752RHBe9Zp+45Wuyb5sX+0PK8F1xf4vxIqk4qE//0uvZNfzqnwE8t3DiTJewKjZ2mWwpAAfGgpkYTVXhdShWrMpReurJGJaaTlG5/QxTGOR4KnLHD5Ka5MNh3vRdbxuI9At6nyW28vVKrOtbHM4=
+	t=1759947477; cv=none; b=JaVB2tzkzYnlJt2b+3FNPmNK5UaPKhEuBJ2/eb7F8TKsSDOk7Z1RMpp+ScpQWn0YYCCNr8lMogTBhIwMWFglaNg5V4czHEmNV1FOXs+UdOtcUWSyo+3q/vrA+sTXJbKWjRSMwXlwTdEz0P74Sm8nl+yhnIXv+F6Mr/Yvmz9c8R8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759944728; c=relaxed/simple;
-	bh=FZ72KjjNRCv+mDtm1ZNzA+BxeX+JJu8XiulC7AUJhyk=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Ebir+bqAkPOAy3Ia/Y0bdIbzBPI4p74x1BNTHwj6XT9Lf3mtiHrieLMQ868XR1zsro5MXQguQTsjMwSK3LbSk4PyB8udUcXGlzXae9NgMa8JIokY3if273CeFu/nkMZZeoIJhiTvcjfTzzVWt5b8URfspdAwyRceclJbV+Hdhsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=JTB1oRfT; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-42f7b17f9f7so612075ab.1
-        for <netdev@vger.kernel.org>; Wed, 08 Oct 2025 10:32:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1759944724; x=1760549524; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vipt197t4SpD4OGfl+VquOF1ckWbo9u7qu446HO7ecU=;
-        b=JTB1oRfTUECNjB+Ppzy7RfBTKYMA8Tg/4gIr2ln1t7ItHJ7lft6sMrMnIouQG8dfho
-         ywCCmn8Qtc1+Uhry5kt9xmyE2c3f3tiQTLDo0Ecwgiumw8Fmj6OYi63aqsOOBjWeK3O7
-         Fd6AldlqM65ZrIM5PT56H2LltzS3OeG9TxrMAO5zdUkYNpM70NeHTMBaSTFikvFrPiPD
-         /qqUGu6MV3vmFJVzQkI/SLvfKb3LrX34sdNBbK8orFYTCClvnRdnMxEqJ22PAjOAEwG3
-         59xGdyJjxipvvYqFiCCR7hdTlolUIka8j9KpsOw4jX6I6wrwpvvd6HaaCIn/f4Go9Lyi
-         mw9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759944724; x=1760549524;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vipt197t4SpD4OGfl+VquOF1ckWbo9u7qu446HO7ecU=;
-        b=MAiu78FRU55gdCWMEJNo2iysB6ERtQPDh903V9YW9N7mFB3WPITfbW7luu++QqjJDx
-         676BGApV/S86ee4EEnPMlMxhMy6Pndz5rS0YVREXKoKbIqVSt+fq9CLHKNVjws01MflM
-         LEB+fKfisBkkW6eH34pRgwMlaVSOxeFOeSc9b3GTrhbsJ2YVKQLht11+jiDlmsJ0xIw6
-         Zb/1Oc7fXB5jup8Kyc+HX47xYc9sVxLEUIlfAWKyoMKSDJ28AW5B7olJKXzPFYVM00xi
-         82AasR3f6AdiwHR/OVYtWp6GxXicQJPr6S+bxZtOoNOAunZd0Q5pId9y2rJHzDdCaehu
-         Ztng==
-X-Gm-Message-State: AOJu0Yz2PYLaK4O1PExb8KKR0bjnUOmW+mWBDJQCdBgGkQJwQod2MlZu
-	4p9MvqFBCWnndzSxv7qr8N/7a0dsXVRErmrBmFNAE+M4hUn1MsWsBkOIWeuuBHDCm73iChFIRi3
-	JU4NHFic=
-X-Gm-Gg: ASbGncuBByDt3EWi5fwsUHYUMAngOAqcW8U+2hD2Da6ycvT3RkNDfg0sRwAiVKwW9SS
-	jz87mbewbtErJw0sXHtQCakB6ORNnv9tOYNdSHeCjxHKgW/ugK82qXzNzeAcAqVh4IdllbK3uRW
-	M7+2S1gP7tW1HnwOMdewYCTOEOB8cyWY1r5Mxue2P10wa0uvF0s/Orp1G0V+V/3WXuQyxRCoPNO
-	PHHxlM7wi7Puu6Z7fA+Z0UUSEyXXcu6vv1NdkySl6mHkOdZqiHLojEhGEotVLRPNyOyRvYUxoaG
-	PX9vR07z/Ru47zfr+Rj/EoIXjnJUrnOsbH9vlAzHemuEGewGtN9FWxqqz/46WHWV6ETGomguoTn
-	AaH5uD9zfMUIODvDDNc9UGeZxkKs6/ZoLUEUGrQ==
-X-Google-Smtp-Source: AGHT+IEC4Taq3VC3RrSC9C71BGoDHllCdNhzl2OzqWKMV9gk2XtuM6gXx0BiF6KKCcpdB8f7gkn/jg==
-X-Received: by 2002:a05:6e02:18cf:b0:42e:73f7:79c4 with SMTP id e9e14a558f8ab-42f873fb613mr40954925ab.27.1759944723815;
-        Wed, 08 Oct 2025 10:32:03 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-42f9027872csm1366205ab.10.2025.10.08.10.32.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Oct 2025 10:32:03 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org
-In-Reply-To: <1b3a55134d4a9a39acab74b8566bf99864393efc.1759914262.git.asml.silence@gmail.com>
-References: <1b3a55134d4a9a39acab74b8566bf99864393efc.1759914262.git.asml.silence@gmail.com>
-Subject: Re: [PATCH 1/1] io_uring/zcrx: increment fallback loop src offset
-Message-Id: <175994472323.2061199.15519046555023509207.b4-ty@kernel.dk>
-Date: Wed, 08 Oct 2025 11:32:03 -0600
+	s=arc-20240116; t=1759947477; c=relaxed/simple;
+	bh=4aQzZE4dPKYLC7wE9e+3mYUgK3sZmtIL+KSSPfosfqc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AUHMQXV9xvk6mUqbADeS7rK+R0U40X8mcBP4NNIsZXJqpJM9Xp7TCHDvflWY1grGYqSVLNZ49QlOzvg0r9ni2uKHlT0oYKR7LEsmAzUdCbnLGbPOJ8WL0CVats7crbnZEdbG2cxIL8Y/61n+p87UQGhxOb9AD/iLiIw7Xb6f/yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GUt9NBVm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F88AC4CEE7;
+	Wed,  8 Oct 2025 18:17:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759947476;
+	bh=4aQzZE4dPKYLC7wE9e+3mYUgK3sZmtIL+KSSPfosfqc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GUt9NBVmokoT4ZHWQS2ZfEzYW9YwNbuP1F8iFd9oXTaOge9DACR/POTm/b7hf7nTE
+	 D8NeRBhkov7umkM+ojr4jlvj5K5NMZ2jC1tTJUGLS6APxkkFjdJrvD7R6eSz26xPUy
+	 OSwziBUZXFcoLJIyC7ffGhxPeJm0XRHHnUjtVHB2pV6MDugaF3Z02jU9/fquKH+XES
+	 kVm4CQhouvOLTs6je5l1/iKeXfqH8aPwKl0DVwfP31DtHo0R9u6V1KARZi1qBLlIF1
+	 rFkJuO/nZENaLaTWVGNKuJoCf9QYxinbpR1Hu84vXb8otD+PMj4mbhMRdPZE1mFAUJ
+	 vyv2kaNgm3NEg==
+Date: Wed, 8 Oct 2025 08:17:55 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Matyas Hurtik <matyas.hurtik@cdn77.com>
+Cc: Daniel Sedlak <daniel.sedlak@cdn77.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org,
+	netdev@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Subject: Re: [PATCH v5] memcg: expose socket memory pressure in a cgroup
+Message-ID: <aOaq07jS60mHYGBe@slm.duckdns.org>
+References: <20251007125056.115379-1-daniel.sedlak@cdn77.com>
+ <aOVxrwQ8MHbaRk6J@slm.duckdns.org>
+ <6cbf24f6-bd05-45d0-9bc8-5369f3708d02@cdn77.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6cbf24f6-bd05-45d0-9bc8-5369f3708d02@cdn77.com>
 
-
-On Wed, 08 Oct 2025 13:39:01 +0100, Pavel Begunkov wrote:
-> Don't forget to adjust the source offset in io_copy_page(), otherwise
-> it'll be copying into the same location in some cases for highmem
-> setups.
+On Wed, Oct 08, 2025 at 02:46:23PM +0200, Matyas Hurtik wrote:
+> Hello,
+> > I'm not against going 1) but let's not do a separate file for this. Can't
+> > you do memory.stat.local?
 > 
+> I can't find memory.stat.local, so should we create it and add the counter
+> as an entry there?
+
+Yes.
+
+> Regarding the code, is there anything you would like us to improve? I had to
+> rewrite it a bit
 > 
+> because of the recent changes.
 
-Applied, thanks!
+I think memcg guys will have much better idea on the actual code. Let's wait
+for them to chime in.
 
-[1/1] io_uring/zcrx: increment fallback loop src offset
-      commit: e9a9dcb4ccb32446165800a9d83058e95c4833d2
+Thanks.
 
-Best regards,
 -- 
-Jens Axboe
-
-
-
+tejun
 
