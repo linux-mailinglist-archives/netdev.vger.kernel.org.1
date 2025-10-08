@@ -1,88 +1,89 @@
-Return-Path: <netdev+bounces-228237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C02DBC56E1
-	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 16:27:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A048BC56EF
+	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 16:28:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 597413A69C6
-	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 14:27:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EACE3A703B
+	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 14:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C7B7287268;
-	Wed,  8 Oct 2025 14:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4177C28B407;
+	Wed,  8 Oct 2025 14:28:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GR1UvI8Q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3m6+fyJF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952861E489
-	for <netdev@vger.kernel.org>; Wed,  8 Oct 2025 14:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07282629D
+	for <netdev@vger.kernel.org>; Wed,  8 Oct 2025 14:28:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759933625; cv=none; b=HwHpx2Be7TTTlhfDsRrOkZ/JoD/A6gSO2C3/5kvMxYjKzDAsVYlgWYiIgpS8xvfkxhrjExRZGnBK2Akjdd5skoLso4JlKiT1LIwY2IsyYk5hTdxiiDAho92wgw4mTFGYC2Y6sNQ9fR7fJFItCJDwDasyyIx/vK6ESOEw+8E2fJk=
+	t=1759933699; cv=none; b=Fn5SGPpLk86TOt8ZnYnrKx0i1ykdIJ7dGn2oJ9y9qHC4jRtUS8tyZ18y/35HIEFrG06cis3OWJfdGT+NNrm6SKDUT72ByE7c1lcZ4w7DuDo7Ny1IgPloXB27EX56jZVGNlG/Nqn6TNrhsRw/UahLuno6Gm6YvHWj1DA2dYSalFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759933625; c=relaxed/simple;
-	bh=fJN1bBcYCvfkVWJ+ape/+AaILyURo7rI+Re3epMhWIo=;
+	s=arc-20240116; t=1759933699; c=relaxed/simple;
+	bh=7kuSwWgFm/nXKd11wGabd7rfOymGvPQuJ7XIwx9AlAM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nPoAXYN1tL2XhrNPOpxIYEj3CUWLNwykbDEkrPGD2huX8dcsNEHiD7lCPGxZlISsohf5552XDsLFtdjPyarM7HDSh+c7pAkom+iIC63Byyhy5Y3Ifd8JBezbGEQIuEk2ePhUJ060VWcr4RcE03i0ZwJ4eL6T28uA+mw2Zgeo6dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GR1UvI8Q; arc=none smtp.client-ip=209.85.160.170
+	 To:Cc:Content-Type; b=FQ65vjb9acwu4MQ/jCRgU9FgJeu/29GU/AbXzGCHvctKr+xgcpnkGW1PCa0+EWOcokRqR0aD8+BfcOiLKIoc4+J/rj2Afj+V58mBU3noyev2FGbwaoUPGjf3Q8vXfi/BUnJme2v2Cy4Vm9Ct0IKgKabOMYDcdxPq8cgk0fcu7pA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3m6+fyJF; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4df3fabe9c2so380891cf.1
-        for <netdev@vger.kernel.org>; Wed, 08 Oct 2025 07:27:03 -0700 (PDT)
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4e6ec0d1683so287591cf.0
+        for <netdev@vger.kernel.org>; Wed, 08 Oct 2025 07:28:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759933622; x=1760538422; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1759933696; x=1760538496; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3HtBKIShAmoXOkmskp+CQr6Z30m7aYa08KHDthGcujY=;
-        b=GR1UvI8QQEz4fCCaWR+tdi3BRu7qKBO8UQsLWRHMb2Ba65R2JlEMRHsmocJOdREq8s
-         1ZNpIm733UvC0YlECQDcbsXbR9uzQqLGPqws+5XCZKiizg6Dql/cK3tudp0DYVOFOcIt
-         Ee0SQaAyv4bicmwkF2zY+CatUupkDDtXs95TmZnFpv2klYuQlGNSpGZPVgyo6qb7rCwF
-         dTsB1/McW9rINwabmbTSk27jT/Uo8OkTkk2+5GOzvixdrgD2aloXkpl0lKnotOqzgBsq
-         PC8EljGO90j+SEKftkaLY4p+PIVTcQ7O08ODrLycvCc3X+BLYklXsWAFIHyDHrKwMgup
-         4W+g==
+        bh=7kuSwWgFm/nXKd11wGabd7rfOymGvPQuJ7XIwx9AlAM=;
+        b=3m6+fyJFZf4dzvlN7SCcdOgqF57c4Z7ryOhXO6/lwz06iOlbqe0MtWnh9gOjIJT+RX
+         4ZPoi7+FARCmqd+rfsKinXNbXtJ7auJH/CShSklnSOUCQXGgIgPYjsIeU64LcZOjx94M
+         yt41LH1Tf5j4aZxQjrzcNVTJ5cDTSkyOio4zK0cgPykw+/O/RoNX6XmkkgBQQCWsmTPE
+         jPhZ3hcofZgrmpmYvuh6lJt/dX14W1xaz2lqiV3eUzbwu8nga8VJjSYuVGEA4fYhgCmM
+         AfYrFlVvLm8uX/RbHlF96NgH7szH2Ya1k2YoHhi+N9C1f4DfME6eDYgcP6SdZhM4ShVs
+         sUrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759933622; x=1760538422;
+        d=1e100.net; s=20230601; t=1759933696; x=1760538496;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3HtBKIShAmoXOkmskp+CQr6Z30m7aYa08KHDthGcujY=;
-        b=KhCvD7evbQ96A+anQdEOhnyIpAlRJ3kArOEDGtVTyAfzZ8Bg2I1K2AaZynaC/obxa1
-         1Y/3UltAPtfrNhMPW/yJQ9rKNLErvsKDqW0ahWAgAfvzbyvfM0fQAdxQcKd3egC2mIC9
-         KFGYuyrxdaEdxaW9M32jv6UgWEfz2D9Ic1m0XYEAfYZsRJx8dypevA6Pt9FSsAH3B4/a
-         RfifZeBkgzxWkBYStonEhvGbUv0C7Sjv7yg6NIijyZKc3dHY6QziFLDnKP1vpn7BFn4M
-         FfkjM/CWvuix8nn7FiruroZMQT1dDW2FcKxVoKrFIOK3eKJBmDrObFAmnbpFmRa7fK8S
-         w6mQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUgBr1yDqqvXPWf61fx/iPIkqAjKKZ3f9XMGGD23jXNCq4ItVlloipgifs0YUSZGDWX8GaV9/c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGyGYJi5DU6aOlBIgoMJsVMZKv5Z/391+EnJzmXmR84E8/k9lB
-	KcpPmBCfzhnUBD0EM2TlczJUTUGNfudJcXdL6tRuE8dZrft8eSjaojUC816qdm9O8m61PICbFml
-	DV9lY4xY/WaelapRI23x6XQg0s2wztFKcuaH9WIWm
-X-Gm-Gg: ASbGnctgDWMm/tuzn18+f7UJCJQohzvENa7J/BuZI4FkgkHpn4DeXRer2pHYvoLepTQ
-	hc1D5Bc2c2AcxX+BjTS+qkSqlx9Oq6ZvzUjD4ebDx9kfkScpp4spPRuamVhqaM65rGKXvCucyKE
-	h79SxT82ai9vsAYPXSscFOALB0QdXGLG3f4yrkD7iKEiW+ag4vkJwa1ltpvnOHzXwshrxl0irWY
-	bTytqRMKNu3fUfAxL3afk3X9EVGAVtnCli48q8EaqEfqmErLkwiOQM5+Qn17LC4lyWuv8Sy7fSE
-	l1U=
-X-Google-Smtp-Source: AGHT+IFjuC52chesM6604EtzzdWEyYkgOJM5R44oiptFOVek1vIWXki4imho9oHNszU3I/buEh9hxEqk6bdzdi4VsAA=
-X-Received: by 2002:a05:622a:1111:b0:4b3:1617:e617 with SMTP id
- d75a77b69052e-4e6eabcef17mr7581171cf.11.1759933622007; Wed, 08 Oct 2025
- 07:27:02 -0700 (PDT)
+        bh=7kuSwWgFm/nXKd11wGabd7rfOymGvPQuJ7XIwx9AlAM=;
+        b=oat3hevR3efIEvKax25TWFtrk9IzGBeOi8EgTak+TKZGddfoSyZR7D2USSRiAOfYeF
+         w8tA9Vln3jMkcUfbRvbanh0IRZOmC21sRuJqr8gtxVSTwOu9W/194uU+HF+v8rE+TgJn
+         qvlPvSVc7I+ydVh/lOQntYpMkyQ3T3sHL7s8w+7FovQSkl95zhaqeOeYBF2pyi0KoLtv
+         bSemdnHo/RaErCkqeD54mKPVLoGvJT2K2pPSrqX9ai4fr8pDiHP+vao+lJcI2vqdObqi
+         ZIE5yPkxfh5J9/tjlnd6KJslZkDrJ5wgFzohvKtG1fiPy4bUNgLb0KKEU5WK4JqAjYNw
+         Kx4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX9rFgBe37MyS0joHgJjMVSTJxsk8o2j753cGxc4eqd7vaUTG9KFP24vYAj3V0S9wfLKHrQif4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0DxgtKaxSXuQtn3KgHoPOyOTH9pkW1RtvUJZXbgZDjSVAb/9n
+	N6radQvdI6FFId2h/gVd5KRz5Ct4hTyVzT9Ni2j77X/wuQkVYtwuSr80FWr4M/QYhS2s9V2HSvl
+	L/BPXYun85hUqHK1l41D0z1d6TF32amRQUr3X0ka8
+X-Gm-Gg: ASbGnct6HwzR4Mz5zfm1nXAdIf4Tzm8JPYive0y4u2dsz+4EAkjx6kmMgTxdCHo3Vxk
+	K4Dwl97kGZvzhH/7ayXTVjNH1Qf4OTv5M62Zape3VgYgJHJpjt88aOy9zJtTkzxLHCPcx8aF5in
+	UzHoraMMyGJqcl70M6ANncbQEjZevOR0e17yKMhdJ3dGFN27xnbJqQLyaJHgd4rNPo4C7QEel8f
+	WSgxGeT6rAKHM8saC7DrB/o6ymSef5eLZeSTEPrUtbPxCoC95kZHElmDqcm1lSvkrXo1ZZgASOj
+	X8o=
+X-Google-Smtp-Source: AGHT+IFUVZNPIK0AcOI8LDSsBATJuC4gcq/tKXcacLJQjfjjgvMc65YqHi2EyLJKbMbLw0NUZsm1TADkl0TzQ1/+nvU=
+X-Received: by 2002:a05:622a:344:b0:4b7:9b7a:1cfc with SMTP id
+ d75a77b69052e-4e6eabce6d2mr7590211cf.10.1759933695720; Wed, 08 Oct 2025
+ 07:28:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251008104612.1824200-1-edumazet@google.com> <20251008104612.1824200-3-edumazet@google.com>
-In-Reply-To: <20251008104612.1824200-3-edumazet@google.com>
+References: <20251008104612.1824200-1-edumazet@google.com> <20251008104612.1824200-4-edumazet@google.com>
+In-Reply-To: <20251008104612.1824200-4-edumazet@google.com>
 From: Neal Cardwell <ncardwell@google.com>
-Date: Wed, 8 Oct 2025 10:26:45 -0400
-X-Gm-Features: AS18NWCurPPd4PwXxy18x_ELEL1RR47a3eJsWW2eOayaImvCd_6geLIv-1IlS64
-Message-ID: <CADVnQymCD-zpw_kN3TUaWZ3afsJUZd5JazGA28s1+siQzpBkpw@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next 2/4] net: control skb->ooo_okay from skb_set_owner_w()
+Date: Wed, 8 Oct 2025 10:27:59 -0400
+X-Gm-Features: AS18NWC-3H_J3dkTMbZ6EFBue-JuYUbELZ4WLgT529e7Htmvjia3fEWbIB3XOUE
+Message-ID: <CADVnQymesd7iutFS7Dim9nCmByLn==6HSCMuKTkc4N26gD-3UA@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next 3/4] net: add /proc/sys/net/core/txq_reselection_ms
+ control
 To: Eric Dumazet <edumazet@google.com>
 Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
@@ -94,91 +95,13 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Oct 8, 2025 at 6:46=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
 rote:
 >
-> 15 years after Tom Herbert added skb->ooo_okay, only TCP transport
-> benefits from it.
+> Add a new sysctl to control how often a queue reselection
+> can happen even if a flow has a persistent queue of skbs
+> in a Qdisc or NIC queue.
 >
-> We can support other transports directly from skb_set_owner_w().
->
-> If no other TX packet for this socket is in a host queue (qdisc, NIC queu=
-e)
-> there is no risk of self-inflicted reordering, we can set skb->ooo_okay.
->
-> This allows netdev_pick_tx() to choose a TX queue based on XPS settings,
-> instead of reusing the queue chosen at the time the first packet was sent
-> for connected sockets.
->
-> Tested:
->   500 concurrent UDP_RR connected UDP flows, host with 32 TX queues, XPS =
-setup.
->
->   super_netperf 500 -t UDP_RR -H <host> -l 1000 -- -r 100,100 -Nn &
->
-> This patch saves between 10% and 20% of cycles, depending on how
-> process scheduler migrates threads among cpus.
->
-> Using following bpftrace script, we can see the effect on Qdisc/NIC tx qu=
-eues
-> being better used (less cache line misses).
->
-> bpftrace -e '
-> k:__dev_queue_xmit { @start[cpu] =3D nsecs; }
-> kr:__dev_queue_xmit {
->  if (@start[cpu]) {
->     $delay =3D nsecs - @start[cpu];
->     delete(@start[cpu]);
->     @__dev_queue_xmit_ns =3D hist($delay);
->  }
-> }
-> END { clear(@start); }'
->
-> Before:
-> @__dev_queue_xmit_ns:
-> [128, 256)             6 |                                               =
-     |
-> [256, 512)        116283 |                                               =
-     |
-> [512, 1K)        1888205 |@@@@@@@@@@@                                    =
-     |
-> [1K, 2K)         8106167 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@    |
-> [2K, 4K)         8699293 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@@@@@|
-> [4K, 8K)         2600676 |@@@@@@@@@@@@@@@                                =
-     |
-> [8K, 16K)         721688 |@@@@                                           =
-     |
-> [16K, 32K)        122995 |                                               =
-     |
-> [32K, 64K)         10639 |                                               =
-     |
-> [64K, 128K)          119 |                                               =
-     |
-> [128K, 256K)           1 |                                               =
-     |
->
-> After:
-> @__dev_queue_xmit_ns:
-> [128, 256)             3 |                                               =
-     |
-> [256, 512)        651112 |@@                                             =
-     |
-> [512, 1K)        8109938 |@@@@@@@@@@@@@@@@@@@@@@@@@@                     =
-     |
-> [1K, 2K)        16081031 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@@@@@|
-> [2K, 4K)         2411692 |@@@@@@@                                        =
-     |
-> [4K, 8K)           98994 |                                               =
-     |
-> [8K, 16K)           1536 |                                               =
-     |
-> [16K, 32K)           587 |                                               =
-     |
-> [32K, 64K)             2 |                                               =
-     |
+> This sysctl is used in the following patch.
 >
 > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
 
 Reviewed-by: Neal Cardwell <ncardwell@google.com>
 
