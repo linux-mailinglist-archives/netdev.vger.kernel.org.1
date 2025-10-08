@@ -1,121 +1,112 @@
-Return-Path: <netdev+bounces-228239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B42F6BC5721
-	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 16:37:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EDC1BC567D
+	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 16:14:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E9B93C7477
-	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 14:37:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F21F3B7B93
+	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 14:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECD8F2EBBA8;
-	Wed,  8 Oct 2025 14:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11A02298CA7;
+	Wed,  8 Oct 2025 14:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="PYiweDzo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L3FWpQ1C"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D562EB870;
-	Wed,  8 Oct 2025 14:37:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B8D2980C2
+	for <netdev@vger.kernel.org>; Wed,  8 Oct 2025 14:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759934256; cv=none; b=L6zYhCoxr4eTkJQgJWI3of7Lv2muCz6aKD2zFlhlYDDISEy/xwVt5NYc4zUOjN9MeStPffO2GEySAc1U41derYSkWBRRnYDAEHtLNLWxVdUUE4uv9BZ59vOHPwZPbca65/POh67Ia7PQTZmdr3KlmaRLkflO6j/WllwAd2HEyzM=
+	t=1759932875; cv=none; b=tgop+frDTDMUk/WxiaxrV+tDpIfsBxjkJt1jkx3Z8a9UCfVjnrHiI4vOTAFlWyJ+mRHjsEme5rji6RDO5hP6+cyERphVMSRgJc0tbOUIVyB21za5efGhwv5V6n/YIIB9yKRXJh2iPttPLO94/kVLj4GcN7MBj/IdjlbrS6PpR70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759934256; c=relaxed/simple;
-	bh=fM/soW1wxcm6ZUoUCSrXUsq1Ch641FejBxdWZ2T9VTY=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RP5mZRQ0fLWRtYpLvlvoEZKmvK4Iavn4+YMrZrjc5vxVkUUkBU5xDWFueylwAFXMqZ/JSK2h0FYtrzzlWsZfj4M/EgfS5Yq5AKsNxx8Gbc9aZ0ZSj+DjkRl7A6dgUqIJUfV6mFReX6AXyJI3OrdwxXH6FgVLfTEzTEEJ/imj6iM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=PYiweDzo; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1759934244; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=y8JH2A/X+FfSGLqk5PRkD3V44OnLqwLLX/lM69mSF2o=;
-	b=PYiweDzo0YOeOsiHJRq0QGRmJ9YqbxqcuL9iWNng1x09kPqvoXGqNwd4OkNnfukheFXOny3gBGe03TOO1dX55vQ9oua8uirGGE34OHhIw/OjYMnzoFT13PRP7a/CLvBK7yUsU2ZKhQXe7p97lzCkAv5TQiosJyA8Wn9kZ4rGzA0=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WpfC3B0_1759932368 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 08 Oct 2025 22:06:08 +0800
-Date: Wed, 8 Oct 2025 22:06:08 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Guangguan Wang <guangguan.wang@linux.alibaba.com>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org
-Subject: Re: [PATCH net-next v5 2/2] net/smc: handle -ENOMEM from
- smc_wr_alloc_link_mem gracefully
-Message-ID: <aOZv0NmekKIgpc5M@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20250929000001.1752206-1-pasic@linux.ibm.com>
- <20250929000001.1752206-3-pasic@linux.ibm.com>
- <aNnl_CfV0EvIujK0@linux.alibaba.com>
- <de0baa92-417c-475a-a342-9041f8fb5b8e@linux.ibm.com>
+	s=arc-20240116; t=1759932875; c=relaxed/simple;
+	bh=kmEWOb1DQ6PU7j7I3ZDzT0cpIA0LPrVczuwNMhA7vm4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YvoVUgA9YT30DU4ghswc8DSYQ0mfk8lNQZPTNg8Tu1Wpg/hztLbtXAhc+tR4PTLvLzQK+lVk3+LOMkp1I5ePZ0sTnwWHp/VN/0FmqsMMjDwQi/08atGE97HnRPGT2ePSu8AHRcMfkUiZaYcPDKmshAn8fZcuUpO/q1E5ryXpxY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L3FWpQ1C; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759932872;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oYh8HFnLFM2OC3MSbODq350hBosxnk0XuD1fw/F+QdM=;
+	b=L3FWpQ1ChoIlSKhiEFg212goQvH4foVDC0k20Jmix2horm6I3yXpvaiY8ol9il5X4rbqtG
+	+nSKkVXqPtZgDtUxxs3wqs/AYZeEWE5m/jFi34kk9ST7W9TGxGxkGJ98zP3maT1T3vocdE
+	PMZH5bxelBhLkND2lSX29LIRFbFRuM8=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-616-QPzE80SSOvOGMdK5hiKT8Q-1; Wed,
+ 08 Oct 2025 10:14:25 -0400
+X-MC-Unique: QPzE80SSOvOGMdK5hiKT8Q-1
+X-Mimecast-MFC-AGG-ID: QPzE80SSOvOGMdK5hiKT8Q_1759932863
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1ABFC18004D4;
+	Wed,  8 Oct 2025 14:14:23 +0000 (UTC)
+Received: from p16v.luc.cera.cz (unknown [10.44.32.116])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0E6C5180035E;
+	Wed,  8 Oct 2025 14:14:19 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net] dpll: zl3073x: Increase maximum size of flash utility
+Date: Wed,  8 Oct 2025 16:14:18 +0200
+Message-ID: <20251008141418.841053-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <de0baa92-417c-475a-a342-9041f8fb5b8e@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 2025-10-06 11:25:22, Mahanta Jambigi wrote:
->On 29/09/25 7:20 am, Dust Li wrote:
->>> diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
->>> index 8d06c8bb14e9..5c18f08a4c8a 100644
->>> --- a/net/smc/smc_core.h
->>> +++ b/net/smc/smc_core.h
->>> @@ -175,6 +175,8 @@ struct smc_link {
->>> 	struct completion	llc_testlink_resp; /* wait for rx of testlink */
->>> 	int			llc_testlink_time; /* testlink interval */
->>> 	atomic_t		conn_cnt; /* connections on this link */
->>> +	u16			max_send_wr;
->>> +	u16			max_recv_wr;
->> 
->> Here, you've moved max_send_wr/max_recv_wr from the link group to individual links.
->> This means we can now have different max_send_wr/max_recv_wr values on two
->> different links within the same link group.
->> Since in Alibaba we doesn't use multi-link configurations, we haven't tested
->
->Does Alibaba always use a single RoCE device for SMC-R? In that case how
->redundancy is achieved if that link goes down?
+Newer firmware bundles contain a flash utility whose size exceeds
+the currently allowed limit. Increase the maximum allowed size
+to accommodate the newer utility version.
 
-We expose a virtual RDMA device to our client inside their virtual
-machine. The underlying network is already redundant, so it’s got
-built-in reliability. You can think of it kind of like virtio-net, but
-instead of a regular virtual NIC, it’s an RDMA device.
+Without this patch:
+ # devlink dev flash i2c/1-0070 file fw_nosplit_v3.hex
+ Failed to load firmware
+ Flashing failed
+ Error: zl3073x: FW load failed: [utility] component is too big (11000 bytes)
 
->
->> this scenario. Have you tested the link-down handling process in a multi-link
->> setup?
->I did test this after you query & don't see any issues. As Halil
->mentioned in worst case scenario one link might perform lesser than the
->other, that too if the kcalloc() failed for that link in
->smc_wr_alloc_link_mem() & succeeded in subsequent request with reduced
->max_send_wr/max_recv_wr size(half).
+Fixes: ca017409da694 ("dpll: zl3073x: Add firmware loading functionality")
+Suggested-by: Prathosh Satish <Prathosh.Satish@microchip.com>
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ drivers/dpll/zl3073x/fw.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Great! You can add my
+diff --git a/drivers/dpll/zl3073x/fw.c b/drivers/dpll/zl3073x/fw.c
+index d5418ff74886..def37fe8d9b0 100644
+--- a/drivers/dpll/zl3073x/fw.c
++++ b/drivers/dpll/zl3073x/fw.c
+@@ -37,7 +37,7 @@ struct zl3073x_fw_component_info {
+ static const struct zl3073x_fw_component_info component_info[] = {
+ 	[ZL_FW_COMPONENT_UTIL] = {
+ 		.name		= "utility",
+-		.max_size	= 0x2300,
++		.max_size	= 0x4000,
+ 		.load_addr	= 0x20000000,
+ 		.flash_type	= ZL3073X_FLASH_TYPE_NONE,
+ 	},
+-- 
+2.49.1
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-
->> Otherwise, the patch looks good to me.
->> 
->> Best regards,
->> Dust
 
