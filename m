@@ -1,101 +1,80 @@
-Return-Path: <netdev+bounces-228279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1B7FBC643B
-	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 20:18:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEA2DBC64D7
+	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 20:32:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEFE6189EDE2
-	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 18:18:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67FA4406507
+	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 18:32:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3300F2BE64F;
-	Wed,  8 Oct 2025 18:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42CF22C0F7A;
+	Wed,  8 Oct 2025 18:32:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GUt9NBVm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jgHrqYTW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD2D2BDC32;
-	Wed,  8 Oct 2025 18:17:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF40F20370B;
+	Wed,  8 Oct 2025 18:32:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759947477; cv=none; b=JaVB2tzkzYnlJt2b+3FNPmNK5UaPKhEuBJ2/eb7F8TKsSDOk7Z1RMpp+ScpQWn0YYCCNr8lMogTBhIwMWFglaNg5V4czHEmNV1FOXs+UdOtcUWSyo+3q/vrA+sTXJbKWjRSMwXlwTdEz0P74Sm8nl+yhnIXv+F6Mr/Yvmz9c8R8=
+	t=1759948370; cv=none; b=d+9eXdMUpV4GoHxqg+NDrdBwf/z1JdgIiSXsW6MXMdIT+459448svCVFBb3Ito5lKt4vdyyoKyabkaIZBCsMDCHgwBkvidXQceZhxpjDoaMH5t+FKjIgkkbuWLF/dSRrwjUWEpuQPqxo/0WakCmNULhYwNLTiSIMCEV4bKojW0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759947477; c=relaxed/simple;
-	bh=4aQzZE4dPKYLC7wE9e+3mYUgK3sZmtIL+KSSPfosfqc=;
+	s=arc-20240116; t=1759948370; c=relaxed/simple;
+	bh=sTWPKF9alo+tvVGt9lUYHopgwmcpVLiijGjofW7+p8U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AUHMQXV9xvk6mUqbADeS7rK+R0U40X8mcBP4NNIsZXJqpJM9Xp7TCHDvflWY1grGYqSVLNZ49QlOzvg0r9ni2uKHlT0oYKR7LEsmAzUdCbnLGbPOJ8WL0CVats7crbnZEdbG2cxIL8Y/61n+p87UQGhxOb9AD/iLiIw7Xb6f/yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GUt9NBVm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F88AC4CEE7;
-	Wed,  8 Oct 2025 18:17:56 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=kI3ly+FfVg1Wlt/uGPe+lOk84BDSZ1LbWhRhDg4Fq26cr4RpNk6h2h6yNrdjrSO/EUDzqGZQPNWmrRVr/OjMzif675oB2OuzdoznQLxNT3ug1o0rQnE81N9bqhjxVNmMF0WUJ0OUkdbURVqYluTh7KrG7fQMJxBl4oCCV5+/ZoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jgHrqYTW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E115EC4CEE7;
+	Wed,  8 Oct 2025 18:32:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759947476;
-	bh=4aQzZE4dPKYLC7wE9e+3mYUgK3sZmtIL+KSSPfosfqc=;
+	s=k20201202; t=1759948370;
+	bh=sTWPKF9alo+tvVGt9lUYHopgwmcpVLiijGjofW7+p8U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GUt9NBVmokoT4ZHWQS2ZfEzYW9YwNbuP1F8iFd9oXTaOge9DACR/POTm/b7hf7nTE
-	 D8NeRBhkov7umkM+ojr4jlvj5K5NMZ2jC1tTJUGLS6APxkkFjdJrvD7R6eSz26xPUy
-	 OSwziBUZXFcoLJIyC7ffGhxPeJm0XRHHnUjtVHB2pV6MDugaF3Z02jU9/fquKH+XES
-	 kVm4CQhouvOLTs6je5l1/iKeXfqH8aPwKl0DVwfP31DtHo0R9u6V1KARZi1qBLlIF1
-	 rFkJuO/nZENaLaTWVGNKuJoCf9QYxinbpR1Hu84vXb8otD+PMj4mbhMRdPZE1mFAUJ
-	 vyv2kaNgm3NEg==
-Date: Wed, 8 Oct 2025 08:17:55 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Matyas Hurtik <matyas.hurtik@cdn77.com>
-Cc: Daniel Sedlak <daniel.sedlak@cdn77.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org,
-	netdev@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-Subject: Re: [PATCH v5] memcg: expose socket memory pressure in a cgroup
-Message-ID: <aOaq07jS60mHYGBe@slm.duckdns.org>
-References: <20251007125056.115379-1-daniel.sedlak@cdn77.com>
- <aOVxrwQ8MHbaRk6J@slm.duckdns.org>
- <6cbf24f6-bd05-45d0-9bc8-5369f3708d02@cdn77.com>
+	b=jgHrqYTWruq2gYgNiUWZXVxjyqW0UNbYqrh1kSicJUgIauEApt5VGgztdcNqL0gix
+	 zUS13Ee4+DbwdCKH1mwpvN5FQTnhOdmKnsdg7FBimtCN06BmffyAXcl54GtYhE7opS
+	 lLlCIPTNuHezutgpR7NREuYuTA6zdRbuSFzWXV/RiVYQuxLk/q1VdV1IZ5L53/lVHR
+	 GnSz+dRS8ebl3tYwGX9lfcbCk/18HGcAKci3L07jiUsh6CSbaBFi/zb3Tbxoo3CMRH
+	 1AyEcYKiYYtLKHyqQhr5IExVwAAGfs/3Xq1Zdp01E4H2tj6ym/BpC7CsxYPD/g+y78
+	 fgX/0fH5APJLA==
+Date: Wed, 8 Oct 2025 19:32:45 +0100
+From: Simon Horman <horms@kernel.org>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	shuah@kernel.org, willemb@google.com, daniel.zahka@gmail.com,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] selftests: drv-net: update remaining Python init
+ files
+Message-ID: <20251008183245.GS3060232@horms.kernel.org>
+References: <20251008162503.1403966-1-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6cbf24f6-bd05-45d0-9bc8-5369f3708d02@cdn77.com>
+In-Reply-To: <20251008162503.1403966-1-sdf@fomichev.me>
 
-On Wed, Oct 08, 2025 at 02:46:23PM +0200, Matyas Hurtik wrote:
-> Hello,
-> > I'm not against going 1) but let's not do a separate file for this. Can't
-> > you do memory.stat.local?
+On Wed, Oct 08, 2025 at 09:25:03AM -0700, Stanislav Fomichev wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
 > 
-> I can't find memory.stat.local, so should we create it and add the counter
-> as an entry there?
-
-Yes.
-
-> Regarding the code, is there anything you would like us to improve? I had to
-> rewrite it a bit
+> Convert remaining __init__ files similar to what we did in
+> commit b615879dbfea ("selftests: drv-net: make linters happy with our imports")
 > 
-> because of the recent changes.
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-I think memcg guys will have much better idea on the actual code. Let's wait
-for them to chime in.
+Hi Stan,
 
-Thanks.
+Sorry to be the bearer of such news.
+But your SoB line needs to go here as you posted the patch.
 
 -- 
-tejun
+pw-bot: changes-requested
 
