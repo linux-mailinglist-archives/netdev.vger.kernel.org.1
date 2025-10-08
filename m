@@ -1,120 +1,151 @@
-Return-Path: <netdev+bounces-228249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C36FEBC590D
-	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 17:26:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05A4FBC591F
+	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 17:29:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF3751883B46
-	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 15:26:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6B2819E25E3
+	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 15:29:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 995B22F25F3;
-	Wed,  8 Oct 2025 15:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BFAC2F362F;
+	Wed,  8 Oct 2025 15:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3kgxx6g9"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="r9t73sjk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106C763CB
-	for <netdev@vger.kernel.org>; Wed,  8 Oct 2025 15:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67612EBBA8;
+	Wed,  8 Oct 2025 15:29:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759937164; cv=none; b=itc7mWH7P6E3fsPUspc8HS3o2CD4AGdgqaJyYtSafHR0D+dJ6lA7kfxWMz03CeUkYG64KM7xoomD7c2PF9KFWbjgl1nqb2VxryqY2kg2OV/qLjMVLiFKHoDn5X+PyHpZ4uAQQXfwESxZNFRS74rZUnG7xwhWvPllihoH8T2jI44=
+	t=1759937350; cv=none; b=EnYrr7OBidEmrET/1mGhzX8GOERKQ+4tsqv38lJaBbgLbfhBlZObFAmB8iLIVse11bgwAZCBf63i01K/sKy+aT561UDKA4az/bkx6VdquGmPwP69EK13u5A8c1+Aij9SdFKeG1gXFtw13KZ7vmBMNhDA3fRJUUHD3bZzVd3QeHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759937164; c=relaxed/simple;
-	bh=SQBWCpBgLP+/RvcD/6595vd6vOu25M0AzpXvCuHDuxI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=goKjHedmPupXDa2ged0i7jdvqxDAzeI5pLjx+uu0uGvy7W1dOc3uSQx33FAmhiFzKavIRFxn8s2s3yuluPUR02MFczQsno2y54jMig1GWB+Akzkz+ocNqy8+WMLQRGRhTLucqJZy2BZNl5BSVC3gb5YtxAUmHsX/Lws8g+tXWq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3kgxx6g9; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4df2911ac5aso46470101cf.2
-        for <netdev@vger.kernel.org>; Wed, 08 Oct 2025 08:26:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759937162; x=1760541962; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0oafv7DqO3zrhFHK+mNWUe5ZhHeH5fLsITg/MHv/n/w=;
-        b=3kgxx6g9eH5YXvkACQKD27ixEL57UC23HGgGJQBdC8C57/SIjkqAu/ZSw9JXgMVu2Z
-         0cgZAzUBDal8Q/RMvPEgfrlev3qC51wraLtgeZHWAgJ6bJJZRFeI5HmOmJAW9GfSmQHD
-         VdbgLY/FffFU7mLL39YcnfQIBdG144RlqYp5to2LBZ043yf46veOZk6Fu+tgEyqw4OE+
-         kNKj/yQj4gjrt4z3IySvgyaoufwfW+8gUNcuJ6yznQChbE0j3KFuxjdJnzdiNthYL7kS
-         9RIwszFQvs3lo5Sq7ztLmjxlLUH5v/UTOw0F45oTbDSAXFmeqysIVlIFtoSg5PPqbNlx
-         rL3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759937162; x=1760541962;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0oafv7DqO3zrhFHK+mNWUe5ZhHeH5fLsITg/MHv/n/w=;
-        b=Jgr7ARLqNUo+jJveJpHJdBGXbLJmJXm/koOXElrphCCCCiP0c7KS7u20WoBgnjAowq
-         gJLeaZyukacvDf1UmeaIpIILde0v8RXSlvF9T3LwGvxole+ySH1pOgvuMh9tAHnuXIfg
-         GLi/TykG7wQSOfxTQQgOvVjV3seD6LeRYI3AOZ5zoLEkTcD2c7Vohm2emYODIVm8jPoM
-         X7Lx3Uo2dgm1XcmQKkP05N0CQaoSy23K0i/UBs2D7ibSSJCjCwKmURlp/9hR2qx3nY4c
-         fKZ/V6lDTF1lokWoLIsgKWZ1mIuTy9MJdPHLbd08wd5Stwnd7VPkpE632+0+52E5LaWo
-         EGpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWedgCuc7SVaDUOiT1WSn65+r2kZk2/wamtworQK4a8BTZW+LLxPaFZYceUZ/ClkpiIwQ7A+Tg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFGQ8me/fKZB4QJkK5OvuZKskeCzPBqhErE1+jzdrc05wDsgp7
-	W3sTKgpONXtq6WpnozXwQblMDyYPkp+tGhNZCzmRgUNJuL+x7uW2vAvzcikQSCZ7lgAO41Ruwhh
-	UGnb2K0xi/f4XP6/8uneraLSPm8BXsLdCbZmbnPSS
-X-Gm-Gg: ASbGncsIkvf7UNvY+Pg7584RLu/DniaNutcb5+jY8NXvdo4MkwRa6ZIbklbo3MFdoX0
-	hq1+uJyrdS4rD2cgMIXqXsddtZR/7LoKsZzFc9QVXwhCK1mdo7OQacMCEikGuKefCm/QVA47FPM
-	ZiurqKMiJ8mmI9PwPeUICnOg5Ii9ScstlvPcA4VKQZ6gf+kX28MZ9j455wlQR68ER7KYmMZ9mxq
-	OMEvP6C0cJO9pzwhCNfC+A4mS3Sut6lBuNUx0RKnqeDUOZ8jcx9tHWqEPbz0t5MkkJfDj1H
-X-Google-Smtp-Source: AGHT+IHiJeavenOBUq9hxU9x3viwbIhix9jT08DZt301Re8DewR+XYd2ofUpZrOj9cfSMoSCikqwuOhZeMDSNVkU/44=
-X-Received: by 2002:a05:622a:4243:b0:4b7:aff5:e8c2 with SMTP id
- d75a77b69052e-4e6ead657c4mr54597061cf.58.1759937161230; Wed, 08 Oct 2025
- 08:26:01 -0700 (PDT)
+	s=arc-20240116; t=1759937350; c=relaxed/simple;
+	bh=KD9mrhpm/9jxD+xvxfZWyyz/ZbfaFLVcFqSwAfyai84=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rn4F5xJcb/OZIZJxlq3ZjaPoXN8gwuebzMYatv+yH9eY+bpRP/dX25pEWk5Dwyqkw1xO9WOrEKHBnkrQT4Mn5hTdH/QE9jq2xHtJUypo1ZwFSxvKj12AeCdPs7dDZjZGwySNN6QMOj0yVZ+C/lL6qu5wqvlhkRH5Wsot3Wv6aSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=r9t73sjk; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [10.18.189.204] (unknown [167.220.238.76])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 178662038B68;
+	Wed,  8 Oct 2025 08:29:00 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 178662038B68
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1759937346;
+	bh=ZGkSKYPpStoCJnmnJ2C0D3KKEdglbi6pFFfgtydhTrw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=r9t73sjkyMgLL0RbNZ+lHPJGmo3+icT6T9iO6EA6FKYxbm92zixnLM9/dv4ZgziXE
+	 R7M5aPlxGSc8G57R0aeWTezPsijgYU6Q72JmQsmKvf7OjPLUzkJFFKdT6uc7LCvhMk
+	 ofrf6jPKPnAkRJg/npsByOOa0klk3fRwnYKvEWoM=
+Message-ID: <7bc327ba-0050-4d9e-86b6-1b7427a96f53@linux.microsoft.com>
+Date: Wed, 8 Oct 2025 20:58:58 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251008104612.1824200-1-edumazet@google.com> <20251008104612.1824200-4-edumazet@google.com>
- <3272d2ee-dd62-4f0d-82cc-f50eb1106fcb@redhat.com>
-In-Reply-To: <3272d2ee-dd62-4f0d-82cc-f50eb1106fcb@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 8 Oct 2025 08:25:49 -0700
-X-Gm-Features: AS18NWA20nlh63XU-ZC7DrAIZ21xtgdBv9g0bt-T00o5n5yHyr1ArMH5CydF0GU
-Message-ID: <CANn89iJT+BUfY9QCh60zZEst0tM5jq9BxyfPcq8bbkOm64H90Q@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next 3/4] net: add /proc/sys/net/core/txq_reselection_ms
- control
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: mana: Linearize SKB if TX SGEs exceeds
+ hardware limit
+To: Eric Dumazet <edumazet@google.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+ kotaranov@microsoft.com, horms@kernel.org, shradhagupta@linux.microsoft.com,
+ ernis@linux.microsoft.com, dipayanroy@linux.microsoft.com,
+ shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, gargaditya@microsoft.com,
+ ssengar@linux.microsoft.com
+References: <20251003154724.GA15670@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <CANn89iJwkbxC5HvSKmk807K-3HY+YR1kt-LhcYwnoFLAaeVVow@mail.gmail.com>
+ <9d886861-2e1f-4ea8-9f2c-604243bd751b@linux.microsoft.com>
+ <CANn89iKwHWdUaeAsdSuZUXG-W8XwyM2oppQL9spKkex0p9-Azw@mail.gmail.com>
+Content-Language: en-US
+From: Aditya Garg <gargaditya@linux.microsoft.com>
+In-Reply-To: <CANn89iKwHWdUaeAsdSuZUXG-W8XwyM2oppQL9spKkex0p9-Azw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 8, 2025 at 8:21=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 10/8/25 12:46 PM, Eric Dumazet wrote:
-> > @@ -667,6 +667,13 @@ static struct ctl_table netns_core_table[] =3D {
-> >               .extra2         =3D SYSCTL_ONE,
-> >               .proc_handler   =3D proc_dou8vec_minmax,
-> >       },
-> > +     {
-> > +             .procname       =3D "txq_reselection_ms",
-> > +             .data           =3D &init_net.core.sysctl_txq_reselection=
-,
-> > +             .maxlen         =3D sizeof(int),
-> > +             .mode           =3D 0644,
-> > +             .proc_handler   =3D proc_dointvec_ms_jiffies,
->
-> Do we need a min value to avoid syzbot or some users tripping on bad valu=
-es?
+On 08-10-2025 20:51, Eric Dumazet wrote:
+> On Wed, Oct 8, 2025 at 8:16 AM Aditya Garg
+> <gargaditya@linux.microsoft.com> wrote:
+>>
+>> On 03-10-2025 21:45, Eric Dumazet wrote:
+>>> On Fri, Oct 3, 2025 at 8:47 AM Aditya Garg
+>>> <gargaditya@linux.microsoft.com> wrote:
+>>>>
+>>>> The MANA hardware supports a maximum of 30 scatter-gather entries (SGEs)
+>>>> per TX WQE. In rare configurations where MAX_SKB_FRAGS + 2 exceeds this
+>>>> limit, the driver drops the skb. Add a check in mana_start_xmit() to
+>>>> detect such cases and linearize the SKB before transmission.
+>>>>
+>>>> Return NETDEV_TX_BUSY only for -ENOSPC from mana_gd_post_work_request(),
+>>>> send other errors to free_sgl_ptr to free resources and record the tx
+>>>> drop.
+>>>>
+>>>> Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
+>>>> Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+>>>> ---
+>>>>    drivers/net/ethernet/microsoft/mana/mana_en.c | 26 +++++++++++++++----
+>>>>    include/net/mana/gdma.h                       |  8 +++++-
+>>>>    include/net/mana/mana.h                       |  1 +
+>>>>    3 files changed, 29 insertions(+), 6 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+>>>> index f4fc86f20213..22605753ca84 100644
+>>>> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+>>>> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+>>>> @@ -20,6 +20,7 @@
+>>>>
+>>>>    #include <net/mana/mana.h>
+>>>>    #include <net/mana/mana_auxiliary.h>
+>>>> +#include <linux/skbuff.h>
+>>>>
+>>>>    static DEFINE_IDA(mana_adev_ida);
+>>>>
+>>>> @@ -289,6 +290,19 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+>>>>           cq = &apc->tx_qp[txq_idx].tx_cq;
+>>>>           tx_stats = &txq->stats;
+>>>>
+>>>> +       BUILD_BUG_ON(MAX_TX_WQE_SGL_ENTRIES != MANA_MAX_TX_WQE_SGL_ENTRIES);
+>>>> +       #if (MAX_SKB_FRAGS + 2 > MANA_MAX_TX_WQE_SGL_ENTRIES)
+>>>> +               if (skb_shinfo(skb)->nr_frags + 2 > MANA_MAX_TX_WQE_SGL_ENTRIES) {
+>>>> +                       netdev_info_once(ndev,
+>>>> +                                        "nr_frags %d exceeds max supported sge limit. Attempting skb_linearize\n",
+>>>> +                                        skb_shinfo(skb)->nr_frags);
+>>>> +                       if (skb_linearize(skb)) {
+>>>
+>>> This will fail in many cases.
+>>>
+>>> This sort of check is better done in ndo_features_check()
+>>>
+>>> Most probably this would occur for GSO packets, so can ask a software
+>>> segmentation
+>>> to avoid this big and risky kmalloc() by all means.
+>>>
+>>> Look at idpf_features_check()  which has something similar.
+>>
+>> Hi Eric,
+>> Thank you for your review. I understand your concerns regarding the use
+>> of skb_linearize() in the xmit path, as it can fail under memory
+>> pressure and introduces additional overhead in the transmit path. Based
+>> on your input, I will work on a v2 that will move the SGE limit check to
+>> the ndo_features_check() path and for GSO skbs exceding the hw limit
+>> will disable the NETIF_F_GSO_MASK to enforce software segmentation in
+>> kernel before the call to xmit.
+>> Also for non GSO skb exceeding the SGE hw limit should we go for using
+>> skb_linearize only then or would you suggest some other approach here?
+> 
+> I think that for non GSO, the linearization attempt is fine.
+> 
+> Note that this is extremely unlikely for non malicious users,
+> and MTU being usually small (9K or less),
+> the allocation will be much smaller than a GSO packet.
 
-I was thinking about accepting all values. I do not think syzbot would
-find any issue here,
-even on a 32bit host.
-
-0 could be the value to disable the feature, instead of
-
-echo 2147483647 >/proc/sys/net/core/txq_reselection_ms
+Okay. Will send a v2
 
