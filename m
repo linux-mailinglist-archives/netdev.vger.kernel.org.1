@@ -1,152 +1,159 @@
-Return-Path: <netdev+bounces-228206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D7CDBC4AA7
-	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 14:00:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E7E3FBC4C48
+	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 14:28:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0B853A86C8
-	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 12:00:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A43353C0E77
+	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 12:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E242246BA9;
-	Wed,  8 Oct 2025 12:00:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABDF123C4FF;
+	Wed,  8 Oct 2025 12:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mez3PiSk"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wismer.xyz header.i=@wismer.xyz header.b="k/nuk2hb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from out4.tophost.ch (out4.tophost.ch [46.232.182.213])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DDE2F3C38
-	for <netdev@vger.kernel.org>; Wed,  8 Oct 2025 12:00:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473FB21B9C0;
+	Wed,  8 Oct 2025 12:28:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.232.182.213
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759924812; cv=none; b=T7uvoUKT1FX+XWSOo2FMtMIsj3qJm6IcMo+e3QHkRz0898burI3qyMATo1FpGXw4kBjNIUqM2UVTVMOB3Z+r8j/LiQ33yxxK+GDHyJCxd/rZbIHYIET0EsCJMhv7sAnO+DRb440wsQWUNvGq5QhJe42AzQ6GVGZIgm4ZYvhTgwA=
+	t=1759926511; cv=none; b=Y9H0RaQVK8z/4H1TzDaRwoIOB/M0uA1GSqvKkxjCvKiMw1UsCBhP8C7jclwsf1OYkB3qt/1nz8ti8uwcBCrSzCFoFTgT+xAUVQXIg1qQi1OejfVHnqkmLGZHU3nWijBk3bpbg1sisy/C5CO3CDc/mxnt6K7ve0Te5N2E8a6eQHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759924812; c=relaxed/simple;
-	bh=XGOe8jWd4nVrbi8ZdLlMxwTp5ZPj5CcYqRnLiotT1vI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZNMHZfRqWaPvse8ZyaorKF65h2EnRjntGa/ruNjPsI2u+1oH9Y0rKR7O8OVucZadX5HVJTBuxXezZmi3gquDFL2Gz+T5UZp+fjhtHmvBPxg/qS67TZWtLvgNtmdkbOZNjPF3TBKX4h28YpNgFZwjFS+qF4I150Y1jCXl9nG28Jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mez3PiSk; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759924810; x=1791460810;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=XGOe8jWd4nVrbi8ZdLlMxwTp5ZPj5CcYqRnLiotT1vI=;
-  b=Mez3PiSkWjl4p27TKlTHKa886Xkp6yN52pv/Jm4TLXiXtjGNkweKASFp
-   oFSywbfRnDUBaSqhOSays5jUoxotNEy+OK4MmlUuQNFsXgKyheH0NKpw1
-   9/UsaB7jHbMB7H3NDzXhPj8IapmLTlocamWq6mRc8319+9XgkJJxHCZcD
-   OOd6OLik40ZZwIS9uCCJPUvgxzz7CwqD+nu/4xaSK4QmQpOoqwviS2p30
-   BG0D/V57TAq5Lx2dT/rkbZMCE1J6cMS3BFAvxDgbbVEeYMPlEaHOyrsfy
-   VrIGlKwfoE4TXkBXyIc00h39FbVrjBZXmNOcEAygxbA1acjQf80LVHcid
-   A==;
-X-CSE-ConnectionGUID: 6oQehOrIScWqtnOp7SMkUQ==
-X-CSE-MsgGUID: TRPrMd/7SCieTNsGKRr0sw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11575"; a="73541158"
-X-IronPort-AV: E=Sophos;i="6.19,323,1754982000"; 
-   d="scan'208";a="73541158"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2025 05:00:06 -0700
-X-CSE-ConnectionGUID: qlmCwMTjQZKyzrMO7KmdDQ==
-X-CSE-MsgGUID: BZJmvj+ZRPKr6FtJHShHNQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,323,1754982000"; 
-   d="scan'208";a="180090586"
-Received: from gklab-003-001.igk.intel.com ([10.91.173.48])
-  by fmviesa007.fm.intel.com with ESMTP; 08 Oct 2025 05:00:04 -0700
-From: Grzegorz Nitka <grzegorz.nitka@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-net] ice: fix PTP cleanup on driver removal in error path
-Date: Wed,  8 Oct 2025 13:58:11 +0200
-Message-Id: <20251008115811.1578695-1-grzegorz.nitka@intel.com>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1759926511; c=relaxed/simple;
+	bh=bJZwQB0eD/a80IPP/m1ic8+FM4WfH8rPsVolRrikLtE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SIhR5MXafh2USq3PLWEH97X7bTbo4CMbf+FBFpJzVaLAtXh37JdbYrXavy0QJkTUKUfKw/LM/TQAs6QnQwxg6m/ngVbC112kRNexUPlyq0N7HL9FdFQji58hjbJdtJmLNxM+5jbD2TZUluGpudpSeA/GLsHxD/aR95c/FPu6PyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wismer.xyz; spf=pass smtp.mailfrom=wismer.xyz; dkim=pass (2048-bit key) header.d=wismer.xyz header.i=@wismer.xyz header.b=k/nuk2hb; arc=none smtp.client-ip=46.232.182.213
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wismer.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wismer.xyz
+Received: from srv125.tophost.ch ([194.150.248.5])
+	by filter3.tophost.ch with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <thomas@wismer.xyz>)
+	id 1v6Siu-00HEio-1b; Wed, 08 Oct 2025 13:52:50 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=wismer.xyz;
+	s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:References:
+	In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=jcrzgQaRo1s3Zc3rxVMNCH6Ga4jTLLoMlb1z0pI42TQ=; b=k/nuk2hb22e48eTiuOitgKNYnS
+	S6S+PxKSnOb0A/DjeNt+6wofSRKNGY34A2/XEAUq7QqQ5VyV7pTUL7GG6thx3tJYXEQit2zcHyCRL
+	8QswE0ABV3qgGyxpQVVcGImMHl3V5GbTnfyTrF20eaGHSTra+SGREiZascklXWkK3J3xN9drEEPs9
+	F9MNvA+UIeV1V888hTDQSyQ6Xe4fiu5y6FuaMMU13f1mlXMdsOd2hgFdilNgPtHBtPO7EAyYY7hhY
+	Cs0x9+sLanO4DYTP6Pjoh1Zw+M7VSHmLiVGUmo5lDoW/B7dhjev0EOEr+5QuoNiWBRa1zVkAF2zXG
+	FZwk7zfA==;
+Received: from [213.55.186.58] (port=20306 helo=pavilion)
+	by srv125.tophost.ch with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <thomas@wismer.xyz>)
+	id 1v6Sit-00000004Xlh-0ZFe;
+	Wed, 08 Oct 2025 13:52:45 +0200
+Date: Wed, 8 Oct 2025 13:52:43 +0200
+From: Thomas Wismer <thomas@wismer.xyz>
+To: Conor Dooley <conor@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Kory Maincent
+ <kory.maincent@bootlin.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Thomas Wismer <thomas.wismer@scs.ch>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/3] dt-bindings: pse-pd: ti,tps23881: Add TPS23881B
+Message-ID: <20251008135243.22a908ec@pavilion>
+In-Reply-To: <20251007-stipulate-replace-1be954b0e7d2@spud>
+References: <20251004180351.118779-2-thomas@wismer.xyz>
+	<20251004180351.118779-8-thomas@wismer.xyz>
+	<20251007-stipulate-replace-1be954b0e7d2@spud>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Get-Message-Sender-Via: srv125.tophost.ch: authenticated_id: thomas@wismer.xyz
+X-Authenticated-Sender: srv125.tophost.ch: thomas@wismer.xyz
+X-Spampanel-Domain: smtpout.tophost.ch
+X-Spampanel-Username: 194.150.248.5
+Authentication-Results: tophost.ch; auth=pass smtp.auth=194.150.248.5@smtpout.tophost.ch
+X-Spampanel-Outgoing-Class: unsure
+X-Spampanel-Outgoing-Evidence: Combined (0.50)
+X-Recommended-Action: accept
+X-Filter-ID: 9kzQTOBWQUFZTohSKvQbgI7ZDo5ubYELi59AwcWUnuV5syPzpWv16mXo6WqDDpKEChjzQ3JIZVFF
+ 8HV60IETFiu2SmbhJN1U9FKs8X3+Nt208ASTx3o2OZ4zYnDmkLm5Mv/tafLC72ko3Lqe/Da7zEtV
+ 5r/L4Ot8UddBJecz0vF0xYCHwzEoZpUBagq+YQPMCtmoQhY2xrBb8C+tWUvqrqBKsSdhvd/J5sX5
+ daZjkYsG4jVZi5Tfop5qjCZejidXzthz0vNkOX8Em4cj6D/wddIY3ooDH3xmALJ0KCcsszI9W7vD
+ 6C469DIPe8wH3iOJ3xyMg3et4b3PQUopDmbZCssYHNuxAmlPRpR5yzngsxCROUzReCS8EpKh0It9
+ L25JS816nuiE0t5pG6MLXGczoaQ34/6XxaNTDAhv7aV57JsPc1xQig4or8SGp+oEgVY8m5YhXjt1
+ 1mZXDl6SZZzjGdqG2Lj5rCXX7a7k66n+dqZH8SumKJ6G2ITZ1QpN+fKl6MqQzpHx+R/se4ridaNZ
+ B8TZI7fFfQwiuwD2LcLdqjNzWvfUWpSzeqsU5PCGCDUFaU8uhHiAnATVZ6fUz0ieq3c+galx1KGI
+ Pp5jnkiI48QcVV/sevQbkxCuiwh6Dw2ezHpzBWCNEjuWRvIT4EJ2lr2fnvN0vyHJPWrtFePT1LWJ
+ YkjVkiWyun89aYjOQVn+0u9hv6vc4kaDyrzZqOtFmCYx9ZUW4uF3IsCR4FQZzMS1+iCTTpBSBU9f
+ +Vf3ILgJPePj0AiYMnkOYZl+Ft134+Tg4Kc9J0hnMXKx8pjHWEGHlWxPsl3WEfCK++QP7hwqRAUa
+ ZyvXYsGqun+gsnRrwx4NiFDSlcM+Wn9owyaX/KlLn/njN5eSj526f3kLYY1TsMEeeHi+U6STQXMQ
+ D692EpmpxHPQ6fdixDnE+NhRq2DzlcAJUjaLcRLsWJVw5FAS+DG0fESebuRosX/9DvJ1PqhoyZO+
+ 55MGpfuy7J6qK9cOuNFQ+5eGIII/qgXB3gv2NI/ukWuQBNrXV+EmIqM8SxKOhcObZXWnkEw+6F9C
+ GyYaSNdYCqWjx7tVBcUyWD6tuli72Uhh4KMdzekambyQyMd4zC4QeDwRSaOU1duojVsD0mcRXp3i
+ H/O1nLlsNVT2ZXBi9hWEAP02Kq9O1EK/TYp24VOsP5eu885wo+t+ynT3Y80OmAux3oN13+ztUzne
+ WewwEyDnbwd6egxf+5+PsAe2KUEdvp80LOErjFwUf/rlg8VmOc5TmmgdvZqrRINDmcHx2hb+kvjY
+ MSg1O9jlcFeiwd6G/JABbKl/d5wvz25WxpLvJQch9a84ocD+HpMJ647lNwN4qOsSZg+fYhVZG4mh
+ yjRtVCRmo/KLfKlWmgufHFIwhu0oznfSscIjbgCEW8FLB4OaDyJuGHToBIYrrlDXmPN7G7txF2nS
+ g2cyQb8Y5qkVLHiOZSn5k9NADD0BBW1oT5qIEWguCTF5tOP3jj0yLjiiCMcv+tRXcSj1CD4=
+X-Report-Abuse-To: spam@filter1.tophost.ch
+X-Complaints-To: abuse@filter1.tophost.ch
 
-Improve PTP feature cleanup in error path by adding explicit call to
-ice_ptp_cleanup_pf in the case in which PTP feature is not fully
-operational at the time of driver removal (which is indicated by
-ptp->state flag).
-At the driver probe, if PTP feature is supported, each PF adds its own
-port to the list of ports controlled by ice_adapter object.
-Analogously, at the driver remove, it's expected each PF is
-responsible for removing previously added port from the list.
-If for some reason (like errors in reset handling, NVM update etc.), PTP
-feature has not rebuilt successfully, the driver is still responsible for
-proper clearing ice_adapter port list. It's done by calling
-ice_ptp_cleanup_pf function.
-Otherwise, the following call trace is observed when ice_adapter object
-is freed (port list is not empty, as it is expected at this stage):
+Am Tue, 7 Oct 2025 21:40:03 +0100
+schrieb Conor Dooley <conor@kernel.org>:
 
-[  T93022] ------------[ cut here ]------------
-[  T93022] WARNING: CPU: 10 PID: 93022 at
-ice/ice_adapter.c:67 ice_adapter_put+0xef/0x100 [ice]
-...
-[  T93022] RIP: 0010:ice_adapter_put+0xef/0x100 [ice]
-...
-[  T93022] Call Trace:
-[  T93022]  <TASK>
-[  T93022]  ? ice_adapter_put+0xef/0x100 [ice
-33d2647ad4f6d866d41eefff1806df37c68aef0c]
-[  T93022]  ? __warn.cold+0xb0/0x10e
-[  T93022]  ? ice_adapter_put+0xef/0x100 [ice
-33d2647ad4f6d866d41eefff1806df37c68aef0c]
-[  T93022]  ? report_bug+0xd8/0x150
-[  T93022]  ? handle_bug+0xe9/0x110
-[  T93022]  ? exc_invalid_op+0x17/0x70
-[  T93022]  ? asm_exc_invalid_op+0x1a/0x20
-[  T93022]  ? ice_adapter_put+0xef/0x100 [ice
-33d2647ad4f6d866d41eefff1806df37c68aef0c]
-[  T93022]  pci_device_remove+0x42/0xb0
-[  T93022]  device_release_driver_internal+0x19f/0x200
-[  T93022]  driver_detach+0x48/0x90
-[  T93022]  bus_remove_driver+0x70/0xf0
-[  T93022]  pci_unregister_driver+0x42/0xb0
-[  T93022]  ice_module_exit+0x10/0xdb0 [ice
-33d2647ad4f6d866d41eefff1806df37c68aef0c]
-...
-[  T93022] ---[ end trace 0000000000000000 ]---
-[  T93022] ice: module unloaded
+> On Sat, Oct 04, 2025 at 08:03:53PM +0200, Thomas Wismer wrote:
+> > From: Thomas Wismer <thomas.wismer@scs.ch>
+> > 
+> > Add the TPS23881B I2C power sourcing equipment controller to the
+> > list of supported devices.  
+> 
+> Missing an explanation for why a fallback compatible is not suitable
+> here. Seems like it is, if the only difference is that the firmware is
+> not required to be refreshed, provided that loading the non-B firmware
+> on a B device would not be problematic.
 
-Fixes: e800654e85b5 ("ice: Use ice_adapter for PTP shared data instead of auxdev")
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ptp.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Loading the non-B firmware on a B device is indeed problematic. I'll
+append the following paragraph to the patch when reposting it after
+the current merge window has closed.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index fb0f6365a6d6..c43a7973d70f 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -3282,8 +3282,10 @@ void ice_ptp_init(struct ice_pf *pf)
-  */
- void ice_ptp_release(struct ice_pf *pf)
- {
--	if (pf->ptp.state != ICE_PTP_READY)
-+	if (pf->ptp.state != ICE_PTP_READY) {
-+		ice_ptp_cleanup_pf(pf);
- 		return;
-+	}
- 
- 	pf->ptp.state = ICE_PTP_UNINIT;
- 
+Falling back to the TPS23881 predecessor device is not suitable as firmware
+loading needs to handled differently by the driver. The TPS23881 and
+TPS23881B devices require different firmware. Trying to load the TPS23881
+firmware on a TPS23881B device fails and must therefore be omitted.
 
-base-commit: 8b223715f39c8a944abff2831c47d5509fdb6e57
--- 
-2.39.3
+> > 
+> > Signed-off-by: Thomas Wismer <thomas.wismer@scs.ch>
+> > ---
+> >  Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git
+> > a/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml
+> > b/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml
+> > index bb1ee3398655..0b3803f647b7 100644 ---
+> > a/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml +++
+> > b/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml @@
+> > -16,6 +16,7 @@ properties: compatible: enum:
+> >        - ti,tps23881
+> > +      - ti,tps23881b
+> >  
+> >    reg:
+> >      maxItems: 1
+> > -- 
+> > 2.43.0
+> >   
 
 
