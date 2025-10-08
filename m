@@ -1,95 +1,87 @@
-Return-Path: <netdev+bounces-228163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E23FBC379C
-	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 08:28:43 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9F78BC37C6
+	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 08:38:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B850B401009
-	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 06:28:22 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C3A0A4E0F3E
+	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 06:38:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60D72E8E06;
-	Wed,  8 Oct 2025 06:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1319257AC2;
+	Wed,  8 Oct 2025 06:37:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="p39IZFgJ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="m+69fe7W";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="p39IZFgJ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="m+69fe7W"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sou1kaY+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE2F2DECAA
-	for <netdev@vger.kernel.org>; Wed,  8 Oct 2025 06:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134A721D3CA
+	for <netdev@vger.kernel.org>; Wed,  8 Oct 2025 06:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759904900; cv=none; b=oZZVw4GFm5KiLC8VutG4/vMjWpLbp1wrtobsK41EiopDcnSpIsJ9NEYf6YxPIYwaKMmzPmAMOsu3XoDCKZ2UigQM8hSJGl6BnwSOjDCLwoE1nE7dOyp1agNDnKkWR4NlurQC7xdS35aUcNlhMhs5JgKCCs0/lzLYjTVpXBJu3JY=
+	t=1759905478; cv=none; b=PDcNITSTXapYPzPbMJUs0EexttWKQOUi0ftJ6+EN1zS7JV+yvEVOu7bI8gtd8bRrM06rUwUXbuQq0oYlF8JOzSdtP+wQ+ghaNMmUEhSmFpuSTkVRXV+fFcm3YIvSa7GgxIKq2dB8SoWSHcDdsn0xlR0JLwihvTO5mBSvDzYxqNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759904900; c=relaxed/simple;
-	bh=wa4bLhn/oHSpnMxDwdWDJ32noH/AEmOOr1Mif6Co1Qg=;
+	s=arc-20240116; t=1759905478; c=relaxed/simple;
+	bh=8QdAdishTyYfv71tuyUdozzYHm3+rtg1rq3Cwr/XbVM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bpu0MgstaW6R1hV3+x67ubSXxqro1UWSKGV9dIcC/VOiYP0f+/OTiOnMBor5uxVBHE0/SKDCw3QBOc7krEz2fTL9RjalSwvTkqLqs+OjpUiMFheU2NmZ1PO8gRhZQ7DFC96srnhD2YYgjQyjV4O3dEW8S/PS1njEBbX5fqjMgR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=p39IZFgJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=m+69fe7W; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=p39IZFgJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=m+69fe7W; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8EC712203A;
-	Wed,  8 Oct 2025 06:28:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759904890; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	 In-Reply-To:Content-Type; b=LA/l+6kMMfLO+igi+cgQy2x93q7gDn3/MVx9A9kgKFjS/Jv2IpdTZLjyn6JNN9lLVuk3AKd85pzxfxUB7ZiCFZs7KroB9SyBmaazs1H71z5LqDaQz2PmPB9lnoNZ/E/tPV28sWN/eMKKkibHQ38QN3++B4y+W7+yd+ndbUeofMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sou1kaY+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759905476;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=G30fkVhy2gt4+zO5lsG/AarvvqJdFSCDE0XNQeDoy7Y=;
-	b=p39IZFgJGEXpxI8KHuPkVWfzKOGbDP01J9Yk+pbT1/Knpf7vdUBg0ddKe3J6i5cpP/DWr1
-	qVjG088Dyb2wMxBE6w/OIzouPuEuz13sh+JNyJixw8Y22MEMJCJ7QjV6TUSCWMC2hnX/4m
-	+vSMY3h8ZtqluRCfbI7Wl9ecnfuy2HI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759904890;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G30fkVhy2gt4+zO5lsG/AarvvqJdFSCDE0XNQeDoy7Y=;
-	b=m+69fe7Wbdvt+M1FfZytQ8kiqqgqxwUNDoQj5bQ5XOwQN6DW8Ue30/4zSwDUO7RsmTsWdF
-	Oh5KCLNkf5TdbfDQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1759904890; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G30fkVhy2gt4+zO5lsG/AarvvqJdFSCDE0XNQeDoy7Y=;
-	b=p39IZFgJGEXpxI8KHuPkVWfzKOGbDP01J9Yk+pbT1/Knpf7vdUBg0ddKe3J6i5cpP/DWr1
-	qVjG088Dyb2wMxBE6w/OIzouPuEuz13sh+JNyJixw8Y22MEMJCJ7QjV6TUSCWMC2hnX/4m
-	+vSMY3h8ZtqluRCfbI7Wl9ecnfuy2HI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1759904890;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G30fkVhy2gt4+zO5lsG/AarvvqJdFSCDE0XNQeDoy7Y=;
-	b=m+69fe7Wbdvt+M1FfZytQ8kiqqgqxwUNDoQj5bQ5XOwQN6DW8Ue30/4zSwDUO7RsmTsWdF
-	Oh5KCLNkf5TdbfDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E15C813693;
-	Wed,  8 Oct 2025 06:28:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id cschNXkE5mgGRQAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 08 Oct 2025 06:28:09 +0000
-Message-ID: <c05ac7b9-d71b-4069-ac73-19a082eea559@suse.de>
-Date: Wed, 8 Oct 2025 08:28:09 +0200
+	bh=WCoKGJrY9ItSJhO4qZWZixqx9U2vtkKjjoaRx6SQRnI=;
+	b=Sou1kaY+X8M1WYsVxAees6PsG0Gb9EoR4R8Es5qQHT9vukGXzTzQIupGLPkdJ9meBCY6eR
+	4Fy5FCwg9gVFIHtkw0rFGIjZsGUrPDKsp1mt0XPs70hF0Kx3T9lHmBNK6H5vcAFyibLDiN
+	jMOGtEMV/WZD92WQlyIAr6s6AoDm45U=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-594-N_2VIMmsOtSzOhm4TchJbA-1; Wed, 08 Oct 2025 02:37:52 -0400
+X-MC-Unique: N_2VIMmsOtSzOhm4TchJbA-1
+X-Mimecast-MFC-AGG-ID: N_2VIMmsOtSzOhm4TchJbA_1759905471
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3f384f10762so3784329f8f.3
+        for <netdev@vger.kernel.org>; Tue, 07 Oct 2025 23:37:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759905471; x=1760510271;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WCoKGJrY9ItSJhO4qZWZixqx9U2vtkKjjoaRx6SQRnI=;
+        b=Fb97gQKeJLjcOS3vh/UcOv9H0YklrrYOpYZw48+tVCs1XSIEzc59hDq4D5YOBxOo2e
+         ILTkPG7rcbMfZ1GwfERWvHw0b6iC/iK+q/f4o5nQf9rRFTcsPBhQNGL6qJfSrDUYXkhE
+         SdCikF+9GtQ7QAMnCjqhsw9V8HlRgaA7XdauCG7PL5JCOWedcmt5RJIfhKtY8tctLoLo
+         mJW50lfpLLA88uyMmVIpzkXTkiuUkeBuW/MeU7Xxfts0jI2tP3dk8L1LyOh1EXpg88jf
+         9YjxNvOFa4lRhgCJpxpxzFOVDBqFwQSe502JadGDiS7iu+6Xy3BFdxflLtdqW4M4HgCI
+         czXw==
+X-Forwarded-Encrypted: i=1; AJvYcCX4HSbuo5g77rOSaO1WU2slP/2J3hJ74vC5qLA6cstztos4XXoTZLRZzf7uU3cNR5Q1uosvTs8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1Wcx6uEDsaM1WKiF/4T+a+TlG78WM9tMn9jktw4JMjU239KPH
+	qKjq/AHsORYD7a+/zTd2MnIjqGqy27mITOOboZLTW2JM1VEQfs0U8nKlUxxeqlfdTOcT/rRTqfj
+	9KWwjYVw0MziBKPnQPucOZdiD6HCsiJqvf90H3TtwTOEaTYYHPV6hPdakJg==
+X-Gm-Gg: ASbGncvgt3yQbu5oqBa6/xyFNjT34ecQ+/F8CQVu9EkxvG9IL8OqMjcrgPaIR0Gk1V/
+	+EPwizoC8Klmw4y39Sq/7Zlsv608dmy9XvrJXMR6jrOJuzAWL07BKd/C1Rp6Ok3ko8Y4GQIGKob
+	3aEyM5OK/jHDfUep76e0B7RH3ITr7VEjWiOC1IX0j8utYysTn51vBU0oRPHvFidurB19O6krEgt
+	X9ta2eSGQOp7K/U46ckJLNmurdKS7hNmYI5TsGRL7df1hzmjxaPF+dBMMP4ML5LL7g426B7mUaR
+	OqOFfAGlp+QcMc06L49858M90iQFrjJ67/1FpNBtBZAXUgCBNC9+bWENFXfxdGVT+/mddTUDOQo
+	1cTvxLklWrDbjOprFVg==
+X-Received: by 2002:a05:6000:26ca:b0:400:1bbb:d279 with SMTP id ffacd0b85a97d-4266e7d44f1mr1140993f8f.39.1759905471471;
+        Tue, 07 Oct 2025 23:37:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE40fep1FaR2M7WsiBVuy8GPUnFsvZIKRHeaWxSKXFe7u0zA/5qdUcEU7HRu4ahzS6I9+Q3DA==
+X-Received: by 2002:a05:6000:26ca:b0:400:1bbb:d279 with SMTP id ffacd0b85a97d-4266e7d44f1mr1140978f8f.39.1759905471027;
+        Tue, 07 Oct 2025 23:37:51 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4255d8e980dsm30821138f8f.36.2025.10.07.23.37.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Oct 2025 23:37:50 -0700 (PDT)
+Message-ID: <fcd97ca7-f293-49ce-bf01-3ba0001a7753@redhat.com>
+Date: Wed, 8 Oct 2025 08:37:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,125 +89,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nvme/tcp: handle tls partially sent records in
- write_space()
-To: Wilfred Mallawa <wilfred.opensource@gmail.com>,
- linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Sabrina Dubroca <sd@queasysnail.net>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20251007004634.38716-2-wilfred.opensource@gmail.com>
- <0bf649d5-112f-42a8-bc8d-6ef2199ed19d@suse.de>
- <339cbb66fbcd78d639d0d8463a3a67daf089f40d.camel@gmail.com>
- <8e5a3ff3-d17a-488f-97fb-3904684edb47@suse.de>
- <143591bfd3499f2ee90034190a94154a965f563d.camel@gmail.com>
+Subject: Re: [PATCH RFC net-next 5/5] net: dev_queue_xmit() llist adoption
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
+ <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20251006193103.2684156-1-edumazet@google.com>
+ <20251006193103.2684156-6-edumazet@google.com>
 Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <143591bfd3499f2ee90034190a94154a965f563d.camel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FREEMAIL_TO(0.00)[gmail.com,lists.infradead.org,vger.kernel.org];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[kernel.org,kernel.dk,lst.de,grimberg.me,gmail.com,queasysnail.net,davemloft.net,google.com,redhat.com];
-	RCVD_TLS_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TAGGED_RCPT(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -2.80
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251006193103.2684156-6-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 10/8/25 04:11, Wilfred Mallawa wrote:
-> On Tue, 2025-10-07 at 11:51 +0200, Hannes Reinecke wrote:
->> On 10/7/25 11:24, Wilfred Mallawa wrote:
->>> On Tue, 2025-10-07 at 07:19 +0200, Hannes Reinecke wrote:
->>>> On 10/7/25 02:46, Wilfred Mallawa wrote:
->>>>> From: Wilfred Mallawa <wilfred.mallawa@wdc.com>
->>>>>
->>>>
->>> [...]
->>>> I wonder: Do we really need to check for a partially assembled
->>>> record,
->>>> or wouldn't it be easier to call queue->write_space() every time
->>>> here?
->>>> We sure would end up with executing the callback more often, but
->>>> if
->>>> no
->>>> data is present it shouldn't do any harm.
->>>>
->>>> IE just use
->>>>
->>>> if (nvme_tcp_queue_tls(queue)
->>>>        queue->write_space(sk);
->>>
->>> Hey Hannes,
->>>
->>> This was my initial approach, but I figured using
->>> tls_is_partially_sent_record() might be slightly more efficient.
->>> But if
->>> we think that's negligible, happy to go with this approach
->>> (omitting
->>> the partial record check).
->>>
->> Please do.
->> Performance testing on NVMe-TCP is notoriously tricky, so for now we
->> really should not assume anything here.
->> And it's making the patch _vastly_ simpler, _and_ we don't have to
->> involve the networking folks here.
-> 
-> Okay, will send a V2 with this approach.
-> 
->> We have a similar patch for the data_ready() function in nvmet_tcp(),
->> and that seemed to work, too.
->> Nit: we don't unset the 'NOSPACE' flag there. Can you check if that's
->> really required?
->> And, if it is, fixup nvmet_tcp() to unset it?
->> Or, if not, modify your patch to not clear it?
-> 
-> I don't see why we would need to clear the NOSPACE flag in
-> data_ready()? My understanding is that this flag is used when the send
-> buffer is full.
-> 
-> I would think the clear_bit() is necessary in write_space() since it
-> would typically get done in something like sk_stream_write_space()?
-> However, running some quick FIOs with the clear_bit() removed, things
-> seem to work. Not sure if removing it has any further implications
-> though...
-> 
-I am not sure, either. Code analysis suggests that we don't need to
-do that, but then we're the first ever to explore that area.
-So I would think we don't need to worry (as nvmet-tcp doesn't do that,
-either). Sounds like a question for LPC.
-So let's drop the 'NOSPACE' flag handling to get the
-partial records fixed, and address the NOSPACE issue separately.
+Hi,
 
-Cheers,
+On 10/6/25 9:31 PM, Eric Dumazet wrote:
+> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+> index 31561291bc92fd70d4d3ca8f5f7dbc4c94c895a0..94966692ccdf51db085c236319705aecba8c30cf 100644
+> --- a/include/net/sch_generic.h
+> +++ b/include/net/sch_generic.h
+> @@ -115,7 +115,9 @@ struct Qdisc {
+>  	struct Qdisc            *next_sched;
+>  	struct sk_buff_head	skb_bad_txq;
+>  
+> -	spinlock_t		busylock ____cacheline_aligned_in_smp;
+> +	atomic_long_t		defer_count ____cacheline_aligned_in_smp;
+> +	struct llist_head	defer_list;
+> +
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Dumb question: I guess the above brings back Qdisc to the original size
+? (pre patch 4/5?) If so, perhaps is worth mentioning somewhere in the
+commit message.
+
+Thanks,
+
+Paolo
+
 
