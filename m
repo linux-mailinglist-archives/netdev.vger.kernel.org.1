@@ -1,149 +1,127 @@
-Return-Path: <netdev+bounces-228182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DC3ABC3ED0
-	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 10:50:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5D04BC3EFC
+	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 10:51:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C97494E2E8C
-	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 08:50:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E8D93ADE5C
+	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 08:51:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7BA2F361E;
-	Wed,  8 Oct 2025 08:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9666E2F361E;
+	Wed,  8 Oct 2025 08:51:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="esadfgje"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b3oyHJ7+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB41F4A33
-	for <netdev@vger.kernel.org>; Wed,  8 Oct 2025 08:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714EE2E22B4
+	for <netdev@vger.kernel.org>; Wed,  8 Oct 2025 08:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759913433; cv=none; b=jgJEgVq8BFkbD0aFfeoZ2lNg5CZKvXSLRHJPU1jA49Vh7bV6hRQEG4Aa//10X5fGWMmvnVSclCIvJKoZlSNvtGVdZyQCq2UfRkoWdKOyEDPFiu/l39i9QPPFpU1Q9ZI56pp5fkEM93Vh61fH0je4CdZDAYoabZ7Kq25/e96+pXM=
+	t=1759913511; cv=none; b=j2pGGiD2tHP6zbKVFtVO8cqoFg7bETnR2+TzutvbrDTTMV9DFYthDPDKJXn+LpkwVrB4tTgLjobQ/DFrlAwxtbiSw/4V+OLhtVvzZ9bYwGzAHC5J0JzV2nVvwz2vLAp8Cu+TWAmlTj3n9imLRKSLeq4qhtjaXlsreFxKB5wHmBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759913433; c=relaxed/simple;
-	bh=mjKV8LR3z0adrs0lgCARkF49pJwCIwW9No7CKCawXy8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KfJLZlfFYrEPCAZ03el6raHOuNwEU0IFdH3nU0a/7/KxzZtMweUQvC2IWp5GuZ4LodQtoCs4k6gbGvecmaFCYx8OUrlxlJPc3x2m+D4uM2AXmS1+EoGKoIDj11GpHsscEPHlZSVNvLQpBm2Hdx0NEAUazwX6atArnwyHgpLKpC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=esadfgje; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-62fc28843ecso10467521a12.1
-        for <netdev@vger.kernel.org>; Wed, 08 Oct 2025 01:50:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759913430; x=1760518230; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=SDdgt531fZXua2Nuzzq7uSWagHpPHjlp+/dNBNaohR8=;
-        b=esadfgjet+I774mpqEHp0XtND+ZhDCEJcapjt6MUj8Sz1+yZ54QUZKKwPNnsVaBVnq
-         xz01LLF62F3dlYF1fQrhcGJzwz2ZZLi/OzAlfk++m+BQUY0FsKmjBvT6wzDphI4ehcnq
-         /EFJLS8Jtk9vFoU7O9ukcULs7ZPejjhOAVf7PpVxuQq6hriZCmg3WP2asoCJJipZgTd/
-         ytza1DhjNsUfrHSC9puA2gnSbsMTEDZAFHxNIM7NJOi+f+1ABxZCc3hhlqanuMbZlgxa
-         REfUNzoZn1ayp8775l7e//V2di0eTWhkmyZbno8m9nJ+Qu6m0TXf7xDeLq8muF4HU9iC
-         S79w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759913430; x=1760518230;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SDdgt531fZXua2Nuzzq7uSWagHpPHjlp+/dNBNaohR8=;
-        b=dSC8wnAMhCVNGAs1+4wBTNuUXABNABYpQvCFMoYSEeD41LytEfFla44OviQDzSTmov
-         R8rXGBAYYJkJKwDh1G+bcrHF5kPsjiT0HXxexQ7JW4cHmbguDSckuT6ygp5bXN0yJxFg
-         tOcuhr+Px/GpUGm08JUYI19Qkn27bUgdmjifj+iFTbfMESn0J2JxtsyO5MvnojjjyrX+
-         OKKR5YiM0jaUfN+DrBv19K/p5GCgh0X1gz3OvDZFuSPcsSCoYaOErNmmauWP2heCf2R2
-         Zu/yM5mbD+YLRro7TsvjB7kafPXJ360naUz9K95m9Udv/TAaOLpnrhI/tY//RFwzWYx+
-         mzxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWSIUlM68fcU73eJsYeyaoFQJNS0kEM/jBOwwiTd/pTCkU4AHkadHaT0LR3Gfdq7FzC9N+VNhY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmH878E1wKl04sVhn7D/EB7yp/6itRTBPVaHxHyCGDRl+ekOo0
-	gv/tFpI7WFzlMjTV/jgOxzR1isKc2kNnyvNhGq0YTs0ZhyoJF0pLOUa0WzI5UwLTgpSebM4Xryj
-	H5NJOBWHU7GTmFli9m+AePJfKW0NUwic=
-X-Gm-Gg: ASbGnctFalUtQ21LJdkPlMgUs5r9NDIeDHMnHwNY6JmEV93gymAw9MHBpnyxbYpCgZt
-	y7UUfdAC40sPe634P0yTtUMweCWMDQP+PZTL03ph6ky6b1Y+cj8qAWbl1Gj74ZS8zgZk+eICoZH
-	MAZeTbFIklV6llWjgbf+Uo88S5gZh836ddc2i9bk1+4cVN+N0zJbn30KX3nEu9MlnhhuLryZ8XE
-	oml3TZTcRtEU36gU5n0JQWvA36YV9dM84MNHS69U05nzsF2m46mbpM3fmrjEEM3BjEk/lWVcAsS
-	2yL3hU/JyAXxNzDwoYEDrqdbxrgYqYhhoDyZ/f4=
-X-Google-Smtp-Source: AGHT+IH6PbQWB6HSus6hSy1TQCxi0qBoYNbFZhZzCJz8Lu5/L/loeIThQUlVSg8ujmNzSV989rkYc2HCeJ4j/hJs6lQ=
-X-Received: by 2002:a05:6402:2708:b0:639:c56d:2407 with SMTP id
- 4fb4d7f45d1cf-639d5c3f43fmr2353930a12.22.1759913429770; Wed, 08 Oct 2025
- 01:50:29 -0700 (PDT)
+	s=arc-20240116; t=1759913511; c=relaxed/simple;
+	bh=61um9Z5Z7w5C/Y58XBFy7nF1UiQ4Fnu9RxUx6QSY6KQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iT/LG/uJVb6isFmawywUuc5SJynKnw5voN4LfLD3wiVTTFvAGu8hjoPHhLDryTEW6TQfh0wE0zK2jizCNHpQBJelCwpkf3TGiVzJXHhQ80a7DXSzXbcKGrHyPctfYm5PQFm89yF628pg1Ct8zIgLoYITcWzttIVMi72ED+nL+vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b3oyHJ7+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EF27C4CEF4;
+	Wed,  8 Oct 2025 08:51:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759913511;
+	bh=61um9Z5Z7w5C/Y58XBFy7nF1UiQ4Fnu9RxUx6QSY6KQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=b3oyHJ7+KXvjNYGV5Fw5uVcZFR4+Dfis8w+SPAoiZeuT8CCSZL72C2ZNT3XnM4X8l
+	 bMhevnQ5KyKzsRfHNt71zpptisC15rsjIIVAi44gIS8E+I0zCDW0F5QQp7+YRDPe7P
+	 3p/GVPIThd97flfhMDWetR/RZPXHyyH8WnYDZLNSTrr1t3q30iQ7Uc9C+OJ3Ht4ceR
+	 oUnpFEg+pPQukM9ywLeLLtY8oFRmhyYSCRrSpBgapEjIH4KoxfdmTGYRM+aW5WIlvP
+	 mtT6GEgD+CPMnSYQcM8WC2uX3nk8dTLheOOCm76VDI0mG2CzeRolDurjExgVeIc+SW
+	 S6LVF3V3wA1jg==
+Date: Wed, 8 Oct 2025 10:51:48 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: airoha: Fix loopback mode configuration for
+ GDM2 port
+Message-ID: <aOYmJC1-mn22ehRG@lore-desk>
+References: <20251005-airoha-loopback-mode-fix-v1-1-d017f78acf76@kernel.org>
+ <7b460ea8-c340-4ab8-96d9-43568227ee07@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251005204946.2150340-1-pbrobinson@gmail.com> <20251007181903.36a3a345@kernel.org>
-In-Reply-To: <20251007181903.36a3a345@kernel.org>
-From: Peter Robinson <pbrobinson@gmail.com>
-Date: Wed, 8 Oct 2025 09:50:17 +0100
-X-Gm-Features: AS18NWCYtfrYTwu7zaX5ATVUv3xg_8f1v37nPjmdIdgBrx3Rkn92q_enxY_9SOs
-Message-ID: <CALeDE9MhZXmnQzazoN_HN=yTGiT=EWDhL4AQmERVvOmuELNqJQ@mail.gmail.com>
-Subject: Re: [PATCH] ptp: netc: Add dependency on NXP_ENETC4
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Frank Li <Frank.Li@nxp.com>, Wei Fang <wei.fang@nxp.com>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="F73I8gfksC2p3ILC"
+Content-Disposition: inline
+In-Reply-To: <7b460ea8-c340-4ab8-96d9-43568227ee07@redhat.com>
 
-On Wed, 8 Oct 2025 at 02:19, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Sun,  5 Oct 2025 21:49:42 +0100 Peter Robinson wrote:
-> > The NETC V4 Timer PTP IP works with the associated NIC
-> > so depend on it, plus compile test, and default it on if
-> > the NIC is enabled similar to the other PTP modules.
-> >
-> > Fixes: 87a201d59963e ("ptp: netc: add NETC V4 Timer PTP driver support")
->
-> You put a Fixes tag here, suggesting this is a fix.
-> What bug is it fixing? Seems like an improvement to the default
-> kconfig behavior, TBH. If it is a bug fix please explain in the
-> commit message more. If not please drop the Fixes tag and repost
-> next week. Also..
 
-I don't believe it works without the associated hardware so it seems
-like a bug to me, There's likely nuance and opinion. I labelled as a
-fix so it lands into the same kernel release as opposed to the next
-one.
+--F73I8gfksC2p3ILC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+On Oct 07, Paolo Abeni wrote:
+> On 10/5/25 4:52 PM, Lorenzo Bianconi wrote:
+> > Add missing configuration for loopback mode in airhoha_set_gdm2_loopback
+> > routine.
+> >=20
+> > Fixes: 9cd451d414f6e ("net: airoha: Add loopback support for GDM2")
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 > > ---
-> >  drivers/ptp/Kconfig | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig
-> > index 5f8ea34d11d6d..a5542751216d6 100644
-> > --- a/drivers/ptp/Kconfig
-> > +++ b/drivers/ptp/Kconfig
-> > @@ -255,6 +255,8 @@ config PTP_S390
-> >
-> >  config PTP_NETC_V4_TIMER
-> >       tristate "NXP NETC V4 Timer PTP Driver"
-> > +     depends on NXP_ENETC4 || COMPILE_TEST
->
-> .. why? Does the clock driver not work at all without the networking
-> driver? Or you just think that they go together?
+> >  drivers/net/ethernet/airoha/airoha_eth.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
+ernet/airoha/airoha_eth.c
+> > index 81ea01a652b9c545c348ad6390af8be873a4997f..abe7a23e3ab7a189a3a2800=
+7004572719307de90 100644
+> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> > @@ -1710,7 +1710,9 @@ static void airhoha_set_gdm2_loopback(struct airo=
+ha_gdm_port *port)
+> >  	airoha_fe_wr(eth, REG_GDM_RXCHN_EN(2), 0xffff);
+> >  	airoha_fe_rmw(eth, REG_GDM_LPBK_CFG(2),
+> >  		      LPBK_CHAN_MASK | LPBK_MODE_MASK | LPBK_EN_MASK,
+> > -		      FIELD_PREP(LPBK_CHAN_MASK, chan) | LPBK_EN_MASK);
+> > +		      FIELD_PREP(LPBK_CHAN_MASK, chan) |
+> > +		      FIELD_PREP(LPBK_MODE_MASK, 7) |
+>=20
+> I suggest introducing some human readable macro to replace the above
+> magic number.
 
-It is my understanding that it doesn't, it's also the way the
-PTP_1588_CLOCK_QORIQ does it, hence i did that way.
+ack, I will do in v2.
 
-> > +     default y if NXP_ENETC4
->
-> Isn't this better written as:
->
->         default NXP_ENETC4
+Regards,
+Lorenzo
 
-I did it the same way as the other HW drivers such as
-PTP_1588_CLOCK_QORIQ and PTP_1588_CLOCK_DTE did in that Kconfig file
-for consistency
+>=20
+> Thanks,
+>=20
+> Paolo
+>=20
 
-> ?
->
-> >       depends on PTP_1588_CLOCK
-> >       depends on PCI_MSI
-> >       help
->
+--F73I8gfksC2p3ILC
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaOYmJAAKCRA6cBh0uS2t
+rLIaAP9ZpLaeZx/xuXWhNczt2hljchjtx1rGalRK9vfN4hRXaAEAwAG7dafqK7nA
+xqMvinYWqO1bJ84j20g9/PDkDWmpGg8=
+=3Lie
+-----END PGP SIGNATURE-----
+
+--F73I8gfksC2p3ILC--
 
