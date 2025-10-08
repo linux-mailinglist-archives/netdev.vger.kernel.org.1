@@ -1,98 +1,97 @@
-Return-Path: <netdev+bounces-228217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C76A3BC4FE7
-	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 14:53:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A6DDBC5102
+	for <lists+netdev@lfdr.de>; Wed, 08 Oct 2025 14:59:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 932FA4ECAEB
-	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 12:53:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C6D718868A1
+	for <lists+netdev@lfdr.de>; Wed,  8 Oct 2025 13:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C54225392D;
-	Wed,  8 Oct 2025 12:53:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="P4r5ZVOX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84973260563;
+	Wed,  8 Oct 2025 12:59:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A7222576E;
-	Wed,  8 Oct 2025 12:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B42A2512C8;
+	Wed,  8 Oct 2025 12:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759927985; cv=none; b=bpD4Q1c14/1UJwEldopEiwE+dCoq+RdhcPvWagU0iBpVFr6x+RoTBOAIGAJ0JxcNddu2hHu2DTzU47ncZJbzgXTv87KxeTZAEUH5/mbbaeV9PZsSg2kkslcgiUXckHTWhgs/X9jwFOhIKQd3QrnuAutHsAha2P4Qw16IgyhS8js=
+	t=1759928391; cv=none; b=iAaCu0wMpF9hVxrkyVxnP1wV8V6p2lwJTwurH/9OY9aegr3tRK+fGeyQ3JlZTGr93tsFfiyffu6o6WEG+e1m8HyvwW2oZUliH7+VXjkWRZI5EDakLC2ikYFvaw7vgddkGnr4cPxDNQUU4MyNKxf6h8IxrsL/nvj8vowvQVN1qLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759927985; c=relaxed/simple;
-	bh=KE994vaHc9Lub7dV+5qjBDCWtxEyznYGfeEQaGAijBc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TclUDbdR4EdjvFWCpSWN+mgAfrmgDO1xBYPtQzPK7ttHXbXA5Mi4BPGLJDYE7auQK0qcBwXtu2NLubrsmQ6T5BhjXmpTKYFNBzZdTYKiy2vRpkYW9agB1Erjrr4CQyw+/9qvgQLEl9CaCawPjgRBXmyEGWA5KAMlN45gbg3LIKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=P4r5ZVOX; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rUcNF7HmWtTGzIMms9/Q8UU/RXubK/rmOwXw+oXKsP0=; b=P4r5ZVOXQiZxQe2ze5I0fRfgFe
-	pSpL71g8anM40noUiJXsS1xp7yhe7SztuvFwnfLEjqAf49e2OQLwcE5TZP0Pg/i4Rf/vXmYe5GqKS
-	ZxRDzDuS1Bd8r1TvlSsZ1BW8OV0vDdXB5yAkcADohw3lmkGVx7cRii+Uo5129WxPXBPEheNifZTxR
-	WrxZBW6N8RjfU85mN5Cc1hUqI6oUamCnSbXDX06fCeus8sBwf79InY0GglbCWK8y8eLs5tc3veJg4
-	eX9w5YCrW7AKcT1QcqduhUqp+U5WRxssoDlh0GVzi4YgTi+7gPx4nDSFpwma8/gDAxdfAxm4xnTxW
-	TI2yTqYQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56520)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1v6Tex-0000000064b-2vae;
-	Wed, 08 Oct 2025 13:52:47 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1v6Ter-000000003sR-3QOm;
-	Wed, 08 Oct 2025 13:52:42 +0100
-Date: Wed, 8 Oct 2025 13:52:41 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Alexander Wilhelm <alexander.wilhelm@westermo.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	s=arc-20240116; t=1759928391; c=relaxed/simple;
+	bh=RCXBj4j70WAEuAw7p4BCz+eX/3JJaO+E/7fc7KpQLkY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NpDe6F8hwBNBqijSKm5N5WzuuuoMWmWGCDULmxe74bBGAdlYPt7oXfr0ShMAOjLeVBLVz3gyMnhl9I1rlsHPe9Cd9PVwnBj9UwTZb4OPWMnqFea4G1BhaPcVe0iZtGHrjRK03bet2mdhgbT6UrWf0Jfrz2gt1CKvoEeFL2Msv4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 25E2A602F8; Wed,  8 Oct 2025 14:59:47 +0200 (CEST)
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Aquantia PHY in OCSGMII mode?
-Message-ID: <aOZemYL1iofWyBji@shell.armlinux.org.uk>
-References: <20250827073120.6i4wbuimecdplpha@skbuf>
- <aK7Ep7Khdw58hyA0@FUE-ALEWI-WINX>
- <aK7GNVi8ED0YiWau@shell.armlinux.org.uk>
- <aK7J7kOltB/IiYUd@FUE-ALEWI-WINX>
- <aK7MV2TrkVKwOEpr@shell.armlinux.org.uk>
- <20250828092859.vvejz6xrarisbl2w@skbuf>
- <aN4TqGD-YBx01vlj@FUE-ALEWI-WINX>
- <20251007140819.7s5zfy4zv7w3ffy5@skbuf>
- <aOYXEFf1fVK93QeS@FUE-ALEWI-WINX>
- <20251008111059.wxf3jgialy36qc6m@skbuf>
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH net 0/4] netfilter: updates for net
+Date: Wed,  8 Oct 2025 14:59:38 +0200
+Message-ID: <20251008125942.25056-1-fw@strlen.de>
+X-Mailer: git-send-email 2.49.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251008111059.wxf3jgialy36qc6m@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 08, 2025 at 02:10:59PM +0300, Vladimir Oltean wrote:
-> 1. Configure IF_MODE=3 (SGMII autoneg format) for 2500base-x:
+The following patchset contains Netfilter fixes for *net*:
 
-Just to be clear, we're not going to accept SGMII autoneg format for
-2500base-X.
+1) Fix crash (call recursion) when nftables synproxy extension is used
+   in an object map.  When this feature was added in v5.4 the required
+   hook call validation was forgotten.
+   Fix from Fernando Fernandez Mancera.
+2) bridge br_vlan_fill_forward_path_pvid uses incorrect
+   rcu_dereference_protected(); we only have rcu read lock but not
+   RTNL.  Fix from Eric Woudstra.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Last two patches address flakes in two existing selftests.
+
+Please, pull these changes from:
+The following changes since commit 2c95a756e0cfc19af6d0b32b0c6cf3bada334998:
+
+  net: pse-pd: tps23881: Fix current measurement scaling (2025-10-07 18:30:53 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-25-10-08
+
+for you to fetch changes up to e84945bdc619ed4243ba4298dbb8ca2062026474:
+
+  selftests: netfilter: query conntrack state to check for port clash resolution (2025-10-08 13:17:31 +0200)
+
+----------------------------------------------------------------
+netfilter pull request nf-25-10-08
+
+----------------------------------------------------------------
+Eric Woudstra (1):
+      bridge: br_vlan_fill_forward_path_pvid: use br_vlan_group_rcu()
+
+Fernando Fernandez Mancera (1):
+      netfilter: nft_objref: validate objref and objrefmap expressions
+
+Florian Westphal (2):
+      selftests: netfilter: nft_fib.sh: fix spurious test failures
+      selftests: netfilter: query conntrack state to check for port clash resolution
+
+ net/bridge/br_vlan.c                               |  2 +-
+ net/netfilter/nft_objref.c                         | 39 +++++++++++++++
+ .../selftests/net/netfilter/nf_nat_edemux.sh       | 58 +++++++++++++++-------
+ tools/testing/selftests/net/netfilter/nft_fib.sh   | 13 +++--
+ 4 files changed, 89 insertions(+), 23 deletions(-)
 
