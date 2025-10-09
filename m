@@ -1,64 +1,62 @@
-Return-Path: <netdev+bounces-228414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98004BC9FA5
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 18:08:25 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D287FBCA16A
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 18:16:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 15F64353F8F
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 16:06:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9DC7F540C89
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 16:08:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F06822F39B7;
-	Thu,  9 Oct 2025 15:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD3A2F530E;
+	Thu,  9 Oct 2025 16:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mh0krRK1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bHaL1wtJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4DCF2F0673;
-	Thu,  9 Oct 2025 15:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AF91A267;
+	Thu,  9 Oct 2025 16:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760025583; cv=none; b=nr7kCeLrxHIV2W5ZoCEasWZqslGeZPaFFt/yqaXm8WpiAumaeO0Ls5xmyOkBECxocjYkKIwh8MRkJQQTIC1rqWnfK2UdhlHaA1kJduD9Zkyyy9D3lw9sDF6/P+kk/UYLFyodfa2zLIpBjnMFm1kcmpJ21aCvlOdYMlq78FAqKvI=
+	t=1760025634; cv=none; b=mOyqzpPErSZCDtRyKeqzIxnZbwMyA94Tu8TrUQbFXTfyONKrNSHCml9710dEpsHbCJ5CINJCfqc9dsnPAMC9zUK+URiHh1PX1LsXOq77d1FYlUyJXfB2sstWw4qEOPcMxxLRI7mk06T18qctb5jnEVeO/ZSlAtyERvnqUbX95ME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760025583; c=relaxed/simple;
-	bh=pwCS7DcqmB7VW978pKQjnokoVKezjc6Cbqb+Nle17es=;
+	s=arc-20240116; t=1760025634; c=relaxed/simple;
+	bh=Fi7bHxwuG0E5jp8GLYg02fCOE2rLCCy8GclI9WMQB70=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mSjeTT8CuA0KMn4jjTVScX24/t6CBGJ92fm3ZUKEvdFKRELs7aNBJtG+fUxh3d80yAdpsgwHck8VTslUi0DT/zICJqFRVdz0O6Zq3DU+tyiUo7gWFbgBwylqeMgPThfiB3GoFmh/FfSxbGTBFs/tdfoKGTgJEEAfBmeLBwTUjH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mh0krRK1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BC88C4CEE7;
-	Thu,  9 Oct 2025 15:59:42 +0000 (UTC)
+	 MIME-Version:Content-Type; b=CWDLpH/GHekRAmoIrhmcNLRnvlAqjShLQkHKrEOLwMWLVI3FV/DmLp9vjh6t4XjgOfrCXV47ZyOM2ksDLAYUbsjjvSlAKsLbXIas01+i0fneV+T1ocQtGN/pvZGOM+s+uE6nYwXdhIM16RM+KnvU5ICpXLTn/oYnnOVDtlqRvYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bHaL1wtJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7473CC4CEE7;
+	Thu,  9 Oct 2025 16:00:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760025583;
-	bh=pwCS7DcqmB7VW978pKQjnokoVKezjc6Cbqb+Nle17es=;
+	s=k20201202; t=1760025634;
+	bh=Fi7bHxwuG0E5jp8GLYg02fCOE2rLCCy8GclI9WMQB70=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mh0krRK1DQt5XsHxc+yjH/lYDr5e4J1X2++dxcYfWcMuVUyf8WM7gFuoKpWT/VB8P
-	 DsxPHY+dXBb+uVfmrCU2AVcM2Lpb4+lHbYqHmJkxBDCa4vurgp+HypUOf7ALlvpc8v
-	 l5TFa34kKEFZ3reGuZgDDzbaLKdW3b8lKDJqnSZs6GMYy7NbXgJcPzeVnby9NDpe+o
-	 1aPg4mTHVjIPEIwd+3lg9I+/4ja1Fd0rgJAVjN4VUQTmLJja4Wlperp4hhKqBEfyvb
-	 h4PDeFqOiBXQQY9Z1FvkWDKwBJzwbJJlzeEP49XlLoNXJ7C4lnDq9IjvPJCgBFZNmy
-	 ybVtJ4XHLJiPg==
+	b=bHaL1wtJBwAyQmcOl6WAOz6FmLioyMfBR5vqH4zZr88PQuWFFIbunnP/tgsNhN181
+	 zlKOhdr7VidEeBbYc39YZ9z4G0+1Jnfnwo1BTbXTDJHvqByWzGLLTaurziMYJTG0D7
+	 Htr7ZhoAHgWCDgeEYyV/7w524BPJFtbog0+SjSROQT+qoeWA+4Wcx240o7RxLEg/Jp
+	 NUsjFxEDtvlGI3wFShRqG2rRVHYIoidAULOPt4U1SdN4jam43RGSaEZzmmLnBKKUou
+	 zOlEPz9zdcUhkaeTHBj886wNijdoGvixeAJLibOHzoUKB+CMRdkqb1CDHbZ0XYAhEI
+	 5hpDN2glqe+Yw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Amery Hung <ameryhung@gmail.com>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
+Cc: =?UTF-8?q?Ricardo=20B=2E=20Marli=C3=A8re?= <rbm@suse.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
+	maciej.fijalkowski@intel.com,
 	ast@kernel.org,
 	daniel@iogearbox.net,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	mohsin.bashr@gmail.com,
+	eddyz87@gmail.com,
 	netdev@vger.kernel.org,
 	bpf@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17] selftests: drv-net: Pull data before parsing headers
-Date: Thu,  9 Oct 2025 11:55:23 -0400
-Message-ID: <20251009155752.773732-57-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17-6.1] selftests/bpf: Upon failures, exit with code 1 in test_xsk.sh
+Date: Thu,  9 Oct 2025 11:55:53 -0400
+Message-ID: <20251009155752.773732-87-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251009155752.773732-1-sashal@kernel.org>
 References: <20251009155752.773732-1-sashal@kernel.org>
@@ -68,265 +66,101 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.17.1
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Amery Hung <ameryhung@gmail.com>
+From: Ricardo B. Marlière <rbm@suse.com>
 
-[ Upstream commit efec2e55bdefb889639a6e7fe1f1f2431cdddc6a ]
+[ Upstream commit 2a912258c90e895363c0ffc0be8a47f112ab67b7 ]
 
-It is possible for drivers to generate xdp packets with data residing
-entirely in fragments. To keep parsing headers using direct packet
-access, call bpf_xdp_pull_data() to pull headers into the linear data
-area.
+Currently, even if some subtests fails, the end result will still yield
+"ok 1 selftests: bpf: test_xsk.sh". Fix it by exiting with 1 if there are
+any failures.
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
-Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
-Link: https://patch.msgid.link/20250922233356.3356453-9-ameryhung@gmail.com
+Signed-off-by: Ricardo B. Marlière <rbm@suse.com>
+Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+Link: https://lore.kernel.org/bpf/20250828-selftests-bpf-test_xsk_ret-v1-1-e6656c01f397@suse.com
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-YES
+Based on my comprehensive analysis, here is my determination:
 
-- What it fixes and why it matters
-  - The BPF selftest program parsed Ethernet/IP/UDP headers using direct
-    packet access without guaranteeing those headers are in the linear
-    area. On drivers/NIC configs that place header data entirely in XDP
-    fragments (multi-buffer/HDS), this can lead to invalid accesses or
-    verifier failures. The patch ensures headers are pulled into the
-    linear area before parsing, so the tests behave correctly on such
-    drivers.
+**Backport Status: YES**
 
-- Scope and contained changes
-  - Single selftests file only:
-    tools/testing/selftests/net/lib/xdp_native.bpf.c.
-  - Adds kfunc declaration for `bpf_xdp_pull_data()` at
-    xdp_native.bpf.c:17 to request pulling bytes from non-linear XDP
-    data into the linear region.
-  - Updates the UDP header parsing helper to pull and then re-read
-    pointers:
-    - Pull L2 first, then re-load pointers (xdp_native.bpf.c:78–86 and
-      96–106).
-    - For IPv4, pull up to L3+L4 and re-load pointers
-      (xdp_native.bpf.c:91–106).
-    - For IPv6, same pattern (xdp_native.bpf.c:109–124).
-    - This ensures `data`/`data_end` are refreshed after each pull to
-      satisfy the verifier and correctness of direct accesses.
-  - Updates TX path similarly:
-    - Pull L2 then re-load pointers (xdp_native.bpf.c:182–190).
-    - For IPv4, pull up to L3+L4, re-load pointers, then validate, swap
-      L2 and swap IPv4 src/dst (xdp_native.bpf.c:196–221).
-    - For IPv6, same flow including `eth = data` reload before swapping
-      MACs (xdp_native.bpf.c:233–261).
-  - No kernel subsystem logic is changed; only test-side BPF program
-    logic.
+## Analysis
 
-- Backport suitability vs. stable rules
-  - Fixes a real-world issue affecting test correctness on drivers that
-    produce non-linear XDP frames (user-visible in CI/selftests).
-  - Minimal, self-contained change confined to selftests; no API or ABI
-    changes; no architecture changes; low regression risk to the kernel
-    proper.
-  - Aligns with stable policy to keep selftests working on stable trees
-    that already have the underlying feature.
+### Code Change
+The commit adds a simple 2-line fix to ensure the test script exits with
+code 1 when failures occur:
+```bash
++else
++       exit 1
+```
 
-- Important dependency to include
-  - This change depends on kernel support for the kfunc
-    `bpf_xdp_pull_data()` which is introduced by “bpf: Support pulling
-    non-linear xdp data” (net/core/filter.c:12253). Ensure that commit
-    is present in the target stable branch; otherwise the selftest
-    program load will fail on kernels without this kfunc.
-  - There is a follow-up fix that must be included to avoid verifier
-    failures: “selftests: drv-net: Reload pkt pointer after calling
-    filter_udphdr” (commit 11ae737efea10). It re-computes header length
-    using a freshly reloaded `ctx->data` after `filter_udphdr()` because
-    `bpf_xdp_pull_data()` invalidates earlier packet pointers. In this
-    tree, that fix manifests as changing `hdr_len` calculations to `...
-    - (void *)(long)ctx->data` (e.g., xdp_native.bpf.c:430–436 and
-    582–590). Backport this fix alongside the main patch to prevent non-
-    deterministic verifier errors depending on compiler codegen.
+### Rationale for Backporting
 
-- Risk and side effects
-  - Selftests-only; no effect on runtime kernel paths.
-  - The only meaningful risk is missing dependencies: if
-    `bpf_xdp_pull_data()` support isn’t in the target stable branch, or
-    if the follow-up “Reload pkt pointer” fix is omitted, test load or
-    verification can fail. With both present, changes are
-    straightforward and low risk.
+**1. Pattern of Similar Backports**
+My research shows that similar test exit code fixes have been
+consistently backported to stable kernels:
+- `selftests/net: have gro.sh -t return a correct exit code` (commit
+  784e6abd99f24) was backported by AUTOSEL
+- `selftests: ksft: Fix finished() helper exit code on skipped tests`
+  (commit 170c966cbe274) was backported by AUTOSEL
+- `selftests: xsk: fix reporting of failed tests` (commit 895b62eed2ab4)
+  was backported to stable 6.1 branches
 
-Given the above, this is a good candidate for stable backport on
-branches that already include `bpf_xdp_pull_data()` support, and it
-should be backported together with the follow-up “Reload pkt pointer”
-fix to avoid verifier regressions.
+**2. Critical for Testing Infrastructure**
+This fix addresses a real bug in test reporting that affects:
+- **CI/Automated Testing**: Systems running selftests on stable kernels
+  rely on correct exit codes to detect regressions
+- **False Positives**: The current behavior reports "ok" even when tests
+  fail, masking real problems
+- **Quality Assurance**: Proper exit codes are essential for stable
+  kernel validation
 
- .../selftests/net/lib/xdp_native.bpf.c        | 89 +++++++++++++++----
- 1 file changed, 74 insertions(+), 15 deletions(-)
+**3. Meets Stable Kernel Rules**
+According to Documentation/process/stable-kernel-rules.rst:
+- ✅ **Obviously correct**: Trivial 2-line addition with clear intent
+- ✅ **Small and contained**: Only 2 lines in a single shell script
+- ✅ **Fixes a real bug**: Test infrastructure incorrectly reporting
+  success on failures
+- ✅ **Already in mainline**: Commit 2a912258c90e exists in upstream
+- ✅ **Minimal risk**: Changes only test infrastructure, cannot affect
+  kernel runtime
+- ✅ **Benefits users**: Helps developers and organizations running tests
+  on stable kernels
 
-diff --git a/tools/testing/selftests/net/lib/xdp_native.bpf.c b/tools/testing/selftests/net/lib/xdp_native.bpf.c
-index 521ba38f2ddda..df4eea5c192b3 100644
---- a/tools/testing/selftests/net/lib/xdp_native.bpf.c
-+++ b/tools/testing/selftests/net/lib/xdp_native.bpf.c
-@@ -14,6 +14,8 @@
- #define MAX_PAYLOAD_LEN 5000
- #define MAX_HDR_LEN 64
+**4. Historical Evidence**
+The commit 8f610b24a1a44 shows this has already been selected by AUTOSEL
+for backporting, with the marker `[ Upstream commit
+2a912258c90e895363c0ffc0be8a47f112ab67b7 ]` and signed by Sasha Levin.
+
+### Conclusion
+This is a clear candidate for stable backporting. It fixes test
+infrastructure that provides critical validation for stable kernels,
+follows established backporting patterns for similar fixes, and meets
+all stable kernel rules criteria.
+
+ tools/testing/selftests/bpf/test_xsk.sh | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tools/testing/selftests/bpf/test_xsk.sh b/tools/testing/selftests/bpf/test_xsk.sh
+index 65aafe0003db0..62db060298a4a 100755
+--- a/tools/testing/selftests/bpf/test_xsk.sh
++++ b/tools/testing/selftests/bpf/test_xsk.sh
+@@ -241,4 +241,6 @@ done
  
-+extern int bpf_xdp_pull_data(struct xdp_md *xdp, __u32 len) __ksym __weak;
-+
- enum {
- 	XDP_MODE = 0,
- 	XDP_PORT = 1,
-@@ -68,30 +70,57 @@ static void record_stats(struct xdp_md *ctx, __u32 stat_type)
- 
- static struct udphdr *filter_udphdr(struct xdp_md *ctx, __u16 port)
- {
--	void *data_end = (void *)(long)ctx->data_end;
--	void *data = (void *)(long)ctx->data;
- 	struct udphdr *udph = NULL;
--	struct ethhdr *eth = data;
-+	void *data, *data_end;
-+	struct ethhdr *eth;
-+	int err;
-+
-+	err = bpf_xdp_pull_data(ctx, sizeof(*eth));
-+	if (err)
-+		return NULL;
-+
-+	data_end = (void *)(long)ctx->data_end;
-+	data = eth = (void *)(long)ctx->data;
- 
- 	if (data + sizeof(*eth) > data_end)
- 		return NULL;
- 
- 	if (eth->h_proto == bpf_htons(ETH_P_IP)) {
--		struct iphdr *iph = data + sizeof(*eth);
-+		struct iphdr *iph;
-+
-+		err = bpf_xdp_pull_data(ctx, sizeof(*eth) + sizeof(*iph) +
-+					     sizeof(*udph));
-+		if (err)
-+			return NULL;
-+
-+		data_end = (void *)(long)ctx->data_end;
-+		data = (void *)(long)ctx->data;
-+
-+		iph = data + sizeof(*eth);
- 
- 		if (iph + 1 > (struct iphdr *)data_end ||
- 		    iph->protocol != IPPROTO_UDP)
- 			return NULL;
- 
--		udph = (void *)eth + sizeof(*iph) + sizeof(*eth);
--	} else if (eth->h_proto  == bpf_htons(ETH_P_IPV6)) {
--		struct ipv6hdr *ipv6h = data + sizeof(*eth);
-+		udph = data + sizeof(*iph) + sizeof(*eth);
-+	} else if (eth->h_proto == bpf_htons(ETH_P_IPV6)) {
-+		struct ipv6hdr *ipv6h;
-+
-+		err = bpf_xdp_pull_data(ctx, sizeof(*eth) + sizeof(*ipv6h) +
-+					     sizeof(*udph));
-+		if (err)
-+			return NULL;
-+
-+		data_end = (void *)(long)ctx->data_end;
-+		data = (void *)(long)ctx->data;
-+
-+		ipv6h = data + sizeof(*eth);
- 
- 		if (ipv6h + 1 > (struct ipv6hdr *)data_end ||
- 		    ipv6h->nexthdr != IPPROTO_UDP)
- 			return NULL;
- 
--		udph = (void *)eth + sizeof(*ipv6h) + sizeof(*eth);
-+		udph = data + sizeof(*ipv6h) + sizeof(*eth);
- 	} else {
- 		return NULL;
- 	}
-@@ -145,17 +174,34 @@ static void swap_machdr(void *data)
- 
- static int xdp_mode_tx_handler(struct xdp_md *ctx, __u16 port)
- {
--	void *data_end = (void *)(long)ctx->data_end;
--	void *data = (void *)(long)ctx->data;
- 	struct udphdr *udph = NULL;
--	struct ethhdr *eth = data;
-+	void *data, *data_end;
-+	struct ethhdr *eth;
-+	int err;
-+
-+	err = bpf_xdp_pull_data(ctx, sizeof(*eth));
-+	if (err)
-+		return XDP_PASS;
-+
-+	data_end = (void *)(long)ctx->data_end;
-+	data = eth = (void *)(long)ctx->data;
- 
- 	if (data + sizeof(*eth) > data_end)
- 		return XDP_PASS;
- 
- 	if (eth->h_proto == bpf_htons(ETH_P_IP)) {
--		struct iphdr *iph = data + sizeof(*eth);
--		__be32 tmp_ip = iph->saddr;
-+		struct iphdr *iph;
-+		__be32 tmp_ip;
-+
-+		err = bpf_xdp_pull_data(ctx, sizeof(*eth) + sizeof(*iph) +
-+					     sizeof(*udph));
-+		if (err)
-+			return XDP_PASS;
-+
-+		data_end = (void *)(long)ctx->data_end;
-+		data = (void *)(long)ctx->data;
-+
-+		iph = data + sizeof(*eth);
- 
- 		if (iph + 1 > (struct iphdr *)data_end ||
- 		    iph->protocol != IPPROTO_UDP)
-@@ -169,8 +215,10 @@ static int xdp_mode_tx_handler(struct xdp_md *ctx, __u16 port)
- 			return XDP_PASS;
- 
- 		record_stats(ctx, STATS_RX);
-+		eth = data;
- 		swap_machdr((void *)eth);
- 
-+		tmp_ip = iph->saddr;
- 		iph->saddr = iph->daddr;
- 		iph->daddr = tmp_ip;
- 
-@@ -178,9 +226,19 @@ static int xdp_mode_tx_handler(struct xdp_md *ctx, __u16 port)
- 
- 		return XDP_TX;
- 
--	} else if (eth->h_proto  == bpf_htons(ETH_P_IPV6)) {
--		struct ipv6hdr *ipv6h = data + sizeof(*eth);
-+	} else if (eth->h_proto == bpf_htons(ETH_P_IPV6)) {
- 		struct in6_addr tmp_ipv6;
-+		struct ipv6hdr *ipv6h;
-+
-+		err = bpf_xdp_pull_data(ctx, sizeof(*eth) + sizeof(*ipv6h) +
-+					     sizeof(*udph));
-+		if (err)
-+			return XDP_PASS;
-+
-+		data_end = (void *)(long)ctx->data_end;
-+		data = (void *)(long)ctx->data;
-+
-+		ipv6h = data + sizeof(*eth);
- 
- 		if (ipv6h + 1 > (struct ipv6hdr *)data_end ||
- 		    ipv6h->nexthdr != IPPROTO_UDP)
-@@ -194,6 +252,7 @@ static int xdp_mode_tx_handler(struct xdp_md *ctx, __u16 port)
- 			return XDP_PASS;
- 
- 		record_stats(ctx, STATS_RX);
-+		eth = data;
- 		swap_machdr((void *)eth);
- 
- 		__builtin_memcpy(&tmp_ipv6, &ipv6h->saddr, sizeof(tmp_ipv6));
+ if [ $failures -eq 0 ]; then
+         echo "All tests successful!"
++else
++	exit 1
+ fi
 -- 
 2.51.0
 
