@@ -1,104 +1,71 @@
-Return-Path: <netdev+bounces-229083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E452BD8129
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:04:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD257BD83B0
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:42:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D80934F9304
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:04:16 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 344504EB0D2
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:41:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E8D30F944;
-	Tue, 14 Oct 2025 08:02:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8BB30F940;
+	Tue, 14 Oct 2025 08:41:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bi362HIB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VTLIt68X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED56E30F927
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:02:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5678E30F937
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760428967; cv=none; b=XQBwpuZ0gQYbsdgt2ckEh+8BZ1lZyJrcHbQPVrb6e1jmFD5UmFqVsysJ05UkwT3j6O3B71ElpC41F66qMih1vvC78rQJvD/q4PaefFzsQcJpC+8P3VZ9h++rV2eg81GjMuTszyUoqY6FmujbchZvjrbf7i9ME6iUBCvaewHqXAg=
+	t=1760431299; cv=none; b=cqSB0kC4nQgI6CuiOvUVijpVRqG0spz0Seof7vvf0nUIIEe5tV1/rck1VS2bAjD9a8nB8QYDExo62pqIm86wMAY3UfGFizaG9BMpN2g65rhrjs8BMJAdOuSDE64q6NHjG3xTCxTRRgB0AB5y4Shrb8Y7P78njBYsSNmXvetV1vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760428967; c=relaxed/simple;
-	bh=ii+CgokO79ILxVFZG72I/AThFDGSQaZy7MH6v2mPnB0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZKb/IVpm4dAXU5XBIaPZmUNqIGBMP+3oLyMsDB6sUOJB3p9EmEgMDpnMQh+QUnLIT61QIR+hrOcHpJB65krnFeOjQVV9Z+cM4xkeT2AMWfzfcd3BS5Qtk4qu3eR6W4n2oDRx/5Ev668TIVDR/R5k4o4sT9U7t3BSpqrr1VV+6Eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bi362HIB; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-793021f348fso4610198b3a.1
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:02:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760428965; x=1761033765; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yHNcv9pTQXDC3e5Z3Ktz2JVad9X9+xNmKOZAFwSRrUU=;
-        b=bi362HIBJL7H9o8iJbQft3oEUSAG5ncYmhViiVAeKW6DdChzMUeoR7g/U8jD1Djiyv
-         2sr1VL4tl2Vc3vkC4BCU5bAjmqkXdln2uNe4JhKX8LitE8UFYGUDJTxFrPbqZu21F1h7
-         slwQGCBihACae3seHNz+netwMeLXcq3c1h9BdX2IvRIbtVkwLiIvp3o/CIZcuhAOfx7g
-         uavIjAt6rSynwv2fneGvg2tIs5DQ9BpGz8OnuxgsQKdnDXY3PfZVzXgkKcPFadCeU8P9
-         d+9OuwV4s7vbVxKZO6uLYLFdLjsg/DeGeF3V32lCSlh5DMhqIj+drH0X4siVPilrev0r
-         n3XA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760428965; x=1761033765;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yHNcv9pTQXDC3e5Z3Ktz2JVad9X9+xNmKOZAFwSRrUU=;
-        b=qKCjmfxWnCabSWEO9p/CHp/xARalske2PLMwBhV4NvG4sxDbzXc46vwNL7FkJPgFpa
-         EAFxAY8TlccSMOzucZFNMYQyIJrQ0sYWk7OAgDZO/oSYOIpZjf+yX/EYb09XrKAz5tEF
-         w5pJa+71w9h4cdtm7dmV1pwq47oEhQkyhBSYAGw8wWUslyLBZmVbMPHVZypQ2cyxSQrM
-         2OjNzPS3PY5UyJfiF0XVQYSy5Yvj2/dO3jtM5fHlHfgXga5u9lBVf6YlshCQMM6HaVzA
-         hDIcxeGhq8h3mNE4dfxmM0Fwf496wGP7wAM2a97Csr4otjVv2DGlyQ8iFIZL465qhILd
-         LgIg==
-X-Gm-Message-State: AOJu0YyV2J9dINq91WXh+6UJx1WkZPka1KzXRrmhtRUTMNoygCzonN6o
-	eqIdGkwPXJm6PmAnp0ottE4jvO3KSNm+V18tlmK+I3lUk7c2gCDO2191vJQYLQZzXq0=
-X-Gm-Gg: ASbGncuwRySU+Vqd8k5aydGycovVk+sn2aLu8BhxCDhjOz6g/UYI9k2oNv6vHw/z/mx
-	euSNNSj/rABGGQW8ekUi4BIHUlmtYgX4KSZ6zlNYCHEixrPEN538aT0VhZLS/fox4ZburcKRRqT
-	aS04GvpyeKxM58AAaucdB8w8yG7xwzR9ci5uOY9JPGd9zisXphy2B+AoWpEdEyU1uiZi2XDN5iV
-	XggFldt99cBTpayBIGOUDNiUzNJEsDUWgJ+5b6inv6nTS5Z0cgtx8C+UsLNK8gT8HoOWgw766el
-	5mn2bCgn0/1kVDroWh/HVupswmk8Irt2zYgwte76olB4jxVpJ+Rr+H6uR61MZGdEwly4dnBa4O6
-	VGkD+fCyZwU2Tkswj/yaD8WeXDHgze5ST+I77PxWNkRUEtTyUaqZAyr6T
-X-Google-Smtp-Source: AGHT+IHhQNVbwqtX76FTn1yokD9QiIWL92xadhhSbKMe7+jaBPQN7bXiQcYBuRWE7hMxzhtBFCs1Qg==
-X-Received: by 2002:a05:6a20:918e:b0:261:f6d2:e733 with SMTP id adf61e73a8af0-32da817d154mr33377589637.16.1760428965021;
-        Tue, 14 Oct 2025 01:02:45 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33b626407c4sm14648210a91.6.2025.10.14.01.02.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Oct 2025 01:02:44 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1760431299; c=relaxed/simple;
+	bh=VQQ0cSA27uMDgoOksZ9nAA8/qTPIu0hBMexqjmJ6kwc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ezoagAntnbXM7wJeh7XdVs6hNTuZ8K1mHfk9NN3lYwdMZja30sh+ALtAMAGr2D47uVMG2IUiFzh1LsNQCt9BDhl4snFyf7vKeJG2DlrjTRYSNIAvrnglQwwiy2pJKIFjCthx+9QCLVROORkiEI+ctj+Gv7y+h61TklIz5T1K4UU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VTLIt68X; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760431296;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=g+5bhDzSA+Udc5qJjyVCOEZAN6FwwM9bAyimGF6b+f0=;
+	b=VTLIt68XJFcBGoOk4QiOID1QEZMojU6n7D0dfRWMOGrH2BDk6XWOzF/ICGwmRRlb7Ksbu4
+	5Sqd7E1nqIc93od/wJ0NFt6ItGSBUhzgdz4YnbiZAwFfiQfSMuZaE2NlQecDWmsFNQdLfs
+	5kIOpTcWM44v2/gEJWOSRs/SyOhVAms=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-589-iFG2ai3bNhGcMraI2mrl1A-1; Tue,
+ 14 Oct 2025 04:41:32 -0400
+X-MC-Unique: iFG2ai3bNhGcMraI2mrl1A-1
+X-Mimecast-MFC-AGG-ID: iFG2ai3bNhGcMraI2mrl1A_1760431291
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 95EE1180057B;
+	Tue, 14 Oct 2025 08:41:31 +0000 (UTC)
+Received: from fedora (unknown [10.44.34.41])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 85A601800577;
+	Tue, 14 Oct 2025 08:41:29 +0000 (UTC)
+From: Jan Vaclav <jvaclav@redhat.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sabrina Dubroca <sdubroca@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
 	Simon Horman <horms@kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Stanislav Fomichev <stfomichev@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	bridge@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv4 net-next 2/4] bonding: use common function to compute the features
-Date: Tue, 14 Oct 2025 08:02:15 +0000
-Message-ID: <20251014080217.47988-3-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20251014080217.47988-1-liuhangbin@gmail.com>
-References: <20251014080217.47988-1-liuhangbin@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	Jan Vaclav <jvaclav@redhat.com>
+Subject: [PATCH v3 net-next] net/hsr: add protocol version to fill_info output
+Date: Thu,  9 Oct 2025 23:09:08 +0200
+Message-ID: <20251009210903.1055187-6-jvaclav@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,162 +73,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Use the new functon netdev_compute_features_from_lowers() to compute the
-bonding features.
+Currently, it is possible to configure IFLA_HSR_VERSION, but
+there is no way to check in userspace what the currently
+configured HSR protocol version is.
 
-Note that bond_compute_features() currently uses bond_for_each_slave()
-to traverse the lower devices list, and that is just a macro wrapper of
-netdev_for_each_lower_private(). We use similar helper
-netdev_for_each_lower_dev() in netdev_compute_features_from_lowers() to
-iterate the slave device, as there is not need to get the private data.
+Add it to the output of hsr_fill_info(), when the interface
+is using the HSR protocol. Let's not expose it when using
+the PRP protocol, since it only has one version and it's
+not possible to set it from userspace.
 
-No functional change intended.
-
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+This info could then be used by e.g. ip(8), like so:
+$ ip -d link show hsr0
+12: hsr0: <BROADCAST,MULTICAST> mtu ...
+    ...
+    hsr slave1 veth0 slave2 veth1 ... proto 0 version 1
 ---
- drivers/net/bonding/bond_main.c | 99 ++-------------------------------
- 1 file changed, 4 insertions(+), 95 deletions(-)
+v3: Changed after discussion so that IFLA_HSR_VERSION is filled
+    only when the protocol is HSR (and not PRP, since setting
+    the version is prohibited if the protocol is PRP).
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 4da619210c1f..3b78984e5912 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -1468,97 +1468,6 @@ static netdev_features_t bond_fix_features(struct net_device *dev,
- 	return features;
- }
+v2: https://lore.kernel.org/netdev/20250922093743.1347351-3-jvaclav@redhat.com/
+
+v1: https://lore.kernel.org/netdev/20250918125337.111641-2-jvaclav@redhat.com/
+
+ net/hsr/hsr_netlink.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/hsr/hsr_netlink.c b/net/hsr/hsr_netlink.c
+index b12047024..4461adf69 100644
+--- a/net/hsr/hsr_netlink.c
++++ b/net/hsr/hsr_netlink.c
+@@ -166,6 +166,8 @@ static int hsr_fill_info(struct sk_buff *skb, const struct net_device *dev)
+ 		goto nla_put_failure;
+ 	if (hsr->prot_version == PRP_V1)
+ 		proto = HSR_PROTOCOL_PRP;
++	else if (nla_put_u8(skb, IFLA_HSR_VERSION, hsr->prot_version))
++		goto nla_put_failure;
+ 	if (nla_put_u8(skb, IFLA_HSR_PROTOCOL, proto))
+ 		goto nla_put_failure;
  
--#define BOND_VLAN_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
--				 NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE | \
--				 NETIF_F_GSO_ENCAP_ALL | \
--				 NETIF_F_HIGHDMA | NETIF_F_LRO)
--
--#define BOND_ENC_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
--				 NETIF_F_RXCSUM | NETIF_F_GSO_SOFTWARE | \
--				 NETIF_F_GSO_PARTIAL)
--
--#define BOND_MPLS_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
--				 NETIF_F_GSO_SOFTWARE)
--
--#define BOND_GSO_PARTIAL_FEATURES (NETIF_F_GSO_ESP)
--
--
--static void bond_compute_features(struct bonding *bond)
--{
--	netdev_features_t gso_partial_features = BOND_GSO_PARTIAL_FEATURES;
--	unsigned int dst_release_flag = IFF_XMIT_DST_RELEASE |
--					IFF_XMIT_DST_RELEASE_PERM;
--	netdev_features_t vlan_features = BOND_VLAN_FEATURES;
--	netdev_features_t enc_features  = BOND_ENC_FEATURES;
--#ifdef CONFIG_XFRM_OFFLOAD
--	netdev_features_t xfrm_features  = BOND_XFRM_FEATURES;
--#endif /* CONFIG_XFRM_OFFLOAD */
--	netdev_features_t mpls_features  = BOND_MPLS_FEATURES;
--	struct net_device *bond_dev = bond->dev;
--	struct list_head *iter;
--	struct slave *slave;
--	unsigned short max_hard_header_len = ETH_HLEN;
--	unsigned int tso_max_size = TSO_MAX_SIZE;
--	u16 tso_max_segs = TSO_MAX_SEGS;
--
--	if (!bond_has_slaves(bond))
--		goto done;
--
--	vlan_features = netdev_base_features(vlan_features);
--	mpls_features = netdev_base_features(mpls_features);
--
--	bond_for_each_slave(bond, slave, iter) {
--		vlan_features = netdev_increment_features(vlan_features,
--			slave->dev->vlan_features, BOND_VLAN_FEATURES);
--
--		enc_features = netdev_increment_features(enc_features,
--							 slave->dev->hw_enc_features,
--							 BOND_ENC_FEATURES);
--
--#ifdef CONFIG_XFRM_OFFLOAD
--		xfrm_features = netdev_increment_features(xfrm_features,
--							  slave->dev->hw_enc_features,
--							  BOND_XFRM_FEATURES);
--#endif /* CONFIG_XFRM_OFFLOAD */
--
--		gso_partial_features = netdev_increment_features(gso_partial_features,
--								 slave->dev->gso_partial_features,
--								 BOND_GSO_PARTIAL_FEATURES);
--
--		mpls_features = netdev_increment_features(mpls_features,
--							  slave->dev->mpls_features,
--							  BOND_MPLS_FEATURES);
--
--		dst_release_flag &= slave->dev->priv_flags;
--		if (slave->dev->hard_header_len > max_hard_header_len)
--			max_hard_header_len = slave->dev->hard_header_len;
--
--		tso_max_size = min(tso_max_size, slave->dev->tso_max_size);
--		tso_max_segs = min(tso_max_segs, slave->dev->tso_max_segs);
--	}
--	bond_dev->hard_header_len = max_hard_header_len;
--
--done:
--	bond_dev->gso_partial_features = gso_partial_features;
--	bond_dev->vlan_features = vlan_features;
--	bond_dev->hw_enc_features = enc_features | NETIF_F_GSO_ENCAP_ALL |
--				    NETIF_F_HW_VLAN_CTAG_TX |
--				    NETIF_F_HW_VLAN_STAG_TX;
--#ifdef CONFIG_XFRM_OFFLOAD
--	bond_dev->hw_enc_features |= xfrm_features;
--#endif /* CONFIG_XFRM_OFFLOAD */
--	bond_dev->mpls_features = mpls_features;
--	netif_set_tso_max_segs(bond_dev, tso_max_segs);
--	netif_set_tso_max_size(bond_dev, tso_max_size);
--
--	bond_dev->priv_flags &= ~IFF_XMIT_DST_RELEASE;
--	if ((bond_dev->priv_flags & IFF_XMIT_DST_RELEASE_PERM) &&
--	    dst_release_flag == (IFF_XMIT_DST_RELEASE | IFF_XMIT_DST_RELEASE_PERM))
--		bond_dev->priv_flags |= IFF_XMIT_DST_RELEASE;
--
--	netdev_change_features(bond_dev);
--}
--
- static void bond_setup_by_slave(struct net_device *bond_dev,
- 				struct net_device *slave_dev)
- {
-@@ -2273,7 +2182,7 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
- 	}
- 
- 	bond->slave_cnt++;
--	bond_compute_features(bond);
-+	netdev_compute_features_from_lowers(bond->dev, true);
- 	bond_set_carrier(bond);
- 
- 	/* Needs to be called before bond_select_active_slave(), which will
-@@ -2525,7 +2434,7 @@ static int __bond_release_one(struct net_device *bond_dev,
- 		call_netdevice_notifiers(NETDEV_RELEASE, bond->dev);
- 	}
- 
--	bond_compute_features(bond);
-+	netdev_compute_features_from_lowers(bond->dev, true);
- 	if (!(bond_dev->features & NETIF_F_VLAN_CHALLENGED) &&
- 	    (old_features & NETIF_F_VLAN_CHALLENGED))
- 		slave_info(bond_dev, slave_dev, "last VLAN challenged slave left bond - VLAN blocking is removed\n");
-@@ -4028,7 +3937,7 @@ static int bond_slave_netdev_event(unsigned long event,
- 	case NETDEV_FEAT_CHANGE:
- 		if (!bond->notifier_ctx) {
- 			bond->notifier_ctx = true;
--			bond_compute_features(bond);
-+			netdev_compute_features_from_lowers(bond->dev, true);
- 			bond->notifier_ctx = false;
- 		}
- 		break;
-@@ -6011,7 +5920,7 @@ void bond_setup(struct net_device *bond_dev)
- 	 * capable
- 	 */
- 
--	bond_dev->hw_features = BOND_VLAN_FEATURES |
-+	bond_dev->hw_features = VIRTUAL_DEV_VLAN_FEATURES |
- 				NETIF_F_HW_VLAN_CTAG_RX |
- 				NETIF_F_HW_VLAN_CTAG_FILTER |
- 				NETIF_F_HW_VLAN_STAG_RX |
 -- 
-2.50.1
+2.51.0
 
 
