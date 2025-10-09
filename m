@@ -1,86 +1,54 @@
-Return-Path: <netdev+bounces-228328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D36BBC7EC7
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 10:07:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E02CBC8022
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 10:20:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28D883A2BC2
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 08:07:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84A9E3B6F1B
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 08:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE2552D7DF8;
-	Thu,  9 Oct 2025 08:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AKw/JXTV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603AF28C014;
+	Thu,  9 Oct 2025 08:20:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F318F2D5927
-	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 08:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3808626B97E;
+	Thu,  9 Oct 2025 08:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759996971; cv=none; b=VSwFCM7OulCjeMxga6Ej9Il+x1FpFQRoJOaqR4fX0OUGo/JWz4oOmXCzhS8f0E95ohy8ukl0VbWRFQRizDT6BKBVFIS5cayyxmCY0hh5V0VMsG2YIG4Jn/D2pZGUF+vM2GYkfVmh1dcH6Z5pCvaQ701R1V01qtC5wP/tXBji4hc=
+	t=1759998038; cv=none; b=cWmqDwSIO66TD1ZBMCMVgwKNRiWvloggY2coS4at9fXePtT8MOw51LxiJ3XQhX92RBO2kvrWeULSy1z11gjjqEX91CtHVp9hyl4m1xDT1NTmCwNYMEusO/TBwx94MyoKt/W2QGQylRwQ9Se7lj6O6UvccDXgDB4BWi7iECcMy7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759996971; c=relaxed/simple;
-	bh=KfgP8PKHQkhMPJ6eadK+yTkypPjqTwhIA8NepWDeE9A=;
+	s=arc-20240116; t=1759998038; c=relaxed/simple;
+	bh=r4j7KL3ZDY2ItBlX7tAcF4DYZ7j4P2ykR08zNx+Sdac=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kytn3sup3X1MXyHuGvSyRB4DbqKj1esoJ9aiJZQ3SrXiTecRKgSLvTydFfFMlGrlfIvoX8v3Qcjb4DCHp2GXIVRJd67W4UVmjAslcb0HNgXhGQhS08rcb97EJhbOrVCwQlHwYL3g58FS7QF/S6sZtfxn9BHuA0rHhET8Qx+A+p8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AKw/JXTV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759996968;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V6zsf8fjJWbuUz6EJwoT59Z49B5oYOEITBMV+N/RaV8=;
-	b=AKw/JXTVyvDw4cD5PZBbcwJWzSxkLXr64lpoIyOfgUenGbtYo80Qjoh8PQrV6HvEjIg/Ca
-	7gEBHPTqaJ2NDyJ2040eioPFF2feErLrjoYUoxzIRrC7A427HcuYt71/bT6/Vk36zfRnCW
-	05u5OeleOkHAROlnxYNkCE5bbC2+NRQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-654-U9X_TVdyPAGVUSmF7JXZHQ-1; Thu, 09 Oct 2025 04:02:47 -0400
-X-MC-Unique: U9X_TVdyPAGVUSmF7JXZHQ-1
-X-Mimecast-MFC-AGG-ID: U9X_TVdyPAGVUSmF7JXZHQ_1759996966
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3ece0fd841cso696730f8f.0
-        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 01:02:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759996966; x=1760601766;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V6zsf8fjJWbuUz6EJwoT59Z49B5oYOEITBMV+N/RaV8=;
-        b=j28EdzO5TEEc/xWm9JA2GjqtJyJhaLzUiBumd9MIbvVQil89Twnq3/WpCmsNbsE5Xv
-         BbzfVy8gJY1dd5qQr+Ww0T5na/fn1qSCGBhEAzgh9OPnYwx/jWNxc6KxAwsgCf9QIV+5
-         6XrEUKtBaHK9E7i97TPpiyxYJQyOeIzZy/dZD8alHG0tiYP1tM6vSWzfnMtQceGDTBJn
-         ELDxP/7zFwkgRdeFrboskWukhshgbHVrPunsXByNXspdyeMEQuW9C375zdZXvtIHcTUm
-         Efqn6zMqQmhhBz6d89HrjD04zvhOu1FjOg+ohce6d3CTz1BTfl1vv2CZXVdWQAQ9Rh23
-         lj1g==
-X-Gm-Message-State: AOJu0YxpsqnVqGnLwl7+UYbtdfztNLe84ChkxNnarWLci6KJg7bXn6rm
-	iX5Rjj2x2p5tx3UF7EjSXFK4GHJmDF1APTW5dHeS73XLyxSMrVh/uCfm/9ce/pR/rNx77hk6jf4
-	ALB59HOg2k5yZ7GnjdutbluDS5mXaGK8kG2CRqdxAmzx/ff5eMS04lh7Qs3KBf4i4fQ==
-X-Gm-Gg: ASbGnctMi8XX9zfCeYh/+T3Uxb5TQoJwPawH+8Co6YWXztAx+jgtRmxhvfRclFQF06/
-	klgKptadH2eya0YaTn4MHIMt5l69Zr/bwDjNl9+xc0kQSoW4lVTp2xsLacn/Bbi/3Kznl7Tif/v
-	qheSrU4j3OUavMd0/7VMzgexbNIx+n3qKtWG4BJXokdWaStjRy/e/lHYeKop/ANvWc/8GQmIFlT
-	SBhBMrjkaBw8Vb57AgSgs8ussA1NB3X07aUXuuK79roPF+w4fxMOMlE/KV2JaejsgnwomIj+AvZ
-	YinhbMz3q0v2FPdAuFCKfLgesEksGhenkOGQJsWQqbgLZvJCQ5bj7RpqPRCDjuRWFGMTjabtoBb
-	GY1um1GFceMm9b+uX1w==
-X-Received: by 2002:a05:6000:26d0:b0:425:8bf9:557d with SMTP id ffacd0b85a97d-4266e8dd3c2mr4394918f8f.44.1759996965730;
-        Thu, 09 Oct 2025 01:02:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IErg2jmKIzfr0le15oKD1DjKM11Y25v2S6Dk1KGneA1BBfPBadVcx+OCodmaVYpJSX8X4ibLA==
-X-Received: by 2002:a05:6000:26d0:b0:425:8bf9:557d with SMTP id ffacd0b85a97d-4266e8dd3c2mr4394872f8f.44.1759996965224;
-        Thu, 09 Oct 2025 01:02:45 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4255d8f45e9sm33944702f8f.51.2025.10.09.01.02.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Oct 2025 01:02:44 -0700 (PDT)
-Message-ID: <ef6fd852-0e9a-41fb-a4f9-8cc95c78f9bd@redhat.com>
-Date: Thu, 9 Oct 2025 10:02:42 +0200
+	 In-Reply-To:Content-Type; b=pUAvLRyzDeAVWYHKe7DJyGMf6wyYuSYTyZSEMDvDgsCP1+IwyuQ9+Ssk/26PD+pRfNG8XC8eUSzEFd1W0/YGDQEecLLr6zS8P8rnaictPJvLiO1Z56HTtRRundgDFDYU9IMVfjP+mDDcMRos/Py0Xz21XRAFFzIZ+Z+zWmqiIAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4cj2Td0Mj6z9sSL;
+	Thu,  9 Oct 2025 10:04:37 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id qQ36Dhni13kk; Thu,  9 Oct 2025 10:04:36 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4cj2Tc5kJ8z9sSC;
+	Thu,  9 Oct 2025 10:04:36 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id A8FDF8B770;
+	Thu,  9 Oct 2025 10:04:36 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id CnXkw3FAfnqR; Thu,  9 Oct 2025 10:04:36 +0200 (CEST)
+Received: from [192.168.235.99] (unknown [192.168.235.99])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id AE04F8B76D;
+	Thu,  9 Oct 2025 10:04:34 +0200 (CEST)
+Message-ID: <faf62f20-8844-42a0-a7a7-846d8ead0622@csgroup.eu>
+Date: Thu, 9 Oct 2025 10:04:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,98 +56,102 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: usb: lan78xx: Fix lost EEPROM write timeout
- error(-ETIMEDOUT) in lan78xx_write_raw_eeprom
-To: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>,
- Thangaraj Samynathan <Thangaraj.S@microchip.com>,
- Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
- UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org, khalid@kernel.org,
- linux-kernel-mentees@lists.linuxfoundation.org, skhan@linuxfoundation.org,
- david.hunter.linux@gmail.com, stable@vger.kernel.org
-References: <20251009053009.5427-1-bhanuseshukumar@gmail.com>
- <b183a040-3d1c-47aa-a41a-9865ba70b94d@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <b183a040-3d1c-47aa-a41a-9865ba70b94d@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: (bisected) [PATCH v2 08/37] mm/hugetlb: check for unreasonable
+ folio sizes when registering hstate
+To: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
+Cc: Zi Yan <ziy@nvidia.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Marco Elver <elver@google.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>,
+ Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
+ netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+ Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+ Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+ virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+ wireguard@lists.zx2c4.com, x86@kernel.org,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+References: <20250901150359.867252-1-david@redhat.com>
+ <20250901150359.867252-9-david@redhat.com>
+ <3e043453-3f27-48ad-b987-cc39f523060a@csgroup.eu>
+ <d3fc12d4-0b59-4b1f-bb5c-13189a01e13d@redhat.com>
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+Content-Language: fr-FR
+In-Reply-To: <d3fc12d4-0b59-4b1f-bb5c-13189a01e13d@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hello,
 
-On 10/9/25 7:41 AM, Bhanu Seshu Kumar Valluri wrote:
-> On 09/10/25 11:00, Bhanu Seshu Kumar Valluri wrote:
->> The function lan78xx_write_raw_eeprom failed to properly propagate EEPROM
->> write timeout errors (-ETIMEDOUT). In the timeout  fallthrough path, it first
->> attempted to restore the pin configuration for LED outputs and then
->> returned only the status of that restore operation, discarding the
->> original timeout error saved in ret.
+
+Le 09/10/2025 à 09:22, David Hildenbrand a écrit :
+> On 09.10.25 09:14, Christophe Leroy wrote:
+>> Hi David,
 >>
->> As a result, callers could mistakenly treat EEPROM write operation as
->> successful even though the EEPROM write had actually timed out with no
->> or partial data write.
->>
->> To fix this, handle errors in restoring the LED pin configuration separately.
->> If the restore succeeds, return any prior EEPROM write timeout error saved
->> in ret to the caller.
->>
->> Suggested-by: Oleksij Rempel <o.rempel@pengutronix.de>
->> Fixes: 8b1b2ca83b20 ("net: usb: lan78xx: Improve error handling in EEPROM and OTP operations")
->> cc: stable@vger.kernel.org
->> Signed-off-by: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
->> ---
->>  Note:
->>  The patch is compiled and tested using EVB-LAN7800LC.
->>  The patch was suggested by Oleksij Rempel while reviewing a fix to a bug
->>  found by syzbot earlier.
->>  The review mail chain where this fix was suggested is given below.
->>  https://lore.kernel.org/all/aNzojoXK-m1Tn6Lc@pengutronix.de/
->>
->>  ChangeLog:
->>  v1->v2:
->>   Added cc:stable tag as asked during v1 review.
->>   V1 Link : https://lore.kernel.org/all/20251004040722.82882-1-bhanuseshukumar@gmail.com/
->>
->>  drivers/net/usb/lan78xx.c | 11 +++++++----
->>  1 file changed, 7 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
->> index d75502ebbc0d..5ccbe6ae2ebe 100644
->> --- a/drivers/net/usb/lan78xx.c
->> +++ b/drivers/net/usb/lan78xx.c
->> @@ -1174,10 +1174,13 @@ static int lan78xx_write_raw_eeprom(struct lan78xx_net *dev, u32 offset,
->>  	}
->>  
->>  write_raw_eeprom_done:
->> -	if (dev->chipid == ID_REV_CHIP_ID_7800_)
->> -		return lan78xx_write_reg(dev, HW_CFG, saved);
->> -
->> -	return 0;
->> +	if (dev->chipid == ID_REV_CHIP_ID_7800_) {
->> +		int rc = lan78xx_write_reg(dev, HW_CFG, saved);
->> +		/* If USB fails, there is nothing to do */
->> +		if (rc < 0)
->> +			return rc;
->> +	}
->> +	return ret;
->>  }
->>  
->>  static int lan78xx_read_raw_otp(struct lan78xx_net *dev, u32 offset,
+>> Le 01/09/2025 à 17:03, David Hildenbrand a écrit :
+>>> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
+>>> index 1e777cc51ad04..d3542e92a712e 100644
+>>> --- a/mm/hugetlb.c
+>>> +++ b/mm/hugetlb.c
+>>> @@ -4657,6 +4657,7 @@ static int __init hugetlb_init(void)
+>>>        BUILD_BUG_ON(sizeof_field(struct page, private) * BITS_PER_BYTE <
+>>>                __NR_HPAGEFLAGS);
+>>> +    BUILD_BUG_ON_INVALID(HUGETLB_PAGE_ORDER > MAX_FOLIO_ORDER);
+>>>        if (!hugepages_supported()) {
+>>>            if (hugetlb_max_hstate || default_hstate_max_huge_pages)
+>>> @@ -4740,6 +4741,7 @@ void __init hugetlb_add_hstate(unsigned int order)
+>>>        }
+>>>        BUG_ON(hugetlb_max_hstate >= HUGE_MAX_HSTATE);
+>>>        BUG_ON(order < order_base_2(__NR_USED_SUBPAGE));
+>>> +    WARN_ON(order > MAX_FOLIO_ORDER);
+>>>        h = &hstates[hugetlb_max_hstate++];
+>>>        __mutex_init(&h->resize_lock, "resize mutex", &h->resize_key);
+>>>        h->order = order;
 > 
-> Hi,
+> We end up registering hugetlb folios that are bigger than 
+> MAX_FOLIO_ORDER. So we have to figure out how a config can trigger that 
+> (and if we have to support that).
 > 
-> The subject prefix must be [PATCH v2] instead. I overlooked it. Should I resend it?
 
-This is not a review, and given the current amount of queued patches a
-real one will not follow soon, but please do not send a new version just
-for this.
+MAX_FOLIO_ORDER is defined as:
 
-Thanks,
+#ifdef CONFIG_ARCH_HAS_GIGANTIC_PAGE
+#define MAX_FOLIO_ORDER		PUD_ORDER
+#else
+#define MAX_FOLIO_ORDER		MAX_PAGE_ORDER
+#endif
 
-Paolo
+MAX_PAGE_ORDER is the limit for dynamic creation of hugepages via 
+/sys/kernel/mm/hugepages/ but bigger pages can be created at boottime 
+with kernel boot parameters without CONFIG_ARCH_HAS_GIGANTIC_PAGE:
 
+   hugepagesz=64m hugepages=1 hugepagesz=256m hugepages=1
+
+Gives:
+
+HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+HugeTLB: 0 KiB vmemmap can be freed for a 1.00 GiB page
+HugeTLB: registered 64.0 MiB page size, pre-allocated 1 pages
+HugeTLB: 0 KiB vmemmap can be freed for a 64.0 MiB page
+HugeTLB: registered 256 MiB page size, pre-allocated 1 pages
+HugeTLB: 0 KiB vmemmap can be freed for a 256 MiB page
+HugeTLB: registered 4.00 MiB page size, pre-allocated 0 pages
+HugeTLB: 0 KiB vmemmap can be freed for a 4.00 MiB page
+HugeTLB: registered 16.0 MiB page size, pre-allocated 0 pages
+HugeTLB: 0 KiB vmemmap can be freed for a 16.0 MiB page
+
+
+Christophe
 
