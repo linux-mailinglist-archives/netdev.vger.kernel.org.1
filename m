@@ -1,107 +1,105 @@
-Return-Path: <netdev+bounces-228384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 261A5BC9986
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 16:45:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BB54BC998F
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 16:46:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9D44E4FCF01
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 14:43:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B0E33E13F6
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 14:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618232EB5CF;
-	Thu,  9 Oct 2025 14:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4085F2EB848;
+	Thu,  9 Oct 2025 14:44:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="A9VabX1f"
+	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="4Sa3zM8D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C138C2EAD13
-	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 14:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64AA32EB847;
+	Thu,  9 Oct 2025 14:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760021029; cv=none; b=br/SN00DJcEXWZWi5M6splNC/kDIWoqn/dBKltTGfTfZ3Zg7wrnVkzdaUJJVYGV0tDG6vIaZYgFwBU6LIhP2I5JO9gNqiYxoIrptF/MHSVcbvotjbqwv5sL4NCWnniI1nK6HfxhIX47dXaN7ORhE/kaMcERstKZhmM0HJkJJ+Vg=
+	t=1760021058; cv=none; b=BXBY/2lFc/ZA+jLGsVthixP4Xk3V1miNwL9vliqm5R8QPGh+Qp4M5FfIARNVNrIsg5QCSV74ZmBLf5T9jd0hXRrEMrgbdcoc8AWusE0eVpkA8iEPhju5d0SlcT2LhtSFK9oIttvMICg1eqZcOhA9YRdLVt/jl0m8Oyhhfv3kUXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760021029; c=relaxed/simple;
-	bh=hRicmbLQWEJ8+bPspecCmobqh1Mt64hI1L8Yhs3vPYk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XsESR8rBAdiUZ/Gx41cbKuMapT1zuSBf5sO2oJMiXU6hmEJBWz8I9gUiChOZOF1X7CiD0Ps4+cTvn/T/t/AwdKGNGamVMkSpOU4nD2MjKIWk5NyYnxTC3cTCCne72TzxI0S9mzkcfoik0RrPceZiXIsEPREW+ZF1nDkkMYxEm8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=A9VabX1f; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-330631e534eso1230086a91.0
-        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 07:43:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1760021027; x=1760625827; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=82eJnEG3a2gfzvtAFqHYyT6W99N4n+MkixpvA8b26PM=;
-        b=A9VabX1fKTfAj0vBmzcnMWQSmxIpDQognGLwtLAAFw6J7PvLiEI7zm4gO6hNh5tHH/
-         hvQkvFmjtHDA+AmOSpgX6XRaSyT+drTwYh4LFGLenigAy3FQHbOZ66WoW0FFakEbzOWQ
-         qTTf9+/mtmQcdkToN1BZLL6xX85NAygIYzvRc3GnIyKLt1qb03/jjwdknFXw6mTvZfCF
-         UgQzrH24YklzgNYfH5811xVZTZtB0dN9oyB6dS0DDVzAdEdSX88IrspEH4v73UYnzcmt
-         B8xECq99sCToB7tDI1ymkSzPGDoOTJf9/h+FNYwgjYzr9pFIreOMmmxotuOrkCmON4Uf
-         Tn5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760021027; x=1760625827;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=82eJnEG3a2gfzvtAFqHYyT6W99N4n+MkixpvA8b26PM=;
-        b=Hc4XHKNdruyNNyUBBjVa48G4MMGEc0HH9t7enwLo+fMnhspmZmsHiKg+Imq6ULMoSL
-         GCcXP6zssMRvXS4sPRHw6FfpQAluZlWWlrbj2nVcAPNAZeyzoA1cZrU9XKDqDlkvlqkH
-         WbInbGKiE+xpT+Rc1bFmSkfkt808uqVJjv+9/WvwErI0iBkIoJ77+wT8QoXWA1yyT+pb
-         4xMPGnvzLWT9t7g47Sp6CBBVzrw6AKlPqXtNMvqJDBuM7X9atqO5ziuLQeTRUibqLOdy
-         wfDGiqsSoMMQbS7XSb7zJF8h+qJLFk9kfe20GRzYRSMZX3wUdERWv/Eth7LVXZTDl8ZR
-         2zWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW76LunFK8aCLywNAKckyMT5k4JP4FQQMa/Y8qknKdcI0AabYI4nIL66OENYvrXtZAbi0uIylI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcLhETCYD40QA0VEg1PyemixIucnvTum0lYBnsOp8y5Tm8abaq
-	6Gd6vNzR1LbWOeNgehyfmB4F/cR5rPrv+NV86NctIFU1xYHwK1O8kP2lRBI0PQ4z20fZJcrsn+U
-	VsYYQnJdByscmT2scZsTCKo/oIPlL8tuXAAGqAlSN
-X-Gm-Gg: ASbGncuGO6i+voGnM7VaZol31SkP4ayFA4oG3IjsmDEIcj4H9YLM8wcjjUTZnNWD741
-	yobc7i85lEsZD/TFS+F3RO86+oZeNcH8enBnF6OBRXSQ8SwTSCogqpogzr1j4p/elTrHS46KHN9
-	s/xEDwyrU6TcvRNmIWc3eWNU7M99s1TzqHQx4FqyN8UU+wg8L7wyUk/yfSylnaT4hPacS7IdQmK
-	x1hgdsMbwz6q+f6AyMK1ZN8JH9vTFK5/IZxuplhPY24uQ3BDuFzIZJBXRyImGLiMAN3moi1FV2N
-	MoZ3sW54CrXa3MUBTAsRKkEiR4lO7LX2NDLRZQUy3eRAiLeke/4VC1ekDMPnTh56DWo=
-X-Google-Smtp-Source: AGHT+IH805V7OJYS76B/rqvAegpKx0ru2dDHeH6i2pmIfcb1qUFIZrvtv/9KKjkxayYPFQ3wLu7QgWNtfXP6qRGTo60=
-X-Received: by 2002:a17:90b:4b87:b0:339:a4ef:c8b4 with SMTP id
- 98e67ed59e1d1-33b513861d8mr9700512a91.28.1760021026889; Thu, 09 Oct 2025
- 07:43:46 -0700 (PDT)
+	s=arc-20240116; t=1760021058; c=relaxed/simple;
+	bh=GJwJeFIPpG620HviwBNcU+VoSoiv+7fzEEmZ0FS2P48=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WW1FoV5047cfUyQuIcygagDmmiPXs6WHJXpjV43h7SHZAKFWi6nknRiEwmZratxyjWu3MnkSMdSzH3Xkrq8loZDCqWPlbpAL9M554gD0ksWfgZse0VN9eawqa/jdxhxLzi3i9f7AmiQCHFOj45iX4REO9wHwNaErMz/YvPqB4ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=pass smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=4Sa3zM8D; arc=none smtp.client-ip=95.168.196.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cdn77.com
+DKIM-Signature: a=rsa-sha256; t=1760021046; x=1760625846; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=ToT0NvhlqFGtmHqtaoOHWloSTlf7psIb/sdAF5TIfxc=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:In-Reply-To:References;
+   b=4Sa3zM8DcUS5rZ3SLc/w5A+CEPjq7es5HLlbIW2+08+b4NY32YTRJyokfqJFtHcRpGJ6HiIZYCZ16+lP9nsssmpXcE4ZS5JvB23bxUOFfZfAMujFDMIipf9jCXfpedIp3Z+FZQ/4AdsdVi8bwTbVFdKCt0yPZYbgvateGqvTEXs=
+Received: from [10.26.3.35] ([80.250.18.198])
+        by mail.sh.cz (14.1.0 build 17 ) with ASMTP (SSL) id 202510091644051992;
+        Thu, 09 Oct 2025 16:44:05 +0200
+Message-ID: <13b5aeb6-ee0a-4b5b-a33a-e1d1d6f7f60e@cdn77.com>
+Date: Thu, 9 Oct 2025 16:44:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251007-ip6_tunnel-headroom-v1-1-c1287483a592@arista.com> <20251007183721.7654cd3c@kernel.org>
-In-Reply-To: <20251007183721.7654cd3c@kernel.org>
-From: Dmitry Safonov <dima@arista.com>
-Date: Thu, 9 Oct 2025 15:43:34 +0100
-X-Gm-Features: AS18NWBQGRh6-gDD8buab9A_yPyWA20bkiesKGCiJxTSNNu73FtqaTqUrITm5KY
-Message-ID: <CAGrbwDQB-x6t6cHS3prVxWXPuOPYQXF8mqUTuzmSn_95SBXK1Q@mail.gmail.com>
-Subject: Re: [PATCH] net/ip6_tunnel: Prevent perpetual tunnel growth
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Dmitry Safonov via B4 Relay <devnull+dima.arista.com@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Tom Herbert <tom@herbertland.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Florian Westphal <fw@strlen.de>, Francesco Ruggeri <fruggeri05@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5] memcg: expose socket memory pressure in a cgroup
+To: Roman Gushchin <roman.gushchin@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Yosry Ahmed <yosry.ahmed@linux.dev>,
+ linux-mm@kvack.org, netdev@vger.kernel.org,
+ Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>,
+ Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org,
+ Tejun Heo <tj@kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
+ <mkoutny@suse.com>, Matyas Hurtik <matyas.hurtik@cdn77.com>
+References: <20251007125056.115379-1-daniel.sedlak@cdn77.com>
+ <87qzvdqkyh.fsf@linux.dev>
+Content-Language: en-US
+From: Daniel Sedlak <daniel.sedlak@cdn77.com>
+In-Reply-To: <87qzvdqkyh.fsf@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CTCH: RefID="str=0001.0A2D0305.68E7CA35.0040,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
 
-On Wed, Oct 8, 2025 at 2:37=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Tue, 07 Oct 2025 07:08:36 +0100 Dmitry Safonov via B4 Relay wrote:
-> > +     static const unsigned int max_allowed =3D 512;
->
-> nit: could we drop this 'static' while we move the code?
+Hi Roman,
 
-Yep, thanks, will send v2 with static dropped.
+On 10/8/25 8:58 PM, Roman Gushchin wrote:
+>> This patch exposes a new file for each cgroup in sysfs which is a
+>> read-only single value file showing how many microseconds this cgroup
+>> contributed to throttling the throughput of network sockets. The file is
+>> accessible in the following path.
+>>
+>>    /sys/fs/cgroup/**/<cgroup name>/memory.net.throttled_usec
+> 
+> Hi Daniel!
+> 
+> How this value is going to be used? In other words, do you need an
+> exact number or something like memory.events::net_throttled would be
+> enough for your case?
 
-Thanks,
-            Dmitry
+Just incrementing a counter each time the vmpressure() happens IMO 
+provides bad semantics of what is actually happening, because it can 
+hide important details, mainly the _time_ for how long the network 
+traffic was slowed down.
+
+For example, when memory.events::net_throttled=1000, it can mean that 
+the network was slowed down for 1 second or 1000 seconds or something 
+between, and the memory.net.throttled_usec proposed by this patch 
+disambiguates it.
+
+In addition, v1/v2 of this series started that way, then from v3 we 
+rewrote it to calculate the duration instead, which proved to be better 
+information for debugging, as it is easier to understand implications.
+
+Thanks!
+Daniel
+
+
 
