@@ -1,132 +1,119 @@
-Return-Path: <netdev+bounces-228331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B640BC7FBE
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 10:16:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBC52BC7FF2
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 10:20:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1F9854F5DC2
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 08:16:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD5711A607B3
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 08:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 876F2277CB2;
-	Thu,  9 Oct 2025 08:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F384C269806;
+	Thu,  9 Oct 2025 08:20:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fpaM2M+r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZ32/4sI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66E72609E3
-	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 08:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C251F7569;
+	Thu,  9 Oct 2025 08:20:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759997756; cv=none; b=I7dSHSshySa7K9xG9nL1tuDP97gX5eDqawXmR7Fic/hZqO3J/u6HB5eypjU94wEVtV0jqcB8Mu2hLNJ5ZmLLt3JOb+pIDOWMQms6+mA892TeFDlQzfsuTc2jyXPzaidMcrw2BPuJ9To/fjknzT5zC/zcb4V0kmdvaqeLcNYE8P4=
+	t=1759998021; cv=none; b=B+V5B83Q8yonwBha4T4HDwxtSNBEKn8f1cv/sWyHIdo5Ot3y9mDcBBb9dGnFVdnvxRC81nm0bR9kt5ZHg5yccQwfBJR4oFj1PSFlVZ8Vjf8Fp2vfmxd27SNKpiTPKw2VhRYKr4z3rgv207O7xORuomgtTbcetpzZQmp1yQHDQ7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759997756; c=relaxed/simple;
-	bh=m9XiVtTAN/QcQjl8cEjXtLDaFvDP8ICTqR1U2yHijVg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SfmBITdqr3R0NLa+1zngXoESCVYK01Obsj64MJlmHdt/SKHmSLXNdlf8v+kLoAWybUC1jRScD5DtGNyRQvWWta78x06WxLSuzrYS7xD6403+ZslcFqDQ7KhuMst31nl2p+jMYXVwikLLuQ6ZQCmbG7ebQ1vg2GmY0TPAvkAFQAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fpaM2M+r; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759997752;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uRe9k9uGBBpiKkw7TBSCO4t/JPzp2ByEOYJUEhSNCs8=;
-	b=fpaM2M+rVjj1ccMzQ4+AdPUZNuek5W9X6RcZZg50LqDi+PCq3nC6BdsDahvcMa8ubHAv0w
-	X185ijS29XsllI9vwAaaWYc9hM4o1wC0nJYmR0P6rsiXIwGQpfYoJ/UcqzmDUYgvKZSK/r
-	uUDBB6nMnYDmDhybweUMEtv1O3q4EIk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-176-7YGZ80tvNxaH-NgJfR-fVg-1; Thu, 09 Oct 2025 04:15:51 -0400
-X-MC-Unique: 7YGZ80tvNxaH-NgJfR-fVg-1
-X-Mimecast-MFC-AGG-ID: 7YGZ80tvNxaH-NgJfR-fVg_1759997750
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-46e35baddc1so8425405e9.2
-        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 01:15:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759997750; x=1760602550;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uRe9k9uGBBpiKkw7TBSCO4t/JPzp2ByEOYJUEhSNCs8=;
-        b=YyaQutVi4DNTyGBYRtQZB2yd4lM2W6TFRRKJsmgTXfoRZA/ivyx0jEiNFbmwnwg1UQ
-         QYlP7n3DTllg+82tVm4QuQ1dK1btZvdCcAGQ5MQObrlMkg2JWLhWBEheXnuh2sjgk0Wn
-         qAYye9oIpQh7++YLhODUDDvZwVdhspBvdz/WeZJ7FKey24RE5mNqftjvJqAnU54WDUGv
-         YbR+uEJqUhjvVzBU9L+4OrvlNzl9JohKzuxjZHiKGZOgHbuQHcp71GmvItFIs8O9qY6R
-         JIVrMHmFOAZlcyTq0JEjTQraAqhwzC83iy+ia/DOcF3ZgLe+V6Dj+f3FxdNvXX+gKzLV
-         27Og==
-X-Forwarded-Encrypted: i=1; AJvYcCWlretYK5644/mEn3TUO5ToT+qfBXnacRnYCtj/YLsLlD4HVJ46a7tHD/96H9EdsheaaywpsWQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeDFzu7nkOhg1TbxU5uq5wOA+PALJd04XnFeNbTUkTUDtL6grl
-	frNJ3hv13g9luz1KkvW+yrL5omMoAwFHRTYxl4Kc7YYfO3x8pHwzoEyPPjh7BafiXeStLrkbpVV
-	2EelkeHSAVwsJIerLWaQMeZKvNccur2SDEPZScc2bL9hmO/um2C5NyeNGh7Pr6JZUBg==
-X-Gm-Gg: ASbGnctbL+58oaxqizLSjwZovkbUHRQ3v5x7Yu3ZR1JgykmVILdJFUCo8TQlrw5s9Kd
-	uGbGd47ljQD0SpTa5zhHKVreqhKfljI8GOAeWZVDDAuv86jrIUnOAxW6SnOfhYAln+/VVoKPhq6
-	CQNbgpfHBSuXjLRblK6xRvRvpASDAdR8wdGRsopJNfJS+KiW4juUVcBlNFCKhDdfkCMBLTMDKYI
-	tmLOit2o8boaaddcBgk7D+Djk19gH6ybUwxqW9b5MiMYHEAqiwgg6u+FdfwQ/cI+P1gIV6FiO4B
-	aY7gBVoqApq+6p78L9gyqaEFfzr/uprFjoBy7P0zbGiSb0dE8CaL3TIodubxKGzhh5RvQ3xYhGE
-	93clwn7R/ih/nu82LmA==
-X-Received: by 2002:a05:600c:1e87:b0:46e:345d:dfde with SMTP id 5b1f17b1804b1-46fa9a9f051mr57108915e9.16.1759997750106;
-        Thu, 09 Oct 2025 01:15:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG/NKmEyIKDnjxYZK02GhdTjC9WGAo5EZp8s6qd6Yj74nKrU+HmnBUFXfjEDbRJZ4WcC3QcWA==
-X-Received: by 2002:a05:600c:1e87:b0:46e:345d:dfde with SMTP id 5b1f17b1804b1-46fa9a9f051mr57108585e9.16.1759997749648;
-        Thu, 09 Oct 2025 01:15:49 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fa9c07992sm84826105e9.5.2025.10.09.01.15.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Oct 2025 01:15:49 -0700 (PDT)
-Message-ID: <32800363-aed6-4e59-9ad1-435e819bca80@redhat.com>
-Date: Thu, 9 Oct 2025 10:15:47 +0200
+	s=arc-20240116; t=1759998021; c=relaxed/simple;
+	bh=+LilCkN8Rg/+FE6al4QbLxMtRzCZS/9knQIipOo+qGw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=sTOQuq+TUNLYOYGeHuWLDn6AQ3s+tndPtcwjFx2OohS8HFxlBwTm1AW88SkFBNbmtZzDsfdhoUhzmpRfc56JY4uY73NHCJAG3gW/8scQBx82IDzqBzvDRX/7JNuM8opgcQPkbYJWuMs63GnrHil4SJLvHIFLPEabq2NyL782NUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZ32/4sI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 411F2C4CEE7;
+	Thu,  9 Oct 2025 08:20:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759998021;
+	bh=+LilCkN8Rg/+FE6al4QbLxMtRzCZS/9knQIipOo+qGw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=EZ32/4sInmVutnElkHLlbY7Mm9CMbp5mExAuh3Xanv/ivS+/fEZm9Gp99NggEyye4
+	 V/f3vgpOFD95GBsdnk/8qD5WQE2r5NzgY0r4W1JPl9u2SLiDFI4rbLyjqmeCmbnWV/
+	 +Pr1fW7VBgMPCfBe0voWVXPd9uUBTbJWWKnBv648YQmrjfrZAjcQ6gS7Qif0FTX5Aq
+	 s/QhuIT00HaXqS92Z9YMlprP18P1Okkm27hh3SZ2ZwJUWPBH5p+YLMUKUve/GrfUMP
+	 HEbXvUoQlZEi5EVwzyLmbm5tjRLmWgPulb0j8YgkczBlM8qanuqSmTPYij33bcjlCc
+	 NzQvNSWp74y0Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF693A41039;
+	Thu,  9 Oct 2025 08:20:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] r8169: fix packet truncation after S4 resume on
- RTL8168H/RTL8111H
-To: lilinmao <lilinmao@kylinos.cn>, hkallweit1@gmail.com, nic_swsd@realtek.com
-Cc: kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251006034908.2290579-1-lilinmao@kylinos.cn>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251006034908.2290579-1-lilinmao@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/4] netfilter: nft_objref: validate objref and
+ objrefmap
+ expressions
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175999800951.3823315.17284395638131592357.git-patchwork-notify@kernel.org>
+Date: Thu, 09 Oct 2025 08:20:09 +0000
+References: <20251008125942.25056-2-fw@strlen.de>
+In-Reply-To: <20251008125942.25056-2-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
+ pablo@netfilter.org
 
-On 10/6/25 5:49 AM, lilinmao wrote:
-> From: Linmao Li <lilinmao@kylinos.cn>
+Hello:
 
-From: tag is not needed when the submitting email address matches the SoB
+This series was applied to netdev/net.git (main)
+by Florian Westphal <fw@strlen.de>:
 
+On Wed,  8 Oct 2025 14:59:39 +0200 you wrote:
+> From: Fernando Fernandez Mancera <fmancera@suse.de>
 > 
-> After resume from S4 (hibernate), RTL8168H/RTL8111H truncates incoming
-> packets. Packet captures show messages like "IP truncated-ip - 146 bytes
-> missing!".
+> Referencing a synproxy stateful object from OUTPUT hook causes kernel
+> crash due to infinite recursive calls:
 > 
-> The issue is caused by RxConfig not being properly re-initialized after
-> resume. Re-initializing the RxConfig register before the chip
-> re-initialization sequence avoids the truncation and restores correct
-> packet reception.
+> BUG: TASK stack guard page was hit at 000000008bda5b8c (stack is 000000003ab1c4a5..00000000494d8b12)
+> [...]
+> Call Trace:
+>  __find_rr_leaf+0x99/0x230
+>  fib6_table_lookup+0x13b/0x2d0
+>  ip6_pol_route+0xa4/0x400
+>  fib6_rule_lookup+0x156/0x240
+>  ip6_route_output_flags+0xc6/0x150
+>  __nf_ip6_route+0x23/0x50
+>  synproxy_send_tcp_ipv6+0x106/0x200
+>  synproxy_send_client_synack_ipv6+0x1aa/0x1f0
+>  nft_synproxy_do_eval+0x263/0x310
+>  nft_do_chain+0x5a8/0x5f0 [nf_tables
+>  nft_do_chain_inet+0x98/0x110
+>  nf_hook_slow+0x43/0xc0
+>  __ip6_local_out+0xf0/0x170
+>  ip6_local_out+0x17/0x70
+>  synproxy_send_tcp_ipv6+0x1a2/0x200
+>  synproxy_send_client_synack_ipv6+0x1aa/0x1f0
+> [...]
 > 
-> This follows the same pattern as commit ef9da46ddef0 ("r8169: fix data
-> corruption issue on RTL8402").
-> 
-> Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
+> [...]
 
-Please send a new version including the fixes tag as asked by Jacob.
-While at it please also add the missing 'net' prefix inside the subject.
+Here is the summary with links:
+  - [net,1/4] netfilter: nft_objref: validate objref and objrefmap expressions
+    https://git.kernel.org/netdev/net/c/f359b809d54c
+  - [net,2/4] bridge: br_vlan_fill_forward_path_pvid: use br_vlan_group_rcu()
+    https://git.kernel.org/netdev/net/c/bbf0c98b3ad9
+  - [net,3/4] selftests: netfilter: nft_fib.sh: fix spurious test failures
+    https://git.kernel.org/netdev/net/c/a126ab6b26f1
+  - [net,4/4] selftests: netfilter: query conntrack state to check for port clash resolution
+    https://git.kernel.org/netdev/net/c/e84945bdc619
 
-You can retain Jacob's ack.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Thanks,
-
-Paolo
 
 
