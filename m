@@ -1,171 +1,143 @@
-Return-Path: <netdev+bounces-228335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 170F7BC8127
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 10:38:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93E7CBC81D8
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 10:46:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B785A344CE5
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 08:38:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82B961883695
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 08:46:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8646F28935C;
-	Thu,  9 Oct 2025 08:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E392D29CE;
+	Thu,  9 Oct 2025 08:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XHEK6i2R"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="NEOiBOSl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8342857F2
-	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 08:38:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F28D241CB7
+	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 08:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759999116; cv=none; b=fh09Xft1V6foCvQUKtDiajokDdb83/Bajujue9R2W5XpS49EwK09PI+nm+lnoMa+ErYsdpVAsvcwXI6qkzMAHj5RdnQrvhivTL2mJYyxfz5M/z/LyAMXBrsB58h0joKrkVi6pXs4aRZnF6FSPLgikdAK70WCJgf/Gx+FNzxZAOQ=
+	t=1759999577; cv=none; b=hP9dzjywxTRyWfqbahyQJ4yLdGhesHr1/M28JMo50wEV8TwoZmg9qclCOmiAbCIKsdOKMUscptwTLwIpL5inWJJbttmjvEYBOxTCPeQonJOCkHs93VoXQq+xxL2CVJehWioIwmCiorKzTHrcaQyEvl5bKYN7FzqpmRA9kFbWcFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759999116; c=relaxed/simple;
-	bh=FQ+shGWmBVc44oL0Bqn7e7fPtD4QN75FTnqke7XtEdg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZWEEzD9EUdG5L46QjqwKqm184yK2NnafmYVkGoSmBVT0H8A8x+6YxG0nUlCWNfV49+ktfoUtTRsifYS+y+i6YnANvWmF0GMKLqs5h5FHc8BlK2lmTEDfMxbT9FgxvpazyjoMpa3FOvbgxGE6uxr5UTevRnunxD8Pt2sbWdQIGfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XHEK6i2R; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-42486ed0706so4254605ab.0
-        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 01:38:34 -0700 (PDT)
+	s=arc-20240116; t=1759999577; c=relaxed/simple;
+	bh=j9tui5eJzJLsax1769EHY8UHjMyQ6/zsXBdKNns+VaU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sLRfAGahJ8aoMrH7JPv+6yzum8c7aejkoZzm/S02B/VcJunru7NWPyoAgkt1Mix5X+JYsKhJTWwrDbVOv7mXGVjVTpFbyBSrVofvGt7UHfQDqgMpVuYn8dnUyCEQxDDIx6my4hc5ma6tSTHIQuWz5CFzuuD6OrvG9/Fr/UC9HUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=NEOiBOSl; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-46e47cca387so7070175e9.3
+        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 01:46:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759999114; x=1760603914; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FJdA2wzrVpL1AvGn+9fzAMMPbIvnSOMtWQ2QiUJOEpk=;
-        b=XHEK6i2RlrET375+xk7wrU/UER/6YNZ7h7+O1pqleAxDbvKgBbaHrX8rdVYXAbHcpt
-         hmghsEvIQ9Py8NX6IbP6NS0cHQmCb+jbK1C2i/gm7mcJHj4EzNsydTYmA0DVj2S+KBkx
-         cNd+vJaA+mb0itJvsjDkm75NCuZdHCPvOhCz4QqW/uW0bvuSM7UCtBDZiyFI53trHw2k
-         egwmFkFcjXcy2jeteMKKHodUlLfPIiL40ytQC1WeGlfkKbZTqT1ge9gnrEwNtnXM1p7q
-         sQw0S1XACLlUpwUsZ0E4nE+xj7xqcJwi5PGEcxug3TDhUpm/8OkwHhdQDD3r3hfCcfMg
-         I0yQ==
+        d=suse.com; s=google; t=1759999573; x=1760604373; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rvj68KFSR7ZfwqQ2z1ObDxdGhaWv0RqpFINxidcP65M=;
+        b=NEOiBOSl+zrrhbCj/qu3nQnmySE8VU+tWtu7OaVcfbp3syKIAziwgdTIQ/T8bHTyHs
+         Hypk8dWyYyG6hIlwTXAuIYRFmEW1tKvlCYrPdGzSn+a2MH+c3AL/mb64tLNqiMhRMVy2
+         FzHUDXzLX9GITUSbH7nJ34WmSfVLkLjg3OTPBCQwXYGRXPVG8fVNAPDKkH/xWSwOyoZz
+         842vc1+7afg1P8dSSlKzrRn27qREXchhWjuw3ufo6QtHtYcns5f9UJyyulTrseytATj6
+         ejHkE9sbvk+sbNEJ83U918PR6aD4XLAtN6pPlXbf6NUqp1qd43M+swhVe11LtYJSourF
+         2Yrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759999114; x=1760603914;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FJdA2wzrVpL1AvGn+9fzAMMPbIvnSOMtWQ2QiUJOEpk=;
-        b=cY0qLZt3c2URuiLqAe2/D6G5Jtgx331XBTKGbpo0YzdVSpyg3djUEFp4zORmxS/qDs
-         uej3ePYlqc9T/6JktzZ3mXCIN3lEFUf1c0Up7WFDsnZxtesV7s9Ii57DkoekLYp1QzzW
-         WCsi4ByfjysYUbLM4kRX5EDSiHhFQBD02MfnCSTVuERlkXKhL+XKedesAsE/l9rMM8d8
-         0kNq/0FMYZEYYzysdkWFZWup2S0xOW2NBg1+IDPZnhPejvcOsfV2RlpmnW/e6PFHgzjd
-         8xs9U8juv9a50MFZ3x5nyIL8YdYgEGB/PpFt07KFuLIbBEWgqg0EwkSquA5LVFATbTvG
-         KyuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXUS1Tvyhfz6cK5IYytArVnz5g65iXh8u5c4PkPk8SwFa6IeZ0yOtH93Dt7p8BFMMBVGvPR9MQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwY/GI+HqSg4kPfRIRjGDVrnhWiS+ALwQVcK8zlGQjeWu9Mqg4T
-	nBlsFDgoHnoRBRCAtWEYLRmAUbbMeh6mb9JOJLb5F7lelHyMfq2GR5Uu8JVsryHqSG/Tbe7vM9V
-	iueS8TilEZf6Efo1gAakqFNl8NknhC+aIav0vUEA=
-X-Gm-Gg: ASbGncsZjSP6wTXynuNotpvd2wanQRAJZg/ibKWKPsvTEnTLFsmv7ePcQd8D2q3jSjB
-	RTw6YZbK6hJ8IKcGzSlsIP/qmXEhIYsBe+nSZdlB/QdeEPoSm3SEcPxjzEvkvdK8HgXOPMVMvaZ
-	2eCXVm8e1Kz3b8q/kS+EX9EtyLfOIrOINAROn7WZkv3cMeZFdwqwV0ouP78+lMjwkadpsYY6RJ1
-	vxHVrqFa+fGm/bmMoJv65EDSRsRTNk=
-X-Google-Smtp-Source: AGHT+IGgDpJZw70+gYM2+AKgrpw+FhwIc7t9dLrpTQ7TwmqH2Zts3lJgbj9Alx5YVex6vzAB8wLcj4rDf/aonrKTWhE=
-X-Received: by 2002:a05:6e02:1529:b0:3f3:4562:ca92 with SMTP id
- e9e14a558f8ab-42f8736a83fmr67845345ab.10.1759999113970; Thu, 09 Oct 2025
- 01:38:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759999573; x=1760604373;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rvj68KFSR7ZfwqQ2z1ObDxdGhaWv0RqpFINxidcP65M=;
+        b=DmOExWt8RU7bg1aydYHEumwd9P65VX4BgB77HEH4c3jnn46yMglOvhJHEVpCQDrj/b
+         A+iknvk8IQIozy4j1OBT/4qfWz20Gbm09bNMhjlvi6JidGNDIQjrMCn4Rn3oQXQ6tl1c
+         B88KJ1BSduVKjNQF+WcS6d8VCF/Agj7U+FgpJMx8nBk6kHAMR6G0nzyWbT7qO5EKHgb4
+         bXDQWnHO5O/PNv7FTerlbD7WKWceKWwcF+C7P40EWvGeR7lwtsOQ7FU/kiR3A+xaPWdS
+         eh1PPpfORLNV2ztxud13z35Rgqny+ZyT5ReOC3cZlJVqDGoBhe//KQzWf+Ofh1ur4k/W
+         QD7A==
+X-Forwarded-Encrypted: i=1; AJvYcCX6nmR1hQd3MTrjraUPDWbKiBAZdnGNJj7UFTsLkpbt9A2od1eLN0/cmAssG8bnu+QJeZR3zMo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyn3m2Pb3xbKc7huJavJ02zxWriLr/nGfBgSWtGYrDYDt4jABg/
+	8YYs/d9qYUZt8mTBn5h3AZ4ha8aG2ZbNd13heGjt6kGe5OEPsCUvIyat8NaMVQ0Kzzc=
+X-Gm-Gg: ASbGncuWaVKVLVjn0cjRr/cDCHjM4ATDXvp4peSEaEYqJUjJpYyUFiydm2epdMUwKKO
+	+i/GsDvVmE+GBJ2aG29dUWik/KsMThKLVY+gZzFQPwFTgI6gkp1b8jKyefi+bmQQ8AiPXEnlZJR
+	Cg/71Bg8XlXqoia7udk45h6CtJ8eP58TkQzDHwS82miB33Ah/91nTjWw2oxuM5kggQgrIy/FN9J
+	jJnQUe8mejhfoWhjV+Z+QPhoQsUDXwA2JKPtZqOiXz9BsFKEF89pjBipnx/Xnc30/tbOzlGXWhV
+	Sy4sfNVMNXBxYssVG9zjKfm/aqTTzdUQC/1Kp+yRGZnNwLiY1Z+8NRSQtl2Hw1ALlfmmj7bdslE
+	M/ARUpTMr0q4HsTT24kwv782jE9yaShSxozjFyz3mtuM1bkl20K8bZoH/C2Kf5UYga7R48DriOX
+	lEDGPoSkr71hiD/NW8M3Aepg==
+X-Google-Smtp-Source: AGHT+IEi3HXnnC/f370e710EbqpsCcLPh7EpjlOM2w7z59g46v3Q/HAwcoGhELlCDCUBjaGSNJxQJQ==
+X-Received: by 2002:a05:600c:46cf:b0:46e:35a0:3587 with SMTP id 5b1f17b1804b1-46fa9b02cebmr47668335e9.27.1759999573232;
+        Thu, 09 Oct 2025 01:46:13 -0700 (PDT)
+Received: from ?IPV6:2001:a61:13f9:6a01:5105:f83:acc3:eef5? ([2001:a61:13f9:6a01:5105:f83:acc3:eef5])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fa9d71489sm74645875e9.19.2025.10.09.01.46.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Oct 2025 01:46:12 -0700 (PDT)
+Message-ID: <3a1b4778-4cf0-4483-9611-93b37d9a2361@suse.com>
+Date: Thu, 9 Oct 2025 10:46:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251006193103.2684156-1-edumazet@google.com> <20251006193103.2684156-2-edumazet@google.com>
- <4e997355-1c76-429b-b67f-2c543fd0853a@intel.com> <aOVs9yvrwkH0dCDJ@boxer>
-In-Reply-To: <aOVs9yvrwkH0dCDJ@boxer>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 9 Oct 2025 16:37:56 +0800
-X-Gm-Features: AS18NWC8efYUnEY9e0cb7Vv3Mwf0SN7TrGBcblA2wqV-4AJlPgqo93F1_Ry2deY
-Message-ID: <CAL+tcoBN9puWX-sTGvTiBN0Hg5oXKR3mjv783YXeR4Bsovuxkw@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next 1/5] net: add add indirect call wrapper in skb_release_head_state()
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Eric Dumazet <edumazet@google.com>, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 3/3] net: usb: ax88179_178a: add USB device driver for
+ config selection
+To: yicongsrfy@163.com, oneukum@suse.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, linux-usb@vger.kernel.org, marcan@marcan.st,
+ netdev@vger.kernel.org, pabeni@redhat.com, yicong@kylinos.cn
+References: <666ef6bf-46f0-4b3e-9c28-9c9b7e602900@suse.com>
+ <20251009073450.87902-1-yicongsrfy@163.com>
+Content-Language: en-US
+From: Oliver Neukum <oneukum@suse.com>
+In-Reply-To: <20251009073450.87902-1-yicongsrfy@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 8, 2025 at 3:42=E2=80=AFAM Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> On Tue, Oct 07, 2025 at 05:26:46PM +0200, Alexander Lobakin wrote:
-> > From: Eric Dumazet <edumazet@google.com>
-> > Date: Mon,  6 Oct 2025 19:30:59 +0000
-> >
-> > > While stress testing UDP senders on a host with expensive indirect
-> > > calls, I found cpus processing TX completions where showing
-> > > a very high cost (20%) in sock_wfree() due to
-> > > CONFIG_MITIGATION_RETPOLINE=3Dy.
-> > >
-> > > Take care of TCP and UDP TX destructors and use INDIRECT_CALL_3() mac=
-ro.
-> > >
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > ---
-> > >  net/core/skbuff.c | 4 +++-
-> > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > > index bc12790017b0b5c0be99f8fb9d362b3730fa4eb0..c9c06f9a8d6085f8d0907=
-b412e050a60c835a6e8 100644
-> > > --- a/net/core/skbuff.c
-> > > +++ b/net/core/skbuff.c
-> > > @@ -1136,7 +1136,9 @@ void skb_release_head_state(struct sk_buff *skb=
-)
-> > >     skb_dst_drop(skb);
-> > >     if (skb->destructor) {
-> > >             DEBUG_NET_WARN_ON_ONCE(in_hardirq());
-> > > -           skb->destructor(skb);
-> > > +           INDIRECT_CALL_3(skb->destructor,
-> > > +                           tcp_wfree, __sock_wfree, sock_wfree,
-> > > +                           skb);
-> >
-> > Not sure, but maybe we could add generic XSk skb destructor here as
-> > well?
+Hi,
 
-I added the following snippet[1] and only saw a stable ~1% improvement
-when sending 64 size packets with xdpsock.
+On 09.10.25 09:34, yicongsrfy@163.com wrote:
 
-I'm not so sure it deserves a follow-up patch to Eric's series. Better
-than nothing? Any ideas on this one?
+>>> +static void __exit ax88179_driver_exit(void)
+>>> +{
+>>> +	usb_deregister(&ax88179_178a_driver);
+>>
+>> The window for the race
+>>
+>>> +	usb_deregister_device_driver(&ax88179_cfgselector_driver);
+>>
+>> Wrong order. I you remove ax88179_178a_driver before you remove
+>> ax88179_cfgselector_driver, you'll leave a window during which
+>> devices would be switched to a mode no driver exists for.
+> 
+> In my init function, I first call usb_register_device_driver and then call
+> usb_register; in exit, I reverse the order by calling usb_deregister first,
+> then usb_deregister_device_driver. Why is this sequence considered incorrect?
 
-[1]
-INDIRECT_CALL_4(skb->destructor, tcp_wfree, __sock_wfree, sock_wfree,
-xsk_destruct_skb, skb);
+To explain this I need to make a chart:
 
->>  Or it's not that important as generic XSk is not the best way to
-> > use XDP sockets?
+CPU A								CPU B
 
-Yes, it surely matters. At least, virtio_net and veth need this copy
-mode. And I've been working on batch xmit to ramp up the generic path.
+usb_deregister(&ax88179_178a_driver);
 
-> >
-> > Maciej, what do you think?
->
-> I would appreciate it as there has been various attempts to optmize xsk
-> generic xmit path.
+								New device registered
+								ax88179_cfgselector_driver:
+									Device switches to proprietary mode
 
-So do I!
+usb_deregister_device_driver(&ax88179_cfgselector_driver);
+[This comes too late. No consequences for current events]
+								No driver. No probe().
+								Very sad device. Disappointed user.
 
-Thanks,
-Jason
+I hope you excuse my attempt at humor. Anyway this order is incorrect, as I hope
+you see from the chart. Now you may say that the class mode would not work
+anyway, but that is an iffy argument. It is better to have the order that is
+right.
 
+	Regards
+		Oliver
 
->
-> >
-> > >     }
-> > >  #if IS_ENABLED(CONFIG_NF_CONNTRACK)
-> > >     nf_conntrack_put(skb_nfct(skb));
-> >
-> > Thanks,
-> > Olek
->
 
