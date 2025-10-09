@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-228356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E257BC8B16
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 13:06:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCDFFBC8B3E
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 13:10:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C50513BBD03
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 11:04:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80E213A28A1
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 11:10:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C0B2DD5EB;
-	Thu,  9 Oct 2025 11:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B44EC2DD5EB;
+	Thu,  9 Oct 2025 11:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="tG8RGNQI"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="OaEjCJas"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5487F1E503D
-	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 11:04:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E8A119E967
+	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 11:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760007859; cv=none; b=l03dBAbcrW8HiuWmC6Z4cXtW8jXK/LMpn2bR00ilP0WHNudAbeI/HMfcsk4Uef6NwLeMr6Jo71F3zwdR0AgdN7hmSPAMllUvYg0R0fIYLnLCgMJF+8GPGNx4IuRAQJr7wlRzhitPWLfrC7cMizYLvmUunSA5kYPzrwMOSkMOPWo=
+	t=1760008224; cv=none; b=HMyRTx7QZih0I08oRPAVDZG3NE73ADdfMfCffn17jxZav1gAc/Jq+CXshtx41G3XW3xUae71xstnbwV9oac4ddG8x/WwSklt9nQvkqjNtk8atdX8BkFWYnAP8+E+rMFZ1luQX0j3NeDjoxnttXq9P9naoF6KbC+eWAzbpZ+mBWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760007859; c=relaxed/simple;
-	bh=iJ4zznhUQGKrFCqKoKDAq6BrsfV2762JIMD55qTSfOU=;
+	s=arc-20240116; t=1760008224; c=relaxed/simple;
+	bh=s8tPhfl6hg5iWVo36nUILps2QIqu5ZPUwcH/FH/mBhQ=;
 	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=SQxw94KlFIMumabJVM93VbP9V1j1RY2UDh7P2t+xTlQ6kW98/2zZcAmbB+emm146W7C0qWDOVD8jng6EiyzwZFg/ACuYW6wXaZE3WeC3s8lgeyfyM2oF+6iue5srrQgYgrbWe5yHSTc5kfncPEUU5QyPGLTLUtKBmUdy3Y3ch4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=tG8RGNQI; arc=none smtp.client-ip=115.124.30.118
+	 Content-Type; b=ft35zeMckjXjrZti5dyq3z+hcqkniZKkyi/MyCd6mULDToRJfdf1a4h4lWxzZRdFX7hrodowSXIatrc50QzdOA5awUK6Nn/z2M/p+Ol0rMzxsA0bSbJUGAK3RyswUDN2XOyafcMHv4XIc1BogceDqE7Ddylk+FaYL7qeRSIjkeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=OaEjCJas; arc=none smtp.client-ip=115.124.30.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1760007853; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=44e1lH7CB/uDQFY83UsNxWUC7U6/pKA1atcIn06ec3E=;
-	b=tG8RGNQIQCY+ubudDHEPC5ZrLh8Gc7rUv9gCAO/VdLkubAsTVc28w3eWgmtIHNvkA/p7po1/gp5MZM7UrvrRGPKN63W8lRKKuxHSwUr03kPLoH0bFrzj0QfNXdlQ73w5AMXh4V40oqXVcbh2irGTrKC1FhpaU3rRVgNwL1tCA3g=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WpmbiKw_1760007852 cluster:ay36)
+	t=1760008219; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=EIZSpyLf0xPGj6v5S3kPgXN9LUWMdJHWkiRHbuHdF6I=;
+	b=OaEjCJaslRON3EOhlH12CA1DJ7/KfgS+dgucXcQIgTwYkBZe6Svv0sDDhwVhdqeUH35ed3Y1rAGA34XfZkmnCptDT4yP1vwPu5F8DBeTvT7ZTnVrEEgXB+iYM7x1feNboEJqrN8+uLFNrlE164h/4bFJxTxo3EL0exbGpTQqrB0=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Wplv.cc_1760008218 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Thu, 09 Oct 2025 19:04:12 +0800
-Message-ID: <1760007608.9282165-1-xuanzhuo@linux.alibaba.com>
+          Thu, 09 Oct 2025 19:10:18 +0800
+Message-ID: <1760008083.6644826-2-xuanzhuo@linux.alibaba.com>
 Subject: Re: [PATCH net 2/2] virtio-net: correct hdr_len handling for VIRTIO_NET_F_GUEST_HDRLEN
-Date: Thu, 9 Oct 2025 19:00:08 +0800
+Date: Thu, 9 Oct 2025 19:08:03 +0800
 From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 To: Jason Wang <jasowang@redhat.com>
 Cc: netdev@vger.kernel.org,
@@ -132,8 +132,12 @@ for
 >     all the headers up to and including the inner transport.
 > """
 
-Sorry, I referred to the old spec. According to the latest spec, this case =
-should indeed be considered.
+I checked the new code, VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV6
+and VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4 are not supported, so the next versi=
+on
+will not include these feature.
+
+Thanks.
 
 
 >
@@ -146,22 +150,6 @@ should indeed be considered.
 en);
 >
 > Should we at least check against the feature of VIRTIO_NET_F_GUEST_HDRLEN?
-
-I think we don't need to check for VIRTIO_NET_F_GUEST_HDRLEN, because regar=
-dless
-of whether this feature has been negotiated or not, we always pass this val=
-ue
-hdr_len.
-
-Previously, the value might have been incorrect but still acceptable; howev=
-er,
-once VIRTIO_NET_F_GUEST_HDRLEN is negotiated, incorrect values must no
-longer be accepted. Therefore, we don't need to check VIRTIO_NET_F_GUEST_HD=
-RLEN.
-On the other hand, VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4 should be checked.
-
-Thanks.
-
 >
 > >                 if (sinfo->gso_type & SKB_GSO_TCP_ECN)
 > >                         hdr->gso_type |=3D VIRTIO_NET_HDR_GSO_ECN;
