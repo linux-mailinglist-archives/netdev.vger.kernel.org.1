@@ -1,67 +1,63 @@
-Return-Path: <netdev+bounces-228405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 464DBBC9E59
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 18:00:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30387BC9E86
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 18:01:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0F75C4FAE86
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 16:00:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE8DF3B7143
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 16:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD01023183A;
-	Thu,  9 Oct 2025 15:55:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649E92F5A10;
+	Thu,  9 Oct 2025 15:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Lat76oqH"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="MklNDhUi"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343F622D781;
-	Thu,  9 Oct 2025 15:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D98023B615;
+	Thu,  9 Oct 2025 15:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760025322; cv=none; b=seBv7tP3HDu0tiijrZ5Yy2p9Y1H4J06rPt80zBFwo6I9PV4p9OeNs94B4jvE4oSuW+zbKZjiFPnZPjeMDjBODRN4TsCivfd0WLKV4cGXBwAOAwDiJ+zWug4y2qQe8CfL5nF/l1V8sJeO4ruA6t3ZfJZFFfr076Y23a28gYG7SW4=
+	t=1760025353; cv=none; b=Jt0gSVd3HvOVy3uF3uas3CH18wmschB5v1Xni9mSBJaJGXnRQl1eHPc4jXP+OKifvY7Fy+uR4rMbdVshtItIucA4psGapO806CoaeU3VecRu/ABnJF6B8E4Ml4Gzh1abKTgIgQ0df8mrgW9En4CH0XfZNrBx4MkzRTJYUgMcDTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760025322; c=relaxed/simple;
-	bh=2Se7zj33Lgo/YtUKTOpJ2DSK5Pf7p9rJmkBLoSnWiHc=;
+	s=arc-20240116; t=1760025353; c=relaxed/simple;
+	bh=NmHYnwZO3k1u6RXbCftGuTbVjS2S07lpsShuIUYK9b0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=thEQbivUUcptO+Y5rlK7GtZUQ6XMymQGXMutocWT8n8RkcRHU5Sj/SVe7Z3x9JEbh8BsMqEBHC1a/W5U0cabSHHeUXpyLapLGdR9Dgi/am7zisp62mosGDK4RJdn34xrRRzRWpqGJ0472JExJNgqGNEyUOeqECorfkYOtBq8omA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Lat76oqH; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=I7LiW3POs9qUUfpviwixanAJp01LsVN0Px4JS0kyyTLse5KZ+2O1Vby9381iPbopv1rvSvPfUVTTsjMg5GSeh6Rq/EQXoACJytXprRjxTXEazLOQMoTPYywZ3Bxiyce4B3vmjZP75vLllevW8WikkgyAcTUl4EIsxCcIUUCxmLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=MklNDhUi; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1760025321; x=1791561321;
+  t=1760025351; x=1791561351;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=2Se7zj33Lgo/YtUKTOpJ2DSK5Pf7p9rJmkBLoSnWiHc=;
-  b=Lat76oqH5XxuMIrYEAmXB3RHC7CU0I5CwtyNSheFvdWfnpklX7ci+oDd
-   U9sbOpumIlWyxoakXfiIWTQctJoJ0RZPq2l25mKbYG8E1OhWx0zN9GkBy
-   RXdh8f68eEtMrLmCVubqEix/yDMAf+BdbQ36YHz5h5SXfAKci0Ua6+pku
-   T7symft7ZG+hm1LBrCyoY0Be2NmZPi3/JtU8JkXUFHGgLJW4ejNS3PNAU
-   kJt46GZZWuHP8VvBucF5utmWlbVKHDYR5IBBdYSQgF6eB9XADRVA+cE7g
-   3Jhj+E2btVxh5D32EOa+TdsfucQNV5DmrpsUjUTT10gXE3huWEl6pRuPp
-   A==;
-X-CSE-ConnectionGUID: zFf2VAeJSDmWhPAONYY24w==
-X-CSE-MsgGUID: 7xgqSkgPTC+yiXsQ9TcNyg==
+  bh=NmHYnwZO3k1u6RXbCftGuTbVjS2S07lpsShuIUYK9b0=;
+  b=MklNDhUiAXlDWkg1U5EDOfYbHPQxYJCkC2Dfpk5CZHi8zoXIDPw74Won
+   W+XQAhKKLVuGEB0FkXLxChJ5K57+45fQo9ToiCIrS2LjNcn4R78OlgEXu
+   4+vQ4dWA5BhXNTJjwWV8ykYuHHyDxWbK3s3Q03FZuvJ7JqMwwNSZi7r73
+   WIQYIzi4nQ6y1RJck2emoxi50CzxdVmnx8vBEhywtI6ZtwkUu7WpBvo6H
+   S+aWByE9WhX11IRxV5XcMHQPmA4dOC1U6t/L0ClQYe2j5YxE3vHZ0zj3n
+   lr/4XBMEEmgkStiIqFrDROAAB+4pEjDW2SoDZitk5Fe+O7OPMnAELrwfe
+   w==;
+X-CSE-ConnectionGUID: BY5Dt4iOTF6lw0TCi1Tv9Q==
+X-CSE-MsgGUID: /RvSuAcuQFKg0QDO0OH5Pg==
 X-IronPort-AV: E=Sophos;i="6.19,216,1754982000"; 
-   d="scan'208";a="214905374"
+   d="scan'208";a="48057949"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Oct 2025 08:55:19 -0700
-Received: from chn-vm-ex1.mchp-main.com (10.10.87.30) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Oct 2025 08:55:49 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Thu, 9 Oct 2025 08:55:14 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
- chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Thu, 9 Oct 2025 08:55:13 -0700
+ 15.1.2507.58; Thu, 9 Oct 2025 08:55:31 -0700
 Received: from che-lt-i64410lx.microchip.com (10.10.85.11) by
  chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Thu, 9 Oct 2025 08:55:05 -0700
+ 15.1.2507.58 via Frontend Transport; Thu, 9 Oct 2025 08:55:22 -0700
 From: Balamanikandan Gunasundar <balamanikandan.gunasundar@microchip.com>
 To: Mauro Carvalho Chehab <mchehab@kernel.org>
 CC: Eugen Hristev <eugen.hristev@linaro.org>, Chas Williams
@@ -75,10 +71,11 @@ CC: Eugen Hristev <eugen.hristev@linaro.org>, Chas Williams
 	<dan.scally+renesas@ideasonboard.com>, Tomi Valkeinen
 	<tomi.valkeinen@ideasonboard.com>, <linux-kernel@vger.kernel.org>,
 	<linux-media@vger.kernel.org>, <linux-atm-general@lists.sourceforge.net>,
-	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-Subject: [PATCH 14/18] media: microchip-isc: fix histogram state initialization order
-Date: Thu, 9 Oct 2025 21:22:47 +0530
-Message-ID: <20251009155251.102472-15-balamanikandan.gunasundar@microchip.com>
+	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	Balamanikandan Gunasundar <balamanikandan.gunasundar@microchip.com>
+Subject: [PATCH 16/18] media: microchip-isc: enable userspace histogram statistics export
+Date: Thu, 9 Oct 2025 21:22:49 +0530
+Message-ID: <20251009155251.102472-17-balamanikandan.gunasundar@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251009155251.102472-1-balamanikandan.gunasundar@microchip.com>
 References: <20251009155251.102472-1-balamanikandan.gunasundar@microchip.com>
@@ -93,31 +90,45 @@ Content-Type: text/plain
 
 From: Balakrishnan Sambath <balakrishnan.s@microchip.com>
 
-Move hist_stat assignment before profile update to ensure histogram state
-is properly set when update_profile triggers register writes. This prevents
-race conditions during histogram initialization.
+Export raw histogram data to userspace only when all 4 Bayer channels
+are ready and userspace has active listeners. Also continue AWB work as
+long as userspace listeners are active.
 
 Signed-off-by: Balakrishnan Sambath <balakrishnan.s@microchip.com>
+Signed-off-by: Balamanikandan Gunasundar <balamanikandan.gunasundar@microchip.com>
 ---
- drivers/media/platform/microchip/microchip-isc-base.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/media/platform/microchip/microchip-isc-base.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/media/platform/microchip/microchip-isc-base.c b/drivers/media/platform/microchip/microchip-isc-base.c
-index 6651be6fcb57..e9f14de7ae32 100644
+index cafd05244db2..6c937a20fce0 100644
 --- a/drivers/media/platform/microchip/microchip-isc-base.c
 +++ b/drivers/media/platform/microchip/microchip-isc-base.c
-@@ -275,10 +275,10 @@ static void isc_set_histogram(struct isc_device *isc, bool enable)
- 			     ISC_HIS_CTRL_EN);
- 		regmap_write(regmap, ISC_INTEN, ISC_INT_HISDONE);
- 		ctrls->hist_id = ISC_HIS_CFG_MODE_GR;
-+		ctrls->hist_stat = HIST_ENABLED;
- 		isc_update_profile(isc);
- 		regmap_write(regmap, ISC_CTRLEN, ISC_CTRL_HISREQ);
- 
--		ctrls->hist_stat = HIST_ENABLED;
+@@ -1450,6 +1450,15 @@ static void isc_awb_work(struct work_struct *w)
+ 	if (hist_id != ISC_HIS_CFG_MODE_B) {
+ 		hist_id++;
  	} else {
- 		regmap_write(regmap, ISC_INTDIS, ISC_INT_HISDONE);
- 		regmap_write(regmap, ISC_HIS_CTRL + isc->offsets.his,
++		/* All 4 channels processed - notify userspace */
++		if (isc_stats_active(&isc->stats))
++			isc_stats_isr(&isc->stats);
++		else
++			dev_info(isc->dev, "No active userspace listeners\n");
++	}
++
++	/* Continue with AWB processing only if AWB is enabled */
++	if (ctrls->awb != ISC_WB_NONE) {
+ 		isc_wb_update(ctrls);
+ 		hist_id = ISC_HIS_CFG_MODE_GR;
+ 	}
+@@ -1499,7 +1508,7 @@ static void isc_awb_work(struct work_struct *w)
+ 	mutex_lock(&isc->awb_mutex);
+ 
+ 	/* streaming is not active anymore */
+-	if (isc->stop) {
++	if (isc->stop && !isc_stats_active(&isc->stats)) {
+ 		mutex_unlock(&isc->awb_mutex);
+ 		return;
+ 	}
 -- 
 2.34.1
 
