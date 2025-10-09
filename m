@@ -1,196 +1,169 @@
-Return-Path: <netdev+bounces-228435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5705CBCACE4
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 22:29:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F5FBBCAC2C
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 22:11:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2AF9D4F0192
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 20:29:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BE0A18985DC
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 20:11:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 251D327056B;
-	Thu,  9 Oct 2025 20:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ABC9264628;
+	Thu,  9 Oct 2025 20:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=email-od.com header.i=@email-od.com header.b="IPduxbX8"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CEgg8MOR"
 X-Original-To: netdev@vger.kernel.org
-Received: from s1-ba86.socketlabs.email-od.com (s1-ba86.socketlabs.email-od.com [142.0.186.134])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E92E271440
-	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 20:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=142.0.186.134
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F448262FEC
+	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 20:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760041750; cv=none; b=g3+pd7SJnAC9I+CmjjQ4hBeo3atqwmdK6JjYc8hlQ/M/qRTxzvPgOzf3CjcwIIAUQJPoPq7K/gXWInbVuZ9/MZcnABDeR1ZR+j177qIaBch0A9R4X5LjzuHmYwaLivSR/8Nh8WpsvcJryPWJhTIHd7uTQVN7vZupuKgmNU/uPW0=
+	t=1760040683; cv=none; b=WupdPa4zoG9QUwt9VibKVWXriQ0+2B/kmmx04KHwsXC/C5wjruLdQ5yjawDkbBnLy0aaimLHcxiHENfM2XYr57pP45GRvOE3y4P3xzc56ywc+q1FGdmohhPCN+cMhorlKzQ0IsjG+RFwIWdr+iG6KRvKr3wq5fip7OQdBy//aPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760041750; c=relaxed/simple;
-	bh=jxHNPvtonKIh6HD+twGlbhC/21NmPGMHzw7NpLnXoas=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GbKT7kb69BIKemulhGqnDBU1xntayBA18s0nviimYsYC47floWYoXwtctI3CLIlGJgo1e87nAeruFm+RUKY9QhgBq80hhOoUqlnYs3Fx5iEwZSrxo3XebpLjuyJXamTwhUEPjZTByNUiesjTeV4jALQGJGR4oxd7Xh8ppZecvF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nalramli.com; spf=pass smtp.mailfrom=email-od.com; dkim=pass (1024-bit key) header.d=email-od.com header.i=@email-od.com header.b=IPduxbX8; arc=none smtp.client-ip=142.0.186.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nalramli.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=email-od.com
-DKIM-Signature: v=1; a=rsa-sha256; d=email-od.com;i=@email-od.com;s=dkim;
-	c=relaxed/relaxed; q=dns/txt; t=1760041748; x=1762633748;
-	h=content-transfer-encoding:mime-version:references:in-reply-to:message-id:date:subject:cc:to:from:x-thread-info:subject:to:from:cc:reply-to;
-	bh=K09yGhuPuz5y5DBtOYrDuFkQOt0DZmwIm4f7CMtsXxA=;
-	b=IPduxbX8A6JypkhzV1Yw/oTz0CpnR039QQ6a+rxX3ShKJ+Q8T9M3lNISQ1/H08K+ER0Hpy4jv38z/a1H6yRaBVHy+Gg6IU1Fz5+odYGRdR3FDTstTy0yERIWtiUvOZxesd53fTREV4xR9QVQTxQqHYDFvhxO2ppji6LEM8RaDK4=
-X-Thread-Info: NDUwNC4xMi42YjZmMTAwMDBiMDgxNzMubmV0ZGV2PXZnZXIua2VybmVsLm9yZw==
-x-xsSpam: eyJTY29yZSI6MCwiRGV0YWlscyI6bnVsbH0=
-Received: from nalramli-fst-tp.. (d4-50-191-215.clv.wideopenwest.com [50.4.215.191])
-	by nalramli.com (Postfix) with ESMTPSA id 0F1382CE01B3;
-	Thu,  9 Oct 2025 15:28:41 -0400 (EDT)
-From: "Nabil S. Alramli" <dev@nalramli.com>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	lishujin@kuaishou.com,
-	xingwanli@kuaishou.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	team-kernel@fastly.com,
-	khubert@fastly.com,
-	nalramli@fastly.com,
-	dev@nalramli.com
-Subject: [RFC ixgbe 1/2] ixgbe: Implement support for ndo_xdp_xmit in skb mode
-Date: Thu,  9 Oct 2025 15:28:30 -0400
-Message-ID: <20251009192831.3333763-2-dev@nalramli.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251009192831.3333763-1-dev@nalramli.com>
-References: <20251009192831.3333763-1-dev@nalramli.com>
+	s=arc-20240116; t=1760040683; c=relaxed/simple;
+	bh=GH/isMXZuyY6n7CPnG1haS9m5ZS6KNNrdO16o7tR+Wk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DmQ8/AV07JNDPAA5hVa4nLa/Wq81PT+E7dcf2Bfhn8dgfDs/Dp/GAr1M0AM6TLVPHN8HqHTry7EqafLXFZx3uyP5RCzHdfrvpRpFb5l0eXGZ6/LM69mqKrU1SdrdPAg/iHFPHOxxkzUWN5J0Qb5Z2NwRbIwOWZJ01D4/Ptfp2iE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CEgg8MOR; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3fa528f127fso1016616f8f.1
+        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 13:11:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1760040680; x=1760645480; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I0bxSC9qVdAO+PHu6prllXc1vwxGvmh0YPQ8osQBxSA=;
+        b=CEgg8MORPxtBHBJgfMMPwJj5XYaeA53FuO8l3JSVqJYfYtQCDTdAo67Px9GPCmOwzF
+         EAyAD34u2CA3ZPwIrh2ohClDQOWR9SMfKGK/72ZcOH5A46fVeXb3PqCzAmeEDHAhg6Ys
+         iKmaxtIQAirkEmQtHoEEarFvoGBaJDE6XwAo9ZnU3f1iDuiFXF2F2D//7x/BsizZWE7a
+         WhBZB6aH+HfjcgKwUw4f0DNTSgc6i9z5ijsRUyzA+9/DzgOIhtdmsgqkaWHWRn6HI062
+         YlyiK5ZrG9MKduy//tau/CTEclMBo5PxhoI+WmABjxl5EdOX9RHuLlil2I+frZMMaRdn
+         67XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760040680; x=1760645480;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I0bxSC9qVdAO+PHu6prllXc1vwxGvmh0YPQ8osQBxSA=;
+        b=jKmrvgfuV9tx+Eem0O53SW0m2vRQuPdCdQ/YnTzSFg1oKFoRbc4vdyYT19qD3wdD36
+         Ppv/QRRxPMiP0zX74BY8LiJVgQZFtbT09MmB2mRtomyEQzO7nwMQebOgirsh18izjTYs
+         8rvHDDYrn0E6SrGUj6blYt5LSjA+MiH+zPYeBS/ByTBNHbA461vlgVWCvFusUkTVOzM+
+         Tb4lT4JTEGaditxe+PiZPbtP3mv+oyP36dU50rQFQrBVB3MnYEiqjB9Smhw4ad6fX14G
+         JQjkUKnAaGwyBCM1wYur+kTstUp6Zhh/PTqpRibbGMXkGfXeZ5hz2V6QwcR+ssU9nMig
+         MmTw==
+X-Forwarded-Encrypted: i=1; AJvYcCVVH+r0Xabrn/HoCy25budqXg1Q8Pzgyzh0DimyrBL7XS+p7xErspQqB2CL3zW6cyuo87LtBqY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIJNfIQpTU5UhtumMxGcafRk19Bl0WMyRBG5tlsXV4dbmqwHq1
+	43Qi0CR8bUovoJLjdCQqc5OahF3VgyPuVBTYobFCKPgKY0+RchS5OfC9BdjbH7K5iLY=
+X-Gm-Gg: ASbGncs8Xe9f/SfYRmqp+FbiqysZcO5sYPAbvjQNypHGuTe/eSQpJ1WAefFG1JRMUkA
+	xqGuqRz2iE+nmF7RR3TwKYl6HL+sVMwdV5X5bUQkXyXB3mn6AjtY8riW1wKbLnbPVrHPSi0KA6I
+	QcClwFp/gFatbE9ceIfqWKb0HDV267OacCSl8cpdxyWNMKnyFEw4Q44l7Q80Ah4R3uN535A4UWj
+	yL6ueDStQQHls58YnkeOkkakH1oRsPLJprZ7sSgcdpdVqENMEcY+P0kE/pmjd5T7af3rK7GCU0D
+	jabZ5JKpb2nxm4o01y2nr0es30StdVMudqkoCTa5fdprx2PHTuNly0ipX2GUy61Zpi17R2OqF4D
+	lENURpqTcYQrIbZcrz30cMPUnzuBlm1NExwJjPaexiNNo04/H+2/wEYOJIA==
+X-Google-Smtp-Source: AGHT+IFuLsi4wmsunBeslCI8cKWeFy4ZUEWU/gsK5+phruyOaGgG2/phEeGUm4ke9yIArdmP/BdHLA==
+X-Received: by 2002:a5d:5f96:0:b0:3ec:42f9:952b with SMTP id ffacd0b85a97d-42666a9e191mr6428067f8f.4.1760040679687;
+        Thu, 09 Oct 2025 13:11:19 -0700 (PDT)
+Received: from [192.168.0.36] ([82.76.24.202])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce5cf70fsm563238f8f.27.2025.10.09.13.11.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Oct 2025 13:11:19 -0700 (PDT)
+Message-ID: <7b861236-8317-4435-8582-bd97f545e322@linaro.org>
+Date: Thu, 9 Oct 2025 23:11:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/18] media: microchip-isc: Color correction and
+ histogram stats
+To: Balamanikandan Gunasundar <balamanikandan.gunasundar@microchip.com>
+Cc: Chas Williams <3chas3@gmail.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Balakrishnan Sambath <balakrishnan.s@microchip.com>,
+ Hans Verkuil <hverkuil@kernel.org>, Ricardo Ribalda <ribalda@chromium.org>,
+ Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>,
+ Jacopo Mondi <jacopo.mondi@ideasonboard.com>,
+ Daniel Scally <dan.scally+renesas@ideasonboard.com>,
+ Tomi Valkeinen <tomi.valkeinen@ideasonboard.com>,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org,
+ Mauro Carvalho Chehab <mchehab@kernel.org>
+References: <20251009155251.102472-1-balamanikandan.gunasundar@microchip.com>
+From: Eugen Hristev <eugen.hristev@linaro.org>
+Content-Language: en-US
+In-Reply-To: <20251009155251.102472-1-balamanikandan.gunasundar@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-This commit adds support for `ndo_xdp_xmit` in skb mode in the ixgbe
-ethernet driver, by allowing the call to continue to transmit the packets
-using `dev_direct_xmit`.
+Hi Bala,
 
-Previously, the driver did not support the operation in skb mode. The
-handler `ixgbe_xdp_xmit` had the following condition:
+On 10/9/25 18:52, Balamanikandan Gunasundar wrote:
+> Hi,
+> 
+> This patch series has a set of enhancements to the Microchip Image Sensor
+> Controller driver. The objective is to expand its image processing
+> capabilities and to improve the colors.
+> 
+> This series also introduces a new stats driver that exposes the histogram
+> data to userspace via v4l2 controls. This allows applications such as
+> libcamera to access real time image statistics for advanced image
+> processing like automatic exposure, white balance adjustments etc.
+> 
+> Balakrishnan Sambath (11):
+>   media: microchip-isc: Enable GDC and CBC module flags for RGB formats
+>   media: microchip-isc: Improve histogram calculation with outlier
+>     rejection
+>   media: microchip-isc: Use channel averages for Grey World AWB
+>   media: microchip-isc: Add range based black level correction
+>   media: platform: microchip: Extend gamma table and control range
+>   media: platform: microchip: Add new histogram submodule
+>   media: microchip-isc: Register and unregister statistics device
+>   media: microchip-isc: Always enable histogram for all RAW formats
+>   media: microchip-isc: fix histogram state initialization order
+>   media: microchip-isc: decouple histogram cycling from AWB mode
+>   media: microchip-isc: enable userspace histogram statistics export
+> 
+> Balamanikandan Gunasundar (7):
+>   media: platform: microchip: set maximum resolution for sam9x7
+>   media: platform: microchip: Include DPC modules flags in pipeline
+>   media: microchip-isc: expose hue and saturation as v4l2 controls
+>   media: microchip-isc: Rename CBC to CBHS
+>   media: microchip-isc: Store histogram data of all channels
+>   media: videodev2.h, v4l2-ioctl: Add microchip statistics format
+>   media: microchip-isc: expose color correction registers as v4l2
+>     controls
+> 
+>  drivers/media/platform/microchip/Kconfig      |   2 +
+>  drivers/media/platform/microchip/Makefile     |   2 +-
+>  .../platform/microchip/microchip-isc-base.c   | 373 ++++++++++--
+>  .../platform/microchip/microchip-isc-regs.h   |   3 +
+>  .../platform/microchip/microchip-isc-stats.c  | 549 ++++++++++++++++++
+>  .../media/platform/microchip/microchip-isc.h  |  44 +-
+>  .../microchip/microchip-sama5d2-isc.c         |   2 +-
+>  .../microchip/microchip-sama7g5-isc.c         |  73 ++-
+>  drivers/media/v4l2-core/v4l2-ioctl.c          |   1 +
+>  include/linux/atmel-isc-media.h               |  13 +
+>  include/uapi/linux/videodev2.h                |   3 +
+>  11 files changed, 1001 insertions(+), 64 deletions(-)
+>  create mode 100644 drivers/media/platform/microchip/microchip-isc-stats.c
+> 
 
-```
-	ring =3D adapter->xdp_prog ? ixgbe_determine_xdp_ring(adapter) : NULL;
-	if (unlikely(!ring))
-		return -ENXIO;
-```
+This looks interesting.
+I would like to see the compliance tool output for more platforms
+(sama7g5, sama5d2, and the new sam9x7), also the media-ctl -p , to see
+the topology with your new driver.
 
-That only works in native mode. In skb mode, `adapter->xdp_prog =3D=3D NU=
-LL` so
-the call returned an error, which prevented the ability to send packets
-using `bpf_prog_test_run_opts` with the `BPF_F_TEST_XDP_LIVE_FRAMES` flag=
-.
-
-Signed-off-by: Nabil S. Alramli <dev@nalramli.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  8 ++++
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 43 +++++++++++++++++--
- 2 files changed, 47 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ether=
-net/intel/ixgbe/ixgbe.h
-index e6a380d4929b..26c378853755 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-@@ -846,6 +846,14 @@ struct ixgbe_ring *ixgbe_determine_xdp_ring(struct i=
-xgbe_adapter *adapter)
- 	return adapter->xdp_ring[index];
- }
-=20
-+static inline
-+struct ixgbe_ring *ixgbe_determine_tx_ring(struct ixgbe_adapter *adapter=
-)
-+{
-+	int index =3D ixgbe_determine_xdp_q_idx(smp_processor_id());
-+
-+	return adapter->tx_ring[index];
-+}
-+
- static inline u8 ixgbe_max_rss_indices(struct ixgbe_adapter *adapter)
- {
- 	switch (adapter->hw.mac.type) {
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/=
-ethernet/intel/ixgbe/ixgbe_main.c
-index 467f81239e12..fed70cbdb1b2 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -10748,7 +10748,8 @@ static int ixgbe_xdp_xmit(struct net_device *dev,=
- int n,
- 	/* During program transitions its possible adapter->xdp_prog is assigne=
-d
- 	 * but ring has not been configured yet. In this case simply abort xmit=
-.
- 	 */
--	ring =3D adapter->xdp_prog ? ixgbe_determine_xdp_ring(adapter) : NULL;
-+	ring =3D adapter->xdp_prog ? ixgbe_determine_xdp_ring(adapter) :
-+		ixgbe_determine_tx_ring(adapter);
- 	if (unlikely(!ring))
- 		return -ENXIO;
-=20
-@@ -10762,9 +10763,43 @@ static int ixgbe_xdp_xmit(struct net_device *dev=
-, int n,
- 		struct xdp_frame *xdpf =3D frames[i];
- 		int err;
-=20
--		err =3D ixgbe_xmit_xdp_ring(ring, xdpf);
--		if (err !=3D IXGBE_XDP_TX)
--			break;
-+		if (adapter->xdp_prog) {
-+			err =3D ixgbe_xmit_xdp_ring(ring, xdpf);
-+			if (err !=3D IXGBE_XDP_TX)
-+				break;
-+		} else {
-+			struct xdp_buff xdp =3D {0};
-+			unsigned int metasize =3D 0;
-+			unsigned int size =3D 0;
-+			unsigned int truesize =3D 0;
-+			struct sk_buff *skb =3D NULL;
-+
-+			xdp_convert_frame_to_buff(xdpf, &xdp);
-+			size =3D xdp.data_end - xdp.data;
-+			metasize =3D xdp.data - xdp.data_meta;
-+			truesize =3D SKB_DATA_ALIGN(xdp.data_end - xdp.data_hard_start) +
-+				   SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-+
-+			skb =3D napi_alloc_skb(&ring->q_vector->napi, truesize);
-+			if (likely(skb)) {
-+				skb_reserve(skb, xdp.data - xdp.data_hard_start);
-+				skb_put_data(skb, xdp.data, size);
-+				build_skb_around(skb, skb->data, truesize);
-+				if (metasize)
-+					skb_metadata_set(skb, metasize);
-+				skb->dev =3D dev;
-+				skb->queue_mapping =3D ring->queue_index;
-+
-+				err =3D dev_direct_xmit(skb, ring->queue_index);
-+				if (!dev_xmit_complete(err))
-+					break;
-+			} else {
-+				break;
-+			}
-+
-+			xdp_return_frame_rx_napi(xdpf);
-+		}
-+
- 		nxmit++;
- 	}
-=20
---=20
-2.43.0
-
+Thanks,
+Eugen
 
