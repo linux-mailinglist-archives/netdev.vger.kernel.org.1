@@ -1,170 +1,244 @@
-Return-Path: <netdev+bounces-228322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1F40BC79C5
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 09:08:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FB7EBC7AB3
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 09:20:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82D2D3E6F7B
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 07:08:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A2F419E70B1
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 07:21:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BF52BE65B;
-	Thu,  9 Oct 2025 07:07:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TnvQmqxZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09DD2D0C79;
+	Thu,  9 Oct 2025 07:20:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEB7F1C1F02
-	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 07:07:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685D6298CA4;
+	Thu,  9 Oct 2025 07:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759993679; cv=none; b=J7xl6ONLTbxZ6px3Q1mtNrEsXhZlu6hXFZAAGbWP4al7X8y7Vq80T3F/yPcWtqKhNg3s+Bvy3HkIfdcd5CYeKyHRX6ssbhKDI6/SH0H53BUG9YWYq8mc57GpOMm8pzK9kN8TgJYguiXddKrFZdKydpAnaxY+usXEkMMPR76jlgg=
+	t=1759994436; cv=none; b=ozYhkuaNZZIOikcvqrcgDeoXTxpRYWCZzu7bQ6kLZ51SCZbkblTXwsHczAoo5VM4utDOoeyY9ajZVVa4WwQYOcSIUpam/hcsP5uCp+DC5TePIj6xIIAeCP7A+uwi03JhZTRO0ZKDf87KyTK+/edBI2cWj+8wVDtjtGamU/g+uII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759993679; c=relaxed/simple;
-	bh=lbbVyk5jCBer66b9CPFbrfSyMRiBlKAI8daIXk3lt70=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dr1zcHYP15Bztl4Rhj7Z0hs6qrWjwrBvP0u6Zf0r2ER2VRVprlexzqwRtYYLrogrhMwGOrOPT2KHG89GLRpxKVptHwjKM7noMoGblM2IEyZfUED+NL6Q+m+8ajuglRJM5UU5ST5lGBPnjiKPOR2gjrRV5xUEYtycbaagVw4xfoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TnvQmqxZ; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4df0467b510so6037561cf.3
-        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 00:07:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759993676; x=1760598476; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3M52dh1h+FfVjykyrFeFn3fcuq9jJ8NMh6+SJVp+QDw=;
-        b=TnvQmqxZFG/sxOwPBPwnYGgMkEc4zqUpG4EHS4nuKORDYTrncQOkNboEATQGD+jc8k
-         Fx9Dgl5Xlv8+PULY5zYHD/7tehLiEpgt+dupflPvF2x69WkLuDREPnjj4m8iJK9cxSss
-         0yBCfCBmnxR1Qi/RKE547TJnRZcrRUll3hwlTBnfTGm8lb/qaJM76Wv/SSjeUeavR5Ts
-         9TUL++xlKd+7mS732GqXIDn3pEY7Tmximo7hstttDYJs1naJiGgmWmCJo+edOLiYM3aZ
-         TAkTm2d3OYXFOxoHexAf62Qpvutax+IxHbsKTJaSN2YACZd7u++x0sjlgcNjXBU9V7cx
-         dLQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759993676; x=1760598476;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3M52dh1h+FfVjykyrFeFn3fcuq9jJ8NMh6+SJVp+QDw=;
-        b=FekPHAJotVFOx/Ahs8Vvq08Fq/sWYRt/OzgAhT+1reihx4kZ07L79hxFlVsSzL1RXI
-         8rpO543lkw1+1r4FfHmVkYAIT2wSlmKQR50Z9T5yFCGvE9Cew1ybAVCgFV2wV5yHs+kz
-         in0mARY0/ANGG0SXpAFdxWRKQDsJTwPGkWC4AuMEVL9D3TAl6Oomld0Fh/kdBP8NCZD/
-         Npj8vb6J7N2nzOEzTyTcaR+Bu7rkI6HVQpAkPpDmrF8Cxu2iab7X1D9kISZGo5CvFWAh
-         FSB5XAg+c9FG+NGkqqWyeeB6OCiOYWOsMzozQsTvba7hhhTQAE3baAyU96Ksvqd/8onZ
-         ulQw==
-X-Forwarded-Encrypted: i=1; AJvYcCV0JIv3xmC1KUVkkHxXoaKEj/1MOwtV8xi1nE2ySyDNolLSLOzjtHaIgDVG2maJEMumdGwSFQA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywwt+HgTbz0pJOY6LZ5TRyT+7FoOF6v5DXLd/45K07lvD1Y1Xo4
-	+0tQl26AxHTBrXRPB66eWDiRk9PDsY9V80N5IRi4WN97SvApkYFLn7GLmtds7zuGPYl1NXZtGmU
-	siy+yCAg/e7uGtziG3UmECc2HNxZmhQDjuALjT30M
-X-Gm-Gg: ASbGncsXQBwVHizo6ihZ/1RRbJURVXxblKKpBtG6am1/yVQSnbHRDODxlgVG14qQEOv
-	jVWgU+oDM7UVYm8XqY4jCpccXeHmWdFp2X6wbiZQD0VbHXfyc1QEhfs8lYIDfCicIPxayxb7l9U
-	IXI+CyPKw1nZA8l2coYGF/uad08iVDvjlFF8Xf0mPPZgDMBrDUwzrKqNHpmzbQMEkZfUgozUR1E
-	yPRtNHFnxfX3/i1gscr1aiQpn7oBJEJZkknrw==
-X-Google-Smtp-Source: AGHT+IGX8qBecZyb+pIbR5G0iTKPZsClm1K9y+5nFkeZs4NBukkbXnHL7r7xRdYK4Yr36ptDZgKGjM2jiXSeZKLPycE=
-X-Received: by 2002:ac8:5847:0:b0:4d2:95ab:ecb0 with SMTP id
- d75a77b69052e-4e6ead5afb8mr84565721cf.64.1759993675359; Thu, 09 Oct 2025
- 00:07:55 -0700 (PDT)
+	s=arc-20240116; t=1759994436; c=relaxed/simple;
+	bh=qiRw4QuoIHdxgOMBw5rOBwaXySx4YLDEZtVJzzfIsuA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z1iMZdIQ2LfY98Zq9sJDWmqOVQg3nEREc9g5XGqwJ+oyo6Bf/a4s+ziwP2nXVp5lKb2iAnO3cryLV/X91lomZF6sezxjUTlw9LgXwYdcPUeFcDySq2Bh2WY4wtA8Lu1gw0Y+GajJdjDO4RBUxunfgRyWOERuZ0+qZ359hv9oPVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4cj1Mm20R5z9sSd;
+	Thu,  9 Oct 2025 09:14:28 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id IrXIuvb4y-IU; Thu,  9 Oct 2025 09:14:28 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4cj1Mm0p1dz9sSb;
+	Thu,  9 Oct 2025 09:14:28 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id F24048B76C;
+	Thu,  9 Oct 2025 09:14:27 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id wHEaqnf6dd0R; Thu,  9 Oct 2025 09:14:27 +0200 (CEST)
+Received: from [192.168.235.99] (unknown [192.168.235.99])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id D85288B768;
+	Thu,  9 Oct 2025 09:14:25 +0200 (CEST)
+Message-ID: <3e043453-3f27-48ad-b987-cc39f523060a@csgroup.eu>
+Date: Thu, 9 Oct 2025 09:14:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <3b78ca04-f4b9-4d12-998d-4e21a3a8397f@chinatelecom.cn>
-In-Reply-To: <3b78ca04-f4b9-4d12-998d-4e21a3a8397f@chinatelecom.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 9 Oct 2025 00:07:44 -0700
-X-Gm-Features: AS18NWASjTPvsTSPBC6XRuDuoZqgCPV0bsX2fSbCWNUjwlh1HcRwARWtjH3Fxjw
-Message-ID: <CANn89i+rHTU2eVtkc0H=v+8PczfonOxTqc=fCw+6QRwj_3MURg@mail.gmail.com>
-Subject: Re: [PATCH] bpf, sockmap: Update tp->rcv_nxt in sk_psock_skb_ingress
-To: zhengguoyong <zhenggy@chinatelecom.cn>
-Cc: john.fastabend@gmail.com, jakub@cloudflare.com, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: (bisected) [PATCH v2 08/37] mm/hugetlb: check for unreasonable
+ folio sizes when registering hstate
+To: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
+Cc: Zi Yan <ziy@nvidia.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Marco Elver <elver@google.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>,
+ Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
+ netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+ Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+ Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+ virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+ wireguard@lists.zx2c4.com, x86@kernel.org,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+References: <20250901150359.867252-1-david@redhat.com>
+ <20250901150359.867252-9-david@redhat.com>
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+Content-Language: fr-FR
+In-Reply-To: <20250901150359.867252-9-david@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 8, 2025 at 8:07=E2=80=AFPM zhengguoyong <zhenggy@chinatelecom.c=
-n> wrote:
->
-> When using sockmap to forward TCP traffic to the application
-> layer of the peer socket, the peer socket's tcp_bpf_recvmsg_parser
-> processing flow will synchronously update the tp->copied_seq field.
-> This causes tp->rcv_nxt to become less than tp->copied_seq.
->
-> Later, when this socket receives SKB packets from the protocol stack,
-> in the call chain tcp_data_ready =E2=86=92 tcp_epollin_ready, the functio=
-n
-> tcp_epollin_ready will return false, preventing the socket from being
-> woken up to receive new packets.
->
-> Therefore, it is necessary to synchronously update the tp->rcv_nxt
-> information in sk_psock_skb_ingress.
->
-> Signed-off-by: GuoYong Zheng <zhenggy@chinatelecom.cn>
+Hi David,
 
-Hi GuoYong Zheng
+Le 01/09/2025 à 17:03, David Hildenbrand a écrit :
+> Let's check that no hstate that corresponds to an unreasonable folio size
+> is registered by an architecture. If we were to succeed registering, we
+> could later try allocating an unsupported gigantic folio size.
+> 
+> Further, let's add a BUILD_BUG_ON() for checking that HUGETLB_PAGE_ORDER
+> is sane at build time. As HUGETLB_PAGE_ORDER is dynamic on powerpc, we have
+> to use a BUILD_BUG_ON_INVALID() to make it compile.
+> 
+> No existing kernel configuration should be able to trigger this check:
+> either SPARSEMEM without SPARSEMEM_VMEMMAP cannot be configured or
+> gigantic folios will not exceed a memory section (the case on sparse).
+> 
+> Reviewed-by: Zi Yan <ziy@nvidia.com>
+> Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+> Reviewed-by: Liam R. Howlett <Liam.Howlett@oracle.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-We request a Fixes: tag for patches claiming to fix a bug.
+I get following warning on powerpc with linus tree, bisected to commit 
+7b4f21f5e038 ("mm/hugetlb: check for unreasonable folio sizes when 
+registering hstate")
 
-How would stable teams decide to backport a patch or not, and to which vers=
-ions,
-without having to fully understand this code ?
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 0 at mm/hugetlb.c:4744 hugetlb_add_hstate+0xc0/0x180
+Modules linked in:
+CPU: 0 UID: 0 PID: 0 Comm: swapper Not tainted 
+6.17.0-rc4-00275-g7b4f21f5e038 #1683 NONE
+Hardware name: QEMU ppce500 e5500 0x80240020 QEMU e500
+NIP:  c000000001357408 LR: c000000001357c90 CTR: 0000000000000003
+REGS: c00000000152bad0 TRAP: 0700   Not tainted 
+(6.17.0-rc4-00275-g7b4f21f5e038)
+MSR:  0000000080021002 <CE,ME>  CR: 44000448  XER: 20000000
+IRQMASK: 1
+GPR00: c000000001357c90 c00000000152bd70 c000000001339000 0000000000000012
+GPR04: 000000000000000a 0000000000001000 000000000000001e 0000000000000000
+GPR08: 0000000000000000 0000000000000000 0000000000000001 000000000000000a
+GPR12: c000000001357b68 c000000001590000 0000000000000000 0000000000000000
+GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+GPR20: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+GPR24: c0000000011adb40 c00000000156b528 0000000000000000 c00000000156b4b0
+GPR28: c00000000156b528 0000000000000012 0000000040000000 0000000000000000
+NIP [c000000001357408] hugetlb_add_hstate+0xc0/0x180
+LR [c000000001357c90] hugepagesz_setup+0x128/0x150
+Call Trace:
+[c00000000152bd70] [c00000000152bda0] init_stack+0x3da0/0x4000 (unreliable)
+[c00000000152be10] [c000000001357c90] hugepagesz_setup+0x128/0x150
+[c00000000152be80] [c00000000135841c] hugetlb_bootmem_alloc+0x84/0x104
+[c00000000152bec0] [c00000000135143c] mm_core_init+0x30/0x174
+[c00000000152bf30] [c000000001332ed4] start_kernel+0x540/0x880
+[c00000000152bfe0] [c000000000000a50] start_here_common+0x1c/0x20
+Code: 2c09000f 39000001 38e00000 39400001 7d00401e 0b080000 281d0001 
+7d00505e 79080020 0b080000 281d000c 7d4a385e <0b0a0000> 1f5a00b8 
+38bf0020 3c82ffe8
+---[ end trace 0000000000000000 ]---
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 0 at mm/hugetlb.c:4744 hugetlb_add_hstate+0xc0/0x180
+Modules linked in:
+CPU: 0 UID: 0 PID: 0 Comm: swapper Tainted: G        W 
+6.17.0-rc4-00275-g7b4f21f5e038 #1683 NONE
+Tainted: [W]=WARN
+Hardware name: QEMU ppce500 e5500 0x80240020 QEMU e500
+NIP:  c000000001357408 LR: c000000001357c90 CTR: 0000000000000005
+REGS: c00000000152bad0 TRAP: 0700   Tainted: G        W 
+(6.17.0-rc4-00275-g7b4f21f5e038)
+MSR:  0000000080021002 <CE,ME>  CR: 48000448  XER: 20000000
+IRQMASK: 1
+GPR00: c000000001357c90 c00000000152bd70 c000000001339000 000000000000000e
+GPR04: 000000000000000a 0000000000001000 0000000040000000 0000000000000000
+GPR08: 0000000000000000 0000000000000001 0000000000000001 0000000000000280
+GPR12: c000000001357b68 c000000001590000 0000000000000000 0000000000000000
+GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+GPR20: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+GPR24: c0000000011adb40 c00000000156b5e0 0000000000000001 c00000000156b4b0
+GPR28: c00000000156b528 000000000000000e 0000000004000000 00000000000000b8
+NIP [c000000001357408] hugetlb_add_hstate+0xc0/0x180
+LR [c000000001357c90] hugepagesz_setup+0x128/0x150
+Call Trace:
+[c00000000152bd70] [c000000000f27048] __func__.0+0x0/0x18 (unreliable)
+[c00000000152be10] [c000000001357c90] hugepagesz_setup+0x128/0x150
+[c00000000152be80] [c00000000135841c] hugetlb_bootmem_alloc+0x84/0x104
+[c00000000152bec0] [c00000000135143c] mm_core_init+0x30/0x174
+[c00000000152bf30] [c000000001332ed4] start_kernel+0x540/0x880
+[c00000000152bfe0] [c000000000000a50] start_here_common+0x1c/0x20
+Code: 2c09000f 39000001 38e00000 39400001 7d00401e 0b080000 281d0001 
+7d00505e 79080020 0b080000 281d000c 7d4a385e <0b0a0000> 1f5a00b8 
+38bf0020 3c82ffe8
+---[ end trace 0000000000000000 ]---
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 0 at mm/hugetlb.c:4744 hugetlb_add_hstate+0xc0/0x180
+Modules linked in:
+CPU: 0 UID: 0 PID: 0 Comm: swapper Tainted: G        W 
+6.17.0-rc4-00275-g7b4f21f5e038 #1683 NONE
+Tainted: [W]=WARN
+Hardware name: QEMU ppce500 e5500 0x80240020 QEMU e500
+NIP:  c000000001357408 LR: c000000001357c90 CTR: 0000000000000004
+REGS: c00000000152bad0 TRAP: 0700   Tainted: G        W 
+(6.17.0-rc4-00275-g7b4f21f5e038)
+MSR:  0000000080021002 <CE,ME>  CR: 48000448  XER: 20000000
+IRQMASK: 1
+GPR00: c000000001357c90 c00000000152bd70 c000000001339000 0000000000000010
+GPR04: 000000000000000a 0000000000001000 0000000004000000 0000000000000000
+GPR08: 0000000000000000 0000000000000002 0000000000000001 0000000000000a00
+GPR12: c000000001357b68 c000000001590000 0000000000000000 0000000000000000
+GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+GPR20: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+GPR24: c0000000011adb40 c00000000156b698 0000000000000002 c00000000156b4b0
+GPR28: c00000000156b528 0000000000000010 0000000010000000 0000000000000170
+NIP [c000000001357408] hugetlb_add_hstate+0xc0/0x180
+LR [c000000001357c90] hugepagesz_setup+0x128/0x150
+Call Trace:
+[c00000000152bd70] [c000000000f27048] __func__.0+0x0/0x18 (unreliable)
+[c00000000152be10] [c000000001357c90] hugepagesz_setup+0x128/0x150
+[c00000000152be80] [c00000000135841c] hugetlb_bootmem_alloc+0x84/0x104
+[c00000000152bec0] [c00000000135143c] mm_core_init+0x30/0x174
+[c00000000152bf30] [c000000001332ed4] start_kernel+0x540/0x880
+[c00000000152bfe0] [c000000000000a50] start_here_common+0x1c/0x20
+Code: 2c09000f 39000001 38e00000 39400001 7d00401e 0b080000 281d0001 
+7d00505e 79080020 0b080000 281d000c 7d4a385e <0b0a0000> 1f5a00b8 
+38bf0020 3c82ffe8
+---[ end trace 0000000000000000 ]---
 
 
 > ---
->  net/core/skmsg.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
->
-> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> index 9becadd..e9d841c 100644
-> --- a/net/core/skmsg.c
-> +++ b/net/core/skmsg.c
-> @@ -576,6 +576,7 @@ static int sk_psock_skb_ingress(struct sk_psock *psoc=
-k, struct sk_buff *skb,
->         struct sock *sk =3D psock->sk;
->         struct sk_msg *msg;
->         int err;
-> +       u32 seq;
->
->         /* If we are receiving on the same sock skb->sk is already assign=
-ed,
->          * skip memory accounting and owner transition seeing it already =
-set
-> @@ -595,8 +596,15 @@ static int sk_psock_skb_ingress(struct sk_psock *pso=
-ck, struct sk_buff *skb,
->          */
->         skb_set_owner_r(skb, sk);
->         err =3D sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, ms=
-g, true);
-> -       if (err < 0)
-> +       if (err < 0) {
->                 kfree(msg);
-> +       } else {
-> +               bh_lock_sock_nested(sk);
-> +               seq =3D READ_ONCE(tcp_sk(sk)->rcv_nxt) + len;
-> +               WRITE_ONCE(tcp_sk(sk)->rcv_nxt, seq);
+>   mm/hugetlb.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
+> index 1e777cc51ad04..d3542e92a712e 100644
+> --- a/mm/hugetlb.c
+> +++ b/mm/hugetlb.c
+> @@ -4657,6 +4657,7 @@ static int __init hugetlb_init(void)
+>   
+>   	BUILD_BUG_ON(sizeof_field(struct page, private) * BITS_PER_BYTE <
+>   			__NR_HPAGEFLAGS);
+> +	BUILD_BUG_ON_INVALID(HUGETLB_PAGE_ORDER > MAX_FOLIO_ORDER);
+>   
+>   	if (!hugepages_supported()) {
+>   		if (hugetlb_max_hstate || default_hstate_max_huge_pages)
+> @@ -4740,6 +4741,7 @@ void __init hugetlb_add_hstate(unsigned int order)
+>   	}
+>   	BUG_ON(hugetlb_max_hstate >= HUGE_MAX_HSTATE);
+>   	BUG_ON(order < order_base_2(__NR_USED_SUBPAGE));
+> +	WARN_ON(order > MAX_FOLIO_ORDER);
+>   	h = &hstates[hugetlb_max_hstate++];
+>   	__mutex_init(&h->resize_lock, "resize mutex", &h->resize_key);
+>   	h->order = order;
 
-This does not look to be the right place.
-
-Re-locking a socket _after_ the fundamental change took place is
-fundamentally racy.
-
-Also do we have a guarantee sk is always a TCP socket at this point ?
-
-If yes, why do we have sk_is_tcp() check in sk_psock_init_strp() ?
-
-> +               bh_unlock_sock(sk);
-> +       }
-> +
->         return err;
->  }
->
-> --
-> 1.8.3.1
 
