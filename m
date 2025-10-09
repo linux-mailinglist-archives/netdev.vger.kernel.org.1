@@ -1,137 +1,154 @@
-Return-Path: <netdev+bounces-228424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52E0CBCA61E
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 19:33:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26743BCA81D
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 20:04:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E77AB4F8A1D
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 17:33:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EA861A65C38
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 18:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D69C245033;
-	Thu,  9 Oct 2025 17:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF682F39CB;
+	Thu,  9 Oct 2025 17:59:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VcjPQAnr"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="brCnqSu9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0564E2556E
-	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 17:33:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BAB2F290A
+	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 17:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760031188; cv=none; b=LX3/Q2FeUx/rqEUxcGKpFwIgPBSTSK+du2BtJrZ6oizKrhhBABZMr8E/dQGoEngedo7IDoOTtmJ2te/X05Oq7RIZHSoFFpkGmzPQvQrD3kp0ka9gi3PUYA2FVawe3GuOK9n8TrrjjfcatZJazLCp6pZFzTeUgNxGzPZSg4uwyks=
+	t=1760032755; cv=none; b=guTn3tz3RJd5CxcWNncmKJHyW5sQbTSOfnX/3NpGPt5pRcL6errHRp5HXJ5AhcQSb3E3KE5bME8W2fT6pmSvm8zwyJmEg4xB2nr6Tc1VxgJXpMdgk2cashcRBbFVP+Mc2TQcmW+N+/vqR6r96sr41gKue5WNDGfGebuTHDXYIW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760031188; c=relaxed/simple;
-	bh=9vAUJTKDsrddX0ECgsQNxyK2CN2AgssZKpAoBZkq1Vc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gA20NI+G1c4fN0D8x84NKrXhZdNFDMFwkMRlJVbCmBXwTK7l45qdMIb4IXVr66mX/GEau3lU+YK/zT+Ji9/JnzsQgSyuHzBNtPvUUvV2hwHSYpGMA0+XNcQP8n2vtRBF+rhohH3HClLbizat0SvLRs7w6GhfLuu0phTCTdh7KNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VcjPQAnr; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-57992ba129eso1418453e87.3
-        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 10:33:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760031183; x=1760635983; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pLxztCZhFqGeufXzkuXXus/JxbN+hE9UN/bbCDJgNrI=;
-        b=VcjPQAnrGgVLeBRfC+uuXGk9pbzHCz+TJp+w3cYNpnU0m8UPJy6bEP8hXrxK2eIM/q
-         iCzmNuIjzPH/NF3o987LmRNMcmPBiwhaeWtF6rYhzZK+TMltB59RykpDq3+MJ6AsyiCb
-         mfa6J0Jqx7t9SLw8elKeYanX6DmmM64op0Isq71miJrarJPwitzOxZ9ns5FyN+A2wmID
-         7iisjgbsvW4XK6na7u0YUt/ET4Lhpmr63SmF89zbwle2su0ylDTnQvfqIqvbp2SvlxUH
-         R0j0rVJ8FuirNgR3EhUfnaTvOYVzpNMLnxq87Z1CLxZJvgsWlKXMWWFL4TAAp/RC7weK
-         iSnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760031183; x=1760635983;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pLxztCZhFqGeufXzkuXXus/JxbN+hE9UN/bbCDJgNrI=;
-        b=j+BZ4yJmPZZI7VP+HnA9dT7qopepiow6RkjUGcMQ+aJi9s5YV88H2iqK0LpGqujOA9
-         X+1gNZ9ZMbPQkc053UUl+I1oFZurV9Q9N8Pz91g1av/OCpzsUAhpHaTl244dT+3ah9mu
-         /BQTAAttLfvMz9qOFul3+MXur9AYSj+QsGygrulNHeew8WrPZotnnF/b1QyeodD1qklr
-         d6DUyTN06lYgT7+LtySSwloXFapz6GxLqqiY89qyZ0ra9EcXnTOijFHjcdhrMulJPx5L
-         HYmftMpg2YvcFzMhvwcTQxxfxNbFTGWddMZaKHL1avVqLnikYDB0OsjMydravlHmdWf1
-         WN7A==
-X-Forwarded-Encrypted: i=1; AJvYcCVS5KluFUWOJvZN38kzMn1wR87zw/Q5/+WZfwdhCYkOTVSjHoMgyqXioDXFfD3QTmzk+FnJhCM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwG59j7+62Hr8CTJ1akAdTsmUpK5xN5EN3y1aVEISSWs09Db6HD
-	KuAnZ6rGS23HnuslThD8AtCvJ4FPXc3QM3psqbxdul0R/TjjJuwcHXNl
-X-Gm-Gg: ASbGncsnk3p2znDCTWDklCrUz2AuXpSKrfwvl1hHeWRcZsUi1512WSax3cW/KNb7CAQ
-	pvsrqjMG7gHZntBmwGC8zoqpylg4ZFYcJSUjlkSSJ6ZtsOz35bx4oHwya0SLuoQVnT6z4By5itt
-	fg6BR1Neto+5fwNQi3SMwfIeAY+xmaOczR/uQKwl7aDx3l5x9dN1Vwmymw97HuGoprNLAEfVYB3
-	i4kbt5QqlhPLfKn1EFyXzcoaCD5xV+EVQFSE97j47o1hf66k+oW4AUMXCoSPslxUgXxRCWVXKnX
-	w9uMd+gh0tpsBgh8m1sWRro/33N0mwr44eG1B5q7l47lf8MqhhNeR3WACVni3tmUi4805duoWU9
-	0Tn5pTHDyDcDUT2YRfmpZ2iwi25mk8z6JJfB1nRwgmP8R4ORdMkjz/fmhifA0W5T3tpHRJPTcTQ
-	==
-X-Google-Smtp-Source: AGHT+IEvKuMOdYtRvPFBMg7RxLA8EnqpMsXl9d+MHkhe21lfjfclec1AQfTv2w3cGrLhXn53i9/gXA==
-X-Received: by 2002:a05:651c:982:b0:362:95d5:3858 with SMTP id 38308e7fff4ca-37609cf837cmr25479361fa.3.1760031182940;
-        Thu, 09 Oct 2025 10:33:02 -0700 (PDT)
-Received: from home-server.lan ([82.208.126.183])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59088577c1bsm26239e87.106.2025.10.09.10.33.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Oct 2025 10:33:02 -0700 (PDT)
-From: Alexey Simakov <bigalex934@gmail.com>
-To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Cc: Alexey Simakov <bigalex934@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH] sctp: fix null derefer in sctp_sf_do_5_1D_ce()
-Date: Thu,  9 Oct 2025 20:32:49 +0300
-Message-Id: <20251009173248.11881-1-bigalex934@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1760032755; c=relaxed/simple;
+	bh=2UczG0xXLbW4f5zR7wGxz0Ssgvzf+bh0Ivm4uB9XVzM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=kJHx9J+rFZw/w54MB9oofVX8nFtJIs8QcD9QWW+eBzESjovUWrsGODay0Qfn785ngTGl105Oci0CCNIH2I0RBORCKDjOw+c9abyzLFpOhDGRIxg1k8Magam+blGcUOvQuaV5/nkvYJB8bIQNFSVLJsDcGbq9G+pETHaKTOBilhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=brCnqSu9; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760032740;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/LjspjRAg7UFQe7nc1ChhpN/Yf6KjTCzKdSwL9hxGYw=;
+	b=brCnqSu9VGHT/fqGA/etX42LAH8RMi97BzTQX1ZjtyFYtW6GOyWeZ+wGb2YEtlGBv6H3Bl
+	XYJ3EXWAoposyXg6l44USDV3nGpuzuqGmgcv6+YgqJLf9ZWRVe1iRr0f4pj4w8Ez7DC9Dw
+	YCmA0inAJt2DGY6aumLG9v0/vUhRasw=
+From: Roman Gushchin <roman.gushchin@linux.dev>
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: Daniel Sedlak <daniel.sedlak@cdn77.com>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
+ Horman <horms@kernel.org>,  Jonathan Corbet <corbet@lwn.net>,  Neal
+ Cardwell <ncardwell@google.com>,  Kuniyuki Iwashima <kuniyu@google.com>,
+  David Ahern <dsahern@kernel.org>,  Andrew Morton
+ <akpm@linux-foundation.org>,  Yosry Ahmed <yosry.ahmed@linux.dev>,
+  linux-mm@kvack.org,  netdev@vger.kernel.org,  Johannes Weiner
+ <hannes@cmpxchg.org>,  Michal Hocko <mhocko@kernel.org>,  Muchun Song
+ <muchun.song@linux.dev>,  cgroups@vger.kernel.org,  Tejun Heo
+ <tj@kernel.org>,  Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
+  Matyas Hurtik
+ <matyas.hurtik@cdn77.com>
+Subject: Re: [PATCH v5] memcg: expose socket memory pressure in a cgroup
+In-Reply-To: <tr7hsmxqqwpwconofyr2a6czorimltte5zp34sp6tasept3t4j@ij7acnr6dpjp>
+	(Shakeel Butt's message of "Thu, 9 Oct 2025 09:06:13 -0700")
+References: <20251007125056.115379-1-daniel.sedlak@cdn77.com>
+	<87qzvdqkyh.fsf@linux.dev>
+	<13b5aeb6-ee0a-4b5b-a33a-e1d1d6f7f60e@cdn77.com>
+	<87o6qgnl9w.fsf@linux.dev>
+	<tr7hsmxqqwpwconofyr2a6czorimltte5zp34sp6tasept3t4j@ij7acnr6dpjp>
+Date: Thu, 09 Oct 2025 10:58:51 -0700
+Message-ID: <87a5205544.fsf@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Migadu-Flow: FLOW_OUT
 
-The check of new_asoc->peer.adaptation_ind can fail,
-leaving ai_ev unitilialized. In that case, the code
-can jump to the nomem_authdev label and later call
-sctp_ulpevent_free() with a null  ai_ev pointer.
-Leading to potential null dereference.
+Shakeel Butt <shakeel.butt@linux.dev> writes:
 
-Add check of ai_ev pointer before call of
-sctp_ulpevent_free function.
+> On Thu, Oct 09, 2025 at 08:32:27AM -0700, Roman Gushchin wrote:
+>> Daniel Sedlak <daniel.sedlak@cdn77.com> writes:
+>> 
+>> > Hi Roman,
+>> >
+>> > On 10/8/25 8:58 PM, Roman Gushchin wrote:
+>> >>> This patch exposes a new file for each cgroup in sysfs which is a
+>> >>> read-only single value file showing how many microseconds this cgroup
+>> >>> contributed to throttling the throughput of network sockets. The file is
+>> >>> accessible in the following path.
+>> >>>
+>> >>>    /sys/fs/cgroup/**/<cgroup name>/memory.net.throttled_usec
+>> >> Hi Daniel!
+>> >> How this value is going to be used? In other words, do you need an
+>> >> exact number or something like memory.events::net_throttled would be
+>> >> enough for your case?
+>> >
+>> > Just incrementing a counter each time the vmpressure() happens IMO
+>> > provides bad semantics of what is actually happening, because it can
+>> > hide important details, mainly the _time_ for how long the network
+>> > traffic was slowed down.
+>> >
+>> > For example, when memory.events::net_throttled=1000, it can mean that
+>> > the network was slowed down for 1 second or 1000 seconds or something
+>> > between, and the memory.net.throttled_usec proposed by this patch
+>> > disambiguates it.
+>> >
+>> > In addition, v1/v2 of this series started that way, then from v3 we
+>> > rewrote it to calculate the duration instead, which proved to be
+>> > better information for debugging, as it is easier to understand
+>> > implications.
+>> 
+>> But how are you planning to use this information? Is this just
+>> "networking is under pressure for non-trivial amount of time ->
+>> raise the memcg limit" or something more complicated?
+>> 
+>> I am bit concerned about making this metric the part of cgroup API
+>> simple because it's too implementation-defined and in my opinion
+>> lack the fundamental meaning.
+>> 
+>> Vmpressure is calculated based on scanned/reclaimed ratio (which is
+>> also not always the best proxy for the memory pressure level), then
+>> if it reaches some level we basically throttle networking for 1s.
+>> So it's all very arbitrary.
+>> 
+>> I totally get it from the debugging perspective, but not sure about
+>> usefulness of it as a permanent metric. This is why I'm asking if there
+>> are lighter alternatives, e.g. memory.events or maybe even tracepoints.
+>> 
+>
+> I also have a very similar opinion that if we expose the current
+> implementation detail through a stable interface, we might get stuck
+> with this implementation and I want to change this in future.
+>
+> Coming back to what information should we expose that will be helpful
+> for Daniel & Matyas and will be beneficial in general. After giving some
+> thought, I think the time "network was slowed down" or more specifically
+> time window when mem_cgroup_sk_under_memory_pressure() returns true
+> might not be that useful without the actual network activity. Basically
+> if no one is calling mem_cgroup_sk_under_memory_pressure() and doing
+> some actions, the time window is not that useful.
+>
+> How about we track the actions taken by the callers of
+> mem_cgroup_sk_under_memory_pressure()? Basically if network stack
+> reduces the buffer size or whatever the other actions it may take when
+> mem_cgroup_sk_under_memory_pressure() returns, tracking those actions
+> is what I think is needed here, at least for the debugging use-case.
+>
+> WDYT?
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+I feel like if it's mostly intended for debugging purposes,
+a combination of a trace point and bpftrace can work pretty well,
+so there is no need to create a new sysfs interface.
 
-Fixes: 30f6ebf65bc4 ("sctp: add SCTP_AUTH_NO_AUTH type for AUTHENTICATION_EVENT")
-Signed-off-by: Alexey Simakov <bigalex934@gmail.com>
----
- net/sctp/sm_statefuns.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/sctp/sm_statefuns.c b/net/sctp/sm_statefuns.c
-index a0524ba8d787..93cac73472c7 100644
---- a/net/sctp/sm_statefuns.c
-+++ b/net/sctp/sm_statefuns.c
-@@ -885,7 +885,8 @@ enum sctp_disposition sctp_sf_do_5_1D_ce(struct net *net,
- 	return SCTP_DISPOSITION_CONSUME;
- 
- nomem_authev:
--	sctp_ulpevent_free(ai_ev);
-+	if (ai_ev)
-+		sctp_ulpevent_free(ai_ev);
- nomem_aiev:
- 	sctp_ulpevent_free(ev);
- nomem_ev:
--- 
-2.34.1
-
-I already have sent this patch from another email, but
-he wasnt applicable since company mail server corrupt
-it.
 
