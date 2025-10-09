@@ -1,143 +1,100 @@
-Return-Path: <netdev+bounces-228416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0998BCA17A
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 18:16:37 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80610BCA312
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 18:31:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEBC83E1FA5
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 16:12:56 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2B52F34F5CB
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 16:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB89D226D16;
-	Thu,  9 Oct 2025 16:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZUm0GTpV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F981F875A;
+	Thu,  9 Oct 2025 16:31:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18AA1DE3BB
-	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 16:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2391A9F96
+	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 16:31:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760025995; cv=none; b=rPHd4Icl6w0OQQpr1XK1Mqy2GFyWL/9Wu8Nu1NVfgE1nBiD12YTm1G+95N6Y7dFVuRFInJmpma0B3uvps2XtmA1YIu0lXWtJ4xkhiQbnY6/H5tS9/mWIFA89zWWYiINjd4Wo6TlNtGZqn9DPMlG62My4s35Mq50DoUJiDa5EATs=
+	t=1760027492; cv=none; b=S6lVF+5oXHRXWiXM2dc8hEhZmdrIj6x+gaEYqxHQume0UTjPIktmHAo8qaA697Nuu9s+AsdIwnVSj5UinU7Rwme0PO0R3KPqde9C+ZC3Y1sGgSWkvLphHL3kBJsbEVdl+pAiALHKc7EdV7uf6otVTSGBU5M/TAJz6znGQklYAL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760025995; c=relaxed/simple;
-	bh=NcO+P8kozAojpKsaknXrA27jXpe71fCctjMFmkzDnRQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B3qIAm6I/2fBEZR0ldvH90sWJe/N8Rd9OLUmteUVUd0Uzknd/Hg5iLxXtd04e0IQO6usIJUeJREXFjHNPhlHXGW5RAR7+10nKjxJQQANBOL1wrI+qHIb1E3ewXnwaYz5OKC8VQNqXBhLKiPooKjCw5cqI6xK1G1JV/BWlsxNpA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZUm0GTpV; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 9 Oct 2025 09:06:13 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760025980;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KukbsMbl2huYRhlfoo2l0mDAbmiuXFQP1BtPelYVi10=;
-	b=ZUm0GTpVawkjiuJwQRpZJGGk3dlnInR8BQqp+avz857kSA9AMtwUiJc7SoyzfdEfczhfgI
-	t4YvP0k8b3mNJ0nUQGPRRxpmwogQOXrODl08eBC2UrQ9b2x+HSYz41SR2yCPRxhwqnizPK
-	1dbY1/nAOQlraza2002+CzXHfj4NQzw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Roman Gushchin <roman.gushchin@linux.dev>
-Cc: Daniel Sedlak <daniel.sedlak@cdn77.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, 
-	netdev@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal Hocko <mhocko@kernel.org>, Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org, 
-	Tejun Heo <tj@kernel.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Matyas Hurtik <matyas.hurtik@cdn77.com>
-Subject: Re: [PATCH v5] memcg: expose socket memory pressure in a cgroup
-Message-ID: <tr7hsmxqqwpwconofyr2a6czorimltte5zp34sp6tasept3t4j@ij7acnr6dpjp>
-References: <20251007125056.115379-1-daniel.sedlak@cdn77.com>
- <87qzvdqkyh.fsf@linux.dev>
- <13b5aeb6-ee0a-4b5b-a33a-e1d1d6f7f60e@cdn77.com>
- <87o6qgnl9w.fsf@linux.dev>
+	s=arc-20240116; t=1760027492; c=relaxed/simple;
+	bh=qrYoADEnVXD0we0CMIGwA9CwQG9JnCQdKbRtnkxQ5RI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=pJEEhhCKBtIvhqo/uXlXK5Rz9ohfgupUABp/ZQdgru0CMN9+xjNrgdrB4fmiDdmpgW2uJpXBeNwJpeHADRLfoWQ6D7w5ynH27Jv9inuS6Aukle1zyOWdMa+0lBO1qn8YvqB90HqMKmWfhL8MJ/ADbhx5eDMpf/Qypc8sGuLk35c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-42f8a89bb47so27992405ab.2
+        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 09:31:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760027490; x=1760632290;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cvA/J4dyztXMhogEO5JrwyKZPNKcLHZNyBJCUhQ7UMw=;
+        b=KPrLQwJk9O6dvn9ED7gCTcm25AQQmyHLcyq3qVRG0RPGOOiQu6pqQrGgR8BVdrkw2d
+         IYTZ6nR2u8Qwse9UwzsqwQVtsRD4/hdVitLt5Buds0t349jzl8fvPLcrT6k7mL/lmZqC
+         W4RBVxD6XzLrqlapx3uIhN1NNmPYPklUSpEseuKq6snIVpCZc2oIM0MoOylxIz2M0qtD
+         Lj7ngiBHFq2ZzznAsKh3DL3tGo2lIHUsZycfYPuDDl5lOBWyWVbFiKm7PlyrnKi053hQ
+         7ihHErNQEx6SvatKOUve2ODWHSC4HDv7I4PuAmjYkigChfizfeHEeUGbl4wydNBuvf3j
+         9ECQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUp/fZL+EMRVxMV0/MzF+yKqcPHugM3GkOVoAKyIwyxyPFLdrrZ4SzW2R9aDIAe6tcwOVh39xw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVDPWF+l/1ezUGqSyDuDP+Z37nOvOjhC60LnS0c+mnZkFbpb0P
+	9ZRA2JJWpDInRYexfRWGi0E2+iTkk1TPk3dRVIvnjAhn0GAA7aY0IL456ak4UabSZU62cxl2iYf
+	Yk2i9d8sgMZxieIhCXv3WdmUzD5PXwmZzHYQvpRLuNJ7b9KpJuzQcIQzBeMQ=
+X-Google-Smtp-Source: AGHT+IH+3ddjgqrEcOVhLcyur4IziVSjaf1FPkRItg24ZYiymtjP8/LF++Mm4T8LVfUSNmSyxqfMm/gjl+oHOieZ3ps/9zMniNVy
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87o6qgnl9w.fsf@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6e02:18cf:b0:428:24b4:42d3 with SMTP id
+ e9e14a558f8ab-42f873e3dc8mr69617735ab.15.1760027490108; Thu, 09 Oct 2025
+ 09:31:30 -0700 (PDT)
+Date: Thu, 09 Oct 2025 09:31:30 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68e7e362.050a0220.1186a4.0000.GAE@google.com>
+Subject: [syzbot] Monthly mptcp report (Oct 2025)
+From: syzbot <syzbot+listd2daf64d46ed16abd4d5@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, martineau@kernel.org, matttbe@kernel.org, 
+	mptcp@lists.linux.dev, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Oct 09, 2025 at 08:32:27AM -0700, Roman Gushchin wrote:
-> Daniel Sedlak <daniel.sedlak@cdn77.com> writes:
-> 
-> > Hi Roman,
-> >
-> > On 10/8/25 8:58 PM, Roman Gushchin wrote:
-> >>> This patch exposes a new file for each cgroup in sysfs which is a
-> >>> read-only single value file showing how many microseconds this cgroup
-> >>> contributed to throttling the throughput of network sockets. The file is
-> >>> accessible in the following path.
-> >>>
-> >>>    /sys/fs/cgroup/**/<cgroup name>/memory.net.throttled_usec
-> >> Hi Daniel!
-> >> How this value is going to be used? In other words, do you need an
-> >> exact number or something like memory.events::net_throttled would be
-> >> enough for your case?
-> >
-> > Just incrementing a counter each time the vmpressure() happens IMO
-> > provides bad semantics of what is actually happening, because it can
-> > hide important details, mainly the _time_ for how long the network
-> > traffic was slowed down.
-> >
-> > For example, when memory.events::net_throttled=1000, it can mean that
-> > the network was slowed down for 1 second or 1000 seconds or something
-> > between, and the memory.net.throttled_usec proposed by this patch
-> > disambiguates it.
-> >
-> > In addition, v1/v2 of this series started that way, then from v3 we
-> > rewrote it to calculate the duration instead, which proved to be
-> > better information for debugging, as it is easier to understand
-> > implications.
-> 
-> But how are you planning to use this information? Is this just
-> "networking is under pressure for non-trivial amount of time ->
-> raise the memcg limit" or something more complicated?
-> 
-> I am bit concerned about making this metric the part of cgroup API
-> simple because it's too implementation-defined and in my opinion
-> lack the fundamental meaning.
-> 
-> Vmpressure is calculated based on scanned/reclaimed ratio (which is
-> also not always the best proxy for the memory pressure level), then
-> if it reaches some level we basically throttle networking for 1s.
-> So it's all very arbitrary.
-> 
-> I totally get it from the debugging perspective, but not sure about
-> usefulness of it as a permanent metric. This is why I'm asking if there
-> are lighter alternatives, e.g. memory.events or maybe even tracepoints.
-> 
+Hello mptcp maintainers/developers,
 
-I also have a very similar opinion that if we expose the current
-implementation detail through a stable interface, we might get stuck
-with this implementation and I want to change this in future.
+This is a 31-day syzbot report for the mptcp subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/mptcp
 
-Coming back to what information should we expose that will be helpful
-for Daniel & Matyas and will be beneficial in general. After giving some
-thought, I think the time "network was slowed down" or more specifically
-time window when mem_cgroup_sk_under_memory_pressure() returns true
-might not be that useful without the actual network activity. Basically
-if no one is calling mem_cgroup_sk_under_memory_pressure() and doing
-some actions, the time window is not that useful.
+During the period, 2 new issues were detected and 5 were fixed.
+In total, 4 issues are still open and 33 have already been fixed.
 
-How about we track the actions taken by the callers of
-mem_cgroup_sk_under_memory_pressure()? Basically if network stack
-reduces the buffer size or whatever the other actions it may take when
-mem_cgroup_sk_under_memory_pressure() returns, tracking those actions
-is what I think is needed here, at least for the debugging use-case.
+Some of the still happening issues:
 
-WDYT?
+Ref Crashes Repro Title
+<1> 9       No    WARNING in subflow_data_ready (4)
+                  https://syzkaller.appspot.com/bug?extid=0ff6b771b4f7a5bce83b
+<2> 1       No    possible deadlock in mptcp_pm_nl_add_addr_doit
+                  https://syzkaller.appspot.com/bug?extid=7fb125d1bae280dc4749
+<3> 1       No    possible deadlock in mptcp_subflow_create_socket (2)
+                  https://syzkaller.appspot.com/bug?extid=fb2c3fa2ba28aec94627
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
