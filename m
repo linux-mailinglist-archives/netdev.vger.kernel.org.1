@@ -1,90 +1,111 @@
-Return-Path: <netdev+bounces-228311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6266BC71E0
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 03:34:14 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00D8FBC7486
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 05:19:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1A3A18992E3
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 01:34:37 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D7F864EAD36
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 03:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D5172AD14;
-	Thu,  9 Oct 2025 01:34:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k6mmMfUQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C0F5230996;
+	Thu,  9 Oct 2025 03:19:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF25DEEC3
-	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 01:34:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+Received: from chinatelecom.cn (smtpnm6-09.21cn.com [182.42.152.55])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42052230BCC;
+	Thu,  9 Oct 2025 03:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=182.42.152.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759973650; cv=none; b=bezHICre0nTdlm9lqoVOOZKbvH6kB8Cr2rfxrT2Af7KF4yZz2ArKHDxUUwgjqyo3HpLbqSNfixkdY+w1sqkfO8an5YjvmziWuA2iOHwyYXrVKhK+RWHH9fJlMJJ5pdm04c3YUKO6/4ZyytTukLRiSYjvczkaRmDlJ1y2lZXHtuQ=
+	t=1759979946; cv=none; b=IdjUkNLj+9+kjv2CSv2REqJeDNQFeYnzk+BRoc+Ylkja7kWR69By5fw+yXAh4MoZ6gUbmNherKQr9bcNkcNoRHgVGqykG1FaRhZAz/l9hvtteFEsDjN8rIkGJzTDJ/H+59RFRXuHCNTXWCPHuPUH+ezdg4rArOd6PbFgO9f2pks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759973650; c=relaxed/simple;
-	bh=nw31RWs7URGV6u7HVA/lhffYgc8Z2l0LldHw/8K7W30=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=b6slzUtDBqGCzISAyrZ3ZlKGOIwEhWJqIPxrbykn3M9YZLnXDCci5Bliqvcye10tOHO/idrtvWQIQcrNX8I3dwMiCPCNROcooVBKOuxjaphuAWQugWl9Y/jKKfDUJW3aDUn4kTPyYdTz68LtxrONZw+wRM3Ysbl+NPDmxb8VblU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k6mmMfUQ; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b555ab7fabaso362567a12.0
-        for <netdev@vger.kernel.org>; Wed, 08 Oct 2025 18:34:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759973647; x=1760578447; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=nw31RWs7URGV6u7HVA/lhffYgc8Z2l0LldHw/8K7W30=;
-        b=k6mmMfUQCYmBCQOQUYbJ+4V6Qztc1XXpN4q+32qML5/qD1yKRqGekS3FHWPX8DlAuW
-         WEYOyycNPNkTUBKiU2iV5bYmBPurV56mTRrgu6HSiQFshFUEiRrHOrmm9oF6gEz0icE8
-         kZ1bt/obkCYQWdWVGh7z0POGBs9JDuxNYoiALDe2d1k1m9/CKUkhegioKco21mhZB+Kk
-         hlwuWc+RcBtA6O/ZIdziAkBNK70ei1D+keP/FK6gPJU7lCfjKafaKO4n8n2gQT8oKMZe
-         u1DphW92re8JxmYmDkfyKoDhY11gzMsoJvAipYA4KDJ8uMYTQsJ+Cn8h8/FnTh7YPyPr
-         voLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759973647; x=1760578447;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nw31RWs7URGV6u7HVA/lhffYgc8Z2l0LldHw/8K7W30=;
-        b=CkxjBoj2KcK6DN8dK9IMarZJSmAOLsQTKCsBBwAOINPsI3MiMBgM7SLPi8joi4n4Di
-         NbRc1W5pRibgJTyGIJOgo8GBWgfQhDBDCyJGjiedWLsm5zgsVPfFtHLhiT32Bt5LSWJi
-         FtaPPeuXTMUvjAcyr0/IFWcJ//ED/AbhLSu/SICiaSgQc0W8LTKWKL/2ZT/PIB3PsQu0
-         yTZin8JK+MYVOegDdnycjQ0abk742pxja7g64DQu2Ke9dhh9lryxL2RGZnh02jG88Na/
-         pc79tGQNqmT/rc22Kg1SNl85+s8Ny+yGPfSPVG24pxU0Ut6CVtlFQKvl0MBgfY2EAsT2
-         6gDQ==
-X-Gm-Message-State: AOJu0YxInOmP912wfyS9ChdoWT9KcjH6zYep81H9PA8pzOu9VLIWdkQI
-	4jctBMwUZELcbmjRW+97+BoBNF07Mtx7rt609CFbCRZ+d7F+82FORjJy66wgEbWMXQawfLVEsTG
-	1FFTlhpGrEVyy97KrskbMNiQhC8zChViZXK6r
-X-Gm-Gg: ASbGnct6FVI9casIC+ICJik4r8VVv2wBscttGG6t15psYvrRFqaEwwgUKLOQqP+f9Xh
-	vcbJIBsLXXx0ufsi2skCCn8n5wr43HHvp7qvxMnttwWnXjAsW0GlrLWQTN19YSTZZ6EoZip4nI1
-	leInHJL00ZsGs4njcZd4KEYFFB8ojF6jkS4VVD2sXGtrOnkyIMFie4dUFaSk0vcTr6e/JQyPPd2
-	3/dPo7WhHQ7B/XZcxjoi9gmRn7P+j3UDfl6XDcODINnZ+61eJMbE6Cw2x7xN0JWstlNzAjTQeFa
-X-Google-Smtp-Source: AGHT+IF+z2qwf8qIG3Q/H/3fg7jWB5tIT9BSkPTc+a4gYJNGHVHxenKiwpLtFAEIG159XR0RZnOz1GG88khEhShEdVo=
-X-Received: by 2002:a17:903:8cc:b0:267:9c2f:4655 with SMTP id
- d9443c01a7336-290273ffcf6mr65517225ad.41.1759973646784; Wed, 08 Oct 2025
- 18:34:06 -0700 (PDT)
+	s=arc-20240116; t=1759979946; c=relaxed/simple;
+	bh=2dVoS6G/45/uzPULkcFB5snwNDzAAe9QEfhs6uojtSY=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=VLZxef+JmQygGNk58yhAQ9of+oEdixn5LwAHPcpRblvBNVNIXZoyH6LHGfqZelhJeEjCrmIMBy7y/cP6/wRT2s1v+QttuPwrsdXJX6k0PbJwKq9QMpIKxDSginwhXzPtXiiZVDFjhB+qmibaEQaUL8r4TkRPLGveGpsrkE+/pmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn; spf=pass smtp.mailfrom=chinatelecom.cn; arc=none smtp.client-ip=182.42.152.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chinatelecom.cn
+HMM_SOURCE_IP:192.168.137.232:0.1902175892
+HMM_ATTACHE_NUM:0000
+HMM_SOURCE_TYPE:SMTP
+Received: from clientip-27.148.194.68 (unknown [192.168.137.232])
+	by chinatelecom.cn (HERMES) with SMTP id B83E41120EE27;
+	Thu,  9 Oct 2025 11:06:57 +0800 (CST)
+X-189-SAVE-TO-SEND: zhenggy@chinatelecom.cn
+Received: from  ([27.148.194.68])
+	by gateway-ssl-dep-79cdd9d55b-2nzwx with ESMTP id 375b2c6fbcaa43b497e9cf07ee1cdf4b for john.fastabend@gmail.com;
+	Thu, 09 Oct 2025 11:07:06 CST
+X-Transaction-ID: 375b2c6fbcaa43b497e9cf07ee1cdf4b
+X-Real-From: zhenggy@chinatelecom.cn
+X-Receive-IP: 27.148.194.68
+X-MEDUSA-Status: 0
+Sender: zhenggy@chinatelecom.cn
+Message-ID: <3b78ca04-f4b9-4d12-998d-4e21a3a8397f@chinatelecom.cn>
+Date: Thu, 9 Oct 2025 11:07:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: SIMON BABY <simonkbaby@gmail.com>
-Date: Wed, 8 Oct 2025 18:33:55 -0700
-X-Gm-Features: AS18NWDNEleDNOpz5zAI1nRfCILBnqrtfSeLgBSzxIoPsvd3eqdMGo7VNV_Y3_I
-Message-ID: <CAEFUPH0W2SJkBH72o3jxDsVzM5GEMGS0uRwwXC6LDtwz3yLe3g@mail.gmail.com>
-Subject: query on marvel DSA driver and ACLs (Access Control lists)
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Ctyun AOneMail
+Content-Language: en-US
+To: john.fastabend@gmail.com, jakub@cloudflare.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org
+From: zhengguoyong <zhenggy@chinatelecom.cn>
+Subject: [PATCH] bpf, sockmap: Update tp->rcv_nxt in sk_psock_skb_ingress
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hello Team,
+When using sockmap to forward TCP traffic to the application
+layer of the peer socket, the peer socket's tcp_bpf_recvmsg_parser
+processing flow will synchronously update the tp->copied_seq field.
+This causes tp->rcv_nxt to become less than tp->copied_seq.
 
-Can I know if the marvell DSA supports the Access control lists and
-policy based QOS settings for marvel 88E6390 switches. Please advise.
+Later, when this socket receives SKB packets from the protocol stack,
+in the call chain tcp_data_ready → tcp_epollin_ready, the function
+tcp_epollin_ready will return false, preventing the socket from being
+woken up to receive new packets.
 
+Therefore, it is necessary to synchronously update the tp->rcv_nxt
+information in sk_psock_skb_ingress.
 
-Regards
-Simon
+Signed-off-by: GuoYong Zheng <zhenggy@chinatelecom.cn>
+---
+ net/core/skmsg.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+index 9becadd..e9d841c 100644
+--- a/net/core/skmsg.c
++++ b/net/core/skmsg.c
+@@ -576,6 +576,7 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
+ 	struct sock *sk = psock->sk;
+ 	struct sk_msg *msg;
+ 	int err;
++	u32 seq;
+
+ 	/* If we are receiving on the same sock skb->sk is already assigned,
+ 	 * skip memory accounting and owner transition seeing it already set
+@@ -595,8 +596,15 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
+ 	 */
+ 	skb_set_owner_r(skb, sk);
+ 	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, true);
+-	if (err < 0)
++	if (err < 0) {
+ 		kfree(msg);
++	} else {
++		bh_lock_sock_nested(sk);
++		seq = READ_ONCE(tcp_sk(sk)->rcv_nxt) + len;
++		WRITE_ONCE(tcp_sk(sk)->rcv_nxt, seq);
++		bh_unlock_sock(sk);
++	}
++
+ 	return err;
+ }
+
+-- 
+1.8.3.1
 
