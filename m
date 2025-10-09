@@ -1,168 +1,125 @@
-Return-Path: <netdev+bounces-228429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E543BCAA2C
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 21:02:19 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DECA7BCAA4A
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 21:06:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DD6F735397A
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 19:02:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8A2E24E0586
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 19:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1811D1F7580;
-	Thu,  9 Oct 2025 19:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED4F6241679;
+	Thu,  9 Oct 2025 19:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iKpFldBH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QuvQxGL3"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74FCA31
-	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 19:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BD934BA59
+	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 19:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760036535; cv=none; b=mxsISY79rYb7Ad0ynWFBHcwvlwKk8Sq9GiHGp6AzCYBU4r+3PdrcYStX/NbFJhjuGrXJme5p+Dd91J9js6xJbx5aDE61BUx8yecQJW/sbc1Q8iXcOl75qlOcaTVmG6mEGyz42DxF80MjlRj+2n5aICL+iFlCAhBXcS1sg/i0TDQ=
+	t=1760036787; cv=none; b=Ph2jJMnAoDQ6K+UE/TUGid6r9LOLcfR0u0cUGgEI+X9wDI+4hgR08yQEkKOauvsT7BJ7XTVsMzzvigkg7D3gyqknUaIspRC5sfRvSVcrTixFLJ6I377N4dzNWssj4IQdy5V9FBmufRSKwJRV4MU8YoW945bMCRZB2vWZ/p+aeFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760036535; c=relaxed/simple;
-	bh=ZqJ3aigxqyk4sKyNQTbbDXLiXw5cyJyw45Clehrvmwg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=G6jJbgoGkJwcHKPmVYD0CYkW2v5BodrX50fi6e1I+1J9PncPnD4FcXD9YNyXDovFwoXuOAGASOxnjHMyZaQCEgRjmMlQCbLz3RieJz1KZJ95EKNI8MgcqDxWhwBuvPANZIfj/NeES6K7UDa8+MZ1zZCu9/+KlO/iEfe23uQwuDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iKpFldBH; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760036528;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tEZY6b9Il/bPIuUgXhNINbaf1qEh3uV81jyRdL6VxBg=;
-	b=iKpFldBHyIIoqxe6JgGEDlkn6AJo8vprgXkgchWpTr+HDYbXIVn0Wo0bfG6Qj9Kx1si1qA
-	dt5eDxW521POW0bcUPeN/UWnyHgbK7GLEwG1g3EPenu0oHvml/5Jc5SUsum/acZdSTrAH4
-	pezT2MwlyiGTAisl7TC1BJF2YoEM34I=
-From: Roman Gushchin <roman.gushchin@linux.dev>
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: Daniel Sedlak <daniel.sedlak@cdn77.com>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
- Horman <horms@kernel.org>,  Jonathan Corbet <corbet@lwn.net>,  Neal
- Cardwell <ncardwell@google.com>,  Kuniyuki Iwashima <kuniyu@google.com>,
-  David Ahern <dsahern@kernel.org>,  Andrew Morton
- <akpm@linux-foundation.org>,  Yosry Ahmed <yosry.ahmed@linux.dev>,
-  linux-mm@kvack.org,  netdev@vger.kernel.org,  Johannes Weiner
- <hannes@cmpxchg.org>,  Michal Hocko <mhocko@kernel.org>,  Muchun Song
- <muchun.song@linux.dev>,  cgroups@vger.kernel.org,  Tejun Heo
- <tj@kernel.org>,  Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
-  Matyas Hurtik
- <matyas.hurtik@cdn77.com>
-Subject: Re: [PATCH v5] memcg: expose socket memory pressure in a cgroup
-In-Reply-To: <qdblzbalf3xqohvw2az3iogevzvgn3c3k64nsmyv2hsxyhw7r4@oo7yrgsume2h>
-	(Shakeel Butt's message of "Thu, 9 Oct 2025 11:32:56 -0700")
-References: <20251007125056.115379-1-daniel.sedlak@cdn77.com>
-	<87qzvdqkyh.fsf@linux.dev>
-	<13b5aeb6-ee0a-4b5b-a33a-e1d1d6f7f60e@cdn77.com>
-	<87o6qgnl9w.fsf@linux.dev>
-	<tr7hsmxqqwpwconofyr2a6czorimltte5zp34sp6tasept3t4j@ij7acnr6dpjp>
-	<87a5205544.fsf@linux.dev>
-	<qdblzbalf3xqohvw2az3iogevzvgn3c3k64nsmyv2hsxyhw7r4@oo7yrgsume2h>
-Date: Thu, 09 Oct 2025 12:02:00 -0700
-Message-ID: <875xcn526v.fsf@linux.dev>
+	s=arc-20240116; t=1760036787; c=relaxed/simple;
+	bh=ddLCZ0Erq4J+fD+SEojwpwJBX3/dCdE8Jy+xB1E/FKc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uLJ2PNnzWUDOG2SH/mz99gaJONjUOlWgAifL8hVs+srO6RSp2m/vPc4oghXoxU143M/4hDWCRzFvWUCM8deQQlgG3wtdgug6JLUGsE0moGWeu0TioF9D5pCmK2P3s/uabZ5legkMbYFV9UAvXPFzMThqulHtkLEfEfFwjwC85WI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QuvQxGL3; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-32eb76b9039so1855865a91.1
+        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 12:06:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760036786; x=1760641586; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JEjGknaIQTT5zCZesWXYRLiR/b6Jtfo4VUqPR/aQN+c=;
+        b=QuvQxGL3qJSUDIrk16yTSZbMAzVfSwjOk0rReFZkk1ldmXdX3DOenttBNbucot8BLO
+         buzqt7OZOEwIeEwqy2UsWxFkvC8fN8bBkXtr3Ig+q4U/P/cF0HzRsS4Tl/+mZJLAvJ8x
+         9Rm4dNi7R8yOUFq4t63Xt1jcfE/BTK2DrYgN8G0LW+OYmLZzDkVbgSw7+8zkwy/o6Qu3
+         +mYmIFaShEjzvEtJfNzBEdNw/c/a1ClIWIwdiwMW8SZkLY1JeTFIPMK+m7OT1WQtXI/C
+         mg5i5RJa9KfutLiQrkuSVXQmbkBsnh50v8/3fYcAS8TZHa1ucJMF9xlfJbEPYECELZmV
+         Vs4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760036786; x=1760641586;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JEjGknaIQTT5zCZesWXYRLiR/b6Jtfo4VUqPR/aQN+c=;
+        b=G2Mg/7f1imFX2XLBE16nvDADH6LD2XTZa5lg02BOCHJqAdJFMpcuv+u7uomqdawJPx
+         UDVNe8NRhRUamGq2LbaF9cvUx4K1rF1vLwTgH32Pee4RSgIR2OXTPkx8S9WiQ3FeKEMr
+         5aM1YT7MDe2/M7h9gpaLJ0vPe2l0pEChd6UBHA+4sC70LGxQROxHYRVt89hbwes59R4R
+         6RhPUlV4GPma6A87oWvyur3qPKoSCl23aoVyqS/MRQF5Y/2oGYlSqz1fHb7wFX76QcBM
+         4oSq2RvMkh/WQEGhFnmP4gAtrJ1l3dvgnG2tsSdZjWOCfq+DpFBVWCsrlENw/RSTqk/m
+         yKuA==
+X-Gm-Message-State: AOJu0Yy49wM6G9wT/iewNCV7+ScwP9cwQQu2jbEfHwIsjsbUpS841ZrD
+	A3liYDpH2ww1A4kO3StTjKPXXhCOIcTitunmvXhLx5tYe0cs/cZawTFl
+X-Gm-Gg: ASbGncsCIv5av0BERnq2PsfeiO06XLAIBQQi0Edd2szkFmznN4sLt28CnxTMIvdbs9k
+	hqBHsRjM85wefbbjql1NY26HBXscRovjJXC235qcfO9J5Ev3IrE9j0moG0ey9eX165X2reEnFQ1
+	d5qHTUEoxYovyiqG/RzxtpzlHEqymryODLpZEQnHWbSFxwecd8+fWxO0ENxuoEmdY/Q1WjXKhQw
+	O/m1cvh67eYOR3pQMbcdMNbA1N46j5pvjaTqWKPomZZ2GLr0UGKWXt521tfNzw4UjNoTyxuoU6/
+	7JodXnhv29VY9zlI97bMx1l4bjX4qlPSQ2KHbb+pWCu2v9y/9m3mNWN5/dtFleV7lIARUvyW0NW
+	wMM2xRCUb5jYXyoTm6PGBuz5bEKiOrPh8q82gB7ggIjouWA2fXY51KHjtjw==
+X-Google-Smtp-Source: AGHT+IFXUt6VUamHbHYZHs4517klUwXoUlo89uzt3GFSwzjhloph9wZ5hjH2CwLWBaE4x3gtGf/L2w==
+X-Received: by 2002:a17:90b:3b50:b0:32b:8b8d:c2d1 with SMTP id 98e67ed59e1d1-33b5127ba49mr10126458a91.21.1760036785539;
+        Thu, 09 Oct 2025 12:06:25 -0700 (PDT)
+Received: from mythos-cloud ([175.204.162.54])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b678df4ba7fsm350174a12.32.2025.10.09.12.06.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Oct 2025 12:06:25 -0700 (PDT)
+From: Yeounsu Moon <yyyynoom@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yeounsu Moon <yyyynoom@gmail.com>
+Subject: [PATCH net] net: dlink: fix null dereference in receive_packet()
+Date: Fri, 10 Oct 2025 04:02:22 +0900
+Message-ID: <20251009190222.4777-1-yyyynoom@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-Shakeel Butt <shakeel.butt@linux.dev> writes:
+If `np->rx_skbuff[entry]` was not allocated before
+reuse, `receive_packet()` will cause null dereference.
 
-> On Thu, Oct 09, 2025 at 10:58:51AM -0700, Roman Gushchin wrote:
->> Shakeel Butt <shakeel.butt@linux.dev> writes:
->> 
->> > On Thu, Oct 09, 2025 at 08:32:27AM -0700, Roman Gushchin wrote:
->> >> Daniel Sedlak <daniel.sedlak@cdn77.com> writes:
->> >> 
->> >> > Hi Roman,
->> >> >
->> >> > On 10/8/25 8:58 PM, Roman Gushchin wrote:
->> >> >>> This patch exposes a new file for each cgroup in sysfs which is a
->> >> >>> read-only single value file showing how many microseconds this cgroup
->> >> >>> contributed to throttling the throughput of network sockets. The file is
->> >> >>> accessible in the following path.
->> >> >>>
->> >> >>>    /sys/fs/cgroup/**/<cgroup name>/memory.net.throttled_usec
->> >> >> Hi Daniel!
->> >> >> How this value is going to be used? In other words, do you need an
->> >> >> exact number or something like memory.events::net_throttled would be
->> >> >> enough for your case?
->> >> >
->> >> > Just incrementing a counter each time the vmpressure() happens IMO
->> >> > provides bad semantics of what is actually happening, because it can
->> >> > hide important details, mainly the _time_ for how long the network
->> >> > traffic was slowed down.
->> >> >
->> >> > For example, when memory.events::net_throttled=1000, it can mean that
->> >> > the network was slowed down for 1 second or 1000 seconds or something
->> >> > between, and the memory.net.throttled_usec proposed by this patch
->> >> > disambiguates it.
->> >> >
->> >> > In addition, v1/v2 of this series started that way, then from v3 we
->> >> > rewrote it to calculate the duration instead, which proved to be
->> >> > better information for debugging, as it is easier to understand
->> >> > implications.
->> >> 
->> >> But how are you planning to use this information? Is this just
->> >> "networking is under pressure for non-trivial amount of time ->
->> >> raise the memcg limit" or something more complicated?
->> >> 
->> >> I am bit concerned about making this metric the part of cgroup API
->> >> simple because it's too implementation-defined and in my opinion
->> >> lack the fundamental meaning.
->> >> 
->> >> Vmpressure is calculated based on scanned/reclaimed ratio (which is
->> >> also not always the best proxy for the memory pressure level), then
->> >> if it reaches some level we basically throttle networking for 1s.
->> >> So it's all very arbitrary.
->> >> 
->> >> I totally get it from the debugging perspective, but not sure about
->> >> usefulness of it as a permanent metric. This is why I'm asking if there
->> >> are lighter alternatives, e.g. memory.events or maybe even tracepoints.
->> >> 
->> >
->> > I also have a very similar opinion that if we expose the current
->> > implementation detail through a stable interface, we might get stuck
->> > with this implementation and I want to change this in future.
->> >
->> > Coming back to what information should we expose that will be helpful
->> > for Daniel & Matyas and will be beneficial in general. After giving some
->> > thought, I think the time "network was slowed down" or more specifically
->> > time window when mem_cgroup_sk_under_memory_pressure() returns true
->> > might not be that useful without the actual network activity. Basically
->> > if no one is calling mem_cgroup_sk_under_memory_pressure() and doing
->> > some actions, the time window is not that useful.
->> >
->> > How about we track the actions taken by the callers of
->> > mem_cgroup_sk_under_memory_pressure()? Basically if network stack
->> > reduces the buffer size or whatever the other actions it may take when
->> > mem_cgroup_sk_under_memory_pressure() returns, tracking those actions
->> > is what I think is needed here, at least for the debugging use-case.
->> >
->> > WDYT?
->> 
->> I feel like if it's mostly intended for debugging purposes,
->> a combination of a trace point and bpftrace can work pretty well,
->> so there is no need to create a new sysfs interface.
->> 
->
-> Definitely not a new interface but I think having such information in
-> memory.events or memory.stat would be more convenient. Basically the
-> number of times the sockets in this memcg have to be clamped due to
-> memory pressure would be useful in general.
+This patch fixes the issue by breaking out of the loop when
+`np->rx_skbuff[entry]` is `NULL`.
 
-Yeah, if we're going to add something, memory.events looks like the best
-option, also because it allows to poll and get notified when the event
-occurs.
+Found by inspection.
+
+Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Tested-on: D-Link DGE-550T Rev-A3
+---
+ drivers/net/ethernet/dlink/dl2k.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
+index 1996d2e4e3e2..aa3840454fcb 100644
+--- a/drivers/net/ethernet/dlink/dl2k.c
++++ b/drivers/net/ethernet/dlink/dl2k.c
+@@ -969,6 +969,8 @@ receive_packet (struct net_device *dev)
+ 			if (pkt_len <= copy_thresh)
+ 				skb = netdev_alloc_skb_ip_align(dev, pkt_len);
+ 			if (!skb) {
++				if (!np->rx_skbuff[entry])
++					break;
+ 				dma_unmap_single(&np->pdev->dev,
+ 						 desc_to_dma(desc),
+ 						 np->rx_buf_sz,
+-- 
+2.51.0
+
 
