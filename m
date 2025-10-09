@@ -1,167 +1,116 @@
-Return-Path: <netdev+bounces-228415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D287FBCA16A
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 18:16:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D05BBC9FD6
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 18:09:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9DC7F540C89
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 16:08:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A742B1A63EBA
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 16:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD3A2F530E;
-	Thu,  9 Oct 2025 16:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20FDA2E8E11;
+	Thu,  9 Oct 2025 15:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bHaL1wtJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="miU5UIJT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AF91A267;
-	Thu,  9 Oct 2025 16:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A353D2206AC
+	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 15:56:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760025634; cv=none; b=mOyqzpPErSZCDtRyKeqzIxnZbwMyA94Tu8TrUQbFXTfyONKrNSHCml9710dEpsHbCJ5CINJCfqc9dsnPAMC9zUK+URiHh1PX1LsXOq77d1FYlUyJXfB2sstWw4qEOPcMxxLRI7mk06T18qctb5jnEVeO/ZSlAtyERvnqUbX95ME=
+	t=1760025422; cv=none; b=SbPW+HFt+d8Je0zvEPYK01CQ0IPcREFAwEF1SlMYXoJEI0Zc4J4m05XqsZOVrs7ANU+x24rBPUtGAVJ4BNrpkFq4ZEM/AqovU3ysaft6UylgSoxERLak/TbdR7nPVLWaGGyQCYE6rJE5vle9Zab4iqUDyoQ6DxKkEKWqDd5z6xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760025634; c=relaxed/simple;
-	bh=Fi7bHxwuG0E5jp8GLYg02fCOE2rLCCy8GclI9WMQB70=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CWDLpH/GHekRAmoIrhmcNLRnvlAqjShLQkHKrEOLwMWLVI3FV/DmLp9vjh6t4XjgOfrCXV47ZyOM2ksDLAYUbsjjvSlAKsLbXIas01+i0fneV+T1ocQtGN/pvZGOM+s+uE6nYwXdhIM16RM+KnvU5ICpXLTn/oYnnOVDtlqRvYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bHaL1wtJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7473CC4CEE7;
-	Thu,  9 Oct 2025 16:00:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760025634;
-	bh=Fi7bHxwuG0E5jp8GLYg02fCOE2rLCCy8GclI9WMQB70=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bHaL1wtJBwAyQmcOl6WAOz6FmLioyMfBR5vqH4zZr88PQuWFFIbunnP/tgsNhN181
-	 zlKOhdr7VidEeBbYc39YZ9z4G0+1Jnfnwo1BTbXTDJHvqByWzGLLTaurziMYJTG0D7
-	 Htr7ZhoAHgWCDgeEYyV/7w524BPJFtbog0+SjSROQT+qoeWA+4Wcx240o7RxLEg/Jp
-	 NUsjFxEDtvlGI3wFShRqG2rRVHYIoidAULOPt4U1SdN4jam43RGSaEZzmmLnBKKUou
-	 zOlEPz9zdcUhkaeTHBj886wNijdoGvixeAJLibOHzoUKB+CMRdkqb1CDHbZ0XYAhEI
-	 5hpDN2glqe+Yw==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: =?UTF-8?q?Ricardo=20B=2E=20Marli=C3=A8re?= <rbm@suse.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	maciej.fijalkowski@intel.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	eddyz87@gmail.com,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-6.1] selftests/bpf: Upon failures, exit with code 1 in test_xsk.sh
-Date: Thu,  9 Oct 2025 11:55:53 -0400
-Message-ID: <20251009155752.773732-87-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251009155752.773732-1-sashal@kernel.org>
-References: <20251009155752.773732-1-sashal@kernel.org>
+	s=arc-20240116; t=1760025422; c=relaxed/simple;
+	bh=fEPjMABZJqK2RV7aPLAwmCyreoCKrgnuKQ175KZEw7s=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:From:Subject:Cc:
+	 References:In-Reply-To; b=SiXLH6QNiIGZYauDv85jFt3r/GhaABmXHudQoTVk7R8SppTdagZOWb5jSjYyZVOtv8LyH/TUCylmHj1eJTCz1i0WzAWxEwYGDrSxhZZUkpXdIn1d/v6WNvvNGXLWidwDfUfFjaBzwYdG5Nmerx+ugmkLq2mtnVapLlbiwyjQCGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=miU5UIJT; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b6271ea39f4so746382a12.3
+        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 08:56:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760025419; x=1760630219; darn=vger.kernel.org;
+        h=in-reply-to:references:cc:subject:from:to:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qgo3KudljITGQSuGvHmW5cffvohs9TZ6aTPtPKYUDQo=;
+        b=miU5UIJTb62u6fi7DEk4gYEdJb68gKcH2l3HvT/cV2qBeAo4YdBA8byWePEXY8N7Ev
+         pure7uVMLefE7qeO5MxlENEEN6SxD6V+XDmrICyoplzgWcfOLAFssCMTI1OYFQl1fWft
+         p8dBPIX2cTW0y+vcYqD4tAfNMg6qyOPx1k+fxjL18nELU7c6G2UxWTAoJmS74noFo+Oa
+         Swgllip9u8wXjuPN6ygj1r89rHyAZww1ZCyv1I5zNh3i3aOy7EGoxfPTbtaD+ba206Cg
+         CfprQxYExXoDRBQEY+4G/mvNE793vZvbo2tzMjVol0WO8AM/1my9aitoti6vx6pgDIwH
+         RAfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760025419; x=1760630219;
+        h=in-reply-to:references:cc:subject:from:to:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qgo3KudljITGQSuGvHmW5cffvohs9TZ6aTPtPKYUDQo=;
+        b=rFJf78TPgG7EnP+Ug+C36HTiGm1JvvK+Ic4nqLDsAy0ySi4Gsppb4VPQdoIlR7Bhwg
+         VQNTn7SJFIU7M+4V3pNN5D5SrOwi6IFm2fZKSSC9OBAw1XvwRkDpx0KunhchPWkvef7X
+         wsOQdDQ3LrifQwcbP5BG9DgOfbC+uTbPmqNMQ6jqAChvByHHoFxaWNKJaZvGeX3cd7Pu
+         n/q/GQe/QNp5iOOSMAWvXHCSp0Gxf2Nt6QIwYM259gYkptVCfeRNNphJ0MKgV7yYEd4d
+         /6c5K+VqYhT7BV4ZS0uyADvo2dcYPzt/B/KF3nj6rwngWftYNPhu9wrdC9lUD00AMMLw
+         OAFw==
+X-Forwarded-Encrypted: i=1; AJvYcCUJp6pi/iQofn8xZxv9IqH1+vRkX31A3HCLwBLwSa2QK2hPTwXDig5IkC2/rpWbTAg8Lo6Qfqk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwhOaFTj804koUKiGuhACzB5GeLiygHNY9Ky8TBQ5jw37Zmme8
+	AqWSWWIGfMx5epHCJgK+L5uRKBoUyL1Tmoan9BNFANvCFIJDheZR9j8W
+X-Gm-Gg: ASbGncsKC7Jeaplvjmj+nol3sX9y0Gl832+Ni9RpCEaeymtbKXHlQ37yW5vpS/4nz8M
+	NzlQdkJviskB8zsLGVENtDKzLBpfyRMENYXcMg2eOSRdkSBbxhQY47Z9YmGC/decFtzZOAkP8B/
+	LKjFnHk3IZ0fWLrtHDQTXgxl41RPz1/XDtCc8qaCicMgZ6sl4wzWU+LrniHt8SIN6tTBgzYNei6
+	igFtCTBZ5PB8TrP4bbi4dxoPazkYyTNKeT+3rQ1uh/W0gEruzco3lgn1htsPwprFDJPLyUR9afR
+	iKHxCxUsbeK2aLd9hfp4BlQI6TPWICUuJJAuj/KnQZjulpoQaAdWD//dlykSVInjeqMs2+RGpGu
+	ELMv+v11TSQyCdz9IXMkv4M1GQnRmUmCqcMGVuLuWwLA=
+X-Google-Smtp-Source: AGHT+IEFf2RnfqrbKgLS8ZhhKtvMKGc2UMdAzovJyGrgaoGsX6xngdyLDG8NWdEBK5j0gpEaPZA0hw==
+X-Received: by 2002:a17:903:3c25:b0:26c:3e5d:43b6 with SMTP id d9443c01a7336-290273ef107mr101385425ad.32.1760025418779;
+        Thu, 09 Oct 2025 08:56:58 -0700 (PDT)
+Received: from localhost ([175.204.162.54])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29034f0712fsm32711735ad.71.2025.10.09.08.56.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Oct 2025 08:56:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.17.1
-Content-Transfer-Encoding: 8bit
+Date: Fri, 10 Oct 2025 00:56:55 +0900
+Message-Id: <DDDWXTRCYVDA.33VBJ38T4QBXH@gmail.com>
+To: "Simon Horman" <horms@kernel.org>
+From: "Yeounsu Moon" <yyyynoom@gmail.com>
+Subject: Re: [PATCH net] net: dlink: handle dma_map_single() failure
+ properly
+Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+X-Mailer: aerc 0.20.1
+References: <20251002152638.1165-1-yyyynoom@gmail.com>
+ <20251003094424.GF2878334@horms.kernel.org>
+ <DDA4Y2GRUHD4.1DFHX01NOJYCB@gmail.com>
+ <20251008091346.GO3060232@horms.kernel.org>
+In-Reply-To: <20251008091346.GO3060232@horms.kernel.org>
 
-From: Ricardo B. Marlière <rbm@suse.com>
-
-[ Upstream commit 2a912258c90e895363c0ffc0be8a47f112ab67b7 ]
-
-Currently, even if some subtests fails, the end result will still yield
-"ok 1 selftests: bpf: test_xsk.sh". Fix it by exiting with 1 if there are
-any failures.
-
-Signed-off-by: Ricardo B. Marlière <rbm@suse.com>
-Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
-Link: https://lore.kernel.org/bpf/20250828-selftests-bpf-test_xsk_ret-v1-1-e6656c01f397@suse.com
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-Based on my comprehensive analysis, here is my determination:
-
-**Backport Status: YES**
-
-## Analysis
-
-### Code Change
-The commit adds a simple 2-line fix to ensure the test script exits with
-code 1 when failures occur:
-```bash
-+else
-+       exit 1
-```
-
-### Rationale for Backporting
-
-**1. Pattern of Similar Backports**
-My research shows that similar test exit code fixes have been
-consistently backported to stable kernels:
-- `selftests/net: have gro.sh -t return a correct exit code` (commit
-  784e6abd99f24) was backported by AUTOSEL
-- `selftests: ksft: Fix finished() helper exit code on skipped tests`
-  (commit 170c966cbe274) was backported by AUTOSEL
-- `selftests: xsk: fix reporting of failed tests` (commit 895b62eed2ab4)
-  was backported to stable 6.1 branches
-
-**2. Critical for Testing Infrastructure**
-This fix addresses a real bug in test reporting that affects:
-- **CI/Automated Testing**: Systems running selftests on stable kernels
-  rely on correct exit codes to detect regressions
-- **False Positives**: The current behavior reports "ok" even when tests
-  fail, masking real problems
-- **Quality Assurance**: Proper exit codes are essential for stable
-  kernel validation
-
-**3. Meets Stable Kernel Rules**
-According to Documentation/process/stable-kernel-rules.rst:
-- ✅ **Obviously correct**: Trivial 2-line addition with clear intent
-- ✅ **Small and contained**: Only 2 lines in a single shell script
-- ✅ **Fixes a real bug**: Test infrastructure incorrectly reporting
-  success on failures
-- ✅ **Already in mainline**: Commit 2a912258c90e exists in upstream
-- ✅ **Minimal risk**: Changes only test infrastructure, cannot affect
-  kernel runtime
-- ✅ **Benefits users**: Helps developers and organizations running tests
-  on stable kernels
-
-**4. Historical Evidence**
-The commit 8f610b24a1a44 shows this has already been selected by AUTOSEL
-for backporting, with the marker `[ Upstream commit
-2a912258c90e895363c0ffc0be8a47f112ab67b7 ]` and signed by Sasha Levin.
-
-### Conclusion
-This is a clear candidate for stable backporting. It fixes test
-infrastructure that provides critical validation for stable kernels,
-follows established backporting patterns for similar fixes, and meets
-all stable kernel rules criteria.
-
- tools/testing/selftests/bpf/test_xsk.sh | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/tools/testing/selftests/bpf/test_xsk.sh b/tools/testing/selftests/bpf/test_xsk.sh
-index 65aafe0003db0..62db060298a4a 100755
---- a/tools/testing/selftests/bpf/test_xsk.sh
-+++ b/tools/testing/selftests/bpf/test_xsk.sh
-@@ -241,4 +241,6 @@ done
- 
- if [ $failures -eq 0 ]; then
-         echo "All tests successful!"
-+else
-+	exit 1
- fi
--- 
-2.51.0
-
+> Sorry for the slow response, I've been ill for the past few days.
+No worries. I hope you're feeling better now.
+>
+> I did also consider the option above. That is handling the
+> errors in the loop. And I can see some merit in that approach,
+> e.g. reduced scope of variables.
+>
+> But I think the more idiomatic approach is to handle them 'here'.
+> That is, at the end of the function. So I would lean towards
+> that option.
+Not only with `goto`, but there are also issues such as replacing  `printk(=
+)`
+with `netdev_info()`. So for now, I'll send the patch that fix `alloc_list(=
+)`
+correctly.
 
