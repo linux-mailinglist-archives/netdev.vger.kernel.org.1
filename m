@@ -1,200 +1,107 @@
-Return-Path: <netdev+bounces-228383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A455DBC9932
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 16:42:36 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 261A5BC9986
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 16:45:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 284163B1588
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 14:41:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9D44E4FCF01
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 14:43:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC9D2EBDDE;
-	Thu,  9 Oct 2025 14:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618232EB5CF;
+	Thu,  9 Oct 2025 14:43:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YffHYIU8"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="A9VabX1f"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D940A2EBDC7;
-	Thu,  9 Oct 2025 14:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C138C2EAD13
+	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 14:43:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760020830; cv=none; b=u05+hK8ZM5KPGz+zlufK04yUwyk1+sDNmzEsQR7YFz62G5aE24xQNynG2CSH9Xm9H+p0HF4otNtq1+c49tnHjfpR2vOfZ36lvCTtjlbwrzBDyxz7ZPidHd6/+Sr/J8h8CozPoz4NAuvC91S62nibXAJZyHGRuanoCsGfjD5+xLw=
+	t=1760021029; cv=none; b=br/SN00DJcEXWZWi5M6splNC/kDIWoqn/dBKltTGfTfZ3Zg7wrnVkzdaUJJVYGV0tDG6vIaZYgFwBU6LIhP2I5JO9gNqiYxoIrptF/MHSVcbvotjbqwv5sL4NCWnniI1nK6HfxhIX47dXaN7ORhE/kaMcERstKZhmM0HJkJJ+Vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760020830; c=relaxed/simple;
-	bh=Q5d3qq8CBu0CFDJAvr0CttImsV3wUOAnXASWJH919jg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YuimJfK2voZBfbyUGiX9+xd4ntvWhe0LRqKhVSWFObqp6+dfs667CyGeAgOk06xDbwsRZ9G/+lXERBLLt6CuT8Fg5WEWUetmc/tdoHJ+SOMFMTuue2DW8sTEYeL4x7tAWbSIWR5c1gB595q3prSYR2V3frBQq3EWp6UjVuoZvIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YffHYIU8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E9EFC4CEE7;
-	Thu,  9 Oct 2025 14:40:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760020828;
-	bh=Q5d3qq8CBu0CFDJAvr0CttImsV3wUOAnXASWJH919jg=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=YffHYIU8YTkZ8mhxH1QAlUKOXIOd/BLmVAAZnXKphxDqO+YxuR7Ji8nlX3/eCrjOr
-	 WHh5PKm/nAWsLI4hKSJHAMAs6SmgUq3oY/tAV46KoN0bnT0zTrvBO0PoXAWpfa71+v
-	 d+KQETK5PB7nMu+sACmykEgaa/jnquIY0dcr0qWuty4kA7kdhLmIaq4MKe7qC2Xkt/
-	 7oS88t+IADooyNhuGklZrfjrD57SY1TmGPPlv5pkRFzGXWbh/JxXToSuvbElrdsdgw
-	 Cnoj5VYoFFrTQu6MKnWU1VTgwha2W6Imr4GpOXUqd2OaTkIxJpKZFiguzSSglHbKEw
-	 plln46j6tsLew==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Thu, 09 Oct 2025 10:40:11 -0400
-Subject: [PATCH v3 2/2] sunrpc: add a slot to rqstp->rq_bvec for TCP record
- marker
+	s=arc-20240116; t=1760021029; c=relaxed/simple;
+	bh=hRicmbLQWEJ8+bPspecCmobqh1Mt64hI1L8Yhs3vPYk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XsESR8rBAdiUZ/Gx41cbKuMapT1zuSBf5sO2oJMiXU6hmEJBWz8I9gUiChOZOF1X7CiD0Ps4+cTvn/T/t/AwdKGNGamVMkSpOU4nD2MjKIWk5NyYnxTC3cTCCne72TzxI0S9mzkcfoik0RrPceZiXIsEPREW+ZF1nDkkMYxEm8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=A9VabX1f; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-330631e534eso1230086a91.0
+        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 07:43:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1760021027; x=1760625827; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=82eJnEG3a2gfzvtAFqHYyT6W99N4n+MkixpvA8b26PM=;
+        b=A9VabX1fKTfAj0vBmzcnMWQSmxIpDQognGLwtLAAFw6J7PvLiEI7zm4gO6hNh5tHH/
+         hvQkvFmjtHDA+AmOSpgX6XRaSyT+drTwYh4LFGLenigAy3FQHbOZ66WoW0FFakEbzOWQ
+         qTTf9+/mtmQcdkToN1BZLL6xX85NAygIYzvRc3GnIyKLt1qb03/jjwdknFXw6mTvZfCF
+         UgQzrH24YklzgNYfH5811xVZTZtB0dN9oyB6dS0DDVzAdEdSX88IrspEH4v73UYnzcmt
+         B8xECq99sCToB7tDI1ymkSzPGDoOTJf9/h+FNYwgjYzr9pFIreOMmmxotuOrkCmON4Uf
+         Tn5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760021027; x=1760625827;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=82eJnEG3a2gfzvtAFqHYyT6W99N4n+MkixpvA8b26PM=;
+        b=Hc4XHKNdruyNNyUBBjVa48G4MMGEc0HH9t7enwLo+fMnhspmZmsHiKg+Imq6ULMoSL
+         GCcXP6zssMRvXS4sPRHw6FfpQAluZlWWlrbj2nVcAPNAZeyzoA1cZrU9XKDqDlkvlqkH
+         WbInbGKiE+xpT+Rc1bFmSkfkt808uqVJjv+9/WvwErI0iBkIoJ77+wT8QoXWA1yyT+pb
+         4xMPGnvzLWT9t7g47Sp6CBBVzrw6AKlPqXtNMvqJDBuM7X9atqO5ziuLQeTRUibqLOdy
+         wfDGiqsSoMMQbS7XSb7zJF8h+qJLFk9kfe20GRzYRSMZX3wUdERWv/Eth7LVXZTDl8ZR
+         2zWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW76LunFK8aCLywNAKckyMT5k4JP4FQQMa/Y8qknKdcI0AabYI4nIL66OENYvrXtZAbi0uIylI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcLhETCYD40QA0VEg1PyemixIucnvTum0lYBnsOp8y5Tm8abaq
+	6Gd6vNzR1LbWOeNgehyfmB4F/cR5rPrv+NV86NctIFU1xYHwK1O8kP2lRBI0PQ4z20fZJcrsn+U
+	VsYYQnJdByscmT2scZsTCKo/oIPlL8tuXAAGqAlSN
+X-Gm-Gg: ASbGncuGO6i+voGnM7VaZol31SkP4ayFA4oG3IjsmDEIcj4H9YLM8wcjjUTZnNWD741
+	yobc7i85lEsZD/TFS+F3RO86+oZeNcH8enBnF6OBRXSQ8SwTSCogqpogzr1j4p/elTrHS46KHN9
+	s/xEDwyrU6TcvRNmIWc3eWNU7M99s1TzqHQx4FqyN8UU+wg8L7wyUk/yfSylnaT4hPacS7IdQmK
+	x1hgdsMbwz6q+f6AyMK1ZN8JH9vTFK5/IZxuplhPY24uQ3BDuFzIZJBXRyImGLiMAN3moi1FV2N
+	MoZ3sW54CrXa3MUBTAsRKkEiR4lO7LX2NDLRZQUy3eRAiLeke/4VC1ekDMPnTh56DWo=
+X-Google-Smtp-Source: AGHT+IH805V7OJYS76B/rqvAegpKx0ru2dDHeH6i2pmIfcb1qUFIZrvtv/9KKjkxayYPFQ3wLu7QgWNtfXP6qRGTo60=
+X-Received: by 2002:a17:90b:4b87:b0:339:a4ef:c8b4 with SMTP id
+ 98e67ed59e1d1-33b513861d8mr9700512a91.28.1760021026889; Thu, 09 Oct 2025
+ 07:43:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251009-rq_bvec-v3-2-57181360b9cb@kernel.org>
-References: <20251009-rq_bvec-v3-0-57181360b9cb@kernel.org>
-In-Reply-To: <20251009-rq_bvec-v3-0-57181360b9cb@kernel.org>
-To: Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
- Tom Talpey <tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, 
- Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- David Howells <dhowells@redhat.com>
-Cc: Brandon Adams <brandona@meta.com>, linux-nfs@vger.kernel.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4629; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=Q5d3qq8CBu0CFDJAvr0CttImsV3wUOAnXASWJH919jg=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBo58lVtzZDNIWPHun+Aq9RuSa1HmnFxegY64W1n
- kYaVRf0qtqJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaOfJVQAKCRAADmhBGVaC
- FbmND/9bw1uE4pdATCZMvrFyEnaZ5pkYHHfqAhWZVxSbJHKV9Y1gZtz5XtLgLUpuly/rgU/GZCk
- vCj4wqsp9OJX4mn5RDuOYzGIgOcnxuROfJOFeIpvqja5dt8HsuV57lsCLr3xMr1RkS8glV0O7Fh
- 0bfZhMTDuufNWWM4eKDBEhHGcNSJp/JTScUxo+EnrsNCxAyFQwPprxL6sNrQFc6Cgz/x1gXTP2h
- Y7Q2MgXo7uIZEiRGQ2QYmK5p3NFlAfs5mdXZ7zb0CLpqsoNEtudsY+N3ZhAWgZfWnfr4NssmKE7
- lSGLLmJ3Pi8nW5Bhk9ErenKQ0DYrrV5Nx7qpZuCR8l7VY4Zh5tXNBQ/sD4mnmh9BgyGgtbIMHQI
- Bpjm8vM3QcU1BQr3dQcsXWaSehU3nEe96hh6uJtz9dMzu2yPUFlie/uM3fBluFryb/MQZcKROH0
- tYTaWTJAx6K6S8ZIJ1QxUlZ5rjfhpqwTemv8s2FjIoRn1i7diWbJlk30lOhKB32a1C3GEFbU1/l
- potB6Tp1Fc7vREUeXc1q8xNhGoP72bVEZEODGRuumazIuO3G+fE+pxOJwitulr6Kv/H7PxkeSe/
- iHcZMV8AjXAdBY7FOBL5x/iukB6A1Gc7gxLr0i1gJplowqp7/bg7F3xEd9I0QtU/da65YaTOsVA
- Hrhbpw+IWdv2UuQ==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+References: <20251007-ip6_tunnel-headroom-v1-1-c1287483a592@arista.com> <20251007183721.7654cd3c@kernel.org>
+In-Reply-To: <20251007183721.7654cd3c@kernel.org>
+From: Dmitry Safonov <dima@arista.com>
+Date: Thu, 9 Oct 2025 15:43:34 +0100
+X-Gm-Features: AS18NWBQGRh6-gDD8buab9A_yPyWA20bkiesKGCiJxTSNNu73FtqaTqUrITm5KY
+Message-ID: <CAGrbwDQB-x6t6cHS3prVxWXPuOPYQXF8mqUTuzmSn_95SBXK1Q@mail.gmail.com>
+Subject: Re: [PATCH] net/ip6_tunnel: Prevent perpetual tunnel growth
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Dmitry Safonov via B4 Relay <devnull+dima.arista.com@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Tom Herbert <tom@herbertland.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Florian Westphal <fw@strlen.de>, Francesco Ruggeri <fruggeri05@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We've seen some occurrences of messages like this in dmesg on some knfsd
-servers:
+On Wed, Oct 8, 2025 at 2:37=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Tue, 07 Oct 2025 07:08:36 +0100 Dmitry Safonov via B4 Relay wrote:
+> > +     static const unsigned int max_allowed =3D 512;
+>
+> nit: could we drop this 'static' while we move the code?
 
-    xdr_buf_to_bvec: bio_vec array overflow
+Yep, thanks, will send v2 with static dropped.
 
-Usually followed by messages like this that indicate a short send (note
-that this message is from an older kernel and the amount that it reports
-attempting to send is short by 4 bytes):
-
-    rpc-srv/tcp: nfsd: sent 1048155 when sending 1048152 bytes - shutting down socket
-
-svc_tcp_sendmsg() steals a slot in the rq_bvec array for the TCP record
-marker. If the send is an unaligned READ call though, then there may not
-be enough slots in the rq_bvec array in some cases.
-
-Add a rqstp->rq_bvec_len field and use that to keep track of the length
-of rq_bvec. Use that in place of rq_maxpages where it's iterating over
-the bvec.
-
-Fixes: e18e157bb5c8 ("SUNRPC: Send RPC message on TCP with a single sock_sendmsg() call")
-Tested-by: Brandon Adams <brandona@meta.com>
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- fs/nfsd/vfs.c              | 6 +++---
- include/linux/sunrpc/svc.h | 1 +
- net/sunrpc/svc.c           | 4 +++-
- net/sunrpc/svcsock.c       | 4 ++--
- 4 files changed, 9 insertions(+), 6 deletions(-)
-
-diff --git a/fs/nfsd/vfs.c b/fs/nfsd/vfs.c
-index 77f6879c2e063fa79865100bbc2d1e64eb332f42..6c7224570d2dadae21876e0069e0b2e0551af0fa 100644
---- a/fs/nfsd/vfs.c
-+++ b/fs/nfsd/vfs.c
-@@ -1111,7 +1111,7 @@ nfsd_direct_read(struct svc_rqst *rqstp, struct svc_fh *fhp,
- 
- 	v = 0;
- 	total = dio_end - dio_start;
--	while (total && v < rqstp->rq_maxpages &&
-+	while (total && v < rqstp->rq_bvec_len &&
- 	       rqstp->rq_next_page < rqstp->rq_page_end) {
- 		len = min_t(size_t, total, PAGE_SIZE);
- 		bvec_set_page(&rqstp->rq_bvec[v], *rqstp->rq_next_page,
-@@ -1200,7 +1200,7 @@ __be32 nfsd_iter_read(struct svc_rqst *rqstp, struct svc_fh *fhp,
- 
- 	v = 0;
- 	total = *count;
--	while (total && v < rqstp->rq_maxpages &&
-+	while (total && v < rqstp->rq_bvec_len &&
- 	       rqstp->rq_next_page < rqstp->rq_page_end) {
- 		len = min_t(size_t, total, PAGE_SIZE - base);
- 		bvec_set_page(&rqstp->rq_bvec[v], *rqstp->rq_next_page,
-@@ -1318,7 +1318,7 @@ nfsd_vfs_write(struct svc_rqst *rqstp, struct svc_fh *fhp,
- 	if (stable && !fhp->fh_use_wgather)
- 		kiocb.ki_flags |= IOCB_DSYNC;
- 
--	nvecs = xdr_buf_to_bvec(rqstp->rq_bvec, rqstp->rq_maxpages, payload);
-+	nvecs = xdr_buf_to_bvec(rqstp->rq_bvec, rqstp->rq_bvec_len, payload);
- 	iov_iter_bvec(&iter, ITER_SOURCE, rqstp->rq_bvec, nvecs, *cnt);
- 	since = READ_ONCE(file->f_wb_err);
- 	if (verf)
-diff --git a/include/linux/sunrpc/svc.h b/include/linux/sunrpc/svc.h
-index 5506d20857c318774cd223272d4b0022cc19ffb8..0ee1f411860e55d5e0131c29766540f673193d5f 100644
---- a/include/linux/sunrpc/svc.h
-+++ b/include/linux/sunrpc/svc.h
-@@ -206,6 +206,7 @@ struct svc_rqst {
- 
- 	struct folio_batch	rq_fbatch;
- 	struct bio_vec		*rq_bvec;
-+	u32			rq_bvec_len;
- 
- 	__be32			rq_xid;		/* transmission id */
- 	u32			rq_prog;	/* program number */
-diff --git a/net/sunrpc/svc.c b/net/sunrpc/svc.c
-index 4704dce7284eccc9e2bc64cf22947666facfa86a..a6bdd83fba77b13f973da66a1bac00050ae922fe 100644
---- a/net/sunrpc/svc.c
-+++ b/net/sunrpc/svc.c
-@@ -706,7 +706,9 @@ svc_prepare_thread(struct svc_serv *serv, struct svc_pool *pool, int node)
- 	if (!svc_init_buffer(rqstp, serv, node))
- 		goto out_enomem;
- 
--	rqstp->rq_bvec = kcalloc_node(rqstp->rq_maxpages,
-+	/* +1 for the TCP record marker */
-+	rqstp->rq_bvec_len = rqstp->rq_maxpages + 1;
-+	rqstp->rq_bvec = kcalloc_node(rqstp->rq_bvec_len,
- 				      sizeof(struct bio_vec),
- 				      GFP_KERNEL, node);
- 	if (!rqstp->rq_bvec)
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 377fcaaaa061463fc5c85fc09c7a8eab5e06af77..2075ddec250b3fdb36becca4a53f1c0536f8634a 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -740,7 +740,7 @@ static int svc_udp_sendto(struct svc_rqst *rqstp)
- 	if (svc_xprt_is_dead(xprt))
- 		goto out_notconn;
- 
--	count = xdr_buf_to_bvec(rqstp->rq_bvec, rqstp->rq_maxpages, xdr);
-+	count = xdr_buf_to_bvec(rqstp->rq_bvec, rqstp->rq_bvec_len, xdr);
- 
- 	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
- 		      count, rqstp->rq_res.len);
-@@ -1244,7 +1244,7 @@ static int svc_tcp_sendmsg(struct svc_sock *svsk, struct svc_rqst *rqstp,
- 	memcpy(buf, &marker, sizeof(marker));
- 	bvec_set_virt(rqstp->rq_bvec, buf, sizeof(marker));
- 
--	count = xdr_buf_to_bvec(rqstp->rq_bvec + 1, rqstp->rq_maxpages - 1,
-+	count = xdr_buf_to_bvec(rqstp->rq_bvec + 1, rqstp->rq_bvec_len - 1,
- 				&rqstp->rq_res);
- 
- 	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
-
--- 
-2.51.0
-
+Thanks,
+            Dmitry
 
