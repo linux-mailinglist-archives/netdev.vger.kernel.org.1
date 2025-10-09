@@ -1,116 +1,163 @@
-Return-Path: <netdev+bounces-228411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D05BBC9FD6
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 18:09:18 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCEAABC9F01
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 18:05:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A742B1A63EBA
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 16:03:39 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 01A3E3544FC
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 16:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20FDA2E8E11;
-	Thu,  9 Oct 2025 15:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E008D2EFD8F;
+	Thu,  9 Oct 2025 15:58:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="miU5UIJT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B2Rwh1V6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A353D2206AC
-	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 15:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C0012EF64C
+	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 15:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760025422; cv=none; b=SbPW+HFt+d8Je0zvEPYK01CQ0IPcREFAwEF1SlMYXoJEI0Zc4J4m05XqsZOVrs7ANU+x24rBPUtGAVJ4BNrpkFq4ZEM/AqovU3ysaft6UylgSoxERLak/TbdR7nPVLWaGGyQCYE6rJE5vle9Zab4iqUDyoQ6DxKkEKWqDd5z6xw=
+	t=1760025513; cv=none; b=GvhRhMARyecF6QgipzCk5ybOF1K16MsW3gLcvrb5V6A6GAjnJnmv/Bo/MbQKhj53kOdhbZTWXIBTf1uLw6QoPJpeUznoY3W5ryVe310rwhPz3tdfVw9OSINiLu1w2j3JAqC0Lf71qA/yTZli7Ej5siV1YtiaQ3ses+eHOhEb3cY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760025422; c=relaxed/simple;
-	bh=fEPjMABZJqK2RV7aPLAwmCyreoCKrgnuKQ175KZEw7s=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:From:Subject:Cc:
-	 References:In-Reply-To; b=SiXLH6QNiIGZYauDv85jFt3r/GhaABmXHudQoTVk7R8SppTdagZOWb5jSjYyZVOtv8LyH/TUCylmHj1eJTCz1i0WzAWxEwYGDrSxhZZUkpXdIn1d/v6WNvvNGXLWidwDfUfFjaBzwYdG5Nmerx+ugmkLq2mtnVapLlbiwyjQCGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=miU5UIJT; arc=none smtp.client-ip=209.85.215.182
+	s=arc-20240116; t=1760025513; c=relaxed/simple;
+	bh=8OZiH1BDPLJdfYF0II7is8iKCCoKggl/I/ld9NWAY60=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oNTvynThIwPkRVqRfFqT8RkTshn1o2pwQAHo5tIgeF7IOs0vaTk8ZPWgXGH1L4lOmQVfkzWHEBLOwmDQZUAOxMMK/aWqqnrxqtlnNLiOv8G8GDr/S6SQ0ybQlq/YQp3u7jhrlvDeH+NcuhnXc9obpnN8ykjybhMVI0mHgKY0iCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B2Rwh1V6; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b6271ea39f4so746382a12.3
-        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 08:56:59 -0700 (PDT)
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b60971c17acso956428a12.3
+        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 08:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760025419; x=1760630219; darn=vger.kernel.org;
-        h=in-reply-to:references:cc:subject:from:to:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qgo3KudljITGQSuGvHmW5cffvohs9TZ6aTPtPKYUDQo=;
-        b=miU5UIJTb62u6fi7DEk4gYEdJb68gKcH2l3HvT/cV2qBeAo4YdBA8byWePEXY8N7Ev
-         pure7uVMLefE7qeO5MxlENEEN6SxD6V+XDmrICyoplzgWcfOLAFssCMTI1OYFQl1fWft
-         p8dBPIX2cTW0y+vcYqD4tAfNMg6qyOPx1k+fxjL18nELU7c6G2UxWTAoJmS74noFo+Oa
-         Swgllip9u8wXjuPN6ygj1r89rHyAZww1ZCyv1I5zNh3i3aOy7EGoxfPTbtaD+ba206Cg
-         CfprQxYExXoDRBQEY+4G/mvNE793vZvbo2tzMjVol0WO8AM/1my9aitoti6vx6pgDIwH
-         RAfw==
+        d=gmail.com; s=20230601; t=1760025512; x=1760630312; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gAdLvpKJCv4jbHmMWHwPbYfzoSafhf17EqbwEP2QLrE=;
+        b=B2Rwh1V6gts6iIuIMsEzf7WL/5UrgNanQjsNccUtZ3RRhDYGWsGgkseljHazD1Zkaq
+         NRxZz6j8b3TAau/Urexf7coUW+LPRnSyuDvjQqaWxMVSVMRonPS00WfeNTSpd1wwLHmI
+         T8CLJwJTSHSIKcoyZZBi1BI6QQ3aKkdLnUjj9b5jBynY4Wd44BdcE4dKaLbJ9CRnFCdB
+         /jq15Pafb8FjSRFnSUfvYd+8jBqt2CjyKXcPh4fyIXHi+i2SD2zNsNPKHlsWM1nBq4l4
+         MR1VhOg+Ary13CsqogyPZlVIocW//BdR6tRN5BHKpTchPZFd7CUpgkoyWUTdiT+2wWhe
+         4i1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760025419; x=1760630219;
-        h=in-reply-to:references:cc:subject:from:to:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qgo3KudljITGQSuGvHmW5cffvohs9TZ6aTPtPKYUDQo=;
-        b=rFJf78TPgG7EnP+Ug+C36HTiGm1JvvK+Ic4nqLDsAy0ySi4Gsppb4VPQdoIlR7Bhwg
-         VQNTn7SJFIU7M+4V3pNN5D5SrOwi6IFm2fZKSSC9OBAw1XvwRkDpx0KunhchPWkvef7X
-         wsOQdDQ3LrifQwcbP5BG9DgOfbC+uTbPmqNMQ6jqAChvByHHoFxaWNKJaZvGeX3cd7Pu
-         n/q/GQe/QNp5iOOSMAWvXHCSp0Gxf2Nt6QIwYM259gYkptVCfeRNNphJ0MKgV7yYEd4d
-         /6c5K+VqYhT7BV4ZS0uyADvo2dcYPzt/B/KF3nj6rwngWftYNPhu9wrdC9lUD00AMMLw
-         OAFw==
-X-Forwarded-Encrypted: i=1; AJvYcCUJp6pi/iQofn8xZxv9IqH1+vRkX31A3HCLwBLwSa2QK2hPTwXDig5IkC2/rpWbTAg8Lo6Qfqk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwhOaFTj804koUKiGuhACzB5GeLiygHNY9Ky8TBQ5jw37Zmme8
-	AqWSWWIGfMx5epHCJgK+L5uRKBoUyL1Tmoan9BNFANvCFIJDheZR9j8W
-X-Gm-Gg: ASbGncsKC7Jeaplvjmj+nol3sX9y0Gl832+Ni9RpCEaeymtbKXHlQ37yW5vpS/4nz8M
-	NzlQdkJviskB8zsLGVENtDKzLBpfyRMENYXcMg2eOSRdkSBbxhQY47Z9YmGC/decFtzZOAkP8B/
-	LKjFnHk3IZ0fWLrtHDQTXgxl41RPz1/XDtCc8qaCicMgZ6sl4wzWU+LrniHt8SIN6tTBgzYNei6
-	igFtCTBZ5PB8TrP4bbi4dxoPazkYyTNKeT+3rQ1uh/W0gEruzco3lgn1htsPwprFDJPLyUR9afR
-	iKHxCxUsbeK2aLd9hfp4BlQI6TPWICUuJJAuj/KnQZjulpoQaAdWD//dlykSVInjeqMs2+RGpGu
-	ELMv+v11TSQyCdz9IXMkv4M1GQnRmUmCqcMGVuLuWwLA=
-X-Google-Smtp-Source: AGHT+IEFf2RnfqrbKgLS8ZhhKtvMKGc2UMdAzovJyGrgaoGsX6xngdyLDG8NWdEBK5j0gpEaPZA0hw==
-X-Received: by 2002:a17:903:3c25:b0:26c:3e5d:43b6 with SMTP id d9443c01a7336-290273ef107mr101385425ad.32.1760025418779;
-        Thu, 09 Oct 2025 08:56:58 -0700 (PDT)
-Received: from localhost ([175.204.162.54])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29034f0712fsm32711735ad.71.2025.10.09.08.56.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Oct 2025 08:56:58 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760025512; x=1760630312;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gAdLvpKJCv4jbHmMWHwPbYfzoSafhf17EqbwEP2QLrE=;
+        b=CnMDfHeWgP00eLQwV4Q4NXdAUzGZICmuSe8UxpIJuPNBnhf2cnD8mNdyf+pHzX1nLg
+         j4773pC0+Q81lvcAL6u651QIbWnO7B8mR05WXysGRoPt1bnDFmB7xoAMC9rzMQI3lKQp
+         saxSEEhcK0MCGWHnDLYkaVRDf0WMfylSvBF9D2UPdnIGuLVomKNRh4QtWO4Tu7bLBaYH
+         0M4WI4zYhxot8C933eX2b+JSjzHRDQmhfI1MCbhaBu6Bl+K3NULld0nkaTfpl0UJHS4D
+         SVHhW4kaqImXI5dzs0KxlJhLxSfNJeFLNnI6zJ5cbABfAB/fimWQpArbq8WQzuKdvYBE
+         pd8A==
+X-Gm-Message-State: AOJu0YxPduPMC9mGexKuvujI3YSrH0SuPhRqJXIVOQN/wZ1OMUcOVY/h
+	ABqTdrFeb3A9Q/1xTunmYgMnOqE57YeKqrfj+vrH8fZ+En4ht7G8gWn9
+X-Gm-Gg: ASbGncvdZ4gVTIUBlc6Fe8EdxxROl0AHrHqr8Y9E/j7lC0NEGUE2pfp8HqazlT/LOBR
+	8BPVGY5OA8nOH/vlq5QDg8HTDiwDlsD4PGfGYNnUD4X2iFjYFUgHuyOoOcE3En7k8cqCpmXnMx8
+	IcLENwq3uMdXBWtbPi5OtN7fSPZs2j/ZolyYgKK1bBiPPytk3i1SbzUqeO1RwJ3PjPOtxcxDHpQ
+	sWX9Y0IfeXfgloDzgysqtV3fFIJwwiIvu63xdg+2oiECKsBvD3D/TRM4jNQh6EanipqEnAp8qUw
+	tlJsHqcCMoAUtiT9hHZR7b9CQeW9QGxqM1zRxXbRrQXrFt/ToYyeXJBkK5SZQJhRNZ0H9K/QF42
+	4qNVqRt2dwbaf7zjz3sKmEq7Evg/I+NUVLXs2mzGLDf1pufCX0wtw8l5kAA==
+X-Google-Smtp-Source: AGHT+IH6oXZ0R/UodGK/kVJXi2B1T3lBvL0TuIS/Hh1ntLXXA4peFkl0J++JBh6etU+8qLRjDNuweA==
+X-Received: by 2002:a17:903:3885:b0:256:9c51:d752 with SMTP id d9443c01a7336-290273069bbmr105229465ad.56.1760025511618;
+        Thu, 09 Oct 2025 08:58:31 -0700 (PDT)
+Received: from mythos-cloud ([175.204.162.54])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29034e44ef9sm32585005ad.52.2025.10.09.08.58.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Oct 2025 08:58:31 -0700 (PDT)
+From: Yeounsu Moon <yyyynoom@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yeounsu Moon <yyyynoom@gmail.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net v2] net: dlink: handle dma_map_single() failure properly
+Date: Fri, 10 Oct 2025 00:57:16 +0900
+Message-ID: <20251009155715.1576-2-yyyynoom@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 10 Oct 2025 00:56:55 +0900
-Message-Id: <DDDWXTRCYVDA.33VBJ38T4QBXH@gmail.com>
-To: "Simon Horman" <horms@kernel.org>
-From: "Yeounsu Moon" <yyyynoom@gmail.com>
-Subject: Re: [PATCH net] net: dlink: handle dma_map_single() failure
- properly
-Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-X-Mailer: aerc 0.20.1
-References: <20251002152638.1165-1-yyyynoom@gmail.com>
- <20251003094424.GF2878334@horms.kernel.org>
- <DDA4Y2GRUHD4.1DFHX01NOJYCB@gmail.com>
- <20251008091346.GO3060232@horms.kernel.org>
-In-Reply-To: <20251008091346.GO3060232@horms.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-> Sorry for the slow response, I've been ill for the past few days.
-No worries. I hope you're feeling better now.
->
-> I did also consider the option above. That is handling the
-> errors in the loop. And I can see some merit in that approach,
-> e.g. reduced scope of variables.
->
-> But I think the more idiomatic approach is to handle them 'here'.
-> That is, at the end of the function. So I would lean towards
-> that option.
-Not only with `goto`, but there are also issues such as replacing  `printk(=
-)`
-with `netdev_info()`. So for now, I'll send the patch that fix `alloc_list(=
-)`
-correctly.
+There is no error handling for `dma_map_single()` failures.
+
+Add error handling by checking `dma_mapping_error()` and freeing
+the `skb` using `dev_kfree_skb()` (process context) when it fails.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
+Tested-on: D-Link DGE-550T Rev-A3
+Suggested-by: Simon Horman <horms@kernel.org>
+---
+Changelog:
+v2:
+- fix one thing properly
+- use goto statement, per Simon's suggestion
+v1: https://lore.kernel.org/netdev/20251002152638.1165-1-yyyynoom@gmail.com/
+---
+ drivers/net/ethernet/dlink/dl2k.c | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
+index 1996d2e4e3e2..7077d705e471 100644
+--- a/drivers/net/ethernet/dlink/dl2k.c
++++ b/drivers/net/ethernet/dlink/dl2k.c
+@@ -508,25 +508,34 @@ static int alloc_list(struct net_device *dev)
+ 	for (i = 0; i < RX_RING_SIZE; i++) {
+ 		/* Allocated fixed size of skbuff */
+ 		struct sk_buff *skb;
++		dma_addr_t addr;
+ 
+ 		skb = netdev_alloc_skb_ip_align(dev, np->rx_buf_sz);
+ 		np->rx_skbuff[i] = skb;
+-		if (!skb) {
+-			free_list(dev);
+-			return -ENOMEM;
+-		}
++		if (!skb)
++			goto err_free_list;
++
++		addr = dma_map_single(&np->pdev->dev, skb->data,
++				      np->rx_buf_sz, DMA_FROM_DEVICE);
++		if (dma_mapping_error(&np->pdev->dev, addr))
++			goto err_kfree_skb;
+ 
+ 		np->rx_ring[i].next_desc = cpu_to_le64(np->rx_ring_dma +
+ 						((i + 1) % RX_RING_SIZE) *
+ 						sizeof(struct netdev_desc));
+ 		/* Rubicon now supports 40 bits of addressing space. */
+-		np->rx_ring[i].fraginfo =
+-		    cpu_to_le64(dma_map_single(&np->pdev->dev, skb->data,
+-					       np->rx_buf_sz, DMA_FROM_DEVICE));
++		np->rx_ring[i].fraginfo = cpu_to_le64(addr);
+ 		np->rx_ring[i].fraginfo |= cpu_to_le64((u64)np->rx_buf_sz << 48);
+ 	}
+ 
+ 	return 0;
++
++err_kfree_skb:
++	dev_kfree_skb(np->rx_skbuff[i]);
++	np->rx_skbuff[i] = NULL;
++err_free_list:
++	free_list(dev);
++	return -ENOMEM;
+ }
+ 
+ static void rio_hw_init(struct net_device *dev)
+-- 
+2.51.0
+
 
