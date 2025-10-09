@@ -1,182 +1,238 @@
-Return-Path: <netdev+bounces-228378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78901BC954F
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 15:37:46 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6965BC9691
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 16:03:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CDEA8345D21
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 13:37:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B5DD14E8728
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 14:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE4182E8E13;
-	Thu,  9 Oct 2025 13:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66512E9EDA;
+	Thu,  9 Oct 2025 14:03:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QXmhDU9I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hx1cpHeP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C232E8E08
-	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 13:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2600816EB42
+	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 14:03:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760017050; cv=none; b=MimYQwYaVQ+rmAaE8TGA+/3fiKPmQV2xugm+fl4cfCPdEtd+X5sbm5dTOpsf20Z9V8Nskkpacab1LG/MtI/uq2sqxfX2B/bYo+D9eXXcrD506ObMShWRO6RkWtzPN+gphKO9LJeuh671CPrBCqK0NhDqRvcqz9z2VvMsiyVyYYM=
+	t=1760018582; cv=none; b=bhrkCPrN3yZwQp2pupsvOB3h7tJAp3Wq7oWfMB1bkrhDVk0CWUQELgBpvYseGlVL8/Fp08qa8es7wqbDP1+pTTw5xihT9c7KiE5NDGdPhlY4jV6Kb0U7l/6J2SIGT/jppLLpfH1lf4hCKEaf7Yy9bjwTQYyKuG8iXGI2NO/YP4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760017050; c=relaxed/simple;
-	bh=7NdTvvUFK/WVGSYlLXsbwdrwKPNZwb8MV31/iuYNMko=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=atq2ixYj19gyGNjevcxz6l9yisxF2TiyRuRhXzB5zC9U6d4GlRHU1ZglQ34Fb62f9wcaYJyFDY3QlyjkLSvJPG3DV3Brb8p3Zd6GibJAkTwcchVhx626DzykMorMQIO6KUC8ujN/5Ba/SU9QMfPZt9bblEbbDfXSAlfQakJYVhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QXmhDU9I; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760017048;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QSnlK9qf9+QtrbFfXzTXGo8du1cPFojIdvhyIWDFaG4=;
-	b=QXmhDU9Iet5vhAhr2qWm8ezr/UGEp076xcPaTJK3wRz9iGiO0tWUJuTZzA3rnr+Ci2TiEN
-	3BECBE4Z26fGVVO8d0TtGQRwztXDCPp7dCWtsLjtlbCkDAJDXrD3BO/HnSBs08Cx2xd2Ak
-	IQLUgEWGpwmOhkHUPnNXTbYdWcdkEP8=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-516-dd7FBqRQOoal-qT7Faj2Ww-1; Thu, 09 Oct 2025 09:37:27 -0400
-X-MC-Unique: dd7FBqRQOoal-qT7Faj2Ww-1
-X-Mimecast-MFC-AGG-ID: dd7FBqRQOoal-qT7Faj2Ww_1760017046
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4ddc5a484c9so35494271cf.1
-        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 06:37:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760017046; x=1760621846;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1760018582; c=relaxed/simple;
+	bh=sY/gtgf7NBozOjwc2EeRJ+KgsNPbK5kep4ypL81cuJQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U3KGY0DAwLeX/ArKmTubaKRKBuLSCUokkpeYrxn/fALKTgKCjHKKWQf4yZLJc5ijnvtdUyyy8H6fzFYINtqTtdSzFa4BusLjIUgTAh/jTf9tTyimipEKngKfzzkkZYmQinkCRIuL0clms2+asg2t2sN3yJxz80kYAgvPi865EoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hx1cpHeP; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-930cfdfabb3so92563739f.1
+        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 07:03:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760018580; x=1760623380; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QSnlK9qf9+QtrbFfXzTXGo8du1cPFojIdvhyIWDFaG4=;
-        b=soRl6Pb2GWG3QnDWvrmWA5MJoaNiDGahqHtWgtEzOhBhZGCCHJTrfY9acO/pfo4xnD
-         Ge4q0OvVc/UInnnsiXo++u59krokTiWqI2oDkOXhQfy0wf+gVLGhN6m6N1OZ/nz71Wdu
-         A0Ll3UpS16fQmVoUKEeuSGq7hPDvSHO83p2y6liNqLqDXjA8EDBaZQtcxSyAQOfIPT9L
-         OSpTV4fr67cBljCt+5eGVNpxsy8eYKAK2ST5FTWh5q2+m2Tj4xIgDcR151DKSLFjPzJN
-         FoseC6fsEnxEzZESNuzOuXYb0KQFLiJbQyj+6yOE/bXCn6Kl1P+uUYV2x3Q4Jf3QWpFg
-         zDrA==
-X-Forwarded-Encrypted: i=1; AJvYcCVBsIxBLXfHXC2+XhRMzu9G2JF1ksUv9mk5tUP+JiGLo5NU9A1UDYTGX2dYxQ6gXIEFG1iXKf4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4dmeCPgsQZaY9WvAhouzLdqgUGfjGXFVPxLJRcsCev+bpkMsa
-	UecSByg834dVXjq9wrUEi7r90bqFMc16b1X8brLPkqEB64HTLZumS8nSlxfC/0vWVAwLBlwr8fX
-	P1LtMmZG2kOnrHTkh/9CZimD1fdgFtXLo18DIev+DWTRYGdbkWg6Q/JFzsQ==
-X-Gm-Gg: ASbGnctlruUqfdSKbZ9Fa2xmw+db3+bPX2N1A72Jg07m8cfs9EHhaoTapKMa2k+Wr7z
-	0MKloZBUfeLh7TRNr9xtFT3uqLDmNbMQHl/5SnAb/sNCCv3MbWYY5qmJ6IktXBgD7hxooyi2pUw
-	1YWl+s98sr413x4Wj1aSKDev+XxuaWFry3APqhVvOp9jPjhawRTZauvUEofLImT0n60br26ditC
-	aX287WLoUhjfFWQiny0eRiTv9ZgGT5Nwoy4CPJfMB+yQylSBuhvy2UUzSurnIzVccF8al162f69
-	eNAMAvA4svt1IkQ53+o/ZZhbQpQJIynMAyo=
-X-Received: by 2002:a05:622a:552:b0:4d3:1b4f:dda1 with SMTP id d75a77b69052e-4e6ead5b74fmr99238181cf.61.1760017046386;
-        Thu, 09 Oct 2025 06:37:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGkkkln0wvJVfA+/SQdl7KyNaqeghASgRMRgQSZA/6yVrMeWhD/2djQvFf88sK4uQV3LAnLRw==
-X-Received: by 2002:a05:622a:552:b0:4d3:1b4f:dda1 with SMTP id d75a77b69052e-4e6ead5b74fmr99237541cf.61.1760017045789;
-        Thu, 09 Oct 2025 06:37:25 -0700 (PDT)
-Received: from redhat.com ([138.199.52.81])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-884a2369b3fsm191330185a.51.2025.10.09.06.37.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Oct 2025 06:37:25 -0700 (PDT)
-Date: Thu, 9 Oct 2025 09:37:20 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org
-Subject: Re: [PATCH 1/3] virtio: dwords->qwords
-Message-ID: <20251009093127-mutt-send-email-mst@kernel.org>
-References: <cover.1760008797.git.mst@redhat.com>
- <350d0abfaa2dcdb44678098f9119ba41166f375f.1760008798.git.mst@redhat.com>
- <26d7d26e-dd45-47bb-885b-45c6d44900bb@lunn.ch>
+        bh=lfk2bfyqFX2yPC1pilpdm6kUPU4T4/Dvd4LObp2un+E=;
+        b=hx1cpHeP97IWTfCT66W1ey8BmgdueE/D7jc6vp7ykfiYizvyc/GsfcLOSLM6TXLhgj
+         iWW0DwTWqTMlJQbjl0jgrp7SDTEQGQDXDURN1N6/+i/cZ5sXdwvJJkXzGVXOcfaOI2D7
+         36u8V4bRl1U6piKJ9JqjusCQcJlCOk32W3ITClBZCzYmr1q+2ZscngIlBzpnnLao2Qxr
+         vPwpCbLtuvfHpmE4G8DJOCiWi0vsOCKe8awit8HDZj9PoQVtjeB4SGuW7WoVVN8nJpl8
+         XRJQoC/m7LDM1puM9HBFRMuSMcRaRftNpF60Pmdoui9AVYvyztxWlOEBXpT6MTImiZmc
+         y8OQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760018580; x=1760623380;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lfk2bfyqFX2yPC1pilpdm6kUPU4T4/Dvd4LObp2un+E=;
+        b=RU8YrCJFkmHEX/T8+YOVV91YthM+WFOmZzV1d+FuXeaSTYG4RscNtpD7qkE8O+rVOM
+         lDqu6sYEegEx1moWoaPZy6nbpVG771FuhSBdibESRBVhbJkDbP7kQ2thDz7b9msoAlGy
+         mMzbjrtNxS9lxAZrZUDKmQsvPBD7Js0fkgFa4FgtK5WUBUFs452lVOi47+YrFNfcZxtI
+         7iK+9Cj7McpkkhbRSUnl7BzvlKNJDTHUgAAufd/VVJMkJlIdIsOoZZHw3SGruCTTf00d
+         9nIFTpZBWtwZlrXVwXqJEKf6dFpYirrEJvVH5QNIaN+a9tV2iGdKhqPfIYGdFzX8hsbS
+         dQmg==
+X-Forwarded-Encrypted: i=1; AJvYcCWWu5QW0i2orQ5Ug7N9oaYHDM1VRo6sLG9VHb7StfWEFlkKic7ZYx5m4PjVhIgFxqrAawiDAkQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5tgskQz4IJnkSttJ8ADUC/9szTuf+vA42VVe9q6ZCqU32TVS3
+	Z/cZd4LMsyv8bsOgrevxgc5QeW8OtyNXfrc0vcEoGZy6HOQGftGd+eT/HjmXy2VF2lsggmX+3CW
+	0jJk4stE/z9TKsSPWvfvRZG11bD+NzZ4=
+X-Gm-Gg: ASbGncuTey6s/6dx3Ed8W26So8Ll8U/GsVPMtRPRzV2B+GX82hfyBvF2HbG8r6j/4tR
+	XGgdxj86UEMby37sHTo/dJXBTFZHVT1haBDNZhnZKjHkPGLn1B/k4dx2CxeivTWVx81JLEXQ9gN
+	sNfiseJf/yaBgYo9r7VLkDHhaTv02QulCxMmo/W8QEgMgS5v92ZOQ3CO9WGgeWG/neQWv1vusb8
+	01XdDn+O7nKsxGjGwtZuUczFGI8zCc=
+X-Google-Smtp-Source: AGHT+IGFUh+yxdaAwOY01QTdDPRzmkqga8JwC7gVQ8hdE1VZLzwP/yHjfQX0w+P+lGz62g/ohriduN1YX1Cx7jhB7TA=
+X-Received: by 2002:a05:6e02:4405:20b0:42f:9888:48f1 with SMTP id
+ e9e14a558f8ab-42f98884980mr2655225ab.1.1760018579842; Thu, 09 Oct 2025
+ 07:02:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <26d7d26e-dd45-47bb-885b-45c6d44900bb@lunn.ch>
+References: <20251008165659.4141318-1-aleksander.lobakin@intel.com>
+In-Reply-To: <20251008165659.4141318-1-aleksander.lobakin@intel.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 9 Oct 2025 22:02:23 +0800
+X-Gm-Features: AS18NWAnZSobSr21rzMet2NXYBsUZ-tOijH1hdSEoiMgzrgWiOgQX5AxwPD-zdc
+Message-ID: <CAL+tcoAWf4sNkQzCBTE8S7VgH12NPyqwiYDiig+jv0KGYAhFTA@mail.gmail.com>
+Subject: Re: [PATCH bpf] xsk: harden userspace-supplied &xdp_desc validation
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Magnus Karlsson <magnus.karlsson@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kees Cook <kees@kernel.org>, nxne.cnse.osdt.itp.upstreaming@intel.com, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 09, 2025 at 02:31:04PM +0200, Andrew Lunn wrote:
-> On Thu, Oct 09, 2025 at 07:24:08AM -0400, Michael S. Tsirkin wrote:
-> > A "word" is 16 bit. 64 bit integers like virtio uses are not dwords,
-> > they are actually qwords.
-> 
-> I'm having trouble with this....
-> 
-> This bit makes sense. 4x 16bits = 64 bits.
-> 
-> > -static const u64 vhost_net_features[VIRTIO_FEATURES_DWORDS] = {
-> > +static const u64 vhost_net_features[VIRTIO_FEATURES_QWORDS] = {
-> 
-> If this was u16, and VIRTIO_FEATURES_QWORDS was 4, which the Q would
-> imply, than i would agree with what you are saying. But this is a u64
-> type.  It is already a QWORD, and this is an array of two of them.
+On Thu, Oct 9, 2025 at 12:59=E2=80=AFAM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> Turned out certain clearly invalid values passed in &xdp_desc from
+> userspace can pass xp_{,un}aligned_validate_desc() and then lead
+> to UBs or just invalid frames to be queued for xmit.
+>
+> desc->len close to ``U32_MAX`` with a non-zero pool->tx_metadata_len
+> can cause positive integer overflow and wraparound, the same way low
+> enough desc->addr with a non-zero pool->tx_metadata_len can cause
+> negative integer overflow. Both scenarios can then pass the
+> validation successfully.
+> This doesn't happen with valid XSk applications, but can be used
+> to perform attacks.
+>
+> Always promote desc->len to ``u64`` first to exclude positive
+> overflows of it. Use explicit check_{add,sub}_overflow() when
+> validating desc->addr (which is ``u64`` already).
+>
+> bloat-o-meter reports a little growth of the code size:
+>
+> add/remove: 0/0 grow/shrink: 2/1 up/down: 60/-16 (44)
+> Function                                     old     new   delta
+> xskq_cons_peek_desc                          299     330     +31
+> xsk_tx_peek_release_desc_batch               973    1002     +29
+> xsk_generic_xmit                            3148    3132     -16
+>
+> but hopefully this doesn't hurt the performance much.
 
-I don't get what you are saying here.
-It's an array of qwords and VIRTIO_FEATURES_QWORDS tells you
-how many QWORDS are needed to fit all of them.
+I don't see an evident point that might affect the performance. Since
+you said that, I tested by running './xdpsock -i eth1 -t -S -s 64' and
+didn't spot any degradation.
 
-This is how C arrays are declared.
+>
+> Fixes: 341ac980eab9 ("xsk: Support tx_metadata_len")
+> Cc: stable@vger.kernel.org # 6.8+
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
+Thanks for the fix!
 
-> I think the real issue here is not D vs Q, but WORD. We have a default
-> meaning of a u16 for a word, especially in C. But that is not the
-> actual definition of a word a computer scientist would use. Wikipedia
-> has:
-> 
->   In computing, a word is any processor design's natural unit of
->   data. A word is a fixed-sized datum handled as a unit by the
->   instruction set or the hardware of the processor.
-> 
-> A word can be any size. In this context, virtio is not referring to
-> the instruction set, but a protocol. Are all fields in this protocol
-> u64? Hence word is u64? And this is an array of two words? That would
-> make DWORD correct, it is two words.
-> 
-> If you want to change anything here, i would actually change WORD to
-> something else, maybe FIELD?
-> 
-> And i could be wrong here, i've not looked at the actual protocol, so
-> i've no idea if all fields in the protocol are u64. There are
-> protocols like this, IPv6 uses u32, not octets, and the length field
-> in the headers refer to the number of u32s in the header.
-> 
-> 	Andrew
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
+> ---
+>  net/xdp/xsk_queue.h | 45 +++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 35 insertions(+), 10 deletions(-)
+>
+> diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
+> index f16f390370dc..1eb8d9f8b104 100644
+> --- a/net/xdp/xsk_queue.h
+> +++ b/net/xdp/xsk_queue.h
+> @@ -143,14 +143,24 @@ static inline bool xp_unused_options_set(u32 option=
+s)
+>  static inline bool xp_aligned_validate_desc(struct xsk_buff_pool *pool,
+>                                             struct xdp_desc *desc)
+>  {
+> -       u64 addr =3D desc->addr - pool->tx_metadata_len;
+> -       u64 len =3D desc->len + pool->tx_metadata_len;
+> -       u64 offset =3D addr & (pool->chunk_size - 1);
+> +       u64 len =3D desc->len;
+> +       u64 addr, offset;
+>
+> -       if (!desc->len)
+> +       if (!len)
+>                 return false;
+>
+> -       if (offset + len > pool->chunk_size)
+> +       /* Can overflow if desc->addr < pool->tx_metadata_len */
+> +       if (check_sub_overflow(desc->addr, pool->tx_metadata_len, &addr))
+> +               return false;
+> +
+> +       offset =3D addr & (pool->chunk_size - 1);
+> +
+> +       /*
+> +        * Can't overflow: @offset is guaranteed to be < ``U32_MAX``
+> +        * (pool->chunk_size is ``u32``), @len is guaranteed
+> +        * to be <=3D ``U32_MAX``.
+> +        */
+> +       if (offset + len + pool->tx_metadata_len > pool->chunk_size)
+>                 return false;
+>
+>         if (addr >=3D pool->addrs_cnt)
+> @@ -158,27 +168,42 @@ static inline bool xp_aligned_validate_desc(struct =
+xsk_buff_pool *pool,
+>
+>         if (xp_unused_options_set(desc->options))
+>                 return false;
+> +
 
-Virtio uses "dword" to mean "32 bits" in several places:
+nit?
 
-
-
-device-types/i2c/description.tex:The \field{padding} is used to pad to full dword.
-
-pads to 32 bit
-
-
-transport-pci.tex:        u8 padding[2];  /* Pad to full dword. */
-
-same
-
-
-
-
-Under pci, the meaning is also generally as I use it here.
-E.g.:
-
-Documentation/PCI/pci.rst:You can use `pci_(read|write)_config_(byte|word|dword)` to access the config
-
-
-
-
-
-
--- 
-MST
-
+>         return true;
+>  }
+>
+>  static inline bool xp_unaligned_validate_desc(struct xsk_buff_pool *pool=
+,
+>                                               struct xdp_desc *desc)
+>  {
+> -       u64 addr =3D xp_unaligned_add_offset_to_addr(desc->addr) - pool->=
+tx_metadata_len;
+> -       u64 len =3D desc->len + pool->tx_metadata_len;
+> +       u64 len =3D desc->len;
+> +       u64 addr, end;
+>
+> -       if (!desc->len)
+> +       if (!len)
+>                 return false;
+>
+> +       /* Can't overflow: @len is guaranteed to be <=3D ``U32_MAX`` */
+> +       len +=3D pool->tx_metadata_len;
+>         if (len > pool->chunk_size)
+>                 return false;
+>
+> -       if (addr >=3D pool->addrs_cnt || addr + len > pool->addrs_cnt ||
+> -           xp_desc_crosses_non_contig_pg(pool, addr, len))
+> +       /* Can overflow if desc->addr is close to 0 */
+> +       if (check_sub_overflow(xp_unaligned_add_offset_to_addr(desc->addr=
+),
+> +                              pool->tx_metadata_len, &addr))
+> +               return false;
+> +
+> +       if (addr >=3D pool->addrs_cnt)
+> +               return false;
+> +
+> +       /* Can overflow if pool->addrs_cnt is high enough */
+> +       if (check_add_overflow(addr, len, &end) || end > pool->addrs_cnt)
+> +               return false;
+> +
+> +       if (xp_desc_crosses_non_contig_pg(pool, addr, len))
+>                 return false;
+>
+>         if (xp_unused_options_set(desc->options))
+>                 return false;
+> +
+>         return true;
+>  }
+>
+> --
+> 2.51.0
+>
+>
 
