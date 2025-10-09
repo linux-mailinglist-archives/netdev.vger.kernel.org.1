@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-228407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 921C8BC9F24
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 18:05:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6039ABC9F59
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 18:07:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E2A51A6485C
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 16:01:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8870118877BB
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 16:01:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B59F23ABBD;
-	Thu,  9 Oct 2025 15:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34C2F2F60B4;
+	Thu,  9 Oct 2025 15:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="tceG3tzJ"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Bj+YV2mv"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DD8226CF1;
-	Thu,  9 Oct 2025 15:55:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87DF523B607;
+	Thu,  9 Oct 2025 15:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760025351; cv=none; b=POiY8QrtAW0fRqnDb2+NZ+o/8WHoH7+V3YwF2SwDUhYGX5mGEERMvG5gLhi4Ngk3HdvGaEAlAQ0uO2ULXnPK2+R44dRMmm2XudXp3zko9Pu9AxY5fiYmrYg1kOxBxling/ybYtMYrPAIF/mcVpR9oLeiSMji8fwO4qsP1hh4Qp4=
+	t=1760025354; cv=none; b=DWF4HOmruFUBo1YpbvWHYw9N0VnHpxtG1Xa6dxKNY5gRbssk9nDKgxGhXx9f48ybGVbYkrGcWVm08T7P7LYSy3+v2m2S2ZwjK5zTP8vMizAXRTKjduidz9RxiCQ0ucwG3I05qEvpGW7HPtqwBLg7p+eLB0vpobMlS5qHAXR91Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760025351; c=relaxed/simple;
-	bh=186aunkFZ+DaR7NwbVBgBmpyszUiuZDCagnLEubuYVI=;
+	s=arc-20240116; t=1760025354; c=relaxed/simple;
+	bh=gEsdwK0m2kA3C6dQH8WJCbm+g8019XTzo1jqoCAXjPE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IvUJYqAlvyzT3wlB/L4J+Rv2z0CiTiN4dj7YwQnbrMkjkdkV8mYTHZN+buYRI09JXxLnhbbnun3J+2dhTu/+GlQ45Z5f153Y1fa94vFfoG4izVw65M1XzGRAYIU6ZIJdguQ1GV0JSz3xOTpwo263p5/CnfV+a0DxLr5vbBkRt60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=tceG3tzJ; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=an0gIP/Hk5om9RSIyMQVT8gcna6ILNC1anADI6YKilXzo5BdjV6S0gGMUUETrlwXt87J7lWXRsjAmYS9usT9crnJz0xbdInPEv74FRAVUlq1enNgF4lqrjnZR4+IE4lplpuLX53w3dPqxTrOH7CvyFUH4ZF8jLHdGVpy7zM4NjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Bj+YV2mv; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1760025350; x=1791561350;
+  t=1760025351; x=1791561351;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=186aunkFZ+DaR7NwbVBgBmpyszUiuZDCagnLEubuYVI=;
-  b=tceG3tzJj96pEpB8EmvtnbZMozJx61OCL4l9FtRHmwRu1uyvuAytPC0o
-   kiNHPtUtGAl2netaaqwVj6ntc5VSYEyh3zM1LMsogg+7wNN65PtM8GbbZ
-   Gm7JayAsPPtpCNuCeFxMnfyD3Iz2hBtneJKhpt8sybfNEfWTy3igfsGGv
-   FmvylRnNk4mB6fh97Qz8VBmlMhKoE72/4iMN8NVXZvIbb3oinMDzY+8Bb
-   v5leIJzW8AmK1zOT9XLpXdpbqhU5ezcvKfmuS/dvHHi7kqyALsAx36YwN
-   p21vs1elR4mlAufQ8YLU3ze939kr9XW5XVvWbdStFckI45IvSA5w+aQUS
-   A==;
+  bh=gEsdwK0m2kA3C6dQH8WJCbm+g8019XTzo1jqoCAXjPE=;
+  b=Bj+YV2mvQG9jaHrOPYrWJzoA8V5m6YoDSOS/StuvxW//y+l7A+KPZnYI
+   /NaWrS/sxT3pryzljehKZTjrxb/67JSd2451MlconCi3+oNEV4/41QxV1
+   FzhpZoNTUqlEZRnJFFdgKUng/DaVKWmZqCQsk24p8VLaFvq4fWKcLO42e
+   4u8qUTejIoQEMF66pwbN5faDucszwZnHGzMq3g7cvkdvzrweloJC3pTMU
+   Tj5xi/klb2jsTwB65qJ8yqfJud8rj2e2S2DAHExyo5vyRBHySzINR3Vtb
+   0U3yv50QaRHNnc2oZ9Gfnzl2aq4AJXtMXSzK2/Q868hsRANomKT80oDVJ
+   g==;
 X-CSE-ConnectionGUID: BY5Dt4iOTF6lw0TCi1Tv9Q==
-X-CSE-MsgGUID: gRBAh4qzTtiU7k10zAP/nw==
+X-CSE-MsgGUID: o2p5G75YS8ucjPccvfHITQ==
 X-IronPort-AV: E=Sophos;i="6.19,216,1754982000"; 
-   d="scan'208";a="48057947"
+   d="scan'208";a="48057950"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Oct 2025 08:55:48 -0700
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Oct 2025 08:55:50 -0700
 Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
  chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Thu, 9 Oct 2025 08:55:22 -0700
+ 15.1.2507.58; Thu, 9 Oct 2025 08:55:39 -0700
 Received: from che-lt-i64410lx.microchip.com (10.10.85.11) by
  chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Thu, 9 Oct 2025 08:55:14 -0700
+ 15.1.2507.58 via Frontend Transport; Thu, 9 Oct 2025 08:55:31 -0700
 From: Balamanikandan Gunasundar <balamanikandan.gunasundar@microchip.com>
 To: Mauro Carvalho Chehab <mchehab@kernel.org>
 CC: Eugen Hristev <eugen.hristev@linaro.org>, Chas Williams
@@ -71,10 +71,11 @@ CC: Eugen Hristev <eugen.hristev@linaro.org>, Chas Williams
 	<dan.scally+renesas@ideasonboard.com>, Tomi Valkeinen
 	<tomi.valkeinen@ideasonboard.com>, <linux-kernel@vger.kernel.org>,
 	<linux-media@vger.kernel.org>, <linux-atm-general@lists.sourceforge.net>,
-	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-Subject: [PATCH 15/18] media: microchip-isc: decouple histogram cycling from AWB mode
-Date: Thu, 9 Oct 2025 21:22:48 +0530
-Message-ID: <20251009155251.102472-16-balamanikandan.gunasundar@microchip.com>
+	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	Balamanikandan Gunasundar <balamanikandan.gunasundar@microchip.com>
+Subject: [PATCH 17/18] media: videodev2.h, v4l2-ioctl: Add microchip statistics format
+Date: Thu, 9 Oct 2025 21:22:50 +0530
+Message-ID: <20251009155251.102472-18-balamanikandan.gunasundar@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251009155251.102472-1-balamanikandan.gunasundar@microchip.com>
 References: <20251009155251.102472-1-balamanikandan.gunasundar@microchip.com>
@@ -87,30 +88,42 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-From: Balakrishnan Sambath <balakrishnan.s@microchip.com>
+Add microchip ISC specific statistics meta data format. This data consists
+of raw histogram statistics that is exported to userspace for further
+processing. This fixes the kernel warning "Unknown pixelformat"
 
-Fix histogram cycling stopping after first channel when AWB is disabled.
-Now the histogram cycling will continue even when AWB is disabled,
-enabling hardware histogram data export to userspace.
-
-Signed-off-by: Balakrishnan Sambath <balakrishnan.s@microchip.com>
+Signed-off-by: Balamanikandan Gunasundar <balamanikandan.gunasundar@microchip.com>
 ---
- drivers/media/platform/microchip/microchip-isc-base.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/media/v4l2-core/v4l2-ioctl.c | 1 +
+ include/uapi/linux/videodev2.h       | 3 +++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/drivers/media/platform/microchip/microchip-isc-base.c b/drivers/media/platform/microchip/microchip-isc-base.c
-index e9f14de7ae32..cafd05244db2 100644
---- a/drivers/media/platform/microchip/microchip-isc-base.c
-+++ b/drivers/media/platform/microchip/microchip-isc-base.c
-@@ -1509,7 +1509,7 @@ static void isc_awb_work(struct work_struct *w)
- 	mutex_unlock(&isc->awb_mutex);
+diff --git a/drivers/media/v4l2-core/v4l2-ioctl.c b/drivers/media/v4l2-core/v4l2-ioctl.c
+index 01cf52c3ea33..a03e8f3ab610 100644
+--- a/drivers/media/v4l2-core/v4l2-ioctl.c
++++ b/drivers/media/v4l2-core/v4l2-ioctl.c
+@@ -1467,6 +1467,7 @@ static void v4l_fill_fmtdesc(struct v4l2_fmtdesc *fmt)
+ 	case V4L2_META_FMT_RK_ISP1_PARAMS:	descr = "Rockchip ISP1 3A Parameters"; break;
+ 	case V4L2_META_FMT_RK_ISP1_STAT_3A:	descr = "Rockchip ISP1 3A Statistics"; break;
+ 	case V4L2_META_FMT_RK_ISP1_EXT_PARAMS:	descr = "Rockchip ISP1 Ext 3A Params"; break;
++	case V4L2_META_FMT_ISC_STAT_3A: descr = "Microchip ISP statistics"; break;
+ 	case V4L2_META_FMT_C3ISP_PARAMS:	descr = "Amlogic C3 ISP Parameters"; break;
+ 	case V4L2_META_FMT_C3ISP_STATS:		descr = "Amlogic C3 ISP Statistics"; break;
+ 	case V4L2_PIX_FMT_NV12_8L128:	descr = "NV12 (8x128 Linear)"; break;
+diff --git a/include/uapi/linux/videodev2.h b/include/uapi/linux/videodev2.h
+index becd08fdbddb..ba628f9bb89f 100644
+--- a/include/uapi/linux/videodev2.h
++++ b/include/uapi/linux/videodev2.h
+@@ -875,6 +875,9 @@ struct v4l2_pix_format {
+ #define V4L2_META_FMT_RK_ISP1_STAT_3A	v4l2_fourcc('R', 'K', '1', 'S') /* Rockchip ISP1 3A Statistics */
+ #define V4L2_META_FMT_RK_ISP1_EXT_PARAMS	v4l2_fourcc('R', 'K', '1', 'E') /* Rockchip ISP1 3a Extensible Parameters */
  
- 	/* if awb has been disabled, we don't need to start another histogram */
--	if (ctrls->awb)
-+	if (ctrls->hist_stat == HIST_ENABLED)
- 		regmap_write(regmap, ISC_CTRLEN, ISC_CTRL_HISREQ);
- 
- 	pm_runtime_put_sync(isc->dev);
++/* Vendor specific - used for Microchip camera sub-system */
++#define V4L2_META_FMT_ISC_STAT_3A      v4l2_fourcc('I', 'S', 'C', 'S')
++
+ /* Vendor specific - used for C3_ISP */
+ #define V4L2_META_FMT_C3ISP_PARAMS	v4l2_fourcc('C', '3', 'P', 'M') /* Amlogic C3 ISP Parameters */
+ #define V4L2_META_FMT_C3ISP_STATS	v4l2_fourcc('C', '3', 'S', 'T') /* Amlogic C3 ISP Statistics */
 -- 
 2.34.1
 
