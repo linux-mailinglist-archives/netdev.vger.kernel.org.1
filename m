@@ -1,69 +1,59 @@
-Return-Path: <netdev+bounces-228371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9190BBC917D
-	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 14:43:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D053BC91BF
+	for <lists+netdev@lfdr.de>; Thu, 09 Oct 2025 14:48:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE6BE189EB12
-	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 12:43:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 669D91A619B2
+	for <lists+netdev@lfdr.de>; Thu,  9 Oct 2025 12:48:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A45FB2E6CB3;
-	Thu,  9 Oct 2025 12:42:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679862E092E;
+	Thu,  9 Oct 2025 12:48:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dwqhE/sO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B832E62B5
-	for <netdev@vger.kernel.org>; Thu,  9 Oct 2025 12:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97505BA3F;
+	Thu,  9 Oct 2025 12:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760013776; cv=none; b=QpXhnMLYJowl0BPonl33enPC5ck1uPlSuaOB6xzTqakFfvwZSOvfUR2/XD14iA7ga3CKWbLpT3qrN9+HjMytIXfR2hz5bX5YyZXnkjgNrFX3MaTlYIHqAVzc/Mn6X1l50Y7FfKWrwYaT6++yzLS6JOxw2EDWCxkekCqZM3Ijp/g=
+	t=1760014081; cv=none; b=I0GKTdXi0CbKvEGwpS+HsrtBK42NaXrs3mscYrNLp17bFn2rimOO2LU64j6G2kxDaphEu1V/qW1+tZKIubWpBnYui7no8L8BL1UMzTl09f+prI5Ysnw+QZWmGBGlT+FCww//UODymT0grOin0XbSCS3YsDjvLYgvLBl725sWWnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760013776; c=relaxed/simple;
-	bh=WmpQBY6TbZ5ansusUYRaOEUZ7KkH3epNLcYEh/JQ11A=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=sRIRaUXL+BrXrH2TndEdU9a8f9gmLGkJWfd+94KkHU+QdrM7D6ErVgbkeg+cR+CSC7Bs8+wxVMCCjFmRI1Ts5a4g8l+mZjbfKnE1eR/sN6YdMtO0PARp+/EZQTHnyG8KoA3OGPbXj7xlEDtOboyiDSn/hBW0RU3G2cXe7gphYgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b472842981fso112425166b.1
-        for <netdev@vger.kernel.org>; Thu, 09 Oct 2025 05:42:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760013773; x=1760618573;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DyrRfyeyAKkW55cTD8t/TpjrjYwQIMXKnAOmH4iGp1U=;
-        b=viZbkDZu6z0QJAx7WJOsj1B2xVeYh/3GY4OXDe91SBvFs8oUeRpEh0ccywyNM+KrH8
-         M1HhzbE3eqUvdVWa6cXdfvJZ/HiOQbhbm99wm/sruWUdvEVoCcvkRuuAXVwcEpm7F544
-         Uwj8nj0QNohyl9ypwvAqwGU2styzGm3vnmGTKPHUBg18viNkIp6FYnDc0nZ1xTpAVeo9
-         kkEdXeYbyixK9jnQUHGEOOcUlB1h62mh+5pj79gGSjK8AamUIXxg66x+fTyEWD5gAvpw
-         0j+DO8gEIaBapQnapgBUEhl4ohYyzRb+jRywX1UO7PaEr+A6X6bgq3ewHOGbO/Cq9lxI
-         ozdQ==
-X-Gm-Message-State: AOJu0Yw2IaP5InTmaZHI9eh8zhVA1Nvv300TRqbSDL8HrHBSqPyqbpK8
-	BrbP6jUmpIk1/BUa3ffYhuawqFODrKKFBDYxkvfNF85Rzqyq5/ODvYfj
-X-Gm-Gg: ASbGncueDrJYUDh3b7jPv5NxAW263F8RgH3MSJboDpKxnP2Qaz7N4WIc+bza1QaUdGj
-	z2R4Mf4YNGeQPjKHmO+YRIxvy5nGERl2jPK+dQDNrY5ObppdOhHZtDMSVkJkBMJ6Rz7yk31nFkD
-	URO4gNww4b73vffUlE9j7u2Xa/4TbEynKloWUB7u5oM4VOlWpT+IvF20cTiO1PmHhiLlj5OJJJO
-	NLIyNIDsWnYkdm5rSULtrxtVUDRHnXk0U1bNwa6VkxSg1vv+6VS6LA5NE7mNBim4eW/CqR1FMF3
-	eBKkGm9TVaU+/SYRXHf0d+CC/BsouzgkAn9WmKu+wdDY7nkzmXRJK8Hr3j0MBXPkwzmvEyriiLD
-	BV1dBWDl93tQCdJ4wztkll10ffrEmB0VBfbhyJErWeQ==
-X-Google-Smtp-Source: AGHT+IFuKfX7/ZZVmvCxT5q69r5K5958LNTBo4BJneTc+LU73F5QtYlXnUH99ORNGxM9LdOlBjnCZw==
-X-Received: by 2002:a17:906:7313:b0:b40:8deb:9cbe with SMTP id a640c23a62f3a-b50aa793004mr810654666b.2.1760013772798;
-        Thu, 09 Oct 2025 05:42:52 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:71::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b55a8843fd6sm5490966b.74.2025.10.09.05.42.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Oct 2025 05:42:52 -0700 (PDT)
-Date: Thu, 9 Oct 2025 05:42:50 -0700
-From: Breno Leitao <leitao@debian.org>
-To: saeedm@nvidia.com, itayavr@nvidia.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	dcostantino@meta.com, kuba@kernel.org
-Subject: mlx5: CX7: fw_tracer: crash at mlx5_tracer_print_trace()
-Message-ID: <hanz6rzrb2bqbplryjrakvkbmv4y5jlmtthnvi3thg5slqvelp@t3s3erottr6s>
+	s=arc-20240116; t=1760014081; c=relaxed/simple;
+	bh=k8sU+bq8157+OitLUWgTfChNmvNmCTWggeAmvYB82tM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CStjdiWbeIXqZ738s7x5K6kGyDkijMyYrBnQMh7fZja4rNcND6+jKPLd5ZJVcWUDKKEINqi43NMPpJNNRST/5qtEC9KBzB8ekXaH8sh6vhGRlmN+GYVXg0Az8qjtOp8GDH0UhsPmwBPkL2tsWKs7Iu3LbTfhbpeiN1AWxyiuH6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dwqhE/sO; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=YUpyyd67HoUtnYCpJnUaGRmwxPERukwal2oCb7xHnok=; b=dwqhE/sOu2CR0t52IOWxlfY5hO
+	aSQsDujsiN6mqy2x9VjDDh6NR0dCySTEyHlfk3k0OHJKSJiH1vuDgPcZceFZ6LrrxQP8am2QBwurk
+	tdUZobfNJCcTMibhLmkTuahZEIEpJuPI+EJYF5yl9oiEMfSUUWFMjKRet3hdrOGrXlyk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v6q3l-00AWoZ-F0; Thu, 09 Oct 2025 14:47:53 +0200
+Date: Thu, 9 Oct 2025 14:47:53 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH 3/3] vhost: use checked versions of VIRTIO_BIT
+Message-ID: <d4fcd2d8-ac84-4d9f-a47a-fecc50e18e20@lunn.ch>
+References: <cover.1760008797.git.mst@redhat.com>
+ <6629538adfd821c8626ab8b9def49c23781e6775.1760008798.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,66 +62,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <6629538adfd821c8626ab8b9def49c23781e6775.1760008798.git.mst@redhat.com>
 
-Hello,
+On Thu, Oct 09, 2025 at 07:24:16AM -0400, Michael S. Tsirkin wrote:
+> This adds compile-time checked versions of VIRTIO_BIT that set bits in
+> low and high qword, respectively.  Will prevent confusion when people
+> set bits in the wrong qword.
+> 
+> Cc: "Paolo Abeni" <pabeni@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  drivers/vhost/net.c             | 4 ++--
+>  include/linux/virtio_features.h | 9 +++++++++
+>  2 files changed, 11 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 43d51fb1f8ea..8b98e1a8baaa 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -76,8 +76,8 @@ static const u64 vhost_net_features[VIRTIO_FEATURES_QWORDS] = {
+>  	(1ULL << VIRTIO_F_ACCESS_PLATFORM) |
+>  	(1ULL << VIRTIO_F_RING_RESET) |
+>  	(1ULL << VIRTIO_F_IN_ORDER),
+> -	VIRTIO_BIT(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
+> -	VIRTIO_BIT(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
+> +	VIRTIO_BIT_HI(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
+> +	VIRTIO_BIT_HI(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
 
-I am seeing a crash in some production host in function
-mlx5_tracer_print_trace() that sprintf a string (%s) pointing to value
-that doesn't seem to be addressable. I am seeing this on 6.13, but,
-looking at the upstream code, the function is the same.
+How any bits in vhost_net_features are currently in use? How likely is
+it to go from 2x 64bit words to 3x 64 bit words? Rather than _LO, _HI,
+would _1ST, _2ND be better leaving it open for _3RD?
 
-Unfortunately I am not able to reproduce this on upstream kernel easily.
-Host is running ConnectX-7.
+I would also be tempted to rename these macros to include _LO_ and
+_HI_ in them. VIRTIO_BIT_HI(VIRTIO_LO_F_IN_ORDER) is more likely to be
+spotted as wrong this way.
 
-Here is the quick stack of the problem:
+An alternative would be to convert to a linux bitmap, which is
+arbitrary length so you just use bit number and leave the
+implementation to map that to the correct offset in the underlying
+data structure.
 
-	Unable to handle kernel paging request at virtual address 00000000213afe58
-
-	#0  string_nocheck(buf=0xffff8002a11af909[vmap stack: 1315725 (kworker/u576:1) +0xf909], end=0xffff8002a11afae0[vmap stack: 1315725 (kworker/u576:1) +0xfae0], s=0x213afe59, len=0) (lib/vsprintf.c:646:12)
-	#1  string(end=0xffff8002a11afae0[vmap stack: 1315725 (kworker/u576:1) +0xfae0], s=0x213afe58) (lib/vsprintf.c:728:9)
-	#2  vsnprintf(buf=0xffff8002a11af8e0[vmap stack: 1315725 (kworker/u576:1) +0xf8e0], fmt=0xffff10006cd4950a, end=0xffff8002a11afae0[vmap stack: 1315725 (kworker/u576:1) +0xfae0], str=0xffff8002a11af909[vmap stack: 1315725 (kworker/u576:1) +0xf909], old_fmt=0xffff10006cd49508) (lib/vsprintf.c:2848:10)
-	#3  snprintf (lib/vsprintf.c:2983:6)
-
-Looking further, I found this code:
-
-        snprintf(tmp, sizeof(tmp), str_frmt->string,
-                 str_frmt->params[0],
-                 str_frmt->params[1],
-                 str_frmt->params[2],
-                 str_frmt->params[3],
-                 str_frmt->params[4],
-                 str_frmt->params[5],
-                 str_frmt->params[6]);
-
-
-and the str_frmt has the following content:
-
-	*(struct tracer_string_format *)0xffff100026547260 = {
-	.string = (char *)0xffff10006cd494df = "PCA 9655E init, failed to verify command %s, failed %d",
-	.params = (int [7]){ 557514328, 3 },
-	.num_of_params = (int)2,
-	.last_param_num = (int)2,
-	.event_id = (u8)3,
-	.tmsn = (u32)5201,
-	.hlist = (struct hlist_node){
-		.next = (struct hlist_node *)0xffff0009f63ce078,
-		.pprev = (struct hlist_node **)0xffff0004123ec8d8,
-	},
-	.list = (struct list_head){
-		.next = (struct list_head *)0xdead000000000100,
-		.prev = (struct list_head *)0xdead000000000122,
-	},
-	.timestamp = (u32)22,
-	.lost = (bool)0,
-	}
-
-
-My understanding that we are printf %s with params[0], which is 557514328 (aka
-0x213afe58). So, sprintf is trying to access the content of 0x213afe58, which
-is invalid, and crash.
-
-Is this a known issue?
-
-Thanks
---breno
+	Andrew
 
