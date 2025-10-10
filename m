@@ -1,231 +1,190 @@
-Return-Path: <netdev+bounces-228564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 105F4BCE3EE
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 20:29:44 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3383BCE425
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 20:34:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 856554031BF
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 18:28:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A5B724E5EC5
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 18:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAEC02FF151;
-	Fri, 10 Oct 2025 18:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8EB301022;
+	Fri, 10 Oct 2025 18:34:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z2jFgeA3"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ZaijfOck"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011071.outbound.protection.outlook.com [52.101.65.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E6D2FFDC0;
-	Fri, 10 Oct 2025 18:27:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760120855; cv=none; b=QsTTmC4kSpCYyNejb0sE5WATtvWD/7URMC6ji1BaGv3bU3Mi5z1INTcrH02z3oL1uUkws9ul5HSIUPJtyB4curK7rObTeiUPgx0P6eXIax8zV1r1/B3q7vxMGWKphfeqTUZOCSHp9O/FWkEZDL4fiCkbHcsbYkE4c6859421DRo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760120855; c=relaxed/simple;
-	bh=eLy5f8BYq1FZ75LlTMzJvXsfCy88if544RCMW6Jg9FM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=O7vgedinTj9JedMzX5H2MRnTmSNUQlKRnOGSvLa8fpC/g2OBjLfGVZfMQ54evZlzv1tNNRQyCFfN7T/TXE5TdNYG3FcZVHxUzkkmLIFoXHEGMQAXopk8J/deRPvY5gXWgycArGygRb/hNOQOvMC/LgIroDuN3kwbuo6ZaSiFgvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z2jFgeA3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D3E0C4CEF5;
-	Fri, 10 Oct 2025 18:27:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760120853;
-	bh=eLy5f8BYq1FZ75LlTMzJvXsfCy88if544RCMW6Jg9FM=;
-	h=From:Date:Subject:To:Cc:From;
-	b=Z2jFgeA3HOvCBv9HW0qSykSn5u+tXiXUOxQctdezWagjGCbHS5j+9vC8Cso8BGBAY
-	 i+A7R1yrViLxfBfYCyDRztU3Fw324cq94aBY3bI6lBuyDdSIw19Pz4IJn5js3SUlEx
-	 hztQJG2yEJIQIu1WqM+hcmoUvAfhYhrFoGtoc92HYsIO3UwIp+3JgQP4RO+Rpx9Vjp
-	 sp7J/c3v8hQsg5cYmUbq3dIGNEV1W/3INFAEL0VlOaKwDosNRLlPP04AB94mspPPAz
-	 vwnyMVV+p18peibko9X6g2ETn73yQvxpHKXQ9xj3x2FKgTlnFCaeRXDdSHTM7fQsZk
-	 yn1IyLL0lEQ1Q==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Fri, 10 Oct 2025 14:27:22 -0400
-Subject: [PATCH v5] sunrpc: allocate a separate bvec array for socket sends
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1EEE86323;
+	Fri, 10 Oct 2025 18:34:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760121281; cv=fail; b=k2XWyoQls424pNJ6HVbVFO5L9ZKB2a9JVixFnYZJIFC+r1lSzsbBaLkInzoaWAHagxgMZ63gxOsajuvOYBQQvndTV8LNWE6rrp9HC4dSgxdXmHeDdfG4UStg7Uu1Nl01irQMnwkOsft4l8vgbFgBTQIJYLb0r0nrP1x7hoE1LZo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760121281; c=relaxed/simple;
+	bh=OihoiuIIFvJkjTg6W5628oMDJJVbq/Faq1WMRo1LVVs=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=Mniz5fXvc8f3UbPb6rstxffFWrWH6VZuKTvEmlo5Ea9T4gOgn64bs8ULOGBQExwvjN6o+rMc6NXuv69ENcV+lbgdwi3iFvTSes36JwNHqKS++S9mO1bm/bBYCEnrTeJh1eQm5rYdO3+yizWGO9kWZYcy3NVQFMmLw6deBfdiKiE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ZaijfOck; arc=fail smtp.client-ip=52.101.65.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=czX+h00vRo2i/27qs0dxPAb2Xi2pNMt5YMBavZnEK6asCBFc31lKuGyJIaY6XBU74iUMm2fawNKNq/PSKVA+vH2Vq7JeMnhKo6yD8k/Uw99Cw1/r7yx/a28Zp2jGO2jtFAvaYqmdPPI75ud3wr4AbnX7gS17hr1RrHeZT6MNq7IAjeGM5Z9kVEssAOCfRBYA6sPvhPc0OJAARNDCT235f/irMGzPSvj4beQv7JnDZ9Z8fS1GXuJu95mT0ig2RxS8MqSjeMx0Vxb3duAHUa7LPCQkAWOEkfvKOwA6N9BW/tcQaAqwGqfcGeMJXkkcmdxpyF5fl0hoorzoGu7JZiPb6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YBnsojTAZqV77+BUyBvdXgACZNfirnrrn/SN6G+HdSI=;
+ b=sPspWJ66L9BOpj5lXGNQBzzuKgyKGIoeuZvCbNKiFJNo3R2BDciV64q0SqwioYn/ufq3MXtASKXA1BbLTJgAhDi1Nso3lUTuRW4vCNpJ4Nnnlv7Gu4W6nBRZHP6s7EqhsHy1p4jwEKQUeYEiOQPZY4laaN6gXckS5py+BcPJnmmpd6oDoYvjT3ZhLCe7Le5TvsRntwRANsJWJkWmd9XQ52dSXgeR7v8QOELpo9yjK4mvkR1kWtoKWtkhrdd3Yn4q+xb9EydUlKRxfEM3qoaSgR7gqnMXeq89QjeJoqRFFHtEP/ki3ZdkYLpCmz9W5f6oEtYlrNnMzJZcqmrH7idm9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YBnsojTAZqV77+BUyBvdXgACZNfirnrrn/SN6G+HdSI=;
+ b=ZaijfOckQuZ79uKiQ6a/HcKfjL3zWEyyFZdCI0XS/UyUYVLsacawDY29YYplBdQL0IoZ8qrnrx0mGiF3tTzZJi+8Sa5UCnkTBDoLlFOdaIb3xpPvPKpJgzXXP2E1gi2Cf6gDmYaBGs8ivBnG2eQ+RiHVMqlvwz5PvZQEKXB7X+1836jibVx4UK8FZ2x//KXmCgVz+FgBB8D3JC/lvBF7aZicg+rupPa4eu2LRjZF3aECwx4SpXmy9YPxOP3QphYNPZ7kExB+wGq2CfA41KQ9YvsJlsJo/r2UlvDTbqCujgOXSRcgjFC3ZNz/o8bOpAyh1jjouOgwICLr6Bo2/64t0Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXSPRMB0053.eurprd04.prod.outlook.com (2603:10a6:102:23f::21)
+ by VI1PR04MB6783.eurprd04.prod.outlook.com (2603:10a6:803:130::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9203.10; Fri, 10 Oct
+ 2025 18:34:36 +0000
+Received: from PAXSPRMB0053.eurprd04.prod.outlook.com
+ ([fe80::504f:2a06:4579:5f15]) by PAXSPRMB0053.eurprd04.prod.outlook.com
+ ([fe80::504f:2a06:4579:5f15%6]) with mapi id 15.20.9203.007; Fri, 10 Oct 2025
+ 18:34:36 +0000
+From: Frank Li <Frank.Li@nxp.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
+	linux-kernel@vger.kernel.org (open list)
+Cc: imx@lists.linux.dev
+Subject: [PATCH 1/1] dt-bindings: net: dsa: nxp,sja1105: Add optional clock
+Date: Fri, 10 Oct 2025 14:34:17 -0400
+Message-Id: <20251010183418.2179063-1-Frank.Li@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: PH7PR13CA0002.namprd13.prod.outlook.com
+ (2603:10b6:510:174::6) To PAXSPRMB0053.eurprd04.prod.outlook.com
+ (2603:10a6:102:23f::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251010-rq_bvec-v5-1-44976250199d@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAApQ6WgC/3XMQQ7CIBCF4asY1mKYQaB15T2MMQUGJZpWqSEa0
- 7uLblrTuHyT+f4X6ylF6tlm8WKJcuxj15ahlgvmTk17JB592QwFKhCi4ul2sJkct1o3wYvgrbW
- sfF8Thfj4lnb7sk+xv3fp+Q1n+FznjQxccBNQeoneKFLbM6WWLqsuHdknkvEPxAIrlE40lWrQu
- BmUU1iPUBaoDFQgtbC1szO4nkAQI1xz4BqN0iaAoxp+4DAMbw0sK5BKAQAA
-X-Change-ID: 20251008-rq_bvec-b66afd0fdbbb
-To: Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
- Tom Talpey <tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, 
- Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- David Howells <dhowells@redhat.com>
-Cc: Brandon Adams <brandona@meta.com>, linux-nfs@vger.kernel.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5335; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=eLy5f8BYq1FZ75LlTMzJvXsfCy88if544RCMW6Jg9FM=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBo6VAPtUGvoIwWqqz/lc5Ho7U9WvDl3ATC9mU2v
- a2ELpDKYGGJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaOlQDwAKCRAADmhBGVaC
- Ff4oD/0S5lUBbOdg04YMWA9mXPWwc1H071gKHk//J9K9bFDXtpPt6gaGqwyS4eCs6XoURn/VX5T
- AntwsbiBmm5WFbstLEhvRiHVTaLQrhDQ0ojN4AlOjOj2OA/nft8ZFxBdSJJXKV14cI/w4IMuLTH
- VQp4WnMpNVgb2nLpvTE8D1q2tlHghhj9xdcouhytxjkALj1uBvbiECnXbR6rBI81aS6SVUTaNZA
- gRY6/uOMFb6brNKovczfOTlRUFGOPoX77J7QvIoZo9N6o/SWb0nInbPE4uyMCLUOKx4bBcpy4lw
- fZTIym6TnDPVravIv1OIgLa7OBEjDBR0N36NiEKjBE+dT1LtV7cN2FMInU3olVkTzCDc523E9Z5
- +7V9bWBwPAQez7kqDOreJVnZiota0Eyg56LxbJkJKI4ptsLy97fvpuQN+QhYJLOotzkBYLOnneR
- Yg56qonIq7ffIxUXa8FxBbHCaWv8VsJgVGRYarqSklNUaLSd/g8qExL52Sh9M+ECglaJ2aw1URi
- UJT3EmR7WsnooAjHKN8E9XCIjPeZrap+nYqUiehJtWT4CbJOke35bOlx0iavEas+PHq0Gcv+QrF
- +AOI96dJO/bDOK7D23K3huuVnkFS3NqvsracLnfSvbyBR0znsCliRFDoRqPhOmsygx2c+32UOcq
- G70fwp3kxPk9wyg==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXSPRMB0053:EE_|VI1PR04MB6783:EE_
+X-MS-Office365-Filtering-Correlation-Id: f289a165-331f-4bc6-8ad2-08de082ba9d7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|52116014|366016|1800799024|19092799006|921020|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ZH/gCnKhyyfFtrndCXWYKisaOrJnMdZKtIrG9HwDsjSg59ayEqKxHhwS0Btu?=
+ =?us-ascii?Q?5yLLLP+Hw4tnA1aCSQNZQrq8AI8qA5iouJ0rgCnEfhLKsSBkb3f8q3ZG/mpx?=
+ =?us-ascii?Q?2l/rKERtHAaMnSDkRvWLvHbb8H9QWU+lK2pe44hQiRPjrBnKuratCMtOz7g5?=
+ =?us-ascii?Q?PcTWhc1G4Dt1OYzDAmAJOCePw+Ha1wiRVXk8/+oA8vemKlkGAG0YW+J3c4Jq?=
+ =?us-ascii?Q?sBotD9I2uguaErYw8k+ymG9RU3ap9MYDxNecNSvMWTNxHqwI1kqt61uUp0g6?=
+ =?us-ascii?Q?IrxnDJf2yYwzuGnWoiYA35W4/ivs0xlb9lJ5CQLXgKjKDizWj+4wn0FYxgll?=
+ =?us-ascii?Q?4kxwHOyAxb5i/hyGFL/wbqW1mGHv5TUbuUmjG+nB/01EbGvyxHaPM5RhmhaP?=
+ =?us-ascii?Q?7lcXUpqkfiJSP/9uHbPeGHP2uC7KDqP7I5S93f8/V/jBTJuxlc9vh7QuHj27?=
+ =?us-ascii?Q?iTSOmS0fz2BPktmG4aBHrCd7bnG7Fhx9YoP9qEm7zUc3mOajGWFR4YREGkaV?=
+ =?us-ascii?Q?5d3wSxbmMoUcnmVi1dGWSNi6gttyXw7XJfGpeJpMr5xpntTU1Asp5ftZCBp2?=
+ =?us-ascii?Q?4o+yFzAAGIrdaM1Gf9C29aDkk2/EoRdbTQKTzdl6LGfHIc5pbcq2flXk52GJ?=
+ =?us-ascii?Q?WjRRjxRoVSDK0qTzhqj67EskBaol9UVmGxvpPZ7yi3DQJh4fmyJPlE1Jdf2E?=
+ =?us-ascii?Q?Z3DuS+wPZVCmvk7sObWzKEtjnhUyefr6kQOyMZKJVW8IgJOeGFMnqmPDNLy1?=
+ =?us-ascii?Q?Pc3iDQq/dgXToTOE5d30dkGhwsUVVwxctVoiZitzwZ/K0Bj3WZqZ5Hr18uTh?=
+ =?us-ascii?Q?ofDldwpOuSPsqxn855dTfSTUJ8PszOMTFQbdIv67uVmqLo68xjN70R4PWOPv?=
+ =?us-ascii?Q?NjZqxD+ZKLPkEiyl/2eujOqA1ymUD7Mf1cNrFlAhAhNKqmlWdIfTnxIp4SNg?=
+ =?us-ascii?Q?V09RRSKVpG73DdnI9QJAEJe4q7zj4WdX2JjG65dsVIds1wCdRXRWyUZ8HQNc?=
+ =?us-ascii?Q?JeGwf5tVuAYDFGQ/vn8TBxh6B3hR03wKuZlv3QVjrKbauvugFPlxI0DkCGwL?=
+ =?us-ascii?Q?G1Gc9XM9ETQ6j+19KoYHxb6/gFEuz33ceokca1jfD85BWqFXDRlAzNB5Y1G8?=
+ =?us-ascii?Q?7AKIZZQfgmABa4jl3sZyvHJ3bdCNUshD5WEjPzf7NVlKZojKW9CrK4HKjWqZ?=
+ =?us-ascii?Q?gVl2xpZHJAsJwqip9odEmijB3z5tmmYoDjRlFsvNNT9/28aQ6QRea1J+Uuq/?=
+ =?us-ascii?Q?77m5Rzwx8HKPZuaViK21BU1/yYLgFmc9wy3h6zCVvX9LGMO9Hp4/tmwzZdRl?=
+ =?us-ascii?Q?EdXHaZO/Jc5FP7ZE/xSbnvWN6sY9jEuKhTXqQN3yr+xeQRqFO0Npx+Zh0rE7?=
+ =?us-ascii?Q?Dadh8O9sMveYl7tEDDEke8SMNqN0MEtYybQldpraVVL77xbLjqdKpOnBMWsv?=
+ =?us-ascii?Q?jWgW3iP4nAsoQqcc8Q3TWyCVSgvDA9e4v9D7/a/DQABZrRJjBW+PrYNQE1lU?=
+ =?us-ascii?Q?RooFERq806Lv/sEAI/bRTQQHbsCZ0UAZefXHkLm6sV5tzx/LSGTAMZgBiA?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXSPRMB0053.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(52116014)(366016)(1800799024)(19092799006)(921020)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?O8NdcQlySCqMaIrIn9uKrXt5flyP+bjFYLd0w8FCc/uhe7RB7qqajqCP4sH2?=
+ =?us-ascii?Q?zp9X4Bae/Odg88BUsmgU2XHyfQDY6HgyAOSsuLDVB8bL72HtWukcHLyz/plJ?=
+ =?us-ascii?Q?4lcr9DqGw4i/4/tG9PuOrf/DdzCKvgog/yDzXYAHuF0f1WHqvC2GaqDoOpd/?=
+ =?us-ascii?Q?7Tbxep6mBHJrPJWV9UiW231zzM/Ig3XESjyDmgKMF0FQqo0WZf4DleDp1sA9?=
+ =?us-ascii?Q?meCg26ROpXiPiy0LY2zBwcIlt/KTJXFM0Yrkes6qG5XkaXUtL4zafvn5xJr1?=
+ =?us-ascii?Q?iN00d9n98fSifKwy2NegSG94I/W0pwxo2y7BtK/izAdEkWfJO8I5KLMKlEfB?=
+ =?us-ascii?Q?BlhFl3vWNc8cPoA+GIbuTZEXWe6CIEF5IEvzGutDamQ49sL0VYmQ172S71pJ?=
+ =?us-ascii?Q?ltYLCT0rwJt56+KqyqpqEqT0mPdJOqE+eDeYw8wdouMDS+DlX67Pvd1HC8+F?=
+ =?us-ascii?Q?ewDHBWjEWYAH1WkvsDW19LE+0HOcWeb6I56bTpzk1XeWdSlYSY7Z0BYtTgbE?=
+ =?us-ascii?Q?b6cCPg9CUhCiIxISKRmsmZRN8cdiNTiiPcnPlV4pMgWLlHKvmkF1+izDdkNP?=
+ =?us-ascii?Q?cz8c677tiz96DA5rc4Wsw63qvpDX76fkEy80M1k3nbzkalCyQ9elaQhj4B1B?=
+ =?us-ascii?Q?vQk/ruzDMb8GXcMlh/caWinZO45nQX29IsO0bVtgz9sIkskgik9gSghRxwxK?=
+ =?us-ascii?Q?m3n4NrT4x/FCq3eRJH9tW9o7XTe1X8tyMeLJ/zKVEUTF6nBXmTSxRfqHgJ+1?=
+ =?us-ascii?Q?aFmkM01X/bJkRZbF/8764sPYW1Vxyow2Dv2EJTkbmrJpSlwUyt6lBBvor2rf?=
+ =?us-ascii?Q?yT25+2j0EefBqwm6kbkafoOZKlCm1fy2Bbvy0CGWijDROYsX2C/IWXDtV89Z?=
+ =?us-ascii?Q?2KenzN9a1YNbxqAv5WiU4QW7+m3TxmAYW7Yz25XGsAORCp+mNHIiQzzTX8gr?=
+ =?us-ascii?Q?dno5eGvu02/uR5uygK6+hwMEirE4BLTsrO140xii/qtTS2nRbkcd28hPmj/t?=
+ =?us-ascii?Q?hEj8bLKAIkO6nt0EnuK8RdcJ9kk5Ge4uifaBYP6uOvbt8KKHGjH8Fh4MauKB?=
+ =?us-ascii?Q?UcHJCdtIe73DZiQZppi0hmfgmfSkRCC3tf1/Wt1VuSlSCKHeJes175AYqE4y?=
+ =?us-ascii?Q?TI86h0HBgtfDzWvlnsDhsqKzO0I0Cc6DFlyRmirOvqGYUwUvg3FCIKUsIuzs?=
+ =?us-ascii?Q?AV9cJ9hstudMcv8OY7MNZebNFtvPglirvRScuezNEwP87YmPNH6VMGk4TNoK?=
+ =?us-ascii?Q?C9V+6LEZ3iiz20HU5IMPZFE9qQvqCw0vgEyPTaUD5GohYu14HxDx36OWBCi/?=
+ =?us-ascii?Q?jc17zJk5NI/gCYyLzFWbI9qXBiFY1CUJmV/M0HWlZlOG8BIwXppg85kDmtM0?=
+ =?us-ascii?Q?7eItcDwBT18fxq/IwMFbTsYRve3XLV3JuaeSg0cMQAdNKiOyG8f2BbBb0Zc2?=
+ =?us-ascii?Q?xT91rmzqPC8OSt4DV1dB6UhbL5B7ron8NAa+hLOieVlXeeRpObig+pf6CO1D?=
+ =?us-ascii?Q?vbgxDtp7ki8Yc8SbJzC9nzhr8zcm7fZpDiz3r/23yCixewvI7jPzt7TcIWlO?=
+ =?us-ascii?Q?ZLNVv2y4URU/k4q/IFEg+FEsL0xEzqpAxzg/fya0?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f289a165-331f-4bc6-8ad2-08de082ba9d7
+X-MS-Exchange-CrossTenant-AuthSource: PAXSPRMB0053.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2025 18:34:36.3314
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AKTK8f1MZ8p/1QTNWoxybRXZJaLjeUJcGRTuM/XBH+GShD1h+mY63EE8PaMulfaeTtQnmL02j04Ej8+ZTfQTqQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6783
 
-svc_tcp_sendmsg() calls xdr_buf_to_bvec() with the second slot of
-rq_bvec as the start, but doesn't reduce the array length by one, which
-could lead to an array overrun. Also, rq_bvec is always rq_maxpages in
-length, which can be too short in some cases, since the TCP record
-marker consumes a slot.
+Add optional clock for OSC_IN and fix the below CHECK_DTBS warnings:
+  arch/arm/boot/dts/nxp/imx/imx6qp-prtwd3.dtb: switch@0 (nxp,sja1105q): Unevaluated properties are not allowed ('clocks' was unexpected)
 
-Fix both problems by adding a separate bvec array to the svc_sock that
-is specifically for sending. Allocate it when doing the first send on
-the socket, to avoid allocating the array for listener sockets.
-
-For TCP, make this array one slot longer than rq_maxpages, to account
-for the record marker. For UDP only allocate as large an array as we
-need since frames are limited to 64k anyway.
-
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
+Signed-off-by: Frank Li <Frank.Li@nxp.com>
 ---
-Minor update to the last patch to reduce the size of the array on UDP
-sockets since that transport doesn't need rq_maxpages.
----
-Changes in v5:
-- reduce the size of sk_bvec on UDP sockets
-- Link to v4: https://lore.kernel.org/r/20251010-rq_bvec-v4-1-627567f1ce91@kernel.org
+ Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Changes in v4:
-- switch to allocating a separate bvec for sends in the svc_sock
-- Link to v3: https://lore.kernel.org/r/20251009-rq_bvec-v3-0-57181360b9cb@kernel.org
-
-Changes in v3:
-- Add rq_bvec_len field and use it in appropriate places
-- Link to v2: https://lore.kernel.org/r/20251008-rq_bvec-v2-0-823c0a85a27c@kernel.org
-
-Changes in v2:
-- Better changelog message for patch #2
-- Link to v1: https://lore.kernel.org/r/20251008-rq_bvec-v1-0-7f23d32d75e5@kernel.org
----
- include/linux/sunrpc/svcsock.h |  3 +++
- net/sunrpc/svcsock.c           | 29 ++++++++++++++++++++++-------
- 2 files changed, 25 insertions(+), 7 deletions(-)
-
-diff --git a/include/linux/sunrpc/svcsock.h b/include/linux/sunrpc/svcsock.h
-index 963bbe251e52109a902f6b9097b6e9c3c23b1fd8..a80a05aba75410b3c4cd7ba19181ead7d40e1fdf 100644
---- a/include/linux/sunrpc/svcsock.h
-+++ b/include/linux/sunrpc/svcsock.h
-@@ -26,6 +26,9 @@ struct svc_sock {
- 	void			(*sk_odata)(struct sock *);
- 	void			(*sk_owspace)(struct sock *);
+diff --git a/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml b/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
+index e9dd914b0734c..607b7fe8d28ee 100644
+--- a/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
+@@ -41,6 +41,9 @@ properties:
+       therefore discouraged.
+     maxItems: 1
  
-+	/* For sends */
-+	struct bio_vec		*sk_bvec;
++  clocks:
++    maxItems: 1
 +
- 	/* private TCP part */
- 	/* On-the-wire fragment header: */
- 	__be32			sk_marker;
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 7b90abc5cf0ee1520796b2f38fcb977417009830..0ec1131ffade8d0c66099bfb1fb141b22c6e411b 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -730,6 +730,13 @@ static int svc_udp_sendto(struct svc_rqst *rqstp)
- 	unsigned int count;
- 	int err;
+   spi-cpha: true
+   spi-cpol: true
  
-+	count = DIV_ROUND_UP(RPC_MAX_REPHEADER_WITH_AUTH + RPCSVC_MAXPAYLOAD_UDP, PAGE_SIZE);
-+	if (!svsk->sk_bvec) {
-+		svsk->sk_bvec = kcalloc(count, sizeof(*svsk->sk_bvec), GFP_KERNEL);
-+		if (!svsk->sk_bvec)
-+			return -ENOMEM;
-+	}
-+
- 	svc_udp_release_ctxt(xprt, rqstp->rq_xprt_ctxt);
- 	rqstp->rq_xprt_ctxt = NULL;
- 
-@@ -740,14 +747,14 @@ static int svc_udp_sendto(struct svc_rqst *rqstp)
- 	if (svc_xprt_is_dead(xprt))
- 		goto out_notconn;
- 
--	count = xdr_buf_to_bvec(rqstp->rq_bvec, rqstp->rq_maxpages, xdr);
-+	count = xdr_buf_to_bvec(svsk->sk_bvec, rqstp->rq_maxpages, xdr);
- 
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
-+	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, svsk->sk_bvec,
- 		      count, rqstp->rq_res.len);
- 	err = sock_sendmsg(svsk->sk_sock, &msg);
- 	if (err == -ECONNREFUSED) {
- 		/* ICMP error on earlier request. */
--		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
-+		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, svsk->sk_bvec,
- 			      count, rqstp->rq_res.len);
- 		err = sock_sendmsg(svsk->sk_sock, &msg);
- 	}
-@@ -1235,19 +1242,19 @@ static int svc_tcp_sendmsg(struct svc_sock *svsk, struct svc_rqst *rqstp,
- 	int ret;
- 
- 	/* The stream record marker is copied into a temporary page
--	 * fragment buffer so that it can be included in rq_bvec.
-+	 * fragment buffer so that it can be included in sk_bvec.
- 	 */
- 	buf = page_frag_alloc(&svsk->sk_frag_cache, sizeof(marker),
- 			      GFP_KERNEL);
- 	if (!buf)
- 		return -ENOMEM;
- 	memcpy(buf, &marker, sizeof(marker));
--	bvec_set_virt(rqstp->rq_bvec, buf, sizeof(marker));
-+	bvec_set_virt(svsk->sk_bvec, buf, sizeof(marker));
- 
--	count = xdr_buf_to_bvec(rqstp->rq_bvec + 1, rqstp->rq_maxpages,
-+	count = xdr_buf_to_bvec(svsk->sk_bvec + 1, rqstp->rq_maxpages,
- 				&rqstp->rq_res);
- 
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
-+	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, svsk->sk_bvec,
- 		      1 + count, sizeof(marker) + rqstp->rq_res.len);
- 	ret = sock_sendmsg(svsk->sk_sock, &msg);
- 	page_frag_free(buf);
-@@ -1272,6 +1279,13 @@ static int svc_tcp_sendto(struct svc_rqst *rqstp)
- 					 (u32)xdr->len);
- 	int sent;
- 
-+	if (!svsk->sk_bvec) {
-+		/* +1 for TCP record marker */
-+		svsk->sk_bvec = kcalloc(rqstp->rq_maxpages + 1, sizeof(*svsk->sk_bvec), GFP_KERNEL);
-+		if (!svsk->sk_bvec)
-+			return -ENOMEM;
-+	}
-+
- 	svc_tcp_release_ctxt(xprt, rqstp->rq_xprt_ctxt);
- 	rqstp->rq_xprt_ctxt = NULL;
- 
-@@ -1636,5 +1650,6 @@ static void svc_sock_free(struct svc_xprt *xprt)
- 		sock_release(sock);
- 
- 	page_frag_cache_drain(&svsk->sk_frag_cache);
-+	kfree(svsk->sk_bvec);
- 	kfree(svsk);
- }
-
----
-base-commit: 177818f176ef904fb18d237d1dbba00c2643aaf2
-change-id: 20251008-rq_bvec-b66afd0fdbbb
-
-Best regards,
 -- 
-Jeff Layton <jlayton@kernel.org>
+2.34.1
 
 
