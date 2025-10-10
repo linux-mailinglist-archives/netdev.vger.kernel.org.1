@@ -1,643 +1,574 @@
-Return-Path: <netdev+bounces-228545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AA95BCDDC1
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 17:48:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C55A6BCDE9A
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 18:00:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4C9D25400B9
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 15:46:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8126340048C
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 15:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535A1258ECB;
-	Fri, 10 Oct 2025 15:46:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F2326CE34;
+	Fri, 10 Oct 2025 15:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i52ha4N3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iTq21gdp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6009426A09B
-	for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 15:46:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD2125CC7A;
+	Fri, 10 Oct 2025 15:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760111195; cv=none; b=nte4luDGnAsjr3MWTHR0iwCZxOHXL9I2vDsvxzV/kVgUkLul9odVuJKCodJcBRk6+eWzsDYQVqDgjHEa4bEuB37qqV62LAVALBbef/5Gl5TUDCm6saDtyEZb5C2SJ4fU3JrcwyCHYMjRF4gIJ1a/t2KqmektrhoL65aAHlJSSfg=
+	t=1760111832; cv=none; b=YAVQToQcihf7JY1mLlzAfVfhUFojx222VTnE5qoG6zCV9nKsY/E7eToGCevJw5P0zchVf4aNxbIlwM0VdyoRCliy5ksu3D2nLXWmkJDmgjrcFyiTnv58No9S5SIi5Nv62gzCOsEf0aDsMW7BR8sxlI6heNjAnA0ELeWU+3e6IJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760111195; c=relaxed/simple;
-	bh=hajIfUOUzPfAHK2EIpCpgcyFok7KAfChCEPCI2ylAQg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i1MFuFhgjr9ckMcPdXqeyhgwKjXRHPDuANgwe8nrAXTfRaPyrA1mRl3EvMsBfShQBVQlr8XTF+Gd6En12Hbgrs6il4UzX8GnXD+CQFHpQTZqFCK6hW5JF5PH8jg0f1BQPW7nf0YBR20vn/nEchjQXGKYxTpXpCWLLOWoXSLBSYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i52ha4N3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760111191;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9V7bwRJaBRyjNUiGCasrfxXLju9MnCe0DWYFeLYZuSw=;
-	b=i52ha4N3ro8YTUrUUirYugS7PGAgiGnsRMbYBtzD67huPYdStn7tHZyKlrfc/nUxchqfD7
-	wwXSgNw035UD+m02qapVxEErz3w2VJvztN5lcYIMR1NjtQvXUEy7XwRwNRS/MdLZkVxbUh
-	HZ//uUJH3EwtflgbkgZIGtmyNzauWaI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-113-yOAjtdguOHWyK0_ugjXIWw-1; Fri, 10 Oct 2025 11:46:30 -0400
-X-MC-Unique: yOAjtdguOHWyK0_ugjXIWw-1
-X-Mimecast-MFC-AGG-ID: yOAjtdguOHWyK0_ugjXIWw_1760111189
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-46e4d34ff05so11997175e9.2
-        for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 08:46:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760111189; x=1760715989;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9V7bwRJaBRyjNUiGCasrfxXLju9MnCe0DWYFeLYZuSw=;
-        b=jFNpKXdLVq0nz6bAL+xJM2tqyAVAANPRV46BClH/0Z/0ho/KQsKx+L0zby3ahP1K74
-         G49aegLNw0WUNtVVwTha4Lm2+FcN/8CW6WBk965EbcBepcPoOL2a+LcZU52b64lb03ir
-         pEKNn5lMyPWalSOwzsTBG7woa6HwjqYJV+jycbtoHWbk0HbAn7/1zWem9jy4Qli6nxEt
-         X9OQm+0zLjXTj1n9oHT2DdE0eHqM1yKB1m98epDWPSfTszehT4L5IMvzUI/hpAlnDFDr
-         A0GIJLY+KfEEhPFJbFeSpaz9ZHG4t7Lq4JncXCQmmDptflH0kv8SguBGV0oOOGnCApKM
-         mteQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUtGxMUuUuZrpbI/zNSL1LqvoIMAmiYfrkJ/CXbTRschg8Wa9+iKSC3WFlQL9/we897j/qTH30=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAtwe+hVH6D8LC9utVr4Gz5rfzRtNpmR+k8+XKYOtBHA7YKuLB
-	2B3w4waHAbcl7Os1vApIzXDI7nXWU/h9yqSOA6vTYFN9GxCNAdVrRgjv9tfZNa83nEWzrvwD9Ue
-	6nSroZnejhK1cRTyhpQZ4VDQ+djnY7W/l0UPvFs9KsSgqLVbxL+1An92ILg==
-X-Gm-Gg: ASbGncunujaN70HbsuwnZ7B58/qtvdhqtxthpBDEAdEISSFQS54m0qpgO12cXjfRGPL
-	0R5U4BYpsQW3K0A984A8Roa26FEC8cOqJa2bi55TxEi3VSAdihoPdxdPpSIBG+Qw5BTFzpnQN+d
-	iXlVtHwhvupgwDWPOUYZYZLt4+N2LyO5E7Ws3NtBs5SzQOFPaiUwMj6H7M+y98KT6K27vn+a68n
-	EgcuuyEFUK90mWrmF7UlQgQMS9ioPIN0EaPZmnV9vPgU60dVdQPk8/wkSKq8xG1gefm7D3vblaO
-	RNh0A+koJ3RaiBJ9emzL7UogTnrEEMZguQ==
-X-Received: by 2002:a05:600c:a402:b0:46f:b43a:aef4 with SMTP id 5b1f17b1804b1-46fb43aaf69mr25615555e9.38.1760111188495;
-        Fri, 10 Oct 2025 08:46:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGC+I/iL9xbgVtNIWJDajej78nWFVFkWjxzbdVkeG1BaG4DCKNw2ztSDWY8/FJu9/nVy0YTfw==
-X-Received: by 2002:a05:600c:a402:b0:46f:b43a:aef4 with SMTP id 5b1f17b1804b1-46fb43aaf69mr25615225e9.38.1760111187918;
-        Fri, 10 Oct 2025 08:46:27 -0700 (PDT)
-Received: from fedora ([2a01:e0a:257:8c60:80f1:cdf8:48d0:b0a1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fab3cc939sm63563715e9.1.2025.10.10.08.46.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Oct 2025 08:46:27 -0700 (PDT)
-Date: Fri, 10 Oct 2025 17:46:25 +0200
-From: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
-To: Francesco Valla <francesco@valla.it>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>,
-	Harald Mommer <harald.mommer@opensynergy.com>,
-	Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Damir Shaikhutdinov <Damir.Shaikhutdinov@opensynergy.com>,
-	linux-kernel@vger.kernel.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	development@redaril.me
-Subject: Re: [PATCH v5] can: virtio: Initial virtio CAN driver.
-Message-ID: <aOkqUWxiRDlm0Jzi@fedora>
-References: <20240108131039.2234044-1-Mikhail.Golubev-Ciuchea@opensynergy.com>
- <2243144.yiUUSuA9gR@fedora.fritz.box>
+	s=arc-20240116; t=1760111832; c=relaxed/simple;
+	bh=wrJrufHcWkFqnCsQZivjnBZTaG+98pUR1JJIonZfJf4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=JUxFf0IJcd7WrbIdaZ4aoanEIJYDr6X8cw16UFoVtiJgva540e9gOXMnmmrS2b5shThFHlBVm5aW4DoE/5DDd23jZrHHS1aTQwChDCKFvLiw72iSgoSbAFOrIs6K3ebS3FRazxu+Vg9O1GJBiEk0zxZtT0mjGyoz5sFXY9UYgt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iTq21gdp; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760111829; x=1791647829;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=wrJrufHcWkFqnCsQZivjnBZTaG+98pUR1JJIonZfJf4=;
+  b=iTq21gdp2T9cjQPWFGVqUNmcVFn9X0ec3T7n+kx7Q7S7w3wvweaJ/61j
+   NNor42dgCWPQtEz2t0IPQ4rPyhQ3MmS6mNNHSNm3k6QFIjIobCL5gkwaZ
+   QJdgV4Tw5mfGmh2WVNUcGST2jWijIYATWqWJjihTu0XIV/uzpl0bVresC
+   FRqblV/7mXWCrN/V+oOfPQNH9kCaJ3QPpOJXPWoRVwYyqBoqPnZRxKBLf
+   8SK2XpaZ1gNj7uc0EU4vvXKLSGUQAhv3QSayLqBHUaNunxO9s3RpuEExa
+   dJCbatnTvnlQ3USK9f2BfxsgcEm+j5ctLTReMDpu/1GYA++Qp59ktSYgs
+   Q==;
+X-CSE-ConnectionGUID: Z2xy0R6xQPOMbIj/nFl2yw==
+X-CSE-MsgGUID: eAQpWyCLQ3aX6xTYj9d5Bw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="62276886"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="62276886"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2025 08:57:09 -0700
+X-CSE-ConnectionGUID: 73A3lnP8SoWDVqTiHAoymQ==
+X-CSE-MsgGUID: W8tmQ2ekSAeuNsRE+DZPEA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,219,1754982000"; 
+   d="scan'208";a="218105810"
+Received: from aschofie-mobl2.amr.corp.intel.com (HELO [10.125.111.66]) ([10.125.111.66])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2025 08:57:08 -0700
+Message-ID: <b8617b43-53e1-46ac-bf61-1a04ae8d5397@intel.com>
+Date: Fri, 10 Oct 2025 08:57:07 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2243144.yiUUSuA9gR@fedora.fritz.box>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 00/22] Type2 device basic support
+To: Alejandro Lucero Palau <alucerop@amd.com>,
+ alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+References: <20251006100130.2623388-1-alejandro.lucero-palau@amd.com>
+ <ecef9be4-79cc-4951-bbc4-807869ba1fd5@intel.com>
+ <0b41e061-53e1-49ef-9f24-01e01143b709@amd.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <0b41e061-53e1-49ef-9f24-01e01143b709@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 11, 2025 at 10:59:40PM +0200, Francesco Valla wrote:
-> Hello Mikhail, Harald,
-> 
-> hoping there will be a v6 of this patch soon, a few comments:
-> 
 
-I am working on the v6 by addressing the comments in this thread.
 
-> On Monday, 8 January 2024 at 14:10:35 Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com> wrote:
+On 10/10/25 3:39 AM, Alejandro Lucero Palau wrote:
+> Hi Dave,
 > 
-> [...]
+> On 10/8/25 00:41, Dave Jiang wrote:
+>> CAUTION: This message has originated from an External Source. Please use proper judgment and caution when opening attachments, clicking links, or responding to this email.
+>>
+>>
+>> On 10/6/25 3:01 AM, alejandro.lucero-palau@amd.com wrote:
+>>> From: Alejandro Lucero <alucerop@amd.com>
+>>>
+>>> The patchset should be applied on the described base commit then applying
+>>> Terry's v11 about CXL error handling. The first 3 patches come from Dan's
+>>> for-6.18/cxl-probe-order branch.
+>> I Alejandro, I can't seem to apply with this instruction:
+>>
+>> ✔ ~/git/kernel-review [review L|…9]
+>> 16:35 $ git reset --hard f11a5f89910a7ae970fbce4fdc02d86a8ba8570f
+>> HEAD is now at f11a5f89910a Documentation/ABI/testing/debugfs-cxl: Add 'cxl' to clear_poison path
+>> ✔ ~/git/kernel-review [review L|…9]
+>> 16:35 $ b4 shazam https://lore.kernel.org/linux-cxl/20251006100130.2623388-1-alejandro.lucero-palau@amd.com/T/#m712c7d01ffc7350d9ef638b932b9693a96fe47a9
+>> Grabbing thread from lore.kernel.org/all/20251006100130.2623388-1-alejandro.lucero-palau@amd.com/t.mbox.gz
+>> Checking for newer revisions
+>> Grabbing search results from lore.kernel.org
+>> Analyzing 33 messages in the thread
+>> Analyzing 620 code-review messages
+>> Checking attestation on all messages, may take a moment...
+>> ---
+>>    ✓ [PATCH v19 1/22] cxl/mem: Arrange for always-synchronous memdev attach
+>>    ✓ [PATCH v19 2/22] cxl/port: Arrange for always synchronous endpoint attach
+>>    ✓ [PATCH v19 3/22] cxl/mem: Introduce a memdev creation ->probe() operation
+>>    ✓ [PATCH v19 4/22] cxl: Add type2 device basic support
+>>    ✓ [PATCH v19 5/22] sfc: add cxl support
+>>    ✓ [PATCH v19 6/22] cxl: Move pci generic code
+>>    ✓ [PATCH v19 7/22] cxl: allow Type2 drivers to map cxl component regs
+>>    ✓ [PATCH v19 8/22] cxl: Support dpa initialization without a mailbox
+>>    ✓ [PATCH v19 9/22] cxl: Prepare memdev creation for type2
+>>    ✓ [PATCH v19 10/22] sfc: create type2 cxl memdev
+>>    ✓ [PATCH v19 11/22] cxl: Define a driver interface for HPA free space enumeration
+>>    ✓ [PATCH v19 12/22] sfc: get root decoder
+>>    ✓ [PATCH v19 13/22] cxl: Define a driver interface for DPA allocation
+>>      + Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+>>    ✓ [PATCH v19 14/22] sfc: get endpoint decoder
+>>    ✓ [PATCH v19 15/22] cxl: Make region type based on endpoint type
+>>      + Reviewed-by: Davidlohr Bueso <dave@stgolabs.net> (✓ DKIM/stgolabs.net)
+>>    ✓ [PATCH v19 16/22] cxl/region: Factor out interleave ways setup
+>>    ✓ [PATCH v19 17/22] cxl/region: Factor out interleave granularity setup
+>>    ✓ [PATCH v19 18/22] cxl: Allow region creation by type2 drivers
+>>    ✓ [PATCH v19 19/22] cxl: Avoid dax creation for accelerators
+>>    ✓ [PATCH v19 20/22] sfc: create cxl region
+>>    ✓ [PATCH v19 21/22] cxl: Add function for obtaining region range
+>>    ✓ [PATCH v19 22/22] sfc: support pio mapping based on cxl
+>>    ---
+>>    ✓ Signed: DKIM/amd.com
+>>    ---
+>>    NOTE: install patatt for end-to-end signature verification
+>> ---
+>> Total patches: 22
+>> ---
+>>   Deps: looking for dependencies matching 23 patch-ids
+>>   Deps: Applying prerequisite patch: [PATCH v11 01/23] cxl: Remove ifdef blocks of CONFIG_PCIEAER_CXL from core/pci.c
+>>   Deps: Applying prerequisite patch: [PATCH v11 02/23] CXL/AER: Remove CONFIG_PCIEAER_CXL and replace with CONFIG_CXL_RAS
+>>   Deps: Applying prerequisite patch: [PATCH v11 03/23] cxl/pci: Remove unnecessary CXL Endpoint handling helper functions
+>>   Deps: Applying prerequisite patch: [PATCH v11 04/23] cxl/pci: Remove unnecessary CXL RCH handling helper functions
+>>   Deps: Applying prerequisite patch: [PATCH v11 05/23] cxl: Move CXL driver RCH error handling into CONFIG_CXL_RCH_RAS conditional block
+>>   Deps: Applying prerequisite patch: [PATCH v11 06/23] CXL/AER: Introduce rch_aer.c into AER driver for handling CXL RCH errors
+>>   Deps: Applying prerequisite patch: [PATCH v11 08/23] PCI/CXL: Introduce pcie_is_cxl()
+>>   Deps: Applying prerequisite patch: [PATCH v11 09/23] PCI/AER: Report CXL or PCIe bus error type in trace logging
+>>   Deps: Applying prerequisite patch: [PATCH v11 10/23] CXL/AER: Update PCI class code check to use FIELD_GET()
+>>   Deps: Applying prerequisite patch: [PATCH v11 11/23] cxl/pci: Update RAS handler interfaces to also support CXL Ports
+>>   Deps: Applying prerequisite patch: [PATCH v12 12/25] cxl/pci: Log message if RAS registers are unmapped
+>>   Deps: Applying prerequisite patch: [PATCH v11 13/23] cxl/pci: Unify CXL trace logging for CXL Endpoints and CXL Ports
+>>   Deps: Applying prerequisite patch: [PATCH v12 14/25] cxl/pci: Update cxl_handle_cor_ras() to return early if no RAS errors
+>>   Deps: Applying prerequisite patch: [PATCH v11 15/23] cxl/pci: Map CXL Endpoint Port and CXL Switch Port RAS registers
+>>   Deps: Applying prerequisite patch: [PATCH v11 17/23] CXL/AER: Introduce cxl_aer.c into AER driver for forwarding CXL errors
+>>   Deps: Applying prerequisite patch: [PATCH v11 18/23] PCI/AER: Dequeue forwarded CXL error
+>>   Deps: Applying prerequisite patch: [PATCH v11 19/23] CXL/PCI: Introduce CXL Port protocol error handlers
+>>   Deps: Applying prerequisite patch: [PATCH v11 20/23] CXL/PCI: Export and rename merge_result() to pci_ers_merge_result()
+>>   Deps: Applying prerequisite patch: [PATCH v11 21/23] CXL/PCI: Introduce CXL uncorrectable protocol error recovery
+>>   Deps: Applying prerequisite patch: [PATCH v11 22/23] CXL/PCI: Enable CXL protocol errors during CXL Port probe
+>>   Deps: Applying prerequisite patch: [PATCH v11 23/23] CXL/PCI: Disable CXL protocol error interrupts during CXL Port cleanup
+>> Applying: cxl: Remove ifdef blocks of CONFIG_PCIEAER_CXL from core/pci.c
+>> Applying: CXL/AER: Remove CONFIG_PCIEAER_CXL and replace with CONFIG_CXL_RAS
+>> Applying: cxl/pci: Remove unnecessary CXL Endpoint handling helper functions
+>> Applying: cxl/pci: Remove unnecessary CXL RCH handling helper functions
+>> Applying: cxl: Move CXL driver RCH error handling into CONFIG_CXL_RCH_RAS conditional block
+>> Applying: CXL/AER: Introduce rch_aer.c into AER driver for handling CXL RCH errors
+>> Applying: PCI/CXL: Introduce pcie_is_cxl()
+>> Patch failed at 0007 PCI/CXL: Introduce pcie_is_cxl()
+>> error: patch failed: include/uapi/linux/pci_regs.h:1274
+>> error: include/uapi/linux/pci_regs.h: patch does not apply
+>> hint: Use 'git am --show-current-patch=diff' to see the failed patch
+>> hint: When you have resolved this problem, run "git am --continue".
+>> hint: If you prefer to skip this patch, run "git am --skip" instead.
+>> hint: To restore the original branch and stop patching, run "git am --abort".
+>> hint: Disable this message with "git config set advice.mergeConflict false"
+>>
+>> I also tried applying Terry's v11 first (which applied) and then this series failed as well.
 > 
-> > +
-> > +/* virtio_can private data structure */
-> > +struct virtio_can_priv {
-> > +	struct can_priv can;	/* must be the first member */
-> > +	/* NAPI for RX messages */
-> > +	struct napi_struct napi;
-> > +	/* NAPI for TX messages */
-> > +	struct napi_struct napi_tx;
-> > +	/* The network device we're associated with */
-> > +	struct net_device *dev;
-> > +	/* The virtio device we're associated with */
-> > +	struct virtio_device *vdev;
-> > +	/* The virtqueues */
-> > +	struct virtqueue *vqs[VIRTIO_CAN_QUEUE_COUNT];
-> > +	/* I/O callback function pointers for the virtqueues */
-> > +	vq_callback_t *io_callbacks[VIRTIO_CAN_QUEUE_COUNT];
-> > +	/* Lock for TX operations */
-> > +	spinlock_t tx_lock;
-> > +	/* Control queue lock. Defensive programming, may be not needed */
-> > +	struct mutex ctrl_lock;
-> > +	/* Wait for control queue processing without polling */
-> > +	struct completion ctrl_done;
-> > +	/* List of virtio CAN TX message */
-> > +	struct list_head tx_list;
-> > +	/* Array of receive queue messages */
-> > +	struct virtio_can_rx rpkt[128];
 > 
-> This array should probably be allocated dynamically at probe - maybe
-> using a module parameter instead of a hardcoded value as length? 
+> You need to apply Terry's v11 patches for sure on the commit base. If not the v19 series can not be applied cleanly.
 > 
+> 
+> I have tried this again a couple of times and it works for me:
+> 
+> 
+> 1)  git reset --hard f11a5f89910a
+> 
+> 2) git am Enable-CXL-PCIe-Port-Protocol-Error-handling-and-logging.patch
+> 
+> 3) git am Type2-device-basic-support.patch
 
-If I allocate this array in probe(), I would not know sdu[] in advance
-if I defined it as a flexible array. That made me wonder: can sdu[] be
-defined as flexible array for rx? 
+1) $ git reset --hard f11a5f89910a
+2) $ b4 shazam -v11 https://lore.kernel.org/linux-cxl/20250827013539.903682-1-terry.bowman@amd.com/T/#m9c6963513137b67d281414e88b57fe4f346bedab
+(success)
+3) $ b4 shazam https://lore.kernel.org/linux-cxl/0b41e061-53e1-49ef-9f24-01e01143b709@amd.com/T/#m712c7d01ffc7350d9ef638b932b9693a96fe47a9
+...
+Applying: cxl: Remove ifdef blocks of CONFIG_PCIEAER_CXL from core/pci.c
+Patch failed at 0001 cxl: Remove ifdef blocks of CONFIG_PCIEAER_CXL from core/pci.c
+error: patch failed: drivers/cxl/Kconfig:233
+error: drivers/cxl/Kconfig: patch does not apply
+error: patch failed: drivers/cxl/core/Makefile:14
+error: drivers/cxl/core/Makefile: patch does not apply
+error: patch failed: drivers/cxl/core/core.h:143
+error: drivers/cxl/core/core.h: patch does not apply
+error: patch failed: drivers/cxl/core/pci.c:6
+error: drivers/cxl/core/pci.c: patch does not apply
+error: patch failed: drivers/cxl/core/ras.c:5
+error: drivers/cxl/core/ras.c: patch does not apply
+error: patch failed: drivers/cxl/cxl.h:761
+error: drivers/cxl/cxl.h: patch does not apply
+error: patch failed: drivers/cxl/cxlpci.h:132
+error: drivers/cxl/cxlpci.h: patch does not apply
+error: patch failed: tools/testing/cxl/Kbuild:61
+error: tools/testing/cxl/Kbuild: patch does not apply
+...
 
-Thanks.
+DJ
 
-> > +	/* Those control queue messages cannot live on the stack! */
-> > +	struct virtio_can_control_out cpkt_out;
-> > +	struct virtio_can_control_in cpkt_in;
-> 
-> Consider using a container struct as you did for the tx message, e.g.:
-> 
-> struct virtio_can_control {
-> 	struct virtio_can_control_out ctrl_out;
-> 	struct virtio_can_control_in ctrl_in;
-> };
-> 
-> > +	/* Data to get and maintain the putidx for local TX echo */
-> > +	struct ida tx_putidx_ida;
-> > +	/* In flight TX messages */
-> > +	atomic_t tx_inflight;
-> > +	/* BusOff pending. Reset after successful indication to upper layer */
-> > +	bool busoff_pending;
-> > +};
-> > +
-> 
-> [...]
-> 
-> > +
-> > +/* Send a control message with message type either
-> > + *
-> > + * - VIRTIO_CAN_SET_CTRL_MODE_START or
-> > + * - VIRTIO_CAN_SET_CTRL_MODE_STOP.
-> > + *
-> > + * Unlike AUTOSAR CAN Driver Can_SetControllerMode() there is no requirement
-> > + * for this Linux driver to have an asynchronous implementation of the mode
-> > + * setting function so in order to keep things simple the function is
-> > + * implemented as synchronous function. Design pattern is
-> > + * virtio_console.c/__send_control_msg() & virtio_net.c/virtnet_send_command().
-> > + */
-> > +static u8 virtio_can_send_ctrl_msg(struct net_device *ndev, u16 msg_type)
-> > +{
-> > +	struct scatterlist sg_out, sg_in, *sgs[2] = { &sg_out, &sg_in };
-> > +	struct virtio_can_priv *priv = netdev_priv(ndev);
-> > +	struct device *dev = &priv->vdev->dev;
-> > +	struct virtqueue *vq;
-> > +	unsigned int len;
-> > +	int err;
-> > +
-> > +	vq = priv->vqs[VIRTIO_CAN_QUEUE_CONTROL];
-> > +
-> > +	/* The function may be serialized by rtnl lock. Not sure.
-> > +	 * Better safe than sorry.
-> > +	 */
-> > +	mutex_lock(&priv->ctrl_lock);
-> > +
-> > +	priv->cpkt_out.msg_type = cpu_to_le16(msg_type);
-> > +	sg_init_one(&sg_out, &priv->cpkt_out, sizeof(priv->cpkt_out));
-> > +	sg_init_one(&sg_in, &priv->cpkt_in, sizeof(priv->cpkt_in));
-> > +
-> > +	err = virtqueue_add_sgs(vq, sgs, 1u, 1u, priv, GFP_ATOMIC);
-> > +	if (err != 0) {
-> > +		/* Not expected to happen */
-> > +		dev_err(dev, "%s(): virtqueue_add_sgs() failed\n", __func__);
-> > +	}
-> 
-> Here it should return VIRTIO_CAN_RESULT_NOT_OK after unlocking the
-> mutex, or it might wait for completion indefinitley below.
-> 
-> > +
-> > +	if (!virtqueue_kick(vq)) {
-> > +		/* Not expected to happen */
-> > +		dev_err(dev, "%s(): Kick failed\n", __func__);
-> > +	}
-> 
-> And here too.
-> 
-> > +
-> > +	while (!virtqueue_get_buf(vq, &len) && !virtqueue_is_broken(vq))
-> > +		wait_for_completion(&priv->ctrl_done);
-> > +
-> > +	mutex_unlock(&priv->ctrl_lock);
-> > +
-> > +	return priv->cpkt_in.result;
-> > +}
-> > +
-> 
-> [...]
-> 
-> > +static netdev_tx_t virtio_can_start_xmit(struct sk_buff *skb,
-> > +					 struct net_device *dev)
-> > +{
-> > +	const unsigned int hdr_size = offsetof(struct virtio_can_tx_out, sdu);
-> > +	struct scatterlist sg_out, sg_in, *sgs[2] = { &sg_out, &sg_in };
-> > +	struct canfd_frame *cf = (struct canfd_frame *)skb->data;
-> > +	struct virtio_can_priv *priv = netdev_priv(dev);
-> > +	netdev_tx_t xmit_ret = NETDEV_TX_OK;
-> > +	struct virtio_can_tx *can_tx_msg;
-> > +	struct virtqueue *vq;
-> > +	unsigned long flags;
-> > +	u32 can_flags;
-> > +	int putidx;
-> > +	int err;
-> > +
-> > +	vq = priv->vqs[VIRTIO_CAN_QUEUE_TX];
-> > +
-> > +	if (can_dev_dropped_skb(dev, skb))
-> > +		goto kick; /* No way to return NET_XMIT_DROP here */
-> > +
-> > +	/* No local check for CAN_RTR_FLAG or FD frame against negotiated
-> > +	 * features. The device will reject those anyway if not supported.
-> > +	 */
-> > +
-> > +	can_tx_msg = kzalloc(sizeof(*can_tx_msg), GFP_ATOMIC);
-> > +	if (!can_tx_msg) {
-> > +		dev->stats.tx_dropped++;
-> > +		goto kick; /* No way to return NET_XMIT_DROP here */
-> > +	}
-> > +
-> 
-> Since we are allocating tx messages dynamically, the sdu[64] array inside
-> struct virtio_can_tx_out can be converted to a flexible array and here
-> the allocation can become:
-> 
-> 	can_tx_msg = kzalloc(sizeof(*can_tx_msg) + cf->len, GFP_ATOMIC);
-> 
-> This would save memory in particular on CAN-CC interfaces, where 56 bytes
-> per message would otherwise be lost (not to mention the case if/when
-> CAN-XL will be supported).
-> 
-> > +	can_tx_msg->tx_out.msg_type = cpu_to_le16(VIRTIO_CAN_TX);
-> > +	can_flags = 0;
-> > +
-> > +	if (cf->can_id & CAN_EFF_FLAG) {
-> > +		can_flags |= VIRTIO_CAN_FLAGS_EXTENDED;
-> > +		can_tx_msg->tx_out.can_id = cpu_to_le32(cf->can_id & CAN_EFF_MASK);
-> > +	} else {
-> > +		can_tx_msg->tx_out.can_id = cpu_to_le32(cf->can_id & CAN_SFF_MASK);
-> > +	}
-> > +	if (cf->can_id & CAN_RTR_FLAG)
-> > +		can_flags |= VIRTIO_CAN_FLAGS_RTR;
-> > +	else
-> > +		memcpy(can_tx_msg->tx_out.sdu, cf->data, cf->len);
-> > +	if (can_is_canfd_skb(skb))
-> > +		can_flags |= VIRTIO_CAN_FLAGS_FD;
-> > +
-> > +	can_tx_msg->tx_out.flags = cpu_to_le32(can_flags);
-> > +	can_tx_msg->tx_out.length = cpu_to_le16(cf->len);
-> > +
-> > +	/* Prepare sending of virtio message */
-> > +	sg_init_one(&sg_out, &can_tx_msg->tx_out, hdr_size + cf->len);
-> > +	sg_init_one(&sg_in, &can_tx_msg->tx_in, sizeof(can_tx_msg->tx_in));
-> > +
-> > +	putidx = virtio_can_alloc_tx_idx(priv);
-> > +
-> > +	if (unlikely(putidx < 0)) {
-> > +		/* -ENOMEM or -ENOSPC here. -ENOSPC should not be possible as
-> > +		 * tx_inflight >= can.echo_skb_max is checked in flow control
-> > +		 */
-> > +		WARN_ON_ONCE(putidx == -ENOSPC);
-> > +		kfree(can_tx_msg);
-> > +		dev->stats.tx_dropped++;
-> > +		goto kick; /* No way to return NET_XMIT_DROP here */
-> > +	}
-> > +
-> > +	can_tx_msg->putidx = (unsigned int)putidx;
-> > +
-> > +	/* Protect list operation */
-> > +	spin_lock_irqsave(&priv->tx_lock, flags);
-> > +	list_add_tail(&can_tx_msg->list, &priv->tx_list);
-> > +	spin_unlock_irqrestore(&priv->tx_lock, flags);
-> > +
-> > +	/* Push loopback echo. Will be looped back on TX interrupt/TX NAPI */
-> > +	can_put_echo_skb(skb, dev, can_tx_msg->putidx, 0);
-> > +
-> > +	/* Protect queue and list operations */
-> > +	spin_lock_irqsave(&priv->tx_lock, flags);
-> > +	err = virtqueue_add_sgs(vq, sgs, 1u, 1u, can_tx_msg, GFP_ATOMIC);
-> > +	if (unlikely(err)) { /* checking vq->num_free in flow control */
-> > +		list_del(&can_tx_msg->list);
-> > +		can_free_echo_skb(dev, can_tx_msg->putidx, NULL);
-> > +		virtio_can_free_tx_idx(priv, can_tx_msg->putidx);
-> > +		spin_unlock_irqrestore(&priv->tx_lock, flags);
-> > +		netif_stop_queue(dev);
-> > +		kfree(can_tx_msg);
-> > +		/* Expected never to be seen */
-> > +		netdev_warn(dev, "TX: Stop queue, err = %d\n", err);
-> > +		xmit_ret = NETDEV_TX_BUSY;
-> > +		goto kick;
-> > +	}
-> > +
-> > +	/* Normal flow control: stop queue when no transmission slots left */
-> > +	if (atomic_read(&priv->tx_inflight) >= priv->can.echo_skb_max ||
-> > +	    vq->num_free == 0 || (vq->num_free < ARRAY_SIZE(sgs) &&
-> > +	    !virtio_has_feature(vq->vdev, VIRTIO_RING_F_INDIRECT_DESC))) {
-> > +		netif_stop_queue(dev);
-> > +		netdev_dbg(dev, "TX: Normal stop queue\n");
-> > +	}
-> > +
-> > +	spin_unlock_irqrestore(&priv->tx_lock, flags);
-> > +
-> > +kick:
-> > +	if (netif_queue_stopped(dev) || !netdev_xmit_more()) {
-> > +		if (!virtqueue_kick(vq))
-> > +			netdev_err(dev, "%s(): Kick failed\n", __func__);
-> > +	}
-> > +
-> > +	return xmit_ret;
-> > +}
-> > +
-> > +static const struct net_device_ops virtio_can_netdev_ops = {
-> > +	.ndo_open = virtio_can_open,
-> > +	.ndo_stop = virtio_can_close,
-> > +	.ndo_start_xmit = virtio_can_start_xmit,
-> > +	.ndo_change_mtu = can_change_mtu,
-> > +};
-> > +
-> > +static int register_virtio_can_dev(struct net_device *dev)
-> > +{
-> > +	dev->flags |= IFF_ECHO;	/* we support local echo */
-> > +	dev->netdev_ops = &virtio_can_netdev_ops;
-> > +
-> > +	return register_candev(dev);
-> > +}
-> > +
-> > +/* Compare with m_can.c/m_can_echo_tx_event() */
-> > +static int virtio_can_read_tx_queue(struct virtqueue *vq)
-> > +{
-> > +	struct virtio_can_priv *can_priv = vq->vdev->priv;
-> > +	struct net_device *dev = can_priv->dev;
-> > +	struct virtio_can_tx *can_tx_msg;
-> > +	struct net_device_stats *stats;
-> > +	unsigned long flags;
-> > +	unsigned int len;
-> > +	u8 result;
-> > +
-> > +	stats = &dev->stats;
-> > +
-> > +	/* Protect list and virtio queue operations */
-> > +	spin_lock_irqsave(&can_priv->tx_lock, flags);
-> > +
-> > +	can_tx_msg = virtqueue_get_buf(vq, &len);
-> > +	if (!can_tx_msg) {
-> > +		spin_unlock_irqrestore(&can_priv->tx_lock, flags);
-> > +		return 0; /* No more data */
-> > +	}
-> > +
-> > +	if (unlikely(len < sizeof(struct virtio_can_tx_in))) {
-> > +		netdev_err(dev, "TX ACK: Device sent no result code\n");
-> > +		result = VIRTIO_CAN_RESULT_NOT_OK; /* Keep things going */
-> > +	} else {
-> > +		result = can_tx_msg->tx_in.result;
-> > +	}
-> > +
-> > +	if (can_priv->can.state < CAN_STATE_BUS_OFF) {
-> > +		/* Here also frames with result != VIRTIO_CAN_RESULT_OK are
-> > +		 * echoed. Intentional to bring a waiting process in an upper
-> > +		 * layer to an end.
-> > +		 * TODO: Any better means to indicate a problem here?
-> > +		 */
-> > +		if (result != VIRTIO_CAN_RESULT_OK)
-> > +			netdev_warn(dev, "TX ACK: Result = %u\n", result);
-> 
-> Maybe an error frame reporting CAN_ERR_CRTL_UNSPEC would be better?
-> 
-> For sure, counting the known errors as valid tx_packets and tx_bytes
-> is misleading.
-> 
-> > +
-> > +		stats->tx_bytes += can_get_echo_skb(dev, can_tx_msg->putidx,
-> > +						    NULL);
-> > +		stats->tx_packets++;
-> > +	} else {
-> > +		netdev_dbg(dev, "TX ACK: Controller inactive, drop echo\n");
-> > +		can_free_echo_skb(dev, can_tx_msg->putidx, NULL);
-> > +	}
-> > +
-> > +	list_del(&can_tx_msg->list);
-> > +	virtio_can_free_tx_idx(can_priv, can_tx_msg->putidx);
-> > +
-> > +	/* Flow control */
-> > +	if (netif_queue_stopped(dev)) {
-> > +		netdev_dbg(dev, "TX ACK: Wake up stopped queue\n");
-> > +		netif_wake_queue(dev);
-> > +	}
-> > +
-> > +	spin_unlock_irqrestore(&can_priv->tx_lock, flags);
-> > +
-> > +	kfree(can_tx_msg);
-> > +
-> > +	return 1; /* Queue was not empty so there may be more data */
-> > +}
-> > +
-> 
-> [...]
-> 
-> > +
-> > +static int virtio_can_find_vqs(struct virtio_can_priv *priv)
-> > +{
-> > +	/* The order of RX and TX is exactly the opposite as in console and
-> > +	 * network. Does not play any role but is a bad trap.
-> > +	 */
-> > +	static const char * const io_names[VIRTIO_CAN_QUEUE_COUNT] = {
-> > +		"can-tx",
-> > +		"can-rx",
-> > +		"can-state-ctrl"
-> > +	};
-> > +
-> > +	priv->io_callbacks[VIRTIO_CAN_QUEUE_TX] = virtio_can_tx_intr;
-> > +	priv->io_callbacks[VIRTIO_CAN_QUEUE_RX] = virtio_can_rx_intr;
-> > +	priv->io_callbacks[VIRTIO_CAN_QUEUE_CONTROL] = virtio_can_control_intr;
-> > +
-> > +	/* Find the queues. */
-> > +	return virtio_find_vqs(priv->vdev, VIRTIO_CAN_QUEUE_COUNT, priv->vqs,
-> > +			       priv->io_callbacks, io_names, NULL);
-> > +}
-> 
-> Syntax of virtio_find_vqs changed a bit, here should now be:
-> 
-> 	struct virtqueue_info vqs_info[] = {
-> 		{ "can-tx", virtio_can_tx_intr },
-> 		{ "can-rx", virtio_can_rx_intr },
-> 		{ "can-state-ctrl", virtio_can_control_intr },
-> 	};
-> 
-> 	return virtio_find_vqs(priv->vdev, VIRTIO_CAN_QUEUE_COUNT, priv->vqs,
-> 			  vqs_info, NULL);
-> 
-> > +
-> > +/* Function must not be called before virtio_can_find_vqs() has been run */
-> > +static void virtio_can_del_vq(struct virtio_device *vdev)
-> > +{
-> > +	struct virtio_can_priv *priv = vdev->priv;
-> > +	struct list_head *cursor, *next;
-> > +	struct virtqueue *vq;
-> > +
-> > +	/* Reset the device */
-> > +	if (vdev->config->reset)
-> > +		vdev->config->reset(vdev);
-> > +
-> > +	/* From here we have dead silence from the device side so no locks
-> > +	 * are needed to protect against device side events.
-> > +	 */
-> > +
-> > +	vq = priv->vqs[VIRTIO_CAN_QUEUE_CONTROL];
-> > +	while (virtqueue_detach_unused_buf(vq))
-> > +		; /* Do nothing, content allocated statically */
-> > +
-> > +	vq = priv->vqs[VIRTIO_CAN_QUEUE_RX];
-> > +	while (virtqueue_detach_unused_buf(vq))
-> > +		; /* Do nothing, content allocated statically */
-> > +
-> > +	vq = priv->vqs[VIRTIO_CAN_QUEUE_TX];
-> > +	while (virtqueue_detach_unused_buf(vq))
-> > +		; /* Do nothing, content to be de-allocated separately */
-> > +
-> > +	/* Is keeping track of allocated elements by an own linked list
-> > +	 * really necessary or may this be optimized using only
-> > +	 * virtqueue_detach_unused_buf()?
-> > +	 */
-> > +	list_for_each_safe(cursor, next, &priv->tx_list) {
-> > +		struct virtio_can_tx *can_tx;
-> > +
-> > +		can_tx = list_entry(cursor, struct virtio_can_tx, list);
-> > +		list_del(cursor);
-> > +		kfree(can_tx);
-> > +	}
-> 
-> I'd drop the tx_list entirely and rely on virtqueue_detach_unused_buf();
-> this would allow to remove at least one spinlock save/restore pair at
-> each transmission. 
-> 
-> > +
-> > +	if (vdev->config->del_vqs)
-> > +		vdev->config->del_vqs(vdev);
-> > +}
-> > +
-> 
-> [...]
-> 
-> > diff --git a/include/uapi/linux/virtio_can.h b/include/uapi/linux/virtio_can.h
-> > new file mode 100644
-> > index 000000000000..7cf613bb3f1a
-> > --- /dev/null
-> > +++ b/include/uapi/linux/virtio_can.h
-> > @@ -0,0 +1,75 @@
-> > +/* SPDX-License-Identifier: BSD-3-Clause */
-> > +/*
-> > + * Copyright (C) 2021-2023 OpenSynergy GmbH
-> > + */
-> > +#ifndef _LINUX_VIRTIO_VIRTIO_CAN_H
-> > +#define _LINUX_VIRTIO_VIRTIO_CAN_H
-> > +
-> > +#include <linux/types.h>
-> > +#include <linux/virtio_types.h>
-> > +#include <linux/virtio_ids.h>
-> > +#include <linux/virtio_config.h>
-> > +
-> > +/* Feature bit numbers */
-> > +#define VIRTIO_CAN_F_CAN_CLASSIC        0
-> > +#define VIRTIO_CAN_F_CAN_FD             1
-> > +#define VIRTIO_CAN_F_LATE_TX_ACK        2
-> > +#define VIRTIO_CAN_F_RTR_FRAMES         3
-> > +
-> 
-> The values for VIRTIO_CAN_F_LATE_TX_ACK and VIRTIO_CAN_F_RTR_FRAMES are
-> inverted w.r.t. the merged virto-can spec [1].
-> 
-> Note that this is the only deviation from the spec I found.
-> 
-> > +/* CAN Result Types */
-> > +#define VIRTIO_CAN_RESULT_OK            0
-> > +#define VIRTIO_CAN_RESULT_NOT_OK        1
-> > +
-> > +/* CAN flags to determine type of CAN Id */
-> > +#define VIRTIO_CAN_FLAGS_EXTENDED       0x8000
-> > +#define VIRTIO_CAN_FLAGS_FD             0x4000
-> > +#define VIRTIO_CAN_FLAGS_RTR            0x2000
-> > +
-> > +struct virtio_can_config {
-> > +#define VIRTIO_CAN_S_CTRL_BUSOFF (1u << 0) /* Controller BusOff */
-> > +	/* CAN controller status */
-> > +	__le16 status;
-> > +};
-> > +
-> > +/* TX queue message types */
-> > +struct virtio_can_tx_out {
-> > +#define VIRTIO_CAN_TX                   0x0001
-> > +	__le16 msg_type;
-> > +	__le16 length; /* 0..8 CC, 0..64 CAN-FD, 0..2048 CAN-XL, 12 bits */
-> > +	__u8 reserved_classic_dlc; /* If CAN classic length = 8 then DLC can be 8..15 */
-> > +	__u8 padding;
-> > +	__le16 reserved_xl_priority; /* May be needed for CAN XL priority */
-> > +	__le32 flags;
-> > +	__le32 can_id;
-> > +	__u8 sdu[64];
-> > +};
-> > +
-> 
-> sdu[] here might be a flexible array, if the driver allocates
-> virtio_can_tx_out structs dyncamically (see above). This would be
-> beneficial in case of CAN-XL frames (if/when they will be supported).
-> 
-> > +struct virtio_can_tx_in {
-> > +	__u8 result;
-> > +};
-> > +
-> > +/* RX queue message types */
-> > +struct virtio_can_rx {
-> > +#define VIRTIO_CAN_RX                   0x0101
-> > +	__le16 msg_type;
-> > +	__le16 length; /* 0..8 CC, 0..64 CAN-FD, 0..2048 CAN-XL, 12 bits */
-> > +	__u8 reserved_classic_dlc; /* If CAN classic length = 8 then DLC can be 8..15 */
-> > +	__u8 padding;
-> > +	__le16 reserved_xl_priority; /* May be needed for CAN XL priority */
-> > +	__le32 flags;
-> > +	__le32 can_id;
-> > +	__u8 sdu[64];
-> > +};
-> > +
-> 
-> Again, sdu[] might be a flexible array.
-> 
-> > +/* Control queue message types */
-> > +struct virtio_can_control_out {
-> > +#define VIRTIO_CAN_SET_CTRL_MODE_START  0x0201
-> > +#define VIRTIO_CAN_SET_CTRL_MODE_STOP   0x0202
-> > +	__le16 msg_type;
-> > +};
-> > +
-> > +struct virtio_can_control_in {
-> > +	__u8 result;
-> > +};
-> > +
-> > +#endif /* #ifndef _LINUX_VIRTIO_VIRTIO_CAN_H */
-> > 
-> 
-> Thank you for your work!
-> 
-> Regards,
-> Francesco
 > 
 > 
-> [1] https://github.com/oasis-tcs/virtio-spec/blob/virtio-1.4/device-types/can/description.tex#L45
+> Hopefully you can reproduce this as well. Maybe Ben Cheatham can comment on this, if he had problems applying them, as it seems he was able to work with it.
 > 
 > 
+> Thank you
 > 
 > 
+>> DJ
+>>
+>>> v19 changes:
+>>>
+>>>    Removal of cxl_acquire_endpoint and driver callback for unexpected cxl
+>>>    module removal. Dan's patches made them unnecessary.
+>>>
+>>>    patch 4: remove code already moved by Terry's patches (Ben Cheatham)
+>>>
+>>>    patch 6: removed unrelated change (Ben Cheatham)
+>>>
+>>>    patch 7: fix error report inconsistencies (Jonathan, Dave)
+>>>
+>>>    patch 9: remove unnecessary comment (Ben Cheatham)
+>>>
+>>>    patch 11: fix __free usage (Jonathan Cameron, Ben Cheatham)
+>>>
+>>>    patch 13: style fixes (Jonathan Cameron, Dave Jiag)
+>>>
+>>>    patch 14: move code to previous patch (Jonathan Cameron)
+>>>
+>>>    patch 18: group code in one locking (Dave Jian)
+>>>            use __free helper (Ben Cheatham)
+>>>
+>>>
+>>> v18 changes:
+>>>
+>>>    patch 1: minor changes and fixing docs generation (Jonathan, Dan)
+>>>
+>>>    patch4: merged with v17 patch5
+>>>
+>>>    patch 5: merging v17 patches 6 and 7
+>>>
+>>>    patch 6: adding helpers for clarity
+>>>
+>>>    patch 9:
+>>>        - minor changes (Dave)
+>>>        - simplifying flags check (Dan)
+>>>
+>>>    patch 10: minor changes (Jonathan)
+>>>
+>>>    patch 11:
+>>>        - minor changes (Dave)
+>>>        - fix mess (Jonathan, Dave)
+>>>
+>>>    patch 18: minor changes (Jonathan, Dan)
+>>>
+>>> v17 changes: (Dan Williams review)
+>>>   - use devm for cxl_dev_state allocation
+>>>   - using current cxl struct for checking capability registers found by
+>>>     the driver.
+>>>   - simplify dpa initialization without a mailbox not supporting pmem
+>>>   - add cxl_acquire_endpoint for protection during initialization
+>>>   - add callback/action to cxl_create_region for a driver notified about cxl
+>>>     core kernel modules removal.
+>>>   - add sfc function to disable CXL-based PIO buffers if such a callback
+>>>     is invoked.
+>>>   - Always manage a Type2 created region as private not allowing DAX.
+>>>
+>>> v16 changes:
+>>>   - rebase against rc4 (Dave Jiang)
+>>>   - remove duplicate line (Ben Cheatham)
+>>>
+>>> v15 changes:
+>>>   - remove reference to unused header file (Jonathan Cameron)
+>>>   - add proper kernel docs to exported functions (Alison Schofield)
+>>>   - using an array to map the enums to strings (Alison Schofield)
+>>>   - clarify comment when using bitmap_subset (Jonathan Cameron)
+>>>   - specify link to type2 support in all patches (Alison Schofield)
+>>>
+>>>    Patches changed (minor): 4, 11
+>>>
+>>> v14 changes:
+>>>   - static null initialization of bitmaps (Jonathan Cameron)
+>>>   - Fixing cxl tests (Alison Schofield)
+>>>   - Fixing robot compilation problems
+>>>
+>>>    Patches changed (minor): 1, 4, 6, 13
+>>>
+>>> v13 changes:
+>>>   - using names for headers checking more consistent (Jonathan Cameron)
+>>>   - using helper for caps bit setting (Jonathan Cameron)
+>>>   - provide generic function for reporting missing capabilities (Jonathan Cameron)
+>>>   - rename cxl_pci_setup_memdev_regs to cxl_pci_accel_setup_memdev_regs (Jonathan Cameron)
+>>>   - cxl_dpa_info size to be set by the Type2 driver (Jonathan Cameron)
+>>>   - avoiding rc variable when possible (Jonathan Cameron)
+>>>   - fix spelling (Simon Horman)
+>>>   - use scoped_guard (Dave Jiang)
+>>>   - use enum instead of bool (Dave Jiang)
+>>>   - dropping patch with hardware symbols
+>>>
+>>> v12 changes:
+>>>   - use new macro cxl_dev_state_create in pci driver (Ben Cheatham)
+>>>   - add public/private sections in now exported cxl_dev_state struct (Ben
+>>>     Cheatham)
+>>>   - fix cxl/pci.h regarding file name for checking if defined
+>>>   - Clarify capabilities found vs expected in error message. (Ben
+>>>     Cheatham)
+>>>   - Clarify new CXL_DECODER_F flag (Ben Cheatham)
+>>>   - Fix changes about cxl memdev creation support moving code to the
+>>>     proper patch. (Ben Cheatham)
+>>>   - Avoid debug and function duplications (Ben Cheatham)
+>>>
+>>> v11 changes:
+>>>   - Dropping the use of cxl_memdev_state and going back to using
+>>>     cxl_dev_state.
+>>>   - Using a helper for an accel driver to allocate its own cxl-related
+>>>     struct embedding cxl_dev_state.
+>>>   - Exporting the required structs in include/cxl/cxl.h for an accel
+>>>     driver being able to know the cxl_dev_state size required in the
+>>>     previously mentioned helper for allocation.
+>>>   - Avoid using any struct for dpa initialization by the accel driver
+>>>     adding a specific function for creating dpa partitions by accel
+>>>     drivers without a mailbox.
+>>>
+>>> v10 changes:
+>>>   - Using cxl_memdev_state instead of cxl_dev_state for type2 which has a
+>>>     memory after all and facilitates the setup.
+>>>   - Adapt core for using cxl_memdev_state allowing accel drivers to work
+>>>     with them without further awareness of internal cxl structs.
+>>>   - Using last DPA changes for creating DPA partitions with accel driver
+>>>     hardcoding mds values when no mailbox.
+>>>   - capabilities not a new field but built up when current register maps
+>>>     is performed and returned to the caller for checking.
+>>>   - HPA free space supporting interleaving.
+>>>   - DPA free space droping max-min for a simple alloc size.
+>>>
+>>> v9 changes:
+>>>   - adding forward definitions (Jonathan Cameron)
+>>>   - using set_bit instead of bitmap_set (Jonathan Cameron)
+>>>   - fix rebase problem (Jonathan Cameron)
+>>>   - Improve error path (Jonathan Cameron)
+>>>   - fix build problems with cxl region dependency (robot)
+>>>   - fix error path (Simon Horman)
+>>>
+>>> v8 changes:
+>>>   - Change error path labeling inside sfc cxl code (Edward Cree)
+>>>   - Properly handling checks and error in sfc cxl code (Simon Horman)
+>>>   - Fix bug when checking resource_size (Simon Horman)
+>>>   - Avoid bisect problems reordering patches (Edward Cree)
+>>>   - Fix buffer allocation size in sfc (Simon Horman)
+>>>
+>>> v7 changes:
+>>>
+>>>   - fixing kernel test robot complains
+>>>   - fix type with Type3 mandatory capabilities (Zhi Wang)
+>>>   - optimize code in cxl_request_resource (Kalesh Anakkur Purayil)
+>>>   - add sanity check when dealing with resources arithmetics (Fan Ni)
+>>>   - fix typos and blank lines (Fan Ni)
+>>>   - keep previous log errors/warnings in sfc driver (Martin Habets)
+>>>   - add WARN_ON_ONCE if region given is NULL
+>>>
+>>> v6 changes:
+>>>
+>>>   - update sfc mcdi_pcol.h with full hardware changes most not related to
+>>>     this patchset. This is an automatic file created from hardware design
+>>>     changes and not touched by software. It is updated from time to time
+>>>     and it required update for the sfc driver CXL support.
+>>>   - remove CXL capabilities definitions not used by the patchset or
+>>>     previous kernel code. (Dave Jiang, Jonathan Cameron)
+>>>   - Use bitmap_subset instead of reinventing the wheel ... (Ben Cheatham)
+>>>   - Use cxl_accel_memdev for new device_type created (Ben Cheatham)
+>>>   - Fix construct_region use of rwsem (Zhi Wang)
+>>>   - Obtain region range instead of region params (Allison Schofield, Dave
+>>>     Jiang)
+>>>
+>>> v5 changes:
+>>>
+>>>   - Fix SFC configuration based on kernel CXL configuration
+>>>   - Add subset check for capabilities.
+>>>   - fix region creation when HDM decoders programmed by firmware/BIOS (Ben
+>>>     Cheatham)
+>>>   - Add option for creating dax region based on driver decission (Ben
+>>>     Cheatham)
+>>>   - Using sfc probe_data struct for keeping sfc cxl data
+>>>
+>>> v4 changes:
+>>>
+>>>   - Use bitmap for capabilities new field (Jonathan Cameron)
+>>>   - Use cxl_mem attributes for sysfs based on device type (Dave Jian)
+>>>   - Add conditional cxl sfc compilation relying on kernel CXL config (kernel test robot)
+>>>   - Add sfc changes in different patches for facilitating backport (Jonathan Cameron)
+>>>   - Remove patch for dealing with cxl modules dependencies and using sfc kconfig plus
+>>>     MODULE_SOFTDEP instead.
+>>>
+>>> v3 changes:
+>>>
+>>>   - cxl_dev_state not defined as opaque but only manipulated by accel drivers
+>>>     through accessors.
+>>>   - accessors names not identified as only for accel drivers.
+>>>   - move pci code from pci driver (drivers/cxl/pci.c) to generic pci code
+>>>     (drivers/cxl/core/pci.c).
+>>>   - capabilities field from u8 to u32 and initialised by CXL regs discovering
+>>>     code.
+>>>   - add capabilities check and removing current check by CXL regs discovering
+>>>     code.
+>>>   - Not fail if CXL Device Registers not found. Not mandatory for Type2.
+>>>   - add timeout in acquire_endpoint for solving a race with the endpoint port
+>>>     creation.
+>>>   - handle EPROBE_DEFER by sfc driver.
+>>>   - Limiting interleave ways to 1 for accel driver HPA/DPA requests.
+>>>   - factoring out interleave ways and granularity helpers from type2 region
+>>>     creation patch.
+>>>   - restricting region_creation for type2 to one endpoint decoder.
+>>>
+>>> v2 changes:
+>>>
+>>> I have removed the introduction about the concerns with BIOS/UEFI after the
+>>> discussion leading to confirm the need of the functionality implemented, at
+>>> least is some scenarios.
+>>>
+>>> There are two main changes from the RFC:
+>>>
+>>> 1) Following concerns about drivers using CXL core without restrictions, the CXL
+>>> struct to work with is opaque to those drivers, therefore functions are
+>>> implemented for modifying or reading those structs indirectly.
+>>>
+>>> 2) The driver for using the added functionality is not a test driver but a real
+>>> one: the SFC ethernet network driver. It uses the CXL region mapped for PIO
+>>> buffers instead of regions inside PCIe BARs.
+>>>
+>>> RFC:
+>>>
+>>> Current CXL kernel code is focused on supporting Type3 CXL devices, aka memory
+>>> expanders. Type2 CXL devices, aka device accelerators, share some functionalities
+>>> but require some special handling.
+>>>
+>>> First of all, Type2 are by definition specific to drivers doing something and not just
+>>> a memory expander, so it is expected to work with the CXL specifics. This implies the CXL
+>>> setup needs to be done by such a driver instead of by a generic CXL PCI driver
+>>> as for memory expanders. Most of such setup needs to use current CXL core code
+>>> and therefore needs to be accessible to those vendor drivers. This is accomplished
+>>> exporting opaque CXL structs and adding and exporting functions for working with
+>>> those structs indirectly.
+>>>
+>>> Some of the patches are based on a patchset sent by Dan Williams [1] which was just
+>>> partially integrated, most related to making things ready for Type2 but none
+>>> related to specific Type2 support. Those patches based on Dan´s work have Dan´s
+>>> signing as co-developer, and a link to the original patch.
+>>>
+>>> A final note about CXL.cache is needed. This patchset does not cover it at all,
+>>> although the emulated Type2 device advertises it. From the kernel point of view
+>>> supporting CXL.cache will imply to be sure the CXL path supports what the Type2
+>>> device needs. A device accelerator will likely be connected to a Root Switch,
+>>> but other configurations can not be discarded. Therefore the kernel will need to
+>>> check not just HPA, DPA, interleave and granularity, but also the available
+>>> CXL.cache support and resources in each switch in the CXL path to the Type2
+>>> device. I expect to contribute to this support in the following months, and
+>>> it would be good to discuss about it when possible.
+>>>
+>>> [1] https://lore.kernel.org/linux-cxl/98b1f61a-e6c2-71d4-c368-50d958501b0c@intel.com/T/
+>>>
+>>> Alejandro Lucero (21):
+>>>    cxl/mem: Arrange for always-synchronous memdev attach
+>>>    cxl/port: Arrange for always synchronous endpoint attach
+>>>    cxl: Add type2 device basic support
+>>>    sfc: add cxl support
+>>>    cxl: Move pci generic code
+>>>    cxl: allow Type2 drivers to map cxl component regs
+>>>    cxl: Support dpa initialization without a mailbox
+>>>    cxl: Prepare memdev creation for type2
+>>>    sfc: create type2 cxl memdev
+>>>    cxl: Define a driver interface for HPA free space enumeration
+>>>    sfc: get root decoder
+>>>    cxl: Define a driver interface for DPA allocation
+>>>    sfc: get endpoint decoder
+>>>    cxl: Make region type based on endpoint type
+>>>    cxl/region: Factor out interleave ways setup
+>>>    cxl/region: Factor out interleave granularity setup
+>>>    cxl: Allow region creation by type2 drivers
+>>>    cxl: Avoid dax creation for accelerators
+>>>    sfc: create cxl region
+>>>    cxl: Add function for obtaining region range
+>>>    sfc: support pio mapping based on cxl
+>>>
+>>> Dan Williams (1):
+>>>    cxl/mem: Introduce a memdev creation ->probe() operation
+>>>
+>>>   drivers/cxl/Kconfig                   |   2 +-
+>>>   drivers/cxl/core/core.h               |   9 +-
+>>>   drivers/cxl/core/hdm.c                |  85 ++++++
+>>>   drivers/cxl/core/mbox.c               |  63 +---
+>>>   drivers/cxl/core/memdev.c             | 209 +++++++++----
+>>>   drivers/cxl/core/pci.c                |  63 ++++
+>>>   drivers/cxl/core/port.c               |   1 +
+>>>   drivers/cxl/core/region.c             | 418 +++++++++++++++++++++++---
+>>>   drivers/cxl/core/regs.c               |   2 +-
+>>>   drivers/cxl/cxl.h                     | 125 +-------
+>>>   drivers/cxl/cxlmem.h                  |  90 +-----
+>>>   drivers/cxl/cxlpci.h                  |  21 +-
+>>>   drivers/cxl/mem.c                     | 146 +++++----
+>>>   drivers/cxl/pci.c                     |  88 +-----
+>>>   drivers/cxl/port.c                    |  46 ++-
+>>>   drivers/cxl/private.h                 |  17 ++
+>>>   drivers/net/ethernet/sfc/Kconfig      |  10 +
+>>>   drivers/net/ethernet/sfc/Makefile     |   1 +
+>>>   drivers/net/ethernet/sfc/ef10.c       |  50 ++-
+>>>   drivers/net/ethernet/sfc/efx.c        |  15 +-
+>>>   drivers/net/ethernet/sfc/efx.h        |   1 -
+>>>   drivers/net/ethernet/sfc/efx_cxl.c    | 165 ++++++++++
+>>>   drivers/net/ethernet/sfc/efx_cxl.h    |  40 +++
+>>>   drivers/net/ethernet/sfc/net_driver.h |  12 +
+>>>   drivers/net/ethernet/sfc/nic.h        |   3 +
+>>>   include/cxl/cxl.h                     | 291 ++++++++++++++++++
+>>>   include/cxl/pci.h                     |  21 ++
+>>>   tools/testing/cxl/Kbuild              |   1 -
+>>>   tools/testing/cxl/test/mem.c          |   5 +-
+>>>   tools/testing/cxl/test/mock.c         |  17 --
+>>>   30 files changed, 1476 insertions(+), 541 deletions(-)
+>>>   create mode 100644 drivers/cxl/private.h
+>>>   create mode 100644 drivers/net/ethernet/sfc/efx_cxl.c
+>>>   create mode 100644 drivers/net/ethernet/sfc/efx_cxl.h
+>>>   create mode 100644 include/cxl/cxl.h
+>>>   create mode 100644 include/cxl/pci.h
+>>>
+>>>
+>>> base-commit: f11a5f89910a7ae970fbce4fdc02d86a8ba8570f
+>>> prerequisite-patch-id: 44c914dd079e40d716f3f2d91653247eca731594
+>>> prerequisite-patch-id: b13ca5c11c44a736563477d67b1dceadfe3ea19e
+>>> prerequisite-patch-id: d0d82965bbea8a2b5ea2f763f19de4dfaa8479c3
+>>> prerequisite-patch-id: dd0f24b3bdb938f2f123bc26b31cd5fe659e05eb
+>>> prerequisite-patch-id: 2ea41ec399f2360a84e86e97a8f940a62561931a
+>>> prerequisite-patch-id: 367b61b5a313db6324f9cf917d46df580f3bbd3b
+>>> prerequisite-patch-id: 1805332a9f191bc3547927d96de5926356dac03c
+>>> prerequisite-patch-id: 40657fd517f8e835a091c07e93d6abc08f85d395
+>>> prerequisite-patch-id: 901eb0d91816499446964b2a9089db59656da08d
+>>> prerequisite-patch-id: 79856c0199d6872fd2f76a5829dba7fa46f225d6
+>>> prerequisite-patch-id: 6f3503e59a3d745e5ecff4aaed668e2d32da7e4b
+>>> prerequisite-patch-id: e9dc88f1b91dce5dc3d46ff2b5bf184aba06439d
+>>> prerequisite-patch-id: 196fe106100aad619d5be7266959bbeef29b7c8b
+>>> prerequisite-patch-id: 7e719ed404f664ee8d9b98d56f58326f55ea2175
+>>> prerequisite-patch-id: 560f95992e13a08279034d5f77aacc9e971332dd
+>>> prerequisite-patch-id: 8656445ee654056695ff2894e28c8f1014df919e
+>>> prerequisite-patch-id: 001d831149eb8f9ae17b394e4bcd06d844dd39d9
+>>> prerequisite-patch-id: 421368aa5eac2af63ef2dc427af2ec11ad45c925
+>>> prerequisite-patch-id: 18fd00d4743711d835ad546cfbb558d9f97dcdfc
+>>> prerequisite-patch-id: d89bf9e6d3ea5d332ec2c8e441f1fe6d84e726d3
+>>> prerequisite-patch-id: 3a6953d11b803abeb437558f3893a3b6a08acdbb
+>>> prerequisite-patch-id: 0dd42a82e73765950bd069d421d555ded8bfeb25
+>>> prerequisite-patch-id: da6e0df31ad0d5a945e0a0d29204ba75f0c97344
+>>
 
 
