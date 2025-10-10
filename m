@@ -1,225 +1,100 @@
-Return-Path: <netdev+bounces-228549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 329DCBCDF5D
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 18:28:14 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9E06BCE034
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 18:57:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27E961893DB4
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 16:28:37 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E3235500F87
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 16:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9755A2F60A1;
-	Fri, 10 Oct 2025 16:28:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD8A2FC896;
+	Fri, 10 Oct 2025 16:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rYX3urCU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BmJ6TLz+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6818B4A02;
-	Fri, 10 Oct 2025 16:28:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978092FC876;
+	Fri, 10 Oct 2025 16:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760113689; cv=none; b=EFDLcLUgrRyMbSwJ30qHe7CdjsK4xkKlxMUD6RpBa9bystvh+DEUhQ3Mv/DIahLdzgMtJ/vrl4Ju9c7aRIGuHs5Py7CQK8stCfE8aMB1xy+Wkg6jLUpohSWJesH/au9YzXNdHqFo5j2nxzgq6be5iKl8bIdFY8hhZ6F66FAJ0mQ=
+	t=1760115309; cv=none; b=a0Eyq7QNRnlA2/G04uhf1e3Rc6ycje/GXUaLYPMYkDA3cv3vy0St4J3iPYSXGKOAkkcQUlhXD40PCMrMkAok8z7uBAMj3SwrcWaFAQCh0c21ytJZ5GXNZvji0LJZcpPRWJeY5gP0THDHg1ywsy8jHsnp7+0F5tKyylKictTv714=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760113689; c=relaxed/simple;
-	bh=ul0WhsI1/S/s1VuIA53kCuhvAfuZ5mveHzB8QuQ0UJU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=KfnMN/215slTuKSFFpIme5ZAkylv4LucQ624bNJNETOTo+H7TN6stMKD42t6WyeXxHU0MBSzXtZbmpiBqwDb10e+oFcATFVwexvzBqkwfU79oMESDz1DkiNp5Z8kj7dtDXNTbvqEHw0Iz6/yG9yOElImV7LJX9YyuJdKqLH5IlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rYX3urCU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAA1CC4CEF1;
-	Fri, 10 Oct 2025 16:28:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760113688;
-	bh=ul0WhsI1/S/s1VuIA53kCuhvAfuZ5mveHzB8QuQ0UJU=;
-	h=From:Date:Subject:To:Cc:From;
-	b=rYX3urCU8TISIqtEkj5mxobKUDaiZRYTRSrsbBC9qPGdcCYN07X8QHcqroNaXdtc3
-	 DlV3FF94K/Z6KzkbZEhDTUsNbljVzF1MbUIpt/9CWiopy0Wyj4Q4Ok7LA6RtebXwar
-	 OBeDB6i2huV8XumssoV8waCkxZRnPkyEAFIEMKQcQfpmIZ19G7QK2FnUFEHbkuDTkM
-	 xqC/7qTTE2bPPraKoiExK6jwiLffKMcYWhovuP7gUtitIWdoHSHVOQgNlAQ89hs2sk
-	 SwzI0kr6/4Qo0798RypCTiMDeVowMOox9xm7H2y5NlUgySGZWb2Dkr9miHSQkciaMh
-	 QkB5lzZ4GIGdg==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Fri, 10 Oct 2025 12:27:56 -0400
-Subject: [PATCH v4] sunrpc: allocate a separate bvec array for socket sends
+	s=arc-20240116; t=1760115309; c=relaxed/simple;
+	bh=suRumcgYqoCReE8eyejZ0DNC/ShHcuzZ9zg6cgvFHCE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YjaWV+S50zk2riFKqaI7zPK14D3yL+cAPN3dEbxOf1LinDmIONht2+JMEgweio/v+6zuXAn8s3akHwpJ9gV+u3dC8X8BRK2pBUGmn3NN3iGEj+0JtJquirqg0UVYB2xhuBNrF6RTNOrKtMClhzDxF0T5zWyzzjfQySvV8wzGzjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BmJ6TLz+; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=vscTT9HApN3I/7J7o6eTXeB4kqT2Uq/JxUsNpPc9x4c=; b=BmJ6TLz+3ImZgyegUyiBhBdxD6
+	6t7z+p3q0qqdz29e9/eJ53uRu+bGZ1JD+F4O8+/JkzDTC0o1kuaU72MG9wZAY+OV7uRg1f7MlAwY1
+	fxV7oYk88oPiZ73BA+Net4WlYvnjkrZ7uTsUByCBLA/Kegb9P0cyY4nR6GrNremzyFGY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v7GOE-00AcUe-SN; Fri, 10 Oct 2025 18:54:46 +0200
+Date: Fri, 10 Oct 2025 18:54:46 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Conor Dooley <conor@kernel.org>
+Cc: Thomas Wismer <thomas@wismer.xyz>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Thomas Wismer <thomas.wismer@scs.ch>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/3] dt-bindings: pse-pd: ti,tps23881: Add TPS23881B
+Message-ID: <d93573b4-6faa-4af5-80ae-32d68092ff30@lunn.ch>
+References: <20251004180351.118779-2-thomas@wismer.xyz>
+ <20251004180351.118779-8-thomas@wismer.xyz>
+ <20251007-stipulate-replace-1be954b0e7d2@spud>
+ <20251008135243.22a908ec@pavilion>
+ <e14c6932-efc9-4bf2-a07b-6bbb56d7ffbd@lunn.ch>
+ <20251009223302.306e036a@pavilion>
+ <8395a77f-b3ae-4328-9acb-58c6ac00bf9e@lunn.ch>
+ <20251010-gigahertz-parakeet-4e8b62ffa9fd@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251010-rq_bvec-v4-1-627567f1ce91@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAs06WgC/3XMSwrCMBSF4a2UjI3kYZrUkfsQkTxu2qC0mkhQS
- vdu2olKcXgu9/tHlCAGSGhfjShCDikMfRm7TYVsp/sWcHBlI0aYoIQoHO9nk8FiU9faO+KdMQa
- V71sEH55L6XgquwvpMcTXEs50vq4bmWKCpWfcceakAHG4QOzhuh1ii+ZIZn8gK1AxbolWQjNpV
- 5B/w+YDeYFCUkV5TUxjzQ+cpukN0txJLREBAAA=
-X-Change-ID: 20251008-rq_bvec-b66afd0fdbbb
-To: Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
- Tom Talpey <tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, 
- Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- David Howells <dhowells@redhat.com>
-Cc: Brandon Adams <brandona@meta.com>, linux-nfs@vger.kernel.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5016; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=ul0WhsI1/S/s1VuIA53kCuhvAfuZ5mveHzB8QuQ0UJU=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBo6TQWlU2sYUUxkyJz5mMC2jAG0H66eSMFq3DJX
- w75JbfPFs+JAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaOk0FgAKCRAADmhBGVaC
- FQJ0D/9WNWPmLLO4vdQY5NoKnFwwhm0u6ltrQnhgYZdT2y67ARPfeTHGXMvia7cous5RuacocaJ
- aeWQrZjmxt9YVGKFaKIAnpJrdVVcwgFKfnuYB8jXpIO+gZk/4XDxBSBHiUYrI6q+HdykpSg3xRy
- 8YNmMu1AcUwOOtZ00ZNY/7Y5lnYcSiLFbWz5Lv68ZQcuzXRFH1UPwJAHsEIpUNeBkConZ/ceiZ8
- /ZCpDAtHMtTxSktJKA+77TTa/LSz78Ty0hwy3V2GPBEL/qlwthezvMEMh2JFmx3EoVXpYqZhxmt
- Fjw7SYeutAqgQY7Wbl/sDYmCazuJQz98UIgbNe4ri69YncoD/RTcDfStD0rusqUMjLV5ZYCCRYQ
- RNCB80Ox5aw1bgTbpDHp+talACtar6dzw/P+CUxz4VDM5bVvxGwQLRKRNW8gWFRS0Y9zDHP+JkF
- N6IEYYWQuZkZhBV+LgSNMQ9+eA1Wqf8nSL+TLzzhc9VgZN6dYmIeuxmnjaBcO5xq8dtucOuZ+bM
- BqCNMXZHRQQZDIQA4CREugSfxnQpyDDZaMgBGNroDTSItJps67WzkS98YLWCa2Mt5QHHx6bzSKT
- 4qMNaybGEmsnN5yPdmiLtXUcCLTMRpRRJvbJWglOgrfyA6GU5F8Xiwpv/0oNrmnDTwupxUJJpCx
- hLR9jbRykOo4kTA==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251010-gigahertz-parakeet-4e8b62ffa9fd@spud>
 
-svc_tcp_sendmsg() calls xdr_buf_to_bvec() with the second slot of
-rq_bvec as the start, but doesn't reduce the array length by one, which
-could lead to an array overrun. Also, rq_bvec is always rq_maxpages in
-length, which can be too short in some cases, since the TCP record
-marker consumes a slot.
+> > So if the silicon and the DT disagree, you get -ENODEV or similar?
+> > That is what i would recommend, so that broken DT blobs get found by
+> > the developer.
+> 
+> I'm personally not a big fan of this kind of thing, as it prevents using
+> fallbacks for new devices when done strictly. I only really like it
+> being done this way if the driver does not produce errors for unknown
+> part numbers, only if (using this case as an example) a b device is
+> labeled as a non-b, or vice-versa. IOW, if the driver doesn't recognise
+> the ID, believe what's in DT.
 
-Fix both problems by adding a separate bvec array to the svc_sock that
-is specifically for sending. Allocate it when doing the first send on
-the socket, to avoid allocating the array for listener sockets.
+The issue we have seen in the past when not strictly checking the
+compatible against the hardware, is that a number of DT blob ship with
+the wrong compatible. Then sometime later you find you need to key
+some feature off the compatible, but you cannot without breaking all
+those devices which have the wrong compatible.
 
-For TCP, make this array one slot longer than rq_maxpages, to account
-for the record marker.
+In order to be able to use the compatible, it has to be correct.
 
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
-This fixes the same problem in an alternate way -- by adding a separate
-new bvec array to the svc_sock for sending purposes.
----
-Changes in v4:
-- switch to allocating a separate bvec for sends in the svc_sock
-- Link to v3: https://lore.kernel.org/r/20251009-rq_bvec-v3-0-57181360b9cb@kernel.org
-
-Changes in v3:
-- Add rq_bvec_len field and use it in appropriate places
-- Link to v2: https://lore.kernel.org/r/20251008-rq_bvec-v2-0-823c0a85a27c@kernel.org
-
-Changes in v2:
-- Better changelog message for patch #2
-- Link to v1: https://lore.kernel.org/r/20251008-rq_bvec-v1-0-7f23d32d75e5@kernel.org
----
- include/linux/sunrpc/svcsock.h |  3 +++
- net/sunrpc/svcsock.c           | 28 +++++++++++++++++++++-------
- 2 files changed, 24 insertions(+), 7 deletions(-)
-
-diff --git a/include/linux/sunrpc/svcsock.h b/include/linux/sunrpc/svcsock.h
-index 963bbe251e52109a902f6b9097b6e9c3c23b1fd8..a80a05aba75410b3c4cd7ba19181ead7d40e1fdf 100644
---- a/include/linux/sunrpc/svcsock.h
-+++ b/include/linux/sunrpc/svcsock.h
-@@ -26,6 +26,9 @@ struct svc_sock {
- 	void			(*sk_odata)(struct sock *);
- 	void			(*sk_owspace)(struct sock *);
- 
-+	/* For sends */
-+	struct bio_vec		*sk_bvec;
-+
- 	/* private TCP part */
- 	/* On-the-wire fragment header: */
- 	__be32			sk_marker;
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 7b90abc5cf0ee1520796b2f38fcb977417009830..09ba65ba2e805b20044a7c27ee028bbeeaf5e44b 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -730,6 +730,12 @@ static int svc_udp_sendto(struct svc_rqst *rqstp)
- 	unsigned int count;
- 	int err;
- 
-+	if (!svsk->sk_bvec) {
-+		svsk->sk_bvec = kcalloc(rqstp->rq_maxpages, sizeof(*svsk->sk_bvec), GFP_KERNEL);
-+		if (!svsk->sk_bvec)
-+			return -ENOMEM;
-+	}
-+
- 	svc_udp_release_ctxt(xprt, rqstp->rq_xprt_ctxt);
- 	rqstp->rq_xprt_ctxt = NULL;
- 
-@@ -740,14 +746,14 @@ static int svc_udp_sendto(struct svc_rqst *rqstp)
- 	if (svc_xprt_is_dead(xprt))
- 		goto out_notconn;
- 
--	count = xdr_buf_to_bvec(rqstp->rq_bvec, rqstp->rq_maxpages, xdr);
-+	count = xdr_buf_to_bvec(svsk->sk_bvec, rqstp->rq_maxpages, xdr);
- 
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
-+	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, svsk->sk_bvec,
- 		      count, rqstp->rq_res.len);
- 	err = sock_sendmsg(svsk->sk_sock, &msg);
- 	if (err == -ECONNREFUSED) {
- 		/* ICMP error on earlier request. */
--		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
-+		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, svsk->sk_bvec,
- 			      count, rqstp->rq_res.len);
- 		err = sock_sendmsg(svsk->sk_sock, &msg);
- 	}
-@@ -1235,19 +1241,19 @@ static int svc_tcp_sendmsg(struct svc_sock *svsk, struct svc_rqst *rqstp,
- 	int ret;
- 
- 	/* The stream record marker is copied into a temporary page
--	 * fragment buffer so that it can be included in rq_bvec.
-+	 * fragment buffer so that it can be included in sk_bvec.
- 	 */
- 	buf = page_frag_alloc(&svsk->sk_frag_cache, sizeof(marker),
- 			      GFP_KERNEL);
- 	if (!buf)
- 		return -ENOMEM;
- 	memcpy(buf, &marker, sizeof(marker));
--	bvec_set_virt(rqstp->rq_bvec, buf, sizeof(marker));
-+	bvec_set_virt(svsk->sk_bvec, buf, sizeof(marker));
- 
--	count = xdr_buf_to_bvec(rqstp->rq_bvec + 1, rqstp->rq_maxpages,
-+	count = xdr_buf_to_bvec(svsk->sk_bvec + 1, rqstp->rq_maxpages,
- 				&rqstp->rq_res);
- 
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
-+	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, svsk->sk_bvec,
- 		      1 + count, sizeof(marker) + rqstp->rq_res.len);
- 	ret = sock_sendmsg(svsk->sk_sock, &msg);
- 	page_frag_free(buf);
-@@ -1272,6 +1278,13 @@ static int svc_tcp_sendto(struct svc_rqst *rqstp)
- 					 (u32)xdr->len);
- 	int sent;
- 
-+	if (!svsk->sk_bvec) {
-+		/* +1 for TCP record marker */
-+		svsk->sk_bvec = kcalloc(rqstp->rq_maxpages + 1, sizeof(*svsk->sk_bvec), GFP_KERNEL);
-+		if (!svsk->sk_bvec)
-+			return -ENOMEM;
-+	}
-+
- 	svc_tcp_release_ctxt(xprt, rqstp->rq_xprt_ctxt);
- 	rqstp->rq_xprt_ctxt = NULL;
- 
-@@ -1636,5 +1649,6 @@ static void svc_sock_free(struct svc_xprt *xprt)
- 		sock_release(sock);
- 
- 	page_frag_cache_drain(&svsk->sk_frag_cache);
-+	kfree(svsk->sk_bvec);
- 	kfree(svsk);
- }
-
----
-base-commit: 177818f176ef904fb18d237d1dbba00c2643aaf2
-change-id: 20251008-rq_bvec-b66afd0fdbbb
-
-Best regards,
--- 
-Jeff Layton <jlayton@kernel.org>
-
+   Andrew
 
