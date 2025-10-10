@@ -1,134 +1,208 @@
-Return-Path: <netdev+bounces-228566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79B7EBCE80E
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 22:43:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A3EBCE9AB
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 23:20:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16FE0544C30
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 20:43:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE55A19A26CE
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 21:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A66032750E1;
-	Fri, 10 Oct 2025 20:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B5E325A2A5;
+	Fri, 10 Oct 2025 21:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UNcupHq9"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=antispam.mailspamprotection.com header.i=@antispam.mailspamprotection.com header.b="I6Mvph+L";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=valla.it header.i=@valla.it header.b="a4soGJk2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from delivery.antispam.mailspamprotection.com (delivery.antispam.mailspamprotection.com [185.56.87.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53FD1DDC33;
-	Fri, 10 Oct 2025 20:43:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760128982; cv=none; b=ZQYAfhefrJyjp+P0QEwbqdeDXztDF2uqiykfMSXtEYnaGv0kWIJBjkDCnqkyDi6KMDNR6AgwQ9pfSVfKL8rLlYPLwZjzg1GlpGopt2cOIur11MSjCZHxTWgjLQt8WA4vj45+ND+FB6RkV+KwbGVONNRfGOaQ6jA4bBckEY9QCF0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760128982; c=relaxed/simple;
-	bh=SWmyU8vAfJAl7JM7RoIxG/43ALVz3UYnrZXUQvZIby4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ivzi92cbt3wu0mSpm1Bo+2Mtus6T+pEaGJSDRmidYtG0mbY7X5BQrG4p7evMzP8ohFDqNQowTmUNQ2JztvvTDnZ6QYeDc/z7KYEjGF+JUTNsUQbJkdjAQMfTyu53IMxoLU+Ua0CIKcnbs0UZWHpXs6ffC6HpDxxUpbllEpRQwRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=UNcupHq9; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59AFtvgB029883;
-	Fri, 10 Oct 2025 20:42:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=FpmfnMx50Z89hypFinEnXSu9g7XfG
-	ZrN+jAIv/id1rA=; b=UNcupHq9aPF/yPFzxkM1VMnFwxSZEMS0+OrQ0OBidkvMK
-	d633Lj9K2S13lz/okyjVooFc0RFnE1V3CMwWKuMldI+1pVWShjhQzKJHPKOLOiFU
-	uhn87pWtppzGwk7rUu3emLptHMYk90konnU0SSuo0IjNZ6OLF6qVgar2lSnq4WoR
-	rNsF2bT9UaGkShR08F4mV5JFnV4WVbp6PL/jSv1LdGo8BkampkWKwThHEB7DJJ2e
-	QeRA4zU05aBEKj+zhPgihWoa38xKOaZVgW0lpJQ87II8FEpnJlT3nuoMHisbbI51
-	PKLZXLhaNM14brA7MRXkE02caEW4Sa6wc2P4kWm5g==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49nv69ve5c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Oct 2025 20:42:46 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 59AIkL7M036952;
-	Fri, 10 Oct 2025 20:42:45 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 49nv65q2fe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Oct 2025 20:42:45 +0000
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 59AKgink008014;
-	Fri, 10 Oct 2025 20:42:44 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 49nv65q2eu-1;
-	Fri, 10 Oct 2025 20:42:44 +0000
-From: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-To: Sunil Goutham <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
-        hariprasad <hkelam@marvell.com>,
-        Subbaraya Sundeep <sbhatta@marvell.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc: dan.carpenter@linaro.org, kernel-janitors@vger.kernel.org,
-        error27@gmail.com, harshit.m.mogalapalli@oracle.com
-Subject: [PATCH] Octeontx2-af: Fix missing error code in cgx_probe()
-Date: Fri, 10 Oct 2025 13:42:39 -0700
-Message-ID: <20251010204239.94237-1-harshit.m.mogalapalli@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB962594BD;
+	Fri, 10 Oct 2025 21:20:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.56.87.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760131253; cv=pass; b=qK5caUpkQChj07iEU1IZHQEwmeb9wbvWyBvSOjNKXQnSAUeG3vFn9ycAiW0wobTOA0v1pe6O7kEhfoJgaFOB+1iHSwk16kYKS5UQ1LY4+k7LcceGCvaaSN4qb/UUaLisymU9IrPNCOB2Tny4ysBw6NI7QQoiCaynXj5LK8yDpZg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760131253; c=relaxed/simple;
+	bh=fPlDHZlSJRA5PDvHco57sjg3ozHSO1I20UpOSkNVqQI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EAvVo5AbMLBEbc8GXSn6GFLIShFQDxBbgrUO9BakptF0EHYTY+RJLRk2biH5lKtxAGo+udoLeEpfoQTVTXm4Tp0l/+Ze3LKVkWu68/po64w7bGLoil1QBFwoPiwjMm8ezWT/WbBufuBu+RtsCwxEFIdK56X04RDQg5GLISw3r84=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it; spf=pass smtp.mailfrom=valla.it; dkim=pass (1024-bit key) header.d=antispam.mailspamprotection.com header.i=@antispam.mailspamprotection.com header.b=I6Mvph+L; dkim=pass (1024-bit key) header.d=valla.it header.i=@valla.it header.b=a4soGJk2; arc=pass smtp.client-ip=185.56.87.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valla.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=valla.it
+ARC-Seal: i=1; cv=none; a=rsa-sha256; d=outgoing.instance-europe-west4-x65p.prod.antispam.mailspamprotection.com; s=arckey; t=1760131251;
+	 b=hNSFIuR//PUjBb8UppfHT1xpEArShO1AA3kogNyDosQQe55YXx1ZbgxisJKYz2yG3W7jk6wCQu
+	  fRigJ1/6y8Y5WZ2OnheL9Ca5AI11wKLNjS18WMRKJw4XpmMn5jJ4loDwKIW5L2CfTEo6qTz5uV
+	  GSU2DIn5ycIjdkkcArhxFQSZeipLJ9PiJkQORQTfMiewDN6skAyyPBFZd6Uh7MPMWxOTaHtV7u
+	  hAJjtOFrdpLO86vzGrRs31fcYyXsiE5LiVPc84mm+VA1giK60UiFLq9C3qM9JLI6msA5sSq6+w
+	  S7cmP+uvBpvPlyQ3bvRnWGiDjNpImYSipmxO7TWQMzDa1Q==;
+ARC-Authentication-Results: i=1; outgoing.instance-europe-west4-x65p.prod.antispam.mailspamprotection.com; smtp.remote-ip=35.214.173.214;
+	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
+	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
+	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
+	arc=none
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed; d=outgoing.instance-europe-west4-x65p.prod.antispam.mailspamprotection.com; s=arckey; t=1760131251;
+	bh=fPlDHZlSJRA5PDvHco57sjg3ozHSO1I20UpOSkNVqQI=;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
+	  Message-ID:Date:Subject:Cc:To:From:DKIM-Signature:DKIM-Signature;
+	b=E0723+QxCuGANTCDJnbXreUWwOPl4rUQbkIt62/6waonxjGGX4DeRr5tvwrbdcCab1gTUJ/vT9
+	  ECsyRd4ZEA+rhZ5Mb+V9ZYIhs2wM0dmIWlJJj2Y5jzAUyfVOnpIXBhanRCOgJjcdx65NIF2wT+
+	  DSSxrx25oI4b3rrKWbr+hgCv3vmi4N+yBp/GMkcfMoKSTgyXWYQppAyF6tJvbj/DpLheMEVG2E
+	  eozAwJ5kTonnp7Wz/DwFK33iPSS4m56oPNhD9oiQvCWwMGqv41KOS/ikDKx/zJHS+qyqMJgxiz
+	  SwzKvBu5r/idTjq+bnCQbkJ83fhwSD+1VNem9wVUCQG6Dg==;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=antispam.mailspamprotection.com; s=default; h=CFBL-Feedback-ID:CFBL-Address
+	:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Reply-To:List-Unsubscribe;
+	bh=Pa3D+kH4AJps3m5pvh+XsXvkn2PadB4zax/ER5QUhaU=; b=I6Mvph+La2JGmY6g6TZCwRDd8d
+	vJX2GUgna8IUdd+Ltr0b5+GbxNmbfdLofQM3zsEH7m+BcnTC1BnJzSrp0xCQjvMP+z8kxkbpv6BPN
+	L+vrvipBf53plAGo18iO94vQzRnOEpeDYYn7SmSlAltJYiJRPcjr26chw3S+2gT9hYaA=;
+Received: from 214.173.214.35.bc.googleusercontent.com ([35.214.173.214] helo=esm19.siteground.biz)
+	by instance-europe-west4-x65p.prod.antispam.mailspamprotection.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <francesco@valla.it>)
+	id 1v7KXY-00000008i49-08Me;
+	Fri, 10 Oct 2025 21:20:42 +0000
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=valla.it;
+	s=default; h=Date:Subject:Cc:To:From:list-help:list-unsubscribe:
+	list-subscribe:list-post:list-owner:list-archive;
+	bh=Pa3D+kH4AJps3m5pvh+XsXvkn2PadB4zax/ER5QUhaU=; b=a4soGJk2euqlfaLc6adf+mUjUX
+	2jNarlk/C/D5cX3Ig9UyytaSOhwu83PqdoS/XtcmZ4plVMKykP/nlbqJCnRsR0sqxCf0H3736eJxa
+	PCNBpc7B4jQABd+kVG7cZmQl5wmPuW962CXROBvVoBdNwYRQJ3tdOjQPdRRbNGWAR1PI=;
+Received: from [87.16.13.60] (port=59834 helo=fedora.fritz.box)
+	by esm19.siteground.biz with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <francesco@valla.it>)
+	id 1v7KXH-00000000PLJ-0N73;
+	Fri, 10 Oct 2025 21:20:23 +0000
+From: Francesco Valla <francesco@valla.it>
+To: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>,
+ Harald Mommer <harald.mommer@opensynergy.com>,
+ Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com>,
+ Wolfgang Grandegger <wg@grandegger.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Damir Shaikhutdinov <Damir.Shaikhutdinov@opensynergy.com>,
+ linux-kernel@vger.kernel.org, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ development@redaril.me
+Subject: Re: [PATCH v5] can: virtio: Initial virtio CAN driver.
+Date: Fri, 10 Oct 2025 23:20:22 +0200
+Message-ID: <2318164.vFx2qVVIhK@fedora.fritz.box>
+In-Reply-To: <aOkqUWxiRDlm0Jzi@fedora>
+References:
+ <20240108131039.2234044-1-Mikhail.Golubev-Ciuchea@opensynergy.com>
+ <2243144.yiUUSuA9gR@fedora.fritz.box> <aOkqUWxiRDlm0Jzi@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-10_05,2025-10-06_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 mlxlogscore=999
- phishscore=0 spamscore=0 adultscore=0 suspectscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510020000
- definitions=main-2510100119
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDA4MDEyMSBTYWx0ZWRfX8qpiAakia7C1
- GKaPqawfZyo/SM1nhpguFTX6zgl9y45RHf0FJdB9fMZdd2PLNuiX5OhogiiijldRzv+O+5PgS7f
- 2//ND0DWE5aGTeLHRJJMdM9uGQ0H39IWQC1XCcrJU6ME6BtTCPqyE7SX7D9vy2eYcuT/XEiDkSX
- JT5PFtjmiNZpBaJrxq8kC1YJJ44J2tdVgkcnGRgikFTOgvOCNYsh/dY6RilDC2iCWmdxlMMrmzG
- n2/zRd9Vecd2Tgaz8lTYXWedKA9thgXXXgFD8YryKtf3BSsBynGREBsSPlIxEgbCsXQRSY/Vu99
- 5GwMWy1HDjaX++RhPVu5HEIV0urelEyhj9wzcAOHhdJMuS7Oh9aswTwE1fpWqB+JfUBq6tX8Bxr
- oiLDrRKOsKTQF+aXbLvg5WG3GEU/XaVa9TiSaFJNMHYMX5QCn9M=
-X-Authority-Analysis: v=2.4 cv=dtrWylg4 c=1 sm=1 tr=0 ts=68e96fc6 b=1 cx=c_pps
- a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
- a=x6icFKpwvdMA:10 a=VwQbUJbxAAAA:8 a=KKAkSRfTAAAA:8 a=yPCof4ZbAAAA:8
- a=Yqazk3itAgfi9cqaz0UA:9 a=cvBusfyB2V15izCimMoJ:22 cc=ntf awl=host:13624
-X-Proofpoint-GUID: _hdJsDoazvxcdO1wPW9vHgV-x98ip4Mf
-X-Proofpoint-ORIG-GUID: _hdJsDoazvxcdO1wPW9vHgV-x98ip4Mf
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - esm19.siteground.biz
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - valla.it
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-SGantispam-id: a9073c73fb2f04c10de87ad2a155623d
+AntiSpam-DLS: false
+AntiSpam-DLSP: 
+AntiSpam-DLSRS: 
+AntiSpam-TS: 1.0
+CFBL-Address: feedback@antispam.mailspamprotection.com; report=arf
+CFBL-Feedback-ID: 1v7KXY-00000008i49-08Me-feedback@antispam.mailspamprotection.com
+Authentication-Results: outgoing.instance-europe-west4-x65p.prod.antispam.mailspamprotection.com;
+	iprev=pass (214.173.214.35.bc.googleusercontent.com) smtp.remote-ip=35.214.173.214;
+	auth=pass (LOGIN) smtp.auth=esm19.siteground.biz;
+	dkim=pass header.d=valla.it header.s=default header.a=rsa-sha256;
+	arc=none
 
-When CGX fails mapping to NIX, set the error code to -ENODEV, currently
-err is zero and that is treated as success path.
+On Friday, 10 October 2025 at 17:46:25 Matias Ezequiel Vara Larsen <mvaralar@redhat.com> wrote:
+> On Thu, Sep 11, 2025 at 10:59:40PM +0200, Francesco Valla wrote:
+> > Hello Mikhail, Harald,
+> > 
+> > hoping there will be a v6 of this patch soon, a few comments:
+> > 
+> 
+> I am working on the v6 by addressing the comments in this thread.
+> 
+> > On Monday, 8 January 2024 at 14:10:35 Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com> wrote:
+> > 
+> > [...]
+> > 
+> > > +
+> > > +/* virtio_can private data structure */
+> > > +struct virtio_can_priv {
+> > > +	struct can_priv can;	/* must be the first member */
+> > > +	/* NAPI for RX messages */
+> > > +	struct napi_struct napi;
+> > > +	/* NAPI for TX messages */
+> > > +	struct napi_struct napi_tx;
+> > > +	/* The network device we're associated with */
+> > > +	struct net_device *dev;
+> > > +	/* The virtio device we're associated with */
+> > > +	struct virtio_device *vdev;
+> > > +	/* The virtqueues */
+> > > +	struct virtqueue *vqs[VIRTIO_CAN_QUEUE_COUNT];
+> > > +	/* I/O callback function pointers for the virtqueues */
+> > > +	vq_callback_t *io_callbacks[VIRTIO_CAN_QUEUE_COUNT];
+> > > +	/* Lock for TX operations */
+> > > +	spinlock_t tx_lock;
+> > > +	/* Control queue lock. Defensive programming, may be not needed */
+> > > +	struct mutex ctrl_lock;
+> > > +	/* Wait for control queue processing without polling */
+> > > +	struct completion ctrl_done;
+> > > +	/* List of virtio CAN TX message */
+> > > +	struct list_head tx_list;
+> > > +	/* Array of receive queue messages */
+> > > +	struct virtio_can_rx rpkt[128];
+> > 
+> > This array should probably be allocated dynamically at probe - maybe
+> > using a module parameter instead of a hardcoded value as length? 
+> > 
+> 
+> If I allocate this array in probe(), I would not know sdu[] in advance
+> if I defined it as a flexible array. That made me wonder: can sdu[] be
+> defined as flexible array for rx? 
+> 
+> Thanks.
+> 
 
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Closes: https://lore.kernel.org/all/aLAdlCg2_Yv7Y-3h@stanley.mountain/
-Fixes: d280233fc866 ("Octeontx2-af: Fix NIX X2P calibration failures")
-Signed-off-by: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
----
-This is based on static analysis with smatch and only compile tested.
----
- drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 1 +
- 1 file changed, 1 insertion(+)
+One thing that can be done is to define struct virtio_can_rx as:
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-index d374a4454836..ec0e11c77cbf 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-@@ -1981,6 +1981,7 @@ static int cgx_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	    !is_cgx_mapped_to_nix(pdev->subsystem_device, cgx->cgx_id)) {
- 		dev_notice(dev, "CGX %d not mapped to NIX, skipping probe\n",
- 			   cgx->cgx_id);
-+		err = -ENODEV;
- 		goto err_release_regions;
- 	}
- 
--- 
-2.39.3
+struct virtio_can_rx {
+#define VIRTIO_CAN_RX                   0x0101
+	__le16 msg_type;
+	__le16 length; /* 0..8 CC, 0..64 CAN-FD, 0..2048 CAN-XL, 12 bits */
+	__u8 reserved_classic_dlc; /* If CAN classic length = 8 then DLC can be 8..15 */
+	__u8 padding;
+	__le16 reserved_xl_priority; /* May be needed for CAN XL priority */
+	__le32 flags;
+	__le32 can_id;
+	__u8 sdu[] __counted_by(length);
+};
+
+and then allocate the rpkt[] array using the maximum length for SDU:
+
+priv->rpkt = kcalloc(num_rx_buffers,
+		sizeof(struct virtio_can_rx) + VIRTIO_CAN_MAX_DLEN,
+		GFP_KERNEL);
+
+In this way, the size of each member of rpkt[] is known and is thus
+suitable for virtio_can_populate_vqs().
+
+
+Regards,
+
+Francesco
+
 
 
