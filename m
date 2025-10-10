@@ -1,94 +1,88 @@
-Return-Path: <netdev+bounces-228527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DD7DBCD58F
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 15:53:00 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0674BCD59E
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 15:54:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1A84634F95B
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 13:53:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7C1844E3260
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 13:54:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128882EFDA6;
-	Fri, 10 Oct 2025 13:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wZtnX/4g"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A5D52F362F;
+	Fri, 10 Oct 2025 13:54:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD33E288C25
-	for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 13:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2C91C5D44;
+	Fri, 10 Oct 2025 13:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760104377; cv=none; b=oWPx9INJ+im8wV0DFKWHUivzIBpBwRMoU/72PRP3T1ladpq/tj2kDSwEfuFe4+fRK8jW/BhlnQUpnPbU6fXeMztks3oR6uFatkomStVYVclT4bSI3ejT9l8kb+dAN/+LcpTdBkv+lCoOiW+Dg2NagRhfdPtULQRMMmTpakcfzi8=
+	t=1760104460; cv=none; b=H6R8TdSg6FQfibeVIO9JWpBQIvUp8C6/K48UrU5bwkwDziptntRw9FZVPU6QIXoEyyHviNy2CqYI+dgMruNMiKvNdx+EBsNUjWu0kWa6Sy3quI4L/1E+W02m6P1K2PzJjEvjOE2jRA6GZSc8OwRhFZkBsuk5nFTcwho8oRD721g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760104377; c=relaxed/simple;
-	bh=52FH/UthIByShqOMgMjB+i5hbOx0pMWmDVdqVUuEL9Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d1GN9bVzZruPk2uDUub6Y93MqNdUKv+Gbq2j58Y4LVmur65/AA0yBaIWGV5WfTp8EXj/wP8tTTSa8xQfr0VNMpjUJX0fl/oAlP+ovqoIwm2ztkcBJkvTgV7aVJ0WZRZXnxv4oGYfhYq9NESZNmUHTMZxu2AbYbgnOnn5rvE4kJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wZtnX/4g; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6aDPD3sm9RPdq6tvBSzBbUI+uHVMKnRgb+CD3IUbDcQ=; b=wZtnX/4gkp8xtA9PUwtEwGjgmt
-	cLtz6qqft/dk48V0juRAkdVLanb0W32hp86MgNjCYyofGbtIIylbydXKbbugEz9GeFraqQvmOPPEp
-	ZvUNMzIoNaPQxISIGuul36zvn4KqAbggVfUf9Awh5ymS0KGAUPPjemSZ835g66ETy/Hs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1v7DYC-00Abk9-UJ; Fri, 10 Oct 2025 15:52:52 +0200
-Date: Fri, 10 Oct 2025 15:52:52 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: 'Simon Horman' <horms@kernel.org>, netdev@vger.kernel.org,
-	'Andrew Lunn' <andrew+netdev@lunn.ch>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	'Eric Dumazet' <edumazet@google.com>,
-	'Jakub Kicinski' <kuba@kernel.org>,
-	'Paolo Abeni' <pabeni@redhat.com>,
-	"'Russell King (Oracle)'" <rmk+kernel@armlinux.org.uk>,
-	'Mengyuan Lou' <mengyuanlou@net-swift.com>
-Subject: Re: [PATCH net-next 1/3] net: txgbe: expend SW-FW mailbox buffer
- size to identify QSFP module
-Message-ID: <f4c6d749-020a-46ca-844b-558542113327@lunn.ch>
-References: <20250928093923.30456-1-jiawenwu@trustnetic.com>
- <20250928093923.30456-2-jiawenwu@trustnetic.com>
- <aNqPAH2q0sqxE6bX@horms.kernel.org>
- <000201dc39b9$5cdcf5f0$1696e1d0$@trustnetic.com>
+	s=arc-20240116; t=1760104460; c=relaxed/simple;
+	bh=74teSWYi4/L4IaGFglEu9oWYkl+qtemgenQPUyRahU4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bXbR/1wNw/f/WKtsWzjTqV+D75DienfLb3Yuz6VDP4m6dI4yJwin8hajXgedIa9IwlxrwQtQJNtd6flSQGr8IAv4uSr/8i7qO/TE355OYIdG/4n0qZ2AOuIXV0gQdbRzWX73H5bmYCo+axCVbOoIRQ7b5wNItQaXwo4uiJh2agE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 3ACBA61775; Fri, 10 Oct 2025 15:54:16 +0200 (CEST)
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>,
+	sdf@fomichev.me
+Subject: [PATCH net 0/2] net: avoid LOCKDEP MAX_LOCK_DEPTH splat
+Date: Fri, 10 Oct 2025 15:54:10 +0200
+Message-ID: <20251010135412.22602-1-fw@strlen.de>
+X-Mailer: git-send-email 2.49.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000201dc39b9$5cdcf5f0$1696e1d0$@trustnetic.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 10, 2025 at 03:42:00PM +0800, Jiawen Wu wrote:
-> On Mon, Sep 29, 2025 9:52 PM, Simon Horman wrote:
-> > On Sun, Sep 28, 2025 at 05:39:21PM +0800, Jiawen Wu wrote:
-> > > In order to identify 40G and 100G QSFP modules, expend mailbox buffer
-> > > size to store more information read from the firmware.
-> > 
-> > Hi,
-> > 
-> > I see that the message size is increased by 4 bytes,
-> > including two new one-byte fields.
-> > But I don't see how that is used by this patchset.
-> > Could you expand on this a little?
-> 
-> It is used for QSFP modules, I haven't added the part of these modules yet.
-> But the firmware was changed. So when using the new firmware, the module
-> cannot be identified due to incorrect length of mailbox buffer.
- 
-And with old firmware? Can you tell the end of the message has not
-been filled in with old firmware?
+unshare -n bash -c 'for i in $(seq 1 100);do ip link add foo$i type dummy;done'
+Gives:
 
-	Andrew
+BUG: MAX_LOCK_DEPTH too low!
+turning off the locking correctness validator.
+depth: 48  max: 48!
+48 locks held by kworker/u16:1/69:
+ #0: ffff8880010b7148 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work+0x7ed/0x1350
+ #1: ffffc900004a7d40 (net_cleanup_work){+.+.}-{0:0}, at: process_one_work+0xcf3/0x1350
+ #2: ffffffff8bc6fbd0 (pernet_ops_rwsem){++++}-{4:4}, at: cleanup_net+0xab/0x7f0
+ #3: ffffffff8bc8daa8 (rtnl_mutex){+.+.}-{4:4}, at: default_device_exit_batch+0x7e/0x2e0
+ #4: ffff88800b5e9cb0 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: unregister_netdevice_many_notify+0x1056/0x1b00
+[..]
+
+Work around this by splitting the list into lockdep-digestable sublists.
+This patchset should have no effect whatsoever for non-lockdep builds.
+
+This issue is a problem for me because of a recent test case added
+to nftables userspace which will create/destroy 100 dummy net devices,
+so when I run the tests on a debug kernel lockdep coverage is now lost.
+
+Alternative suggestions welcome.
+
+I did not yet encounter another code path that would take so many mutexes
+in a row, so I don't see a reason to muck with task_struct->held_locks[].
+
+Florian Westphal (2):
+  net: core: move unregister_many inner loops to a helper
+  net: core: split unregister_netdevice list into smaller chunks
+
+ net/core/dev.c | 89 ++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 65 insertions(+), 24 deletions(-)
+
+-- 
+2.49.1
 
