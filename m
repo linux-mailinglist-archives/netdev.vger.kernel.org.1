@@ -1,154 +1,142 @@
-Return-Path: <netdev+bounces-228484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2709BCC1E9
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 10:26:12 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06084BCC1AD
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 10:22:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74DDE400DA1
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 08:26:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D92274F6771
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 08:22:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98F925B31B;
-	Fri, 10 Oct 2025 08:26:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 620C425A355;
+	Fri, 10 Oct 2025 08:21:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="wh+SrsUz"
 X-Original-To: netdev@vger.kernel.org
-Received: from chinatelecom.cn (smtpnm6-10.21cn.com [182.42.147.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54A8F255F2C;
-	Fri, 10 Oct 2025 08:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=182.42.147.92
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295111991D2;
+	Fri, 10 Oct 2025 08:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760084768; cv=none; b=gIDiiZ3uQMyg/K6aaJjWpE3mzdCUagS8p6C5CthjmqHB2tJTzIcTw+LALvcbKKR/t3bhrA4aIy/TA7lpjAskR0YHyfLwwyJXNqwDYWhaF1PVP8huEMmyffcgT5MXUxKcliYQB1jjnCDf/SwIisykgLOENmBbh0DBZqA4LWal7EY=
+	t=1760084519; cv=none; b=ZQVUMZM8IMjltOnK30OtI+S5MJYmYcux3k/4KhepRvoa+ep4R2k2SI3ACdFw0fGYRmV18Py0ErNDn7zne4tFcMlLFYjscAY6KNoVd7+ZrckMvTP+grrPgHgKbdW0JquwYGzD37aeBz1c0xBzAoP4mVwvBlBkmoFC2Up1X39gn78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760084768; c=relaxed/simple;
-	bh=ZuFuyTGu23tvFNWi4Iv+KCLI8/7kdNScqRY8LYBHD+M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JZYqVavPCTgxFrN6gZp/d+tfsDs77oDaOeyC5kpgt/DRJWIxNOEejeKX1Kc8+lamB3nkecZEDPAvfuijMo4SOZWUUjDErYZl41nxviPz2JpOIr5JNQCMRWeuPSkXgg/MyMcq7aprrrPMjz7RXfXXyrFPR63N1ktHsRNJtdlZkTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn; spf=pass smtp.mailfrom=chinatelecom.cn; arc=none smtp.client-ip=182.42.147.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chinatelecom.cn
-HMM_SOURCE_IP:192.168.139.44:0.1171078105
-HMM_ATTACHE_NUM:0000
-HMM_SOURCE_TYPE:SMTP
-Received: from clientip-27.148.194.68 (unknown [192.168.139.44])
-	by chinatelecom.cn (HERMES) with SMTP id E8B6CB0CA534;
-	Fri, 10 Oct 2025 16:17:29 +0800 (CST)
-X-189-SAVE-TO-SEND: zhenggy@chinatelecom.cn
-Received: from  ([27.148.194.68])
-	by gateway-ssl-dep-79cdd9d55b-z742x with ESMTP id 1de75387086b4f1a9ceda4f4d87fbae0 for edumazet@google.com;
-	Fri, 10 Oct 2025 16:17:50 CST
-X-Transaction-ID: 1de75387086b4f1a9ceda4f4d87fbae0
-X-Real-From: zhenggy@chinatelecom.cn
-X-Receive-IP: 27.148.194.68
-X-MEDUSA-Status: 0
-Sender: zhenggy@chinatelecom.cn
-Message-ID: <81694a16-07df-44f0-a0a1-601821e8859d@chinatelecom.cn>
-Date: Fri, 10 Oct 2025 16:18:07 +0800
+	s=arc-20240116; t=1760084519; c=relaxed/simple;
+	bh=YSQNJr2oYKk3qMOODi3stI1a6DzS4lkkF0P3amUMrSI=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=MXnoaPd3KRrXcZNcCwI5Ynj/lCCMZN5LPyIY/QkzEdgVlUjEL77FvPLnXAfSLlASJPqG0t2tzQkXVqH8CZ+cgYofUxZe6CY1iXKhTWL22VK4IAJzPCv7q/VQG5SKFHparbJiVenW2hQT9QjXn3QGdG+Ro8hSUckkO3JGOun3yxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=wh+SrsUz; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+Received: from pendragon.ideasonboard.com (cpc89244-aztw30-2-0-cust6594.18-1.cable.virginm.net [86.31.185.195])
+	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 496105B3;
+	Fri, 10 Oct 2025 10:20:19 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1760084419;
+	bh=YSQNJr2oYKk3qMOODi3stI1a6DzS4lkkF0P3amUMrSI=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=wh+SrsUzNEIBibEeDhQhc1qqGwwHfMb0P91qH4PQjEOeo2y92dpRU3qb8lSxIM+ZK
+	 pSh8HHZg0ZlJ3FC2XjO/lHGbgIFqcbukSrVU/O9LCrMj79vYrK/H6sDVQ03LnNFNu6
+	 MElInC2i8+egIqm6SC68AU0whL2i6oGUB4EGP4sE=
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Ctyun AOneMail
-Subject: Re: [PATCH] bpf, sockmap: Update tp->rcv_nxt in sk_psock_skb_ingress
-Content-Language: en-US
-To: =?UTF-8?B?44CQ5aSW6YOo6LSm5Y+344CRIEVyaWMgRHVtYXpldA==?=
- <edumazet@google.com>
-Cc: john.fastabend@gmail.com, jakub@cloudflare.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- bpf@vger.kernel.org
-References: <3b78ca04-f4b9-4d12-998d-4e21a3a8397f@chinatelecom.cn>
- <CANn89i+rHTU2eVtkc0H=v+8PczfonOxTqc=fCw+6QRwj_3MURg@mail.gmail.com>
-From: zhengguoyong <zhenggy@chinatelecom.cn>
-In-Reply-To: <CANn89i+rHTU2eVtkc0H=v+8PczfonOxTqc=fCw+6QRwj_3MURg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <7b861236-8317-4435-8582-bd97f545e322@linaro.org>
+References: <20251009155251.102472-1-balamanikandan.gunasundar@microchip.com> <7b861236-8317-4435-8582-bd97f545e322@linaro.org>
+Subject: Re: [PATCH 00/18] media: microchip-isc: Color correction and histogram stats
+From: Kieran Bingham <kieran.bingham@ideasonboard.com>
+Cc: Chas Williams <3chas3@gmail.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, Balakrishnan Sambath <balakrishnan.s@microchip.com>, Hans Verkuil <hverkuil@kernel.org>, Ricardo Ribalda <ribalda@chromium.org>, Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>, Jacopo Mondi <jacopo.mondi@ideasonboard.com>, Daniel Scally <dan.scally+renesas@ideasonboard.com>, Tomi Valkeinen <tomi.valkeinen@ideasonboard.com>, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Mauro Carvalho Chehab <mchehab@kernel.org>
+To: Balamanikandan Gunasundar <balamanikandan.gunasundar@microchip.com>, Eugen Hristev <eugen.hristev@linaro.org>
+Date: Fri, 10 Oct 2025 09:21:51 +0100
+Message-ID: <176008451125.756374.6436397947711705101@ping.linuxembedded.co.uk>
+User-Agent: alot/0.9.1
 
-Hi Eric,
+Quoting Eugen Hristev (2025-10-09 21:11:17)
+> Hi Bala,
+>=20
+> On 10/9/25 18:52, Balamanikandan Gunasundar wrote:
+> > Hi,
+> >=20
+> > This patch series has a set of enhancements to the Microchip Image Sens=
+or
+> > Controller driver. The objective is to expand its image processing
+> > capabilities and to improve the colors.
+> >=20
+> > This series also introduces a new stats driver that exposes the histogr=
+am
+> > data to userspace via v4l2 controls. This allows applications such as
+> > libcamera to access real time image statistics for advanced image
+> > processing like automatic exposure, white balance adjustments etc.
 
-Thank you for your reply. Indeed, using bh_lock_sock_nested can lead to deadlock risks.
-I apologize for not noticing this earlier.
+How much data do you anticipate to be passing through controls? (What
+can the hardware provide in total if we look at the bigger picture to
+support the full device?)
 
-Can I change bh_lock_sock_nested to lock_sock to resolve this deadlock issue?
-Or do you have any better suggestions on where to update the tp->rcv_nxt field in the process?
+For all other ISPs we've been working towards using structured parameter
+buffers to pass data - and we've been making that format extensible,
+which I think could also be a design that can apply to statistics.
 
-Look forward to your response. Thank you.
+This would greatly reduce the overhead of managing 'one control per
+value' ... or things like passing large tables (like a lens shading
+table perhaps) through controls.
 
-*From:* 【外部账号】Eric Dumazet
-*收件人:* zhengguoyong
-*抄送:* john.fastabend@gmail.com, jakub@cloudflare.com, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, bpf@vger.kernel.org
-*主题:* [PATCH] bpf, sockmap: Update tp->rcv_nxt in sk_psock_skb_ingress
-*日期:* 2025-10-09 15:07:44
-> On Wed, Oct 8, 2025 at 8:07 PM zhengguoyong <zhenggy@chinatelecom.cn> wrote:
->>
->> When using sockmap to forward TCP traffic to the application
->> layer of the peer socket, the peer socket's tcp_bpf_recvmsg_parser
->> processing flow will synchronously update the tp->copied_seq field.
->> This causes tp->rcv_nxt to become less than tp->copied_seq.
->>
->> Later, when this socket receives SKB packets from the protocol stack,
->> in the call chain tcp_data_ready → tcp_epollin_ready, the function
->> tcp_epollin_ready will return false, preventing the socket from being
->> woken up to receive new packets.
->>
->> Therefore, it is necessary to synchronously update the tp->rcv_nxt
->> information in sk_psock_skb_ingress.
->>
->> Signed-off-by: GuoYong Zheng <zhenggy@chinatelecom.cn>
-> 
-> Hi GuoYong Zheng
-> 
-> We request a Fixes: tag for patches claiming to fix a bug.
-> 
-> How would stable teams decide to backport a patch or not, and to which versions,
-> without having to fully understand this code ?
-> 
-> 
->> ---
->>  net/core/skmsg.c | 10 +++++++++-
->>  1 file changed, 9 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
->> index 9becadd..e9d841c 100644
->> --- a/net/core/skmsg.c
->> +++ b/net/core/skmsg.c
->> @@ -576,6 +576,7 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
->>         struct sock *sk = psock->sk;
->>         struct sk_msg *msg;
->>         int err;
->> +       u32 seq;
->>
->>         /* If we are receiving on the same sock skb->sk is already assigned,
->>          * skip memory accounting and owner transition seeing it already set
->> @@ -595,8 +596,15 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
->>          */
->>         skb_set_owner_r(skb, sk);
->>         err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, true);
->> -       if (err < 0)
->> +       if (err < 0) {
->>                 kfree(msg);
->> +       } else {
->> +               bh_lock_sock_nested(sk);
->> +               seq = READ_ONCE(tcp_sk(sk)->rcv_nxt) + len;
->> +               WRITE_ONCE(tcp_sk(sk)->rcv_nxt, seq);
-> 
-> This does not look to be the right place.
-> 
-> Re-locking a socket _after_ the fundamental change took place is
-> fundamentally racy.
-> 
-> Also do we have a guarantee sk is always a TCP socket at this point ?
-> 
-> If yes, why do we have sk_is_tcp() check in sk_psock_init_strp() ?
-> 
->> +               bh_unlock_sock(sk);
->> +       }
->> +
->>         return err;
->>  }
->>
->> --
->> 1.8.3.1
+--
+Kieran
 
+> >=20
+> > Balakrishnan Sambath (11):
+> >   media: microchip-isc: Enable GDC and CBC module flags for RGB formats
+> >   media: microchip-isc: Improve histogram calculation with outlier
+> >     rejection
+> >   media: microchip-isc: Use channel averages for Grey World AWB
+> >   media: microchip-isc: Add range based black level correction
+> >   media: platform: microchip: Extend gamma table and control range
+> >   media: platform: microchip: Add new histogram submodule
+> >   media: microchip-isc: Register and unregister statistics device
+> >   media: microchip-isc: Always enable histogram for all RAW formats
+> >   media: microchip-isc: fix histogram state initialization order
+> >   media: microchip-isc: decouple histogram cycling from AWB mode
+> >   media: microchip-isc: enable userspace histogram statistics export
+> >=20
+> > Balamanikandan Gunasundar (7):
+> >   media: platform: microchip: set maximum resolution for sam9x7
+> >   media: platform: microchip: Include DPC modules flags in pipeline
+> >   media: microchip-isc: expose hue and saturation as v4l2 controls
+> >   media: microchip-isc: Rename CBC to CBHS
+> >   media: microchip-isc: Store histogram data of all channels
+> >   media: videodev2.h, v4l2-ioctl: Add microchip statistics format
+> >   media: microchip-isc: expose color correction registers as v4l2
+> >     controls
+> >=20
+> >  drivers/media/platform/microchip/Kconfig      |   2 +
+> >  drivers/media/platform/microchip/Makefile     |   2 +-
+> >  .../platform/microchip/microchip-isc-base.c   | 373 ++++++++++--
+> >  .../platform/microchip/microchip-isc-regs.h   |   3 +
+> >  .../platform/microchip/microchip-isc-stats.c  | 549 ++++++++++++++++++
+> >  .../media/platform/microchip/microchip-isc.h  |  44 +-
+> >  .../microchip/microchip-sama5d2-isc.c         |   2 +-
+> >  .../microchip/microchip-sama7g5-isc.c         |  73 ++-
+> >  drivers/media/v4l2-core/v4l2-ioctl.c          |   1 +
+> >  include/linux/atmel-isc-media.h               |  13 +
+> >  include/uapi/linux/videodev2.h                |   3 +
+> >  11 files changed, 1001 insertions(+), 64 deletions(-)
+> >  create mode 100644 drivers/media/platform/microchip/microchip-isc-stat=
+s.c
+> >=20
+>=20
+> This looks interesting.
+> I would like to see the compliance tool output for more platforms
+> (sama7g5, sama5d2, and the new sam9x7), also the media-ctl -p , to see
+> the topology with your new driver.
+>=20
+> Thanks,
+> Eugen
 
