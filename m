@@ -1,87 +1,88 @@
-Return-Path: <netdev+bounces-228534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 035FEBCD7DD
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 16:21:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6FF0BCD80D
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 16:24:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D08433561C0
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 14:20:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7C11188E8FC
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 14:24:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE0E12F5A29;
-	Fri, 10 Oct 2025 14:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0647287268;
+	Fri, 10 Oct 2025 14:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mgcdt5nb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gCs3Xs3j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B132F5499
-	for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 14:19:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A8B17597
+	for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 14:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760105963; cv=none; b=I9k7i1Cl3TPlcMJRQWcfj0W2UIjw3rL7uvrEffe+wsihqMHzPXXcJADOhzfu87glPzl3p9FrTksnm8qqL05iL0BK/Q26CGrMojIrgGPK8uOwIzTbrg9WPchrVOHHTt1iEXlQrYUCZl1GN60FakKB6leAVQIHbfp+owJ1zf2wfqg=
+	t=1760106242; cv=none; b=rxwiFfZVX5YH96sJM9NP3e3SWLbtGm4Tmt1DWijYT370TigF35N09CxM6lUofnJFq5vIh4owWmeuNrhNHFsiY30bnhv/6y3427iB5GUTuBNiyvLL+UqI5H3XzGc9Q2SRCCP9pVfiryefZFAQmRnQP1RG5UHCsv7Lw7LYHnKcGBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760105963; c=relaxed/simple;
-	bh=FdLxE7Lm30nhyAzpTObSV2SsmYXiyE6njXvC6pEK/ss=;
+	s=arc-20240116; t=1760106242; c=relaxed/simple;
+	bh=728Pg4sn3XA6HHuow/YpDlQqrnEkY+wYm3DVQHrsDtk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gdlu2RzPmoW4cGgmcSq50WzsQM8zMe5QzjM26lk5zJHTBIzChTUn/Az11lNzfd76b6c4WXBJrz1Bx/WuYx9l7alB/DjjmvUQ3snAj2tGTiG1IZ1sHOFI/yiJ7nTGKNmaoLsMj/Xl8GsJ0v9r16DkNZbDXKDMa9OR4qQNM2hNdPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mgcdt5nb; arc=none smtp.client-ip=74.125.224.46
+	 To:Cc:Content-Type; b=nj4syp8OZ9b+mbRYsrHcwlsmTaKJ+es6Qh/ovaU3RitfjN53aeaPcZL1Bb/06LkObiiL81fOCW86PQphB80TPeugIy6fVLAnNRS2FCJe7zzo2JncYUn7tTzFvATAs7NK4Wurs2PKmqZJgaKNDBs8t+cYMe3V7cZNXbBLAZ/jqZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gCs3Xs3j; arc=none smtp.client-ip=209.85.128.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-63b960a0a2bso2488361d50.1
-        for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 07:19:21 -0700 (PDT)
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-72ce9790aceso19597867b3.3
+        for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 07:24:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760105961; x=1760710761; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760106239; x=1760711039; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FdLxE7Lm30nhyAzpTObSV2SsmYXiyE6njXvC6pEK/ss=;
-        b=mgcdt5nbX1LLUaGdnUPLUImPENVMbDBZ/LIBH4nO6BbtnVPuj8xQF++g6WRLpevd9u
-         nQNz4U6c5mLeiUazjtzOJfUDLN6RBUPm2934+fnbqyxYCK640jwZ8YdS5ua/b1g5r+7G
-         iedrPck8PskE12I+Bpw1Yq/hP+b+KHWaxyjsmtlkvMJrGVu0ritCRfA+ESqZ4fE035XU
-         3U0JUz3LaPiJckH/vh7wDwrKh6V9uvmtAOHBe4Un+G0XQGcyeRSxd9VO+qb8HlElyAd1
-         CzOTaYPoVYmVJk1zb+4P5RVGJlztoex7DUOtgfOtcLnxs2SvImjz8upUTUMZh14y4Cfo
-         uYFw==
+        bh=ep8vBwkncVq2/IyBnp2z8KCBLEvYE8o7QIrmGoze/68=;
+        b=gCs3Xs3jeXyGap8ELqMKwYCt9LvFOgdRd1sBWvHq/SQ1xXCEP7sIy+BehNcP9KVnd0
+         RJ/pz17JXVV8RYbJIkrzv+SVlwm/TSaCSJsJBIC1LJfjzOqFPQM5nfxKSYqnUZAsvBW9
+         ypYXAWFvul/ffm5Xshlj6LqeNAXQJ9tQGQ74W8VkPw5muRv7CTXczU/oD6OKsrXszPeU
+         grnsoV+2XQ4c1o4Lnzo7POsVvopsuQmDEr9dxFvddNkooJlT1I7rHKJptFAF9TkMt9LX
+         kTfYnb9/h7T40FNZ5MXm+hGb4B6/6z821ZhjUp+11DUiInqSvCGdeXOwlNZ9EuJ+Mcrs
+         oOJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760105961; x=1760710761;
+        d=1e100.net; s=20230601; t=1760106239; x=1760711039;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FdLxE7Lm30nhyAzpTObSV2SsmYXiyE6njXvC6pEK/ss=;
-        b=OeFwxMhw1p4CqK98iw9zDeuVOJP+4UfMhFOLlu8unHKIoXgWlf5Dwc1tq3Npzafc+t
-         EBJfec99QBBGPIw1Aj+/xlxtBfKvkStpUoK2vGFRFOmk5mUA/9OxQT549Y/vpvRbqDDU
-         tKQ1mwVkmwuTrkpBrpWvTWfmW+u6KGOCzQ8MHq0cq2EUBJwpIUvR+Lo3qTlMeTzubP6l
-         eXGD1K/IJafSgleab+dsiS7JYXTJelr1ZtmzJ4k9WJI97D8wu67FSyj5zhY42/fWrPPz
-         eQFlOFJ2SaQJsow+Lp+FjOwZmoUmPSJVrXXrxiPmcCBwZ8E+V37Uru6UOYuyAL5iiDfo
-         OvFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWjOdmQwouTakv6zfToRrDobm3MhGTric3MDu0idBN23JnB6VDPC/awEy6VBlw5trNXRAS0Ono=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxpe8/JH+V+B1k5TskcuCBa+ixUVKuRDGYaZ/UY/rMjvjPBwj9m
-	ZiG04jaEk5DEKbgdiokbrpdiMWVfqATzDYxekZTZBq+rfeiZXW98zdTaRj2BslrhlvZj42pvPmb
-	bRV1jmxYwUB3AlRHh47Wa8ZgA+lYebHmrNpyWmawd
-X-Gm-Gg: ASbGnct+PwRzjzsFYRZ7bOo1yn1ar8msVExZdAXCWp37xXvubsMUQAITrP+RiwrU32Q
-	wTBekzEpjDssJ/EygIhDLQGXgJcKDRrEJrwVYayToTKKkHSytbYkSDfx8x5KOv26Y6nt2kJQ8OS
-	AuEm0ls6JN2B1I1dOXJsiyJpIhzuyDqeeGmgBu6LVcrwBSPteLDpnyAg79Krrkz4B3G2Lxewh7a
-	9byQWrErSRDgFlO9l1kBtLDZs94v1vUc6I/0dgTHRXz
-X-Google-Smtp-Source: AGHT+IH5jygwKiKj8iWh7NXNa5aupSDxyDfR+khBSnZcImv7vqxxqCrpmKSorFziFLH513QVJf/OcUBtXZUfZcpK4oU=
-X-Received: by 2002:a53:b6cd:0:b0:636:d4ab:a507 with SMTP id
- 956f58d0204a3-63ccb85e07emr8088258d50.16.1760105960542; Fri, 10 Oct 2025
- 07:19:20 -0700 (PDT)
+        bh=ep8vBwkncVq2/IyBnp2z8KCBLEvYE8o7QIrmGoze/68=;
+        b=ay/5q7Gd/+EHEF+BpeJ5ExnpSFlxOoesILtE/AC8St6w0oCD3Z845kj7SPV7vC/ny7
+         EyjH2hcb/Ds+POz6HzRekycHogKnJVxfuQES98uUlp1wYQsDflYzyJQO0HROF4ovhZxl
+         8Tai1Bc1z03i5ia7+KgNKhxicRgNcMXV0agAOeiTYzqwUY7zR20GYdf8HV5rWDSgmxlR
+         xTgXZ3F2dxeWWMdte6oWtDJx+8xYjYK1UbnMX2nzaTi57jMh6Xaseq2lmPXkIrJnRLfZ
+         PkqX/hu7eGkiD1MplRBXmqWr9sPivY00zOlthVutC0tRD4tfqqfGlE9iG6ie/w4ftQCx
+         bUkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXeqhdl4mKEdaHdZ6muerWNxKszvbfrJAgxe7KNVtJ0uCQXmmMZ0abyMYhOGvx1bXx8TEsS0bw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVqltgXO79vrp7wx4hBuik+R1SCTE6TJt0Ow+byJS7QKwpmImi
+	HqXTsmkzsXEGQkWrahZXkcvvJSAeHyOMpGh0JaEnJLw9Dgtv6usaKkCkT0gZbSVhoGZcsMPe+6u
+	0hB10T2yIc59xGlUj6G4S822ZhQy0DW5glAXl5F05
+X-Gm-Gg: ASbGnctDP0aziQKn/ohAxeiX01QC0SVp0n/L6tNtUbdU1HMZLSAZxH7E2Quu5kxG3xl
+	hxPGcxcjZeUoEi14nEjbfbAiSN2t+9ngfJFIPNxT3C6GXvl/IQFY78ltkn0v1iOY7DdeClRXTSf
+	cUfLFg9IEN56ST48K3tJ+mSmah9ocLebj+eP1ZZfaiHVOgGyhWdmYWykfHMAe9WbRKnlbC/jQ6g
+	TcrnuqNvMosGBQoBPhRa+mb9lfZFeT4+9hFgGrplYmp
+X-Google-Smtp-Source: AGHT+IFXUmNhceZhgJjwPY/VRP9jDGszxMq44Rpe9q3p1bI1zOHVpEFQvHQpi/tuqUftv/YFXc8YNDVTdg5ozI7vO+Y=
+X-Received: by 2002:a05:690c:e0a:b0:781:64f:2b16 with SMTP id
+ 00721157ae682-781064f3482mr52227047b3.56.1760106238542; Fri, 10 Oct 2025
+ 07:23:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251007001120.2661442-1-kuniyu@google.com> <20251007001120.2661442-2-kuniyu@google.com>
-In-Reply-To: <20251007001120.2661442-2-kuniyu@google.com>
+References: <20251007001120.2661442-1-kuniyu@google.com> <20251007001120.2661442-3-kuniyu@google.com>
+In-Reply-To: <20251007001120.2661442-3-kuniyu@google.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 10 Oct 2025 07:19:07 -0700
-X-Gm-Features: AS18NWANXiYqX9j9t6ZkUl82Zdn7j6m_ZQHBRWnadmG5JVnbTEP8rqhXa70_KeA
-Message-ID: <CANn89i+=V0Pr4B0C9NH4vLf4kRdQAhpT53UyVPEPxQavvZ6FCQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next/net 1/6] tcp: Save lock_sock() for memcg in inet_csk_accept().
+Date: Fri, 10 Oct 2025 07:23:47 -0700
+X-Gm-Features: AS18NWDQf2ogI7PP3DWUgSD8qvpKvGg_Iu4VbjufziD2iUPvf_knUOrdlfOrzSs
+Message-ID: <CANn89iJYv-ei-0yKzveLF7teyNpMUwTCf8YmOUzxZcyhowsTUQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next/net 2/6] net: Allow opt-out from global protocol
+ memory accounting.
 To: Kuniyuki Iwashima <kuniyu@google.com>
 Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
 	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
@@ -89,29 +90,41 @@ Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
 	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
 	Mina Almasry <almasrymina@google.com>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Shakeel Butt <shakeel.butt@linux.dev>
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Mon, Oct 6, 2025 at 5:11=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.com=
 > wrote:
 >
-> If memcg is enabled, accept() acquires lock_sock() twice for each new
-> TCP/MPTCP socket in inet_csk_accept() and __inet_accept().
+> Some protocols (e.g., TCP, UDP) implement memory accounting for socket
+> buffers and charge memory to per-protocol global counters pointed to by
+> sk->sk_proto->memory_allocated.
 >
-> Let's move memcg operations from inet_csk_accept() to __inet_accept().
+> Sometimes, system processes do not want that limitation.  For a similar
+> purpose, there is SO_RESERVE_MEM for sockets under memcg.
 >
-> Note that SCTP somehow allocates a new socket by sk_alloc() in
-> sk->sk_prot->accept() and clones fields manually, instead of using
-> sk_clone_lock().
+> Also, by opting out of the per-protocol accounting, sockets under memcg
+> can avoid paying costs for two orthogonal memory accounting mechanisms.
+> A microbenchmark result is in the subsequent bpf patch.
 >
-> mem_cgroup_sk_alloc() is called for SCTP before __inet_accept(),
-> so I added the protocol check in __inet_accept(), but this can be
-> removed once SCTP uses sk_clone_lock().
+> Let's allow opt-out from the per-protocol memory accounting if
+> sk->sk_bypass_prot_mem is true.
+>
+> sk->sk_bypass_prot_mem and sk->sk_prot are placed in the same cache
+> line, and sk_has_account() always fetches sk->sk_prot before accessing
+> sk->sk_bypass_prot_mem, so there is no extra cache miss for this patch.
+>
+> The following patches will set sk->sk_bypass_prot_mem to true, and
+> then, the per-protocol memory accounting will be skipped.
+>
+> Note that this does NOT disable memcg, but rather the per-protocol one.
+>
+> Another option not to use the hole in struct sock_common is create
+> sk_prot variants like tcp_prot_bypass, but this would complicate
+> SOCKMAP logic, tcp_bpf_prots etc.
 >
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> Reviewed-by: Shakeel Butt <shakeel.butt@linux.dev>
 
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 
