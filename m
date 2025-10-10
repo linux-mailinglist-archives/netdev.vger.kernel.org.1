@@ -1,433 +1,353 @@
-Return-Path: <netdev+bounces-228456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 365EBBCB41D
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 02:05:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C844CBCB431
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 02:10:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BC6A3B284E
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 00:04:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEB043A6622
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 00:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60DCB1E766E;
-	Fri, 10 Oct 2025 00:04:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3530E2AD22;
+	Fri, 10 Oct 2025 00:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NaHdpzfx"
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="FBfD7cRI";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="wcw6eCbq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA081547F2;
-	Fri, 10 Oct 2025 00:04:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47641BC2A;
+	Fri, 10 Oct 2025 00:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760054656; cv=none; b=EGFTelulFnXIHQPY77t7DzQn+FG6bRt/Yk4U4WX8X5lDQCDB83OVts3Tz17DynnN8vxVwIyaJj6uWCAzCrrsgXVLoVD+vi3l/lvCLjLU/ia/EC7ExSdh314eTf9+8kjZzDhiGm+ZQrmvLuShhuOGzACJzK+loI2cHl6weMaS+jM=
+	t=1760055031; cv=none; b=G1K3J4+K0/v4tDXGBVkCl1lHt2jKwb9mHhOgG39ycLDweZCeMVplce+W+Vv7TE+vqTpyTz9htK3oVJJGF5sCrbz5rivEM0f16uJscKFQewy55X/4kbxAFjxYXO7hh9HRYddRY4s7Cij2/ex16RxGSns1jdAYEAsQ2S1GS+DqS1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760054656; c=relaxed/simple;
-	bh=GJMrjEcsZnm+4A1earTDzo1+f/eVV90GXue0FW/CVko=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nHGc6/kec/a0ThXY3QUkfW8Bwh7RczoJFZd9XUK7mj6F2kqplRHVBoSA+Q8Kqm7vbTmvxavhaNDxXwRVdCVJ2kAbv6A1QXzjfT4hQFNNjEsL102KYR/Dk4dw8JTVn9zBaomSBwhCwI3z/F+9EBwM6HESuKXMpEpvuC9soA25Muo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NaHdpzfx; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760054655; x=1791590655;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=GJMrjEcsZnm+4A1earTDzo1+f/eVV90GXue0FW/CVko=;
-  b=NaHdpzfxsgqVgRkW92M6C+G7SdeINyg7oMEftdac2A15HhusvyPUpAxv
-   G3lPrTSFPb8hUy8qCew4wiaxaj1UBmvNe/fPVvvhfgjdHk4+McZQHP/tU
-   pd+GLqbzM5hkdSCgtX+1jzhKdxrOPSIR5PZn//5QYW4KQ0jsk9/sLgXK1
-   4K7XdHjEAM2vUaD41sYFzg9RCGOjUWHq398/Tn53M3zvbB01pDYhKZy4P
-   NxTvXmnoRvsnK5OoeixJ2I6bzqlC4pJckCuVSZPrQ0AZTfUO/9Eo4IkZR
-   obf4maHFWuv6N4gOKB9d9PTMURs3mwm2+nqj3/Xb6kTDXC2KlmyayKwoO
-   A==;
-X-CSE-ConnectionGUID: /AZFRy1lQladpDsXYLIlQw==
-X-CSE-MsgGUID: fC0voUeoQWeT1zSyehtPyQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11577"; a="62316089"
-X-IronPort-AV: E=Sophos;i="6.19,217,1754982000"; 
-   d="scan'208";a="62316089"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2025 17:04:09 -0700
-X-CSE-ConnectionGUID: xitU3fU0SmekpQh72WCQ2w==
-X-CSE-MsgGUID: iHC2zFvwTaSMKPgGOO2oyA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,217,1754982000"; 
-   d="scan'208";a="180858277"
-Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2025 17:04:09 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Thu, 09 Oct 2025 17:03:49 -0700
-Subject: [PATCH net v3 4/6] ixgbevf: fix mailbox API compatibility by
- negotiating supported features
+	s=arc-20240116; t=1760055031; c=relaxed/simple;
+	bh=ILO6mk9xMKJYjMG/ztxFdn243CQQZsFxR9A7pMa3iwc=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=FAxzi2gcIhu1HryTL4WSzXnSEV8L/gBKNOPAAH9Lze1kLjPI60PG5GZjcZdIz1Lqic+40MABR5q0o5Wq0HiSb96SqomtafPIeVP+7Tuo5r1VwXv4d7LZ7hkzstWb2TJD7oCBaQH2hZOnmnB8j0upXXeqjSBCZLT+EQ/31FonuGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=FBfD7cRI; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=wcw6eCbq; arc=none smtp.client-ip=202.12.124.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 64E167A00CB;
+	Thu,  9 Oct 2025 20:10:27 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Thu, 09 Oct 2025 20:10:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
+	1760055027; x=1760141427; bh=/rIslGpp5X3plNPgeuvixOqik8qIg2/1lu+
+	r9KnPNNk=; b=FBfD7cRIM1eMUe95Z5kDH9R0/Ygf1UlqsF0h6/84z0tPPGGk2Aq
+	hj1rjguWebbFmGSY7Nxs0JIyZK0JVcdX7YMcgdFzOv+zlLvlfa51T7+qVzhVdyrG
+	bKzbhNBUKG0QoEBe24MeEl+B4oxlBBHwJqPx/fjSEI74J5B/IByq+xW0VZ7vHY+E
+	P3Nb9nVkGeHcOsC4MRBNkRU7PhSErEHiRsWe9QNKL83PJ65/iDfDwkVfjO/6dy2t
+	IwDjETer/xEoaNBHXDUv3qFqCkB673Ux2kREhciFy5KUOGyut2OdyGiWyNHnmHBO
+	473P2aHpjqNB8EnwgXcuedd2/yJasc30nDw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1760055027; x=
+	1760141427; bh=/rIslGpp5X3plNPgeuvixOqik8qIg2/1lu+r9KnPNNk=; b=w
+	cw6eCbqJYh9MCL0OqaikZgHysUoJyOpQXzqZu5yLENOElTnfPJxc/AfdjjMWxK3b
+	xJVWP0XW91r2lywXYLDY1j+tyxSKCqO3wKSr1+/yjCXZ4MNJNnrPkjAJWbsFwiCc
+	ropRJtG8QpvUlUO3I2XA8xyMWh+KE4uom1b6AbmlJt+gTJgZP+MgrjhgMa1Qo8OQ
+	Xw13KxqRmJcfv/+nUhxbhSKYDZ7NhqtDsb17YKvcHitSX7v2dk7QAe6VJGYBC6qG
+	jL6AJeQRJC+XcGv7Yv+ytA3bLpsVEo1wOR8u6gmr6GDJJn/XB9y8HRsv1wv/h4TR
+	RXS7cQU/l8eUge8KjBtDg==
+X-ME-Sender: <xms:8k7oaMjUbHWpGYmiTIY1-IcFIdhHwSeAitTti-zrSf4WQijstmeoFA>
+    <xme:8k7oaF_HGpvL7bMvFw_hwEZ0-mmlwh63uO-rJYrtuzv94EkHZAHfzw1C7Lwkd5TmN
+    K_IQwvslmSX9uFc-pdJKnzwq5Ep-37PNvMnIcPRBRjTV4sG7Q>
+X-ME-Received: <xmr:8k7oaEZDxyXL3wK54UvjqlORWCl7rEfbgvb5ACqqc-Op66NRWs5w_gbOB8HfdKyfm-gzYnCGQEkVNefvsk1eM8FNhUt074lBviWs3HVMH9TP>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddutdejheekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurheptgfgggfhvfevufgjfhffkfhrsehtqhertddttdejnecuhfhrohhmpefpvghilheu
+    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
+    epleejtdefgeeukeeiteduveehudevfeffvedutefgteduhfegvdfgtdeigeeuudejnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
+    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepudejpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopehlihhnuhigqdhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtohepthhomhesthgrlhhpvgihrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehr
+    vgguhhgrthdrtghomhdprhgtphhtthhopehokhhorhhnihgvvhesrhgvughhrghtrdgtoh
+    hmpdhrtghpthhtohepughhohifvghllhhssehrvgguhhgrthdrtghomhdprhgtphhtthho
+    pegthhhutghkrdhlvghvvghrsehorhgrtghlvgdrtghomhdprhgtphhtthhopegurghird
+    hnghhosehorhgrtghlvgdrtghomh
+X-ME-Proxy: <xmx:8k7oaLtSUoL55rnpdiH74yDJBxZYQlaar0S3RkP-0-UnYbJO1bCogA>
+    <xmx:8k7oaAneupu_bVCTfnygf1qNWM5Xik-g1gMEBlkqhI1EwL8LASOebw>
+    <xmx:8k7oaLxenfkQjnj-FdY43vvZzdSAMVOKd6fpRCNnRlaYv3H0nyMlYA>
+    <xmx:8k7oaEzaT8uGbhdLbpaUmNlgvlPwfwq0QQsxTfOIyQXbHQgfHU6EBw>
+    <xmx:807oaG1VOBx_ZBpLtGc-EbOP6FmkkvNEhMQTeGkfmfvJKe8EreNNNdy8>
+Feedback-ID: iab3e480c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 9 Oct 2025 20:10:22 -0400 (EDT)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251009-jk-iwl-net-2025-10-01-v3-4-ef32a425b92a@intel.com>
-References: <20251009-jk-iwl-net-2025-10-01-v3-0-ef32a425b92a@intel.com>
-In-Reply-To: <20251009-jk-iwl-net-2025-10-01-v3-0-ef32a425b92a@intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Emil Tantilov <emil.s.tantilov@intel.com>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Sridhar Samudrala <sridhar.samudrala@intel.com>, 
- Phani Burra <phani.r.burra@intel.com>, 
- Piotr Kwapulinski <piotr.kwapulinski@intel.com>, 
- Simon Horman <horms@kernel.org>, Radoslaw Tyl <radoslawx.tyl@intel.com>, 
- Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Cc: Konstantin Ilichev <konstantin.ilichev@intel.com>, 
- Milena Olech <milena.olech@intel.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>, stable@vger.kernel.org, 
- Rafal Romanowski <rafal.romanowski@intel.com>
-X-Mailer: b4 0.15-dev-89294
-X-Developer-Signature: v=1; a=openpgp-sha256; l=12961;
- i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=FOHZYctobMXLMCihiXUYZlPGi8uqnrgJ1tbuyH6sdNg=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhowXvuUz1ZXCHZc/X3vkUk56n4RosRHjlK19nlr72mcuS
- PzNu2BSRykLgxgXg6yYIouCQ8jK68YTwrTeOMvBzGFlAhnCwMUpABPRecnw32++seMO3tNbjx37
- pTQn6L3HZouDHpK8tyO/VahzbOyayc7IcD7cu6ile/71S68X1n29U2jdreJjnfNYx79/O0fzdld
- BJgA=
-X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
- fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
+From: NeilBrown <neilb@ownmail.net>
+To: "Jeff Layton" <jlayton@kernel.org>
+Cc: "Chuck Lever" <chuck.lever@oracle.com>,
+ "Olga Kornievskaia" <okorniev@redhat.com>, "Dai Ngo" <Dai.Ngo@oracle.com>,
+ "Tom Talpey" <tom@talpey.com>, "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
+ "David Howells" <dhowells@redhat.com>, "Brandon Adams" <brandona@meta.com>,
+ linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject:
+ Re: [PATCH v2 2/2] sunrpc: add a slot to rqstp->rq_bvec for TCP record marker
+In-reply-to: <74e20200de3d113c0bced1380c0ce99a569c2892.camel@kernel.org>
+References: <>, <74e20200de3d113c0bced1380c0ce99a569c2892.camel@kernel.org>
+Date: Fri, 10 Oct 2025 11:10:20 +1100
+Message-id: <176005502018.1793333.5043420085151021396@noble.neil.brown.name>
+Reply-To: NeilBrown <neil@brown.name>
 
-From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+On Thu, 09 Oct 2025, Jeff Layton wrote:
+> On Thu, 2025-10-09 at 08:51 +1100, NeilBrown wrote:
+> > On Thu, 09 Oct 2025, Jeff Layton wrote:
+> > > We've seen some occurrences of messages like this in dmesg on some knfsd
+> > > servers:
+> > >=20
+> > >     xdr_buf_to_bvec: bio_vec array overflow
+> > >=20
+> > > Usually followed by messages like this that indicate a short send (note
+> > > that this message is from an older kernel and the amount that it reports
+> > > attempting to send is short by 4 bytes):
+> > >=20
+> > >     rpc-srv/tcp: nfsd: sent 1048155 when sending 1048152 bytes - shutti=
+ng down socket
+> > >=20
+> > > svc_tcp_sendmsg() steals a slot in the rq_bvec array for the TCP record
+> > > marker. If the send is an unaligned READ call though, then there may not
+> > > be enough slots in the rq_bvec array in some cases.
+> > >=20
+> > > Add a slot to the rq_bvec array, and fix up the array lengths in the
+> > > callers that care.
+> > >=20
+> > > Fixes: e18e157bb5c8 ("SUNRPC: Send RPC message on TCP with a single soc=
+k_sendmsg() call")
+> > > Tested-by: Brandon Adams <brandona@meta.com>
+> > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > > ---
+> > >  fs/nfsd/vfs.c        | 6 +++---
+> > >  net/sunrpc/svc.c     | 3 ++-
+> > >  net/sunrpc/svcsock.c | 4 ++--
+> > >  3 files changed, 7 insertions(+), 6 deletions(-)
+> >=20
+> > I can't say that I'm liking this patch.
+> >=20
+> > There are 11 place where (in nfsd-testing recently) where
+> > rq_maxpages is used (as opposed to declared or assigned).
+> >=20
+> > 3 in nfsd/vfs.c
+> > 4 in sunrpc/svc.c
+> > 1 in sunrpc/svc_xprt.c
+> > 2 in sunrpc/svcsock.c
+> > 1 in xprtrdma/svc_rdma_rc.c
+> >=20
+> > Your patch changes six of those to add 1.  I guess the others aren't
+> > "callers that care".  It would help to have it clearly stated why, or
+> > why not, a caller might care.
+> >=20
+> > But also, what does "rq_maxpages" even mean now?
+> > The comment in svc.h still says "num of entries in rq_pages"
+> > which is certainly no longer the case.
+> > But if it was the case, we should have called it "rq_numpages"
+> > or similar.
+> > But maybe it wasn't meant to be the number of pages in the array,
+> > maybe it was meant to be the maximum number of pages is a request
+> > or a reply.....
+> > No - that is sv_max_mesg, to which we add 2 and 1.
+> > So I could ask "why not just add another 1 in svc_serv_maxpages()?"
+> > Would the callers that might not care be harmed if rq_maxpages were
+> > one larger than it is?
+> >=20
+> > It seems to me that rq_maxpages is rather confused and the bug you have
+> > found which requires this patch is some evidence to that confusion.  We
+> > should fix the confusion, not just the bug.
+> >=20
+> > So simple question to cut through my waffle:
+> > Would this:
+> > -	return DIV_ROUND_UP(serv->sv_max_mesg, PAGE_SIZE) + 2 + 1;
+> > +	return DIV_ROUND_UP(serv->sv_max_mesg, PAGE_SIZE) + 2 + 1 + 1;
+> >=20
+> > fix the problem.  If not, why not?  If so, can we just do this?
+> > then look at renaming rq_maxpages to rq_numpages and audit all the uses
+> > (and maybe you have already audited...).
+> >=20
+>=20
+> I get the objection. I'm not crazy about all of the adjustments either.
+>=20
+> rq_maxpages is used to size two fields in the rqstp: rq_pages and
+> rq_bvec. It turns out that they both want rq_maxpages + 1 slots. The
+> rq_pages array needs the extra slot for a NULL terminator, and rq_bvec
+> needs it for the TCP record marker.
 
-There was backward compatibility in the terms of mailbox API. Various
-drivers from various OSes supporting 10G adapters from Intel portfolio
-could easily negotiate mailbox API.
+Somehow the above para helped a lot for me to understand what the issue
+is here - thanks.
 
-This convention has been broken since introducing API 1.4.
-Commit 0062e7cc955e ("ixgbevf: add VF IPsec offload code") added support
-for IPSec which is specific only for the kernel ixgbe driver. None of the
-rest of the Intel 10G PF/VF drivers supports it. And actually lack of
-support was not included in the IPSec implementation - there were no such
-code paths. No possibility to negotiate support for the feature was
-introduced along with introduction of the feature itself.
+rq_bvec is used for two quite separate purposes.
 
-Commit 339f28964147 ("ixgbevf: Add support for new mailbox communication
-between PF and VF") increasing API version to 1.5 did the same - it
-introduced code supported specifically by the PF ESX driver. It altered API
-version for the VF driver in the same time not touching the version
-defined for the PF ixgbe driver. It led to additional discrepancies,
-as the code provided within API 1.6 cannot be supported for Linux ixgbe
-driver as it causes crashes.
+nfsd/vfs.c uses it to assemble read/write requests to send to the
+filesystem.
+sunrpc/svcsock.c uses to assemble send/recv requests to send to the
+network.
 
-The issue was noticed some time ago and mitigated by Jake within the commit
-d0725312adf5 ("ixgbevf: stop attempting IPSEC offload on Mailbox API 1.5").
-As a result we have regression for IPsec support and after increasing API
-to version 1.6 ixgbevf driver stopped to support ESX MBX.
+It might help me if this were documented clearly in svc.h as I seem to
+have had to discover several times now :-(
 
-To fix this mess add new mailbox op asking PF driver about supported
-features. Basing on a response determine whether to set support for IPSec
-and ESX-specific enhanced mailbox.
+Should these even use the same rq_bvec?  I guess it makes sense to share
+but we should be cautious about letting the needs of one side infect the
+code of the other side.
 
-New mailbox op, for compatibility purposes, must be added within new API
-revision, as API version of OOT PF & VF drivers is already increased to
-1.6 and doesn't incorporate features negotiate op.
+So if we increase the size of rq_bvec to meet the needs of svcsock.c, do
+we need to make *any* code changes to vfs.c?  I doubt it.
 
-Features negotiation mechanism gives possibility to be extended with new
-features when needed in the future.
+It bothers me a little bit that svc_tcp_sendmsg() needs to allocate a
+frag.  But given that it does, could it also allocate a larger bvec if
+rq_bvec isn't big enough?
 
-Reported-by: Jacob Keller <jacob.e.keller@intel.com>
-Closes: https://lore.kernel.org/intel-wired-lan/20241101-jk-ixgbevf-mailbox-v1-5-fixes-v1-0-f556dc9a66ed@intel.com/
-Fixes: 0062e7cc955e ("ixgbevf: add VF IPsec offload code")
-Fixes: 339f28964147 ("ixgbevf: Add support for new mailbox communication between PF and VF")
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/ixgbevf/ixgbevf.h      |  7 ++++
- drivers/net/ethernet/intel/ixgbevf/mbx.h          |  4 ++
- drivers/net/ethernet/intel/ixgbevf/vf.h           |  1 +
- drivers/net/ethernet/intel/ixgbevf/ipsec.c        | 10 +++++
- drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c | 32 +++++++++++++++-
- drivers/net/ethernet/intel/ixgbevf/vf.c           | 45 ++++++++++++++++++++++-
- 6 files changed, 96 insertions(+), 3 deletions(-)
+Or should svc_tcp_recvfrom() allocate the frag and make sure the bvec is
+big enough ......
+Or svc_alloc_arg() could check with each active transport for any
+preallocation requirements...
+Or svc_create_socket() could update some "bvec_size" field in svc_serv
+which svc_alloc_arg() could check an possibly realloc rq_bvec.
 
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-index 3a379e6a3a2a..039187607e98 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-+++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-@@ -363,6 +363,13 @@ struct ixgbevf_adapter {
- 	struct ixgbe_hw hw;
- 	u16 msg_enable;
- 
-+	u32 pf_features;
-+#define IXGBEVF_PF_SUP_IPSEC		BIT(0)
-+#define IXGBEVF_PF_SUP_ESX_MBX		BIT(1)
-+
-+#define IXGBEVF_SUPPORTED_FEATURES	(IXGBEVF_PF_SUP_IPSEC | \
-+					IXGBEVF_PF_SUP_ESX_MBX)
-+
- 	struct ixgbevf_hw_stats stats;
- 
- 	unsigned long state;
-diff --git a/drivers/net/ethernet/intel/ixgbevf/mbx.h b/drivers/net/ethernet/intel/ixgbevf/mbx.h
-index c1494fd1f67b..a8ed23ee66aa 100644
---- a/drivers/net/ethernet/intel/ixgbevf/mbx.h
-+++ b/drivers/net/ethernet/intel/ixgbevf/mbx.h
-@@ -67,6 +67,7 @@ enum ixgbe_pfvf_api_rev {
- 	ixgbe_mbox_api_14,	/* API version 1.4, linux/freebsd VF driver */
- 	ixgbe_mbox_api_15,	/* API version 1.5, linux/freebsd VF driver */
- 	ixgbe_mbox_api_16,      /* API version 1.6, linux/freebsd VF driver */
-+	ixgbe_mbox_api_17,	/* API version 1.7, linux/freebsd VF driver */
- 	/* This value should always be last */
- 	ixgbe_mbox_api_unknown,	/* indicates that API version is not known */
- };
-@@ -106,6 +107,9 @@ enum ixgbe_pfvf_api_rev {
- /* mailbox API, version 1.6 VF requests */
- #define IXGBE_VF_GET_PF_LINK_STATE	0x11 /* request PF to send link info */
- 
-+/* mailbox API, version 1.7 VF requests */
-+#define IXGBE_VF_FEATURES_NEGOTIATE	0x12 /* get features supported by PF*/
-+
- /* length of permanent address message returned from PF */
- #define IXGBE_VF_PERMADDR_MSG_LEN	4
- /* word in permanent address message with the current multicast type */
-diff --git a/drivers/net/ethernet/intel/ixgbevf/vf.h b/drivers/net/ethernet/intel/ixgbevf/vf.h
-index 2d791bc26ae4..4f19b8900c29 100644
---- a/drivers/net/ethernet/intel/ixgbevf/vf.h
-+++ b/drivers/net/ethernet/intel/ixgbevf/vf.h
-@@ -26,6 +26,7 @@ struct ixgbe_mac_operations {
- 	s32 (*stop_adapter)(struct ixgbe_hw *);
- 	s32 (*get_bus_info)(struct ixgbe_hw *);
- 	s32 (*negotiate_api_version)(struct ixgbe_hw *hw, int api);
-+	int (*negotiate_features)(struct ixgbe_hw *hw, u32 *pf_features);
- 
- 	/* Link */
- 	s32 (*setup_link)(struct ixgbe_hw *, ixgbe_link_speed, bool, bool);
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ipsec.c b/drivers/net/ethernet/intel/ixgbevf/ipsec.c
-index 65580b9cb06f..fce35924ff8b 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ipsec.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/ipsec.c
-@@ -273,6 +273,9 @@ static int ixgbevf_ipsec_add_sa(struct net_device *dev,
- 	adapter = netdev_priv(dev);
- 	ipsec = adapter->ipsec;
- 
-+	if (!(adapter->pf_features & IXGBEVF_PF_SUP_IPSEC))
-+		return -EOPNOTSUPP;
-+
- 	if (xs->id.proto != IPPROTO_ESP && xs->id.proto != IPPROTO_AH) {
- 		NL_SET_ERR_MSG_MOD(extack, "Unsupported protocol for IPsec offload");
- 		return -EINVAL;
-@@ -405,6 +408,9 @@ static void ixgbevf_ipsec_del_sa(struct net_device *dev,
- 	adapter = netdev_priv(dev);
- 	ipsec = adapter->ipsec;
- 
-+	if (!(adapter->pf_features & IXGBEVF_PF_SUP_IPSEC))
-+		return;
-+
- 	if (xs->xso.dir == XFRM_DEV_OFFLOAD_IN) {
- 		sa_idx = xs->xso.offload_handle - IXGBE_IPSEC_BASE_RX_INDEX;
- 
-@@ -612,6 +618,10 @@ void ixgbevf_init_ipsec_offload(struct ixgbevf_adapter *adapter)
- 	size_t size;
- 
- 	switch (adapter->hw.api_version) {
-+	case ixgbe_mbox_api_17:
-+		if (!(adapter->pf_features & IXGBEVF_PF_SUP_IPSEC))
-+			return;
-+		break;
- 	case ixgbe_mbox_api_14:
- 		break;
- 	default:
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-index 92671638b428..d5ce20f47def 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-@@ -2271,10 +2271,35 @@ static void ixgbevf_init_last_counter_stats(struct ixgbevf_adapter *adapter)
- 	adapter->stats.base_vfmprc = adapter->stats.last_vfmprc;
- }
- 
-+/**
-+ * ixgbevf_set_features - Set features supported by PF
-+ * @adapter: pointer to the adapter struct
-+ *
-+ * Negotiate with PF supported features and then set pf_features accordingly.
-+ */
-+static void ixgbevf_set_features(struct ixgbevf_adapter *adapter)
-+{
-+	u32 *pf_features = &adapter->pf_features;
-+	struct ixgbe_hw *hw = &adapter->hw;
-+	int err;
-+
-+	err = hw->mac.ops.negotiate_features(hw, pf_features);
-+	if (err && err != -EOPNOTSUPP)
-+		netdev_dbg(adapter->netdev,
-+			   "PF feature negotiation failed.\n");
-+
-+	/* Address also pre API 1.7 cases */
-+	if (hw->api_version == ixgbe_mbox_api_14)
-+		*pf_features |= IXGBEVF_PF_SUP_IPSEC;
-+	else if (hw->api_version == ixgbe_mbox_api_15)
-+		*pf_features |= IXGBEVF_PF_SUP_ESX_MBX;
-+}
-+
- static void ixgbevf_negotiate_api(struct ixgbevf_adapter *adapter)
- {
- 	struct ixgbe_hw *hw = &adapter->hw;
- 	static const int api[] = {
-+		ixgbe_mbox_api_17,
- 		ixgbe_mbox_api_16,
- 		ixgbe_mbox_api_15,
- 		ixgbe_mbox_api_14,
-@@ -2295,8 +2320,9 @@ static void ixgbevf_negotiate_api(struct ixgbevf_adapter *adapter)
- 		idx++;
- 	}
- 
--	/* Following is not supported by API 1.6, it is specific for 1.5 */
--	if (hw->api_version == ixgbe_mbox_api_15) {
-+	ixgbevf_set_features(adapter);
-+
-+	if (adapter->pf_features & IXGBEVF_PF_SUP_ESX_MBX) {
- 		hw->mbx.ops.init_params(hw);
- 		memcpy(&hw->mbx.ops, &ixgbevf_mbx_ops,
- 		       sizeof(struct ixgbe_mbx_operations));
-@@ -2654,6 +2680,7 @@ static void ixgbevf_set_num_queues(struct ixgbevf_adapter *adapter)
- 		case ixgbe_mbox_api_14:
- 		case ixgbe_mbox_api_15:
- 		case ixgbe_mbox_api_16:
-+		case ixgbe_mbox_api_17:
- 			if (adapter->xdp_prog &&
- 			    hw->mac.max_tx_queues == rss)
- 				rss = rss > 3 ? 2 : 1;
-@@ -4649,6 +4676,7 @@ static int ixgbevf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	case ixgbe_mbox_api_14:
- 	case ixgbe_mbox_api_15:
- 	case ixgbe_mbox_api_16:
-+	case ixgbe_mbox_api_17:
- 		netdev->max_mtu = IXGBE_MAX_JUMBO_FRAME_SIZE -
- 				  (ETH_HLEN + ETH_FCS_LEN);
- 		break;
-diff --git a/drivers/net/ethernet/intel/ixgbevf/vf.c b/drivers/net/ethernet/intel/ixgbevf/vf.c
-index f05246fb5a74..74d320879513 100644
---- a/drivers/net/ethernet/intel/ixgbevf/vf.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/vf.c
-@@ -313,6 +313,7 @@ int ixgbevf_get_reta_locked(struct ixgbe_hw *hw, u32 *reta, int num_rx_queues)
- 	 * is not supported for this device type.
- 	 */
- 	switch (hw->api_version) {
-+	case ixgbe_mbox_api_17:
- 	case ixgbe_mbox_api_16:
- 	case ixgbe_mbox_api_15:
- 	case ixgbe_mbox_api_14:
-@@ -383,6 +384,7 @@ int ixgbevf_get_rss_key_locked(struct ixgbe_hw *hw, u8 *rss_key)
- 	 * or if the operation is not supported for this device type.
- 	 */
- 	switch (hw->api_version) {
-+	case ixgbe_mbox_api_17:
- 	case ixgbe_mbox_api_16:
- 	case ixgbe_mbox_api_15:
- 	case ixgbe_mbox_api_14:
-@@ -555,6 +557,7 @@ static s32 ixgbevf_update_xcast_mode(struct ixgbe_hw *hw, int xcast_mode)
- 	case ixgbe_mbox_api_14:
- 	case ixgbe_mbox_api_15:
- 	case ixgbe_mbox_api_16:
-+	case ixgbe_mbox_api_17:
- 		break;
- 	default:
- 		return -EOPNOTSUPP;
-@@ -646,6 +649,7 @@ static int ixgbevf_get_pf_link_state(struct ixgbe_hw *hw, ixgbe_link_speed *spee
- 
- 	switch (hw->api_version) {
- 	case ixgbe_mbox_api_16:
-+	case ixgbe_mbox_api_17:
- 		break;
- 	default:
- 		return -EOPNOTSUPP;
-@@ -669,6 +673,42 @@ static int ixgbevf_get_pf_link_state(struct ixgbe_hw *hw, ixgbe_link_speed *spee
- 	return err;
- }
- 
-+/**
-+ * ixgbevf_negotiate_features_vf - negotiate supported features with PF driver
-+ * @hw: pointer to the HW structure
-+ * @pf_features: bitmask of features supported by PF
-+ *
-+ * Return: IXGBE_ERR_MBX in the  case of mailbox error,
-+ * -EOPNOTSUPP if the op is not supported or 0 on success.
-+ */
-+static int ixgbevf_negotiate_features_vf(struct ixgbe_hw *hw, u32 *pf_features)
-+{
-+	u32 msgbuf[2] = {};
-+	int err;
-+
-+	switch (hw->api_version) {
-+	case ixgbe_mbox_api_17:
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	msgbuf[0] = IXGBE_VF_FEATURES_NEGOTIATE;
-+	msgbuf[1] = IXGBEVF_SUPPORTED_FEATURES;
-+
-+	err = ixgbevf_write_msg_read_ack(hw, msgbuf, msgbuf,
-+					 ARRAY_SIZE(msgbuf));
-+
-+	if (err || (msgbuf[0] & IXGBE_VT_MSGTYPE_FAILURE)) {
-+		err = IXGBE_ERR_MBX;
-+		*pf_features = 0x0;
-+	} else {
-+		*pf_features = msgbuf[1];
-+	}
-+
-+	return err;
-+}
-+
- /**
-  *  ixgbevf_set_vfta_vf - Set/Unset VLAN filter table address
-  *  @hw: pointer to the HW structure
-@@ -799,6 +839,7 @@ static s32 ixgbevf_check_mac_link_vf(struct ixgbe_hw *hw,
- 				     bool *link_up,
- 				     bool autoneg_wait_to_complete)
- {
-+	struct ixgbevf_adapter *adapter = hw->back;
- 	struct ixgbe_mbx_info *mbx = &hw->mbx;
- 	struct ixgbe_mac_info *mac = &hw->mac;
- 	s32 ret_val = 0;
-@@ -825,7 +866,7 @@ static s32 ixgbevf_check_mac_link_vf(struct ixgbe_hw *hw,
- 	 * until we are called again and don't report an error
- 	 */
- 	if (mbx->ops.read(hw, &in_msg, 1)) {
--		if (hw->api_version >= ixgbe_mbox_api_15)
-+		if (adapter->pf_features & IXGBEVF_PF_SUP_ESX_MBX)
- 			mac->get_link_status = false;
- 		goto out;
- 	}
-@@ -1026,6 +1067,7 @@ int ixgbevf_get_queues(struct ixgbe_hw *hw, unsigned int *num_tcs,
- 	case ixgbe_mbox_api_14:
- 	case ixgbe_mbox_api_15:
- 	case ixgbe_mbox_api_16:
-+	case ixgbe_mbox_api_17:
- 		break;
- 	default:
- 		return 0;
-@@ -1080,6 +1122,7 @@ static const struct ixgbe_mac_operations ixgbevf_mac_ops = {
- 	.setup_link		= ixgbevf_setup_mac_link_vf,
- 	.check_link		= ixgbevf_check_mac_link_vf,
- 	.negotiate_api_version	= ixgbevf_negotiate_api_version_vf,
-+	.negotiate_features	= ixgbevf_negotiate_features_vf,
- 	.set_rar		= ixgbevf_set_rar_vf,
- 	.update_mc_addr_list	= ixgbevf_update_mc_addr_list_vf,
- 	.update_xcast_mode	= ixgbevf_update_xcast_mode,
+I'm rambling a bit here.  I agree with Chuck (and you) that it would be
+nice if this need for a larger bvec were kept local to svcsock code if
+possible.
 
--- 
-2.51.0.rc1.197.g6d975e95c9d7
+But I'm fairly confident that the current problem doesn't justify any
+changes to vfs.c.  svc.c probably needs to somehow be involved in
+rq_bvec being bigger and svcsock.c certainly needs to be able to make
+use of the extra space, but that seems to be all that is required.
+
+Thanks,
+NeilBrown
+
+
+>=20
+> The RPC code mostly ignores the last slot in rq_pages array after it's
+> allocated, but we need rq_bvec to treat it like any other slot, hence
+> the adjustment here.
+>=20
+> I looked at just doing what you suggest first. It would fix it, but at
+> the expense of keeping an extra page per nfsd thread. We could couple
+> your suggested fix with just not allocating that last rq_pages slot,
+> but we end up having to adjust more places than this change does. Also,
+> at that point, rq_maxpages is not _really_ the max number of pages.
+>=20
+> Maybe what we need to do is move to a separate length field for
+> rq_bvec? We have some existing holes in svc_rqst that could hold one
+> and that would make the code more clear. I'll respin this and see how
+> that looks.
+>=20
+> Thanks for the review!
+>=20
+> >=20
+> >=20
+> > >=20
+> > > diff --git a/fs/nfsd/vfs.c b/fs/nfsd/vfs.c
+> > > index 77f6879c2e063fa79865100bbc2d1e64eb332f42..c4e9300d657cf7fdba23f2f=
+4e4bdaad9cd99d1a3 100644
+> > > --- a/fs/nfsd/vfs.c
+> > > +++ b/fs/nfsd/vfs.c
+> > > @@ -1111,7 +1111,7 @@ nfsd_direct_read(struct svc_rqst *rqstp, struct s=
+vc_fh *fhp,
+> > > =20
+> > >  	v =3D 0;
+> > >  	total =3D dio_end - dio_start;
+> > > -	while (total && v < rqstp->rq_maxpages &&
+> > > +	while (total && v < rqstp->rq_maxpages + 1 &&
+> > >  	       rqstp->rq_next_page < rqstp->rq_page_end) {
+> > >  		len =3D min_t(size_t, total, PAGE_SIZE);
+> > >  		bvec_set_page(&rqstp->rq_bvec[v], *rqstp->rq_next_page,
+> > > @@ -1200,7 +1200,7 @@ __be32 nfsd_iter_read(struct svc_rqst *rqstp, str=
+uct svc_fh *fhp,
+> > > =20
+> > >  	v =3D 0;
+> > >  	total =3D *count;
+> > > -	while (total && v < rqstp->rq_maxpages &&
+> > > +	while (total && v < rqstp->rq_maxpages + 1 &&
+> > >  	       rqstp->rq_next_page < rqstp->rq_page_end) {
+> > >  		len =3D min_t(size_t, total, PAGE_SIZE - base);
+> > >  		bvec_set_page(&rqstp->rq_bvec[v], *rqstp->rq_next_page,
+> > > @@ -1318,7 +1318,7 @@ nfsd_vfs_write(struct svc_rqst *rqstp, struct svc=
+_fh *fhp,
+> > >  	if (stable && !fhp->fh_use_wgather)
+> > >  		kiocb.ki_flags |=3D IOCB_DSYNC;
+> > > =20
+> > > -	nvecs =3D xdr_buf_to_bvec(rqstp->rq_bvec, rqstp->rq_maxpages, payload=
+);
+> > > +	nvecs =3D xdr_buf_to_bvec(rqstp->rq_bvec, rqstp->rq_maxpages + 1, pay=
+load);
+> > >  	iov_iter_bvec(&iter, ITER_SOURCE, rqstp->rq_bvec, nvecs, *cnt);
+> > >  	since =3D READ_ONCE(file->f_wb_err);
+> > >  	if (verf)
+> > > diff --git a/net/sunrpc/svc.c b/net/sunrpc/svc.c
+> > > index 4704dce7284eccc9e2bc64cf22947666facfa86a..919263a0c04e3f1afa60741=
+4bc1893ba02206e38 100644
+> > > --- a/net/sunrpc/svc.c
+> > > +++ b/net/sunrpc/svc.c
+> > > @@ -706,7 +706,8 @@ svc_prepare_thread(struct svc_serv *serv, struct sv=
+c_pool *pool, int node)
+> > >  	if (!svc_init_buffer(rqstp, serv, node))
+> > >  		goto out_enomem;
+> > > =20
+> > > -	rqstp->rq_bvec =3D kcalloc_node(rqstp->rq_maxpages,
+> > > +	/* +1 for the TCP record marker */
+> > > +	rqstp->rq_bvec =3D kcalloc_node(rqstp->rq_maxpages + 1,
+> > >  				      sizeof(struct bio_vec),
+> > >  				      GFP_KERNEL, node);
+> > >  	if (!rqstp->rq_bvec)
+> > > diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
+> > > index 377fcaaaa061463fc5c85fc09c7a8eab5e06af77..5f8bb11b686bcd7302b9447=
+6490ba9b1b9ddc06a 100644
+> > > --- a/net/sunrpc/svcsock.c
+> > > +++ b/net/sunrpc/svcsock.c
+> > > @@ -740,7 +740,7 @@ static int svc_udp_sendto(struct svc_rqst *rqstp)
+> > >  	if (svc_xprt_is_dead(xprt))
+> > >  		goto out_notconn;
+> > > =20
+> > > -	count =3D xdr_buf_to_bvec(rqstp->rq_bvec, rqstp->rq_maxpages, xdr);
+> > > +	count =3D xdr_buf_to_bvec(rqstp->rq_bvec, rqstp->rq_maxpages + 1, xdr=
+);
+> > > =20
+> > >  	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
+> > >  		      count, rqstp->rq_res.len);
+> > > @@ -1244,7 +1244,7 @@ static int svc_tcp_sendmsg(struct svc_sock *svsk,=
+ struct svc_rqst *rqstp,
+> > >  	memcpy(buf, &marker, sizeof(marker));
+> > >  	bvec_set_virt(rqstp->rq_bvec, buf, sizeof(marker));
+> > > =20
+> > > -	count =3D xdr_buf_to_bvec(rqstp->rq_bvec + 1, rqstp->rq_maxpages - 1,
+> > > +	count =3D xdr_buf_to_bvec(rqstp->rq_bvec + 1, rqstp->rq_maxpages,
+> > >  				&rqstp->rq_res);
+> > > =20
+> > >  	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
+> > >=20
+> > > --=20
+> > > 2.51.0
+> > >=20
+> > >=20
+>=20
+> --=20
+> Jeff Layton <jlayton@kernel.org>
+>=20
 
 
