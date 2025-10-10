@@ -1,110 +1,154 @@
-Return-Path: <netdev+bounces-228482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD07EBCC02F
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 10:00:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2709BCC1E9
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 10:26:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 974D23B66BA
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 08:00:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74DDE400DA1
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 08:26:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B9D1E25E3;
-	Fri, 10 Oct 2025 08:00:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="CBsueoYO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98F925B31B;
+	Fri, 10 Oct 2025 08:26:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1EB272810;
-	Fri, 10 Oct 2025 08:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+Received: from chinatelecom.cn (smtpnm6-10.21cn.com [182.42.147.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54A8F255F2C;
+	Fri, 10 Oct 2025 08:26:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=182.42.147.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760083242; cv=none; b=tZnHv0w5ghPwTEfIxiXbj+xiyDn+DvcDOFNdfnVWUy5Xc8W501nJs4P8W2bMj/vniLM+WJkDPezohf1Fk4GCf+1GLuEmTro2rdomCmn4tmjVnKEPQ9/0x13K8Q0lGwZ1nJMwQr2MX4L195ehQ3H1Z+3W28WKLt1qfhUNc9fm+FE=
+	t=1760084768; cv=none; b=gIDiiZ3uQMyg/K6aaJjWpE3mzdCUagS8p6C5CthjmqHB2tJTzIcTw+LALvcbKKR/t3bhrA4aIy/TA7lpjAskR0YHyfLwwyJXNqwDYWhaF1PVP8huEMmyffcgT5MXUxKcliYQB1jjnCDf/SwIisykgLOENmBbh0DBZqA4LWal7EY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760083242; c=relaxed/simple;
-	bh=7VSc4VZGRf4kATJd9RpFMALSCnx/oi6QGglUySBWA3Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GRbLv/AwsE0OnbelL2sVHWk/Bup54nCzsFvZuh9PqQgNpS5DlnncJimQPtKoaDIR0HpAX1RpQDIZVEyMU2rbyXtC4M/lY8HyZM1+w6VXOh7HmrHEeRf8oaZQt3NnLaYRYcHkxUOJaEadZ3oTQxIsn/h13anD88bUlbInt/nK3TE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=CBsueoYO; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Ri
-	4q9fhZbJ9iRglDYBjtEDYzk9imyFA9mfEoZbEnZks=; b=CBsueoYOusTSV9Z6gD
-	KUzdGe+lvatYdGArYQoUAOSMpTLvcIKtfTV/EHD+nKoXsm71P337FVUqey0dSLMM
-	7MJ8znVx+zQuIqP1TSMGvRQjZlekImhBjKdXkt8X/TZeDJpH8phHAExBOA5MbpmT
-	q+zxEtPGvjpTGsUiGYhHoIiS0=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wBH2wn3vOhoULLLDA--.5915S2;
-	Fri, 10 Oct 2025 15:59:52 +0800 (CST)
-From: yicongsrfy@163.com
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	oneukum@suse.com
-Cc: horms@kernel.org,
-	kuba@kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	yicong@kylinos.cn,
-	stable@vger.kernel.org
-Subject: [PATCH net v2] r8152: add error handling in rtl8152_driver_init
-Date: Fri, 10 Oct 2025 15:59:49 +0800
-Message-Id: <20251010075949.337132-1-yicongsrfy@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1760084768; c=relaxed/simple;
+	bh=ZuFuyTGu23tvFNWi4Iv+KCLI8/7kdNScqRY8LYBHD+M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JZYqVavPCTgxFrN6gZp/d+tfsDs77oDaOeyC5kpgt/DRJWIxNOEejeKX1Kc8+lamB3nkecZEDPAvfuijMo4SOZWUUjDErYZl41nxviPz2JpOIr5JNQCMRWeuPSkXgg/MyMcq7aprrrPMjz7RXfXXyrFPR63N1ktHsRNJtdlZkTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn; spf=pass smtp.mailfrom=chinatelecom.cn; arc=none smtp.client-ip=182.42.147.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chinatelecom.cn
+HMM_SOURCE_IP:192.168.139.44:0.1171078105
+HMM_ATTACHE_NUM:0000
+HMM_SOURCE_TYPE:SMTP
+Received: from clientip-27.148.194.68 (unknown [192.168.139.44])
+	by chinatelecom.cn (HERMES) with SMTP id E8B6CB0CA534;
+	Fri, 10 Oct 2025 16:17:29 +0800 (CST)
+X-189-SAVE-TO-SEND: zhenggy@chinatelecom.cn
+Received: from  ([27.148.194.68])
+	by gateway-ssl-dep-79cdd9d55b-z742x with ESMTP id 1de75387086b4f1a9ceda4f4d87fbae0 for edumazet@google.com;
+	Fri, 10 Oct 2025 16:17:50 CST
+X-Transaction-ID: 1de75387086b4f1a9ceda4f4d87fbae0
+X-Real-From: zhenggy@chinatelecom.cn
+X-Receive-IP: 27.148.194.68
+X-MEDUSA-Status: 0
+Sender: zhenggy@chinatelecom.cn
+Message-ID: <81694a16-07df-44f0-a0a1-601821e8859d@chinatelecom.cn>
+Date: Fri, 10 Oct 2025 16:18:07 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Ctyun AOneMail
+Subject: Re: [PATCH] bpf, sockmap: Update tp->rcv_nxt in sk_psock_skb_ingress
+Content-Language: en-US
+To: =?UTF-8?B?44CQ5aSW6YOo6LSm5Y+344CRIEVyaWMgRHVtYXpldA==?=
+ <edumazet@google.com>
+Cc: john.fastabend@gmail.com, jakub@cloudflare.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <3b78ca04-f4b9-4d12-998d-4e21a3a8397f@chinatelecom.cn>
+ <CANn89i+rHTU2eVtkc0H=v+8PczfonOxTqc=fCw+6QRwj_3MURg@mail.gmail.com>
+From: zhengguoyong <zhenggy@chinatelecom.cn>
+In-Reply-To: <CANn89i+rHTU2eVtkc0H=v+8PczfonOxTqc=fCw+6QRwj_3MURg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBH2wn3vOhoULLLDA--.5915S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrKFWrGFWfur1UXr1fJw43Wrg_yoWkZrcEkr
-	yIga47Xr1DuFW5KF15WrWavrySkan0vFs3Zr4xt3sIgwnrXrn5Gr1UZr9xXw4UWrWfZFnx
-	Ca1UGFyxCr129jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU82iiDUUUUU==
-X-CM-SenderInfo: p1lf00xjvuw5i6rwjhhfrp/1tbiLBPi22jouzAv0AAAsy
 
-From: Yi Cong <yicong@kylinos.cn>
+Hi Eric,
 
-rtl8152_driver_init missing error handling.
-If cannot register rtl8152_driver, rtl8152_cfgselector_driver
-should be deregistered.
+Thank you for your reply. Indeed, using bh_lock_sock_nested can lead to deadlock risks.
+I apologize for not noticing this earlier.
 
-Fixes: ec51fbd1b8a2 ("r8152: add USB device driver for config selection")
-Cc: stable@vger.kernel.org
-Signed-off-by: Yi Cong <yicong@kylinos.cn>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Can I change bh_lock_sock_nested to lock_sock to resolve this deadlock issue?
+Or do you have any better suggestions on where to update the tp->rcv_nxt field in the process?
 
-v2: replacing return 0 with return ret and adding Cc stable
----
- drivers/net/usb/r8152.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Look forward to your response. Thank you.
 
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 44cba7acfe7d..8a0c824e9eb4 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -10122,7 +10122,14 @@ static int __init rtl8152_driver_init(void)
- 	ret = usb_register_device_driver(&rtl8152_cfgselector_driver, THIS_MODULE);
- 	if (ret)
- 		return ret;
--	return usb_register(&rtl8152_driver);
-+
-+	ret = usb_register(&rtl8152_driver);
-+	if (ret) {
-+		usb_deregister_device_driver(&rtl8152_cfgselector_driver);
-+		return ret;
-+	}
-+
-+	return ret;
- }
- 
- static void __exit rtl8152_driver_exit(void)
--- 
-2.25.1
+*From:* 【外部账号】Eric Dumazet
+*收件人:* zhengguoyong
+*抄送:* john.fastabend@gmail.com, jakub@cloudflare.com, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, bpf@vger.kernel.org
+*主题:* [PATCH] bpf, sockmap: Update tp->rcv_nxt in sk_psock_skb_ingress
+*日期:* 2025-10-09 15:07:44
+> On Wed, Oct 8, 2025 at 8:07 PM zhengguoyong <zhenggy@chinatelecom.cn> wrote:
+>>
+>> When using sockmap to forward TCP traffic to the application
+>> layer of the peer socket, the peer socket's tcp_bpf_recvmsg_parser
+>> processing flow will synchronously update the tp->copied_seq field.
+>> This causes tp->rcv_nxt to become less than tp->copied_seq.
+>>
+>> Later, when this socket receives SKB packets from the protocol stack,
+>> in the call chain tcp_data_ready → tcp_epollin_ready, the function
+>> tcp_epollin_ready will return false, preventing the socket from being
+>> woken up to receive new packets.
+>>
+>> Therefore, it is necessary to synchronously update the tp->rcv_nxt
+>> information in sk_psock_skb_ingress.
+>>
+>> Signed-off-by: GuoYong Zheng <zhenggy@chinatelecom.cn>
+> 
+> Hi GuoYong Zheng
+> 
+> We request a Fixes: tag for patches claiming to fix a bug.
+> 
+> How would stable teams decide to backport a patch or not, and to which versions,
+> without having to fully understand this code ?
+> 
+> 
+>> ---
+>>  net/core/skmsg.c | 10 +++++++++-
+>>  1 file changed, 9 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+>> index 9becadd..e9d841c 100644
+>> --- a/net/core/skmsg.c
+>> +++ b/net/core/skmsg.c
+>> @@ -576,6 +576,7 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
+>>         struct sock *sk = psock->sk;
+>>         struct sk_msg *msg;
+>>         int err;
+>> +       u32 seq;
+>>
+>>         /* If we are receiving on the same sock skb->sk is already assigned,
+>>          * skip memory accounting and owner transition seeing it already set
+>> @@ -595,8 +596,15 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
+>>          */
+>>         skb_set_owner_r(skb, sk);
+>>         err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, true);
+>> -       if (err < 0)
+>> +       if (err < 0) {
+>>                 kfree(msg);
+>> +       } else {
+>> +               bh_lock_sock_nested(sk);
+>> +               seq = READ_ONCE(tcp_sk(sk)->rcv_nxt) + len;
+>> +               WRITE_ONCE(tcp_sk(sk)->rcv_nxt, seq);
+> 
+> This does not look to be the right place.
+> 
+> Re-locking a socket _after_ the fundamental change took place is
+> fundamentally racy.
+> 
+> Also do we have a guarantee sk is always a TCP socket at this point ?
+> 
+> If yes, why do we have sk_is_tcp() check in sk_psock_init_strp() ?
+> 
+>> +               bh_unlock_sock(sk);
+>> +       }
+>> +
+>>         return err;
+>>  }
+>>
+>> --
+>> 1.8.3.1
 
 
