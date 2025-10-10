@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-228526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A9BEBCD589
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 15:51:53 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DD7DBCD58F
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 15:53:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94B1C42536D
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 13:51:49 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1A84634F95B
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 13:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CB02EFDA6;
-	Fri, 10 Oct 2025 13:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128882EFDA6;
+	Fri, 10 Oct 2025 13:52:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gG5ajnbC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wZtnX/4g"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8812EFDA5
-	for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 13:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD33E288C25
+	for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 13:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760104307; cv=none; b=EWrcFqmlgwRhWBqZWS3rw7QDWE6kKkF4GJoQuLnTmaXdp4CG1oQT5QLhxM/++vCb9D0NW5pZx29IDsLE84ooyBed3zfAULFXDAlGFacHGl2oLnby8z97fe/TQsVrOvPG8rdQzQKehtbjrIbdOUeSxqrD96LU3TCXvT3RvczELUw=
+	t=1760104377; cv=none; b=oWPx9INJ+im8wV0DFKWHUivzIBpBwRMoU/72PRP3T1ladpq/tj2kDSwEfuFe4+fRK8jW/BhlnQUpnPbU6fXeMztks3oR6uFatkomStVYVclT4bSI3ejT9l8kb+dAN/+LcpTdBkv+lCoOiW+Dg2NagRhfdPtULQRMMmTpakcfzi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760104307; c=relaxed/simple;
-	bh=aP6KvYdPFnC1vI+uIAbFW9bWLn2//lbUQyyA/EzmnHI=;
+	s=arc-20240116; t=1760104377; c=relaxed/simple;
+	bh=52FH/UthIByShqOMgMjB+i5hbOx0pMWmDVdqVUuEL9Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JMeFhrlv3RTt/NlFsCTEpuLRl9pJWuWpg9JpzUxhsG3+Nk+XReTjSHNTKg1d15EdSY4eN6Q+Osjg3HB3rl1KJdW1V7FSFcwXYyjfErsvAP4UF9o8kFl1iANlyyVOF7+qI3Qmuw0PmIssrwc55REVCUnqmDQ5q59BviVoQNqbfsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gG5ajnbC; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=d1GN9bVzZruPk2uDUub6Y93MqNdUKv+Gbq2j58Y4LVmur65/AA0yBaIWGV5WfTp8EXj/wP8tTTSa8xQfr0VNMpjUJX0fl/oAlP+ovqoIwm2ztkcBJkvTgV7aVJ0WZRZXnxv4oGYfhYq9NESZNmUHTMZxu2AbYbgnOnn5rvE4kJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wZtnX/4g; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,30 +36,30 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7YzZen0SnBLJiOgQiQY4Nuyrw85yOhaGlINCM33I34M=; b=gG5ajnbCAGpAQks51R5Vyf++qF
-	JwR7KAn+3gg1j2RuzCnNmWj0UJ1fSnW3jeWaJT4jasykFIIF9b+2mXaonPnw7/fGBjFMrvhCCqVfG
-	EhP7IaMPP3j9CspLtRnaxipvuV16HTAWs9wJq/RdZ4ki7JiuuuejZlKkLjRBC3twqoDQ=;
+	bh=6aDPD3sm9RPdq6tvBSzBbUI+uHVMKnRgb+CD3IUbDcQ=; b=wZtnX/4gkp8xtA9PUwtEwGjgmt
+	cLtz6qqft/dk48V0juRAkdVLanb0W32hp86MgNjCYyofGbtIIylbydXKbbugEz9GeFraqQvmOPPEp
+	ZvUNMzIoNaPQxISIGuul36zvn4KqAbggVfUf9Awh5ymS0KGAUPPjemSZ835g66ETy/Hs=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1v7DX0-00Abj9-63; Fri, 10 Oct 2025 15:51:38 +0200
-Date: Fri, 10 Oct 2025 15:51:38 +0200
+	id 1v7DYC-00Abk9-UJ; Fri, 10 Oct 2025 15:52:52 +0200
+Date: Fri, 10 Oct 2025 15:52:52 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: 'Jakub Kicinski' <kuba@kernel.org>, netdev@vger.kernel.org,
+Cc: 'Simon Horman' <horms@kernel.org>, netdev@vger.kernel.org,
 	'Andrew Lunn' <andrew+netdev@lunn.ch>,
 	"'David S. Miller'" <davem@davemloft.net>,
 	'Eric Dumazet' <edumazet@google.com>,
+	'Jakub Kicinski' <kuba@kernel.org>,
 	'Paolo Abeni' <pabeni@redhat.com>,
-	'Simon Horman' <horms@kernel.org>,
 	"'Russell King (Oracle)'" <rmk+kernel@armlinux.org.uk>,
 	'Mengyuan Lou' <mengyuanlou@net-swift.com>
-Subject: Re: [PATCH net-next 2/3] net: txgbe: optimize the flow to setup PHY
- for AML devices
-Message-ID: <f76ed32e-b007-484c-a228-4b7774a49020@lunn.ch>
+Subject: Re: [PATCH net-next 1/3] net: txgbe: expend SW-FW mailbox buffer
+ size to identify QSFP module
+Message-ID: <f4c6d749-020a-46ca-844b-558542113327@lunn.ch>
 References: <20250928093923.30456-1-jiawenwu@trustnetic.com>
- <20250928093923.30456-3-jiawenwu@trustnetic.com>
- <20250929183946.0426153d@kernel.org>
- <000301dc39ba$55739250$005ab6f0$@trustnetic.com>
+ <20250928093923.30456-2-jiawenwu@trustnetic.com>
+ <aNqPAH2q0sqxE6bX@horms.kernel.org>
+ <000201dc39b9$5cdcf5f0$1696e1d0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,24 +68,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <000301dc39ba$55739250$005ab6f0$@trustnetic.com>
+In-Reply-To: <000201dc39b9$5cdcf5f0$1696e1d0$@trustnetic.com>
 
-On Fri, Oct 10, 2025 at 03:48:57PM +0800, Jiawen Wu wrote:
-> On Tue, Sep 30, 2025 9:40 AM, Jakub Kicinski wrote:
-> > On Sun, 28 Sep 2025 17:39:22 +0800 Jiawen Wu wrote:
-> > > To adapt to new firmware for AML devices, the driver should send the
-> > > "SET_LINK_CMD" to the firmware only once when switching PHY interface
-> > > mode. And the unknown link speed is permitted in the mailbox buffer. The
-> > > firmware will configure the PHY completely when the conditions are met.
+On Fri, Oct 10, 2025 at 03:42:00PM +0800, Jiawen Wu wrote:
+> On Mon, Sep 29, 2025 9:52 PM, Simon Horman wrote:
+> > On Sun, Sep 28, 2025 at 05:39:21PM +0800, Jiawen Wu wrote:
+> > > In order to identify 40G and 100G QSFP modules, expend mailbox buffer
+> > > size to store more information read from the firmware.
 > > 
-> > Could you mention what the TXGBE_GPIOBIT_3 does, since you're removing
-> > it all over the place?
+> > Hi,
+> > 
+> > I see that the message size is increased by 4 bytes,
+> > including two new one-byte fields.
+> > But I don't see how that is used by this patchset.
+> > Could you expand on this a little?
 > 
-> Okay. It is used for RX signal, which indicate that PHY should be re-configured.
-> Now we remove it from the driver, let the firmware to configure PHY completely.
-
-Does this rely on new firmware? Or has the firmware always configured
-the PHY, and then the driver reconfigures it?
+> It is used for QSFP modules, I haven't added the part of these modules yet.
+> But the firmware was changed. So when using the new firmware, the module
+> cannot be identified due to incorrect length of mailbox buffer.
+ 
+And with old firmware? Can you tell the end of the message has not
+been filled in with old firmware?
 
 	Andrew
 
