@@ -1,93 +1,90 @@
-Return-Path: <netdev+bounces-228474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57DE7BCBE48
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 09:18:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 066FCBCBE7B
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 09:24:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 18BC14EADA5
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 07:18:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 299F91A62BE6
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 07:24:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 949051E0E14;
-	Fri, 10 Oct 2025 07:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="upx2IcbI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D202749E4;
+	Fri, 10 Oct 2025 07:24:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A09D1A267;
-	Fri, 10 Oct 2025 07:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283AC26FDAC
+	for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 07:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760080719; cv=none; b=GwcF/1jWl0AFeWxvjUfeWFHrTe3xCiKAHdk/yU45jteZ4i1gSumErrg2QmU4cbqJ3mZ4YTZy0YGLkDtg1zdCXuwtSsNdleajmZ2Pw8+sKbTvjxvVHIiryrETBehuwtcwcD6MZSAvCuzb9paiSQIekdvACrQaYglz8twGoQl1DwI=
+	t=1760081048; cv=none; b=TeJlt8NdwCkNaD5jdVIauNydqFVzqjRtEalr05PHJCV/ufwKg1djsGI5bqz11UXgHEzCEnSf05DzGpMM5w+UePrk+X8O2E9SCEDg0Nocag2/Y4vW//WBuHy1d33pq+duCIBo9mo37VG7HPkRzbhX0g+Wco4clFVcUe83emJetu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760080719; c=relaxed/simple;
-	bh=0L2Qi+NGJJTq2+7NzVpgzCxVh7Djj6DY8ORJwVShcws=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z1OzKqGtUXonD7lOlwPt11yc/2bVLFMcdASW0x7ult4o0s7eVXfpd09OUVx0BSf07qhM2B1+9ZzE3pPzjVJJYAKFnm2zCJMiAmFszZh4rCeLnKEmj4Llf6ddgsi6m8dzhNbvOONHLfOPm/6eiM6bHwcNeJPbOqL5aTyTbTBjZTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=upx2IcbI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EDBCC4CEF1;
-	Fri, 10 Oct 2025 07:18:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760080718;
-	bh=0L2Qi+NGJJTq2+7NzVpgzCxVh7Djj6DY8ORJwVShcws=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=upx2IcbILcqGDdpncJur8gjpsPOgzpjJ4fMR8DxXT+i9zNAqr7bgS9TOmdulEvS5D
-	 743devjPJB4TEDFIzcuB1F8uCwyuG3XK0bhgEBkL1FrXzdxI+dpmsNcqrfiRrOxT9i
-	 ukRgLMgbCUYlnfBN+Ht8CJHfmcSgA5DMJa4ZGpabPAx6fpQqx2L9d2MDLgYf67a3WO
-	 t8Le/xz8UVCVINAa9m+SK1igdzCl89/fpix3RHuOU16njswwEy5LuVh/54eOm1xgoo
-	 r12T6MULrRNF0Qvuxhm12M3b1B23oYNmLrd9+mEbXuDwQ4tzFLBSfQMMvukzBjFJtL
-	 2gC2GQzHqmjWQ==
-Date: Fri, 10 Oct 2025 08:18:35 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yeounsu Moon <yyyynoom@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: dlink: fix null dereference in receive_packet()
-Message-ID: <20251010071835.GB3115768@horms.kernel.org>
-References: <20251009190222.4777-1-yyyynoom@gmail.com>
+	s=arc-20240116; t=1760081048; c=relaxed/simple;
+	bh=Jg+d4M7SD0tg1BCcESORZKIiOOrCQxdG8BTeosz9N8g=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Qgy6B7YZlOWOIhmD2Lp/oNx3bX+XapAuTH2uCwCDJ+OMJI9m23EHRF30hwi24eevl83J2ko8pMUhp4JuMDouk/ffLxdk9LdrUogtUbMFeHtLekRVNJGfcb00DKcSDxHPrAOmFAG0h+JcPusSLHRlENUAfNUufxNsY/g7Rfe0Stg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-927f4207211so578884039f.3
+        for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 00:24:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760081044; x=1760685844;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=85c0lO31mJmxX7OG2HQ6romLReQO9OCVh5cFYAjQiA4=;
+        b=iV+CU9JyiUYo/vW3aj9LiRRvHg4vY2Ss7UJQJ2YleHxrtlPj/HYJ+Cc6iNxQiK/QO2
+         IgdkvRqSS/IwBHTIcXXg7r7x8iPUqXCmOavU/m6AFJdDZsXTqVYc/1kTxqag+jnvHhvn
+         TIdPgnQ6AlFhcZU7JmesVs8ksTXXOojZbrrY3eirh57t/bCJ9Gk81wIGmR9pakhGNSxf
+         tf1pEiJfbGvb5xz1O8KD/qyLKuKJ1CS4a8WQC6IU9jklAhFe5/wLG1H/kZQ29MHmn9aO
+         lUvtteA7SW2bHSFB9g0qwQuqcRjOKOjGGQt0CnRWqRmFGQNdKeDY9H8WhP13clauEAbK
+         lEFw==
+X-Forwarded-Encrypted: i=1; AJvYcCXJyhbqhEJrP/Z8c0LD7A8Nr06ZGe5cS+R+MaK7ApnICF9or3JoTMNvhHZCZv9g8CYRLdBxVo0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgjhgJOWvUr170c/QtF7h8OZcyhnn9IDJhLAX6jLa3r5tla9An
+	UlPotTOcF8LqoW3EC0Jp89Z8P3FBStJfTNG/6sH8zTismLDETB6y/ST385barDserZfR2pTHIwC
+	72F4UQfTh1l3Vy13/yDRE/lnZgL7es+EhPL5c0iQOmDD55nVHJUs1hGuGjRw=
+X-Google-Smtp-Source: AGHT+IH9YdmnB2MPeJu4hJxqiBrxo57sGfjXN0vwjr7W+/+/+p6zwPPzsFWiRrpzBzWe7uajTaaIEEhiQD3ZQbKbM5mUjQccgD7r
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251009190222.4777-1-yyyynoom@gmail.com>
+X-Received: by 2002:a05:6602:1514:b0:8fc:2095:302b with SMTP id
+ ca18e2360f4ac-93bd191f136mr1284776739f.16.1760081044336; Fri, 10 Oct 2025
+ 00:24:04 -0700 (PDT)
+Date: Fri, 10 Oct 2025 00:24:04 -0700
+In-Reply-To: <20251010033310.8501-1-hdanton@sina.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68e8b494.050a0220.1186a4.0007.GAE@google.com>
+Subject: Re: [syzbot] [net?] [virt?] BUG: sleeping function called from
+ invalid context in __set_page_owner
+From: syzbot <syzbot+665739f456b28f32b23d@syzkaller.appspotmail.com>
+To: ast@kernel.org, hdanton@sina.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Oct 10, 2025 at 04:02:22AM +0900, Yeounsu Moon wrote:
-> If `np->rx_skbuff[entry]` was not allocated before
-> reuse, `receive_packet()` will cause null dereference.
-> 
-> This patch fixes the issue by breaking out of the loop when
-> `np->rx_skbuff[entry]` is `NULL`.
+Hello,
 
-I see that if np->rx_skbuff[entry] there will be a dereference.
-But I'm less clear on how this situation can occur.
-So I think it would be worth adding some explanation of that
-to the commit message.
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-Also, I do see that break will result in np->rx_skbuff[entry],
-and other empty entries in that array, being refilled.
-This is due to the refill loop that towards the end of receive_packet().
-But perhaps it is worth mentioning that in the commit message too?
+Reported-by: syzbot+665739f456b28f32b23d@syzkaller.appspotmail.com
+Tested-by: syzbot+665739f456b28f32b23d@syzkaller.appspotmail.com
 
-> 
-> Found by inspection.
+Tested on:
 
-Thanks, that is clear.
+commit:         5472d60c Merge tag 'trace-v6.18-2' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=178251e2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=db9c80a8900dca57
+dashboard link: https://syzkaller.appspot.com/bug?extid=665739f456b28f32b23d
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=120851e2580000
 
-> 
-> Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Tested-on: D-Link DGE-550T Rev-A3
-
-...
+Note: testing is done by a robot and is best-effort only.
 
