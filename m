@@ -1,190 +1,162 @@
-Return-Path: <netdev+bounces-228543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72C5EBCDCC4
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 17:29:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 94DB6BCDD40
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 17:42:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82EA2401A6D
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 15:28:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DD775460B7
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 15:41:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E71022F9C3C;
-	Fri, 10 Oct 2025 15:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MJ8CHehq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 178532FB614;
+	Fri, 10 Oct 2025 15:41:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66642F9982
-	for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 15:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7A92FB0A5
+	for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 15:41:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760110098; cv=none; b=Wtk8VOLsxBoysB0llRSEMn564bfVup7ylkL23skxBhc5QnyJ55WKeBa2MtMztxfMGbxFxdMRlXDDIAgNhkqF0PvKqcqeFsCNiOTbO2B5F5jSlYaNRHsYmzD3tajt5LyzfQhQrjcXDrETTnG/UdDzYNx2xc7nUOX8yukkXr0bU7c=
+	t=1760110891; cv=none; b=HHkW+i6dfzt3ae0Gdt8NEPc9vMV1Jv/kv5b8tcccGAQwVX8ift6ehNUJByx3Do7x/fRXHUwUgqivDYSzpdtRXfMWSq2gEqc87eL78kymME4hIeHlNirH3XO0TFXRYyo7rtWyBR1ldjOkmUxfsOTKKVEDE6rrBKPSwfizQUgJnu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760110098; c=relaxed/simple;
-	bh=YiIOv1FrYRHAOigDer5NhDZfgGWnuEe3aZ1JEt1bh68=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AhX05qvtpsAMRUnkTSOstvxA2v0sJkGgkhd+TgiyMBcKcGxYan9JTbZfxy/Kbd6CdGSuS2pQFFYxhKRyUxfglnaNdPTzixB6oxcjEjiqVRbQi716Za2tk6ltJIKyhFE+IJcFY7ylCeBTjU5PYCeIrPK7dcc7cPh6zIKRk9+1F0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MJ8CHehq; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <cb3b5d30-d232-4eb8-af31-2a1518ed8966@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760110093;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r8gKcoOaYYdHXMbG9Fq/8pPdJ3EoFkEGz2jidWyUbww=;
-	b=MJ8CHehqhqPZ/TlpiHIHzCAq5xmszw+OLW1wu7/qt2FN4p/jZZfC3vJcQFqVridBTRFT9G
-	LkmgnIoLYoJDby9NyK4FQNGPVG7SleY6sojFdC1QosRG1ZfPYnh9iqcHQagzjdIqbtvmNr
-	zY1m1N7w5oI2SBSCyWK5XYj/07UDnl0=
-Date: Fri, 10 Oct 2025 08:28:04 -0700
+	s=arc-20240116; t=1760110891; c=relaxed/simple;
+	bh=oXdJ9hxao0+88bJ3Q5bqzIcokKU8lyciNlAMcN/Ujkg=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=c9HxIPjJKMgi9ha08YY0dvuusdvqmkvtMf5alHSjCrWcQLBeOqUDyfbBxdgwX645qChKYPM2QGz+qBx3XRO9ritBoyPYzqxCyRMZij/qMn9FkxImsoDJyQIKnzYmDfW9jppIe9uF+rPrfa/CMhKmP1Qk94g4UchVnTFF45by4LI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-42594b7f324so76996755ab.1
+        for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 08:41:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760110888; x=1760715688;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9t4YKrQ+i6zPnSqIk+4cnVQH6VUcMiv6uzmRTIEIoKI=;
+        b=ZiGyWvnhPKTjmuCHDTtSZuOvsyBgHqv2B2Qc6S3XU+O1pY++bHAU0pwvvG19p3JLzA
+         P27OeMSJy9cJlwa9MZ7wbPXG0gJmq+QCoGpkFukln1s48fCpMogpHZhz6zFcrHFYHD9+
+         mybHP6tQL9Dn7UCKUZsR428LONzJlxG9slvenX1PaqAlSw7WrGwxSSPuRvEPjdJDAjkQ
+         Yv0wo07oLYM0vyJa1a4d20AXKTrDKBQ+uGQsBFd7FgiPSWA0yYIWoz5y4b/IKSoC/f3S
+         h1ylrVGBiQCYus5RRRpDq3uyJiTzF/FOabhF5JeDxuxdE/HBRfdQACG9fpmVZ97OQwfz
+         HfXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXbE8PawLjNfq2IR3FFkE+KuYhNso1qO7y+HAkuFfiVhJfD5wJBWsGCt9avmDCcmNZGbJqK/GE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxA5E4KEyCaar2N77uJs84pLhqiTjuCF3AFk56IC53NSITUJiPw
+	0oyQq12JUJo273Iz+Zk5AMfCFZ/n3M3XmLD0p33rW95wi/8MPyJJR3uURaKt7Um8WQCZ0poTzHz
+	dYfbnHJKpDhZFVLUBT/LFx4mJFiquY8SKMVHAqscsMr8H5ku/MdZ1hwJyUIw=
+X-Google-Smtp-Source: AGHT+IEXeRrI+/fpBtKbI9Pf7crdMPmeGYhJHB7bmAj+WEO9WUvJdaR7A0Zl93pdG0LU5IE8GvkXLiCIYtgbmi5st4mnPcBuaQd7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2] bpf: test_run: Use migrate_enable()/disable()
- universally
-Content-Language: en-GB
-To: Sahil Chandna <chandna.linuxkernel@gmail.com>, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org, john.fastabend@gmail.com, haoluo@google.com,
- jolsa@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
-Cc: david.hunter.linux@gmail.com, skhan@linuxfoundation.org,
- khalid@kernel.org, syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
-References: <20251010075923.408195-1-chandna.linuxkernel@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20251010075923.408195-1-chandna.linuxkernel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6e02:1949:b0:42f:94f5:4684 with SMTP id
+ e9e14a558f8ab-42f94f54907mr64897265ab.5.1760110888125; Fri, 10 Oct 2025
+ 08:41:28 -0700 (PDT)
+Date: Fri, 10 Oct 2025 08:41:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68e92928.050a0220.3897dc.0194.GAE@google.com>
+Subject: [syzbot] [bpf?] [net?] WARNING in sock_map_delete_elem (2)
+From: syzbot <syzbot+ad76dbe500667f3a4e17@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, jakub@cloudflare.com, john.fastabend@gmail.com, 
+	kuba@kernel.org, kuniyu@google.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	willemb@google.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    fd94619c4336 Merge tag 'zonefs-6.18-rc1' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14ff8ee2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e2b03b8b7809165e
+dashboard link: https://syzkaller.appspot.com/bug?extid=ad76dbe500667f3a4e17
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/201636e25a0b/disk-fd94619c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/b63e3832240c/vmlinux-fd94619c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/11fc378734e8/bzImage-fd94619c.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ad76dbe500667f3a4e17@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+DEBUG_LOCKS_WARN_ON(this_cpu_read(softirq_ctrl.cnt))
+WARNING: CPU: 0 PID: 5969 at kernel/softirq.c:176 __local_bh_disable_ip+0x3d9/0x540 kernel/softirq.c:176
+Modules linked in:
+CPU: 0 UID: 0 PID: 5969 Comm: syz.1.2 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+RIP: 0010:__local_bh_disable_ip+0x3d9/0x540 kernel/softirq.c:176
+Code: 0f b6 04 28 84 c0 0f 85 56 01 00 00 83 3d 52 9b 32 0d 00 75 19 90 48 c7 c7 c0 b7 c9 8a 48 c7 c6 00 b8 c9 8a e8 f8 5f fe ff 90 <0f> 0b 90 90 90 e9 7b ff ff ff 90 0f 0b 90 e9 71 fe ff ff e8 cf 84
+RSP: 0018:ffffc900056bf940 EFLAGS: 00010246
+RAX: f63c8546519c3800 RBX: 1ffff92000ad7f30 RCX: 0000000000080000
+RDX: ffffc9000d891000 RSI: 00000000000093ed RDI: 00000000000093ee
+RBP: ffffc900056bfa48 R08: 0000000000000000 R09: 0000000000000000
+R10: dffffc0000000000 R11: ffffed101710487b R12: ffff88803c911e00
+R13: dffffc0000000000 R14: ffff88803c91294c R15: 1ffff11007922529
+FS:  00007fe7c46d66c0(0000) GS:ffff888127020000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b30217ff8 CR3: 000000001dfd6000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ local_bh_disable include/linux/bottom_half.h:20 [inline]
+ spin_lock_bh include/linux/spinlock_rt.h:87 [inline]
+ __sock_map_delete net/core/sock_map.c:421 [inline]
+ sock_map_delete_elem+0xaf/0x170 net/core/sock_map.c:452
+ bpf_prog_e78d8a1634f5e22d+0x46/0x4e
+ bpf_dispatcher_nop_func include/linux/bpf.h:1350 [inline]
+ __bpf_prog_run include/linux/filter.h:721 [inline]
+ bpf_prog_run include/linux/filter.h:728 [inline]
+ bpf_prog_run_pin_on_cpu include/linux/filter.h:745 [inline]
+ bpf_flow_dissect+0x225/0x720 net/core/flow_dissector.c:1024
+ bpf_prog_test_run_flow_dissector+0x37c/0x5c0 net/bpf/test_run.c:1425
+ bpf_prog_test_run+0x2cd/0x340 kernel/bpf/syscall.c:4673
+ __sys_bpf+0x562/0x860 kernel/bpf/syscall.c:6152
+ __do_sys_bpf kernel/bpf/syscall.c:6244 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:6242 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6242
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fe7c646eec9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fe7c46d6038 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007fe7c66c5fa0 RCX: 00007fe7c646eec9
+RDX: 0000000000000050 RSI: 0000200000000000 RDI: 000000000000000a
+RBP: 00007fe7c64f1f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fe7c66c6038 R14: 00007fe7c66c5fa0 R15: 00007ffd3a510c78
+ </TASK>
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-On 10/10/25 12:59 AM, Sahil Chandna wrote:
-> The timer context can safely use migrate_disable()/migrate_enable()
-> universally instead of conditional preemption or migration disabling.
-> Previously, the timer was initialized in NO_PREEMPT mode by default,
-> which disabled preemption and forced execution in atomic context.
-> This caused issues on PREEMPT_RT configurations when invoking
-> spin_lock_bh() — a sleeping lock — leading to the following warning:
->
-> BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:48
-> in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 6107, name: syz.0.17
-> preempt_count: 1, expected: 0
-> RCU nest depth: 1, expected: 1
-> Preemption disabled at:
-> [<ffffffff891fce58>] bpf_test_timer_enter+0xf8/0x140 net/bpf/test_run.c:42
->
-> Reported-by: syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=1f1fbecb9413cdbfbef8
-> Tested-by: syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
-> Signed-off-by: Sahil Chandna <chandna.linuxkernel@gmail.com>
->
-> ---
-> Link to v1: https://lore.kernel.org/all/20251006054320.159321-1-chandna.linuxkernel@gmail.com/
->
-> Changes since v1:
-> - Dropped `enum { NO_PREEMPT, NO_MIGRATE } mode` from `struct bpf_test_timer`.
-> - Removed all conditional preempt/migrate disable logic.
-> - Unified timer handling to use `migrate_disable()` / `migrate_enable()` universally.
->
-> Testing:
-> - Reproduced syzbot bug locally using the provided reproducer.
-> - Observed `BUG: sleeping function called from invalid context` on v1.
-> - Confirmed bug disappears after applying this patch.
-> - Validated normal functionality of `bpf_prog_test_run_*` helpers with C
->    reproducer.
-> ---
->   net/bpf/test_run.c | 20 ++++++--------------
->   1 file changed, 6 insertions(+), 14 deletions(-)
->
-> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-> index dfb03ee0bb62..b23bc93e738e 100644
-> --- a/net/bpf/test_run.c
-> +++ b/net/bpf/test_run.c
-> @@ -29,7 +29,6 @@
->   #include <trace/events/bpf_test_run.h>
->   
->   struct bpf_test_timer {
-> -	enum { NO_PREEMPT, NO_MIGRATE } mode;
->   	u32 i;
->   	u64 time_start, time_spent;
->   };
-> @@ -38,10 +37,7 @@ static void bpf_test_timer_enter(struct bpf_test_timer *t)
->   	__acquires(rcu)
->   {
->   	rcu_read_lock();
-> -	if (t->mode == NO_PREEMPT)
-> -		preempt_disable();
-> -	else
-> -		migrate_disable();
-> +	migrate_disable();
->   
->   	t->time_start = ktime_get_ns();
->   }
-> @@ -50,11 +46,7 @@ static void bpf_test_timer_leave(struct bpf_test_timer *t)
->   	__releases(rcu)
->   {
->   	t->time_start = 0;
-> -
-> -	if (t->mode == NO_PREEMPT)
-> -		preempt_enable();
-> -	else
-> -		migrate_enable();
-> +	migrate_enable();
->   	rcu_read_unlock();
->   }
->   
-> @@ -374,7 +366,7 @@ static int bpf_test_run_xdp_live(struct bpf_prog *prog, struct xdp_buff *ctx,
->   
->   {
->   	struct xdp_test_data xdp = { .batch_size = batch_size };
-> -	struct bpf_test_timer t = { .mode = NO_MIGRATE };
-> +	struct bpf_test_timer t;
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-We still need to initialize 'struct bpf_test_timer t' with t.time_spent = 0 like
-	struct bpf_test_timer t = {};
-since time_spent is used like
-         t->time_spent += ktime_get_ns() - t->time_start;
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
->   	int ret;
->   
->   	if (!repeat)
-> @@ -404,7 +396,7 @@ static int bpf_test_run(struct bpf_prog *prog, void *ctx, u32 repeat,
->   	struct bpf_prog_array_item item = {.prog = prog};
->   	struct bpf_run_ctx *old_ctx;
->   	struct bpf_cg_run_ctx run_ctx;
-> -	struct bpf_test_timer t = { NO_MIGRATE };
-> +	struct bpf_test_timer t;
->   	enum bpf_cgroup_storage_type stype;
->   	int ret;
->   
-> @@ -1377,7 +1369,7 @@ int bpf_prog_test_run_flow_dissector(struct bpf_prog *prog,
->   				     const union bpf_attr *kattr,
->   				     union bpf_attr __user *uattr)
->   {
-> -	struct bpf_test_timer t = { NO_PREEMPT };
-> +	struct bpf_test_timer t;
->   	u32 size = kattr->test.data_size_in;
->   	struct bpf_flow_dissector ctx = {};
->   	u32 repeat = kattr->test.repeat;
-> @@ -1445,7 +1437,7 @@ int bpf_prog_test_run_flow_dissector(struct bpf_prog *prog,
->   int bpf_prog_test_run_sk_lookup(struct bpf_prog *prog, const union bpf_attr *kattr,
->   				union bpf_attr __user *uattr)
->   {
-> -	struct bpf_test_timer t = { NO_PREEMPT };
-> +	struct bpf_test_timer t;
->   	struct bpf_prog_array *progs = NULL;
->   	struct bpf_sk_lookup_kern ctx = {};
->   	u32 repeat = kattr->test.repeat;
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
+If you want to undo deduplication, reply with:
+#syz undup
 
