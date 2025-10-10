@@ -1,303 +1,244 @@
-Return-Path: <netdev+bounces-228509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F684BCD0FA
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 15:12:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9983DBCD16C
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 15:17:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1F0C14E1FEC
-	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 13:12:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 111CF1A6664C
+	for <lists+netdev@lfdr.de>; Fri, 10 Oct 2025 13:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC652F0C78;
-	Fri, 10 Oct 2025 13:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE922EF662;
+	Fri, 10 Oct 2025 13:17:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c04uxI3Z"
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="uKh8jlHP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011007.outbound.protection.outlook.com [52.101.70.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCA82F0C7D
-	for <netdev@vger.kernel.org>; Fri, 10 Oct 2025 13:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68F01F63FF;
+	Fri, 10 Oct 2025 13:17:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.7
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760101971; cv=fail; b=kctBOodAx4E+e9CO9pCSdLd2eqdqlZGjB1DxNnTFuMwX6qbU8N7EL8cmhvolzrDopry99FYSH8g9fql9pkEscefz6X89Mv7iiOBsn5gVAJ/ILByl2Ml0YhNwTY4SzISY+yvGiK4HkFN6AnLw/f2DKI/IdiDflRWDbdzdBCDFkJA=
+	t=1760102256; cv=fail; b=klrdrk66FDT/Ut3spPn5777UB6rDwelngCa6pF0baqdrwR4jJxabAcrS8uhoFKatI/5e8ZhaTwn+gQw5aaaM28uBKZQn9dxmBrI1ecSqcIqlWwgnuabJ95vdasUaZ6/T/tVrZDQYQk9weOHDzpO1ivQkgwlExQimvSeeHw0gDi0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760101971; c=relaxed/simple;
-	bh=FRHBOWNsWkEcdJqVjdpXvKsqYSD163HkuFjZ/5m/omg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=mJFEm0pbYd2y8bCF7uV7k66x/8fVK7CZiB8CFE9e5WUHIWe/2iIdkD5HLcYdxbcizQuEnTjbXSmimH3CV9bEwOKUEZZD4VPGpTt61oAGaoC/9jdewwUMGIKdGidqdUbhEq5LxfSZD7AyvVs8ahgrLjoRFTw9fvSgtsODpEif2H8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c04uxI3Z; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760101970; x=1791637970;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=FRHBOWNsWkEcdJqVjdpXvKsqYSD163HkuFjZ/5m/omg=;
-  b=c04uxI3ZFenRbyP9FeM4NnyPQIvaoEYvhWcUKKjRtMrU5gATxdxxL+1H
-   6khyYTWkHGc8LYH5w1jSmA9eMzzNeiR7Zml5VKKN57OSPyYno8/XIomLl
-   2hiQPcurLhw3ldHJb/Kaj/RafxnWCy0awd64PK8tfoZ8qWxNIeLOaGOIi
-   0P44DHV9PGXTsruB+T7VUb18qaO0O66LXuhGyVg1P8o20ODhQcyIhqUyu
-   tnEnI+LsZe+1PMsvt0uWLLV4A6htpxyyeV4Fn4gFdXwWfntsf40buhQ1N
-   fPIgiHXY6V4+7ZXATmWtjr+vE/1rTPdPKknFBUQg1BfEbkShLOF1b4SIk
-   A==;
-X-CSE-ConnectionGUID: 0QjhKYZ1TA+LvK27N9+BNg==
-X-CSE-MsgGUID: 9wQi2LY3R82RD1rjdkOggg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11578"; a="72932228"
-X-IronPort-AV: E=Sophos;i="6.19,219,1754982000"; 
-   d="scan'208";a="72932228"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2025 06:12:49 -0700
-X-CSE-ConnectionGUID: igP8wzwYQPOcsPUuoU9bqA==
-X-CSE-MsgGUID: yUdO5pmDS5KwM+CnCcHc4Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,219,1754982000"; 
-   d="scan'208";a="211628543"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2025 06:12:49 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 10 Oct 2025 06:12:47 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Fri, 10 Oct 2025 06:12:47 -0700
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.56)
- by edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 10 Oct 2025 06:12:47 -0700
+	s=arc-20240116; t=1760102256; c=relaxed/simple;
+	bh=Hf8GkYzB+qqqOXrjlRNB/0v75XKReaiSXk1etCqppWs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=R2r2s+UxDbDLfyX26+MzW1My7CYQXa2plK0F/Dzd4A00mijhYNPn8bCQ5vVjE7xrDGGGPl+KG0hUUNEgcnSxJhsE6UpBi7TlqjWM28txQ/VSRFxanB7HotN5f+n8sCyt9mKnntB8rZO6CoqMDKyBUmhntcIMji1+GUW0FTgQ2zw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=uKh8jlHP; arc=fail smtp.client-ip=52.101.70.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vlIYbubUUOQAiuD6MxVCig+FsCX3aeNbc95NMlw/ctwvqLTKMjVPCcpjBlOGxinVNLGMGrr06FqGAK5Dp5DUZCk4Igm00IY3P7j4ptdteG0veFH3WKyHTABLBsvn2O2SZFCuIQvcD3yetMZExfBF1oc52EUSAkpRuNxaZflgaPr8cBtwVoGmIlQtdqcO5YbeVdUPCO+LSgdP3RoIL+inWtzKHRZRBrkzzGh0jofupsvxAFa3cEufObBTWh7lZf4Uv7OncG6mQZt9lEfwAUPYrl74Xrxe5sIzGRfBS0+ZLjowTt9GNWXW/+W/TQ+cTjjEd6Uri10yLls6k+xU6C5bzg==
+ b=o2as/EC0biERDkUPr7VlIbj45sVonlWVchRAy/b0jwTAtoMMSnkxkCg+ky2xSNcYOyiEKyZAz36iuzeT7FffcUfXHKe02ZaEhqqOLWHJVzFVLm1G0hN5m7TF9xlBlcQNGmbtIyYqbuXr1JxaBBREcF+czY/I91nKzUBIS1orA4bLi83At1iqC7KTbZxgKiZ7Zc88zHOtTy4QpuaBxhvmbt6L9JuBavVrU2x+aDLLXIBxXTtSzbXachGcA3JOTZvOQGe+Q0RPDsGa9VB48OnN2AC4prWYkwkKw+FUqdnyImRSsvZmD7IenyTStEZcJIoC+H67bhHz5Xu5GZy/7iyyag==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qS4QgxkW3eOwE7V+lLVvhGRaVSqREGr/YJL6YsFmmIo=;
- b=qFq8cYGOM4X8IIIvwRFnoxXeYQSNEwVTJcRoM36ALph8I9hf5Z4K6mB4wTg6Cbv5gRuRfD59hyl3z8FvsSYzBUGkbjbW3BFc+3Ec20mcImtuXv81Sz5DE3J7wXCX75zhBDdg/mtvWACMCI04HBB9oe/ucJSNPlWe6TEPv9130lO7urFopDRA0UdsoEuSmgf1JiweTwOVb9e8Geic8ERIMlXfA11hKw75VUBMAIZLbGecIIb1RqIVZgzOKLpvlIz7rQBIzbfQcBEXbOMCdpw3WmAUwFE7/Id07JalIYJElAygf6rBN5y5OhUnd5MAxGaeJaiWW2SOcFi+LZwyjjztpA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7557.namprd11.prod.outlook.com (2603:10b6:8:14d::18)
- by DM3PPFE8B1F622C.namprd11.prod.outlook.com (2603:10b6:f:fc00::f58) with
+ bh=tnaT0BrUbHRTlWXSxwNklBvMVknsnOUcj1S/6RwJ1e8=;
+ b=qVQ+aSpmCHdb4RVdcfv6vdGOh8U4pn6tdE0V2yseCiG1l7THS4oR6pm5zGCVdxKV+2iVjOMTg7ksnylfNFefu64kOIXikozqS5eYHeR+3YDFRwTMgCNazq6RqrlHjnuY0YGF+6cydbW7PGpT1IkEzaZPNbsK+HmfLLQ62wFFX1fcFwvc1ARWeIyDXfOWF+JVxRndCEtUqN5qLTrV5uU7RCrWLiArkr0R9e/WG6skq8ATmiok48ivEb/Nf03HkD/L9MnR7G+xlYSEZxoy+dkD5nl1Cn3HZ5IlPTmYU2HoRYUipCG9Ooh/Hoq2GKIEloBopor6RKs4G9AHxORKgLhBLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 131.228.6.101) smtp.rcpttodomain=amazon.com
+ smtp.mailfrom=nokia-bell-labs.com; dmarc=pass (p=reject sp=reject pct=100)
+ action=none header.from=nokia-bell-labs.com; dkim=none (message not signed);
+ arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tnaT0BrUbHRTlWXSxwNklBvMVknsnOUcj1S/6RwJ1e8=;
+ b=uKh8jlHPNAkzd0wQfOUoFeGK0BINPRDuuQe2L+xh3UnyLQM8QanqLUrR08JP/CGEeChnlB+ganPZ1eAu7r1nGf9LBInafY9bhGMyIL7CqK4KYFBCqSLRF/llKB13p3WQR3UJOQNwDvbzTTRqGg9ToYeUhfZFTF8RXKzpFGVEI6rN+s0tfgqdcVbM1XVI82xk2ppQTNpT4v6jOp2eUQe5udGsmEftz3Yhc2LimDbZOY3kyf/vORqS79hW8uHnsH3S1udXftT5WkTnAJ+7rXLDy0Fw4oEg7v5y2IID4PE1Z98CFwkU7x5THXJZPkekaGPQxW57BcoP6wbiGPkfQ/SsJQ==
+Received: from DB9PR02CA0017.eurprd02.prod.outlook.com (2603:10a6:10:1d9::22)
+ by VI1PR07MB6223.eurprd07.prod.outlook.com (2603:10a6:800:137::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.13; Fri, 10 Oct
- 2025 13:12:44 +0000
-Received: from DS0PR11MB7557.namprd11.prod.outlook.com
- ([fe80::fc44:fb3a:41f4:b8b8]) by DS0PR11MB7557.namprd11.prod.outlook.com
- ([fe80::fc44:fb3a:41f4:b8b8%5]) with mapi id 15.20.9203.009; Fri, 10 Oct 2025
- 13:12:44 +0000
-From: "Landowski, Marek" <marek.landowski@intel.com>
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, "Chittim, Madhu"
-	<madhu.chittim@intel.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Lobakin, Aleksander"
-	<aleksander.lobakin@intel.com>, "horms@kernel.org" <horms@kernel.org>,
-	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v5] idpf: add support for IDPF
- PCI programming interface
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v5] idpf: add support for IDPF
- PCI programming interface
-Thread-Index: AQHcLxbHMIixv6e7AkisiVpKkkSSnLSptdcAgBGmC6A=
-Date: Fri, 10 Oct 2025 13:12:19 +0000
-Deferred-Delivery: Fri, 10 Oct 2025 13:11:47 +0000
-Message-ID: <DS0PR11MB75571E0BE5A3B82C01CCF3C7FFEFA@DS0PR11MB7557.namprd11.prod.outlook.com>
-References: <20250926184533.1872683-1-madhu.chittim@intel.com>
- <IA3PR11MB8986359A7987D84D5950113CE51BA@IA3PR11MB8986.namprd11.prod.outlook.com>
-In-Reply-To: <IA3PR11MB8986359A7987D84D5950113CE51BA@IA3PR11MB8986.namprd11.prod.outlook.com>
-Accept-Language: en-US, pl-PL
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7557:EE_|DM3PPFE8B1F622C:EE_
-x-ms-office365-filtering-correlation-id: b78e42f1-7113-4bd0-bcf5-08de07feb377
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?UOC/uTroLy1lgYffJS0MtVRTvLKnfD+vBDhdkzkZQGJFktL+7PuIYBICK8GU?=
- =?us-ascii?Q?gjpkLudi8Lhkrv2ss0Uitrb3tg9SBBfppy46I4xbG+v5MXBNw5ZNjkWM1rDo?=
- =?us-ascii?Q?NlM3nEO6RcgIDvyR5Yms5AEAUb67tUzdxEKkif50ec6lI74YZWDDPjys4MOH?=
- =?us-ascii?Q?wTX37iuhCbPDLKSMpEb1dbaRnIIxVOpSMkDNFp4OSoXpmwxROaiM0xyystQ6?=
- =?us-ascii?Q?5RitJy4wDy0YuxeoucIOdwb1vppDOT1brcIAj8G7RHjtyUhHsidfUmRx86Ix?=
- =?us-ascii?Q?46rebjiF2Pti2dFm1LsD2ITb1RNmnyYsyZciNEeuA4bNYcTIK7soeAOS88VF?=
- =?us-ascii?Q?1B9ok7/heZWKEu9JQ89bT20hvkYJKgRz0tEX/Ucsfy7E+E7gkG7j0e83xSxF?=
- =?us-ascii?Q?H1s1WiN7KYHjFo3kA1JcIbDPvwiy8E1+OThvNSaZkZV1KP0vp9I8ApvlvqYp?=
- =?us-ascii?Q?jUoxuBztE09b8O27zNgUdpmmqVW1zpHV51u5BGxcXfTKxVMh3bA1Kcrou4mT?=
- =?us-ascii?Q?M/DrhXNH2ZAzbksPlzdApyf+0wkgEzEHc9iyNGGCp3nxz2yBazwOkQ//few2?=
- =?us-ascii?Q?CU25xqT137x8Y2E2lt7lDUnEgFtrFQJ500iK8cx2SN2dU+V6uvl1rS+g4wmg?=
- =?us-ascii?Q?nr6IM3E0vM1L0oBZBZ+JxEQWmxC4xZSS39HjY5QoQdC3BHNgJZPhIo7ev6zs?=
- =?us-ascii?Q?KL1d/6YC27p6HkT71byg25TZox+Job07GXtcHuQuyg7ZwinmdPjso9Ccej8S?=
- =?us-ascii?Q?xXhhLRq6Uu20p7sN/K3xijESIkVZlFbwT3N+HbTmSLG0Qj86JkV/XeFOXsJ5?=
- =?us-ascii?Q?D1/4RAcMFQrwF1excpT99NXpJi3Ap7K3jOUuv3wxJTZZF9u19Mxvx2CmNi7P?=
- =?us-ascii?Q?h2IfzAbSuM0yHF9E+KWWVJ9nOMvGyEGtFa0I0uBG746swC431AkzbLvZybXD?=
- =?us-ascii?Q?0lkDRunuoILU5HNwXujagZVJtsuXFFK6wXAn/hCPKeTUhxo4YZwvaJUZYmFO?=
- =?us-ascii?Q?M37KvOPvZVUTSk1UeiRt/QdwtsISVCCn0eCHX4S8N1oYhMQ6XkUu3A5m6NnS?=
- =?us-ascii?Q?wazhpL9PofDN+5R7yapiKUO6wm66Fb7ZCfzYA2ennNIZCIh9bjafa8rOdazR?=
- =?us-ascii?Q?7tGvqg5oY3UKE4Hk+uXjlZ8ZAf6fzsAu+3lrf7H+09Daz0bG5C+meHXfsDei?=
- =?us-ascii?Q?b4f0nnqfqXRuYeupCQ2+EVatQG0FHaJxiVyPyUZxr4IrTHFFLieaE9TH8u9I?=
- =?us-ascii?Q?TAYL31XhPuaKRH0lpm/mZ3xUiZkZP8j+tgGNygjOttL1GbC9I9WnbUMVYlwQ?=
- =?us-ascii?Q?dNkTXV56so4+WBH8EFIu9tJU8sKCeUxuR75gupVeinvGKZcAJviSywSaaED3?=
- =?us-ascii?Q?EiMsUy4SJy/V54EiTWTZAL2ggXygc9TnCc74o49Y9LN+JiZsbaqpNBVSm3tu?=
- =?us-ascii?Q?3T56MuKKoqB8BMBZ67QfZhcZ3N5hJCj+trUPubn1nP9nTB/ovLIcaw=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7557.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?AQRyjkdGawuNo48ZIhcP0AxiGoJGE10slgqb4tKrCSX2Y6sA09+74qDnCMIF?=
- =?us-ascii?Q?aBhFbVTQ+rDy9oCQoAIAgkRwTmugnP9X0Xx2IoP51jz9OA5UzsXYG2ynlWaK?=
- =?us-ascii?Q?fc17cNLBem1xq78R19PhIhZahBw+qsXBv6CHyAHAKmthoyEZYJvbC6DUHDcm?=
- =?us-ascii?Q?ACz1NIOPSs5hsJ8wFOOELzvusoEUEc9qnTrGfdYWfR7yTu6/HlFGC+xjIUEb?=
- =?us-ascii?Q?hLqaCBf14VMbLUU9P/OyK8lC4Nw/+44/WcGE0btjaAGNPIle2ScJeKlY04Fh?=
- =?us-ascii?Q?aOkQQ9IlkHPcIdQkWEwP443fbpo2uvBi7KujeMJEQOBlurXr87G6WdXcfSfj?=
- =?us-ascii?Q?SS2gR1pzho6h7HLf3zpDrk8Cl3D5jvL5Gjzu0sDQvIOv7l2FW1D6oO16Ab68?=
- =?us-ascii?Q?AbMfE6UtbaBOKa3XNj1+mW1oHkUkBE1C4vUOE1rEVnXV03JG4V4gaoQmN6VM?=
- =?us-ascii?Q?34aD63Rq610/rYicX2jg5rY84PdQplLes4jckrkQIgNo29uBy/uQ2ZxtJHnz?=
- =?us-ascii?Q?NOCo15a0YJ5BsAFHTBdg3HVvOG4a+SUn1MNXXPozNTxsK8msV0eDxLNIFiDP?=
- =?us-ascii?Q?3z9aG4c/1i79pTav9c3zRKR3b8iNgitJbA2xU6G3sEXnrM2OngPcScB+hcHi?=
- =?us-ascii?Q?E2J60L6UhruKIP73k+sx0cBGNlZmCGIaxdg7EPAaMqmXroehPaTnPnTApL8B?=
- =?us-ascii?Q?VjDNJD3ehO/PDLDiU1ALvR0QDoHFfjYR5J544DYVpIwm96+nbOgUmVIwZixy?=
- =?us-ascii?Q?uBb92xk2CjfBOMEkCIPGwSqEW+qbQC/tVvasMYKeSoU+A4J5MlAn9hNBwxeN?=
- =?us-ascii?Q?ezn201u05SjW/sR9CMj8O0y3eb3EgKZzLyXyH1dkgEdHGg0ovoO6PmePBV7C?=
- =?us-ascii?Q?hcU0TVl6Q721Wzn8ipM8SG0kggZZpBXEffm5vjiQyIUq2Y/GsOh5LmC2c8gp?=
- =?us-ascii?Q?ol+ytldNJ2mi6EQgF/L8TqDWPwxglUyACQhB95MeG01e1WLGPUKvOOiA2YbV?=
- =?us-ascii?Q?m59oA4q8r/qi+p6IRcOGO5Kb78XpN7mXi+szz4hbpEMv35WPDCMyYMATUsCJ?=
- =?us-ascii?Q?mQ5BNj6SDKvxtJcZeIKXs0/Am1B3gfKkmpcP32tHIxDGi3kgnjiBV5zrnpNI?=
- =?us-ascii?Q?FKGgCAlMY+qFy6xXPc42Upz/3XoBijN/bG/XLYsDrYUjDSM7tJ9DZ4s89YX9?=
- =?us-ascii?Q?6Z9RoOlXJq3UUk5ToLca6o3TgXOWsLFPUzfwy9ma2+jv5F/C5jDBVUSimWzc?=
- =?us-ascii?Q?cNJ0iLKul9HIJgaxGLTEwp+uwdKFwsyIWhGYZbv//D79GsAUf7w7V1FjEOPt?=
- =?us-ascii?Q?bLjC+LVHy40oKBrHSsuUgSDacbB7r8F/tRZ5GGc4U/q8t/tXnZEH9MlWU1FE?=
- =?us-ascii?Q?SrqDF1XGhbQDtH9k3lOcDrw3G9/yGqcRzjRVSUQK7zPUSSOtvu1Qch2pGYkF?=
- =?us-ascii?Q?MQ33cwCeXjj+b1RDZUTfFkc/fEH/B+o8O8HHFShTzW6gg8cORuDshSd8mjff?=
- =?us-ascii?Q?VPiLX4EBzL/56ExyYEyuoFgJ7b1dgDhl4RCiq3mnm14V4EOa5pnApQGA5kjV?=
- =?us-ascii?Q?qcnCMKr6cuJCYm0lKdZuiSRjfkfX+WRtta65T5uS?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9203.10; Fri, 10 Oct
+ 2025 13:17:31 +0000
+Received: from DB1PEPF000509FE.eurprd03.prod.outlook.com
+ (2603:10a6:10:1d9:cafe::80) by DB9PR02CA0017.outlook.office365.com
+ (2603:10a6:10:1d9::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9203.9 via Frontend Transport; Fri,
+ 10 Oct 2025 13:17:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.6.101)
+ smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nokia-bell-labs.com;
+Received-SPF: Pass (protection.outlook.com: domain of nokia-bell-labs.com
+ designates 131.228.6.101 as permitted sender)
+ receiver=protection.outlook.com; client-ip=131.228.6.101;
+ helo=fr712usmtp1.zeu.alcatel-lucent.com; pr=C
+Received: from fr712usmtp1.zeu.alcatel-lucent.com (131.228.6.101) by
+ DB1PEPF000509FE.mail.protection.outlook.com (10.167.242.40) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9203.9
+ via Frontend Transport; Fri, 10 Oct 2025 13:17:31 +0000
+Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
+	by fr712usmtp1.zeu.alcatel-lucent.com (Postfix) with ESMTP id B7ED61C005A;
+	Fri, 10 Oct 2025 16:17:29 +0300 (EEST)
+From: chia-yu.chang@nokia-bell-labs.com
+To: pabeni@redhat.com,
+	edumazet@google.com,
+	linux-doc@vger.kernel.org,
+	corbet@lwn.net,
+	horms@kernel.org,
+	dsahern@kernel.org,
+	kuniyu@amazon.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	dave.taht@gmail.com,
+	jhs@mojatatu.com,
+	kuba@kernel.org,
+	stephen@networkplumber.org,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	donald.hunter@gmail.com,
+	ast@fiberby.net,
+	liuhangbin@gmail.com,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	ij@kernel.org,
+	ncardwell@google.com,
+	koen.de_schepper@nokia-bell-labs.com,
+	g.white@cablelabs.com,
+	ingemar.s.johansson@ericsson.com,
+	mirja.kuehlewind@ericsson.com,
+	cheshire@apple.com,
+	rs.ietf@gmx.at,
+	Jason_Livingood@comcast.com,
+	vidhi_goel@apple.com
+Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Subject: [PATCH v4 net-next 00/13] AccECN protocol case handling series
+Date: Fri, 10 Oct 2025 15:17:14 +0200
+Message-Id: <20251010131727.55196-1-chia-yu.chang@nokia-bell-labs.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7557.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b78e42f1-7113-4bd0-bcf5-08de07feb377
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Oct 2025 13:12:44.6617
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB1PEPF000509FE:EE_|VI1PR07MB6223:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3ee0d5e3-bb4a-403a-1c15-08de07ff5e51
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|7416014|376014|36860700013|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VlFlTFU3UlloUDRML2JZS0plbmZBblZXdzRHbHNTaVlBYWdVSEk1cHBMakxF?=
+ =?utf-8?B?cTU0NVhTaEJ5eDdHZjNaQXg3MGJUYW02VlpESjN2c01ocEpZTVZvQ2UrZno1?=
+ =?utf-8?B?akNCR0JVRTZZbjJWbnJaZ0plVTdxYndKbnlLdjNXUFpzMGozZzIwcGJxVm5u?=
+ =?utf-8?B?VTRYQU1tUjY3UUI0bFhEOU5CRCttYWpGLzVIZFZBZjU1ajNpa1g3Tjd0OUV0?=
+ =?utf-8?B?b3lrUk5aKzVPUzNJSmZzcTZUTUE2dklmRDY5RmMxSXBwMkU2ZnJZVW5OSVNE?=
+ =?utf-8?B?SmVXbGRqZFFNS3AwanZXUi9ROFZDSnVBMHBzMU1UVXJOR3h5VTNnakZ2cHo5?=
+ =?utf-8?B?SWYwWFJSU3RYTUJ1OWpYcVB0N0FOY2d1aUY2bHNOVEVtZmxTNHIrUVJxNlc5?=
+ =?utf-8?B?T3YxRnhacXJTR25NdDNyaUlKNmtINitFay80ZC84WjRrR1hEb3F2WU9GZHFX?=
+ =?utf-8?B?Yk9KQWdCUm0rcWJ2Z0srb2daM2EzTWNFZWdRMmNINERaYmRuV3dlSGI2dkpv?=
+ =?utf-8?B?Rnk2THRDS3NvUDJ5M1UrNURhV3RIOVcySW04MldWMTZGaUp6bFpwamxaZDA4?=
+ =?utf-8?B?WnF6OXZocFhnTzN1SGNPci9wenF1WUMvODh4S0RwemFmM0pyOXdXbXpBYis2?=
+ =?utf-8?B?Z01uM1I1b1lBR0hoam90dTZrRndWN1ppaGpydFdVNkZoWE5qUFp0TEFQOSta?=
+ =?utf-8?B?RVZuWWFENU1KRkJtc3FvWGloaHFnaTAvZHdkdStWd2xlSFg4V2kvR1BoZFMy?=
+ =?utf-8?B?OXh3Nlk4LzZVVFBqYUNRbzRUVUdQL1dHWGx5dGRNOUlRTGhXenJlaFBwSzhS?=
+ =?utf-8?B?MTlZbWJTc2JDaXY1OXJZdm9mRmFWdk92eHFoeWYzNTlucGVtcnpIN3pKaVRi?=
+ =?utf-8?B?bkpnRzM5bFhPenB6V2FzTTZIR2lRRHd0UHU2dkRvR0habmZuSFh5Nk42MWE5?=
+ =?utf-8?B?cC9uMVZXUTkvQTIySnFkZkU0UUZZNDBLUXE4MW1HZmxlcnBHa0JBYTUwQTVY?=
+ =?utf-8?B?YUMxK1M3YzRsUm9WUWg3Zy8xWlhWT1lXb29mNitzcHdzeXZnUElZQVV3TTdS?=
+ =?utf-8?B?M0FGVzVxcERnTHlkZUIvSmhWNjlCdkhIRjRpQzd2dlczaWx1MTV6eHZNbjcr?=
+ =?utf-8?B?NGMvYUZnOExUYURTdlVHcE1WbldKdFFwM0JCdFpWTlA1b29ETEVpeHlPbC91?=
+ =?utf-8?B?RWo1M2d5NTJacE9VYkRRMVZDcTl0bVFWVmVlVXZQN1hnZmdxZ0Rzajk0V3RF?=
+ =?utf-8?B?RWgzL3l2cm9VekVNUmh4M1lQVXJqNFl3RXhsc1N5TmxhVnZrNk01d0hxMitH?=
+ =?utf-8?B?Z1dFNVpuR0NKRGovYmhqc3VneHc3TXBFMlNQajBjNDNSS0pIR0F5UjlORlNO?=
+ =?utf-8?B?NGNRcHI4NXR5K3hWU3BCRDJNRURrMXNOU0w2WVhxUDhCeFl5Qmk1djZkNnM3?=
+ =?utf-8?B?eVFadU1ab0ZCZUw3M2twTUM0Z3VFbWE4eUJvU0ZjK0dGVWs5TkFhQlRTNGwr?=
+ =?utf-8?B?UHVHQnJpVmtyWGY2RmpaZ0kzQXJsUlJzNmkySXoxbEo3OFBxbzgyelR5cGVs?=
+ =?utf-8?B?WXVRNzJlRjIyOUYvcHBFdVZIVWxWUjB6K2pjOXlnVTVoeUpCVWFhWHNMR2VN?=
+ =?utf-8?B?Q1pMaGtmejdmaXpjMTFBQ2RwNG1IREZPMHZ1eDlyV1dUT21KQWdQcU0wLzRw?=
+ =?utf-8?B?OFRTa1pjSDVIWDk5S3RnV0VRZWxoVVdEeHdpNndhSzNRTHRDamhTK2crSkRz?=
+ =?utf-8?B?aERyeFU1em1MbGpoZHVsZnRpb3N0bXpTSTlKTkFhMHh3aTcza1ZvUFQ1aXli?=
+ =?utf-8?B?SjVleXFYc2prajZpQng3T29QWmdFZlMvSjhlT3BJbXZDYWdxZ0RTMm1vZGtD?=
+ =?utf-8?B?S3ZsYWtNdjVteVU4S3czTk5XSy9YTUlFdXFIRWE1VXNDcHdqUTRsUEV1ZHYz?=
+ =?utf-8?B?SjhpY3hRZEZsTDlXdkhaeXFhRjk5MGtVb1dXNHJ6WDJwWmlHMTFoQU90REUx?=
+ =?utf-8?B?OEpUVDFSUmUyNzFGbWpRMjhtZzBXTExzb2NMcGg1VTNwdXBsWU11Qzl4Qjl5?=
+ =?utf-8?B?dGV5Mm1aUUlJQU5zZlJ4bkFNaVl6R1hBYWJLUFlMK0lrVElTd1RIclVYT0NZ?=
+ =?utf-8?Q?5tn166IKSf6ALdUhUwDtLTiQr?=
+X-Forefront-Antispam-Report:
+	CIP:131.228.6.101;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fr712usmtp1.zeu.alcatel-lucent.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(36860700013)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2025 13:17:31.2823
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: W8zkWZdhretXfAZ8Ci/ax4KCRtumDxeC5KeH4VonTqXYtUFUA1dyLIsWjAiMjg7HOyrKfezh7BMiMu5VS0vYfKoDHDmaeh0Zysg9UZjFjzE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPFE8B1F622C
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3ee0d5e3-bb4a-403a-1c15-08de07ff5e51
+X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.6.101];Helo=[fr712usmtp1.zeu.alcatel-lucent.com]
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TreatMessagesAsInternal-DB1PEPF000509FE.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR07MB6223
 
+From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 
+Hello,
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Loktionov, Aleksandr
-> Sent: 29 September, 2025 08:27
-> To: Chittim, Madhu <madhu.chittim@intel.com>; intel-wired-lan@lists.osuos=
-l.org
-> Cc: netdev@vger.kernel.org; Lobakin, Aleksander
-> <aleksander.lobakin@intel.com>; horms@kernel.org; Samudrala, Sridhar
-> <sridhar.samudrala@intel.com>
-> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v5] idpf: add support for =
-IDPF PCI
-> programming interface
->=20
->=20
->=20
-> > -----Original Message-----
-> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> > Of Madhu Chittim
-> > Sent: Friday, September 26, 2025 8:46 PM
-> > To: intel-wired-lan@lists.osuosl.org
-> > Cc: netdev@vger.kernel.org; Lobakin, Aleksander
-> > <aleksander.lobakin@intel.com>; horms@kernel.org; Samudrala, Sridhar
-> > <sridhar.samudrala@intel.com>
-> > Subject: [Intel-wired-lan] [PATCH iwl-next v5] idpf: add support for
-> > IDPF PCI programming interface
-> >
-> > From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-> >
-> > At present IDPF supports only 0x1452 and 0x145C as PF and VF device
-> > IDs on our current generation hardware. Future hardware exposes a new
-> > set of device IDs for each generation. To avoid adding a new device ID
-> > for each generation and to make the driver forward and backward
-> > compatible, make use of the IDPF PCI programming interface to load the
-> > driver.
-> >
-> > Write and read the VF_ARQBAL mailbox register to find if the current
-> > device is a PF or a VF.
-> >
-> > PCI SIG allocated a new programming interface for the IDPF compliant
-> > ethernet network controller devices. It can be found at:
-> > https://members.pcisig.com/wg/PCI-SIG/document/20113
-> > with the document titled as 'PCI Code and ID Assignment Revision 1.16'
-> > or any latest revisions.
-> >
-> > Tested this patch by doing a simple driver load/unload on Intel IPU
-> > E2000 hardware which supports 0x1452 and 0x145C device IDs and new
-> > hardware which supports the IDPF PCI programming interface.
-> >
-> > Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> > Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-> > Signed-off-by: Madhu Chittim <madhu.chittim@intel.com>
-> > ---
-> > v5:
-> > - Removed use of resource_set_range
-> > - ioremap only the register which we would like write and read back
-> > - Renamed function from idpf_is_vf_device to idpf_get_device_type and
-> >   moved it idpf_main.c as it is not specific to VF
-> > - idpf_get_device_type now returns device type
-> >
-> > v4:
-> > - add testing info
-> > - use resource_size_t instead of long
-> > - add error statement for ioremap failure
-> >
-> > v3:
-> > - reworked logic to avoid gotos
-> >
-> > v2:
-> > - replace *u8 with *bool in idpf_is_vf_device function parameter
-> > - use ~0 instead of 0xffffff in PCI_DEVICE_CLASS parameter
-> >
-> >  drivers/net/ethernet/intel/idpf/idpf.h      |   1 +
-> >  drivers/net/ethernet/intel/idpf/idpf_main.c | 105 ++++++++++++++++---
-> > -
-> >  2 files changed, 89 insertions(+), 17 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/intel/idpf/idpf.h
-> > b/drivers/net/ethernet/intel/idpf/idpf.h
-> > index 8cfc68cbfa06..bdabea45e81f 100644
-> > --- a/drivers/net/ethernet/intel/idpf/idpf.h
-> > +++ b/drivers/net/ethernet/intel/idpf/idpf.h
-> > @@ -1005,6 +1005,7 @@ void idpf_mbx_task(struct work_struct *work);
-> > void idpf_vc_event_task(struct work_struct *work);  void
-> > idpf_dev_ops_init(struct idpf_adapter *adapter);  void
-> > idpf_vf_dev_ops_init(struct idpf_adapter *adapter);
-> > +int idpf_get_device_type(struct pci_dev *pdev);
-> >  int idpf_intr_req(struct idpf_adapter *adapter);  void
-> > idpf_intr_rel(struct idpf_adapter *adapter);
-> >  u16 idpf_get_max_tx_hdr_size(struct idpf_adapter *adapter); diff --
-> > git a/drivers/net/ethernet/intel/idpf/idpf_main.c
-> > b/drivers/net/ethernet/intel/idpf/idpf_main.c
-> > index 8c46481d2e1f..f1af7dadf179 100644
-> > --- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-> > +++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-> > @@ -3,15 +3,93 @@
-> >
-> ...
-> > --
-> > 2.51.0
->=20
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
->=20
+Plesae find the v4 AccECN case handling patch series, which covers
+several excpetional case handling of Accurate ECN spec (RFC9768),
+adds new identifiers to be used by CC modules, adds ecn_delta into
+rate_sample, and keeps the ACE counter for computation, etc.
 
-Tested-by: Marek Landowski <marek.landowski@intel.com>
+This patch series is part of the full AccECN patch series, which is available at
+https://github.com/L4STeam/linux-net-next/commits/upstream_l4steam/
+
+Best regards,
+Chia-Yu
+
+---
+v4:
+- Add previous #13 in v2 back after dicussion with the RFC author.
+- Add TCP_ACCECN_OPTION_PERSIST to tcp_ecn_option sysctl to ignore AccECN fallback policy on sending AccECN option.
+
+v3:
+- Add additional min() check if pkts_acked_ewma is not initialized in #1.
+- Change TCP_CONG_WANTS_ECT_1 into individual flag add helper function INET_ECN_xmit_wants_ect_1() in #3.
+- Add empty line between variable declarations and code in #4.
+- Update commit message to fix old AccECN commits in #5.
+- Remove unnecessary brackets in #10.
+- Move patch #3 in v2 to a later Prague patch serise and remove patch #13 in v2.
+
+---
+Chia-Yu Chang (11):
+  tcp: L4S ECT(1) identifier and NEEDS_ACCECN for CC modules
+  tcp: disable RFC3168 fallback identifier for CC modules
+  tcp: accecn: handle unexpected AccECN negotiation feedback
+  tcp: accecn: retransmit downgraded SYN in AccECN negotiation
+  tcp: move increment of num_retrans
+  tcp: accecn: retransmit SYN/ACK without AccECN option or non-AccECN
+    SYN/ACK
+  tcp: accecn: unset ECT if receive or send ACE=0 in AccECN negotiaion
+  tcp: accecn: fallback outgoing half link to non-AccECN
+  tcp: accecn: verify ACE counter in 1st ACK after AccECN negotiation
+  tcp: accecn: detect loss ACK w/ AccECN option and add
+    TCP_ACCECN_OPTION_PERSIST
+  tcp: accecn: enable AccECN
+
+Ilpo Järvinen (2):
+  tcp: try to avoid safer when ACKs are thinned
+  gro: flushing when CWR is set negatively affects AccECN
+
+ Documentation/networking/ip-sysctl.rst        |  2 +
+ .../networking/net_cachelines/tcp_sock.rst    |  1 +
+ include/linux/tcp.h                           |  4 +-
+ include/net/inet_ecn.h                        | 20 +++-
+ include/net/tcp.h                             | 32 ++++++-
+ include/net/tcp_ecn.h                         | 92 ++++++++++++++-----
+ net/ipv4/sysctl_net_ipv4.c                    |  4 +-
+ net/ipv4/tcp.c                                |  2 +
+ net/ipv4/tcp_cong.c                           | 10 +-
+ net/ipv4/tcp_input.c                          | 58 ++++++++++--
+ net/ipv4/tcp_minisocks.c                      | 40 +++++---
+ net/ipv4/tcp_offload.c                        |  3 +-
+ net/ipv4/tcp_output.c                         | 42 ++++++---
+ 13 files changed, 240 insertions(+), 70 deletions(-)
+
+-- 
+2.34.1
+
 
