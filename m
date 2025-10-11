@@ -1,93 +1,64 @@
-Return-Path: <netdev+bounces-228602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F48ABCFA62
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 20:04:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 01D24BCFB21
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 20:52:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D03DA4E0EEA
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 18:04:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E59244E6A79
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 18:52:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDFE61E3DDB;
-	Sat, 11 Oct 2025 18:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E57283FD3;
+	Sat, 11 Oct 2025 18:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="Np5cD2bh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eY//RnJ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4692D1ACEAF
-	for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 18:04:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418C9246793;
+	Sat, 11 Oct 2025 18:52:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760205850; cv=none; b=gRj8vgcv9FI1lAP6FMk8s6lfXFigSoYchIcVZQ54rNDT2iGIYKvDV7RnKuYEtyg31vopce7R7xxZY/mPk5krIuxDRB6jFEYTt6H9/TgQBuhSCFMDg392rq8U78mX0DOtpzkkpG37dQuDZkPlmiKMTiMMQA4Sjz4kIu5cdpSSswg=
+	t=1760208751; cv=none; b=P+Uin6oJV5s1y6vnjvOS2n9XGWGAcPcZ3/CX/cPA9zDXWSGxsATe3vhG8fbMoW93KT7XJE0FjNS5bD1hpWb7RNG3epRAzqHnQP7mUlGhlPZv998GPIr8VMvkewoaSDMGjmqunxLpPyEDwaU+JxT89CDMgs0ESJ72MUf6mDEXAsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760205850; c=relaxed/simple;
-	bh=CfZ6Ogw1SDTfiNV1N44wJLznxd/1DH2Jp1q8mPQdEkw=;
+	s=arc-20240116; t=1760208751; c=relaxed/simple;
+	bh=0h4gT68eVwzFNQ4ql0PAM2G2QU1YrCNWrtkdF0+rzXY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZFOYmR+Q9hiiXPBBx9R+eOHfFyCRrOVR1AjhQesmxkknQFC+qh54xz6AYlQyegGAay5aAQByt+rVwo4s6ZYx5pjGVb39CZBTEoaqJCqMvNcPUfSL7hWejciIPW2OnIwX1aDi/6Gnxs16MFDuYAksRZJUjHMbmmSAhQsgOtv+Zq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=Np5cD2bh; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-789b93e9971so263984b3a.1
-        for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 11:04:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1760205848; x=1760810648; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M0IvAdUYDvrJ8BmCFPvW2btvMiVtD9TKPbA5D4CG4UY=;
-        b=Np5cD2bhZibq71uqUZC+DsNAqdYDBMEygl2MTKzZ3z+hKgmM24foEHfBDDPDZEd26p
-         WfTvu3dghN7Cu58BiVW0aDf1K4QJ8ax5hmWmdIEK/hxro4l3y6Ubin18uKOrrbCwQjWW
-         oSXEu3XTLOh9Ju4gtyuVkiwi6P5tJJKIikGdFXWf/h5ZJnTqzkE78kXuB9mRbWrRsOzg
-         A0ZeMPsFlMOfdDWniF09ywCD9BmiUJ0Cmjn7Lzo1Xj5exvzIUes9QUtoUizFaVzB9VrH
-         rk5fBOhIRRJWZlNoBh6YEgwdV/+Y5dosuC+MOeyfEZszSMrE0X4FVqtqP19guu6XR75O
-         FIpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760205848; x=1760810648;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M0IvAdUYDvrJ8BmCFPvW2btvMiVtD9TKPbA5D4CG4UY=;
-        b=sWXu56GIic7kzAcQljvhlMJtFath+A1vfKzgNsViEODtRZpwP417x47FYeVZPJYreM
-         Lpw64YKmmOq+MfgLBc8vymG4ENvjqnd6lFrwt1uVplM6ax7kwqLGUZIgM7737Hkee57C
-         t10K5mvJLQnZIQNKcuQsubE26kln7mXKNOGscWzMCpLTmvRLSVWG7ME5faBYCPDChyGD
-         eBo6TzH4L0KxJJ3oGdWBVKtn7x8qtFxdV3f8yl9HXI0CbUs+QrNdiTy7bh5+8Fx1kzcc
-         q6HTvUKfv1Dd4XHDVQZ3l1cxXeG5mmj8dQkWvk+AZkXrHR0/HAV8p+ABeS5sdPy4nGU+
-         yJuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUzWa4F21jVBCW40pUrRAOfPAIk76iqGVYFvKmxsK1EAXFXDJdxIms3XyuNkv9AZNZDP2agMUg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz18tQKmwuS0cPuy72hF55K+Vtc6ESpAeSRhsKCjkvWyQDAL5xs
-	184N+pBylGORJeOQKdjaDCQDFHYGb9yzZrgRaZGlP2vl2TedHsP0eIN9bq8MkDYJ/ZI=
-X-Gm-Gg: ASbGncvFRHwTE5OdYWY+bh8fldR2B0/6qXgShlICsUJxgy7EC40sUYt9nAo7N1yManc
-	OJs2tjFCOsaHutOiCuGkfWyPBvADeDc/xxFPE9snJyr67OXClYb+pCIWNYhAbdAfQvGpCz5GSD+
-	LCnWYbJU+HyHZVMi+F+FdXWFDVGzM874EQvAHJj31DvCjIbaF9m6VSmsdRPFRHt7w39KjW5WmnH
-	wgiAFmir/lHrWS9oHo96RQgA+L+t8zpF7bzbcI4JIFfF5nW3zxBfTwjhuEPmbOxqlpTdpr626mJ
-	PUV08tcxgSZHrtX3WpncfORijUzICzyzdSz1GbEJon5YptgxPvKWcUTkW7leEP4maK5SIjLLIK/
-	h/zvFhV5UQ++xRVxRQ9Xgog2mtA==
-X-Google-Smtp-Source: AGHT+IGOlsBu1O2Gi4g9BUBt3jLFQRK0wdTmxw6mBxyRBp/kPtQGAmRnuCiV8kfni5DTP5UEoGTWAA==
-X-Received: by 2002:a05:6a00:3d52:b0:77f:482f:4693 with SMTP id d2e1a72fcca58-793855136ecmr9427486b3a.1.1760205848369;
-        Sat, 11 Oct 2025 11:04:08 -0700 (PDT)
-Received: from t14 ([2001:5a8:4519:2200:afac:e5a3:14c2:d53])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992b733355sm6507510b3a.26.2025.10.11.11.04.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Oct 2025 11:04:08 -0700 (PDT)
-Date: Sat, 11 Oct 2025 11:04:05 -0700
-From: Jordan Rife <jordan@jrife.io>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Aditi Ghag <aditi.ghag@isovalent.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kerneljasonxing@gmail.com>
-Subject: Re: [RFC PATCH bpf-next 00/14] bpf: Efficient socket destruction
-Message-ID: <d2ncodvtjvi635zlg56yomqvjdkg3ilrpcgwhpoot362ayz3oe@ck37mtffvcep>
-References: <20250909170011.239356-1-jordan@jrife.io>
- <80b309fe-6ba0-4ca5-a0b7-b04485964f5d@linux.dev>
- <ilrnfpmoawkbsz2qnyne7haznfjxek4oqeyl7x5cmtds5sdvxe@dy6fs3ej4rbr>
- <df4c8852-f6d1-4278-84d8-441aad1f9994@linux.dev>
- <CABi4-ogK1zaupzpRppGEdM0v+4BSJHbrC4Fg=j1zBSGLbkx1rQ@mail.gmail.com>
- <854e2fce-9d34-4472-b7b8-f66248f3ff01@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qKSk0tUI65G9imgvVNBqRnGUWBDjcLZdqqZCDzFur63ZoQdsD7O3f2g5oZNXY34a8vCsQGrz2k2uNpTYYCFbHPL9Zb2kwko9JU59sfNdokof3r6KWYpEOzIGSC1EnLhdX0cIsWUzPxvZIg7ZGBW+hctxHc+AHgh+7r6BaC6/LEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eY//RnJ/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8YkkRvntH2lmBxGMbxu5YEt1wQu1wmRQ+IfMdCf3sZk=; b=eY//RnJ/RGfTAsy/4wBgGpvT5V
+	68rPc2HiL/gE2jWbClfukl8YGAJuFw8zBulvwWzWVpgoSb5k2Q3JGz2BIoo8Foro+AXdVEWYx1RQr
+	F0dkxvJLpxCQsY4N8b0ShZ5QJhZ6GHDNEvk8XqJov3GFPeJ+AuEoCByLaj+Lx9dyotGY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v7ehW-00AgHw-E5; Sat, 11 Oct 2025 20:52:18 +0200
+Date: Sat, 11 Oct 2025 20:52:18 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-doc@vger.kernel.org
+Subject: Re: [PATCH 1/3] virtio: dwords->qwords
+Message-ID: <c4aa4304-b675-4a60-bb7e-adcf26a8694d@lunn.ch>
+References: <cover.1760008797.git.mst@redhat.com>
+ <350d0abfaa2dcdb44678098f9119ba41166f375f.1760008798.git.mst@redhat.com>
+ <26d7d26e-dd45-47bb-885b-45c6d44900bb@lunn.ch>
+ <20251009093127-mutt-send-email-mst@kernel.org>
+ <6ca20538-d2ab-4b73-8b1a-028f83828f3e@lunn.ch>
+ <20251011134052-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,80 +67,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <854e2fce-9d34-4472-b7b8-f66248f3ff01@linux.dev>
+In-Reply-To: <20251011134052-mutt-send-email-mst@kernel.org>
 
-On Tue, Oct 07, 2025 at 01:32:30PM -0700, Martin KaFai Lau wrote:
-> On 10/6/25 1:19 PM, Jordan Rife wrote:
-> 
-> > Yeah, this is a bit tricky. I'll have to think a bit more about how
-> > this would work. The ETIMEOUT thing would work for TCP, but if I'm
-> > trying to extend this to UDP sockets I think you may need an explicit
-> > bpf_sock_destroy() call anyway? And if you're making
-> > bpf_sock_destroy() work in that context then maybe supporting ETIMEOUT
-> > is redundant?
-> > 
-> > > [ Unrelated, but in case it needs a new BPF_SOCK_OPS_*_CB enum. I would mostly
-> > > freeze any new BPF_SOCK_OPS_*_CB addition and requiring to move the bpf_sock_ops
-> > > to the struct_ops infrastructure first before adding new ops. ]
-> > 
-> > Thanks, I'll look into this. One aspect I'm uncertain about is
-> > applying this kind of approach to UDP sockets. The BPF_SOCK_OPS_RTO_CB
-> > callback provides a convenient place to handle this for TCP, but UDP
-> > doesn't exactly have any timeouts where a similar callback makes
-> > sense. Instead, you'd need to have something like a callback for UDP
-> > that executes on every sendmsg call where you run some logic similar
-> > to the code above. This is less ideal, since you need to do extra work
-> > on every sendmsg call instead of just when a timeout occurs as with
-> 
-> Yeah, regardless of ETIMEOUT or bpf_sock_destroy(), I think the
-> BPF_SOCK_OPS_RTO_CB is better for TCP because of no overhead on the fastpath
-> msg.
-> 
-> > BPF_SOCK_OPS_RTO_CB, but maybe the extra cost here would be
-> > negligible. Combined, I imagine something like this:
-> > 
-> > switch (op) {
-> > case BPF_SOCK_OPS_RTO_CB:
-> > case BPF_SOCK_OPS_UDP_SENDMSG_CB:
-> Beside the fastpath msg overhead, I hate to say this, no new CB enum can be
-> added. I was hoping the only exception is the pending udp timestamping work
-> but it has been pending for too long, so we have to move on.
+> That's not spec, that's linux driver. The spec is the source of truth.
 
-Ah yeah, understood. I was a bit unclear in my last email. I get that
-sockops is closed to extension until migration to struct_ops. I guess my
-question was would it be worth trying to move bpf_sock_ops to struct_ops
-at this stage, but this seems like a heavy lift so is probably best left
-for later.
+Right, lets follow this.
 
-> The bpf_sock_ops needs to move to struct_ops first. I suspect some of the
-> bpf_sock_destroy() hiccup being faced here is that the running context is
-> only known at runtime as an enum instead of something static that the
-> verifier can help to check the right kfunc to use. Once struct_ops is ready,
-> adding a sendmsg ops will be in general useful.
-> 
-> If TCP is solved with the existing BPF_SOCK_OPS_RTO_CB+ETIMEOUT, the
-> remaining is UDP and it seems you are interested in connected (iirc?) UDP
-> only. It is why I asked how many UDP sockets you may have in production.
-> > I think using socket callbacks like BPF_SOCK_OPS_RTO_CB would make for
-> > a more elegant solution and wouldn't require as much bookkeeping,
-> yeah, if it needs to iterate less, it has to do its own bookkeeping. This
-> patch uses the sock_hash but it can also be done in the bpf list/rb/arena
-> also. The bpf_sock_destroy_might_sleep() should be strict forward. The
-> SEC("syscall")+bpf_sock_destroy_might_sleep could be useful for other use
-> cases also.
+I'm looking at
 
-For now, I'll look into the BPF_SOCK_OPS_RTO_CB+ETIMEOUT mechanism for
-the TCP case and bpf_sock_destroy_might_sleep() for the connected UDP
-case if that sounds good to you. Even if the UDP case could be handled
-in a simpler way eventually with struct_ops (e.g. a sendmsg callback),
-bpf_sock_destroy_might_sleep() would be useful to have around as you
-say.
+https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html
 
-I'm curious if the migration to struct_ops is already underway. If not,
-I'd be interested in exploring this more later on.
+Is that correct?
 
-Thanks!
+That document does not have a definition of word. However, what is
+interesting is section "4.2.2 MMIO Device Register Layout"
 
-Jordan
+DeviceFeaturesSel 0x014
 
+Device (host) features word selection.
+Writing to this register selects a set of 32 device feature bits accessible by reading from DeviceFeatures.
+
+and
+
+DriverFeaturesSel 0x024
+
+Activated (guest) features word selection
+Writing to this register selects a set of 32 activated feature bits accessible by writing to DriverFeatures.
+
+I would interpret this as meaning a feature word is a u32. Hence a
+DWORD is a u64, as the current code uses.
+
+	Andrew
 
