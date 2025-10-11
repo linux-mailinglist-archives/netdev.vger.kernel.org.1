@@ -1,205 +1,205 @@
-Return-Path: <netdev+bounces-228593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A6DDBCF59A
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 15:18:01 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7535BCF5B5
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 15:34:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05F9C1899F03
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 13:18:24 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4431334B281
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 13:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A203142048;
-	Sat, 11 Oct 2025 13:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 734A9259C9C;
+	Sat, 11 Oct 2025 13:34:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XMUogdy2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CbFI4omk"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CD7381AF
-	for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 13:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F7D61FFE
+	for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 13:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760188677; cv=none; b=Ac/ELhCA8qB6TtvHA09cWizoiZq94qfqnQ7ztzQizDlYmTJ+vF2/FQkmQNzkTULCbq6XTtdj2gRoQn50RftcVQHFAqiuBRbnHYWwh4dk38142po2v/y2trLpfU0i8zhLGDzs0OexvMKcW4uRO9iXdNt+Uo0Ax2FlLYhY2RuwXH8=
+	t=1760189684; cv=none; b=kpNYlmMkBk/hKdpGddBFzuuQXCwV8w+bkRWIHETkukZQRy17KjrdeHis9dOQyTGSruLr0O9G4sOrr4EYOyPEkEtuL94bUmfyF2fjimv8rrG4NoD5rTkaF7b3yecGqF+eaOxWRc6OMyyZG4jfaxF7RJINIEeCNFwyk/m7A/8HXaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760188677; c=relaxed/simple;
-	bh=Ony5/Bpkn2oBoPDgSBbF67RL+Nu3ZIMShNT4v29e/Gc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nZWCmLRkDPWHXFczzLWqXvx1q6qluooRog3K8JqZam1ZC8dErBSqeNj1IJE7lfYMVXCA210GOoKRlO1AcObo1T/SuHRhx6hMi9ucAH9RO2rc3YJBILiG9trUCeN/fQM+6hwBlrn0ztXuuakMrzBB0bDPswX7pqIGo6l85wliUAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XMUogdy2; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760188672;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5u+nYW0O5RZTJkOhowOIKbnSOaMTa3H66LGagfABBEo=;
-	b=XMUogdy2qYBTv7cdgdVhJEMKKthYjUkFkktP+ix0hWXAJSe+r5dWOmh4zlASNMSSH0TPc2
-	/fhx6fgsDxZJV7YPZ3W2yxtigxpP2smFgbPkx9d4+WAqNmDa8nbTpejsPr/vci8nXLE2AG
-	eP85TW4V3naGAKuZg+JGr3qo4i+6W+M=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Sahil Chandna <chandna.linuxkernel@gmail.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, song@kernel.org, john.fastabend@gmail.com,
- haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, david.hunter.linux@gmail.com,
- skhan@linuxfoundation.org, khalid@kernel.org, chandna.linuxkernel@gmail.com,
- syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
-Subject:
- Re: [PATCH v2] bpf: test_run: Use migrate_enable()/disable() universally
-Date: Sat, 11 Oct 2025 21:17:24 +0800
-Message-ID: <1935291.tdWV9SEqCh@7950hx>
-In-Reply-To: <20251010075923.408195-1-chandna.linuxkernel@gmail.com>
-References: <20251010075923.408195-1-chandna.linuxkernel@gmail.com>
+	s=arc-20240116; t=1760189684; c=relaxed/simple;
+	bh=0eibqLwpXBrjUm2YGT1GLTK10uNsplZcqPI1+nozNhM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e0Vz9CedIKmj2il7rTkshlaRXnMQ/OC45PULmtLufYHOXX/gikZwqi0ss2UCRM+cHJ9I7rx9i47r+7PAZIsyUsrH+sH8HBfUC8VCv9spKL2n6LTzRTULj8emebZQ89mov29KO8r0kHrN3xdft9kxN7MYfVmdvN3O+6l+UbvSWVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CbFI4omk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8027CC4CEFE;
+	Sat, 11 Oct 2025 13:34:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760189683;
+	bh=0eibqLwpXBrjUm2YGT1GLTK10uNsplZcqPI1+nozNhM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CbFI4omkz7RznMb6Vks53VvoAzqdHh5iq1prnThbZ1BNuh1cjrjkdwavfL6LpYQtE
+	 2cZN+p24KPX9z2yZ6adKbUC+219MBH4Wrxl+sBwvba2eQZ9+pqP3g//sVZT46Ya2yZ
+	 /SW3bxuEHaYhUvX8LoaVPkOg9+iAPaAxlmHA4cklQNlxM3QEnwzKRGzn8+p05oHOD/
+	 v7e0/4vLLjTYW51kYuVJ7HswxVoSsfnKkXwv++a1PHrYwOyvztNnb0i6e/kcu99JlF
+	 PvouCr3xiej7hfzkItlV5kluNwgICNAGg6IhFgI4GwVYK8+3JlzBHdHE8xhSqXn4OS
+	 NhjGgiOGkFCkw==
+Date: Sat, 11 Oct 2025 15:34:41 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: airoha: Take into account out-of-order tx
+ completions in airoha_dev_xmit()
+Message-ID: <aOpc8d0dPGOnwfJE@lore-desk>
+References: <20251010-airoha-tx-busy-queue-v1-1-9e1af5d06104@kernel.org>
+ <aOo0woPiMxjABFv2@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="nk5Dyb1DUQd53K2s"
+Content-Disposition: inline
+In-Reply-To: <aOo0woPiMxjABFv2@horms.kernel.org>
+
+
+--nk5Dyb1DUQd53K2s
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
 
-On 2025/10/10 15:59, Sahil Chandna wrote:
-> The timer context can safely use migrate_disable()/migrate_enable()
-> universally instead of conditional preemption or migration disabling.
-> Previously, the timer was initialized in NO_PREEMPT mode by default,
-> which disabled preemption and forced execution in atomic context.
-> This caused issues on PREEMPT_RT configurations when invoking
-> spin_lock_bh() =E2=80=94 a sleeping lock =E2=80=94 leading to the followi=
-ng warning:
+> On Fri, Oct 10, 2025 at 07:21:43PM +0200, Lorenzo Bianconi wrote:
+> > Completion napi can free out-of-order tx descriptors if hw QoS is
+> > enabled and packets with different priority are queued to same DMA ring.
+> > Take into account possible out-of-order reports checking if the tx queue
+> > is full using circular buffer head/tail pointer instead of the number of
+> > queued packets.
+> >=20
+> > Fixes: 23020f0493270 ("net: airoha: Introduce ethernet support for EN75=
+81 SoC")
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > ---
+> >  drivers/net/ethernet/airoha/airoha_eth.c | 15 ++++++++++++++-
+> >  1 file changed, 14 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
+ernet/airoha/airoha_eth.c
+> > index 833dd911980b3f698bd7e5f9fd9e2ce131dd5222..5e2ff52dba03a7323141fe9=
+860fba52806279bd0 100644
+> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> > @@ -1873,6 +1873,19 @@ static u32 airoha_get_dsa_tag(struct sk_buff *sk=
+b, struct net_device *dev)
+> >  #endif
+> >  }
+> > =20
+> > +static bool airoha_dev_is_tx_busy(struct airoha_queue *q, u32 nr_frags)
+> > +{
+> > +	u16 index =3D (q->head + nr_frags) % q->ndesc;
+> > +
+> > +	/* completion napi can free out-of-order tx descriptors if hw QoS is
+> > +	 * enabled and packets with different priorities are queued to the sa=
+me
+> > +	 * DMA ring. Take into account possible out-of-order reports checking
+> > +	 * if the tx queue is full using circular buffer head/tail pointers
+> > +	 * instead of the number of queued packets.
+> > +	 */
+> > +	return index >=3D q->tail && (q->head < q->tail || q->head > index);
 >=20
-> BUG: sleeping function called from invalid context at kernel/locking/spin=
-lock_rt.c:48
-> in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 6107, name: syz.0.=
-17
-> preempt_count: 1, expected: 0
-> RCU nest depth: 1, expected: 1
-> Preemption disabled at:
-> [<ffffffff891fce58>] bpf_test_timer_enter+0xf8/0x140 net/bpf/test_run.c:42
+> Hi Lorenzo,
+
+Hi Simon,
+
+thx for the review.
+
 >=20
-> Reported-by: syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3D1f1fbecb9413cdbfbef8
-> Tested-by: syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
-> Signed-off-by: Sahil Chandna <chandna.linuxkernel@gmail.com>
+> I think there is a corner case here.
+> Perhaps they can't occur, but here goes.
 >=20
-> ---
-> Link to v1: https://lore.kernel.org/all/20251006054320.159321-1-chandna.l=
-inuxkernel@gmail.com/
+> Let us suppose that head is 1.
+> And the ring is completely full, so tail is 2.
 >=20
-> Changes since v1:
-> - Dropped `enum { NO_PREEMPT, NO_MIGRATE } mode` from `struct bpf_test_ti=
-mer`.
-> - Removed all conditional preempt/migrate disable logic.
-> - Unified timer handling to use `migrate_disable()` / `migrate_enable()` =
-universally.
+> Now, suppose nr_frags is ndesc - 1.
+> In this case the function above will return false. But the ring is full.
 >=20
-> Testing:
-> - Reproduced syzbot bug locally using the provided reproducer.
-> - Observed `BUG: sleeping function called from invalid context` on v1.
-> - Confirmed bug disappears after applying this patch.
-> - Validated normal functionality of `bpf_prog_test_run_*` helpers with C
->   reproducer.
-> ---
->  net/bpf/test_run.c | 20 ++++++--------------
->  1 file changed, 6 insertions(+), 14 deletions(-)
+> Ok, ndesc is actually 1024 and nfrags should never be close to that.
+> But the problem is general. And a perhaps more realistic example is:
 >=20
-> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-> index dfb03ee0bb62..b23bc93e738e 100644
-> --- a/net/bpf/test_run.c
-> +++ b/net/bpf/test_run.c
-> @@ -29,7 +29,6 @@
->  #include <trace/events/bpf_test_run.h>
-> =20
->  struct bpf_test_timer {
-> -	enum { NO_PREEMPT, NO_MIGRATE } mode;
->  	u32 i;
->  	u64 time_start, time_spent;
->  };
-> @@ -38,10 +37,7 @@ static void bpf_test_timer_enter(struct bpf_test_timer=
- *t)
->  	__acquires(rcu)
->  {
->  	rcu_read_lock();
-> -	if (t->mode =3D=3D NO_PREEMPT)
-> -		preempt_disable();
-> -	else
-> -		migrate_disable();
-> +	migrate_disable();
-
-Maybe we can use rcu_read_lock_dont_migrate/rcu_read_unlock_migrate
-here instead, which has better performance :)
-
-Thanks!
-Menglong Dong
-
-> =20
->  	t->time_start =3D ktime_get_ns();
->  }
-> @@ -50,11 +46,7 @@ static void bpf_test_timer_leave(struct bpf_test_timer=
- *t)
->  	__releases(rcu)
->  {
->  	t->time_start =3D 0;
-> -
-> -	if (t->mode =3D=3D NO_PREEMPT)
-> -		preempt_enable();
-> -	else
-> -		migrate_enable();
-> +	migrate_enable();
->  	rcu_read_unlock();
->  }
-> =20
-> @@ -374,7 +366,7 @@ static int bpf_test_run_xdp_live(struct bpf_prog *pro=
-g, struct xdp_buff *ctx,
-> =20
->  {
->  	struct xdp_test_data xdp =3D { .batch_size =3D batch_size };
-> -	struct bpf_test_timer t =3D { .mode =3D NO_MIGRATE };
-> +	struct bpf_test_timer t;
->  	int ret;
-> =20
->  	if (!repeat)
-> @@ -404,7 +396,7 @@ static int bpf_test_run(struct bpf_prog *prog, void *=
-ctx, u32 repeat,
->  	struct bpf_prog_array_item item =3D {.prog =3D prog};
->  	struct bpf_run_ctx *old_ctx;
->  	struct bpf_cg_run_ctx run_ctx;
-> -	struct bpf_test_timer t =3D { NO_MIGRATE };
-> +	struct bpf_test_timer t;
->  	enum bpf_cgroup_storage_type stype;
->  	int ret;
-> =20
-> @@ -1377,7 +1369,7 @@ int bpf_prog_test_run_flow_dissector(struct bpf_pro=
-g *prog,
->  				     const union bpf_attr *kattr,
->  				     union bpf_attr __user *uattr)
->  {
-> -	struct bpf_test_timer t =3D { NO_PREEMPT };
-> +	struct bpf_test_timer t;
->  	u32 size =3D kattr->test.data_size_in;
->  	struct bpf_flow_dissector ctx =3D {};
->  	u32 repeat =3D kattr->test.repeat;
-> @@ -1445,7 +1437,7 @@ int bpf_prog_test_run_flow_dissector(struct bpf_pro=
-g *prog,
->  int bpf_prog_test_run_sk_lookup(struct bpf_prog *prog, const union bpf_a=
-ttr *kattr,
->  				union bpf_attr __user *uattr)
->  {
-> -	struct bpf_test_timer t =3D { NO_PREEMPT };
-> +	struct bpf_test_timer t;
->  	struct bpf_prog_array *progs =3D NULL;
->  	struct bpf_sk_lookup_kern ctx =3D {};
->  	u32 repeat =3D kattr->test.repeat;
+>   ndesc is 1024
+>   head is 1008
+>   The ring is full so tail is 1009
+>   (Or head is any other value that leaves less than 16 slots free)
+>   nr_frags is 16
 >=20
+> airoha_dev_is_tx_busy() returns false, even though the ring is full.
 
+yes, you are right, this corner case is not properly managed by the proposed
+algorithm, thx for pointing this out.
 
+>=20
+> Probably this has it's own problems. But if my reasoning above is correct
+> (is it?) then the following seems to address it by flattening and extendi=
+ng
+> the ring. Because what we are about is the relative value of head, index
+> and tail. Not the slots they occupy in the ring.
+>=20
+> N.B: I tetsed the algorirthm with a quick implementation in user-space.
+> The following is, however, completely untested.
+>=20
+> static bool airoha_dev_is_tx_busy(struct airoha_queue *q, u32 nr_frags)
+> {
+> 	unsigned int tail =3D q->tail < q->head ? q->tail + q->ndesc : q->tail;
+> 	unsigned int index =3D q->head + nr_frags;
+>=20
+> 	return index >=3D tail;
+> }
 
+I agree, the algorithm you proposed properly manages the 99% of the cases. =
+The
+only case where it fails is when the queue is empty (so tail =3D head =3D x,
+e.g. x =3D 0). In this case we would have:
 
+	- q->ndesc =3D 1024
+	- q->tail =3D q->head =3D 0
+	- tail =3D 0
+	- index =3D n (e.g. n =3D 1)
+	- index >=3D tail =3D=3D> 1 >=3D 0 =3D=3D> busy (but the queue is actually=
+ empty).
+
+I guess we should add a minor change in the tail definition:
+
+	u32 tail =3D q->tail <=3D q->head ? q->tail + q->ndesc : q->tail;
+
+so:
+	- q->ndesc =3D 1024
+	- q->tail =3D q->head =3D 0
+	- tail =3D 1024
+	- index =3D n (e.g. n =3D 1)
+	- index >=3D tail =3D> 1 < 1024 =3D> OK
+
+Can you spot any downside with this approach?
+I tested the proposed approach and it seems to be working fine.
+
+Regards,
+Lorenzo
+
+>=20
+> ...
+
+--nk5Dyb1DUQd53K2s
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaOpc8QAKCRA6cBh0uS2t
+rIRpAQDSIsIVZ9Ty0Rkg1NUgdKBIwZ81yEMCdi/+UaKq4bLPLgEAj8DhwXBDnnv0
+f4sdK7RnQFXPyXMgAKP1Sck+WfHt7QU=
+=csea
+-----END PGP SIGNATURE-----
+
+--nk5Dyb1DUQd53K2s--
 
