@@ -1,245 +1,345 @@
-Return-Path: <netdev+bounces-228583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1711BCF233
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 10:27:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27562BCF2D9
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 11:15:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 033F74E7C3D
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 08:27:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B22CB4E4902
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 09:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C173238C36;
-	Sat, 11 Oct 2025 08:27:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NbckeqYr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8091120102B;
+	Sat, 11 Oct 2025 09:15:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B657235074
-	for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 08:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6605122CBF1;
+	Sat, 11 Oct 2025 09:15:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760171264; cv=none; b=HLwszBIrmUXKalfxXRMmMvvQKLoyCbuJEoBXqoIh5j3eMYPjNURVLrkxg15erDw9RiRzOxaT9B8Rt/ANBU/YRGvlg3uqKRMHLIxaQMOl9XHl6ai9OQsYJhIOCOWW6A9RtexYDN85W1+/dTAUJ6VSR6gcV5X1BcYyT8LOvBysVoQ=
+	t=1760174114; cv=none; b=KBTiXa4qBIEg9uO3bxjOBmAXDEWmn5l39BGTfF05utP8rpK7dB9BMtcCvlxUxireBbdBL3OsWWB4dN8Lp5kq10Qc77cjAmLOYqaqZWl+D1lI+iu/udReMQs1IpeslPt+EWzS0/9Y6XNML4YvEWtsB761eZCvM+MjSjMZhD5VquE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760171264; c=relaxed/simple;
-	bh=r95oH5GbkUOVXpI5nlGaWqGgXfXqMTaFecuIS27pkx8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NcNsN0JTlf25uWWdtkBaUWZdloePuYNpiWGgXJx769nVdf/j5GWXClwP/CGnyfPXcRFSKlkKkTy8xQjMBjLVJcN1QEe9REjWpo+ieUbZIOQlPgxvuSX/AfEZNW8sKeNorK96J5eJuFjgTbIfwWIx1Z8kdLbiisVI4fTc+2poXDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NbckeqYr; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-36d77ae9de5so21270291fa.2
-        for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 01:27:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760171256; x=1760776056; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r95oH5GbkUOVXpI5nlGaWqGgXfXqMTaFecuIS27pkx8=;
-        b=NbckeqYrtuwuA/gQ/2gPNcpI2d8CENatmE+TClmcpUpoUUa5817PQV297ux7NIR4p0
-         nTSt/Rf1idCP2cQj7XqFOfx6kSmSgwhb/VTjTxq+kzx67YHlzPNrmTe3O2v4EORttYXO
-         m3hWXCl0OkjMJTXIqOhJLF+3jA5TWzaq+pUaUf/MqK2mmLSmE7J7MxchG7+laDNAwsy4
-         MoaGMje0IKkUUeA89nZd3dfrlpP5TN0L3iZWHLleCpfHcxSlwTj3Rf8XwmiXQ1uN0LxH
-         9eO5xDUS1wJmnzxKdjRAW7brJjJ1IVoV/yjm0zGlblwwnIRxgOCgMwngE2NzW08gwf9h
-         8GEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760171256; x=1760776056;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=r95oH5GbkUOVXpI5nlGaWqGgXfXqMTaFecuIS27pkx8=;
-        b=dNa+rsr6n1y+Oy+sWWrOhYhK/BIlFh89itQ2x4PQKtw23XGzmLgYSYxqA5DWOUB/wb
-         QJzKcjZH8MD0X/0vDNRwmYWYQBOCKEIbNkl1Gb6CRM2R/mgcG3yL/W4OQMeC65hhqxV6
-         3vEBTYlLPYuJNh8jMZEIhYuznPU/vGoZIGXX8NmNPvoI9mBp1WGjq0VkHF2ybkttj4J9
-         rH2p4EgnKmLHHGftzVqorqKfe5ctaM44aTln54wqPARuY+k4k0slyUYffyYf4CXc15t5
-         E0rUhF8+a/Sa8JI9Vk1iygHuJWqhto4FS3LkNFzIIMWPOfNgyi0hoVshfZqgdcwdqOOB
-         E/0w==
-X-Forwarded-Encrypted: i=1; AJvYcCU1a+oEU2qoTjuMWfpe+kp4FG7CFc7Fr3YMT78V+mij/faA8sZ0B08zCG9HRD4x2JYHGFR2CbI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJPWbF6OC+W63aNHSziK/VVI4+Y2FCIB12AmLNLr8tIwoz3p0O
-	LdZNF38fJOEWYnhPtRigaT6qwqnZO30hCQzftbP9xHdXxZCn4pl9eVW5GaQU6eJFWROqXLAXxb8
-	yVDHPTWonoqFM0S1mGrZIZ4lWyvPPOU8=
-X-Gm-Gg: ASbGncs5+w7QeO/+kUor7/Cm5rz+M1ivgnA66PJa1GK0gN/jZqf9SH/fhhhnfitn6TU
-	CORU4mb/1NWcb3HeIkrqS/OOhIXpfFrKJMBX0a1090cUWW/L3jVW9T9o3u1BfmrBp6Gww6jm3wz
-	xlbFeis8Yu0yZZXfxX4jVKpI0HVi+AD4H/w5Vjzpxo9NgknfQuMBw9n9RYI1icDiQJEakoxKAfv
-	drYf0Yr2kPE74SJM3LgpY4EvmcPd0f/ysFn
-X-Google-Smtp-Source: AGHT+IGJCLDt3s/Ad2Kslk35KMxhOBmufBzkiQdY4j+DcxoO4hZ+WRXdBjByfsAv42RY5rg/QH3wm4QkKHh7CV+5qXE=
-X-Received: by 2002:a2e:9a16:0:b0:375:d1fa:4b76 with SMTP id
- 38308e7fff4ca-37609ef1253mr38871061fa.45.1760171255835; Sat, 11 Oct 2025
- 01:27:35 -0700 (PDT)
+	s=arc-20240116; t=1760174114; c=relaxed/simple;
+	bh=Ju9tKnQUkAu/ViD6U/X2mTleMwjgiTF1ChocYUuMIjE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=EqjvGUzu9gP1x3NHMZvrdbZL8Zn6HODO0jwE7fId33Eki9xHbINF9gqLl4lHlHn6N7UAIu2Mhs++yM2/eP71y4hHUhS3otE+OKMTo0EuMraa4CeTVAtM8IfM2gWIx03Fr4Gml+ur1tkBHK7UoCwMWDfavwy+fvXq3d5e5zOIxGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [192.168.178.143] (p5dc88066.dip0.t-ipconnect.de [93.200.128.102])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 59B9F0Q1023991
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Sat, 11 Oct 2025 11:15:00 +0200 (CEST)
+Message-ID: <c26f7e6f-af90-4a5c-a064-34b4e25ee7c3@tu-dortmund.de>
+Date: Sat, 11 Oct 2025 11:15:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <wL97kjSJHOArswIoM2huzx9vV9M9uh0SoCZtDVYo-HJFeCwZXraoJ4kc0l1hkxt1XLsejTsRCRCkTqASpo98zAUyfmYoCfzGD3vkaThigVA=@proton.me>
- <aM_L1Hbind29q_Z_@shell.armlinux.org.uk> <mgCCIJjGoUsB3nhQPO_r2E4X7JvDb5_40Aq9GVv5OoH6OXxsKCuO3lnlVSHj-zH00KV5AY66F4VE6bed9R5yu8SM_jNeBpdGDYAkBNq7hXA=@proton.me>
- <aNEVX9ew-5kPB22u@shell.armlinux.org.uk> <GyVvHJnPCxv3x_uGwaDIu_KKQgeFhh24x4aRcVQ0WQVr4tjxubB3qeWiSGVmwy8VbKrAQ2nF0iUDLHPTgE7M9ZiOqW1XQ5nTYgzyIcl-VZc=@proton.me>
- <fw_IlfASLLWC-FISSL4_CyGBtQ4GIHUyP2yekbr82wpiTNryNcql8NAqEdY37qE8AlZjMe4fLdo7I0yYsBaZpYhwB8Eq8GVxYNLUgcTjI7s=@proton.me>
-In-Reply-To: <fw_IlfASLLWC-FISSL4_CyGBtQ4GIHUyP2yekbr82wpiTNryNcql8NAqEdY37qE8AlZjMe4fLdo7I0yYsBaZpYhwB8Eq8GVxYNLUgcTjI7s=@proton.me>
-From: Marcin Wojtas <marcin.s.wojtas@gmail.com>
-Date: Sat, 11 Oct 2025 10:27:24 +0200
-X-Gm-Features: AS18NWAEFUJYVfgkWo9Do79GYOK0ZP5BTcr9THwX4FRQQOvcEBJQVX385pq_ZrQ
-Message-ID: <CAHzn2R3+ow2fJfiZ6Wfd+WMBkEDcgxAR19EtJefrgWWOCniwLg@mail.gmail.com>
-Subject: Re: Marvell 375 and Marvel 88E1514 Phy network problem: mvpp2 or DTS related?
-To: Zoo Moo <zoomoo100@proton.me>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH net-next v5 4/8] TUN & TAP: Wake netdev queue after consuming
+ an entry
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com, eperezma@redhat.com,
+        stephen@networkplumber.org, leiyang@redhat.com, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+        kvm@vger.kernel.org, Tim Gebauer <tim.gebauer@tu-dortmund.de>
+References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+ <20250922221553.47802-5-simon.schippers@tu-dortmund.de>
+ <20250923123101-mutt-send-email-mst@kernel.org>
+ <4dde6d41-2a26-47b8-aef1-4967f7fc94ab@tu-dortmund.de>
+ <20250928182445-mutt-send-email-mst@kernel.org>
+ <b901efef-2dc8-4de3-8f87-22f8c9c1cbc6@tu-dortmund.de>
+Content-Language: en-US
+In-Reply-To: <b901efef-2dc8-4de3-8f87-22f8c9c1cbc6@tu-dortmund.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi ZM,
+On 29.09.25 11:43, Simon Schippers wrote:
+> On 29.09.25 00:33, Michael S. Tsirkin wrote:
+>> On Sun, Sep 28, 2025 at 11:27:25PM +0200, Simon Schippers wrote:
+>>> On 23.09.25 18:36, Michael S. Tsirkin wrote:
+>>>> On Tue, Sep 23, 2025 at 12:15:49AM +0200, Simon Schippers wrote:
+>>>>> The new wrappers tun_ring_consume/tap_ring_consume deal with consuming an
+>>>>> entry of the ptr_ring and then waking the netdev queue when entries got
+>>>>> invalidated to be used again by the producer.
+>>>>> To avoid waking the netdev queue when the ptr_ring is full, it is checked
+>>>>> if the netdev queue is stopped before invalidating entries. Like that the
+>>>>> netdev queue can be safely woken after invalidating entries.
+>>>>>
+>>>>> The READ_ONCE in __ptr_ring_peek, paired with the smp_wmb() in
+>>>>> __ptr_ring_produce within tun_net_xmit guarantees that the information
+>>>>> about the netdev queue being stopped is visible after __ptr_ring_peek is
+>>>>> called.
+>>>>>
+>>>>> The netdev queue is also woken after resizing the ptr_ring.
+>>>>>
+>>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>>> ---
+>>>>>  drivers/net/tap.c | 44 +++++++++++++++++++++++++++++++++++++++++++-
+>>>>>  drivers/net/tun.c | 47 +++++++++++++++++++++++++++++++++++++++++++++--
+>>>>>  2 files changed, 88 insertions(+), 3 deletions(-)
+>>>>>
+>>>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+>>>>> index 1197f245e873..f8292721a9d6 100644
+>>>>> --- a/drivers/net/tap.c
+>>>>> +++ b/drivers/net/tap.c
+>>>>> @@ -753,6 +753,46 @@ static ssize_t tap_put_user(struct tap_queue *q,
+>>>>>  	return ret ? ret : total;
+>>>>>  }
+>>>>>  
+>>>>> +static struct sk_buff *tap_ring_consume(struct tap_queue *q)
+>>>>> +{
+>>>>> +	struct netdev_queue *txq;
+>>>>> +	struct net_device *dev;
+>>>>> +	bool will_invalidate;
+>>>>> +	bool stopped;
+>>>>> +	void *ptr;
+>>>>> +
+>>>>> +	spin_lock(&q->ring.consumer_lock);
+>>>>> +	ptr = __ptr_ring_peek(&q->ring);
+>>>>> +	if (!ptr) {
+>>>>> +		spin_unlock(&q->ring.consumer_lock);
+>>>>> +		return ptr;
+>>>>> +	}
+>>>>> +
+>>>>> +	/* Check if the queue stopped before zeroing out, so no ptr get
+>>>>> +	 * produced in the meantime, because this could result in waking
+>>>>> +	 * even though the ptr_ring is full.
+>>>>
+>>>> So what? Maybe it would be a bit suboptimal? But with your design, I do
+>>>> not get what prevents this:
+>>>>
+>>>>
+>>>> 	stopped? -> No
+>>>> 		ring is stopped
+>>>> 	discard
+>>>>
+>>>> and queue stays stopped forever
+>>>>
+>>>
+>>> I think I found a solution to this problem, see below:
+>>>
+>>>>
+>>>>> The order of the operations
+>>>>> +	 * is ensured by barrier().
+>>>>> +	 */
+>>>>> +	will_invalidate = __ptr_ring_will_invalidate(&q->ring);
+>>>>> +	if (unlikely(will_invalidate)) {
+>>>>> +		rcu_read_lock();
+>>>>> +		dev = rcu_dereference(q->tap)->dev;
+>>>>> +		txq = netdev_get_tx_queue(dev, q->queue_index);
+>>>>> +		stopped = netif_tx_queue_stopped(txq);
+>>>>> +	}
+>>>>> +	barrier();
+>>>>> +	__ptr_ring_discard_one(&q->ring, will_invalidate);
+>>>>> +
+>>>>> +	if (unlikely(will_invalidate)) {
+>>>
+>>> Here I just check for
+>>>
+>>> 	if (will_invalidate || __ptr_ring_empty(&q->ring)) {
+>>>
+>>> instead because, if the ptr_ring is empty and the netdev queue stopped,
+>>> the race must have occurred. Then it is safe to wake the netdev queue,
+>>> because it is known that space in the ptr_ring was freed when the race
+>>> occurred. Also, it is guaranteed that tap_ring_consume is called at least
+>>> once after the race, because a new entry is generated by the producer at
+>>> the race.
+>>> In my adjusted implementation, it tests fine with pktgen without any lost
+>>> packets.
+>>
+>>
+>> what if it is not empty and ring is stopped?
+>>
+> 
+> Then it can not be assumed that there is free space in the ptr_ring,
+> because __ptr_ring_discard_one may only create space after one of the
+> upcoming entries that it will consume. Only if the ptr_ring is empty
+> (which will obviously happen after some time) it is guaranteed that there
+> is free space in the ptr_ring, either because the race occurred
+> previously or __ptr_ring_discard_one freed entries right before.
+> 
+>>>
+>>> Generally now I think that the whole implementation can be fine without
+>>> using spinlocks at all. I am currently adjusting the implementation
+>>> regarding SMP memory barrier pairings, and I have a question:
+>>> In the v4 you mentioned "the stop -> wake bounce involves enough barriers
+>>> already". Does it, for instance, mean that netif_tx_wake_queue already
+>>> ensures memory ordering, and I do not have to use an smp_wmb() in front of
+>>> netif_tx_wake_queue() and smp_rmb() in front of the ptr_ring operations
+>>> in tun_net_xmit?
+>>> I dug through net/core/netdevice.h and dev.c but could not really
+>>> answer this question by myself...
+>>> Thanks :)
+>>
+>> Only if it wakes up something, I think.
+>>
+>> Read:
+>>
+>> SLEEP AND WAKE-UP FUNCTIONS
+>>
+>>
+>> in Documentation/memory-barriers.txt
+>>
+>>
+>> IIUC this is the same.
+>>
+>>
+> 
+> Thanks, I will look into it! :)
+> 
 
-Have you checked pinctrl settings? The MDIO looks like properly
-working, so I'd double-check if the pins that are assigned to RGMII in
-U-Boot (I assume the interface works there), are not overriden by e.g.
-wrong device tree configuration in kernel.
+I do not see how the netdev queue flow control follows a setup with a
+sleeper and a waker as described in SLEEP AND WAKE-UP FUNCTIONS.
 
-Best regards,
-Marcin
+Yes, there is netif_tx_wake_queue, but it does not call a waker function
+like complete() or wake_up(). And I do not see how there is a sleeper
+that calls schedule() somewhere.
 
+Do I misunderstand something?
 
-=C5=9Br., 1 pa=C5=BA 2025 o 05:05 Zoo Moo <zoomoo100@proton.me> napisa=C5=
-=82(a):
->
-> On Wednesday, September 24th, 2025 at 11:33 AM, Zoo Moo <zoomoo100@proton=
-.me> wrote:
-> >
->
-> > On Monday, 22 September 2025 at 19:22, Russell King (Oracle) linux@arml=
-inux.org.uk wrote:
-> >
->
-> > > On Mon, Sep 22, 2025 at 08:58:49AM +0000, Zoo Moo wrote:
-> > >
->
-> > > > Sent with Proton Mail secure email.
-> > > >
->
-> > > > On Sunday, 21 September 2025 at 19:56, Russell King (Oracle) linux@=
-armlinux.org.uk wrote:
-> > > >
->
-> > > > > On Sun, Sep 21, 2025 at 09:05:18AM +0000, Zoo Moo wrote:
-> > > >
->
-> > > > > > Hi,
-> > > >
->
-> > > > > > Bodhi from Doozan (https://forum.doozan.com) has been helping m=
-e try to get Debian to work on a Synology DS215j NAS. The DS215j is based o=
-n a Marvell Armada 375 (88F6720) and uses a Marvel 88E1514 PHY.
-> > > >
->
-> > > > > Probably wrong RGMII phy-mode. I see you're using rgmii-id. Maybe=
- that
-> > > > > isn't correct. Just a guess based on the problems that RGMII norm=
-ally
-> > > > > causes.
-> > > >
->
-> > > > Hi Russell,
-> > > >
->
-> > > > Thanks, we did try different drivers (gmii, sgmii), but they didn't=
- help, details in this message https://forum.doozan.com/read.php?2,138851,1=
-39291#msg-139291.
-> > >
->
-> > > What I was meaning was not to try stuff like "SGMII", but try the oth=
-er
-> > > three flavours of RGMII. In other words:
-> > >
->
-> > > rgmii
-> > > rgmii-txid
-> > > rgmii-rxid
-> > >
->
-> > > If u-boot works, and it's using RGMII, then it's definitely one of th=
-e
-> > > four flavours of RGMII interface.
-> > >
->
-> > > No need to post the failures of the testing to the forums - just say
-> > > here whether any of those result in packet flow or not. Nothing else
-> > > should change - the only difference between these modes are the timin=
-gs
-> > > of the RGMII interface, and having the wrong mode is the most common
-> > > reason for RGMII not working.
-> > >
->
-> > > Thanks.
-> > >
->
-> > > --
-> > > RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> > > FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-> >
->
-> >
->
-> > Thanks Russel,
-> >
->
-> > I tried all flavours again (rgmii, rgmii-id, rgmii-txid and rgmii-rxid)=
-, but all resulted in the same outcome.
-> >
->
-> > ifconfig shows it sends packets, but nothing is received. I cannot dete=
-ct it actually sending any packets from the device though.
-> >
->
-> > For example:
-> >
->
-> > root@(none):~# ifconfig eth0 192.168.27.111 netmask 255.255.255.0 up hw=
- ether 00:11:22:33:44:55
-> > [ 31.727773][ T2055] mvpp2 f10f0000.ethernet eth0: PHY [f10c0054.mdio-m=
-ii:01] driver [Marvell 88E1510] (irq=3DPOLL)
-> > [ 31.738178][ T2055] mvpp2 f10f0000.ethernet eth0: configuring for phy/=
-rgmii-txid link mode
-> > [ 36.007360][ T10] mvpp2 f10f0000.ethernet eth0: Link is Up - 1Gbps/Ful=
-l - flow control off
-> >
->
-> > root@(none):~# dhclient eth0
-> > root@(none):~# ifconfig eth0
-> > eth0: flags=3D4163<UP,BROADCAST,RUNNING,MULTICAST> mtu 1500
-> >
->
-> > inet 192.168.27.111 netmask 255.255.255.0 broadcast 192.168.27.255
-> > inet6 <IP6 ADDRESS> prefixlen 64 scopeid 0x20<link>
-> >
->
-> > ether 00:11:22:33:44:55 txqueuelen 2048 (Ethernet)
-> > RX packets 0 bytes 0 (0.0 B)
-> > RX errors 0 dropped 0 overruns 0 frame 0
-> > TX packets 71 bytes 4858 (4.7 KiB)
-> > TX errors 0 dropped 0 overruns 0 carrier 0 collisions 0
-> >
->
-> > Do I need to adjust the internal delays? rx-internal-delay-ps/tx-intern=
-al-delay-ps
-> >
->
-> > (reference: https://www.thegoodpenguin.co.uk/blog/linux-ethernet-phy-mo=
-de-bindings-explained/)
-> >
->
-> > Is it something we can determine by looking at the Synology kernel sour=
-ce?
->
->
-> Hi,
->
-> Any other suggestions I could try to debug this issue?
->
-> Appreciate any suggestions.
->
-> Cheers,
-> ZM
+For now I would instead use an additional smp_wmb() in front of
+netif_tx_wake_queue for the consumer and an smp_rmb() in front of all
+ptr_ring operations for the producer. This ensures that space, which is
+freed by the consumer that woke up the netdev queue, is visible for the
+producer.
+
+Thanks! :)
+
+>>>
+>>>>> +		if (stopped)
+>>>>> +			netif_tx_wake_queue(txq);
+>>>>> +		rcu_read_unlock();
+>>>>> +	}
+>>>>
+>>>>
+>>>> After an entry is consumed, you can detect this by checking
+>>>>
+>>>> 	                r->consumer_head >= r->consumer_tail
+>>>>
+>>>>
+>>>> so it seems you could keep calling regular ptr_ring_consume
+>>>> and check afterwards?
+>>>>
+>>>>
+>>>>
+>>>>
+>>>>> +	spin_unlock(&q->ring.consumer_lock);
+>>>>> +
+>>>>> +	return ptr;
+>>>>> +}
+>>>>> +
+>>>>>  static ssize_t tap_do_read(struct tap_queue *q,
+>>>>>  			   struct iov_iter *to,
+>>>>>  			   int noblock, struct sk_buff *skb)
+>>>>> @@ -774,7 +814,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
+>>>>>  					TASK_INTERRUPTIBLE);
+>>>>>  
+>>>>>  		/* Read frames from the queue */
+>>>>> -		skb = ptr_ring_consume(&q->ring);
+>>>>> +		skb = tap_ring_consume(q);
+>>>>>  		if (skb)
+>>>>>  			break;
+>>>>>  		if (noblock) {
+>>>>> @@ -1207,6 +1247,8 @@ int tap_queue_resize(struct tap_dev *tap)
+>>>>>  	ret = ptr_ring_resize_multiple_bh(rings, n,
+>>>>>  					  dev->tx_queue_len, GFP_KERNEL,
+>>>>>  					  __skb_array_destroy_skb);
+>>>>> +	if (netif_running(dev))
+>>>>> +		netif_tx_wake_all_queues(dev);
+>>>>>  
+>>>>>  	kfree(rings);
+>>>>>  	return ret;
+>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>>>>> index c6b22af9bae8..682df8157b55 100644
+>>>>> --- a/drivers/net/tun.c
+>>>>> +++ b/drivers/net/tun.c
+>>>>> @@ -2114,13 +2114,53 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+>>>>>  	return total;
+>>>>>  }
+>>>>>  
+>>>>> +static void *tun_ring_consume(struct tun_file *tfile)
+>>>>> +{
+>>>>> +	struct netdev_queue *txq;
+>>>>> +	struct net_device *dev;
+>>>>> +	bool will_invalidate;
+>>>>> +	bool stopped;
+>>>>> +	void *ptr;
+>>>>> +
+>>>>> +	spin_lock(&tfile->tx_ring.consumer_lock);
+>>>>> +	ptr = __ptr_ring_peek(&tfile->tx_ring);
+>>>>> +	if (!ptr) {
+>>>>> +		spin_unlock(&tfile->tx_ring.consumer_lock);
+>>>>> +		return ptr;
+>>>>> +	}
+>>>>> +
+>>>>> +	/* Check if the queue stopped before zeroing out, so no ptr get
+>>>>> +	 * produced in the meantime, because this could result in waking
+>>>>> +	 * even though the ptr_ring is full. The order of the operations
+>>>>> +	 * is ensured by barrier().
+>>>>> +	 */
+>>>>> +	will_invalidate = __ptr_ring_will_invalidate(&tfile->tx_ring);
+>>>>> +	if (unlikely(will_invalidate)) {
+>>>>> +		rcu_read_lock();
+>>>>> +		dev = rcu_dereference(tfile->tun)->dev;
+>>>>> +		txq = netdev_get_tx_queue(dev, tfile->queue_index);
+>>>>> +		stopped = netif_tx_queue_stopped(txq);
+>>>>> +	}
+>>>>> +	barrier();
+>>>>> +	__ptr_ring_discard_one(&tfile->tx_ring, will_invalidate);
+>>>>> +
+>>>>> +	if (unlikely(will_invalidate)) {
+>>>>> +		if (stopped)
+>>>>> +			netif_tx_wake_queue(txq);
+>>>>> +		rcu_read_unlock();
+>>>>> +	}
+>>>>> +	spin_unlock(&tfile->tx_ring.consumer_lock);
+>>>>> +
+>>>>> +	return ptr;
+>>>>> +}
+>>>>> +
+>>>>>  static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>>>>>  {
+>>>>>  	DECLARE_WAITQUEUE(wait, current);
+>>>>>  	void *ptr = NULL;
+>>>>>  	int error = 0;
+>>>>>  
+>>>>> -	ptr = ptr_ring_consume(&tfile->tx_ring);
+>>>>> +	ptr = tun_ring_consume(tfile);
+>>>>>  	if (ptr)
+>>>>>  		goto out;
+>>>>>  	if (noblock) {
+>>>>> @@ -2132,7 +2172,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>>>>>  
+>>>>>  	while (1) {
+>>>>>  		set_current_state(TASK_INTERRUPTIBLE);
+>>>>> -		ptr = ptr_ring_consume(&tfile->tx_ring);
+>>>>> +		ptr = tun_ring_consume(tfile);
+>>>>>  		if (ptr)
+>>>>>  			break;
+>>>>>  		if (signal_pending(current)) {
+>>>>> @@ -3621,6 +3661,9 @@ static int tun_queue_resize(struct tun_struct *tun)
+>>>>>  					  dev->tx_queue_len, GFP_KERNEL,
+>>>>>  					  tun_ptr_free);
+>>>>>  
+>>>>> +	if (netif_running(dev))
+>>>>> +		netif_tx_wake_all_queues(dev);
+>>>>> +
+>>>>>  	kfree(rings);
+>>>>>  	return ret;
+>>>>>  }
+>>>>> -- 
+>>>>> 2.43.0
+>>>>
+>>
 
