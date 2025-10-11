@@ -1,204 +1,133 @@
-Return-Path: <netdev+bounces-228600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65EACBCFA4C
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 19:43:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B01E1BCFA5E
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 19:58:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DE449349614
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 17:43:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D51F618974C6
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 17:59:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF24D2836BF;
-	Sat, 11 Oct 2025 17:42:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E583626E6E6;
+	Sat, 11 Oct 2025 17:58:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SGrLl8zV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YHHmNeJ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FB81DF75C
-	for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 17:42:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610B318A6D4
+	for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 17:58:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760204574; cv=none; b=rlYqQ41wpA1ZI4w/a9mEN8HNX44Z/rq74xDmJxWtQonNT4Y16XQus1z/9aZVEsw9QmgTNc/dJ1UDNxpI3hKQkZsoaGEjH9OczWkv6xT1h3wiF+ZPfAHNqqxc1J3qd/LDCtIQW60EJ5hIu5ot9d1xqEhClIgyQ0Wknu3YS/sG1k8=
+	t=1760205519; cv=none; b=Q7DFQOURd0sabJu8nJmCFSPn7hvxq2xNqkGIa0pbY8cwy7zNa6PENKRg0oewDG7kX4AJEQksGEV3ttym+jjY8+T5YdfJUGOKY/dptqzLxY9GBwcUgkAwdhK/HiRnwbv7dx0O+TgYXpJa8vPA28wwdbzqUs9Ok1msHRB9w8O2/po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760204574; c=relaxed/simple;
-	bh=+XORBWOfOoSgbPifqtxEJHlGrWYpXTS+d55JX3wMoO4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ol5bXCVy0F1Ia8JWfxFt4L2HtMRLcpG2tWlEf96imTgZuEJ560UF1HRxeX/ariSlBMLY/QsIj2WGytGygrtlgH/ogi0ZzltEW+2c6zhRKXK1qOOgHIqlDQVxF3aacY7CHX7xTGvIGcgg5x2itsN9xzY/LSn6OPCmjb0MdKtjHCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SGrLl8zV; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760204572;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=THkkeCujAz7WFSbw0zVRRMF8zd65cL2y27OLjm1PRmo=;
-	b=SGrLl8zVFg2y3BOgypXrpBk0Vu0jQvERbSXjHLE8OKcBj/OSBW/kYwD6WpEWKR5NjeLaHB
-	40Zt6ypgirWyPBZWC2olY+H+ACbW/m5rJqzzuNWt5aBLHnMwev314tyCqCCCuPQcOylqIM
-	We7lXySOSn6QwVFKoQJ5K5B+ytHHvPs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-577-41QoMVsGOJC8Ku1PkWytVA-1; Sat, 11 Oct 2025 13:42:50 -0400
-X-MC-Unique: 41QoMVsGOJC8Ku1PkWytVA-1
-X-Mimecast-MFC-AGG-ID: 41QoMVsGOJC8Ku1PkWytVA_1760204569
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46e4cc8ed76so15070815e9.1
-        for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 10:42:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760204569; x=1760809369;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1760205519; c=relaxed/simple;
+	bh=ztCgEjeSm5QWfKdIMsylb9vBpYZ8dXFKl7yZOD1ILT4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KYiLlN2Bkn51Jzr5K3mRm9zhxrVL7B0zEggwyKPzXl/yrumazDhNCbRbNkpublldESDsE/j3YHKndAV/i2Pr3edtMVP2xHdqDEybFu8ZlwjroEcQU3bD9sQoJrdYxvwFLwpZ1Y9Hen3ZKwqNHu6kGUHDr1AGWL11Y9A7ia79pnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YHHmNeJ2; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-4308afd43f0so340605ab.0
+        for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 10:58:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760205517; x=1760810317; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=THkkeCujAz7WFSbw0zVRRMF8zd65cL2y27OLjm1PRmo=;
-        b=stBbGlYIrxmOIVvZqGWFgfBMamyoynhwOkrmJsklhlSRuXOW5EsU/S6oKS0TKrJBRQ
-         0wMpMDk4058i6mwmnwPCG0fx5O/8Il0x9vAj7G0Gerk6et2FuWgl9EaLMA7f6dLgheJv
-         4mqhouK+lG5QIoy8YWcYAk8okBXttMkqBOLxKIHroom7uXjncMG4UpfGHWBlffgQjzJb
-         nC97RvUSGhiYJGq5q9CLHz4qWsfm/Nf4LbLixhknIW/gZznhsUsoy+toopmLnC3gTyxA
-         02uoMT9Kw+GCsL/qn2AUal8KwSatmU3kxlS9Zq6i6qWyOvFEqeQDX2mcxFarcUE3ejhN
-         p/rA==
-X-Forwarded-Encrypted: i=1; AJvYcCU03SaPQp4bU0PhN1CECDWe/N13fQ68mrh7ukm2kR4CpnhSLt/LA1dDKBT9JvijpKIQrRDkHQ8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzop0TPoCxLsq5g32s9hFCkQo+3XIGLE5jWK8ePHU6GtSUCY10m
-	L9KxLTS5OADgPsA0zVe3WW1i0wKjt1cDwNv9TX+caQuOD1mcm6kuzUTKP839rXmWh28w8DADfX2
-	C/bUdHNvdHeR5n6VpOP4REVY1aJ89KxHO2cMP0m/m6iY08TTV0PMV+I+5dA==
-X-Gm-Gg: ASbGncsxR1/oq5Jt29hBLf56X5f0grywu8He5LT/BFDbFaAHn/mT44jgQEQ4ZDiFZnc
-	9U9vJkvj9TqAejmMba84CAXwl16lkRANuIxMn0M9s6zWaT/OfFPcYrMHzrN5sGNkSSmO781/fk1
-	1wDZizXUe0ISrRneCAwnMjlsDy2dYK1lf0nqixKZgTxbThljDK949z5ISSqE9puMfWhy8sRHrqO
-	Vqi7keSGNWMt+6c6Te3ASmbyQeKYtNJBx9WDAvOo575Pivb717bRxrAMLNxbVqLbckhbhJQKAfE
-	N3jBZIXefbPhHomobtVlgwD3xixeczTyZo0=
-X-Received: by 2002:a05:600c:5247:b0:46f:b340:75e7 with SMTP id 5b1f17b1804b1-46fb34075efmr67029415e9.8.1760204569310;
-        Sat, 11 Oct 2025 10:42:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGLanRjSPD2Xtlxm8R6qQutwfzZwiu2kRm9erxJSoygqMN52KcMygCW4j6dhl5fQ2CtN6pGVA==
-X-Received: by 2002:a05:600c:5247:b0:46f:b340:75e7 with SMTP id 5b1f17b1804b1-46fb34075efmr67029165e9.8.1760204568694;
-        Sat, 11 Oct 2025 10:42:48 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fab36cc32sm88406675e9.0.2025.10.11.10.42.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Oct 2025 10:42:48 -0700 (PDT)
-Date: Sat, 11 Oct 2025 13:42:45 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org
-Subject: Re: [PATCH 1/3] virtio: dwords->qwords
-Message-ID: <20251011134052-mutt-send-email-mst@kernel.org>
-References: <cover.1760008797.git.mst@redhat.com>
- <350d0abfaa2dcdb44678098f9119ba41166f375f.1760008798.git.mst@redhat.com>
- <26d7d26e-dd45-47bb-885b-45c6d44900bb@lunn.ch>
- <20251009093127-mutt-send-email-mst@kernel.org>
- <6ca20538-d2ab-4b73-8b1a-028f83828f3e@lunn.ch>
+        bh=C4lOKDIigswOdW3lLMRo/9I9yN0tcBS8IM0nhuqIKjI=;
+        b=YHHmNeJ2XY4hTOBijIS72iIVYe/tbMtxVb/sz64iJE81gJps3scHp3dWrigQvXJ/B/
+         jrTG+Xtb8WWFzqan+3i9io3glY6Y0xPAWAXxAoWPMFsOZQqhrN8R8FkxMlehJIgiGUt5
+         q/0ngJ8dqxw0CU9t85l+/uDK892qomXwau2EnPbykP/Yyl2jHpGdz8ngNdvjIPpnbKKJ
+         9/CuToslTlcAgywQerGMUMvCg9LZ9Oqyc9+ODRuBvy6skTvJeZGNZcuEXPYFYpuG6Ual
+         rOQCutz/DouUorew3DKfA0sJsXLYh4+5o31HQ4TU7zr8Kwai9MluAMLl7rcRst+ADcvE
+         64YA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760205517; x=1760810317;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C4lOKDIigswOdW3lLMRo/9I9yN0tcBS8IM0nhuqIKjI=;
+        b=M0sOw49bGH4s7tFYEV/AvcSrSe7ZF55WUyo4xVo2rI+8b6zP8vGj3W3vrAk7IVmd2Q
+         YycpKQl6APqG1mXEkaEXPr3f1uBobt2dp3QqaENv7I5duipWKQCW5OwgiLX9ySru+G4k
+         QOrvi3uQxEpWrPa41F8i4j7Ohp4gAl0p7UBLB2wOUq8ayOB2+HxiE8jM1A3mHvWK3CyG
+         SPKydH9WpES4T0qPSTQz8d+3SvSx0h8L+wJf1nBI56KgTPuMReCFNAnWXTXAYSmgtRnK
+         x0+y4M59usBi6CZsYQ5ikwfAsfuHaSEiT8gbDgXD1OfLGRzL1xjv116hMRDeV/79lnDL
+         /XgA==
+X-Forwarded-Encrypted: i=1; AJvYcCX2WGxLcVt5yfHqB/24ZBVSc8H22qR9pHl/G+LNo6PlasIdyFoABgbgDCI8S9PX3gpUPyl9BW4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCJxIvuNah4kFkPYoplQaCxcEQ2ac5UgUH/jo3yOvvLOJPkufF
+	bOY3wX+4o00YxT+fIOie6nTdWBH3xS04MjZoBshB3GvGoHu93SfQf72YWb8C50BatQJItQM8LiX
+	IFG2Of8ibvjq9fB9DZwIlWY/OSL1ftIS0FUgEfjIw
+X-Gm-Gg: ASbGncvg9SP20/kFq/xy/oLizr+PFnhKU26lyJ70P8DsUWyBS1oQMDJBeU22KAwB5Fv
+	VCoSJGBQft5PoQ2gqH3d6enJ1qMe4ARtNMQGyKZ2y6Zjw7rB83bL+z8/yMkdpxlf4Um0fjHHrOi
+	VpCARSIbCpFIledBe349bHgiLMMP5d0I3jJILapN7w1PNpVIDA7U3ajIA0lDpJtIFGSdCn0rByz
+	ka7u1u3j0lmgOLwZm1xdj9ARcaD1EJq2kV6XaSHrRT0KVcLRhDaAWIOFmUGuZQ9Xg==
+X-Google-Smtp-Source: AGHT+IGUDqO7luDHtkmTjoqJwkGD7U99l1JHor+zAnAZOiHcypaKl8AmMXqgeWg6QNaYxFYI5NpC8dtQMSaiQpOB4ug=
+X-Received: by 2002:a05:622a:4889:b0:4e7:1e07:959c with SMTP id
+ d75a77b69052e-4e71e07992cmr855061cf.10.1760205516982; Sat, 11 Oct 2025
+ 10:58:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6ca20538-d2ab-4b73-8b1a-028f83828f3e@lunn.ch>
+References: <20251011115742.1245771-1-edumazet@google.com>
+In-Reply-To: <20251011115742.1245771-1-edumazet@google.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Sat, 11 Oct 2025 13:58:20 -0400
+X-Gm-Features: AS18NWAQDqsMVv0QeNLgSz-sSH_jw4As6vO2O-oEzs5fdUc5XAh51ozfTSglxNM
+Message-ID: <CADVnQyk7M2Z0fz3ub_qpVyW16mpEbRWjRudpRzzTvOMA3j9fLw@mail.gmail.com>
+Subject: Re: [PATCH net] tcp: fix tcp_tso_should_defer() vs large RTT
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Oct 11, 2025 at 07:25:55PM +0200, Andrew Lunn wrote:
-> On Thu, Oct 09, 2025 at 09:37:20AM -0400, Michael S. Tsirkin wrote:
-> > On Thu, Oct 09, 2025 at 02:31:04PM +0200, Andrew Lunn wrote:
-> > > On Thu, Oct 09, 2025 at 07:24:08AM -0400, Michael S. Tsirkin wrote:
-> > > > A "word" is 16 bit. 64 bit integers like virtio uses are not dwords,
-> > > > they are actually qwords.
-> > > 
-> > > I'm having trouble with this....
-> > > 
-> > > This bit makes sense. 4x 16bits = 64 bits.
-> > > 
-> > > > -static const u64 vhost_net_features[VIRTIO_FEATURES_DWORDS] = {
-> > > > +static const u64 vhost_net_features[VIRTIO_FEATURES_QWORDS] = {
-> > > 
-> > > If this was u16, and VIRTIO_FEATURES_QWORDS was 4, which the Q would
-> > > imply, than i would agree with what you are saying. But this is a u64
-> > > type.  It is already a QWORD, and this is an array of two of them.
-> > 
-> > I don't get what you are saying here.
-> > It's an array of qwords and VIRTIO_FEATURES_QWORDS tells you
-> > how many QWORDS are needed to fit all of them.
-> > 
-> > This is how C arrays are declared.
-> > 
-> > 
-> > > I think the real issue here is not D vs Q, but WORD. We have a default
-> > > meaning of a u16 for a word, especially in C. But that is not the
-> > > actual definition of a word a computer scientist would use. Wikipedia
-> > > has:
-> > > 
-> > >   In computing, a word is any processor design's natural unit of
-> > >   data. A word is a fixed-sized datum handled as a unit by the
-> > >   instruction set or the hardware of the processor.
-> > > 
-> > > A word can be any size. In this context, virtio is not referring to
-> > > the instruction set, but a protocol. Are all fields in this protocol
-> > > u64? Hence word is u64? And this is an array of two words? That would
-> > > make DWORD correct, it is two words.
-> > > 
-> > > If you want to change anything here, i would actually change WORD to
-> > > something else, maybe FIELD?
-> > > 
-> > > And i could be wrong here, i've not looked at the actual protocol, so
-> > > i've no idea if all fields in the protocol are u64. There are
-> > > protocols like this, IPv6 uses u32, not octets, and the length field
-> > > in the headers refer to the number of u32s in the header.
-> > > 
-> > > 	Andrew
-> > 
-> > 
-> > Virtio uses "dword" to mean "32 bits" in several places:
-> 
-> It also uses WORD to represent 32 bits:
-
-
-That's not spec, that's linux driver. The spec is the source of truth.
-
-
-> void
-> vp_modern_get_driver_extended_features(struct virtio_pci_modern_device *mdev,
-> 				       u64 *features)
-> {
-> 	struct virtio_pci_common_cfg __iomem *cfg = mdev->common;
-> 	int i;
-> 
-> 	virtio_features_zero(features);
-> 	for (i = 0; i < VIRTIO_FEATURES_WORDS; i++) {
-> 		u64 cur;
-> 
-> 		vp_iowrite32(i, &cfg->guest_feature_select);
-> 		cur = vp_ioread32(&cfg->guest_feature);
-> 		features[i >> 1] |= cur << (32 * (i & 1));
-> 	}
-> }
-> 
-> And this is a function dealing features. So this seems to suggest a
-> WORD is a u32, when dealing with features.
-
-This is very recent with Paolo's patches/
-That's exactly why my patches fix it.
-
-> A DWORD would thus be a
-> u64, making the current code correct.
-> 
-> As i said, the problem here is WORD. It means different things to
-> different people. And it even has different means to different parts
-> of the virtio code, as you pointed out.
+On Sat, Oct 11, 2025 at 7:57=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
+> Neal reported that using neper tcp_stream with TCP_TX_DELAY
+> set to 50ms would often lead to flows stuck in a small cwnd mode,
+> regardless of the congestion control.
 >
-> 
-> If we want to change anything here, i suggest we change WORD to
-> something else, to try to avoid the problem that word could be a u16,
-> u32, or even a u42, depending on where it is used.
-> 
-> 	Andrew
+> While tcp_stream sets TCP_TX_DELAY too late after the connect(),
+> it highlighted two kernel bugs.
+>
+> The following heuristic in tcp_tso_should_defer() seems wrong
+> for large RTT:
+>
+> delta =3D tp->tcp_clock_cache - head->tstamp;
+> /* If next ACK is likely to come too late (half srtt), do not defer */
+> if ((s64)(delta - (u64)NSEC_PER_USEC * (tp->srtt_us >> 4)) < 0)
+>       goto send_now;
+>
+> If next ACK is expected to come in more than 1 ms, we should
+> not defer because we prefer a smooth ACK clocking.
+>
+> While blamed commit was a step in the good direction, it was not
+> generic enough.
+>
+> Another patch fixing TCP_TX_DELAY for established flows
+> will be proposed when net-next reopens.
+>
+> Fixes: 50c8339e9299 ("tcp: tso: restore IW10 after TSO autosizing")
+> Reported-by: Neal Cardwell <ncardwell@google.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
 
+Thanks, Eric! Great catch! The patch looks great to me, and I tested
+that it fixes the issue I was seeing with neper tcp_stream with
+TCP_TX_DELAY.
 
+Reviewed-by: Neal Cardwell <ncardwell@google.com>
+Tested-by: Neal Cardwell <ncardwell@google.com>
+
+neal
 
