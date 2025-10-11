@@ -1,90 +1,67 @@
-Return-Path: <netdev+bounces-228604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68770BCFD32
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 00:28:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13FD7BCFDEA
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 01:42:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAB423BD344
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 22:28:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7236402ADE
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 23:42:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D41F188580;
-	Sat, 11 Oct 2025 22:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6218B25783C;
+	Sat, 11 Oct 2025 23:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GtJaZHUD"
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="jYOnuS09"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from r3-18.sinamail.sina.com.cn (r3-18.sinamail.sina.com.cn [202.108.3.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821BC223DCE
-	for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 22:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72FD24676C
+	for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 23:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760221721; cv=none; b=soQZjVwpgEp4F/02ikRPKMViR3t4vAbHCz4n60ME1C65mpNy4sPGWGXHPZN5KbB0KoIHSHXcfPpxWOqFN9nzcR6HmIbnZdFsUQz0tF9MEqsxO65N6GHF0O1YoetSoHrXWDd17puRyWuNiStgzfc3z0IOCLbAMvrRPct/Bis0wms=
+	t=1760226120; cv=none; b=bcBxydJLmNozJl85ZcDGnNri9WkLV2jz52i2Y+/4QYn8e0omLYY4ZNR9ySZ/5UlnW75kwf4j3woyC6NTo8Gkq9C3lmUlLtRPhmEe1T/fhhwnXEbcZ0IklvAdMBX9/oo0Zf4qebo50rY1BlBYJ3gpITVsfkpCDO5C0C0rmsaHK/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760221721; c=relaxed/simple;
-	bh=1cxqa9/a6/4/IseLrjSRryZ7gaAyBeI1x1vSgmwzOzM=;
+	s=arc-20240116; t=1760226120; c=relaxed/simple;
+	bh=+BgaisoJpkMJRcrw4zm/dOKBPWo38wqDjpde9doKT6w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Datnz1q9o9STI7KNds2ncn0RNoQcDMYRHr8ag1u82KXHHvgHWnAlk1Piy398RrN91lyVwdGsWRmSGdGUlfl0emv5PW1Q2RMm9uM4F4zh9h2v7/WoY7AjYA63wXifJH+tNGgNDbagUpVi8bd1NYIHn1THcLdMKzZao3xkhKE1dY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GtJaZHUD; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-77f605f22easo2718711b3a.2
-        for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 15:28:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760221719; x=1760826519; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VlvIa089srhXVyQ7tc1Yl/MMFy8Ph9aqA9Fa75oaPQk=;
-        b=GtJaZHUDTiW0YYS5+GF+yTSZZk9b1ZLOaYKylJuiJjIW+JO9jlvjgQQK0bEFwqcK44
-         stYMCF5z0tDV5WFW9XpoB+4NRCExuUuHe1BXmyldX7rlXFG0NSAn2wJ7aQNa781s5Umn
-         F/0f6dJJItxdF2Ixb68H/2MaQVzBinY+/w3c+9+WR8LsGftP5HItIyIimJtHZpzoFiLj
-         H/79//KMKCjbPGXzS3qN00crVJR0lbjYTj/Jz9CKUBqAZKYDA8amZ3lo+B8iAwjfXPSl
-         jftlwBuYB1oxqr5LZLAgRKXd/VsuTv2Vo1zb5Wo9chTbhruSaUTrjpwjSOu3obesTdfM
-         kaCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760221719; x=1760826519;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VlvIa089srhXVyQ7tc1Yl/MMFy8Ph9aqA9Fa75oaPQk=;
-        b=VqW+tX6PLcfmkAFVsa66WBEuQWtmAjQBEcmpCQkP7U9hrgzq5tWG3vYKA5Dfrq83X9
-         XJ6zKf/tfg85fOXPV7eCj3qsUEMCNzY/MBPMFfQp5FHKybCrPZLhZ98gIvUnYXCZ+4wk
-         WgDSgaI2IL/ueCcgEtj0P0rnssIwsJ+hF6BNr5m47IOtNuuTcQjyCy3JquQPNphXuUOW
-         5QBEHnnij7iqjY/ZWy1sVbcMA5SBeenVt5hN0ZxONr2Cbf+SkFNgpL/LHIRw716hCir4
-         p5C8CCD+vkrRVogpGpQDBTN5zUpwVeHF/nCFqRHsKPsZqG+S3X3hnEyLmoumg25cnKoG
-         N/Hg==
-X-Gm-Message-State: AOJu0YwXkth8VIklpxNomNrEpfheodYjH1S7k/lmdmTWZL6gu/YQDaFM
-	ioWfsHorWgOxe2ykLXCz8rEAY+Iwx7uYHg3+Uq6hwVhHkYJEVNXZfuIEfHXp29Vs
-X-Gm-Gg: ASbGncttcLvESmkeWvo07Y30vkCTzzLbz19/H8L+lkLF5+vasKwtnHmpX7G3VagNvvd
-	Gu5ru8Kn5572RlBP81GOx16p2rpCf2G4P0mLfAs0XRdQHQuPTeoZY2jnJMbuDzYBfuVhfFzeQ1z
-	qFlxg9iJMgcVRQSfGCplGB034CF/QjEHwqSlLA/7+/WFHpJeRncnuCafxHKNY8SSE/Fh7njSzJS
-	R+EP/dWp6etFww2vSXMYUDckCXQnBf+RcHMcLrCcaq0KKv60GPu1ON6akxaQhr1Tq3vrIFGdt5o
-	qpLgWmunIaPkwX6lTWkODENK87jwpbL2Qf3Ly+EjswB4tkF6o04IdDyULQHvq+COHjrvV8l5Jck
-	mzM8NrHfKr/Ar8mGo7tR2AhJdqSJS7hF86RtkNK9cz3BwZQGEMFMEV239wsoh8kuHzpOy8/zEEY
-	9IXK4=
-X-Google-Smtp-Source: AGHT+IFpAevmluy6PVpI4+JhoBzCM1cXAIYugeSCfeKlLByV/r1c2Y80GrLDu+qYcotEOHagBNfZ2Q==
-X-Received: by 2002:a05:6a20:748c:b0:24b:c7d9:88e4 with SMTP id adf61e73a8af0-32da83e5ef2mr22266244637.42.1760221719422;
-        Sat, 11 Oct 2025 15:28:39 -0700 (PDT)
-Received: from yijingzeng-mac.thefacebook.com ([2620:10d:c090:400::5:6972])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992dd854a2sm6870688b3a.76.2025.10.11.15.28.38
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 11 Oct 2025 15:28:38 -0700 (PDT)
-From: Yijing Zeng <zengyijing19900106@gmail.com>
-To: netdev@vger.kernel.org
-Cc: stephen@networkplumber.org,
-	me@pmachata.org,
-	kuba@kernel.org,
-	yijingzeng@meta.com
-Subject: [PATCH v2] dcb: fix tc-maxrate unit conversions
-Date: Sat, 11 Oct 2025 15:25:24 -0700
-Message-ID: <20251011222829.25295-1-zengyijing19900106@gmail.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20251008031640.25870-1-zengyijing19900106@gmail.com>
-References: <20251008031640.25870-1-zengyijing19900106@gmail.com>
+	 MIME-Version; b=q3x76XdbETwbSuhIoL9dXFvJPSEFcNN83ZXbmlsfJZSxgtIABgl+SJ0CF0bMf3yCKHWKkzkJM0sY3ubH9qSkkotaj1Ap1LvUAkespjCzpNocNkjvqMayffAyVtMfVwc0RhrAL+1aGDuUCUs5EMjV9PvU0MGyscELYlf8I4cz3IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=jYOnuS09; arc=none smtp.client-ip=202.108.3.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1760226116;
+	bh=ixMJ4H8Ln9X+7kZmTOGyuMjN/YJrJMUvqkp2MDOpWO4=;
+	h=From:Subject:Date:Message-ID;
+	b=jYOnuS09uBmckiAxkNfmLs5xYITUXJUZolrGoN9SoXox3tZ3DJD6NFEMGtLt7KD7C
+	 FFp5zEpcPG/gTz6xXz+EmvRcmWgPIfDmjVTRUTYHGl0+LE/Phprr1UFkItmhyuxh/i
+	 nSTmMSyKZnlKtd/F9QCFwm25UukR0/U8xPnQm/GI=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
+	by sina.com (10.54.253.32) with ESMTP
+	id 68EAEB1B00001BA5; Sat, 12 Oct 2025 07:41:17 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 7920164456699
+X-SMAIL-UIID: 2CABCCB3694F44FFBBD46C5BB5C6B241-20251012-074117-1
+From: Hillf Danton <hdanton@sina.com>
+To: ast@kernel.org,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: syzbot <syzbot+ad76dbe500667f3a4e17@syzkaller.appspotmail.com>,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [bpf?] [net?] WARNING in sock_map_delete_elem (2)
+Date: Sun, 12 Oct 2025 07:41:05 +0800
+Message-ID: <20251011234106.8522-1-hdanton@sina.com>
+In-Reply-To: <68e92928.050a0220.3897dc.0194.GAE@google.com>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,67 +70,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Yijing Zeng <yijingzeng@meta.com>
+On Fri, 10 Oct 2025 08:41:28 -0700
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    fd94619c4336 Merge tag 'zonefs-6.18-rc1' of git://git.kern..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=14ff8ee2580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=e2b03b8b7809165e
+> dashboard link: https://syzkaller.appspot.com/bug?extid=ad76dbe500667f3a4e17
+> compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/201636e25a0b/disk-fd94619c.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/b63e3832240c/vmlinux-fd94619c.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/11fc378734e8/bzImage-fd94619c.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+ad76dbe500667f3a4e17@syzkaller.appspotmail.com
+> 
+> ------------[ cut here ]------------
+> DEBUG_LOCKS_WARN_ON(this_cpu_read(softirq_ctrl.cnt))
 
-The ieee_maxrate UAPI is defined as kbps, but dcb_maxrate uses Bps.
-This fix patch converts Bps to kbps for parse by dividing 125,
-and convert kbps to Bps for print_rate() by multiplying 125.
+Did bpf help find out anything wrong in softirq?
 
-Fixes: 117939d9bd89 ("dcb: Add a subtool for the DCB maxrate object")
-Signed-off-by: Yijing Zeng <yijingzeng@meta.com>
----
-v2:
-  - Address style comments
-  - Avoid potential overflow
-
- dcb/dcb_maxrate.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
-
-diff --git a/dcb/dcb_maxrate.c b/dcb/dcb_maxrate.c
-index 1538c6d7..8c5a7e55 100644
---- a/dcb/dcb_maxrate.c
-+++ b/dcb/dcb_maxrate.c
-@@ -42,13 +42,20 @@ static void dcb_maxrate_help(void)
- 
- static int dcb_maxrate_parse_mapping_tc_maxrate(__u32 key, char *value, void *data)
- {
--	__u64 rate;
-+	__u64 rate_bytes_per_sec;
-+	__u64 rate_kbits_per_sec;
- 
--	if (get_rate64(&rate, value))
-+	if (get_rate64(&rate_bytes_per_sec, value))
- 		return -EINVAL;
- 
-+	/* get_rate64() returns Bps.
-+	 * ieee_maxrate UAPI expects kbps.
-+	 * convert Bps to kbps by dividing 125.
-+	 */
-+	rate_kbits_per_sec = rate_bytes_per_sec / 125;
-+
- 	return dcb_parse_mapping("TC", key, IEEE_8021QAZ_MAX_TCS - 1,
--				 "RATE", rate, -1,
-+				 "RATE", rate_kbits_per_sec, -1,
- 				 dcb_set_u64, data);
- }
- 
-@@ -62,8 +69,14 @@ static void dcb_maxrate_print_tc_maxrate(struct dcb *dcb, const struct ieee_maxr
- 	print_string(PRINT_FP, NULL, "tc-maxrate ", NULL);
- 
- 	for (i = 0; i < size; i++) {
-+		/* ieee_maxrate UAPI returns kbps.
-+		 * print_rate() expects Bps for display.
-+		 * convert kbps to Bps by multiplying 125.
-+		 */
-+		__u64 rate_bytes_per_sec  = maxrate->tc_maxrate[i] * 125;
-+
- 		snprintf(b, sizeof(b), "%zd:%%s ", i);
--		print_rate(dcb->use_iec, PRINT_ANY, NULL, b, maxrate->tc_maxrate[i]);
-+		print_rate(dcb->use_iec, PRINT_ANY, NULL, b, rate_bytes_per_sec);
- 	}
- 
- 	close_json_array(PRINT_JSON, "tc_maxrate");
--- 
-2.50.1
-
+> WARNING: CPU: 0 PID: 5969 at kernel/softirq.c:176 __local_bh_disable_ip+0x3d9/0x540 kernel/softirq.c:176
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 5969 Comm: syz.1.2 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+> RIP: 0010:__local_bh_disable_ip+0x3d9/0x540 kernel/softirq.c:176
+> Code: 0f b6 04 28 84 c0 0f 85 56 01 00 00 83 3d 52 9b 32 0d 00 75 19 90 48 c7 c7 c0 b7 c9 8a 48 c7 c6 00 b8 c9 8a e8 f8 5f fe ff 90 <0f> 0b 90 90 90 e9 7b ff ff ff 90 0f 0b 90 e9 71 fe ff ff e8 cf 84
+> RSP: 0018:ffffc900056bf940 EFLAGS: 00010246
+> RAX: f63c8546519c3800 RBX: 1ffff92000ad7f30 RCX: 0000000000080000
+> RDX: ffffc9000d891000 RSI: 00000000000093ed RDI: 00000000000093ee
+> RBP: ffffc900056bfa48 R08: 0000000000000000 R09: 0000000000000000
+> R10: dffffc0000000000 R11: ffffed101710487b R12: ffff88803c911e00
+> R13: dffffc0000000000 R14: ffff88803c91294c R15: 1ffff11007922529
+> FS:  00007fe7c46d66c0(0000) GS:ffff888127020000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000001b30217ff8 CR3: 000000001dfd6000 CR4: 00000000003526f0
+> Call Trace:
+>  <TASK>
+>  local_bh_disable include/linux/bottom_half.h:20 [inline]
+>  spin_lock_bh include/linux/spinlock_rt.h:87 [inline]
+>  __sock_map_delete net/core/sock_map.c:421 [inline]
+>  sock_map_delete_elem+0xaf/0x170 net/core/sock_map.c:452
+>  bpf_prog_e78d8a1634f5e22d+0x46/0x4e
+>  bpf_dispatcher_nop_func include/linux/bpf.h:1350 [inline]
+>  __bpf_prog_run include/linux/filter.h:721 [inline]
+>  bpf_prog_run include/linux/filter.h:728 [inline]
+>  bpf_prog_run_pin_on_cpu include/linux/filter.h:745 [inline]
+>  bpf_flow_dissect+0x225/0x720 net/core/flow_dissector.c:1024
+>  bpf_prog_test_run_flow_dissector+0x37c/0x5c0 net/bpf/test_run.c:1425
+>  bpf_prog_test_run+0x2cd/0x340 kernel/bpf/syscall.c:4673
+>  __sys_bpf+0x562/0x860 kernel/bpf/syscall.c:6152
+>  __do_sys_bpf kernel/bpf/syscall.c:6244 [inline]
+>  __se_sys_bpf kernel/bpf/syscall.c:6242 [inline]
+>  __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6242
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
