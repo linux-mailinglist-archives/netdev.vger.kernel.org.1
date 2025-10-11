@@ -1,139 +1,161 @@
-Return-Path: <netdev+bounces-228590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA51EBCF3C3
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 12:43:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6316BBCF40B
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 13:03:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61F404043CA
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 10:43:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BE04189D2AB
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 11:04:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3EF8258ED5;
-	Sat, 11 Oct 2025 10:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A08B2571A5;
+	Sat, 11 Oct 2025 11:03:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z7YRL+Xv"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="mBwpVA7u";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="sYBdoTme"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8F3256C88
-	for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 10:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E58262FF8
+	for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 11:03:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760179398; cv=none; b=SyR0eC8ZvspLg+gqGQ5hDXgHz+61d/9X8Cp5P1cco+sSc2MXVO/JIwtX0wss+O3pEzAyiJao0MxJhOT+Ssw4I77b7XvsRoJIrTcJLKtAmiTthPwEcCdvdnXWshqUaOVL/w1hy6fcHQFVekdUmnBZ0FUUTNLPg0Wo2oQVW2hnA9w=
+	t=1760180615; cv=none; b=Iqz0Fi/cazlS1erp+lrEWBbUqIoJJU0IrdnPMeJ3BewCcKiiPSaDojdXCeinSUSz9Hm7oNxmTW2z6TXfn1e2VGgtJOaBarT8ujTyhQmRPR9KpZmVkbXIoZayfWNOREvJxr8U2oFxUHYqqdKUo0xG6YkOJpaXQ62bVW4O1IU3A4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760179398; c=relaxed/simple;
-	bh=nvw6W22YNUcuYDkHM+/YmRNu7p7dmP/S/3RcNhOY36U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QbHcUteNNn491RmY/73BEYgD7LQNpj3mgSOfep02B+E60sgsqQ8Sjq2YBLKNDIx4x8Njv+8XWfTXMm7Rd2kJFqbA7vpcWVK5AHcDMPrvl9T3+f1cf18sgdGcDJT8hsw1ZZpqhSm+BXyWH5oXWLgx8ypIcP+2cqMBzByvD+MPR+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z7YRL+Xv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 737BCC4CEF4;
-	Sat, 11 Oct 2025 10:43:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760179398;
-	bh=nvw6W22YNUcuYDkHM+/YmRNu7p7dmP/S/3RcNhOY36U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z7YRL+XvPTvkgZK8XFE7+R7vW0qu3Q9vz9NeH6kX1WYopPqSBVEDm/tpicH10elOm
-	 mtxO8+nClsaSliE7N9vg0ra4GVLP34we1YWBfftqCtl8W8C1+9kLBhXC9fOZfMI//6
-	 x2BNtd3E8Z05g9V7prCiRug5HF950H2QOuKWorVId+dSXVEmSQZf5hnp4A1Kv/s8ey
-	 nsAOW+PvetWJife73IN+NqWpjUS1y8+bujPHItr8wjrcn81inYRccNvV0ls7/Rrcxj
-	 2W/qz3tcMo/BwmmA2o4VA4i3A8LQerqjX5DWx6kGVfQQwHvCNv2Xuz9/4y675ycEol
-	 OMFiEChbBUG/g==
-Date: Sat, 11 Oct 2025 11:43:14 +0100
-From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1760180615; c=relaxed/simple;
+	bh=hU5amFH1sYdSOPa2rqyu+5R5NsXEJs7LTFhiTeRptgI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RAleUa9VHKynpTtOen+YjkshEUg7zgP6Y3LKEpM1EAbDg+OOijcAF0eGrEtC81KpBm6LsF8LOnGMWunIqdTQ1jaY8/7dCGtraAJlP6eJmi2DERANbuPBFCJm3cx0CmKtUI5xN2oDagExR7AwpnvNCBgvj8NvhQdYWZNTuzOPSv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=mBwpVA7u; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=sYBdoTme; arc=none smtp.client-ip=80.241.56.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4ckLM35qT7z9tVP;
+	Sat, 11 Oct 2025 13:03:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1760180607;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CSQuojGO5PPwsr0a+64d6W8P1UV65lWZWjx8iH7CmFo=;
+	b=mBwpVA7uXDGU213xYU57AnTGqy1M3TrhyFvEBPKwMmF3ehFvppmiDYzbb83lIXI7bqk6aK
+	WzQf6csmgYu6zJePyPGDL5+VjBuOvlc1wGxW+E7YKP8PGSBN9Lfq9wefec81YF7Rmva2SG
+	vbVki94QpS2snKJU8c0G7zj4g5eKjT+ctJFk7NxQO+sMT06VFt2zoBpPIttRqglLj/Dxwt
+	D05pp1ePxVIGXCeQUwrW8gMX/uBIStKoaeJKvTMCvpNeolsbh/BMCn4S/3McPu+F2sJ0nH
+	d/rX81QVqRqr9KiPrmZxEHJhfQQBcmml7sXbrdkOzEIHUQXNopbIjjp1q5V5Yg==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=sYBdoTme;
+	spf=pass (outgoing_mbo_mout: domain of marek.vasut@mailbox.org designates 2001:67c:2050:b231:465::202 as permitted sender) smtp.mailfrom=marek.vasut@mailbox.org
+From: Marek Vasut <marek.vasut@mailbox.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1760180606;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CSQuojGO5PPwsr0a+64d6W8P1UV65lWZWjx8iH7CmFo=;
+	b=sYBdoTme+an2tpxAtEQHbMh7oRsRh6iKzPPooNXP/6ohZBXG+OXDoFC6txhJw3oz3R91Nc
+	5SKHKpIY2ycZQ4oPd3bLNLN343z4g0bSUwJiuiwetAzGbwfSxuQjARfdbFYL1qIjagNeDG
+	5bmUjXvwva/5M4M8Gd0JkqGwO/+mVfxZKZxcMbBgduaaoWYLNdd8nY0lAU/yV1HNBJTgGb
+	cE4JgUtYh/kEPE0O2F8REBmCefjiCDQ2NaxQsLQr3g01HCZ5/o9deZrq5WBxiyaMkvBMDn
+	ETvMoMK+RAWTYxUop7JpsfLeg7w7nKTNBh7ghTa7Zw+08X43Ip6MwodMlVzcLQ==
+To: netdev@vger.kernel.org
+Cc: Marek Vasut <marek.vasut@mailbox.org>,
 	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Daniel Golle <daniel@makrotopia.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: airoha: Take into account out-of-order tx
- completions in airoha_dev_xmit()
-Message-ID: <aOo0woPiMxjABFv2@horms.kernel.org>
-References: <20251010-airoha-tx-busy-queue-v1-1-9e1af5d06104@kernel.org>
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Markus Stockhausen <markus.stockhausen@gmx.de>,
+	Michael Klein <michael@fossekall.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>
+Subject: [net,PATCH] net: phy: realtek: Avoid PHYCR2 access if PHYCR2 not present
+Date: Sat, 11 Oct 2025 13:02:49 +0200
+Message-ID: <20251011110309.12664-1-marek.vasut@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251010-airoha-tx-busy-queue-v1-1-9e1af5d06104@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-MBO-RS-META: yuf9zq4p9jpakzrfh6jb9e93mwaoihas
+X-MBO-RS-ID: 01c54f5ace3fe6d79fd
+X-Rspamd-Queue-Id: 4ckLM35qT7z9tVP
 
-On Fri, Oct 10, 2025 at 07:21:43PM +0200, Lorenzo Bianconi wrote:
-> Completion napi can free out-of-order tx descriptors if hw QoS is
-> enabled and packets with different priority are queued to same DMA ring.
-> Take into account possible out-of-order reports checking if the tx queue
-> is full using circular buffer head/tail pointer instead of the number of
-> queued packets.
-> 
-> Fixes: 23020f0493270 ("net: airoha: Introduce ethernet support for EN7581 SoC")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  drivers/net/ethernet/airoha/airoha_eth.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-> index 833dd911980b3f698bd7e5f9fd9e2ce131dd5222..5e2ff52dba03a7323141fe9860fba52806279bd0 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -1873,6 +1873,19 @@ static u32 airoha_get_dsa_tag(struct sk_buff *skb, struct net_device *dev)
->  #endif
->  }
->  
-> +static bool airoha_dev_is_tx_busy(struct airoha_queue *q, u32 nr_frags)
-> +{
-> +	u16 index = (q->head + nr_frags) % q->ndesc;
-> +
-> +	/* completion napi can free out-of-order tx descriptors if hw QoS is
-> +	 * enabled and packets with different priorities are queued to the same
-> +	 * DMA ring. Take into account possible out-of-order reports checking
-> +	 * if the tx queue is full using circular buffer head/tail pointers
-> +	 * instead of the number of queued packets.
-> +	 */
-> +	return index >= q->tail && (q->head < q->tail || q->head > index);
+The driver is currently checking for PHYCR2 register presence in
+rtl8211f_config_init(), but it does so after accessing PHYCR2 to
+disable EEE. This was introduced in commit bfc17c165835 ("net:
+phy: realtek: disable PHY-mode EEE"). Move the PHYCR2 presence
+test before the EEE disablement and simplify the code.
 
-Hi Lorenzo,
+Fixes: bfc17c165835 ("net: phy: realtek: disable PHY-mode EEE")
+Signed-off-by: Marek Vasut <marek.vasut@mailbox.org>
+---
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Andrew Lunn <andrew@lunn.ch>
+Cc: Daniel Golle <daniel@makrotopia.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Markus Stockhausen <markus.stockhausen@gmx.de>
+Cc: Michael Klein <michael@fossekall.de>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org
+---
+ drivers/net/phy/realtek/realtek_main.c | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
-I think there is a corner case here.
-Perhaps they can't occur, but here goes.
+diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+index 82d8e1335215d..a724b21b4fe73 100644
+--- a/drivers/net/phy/realtek/realtek_main.c
++++ b/drivers/net/phy/realtek/realtek_main.c
+@@ -633,26 +633,25 @@ static int rtl8211f_config_init(struct phy_device *phydev)
+ 			str_enabled_disabled(val_rxdly));
+ 	}
+ 
++	if (!priv->has_phycr2)
++		return 0;
++
+ 	/* Disable PHY-mode EEE so LPI is passed to the MAC */
+ 	ret = phy_modify_paged(phydev, RTL8211F_PHYCR_PAGE, RTL8211F_PHYCR2,
+ 			       RTL8211F_PHYCR2_PHY_EEE_ENABLE, 0);
+ 	if (ret)
+ 		return ret;
+ 
+-	if (priv->has_phycr2) {
+-		ret = phy_modify_paged(phydev, RTL8211F_PHYCR_PAGE,
+-				       RTL8211F_PHYCR2, RTL8211F_CLKOUT_EN,
+-				       priv->phycr2);
+-		if (ret < 0) {
+-			dev_err(dev, "clkout configuration failed: %pe\n",
+-				ERR_PTR(ret));
+-			return ret;
+-		}
+-
+-		return genphy_soft_reset(phydev);
++	ret = phy_modify_paged(phydev, RTL8211F_PHYCR_PAGE,
++			       RTL8211F_PHYCR2, RTL8211F_CLKOUT_EN,
++			       priv->phycr2);
++	if (ret < 0) {
++		dev_err(dev, "clkout configuration failed: %pe\n",
++			ERR_PTR(ret));
++		return ret;
+ 	}
+ 
+-	return 0;
++	return genphy_soft_reset(phydev);
+ }
+ 
+ static int rtl821x_suspend(struct phy_device *phydev)
+-- 
+2.51.0
 
-Let us suppose that head is 1.
-And the ring is completely full, so tail is 2.
-
-Now, suppose nr_frags is ndesc - 1.
-In this case the function above will return false. But the ring is full.
-
-Ok, ndesc is actually 1024 and nfrags should never be close to that.
-But the problem is general. And a perhaps more realistic example is:
-
-  ndesc is 1024
-  head is 1008
-  The ring is full so tail is 1009
-  (Or head is any other value that leaves less than 16 slots free)
-  nr_frags is 16
-
-airoha_dev_is_tx_busy() returns false, even though the ring is full.
-
-Probably this has it's own problems. But if my reasoning above is correct
-(is it?) then the following seems to address it by flattening and extending
-the ring. Because what we are about is the relative value of head, index
-and tail. Not the slots they occupy in the ring.
-
-N.B: I tetsed the algorirthm with a quick implementation in user-space.
-The following is, however, completely untested.
-
-static bool airoha_dev_is_tx_busy(struct airoha_queue *q, u32 nr_frags)
-{
-	unsigned int tail = q->tail < q->head ? q->tail + q->ndesc : q->tail;
-	unsigned int index = q->head + nr_frags;
-
-	return index >= tail;
-}
-
-...
 
