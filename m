@@ -1,205 +1,163 @@
-Return-Path: <netdev+bounces-228594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7535BCF5B5
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 15:34:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BFF8BCF69A
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 16:13:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4431334B281
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 13:34:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7BF0402BF5
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 14:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 734A9259C9C;
-	Sat, 11 Oct 2025 13:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CbFI4omk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ACFD27C154;
+	Sat, 11 Oct 2025 14:13:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F7D61FFE
-	for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 13:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D902277CA5
+	for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 14:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760189684; cv=none; b=kpNYlmMkBk/hKdpGddBFzuuQXCwV8w+bkRWIHETkukZQRy17KjrdeHis9dOQyTGSruLr0O9G4sOrr4EYOyPEkEtuL94bUmfyF2fjimv8rrG4NoD5rTkaF7b3yecGqF+eaOxWRc6OMyyZG4jfaxF7RJINIEeCNFwyk/m7A/8HXaY=
+	t=1760191987; cv=none; b=j8v1yBWpMWrXcUkV3Dy/rO+sU1oV9h3GLQlC7mGkVkaP4Fot8IUY1yYRqVtpCxxFyfle4obppK1Cy8GCq09VGoIQ/JJE+HM54HnwzIh9eU6fTuQvwfqU8sX30HoFUNu2MW+wtysFJe1zQQfZAwp3JVVFBIGd/CYJibxJHl/Siy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760189684; c=relaxed/simple;
-	bh=0eibqLwpXBrjUm2YGT1GLTK10uNsplZcqPI1+nozNhM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e0Vz9CedIKmj2il7rTkshlaRXnMQ/OC45PULmtLufYHOXX/gikZwqi0ss2UCRM+cHJ9I7rx9i47r+7PAZIsyUsrH+sH8HBfUC8VCv9spKL2n6LTzRTULj8emebZQ89mov29KO8r0kHrN3xdft9kxN7MYfVmdvN3O+6l+UbvSWVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CbFI4omk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8027CC4CEFE;
-	Sat, 11 Oct 2025 13:34:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760189683;
-	bh=0eibqLwpXBrjUm2YGT1GLTK10uNsplZcqPI1+nozNhM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CbFI4omkz7RznMb6Vks53VvoAzqdHh5iq1prnThbZ1BNuh1cjrjkdwavfL6LpYQtE
-	 2cZN+p24KPX9z2yZ6adKbUC+219MBH4Wrxl+sBwvba2eQZ9+pqP3g//sVZT46Ya2yZ
-	 /SW3bxuEHaYhUvX8LoaVPkOg9+iAPaAxlmHA4cklQNlxM3QEnwzKRGzn8+p05oHOD/
-	 v7e0/4vLLjTYW51kYuVJ7HswxVoSsfnKkXwv++a1PHrYwOyvztNnb0i6e/kcu99JlF
-	 PvouCr3xiej7hfzkItlV5kluNwgICNAGg6IhFgI4GwVYK8+3JlzBHdHE8xhSqXn4OS
-	 NhjGgiOGkFCkw==
-Date: Sat, 11 Oct 2025 15:34:41 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: airoha: Take into account out-of-order tx
- completions in airoha_dev_xmit()
-Message-ID: <aOpc8d0dPGOnwfJE@lore-desk>
-References: <20251010-airoha-tx-busy-queue-v1-1-9e1af5d06104@kernel.org>
- <aOo0woPiMxjABFv2@horms.kernel.org>
+	s=arc-20240116; t=1760191987; c=relaxed/simple;
+	bh=rMo7HfRIE7eA6+jB+hLqNHgWOJShn+j7QG+I35e6KqY=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=GlsO50AVXu08MXwh4mGb8j3+Fj/3BY4CaImSYQtlWj+XLkM2KUIwXC9mbHN5mn/Mr3qH1Lo+908lTKCR0ZlWwt+TyMSEeKueKbo9lORC1+yFOtnbhzGPawwZwvQRLYhv++dqRlgN35W3I6wSe/GuZ2JPAZmUJnNeCKcM3Wc7pb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-927f4207211so1303450839f.3
+        for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 07:13:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760191984; x=1760796784;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ip+uLuuOjcts4R2e3BONfrdlhtbZShsrdc7YY7Z9NqQ=;
+        b=AvzMEUSuA7hmNre+J6hANr6DSRZlz6D1VDNmfCDbqqTdTLnBp5Qj+UhR+0fWNBjXNd
+         7B2LUfY5B7xA3V4tW11GUJESpL4VQ26PV1xPTMmDyyZGj7Xf6mFNiZFHnwEOd3VIgvmH
+         gBHDvRpkrfNoGuoDIxXSZLO/6/TmnjiUf0FNkCBw71kUGXUfqZ72RyvTIkDzOu5rrWM/
+         Rl+vDUb2W6rqHgZ0l7yqRj4vOU7ecN63UL7Dy7u8aFmE5k3iMK+/m/2H6EM2pDxZLUIv
+         O6OtYCSdSh3Oh3f8ohhtrphhjGOZ4W3GVhHS5DMn/C+8wh9qlP/Elb7mCf1QIRLX3v1T
+         AFxg==
+X-Forwarded-Encrypted: i=1; AJvYcCVx8E+4jr33v2V84lzRZTYzQYPiZVsAbkj33fSUUV0ylk3vlYzz4NwZGd8VhTBYP8FL6UhN/zA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5CnLyUUGG6cUjgUYuMTN6GnxqUY2sadSkPy2CHYFa/UfI7jGT
+	WFhhSxYjraJAmrK9rkxWcZsuYXb+01J+CwW1WchuDzwe2lgJ6uliJYWI0080Nzc0WU0vtHZUCAY
+	rbeFz6AXDlg9NC9bPuvNrqoT2idCOmKmmrFInw6H6DZ2Ew8G7mCVqLOdfkvM=
+X-Google-Smtp-Source: AGHT+IEYPeX0/JDZU2gXu5fZkKpTTFLubdS5ByzTo1zPFXqvhpbxq1nIWID2iHSofUykOKknq0DL0gMJcAfCLjzG4rPoTWJu6fOB
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="nk5Dyb1DUQd53K2s"
-Content-Disposition: inline
-In-Reply-To: <aOo0woPiMxjABFv2@horms.kernel.org>
+X-Received: by 2002:a05:6602:3584:b0:92f:1738:92a0 with SMTP id
+ ca18e2360f4ac-93bd17e481dmr2099063739f.7.1760191984683; Sat, 11 Oct 2025
+ 07:13:04 -0700 (PDT)
+Date: Sat, 11 Oct 2025 07:13:04 -0700
+In-Reply-To: <20251011094107.16439-1-xuanzhuo@linux.alibaba.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68ea65f0.050a0220.91a22.01ce.GAE@google.com>
+Subject: [syzbot ci] Re: fixes two virtio-net related bugs.
+From: syzbot ci <syzbot+cia46944debf22e178@syzkaller.appspotmail.com>
+To: alvaro.karsz@solid-run.com, andrew@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, eperezma@redhat.com, hengqi@linux.alibaba.com, 
+	jasowang@redhat.com, jiri@resnulli.us, kuba@kernel.org, mst@redhat.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, virtualization@lists.linux.dev, 
+	willemb@google.com, xuanzhuo@linux.alibaba.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+syzbot ci has tested the following series
+
+[v1] fixes two virtio-net related bugs.
+https://lore.kernel.org/all/20251011094107.16439-1-xuanzhuo@linux.alibaba.com
+* [PATCH net v1 1/3] virtio-net: fix incorrect flags recording in big mode
+* [PATCH net v1 2/3] virtio-net: correct hdr_len handling for VIRTIO_NET_F_GUEST_HDRLEN
+* [PATCH net v1 3/3] virtio-net: correct hdr_len handling for tunnel gso
+
+and found the following issue:
+WARNING in virtio_net_hdr_from_skb
+
+Full report is available here:
+https://ci.syzbot.org/series/694015b3-a5d7-400b-a7c2-c9ee69c35027
+
+***
+
+WARNING in virtio_net_hdr_from_skb
+
+tree:      net
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
+base:      2c95a756e0cfc19af6d0b32b0c6cf3bada334998
+arch:      amd64
+compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+config:    https://ci.syzbot.org/builds/5e67ae6c-bfc6-42cc-ab94-ff0cde528221/config
+C repro:   https://ci.syzbot.org/findings/39fb9135-9abf-418b-82a0-6478c7642a48/c_repro
+syz repro: https://ci.syzbot.org/findings/39fb9135-9abf-418b-82a0-6478c7642a48/syz_repro
+
+syz.0.17 uses obsolete (PF_INET,SOCK_PACKET)
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 5956 at ./include/linux/skbuff.h:3071 skb_transport_header include/linux/skbuff.h:3071 [inline]
+WARNING: CPU: 1 PID: 5956 at ./include/linux/skbuff.h:3071 tcp_hdr include/linux/tcp.h:26 [inline]
+WARNING: CPU: 1 PID: 5956 at ./include/linux/skbuff.h:3071 tcp_hdrlen include/linux/tcp.h:36 [inline]
+WARNING: CPU: 1 PID: 5956 at ./include/linux/skbuff.h:3071 virtio_net_hdr_from_skb+0x5e6/0x8d0 include/linux/virtio_net.h:226
+Modules linked in:
+CPU: 1 UID: 0 PID: 5956 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:skb_transport_header include/linux/skbuff.h:3071 [inline]
+RIP: 0010:tcp_hdr include/linux/tcp.h:26 [inline]
+RIP: 0010:tcp_hdrlen include/linux/tcp.h:36 [inline]
+RIP: 0010:virtio_net_hdr_from_skb+0x5e6/0x8d0 include/linux/virtio_net.h:226
+Code: 6f 01 4c 89 e8 48 c1 e8 03 0f b6 04 28 84 c0 0f 85 d8 02 00 00 41 c6 45 00 05 66 41 bf 08 00 e9 2c fd ff ff e8 2b 33 a8 f7 90 <0f> 0b 90 e9 f4 fb ff ff e8 1d 33 a8 f7 90 0f 0b 90 e9 b7 fc ff ff
+RSP: 0018:ffffc90003777228 EFLAGS: 00010293
+RAX: ffffffff8a16e845 RBX: ffff8881763f4fd0 RCX: ffff888106388000
+RDX: 0000000000000000 RSI: 000000000000ffff RDI: 000000000000ffff
+RBP: 000000000000ffff R08: ffff88817517f059 R09: 0000000000000000
+R10: ffff88817517f050 R11: ffffed102ea2fe0c R12: ffff88816a55a498
+R13: ffff8881763f4fb6 R14: ffff8881763f4f00 R15: 1ffff1102ec7e9f6
+FS:  0000555585886500(0000) GS:ffff8882a9d3b000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000010000 CR3: 00000001128ba000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ tpacket_rcv+0x1527/0x31c0 net/packet/af_packet.c:2362
+ deliver_skb net/core/dev.c:2472 [inline]
+ deliver_ptype_list_skb net/core/dev.c:2487 [inline]
+ __netif_receive_skb_core+0x3465/0x4380 net/core/dev.c:6023
+ __netif_receive_skb_one_core net/core/dev.c:6077 [inline]
+ __netif_receive_skb+0x72/0x380 net/core/dev.c:6192
+ netif_receive_skb_internal net/core/dev.c:6278 [inline]
+ netif_receive_skb+0x1cb/0x790 net/core/dev.c:6337
+ tun_rx_batched+0x1b9/0x730 drivers/net/tun.c:1485
+ tun_get_user+0x2b65/0x3e90 drivers/net/tun.c:1953
+ tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1999
+ new_sync_write fs/read_write.c:593 [inline]
+ vfs_write+0x5c9/0xb30 fs/read_write.c:686
+ ksys_write+0x145/0x250 fs/read_write.c:738
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fd130b8eec9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffcdba8f558 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007fd130de5fa0 RCX: 00007fd130b8eec9
+RDX: 000000000000fdef RSI: 00002000000002c0 RDI: 0000000000000003
+RBP: 00007fd130c11f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fd130de5fa0 R14: 00007fd130de5fa0 R15: 0000000000000003
+ </TASK>
 
 
---nk5Dyb1DUQd53K2s
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+***
 
-> On Fri, Oct 10, 2025 at 07:21:43PM +0200, Lorenzo Bianconi wrote:
-> > Completion napi can free out-of-order tx descriptors if hw QoS is
-> > enabled and packets with different priority are queued to same DMA ring.
-> > Take into account possible out-of-order reports checking if the tx queue
-> > is full using circular buffer head/tail pointer instead of the number of
-> > queued packets.
-> >=20
-> > Fixes: 23020f0493270 ("net: airoha: Introduce ethernet support for EN75=
-81 SoC")
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> >  drivers/net/ethernet/airoha/airoha_eth.c | 15 ++++++++++++++-
-> >  1 file changed, 14 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
-ernet/airoha/airoha_eth.c
-> > index 833dd911980b3f698bd7e5f9fd9e2ce131dd5222..5e2ff52dba03a7323141fe9=
-860fba52806279bd0 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> > @@ -1873,6 +1873,19 @@ static u32 airoha_get_dsa_tag(struct sk_buff *sk=
-b, struct net_device *dev)
-> >  #endif
-> >  }
-> > =20
-> > +static bool airoha_dev_is_tx_busy(struct airoha_queue *q, u32 nr_frags)
-> > +{
-> > +	u16 index =3D (q->head + nr_frags) % q->ndesc;
-> > +
-> > +	/* completion napi can free out-of-order tx descriptors if hw QoS is
-> > +	 * enabled and packets with different priorities are queued to the sa=
-me
-> > +	 * DMA ring. Take into account possible out-of-order reports checking
-> > +	 * if the tx queue is full using circular buffer head/tail pointers
-> > +	 * instead of the number of queued packets.
-> > +	 */
-> > +	return index >=3D q->tail && (q->head < q->tail || q->head > index);
->=20
-> Hi Lorenzo,
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
 
-Hi Simon,
-
-thx for the review.
-
->=20
-> I think there is a corner case here.
-> Perhaps they can't occur, but here goes.
->=20
-> Let us suppose that head is 1.
-> And the ring is completely full, so tail is 2.
->=20
-> Now, suppose nr_frags is ndesc - 1.
-> In this case the function above will return false. But the ring is full.
->=20
-> Ok, ndesc is actually 1024 and nfrags should never be close to that.
-> But the problem is general. And a perhaps more realistic example is:
->=20
->   ndesc is 1024
->   head is 1008
->   The ring is full so tail is 1009
->   (Or head is any other value that leaves less than 16 slots free)
->   nr_frags is 16
->=20
-> airoha_dev_is_tx_busy() returns false, even though the ring is full.
-
-yes, you are right, this corner case is not properly managed by the proposed
-algorithm, thx for pointing this out.
-
->=20
-> Probably this has it's own problems. But if my reasoning above is correct
-> (is it?) then the following seems to address it by flattening and extendi=
-ng
-> the ring. Because what we are about is the relative value of head, index
-> and tail. Not the slots they occupy in the ring.
->=20
-> N.B: I tetsed the algorirthm with a quick implementation in user-space.
-> The following is, however, completely untested.
->=20
-> static bool airoha_dev_is_tx_busy(struct airoha_queue *q, u32 nr_frags)
-> {
-> 	unsigned int tail =3D q->tail < q->head ? q->tail + q->ndesc : q->tail;
-> 	unsigned int index =3D q->head + nr_frags;
->=20
-> 	return index >=3D tail;
-> }
-
-I agree, the algorithm you proposed properly manages the 99% of the cases. =
-The
-only case where it fails is when the queue is empty (so tail =3D head =3D x,
-e.g. x =3D 0). In this case we would have:
-
-	- q->ndesc =3D 1024
-	- q->tail =3D q->head =3D 0
-	- tail =3D 0
-	- index =3D n (e.g. n =3D 1)
-	- index >=3D tail =3D=3D> 1 >=3D 0 =3D=3D> busy (but the queue is actually=
- empty).
-
-I guess we should add a minor change in the tail definition:
-
-	u32 tail =3D q->tail <=3D q->head ? q->tail + q->ndesc : q->tail;
-
-so:
-	- q->ndesc =3D 1024
-	- q->tail =3D q->head =3D 0
-	- tail =3D 1024
-	- index =3D n (e.g. n =3D 1)
-	- index >=3D tail =3D> 1 < 1024 =3D> OK
-
-Can you spot any downside with this approach?
-I tested the proposed approach and it seems to be working fine.
-
-Regards,
-Lorenzo
-
->=20
-> ...
-
---nk5Dyb1DUQd53K2s
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaOpc8QAKCRA6cBh0uS2t
-rIRpAQDSIsIVZ9Ty0Rkg1NUgdKBIwZ81yEMCdi/+UaKq4bLPLgEAj8DhwXBDnnv0
-f4sdK7RnQFXPyXMgAKP1Sck+WfHt7QU=
-=csea
------END PGP SIGNATURE-----
-
---nk5Dyb1DUQd53K2s--
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
