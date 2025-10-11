@@ -1,89 +1,110 @@
-Return-Path: <netdev+bounces-228581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1B52BCF1BE
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 10:02:11 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A2B3BCF224
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 10:25:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BAB819A48DA
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 08:02:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3D8724E2672
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 08:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C5F8185955;
-	Sat, 11 Oct 2025 08:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC95B233707;
+	Sat, 11 Oct 2025 08:25:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MUKrm9hR"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="TTmvfZe5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 507BC1EEA31;
-	Sat, 11 Oct 2025 08:02:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182AB2045B7;
+	Sat, 11 Oct 2025 08:25:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760169728; cv=none; b=W7faEOupvgW/6YQKlBFkkEDTsBBJ9xkYOVp/P9toUw5++BuAKMh4sUcwB4IFmDVAHqlH90Ysh078+rq7QEdAAgPPzMcbLssnfKSlD2nW+XQQtV572dgO61f+PHhsiFSTIRIv1hHQpk27lad2x4hj/bEkFMlQPwMxY23+JsAdp1k=
+	t=1760171111; cv=none; b=uBrAF+sSaFb+bTJ3oyK4PahmJqCow3E6J6UDu5Fj7HMh7e5+BKveTilfqkHJccChN7xrxhYDZmv8CjXhbFyF03uHV3SK1LpSFO+SRGfgYr1mJzmP9dBpjx3po5FTIsSrjI7fOXj3gEOhvLwqX1GKMaEZNzfrtaHMxAcFmEN2/eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760169728; c=relaxed/simple;
-	bh=kdpPAoMGGneDhkZQDbHzrKQRkHA/Rwa4e7iHJOy/Qdw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n4Ix4diAwcf4iVT8fjmtwJgK0KkOwZ+LSjTH2dPUIkK0Ml5XEEeV+lPgqhEZsVfwPjI1vZ9ZYcHJ4eW2roHC4ZHSUgpryf/P+5TNqqkYV8ZZePd/VwBhGYFVtO5ovSyc+LkIC/Elpzxe1W8YtZmVjf6hk0iyiOEdhAsiYvFePEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MUKrm9hR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FC07C4CEF4;
-	Sat, 11 Oct 2025 08:02:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760169724;
-	bh=kdpPAoMGGneDhkZQDbHzrKQRkHA/Rwa4e7iHJOy/Qdw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MUKrm9hR2SrUvaqPKbA96PQrvg/bGFmBODThuJZapHwSXb6CL5EoU3sPd9l+toz5N
-	 U2qXAEH8qReXHhVESrdot0Qo0FVBxUGvAGw715K5iqT2f4FnmSy3dXRhclFhvSptSd
-	 YMvPPl6hJwPBr7Hx94oy1ixuUAnV1D/eVMYjeP2qe47CgJetSidHnzMr5afDZXdiOF
-	 o9fv/dFhTTRS12W30AW441DCyxTMZNAgCy9nuKYvtddphGqyoEsK1+I6oAM9RJrwG+
-	 ntS5qXW3ykk+fKpmNetWqi+TSXatMcFQasazZvQY+b9JnhPdQQ7bmr//JEXkdisD/x
-	 yeaGiAiNOx5Sg==
-Date: Sat, 11 Oct 2025 09:02:00 +0100
-From: Simon Horman <horms@kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Philippe Guibert <philippe.guibert@6wind.com>
-Subject: Re: [PATCH net] doc: fix seg6_flowlabel path
-Message-ID: <aOoO-AXbtSEwEoZH@horms.kernel.org>
-References: <20251010141859.3743353-1-nicolas.dichtel@6wind.com>
+	s=arc-20240116; t=1760171111; c=relaxed/simple;
+	bh=7+Y8h6gXG2SuDe1E/iknJtQNKxJeFP7rvXWOL/4bjjU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CYFYZwcMCp7EX4weOJ8KPtvRyQnq7G3KjoYwPnKS8zrCTbptp69VdhVPbM4U3U0OutO2LQY9hJ8GzhlTUz+COIvtbOVjjOu3vuPgdKgkNlnyV6sC3LvoDSoV56CPi6E160MnJPaR+G8hCtrifvdUgtc3unoJzShDhRrFXzauCdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=TTmvfZe5; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=wn
+	raGndEW17agKJvHcNVi4M70SQfTkop2yVtlgiy4zk=; b=TTmvfZe5vFrGqWjPPP
+	ELwdz9pu/oOgs2t0HSNCQMELhKRKajV2qFF9EBGlb5gCqYhato781FcnS/42o/lH
+	/mqz64gBl1y8b/hkxHB4baqp+fEMeFHKKUg7oBcY70LxHzLMHi2SMGSRgWDaLi/4
+	AmIta4PDZx2BdcZO37KzCJvqk=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wD3LyUxFOpojB64DQ--.7680S2;
+	Sat, 11 Oct 2025 16:24:17 +0800 (CST)
+From: yicongsrfy@163.com
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	oneukum@suse.com
+Cc: horms@kernel.org,
+	kuba@kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	stable@vger.kernel.org,
+	Yi Cong <yicong@kylinos.cn>
+Subject: [PATCH net v3] r8152: add error handling in rtl8152_driver_init
+Date: Sat, 11 Oct 2025 16:24:15 +0800
+Message-Id: <20251011082415.580740-1-yicongsrfy@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251010141859.3743353-1-nicolas.dichtel@6wind.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3LyUxFOpojB64DQ--.7680S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrKFWrGFWfur1UXr1fJw43Wrg_yoWkuwbEkr
+	y0ga43Xr1DuFW5Kr15Wr4avrySkan0vFn3Zr1xt3sIgwnrXrn5Gr15Zr9xXw4UWryfZF9x
+	Ca1UGFyxCr129jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8xwIDUUUUU==
+X-CM-SenderInfo: p1lf00xjvuw5i6rwjhhfrp/1tbixwTj22jqDAYbEgABs7
 
-On Fri, Oct 10, 2025 at 04:18:59PM +0200, Nicolas Dichtel wrote:
-> This sysctl is not per interface; it's global per netns.
-> 
-> Fixes: 292ecd9f5a94 ("doc: move seg6_flowlabel to seg6-sysctl.rst")
-> Reported-by: Philippe Guibert <philippe.guibert@6wind.com>
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+From: Yi Cong <yicong@kylinos.cn>
 
-Thanks.
+rtl8152_driver_init missing error handling.
+If cannot register rtl8152_driver, rtl8152_cfgselector_driver
+should be deregistered.
 
-Thinking aloud:
-
-I see that above the lines added by this patch are documentation
-for the variables seg6_require_hmac and seg6_enabled. Which
-are per interface. And thus documented correctly.
-
-And below the lines added by the patch is only seg6_flowlabel.
-Which, as the patch description says, are global rather than
-per interface. And with this patch that is now documented correctly too.
-
-I also agree that this problem was introduced by the cited commit.
-
-And as a documentation correction it seems appropriate for net.
-
+Fixes: ec51fbd1b8a2 ("r8152: add USB device driver for config selection")
+Cc: stable@vger.kernel.org
+Signed-off-by: Yi Cong <yicong@kylinos.cn>
 Reviewed-by: Simon Horman <horms@kernel.org>
+
+---
+v2: replacing return 0 with return ret and adding Cc stable
+v3: delete the redundant return ret
+---
+ drivers/net/usb/r8152.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index 44cba7acfe7d..a22d4bb2cf3b 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -10122,7 +10122,12 @@ static int __init rtl8152_driver_init(void)
+ 	ret = usb_register_device_driver(&rtl8152_cfgselector_driver, THIS_MODULE);
+ 	if (ret)
+ 		return ret;
+-	return usb_register(&rtl8152_driver);
++
++	ret = usb_register(&rtl8152_driver);
++	if (ret)
++		usb_deregister_device_driver(&rtl8152_cfgselector_driver);
++
++	return ret;
+ }
+ 
+ static void __exit rtl8152_driver_exit(void)
+-- 
+2.25.1
+
 
