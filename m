@@ -1,67 +1,50 @@
-Return-Path: <netdev+bounces-228596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3570BCF6FB
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 16:21:13 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DCD1BCF74F
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 16:30:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8BC240554F
-	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 14:21:12 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3D7864E1C1A
+	for <lists+netdev@lfdr.de>; Sat, 11 Oct 2025 14:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA6B193077;
-	Sat, 11 Oct 2025 14:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jVgGZBNM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD26E20468E;
+	Sat, 11 Oct 2025 14:30:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7811CFBA
-	for <netdev@vger.kernel.org>; Sat, 11 Oct 2025 14:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD3286347;
+	Sat, 11 Oct 2025 14:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760192470; cv=none; b=WJbjuelQHEjsn/9zVFP2U3l2slyuzwR2s7OKVaVWjKWJShXmggFvX4iWjWkosaPAuLum+WqRhRhzyNT6SdRZ/wgJAOI58Ve/BT+epHxodVxGLLJzORywfepEGZ254iJHQjipcqKMzGC7OW5c4Sbpj15o6IpE8mSuC6JLhqGX/fw=
+	t=1760193010; cv=none; b=ZxurTww8tYki6D16iqXRf1qOtLK4mK0AMQSPLei7cBEyrqAnCoLOX5VpGU1TEStkxTIzDzQW5q3V0qC8LZoDzKNZU6X3Mr2t8k0Ckuji0AsrOW2Cj3iFE26N7F76awGEjc6BK6bTuNJA2K8wxikiWOQRSB9Pn2BhJVXj3clYZ6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760192470; c=relaxed/simple;
-	bh=L7qfveNFfXijTIQvQDxPrY+XLUonkpO+WK3/+8YcIlw=;
+	s=arc-20240116; t=1760193010; c=relaxed/simple;
+	bh=wczVGQH1eHpzXRC3+L/CdGXCe/iIQeLXs4DV7ZAvwck=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dx7p9aVTpOURGRnWS3bYfojvdU0mn4dfmXkrJdh10SVmCQ0pYRjQsE7KejP0dUjLsDZGCUp4NdxVw6wkZ4EHn7Ewssi7dFJ3DdxL38Wcbn7Ng2jWTsRw04lVwOzKiYlrYDHpWJbCORdAp4QkK01Sd2PYcmI4fap0XTK5Ceoiroc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jVgGZBNM; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9ki1VtZs/7m7y7Kpedz6/5N8IlHLHdl/yh+d2a/xlrU=; b=jVgGZBNMuhiSfiUDisQODor4Y1
-	w8O0FrMmfZZcDLDH7ZBR8/gd9A+AYER16bFy7tKrxcCFTe9ASchYzGSefqsbsew8D6FrpOKvjelKp
-	ND9NVkIeFqW0kRjLNLC7wYVKa6gRqLUvMQR8IMRUcflT3gNC7rKblHdGY8ol8ytJHEB8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1v7aSr-00AfV6-DW; Sat, 11 Oct 2025 16:20:53 +0200
-Date: Sat, 11 Oct 2025 16:20:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: 'Simon Horman' <horms@kernel.org>, netdev@vger.kernel.org,
-	'Andrew Lunn' <andrew+netdev@lunn.ch>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	'Eric Dumazet' <edumazet@google.com>,
-	'Jakub Kicinski' <kuba@kernel.org>,
-	'Paolo Abeni' <pabeni@redhat.com>,
-	"'Russell King (Oracle)'" <rmk+kernel@armlinux.org.uk>,
-	'Mengyuan Lou' <mengyuanlou@net-swift.com>
-Subject: Re: [PATCH net-next 1/3] net: txgbe: expend SW-FW mailbox buffer
- size to identify QSFP module
-Message-ID: <c42a5a4a-b886-4dbd-a893-3d1f2885ef4f@lunn.ch>
-References: <20250928093923.30456-1-jiawenwu@trustnetic.com>
- <20250928093923.30456-2-jiawenwu@trustnetic.com>
- <aNqPAH2q0sqxE6bX@horms.kernel.org>
- <000201dc39b9$5cdcf5f0$1696e1d0$@trustnetic.com>
- <f4c6d749-020a-46ca-844b-558542113327@lunn.ch>
- <002301dc3a52$63a80fc0$2af82f40$@trustnetic.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=c5UIKSISCffuF5ZxQEuo4lNiERNVBqCKUGtkkB4xLFvAjLxQTYD21UnrYVbL2g3LepSd29xSHm19TRM3GYOn/bTBDF3cjvbQyIwVMU0hF6VWU5+nZD22xpK8dqHu1Ms4+PGI5s2mox0REwQb6MueVogsPuwHFIAdizHI3Ov8kCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id A522160742; Sat, 11 Oct 2025 16:30:06 +0200 (CEST)
+Date: Sat, 11 Oct 2025 16:30:06 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
+	sdf@fomichev.me
+Subject: Re: [PATCH net 2/2] net: core: split unregister_netdevice list into
+ smaller chunks
+Message-ID: <aOpp7n2E9ZVS6RJh@strlen.de>
+References: <20251010135412.22602-1-fw@strlen.de>
+ <20251010135412.22602-3-fw@strlen.de>
+ <aOmK5i5e_Oi93JiO@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,17 +53,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <002301dc3a52$63a80fc0$2af82f40$@trustnetic.com>
+In-Reply-To: <aOmK5i5e_Oi93JiO@mini-arch>
 
-> The old firmware has not been released to the public, so there is no need
-> to worry about the compatibility on the old firmware.
+Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> On 10/10, Florian Westphal wrote:
+> > +static void unregister_netdevice_close_many_lockdep(struct list_head *head)
+> > +{
+> > +#ifdef CONFIG_LOCKDEP
+> > +	unsigned int lock_depth = lockdep_depth(current);
+> > +	unsigned int lock_count = lock_depth;
+> > +	struct net_device *dev, *tmp;
+> > +	LIST_HEAD(done_head);
+> > +
+> > +	list_for_each_entry_safe(dev, tmp, head, unreg_list) {
+> > +		if (netdev_need_ops_lock(dev))
+> > +			lock_count++;
+> > +
+> > +		/* we'll run out of lockdep keys, reduce size. */
+> > +		if (lock_count >= MAX_LOCK_DEPTH - 1) {
+> > +			LIST_HEAD(tmp_head);
+> > +
+> > +			list_cut_before(&tmp_head, head, &dev->unreg_list);
+> > +			unregister_netdevice_close_many(&tmp_head);
+> > +			lock_count = lock_depth;
+> > +			list_splice_tail(&tmp_head, &done_head);
+> > +		}
+> > +	}
+> > +
+> > +	unregister_netdevice_close_many(head);
+> > +
+> > +	list_for_each_entry_safe_reverse(dev, tmp, &done_head, unreg_list)
+> > +		list_move(&dev->unreg_list, head);
+> > +#else
+> > +	unregister_netdevice_close_many(head);
+> > +#endif
+> 
+> 
+> Any reason not to morph the original code to add this 'no more than 8 at a
+> time' constraint? Having a separate lockdep path with list juggling
+> seems a bit fragile.
+> 
+> 1. add all ops locked devs to the list
+> 2. for each MAX_LOCK_DEPTH (or 'infinity' in the case of non-lockdep)
+>   2.1 lock N devs
+>   2.2 netif_close_many
+>   2.3 unlock N devs
+> 3. ... do the non-ops-locked ones
+> 
+> This way the code won't diverge too much I hope.
 
-Please add this to the commit message.
+I think that having extra code for LOCKDEP (which means debug kernel
+that often also includes k?san, kmemleak etc. is ok.
 
-Once firmware is out in the wild, you need to consider backwards
-compatibility. As reviewers, it is something we look at. So you can
-save us time and effort by saying backwards compatibility is not
-required because ...
+I was more concerned with having no changes to normal (non-lockdep)
+kernel.
 
-	Andrew
+Let me try again, I tried to do your solution above before going with
+this extra lockdep-only juggling but I ended up making a mess.
 
