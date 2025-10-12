@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-228625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 893B1BD03CD
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 16:29:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A11CBD03C4
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 16:29:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 35C0F347D88
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 14:29:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 117B93BE257
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 14:28:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239DB2874EA;
-	Sun, 12 Oct 2025 14:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF212874F7;
+	Sun, 12 Oct 2025 14:28:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4C02882DF
-	for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 14:28:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF11228726F
+	for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 14:28:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760279336; cv=none; b=VbvAiVp9mVcrlK8tukhl9VbMyZvYG5nMJtT2ciiBZNMLvClEHeUDw3ZxmzLhW1MrfKfZXwtJYjvkU5Aj+zEEtuDTVkvsm4pHRE71ChmEgIna4L2/7Y+KaS2XZQEBXpbATTbrDzBujT8lzb8JWBYXh001QpqWgpq93ONoQw/7jKc=
+	t=1760279333; cv=none; b=GrET3H5nbXGvJPBf8ila1PQ86srjfLn8vDST5jz1B8xOu86Pqs4SoQOCSPme1LvpT5bnDBxzW76T+DHWtHVuGpjiQhPi1o9PBVDz8+ZRpRx7fqN4nTYA62wQN806iCKM0A7pio4anxJeVvpLB9HBuo1ZWA6j8u4ylJg78TFLvw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760279336; c=relaxed/simple;
-	bh=zkX2Q58K2Q/Ts4j32RbqD+OkAZHda5+HV3RfXV9Wxpk=;
+	s=arc-20240116; t=1760279333; c=relaxed/simple;
+	bh=V4741N7mWje9GwplW/wE4MaPFAZiPIK/txjYm32qFvk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V0BXWbQxj8zgmbkJEfHv33KzQSa8PPIDlzFW97zVyRUVeSmjeLzm+5CpF5lili0fb1A3tqVKh7qi/280MKCR/cIdn8OV7ML7aL4uDBLURQS7YHS/22haWRWf4lVeio67+JFTShkqDyU+MjbtoRGfcSNH3mkFRxd5UBUAqCfQShE=
+	 MIME-Version; b=WuA2RJYhm+XB4TBAgzCjq8kuFRbmKydiskVCQSmT9DkryWQtNxDgbZkxnPNWRZMv6Ll1TTTYtHK2pehK8WXyrlXOeswe0CAtt6xqyu+FLpqv+N8Y8YJq+uvkfDdvAN4zdKqlxThHIfASUCXqXMU7gTl/drfsWhtyyjY9v76GOzI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,19 +33,19 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1v7x3x-00044i-IN; Sun, 12 Oct 2025 16:28:41 +0200
+	id 1v7x3w-00044j-8W; Sun, 12 Oct 2025 16:28:40 +0200
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1v7x3v-003EUj-1A;
+	id 1v7x3v-003EUk-1Q;
 	Sun, 12 Oct 2025 16:28:39 +0200
 Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
 	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 0699C48405E;
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 1937848405F;
 	Sun, 12 Oct 2025 14:28:39 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -54,13 +54,11 @@ Cc: davem@davemloft.net,
 	linux-can@vger.kernel.org,
 	kernel@pengutronix.de,
 	Celeste Liu <uwu@coelacanthus.name>,
-	Runcheng Lu <runcheng.lu@hpmicro.com>,
 	stable@vger.kernel.org,
-	Vincent Mailhol <mailhol@kernel.org>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net 1/9] can: gs_usb: increase max interface to U8_MAX
-Date: Sun, 12 Oct 2025 16:20:45 +0200
-Message-ID: <20251012142836.285370-2-mkl@pengutronix.de>
+Subject: [PATCH net 2/9] can: gs_usb: gs_make_candev(): populate net_device->dev_port
+Date: Sun, 12 Oct 2025 16:20:46 +0200
+Message-ID: <20251012142836.285370-3-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251012142836.285370-1-mkl@pengutronix.de>
 References: <20251012142836.285370-1-mkl@pengutronix.de>
@@ -78,118 +76,35 @@ X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 From: Celeste Liu <uwu@coelacanthus.name>
 
-This issue was found by Runcheng Lu when develop HSCanT USB to CAN FD
-converter[1]. The original developers may have only 3 interfaces
-device to test so they write 3 here and wait for future change.
+The gs_usb driver supports USB devices with more than 1 CAN channel.
+In old kernel before 3.15, it uses net_device->dev_id to distinguish
+different channel in userspace, which was done in commit
+acff76fa45b4 ("can: gs_usb: gs_make_candev(): set netdev->dev_id").
+But since 3.15, the correct way is populating net_device->dev_port.
+And according to documentation, if network device support multiple
+interface, lack of net_device->dev_port SHALL be treated as a bug.
 
-During the HSCanT development, we actually used 4 interfaces, so the
-limitation of 3 is not enough now. But just increase one is not
-future-proofed. Since the channel index type in gs_host_frame is u8,
-just make canch[] become a flexible array with a u8 index, so it
-naturally constraint by U8_MAX and avoid statically allocate 256
-pointer for every gs_usb device.
-
-[1]: https://github.com/cherry-embedded/HSCanT-hardware
-
-Fixes: d08e973a77d1 ("can: gs_usb: Added support for the GS_USB CAN devices")
-Reported-by: Runcheng Lu <runcheng.lu@hpmicro.com>
+Fixes: acff76fa45b4 ("can: gs_usb: gs_make_candev(): set netdev->dev_id")
 Cc: stable@vger.kernel.org
-Reviewed-by: Vincent Mailhol <mailhol@kernel.org>
 Signed-off-by: Celeste Liu <uwu@coelacanthus.name>
-Link: https://patch.msgid.link/20250930-gs-usb-max-if-v5-1-863330bf6666@coelacanthus.name
+Link: https://patch.msgid.link/20250930-gs-usb-populate-net_device-dev_port-v1-1-68a065de6937@coelacanthus.name
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/usb/gs_usb.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ drivers/net/can/usb/gs_usb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/net/can/usb/gs_usb.c b/drivers/net/can/usb/gs_usb.c
-index c9482d6e947b..9fb4cbbd6d6d 100644
+index 9fb4cbbd6d6d..69b8d6da651b 100644
 --- a/drivers/net/can/usb/gs_usb.c
 +++ b/drivers/net/can/usb/gs_usb.c
-@@ -289,11 +289,6 @@ struct gs_host_frame {
- #define GS_MAX_RX_URBS 30
- #define GS_NAPI_WEIGHT 32
+@@ -1245,6 +1245,7 @@ static struct gs_can *gs_make_candev(unsigned int channel,
  
--/* Maximum number of interfaces the driver supports per device.
-- * Current hardware only supports 3 interfaces. The future may vary.
-- */
--#define GS_MAX_INTF 3
--
- struct gs_tx_context {
- 	struct gs_can *dev;
- 	unsigned int echo_id;
-@@ -324,7 +319,6 @@ struct gs_can {
+ 	netdev->flags |= IFF_ECHO; /* we support full roundtrip echo */
+ 	netdev->dev_id = channel;
++	netdev->dev_port = channel;
  
- /* usb interface struct */
- struct gs_usb {
--	struct gs_can *canch[GS_MAX_INTF];
- 	struct usb_anchor rx_submitted;
- 	struct usb_device *udev;
- 
-@@ -336,9 +330,11 @@ struct gs_usb {
- 
- 	unsigned int hf_size_rx;
- 	u8 active_channels;
-+	u8 channel_cnt;
- 
- 	unsigned int pipe_in;
- 	unsigned int pipe_out;
-+	struct gs_can *canch[] __counted_by(channel_cnt);
- };
- 
- /* 'allocate' a tx context.
-@@ -599,7 +595,7 @@ static void gs_usb_receive_bulk_callback(struct urb *urb)
- 	}
- 
- 	/* device reports out of range channel id */
--	if (hf->channel >= GS_MAX_INTF)
-+	if (hf->channel >= parent->channel_cnt)
- 		goto device_detach;
- 
- 	dev = parent->canch[hf->channel];
-@@ -699,7 +695,7 @@ static void gs_usb_receive_bulk_callback(struct urb *urb)
- 	/* USB failure take down all interfaces */
- 	if (rc == -ENODEV) {
- device_detach:
--		for (rc = 0; rc < GS_MAX_INTF; rc++) {
-+		for (rc = 0; rc < parent->channel_cnt; rc++) {
- 			if (parent->canch[rc])
- 				netif_device_detach(parent->canch[rc]->netdev);
- 		}
-@@ -1460,17 +1456,19 @@ static int gs_usb_probe(struct usb_interface *intf,
- 	icount = dconf.icount + 1;
- 	dev_info(&intf->dev, "Configuring for %u interfaces\n", icount);
- 
--	if (icount > GS_MAX_INTF) {
-+	if (icount > type_max(parent->channel_cnt)) {
- 		dev_err(&intf->dev,
- 			"Driver cannot handle more that %u CAN interfaces\n",
--			GS_MAX_INTF);
-+			type_max(parent->channel_cnt));
- 		return -EINVAL;
- 	}
- 
--	parent = kzalloc(sizeof(*parent), GFP_KERNEL);
-+	parent = kzalloc(struct_size(parent, canch, icount), GFP_KERNEL);
- 	if (!parent)
- 		return -ENOMEM;
- 
-+	parent->channel_cnt = icount;
-+
- 	init_usb_anchor(&parent->rx_submitted);
- 
- 	usb_set_intfdata(intf, parent);
-@@ -1531,7 +1529,7 @@ static void gs_usb_disconnect(struct usb_interface *intf)
- 		return;
- 	}
- 
--	for (i = 0; i < GS_MAX_INTF; i++)
-+	for (i = 0; i < parent->channel_cnt; i++)
- 		if (parent->canch[i])
- 			gs_destroy_candev(parent->canch[i]);
- 
-
-base-commit: 2c95a756e0cfc19af6d0b32b0c6cf3bada334998
+ 	/* dev setup */
+ 	strcpy(dev->bt_const.name, KBUILD_MODNAME);
 -- 
 2.51.0
 
