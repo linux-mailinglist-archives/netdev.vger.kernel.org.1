@@ -1,277 +1,146 @@
-Return-Path: <netdev+bounces-228636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1BE9BD0685
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 17:53:14 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2816DBD069E
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 18:01:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE1601894C96
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 15:53:37 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 91B2C4E1F26
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 16:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1326E2EC0A5;
-	Sun, 12 Oct 2025 15:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A33C51C6FEC;
+	Sun, 12 Oct 2025 16:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Nw9TG1jS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lgo26uS2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659392EC08A
-	for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 15:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DF4C1EA65;
+	Sun, 12 Oct 2025 16:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760284390; cv=none; b=n8Lg3Q8O2cPLf1U9cYq/E3XK5PLntbZC0xFBeD6JW50MaRI25LvCuMYQuDBRp70ZZ1K1/c69ZWU4aisYt1dEf8liRAwXLrpaWR8AsVnJst8JAtNiJWIzgUK79ud5J3ksQuA+/T+TV2enxJkdtRHu3LViH/C77hAUslKmSnCv5Zw=
+	t=1760284879; cv=none; b=iYNbRwf29iwhyX5LbQmxoKZOGkvw0q9KFKG2VZoufU/PSrTOmPq0aglN7LGuaxBRevRGxhyHIcYd1ciOoO+NfDRZ2pIeIGWdk2UyNxrsNMcoS1Iu2K3TXCMlXdZMUekqjZ2I7Y2bmE7jgzuaCgxzDRprcrIuYQBzK1TbjtPu+Wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760284390; c=relaxed/simple;
-	bh=/VMuLvjH0Wpf8hba41ay39CHIHfntnq3esFPC5cSfb0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mnMNgIDwUIJrEcF5Vj2S9SmQWT13q3vAw/xPL8pBhXlV22dumUeuzmuwAEhOBG4S/VUBNxzcXm3LeUBrKMce33bLaFHzi1N47oGaTfAjzGNs2ckyj91TDfVeKvylZH10UwRHfs6OSlTIlnCLbKyjQ16x3z4XG0iLOQ8wcRmuSJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=Nw9TG1jS; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-267f0fe72a1so24470475ad.2
-        for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 08:53:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1760284385; x=1760889185; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3vNK/W2vE5CrWbmOQptlg81Stw1jBqstidM0EFkFfMA=;
-        b=Nw9TG1jSKvNro0FAQYf6zxcfXH9S/1ssnOh/ibWEKnsMpNJrrun1FsWYOeqjxwJhaj
-         WG4Md5dwpA5TPgoEz9695HeApz67QB+2RTLXX5T4qexUuBzuN0mZeHN1oS8xOSk1qtp/
-         r/nXVm4GRsKjwVtxHoFEsWXcZo2x0biPmiUwyHx9PCONBjebSGPZMlQLEquXA7nCERNb
-         rYhxreOKS/lv6K1dF06obrjmwnBnQglzCloquTfkNVCUyDjMivvW3Kk1m6Oq6Hl3s52i
-         K2IJxyN7mURQjYO/zDaDUzbsFFtFeW+Z80KIkAMsVI6DiQ0KLumILsVMVM6BUTdYoX77
-         xn/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760284385; x=1760889185;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3vNK/W2vE5CrWbmOQptlg81Stw1jBqstidM0EFkFfMA=;
-        b=eaSp9bXF/LIsFnj35BnxRU/V1kbtU6EL9cWFXsXf7qHDKlCvHpbUdzi1tBK/OEPfKI
-         ZbHwHh4NzUTLfyqxD+B1Eb2iyqBB1/d4jmfXyXhT9vbXGe2idtScZb9mokvXZZyIYZjh
-         1zJ6X6SMAEcIctPcDhgU4K3EKeOZ2PN8LYxmNYIFnNtICDGx+4rQTFRETgNynQVVqUIg
-         Nd1J2oRHz6QpjV6YYO/L1ceJ9iP2wsJdLBq7FzZBVhPMTRHhDtewn9BqOI968t29bqz+
-         GahxQu7uS9nvFP/N61WGHQL2hxgzKow0iTlI5U4xQf+rzlXFE/A3LjuHNm65WLl9I1sU
-         /y0w==
-X-Forwarded-Encrypted: i=1; AJvYcCVlyPJcaRpl51v9pDp5/s89ASL1izPe4rrkijUPuAUVVRANNf0jGtvbp/qoE6KM3oWEtQACDfM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPhUybKyfItVtLirnSp5wXkjNzH0p+VN8zxIFDxr3+2qqtdHBG
-	eLfzAbek+vdH1ZoPFHSTi0GIAX7nqmvZG0sKuZDc4E0jgVZmln8maHVZltry9XQ6GwuD/q9piie
-	Vauz5fa3x0Ns3sXk4U5UCpQ8gqs7LdoNaoyIrV9fS
-X-Gm-Gg: ASbGncuSQ5ob6WdYRr8TBcKyp2LUkblx4qVyo4avyvhqOA3XwbmLFqg0rwpcIJty8zp
-	2hhJq/4pvp3eBA/T+mDez2YXZc5HYD6mB5jhPzrByT+MghU0GCkgsMqvdRezHCKvvoxYHroH65S
-	1HA460myn9xt/QtrUgQKzVFnC+XwBTDuBNXZ/DDY91RS6Nkhxe+7+fciyvK01E1TGDgbk538NIS
-	Yo0GUEnFh+jmdp6tKkzTwcldyRBekx2TI+e8QPpi914LBnjKpFPj7Zr61uZPOJgGxN4MaXthfiI
-	T8qFIQ9fFcdC
-X-Google-Smtp-Source: AGHT+IHxJtS5I9ErUleO7vIDv0xZFGkNk841TYZctOcE+MKe/RoTQlBh65eDZvjqgIUYgCqACIrwNf+6cqJVjXJV/UM=
-X-Received: by 2002:a17:902:cf04:b0:267:b6f9:2ce with SMTP id
- d9443c01a7336-2902736dff9mr237505235ad.41.1760284385140; Sun, 12 Oct 2025
- 08:53:05 -0700 (PDT)
+	s=arc-20240116; t=1760284879; c=relaxed/simple;
+	bh=nuCpDcaIg+ludZm6wKQk4NOIO06DFnB9ROm6alQpbkg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XLoVbIYSm8waApgGqamFJAgBJpMk2rs8NoQrbE1TCk5uPwo2lmWKnKefGIxhMpIuWFlRsAXtp1PBYNdoI9Ie/mlESrCgIvX/Ld7k+nqZZKPEifhTJBAN6bFFdySyb56GqW3MlTWo49zyqwH41u9gXdqKLVNMcwLhNCLPTFyGD/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lgo26uS2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDA35C4CEE7;
+	Sun, 12 Oct 2025 16:01:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760284878;
+	bh=nuCpDcaIg+ludZm6wKQk4NOIO06DFnB9ROm6alQpbkg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=lgo26uS2OIp5tlRd2gFqM1yZDIIxfNYLOgglamjrOaj9Elz/84HuwTHlMIKqoGGbw
+	 sZF4x5q5YLX/pKgWCv9Oivzyx4ymSx/ldPdGfLAYKM/Sz6APrnsTAoierUty+NH9vF
+	 FxgJs/LdzMoC1JOLZITF4diky8XVbBcfY6rMwYX5bj+xY76i3ChXz9wQ4uMt+3On8I
+	 VsPVE6f6l78X8aDi6Cm4waVTtbaQPmzze+BL4uICztHkgY7zy6VdwWHSwbXw6oAt+f
+	 X+DumqVuuP9Qfahjf9m/azFc6qj7eGjOZIzv3cZTOPQ+uiPxLZPk2V81AiR65Fgbse
+	 ykCOAbQIWOH5w==
+Message-ID: <0c6045c9-67e1-4358-ae3a-d63c343eef79@kernel.org>
+Date: Mon, 13 Oct 2025 01:01:15 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <681a1770.050a0220.a19a9.000d.GAE@google.com> <68ea0a24.050a0220.91a22.01ca.GAE@google.com>
- <CANn89iLjjtXV3ZMxfQDb1bbsVJ6a_Chexu4FwqeejxGTwsR_kg@mail.gmail.com> <CAM0EoMnGLqKU7AnsgS00SEgU0eq71f-kiqNniCNyfiyAfNm8og@mail.gmail.com>
-In-Reply-To: <CAM0EoMnGLqKU7AnsgS00SEgU0eq71f-kiqNniCNyfiyAfNm8og@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sun, 12 Oct 2025 11:52:54 -0400
-X-Gm-Features: AS18NWDNSPnjrErWLLE3rdMuhlIqaiuldMhXvgJdXjdU8KW8o9PP9GYWiDABppA
-Message-ID: <CAM0EoMmK7TJ4w_heeMuD+YmUdMyEz7VWKY+a+qMO2UN4GYZ5jQ@mail.gmail.com>
-Subject: Re: [syzbot] [net?] [mm?] INFO: rcu detected stall in
- inet_rtm_newaddr (2)
-To: Eric Dumazet <edumazet@google.com>
-Cc: syzbot <syzbot+51cd74c5dfeafd65e488@syzkaller.appspotmail.com>, 
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>, davem@davemloft.net, dsahern@kernel.org, 
-	hdanton@sina.com, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, tglx@linutronix.de, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] can: add Transmitter Delay Compensation (TDC)
+ documentation
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Geert Uytterhoeven <geert@linux-m68k.org>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251012-can-fd-doc-v1-0-86cc7d130026@kernel.org>
+ <20251012-can-fd-doc-v1-2-86cc7d130026@kernel.org>
+ <1b53ea33-1c57-40e9-bc55-619d691e4c32@lunn.ch>
+Content-Language: en-US
+From: Vincent Mailhol <mailhol@kernel.org>
+Autocrypt: addr=mailhol@kernel.org; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ JFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbEBrZXJuZWwub3JnPsKZBBMWCgBBFiEE7Y9wBXTm
+ fyDldOjiq1/riG27mcIFAmdfB/kCGwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcC
+ F4AACgkQq1/riG27mcKBHgEAygbvORJOfMHGlq5lQhZkDnaUXbpZhxirxkAHwTypHr4A/joI
+ 2wLjgTCm5I2Z3zB8hqJu+OeFPXZFWGTuk0e2wT4JzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrb
+ YZzu0JG5w8gxE6EtQe6LmxKMqP6EyR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDl
+ dOjiq1/riG27mcIFAmceMvMCGwwFCQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8V
+ zsZwr/S44HCzcz5+jkxnVVQ5LZ4BANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <1b53ea33-1c57-40e9-bc55-619d691e4c32@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Oct 12, 2025 at 11:46=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
-> wrote:
->
-> On Sat, Oct 11, 2025 at 5:42=E2=80=AFAM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Sat, Oct 11, 2025 at 12:41=E2=80=AFAM syzbot
-> > <syzbot+51cd74c5dfeafd65e488@syzkaller.appspotmail.com> wrote:
-> > >
-> > > syzbot has found a reproducer for the following issue on:
-> > >
-> > > HEAD commit:    18a7e218cfcd Merge tag 'net-6.18-rc1' of git://git.ke=
-rnel...
-> > > git tree:       net-next
-> > > console output: https://syzkaller.appspot.com/x/log.txt?x=3D12504dcd9=
-80000
-> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=3D61ab7fa74=
-3df0ec1
-> > > dashboard link: https://syzkaller.appspot.com/bug?extid=3D51cd74c5dfe=
-afd65e488
-> > > compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909=
-b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D14d2a54=
-2580000
-> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D142149e25=
-80000
-> > >
-> > > Downloadable assets:
-> > > disk image: https://storage.googleapis.com/syzbot-assets/7a01e6dce97e=
-/disk-18a7e218.raw.xz
-> > > vmlinux: https://storage.googleapis.com/syzbot-assets/5e1b7e41427f/vm=
-linux-18a7e218.xz
-> > > kernel image: https://storage.googleapis.com/syzbot-assets/69b5586012=
-09/bzImage-18a7e218.xz
-> > >
-> > > IMPORTANT: if you fix the issue, please add the following tag to the =
-commit:
-> > > Reported-by: syzbot+51cd74c5dfeafd65e488@syzkaller.appspotmail.com
-> > >
-> > > sched: DL replenish lagged too much
-> > > rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-> > > rcu:    0-...!: (2 GPs behind) idle=3D7754/1/0x4000000000000000 softi=
-rq=3D15464/15465 fqs=3D1
-> > > rcu:    (detected by 1, t=3D10502 jiffies, g=3D11321, q=3D371 ncpus=
-=3D2)
-> > > Sending NMI from CPU 1 to CPUs 0:
-> > > NMI backtrace for cpu 0
-> > > CPU: 0 UID: 0 PID: 5948 Comm: syz-executor Not tainted syzkaller #0 P=
-REEMPT(full)
-> > > Hardware name: Google Google Compute Engine/Google Compute Engine, BI=
-OS Google 10/02/2025
-> > > RIP: 0010:rb_insert_color_cached include/linux/rbtree.h:113 [inline]
-> > > RIP: 0010:rb_add_cached include/linux/rbtree.h:183 [inline]
-> > > RIP: 0010:timerqueue_add+0x1a8/0x200 lib/timerqueue.c:40
-> > > Code: e7 31 f6 e8 6a 0c de f6 42 80 3c 2b 00 74 08 4c 89 f7 e8 7b 0a =
-de f6 4d 89 26 4d 8d 7e 08 4c 89 f8 48 c1 e8 03 42 80 3c 28 00 <74> 08 4c 8=
-9 ff e8 5e 0a de f6 4d 89 27 4d 85 e4 40 0f 95 c5 eb 07
-> > > RSP: 0018:ffffc90000007cf0 EFLAGS: 00000046
-> > > RAX: 1ffff110170c4f83 RBX: 1ffff110170c4f82 RCX: 0000000000000000
-> > > RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88805de72358
-> > > RBP: 0000000000000000 R08: ffff88805de72357 R09: 0000000000000000
-> > > R10: ffff88805de72340 R11: ffffed100bbce46b R12: ffff88805de72340
-> > > R13: dffffc0000000000 R14: ffff8880b8627c10 R15: ffff8880b8627c18
-> > > FS:  000055557c657500(0000) GS:ffff888125d0f000(0000) knlGS:000000000=
-0000000
-> > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > CR2: 0000200000000600 CR3: 000000002ee76000 CR4: 00000000003526f0
-> > > Call Trace:
-> > >  <IRQ>
-> > >  __run_hrtimer kernel/time/hrtimer.c:1794 [inline]
-> > >  __hrtimer_run_queues+0x656/0xc60 kernel/time/hrtimer.c:1841
-> > >  hrtimer_interrupt+0x45b/0xaa0 kernel/time/hrtimer.c:1903
-> > >  local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1041 [inline]
-> > >  __sysvec_apic_timer_interrupt+0x108/0x410 arch/x86/kernel/apic/apic.=
-c:1058
-> > >  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1052 [=
-inline]
-> > >  sysvec_apic_timer_interrupt+0xa1/0xc0 arch/x86/kernel/apic/apic.c:10=
-52
-> > >  </IRQ>
-> > >  <TASK>
-> > >  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idten=
-try.h:702
-> > > RIP: 0010:pv_vcpu_is_preempted arch/x86/include/asm/paravirt.h:579 [i=
-nline]
-> > > RIP: 0010:vcpu_is_preempted arch/x86/include/asm/qspinlock.h:63 [inli=
-ne]
-> > > RIP: 0010:owner_on_cpu include/linux/sched.h:2282 [inline]
-> > > RIP: 0010:mutex_spin_on_owner+0x189/0x360 kernel/locking/mutex.c:361
-> > > Code: b6 04 30 84 c0 0f 85 59 01 00 00 48 8b 44 24 08 8b 18 48 8b 44 =
-24 48 42 80 3c 30 00 74 0c 48 c7 c7 90 8c fa 8d e8 a7 cd 88 00 <48> 83 3d f=
-f 27 5e 0c 00 0f 84 b9 01 00 00 48 89 df e8 41 e0 d5 ff
-> > > RSP: 0018:ffffc900034c7428 EFLAGS: 00000246
-> > > RAX: 1ffffffff1bf5192 RBX: 0000000000000001 RCX: ffffffff819c6588
-> > > RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffffffff8f4df8a0
-> > > RBP: 1ffffffff1e9bf14 R08: ffffffff8f4df8a7 R09: 1ffffffff1e9bf14
-> > > R10: dffffc0000000000 R11: fffffbfff1e9bf15 R12: ffffffff8f4df8a0
-> > > R13: ffffffff8f4df8f0 R14: dffffc0000000000 R15: ffff8880267a9e40
-> > >  mutex_optimistic_spin kernel/locking/mutex.c:464 [inline]
-> > >  __mutex_lock_common kernel/locking/mutex.c:602 [inline]
-> > >  __mutex_lock+0x311/0x1350 kernel/locking/mutex.c:760
-> > >  rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
-> > >  inet_rtm_newaddr+0x3b0/0x18b0 net/ipv4/devinet.c:978
-> > >  rtnetlink_rcv_msg+0x7cf/0xb70 net/core/rtnetlink.c:6954
-> > >  netlink_rcv_skb+0x205/0x470 net/netlink/af_netlink.c:2552
-> > >  netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
-> > >  netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
-> > >  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
-> > >  sock_sendmsg_nosec net/socket.c:727 [inline]
-> > >  __sock_sendmsg+0x21c/0x270 net/socket.c:742
-> > >  __sys_sendto+0x3bd/0x520 net/socket.c:2244
-> > >  __do_sys_sendto net/socket.c:2251 [inline]
-> > >  __se_sys_sendto net/socket.c:2247 [inline]
-> > >  __x64_sys_sendto+0xde/0x100 net/socket.c:2247
-> > >  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> > >  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
-> > >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > > RIP: 0033:0x7faade790d5c
-> > > Code: 2a 5f 02 00 44 8b 4c 24 2c 4c 8b 44 24 20 89 c5 44 8b 54 24 28 =
-48 8b 54 24 18 b8 2c 00 00 00 48 8b 74 24 10 8b 7c 24 08 0f 05 <48> 3d 00 f=
-0 ff ff 77 34 89 ef 48 89 44 24 08 e8 70 5f 02 00 48 8b
-> > > RSP: 002b:00007ffdd2e3b670 EFLAGS: 00000293 ORIG_RAX: 000000000000002=
-c
-> > > RAX: ffffffffffffffda RBX: 00007faadf514620 RCX: 00007faade790d5c
-> > > RDX: 0000000000000028 RSI: 00007faadf514670 RDI: 0000000000000003
-> > > RBP: 0000000000000000 R08: 00007ffdd2e3b6c4 R09: 000000000000000c
-> > > R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
-> > > R13: 0000000000000000 R14: 00007faadf514670 R15: 0000000000000000
-> > >  </TASK>
-> > > rcu: rcu_preempt kthread timer wakeup didn't happen for 10499 jiffies=
-! g11321 f0x0 RCU_GP_WAIT_FQS(5) ->state=3D0x402
-> > > rcu:    Possible timer handling issue on cpu=3D0 timer-softirq=3D4286
-> > > rcu: rcu_preempt kthread starved for 10500 jiffies! g11321 f0x0 RCU_G=
-P_WAIT_FQS(5) ->state=3D0x402 ->cpu=3D0
-> > > rcu:    Unless rcu_preempt kthread gets sufficient CPU time, OOM is n=
-ow expected behavior.
-> > > rcu: RCU grace-period kthread stack dump:
-> > > task:rcu_preempt     state:I stack:27224 pid:16    tgid:16    ppid:2 =
-     task_flags:0x208040 flags:0x00080000
-> > > Call Trace:
-> > >  <TASK>
-> > >  context_switch kernel/sched/core.c:5325 [inline]
-> > >  __schedule+0x1798/0x4cc0 kernel/sched/core.c:6929
-> > >  __schedule_loop kernel/sched/core.c:7011 [inline]
-> > >  schedule+0x165/0x360 kernel/sched/core.c:7026
-> > >  schedule_timeout+0x12b/0x270 kernel/time/sleep_timeout.c:99
-> > >  rcu_gp_fqs_loop+0x301/0x1540 kernel/rcu/tree.c:2083
-> > >  rcu_gp_kthread+0x99/0x390 kernel/rcu/tree.c:2285
-> > >  kthread+0x711/0x8a0 kernel/kthread.c:463
-> > >  ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
-> > >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-> > >  </TASK>
-> > >
-> > >
-> > > ---
-> > > If you want syzbot to run the reproducer, reply with:
-> > > #syz test: git://repo/address.git branch-or-commit-hash
-> > > If you attach or paste a git patch, syzbot will apply it before testi=
-ng.
-> >
-> > Yet another taprio report.
-> >
-> > If taprio can not be fixed, perhaps we should remove it from the
-> > kernel, or clearly marked as broken.
-> > (Then ask syzbot to no longer include it)
->
-> Agreed on the challenge with taprio.
-> We need the stakeholders input: Vinicius - are you still working in
-> this space? Vladimir you also seem to have interest (or maybe nxp
-> does) in this?
+Hi Andrew,
 
-+ Vladmir..
+On 12/10/2025 at 23:47, Andrew Lunn wrote:
+> On Sun, Oct 12, 2025 at 08:23:43PM +0900, Vincent Mailhol wrote:
+>> Back in 2021, support for CAN TDC was added to the kernel in series [1]
+>> and in iproute2 in series [2]. However, the documentation was never
+>> updated.
+> 
+> Hi Vincent
+> 
+> I also don't see anything in man ip-link, nor ip link help. Maybe you
+> can add this documentation as well?
 
-> At a minimum, we should mark it as broken unless the stakeholders want
-> to actively fix these issues.
-> Would syzbot still look at it if it was marked broken?
->
-> cheers,
-> jamal
+The help is indeed not directly visible. But I think this is intended
+because can is a sub type. The can is simply listed in man ip-link
+under the Link types enumeration.
+
+The can help then be obtain by providing that can type:
+
+  $ ip link help can
+  Usage: ip link set DEVICE type can
+  	[ bitrate BITRATE [ sample-point SAMPLE-POINT] ] |
+  	[ tq TQ prop-seg PROP_SEG phase-seg1 PHASE-SEG1
+   	  phase-seg2 PHASE-SEG2 [ sjw SJW ] ]
+
+  	[ dbitrate BITRATE [ dsample-point SAMPLE-POINT] ] |
+  	[ dtq TQ dprop-seg PROP_SEG dphase-seg1 PHASE-SEG1
+   	  dphase-seg2 PHASE-SEG2 [ dsjw SJW ] ]
+  	[ tdcv TDCV tdco TDCO tdcf TDCF ]
+
+  	[ loopback { on | off } ]
+  	[ listen-only { on | off } ]
+  	[ triple-sampling { on | off } ]
+  	[ one-shot { on | off } ]
+  	[ berr-reporting { on | off } ]
+  	[ fd { on | off } ]
+  	[ fd-non-iso { on | off } ]
+  	[ presume-ack { on | off } ]
+  	[ cc-len8-dlc { on | off } ]
+  	[ tdc-mode { auto | manual | off } ]
+
+  	[ restart-ms TIME-MS ]
+  	[ restart ]
+
+  	[ termination { 0..65535 } ]
+
+  	Where: BITRATE	:= { NUMBER in bps }
+  		  SAMPLE-POINT	:= { 0.000..0.999 }
+  		  TQ		:= { NUMBER in ns }
+  		  PROP-SEG	:= { NUMBER in tq }
+  		  PHASE-SEG1	:= { NUMBER in tq }
+  		  PHASE-SEG2	:= { NUMBER in tq }
+  		  SJW		:= { NUMBER in tq }
+  		  TDCV		:= { NUMBER in tc }
+  		  TDCO		:= { NUMBER in tc }
+  		  TDCF		:= { NUMBER in tc }
+  		  RESTART-MS	:= { 0 | NUMBER in ms }
+
+Does this make sense?
+
+
+Yours sincerely,
+Vincent Mailhol
+
 
