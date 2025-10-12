@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-228622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2832CBD03C7
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 16:29:06 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C00CCBD03D3
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 16:29:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DE2F3BE136
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 14:29:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 15ECD4E9DC9
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 14:29:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A16D7287514;
-	Sun, 12 Oct 2025 14:28:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285BB288510;
+	Sun, 12 Oct 2025 14:28:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0A1287252
-	for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 14:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 534C82874EA
+	for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 14:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760279333; cv=none; b=Wm8/Hp0ANZLujYGcuTwvP+Y2RG4eLXUbjnp1O0NoubyoIP1VmorcXeClcPtbcYM328aQhUCmeEZtRqGSVV96niHvSshPaKye989uwEyNOJ4dYogCHZYImrpfT42VxfTViHhJQubaXNAwIjtwb8wXsznweI4xEUY6pWfbaCPQPPE=
+	t=1760279335; cv=none; b=oUw3uxAUJKpHtOvH9KRnRXVc22e6XZMlLXY+5V2AtRUah1VHG9sVuPrY5jDo9TyOFVcdvwGYLFF2YeL3L2xE0sL3N5sMtPR59boz375I/mx/ZsYvUZHmJYeaVqCcIPboo7vj45w+ErsuXT4DLo/HMau8se3H86lB2Tqd86safp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760279333; c=relaxed/simple;
-	bh=rwPR9Y3S5X1jNFtstjpORz/sGfQMScJphvyaP9mttPg=;
+	s=arc-20240116; t=1760279335; c=relaxed/simple;
+	bh=GYgaT837COzfq0a2uDjVt7G+BVNrg+bGNkXg4+DLpZA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iOjTVa+dGca2rYfJqlR4SMNMrJXymxAtQmGUnVRW6b8Jqs4vEE3UHwylrLb8YooO0DUrW25AgVJ8oCScqosplIpYCxpoKOebZsJIImYoAfYXZ5RvfItcg72AntWMHN38xmq8EPiEt7dDTQ/KN2EPYbXb2WKuva6nPtJYekNCNIE=
+	 MIME-Version; b=b9hj0+AlBxmazVrUIV2OYH2j+W059NrypCux2Xtwv5YP9hf1rG5A8QN2e+SBa4lojhY6jGSsNcuadFA3155NKSBdzCqKqY/O4o8FWNIiMP2ywzPnIp9uQDWGPtPK1CeAMtQcUaPadjJ80+msKb5ggrx1i4uKx8I8n/4HhxusxbA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,19 +33,19 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1v7x3w-00044n-8U; Sun, 12 Oct 2025 16:28:40 +0200
+	id 1v7x3w-00044o-FI; Sun, 12 Oct 2025 16:28:40 +0200
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1v7x3v-003EUs-23;
+	id 1v7x3v-003EUv-2H;
 	Sun, 12 Oct 2025 16:28:39 +0200
 Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
 	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 5E781484063;
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 6DE52484064;
 	Sun, 12 Oct 2025 14:28:39 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -54,10 +54,10 @@ Cc: davem@davemloft.net,
 	linux-can@vger.kernel.org,
 	kernel@pengutronix.de,
 	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Markus Schneider-Pargmann <msp@baylibre.com>
-Subject: [PATCH net 6/9] can: m_can: fix CAN state in system PM
-Date: Sun, 12 Oct 2025 16:20:50 +0200
-Message-ID: <20251012142836.285370-7-mkl@pengutronix.de>
+	Dong Aisheng <aisheng.dong@nxp.com>
+Subject: [PATCH net 7/9] can: m_can: replace Dong Aisheng's old email address
+Date: Sun, 12 Oct 2025 16:20:51 +0200
+Message-ID: <20251012142836.285370-8-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251012142836.285370-1-mkl@pengutronix.de>
 References: <20251012142836.285370-1-mkl@pengutronix.de>
@@ -73,61 +73,74 @@ X-SA-Exim-Mail-From: mkl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-A suspend/resume cycle on a down interface results in the interface
-coming up in Error Active state. A suspend/resume cycle on an Up
-interface will always result in Error Active state, regardless of the
-actual CAN state.
+Dong Aisheng's old Freescale email is not valid anymore and bounces,
+replace it by the new NXP one.
 
-During suspend, only set running interfaces to CAN_STATE_SLEEPING.
-During resume only touch the CAN state of running interfaces. For
-wakeup sources, set the CAN state depending on the Protocol Status
-Regitser (PSR), for non wakeup source interfaces m_can_start() will do
-the same.
-
-Fixes: e0d1f4816f2a ("can: m_can: add Bosch M_CAN controller support")
-Reviewed-by: Markus Schneider-Pargmann <msp@baylibre.com>
-Link: https://patch.msgid.link/20250929-m_can-fix-state-handling-v4-4-682b49b49d9a@pengutronix.de
+Reviewed-by: Dong Aisheng <aisheng.dong@nxp.com>
+Link: https://patch.msgid.link/20251009-m_can-update-email-address-v1-1-30a268587f69@pengutronix.de
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/m_can/m_can.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ .mailmap                               | 1 +
+ drivers/net/can/m_can/m_can.c          | 4 ++--
+ drivers/net/can/m_can/m_can_platform.c | 4 ++--
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
+diff --git a/.mailmap b/.mailmap
+index d30f9363a4c9..8160c62f11e9 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -227,6 +227,7 @@ Dmitry Safonov <0x7f454c46@gmail.com> <dima@arista.com>
+ Dmitry Safonov <0x7f454c46@gmail.com> <d.safonov@partner.samsung.com>
+ Dmitry Safonov <0x7f454c46@gmail.com> <dsafonov@virtuozzo.com>
+ Domen Puncer <domen@coderock.org>
++Dong Aisheng <aisheng.dong@nxp.com> <b29396@freescale.com>
+ Douglas Gilbert <dougg@torque.net>
+ Drew Fustini <fustini@kernel.org> <drew@pdp7.com>
+ <duje@dujemihanovic.xyz> <duje.mihanovic@skole.hr>
 diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index b6db5b57241c..f2576e577058 100644
+index f2576e577058..ad4f577c1ef7 100644
 --- a/drivers/net/can/m_can/m_can.c
 +++ b/drivers/net/can/m_can/m_can.c
-@@ -2503,12 +2503,11 @@ int m_can_class_suspend(struct device *dev)
- 		}
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
+ // CAN bus driver for Bosch M_CAN controller
+ // Copyright (C) 2014 Freescale Semiconductor, Inc.
+-//      Dong Aisheng <b29396@freescale.com>
++//      Dong Aisheng <aisheng.dong@nxp.com>
+ // Copyright (C) 2018-19 Texas Instruments Incorporated - http://www.ti.com/
  
- 		m_can_clk_stop(cdev);
-+		cdev->can.state = CAN_STATE_SLEEPING;
- 	}
- 
- 	pinctrl_pm_select_sleep_state(dev);
- 
--	cdev->can.state = CAN_STATE_SLEEPING;
--
- 	return ret;
+ /* Bosch M_CAN user manual can be obtained from:
+@@ -2556,7 +2556,7 @@ int m_can_class_resume(struct device *dev)
  }
- EXPORT_SYMBOL_GPL(m_can_class_suspend);
-@@ -2521,8 +2520,6 @@ int m_can_class_resume(struct device *dev)
+ EXPORT_SYMBOL_GPL(m_can_class_resume);
  
- 	pinctrl_pm_select_default_state(dev);
+-MODULE_AUTHOR("Dong Aisheng <b29396@freescale.com>");
++MODULE_AUTHOR("Dong Aisheng <aisheng.dong@nxp.com>");
+ MODULE_AUTHOR("Dan Murphy <dmurphy@ti.com>");
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("CAN bus driver for Bosch M_CAN controller");
+diff --git a/drivers/net/can/m_can/m_can_platform.c b/drivers/net/can/m_can/m_can_platform.c
+index 057eaa7b8b4b..4a412add2b8d 100644
+--- a/drivers/net/can/m_can/m_can_platform.c
++++ b/drivers/net/can/m_can/m_can_platform.c
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
+ // IOMapped CAN bus driver for Bosch M_CAN controller
+ // Copyright (C) 2014 Freescale Semiconductor, Inc.
+-//	Dong Aisheng <b29396@freescale.com>
++//	Dong Aisheng <aisheng.dong@nxp.com>
+ //
+ // Copyright (C) 2018-19 Texas Instruments Incorporated - http://www.ti.com/
  
--	cdev->can.state = CAN_STATE_ERROR_ACTIVE;
--
- 	if (netif_running(ndev)) {
- 		ret = m_can_clk_start(cdev);
- 		if (ret)
-@@ -2540,6 +2537,8 @@ int m_can_class_resume(struct device *dev)
- 			if (cdev->ops->init)
- 				ret = cdev->ops->init(cdev);
+@@ -236,7 +236,7 @@ static struct platform_driver m_can_plat_driver = {
  
-+			cdev->can.state = m_can_state_get_by_psr(cdev);
-+
- 			m_can_write(cdev, M_CAN_IE, cdev->active_interrupts);
- 		} else {
- 			ret  = m_can_start(ndev);
+ module_platform_driver(m_can_plat_driver);
+ 
+-MODULE_AUTHOR("Dong Aisheng <b29396@freescale.com>");
++MODULE_AUTHOR("Dong Aisheng <aisheng.dong@nxp.com>");
+ MODULE_AUTHOR("Dan Murphy <dmurphy@ti.com>");
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("M_CAN driver for IO Mapped Bosch controllers");
 -- 
 2.51.0
 
