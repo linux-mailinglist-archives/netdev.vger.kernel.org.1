@@ -1,171 +1,276 @@
-Return-Path: <netdev+bounces-228611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 331E5BD0163
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 13:25:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBA27BD0196
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 13:54:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31E373BCA2E
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 11:24:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B767E1892C91
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 11:54:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4764274B55;
-	Sun, 12 Oct 2025 11:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qV9gDa84"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9D0273816;
+	Sun, 12 Oct 2025 11:54:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from baidu.com (mx22.baidu.com [220.181.50.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E59274B40;
-	Sun, 12 Oct 2025 11:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F16214807;
+	Sun, 12 Oct 2025 11:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.181.50.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760268263; cv=none; b=dWvhztkVX30mvmEA1UxMklMTTq6KbLWqYtpczgbKPa890xQvASU9i/qwu+Qkxnysvk0uGIqJ7FtQQ0AGGFE54kgmXwpGAk4dfGEgkX8Y6N9GtdxRTkzbnSbyoVFgmEYzgsnglxpsq2w3p/RUWwLdrz5XIMu9mMVBIuSZlSJrmJ8=
+	t=1760270057; cv=none; b=hB1Ivlh/nLr6j/wAXhw8e/jisT6M16V62mTXCY26Zpk+aT9QTvDuhpkOzcu51tKptYaF2MkYEwNjDsbCOlYd9jeSSyAHt9z+xmCoMti6avpr83NIdKE/6C2N/1HaPidlyDsat5fttHHaxuhAqyuSJRI/jWPPFt1vGFQoqe9S5rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760268263; c=relaxed/simple;
-	bh=IF07Mt8rYmUujU1hE7dfnLqFNnP79CelssmnQbjwpiA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=FeskOalqQbOULBKUp14ujBU22+bj85/IRX/i95YFhO76R6kETTxMAMupAoXntnSipR9sK5xCqtVAFFWbNu/6+9wlgV1O02LuX+X6WwuhVH/e5YDNCFlBsXrB6VLLAjPPa1TmLl5l5xPYLPrRg0Vocf0LnCQGVkJtvx3wG6u3jO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qV9gDa84; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80A0CC116D0;
-	Sun, 12 Oct 2025 11:24:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760268263;
-	bh=IF07Mt8rYmUujU1hE7dfnLqFNnP79CelssmnQbjwpiA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=qV9gDa849luF9pS3ep8osjNW551NYhmIU8gnYWTEuQRwQ/xuGF+YZD5XX8UQfNEQ9
-	 smM9sw/fkzd7SIxqr4jlS5WnlB6omrILMlXKXIy6xMjOtLYHRY+XPKg3+c95O7YlvR
-	 gjTmuBGcq5t4X3Z5LPtuR4J16jYYpuLEBJ6ZrS2tT6Xm8oGaQlwjXuWej0D3//nCV7
-	 R11k/0vbDT7q8sPUqcA/f4++RFyyROIYXQDOXTwzINx26ev9J8L/25Q7VhJg241VAI
-	 AC/psM2DDbubL9SDNUQqfXrQcvQ0XSuYAXW3X3U9ZMEKDC84cr0U5ym2t9wB3mFqde
-	 jeOLkUl5aydCA==
-From: Vincent Mailhol <mailhol@kernel.org>
-Date: Sun, 12 Oct 2025 20:23:43 +0900
-Subject: [PATCH 2/2] can: add Transmitter Delay Compensation (TDC)
- documentation
+	s=arc-20240116; t=1760270057; c=relaxed/simple;
+	bh=g/lsp42oyDVgXy4RMAqncFSNCkuiqBE+xgpVOAv+6cc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZnvYQIajnYRmJ9tWsqNfP0l+K7/Dg6bWUIqgTWYRlZ5KoCoFR+KBPycDLOLgy6JpveKbEnpLmtAQe7dyF2GbMofZ9gBgZLO9zfcNlZPx8ReLBDUQQyXOreJDSlf7lJWs5M9OybBIA4vpodwPsKmHTPRt+2sJ1fX1GggEpRZV9sA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=220.181.50.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+From: lirongqing <lirongqing@baidu.com>
+To: Jonathan Corbet <corbet@lwn.net>, Russell King <linux@armlinux.org.uk>,
+	Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>,
+	Andrew Morton <akpm@linux-foundation.org>, Lance Yang <lance.yang@linux.dev>,
+	Masami Hiramatsu <mhiramat@kernel.org>, "Jason A . Donenfeld"
+	<Jason@zx2c4.com>, Shuah Khan <shuah@kernel.org>, "Paul E . McKenney"
+	<paulmck@kernel.org>, Petr Mladek <pmladek@suse.com>, Randy Dunlap
+	<rdunlap@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, Feng Tang
+	<feng.tang@linux.alibaba.com>, Pawan Gupta
+	<pawan.kumar.gupta@linux.intel.com>, Kees Cook <kees@kernel.org>, Arnd
+ Bergmann <arnd@arndb.de>, Li RongQing <lirongqing@baidu.com>, Phil Auld
+	<pauld@redhat.com>, Joel Granados <joel.granados@kernel.org>, Jakub Kicinski
+	<kuba@kernel.org>, Simon Horman <horms@kernel.org>, Anshuman Khandual
+	<anshuman.khandual@arm.com>, Stanislav Fomichev <sdf@fomichev.me>, "Liam R .
+ Howlett" <Liam.Howlett@oracle.com>, Lorenzo Stoakes
+	<lorenzo.stoakes@oracle.com>, David Hildenbrand <david@redhat.com>, Florian
+ Westphal <fw@strlen.de>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-aspeed@lists.ozlabs.org>, <wireguard@lists.zx2c4.com>,
+	<netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
+Subject: [PATCH][v3] hung_task: Panic after fixed number of hung tasks
+Date: Sun, 12 Oct 2025 19:50:35 +0800
+Message-ID: <20251012115035.2169-1-lirongqing@baidu.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251012-can-fd-doc-v1-2-86cc7d130026@kernel.org>
-References: <20251012-can-fd-doc-v1-0-86cc7d130026@kernel.org>
-In-Reply-To: <20251012-can-fd-doc-v1-0-86cc7d130026@kernel.org>
-To: Oliver Hartkopp <socketcan@hartkopp.net>, 
- Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>, Geert Uytterhoeven <geert@linux-m68k.org>, 
- linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Vincent Mailhol <mailhol@kernel.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4110; i=mailhol@kernel.org;
- h=from:subject:message-id; bh=IF07Mt8rYmUujU1hE7dfnLqFNnP79CelssmnQbjwpiA=;
- b=owGbwMvMwCV2McXO4Xp97WbG02pJDBmv++/OuMc0vahLVXWS8lWtGQqlwn+FpEOEorQ+69k0P
- 1jzi3VKRykLgxgXg6yYIsuyck5uhY5C77BDfy1h5rAygQxh4OIUgInsVWL4Z3t+z4eZ882/+cZv
- ui/dtP7XrZwq5gnNR/7cXFQUc2xPRSojw52tB64m8jL/k6ry+HUit2Wrx2G7yCdzXNIlxGtOnJU
- pZQIA
-X-Developer-Key: i=mailhol@kernel.org; a=openpgp;
- fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
+Content-Type: text/plain
+X-ClientProxiedBy: bjkjy-exc11.internal.baidu.com (172.31.51.11) To
+ bjkjy-exc3.internal.baidu.com (172.31.50.47)
+X-FEAS-Client-IP: 172.31.50.47
+X-FE-Policy-ID: 52:10:53:SYSTEM
 
-Back in 2021, support for CAN TDC was added to the kernel in series [1]
-and in iproute2 in series [2]. However, the documentation was never
-updated.
+From: Li RongQing <lirongqing@baidu.com>
 
-Add a new sub-section under CAN-FD driver support to document how to
-configure the TDC using the "ip tool".
+Currently, when 'hung_task_panic' is enabled, the kernel panics
+immediately upon detecting the first hung task. However, some hung
+tasks are transient and the system can recover, while others are
+persistent and may accumulate progressively.
 
-[1] add the netlink interface for CAN-FD Transmitter Delay Compensation (TDC)
-Link: https://lore.kernel.org/all/20210918095637.20108-1-mailhol.vincent@wanadoo.fr/
+This patch extends the 'hung_task_panic' sysctl to allow specifying
+the number of hung tasks that must be detected before triggering
+a kernel panic. This provides finer control for environments where
+transient hangs may occur but persistent hangs should still be fatal.
 
-[2] iplink_can: cleaning, fixes and adding TDC support
-Link: https://lore.kernel.org/all/20211103164428.692722-1-mailhol.vincent@wanadoo.fr/
+The sysctl can be set to:
+- 0: disabled (never panic)
+- 1: original behavior (panic on first hung task)
+- N: panic when N hung tasks are detected
 
-Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
+This maintains backward compatibility while providing more flexibility
+for handling different hang scenarios.
+
+Signed-off-by: Li RongQing <lirongqing@baidu.com>
 ---
- Documentation/networking/can.rst | 60 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+Diff with v2: not add new sysctl, extend hung_task_panic
 
-diff --git a/Documentation/networking/can.rst b/Documentation/networking/can.rst
-index 58c026d51d94..de9e7549859f 100644
---- a/Documentation/networking/can.rst
-+++ b/Documentation/networking/can.rst
-@@ -1464,6 +1464,66 @@ Example when 'fd-non-iso on' is added on this switchable CAN FD adapter::
-    can <FD,FD-NON-ISO> state ERROR-ACTIVE (berr-counter tx 0 rx 0) restart-ms 0
- 
- 
-+Transmitter Delay Compensation
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+At high bit rates, the propagation delay from the TX pin to the RX pin of
-+the transceiver might become greater than the actual bit time causing
-+measurement errors: the RX pin would still be measuring the previous bit.
-+
-+The Transmitter Delay Compensation (thereafter, TDC) resolves this problem
-+by introducing a Secondary Sample Point (SSP) equal to the distance, in
-+minimum time quantum, from the start of the bit time on the TX pin to the
-+actual measurement on the RX pin. The SSP is calculated as the sum of two
-+configurable values: the TDC Value (TDCV) and the TDC offset (TDCO).
-+
-+TDC, if supported by the device, can be configured together with CAN-FD
-+using the ip tool's "tdc-mode" argument as follow::
-+
-+- **omitted**: when no "tdc-mode" option is provided, the kernel will
-+  automatically decide whether TDC should be turned on, in which case it
-+  will calculate a default TDCO and use the TDCV as measured by the
-+  device. This is the recommended method to use TDC.
-+
-+- **"tdc-mode off"**: TDC is explicitly disabled.
-+
-+- **"tdc-mode auto"**: the user must provide the "tdco" argument. The TDCV
-+  will be automatically calculated by the device. This option is only
-+  available if the device supports the TDC-AUTO CAN controller mode.
-+
-+- **"tdc-mode manual"**: the user must provide both the "tdco" and "tdcv"
-+  arguments. This option is only available if the device supports the
-+  TDC-MANUAL CAN controller mode.
-+
-+Note that some devices may offer an additional parameter: "tdcf" (TDC Filter
-+window). If supported by your device, this can be added as an optional
-+argument to either "tdc-mode auto" or "tdc-mode manual".
-+
-+Example configuring a 500 kbit/s arbitration bitrate, a 5 Mbit/s data
-+bitrate, a TDCO of 15 minimum time quantum and a TDCV automatically measured
-+by the device::
-+
-+    $ ip link set can0 up type can bitrate 500000 \
-+                                   fd on dbitrate 4000000 \
-+				   tdc-mode auto tdco 15
-+    $ ip -details link show can0
-+    5: can0: <NOARP,UP,LOWER_UP,ECHO> mtu 72 qdisc pfifo_fast state UP \
-+             mode DEFAULT group default qlen 10
-+        link/can  promiscuity 0 allmulti 0 minmtu 72 maxmtu 72
-+        can <FD,TDC-AUTO> state ERROR-ACTIVE restart-ms 0
-+          bitrate 500000 sample-point 0.875
-+          tq 12 prop-seg 69 phase-seg1 70 phase-seg2 20 sjw 10 brp 1
-+          ES582.1/ES584.1: tseg1 2..256 tseg2 2..128 sjw 1..128 brp 1..512 \
-+          brp_inc 1
-+          dbitrate 4000000 dsample-point 0.750
-+          dtq 12 dprop-seg 7 dphase-seg1 7 dphase-seg2 5 dsjw 2 dbrp 1
-+          tdco 15 tdcf 0
-+          ES582.1/ES584.1: dtseg1 2..32 dtseg2 1..16 dsjw 1..8 dbrp 1..32 \
-+          dbrp_inc 1
-+          tdco 0..127 tdcf 0..127
-+          clock 80000000
-+
-+
- Supported CAN Hardware
- ----------------------
- 
+ Documentation/admin-guide/kernel-parameters.txt      | 20 +++++++++++++-------
+ Documentation/admin-guide/sysctl/kernel.rst          |  3 ++-
+ arch/arm/configs/aspeed_g5_defconfig                 |  2 +-
+ kernel/configs/debug.config                          |  2 +-
+ kernel/hung_task.c                                   | 16 +++++++++++-----
+ lib/Kconfig.debug                                    | 10 ++++++----
+ tools/testing/selftests/wireguard/qemu/kernel.config |  2 +-
+ 7 files changed, 35 insertions(+), 20 deletions(-)
 
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index a51ab46..7d9a8ee 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -1992,14 +1992,20 @@
+ 			the added memory block itself do not be affected.
+ 
+ 	hung_task_panic=
+-			[KNL] Should the hung task detector generate panics.
+-			Format: 0 | 1
++			[KNL] Number of hung tasks to trigger kernel panic.
++			Format: <int>
++
++			Set this to the number of hung tasks that must be
++			detected before triggering a kernel panic.
++
++			0: don't panic
++			1: panic immediately on first hung task
++			N: panic after N hung tasks are detect
+ 
+-			A value of 1 instructs the kernel to panic when a
+-			hung task is detected. The default value is controlled
+-			by the CONFIG_BOOTPARAM_HUNG_TASK_PANIC build-time
+-			option. The value selected by this boot parameter can
+-			be changed later by the kernel.hung_task_panic sysctl.
++			The default value is controlled by the
++			CONFIG_BOOTPARAM_HUNG_TASK_PANIC build-time option. The value
++			selected by this boot parameter can be changed later by the
++			kernel.hung_task_panic sysctl.
+ 
+ 	hvc_iucv=	[S390]	Number of z/VM IUCV hypervisor console (HVC)
+ 				terminal devices. Valid values: 0..8
+diff --git a/Documentation/admin-guide/sysctl/kernel.rst b/Documentation/admin-guide/sysctl/kernel.rst
+index f3ee807..0a8dfab 100644
+--- a/Documentation/admin-guide/sysctl/kernel.rst
++++ b/Documentation/admin-guide/sysctl/kernel.rst
+@@ -397,7 +397,8 @@ a hung task is detected.
+ hung_task_panic
+ ===============
+ 
+-Controls the kernel's behavior when a hung task is detected.
++When set to a non-zero value, a kernel panic will be triggered if the
++number of detected hung tasks reaches this value
+ This file shows up if ``CONFIG_DETECT_HUNG_TASK`` is enabled.
+ 
+ = =================================================
+diff --git a/arch/arm/configs/aspeed_g5_defconfig b/arch/arm/configs/aspeed_g5_defconfig
+index 61cee1e..c3b0d5f 100644
+--- a/arch/arm/configs/aspeed_g5_defconfig
++++ b/arch/arm/configs/aspeed_g5_defconfig
+@@ -308,7 +308,7 @@ CONFIG_PANIC_ON_OOPS=y
+ CONFIG_PANIC_TIMEOUT=-1
+ CONFIG_SOFTLOCKUP_DETECTOR=y
+ CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC=y
+-CONFIG_BOOTPARAM_HUNG_TASK_PANIC=y
++CONFIG_BOOTPARAM_HUNG_TASK_PANIC=1
+ CONFIG_WQ_WATCHDOG=y
+ # CONFIG_SCHED_DEBUG is not set
+ CONFIG_FUNCTION_TRACER=y
+diff --git a/kernel/configs/debug.config b/kernel/configs/debug.config
+index e81327d..9f6ab7d 100644
+--- a/kernel/configs/debug.config
++++ b/kernel/configs/debug.config
+@@ -83,7 +83,7 @@ CONFIG_SLUB_DEBUG_ON=y
+ #
+ # Debug Oops, Lockups and Hangs
+ #
+-# CONFIG_BOOTPARAM_HUNG_TASK_PANIC is not set
++CONFIG_BOOTPARAM_HUNG_TASK_PANIC=0
+ # CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC is not set
+ CONFIG_DEBUG_ATOMIC_SLEEP=y
+ CONFIG_DETECT_HUNG_TASK=y
+diff --git a/kernel/hung_task.c b/kernel/hung_task.c
+index b2c1f14..3929ed9 100644
+--- a/kernel/hung_task.c
++++ b/kernel/hung_task.c
+@@ -81,7 +81,7 @@ static unsigned int __read_mostly sysctl_hung_task_all_cpu_backtrace;
+  * hung task is detected:
+  */
+ static unsigned int __read_mostly sysctl_hung_task_panic =
+-	IS_ENABLED(CONFIG_BOOTPARAM_HUNG_TASK_PANIC);
++	CONFIG_BOOTPARAM_HUNG_TASK_PANIC;
+ 
+ static int
+ hung_task_panic(struct notifier_block *this, unsigned long event, void *ptr)
+@@ -218,8 +218,11 @@ static inline void debug_show_blocker(struct task_struct *task, unsigned long ti
+ }
+ #endif
+ 
+-static void check_hung_task(struct task_struct *t, unsigned long timeout)
++static void check_hung_task(struct task_struct *t, unsigned long timeout,
++		unsigned long prev_detect_count)
+ {
++	unsigned long total_hung_task;
++
+ 	if (!task_is_hung(t, timeout))
+ 		return;
+ 
+@@ -229,9 +232,11 @@ static void check_hung_task(struct task_struct *t, unsigned long timeout)
+ 	 */
+ 	sysctl_hung_task_detect_count++;
+ 
++	total_hung_task = sysctl_hung_task_detect_count - prev_detect_count;
+ 	trace_sched_process_hang(t);
+ 
+-	if (sysctl_hung_task_panic) {
++	if (sysctl_hung_task_panic &&
++			(total_hung_task >= sysctl_hung_task_panic)) {
+ 		console_verbose();
+ 		hung_task_show_lock = true;
+ 		hung_task_call_panic = true;
+@@ -300,6 +305,7 @@ static void check_hung_uninterruptible_tasks(unsigned long timeout)
+ 	int max_count = sysctl_hung_task_check_count;
+ 	unsigned long last_break = jiffies;
+ 	struct task_struct *g, *t;
++	unsigned long prev_detect_count = sysctl_hung_task_detect_count;
+ 
+ 	/*
+ 	 * If the system crashed already then all bets are off,
+@@ -320,7 +326,7 @@ static void check_hung_uninterruptible_tasks(unsigned long timeout)
+ 			last_break = jiffies;
+ 		}
+ 
+-		check_hung_task(t, timeout);
++		check_hung_task(t, timeout, prev_detect_count);
+ 	}
+  unlock:
+ 	rcu_read_unlock();
+@@ -389,7 +395,7 @@ static const struct ctl_table hung_task_sysctls[] = {
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec_minmax,
+ 		.extra1		= SYSCTL_ZERO,
+-		.extra2		= SYSCTL_ONE,
++		.extra2		= SYSCTL_INT_MAX,
+ 	},
+ 	{
+ 		.procname	= "hung_task_check_count",
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 3034e294..077b9e4 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -1258,12 +1258,14 @@ config DEFAULT_HUNG_TASK_TIMEOUT
+ 	  Keeping the default should be fine in most cases.
+ 
+ config BOOTPARAM_HUNG_TASK_PANIC
+-	bool "Panic (Reboot) On Hung Tasks"
++	int "Number of hung tasks to trigger kernel panic"
+ 	depends on DETECT_HUNG_TASK
++	default 0
+ 	help
+-	  Say Y here to enable the kernel to panic on "hung tasks",
+-	  which are bugs that cause the kernel to leave a task stuck
+-	  in uninterruptible "D" state.
++	  The number of hung tasks must be detected to trigger kernel panic.
++
++	  - 0: Don't trigger panic
++	  - N: Panic when N hung tasks are detected
+ 
+ 	  The panic can be used in combination with panic_timeout,
+ 	  to cause the system to reboot automatically after a
+diff --git a/tools/testing/selftests/wireguard/qemu/kernel.config b/tools/testing/selftests/wireguard/qemu/kernel.config
+index 936b18b..0504c11 100644
+--- a/tools/testing/selftests/wireguard/qemu/kernel.config
++++ b/tools/testing/selftests/wireguard/qemu/kernel.config
+@@ -81,7 +81,7 @@ CONFIG_WQ_WATCHDOG=y
+ CONFIG_DETECT_HUNG_TASK=y
+ CONFIG_BOOTPARAM_HARDLOCKUP_PANIC=y
+ CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC=y
+-CONFIG_BOOTPARAM_HUNG_TASK_PANIC=y
++CONFIG_BOOTPARAM_HUNG_TASK_PANIC=1
+ CONFIG_PANIC_TIMEOUT=-1
+ CONFIG_STACKTRACE=y
+ CONFIG_EARLY_PRINTK=y
 -- 
-2.49.1
+2.9.4
 
 
