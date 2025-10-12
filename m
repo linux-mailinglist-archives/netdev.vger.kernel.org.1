@@ -1,193 +1,136 @@
-Return-Path: <netdev+bounces-228645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9227ABD0AD9
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 21:18:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2463BBD0BE5
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 22:00:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 812EC4E7143
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 19:18:04 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F1CDD4E1517
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 20:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B46C3272E6E;
-	Sun, 12 Oct 2025 19:17:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51AED205ABA;
+	Sun, 12 Oct 2025 20:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OAiHh6fc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ceYVgSEK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D26C1E9B37
-	for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 19:17:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5931547E7
+	for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 20:00:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760296679; cv=none; b=S7VYR/5epzxYdX303xVx5YhQthyMoUnBM7P5NefT0uYq3wtreTVEWDdIKebGIXq35KNRbPTxtPeBd3v1zZJ9wmROR7GnkP59uIcIZ0sc9jJXv2NJdtunhI+YqKrHAoyjYvuHpLzNlW/AM/5nw7n/LUUIOYhIXRfLayuSOcLMAzc=
+	t=1760299250; cv=none; b=fvOvZoQ8TtpxnY7H/wBVNcWnAAebDYzXZvlG0KwOIOiKvV0lhCUpJ7SymXUlCtSVsD5KlfDTFqb1l+gi9zOFRHYxsUirSfbcqPM1pFvbOfw1iMCZiJVTKAVlwghPZxbce51fPw8GGIeENH/tssM6uJm6FaH+JplVReayufgfmaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760296679; c=relaxed/simple;
-	bh=A3Z0XV+aqR3Bg2mpMrZomWGUcAUm8fgeCMh6RsgVMqw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LiG4w8Wr07+Bk9BVmJG8OzSQo0D1eafA7kcGXMa00RRlBszZLwA3TObTqDDuXhP8DVK+og5u+5IbQ4erBVHTVWJpUBd53eiIERlzV3mlegGaplIQ4uPStKsveZ72IqPXTneiw70v4L5L8jCYQbc1/dmGWht/bstBUS8jAdLnOuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OAiHh6fc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760296677;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v/dR7852yMs8pT9RLFFYNYHUOca2oMO/u0IxKaXqyfA=;
-	b=OAiHh6fcICNTU83DEfRW71BkCL5fTXyvs5pehOnb48KovUvXg91kRh90fGey7eG48/JEM5
-	ORSBEbHsSkEawmK3H47/UgduSFTJBnazXGEGK2qkK1Ccn/vuysJT8Fy3Cjy9kGaBkAjq0t
-	48hSsjK+ApSIwMrYK9qXnIMfxa4vA7A=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-553-Vto2EQLANmyMUh9oh327qA-1; Sun, 12 Oct 2025 15:17:55 -0400
-X-MC-Unique: Vto2EQLANmyMUh9oh327qA-1
-X-Mimecast-MFC-AGG-ID: Vto2EQLANmyMUh9oh327qA_1760296674
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-46e45899798so25691395e9.3
-        for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 12:17:55 -0700 (PDT)
+	s=arc-20240116; t=1760299250; c=relaxed/simple;
+	bh=gsR6VLtEWh7Ep7Ju4BrPFAE2zcsW59Ip654xHVUfQTo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=HsvTLKG63/Tiz/fnLlkoeE44xDCYBgePGwYXb3eArFEzQcJgOLHwFilAhGTV6eIvunq/J2xfgu5IcZ+knVe8KrPfq7HhQDbgYl9XDuYf2hM5R72tM3gaFcoN89gFSLmQS8ilmq6jn00IfW9f04+1sf0oKVrltcyPoq3nxdpRhVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ceYVgSEK; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-639df8d869fso6744892a12.0
+        for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 13:00:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760299247; x=1760904047; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qhBizdbTK0z+OclNT8Vb7bFkHGH494w/g8TAfLl99kc=;
+        b=ceYVgSEKYo9HQ2EpicwV4tUvownrShgL9CFnw7TjLMqZVb4cVGmmsfXJ3ZL5hQ9EJ6
+         UHOU7t1y9Pstw4nMMzD1Az7YfwdtZTJevI+DoAF0s4JA4hIZ7ud7p6I9N/G0pbUEvImr
+         orpryvnIZB0VwJYvM2ku7dnLgH6KfuMkAKqaRyJ0EEX7TrSE7YEDgG6LEoMmlUE4MeZM
+         m6Uhfrp+lbu//GPKKRqg/opq/KfJp3jJtgrZ7O/9FsN6yiRVCiiKnLjJq0BaAiUytpbG
+         RuRP1T/r+rTiXTa8NS7VORrQLBMyyfdIk9FambNx+GtjBT3sydNVGLWZOTmqFMdxfljl
+         dVHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760296674; x=1760901474;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v/dR7852yMs8pT9RLFFYNYHUOca2oMO/u0IxKaXqyfA=;
-        b=PIW3u4mgs2xjWIshFA65cb1ZVnxLDQf0s0+3TYWERawPZi379DKtuGGrYcHsOT7ylr
-         Fz++ftZp7Mi9bgPk0VGaHVwULgzSX/XitJhY1ItM5uiCUdna023Ii3DgeF/kcnRaCiu9
-         QXm0/vwbqaT1QetbUl5kn3Ks72dRsBSBYbIYjmMl6GE8ZQ0fmPOpbnHNvpF/jg2uIor0
-         +6HJ8kSjgegnyJCZlWBoL67sDivUFaUvTFv/kGb+GujyMPMyVleSRHFcTwTdUW2K3KVY
-         mDYgKpcNUyHC8k1m1OvkICfIh6IXN/HBvAIU4f01O58om008DAxQ8KDIGIjiEliCs2p6
-         EPxA==
-X-Forwarded-Encrypted: i=1; AJvYcCUESlpfmpmPbquNb1tBR75OqYFqxtz2Zb0zMlxO9E9B7fpezyyIAqgbcdRpzMcECqcN9iCD62w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3tOnqCxjV0rifJpmhBRVgQxRqu1ax5aZCSm68Iv+hRQMOnYhM
-	N+5pdIn4G4Ga2M895OyolA26/AzcrwyvVi2XU8DMirbr3g2i01OhkB69xaAr/HvZ+I2qclqjTXN
-	Dkywp55Yl3gZ5/+eMZKaEUFGrGXkLdpZRCBPBm/3nygLL+yRZy9OhabWcrg==
-X-Gm-Gg: ASbGncsCcDQVwIbtu9RvmVHXq4MGZ5LI512NSMVGWuNLReG121Wn/OpP0L21Rk24iS5
-	rBp0p28kQFQh1owTiHZ99A3Ua2+VkEKA8gBS9UOytSALg88y2cMjKVUxNrJS2L+bnBs9Wh6VXBy
-	SnMLGa228E0JQwf04hsp7CjiaNE47BJK5SRz+L6ZZ4G/CjFFQX/a5uKnpokeh30DTN8oCuLgl6f
-	HuuNmlEV7FbyiwNhv4ZcL1J4bNTO8oTleb2ssAlPVFkoqB8tpknDaopaBaHfonMsUgrfoZMcebd
-	XaoqisH18trle9nx2OlstIM2CjkR2A==
-X-Received: by 2002:a05:600c:4ed0:b0:46e:39e1:fc3c with SMTP id 5b1f17b1804b1-46fa9a8be52mr117921685e9.5.1760296674289;
-        Sun, 12 Oct 2025 12:17:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEmLezo5h9IdZASkzNABJRNf+q1estWeI7SsZRQXuBRZVVly4xzTsB0yzUTdppy7wFbEkBWcw==
-X-Received: by 2002:a05:600c:4ed0:b0:46e:39e1:fc3c with SMTP id 5b1f17b1804b1-46fa9a8be52mr117921495e9.5.1760296673709;
-        Sun, 12 Oct 2025 12:17:53 -0700 (PDT)
-Received: from redhat.com ([31.187.78.130])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fb4983053sm148394535e9.8.2025.10.12.12.17.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Oct 2025 12:17:53 -0700 (PDT)
-Date: Sun, 12 Oct 2025 15:17:50 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org
-Subject: Re: [PATCH 1/3] virtio: dwords->qwords
-Message-ID: <20251012151345-mutt-send-email-mst@kernel.org>
-References: <cover.1760008797.git.mst@redhat.com>
- <350d0abfaa2dcdb44678098f9119ba41166f375f.1760008798.git.mst@redhat.com>
- <26d7d26e-dd45-47bb-885b-45c6d44900bb@lunn.ch>
- <20251009093127-mutt-send-email-mst@kernel.org>
- <6ca20538-d2ab-4b73-8b1a-028f83828f3e@lunn.ch>
- <20251011134052-mutt-send-email-mst@kernel.org>
- <c4aa4304-b675-4a60-bb7e-adcf26a8694d@lunn.ch>
- <20251012031758-mutt-send-email-mst@kernel.org>
- <36501d9c-9db9-45e6-9a77-1efd530545ee@lunn.ch>
+        d=1e100.net; s=20230601; t=1760299247; x=1760904047;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qhBizdbTK0z+OclNT8Vb7bFkHGH494w/g8TAfLl99kc=;
+        b=B9jVC28e2AcHf8hY7Oe/KbNA32vxx8CQFe75EIEkDzpzqGAhuquPxgbmdOYW50sq/o
+         ubka+nB9KGo657QiJDLTM7JYPurQ1f74jNuASiciOgHcA9w4YgaU46pgbiaJL/+aNZYW
+         GCMc5NHbLbBiJxMXRSkJvDZ6KdUGiqNircdLONtzRWzziQU1+Q5nuqtZMz0t4dW33ZF8
+         rm0JznYK3jscSAHyRk2GKG2aTWklSKa2JPOPkOK8Hjio4pt0+DhC3VpKFb9y1ZwEmEdo
+         t47vO0KbYOTM/bEwJDXVXMDpNlWdr8l87ObFcJeJx2bNEUGsbLkIbYV0UcsCoI/M2McJ
+         FF7g==
+X-Forwarded-Encrypted: i=1; AJvYcCWUZ0BR4O1Y7A6ST7665Crb+M0JkExqjsDh/NI8KastHwumd1BFqzkp3zSSXKP0BWdUs2TepwE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhAk2OZvBtrwpctrnIgoVosV++hBv7RCYBMTR5w0LaMjQCLflh
+	QyiWwPeplv14L4xRo1jDiihz/MLgEyRO5DJP8SqMwFbYeIKVOPJuN4O0s0sIyg==
+X-Gm-Gg: ASbGncsU3icmM2DLdR1MAmPPgaFqxR2oGf+EzVDwWLg/s2wVbBHk+0ePYIP6UnRZLEZ
+	F3sud7iSgAKu+ZatF0/xaaT6SKKYwj68SwYdQmtFtcEy/QiUHEIwvOCccyUNw+KD+q0LJDWLpaN
+	aQ++Lhhm91FU8xIZJpRxQxSQtxF3XuSxuZarq7Meu3/mr9uMmQ3amF429ahIDu6pQ5oc/TnL8w3
+	dCUMta/0huaq4KE/o3J/ys7GjegzIbjpilRhGuuiQIQrdJZUtQsdC7R7GsjxucKLkRj0BLrK86C
+	RQ78GZ59WNWtEqMQnFvLrQ1jU8uE2ICnJlkaEhSFxKSKlQWfgPt+5lenw8tWt4GFg+xB7kPGzp4
+	aHTOO1yWg1cHB4PrIwwhR2bwTpZO8/t2szywpZdSXHUF6tGAcNLH4sw==
+X-Google-Smtp-Source: AGHT+IEuMwBGN8leVN09ZBnD48z+ZF3LbUxEgujm4n8TM9fKLeko+pSXEDUltw4QDk+L+Sj011ZL+w==
+X-Received: by 2002:a05:6402:3510:b0:634:c4b5:5d7 with SMTP id 4fb4d7f45d1cf-639d5c6fadamr17675616a12.34.1760299246552;
+        Sun, 12 Oct 2025 13:00:46 -0700 (PDT)
+Received: from foxbook (bff184.neoplus.adsl.tpnet.pl. [83.28.43.184])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63a5c1348b2sm7454711a12.37.2025.10.12.13.00.44
+        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
+        Sun, 12 Oct 2025 13:00:46 -0700 (PDT)
+Date: Sun, 12 Oct 2025 22:00:42 +0200
+From: Michal Pecio <michal.pecio@gmail.com>
+To: Petko Manolov <petkan@nucleusys.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: usb: rtl8150: Fix frame padding
+Message-ID: <20251012220042.4ca776b1.michal.pecio@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <36501d9c-9db9-45e6-9a77-1efd530545ee@lunn.ch>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sun, Oct 12, 2025 at 04:39:06PM +0200, Andrew Lunn wrote:
-> > > DeviceFeaturesSel 0x014
-> > > 
-> > > Device (host) features word selection.
-> > > Writing to this register selects a set of 32 device feature bits accessible by reading from DeviceFeatures.
-> > > 
-> > > and
-> > > 
-> > > DriverFeaturesSel 0x024
-> > > 
-> > > Activated (guest) features word selection
-> > > Writing to this register selects a set of 32 activated feature bits accessible by writing to DriverFeatures.
-> > > 
-> > > I would interpret this as meaning a feature word is a u32. Hence a
-> > > DWORD is a u64, as the current code uses.
-> > > 
-> > > 	Andrew
-> > 
-> > 
-> > Hmm indeed.
-> > At the same time, pci transport has:
-> > 
-> >          u8 padding[2];  /* Pad to full dword. */
-> > 
-> > and i2c has:
-> > 
-> > The \field{padding} is used to pad to full dword.
-> > 
-> > both of which use dword to mean 32 bit.
-> > 
-> > This comes from PCI which also does not define word but uses it
-> > to mean 16 bit.
-> 
-> Yes, reading the spec, you need to consider the context 'word' is used
-> in. Maybe this is something which can be cleaned up, made uniform
-> across the whole document?
+TX frames aren't padded and unknown memory is sent into the ether.
 
-Yes and thanks for bringing this to my attention.
-So MMIO can be "features set selection"
+Theoretically, it isn't even guaranteed that the extra memory exists
+and can be sent out, which could cause further problems. In practice,
+I found that plenty of tailroom exists in the skb itself (in my test
+with ping at least) and skb_padto() easily succeeds, so use it here.
 
-And pci can be "pad to 32 bit".
+In the event of -ENOMEM drop the frame like other drivers do.
 
+The use of one more padding byte instead of a USB zero-length packet
+is retained to avoid regression. I have a dodgy Etron xHCI controller
+which doesn't seem to support sending ZLPs at all.
 
-Less work than defining "word".
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Signed-off-by: Michal Pecio <michal.pecio@gmail.com>
+---
+ drivers/net/usb/rtl8150.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-> > I don't have the problem changing everything to some other
-> > wording completely but "chunk" is uninformative, and
-> > more importantly does not give a clean way to refer to
-> > 2 chunks and 4 chunks.
-> > Similarly, if we use "word" to mean 32 bit there is n clean
-> > way to refer to 16 bits which we use a lot.
-> > 
-> > 
-> > using word as 16 bit has the advantage that you
-> > can say byte/word/dword/qword and these do not
-> > cause too much confusion.
-> 
-> > So I am still inclined to align everything on pci terminology
-> > but interested to hear what alternative you suggest.
-> 
-> How about something simple:
-> 
-> #define VIRTIO_FEATURES_DU32WORDS	2
-> #define VIRTIO_FEATURES_U32WORDS	(VIRTIO_FEATURES_D32WORDS * 2)
-> 
-> or, if the spec moves away from using 'word':
-> 
-> #define VIRTIO_FEATURES_U64S	2
-> #define VIRTIO_FEATURES_U32S	(VIRTIO_FEATURES_U32S * 2)
-> 
-> The coding style says not to use Hungarian notation, but here it
-> actually make sense, and avoids the ambiguity in the spec.
-> 
-> 	Andrew
-
-I mean we can just define number of bits. Open-code / 32 or / 64
-as needed. Hmm?
-
-
+diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
+index 92add3daadbb..d6dce8babae0 100644
+--- a/drivers/net/usb/rtl8150.c
++++ b/drivers/net/usb/rtl8150.c
+@@ -685,9 +685,14 @@ static netdev_tx_t rtl8150_start_xmit(struct sk_buff *skb,
+ 	rtl8150_t *dev = netdev_priv(netdev);
+ 	int count, res;
+ 
++	/* pad the frame and ensure terminating USB packet, datasheet 9.2.3 */
++	count = max(skb->len, ETH_ZLEN);
++	if (count % 64 == 0)
++		count++;
++	if (skb_padto(skb, count))
++		return NETDEV_TX_OK;
++
+ 	netif_stop_queue(netdev);
+-	count = (skb->len < 60) ? 60 : skb->len;
+-	count = (count & 0x3f) ? count : count + 1;
+ 	dev->tx_skb = skb;
+ 	usb_fill_bulk_urb(dev->tx_urb, dev->udev, usb_sndbulkpipe(dev->udev, 2),
+ 		      skb->data, count, write_bulk_callback, dev);
 -- 
-MST
-
+2.48.1
 
