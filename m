@@ -1,178 +1,130 @@
-Return-Path: <netdev+bounces-228607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01EAFBD003D
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 09:26:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26D03BD00A5
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 11:20:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 501484E174D
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 07:26:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53CFE189236E
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 09:20:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BCC22068A;
-	Sun, 12 Oct 2025 07:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5656B2367D6;
+	Sun, 12 Oct 2025 09:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BdmKOPcL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lIoQ0XBn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CA121FF29
-	for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 07:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E561400C
+	for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 09:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760253990; cv=none; b=YyuEHE73xLQAkGi7cmHuviXPdjmdZ6xdbRdBE9sxfXBVdmUYPqFX0rRmRNp1FGiKcD/LVl0f0nZFUmM4im5cbdyWGXwV1XKPjMUGYqVeuJHBLSrjSrTmkFCavVd1cHKEILmMXLF9eM8/ayNeX0X+jvU3tPTq7ayg3dxmksuuwac=
+	t=1760260827; cv=none; b=p73Q9WCl/TycTDMR/DzHwioerOb+SJY+3kdYix/ldoBfXKWJwtoIBwKG3tFuqyIYMFYQD6vRpniB4WhV4l/Xkif0mqLjcDOKWEh6BnUdDlc9ilhSfd6Y6WD+J9UYklwITsff6xjqjaZamd1gdhRe++owgH1p6YdpKM7Mfy8ItTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760253990; c=relaxed/simple;
-	bh=UEv2x/Lmp84MhY9spkwvdA5qI6xvme3Kk+89d41lEWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KFq6y6sWksPwKlbdizI3ZEYdiU3WpE/OPAwco4goubCPomd1OTQyJ9ij7n7d67MNlXzbbmln/FfK00U1eYrO6V76KF5sQrNI80b18SAgNQp+nOOAvM5C5FukUxh0JiTipfV5sRwf9L/OmeehIzqpr6EuyPFc/uhuOztWXe4Fc1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BdmKOPcL; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760253988;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mg3HCPvWm6jwVlci7BHs0yCEk+Zd1iOvD/o3EJNM9JE=;
-	b=BdmKOPcLGmHQBCuih3yJFx7ptznKkA1R7ar72zjy/HdeU79B4j3gBOG4qmW1b2cZ9yQjGO
-	1k44Qsh750Ox2XutuhHIGl8sj//CN9znl0zcIjsEGRVHc2S6ZfzeWRUwpNjQZEzhx9FheX
-	j9TmfmDgkoECLvNBBxPAcLsqrwnoJpA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-6-kqkkGQjfNR27y6qDaicRHg-1; Sun, 12 Oct 2025 03:26:26 -0400
-X-MC-Unique: kqkkGQjfNR27y6qDaicRHg-1
-X-Mimecast-MFC-AGG-ID: kqkkGQjfNR27y6qDaicRHg_1760253985
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-46e4cc8ed76so17733185e9.1
-        for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 00:26:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760253985; x=1760858785;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mg3HCPvWm6jwVlci7BHs0yCEk+Zd1iOvD/o3EJNM9JE=;
-        b=wuCL/Gd0cX/zRDrAMpiYrwYkU01TRQdFwLS8VuM9F8rZmv7sKEdrPp3j1BuwF7jX40
-         xLWCZxP6uVVkLYrikUM8IJsQPrxrfacCqfJw+06XAi9qSl/IyHhEE7rywjCXtBDZ4Qpk
-         7eE6jCMV7tbK33TZXeJqaHJq5l7KKsIfN/gtt1fDl5h5t2sCIvMUkQyDIhejn5IG4Jhd
-         XeDu8vmu3S3k+MoPGYgJdIPBCQEcSf9Hb3jqeIETHQzXsBtFBzJs7VOAcJ4f7YZ/65jg
-         jW8foZHontyr7LhBuN8QrPr0czh4DPDV45Nwjh4En49XPsXq1obCvH0iSb6Mf8580xRm
-         BAkA==
-X-Forwarded-Encrypted: i=1; AJvYcCW6eUDGrdgdcARuRdNk/Dcpk4dXN4aMqhUhqwgXVL5NM1ScFPXDHP1icje4A7xqUVMS1XmxX2o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCAzEk4KXyKH+52VwOLWJUb8HvQSj7k0AleMtYXNUR5a6hzzqY
-	m8paIeQORCcoySmXCZV6ioLOV98Zodog+Glu17t0ZJ9LN8LLO6gMnpuQVgJt2KVUUtSph1LETKJ
-	7YBHR97QNnPbfHPImRGUxdvf8HKkCYou2NitA2Xe3jWOGC1UW2gEDegZKGg==
-X-Gm-Gg: ASbGnctD0/438Gyz/IITYX+K61anaJas9nuh/LrcCGiUMx9/5KGUpgxymXVT4yjtxeZ
-	+sIePzxcuHgwafWf4bbPiMBiNQPbGqfIROg0HGfO35A1jq1Axhys8rLL7WhZF4BCUtpqNvHFq7w
-	j13g+cOq8XF72yY8kSPtR4FVHk2u8W+A+kkI7iiD668d51iH3fswHu1ZG51yDS8cb3zPDTc7cna
-	FVG88A4Flo0voa9NUGei6twCbo48nLdB+t74vmgrbhyE5qUBwEHiq8MTX0uIUSDCrt9obDuPJU9
-	plJyf/nUIiovl2JlOa4jx5k2blSW1NHIIg==
-X-Received: by 2002:a05:600c:1c96:b0:46f:c0c9:6961 with SMTP id 5b1f17b1804b1-46fc0e7f6e7mr21553965e9.14.1760253985220;
-        Sun, 12 Oct 2025 00:26:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE3gaXMtNNYza81JdpwSjq/QqGvQLh5iun4C2wC9jv6BcMxYyPNrpdbHApBSwlfgxaXbiFriA==
-X-Received: by 2002:a05:600c:1c96:b0:46f:c0c9:6961 with SMTP id 5b1f17b1804b1-46fc0e7f6e7mr21553775e9.14.1760253984757;
-        Sun, 12 Oct 2025 00:26:24 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:152d:b200:2a90:8f13:7c1e:f479])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fb483bcf9sm127107785e9.6.2025.10.12.00.26.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Oct 2025 00:26:24 -0700 (PDT)
-Date: Sun, 12 Oct 2025 03:26:21 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org
-Subject: Re: [PATCH 1/3] virtio: dwords->qwords
-Message-ID: <20251012031758-mutt-send-email-mst@kernel.org>
-References: <cover.1760008797.git.mst@redhat.com>
- <350d0abfaa2dcdb44678098f9119ba41166f375f.1760008798.git.mst@redhat.com>
- <26d7d26e-dd45-47bb-885b-45c6d44900bb@lunn.ch>
- <20251009093127-mutt-send-email-mst@kernel.org>
- <6ca20538-d2ab-4b73-8b1a-028f83828f3e@lunn.ch>
- <20251011134052-mutt-send-email-mst@kernel.org>
- <c4aa4304-b675-4a60-bb7e-adcf26a8694d@lunn.ch>
+	s=arc-20240116; t=1760260827; c=relaxed/simple;
+	bh=3DV/u5wjSCtg1WSPlQteng/aS2VViRpDHJXCVKKehVo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=SSppRAkDBdabHbfxqvX5eFg9lObI5HhixBRPhpfJohkCsmwyHnLB2mVDkm6q07tHq7r77TOM6ysXSwmvahz/2zRrAwbd11q096Pc8lyWdBs+cvgPo4PNg7Std+pVELmyLX/kM4TOJJsDpYnAQ0fUPfLgGoTyCzKv93dvd6h8v28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lIoQ0XBn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1370EC4CEE7;
+	Sun, 12 Oct 2025 09:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760260826;
+	bh=3DV/u5wjSCtg1WSPlQteng/aS2VViRpDHJXCVKKehVo=;
+	h=From:Date:Subject:To:Cc:From;
+	b=lIoQ0XBnPfDb39ejCm9t7Ft7oUm2id6K2uOyaSxfR0R/YIHmbv+gz/S4E+TNeiCZC
+	 nmVo7/0XGlSQKliLIyrkKNh1byogSLS2jIZKFPdnnJynMHTDChYCFQpscK2HvfHI6Y
+	 5YSSM4geEyhrwZQbOEAvvSSTIEyfqP6yHGVRX4PgXF6qMVAAXcFgyW4Upwy3YnGcI4
+	 6xHImMKb9V2ERh0lqnaH3EvUfNok9CFF5jZCSL7/KgC3Vvl6xdadEvIYva9VoQ2I4z
+	 d7ufZ7hVAK8O6z7VUvzqnWzMfWs3wDRlzb3RVLzUP9ppQIGszhLi3eV0q1xRhXHytg
+	 uQN/AGn+koO6Q==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Sun, 12 Oct 2025 11:19:44 +0200
+Subject: [PATCH net v2] net: airoha: Take into account out-of-order tx
+ completions in airoha_dev_xmit()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c4aa4304-b675-4a60-bb7e-adcf26a8694d@lunn.ch>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251012-airoha-tx-busy-queue-v2-1-a600b08bab2d@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAK9y62gC/32NQQ6CMBBFr0Jm7ZhOFaOuvIdhUegAE02rUyAQw
+ t1tOIDL93/++yskVuEE92IF5UmSxJDBHgpoehc6RvGZwRpbkiGDTjT2DocZ6zEt+B15ZKx9S9R
+ wcz2xhzz9KLcy79onBB6gymEvaYi67FcT7dV/60RIeGNybenNhcz58WIN/D5G7aDatu0HAPDQD
+ b4AAAA=
+X-Change-ID: 20251010-airoha-tx-busy-queue-bdf11cec83ed
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Simon Horman <horms@kernel.org>
+X-Mailer: b4 0.14.2
 
-On Sat, Oct 11, 2025 at 08:52:18PM +0200, Andrew Lunn wrote:
-> > That's not spec, that's linux driver. The spec is the source of truth.
-> 
-> Right, lets follow this.
-> 
-> I'm looking at
-> 
-> https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html
-> 
-> Is that correct?
-> 
-> That document does not have a definition of word. However, what is
-> interesting is section "4.2.2 MMIO Device Register Layout"
-> 
-> DeviceFeaturesSel 0x014
-> 
-> Device (host) features word selection.
-> Writing to this register selects a set of 32 device feature bits accessible by reading from DeviceFeatures.
-> 
-> and
-> 
-> DriverFeaturesSel 0x024
-> 
-> Activated (guest) features word selection
-> Writing to this register selects a set of 32 activated feature bits accessible by writing to DriverFeatures.
-> 
-> I would interpret this as meaning a feature word is a u32. Hence a
-> DWORD is a u64, as the current code uses.
-> 
-> 	Andrew
+Completion napi can free out-of-order tx descriptors if hw QoS is
+enabled and packets with different priority are queued to same DMA ring.
+Take into account possible out-of-order reports checking if the tx queue
+is full using circular buffer head/tail pointer instead of the number of
+queued packets.
 
+Fixes: 23020f0493270 ("net: airoha: Introduce ethernet support for EN7581 SoC")
+Suggested-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+Changes in v2:
+- Fix corner case when the queue is full
+- Link to v1: https://lore.kernel.org/r/20251010-airoha-tx-busy-queue-v1-1-9e1af5d06104@kernel.org
+---
+ drivers/net/ethernet/airoha/airoha_eth.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-Hmm indeed.
-At the same time, pci transport has:
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 833dd911980b3f698bd7e5f9fd9e2ce131dd5222..433a646e9831773bf63600e7c3d3b2176c4d133e 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -1873,6 +1873,20 @@ static u32 airoha_get_dsa_tag(struct sk_buff *skb, struct net_device *dev)
+ #endif
+ }
+ 
++static bool airoha_dev_tx_queue_busy(struct airoha_queue *q, u32 nr_frags)
++{
++	u32 tail = q->tail <= q->head ? q->tail + q->ndesc : q->tail;
++	u32 index = q->head + nr_frags;
++
++	/* completion napi can free out-of-order tx descriptors if hw QoS is
++	 * enabled and packets with different priorities are queued to the same
++	 * DMA ring. Take into account possible out-of-order reports checking
++	 * if the tx queue is full using circular buffer head/tail pointers
++	 * instead of the number of queued packets.
++	 */
++	return index >= tail;
++}
++
+ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
+ 				   struct net_device *dev)
+ {
+@@ -1926,7 +1940,7 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
+ 	txq = netdev_get_tx_queue(dev, qid);
+ 	nr_frags = 1 + skb_shinfo(skb)->nr_frags;
+ 
+-	if (q->queued + nr_frags > q->ndesc) {
++	if (airoha_dev_tx_queue_busy(q, nr_frags)) {
+ 		/* not enough space in the queue */
+ 		netif_tx_stop_queue(txq);
+ 		spin_unlock_bh(&q->lock);
 
-         u8 padding[2];  /* Pad to full dword. */
+---
+base-commit: 18a7e218cfcdca6666e1f7356533e4c988780b57
+change-id: 20251010-airoha-tx-busy-queue-bdf11cec83ed
 
-and i2c has:
-
-The \field{padding} is used to pad to full dword.
-
-both of which use dword to mean 32 bit.
-
-This comes from PCI which also does not define word but uses it
-to mean 16 bit.
-
-
-
-
-I don't have the problem changing everything to some other
-wording completely but "chunk" is uninformative, and
-more importantly does not give a clean way to refer to
-2 chunks and 4 chunks.
-Similarly, if we use "word" to mean 32 bit there is n clean
-way to refer to 16 bits which we use a lot.
-
-
-using word as 16 bit has the advantage that you
-can say byte/word/dword/qword and these do not
-cause too much confusion.
-
-
-So I am still inclined to align everything on pci terminology
-but interested to hear what alternative you suggest.
-
-
+Best regards,
 -- 
-MST
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
