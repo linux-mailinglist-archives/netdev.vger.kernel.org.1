@@ -1,53 +1,61 @@
-Return-Path: <netdev+bounces-228617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 377CFBD02EA
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 15:57:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C973CBD03BE
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 16:28:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73A95189092D
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 13:57:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FD6A18961AA
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 14:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ADC21ACEDF;
-	Sun, 12 Oct 2025 13:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CA1528727C;
+	Sun, 12 Oct 2025 14:28:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from plesk.hostmyservers.fr (plesk.hostmyservers.fr [45.145.164.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A762C1A314E;
-	Sun, 12 Oct 2025 13:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.164.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A0A28724E
+	for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 14:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760277416; cv=none; b=PgrTqeUh3vfu60ZYs15lEZn/ShHQf/TOgA3z7FAzVxOtlc9++xLiLHBJPoyjOOXfneAhFTrcJNdW1dp8/cwLluWsJrg9y9Gdwa+c8TSxVRKvxSwi1CCLJDxuDfZ4jZEzU7WFQAA7pUOC1F9+0Yffx6oTxu4KibHTiA6hpweCw90=
+	t=1760279333; cv=none; b=WxDX0JqKlBsNabG0gY6i4/bFjKymBh+66crtcfYQTXWLURal3ncGhn1+RFLFTq76621ywDA3P9dIk2Ed0OcCfD4k5nRRv+988fITg/I8mBi3rmwJvoIh3LOF6kaiQTUvQJQE9wP/xvU7T9MVqqvcvRRr99wX+n/u7oU8r8Jt+pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760277416; c=relaxed/simple;
-	bh=dfHmpJ3HxLV4gF+y5WmcffGIAAXZtrfoTvfesEZafuE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MhorDEr9dtwPDED9/IG/3I+eZ0a4aMExoh8lbg+ac4JrjPVj/4RLHjHtQojAaWWKgvNQhS5iJ10wSEi1KoUxFMKTIOZwcJH0T7Q3d3MXxIc/SEssLxmHLNOS/JHJStetynhfztBOgu9CKMEr5tPtjQ8e7kCKR19PrKPXXdUPlyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com; spf=pass smtp.mailfrom=arnaud-lcm.com; arc=none smtp.client-ip=45.145.164.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arnaud-lcm.com
-Received: from 7cf34ddaca59.ant.amazon.com (unknown [89.100.17.9])
-	by plesk.hostmyservers.fr (Postfix) with ESMTPSA id 5E5814018F;
-	Sun, 12 Oct 2025 13:56:50 +0000 (UTC)
-Authentication-Results: Plesk;
-	spf=pass (sender IP is 89.100.17.9) smtp.mailfrom=contact@arnaud-lcm.com smtp.helo=7cf34ddaca59.ant.amazon.com
-Received-SPF: pass (Plesk: connection is authenticated)
-From: Arnaud lecomte <contact@arnaud-lcm.com>
-To: syzbot+c9b724fbb41cf2538b7b@syzkaller.appspotmail.com
-Cc: bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	contact@arnaud-lcm.com
-Subject: test
-Date: Sun, 12 Oct 2025 14:56:49 +0100
-Message-ID: <20251012135649.59492-1-contact@arnaud-lcm.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <688809c1.a00a0220.b12ec.00b7.GAE@google.com>
-References: <688809c1.a00a0220.b12ec.00b7.GAE@google.com>
+	s=arc-20240116; t=1760279333; c=relaxed/simple;
+	bh=Xdv43s3ud66H3OKIaHVEqrwrvpZRtpKfD5i3rJrg48E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F4WHKwQ7Scd52LPuXDGElWE2SpOPHI92VoJDfcyFplQu8QN2+mRvaajAdcwzofRyGGc/H10O4+kWp/7CYUh2jMmD+FjCfDde7t5pBpwcvSG9oUcMNnSJ7k4JdmLzLEzWlsH3TfWh6WPUNgstKf3OWW7GDMEu7Sg5cG/Lg1JWK28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1v7x3w-00044h-8V; Sun, 12 Oct 2025 16:28:40 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1v7x3v-003EUi-0v;
+	Sun, 12 Oct 2025 16:28:39 +0200
+Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id EBD3748405D;
+	Sun, 12 Oct 2025 14:28:38 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/9] pull-request: can 2025-10-12
+Date: Sun, 12 Oct 2025 16:20:44 +0200
+Message-ID: <20251012142836.285370-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,111 +63,72 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-PPP-Message-ID: <176027741085.28150.16747354518360343128@Plesk>
-X-PPP-Vhost: arnaud-lcm.com
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-#syz test
+Hello netdev-team,
 
-diff --git a/kernel/bpf/stackmap.c b/kernel/bpf/stackmap.c
-index 3615c06b7dfa..c0ee51db8eed 100644
---- a/kernel/bpf/stackmap.c
+this is a pull request of 9 patches for net/main.
 
- BPF_CALL_3(bpf_get_stackid, struct pt_regs *, regs, struct bpf_map *, map,
-           u64, flags)
- {
--       u32 max_depth = map->value_size / stack_map_data_size(map);
--       u32 skip = flags & BPF_F_SKIP_FIELD_MASK;
-+       u32 elem_size = stack_map_data_size(map);
-        bool user = flags & BPF_F_USER_STACK;
-        struct perf_callchain_entry *trace;
-        bool kernel = !user;
-+       u32 max_depth;
+The first 2 paches are by Celeste Liu and target the gS_usb driver.
+The first patch remove the limitation to 3 CAN interface per USB
+device. The second patch adds the missing population of
+net_device->dev_port.
 
-        if (unlikely(flags & ~(BPF_F_SKIP_FIELD_MASK | BPF_F_USER_STACK |
-                               BPF_F_FAST_STACK_CMP | BPF_F_REUSE_STACKID)))
-                return -EINVAL;
+THe next 4 patches are by me and fix the m_can driver. They add a
+missing pm_runtime_disable(), fix the CAN state transition back to
+Error Active and fix the state after ifup and suspend/resume.
 
--       max_depth += skip;
--       if (max_depth > sysctl_perf_event_max_stack)
--               max_depth = sysctl_perf_event_max_stack;
--
-+       max_depth = stack_map_calculate_max_depth(map->value_size, elem_size, flags);
-        trace = get_perf_callchain(regs, 0, kernel, user, max_depth,
-                                   false, false);
+Another patch by me targets the m_can driver, too and replaces Dong
+Aisheng's old email address.
 
-@@ -371,15 +391,11 @@ BPF_CALL_3(bpf_get_stackid_pe, struct bpf_perf_event_data_kern *, ctx,
-                return -EFAULT;
+The last 2 patches are by Vincent Mailhol and update the CAN
+networking Documentation.
 
-        nr_kernel = count_kernel_ip(trace);
-+       __u64 nr = trace->nr; /* save original */
+regards,
+Marc
 
-        if (kernel) {
--               __u64 nr = trace->nr;
--
-                trace->nr = nr_kernel;
-                ret = __bpf_get_stackid(map, trace, flags);
--
--               /* restore nr */
--               trace->nr = nr;
-        } else { /* user */
-                u64 skip = flags & BPF_F_SKIP_FIELD_MASK;
+---
 
-@@ -390,6 +406,10 @@ BPF_CALL_3(bpf_get_stackid_pe, struct bpf_perf_event_data_kern *, ctx,
-                flags = (flags & ~BPF_F_SKIP_FIELD_MASK) | skip;
-                ret = __bpf_get_stackid(map, trace, flags);
-        }
-+
-+       /* restore nr */
-+       trace->nr = nr;
-+
-        return ret;
- }
+The following changes since commit 2c95a756e0cfc19af6d0b32b0c6cf3bada334998:
 
-@@ -406,7 +426,7 @@ static long __bpf_get_stack(struct pt_regs *regs, struct task_struct *task,
-                            struct perf_callchain_entry *trace_in,
-                            void *buf, u32 size, u64 flags, bool may_fault)
- {
--       u32 trace_nr, copy_len, elem_size, num_elem, max_depth;
-+       u32 trace_nr, copy_len, elem_size, max_depth;
-        bool user_build_id = flags & BPF_F_USER_BUILD_ID;
-        bool crosstask = task && task != current;
-        u32 skip = flags & BPF_F_SKIP_FIELD_MASK;
-@@ -438,21 +458,20 @@ static long __bpf_get_stack(struct pt_regs *regs, struct task_struct *task,
-                goto clear;
-        }
+  net: pse-pd: tps23881: Fix current measurement scaling (2025-10-07 18:30:53 -0700)
 
--       num_elem = size / elem_size;
--       max_depth = num_elem + skip;
--       if (sysctl_perf_event_max_stack < max_depth)
--               max_depth = sysctl_perf_event_max_stack;
-+       max_depth = stack_map_calculate_max_depth(size, elem_size, flags);
+are available in the Git repository at:
 
-        if (may_fault)
-                rcu_read_lock(); /* need RCU for perf's callchain below */
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.18-20251012
 
--       if (trace_in)
-+       if (trace_in) {
-                trace = trace_in;
--       else if (kernel && task)
-+               trace->nr = min_t(u32, trace->nr, max_depth);
-+       } else if (kernel && task) {
-                trace = get_callchain_entry_for_task(task, max_depth);
--       else
-+       } else {
-                trace = get_perf_callchain(regs, 0, kernel, user, max_depth,
-                                           crosstask, false);
-+       }
+for you to fetch changes up to 91cb822f98b3438812304d151076dfca9b30d2e0:
 
-        if (unlikely(!trace) || trace->nr < skip) {
-                if (may_fault)
-@@ -461,7 +480,6 @@ static long __bpf_get_stack(struct pt_regs *regs, struct task_struct *task,
-        }
+  Merge patch series "can: add Transmitter Delay Compensation (TDC) documentation" (2025-10-12 16:18:47 +0200)
 
-        trace_nr = trace->nr - skip;
--       trace_nr = (trace_nr <= num_elem) ? trace_nr : num_elem;
-        copy_len = trace_nr * elem_size;
+----------------------------------------------------------------
+linux-can-fixes-for-6.18-20251012
 
-        ips = trace->ip + skip;
---
-2.47.3
+----------------------------------------------------------------
+Celeste Liu (2):
+      can: gs_usb: increase max interface to U8_MAX
+      can: gs_usb: gs_make_candev(): populate net_device->dev_port
+
+Marc Kleine-Budde (7):
+      can: m_can: m_can_plat_remove(): add missing pm_runtime_disable()
+      can: m_can: m_can_handle_state_errors(): fix CAN state transition to Error Active
+      can: m_can: m_can_chip_config(): bring up interface in correct state
+      can: m_can: fix CAN state in system PM
+      Merge patch series "can: m_can: fix pm_runtime and CAN state handling"
+      can: m_can: replace Dong Aisheng's old email address
+      Merge patch series "can: add Transmitter Delay Compensation (TDC) documentation"
+
+Vincent Mailhol (2):
+      can: remove false statement about 1:1 mapping between DLC and length
+      can: add Transmitter Delay Compensation (TDC) documentation
+
+ .mailmap                               |  1 +
+ Documentation/networking/can.rst       | 67 +++++++++++++++++++++++++++++++--
+ drivers/net/can/m_can/m_can.c          | 68 +++++++++++++++++++---------------
+ drivers/net/can/m_can/m_can_platform.c |  6 +--
+ drivers/net/can/usb/gs_usb.c           | 23 ++++++------
+ 5 files changed, 117 insertions(+), 48 deletions(-)
 
