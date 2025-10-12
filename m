@@ -1,197 +1,89 @@
-Return-Path: <netdev+bounces-228615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BE30BD02AB
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 15:27:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A9DCBBD02B4
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 15:29:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 079723B69BA
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 13:27:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69EAB3B878F
+	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 13:29:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCC5D2750E1;
-	Sun, 12 Oct 2025 13:27:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="uVgynvdx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9556A2750E1;
+	Sun, 12 Oct 2025 13:29:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963432594BD;
-	Sun, 12 Oct 2025 13:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C4C33997
+	for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 13:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760275647; cv=none; b=FV2t32PihXRTWPO6mDvO1kxPR3dTI9pi6F+elzQEwzBlJpdnisglzJaPJiIVAaZMGv7cBsok1yLfX8wMrCsAfWY3KaOIorTiwarRUzvdg8vFZ4M5US2zcffYlO8lnruItFiCQMhZOtcvLj8sep77w1XnbAZNckjha+GeatLvPqw=
+	t=1760275744; cv=none; b=arS/iD8af7WG/H4SwEGXuMAF9RQA6RVzNP8lLc9Ldr5Wgh3Y3I6lhZh4AnM95QPzh28SJVrSs7TmwQEcd0cKH1UQoPo9aBXlVunLPkCM4SgM7v6ji/utMndWRUYk+dH9fFiGbH8NSCOJsrGzKL83zUYMzdqMkAH89pIdZKMbKaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760275647; c=relaxed/simple;
-	bh=pjqlBmK1+WbqnxRQqFRg6aWJ1GRKnD6tJB2spJsJOTo=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=CtolHzhKcZgdKBSkJlRuvX3RSexK/DooxC0G7t1ElJHh8fXi+IGh6d6rPsH0MO7jA4gSwwfgn66wCrAoI4RdFasX7T0m4kKNOOKsWoeumiKZ7ywED2ppyU+X5rwms9E6gruElrI1F2TACmtILEZcRk3PdceRFi05d4xy2CdVbWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=uVgynvdx; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1760275594; x=1760880394; i=markus.elfring@web.de;
-	bh=yVG8ADOPDzqUmkywmgv9dc2B90UlYkCVvSg1ciAYIFg=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=uVgynvdxLKobuK46q24Dep5yA0kbVnCiMyB0iFSBftMOhXlZZbPa+Q7Q8SL+1DXL
-	 KoNvsuYS+4wpVBAeO6GNn9kKyCFOeoM39REJ/7QtDFCB1UaxddjMyyxxmMlW13e80
-	 cyBigF+AvQNY3ht+KYW+4el19RVKdgKk8jcw5LWcqvcfvceHW5DTmrgbmSJPybqV+
-	 sXuDHcSFqbtVkOPv4l7n7as1s97dV5KbvVRh3ntC6DZJHRLK3v15fzw8X5uQf2eN7
-	 1DUfLs5SDBO9p1V6DwEZ0ZC2Y/ALuWVJWBrKuIqB+4lwCh0sBgmK3tgVQ0fv8/Qr2
-	 +S2+XDv5pabcZinjxg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.69.235]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MNfU1-1urnDm441j-00VjQA; Sun, 12
- Oct 2025 15:26:34 +0200
-Message-ID: <0aea408f-f6d7-4e2d-8cee-1801ad7f3139@web.de>
-Date: Sun, 12 Oct 2025 15:26:20 +0200
+	s=arc-20240116; t=1760275744; c=relaxed/simple;
+	bh=irl4flsspEWqN2JbuaaethEiXG2Hm1MSnwEfJJSjN38=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=ZAwMY75dshx7bLWs8QPBvIHt99y1H8FJAMNG8N6r3YVM5GdPNzm6yr+HwijE5nMtdgWuypeoiOH2KVXaOfxRTMquEZD/6IgQSIYjLhaM7Dtdfj7CFYEgZjrcuLmhKvpprCjuBWzdv9gILpfeCz+vBIMNXbK1PYnhw9tiULooxuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-42d7e4abc61so124702125ab.3
+        for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 06:29:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760275742; x=1760880542;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uYngBb1Az4lSjC0yPY2rNk2hNyxaE8GGPWbiAnbBpFU=;
+        b=uuV3OYLM3wSsfG5lz0kDnIwV59tdhngcnXrr5QResMNiW1IDH1vmhIR1Cx+sn1iegf
+         fxT4BZqfr4ydQn+e7tgQ8v9cAkbEilyGBKnmbyAKUlSnoB2WdAAYMz3JHTWi4TmD6aAi
+         aVGKgQ2EKDZ8mnKp8OJlM5/MtBrQ3Q4HSQtEoRd90yRHdrQtwNHngjKPfWtMNbePx+lk
+         mQqqGT/Fr8OTt/EkfR6kPo1yqngXUZxS5BQeO3nY0PoUNNeTy/xBay1/R8Kbgm8rrhoS
+         9Br/pvDTOv9nKdI+5DhI6rzALm7ZPudLeBEKj4d4GE+cMm3w9aW8p4XHAkrEqcOOoAZO
+         RzZA==
+X-Forwarded-Encrypted: i=1; AJvYcCUMyqosm5DTz29b7bT9lLBt227aCjnbe4a/LucT26Fqn0WiUB+IMU5WxjvRvSLstCL00rkoB5U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypCsFF2TNA5t/SccXT6L0igN0N4VWvYDRfdAnzTTrrbxFrJrna
+	5rwdVSeswSLXQGVJReZDApDzo8cJHU7uElqfSGwjWwKOlpfwTNLe0kHi6Pmp8gV4ztZitNFSn2e
+	Ge/9I/ZmH80LfEvj5S1b9zGd1+TbneE+QWt5Mw2Wwb33p/lZgKoiu6vijTPI=
+X-Google-Smtp-Source: AGHT+IEJIqNbrGsfblcj3SYtGHu8r6eHFjXqm+qPTuTO7lF+OSeoTjD3z2vlKvgCnXOaf4G93JSCp5DPqRwnYuhOzXtq9nrduW0k
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Li RongQing <lirongqing@baidu.com>, linux-doc@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
- wireguard@lists.zx2c4.com, Andrew Jeffery <andrew@codeconstruct.com.au>,
- Andrew Morton <akpm@linux-foundation.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Arnd Bergmann
- <arnd@arndb.de>, David Hildenbrand <david@redhat.com>,
- Feng Tang <feng.tang@linux.alibaba.com>, Florian Westphal <fw@strlen.de>,
- Jakub Kicinski <kuba@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
- Joel Granados <joel.granados@kernel.org>, Joel Stanley <joel@jms.id.au>,
- Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>,
- Lance Yang <lance.yang@linux.dev>, "Liam R . Howlett"
- <Liam.Howlett@oracle.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- "Paul E . McKenney" <paulmck@kernel.org>,
- Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
- Petr Mladek <pmladek@suse.com>, Phil Auld <pauld@redhat.com>,
- Randy Dunlap <rdunlap@infradead.org>, Russell King <linux@armlinux.org.uk>,
- Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Steven Rostedt <rostedt@goodmis.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
-References: <20251012115035.2169-1-lirongqing@baidu.com>
-Subject: Re: [PATCH v3] hung_task: Panic after fixed number of hung tasks
-Content-Language: en-GB, de-DE
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20251012115035.2169-1-lirongqing@baidu.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:WAgp8h3DyF6g11AayvlQAbFiTVzjoFCtdKXHQo068coehoUT01P
- bW6tgArZAVON6B1QS/KDDP2llblnKalEayJyP8SUrAkR49Edq95sn6phJexJn8o27fA/S0y
- 1cIqFOnqVLrsmWwTO+jLfK/uCP4ll9phmEtknMatXpyd6vM5267T2cBLBfCQ7rQmSBpkzAc
- Y/rAKFr/N7Lq0QmKzb1Xw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:4M4KDQe0V1M=;DELwcmNw3ZKCxN2ao5uzkogf/bG
- nU5/BbxMSQnPDz1RqtNBibOFpd8zb0u7514KU2mluqSfSV2rMBzXRRtwIAe0u3TvYXQYDvh77
- 5ptEjDs38wAWMlqmf3IDu8AtBgG0GWfiUBL8fzGmcA39yfUGsJpE319Vm5PokuXKphsfzCvYO
- sESX3jrAhosM5Psih7SzJ1bxEoaJjSsPNyEkiG37g7ESUBjn93i/kMLWdgfWQEldgYkOUVQ7i
- IAau6qTm01/HblmlVk7LrJBJEAOJFoh3dCaTWRJ10qrPLoZCJcE62GHR+VaE5kHBPTZtTMfxO
- FGBszJMB0Z6zCyzsv6mwM8jeIupt5ReavH8K8WyNdCjeM6Tl2hHsSuFaUpqqRda81jyUzhLIo
- PlLeUQNtuk2zuoP2Ze99r/jCV+Uq7ZPQogCjAE1EZB3fbN81Czw0++tVq/HTGMZU0Y6jtbBsM
- BHffKIiv+t5yhL/XMdbIaelv+baivvhF/iJObTYphkJt21JIhv2dR3xGUGCGP/YlDEjxFcRUr
- 072JPk1zwC6d4NV0mDnNIr6uM7NKQ4QyUco5kkzMJ2CdbKlRRDDd0EZWAd8/7gFUoQTQpd2J2
- 2cv9gBcJHQoMm5FcLmBsTZMa02pmHJGHXQmuPkwo200sDG+OyMz299GTq++sTkY+Mf96dcGlH
- Aw7QnWCggbCWGNgfIDtfPjyjjUv3jQdS+Js6kypVYfe3s+Q6a5oCUpZ+ekTvrfRiEADVw+u5L
- HF8g+4BYZTrkKuJ5PycB5jWni/rvU0zejmVK9ta0iPLBcTIN14enm5xQHNNfX5XBiB44R4zql
- +XApa3EGYOK4B62xcIN4SRpEMGtn9RB2GyvdwXDcYIw/+nK/NcfpKwxCfsuzXzzzILz3LqurU
- LQkhgYea1c3WlYztmz0Dd0LvOiRqhl2X4uLQMgUe4LgvMPe+IXfG/ls8iRGufPlp01wsmgz1z
- XS34LhOpiv2b/Gpezs5Nif1WyPZeRk32ZOmO+fvhYHXOZI2KYDR9P50w1Fs4QSjCCiVKGE01I
- 4rAuu3MzK1xD8mP4V8pef1BCqjUZPjJGgkpLDgmXoKd/Z3BixNQHRl7cb8quiNhPhHMbxVfSk
- VYyWXk7SFcB5QIK0At+EhnN04JaPSsGq+5jymYBYh+uIg/vHEQeZMzaFxGr2tACMIJbFkDdLt
- gYAI9vZakN8/6cxu2M/hORVZ/QF5ZFDl7LoGdPD1r9nYWOwE6JfiSvKz95LMQjH7Mbr3JSkoZ
- ERWWHQ7/al73gpyenPx5SjF/dkY9YOiigEJFjYE0EVBcQwjr2ZMl/PTcebOhJFUMyTiXk9GVJ
- rPoxJSH4q1GcLUH2EYCu+/4b4bltZTK3URPCcNzSdWZZpcoX+0MzqwMCFMy+bxGoozr3SNpSZ
- IaqgwB+O7hZy0A33FiwIruOYGC8QS8JeVewBhf5aWBBC5+YNFIxWlH1/ApOfFJrWT8Y6sh1tW
- WNaf8nwPon4PI/PxT+bFtGLDHBXoLg04bXrzEueDLgwVzSz6LOW5o8jrKCIgoxIi+uoahi7dX
- ZoTooLPtLK60uNTHg+R/9K1Rex2+4x1zKwHPYNfsg6Hpu7VlxHUNoUVc/Qc9pmf9ed45jR3vx
- YtnH6A9MOzS13+AlsaMkYqDTTgW9ysE4MFqB9hiyqF1r1e9dsVm3kY5k2EHcW9rH2UjMRM+Ea
- Uz1lNiDLsxSWlJTInM3KbOoIueLYemnfDJAL+DfVOpXaJ19714i6ZUKq9KENI/4WRQkf5yGzU
- /DWUBC53+YJO/ATMs2WWIwLI6acmvKN5w7mX60g4g1cLmTT/7a5+M7iYMUrP6CWsTBJtXEzYS
- 01mGjVG2yhATDOOPcXUH5KJQ12WGFJmaFlWHYLFbA1EDoFghz5670T3nlP5xbB+Qoi0XWu3l5
- iscPLMtcDZ/k40mTt0Y1baKRtgnM1Bki9g8PJxlJM/0R54QTukialxPlWBBB7GHsVx/nnxuYf
- J3P0V1HxqZfBBatArD7qJNcBmmo/Ovqbbn5yBfc8tK1gbbuxOcd3NnAXSenU4PkHp6p7EWGgl
- HeFtF8F8NDPMQwkAykvAsEPtb2AN7u8TCedgUgS9O/Ux0g6CnDYNlZsRDyzPvDF3QD99RJtYw
- jw6cb6JVmbdL0wSkC87muVgPP3RG8Ja8hIx8xGqFQiLKpiMw6nHtDvnAa+nY0t5AoOdYOFLNC
- 13hysZoSdV8YB66k9+ie4YersjebLGglK5noO0UwQlnfAQ7qWNit6uRn+/wW9pneXtehfr90q
- Zr7IFdXNwDcwKXnGkZnrTKCBFln43eW44t5DWeSSqWrWDSGP2V5ueevBd7DrSEM0RVKxTB3ll
- WdkHwVcSQ6rRjFsxcL1+FGE5RDiVpPxW/jd67ZGivCQb+HGJwunOP4EWrjXYp8Zg4j+EOwvls
- 5xzovXx01XcFbrgIAMM2k1iyCCCKTQ8/EhD8tsQPCzON/nZBAZVpKSefqSDtG7SsPzCXYCGKu
- fMk11g3o2BVVGjOSDMlVgwl0NwTEGhH822XpBqKR2sgDp1OOLkRPlJ9G6QOVnkes38X4n79g+
- zClINI8Ff/x6LIKBtF00CD6+OW4lkE+9kl1MvhsFVemDQhUKGgDDnYYxs4xrAkCUGxXrhavpb
- sjAu3oxjDGDeN7YvDgeJZn8uybXoEXY+XiSf4erKBogkyeXMxO8HDL7ebDKHfo40CWn/Jafhx
- FkEhHazt1rRO+CN0a0KxvlzHGT+jgwYe3czTlzDVbbTX3EgRZNVdOn1LHzmVnIQrfaED4wHBI
- ETf5jK3OiZRUyqrQBpvZV4tor6nv8+N3g6WVJx38EXNh4LadY5+cctbE3/IvHNfZL5Lh8afdh
- de10CWT8SFo2WIS+mDTyRvfzY7Tg4YHO7Tr8z8N7zPZ/FurAFF+bEFOFheJkD35iJMN9kD5W1
- G7IMafpYQBEMpHRUXXfheL5LZH8f6AX5rgeBINZQ0KQk9U606TLGWAgHyRllxvKXbnaBKDnjy
- sGEX6YA5HttqLPNGJzJtvkdH2LJbdW8OS0zYf5gJT88/m3cwWEjc7o2hiOyFp5/NjhhpSL7s3
- vAX1Jbq9S2ndkr+IJRqiHf1EEFqUHz5a4SYsON7D9dclb1EKHkzs+ynRs2DGhx8tgmJbiBlpS
- +9EY/qqLtAfhx0UORMMCJkRFMOchLtjOYfR4S1uWfaQaVScgdrRBWDXZG/ZbV4KYU0tDpErOA
- Z4zaGDVCV9K+rnKY3XqT1Gap0sIQuWB2mn0Yju5iKkQ9REndepD5bOC7oIXGS5vsPDMSfXrbC
- yeaQGPIk+37shl0LI5U6+aa8HB8YUDOChkxR7r4APZCRJZFtlplyBZ2ceNtx2izU276XTy1kl
- +Qa69Qwvv5znW2Ndjqu/CsaMwPFMKBDfN5Kgm4OM1ois78jUdSmZ+3TyRT28yBYee8IVWIh5J
- +mAX0PKFqMji5v1k5CU+5ziOcdU01otwKM6MbubsHSLyZTOh+7rH3tQdGl+rvYcc/6sC6s0ul
- Ec60sQUU7DOuxoqveh3sFMSjEXMK5WXczgHfeAPnmVXIYmwJDdNFZzVZkodk6ts2FkIrvr1Vp
- Fx8QU82lXUbAc362hpDumDbZE1vOFB9/ATEMsVrRON84jQGHs543c73Ze10L/pjawG3UcKB13
- HFuWTH+3ZmxCyqycSL/sG51N1CMGKM8QSyB+zBeSz8RYKZG1wIuXW84GEtyqrA/BNc7yf3j34
- woKZ61Xzj5TlO6NIvIbAzS4T6cMUzU/yGZyvr1ixLVQ4vYyzUOkK/xKUdH3YEGk1yRn8uORZY
- 439/8KQAdilCasEWxQR8G4IoU5u+bQRV0g3dk6gIggm3XwVkQWCz5EYcq/wVLAFFqPUZFeHxE
- g403bUMdp2g+CJ0Gh8Y8GWrj9519SoGPPAtJGeeFiRUs2KwScqk5OhiS9AELBlGROb8GnlSE2
- wjb+Gpu9VsUeV9UCHjyXCxBXl16QC8tblQIdX7DRYmLpA18yaOQGufrm6OdmfCYfeyxLaB6nZ
- G16sPcQozLJ9PWwFfAaYfYDkdRmyYuTykoxUeYeDd9V4IlCrt4gN77vA2KG44uM1oRf5O7VJO
- MiV/m8ZUuPM1MMWFsjGL9fKqIDA225aEakl5DqXQoTBJSqOi3O+u1Ane5n9n6YStgNgNIzj8Q
- 0SpZQPsg81Q4LLokSr3S5Y0OGE4rZwprujCjsaTR/oXdnT0p+rOBMdSuJ7YnR4sjsJjNJ+2+K
- 6sd+spXPghluZTP+DBD1csYP+Nl7H9l2CqGHXxEGd2SsKeDNuI3fXWof5AZMF4Y05AmQJ9D1c
- 8WvEdUVbiRCtxcbXzWEzV7gqjkiJ1scKo1gCQAgn2L0q4N85NdHRPfjaWVPjJHIWLsXV17CGn
- GS9kslfjzTxRwbEzuo7PutzKlZ0OBYhOHYRQ1wIekFmvUlEiur6BfX84spaCZ3GCS0rqdYv7k
- ZgRhwzO5iPL3rxd1vWLrP+dtr/oOWhSgn1Bi7zoFSgXCs/iDcnpACN0dSRo7IrN9C8RaChTah
- WDkr7scYmBLsSmVldCeX4SsMDEfSJb2sN8K/2MHirsRX3ZgdZyyQXhEGHs6DYknT46RpEk6El
- nfrHExoZ33RQiL9yXyARKNJcrx0ktTvoQC38LLxxuUCZFUWi8V0JzdGt0O0d6ZQbRgQLc7aoS
- 1jguQyrRSehr+IWfmbHwycuTXkFkunYmBzWcANuqXV4v1Zl/6qfw5w1BmFaOtTi7qWyC4x07x
- zsYQbbV6MPNIqay92vtdFYLXmW9kmeHVBW/gno1C+kW33xJsD90J6iHcutlLWZXMIrUWLmIuf
- fy7JkZ7gh07sICH43v7aw3JeQGwaC0K+WUsj450SBe5xAQB3gKxQx3kOLNY868XCDte+ZheAZ
- 2e2aTJatoZpaY/HzmrP0Dam0SizyxrlTcYsdZFDJ9C1Tbh65KlQLAXCi7QOHKS2XmLxOUihCo
- 3vS2RrkNK9UCbPutpn6jrae8iKsVmC457ieG96L0WwPlhUCicHjsMJNkZ2ky0AwOD1BzqjDV4
- HP/hUmV/2zF9tD/VlnJG1wfGKmP9AFDqqdzeliJ3EKwMsWLsQKlOyWKiRQa+z3Ugc5Gl7es7h
- RXGoA==
+X-Received: by 2002:a05:6e02:12c5:b0:426:39a:90f1 with SMTP id
+ e9e14a558f8ab-42f873d62c7mr206252075ab.18.1760275742364; Sun, 12 Oct 2025
+ 06:29:02 -0700 (PDT)
+Date: Sun, 12 Oct 2025 06:29:02 -0700
+In-Reply-To: <20251012130418.49730-1-contact@arnaud-lcm.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68ebad1e.050a0220.ac43.000a.GAE@google.com>
+Subject: Re: [syzbot] [bpf?] KASAN: slab-out-of-bounds Write in __bpf_get_stackid
+From: syzbot <syzbot+c9b724fbb41cf2538b7b@syzkaller.appspotmail.com>
+To: bpf@vger.kernel.org, contact@arnaud-lcm.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-=E2=80=A6
-> This patch extends the =E2=80=A6
+Hello,
 
-Will another imperative wording approach become more helpful for an improv=
-ed
-change description?
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/submitting-patches.rst?h=3Dv6.17#n94
+syzbot tried to test the proposed patch but the build/boot failed:
+
+failed to apply patch:
+checking file kernel/bpf/stackmap.c
+patch: **** unexpected end of file in patch
 
 
-=E2=80=A6
-> +++ b/kernel/hung_task.c
-=E2=80=A6
-@@ -229,9 +232,11 @@ static void check_hung_task(struct task_struct *t, un=
-signed long timeout)
-=E2=80=A6
->  	trace_sched_process_hang(t);
-> =20
-> -	if (sysctl_hung_task_panic) {
-> +	if (sysctl_hung_task_panic &&
-> +			(total_hung_task >=3D sysctl_hung_task_panic)) {
-=E2=80=A6
 
-I suggest to use the following source code variant instead.
+Tested on:
 
-	if (sysctl_hung_task_panic && total_hung_task >=3D sysctl_hung_task_panic=
-) {
+commit:         67029a49 Merge tag 'trace-v6.18-3' of git://git.kernel..
+git tree:       bpf
+kernel config:  https://syzkaller.appspot.com/x/.config?x=412ee2f8b704a5e6
+dashboard link: https://syzkaller.appspot.com/bug?extid=c9b724fbb41cf2538b7b
+compiler:       
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=14465b34580000
 
-
-Regards,
-Markus
 
