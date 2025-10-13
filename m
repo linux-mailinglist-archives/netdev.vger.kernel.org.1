@@ -1,95 +1,86 @@
-Return-Path: <netdev+bounces-228679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA686BD1F1C
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 10:11:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CC27BD1F37
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 10:12:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 92E8E4E1161
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 08:11:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 282B23BEB2B
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 08:11:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1A422EB5A1;
-	Mon, 13 Oct 2025 08:11:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B122ED15C;
+	Mon, 13 Oct 2025 08:11:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="hN5ZU1ai";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="JHQYgRZP";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="hN5ZU1ai";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="JHQYgRZP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LrMDkz1g"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0F62EBDF9
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 08:11:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D1E2EC564
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 08:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760343063; cv=none; b=I7B5bssSeRK6o7bTS8IiuHmg78F+SoE2bdnXrDv/cOlySaCq61e2K+iiQHpEDuiWPyZpr22nxroZTNy+FGCvhxVJLp0Xb9qZRYigMnW6PJLEXjxkI0ZPP1RMmlZJDyZHSAhpABpEsKYT/HpvdTuiPdh9G4mC2UItHdGmt/bHYsY=
+	t=1760343104; cv=none; b=hkOl1Ixt3JSwqWcPlFfGfMlYUcdqGyAr0abXqOrPMuh2kB1TfXpmQw7zcNwXyVhqXxdiyCo2qBLmS0/4oB7va0JR9Isu+4Z3awC+WTdPwIMXDqipeXX+Eh9xVfPRN+dkWdbex1u2lAAnD+1Ok+c64a5ympjMLuC3bJW0Txe9+hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760343063; c=relaxed/simple;
-	bh=lopXj8e6aKPDNo7SHBuieYj+hSmgFkgij2+xbxnVH6Q=;
+	s=arc-20240116; t=1760343104; c=relaxed/simple;
+	bh=9yCeUnVOh4PkNtq971jR4OvxcgQqKArslTOCky9HAQg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uzrkvO+Eiq4Gq8dWsG/cs1/j/zkf7uSpovp+nCDE9W3crKgh6+VXXZxinXZSouaCArX6AmisOX/ClSQ3orryhJU1b+SUcvSvvtgd8i3iSMKy2jrv0gxKgCGnjXRwRXU/Bk715RdEz6Wt5rvg9fAxbSBSgtH7N5Q8OWSjDFKpyaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=hN5ZU1ai; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=JHQYgRZP; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=hN5ZU1ai; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=JHQYgRZP; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 2C75A21275;
-	Mon, 13 Oct 2025 08:11:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1760343060; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	 In-Reply-To:Content-Type; b=LztEksIQEs8axj66Za+En+PKWahz3ktRiI6Bag59cAOe3FIBNL25xa/PvgRhcMUejc/KKyEC2WQkqv432qR85/0zJSVt5nxf0FaWGGiZgc1ZAeeluMSSuuQkV3Qg13SJSbYNrEdpDDwWYYb+cDjwMwnqvM1kBdYYNRTqADYldqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LrMDkz1g; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760343101;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=8ps41zUy95kfjQbWRm26qwDq0kcKNrKkfDkWwXUzHQk=;
-	b=hN5ZU1aiAETszeTISSACxTrVIT4FIDiNbwSCadcQjU4eLVyGNFACm9vuYpGaOt0InVZNYF
-	szhIRF9tldJ1NwWFm8eqsrCUfMokc9koSOXtaSXzh9Tfg7bk2O1UIS3FelNv/ocXg9fGon
-	kKzk2SaMRc8dAI2b8h6uN4JKW2kfZkI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1760343060;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=8ps41zUy95kfjQbWRm26qwDq0kcKNrKkfDkWwXUzHQk=;
-	b=JHQYgRZPJtqz/rhmxOsmYlzT6tBnNajUWKDitVayTk3qrf1RZRnHzc1oNPW45ivTr/4mvk
-	UhSMUJHtTLjeCRCg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1760343060; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=8ps41zUy95kfjQbWRm26qwDq0kcKNrKkfDkWwXUzHQk=;
-	b=hN5ZU1aiAETszeTISSACxTrVIT4FIDiNbwSCadcQjU4eLVyGNFACm9vuYpGaOt0InVZNYF
-	szhIRF9tldJ1NwWFm8eqsrCUfMokc9koSOXtaSXzh9Tfg7bk2O1UIS3FelNv/ocXg9fGon
-	kKzk2SaMRc8dAI2b8h6uN4JKW2kfZkI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1760343060;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=8ps41zUy95kfjQbWRm26qwDq0kcKNrKkfDkWwXUzHQk=;
-	b=JHQYgRZPJtqz/rhmxOsmYlzT6tBnNajUWKDitVayTk3qrf1RZRnHzc1oNPW45ivTr/4mvk
-	UhSMUJHtTLjeCRCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1039213874;
-	Mon, 13 Oct 2025 08:11:00 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id HCp0AxS07GiGHQAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Mon, 13 Oct 2025 08:11:00 +0000
-Message-ID: <32a23856-ffaa-4d41-b77f-fa0306042621@suse.cz>
-Date: Mon, 13 Oct 2025 10:10:59 +0200
+	 in-reply-to:in-reply-to:references:references;
+	bh=f1tPp8YEljYMfDXm3ZuBVdpyd9eaR3nb2fIv3sUlkgA=;
+	b=LrMDkz1g41hoUfjBS7RIXFSScTQiGibBNcRz/e+Sa5FB+AnKuWGG2ciN9UuasDwMyxrISZ
+	F4EQBQMHpHyNQM0YilxPMadcKdGQtgime0bufBXQWs0XNLvs8a35HcNvUUbltTwszRNrRY
+	f1dbRE2rJI4eKICGto18oNI18lZqA90=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-611-EupemKlQPg2FVuKGiHYaxw-1; Mon, 13 Oct 2025 04:11:39 -0400
+X-MC-Unique: EupemKlQPg2FVuKGiHYaxw-1
+X-Mimecast-MFC-AGG-ID: EupemKlQPg2FVuKGiHYaxw_1760343099
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3ee888281c3so4678420f8f.3
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 01:11:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760343099; x=1760947899;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=f1tPp8YEljYMfDXm3ZuBVdpyd9eaR3nb2fIv3sUlkgA=;
+        b=biQR9TRWxK6PqPlZhp/sp7lyH6OsEIzU70Immcfh+gPsTxTjEqsWeSajqAeCdGkbRn
+         k33XfUKIshr5tbUkGmVWqTErToGRyK4GVZ2ezuFCpEEI9GHkm8uHEWUOinashH2TIf24
+         iLfleka5IWSBXnHiTC8mCegK+I6eFZKNbX/1OZCzqB2+tXXOkjaHESao/lY1+9xrZVuM
+         PusRW4Mc33wZh1Jy3HxIMi0KlyxELSZzFeDNEltwh3kefc6bNUd4H3gApC8NzW7zU+hs
+         Pl5rov91tnNWsLAksvRTKRUBZw27PDJz7a/exbCQEswi/+m2aXoxJBV8qaVg28xDJ+nA
+         JJZw==
+X-Forwarded-Encrypted: i=1; AJvYcCUNekUVXa2wrhxrHOBO0j4N6zGAZlax+iFTNvLv71ZNZEBSSqilHT9i5N58gwL/yX8OJ1qz9J8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDRAk1UKsMIhkiaKXCk/iL/975R1FwxIguljr/ss3WLwF1w65k
+	wFN4BD/HuHSiA+BfHnCdKZEUhLn7fl62mVQXDXgshWZj2faFJqu1hLfx1p2imDrJWiAQkrj17sy
+	s63B01vFX3n5xSc5NZYDG/p+0K0RDYdGrr0AfE1nGNQVOQWRsm4c1wf0xAw==
+X-Gm-Gg: ASbGnctnu27Edb0wAWrU8VB/jRkbXTyoCp45UEMF+7zt+DiC0nUYvu1M2ey56Fxz2/2
+	B7PrZ7z5LVQLqbLUfWQF5H1TJcwKa4fUS/8G4HG1UJMgfeKgH8qItTEGozoB5LYMYt6O2nDXMyn
+	DQP/iAnJy9250A7FSwK9c93fnP+Go0WO6zUmuacB33nAwRsAQaVnXy3XuGvxpuqfO2cXizRiIgx
+	KHzRoXIhDZS0LhmtX8jJtCQtPfIru7h9gqh0Y97gooQ284V0zqnmIsNqD8MBJncsPB66mQbJTot
+	mMuDJaGU8SVg5/WgUfauIJVjBm0LPKUeCTrhL+cUJ1x8
+X-Received: by 2002:a05:6000:603:b0:407:77f9:949e with SMTP id ffacd0b85a97d-42666ac7026mr12223996f8f.21.1760343098687;
+        Mon, 13 Oct 2025 01:11:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF7JlCWnkPct1cz9l8P3e2Ai1ZjwIQPTyoLeL4/jqXzDz+4utC6DGYywfrc0J3b6VB+SnU/BQ==
+X-Received: by 2002:a05:6000:603:b0:407:77f9:949e with SMTP id ffacd0b85a97d-42666ac7026mr12223975f8f.21.1760343098309;
+        Mon, 13 Oct 2025 01:11:38 -0700 (PDT)
+Received: from [192.168.0.115] ([212.105.153.201])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce57cc03sm17518704f8f.4.2025.10.13.01.11.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Oct 2025 01:11:37 -0700 (PDT)
+Message-ID: <27931e85-451f-4711-9681-38db2563efc2@redhat.com>
+Date: Mon, 13 Oct 2025 10:11:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,106 +88,98 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [mm?] WARNING: locking bug in __set_page_owner (2)
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Andrew Morton <akpm@linux-foundation.org>
-Cc: syzbot <syzbot+8259e1d0e3ae8ed0c490@syzkaller.appspotmail.com>,
- Johannes Weiner <hannes@cmpxchg.org>, Brendan Jackman <jackmanb@google.com>,
- LKML <linux-kernel@vger.kernel.org>, linux-mm <linux-mm@kvack.org>,
- Michal Hocko <mhocko@suse.com>, Network Development
- <netdev@vger.kernel.org>, Suren Baghdasaryan <surenb@google.com>,
- syzkaller-bugs <syzkaller-bugs@googlegroups.com>, ziy@nvidia.com,
- bpf <bpf@vger.kernel.org>
-References: <68e7e6ad.a70a0220.126b66.0043.GAE@google.com>
- <20251009165241.4d78dc5d9fa5525d988806b5@linux-foundation.org>
- <CAADnVQK_8bNYEA7TJYgwTYR57=TTFagsvRxp62pFzS_z129eTg@mail.gmail.com>
- <20251009174108.ad6fea5b1e4bb84b8e2e223b@linux-foundation.org>
- <CAADnVQKkLyJ0cbLet3q3X+X70FPAejcqTxP66d82WTO82c16rw@mail.gmail.com>
+Subject: Re: [PATCH net v2 3/3] virtio-net: correct hdr_len handling for
+ tunnel gso
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>,
+ Jiri Pirko <jiri@resnulli.us>, Alvaro Karsz <alvaro.karsz@solid-run.com>,
+ Heng Qi <hengqi@linux.alibaba.com>, virtualization@lists.linux.dev
+References: <20251013020629.73902-1-xuanzhuo@linux.alibaba.com>
+ <20251013020629.73902-4-xuanzhuo@linux.alibaba.com>
 Content-Language: en-US
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- m6M14QORSWTLRg==
-In-Reply-To: <CAADnVQKkLyJ0cbLet3q3X+X70FPAejcqTxP66d82WTO82c16rw@mail.gmail.com>
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251013020629.73902-4-xuanzhuo@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TAGGED_RCPT(0.00)[8259e1d0e3ae8ed0c490];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,linux-foundation.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.cz:mid,imap1.dmz-prg2.suse.org:helo,linux-foundation.org:email];
-	RCVD_COUNT_TWO(0.00)[2];
-	SUBJECT_HAS_QUESTION(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
+Content-Transfer-Encoding: 7bit
 
-On 10/10/25 03:02, Alexei Starovoitov wrote:
-> On Thu, Oct 9, 2025 at 5:41 PM Andrew Morton <akpm@linux-foundation.org> wrote:
->> Seems 6.18 will need this.  Do you think it is needed in earlier kernel
->> versions?
+On 10/13/25 4:06 AM, Xuan Zhuo wrote:
+> The commit a2fb4bc4e2a6a03 ("net: implement virtio helpers to handle UDP
+> GSO tunneling.") introduces support for the UDP GSO tunnel feature in
+> virtio-net.
 > 
-> Maybe. I need to study the git history of that code to see
-> whether it's a new path or I simply missed it earlier.
+> The virtio spec says:
+> 
+>     If the \field{gso_type} has the VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4 bit or
+>     VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV6 bit set, \field{hdr_len} accounts for
+>     all the headers up to and including the inner transport.
+> 
+> The commit did not update the hdr_len to include the inner transport.
+> 
+> Fixes: a2fb4bc4e2a6a03 ("net: implement virtio helpers to handle UDP GSO tunneling.")
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
-I would add the following, which means 6.15. Maybe there were no users
-immediately that would trigger it, but should be proper. The only non-EOL
-stable is 6.17 anyway, but might help others backporting.
+Side note: qemu support for UDP GSO tunneling is available in qemu since
+commit a5289563ad.
 
-Fixes: 97769a53f117 ("mm, bpf: Introduce try_alloc_pages() for opportunistic
-page allocation")
-Acked-by: Vlastimil Babka <vbabka@suse.cz>
+> ---
+>  include/linux/virtio_net.h | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+> 
+> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+> index e059e9c57937..765fd5f471a4 100644
+> --- a/include/linux/virtio_net.h
+> +++ b/include/linux/virtio_net.h
+> @@ -403,6 +403,7 @@ virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
+>  	struct virtio_net_hdr *hdr = (struct virtio_net_hdr *)vhdr;
+>  	unsigned int inner_nh, outer_th;
+>  	int tnl_gso_type;
+> +	u16 hdr_len;
+>  	int ret;
+>  
+>  	tnl_gso_type = skb_shinfo(skb)->gso_type & (SKB_GSO_UDP_TUNNEL |
+> @@ -434,6 +435,23 @@ virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
+>  	outer_th = skb->transport_header - skb_headroom(skb);
+>  	vhdr->inner_nh_offset = cpu_to_le16(inner_nh);
+>  	vhdr->outer_th_offset = cpu_to_le16(outer_th);
+> +
+> +	switch (skb->inner_ipproto) {
+> +	case IPPROTO_TCP:
+> +		hdr_len = inner_tcp_hdrlen(skb);
+> +		break;
+> +
+> +	case IPPROTO_UDP:
+> +		hdr_len = sizeof(struct udphdr);
+> +		break;
+> +
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	hdr_len += skb_inner_transport_offset(skb);
+> +	hdr->hdr_len = __cpu_to_virtio16(little_endian, hdr_len);
+
+I'm not sure this is the correct fix.
+
+virtio_net_hdr_tnl_from_skb() just called virtio_net_hdr_from_skb() on
+the inner header. The virtio spec also specifies:
+
+"""
+ If the VIRTIO_NET_F_GUEST_HDRLEN feature has been negotiated,
+ \field{hdr_len} indicates the header length that needs to be replicated
+ for each packet. It's the number of bytes from the beginning of the packet
+ to the beginning of the transport payload.
+"""
+
+If `hdr_len` is currently wrong for UDP GSO packets, it's also wrong for
+ plain GSO packets (without UDP tunnel) and the its value should be
+possibly fixed in virtio_net_hdr_from_skb().
+
+Thanks,
+
+Paolo
+
 
