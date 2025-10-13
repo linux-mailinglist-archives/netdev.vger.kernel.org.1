@@ -1,85 +1,89 @@
-Return-Path: <netdev+bounces-228949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8C6EBD6562
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 23:14:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 939ACBD6565
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 23:15:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CB033A5C57
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 21:14:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17C3A19A0202
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 21:15:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D82029CB48;
-	Mon, 13 Oct 2025 21:14:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4202A2D9ED1;
+	Mon, 13 Oct 2025 21:14:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ktat3RsU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPvG3u0F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3CDF219E8
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 21:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF39422D4E9
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 21:14:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760390094; cv=none; b=jSrgrHw7KMjpRL/ELCVzif7Hl8tVxKmwN2JEnFJf6ez+l8nEa6+I2+C7w1Jw0JAMIHJU81dww+vdoUEo14eXo2aH4/FN7zxS4/T8/z88dNp/41z6jBJHcLPXsw8O6erd5lb8SodO5kBWZoSX8U+x1fMTcQZf+CDEATR91E2ydd0=
+	t=1760390095; cv=none; b=PAlmv2LC7rJI3e8FmeWGJ48n22/qOXFiKCtUGQ+1vPp9ncrL2x+NpoHz2+3+7UlpgBSvjZScnPVrJCmMruhBCGwpjiCG4NTyYl4eFMkGJMPcUDwV6u6aHW91Dz+eM9ZsxETnR9jmz6BUEdDXsLk55M6G+fH3tK899F7DQfSeZpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760390094; c=relaxed/simple;
-	bh=fiVZPoISxgdsWpDRlbthWnPi3DmwLnYay4eQmY78Rj4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h6m6+FJEMBUwKOBGYm8c6v9KcMVGTVqrm/vdjTrjlEF+gkK+bMvwIqt4OtreTlsjf/h3SCyqtHkAYlwJDMSP86oiEAwSlQv4j0os5aGGZ9wWfNrkg2Dnj8av2QvKLhXRWN+7EPBoH58CYnR3JanfcVp1uV0f9jkilTrokXVB8gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ktat3RsU; arc=none smtp.client-ip=209.85.210.52
+	s=arc-20240116; t=1760390095; c=relaxed/simple;
+	bh=FXKnWLipzyOjCV/JuxZOMe9e34W/o2jHr9FpwFUq5U4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PXcNVMTqLUqQqM1Lqht46098lQIV/1RmwmsoK2bLzJ2EXQK06vDcYd2QJ1zhbV2GgvFhEfcZzoin1skDg9CX874O516UQgII6AgKxu6sqt/GWTDvL2On+86Qu0JunI7sEG4Eq2ZiqUqkYEaOEXS5SMBp9Ogz5GccuAvMG7+XP1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OPvG3u0F; arc=none smtp.client-ip=209.85.161.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7af40016ab3so3250534a34.2
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:14:51 -0700 (PDT)
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-64e5f669511so2474570eaf.2
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:14:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760390091; x=1760994891; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fxXABW+Lic03ma+LulOIrKLZk3KJJ9CW9RVHua2P8ns=;
-        b=Ktat3RsU6+72cLRCsqcDAp5e629WfZFDGJdkVT/KeAPRN9qJJI0bvS12zOy1/5IaUs
-         YrjKBXwMuwXLMNS1hF8hakXs5Ij6cIPu+Ce903ILi7F8MxBiGQga2NGuHlgzVw3sbhRE
-         e/Mgdo21pSLVRFTpn1qQGlXse1p05EPakn/8q4maC3M6WBgoxdOrHWCPxcuCju8CxTuZ
-         Qf6dQNzIAh9GMf7Xj6gBtm0HVk5k7WA14ogR431KQrIHaczU8CotadNjGndAtMl7ryvo
-         jY0u27xT1S9rdCesvv2Q3OZevOGA5wh76xFCYueK9KxKg8ISrNyJSkmkAdKMIzYTgr9Y
-         6OmQ==
+        d=gmail.com; s=20230601; t=1760390093; x=1760994893; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=goaqvGEJKuS2hIGX+Z9ykCyJxu1Z7XvKkjtUr71VoHY=;
+        b=OPvG3u0FCUVOv/Xkd8x1EsNkSIlzVew2lYIBo92lp9tPgLlMiA4d3/HBmKp99GirOi
+         tw1dsXYvd4BxPS5bq7k3+HbdrzvEcCegWjdEnrjJv6bLNTKBlcARxQK1eJEO+9JwUTDQ
+         o5YHP/dZ0bPHbjWG8msPSEyzEg8OizpqQVUV1Nih8eGVVHHKHUXbOGDPQNGd/uvCrm73
+         0t9v237AfftLcQS0wQ8qX31PLVW5PA71jFh6o6QDpeIdYFXKHIk80gMhvRKg3epBkQTx
+         dfCsN6gJWVZ9//aGyPxv7oHKNJaa1vmkkzGmUr6wI/7CSk56/xS0H0sOrfUK5CCOJ++b
+         v9/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760390091; x=1760994891;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fxXABW+Lic03ma+LulOIrKLZk3KJJ9CW9RVHua2P8ns=;
-        b=VECyWmYCG5byyF1mJZh0iVJ4sXoq00qkRVI28tMVaqJxNYkgzSaKhKBooPvcDqenoQ
-         ehSTBjzukT0G30cxBG0RywZbfeDYeCOzmD4AJZOJU1oIBrVzI9DCIrF0aVHvehKT4ahD
-         akYGGw1cqge2eDJBRBKubziH7OjQMqRSlnLN8/DWcq0YclB0qMFZq/fTykhFp27blh4+
-         39iys545jejazltyDEWtL6UVyYskFBdukWh1TahaEHa1DMmLlCCP6LrkxGupdIGOHntt
-         EgAQfjpR0YpQP8k+GGAE5pDr7e7FtuY/yLpktFrNX4MMPj/fFX1ncZszPi5CJ7kRx4cW
-         Xv+g==
-X-Forwarded-Encrypted: i=1; AJvYcCVjnFHoAv7CugupC7l+QeGAdpS0wgHBr0BHVDV2O7qAD/7rCuueF6EDC8t+P4RWlSktcJtf7y4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUrF/AiXCm3G+Y8VCEbzYIBXWk4kIbvNjiyqdybzpjjM41LdQN
-	OLPh7tfUfxvn7zyX6YZXeVgXIawyX7uL2nUKgqFeJBQn+jNAWBSMhG+/iUSW/A==
-X-Gm-Gg: ASbGncunXYs3yqYanehUl745Ys92xX+w/oi6XnYIZh62xA93YKgrcL2B4F8jOHJo7S+
-	UgC5su6EMg7iUNM1ZyHLrOT1719pNrhyBUlbNZ+5qTgYnAmpMlMg1fhBrSoJWQFxopRLTSbdbFZ
-	Lv1TAWy/mS8LlQtb2IPNFm+z2yhKcNhzIeNKXW+7ybBk/r8j2uuXRevQTTCBlIBYgocJjIu5zKo
-	6D0vs52peYhj7A4DasbXDKzMj5KhNS2/O7Rd6dT52nHPqQ1twDfjmuUqejTAwmDR1tCaqYybqd+
-	ZCLC3IhfQMs82qltd32nmB18YzD6FDZ45LyFAsyE/mZx8/sxf3eC5UeatJLpnMzgoAhsWGo/1rU
-	R1cx2O1XggyhXgo37EPDJ8c0c6tpZi691D8nZw21KNK3VMlccTynrXEc5cYHxfUMOytTd
-X-Google-Smtp-Source: AGHT+IHjM1R93jlJk9QAmUVhPTRkSV5Mb7eLKP8CacnnDAFfvtuQiWEdtkuXnbSSCuIc5CBbP6GNFQ==
-X-Received: by 2002:a05:6830:3c90:b0:79d:ebe:f238 with SMTP id 46e09a7af769-7c0df71598cmr17132862a34.12.1760390090878;
-        Mon, 13 Oct 2025 14:14:50 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:3::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7c0f90fb2b7sm3823153a34.22.2025.10.13.14.14.50
+        d=1e100.net; s=20230601; t=1760390093; x=1760994893;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=goaqvGEJKuS2hIGX+Z9ykCyJxu1Z7XvKkjtUr71VoHY=;
+        b=o8ZJR40NC/M29MTmD7CV4hTwCuuRcntvXWgmOVd2oT0pjJCqfXHj9ZKV8xBU8FP7ij
+         BlbLt+NzUXB+mYupx/fRcqBGDlM+Vcsxs2nL212NMk8Gy86Kg7m+Tqk2yxJ2b4n1lkzi
+         Emu43IPsH9SBjel+Qj7C34XQtUchEAEb8icBhuxIqaeHcdyrCotO0gh2wVboDAeM71N3
+         gu89a5Wd3yaxS6C9otwGZSHJ2D7e7YJgd1LVNtotkGQVI2V6DoPtMtGcTVbPuYh1q78c
+         lA8LwrWGHDRo+J5BcTTxUhWdFN6ZeE8fA0timkBqr/nBvQqY9HR6r7Dpjbc3KACLgeZU
+         5lfA==
+X-Forwarded-Encrypted: i=1; AJvYcCW28ctkqj+9OeFWYHujjTjtRccgl60i+aeKzajk7aIr0NujB+lbWvGSidCVU2pqjy/gPgVlwn8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxr7sHqK0noBJOzSlfTsXkk7GqzwWjhpZKOK5Chn46MGu0bOMWQ
+	VXmBykJZa5E1Glgggb4pwME4huJuGhyKgKZdZM7iBbF7iRoZggZisHCW
+X-Gm-Gg: ASbGnctcJARyMViggbXHngZhZb/hwFUnIrcD2GOb6Iyd9wtrcYPrdkXRhwiNNlgoHkp
+	IOdpmF9U1P+M8XWxFMO/S0ZQxRijIGWxCWf/AsozD9di5DxIPz3EDNGo6SXDehBajQcCA4HQVJz
+	35w0viZaUiya3GoaEUDQ0LYISmTV2vvreq9NjPkNID+bwoMMbk872+6m6aybgwx2u78bI6IXmqz
+	/vMv380TJkmwoRs7F5ajaIkDZj08kIIss+RrsdL9J/DyDnGQ58/Gd/Td7HT+QEMiGJyPFNmr1Ha
+	ebOMXbcHl6O1SnTDW2Yr9TuBZDFuImlsiIPKa3kP+scuwcuqj/aSdT9jBMBPAikrRTCh69krW2j
+	DnVYsYIHyEMNvqkpCuI3P2ZLiAsCovFhiLUD5PZ7/FfB3pyJZBecUIhWE1ZY=
+X-Google-Smtp-Source: AGHT+IHOm4T5kndyJ81BzVXfixdjwFiRd6ZkzPpg5/xpzlvS2dZLJIZ8e0ALBrmih0X9cIJOBJsahg==
+X-Received: by 2002:a05:6870:6122:b0:35b:11fe:3d1b with SMTP id 586e51a60fabf-3c0f6bf49e1mr9624051fac.18.1760390092734;
+        Mon, 13 Oct 2025 14:14:52 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:74::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3c8c8bd683fsm3834751fac.12.2025.10.13.14.14.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Oct 2025 14:14:50 -0700 (PDT)
+        Mon, 13 Oct 2025 14:14:51 -0700 (PDT)
 From: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
 To: "David S . Miller" <davem@davemloft.net>
 Cc: Jakub Kicinski <kuba@kernel.org>,
 	Alexander Duyck <alexanderduyck@fb.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next 0/2] Add aarch64 support for FBNIC
-Date: Mon, 13 Oct 2025 14:14:47 -0700
-Message-ID: <20251013211449.1377054-1-dimitri.daskalakis1@gmail.com>
+Subject: [PATCH net-next 1/2] net: fbnic: Fix page chunking logic when PAGE_SIZE > 4K
+Date: Mon, 13 Oct 2025 14:14:48 -0700
+Message-ID: <20251013211449.1377054-2-dimitri.daskalakis1@gmail.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251013211449.1377054-1-dimitri.daskalakis1@gmail.com>
+References: <20251013211449.1377054-1-dimitri.daskalakis1@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,17 +92,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We need to support aarch64 with 64K PAGE_SIZE, and I uncovered an issue
-during testing.
+The HW always works on a 4K page size. When the OS supports larger
+pages, we fragment them across multiple BDQ descriptors.
+We were not properly incrementing the descriptor, which resulted in us
+specifying the last chunks id/addr and then 15 zero descriptors. This
+would cause packet loss and driver crashes. This is not a fix since the
+Kconfig prevents use outside of x86.
 
-Dimitri Daskalakis (2):
-  net: fbnic: Fix page chunking logic when PAGE_SIZE > 4K
-  net: fbnic: Allow builds for all 64 bit architectures
-
- drivers/net/ethernet/meta/Kconfig            | 2 +-
+Signed-off-by: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
  drivers/net/ethernet/meta/fbnic/fbnic_txrx.c | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ 1 file changed, 1 insertion(+)
 
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+index b1e8ce89870f..57e18a68f5d2 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+@@ -887,6 +887,7 @@ static void fbnic_bd_prep(struct fbnic_ring *bdq, u16 id, netmem_ref netmem)
+ 		*bdq_desc = cpu_to_le64(bd);
+ 		bd += FIELD_PREP(FBNIC_BD_DESC_ADDR_MASK, 1) |
+ 		      FIELD_PREP(FBNIC_BD_DESC_ID_MASK, 1);
++		bdq_desc++;
+ 	} while (--i);
+ }
+ 
 -- 
 2.47.3
 
