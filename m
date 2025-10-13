@@ -1,266 +1,257 @@
-Return-Path: <netdev+bounces-228790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D21DBD3DA2
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:05:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE9E7BD3E43
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:08:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 87FD734E0BC
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:05:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F668405494
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8B8311580;
-	Mon, 13 Oct 2025 14:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4BB930AD0F;
+	Mon, 13 Oct 2025 14:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="H1vpc0oQ";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="dK3BylL3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eI5h7Hu2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A27310625;
-	Mon, 13 Oct 2025 14:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760367225; cv=fail; b=JIaRDCdYaGN5ABSp1NzmYmpriZ4D2nEZ3I2jTUHjz9/7lz9OzaHktdgersACBedGidBohhqROwQ4aMux/yUfpnpGMU62GfAGYMnlxyucsU44rx7HhfK3ImWnw5wE/lavPsYZZVoTMC+2riikWW28bynmsMVvEbf5DISBooe4NYE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760367225; c=relaxed/simple;
-	bh=s3SdVCgHmzfP4g9pJMTibGJTRGCIF9Bh9uolfn5OBdA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Ky7SofBjb1DE/fls6LvBOaCfzeXfd4HRT+wCAmqzQY/Mb5ZO52I8TbV4BUSxhGOnHeujYIAeoBxvXK0OcCh0Dke1d4r+MpRaUHhtBQkwcdQKFO0cUsCkSBs0f0GOu1wQ/CU6aeliiR1ThU5HB7CkUF21lP2HdWWljVj62PF++1c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=H1vpc0oQ; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=dK3BylL3; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59DEkvPG003683;
-	Mon, 13 Oct 2025 14:52:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=7/eLJnKQgPtMHXI6oUVQ9qCOJXloLRXprLkRk4+SRFE=; b=
-	H1vpc0oQdGInJkEOjQPNjOTF+KiDrm0rK3Hv4pbCcz7VTSrJkePs0BD8ws5nvCA7
-	oQoOXokRuH2qNrgf7BVZen31gJfB/5MrkbwHFuOGGWic9quS+x7cAnnqNSVMlZoy
-	jFLrAi6weE6DEYMTqtg8763Wradz5Jhz5/+zWHX6TAtjgjaKxflVrQ/61K6rquB9
-	dj14Ev6aNrorhkIqML2lL04kZRAuI3MOUdhuGbf0Zi0RTJl+7e4o6F7Nk3w1nVu5
-	guJepeQ/rDDIYG57kUirMgnzHFfqLlBjjV+oB7mxzk9JR5Eqh4//gLc590k26tjS
-	vKu9+pbV+wBL68LYeNMYdQ==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49qf47je4h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 13 Oct 2025 14:52:54 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 59DDKZvr017998;
-	Mon, 13 Oct 2025 14:52:53 GMT
-Received: from ph0pr06cu001.outbound.protection.outlook.com (mail-westus3azon11011055.outbound.protection.outlook.com [40.107.208.55])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 49qdp7dwfw-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 13 Oct 2025 14:52:53 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EHCa3d5ccs+ZrYT4eHVZAFPiCPae2nRE0FWfEA7mfIlr6Z3c8bHnKxRd30FsIMX/Xwedv0WkZVw7BBrsG7zIPrijn6FVD2kAsfUQkpnfCcN6sE2b5GK4KPyJodYW6VA7PFnnXOGQWi6dfe/3ShdFEP8QeSFRWMkGfyK6UxqV7j+ST2BxFAoPTxvHvsnvV3nM7eS+sN6jLuHaMFBFjwwciKJuE8Jf9/mC6o2IO/16hN6FtUAAiISFhDb83HbPa2RLhNLwdyNYZCzgF6INZlwvQwkKIwEhfhnrhd3coxdPrGmrcbxQOvylOCiaGLZL+BSQthwWKnOSqGFCZ9t39XAMbg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7/eLJnKQgPtMHXI6oUVQ9qCOJXloLRXprLkRk4+SRFE=;
- b=iC0B9Aqqyi8w7Yafx9ewKQCtzRkb668XjrXii6v6sGIW5ClV8PkV3g48b441zKj4GVqOiIwRPVd2Du2P+n/Tq2lKEwWZ0bh/D/LW7VrATV1lbBcmntJSTtfS/3ag6+4J1Vu/4YlkNzeG2AffLTy4U2MtqYlozrgOj4Ou7xcapHM9vjXqXG7wJakalYUzxqsYnYAGMHweoZk2nw04B0ND0g6kGmDZt/dDfPeLeAKardBJjbuN03ICNuvR1nyTKgb1g1A3vTFgenkKcp7Tws/+yBvns8hRa0ovu894rh+joEb0Ki7SD3t1AbZ03gfb6w3Q0qCMKbV8qBYAn92SwEw5mw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78257226CFE
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:53:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760367204; cv=none; b=nJyb94a8DUEk5HbWlsDEvdAvTN6Uowt8AcA2m8U/W3ZylmfNTxa/lrt1AbPu+jQ6pqS0zzoiOponfAhBSZjHywDqoxH9Y1F6zfjAJbplLAYA099EeaTSvEplVMTayn43oL2xuBQM/3yrajdvcXZEmhf0997bqw2D3JWw8Xci25E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760367204; c=relaxed/simple;
+	bh=bSEBq/uVXgrRFdrC3jvOQMbnwmsIHdYUxMJ+CsFrB9I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dRaHMXEqE5B1BOaGQjAvnOz5tDFm4yJm0kZlva6V4vkJBNgSqmHbz1V5XuI+RdzJsBxY1BE6V6h/pjSwcwpDI9L6IjC4h5AqgTp9JEipcsMaP4bSP8iY34IL7MgdtahHXyTCbwrW8fqujpcUyR7k90LNm13IHSRn0cZLDkx3Fzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eI5h7Hu2; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-46e2c3b6d4cso31990255e9.3
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:53:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7/eLJnKQgPtMHXI6oUVQ9qCOJXloLRXprLkRk4+SRFE=;
- b=dK3BylL3hFGahN/IDK5+RMLAbFEDTkItsYYd6blUxQCINO5WEIV0fx1aSLlQsDxg6H4XR7UCBrH5pfXuYo/XzfoQTJ1p4gEYNg4YnDhJM1nC1TiJeQuKIAg7HN1fXmMh3GQYSnc20HvHqQxPM1guov6nbB4XZdQIi2834Yx7jv0=
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
- by IA3PR10MB8663.namprd10.prod.outlook.com (2603:10b6:208:571::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9203.12; Mon, 13 Oct
- 2025 14:52:50 +0000
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::743a:3154:40da:cf90]) by BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::743a:3154:40da:cf90%4]) with mapi id 15.20.9203.009; Mon, 13 Oct 2025
- 14:52:50 +0000
-Message-ID: <846db8bf-6e5a-4a2c-90fa-3d4ffaf4c1de@oracle.com>
-Date: Mon, 13 Oct 2025 10:52:45 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/13] vfs: recall-only directory delegations for knfsd
-To: Jeff Layton <jlayton@kernel.org>, Miklos Szeredi <miklos@szeredi.hu>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Trond Myklebust
- <trondmy@kernel.org>,
-        Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>,
-        Paulo Alcantara <pc@manguebit.org>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-        Bharath SM <bharathsm@microsoft.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Danilo Krummrich <dakr@kernel.org>,
-        David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>,
-        NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>,
-        Dai Ngo <Dai.Ngo@oracle.com>, Amir Goldstein <amir73il@gmail.com>,
-        Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Carlos Maiolino <cem@kernel.org>,
-        Kuniyuki Iwashima <kuniyu@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, netfs@lists.linux.dev,
-        ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
-        linux-xfs@vger.kernel.org, netdev@vger.kernel.org
-References: <20251013-dir-deleg-ro-v1-0-406780a70e5e@kernel.org>
-Content-Language: en-US
-From: Chuck Lever <chuck.lever@oracle.com>
-In-Reply-To: <20251013-dir-deleg-ro-v1-0-406780a70e5e@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH5PR03CA0001.namprd03.prod.outlook.com
- (2603:10b6:610:1f1::29) To BN0PR10MB5128.namprd10.prod.outlook.com
- (2603:10b6:408:117::24)
+        d=gmail.com; s=20230601; t=1760367200; x=1760972000; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dic3M/lLM2/ycZ5ZARs7aXZDn/viBq+O10qSDjyGmLY=;
+        b=eI5h7Hu2yH7LOsJfEAzfkjFKS2FVeOXqWKf43qeyUV5VU5WOmytJpVxVeItaZMECVT
+         rhVyFzeCfU93NyO0ntGLLzO59Xbo581j9aK8onwIjzP8A+FFZLTyhgTg52ouWvd0luR5
+         8uvNePxkBpCODQxjXQWilIjptHnGNL5MeeTTJlgGGycIWO1VQ98A4yKwlIjL7vUlDnv+
+         Qt1Wy8Iw1vWCog1+QzRx+0zhSyciqC2JlIVgT7UivaTSTLOO2HzzI2YOgjmsmtu1TyGg
+         GqyXyVr2cb9km5kE0BKeBQNmQGTUpVvaQEBIIE7jiKJaLCuuGSG5oppKz/eSNHGWrP1b
+         mbGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760367200; x=1760972000;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dic3M/lLM2/ycZ5ZARs7aXZDn/viBq+O10qSDjyGmLY=;
+        b=SN7cVOn2enVmqPNabU+ZkI7ZhiUs5CRSxPSM15tN19NJvXQC4hWGtNkp/SkOXH5Rev
+         wcBj1cCA5vsY0QDbtYgDSPMHUZUZOcgePip+7UpvrBDHglw5eSoTsTIdvfzqkPXszWTj
+         840XaYS6HRNiq2oe4yymuMfI0itV2+CjetF75iLlZVHimoiayNCzHi+5gu04rckuZQwj
+         H9Mb+NGO2uqoOOsJs8y0PqmCjikVjtvkuVUh/oDuoA/JAvjS/ljXb1xtd9j4Nokff8uO
+         FAXQHvp3bLkGPzbY2ujOysCfVpU9GuXsD3RYI9BApRtO2VigUNbwkSkDWXU8n5tpgm/o
+         vN8w==
+X-Gm-Message-State: AOJu0YxBIzIwPBL6YkfeUAv53tCHPvRGDEfdW/2qybjAxtGGmH4mSE9L
+	i8hhxLSgHGq73d7bHVcOq6xtOkZcrYKXmm3GqHDCWIRU8HqDQTE8qe8+czUvUEJ3
+X-Gm-Gg: ASbGncu3z2iqxD1eHooVQFrZ/+8s6cB3qsJNn/VFu/oq3+ruKCOtWA0NoLbJwglNd4A
+	Ml0mUMo21DxA2NavDTHd2+Y/D8Q5Q+BGH1+QahzXwA6EIlhS4xn5GLzKDJxpOEXYgpztGUKgD2k
+	w47AuFq6vXQ2W/u3O10NrmlZVL/ojpTNII5Loz8V7Fqf/WzLw5ArNakVFQlJaZUGczNlXaGi05B
+	c2kbSY07UTe/OVUXApvJkexPLK51V/2K2jGtT0FjJPARavLZxKvmJQlXGw+dxlFbVQs1QBkFLZd
+	tl1eKYfLBrDyD0anuBLhnLrD3l/Qb/3gYIAr4wXMkyiW6UvJi+EMeM9Ra6DRwFAD5FKKhnKVWeo
+	kBSOQfeXR2GhOj4v3GywE8SdPGT2B+j4Qh6M=
+X-Google-Smtp-Source: AGHT+IFDZTW2epAqGg1QWXue+k/9B/Zz7ksBcY03jdXwPOwwoD8VfVpwsFq2UFKu96q8UNrRi/98QQ==
+X-Received: by 2002:a05:600c:4e47:b0:46e:42fa:ffce with SMTP id 5b1f17b1804b1-46fa9a863c4mr151531815e9.2.1760367200111;
+        Mon, 13 Oct 2025 07:53:20 -0700 (PDT)
+Received: from 127.com ([2620:10d:c092:600::1:eb09])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce5e0e70sm18641085f8f.40.2025.10.13.07.53.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Oct 2025 07:53:18 -0700 (PDT)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Joshua Washington <joshwash@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Jian Shen <shenjian15@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	kernel-team@meta.com,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Joe Damato <joe@dama.to>,
+	David Wei <dw@davidwei.uk>,
+	Willem de Bruijn <willemb@google.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Breno Leitao <leitao@debian.org>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>
+Subject: [PATCH net-next v4 00/24][pull request] Queue configs and large buffer providers
+Date: Mon, 13 Oct 2025 15:54:02 +0100
+Message-ID: <cover.1760364551.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN0PR10MB5128:EE_|IA3PR10MB8663:EE_
-X-MS-Office365-Filtering-Correlation-Id: d01fd30c-5f51-49d2-2346-08de0a682e1c
-X-LD-Processed: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
- BCL:0;ARA:13230040|1800799024|366016|376014|7416014|921020;
-X-Microsoft-Antispam-Message-Info:
- =?utf-8?B?OHZFc3JoWEpUNWdSZXREVng2WERwVERCaFV6K1VQa2dIN0ZZTEFmcDBaYllV?=
- =?utf-8?B?bjBpcHJsdi8xbll6bzJsa0RnM0JDZ2dJMHEyK1ZjWlVHL2VDTUlTdDZLaVZF?=
- =?utf-8?B?WlZBYzAwUUh4VXhQUVFYcFdPMXJzdDhyRVg4S01CQlMzcFBXNjMxVk85QkFK?=
- =?utf-8?B?SXVQb1FKcDFTb01GVlNBblhTN0xCLytEeFA1cUJSUGk1VFRzOXFXb052OEV4?=
- =?utf-8?B?RzRzWnpoN3c4KzJqaGlYaXNNK1p3N1Q2RWRENE1DdGhrUUx5Mk52VXpIREVj?=
- =?utf-8?B?N1VReTFrZnREQ2QydDZCVTVrVnVkSkVYeFlGdTlhVjYxMHN2d3FSWGRCUllS?=
- =?utf-8?B?UkxpOUI0aWwvUERhMWFmS3JKVzdsRlJpa1pEbXBjOENhbDVKWjhDRkp1WU1D?=
- =?utf-8?B?ZE53Vkk1aitiUG1kVjk1S1hkdmYrSHEvcnJpUkdEOWpIRTZqVkRRTzZoTWti?=
- =?utf-8?B?U1pLTFBNalRBTmZkNVBuMktqTjhoelpWcnptZndraEp1WEtFUVNPckZ3TGNl?=
- =?utf-8?B?K0VaOHBpOE9VcU52UXIvSEtha3lUWktaOHc1clN0RVUrQTBPRWFLNDZMNW1K?=
- =?utf-8?B?Y1A4L3QybVp2dm0yemF5RWhkSE9vcDN3VXZSNHM3bmRwenBOeGIyZW1yWEQx?=
- =?utf-8?B?Y2c0bnY4RlJZSUc0ellzQUNsOU1FaTI2MkJBL2paamNRQkdSczN5OHpwWklH?=
- =?utf-8?B?OHdVLzhjOTdwOTlEaFl0QVNBcDg1UnhLdlhIT0pOS2krclRROERJUE1nNmFp?=
- =?utf-8?B?eGdGNkxUWS9ENHdzK0dMaDh2K3RlSkVWbkdHNS80S1RVaDQyU2V0TWlGWUYr?=
- =?utf-8?B?K0J1MGxkUVRkMHhEU3ZjYkNDazZUWHlGWTkya25rVW55Q0Y0RFhTOU9SZmJO?=
- =?utf-8?B?NGdHTGt2R281aldWOFNNQXVVb0U4UGVYbjhNcG9lRWFQZzF4UFlqRStTckZX?=
- =?utf-8?B?ay9sZzZUOThDNUhURS9ROTlGdVY3b21wSTlRUXZIdldhQVhhR0ZjNGx4amxr?=
- =?utf-8?B?a3BHZU1lZDhUM1M0aHVNZU1hQ3RDRkZyNFpOcUNUcy9SVGl1MHVSbGtCSTFZ?=
- =?utf-8?B?MWhpWWtGT1Q4Z3l1T0RwVE54WmlDRWNudFYrbUZKU0V4LzhDM2M5NTdNRUNE?=
- =?utf-8?B?OFAvbDFLZUpMVm5iVEYzYUh3a1hXcHc5RmpqRkZsUlViNFRVUkZwc1Y1ZVlJ?=
- =?utf-8?B?MmIvQzRDRzd2VTFJN29GZ3l3K3NzVElPNTg5UDlhRVhpbjI0REZCejQ5WGFq?=
- =?utf-8?B?STA1S2pVMnExMXIwSTd5VmEzeVh1TUxmOUF3ZDdHeWRoR1p1dUFOR3B2VmxB?=
- =?utf-8?B?RHlkNVZzTkQwMVBBK2gzL2tCN0ZTL2x2VEcwZkM4RXZxaUJrMFhIMGhSbEUy?=
- =?utf-8?B?TUtpSnBhMVNUa0doNmlFNmlydnpIQU5nUWkxWXIyK0RJNUtXa3BDNk04TmQx?=
- =?utf-8?B?bjBmSGdjMWNxWjRBYjZCaHVQcGdFWUdMSXNPdmR5aXhoWnQvNUlhRDkzdklD?=
- =?utf-8?B?TzYzOEQ1YXdjeWh2NERCY2E0SnZYM29tUXRIL1Q3ZHMrOCtGb1Nhb3NDWWR3?=
- =?utf-8?B?SHhMRFcrdkxSZHBlMTc3bHh4ZWZSL2ZhNkNPby80Z2ZKL2FNRGtBa21BZjMv?=
- =?utf-8?B?THBhcmZBQXdlVE1YV3ozVk9UVURqckNNaEdheDJnVEhIRXY2MU9wTmNGNWxz?=
- =?utf-8?B?ZVdnakdmSnBKT0V2bzBRcndJNmd5azA4Mm54WEJpZmFqR1BHOHdqa0JpTktQ?=
- =?utf-8?B?VEFTRHVicy9MRTdqTzBSREM3UEVaYWlqN1o4MWNKK1dSZkJjSDNuUzhibXJM?=
- =?utf-8?B?elZhcDl0OXZVUyticllUR3gvY2E3ZDZRZkhGZXkwdk4ydGgwVVBXUk95bHFD?=
- =?utf-8?B?QnNtRE1iUGh4dW50SHR6ZHUzeEQ0R1VIV3MyQVFxa2dvWTl5b21PVCtwUlFq?=
- =?utf-8?B?dzE1blNBano4ckFFMEtFNGFUTWpjbmk5bXgwdEg3d2R0RUNzKzZrbzR3VjVj?=
- =?utf-8?Q?oMB8avdMk9ORK35RLjcem+lzNL1eV8=3D?=
-X-Forefront-Antispam-Report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
- =?utf-8?B?NExMWVBHOWxiS0RpNzQ3Y3NBN3VIVSt2MENYYk45NW1wV0VyVFRPT0RiRzcz?=
- =?utf-8?B?ODl4NkhXZmZaejlza3cxZlArVTRIdStiWi9OcDd4SWdQTDVUREwreHFWUU1W?=
- =?utf-8?B?SFMwQzRuVWJRWXh5N0s1WEN5VHlZdnByekZObW13RytvYlpOWE50N1lTdnUv?=
- =?utf-8?B?TEZyUXNlWEIzZU9ML3dKRHd6Y1NPTTBLaTBLajlvZkIxeTM4bzliSjlsUUZM?=
- =?utf-8?B?TEFZZFRTZE5uUlp4R0tabDJxM1hxUEx0U1ZoZ1plcVNhclh4Ym5IcmE1dHl2?=
- =?utf-8?B?c0s1SVhPVHkwVk1RdUx2QTJMbjhlRmhxT3hzd1M1VDhES3BZK0VmV1ZZcVNS?=
- =?utf-8?B?bUszRk40ckVtOUM1aFF6UzMzSzhkVGdUQ1NMZnFEVENFVFplL1ZVQWJ0R3l0?=
- =?utf-8?B?bVYwRjJ5ejJza01zNjV3RlFQaG50N3BiMVpHbFVPM0wyVGdzcDVlVnJhTWRu?=
- =?utf-8?B?bkhVQjg5RkF0RkZIU2Y4MllYb0Q3QzJ3d0pSUEg5eVJ3UHVJMHdLM25xRDRj?=
- =?utf-8?B?azlLVjAxTWtBNFhJcmFmZk40UGhVUFFIckJacSsyOWZhT1NNQitlcU51ZWFw?=
- =?utf-8?B?dzJOdWw5OEdoeFNwOVkzT2lNK0hxUWEvdEtUTC9IQ3dibHBCSklNNXVQNGMw?=
- =?utf-8?B?S2xCaHNoY0hVUU4wOXpjUUNJT21DbFF1eDRkY2pSM0diY2tNdUxXNnZkNmY3?=
- =?utf-8?B?cEhoc28xcmF2eTVSWnVrK1pTOWlvMjMxaElIWFBXN09NajVGL2RCYU1tTjlo?=
- =?utf-8?B?bnVhV2VQUmpEejg4Rmg2M3h4bTZyWnZiWExmMjhNSDYxNXZkRTNFQUtNZGRE?=
- =?utf-8?B?dmhVRVFnWUJqVytUY0V5WWhscTlLN3NyZlhIZklxN1E4UVpYTFJxRlljN2Jh?=
- =?utf-8?B?TWNaWTBCbUswUUt3VkRBa1lHMlJLZ1VycWhJcitMNDdXSTZaZWdZaytUck5K?=
- =?utf-8?B?QldXdFVxdXg2ZmNjcjV6UStOT3l1UVZBY2ZBNWxXcUxxdVkvemtJeWt5QklH?=
- =?utf-8?B?eFdteVNmVWZTbXM0aHByWjJteEErK1hmUUJPeGRnVlQxN3JTdEt6TERpNXdY?=
- =?utf-8?B?S0U0MDIwL1hYV01HWW1rUDJEaVZQNEI2Vlc3WXhqcVVwL0N0YS9PWktaM01H?=
- =?utf-8?B?MUdkRUY5emJ2R3gycUdkaU1JcVVnUjB4ak5TYXdSM1RRTm82blVFZ0ppMXJX?=
- =?utf-8?B?dzlOWUtCSGliOVcwc2VuTVJRVWEzMlBaMzl3SGNJZVF0NGZQRDU2RnRwTmp3?=
- =?utf-8?B?d0dGSWFQMlk0OXloVTJOVUxFR2ZGMnVZWWlrNmZWMzQzMWxYMVE4dDl3clY1?=
- =?utf-8?B?Ly9aMldKVWFJRjQzM3lJRE5ZN0J5ZjFDSzlxUStEQWdPRE5RSWl6UmpYUEVq?=
- =?utf-8?B?NGVydmFjWWM0cVhyVmNBVDlMWVlZQzdlTUxhemFUVzVKclhUcmZ4Q1lvZWFN?=
- =?utf-8?B?VnA2TGVuekhwZmpSNU9XMXYwRVJqTDFmcndhZDhzMHJydEtvUzlKOGJoT2lt?=
- =?utf-8?B?SHBTLy92dlcxR2Z2V0I0UjNVeXZvNlVmMGlldTVPZ05wR2Z2Mk1QR2J1Y1o5?=
- =?utf-8?B?VWd5THl5SERPOUVmcGRtZ3pSb0w0Y3VwTmFITmg2OXorUWhzR1M0UmNMR0xj?=
- =?utf-8?B?WUJicjgySlcya3RLZmh2RytUeHFOalpUOXRNNHBUKzFMSzRMNTNDQm9pT3N3?=
- =?utf-8?B?T251dm14Q1N5bmpRd1AwZ2g1Q2V2Nis1VUFONld4S0tubWJrMWpSQlhlbmNE?=
- =?utf-8?B?UGZUN1F1dFI3NEpweVhYcXFXeTFTSC84V2RWeWtIOUZlZzNJcWZaa2FYem51?=
- =?utf-8?B?UGJFalpwb2piNVV5T1ZCT2JmOHRwTXk2UUp4WTlpYnZibHhTbDZaS21nd2JU?=
- =?utf-8?B?NXMxSmxsTEthcWNXVm52VS9teUtURWtGTnA4Qm5UZlVyYW5DcWZyYkc1dXp4?=
- =?utf-8?B?cDkvdEtnS2cyVUR5QnpXZGRCRG1aa3VPUXR3VE9Jdk1sajVFb2YxWStqQUda?=
- =?utf-8?B?cm5OOW5KNGVPY09lNFZNZlYwNnMrNFcyVHpReEJndkltZ2J6eUlONWtVbGY5?=
- =?utf-8?B?eHpuck1jR1FKRk55L1dNL2NiZ0V2MTc3RWY4MHBUcm9EUGxZVW9YN2NpSzdL?=
- =?utf-8?Q?At7ehQQZOfkvBjPYDTZvq2xG+?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	MkMqV24Tqt02Yo8aAuMw1sQDeVXg049xq2ukPFguujumjqh5wTG0H6apsBAtUCrMQSCWXUmMg/+bIizBJHFwt66mhC5kpVCv76nDGjfl7DHeMTNDajEfgOtG/6FCDceRCYc/xwLoS1an1+uPu05iNV045/nJWh7trzrULX/TR0bCwOxxbXQXoHvGqCTMz3QjLkFRoikzAV7HEg48A3NU4UHKsp6eVedR5REanxKhkDYYgy68qzKBfsv/w8vuHyiQcX+6bEbDi5X2dlZo3xhh6BK9k0lARlZKziSnjUMJzzXT7SZC0L1eyXk9ur7158p0HQcONROg3xuWd8sPSabX1rgdvBvqvpn7CHg3dzOsem4B8UXEaShMPqbjzM25Vyf6bM1C35GilI1un0sajtnAEr+PXyLdsXn99tUUlCJQ64sJMifqZiOgBsTLv8nt5wD5IKaOI1LG+MWCr+3ROliB/OFBREibuinuQSVKQQUJZo6mlPZUvK/71HO9zGE3TVpKr/my6iXAcTAoG4rTf85dNc2/5MfcU4lTF16tZYsLopKu54VGetYa/LwqfN6LDMuLIoBT94zGpZ/9u+qDPJ1TysdAbR48Jxi62OdzBvobk+Y=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d01fd30c-5f51-49d2-2346-08de0a682e1c
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2025 14:52:50.1321
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: atique44Lc2NFolj3akAe5k6jhHDewWe9KgU9zOAeaGv1DwJgaLGw88ySK9A0cGxjyy6VxESzVidMZA7/h+Yxw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR10MB8663
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-13_05,2025-10-06_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 suspectscore=0
- mlxlogscore=999 adultscore=0 bulkscore=0 spamscore=0 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2510020000 definitions=main-2510130066
-X-Authority-Analysis: v=2.4 cv=SK9PlevH c=1 sm=1 tr=0 ts=68ed1246 cx=c_pps
- a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=x6icFKpwvdMA:10 a=GoEa3M9JfhUA:10 a=bYUO7fSskbVSFXVlvFkA:9
- a=QEXdDO2ut3YA:10 a=UhEZJTgQB8St2RibIkdl:22 a=Z5ABNNGmrOfJ6cZ5bIyy:22
- a=QOGEsqRv6VhmHaoFNykA:22
-X-Proofpoint-GUID: h5et_sjEX4tWXtisRPYr1u7p6zHk23NZ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDExMDAxNiBTYWx0ZWRfX0G6EeBEL7hlS
- 90Wsngl46qB3XaKyp/NT/PcE6H2v5UfWzOYSo0l0D9TRA3jCgux+22gaxYCMD8tSMlOUcJ/Zpnf
- OYiy0HSeKFw5V4tem0zWTZoYq0cZGFLVV+6tBrfOnR4YUsQ8FWBa1TJ2BadJZ8V7nj2dn038Me3
- AatQ3yS5D5Xk2k2oIZBLCKU4fdPkDAsbngtCgXNV/lYnVl5rcWGjMnjrCc7/WNrcRoJqwHyTzgX
- AEpN/2vgPlNuK93Jz5YH/Vad1yaWGwWblSP0CAPdytcnm+XusRCwpaatfx3t3WZpBr42Xk0rlml
- OyqXThrKlGaGgwCbAsDaR/fRl5LUGX60kHvSHuzJdOWQ7XnJbYazWTzFR1nWbdqoTJVBqa+PC3c
- a4jpIPjErDRSbs/XHR2zkaai93B4hw==
-X-Proofpoint-ORIG-GUID: h5et_sjEX4tWXtisRPYr1u7p6zHk23NZ
+Content-Transfer-Encoding: 8bit
 
-On 10/13/25 10:47 AM, Jeff Layton wrote:
-> It would be great if we could get into linux-next soon so that it can be
-> merged for v6.19. Christian, could you pick up the vfs/filelock patches,
-> and Chuck pick up the nfsd patches?
+Add support for per-queue rx buffer length configuration based on [2]
+and basic infrastructure for using it in memory providers like
+io_uring/zcrx. Note, it only includes net/ patches and leaves out
+zcrx to be merged separately. Large rx buffers can be beneficial with
+hw-gro enabled cards that can coalesce traffic, which reduces the
+number of frags traversing the network stack and resuling in larger
+contiguous chunks of data given to the userspace.
 
-Question about merge strategy:
+Benchmarks with zcrx [2+3] show up to ~30% improvement in CPU util.
+E.g. comparison for 4K vs 32K buffers with a 200Gbit NIC, napi and
+userspace pinned to the same CPU:
 
-Seems like I would have to base nfsd-testing (and nfsd-next) on
-Christian's tree, once the VFS changes are applied, for one or two of
-the NFSD patches to work. Yes?
+packets=23987040 (MB=2745098), rps=199559 (MB/s=22837)
+CPU    %usr   %nice    %sys %iowait    %irq   %soft   %idle
+  0    1.53    0.00   27.78    2.72    1.31   66.45    0.22
+packets=24078368 (MB=2755550), rps=200319 (MB/s=22924)
+CPU    %usr   %nice    %sys %iowait    %irq   %soft   %idle
+  0    0.69    0.00    8.26   31.65    1.83   57.00    0.57
 
+netdev + zcrx changes:
+[1] https://github.com/isilence/linux.git zcrx/large-buffers-v4
+
+Per queue configuration series:
+[2] https://lore.kernel.org/all/20250421222827.283737-1-kuba@kernel.org/
+
+Liburing example:
+[3] https://github.com/isilence/liburing.git zcrx/rx-buf-len
+
+---
+The following changes since commit 3a8660878839faadb4f1a6dd72c3179c1df56787:
+
+  Linux 6.18-rc1 (2025-10-12 13:42:36 -0700)
+
+are available in the Git repository at:
+
+  https://github.com/isilence/linux.git tags/net-for-6.19-queue-rx-buf-len
+
+for you to fetch changes up to bc5737ba2a1e5586408cd0398b2db0f218ed3e89:
+
+  net: validate driver supports passed qcfg params (2025-10-13 10:04:05 +0100)
+
+
+v4: - Update fbnic qops
+    - Propagate max buf len for hns3
+    - Use configured buf size in __bnxt_alloc_rx_netmem
+    - Minor stylistic changes
+v3: https://lore.kernel.org/all/cover.1755499375.git.asml.silence@gmail.com/
+    - Rebased, excluded zcrx specific patches
+    - Set agg_size_fac to 1 on warning
+v2: https://lore.kernel.org/all/cover.1754657711.git.asml.silence@gmail.com/
+    - Add MAX_PAGE_ORDER check on pp init
+    - Applied comments rewording
+    - Adjust pp.max_len based on order
+    - Patch up mlx5 queue callbacks after rebase
+    - Minor ->queue_mgmt_ops refactoring
+    - Rebased to account for both fill level and agg_size_fac
+    - Pass providers buf length in struct pp_memory_provider_params and
+      apply it in __netdev_queue_confi().
+    - Use ->supported_ring_params to validate drivers support of set
+      qcfg parameters.
+
+Jakub Kicinski (20):
+  docs: ethtool: document that rx_buf_len must control payload lengths
+  net: ethtool: report max value for rx-buf-len
+  net: use zero value to restore rx_buf_len to default
+  net: clarify the meaning of netdev_config members
+  net: add rx_buf_len to netdev config
+  eth: bnxt: read the page size from the adapter struct
+  eth: bnxt: set page pool page order based on rx_page_size
+  eth: bnxt: support setting size of agg buffers via ethtool
+  net: move netdev_config manipulation to dedicated helpers
+  net: reduce indent of struct netdev_queue_mgmt_ops members
+  net: allocate per-queue config structs and pass them thru the queue
+    API
+  net: pass extack to netdev_rx_queue_restart()
+  net: add queue config validation callback
+  eth: bnxt: always set the queue mgmt ops
+  eth: bnxt: store the rx buf size per queue
+  eth: bnxt: adjust the fill level of agg queues with larger buffers
+  netdev: add support for setting rx-buf-len per queue
+  net: wipe the setting of deactived queues
+  eth: bnxt: use queue op config validate
+  eth: bnxt: support per queue configuration of rx-buf-len
+
+Pavel Begunkov (4):
+  net: page_pool: sanitise allocation order
+  net: hns3: net: use zero to restore rx_buf_len to default
+  net: let pp memory provider to specify rx buf len
+  net: validate driver supports passed qcfg params
+
+ Documentation/netlink/specs/ethtool.yaml      |   4 +
+ Documentation/netlink/specs/netdev.yaml       |  15 ++
+ Documentation/networking/ethtool-netlink.rst  |   7 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 148 +++++++++++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   5 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   9 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |   6 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h |   2 +-
+ drivers/net/ethernet/google/gve/gve_main.c    |   9 +-
+ .../ethernet/hisilicon/hns3/hns3_ethtool.c    |  10 +-
+ .../marvell/octeontx2/nic/otx2_ethtool.c      |   6 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  10 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  |   8 +-
+ drivers/net/netdevsim/netdev.c                |   8 +-
+ include/linux/ethtool.h                       |   3 +
+ include/net/netdev_queues.h                   |  88 +++++++--
+ include/net/netdev_rx_queue.h                 |   3 +-
+ include/net/netlink.h                         |  19 ++
+ include/net/page_pool/types.h                 |   1 +
+ .../uapi/linux/ethtool_netlink_generated.h    |   1 +
+ include/uapi/linux/netdev.h                   |   2 +
+ net/core/Makefile                             |   1 +
+ net/core/dev.c                                |  12 +-
+ net/core/dev.h                                |  15 ++
+ net/core/netdev-genl-gen.c                    |  15 ++
+ net/core/netdev-genl-gen.h                    |   1 +
+ net/core/netdev-genl.c                        |  92 +++++++++
+ net/core/netdev_config.c                      | 183 ++++++++++++++++++
+ net/core/netdev_rx_queue.c                    |  22 ++-
+ net/core/page_pool.c                          |   3 +
+ net/ethtool/common.c                          |   4 +-
+ net/ethtool/netlink.c                         |  14 +-
+ net/ethtool/rings.c                           |  14 +-
+ tools/include/uapi/linux/netdev.h             |   2 +
+ 34 files changed, 650 insertions(+), 92 deletions(-)
+ create mode 100644 net/core/netdev_config.c
 
 -- 
-Chuck Lever
+2.49.0
+
 
