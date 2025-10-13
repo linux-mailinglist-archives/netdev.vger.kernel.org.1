@@ -1,52 +1,42 @@
-Return-Path: <netdev+bounces-228883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE485BD5668
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 19:12:39 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8533CBD5753
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 19:22:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1CC41896773
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:13:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A56DE4F06B0
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:17:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B295298CC0;
-	Mon, 13 Oct 2025 17:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XQ1UEGnM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E38729AB15;
+	Mon, 13 Oct 2025 17:17:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F191021B9DE;
-	Mon, 13 Oct 2025 17:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D1A35965;
+	Mon, 13 Oct 2025 17:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760375556; cv=none; b=MzwJCck0Cxs4J4jmp18peFfRJLFxzrFnQQ/LF46ZI3Pkrk5PlDhZXm5BQJL4ioXb+/3rDP0GCxsm0kg3wfLvDiEisRKVEG5fN6NJNHB0PUqyy+Ci5QYFBOBSYgu+tFGUTfNb526+Segwt1DSmHcnUEA4CbT12Me2ozFjS6YKee8=
+	t=1760375843; cv=none; b=sPpNnLrKZECK+gzLtYbM8cDTxCObYmcwBgfnzxNQUTjFnY66X0d0i1GzDp2upXL/mNVrL9qHsT+EBpLiJ9BhnEafukU9Clcs7oP7pHiQrnNTAofATWZd94tTCE6nicLm3xanEvvFSIH2TrIgZTZac0D7we/YIflqu4Dm4lJvr+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760375556; c=relaxed/simple;
-	bh=717BLPS8TqcgpzXR0dY5x7Gybl2tsULmLFysiGQrXNI=;
+	s=arc-20240116; t=1760375843; c=relaxed/simple;
+	bh=fcND229VHRDota8cK8z5FL5e4ujtwhOSk4MZxJErcQs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gTZu0oveoMvHHpeuFfTbBuWT9MUk2QYdYjlz6cWjVHjHEsxjXGR0wm2e+iWMqPdvK3WifLcr+hUtWRGPesgiigvAMMFkU+zPjbO7zQlM4wxoXMtZ2R8FZqZ23vIDlkDwBjoVj33JZ3OcbuML8yy3o8rHMSjaTySzIe6keL1dcUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XQ1UEGnM; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=z2hdWZ0thhVkXt2TsbVzmKj2YSVerRKfrQUAEPsjG+o=; b=XQ1UEGnMfggLK+U6HoAn11DmZo
-	ekyxdCXIzLKTYI2Au0FY3mbbQnkS6GVQTS7ot3OGcG+6Wd1nlzssyMW4Zp4XlzftNkvJ8mlefYNUx
-	fO8N+LUXigXqrGqI14BFslaizX/UaKuqxPohopAutXpO2qxy8/Pv50UPglC/gG2mA0LktVjyJyTe7
-	9gwx1d45jZj4FljtiKV4Qqe88h3SIwB+aKSDYbcVQAuJwRCkC1LiCo3zdwiO4mi4/Gd/74Y4jXtPj
-	dE6V9PmIJXALUrAOOxIR9733nd77noaGmhdhCZu/EejZVSYO9kXrtmecdINUi8XNfvyPT11Hx73kQ
-	ICXTbfuA==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1v8M63-0000000Dzof-3PUA;
-	Mon, 13 Oct 2025 17:12:31 +0000
-Message-ID: <572c425e-d29d-43e5-930f-4be7220e89fc@infradead.org>
-Date: Mon, 13 Oct 2025 10:12:30 -0700
+	 In-Reply-To:Content-Type; b=ZFilvUn++b09+396sD97svDGzF8dseyDq31tCNaQifhzTpJmctkBbwQmjnTCqKTSQyP0JizDBzJg3bu9BAuttcWRaKiZGhvS6dh224UbYxCVCRTCxXQKSZm9XV0q1YkP9o8rTi3wDWKjTp6UsS1JnzkV2YFkQPDkcKvjoZYiAqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; arc=none smtp.client-ip=23.88.97.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id 85DA648532; Mon, 13 Oct 2025 17:17:19 +0000 (UTC)
+X-Spam-Level: 
+Received: from [IPV6:2a00:6020:47a3:e800:94d3:d213:724a:4e07] (unknown [IPv6:2a00:6020:47a3:e800:94d3:d213:724a:4e07])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 87BC3484CE;
+	Mon, 13 Oct 2025 17:17:18 +0000 (UTC)
+Message-ID: <70d926a1-e118-43d9-8715-70feebc214a5@birger-koblitz.de>
+Date: Mon, 13 Oct 2025 19:17:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,127 +44,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 06/24] net: clarify the meaning of
- netdev_config members
-To: Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Donald Hunter <donald.hunter@gmail.com>,
- Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Joshua Washington
- <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
- Jian Shen <shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
- Jijie Shao <shaojijie@huawei.com>, Sunil Goutham <sgoutham@marvell.com>,
- Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
- <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
- Bharat Bhushan <bbhushan2@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Alexander Duyck <alexanderduyck@fb.com>,
- kernel-team@meta.com, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Joe Damato <joe@dama.to>, David Wei <dw@davidwei.uk>,
- Willem de Bruijn <willemb@google.com>, Mina Almasry
- <almasrymina@google.com>, Breno Leitao <leitao@debian.org>,
- Dragos Tatulea <dtatulea@nvidia.com>, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
- Jonathan Corbet <corbet@lwn.net>
-References: <cover.1760364551.git.asml.silence@gmail.com>
- <fa4a6200c614f9f6652624b03e46b3bfa2539a72.1760364551.git.asml.silence@gmail.com>
+Subject: Re: [PATCH net-next] ixgbe: Add 10G-BX support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251013-10gbx-v1-1-ab9896af3d58@birger-koblitz.de>
+ <b5dd3a3e-2420-4c7c-b690-3799fac14623@lunn.ch>
+From: Birger Koblitz <mail@birger-koblitz.de>
 Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <fa4a6200c614f9f6652624b03e46b3bfa2539a72.1760364551.git.asml.silence@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <b5dd3a3e-2420-4c7c-b690-3799fac14623@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi,
-
-On 10/13/25 7:54 AM, Pavel Begunkov wrote:
-> From: Jakub Kicinski <kuba@kernel.org>
+On 13/10/2025 6:31 pm, Andrew Lunn wrote:
+>> @@ -1678,6 +1679,26 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+>>   			else
+>>   				hw->phy.sfp_type =
+>>   					ixgbe_sfp_type_1g_bx_core1;
+>> +		/* Support Ethernet 10G-BX, checking the Bit Rate
+>> +		 * Nominal Value as per SFF-8472 to be 12.5 Gb/s (67h) and
+>> +		 * Single Mode fibre with at least 1km link length
+>> +		 */
+>> +		} else if ((!comp_codes_10g) && (bitrate_nominal == 0x67) &&
+>> +			   (!(cable_tech & IXGBE_SFF_DA_PASSIVE_CABLE)) &&
+>> +			   (!(cable_tech & IXGBE_SFF_DA_ACTIVE_CABLE))) {
+>> +			status = hw->phy.ops.read_i2c_eeprom(hw,
+>> +					    IXGBE_SFF_SM_LENGTH,
+>> +					    &sm_length);
 > 
-> hds_thresh and hds_config are both inside struct netdev_config
-> but have quite different semantics. hds_config is the user config
-> with ternary semantics (on/off/unset). hds_thresh is a straight
-> up value, populated by the driver at init and only modified by
-> user space. We don't expect the drivers to have to pick a special
-> hds_thresh value based on other configuration.
+> It seems like byte 15, Length (SMF), "Link length supported for single
+> mode fiber, units of 100 m" should be checked here. A 255 * 100m would
+> be more than 1Km, the condition you say in the comment.
 > 
-> The two approaches have different advantages and downsides.
-> hds_thresh ("direct value") gives core easy access to current
-> device settings, but there's no way to express whether the value
-> comes from the user. It also requires the initialization by
-> the driver.
-> 
-> hds_config ("user config values") tells us what user wanted, but
-> doesn't give us the current value in the core.
-> 
-> Try to explain this a bit in the comments, so at we make a conscious
-> choice for new values which semantics we expect.
-> 
-> Move the init inside ethtool_ringparam_get_cfg() to reflect the semantics.
-> Commit 216a61d33c07 ("net: ethtool: fix ethtool_ringparam_get_cfg()
-> returns a hds_thresh value always as 0.") added the setting for the
-> benefit of netdevsim which doesn't touch the value at all on get.
-> Again, this is just to clarify the intention, shouldn't cause any
-> functional change.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> [pavel: applied clarification on relationship b/w HDS thresh and config]
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> ---
->  include/net/netdev_queues.h | 20 ++++++++++++++++++--
->  net/ethtool/common.c        |  3 ++-
->  2 files changed, 20 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-> index cd00e0406cf4..9d5dde36c2e5 100644
-> --- a/include/net/netdev_queues.h
-> +++ b/include/net/netdev_queues.h
-> @@ -6,11 +6,27 @@
->  
->  /**
->   * struct netdev_config - queue-related configuration for a netdev
-> - * @hds_thresh:		HDS Threshold value.
-> - * @hds_config:		HDS value from userspace.
->   */
->  struct netdev_config {
-> +	/* Direct value
-> +	 *
-> +	 * Driver default is expected to be fixed, and set in this struct
-> +	 * at init. From that point on user may change the value. There is
-> +	 * no explicit way to "unset" / restore driver default. Used only
-> +	 * when @hds_config is set.
-> +	 */
-> +	/** @hds_thresh: HDS Threshold value (ETHTOOL_A_RINGS_HDS_THRESH).
-> +	 */
->  	u32	hds_thresh;
-> +
-> +	/* User config values
-> +	 *
-> +	 * Contain user configuration. If "set" driver must obey.
-> +	 * If "unset" driver is free to decide, and may change its choice
-> +	 * as other parameters change.
-> +	 */
-> +	/** @hds_config: HDS enabled (ETHTOOL_A_RINGS_TCP_DATA_SPLIT).
-> +	 */
->  	u8	hds_config;
->  };
+> 	Andrew
 
-kernel-doc comments should being with
-/**
-on a separate line. This will prevent warnings like these new ones:
+Bytes 14 and 15 refer to the same information, just in different units. 
+Byte 14 is the SM link length in km, byte 15 the same in 100m units. BX 
+offers a link length of at least 1km, up to at least 40km, which would 
+overflow to 255 in byte 15. In theory one could make a consistency check 
+between bytes 14 and 15 by dividing byte 15 by 10 and comparing the 
+result with byte 14, but in terms of identifying link lengths of >=1km, 
+checking byte 14 is probably enough, in particular as rounding of byte 
+14 could be inconsistently done, making the consistency check difficult. 
+One could also check for byte 14 to be 0 and byte 15 to be < 10 to 
+identify SM links <1km, but I do not believe such BX modules exist and 
+again, there would be the issue of rounding for link lengths >=500m.
 
-Warning: include/net/netdev_queues.h:36 struct member 'hds_thresh' not described in 'netdev_config'
-Warning: include/net/netdev_queues.h:36 struct member 'hds_config' not described in 'netdev_config'
-Warning: include/net/netdev_queues.h:36 struct member 'rx_buf_len' not described in 'netdev_config'
-
-(but there are 4 variables that this applies to. I don't know why kernel-doc.py
-only reported 3 of them.)
-
-
--- 
-~Randy
-
+Birger
 
