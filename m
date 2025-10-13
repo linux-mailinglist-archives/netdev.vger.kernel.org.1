@@ -1,218 +1,125 @@
-Return-Path: <netdev+bounces-228791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C82F7BD415C
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:23:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E961BD3F3F
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:14:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C63193E69AE
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:05:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B64B18863D9
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AEBB311597;
-	Mon, 13 Oct 2025 14:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C3830C35C;
+	Mon, 13 Oct 2025 14:54:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lSKpqIQH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HCSNwkhy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0BC310763
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:53:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8897030505B
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:54:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760367225; cv=none; b=SvgTj0p1oogtSy8DIwAsgGS5gyfXzHIsmtj6GzotpBlZsTKEihJC4+SgoGQWjk8Nqy+Tel8tC8/em7v+QbOQTYLmOzKQNOO7yZx79oHg1ISKH/+D+dLZQLlg2wfPAPbjU38BFojQdJSFaqOiX1fXLE+aJlbyskFR1OnBpNccBZk=
+	t=1760367263; cv=none; b=F4KpADgpScLn3g3u12tZv7rTw/Il/E0BB4U2Nwv1vyE/muyyAifri35L0ZqhbFtnfYtw0POVovfGTM7rvjnqT9SIB4KUONMNHOb0b96vL+rbprYvN5njyGRU+JL1Vg8EUN3CQ0fV2YF9aWzdDVNZyKjqJCqd89TZuoApgeoCJ00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760367225; c=relaxed/simple;
-	bh=YfJ1fqXNyw5aWMbbwGECFiNPz3jXV/l4u98wRnHXoPI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nB4sm20No0asTg8WY2/77At6aDDq36QxMOCCZXKswYLMI0afgDqSW7H6s1Kl2FgH7gAWUnvMq1pUGEsVr9EwNcwvRX21e6inruwjRDAt4Myet4oPQmw21KrTbD5ODDqhy6sgQGPmOzfvgih5HLIEyxQn5oW+YheEtXBPWjHUTDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lSKpqIQH; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3ee1221ceaaso3402277f8f.3
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:53:42 -0700 (PDT)
+	s=arc-20240116; t=1760367263; c=relaxed/simple;
+	bh=6TDEsZ/d+ZchQ+YUtQq30RN8kN900flDr/OsMOpvjtI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=t1Re6zOGBzywJRVhs5X98dAxa03EZW2svxtQSN/6+vh5rpnFNAR5cllFKNBuT+McmdxgUGFKep2T/tjjIYtcAtJxxGNWVLJDYu3bfFOGR6K8933txg8t57XuYaKOZ654qFU9jPHInHUyE/J2FbBFylHeOrHyf4PqaoGwIjrlulA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HCSNwkhy; arc=none smtp.client-ip=209.85.219.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-81a8065daf4so131371936d6.0
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:54:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760367220; x=1760972020; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JkTczQTZHYryzPDWDXYNY8z0qrPjMacwqBMHw46Z8LQ=;
-        b=lSKpqIQHRd3woDV+87HYJx6DE8z9s2XGSHnzaW+2akoWtXg4Xe8StTaroJF71q/hdU
-         BHEp3Y4kR75wUi+xOs/FNXY/CA/trMdZzg+6qyn3dWT4gFSXzNKLjlms46r1MKeT8RRl
-         xCfhwqdqlt1mODLzhvoGYhzeqCms9oWhCZmIXmZAoqCQaMwBXylgPByhLdh42fXbO20P
-         R8aR0n8ijPEB/15RMK0aqBdXb2D17WV/R0xC6aW7fspUnQ5XVfY0BTcLU/NOoFO439jJ
-         kFuGXDcrtq7U3vaYHMOkA/QVE19Vc9bzDzU/kBp9DJQsqkuGS4QHeQ+J1f0My+FqDmmv
-         /CSA==
+        d=google.com; s=20230601; t=1760367260; x=1760972060; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UAJC/elBYbN9mFiyODP7E7f/su0W1hYJfJY8so7cXa0=;
+        b=HCSNwkhySu4NXg2SXjv35yukQGdALQvMFZuhawTrUm1hfIXdBIII22LGAdTqKYxb1p
+         u0qkf9QDFLiGfplaJyml2+EFLn8G43uhWwbL5RPJH2lm+EEAT7Zh2W9eQxDLdI4rXSTQ
+         qvTPeAjMLnKkuA2GhrlsE0X2g6Mq9oKQOYGM1dysoB9ujuVdL65/Pk9lq1jxxzEuk/34
+         OtD+/TcUYtvLv+eMkfCJek8lWNhFBeDtsF313S0McgpCJO9m98vdW7q+72SwqpwempRj
+         wNgR/Us85PZX5524AczolOyBrY5XdM+1PSj2e9IoWVgiP9x9ft0wPc8565cdoCd4/nEJ
+         PTwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760367220; x=1760972020;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JkTczQTZHYryzPDWDXYNY8z0qrPjMacwqBMHw46Z8LQ=;
-        b=UxZaYpU6Px5m9Mr0cWcFezEAGeCo0zNp9LayPEOgt0FN0k2MY77rOaey7+yFZi02gh
-         la/NCR2IUMDBSMl/bGRQ/gom3gkOJ3ChTwabE9FC/x7B9WglMH57A9jVkesY9QB8yYRt
-         j8DQd+dzvtlJDg6jgrN51/sHpB1ktQ7aGXgeOahKB6XK9VoRwLcw+RlCli8JiUWb1AZd
-         PljafmpgutlgvAyRmtAUpXnS+nAhFixnf25M68+k3HH/mfqHw4YWFSmnqZcWeAgv7EjX
-         Xl6oEALTMk9A6wQthWhb2Kb9qkNoQCBWsh7oUbUVBPstNYh7c9RfnfKaeF4QPeZNmYsJ
-         kmmQ==
-X-Gm-Message-State: AOJu0Yx+uPFnFQlguquK60I7Zj2tvVJG7z0+SOtUG+h4s6zYlEZFzLNY
-	Dv4dicY880iQkHObZgB3ZzuwrXFCr0qF5KDsJRQIUIqK7E+6FhgizWkQ/nbmSEfn
-X-Gm-Gg: ASbGncv9amsjsTRsR8r9C6zOKqaJ4HatTto8b+wWkpFtmKRcTqMQyKvbfsp2VPs+CKL
-	B7/MBBN8H4vNB1rdpdnCVyUJuNPJ1AvyT8IbkdB7WG1VrsuImAyHXFUqkUUsNE5kMp8bSwOErJW
-	4MIoxP70Wm09Y6gsGU0X9SPRd2Z16LedTr1FgpHRiTpa7giBoxEQfXHL9YYfimwkYkomYXXt4LL
-	TtL4Gj/CeWtIbwYvIJ6AIT77KS0xijuDyRJ4LolUL2YipTnuxelAfUj1L52QiKc8kH8iS6OEDEC
-	m+RpigQxPsS4gu8yMRVrhmsxnPAopuilC+fnRbmNZCpE6mqk6QC//YfhITiLswp7oIJkXCFgF9x
-	Zgplj/7Ctpcu5p87+D8G41zn31ycFiF1uIHU=
-X-Google-Smtp-Source: AGHT+IH1AcW1vbl3T0tBxKkGhV2edrcBa7q1HnLUi7VWiRaXXYXEc5A2MgNgOomw2NjVWPsYTALNzw==
-X-Received: by 2002:a5d:64e7:0:b0:425:769d:4426 with SMTP id ffacd0b85a97d-4266e7dfff1mr12304230f8f.34.1760367220062;
-        Mon, 13 Oct 2025 07:53:40 -0700 (PDT)
-Received: from 127.com ([2620:10d:c092:600::1:eb09])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce5e0e70sm18641085f8f.40.2025.10.13.07.53.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Oct 2025 07:53:39 -0700 (PDT)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Joshua Washington <joshwash@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Jian Shen <shenjian15@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jijie Shao <shaojijie@huawei.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	hariprasad <hkelam@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	kernel-team@meta.com,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Joe Damato <joe@dama.to>,
-	David Wei <dw@davidwei.uk>,
-	Willem de Bruijn <willemb@google.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Breno Leitao <leitao@debian.org>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: [PATCH net-next v4 10/24] eth: bnxt: support setting size of agg buffers via ethtool
-Date: Mon, 13 Oct 2025 15:54:12 +0100
-Message-ID: <7760b969989404e3ea3fa5ed3404b54378b09e4e.1760364551.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <cover.1760364551.git.asml.silence@gmail.com>
-References: <cover.1760364551.git.asml.silence@gmail.com>
+        d=1e100.net; s=20230601; t=1760367260; x=1760972060;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UAJC/elBYbN9mFiyODP7E7f/su0W1hYJfJY8so7cXa0=;
+        b=txJROSfRllyviE+DV4hIakcKye69KaTQw1YL9j79a4ThXiTrPZ0pY4Mg90n5CQfY3i
+         LT3iHunYFqWK4a1PMbGXslugpItrAPCM5Ublckh2/rI6YI667qpc2usKOPObDAsknyxC
+         nJfKo/KRi51T9yrhkFN0KeXI+16ay1pavu4CTz2q6Ixz/3pi1mTKsx1Jzr+nnPfDhzCu
+         nwH7dtl6zGABq+jV/T9vlTc9DAIOiXI8PpEaLEFLqN/FLg7XLGkNFByYOHEBMbJXbPkJ
+         BvO/4hgeE1gDkBFC/aW5w86fMSgkArtg7JIRFBS6w2uA3gtzIgLuBW51TDA2A0pD7NBi
+         Ni0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUpXcSEKOf7GWYVdHxYevlpxXlaiHX+lRNYELr/Yrlwzhgl8L3PTvEkzF5fl8EG4JqcwpA2bkc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhmRF95PwCGkX9qZVkNbD/h6OuAyLfHvfiez7ZYKd+G1lKKVQs
+	8z67/tlWb2OArDNAEzB5bqLEi595+AK5v4pPo9hhAx+24zIx1E+m21yz2ELpLWqPZFP4YA82lK1
+	HMGZa28iHozyK2g==
+X-Google-Smtp-Source: AGHT+IGF97zkY8g1nSw7MH5pA88MkNTr6JSO3YWACqv8LK/WR5NZr4Slb0242tRrtc8jhwav9W4Be03StI32bg==
+X-Received: from qtko17.prod.google.com ([2002:a05:622a:1391:b0:4b7:a698:dea7])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:4814:b0:4b5:dc7c:a6ef with SMTP id d75a77b69052e-4e6ead57ffcmr294427571cf.50.1760367260310;
+ Mon, 13 Oct 2025 07:54:20 -0700 (PDT)
+Date: Mon, 13 Oct 2025 14:54:12 +0000
+In-Reply-To: <20251013145416.829707-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20251013145416.829707-1-edumazet@google.com>
+X-Mailer: git-send-email 2.51.0.740.g6adb054d12-goog
+Message-ID: <20251013145416.829707-2-edumazet@google.com>
+Subject: [PATCH v1 net-next 1/5] net: add add indirect call wrapper in skb_release_head_state()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Jakub Kicinski <kuba@kernel.org>
+While stress testing UDP senders on a host with expensive indirect
+calls, I found cpus processing TX completions where showing
+a very high cost (20%) in sock_wfree() due to
+CONFIG_MITIGATION_RETPOLINE=y.
 
-bnxt seems to be able to aggregate data up to 32kB without any issue.
-The driver is already capable of doing this for systems with higher
-order pages. While for systems with 4k pages we historically preferred
-to stick to small buffers because they are easier to allocate, the
-zero-copy APIs remove the allocation problem. The ZC mem is
-pre-allocated and fixed size.
+Take care of TCP and UDP TX destructors and use INDIRECT_CALL_3() macro.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  3 ++-
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 21 ++++++++++++++++++-
- 2 files changed, 22 insertions(+), 2 deletions(-)
+ net/core/skbuff.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index bbf4ff49ac0f..3abe59e9b021 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -758,7 +758,8 @@ struct nqe_cn {
- #define BNXT_RX_PAGE_SHIFT PAGE_SHIFT
- #endif
- 
--#define BNXT_RX_PAGE_SIZE (1 << BNXT_RX_PAGE_SHIFT)
-+#define BNXT_MAX_RX_PAGE_SIZE	(1 << 15)
-+#define BNXT_RX_PAGE_SIZE	(1 << BNXT_RX_PAGE_SHIFT)
- 
- #define BNXT_MAX_MTU		9500
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 41686a6f84b5..7b5b9781262d 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -835,6 +835,8 @@ static void bnxt_get_ringparam(struct net_device *dev,
- 	ering->rx_jumbo_pending = bp->rx_agg_ring_size;
- 	ering->tx_pending = bp->tx_ring_size;
- 
-+	kernel_ering->rx_buf_len_max = BNXT_MAX_RX_PAGE_SIZE;
-+	kernel_ering->rx_buf_len = bp->rx_page_size;
- 	kernel_ering->hds_thresh_max = BNXT_HDS_THRESHOLD_MAX;
- }
- 
-@@ -862,6 +864,21 @@ static int bnxt_set_ringparam(struct net_device *dev,
- 		return -EINVAL;
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index bc12790017b0b5c0be99f8fb9d362b3730fa4eb0..692e3a70e75ed14786a67d72bc2ebc0282eee2be 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -1136,7 +1136,16 @@ void skb_release_head_state(struct sk_buff *skb)
+ 	skb_dst_drop(skb);
+ 	if (skb->destructor) {
+ 		DEBUG_NET_WARN_ON_ONCE(in_hardirq());
+-		skb->destructor(skb);
++#ifdef CONFIG_INET
++		INDIRECT_CALL_3(skb->destructor,
++				tcp_wfree, __sock_wfree, sock_wfree,
++				skb);
++#else
++		INDIRECT_CALL_1(skb->destructor,
++				sock_wfree,
++				skb);
++
++#endif
  	}
- 
-+	if (!kernel_ering->rx_buf_len)	/* Zero means restore default */
-+		kernel_ering->rx_buf_len = BNXT_RX_PAGE_SIZE;
-+
-+	if (kernel_ering->rx_buf_len != bp->rx_page_size &&
-+	    !(bp->flags & BNXT_FLAG_CHIP_P5_PLUS)) {
-+		NL_SET_ERR_MSG_MOD(extack, "changing rx-buf-len not supported");
-+		return -EINVAL;
-+	}
-+	if (!is_power_of_2(kernel_ering->rx_buf_len) ||
-+	    kernel_ering->rx_buf_len < BNXT_RX_PAGE_SIZE ||
-+	    kernel_ering->rx_buf_len > BNXT_MAX_RX_PAGE_SIZE) {
-+		NL_SET_ERR_MSG_MOD(extack, "rx-buf-len out of range, or not power of 2");
-+		return -ERANGE;
-+	}
-+
- 	if (netif_running(dev))
- 		bnxt_close_nic(bp, false, false);
- 
-@@ -874,6 +891,7 @@ static int bnxt_set_ringparam(struct net_device *dev,
- 
- 	bp->rx_ring_size = ering->rx_pending;
- 	bp->tx_ring_size = ering->tx_pending;
-+	bp->rx_page_size = kernel_ering->rx_buf_len;
- 	bnxt_set_ring_params(bp);
- 
- 	if (netif_running(dev))
-@@ -5577,7 +5595,8 @@ const struct ethtool_ops bnxt_ethtool_ops = {
- 				     ETHTOOL_COALESCE_STATS_BLOCK_USECS |
- 				     ETHTOOL_COALESCE_USE_ADAPTIVE_RX |
- 				     ETHTOOL_COALESCE_USE_CQE,
--	.supported_ring_params	= ETHTOOL_RING_USE_TCP_DATA_SPLIT |
-+	.supported_ring_params	= ETHTOOL_RING_USE_RX_BUF_LEN |
-+				  ETHTOOL_RING_USE_TCP_DATA_SPLIT |
- 				  ETHTOOL_RING_USE_HDS_THRS,
- 	.get_link_ksettings	= bnxt_get_link_ksettings,
- 	.set_link_ksettings	= bnxt_set_link_ksettings,
+ #if IS_ENABLED(CONFIG_NF_CONNTRACK)
+ 	nf_conntrack_put(skb_nfct(skb));
 -- 
-2.49.0
+2.51.0.740.g6adb054d12-goog
 
 
