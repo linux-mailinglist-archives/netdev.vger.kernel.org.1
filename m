@@ -1,140 +1,130 @@
-Return-Path: <netdev+bounces-228813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD202BD4123
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:22:38 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B7CCBD4285
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:27:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9AF61890A6F
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:18:22 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 27BD834E99A
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B23830B536;
-	Mon, 13 Oct 2025 15:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68AAA22157B;
+	Mon, 13 Oct 2025 15:15:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Km/+C7xs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V9JBEk5T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD12130B525
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 15:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B792326B742
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 15:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760367750; cv=none; b=eeEgdheVv+2ttaRyimbELVhuoZGsCeYra5meF9IPzDxFhtv5vWDTmUJxMe1rpnuEjrc7ts/UaGPvSRXR56CbkBOBmIsH8Wm+vclUtuH0J59vjdjTwgF6wZ1MAIFqmQt/uTj8DI2ASvEdZC0QzadBvTih1DwF/ppLYPHy8SYfxnc=
+	t=1760368522; cv=none; b=FUhJIA2CcyprF7ITYvzagTn85xotTErJGlxZRPAhJKKXLRdlTfLJsoRMiGHXIS4wPEMuARb20EZz/ycIKhhgUKBV1PV4+5JgQZyRM7tGSL5KYUHzJC22dt9gAudYhv9vliIm5b3MZkjy0YMaWOI+m0J4rRckMHtwiXgpjUzeefg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760367750; c=relaxed/simple;
-	bh=XZ4lzHryEJQS9jgidvbUbN7osxHnfwhUvb5lDvX5gJM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D2Ss/EZ+XSofcKZoMX/TdcicQhlpgOR5HsDlM/JZ3p9Vl/dR9jkcLUwvv3o8+SWklCgo4+G48xn68Z0wXTLX1GKzAr2CFlh2eSV93xXcJQD7Q0TFVc976PjAwYd2u8m2l1F79YfaGsxPKDgaVdpiWiDuZxdpOTZ+a2c3MxVKi2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Km/+C7xs; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3f0ae439bc3so2017064f8f.1
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 08:02:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760367746; x=1760972546; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Yh3tjmmjbgFKGhBWocvc5VFMFhZLywRMRFtzLSkbw0s=;
-        b=Km/+C7xsfZItqUK1cRI41oQudCJQXawtSlxm2Y90QzKe9b1CH9Lue/2I7UhiV9ElL/
-         QbsSPdkyMDOFYhdArM/WwUk4HrRd78V3RT1IKtSrA3tojPLDyJJgw1uFNjhsOatstdjf
-         awHA8HXlg+4SOEZ9oEI0WYufnhqiDxH7H1pDa2kElbVfVK/isv9w6THHMeFYOFdsTzrT
-         4XPM6rT28Dtw7BCO5UlxgNQd6gurCk9yoS6p4GVG3DiwKS/kZXmT1g4FH0o84SKujCvj
-         NNq3v1ken4Lh0yVIZ4HeRdWXMC3yki6pD6VwCI9gK9RKdT3vhvmYDl93+WFdT69sWhcP
-         DVaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760367746; x=1760972546;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yh3tjmmjbgFKGhBWocvc5VFMFhZLywRMRFtzLSkbw0s=;
-        b=HBIzApXkwOOC02NolXpQRIcmSyLx1cwrZXHKbK9IgFNIH9COedjT1o5f0WVcCm6t9l
-         DSx8a+vTQYelm8tWyUAViP98gtumjcLmWIZUUYCY3jSCpi8oFbZXB5bSjg9d+nsCpP3X
-         YlDTpo2AHh+J6folve12GOdnW9hYIBnfGa9xfuqtw1FoejdbiOV3vt929y5Q987W7nL6
-         iTn1ocPobRtj558GxRNP5nx3IQ92RpOYvbquC4HH2ISdQXgLQVXstXVx5PFwVDBFu+Ij
-         ZLvZmuXVqEp7w6+WkMfDp4fPKUHToFK2dw36rNDTJiBmR4TrE4ESCus5PuN1qjmadkrT
-         UDxg==
-X-Gm-Message-State: AOJu0YwwGU6ik0wDHCHJgtDeHLBDhBx1rdRJfT0hNjahDHZLAPEQ/wwC
-	95NsT3IYIuVXQzxwbwZwMVgqzp5VjOr/GPgUkLi6Pyyr/pzrZX03SdBkItyWqUJc
-X-Gm-Gg: ASbGncsSpjcpuwk7ikw8fQ0eQJimDSQVI2CMlmaJs+8t8cNWxu2xFAZ3Q6Q8VzdCo38
-	aALJEumPRRWoeheKmjnEx1TUkYwYOYtfnFfhuRtMdco3ORhp9v8Rb9EBMLNtgx2xsFZzbzLpiUQ
-	3ctVRCPn6gK8rmBsT7tnz2gQwOEtgnaM8/NtkKg3AfJZ06KXkqqKj+MN23GCF91cteSncDdD/7L
-	ZvB7m70ChOYr5vlc71IPPXRTWu+Jm7L9XLcqvJ7Co5eB8X1ZhYrhqhAriVIW4MYNmBqj0yqHFDr
-	DgBiL2XROx+iNldRcb6xoS5T/hmvJZG3krQwkNZK0EPKULoV7ZfoYBk1c/TxmRKkpG0pagIZPsz
-	JvRJKzVXSktWdg+dyWosvBUQjWJJqYAByf3gUgmqiD5sLGSU4qvw1n2DiBy1uFdAUfSOBs20UXr
-	uNNKcHI5Kv
-X-Google-Smtp-Source: AGHT+IGNkJ4QbgL7tRzgvPN+I8L7UO5FdEYBSf53xVmGqianIIUKzVvqoD7JkSPO2wQpbIF5bLMK1Q==
-X-Received: by 2002:a05:6000:491e:b0:426:d549:5861 with SMTP id ffacd0b85a97d-426d5495947mr6222761f8f.42.1760367745998;
-        Mon, 13 Oct 2025 08:02:25 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:eb09])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce583664sm18651180f8f.22.2025.10.13.08.02.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Oct 2025 08:02:24 -0700 (PDT)
-Message-ID: <f0e40a00-ab13-42dc-b9ca-010fd4b115b8@gmail.com>
-Date: Mon, 13 Oct 2025 16:03:40 +0100
+	s=arc-20240116; t=1760368522; c=relaxed/simple;
+	bh=c4rS93Rby4lVufqazjHfnme806G3DSAkw+yIkKx5apk=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=PPNUUqKqgC5RbJuGaIryEoAUhwCfnRTphrDq/TQWmMMNtE2jEhwJajLwEd4y6fNcAPMvwvl6UW3zV90xZj3PeyMIdel3bawY55MDL0hDa2NkuQZYbXOpUkagLKHpy2RSXgF0/Qi4qpRne+3Q3UKtvExeCvhDDrH5QvLe+ae46z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V9JBEk5T; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760368521; x=1791904521;
+  h=from:to:cc:subject:date:message-id;
+  bh=c4rS93Rby4lVufqazjHfnme806G3DSAkw+yIkKx5apk=;
+  b=V9JBEk5TtzwzK4iTO4qbMA7QtTvioMmnK5lzFNEef34GmODATRhajnqR
+   6XUtGobx9jr84iRYWmn+GJ/ssxUH6ZpN6GrT7I/hI7evHgBmqwNsUgBgB
+   RBxvaR4V/izi57wUlcgA7104uuFH/1ffa5EfxMgU/IXCRc1S91qtJVjmS
+   ww9VXwN8EK8NEn9429EFWsSGhG2xOGVjMjTmS+FL6tUJ9CtFGp16xTuN0
+   /VH4iCKXydLWU0yPF5BJuQ1P+A0ylVgsIiSs8KZCUbKm7YaQsLz86bhZ0
+   KReWx77O+SHDwIfPEkPRsFqGzHItf0bXlON26K+C1cMz12uM5b0DD4MLu
+   g==;
+X-CSE-ConnectionGUID: 71rfkS3nSfidZs89sjh92g==
+X-CSE-MsgGUID: Tg1sd57BQOyna2SGWAaYNw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="62443343"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="62443343"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2025 08:15:20 -0700
+X-CSE-ConnectionGUID: KUykYF+DS+m5apxPfOqdrw==
+X-CSE-MsgGUID: 6PMpYbLYRMaGGMZ/nd3AAw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,225,1754982000"; 
+   d="scan'208";a="181632216"
+Received: from estantil-desk.jf.intel.com ([10.166.241.24])
+  by orviesa008.jf.intel.com with ESMTP; 13 Oct 2025 08:15:20 -0700
+From: Emil Tantilov <emil.s.tantilov@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	przemyslaw.kitszel@intel.com,
+	anthony.l.nguyen@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	decot@google.com,
+	willemb@google.com,
+	joshua.a.hay@intel.com,
+	madhu.chittim@intel.com,
+	horms@kernel.org
+Subject: [PATCH iwl-net] idpf: fix possible vport_config NULL pointer deref in remove
+Date: Mon, 13 Oct 2025 08:08:24 -0700
+Message-Id: <20251013150824.28705-1-emil.s.tantilov@intel.com>
+X-Mailer: git-send-email 2.17.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 00/24][pull request] Queue configs and large
- buffer providers
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Donald Hunter <donald.hunter@gmail.com>,
- Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Joshua Washington
- <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
- Jian Shen <shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
- Jijie Shao <shaojijie@huawei.com>, Sunil Goutham <sgoutham@marvell.com>,
- Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
- <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
- Bharat Bhushan <bbhushan2@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Alexander Duyck <alexanderduyck@fb.com>,
- kernel-team@meta.com, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Joe Damato <joe@dama.to>, David Wei <dw@davidwei.uk>,
- Willem de Bruijn <willemb@google.com>, Mina Almasry
- <almasrymina@google.com>, Breno Leitao <leitao@debian.org>,
- Dragos Tatulea <dtatulea@nvidia.com>, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
- Jonathan Corbet <corbet@lwn.net>, io-uring <io-uring@vger.kernel.org>
-References: <cover.1760364551.git.asml.silence@gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <cover.1760364551.git.asml.silence@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 10/13/25 15:54, Pavel Begunkov wrote:
+Attempting to remove the driver will cause a crash in cases where
+the vport failed to initialize. Following trace is from an instance where
+the driver failed during an attempt to create a VF:
+[ 1661.543624] idpf 0000:84:00.7: Device HW Reset initiated
+[ 1722.923726] idpf 0000:84:00.7: Transaction timed-out (op:1 cookie:2900 vc_op:1 salt:29 timeout:60000ms)
+[ 1723.353263] BUG: kernel NULL pointer dereference, address: 0000000000000028
+...
+[ 1723.358472] RIP: 0010:idpf_remove+0x11c/0x200 [idpf]
+...
+[ 1723.364973] Call Trace:
+[ 1723.365475]  <TASK>
+[ 1723.365972]  pci_device_remove+0x42/0xb0
+[ 1723.366481]  device_release_driver_internal+0x1a9/0x210
+[ 1723.366987]  pci_stop_bus_device+0x6d/0x90
+[ 1723.367488]  pci_stop_and_remove_bus_device+0x12/0x20
+[ 1723.367971]  pci_iov_remove_virtfn+0xbd/0x120
+[ 1723.368309]  sriov_disable+0x34/0xe0
+[ 1723.368643]  idpf_sriov_configure+0x58/0x140 [idpf]
+[ 1723.368982]  sriov_numvfs_store+0xda/0x1c0
 
-Forgot to CC io_uring
+Avoid the NULL pointer dereference by adding NULL pointer check for
+vport_config[i], before freeing user_config.q_coalesce.
 
-> Add support for per-queue rx buffer length configuration based on [2]
-> and basic infrastructure for using it in memory providers like
-> io_uring/zcrx. Note, it only includes net/ patches and leaves out
-> zcrx to be merged separately. Large rx buffers can be beneficial with
-> hw-gro enabled cards that can coalesce traffic, which reduces the
-> number of frags traversing the network stack and resuling in larger
-> contiguous chunks of data given to the userspace.
+Fixes: e1e3fec3e34b ("idpf: preserve coalescing settings across resets")
+Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
+Reviewed-by: Chittim Madhu <madhu.chittim@intel.com>
+---
+ drivers/net/ethernet/intel/idpf/idpf_main.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Same note as the last time, not great that it's over the 15 patches,
-but I don't see a good way to shrink it considering that the original
-series [2] is 22 patches long, and I'll somehow need to pull it it
-into the io_uring tree after. Please let me know if there is a strong
-feeling about that, and/or what would the preferred way be.
-
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
+index 8c46481d2e1f..8cf4ff697572 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_main.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
+@@ -63,6 +63,8 @@ static void idpf_remove(struct pci_dev *pdev)
+ 	destroy_workqueue(adapter->vc_event_wq);
+ 
+ 	for (i = 0; i < adapter->max_vports; i++) {
++		if (!adapter->vport_config[i])
++			continue;
+ 		kfree(adapter->vport_config[i]->user_config.q_coalesce);
+ 		kfree(adapter->vport_config[i]);
+ 		adapter->vport_config[i] = NULL;
 -- 
-Pavel Begunkov
+2.37.3
 
 
