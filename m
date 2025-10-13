@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-228947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBA43BD64D5
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 22:58:45 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DB2CBD6557
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 23:13:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C640188BCB7
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 20:59:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 906F74E6697
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 21:13:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AEE82DE1F0;
-	Mon, 13 Oct 2025 20:58:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0BCA296BDE;
+	Mon, 13 Oct 2025 21:13:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dod3PK9j"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DUxTdpLb"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654971D618E;
-	Mon, 13 Oct 2025 20:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E11219E8;
+	Mon, 13 Oct 2025 21:13:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760389120; cv=none; b=r7zO2FFuAhjfapm2+Cmnz70IBrIwGxug7XA9rZe6Ipp/TW9j7jO54cngRtX4notLniDlcKbMQfjrk4RKFjucHEb7p4YTgTqFm5TNED0GFRZ8LVlQbBDx2Ikpjd+Jl3wYx9yObRqXDpUogvh/gBTeSCNoNCeGmg2LuvI0leE5fK0=
+	t=1760390013; cv=none; b=Ab0uzHOffP9/RjOg61aO7h3P0ehOs4VaGZQfOx/y/NZetLeFge4BgjbXku8WOFLLMRujHBQPIDB6EujsRMj7sbRv8B4WP05ZIsM2dA+F8BVxGLMTW35VhH8kUz3BYOCIMQLmLaRhVmQsn+lcW7nqQQZZ/tbVG7VRR3bZPZGdw20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760389120; c=relaxed/simple;
-	bh=ZLMOYXdGkPVZxvZex41E5YaIlwF+jW9uMwcs1J+3ERk=;
+	s=arc-20240116; t=1760390013; c=relaxed/simple;
+	bh=4RZ1W/0OtJO42EVel9j3/ON3Ful8VIZ1NXg+yp0Riug=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qRkTrxhTXy7f6yp2XS4KZ4grIePTTpEjzQghRiKFyXn+821nE+JlapZT6N09JZ666HOU7OXw0FC37WL7l5DgPpKEM2WwF+gq5nU/6qYn4wHlwWgv53LF1e1jRawvJ8opzu94fXfDkbkSq432SSZnEXA+BWm8ElkMGu5NfpV2+0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dod3PK9j; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=AiV13WsX1apnd2/vpg8lpkaGFqjc0CGOUyuxyepOZ5RaEw3H1dHaWbHzi4LpZ2vE73IAHIKbkq7rZx5t+CKG9e0Fw8EnLpTtoTa70VyoilvTc91BrVYVgvRH5T346oqBXngFD6MyDD19WA1QJCNJKNrUcAkWH9uH6iKptNzjYyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DUxTdpLb; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,23 +36,29 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lefGc/4TkfHmx8o0Y4gAe9QYz9+YikedJfN4gQ335Ns=; b=dod3PK9jTI2hpvAD4+SKvmXcd7
-	ggs5kba0Ilft1Rnd6hQ++NTgcasRLB+xWEW+79fXQpN92Yx1MafthZrF3iNzBSKAfvyqLXqxPp5K4
-	UlmlDTtQQdwhWB66zt841YBRfzeSQmHJsm3WPH2OILEKsb9lW6ahtczBTD/8tR+SaU+o=;
+	bh=lILPrmAnEJYFOg9nKICbbMK/wh/wWM1Gf/ZklRUMM3I=; b=DUxTdpLbIDoIluCHOCvrB+0FqV
+	mqoyAUuQ3hL2gr991kawpdf16Ct5d3qyamLT3uD2R91pK8PpqtDx2FYS34fbunxAYr/Fyim9PLUFk
+	RZtVr2+BYJ7hS2sIZ5CbyfLtBtywiZtS3aVcCZUDWMnTTEyRG97zp6MTcYGocgpkc4as=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1v8Pci-00Aq3X-2f; Mon, 13 Oct 2025 22:58:28 +0200
-Date: Mon, 13 Oct 2025 22:58:28 +0200
+	id 1v8Pr6-00Aq7D-5J; Mon, 13 Oct 2025 23:13:20 +0200
+Date: Mon, 13 Oct 2025 23:13:20 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] MAINTAINERS: add myself as maintainer for b53
-Message-ID: <345b0ee5-aee1-43c9-83f6-3b03f367bc8a@lunn.ch>
-References: <20251013180347.133246-1-jonas.gorski@gmail.com>
+To: Haiyang Zhang <haiyangz@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	haiyangz@microsoft.com, paulros@microsoft.com, decui@microsoft.com,
+	kys@microsoft.com, wei.liu@kernel.org, edumazet@google.com,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	longli@microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, dipayanroy@linux.microsoft.com,
+	kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, leon@kernel.org,
+	mlevitsk@redhat.com, yury.norov@gmail.com,
+	shirazsaleem@microsoft.com, andrew+netdev@lunn.ch,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: mana: Support HW link state events
+Message-ID: <74490632-68da-401d-89a7-3d937d63cbe3@lunn.ch>
+References: <1760384001-30805-1-git-send-email-haiyangz@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,17 +67,69 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251013180347.133246-1-jonas.gorski@gmail.com>
+In-Reply-To: <1760384001-30805-1-git-send-email-haiyangz@linux.microsoft.com>
 
-On Mon, Oct 13, 2025 at 08:03:47PM +0200, Jonas Gorski wrote:
-> I wrote the original OpenWrt driver that Florian used as the base for
-> the dsa driver, I might as well take responsibility for it.
-> 
-> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+> +static void mana_link_state_handle(struct work_struct *w)
+> +{
+> +	struct mana_context *ac =
+> +		container_of(w, struct mana_context, link_change_work.work);
+> +	struct mana_port_context *apc;
+> +	struct net_device *ndev;
+> +	bool link_up;
+> +	int i;
 
-Thanks for volunteering.
+Since you don't need ac here, i would postpone the assignment into the
+body of the function, so keeping with reverse christmass tree.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> +
+> +	if (!rtnl_trylock()) {
+> +		schedule_delayed_work(&ac->link_change_work, 1);
+> +		return;
+> +	}
 
-    Andrew
+Is there a deadlock you are trying to avoid here? Why not wait for the
+lock?
+
+> +
+> +	if (ac->link_event == HWC_DATA_HW_LINK_CONNECT)
+> +		link_up = true;
+> +	else if (ac->link_event == HWC_DATA_HW_LINK_DISCONNECT)
+> +		link_up = false;
+> +	else
+> +		goto out;
+> +
+> +	/* Process all ports */
+> +	for (i = 0; i < ac->num_ports; i++) {
+> +		ndev = ac->ports[i];
+> +		if (!ndev)
+> +			continue;
+> +
+> +		apc = netdev_priv(ndev);
+> +
+> +		if (link_up) {
+> +			netif_carrier_on(ndev);
+> +
+> +			if (apc->port_is_up)
+> +				netif_tx_wake_all_queues(ndev);
+> +
+> +			__netdev_notify_peers(ndev);
+> +		} else {
+> +			if (netif_carrier_ok(ndev)) {
+> +				netif_tx_disable(ndev);
+> +				netif_carrier_off(ndev);
+> +			}
+> +		}
+
+It is odd this is asymmetric. Up and down should really be opposites.
+
+> @@ -3500,6 +3548,8 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+>  	int err;
+>  	int i;
+>  
+> +	cancel_delayed_work_sync(&ac->link_change_work);
+
+I don't know delayed work too well. Is this sufficient when the work
+requeues itself because it cannot get RTNL?
+
+	Andrew
 
