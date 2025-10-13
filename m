@@ -1,238 +1,295 @@
-Return-Path: <netdev+bounces-228808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C31AABD433F
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:29:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0F2ABD3FDC
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:17:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 94C254FB167
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:11:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E1DC3E479E
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:05:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D845B314D25;
-	Mon, 13 Oct 2025 14:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B1E5311969;
+	Mon, 13 Oct 2025 14:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jF5dvbjA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hiNG2nGf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED27230C63D
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:54:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5433112C8
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:53:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760367264; cv=none; b=cs5OHlp1XnQFtVQn46b/i+QzM3z6E7GGbcieMbn7BsC3Y9mzIil5Le27XoYdcJht0gujvoR1DhzQj8tw0XkmI4LyQdzTTFpMOmIgh06X3NlCoc/D6ADr5F0XW2c2avMsHuPfNef/CspXmwJx9ewN6MqUc1qOp7VVJKszAWcTHPw=
+	t=1760367227; cv=none; b=oT77Z+PAdYOUM92x36TZXru77QLA9j6QRzx1pJGv6aZrNSyj/iyQYGjxQE5xKOSrLg0QBeFIALLbm4GevUqiQVcP3SxSyO8+sWQbO4A+kKGCjaNIvYxR08GL5R+U6sso94y1SWEG1RIrOhPaswcS+kN6YC+XJp92/ZfVhdXW7U4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760367264; c=relaxed/simple;
-	bh=4xjnwpDHCO8jZOH0dDAJ859tN+yDaKjmXPpzturFAHM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Nzmhy+F3wqqD4tc+o8fPoSDJ4lapikEvAMveBzIl1X832+JfQyyJ4sDX/60ZWIcAcU58vWWnH+8EDxmj+hG3/Gl5+cS5rm7ZRx8o9apOWqmE17CIdwUd02y09yxXDxQ5V+iE92ruQNTVsPTWZuSWM8RDbd6UjR7nI2ymGBBsC6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jF5dvbjA; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-7811685b417so39731807b3.1
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:54:22 -0700 (PDT)
+	s=arc-20240116; t=1760367227; c=relaxed/simple;
+	bh=E8WoJuBOO+qk8Q5hqtoULQ0PwkM4ocuACiUdIi2N6so=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cTMrOEYkyEAwWQ/jcQpW03T+LG6qz6rZjvmTmi7fzaSKbe69XaNTConIrqV9KOO5WRav7QIGh8idP+zkDiTczNAwvfai3t8Cp0M35M3AaNOBlmlMuzMCpWa55V5r2umENMsYlCxCXM5J0FMCTuD8woh0sfLn9M22VWogUMBCmQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hiNG2nGf; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3fc36b99e92so3810163f8f.0
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:53:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760367262; x=1760972062; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jBTJqKDiqADcC4DXZyV5q7f1a5fG8ExfroHN1cYdpm4=;
-        b=jF5dvbjAPE1vdWdolv6mnNI34RSJlcbUbexx5yKpF6xY1jvQtY6fYAUoS1482BmTkc
-         pxs1gdikKmJEdt6stu8tRhnKNGOIBVFTSZgj5Nyh8ZM6RIiyvvhXU/2rYGWwgoECtRiN
-         NkwcJCmf8OPgyWMXacLDZfqDhhpE6v+jziVoMWBJepN5KoFONnfNMHnJHz1EZ3eAMQ0b
-         i3kpb4xd99eKT2GivPEGi3/N0WyPQVhRO44sdk9yyn4uIc7fiyFwolAEQ5ukN9HLXVEl
-         3csqQeoxxsf2K7HGIrrBY7/5oGpNCCpRVBUyi2LNJLDXH0AnH8ffNXFjiyspA53qRdyl
-         5inw==
+        d=gmail.com; s=20230601; t=1760367222; x=1760972022; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bxISOHK0sfOtFB4YWzm4iWfmIyELFZH9BHOLFWLiapg=;
+        b=hiNG2nGfIOADsE6zv+QCnp6aPiVdaHd6GuPVT8fBfgs6P1Ceh+IqHgXZoWTBEFkZkH
+         a4/69ZYAqcwdOPfap5Ut7XpJFErQFPsha4AGKWF5CmCtwz9FRbmXx5cvA6Y5bsZ8YBSx
+         QPmSYVGVKPwHebxDSKmjK7zoRoN9d49lh2s9O3YaLp3r2oUUA9B3/oibXpoSViZj/3sW
+         iEDiycF9RUBsiUZRWqg9buB/7ynAbXx3TphsvpMV0RUOsm+xsoIrxOrWdyl1xSxOrTvS
+         we8LnQeyHQqLvwGdlj+bDLwgtQDUBhSLTC2Ce/Hnwu3qUGVALaWi9veZy3A37I7avq16
+         V27A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760367262; x=1760972062;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jBTJqKDiqADcC4DXZyV5q7f1a5fG8ExfroHN1cYdpm4=;
-        b=AP3DStZvgIoANY0QexJD2sWeY0FOpnQBozAgTHpIbpngCGQzyvxv4h48xRWIqHq1th
-         daW/1j2P8lmvD/Cg2Bosq6d6FbPsyQ+S1pmcW6eQmfIFT90wdVlYZGYvazUWUw0AUrWT
-         eOvF7b6xSRjZRhndt1cxnAATJqT88gtMxiLtk05Z2W4TA85OhFcm1xQ76CcDSBhL9RkD
-         yhSm1zarILzGywuDcIjYKGHIvhISeFXU4vno28sIEUSwE/hAlh5i8SnXnTkg071alGhj
-         BRG+vLiTKgwZomtIzPEybibt6A9b6gbCcXDQwa2kUiRdMSeZdKqqXOZiDLk4OfewJEV2
-         pZrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV0vf4JkNRuRJcJGj8Q2xc+axMM7YodAqW4tJ2n/jUM2T70yZwBGMseNIpgcrquJtqf0UMyLTc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzp0gsHE+76dqae7hY3dMyMea77MNxLmKUt4HxLZW5TXkY+aMux
-	N8y9r8B/wf0zEeAh+AQe/NJPXmwpjxTWUUQOhLN/pZ7A/1PstUvjRCL+6ikbbTd07U54BCIktb5
-	8mu4dHi2NVs+z9w==
-X-Google-Smtp-Source: AGHT+IG947YWuCFP4OUIYR0LkYqXV8YmQ/QB3gxK8NR7VU7zWh4B5WD7/DPA/YlhmKo4S77AdwKj3/V1RvL2Og==
-X-Received: from ywbeo19.prod.google.com ([2002:a05:690c:2c13:b0:744:417d:fb23])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690c:e0a:b0:773:e84f:ece8 with SMTP id 00721157ae682-780e1659b17mr197262747b3.14.1760367261801;
- Mon, 13 Oct 2025 07:54:21 -0700 (PDT)
-Date: Mon, 13 Oct 2025 14:54:13 +0000
-In-Reply-To: <20251013145416.829707-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1760367222; x=1760972022;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bxISOHK0sfOtFB4YWzm4iWfmIyELFZH9BHOLFWLiapg=;
+        b=twh01PyL1+W2EAJcR4btqFmvdQl7xieZF7p48492+9baX9i745whfPmRflVqM0cgny
+         iekrsalBeKmCYKNIBQMgwX/Fq5su88kPCtIH/bzXNLgJGyMAxy3I1PUGZ4Sdz46KFPF7
+         PtaYj8vQzyFhOHn2pe2BydSu5wEsVBgn20lGVzLxc7XhZGz4duzvbJy4aWYSDCkGUmwF
+         OST/+q3FdVBJx/EkHTM+au2Ynv6TxOAMJ6UPCKpZAS2X3lxuBEoDvD/zH+rDG6FZ8uZh
+         uFfakuywk2PqKsYU+PMyQALpFqX8UwiANZE1bqJFIZZthS02W75XBTAGlayxATNIh2nt
+         Ju4Q==
+X-Gm-Message-State: AOJu0YyHjTnMUGCjpUO9FltZ8K2gXrCxPeRtikenJoVczSDCZxMhP/px
+	jTi5xOBVxdPGpDDHnHFWoFvdX0IlIzoabEPsdOpQoWIRnI3PWa0TbFaQLBiglV0e
+X-Gm-Gg: ASbGncsNxEnbF7TfU58UJxlbCnG3AOMMS9bctubGuVlF/JIuWGOdfOoPaeLjIgrT3YZ
+	+0cAAS7Eq26qtdP6sfT0lL00qcmtZ3lj0miqFOgAeGasi1RQ/RiTHCpmTSLucbFNb+o4F2oCEQe
+	qP3uangDaD5roZz0uhTBoxICYn1+DlPVyXwcNsoZp+GaP2lTSWYcqZ7m1i0RE7y09EdUMMKyCqZ
+	jvOWJtZwG2TlSZ/CEh7ZSiTv6b54Z7uEuDpp4rg19Sgx091wudLk6818P5De2twt0yCZ4OKLrIK
+	b9nA166il/UPgkVPWzhsc/AEThE9wRJtc+6zV6baJpZfCqxbbXuMu2TXewAJhxvd3jO5Uvu9Xa1
+	S+/T+9VwMYyZ0/OZJyu83M/dJ2gMwkFYAfIM=
+X-Google-Smtp-Source: AGHT+IEzTwZdHTurtXtAEUjWNLzW7QhST7sltiH1Xg9KXxn65EDy7cgKglM2V8lRa6iGebxt7MLQeg==
+X-Received: by 2002:a05:6000:609:b0:3ec:db87:ff53 with SMTP id ffacd0b85a97d-42666aa67demr15479799f8f.12.1760367222156;
+        Mon, 13 Oct 2025 07:53:42 -0700 (PDT)
+Received: from 127.com ([2620:10d:c092:600::1:eb09])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce5e0e70sm18641085f8f.40.2025.10.13.07.53.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Oct 2025 07:53:41 -0700 (PDT)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Joshua Washington <joshwash@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Jian Shen <shenjian15@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	kernel-team@meta.com,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Joe Damato <joe@dama.to>,
+	David Wei <dw@davidwei.uk>,
+	Willem de Bruijn <willemb@google.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Breno Leitao <leitao@debian.org>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>
+Subject: [PATCH net-next v4 11/24] net: move netdev_config manipulation to dedicated helpers
+Date: Mon, 13 Oct 2025 15:54:13 +0100
+Message-ID: <247a04527829dcc9e7a6e580b3cd5fe4745c9e84.1760364551.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <cover.1760364551.git.asml.silence@gmail.com>
+References: <cover.1760364551.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251013145416.829707-1-edumazet@google.com>
-X-Mailer: git-send-email 2.51.0.740.g6adb054d12-goog
-Message-ID: <20251013145416.829707-3-edumazet@google.com>
-Subject: [PATCH v1 net-next 2/5] net/sched: act_mirred: add loop detection
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Commit 0f022d32c3ec ("net/sched: Fix mirred deadlock on device recursion")
-added code in the fast path, even when act_mirred is not used.
+From: Jakub Kicinski <kuba@kernel.org>
 
-Prepare its revert by implementing loop detection in act_mirred.
+netdev_config manipulation will become slightly more complicated
+soon and we will need to call if from ethtool as well as queue API.
+Encapsulate the logic into helper functions.
 
-Adds an array of device pointers in struct netdev_xmit.
-
-tcf_mirred_is_act_redirect() can detect if the array
-already contains the target device.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- include/linux/netdevice_xmit.h |  9 ++++-
- net/sched/act_mirred.c         | 62 +++++++++++++---------------------
- 2 files changed, 31 insertions(+), 40 deletions(-)
+ net/core/Makefile        |  1 +
+ net/core/dev.c           |  7 ++-----
+ net/core/dev.h           |  5 +++++
+ net/core/netdev_config.c | 43 ++++++++++++++++++++++++++++++++++++++++
+ net/ethtool/netlink.c    | 14 ++++++-------
+ 5 files changed, 57 insertions(+), 13 deletions(-)
+ create mode 100644 net/core/netdev_config.c
 
-diff --git a/include/linux/netdevice_xmit.h b/include/linux/netdevice_xmit.h
-index 813a19122ebbb2c6a04176330b1055b7c2b9c902..cc232508e695eefe95ea6e55a21978be11d5da83 100644
---- a/include/linux/netdevice_xmit.h
-+++ b/include/linux/netdevice_xmit.h
-@@ -2,6 +2,12 @@
- #ifndef _LINUX_NETDEVICE_XMIT_H
- #define _LINUX_NETDEVICE_XMIT_H
+diff --git a/net/core/Makefile b/net/core/Makefile
+index 9ef2099c5426..9f1f08ff585f 100644
+--- a/net/core/Makefile
++++ b/net/core/Makefile
+@@ -21,6 +21,7 @@ obj-y += net-sysfs.o
+ obj-y += hotdata.o
+ obj-y += netdev_rx_queue.o
+ obj-y += netdev_queues.o
++obj-y += netdev_config.o
+ obj-$(CONFIG_PAGE_POOL) += page_pool.o page_pool_user.o
+ obj-$(CONFIG_PROC_FS) += net-procfs.o
+ obj-$(CONFIG_NET_PKTGEN) += pktgen.o
+diff --git a/net/core/dev.c b/net/core/dev.c
+index a64cef2c537e..5f92425dfdbd 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -11973,10 +11973,8 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
+ 	if (!dev->ethtool)
+ 		goto free_all;
  
-+#if IS_ENABLED(CONFIG_NET_ACT_MIRRED)
-+#define MIRRED_NEST_LIMIT	4
-+#endif
-+
-+struct net_device;
-+
- struct netdev_xmit {
- 	u16 recursion;
- 	u8  more;
-@@ -9,7 +15,8 @@ struct netdev_xmit {
- 	u8  skip_txqueue;
- #endif
- #if IS_ENABLED(CONFIG_NET_ACT_MIRRED)
--	u8 sched_mirred_nest;
-+	u8			sched_mirred_nest;
-+	struct net_device	*sched_mirred_dev[MIRRED_NEST_LIMIT];
- #endif
- #if IS_ENABLED(CONFIG_NF_DUP_NETDEV)
- 	u8 nf_dup_skb_recursion;
-diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-index 5f01f567c934d3669d9a3058cff861a8fe5f88b6..f27b583def78e4afecc7112854b93d59c2520201 100644
---- a/net/sched/act_mirred.c
-+++ b/net/sched/act_mirred.c
-@@ -29,31 +29,6 @@
- static LIST_HEAD(mirred_list);
- static DEFINE_SPINLOCK(mirred_list_lock);
+-	dev->cfg = kzalloc(sizeof(*dev->cfg), GFP_KERNEL_ACCOUNT);
+-	if (!dev->cfg)
++	if (netdev_alloc_config(dev))
+ 		goto free_all;
+-	dev->cfg_pending = dev->cfg;
  
--#define MIRRED_NEST_LIMIT    4
--
--#ifndef CONFIG_PREEMPT_RT
--static u8 tcf_mirred_nest_level_inc_return(void)
--{
--	return __this_cpu_inc_return(softnet_data.xmit.sched_mirred_nest);
--}
--
--static void tcf_mirred_nest_level_dec(void)
--{
--	__this_cpu_dec(softnet_data.xmit.sched_mirred_nest);
--}
--
--#else
--static u8 tcf_mirred_nest_level_inc_return(void)
--{
--	return current->net_xmit.sched_mirred_nest++;
--}
--
--static void tcf_mirred_nest_level_dec(void)
--{
--	current->net_xmit.sched_mirred_nest--;
--}
--#endif
--
- static bool tcf_mirred_is_act_redirect(int action)
- {
- 	return action == TCA_EGRESS_REDIR || action == TCA_INGRESS_REDIR;
-@@ -439,44 +414,53 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
- {
- 	struct tcf_mirred *m = to_mirred(a);
- 	int retval = READ_ONCE(m->tcf_action);
--	unsigned int nest_level;
-+	struct netdev_xmit *xmit;
- 	bool m_mac_header_xmit;
- 	struct net_device *dev;
--	int m_eaction;
-+	int i, m_eaction;
- 	u32 blockid;
- 
--	nest_level = tcf_mirred_nest_level_inc_return();
--	if (unlikely(nest_level > MIRRED_NEST_LIMIT)) {
-+#ifdef CONFIG_PREEMPT_RT
-+	xmit = &current->net_xmit;
-+#else
-+	xmit = this_cpu_ptr(&softnet_data.xmit);
-+#endif
-+	if (unlikely(xmit->sched_mirred_nest >= MIRRED_NEST_LIMIT)) {
- 		net_warn_ratelimited("Packet exceeded mirred recursion limit on dev %s\n",
- 				     netdev_name(skb->dev));
--		retval = TC_ACT_SHOT;
--		goto dec_nest_level;
-+		return TC_ACT_SHOT;
+ 	dev->num_napi_configs = maxqs;
+ 	napi_config_sz = array_size(maxqs, sizeof(*dev->napi_config));
+@@ -12047,8 +12045,7 @@ void free_netdev(struct net_device *dev)
+ 		return;
  	}
  
- 	tcf_lastuse_update(&m->tcf_tm);
- 	tcf_action_update_bstats(&m->common, skb);
+-	WARN_ON(dev->cfg != dev->cfg_pending);
+-	kfree(dev->cfg);
++	netdev_free_config(dev);
+ 	kfree(dev->ethtool);
+ 	netif_free_tx_queues(dev);
+ 	netif_free_rx_queues(dev);
+diff --git a/net/core/dev.h b/net/core/dev.h
+index 900880e8b5b4..1ec0b836c652 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -92,6 +92,11 @@ extern struct rw_semaphore dev_addr_sem;
+ extern struct list_head net_todo_list;
+ void netdev_run_todo(void);
  
- 	blockid = READ_ONCE(m->tcfm_blockid);
--	if (blockid) {
--		retval = tcf_blockcast(skb, m, blockid, res, retval);
--		goto dec_nest_level;
++int netdev_alloc_config(struct net_device *dev);
++void __netdev_free_config(struct netdev_config *cfg);
++void netdev_free_config(struct net_device *dev);
++int netdev_reconfig_start(struct net_device *dev);
++
+ /* netdev management, shared between various uAPI entry points */
+ struct netdev_name_node {
+ 	struct hlist_node hlist;
+diff --git a/net/core/netdev_config.c b/net/core/netdev_config.c
+new file mode 100644
+index 000000000000..270b7f10a192
+--- /dev/null
++++ b/net/core/netdev_config.c
+@@ -0,0 +1,43 @@
++// SPDX-License-Identifier: GPL-2.0-only
++
++#include <linux/netdevice.h>
++#include <net/netdev_queues.h>
++
++#include "dev.h"
++
++int netdev_alloc_config(struct net_device *dev)
++{
++	struct netdev_config *cfg;
++
++	cfg = kzalloc(sizeof(*dev->cfg), GFP_KERNEL_ACCOUNT);
++	if (!cfg)
++		return -ENOMEM;
++
++	dev->cfg = cfg;
++	dev->cfg_pending = cfg;
++	return 0;
++}
++
++void __netdev_free_config(struct netdev_config *cfg)
++{
++	kfree(cfg);
++}
++
++void netdev_free_config(struct net_device *dev)
++{
++	WARN_ON(dev->cfg != dev->cfg_pending);
++	__netdev_free_config(dev->cfg);
++}
++
++int netdev_reconfig_start(struct net_device *dev)
++{
++	struct netdev_config *cfg;
++
++	WARN_ON(dev->cfg != dev->cfg_pending);
++	cfg = kmemdup(dev->cfg, sizeof(*dev->cfg), GFP_KERNEL_ACCOUNT);
++	if (!cfg)
++		return -ENOMEM;
++
++	dev->cfg_pending = cfg;
++	return 0;
++}
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index 2f813f25f07e..d376d3043177 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -6,6 +6,7 @@
+ #include <linux/ethtool_netlink.h>
+ #include <linux/phy_link_topology.h>
+ #include <linux/pm_runtime.h>
++#include "../core/dev.h"
+ #include "netlink.h"
+ #include "module_fw.h"
+ 
+@@ -906,12 +907,9 @@ static int ethnl_default_set_doit(struct sk_buff *skb, struct genl_info *info)
+ 
+ 	rtnl_lock();
+ 	netdev_lock_ops(dev);
+-	dev->cfg_pending = kmemdup(dev->cfg, sizeof(*dev->cfg),
+-				   GFP_KERNEL_ACCOUNT);
+-	if (!dev->cfg_pending) {
+-		ret = -ENOMEM;
+-		goto out_tie_cfg;
 -	}
-+	if (blockid)
-+		return tcf_blockcast(skb, m, blockid, res, retval);
++	ret = netdev_reconfig_start(dev);
++	if (ret)
++		goto out_unlock;
  
- 	dev = rcu_dereference_bh(m->tcfm_dev);
- 	if (unlikely(!dev)) {
- 		pr_notice_once("tc mirred: target device is gone\n");
- 		tcf_action_inc_overlimit_qstats(&m->common);
--		goto dec_nest_level;
-+		return retval;
- 	}
-+	for (i = 0; i < xmit->sched_mirred_nest; i++) {
-+		if (xmit->sched_mirred_dev[i] != dev)
-+			continue;
-+		pr_notice_once("tc mirred: loop on device %s\n",
-+			       netdev_name(dev));
-+		tcf_action_inc_overlimit_qstats(&m->common);
-+		return retval;
-+	}
-+
-+	xmit->sched_mirred_dev[xmit->sched_mirred_nest++] = dev;
- 
- 	m_mac_header_xmit = READ_ONCE(m->tcfm_mac_header_xmit);
- 	m_eaction = READ_ONCE(m->tcfm_eaction);
- 
- 	retval = tcf_mirred_to_dev(skb, m, dev, m_mac_header_xmit, m_eaction,
- 				   retval);
--
--dec_nest_level:
--	tcf_mirred_nest_level_dec();
-+	xmit->sched_mirred_nest--;
- 
- 	return retval;
- }
+ 	ret = ethnl_ops_begin(dev);
+ 	if (ret < 0)
+@@ -930,9 +928,9 @@ static int ethnl_default_set_doit(struct sk_buff *skb, struct genl_info *info)
+ out_ops:
+ 	ethnl_ops_complete(dev);
+ out_free_cfg:
+-	kfree(dev->cfg_pending);
+-out_tie_cfg:
++	__netdev_free_config(dev->cfg_pending);
+ 	dev->cfg_pending = dev->cfg;
++out_unlock:
+ 	netdev_unlock_ops(dev);
+ 	rtnl_unlock();
+ out_dev:
 -- 
-2.51.0.740.g6adb054d12-goog
+2.49.0
 
 
