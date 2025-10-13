@@ -1,115 +1,152 @@
-Return-Path: <netdev+bounces-228706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6287EBD2A3F
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 12:51:02 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4312BD2B85
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 13:07:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2F04A4EC915
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 10:51:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CE03D4F0D96
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 11:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43198302746;
-	Mon, 13 Oct 2025 10:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="edJ2DNSy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ADE626A087;
+	Mon, 13 Oct 2025 11:05:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B183043C4
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 10:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BBDA19D087
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 11:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760352654; cv=none; b=aRQUVsZVpoWrKgXeBJdEO7K9fomKNeIZLk8hjVPqb6JCgeJaiuaWJF74vSRA+xP5qmcjbSW4+LdtMqcZaIePxHQXUh0O3GtUgnsVsOGv9GM43l+3ATdrB9R5cFOeHu4L9p972VByPUIT7v432htZs+A5NhGVzQr8w/HrORKnBNQ=
+	t=1760353543; cv=none; b=Wah9pXTdyhG3g2zU1MDtlsSfaPcE5FFp19dSLhuUnbY1Hw4qbduvqKdAvvYK6rj+GY/R7QujNnGqHQ/xM/3lsn3z/C/2FKytdkzdZ3N/TYgAlohWH6cgekecuUVOPbRP5Sr41IcsNEEiB3WrZVVDGfOeRPo/Q8UpHx0UseWYeRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760352654; c=relaxed/simple;
-	bh=wNP5THpXLBBCsooeBbFGaCM7Hjs85FFamh1ekejynLM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YWDqUOHsMJGiqoFddBghGxgPOZP6VW7SG2Hh/Wgalxbb1JWDKKwm81MfTVqL2kO+YdsO9VXFux5OP90L4LFfHxPzzvcmOdoSPyQWWwBIbXpEus4iK5iodkjxmxVRlF0kB7WtkeVeAj8HizpEDtL27VNy17GbyalJ6axhctRNTkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=edJ2DNSy; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1760353543; c=relaxed/simple;
+	bh=2VR10E5wmg+4Yys6nHjV3FIVrHeBrYXrjEeeXKow4Ww=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=svF4xSlDyAjfNzWWWaeCyqYLxMOdkDgp95RQDZ/e2x4qB2ByWE8AWYcreLTHtNJFTUHvKBg8GVwHBpJCXfY8JmzNRefiqEoAeFAamSMX11zo1v4ZeItFkNXBn/7Y3TEcncucHOzhKJeOHHPt4zrgRihs16ibeAQ0fwG7K0h6e8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-636de696e18so8485533a12.3
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 03:50:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760352648; x=1760957448; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ywHY3N/RI9LLiDCgfHoL3E6H1b5BrPsw9rGztJzIzfc=;
-        b=edJ2DNSya4n3LkBzMaSlhQLuNmQdeuRa6EsBik6tCyiqMkpkIO9+QC0uSwxcS6TT5l
-         NhTmBm1t+TmFdBtG9jlk4ojBAPzpMewBQHXFOY4AJnJBMajkku1lsbiARphZIMiRBghv
-         Kdi6NRC2mYNCG/VKsyavb0a9rNpc5VsKj0BS9KcDA5Ug9//zv8r6GHR4wnIT8GjSGjPL
-         aGeAXx3gP74r3Zw/uV23sb9YYPQAT5LqbMbtPmvdZJhIefaWS9m4MG8lpvJL1BNOPoqa
-         aZE7CY7ztdEc8FSBIFkePH1xuNO5tJ+aPt9LvsXpZ9YPwJRSuTOh+7c0XfSxY5cKcj29
-         dGgA==
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-63163a6556bso8123831a12.1
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 04:05:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760352648; x=1760957448;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ywHY3N/RI9LLiDCgfHoL3E6H1b5BrPsw9rGztJzIzfc=;
-        b=CI8FycXWsyvBRo/ZjBXf7s1bEMPv+qb5Iouvtet+NmGNdrSkkigStWgHqI942H92jw
-         e1XPwdEbQYLXewD7lg6pcgZTbLd9OyZ/qfJw4xbzR+ESWYr+sp3IMr3cbZeGVMge1H23
-         0WkybeUugIsU7+rXeNf+cod/4J+7Dx5NFsud6wsD6HtbAD4VbEAGgzyIB+/addGyyC8u
-         Ndj4dbTNqhVnod1OqNjet6WiOlwRRo0bVUmBT5dYPpt5EvWVLGi2TR63/8hHOV8K8y/T
-         MWqBRGQT9C6u8wBrDbjgW9IoMmfoQ503bikOYf5bHk02qbQwEgPztGHN9VTLkWFZi4A+
-         2qyg==
-X-Forwarded-Encrypted: i=1; AJvYcCUsPE5loqFDI4WtwkLzwDkkuWGBtMdahio3h2ER2ifryVrL/O23IG4Q8NIi79exKeI6fnio6Hw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKCoWekPv14WfSZSqalfqn0xy/7Hctt58gTLRtaF2tT3otKbjK
-	fZZzVLcxlOqCfe13UdFR5lBH5GzeG5nViJsXtQkputM33NtsrctZv+2d
-X-Gm-Gg: ASbGncuX8Wss7WcAkgmKCYZuWWxArS8MfmT1T+91Eb58WyJGem+JU5OnVliK0Ux0vWZ
-	FYUttwCm+KWmC7HoVhM524mNKFFUNnBI3zHmCXQysQNa/xT1iL/gdWD1t205GX/Ihnukeh5V8H/
-	LrWkh1Z8JkxKMia69zTmvzm9DIMchWLczGBLp/YkxhlX8Nn2Ji0Uqk1MpLAvSDtk49CvBfXw358
-	K+l7ywNFuEXnCLl84rHDab7uwR/eXf1Thjp7AN23iYa+Q7PBSwG+uXYMYHhGN00108+lt28iE3a
-	UwAxOn4Ok9HXFEzqlUp59eer3lqXfdWtOBEy1CuyWtD8Mwt7T587vajciwxiB08Vau+3I3o1lzo
-	2lGC03RQIPwUmrdYY3ZRe7/8qf1lq1owqV2EGtD58MYgzLqrE+UOailhMRO+EqL4J
-X-Google-Smtp-Source: AGHT+IEr2IkhLy3Hq74fdNOtudRrfh+iuu7rWrRfFvpPJo3KF6R4emQcUvwa9LHRg8/IJ9TOsz5Fig==
-X-Received: by 2002:a05:6402:144b:b0:63a:38e:1dd5 with SMTP id 4fb4d7f45d1cf-63a038e4b6fmr12861262a12.7.1760352647388;
-        Mon, 13 Oct 2025 03:50:47 -0700 (PDT)
-Received: from foxbook (bff184.neoplus.adsl.tpnet.pl. [83.28.43.184])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63b616d12fesm8024557a12.24.2025.10.13.03.50.46
-        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
-        Mon, 13 Oct 2025 03:50:47 -0700 (PDT)
-Date: Mon, 13 Oct 2025 12:50:43 +0200
-From: Michal Pecio <michal.pecio@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Petko Manolov <petkan@nucleusys.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: usb: rtl8150: Fix frame padding
-Message-ID: <20251013125043.0ae574e7.michal.pecio@gmail.com>
-In-Reply-To: <aOzNH0OQZYJYS1IT@horms.kernel.org>
-References: <20251012220042.4ca776b1.michal.pecio@gmail.com>
-	<aOzNH0OQZYJYS1IT@horms.kernel.org>
+        d=1e100.net; s=20230601; t=1760353540; x=1760958340;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OmLqeppxe73hh13JxtM2ixOg3mr3dSJTkeBYNyqFybw=;
+        b=QyhvH50SHv8mLMdhqFeJ/YgqNOjzZYAkJDQoThv/ov2U7z7bC94OM/NaEvFduSHpKL
+         ZEo1KnlF9cQQ3a1OGMKBb2CqaOTPRunGU6sxZNTvw21B0bKK8PeKQ4uB7s2rc5bb2efX
+         NnQbVnkVbuKNtZoZsA1KRMNrE3a7yC5UbSMeqJN5UrdRf8uUb3re1JbqzSN2/J5Lgsu0
+         jfaxgK2xMPyPaNC6eQUqDGI5hAZMfYrKouOMR7xZtE1zT6gIybNicEDmb7qkdm6pn1IA
+         EnXqlkmd2//rqZ/gT0/VAgl09QG5wFjnkqboI7o4tdaZxEqs3nRVFluLqi6MYk9XIxB/
+         6OYg==
+X-Gm-Message-State: AOJu0Yy1gUd9H+AKzctd6tpjU4Y4MKXNXTWbi1ZsD6V9N56UfQx6pbL1
+	qqbM0Xnw90oUj4bvF8xxcgA9S9fYHRehEzsqIYNr+vbOO/L0Aysve3Me
+X-Gm-Gg: ASbGnctnzBzqLN4l20qMHXqvbyOaWooGTywB96gUGgsudNR/Y+LGA6+t//eznn4eJ68
+	FOc0x1N7jQohta079rBVRlduBy+jYKL2TI8kFnrJBkS2Dz5xfDW7nFdOw+UPb/hYegr2xBSYMX8
+	EDnknGukD29zCVv1mJ5/wEzXi4j8rUJwbFCbDrUJ4DC/EcKiTTqhRLcPk1K6iY/Ox11UoBuom73
+	XvNdjZ+ahDc6X69LW6e3yBp4sN6EKKM4wsQavzYuh++3TuSV1CZBYhDshBGpBU74RYDMjuEx3kk
+	fahjsM/sb7gid8lbWT9qRulC1lOMpoBH0kTOWmW2GfCA/gk6FuQDsWxAuoU9VnMbh/3kWEbx5HA
+	FPK/I1kjMcDodR4eIq1s5oOLc/VMJ2MC+RXo=
+X-Google-Smtp-Source: AGHT+IGfjpsttXQ6mVNBCI+WQJkc+SoRWJBewz2mUjprO6UzkXnxv8IdBN8hGF8N7hiFPxEeQBzZ/g==
+X-Received: by 2002:a05:6402:40cd:b0:639:dbe7:37c1 with SMTP id 4fb4d7f45d1cf-639dbe73c81mr18605916a12.15.1760353539497;
+        Mon, 13 Oct 2025 04:05:39 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:8::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63a5c132b68sm8775862a12.31.2025.10.13.04.05.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Oct 2025 04:05:39 -0700 (PDT)
+Date: Mon, 13 Oct 2025 04:05:36 -0700
+From: Breno Leitao <leitao@debian.org>
+To: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel-team@meta.com, gustavold@gmail.com
+Subject: Re: [PATCH net] netpoll: Fix deadlock caused by memory allocation
+ under spinlock
+Message-ID: <rozn3jx2kbtlpcfvymykyqp2wapqw3jp4wkv6ehrzfqynokr7z@eij4fqog2ldu>
+References: <20251013-fix_netpoll_aa-v1-1-94a1091f92f0@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251013-fix_netpoll_aa-v1-1-94a1091f92f0@debian.org>
 
-On Mon, 13 Oct 2025 10:57:51 +0100, Simon Horman wrote:
-> Hi Michal,
+On Mon, Oct 13, 2025 at 02:42:29AM -0700, Breno Leitao wrote:
+> Fix a AA deadlock in refill_skbs() where memory allocation while holding
+> skb_pool->lock can trigger a recursive lock acquisition attempt.
 > 
-> I think this should also increment a dropped counter.
-> As this driver already uses dev->netdev->stats [*]
-> I think that would be:
+> The deadlock scenario occurs when the system is under severe memory
+> pressure:
 > 
-> 		dev->netdev->stats.tx_dropped++;
->
-> [*] I specifically mention this, for the record because,
->     new users are discouraged. But this driver is an existing user
->     so I think we are ok.
+> 1. refill_skbs() acquires skb_pool->lock (spinlock)
+> 2. alloc_skb() is called while holding the lock
+> 3. Memory allocator fails and calls slab_out_of_memory()
+> 4. This triggers printk() for the OOM warning
+> 5. The console output path calls netpoll_send_udp()
+> 6. netpoll_send_udp() attempts to acquire the same skb_pool->lock
+> 7. Deadlock: the lock is already held by the same CPU
+> 
+> Call stack:
+>   refill_skbs()
+>     spin_lock_irqsave(&skb_pool->lock)    <- lock acquired
+>     __alloc_skb()
+>       kmem_cache_alloc_node_noprof()
+>         slab_out_of_memory()
+>           printk()
+>             console_flush_all()
+>               netpoll_send_udp()
+>                 skb_dequeue()
+>                   spin_lock_irqsave()     <- deadlock attempt
+> 
+> Refactor refill_skbs() to never allocate memory while holding
+> the spinlock.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Fixes: 1da177e4c3f41 ("Linux-2.6.12-rc2")
+> ---
+>  net/core/netpoll.c | 18 +++++++++++++++---
+>  1 file changed, 15 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+> index 60a05d3b7c249..788cec4d527f8 100644
+> --- a/net/core/netpoll.c
+> +++ b/net/core/netpoll.c
+> @@ -232,14 +232,26 @@ static void refill_skbs(struct netpoll *np)
+>  
+>  	skb_pool = &np->skb_pool;
+>  
+> -	spin_lock_irqsave(&skb_pool->lock, flags);
+> -	while (skb_pool->qlen < MAX_SKBS) {
+> +	while (1) {
+> +		spin_lock_irqsave(&skb_pool->lock, flags);
+> +		if (skb_pool->qlen >= MAX_SKBS)
+> +			goto unlock;
+> +		spin_unlock_irqrestore(&skb_pool->lock, flags);
+> +
+>  		skb = alloc_skb(MAX_SKB_SIZE, GFP_ATOMIC);
+>  		if (!skb)
+> -			break;
+> +			return;
+>  
+> +		spin_lock_irqsave(&skb_pool->lock, flags);
+> +		if (skb_pool->qlen >= MAX_SKBS)
+> +			/* Discard if len got increased (TOCTOU) */
+> +			goto discard;
+>  		__skb_queue_tail(skb_pool, skb);
+> +		spin_unlock_irqrestore(&skb_pool->lock, flags);
+>  	}
 
-Thanks, makes sense, will do.
+We probably want to return in here, as pointed out by Rik van Riel
+offline.
 
-I will only drop "dev->" because it's superfluous - we already have
-'netdev' here, which was used to obtain 'dev' in the first place.
+If there are no more concerns, I will wait the 24-hours period and send
+a v2.
 
