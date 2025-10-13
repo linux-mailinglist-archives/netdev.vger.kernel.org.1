@@ -1,200 +1,222 @@
-Return-Path: <netdev+bounces-228954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4820BD660B
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 23:35:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A55FBD664D
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 23:44:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88E11402CE2
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 21:35:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAFA240150F
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 21:44:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F10B02DE1F0;
-	Mon, 13 Oct 2025 21:35:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179902EAD0A;
+	Mon, 13 Oct 2025 21:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iuiHMEGI"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="V7IPMAVN";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="aDdWPbWo";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="V7IPMAVN";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="aDdWPbWo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02EAD2D9EF8;
-	Mon, 13 Oct 2025 21:35:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4FA2D738A
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 21:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760391341; cv=none; b=ODNiPl2lpWG3g9sm2DVXY3nSEiusWfawc/98krp0sbAU+J44Q3948YKNu0HB2DRqw6oH+ox3rHWiNje2fHllmBDM2znK6YrtwhKVjm1S+RSudPkijKRwrO9NTl1bOvoMVKp8wJ+rH28kyTrRORvDWjd4JihrQo4BR/5oFTAdjec=
+	t=1760391876; cv=none; b=a8mUt439rcNrknJozMuyNNDsI1VG+Kb8uKi3h9yZRAf7Mw3nGvYy+6J5hesVJCp1dM1SU7FPIX+B6syz0vFEBgHfNx648zDXAtOuEyQIRyA46RIHWCwZcXJmVpicNFcFYWcF24lBaqYtlgiypEcdzld2r9StsdfUabNLBZxqwJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760391341; c=relaxed/simple;
-	bh=jqPWipQvwEI0426R6a2KF+Ie8Wc+CqVLazRzissvs9o=;
+	s=arc-20240116; t=1760391876; c=relaxed/simple;
+	bh=lh9MCjYL6rgmGC3R1kLTmNuNL6c+Tw/7UTOuHqIc7dA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HDYmGvvqFm8clE7k7rAaZQokHzfjGHtOGUQ0mH0oPzoWeCZ6fXsAbrmeizLqnA2aKnV4ngOygMuPVcbWMPwHEM/2WN5KlUvFXdOYGnU76fXavbqBuOTl1aOvf1otjxbUsXUD93SENJfCjZ65zuVBky3yhjXLes+2hwESz5z/x7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iuiHMEGI; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 13 Oct 2025 14:35:28 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760391336;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UzdP4w1qMp1m7p8LxfmUEpS+PuGJSgK4HICs+1HfO2IHv6goWoxSXXRlRbsvqpYNitLuXh+4pdMNa94yD39eh4Y1TcARIgnurHfMrfoxHMeZn8TyhsiErOuzlBoLd3aIFNGPPjvGP3e7xLS6egRJrhl106BcK2bP25Qr0PacCHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=V7IPMAVN; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=aDdWPbWo; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=V7IPMAVN; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=aDdWPbWo; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from lion.mk-sys.cz (unknown [10.100.225.114])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 732B72236D;
+	Mon, 13 Oct 2025 21:44:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1760391872; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JPYBsz9pGkaccZ8zsTc8dJhQOz3Z69EhCvUXsfnXcEw=;
-	b=iuiHMEGIr7qkZSeMQxTocOUmuJoL5V6SAxdiC/mkgSEnLO13/XyNWsDjIL5aO/NABfVdmM
-	sR9PlyajnkGBvkhbHlCOkLasA30uo8fMIDqpstbEdlm6aKyk2pCFeecAKGU6WqGTMh9UGu
-	NxoDle17IfphqPCP6oz4WG36+11j/3k=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Barry Song <21cnbao@gmail.com>, netdev@vger.kernel.org, 
-	linux-mm@kvack.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Barry Song <v-songbaohua@oppo.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Suren Baghdasaryan <surenb@google.com>, 
-	Michal Hocko <mhocko@suse.com>, Brendan Jackman <jackmanb@google.com>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Huacai Zhou <zhouhuacai@oppo.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
-	Harry Yoo <harry.yoo@oracle.com>, David Hildenbrand <david@redhat.com>, 
-	Matthew Wilcox <willy@infradead.org>, Roman Gushchin <roman.gushchin@linux.dev>
-Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network
- buffer allocation
-Message-ID: <dhmafwxu2jj4lu6acoqdhqh46k33sbsj5jvepcfzly4c7dn2t7@ln5dgubll4ac>
-References: <20251013101636.69220-1-21cnbao@gmail.com>
- <927bcdf7-1283-4ddd-bd5e-d2e399b26f7d@suse.cz>
+	bh=kgFsYxfzSrkJMlmZUyRhEeO+PCyaMQMmKtBADIrchFc=;
+	b=V7IPMAVN9Rg3VCezWy+WCHvxAdYUEkt2Qt8sTgPRVf2IKoAgxtOAHxdYSw3b6vtNjq1qx7
+	9HpBFFt0ecnjyX/38m8e6+Z/1YrDBrTNiIVBOvOxXiC4afH7gFvcjEBLs7Y+Fs1no9cXN3
+	P1+s+2tlp8RqpyAGEIUjbGRUkukq1wc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1760391872;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kgFsYxfzSrkJMlmZUyRhEeO+PCyaMQMmKtBADIrchFc=;
+	b=aDdWPbWoUU0nI1ahHgn7z/w9748OqVDgsLBQE8IrlkyH+FV65Y9ZOVensWnOeXLCx71SmT
+	A6Dk0lUtEjh8TRAw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1760391872; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kgFsYxfzSrkJMlmZUyRhEeO+PCyaMQMmKtBADIrchFc=;
+	b=V7IPMAVN9Rg3VCezWy+WCHvxAdYUEkt2Qt8sTgPRVf2IKoAgxtOAHxdYSw3b6vtNjq1qx7
+	9HpBFFt0ecnjyX/38m8e6+Z/1YrDBrTNiIVBOvOxXiC4afH7gFvcjEBLs7Y+Fs1no9cXN3
+	P1+s+2tlp8RqpyAGEIUjbGRUkukq1wc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1760391872;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kgFsYxfzSrkJMlmZUyRhEeO+PCyaMQMmKtBADIrchFc=;
+	b=aDdWPbWoUU0nI1ahHgn7z/w9748OqVDgsLBQE8IrlkyH+FV65Y9ZOVensWnOeXLCx71SmT
+	A6Dk0lUtEjh8TRAw==
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id 50F3A20057; Mon, 13 Oct 2025 23:44:32 +0200 (CEST)
+Date: Mon, 13 Oct 2025 23:44:32 +0200
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [REGRESSION] xfrm issue bisected to 6471658dc66c ("udp: use
+ skb_attempt_defer_free()")
+Message-ID: <gpjh4lrotyephiqpuldtxxizrsg6job7cvhiqrw72saz2ubs3h@g6fgbvexgl3r>
+References: <20250916160951.541279-1-edumazet@google.com>
+ <20250916160951.541279-11-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="cfbkzohclohupiwg"
+Content-Disposition: inline
+In-Reply-To: <20250916160951.541279-11-edumazet@google.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.40 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_ONE(0.00)[1];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com,secunet.com,gondor.apana.org.au];
+	TAGGED_RCPT(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Spam-Flag: NO
+X-Spam-Score: -4.40
+
+
+--cfbkzohclohupiwg
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <927bcdf7-1283-4ddd-bd5e-d2e399b26f7d@suse.cz>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 13, 2025 at 08:30:13PM +0200, Vlastimil Babka wrote:
-> On 10/13/25 12:16, Barry Song wrote:
-> > From: Barry Song <v-songbaohua@oppo.com>
-> > 
-> > On phones, we have observed significant phone heating when running apps
-> > with high network bandwidth. This is caused by the network stack frequently
-> > waking kswapd for order-3 allocations. As a result, memory reclamation becomes
-> > constantly active, even though plenty of memory is still available for network
-> > allocations which can fall back to order-0.
-> > 
-> > Commit ce27ec60648d ("net: add high_order_alloc_disable sysctl/static key")
-> > introduced high_order_alloc_disable for the transmit (TX) path
-> > (skb_page_frag_refill()) to mitigate some memory reclamation issues,
-> > allowing the TX path to fall back to order-0 immediately, while leaving the
-> > receive (RX) path (__page_frag_cache_refill()) unaffected. Users are
-> > generally unaware of the sysctl and cannot easily adjust it for specific use
-> > cases. Enabling high_order_alloc_disable also completely disables the
-> > benefit of order-3 allocations. Additionally, the sysctl does not apply to the
-> > RX path.
-> > 
-> > An alternative approach is to disable kswapd for these frequent
-> > allocations and provide best-effort order-3 service for both TX and RX paths,
-> > while removing the sysctl entirely.
-> > 
-> > Cc: Jonathan Corbet <corbet@lwn.net>
-> > Cc: Eric Dumazet <edumazet@google.com>
-> > Cc: Kuniyuki Iwashima <kuniyu@google.com>
-> > Cc: Paolo Abeni <pabeni@redhat.com>
-> > Cc: Willem de Bruijn <willemb@google.com>
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Cc: Jakub Kicinski <kuba@kernel.org>
-> > Cc: Simon Horman <horms@kernel.org>
-> > Cc: Vlastimil Babka <vbabka@suse.cz>
-> > Cc: Suren Baghdasaryan <surenb@google.com>
-> > Cc: Michal Hocko <mhocko@suse.com>
-> > Cc: Brendan Jackman <jackmanb@google.com>
-> > Cc: Johannes Weiner <hannes@cmpxchg.org>
-> > Cc: Zi Yan <ziy@nvidia.com>
-> > Cc: Yunsheng Lin <linyunsheng@huawei.com>
-> > Cc: Huacai Zhou <zhouhuacai@oppo.com>
-> > Signed-off-by: Barry Song <v-songbaohua@oppo.com>
-> > ---
-> >  Documentation/admin-guide/sysctl/net.rst | 12 ------------
-> >  include/net/sock.h                       |  1 -
-> >  mm/page_frag_cache.c                     |  2 +-
-> >  net/core/sock.c                          |  8 ++------
-> >  net/core/sysctl_net_core.c               |  7 -------
-> >  5 files changed, 3 insertions(+), 27 deletions(-)
-> > 
-> > diff --git a/Documentation/admin-guide/sysctl/net.rst b/Documentation/admin-guide/sysctl/net.rst
-> > index 2ef50828aff1..b903bbae239c 100644
-> > --- a/Documentation/admin-guide/sysctl/net.rst
-> > +++ b/Documentation/admin-guide/sysctl/net.rst
-> > @@ -415,18 +415,6 @@ GRO has decided not to coalesce, it is placed on a per-NAPI list. This
-> >  list is then passed to the stack when the number of segments reaches the
-> >  gro_normal_batch limit.
-> >  
-> > -high_order_alloc_disable
-> > -------------------------
-> > -
-> > -By default the allocator for page frags tries to use high order pages (order-3
-> > -on x86). While the default behavior gives good results in most cases, some users
-> > -might have hit a contention in page allocations/freeing. This was especially
-> > -true on older kernels (< 5.14) when high-order pages were not stored on per-cpu
-> > -lists. This allows to opt-in for order-0 allocation instead but is now mostly of
-> > -historical importance.
-> > -
-> > -Default: 0
-> > -
-> >  2. /proc/sys/net/unix - Parameters for Unix domain sockets
-> >  ----------------------------------------------------------
-> >  
-> > diff --git a/include/net/sock.h b/include/net/sock.h
-> > index 60bcb13f045c..62306c1095d5 100644
-> > --- a/include/net/sock.h
-> > +++ b/include/net/sock.h
-> > @@ -3011,7 +3011,6 @@ extern __u32 sysctl_wmem_default;
-> >  extern __u32 sysctl_rmem_default;
-> >  
-> >  #define SKB_FRAG_PAGE_ORDER	get_order(32768)
-> > -DECLARE_STATIC_KEY_FALSE(net_high_order_alloc_disable_key);
-> >  
-> >  static inline int sk_get_wmem0(const struct sock *sk, const struct proto *proto)
-> >  {
-> > diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
-> > index d2423f30577e..dd36114dd16f 100644
-> > --- a/mm/page_frag_cache.c
-> > +++ b/mm/page_frag_cache.c
-> > @@ -54,7 +54,7 @@ static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
-> >  	gfp_t gfp = gfp_mask;
-> >  
-> >  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-> > -	gfp_mask = (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
-> > +	gfp_mask = (gfp_mask & ~__GFP_RECLAIM) |  __GFP_COMP |
-> >  		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
-> 
-> I'm a bit worried about proliferating "~__GFP_RECLAIM" allocations now that
-> we introduced alloc_pages_nolock() and kmalloc_nolock() where it's
-> interpreted as "cannot spin" - see gfpflags_allow_spinning(). Currently it's
-> fine for the page allocator itself where we have a different entry point
-> that uses ALLOC_TRYLOCK, but it can affect nested allocations of all kinds
-> of debugging and accounting metadata (page_owner, memcg, alloc tags for slab
-> objects etc). kmalloc_nolock() relies on gfpflags_allow_spinning() fully
-> 
-> I wonder if we should either:
-> 
-> 1) sacrifice a new __GFP flag specifically for "!allow_spin" case to
-> determine it precisely.
-> 
-> 2) keep __GFP_KSWAPD_RECLAIM for allocations that remove it for purposes of
-> not being disturbing (like proposed here), but that can in fact allow
-> spinning. Instead, decide to not wake up kswapd by those when other
-> information indicates it's an opportunistic allocation
-> (~__GFP_DIRECT_RECLAIM, _GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC,
-> order > 0...)
-> 
-> 3) something better?
-> 
+On Tue, Sep 16, 2025 at 04:09:51PM GMT, Eric Dumazet wrote:
+> Move skb freeing from udp recvmsg() path to the cpu
+> which allocated/received it, as TCP did in linux-5.17.
+>=20
+> This increases max thoughput by 20% to 30%, depending
+> on number of BH producers.
+>=20
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
 
-For the !allow_spin allocations, I think we should just add a new __GFP
-flag instead of adding more complexity to other allocators which may or
-may not want kswapd wakeup for many different reasons.
+I encountered problems in 6.18-rc1 which were bisected to this patch,
+mainline commit 6471658dc66c ("udp: use skb_attempt_defer_free()").
 
+The way to reproduce is starting a ssh connection to a host which
+matches a security policy. The first problem seen in the log is hitting
+the check
 
+	WARN_ON(x->km.state !=3D XFRM_STATE_DEAD);
 
+in __xfrm_state_destroy() with a stack like this:
+
+[  114.112830] Call Trace:
+[  114.112832]  <IRQ>
+[  114.112835]  __skb_ext_put+0x96/0xc0
+[  114.112840]  napi_consume_skb+0x42/0x110
+[  114.112842]  net_rx_action+0x14a/0x350
+[  114.112846]  ? __napi_schedule+0xb6/0xc0
+[  114.112848]  ? igb_msix_ring+0x6c/0x80 [igb 65a71327db3d237d6ebd4db22221=
+016aa90703c9]
+[  114.112854]  handle_softirqs+0xca/0x270
+[  114.112858]  __irq_exit_rcu+0xbc/0xe0
+[  114.112860]  common_interrupt+0x85/0xa0
+[  114.112863]  </IRQ>
+
+After that, the system quickly becomes unusable, the immediate crash
+varies, often it's in a completely different part of kernel (e.g. amdgpu
+driver).
+
+Tomorrow I'll try reproducing with panic_on_warn so that I can get more
+information.
+
+Michal
+
+>  net/ipv4/udp.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>=20
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index 7d1444821ee51a19cd5fd0dd5b8d096104c9283c..0c40426628eb2306b60988134=
+1a51307c4993871 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -1825,6 +1825,13 @@ void skb_consume_udp(struct sock *sk, struct sk_bu=
+ff *skb, int len)
+>  	if (unlikely(READ_ONCE(udp_sk(sk)->peeking_with_offset)))
+>  		sk_peek_offset_bwd(sk, len);
+> =20
+> +	if (!skb_shared(skb)) {
+> +		if (unlikely(udp_skb_has_head_state(skb)))
+> +			skb_release_head_state(skb);
+> +		skb_attempt_defer_free(skb);
+> +		return;
+> +	}
+> +
+>  	if (!skb_unref(skb))
+>  		return;
+> =20
+> --=20
+> 2.51.0.384.g4c02a37b29-goog
+>=20
+>=20
+
+--cfbkzohclohupiwg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmjtcroACgkQ538sG/LR
+dpUFAgf/daI+OdBjTzCu9/mkqZHsFPeLe28ONTAuGcWjgPU4LpRf6LJIW7z9tmrH
+vIHs1k5ceVB11AI6b1pmc4nQWcgRhmOfxxaULrTbyZwi8L28hkiA0MqINP8XiY8d
+Ge07KMWsy7A6o/+4FpE1u2Omfy95QtoQaFWwKl4dCHfEnX+zCwNOO+qweYfD6N1G
+c6jevNLnR1VKoHdQEqsVPDqCVLqdn3p+5cunWhCK+heYcy/97Qb1qNpVYxdIk4aQ
+Tt6AT8KHQnzLDX2yFFheJGMWstSNvchU6CqabVqih9JLeU0LEEgVwJItaCS9gYdn
+K5/wOvcJbUTmyo4df74zI9zmMxJRfg==
+=lSLt
+-----END PGP SIGNATURE-----
+
+--cfbkzohclohupiwg--
 
