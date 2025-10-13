@@ -1,144 +1,88 @@
-Return-Path: <netdev+bounces-228888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAF82BD5834
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 19:35:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 244E9BD57A7
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 19:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 389503E5284
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:30:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A46518A4866
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:26:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3AEF3081A8;
-	Mon, 13 Oct 2025 17:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3BF3303A0A;
+	Mon, 13 Oct 2025 17:25:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="v6PXfwYo"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HbjFmU9a"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.166.231])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07AD23081A3;
-	Mon, 13 Oct 2025 17:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.166.231
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180B923D7F4;
+	Mon, 13 Oct 2025 17:25:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760376622; cv=none; b=kwiRSGwPeGWztKD4lJAZRNgc2t5Ec5kC9Yf+nuoot+cqsnDjBsIWbk19MHxHSf8OtXNuXMevveXfjTTD5uxsGGzc90C6/xo+CoEjyHTFBitSnzOGOU8psRChC9Et8ulYwWT7z1moOcpMRrXtNKDSpuNyymwNq7TqOuGztu9nsOQ=
+	t=1760376339; cv=none; b=l8oAGOfPEiTsxaR7E70l+/xVvSqSAjVN/4I1mcO4Bd+GrCixvvDwvc9EGW5cDP+rfeaRnRwsW1cbJqWDRlRigMx6LK2QxyhFybhRZPTBrXoKpV+PQW0bJI7MdMnW52xaklXY+4uTtljE37HxVoHmM8js9h+guRKGiTk3OrVEs1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760376622; c=relaxed/simple;
-	bh=4AIX/fhBXi6apAU21YIhJmoAOPOGxuGkR0jEWrkHbcg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F59/x/SPUSMwZ4fcDwCzP4B4VGyD1AM4V+Zrxbq8BFNpypZyy7gCeBIboa5CMseVuQ0xhEWTVsDEH9AC/G6j+HjbWKDYyuV6Ubq/IF7iMUyOku52WfxAN3dzY2CfVookEw7GlSakYyg0uX9f7D8ZonkV+kvHGKm1N21wNX94l7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=v6PXfwYo; arc=none smtp.client-ip=192.19.166.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: from mail-acc-it-01.broadcom.com (mail-acc-it-01.acc.broadcom.net [10.35.36.83])
-	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 699FDC0000D0;
-	Mon, 13 Oct 2025 10:23:09 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 699FDC0000D0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-	s=dkimrelay; t=1760376189;
-	bh=4AIX/fhBXi6apAU21YIhJmoAOPOGxuGkR0jEWrkHbcg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=v6PXfwYoxcVVyVdt1q8wOHZmeXc2IlTkefj+c/SMnSP6SUYQTwFnp1ZePvkNLd/JA
-	 EkNi1t8aMo6MYJSfLLeJ17LDhmsT6O0+O5Ky6IOlt7B9e5pEeHqarID7G6OipzrNvI
-	 nJawqeuZSxBT+WGVobHxQkPzLnNtXScIUmCv3qQU=
-Received: from stbirv-lnx-1.igp.broadcom.net (stbirv-lnx-1.igp.broadcom.net [10.67.48.32])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail-acc-it-01.broadcom.com (Postfix) with ESMTPSA id 68C394002F44;
-	Mon, 13 Oct 2025 13:23:08 -0400 (EDT)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Justin Chen <justin.chen@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1760376339; c=relaxed/simple;
+	bh=UlOaVrzspTJDgkCtsEfuESTgzGdfCImxmGdrw+/RBbU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ts5JFrDjro3MeyukwhsfI+ImXiX7yFMsiR4lNxc0RBUYeMJkATiEuttAMtFDQfhz8YSD6I3tMpJomoH0GiusXL5jNJE0p5CB2YmtAiVrF/s2VkbDekWYx4qeto/JRWiVbMpMCSNEj53mqP21XegL67gWMlJXHuliZ9R/kfDWAJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HbjFmU9a; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=mViysU4fstpkJe1v81vZ97t0ItjmFyl1yEzmvEtHZ60=; b=HbjFmU9aqyzgslZmHGNJLu/efF
+	Ip/Ptjme0/TvrWsUiAyGsW7oPPpAJzoqq65BWfeAiTE4k3MEqzCgAaOI4a68a43NAR9ZjSTAtSVuH
+	mFbaDpmpLShSGl4MrsZQobbhhWW36gpxeOV/gwHOwaWu8U0AV4Tl7LNdn8CHrjnj5Js0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v8MIZ-00Aowb-JV; Mon, 13 Oct 2025 19:25:27 +0200
+Date: Mon, 13 Oct 2025 19:25:27 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Breno Leitao <leitao@debian.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	bcm-kernel-feedback-list@broadcom.com (open list:BROADCOM ASP 2.0 ETHERNET DRIVER),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] net: bcmasp: Add support for PHY-based Wake-on-LAN
-Date: Mon, 13 Oct 2025 10:23:06 -0700
-Message-Id: <20251013172306.2250223-1-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.34.1
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	David Wei <dw@davidwei.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH net] netdevsim: set the carrier when the device goes up
+Message-ID: <7e1d28c0-7276-448f-8d01-531b7e8bd195@lunn.ch>
+References: <20251013-netdevsim_fix-v1-1-357b265dd9d0@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251013-netdevsim_fix-v1-1-357b265dd9d0@debian.org>
 
-If available, interrogate the PHY to find out whether we can use it for
-Wake-on-LAN. This can be a more power efficient way of implementing that
-feature, especially when the MAC is powered off in low power states.
+On Mon, Oct 13, 2025 at 10:09:22AM -0700, Breno Leitao wrote:
+> Bringing a linked netdevsim device down and then up causes communication
+> failure because both interfaces lack carrier. Basically a ifdown/ifup on
+> the interface make the link broken.
+> 
+> When a device is brought up, if it has a peer and this peer device is
+> UP, set both carriers to on.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Fixes: 3762ec05a9fbda ("netdevsim: add NAPI support")
 
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
- .../ethernet/broadcom/asp2/bcmasp_ethtool.c   | 34 +++++++++++++++++--
- 1 file changed, 32 insertions(+), 2 deletions(-)
+It was not obvious what adding NAPI has to do with carrier status.  I
+had to go look at 3762ec05a9fbda to see that that was when nsim_stop()
+started to change the carrier on stop. This patch makes nsim_open()
+somewhat symmetrical. If you need a respin, maybe expand the commit
+message to explain this.
 
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
-index 63f1a8c3a7fb..dd80ccfca19d 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
-@@ -163,11 +163,30 @@ static void bcmasp_set_msglevel(struct net_device *dev, u32 level)
- static void bcmasp_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
- {
- 	struct bcmasp_intf *intf = netdev_priv(dev);
-+	struct bcmasp_priv *priv = intf->parent;
-+	struct device *kdev = &priv->pdev->dev;
-+	u32 phy_wolopts = 0;
-+
-+	if (dev->phydev) {
-+		phy_ethtool_get_wol(dev->phydev, wol);
-+		phy_wolopts = wol->wolopts;
-+	}
-+
-+	/* MAC is not wake-up capable, return what the PHY does */
-+	if (!device_can_wakeup(kdev))
-+		return;
-+
-+	/* Overlay MAC capabilities with that of the PHY queried before */
-+	wol->supported |= BCMASP_SUPPORTED_WAKE;
-+	wol->wolopts |= intf->wolopts;
-+
-+	/* Return the PHY configured magic password */
-+	if (phy_wolopts & WAKE_MAGICSECURE)
-+		return;
- 
--	wol->supported = BCMASP_SUPPORTED_WAKE;
--	wol->wolopts = intf->wolopts;
- 	memset(wol->sopass, 0, sizeof(wol->sopass));
- 
-+	/* Otherwise the MAC one */
- 	if (wol->wolopts & WAKE_MAGICSECURE)
- 		memcpy(wol->sopass, intf->sopass, sizeof(intf->sopass));
- }
-@@ -177,10 +196,21 @@ static int bcmasp_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
- 	struct bcmasp_intf *intf = netdev_priv(dev);
- 	struct bcmasp_priv *priv = intf->parent;
- 	struct device *kdev = &priv->pdev->dev;
-+	int ret = 0;
-+
-+	/* Try Wake-on-LAN from the PHY first */
-+	if (dev->phydev) {
-+		ret = phy_ethtool_set_wol(dev->phydev, wol);
-+		if (ret != -EOPNOTSUPP && wol->wolopts)
-+			return ret;
-+	}
- 
- 	if (!device_can_wakeup(kdev))
- 		return -EOPNOTSUPP;
- 
-+	if (wol->wolopts & ~BCMASP_SUPPORTED_WAKE)
-+		return -EINVAL;
-+
- 	/* Interface Specific */
- 	intf->wolopts = wol->wolopts;
- 	if (intf->wolopts & WAKE_MAGICSECURE)
--- 
-2.34.1
+Otherwise this looks O.K. to me.
 
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
