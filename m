@@ -1,130 +1,97 @@
-Return-Path: <netdev+bounces-228659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBF67BD12B2
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 04:06:58 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 677CDBD134C
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 04:19:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C068B1890735
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 02:07:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 026C84EB4A9
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 02:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17CE827FD4B;
-	Mon, 13 Oct 2025 02:06:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="cb25h4tN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A99274FCB;
+	Mon, 13 Oct 2025 02:19:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+Received: from baidu.com (mx24.baidu.com [111.206.215.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FED0271A9A
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 02:06:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DDC169AE6;
+	Mon, 13 Oct 2025 02:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760321204; cv=none; b=WVcwezmefhK2GprrEx5VVvvpuhZNRjJoScULpY+fzW/o2EoHujEQCbzRgxtsT9uTKj0p3eTz7nTKpwwGFbUA+hrEDU30hk8ygv8iDmsJl+Yq4Tmj00rxexsuoT/gBBQOgf3qzB4Sf9vsalGThfyfF+1s4w5Sl64ZAixDGbOfBNs=
+	t=1760321950; cv=none; b=h8Pq/sEDezJzCSiMN2YL+IY41U+jY77VJhTNfwmYygXIEiO1OXTEWl/f9QNmMvklY903XoAWP+WsDkLG69eRt6DtvlqArzaQvOXYwSVBWxDL8DZbgIUWQVXOwWmJwLZ2E2D4hO3tRWMm9Tnjl2nC7hBSbtvlvP66DZ8rK7k/vRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760321204; c=relaxed/simple;
-	bh=copfItzbQRl+LB1/PUbOAcdAvk1CS5I9MQeqTNbKqXQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CQCKJoAORhxnE2CBqTyxYiNzyXByTUYHfAEh1Yed0V1uL9q+mvJeL14f9exi86iKuKUOeEqCjU63idds56biVTV/xDUYgm8hXD168tKM71JnvSqrCjZ7b0M6zvxuNE11XI8A/ZR2SB2LeXEAdsGHbIgK58XE9i3GKuXYweewsfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=cb25h4tN; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1760321193; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=TKKlad8ZOJRTk7a95rnaDVFwiiHJsm1/cvNbYBEJQyU=;
-	b=cb25h4tN2+cbDbN6xo5ac4AxoxmYtcocuerEBOrmnevy0/038KuoQIyMA2+2GgEaLyTQ1yGw8JQJtx9XsyHdlGBcLfapcjY+dNTTD3n1KOP78ekuqB6ZdBx7N45hpcSfLMnv1jzN1+56J3pNw6l40Ckw3OWvSx9p9kxUTrAjhWk=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WpztGSc_1760321192 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 13 Oct 2025 10:06:32 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	Heng Qi <hengqi@linux.alibaba.com>,
-	virtualization@lists.linux.dev
-Subject: [PATCH net v2 3/3] virtio-net: correct hdr_len handling for tunnel gso
-Date: Mon, 13 Oct 2025 10:06:29 +0800
-Message-Id: <20251013020629.73902-4-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20251013020629.73902-1-xuanzhuo@linux.alibaba.com>
-References: <20251013020629.73902-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1760321950; c=relaxed/simple;
+	bh=wckOwuj24Ij1V2m401eRdyD2GopDhpl7foF6Yjx/7Fk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ECUIfhaOSJ9cn8W4cV1nwFaKHQPSaY5LIJYe1pJAuuhBY0Ez4lfamf8X5GP1E5dDAdtHeO8QeD2b+5QxeQsu31LYqOWZ8Pib9nwnW8h5C5qgC4rUbuYSBra38FCvoFWbjrVocq4zma3LPl6O2HbrrWe1UMPH0GKdNhgfphMoIjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+From: "Li,Rongqing" <lirongqing@baidu.com>
+To: Markus Elfring <Markus.Elfring@web.de>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-aspeed@lists.ozlabs.org"
+	<linux-aspeed@lists.ozlabs.org>, "wireguard@lists.zx2c4.com"
+	<wireguard@lists.zx2c4.com>, Andrew Jeffery <andrew@codeconstruct.com.au>,
+	Andrew Morton <akpm@linux-foundation.org>, Anshuman Khandual
+	<anshuman.khandual@arm.com>, Arnd Bergmann <arnd@arndb.de>, David Hildenbrand
+	<david@redhat.com>, Feng Tang <feng.tang@linux.alibaba.com>, Florian Westphal
+	<fw@strlen.de>, Jakub Kicinski <kuba@kernel.org>, "Jason A . Donenfeld"
+	<Jason@zx2c4.com>, Joel Granados <joel.granados@kernel.org>, Joel Stanley
+	<joel@jms.id.au>, Jonathan Corbet <corbet@lwn.net>, Kees Cook
+	<kees@kernel.org>, Lance Yang <lance.yang@linux.dev>, "Liam R . Howlett"
+	<Liam.Howlett@oracle.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>, "Paul E . McKenney"
+	<paulmck@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, "Petr
+ Mladek" <pmladek@suse.com>, Phil Auld <pauld@redhat.com>, Randy Dunlap
+	<rdunlap@infradead.org>, Russell King <linux@armlinux.org.uk>, Shuah Khan
+	<shuah@kernel.org>, Simon Horman <horms@kernel.org>, Stanislav Fomichev
+	<sdf@fomichev.me>, Steven Rostedt <rostedt@goodmis.org>
+CC: LKML <linux-kernel@vger.kernel.org>, "kernel-janitors@vger.kernel.org"
+	<kernel-janitors@vger.kernel.org>
+Subject: =?utf-8?B?UkU6IFvlpJbpg6jpgq7ku7ZdIFJlOiBbUEFUQ0ggdjNdIGh1bmdfdGFzazog?=
+ =?utf-8?Q?Panic_after_fixed_number_of_hung_tasks?=
+Thread-Topic: =?utf-8?B?W+WklumDqOmCruS7tl0gUmU6IFtQQVRDSCB2M10gaHVuZ190YXNrOiBQYW5p?=
+ =?utf-8?Q?c_after_fixed_number_of_hung_tasks?=
+Thread-Index: AQHcO3v66ZG2hk4PtE6ORt/xqoKtirS/VpVw
+Date: Mon, 13 Oct 2025 02:14:58 +0000
+Message-ID: <2b19bac7de174fe6baa07234b88c8156@baidu.com>
+References: <20251012115035.2169-1-lirongqing@baidu.com>
+ <0aea408f-f6d7-4e2d-8cee-1801ad7f3139@web.de>
+In-Reply-To: <0aea408f-f6d7-4e2d-8cee-1801ad7f3139@web.de>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: 06377f1ca66f
-Content-Transfer-Encoding: 8bit
+X-FEAS-Client-IP: 172.31.50.45
+X-FE-Policy-ID: 52:10:53:SYSTEM
 
-The commit a2fb4bc4e2a6a03 ("net: implement virtio helpers to handle UDP
-GSO tunneling.") introduces support for the UDP GSO tunnel feature in
-virtio-net.
-
-The virtio spec says:
-
-    If the \field{gso_type} has the VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4 bit or
-    VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV6 bit set, \field{hdr_len} accounts for
-    all the headers up to and including the inner transport.
-
-The commit did not update the hdr_len to include the inner transport.
-
-Fixes: a2fb4bc4e2a6a03 ("net: implement virtio helpers to handle UDP GSO tunneling.")
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
- include/linux/virtio_net.h | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-index e059e9c57937..765fd5f471a4 100644
---- a/include/linux/virtio_net.h
-+++ b/include/linux/virtio_net.h
-@@ -403,6 +403,7 @@ virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
- 	struct virtio_net_hdr *hdr = (struct virtio_net_hdr *)vhdr;
- 	unsigned int inner_nh, outer_th;
- 	int tnl_gso_type;
-+	u16 hdr_len;
- 	int ret;
- 
- 	tnl_gso_type = skb_shinfo(skb)->gso_type & (SKB_GSO_UDP_TUNNEL |
-@@ -434,6 +435,23 @@ virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
- 	outer_th = skb->transport_header - skb_headroom(skb);
- 	vhdr->inner_nh_offset = cpu_to_le16(inner_nh);
- 	vhdr->outer_th_offset = cpu_to_le16(outer_th);
-+
-+	switch (skb->inner_ipproto) {
-+	case IPPROTO_TCP:
-+		hdr_len = inner_tcp_hdrlen(skb);
-+		break;
-+
-+	case IPPROTO_UDP:
-+		hdr_len = sizeof(struct udphdr);
-+		break;
-+
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	hdr_len += skb_inner_transport_offset(skb);
-+	hdr->hdr_len = __cpu_to_virtio16(little_endian, hdr_len);
-+
- 	return 0;
- }
- 
--- 
-2.32.0.3.g01195cf9f
-
+PiDigKYNCj4gPiBUaGlzIHBhdGNoIGV4dGVuZHMgdGhlIOKApg0KPiANCj4gV2lsbCBhbm90aGVy
+IGltcGVyYXRpdmUgd29yZGluZyBhcHByb2FjaCBiZWNvbWUgbW9yZSBoZWxwZnVsIGZvciBhbg0K
+PiBpbXByb3ZlZCBjaGFuZ2UgZGVzY3JpcHRpb24/DQo+IGh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcv
+cHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L3RvcnZhbGRzL2xpbnV4LmdpdC90cmVlL0RvY3VtDQo+
+IGVudGF0aW9uL3Byb2Nlc3Mvc3VibWl0dGluZy1wYXRjaGVzLnJzdD9oPXY2LjE3I245NA0KPiAN
+Cg0Kd2lsbCBmaXggaW4gbmV4dCB2ZXJzaW9uDQo+IA0KPiDigKYNCj4gPiArKysgYi9rZXJuZWwv
+aHVuZ190YXNrLmMNCj4g4oCmDQo+IEBAIC0yMjksOSArMjMyLDExIEBAIHN0YXRpYyB2b2lkIGNo
+ZWNrX2h1bmdfdGFzayhzdHJ1Y3QgdGFza19zdHJ1Y3QgKnQsDQo+IHVuc2lnbmVkIGxvbmcgdGlt
+ZW91dCkg4oCmDQo+ID4gIAl0cmFjZV9zY2hlZF9wcm9jZXNzX2hhbmcodCk7DQo+ID4NCj4gPiAt
+CWlmIChzeXNjdGxfaHVuZ190YXNrX3BhbmljKSB7DQo+ID4gKwlpZiAoc3lzY3RsX2h1bmdfdGFz
+a19wYW5pYyAmJg0KPiA+ICsJCQkodG90YWxfaHVuZ190YXNrID49IHN5c2N0bF9odW5nX3Rhc2tf
+cGFuaWMpKSB7DQo+IOKApg0KPiANCj4gSSBzdWdnZXN0IHRvIHVzZSB0aGUgZm9sbG93aW5nIHNv
+dXJjZSBjb2RlIHZhcmlhbnQgaW5zdGVhZC4NCj4gDQo+IAlpZiAoc3lzY3RsX2h1bmdfdGFza19w
+YW5pYyAmJiB0b3RhbF9odW5nX3Rhc2sgPj0gc3lzY3RsX2h1bmdfdGFza19wYW5pYykNCj4gew0K
+PiANCg0Kd2lsbCBmaXggaW4gbmV4dCB2ZXJzaW9uDQoNCnRoYW5rcw0KDQotTGkNCg0KPiANCj4g
+UmVnYXJkcywNCj4gTWFya3VzDQoNCg==
 
