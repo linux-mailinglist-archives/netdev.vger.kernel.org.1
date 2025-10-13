@@ -1,147 +1,133 @@
-Return-Path: <netdev+bounces-228669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 920F6BD18FD
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 07:59:49 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77D2EBD1ADF
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 08:29:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF8371893F25
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 06:00:12 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 507964E7273
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 06:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D631C2DEA7B;
-	Mon, 13 Oct 2025 05:59:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE3F21CFF7;
+	Mon, 13 Oct 2025 06:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fjjhREQy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mpS5vRk4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114CC2DC79E
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 05:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3AC1DE4CD
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 06:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760335184; cv=none; b=QstYk6ZaXdGqcbZIZp9UpIocS97yDqipbF8me15D1Gp+xXf+TEKpmdAfL/UHemdYXh3V6t/BicFGnVlqmrc7O80aYFIJWIJXpJ9o1+V+a6NHHVwMBD2bZiqsg4tt6DlJW74P5Oelx4dgQDANBlSOE9TyDIL2S4MZsH6TrAFg6fs=
+	t=1760336845; cv=none; b=fTgr80tOzvaLvlm94VbvlDGZCtQXerbNL7LJZH4y66diT/b9/afWAESp6qdEJhA+SSMdt9uzv1R2Xq0Fhx9sJDDO0ogsjpdYGeuT3th2oeUwujQrXLMht9+/BTd15A3cYW+9twVkdzM7gAOrRPmn5pdsCe+VO4FduOnhz8WAOP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760335184; c=relaxed/simple;
-	bh=Bd28e7IuOcHibn3LLyPlNz4Tj23RtsGOy6jtLQP1y84=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f9ThUfcMxaum00r4HGcyszIb6ggwPh9GktekInOda2FCxm/qcuanVDEm4wfA3+o+oZLMzi2BDGXSdqnmqSuQQOA6xu3zxgEck9nSN/SExxB4JSYJjenh2DpOa7TORxFb9NfiGSumrNgd9zROdsXOtdDRiIHgQUzskY37oSWzzJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fjjhREQy; arc=none smtp.client-ip=209.85.208.43
+	s=arc-20240116; t=1760336845; c=relaxed/simple;
+	bh=C8vNNHZvAtyBt20ycUXr/JZp4K3nXiHY4UV19MDvuHg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rObIST0CgxK0BUbA1f7ZbIfcpBop1qUP9D9v6t9FhLM4Cj6mDTW3uau4w+3lG9/rBh95zEvBnttoyufuUi+lRrJ8/t+oEUB0B4EN0S/fbPxknoHwctf9dptnujXjm+bzI3g+qmORTH5XNB3CGiLibhVUeRYMlASaamsBmgpCm0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mpS5vRk4; arc=none smtp.client-ip=209.85.166.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-639e1e8c8c8so7299890a12.1
-        for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 22:59:42 -0700 (PDT)
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-42f9f5a9992so22203365ab.2
+        for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 23:27:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760335181; x=1760939981; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1760336843; x=1760941643; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UQNzxcG14jNClBvMbrCumaocAylKfaLe9L9Jz7gjInc=;
-        b=fjjhREQyYvIXooCRS2QdQWl0TXKyOm2CeFRLd7GTQXju/WgHUwxKn4LvU56cUlLn6j
-         QJYVeIL/grccyAg7uoIsfmBF31uiGo7t4+ikxUvP6ONxd9ShP3rCk0ni8m6zZCgCNN8o
-         xsXJXhCLaFzyvbSDSnphwExdRjtxEUTTardYk7ebvF3+bHnCtFpCZ6LgYRfCYVJib9x4
-         8Abeqx6fXkD5nL/8UZkWXZCUKeiEObmoLd8YaSwB9VDLjH/JYpd4yKH29xdQS+bM1b5G
-         ObJ2Zeu4gLUEvfOIEtvHbd/maQHP8qsQTA9k9p5QG454ybF93eQ29piwxwO48OBhVNpi
-         OwUA==
+        bh=C8vNNHZvAtyBt20ycUXr/JZp4K3nXiHY4UV19MDvuHg=;
+        b=mpS5vRk47wz6HkiByl2FfuKJKgaYrs6RZDtxBq7BcllU93wBeDaKiPHHbyv1JNfgyA
+         Vo4Up9bC3gqO/d5R7/Xv50df0X7gRgXI7SMoWNs1ph8PEOQqARABBtMAjJ/xPOx7PTyM
+         MIDPvqOF8WNLjrpM2wJhtxrXx/mTagIGOCckiGNZ+pNp+tS1SqS/7gGYaoxAmG2Ie6QQ
+         RsWR6TDG7pFWtt1YEIG5bpEeeLR4zYSpM7n6P0Supn49E1bHq+Pu+phqkqr5X4ncDgyE
+         CAaVPD0SVDvZ6B83+SBP3EIpVVd45G0Ajzj2OYQPg513VuuiunzK6KlofOukf8saQg3H
+         Oupg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760335181; x=1760939981;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1760336843; x=1760941643;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UQNzxcG14jNClBvMbrCumaocAylKfaLe9L9Jz7gjInc=;
-        b=nW2JxEqOYW9SpmEDHSewF7oUhi+Ht5wGrtNhm575br1M06EZUlFv9CaDxJRK8OfkPs
-         1WS8ITDNjYHrOrmEtZsQmfj8aEdRsdDIHTRn7iTefHwVZkSenHWLivfb977kn4ERIeDd
-         gPZqIW83PXCh/slKRpQAXATDjF0HW/LfqGrVL0hSATDh1YEONnQaISFTdEFJt9EybZEl
-         SB4p0zdOoxbPeXjWQbdPj60nKlgCjN8KnDzq2VDMqid4z0GnlVNyJHCkWTu65IKNZ/ut
-         643+IQyxLvwQ6dllU4gonr2t+aRqtPYdQbSIvPGCkOWUvIVwsNs7MRSdO8H0KvzcnQXu
-         +fEw==
-X-Forwarded-Encrypted: i=1; AJvYcCVePYnl5kWtc9y3L/UuugHXm+qkWXTPUf3e9Dv7r8e4CEs8aEXhIYNBuHj/PS0eHrqQslfUAQQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk0+5t/mYrXHs8PUuTUO8vl4yLci2KLSuHf6v68mIIhf8pMSWz
-	jduiy882N/Li/KEgGsIrYP2wEWfQsQBylpb2Chr+xNpJWXg3YEwz0Ev+
-X-Gm-Gg: ASbGnctuRcmqEgfuYpSoy16RAvZGAWRuQUmq+7L/NaZZIoqlAv/yCA2Ak+aQLnAHQjA
-	7LoShcHW+gnGGsSOnG27fkybtnwyiMGKu6ECGdwP0VGjdvTjsgmr68wqClO5lU1Sm48IRWwV2o1
-	BnbEF8VJPKd0SQr8iEU/PtfteSApfZ82nw6s2/ZT5/N8Kg88Mk257Dt8gfZduHOMvLTcFLCn3BH
-	/CQFHFgrJqdXrjBR664EhSO8qhieLfs4cp6Ii4tJZKbdwXUk/nPuZaLYXzMnvFpN/KEDQW2yOHN
-	72Q8dOj+57oGdqP2daT//2RLWyzjx4pac/lcU5XpznvFPNgjr9/NDwgDO0Ue3KaMQ3F1HZf6Rrr
-	WoHaT2XANfauv6W/YCzfP76J2beNLg0AmjptULlcB7KUGaXPIT0/WWA==
-X-Google-Smtp-Source: AGHT+IGiGEcrsAYUHxU2I2SrW2lGOTNaCoPwD4SCwXuyD4vprrWrEyrI422ngQmr2KS9P8klCSJyjQ==
-X-Received: by 2002:a17:907:86a6:b0:b45:eea7:e986 with SMTP id a640c23a62f3a-b50ac4db255mr2188162966b.43.1760335181143;
-        Sun, 12 Oct 2025 22:59:41 -0700 (PDT)
-Received: from foxbook (bff184.neoplus.adsl.tpnet.pl. [83.28.43.184])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b55d8c129c4sm862815366b.41.2025.10.12.22.59.39
-        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
-        Sun, 12 Oct 2025 22:59:40 -0700 (PDT)
-Date: Mon, 13 Oct 2025 07:59:37 +0200
-From: Michal Pecio <michal.pecio@gmail.com>
-To: Oliver Neukum <oneukum@suse.com>
-Cc: yicongsrfy@163.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, linux-usb@vger.kernel.org,
- marcan@marcan.st, netdev@vger.kernel.org, pabeni@redhat.com,
- yicong@kylinos.cn
-Subject: Re: [PATCH v4 3/3] net: usb: ax88179_178a: add USB device driver
- for config selection
-Message-ID: <20251013075937.4de02dfe.michal.pecio@gmail.com>
-In-Reply-To: <666ef6bf-46f0-4b3e-9c28-9c9b7e602900@suse.com>
-References: <5a3b2616-fcfd-483a-81a4-34dd3493a97c@suse.com>
-	<20250930080709.3408463-1-yicongsrfy@163.com>
-	<20250930080709.3408463-3-yicongsrfy@163.com>
-	<666ef6bf-46f0-4b3e-9c28-9c9b7e602900@suse.com>
+        bh=C8vNNHZvAtyBt20ycUXr/JZp4K3nXiHY4UV19MDvuHg=;
+        b=uO7hi2+HqVL1Hg1r+lDJKOPnCiMkmroW18l1NTmKp2sppe34HWEdHbKMzBI5ZCxtRW
+         /L2bRuwIThuk67mpXxKvYXaGoxh0Ozec6mD2VyVTSgZS5I9oeTjfXRgqxj9MDhZELMHa
+         U8u/lMO/B8SNB237Ib98b6OH2hQBu5XEN/xiXnUT3gp4yAfaopi5MATl6Ju3lIrkmltF
+         U/cr8slNU78mIXS1nAYYYWvil9fGhFOCMvZEJQtFwz69C1YNPs/MoZpvlIENiqosyb3F
+         oGQJF43pTNJhYdSpGNLc2d0UvHAmv8ZPoMnlel+dJeW4XvA2chyhqaySB8teNYBGFjai
+         8zlw==
+X-Forwarded-Encrypted: i=1; AJvYcCVvWQX2stA0AkJP2ktjMBZhVpEVCziOlyA/HLXXUaoKqICzsQoCcTN7/GzxyQ1hrhtoGRPUsak=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy66EcC159NddOIy39csTtS9DKu3Q3yFyXqX6yn7UP58GY23DpX
+	LRMPq4AhMe8AICwSeXmUkQzu1+N6qpev3pBRzoMpyjogOuPBgBoMM+J23kxbSEEHcLCCMtpUT3I
+	pvCYgF/XC/bgMdd+MJ3IwgKHpzERVhzs=
+X-Gm-Gg: ASbGnctmNLP61Z8ThZjnEpp0QtDvowKSiu4vzd5TxPJeCVoYJQXXuejWHk2iWsBZMF0
+	jScMtwiv/1vGlpZXiMydcnpn++8aWMKb+D98D830q1mkVU2ShBCnGAqnwH6xb3dHZyUkXSKlCuQ
+	z8vikZbVX+joF5yn8n68pGHeIfrKOy/TAxV/p7XefvkUTHumQ0Wiqt8InkEOL/Cc4s8+YJAJ47r
+	v2sxgZGrXGb78/qeOUq9P3oEib1LEBlTXTZXLqL1KL9m+w=
+X-Google-Smtp-Source: AGHT+IGgqHYD4VflONP0jVPXUlkjVXxJTP76TmwWfIxXjKC1WZ/+/7GjlfWRE4kW6YotyzP3yXTySDvv/hzKRy5esck=
+X-Received: by 2002:a05:6e02:1c2a:b0:42d:8a3f:ec8f with SMTP id
+ e9e14a558f8ab-42f873d1bbemr227352135ab.15.1760336842774; Sun, 12 Oct 2025
+ 23:27:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250926074033.1548675-1-xuanqiang.luo@linux.dev>
+ <20250926074033.1548675-2-xuanqiang.luo@linux.dev> <f64b89b1-d01c-41d6-9158-e7c14d236d2d@redhat.com>
+ <zus4r4dgghmcyyj2bcjiprad4w666u4paqo3c5jgamr5apceje@zzdlbm75h5m5>
+In-Reply-To: <zus4r4dgghmcyyj2bcjiprad4w666u4paqo3c5jgamr5apceje@zzdlbm75h5m5>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 13 Oct 2025 14:26:46 +0800
+X-Gm-Features: AS18NWCqkc9Ka0YUDI18cPQBvhXm9QgW6suHmb1R73bEJDpKv6-WkV-6kSpej5Q
+Message-ID: <CAL+tcoBy+8RvKXDB2V0mcJ3pOFsrXEsaNYM_o21bk2Q1cLiNSA@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 1/3] rculist: Add hlist_nulls_replace_rcu()
+ and hlist_nulls_replace_init_rcu()
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: Paolo Abeni <pabeni@redhat.com>, kuba@kernel.org, edumazet@google.com, 
+	davem@davemloft.net, horms@kernel.org, kuniyu@google.com, 
+	xuanqiang.luo@linux.dev, "Paul E. McKenney" <paulmck@kernel.org>, netdev@vger.kernel.org, 
+	Xuanqiang Luo <luoxuanqiang@kylinos.cn>, Frederic Weisbecker <frederic@kernel.org>, 
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 30 Sep 2025 10:57:05 +0200, Oliver Neukum wrote:
-> > +static int __init ax88179_driver_init(void)
-> > +{
-> > +	int ret;
-> > +
-> > +	ret = usb_register_device_driver(&ax88179_cfgselector_driver, THIS_MODULE);
-> > +	if (ret)
-> > +		return ret;
-> > +	return usb_register(&ax88179_178a_driver);  
-> 
-> Missing error handling. If you cannot register ax88179_178a_driver
-> you definitely do not want to keep ax88179_cfgselector_driver
-> 
-> > +}
-> > +
-> > +static void __exit ax88179_driver_exit(void)
-> > +{
-> > +	usb_deregister(&ax88179_178a_driver);  
-> 
-> The window for the race
-> 
-> > +	usb_deregister_device_driver(&ax88179_cfgselector_driver);  
-> 
-> Wrong order. I you remove ax88179_178a_driver before you remove
-> ax88179_cfgselector_driver, you'll leave a window during which
-> devices would be switched to a mode no driver exists for.
+On Mon, Oct 13, 2025 at 1:36=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linux.de=
+v> wrote:
+>
+> On Tue, Sep 30, 2025 at 11:16:00AM +0800, Paolo Abeni wrote:
+> > On 9/26/25 9:40 AM, xuanqiang.luo@linux.dev wrote:
+> > > From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+> > >
+> > > Add two functions to atomically replace RCU-protected hlist_nulls ent=
+ries.
+> [...]
+> > >
+> > > Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+> >
+> > This deserves explicit ack from RCU maintainers.
+> >
+> > Since we are finalizing the net-next PR, I suggest to defer this series
+> > to the next cycle, to avoid rushing such request.
+> >
+> > Thanks,
+> >
+> > Paolo
+>
+> Hi maintainers,
+>
+> This patch was previously held off due to the merge window.
+>
+> Now that the merge net-next has open and no further changes are required,
+> could we please consider merging it directly?
+>
+> Apologies for the slight push, but I'm hoping we can get a formal
+> commit backported to our production branch.
 
-Hmm, what about registration?
+I suppose a new version that needs to be rebased is necessary.
 
-I added msleep(1000) and simulated usb_register() error, then
-cfgselector binds to the device and switches configuration before
-the interface driver is available. But the module fails to load
-(I fixed this) and device is left with no driver whatsoever.
-
-Moreover, according to c67cc4315a8e, config switch is irreversible
-since the device reconnects with only the vendor config available.
-I can't test it because my device doesn't have a CDC config at all.
-
-There is a gotcha. I tried to test in a realistic scenario: device
-hotplug, module not loaded yet. I found that udev apparently retries
-loading the module, so this state would be fixed unless the module
-init error is persistent. Still, better not to rely on this?
-
-Would it make sense to swap registration order?
-
-Regards,
-Michal
+Thanks,
+Jason
 
