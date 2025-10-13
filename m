@@ -1,56 +1,63 @@
-Return-Path: <netdev+bounces-228712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE47EBD2ECF
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 14:11:30 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EF0DBD2EDA
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 14:13:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D8BD1885331
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 12:11:54 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1995634B69B
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 12:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB56626E6E6;
-	Mon, 13 Oct 2025 12:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9852626E6E3;
+	Mon, 13 Oct 2025 12:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bpf/i9CY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOyWdX+U"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A216C26CE2C;
-	Mon, 13 Oct 2025 12:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650CC24468D;
+	Mon, 13 Oct 2025 12:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760357486; cv=none; b=ac1r6LKbJQeTUQqHLNEsdDBtWuzT9tUeD1+PnfXpfDOmVdiHIafuC3igseYmLhLTEaZkaDENsk/rbSqjN6TdDHkCqel8TOo3Fa09LXwLXbILP49XxJuMYz9fURpywlW5AK1NSGTeDo4Jm175O6Ml3touHrJ3KSk7CeFFlpbcQ4E=
+	t=1760357594; cv=none; b=OQHkrgIzx0K+NQypZe0zUxCbIxZ84oNkOch7ntWupsosSQtf8Gs4k1JnTE7iNKptproJm6qafEyOGTYe9ovUwk5v9e2vdlxgsYbWjv7GuO988IFGtrDA4BoxLQQSY7SW6NqrlYcLghpgUOdU/Az+/A8G1hksJMxDRMeilW9WGd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760357486; c=relaxed/simple;
-	bh=FHPbcE/kJT0CJg69NFhkZRj6oDXaJKFMg5/ZC3/o6t4=;
+	s=arc-20240116; t=1760357594; c=relaxed/simple;
+	bh=Ve9/iWpbfn/kX74iNG2Ij6hQmnMR/JIdGPX40kr4Y6E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HD5dgGs4RcFQUqxqWuRXRq6tuYUwQnqeG/hOAY1313sKnnJY8d12590XQUFY/y43P+0VSyFAKiRuI7cMfG5dVak/CLoT1/cGv/92blnC6hK7NFTKIHFiGQPQWQ54RkBettL2ACTGOSwoL7fnxVfecDaDTAl+APp5y7MlyxSfk3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bpf/i9CY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 553DDC4CEE7;
-	Mon, 13 Oct 2025 12:11:24 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=u+jxA33WH6ih0XuphT3XVDJ5uUKzxqnvK2lgpniZED8MGVUur7va4D3yzSHpi0i3e8WGN3u5xjH2SIzp/QAbQBV4CJ5nzvxavVK2/5O8iGMHFcPtPi6gN01xmjOPZV3TVSV2DBh0j2SvqdYRN4wjFNUO8uIgP7rzVKgGcuTEHuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jOyWdX+U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1528C4CEE7;
+	Mon, 13 Oct 2025 12:13:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760357486;
-	bh=FHPbcE/kJT0CJg69NFhkZRj6oDXaJKFMg5/ZC3/o6t4=;
+	s=k20201202; t=1760357594;
+	bh=Ve9/iWpbfn/kX74iNG2Ij6hQmnMR/JIdGPX40kr4Y6E=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bpf/i9CYf1aXgXRqA2LOl1jOtLRPUKAj25e2BlpQn4bbNXH53n2wFayYZHGeOqVjP
-	 onPRWP++15+eF54fABbsyIzx9Q7zW+nMpZV6GAFaAxo3rA9O0WjTGwsa+YEfXPf0TX
-	 ggJ4Z0YMM7SGTpzREi9oEd98wyEEAlKm9V0RmBpY0WsGakpBiq9iJEw2msIkrxRN3e
-	 wcuAKbWpL+T8sSg2zdcsZ4Fi0s5AwmS4csusD33QSQamFiN+x5uPgkm6FDlJrBI+0X
-	 hO2CURZKdmGBj8J4Zt4Az6a2zWy00VdWcn1pjp2Qhpx7GNkkPF6XHsy7ojjZbri4Nj
-	 ML9mwQDc0VCYA==
-Date: Mon, 13 Oct 2025 13:11:22 +0100
+	b=jOyWdX+U00ecIVdoFM2BjCh5Fz7HURlWY4AqFsk/7lfbDVHgBICtfA/PoODLzRP4O
+	 dD7+8DiiYmOWp3dBoZJZR9DV4S7fnR2KZ+yNTiJrK5mPvK1UgeUUuhAZS2KqwpHVy/
+	 XboQtny2cW9/xwPPiPLRU6XcJcDTPIzuauwFSYhbfD4g51CEXHxv4Lcb/GhdX/K7JM
+	 WJPAPCi2lmEA0i1kqEA8qZdgRTXMYcYIkQK2aLgAzl2VKYlZDGZRuSrPxyHt4xAPzY
+	 vlVMU/fn/1DGRRLgB2Vl13fKMyb/Yf2jY95IquhezkSU5gxK0OOpvL5CgC3l10kNtA
+	 +7YIxrhwnLKEg==
+Date: Mon, 13 Oct 2025 13:13:09 +0100
 From: Simon Horman <horms@kernel.org>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: idosch@nvidia.com, razor@blackwall.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	bridge@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: bridge: correct debug message function
- name in br_fill_ifinfo
-Message-ID: <aOzsaqMGpVL5HnZq@horms.kernel.org>
-References: <20251013100121.755899-1-alok.a.tiwari@oracle.com>
+To: Vincent Mailhol <mailhol@kernel.org>
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] can: add Transmitter Delay Compensation (TDC)
+ documentation
+Message-ID: <aOzs1TjdaqZqNW8M@horms.kernel.org>
+References: <20251013-can-fd-doc-v2-0-5d53bdc8f2ad@kernel.org>
+ <20251013-can-fd-doc-v2-2-5d53bdc8f2ad@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,15 +66,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251013100121.755899-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20251013-can-fd-doc-v2-2-5d53bdc8f2ad@kernel.org>
 
-On Mon, Oct 13, 2025 at 03:01:16AM -0700, Alok Tiwari wrote:
-> The debug message in br_fill_ifinfo() incorrectly refers to br_fill_info
-> instead of the actual function name. Update it for clarity in debugging
-> output.
+On Mon, Oct 13, 2025 at 07:10:23PM +0900, Vincent Mailhol wrote:
+> Back in 2021, support for CAN TDC was added to the kernel in series [1]
+> and in iproute2 in series [2]. However, the documentation was never
+> updated.
 > 
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+> Add a new sub-section under CAN-FD driver support to document how to
+> configure the TDC using the "ip tool".
+> 
+> [1] add the netlink interface for CAN-FD Transmitter Delay Compensation (TDC)
+> Link: https://lore.kernel.org/all/20210918095637.20108-1-mailhol.vincent@wanadoo.fr/
+> 
+> [2] iplink_can: cleaning, fixes and adding TDC support
+> Link: https://lore.kernel.org/all/20211103164428.692722-1-mailhol.vincent@wanadoo.fr/
+> 
+> Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
+> ---
+> Changes in v2:
+> 
+>   - Fix below "make htmldocs" error:
+> 
+>       can.rst:1484: ERROR: Unexpected indentation. [docutils]
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Thanks, I confirmed that "make htmldocs" is happy now.
 
+> 
+>   - Change from "Bullet lists" to "Definition lists" format.
+> 
+> Link to v1: https://lore.kernel.org/all/20251012-can-fd-doc-v1-2-86cc7d130026@kernel.org/
+
+...
 
