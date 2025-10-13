@@ -1,146 +1,227 @@
-Return-Path: <netdev+bounces-228880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2D77BD5729
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 19:19:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A84EBD5726
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 19:19:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 107234F33DF
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:09:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BDC594F34FC
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:11:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E878A2C08B1;
-	Mon, 13 Oct 2025 17:09:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3072C0F8C;
+	Mon, 13 Oct 2025 17:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VeN7qF+l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C31C23D7F4
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 17:09:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F202B2BE646
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 17:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760375371; cv=none; b=eY+N9xOZiLQ7PGZzZo1GZ24dVSYdmVPWQSPufyyGiSFkQ0CJ1ER1U9+vqXlJJtbIAsLCe/QGlbndtfjKcDrbuzxbVB9gUUUciV/k8/kSBHYdOPdHmPoSahDNJOTLWEJQnw+DSGmS/FICR29U95A7QxMkf8FB15/wJPvPCF7+o0g=
+	t=1760375476; cv=none; b=k9Obw/nv6ZEFrV+/GibzXtIOepddQsyLJatrWl2gYb9eGakG/EJPTgz1mgU4WbwFPOPr4bACamgs+uxMRgW3EXoacYpzzg4QH1XwKdStRV48fAN1Y8KFX0M4wte9aANBYXkiPQlD4ML1dHLS0p7+ffaYiaq9MgzZgHEPzM2sW4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760375371; c=relaxed/simple;
-	bh=GcsJsmNR66TkTqTz1B+6YFyl+EAGJv7TFYbWgcNErZA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=bU+bIHdIQ/+ajFO/dI/5rAkpNa0RBwlo6gSaTcjMrVrzsCZ9DKoOPFsqprUKHYlI7IKA33jhz1cOuxhbJR1Te+3lhdcLpw87yRMDkk/h95pdYW1COhxhE+Eb8mnkoh/LPQ3s1PGmcTkfTaQAU157297UDRaWOYrW6S1+xIXWWqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1760375476; c=relaxed/simple;
+	bh=S2gIQP94lgffpY4CdKMCyczm6+A1tXicz6mTVuc1Joc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B/RtGwIPab7T0ihX7/Nt1cOMU6HHum+ys+quKwl8JiE6g1n86ylm55018ryydVXxXifv0eKcIFhRK29pxwbZItXglL7D9VLOhz8CvnppzaRN+5mP0ANWYKbQkV0+fRq8AdDr+BTqcnRUeSYtIPa7atKcwyiKmRNgX3qqaZLyMlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VeN7qF+l; arc=none smtp.client-ip=209.85.210.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b3c2c748bc8so637718866b.2
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 10:09:26 -0700 (PDT)
+Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-780fc3b181aso2583060b3a.2
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 10:11:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760375474; x=1760980274; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vNU/E/UrNDC/G0pLcdg/DKYe53UeEuOcIs6nSU8+lgY=;
+        b=VeN7qF+lWkeOtd1YiRy10WCaODuPsakI6f5p+sTuUP9YQJoWT7Xtx8DmVq9GRvzNK5
+         Tsi/WJLMBe8GuBob8bJXFtVGNAEiTmWUGq07Xs0ZlYGBgd6Ftjg2ktWzl2v/3czUFozS
+         CCeEigUL4BHaeFCUZYKSW9ksIdUEEfxFs56Q8G5qLelE0eg0Ew0V+jh5sxj7tVadKyIB
+         VKz0HSh2TvRtOP1WbCtNx1E+PFC7AZorlmC8idbXEQS0MTs48XBB4fr04Mu1U5TFbl15
+         D3moql5bcwtkfvR/spj572cylgzWylB73P7ECjyrZ/9NItM1miAV9CidINU0MgkLeWOh
+         22LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760375365; x=1760980165;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1760375474; x=1760980274;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gzbk+4Totk/9NHbsfjmJ9rzLfO5PvmO39iyLAhqUy/w=;
-        b=uept10Ydm1qg7IwS3107hVtjQzUYU+EjURXzCJB02UUbJEV0G8dZtWF/q+4fDWV1vu
-         /Q6hgoIimn3wBEcgp2E+B0ujUkEz0kjDEn6yULwx2QQb4FrC3tcDY9gcRiJEwV2CKZN3
-         lpzHB9LD/pPyP89YtFyjZfkK0Hn4mJjG/aHAxjITbAni7uXcmavWtYZHSL5U1MzjlTrh
-         FT5fDrl7FErXInM/fjNiSTMlkc6678PjCdTHrI18ZMupHa34cM+14/KbfjBq9u5/aor1
-         Ts8xkGXSXEFdJsKd1LHI7+OTbb+/IGYLXUKlCiyKAE0xPyBHSACS4uTPahSEbY9EDSqr
-         3vhg==
-X-Gm-Message-State: AOJu0YwgGtfzCcY2oaItvPEG7uk21f5UFbcexVYm52XTa1nu0muA0lXH
-	0m5/O2p0a2H+Hxj3nhxPPxabDZrBxd7lqLSGHGFHxARFbSPm7pepAAe2
-X-Gm-Gg: ASbGncv9etmRnN204GBYYuwkY8z0Oma1DYfadGKja5Md273lrsZDNNujtHSZog1bfO+
-	Jb0Q8Zc0CxX8QrnWRVvFATu2hbmopFxLWRhqQVqq3GwX1t7/h5IPUrz5PVeEH4xatVeq+N2AVMz
-	MoBgC1uxFpftbQi9W1nPk5O96RE0jDe/3zgEcL+laoURQ3yfF0o2QEb+bd88WUMfuj6lMAaaUEa
-	ufVPo9qvhoDZRGj9pq18JCGJjgbM5JMmJppGKmIcOJbgGj2Hrq2yn65timMF2k9JlR/gX5k722M
-	wMkezy6tnM6r0t1HEfdZna5Hq37auzV2kMRFDZxQD9N25Atmg2GW3i9UuDXIYHiHJ11v/wc9FQ/
-	6lMv3xFl9tdaEKfWlxBXq8MEu4L7ivcYVR/ZkAriRryZTuVA=
-X-Google-Smtp-Source: AGHT+IGt5kR5F8pvKrJpygfr2pjUntgvPJaB47lL0nD0FC9FyzJ3Jztqt6mIq5PEXkSvc0BpQWVJcw==
-X-Received: by 2002:a17:907:2da9:b0:b4f:e357:78f8 with SMTP id a640c23a62f3a-b50ac7eb031mr2337168066b.52.1760375364369;
-        Mon, 13 Oct 2025 10:09:24 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:72::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b55d61d04dfsm968072966b.22.2025.10.13.10.09.23
+        bh=vNU/E/UrNDC/G0pLcdg/DKYe53UeEuOcIs6nSU8+lgY=;
+        b=BvsT4p7Pcg09cP7T4Ib+c3CCCh50+WlldjC6HT6wJfndFKLFn8RcTuv1JzOVSR2SDy
+         KURoDeH+C5va4TH2LWxXhEUS38Cs4p3M5IUUNBkBJf43tKSrypUZCBko2Ht18Ef+jVhW
+         K2lFn5Yud2pe4jlxMYmoRufb9CYNxvalna90K9eaMfZ74ZC08rVq3jK128TSIkGqV+7o
+         Wz6z+LL6dOrFSupWAm39KVKnZZnhsTwTk1fL7DYLB+hPXUqcAi35BTN1552LLKdspjn9
+         iEQ6Dpc3FopS3XleItAbN6jW7KkdHn6WARlGETTe4lMxkKMdi8yRcuyVZq9lD1fKMVL3
+         X/Zg==
+X-Forwarded-Encrypted: i=1; AJvYcCVJe/5N15FAEry5q7lDXzQ2zluQUJFdiZJLO+a1uILhkT5rjCT/ramlIo/0jOCAYAnrJfHj2pU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxzh8INVKFiWWA8q1vIxLrjBr51yHplNfsCfC6xJ3a/QBcBX0bx
+	3q9aTuOZtvdRBUhFMpTE1ZXp2JeG22AgLgi6Y0WR1+dPiUgjIrUGWTwL
+X-Gm-Gg: ASbGncuQMkwr1kSIRlKuD6JnFuATfDxr7XYE79NRdidNJyYGHuhAmccjtuvkH6h5wDC
+	gMO1GuZ43wFWtRUlU/Y7O1kjFXSdXicS+aBNeC/4Wn9IMtNczM9eECBJWwO7KL3NQ3tLK3e3zgA
+	ToGdopf8qFSQC2v8Du+M3PNKQYiuC7LENLWUq1T7nYpnmEmS53pSMDak80yeXBV4iSQzxi18Jvj
+	I4uMH2GjnEMJVzMyVFgVLVKKH+uKLIl7N2WUqC5f5mYXQR6uIsnBLfXc1B1RSKv/XTYbLnrXbPs
+	LiwNtDy294H4ynNygoMZz0kd1xZYkEgTsPCD6yXGOtxQApx+dcM4+P9HB/Q8DpxUUe2SmT6RY2c
+	4vADbYgvJ784ARr77D7t3hG44NqzYUTLSSYdse123Rmv56loKmiEbMl0alaBsRHCcVWkrwn8U3s
+	XXRU+g3vOR+dvWdpbqOAJRBVU4JNXQMMFc
+X-Google-Smtp-Source: AGHT+IFrdLCo/eZa8p+hiG7JwHLn3+CSG/njknEnKNZNV9VR+YEiYQEHF/YrPnjgWDnY3Yrqr5yvUA==
+X-Received: by 2002:a05:6a00:8d5:b0:792:4e77:6ffa with SMTP id d2e1a72fcca58-79387834ed2mr20630907b3a.23.1760375474048;
+        Mon, 13 Oct 2025 10:11:14 -0700 (PDT)
+Received: from chandna.localdomain ([182.77.76.41])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992d0e275csm12144012b3a.61.2025.10.13.10.11.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Oct 2025 10:09:23 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Mon, 13 Oct 2025 10:09:22 -0700
-Subject: [PATCH net] netdevsim: set the carrier when the device goes up
+        Mon, 13 Oct 2025 10:11:13 -0700 (PDT)
+From: Sahil Chandna <chandna.linuxkernel@gmail.com>
+To: ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	john.fastabend@gmail.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: david.hunter.linux@gmail.com,
+	skhan@linuxfoundation.org,
+	khalid@kernel.org,
+	chandna.linuxkernel@gmail.com,
+	syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
+Subject: [PATCH v3] bpf: test_run: fix atomic context in timer path causing sleep-in-atomic BUG
+Date: Mon, 13 Oct 2025 22:41:04 +0530
+Message-ID: <20251013171104.493153-1-chandna.linuxkernel@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251013-netdevsim_fix-v1-1-357b265dd9d0@debian.org>
-X-B4-Tracking: v=1; b=H4sIAEEy7WgC/x3MWwqAIBAF0K0M9ztBe1FuJSKsxpqPLDQiiPYed
- BZwHiSOwgmWHkS+JMkeYMlkhGl1YWElMywh13lltClU4HPmK8k2eLnV2LrGVboufeOREY7IXu7
- /6xD4RP++H+ng1TtkAAAA
-X-Change-ID: 20251013-netdevsim_fix-b9a8a5064f8f
-To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel-team@meta.com, Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-dd21f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1356; i=leitao@debian.org;
- h=from:subject:message-id; bh=GcsJsmNR66TkTqTz1B+6YFyl+EAGJv7TFYbWgcNErZA=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBo7TJDW761SlNjpZNmbozNyChyMxtw+94H7IFC4
- YVqbKWDUeCJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaO0yQwAKCRA1o5Of/Hh3
- bWtOEACdABdg97kR6gRbybCU2xqATK1KstssSfsOUrtyJ1FRnjIzSVX7e/gF7GVdfFmtyJzqD7t
- QO0+vcYxeGIW42+omO2ALE9lNopeK3EPhi/X5bvypiqLqSRaFBqNidiA2ZS4K4OZLDVBUrxoFRG
- slHsLHOqf0+GgDGvoF4WhM+4hNBsdn2UiTx77peuPME/QJsqkBtOAEars11h4sYYipFE01vOwTO
- u4wwHyeTRSu6oc2SsA4b8u0XRyejsQIRix75bJsjmnoRZoV68XqD7gmp3bbnzsBuvynq8ZF49Ez
- kNmx7KuK3GvVlRUjFpnd+pD/u9ZeK2aBawj11oTWKJne5j61Hwn4979RLM5zvfQ1iYTLgTVmwZV
- fJZWInQRX5+FDf/qhwDONGroVCpt4IoHcRZ75mDGKTHbFrJpEmtRbUu4+p6IXu7RzhToatBzUtj
- WmrKUiUYA4xIqKbjkkHWstGMfU/kK/CzXtWnmNJ5sRMuVhlrrmLQc8wO7FgWK8G6BhtJkELmn0Z
- ZCrlIxUAn16LKYT4IKCW0P+SDWnRodLAKfkwns7Zv/qDoxDNUaYXTfkNnjwSLOezO6Oa6doOEmF
- MNvYMWTCQhhJMrXs8diQ7oAW2z6FOaYMuOiLsrSEW0OqXZX5cIdEqkn46+yhgT7JxHbbD9Jl1hh
- J4ushMPWj2YQKIg==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+Content-Transfer-Encoding: 8bit
 
-Bringing a linked netdevsim device down and then up causes communication
-failure because both interfaces lack carrier. Basically a ifdown/ifup on
-the interface make the link broken.
+The timer mode is initialized to NO_PREEMPT mode by default,
+this disable preemption and force execution in atomic context
+causing issue on PREEMPT_RT configurations when invoking
+spin_lock_bh(), leading to the following warning:
 
-When a device is brought up, if it has a peer and this peer device is
-UP, set both carriers to on.
+BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:48
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 6107, name: syz.0.17
+preempt_count: 1, expected: 0
+RCU nest depth: 1, expected: 1
+Preemption disabled at:
+[<ffffffff891fce58>] bpf_test_timer_enter+0xf8/0x140 net/bpf/test_run.c:42
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Fixes: 3762ec05a9fbda ("netdevsim: add NAPI support")
+Fix this, by removing NO_PREEMPT/NO_MIGRATE mode check.
+Also, the test timer context no longer needs explicit calls to
+migrate_disable()/migrate_enable() with rcu_read_lock()/rcu_read_unlock().
+Use helpers rcu_read_lock_dont_migrate() and rcu_read_unlock_migrate()
+instead.
+
+Reported-by: syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=1f1fbecb9413cdbfbef8
+Tested-by: syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
+Signed-off-by: Sahil Chandna <chandna.linuxkernel@gmail.com>
+
 ---
- drivers/net/netdevsim/netdev.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Changes since v2:
+- Fix uninitialized struct bpf_test_timer
 
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index ebc3833e95b44..fa1d97885caaf 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -545,6 +545,7 @@ static void nsim_enable_napi(struct netdevsim *ns)
- static int nsim_open(struct net_device *dev)
+Changes since v1:
+- Dropped `enum { NO_PREEMPT, NO_MIGRATE } mode` from `struct bpf_test_timer`.
+- Removed all conditional preempt/migrate disable logic.
+- Unified timer handling to use `migrate_disable()` / `migrate_enable()` universally.
+
+Link to v2: https://lore.kernel.org/all/20251010075923.408195-1-chandna.linuxkernel@gmail.com/
+Link to v1: https://lore.kernel.org/all/20251006054320.159321-1-chandna.linuxkernel@gmail.com/
+
+Testing:
+- Reproduced syzbot bug locally using the provided reproducer.
+- Observed `BUG: sleeping function called from invalid context` on v1.
+- Confirmed bug disappears after applying this patch.
+- Validated normal functionality of `bpf_prog_test_run_*` helpers with C
+  reproducer.
+---
+ net/bpf/test_run.c | 23 ++++++-----------------
+ 1 file changed, 6 insertions(+), 17 deletions(-)
+
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index dfb03ee0bb62..f1719ea7a037 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -29,7 +29,6 @@
+ #include <trace/events/bpf_test_run.h>
+ 
+ struct bpf_test_timer {
+-	enum { NO_PREEMPT, NO_MIGRATE } mode;
+ 	u32 i;
+ 	u64 time_start, time_spent;
+ };
+@@ -37,12 +36,7 @@ struct bpf_test_timer {
+ static void bpf_test_timer_enter(struct bpf_test_timer *t)
+ 	__acquires(rcu)
  {
- 	struct netdevsim *ns = netdev_priv(dev);
-+	struct netdevsim *peer;
- 	int err;
- 
- 	netdev_assert_locked(dev);
-@@ -555,6 +556,12 @@ static int nsim_open(struct net_device *dev)
- 
- 	nsim_enable_napi(ns);
- 
-+	peer = rtnl_dereference(ns->peer);
-+	if (peer && netif_running(peer->netdev)) {
-+		netif_carrier_on(dev);
-+		netif_carrier_on(peer->netdev);
-+	}
-+
- 	return 0;
+-	rcu_read_lock();
+-	if (t->mode == NO_PREEMPT)
+-		preempt_disable();
+-	else
+-		migrate_disable();
+-
++	rcu_read_lock_dont_migrate();
+ 	t->time_start = ktime_get_ns();
  }
  
-
----
-base-commit: 0b4b77eff5f8cd9be062783a1c1e198d46d0a753
-change-id: 20251013-netdevsim_fix-b9a8a5064f8f
-
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
+@@ -50,12 +44,7 @@ static void bpf_test_timer_leave(struct bpf_test_timer *t)
+ 	__releases(rcu)
+ {
+ 	t->time_start = 0;
+-
+-	if (t->mode == NO_PREEMPT)
+-		preempt_enable();
+-	else
+-		migrate_enable();
+-	rcu_read_unlock();
++	rcu_read_unlock_migrate();
+ }
+ 
+ static bool bpf_test_timer_continue(struct bpf_test_timer *t, int iterations,
+@@ -374,7 +363,7 @@ static int bpf_test_run_xdp_live(struct bpf_prog *prog, struct xdp_buff *ctx,
+ 
+ {
+ 	struct xdp_test_data xdp = { .batch_size = batch_size };
+-	struct bpf_test_timer t = { .mode = NO_MIGRATE };
++	struct bpf_test_timer t = {};
+ 	int ret;
+ 
+ 	if (!repeat)
+@@ -404,7 +393,7 @@ static int bpf_test_run(struct bpf_prog *prog, void *ctx, u32 repeat,
+ 	struct bpf_prog_array_item item = {.prog = prog};
+ 	struct bpf_run_ctx *old_ctx;
+ 	struct bpf_cg_run_ctx run_ctx;
+-	struct bpf_test_timer t = { NO_MIGRATE };
++	struct bpf_test_timer t = {};
+ 	enum bpf_cgroup_storage_type stype;
+ 	int ret;
+ 
+@@ -1377,7 +1366,7 @@ int bpf_prog_test_run_flow_dissector(struct bpf_prog *prog,
+ 				     const union bpf_attr *kattr,
+ 				     union bpf_attr __user *uattr)
+ {
+-	struct bpf_test_timer t = { NO_PREEMPT };
++	struct bpf_test_timer t = {};
+ 	u32 size = kattr->test.data_size_in;
+ 	struct bpf_flow_dissector ctx = {};
+ 	u32 repeat = kattr->test.repeat;
+@@ -1445,7 +1434,7 @@ int bpf_prog_test_run_flow_dissector(struct bpf_prog *prog,
+ int bpf_prog_test_run_sk_lookup(struct bpf_prog *prog, const union bpf_attr *kattr,
+ 				union bpf_attr __user *uattr)
+ {
+-	struct bpf_test_timer t = { NO_PREEMPT };
++	struct bpf_test_timer t = {};
+ 	struct bpf_prog_array *progs = NULL;
+ 	struct bpf_sk_lookup_kern ctx = {};
+ 	u32 repeat = kattr->test.repeat;
+-- 
+2.50.1
 
 
