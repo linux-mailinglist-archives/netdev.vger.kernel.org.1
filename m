@@ -1,317 +1,200 @@
-Return-Path: <netdev+bounces-228953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 616BCBD65C0
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 23:31:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4820BD660B
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 23:35:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1583C3E5485
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 21:31:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88E11402CE2
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 21:35:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439F725EF87;
-	Mon, 13 Oct 2025 21:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F10B02DE1F0;
+	Mon, 13 Oct 2025 21:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C7zRxW/O"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iuiHMEGI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C171EFFB7;
-	Mon, 13 Oct 2025 21:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02EAD2D9EF8;
+	Mon, 13 Oct 2025 21:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760391068; cv=none; b=nWzyMNFI6eQNxY0sIpxxP0EBSHSjaoWfg60l+p5+DvmKZpZlGKW6C36idm5G2HGUffZZdHU2ZdtUliC1wjnidiZKrq3/FCgzUdr+/wZjUfHYPjybTIAcJCS3k++NbRjaBcwnQw7ZxR5fNUaU/3QdyY6BSLDHUhoCJimy131riZ8=
+	t=1760391341; cv=none; b=ODNiPl2lpWG3g9sm2DVXY3nSEiusWfawc/98krp0sbAU+J44Q3948YKNu0HB2DRqw6oH+ox3rHWiNje2fHllmBDM2znK6YrtwhKVjm1S+RSudPkijKRwrO9NTl1bOvoMVKp8wJ+rH28kyTrRORvDWjd4JihrQo4BR/5oFTAdjec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760391068; c=relaxed/simple;
-	bh=tm3f9QBVDbCyS+aclYeJleqzPEQAMHHJG+uDCCqQgJ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Oy+SGROprWg2gnI2kJxprD6Hr83NlLG9JKN/epdx6UA3RTa7/KSVLXv51YoEc94e2V8qBheSedUjJ7JDk+b/SEuZRaY0fsI+dBjYNl19i38PcVRJ1htt3rDqKYDTgRYaPkF1f2hXUuqC0NRRJCzYFo1BhcDCh7mAV3JHCi7S+Ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C7zRxW/O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61E89C4CEE7;
-	Mon, 13 Oct 2025 21:31:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760391067;
-	bh=tm3f9QBVDbCyS+aclYeJleqzPEQAMHHJG+uDCCqQgJ4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=C7zRxW/OldpGB6bsfD/E8QfMMDozWGbpvrhvggrI6c16pX5nJxTeKG/l7I5jLnZ5A
-	 J7no10m9WIldGd2Nitpbb1L5TL9qRSiZK6+rLLJjmvN7nq9nlfhyiYrr50BOBrFPRM
-	 2SHf34MK8GLsHDtdMl/eVRyn6lSS7EOWHBd0/k0boegKSounp7DkKjQjR7Xz16bm29
-	 r8aChWUYAZKewzh7z2gb1yclPeiGFZsu3mLjftS5if+ERrktC88amEGljfI48nd+Re
-	 2gMkK1K2l6yzKWB8VByTV/Eps7ncrC619KJusYKsE6F3XsPdBizexLgd7R0y/UAMlv
-	 XzGVvNEELTFPA==
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Sundar S K <Shyam-sundar.S-k@amd.com>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] dt-bindings: net: Convert amd,xgbe-seattle-v1a to DT schema
-Date: Mon, 13 Oct 2025 16:30:49 -0500
-Message-ID: <20251013213049.686797-2-robh@kernel.org>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1760391341; c=relaxed/simple;
+	bh=jqPWipQvwEI0426R6a2KF+Ie8Wc+CqVLazRzissvs9o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HDYmGvvqFm8clE7k7rAaZQokHzfjGHtOGUQ0mH0oPzoWeCZ6fXsAbrmeizLqnA2aKnV4ngOygMuPVcbWMPwHEM/2WN5KlUvFXdOYGnU76fXavbqBuOTl1aOvf1otjxbUsXUD93SENJfCjZ65zuVBky3yhjXLes+2hwESz5z/x7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iuiHMEGI; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 13 Oct 2025 14:35:28 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760391336;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JPYBsz9pGkaccZ8zsTc8dJhQOz3Z69EhCvUXsfnXcEw=;
+	b=iuiHMEGIr7qkZSeMQxTocOUmuJoL5V6SAxdiC/mkgSEnLO13/XyNWsDjIL5aO/NABfVdmM
+	sR9PlyajnkGBvkhbHlCOkLasA30uo8fMIDqpstbEdlm6aKyk2pCFeecAKGU6WqGTMh9UGu
+	NxoDle17IfphqPCP6oz4WG36+11j/3k=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Barry Song <21cnbao@gmail.com>, netdev@vger.kernel.org, 
+	linux-mm@kvack.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Barry Song <v-songbaohua@oppo.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Suren Baghdasaryan <surenb@google.com>, 
+	Michal Hocko <mhocko@suse.com>, Brendan Jackman <jackmanb@google.com>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Huacai Zhou <zhouhuacai@oppo.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+	Harry Yoo <harry.yoo@oracle.com>, David Hildenbrand <david@redhat.com>, 
+	Matthew Wilcox <willy@infradead.org>, Roman Gushchin <roman.gushchin@linux.dev>
+Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network
+ buffer allocation
+Message-ID: <dhmafwxu2jj4lu6acoqdhqh46k33sbsj5jvepcfzly4c7dn2t7@ln5dgubll4ac>
+References: <20251013101636.69220-1-21cnbao@gmail.com>
+ <927bcdf7-1283-4ddd-bd5e-d2e399b26f7d@suse.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <927bcdf7-1283-4ddd-bd5e-d2e399b26f7d@suse.cz>
+X-Migadu-Flow: FLOW_OUT
 
-Convert amd,xgbe-seattle-v1a binding to DT schema format. It's a
-straight-forward conversion.
+On Mon, Oct 13, 2025 at 08:30:13PM +0200, Vlastimil Babka wrote:
+> On 10/13/25 12:16, Barry Song wrote:
+> > From: Barry Song <v-songbaohua@oppo.com>
+> > 
+> > On phones, we have observed significant phone heating when running apps
+> > with high network bandwidth. This is caused by the network stack frequently
+> > waking kswapd for order-3 allocations. As a result, memory reclamation becomes
+> > constantly active, even though plenty of memory is still available for network
+> > allocations which can fall back to order-0.
+> > 
+> > Commit ce27ec60648d ("net: add high_order_alloc_disable sysctl/static key")
+> > introduced high_order_alloc_disable for the transmit (TX) path
+> > (skb_page_frag_refill()) to mitigate some memory reclamation issues,
+> > allowing the TX path to fall back to order-0 immediately, while leaving the
+> > receive (RX) path (__page_frag_cache_refill()) unaffected. Users are
+> > generally unaware of the sysctl and cannot easily adjust it for specific use
+> > cases. Enabling high_order_alloc_disable also completely disables the
+> > benefit of order-3 allocations. Additionally, the sysctl does not apply to the
+> > RX path.
+> > 
+> > An alternative approach is to disable kswapd for these frequent
+> > allocations and provide best-effort order-3 service for both TX and RX paths,
+> > while removing the sysctl entirely.
+> > 
+> > Cc: Jonathan Corbet <corbet@lwn.net>
+> > Cc: Eric Dumazet <edumazet@google.com>
+> > Cc: Kuniyuki Iwashima <kuniyu@google.com>
+> > Cc: Paolo Abeni <pabeni@redhat.com>
+> > Cc: Willem de Bruijn <willemb@google.com>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: Jakub Kicinski <kuba@kernel.org>
+> > Cc: Simon Horman <horms@kernel.org>
+> > Cc: Vlastimil Babka <vbabka@suse.cz>
+> > Cc: Suren Baghdasaryan <surenb@google.com>
+> > Cc: Michal Hocko <mhocko@suse.com>
+> > Cc: Brendan Jackman <jackmanb@google.com>
+> > Cc: Johannes Weiner <hannes@cmpxchg.org>
+> > Cc: Zi Yan <ziy@nvidia.com>
+> > Cc: Yunsheng Lin <linyunsheng@huawei.com>
+> > Cc: Huacai Zhou <zhouhuacai@oppo.com>
+> > Signed-off-by: Barry Song <v-songbaohua@oppo.com>
+> > ---
+> >  Documentation/admin-guide/sysctl/net.rst | 12 ------------
+> >  include/net/sock.h                       |  1 -
+> >  mm/page_frag_cache.c                     |  2 +-
+> >  net/core/sock.c                          |  8 ++------
+> >  net/core/sysctl_net_core.c               |  7 -------
+> >  5 files changed, 3 insertions(+), 27 deletions(-)
+> > 
+> > diff --git a/Documentation/admin-guide/sysctl/net.rst b/Documentation/admin-guide/sysctl/net.rst
+> > index 2ef50828aff1..b903bbae239c 100644
+> > --- a/Documentation/admin-guide/sysctl/net.rst
+> > +++ b/Documentation/admin-guide/sysctl/net.rst
+> > @@ -415,18 +415,6 @@ GRO has decided not to coalesce, it is placed on a per-NAPI list. This
+> >  list is then passed to the stack when the number of segments reaches the
+> >  gro_normal_batch limit.
+> >  
+> > -high_order_alloc_disable
+> > -------------------------
+> > -
+> > -By default the allocator for page frags tries to use high order pages (order-3
+> > -on x86). While the default behavior gives good results in most cases, some users
+> > -might have hit a contention in page allocations/freeing. This was especially
+> > -true on older kernels (< 5.14) when high-order pages were not stored on per-cpu
+> > -lists. This allows to opt-in for order-0 allocation instead but is now mostly of
+> > -historical importance.
+> > -
+> > -Default: 0
+> > -
+> >  2. /proc/sys/net/unix - Parameters for Unix domain sockets
+> >  ----------------------------------------------------------
+> >  
+> > diff --git a/include/net/sock.h b/include/net/sock.h
+> > index 60bcb13f045c..62306c1095d5 100644
+> > --- a/include/net/sock.h
+> > +++ b/include/net/sock.h
+> > @@ -3011,7 +3011,6 @@ extern __u32 sysctl_wmem_default;
+> >  extern __u32 sysctl_rmem_default;
+> >  
+> >  #define SKB_FRAG_PAGE_ORDER	get_order(32768)
+> > -DECLARE_STATIC_KEY_FALSE(net_high_order_alloc_disable_key);
+> >  
+> >  static inline int sk_get_wmem0(const struct sock *sk, const struct proto *proto)
+> >  {
+> > diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+> > index d2423f30577e..dd36114dd16f 100644
+> > --- a/mm/page_frag_cache.c
+> > +++ b/mm/page_frag_cache.c
+> > @@ -54,7 +54,7 @@ static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
+> >  	gfp_t gfp = gfp_mask;
+> >  
+> >  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> > -	gfp_mask = (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
+> > +	gfp_mask = (gfp_mask & ~__GFP_RECLAIM) |  __GFP_COMP |
+> >  		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
+> 
+> I'm a bit worried about proliferating "~__GFP_RECLAIM" allocations now that
+> we introduced alloc_pages_nolock() and kmalloc_nolock() where it's
+> interpreted as "cannot spin" - see gfpflags_allow_spinning(). Currently it's
+> fine for the page allocator itself where we have a different entry point
+> that uses ALLOC_TRYLOCK, but it can affect nested allocations of all kinds
+> of debugging and accounting metadata (page_owner, memcg, alloc tags for slab
+> objects etc). kmalloc_nolock() relies on gfpflags_allow_spinning() fully
+> 
+> I wonder if we should either:
+> 
+> 1) sacrifice a new __GFP flag specifically for "!allow_spin" case to
+> determine it precisely.
+> 
+> 2) keep __GFP_KSWAPD_RECLAIM for allocations that remove it for purposes of
+> not being disturbing (like proposed here), but that can in fact allow
+> spinning. Instead, decide to not wake up kswapd by those when other
+> information indicates it's an opportunistic allocation
+> (~__GFP_DIRECT_RECLAIM, _GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC,
+> order > 0...)
+> 
+> 3) something better?
+> 
 
-Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
----
- .../bindings/net/amd,xgbe-seattle-v1a.yaml    | 147 ++++++++++++++++++
- .../devicetree/bindings/net/amd-xgbe.txt      |  76 ---------
- 2 files changed, 147 insertions(+), 76 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/amd,xgbe-seattle-v1a.yaml
- delete mode 100644 Documentation/devicetree/bindings/net/amd-xgbe.txt
+For the !allow_spin allocations, I think we should just add a new __GFP
+flag instead of adding more complexity to other allocators which may or
+may not want kswapd wakeup for many different reasons.
 
-diff --git a/Documentation/devicetree/bindings/net/amd,xgbe-seattle-v1a.yaml b/Documentation/devicetree/bindings/net/amd,xgbe-seattle-v1a.yaml
-new file mode 100644
-index 000000000000..006add8b6410
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/amd,xgbe-seattle-v1a.yaml
-@@ -0,0 +1,147 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/amd,xgbe-seattle-v1a.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: AMD XGBE Seattle v1a
-+
-+maintainers:
-+  - Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-+
-+allOf:
-+  - $ref: /schemas/net/ethernet-controller.yaml#
-+
-+properties:
-+  compatible:
-+    const: amd,xgbe-seattle-v1a
-+
-+  reg:
-+    items:
-+      - description: MAC registers
-+      - description: PCS registers
-+      - description: SerDes Rx/Tx registers
-+      - description: SerDes integration registers (1/2)
-+      - description: SerDes integration registers (2/2)
-+
-+  interrupts:
-+    description: Device interrupts. The first entry is the general device
-+      interrupt. If amd,per-channel-interrupt is specified, each DMA channel
-+      interrupt must be specified. The last entry is the PCS auto-negotiation
-+      interrupt.
-+    minItems: 2
-+    maxItems: 6
-+
-+  clocks:
-+    items:
-+      - description: DMA clock for the device
-+      - description: PTP clock for the device
-+
-+  clock-names:
-+    items:
-+      - const: dma_clk
-+      - const: ptp_clk
-+
-+  iommus:
-+    maxItems: 1
-+
-+  phy-mode: true
-+
-+  dma-coherent: true
-+
-+  amd,per-channel-interrupt:
-+    description: Indicates that Rx and Tx complete will generate a unique
-+      interrupt for each DMA channel.
-+    type: boolean
-+
-+  amd,speed-set:
-+    description: >
-+      Speed capabilities of the device.
-+        0 = 1GbE and 10GbE
-+        1 = 2.5GbE and 10GbE
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    enum: [0, 1]
-+
-+  amd,serdes-blwc:
-+    description: Baseline wandering correction enablement for each speed.
-+    $ref: /schemas/types.yaml#/definitions/uint32-array
-+    minItems: 3
-+    maxItems: 3
-+    items:
-+      enum: [0, 1]
-+
-+  amd,serdes-cdr-rate:
-+    description: CDR rate speed selection for each speed.
-+    $ref: /schemas/types.yaml#/definitions/uint32-array
-+    items:
-+      - description: CDR rate for 1GbE
-+      - description: CDR rate for 2.5GbE
-+      - description: CDR rate for 10GbE
-+
-+  amd,serdes-pq-skew:
-+    description: PQ data sampling skew for each speed.
-+    $ref: /schemas/types.yaml#/definitions/uint32-array
-+    items:
-+      - description: PQ skew for 1GbE
-+      - description: PQ skew for 2.5GbE
-+      - description: PQ skew for 10GbE
-+
-+  amd,serdes-tx-amp:
-+    description: TX amplitude boost for each speed.
-+    $ref: /schemas/types.yaml#/definitions/uint32-array
-+    items:
-+      - description: TX amplitude for 1GbE
-+      - description: TX amplitude for 2.5GbE
-+      - description: TX amplitude for 10GbE
-+
-+  amd,serdes-dfe-tap-config:
-+    description: DFE taps available to run for each speed.
-+    $ref: /schemas/types.yaml#/definitions/uint32-array
-+    items:
-+      - description: DFE taps available for 1GbE
-+      - description: DFE taps available for 2.5GbE
-+      - description: DFE taps available for 10GbE
-+
-+  amd,serdes-dfe-tap-enable:
-+    description: DFE taps to enable for each speed.
-+    $ref: /schemas/types.yaml#/definitions/uint32-array
-+    items:
-+      - description: DFE taps to enable for 1GbE
-+      - description: DFE taps to enable for 2.5GbE
-+      - description: DFE taps to enable for 10GbE
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - clocks
-+  - clock-names
-+  - phy-mode
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    ethernet@e0700000 {
-+        compatible = "amd,xgbe-seattle-v1a";
-+        reg = <0xe0700000 0x80000>,
-+              <0xe0780000 0x80000>,
-+              <0xe1240800 0x00400>,
-+              <0xe1250000 0x00060>,
-+              <0xe1250080 0x00004>;
-+        interrupts = <0 325 4>,
-+                     <0 326 1>, <0 327 1>, <0 328 1>, <0 329 1>,
-+                     <0 323 4>;
-+        amd,per-channel-interrupt;
-+        clocks = <&xgbe_dma_clk>, <&xgbe_ptp_clk>;
-+        clock-names = "dma_clk", "ptp_clk";
-+        phy-mode = "xgmii";
-+        mac-address = [ 02 a1 a2 a3 a4 a5 ];
-+        amd,speed-set = <0>;
-+        amd,serdes-blwc = <1>, <1>, <0>;
-+        amd,serdes-cdr-rate = <2>, <2>, <7>;
-+        amd,serdes-pq-skew = <10>, <10>, <30>;
-+        amd,serdes-tx-amp = <15>, <15>, <10>;
-+        amd,serdes-dfe-tap-config = <3>, <3>, <1>;
-+        amd,serdes-dfe-tap-enable = <0>, <0>, <127>;
-+    };
-diff --git a/Documentation/devicetree/bindings/net/amd-xgbe.txt b/Documentation/devicetree/bindings/net/amd-xgbe.txt
-deleted file mode 100644
-index 9c27dfcd1133..000000000000
---- a/Documentation/devicetree/bindings/net/amd-xgbe.txt
-+++ /dev/null
-@@ -1,76 +0,0 @@
--* AMD 10GbE driver (amd-xgbe)
--
--Required properties:
--- compatible: Should be "amd,xgbe-seattle-v1a"
--- reg: Address and length of the register sets for the device
--   - MAC registers
--   - PCS registers
--   - SerDes Rx/Tx registers
--   - SerDes integration registers (1/2)
--   - SerDes integration registers (2/2)
--- interrupts: Should contain the amd-xgbe interrupt(s). The first interrupt
--  listed is required and is the general device interrupt. If the optional
--  amd,per-channel-interrupt property is specified, then one additional
--  interrupt for each DMA channel supported by the device should be specified.
--  The last interrupt listed should be the PCS auto-negotiation interrupt.
--- clocks:
--   - DMA clock for the amd-xgbe device (used for calculating the
--     correct Rx interrupt watchdog timer value on a DMA channel
--     for coalescing)
--   - PTP clock for the amd-xgbe device
--- clock-names: Should be the names of the clocks
--   - "dma_clk" for the DMA clock
--   - "ptp_clk" for the PTP clock
--- phy-mode: See ethernet.txt file in the same directory
--
--Optional properties:
--- dma-coherent: Present if dma operations are coherent
--- amd,per-channel-interrupt: Indicates that Rx and Tx complete will generate
--  a unique interrupt for each DMA channel - this requires an additional
--  interrupt be configured for each DMA channel
--- amd,speed-set: Speed capabilities of the device
--    0 - 1GbE and 10GbE (default)
--    1 - 2.5GbE and 10GbE
--
--The MAC address will be determined using the optional properties defined in
--ethernet.txt.
--
--The following optional properties are represented by an array with each
--value corresponding to a particular speed. The first array value represents
--the setting for the 1GbE speed, the second value for the 2.5GbE speed and
--the third value for the 10GbE speed.  All three values are required if the
--property is used.
--- amd,serdes-blwc: Baseline wandering correction enablement
--    0 - Off
--    1 - On
--- amd,serdes-cdr-rate: CDR rate speed selection
--- amd,serdes-pq-skew: PQ (data sampling) skew
--- amd,serdes-tx-amp: TX amplitude boost
--- amd,serdes-dfe-tap-config: DFE taps available to run
--- amd,serdes-dfe-tap-enable: DFE taps to enable
--
--Example:
--	xgbe@e0700000 {
--		compatible = "amd,xgbe-seattle-v1a";
--		reg = <0 0xe0700000 0 0x80000>,
--		      <0 0xe0780000 0 0x80000>,
--		      <0 0xe1240800 0 0x00400>,
--		      <0 0xe1250000 0 0x00060>,
--		      <0 0xe1250080 0 0x00004>;
--		interrupt-parent = <&gic>;
--		interrupts = <0 325 4>,
--			     <0 326 1>, <0 327 1>, <0 328 1>, <0 329 1>,
--			     <0 323 4>;
--		amd,per-channel-interrupt;
--		clocks = <&xgbe_dma_clk>, <&xgbe_ptp_clk>;
--		clock-names = "dma_clk", "ptp_clk";
--		phy-mode = "xgmii";
--		mac-address = [ 02 a1 a2 a3 a4 a5 ];
--		amd,speed-set = <0>;
--		amd,serdes-blwc = <1>, <1>, <0>;
--		amd,serdes-cdr-rate = <2>, <2>, <7>;
--		amd,serdes-pq-skew = <10>, <10>, <30>;
--		amd,serdes-tx-amp = <15>, <15>, <10>;
--		amd,serdes-dfe-tap-config = <3>, <3>, <1>;
--		amd,serdes-dfe-tap-enable = <0>, <0>, <127>;
--	};
--- 
-2.51.0
+
 
 
