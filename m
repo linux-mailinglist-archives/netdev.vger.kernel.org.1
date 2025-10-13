@@ -1,165 +1,217 @@
-Return-Path: <netdev+bounces-228672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6762BD1CFA
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 09:31:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4912BD1D07
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 09:33:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5A05B348ACF
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 07:31:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 139213C0457
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 07:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50BE12E8DFE;
-	Mon, 13 Oct 2025 07:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D3927934B;
+	Mon, 13 Oct 2025 07:32:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="mL8N1wCk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xJbukY1H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2332E8DE2
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:31:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA76274B42
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760340681; cv=none; b=sVpiiTgHZR1aMkyW6Ntr0y7p1EKxEa+leGrWBfcQkdl913aSR3RkzsB173A/XO7rbDHznxiHcoM6BsM5MIjmzbWjm0l2TX3bNbkrxK6GaPGPZyS+m5JULbeAsZ01RlekHG1tKbbRAr+mkUVlbkUlDUQSy6VR1gZnhN7bK4HGaIQ=
+	t=1760340727; cv=none; b=Z2bDVk+v/vdEYQimudLQKwXhLmN/IR8x4e6o2XCKr1qyw8u4pwXfuBwCggYKrGO57LYEDkIzipY6V8H7GMf520BmbsiSAnmKx9gu5swH3o9Nyxzt6fhbFCEgV2U8Zq99II4Ydn5CGAxZBVTk1ZdqbNUAkQZZFIOOqjvQbtmcwa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760340681; c=relaxed/simple;
-	bh=nQd1wpSadkiLWOBWBzuaZBnKqek/NdGGpG/QSpGtpkQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=HLGlecIwC03SpsYxgLzOZ+IWlyEXbB5ByrZkBSqORxPFPyu6t4gg0nA0cJ146ssd/Vx3mbe9g4VhiRKUGxkR3SwT2giandk9kyuudeQ8SzqgFsBHyEoGL+EBCI0KBtqfAIgl9EphZ2ccSswx0MUJ1yNbV4aMtYKJ5sCr5hE8C3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=mL8N1wCk; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20251013073111euoutp02a4885dec09ea81f5cb81162faf734f2a~t-IOF56dk2092720927euoutp02g
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:31:11 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20251013073111euoutp02a4885dec09ea81f5cb81162faf734f2a~t-IOF56dk2092720927euoutp02g
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1760340671;
-	bh=0C66lDNIsw7boeMvkI3nnrZCgoIXKGyjsWdc4rgF8EE=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=mL8N1wCkL8LSpTI9usNqZH6gXzCV2zL/i/7V9X7vcqQ3YL6mUwtsgNffuE3VYfDl3
-	 ZsZLmKsDKqilpX6FLDf1J1UC4+wKk2NX0QC+lJWMOnBozx8a2Uraa6UJreTXWEy6r9
-	 Ics67206t1pTNNAEfirpt9He7m+qGqFn39WED9Dw=
-Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20251013073110eucas1p2f1db1c771c1450842b0022966f21c4d0~t-INZxAM10776107761eucas1p2M;
-	Mon, 13 Oct 2025 07:31:10 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20251013073109eusmtip173e3c05d8ae051a2867cdde4986d79a8~t-IMEA6LU2984829848eusmtip1H;
-	Mon, 13 Oct 2025 07:31:08 +0000 (GMT)
-Message-ID: <0d5f2179-b89b-42b6-805d-6a50d2268eca@samsung.com>
-Date: Mon, 13 Oct 2025 09:31:08 +0200
+	s=arc-20240116; t=1760340727; c=relaxed/simple;
+	bh=YMQKWWAAQt92vmYhil6N6EMqmMZOmwO9jCJCjdjDPwE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hsjoKOeBgvCkYLRoDrDFZxhQlWYdBhJkQZ6yK76o0oiLS2SCf57RTyKEC3GmQDksmF1jau7dj895U/VKy99J1ZEUaOooW4Ind3V5wRa1EiEIBnUxILnEAMFJyIXTYGwTtWZCC+w2Wr/atdrjb+9txspjyodJRcQ2xhzgdLlT2HY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xJbukY1H; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-859b2ec0556so567261485a.0
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 00:32:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760340723; x=1760945523; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fp6EMRShrEhNA/zc4orOacczfa9hILYLF0zSnXNWJ7A=;
+        b=xJbukY1Hgtf723/EhwtG1soacm2tXXZc2PnqHf5zoh51PRODCEAfnD7qBTmPLi5AMG
+         YGY+CH25QU7rPTQQzLNU1R5GPiGLfw3wOpMY1tXv6pN/K5lg55lABV+SikO+o74n+YqG
+         c/iYwKZFkG6fyqEKk7XO7jcuZJ24MuxMN3tEilQUTMCCFt5gTJ2tf9JdqNY+s+Eyw7wf
+         Icr3exToug5Y4NeUIB8chTOXnOmxLVE80kEyfrYagB6+afb7xmtmqGY/elX2oTIzzeQ3
+         Jufh/I1ppQ0tiTauANCG11GWug7YK/H5jAVWsKcBTC0K498FRTUSlrTOooJkviM7Mewl
+         fsUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760340723; x=1760945523;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Fp6EMRShrEhNA/zc4orOacczfa9hILYLF0zSnXNWJ7A=;
+        b=VJK3udr9Zigbob8z9AJcL70OlS7nOF4ej7RalrrD1sorMd3NpcTE16vKSRg4gxm0xi
+         oqL9Hlh0y8UVSsQL2zcpnYoeiUtxwUaATxAWGwxJlnelSBOcCrlI8LRx63uK0Q0OZQAA
+         yCVn6raCofw02sLfmGAou0e8Qc3ukeLoRovSvY2w35XPmK1ur4EqLwd4mVbX2jiU32/n
+         CotFnIK3rP9Kr6yb8XCrr0ioUPKx72iK3qoP005cPOtS4JKN62+XsiTvrPvPEc4lJm5I
+         RmCOBUAfwQ6g1M57S9ShYNB4AdcVMSFlLMyWnAZXjlDWp+tinsHCunwxIwBo+rGnfOPc
+         Pc0A==
+X-Forwarded-Encrypted: i=1; AJvYcCVi0Ya0Gb/LS/+3GYwCJI6IoWx4uwqkVeZM+8RMJPq7OfJcNaRG9qHUvgmWDfbVaV8FkCA489s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQz1wbz9KRloXGkPoCk/dSNd29cOTW7ma9TWr/CfU61nQz5nm/
+	KldIVH2ClauvL4KLBnt5asnr2KIFXQuIXmgQ+o/fAZhEwcS2IZ62s1Ed8WB4VKjfj/ZC+iFz0GK
+	OVVig2Ij0fQH+TIDtSzFIh89Gwe384Pc2XzSilIsj
+X-Gm-Gg: ASbGncsXOh/NDdiNhdYDBuzlELCSEXbo8zQazYXNC1Yy7PNlRHRhZzJG00FMifZdDpZ
+	fOfNcf/aGB79v2o6u0TdJB2Fj2PVa40cjvoDmrW0uDuKL33XhiU+/zzzk/OAxg+d15JfFsHN9dg
+	vUczWYuPTAUJOoGDbAN7sLlHak1V2/kqcxvOvhi5wiQ6/fFQCaMM8jWoJPlTkaCHXIDr5gVza4L
+	Q0auPRMZoAGhWWxKNiagzuBo6Mlu8B99WznYa16SWQ=
+X-Google-Smtp-Source: AGHT+IFW3d4QvT3vimvh6cf456FIjNSkEAY/i7iqvjn6DVRKEb+C7qK/eBvTOtLF19plwteHdyuWTafZyHXYB5LfnH4=
+X-Received: by 2002:a05:622a:28b:b0:4e0:9097:a5ae with SMTP id
+ d75a77b69052e-4e6eacd8493mr314392321cf.22.1760340722401; Mon, 13 Oct 2025
+ 00:32:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Betterbird (Windows)
-Subject: Re: KMSAN: uninit-value in eth_type_trans
-To: Alexander Potapenko <glider@google.com>, Robin Murphy
-	<robin.murphy@arm.com>, Christoph Hellwig <hch@infradead.org>, Leon
-	Romanovsky <leonro@nvidia.com>, mhklinux@outlook.com
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com, Aleksandr
-	Nogikh <nogikh@google.com>
-Content-Language: en-US
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <CAG_fn=WUGta-paG1BgsGRoAR+fmuCgh3xo=R3XdzOt_-DqSdHw@mail.gmail.com>
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20251013073110eucas1p2f1db1c771c1450842b0022966f21c4d0
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20251008084433eucas1p2d50387b4147f88edb8de400dcf0b0a82
-X-EPHeader: CA
-X-CMS-RootMailID: 20251008084433eucas1p2d50387b4147f88edb8de400dcf0b0a82
-References: <20250925223656.1894710-1-nogikh@google.com>
-	<CAG_fn=U3Rjd_0zfCJE-vuU3Htbf2fRP_GYczdYjJJ1W5o30+UQ@mail.gmail.com>
-	<CGME20251008084433eucas1p2d50387b4147f88edb8de400dcf0b0a82@eucas1p2.samsung.com>
-	<CAG_fn=WUGta-paG1BgsGRoAR+fmuCgh3xo=R3XdzOt_-DqSdHw@mail.gmail.com>
+References: <20250926074033.1548675-1-xuanqiang.luo@linux.dev> <20250926074033.1548675-2-xuanqiang.luo@linux.dev>
+In-Reply-To: <20250926074033.1548675-2-xuanqiang.luo@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 13 Oct 2025 00:31:50 -0700
+X-Gm-Features: AS18NWDu76QxMqWFl0co_-djmn_p3UEoCDyJdLbE01KY7f7pO3sGwvsH0M73HRI
+Message-ID: <CANn89iJ15RFYq65t57sW=F1jZigbr5xTbPNLVY53cKtpMKLotA@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 1/3] rculist: Add hlist_nulls_replace_rcu()
+ and hlist_nulls_replace_init_rcu()
+To: xuanqiang.luo@linux.dev
+Cc: kuniyu@google.com, "Paul E. McKenney" <paulmck@kernel.org>, kerneljasonxing@gmail.com, 
+	davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org, 
+	Xuanqiang Luo <luoxuanqiang@kylinos.cn>, Frederic Weisbecker <frederic@kernel.org>, 
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 08.10.2025 10:43, Alexander Potapenko wrote:
-> On Tue, Oct 7, 2025 at 8:51 AM Alexander Potapenko <glider@google.com> wrote:
->> Folks, as far as I understand, dma_direct_sync_single_for_cpu() and
->> dma_direct_sync_single_for_device() are the places where we send data
->> to or from the device.
->> Should we add KMSAN annotations to those functions to catch infoleaks
->> and mark data from devices as initialized?
-> Something along the lines of:
+On Fri, Sep 26, 2025 at 12:41=E2=80=AFAM <xuanqiang.luo@linux.dev> wrote:
 >
-> ======================================
-> diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
-> index 0d37da3d95b65..7f59de19c1c87 100644
-> --- a/kernel/dma/swiotlb.c
-> +++ b/kernel/dma/swiotlb.c
-> @@ -42,6 +42,7 @@
->   #include <linux/string.h>
->   #include <linux/swiotlb.h>
->   #include <linux/types.h>
-> +#include <linux/kmsan-checks.h>
->   #ifdef CONFIG_DMA_RESTRICTED_POOL
->   #include <linux/of.h>
->   #include <linux/of_fdt.h>
-> @@ -903,10 +904,13 @@ static void swiotlb_bounce(struct device *dev,
-> phys_addr_t tlb_addr, size_t size
+> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 >
->                          local_irq_save(flags);
->                          page = pfn_to_page(pfn);
-> -                       if (dir == DMA_TO_DEVICE)
-> +                       if (dir == DMA_TO_DEVICE) {
-> +                               kmsan_check_highmem_page(page, offset, sz);
->                                  memcpy_from_page(vaddr, page, offset, sz);
-> -                       else
-> +                       } else {
-> +                               kmsan_unpoison_memory(vaddr, sz);
->                                  memcpy_to_page(page, offset, vaddr, sz);
-> +                       }
->                          local_irq_restore(flags);
+> Add two functions to atomically replace RCU-protected hlist_nulls entries=
+.
 >
->                          size -= sz;
-> @@ -915,8 +919,10 @@ static void swiotlb_bounce(struct device *dev,
-> phys_addr_t tlb_addr, size_t size
->                          offset = 0;
->                  }
->          } else if (dir == DMA_TO_DEVICE) {
-> +               kmsan_check_memory(phys_to_virt(orig_addr), size);
->                  memcpy(vaddr, phys_to_virt(orig_addr), size);
->          } else {
-> +               kmsan_unpoison_memory(vaddr, size);
->                  memcpy(phys_to_virt(orig_addr), vaddr, size);
->          }
->   }
-> ======================================
+> Keep using WRITE_ONCE() to assign values to ->next and ->pprev, as
+> mentioned in the patch below:
+> commit efd04f8a8b45 ("rcu: Use WRITE_ONCE() for assignments to ->next for
+> rculist_nulls")
+> commit 860c8802ace1 ("rcu: Use WRITE_ONCE() for assignments to ->pprev fo=
+r
+> hlist_nulls")
 >
-> should be conceptually right, but according to the comment in
-> swiotlb_tbl_map_single()
-> (https://protect2.fireeye.com/v1/url?k=837a6d67-dce15478-837be628-000babdfecba-aa25926458f9fd30&q=1&e=a3963b1b-328b-4f69-8ca5-ffd6fc777dd7&u=https%3A%2F%2Felixir.bootlin.com%2Flinux%2Fv6.17.1%2Fsource%2Fkernel%2Fdma%2Fswiotlb.c%23L1431),
-> that function is deliberately copying the buffer to the device, even
-> when it is uninitialized - and KMSAN actually started reporting that
-> when I applied the above patch.
+> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+> ---
+>  include/linux/rculist_nulls.h | 59 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 59 insertions(+)
 >
-> How should we handle this case?
-> Not adding the kmsan_check_memory() calls will solve the problem, but
-> there might be real infoleaks that we won't detect.
-> We could unpoison the buffer before passing it to
-> swiotlb_tbl_map_single() to ignore just the first infoleak on the
-> buffer.
-> Alternatively, we could require callers to always initialize the
-> buffer passed to swiotlb_tbl_map_single().
+> diff --git a/include/linux/rculist_nulls.h b/include/linux/rculist_nulls.=
+h
+> index 89186c499dd4..c26cb83ca071 100644
+> --- a/include/linux/rculist_nulls.h
+> +++ b/include/linux/rculist_nulls.h
+> @@ -52,6 +52,13 @@ static inline void hlist_nulls_del_init_rcu(struct hli=
+st_nulls_node *n)
+>  #define hlist_nulls_next_rcu(node) \
+>         (*((struct hlist_nulls_node __rcu __force **)&(node)->next))
+>
+> +/**
+> + * hlist_nulls_pprev_rcu - returns the dereferenced pprev of @node.
+> + * @node: element of the list.
+> + */
+> +#define hlist_nulls_pprev_rcu(node) \
+> +       (*((struct hlist_nulls_node __rcu __force **)(node)->pprev))
+> +
+>  /**
+>   * hlist_nulls_del_rcu - deletes entry from hash list without re-initial=
+ization
+>   * @n: the element to delete from the hash list.
+> @@ -152,6 +159,58 @@ static inline void hlist_nulls_add_fake(struct hlist=
+_nulls_node *n)
+>         n->next =3D (struct hlist_nulls_node *)NULLS_MARKER(NULL);
+>  }
+>
+> +/**
+> + * hlist_nulls_replace_rcu - replace an old entry by a new one
+> + * @old: the element to be replaced
+> + * @new: the new element to insert
+> + *
+> + * Description:
+> + * Replace the old entry with the new one in a RCU-protected hlist_nulls=
+, while
+> + * permitting racing traversals.
+> + *
+> + * The caller must take whatever precautions are necessary (such as hold=
+ing
+> + * appropriate locks) to avoid racing with another list-mutation primiti=
+ve, such
+> + * as hlist_nulls_add_head_rcu() or hlist_nulls_del_rcu(), running on th=
+is same
+> + * list.  However, it is perfectly legal to run concurrently with the _r=
+cu
+> + * list-traversal primitives, such as hlist_nulls_for_each_entry_rcu().
+> + */
+> +static inline void hlist_nulls_replace_rcu(struct hlist_nulls_node *old,
+> +                                          struct hlist_nulls_node *new)
+> +{
+> +       struct hlist_nulls_node *next =3D old->next;
+> +
+> +       WRITE_ONCE(new->next, next);
+> +       WRITE_ONCE(new->pprev, old->pprev);
+I do not think these two WRITE_ONCE() are needed.
 
-Well, I didn't consider swiotlb a special case so far. I did a simple 
-test with my PoC patch mentioned earlier in this thread with 
-'swiotlb=force' kernel parameter and I didn't observe any kmsan issues, 
-but I admin that this wasn't exhaustive test.
+At this point new is not yet visible.
 
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
+The following  rcu_assign_pointer() is enough to make sure prior
+writes are committed to memory.
 
+> +       rcu_assign_pointer(hlist_nulls_pprev_rcu(new), new);
+> +       if (!is_a_nulls(next))
+> +               WRITE_ONCE(next->pprev, &new->next);
+> +}
+> +
+> +/**
+> + * hlist_nulls_replace_init_rcu - replace an old entry by a new one and
+> + * initialize the old
+> + * @old: the element to be replaced
+> + * @new: the new element to insert
+> + *
+> + * Description:
+> + * Replace the old entry with the new one in a RCU-protected hlist_nulls=
+, while
+> + * permitting racing traversals, and reinitialize the old entry.
+> + *
+> + * Note: @old must be hashed.
+> + *
+> + * The caller must take whatever precautions are necessary (such as hold=
+ing
+> + * appropriate locks) to avoid racing with another list-mutation primiti=
+ve, such
+> + * as hlist_nulls_add_head_rcu() or hlist_nulls_del_rcu(), running on th=
+is same
+> + * list. However, it is perfectly legal to run concurrently with the _rc=
+u
+> + * list-traversal primitives, such as hlist_nulls_for_each_entry_rcu().
+> + */
+> +static inline void hlist_nulls_replace_init_rcu(struct hlist_nulls_node =
+*old,
+> +                                               struct hlist_nulls_node *=
+new)
+> +{
+> +       hlist_nulls_replace_rcu(old, new);
+> +       WRITE_ONCE(old->pprev, NULL);
+> +}
+> +
+>  /**
+>   * hlist_nulls_for_each_entry_rcu - iterate over rcu list of given type
+>   * @tpos:      the type * to use as a loop cursor.
+> --
+> 2.25.1
+>
 
