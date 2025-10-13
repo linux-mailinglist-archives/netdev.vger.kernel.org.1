@@ -1,140 +1,126 @@
-Return-Path: <netdev+bounces-228710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12584BD2E43
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 14:02:14 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2A29BD2E8F
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 14:08:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4091F189E054
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 12:02:32 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 657D54E446C
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 12:08:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA222475CF;
-	Mon, 13 Oct 2025 12:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFEC426CE2C;
+	Mon, 13 Oct 2025 12:08:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SsAxw18d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sj3cdaJf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B9F1F582B;
-	Mon, 13 Oct 2025 12:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAAF3231832
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 12:08:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760356919; cv=none; b=FYoJv8sLLDCFdXzKVuH/sSLfcBOYwuo5g0J1nwh6oW0t8wjoPOrVdvZVuHPrQEVhPcMGAfWrJkaQDBFjey0ESW/uJhjtkQ03iv7GHmmnFkiTObBvXdPI28H8k9irDtP+tZatxUi4MBJuLUR18aXfYYOVdwtdcm5wmz5YXSsuGf8=
+	t=1760357312; cv=none; b=RWxPIbc0K2pbjmMFwnpzc3ePDm7EkhninD9Rm2vuFxARwU5aWZYkeBSTyDBLT7Mn6mWaaQ18I7B4f4aumPv4GeBdAApgQvZQeyjYDHlpkgTmOqUQSGfvbHtaN/RTWXcWrbjng/MpyTek/PDEDfWyw8/7cHWKLFMGhwYwIXtlzEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760356919; c=relaxed/simple;
-	bh=enYvefS/Tikr/Df0tXu3N3tbv+xh83SSpDgp+gSP1uI=;
+	s=arc-20240116; t=1760357312; c=relaxed/simple;
+	bh=tcsXh5JauTahTEkpcNeAVyZhXtG2K93V43QkKfW9rh0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cnPqRnbX8cY+vtOe8MtbgHzUK70jGYlheWVWnC8Gj632tmXSUpvTlIvvhRS1vdiVvxUxviDUnGZ1SMfMgH1qNR/9LSEIfiI8SoAJAt7zuHrKS/vOKjYgI/pu3oUEtVLEO1cgrYKKI3iPUMo3KIDJCUhKDV7jHCVnvgb6lbXh/iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SsAxw18d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64BE4C4CEF8;
-	Mon, 13 Oct 2025 12:01:56 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Il8XrR+IRhaa4/SBr3InPB5lOo9OY3rxSJ3DCmpz36+61eeFBgL6Tw1psfAPDJXKW0aZ7TKlilrraRo2g81YPfg+/44p+T27SmPTqdQKpuFqDjRE4GyzZZ+5qclCdqRgLPmaeZvUtnXhxlnkR/aUg+QOyg/fmDMznYmOf6NoCE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sj3cdaJf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF4A2C4CEE7;
+	Mon, 13 Oct 2025 12:08:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760356918;
-	bh=enYvefS/Tikr/Df0tXu3N3tbv+xh83SSpDgp+gSP1uI=;
+	s=k20201202; t=1760357311;
+	bh=tcsXh5JauTahTEkpcNeAVyZhXtG2K93V43QkKfW9rh0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SsAxw18d3PhgxxvJaH7gROC84TX83T9iXdI0WW3ryh6GyGpvb2HybHDhYwaksZIIX
-	 OZHcBEKDRss5TPORXs4HIusjwGIcokEs6oLikvf3cf8zE+5SSOEkdI4IZB5rVm64w2
-	 I7yBw8baqbvGjLcIQUmuByGrjP3cGe6wcwDdn3ZrkvPMckqVMjHi59CMurDQtUn/Td
-	 8nrb6KA1wUnJoPtYa2lJiSqKU+DJBneu4qjVETnFv/2X3/bU0UQfnfvjiCovDKOC0v
-	 vGrMBaQ4CxRoBmEooLgLQ2uyj+ZsVUMqPaFxqd8qvZnTsxijPXBJ8CxyBHD26nBxHb
-	 v+EdaYr1041hg==
-Date: Mon, 13 Oct 2025 13:01:54 +0100
+	b=Sj3cdaJfvZ1p/oy3RgDCdKbF4z1GQMYSq/PnbW2+yPjo5zRHtqj3jx/TYmLPQIhan
+	 /mo4+VhsBZej9kXC9VM65VNS69DSEOqduGA8Hjqo+LS69fH7vdM/TvodgoaykgGROc
+	 A8ogbNbN/Px7ZDZ7O/RHD/LZkliWbXmDTvthZ2jJDAmyIs/vhiUNgQBjpOUDiAPSjQ
+	 a+GbBmBKikcagodHHXViZfBfRyOUvao3WzN3zIu1LZ3dszxnTfgAFwc2doDwBlUGfv
+	 7pt1UTDEAbwptYrC/1pMxAGGtP3UhPfYkyAeBCCgLR23EowuwEFuwzlwRifHyIL3SW
+	 8dWBsEWdpS6TA==
+Date: Mon, 13 Oct 2025 13:08:26 +0100
 From: Simon Horman <horms@kernel.org>
-To: Meghana Malladi <m-malladi@ti.com>
-Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
-Subject: Re: [PATCH net] net: ti: icssg-prueth: Fix fdb hash size
- configuration
-Message-ID: <aOzqMj1TbzJCZrRk@horms.kernel.org>
-References: <20251013085925.1391999-1-m-malladi@ti.com>
+To: luoxuanqiang <xuanqiang.luo@linux.dev>
+Cc: Jason Xing <kerneljasonxing@gmail.com>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, kuniyu@google.com,
+	"Paul E. McKenney" <paulmck@kernel.org>, netdev@vger.kernel.org,
+	Xuanqiang Luo <luoxuanqiang@kylinos.cn>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>
+Subject: Re: [PATCH net-next v7 1/3] rculist: Add hlist_nulls_replace_rcu()
+ and hlist_nulls_replace_init_rcu()
+Message-ID: <aOzrup9K8AE_dV28@horms.kernel.org>
+References: <20250926074033.1548675-1-xuanqiang.luo@linux.dev>
+ <20250926074033.1548675-2-xuanqiang.luo@linux.dev>
+ <f64b89b1-d01c-41d6-9158-e7c14d236d2d@redhat.com>
+ <zus4r4dgghmcyyj2bcjiprad4w666u4paqo3c5jgamr5apceje@zzdlbm75h5m5>
+ <CAL+tcoBy+8RvKXDB2V0mcJ3pOFsrXEsaNYM_o21bk2Q1cLiNSA@mail.gmail.com>
+ <71de19ef-6f63-47f5-b5ed-9eaef932439c@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251013085925.1391999-1-m-malladi@ti.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <71de19ef-6f63-47f5-b5ed-9eaef932439c@linux.dev>
 
-On Mon, Oct 13, 2025 at 02:29:25PM +0530, Meghana Malladi wrote:
-> The ICSSG driver does the initial FDB configuration which
-> includes setting the control registers. Other run time
-> management like learning is managed by the PRU's. The default
-> FDB hash size used by the firmware is 512 slots which is not
-> aligned with the driver's configuration. Update the driver
-> FDB config to fix it.
+On Mon, Oct 13, 2025 at 03:04:34PM +0800, luoxuanqiang wrote:
 > 
-> Fixes: abd5576b9c57f ("net: ti: icssg-prueth: Add support for ICSSG switch firmware")
-> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
-> ---
+> 在 2025/10/13 14:26, Jason Xing 写道:
+> > On Mon, Oct 13, 2025 at 1:36 PM Jiayuan Chen <jiayuan.chen@linux.dev> wrote:
+> > > On Tue, Sep 30, 2025 at 11:16:00AM +0800, Paolo Abeni wrote:
+> > > > On 9/26/25 9:40 AM, xuanqiang.luo@linux.dev wrote:
+> > > > > From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+> > > > > 
+> > > > > Add two functions to atomically replace RCU-protected hlist_nulls entries.
+> > > [...]
+> > > > > Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+> > > > This deserves explicit ack from RCU maintainers.
+> > > > 
+> > > > Since we are finalizing the net-next PR, I suggest to defer this series
+> > > > to the next cycle, to avoid rushing such request.
+> > > > 
+> > > > Thanks,
+> > > > 
+> > > > Paolo
+> > > Hi maintainers,
+> > > 
+> > > This patch was previously held off due to the merge window.
+> > > 
+> > > Now that the merge net-next has open and no further changes are required,
+> > > could we please consider merging it directly?
+> > > 
+> > > Apologies for the slight push, but I'm hoping we can get a formal
+> > > commit backported to our production branch.
+> > I suppose a new version that needs to be rebased is necessary.
+> > 
+> > Thanks,
+> > Jason
 > 
-> Please refer trm [1] 6.4.14.12.17 section
-> on how the FDB config register gets configured.
+> I’ve rebased the series of patches onto the latest codebase locally and
+> didn’t encounter any errors.
 > 
-> [1]: https://www.ti.com/lit/pdf/spruim2
+> If there’s anything else I can do to help get these patches merged, just
+> let me know.
 
-Thanks for the link!
-And thanks to TI for publishing this document.
+Hi,
 
-> 
->  drivers/net/ethernet/ti/icssg/icssg_config.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-> index da53eb04b0a4..3f8237c17d09 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-> @@ -66,6 +66,9 @@
->  #define FDB_GEN_CFG1		0x60
->  #define SMEM_VLAN_OFFSET	8
->  #define SMEM_VLAN_OFFSET_MASK	GENMASK(25, 8)
-> +#define FDB_HASH_SIZE_MASK	GENMASK(6, 3)
-> +#define FDB_HASH_SIZE_SHIFT	3
-> +#define FDB_HASH_SIZE		3
+The patch-set has been marked as "Deffered" in Patchwork.
+Presumably by Paolo in conjunction with his response above.
+As such the patch-set needs to be (rebased and) reposted in
+order for it to be considered by the maintainers again.
 
-I am slightly confused about this.
+I think the best practice is for this to happen _after_ one
+of the maintainers has sent an "ANN" email announcing that
+net-next has re-opened. I don't believe that has happened yet.
 
-The patch description says "The default FDB hash size used by the firmware
-is 512 slots which is not aligned with the driver's configuration."
-And above FDB_HASH_SIZE is 3, which is the value that the driver will
-now set hash size to.
-
-But table 6-1404 (on page 4049) of [1] describes 3 as setting
-the FDB hash size to 512 slots. I would have expected a different
-value based on my understanding of the patch description.
-
->  
->  #define FDB_GEN_CFG2		0x64
->  #define FDB_VLAN_EN		BIT(6)
-> @@ -463,6 +466,8 @@ void icssg_init_emac_mode(struct prueth *prueth)
->  	/* Set VLAN TABLE address base */
->  	regmap_update_bits(prueth->miig_rt, FDB_GEN_CFG1, SMEM_VLAN_OFFSET_MASK,
->  			   addr <<  SMEM_VLAN_OFFSET);
-> +	regmap_update_bits(prueth->miig_rt, FDB_GEN_CFG1, FDB_HASH_SIZE_MASK,
-> +			   FDB_HASH_SIZE << FDB_HASH_SIZE_SHIFT);
->  	/* Set enable VLAN aware mode, and FDBs for all PRUs */
->  	regmap_write(prueth->miig_rt, FDB_GEN_CFG2, (FDB_PRU0_EN | FDB_PRU1_EN | FDB_HOST_EN));
->  	prueth->vlan_tbl = (struct prueth_vlan_tbl __force *)(prueth->shram.va +
-> @@ -484,6 +489,8 @@ void icssg_init_fw_offload_mode(struct prueth *prueth)
->  	/* Set VLAN TABLE address base */
->  	regmap_update_bits(prueth->miig_rt, FDB_GEN_CFG1, SMEM_VLAN_OFFSET_MASK,
->  			   addr <<  SMEM_VLAN_OFFSET);
-> +	regmap_update_bits(prueth->miig_rt, FDB_GEN_CFG1, FDB_HASH_SIZE_MASK,
-> +			   FDB_HASH_SIZE << FDB_HASH_SIZE_SHIFT);
->  	/* Set enable VLAN aware mode, and FDBs for all PRUs */
->  	regmap_write(prueth->miig_rt, FDB_GEN_CFG2, FDB_EN_ALL);
->  	prueth->vlan_tbl = (struct prueth_vlan_tbl __force *)(prueth->shram.va +
-> 
-> base-commit: 68a052239fc4b351e961f698b824f7654a346091
-> -- 
-> 2.43.0
-> 
+Thanks!
 
