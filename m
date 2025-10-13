@@ -1,120 +1,122 @@
-Return-Path: <netdev+bounces-228951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BD6BBD6568
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 23:15:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A834BD6581
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 23:18:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5664A3A6A6F
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 21:15:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F5FE18A3E1E
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 21:18:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147382EACF9;
-	Mon, 13 Oct 2025 21:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5552525DAFF;
+	Mon, 13 Oct 2025 21:18:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f/+G99qZ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JQg7UOcP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896AC2DF144
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 21:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E751A9F9B;
+	Mon, 13 Oct 2025 21:18:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760390097; cv=none; b=jBwQJmHV9JCZ3lj2SFUPAR2b0/vu1TmzcBSmo2KgOdFgavexOiZWWl6cAB7PyFk+5CVH6sjEE2l9e/ylZpWO41CRI6uWg6FnOsLt0eJHUBfeHjwESgKSTx2vRkLqdi/I0vcpOB2ofImXdTxLKCVZCj5Uiyfmk1kjfh9yomryru0=
+	t=1760390307; cv=none; b=bghPMhV13/ZsnbB2AfeyJEONo1ayAUU+WRZYQKPj2QHQE4te9hrfLgbvpkQJxZRMr6zznpGCQxs77v855brwhRgaB/GTNYb8P4sTH3wcxsyjZorxTlhuKl42JPlGUlzobkHqVOj+x7GdYBmux2S/7HdWgFwPG231pxHwr56Ntxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760390097; c=relaxed/simple;
-	bh=I1AlkCMSPcd6QsGLGMY4OhQv5y3GApXtoxL4rrFTY1w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BPwk1grJU6GIcwIV3zkfv7JPvzlkuhIjAI4uACx82EtYvPPcYH1QUgMzLhV2RFGhyMVggSdrxiRywl04a6CDCqJbeOxL53RwWmHRSW7NnxZZ1lXMsJgT+LkkoMGi+cglcnnmcQbYqd8EHxD2AeeNnC4Xh7qgKP67RF2ivvP15HI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f/+G99qZ; arc=none smtp.client-ip=209.85.210.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7b7325d8fb5so3167014a34.1
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:14:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760390094; x=1760994894; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5EET3On04/X440jLtrVWK9FlWFxWzeiWWQFMJiADkVQ=;
-        b=f/+G99qZMEvuD39s+Ou3v5Iaz/liPAZ4OC4HpzuXupev8nnXltGSeIRHEezJJhPKXV
-         TOSJUSiqz/k3LZB/NiALXvtY4Ep6CmtVKk9HugKy4OKKMUhv8kzn0ce3NYAQLU3VpZpI
-         Q7fwi6Zi1nYO+F+2W7FGyiSJoVw+zL96Tp1GMz8NW7E5xO6D4hYtYPE/VUSWcqZx7Mrg
-         AWW/JHhATEahUGfojp2YolN8UPY5BoxeKQr3bOi3xKRjQtR1SuVdDNKtDwwlEyEyc4hl
-         VY38phYym8zSy4/QchVDw7Md3SLh0cN2jF3ZIU5ySTY7LQyOlCFkKFilEAJOuszziyKY
-         w9ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760390094; x=1760994894;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5EET3On04/X440jLtrVWK9FlWFxWzeiWWQFMJiADkVQ=;
-        b=ARBcUrsS/w+AwF/aNoTGzJstD1oBI915OhqXIPB5sYM6gWuD0N4zGqcqF+0daj0Jgt
-         dRcOydDmzzcDIuv2/jNIkmUc6IwjVmRiZRmKjzBlTRv01VULcQjsU8al45RRGCDfHpY6
-         YAAfrJNicLxVrlIPeW3xhrShdPN39PDW+lwTlJm8th4TuN4H1M+Fps+/5u0W9OhJ1qSo
-         AtQJ94YsDNWSQUE4mrQ2+AsXqPRsxJ6hvv4DiCb7jirgOqD2DiAV/uwjOIXBHvSQs+6y
-         UBuZ8j23k83i4HaWxiKcTjLwN8BwZhZqhqc//vQWd/RRWFLAMf2Rla9ktjhsyGe2QCr4
-         EPZw==
-X-Forwarded-Encrypted: i=1; AJvYcCXIfzruXpCY4ryY8B5bTmZaOC9qqvu583CpEahMyO9G3UBEjjGDAAHNHWPnOFoBKDqvgODOlgs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6kVB1P2r0Hk9xFaC90oL9uT/s5F1a7eAvQDWKHfG+HKUutn5j
-	X7omV7H15p6uTmItz1mHbeRPBR54Fhk3/dd4AdCTOjbqSYTJ9Y0vWtBn
-X-Gm-Gg: ASbGncspWMwzy4Sc4cVsgPNIAGEMnqHywnL98B3pQHaGT2FIm+JcW5RgxbeuDmzRj0T
-	V/z0WJqQOcrAAwGdP2XgsGcU3bfStoAWFB7gWSbTuhLmTtGq2etkKHz2orJUs11ZxU1jRbYtk6K
-	t8lKiO9OliALw22A6cU1tllpPNUMQKMIdmgAk6NkQojlHOKdmfXEIZjxSQ7lWNIj7j3xoYlKEPG
-	j8cEXrggyz9wBexARU5dlsGwHMZnSexOmXbcQ+lTeHXdENEdkntmC/CsIGCcL4Db3nxwu4e3PHi
-	u+CcMU7wknV5uauxA9XiIYx6VpOVVnvzIWDDN//mLUnLzEHgKfLWRMhQpu9XI9k2SwfhAkHNPaB
-	cosNFkvQCmntiTGPOzBinHXMIvbuworaq3JwE8s/BIrybn9l/s/IelqYvN1E=
-X-Google-Smtp-Source: AGHT+IGlV9QreRk7sl+y9midcquqXDhVtVvLUtKMfpYsZPkxOe1iAVWvBSXmw4UlNTr2SUToUZi/TQ==
-X-Received: by 2002:a05:6830:601a:b0:7b4:1768:ff31 with SMTP id 46e09a7af769-7c0df7a739fmr12217234a34.25.1760390094642;
-        Mon, 13 Oct 2025 14:14:54 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:72::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7c0f911a389sm3833082a34.25.2025.10.13.14.14.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Oct 2025 14:14:53 -0700 (PDT)
-From: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next 2/2] net: fbnic: Allow builds for all 64 bit architectures
-Date: Mon, 13 Oct 2025 14:14:49 -0700
-Message-ID: <20251013211449.1377054-3-dimitri.daskalakis1@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251013211449.1377054-1-dimitri.daskalakis1@gmail.com>
-References: <20251013211449.1377054-1-dimitri.daskalakis1@gmail.com>
+	s=arc-20240116; t=1760390307; c=relaxed/simple;
+	bh=uXXDGa1owQP24cyB5MLZe1wz0OCG8r5FaFOJi2R4CKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=drwjuYkhYvg5M9MHKulXszqN2HGw+m3BSEE4EzHQKJT2rXSpgrx3VWfnNRmvPOJ0wpBXJcET6y0a6EvvW+0rD1XxCbn2CsQ6EuH0b498TNG7VzSdXl5oLJ9glG0RX1sI3n+OczZiEfYatFEMobh0GqjlBQ0pzFApff/dtGfgmqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JQg7UOcP; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=52Il5H6NJOzRW4MLc6CVrFe1BNlv8DrhxyPngZJSTT4=; b=JQ
+	g7UOcP1bSPR5/N4Lr7BdxKe++6n3JhL6Nc1WUgPtrTbiz6swJdfh8wnOo5LaHn0IMncR3Q9XodtYf
+	KUQbiOQ0jBm51nE+Yjq3WwnyLfDFQtduqIADALn+x8O7VWUX5dk/W50a9mCcprJkfD+Ni1bqDTbvE
+	DzZ5V5Rb7AfVPz0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v8Pvs-00Aq9L-65; Mon, 13 Oct 2025 23:18:16 +0200
+Date: Mon, 13 Oct 2025 23:18:16 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: brcm,bcm54xx: add binding
+ for Broadcom Ethernet PHYs
+Message-ID: <6eb4e9ba-51ad-4ee4-af74-49a9bea617f0@lunn.ch>
+References: <20251013202944.14575-1-zajec5@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251013202944.14575-1-zajec5@gmail.com>
 
-This enables aarch64 testing, but there's no reason we cannot support other
-architectures.
+On Mon, Oct 13, 2025 at 10:29:43PM +0200, Rafał Miłecki wrote:
+> From: Rafał Miłecki <rafal@milecki.pl>
+> 
+> Some network devices (e.g. access points) come with BCM54210E PHY that
+> requires being set into master mode to work properly.
+> 
+> Add binding for BCM54210E as found in Luxul AP devices (600d:84a6) and
+> the "brcm,master-mode" property.
 
-Signed-off-by: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Is there anything broadcom about master mode? I assume this is just
+the usual prefer master:
+
+ethtool -s eth42 [master-slave preferred-master|preferred-slave|forced-master|forced-slave]
+
+Also, is this preferred-master or forced-master?
+
+Humm, also how does this differ to ethernet-phy.yaml:
+
+ timing-role:
+    $ref: /schemas/types.yaml#/definitions/string
+    enum:
+      - forced-master
+      - forced-slave
+      - preferred-master
+      - preferred-slave
+    description: |
+      Specifies the timing role of the PHY in the network link. This property is
+      required for setups where the role must be explicitly assigned via the
+      device tree due to limitations in hardware strapping or incorrect strap
+      configurations.
+      It is applicable to Single Pair Ethernet (1000/100/10Base-T1) and other
+      PHY types, including 1000Base-T, where it controls whether the PHY should
+      be a master (clock source) or a slave (clock receiver).
+
+      - 'forced-master': The PHY is forced to operate as a master.
+      - 'forced-slave': The PHY is forced to operate as a slave.
+      - 'preferred-master': Prefer the PHY to be master but allow negotiation.
+      - 'preferred-slave': Prefer the PHY to be slave but allow negotiation.
+
+	Andrew
+
+    Andrew
+
 ---
- drivers/net/ethernet/meta/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/meta/Kconfig b/drivers/net/ethernet/meta/Kconfig
-index 3ba527514f1e..dff51f23d295 100644
---- a/drivers/net/ethernet/meta/Kconfig
-+++ b/drivers/net/ethernet/meta/Kconfig
-@@ -19,7 +19,7 @@ if NET_VENDOR_META
- 
- config FBNIC
- 	tristate "Meta Platforms Host Network Interface"
--	depends on X86_64 || COMPILE_TEST
-+	depends on 64BIT || COMPILE_TEST
- 	depends on !S390
- 	depends on MAX_SKB_FRAGS < 22
- 	depends on PCI_MSI
--- 
-2.47.3
-
+pw-bot: cr
 
