@@ -1,244 +1,117 @@
-Return-Path: <netdev+bounces-228858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0239ABD5604
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 19:09:28 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEBD7BD567A
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 19:13:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 017DB3E4C88
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 16:40:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7A3824FCFDA
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 16:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3AB62BE7BA;
-	Mon, 13 Oct 2025 16:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D41502882D6;
+	Mon, 13 Oct 2025 16:51:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X53QfW+I"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="sUr4Q2S/"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B95296BBC
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 16:40:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B54296BD4;
+	Mon, 13 Oct 2025 16:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760373651; cv=none; b=FLYtuDEW+pQP5i+hl1tVwIx7wOEogBpSb3H/62pm/lBq9975A3aADjG88jtq4e8XuAYQuArYwUO46G5gP7YZNha1IG3jw0Wjag8pzB+KVT9JN2AYuiNKerhEjMu/hqaWJeD1XSDYDJWeUrcGyFX+iMDHwmf8+c1o+uF9tgrxN0Q=
+	t=1760374308; cv=none; b=qAiMwLoyL8ySCdJbXMHSq6m7O7S0S2Ef5Ng3NA7/hCOstsKmOVD0mxHyJYnJ2KkK39KAcd7uTGotrKSViXXEyrFA5RKyjsbLe2s+dpICoOqIljK/Rc0ARAezRK/6glGo6V4kIoFvrK63WT2JALpe3yaA/rbdgfBiUUVEI7lWoqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760373651; c=relaxed/simple;
-	bh=sN7m7KVtFP1O6UMDR1mCq5KvZmUG+2AyD9HcCn9BHzk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y234ZuN+Ym7mVrYHiSTNsMfidgC6KMakGBZA0blqxYkc6Ymk2CfbY6wIzYsnXx/778Mr6KD1IT22/A/4E6WKbCy78SZlvdkH4S02SqGB8X4Jqd5BfXxoLmdwIFdOTsAlf3mM0hgtFi6KlI1DCIMY0qvcqMOARpvIsFPRIB5+zZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X53QfW+I; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760373643;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Xr1xLID5gomdkQtccCZ4HHd+IBsFKVqD/prj31TJZnk=;
-	b=X53QfW+IPT36daDXqxSkJ9/GguRsk/1Ep03WReFIZuTCxROBWdN5oTBjdS/x2HbeBzUbDK
-	3Pbh/cmeqVJuM3JPuxmxAfs6XOfuA60aQRChAMQVZPFJmwlVBHKhymGswIBmQkSpplZ22W
-	kR442kZmCMXOaqPWICYZl/BJBl1rZ9w=
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-To: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1760374308; c=relaxed/simple;
+	bh=etctfT5bJS7hMdWOBeKKV/EXgbxxnq1nm3ffRaajVQ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oU4D8zfoMuxKzGVx6Euhl9liftxQsKdv6NLyYbct3EsDSBO2fStRy49bwbQKSFUyJ1cTC1J1X9LYSZy9PxFXaGvZvsvTvogG4IcxwEiWP2sSU8B2WvXI+Oi3YDuI1quomqD8Y9yNcKuuDNN4ujumROUj/qdD06Luxyl29PqnyaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=sUr4Q2S/; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1760374303;
+	bh=etctfT5bJS7hMdWOBeKKV/EXgbxxnq1nm3ffRaajVQ4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=sUr4Q2S/PPM/95hQPr5I57QevO5qM/XqZH6T5QJz2/fRkiUoefmK7iRp2hUgHmH0M
+	 mhFpfl2qq0Wjdf1g73UJ4X5ejEdihoZvS57TU+YoJcJMDmIklUbStAVPHzmlLEJbu/
+	 JK5wjCqqQeTuOegDplsrZtaoB6bLipoMl1Y5XQR1zDgbJBJWdzKtQ8PUqWaBgqZrUF
+	 yAaT0JWQbvV+LKK1uGN4lo/MbSx+aymi90xs5iBX6VXgYXLcH/i5flO5cU8S4E4jkQ
+	 O+YWuHlObDE2VXWK4Qbspf1eultdq9g94uec1diMdOdCHO8laObbFgkRJYorfeO1uW
+	 XZtLhKPFNO04g==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 9C60F60075;
+	Mon, 13 Oct 2025 16:50:35 +0000 (UTC)
+Received: by x201s (Postfix, from userid 1000)
+	id 836782011CC; Mon, 13 Oct 2025 16:50:18 +0000 (UTC)
+From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Igor Russkikh <irusskikh@marvell.com>,
-	Egor Pomozov <epomozov@marvell.com>,
-	Potnuri Bharat Teja <bharat@chelsio.com>,
-	Dimitris Michailidis <dmichail@fungible.com>,
-	Jian Shen <shenjian15@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jijie Shao <shaojijie@huawei.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-	Paul Barker <paul@pbarker.dev>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	MD Danish Anwar <danishanwar@ti.com>,
-	Roger Quadros <rogerq@kernel.org>
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Daniel Zahka <daniel.zahka@gmail.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Joe Damato <jdamato@fastly.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Willem de Bruijn <willemb@google.com>,
+	bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [PATCH net-next 14/14] net: hns3: move hns3pf to use hwtstamp callbacks
-Date: Mon, 13 Oct 2025 16:39:23 +0000
-Message-ID: <20251013163923.5078-1-vadim.fedorenko@linux.dev>
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/6] tools: ynl-gen: generate flags better
+Date: Mon, 13 Oct 2025 16:49:57 +0000
+Message-ID: <20251013165005.83659-1-ast@fiberby.net>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Adopt hns3pf to use .ndo_hwtstamp_get()/.ndo_hwtstamp_set()
-callbacks.
+This series focusses on increasing the quality of
+the C code generated by ynl-gen for flags.
 
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
----
- .../hisilicon/hns3/hns3pf/hclge_main.c        | 13 +++-----
- .../hisilicon/hns3/hns3pf/hclge_ptp.c         | 32 +++++++++++--------
- .../hisilicon/hns3/hns3pf/hclge_ptp.h         |  9 ++++--
- 3 files changed, 28 insertions(+), 26 deletions(-)
+NB: I included a note in patch 6, on usage of the private
+NETDEV_XDP_ACT_MASK in user-space.
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index 9d34d28ff168..81d3bdc098e6 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -9445,15 +9445,8 @@ static int hclge_do_ioctl(struct hnae3_handle *handle, struct ifreq *ifr,
- 	struct hclge_vport *vport = hclge_get_vport(handle);
- 	struct hclge_dev *hdev = vport->back;
- 
--	switch (cmd) {
--	case SIOCGHWTSTAMP:
--		return hclge_ptp_get_cfg(hdev, ifr);
--	case SIOCSHWTSTAMP:
--		return hclge_ptp_set_cfg(hdev, ifr);
--	default:
--		if (!hdev->hw.mac.phydev)
--			return hclge_mii_ioctl(hdev, ifr, cmd);
--	}
-+	if (!hdev->hw.mac.phydev)
-+		return hclge_mii_ioctl(hdev, ifr, cmd);
- 
- 	return phy_mii_ioctl(hdev->hw.mac.phydev, ifr, cmd);
- }
-@@ -12901,6 +12894,8 @@ static const struct hnae3_ae_ops hclge_ops = {
- 	.get_dscp_prio = hclge_get_dscp_prio,
- 	.get_wol = hclge_get_wol,
- 	.set_wol = hclge_set_wol,
-+	.hwtstamp_get = hclge_ptp_get_cfg,
-+	.hwtstamp_set = hclge_ptp_set_cfg,
- };
- 
- static struct hnae3_ae_algo ae_algo = {
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-index 4bd52eab3914..0081c5281455 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-@@ -204,13 +204,17 @@ static int hclge_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
- 	return 0;
- }
- 
--int hclge_ptp_get_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
-+int hclge_ptp_get_cfg(struct hnae3_handle *handle,
-+		      struct kernel_hwtstamp_config *config)
- {
-+	struct hclge_vport *vport = hclge_get_vport(handle);
-+	struct hclge_dev *hdev = vport->back;
-+
- 	if (!test_bit(HCLGE_STATE_PTP_EN, &hdev->state))
- 		return -EOPNOTSUPP;
- 
--	return copy_to_user(ifr->ifr_data, &hdev->ptp->ts_cfg,
--		sizeof(struct hwtstamp_config)) ? -EFAULT : 0;
-+	*config = hdev->ptp->ts_cfg;
-+	return 0;
- }
- 
- static int hclge_ptp_int_en(struct hclge_dev *hdev, bool en)
-@@ -269,7 +273,7 @@ static int hclge_ptp_cfg(struct hclge_dev *hdev, u32 cfg)
- 	return ret;
- }
- 
--static int hclge_ptp_set_tx_mode(struct hwtstamp_config *cfg,
-+static int hclge_ptp_set_tx_mode(struct kernel_hwtstamp_config *cfg,
- 				 unsigned long *flags, u32 *ptp_cfg)
- {
- 	switch (cfg->tx_type) {
-@@ -287,7 +291,7 @@ static int hclge_ptp_set_tx_mode(struct hwtstamp_config *cfg,
- 	return 0;
- }
- 
--static int hclge_ptp_set_rx_mode(struct hwtstamp_config *cfg,
-+static int hclge_ptp_set_rx_mode(struct kernel_hwtstamp_config *cfg,
- 				 unsigned long *flags, u32 *ptp_cfg)
- {
- 	int rx_filter = cfg->rx_filter;
-@@ -332,7 +336,7 @@ static int hclge_ptp_set_rx_mode(struct hwtstamp_config *cfg,
- }
- 
- static int hclge_ptp_set_ts_mode(struct hclge_dev *hdev,
--				 struct hwtstamp_config *cfg)
-+				 struct kernel_hwtstamp_config *cfg)
- {
- 	unsigned long flags = hdev->ptp->flags;
- 	u32 ptp_cfg = 0;
-@@ -359,9 +363,12 @@ static int hclge_ptp_set_ts_mode(struct hclge_dev *hdev,
- 	return 0;
- }
- 
--int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
-+int hclge_ptp_set_cfg(struct hnae3_handle *handle,
-+		      struct kernel_hwtstamp_config *config,
-+		      struct netlink_ext_ack *extack)
- {
--	struct hwtstamp_config cfg;
-+	struct hclge_vport *vport = hclge_get_vport(handle);
-+	struct hclge_dev *hdev = vport->back;
- 	int ret;
- 
- 	if (!test_bit(HCLGE_STATE_PTP_EN, &hdev->state)) {
-@@ -369,16 +376,13 @@ int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr)
- 		return -EOPNOTSUPP;
- 	}
- 
--	if (copy_from_user(&cfg, ifr->ifr_data, sizeof(cfg)))
--		return -EFAULT;
--
--	ret = hclge_ptp_set_ts_mode(hdev, &cfg);
-+	ret = hclge_ptp_set_ts_mode(hdev, config);
- 	if (ret)
- 		return ret;
- 
--	hdev->ptp->ts_cfg = cfg;
-+	hdev->ptp->ts_cfg = *config;
- 
--	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
-+	return 0;
- }
- 
- int hclge_ptp_get_ts_info(struct hnae3_handle *handle,
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-index 61faddcc3dd0..0162fa5ac146 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h
-@@ -62,7 +62,7 @@ struct hclge_ptp {
- 	unsigned long flags;
- 	void __iomem *io_base;
- 	struct ptp_clock_info info;
--	struct hwtstamp_config ts_cfg;
-+	struct kernel_hwtstamp_config ts_cfg;
- 	spinlock_t lock;	/* protects ptp registers */
- 	u32 ptp_cfg;
- 	u32 last_tx_seqid;
-@@ -133,8 +133,11 @@ bool hclge_ptp_set_tx_info(struct hnae3_handle *handle, struct sk_buff *skb);
- void hclge_ptp_clean_tx_hwts(struct hclge_dev *hdev);
- void hclge_ptp_get_rx_hwts(struct hnae3_handle *handle, struct sk_buff *skb,
- 			   u32 nsec, u32 sec);
--int hclge_ptp_get_cfg(struct hclge_dev *hdev, struct ifreq *ifr);
--int hclge_ptp_set_cfg(struct hclge_dev *hdev, struct ifreq *ifr);
-+int hclge_ptp_get_cfg(struct hnae3_handle *handle,
-+		      struct kernel_hwtstamp_config *config);
-+int hclge_ptp_set_cfg(struct hnae3_handle *handle,
-+		      struct kernel_hwtstamp_config *config,
-+		      struct netlink_ext_ack *extack);
- int hclge_ptp_init(struct hclge_dev *hdev);
- void hclge_ptp_uninit(struct hclge_dev *hdev);
- int hclge_ptp_get_ts_info(struct hnae3_handle *handle,
+Asbjørn Sloth Tønnesen (6):
+  tools: ynl-gen: bitshift the flag values in the generated code
+  tools: ynl-gen: refactor render-max enum generation
+  tools: ynl-gen: use uapi mask definition in NLA_POLICY_MASK
+  tools: ynl-gen: add generic p_wrap() helper
+  tools: ynl-gen: construct bitflag masks in generated headers
+  tools: ynl-gen: allow custom naming of render-max definitions
+
+ Documentation/netlink/genetlink-c.yaml        |  3 +
+ Documentation/netlink/genetlink-legacy.yaml   |  3 +
+ .../userspace-api/netlink/c-code-gen.rst      |  7 +-
+ include/uapi/linux/dpll.h                     |  6 +-
+ .../uapi/linux/ethtool_netlink_generated.h    | 20 ++---
+ include/uapi/linux/netdev.h                   | 34 ++++----
+ net/psp/psp-nl-gen.h                          |  4 +-
+ tools/include/uapi/linux/netdev.h             | 34 ++++----
+ tools/net/ynl/pyynl/lib/nlspec.py             |  7 +-
+ tools/net/ynl/pyynl/ynl_gen_c.py              | 79 +++++++++++--------
+ 10 files changed, 117 insertions(+), 80 deletions(-)
+
 -- 
-2.47.3
+2.51.0
 
 
