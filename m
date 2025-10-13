@@ -1,210 +1,180 @@
-Return-Path: <netdev+bounces-228882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AD1DBD576B
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 19:23:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE485BD5668
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 19:12:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88FBC426638
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:12:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1CC41896773
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:13:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A6222C0F96;
-	Mon, 13 Oct 2025 17:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B295298CC0;
+	Mon, 13 Oct 2025 17:12:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b="eyLEq8e0"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XQ1UEGnM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49CE29D266;
-	Mon, 13 Oct 2025 17:11:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F191021B9DE;
+	Mon, 13 Oct 2025 17:12:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760375511; cv=none; b=cSiR9s72t3V5rqp0TvkpXsVNxLpIOMBHoo30/ML21Vhhn9sSUNcrmvsyUNZTx++ApRvusNEPqE3JyBj5uUT0Hp1HjghyhLmhH/5YtaKHSxDAQovKOZVkmD7CgvZrOx3eYkJEo0Of7y2MxuYKEGxkYdYzBW312EvRy2R2tWHIf6o=
+	t=1760375556; cv=none; b=MzwJCck0Cxs4J4jmp18peFfRJLFxzrFnQQ/LF46ZI3Pkrk5PlDhZXm5BQJL4ioXb+/3rDP0GCxsm0kg3wfLvDiEisRKVEG5fN6NJNHB0PUqyy+Ci5QYFBOBSYgu+tFGUTfNb526+Segwt1DSmHcnUEA4CbT12Me2ozFjS6YKee8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760375511; c=relaxed/simple;
-	bh=40CFjh9kzA9585REHD+cA2lYowQDDOU8sCgEpVNrgYM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LDy+U6Uci1J51TIhNCGlbyHNdOYF/BBkxQozU7FPLXfYlxl8kRxlvHu9ulp5eKa84diXXtlxsjWEN869fiHVaM+XuXWl/ZBg0krj3XVtMXGpzCwxAWrwxD/tajc0hgb6AvRy7dGF9w03esoW1cSdS6Iz/cVfZC1qJ8/5AWHO9u0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz; spf=pass smtp.mailfrom=listout.xyz; dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b=eyLEq8e0; arc=none smtp.client-ip=80.241.56.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=listout.xyz
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4clkQy4k8Tz9tQS;
-	Mon, 13 Oct 2025 19:11:38 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=listout.xyz; s=MBO0001;
-	t=1760375498;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3wOr6yUFCcqirizRFMqUeU95gmF6JtVB3tD/YiBrl5s=;
-	b=eyLEq8e0zwq7q1RjPRySRc4b6mZTc5fcaHVaUopkm66qJlDOVuYfLay8kf71/Dm/iNFgHu
-	cHkuYBMF3DlzMUS8Q3lHvEs5vB6XDzyra4rQnyUFSGQRO6S1AyY7dfoWvbnsRlxkzlS5G4
-	zgzDghCo87CXTvOQztMSVt12BoxU7ddMq2BMiJkN9IG0WBWs7q+aIL/4xIi3lLmcknRnBL
-	ZbvpzuVVmvqpYZ2NhZ421WmGDDQRBdDll4iH2ueourg4dIfqWBKxkeYurftTR6NqfjhlIn
-	BotItPmc9oKj8yzYimBbUqBIQoloBbytVsvXJ52wOU65UkGY+NaJSZChnF01Tw==
-From: Brahmajit Das <listout@listout.xyz>
-To: syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
-Cc: listout@listout.xyz,
-	andrii@kernel.org,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	davem@davemloft.net,
-	eddyz87@gmail.com,
-	edumazet@google.com,
-	haoluo@google.com,
-	horms@kernel.org,
-	john.fastabend@gmail.com,
-	jolsa@kernel.org,
-	kpsingh@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	sdf@fomichev.me,
-	song@kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	yonghong.song@linux.dev,
-	Menglong Dong <menglong.dong@linux.dev>,
-	Sahil Chandna <chandna.linuxkernel@gmail.com>
-Subject: [PATCH v2] bpf: avoid sleeping in invalid context during sock_map_delete_elem path
-Date: Mon, 13 Oct 2025 22:41:22 +0530
-Message-ID: <20251013171122.1403859-1-listout@listout.xyz>
-In-Reply-To: <68af9b2b.a00a0220.2929dc.0008.GAE@google.com>
-References: <68af9b2b.a00a0220.2929dc.0008.GAE@google.com>
+	s=arc-20240116; t=1760375556; c=relaxed/simple;
+	bh=717BLPS8TqcgpzXR0dY5x7Gybl2tsULmLFysiGQrXNI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gTZu0oveoMvHHpeuFfTbBuWT9MUk2QYdYjlz6cWjVHjHEsxjXGR0wm2e+iWMqPdvK3WifLcr+hUtWRGPesgiigvAMMFkU+zPjbO7zQlM4wxoXMtZ2R8FZqZ23vIDlkDwBjoVj33JZ3OcbuML8yy3o8rHMSjaTySzIe6keL1dcUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XQ1UEGnM; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=z2hdWZ0thhVkXt2TsbVzmKj2YSVerRKfrQUAEPsjG+o=; b=XQ1UEGnMfggLK+U6HoAn11DmZo
+	ekyxdCXIzLKTYI2Au0FY3mbbQnkS6GVQTS7ot3OGcG+6Wd1nlzssyMW4Zp4XlzftNkvJ8mlefYNUx
+	fO8N+LUXigXqrGqI14BFslaizX/UaKuqxPohopAutXpO2qxy8/Pv50UPglC/gG2mA0LktVjyJyTe7
+	9gwx1d45jZj4FljtiKV4Qqe88h3SIwB+aKSDYbcVQAuJwRCkC1LiCo3zdwiO4mi4/Gd/74Y4jXtPj
+	dE6V9PmIJXALUrAOOxIR9733nd77noaGmhdhCZu/EejZVSYO9kXrtmecdINUi8XNfvyPT11Hx73kQ
+	ICXTbfuA==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1v8M63-0000000Dzof-3PUA;
+	Mon, 13 Oct 2025 17:12:31 +0000
+Message-ID: <572c425e-d29d-43e5-930f-4be7220e89fc@infradead.org>
+Date: Mon, 13 Oct 2025 10:12:30 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 06/24] net: clarify the meaning of
+ netdev_config members
+To: Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Donald Hunter <donald.hunter@gmail.com>,
+ Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Joshua Washington
+ <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
+ Jian Shen <shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
+ Jijie Shao <shaojijie@huawei.com>, Sunil Goutham <sgoutham@marvell.com>,
+ Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
+ <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
+ Bharat Bhushan <bbhushan2@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Alexander Duyck <alexanderduyck@fb.com>,
+ kernel-team@meta.com, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Joe Damato <joe@dama.to>, David Wei <dw@davidwei.uk>,
+ Willem de Bruijn <willemb@google.com>, Mina Almasry
+ <almasrymina@google.com>, Breno Leitao <leitao@debian.org>,
+ Dragos Tatulea <dtatulea@nvidia.com>, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
+ Jonathan Corbet <corbet@lwn.net>
+References: <cover.1760364551.git.asml.silence@gmail.com>
+ <fa4a6200c614f9f6652624b03e46b3bfa2539a72.1760364551.git.asml.silence@gmail.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <fa4a6200c614f9f6652624b03e46b3bfa2539a72.1760364551.git.asml.silence@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-The syzkaller report exposed a BUG: “sleeping function called from
-invalid context” in sock_map_delete_elem, which happens when
-`bpf_test_timer_enter()` disables preemption but the delete path later
-invokes a sleeping function while still in that context. Specifically:
+Hi,
 
-- The crash trace shows `bpf_test_timer_enter()` acquiring a
-  preempt_disable path (via t->mode == NO_PREEMPT), but the symmetric
-  release path always calls migrate_enable(), mismatching the earlier
-  disable.
-- As a result, preemption remains disabled across the
-  sock_map_delete_elem path, leading to a sleeping call under an invalid
-  context. :contentReference[oaicite:0]{index=0}
+On 10/13/25 7:54 AM, Pavel Begunkov wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> 
+> hds_thresh and hds_config are both inside struct netdev_config
+> but have quite different semantics. hds_config is the user config
+> with ternary semantics (on/off/unset). hds_thresh is a straight
+> up value, populated by the driver at init and only modified by
+> user space. We don't expect the drivers to have to pick a special
+> hds_thresh value based on other configuration.
+> 
+> The two approaches have different advantages and downsides.
+> hds_thresh ("direct value") gives core easy access to current
+> device settings, but there's no way to express whether the value
+> comes from the user. It also requires the initialization by
+> the driver.
+> 
+> hds_config ("user config values") tells us what user wanted, but
+> doesn't give us the current value in the core.
+> 
+> Try to explain this a bit in the comments, so at we make a conscious
+> choice for new values which semantics we expect.
+> 
+> Move the init inside ethtool_ringparam_get_cfg() to reflect the semantics.
+> Commit 216a61d33c07 ("net: ethtool: fix ethtool_ringparam_get_cfg()
+> returns a hds_thresh value always as 0.") added the setting for the
+> benefit of netdevsim which doesn't touch the value at all on get.
+> Again, this is just to clarify the intention, shouldn't cause any
+> functional change.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> [pavel: applied clarification on relationship b/w HDS thresh and config]
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+>  include/net/netdev_queues.h | 20 ++++++++++++++++++--
+>  net/ethtool/common.c        |  3 ++-
+>  2 files changed, 20 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
+> index cd00e0406cf4..9d5dde36c2e5 100644
+> --- a/include/net/netdev_queues.h
+> +++ b/include/net/netdev_queues.h
+> @@ -6,11 +6,27 @@
+>  
+>  /**
+>   * struct netdev_config - queue-related configuration for a netdev
+> - * @hds_thresh:		HDS Threshold value.
+> - * @hds_config:		HDS value from userspace.
+>   */
+>  struct netdev_config {
+> +	/* Direct value
+> +	 *
+> +	 * Driver default is expected to be fixed, and set in this struct
+> +	 * at init. From that point on user may change the value. There is
+> +	 * no explicit way to "unset" / restore driver default. Used only
+> +	 * when @hds_config is set.
+> +	 */
+> +	/** @hds_thresh: HDS Threshold value (ETHTOOL_A_RINGS_HDS_THRESH).
+> +	 */
+>  	u32	hds_thresh;
+> +
+> +	/* User config values
+> +	 *
+> +	 * Contain user configuration. If "set" driver must obey.
+> +	 * If "unset" driver is free to decide, and may change its choice
+> +	 * as other parameters change.
+> +	 */
+> +	/** @hds_config: HDS enabled (ETHTOOL_A_RINGS_TCP_DATA_SPLIT).
+> +	 */
+>  	u8	hds_config;
+>  };
 
-To fix this, normalize the disable/enable pairing: always use
-migrate_disable()/migrate_enable() regardless of t->mode. This ensures
-that we never remain with preemption disabled unintentionally when
-entering the delete path, and avoids invalid-context sleeping.
+kernel-doc comments should being with
+/**
+on a separate line. This will prevent warnings like these new ones:
 
-Reported-by: syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=1f1fbecb9413cdbfbef8
-Suggested-by: Yonghong Song <yonghong.song@linux.dev>
-Suggested-by: Menglong Dong <menglong.dong@linux.dev>
-Co-authored-by: Sahil Chandna <chandna.linuxkernel@gmail.com>
-Signed-off-by: Brahmajit Das <listout@listout.xyz>
----
-Changes in v2:
-        - remove enum { NO_PREEMPT, NO_MIGRATE } mode
-        - Using rcu_read_lock_dont_migrate/rcu_read_unlock_migrate
+Warning: include/net/netdev_queues.h:36 struct member 'hds_thresh' not described in 'netdev_config'
+Warning: include/net/netdev_queues.h:36 struct member 'hds_config' not described in 'netdev_config'
+Warning: include/net/netdev_queues.h:36 struct member 'rx_buf_len' not described in 'netdev_config'
 
-Changes in v1:
-        - Changes on top of Sahil's initial work based on feedback from
-        Yonghong's. i.e. remove NO_PREEMPT/NO_MIGRATE in test_run.c and use
-        migrate_disable()/migrate_enable() universally.
-        Link: https://lore.kernel.org/all/d0fdced7-a9a5-473e-991f-4f5e4c13f616@linux.dev/
+(but there are 4 variables that this applies to. I don't know why kernel-doc.py
+only reported 3 of them.)
 
-Please also find Sahil's v2 patch:
-        Link: https://lore.kernel.org/all/20251010075923.408195-1-chandna.linuxkernel@gmail.com/T/
----
- net/bpf/test_run.c | 21 ++++++---------------
- 1 file changed, 6 insertions(+), 15 deletions(-)
 
-diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-index dfb03ee0bb62..83f97ee34419 100644
---- a/net/bpf/test_run.c
-+++ b/net/bpf/test_run.c
-@@ -29,7 +29,6 @@
- #include <trace/events/bpf_test_run.h>
- 
- struct bpf_test_timer {
--	enum { NO_PREEMPT, NO_MIGRATE } mode;
- 	u32 i;
- 	u64 time_start, time_spent;
- };
-@@ -37,11 +36,7 @@ struct bpf_test_timer {
- static void bpf_test_timer_enter(struct bpf_test_timer *t)
- 	__acquires(rcu)
- {
--	rcu_read_lock();
--	if (t->mode == NO_PREEMPT)
--		preempt_disable();
--	else
--		migrate_disable();
-+	rcu_read_lock_dont_migrate();
- 
- 	t->time_start = ktime_get_ns();
- }
-@@ -51,11 +46,7 @@ static void bpf_test_timer_leave(struct bpf_test_timer *t)
- {
- 	t->time_start = 0;
- 
--	if (t->mode == NO_PREEMPT)
--		preempt_enable();
--	else
--		migrate_enable();
--	rcu_read_unlock();
-+	rcu_read_unlock_migrate();
- }
- 
- static bool bpf_test_timer_continue(struct bpf_test_timer *t, int iterations,
-@@ -374,7 +365,7 @@ static int bpf_test_run_xdp_live(struct bpf_prog *prog, struct xdp_buff *ctx,
- 
- {
- 	struct xdp_test_data xdp = { .batch_size = batch_size };
--	struct bpf_test_timer t = { .mode = NO_MIGRATE };
-+	struct bpf_test_timer t = {};
- 	int ret;
- 
- 	if (!repeat)
-@@ -404,7 +395,7 @@ static int bpf_test_run(struct bpf_prog *prog, void *ctx, u32 repeat,
- 	struct bpf_prog_array_item item = {.prog = prog};
- 	struct bpf_run_ctx *old_ctx;
- 	struct bpf_cg_run_ctx run_ctx;
--	struct bpf_test_timer t = { NO_MIGRATE };
-+	struct bpf_test_timer t = {};
- 	enum bpf_cgroup_storage_type stype;
- 	int ret;
- 
-@@ -1377,7 +1368,7 @@ int bpf_prog_test_run_flow_dissector(struct bpf_prog *prog,
- 				     const union bpf_attr *kattr,
- 				     union bpf_attr __user *uattr)
- {
--	struct bpf_test_timer t = { NO_PREEMPT };
-+	struct bpf_test_timer t = {};
- 	u32 size = kattr->test.data_size_in;
- 	struct bpf_flow_dissector ctx = {};
- 	u32 repeat = kattr->test.repeat;
-@@ -1445,7 +1436,7 @@ int bpf_prog_test_run_flow_dissector(struct bpf_prog *prog,
- int bpf_prog_test_run_sk_lookup(struct bpf_prog *prog, const union bpf_attr *kattr,
- 				union bpf_attr __user *uattr)
- {
--	struct bpf_test_timer t = { NO_PREEMPT };
-+	struct bpf_test_timer t = {};
- 	struct bpf_prog_array *progs = NULL;
- 	struct bpf_sk_lookup_kern ctx = {};
- 	u32 repeat = kattr->test.repeat;
 -- 
-2.51.0
+~Randy
 
 
