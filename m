@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-228807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E961BD3F3F
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:14:42 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C31AABD433F
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:29:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B64B18863D9
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:12:04 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 94C254FB167
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C3830C35C;
-	Mon, 13 Oct 2025 14:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D845B314D25;
+	Mon, 13 Oct 2025 14:54:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HCSNwkhy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jF5dvbjA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8897030505B
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED27230C63D
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760367263; cv=none; b=F4KpADgpScLn3g3u12tZv7rTw/Il/E0BB4U2Nwv1vyE/muyyAifri35L0ZqhbFtnfYtw0POVovfGTM7rvjnqT9SIB4KUONMNHOb0b96vL+rbprYvN5njyGRU+JL1Vg8EUN3CQ0fV2YF9aWzdDVNZyKjqJCqd89TZuoApgeoCJ00=
+	t=1760367264; cv=none; b=cs5OHlp1XnQFtVQn46b/i+QzM3z6E7GGbcieMbn7BsC3Y9mzIil5Le27XoYdcJht0gujvoR1DhzQj8tw0XkmI4LyQdzTTFpMOmIgh06X3NlCoc/D6ADr5F0XW2c2avMsHuPfNef/CspXmwJx9ewN6MqUc1qOp7VVJKszAWcTHPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760367263; c=relaxed/simple;
-	bh=6TDEsZ/d+ZchQ+YUtQq30RN8kN900flDr/OsMOpvjtI=;
+	s=arc-20240116; t=1760367264; c=relaxed/simple;
+	bh=4xjnwpDHCO8jZOH0dDAJ859tN+yDaKjmXPpzturFAHM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=t1Re6zOGBzywJRVhs5X98dAxa03EZW2svxtQSN/6+vh5rpnFNAR5cllFKNBuT+McmdxgUGFKep2T/tjjIYtcAtJxxGNWVLJDYu3bfFOGR6K8933txg8t57XuYaKOZ654qFU9jPHInHUyE/J2FbBFylHeOrHyf4PqaoGwIjrlulA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HCSNwkhy; arc=none smtp.client-ip=209.85.219.74
+	 To:Cc:Content-Type; b=Nzmhy+F3wqqD4tc+o8fPoSDJ4lapikEvAMveBzIl1X832+JfQyyJ4sDX/60ZWIcAcU58vWWnH+8EDxmj+hG3/Gl5+cS5rm7ZRx8o9apOWqmE17CIdwUd02y09yxXDxQ5V+iE92ruQNTVsPTWZuSWM8RDbd6UjR7nI2ymGBBsC6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jF5dvbjA; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-81a8065daf4so131371936d6.0
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:54:21 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-7811685b417so39731807b3.1
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:54:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760367260; x=1760972060; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760367262; x=1760972062; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UAJC/elBYbN9mFiyODP7E7f/su0W1hYJfJY8so7cXa0=;
-        b=HCSNwkhySu4NXg2SXjv35yukQGdALQvMFZuhawTrUm1hfIXdBIII22LGAdTqKYxb1p
-         u0qkf9QDFLiGfplaJyml2+EFLn8G43uhWwbL5RPJH2lm+EEAT7Zh2W9eQxDLdI4rXSTQ
-         qvTPeAjMLnKkuA2GhrlsE0X2g6Mq9oKQOYGM1dysoB9ujuVdL65/Pk9lq1jxxzEuk/34
-         OtD+/TcUYtvLv+eMkfCJek8lWNhFBeDtsF313S0McgpCJO9m98vdW7q+72SwqpwempRj
-         wNgR/Us85PZX5524AczolOyBrY5XdM+1PSj2e9IoWVgiP9x9ft0wPc8565cdoCd4/nEJ
-         PTwA==
+        bh=jBTJqKDiqADcC4DXZyV5q7f1a5fG8ExfroHN1cYdpm4=;
+        b=jF5dvbjAPE1vdWdolv6mnNI34RSJlcbUbexx5yKpF6xY1jvQtY6fYAUoS1482BmTkc
+         pxs1gdikKmJEdt6stu8tRhnKNGOIBVFTSZgj5Nyh8ZM6RIiyvvhXU/2rYGWwgoECtRiN
+         NkwcJCmf8OPgyWMXacLDZfqDhhpE6v+jziVoMWBJepN5KoFONnfNMHnJHz1EZ3eAMQ0b
+         i3kpb4xd99eKT2GivPEGi3/N0WyPQVhRO44sdk9yyn4uIc7fiyFwolAEQ5ukN9HLXVEl
+         3csqQeoxxsf2K7HGIrrBY7/5oGpNCCpRVBUyi2LNJLDXH0AnH8ffNXFjiyspA53qRdyl
+         5inw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760367260; x=1760972060;
+        d=1e100.net; s=20230601; t=1760367262; x=1760972062;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UAJC/elBYbN9mFiyODP7E7f/su0W1hYJfJY8so7cXa0=;
-        b=txJROSfRllyviE+DV4hIakcKye69KaTQw1YL9j79a4ThXiTrPZ0pY4Mg90n5CQfY3i
-         LT3iHunYFqWK4a1PMbGXslugpItrAPCM5Ublckh2/rI6YI667qpc2usKOPObDAsknyxC
-         nJfKo/KRi51T9yrhkFN0KeXI+16ay1pavu4CTz2q6Ixz/3pi1mTKsx1Jzr+nnPfDhzCu
-         nwH7dtl6zGABq+jV/T9vlTc9DAIOiXI8PpEaLEFLqN/FLg7XLGkNFByYOHEBMbJXbPkJ
-         BvO/4hgeE1gDkBFC/aW5w86fMSgkArtg7JIRFBS6w2uA3gtzIgLuBW51TDA2A0pD7NBi
-         Ni0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUpXcSEKOf7GWYVdHxYevlpxXlaiHX+lRNYELr/Yrlwzhgl8L3PTvEkzF5fl8EG4JqcwpA2bkc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhmRF95PwCGkX9qZVkNbD/h6OuAyLfHvfiez7ZYKd+G1lKKVQs
-	8z67/tlWb2OArDNAEzB5bqLEi595+AK5v4pPo9hhAx+24zIx1E+m21yz2ELpLWqPZFP4YA82lK1
-	HMGZa28iHozyK2g==
-X-Google-Smtp-Source: AGHT+IGF97zkY8g1nSw7MH5pA88MkNTr6JSO3YWACqv8LK/WR5NZr4Slb0242tRrtc8jhwav9W4Be03StI32bg==
-X-Received: from qtko17.prod.google.com ([2002:a05:622a:1391:b0:4b7:a698:dea7])
+        bh=jBTJqKDiqADcC4DXZyV5q7f1a5fG8ExfroHN1cYdpm4=;
+        b=AP3DStZvgIoANY0QexJD2sWeY0FOpnQBozAgTHpIbpngCGQzyvxv4h48xRWIqHq1th
+         daW/1j2P8lmvD/Cg2Bosq6d6FbPsyQ+S1pmcW6eQmfIFT90wdVlYZGYvazUWUw0AUrWT
+         eOvF7b6xSRjZRhndt1cxnAATJqT88gtMxiLtk05Z2W4TA85OhFcm1xQ76CcDSBhL9RkD
+         yhSm1zarILzGywuDcIjYKGHIvhISeFXU4vno28sIEUSwE/hAlh5i8SnXnTkg071alGhj
+         BRG+vLiTKgwZomtIzPEybibt6A9b6gbCcXDQwa2kUiRdMSeZdKqqXOZiDLk4OfewJEV2
+         pZrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV0vf4JkNRuRJcJGj8Q2xc+axMM7YodAqW4tJ2n/jUM2T70yZwBGMseNIpgcrquJtqf0UMyLTc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzp0gsHE+76dqae7hY3dMyMea77MNxLmKUt4HxLZW5TXkY+aMux
+	N8y9r8B/wf0zEeAh+AQe/NJPXmwpjxTWUUQOhLN/pZ7A/1PstUvjRCL+6ikbbTd07U54BCIktb5
+	8mu4dHi2NVs+z9w==
+X-Google-Smtp-Source: AGHT+IG947YWuCFP4OUIYR0LkYqXV8YmQ/QB3gxK8NR7VU7zWh4B5WD7/DPA/YlhmKo4S77AdwKj3/V1RvL2Og==
+X-Received: from ywbeo19.prod.google.com ([2002:a05:690c:2c13:b0:744:417d:fb23])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:4814:b0:4b5:dc7c:a6ef with SMTP id d75a77b69052e-4e6ead57ffcmr294427571cf.50.1760367260310;
- Mon, 13 Oct 2025 07:54:20 -0700 (PDT)
-Date: Mon, 13 Oct 2025 14:54:12 +0000
+ 2002:a05:690c:e0a:b0:773:e84f:ece8 with SMTP id 00721157ae682-780e1659b17mr197262747b3.14.1760367261801;
+ Mon, 13 Oct 2025 07:54:21 -0700 (PDT)
+Date: Mon, 13 Oct 2025 14:54:13 +0000
 In-Reply-To: <20251013145416.829707-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251013145416.829707-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.0.740.g6adb054d12-goog
-Message-ID: <20251013145416.829707-2-edumazet@google.com>
-Subject: [PATCH v1 net-next 1/5] net: add add indirect call wrapper in skb_release_head_state()
+Message-ID: <20251013145416.829707-3-edumazet@google.com>
+Subject: [PATCH v1 net-next 2/5] net/sched: act_mirred: add loop detection
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -85,40 +85,153 @@ Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-While stress testing UDP senders on a host with expensive indirect
-calls, I found cpus processing TX completions where showing
-a very high cost (20%) in sock_wfree() due to
-CONFIG_MITIGATION_RETPOLINE=y.
+Commit 0f022d32c3ec ("net/sched: Fix mirred deadlock on device recursion")
+added code in the fast path, even when act_mirred is not used.
 
-Take care of TCP and UDP TX destructors and use INDIRECT_CALL_3() macro.
+Prepare its revert by implementing loop detection in act_mirred.
+
+Adds an array of device pointers in struct netdev_xmit.
+
+tcf_mirred_is_act_redirect() can detect if the array
+already contains the target device.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/skbuff.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ include/linux/netdevice_xmit.h |  9 ++++-
+ net/sched/act_mirred.c         | 62 +++++++++++++---------------------
+ 2 files changed, 31 insertions(+), 40 deletions(-)
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index bc12790017b0b5c0be99f8fb9d362b3730fa4eb0..692e3a70e75ed14786a67d72bc2ebc0282eee2be 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -1136,7 +1136,16 @@ void skb_release_head_state(struct sk_buff *skb)
- 	skb_dst_drop(skb);
- 	if (skb->destructor) {
- 		DEBUG_NET_WARN_ON_ONCE(in_hardirq());
--		skb->destructor(skb);
-+#ifdef CONFIG_INET
-+		INDIRECT_CALL_3(skb->destructor,
-+				tcp_wfree, __sock_wfree, sock_wfree,
-+				skb);
-+#else
-+		INDIRECT_CALL_1(skb->destructor,
-+				sock_wfree,
-+				skb);
-+
+diff --git a/include/linux/netdevice_xmit.h b/include/linux/netdevice_xmit.h
+index 813a19122ebbb2c6a04176330b1055b7c2b9c902..cc232508e695eefe95ea6e55a21978be11d5da83 100644
+--- a/include/linux/netdevice_xmit.h
++++ b/include/linux/netdevice_xmit.h
+@@ -2,6 +2,12 @@
+ #ifndef _LINUX_NETDEVICE_XMIT_H
+ #define _LINUX_NETDEVICE_XMIT_H
+ 
++#if IS_ENABLED(CONFIG_NET_ACT_MIRRED)
++#define MIRRED_NEST_LIMIT	4
 +#endif
++
++struct net_device;
++
+ struct netdev_xmit {
+ 	u16 recursion;
+ 	u8  more;
+@@ -9,7 +15,8 @@ struct netdev_xmit {
+ 	u8  skip_txqueue;
+ #endif
+ #if IS_ENABLED(CONFIG_NET_ACT_MIRRED)
+-	u8 sched_mirred_nest;
++	u8			sched_mirred_nest;
++	struct net_device	*sched_mirred_dev[MIRRED_NEST_LIMIT];
+ #endif
+ #if IS_ENABLED(CONFIG_NF_DUP_NETDEV)
+ 	u8 nf_dup_skb_recursion;
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index 5f01f567c934d3669d9a3058cff861a8fe5f88b6..f27b583def78e4afecc7112854b93d59c2520201 100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -29,31 +29,6 @@
+ static LIST_HEAD(mirred_list);
+ static DEFINE_SPINLOCK(mirred_list_lock);
+ 
+-#define MIRRED_NEST_LIMIT    4
+-
+-#ifndef CONFIG_PREEMPT_RT
+-static u8 tcf_mirred_nest_level_inc_return(void)
+-{
+-	return __this_cpu_inc_return(softnet_data.xmit.sched_mirred_nest);
+-}
+-
+-static void tcf_mirred_nest_level_dec(void)
+-{
+-	__this_cpu_dec(softnet_data.xmit.sched_mirred_nest);
+-}
+-
+-#else
+-static u8 tcf_mirred_nest_level_inc_return(void)
+-{
+-	return current->net_xmit.sched_mirred_nest++;
+-}
+-
+-static void tcf_mirred_nest_level_dec(void)
+-{
+-	current->net_xmit.sched_mirred_nest--;
+-}
+-#endif
+-
+ static bool tcf_mirred_is_act_redirect(int action)
+ {
+ 	return action == TCA_EGRESS_REDIR || action == TCA_INGRESS_REDIR;
+@@ -439,44 +414,53 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
+ {
+ 	struct tcf_mirred *m = to_mirred(a);
+ 	int retval = READ_ONCE(m->tcf_action);
+-	unsigned int nest_level;
++	struct netdev_xmit *xmit;
+ 	bool m_mac_header_xmit;
+ 	struct net_device *dev;
+-	int m_eaction;
++	int i, m_eaction;
+ 	u32 blockid;
+ 
+-	nest_level = tcf_mirred_nest_level_inc_return();
+-	if (unlikely(nest_level > MIRRED_NEST_LIMIT)) {
++#ifdef CONFIG_PREEMPT_RT
++	xmit = &current->net_xmit;
++#else
++	xmit = this_cpu_ptr(&softnet_data.xmit);
++#endif
++	if (unlikely(xmit->sched_mirred_nest >= MIRRED_NEST_LIMIT)) {
+ 		net_warn_ratelimited("Packet exceeded mirred recursion limit on dev %s\n",
+ 				     netdev_name(skb->dev));
+-		retval = TC_ACT_SHOT;
+-		goto dec_nest_level;
++		return TC_ACT_SHOT;
  	}
- #if IS_ENABLED(CONFIG_NF_CONNTRACK)
- 	nf_conntrack_put(skb_nfct(skb));
+ 
+ 	tcf_lastuse_update(&m->tcf_tm);
+ 	tcf_action_update_bstats(&m->common, skb);
+ 
+ 	blockid = READ_ONCE(m->tcfm_blockid);
+-	if (blockid) {
+-		retval = tcf_blockcast(skb, m, blockid, res, retval);
+-		goto dec_nest_level;
+-	}
++	if (blockid)
++		return tcf_blockcast(skb, m, blockid, res, retval);
+ 
+ 	dev = rcu_dereference_bh(m->tcfm_dev);
+ 	if (unlikely(!dev)) {
+ 		pr_notice_once("tc mirred: target device is gone\n");
+ 		tcf_action_inc_overlimit_qstats(&m->common);
+-		goto dec_nest_level;
++		return retval;
+ 	}
++	for (i = 0; i < xmit->sched_mirred_nest; i++) {
++		if (xmit->sched_mirred_dev[i] != dev)
++			continue;
++		pr_notice_once("tc mirred: loop on device %s\n",
++			       netdev_name(dev));
++		tcf_action_inc_overlimit_qstats(&m->common);
++		return retval;
++	}
++
++	xmit->sched_mirred_dev[xmit->sched_mirred_nest++] = dev;
+ 
+ 	m_mac_header_xmit = READ_ONCE(m->tcfm_mac_header_xmit);
+ 	m_eaction = READ_ONCE(m->tcfm_eaction);
+ 
+ 	retval = tcf_mirred_to_dev(skb, m, dev, m_mac_header_xmit, m_eaction,
+ 				   retval);
+-
+-dec_nest_level:
+-	tcf_mirred_nest_level_dec();
++	xmit->sched_mirred_nest--;
+ 
+ 	return retval;
+ }
 -- 
 2.51.0.740.g6adb054d12-goog
 
