@@ -1,61 +1,73 @@
-Return-Path: <netdev+bounces-228716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D503BD3004
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 14:35:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BE9ABD3031
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 14:36:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D26EE189E421
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 12:35:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 610A53C5506
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 12:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17E5D26561D;
-	Mon, 13 Oct 2025 12:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5491925BEE5;
+	Mon, 13 Oct 2025 12:36:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zs6dms55"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jfru59pM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A4A22A7E5;
-	Mon, 13 Oct 2025 12:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB09B267714
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 12:36:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760358912; cv=none; b=JqCDq1IpmU8Vv+I4aSbhxe2GRh+bP+WV8ETv15XLtfRI51Gwqlfk/bKEXlFO99L1mjnIsKJwbnYvlAuetZ7ItZlNJ/5YoC/EV+cjiJv1KHfM8iFryqsog4QA0H4EG7EKqkaSY8b/qbez5BFTvZgdbV+n8X45p6I/RGe6G8fE9V0=
+	t=1760358974; cv=none; b=r7DG/higs5guFztR72xmwhG8EaoLLnBt3md0Hkf6IEJGuqERgSp2CXvpA0GscAR0mK8fRO5W/AewL+rzwjqdNC91cg1jkv6lsz4cvNXx5K+Rs5rGmGgrCO+j1SgDu7pguNkYFBqJLytOWjmeRVY7tSLbKJ8csyT6BWeD6LZdRTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760358912; c=relaxed/simple;
-	bh=J7z2lg6KO9CfV5PrQzpW29+4wNZgsDdQxb+OUBTCSKw=;
+	s=arc-20240116; t=1760358974; c=relaxed/simple;
+	bh=tvpkuIhyHlF2GYoB4RvQsCMgyMuCSfSXzKmG4p2lsow=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qz9LfMJ2ciOKnugXN1Cjr+EXRH4r0jMkGv3FJIwa3gjGlUpWn/9pvU4jewtL3qyy8ZAO3nqiKWuZM1+X/WlHbLGfpQC3Xn+S8KgQFdjG82uLzoViCclg+JLBgfuZPsPIZ/dBA4HvPbmoLPGTdpYP3qhOtCcuqpVzcEdnvLpG8Kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zs6dms55; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EAC9C4CEE7;
-	Mon, 13 Oct 2025 12:35:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760358911;
-	bh=J7z2lg6KO9CfV5PrQzpW29+4wNZgsDdQxb+OUBTCSKw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Zs6dms55P2YpofhTi+/MHBPFOsSQVtEGACA3/xMdq0hTsUl/GGd1SyRQPLM0l8Vkg
-	 tfw4q/4cEIkHHnUsTd47dd3tv+pwTwQ457SY6cqwr3tSLx2IBTGyjOEcd87v2VAc+o
-	 gOiJRbiwdSVKoAbf4qfKHVVPjpT2wpdeAN0E+KN2V781jJpp84xMN+ThrW4w+7hV5k
-	 RiFOmOdBXme24Vjuf7pFEG6Zj9hCf6nDA0ZfIXMdhxue2T9cqNtS/jXDHxDHTwmRSA
-	 TLwNVnL20NNSpB8ESQYfVsKWxnfO2qBvD3VkLuiOuYA/BZwtMTuE/yYiQxRnXvSqhU
-	 HUlhPFWaSoeoA==
-Date: Mon, 13 Oct 2025 13:35:07 +0100
-From: Simon Horman <horms@kernel.org>
-To: Michal Pecio <michal.pecio@gmail.com>
-Cc: Petko Manolov <petkan@nucleusys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZkZ+h0F12YGZoWqlHNwGCDVC1bODTrqdfHFckNZsjHxDIz653Pbd+L+kqie6M5X6RJOy8RbRM+uU2IBkT56zz37jA2jIWB0GWv04XcR1ucQZo1fDJALugzqRET4BiK8fU1uecHtimsD1rnDfTZZA0LuDGCBlcWsaKrfnC1oxTfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jfru59pM; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=711VVvRV946xKTh/O+1tuL2juF3oeljtpIu2zz5ku2o=; b=jfru59pMvD1BawADGHW5vgPNM3
+	3uPhzIyek/aNBsm7Q054zscRygOXRhYbzfGnascHIFoV/dPB1BsRT56Y8oL7eq0oVmlLSZ5q8yzGL
+	iPJrbuugh/qmKiMQhTm/LOwvtLWLpB3JoxPU1rwg82ntq3Pt/G8IVNMC6Mx/vCMQTbVI16rkqgGcf
+	CmmguMjysp191i3ygJDm63aTiM18VKNveVWxAMmsy6eDKUWlJE3yHeiSDpfb0E4QDB8gPt18sDd72
+	hnZAfIJOXJS462egKZPuvaHRgmcPQvYxipvpPSENPCyA8TfZrwFAoRtu/LudojfJysaexUSf+YHY2
+	bUj2NBWQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33536)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v8HmO-000000001yw-0CJa;
+	Mon, 13 Oct 2025 13:35:56 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v8HmI-000000000KV-3Kmo;
+	Mon, 13 Oct 2025 13:35:50 +0100
+Date: Mon, 13 Oct 2025 13:35:50 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Marek Vasut <marek.vasut@mailbox.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>, Daniel Golle <daniel@makrotopia.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: usb: rtl8150: Fix frame padding
-Message-ID: <aOzx-4PtIMAk-8Nl@horms.kernel.org>
-References: <20251012220042.4ca776b1.michal.pecio@gmail.com>
- <aOzNH0OQZYJYS1IT@horms.kernel.org>
- <20251013125043.0ae574e7.michal.pecio@gmail.com>
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Markus Stockhausen <markus.stockhausen@gmx.de>,
+	Michael Klein <michael@fossekall.de>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [net,PATCH] net: phy: realtek: Avoid PHYCR2 access if PHYCR2 not
+ present
+Message-ID: <aOzyJuegXDTNCire@shell.armlinux.org.uk>
+References: <20251011110309.12664-1-marek.vasut@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,26 +76,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251013125043.0ae574e7.michal.pecio@gmail.com>
+In-Reply-To: <20251011110309.12664-1-marek.vasut@mailbox.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Oct 13, 2025 at 12:50:43PM +0200, Michal Pecio wrote:
-> On Mon, 13 Oct 2025 10:57:51 +0100, Simon Horman wrote:
-> > Hi Michal,
-> > 
-> > I think this should also increment a dropped counter.
-> > As this driver already uses dev->netdev->stats [*]
-> > I think that would be:
-> > 
-> > 		dev->netdev->stats.tx_dropped++;
-> >
-> > [*] I specifically mention this, for the record because,
-> >     new users are discouraged. But this driver is an existing user
-> >     so I think we are ok.
+On Sat, Oct 11, 2025 at 01:02:49PM +0200, Marek Vasut wrote:
+> The driver is currently checking for PHYCR2 register presence in
+> rtl8211f_config_init(), but it does so after accessing PHYCR2 to
+> disable EEE. This was introduced in commit bfc17c165835 ("net:
+> phy: realtek: disable PHY-mode EEE"). Move the PHYCR2 presence
+> test before the EEE disablement and simplify the code.
 > 
-> Thanks, makes sense, will do.
-> 
-> I will only drop "dev->" because it's superfluous - we already have
-> 'netdev' here, which was used to obtain 'dev' in the first place.
+> Fixes: bfc17c165835 ("net: phy: realtek: disable PHY-mode EEE")
+> Signed-off-by: Marek Vasut <marek.vasut@mailbox.org>
 
-Sounds good, sorry for missing that detail.
+This looks obvious.
+
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+Thanks!
+
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Andrew Lunn <andrew@lunn.ch>
+> Cc: Daniel Golle <daniel@makrotopia.org>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Heiner Kallweit <hkallweit1@gmail.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Markus Stockhausen <markus.stockhausen@gmx.de>
+> Cc: Michael Klein <michael@fossekall.de>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Russell King <linux@armlinux.org.uk>
+
+Please drop this line.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
