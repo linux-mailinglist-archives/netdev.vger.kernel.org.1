@@ -1,137 +1,135 @@
-Return-Path: <netdev+bounces-228901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD076BD5BD2
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 20:35:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 990EDBD5BE1
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 20:38:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E406018A2F35
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 18:36:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EDDE421360
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 18:38:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD812D5939;
-	Mon, 13 Oct 2025 18:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA5F2D47FE;
+	Mon, 13 Oct 2025 18:38:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ESdzC60b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QL00o2NV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B3C20125F
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 18:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC24926E704
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 18:38:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760380550; cv=none; b=qhlsXwkoWp9k7k8sU7yA/lDdv1JhXLY91FT3DG0/luYcHA/op20+rhIaYf6UpYP31xz2a2OApqJdg3iaVvTH4EQHi84Tg1vOue2Jq9BXqrmh9MVzOVsMePjaAYY/HhsPTt3uTbeeal5ghL4F/Vqkh8TwPdJ66mW/Ye+spmfTp8Q=
+	t=1760380727; cv=none; b=EgNBjG4k8ULtpBPaWpyOsKv4pKxp4Sx6yaC6D8RD28j6OI3cqcU5zcbQYY7qsXkoCXBNuvz3qpHQHyN5aw3hR9U8cMGd+J9+ak/Lr4ic2EpB0i45C0ec+9f+n9RWiNWsRHu/n2kjxLadiSyn6mGt8uwO6LUZIty1C2Uy7H+iJXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760380550; c=relaxed/simple;
-	bh=UEna29x+bZvM/HBkGwx99n7Do7hLh1lgHFSn0I3czRI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o0lFfSB3ySOOu992W2Bu0oGIEz/hKFXqjZKfkcaSZbg4EYBu7jbrfmmXIBx9S6zWo+zYJpCNg8SKoDXWK4ppcsM09ckSNvnYDMjHqmSFIN3S5YW0t08VtxbTpfryJebFnp+deb6AF/0zFZ/lLKJ9yJgyg6of8U/x4mFMHJoX8Tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ESdzC60b; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <b7fa9c76-f343-42d0-9c47-6a1af0deea2c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760380545;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2SDPG4mzl5kKo6OO5wGMHX9VYrTxfUd0YtlJcr3KpwQ=;
-	b=ESdzC60bmzAURLxbLw6YswPogINrWqARFYPhTfV9D8OD4JwnlV/yKsn5a+R3l7N1rJYqBz
-	WFIbob8oV2fgIL3XvFz+W4nqbNBElvdrKy1XFLsHkmhdP5CTwV15kdwZVOtrMwZFJ9Cefg
-	vXfs0gDkAOHhS0xoTp2ImFAa8WgwBSk=
-Date: Mon, 13 Oct 2025 11:35:35 -0700
+	s=arc-20240116; t=1760380727; c=relaxed/simple;
+	bh=P61QujgN5J1u4jCGUyQaIH5x+Y70wA/Ujg5vNOBkB/Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bA8LQ+zm8BS3Czwofjio5SJXQeS0vmN8rEym/fk+G6/pjilP36rnstH3s/CSiclj5OHL6kUgE90oLA2e31WPzYA7Jqg4GprfZucCKp/sbCcFwQjSTf/F2MHLgCinA2FsUeui7kjFWecJgB0Vj4MZoXVc0RZBFHQlQTN2zHISrHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QL00o2NV; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-46e4ad36541so47909885e9.0
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 11:38:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760380724; x=1760985524; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xl4UbYGPdAv3c9XGkZNC55N7RR52T7NEIW03HAfvHAo=;
+        b=QL00o2NV47B8sNRBM8C4I+1k8+Szrd3k/Nag0UODfANePPVDKLJiAOjThENdxRSjpN
+         p0AZd75hj9QIAYyHwnTSqRhMx7jQSdGH5PktvzCqUYEXu9SwPbankNfXAEuesDaYZ10u
+         1PFDdFSLT2JLkleUP2/c1eMX2C4Dic/gxF8vjiiWLClzg4voGSLN3XeZSd5yamilc793
+         OFDTlux1US+xHO+Gx9cTxNvyTxVnniAlUEYnewz9kFttLfJxf66pYGJZztlvDa7YhFq6
+         SYLrb9eeAShWnJJvEgKphqiLdKlEV1AOAnpsAHKiPr2N5xUHApKaC0DtTc9Tv67l6VrC
+         kqNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760380724; x=1760985524;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Xl4UbYGPdAv3c9XGkZNC55N7RR52T7NEIW03HAfvHAo=;
+        b=L00r0tMdMYOv2QUeeCsduvHbPUR0vANO5Lw/2FXmR99MZQPNMpqnvoS7dNnqUhZ2LK
+         H1iqR1N/5KUv531NHunblsn2qkuctieWYk8eCkFucFnVtH6Azpg1hr4aGEnRiomjE/DQ
+         6cwk8urnynKxbKabVujI0GFdgn+itYlAQPQFNLBvBXGcNpUK2K48/XSDfA8Qf+G5/IlZ
+         Soz1Nt+eS1ChVY5ZL8Cr8yndF83r8Wtl3sHihRSYFqyGCPAKFvalzV65LqoeCNoRFFM4
+         F4ObP9h1DWLYdZHkuSG+E/9lfhGhQiEgyLXpBa8h41ZJWh4w5kclSxmXmCDPhw43pQlJ
+         Ty1w==
+X-Gm-Message-State: AOJu0YyXOVbk9J5tV7nr4DhwxEoCJj91VK4p9xrLwJk/RAUghp6nL0sX
+	R8GVr5L8SJ1q41+cpAD8VQP/d1LCpvvYpDzmDAro+xvI7ZxSokVG9+lA
+X-Gm-Gg: ASbGncvKAtCr1osKqWxTg7y9iE+Wht3+GX5SGuySyF9OGTSln1gjG8Jh2Cg/MXmzrg4
+	aCcT6JGZZEM0xG/hHnlOBN6d72npNO/E1ThGE2lUzvJipJepWMkaFIMP1b0LMMtXieLq5j0TCDi
+	uSUuLTVeLh6sM4bEjnUHGK4yaTKGTHNsXfzCobmSK1KCDGWxujjkIYFIKRPrJSKWRvhZcND1s+C
+	1VKJvAhrsFoPdQTxdddcWkR4eYvAKWTOIycDEnpmbiQZHhU2ZiUd+Cx3fwpXwvGEsKrH0Iddt9R
+	RV++7wtETU26+0Hc1RwdJK3auRUrGwTcJAR07P+M2qCIW9g4ajj94GmFTHbWzVb09kpCzc/Mz3I
+	NPih8wfIFpN6Jzx/bEoF/RApzZ7Z3xcZpcIATnD/tu0npZw==
+X-Google-Smtp-Source: AGHT+IH37/Iov3SsmBlSzbaKFTprmyioGsd1J9aFxMvYeqTg1z0+yrp2AQWWNizCw0MIJmwxhuvCrQ==
+X-Received: by 2002:a05:600c:528b:b0:46e:5cb5:8ca5 with SMTP id 5b1f17b1804b1-46fa9b164edmr163770565e9.35.1760380724095;
+        Mon, 13 Oct 2025 11:38:44 -0700 (PDT)
+Received: from denis-pc ([176.206.100.218])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426dac0ab7bsm10523024f8f.46.2025.10.13.11.38.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Oct 2025 11:38:43 -0700 (PDT)
+From: Denis Benato <benato.denis96@gmail.com>
+To: linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	Ingo Molnar <mingo@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Denis Benato <benato.denis96@gmail.com>
+Subject: [PATCH net-next v2] eth: fealnx: fix typo in comments
+Date: Mon, 13 Oct 2025 20:36:32 +0200
+Message-ID: <20251013183632.1226627-1-benato.denis96@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3] bpf: test_run: fix atomic context in timer path
- causing sleep-in-atomic BUG
-Content-Language: en-GB
-To: Sahil Chandna <chandna.linuxkernel@gmail.com>, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org, john.fastabend@gmail.com, haoluo@google.com,
- jolsa@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
-Cc: david.hunter.linux@gmail.com, skhan@linuxfoundation.org, khalid@kernel.org
-References: <20251013171104.493153-1-chandna.linuxkernel@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20251013171104.493153-1-chandna.linuxkernel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
+There are a few typos in comments:
+ - replace "avilable" with "available"
+ - replace "mutlicast" with "multicast"
 
+Signed-off-by: Denis Benato <benato.denis96@gmail.com>
+---
+v2:
+  - also fix "mutlicast"
+  - tag for net-next
+---
+ drivers/net/ethernet/fealnx.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 10/13/25 10:11 AM, Sahil Chandna wrote:
-> The timer mode is initialized to NO_PREEMPT mode by default,
-> this disable preemption and force execution in atomic context
-> causing issue on PREEMPT_RT configurations when invoking
-> spin_lock_bh(), leading to the following warning:
->
-> BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:48
-> in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 6107, name: syz.0.17
-> preempt_count: 1, expected: 0
-> RCU nest depth: 1, expected: 1
-> Preemption disabled at:
-> [<ffffffff891fce58>] bpf_test_timer_enter+0xf8/0x140 net/bpf/test_run.c:42
->
-> Fix this, by removing NO_PREEMPT/NO_MIGRATE mode check.
-> Also, the test timer context no longer needs explicit calls to
-> migrate_disable()/migrate_enable() with rcu_read_lock()/rcu_read_unlock().
-> Use helpers rcu_read_lock_dont_migrate() and rcu_read_unlock_migrate()
-> instead.
->
-> Reported-by: syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=1f1fbecb9413cdbfbef8
-> Tested-by: syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
-> Signed-off-by: Sahil Chandna <chandna.linuxkernel@gmail.com>
-
-You have multiple versions in CI:
-   [PATCH v2] bpf: avoid sleeping in invalid context during sock_map_delete_elem path
-   [PATCH v3] bpf: test_run: fix atomic context in timer path causing sleep-in-atomic BUG
-
-In the future, please submit new patch set only after some reviews on the old patch.
-
-I also recommend to replace e.g. [PATCH v3] to [PATCH bpf v3] (or [PATCH bpf-next v3])
-so CI can do proper testing for either bpf or bpf-next.
-
-For the title:
-   bpf: test_run: fix atomic context in timer path causing sleep-in-atomic BUG
-Change to:
-   bpf: Fix sleep-in-atomic BUG in timer path with RT kernel
-
-The code change LGTM.
-
-Acked-by: Yonghong Song <yonghong.song@linux.dev>
-
->
-> ---
-> Changes since v2:
-> - Fix uninitialized struct bpf_test_timer
->
-> Changes since v1:
-> - Dropped `enum { NO_PREEMPT, NO_MIGRATE } mode` from `struct bpf_test_timer`.
-> - Removed all conditional preempt/migrate disable logic.
-> - Unified timer handling to use `migrate_disable()` / `migrate_enable()` universally.
->
-> Link to v2: https://lore.kernel.org/all/20251010075923.408195-1-chandna.linuxkernel@gmail.com/
-> Link to v1: https://lore.kernel.org/all/20251006054320.159321-1-chandna.linuxkernel@gmail.com/
->
-> Testing:
-> - Reproduced syzbot bug locally using the provided reproducer.
-> - Observed `BUG: sleeping function called from invalid context` on v1.
-> - Confirmed bug disappears after applying this patch.
-> - Validated normal functionality of `bpf_prog_test_run_*` helpers with C
->    reproducer.
-> ---
->   net/bpf/test_run.c | 23 ++++++-----------------
->   1 file changed, 6 insertions(+), 17 deletions(-)
-
-[...]
+diff --git a/drivers/net/ethernet/fealnx.c b/drivers/net/ethernet/fealnx.c
+index 6ac8547ef9b8..3c9961806f75 100644
+--- a/drivers/net/ethernet/fealnx.c
++++ b/drivers/net/ethernet/fealnx.c
+@@ -196,7 +196,7 @@ enum intr_status_bits {
+ 	ERI = 0x00000080,	/* receive early int */
+ 	CNTOVF = 0x00000040,	/* counter overflow */
+ 	RBU = 0x00000020,	/* receive buffer unavailable */
+-	TBU = 0x00000010,	/* transmit buffer unavilable */
++	TBU = 0x00000010,	/* transmit buffer unavailable */
+ 	TI = 0x00000008,	/* transmit interrupt */
+ 	RI = 0x00000004,	/* receive interrupt */
+ 	RxErr = 0x00000002,	/* receive error */
+@@ -215,7 +215,7 @@ enum rx_mode_bits {
+ 	CR_W_RXMODEMASK	= 0x000000e0,
+ 	CR_W_PROM	= 0x00000080,	/* promiscuous mode */
+ 	CR_W_AB		= 0x00000040,	/* accept broadcast */
+-	CR_W_AM		= 0x00000020,	/* accept mutlicast */
++	CR_W_AM		= 0x00000020,	/* accept multicast */
+ 	CR_W_ARP	= 0x00000008,	/* receive runt pkt */
+ 	CR_W_ALP	= 0x00000004,	/* receive long pkt */
+ 	CR_W_SEP	= 0x00000002,	/* receive error pkt */
+-- 
+2.51.0
 
 
