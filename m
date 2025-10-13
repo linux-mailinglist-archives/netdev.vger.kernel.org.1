@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-228786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B2C5BD3F1F
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:14:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F7FBD4060
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:20:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A17C2401F87
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:03:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92E703E71A8
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12CE30F956;
-	Mon, 13 Oct 2025 14:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9684C274B27;
+	Mon, 13 Oct 2025 14:53:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LwMBQcd8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sc9l9MkZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C260130F803
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B539030F942
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:53:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760367217; cv=none; b=u/zjODY9bj8dXQJLZMVBaiBWBF57ZwsnTQzdmdUS5NM4v/HN/oGZuv+0qKYLQtra1qlPuPnr0BvL/Z8rNtQPVyHXG8ZA6LP6doxwlMi1qN+nCpwJh+ICiwNDI8q1s6YCV4wi0FSWnoH3q0qPHgqEv6qxDMtL1HE1SvycyNjMOaU=
+	t=1760367219; cv=none; b=tyNrBGnEFFnGMLLccjeo/JXJjM0iGiyoIowOmn5rnlbsSSsvt45NtzzmnvJ/KzcS+73VxrRuWiCV8suFHHhPFDNKyvEaXtgjX60Lu4oqIWfmIX2nINuwHJK+Bpmz1dpF0AmQG7OxQ1OayBb5lYSogWgiMfXru4scN79a0RY1WrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760367217; c=relaxed/simple;
-	bh=kO++hqsqbVoh9SPKYKuZkXB0HqP9mKYieWTgGp5QmOc=;
+	s=arc-20240116; t=1760367219; c=relaxed/simple;
+	bh=PbuNSYS4ZvphCG8IIqw5e2RtAOtPsOlFF3aKC+mIwRo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V6nVaODjgVh7Cv5eOjPRs3T+r9G3EsGXCNv0W2MgLtz0flaQpZ5RlqBt336CrmswUJ6/q+I/HcB58CxqLCIDnDHD3FXUsH9smMOlhXSc3wsOoVRP6OJUx9ZOQwJbGDYO6/RPy5I9rwyu2UdiFBCJn53VBO6U3JqiaL2q+yGDkA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LwMBQcd8; arc=none smtp.client-ip=209.85.128.51
+	 MIME-Version; b=IOlQjwKfGtuzfvCVAGkEcwu8ITDCq8eGUcYnsvwL5uBPFsvyNFaFK+5GWRH/z5W6L9YJ3lMHQGQIEBzfb0lR4wbb6g8QY74I+EbXBkk4Bz2SxMOUy7E6xYRlcXecEKftJe6l7McQUR5SgAFRsfvI+76qXkMEFHiWo1TDJLbOwIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sc9l9MkZ; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-46e42fa08e4so37787515e9.3
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:53:34 -0700 (PDT)
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3ee12a63af1so2537314f8f.1
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:53:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760367212; x=1760972012; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760367214; x=1760972014; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=p/S0lTizHDTDClQAPhS8aQBa6cUKMUxs8/coO2Ar/bs=;
-        b=LwMBQcd87j/WrjYxRbL4Gl5oLQsOynEFPHXfyrYWH3SHXhURp90qFhlvm1LVwBPIBm
-         cnEOAUH+La7y81fMqZ/0A0CSYV/xxJ0ROju+R0m6i32eXqKakYB9gMibCQOWlk7qo/ko
-         LYaFNhHVxSoRLvaaGFqrfeBAqk19dJRjnAKhQ6uzUPApDMVbRbi8/nCH7Tf9fqFXPwxU
-         q5QVTCSDQthgVmP5BvrVunuUi99gEtHH2lclEUgMqGlD3dLL42e7TlOcaRG2LAu3dI0t
-         vDRn+a+7AsbqAV6GxozDuvUQn3PGTdXtflTiWj42llGP4L7ik6Aa0K376qitBlVppAfW
-         ABwQ==
+        bh=qRwTRM1YMVNfPJcUo8UFI2K+NlERkppykhGVZsYyCi8=;
+        b=Sc9l9MkZ3jsGmKuzKFJ+WZzEdPxLvhnRI8KiyXKOgbVGZwAcnRqNP2Ec0LNq1zZ7md
+         Mgq4VfOY21/tdd8fUZAVvlBcnBPIvU/xKZUYZw+ZPbW3jqi0ybSXxiN+ADp6xSnfF0c8
+         aJnV60/1bMla5WqYSH4g+oYgHEAmF0gsmgDAAfe1RLWuoaUpKKPAQ5I5cdOiUCwWuK9J
+         /sEwPMpYtXR5vCLJYbNm1CJS1DaJGx8PL8Apt906L1RQYAMoXgFTCXplecSj7VXQf7fF
+         5J2uOwtwVSGXxOVIYxD+8NSZxxxZ80vhkwxl2ojns6ifMWP5ALcdJlIftTQJE/D3aG58
+         7pnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760367212; x=1760972012;
+        d=1e100.net; s=20230601; t=1760367214; x=1760972014;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=p/S0lTizHDTDClQAPhS8aQBa6cUKMUxs8/coO2Ar/bs=;
-        b=pLLZS9ynoC9uatf4m72dTSXrSep6LljwqxWBIxTvVtPmwAneuAqGuvuFTSphpizYkl
-         IpQTZOxcyN3MVh6zn6+1QDumSRunN/yCIeLAksrYoZJoMqTbuB4RAz39i0Wb0qxIn2Em
-         OLRd2QWMu/iRjp+Pyr3OkazywnCG89XBYonuTy6dBz4f/UwfYAUOq4Y3aHFwJnPaus2f
-         GZDPckx2qpTpNp4wmXmm/PqHl6Ns1OmRqY4/sAHjUTQ/9ORPhevBZi5u9OVWjsG43JuY
-         iD96BEsxg/ii9+n9t9mR87dzyyjymOHLJIKIPTYOfEg49oSjjiO7P3mIuZ/dGtbrkSPQ
-         xmzQ==
-X-Gm-Message-State: AOJu0YxAX6H4KH+rfUxZ2ozXhSnGsG+06mfLkNBdwUT3Z6fS3Rm57AX/
-	+FAfqIYsy6qvjy/ZoxWi8o4BMqFLU5KwNOhQiPLFZ/4FzM8SQ39tLd25C8psojG4
-X-Gm-Gg: ASbGnctRrR5cW7jJyRfTQMungDR9+jDpnweyU+UpTqNmu/lPvsZQ6rtQjlHn9zaqns0
-	Xo7jfA5CNigYoOwt1jFqXeWGZbC2ztCbgzlEQVXFmXs11FS5KwAtOiAtx2ipcLXKNOA+P7hGiTo
-	Mqslw56ZJcsi55f8tVV1+um0jbORcpb8rtcD2NQrmhaQdynZ9AwEs9LVtiKNvGRMCpRkBKuDA3U
-	m0LdZ5DvoGmnJSZn/+/3RFy3nACq2NLzwuPFON4NeOlTM6w3J9QOu3MAMX51JLsaRN3F5sXocKh
-	xV1D1lb7G9lQ+TwbdeCNnd7ch038YckIDrSJY5pxygh12NyY5w3GfGShYZGcEMXYRZZA6kDZEcE
-	LiNoMof0fgfZOaFxuZQ3Z1vL4SkJXAn6NPHQ=
-X-Google-Smtp-Source: AGHT+IG30NLodqm5i6iZDMho0lRpiDey3nRByT9wCK+VDN0c//YQ5bDi8+c0ePHSQFGrSdh/9vp0GA==
-X-Received: by 2002:a05:600c:1394:b0:46e:432f:32ab with SMTP id 5b1f17b1804b1-46fa9b1704emr157969575e9.33.1760367212016;
-        Mon, 13 Oct 2025 07:53:32 -0700 (PDT)
+        bh=qRwTRM1YMVNfPJcUo8UFI2K+NlERkppykhGVZsYyCi8=;
+        b=KHeaK6j11YBfGqh3FUpHqDNFI8TU5xjsQ9HqhuVWuDbGSnKq1qrGBVq4kSaeZXDEyZ
+         qqfZGUMC7Wi9dFkt6sJhIfUqKruo5wayKnEKv5jEwY3X4t5IKX7tBcuIELEqPsYkDCkf
+         mW4guBFUttV0Qk/ZTP6mW4pZ5j2ivIrbEkNCn4cSCG8bWcOZURtdhawZBTImKXhCbxc7
+         NlizRm6I21hyhGNtEEqHy9DvVExaW0XTqu+akq34AMi90OMxPQg2XFD/GVhA+EUnRXwB
+         j7ofXsCj9UUX8uAYfQuRtgVquqnz42c1m4QK33mjwLo80X+JvB3hP3pig6j4nZQtQtAS
+         Uu/w==
+X-Gm-Message-State: AOJu0YxmweEvaBN0qqTMY0lXJn/Sn00GQkesqIpG/NgtnbNv4egZZE8z
+	1c9+GoC/xL3b8it1ctoOkl8hw9kU0LZ8b53A6KBqOYSN5l0z0a0m0nn5O9ukRzzV
+X-Gm-Gg: ASbGnctaZety7bXdR058OafkYh65K4gTxoYf9DGg4/P0GtQzK9wnScQ7Ms/4csPK1NL
+	JbaZCafdQbDtYigK18l3d5UU0JMnvQBZANzOvaNDJvwsmThVh02enUME4AXy+OJIBB0lU9I6KlO
+	PTY6KD3TiGAhf7QQ2s4UaqbxaCINT4vJTntqBZDPSdLtae1lKvvp4PS5TwygojlUm3Vl3Fe051q
+	0ph6DQ+w6m5FnD9SSVEttYDmIXP/AgBcHyXypFz0z6SgE6tsVHco+XloIwuABDTKXGB9Yu2sUWe
+	v8hwFJRR5J/wVRvmKywU549SRYwlJ/pIx0fIwmfogK/egVHv9k0zowrAWKBnHElC6vKV+RNKJ7a
+	FTkIbuiU6J10ZVNNTk8wezZmR4GfPHVeJBjA=
+X-Google-Smtp-Source: AGHT+IHmUh7f1JWY1Bn/xnAz1OdnLNh1wSTUkKJWaDX80Ssi4DYZzLpugyxu+bw4gsN3KGpLNos3vw==
+X-Received: by 2002:a05:6000:4901:b0:426:d5bf:aa7 with SMTP id ffacd0b85a97d-426d5bf0c0bmr6709517f8f.63.1760367214055;
+        Mon, 13 Oct 2025 07:53:34 -0700 (PDT)
 Received: from 127.com ([2620:10d:c092:600::1:eb09])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce5e0e70sm18641085f8f.40.2025.10.13.07.53.30
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce5e0e70sm18641085f8f.40.2025.10.13.07.53.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Oct 2025 07:53:31 -0700 (PDT)
+        Mon, 13 Oct 2025 07:53:33 -0700 (PDT)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew@lunn.ch>,
@@ -114,9 +114,9 @@ Cc: Andrew Lunn <andrew@lunn.ch>,
 	linux-doc@vger.kernel.org,
 	linux-rdma@vger.kernel.org,
 	Jonathan Corbet <corbet@lwn.net>
-Subject: [PATCH net-next v4 06/24] net: clarify the meaning of netdev_config members
-Date: Mon, 13 Oct 2025 15:54:08 +0100
-Message-ID: <fa4a6200c614f9f6652624b03e46b3bfa2539a72.1760364551.git.asml.silence@gmail.com>
+Subject: [PATCH net-next v4 07/24] net: add rx_buf_len to netdev config
+Date: Mon, 13 Oct 2025 15:54:09 +0100
+Message-ID: <bd750653950673fb2a4bc1fe496ddb24cca87619.1760364551.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1760364551.git.asml.silence@gmail.com>
 References: <cover.1760364551.git.asml.silence@gmail.com>
@@ -130,93 +130,65 @@ Content-Transfer-Encoding: 8bit
 
 From: Jakub Kicinski <kuba@kernel.org>
 
-hds_thresh and hds_config are both inside struct netdev_config
-but have quite different semantics. hds_config is the user config
-with ternary semantics (on/off/unset). hds_thresh is a straight
-up value, populated by the driver at init and only modified by
-user space. We don't expect the drivers to have to pick a special
-hds_thresh value based on other configuration.
-
-The two approaches have different advantages and downsides.
-hds_thresh ("direct value") gives core easy access to current
-device settings, but there's no way to express whether the value
-comes from the user. It also requires the initialization by
-the driver.
-
-hds_config ("user config values") tells us what user wanted, but
-doesn't give us the current value in the core.
-
-Try to explain this a bit in the comments, so at we make a conscious
-choice for new values which semantics we expect.
-
-Move the init inside ethtool_ringparam_get_cfg() to reflect the semantics.
-Commit 216a61d33c07 ("net: ethtool: fix ethtool_ringparam_get_cfg()
-returns a hds_thresh value always as 0.") added the setting for the
-benefit of netdevsim which doesn't touch the value at all on get.
-Again, this is just to clarify the intention, shouldn't cause any
-functional change.
+Add rx_buf_len to configuration maintained by the core.
+Use "three-state" semantics where 0 means "driver default".
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-[pavel: applied clarification on relationship b/w HDS thresh and config]
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- include/net/netdev_queues.h | 20 ++++++++++++++++++--
- net/ethtool/common.c        |  3 ++-
- 2 files changed, 20 insertions(+), 3 deletions(-)
+ include/net/netdev_queues.h | 4 ++++
+ net/ethtool/common.c        | 1 +
+ net/ethtool/rings.c         | 2 ++
+ 3 files changed, 7 insertions(+)
 
 diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-index cd00e0406cf4..9d5dde36c2e5 100644
+index 9d5dde36c2e5..31559f2711de 100644
 --- a/include/net/netdev_queues.h
 +++ b/include/net/netdev_queues.h
-@@ -6,11 +6,27 @@
- 
- /**
-  * struct netdev_config - queue-related configuration for a netdev
-- * @hds_thresh:		HDS Threshold value.
-- * @hds_config:		HDS value from userspace.
-  */
- struct netdev_config {
-+	/* Direct value
-+	 *
-+	 * Driver default is expected to be fixed, and set in this struct
-+	 * at init. From that point on user may change the value. There is
-+	 * no explicit way to "unset" / restore driver default. Used only
-+	 * when @hds_config is set.
+@@ -25,6 +25,10 @@ struct netdev_config {
+ 	 * If "unset" driver is free to decide, and may change its choice
+ 	 * as other parameters change.
+ 	 */
++	/** @rx_buf_len: Size of buffers on the Rx ring
++	 *		 (ETHTOOL_A_RINGS_RX_BUF_LEN).
 +	 */
-+	/** @hds_thresh: HDS Threshold value (ETHTOOL_A_RINGS_HDS_THRESH).
-+	 */
- 	u32	hds_thresh;
-+
-+	/* User config values
-+	 *
-+	 * Contain user configuration. If "set" driver must obey.
-+	 * If "unset" driver is free to decide, and may change its choice
-+	 * as other parameters change.
-+	 */
-+	/** @hds_config: HDS enabled (ETHTOOL_A_RINGS_TCP_DATA_SPLIT).
-+	 */
++	u32	rx_buf_len;
+ 	/** @hds_config: HDS enabled (ETHTOOL_A_RINGS_TCP_DATA_SPLIT).
+ 	 */
  	u8	hds_config;
- };
- 
 diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index 55223ebc2a7e..eeb257d9ab48 100644
+index eeb257d9ab48..2f05359d9782 100644
 --- a/net/ethtool/common.c
 +++ b/net/ethtool/common.c
-@@ -902,12 +902,13 @@ void ethtool_ringparam_get_cfg(struct net_device *dev,
- 	memset(param, 0, sizeof(*param));
- 	memset(kparam, 0, sizeof(*kparam));
- 
-+	kparam->hds_thresh = dev->cfg->hds_thresh;
-+
- 	param->cmd = ETHTOOL_GRINGPARAM;
- 	dev->ethtool_ops->get_ringparam(dev, param, kparam, extack);
+@@ -909,6 +909,7 @@ void ethtool_ringparam_get_cfg(struct net_device *dev,
  
  	/* Driver gives us current state, we want to return current config */
  	kparam->tcp_data_split = dev->cfg->hds_config;
--	kparam->hds_thresh = dev->cfg->hds_thresh;
++	kparam->rx_buf_len = dev->cfg->rx_buf_len;
  }
  
  static void ethtool_init_tsinfo(struct kernel_ethtool_ts_info *info)
+diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
+index 628546a1827b..6a74e7e4064e 100644
+--- a/net/ethtool/rings.c
++++ b/net/ethtool/rings.c
+@@ -41,6 +41,7 @@ static int rings_prepare_data(const struct ethnl_req_info *req_base,
+ 		return ret;
+ 
+ 	data->kernel_ringparam.tcp_data_split = dev->cfg->hds_config;
++	data->kernel_ringparam.rx_buf_len = dev->cfg->rx_buf_len;
+ 	data->kernel_ringparam.hds_thresh = dev->cfg->hds_thresh;
+ 
+ 	dev->ethtool_ops->get_ringparam(dev, &data->ringparam,
+@@ -302,6 +303,7 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
+ 		return -EINVAL;
+ 	}
+ 
++	dev->cfg_pending->rx_buf_len = kernel_ringparam.rx_buf_len;
+ 	dev->cfg_pending->hds_config = kernel_ringparam.tcp_data_split;
+ 	dev->cfg_pending->hds_thresh = kernel_ringparam.hds_thresh;
+ 
 -- 
 2.49.0
 
