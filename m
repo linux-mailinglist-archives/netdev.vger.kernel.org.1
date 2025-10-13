@@ -1,137 +1,147 @@
-Return-Path: <netdev+bounces-228668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8774DBD18D9
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 07:57:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 920F6BD18FD
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 07:59:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC0FB1893EE9
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 05:57:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF8371893F25
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 06:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C6D42DF120;
-	Mon, 13 Oct 2025 05:57:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D631C2DEA7B;
+	Mon, 13 Oct 2025 05:59:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SBx0NxsD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fjjhREQy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DBB2DD5E2
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 05:57:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114CC2DC79E
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 05:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760335036; cv=none; b=W5+zH4amiudJlTs4+9TjlQljbcngW22/7PUGp92ifzSppZ8xAULZUdzJF38UASdPstL/2yLpcBjWcPc50DuotgXzwnGqOB/JzFsxxVarKIFGgNysCVhWmEEJAyJbQMjw1rWeCKTr3rbLBbSufSBpe1q1peRwUpGXzHJ7hrwo1Zs=
+	t=1760335184; cv=none; b=QstYk6ZaXdGqcbZIZp9UpIocS97yDqipbF8me15D1Gp+xXf+TEKpmdAfL/UHemdYXh3V6t/BicFGnVlqmrc7O80aYFIJWIJXpJ9o1+V+a6NHHVwMBD2bZiqsg4tt6DlJW74P5Oelx4dgQDANBlSOE9TyDIL2S4MZsH6TrAFg6fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760335036; c=relaxed/simple;
-	bh=GNr9HIVCO7ET2qTQE2UUyDNtrbTlpLvWSYXgJNwgEz8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZcaUJkTjL1ecYdRGCT4D6/5NY8PfK54Qzg7XpXfvxVtxMLtpS3BTGf1MZuF+dQIpnXP7eLPguXXqv1pyulD7aXFJAcK4LYE5F4Y2qS5gejU11IziQKhawzwEe2NEVIMBzmmb0ikgB+Xh7ESbuoXkLK9Qz84yvDuaq4RuwXz0cpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SBx0NxsD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760335033;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rTBbY4ERQzfsiR/UCEXfoNcgIIzJ1jIibSchJTMZ+g0=;
-	b=SBx0NxsD7GTa7x3T9zHXsOLho8lL3DQxEQFpuGu0V+nC5Cwm4fGj1c0NQGTrOtXNbRMl/x
-	oMYMZuxq6H06yYNGXmi4F32dkLQgu3t1HKZJ6Jc2AjHSKOZxCnnKgZudiMFC7GL+KnxVrT
-	xY+CZijVXjGp1YGIjbb+wnR4BRgkdOg=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-685-jNXp7bi8PuWrFQH_jjjSRw-1; Mon, 13 Oct 2025 01:57:11 -0400
-X-MC-Unique: jNXp7bi8PuWrFQH_jjjSRw-1
-X-Mimecast-MFC-AGG-ID: jNXp7bi8PuWrFQH_jjjSRw_1760335031
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-27eeb9730d9so84071265ad.0
-        for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 22:57:11 -0700 (PDT)
+	s=arc-20240116; t=1760335184; c=relaxed/simple;
+	bh=Bd28e7IuOcHibn3LLyPlNz4Tj23RtsGOy6jtLQP1y84=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f9ThUfcMxaum00r4HGcyszIb6ggwPh9GktekInOda2FCxm/qcuanVDEm4wfA3+o+oZLMzi2BDGXSdqnmqSuQQOA6xu3zxgEck9nSN/SExxB4JSYJjenh2DpOa7TORxFb9NfiGSumrNgd9zROdsXOtdDRiIHgQUzskY37oSWzzJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fjjhREQy; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-639e1e8c8c8so7299890a12.1
+        for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 22:59:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760335181; x=1760939981; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UQNzxcG14jNClBvMbrCumaocAylKfaLe9L9Jz7gjInc=;
+        b=fjjhREQyYvIXooCRS2QdQWl0TXKyOm2CeFRLd7GTQXju/WgHUwxKn4LvU56cUlLn6j
+         QJYVeIL/grccyAg7uoIsfmBF31uiGo7t4+ikxUvP6ONxd9ShP3rCk0ni8m6zZCgCNN8o
+         xsXJXhCLaFzyvbSDSnphwExdRjtxEUTTardYk7ebvF3+bHnCtFpCZ6LgYRfCYVJib9x4
+         8Abeqx6fXkD5nL/8UZkWXZCUKeiEObmoLd8YaSwB9VDLjH/JYpd4yKH29xdQS+bM1b5G
+         ObJ2Zeu4gLUEvfOIEtvHbd/maQHP8qsQTA9k9p5QG454ybF93eQ29piwxwO48OBhVNpi
+         OwUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760335030; x=1760939830;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1760335181; x=1760939981;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rTBbY4ERQzfsiR/UCEXfoNcgIIzJ1jIibSchJTMZ+g0=;
-        b=B4fK9qJ7zI0CHTA9vMLpf4kMX38c2/7mTSmD4c7MvrdNwtcEQwx6bL1vpJxUr6CwRl
-         Ac5FQKws9MKfjXDuN61q3CcU+KbxRMeivPFLGG4XDEVAjG8kYUVTLfu82a/YQB1PtaeF
-         YjQ60xjwmMRMdSLLal80unNpEqYsEnjpCCJvBvR/LA1Cax5clmSEAgaSqAqWPWjIvg0h
-         2Xds7EX+2uzq1sTf3G8Xk/5RxiXIUTr9C2lPCl/Fe9QGGyraNDPewCmyhPCP4X25D17d
-         LX5BfVweJQcjGc/KWn13I0X2ySPg5f9qS8FI6aXRhpX3GSMoiOM2BKh4tCZs/3BR3zHM
-         koEw==
-X-Gm-Message-State: AOJu0YyRQL/FMehuAgpYRop00S3vDy6bbjaPs8XB6D4TMt8SXmCZd9q8
-	hHhUxM+FMM3eRPVEimZ3mamJB/3zSSA2i4UPHY9mFTKgn6QlsCYYH8kD6+nQqxa8TziB1AkZBZD
-	5eMvK8otm8Ar/G6+aik8wPqy0/O0pYNG5dD4uyYCjosk5BVF3ent7MAYgZposfiz1woXGwlPQS3
-	C5NT+ODFEicbEzfbRAzV9C57ZwmLvZyw5r
-X-Gm-Gg: ASbGncu0YaBtfSIaTWm0iP5wDFzO7Mo1m/Yr6IEMXlCByA86xT1NBP+z/AUssrb5upC
-	sU37CXCQRABbOQyxVjFmk8mHm9WD+gH2ihp0ekmhJR90ETOMx5SbrQplTk/KH+ukc0RID60FwNm
-	mDnQKArSQK8B7xiq5mOw==
-X-Received: by 2002:a17:90b:33ce:b0:32e:ca03:3ba with SMTP id 98e67ed59e1d1-33b513b233cmr25472474a91.22.1760335030540;
-        Sun, 12 Oct 2025 22:57:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF+1ASVfPg+lv3jSt18c0CP35x0+AGwhiwZAYn/wCujwDEfGVeBA93XTgv9bz62fD/SkCCE1X0vWwbHFagz8RU=
-X-Received: by 2002:a17:90b:33ce:b0:32e:ca03:3ba with SMTP id
- 98e67ed59e1d1-33b513b233cmr25472454a91.22.1760335030144; Sun, 12 Oct 2025
- 22:57:10 -0700 (PDT)
+        bh=UQNzxcG14jNClBvMbrCumaocAylKfaLe9L9Jz7gjInc=;
+        b=nW2JxEqOYW9SpmEDHSewF7oUhi+Ht5wGrtNhm575br1M06EZUlFv9CaDxJRK8OfkPs
+         1WS8ITDNjYHrOrmEtZsQmfj8aEdRsdDIHTRn7iTefHwVZkSenHWLivfb977kn4ERIeDd
+         gPZqIW83PXCh/slKRpQAXATDjF0HW/LfqGrVL0hSATDh1YEONnQaISFTdEFJt9EybZEl
+         SB4p0zdOoxbPeXjWQbdPj60nKlgCjN8KnDzq2VDMqid4z0GnlVNyJHCkWTu65IKNZ/ut
+         643+IQyxLvwQ6dllU4gonr2t+aRqtPYdQbSIvPGCkOWUvIVwsNs7MRSdO8H0KvzcnQXu
+         +fEw==
+X-Forwarded-Encrypted: i=1; AJvYcCVePYnl5kWtc9y3L/UuugHXm+qkWXTPUf3e9Dv7r8e4CEs8aEXhIYNBuHj/PS0eHrqQslfUAQQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxk0+5t/mYrXHs8PUuTUO8vl4yLci2KLSuHf6v68mIIhf8pMSWz
+	jduiy882N/Li/KEgGsIrYP2wEWfQsQBylpb2Chr+xNpJWXg3YEwz0Ev+
+X-Gm-Gg: ASbGnctuRcmqEgfuYpSoy16RAvZGAWRuQUmq+7L/NaZZIoqlAv/yCA2Ak+aQLnAHQjA
+	7LoShcHW+gnGGsSOnG27fkybtnwyiMGKu6ECGdwP0VGjdvTjsgmr68wqClO5lU1Sm48IRWwV2o1
+	BnbEF8VJPKd0SQr8iEU/PtfteSApfZ82nw6s2/ZT5/N8Kg88Mk257Dt8gfZduHOMvLTcFLCn3BH
+	/CQFHFgrJqdXrjBR664EhSO8qhieLfs4cp6Ii4tJZKbdwXUk/nPuZaLYXzMnvFpN/KEDQW2yOHN
+	72Q8dOj+57oGdqP2daT//2RLWyzjx4pac/lcU5XpznvFPNgjr9/NDwgDO0Ue3KaMQ3F1HZf6Rrr
+	WoHaT2XANfauv6W/YCzfP76J2beNLg0AmjptULlcB7KUGaXPIT0/WWA==
+X-Google-Smtp-Source: AGHT+IGiGEcrsAYUHxU2I2SrW2lGOTNaCoPwD4SCwXuyD4vprrWrEyrI422ngQmr2KS9P8klCSJyjQ==
+X-Received: by 2002:a17:907:86a6:b0:b45:eea7:e986 with SMTP id a640c23a62f3a-b50ac4db255mr2188162966b.43.1760335181143;
+        Sun, 12 Oct 2025 22:59:41 -0700 (PDT)
+Received: from foxbook (bff184.neoplus.adsl.tpnet.pl. [83.28.43.184])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b55d8c129c4sm862815366b.41.2025.10.12.22.59.39
+        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
+        Sun, 12 Oct 2025 22:59:40 -0700 (PDT)
+Date: Mon, 13 Oct 2025 07:59:37 +0200
+From: Michal Pecio <michal.pecio@gmail.com>
+To: Oliver Neukum <oneukum@suse.com>
+Cc: yicongsrfy@163.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, linux-usb@vger.kernel.org,
+ marcan@marcan.st, netdev@vger.kernel.org, pabeni@redhat.com,
+ yicong@kylinos.cn
+Subject: Re: [PATCH v4 3/3] net: usb: ax88179_178a: add USB device driver
+ for config selection
+Message-ID: <20251013075937.4de02dfe.michal.pecio@gmail.com>
+In-Reply-To: <666ef6bf-46f0-4b3e-9c28-9c9b7e602900@suse.com>
+References: <5a3b2616-fcfd-483a-81a4-34dd3493a97c@suse.com>
+	<20250930080709.3408463-1-yicongsrfy@163.com>
+	<20250930080709.3408463-3-yicongsrfy@163.com>
+	<666ef6bf-46f0-4b3e-9c28-9c9b7e602900@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251013020629.73902-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20251013020629.73902-1-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 13 Oct 2025 13:56:58 +0800
-X-Gm-Features: AS18NWBMAKf3DfwXNPEeWec1id0-xVBudV2t5aLXFJknu5e8GZOXPWDvpzof4kY
-Message-ID: <CACGkMEugrT0K3LcJsPaN6FDncvBgXRLkG6By8scm8PyABF2BUA@mail.gmail.com>
-Subject: Re: [PATCH net v2 0/3] fixes two virtio-net related bugs.
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Alvaro Karsz <alvaro.karsz@solid-run.com>, Heng Qi <hengqi@linux.alibaba.com>, 
-	virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 13, 2025 at 10:06=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.=
-com> wrote:
->
-> As discussed in http://lore.kernel.org/all/20250919013450.111424-1-xuanzh=
-uo@linux.alibaba.com
-> Commit #1 Move the flags into the existing if condition; the issue is tha=
-t it introduces a
-> small amount of code duplication.
->
-> Commit #3 is new to fix the hdr len in tunnel gso feature.
->
-> Hi @Paolo Abenchi,
-> Could you please test commit #3? I don't have a suitable test environment=
-, as
-> QEMU doesn't currently support the tunnel GSO feature.
+On Tue, 30 Sep 2025 10:57:05 +0200, Oliver Neukum wrote:
+> > +static int __init ax88179_driver_init(void)
+> > +{
+> > +	int ret;
+> > +
+> > +	ret = usb_register_device_driver(&ax88179_cfgselector_driver, THIS_MODULE);
+> > +	if (ret)
+> > +		return ret;
+> > +	return usb_register(&ax88179_178a_driver);  
+> 
+> Missing error handling. If you cannot register ax88179_178a_driver
+> you definitely do not want to keep ax88179_cfgselector_driver
+> 
+> > +}
+> > +
+> > +static void __exit ax88179_driver_exit(void)
+> > +{
+> > +	usb_deregister(&ax88179_178a_driver);  
+> 
+> The window for the race
+> 
+> > +	usb_deregister_device_driver(&ax88179_cfgselector_driver);  
+> 
+> Wrong order. I you remove ax88179_178a_driver before you remove
+> ax88179_cfgselector_driver, you'll leave a window during which
+> devices would be switched to a mode no driver exists for.
 
-It has been there.
+Hmm, what about registration?
 
-Thanks
+I added msleep(1000) and simulated usb_register() error, then
+cfgselector binds to the device and switches configuration before
+the interface driver is available. But the module fails to load
+(I fixed this) and device is left with no driver whatsoever.
 
->
-> Thanks.
->
-> Xuan Zhuo (3):
->   virtio-net: fix incorrect flags recording in big mode
->   virtio-net: correct hdr_len handling for VIRTIO_NET_F_GUEST_HDRLEN
->   virtio-net: correct hdr_len handling for tunnel gso
->
->  drivers/net/virtio_net.c   | 16 ++++++++-----
->  include/linux/virtio_net.h | 46 ++++++++++++++++++++++++++++++++------
->  2 files changed, 50 insertions(+), 12 deletions(-)
->
-> --
-> 2.32.0.3.g01195cf9f
->
+Moreover, according to c67cc4315a8e, config switch is irreversible
+since the device reconnects with only the vendor config available.
+I can't test it because my device doesn't have a CDC config at all.
 
+There is a gotcha. I tried to test in a realistic scenario: device
+hotplug, module not loaded yet. I found that udev apparently retries
+loading the module, so this state would be fixed unless the module
+init error is persistent. Still, better not to rely on this?
+
+Would it make sense to swap registration order?
+
+Regards,
+Michal
 
