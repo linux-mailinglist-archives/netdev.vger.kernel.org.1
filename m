@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-228803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1C7DBD40E4
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:21:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45B1CBD3EEF
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:13:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69A3C3E0418
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:10:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C641F1882DA8
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:11:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A77B30C620;
-	Mon, 13 Oct 2025 14:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F61314B65;
+	Mon, 13 Oct 2025 14:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vqk0YYK4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i23m9acz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B5E3148A7
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:54:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9C03148D1
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:54:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760367248; cv=none; b=N19gKZPmh7A27fXV1WkL1XaEDwXZSZjYjOXx3h7XLZF8QnAfXR+JX58xJtuCUBa30y5HDmcq8acsyWO5kUij3wp9DP90DSXkLz+wJHjWWeINnz5lpmGNDWeX8GGish2kvnVWRMfxy3weOA8UYs+uOCCcahPIRvAhCdjilDl1wog=
+	t=1760367249; cv=none; b=prQUUUk4W7AokPqyZaUcdR/ap3bpsE89CEL6s+sElv2FXjuUcLX1fWRHnT3fj9CzZY7d/6GHbVxRb6qKFOE2joT++/m6BlB9KW0ibRSOIPLSiQk/JgR35Igr/PYFA4tus+Kruq1FwISUdPB0QVXEVmHSmN58nERF0YC0I/nq9UQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760367248; c=relaxed/simple;
-	bh=UN20xXoo/DIsknQaKnQS3nE5pqQGdfuGllMStEKfLhQ=;
+	s=arc-20240116; t=1760367249; c=relaxed/simple;
+	bh=kvdcNejWK/mOk04H688uEbaA/cC9mhfBNv/gUTpRf6E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s+3JZDFlyRh6sWcOd/5EdSpJYuHQYiv/dg8c82OvNwoTvX3yBklk5hHqpVxCVbil46nMAU0hFzFhjvJKDEaDpYL3IIlhSQM9jHyWC1wTg7jfiZQO/oupR3qly3276eCtS3zmWhQWlAJtFcwPBJedoI7lhcXIKSwfjlJPYZ/Jmro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vqk0YYK4; arc=none smtp.client-ip=209.85.128.49
+	 MIME-Version; b=k8pAbFiT0WOG5u/493HAwUSm5SAYeroUAte/L+ku+zxGbzemb9KhPQTFt8x+s7Fzsjg7V+zWZIa0VSvOp19ThmZqLH0RZAhUDVAj5mKUVfn+AcAZPt2ko5+5Pq77g+5oaHcngHrC1dmjIbaqKm5nXuW/yjhYAoNfwshgTfgmiZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i23m9acz; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-46e37d10ed2so39819375e9.2
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:54:05 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-46fc5e54cceso7868225e9.0
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:54:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760367243; x=1760972043; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760367245; x=1760972045; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kBVbea7flwKQsaU79NLWmhrt2gwy8JKbrcaG5BbSXQs=;
-        b=Vqk0YYK4D39Lu3ifEgEsEVQoPaxkf9bJepAlOQBM79Vx3AxqTiUZmN0owgmjsEjzOG
-         +EUXHJdOAb3fDTEloWsDBtBHUQDqOgTS4KrsQcwZ6AfcJ3pew8XTxJkywrhFfJupikPo
-         gG6plI4kX8Stj5BPTj3JMNGg5bISxNAchPeDHn4pwm0tpwVcG0gLIPHKltmbZ+zvvQKv
-         mgA/VlnG5okocDEzcM2C0Co+BFPDv25CGel0/VNvAtx038t3jqqACW8B8oevVONulD4+
-         9NOxAE+P3JjJxpheoXkxJIKweAEnkxYtPSj43uf0lrtZUkcmIRh/utLnFyV1YR9SxEra
-         RwWg==
+        bh=8P7N+yGyf3ZHVe543mLefJ6kNjA/6azjCaZxnGN+ZPM=;
+        b=i23m9aczsGFjsj5EmFXcy2Kiu7yBvPMTfa31e2oyEIasFPR2iIIApYdTCW/n1QfbhO
+         AOu7PRmkgXm0a684VS+381yEorNxEXqEU8KWlwdV07sO/EQkyJoWjDgKbuVTYYYdMy+k
+         yqjvshGJBDn1ECfzVLMNpsfyvIXwH3KD8Am6ZxmNmSA/b3SrZOglImgXxb85ryHFMFAT
+         W/V0Lk0PEizffKeSqAQpo+ym0+/Bb++HzoXP6zUl2474PZMWFADV+RrXKSDchlNvsdEa
+         fQjl+cxtK5W+aHBY30TB4juZr9WfxHycaJyiVvW6ybGeNT2gAnp0hlVknmrZlmR3wWth
+         CzEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760367243; x=1760972043;
+        d=1e100.net; s=20230601; t=1760367245; x=1760972045;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kBVbea7flwKQsaU79NLWmhrt2gwy8JKbrcaG5BbSXQs=;
-        b=m7rKqoZ2znsiMNa2RpX1X3aYQZXyIqdoZbYEo0l4DnLg5i0vDIAMXsKIs/6pS5itvW
-         DN+yOoJg5osFGOYhy1AgBgaQJVQ4i8RnYcMaxKqPy+PzO7PKwWvf0r4tBhMaiWCVKvwe
-         eQWbtyP1Up0WR/U5hTaokSU9If7Q/XdtgF7S0v8pRFgBOV9QJXHAHo/GuG2E/+WAJBL7
-         TxF8AU0R01YgwbLA1B7iUR3qS/FROwgScwato5GOCS8QX7SKaTMq9541NjsJgATB2D43
-         jkrXWZQr+JLM5TxAs8y7MomUl3A8LJR8FIYd54tYQDFY0sR5js30/F+f7VsrCME8hRct
-         hU7w==
-X-Gm-Message-State: AOJu0YwM3QwuujAjfcE84TElPCAkkFfhATpb/aQYqtyZ/GW2RKZr9HGZ
-	rPF65E8PXENSls1YdUtkEdL9VJDpGi418lmCXhWefg69LPH7BpTCn3nTLX4jZiQj
-X-Gm-Gg: ASbGnctQ5jOskxJCb1xrSURvQ5RZIKSVf/WZfu4sqrZ6ckxhd5AsqpuPSJmdxp1WTOw
-	VqgaiLtB16GMkk8WkAyjwl++TbJ90S05+4CWERzhN8gj5QSKm6IwG7jzMO3iq2P2PERJGN2fcbi
-	/LDoYoDcTGWf+o5FlEGjpnkOCxm60DuyJMtzIBQsm7Gi8UcgB3c8yq8YLJlIJGqyI2MXhKTahVR
-	YRbyJDAXyGrGyaA2D8Bxc7fZQg7msL/4X7/fFXiMSXmARn5kDSrATCTeaj4D2H+LuVaW6bKZgW+
-	H9VziJd6urSt7PuicicpomPEeLjd8xM26ytyTYOL/yyFy018OL0iaNiepAuKDqT0eW9gBc1ZhH+
-	6ArCsV50hwPGEVzOnKfXlSOni
-X-Google-Smtp-Source: AGHT+IGvZad4w3tGfNyelo8jRaGthiTAOmBgbASb/CfTYlM5+kxTUyX0ReE6Y+6587qOM/YD4IdmEg==
-X-Received: by 2002:a05:600c:1d1b:b0:46f:b32e:4f3e with SMTP id 5b1f17b1804b1-46fb32e4fa5mr121333895e9.37.1760367243089;
-        Mon, 13 Oct 2025 07:54:03 -0700 (PDT)
+        bh=8P7N+yGyf3ZHVe543mLefJ6kNjA/6azjCaZxnGN+ZPM=;
+        b=Q5sH1PGx4XQljEbro3TGQLjgqBT6fnHhFd7f1UbcrYXi8QPwcdv0tkWVv3kW+2vPhO
+         hNUmlIDBJllfK+NWyemdWw8FvxHByzEmWfa7vnF3XwpXalVFD19/y1c45yIrTJilzAq5
+         shG0KzTZK/5Dmszt0RVIm5HGHXW4hF+dXTaNgOofQlPa2KE01SyCWxKJ7rzBqvGzIdFG
+         sxxfjpJ43COwSNqNwE72AWSTIgOAzukHWyPfXMoW/UY0b6dOTDWstEB9pt9Zh1mkDHiU
+         n+tlq2SM+DQ7pMCKfzunkDTl0LnG3hPcuYAdVx9ku35Xp8pxs7T+vgAmh7rkTZcgARCu
+         fYuA==
+X-Gm-Message-State: AOJu0Yxrs+2rQberc+fZHsNSKJtphVv37JM/bDwqFO53XN1wt12th3LS
+	zzIQwkD1zNJMKlBz1DK0b1DRwN0WFw+Zp1OwZb0dIL8Xn2ZuGsJT/0si9oL//GQs
+X-Gm-Gg: ASbGncvyxW0jf2t8mBntP5UzKljeg2pYfrrAGUDti6lMjWAfgfR2ScgxFrzy5ywvh2r
+	sL+oKKqPfbx5/jvOCyv64Wg7Puxc/5LNoNOf8jFVUxd8zZREnAunsDO//9bubf4auHb5ialEihA
+	5/SME41Up7RsPN1WbWhkz2GvlRHpynO+o/U4Ot+XN8Mi494W2Y1keJzJpoUG2aCoNJXv6zAxnzR
+	/ibdYwnNRIoHbGgeajMHA0p7G4lPrOzQclE9w2oBef+Oy2hleq4oRnV7rmTNmDllD4/xmhfd0sS
+	CL9j+m3Id73OgOaqWaiUaz+ZKJrSaloIWQwrBwJLXyXcDFQGpC18mqSwX96BZQ0cSpvIqNF73su
+	TSujycO5r61d6mgcGgzvaYa4iX81JfxSqJsA=
+X-Google-Smtp-Source: AGHT+IHmYGHVzWzb5HwhHnvUieQF0ev9QYqkEuw6T8jpQDA2962Xt1Dg9W1OR3B1kwfzA7lEzjzxEA==
+X-Received: by 2002:a05:600d:8110:b0:45f:2922:2aef with SMTP id 5b1f17b1804b1-46fa9b09233mr146071455e9.28.1760367244820;
+        Mon, 13 Oct 2025 07:54:04 -0700 (PDT)
 Received: from 127.com ([2620:10d:c092:600::1:eb09])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce5e0e70sm18641085f8f.40.2025.10.13.07.54.01
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce5e0e70sm18641085f8f.40.2025.10.13.07.54.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Oct 2025 07:54:02 -0700 (PDT)
+        Mon, 13 Oct 2025 07:54:04 -0700 (PDT)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew@lunn.ch>,
@@ -114,9 +114,9 @@ Cc: Andrew Lunn <andrew@lunn.ch>,
 	linux-doc@vger.kernel.org,
 	linux-rdma@vger.kernel.org,
 	Jonathan Corbet <corbet@lwn.net>
-Subject: [PATCH net-next v4 22/24] eth: bnxt: support per queue configuration of rx-buf-len
-Date: Mon, 13 Oct 2025 15:54:24 +0100
-Message-ID: <29f1f23b21eb1de0920aa912bcbefc6312160102.1760364551.git.asml.silence@gmail.com>
+Subject: [PATCH net-next v4 23/24] net: let pp memory provider to specify rx buf len
+Date: Mon, 13 Oct 2025 15:54:25 +0100
+Message-ID: <00426e189e98d808efb07370c6a0fc81ded1f787.1760364551.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1760364551.git.asml.silence@gmail.com>
 References: <cover.1760364551.git.asml.silence@gmail.com>
@@ -128,66 +128,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jakub Kicinski <kuba@kernel.org>
+Allow memory providers to configure rx queues with a specific receive
+buffer length. Pass it in sturct pp_memory_provider_params, which is
+copied into the queue, and make __netdev_queue_config() to check if it's
+present and apply to the configuration. This way the configured length
+will persist across queue restarts, and will be automatically removed
+once a memory provider is detached.
 
-Now that the rx_buf_len is stored and validated per queue allow
-it being set differently for different queues. Instead of copying
-the device setting for each queue ask the core for the config
-via netdev_queue_config().
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ include/net/page_pool/types.h |  1 +
+ net/core/netdev_config.c      | 15 +++++++++++----
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index ea95a06ae62b..a734b18e47c4 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -4320,6 +4320,7 @@ static void bnxt_init_ring_struct(struct bnxt *bp)
+diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+index 1509a536cb85..be74e4aec7b5 100644
+--- a/include/net/page_pool/types.h
++++ b/include/net/page_pool/types.h
+@@ -161,6 +161,7 @@ struct memory_provider_ops;
+ struct pp_memory_provider_params {
+ 	void *mp_priv;
+ 	const struct memory_provider_ops *mp_ops;
++	u32 rx_buf_len;
+ };
  
- 	for (i = 0; i < bp->cp_nr_rings; i++) {
- 		struct bnxt_napi *bnapi = bp->bnapi[i];
-+		struct netdev_queue_config qcfg;
- 		struct bnxt_ring_mem_info *rmem;
- 		struct bnxt_cp_ring_info *cpr;
- 		struct bnxt_rx_ring_info *rxr;
-@@ -4342,7 +4343,8 @@ static void bnxt_init_ring_struct(struct bnxt *bp)
- 		if (!rxr)
- 			goto skip_rx;
+ struct page_pool {
+diff --git a/net/core/netdev_config.c b/net/core/netdev_config.c
+index c5ae39e76f40..2c9b06f94e01 100644
+--- a/net/core/netdev_config.c
++++ b/net/core/netdev_config.c
+@@ -2,6 +2,7 @@
  
--		rxr->rx_page_size = bp->rx_page_size;
-+		netdev_queue_config(bp->dev, i,	&qcfg);
-+		rxr->rx_page_size = qcfg.rx_buf_len;
+ #include <linux/netdevice.h>
+ #include <net/netdev_queues.h>
++#include <net/netdev_rx_queue.h>
  
- 		ring = &rxr->rx_ring_struct;
- 		rmem = &ring->ring_mem;
-@@ -15928,6 +15930,7 @@ static int bnxt_queue_mem_alloc(struct net_device *dev,
- 	clone->rx_agg_prod = 0;
- 	clone->rx_sw_agg_prod = 0;
- 	clone->rx_next_cons = 0;
-+	clone->rx_page_size = qcfg->rx_buf_len;
- 	clone->need_head_pool = false;
+ #include "dev.h"
  
- 	rc = bnxt_alloc_rx_page_pool(bp, clone, rxr->page_pool->p.nid);
-@@ -16032,6 +16035,8 @@ static void bnxt_copy_rx_ring(struct bnxt *bp,
- 	src_ring = &src->rx_ring_struct;
- 	src_rmem = &src_ring->ring_mem;
- 
-+	dst->rx_page_size = src->rx_page_size;
-+
- 	WARN_ON(dst_rmem->nr_pages != src_rmem->nr_pages);
- 	WARN_ON(dst_rmem->page_size != src_rmem->page_size);
- 	WARN_ON(dst_rmem->flags != src_rmem->flags);
-@@ -16239,6 +16244,7 @@ bnxt_queue_cfg_defaults(struct net_device *dev, int idx,
+@@ -77,7 +78,7 @@ void netdev_queue_config_update_cnt(struct net_device *dev, unsigned int txq,
+ 	}
  }
  
- static const struct netdev_queue_mgmt_ops bnxt_queue_mgmt_ops = {
-+	.supported_ring_params	= ETHTOOL_RING_USE_RX_BUF_LEN,
- 	.ndo_queue_mem_size	= sizeof(struct bnxt_rx_ring_info),
+-void __netdev_queue_config(struct net_device *dev, int rxq,
++void __netdev_queue_config(struct net_device *dev, int rxq_idx,
+ 			   struct netdev_queue_config *qcfg, bool pending)
+ {
+ 	const struct netdev_config *cfg;
+@@ -88,18 +89,24 @@ void __netdev_queue_config(struct net_device *dev, int rxq,
  
- 	.ndo_queue_cfg_defaults	= bnxt_queue_cfg_defaults,
+ 	/* Get defaults from the driver, in case user config not set */
+ 	if (dev->queue_mgmt_ops->ndo_queue_cfg_defaults)
+-		dev->queue_mgmt_ops->ndo_queue_cfg_defaults(dev, rxq, qcfg);
++		dev->queue_mgmt_ops->ndo_queue_cfg_defaults(dev, rxq_idx, qcfg);
+ 
+ 	/* Set config based on device-level settings */
+ 	if (cfg->rx_buf_len)
+ 		qcfg->rx_buf_len = cfg->rx_buf_len;
+ 
+ 	/* Set config dedicated to this queue */
+-	if (rxq >= 0) {
+-		const struct netdev_queue_config *user_cfg = &cfg->qcfg[rxq];
++	if (rxq_idx >= 0) {
++		const struct netdev_queue_config *user_cfg;
++		struct netdev_rx_queue *rxq;
+ 
++		user_cfg = &cfg->qcfg[rxq_idx];
+ 		if (user_cfg->rx_buf_len)
+ 			qcfg->rx_buf_len = user_cfg->rx_buf_len;
++
++		rxq = __netif_get_rx_queue(dev, rxq_idx);
++		if (rxq->mp_params.mp_ops && rxq->mp_params.rx_buf_len)
++			qcfg->rx_buf_len = rxq->mp_params.rx_buf_len;
+ 	}
+ }
+ 
 -- 
 2.49.0
 
