@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-228762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5731ABD3A92
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 16:49:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9F5CBD3C27
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 16:57:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 195D6189FE34
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 14:49:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CA493E1059
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 14:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63863081C4;
-	Mon, 13 Oct 2025 14:44:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF44526E179;
+	Mon, 13 Oct 2025 14:47:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="g0TgIGJa"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DYMaXNjl"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E403A3081A7;
-	Mon, 13 Oct 2025 14:44:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE1210942
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760366671; cv=none; b=FF1do2aNaovoHtXU7dyW3eNG5A4y2Mlxea/TtVnbD38mswgRS7t0lJ7XVYGhuFKEELxtLRF11aQjpU/gzyTu1oldrzZuypxCYZNNN5xM8r4KQyOwRS0zOOTtCD4Ye04zrOntcVUbq3tId78pnq7yTKoyRvRZuksiIkqKoEhGTjk=
+	t=1760366856; cv=none; b=ZLSz0rDHsM9MhZNskC/Eq5hRJW4HOwfaxIig5ze1ZHHelErtbsw5o9QH3PYO99yfO2t/Ns0qggTdRxT94CBFoJYwBqNPatT8lGkuoMCMWBP97fgYyF568U/cfv7AkQCyvKaQYw9PL41FvZHyw7KSkDUF3Sa7M3lwW/nF9gfMS30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760366671; c=relaxed/simple;
-	bh=70aD+3Tiht88D8owOdTgFkVMX1UdGuo6spJcDNv9RwU=;
+	s=arc-20240116; t=1760366856; c=relaxed/simple;
+	bh=LyUBVirt/YTKs/gXRPUM/IQLsqpXNpUfFHNSwzZQhtc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kQDPQNUE39KQyBpqkXFZDZacRd0O4bmhdGTbUEeMto+QWaN4/WynP9+DH7jl/U4Okev1BsB16ZwaoIp/H20i8KSckfobahnobS08pwvcUDN7Ru7/VEEp93masBRoH6XL5BcmVmCMArq60KDSwW4BT0M2iNzfDa62OSJgIxH3Dyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=g0TgIGJa; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nrz/8hg+ZDOUGP7HKg4JdEHxS+AaDyWPfDM7JCSmkK+dTuCxim+Jg1zOPN3Ic0g2XQozRx8fpOMuqFjkz8HKv0lqhzyHjTyUJM6X1A9kSyuZX6XhwMwf/90czccg5Qd2uxAGQq7tCGOGBZ3sO1H+QAY6tcWm806oHdOe4AZD9Hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DYMaXNjl; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,29 +36,25 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=G+VQB+hiJPh92th3qbheV1XTyYyn2xhM8wRB+hyGEMg=; b=g0TgIGJasgCmkUxU1HDouzoFlJ
-	McSBBwEPiI5tbRS/EjlU3YGJPJosS1UkbDmQ9fFG0i8txHbWTUZ7avsUzfmRmg3LIY9b7vc6yC9mx
-	PcgRFkpXsnwLJtSFBFwPxoU3Y28iLmVfOQ5YZqg3tlUM71WFJKFKHM8JGFhd5+hvo3FA=;
+	bh=h/0I4Gz31qHQ3E4TALYeDQRCDADMqJRa6g6F6Sm8prs=; b=DYMaXNjlsbANWTv0AE3/heGvlF
+	rGXQ8kVxIbg7/0mh53pcGzAFidCW0DW3NOU1h+vJh8yCWpKDfW1TCEOgjF22yw+gWvlUHxIuYuKRz
+	9svkkzJmRxCtpC6NNhl7lKYvNjIDXlhuLryE2vulm7nqbndRY/KLstzV21Gcup9Ua4fA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1v8Jma-00AnPy-Og; Mon, 13 Oct 2025 16:44:16 +0200
-Date: Mon, 13 Oct 2025 16:44:16 +0200
+	id 1v8Jpe-00AnRB-S6; Mon, 13 Oct 2025 16:47:26 +0200
+Date: Mon, 13 Oct 2025 16:47:26 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Parvathi Pudi <parvathi@couthit.com>
-Cc: tony@atomide.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, richardcochran@gmail.com,
-	linux-omap@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	danishanwar@ti.com, pratheesh@ti.com, prajith@ti.com,
-	vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
-	krishna@couthit.com, mohan@couthit.com, pmohan@couthit.com,
-	basharath@couthit.com, "Andrew F . Davis" <afd@ti.com>,
-	Murali Karicheri <m-karicheri2@ti.com>
-Subject: Re: [PATCH 1/2] arm: dts: ti: Adds device tree nodes for PRU Cores,
- IEP and eCAP modules of PRU-ICSS2 Instance.
-Message-ID: <8cfc5ece-6c2e-48d9-a65c-3edbcc9edc39@lunn.ch>
-References: <20251013125401.1435486-1-parvathi@couthit.com>
- <20251013125401.1435486-2-parvathi@couthit.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] net: airoha: Add get_link ethtool callback
+Message-ID: <79e75adf-6cbd-4ec6-9473-591fbdf4248c@lunn.ch>
+References: <20251013-airoha-ethtool-improvements-v1-0-fdd1c6fc9be1@kernel.org>
+ <20251013-airoha-ethtool-improvements-v1-2-fdd1c6fc9be1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,35 +63,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251013125401.1435486-2-parvathi@couthit.com>
+In-Reply-To: <20251013-airoha-ethtool-improvements-v1-2-fdd1c6fc9be1@kernel.org>
 
-> +				interrupt-names = "rx", "emac_ptp_tx",
-> +								"hsr_ptp_tx";
+On Mon, Oct 13, 2025 at 04:29:42PM +0200, Lorenzo Bianconi wrote:
+> Set get_link ethtool callback to ethtool_op_get_link routine.
+> 
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-Something looks wrong with the indentation here. The same happens in
-at least one other place.
-
-> +&pruss2_mdio {
-> +	status = "okay";
-> +	pruss2_eth0_phy: ethernet-phy@0 {
-> +		reg = <0>;
-> +		interrupt-parent = <&gpio3>;
-> +		interrupts = <30 IRQ_TYPE_EDGE_FALLING>;
-> +	};
-> +
-> +	pruss2_eth1_phy: ethernet-phy@1 {
-> +		reg = <1>;
-> +		interrupt-parent = <&gpio3>;
-> +		interrupts = <31 IRQ_TYPE_EDGE_FALLING>;
-> +	};
-
-
-PHY interrupts are 99% level, not edge, because they represent an
-interrupt controller in the PHY, and you need to clear all the
-interrupts in the controller before it deasserts the interrupt pin.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
     Andrew
-
----
-pw-bot: cr
 
