@@ -1,179 +1,311 @@
-Return-Path: <netdev+bounces-228905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A18CBD5CCA
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 20:54:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C8B8BD5F42
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 21:33:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51A6C18A77BC
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 18:54:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A87518A0411
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 19:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 429932D8384;
-	Mon, 13 Oct 2025 18:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B68CC25783C;
+	Mon, 13 Oct 2025 19:33:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iDhhy3hW"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="qV0EOtv0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF412D6E57
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 18:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB6319CCF5;
+	Mon, 13 Oct 2025 19:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760381652; cv=none; b=SVi0B3hatkcQP407APO6KG6dEe7WAwUrcZup4Rbeapu7stQ4zGnmq6hgazVEDNbem5x16SucGIis6AbceSrAmQMQbXyPd5cNzTU2Tl+lBa2Rd6qayoI34kIXZ7FrbB7AE7u+p8Zqc6P9sEWzdOtfvzOIcqjvWBejLKqHGFZ54K0=
+	t=1760384011; cv=none; b=NcCqV0AmQpCUmIz/L9gQVKC4rB7hXkvVgONjvmWmPD0lJoYQT6tvz9mMNL9rZ10ZVqBirgJCrF6zHIUDu7UfcVCQSKyYX628wDk1H7IKLhL3ttpNyClKa0UiO0qT0jbiwslJziFf+MO9i9PUIglySgzR3yqGrOhmQ7KGHx64crQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760381652; c=relaxed/simple;
-	bh=Q0A8mwHB6ISznX1IsEIotmy3Sl/eaR8kzKeY3PLseig=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p2BO1ioAingm88kdFgAY/4x2V5C2wLJlqISVqzNLwQu1lde75K9zn9Bivy12xwFhZIeE9dk0mfSzvG1T4y014yjwJBGe9xoJRWHhzrmukpD6ZiLgjwXywJyn2TFgWMJ5WNZXpelYRWfofzQWtq5NCwxGXnb3xG92mDIB6TzAcRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iDhhy3hW; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-875d55217a5so626076585a.2
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 11:54:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760381649; x=1760986449; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OHvdDoFLXKQzTfUBohM5QpfVzGeutBShrm8qkwsGAgA=;
-        b=iDhhy3hWQseR7B59Wk9B1f1X5jyath/Vv1m6ebI7H29S1vvYX6vMnQ3ToYPWAWwJUf
-         KogVPsls1PuYOmBJZZsKhmYfqJWhawxOO/jQW2Zd36FIr0VZwKyytraEV8ZQjhsiquKT
-         8U/DgtZm/LBOH3sITn2q+qLwHHdZk/TwqTr0Lgz0PVxEVezb4L01HkZupGnKTuJT3QXX
-         QiK7W69yIlzxc12ngLPQ297WhE1NJBvA+bcqRgtWl/6h7ziB37bozqi/nnWtGcLxzF0e
-         oPd3Ma2yPQ0FfC6+IjBkEPm7sOjUjvE1B5LQKtDCnTp+4z2xorUoAsBv0RJ+504llQ1n
-         umfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760381649; x=1760986449;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OHvdDoFLXKQzTfUBohM5QpfVzGeutBShrm8qkwsGAgA=;
-        b=ajxaZLbwacGpptD4IlizViBHvQX+x2+WL08ZgsyopSgk6+vAY1DY8Sa2ESCxIyn6up
-         jsqV/yPOz4rsWUSFktafa0bqd/LfL5rWDHQwiNucYHHlAm5eVXZrCgQwrBptH0cqeyUQ
-         gviuw+EiUlmE5umJUb1RQ2M/61L5nJqHFgNVVis1InLUc3ZKNljpojWTqTWEj6HA4TP+
-         NSDi6KD1jgIwqbx5CxZwiSCqrYH6xOV2uu1WK2XmIx2wWhC3Dk4mfqDusaoRe6lhcYYu
-         R2hu4InozWvgwgRP7naRyb0Eg7D4UPUhGFceZ6sB/FDLNBiTYOH3JB/I5QltObthFvaw
-         aILg==
-X-Gm-Message-State: AOJu0YwwbD5YfOPnwQwNKsDbSSyjSIUAAr9O0AOJYq0W4BHUGlsU0lyp
-	d0BvIy7leOuiULDWw8mcrQv9A8aGNe3YOllrObMBIwJ2U/rVhT+25bfGM/SZhDXC7LsNxd3t801
-	sDimOfrzAhwAFLpEluLYoM5V4a/YutaNgbKp2sm8t
-X-Gm-Gg: ASbGnctWYJ7M6SXYShWxubyeoVVIoJMBMaEaHv1cLNvzh4sb0K7jqEXyXqc+5wlG7Vt
-	qr5BW/I6e/6bq0sOgDh7L/uDFg0NCYSDLBsnj5rm1r6soPVEoz3aAI0DJu82GfcZJ6t9/0SIyGL
-	1CfI0M+xZEKgChckY1/3scAJBTQStK2qXmWFw/i7ugkH4zerQzLHZoCv/hlc45ni8p/jrirBr4w
-	pdl+/gurXUSYihOKtSDUTro68cfJ7Nv
-X-Google-Smtp-Source: AGHT+IHEX/LXCcXiIAvMWCf1qx+3kkMbx/P3MOisSt6xugJLgd5lVynv5AI5WAJHsRmWmbQAX0ncoNz5Nk1IfQjetPE=
-X-Received: by 2002:ac8:5902:0:b0:4de:b0d4:dda4 with SMTP id
- d75a77b69052e-4e6ead7493fmr328872751cf.69.1760381648539; Mon, 13 Oct 2025
- 11:54:08 -0700 (PDT)
+	s=arc-20240116; t=1760384011; c=relaxed/simple;
+	bh=IGRMjsapeQ0uT6RWpW+k4oJ+ncKVZV6zcCoqFxvaTs0=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=cT6g6PsLkGwoqtMI6/7EkW08DjhPCjYs+20tivjwKTSBbJAkh9lLHrKSDsp/dVd4490GYMvohQaD75PZ5a0BL9U40AsyYW3vzytVDEYLKQ3A/OdwsPPi4xMgM9DMVF30Lb0oxVe+uxKgnjlW2NtjtIEygFK6ziPPEb5ohvUbkgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=qV0EOtv0; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1006)
+	id 4F5B62065942; Mon, 13 Oct 2025 12:33:29 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4F5B62065942
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1760384009;
+	bh=PKEqWcC0OSttA8kSq08FINTe0UcdSEm7yoFon2Ds0yo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qV0EOtv07B4vz/z+m7iXRVZQ+/kz3j8e8wuXX/ES03DxBU42/f7yn9tkk8ww5EpnJ
+	 wqExEwR62s351e+kY0B7lyoQwIVRCTanIZDv07iVmb9YF8WwDT+ZCN7uyuY55cYKWK
+	 2TR7HHJuVCPwbnaMOKB6u43McGBFkuFl2vggRZFU=
+From: Haiyang Zhang <haiyangz@linux.microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: haiyangz@microsoft.com,
+	paulros@microsoft.com,
+	decui@microsoft.com,
+	kys@microsoft.com,
+	wei.liu@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	longli@microsoft.com,
+	ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com,
+	kotaranov@microsoft.com,
+	horms@kernel.org,
+	shradhagupta@linux.microsoft.com,
+	leon@kernel.org,
+	mlevitsk@redhat.com,
+	yury.norov@gmail.com,
+	shirazsaleem@microsoft.com,
+	andrew+netdev@lunn.ch,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: mana: Support HW link state events
+Date: Mon, 13 Oct 2025 12:33:21 -0700
+Message-Id: <1760384001-30805-1-git-send-email-haiyangz@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251013101636.69220-1-21cnbao@gmail.com>
-In-Reply-To: <20251013101636.69220-1-21cnbao@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 13 Oct 2025 11:53:57 -0700
-X-Gm-Features: AS18NWAe_NmExu5WITMBDbR0FpCc3scky7DNzwEUSRCGS5tETmNSC2IUauhYc4w
-Message-ID: <CANn89i+wikOQQrGFXu=L3nKPG62rsBmWer5WpLg5wmBN+RdMqA@mail.gmail.com>
-Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network buffer allocation
-To: Barry Song <21cnbao@gmail.com>
-Cc: netdev@vger.kernel.org, linux-mm@kvack.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Barry Song <v-songbaohua@oppo.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Vlastimil Babka <vbabka@suse.cz>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
-	Brendan Jackman <jackmanb@google.com>, Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Huacai Zhou <zhouhuacai@oppo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 13, 2025 at 3:16=E2=80=AFAM Barry Song <21cnbao@gmail.com> wrot=
-e:
->
-> From: Barry Song <v-songbaohua@oppo.com>
->
-> On phones, we have observed significant phone heating when running apps
-> with high network bandwidth. This is caused by the network stack frequent=
-ly
-> waking kswapd for order-3 allocations. As a result, memory reclamation be=
-comes
-> constantly active, even though plenty of memory is still available for ne=
-twork
-> allocations which can fall back to order-0.
->
-> Commit ce27ec60648d ("net: add high_order_alloc_disable sysctl/static key=
-")
-> introduced high_order_alloc_disable for the transmit (TX) path
-> (skb_page_frag_refill()) to mitigate some memory reclamation issues,
-> allowing the TX path to fall back to order-0 immediately, while leaving t=
-he
-> receive (RX) path (__page_frag_cache_refill()) unaffected. Users are
-> generally unaware of the sysctl and cannot easily adjust it for specific =
-use
-> cases. Enabling high_order_alloc_disable also completely disables the
-> benefit of order-3 allocations. Additionally, the sysctl does not apply t=
-o the
-> RX path.
->
-> An alternative approach is to disable kswapd for these frequent
-> allocations and provide best-effort order-3 service for both TX and RX pa=
-ths,
-> while removing the sysctl entirely.
->
->
-...
+From: Haiyang Zhang <haiyangz@microsoft.com>
 
-> Signed-off-by: Barry Song <v-songbaohua@oppo.com>
-> ---
->  Documentation/admin-guide/sysctl/net.rst | 12 ------------
->  include/net/sock.h                       |  1 -
->  mm/page_frag_cache.c                     |  2 +-
->  net/core/sock.c                          |  8 ++------
->  net/core/sysctl_net_core.c               |  7 -------
->  5 files changed, 3 insertions(+), 27 deletions(-)
->
-> diff --git a/Documentation/admin-guide/sysctl/net.rst b/Documentation/adm=
-in-guide/sysctl/net.rst
-> index 2ef50828aff1..b903bbae239c 100644
-> --- a/Documentation/admin-guide/sysctl/net.rst
-> +++ b/Documentation/admin-guide/sysctl/net.rst
-> @@ -415,18 +415,6 @@ GRO has decided not to coalesce, it is placed on a p=
-er-NAPI list. This
->  list is then passed to the stack when the number of segments reaches the
->  gro_normal_batch limit.
->
-> -high_order_alloc_disable
-> -------------------------
-> -
-> -By default the allocator for page frags tries to use high order pages (o=
-rder-3
-> -on x86). While the default behavior gives good results in most cases, so=
-me users
-> -might have hit a contention in page allocations/freeing. This was especi=
-ally
-> -true on older kernels (< 5.14) when high-order pages were not stored on =
-per-cpu
-> -lists. This allows to opt-in for order-0 allocation instead but is now m=
-ostly of
-> -historical importance.
-> -
+Handle the HW link state events received from HW channel, and
+set the proper link state, also stop/wake queues accordingly.
 
-The sysctl is quite useful for testing purposes, say on a freshly
-booted host, with plenty of free memory.
+Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+---
+ .../net/ethernet/microsoft/mana/gdma_main.c   |  1 +
+ .../net/ethernet/microsoft/mana/hw_channel.c  | 12 ++++
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 64 +++++++++++++++++--
+ include/net/mana/gdma.h                       |  4 +-
+ include/net/mana/hw_channel.h                 |  2 +
+ include/net/mana/mana.h                       |  4 ++
+ 6 files changed, 79 insertions(+), 8 deletions(-)
 
-Also, having order-3 pages if possible is quite important for IOMM use case=
-s.
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 43f034e180c4..effe0a2f207a 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -528,6 +528,7 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
+ 	case GDMA_EQE_HWC_INIT_DONE:
+ 	case GDMA_EQE_HWC_SOC_SERVICE:
+ 	case GDMA_EQE_RNIC_QP_FATAL:
++	case GDMA_EQE_HWC_SOC_RECONFIG_DATA:
+ 		if (!eq->eq.callback)
+ 			break;
+ 
+diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+index ada6c78a2bef..4d4113628027 100644
+--- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
++++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+@@ -118,6 +118,7 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
+ 	struct gdma_dev *gd = hwc->gdma_dev;
+ 	union hwc_init_type_data type_data;
+ 	union hwc_init_eq_id_db eq_db;
++	struct mana_context *ac;
+ 	u32 type, val;
+ 	int ret;
+ 
+@@ -196,6 +197,17 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
+ 			hwc->hwc_timeout = val;
+ 			break;
+ 
++		case HWC_DATA_HW_LINK_CONNECT:
++		case HWC_DATA_HW_LINK_DISCONNECT:
++			ac = gd->gdma_context->mana.driver_data;
++			if (!ac)
++				break;
++
++			ac->link_event = type;
++			schedule_delayed_work(&ac->link_change_work, 0);
++
++			break;
++
+ 		default:
+ 			dev_warn(hwc->dev, "Received unknown reconfig type %u\n", type);
+ 			break;
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 0142fd98392c..1cf784740037 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -20,6 +20,7 @@
+ 
+ #include <net/mana/mana.h>
+ #include <net/mana/mana_auxiliary.h>
++#include <net/mana/hw_channel.h>
+ 
+ static DEFINE_IDA(mana_adev_ida);
+ 
+@@ -84,8 +85,9 @@ static int mana_open(struct net_device *ndev)
+ 	/* Ensure port state updated before txq state */
+ 	smp_wmb();
+ 
+-	netif_carrier_on(ndev);
+-	netif_tx_wake_all_queues(ndev);
++	if (netif_carrier_ok(ndev))
++		netif_tx_wake_all_queues(ndev);
++
+ 	netdev_dbg(ndev, "%s successful\n", __func__);
+ 	return 0;
+ }
+@@ -100,6 +102,54 @@ static int mana_close(struct net_device *ndev)
+ 	return mana_detach(ndev, true);
+ }
+ 
++static void mana_link_state_handle(struct work_struct *w)
++{
++	struct mana_context *ac =
++		container_of(w, struct mana_context, link_change_work.work);
++	struct mana_port_context *apc;
++	struct net_device *ndev;
++	bool link_up;
++	int i;
++
++	if (!rtnl_trylock()) {
++		schedule_delayed_work(&ac->link_change_work, 1);
++		return;
++	}
++
++	if (ac->link_event == HWC_DATA_HW_LINK_CONNECT)
++		link_up = true;
++	else if (ac->link_event == HWC_DATA_HW_LINK_DISCONNECT)
++		link_up = false;
++	else
++		goto out;
++
++	/* Process all ports */
++	for (i = 0; i < ac->num_ports; i++) {
++		ndev = ac->ports[i];
++		if (!ndev)
++			continue;
++
++		apc = netdev_priv(ndev);
++
++		if (link_up) {
++			netif_carrier_on(ndev);
++
++			if (apc->port_is_up)
++				netif_tx_wake_all_queues(ndev);
++
++			__netdev_notify_peers(ndev);
++		} else {
++			if (netif_carrier_ok(ndev)) {
++				netif_tx_disable(ndev);
++				netif_carrier_off(ndev);
++			}
++		}
++	}
++
++out:
++	rtnl_unlock();
++}
++
+ static bool mana_can_tx(struct gdma_queue *wq)
+ {
+ 	return mana_gd_wq_avail_space(wq) >= MAX_TX_WQE_SIZE;
+@@ -3059,9 +3109,6 @@ int mana_attach(struct net_device *ndev)
+ 	/* Ensure port state updated before txq state */
+ 	smp_wmb();
+ 
+-	if (apc->port_is_up)
+-		netif_carrier_on(ndev);
+-
+ 	netif_device_attach(ndev);
+ 
+ 	return 0;
+@@ -3154,7 +3201,6 @@ int mana_detach(struct net_device *ndev, bool from_close)
+ 	smp_wmb();
+ 
+ 	netif_tx_disable(ndev);
+-	netif_carrier_off(ndev);
+ 
+ 	if (apc->port_st_save) {
+ 		err = mana_dealloc_queues(ndev);
+@@ -3212,7 +3258,7 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 
+ 	netif_set_tso_max_size(ndev, GSO_MAX_SIZE);
+ 
+-	netif_carrier_off(ndev);
++	netif_carrier_on(ndev);
+ 
+ 	netdev_rss_key_fill(apc->hashkey, MANA_HASH_KEY_SIZE);
+ 
+@@ -3431,6 +3477,8 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+ 
+ 	if (!resuming) {
+ 		ac->num_ports = num_ports;
++
++		INIT_DELAYED_WORK(&ac->link_change_work, mana_link_state_handle);
+ 	} else {
+ 		if (ac->num_ports != num_ports) {
+ 			dev_err(dev, "The number of vPorts changed: %d->%d\n",
+@@ -3500,6 +3548,8 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 	int err;
+ 	int i;
+ 
++	cancel_delayed_work_sync(&ac->link_change_work);
++
+ 	/* adev currently doesn't support suspending, always remove it */
+ 	if (gd->adev)
+ 		remove_adev(gd);
+diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+index 57df78cfbf82..637f42485dba 100644
+--- a/include/net/mana/gdma.h
++++ b/include/net/mana/gdma.h
+@@ -590,6 +590,7 @@ enum {
+ 
+ /* Driver can self reset on FPGA Reconfig EQE notification */
+ #define GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE BIT(17)
++#define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
+ 
+ #define GDMA_DRV_CAP_FLAGS1 \
+ 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
+@@ -599,7 +600,8 @@ enum {
+ 	 GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP | \
+ 	 GDMA_DRV_CAP_FLAG_1_DYNAMIC_IRQ_ALLOC_SUPPORT | \
+ 	 GDMA_DRV_CAP_FLAG_1_SELF_RESET_ON_EQE | \
+-	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE)
++	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE | \
++	 GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE)
+ 
+ #define GDMA_DRV_CAP_FLAGS2 0
+ 
+diff --git a/include/net/mana/hw_channel.h b/include/net/mana/hw_channel.h
+index 83cf93338eb3..16feb39616c1 100644
+--- a/include/net/mana/hw_channel.h
++++ b/include/net/mana/hw_channel.h
+@@ -24,6 +24,8 @@
+ #define HWC_INIT_DATA_PF_DEST_CQ_ID	11
+ 
+ #define HWC_DATA_CFG_HWC_TIMEOUT 1
++#define HWC_DATA_HW_LINK_CONNECT 2
++#define HWC_DATA_HW_LINK_DISCONNECT 3
+ 
+ #define HW_CHANNEL_WAIT_RESOURCE_TIMEOUT_MS 30000
+ 
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 0921485565c0..eee90bb9da1e 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -477,6 +477,10 @@ struct mana_context {
+ 	struct dentry *mana_eqs_debugfs;
+ 
+ 	struct net_device *ports[MAX_PORTS_IN_MANA_DEV];
++
++	/* Link state change work */
++	struct delayed_work link_change_work;
++	u32 link_event;
+ };
+ 
+ struct mana_port_context {
+-- 
+2.34.1
 
-Perhaps kswapd should have some kind of heuristic to not start if a
-recent run has already happened.
-
-I am guessing phones do not need to send 1.6 Tbit per second on
-network devices (yet),
-an option  could be to disable it in your boot scripts.
 
