@@ -1,178 +1,264 @@
-Return-Path: <netdev+bounces-228694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12ADDBD2582
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 11:43:36 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB7F2BD25F7
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 11:51:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E58C24EF401
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 09:43:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 83C414EFF4B
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 09:51:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 720312FF15A;
-	Mon, 13 Oct 2025 09:42:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C8E72FA0D3;
+	Mon, 13 Oct 2025 09:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fq+m4d1p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72FAC2FE599
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 09:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 305852FDC3A
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 09:49:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760348565; cv=none; b=j4DxhH8y7uYCoI9gswWA8pMz56/eHY42Hbd4cK/1aPXY8i4O8Je7xowvmTRK9xZD4DQsJFsb4G5gvA8an7D9maU7BxzBDyLI2Q0/90JXbWRUJ4p0Xi5CHHOQ7QXxzbgQ61g+dp0owTvE43x1EUfv4bGfGBLlH3YMlqPGuB1uLXg=
+	t=1760348971; cv=none; b=KZV2qYi/ZQ2O4iQCBHGVFHvqnwVy0LeFBbRCGTlS08i+FyUCfUWqi0TAxEIGUBWffF8dF1/dlpDX/G1hBNZOQdjT79G3eCJmhGnilwIQXALKatyoXlHfta4cwsX26qO/R5+edeStuZGNTIGIhLmZaXUVebCxOyzM0sHW5ZVuWOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760348565; c=relaxed/simple;
-	bh=EAN4sWBJ5u21afjmQCOH07b3iYnwg0JD2LI+Ap4oW6k=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=mork6E6pKPvkpIAkPblIlS6xOlN/Da1myVlbOwsEDGgK+RzsUyO4A8O+cKZ5sFBPp5QNgy+L8PwXi3YGgxwOJxz+/r0IQke0RgT0OK9cPQbc1+MuXtWVQ5edTrUt1mGnZlzwPmSaDzwypbb6OZDjzKLM/YZD+Vn/oDE36nR8+p0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-634a3327ff7so8158443a12.1
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 02:42:43 -0700 (PDT)
+	s=arc-20240116; t=1760348971; c=relaxed/simple;
+	bh=4nov9Jj558BeQ95uiThVM11nI3KKAb6whRBQXkXuQDo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qdBYoMWANICAWVKvZ0H2wAbCdQd78/V+OiY5dLK5WR1Nnml8Gs2cprtYTh0yT2ipIOgF8TDGNY+Xfd4HO4B1dDWrG+dbKVfx96dnXYoM6kCcFh79jk7qi4EaZ9sdqLqCLJv2coL7SiRte9k8HDfqcZE9i1ha7H+49WvvVj1GBBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fq+m4d1p; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-80ff41475cdso82852786d6.2
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 02:49:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760348967; x=1760953767; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o+P8gMigxQo6JKHqVp52XwSzL9kMvXyrC7PM4myIfBA=;
+        b=fq+m4d1phM8PkiXSq3pNUik4OX/Axdh+iC1LIo46USW+wBFt7GnBO/ouMBvZ2K3EI5
+         aMehQ2aKZX0z512PR17tu3J0k9tYaWJiJG3MLUpDaEYOYLG8xYk3Zu0o05f4XtPZstW6
+         CYUGUzQy6nkZXiVMw6t/uF5F0F7cs4lNXNWa5jVdYSiWHXSgSd8J886jALKHKBF3+yml
+         VWgZPW43j/uo2QLcWFFOCMtnDwncYp7QAX/8Ql/42A7GJejMjjNrSi34DEW0uC9J/oub
+         p0qHm2fEDv2Rm10dRmmo53nDMrnefCCZBzlylLKyHzfdVBqTIwFvxxRA367gcJb93t2e
+         1M5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760348562; x=1760953362;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zTvGYqfZOznQ17hnioy7FCyX6Jv4eDMruKEwckMF/k4=;
-        b=gy1lir6Zi+if0M+4jNT/Zyq0YD5jFq4C0u1AymBKIHEmokGmG3qudGiWKqLmikd6vA
-         9Tk0o4g9FWInLxJ3s32kn9loLcIwOoW1n6bmWmV7w41NhNIPY/ois07EacKvIPVS9z3Y
-         n7vkOVtfugzTc19cnA17uepvH4lvCyb6mAZaHn1aEPWzXzttBvxyixGEtn/UCbTPCCj1
-         IjmKXDeLEVzo+9llPRJpkIKW/cq7rR+l3R4gvEhkaUkFjyYmQb4r4MGLbNL4XCfWg0aX
-         SONXFqF7IyCSt6zWhNqqFW/JPwLOmDmJllCbx2mC7DDgq1Bvw8brQa5YD/QciTU+sT12
-         2q6Q==
-X-Gm-Message-State: AOJu0Yy712ZVNg8iNp3LXPXC7Syl94lpjZDTua1Tqm5OU2sM1Et3gf4Y
-	4UUYpCThQt7XksmMvwXZZamhciZ6b76z28FQxinjTqT+IpyTyJoHYIVA
-X-Gm-Gg: ASbGncsVME3Jl/ezAJ8BTyhROXKhwJ/i/dnR9DtSYdDUOuoYXcVwA1fgi3ztzfrrcDT
-	/93KWji6qqlMRNtHCMKHH/assM8UCLGgXli7jc0zSZrl67PnF+sGHvvNOteDLx2EUCKol/XyudS
-	YHfUzjvTCSB0qRJbe9DYtw5JgF+nQwNW3PYuf/cPrDzVVuygXIExOL+DRN0mXLaGHwe03DxzGgp
-	8sjcjODJ0cjaEdOREKVAchG1K1E9MEBKq4Xe10vF16oFKBy1AgPHaiuac5NZnAJjZlkscSPduYE
-	nTEFnwgjurDJ07lhOmSYtX0qxrMB4TSWYvclKd8OHCXHr1609VqZ2rMl+plx7pypTAhLJdH7lyW
-	ulSPzkf29XyEZ9EBaJxeI2XX9CI5XxrEgVvjAKeHymZgmfls=
-X-Google-Smtp-Source: AGHT+IFcI0cgPTqYWTOSyF+qub8t4bQnrQN0dIPm9yvFJr5D+T7COUZ+n8YwG9QqG0uQau0RjuCcuQ==
-X-Received: by 2002:a17:907:3f1c:b0:b3e:26ae:7288 with SMTP id a640c23a62f3a-b50aa48e3b6mr2185548666b.8.1760348561519;
-        Mon, 13 Oct 2025 02:42:41 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:70::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b55d8c12978sm891499066b.44.2025.10.13.02.42.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Oct 2025 02:42:41 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Mon, 13 Oct 2025 02:42:29 -0700
-Subject: [PATCH net] netpoll: Fix deadlock caused by memory allocation
- under spinlock
+        d=1e100.net; s=20230601; t=1760348967; x=1760953767;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o+P8gMigxQo6JKHqVp52XwSzL9kMvXyrC7PM4myIfBA=;
+        b=aDLkfBahHHAMOAUVBMGNFTQi4rjeuxKpbSTMICI7vPDkMske4/qUr5hPbZ574EtluF
+         GLSL48QBjs455dnqK2CiQjBvDJhrm4rpKOUyX5dqDtUbBremvv1RhIr/mbZYmc5+pKoI
+         VCS8AozSeJ716wkiX6bimERrTaEV12ojLbrfoxEIozB+aj/4U1caogdoN2CNtpHR5hdc
+         7wUSMHR94Dvp4SCfmgiGsVjG9N5EBDIO2UnQqgmp+CdBx/1bSnjikmxJT444+CTzoPFg
+         gY796rRGRuqshq3H//rdc53Rz9NxEoWl7K+KzoV03S3T6FPbh4viQ3d++MewS0funaZN
+         iQGA==
+X-Forwarded-Encrypted: i=1; AJvYcCXhTEepOCEIDto+nWn6188yzXcDJf/dB295rQKZNTzDV40nnYXAVIGVZMMqq2YDMvcqKrZZkew=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFCTnxvXpjITIFFuGe5WNy7swmuSVW/Uhe4UQrBueDvJvk4Ywg
+	MJWvktPWe9BPRtDAhrYtGfpEoAYWzhnEmQe1U38DXvlCzp7R2+uXucKHpGqchRPHkSIkEvx6Trs
+	zLY7juqb3lKLWGp/TYV7kFrwMl1ls44JgaDlfMV14
+X-Gm-Gg: ASbGncuFWHWHwNMmOLjVrJwoCK77Di3JHpGwsTzXnm02HpS4dMy5CCvOERDGx2iEgja
+	yWLA6N0E6dZzG/gGhz0JRo9Ac6zEj1KdU4+aa0C7AS5RNR84X1xOAZ81tNc72xAjDjpNnlvhmgR
+	3dVraceHrwXHtLNUGLg8vzM45pFCS2dyRJqtF3yfz+M+kJn0QiVxFbsQ5VYjWWTx2aG0yifzSJb
+	hFsExHWnU4htk3BIvGTLFkFg2hIaV0TFQwHzCm466U=
+X-Google-Smtp-Source: AGHT+IGvVSZlQx07IrE8SHZzHiA7UU0+Y0I+8HhJag0YsojwcXAlf/bVxhcX4AOuwhw7F5tjqBm1C0tX2Jul8zR6NCc=
+X-Received: by 2002:a05:622a:554:b0:4df:d1e5:47ac with SMTP id
+ d75a77b69052e-4e6ead07cadmr306061391cf.22.1760348966463; Mon, 13 Oct 2025
+ 02:49:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251013-fix_netpoll_aa-v1-1-94a1091f92f0@debian.org>
-X-B4-Tracking: v=1; b=H4sIAITJ7GgC/x3M4QpAMBQG0Fe5fb+t3EmxV5G05o5bGm2SkndXz
- gOcB0WySoGjB1kuLbonOOKKEFafFjE6wxFsbVuuuTFR7ynJeezbNnlvQt+zD2203HSoCEeWqPc
- fDkhyYnzfD3aHdDplAAAA
-X-Change-ID: 20251013-fix_netpoll_aa-c991ac5f2138
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel-team@meta.com, gustavold@gmail.com, Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-dd21f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2358; i=leitao@debian.org;
- h=from:subject:message-id; bh=EAN4sWBJ5u21afjmQCOH07b3iYnwg0JD2LI+Ap4oW6k=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBo7MmQ6bZzDnyeA7HSB+mYJwjwJrnCAoiQRk57X
- fyT4riR3CSJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaOzJkAAKCRA1o5Of/Hh3
- bW6pD/4p6l9yBt+uGrcfQ6NLqvt5xASPh7iCV4JaBKLV8uV09l3b2HdgUaomSNb9/tCBtBAerhq
- +uS7iLu/wJ32EsGFNUl3RWZ1CAN5mnh7uaLSmQ2BxGoyOBPQsUQEo+HyHyZwAwfMwr7GbT0aYtH
- cTriHZSpvoNTCm5y4EQFaRLMVYPUKarz30D8gV86sQCdCEf5HQGm23iVnc+Z3N96HCHs3R0VOuP
- SBz/z8V6Gvd/4c1XHS9SX3JzMM7JnVxw5PyStVeuSkcRFF3030vZM8V/uR5e2sKaVHFr6iZK3vt
- 4E0fCtGil6BpxOLNeTR43ICtloqDK5ZPTUaafiK8UnzyfIQjidmLiLf//lWcG7RdobVqh+HySqh
- i1cxo63VNT7Vs0XGday/DSS4Ig7hMi9hwNw9I7BK+0mmbNRdxK533i8pZjHI2tSCR/kYinJROUh
- X7UljsCDnnJsOLNhzKocXaFFfXZ1LsNTkCnz0gnwEZqfysTENWdlTdkxNNa8g5ACfzMMG1kLJZ4
- ul/aah9w+h72WTQUTtxZxIQiT0yz5UyRzOu/KZNl/EDlqV/VZNVEl1q5Du8QCcjqWIEPJeP6PfY
- zk7qJP7fvtWW1LhuG10SBnnFhKoUY7kCaTHfunCo39W/6Pjl9fXc21btEMfWCxCctjXnEvGxbuy
- bbi0swQEe3e87Ew==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+References: <20250926074033.1548675-1-xuanqiang.luo@linux.dev>
+ <20250926074033.1548675-2-xuanqiang.luo@linux.dev> <CANn89iJ15RFYq65t57sW=F1jZigbr5xTbPNLVY53cKtpMKLotA@mail.gmail.com>
+ <d6a43fe1-2e00-4df4-b4a8-04facd8f05d4@linux.dev>
+In-Reply-To: <d6a43fe1-2e00-4df4-b4a8-04facd8f05d4@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 13 Oct 2025 02:49:14 -0700
+X-Gm-Features: AS18NWB6G6wjZ1a9k85i4wHSSQ6DX0cNBRDtRG67jmDyxRNC9o6gB4vLv6CD27k
+Message-ID: <CANn89iLQMVms1GF_oY1WSCtmxLZaBJrTKaeHnwRo5p9uzFwnVw@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 1/3] rculist: Add hlist_nulls_replace_rcu()
+ and hlist_nulls_replace_init_rcu()
+To: luoxuanqiang <xuanqiang.luo@linux.dev>
+Cc: kuniyu@google.com, "Paul E. McKenney" <paulmck@kernel.org>, kerneljasonxing@gmail.com, 
+	davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org, 
+	Xuanqiang Luo <luoxuanqiang@kylinos.cn>, Frederic Weisbecker <frederic@kernel.org>, 
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fix a AA deadlock in refill_skbs() where memory allocation while holding
-skb_pool->lock can trigger a recursive lock acquisition attempt.
+On Mon, Oct 13, 2025 at 1:26=E2=80=AFAM luoxuanqiang <xuanqiang.luo@linux.d=
+ev> wrote:
+>
+>
+> =E5=9C=A8 2025/10/13 15:31, Eric Dumazet =E5=86=99=E9=81=93:
+> > On Fri, Sep 26, 2025 at 12:41=E2=80=AFAM <xuanqiang.luo@linux.dev> wrot=
+e:
+> >> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+> >>
+> >> Add two functions to atomically replace RCU-protected hlist_nulls entr=
+ies.
+> >>
+> >> Keep using WRITE_ONCE() to assign values to ->next and ->pprev, as
+> >> mentioned in the patch below:
+> >> commit efd04f8a8b45 ("rcu: Use WRITE_ONCE() for assignments to ->next =
+for
+> >> rculist_nulls")
+> >> commit 860c8802ace1 ("rcu: Use WRITE_ONCE() for assignments to ->pprev=
+ for
+> >> hlist_nulls")
+> >>
+> >> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+> >> ---
+> >>   include/linux/rculist_nulls.h | 59 +++++++++++++++++++++++++++++++++=
+++
+> >>   1 file changed, 59 insertions(+)
+> >>
+> >> diff --git a/include/linux/rculist_nulls.h b/include/linux/rculist_nul=
+ls.h
+> >> index 89186c499dd4..c26cb83ca071 100644
+> >> --- a/include/linux/rculist_nulls.h
+> >> +++ b/include/linux/rculist_nulls.h
+> >> @@ -52,6 +52,13 @@ static inline void hlist_nulls_del_init_rcu(struct =
+hlist_nulls_node *n)
+> >>   #define hlist_nulls_next_rcu(node) \
+> >>          (*((struct hlist_nulls_node __rcu __force **)&(node)->next))
+> >>
+> >> +/**
+> >> + * hlist_nulls_pprev_rcu - returns the dereferenced pprev of @node.
+> >> + * @node: element of the list.
+> >> + */
+> >> +#define hlist_nulls_pprev_rcu(node) \
+> >> +       (*((struct hlist_nulls_node __rcu __force **)(node)->pprev))
+> >> +
+> >>   /**
+> >>    * hlist_nulls_del_rcu - deletes entry from hash list without re-ini=
+tialization
+> >>    * @n: the element to delete from the hash list.
+> >> @@ -152,6 +159,58 @@ static inline void hlist_nulls_add_fake(struct hl=
+ist_nulls_node *n)
+> >>          n->next =3D (struct hlist_nulls_node *)NULLS_MARKER(NULL);
+> >>   }
+> >>
+> >> +/**
+> >> + * hlist_nulls_replace_rcu - replace an old entry by a new one
+> >> + * @old: the element to be replaced
+> >> + * @new: the new element to insert
+> >> + *
+> >> + * Description:
+> >> + * Replace the old entry with the new one in a RCU-protected hlist_nu=
+lls, while
+> >> + * permitting racing traversals.
+> >> + *
+> >> + * The caller must take whatever precautions are necessary (such as h=
+olding
+> >> + * appropriate locks) to avoid racing with another list-mutation prim=
+itive, such
+> >> + * as hlist_nulls_add_head_rcu() or hlist_nulls_del_rcu(), running on=
+ this same
+> >> + * list.  However, it is perfectly legal to run concurrently with the=
+ _rcu
+> >> + * list-traversal primitives, such as hlist_nulls_for_each_entry_rcu(=
+).
+> >> + */
+> >> +static inline void hlist_nulls_replace_rcu(struct hlist_nulls_node *o=
+ld,
+> >> +                                          struct hlist_nulls_node *ne=
+w)
+> >> +{
+> >> +       struct hlist_nulls_node *next =3D old->next;
+> >> +
+> >> +       WRITE_ONCE(new->next, next);
+> >> +       WRITE_ONCE(new->pprev, old->pprev);
+> > I do not think these two WRITE_ONCE() are needed.
+> >
+> > At this point new is not yet visible.
+> >
+> > The following  rcu_assign_pointer() is enough to make sure prior
+> > writes are committed to memory.
+>
+> Dear Eric,
+>
+> I=E2=80=99m quoting your more detailed explanation from the other patch [=
+0], thank
+> you for that!
+>
+> However, regarding new->next, if the new object is allocated with
+> SLAB_TYPESAFE_BY_RCU, would we still encounter the same issue as in commi=
+t
+> efd04f8a8b45 (=E2=80=9Crcu: Use WRITE_ONCE() for assignments to ->next fo=
+r
+> rculist_nulls=E2=80=9D)?
+>
+> Also, for the WRITE_ONCE() assignments to ->pprev introduced in commit
+> 860c8802ace1 (=E2=80=9Crcu: Use WRITE_ONCE() for assignments to ->pprev f=
+or
+> hlist_nulls=E2=80=9D) within hlist_nulls_add_head_rcu(), is that also unn=
+ecessary?
 
-The deadlock scenario occurs when the system is under severe memory
-pressure:
+I forgot sk_unhashed()/sk_hashed() could be called from lockless contexts.
 
-1. refill_skbs() acquires skb_pool->lock (spinlock)
-2. alloc_skb() is called while holding the lock
-3. Memory allocator fails and calls slab_out_of_memory()
-4. This triggers printk() for the OOM warning
-5. The console output path calls netpoll_send_udp()
-6. netpoll_send_udp() attempts to acquire the same skb_pool->lock
-7. Deadlock: the lock is already held by the same CPU
+It is a bit weird to annotate the writes, but not the lockless reads,
+even if apparently KCSAN
+is okay with that.
 
-Call stack:
-  refill_skbs()
-    spin_lock_irqsave(&skb_pool->lock)    <- lock acquired
-    __alloc_skb()
-      kmem_cache_alloc_node_noprof()
-        slab_out_of_memory()
-          printk()
-            console_flush_all()
-              netpoll_send_udp()
-                skb_dequeue()
-                  spin_lock_irqsave()     <- deadlock attempt
 
-Refactor refill_skbs() to never allocate memory while holding
-the spinlock.
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Fixes: 1da177e4c3f41 ("Linux-2.6.12-rc2")
----
- net/core/netpoll.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
-
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index 60a05d3b7c249..788cec4d527f8 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -232,14 +232,26 @@ static void refill_skbs(struct netpoll *np)
- 
- 	skb_pool = &np->skb_pool;
- 
--	spin_lock_irqsave(&skb_pool->lock, flags);
--	while (skb_pool->qlen < MAX_SKBS) {
-+	while (1) {
-+		spin_lock_irqsave(&skb_pool->lock, flags);
-+		if (skb_pool->qlen >= MAX_SKBS)
-+			goto unlock;
-+		spin_unlock_irqrestore(&skb_pool->lock, flags);
-+
- 		skb = alloc_skb(MAX_SKB_SIZE, GFP_ATOMIC);
- 		if (!skb)
--			break;
-+			return;
- 
-+		spin_lock_irqsave(&skb_pool->lock, flags);
-+		if (skb_pool->qlen >= MAX_SKBS)
-+			/* Discard if len got increased (TOCTOU) */
-+			goto discard;
- 		__skb_queue_tail(skb_pool, skb);
-+		spin_unlock_irqrestore(&skb_pool->lock, flags);
- 	}
-+discard:
-+	dev_kfree_skb_any(skb);
-+unlock:
- 	spin_unlock_irqrestore(&skb_pool->lock, flags);
- }
- 
-
----
-base-commit: 0b4b77eff5f8cd9be062783a1c1e198d46d0a753
-change-id: 20251013-fix_netpoll_aa-c991ac5f2138
-
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
-
+>
+> [0]: https://lore.kernel.org/all/CANn89iKQM=3D4wjCLxpg-m3jYoUm=3DrsSk68xV=
+LN2902di2+FkSFg@mail.gmail.com/
+>
+> Thanks!
+>
+> >> +       rcu_assign_pointer(hlist_nulls_pprev_rcu(new), new);
+> >> +       if (!is_a_nulls(next))
+> >> +               WRITE_ONCE(next->pprev, &new->next);
+> >> +}
+> >> +
+> >> +/**
+> >> + * hlist_nulls_replace_init_rcu - replace an old entry by a new one a=
+nd
+> >> + * initialize the old
+> >> + * @old: the element to be replaced
+> >> + * @new: the new element to insert
+> >> + *
+> >> + * Description:
+> >> + * Replace the old entry with the new one in a RCU-protected hlist_nu=
+lls, while
+> >> + * permitting racing traversals, and reinitialize the old entry.
+> >> + *
+> >> + * Note: @old must be hashed.
+> >> + *
+> >> + * The caller must take whatever precautions are necessary (such as h=
+olding
+> >> + * appropriate locks) to avoid racing with another list-mutation prim=
+itive, such
+> >> + * as hlist_nulls_add_head_rcu() or hlist_nulls_del_rcu(), running on=
+ this same
+> >> + * list. However, it is perfectly legal to run concurrently with the =
+_rcu
+> >> + * list-traversal primitives, such as hlist_nulls_for_each_entry_rcu(=
+).
+> >> + */
+> >> +static inline void hlist_nulls_replace_init_rcu(struct hlist_nulls_no=
+de *old,
+> >> +                                               struct hlist_nulls_nod=
+e *new)
+> >> +{
+> >> +       hlist_nulls_replace_rcu(old, new);
+> >> +       WRITE_ONCE(old->pprev, NULL);
+> >> +}
+> >> +
+> >>   /**
+> >>    * hlist_nulls_for_each_entry_rcu - iterate over rcu list of given t=
+ype
+> >>    * @tpos:      the type * to use as a loop cursor.
+> >> --
+> >> 2.25.1
+> >>
 
