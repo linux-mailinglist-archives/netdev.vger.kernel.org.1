@@ -1,231 +1,154 @@
-Return-Path: <netdev+bounces-228653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBDEABD117F
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 03:29:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 321BFBD11BB
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 03:45:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 70DE134729F
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 01:29:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5F983BADD5
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 01:45:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF4B224AE6;
-	Mon, 13 Oct 2025 01:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5354D1E521E;
+	Mon, 13 Oct 2025 01:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDZKPQJL"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206A629408;
-	Mon, 13 Oct 2025 01:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB0D34BA2B
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 01:45:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760318947; cv=none; b=jHLlFOOvvmbU3tl9Sgd8ZltdJ3279SNotS11xw21knQLp1OYTOF2DhLFWos6WQHVDrplLhP+1itt3dm6E8yek/4cpQAwLZM7v8xTPmCQHacp0k2N//vHBfNZ9NOc3usMLy/qL0WGFwO3OvV5FM63M0GvR5VVIbyEX4XUC9gRPv0=
+	t=1760319915; cv=none; b=uky24eRKQKeFaudYLcBS71WMIhwLbXnd+P2NbsN8XjZ/PZUWPvc0uZrYezm8GUaI14qH5hzJLCORWbVZAC8eiO/etvGocRCgwsqnD53lQeos8n3WV9qKSYCPQlsnG2d3StH3G92udgLkLYRADgPsWegi3/JAp+sIs9fL39fK0yQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760318947; c=relaxed/simple;
-	bh=pF3SfRA5dJFIspkqg6jyyfpkzqFi8q+zCIaQtyNC6+s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rm/z4HuNUrH2f0B2kqBDUe6r+12cXwaaglrAyQiO6JqXbmVIEu9hpTit23sH9/+JVMk06B+AQAdiYEaKamLaZQoOsLI39pJcUumjQWnyvXSdSysvKjUER/G0OU5VfOVHQTUCIkt0i77CI97gMMPXHittGKqebTc8OF9apttupF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c2dff70000001609-c2-68ec55dc252c
-Date: Mon, 13 Oct 2025 10:28:55 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
-	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
-	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
-	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
-	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-	ngupta@vflare.org, linux-block@vger.kernel.org,
-	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
-	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-	djwong@kernel.org, dri-devel@lists.freedesktop.org,
-	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
-	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
-	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
-	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
-	yeoreum.yun@arm.com, netdev@vger.kernel.org,
-	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
-	catalin.marinas@arm.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, luto@kernel.org,
-	sumit.semwal@linaro.org, gustavo@padovan.org,
-	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
-	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
-	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
-	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
-	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
-	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
-	qiang.zhang@linux.dev, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
-	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
-	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
-	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
-	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
-	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
-	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
-	yuzhao@google.com, baolin.wang@linux.alibaba.com,
-	usamaarif642@gmail.com, joel.granados@kernel.org,
-	richard.weiyang@gmail.com, geert+renesas@glider.be,
-	tim.c.chen@linux.intel.com, linux@treblig.org,
-	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
-	chenhuacai@kernel.org, francesco@valla.it,
-	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
-	masahiroy@kernel.org, brauner@kernel.org,
-	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
-	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
-	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH v17 28/47] dept: add documentation for dept
-Message-ID: <20251013012855.GB52546@system.software.com>
-References: <20251002081247.51255-1-byungchul@sk.com>
- <20251002081247.51255-29-byungchul@sk.com>
- <aN84jKyrE1BumpLj@archie.me>
+	s=arc-20240116; t=1760319915; c=relaxed/simple;
+	bh=4cFWIHu2r+hIi3lR7nn54Om8JSsWHbd/WNP/kpV9rAY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Am4oR0WwuNOZAP1Mgcxoo6Pf5sIpMEatfqtg1lNWllbu8kImfxTKs3/zts7ld/+OOH9NxVaDwYAHGRjEMDhFYYfDXfRpmpCmoLIDBg/zdI9XmES/c/bVc2Qo8XyyNhy/h7NPdsVTX2oCn3ILcRTvjTGQk0B/aVWh7IKPnlm0WyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EDZKPQJL; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-782e93932ffso3313122b3a.3
+        for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 18:45:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760319913; x=1760924713; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=k8WwB9JEN8AlsIlOO6fnHt3vfwGimPuwPhAm6kicKpU=;
+        b=EDZKPQJL8cSGmTnl+MpedZ3H3vFFxf9c+Ka2+1tRFaq6qqJOILOuyFMmJBCzoUrz0O
+         NgkT51OWgvJQc6estpbDYuYQFnjr7gZuvk8FYPGuf/qnrDbAlu2C0upfgEPIoaCP5Rzc
+         ll4/big2pY/OldZWKBCWLirbEddCtO4UNOmvDXsmm8HlSiBwHZs0YHUyPBTC2JNojOAY
+         qrIUY9zhKP1+TtCwC4+OgjQZOJqafw8Nu31UTNGhkYKjL9DznvbA2pZw6+H5mhDcjoSY
+         wD0BDFe5CALrRiz7/kKEQ7kPswQPzrKR7Bi3DLXjoibNN/93JkNMnyU+KqpxowzVm1ZF
+         Rc2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760319913; x=1760924713;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=k8WwB9JEN8AlsIlOO6fnHt3vfwGimPuwPhAm6kicKpU=;
+        b=PU1FXUH5IswPidybDY+46omkAS7mLnc5P9a3dc4unRSkD93DfhLNodNz6bgdEOXMrL
+         RXV5MRtwznpHCYj0UkRnuAGKv5Lknr9JoXPmdbbRy9UBtGVwUJoh+j3K3PNqgq+xsJrf
+         OsDMJsGAlylnIfYmmxyOBGV2amIpzyEIVDGDdN8M1IdcNk8hTCV8GL5kOM32F0ME1tOB
+         7estZ1CrkoEDB8L79N12JojtX2v2zZUoyF1nsR9AeMsRrK23fIN3Z/JIiRzp9y9coDru
+         4dLUjP3XDkMj8zm8LXy5uyhfFUViupoLPqhZ3Db4Ts9D5DZq7LN8lrqTxbBQu9zM0Btg
+         HCAw==
+X-Gm-Message-State: AOJu0Yy37Akf5yaLB/Z4ahyHS3a2dhwJJn8aapfl9mPwgcNzCmvkXKIT
+	m7fcYjviMzkd0cP5lg//79YfPbiJTUtR106Rua5QlG7C5obZl8RoX6TV
+X-Gm-Gg: ASbGncsnNLt9YqUG+7WCtYizHU3opUAuK6u+ApEAVqxy72FolGS1Vx45i6vwaurzRyZ
+	00wPJdqlL+IcdNXbpMQVWi+hVLTXi58Qq1v9MuZWSgNNNRXvaUvWsXt9EsiEg/Ecyr0trvL9FY+
+	fdmInslMZLBjm8BHClLilGf/4xAEWUMVvKXijKKCIm6DDiqLPCckS3AVyZYIGI05xFj5FFzlOgm
+	PJ5oudfF8UFEWorZMq+Iv9OQ2grudEHB4WHaVbCgcyB8Uwv8Jv1B11GVHfM4qdABNUoZSD0Wuj+
+	qZBWaxPwHlvmhP46hfJ4iQHbSEifVMj3Kb49IM28qwLC+CPn2L7PtU8a1ZyRtyCfNQHE64+sXrs
+	pwZTlTtbbWSvVa2PwXfGt9xThBsXWvh7EQBasTKnAm6Zs2qoGOOIZQ1dwucU3h1Ic9iuVOG+0l9
+	VP2rIkNC53pX59EkCwTvTd12G420PGtOclCCbku2FGyK0hKtBGNbw99BU=
+X-Google-Smtp-Source: AGHT+IF4MP0Ujym/6Nd3Q0UMlQ6V1AarYEbhDz3LNzhC/YBLjAa+zqOYHB+wMZ45iJ8HR1IJO2ucdA==
+X-Received: by 2002:a05:6a20:2585:b0:2dc:40f5:3c6c with SMTP id adf61e73a8af0-32da8462b36mr25759861637.54.1760319912912;
+        Sun, 12 Oct 2025 18:45:12 -0700 (PDT)
+Received: from crl-3.node2.local ([125.63.65.162])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33b61aab6c1sm10343857a91.13.2025.10.12.18.45.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Oct 2025 18:45:12 -0700 (PDT)
+From: Kriish Sharma <kriish.sharma2006@gmail.com>
+To: khalasa@piap.pl,
+	khc@pm.waw.pl,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	david.hunter.linux@gmail.com,
+	Kriish Sharma <kriish.sharma2006@gmail.com>
+Subject: [PATCH net-next v3] hdlc_ppp: fix potential null pointer in ppp_cp_event logging
+Date: Mon, 13 Oct 2025 01:43:19 +0000
+Message-Id: <20251013014319.1608706-1-kriish.sharma2006@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aN84jKyrE1BumpLj@archie.me>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTZxTH89z79OltR8m1Q/dMsizrZCpGNicJZ4lxI2bb/WLmdDOZL5lV
-	7tZmBVwLKMZtQIdj6BjUgFmLUiCtKEW0xSIvXRAipjgYyJjNtgLDgpJS2Rit7o2OYsz8cvLL
-	+Z3zz/lwOFZZS1Zy2qwcUZ+l1qmIHMtDcbXr/e/OaF4KXpNBeL4EQ3Wzg8DghUYE9/+2sFDc
-	FsUQ9fQiqBoyseBoKWTgj4sLBII9cwhm7ScQTF97E6L+OwzciswgsAcWGAh0fYGgps5FoPZX
-	PwstvaMIPA1FBCbLL7MwHIiHH8KzBLyVxwmEhqoZsBZ5JHDaYkJgrG8mUHXaiaFtvF0Kv1SZ
-	GGh0boUx+xSGG+V1DFhOGWPlLgOVTR0M2AuSYKLBLIWoNRv8X1di8I7+KIHglInA2PVjEmgt
-	GJdCSXsYg/P2ovD8tA46PV4MvVcmGBhuryZw4uJlCYw6ohK42TiIofmOjwGv+RyG79ubJGC7
-	NcSAq/87FiJlidB0r47AyXtTCIIROwv28Kz0tQzhfnEZFs673IzgOONAwrzNyArF5YvUMzPL
-	Cp+7Dgm2GzNE+Cs8QgRPxIqFvjoqVPSvF9rMfqlgdeYKroZkob5zmtmWsku+KUPUafNE/Yub
-	98k1ngcD+ODxhMMRixEVoPr4UiTjKJ9KLw0XsY+4ZqJbEmPMJ9FQ/7coxoRfTX2+P5dmEvg1
-	1Ot6IC1Fco7lWxPpUMvtJfEk/yodGHEsLSh4oPOtNSg2pOQLER34qgU/FMuo95vAErN8MvUt
-	TDOliFvkRHp2gYu1ZfxaOtYfIjFezj9Pu9zXmVgO5SdkdLTGRx5e+jS92uDD5Yg3PxZrfizW
-	/H+sFbHnkVKblZep1upSUzT5WdrDKQeyM51o8XHtn/yz+wqaG9zRjXgOqeIUmo6gRilR5xny
-	M7sR5VhVgqLi2F2NUpGhzj8i6rPf1+fqREM3SuSw6inFy5FDGUr+Q3WO+JEoHhT1jyzDyVYW
-	oO1d6YWr38uJz68dc7exKfsr4LdcqanvhfDJwNFtPfXPOUD25Z5/daua3OkV75R8utn6wdaj
-	e1rn3ni7L0224sKOLZ9VlenXXk3tcCx/xbbh401p44Nx0RXSI5bJZ2xpnvSQMrzKsLNsMvzz
-	W1uWPUue2Lmx092794Ax8vrI7/6NN1OTxlXYoFFvSGb1BvV/O4WOPLQDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTZxTHfe69vffSUHLtSngUh0mNuhGBmWh2si2bn+aNi8ZoFqNmmTfz
-	xjaUYlpXxYWEWtkYvqx0aZFWpULoDNSBpaiM1DR1q0Eo2oFKJtDhqoLQsYzyJhTWsizzy8nv
-	nN/5J+fDYUl5QrKaVWuPiTqtoFHSUkq6631T3sCn46p3JhtWwSOjn4KpeAUFF5vdNFR4aiTw
-	4McmBJGpCgQz8w4SytuXKEhYggzE554wYDUiWPIFEdjCFhLcXiMBky2LNIzd+RuBdThKQ/Wo
-	kYIJ11kE9ucOBkZ/2Q6xSIcElgZfEPB4ehyBK7pIQNT/DYKErRBq61ppmA/dJ6Ha+gDBleFB
-	EkZaktIbHELgu3qKhmfmNhJ6oxnQNzVBQ6f1DA2x8EUC/myhwXnKJ4FLDgsCU30zDbZLHgra
-	f/+JgfDYAgEDNgsBTZ6dEHE9p6DLXEck70tuXc8CR7WJSJYRAqzXOgiYczUy0F0/QIGrbD04
-	Qr0SeHrVzsDC8GZYchZDsOkFA4PfWaltNsTPlJ+n+MbWGwRf/muC5t2X3Yiff2VBfLzBRPLl
-	5mR7Z3yC5E+3HucbusZp/tXUQ5r3TTsp/l4d5qtCeXy7fZDhT9/+jdn93gHpB4dFjdog6go+
-	PCRV+WZ7qKNnFCemHSZUhuozKlEai7ktuPZpQJJiiluPY6HbKMU0txH398+RKVZwb+HO1lmm
-	EklZkruZjcPeP5bFG9xHuOehezkg4wDHb9ai1JKcMyLcc85L/StW4s6a6DKTXC7uXxwlKhGb
-	5Gz8wyKbGqdxb+NIKEanOJNbh/037hJmJLO/lra/lrb/n3YishEp1FpDkaDWbM3XF6pKtOoT
-	+V8UF3lQ8ildpQtVt1C8d3sAcSxSpstUHWMquUQw6EuKAgizpFIhq/p6RCWXHRZKToq64s91
-	X2pEfQBls5QyS7Zjn3hIzh0RjomFonhU1P1nCTZtdRny1e4xXT8y9MRW9RJrMrW33u14PNTd
-	pzj4cYH35Q5DW9Ce2RxOLzDTipx9e3M/c3hItrt4Y9aKPZIN/q41+7e9uTUnbl678EhIK32m
-	adty4ORfm2LpwmT27NkLBuf3gcim46Ur/TUVI4nRn2fOF+Wv+KTh2wtfhWN5fTmGtXczVlUO
-	KSm9SticS+r0wj/gdz/3kAMAAA==
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 03, 2025 at 09:44:28AM +0700, Bagas Sanjaya wrote:
-> On Thu, Oct 02, 2025 at 05:12:28PM +0900, Byungchul Park wrote:
-> > This document describes the concept and APIs of dept.
-> >
-> > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > ---
-> >  Documentation/dependency/dept.txt     | 735 ++++++++++++++++++++++++++
-> >  Documentation/dependency/dept_api.txt | 117 ++++
-> >  2 files changed, 852 insertions(+)
-> >  create mode 100644 Documentation/dependency/dept.txt
-> >  create mode 100644 Documentation/dependency/dept_api.txt
-> 
-> What about writing dept docs in reST (like the rest of kernel documentation)?
+drivers/net/wan/hdlc_ppp.c: In function ‘ppp_cp_event’:
+drivers/net/wan/hdlc_ppp.c:353:17: warning: ‘%s’ directive argument is null [-Wformat-overflow=]
+  353 |                 netdev_info(dev, "%s down\n", proto_name(pid));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+drivers/net/wan/hdlc_ppp.c:342:17: warning: ‘%s’ directive argument is null [-Wformat-overflow=]
+  342 |                 netdev_info(dev, "%s up\n", proto_name(pid));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sorry for late reply, but sure.  I should and will.  Thank you!
+Update proto_name() to return "LCP" by default instead of NULL.
+This change silences the compiler without changing existing behavior
+and removes the need for the local 'pname' variable in ppp_cp_event.
 
-> ---- >8 ----
-> diff --git a/Documentation/dependency/dept.txt b/Documentation/locking/dept.rst
-> similarity index 92%
-> rename from Documentation/dependency/dept.txt
-> rename to Documentation/locking/dept.rst
-> index 5dd358b96734e6..7b90a0d95f0876 100644
-> --- a/Documentation/dependency/dept.txt
-> +++ b/Documentation/locking/dept.rst
+Suggested-by: Krzysztof Hałasa <khalasa@piap.pl>
+Signed-off-by: Kriish Sharma <kriish.sharma2006@gmail.com>
+---
+v3:
+  - Retarget patch to net-next (cleanup, not bugfix)
+  - Remove 'Fixes' tag
+  - Drop explicit PID_LCP case in proto_name() per Chris’s suggestion
 
-However, I'm not sure if dept is about locking.  dept is about general
-waits e.g. wait_for_completion(), wait_event(), and so on, rather than
-just waits involved in typical locking mechanisms e.g. spin lock, mutex,
-and so on.
+v2: https://lore.kernel.org/all/20251003092918.1428164-1-kriish.sharma2006@gmail.com/
+  - Target the net tree with proper subject prefix "[PATCH net]"
+  - Update proto_name() to return "LCP" by default instead of NULL
+  - Remove local 'pname' variable in ppp_cp_event
+  - Add Suggested-by tag for Krzysztof Hałasa
 
-[snip]
+v1: https://lore.kernel.org/all/20251002180541.1375151-1-kriish.sharma2006@gmail.com/
 
-> > +
-> > +   context X            context Y
-> > +
-			     /*
-			      * Acquired A.
-			      */
-> > +                        mutex_lock A
+ drivers/net/wan/hdlc_ppp.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-			     /*
-			      * Request something that will be handled
-			      * through e.g. wq, deamon or any its own
-			      * way, and then do 'complete B'.
-			      */
-			     request_xxx_and_complete_B();
-        /*
-	 * The request from
-	 * context Y has been
-	 * done.  So running
-	 * toward 'complete B'.
-	 */
+diff --git a/drivers/net/wan/hdlc_ppp.c b/drivers/net/wan/hdlc_ppp.c
+index 7496a2e9a282..159295c4bd6d 100644
+--- a/drivers/net/wan/hdlc_ppp.c
++++ b/drivers/net/wan/hdlc_ppp.c
+@@ -126,14 +126,12 @@ static inline struct proto *get_proto(struct net_device *dev, u16 pid)
+ static inline const char *proto_name(u16 pid)
+ {
+ 	switch (pid) {
+-	case PID_LCP:
+-		return "LCP";
+ 	case PID_IPCP:
+ 		return "IPCP";
+ 	case PID_IPV6CP:
+ 		return "IPV6CP";
+ 	default:
+-		return NULL;
++		return "LCP";
+ 	}
+ }
+ 
+-- 
+2.34.1
 
-	/*
-	 * Wait for A to be
-	 * released, but will
-	 * never happen.
-	 */
-> > +   mutex_lock A <- DEADLOCK
-			     /*
-			      * Wait for 'complete B' to happen, but
-			      * will never happen.
-			      */
-> > +                        wait_for_complete B <- DEADLOCK
-	/*
-	 * Never reachable.
-	 */
-> > +   complete B
-
-			     /*
-			      * Never reachable.
-			      */
-> > +                        mutex_unlock A
-> > +   mutex_unlock A
-> 
-> Can you explain how DEPT detects deadlock on the second example above (like
-> the first one being described in "How DEPT works" section)?
-
-Sure.  I added the explanation inline above.  Don't hesitate if you have
-any questions.  Thanks.
-
-	Byungchul
-> 
-> Confused...
-> 
-> --
-> An old man doll... just what I always wanted! - Clara
 
