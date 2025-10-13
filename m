@@ -1,198 +1,140 @@
-Return-Path: <netdev+bounces-228812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A27B0BD434B
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:29:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD202BD4123
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:22:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 017B63E47A7
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:15:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9AF61890A6F
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:18:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F039226FA70;
-	Mon, 13 Oct 2025 14:59:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B23830B536;
+	Mon, 13 Oct 2025 15:02:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KCUFvwFo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Km/+C7xs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE39222587
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:59:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD12130B525
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 15:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760367570; cv=none; b=n7oO2AcI3MmQ4F+jrtT9Y+68QI07ZJqTuW4Uo95Og4zxYAnQX8U04Vkhc+d/zNw1+7VXyJvi383KyQwSlRwTZa17S4rhYm9TphivyOzMN3XR6O2M+/DG6VqumW3stPcG4LH74/jnPtSnKXc74BqOB8HmETbtH40eFlfCIlyUGDM=
+	t=1760367750; cv=none; b=eeEgdheVv+2ttaRyimbELVhuoZGsCeYra5meF9IPzDxFhtv5vWDTmUJxMe1rpnuEjrc7ts/UaGPvSRXR56CbkBOBmIsH8Wm+vclUtuH0J59vjdjTwgF6wZ1MAIFqmQt/uTj8DI2ASvEdZC0QzadBvTih1DwF/ppLYPHy8SYfxnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760367570; c=relaxed/simple;
-	bh=Xvb1AzUoi47W8nL/7fl/biJbW+fec3U2EjG2ql3fBCM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tkYLo1eUn0WyfXkJcgcEwoakZbQYgtd9xWJ5jQchpf1RPabPY8QD0AmtDjCMuUi1+synSqOm+m8SiRXU3PbeNkEj/wIJKPG9HHjWpTVM6HtkDqNGFyESECkFq1GBFcQ3lAiox+IT+dnfmjftGwiceDYiXgjfb4Pe79JyJ3hH8gQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KCUFvwFo; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-87ae13cc97cso2610316085a.1
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:59:28 -0700 (PDT)
+	s=arc-20240116; t=1760367750; c=relaxed/simple;
+	bh=XZ4lzHryEJQS9jgidvbUbN7osxHnfwhUvb5lDvX5gJM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D2Ss/EZ+XSofcKZoMX/TdcicQhlpgOR5HsDlM/JZ3p9Vl/dR9jkcLUwvv3o8+SWklCgo4+G48xn68Z0wXTLX1GKzAr2CFlh2eSV93xXcJQD7Q0TFVc976PjAwYd2u8m2l1F79YfaGsxPKDgaVdpiWiDuZxdpOTZ+a2c3MxVKi2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Km/+C7xs; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3f0ae439bc3so2017064f8f.1
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 08:02:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760367568; x=1760972368; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=6Ryov5JoZj1+wAh7+cGmYqDb5CI8EvM6lCq43DJKdmE=;
-        b=KCUFvwFoVdgzTSiyGHAP3Yq0lIZoDwGwJixoUu9fRa7WTL+ei2Z7SAEk1GiLZymM0m
-         8OnU/6OEDAhwDHt3Kr1yVS2mxHFC315/I35nhMJWsrPmfq/BX2ImDTiRCNP5T7HlT3i6
-         Kg4SnUcaIUrLfapwpFMDW1GcYfOP+XMNlPj/Ho2WpcNnXy/L/nmrTkttSdT1WEplFkTn
-         dSChg7KgCM3/fWdiNBQr4PlKCh4YjX8/hLEHt4JLcmR8JLNR9kDKNIL53IiryNFHsADm
-         q3W1JjR4VQ+uz22oi580UyTEY3ji3lITgyM1hS8l4poMseTXnEiWPk1kMrAHule3sV5R
-         ebnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760367568; x=1760972368;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=gmail.com; s=20230601; t=1760367746; x=1760972546; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=6Ryov5JoZj1+wAh7+cGmYqDb5CI8EvM6lCq43DJKdmE=;
-        b=WMq1iQOHS+R/m5c8wrfaqNm5HdZRMAebXDeN+GgP5MFGrkqoqF5NnADBAeIcM0fSPG
-         CCiudpuUWgP+cXDwy/lsIzVG6gT4o6KRKK1eA7156ze0yZn3xNz91VwLzB7LxumxRhwD
-         un28m28qyxdmnjtdecBKbScNOvsNi3X2vzNtYCjWWYgkQUAxPLKQf9FraojVoeboclQg
-         96YneT+0WQZvvBR150Xsf6st+j5mWTq5M749rb0wENqiew+ggxRBdMh6+08emen4u4kR
-         w4RQMCSV6ric+d18gT7PE0dZy1wFwkNOL12x/8BWEKQ/HeNtYxU4WvLOybwNTN1utSeG
-         aN7w==
-X-Forwarded-Encrypted: i=1; AJvYcCUgeYKUsjBIrCtj+cjXM5m6Krd9OBuebGM+8qd6RRoVpRY6S6xmydyiw77BidBQAopyDRB8wCM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw95s4gMD4Qj4MKXjZLy5njlGBPcgcPzPuz34n36eQhNP6+S5Jm
-	lJBM74ohGz8GrJ0u9iX1/hG4WmNMMPqr1x6iw0RslOprVkhsHYd3OXRHjK0HFywTTn/6AiASp5f
-	3G1k9AmB+U7qBMA==
-X-Google-Smtp-Source: AGHT+IEVmuPhDlFXtWcOInhYFdnlvocymPxJkMuUZQssMFzRcGEsOKSz6ky3XAG1AwGixZ9wrZziyC6Hvn1z0A==
-X-Received: from qknul20.prod.google.com ([2002:a05:620a:6d14:b0:855:8dab:897f])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:a491:b0:883:c768:200a with SMTP id af79cd13be357-883c768280dmr2238893985a.32.1760367567978;
- Mon, 13 Oct 2025 07:59:27 -0700 (PDT)
-Date: Mon, 13 Oct 2025 14:59:26 +0000
+        bh=Yh3tjmmjbgFKGhBWocvc5VFMFhZLywRMRFtzLSkbw0s=;
+        b=Km/+C7xsfZItqUK1cRI41oQudCJQXawtSlxm2Y90QzKe9b1CH9Lue/2I7UhiV9ElL/
+         QbsSPdkyMDOFYhdArM/WwUk4HrRd78V3RT1IKtSrA3tojPLDyJJgw1uFNjhsOatstdjf
+         awHA8HXlg+4SOEZ9oEI0WYufnhqiDxH7H1pDa2kElbVfVK/isv9w6THHMeFYOFdsTzrT
+         4XPM6rT28Dtw7BCO5UlxgNQd6gurCk9yoS6p4GVG3DiwKS/kZXmT1g4FH0o84SKujCvj
+         NNq3v1ken4Lh0yVIZ4HeRdWXMC3yki6pD6VwCI9gK9RKdT3vhvmYDl93+WFdT69sWhcP
+         DVaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760367746; x=1760972546;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yh3tjmmjbgFKGhBWocvc5VFMFhZLywRMRFtzLSkbw0s=;
+        b=HBIzApXkwOOC02NolXpQRIcmSyLx1cwrZXHKbK9IgFNIH9COedjT1o5f0WVcCm6t9l
+         DSx8a+vTQYelm8tWyUAViP98gtumjcLmWIZUUYCY3jSCpi8oFbZXB5bSjg9d+nsCpP3X
+         YlDTpo2AHh+J6folve12GOdnW9hYIBnfGa9xfuqtw1FoejdbiOV3vt929y5Q987W7nL6
+         iTn1ocPobRtj558GxRNP5nx3IQ92RpOYvbquC4HH2ISdQXgLQVXstXVx5PFwVDBFu+Ij
+         ZLvZmuXVqEp7w6+WkMfDp4fPKUHToFK2dw36rNDTJiBmR4TrE4ESCus5PuN1qjmadkrT
+         UDxg==
+X-Gm-Message-State: AOJu0YwwGU6ik0wDHCHJgtDeHLBDhBx1rdRJfT0hNjahDHZLAPEQ/wwC
+	95NsT3IYIuVXQzxwbwZwMVgqzp5VjOr/GPgUkLi6Pyyr/pzrZX03SdBkItyWqUJc
+X-Gm-Gg: ASbGncsSpjcpuwk7ikw8fQ0eQJimDSQVI2CMlmaJs+8t8cNWxu2xFAZ3Q6Q8VzdCo38
+	aALJEumPRRWoeheKmjnEx1TUkYwYOYtfnFfhuRtMdco3ORhp9v8Rb9EBMLNtgx2xsFZzbzLpiUQ
+	3ctVRCPn6gK8rmBsT7tnz2gQwOEtgnaM8/NtkKg3AfJZ06KXkqqKj+MN23GCF91cteSncDdD/7L
+	ZvB7m70ChOYr5vlc71IPPXRTWu+Jm7L9XLcqvJ7Co5eB8X1ZhYrhqhAriVIW4MYNmBqj0yqHFDr
+	DgBiL2XROx+iNldRcb6xoS5T/hmvJZG3krQwkNZK0EPKULoV7ZfoYBk1c/TxmRKkpG0pagIZPsz
+	JvRJKzVXSktWdg+dyWosvBUQjWJJqYAByf3gUgmqiD5sLGSU4qvw1n2DiBy1uFdAUfSOBs20UXr
+	uNNKcHI5Kv
+X-Google-Smtp-Source: AGHT+IGNkJ4QbgL7tRzgvPN+I8L7UO5FdEYBSf53xVmGqianIIUKzVvqoD7JkSPO2wQpbIF5bLMK1Q==
+X-Received: by 2002:a05:6000:491e:b0:426:d549:5861 with SMTP id ffacd0b85a97d-426d5495947mr6222761f8f.42.1760367745998;
+        Mon, 13 Oct 2025 08:02:25 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:eb09])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce583664sm18651180f8f.22.2025.10.13.08.02.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Oct 2025 08:02:24 -0700 (PDT)
+Message-ID: <f0e40a00-ab13-42dc-b9ca-010fd4b115b8@gmail.com>
+Date: Mon, 13 Oct 2025 16:03:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.740.g6adb054d12-goog
-Message-ID: <20251013145926.833198-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: better handle TCP_TX_DELAY on established flows
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 00/24][pull request] Queue configs and large
+ buffer providers
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Donald Hunter <donald.hunter@gmail.com>,
+ Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Joshua Washington
+ <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
+ Jian Shen <shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
+ Jijie Shao <shaojijie@huawei.com>, Sunil Goutham <sgoutham@marvell.com>,
+ Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
+ <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
+ Bharat Bhushan <bbhushan2@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Alexander Duyck <alexanderduyck@fb.com>,
+ kernel-team@meta.com, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Joe Damato <joe@dama.to>, David Wei <dw@davidwei.uk>,
+ Willem de Bruijn <willemb@google.com>, Mina Almasry
+ <almasrymina@google.com>, Breno Leitao <leitao@debian.org>,
+ Dragos Tatulea <dtatulea@nvidia.com>, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
+ Jonathan Corbet <corbet@lwn.net>, io-uring <io-uring@vger.kernel.org>
+References: <cover.1760364551.git.asml.silence@gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <cover.1760364551.git.asml.silence@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Some applications uses TCP_TX_DELAY socket option after TCP flow
-is established.
+On 10/13/25 15:54, Pavel Begunkov wrote:
 
-Some metrics need to be updated, otherwise TCP might take time to
-adapt to the new (emulated) RTT.
+Forgot to CC io_uring
 
-This patch adjusts tp->srtt_us, tp->rtt_min, icsk_rto
-and sk->sk_pacing_rate.
+> Add support for per-queue rx buffer length configuration based on [2]
+> and basic infrastructure for using it in memory providers like
+> io_uring/zcrx. Note, it only includes net/ patches and leaves out
+> zcrx to be merged separately. Large rx buffers can be beneficial with
+> hw-gro enabled cards that can coalesce traffic, which reduces the
+> number of frags traversing the network stack and resuling in larger
+> contiguous chunks of data given to the userspace.
 
-This is best effort, and for instance icsk_rto is reset
-without taking backoff into account.
+Same note as the last time, not great that it's over the 15 patches,
+but I don't see a good way to shrink it considering that the original
+series [2] is 22 patches long, and I'll somehow need to pull it it
+into the io_uring tree after. Please let me know if there is a strong
+feeling about that, and/or what would the preferred way be.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/tcp.h    |  2 ++
- net/ipv4/tcp.c       | 31 +++++++++++++++++++++++++++----
- net/ipv4/tcp_input.c |  4 ++--
- 3 files changed, 31 insertions(+), 6 deletions(-)
-
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 5ca230ed526ae02711e8d2a409b91664b73390f2..1e547138f4fb7f5c47d15990954d4d135f465f73 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -461,6 +461,8 @@ enum skb_drop_reason tcp_child_process(struct sock *parent, struct sock *child,
- void tcp_enter_loss(struct sock *sk);
- void tcp_cwnd_reduction(struct sock *sk, int newly_acked_sacked, int newly_lost, int flag);
- void tcp_clear_retrans(struct tcp_sock *tp);
-+void tcp_update_pacing_rate(struct sock *sk);
-+void tcp_set_rto(struct sock *sk);
- void tcp_update_metrics(struct sock *sk);
- void tcp_init_metrics(struct sock *sk);
- void tcp_metrics_init(void);
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 8a18aeca7ab07480844946120f51a0555699b4c3..84662904ca96ed5685e56a827d067b62fdac3063 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -3583,9 +3583,12 @@ static int tcp_repair_options_est(struct sock *sk, sockptr_t optbuf,
- DEFINE_STATIC_KEY_FALSE(tcp_tx_delay_enabled);
- EXPORT_IPV6_MOD(tcp_tx_delay_enabled);
- 
--static void tcp_enable_tx_delay(void)
-+static void tcp_enable_tx_delay(struct sock *sk, int val)
- {
--	if (!static_branch_unlikely(&tcp_tx_delay_enabled)) {
-+	struct tcp_sock *tp = tcp_sk(sk);
-+	s32 delta = (val - tp->tcp_tx_delay) << 3;
-+
-+	if (val && !static_branch_unlikely(&tcp_tx_delay_enabled)) {
- 		static int __tcp_tx_delay_enabled = 0;
- 
- 		if (cmpxchg(&__tcp_tx_delay_enabled, 0, 1) == 0) {
-@@ -3593,6 +3596,22 @@ static void tcp_enable_tx_delay(void)
- 			pr_info("TCP_TX_DELAY enabled\n");
- 		}
- 	}
-+	/* If we change tcp_tx_delay on a live flow, adjust tp->srtt_us,
-+	 * tp->rtt_min, icsk_rto and sk->sk_pacing_rate.
-+	 * This is best effort.
-+	 */
-+	if (delta && sk->sk_state == TCP_ESTABLISHED) {
-+		s64 srtt = (s64)tp->srtt_us + delta;
-+
-+		tp->srtt_us = clamp_t(s64, srtt, 1, ~0U);
-+
-+		/* Note: does not deal with non zero icsk_backoff */
-+		tcp_set_rto(sk);
-+
-+		minmax_reset(&tp->rtt_min, tcp_jiffies32, ~0U);
-+
-+		tcp_update_pacing_rate(sk);
-+	}
- }
- 
- /* When set indicates to always queue non-full frames.  Later the user clears
-@@ -4119,8 +4138,12 @@ int do_tcp_setsockopt(struct sock *sk, int level, int optname,
- 			tp->recvmsg_inq = val;
- 		break;
- 	case TCP_TX_DELAY:
--		if (val)
--			tcp_enable_tx_delay();
-+		/* tp->srtt_us is u32, and is shifted by 3 */
-+		if (val < 0 || val >= (1U << (31 - 3)) ) {
-+			err = -EINVAL;
-+			break;
-+		}
-+		tcp_enable_tx_delay(sk, val);
- 		WRITE_ONCE(tp->tcp_tx_delay, val);
- 		break;
- 	default:
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 31ea5af49f2dc8a6f95f3f8c24065369765b8987..8fc97f4d8a6b2f8e39cabf6c9b3e6cdae294a5f5 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -1095,7 +1095,7 @@ static void tcp_rtt_estimator(struct sock *sk, long mrtt_us)
- 	tp->srtt_us = max(1U, srtt);
- }
- 
--static void tcp_update_pacing_rate(struct sock *sk)
-+void tcp_update_pacing_rate(struct sock *sk)
- {
- 	const struct tcp_sock *tp = tcp_sk(sk);
- 	u64 rate;
-@@ -1132,7 +1132,7 @@ static void tcp_update_pacing_rate(struct sock *sk)
- /* Calculate rto without backoff.  This is the second half of Van Jacobson's
-  * routine referred to above.
-  */
--static void tcp_set_rto(struct sock *sk)
-+void tcp_set_rto(struct sock *sk)
- {
- 	const struct tcp_sock *tp = tcp_sk(sk);
- 	/* Old crap is replaced with new one. 8)
 -- 
-2.51.0.740.g6adb054d12-goog
+Pavel Begunkov
 
 
