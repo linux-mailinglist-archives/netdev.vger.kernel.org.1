@@ -1,271 +1,259 @@
-Return-Path: <netdev+bounces-228957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 525D7BD6689
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 23:51:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC246BD6692
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 23:53:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06A18406C1B
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 21:51:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F9AB406833
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 21:53:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A4C82FABFF;
-	Mon, 13 Oct 2025 21:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070A72EE5FD;
+	Mon, 13 Oct 2025 21:53:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WfCKltuU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LsqipJ1X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8892FABE1;
-	Mon, 13 Oct 2025 21:51:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FEF2D6E44
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 21:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760392264; cv=none; b=E6Z5bk0CFNYYP/yjyTTsvnzBLLrZbzzfjK0L9UcVpKntwjmfoZ8INyZRElYOP2uWWuXvODyO2pERmFykA1/KSHmMAKXYJItmIuNcJvO4BU3W7p28+LUyiu+qDLzAurUFHlUvKDG3UbvDDkGWpbC4gt4N1kjhdkXie8umbMFmEgU=
+	t=1760392412; cv=none; b=L1xRZlOR0hxJ2F+Jqgh74lwASM4fbpvtYqwnGa82xjKrH+csB6oA/JCj41sE43mT/3wEroXGefI39uERRrfXLJq1JbcxE96lMlIfAzT3n+HHKQCeOz/wcQ/FDBLshSItpXvQQb1YGDSxp2wmKDHfRtyfyk+a3za/0MmB06bWqs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760392264; c=relaxed/simple;
-	bh=s/rWpAk/spLG7cGAgaAcB22SaCS3hyaO1JzxvOBN1UU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ifEIfSTcn/AY9mgHNgh+UlevAj4YPCxVDOODGnpE8TP1q9wEg6k7uB9rfOLAinC3XlgbH+6RVQ0D3jRkFgiHOTZko8NZGTMmSSpuJxLG5OT6JSpnE+taccr75gjo0rHXxojbMjbwDUSjrjKHbE5xGf93nc4ar3OpR7D4MZls/9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WfCKltuU; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760392261; x=1791928261;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version:content-transfer-encoding;
-  bh=s/rWpAk/spLG7cGAgaAcB22SaCS3hyaO1JzxvOBN1UU=;
-  b=WfCKltuU4HPr1jCPCklCDy9rOgSzuek5cRYlgL1um5CODmqEYV+4t/Gb
-   YdKJHJu7Yo4MRf260y/YgOSzfdHaHkNiF99BiJwdd1Xta5v2G8wD1zTov
-   i/ug3iKcZkHDctxkSLe8AdEshJGyLzItGbp+RSa/O+DepuZz0cgl4z+FU
-   RtaKG4ZEqsfIIZTse9kis6fmqXAWC6dXZJXggCX3tsTirIzZ3klXuoXlB
-   r8KbjkkmwYLddmQRJeC9XNEYjBobQAZklf2AjoUyqLkPRNjCLAhNvXqSX
-   EY+nJkWQbCYLGkFSqK0GOWyRJztKbMzQOs+zSRfu586mzv+06nyXLBs7F
-   g==;
-X-CSE-ConnectionGUID: dHrAoaKFQ+uzqTfYAPhJ+Q==
-X-CSE-MsgGUID: OWi84sCnQU6sF0RWLY3Sdg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11581"; a="88004557"
-X-IronPort-AV: E=Sophos;i="6.19,226,1754982000"; 
-   d="scan'208";a="88004557"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2025 14:51:00 -0700
-X-CSE-ConnectionGUID: K2D8ox7WRo6Awe7td7rbkg==
-X-CSE-MsgGUID: Xg7zxYz8TLC+L6NGk6zaPA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,226,1754982000"; 
-   d="scan'208";a="186809381"
-Received: from vcostago-desk1.jf.intel.com (HELO vcostago-desk1) ([10.88.27.140])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2025 14:51:00 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>, Eric Dumazet <edumazet@google.com>
-Cc: syzbot <syzbot+51cd74c5dfeafd65e488@syzkaller.appspotmail.com>,
- davem@davemloft.net, dsahern@kernel.org, hdanton@sina.com,
- horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, netdev@vger.kernel.org, pabeni@redhat.com,
- syzkaller-bugs@googlegroups.com, tglx@linutronix.de
-Subject: Re: [syzbot] [net?] [mm?] INFO: rcu detected stall in
- inet_rtm_newaddr (2)
-In-Reply-To: <CAM0EoMnGLqKU7AnsgS00SEgU0eq71f-kiqNniCNyfiyAfNm8og@mail.gmail.com>
-References: <681a1770.050a0220.a19a9.000d.GAE@google.com>
- <68ea0a24.050a0220.91a22.01ca.GAE@google.com>
- <CANn89iLjjtXV3ZMxfQDb1bbsVJ6a_Chexu4FwqeejxGTwsR_kg@mail.gmail.com>
- <CAM0EoMnGLqKU7AnsgS00SEgU0eq71f-kiqNniCNyfiyAfNm8og@mail.gmail.com>
-Date: Mon, 13 Oct 2025 14:51:18 -0700
-Message-ID: <87347mmpwp.fsf@intel.com>
+	s=arc-20240116; t=1760392412; c=relaxed/simple;
+	bh=9m4/eG8svGsFedcJvUujwH5oWnPa6sBX3Cx2rq+yV50=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AUDat+2lBJl+tu+0mQVNGNfLAglcYSMUQYGEF0ofcEJPlVwMZS1DRvm6mNXQs7gLEDpwBEZf2pOb3Cf1QBwrTG2s/QYFtmn3QaPcuIlj9ae6f4h90Z4O4Zwzvo5Ds6Yw0P6t2s18LTpWc7oCvkhdsVTsKIpmcuvIKEtNakn9jGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LsqipJ1X; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-46e48d6b95fso41118175e9.3
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:53:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760392409; x=1760997209; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eznQkcbVB5NzB/bIiJpDdx0jzlo0Dnq+XZ627uhHJTw=;
+        b=LsqipJ1XQAbswJGaQA2eAPWHjtbKmoCi52/Aw/NqGZ+ep3zn1rGm6PL2uR/rUrq1tQ
+         QFpHR8iiUsGIOforU8uAx104KqoeCOSMyqbKlfDsTDEh3qlj2uWYsdmPWwL9UVEQ7EDM
+         nKxkgezMAiuakc3+Y4CkuV6T0LaeykBHveL3GQk3qt6HkdnAKd6KT6SqeOKCzeMoMe9b
+         TYn/954rfacURtSgC9Vwa9wXs9JpaI6lcbh4XT/YT5OEO23qe0wOK9EfXavg+dkgcoOn
+         KiNavDlXIeMHMBIHlqDDBdlSP8heYB5LEkVAk3g/J6G2mNDHk1/0UtnGrpDAa3yWGD2+
+         azUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760392409; x=1760997209;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eznQkcbVB5NzB/bIiJpDdx0jzlo0Dnq+XZ627uhHJTw=;
+        b=pqyuo5QpzOwDl3xeLWC8e+V11LAlYoCPBL7D8tZHq4bN9SvR8E7tXsXl1MNW7Z1Dux
+         aMLclS/60i452pP3Ah4K+wmOFMoivbEb4lOYT5TuEYYzKa7WFZj2/j3huI7puJ0/KBQZ
+         Dm9nwUbE4G+Y3qpor7Gmqyan1eieRsMu8b+kvGYM6LVRXOLAv+EMdpB/UuIZ3FZz0FXi
+         nDcAh+eJCoBXAn1QKKS0xwwhEhXLbo5C56+fBdzLqO7BqtbhiJb3gjf3PA2A1nazkvlW
+         2BxpdtaZRAaZTYb4jfCAeyy80LisMWsXdv6vSGqWrFw3tATYuE8kh991Flmy5dIT/wnd
+         WH/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVHGBaBdcOsoqnItoq2/0wneZCqWF1UuPhlOzQqbBG65Mk7LSGoJ2g1XW2OI75tUKsoCnqI944=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRyxfhQIzglBOtzvYEu2Z8P5PfJlPSVGoqprtDepRUKOSc61j6
+	rOmoiDXal4vmHC0u3XirfqgCQjKuA3FqZLObQTYd0YB7OtnKtHSFYp9G/r46YCvmlQiUukAeZHh
+	0mljvEWVVDjiGQ+5/Fk/hVznoEBZJ3cA=
+X-Gm-Gg: ASbGncuIpwzUClGBRpSd7rQ482djPptXtoRTYel+xi7SCGh42rH9o8k6Z1ptCzMdddo
+	vL6qnkcISLAvJyf/uhcV8QuCyuhX+pmGvdFtdCrCDSIEPa3vMnD6VzrEQ7wHjcTvmzWB3HS5Vw0
+	Zh3a9zQT97P8SoUK/dKmzsfkuTRX/dztXmwobwMivBl4f3t2EHsdT9flXtYQFFKa7z24C0M18c+
+	Pp9hthwO/STu5PtFWyvZxNGufSPRkS5yfAVjXUKU7/dut0tQPE27lKlZeI=
+X-Google-Smtp-Source: AGHT+IHjZPYSx/MFnDGMSVq+/lL2r95iSzOO5aOtH3FWckuHrmP+/J89/qhEWOR5QTdySxp5tyYSKjZsZl0Qibs5c9g=
+X-Received: by 2002:a05:6000:4283:b0:3e8:b4cb:c3dc with SMTP id
+ ffacd0b85a97d-4266e7ce955mr15411285f8f.3.1760392409074; Mon, 13 Oct 2025
+ 14:53:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20251013101636.69220-1-21cnbao@gmail.com> <927bcdf7-1283-4ddd-bd5e-d2e399b26f7d@suse.cz>
+ <dhmafwxu2jj4lu6acoqdhqh46k33sbsj5jvepcfzly4c7dn2t7@ln5dgubll4ac>
+In-Reply-To: <dhmafwxu2jj4lu6acoqdhqh46k33sbsj5jvepcfzly4c7dn2t7@ln5dgubll4ac>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 13 Oct 2025 14:53:17 -0700
+X-Gm-Features: AS18NWCpJ5cNadN1PuP9X6HpkCgMz2QoMAjad8BXEm_SW3mlUtmGRuLdphkG_3M
+Message-ID: <CAADnVQKEhfFTSkn6f_PJr6xMcjB4d45E_+TsU6+945f2XD1SmA@mail.gmail.com>
+Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network buffer allocation
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: Vlastimil Babka <vbabka@suse.cz>, Barry Song <21cnbao@gmail.com>, 
+	Network Development <netdev@vger.kernel.org>, linux-mm <linux-mm@kvack.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Barry Song <v-songbaohua@oppo.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+	Brendan Jackman <jackmanb@google.com>, Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Huacai Zhou <zhouhuacai@oppo.com>, 
+	Harry Yoo <harry.yoo@oracle.com>, David Hildenbrand <david@redhat.com>, 
+	Matthew Wilcox <willy@infradead.org>, Roman Gushchin <roman.gushchin@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Jamal Hadi Salim <jhs@mojatatu.com> writes:
-
-> On Sat, Oct 11, 2025 at 5:42=E2=80=AFAM Eric Dumazet <edumazet@google.com=
-> wrote:
->>
->> On Sat, Oct 11, 2025 at 12:41=E2=80=AFAM syzbot
->> <syzbot+51cd74c5dfeafd65e488@syzkaller.appspotmail.com> wrote:
->> >
->> > syzbot has found a reproducer for the following issue on:
->> >
->> > HEAD commit:    18a7e218cfcd Merge tag 'net-6.18-rc1' of git://git.ker=
-nel...
->> > git tree:       net-next
->> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D12504dcd98=
-0000
->> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3D61ab7fa743=
-df0ec1
->> > dashboard link: https://syzkaller.appspot.com/bug?extid=3D51cd74c5dfea=
-fd65e488
->> > compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b=
-7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
->> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D14d2a542=
-580000
->> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D142149e258=
-0000
->> >
->> > Downloadable assets:
->> > disk image: https://storage.googleapis.com/syzbot-assets/7a01e6dce97e/=
-disk-18a7e218.raw.xz
->> > vmlinux: https://storage.googleapis.com/syzbot-assets/5e1b7e41427f/vml=
-inux-18a7e218.xz
->> > kernel image: https://storage.googleapis.com/syzbot-assets/69b55860120=
-9/bzImage-18a7e218.xz
->> >
->> > IMPORTANT: if you fix the issue, please add the following tag to the c=
-ommit:
->> > Reported-by: syzbot+51cd74c5dfeafd65e488@syzkaller.appspotmail.com
->> >
->> > sched: DL replenish lagged too much
->> > rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
->> > rcu:    0-...!: (2 GPs behind) idle=3D7754/1/0x4000000000000000 softir=
-q=3D15464/15465 fqs=3D1
->> > rcu:    (detected by 1, t=3D10502 jiffies, g=3D11321, q=3D371 ncpus=3D=
-2)
->> > Sending NMI from CPU 1 to CPUs 0:
->> > NMI backtrace for cpu 0
->> > CPU: 0 UID: 0 PID: 5948 Comm: syz-executor Not tainted syzkaller #0 PR=
-EEMPT(full)
->> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIO=
-S Google 10/02/2025
->> > RIP: 0010:rb_insert_color_cached include/linux/rbtree.h:113 [inline]
->> > RIP: 0010:rb_add_cached include/linux/rbtree.h:183 [inline]
->> > RIP: 0010:timerqueue_add+0x1a8/0x200 lib/timerqueue.c:40
->> > Code: e7 31 f6 e8 6a 0c de f6 42 80 3c 2b 00 74 08 4c 89 f7 e8 7b 0a d=
-e f6 4d 89 26 4d 8d 7e 08 4c 89 f8 48 c1 e8 03 42 80 3c 28 00 <74> 08 4c 89=
- ff e8 5e 0a de f6 4d 89 27 4d 85 e4 40 0f 95 c5 eb 07
->> > RSP: 0018:ffffc90000007cf0 EFLAGS: 00000046
->> > RAX: 1ffff110170c4f83 RBX: 1ffff110170c4f82 RCX: 0000000000000000
->> > RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88805de72358
->> > RBP: 0000000000000000 R08: ffff88805de72357 R09: 0000000000000000
->> > R10: ffff88805de72340 R11: ffffed100bbce46b R12: ffff88805de72340
->> > R13: dffffc0000000000 R14: ffff8880b8627c10 R15: ffff8880b8627c18
->> > FS:  000055557c657500(0000) GS:ffff888125d0f000(0000) knlGS:0000000000=
-000000
->> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> > CR2: 0000200000000600 CR3: 000000002ee76000 CR4: 00000000003526f0
->> > Call Trace:
->> >  <IRQ>
->> >  __run_hrtimer kernel/time/hrtimer.c:1794 [inline]
->> >  __hrtimer_run_queues+0x656/0xc60 kernel/time/hrtimer.c:1841
->> >  hrtimer_interrupt+0x45b/0xaa0 kernel/time/hrtimer.c:1903
->> >  local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1041 [inline]
->> >  __sysvec_apic_timer_interrupt+0x108/0x410 arch/x86/kernel/apic/apic.c=
-:1058
->> >  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1052 [i=
-nline]
->> >  sysvec_apic_timer_interrupt+0xa1/0xc0 arch/x86/kernel/apic/apic.c:1052
->> >  </IRQ>
->> >  <TASK>
->> >  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtent=
-ry.h:702
->> > RIP: 0010:pv_vcpu_is_preempted arch/x86/include/asm/paravirt.h:579 [in=
-line]
->> > RIP: 0010:vcpu_is_preempted arch/x86/include/asm/qspinlock.h:63 [inlin=
-e]
->> > RIP: 0010:owner_on_cpu include/linux/sched.h:2282 [inline]
->> > RIP: 0010:mutex_spin_on_owner+0x189/0x360 kernel/locking/mutex.c:361
->> > Code: b6 04 30 84 c0 0f 85 59 01 00 00 48 8b 44 24 08 8b 18 48 8b 44 2=
-4 48 42 80 3c 30 00 74 0c 48 c7 c7 90 8c fa 8d e8 a7 cd 88 00 <48> 83 3d ff=
- 27 5e 0c 00 0f 84 b9 01 00 00 48 89 df e8 41 e0 d5 ff
->> > RSP: 0018:ffffc900034c7428 EFLAGS: 00000246
->> > RAX: 1ffffffff1bf5192 RBX: 0000000000000001 RCX: ffffffff819c6588
->> > RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffffffff8f4df8a0
->> > RBP: 1ffffffff1e9bf14 R08: ffffffff8f4df8a7 R09: 1ffffffff1e9bf14
->> > R10: dffffc0000000000 R11: fffffbfff1e9bf15 R12: ffffffff8f4df8a0
->> > R13: ffffffff8f4df8f0 R14: dffffc0000000000 R15: ffff8880267a9e40
->> >  mutex_optimistic_spin kernel/locking/mutex.c:464 [inline]
->> >  __mutex_lock_common kernel/locking/mutex.c:602 [inline]
->> >  __mutex_lock+0x311/0x1350 kernel/locking/mutex.c:760
->> >  rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
->> >  inet_rtm_newaddr+0x3b0/0x18b0 net/ipv4/devinet.c:978
->> >  rtnetlink_rcv_msg+0x7cf/0xb70 net/core/rtnetlink.c:6954
->> >  netlink_rcv_skb+0x205/0x470 net/netlink/af_netlink.c:2552
->> >  netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
->> >  netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
->> >  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
->> >  sock_sendmsg_nosec net/socket.c:727 [inline]
->> >  __sock_sendmsg+0x21c/0x270 net/socket.c:742
->> >  __sys_sendto+0x3bd/0x520 net/socket.c:2244
->> >  __do_sys_sendto net/socket.c:2251 [inline]
->> >  __se_sys_sendto net/socket.c:2247 [inline]
->> >  __x64_sys_sendto+0xde/0x100 net/socket.c:2247
->> >  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->> >  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
->> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->> > RIP: 0033:0x7faade790d5c
->> > Code: 2a 5f 02 00 44 8b 4c 24 2c 4c 8b 44 24 20 89 c5 44 8b 54 24 28 4=
-8 8b 54 24 18 b8 2c 00 00 00 48 8b 74 24 10 8b 7c 24 08 0f 05 <48> 3d 00 f0=
- ff ff 77 34 89 ef 48 89 44 24 08 e8 70 5f 02 00 48 8b
->> > RSP: 002b:00007ffdd2e3b670 EFLAGS: 00000293 ORIG_RAX: 000000000000002c
->> > RAX: ffffffffffffffda RBX: 00007faadf514620 RCX: 00007faade790d5c
->> > RDX: 0000000000000028 RSI: 00007faadf514670 RDI: 0000000000000003
->> > RBP: 0000000000000000 R08: 00007ffdd2e3b6c4 R09: 000000000000000c
->> > R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
->> > R13: 0000000000000000 R14: 00007faadf514670 R15: 0000000000000000
->> >  </TASK>
->> > rcu: rcu_preempt kthread timer wakeup didn't happen for 10499 jiffies!=
- g11321 f0x0 RCU_GP_WAIT_FQS(5) ->state=3D0x402
->> > rcu:    Possible timer handling issue on cpu=3D0 timer-softirq=3D4286
->> > rcu: rcu_preempt kthread starved for 10500 jiffies! g11321 f0x0 RCU_GP=
-_WAIT_FQS(5) ->state=3D0x402 ->cpu=3D0
->> > rcu:    Unless rcu_preempt kthread gets sufficient CPU time, OOM is no=
-w expected behavior.
->> > rcu: RCU grace-period kthread stack dump:
->> > task:rcu_preempt     state:I stack:27224 pid:16    tgid:16    ppid:2  =
-    task_flags:0x208040 flags:0x00080000
->> > Call Trace:
->> >  <TASK>
->> >  context_switch kernel/sched/core.c:5325 [inline]
->> >  __schedule+0x1798/0x4cc0 kernel/sched/core.c:6929
->> >  __schedule_loop kernel/sched/core.c:7011 [inline]
->> >  schedule+0x165/0x360 kernel/sched/core.c:7026
->> >  schedule_timeout+0x12b/0x270 kernel/time/sleep_timeout.c:99
->> >  rcu_gp_fqs_loop+0x301/0x1540 kernel/rcu/tree.c:2083
->> >  rcu_gp_kthread+0x99/0x390 kernel/rcu/tree.c:2285
->> >  kthread+0x711/0x8a0 kernel/kthread.c:463
->> >  ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
->> >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
->> >  </TASK>
->> >
->> >
->> > ---
->> > If you want syzbot to run the reproducer, reply with:
->> > #syz test: git://repo/address.git branch-or-commit-hash
->> > If you attach or paste a git patch, syzbot will apply it before testin=
-g.
->>
->> Yet another taprio report.
->>
->> If taprio can not be fixed, perhaps we should remove it from the
->> kernel, or clearly marked as broken.
->> (Then ask syzbot to no longer include it)
+On Mon, Oct 13, 2025 at 2:35=E2=80=AFPM Shakeel Butt <shakeel.butt@linux.de=
+v> wrote:
 >
-> Agreed on the challenge with taprio.
-> We need the stakeholders input: Vinicius - are you still working in
-> this space? Vladimir you also seem to have interest (or maybe nxp
-> does) in this?
-
-No, I am not working on this space anymore.
-
-I will talk with other Intel folks (and my manager) and see what we can
-do. But if others that find it useful can help even better.
-
-> At a minimum, we should mark it as broken unless the stakeholders want
-> to actively fix these issues.
-> Would syzbot still look at it if it was marked broken?
+> On Mon, Oct 13, 2025 at 08:30:13PM +0200, Vlastimil Babka wrote:
+> > On 10/13/25 12:16, Barry Song wrote:
+> > > From: Barry Song <v-songbaohua@oppo.com>
+> > >
+> > > On phones, we have observed significant phone heating when running ap=
+ps
+> > > with high network bandwidth. This is caused by the network stack freq=
+uently
+> > > waking kswapd for order-3 allocations. As a result, memory reclamatio=
+n becomes
+> > > constantly active, even though plenty of memory is still available fo=
+r network
+> > > allocations which can fall back to order-0.
+> > >
+> > > Commit ce27ec60648d ("net: add high_order_alloc_disable sysctl/static=
+ key")
+> > > introduced high_order_alloc_disable for the transmit (TX) path
+> > > (skb_page_frag_refill()) to mitigate some memory reclamation issues,
+> > > allowing the TX path to fall back to order-0 immediately, while leavi=
+ng the
+> > > receive (RX) path (__page_frag_cache_refill()) unaffected. Users are
+> > > generally unaware of the sysctl and cannot easily adjust it for speci=
+fic use
+> > > cases. Enabling high_order_alloc_disable also completely disables the
+> > > benefit of order-3 allocations. Additionally, the sysctl does not app=
+ly to the
+> > > RX path.
+> > >
+> > > An alternative approach is to disable kswapd for these frequent
+> > > allocations and provide best-effort order-3 service for both TX and R=
+X paths,
+> > > while removing the sysctl entirely.
+> > >
+> > > Cc: Jonathan Corbet <corbet@lwn.net>
+> > > Cc: Eric Dumazet <edumazet@google.com>
+> > > Cc: Kuniyuki Iwashima <kuniyu@google.com>
+> > > Cc: Paolo Abeni <pabeni@redhat.com>
+> > > Cc: Willem de Bruijn <willemb@google.com>
+> > > Cc: "David S. Miller" <davem@davemloft.net>
+> > > Cc: Jakub Kicinski <kuba@kernel.org>
+> > > Cc: Simon Horman <horms@kernel.org>
+> > > Cc: Vlastimil Babka <vbabka@suse.cz>
+> > > Cc: Suren Baghdasaryan <surenb@google.com>
+> > > Cc: Michal Hocko <mhocko@suse.com>
+> > > Cc: Brendan Jackman <jackmanb@google.com>
+> > > Cc: Johannes Weiner <hannes@cmpxchg.org>
+> > > Cc: Zi Yan <ziy@nvidia.com>
+> > > Cc: Yunsheng Lin <linyunsheng@huawei.com>
+> > > Cc: Huacai Zhou <zhouhuacai@oppo.com>
+> > > Signed-off-by: Barry Song <v-songbaohua@oppo.com>
+> > > ---
+> > >  Documentation/admin-guide/sysctl/net.rst | 12 ------------
+> > >  include/net/sock.h                       |  1 -
+> > >  mm/page_frag_cache.c                     |  2 +-
+> > >  net/core/sock.c                          |  8 ++------
+> > >  net/core/sysctl_net_core.c               |  7 -------
+> > >  5 files changed, 3 insertions(+), 27 deletions(-)
+> > >
+> > > diff --git a/Documentation/admin-guide/sysctl/net.rst b/Documentation=
+/admin-guide/sysctl/net.rst
+> > > index 2ef50828aff1..b903bbae239c 100644
+> > > --- a/Documentation/admin-guide/sysctl/net.rst
+> > > +++ b/Documentation/admin-guide/sysctl/net.rst
+> > > @@ -415,18 +415,6 @@ GRO has decided not to coalesce, it is placed on=
+ a per-NAPI list. This
+> > >  list is then passed to the stack when the number of segments reaches=
+ the
+> > >  gro_normal_batch limit.
+> > >
+> > > -high_order_alloc_disable
+> > > -------------------------
+> > > -
+> > > -By default the allocator for page frags tries to use high order page=
+s (order-3
+> > > -on x86). While the default behavior gives good results in most cases=
+, some users
+> > > -might have hit a contention in page allocations/freeing. This was es=
+pecially
+> > > -true on older kernels (< 5.14) when high-order pages were not stored=
+ on per-cpu
+> > > -lists. This allows to opt-in for order-0 allocation instead but is n=
+ow mostly of
+> > > -historical importance.
+> > > -
+> > > -Default: 0
+> > > -
+> > >  2. /proc/sys/net/unix - Parameters for Unix domain sockets
+> > >  ----------------------------------------------------------
+> > >
+> > > diff --git a/include/net/sock.h b/include/net/sock.h
+> > > index 60bcb13f045c..62306c1095d5 100644
+> > > --- a/include/net/sock.h
+> > > +++ b/include/net/sock.h
+> > > @@ -3011,7 +3011,6 @@ extern __u32 sysctl_wmem_default;
+> > >  extern __u32 sysctl_rmem_default;
+> > >
+> > >  #define SKB_FRAG_PAGE_ORDER        get_order(32768)
+> > > -DECLARE_STATIC_KEY_FALSE(net_high_order_alloc_disable_key);
+> > >
+> > >  static inline int sk_get_wmem0(const struct sock *sk, const struct p=
+roto *proto)
+> > >  {
+> > > diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+> > > index d2423f30577e..dd36114dd16f 100644
+> > > --- a/mm/page_frag_cache.c
+> > > +++ b/mm/page_frag_cache.c
+> > > @@ -54,7 +54,7 @@ static struct page *__page_frag_cache_refill(struct=
+ page_frag_cache *nc,
+> > >     gfp_t gfp =3D gfp_mask;
+> > >
+> > >  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> > > -   gfp_mask =3D (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
+> > > +   gfp_mask =3D (gfp_mask & ~__GFP_RECLAIM) |  __GFP_COMP |
+> > >                __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
+> >
+> > I'm a bit worried about proliferating "~__GFP_RECLAIM" allocations now =
+that
+> > we introduced alloc_pages_nolock() and kmalloc_nolock() where it's
+> > interpreted as "cannot spin" - see gfpflags_allow_spinning(). Currently=
+ it's
+> > fine for the page allocator itself where we have a different entry poin=
+t
+> > that uses ALLOC_TRYLOCK, but it can affect nested allocations of all ki=
+nds
+> > of debugging and accounting metadata (page_owner, memcg, alloc tags for=
+ slab
+> > objects etc). kmalloc_nolock() relies on gfpflags_allow_spinning() full=
+y
+> >
+> > I wonder if we should either:
+> >
+> > 1) sacrifice a new __GFP flag specifically for "!allow_spin" case to
+> > determine it precisely.
+> >
+> > 2) keep __GFP_KSWAPD_RECLAIM for allocations that remove it for purpose=
+s of
+> > not being disturbing (like proposed here), but that can in fact allow
+> > spinning. Instead, decide to not wake up kswapd by those when other
+> > information indicates it's an opportunistic allocation
+> > (~__GFP_DIRECT_RECLAIM, _GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC,
+> > order > 0...)
+> >
+> > 3) something better?
+> >
 >
-> cheers,
-> jamal
->
+> For the !allow_spin allocations, I think we should just add a new __GFP
+> flag instead of adding more complexity to other allocators which may or
+> may not want kswapd wakeup for many different reasons.
 
-
-Cheers,
---=20
-Vinicius
+That's what I proposed long ago, but was convinced that the new flag
+adds more complexity. Looks like we walked this road far enough and
+the new flag will actually make things simpler.
+Back then I proposed __GFP_TRYLOCK which is not a good name.
+How about __GFP_NOLOCK ? or __GFP_NOSPIN ?
 
