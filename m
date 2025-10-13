@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-228787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62F7FBD4060
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:20:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECDA6BD3DB9
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 17:05:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92E703E71A8
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:03:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E9FC18A1E63
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 15:04:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9684C274B27;
-	Mon, 13 Oct 2025 14:53:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB043101D1;
+	Mon, 13 Oct 2025 14:53:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sc9l9MkZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KBPnpKP4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B539030F942
-	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:53:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDB330FC16
+	for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 14:53:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760367219; cv=none; b=tyNrBGnEFFnGMLLccjeo/JXJjM0iGiyoIowOmn5rnlbsSSsvt45NtzzmnvJ/KzcS+73VxrRuWiCV8suFHHhPFDNKyvEaXtgjX60Lu4oqIWfmIX2nINuwHJK+Bpmz1dpF0AmQG7OxQ1OayBb5lYSogWgiMfXru4scN79a0RY1WrA=
+	t=1760367221; cv=none; b=Kgkx7BIjll45kCf8em3HUi3YOxxnU2SyYYurUUWJ6In3oUusEW+f2+oI00uPowH0C9oCngY9aLkKLT3OObO2AR+YHnQT0r2jURlKQ5OMl+jarmRo6rB3cuOmE99/9TN712MER0X2dNvOErsd1FQ3+UXrptJYRn4H4miaO/+WHmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760367219; c=relaxed/simple;
-	bh=PbuNSYS4ZvphCG8IIqw5e2RtAOtPsOlFF3aKC+mIwRo=;
+	s=arc-20240116; t=1760367221; c=relaxed/simple;
+	bh=01HcQ+bfWPiQW2hfPP1jD1pyLZ1kMeF3Kk/SUPuy8aY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IOlQjwKfGtuzfvCVAGkEcwu8ITDCq8eGUcYnsvwL5uBPFsvyNFaFK+5GWRH/z5W6L9YJ3lMHQGQIEBzfb0lR4wbb6g8QY74I+EbXBkk4Bz2SxMOUy7E6xYRlcXecEKftJe6l7McQUR5SgAFRsfvI+76qXkMEFHiWo1TDJLbOwIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sc9l9MkZ; arc=none smtp.client-ip=209.85.221.52
+	 MIME-Version; b=izqLPbT+g+drFPr4E4/t6pF7N655NMeVWBpvGa20iGXcjaimE+7MpXusVhbfW6zjrq4QXqEY0jNf81CEFtBUcSytaTQ2KVR69RWOT/APVPuRw1b0sW0WbH/d7SpitGmY9zXWJuw4JzVzpLJCCmhoyvM3Qtshfb35XTUhwMONFQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KBPnpKP4; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3ee12a63af1so2537314f8f.1
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:53:36 -0700 (PDT)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3ee13baf2e1so3174695f8f.3
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 07:53:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760367214; x=1760972014; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760367216; x=1760972016; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qRwTRM1YMVNfPJcUo8UFI2K+NlERkppykhGVZsYyCi8=;
-        b=Sc9l9MkZ3jsGmKuzKFJ+WZzEdPxLvhnRI8KiyXKOgbVGZwAcnRqNP2Ec0LNq1zZ7md
-         Mgq4VfOY21/tdd8fUZAVvlBcnBPIvU/xKZUYZw+ZPbW3jqi0ybSXxiN+ADp6xSnfF0c8
-         aJnV60/1bMla5WqYSH4g+oYgHEAmF0gsmgDAAfe1RLWuoaUpKKPAQ5I5cdOiUCwWuK9J
-         /sEwPMpYtXR5vCLJYbNm1CJS1DaJGx8PL8Apt906L1RQYAMoXgFTCXplecSj7VXQf7fF
-         5J2uOwtwVSGXxOVIYxD+8NSZxxxZ80vhkwxl2ojns6ifMWP5ALcdJlIftTQJE/D3aG58
-         7pnw==
+        bh=HDydaL+0kX4XVTgkMgf2Tdq79K2+oRpgLC/WXO4c2NY=;
+        b=KBPnpKP4Ji9mtBj0UtQH2XnZqsg4/0C+2FXpQjdsR/dyEBzY35xzX3LJdoTvORFimo
+         EAZkU3SjJh2695nGmxoyKzaZm0qNSCfkqzCb6RSnn7XrW3M57vcA+5NgL6esQCyefElt
+         vxG/+hq2TAT2si4AQIS2wocgzQiHTV1H+pzACXV6bbNI5vifQxC1A+zbSdNwShTsou1c
+         NdzRJ+67hvJ+rGv8/uYydvw5q8Q+RZcVSpYwXTJ7VyWp/xQU9bUOwE3w5W+KKtNRzf/u
+         C9LWKWiNbOmqW6r8VH1apStsA29QwMXUabjBtdAFwom9pXItQM9L04zM4MtxyHJEYbsX
+         zRVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760367214; x=1760972014;
+        d=1e100.net; s=20230601; t=1760367216; x=1760972016;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qRwTRM1YMVNfPJcUo8UFI2K+NlERkppykhGVZsYyCi8=;
-        b=KHeaK6j11YBfGqh3FUpHqDNFI8TU5xjsQ9HqhuVWuDbGSnKq1qrGBVq4kSaeZXDEyZ
-         qqfZGUMC7Wi9dFkt6sJhIfUqKruo5wayKnEKv5jEwY3X4t5IKX7tBcuIELEqPsYkDCkf
-         mW4guBFUttV0Qk/ZTP6mW4pZ5j2ivIrbEkNCn4cSCG8bWcOZURtdhawZBTImKXhCbxc7
-         NlizRm6I21hyhGNtEEqHy9DvVExaW0XTqu+akq34AMi90OMxPQg2XFD/GVhA+EUnRXwB
-         j7ofXsCj9UUX8uAYfQuRtgVquqnz42c1m4QK33mjwLo80X+JvB3hP3pig6j4nZQtQtAS
-         Uu/w==
-X-Gm-Message-State: AOJu0YxmweEvaBN0qqTMY0lXJn/Sn00GQkesqIpG/NgtnbNv4egZZE8z
-	1c9+GoC/xL3b8it1ctoOkl8hw9kU0LZ8b53A6KBqOYSN5l0z0a0m0nn5O9ukRzzV
-X-Gm-Gg: ASbGnctaZety7bXdR058OafkYh65K4gTxoYf9DGg4/P0GtQzK9wnScQ7Ms/4csPK1NL
-	JbaZCafdQbDtYigK18l3d5UU0JMnvQBZANzOvaNDJvwsmThVh02enUME4AXy+OJIBB0lU9I6KlO
-	PTY6KD3TiGAhf7QQ2s4UaqbxaCINT4vJTntqBZDPSdLtae1lKvvp4PS5TwygojlUm3Vl3Fe051q
-	0ph6DQ+w6m5FnD9SSVEttYDmIXP/AgBcHyXypFz0z6SgE6tsVHco+XloIwuABDTKXGB9Yu2sUWe
-	v8hwFJRR5J/wVRvmKywU549SRYwlJ/pIx0fIwmfogK/egVHv9k0zowrAWKBnHElC6vKV+RNKJ7a
-	FTkIbuiU6J10ZVNNTk8wezZmR4GfPHVeJBjA=
-X-Google-Smtp-Source: AGHT+IHmUh7f1JWY1Bn/xnAz1OdnLNh1wSTUkKJWaDX80Ssi4DYZzLpugyxu+bw4gsN3KGpLNos3vw==
-X-Received: by 2002:a05:6000:4901:b0:426:d5bf:aa7 with SMTP id ffacd0b85a97d-426d5bf0c0bmr6709517f8f.63.1760367214055;
-        Mon, 13 Oct 2025 07:53:34 -0700 (PDT)
+        bh=HDydaL+0kX4XVTgkMgf2Tdq79K2+oRpgLC/WXO4c2NY=;
+        b=npf4CtCZ0gdI09Eo1IEkDflv0VhwpZYN6Wt+xZQFIlF/Jmfy0WgbjAmJXC8WoGGguu
+         LAyZpHHIcwjr3Bzz0JnibygWB8wS4uFqSLhePY3XO7tCG6lib+fLOaNW9eISWrpV3OPK
+         sHTh+qeE+cgR0/c1KiyhqBTFadKZXxJevLw5e0CXyflhsWNdosRKnsW+iaHKSgJTuPYu
+         VUOrNXr5374eXjUdWEDoFHbrrr9RyyP50IMClEL5MolIuKH/8VnLLie/M4sCJu+MRhgR
+         8ApRo9hPGNY++f0JfWU16ZmUb81RjLEBg3MYICwt+8MUi/8KuqBDP+WLq8zUKCtDbRgJ
+         M7eA==
+X-Gm-Message-State: AOJu0YxQRglPCjOoFdxlYoUE9FEDS4VuAt7T4sbTmA1KsLqhyGQ1BEBH
+	3/No1mgO1A2AtOGbnErY+cN2OIO4jLu3r6mFao8UX+soBJWq1BZpC+cvWIlmpJnR
+X-Gm-Gg: ASbGncvigAZmMN1G/B4qilNITeJNLCjhPVmb1Gme04Lfw73efsfjf9UCf7ja3dmw6yW
+	A75W/iGxaRPia7LPZZSctt8hDqsoS+lKyhi1r7qaAmCyMejd392OfOA2nSBGxNP8YO0Ai8r+9/o
+	S9zX2YQ4ikt7DgK3x0CiCMQdKRs2qJnjKU/ACvxUxKR0GkQmz5iyBjNTV7pbX/y6uA3Z/JYTDkV
+	gJJx/ZotsXKSPz7DT5924ZvOcHmdbcskAlW6rYzrmx8n52hAk8jsHi8CmcoL/eRw2h4vXrL7HBK
+	/oQv1hMnPSuK+xjJH8FLXj26msuxOHtJiy0bXAKBkFTlHDvOYzwLBIID58uzCHERJLKbUG8SKSL
+	jVZFr2aGjNsqFER13L60C+OVm
+X-Google-Smtp-Source: AGHT+IHRs27nVpctjKFY9Eh6lI0fbhQhREsazw83w2WNaCFmZvecllGP5owrumusgM8b2+r8u2mOcQ==
+X-Received: by 2002:a05:6000:178c:b0:3e7:5f26:f1e8 with SMTP id ffacd0b85a97d-42666ab3390mr14959494f8f.5.1760367216021;
+        Mon, 13 Oct 2025 07:53:36 -0700 (PDT)
 Received: from 127.com ([2620:10d:c092:600::1:eb09])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce5e0e70sm18641085f8f.40.2025.10.13.07.53.32
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce5e0e70sm18641085f8f.40.2025.10.13.07.53.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Oct 2025 07:53:33 -0700 (PDT)
+        Mon, 13 Oct 2025 07:53:35 -0700 (PDT)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew@lunn.ch>,
@@ -114,9 +114,9 @@ Cc: Andrew Lunn <andrew@lunn.ch>,
 	linux-doc@vger.kernel.org,
 	linux-rdma@vger.kernel.org,
 	Jonathan Corbet <corbet@lwn.net>
-Subject: [PATCH net-next v4 07/24] net: add rx_buf_len to netdev config
-Date: Mon, 13 Oct 2025 15:54:09 +0100
-Message-ID: <bd750653950673fb2a4bc1fe496ddb24cca87619.1760364551.git.asml.silence@gmail.com>
+Subject: [PATCH net-next v4 08/24] eth: bnxt: read the page size from the adapter struct
+Date: Mon, 13 Oct 2025 15:54:10 +0100
+Message-ID: <d4e27a4a9a6daae6a80b79dfd675ea641e4e2097.1760364551.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1760364551.git.asml.silence@gmail.com>
 References: <cover.1760364551.git.asml.silence@gmail.com>
@@ -130,65 +130,192 @@ Content-Transfer-Encoding: 8bit
 
 From: Jakub Kicinski <kuba@kernel.org>
 
-Add rx_buf_len to configuration maintained by the core.
-Use "three-state" semantics where 0 means "driver default".
+Switch from using a constant to storing the BNXT_RX_PAGE_SIZE
+inside struct bnxt. This will allow configuring the page size
+at runtime in subsequent patches.
+
+The MSS size calculation for older chip continues to use the constant.
+I'm intending to support the configuration only on more recent HW,
+looks like on older chips setting this per queue won't work,
+and that's the ultimate goal.
+
+This patch should not change the current behavior as value
+read from the struct will always be BNXT_RX_PAGE_SIZE at this stage.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+[pavel: place const on right side in comparisons]
+[pavel: update __bnxt_alloc_rx_netmem's size check]
 Reviewed-by: Mina Almasry <almasrymina@google.com>
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- include/net/netdev_queues.h | 4 ++++
- net/ethtool/common.c        | 1 +
- net/ethtool/rings.c         | 2 ++
- 3 files changed, 7 insertions(+)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 32 ++++++++++---------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  4 +--
+ 3 files changed, 20 insertions(+), 17 deletions(-)
 
-diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-index 9d5dde36c2e5..31559f2711de 100644
---- a/include/net/netdev_queues.h
-+++ b/include/net/netdev_queues.h
-@@ -25,6 +25,10 @@ struct netdev_config {
- 	 * If "unset" driver is free to decide, and may change its choice
- 	 * as other parameters change.
- 	 */
-+	/** @rx_buf_len: Size of buffers on the Rx ring
-+	 *		 (ETHTOOL_A_RINGS_RX_BUF_LEN).
-+	 */
-+	u32	rx_buf_len;
- 	/** @hds_config: HDS enabled (ETHTOOL_A_RINGS_TCP_DATA_SPLIT).
- 	 */
- 	u8	hds_config;
-diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index eeb257d9ab48..2f05359d9782 100644
---- a/net/ethtool/common.c
-+++ b/net/ethtool/common.c
-@@ -909,6 +909,7 @@ void ethtool_ringparam_get_cfg(struct net_device *dev,
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 3fc33b1b4dfb..13286f4a2fa7 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -905,7 +905,7 @@ static void bnxt_tx_int(struct bnxt *bp, struct bnxt_napi *bnapi, int budget)
  
- 	/* Driver gives us current state, we want to return current config */
- 	kparam->tcp_data_split = dev->cfg->hds_config;
-+	kparam->rx_buf_len = dev->cfg->rx_buf_len;
+ static bool bnxt_separate_head_pool(struct bnxt_rx_ring_info *rxr)
+ {
+-	return rxr->need_head_pool || PAGE_SIZE > BNXT_RX_PAGE_SIZE;
++	return rxr->need_head_pool || rxr->bnapi->bp->rx_page_size < PAGE_SIZE;
  }
  
- static void ethtool_init_tsinfo(struct kernel_ethtool_ts_info *info)
-diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
-index 628546a1827b..6a74e7e4064e 100644
---- a/net/ethtool/rings.c
-+++ b/net/ethtool/rings.c
-@@ -41,6 +41,7 @@ static int rings_prepare_data(const struct ethnl_req_info *req_base,
- 		return ret;
+ static struct page *__bnxt_alloc_rx_page(struct bnxt *bp, dma_addr_t *mapping,
+@@ -915,9 +915,9 @@ static struct page *__bnxt_alloc_rx_page(struct bnxt *bp, dma_addr_t *mapping,
+ {
+ 	struct page *page;
  
- 	data->kernel_ringparam.tcp_data_split = dev->cfg->hds_config;
-+	data->kernel_ringparam.rx_buf_len = dev->cfg->rx_buf_len;
- 	data->kernel_ringparam.hds_thresh = dev->cfg->hds_thresh;
+-	if (PAGE_SIZE > BNXT_RX_PAGE_SIZE) {
++	if (bp->rx_page_size < PAGE_SIZE) {
+ 		page = page_pool_dev_alloc_frag(rxr->page_pool, offset,
+-						BNXT_RX_PAGE_SIZE);
++						bp->rx_page_size);
+ 	} else {
+ 		page = page_pool_dev_alloc_pages(rxr->page_pool);
+ 		*offset = 0;
+@@ -936,8 +936,9 @@ static netmem_ref __bnxt_alloc_rx_netmem(struct bnxt *bp, dma_addr_t *mapping,
+ {
+ 	netmem_ref netmem;
  
- 	dev->ethtool_ops->get_ringparam(dev, &data->ringparam,
-@@ -302,6 +303,7 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
- 		return -EINVAL;
+-	if (PAGE_SIZE > BNXT_RX_PAGE_SIZE) {
+-		netmem = page_pool_alloc_frag_netmem(rxr->page_pool, offset, BNXT_RX_PAGE_SIZE, gfp);
++	if (bp->rx_page_size < PAGE_SIZE) {
++		netmem = page_pool_alloc_frag_netmem(rxr->page_pool, offset,
++						     bp->rx_page_size, gfp);
+ 	} else {
+ 		netmem = page_pool_alloc_netmems(rxr->page_pool, gfp);
+ 		*offset = 0;
+@@ -1155,9 +1156,9 @@ static struct sk_buff *bnxt_rx_multi_page_skb(struct bnxt *bp,
+ 		return NULL;
  	}
+ 	dma_addr -= bp->rx_dma_offset;
+-	dma_sync_single_for_cpu(&bp->pdev->dev, dma_addr, BNXT_RX_PAGE_SIZE,
++	dma_sync_single_for_cpu(&bp->pdev->dev, dma_addr, bp->rx_page_size,
+ 				bp->rx_dir);
+-	skb = napi_build_skb(data_ptr - bp->rx_offset, BNXT_RX_PAGE_SIZE);
++	skb = napi_build_skb(data_ptr - bp->rx_offset, bp->rx_page_size);
+ 	if (!skb) {
+ 		page_pool_recycle_direct(rxr->page_pool, page);
+ 		return NULL;
+@@ -1189,7 +1190,7 @@ static struct sk_buff *bnxt_rx_page_skb(struct bnxt *bp,
+ 		return NULL;
+ 	}
+ 	dma_addr -= bp->rx_dma_offset;
+-	dma_sync_single_for_cpu(&bp->pdev->dev, dma_addr, BNXT_RX_PAGE_SIZE,
++	dma_sync_single_for_cpu(&bp->pdev->dev, dma_addr, bp->rx_page_size,
+ 				bp->rx_dir);
  
-+	dev->cfg_pending->rx_buf_len = kernel_ringparam.rx_buf_len;
- 	dev->cfg_pending->hds_config = kernel_ringparam.tcp_data_split;
- 	dev->cfg_pending->hds_thresh = kernel_ringparam.hds_thresh;
+ 	if (unlikely(!payload))
+@@ -1203,7 +1204,7 @@ static struct sk_buff *bnxt_rx_page_skb(struct bnxt *bp,
  
+ 	skb_mark_for_recycle(skb);
+ 	off = (void *)data_ptr - page_address(page);
+-	skb_add_rx_frag(skb, 0, page, off, len, BNXT_RX_PAGE_SIZE);
++	skb_add_rx_frag(skb, 0, page, off, len, bp->rx_page_size);
+ 	memcpy(skb->data - NET_IP_ALIGN, data_ptr - NET_IP_ALIGN,
+ 	       payload + NET_IP_ALIGN);
+ 
+@@ -1288,7 +1289,7 @@ static u32 __bnxt_rx_agg_netmems(struct bnxt *bp,
+ 		if (skb) {
+ 			skb_add_rx_frag_netmem(skb, i, cons_rx_buf->netmem,
+ 					       cons_rx_buf->offset,
+-					       frag_len, BNXT_RX_PAGE_SIZE);
++					       frag_len, bp->rx_page_size);
+ 		} else {
+ 			skb_frag_t *frag = &shinfo->frags[i];
+ 
+@@ -1313,7 +1314,7 @@ static u32 __bnxt_rx_agg_netmems(struct bnxt *bp,
+ 			if (skb) {
+ 				skb->len -= frag_len;
+ 				skb->data_len -= frag_len;
+-				skb->truesize -= BNXT_RX_PAGE_SIZE;
++				skb->truesize -= bp->rx_page_size;
+ 			}
+ 
+ 			--shinfo->nr_frags;
+@@ -1328,7 +1329,7 @@ static u32 __bnxt_rx_agg_netmems(struct bnxt *bp,
+ 		}
+ 
+ 		page_pool_dma_sync_netmem_for_cpu(rxr->page_pool, netmem, 0,
+-						  BNXT_RX_PAGE_SIZE);
++						  bp->rx_page_size);
+ 
+ 		total_frag_len += frag_len;
+ 		prod = NEXT_RX_AGG(prod);
+@@ -4478,7 +4479,7 @@ static void bnxt_init_one_rx_agg_ring_rxbd(struct bnxt *bp,
+ 	ring = &rxr->rx_agg_ring_struct;
+ 	ring->fw_ring_id = INVALID_HW_RING_ID;
+ 	if ((bp->flags & BNXT_FLAG_AGG_RINGS)) {
+-		type = ((u32)BNXT_RX_PAGE_SIZE << RX_BD_LEN_SHIFT) |
++		type = ((u32)bp->rx_page_size << RX_BD_LEN_SHIFT) |
+ 			RX_BD_TYPE_RX_AGG_BD | RX_BD_FLAGS_SOP;
+ 
+ 		bnxt_init_rxbd_pages(ring, type);
+@@ -4740,7 +4741,7 @@ void bnxt_set_ring_params(struct bnxt *bp)
+ 	bp->rx_agg_nr_pages = 0;
+ 
+ 	if (bp->flags & BNXT_FLAG_TPA || bp->flags & BNXT_FLAG_HDS)
+-		agg_factor = min_t(u32, 4, 65536 / BNXT_RX_PAGE_SIZE);
++		agg_factor = min_t(u32, 4, 65536 / bp->rx_page_size);
+ 
+ 	bp->flags &= ~BNXT_FLAG_JUMBO;
+ 	if (rx_space > PAGE_SIZE && !(bp->flags & BNXT_FLAG_NO_AGG_RINGS)) {
+@@ -7054,7 +7055,7 @@ static void bnxt_set_rx_ring_params_p5(struct bnxt *bp, u32 ring_type,
+ 	if (ring_type == HWRM_RING_ALLOC_AGG) {
+ 		req->ring_type = RING_ALLOC_REQ_RING_TYPE_RX_AGG;
+ 		req->rx_ring_id = cpu_to_le16(grp_info->rx_fw_ring_id);
+-		req->rx_buf_size = cpu_to_le16(BNXT_RX_PAGE_SIZE);
++		req->rx_buf_size = cpu_to_le16(bp->rx_page_size);
+ 		enables |= RING_ALLOC_REQ_ENABLES_RX_RING_ID_VALID;
+ 	} else {
+ 		req->rx_buf_size = cpu_to_le16(bp->rx_buf_use_size);
+@@ -16631,6 +16632,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	bp = netdev_priv(dev);
+ 	bp->board_idx = ent->driver_data;
+ 	bp->msg_enable = BNXT_DEF_MSG_ENABLE;
++	bp->rx_page_size = BNXT_RX_PAGE_SIZE;
+ 	bnxt_set_max_func_irqs(bp, max_irqs);
+ 
+ 	if (bnxt_vf_pciid(bp->board_idx))
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 741b2d854789..bbf4ff49ac0f 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2361,6 +2361,7 @@ struct bnxt {
+ 	u16			max_tpa;
+ 	u32			rx_buf_size;
+ 	u32			rx_buf_use_size;	/* useable size */
++	u16			rx_page_size;
+ 	u16			rx_offset;
+ 	u16			rx_dma_offset;
+ 	enum dma_data_direction	rx_dir;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+index 3e77a96e5a3e..c23c04007136 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+@@ -183,7 +183,7 @@ void bnxt_xdp_buff_init(struct bnxt *bp, struct bnxt_rx_ring_info *rxr,
+ 			u16 cons, u8 *data_ptr, unsigned int len,
+ 			struct xdp_buff *xdp)
+ {
+-	u32 buflen = BNXT_RX_PAGE_SIZE;
++	u32 buflen = bp->rx_page_size;
+ 	struct bnxt_sw_rx_bd *rx_buf;
+ 	struct pci_dev *pdev;
+ 	dma_addr_t mapping;
+@@ -469,7 +469,7 @@ bnxt_xdp_build_skb(struct bnxt *bp, struct sk_buff *skb, u8 num_frags,
+ 		return NULL;
+ 
+ 	xdp_update_skb_frags_info(skb, num_frags, sinfo->xdp_frags_size,
+-				  BNXT_RX_PAGE_SIZE * num_frags,
++				  bp->rx_page_size * num_frags,
+ 				  xdp_buff_get_skb_flags(xdp));
+ 	return skb;
+ }
 -- 
 2.49.0
 
