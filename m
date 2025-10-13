@@ -1,200 +1,168 @@
-Return-Path: <netdev+bounces-228651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-228652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFF81BD0D4E
-	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 00:55:28 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 890F1BD1139
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 03:19:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99B1E3BAEBA
-	for <lists+netdev@lfdr.de>; Sun, 12 Oct 2025 22:55:27 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D1FEC4E81B2
+	for <lists+netdev@lfdr.de>; Mon, 13 Oct 2025 01:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADEE821D596;
-	Sun, 12 Oct 2025 22:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mo2RQv8K"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A467B1FE47C;
+	Mon, 13 Oct 2025 01:18:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9738156CA
-	for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 22:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE9712B94;
+	Mon, 13 Oct 2025 01:18:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760309725; cv=none; b=jyyLoN73rn9Dyr0BUXEGHB1rzkrP2tAqeWO+pYNZk3qMNvLfWWHcMudffNkjnua/BrWmGhW2TSgTaHIAyf1DG7PLHE4/cVKyU8wr4c5+WqFfDU8eOuvvnOTnjqgicbU4y2DFgkWmBGrUa5ByBCXCQJCFzOOfv6xOLS84oaO4bko=
+	t=1760318333; cv=none; b=bDM7T0hEccmgRdyWp8O0X0wVXZ+srvqFz/39G/Vc0y819R+SbGGjha40i8nSDSK5KNtXs7NDadPqVsmLa84w0LuRN8W2YdiWW//XtBLa2RKTfr1lw6JtAbkIaB8CkPFrr8PfZcM3mX055AJPEYcjbq1kmDDjgZ+xX9RXvD8MlYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760309725; c=relaxed/simple;
-	bh=/aNugIRUK+tpxRbJgf7i0oPPZTjKelZlkgsPkBZfXKw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H88G00CXIZy8svzaYS1Tem6rW3rGg82bdtId1UJRX08IdM4wBMv3DHbfNay/TOhwCaELjVqrYlehXytaovGcqeJtwqVOb2nfOwUkaQ7G4toCefwz4krLYLIf/g+u+ZX8VVF4OiR7lOv6StWPQu0cRoT+zliW6c5ujtTN1+59l8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mo2RQv8K; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-46e5980471eso18432625e9.2
-        for <netdev@vger.kernel.org>; Sun, 12 Oct 2025 15:55:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760309722; x=1760914522; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ga3oYxy9UQThMlPgmNDPkN9ZAYPBeMGO+WE4XySet1w=;
-        b=mo2RQv8K+kYC9Inq2nxfhBjwDFKwNJAxpoGzYLy1GPCZMymOzdbc+19nSrCyW9dTi2
-         WwSIHcpCK6Ex++GlndY/B+CERuzqWViDFLKK3li2ipIhilrp2bli1VCkmjfy6cUpEHtL
-         pnyXzATwRqrrJqZinUt4zdVTuXJvLALsYUXXBI+spgN7KRcUj6zmoO9ZyecwDv5Vh57m
-         mFlRm7edfbniVpbXZRajkx9lxc1QZ6u/dyD+S9VJWzpRHTbfNf9wbmsAw8G9OmdEIwyD
-         MjzcVotaF5uymeRxSHYjovIWbicGl9ZD5o9MDZXR+iQ2SwOzebg1aFN2+vOUSxxZU6/E
-         ZYvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760309722; x=1760914522;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ga3oYxy9UQThMlPgmNDPkN9ZAYPBeMGO+WE4XySet1w=;
-        b=f8bIsH+DvTz0vmzHWm75195/Zsqs4b0paYYPkVMGQPMZHNTzZrnmT707cxNsjIj9VE
-         anI0Hpi4fS8ygxuGCB5KSCSJrioxAGltBnqCjY0U/0HAAFmw4i8L5y/cpFeMtH8KbyRG
-         YID9XgLfjVoNRMX+LEU9RjRPImddR4Cglyn82vzt6sZYiatQaV2CW3s33nGViv357EIk
-         5Tki8ngYT4fFq8uqT5XZziLli5ngaeUJEcxnMlodIwoQYXPtGdQK5TI8nH4g6xQrm114
-         IYN5NnDbmVZoc78ngwmS4iCUF0/Hu8A/y488/mE+IdZsK9ovwoE+V+Fbtmi6qTDSOhI5
-         Y0SA==
-X-Forwarded-Encrypted: i=1; AJvYcCVde6WuyB8BBdy2KBfFqj2wcM74HcFg3kIY1qTQtOwsW+zojK6BgMtfM9kA1dN8fRkDfN1dAwY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbsV8pROt5aI0zmJKq2kftdT+xCD2n1JUlkXg6fQwPA3DPhNHv
-	YeeWlZI6CfNv8c1zluo7I2LLZVVYsHiSvN8bYJ8zLN/c1SHkG3QCnNUF
-X-Gm-Gg: ASbGncvaBOxXO9l6S65B49XwcI5Pa/+97V5UuXoBKnOO6kSDDCvtrNIpaQP51uavyys
-	LUp/ZHTfiRuS6A5EjL8hOnejSLznEapKOFOmkEsQo1C+QOq0t1uapGSUit4mMJjdtENkdM1M/mk
-	VyQkLHWLA9Kk/uPcaKLWS9ZCqfhYmLgURI630zCKcXyomO4pWiwdxmCeMvQUpoeWMP8LO4h0xH8
-	Bm5wpJZp86vM0IpIiM168ateE/2VDSX8orHQ2nEJ9DFkY/nS5YmDwVlOMU2xbCfiVg8bq4zUgoR
-	OeBz8lQJ1H12Mo9VxggKVdpS4vvW8AIlpJTrFsyFddBd6hbShrXwocEqjwzweH2QcXa+EbS+n9Z
-	GtVMFlVl5cd9gXfoeRG12VwH8CqN3XKXQe3KJ11rxnfNEP4CSgMzjCb5XP41nraNDBQ==
-X-Google-Smtp-Source: AGHT+IFntJSUYtRCPK7KavGvKy5wVQkw0dAhrB3ptNAqvEQRke4kEmv88hozJjUx5+qyTb94kmyFNg==
-X-Received: by 2002:a5d:5d08:0:b0:3fe:4fa2:8cdc with SMTP id ffacd0b85a97d-4266e8e6dd8mr12989064f8f.60.1760309721703;
-        Sun, 12 Oct 2025 15:55:21 -0700 (PDT)
-Received: from [192.168.0.4] ([212.50.121.5])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce57cc0esm15261512f8f.6.2025.10.12.15.55.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 Oct 2025 15:55:19 -0700 (PDT)
-Message-ID: <90747682-22c6-4cb6-a6d1-3bef4aeab70e@gmail.com>
-Date: Mon, 13 Oct 2025 01:55:28 +0300
+	s=arc-20240116; t=1760318333; c=relaxed/simple;
+	bh=NiasNDnL7bI+RWAs1WgZxXifIHYVm8cB4osG/bTqMcU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QOIjkf/VpiYM60gfY8pp/Hjy6++5r5wMDYR3MEnfLMzR+aEBylmAG0LNN9Odhm29N3+onVQcHBSrLSumAy+hmIujg32cYJHz9KqdiPRSVs8Ur6dW1/ik9Tc4NmgH7nnhMv8tP1qANSz80oZYQLmF+xzdv5VEfgvl3N/hroRi5gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c2dff70000001609-68-68ec4fde8eb0
+Date: Mon, 13 Oct 2025 10:03:21 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
+	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
+	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
+	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+	ngupta@vflare.org, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
+	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+	djwong@kernel.org, dri-devel@lists.freedesktop.org,
+	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
+	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
+	yeoreum.yun@arm.com, netdev@vger.kernel.org,
+	matthew.brost@intel.com, her0gyugyu@gmail.com,
+	catalin.marinas@arm.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, luto@kernel.org,
+	sumit.semwal@linaro.org, gustavo@padovan.org,
+	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
+	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
+	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
+	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
+	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
+	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
+	qiang.zhang@linux.dev, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
+	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
+	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
+	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
+	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
+	yuzhao@google.com, baolin.wang@linux.alibaba.com,
+	usamaarif642@gmail.com, joel.granados@kernel.org,
+	richard.weiyang@gmail.com, geert+renesas@glider.be,
+	tim.c.chen@linux.intel.com, linux@treblig.org,
+	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+	chenhuacai@kernel.org, francesco@valla.it,
+	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
+	masahiroy@kernel.org, brauner@kernel.org,
+	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
+	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
+	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev
+Subject: Re: [PATCH v17 28/47] dept: add documentation for dept
+Message-ID: <20251013010321.GA52546@system.software.com>
+References: <20251002081247.51255-1-byungchul@sk.com>
+ <20251002081247.51255-29-byungchul@sk.com>
+ <87ldlssg1b.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 0/6] net: wwan: add NMEA port type support
-To: Daniele Palmas <dnlplm@gmail.com>
-Cc: Loic Poulain <loic.poulain@oss.qualcomm.com>,
- Slark Xiao <slark_xiao@163.com>, Muhammad Nuzaihan <zaihan@unrealasia.net>,
- Johannes Berg <johannes@sipsolutions.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- Qiang Yu <quic_qianyu@quicinc.com>, Manivannan Sadhasivam <mani@kernel.org>,
- Johan Hovold <johan@kernel.org>
-References: <20250624213801.31702-1-ryazanov.s.a@gmail.com>
- <CAFEp6-08JX1gDDn2-hP5AjXHCGsPYHe05FscQoyiP_OaSQfzqQ@mail.gmail.com>
- <fc1f5d15-163c-49d7-ab94-90e0522b0e57@gmail.com>
- <CAFEp6-1xoFW6xpQHPN4_XNtbjwvW=TUdFrOkFKwM+-rEH7WqMg@mail.gmail.com>
- <e8d7bab.2987.19936a78b86.Coremail.slark_xiao@163.com>
- <19a5c6e0-fd2a-4cba-92ed-b5c09d68e90c@gmail.com>
- <317b6512.6a9b.1995168196c.Coremail.slark_xiao@163.com>
- <CAFEp6-0jAV9XV-v5X_iwR+DzyC-qytnDFaRubT2KEQav1KzTew@mail.gmail.com>
- <CAGRyCJG-JvPu5Gizn8qEZy0QNYgw6yVxz6_KW0K0HUfhZsrmbw@mail.gmail.com>
- <CAGRyCJE28yf-rrfkFbzu44ygLEvoUM7fecK1vnrghjG_e9UaRA@mail.gmail.com>
- <CAFEp6-18FHj1Spw-=2j_cccmLTKHDS3uHR4ONw8geiTyWrxN2Q@mail.gmail.com>
- <16c0b1fa-9617-4ee1-b82f-e6237d7b5f6f@gmail.com>
- <CAGRyCJGHv19PJ+hyaTYf40GeGRHMXKi-qO0sgREnS3=7rfWGqA@mail.gmail.com>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <CAGRyCJGHv19PJ+hyaTYf40GeGRHMXKi-qO0sgREnS3=7rfWGqA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ldlssg1b.fsf@trenco.lwn.net>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Se0xTdxTH87v3d29vG2uuFcNvkCVbnTE04mMx5vyxqJuJuYQsumG2ZGbZ
+	bqRZq7zWymvJljIKQzRbdQFCAWlRK0IR1iIoDoM0Y3alSmVox0ZR7AB5yKaUhzpYL2aZ/5x8
+	8j0n3/PI4WhVDRvH6TOOag0ZYpqaVWDF9Cp74vC+Kd3WZ9cTIDJbgqG62clCiauSgb6LjQiG
+	IyUIiq4sY5hd/F0Gy509CJ60LLEw6XmMoOJhAYYZxwkEy0NjFDjCSxSEu75B8E/5Eaitc7Pw
+	zH+LBvv9IRrGW6J6a08IQX94NfwamWHBW3achelANQU1VacQFJ5pZiEw+ZyCRte74LPUUdEG
+	LJT/EAtVFYVUNIxTUNZ0lYJFR4MMHKYNUOXvZ2Ck3hqdzJYJPY1jMhj6rgzDxelbDEyOnmKh
+	3XRPBq7ffkJQ0hHB4HpwhwF78VkMlaf/YOHHTi+G/o5qFk60XGIg5FxmwFQ1H12+y8dA81iQ
+	Al/PDQxe6wUM9+8FGXD7e2kIWv5E0PSoLnqGOQe9O1WYL/oWCw3uNkpwnnYiYfZcIS0UWaLk
+	mZqhBbM7Vzjnm2KFp5EBVuics2HhlzoinPQnClesQzLBfG1QJthc2YK7XrM/8SPFW6naNH2O
+	1rBl56cKnaczhLPOsHn14fdNqJgpRXKO8NuJwzeBShG3wkG7QZIxv4H0Pr3ESszyG0kwuEhL
+	JTH8G2Ti2AelSMHR/Pl48v1ozUrNWn4XuTngRBIreSA1Ac8Kq3gzIn/3ii/0NcRbGcYS07yG
+	BJceUpInzceT80ucJMv5TWTeMkJLvI5fT7rafqakXoQflZPqghB6MfIr5Hp9EFsQb33J1vqS
+	rfV/WxuiG5BKn5GTLurTtm/W5Wfo8zYfykx3oejTOr58fvAyetyX0o14DqlXKXVXJ3UqRswx
+	5qd3I8LR6hjlyeJxnUqZKuZ/oTVkfmLITtMau1E8h9WxyjfnclNV/GfiUe0RrTZLa/gvS3Hy
+	OBNKTkjI3ZEd9478wrUHE0/yyre0epKTim6KC5rBvUnp9h3v/cVS3YrXFYMHYu4Gbnw+0n7Q
+	vL+jaeOj2Nsfakwtx3et3rPPf/vjA1lfDx7L2Z3k7F//Vcrb87XimgLzApXcW7vXtGfAdji8
+	ra3JuNblzeoThgMpr7XufHVhbGvKppCuvUKNjTpxm4Y2GMV/AZ3vxSmwAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxbZRTHfe7Lc28bO68VtycjfrDuJRJBl+k8cUaXqNkNUXQz2Xxjrt2u
+	tuGlyy3D4WLCWxFxaqlp2dp1MtgKgbJ1BRaRdEEaWbaBDJFRdYV1qQxGkaiwhgLFdsa4Lye/
+	8z///8n5cHhaHWfX8obCIkku1OZrsJJR5mytyBx7Pap/ytWWBdfKehiYn6tm4PhZD4Zq3zEW
+	rp5pRTA+X40gtuikwdy1wsCytY+DuYXfOFjx9yGwD1lp8HSUUfC3N4FhOvAXAls4gqFuqoyB
+	WfcRBI4JJwdTP2yHmfFuFlZCtygYvRNF4I4kKIj0fIpg2Z4H3zS0Y1gcGKShznYVwclwiIZJ
+	b3LY0TeGwN9cjuF3SycNw5FV8PP8LIZLts8xzAwdp+APL4b6cj8LLqcVQUXjWQx2l4+Brhvf
+	cTA0vUTBdbuVglbfazDunmDgiqWBSt6XdJ1bA866CipZJimwtXVTsOBu4aC/8ToD7tL14BwY
+	ZuFms4ODpfAmWKk3Ql/rLQ5CX9kYODMzyG6zITFm/pIRW9rPU6L5p2Usek54kLgYtyJx7nQF
+	LZotyTYQnaXFyvaPxNNXoliMz49g0X+nnhEvNxCxdiBT7HKEOLHywq/cG8+9o3x+v5RvKJbk
+	J1/Yq9QH/GPMgUZ8qDmysxRVsTWI54nwNAmelGuQgmeE9aQ/3olTjIWNJBhcoFOWNGEduf3Z
+	rhqk5GmhKZ18PeG663lIeJH8OOJBKVYJQFxDgbusFioR+bNf+6/+ILl0LMKkmBYySDAxRaV2
+	0kI6aUrwKVkhPEFilpt0ih8WHiM95y9SFqRy3JN23JN2/J+uR3QLSjMUFhdoDfnPZJny9CWF
+	hkNZ+4wFPpT8SPcnS7Xfornh7b1I4JHmfpW+e1qvZrXFppKCXkR4WpOmqq2a1KtV+7UlH0uy
+	8X35YL5k6kXpPKNZo8reLe1VCx9qi6Q8STogyf9NKV6xthS5r+VIl2U245eD0cAjh+/b4jWe
+	em/j6Pe6dFfuznc/CDlWb6jLzlzep9PZSXlr7aPPvt0SfOXwjuwLqzdn9DpHXlLciK17tWkC
+	F9U8MCX4ir2d4qqcPbmzm31HwqNuz+Dtl+UtRp05trVKEX/z8Q7YlgiVNOTKF0+95Qwf5dp0
+	G77QMCa9dlMGLZu0/wCekX8tjQMAAA==
+X-CFilter-Loop: Reflected
 
-Hi Daniele,
+On Thu, Oct 02, 2025 at 11:36:16PM -0600, Jonathan Corbet wrote:
+> Byungchul Park <byungchul@sk.com> writes:
+> 
+> > This document describes the concept and APIs of dept.
+> >
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > ---
+> >  Documentation/dependency/dept.txt     | 735 ++++++++++++++++++++++++++
+> >  Documentation/dependency/dept_api.txt | 117 ++++
+> >  2 files changed, 852 insertions(+)
+> >  create mode 100644 Documentation/dependency/dept.txt
+> >  create mode 100644 Documentation/dependency/dept_api.txt
+> 
+> As already suggested, this should be in RST; you're already 95% of the
+> way there.  Also, please put it under Documentation/dev-tools; we don't
+> need another top-level directory for this.
 
-On 10/10/25 16:47, Daniele Palmas wrote:
-> Il giorno mer 8 ott 2025 alle ore 23:00 Sergey Ryazanov
-> <ryazanov.s.a@gmail.com> ha scritto:
->> On 10/2/25 18:44, Loic Poulain wrote:
->>> On Tue, Sep 30, 2025 at 9:22 AM Daniele Palmas <dnlplm@gmail.com> wrote:
->>> [...]
->>>> diff --git a/drivers/net/wwan/wwan_hwsim.c b/drivers/net/wwan/wwan_hwsim.c
->>>> index a748b3ea1602..e4b1bbff9af2 100644
->>>> --- a/drivers/net/wwan/wwan_hwsim.c
->>>> +++ b/drivers/net/wwan/wwan_hwsim.c
->>>> @@ -236,7 +236,7 @@ static void wwan_hwsim_nmea_emul_timer(struct timer_list *t)
->>>>           /* 43.74754722298909 N 11.25759835922875 E in DMM format */
->>>>           static const unsigned int coord[4 * 2] = { 43, 44, 8528, 0,
->>>>                                                      11, 15, 4559, 0 };
->>>> -       struct wwan_hwsim_port *port = from_timer(port, t, nmea_emul.timer);
->>>> +       struct wwan_hwsim_port *port = timer_container_of(port, t,
->>>> nmea_emul.timer);
->>>>
->>>> it's basically working fine in operative mode though there's an issue
->>>> at the host shutdown, not able to properly terminate.
->>>>
->>>> Unfortunately I was not able to gather useful text logs besides the picture at
->>>>
->>>> https://drive.google.com/file/d/13ObWikuiMMUENl2aZerzxFBg57OB1KNj/view?usp=sharing
->>>>
->>>> showing an oops with the following call stack:
->>>>
->>>> __simple_recursive_removal
->>>> preempt_count_add
->>>> __pfx_remove_one
->>>> wwan_remove_port
->>>> mhi_wwan_ctrl_remove
->>>> mhi_driver_remove
->>>> device_remove
->>>> device_del
->>>>
->>>> but the issue is systematic. Any idea?
->>>>
->>>> At the moment I don't have the time to debug this deeper, I don't even
->>>> exclude the chance that it could be somehow related to the modem. I
->>>> would like to further look at this, but I'm not sure exactly when I
->>>> can....
->>>
->>> Thanks a lot for testing, Sergey, do you know what is wrong with port removal?
->>
->> Daniele, thanks a lot for verifying the proposal on a real hardware and
->> sharing the build fix.
->>
->> Unfortunately, I unable to reproduce the crash. I have tried multiple
->> times to reboot a VM running the simulator module even with opened GNSS
->> device. No luck. It reboots and shutdowns smoothly.
->>
-> 
-> I've probably figured out what's happening.
-> 
-> The problem seems that the gnss device is not considered a wwan_child
-> by is_wwan_child and this makes device_unregister in wwan_remove_dev
-> to be called twice.
-> 
-> For testing I've overwritten the gnss device class with the following hack:
-> 
-> diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
-> index 4d29fb8c16b8..32b3f7c4a402 100644
-> --- a/drivers/net/wwan/wwan_core.c
-> +++ b/drivers/net/wwan/wwan_core.c
-> @@ -599,6 +599,7 @@ static int wwan_port_register_gnss(struct wwan_port *port)
->                  gnss_put_device(gdev);
->                  return err;
->          }
-> +       gdev->dev.class = &wwan_class;
-> 
->          dev_info(&wwandev->dev, "port %s attached\n", dev_name(&gdev->dev));
-> 
-> and now the system powers off without issues.
-> 
-> So, not sure how to fix it properly, but at least does the analysis
-> make sense to you?
+Sure.  I will.  Thanks!
 
-Nice catch! I had a doubt regarding correct child port detection. Let me 
-double check, and thank you for pointing me to the possible source of 
-issues.
-
---
-Sergey
+	Byungchul
+> 
+> Thanks,
+> 
+> jon
 
