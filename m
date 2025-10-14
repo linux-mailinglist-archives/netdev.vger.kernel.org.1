@@ -1,314 +1,175 @@
-Return-Path: <netdev+bounces-229092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBCFDBD8195
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:07:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82986BD8186
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:07:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A17031920F84
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:06:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C3173E761B
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:06:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D808E30F949;
-	Tue, 14 Oct 2025 08:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC4B301712;
+	Tue, 14 Oct 2025 08:06:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="acqq6Mik"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yg/Vb1qZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8786230F925
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F77A30F812
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760429119; cv=none; b=Evw78XaRG8jeshzk2lqjl3q03JHhX0KKVtEXHDmbP5o4wsHLeeuvgcSghmANavUetMUSCXyGVyzjQaqR3o/AdLD/mhsmokKOj3F/No0t7Wb4HdZFM7EvGOoHGKUo/tu4mc42HRyrFEjstEQ3GQ3Foy0PEpWgkXAoSaW9drg71Zw=
+	t=1760429179; cv=none; b=fCENVA7uWR0tK63Nh7RdRrE9zrCHq9kjaHbfpIQ8hTQv9M/bEbLwmqhOQGZwVMogR/nRm5sPqSuvp0WJ9JC+hcJUVpyWvqj3Y6rDp/qepj1hxi1+Z/0/b+NAECi0uk2JRRTqwFkx3oyZR84UIMZRpB7ozt6CCUSXIZ48yLQNzrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760429119; c=relaxed/simple;
-	bh=u339VYpNOouW3J9Adg4tUVH8g26u3PYUBodmmsdMHiY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P347krGaqVkABZ8x6x6cLWtAkslfzWBfKx/hUDci5q3WqA0kog6jm55lMjDC9HcW7PI5oUyN3h4sqmIIXJ1lNwOIU7B/jaWqzzdRNZ42P+qIPzoSQ9tATtUq3Hsw4FKuMF0HKI3zRcw2F5WUOAHwqsZLW69izp8ZIQ94SBJJDXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=acqq6Mik; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <7d89cff3-1045-4901-bdd3-f669eecfee97@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760429114;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CrtFJlSbkl2kD9ZDAiYi7ybf237RYuXExkbwQ5eQLqc=;
-	b=acqq6MikfIa24RB/Al/PVQMzgOtUm37fAdf1Xj4gFxudmWKtRNWk0SMRngS0Y7K5PFKChs
-	k9TvnQX4VdcoxLiOuh1qULgJCaPw6EcP1boilclC+sVaEd77iuO2rc8mk5DFXX8RgPV3cB
-	G+6R7Os4OmXPLrEmAMmCNjTc9kpYIVk=
-Date: Tue, 14 Oct 2025 16:04:22 +0800
+	s=arc-20240116; t=1760429179; c=relaxed/simple;
+	bh=F3G1G3p2hOku1tMlDLXq4FQY+qT4eMi4tD7Y7d3KUOs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r4a9dLP+OaaMYM3eXI/EgzOw03mZF0g519QvnlRhCEt7mmrMf6wjadJfwtNmNUEAOTBINmzqRHO9mQn65poNCAr9CYFRAhNjP+9n8tQxd7hqKHhwS4GFYjJxtME/UMytN/aVLdVI5BSzNVCenAMJ7XMoZwGCk/0C2cnLt+kttg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yg/Vb1qZ; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-7ea50f94045so74523016d6.1
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:06:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760429176; x=1761033976; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IYqq5yuUz+kcoeHO4a7HlJXL0rYsAVlQamKS1jtV998=;
+        b=yg/Vb1qZgLRZrTPrVOYnlZF4numL5HGWXAmrqESVDRd80l0tlVxRefVXvtX4/IPPwN
+         8yKF1nXwp8GN2i78thmTnrQdkoRodABa+eLAdz5tacaow77WWTxhIUOhs23QE0Axm7Sv
+         EAY+ta4te8zSg6qk5xNmA5CQwwpXOwJ/ra6IrrVfU1KXeS+6zVAnj5WkSSuN83rlhVa8
+         0U/Ucl4hNpI9DGlMtwXtWFZa/0kUMMwyr9Iq7kRAG7UuRMk6hSIPg0ajYSqCCeOZZadn
+         uvRdUDFrqDaSemEvt8lJc0GDBDAromotePR31YK5ORNiafqHK/oqMnO+zbDcLCbOIN75
+         yA/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760429176; x=1761033976;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IYqq5yuUz+kcoeHO4a7HlJXL0rYsAVlQamKS1jtV998=;
+        b=ph340yCCE4xGOdv6Ef7X7AA1zLDbN5fu3kTV2nLr5QkrX63vc0N5yhy4vJ+rshHgsA
+         k1C4ZVs6873CN5eRNX1HvqI/pfRbL6GIQNnYHGJyCSAEpAb2JCqYuUfD0RIG47kyJZ4B
+         d/e3zyxWReGLQsMwzJDgYnrnzv/Q3n3sIs1N0/Rs3F0NhiZWPkiqKf4tlitBN2LtQnCn
+         dKvftEEV8+CGjH86aIgG97DhTeaEaNHF+CW6kmAj2YdKeBf6MxxPsBXDvvzfZ2zCZSf+
+         AuLhDOXlFpr6nof0w5FJDOY6O3blVge4fSKPsE/JHVQBcf4ZLsWxW0LZ8r7j/EGz1vD9
+         vXlg==
+X-Forwarded-Encrypted: i=1; AJvYcCUP1nqcYewlitOxO0697oUpFMqsHd9dwBDIRn6oU/7XMyEMk/JXRRhrczWSfa+9DYpBUgw+8Gc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7Y/Z3xazet6di1CYLq5sDvjHU6sKMwzeIZur9uKWk2F/k2BVg
+	hnFh95Rj9wAx42NCB0K4TaviQy16rw1PX8AGXMPXozIcC2kuzdY6P1frlT9GFcm5GSICwmL48pX
+	8RVau5Kdj8BwbMjjUasWBnwj5Z7K+sSNL4PtAR2Lp
+X-Gm-Gg: ASbGncuYI8PMRoRFdwp72YnY97dn2yKjA1gElIXKmDo2vlv7z8QjZGcB54YXaIIp0xh
+	L3TiO1dg2MNuTrgEz0mPFgbcKm1TvE1L+8OQRd2i+y4ss8zuwpq0M7WdatnKO+i1ItYvfwHtC7p
+	jzzQ4rkErip7F+4KNo9mHQec8coxSxkd/j/lh42M/8EQiWH6wJQ7j6Gbv0yZ1Yo40BpbHn5+Ho7
+	+FYtlRUqGf+rtJ2a97wY3ZCg67iZh/p
+X-Google-Smtp-Source: AGHT+IGYK0GZALIN+dr7ZI3egJ8TMIFhQdN8aTcypIwz8QSD1KvcpeQWxJHY1Miw4WHu/PFhTEXDE/DRrGVokxcqdgE=
+X-Received: by 2002:a05:6214:daa:b0:878:ff84:a2b6 with SMTP id
+ 6a1803df08f44-87a05103754mr404277516d6.0.1760429176013; Tue, 14 Oct 2025
+ 01:06:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v7 1/3] rculist: Add hlist_nulls_replace_rcu()
- and hlist_nulls_replace_init_rcu()
-To: Eric Dumazet <edumazet@google.com>
-Cc: kuniyu@google.com, "Paul E. McKenney" <paulmck@kernel.org>,
- kerneljasonxing@gmail.com, davem@davemloft.net, kuba@kernel.org,
- netdev@vger.kernel.org, Xuanqiang Luo <luoxuanqiang@kylinos.cn>,
- Frederic Weisbecker <frederic@kernel.org>,
- Neeraj Upadhyay <neeraj.upadhyay@kernel.org>
-References: <20250926074033.1548675-1-xuanqiang.luo@linux.dev>
- <20250926074033.1548675-2-xuanqiang.luo@linux.dev>
- <CANn89iJ15RFYq65t57sW=F1jZigbr5xTbPNLVY53cKtpMKLotA@mail.gmail.com>
- <d6a43fe1-2e00-4df4-b4a8-04facd8f05d4@linux.dev>
- <CANn89iLQMVms1GF_oY1WSCtmxLZaBJrTKaeHnwRo5p9uzFwnVw@mail.gmail.com>
- <82a04cb1-9451-493c-9b1e-b4a34f2175cd@linux.dev>
- <CANn89iJdXiE3b8x8vQtbOOi2DTC5P9bOO1HsnRwSPC8qQC--8g@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: luoxuanqiang <xuanqiang.luo@linux.dev>
-In-Reply-To: <CANn89iJdXiE3b8x8vQtbOOi2DTC5P9bOO1HsnRwSPC8qQC--8g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20251014060454.1841122-1-edumazet@google.com> <aO3voj4IbAoHgDoP@krikkit>
+ <c502f3e2-7d6b-4510-a812-c5b656d081d6@redhat.com> <CANn89i+t9e6qRwvkc70dbxAXLz2bGC6uamB==cfcJee3d8tbgQ@mail.gmail.com>
+ <CANn89iJguZEYBP7K_x9LmWGhJw0zf7msbxrVHM0m99pS3dYKKg@mail.gmail.com>
+In-Reply-To: <CANn89iJguZEYBP7K_x9LmWGhJw0zf7msbxrVHM0m99pS3dYKKg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 Oct 2025 01:06:04 -0700
+X-Gm-Features: AS18NWB9pH9FUqTYVW8xOYl4BiSkBPoLhpHS-dnUA21W5oBLO87cmVZQYu9cpm8
+Message-ID: <CANn89iK6w0CNzMqRJiA7QN2Ap3AFWpqWYhbB55RcHPeLq6xzyg@mail.gmail.com>
+Subject: Re: [PATCH net] udp: drop secpath before storing an skb in a receive queue
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Sabrina Dubroca <sd@queasysnail.net>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Michal Kubecek <mkubecek@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-在 2025/10/14 15:34, Eric Dumazet 写道:
-> On Tue, Oct 14, 2025 at 12:21 AM luoxuanqiang <xuanqiang.luo@linux.dev> wrote:
->>
->> 在 2025/10/13 17:49, Eric Dumazet 写道:
->>> On Mon, Oct 13, 2025 at 1:26 AM luoxuanqiang <xuanqiang.luo@linux.dev> wrote:
->>>> 在 2025/10/13 15:31, Eric Dumazet 写道:
->>>>> On Fri, Sep 26, 2025 at 12:41 AM <xuanqiang.luo@linux.dev> wrote:
->>>>>> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
->>>>>>
->>>>>> Add two functions to atomically replace RCU-protected hlist_nulls entries.
->>>>>>
->>>>>> Keep using WRITE_ONCE() to assign values to ->next and ->pprev, as
->>>>>> mentioned in the patch below:
->>>>>> commit efd04f8a8b45 ("rcu: Use WRITE_ONCE() for assignments to ->next for
->>>>>> rculist_nulls")
->>>>>> commit 860c8802ace1 ("rcu: Use WRITE_ONCE() for assignments to ->pprev for
->>>>>> hlist_nulls")
->>>>>>
->>>>>> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
->>>>>> ---
->>>>>>     include/linux/rculist_nulls.h | 59 +++++++++++++++++++++++++++++++++++
->>>>>>     1 file changed, 59 insertions(+)
->>>>>>
->>>>>> diff --git a/include/linux/rculist_nulls.h b/include/linux/rculist_nulls.h
->>>>>> index 89186c499dd4..c26cb83ca071 100644
->>>>>> --- a/include/linux/rculist_nulls.h
->>>>>> +++ b/include/linux/rculist_nulls.h
->>>>>> @@ -52,6 +52,13 @@ static inline void hlist_nulls_del_init_rcu(struct hlist_nulls_node *n)
->>>>>>     #define hlist_nulls_next_rcu(node) \
->>>>>>            (*((struct hlist_nulls_node __rcu __force **)&(node)->next))
->>>>>>
->>>>>> +/**
->>>>>> + * hlist_nulls_pprev_rcu - returns the dereferenced pprev of @node.
->>>>>> + * @node: element of the list.
->>>>>> + */
->>>>>> +#define hlist_nulls_pprev_rcu(node) \
->>>>>> +       (*((struct hlist_nulls_node __rcu __force **)(node)->pprev))
->>>>>> +
->>>>>>     /**
->>>>>>      * hlist_nulls_del_rcu - deletes entry from hash list without re-initialization
->>>>>>      * @n: the element to delete from the hash list.
->>>>>> @@ -152,6 +159,58 @@ static inline void hlist_nulls_add_fake(struct hlist_nulls_node *n)
->>>>>>            n->next = (struct hlist_nulls_node *)NULLS_MARKER(NULL);
->>>>>>     }
->>>>>>
->>>>>> +/**
->>>>>> + * hlist_nulls_replace_rcu - replace an old entry by a new one
->>>>>> + * @old: the element to be replaced
->>>>>> + * @new: the new element to insert
->>>>>> + *
->>>>>> + * Description:
->>>>>> + * Replace the old entry with the new one in a RCU-protected hlist_nulls, while
->>>>>> + * permitting racing traversals.
->>>>>> + *
->>>>>> + * The caller must take whatever precautions are necessary (such as holding
->>>>>> + * appropriate locks) to avoid racing with another list-mutation primitive, such
->>>>>> + * as hlist_nulls_add_head_rcu() or hlist_nulls_del_rcu(), running on this same
->>>>>> + * list.  However, it is perfectly legal to run concurrently with the _rcu
->>>>>> + * list-traversal primitives, such as hlist_nulls_for_each_entry_rcu().
->>>>>> + */
->>>>>> +static inline void hlist_nulls_replace_rcu(struct hlist_nulls_node *old,
->>>>>> +                                          struct hlist_nulls_node *new)
->>>>>> +{
->>>>>> +       struct hlist_nulls_node *next = old->next;
->>>>>> +
->>>>>> +       WRITE_ONCE(new->next, next);
->>>>>> +       WRITE_ONCE(new->pprev, old->pprev);
->>>>> I do not think these two WRITE_ONCE() are needed.
->>>>>
->>>>> At this point new is not yet visible.
->>>>>
->>>>> The following  rcu_assign_pointer() is enough to make sure prior
->>>>> writes are committed to memory.
->>>> Dear Eric,
->>>>
->>>> I’m quoting your more detailed explanation from the other patch [0], thank
->>>> you for that!
->>>>
->>>> However, regarding new->next, if the new object is allocated with
->>>> SLAB_TYPESAFE_BY_RCU, would we still encounter the same issue as in commit
->>>> efd04f8a8b45 (“rcu: Use WRITE_ONCE() for assignments to ->next for
->>>> rculist_nulls”)?
->>>>
->>>> Also, for the WRITE_ONCE() assignments to ->pprev introduced in commit
->>>> 860c8802ace1 (“rcu: Use WRITE_ONCE() for assignments to ->pprev for
->>>> hlist_nulls”) within hlist_nulls_add_head_rcu(), is that also unnecessary?
->>> I forgot sk_unhashed()/sk_hashed() could be called from lockless contexts.
->>>
->>> It is a bit weird to annotate the writes, but not the lockless reads,
->>> even if apparently KCSAN
->>> is okay with that.
->>>
->> Dear Eric,
->>
->> I’m sorry—I still haven’t fully grasped the scenario you mentioned where
->> sk_unhashed()/sk_hashed() can be called from lock‑less contexts. It seems
->> similar to the race described in commit 860c8802ace1 (“rcu: Use
->> WRITE_ONCE() for assignments to ->pprev for hlist_nulls”), e.g.: [0].
->>
-> inet_unhash() does a lockless sk_unhash(sk) call, while no lock is
-> held in some cases (look at tcp_done())
+On Tue, Oct 14, 2025 at 1:01=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
-> void inet_unhash(struct sock *sk)
-> {
-> struct inet_hashinfo *hashinfo = tcp_get_hashinfo(sk);
+> On Tue, Oct 14, 2025 at 12:43=E2=80=AFAM Eric Dumazet <edumazet@google.co=
+m> wrote:
+> >
+> > On Tue, Oct 14, 2025 at 12:32=E2=80=AFAM Paolo Abeni <pabeni@redhat.com=
+> wrote:
+> > >
+> > >
+> > >
+> > > On 10/14/25 8:37 AM, Sabrina Dubroca wrote:
+> > > > 2025-10-14, 06:04:54 +0000, Eric Dumazet wrote:
+> > > >> Michal reported and bisected an issue after recent adoption
+> > > >> of skb_attempt_defer_free() in UDP.
+> > > >>
+> > > >> We had the same issue for TCP, that Sabrina fixed in commit 9b6412=
+e6979f
+> > > >> ("tcp: drop secpath at the same time as we currently drop dst")
+> > > >
+> > > > I'm not convinced this is the same bug. The TCP one was a "leaked"
+> > > > reference (delayed put). This looks more like a double put/missing
+> > > > hold to me (we get to the destroy path without having done the prop=
+er
+> > > > delete, which would set XFRM_STATE_DEAD).
+> > > >
+> > > > And this shouldn't be an issue after b441cf3f8c4b ("xfrm: delete
+> > > > x->tunnel as we delete x").
+> > >
+> > > I think Sabrina is right. If the skb carries a secpath,
+> > > UDP_SKB_IS_STATELESS is not set, and skb_release_head_state() will be
+> > > called by skb_consume_udp().
+> > >
+> > > skb_ext_put() does not clear skb->extensions nor ext->refcnt, if
+> > > skb_attempt_defer_free() enters the slow path (kfree_skb_napi_cache()=
+),
+> > > the skb will go through again skb_release_head_state(), with a double=
+ free.
+> > >
+> > > I think something alike the following (completely untested) should wo=
+rk:
+> > > ---
+> > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > index 95241093b7f0..4a308fd6aa6c 100644
+> > > --- a/net/ipv4/udp.c
+> > > +++ b/net/ipv4/udp.c
+> > > @@ -1851,8 +1851,10 @@ void skb_consume_udp(struct sock *sk, struct
+> > > sk_buff *skb, int len)
+> > >                 sk_peek_offset_bwd(sk, len);
+> > >
+> > >         if (!skb_shared(skb)) {
+> > > -               if (unlikely(udp_skb_has_head_state(skb)))
+> > > +               if (unlikely(udp_skb_has_head_state(skb))) {
+> > >                         skb_release_head_state(skb);
+> > > +                       skb->active_extensions =3D 0;
 >
-> if (sk_unhashed(sk))    // Here no lock is held
->      return;
->
-> Relevant lock (depending on (sk->sk_state == TCP_LISTEN)) is acquired
-> a few lines later.
->
-> Then
->
-> __sk_nulls_del_node_init_rcu() is called safely, while the bucket lock is held.
->
-Dear Eric,
+> We probably also want to clear CONNTRACK state as well.
 
-Thanks for the quick response!
+Perhaps not use skb_release_head_state() ?
 
-In the call path:
-         tcp_retransmit_timer()
-                 tcp_write_err()
-                         tcp_done()
+We know there is no dst, and no destructor.
 
-tcp_retransmit_timer() already calls lockdep_sock_is_held(sk) to check the
-socket‑lock state.
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 95241093b7f0..98628486c4c5 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1851,8 +1851,10 @@ void skb_consume_udp(struct sock *sk, struct
+sk_buff *skb, int len)
+                sk_peek_offset_bwd(sk, len);
 
-void tcp_retransmit_timer(struct sock *sk)
-{
-         struct tcp_sock *tp = tcp_sk(sk);
-         struct net *net = sock_net(sk);
-         struct inet_connection_sock *icsk = inet_csk(sk);
-         struct request_sock *req;
-         struct sk_buff *skb;
-
-         req = rcu_dereference_protected(tp->fastopen_rsk,
-                                  lockdep_sock_is_held(sk)); // Check here
-
-Does that mean we’re already protected by lock_sock(sk) or
-bh_lock_sock(sk)?
-
-Thanks!
-
->
->
->> Two CPUs invoke inet_unhash() from the tcp_retransmit_timer() path on the
->> same sk, causing a race even though tcp_retransmit_timer() checks
->> lockdep_sock_is_held(sk).
->>
->> How does this race happen? I can’t find more details to understand the
->> situation, so any hints would be greatly appreciated.
->>
->> My simple understanding is that hlist_nulls_replace_rcu() might have the
->> same call path as hlist_nulls_add_head_rcu(), so I keep using WRITE_ONCE().
->>
->> Finally, Kuniyuki Iwashima also raised a similar discussion in the v3
->> series; here’s the link [1].
->>
->> [0]:
->> ------------------------------------------------------------------------
->>
->> BUG: KCSAN: data-race in inet_unhash / inet_unhash
->>
->> write to 0xffff8880a69a0170 of 8 bytes by interrupt on cpu 1:
->>    __hlist_nulls_del include/linux/list_nulls.h:88 [inline]
->>    hlist_nulls_del_init_rcu include/linux/rculist_nulls.h:36 [inline]
->>    __sk_nulls_del_node_init_rcu include/net/sock.h:676 [inline]
->>    inet_unhash+0x38f/0x4a0 net/ipv4/inet_hashtables.c:612
->>    tcp_set_state+0xfa/0x3e0 net/ipv4/tcp.c:2249
->>    tcp_done+0x93/0x1e0 net/ipv4/tcp.c:3854
->>    tcp_write_err+0x7e/0xc0 net/ipv4/tcp_timer.c:56
->>    tcp_retransmit_timer+0x9b8/0x16d0 net/ipv4/tcp_timer.c:479
->>    tcp_write_timer_handler+0x42d/0x510 net/ipv4/tcp_timer.c:599
->>    tcp_write_timer+0xd1/0xf0 net/ipv4/tcp_timer.c:619
->>    call_timer_fn+0x5f/0x2f0 kernel/time/timer.c:1404
->>    expire_timers kernel/time/timer.c:1449 [inline]
->>    __run_timers kernel/time/timer.c:1773 [inline]
->>    __run_timers kernel/time/timer.c:1740 [inline]
->>    run_timer_softirq+0xc0c/0xcd0 kernel/time/timer.c:1786
->>    __do_softirq+0x115/0x33f kernel/softirq.c:292
->>    invoke_softirq kernel/softirq.c:373 [inline]
->>    irq_exit+0xbb/0xe0 kernel/softirq.c:413
->>    exiting_irq arch/x86/include/asm/apic.h:536 [inline]
->>    smp_apic_timer_interrupt+0xe6/0x280 arch/x86/kernel/apic/apic.c:1137
->>    apic_timer_interrupt+0xf/0x20 arch/x86/entry/entry_64.S:830
->>    native_safe_halt+0xe/0x10 arch/x86/kernel/paravirt.c:71
->>    arch_cpu_idle+0x1f/0x30 arch/x86/kernel/process.c:571
->>    default_idle_call+0x1e/0x40 kernel/sched/idle.c:94
->>    cpuidle_idle_call kernel/sched/idle.c:154 [inline]
->>    do_idle+0x1af/0x280 kernel/sched/idle.c:263
->>    cpu_startup_entry+0x1b/0x20 kernel/sched/idle.c:355
->>    start_secondary+0x208/0x260 arch/x86/kernel/smpboot.c:264
->>    secondary_startup_64+0xa4/0xb0 arch/x86/kernel/head_64.S:241
->>
->> read to 0xffff8880a69a0170 of 8 bytes by interrupt on cpu 0:
->>    sk_unhashed include/net/sock.h:607 [inline]
->>    inet_unhash+0x3d/0x4a0 net/ipv4/inet_hashtables.c:592
->>    tcp_set_state+0xfa/0x3e0 net/ipv4/tcp.c:2249
->>    tcp_done+0x93/0x1e0 net/ipv4/tcp.c:3854
->>    tcp_write_err+0x7e/0xc0 net/ipv4/tcp_timer.c:56
->>    tcp_retransmit_timer+0x9b8/0x16d0 net/ipv4/tcp_timer.c:479
->>    tcp_write_timer_handler+0x42d/0x510 net/ipv4/tcp_timer.c:599
->>    tcp_write_timer+0xd1/0xf0 net/ipv4/tcp_timer.c:619
->>    call_timer_fn+0x5f/0x2f0 kernel/time/timer.c:1404
->>    expire_timers kernel/time/timer.c:1449 [inline]
->>    __run_timers kernel/time/timer.c:1773 [inline]
->>    __run_timers kernel/time/timer.c:1740 [inline]
->>    run_timer_softirq+0xc0c/0xcd0 kernel/time/timer.c:1786
->>    __do_softirq+0x115/0x33f kernel/softirq.c:292
->>    invoke_softirq kernel/softirq.c:373 [inline]
->>    irq_exit+0xbb/0xe0 kernel/softirq.c:413
->>    exiting_irq arch/x86/include/asm/apic.h:536 [inline]
->>    smp_apic_timer_interrupt+0xe6/0x280 arch/x86/kernel/apic/apic.c:1137
->>    apic_timer_interrupt+0xf/0x20 arch/x86/entry/entry_64.S:830
->>    native_safe_halt+0xe/0x10 arch/x86/kernel/paravirt.c:71
->>    arch_cpu_idle+0x1f/0x30 arch/x86/kernel/process.c:571
->>    default_idle_call+0x1e/0x40 kernel/sched/idle.c:94
->>    cpuidle_idle_call kernel/sched/idle.c:154 [inline]
->>    do_idle+0x1af/0x280 kernel/sched/idle.c:263
->>    cpu_startup_entry+0x1b/0x20 kernel/sched/idle.c:355
->>    rest_init+0xec/0xf6 init/main.c:452
->>    arch_call_rest_init+0x17/0x37
->>    start_kernel+0x838/0x85e init/main.c:786
->>    x86_64_start_reservations+0x29/0x2b arch/x86/kernel/head64.c:490
->>    x86_64_start_kernel+0x72/0x76 arch/x86/kernel/head64.c:471
->>    secondary_startup_64+0xa4/0xb0 arch/x86/kernel/head_64.S:241
->>
->> Reported by Kernel Concurrency Sanitizer on:
->> CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.4.0-rc6+ #0
->> Hardware name: Google Google Compute Engine/Google Compute Engine,
->> BIOS Google 01/01/2011
->>
->> ------------------------------------------------------------------------
->>
->> [1]: https://lore.kernel.org/all/CAAVpQUCoCizxTm6wRs0+n6_kPK+kgxwszsYKNds3YvuBfBvrhg@mail.gmail.com/
->>
->> Thanks!
->>
+        if (!skb_shared(skb)) {
+-               if (unlikely(udp_skb_has_head_state(skb)))
+-                       skb_release_head_state(skb);
++               if (unlikely(udp_skb_has_head_state(skb))) {
++                       nf_reset_ct(skb);
++                       skb_ext_reset(skb);
++               }
+                skb_attempt_defer_free(skb);
+                return;
+        }
 
