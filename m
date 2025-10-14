@@ -1,292 +1,118 @@
-Return-Path: <netdev+bounces-229209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 332B3BD95B1
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:34:23 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1835CBD95D2
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:36:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA34F541E3C
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 12:34:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DE5B250101C
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 12:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B5A313E01;
-	Tue, 14 Oct 2025 12:34:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45316313556;
+	Tue, 14 Oct 2025 12:35:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ASHJO6Qc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ex+R3y//"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89FE2BF3CF;
-	Tue, 14 Oct 2025 12:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118C730C371;
+	Tue, 14 Oct 2025 12:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760445254; cv=none; b=GAKJWzAdqoQuhMFFlWaKaSQj4G1cqxz/ek24sKKEONFd0uLw+zX6chLEF6PhodtvYhgJSHCYfBTp5RWmCJk4aJiVZe71gntiBI50xKt/Kq9XsVGItAf9oB4SyB0YhhYAl3g1uzhih/kdRVrS2eosDU5I/o6hcAPYLB8vHTQEg90=
+	t=1760445352; cv=none; b=ilgK6zH0AtT58u537RTFowaxi0C86GJj/VN2SGc39YXEw9wgGgzHzfsQSzU0l+ILCF0mU97IMpaAmIhL2w66/7Oj0dUkOzBt49LH6byFFihMYCcYk6Ii7FSSmSuKsxizBNH02M4Vm3RQN6nZbu0O1uviQedg2+RLf2EYrGc4RVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760445254; c=relaxed/simple;
-	bh=oQLAeDQyVmjWiiZUx6Tf/I63RDM10DhJXwC5sITM4Uc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=hvHXkaMiAuvHt2K/kCeBeI4lQyE0/ExB3hkD4t3jqRNqUab5ST90wL7N8hb9CzK4WOQViGOIbLgjMPlNzWKoFbnua2E1XphVRu7xThnM5OhqhllvZfl8RtbK1ECmKBzvlL7BGffhCZb2OyytbXhosCqmdcriOwFr504yEKpnP2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ASHJO6Qc; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh02.itg.ti.com ([10.180.78.226])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTP id 59ECXwC61067233;
-	Tue, 14 Oct 2025 07:33:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1760445238;
-	bh=bvs+B4pFlwvao7cFjAjIJQY0fsHlgPIJmdN1Y1I3xzs=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=ASHJO6QcWEH818cl89M0aSyZFzA5x1GoqKsJ1ZolgA6+ZZhYnZFC8p+VBtU7WGefO
-	 fJOCq3+noG99JgDxpy/kn7IJghBCclly58SY5TIYQ+OGNB4DoBDJBcGNsi4thTKKFv
-	 bNf48hKSaRfq2MgEaCt1OtGmw6yaQ7o34wwIazy8=
-Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
-	by lelvem-sh02.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 59ECXwdZ439585
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Tue, 14 Oct 2025 07:33:58 -0500
-Received: from DFLE211.ent.ti.com (10.64.6.69) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Tue, 14
- Oct 2025 07:33:57 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE211.ent.ti.com
- (10.64.6.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Tue, 14 Oct 2025 07:33:57 -0500
-Received: from [172.24.231.225] (a0507033-hp.dhcp.ti.com [172.24.231.225])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 59ECXsED034631;
-	Tue, 14 Oct 2025 07:33:55 -0500
-Message-ID: <2b3d5d75-22d8-4b5c-8445-a5ca3fe0bc69@ti.com>
-Date: Tue, 14 Oct 2025 18:03:54 +0530
+	s=arc-20240116; t=1760445352; c=relaxed/simple;
+	bh=veFrev4WHDqJr8PvwptdqQ0qevY7NBnf6uVDF8KwJvU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BxmTxoxjML0O3WpvgiLc3Rlkh8W/6MwJ80l5McQjRg52Z3AJeqyzk9+pDR9Jd7dEUyCKX0/Tgc+1aAHdP7KBbp2P1xVFH/IuG+U7MNj1Gp4V5rJo9L94Em2SeyfX6x4DoT/VbJSlKlDRirutcIWdNhXIadbSr0DxvLNPcYy9Qcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ex+R3y//; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 613B6C4CEE7;
+	Tue, 14 Oct 2025 12:35:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760445351;
+	bh=veFrev4WHDqJr8PvwptdqQ0qevY7NBnf6uVDF8KwJvU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ex+R3y//T9kDG4MIndwspLzW9Vx5zWHgE/EaFVi2WPfvoDb9Wm53ZgK3WweiF8OFR
+	 UUpPSvNXvWaVMMSpa2NFfFoaYru8wVeUVp9LWCfqdK4O6GNUzIU3ucGrpMQufywb47
+	 kOIrAwSVguW0XyImU4o61QWE8OzcAoMP5nF5hHqTTSVn/s4CFrSlHrUfEukcVzsd7q
+	 KdYC4RfDc08pweMnxmXVaFZYxFRHfmp2XAIaBzqAfakhF25hwmpiq40lUfIiv+6zWC
+	 FcLWsoZRYCArglDakt8a2zEa8ZDsd246egHvmkRQV9YE36MTf7aguEqQQhhipNbJvY
+	 GuHfp8lhzzwuQ==
+Date: Tue, 14 Oct 2025 13:35:43 +0100
+From: Simon Horman <horms@kernel.org>
+To: Frederic Weisbecker <frederic@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 30/33] kthread: Add API to update preferred affinity on
+ kthread runtime
+Message-ID: <aO5Dn2AwQWn0SQKQ@horms.kernel.org>
+References: <20251013203146.10162-1-frederic@kernel.org>
+ <20251013203146.10162-31-frederic@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: ethernet: ti: am65-cpts: fix timestamp loss due
- to race conditions
-To: Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <davem@davemloft.net>, <kuba@kernel.org>, <andrew+netdev@lunn.ch>,
-        <edumazet@google.com>
-CC: <linux-kernel@vger.kernel.org>, <c-vankar@ti.com>, <s-vadapalli@ti.com>,
-        <danishanwar@ti.com>
-References: <20251010150821.838902-1-a-garg7@ti.com>
- <629ffe15-e4d8-4b0c-a909-55fa4248965a@redhat.com>
-Content-Language: en-US
-From: Aksh Garg <a-garg7@ti.com>
-In-Reply-To: <629ffe15-e4d8-4b0c-a909-55fa4248965a@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251013203146.10162-31-frederic@kernel.org>
 
+On Mon, Oct 13, 2025 at 10:31:43PM +0200, Frederic Weisbecker wrote:
 
+...
 
-On 14/10/25 15:02, Paolo Abeni wrote:
-> On 10/10/25 5:08 PM, Aksh Garg wrote:
->> diff --git a/drivers/net/ethernet/ti/am65-cpts.c b/drivers/net/ethernet/ti/am65-cpts.c
->> index 59d6ab989c55..2e9719264ba5 100644
->> --- a/drivers/net/ethernet/ti/am65-cpts.c
->> +++ b/drivers/net/ethernet/ti/am65-cpts.c
->> @@ -163,7 +163,9 @@ struct am65_cpts {
->>  	struct device_node *clk_mux_np;
->>  	struct clk *refclk;
->>  	u32 refclk_freq;
->> -	struct list_head events;
->> +	/* separate lists to handle TX and RX timestamp independently */
->> +	struct list_head events_tx;
->> +	struct list_head events_rx;
->>  	struct list_head pool;
->>  	struct am65_cpts_event pool_data[AM65_CPTS_MAX_EVENTS];
->>  	spinlock_t lock; /* protects events lists*/
->> @@ -172,6 +174,7 @@ struct am65_cpts {
->>  	u32 ts_add_val;
->>  	int irq;
->>  	struct mutex ptp_clk_lock; /* PHC access sync */
->> +	struct mutex rx_ts_lock; /* serialize RX timestamp match */
->>  	u64 timestamp;
->>  	u32 genf_enable;
->>  	u32 hw_ts_enable;
->> @@ -245,7 +248,16 @@ static int am65_cpts_cpts_purge_events(struct am65_cpts *cpts)
->>  	struct am65_cpts_event *event;
->>  	int removed = 0;
->>  
->> -	list_for_each_safe(this, next, &cpts->events) {
->> +	list_for_each_safe(this, next, &cpts->events_tx) {
->> +		event = list_entry(this, struct am65_cpts_event, list);
->> +		if (time_after(jiffies, event->tmo)) {
->> +			list_del_init(&event->list);
->> +			list_add(&event->list, &cpts->pool);
->> +			++removed;
->> +		}
->> +	}
-> 
-> Minor nit: you can move the loop in a separate helper taking the event
-> list as an argument and avoid some code duplication with the the rx loop.
+> @@ -900,6 +899,46 @@ int kthread_affine_preferred(struct task_struct *p, const struct cpumask *mask)
+>  }
+>  EXPORT_SYMBOL_GPL(kthread_affine_preferred);
+>  
+> +/**
+> + * kthread_affine_preferred_update - update a kthread's preferred affinity
+> + * @p: thread created by kthread_create().
+> + * @cpumask: new mask of CPUs (might not be online, must be possible) for @k
+> + *           to run on.
 
-I will create a helper function for this.
+nit: @mask: ...
 
-> 
->> +
->> +	list_for_each_safe(this, next, &cpts->events_rx) {
->>  		event = list_entry(this, struct am65_cpts_event, list);
->>  		if (time_after(jiffies, event->tmo)) {
->>  			list_del_init(&event->list);
->> @@ -306,11 +318,21 @@ static int __am65_cpts_fifo_read(struct am65_cpts *cpts)
->>  				cpts->timestamp);
->>  			break;
->>  		case AM65_CPTS_EV_RX:
->> +			event->tmo = jiffies +
->> +				msecs_to_jiffies(AM65_CPTS_EVENT_RX_TX_TIMEOUT);
->> +
->> +			list_move_tail(&event->list, &cpts->events_rx);
->> +
->> +			dev_dbg(cpts->dev,
->> +				"AM65_CPTS_EV_RX e1:%08x e2:%08x t:%lld\n",
->> +				event->event1, event->event2,
->> +				event->timestamp);
->> +			break;
->>  		case AM65_CPTS_EV_TX:
->>  			event->tmo = jiffies +
->>  				msecs_to_jiffies(AM65_CPTS_EVENT_RX_TX_TIMEOUT);
->>  
->> -			list_move_tail(&event->list, &cpts->events);
->> +			list_move_tail(&event->list, &cpts->events_tx);
-> 
-> Similar thing here.
+Likewise for the documentation of kthread_affine_preferred()
+in a subsequent patch in this series.
 
-The dbg_dev() message have different debug messages. So, do you think a 
-helper function here makes much difference?
+> + *
+> + * Update the cpumask of the desired kthread's affinity that was passed by
+> + * a previous call to kthread_affine_preferred(). This can be called either
+> + * before or after the first wakeup of the kthread.
+> + *
+> + * Returns 0 if the affinity has been applied.
+> + */
+> +int kthread_affine_preferred_update(struct task_struct *p,
+> +				    const struct cpumask *mask)
 
-> 
->>  
->>  			dev_dbg(cpts->dev,
->>  				"AM65_CPTS_EV_TX e1:%08x e2:%08x t:%lld\n",
->> @@ -828,7 +850,7 @@ static bool am65_cpts_match_tx_ts(struct am65_cpts *cpts,
->>  	return found;
->>  }
->>  
->> -static void am65_cpts_find_ts(struct am65_cpts *cpts)
->> +static void am65_cpts_find_tx_ts(struct am65_cpts *cpts)
->>  {
->>  	struct am65_cpts_event *event;
->>  	struct list_head *this, *next;
->> @@ -837,7 +859,7 @@ static void am65_cpts_find_ts(struct am65_cpts *cpts)
->>  	LIST_HEAD(events);
->>  
->>  	spin_lock_irqsave(&cpts->lock, flags);
->> -	list_splice_init(&cpts->events, &events);
->> +	list_splice_init(&cpts->events_tx, &events);
->>  	spin_unlock_irqrestore(&cpts->lock, flags);
->>  
->>  	list_for_each_safe(this, next, &events) {
->> @@ -850,7 +872,7 @@ static void am65_cpts_find_ts(struct am65_cpts *cpts)
->>  	}
->>  
->>  	spin_lock_irqsave(&cpts->lock, flags);
->> -	list_splice_tail(&events, &cpts->events);
->> +	list_splice_tail(&events, &cpts->events_tx);
-> 
-> I see the behavior is pre-existing, but why splicing on tail? events
-> added in between should be older???
-
-I will handle this in future patch.
-
-> 
->>  	list_splice_tail(&events_free, &cpts->pool);
->>  	spin_unlock_irqrestore(&cpts->lock, flags);
->>  }
->> @@ -861,7 +883,7 @@ static long am65_cpts_ts_work(struct ptp_clock_info *ptp)
->>  	unsigned long flags;
->>  	long delay = -1;
->>  
->> -	am65_cpts_find_ts(cpts);
->> +	am65_cpts_find_tx_ts(cpts);
->>  
->>  	spin_lock_irqsave(&cpts->txq.lock, flags);
->>  	if (!skb_queue_empty(&cpts->txq))
->> @@ -899,16 +921,21 @@ static u64 am65_cpts_find_rx_ts(struct am65_cpts *cpts, u32 skb_mtype_seqid)
->>  {
->>  	struct list_head *this, *next;
->>  	struct am65_cpts_event *event;
->> +	LIST_HEAD(events_free);
->>  	unsigned long flags;
->> +	LIST_HEAD(events);
->>  	u32 mtype_seqid;
->>  	u64 ns = 0;
->>  
->>  	spin_lock_irqsave(&cpts->lock, flags);
->>  	__am65_cpts_fifo_read(cpts);
->> -	list_for_each_safe(this, next, &cpts->events) {
->> +	list_splice_init(&cpts->events_rx, &events);
->> +	spin_unlock_irqrestore(&cpts->lock, flags);
-> 
-> Why are you changing the behaviour here, releasing and reacquiring the
-> cpts->lock? It looks like a separate change, if needed at all.
-
-It was added as an optimization, as acquiring the lock for entire loop 
-will delay other events to be handled. I will add this optimization in 
-future patch.
-
-> 
->> +	list_for_each_safe(this, next, &events) {
->>  		event = list_entry(this, struct am65_cpts_event, list);
->>  		if (time_after(jiffies, event->tmo)) {
->> -			list_move(&event->list, &cpts->pool);
->> +			list_move(&event->list, &events_free);
->>  			continue;
->>  		}
->>  
->> @@ -919,10 +946,14 @@ static u64 am65_cpts_find_rx_ts(struct am65_cpts *cpts, u32 skb_mtype_seqid)
->>  
->>  		if (mtype_seqid == skb_mtype_seqid) {
->>  			ns = event->timestamp;
->> -			list_move(&event->list, &cpts->pool);
->> +			list_move(&event->list, &events_free);
->>  			break;
->>  		}
->>  	}
->> +
->> +	spin_lock_irqsave(&cpts->lock, flags);
->> +	list_splice_tail(&events, &cpts->events_rx);
->> +	list_splice_tail(&events_free, &cpts->pool);
->>  	spin_unlock_irqrestore(&cpts->lock, flags);
->>  
->>  	return ns;
->> @@ -948,7 +979,9 @@ void am65_cpts_rx_timestamp(struct am65_cpts *cpts, struct sk_buff *skb)
->>  
->>  	dev_dbg(cpts->dev, "%s mtype seqid %08x\n", __func__, skb_cb->skb_mtype_seqid);
->>  
->> +	mutex_lock(&cpts->rx_ts_lock);
->>  	ns = am65_cpts_find_rx_ts(cpts, skb_cb->skb_mtype_seqid);
->> +	mutex_unlock(&cpts->rx_ts_lock);
-> 
-> The call chain is:
-> 
-> am65_cpsw_nuss_rx_poll() -> am65_cpsw_nuss_rx_packets() ->
-> am65_cpts_rx_timestamp()
-> 
-> this runs in BH context, can't acquire a mutex. Also I don't see why any
-> additional locking would be needed?
-> 
-
-The rationale for adding this lock was to handle concurrent RX threads 
-accessing the timestamp event list. If one RX thread moves all events 
-from events_rx to a temporary list and releases the spinlock, another 
-concurrent RX thread could acquire the lock and find events_rx empty, 
-potentially missing its timestamp.
-
-I need clarification on the RX processing behavior: Can 
-am65_cpsw_nuss_rx_packets() be called for a new RX packet concurrently 
-while a previous RX packet is still being processed, or is RX processing 
-serialized? If RX processing is serialized, then the lock is not 
-required at all.
-
-Anyways, I will remove the lock from this patch, as it was a part of the 
-optimization mentioned above.
-
-> /P
-> 
-
+...
 
