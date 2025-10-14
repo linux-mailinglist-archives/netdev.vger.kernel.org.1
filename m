@@ -1,116 +1,90 @@
-Return-Path: <netdev+bounces-229360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF0CABDB126
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 21:35:16 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8FC7BDB189
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 21:41:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 885585406A7
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 19:35:15 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 726CD4E4430
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 19:41:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53744296BB5;
-	Tue, 14 Oct 2025 19:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049BA2C375A;
+	Tue, 14 Oct 2025 19:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ac8abtOE"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UkjdMtAW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CFD13C8EA;
-	Tue, 14 Oct 2025 19:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1EA2BE652;
+	Tue, 14 Oct 2025 19:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760470511; cv=none; b=Dv+zyzwGAL40sBtxRocROwTkaMO4geFXR1QI8Kpl2Slz7kLfr4WJKmdaEloTJbFG82wCcLbLtrGrkvwSQ7YmR1+H2KrtspHLn4SE67PxbKWlVkUMT900IkO4HsUORMzGdDxeQ8VNw4B86hoE1QIewckYPTDUq8DwkufDyJOEK7U=
+	t=1760470912; cv=none; b=A7QutjyJc3QMl1tFNbeahqiVI7bf3ew6eyB3ufvxOkvQNFDI2L0Lh1MG8SURIrNzeSkiXz1gQmDSFd5GDUd8ipxqhui/omLrRTpi+Qf/xNa5+cmMkKnpvhx4KOFapCq9qtbrOGc4lz+BWhveRL2X7dE2jy1H6nJQuss66BlOosA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760470511; c=relaxed/simple;
-	bh=6WyT5RUgeTI0ramo5ow+utKpZdSxPiw51PSH2clXC/8=;
+	s=arc-20240116; t=1760470912; c=relaxed/simple;
+	bh=48s6HazsimmkxKz5dIDeugIQdXCtQs46JltMGufuiLU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YMXsVB2N15TvWSZrVX9qfUdKmYZmv2M94x2h/eq5dI4gVpLucbsgV+L74jVuCwFjiG21DQyk5l+USkYvDUwZj30v1heVCvPc/n50CSHwXmVKy9gGFX3bw62qdWJVWkCuuWKEMMJ9lZUE+d86ZoduIXmyHxfflEc1H+QF4SOdjfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ac8abtOE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2781C4CEE7;
-	Tue, 14 Oct 2025 19:35:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760470509;
-	bh=6WyT5RUgeTI0ramo5ow+utKpZdSxPiw51PSH2clXC/8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ac8abtOEeRbCjTwzhTOS5RZq9MbwUsog0kpaDNXgQ22qcC3vM9dWkm4b8KRpK9IUn
-	 VlQyDgPN1o4peC4i8lp6WAsSrWwronR0PZu5hVxA9Mqg+a0e3q4kwUXZz6DNVletlv
-	 y0uDXdEVexL3ykZJmx0csC38PAEK06JRsRYSkygc4mqKsDq2+dgZI6NHyP/I1ugda0
-	 epmIwK12HrOCAoOLiU/Ex3a+b9P5m3XAjXLMPPwlMlPdZs2WtUzeMzsqStHcdV9Hf+
-	 kS1cExMfHv6lbbvghK3Csf9NDGtTfI6jI2yZSttAYYjGKeFB/iost+KWyKlLgVq2WZ
-	 kjNpgdAssXWyQ==
-Date: Tue, 14 Oct 2025 20:35:04 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Frank Li <Frank.Li@nxp.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev
-Subject: Re: [PATCH 1/1] dt-bindings: net: dsa: nxp,sja1105: Add optional
- clock
-Message-ID: <20251014-unclothed-outsource-d0438fbf1b23@spud>
-References: <20251010183418.2179063-1-Frank.Li@nxp.com>
- <20251014-flattop-limping-46220a9eda46@spud>
- <20251014-projector-immovably-59a2a48857cc@spud>
- <20251014120213.002308f2@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LFs6Isj9UumWFbPjNbEpr+pyTMRNxTzDNsmdgwizkDupKv1rr1UGGXAP3Dx4uEAYtWmbN2qxrC1Mm8t2WBLXy6EoffJ0/FOWfz5tVQnmRYePS9ie8S7Zsjzog9nOEGaGCaUNT/JgZ9vh3n/HK16T3HnME1kOh9emaA84Mr2F8I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UkjdMtAW; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=+J7CGWA+Rn0M9X0tPytaTQdkqtaZ1USzIfewvswO9Ac=; b=UkjdMtAWrq/Pyzg9TTmoVY6vWA
+	xlVAnfh9JG6yIcEQku5IfrtOtRxgChhBlekd4mzHa6W3ACZNP7ufmRIy+3a03RwaZSF6MOdne/NlZ
+	iBooVZq8+eJ8FwOG8AgM/23ynMjhrVw8DWOpZ7F8HLekXOs2ZEPpPqqoFQqb3/5SUzZY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1v8kty-00Awtc-2U; Tue, 14 Oct 2025 21:41:42 +0200
+Date: Tue, 14 Oct 2025 21:41:42 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parvathi Pudi <parvathi@couthit.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, danishanwar@ti.com,
+	rogerq@kernel.org, pmohan@couthit.com, basharath@couthit.com,
+	afd@ti.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, pratheesh@ti.com,
+	prajith@ti.com, vigneshr@ti.com, praneeth@ti.com, srk@ti.com,
+	rogerq@ti.com, krishna@couthit.com, mohan@couthit.com
+Subject: Re: [PATCH net-next v3 1/3] net: ti: icssm-prueth: Adds helper
+ functions to configure and maintain FDB
+Message-ID: <1e16ab86-ccc1-433a-a482-76d9ba567fb9@lunn.ch>
+References: <20251014124018.1596900-1-parvathi@couthit.com>
+ <20251014124018.1596900-2-parvathi@couthit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="1cavWFt1//eeFpZd"
-Content-Disposition: inline
-In-Reply-To: <20251014120213.002308f2@kernel.org>
-
-
---1cavWFt1//eeFpZd
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20251014124018.1596900-2-parvathi@couthit.com>
 
-On Tue, Oct 14, 2025 at 12:02:13PM -0700, Jakub Kicinski wrote:
-> On Tue, 14 Oct 2025 19:12:23 +0100 Conor Dooley wrote:
-> > On Tue, Oct 14, 2025 at 07:02:50PM +0100, Conor Dooley wrote:
-> > > On Fri, Oct 10, 2025 at 02:34:17PM -0400, Frank Li wrote: =20
-> > > > Add optional clock for OSC_IN and fix the below CHECK_DTBS warnings:
-> > > >   arch/arm/boot/dts/nxp/imx/imx6qp-prtwd3.dtb: switch@0 (nxp,sja110=
-5q): Unevaluated properties are not allowed ('clocks' was unexpected)
-> > > >=20
-> > > > Signed-off-by: Frank Li <Frank.Li@nxp.com> =20
-> > >=20
-> > > Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> > > pw-bot: not-applicable =20
-> >=20
-> > Hmm, I think this pw-bot command, intended for the dt patchwork has
-> > probably screwed with the state in the netdev patchwork. Hopefully I can
-> > fix that via
->=20
-> The pw-bot commands are a netdev+bpf thing :) They won't do anything
-> to dt patchwork. IOW the pw-bot is a different bot than the one that
-> replies when patch is applied.
+> +/* 4 bytes */
+> +struct fdb_index_tbl_entry_t {
+> +	/* Bucket Table index of first Bucket with this MAC address */
+> +	u16 bucket_idx;
+> +	u16 bucket_entries; /* Number of entries in this bucket */
+> +};
 
-Rob's recently added it to our patchwork too.
+Please drop the _t. That is normally used to indicate a type, but this
+is actually a struct
 
---1cavWFt1//eeFpZd
-Content-Type: application/pgp-signature; name="signature.asc"
+> +void icssm_prueth_sw_fdb_tbl_init(struct prueth *prueth)
+> +{
+> +	struct fdb_tbl *t = prueth->fdb_tbl;
+> +
+> +	t->index_a = (struct fdb_index_array_t *)((__force const void *)
+> +			prueth->mem[V2_1_FDB_TBL_LOC].va +
+> +			V2_1_FDB_TBL_OFFSET);
 
------BEGIN PGP SIGNATURE-----
+You cast it to a const void * and then a non-const fdb_index_array_t *?
 
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaO6l6AAKCRB4tDGHoIJi
-0gdJAQCGLivdo7jDloa60UBytTTxBpcVXA0yDHBcrNK1N0asVAEAuJ9ZWl3E3KvI
-t6iFRKWBOW6bFyRDG6Ws3iE5/otsOQ4=
-=qbXq
------END PGP SIGNATURE-----
-
---1cavWFt1//eeFpZd--
 
