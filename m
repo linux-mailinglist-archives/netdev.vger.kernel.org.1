@@ -1,30 +1,31 @@
-Return-Path: <netdev+bounces-229260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA665BD9E8E
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 16:11:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E9F4BD9F2E
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 16:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B16541883DA6
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:10:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B712858233D
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:11:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75165314A8E;
-	Tue, 14 Oct 2025 14:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5102D3164AE;
+	Tue, 14 Oct 2025 14:10:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91956314A9B
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 14:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99433315D25
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 14:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760451031; cv=none; b=nmYTud70e7kiAd98hupMnA178bdteK6r4icPpf73Qn93wLWfRBAJFeBh6BiFkKiiT6Q0ThrVkgvkTw3oMe4NRDICCCm9R+XLZ82NUOPCqBC2VKUZJixc9J7a6D/ToiPZ/g3LTlxhZowJAkMmEUYKQtDdevjn6z4esKfz2Xny+AQ=
+	t=1760451038; cv=none; b=ppVdz7Iq3DLvRulJE7I4SaRLgzpJs7jE7/gxE7YKsmo4+DwaBZKSo2+cQLpkfskfrcd+4w9kdxHS/kCqK/0ff6GOKeDgU9j++EG1ZVfzQOEzVybJd7gNOTFf05asFRbD54CcQqNi8WzTVLipxWvWXQRkqYsRQsCLbZsvlBetrLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760451031; c=relaxed/simple;
-	bh=oKizBa0OR+H5xyFMbad+hPugvFniPBKaToqcR7eGSn4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d6z20VRvUbvkLrh68ewKayxk0RurWcZX4v9npTHSNeNmhttbUukWSbMriwAVMLX/US1uVTNsNfIcO5HAa8k9ukepFke2wcRQcB/a3Z9KatI+5pRWq2qc79E0MEyoeEqZlJxJ5YF8XHvsqyDMbFHVxQk36VqWG8wI2FeahbaPnFA=
+	s=arc-20240116; t=1760451038; c=relaxed/simple;
+	bh=zkX2Q58K2Q/Ts4j32RbqD+OkAZHda5+HV3RfXV9Wxpk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rmpVYx0NLqsonz8RREFfPI7vkbBUiVawHSz1Ebd+w2/QmIJ2siQCg1YkqbdYIXoO/Hu5/qfJ5crc9OQuyOHp2XQLMEwY7sdz8XHHeGafWEMU2x/k5hQZZc3bl9+qSO3yBVXuc+m5bVVxnUWiDX19GMBpRlhOwrbQrPpaHO/EzYg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -32,30 +33,37 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1v8fjK-0008IE-TW; Tue, 14 Oct 2025 16:10:22 +0200
+	id 1v8fjM-0008IF-0u; Tue, 14 Oct 2025 16:10:24 +0200
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1v8fjK-003ZPq-0A;
+	id 1v8fjK-003ZPr-0O;
 	Tue, 14 Oct 2025 16:10:22 +0200
 Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
 	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id AC717485F14;
+	by smtp.blackshift.org (Postfix) with ESMTPSA id BC1F3485F15;
 	Tue, 14 Oct 2025 14:10:21 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	linux-can@vger.kernel.org,
-	kernel@pengutronix.de
-Subject: [PATCH net 0/10] pull-request: can 2025-10-14
-Date: Tue, 14 Oct 2025 14:17:47 +0200
-Message-ID: <20251014122140.990472-1-mkl@pengutronix.de>
+	kernel@pengutronix.de,
+	Celeste Liu <uwu@coelacanthus.name>,
+	Runcheng Lu <runcheng.lu@hpmicro.com>,
+	stable@vger.kernel.org,
+	Vincent Mailhol <mailhol@kernel.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: [PATCH net 01/10] can: gs_usb: increase max interface to U8_MAX
+Date: Tue, 14 Oct 2025 14:17:48 +0200
+Message-ID: <20251014122140.990472-2-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251014122140.990472-1-mkl@pengutronix.de>
+References: <20251014122140.990472-1-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,74 +76,121 @@ X-SA-Exim-Mail-From: mkl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello netdev-team,
+From: Celeste Liu <uwu@coelacanthus.name>
 
-this is a pull request of 10 patches for net/main.
+This issue was found by Runcheng Lu when develop HSCanT USB to CAN FD
+converter[1]. The original developers may have only 3 interfaces
+device to test so they write 3 here and wait for future change.
 
-The first 2 paches are by Celeste Liu and target the gS_usb driver.
-The first patch remove the limitation to 3 CAN interface per USB
-device. The second patch adds the missing population of
-net_device->dev_port.
+During the HSCanT development, we actually used 4 interfaces, so the
+limitation of 3 is not enough now. But just increase one is not
+future-proofed. Since the channel index type in gs_host_frame is u8,
+just make canch[] become a flexible array with a u8 index, so it
+naturally constraint by U8_MAX and avoid statically allocate 256
+pointer for every gs_usb device.
 
-THe next 4 patches are by me and fix the m_can driver. They add a
-missing pm_runtime_disable(), fix the CAN state transition back to
-Error Active and fix the state after ifup and suspend/resume.
+[1]: https://github.com/cherry-embedded/HSCanT-hardware
 
-Another patch by me targets the m_can driver, too and replaces Dong
-Aisheng's old email address.
-
-The next 2 patches are by Vincent Mailhol and update the CAN
-networking Documentation.
-
-Tetsuo Handa contributes the last patch that add missing cleanup calls
-in the NETDEV_UNREGISTER notification handler.
-
-regards,
-Marc
-
+Fixes: d08e973a77d1 ("can: gs_usb: Added support for the GS_USB CAN devices")
+Reported-by: Runcheng Lu <runcheng.lu@hpmicro.com>
+Cc: stable@vger.kernel.org
+Reviewed-by: Vincent Mailhol <mailhol@kernel.org>
+Signed-off-by: Celeste Liu <uwu@coelacanthus.name>
+Link: https://patch.msgid.link/20250930-gs-usb-max-if-v5-1-863330bf6666@coelacanthus.name
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
+ drivers/net/can/usb/gs_usb.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-The following changes since commit 2c95a756e0cfc19af6d0b32b0c6cf3bada334998:
+diff --git a/drivers/net/can/usb/gs_usb.c b/drivers/net/can/usb/gs_usb.c
+index c9482d6e947b..9fb4cbbd6d6d 100644
+--- a/drivers/net/can/usb/gs_usb.c
++++ b/drivers/net/can/usb/gs_usb.c
+@@ -289,11 +289,6 @@ struct gs_host_frame {
+ #define GS_MAX_RX_URBS 30
+ #define GS_NAPI_WEIGHT 32
+ 
+-/* Maximum number of interfaces the driver supports per device.
+- * Current hardware only supports 3 interfaces. The future may vary.
+- */
+-#define GS_MAX_INTF 3
+-
+ struct gs_tx_context {
+ 	struct gs_can *dev;
+ 	unsigned int echo_id;
+@@ -324,7 +319,6 @@ struct gs_can {
+ 
+ /* usb interface struct */
+ struct gs_usb {
+-	struct gs_can *canch[GS_MAX_INTF];
+ 	struct usb_anchor rx_submitted;
+ 	struct usb_device *udev;
+ 
+@@ -336,9 +330,11 @@ struct gs_usb {
+ 
+ 	unsigned int hf_size_rx;
+ 	u8 active_channels;
++	u8 channel_cnt;
+ 
+ 	unsigned int pipe_in;
+ 	unsigned int pipe_out;
++	struct gs_can *canch[] __counted_by(channel_cnt);
+ };
+ 
+ /* 'allocate' a tx context.
+@@ -599,7 +595,7 @@ static void gs_usb_receive_bulk_callback(struct urb *urb)
+ 	}
+ 
+ 	/* device reports out of range channel id */
+-	if (hf->channel >= GS_MAX_INTF)
++	if (hf->channel >= parent->channel_cnt)
+ 		goto device_detach;
+ 
+ 	dev = parent->canch[hf->channel];
+@@ -699,7 +695,7 @@ static void gs_usb_receive_bulk_callback(struct urb *urb)
+ 	/* USB failure take down all interfaces */
+ 	if (rc == -ENODEV) {
+ device_detach:
+-		for (rc = 0; rc < GS_MAX_INTF; rc++) {
++		for (rc = 0; rc < parent->channel_cnt; rc++) {
+ 			if (parent->canch[rc])
+ 				netif_device_detach(parent->canch[rc]->netdev);
+ 		}
+@@ -1460,17 +1456,19 @@ static int gs_usb_probe(struct usb_interface *intf,
+ 	icount = dconf.icount + 1;
+ 	dev_info(&intf->dev, "Configuring for %u interfaces\n", icount);
+ 
+-	if (icount > GS_MAX_INTF) {
++	if (icount > type_max(parent->channel_cnt)) {
+ 		dev_err(&intf->dev,
+ 			"Driver cannot handle more that %u CAN interfaces\n",
+-			GS_MAX_INTF);
++			type_max(parent->channel_cnt));
+ 		return -EINVAL;
+ 	}
+ 
+-	parent = kzalloc(sizeof(*parent), GFP_KERNEL);
++	parent = kzalloc(struct_size(parent, canch, icount), GFP_KERNEL);
+ 	if (!parent)
+ 		return -ENOMEM;
+ 
++	parent->channel_cnt = icount;
++
+ 	init_usb_anchor(&parent->rx_submitted);
+ 
+ 	usb_set_intfdata(intf, parent);
+@@ -1531,7 +1529,7 @@ static void gs_usb_disconnect(struct usb_interface *intf)
+ 		return;
+ 	}
+ 
+-	for (i = 0; i < GS_MAX_INTF; i++)
++	for (i = 0; i < parent->channel_cnt; i++)
+ 		if (parent->canch[i])
+ 			gs_destroy_candev(parent->canch[i]);
+ 
 
-  net: pse-pd: tps23881: Fix current measurement scaling (2025-10-07 18:30:53 -0700)
+base-commit: 2c95a756e0cfc19af6d0b32b0c6cf3bada334998
+-- 
+2.51.0
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.18-20251014
-
-for you to fetch changes up to 93a27b5891b8194a8c083c9a80d2141d4bf47ba8:
-
-  can: j1939: add missing calls in NETDEV_UNREGISTER notification handler (2025-10-13 21:26:31 +0200)
-
-----------------------------------------------------------------
-linux-can-fixes-for-6.18-20251014
-
-----------------------------------------------------------------
-Celeste Liu (2):
-      can: gs_usb: increase max interface to U8_MAX
-      can: gs_usb: gs_make_candev(): populate net_device->dev_port
-
-Marc Kleine-Budde (7):
-      can: m_can: m_can_plat_remove(): add missing pm_runtime_disable()
-      can: m_can: m_can_handle_state_errors(): fix CAN state transition to Error Active
-      can: m_can: m_can_chip_config(): bring up interface in correct state
-      can: m_can: fix CAN state in system PM
-      Merge patch series "can: m_can: fix pm_runtime and CAN state handling"
-      can: m_can: replace Dong Aisheng's old email address
-      Merge patch series "can: add Transmitter Delay Compensation (TDC) documentation"
-
-Tetsuo Handa (1):
-      can: j1939: add missing calls in NETDEV_UNREGISTER notification handler
-
-Vincent Mailhol (2):
-      can: remove false statement about 1:1 mapping between DLC and length
-      can: add Transmitter Delay Compensation (TDC) documentation
-
- .mailmap                               |  1 +
- Documentation/networking/can.rst       | 71 ++++++++++++++++++++++++++++++++--
- drivers/net/can/m_can/m_can.c          | 68 ++++++++++++++++++--------------
- drivers/net/can/m_can/m_can_platform.c |  6 +--
- drivers/net/can/usb/gs_usb.c           | 23 ++++++-----
- net/can/j1939/main.c                   |  2 +
- 6 files changed, 123 insertions(+), 48 deletions(-)
 
