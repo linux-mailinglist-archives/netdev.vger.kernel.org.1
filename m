@@ -1,150 +1,132 @@
-Return-Path: <netdev+bounces-229258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2D12BD9EA9
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 16:12:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E2C7BDA216
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 16:47:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC70C547E0A
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:08:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D81942406A
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E27A314D2E;
-	Tue, 14 Oct 2025 14:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49FEC2D7385;
+	Tue, 14 Oct 2025 14:42:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HINIdKOO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I2xgHOri"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99D3F314A69
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 14:08:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55BAE2701C4
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 14:42:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760450891; cv=none; b=SBUEZMPgbTo0BpvZPbydgY4UTf4AlFd8gB3mRDWMDsShBbivRsvaFhECT7bqlihPonvaV5OMPO509YJc2YkJlrjenhYjwTW1VsHYu9sdG1kbtZKNH/UiDJIeixQnmfRbRAsk7O6Qi48azwZcy/y/nfa2c+PPKsQ/JSrb1Dblbaw=
+	t=1760452954; cv=none; b=Pu8h6kq7v4oz7Tw0fRvymTnzH14++1YQWZbY8FsqYg8DpexXTeA6/mQSvF24nYe7OKwWWpdRcy2XI23Z9gBJTpjlI2BCZ9vXb0untDJzs3cyR7l3M2Un8/cydwDvjCSvstn22WtF4PaMBSpnC+mLZIv80HQG4PtrmzZtuX1evM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760450891; c=relaxed/simple;
-	bh=n7R4IggRMS2QWBufKXlW4yIiJgS8ECJudvpdIBUSECc=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VRIp25/hrMdH2p9P/GSwV/R5DveAYPB+q8nuSjGIDpt69+fIoVsbQ98mAITvlAJ5JW0iNrOXSM2htEvt3oFO3PMrJ5vGkjW4hrUsgB9Fw/7sQMIXEIWJ05BeoYarK+9ZE39ojCgTbIXOkptmgh4TagzLSAixiDGpv9Yt0Iaxt/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HINIdKOO; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-63bad3cd668so3578563a12.3
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 07:08:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760450888; x=1761055688; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UxmeIWwCO+DcngB6umPUO6fAm2SQ1pPxfxXmVq4hIfA=;
-        b=HINIdKOOY33PkiZDjSl6H+xlz2+rQ8lRBI6ACLxbWwv8/BrGmsmgQltebAMRhWpHGe
-         KnSB/pbQZpbsIAF/1LD0+U4sRuFG644ku98PV5QBVYoDojHKLfk5Iku7kGTfkfk0JW4L
-         DbmRLl+gN7S4lxs8iRtR6CDvJVriBBYod5omk2HHJ+zqD6aGcGwixhAPppH3TRM63wm3
-         z5/GAN+fLXCD+fhpwUy0VkbkGhsGtumg9rMXQOR70H0RzIgyGL2tTHTT7O0tFPd+4CbY
-         m3pHhmx7+atPkS0xuzddiXb9l0nE78yugEmvY5kWyuBsfw1rk4bgG6Do0z6cY8gA9iVL
-         0y1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760450888; x=1761055688;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UxmeIWwCO+DcngB6umPUO6fAm2SQ1pPxfxXmVq4hIfA=;
-        b=BGpsSpQ7j0ViJ3Y0swjQ/RnUsXDoFv0w7Z0j4baMK4vi/V+4WE4EM4lZP4x4EhPfHm
-         bdvLzIBxYuPfDDgQn8uB50Ei8VgAlq94X498Fowh+1ncWLlMkeoU4eSuZeLBu/I8nu2l
-         OmHAXfmYrfHwWb4fnE1cwDk0n15OxM1kO5PraxtNkUoV6LjpeMAOhjoUdgk1EdiOVDie
-         hER17cd3uFoBKG6XLPjVhDO4IByh94xtT0TScZ7zgGM7KaIJykj3VzjoExphoEffEFWy
-         /FG13JzZUt2DAYj4Z/UrDDo8j/+AgF1nlR9J83vJxO/qHPhiqzDzkvxnmadXk9qdnRUp
-         G0tg==
-X-Forwarded-Encrypted: i=1; AJvYcCXbNabxZM3f0ngoeXun389/3NhpVuQiigac3WXJx9l0Pd20EXEObjP+ptE/TYHMJZnVK/wPDZs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOMuEVfQSi+ZKP2DkSLWUHnlQk9d+TeFnQxqx0XswNlL6hO7+B
-	x+lZDSRlmAEiawWplWiXYMPcObwzU1OHkk52z8TVMecRM2JNIGTSXKhG
-X-Gm-Gg: ASbGncsXI7BTcC1iijgyQrc5SzVWpbqiQoBa4jbyWB68fjDKDp362GgxlhHZGDYMtSy
-	/DCzQDDW9BtWIrq5Qdzt+dmrV3WE6VF6YMVY7g33HyHRUHUg72086CB7nzoo5eoqOHNuUxIWTyL
-	IFb3ONoQV+bpfBD9XxRbjVA4aybTDlVaYQlVYT47dSees03uRqZLWn0GIQq2gKOB2Vl6oQABKMX
-	+rMUqNzSyYhoNeqgPoHDMPS8ijCDyGw29US8GFCvA0bsUOoOppzYbQ0GvU9W70h9JZkvVuQyMc6
-	Po4hHplbQM99MEHUYbmTKTD4Tv6HwMUDfQlEThazGEEidufFHu0enU861kgMBi+XvW9KTU45MD9
-	40kfBD5t4dw8ltB+gpSzjXyP1WEFW6FfwBpm07RRBKHfAMwhsE2JxnVA=
-X-Google-Smtp-Source: AGHT+IEf3qv2wBAqdGd7LLNTogx5CIdl+mKJKNQg4yODTXzc7y9Gqv2epyMUaFIiqHtW+W3ofsjlrQ==
-X-Received: by 2002:a17:907:96a7:b0:b40:b6a9:f6f9 with SMTP id a640c23a62f3a-b50aa8a847emr2748899766b.19.1760450887527;
-        Tue, 14 Oct 2025 07:08:07 -0700 (PDT)
-Received: from krava ([2a00:102a:5031:2444:abe8:833e:114a:fe50])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b5c78c15decsm7838366b.50.2025.10.14.07.08.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Oct 2025 07:08:07 -0700 (PDT)
-From: Jiri Olsa <olsajiri@gmail.com>
-X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
-Date: Tue, 14 Oct 2025 16:08:03 +0200
-To: Shardul Bankar <shardulsb08@gmail.com>
-Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH bpf 1/1] bpf: test_run: fix ctx leak in
- bpf_prog_test_run_xdp error path
-Message-ID: <aO5ZQ9Kgd35nWNod@krava>
-References: <20251014120037.1981316-1-shardulsb08@gmail.com>
+	s=arc-20240116; t=1760452954; c=relaxed/simple;
+	bh=c6+EocnD4w4+0yuKJRBmHOTb815TgNmuf/l/5ZifKkU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WvAmsfMU7C51L+Sia59FPKbb+Bu51jIuh6bd55AoNWIAiQMvEXTAHbCr6Za+k/hEf5c+ye2m3xBAPjnmQkoDtO9lHnTrACuo7m18Etv6ZlnlbQQjHFNQOL8c0XacOyMw/Pzq1cRzbed7Eb+A+TgTpXZGdscuDHW2Yn6erE35ge4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I2xgHOri; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760452952; x=1791988952;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=c6+EocnD4w4+0yuKJRBmHOTb815TgNmuf/l/5ZifKkU=;
+  b=I2xgHOriVu+nrFh8B2qj0k2aEIZ9HLbjluZmw40URZwy337TEI9/27Da
+   VGL8ZIXtGnOj7i2P96qfnqNENsfg+Ml1cCAoiB0Zo3u7RaFPg1IInI48w
+   u/croCkLHpHyNdUWoZuMih7IsAsbvEXRBkX6dXMaos43GiHK4ctLpBh9A
+   JaQB7dRE8kaSuD+PBDp1eKaOkH1yaASXdnSV6glmbkv6Jpjv58Hvt4eeo
+   CGJ9nJHZ9iXWBV8Zo8QogYhJl4DVB1SusxvLWefT4RDEEm4vM00zGxyIV
+   quddAmWK1jj2coLtQRK160vyEskbe2xzrzh4Gg7vOWaJQY0cAcNs7Eon8
+   g==;
+X-CSE-ConnectionGUID: rXEgIXVCS4i4SI48TmD+bA==
+X-CSE-MsgGUID: 241hUCmqRPe4BOHelfS1Aw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11582"; a="73955277"
+X-IronPort-AV: E=Sophos;i="6.19,228,1754982000"; 
+   d="scan'208";a="73955277"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2025 07:42:31 -0700
+X-CSE-ConnectionGUID: wWn2mO3GSOijVT8WbioiBg==
+X-CSE-MsgGUID: cOXsQb0VQJG4x/V+mZo4TA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,228,1754982000"; 
+   d="scan'208";a="212519417"
+Received: from os-delivery.igk.intel.com ([10.102.21.165])
+  by orviesa002.jf.intel.com with ESMTP; 14 Oct 2025 07:42:30 -0700
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Guenter Roeck <linux@roeck-us.net>
+Subject: [PATCH iwl-net v1] ixgbe: guard fwlog code by CONFIG_DEBUG_FS
+Date: Tue, 14 Oct 2025 16:11:10 +0200
+Message-ID: <20251014141110.751104-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251014120037.1981316-1-shardulsb08@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 14, 2025 at 05:30:37PM +0530, Shardul Bankar wrote:
-> Fix a memory leak in bpf_prog_test_run_xdp() where the context buffer
-> allocated by bpf_ctx_init() is not freed when the function returns early
-> due to a data size check.
-> 
-> On the failing path:
->   ctx = bpf_ctx_init(...);
->   if (kattr->test.data_size_in - meta_sz < ETH_HLEN)
->       return -EINVAL;
-> 
-> The early return bypasses the cleanup label that kfree()s ctx, leading to a
-> leak detectable by kmemleak under fuzzing. Change the return to jump to the
-> existing free_ctx label.
-> 
-> Fixes: fe9544ed1a2e ("bpf: Support specifying linear xdp packet data size for BPF_PROG_TEST_RUN")
-> Reported-by: BPF Runtime Fuzzer (BRF)
-> Signed-off-by: Shardul Bankar <shardulsb08@gmail.com>
+Building the ixgbe without CONFIG_DEBUG_FS leads to a build error. Fix
+that by guarding fwlog code.
 
-Acked-by: Jiri Olsa <jolsa@kernel.org>
+Fixes: 641585bc978e ("ixgbe: fwlog support for e610")
+Reported-by: Guenter Roeck <linux@roeck-us.net>
+Closes: https://lore.kernel.org/lkml/f594c621-f9e1-49f2-af31-23fbcb176058@roeck-us.net/
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 2 ++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h | 8 ++++++++
+ 2 files changed, 10 insertions(+)
 
-jirka
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+index c2f8189a0738..c5d76222df18 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+@@ -3921,6 +3921,7 @@ static int ixgbe_read_pba_string_e610(struct ixgbe_hw *hw, u8 *pba_num,
+ 	return err;
+ }
+ 
++#ifdef CONFIG_DEBUG_FS
+ static int __fwlog_send_cmd(void *priv, struct libie_aq_desc *desc, void *buf,
+ 			    u16 size)
+ {
+@@ -3952,6 +3953,7 @@ void ixgbe_fwlog_deinit(struct ixgbe_hw *hw)
+ 
+ 	libie_fwlog_deinit(&hw->fwlog);
+ }
++#endif /* CONFIG_DEBUG_FS */
+ 
+ static const struct ixgbe_mac_operations mac_ops_e610 = {
+ 	.init_hw			= ixgbe_init_hw_generic,
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+index 11916b979d28..5317798b3263 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+@@ -96,7 +96,15 @@ int ixgbe_aci_update_nvm(struct ixgbe_hw *hw, u16 module_typeid,
+ 			 bool last_command, u8 command_flags);
+ int ixgbe_nvm_write_activate(struct ixgbe_hw *hw, u16 cmd_flags,
+ 			     u8 *response_flags);
++#ifdef CONFIG_DEBUG_FS
+ int ixgbe_fwlog_init(struct ixgbe_hw *hw);
+ void ixgbe_fwlog_deinit(struct ixgbe_hw *hw);
++#else
++static inline int ixgbe_fwlog_init(struct ixgbe_hw *hw)
++{
++	return -EOPNOTSUPP;
++}
++static inline void ixgbe_fwlog_deinit(struct ixgbe_hw *hw) {}
++#endif /* CONFIG_DEBUG_FS */
+ 
+ #endif /* _IXGBE_E610_H_ */
+-- 
+2.49.0
 
-> ---
->  net/bpf/test_run.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-> index dfb03ee0bb62..1782e83de2cb 100644
-> --- a/net/bpf/test_run.c
-> +++ b/net/bpf/test_run.c
-> @@ -1269,7 +1269,7 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog, const union bpf_attr *kattr,
->  		goto free_ctx;
->  
->  	if (kattr->test.data_size_in - meta_sz < ETH_HLEN)
-> -		return -EINVAL;
-> +		goto free_ctx;
->  
->  	data = bpf_test_init(kattr, linear_sz, max_linear_sz, headroom, tailroom);
->  	if (IS_ERR(data)) {
-> -- 
-> 2.34.1
-> 
 
