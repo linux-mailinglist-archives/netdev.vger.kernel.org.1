@@ -1,94 +1,96 @@
-Return-Path: <netdev+bounces-229329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 240E9BDAB94
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 18:59:14 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45F72BDAB97
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 19:00:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D45BF420204
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 16:59:12 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 86AE0352EBC
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7427830499B;
-	Tue, 14 Oct 2025 16:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B935623A994;
+	Tue, 14 Oct 2025 17:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QpKy8WV3"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cAIhpQFX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f228.google.com (mail-il1-f228.google.com [209.85.166.228])
+Received: from mail-qv1-f100.google.com (mail-qv1-f100.google.com [209.85.219.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCBC52877E3
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 16:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FAF12376FC
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 17:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760461151; cv=none; b=ky3Ul04XoikI8VSuyuwMcotJbLLZfnOTPLzzOWDOpw1mSU3EWAvzxGO/W/Xl/t8wyHwGkj+YEDk33A8HQ1JKYjLttVWGSA5d1rf1ScVVrPaKokLYyCGeHSEC3ejDi5IItpA+bHDyKjcxAhzXYmTRf2IyHyZey1fNA+YQwcO4zu0=
+	t=1760461222; cv=none; b=lS6IDzn1PAYIXj2yCYm64ojH3Nsi2Y/q3l6hVlD60NvTmunnaqQ+cLS5NZFiYmgNSeedjQqmxwetrjrrKMRazag+owMuXNMGeXRVPtspCyiyl3V6NhEU/WhzZlbO/Aye4VKkT/BimRq5ojqh3dU15ai0pPlM3JdhU7nJCykczqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760461151; c=relaxed/simple;
-	bh=To36L68Q0mUcwL8pOkN58X9S9RZywNsL3f8N83RmpuU=;
+	s=arc-20240116; t=1760461222; c=relaxed/simple;
+	bh=4bKh6CBaGCJrIciuK2WjKe//apQDhJoVpt2PoSIp340=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BhJm0IN4dl3cIMY7zQhCd/yUEG8JYauZ3XK2wIethkfPagDY3AVBKM/1hz0+2kGXozw1yy+lAdLZJNC1QMLMlDvjcH4IeZY6/9QWoioNz5DuRClGGyIUAHv3tF+c/GU9ZfwKwSH7rePHkSFxyylrgTZhJad5S0AsHVSjxNJTqx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QpKy8WV3; arc=none smtp.client-ip=209.85.166.228
+	 In-Reply-To:Content-Type; b=mz24qj6F5q2poz2LfXAY4aOHxxHhcZJGKfkRLWKE3R5KKY6OeOJ5r/Tu3o+d7wSxP9yKff2stkANXMlxGZogZWODGoBBAOuu1KwrRQdqUv7poGnlEB3oypX6MW7JzV6wKYkMpORvGBnYqIXTMKPLTS9T4VTu3amoO+uH+l1uov0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cAIhpQFX; arc=none smtp.client-ip=209.85.219.100
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-il1-f228.google.com with SMTP id e9e14a558f8ab-43090377002so11531015ab.0
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 09:59:09 -0700 (PDT)
+Received: by mail-qv1-f100.google.com with SMTP id 6a1803df08f44-7946137e7a2so85506066d6.0
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 10:00:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760461149; x=1761065949;
+        d=1e100.net; s=20230601; t=1760461220; x=1761066020;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:dkim-signature:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GWtozxGU539f4y/pKveHBCk5w7jMKl7bA4+WO0yn6z4=;
-        b=XoW777Fu+0MYnUUshBNRMtT26M8+7lMxkcLrK6F+dAw2097ZHLfmDSD2MIa8f3+w+q
-         1ux5x8LFoQi2rc35jpP7cIKU4A8oym7RkpJCOr43+tpGi0j2NKL891n7F4fdTQ/W4hjy
-         dZ77UZbIB9vz9sLYMXJHEAD5eViocIjvKcHvCe1txkZXi3IrILTEsbRcICrNufYQPYn+
-         9gRYUK8TJVoKest4JreFkN/LLMwLCU7YoPXTwL5oyAAdmPofst75U4wZrpBRedaKvpni
-         GhSeSWAZn4WFf5PfTEteim5lUGtJ1SeEIakllYnEBHZa+yQ7gVWng3KEOHYTdbFreck5
-         WKLg==
-X-Gm-Message-State: AOJu0YwcwoIBcc6tQz+6CEGiUHv9quN3J0GskfCI6rUSP/+xPQUCUJ2O
-	+8yMHE5EWa4IMCJMd8Igo2bSFbqaOIOwC3uvjt4+7FX7lIoDXtbqhlyVxgehzOOE7gbL6rn631N
-	nhW1dqFAw6ImLuq99LNXC95+4QySA7By4o7VjaEQW03SGag9zigpFRyn8+jYwKnSqIWYnLbNg4j
-	9L25nIKei6/7UHvS7sYjIUqiCKmGW2raLHOpgGrBEFwThSq/J2aWllsUE9GEnPxV+/7R4SGI+3k
-	iusHWEPOiRBzJWL
-X-Gm-Gg: ASbGnctqm+/pEEq4XHldblj2Lvxx7Vo0D+B96qwpO/ozA2DTfiZ8SFuYYneOdxVluUP
-	3lAngJOnLdRwybLOE4s942ZY6p3Ym7Y7rLo1tYO7qVSF2D53+oi8GZh1wr7OeppQGaTdWSKNtCM
-	OB/Vk7b5LgGVctMderhpuDTvj/Hv+rkmwJKldtKQQkFjv8zU4+7qDlHEw23EWt1WH3R8/qNpkpx
-	G7edgtrR8z6nVC7MyQjNw5bFzLCl/q+LLQBJV+NpFR8HHvtUW1+bLaiVw7TKV4zuJRMM1ioMgsx
-	L4RSB9HN78lyLsgp4n3iIKlifYTj/XgUR8U6UlQt0q63VgwAxMDzdf+0g7hxvtOea4EBFzvi1el
-	DhuGHX7q1k5qkgGRfNFo13dNiXynJMH6g+fMu2YHWdgByRg9+SWVYA9S/i5+QzRmaT92a/VcqjK
-	2JeQao
-X-Google-Smtp-Source: AGHT+IEWWqXz4j871fVeeYEA45Nke4bB5vH+aHE+ED2d7GjvTml2LGGP+0a45UGFTJEiRSBE1VT2JbgBBWsg
-X-Received: by 2002:a92:cda2:0:b0:430:a550:3003 with SMTP id e9e14a558f8ab-430a550306dmr29194905ab.14.1760461148773;
-        Tue, 14 Oct 2025 09:59:08 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-15.dlp.protect.broadcom.com. [144.49.247.15])
-        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-42f902438d4sm10267365ab.4.2025.10.14.09.59.08
+        bh=47hy/eMh6oarfIC86oJHEXvdQdUE7mbvpox0rMjMn8E=;
+        b=umDJsw4ZalIWYUNMzbYKIyjAAD7RvHheuWK8QzWUvp8OgMpD1A1q/xLBmgPctWjx7R
+         BDwrus1jltPYv1Zh9NzwUIz2vAtvj1Ca3EqeS1ZmbMVRZs1045f7zRRDiEDOD9DmjDcJ
+         XdQWpGEvcHCoDda5FVNIH+tNtvA/J2VDSIJBgwyml45a7roygIp25QgQ4JIS0ll70gs6
+         EZEL+x/U3Tr8eZ6XemoygETfimgahZNgYF1Sv2jhCY7pfjTk1rECRzln6+BZ62QoiAjz
+         AoXIZEMrbLl+KW/nQWLxWp1qqvTxYOpdMRTRZNVV3k2HIX6piwCxVL5NGvooG29uhpeV
+         /3Ww==
+X-Forwarded-Encrypted: i=1; AJvYcCWb6C+/mbpe3NrW78+tq6azhsdtlF8mRVwbXnnN1/Xtq13ALUn5GpDe77R4vLzWe273+WK0MWw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXlqTtNSBYMnHJd2vzrO0pHbx2aV/8vkiJUJMt0RG/uQ3wTBmk
+	x83VTJaH3lnvKArEFb/+ZDiPI3aqrhInH5IOpqrUeEDQNK0iYDL5wjxPu37POa3VK0okEXBsQNa
+	YW90yHb4aYji6NI/S4TtJ794KtMPjIpfhe5Gv8OcBL1UFfuRSCPy6ueAhr+29GWTzaveTuVOizD
+	GluuIpxFUnazbNHI/XCHnWVqmZmYpOOXd3QjyKWvtjlKpR/zJVn78VP9fe24o5Y/nxy/B58uebB
+	Bkcaexyr68+jL9u
+X-Gm-Gg: ASbGncsmnwSVGil7odMrAqxp0R2WcuCS7VqBhJDeTnfR0Yw+uw4B2yGFuJgZPnuqQtd
+	IYHEXzIH3rmqm5yDdV3g0IG6eIRl/z/2IUbRrt5ITiG5PowOgVbk+5EXvhneCt2rQaZqFmXnmcE
+	F4q42LsSVkdYF2rpKohrycW9Y7FbjeSYqNJFCMYzg4TGm3BwQWERIblSgHI7xS+BomzI/Q5Ng//
+	ryYNkc4yDhmiqtnxF16r36FBVZy2NcxtbDj5MqrSFJNqWtk+R34FEqbZ4K/a0Y0hxQJP/CnnNpS
+	EnohmJ7/T+YH6fjz+x/mArgibKw5LiOHxe8WE17xI2HRsvUiWUFBd8i8BlBs0SncmMzDkJSdr2A
+	RklOQLTaepU3I8zD+lQuS6/ZesbSLot7KZw4CfzyK0kL2citbtSebbdWCk1CsmFkSYlORIyuzZq
+	YfwZv3
+X-Google-Smtp-Source: AGHT+IHIeoS41hZVSsAlSPzfKWK9sW+O/RAyFJi03JApvqWP+OuQieUn5+uNOt8IGOJ624VbAB4WoKjGfbBW
+X-Received: by 2002:a05:6214:1c0c:b0:802:3d9c:4450 with SMTP id 6a1803df08f44-87b21032734mr373464266d6.19.1760461219783;
+        Tue, 14 Oct 2025 10:00:19 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-19.dlp.protect.broadcom.com. [144.49.247.19])
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-87c012887c9sm226316d6.24.2025.10.14.10.00.19
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 14 Oct 2025 09:59:08 -0700 (PDT)
+        Tue, 14 Oct 2025 10:00:19 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-8645d397860so1205614985a.2
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 09:59:08 -0700 (PDT)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-88d842aa73aso214303785a.0
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 10:00:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1760461148; x=1761065948; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1760461219; x=1761066019; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=GWtozxGU539f4y/pKveHBCk5w7jMKl7bA4+WO0yn6z4=;
-        b=QpKy8WV31to6mVAQUhVFXefk3iPkB/KPJxmYxhzogi2Mlr5PRPnY7omwomd792S1pD
-         AYEzyzmyNRPtDrZePNOOP/K3AvygdynRE/jO38p9Z7bzLQhjgFdIzNt9AebVuKs1GD49
-         +ncTNdGGfJ8yelSfbbXfqld4iSykxfr5bA+DE=
-X-Received: by 2002:a05:620a:a1c2:b0:88b:72c0:b348 with SMTP id af79cd13be357-88b72c0b61fmr310047985a.87.1760461147888;
-        Tue, 14 Oct 2025 09:59:07 -0700 (PDT)
-X-Received: by 2002:a05:620a:a1c2:b0:88b:72c0:b348 with SMTP id af79cd13be357-88b72c0b61fmr310046185a.87.1760461147527;
-        Tue, 14 Oct 2025 09:59:07 -0700 (PDT)
+        bh=47hy/eMh6oarfIC86oJHEXvdQdUE7mbvpox0rMjMn8E=;
+        b=cAIhpQFXMq6ksp0EhDOAsjRgqn+l1fP26vnlKhVgzOMoFTxO2+JH2OS1U5BamhnQLr
+         QwtSNouJFiVS9n6JE7cJ0FQ1Li56SBPhjdx/C6wQQFvep5GvEHJ6fVllFtlChRq7mJaZ
+         /pSoRpFcAQ3QrXKhjZCRgvVBpr4VwPB2RX7CA=
+X-Forwarded-Encrypted: i=1; AJvYcCWEDwWE1aLMgS/ZQ0cD5wXcZ5UiILyA7Gq2kDxqNizGOYdJ+cxCqSHt18bHI8VZFKWeGmI1XdU=@vger.kernel.org
+X-Received: by 2002:a05:620a:f07:b0:855:f375:10aa with SMTP id af79cd13be357-883525c0f62mr4014221385a.50.1760461218418;
+        Tue, 14 Oct 2025 10:00:18 -0700 (PDT)
+X-Received: by 2002:a05:620a:f07:b0:855:f375:10aa with SMTP id af79cd13be357-883525c0f62mr4014208685a.50.1760461217630;
+        Tue, 14 Oct 2025 10:00:17 -0700 (PDT)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8849f2e1db1sm1245622685a.4.2025.10.14.09.59.05
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8849fb96f50sm1232895485a.25.2025.10.14.10.00.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Oct 2025 09:59:06 -0700 (PDT)
-Message-ID: <2a6b84ab-f482-4b0e-b696-f20be82e7b03@broadcom.com>
-Date: Tue, 14 Oct 2025 09:59:00 -0700
+        Tue, 14 Oct 2025 10:00:16 -0700 (PDT)
+Message-ID: <1f6c4433-21dd-4ddd-8db2-4a45cf233941@broadcom.com>
+Date: Tue, 14 Oct 2025 10:00:14 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,14 +99,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH net-next] net: bcmgenet: remove unused platform code
-To: Heiner Kallweit <hkallweit1@gmail.com>, Doug Berger <opendmb@gmail.com>,
+To: Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Doug Berger <opendmb@gmail.com>,
  Broadcom internal kernel review list
  <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
  <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>, Florian Fainelli <f.fainelli@gmail.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+ David Miller <davem@davemloft.net>, Florian Fainelli <f.fainelli@gmail.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 References: <108b4e64-55d4-4b4e-9a11-3c810c319d66@gmail.com>
+ <aO5Mgy4VLgtQ2ErN@horms.kernel.org>
 Content-Language: en-US, fr-FR
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
@@ -139,19 +143,31 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <108b4e64-55d4-4b4e-9a11-3c810c319d66@gmail.com>
+In-Reply-To: <aO5Mgy4VLgtQ2ErN@horms.kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-On 10/13/25 23:02, Heiner Kallweit wrote:
-> This effectively reverts b0ba512e25d7 ("net: bcmgenet: enable driver to
-> work without a device tree"). There has never been an in-tree user of
-> struct bcmgenet_platform_data, all devices use OF or ACPI.
+On 10/14/25 06:13, Simon Horman wrote:
+> On Tue, Oct 14, 2025 at 08:02:47AM +0200, Heiner Kallweit wrote:
+>> This effectively reverts b0ba512e25d7 ("net: bcmgenet: enable driver to
+>> work without a device tree"). There has never been an in-tree user of
+>> struct bcmgenet_platform_data, all devices use OF or ACPI.
+>>
+>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> I'm actually kind of surprised platform driver support was added as
+> recently as 2014. But I guess there was a reason at the time.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Upstreaming of that driver was done in 2014 and as a result there was 
+interest from a customer at a time to continue to work with the modern 
+driver from upstream copied nearly as-is into the vendor tree, hence 
+support for platform data was submitted and accepted to facilitate that.
+
+Since said platforms are now supported by the BMIPS_GENERIC platform, 
+which is DT only, it makes sense to remove the platform data code now.
+
+Thanks!
 -- 
 Florian
 
