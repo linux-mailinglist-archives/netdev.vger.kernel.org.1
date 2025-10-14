@@ -1,106 +1,146 @@
-Return-Path: <netdev+bounces-229313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2D5CBDA772
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:46:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC1BEBDA7AF
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:49:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E3360501DF5
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:38:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B9BB19A0A63
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335472FF65D;
-	Tue, 14 Oct 2025 15:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57E63002AF;
+	Tue, 14 Oct 2025 15:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IFUZeWse"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="GX+yctSw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8202C28D8DB;
-	Tue, 14 Oct 2025 15:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068321C3C08;
+	Tue, 14 Oct 2025 15:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760456307; cv=none; b=lIMAJbVIkEmsg20Qmf3UWZ0AILNrObtLYFI0ruSNNx1gwdYnNbCSjGMcrI19G82iR+J26rGi6ftqJsPCLL17702N9wNHCons0sClN/K5apxmB8NyXZD+WbcyRnbZ68yE0NeReyclxUFf849OmR79k5CEEFIVr4QRTPxVy0/mp7E=
+	t=1760456990; cv=none; b=ieQsLjihXVMxFLRChIXwHTUjibGLpfVgD/3Z6g7r1+nu7HlO1YL5U1ZDE1TXSpHBuMRzSurde0HF3IzfSM2v7cWmqfuW2mbyI69YR6joh1j0OYOuAHqqC1kRRQuZXQP7bhaVX8Mvy0VOYAje2S8yeSryAtrlbSzf3WBzaVgEyzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760456307; c=relaxed/simple;
-	bh=q/WXLPQSkMRoyEVZFpT4T/dKh8qmtV542z46Ju4P4PQ=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
-	 References:In-Reply-To; b=NnbjDJgn8iCRFbPGXdMikOFOCtC6M2fJ5sHcFyHyOjJPpj8SyqNHS83cxHBx/Vvh/cTl4aVeYxmKUVZ6xwvH/XMyQRRc93i/Y8hHnIY/rGUz0hO77w1K7EWsT0axPj4fVU7LEYJeDd/cNZJjMKwJVY7fHcOkEx3K+0fko1ffoPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IFUZeWse; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id E4FB81A1375;
-	Tue, 14 Oct 2025 15:38:22 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id B2059606EC;
-	Tue, 14 Oct 2025 15:38:22 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 71D02102F22A4;
-	Tue, 14 Oct 2025 17:38:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1760456301; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=q/WXLPQSkMRoyEVZFpT4T/dKh8qmtV542z46Ju4P4PQ=;
-	b=IFUZeWse8HRhQFNtoBGScDbnJkoQPZcRUWyOenFV6hXjNstqT2i9PMmh1s7H/PcwmR4iYV
-	HQ3euPHogyYNwvo08rWjjdckhpPEOok6iGD/VPNfs8oZIrRfIkloH5tkuwgAyMNJXgelPh
-	dVhbCY93z8z4CStvKKER0aQ2C7zrIHFSMixiYFFEb098b6baDoHaKmkshcVGO9LywkQt0C
-	4yeIOsUXZ4y2hVaD+/JbXGcxno17v311yi1BNfCzIBPSwakyvdXZANQ8RhIX6oTjFKr4KE
-	azyLrV+7p0S7kUal3JHaLt15/5JYSbB5dLV6PSnVRAwa80rllD59ZaUuqg27cg==
+	s=arc-20240116; t=1760456990; c=relaxed/simple;
+	bh=O2OnOz5scUDSd+QFrf/tvNMYuICl3jWPJOhwXXYif2c=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Z9ma/fttP2P6PX0y7131a12YVq3QFx4ts0ZdlOKv5yxmGbz7msv3HGgcaGzx3qW0QInJ8P5bWUMyPJpkJUaNKBxQpWT3+gUYDmQG9D1D46i3HB/e0yCrkJjAA2mZ9GQuPRKBbrREqNSnvt6dj8uKWRxRfZWQQ8uHE0dKkI25Ias=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=GX+yctSw; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1760456987;
+	bh=O2OnOz5scUDSd+QFrf/tvNMYuICl3jWPJOhwXXYif2c=;
+	h=From:Date:Subject:To:Cc:From;
+	b=GX+yctSwy6m7W9I4+JzKb3R4HW7aDUAyt/mwtGFQlJEWqFbA3pyAC/lsNAcMdaJEg
+	 ytEZeHKXOE8nVkaeMSpoym697Y3LMcOJq48f52J/rDwtVCh4K31E3d9lvzb52FX+Fq
+	 baqnVCBJzPLwoFV/QYHl2+p1DtAD4RDbocqA3mvmE0xGEq6YIHlajUSsESS46DyoTs
+	 DITm5FqB2WbwuTvcSZgETgzwECjyeYZKjMNX4K0HbymnvM6uOU5iRGuSh3+GFXP4ls
+	 NapHKToYf+lwlI4MRl65y/v4h10GefoDlhelFcJi0H5jYUZAOwjkCdu9Q/eKoFmjNo
+	 ra45orkWevLkg==
+Received: from jupiter.universe (dyndsl-091-248-212-042.ewe-ip-backbone.de [91.248.212.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	(Authenticated sender: sre)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 10E6F17E0FC2;
+	Tue, 14 Oct 2025 17:49:47 +0200 (CEST)
+Received: by jupiter.universe (Postfix, from userid 1000)
+	id C7D4B480044; Tue, 14 Oct 2025 17:49:46 +0200 (CEST)
+From: Sebastian Reichel <sebastian.reichel@collabora.com>
+Date: Tue, 14 Oct 2025 17:49:34 +0200
+Subject: [PATCH net] net: stmmac: dwmac-rk: Fix disabling
+ set_clock_selection
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 14 Oct 2025 17:38:10 +0200
-Message-Id: <DDI5O7901X78.1VI8B7669OVP8@bootlin.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net v6 0/5] net: macb: various fixes
-Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Paolo Abeni"
- <pabeni@redhat.com>, "Rob Herring" <robh@kernel.org>, "Krzysztof Kozlowski"
- <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Nicolas Ferre"
- <nicolas.ferre@microchip.com>, "Claudiu Beznea" <claudiu.beznea@tuxon.dev>,
- "Geert Uytterhoeven" <geert@linux-m68k.org>, "Harini Katakam"
- <harini.katakam@xilinx.com>, "Richard Cochran" <richardcochran@gmail.com>,
- "Russell King" <linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Thomas
- Petazzoni" <thomas.petazzoni@bootlin.com>, "Tawfik Bayouk"
- <tawfik.bayouk@mobileye.com>, "Krzysztof Kozlowski"
- <krzysztof.kozlowski@linaro.org>, "Sean Anderson" <sean.anderson@linux.dev>
-To: "Jakub Kicinski" <kuba@kernel.org>, =?utf-8?q?Th=C3=A9o_Lebrun?=
- <theo.lebrun@bootlin.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20250923-macb-fixes-v6-0-772d655cdeb6@bootlin.com>
- <DD2KKUEVR7P1.TFVYX7PES9FS@bootlin.com>
- <20250926134056.383c57a2@kernel.org>
-In-Reply-To: <20250926134056.383c57a2@kernel.org>
-X-Last-TLS-Session-Version: TLSv1.3
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251014-rockchip-network-clock-fix-v1-1-c257b4afdf75@collabora.com>
+X-B4-Tracking: v=1; b=H4sIAA1x7mgC/x2M0QqDMAwAf0XybKAt2jF/RXzQmM3gaCWVTRD/3
+ bDHO447obAKF+iqE5S/UiQnA19XQMuY3owyG0NwofXON6iZVlpkw8T7L+uK9DGDLzkw0MPF5xi
+ nyAQ22JRN/+c9WA7Ddd10TxPpcQAAAA==
+X-Change-ID: 20251014-rockchip-network-clock-fix-2c7069a6b6ec
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ David Wu <david.wu@rock-chips.com>
+Cc: netdev@vger.kernel.org, linux-rockchip@lists.infradead.org, 
+ linux-kernel@vger.kernel.org, kernel@collabora.com, stable@vger.kernel.org, 
+ Sebastian Reichel <sebastian.reichel@collabora.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1840;
+ i=sebastian.reichel@collabora.com; h=from:subject:message-id;
+ bh=O2OnOz5scUDSd+QFrf/tvNMYuICl3jWPJOhwXXYif2c=;
+ b=owJ4nAFtApL9kA0DAAoB2O7X88g7+poByyZiAGjucRo2uFWL3tpG3umZXtieNofXO4nAVctBy
+ 5GLiCh0M1e+rYkCMwQAAQoAHRYhBO9mDQdGP4tyanlUE9ju1/PIO/qaBQJo7nEaAAoJENju1/PI
+ O/qaMRgP/iHJbV5a//GQfdq66WDDNHayu81bXQstYRXDdc/7YdmVEcv0rb8N0XNFrKluxH9R0bR
+ sQ4PWok9aNKOApOWZ08lrrbr4IgNP0oMfR4CRiIEn6p28TI+jjKkq9/639UPolu+/iPapqnkSF6
+ rE2ooV/kOppR6SQrB9+wLisBqnT3QShTnaq7HWhn6jJPWT9u+el0CbscGum+IYuJ/K3iUw2QTJM
+ KgpF4PnJyNCb6V3Et6gOhT67VIU7CFWi/8sAMy0Q3nQrl5wJl1UxFjeHf6KmVxq6Mgs5Q6vpRJf
+ MSvEtO86J9cBNFmgcrcVOasDrgnvvX9ZRbJbfbg4yzOG8C2MBUZ3ZmzOazQTAVqMoIybmZlPvoR
+ nj0khD6HikFTzc9vWa536n1ZuuJH0IIzbX9qZtSvp202bu5nJ7I6k5dvaAfDlHHwPQTMIbKdx4J
+ rzBYGfRYUNusTavH45VWs+4pJed1PIvGJAJ2cm5iVTh0kup4eUS7iPTzDO6uyKVXDrGmLJQmRFC
+ mSY3nIlCJpvo02UCAncaD3OLR7165ubeG+pD1p3pLDQhyQO91xgydGwpXYj1aq6xT04jdgJH5V/
+ B8aO3l2FIdl2KMrX8GYf0ji7K5J9qoiJ0l+R05gQ4rt1GK+BfBsZitLWjW47/3KpUAAQ58gCARc
+ t70WWOTk/R/hbaOtx56g2KQ==
+X-Developer-Key: i=sebastian.reichel@collabora.com; a=openpgp;
+ fpr=EF660D07463F8B726A795413D8EED7F3C83BFA9A
 
-On Fri Sep 26, 2025 at 10:40 PM CEST, Jakub Kicinski wrote:
-> On Fri, 26 Sep 2025 09:56:25 +0200 Th=C3=A9o Lebrun wrote:
->> What's the state of maintainers minds for this series? It has been
->> stable for some time, tested on sam9x75 (by Nicolas Ferre) & EyeQ5
->> and Simon Horman has added his reviewed-by this morning (thanks!).
->> But of course I am biased.
->
-> We'll get to it.. having the revisions a few days apart rather than=20
-> a few weeks apart helps maintainers remember the details, and generally
-> leads to lower wait times. FWIW.
+On all platforms set_clock_selection() writes to a GRF register. This
+requires certain clocks running and thus should happen before the
+clocks are disabled.
 
-ACK! I'll make sure to stay on track for the next ones. It hadn't
-occurred to me that maintainers do forget, which sounds dumb once
-written out loud.
+This has been noticed on RK3576 Sige5, which hangs during system suspend
+when trying to suspend the second network interface. Note, that
+suspending the first interface works, because the second device ensures
+that the necessary clocks for the GRF are enabled.
 
-Thanks Jakub,
+Cc: stable@vger.kernel.org
+Fixes: 2f2b60a0ec28 ("net: ethernet: stmmac: dwmac-rk: Add gmac support for rk3588")
+Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+index 51ea0caf16c1..0786816e05f0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+@@ -1446,14 +1446,15 @@ static int gmac_clk_enable(struct rk_priv_data *bsp_priv, bool enable)
+ 		}
+ 	} else {
+ 		if (bsp_priv->clk_enabled) {
++			if (bsp_priv->ops && bsp_priv->ops->set_clock_selection) {
++				bsp_priv->ops->set_clock_selection(bsp_priv,
++					      bsp_priv->clock_input, false);
++			}
++
+ 			clk_bulk_disable_unprepare(bsp_priv->num_clks,
+ 						   bsp_priv->clks);
+ 			clk_disable_unprepare(bsp_priv->clk_phy);
+ 
+-			if (bsp_priv->ops && bsp_priv->ops->set_clock_selection)
+-				bsp_priv->ops->set_clock_selection(bsp_priv,
+-					      bsp_priv->clock_input, false);
+-
+ 			bsp_priv->clk_enabled = false;
+ 		}
+ 	}
+
+---
+base-commit: 3a8660878839faadb4f1a6dd72c3179c1df56787
+change-id: 20251014-rockchip-network-clock-fix-2c7069a6b6ec
+
+Best regards,
+-- 
+Sebastian Reichel <sebastian.reichel@collabora.com>
 
 
