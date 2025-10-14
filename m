@@ -1,179 +1,217 @@
-Return-Path: <netdev+bounces-229042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B4C8BD770D
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 07:35:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B090BBD76FE
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 07:35:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5FCF64EB66C
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 05:35:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 736EE3AE02F
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 05:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 109F3296BBD;
-	Tue, 14 Oct 2025 05:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41F2296BA7;
+	Tue, 14 Oct 2025 05:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AItdC9qr"
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="EMHXmtH6";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ih+RDekg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from flow-b8-smtp.messagingengine.com (flow-b8-smtp.messagingengine.com [202.12.124.143])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B7928727C
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 05:35:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861CE13DBA0;
+	Tue, 14 Oct 2025 05:34:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.143
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760420116; cv=none; b=lDgouZEyZdQQNP3F3DiQRoAW11AJ8yV1Ig6+ofMj5fgPQYBCPRyCNooC/Uqap3TOZLcrMqIy6/DejXV4/cWXrsoM+k56rvB78H4GpYUCZ8ts1wrnTJmwHuwa0AOrCHLLk5jshJbDuOLkGyX/lOZbs5hiLunz+uh2znGMCLpV1n4=
+	t=1760420101; cv=none; b=uql13z7X+xXzIiYlu646JIWcKnkDlDOPyAwu7tkm/ZejwmE9ud1esGWpdc4WQn2no8qD+KVV0l8uzWcEz54CwjplhpNwv48qO6Qz+rcJc3MIQzNp24InsM0RNhoXdXruwDuTPPnDhRCmnpDGSmtbMqIl0zKvlzRcnqymn8dMqG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760420116; c=relaxed/simple;
-	bh=wvn8CM5LXYun0vdXHMxoU4ZtILqmL0vMJS+JvrBjifY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CejF0y5S6tfcpUNEKEMGpqHZrYWjHfXhqTIdbMz6WFJrF/Z+HpiKCvVgIgsqbfeq+pxcW00BUVr3+UNPZ4BI9Vlk6B4v0mswID6B7W925xo4Y8LjQ6XsffNXjTSElHym1Nwm/soWk16aJs9lhYvsL0nDNoAMVQOQCWqPeitZ/PM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AItdC9qr; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760420114; x=1791956114;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wvn8CM5LXYun0vdXHMxoU4ZtILqmL0vMJS+JvrBjifY=;
-  b=AItdC9qrLUlqzpR6nY7Vx2Ywqrd56mmvLYkw4trPreROfeNfPmyANa2s
-   ZJdlFiAtRb0k7hus4w2XWk7ECbhwvIFBE+HZVW+gOQ7owTUlU+/63uKfg
-   wXdf5RiAb4c06jyeREUSCLg4KcOcRWTP/zWwKReEgHRcAT87dSfScYlxd
-   o7AXNLq/GgSaU/OkFV6C9kLSFTs+7BTvCifxYdcF9Fz+dDLfrN1ABGXGz
-   EIXwkkuzqwau5TCPQ84HO1TttItLnnmRkL9Ofjpr4tE5OCm4GzbwzWwba
-   8i4aUKZ9LH677nBF7rv506/f24jh+t5SWhMq+zdREKOpkyIvssTfl4udJ
-   A==;
-X-CSE-ConnectionGUID: FpiwwnMKSa2HTjuXdU+5Cw==
-X-CSE-MsgGUID: TXWBa2kURgudYYFteWpHeQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11581"; a="62607772"
-X-IronPort-AV: E=Sophos;i="6.19,227,1754982000"; 
-   d="scan'208";a="62607772"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2025 22:35:13 -0700
-X-CSE-ConnectionGUID: 3OHmFtQLTaOU8AUdGPdWFw==
-X-CSE-MsgGUID: +YnTXWAXRxyO/QtXh2txIA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,227,1754982000"; 
-   d="scan'208";a="186041594"
-Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
-  by orviesa004.jf.intel.com with ESMTP; 13 Oct 2025 22:35:09 -0700
-Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1v8Xgg-0002P9-0l;
-	Tue, 14 Oct 2025 05:35:06 +0000
-Date: Tue, 14 Oct 2025 13:28:10 +0800
-From: kernel test robot <lkp@intel.com>
-To: Daniel Jurgens <danielj@nvidia.com>, netdev@vger.kernel.org,
-	mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com,
-	pabeni@redhat.com
-Cc: oe-kbuild-all@lists.linux.dev, virtualization@lists.linux.dev,
-	parav@nvidia.com, shshitrit@nvidia.com, yohadt@nvidia.com,
-	xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
-	shameerali.kolothum.thodi@huawei.com, jgg@ziepe.ca,
-	kevin.tian@intel.com, kuba@kernel.org, andrew+netdev@lunn.ch,
-	edumazet@google.com, Daniel Jurgens <danielj@nvidia.com>
-Subject: Re: [PATCH net-next v4 01/12] virtio_pci: Remove supported_cap size
- build assert
-Message-ID: <202510141339.ne1O8cPc-lkp@intel.com>
-References: <20251013152742.619423-2-danielj@nvidia.com>
+	s=arc-20240116; t=1760420101; c=relaxed/simple;
+	bh=X5WPVB8Em/gBcebUeg/HDVgnFFFK8ttMHgLzywHakA4=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=qFzThTzxYIDivtZcTbW1KntBvvXOrmNP++4/WVC5ujNMN+If8IJX2toWZGghvVHLKDCUdLe8eomN8kVm5wIgftB+BRKN8vhpTVLYxKatvcqdXmOwBQq1dsBEngmYIFAj65iwarrhHA6gm44yyy1p5lhtkBVvTOQpL/cA6RcFnAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=EMHXmtH6; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ih+RDekg; arc=none smtp.client-ip=202.12.124.143
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailflow.stl.internal (Postfix) with ESMTP id 9C94F1300216;
+	Tue, 14 Oct 2025 01:34:57 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Tue, 14 Oct 2025 01:34:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
+	1760420097; x=1760427297; bh=sKvX0cwi5L2mQqOKfWbZAQQCGUflq024x5h
+	ZczDrYtI=; b=EMHXmtH6b1fssNuWNAbg39nPBc2L6iLo9Ov6TFV9qllyxag3kQl
+	VvtR8X+4Za9g2Vw/Na+uS9UetgsfpRkZL1jz1/auc6Oy9Fq/N3API8bZzlIeqS+8
+	OjId+x1I54l5gE4nOruTpTX/eIn+DMjXL5K+xkpQQMMBYqKYZbAoJbxHVEnJCxyO
+	GuwVNtYCGxxVYsar+VUXpQgttiAqGWRjkt15aK64LQqfqxqxFr0g6wXKB/Ibf2XG
+	/cxaxnXKKVd6RVbRRMfLB3f2m4fsB0FeJxFOUSfB6WZiuqXvwmbis9V2yhheF05K
+	VmxNfUjA1k1l+mLURd+ZuZFqVsb6BMYN94A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1760420097; x=
+	1760427297; bh=sKvX0cwi5L2mQqOKfWbZAQQCGUflq024x5hZczDrYtI=; b=i
+	h+RDekgtuViqOuIRe5nRpsoy76Bx+bzGVh5cBTj8/X62C0XR7TEIA2xbt2Ubxpid
+	ZHq1+y+7InziK5qe1r9LHucLnuKtgHqiO+FJDRNHoj+tR9Q3PyID4LVM/3M3ybRX
+	tIH70Tx5Za71PjvLbkA/yeToEismdKYiPPzND/ygwI7geT796CZq/6emzH7eNm4V
+	Kce1Eyi/Y3RiDRX6XMGOfP6tmK6MicTRdw6J7gWuQcQoU6VJmgQ73wKrjDyZY++8
+	u8xiIYup5XPh8TtZB2Jq/GVp2aBKUBf6LKfVQd6UoWatyJpdJXN19DN+foHp9Ekz
+	zoZtogTA7a4Db2it5V2NQ==
+X-ME-Sender: <xms:_-DtaGDSStk9-hdw2H6ZL83waWfdVJ9YX5PyZE66IpkrirSbEhiR2w>
+    <xme:_-DtaPgz524KR1bIMerhs2C7YXAmbZW4Lsj3EsWSvpJwVeGY-BzhhonTtr5xmV6Ss
+    GpABGkyA-RB0RJhi2Lq8cCoQS1KXsJC00AQOjfMWlRhV5yMIA>
+X-ME-Received: <xmr:_-DtaB2IaBnzbz1hHV5senq7g_aSWzgh3eK-gJYcQFcoiXy_Aqk709eaLtyG4VXyvm7TKsTwnzEKdhghfx2bsou0ue1yREccsDhltZNVqC4X>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduudeljeduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurheptgfgggfhvfevufgjfhffkfhrsehtqhertddttdejnecuhfhrohhmpefpvghilheu
+    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
+    epleejtdefgeeukeeiteduveehudevfeffvedutefgteduhfegvdfgtdeigeeuudejnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
+    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepgeefpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpd
+    hrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
+    oheplhhinhhugidqgihfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    hlihhnuhigqdhunhhiohhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
+    oheplhhinhhugidqnhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    hlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
+    pehlihhnuhigqdhfshguvghvvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpth
+    htoheplhhinhhugidqtghifhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
+    ohepvggtrhihphhtfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:_-DtaBIY-oFTdHKRTw3D8L3q4PTHVD4zpV8goGnqHXyVH0nbHG8b-g>
+    <xmx:_-DtaE2CVchSpis3kE9Qdx37fJ6LzhXT6BNt0IM3jeZVpKMoYnyecg>
+    <xmx:_-DtaL64I2eH2ZO8gGbqN6_6BowsHFpdQspB-a4TT9QeVF7PfU6YCw>
+    <xmx:_-DtaBHiAd6eRDoVhivjdRfsp-KtS_QT_guqr2aFH_bbkXfblrXRRA>
+    <xmx:AeHtaDciWRkXrzOWRd6sH4KgBlnrwJkD0ZAWHMp6JhGiQZ8mFgAE876O>
+Feedback-ID: iab3e480c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 14 Oct 2025 01:34:44 -0400 (EDT)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251013152742.619423-2-danielj@nvidia.com>
+From: NeilBrown <neilb@ownmail.net>
+To: "Jeff Layton" <jlayton@kernel.org>
+Cc: "Miklos Szeredi" <miklos@szeredi.hu>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
+ "Chuck Lever" <chuck.lever@oracle.com>,
+ "Alexander Aring" <alex.aring@gmail.com>,
+ "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>, "Steve French" <sfrench@samba.org>,
+ "Paulo Alcantara" <pc@manguebit.org>,
+ "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
+ "Shyam Prasad N" <sprasad@microsoft.com>, "Tom Talpey" <tom@talpey.com>,
+ "Bharath SM" <bharathsm@microsoft.com>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ "Danilo Krummrich" <dakr@kernel.org>,
+ "David Howells" <dhowells@redhat.com>, "Tyler Hicks" <code@tyhicks.com>,
+ "Olga Kornievskaia" <okorniev@redhat.com>,
+ "Dai Ngo" <Dai.Ngo@oracle.com>, "Amir Goldstein" <amir73il@gmail.com>,
+ "Namjae Jeon" <linkinjeon@kernel.org>,
+ "Steve French" <smfrench@gmail.com>,
+ "Sergey Senozhatsky" <senozhatsky@chromium.org>,
+ "Carlos Maiolino" <cem@kernel.org>,
+ "Kuniyuki Iwashima" <kuniyu@google.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, netfs@lists.linux.dev,
+ ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
+ linux-xfs@vger.kernel.org, netdev@vger.kernel.org,
+ "Jeff Layton" <jlayton@kernel.org>
+Subject:
+ Re: [PATCH 02/13] filelock: add a lm_may_setlease lease_manager callback
+In-reply-to: <20251013-dir-deleg-ro-v1-2-406780a70e5e@kernel.org>
+References: <20251013-dir-deleg-ro-v1-0-406780a70e5e@kernel.org>,
+ <20251013-dir-deleg-ro-v1-2-406780a70e5e@kernel.org>
+Date: Tue, 14 Oct 2025 16:34:43 +1100
+Message-id: <176042008301.1793333.506325387242251221@noble.neil.brown.name>
+Reply-To: NeilBrown <neil@brown.name>
 
-Hi Daniel,
+On Tue, 14 Oct 2025, Jeff Layton wrote:
+> The NFSv4.1 protocol adds support for directory delegations, but it
+> specifies that if you already have a delegation and try to request a new
+> one on the same filehandle, the server must reply that the delegation is
+> unavailable.
+>=20
+> Add a new lease manager callback to allow the lease manager (nfsd in
+> this case) to impose this extra check when performing a setlease.
+>=20
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> ---
+>  fs/locks.c               |  5 +++++
+>  include/linux/filelock.h | 14 ++++++++++++++
+>  2 files changed, 19 insertions(+)
+>=20
+> diff --git a/fs/locks.c b/fs/locks.c
+> index 0b16921fb52e602ea2e0c3de39d9d772af98ba7d..9e366b13674538dbf482ffdeee9=
+2fc717733ee20 100644
+> --- a/fs/locks.c
+> +++ b/fs/locks.c
+> @@ -1826,6 +1826,11 @@ generic_add_lease(struct file *filp, int arg, struct=
+ file_lease **flp, void **pr
+>  			continue;
+>  		}
+> =20
+> +		/* Allow the lease manager to veto the setlease */
+> +		if (lease->fl_lmops->lm_may_setlease &&
+> +		    !lease->fl_lmops->lm_may_setlease(lease, fl))
+> +			goto out;
+> +
 
-kernel test robot noticed the following build warnings:
+I don't see any locking around this.  What if the condition which
+triggers a veto happens after this check, and before the lm_change
+below?
+Should lm_change implement the veto?  Return -EAGAIN?
 
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Jurgens/virtio_pci-Remove-supported_cap-size-build-assert/20251014-004146
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20251013152742.619423-2-danielj%40nvidia.com
-patch subject: [PATCH net-next v4 01/12] virtio_pci: Remove supported_cap size build assert
-config: x86_64-defconfig (https://download.01.org/0day-ci/archive/20251014/202510141339.ne1O8cPc-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251014/202510141339.ne1O8cPc-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202510141339.ne1O8cPc-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from include/linux/byteorder/little_endian.h:5,
-                    from arch/x86/include/uapi/asm/byteorder.h:5,
-                    from include/asm-generic/qrwlock_types.h:6,
-                    from arch/x86/include/asm/spinlock_types.h:7,
-                    from include/linux/spinlock_types_raw.h:7,
-                    from include/linux/ratelimit_types.h:7,
-                    from include/linux/printk.h:9,
-                    from include/asm-generic/bug.h:22,
-                    from arch/x86/include/asm/bug.h:103,
-                    from arch/x86/include/asm/alternative.h:9,
-                    from arch/x86/include/asm/segment.h:6,
-                    from arch/x86/include/asm/ptrace.h:5,
-                    from arch/x86/include/asm/math_emu.h:5,
-                    from arch/x86/include/asm/processor.h:13,
-                    from include/linux/sched.h:13,
-                    from include/linux/delay.h:13,
-                    from drivers/virtio/virtio_pci_modern.c:17:
-   drivers/virtio/virtio_pci_modern.c: In function 'virtio_pci_admin_cmd_cap_init':
-   drivers/virtio/virtio_pci_modern.c:326:33: error: 'struct virtio_admin_cmd_query_cap_id_result' has no member named 'support_caps'; did you mean 'supported_caps'?
-     326 |         if (!(le64_to_cpu(data->support_caps[0]) & (1 << VIRTIO_DEV_PARTS_CAP)))
-         |                                 ^~~~~~~~~~~~
-   include/uapi/linux/byteorder/little_endian.h:33:51: note: in definition of macro '__le64_to_cpu'
-      33 | #define __le64_to_cpu(x) ((__force __u64)(__le64)(x))
-         |                                                   ^
-   drivers/virtio/virtio_pci_modern.c:326:15: note: in expansion of macro 'le64_to_cpu'
-     326 |         if (!(le64_to_cpu(data->support_caps[0]) & (1 << VIRTIO_DEV_PARTS_CAP)))
-         |               ^~~~~~~~~~~
->> drivers/virtio/virtio_pci_modern.c:307:35: warning: unused variable 'vp_dev' [-Wunused-variable]
-     307 |         struct virtio_pci_device *vp_dev = to_vp_device(virtio_dev);
-         |                                   ^~~~~~
+NeilBrown
 
 
-vim +/vp_dev +307 drivers/virtio/virtio_pci_modern.c
+>  		/*
+>  		 * No exclusive leases if someone else has a lease on
+>  		 * this file:
+> diff --git a/include/linux/filelock.h b/include/linux/filelock.h
+> index c2ce8ba05d068b451ecf8f513b7e532819a29944..70079beddf61aa32ef01f1114cf=
+0cb3ffaf2131a 100644
+> --- a/include/linux/filelock.h
+> +++ b/include/linux/filelock.h
+> @@ -49,6 +49,20 @@ struct lease_manager_operations {
+>  	int (*lm_change)(struct file_lease *, int, struct list_head *);
+>  	void (*lm_setup)(struct file_lease *, void **);
+>  	bool (*lm_breaker_owns_lease)(struct file_lease *);
+> +
+> +	/**
+> +	 * lm_may_setlease - extra conditions for setlease
+> +	 * @new: new file_lease being set
+> +	 * @old: old (extant) file_lease
+> +	 *
+> +	 * This allows the lease manager to add extra conditions when
+> +	 * setting a lease, based on the presence of an existing lease.
+> +	 *
+> +	 * Return values:
+> +	 *   %false: @new and @old conflict
+> +	 *   %true: No conflict detected
+> +	 */
+> +	bool (*lm_may_setlease)(struct file_lease *new, struct file_lease *old);
+>  };
+> =20
+>  struct lock_manager {
+>=20
+> --=20
+> 2.51.0
+>=20
+>=20
 
-bfcad518605d92 Yishai Hadas   2024-11-13  304  
-bfcad518605d92 Yishai Hadas   2024-11-13  305  static void virtio_pci_admin_cmd_cap_init(struct virtio_device *virtio_dev)
-bfcad518605d92 Yishai Hadas   2024-11-13  306  {
-bfcad518605d92 Yishai Hadas   2024-11-13 @307  	struct virtio_pci_device *vp_dev = to_vp_device(virtio_dev);
-bfcad518605d92 Yishai Hadas   2024-11-13  308  	struct virtio_admin_cmd_query_cap_id_result *data;
-bfcad518605d92 Yishai Hadas   2024-11-13  309  	struct virtio_admin_cmd cmd = {};
-bfcad518605d92 Yishai Hadas   2024-11-13  310  	struct scatterlist result_sg;
-bfcad518605d92 Yishai Hadas   2024-11-13  311  	int ret;
-bfcad518605d92 Yishai Hadas   2024-11-13  312  
-bfcad518605d92 Yishai Hadas   2024-11-13  313  	data = kzalloc(sizeof(*data), GFP_KERNEL);
-bfcad518605d92 Yishai Hadas   2024-11-13  314  	if (!data)
-bfcad518605d92 Yishai Hadas   2024-11-13  315  		return;
-bfcad518605d92 Yishai Hadas   2024-11-13  316  
-bfcad518605d92 Yishai Hadas   2024-11-13  317  	sg_init_one(&result_sg, data, sizeof(*data));
-bfcad518605d92 Yishai Hadas   2024-11-13  318  	cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_CAP_ID_LIST_QUERY);
-16c22c56d42825 Daniel Jurgens 2025-03-04  319  	cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SELF);
-bfcad518605d92 Yishai Hadas   2024-11-13  320  	cmd.result_sg = &result_sg;
-bfcad518605d92 Yishai Hadas   2024-11-13  321  
-bfcad518605d92 Yishai Hadas   2024-11-13  322  	ret = vp_modern_admin_cmd_exec(virtio_dev, &cmd);
-bfcad518605d92 Yishai Hadas   2024-11-13  323  	if (ret)
-bfcad518605d92 Yishai Hadas   2024-11-13  324  		goto end;
-bfcad518605d92 Yishai Hadas   2024-11-13  325  
-c1e3216169ec0d Daniel Jurgens 2025-10-13 @326  	if (!(le64_to_cpu(data->support_caps[0]) & (1 << VIRTIO_DEV_PARTS_CAP)))
-bfcad518605d92 Yishai Hadas   2024-11-13  327  		goto end;
-bfcad518605d92 Yishai Hadas   2024-11-13  328  
-bfcad518605d92 Yishai Hadas   2024-11-13  329  	virtio_pci_admin_cmd_dev_parts_objects_enable(virtio_dev);
-bfcad518605d92 Yishai Hadas   2024-11-13  330  end:
-bfcad518605d92 Yishai Hadas   2024-11-13  331  	kfree(data);
-bfcad518605d92 Yishai Hadas   2024-11-13  332  }
-bfcad518605d92 Yishai Hadas   2024-11-13  333  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
