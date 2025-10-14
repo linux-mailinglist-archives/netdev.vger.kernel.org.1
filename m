@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-229018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 329ECBD7132
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 04:28:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 643E3BD7135
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 04:28:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 406294F43DB
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 02:28:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAF2519A1961
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 02:28:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAE263043C0;
-	Tue, 14 Oct 2025 02:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F17A3043C9;
+	Tue, 14 Oct 2025 02:28:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IkmDwok/"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vp0x9Ehe"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1667C3043B8
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 02:28:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF8A3043D9
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 02:28:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760408903; cv=none; b=Lh8cvXfI6/FzGDa590a6PJ9A7fAwGTTgoVQdUSfQmYPv4kMyPRH/aY1+9VPpFsAD4YWDFPcfRK37/69zh6J6zafyw5MBiW87bBQ652+P0dqpz/AV67xg6nAxPOk2PaDxKERXKP1o95oUlxNE+4XWIv3lGxUe0qz9i/v/I5SOr8g=
+	t=1760408906; cv=none; b=bckFt/vEk4mt/3LKHU4VLrFjYe/Wro8yiv3jihVvj0IUazmIlJRyc/gBBbJOQzR1u5JjYxZFTOQECNB2fjFzvbwTzBal2/c+E91H5z+eIVExH2+7ZaC7cLwTWbUOAT3g1q+StirtjgV8rNAb4Vi1W9kzuqABzeTYqgH7dh/3WvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760408903; c=relaxed/simple;
-	bh=AY5Mnf8bL64hhYHUH2jNynaZAVaW7iM+0ezI1gCItw0=;
+	s=arc-20240116; t=1760408906; c=relaxed/simple;
+	bh=rOHLSKztX+5X2CP1e2mHJW3qyMtnhBRYNeiO9YfwXm4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=F/75ReTmMVMnFCirS9Gpj7QIw82jYivmo0Lt1Qh78Dj5MklfeXT8gJgsEyV8yx7/yeRcLiLmDza90huCJuFfMyLh7hpcC9hI2ltMc8gLsKfVAVLIXCl6Mj9uesACNbyftcLJ98EMIPZjbX6yRVptOQ3FE1OvI8Z31WZZux8vTlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IkmDwok/; arc=none smtp.client-ip=91.218.175.189
+	 MIME-Version; b=kGvp8HrTDEmL+7RriNNMzonYp2aYrv0UUhO7U1v4v9WQrWdhLqGvemZ0KtgIUnyqQHTlGP6laKLfuc3+QCnpAKcEfBibIDxHJ4uzG6/9YAnCVOTQE/LUwwE6I6raFKmTeg2zZ1NZTgFuIC0uthKKAhnxhoImuQ5QpyGXh1CWG34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vp0x9Ehe; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760408899;
+	t=1760408903;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RLVPodE7oh/QCBPyjLUCyrReaVws2Cv/HQ34vyYFglU=;
-	b=IkmDwok/uNe+cUxmlPl/JRR649N+Oi4qUq76qr/pe9zWzhDcifbXpQgZTr8ENxVMbm2qbI
-	yQOgvPeKwOdW0LoiZzSOTX0RQC3PBR4L3ErVzVe1hkzZc4dfqD7WaZ7tWYlS1X44W8JH14
-	GFLDIUzyMFVutz4br/a4tgw93oznRAI=
+	bh=F66F80GBTM/sxJxMAQ/ASPOGklRmV+TojptqHZAvtO8=;
+	b=vp0x9EhevXYXYVF55RtfhysYJN/vKpF8lLMkLcpO4HdEkOTaFh0BEm7yCiEwOggfCZ2qYb
+	fqnYd2051daPmbhlGL2ON0uMQhHbFg3cpH/ncLXCrEmJqf7jUuGanB+aMxLMMAbuvS43oa
+	g4lTDAJ14dPss9Y7toxYMDPvPSrGiAk=
 From: xuanqiang.luo@linux.dev
 To: edumazet@google.com,
 	kuniyu@google.com,
@@ -53,9 +53,9 @@ Cc: kerneljasonxing@gmail.com,
 	horms@kernel.org,
 	jiayuan.chen@linux.dev,
 	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-Subject: [RESEND PATCH net-next v7 2/3] inet: Avoid ehash lookup race in inet_ehash_insert()
-Date: Tue, 14 Oct 2025 10:27:02 +0800
-Message-Id: <20251014022703.1387794-3-xuanqiang.luo@linux.dev>
+Subject: [RESEND PATCH net-next v7 3/3] inet: Avoid ehash lookup race in inet_twsk_hashdance_schedule()
+Date: Tue, 14 Oct 2025 10:27:03 +0800
+Message-Id: <20251014022703.1387794-4-xuanqiang.luo@linux.dev>
 In-Reply-To: <20251014022703.1387794-1-xuanqiang.luo@linux.dev>
 References: <20251014022703.1387794-1-xuanqiang.luo@linux.dev>
 Precedence: bulk
@@ -69,84 +69,106 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-Since ehash lookups are lockless, if one CPU performs a lookup while
-another concurrently deletes and inserts (removing reqsk and inserting sk),
-the lookup may fail to find the socket, an RST may be sent.
+Since ehash lookups are lockless, if another CPU is converting sk to tw
+concurrently, fetching the newly inserted tw with tw->tw_refcnt == 0 cause
+lookup failure.
 
 The call trace map is drawn as follows:
-   CPU 0                           CPU 1
-   -----                           -----
-				inet_ehash_insert()
-                                spin_lock()
-                                sk_nulls_del_node_init_rcu(osk)
+   CPU 0                                CPU 1
+   -----                                -----
+				     inet_twsk_hashdance_schedule()
+				     spin_lock()
+				     inet_twsk_add_node_rcu(tw, ...)
 __inet_lookup_established()
-	(lookup failed)
-                                __sk_nulls_add_node_rcu(sk, list)
-                                spin_unlock()
+(find tw, failure due to tw_refcnt = 0)
+				     __sk_nulls_del_node_init_rcu(sk)
+				     refcount_set(&tw->tw_refcnt, 3)
+				     spin_unlock()
 
-As both deletion and insertion operate on the same ehash chain, this patch
-introduces a new sk_nulls_replace_node_init_rcu() helper functions to
-implement atomic replacement.
+By replacing sk with tw atomically via hlist_nulls_replace_init_rcu() after
+setting tw_refcnt, we ensure that tw is either fully initialized or not
+visible to other CPUs, eliminating the race.
 
-Fixes: 5e0724d027f0 ("tcp/dccp: fix hashdance race for passive sessions")
+It's worth noting that we held lock_sock() before the replacement, so
+there's no need to check if sk is hashed. Thanks to Kuniyuki Iwashima!
+
+Fixes: 3ab5aee7fe84 ("net: Convert TCP & DCCP hash tables to use RCU / hlist_nulls")
 Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 ---
- include/net/sock.h         | 14 ++++++++++++++
- net/ipv4/inet_hashtables.c |  8 ++++++--
- 2 files changed, 20 insertions(+), 2 deletions(-)
+ net/ipv4/inet_timewait_sock.c | 35 ++++++++++++-----------------------
+ 1 file changed, 12 insertions(+), 23 deletions(-)
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 60bcb13f045c..5d299a954859 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -858,6 +858,20 @@ static inline bool sk_nulls_del_node_init_rcu(struct sock *sk)
- 	return rc;
+diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
+index c96d61d08854..d4c781a0667f 100644
+--- a/net/ipv4/inet_timewait_sock.c
++++ b/net/ipv4/inet_timewait_sock.c
+@@ -88,12 +88,6 @@ void inet_twsk_put(struct inet_timewait_sock *tw)
  }
+ EXPORT_SYMBOL_GPL(inet_twsk_put);
  
-+static inline bool sk_nulls_replace_node_init_rcu(struct sock *old,
-+						  struct sock *new)
-+{
-+	if (sk_hashed(old)) {
-+		hlist_nulls_replace_init_rcu(&old->sk_nulls_node,
-+					     &new->sk_nulls_node);
-+		DEBUG_NET_WARN_ON_ONCE(refcount_read(&old->sk_refcnt) == 1);
-+		__sock_put(old);
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- static inline void __sk_add_node(struct sock *sk, struct hlist_head *list)
+-static void inet_twsk_add_node_rcu(struct inet_timewait_sock *tw,
+-				   struct hlist_nulls_head *list)
+-{
+-	hlist_nulls_add_head_rcu(&tw->tw_node, list);
+-}
+-
+ static void inet_twsk_schedule(struct inet_timewait_sock *tw, int timeo)
  {
- 	hlist_add_head(&sk->sk_node, list);
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index b7024e3d9ac3..f5826ec4bcaa 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -720,8 +720,11 @@ bool inet_ehash_insert(struct sock *sk, struct sock *osk, bool *found_dup_sk)
+ 	__inet_twsk_schedule(tw, timeo, false);
+@@ -113,13 +107,12 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+ {
+ 	const struct inet_sock *inet = inet_sk(sk);
+ 	const struct inet_connection_sock *icsk = inet_csk(sk);
+-	struct inet_ehash_bucket *ehead = inet_ehash_bucket(hashinfo, sk->sk_hash);
+ 	spinlock_t *lock = inet_ehash_lockp(hashinfo, sk->sk_hash);
+ 	struct inet_bind_hashbucket *bhead, *bhead2;
+ 
+-	/* Step 1: Put TW into bind hash. Original socket stays there too.
+-	   Note, that any socket with inet->num != 0 MUST be bound in
+-	   binding cache, even if it is closed.
++	/* Put TW into bind hash. Original socket stays there too.
++	 * Note, that any socket with inet->num != 0 MUST be bound in
++	 * binding cache, even if it is closed.
+ 	 */
+ 	bhead = &hashinfo->bhash[inet_bhashfn(twsk_net(tw), inet->inet_num,
+ 			hashinfo->bhash_size)];
+@@ -141,19 +134,6 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+ 
  	spin_lock(lock);
- 	if (osk) {
- 		WARN_ON_ONCE(sk->sk_hash != osk->sk_hash);
--		ret = sk_nulls_del_node_init_rcu(osk);
--	} else if (found_dup_sk) {
-+		ret = sk_nulls_replace_node_init_rcu(osk, sk);
-+		goto unlock;
-+	}
+ 
+-	/* Step 2: Hash TW into tcp ehash chain */
+-	inet_twsk_add_node_rcu(tw, &ehead->chain);
+-
+-	/* Step 3: Remove SK from hash chain */
+-	if (__sk_nulls_del_node_init_rcu(sk))
+-		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
+-
+-
+-	/* Ensure above writes are committed into memory before updating the
+-	 * refcount.
+-	 * Provides ordering vs later refcount_inc().
+-	 */
+-	smp_wmb();
+ 	/* tw_refcnt is set to 3 because we have :
+ 	 * - one reference for bhash chain.
+ 	 * - one reference for ehash chain.
+@@ -163,6 +143,15 @@ void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+ 	 */
+ 	refcount_set(&tw->tw_refcnt, 3);
+ 
++	/* Ensure tw_refcnt has been set before tw is published.
++	 * smp_wmb() provides the necessary memory barrier to enforce this
++	 * ordering.
++	 */
++	smp_wmb();
 +
-+	if (found_dup_sk) {
- 		*found_dup_sk = inet_ehash_lookup_by_sk(sk, list);
- 		if (*found_dup_sk)
- 			ret = false;
-@@ -730,6 +733,7 @@ bool inet_ehash_insert(struct sock *sk, struct sock *osk, bool *found_dup_sk)
- 	if (ret)
- 		__sk_nulls_add_node_rcu(sk, list);
++	hlist_nulls_replace_init_rcu(&sk->sk_nulls_node, &tw->tw_node);
++	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
++
+ 	inet_twsk_schedule(tw, timeo);
  
-+unlock:
  	spin_unlock(lock);
- 
- 	return ret;
 -- 
 2.25.1
 
