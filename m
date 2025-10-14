@@ -1,58 +1,67 @@
-Return-Path: <netdev+bounces-229272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D5ECBD9EC1
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 16:13:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99DFCBD9FDC
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 16:27:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7D48188D49C
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:12:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57D80543632
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E7931578F;
-	Tue, 14 Oct 2025 14:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FEF8248F5A;
+	Tue, 14 Oct 2025 14:27:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qg61uCGC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="k3QLVk9X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B0F30C355;
-	Tue, 14 Oct 2025 14:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFE722615
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 14:27:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760451115; cv=none; b=h4xIQJ1x4n/FwMQPi1wtjF5/EIU6HIi56KvnMQp+TKPB74LRXKEVVcYlBbfkhx/mlK8x2kAxQkkPLOSoAp1dkrxkskXxvSc0Y4NJx220cdxrIH7aHksCk5BPxbJ+Sxs3pfiZ/V/l8o+So0O30BgFe+Sq0l+eKPO3QeVFR8KkHG0=
+	t=1760452039; cv=none; b=mrYPHnC4DajLfQIRsn7V1FADLwWgJPplkbVbn4opuXFAxR35e+JToRHH5ONxhtmexYD4ZKDAtlFCmVwYxXHr5T8laFGQgAKjDMspWDogYK6dSWJOf4DD5WWklHdSF6+jGCWNlitNDJQ63tRMGRFbJJ1FnV1cyiLTWYN9zltrjvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760451115; c=relaxed/simple;
-	bh=/gBS9Ec+weRR1GIYiklQkgoYwSB1yN3/uPyeEbdUeek=;
+	s=arc-20240116; t=1760452039; c=relaxed/simple;
+	bh=2mtpYjwNY1Cxf7Imzrlx6hIdQ1tGeCPxf+hk9SsJ97M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=idu7tzbWROlA1YlVbrOHYHgpg8BY1pOQ2BISvHUCsqxtHD/XxAMFnJIMALeRtJWQpP8aMkkM1JcAO/UaOzyC0dfMxcm5gmENuLQRkt59G1WbOZDP9lUv7N6+Zqyww5roLCge0Fhr6vnxE2+D95PByOT74lCaMXWURSrtrSHAniE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qg61uCGC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22462C113D0;
-	Tue, 14 Oct 2025 14:11:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760451115;
-	bh=/gBS9Ec+weRR1GIYiklQkgoYwSB1yN3/uPyeEbdUeek=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qg61uCGCf6ldIV3YwehuWNNA6wH3MGlEiL9bwCQ/jQD4EcXejnPfTRzrnqADnbbOc
-	 95IfQ5SmtxT9NbRoR7VM1DUW5NJLakPPxbPd4oJ6wdjf6rYt85xq5knE4ZCZTKYbWg
-	 scRapye1FpFUaQ9Wv/kx8l/0gQNsVw284x8SHTPE+YrxP4L0DVFldmHk75zv5GDbpQ
-	 LXervE0DtpTr0unmC4qi35kGZ4osel/27/5CsOWn07z0Gj9U4o9B00+FxmHisSTQ2A
-	 d/kwR/meL1s448+1vZ+Sz/j/Cp99hEeUlGacNx2bppMVXqHTRQtoYSTBI91WstyHY8
-	 l+mA+i2Yi8l4g==
-Date: Tue, 14 Oct 2025 15:11:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	usamaarif642@gmail.com, riel@surriel.com, kernel-team@meta.com
-Subject: Re: [PATCH net v2] netpoll: Fix deadlock in memory allocation under
- spinlock
-Message-ID: <aO5aJ9dN5xIIdmNE@horms.kernel.org>
-References: <20251014-fix_netpoll_aa-v2-1-dafa6a378649@debian.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=k3uq0NqrxS1X6VuwuM5sbi8UDI3juNF/SaD+hk8VMlIaBpx54DaYPZ1u2tzelOQCALd3nMd3+aV8W1KU/8tziXxJVtMZhOeO3+7wrs/QRhGGkwpWAy9ncnlxqHQxG8mYrOj7z8SP8YBtPDRCrX71OUW4a9fs5AyQVCGYNl3kByI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=k3QLVk9X; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 14 Oct 2025 07:27:06 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760452035;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xmzBJXabx4eUefij6QpqRo9hlKdZJcNNossFkRf2xhs=;
+	b=k3QLVk9X68xj0fW6ouutSzsm3KP1k+huwBQS4la+ENxodaZmV1oopg1OpXPyzLIXwI72fH
+	TrU/4mvpvnFPc9jGyZ8pDZjO7OKQLmcXgz95maiE/Cd/Vv6kBa7GFlp+ufqNaTfL0Gpng7
+	aFqkMZaxH/Fh3qXtoaq4BaCYW68nmRc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Michal Hocko <mhocko@suse.com>
+Cc: Vlastimil Babka <vbabka@suse.cz>, Barry Song <21cnbao@gmail.com>, 
+	netdev@vger.kernel.org, linux-mm@kvack.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Barry Song <v-songbaohua@oppo.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Eric Dumazet <edumazet@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Brendan Jackman <jackmanb@google.com>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Huacai Zhou <zhouhuacai@oppo.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+	Harry Yoo <harry.yoo@oracle.com>, David Hildenbrand <david@redhat.com>, 
+	Matthew Wilcox <willy@infradead.org>, Roman Gushchin <roman.gushchin@linux.dev>
+Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network
+ buffer allocation
+Message-ID: <qztimgoebp5ecdmvvgro6sdsng6r7t3pnddg7ddlxagaom73ge@a5wta5ym7enu>
+References: <20251013101636.69220-1-21cnbao@gmail.com>
+ <927bcdf7-1283-4ddd-bd5e-d2e399b26f7d@suse.cz>
+ <aO37Od0VxOGmWCjm@tiehlicka>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,113 +70,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251014-fix_netpoll_aa-v2-1-dafa6a378649@debian.org>
+In-Reply-To: <aO37Od0VxOGmWCjm@tiehlicka>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Oct 14, 2025 at 03:10:51AM -0700, Breno Leitao wrote:
-> Fix a AA deadlock in refill_skbs() where memory allocation while holding
-> skb_pool->lock can trigger a recursive lock acquisition attempt.
+On Tue, Oct 14, 2025 at 09:26:49AM +0200, Michal Hocko wrote:
+> On Mon 13-10-25 20:30:13, Vlastimil Babka wrote:
+> > On 10/13/25 12:16, Barry Song wrote:
+> > > From: Barry Song <v-songbaohua@oppo.com>
+> [...]
+> > I wonder if we should either:
+> > 
+> > 1) sacrifice a new __GFP flag specifically for "!allow_spin" case to
+> > determine it precisely.
 > 
-> The deadlock scenario occurs when the system is under severe memory
-> pressure:
-> 
-> 1. refill_skbs() acquires skb_pool->lock (spinlock)
-> 2. alloc_skb() is called while holding the lock
-> 3. Memory allocator fails and calls slab_out_of_memory()
-> 4. This triggers printk() for the OOM warning
-> 5. The console output path calls netpoll_send_udp()
-> 6. netpoll_send_udp() attempts to acquire the same skb_pool->lock
-> 7. Deadlock: the lock is already held by the same CPU
-> 
-> Call stack:
->   refill_skbs()
->     spin_lock_irqsave(&skb_pool->lock)    <- lock acquired
->     __alloc_skb()
->       kmem_cache_alloc_node_noprof()
->         slab_out_of_memory()
->           printk()
->             console_flush_all()
->               netpoll_send_udp()
->                 skb_dequeue()
->                   spin_lock_irqsave(&skb_pool->lock)     <- deadlock attempt
-> 
-> This bug was exposed by commit 248f6571fd4c51 ("netpoll: Optimize skb
-> refilling on critical path") which removed refill_skbs() from the
-> critical path (where nested printk was being deferred), letting nested
-> printk being calld form inside refill_skbs()
-> 
-> Refactor refill_skbs() to never allocate memory while holding
-> the spinlock.
-> 
-> Another possible solution to fix this problem is protecting the
-> refill_skbs() from nested printks, basically calling
-> printk_deferred_{enter,exit}() in refill_skbs(), then, any nested
-> pr_warn() would be deferred.
-> 
-> I prefer tthis approach, given I _think_ it might be a good idea to move
-> the alloc_skb() from GFP_ATOMIC to GFP_KERNEL in the future, so, having
-> the alloc_skb() outside of the lock will be necessary step.
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> Fixes: 248f6571fd4c51 ("netpoll: Optimize skb refilling on critical path")
-> ---
-> Changes in v2:
-> - Added a return after the successful path (Rik van Riel)
-> - Changed the Fixes tag to point to the commit that exposed the problem.
-> - Link to v1: https://lore.kernel.org/r/20251013-fix_netpoll_aa-v1-1-94a1091f92f0@debian.org
-> ---
->  net/core/netpoll.c | 20 +++++++++++++++++---
->  1 file changed, 17 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-> index 60a05d3b7c249..c19dada9283ce 100644
-> --- a/net/core/netpoll.c
-> +++ b/net/core/netpoll.c
-> @@ -232,14 +232,28 @@ static void refill_skbs(struct netpoll *np)
->  
->  	skb_pool = &np->skb_pool;
->  
-> -	spin_lock_irqsave(&skb_pool->lock, flags);
-> -	while (skb_pool->qlen < MAX_SKBS) {
-> +	while (1) {
-> +		spin_lock_irqsave(&skb_pool->lock, flags);
-> +		if (skb_pool->qlen >= MAX_SKBS)
-> +			goto unlock;
-> +		spin_unlock_irqrestore(&skb_pool->lock, flags);
-> +
->  		skb = alloc_skb(MAX_SKB_SIZE, GFP_ATOMIC);
->  		if (!skb)
-> -			break;
-> +			return;
->  
-> +		spin_lock_irqsave(&skb_pool->lock, flags);
-> +		if (skb_pool->qlen >= MAX_SKBS)
-> +			/* Discard if len got increased (TOCTOU) */
-> +			goto discard;
->  		__skb_queue_tail(skb_pool, skb);
-> +		spin_unlock_irqrestore(&skb_pool->lock, flags);
->  	}
-> +
-> +	return;
+> As said in other reply I do not think this is a good fit for this
+> specific case as it is all or nothing approach. Soon enough we discover
+> that "no effort to reclaim/compact" hurts other usecases. So I do not
+> think we need a dedicated flag for this specific case. We need a way to
+> tell kswapd/kcompactd how much to try instead.
 
-Maybe it is worth leaving alone for clarity.
-And certainly it does no harm.
-But the line above is never reached.
-
-Flagged by Smatch.
-
-> +discard:
-> +	dev_kfree_skb_any(skb);
-> +unlock:
->  	spin_unlock_irqrestore(&skb_pool->lock, flags);
->  }
->  
-> 
-> ---
-> base-commit: c5705a2a4aa35350e504b72a94b5c71c3754833c
-> change-id: 20251013-fix_netpoll_aa-c991ac5f2138
-> 
-> Best regards,
-> --  
-> Breno Leitao <leitao@debian.org>
-> 
+To me this new floag is to decouple two orthogonal requests i.e. no lock
+semantic and don't wakeup kswapd. At the moment the lack of kswapd gfp
+flag convey the semantics of no lock. This can lead to unintended usage
+of no lock semantics by users which for whatever reason don't want to
+wakeup kswapd.
 
