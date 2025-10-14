@@ -1,316 +1,208 @@
-Return-Path: <netdev+bounces-229105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D00DEBD83A1
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:41:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A812DBD83AD
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:42:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9CE318A43E7
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:41:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43056425D19
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:42:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC1330FF37;
-	Tue, 14 Oct 2025 08:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3863030FC28;
+	Tue, 14 Oct 2025 08:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IuqKNsxw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="efmvhSkD"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9997B30FC1F
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1372C305E00
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 08:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760431281; cv=none; b=Y1Ut67vb9zbmX3iJgGl5vofSo0/URkcntDU1oWoG6hwV7QmzwDvMCL56wnP3E4wdpFU/xjDKSiwQ2ldQx8SJy2nQXZZ4yzkPf3Zmk8aENxmic1yPURsndUFJubr6NQz9DFkL0kZYpdRTvLAfxKhQxOxNBKae9tZe09SCIrgC7aw=
+	t=1760431320; cv=none; b=ZjOBcLeAaZGrvtazHCkzcmCFW9jqdJqFx0/ts9cFNLRYWZ9RFWGLdPU2Vu1Fi5AN88GpQGvCU9w2lqGkcqvuNlTSw7grNtOdbHbW3pyFOPWLT9pb2G7XoULISM2mLwOIQHh2LJPA52yjcpk67iiEGQNloAqfCCXrVnqMDIZUQzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760431281; c=relaxed/simple;
-	bh=4pd6qA2EReuxMPBiXivPPDfhOf+67BL73FWrtpDGWEM=;
+	s=arc-20240116; t=1760431320; c=relaxed/simple;
+	bh=nlpGDMe6o7pi8ZnueCZPCmlCM43jnCjNlheYWarkCUY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nL9h5OM1DJX3mMXQtAunfueCXaiT6JrV1d+PRQ8MLGOfcaVbF/VLUVBNdU6C+qfJeno5+dZ9Ui2dOiV9p4NSDD+FJQ6fgn5UzUOB2fK7nzFkew12sttRskdxCPtDe4rh0zPPqy76V22voeuZMP4nEt9HOZZ7r7jWyRtEIvV0c8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IuqKNsxw; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5d0df381-5a17-4b90-92dc-0d2976b585e0@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760431275;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=na4/rjwMlhKsgYN1lEawrQoNJRk4x8k14iu6ZeKXBPk=;
-	b=IuqKNsxw09wHTm9oGS3iFYk0vDrZB1Qu/kzTm+6bN1FcjJpMzeBqi1IYxh5lxVpZ9weg1p
-	dKB3NgF/8xItxriEV3Px9BcvrlKQPDHnzhAR6+VqE6zEAklq8+zkusARBaUqkq8rzZPuL/
-	GjKTG+ZMsnmcHEFh2HyZKfSd+LjexJA=
-Date: Tue, 14 Oct 2025 16:40:22 +0800
+	 In-Reply-To:Content-Type; b=CSyGplEw7qHhc8QuVR3epbvhFnd8ZeTf33Mm9bnWTsZ5SWyVtLNZ2MPwJjbKOGbJtyQnszgQuCbTM/Ilu3pKdC4WGxk41QW4nek6gsvEcykB8++NskP2QpFgEYoqAq9eovkbOkv+vxyYF8jNJcJ+xDyJDySLM5KsUGJvT3io7do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=efmvhSkD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B230EC4CEE7;
+	Tue, 14 Oct 2025 08:41:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760431319;
+	bh=nlpGDMe6o7pi8ZnueCZPCmlCM43jnCjNlheYWarkCUY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=efmvhSkDrII9E9e33qpaN0ACT0uQvw0dPbAAyxZzRO43s/GAwyfwh5qfsVyGYgL1E
+	 ZsrR0QeMfCIvrQBReiHdQGjMGnB8+Oa4C/O0Fodti45pie0hgEU6VRnN6a4mWCV3Ga
+	 kHweCpLz5FI+3Arm027VlPyp/9K+ydEzMgRaRJUr5DNiPLFZLhxj+KUF/S+sRsl7dA
+	 iSTM72ORfdBQswxTiXOgds6EyaKwPJHkRmHNzNySUfN+ZOXkAahVxaHEpVCz48bAR6
+	 Vp14CJDQe43fKJqcYf0kJG/3tqcjJi7AMD+K4EHdRYxc305rHwlwngYJ8HGNqfYxZL
+	 1LaaMrDbRin3A==
+Message-ID: <628aec1c-a989-4806-b3f4-d109d15b3dc4@kernel.org>
+Date: Tue, 14 Oct 2025 10:41:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v7 1/3] rculist: Add hlist_nulls_replace_rcu()
- and hlist_nulls_replace_init_rcu()
-To: Eric Dumazet <edumazet@google.com>
-Cc: kuniyu@google.com, "Paul E. McKenney" <paulmck@kernel.org>,
- kerneljasonxing@gmail.com, davem@davemloft.net, kuba@kernel.org,
- netdev@vger.kernel.org, Xuanqiang Luo <luoxuanqiang@kylinos.cn>,
- Frederic Weisbecker <frederic@kernel.org>,
- Neeraj Upadhyay <neeraj.upadhyay@kernel.org>
-References: <20250926074033.1548675-1-xuanqiang.luo@linux.dev>
- <20250926074033.1548675-2-xuanqiang.luo@linux.dev>
- <CANn89iJ15RFYq65t57sW=F1jZigbr5xTbPNLVY53cKtpMKLotA@mail.gmail.com>
- <d6a43fe1-2e00-4df4-b4a8-04facd8f05d4@linux.dev>
- <CANn89iLQMVms1GF_oY1WSCtmxLZaBJrTKaeHnwRo5p9uzFwnVw@mail.gmail.com>
- <82a04cb1-9451-493c-9b1e-b4a34f2175cd@linux.dev>
- <CANn89iJdXiE3b8x8vQtbOOi2DTC5P9bOO1HsnRwSPC8qQC--8g@mail.gmail.com>
- <7d89cff3-1045-4901-bdd3-f669eecfee97@linux.dev>
- <CANn89iJtMVRhcdfaH3Qz0cLf30cV32jYpAA5YBcL1Auovccdug@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: luoxuanqiang <xuanqiang.luo@linux.dev>
-In-Reply-To: <CANn89iJtMVRhcdfaH3Qz0cLf30cV32jYpAA5YBcL1Auovccdug@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v8 1/3] net: bonding: add broadcast_neighbor option for
+ 802.3ad
+To: Tonghao Zhang <tonghao@bamaicloud.com>, netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Zengbing Tu <tuzengbing@didiglobal.com>
+References: <cover.1751031306.git.tonghao@bamaicloud.com>
+ <84d0a044514157bb856a10b6d03a1028c4883561.1751031306.git.tonghao@bamaicloud.com>
+Content-Language: en-US
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ xsFNBE6S54YBEACzzjLwDUbU5elY4GTg/NdotjA0jyyJtYI86wdKraekbNE0bC4zV+ryvH4j
+ rrcDwGs6tFVrAHvdHeIdI07s1iIx5R/ndcHwt4fvI8CL5PzPmn5J+h0WERR5rFprRh6axhOk
+ rSD5CwQl19fm4AJCS6A9GJtOoiLpWn2/IbogPc71jQVrupZYYx51rAaHZ0D2KYK/uhfc6neJ
+ i0WqPlbtIlIrpvWxckucNu6ZwXjFY0f3qIRg3Vqh5QxPkojGsq9tXVFVLEkSVz6FoqCHrUTx
+ wr+aw6qqQVgvT/McQtsI0S66uIkQjzPUrgAEtWUv76rM4ekqL9stHyvTGw0Fjsualwb0Gwdx
+ ReTZzMgheAyoy/umIOKrSEpWouVoBt5FFSZUyjuDdlPPYyPav+hpI6ggmCTld3u2hyiHji2H
+ cDpcLM2LMhlHBipu80s9anNeZhCANDhbC5E+NZmuwgzHBcan8WC7xsPXPaiZSIm7TKaVoOcL
+ 9tE5aN3jQmIlrT7ZUX52Ff/hSdx/JKDP3YMNtt4B0cH6ejIjtqTd+Ge8sSttsnNM0CQUkXps
+ w98jwz+Lxw/bKMr3NSnnFpUZaxwji3BC9vYyxKMAwNelBCHEgS/OAa3EJoTfuYOK6wT6nadm
+ YqYjwYbZE5V/SwzMbpWu7Jwlvuwyfo5mh7w5iMfnZE+vHFwp/wARAQABzSFKaXJpIFNsYWJ5
+ IDxqaXJpc2xhYnlAa2VybmVsLm9yZz7CwXcEEwEIACEFAlW3RUwCGwMFCwkIBwIGFQgJCgsC
+ BBYCAwECHgECF4AACgkQvSWxBAa0cEnVTg//TQpdIAr8Tn0VAeUjdVIH9XCFw+cPSU+zMSCH
+ eCZoA/N6gitEcnvHoFVVM7b3hK2HgoFUNbmYC0RdcSc80pOF5gCnACSP9XWHGWzeKCARRcQR
+ 4s5YD8I4VV5hqXcKo2DFAtIOVbHDW+0okOzcecdasCakUTr7s2fXz97uuoc2gIBB7bmHUGAH
+ XQXHvdnCLjDjR+eJN+zrtbqZKYSfj89s/ZHn5Slug6w8qOPT1sVNGG+eWPlc5s7XYhT9z66E
+ l5C0rG35JE4PhC+tl7BaE5IwjJlBMHf/cMJxNHAYoQ1hWQCKOfMDQ6bsEr++kGUCbHkrEFwD
+ UVA72iLnnnlZCMevwE4hc0zVhseWhPc/KMYObU1sDGqaCesRLkE3tiE7X2cikmj/qH0CoMWe
+ gjnwnQ2qVJcaPSzJ4QITvchEQ+tbuVAyvn9H+9MkdT7b7b2OaqYsUP8rn/2k1Td5zknUz7iF
+ oJ0Z9wPTl6tDfF8phaMIPISYrhceVOIoL+rWfaikhBulZTIT5ihieY9nQOw6vhOfWkYvv0Dl
+ o4GRnb2ybPQpfEs7WtetOsUgiUbfljTgILFw3CsPW8JESOGQc0Pv8ieznIighqPPFz9g+zSu
+ Ss/rpcsqag5n9rQp/H3WW5zKUpeYcKGaPDp/vSUovMcjp8USIhzBBrmI7UWAtuedG9prjqfO
+ wU0ETpLnhgEQAM+cDWLL+Wvc9cLhA2OXZ/gMmu7NbYKjfth1UyOuBd5emIO+d4RfFM02XFTI
+ t4MxwhAryhsKQQcA4iQNldkbyeviYrPKWjLTjRXT5cD2lpWzr+Jx7mX7InV5JOz1Qq+P+nJW
+ YIBjUKhI03ux89p58CYil24Zpyn2F5cX7U+inY8lJIBwLPBnc9Z0An/DVnUOD+0wIcYVnZAK
+ DiIXODkGqTg3fhZwbbi+KAhtHPFM2fGw2VTUf62IHzV+eBSnamzPOBc1XsJYKRo3FHNeLuS8
+ f4wUe7bWb9O66PPFK/RkeqNX6akkFBf9VfrZ1rTEKAyJ2uqf1EI1olYnENk4+00IBa+BavGQ
+ 8UW9dGW3nbPrfuOV5UUvbnsSQwj67pSdrBQqilr5N/5H9z7VCDQ0dhuJNtvDSlTf2iUFBqgk
+ 3smln31PUYiVPrMP0V4ja0i9qtO/TB01rTfTyXTRtqz53qO5dGsYiliJO5aUmh8swVpotgK4
+ /57h3zGsaXO9PGgnnAdqeKVITaFTLY1ISg+Ptb4KoliiOjrBMmQUSJVtkUXMrCMCeuPDGHo7
+ 39Xc75lcHlGuM3yEB//htKjyprbLeLf1y4xPyTeeF5zg/0ztRZNKZicgEmxyUNBHHnBKHQxz
+ 1j+mzH0HjZZtXjGu2KLJ18G07q0fpz2ZPk2D53Ww39VNI/J9ABEBAAHCwV8EGAECAAkFAk6S
+ 54YCGwwACgkQvSWxBAa0cEk3tRAAgO+DFpbyIa4RlnfpcW17AfnpZi9VR5+zr496n2jH/1ld
+ wRO/S+QNSA8qdABqMb9WI4BNaoANgcg0AS429Mq0taaWKkAjkkGAT7mD1Q5PiLr06Y/+Kzdr
+ 90eUVneqM2TUQQbK+Kh7JwmGVrRGNqQrDk+gRNvKnGwFNeTkTKtJ0P8jYd7P1gZb9Fwj9YLx
+ jhn/sVIhNmEBLBoI7PL+9fbILqJPHgAwW35rpnq4f/EYTykbk1sa13Tav6btJ+4QOgbcezWI
+ wZ5w/JVfEJW9JXp3BFAVzRQ5nVrrLDAJZ8Y5ioWcm99JtSIIxXxt9FJaGc1Bgsi5K/+dyTKL
+ wLMJgiBzbVx8G+fCJJ9YtlNOPWhbKPlrQ8+AY52Aagi9WNhe6XfJdh5g6ptiOILm330mkR4g
+ W6nEgZVyIyTq3ekOuruftWL99qpP5zi+eNrMmLRQx9iecDNgFr342R9bTDlb1TLuRb+/tJ98
+ f/bIWIr0cqQmqQ33FgRhrG1+Xml6UXyJ2jExmlO8JljuOGeXYh6ZkIEyzqzffzBLXZCujlYQ
+ DFXpyMNVJ2ZwPmX2mWEoYuaBU0JN7wM+/zWgOf2zRwhEuD3A2cO2PxoiIfyUEfB9SSmffaK/
+ S4xXoB6wvGENZ85Hg37C7WDNdaAt6Xh2uQIly5grkgvWppkNy4ZHxE+jeNsU7tg=
+In-Reply-To: <84d0a044514157bb856a10b6d03a1028c4883561.1751031306.git.tonghao@bamaicloud.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 7bit
 
+On 27. 06. 25, 15:49, Tonghao Zhang wrote:
+> Stacking technology is a type of technology used to expand ports on
+> Ethernet switches. It is widely used as a common access method in
+> large-scale Internet data center architectures. Years of practice
+> have proved that stacking technology has advantages and disadvantages
+> in high-reliability network architecture scenarios. For instance,
+> in stacking networking arch, conventional switch system upgrades
+> require multiple stacked devices to restart at the same time.
+> Therefore, it is inevitable that the business will be interrupted
+> for a while. It is for this reason that "no-stacking" in data centers
+> has become a trend. Additionally, when the stacking link connecting
+> the switches fails or is abnormal, the stack will split. Although it is
+> not common, it still happens in actual operation. The problem is that
+> after the split, it is equivalent to two switches with the same
+> configuration appearing in the network, causing network configuration
+> conflicts and ultimately interrupting the services carried by the
+> stacking system.
+> 
+> To improve network stability, "non-stacking" solutions have been
+> increasingly adopted, particularly by public cloud providers and
+> tech companies like Alibaba, Tencent, and Didi. "non-stacking" is
+> a method of mimicing switch stacking that convinces a LACP peer,
+> bonding in this case, connected to a set of "non-stacked" switches
+> that all of its ports are connected to a single switch
+> (i.e., LACP aggregator), as if those switches were stacked. This
+> enables the LACP peer's ports to aggregate together, and requires
+> (a) special switch configuration, described in the linked article,
+> and (b) modifications to the bonding 802.3ad (LACP) mode to send
+> all ARP/ND packets across all ports of the active aggregator.
+> 
+> Note that, with multiple aggregators, the current broadcast mode
+> logic will send only packets to the selected aggregator(s).
+> 
+>   +-----------+   +-----------+
+>   |  switch1  |   |  switch2  |
+>   +-----------+   +-----------+
+>           ^           ^
+>           |           |
+>        +-----------------+
+>        |   bond4 lacp    |
+>        +-----------------+
+>           |           |
+>           | NIC1      | NIC2
+>        +-----------------+
+>        |     server      |
+>        +-----------------+
 
-在 2025/10/14 16:09, Eric Dumazet 写道:
-> On Tue, Oct 14, 2025 at 1:05 AM luoxuanqiang <xuanqiang.luo@linux.dev> wrote:
->>
->> 在 2025/10/14 15:34, Eric Dumazet 写道:
->>> On Tue, Oct 14, 2025 at 12:21 AM luoxuanqiang <xuanqiang.luo@linux.dev> wrote:
->>>> 在 2025/10/13 17:49, Eric Dumazet 写道:
->>>>> On Mon, Oct 13, 2025 at 1:26 AM luoxuanqiang <xuanqiang.luo@linux.dev> wrote:
->>>>>> 在 2025/10/13 15:31, Eric Dumazet 写道:
->>>>>>> On Fri, Sep 26, 2025 at 12:41 AM <xuanqiang.luo@linux.dev> wrote:
->>>>>>>> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
->>>>>>>>
->>>>>>>> Add two functions to atomically replace RCU-protected hlist_nulls entries.
->>>>>>>>
->>>>>>>> Keep using WRITE_ONCE() to assign values to ->next and ->pprev, as
->>>>>>>> mentioned in the patch below:
->>>>>>>> commit efd04f8a8b45 ("rcu: Use WRITE_ONCE() for assignments to ->next for
->>>>>>>> rculist_nulls")
->>>>>>>> commit 860c8802ace1 ("rcu: Use WRITE_ONCE() for assignments to ->pprev for
->>>>>>>> hlist_nulls")
->>>>>>>>
->>>>>>>> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
->>>>>>>> ---
->>>>>>>>      include/linux/rculist_nulls.h | 59 +++++++++++++++++++++++++++++++++++
->>>>>>>>      1 file changed, 59 insertions(+)
->>>>>>>>
->>>>>>>> diff --git a/include/linux/rculist_nulls.h b/include/linux/rculist_nulls.h
->>>>>>>> index 89186c499dd4..c26cb83ca071 100644
->>>>>>>> --- a/include/linux/rculist_nulls.h
->>>>>>>> +++ b/include/linux/rculist_nulls.h
->>>>>>>> @@ -52,6 +52,13 @@ static inline void hlist_nulls_del_init_rcu(struct hlist_nulls_node *n)
->>>>>>>>      #define hlist_nulls_next_rcu(node) \
->>>>>>>>             (*((struct hlist_nulls_node __rcu __force **)&(node)->next))
->>>>>>>>
->>>>>>>> +/**
->>>>>>>> + * hlist_nulls_pprev_rcu - returns the dereferenced pprev of @node.
->>>>>>>> + * @node: element of the list.
->>>>>>>> + */
->>>>>>>> +#define hlist_nulls_pprev_rcu(node) \
->>>>>>>> +       (*((struct hlist_nulls_node __rcu __force **)(node)->pprev))
->>>>>>>> +
->>>>>>>>      /**
->>>>>>>>       * hlist_nulls_del_rcu - deletes entry from hash list without re-initialization
->>>>>>>>       * @n: the element to delete from the hash list.
->>>>>>>> @@ -152,6 +159,58 @@ static inline void hlist_nulls_add_fake(struct hlist_nulls_node *n)
->>>>>>>>             n->next = (struct hlist_nulls_node *)NULLS_MARKER(NULL);
->>>>>>>>      }
->>>>>>>>
->>>>>>>> +/**
->>>>>>>> + * hlist_nulls_replace_rcu - replace an old entry by a new one
->>>>>>>> + * @old: the element to be replaced
->>>>>>>> + * @new: the new element to insert
->>>>>>>> + *
->>>>>>>> + * Description:
->>>>>>>> + * Replace the old entry with the new one in a RCU-protected hlist_nulls, while
->>>>>>>> + * permitting racing traversals.
->>>>>>>> + *
->>>>>>>> + * The caller must take whatever precautions are necessary (such as holding
->>>>>>>> + * appropriate locks) to avoid racing with another list-mutation primitive, such
->>>>>>>> + * as hlist_nulls_add_head_rcu() or hlist_nulls_del_rcu(), running on this same
->>>>>>>> + * list.  However, it is perfectly legal to run concurrently with the _rcu
->>>>>>>> + * list-traversal primitives, such as hlist_nulls_for_each_entry_rcu().
->>>>>>>> + */
->>>>>>>> +static inline void hlist_nulls_replace_rcu(struct hlist_nulls_node *old,
->>>>>>>> +                                          struct hlist_nulls_node *new)
->>>>>>>> +{
->>>>>>>> +       struct hlist_nulls_node *next = old->next;
->>>>>>>> +
->>>>>>>> +       WRITE_ONCE(new->next, next);
->>>>>>>> +       WRITE_ONCE(new->pprev, old->pprev);
->>>>>>> I do not think these two WRITE_ONCE() are needed.
->>>>>>>
->>>>>>> At this point new is not yet visible.
->>>>>>>
->>>>>>> The following  rcu_assign_pointer() is enough to make sure prior
->>>>>>> writes are committed to memory.
->>>>>> Dear Eric,
->>>>>>
->>>>>> I’m quoting your more detailed explanation from the other patch [0], thank
->>>>>> you for that!
->>>>>>
->>>>>> However, regarding new->next, if the new object is allocated with
->>>>>> SLAB_TYPESAFE_BY_RCU, would we still encounter the same issue as in commit
->>>>>> efd04f8a8b45 (“rcu: Use WRITE_ONCE() for assignments to ->next for
->>>>>> rculist_nulls”)?
->>>>>>
->>>>>> Also, for the WRITE_ONCE() assignments to ->pprev introduced in commit
->>>>>> 860c8802ace1 (“rcu: Use WRITE_ONCE() for assignments to ->pprev for
->>>>>> hlist_nulls”) within hlist_nulls_add_head_rcu(), is that also unnecessary?
->>>>> I forgot sk_unhashed()/sk_hashed() could be called from lockless contexts.
->>>>>
->>>>> It is a bit weird to annotate the writes, but not the lockless reads,
->>>>> even if apparently KCSAN
->>>>> is okay with that.
->>>>>
->>>> Dear Eric,
->>>>
->>>> I’m sorry—I still haven’t fully grasped the scenario you mentioned where
->>>> sk_unhashed()/sk_hashed() can be called from lock‑less contexts. It seems
->>>> similar to the race described in commit 860c8802ace1 (“rcu: Use
->>>> WRITE_ONCE() for assignments to ->pprev for hlist_nulls”), e.g.: [0].
->>>>
->>> inet_unhash() does a lockless sk_unhash(sk) call, while no lock is
->>> held in some cases (look at tcp_done())
->>>
->>> void inet_unhash(struct sock *sk)
->>> {
->>> struct inet_hashinfo *hashinfo = tcp_get_hashinfo(sk);
->>>
->>> if (sk_unhashed(sk))    // Here no lock is held
->>>       return;
->>>
->>> Relevant lock (depending on (sk->sk_state == TCP_LISTEN)) is acquired
->>> a few lines later.
->>>
->>> Then
->>>
->>> __sk_nulls_del_node_init_rcu() is called safely, while the bucket lock is held.
->>>
->> Dear Eric,
->>
->> Thanks for the quick response!
->>
->> In the call path:
->>           tcp_retransmit_timer()
->>                   tcp_write_err()
->>                           tcp_done()
->>
->> tcp_retransmit_timer() already calls lockdep_sock_is_held(sk) to check the
->> socket‑lock state.
->>
->> void tcp_retransmit_timer(struct sock *sk)
->> {
->>           struct tcp_sock *tp = tcp_sk(sk);
->>           struct net *net = sock_net(sk);
->>           struct inet_connection_sock *icsk = inet_csk(sk);
->>           struct request_sock *req;
->>           struct sk_buff *skb;
->>
->>           req = rcu_dereference_protected(tp->fastopen_rsk,
->>                                    lockdep_sock_is_held(sk)); // Check here
->>
->> Does that mean we’re already protected by lock_sock(sk) or
->> bh_lock_sock(sk)?
-> But the socket lock is not protecting ehash buckets. These are other locks.
->
-> Also, inet_unhash() can be called from other paths, without a socket
-> lock being held.
+Hi,
 
-Dear Eric,
+this breaks broadcast bonding in 6.17. Reverting these three (the two 
+depend on this one) makes 6.17 work again:
+2f9afffc399d net: bonding: send peer notify when failure recovery
+3d98ee52659c net: bonding: add broadcast_neighbor netlink option
+ce7a381697cb net: bonding: add broadcast_neighbor option for 802.3ad
 
-I understand the distinction now, but looking at the call stack in [0],
-both CPUs reach inet_unhash() via the tcp_retransmit_timer() path, so only
-one of them should pass the check, right?
+This was reported downstream as an error in our openQA:
+https://bugzilla.suse.com/show_bug.cgi?id=1250894
 
-I’m still not clear how this race condition arises.
+I bisected using this in qemu:
+systemctl stop network
+ip link del bond0 || true
+ip link set dev eth0 down
+ip addr flush eth0
+ip link add bond0 type bond mode broadcast
+ip link set dev eth0 master bond0
+ip addr add 10.0.2.15/24 dev bond0
+ip link set bond0 up
+sleep 1
+exec nmap -sS 10.0.2.2/32
 
-After encountering the issue, we used WRITE_ONCE() to assign n->pprev in
-hlist_nulls_add_head_rcu().
+Any ideas?
 
-Thank you very much for taking the time to discuss this with me!
+> - https://www.ruijie.com/fr-fr/support/tech-gallery/de-stack-data-center-network-architecture/
+> 
+> Cc: Jay Vosburgh <jv@jvosburgh.net>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> Cc: Steven Rostedt <rostedt@goodmis.org>
+> Cc: Masami Hiramatsu <mhiramat@kernel.org>
+> Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+> Cc: Nikolay Aleksandrov <razor@blackwall.org>
+> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+> Signed-off-by: Zengbing Tu <tuzengbing@didiglobal.com>
+> ---
 
-Thanks!
-
-[0]:
-------------------------------------------------------------------------
-
-BUG: KCSAN: data-race in inet_unhash / inet_unhash
-
-write to 0xffff8880a69a0170 of 8 bytes by interrupt on cpu 1:
-  __hlist_nulls_del include/linux/list_nulls.h:88 [inline]
-  hlist_nulls_del_init_rcu include/linux/rculist_nulls.h:36 [inline]
-  __sk_nulls_del_node_init_rcu include/net/sock.h:676 [inline]
-  inet_unhash+0x38f/0x4a0 net/ipv4/inet_hashtables.c:612
-  tcp_set_state+0xfa/0x3e0 net/ipv4/tcp.c:2249
-  tcp_done+0x93/0x1e0 net/ipv4/tcp.c:3854
-  tcp_write_err+0x7e/0xc0 net/ipv4/tcp_timer.c:56
-  tcp_retransmit_timer+0x9b8/0x16d0 net/ipv4/tcp_timer.c:479	<===
-  tcp_write_timer_handler+0x42d/0x510 net/ipv4/tcp_timer.c:599
-  tcp_write_timer+0xd1/0xf0 net/ipv4/tcp_timer.c:619
-  call_timer_fn+0x5f/0x2f0 kernel/time/timer.c:1404
-  expire_timers kernel/time/timer.c:1449 [inline]
-  __run_timers kernel/time/timer.c:1773 [inline]
-  __run_timers kernel/time/timer.c:1740 [inline]
-  run_timer_softirq+0xc0c/0xcd0 kernel/time/timer.c:1786
-  __do_softirq+0x115/0x33f kernel/softirq.c:292
-  invoke_softirq kernel/softirq.c:373 [inline]
-  irq_exit+0xbb/0xe0 kernel/softirq.c:413
-  exiting_irq arch/x86/include/asm/apic.h:536 [inline]
-  smp_apic_timer_interrupt+0xe6/0x280 arch/x86/kernel/apic/apic.c:1137
-  apic_timer_interrupt+0xf/0x20 arch/x86/entry/entry_64.S:830
-  native_safe_halt+0xe/0x10 arch/x86/kernel/paravirt.c:71
-  arch_cpu_idle+0x1f/0x30 arch/x86/kernel/process.c:571
-  default_idle_call+0x1e/0x40 kernel/sched/idle.c:94
-  cpuidle_idle_call kernel/sched/idle.c:154 [inline]
-  do_idle+0x1af/0x280 kernel/sched/idle.c:263
-  cpu_startup_entry+0x1b/0x20 kernel/sched/idle.c:355
-  start_secondary+0x208/0x260 arch/x86/kernel/smpboot.c:264
-  secondary_startup_64+0xa4/0xb0 arch/x86/kernel/head_64.S:241
-
-read to 0xffff8880a69a0170 of 8 bytes by interrupt on cpu 0:
-  sk_unhashed include/net/sock.h:607 [inline]
-  inet_unhash+0x3d/0x4a0 net/ipv4/inet_hashtables.c:592
-  tcp_set_state+0xfa/0x3e0 net/ipv4/tcp.c:2249
-  tcp_done+0x93/0x1e0 net/ipv4/tcp.c:3854
-  tcp_write_err+0x7e/0xc0 net/ipv4/tcp_timer.c:56
-  tcp_retransmit_timer+0x9b8/0x16d0 net/ipv4/tcp_timer.c:479	<===
-  tcp_write_timer_handler+0x42d/0x510 net/ipv4/tcp_timer.c:599
-  tcp_write_timer+0xd1/0xf0 net/ipv4/tcp_timer.c:619
-  call_timer_fn+0x5f/0x2f0 kernel/time/timer.c:1404
-  expire_timers kernel/time/timer.c:1449 [inline]
-  __run_timers kernel/time/timer.c:1773 [inline]
-  __run_timers kernel/time/timer.c:1740 [inline]
-  run_timer_softirq+0xc0c/0xcd0 kernel/time/timer.c:1786
-  __do_softirq+0x115/0x33f kernel/softirq.c:292
-  invoke_softirq kernel/softirq.c:373 [inline]
-  irq_exit+0xbb/0xe0 kernel/softirq.c:413
-  exiting_irq arch/x86/include/asm/apic.h:536 [inline]
-  smp_apic_timer_interrupt+0xe6/0x280 arch/x86/kernel/apic/apic.c:1137
-  apic_timer_interrupt+0xf/0x20 arch/x86/entry/entry_64.S:830
-  native_safe_halt+0xe/0x10 arch/x86/kernel/paravirt.c:71
-  arch_cpu_idle+0x1f/0x30 arch/x86/kernel/process.c:571
-  default_idle_call+0x1e/0x40 kernel/sched/idle.c:94
-  cpuidle_idle_call kernel/sched/idle.c:154 [inline]
-  do_idle+0x1af/0x280 kernel/sched/idle.c:263
-  cpu_startup_entry+0x1b/0x20 kernel/sched/idle.c:355
-  rest_init+0xec/0xf6 init/main.c:452
-  arch_call_rest_init+0x17/0x37
-  start_kernel+0x838/0x85e init/main.c:786
-  x86_64_start_reservations+0x29/0x2b arch/x86/kernel/head64.c:490
-  x86_64_start_kernel+0x72/0x76 arch/x86/kernel/head64.c:471
-  secondary_startup_64+0xa4/0xb0 arch/x86/kernel/head_64.S:241
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.4.0-rc6+ #0
-Hardware name: Google Google Compute Engine/Google Compute Engine,
-BIOS Google 01/01/2011
-
-------------------------------------------------------------------------
+-- 
+js
+suse labs
 
 
