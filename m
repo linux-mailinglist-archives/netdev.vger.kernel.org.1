@@ -1,232 +1,95 @@
-Return-Path: <netdev+bounces-229250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB38CBD9D10
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:52:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB1ECBD9D22
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 15:54:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8CEE34E76C5
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 13:52:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9817E4E68CE
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 13:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62AF526B2D5;
-	Tue, 14 Oct 2025 13:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gyKslMt/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09F9D26B2D5;
+	Tue, 14 Oct 2025 13:54:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A7418A6B0;
-	Tue, 14 Oct 2025 13:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE63749C;
+	Tue, 14 Oct 2025 13:54:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760449964; cv=none; b=DmADw1jKJcw/r0z05XaEWbWfQDEC6m7xAKcnCR66W8e/KGDtcLZ1unf2pYhOKTAUKFZt5Ogsq2/XVF5jVXQCvRkFvogOeuHXESy6aRSI+0LG4Cbrqh5Diq0ICeAJ6poBJab8F6A6B4cH5DcvjMCG6g/yrOtPeeQJKguDagjeftU=
+	t=1760450065; cv=none; b=IZ+XN4HOWFarCAfNgYmDaid/qSO0VBLsjIgKMWPALHo56gZ+81QxZz4I8OLnHSe7A0JETdjIKoi51s6kpqQtwP1IeyaoBsOfWVLs79dzs0HefbvBYPQBK9l0eYsHi09qoYRUudpFPXQWL6g5RyTZkBbOEMncFFO5USnvrF7ZYHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760449964; c=relaxed/simple;
-	bh=ssjsTqzEfEBT1gonGkyIguCeeCG6cNnHwZVkHgfQfPo=;
+	s=arc-20240116; t=1760450065; c=relaxed/simple;
+	bh=TawJvEMXzd24vJapw7Um3IOxiGFos3PJtw04S/I5obw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hp9C98Q0wWV0aTKgTsOzCvVB3HYC4y2DRhiL9FvreUVZ9JRJVXPXlxHAAuiltaT74xeAbM7tuNNhxIZ0Lz+UNVusl9m4kNiyHHk5TYYqMmBD9G/M6rd3JFnWoj6QzJhDUjfgEevW3r8o5l9JClue4VyYbO2gud6EiI8sqLVd4uI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gyKslMt/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2079DC113D0;
-	Tue, 14 Oct 2025 13:52:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760449963;
-	bh=ssjsTqzEfEBT1gonGkyIguCeeCG6cNnHwZVkHgfQfPo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gyKslMt/Re73fKUgxWghdCYgF6656EvZDcTyasrTDRkn8ySxcPMqGtip7mgtwyOZ0
-	 FBo4JuZ9fy5ala5yvrDcQuEkonoIDKOCSj8lE+Ag4AWeLpMAQpFalh0gKb8q7/a34C
-	 vxiDUQ1U4Gre0vU3WwCZYwSLOxM2vA88recW2Bpuz7V3TqhG7mGf/rRtCAdNm4BulP
-	 e88nzCKJhaQUBhAgvvYO9r6PGnWwacWNgraqXc3k6ZW1gJAQ1iYaNlZ/p1LNk7doo1
-	 zZx9NatAG/BSJCKF8FktW7e9mWnbxyHFIuAKr3xFrh58dahsuoie4ygFDpZY/Iejop
-	 AbnYJlcQZk04g==
-Date: Tue, 14 Oct 2025 15:52:40 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v3 2/3] net: airoha: npu: Add
- airoha_npu_soc_data struct
-Message-ID: <aO5VqDegyOY9fVEK@lore-desk>
-References: <20251013-airoha-npu-7583-v3-0-00f748b5a0c7@kernel.org>
- <20251013-airoha-npu-7583-v3-2-00f748b5a0c7@kernel.org>
- <aO4LL8racazLjjzk@horms.kernel.org>
- <aO4WmeuoAcZLFSBo@lore-desk>
- <20251014134609.GA3239414@horms.kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QOhYXvSpa3su0+cwrt5VtM0Jtf5g7NFORT4CZ2tpYVDpfoZT89B+WyfDFky8X4PHwTZkA6PhOi/dIZE+GvM0LhgXZ9Yd8YpwNmDQA43lM5gniCD2ml8BFTcrKsdOmRooUuypYChD4Pkj0V1vlmNQD1pR2iLIZlsChhmCPaaZq5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 4529160104; Tue, 14 Oct 2025 15:54:21 +0200 (CEST)
+Date: Tue, 14 Oct 2025 15:54:21 +0200
+From: Florian Westphal <fw@strlen.de>
+To: lvxiafei <xiafei_xupt@163.com>
+Cc: pablo@netfilter.org, coreteam@netfilter.org, davem@davemloft.net,
+	edumazet@google.com, horms@kernel.org, kadlec@netfilter.org,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	lvxiafei@sensetime.com, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH V6] netfilter: netns nf_conntrack: per-netns
+ net.netfilter.nf_conntrack_max sysctl
+Message-ID: <aO5WDcNAegXi1Umg@strlen.de>
+References: <aC-B1aSmjDvLEisv@calendula>
+ <20250523092129.98856-1-xiafei_xupt@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="PckbZYlHLnwOdPvs"
-Content-Disposition: inline
-In-Reply-To: <20251014134609.GA3239414@horms.kernel.org>
-
-
---PckbZYlHLnwOdPvs
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250523092129.98856-1-xiafei_xupt@163.com>
 
-On Oct 14, Simon Horman wrote:
-> On Tue, Oct 14, 2025 at 11:23:37AM +0200, Lorenzo Bianconi wrote:
-> > > On Mon, Oct 13, 2025 at 03:58:50PM +0200, Lorenzo Bianconi wrote:
-> > >=20
-> > > ...
-> > >=20
-> > > > @@ -182,49 +192,53 @@ static int airoha_npu_send_msg(struct airoha_=
-npu *npu, int func_id,
-> > > >  	return ret;
-> > > >  }
-> > > > =20
-> > > > -static int airoha_npu_run_firmware(struct device *dev, void __iome=
-m *base,
-> > > > -				   struct resource *res)
-> > > > +static int airoha_npu_load_firmware(struct device *dev, void __iom=
-em *addr,
-> > > > +				    const struct airoha_npu_fw *fw_info)
-> > > >  {
-> > > >  	const struct firmware *fw;
-> > > > -	void __iomem *addr;
-> > > >  	int ret;
-> > > > =20
-> > > > -	ret =3D request_firmware(&fw, NPU_EN7581_FIRMWARE_RV32, dev);
-> > > > +	ret =3D request_firmware(&fw, fw_info->name, dev);
-> > > >  	if (ret)
-> > > >  		return ret =3D=3D -ENOENT ? -EPROBE_DEFER : ret;
-> > > > =20
-> > > > -	if (fw->size > NPU_EN7581_FIRMWARE_RV32_MAX_SIZE) {
-> > > > +	if (fw->size > fw_info->max_size) {
-> > > >  		dev_err(dev, "%s: fw size too overlimit (%zu)\n",
-> > > > -			NPU_EN7581_FIRMWARE_RV32, fw->size);
-> > > > +			fw_info->name, fw->size);
-> > > >  		ret =3D -E2BIG;
-> > > >  		goto out;
-> > > >  	}
-> > > > =20
-> > > > -	addr =3D devm_ioremap_resource(dev, res);
-> > > > -	if (IS_ERR(addr)) {
-> > > > -		ret =3D PTR_ERR(addr);
-> > > > -		goto out;
-> > > > -	}
-> > > > -
-> > > >  	memcpy_toio(addr, fw->data, fw->size);
-> > > > +out:
-> > > >  	release_firmware(fw);
-> > > > =20
-> > > > -	ret =3D request_firmware(&fw, NPU_EN7581_FIRMWARE_DATA, dev);
-> > > > -	if (ret)
-> > > > -		return ret =3D=3D -ENOENT ? -EPROBE_DEFER : ret;
-> > > > +	return ret;
-> > > > +}
-> > > > =20
-> > > > -	if (fw->size > NPU_EN7581_FIRMWARE_DATA_MAX_SIZE) {
-> > > > -		dev_err(dev, "%s: fw size too overlimit (%zu)\n",
-> > > > -			NPU_EN7581_FIRMWARE_DATA, fw->size);
-> > > > -		ret =3D -E2BIG;
-> > > > -		goto out;
-> > > > -	}
-> > > > +static int airoha_npu_run_firmware(struct device *dev, void __iome=
-m *base,
-> > > > +				   struct resource *res)
-> > > > +{
-> > > > +	const struct airoha_npu_soc_data *soc;
-> > > > +	void __iomem *addr;
-> > > > +	int ret;
-> > > > =20
-> > > > -	memcpy_toio(base + REG_NPU_LOCAL_SRAM, fw->data, fw->size);
-> > > > -out:
-> > > > -	release_firmware(fw);
-> > > > +	soc =3D of_device_get_match_data(dev);
-> > > > +	if (!soc)
-> > > > +		return -EINVAL;
-> > > > =20
-> > > > -	return ret;
-> > > > +	addr =3D devm_ioremap_resource(dev, res);
-> > > > +	if (IS_ERR(addr))
-> > > > +		return PTR_ERR(addr);
-> > > > +
-> > > > +	/* Load rv32 npu firmware */
-> > > > +	ret =3D airoha_npu_load_firmware(dev, addr, &soc->fw_rv32);
-> > > > +	if (ret)
-> > > > +		return ret;
-> > > > +
-> > > > +	/* Load data npu firmware */
-> > > > +	return airoha_npu_load_firmware(dev, base + REG_NPU_LOCAL_SRAM,
-> > > > +					&soc->fw_data);
-> > >=20
-> > > Hi Lorenzo,
-> >=20
-> > Hi Simon,
-> >=20
-> > >=20
-> > > There are two calls to airoha_npu_load_firmware() above.
-> > > And, internally, airoha_npu_load_firmware() will call release_firmwar=
-e()
-> > > if an error is encountered.
-> > >=20
-> > > But should release_firmware() be called for the firmware requested
-> > > by the first call to airoha_npu_load_firmware() if the second call fa=
-ils?
-> > > Such clean-up seems to have been the case prior to this patch.
-> >=20
-> > release_firmware() is intended to release the resources allocated by the
-> > corresponding call to request_firmware() in airoha_npu_load_firmware().
-> > According to my understanding we always run release_firmware() in
-> > airoha_npu_load_firmware() before returning to the caller. Even before =
-this
-> > patch we run release_firmware() on the 'first' firmware image before re=
-questing
-> > the second one. Am I missing something?
-> >=20
-> > >=20
-> > > Also, not strictly related. Should release_firmware() be called (twic=
-e)
-> > > when the driver is removed?
-> >=20
-> > For the above reasons, it is not important to call release_firmware() r=
-emoving
-> > the module. Agree?
->=20
-> Thanks, agreed.
->=20
-> For some reason I missed that release_firmware() is called in
-> airoha_npu_load_firmware() regardless of error - I thought it was only
-> in error paths for some reason.
->=20
-> So I agree that the firmware is always released by the time
-> airoha_npu_load_firmware() is returned. As thus there is never
-> a need to release it afterwards.
->=20
-> Reviewed-by: Simon Horman <horms@kernel.org>
->=20
->=20
+lvxiafei <xiafei_xupt@163.com> wrote:
+> > > Wether its time to disallow 0 is a different topic and not related to this patch.
+> > >
+> > > I would argue: "yes", disallow 0 -- users can still set INT_MAX if they
+> > >  want and that should provide enough rope to strangle yourself.
+> 
+> > The question is how to make it without breaking crazy people.
+> 
+> It seems that we need a new topic to discuss the maximum value that the system can
+> tolerate to ensure safety:
+> 
+> 1. This value is a system limitation, not a user setting
+> 2. This value should be calculated based on system resources
+> 3. This value takes precedence over 0 and other larger values that the user sets
+> 4. This value does not affect the value of the user setting, and 0 in the user
+> setting can still indicate that the user setting is unlimited, maintaining
+> compatibility with historical usage.
 
-ack, thx for the review.
+I've applied a variant of this patch to nf-next:testing.
 
-Regards,
-Lorenzo
+Could you please check that I adapted it correctly?
+https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git/commit/?h=testing&id=b7bfa7d96fa5a7f3c2a69ad406ede520e658cb07
 
---PckbZYlHLnwOdPvs
-Content-Type: application/pgp-signature; name=signature.asc
+(I added a patch right before that rejects conntrack_max=0).
 
------BEGIN PGP SIGNATURE-----
+I wonder if we should update the sysctl path to reflect the
+effective value, i.e., so that when netns sets
 
-iHQEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaO5VqAAKCRA6cBh0uS2t
-rKOOAQDpkKyXdtPwflpBidM62ACL3W06z3Xjas/GK4+Y4rraYgD4+VvRgWRlYY8L
-iT7Okq7FVtyyot/ZH4Lpb3VEMvSlCg==
-=CTji
------END PGP SIGNATURE-----
+nf_conntrack_max=1000000
 
---PckbZYlHLnwOdPvs--
+... but init_net is capped at 65536, then a listing
+shows the sysctl at 65536.
+
+It would be similar to what we do for max_buckets.
+
+I also considered to make such a request fail at set time, but it
+would make the sysctl fail/not fail 'randomly' and it also would
+not do the right thing when init_net setting is reduced later.
 
