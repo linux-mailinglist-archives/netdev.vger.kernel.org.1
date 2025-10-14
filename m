@@ -1,233 +1,125 @@
-Return-Path: <netdev+bounces-229045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA39EBD77AC
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 07:48:25 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82F0EBD77E2
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 07:52:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83A573AE668
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 05:48:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 998734F69A8
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 05:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F86286887;
-	Tue, 14 Oct 2025 05:48:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1605296BD3;
+	Tue, 14 Oct 2025 05:52:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="Aw5R92ec";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="o/btPEZQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DJ1+ybYH"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-b8-smtp.messagingengine.com (flow-b8-smtp.messagingengine.com [202.12.124.143])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89EC1D6DB5;
-	Tue, 14 Oct 2025 05:48:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.143
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585AB288C25
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 05:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760420899; cv=none; b=TDUtUEEVfngwsm/qXesMhGZ7SxPXZh5FuGRVGOtAR5w6CUI6uZW/MVpqZSQMwpfJzTyBlSX21Wu6j2HUSWGWoide+dmGqB0/RsoMMeW6W6rQ3r7WcxrrWVYrtEHQB8u6HBGkvAlyUpjiw0PfzbumuyJWn2n4zM0KLD/j4a4THp8=
+	t=1760421163; cv=none; b=jM1dsN2p8NjPe++cOZx9UsjTgQO9aYjBkdYNQxw2VljTHEGeHbsB/ff192wu7rwSRFUMQ1K2jvKKhvzd5nSAfzvINLh6GOTkMUJRp5Fb9LE4wm49dDVVyVOkd29pTiFQ0pAMZY5z6qYUCbg+x7XXBljvA7KmaML349zP9q6sikE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760420899; c=relaxed/simple;
-	bh=uegBLj59RJQhWXj6mlxI9NQJtvv1PvtnctEltpmrOTY=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=rOUNicLja2B+vmbPd3bZ3T8jREEsVo1e3bT8sulwDhFsJSslRsL6R58qBR5WDNzBlZJe/2xT8vuUDLPuhTpjnTX66QkBXfp0c6OqmRySk7hgzEU/fjql7Lr8TOTQdbBu07QcC/YGfVKwn96jsK/LOMO7Mz+nlNImFsxRMKgMm/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=Aw5R92ec; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=o/btPEZQ; arc=none smtp.client-ip=202.12.124.143
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
-Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
-	by mailflow.stl.internal (Postfix) with ESMTP id E88CE130001D;
-	Tue, 14 Oct 2025 01:48:15 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-07.internal (MEProxy); Tue, 14 Oct 2025 01:48:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
-	1760420895; x=1760428095; bh=rOMKmFAm0WYZgl5MX5scSy1m5wik2x9mcuD
-	tQFlTYLs=; b=Aw5R92eccAEyJrtqxi1RTOFXajVvHzlm4Eo2W1B7CJTwUduK5MT
-	zgZX9m1yexKNJy/QCC7qOr+xjb+eb9FQO9KtM4bzhm3rBxuCAC7RD+/qbErnWVNx
-	WzIzJlIMHGcGQ7ID6ost8tmDw5YfcvjBa46wnmB0rhzWAFSB1DDcsL4fG22q9zre
-	YgToglnSlnQAPV/qTZw3r57RhVcGGhiL0jO+pL6uX0H9GrTN8T8fOAh8THII0CcR
-	q+b1AsgEd4hii7jCLaTYMTrvn31SQc8qPNglPErSk6kpzrKlV8zN9n9W1jXwa3zZ
-	3RMarB9cNFW9xKHoWt+ErfDmKhByi+R6paA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1760420895; x=
-	1760428095; bh=rOMKmFAm0WYZgl5MX5scSy1m5wik2x9mcuDtQFlTYLs=; b=o
-	/btPEZQM6HQFqW+n0XO+WzOYpQd+7umSu6b3JOXOG4Xy9j/BqgL3bANljKs5BYdI
-	Cctp+GRKBjaV6gDXfN9qlFFjbfYYWg4uoWAoFtmvbRBZmo5mmZrqiEqZy2mHuBz6
-	wbRU94VcgXG1bOd55u9GITmnOP6/nKT7DMp5qyPgUoXHud+kyuFOlb4iPptRSoNI
-	navi1IrfkgvOcgf2N24dGy1Uc9r+ELVCb4FdODKrx13LjROZElXIyxfYCYYYG7Cb
-	Z4uZ9EU3uR/4o2heTutxqQn8gbkZliFqxRIWTYkHrHwxg9mRtksFLd6SxnTAjAme
-	xwtJJ0oWJDCq6XX7skX0Q==
-X-ME-Sender: <xms:H-TtaFJiME1Wr32XX27p5xp-hYn9E87GLO3-mJ8Odh7m_vhaFUeIeg>
-    <xme:H-TtaALqEJaS09U585MN_ydfOCav44M7MQmpUbB-BXYzWVXwpeHJrIzQP6M1bSXcI
-    522au_IT4RRn6s_V3cUu4f_C3VoEEm1jRRA2y_3eLQ3fj59Yg>
-X-ME-Received: <xmr:H-TtaF8G8LwTXDM9Z2qIQKXw46dp1dc6HTY2mBQaCAobzJU7fxzW8soTOmY3cFGQgk2pKLaBzFhH1YuTQQi9vtuxRLlBwlD8VovL56ZBftzQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduudeljeefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurheptgfgggfhvfevufgjfhffkfhrsehtqhertddttdejnecuhfhrohhmpefpvghilheu
-    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
-    epleejtdefgeeukeeiteduveehudevfeffvedutefgteduhfegvdfgtdeigeeuudejnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
-    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepgeefpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpd
-    hrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    oheplhhinhhugidqgihfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    hlihhnuhigqdhunhhiohhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    oheplhhinhhugidqnhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    hlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
-    pehlihhnuhigqdhfshguvghvvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpth
-    htoheplhhinhhugidqtghifhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    ohepvggtrhihphhtfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:H-TtaCwm8n5GoDWIJqcDj30FEpvpKSlL7xhdRYKYjkDOJZSwiQ_ygw>
-    <xmx:H-TtaF_fluZhrXLP0cldynUm31pJI37d-3hORrSMQFrPrTHyJsboOw>
-    <xmx:H-TtaGiFLmuX43K9Wpqo7vld6I146MTKS8MY6givHf_ph47qxRL3SA>
-    <xmx:H-TtaHPCM2MJ2cmkPiKr7wNINbGqxeu-bNlZBzwsmuQ8-dO_GlZWUg>
-    <xmx:H-TtaFnaFSlRAZiHAv6p5eBEN_hXXg4XBN7Pwkp6eBOp1VVSVtvZ5qZ5>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 14 Oct 2025 01:48:04 -0400 (EDT)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1760421163; c=relaxed/simple;
+	bh=xiqFJOykby4cQK17gVtELNe3dahFjsM+TAM/4GuYD9k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RST7ePblLxWoCtIHD+39GdUj4Nf5jksIlXPppb05ue/lKf/73WMt1Au8P8DLs5e4ORkXNSesS2NY3COQe4VplisTJbRv6Lmuqs0KeahAk/jmR5GvsVcPNtp6qVGiBiPkUFMJBetK+RgPNCm/4zo0Hp3ypvW7RiJPdQkjAEJank0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DJ1+ybYH; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-33226dc4fc9so4398710a91.1
+        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 22:52:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760421161; x=1761025961; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mWlNVmLtjnf8rAcNm545u/wbHRU51ZDEKLc4vvLow4M=;
+        b=DJ1+ybYHL4cjKKbSwkXU6gG1UUY9+h5g+o1p/XIGZoO7DSK4y/CnqS5A0e+NYJe7fP
+         09KHxRjHC4ZvC7WGZP3c3yZxE4qNP4pH1mdTIi8GbuAVtQKELP2d9r39iSBLUIq1Qf/r
+         c4UDvNA2xUsSQGhcPrxQ85ELUVg3HwxMPDwRAzm748x9/YtMvF6vhP7v2RgjlvxhcvI6
+         OONC3FagZW5enMG0bpmzBxV+JKy6mxneZF0Yb6Sy1bpjQ2ukXUiJJHawKG/XCyUNQwin
+         0wEeM6So8r42Wo4X2VfkxllL7k4zH+w1byiU4bvSI0qU6gWP2UL2Tx8VymUZqjAPYkBu
+         bXjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760421161; x=1761025961;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mWlNVmLtjnf8rAcNm545u/wbHRU51ZDEKLc4vvLow4M=;
+        b=d5JhniWi0O6cDY3x5BMJNsiiNLjPqO3iydKTA8KNiGdJymphctzOu7/IGMDr6CTiIK
+         PIywn1oKaul+BeM/IV9ekTmmxItbSgPkgqvyx/pVLYy/P/rSkRlxWeizCykSpRQp8g+P
+         rmpyYX5bu3d8SG6rwiZMF7asdtFWhNTEZoX8lyq8ivlATPI76d/seCL63rzUTnRN+oWs
+         0qw9J6AlflWWWG/j6/GjzAQPW524lpDO7NOIaX47xlcHh4ZEMs8t0pD/xcrsUPoYCZwe
+         4GQhz+q3dhHpm/mwgVgiu2U96/p7DS6DYuho4gJMDZO7Pixi25gQMxjcHK4t9GUngI/w
+         be8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVZX62SqrX+K136zesMjCdQPp1WZnGu2czRbh6VglS717anqG7Vedb1x9/PGgqXSDkSF85tk0E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzX+LrT+L+n/HQg9IsieoHasN9U+FD/oUPt/G4R2UbEIKBYXAc2
+	I278DO2qLyexbHde3hSf3v+jlGxEDK4frSfBqfEwGWCu97m3hZhETvtm
+X-Gm-Gg: ASbGnctH6cAK5uGDxaa60+KGEemvMht+sUDgbevNbkEbu56e60ig18p+pHLihWzwIgN
+	rxCfjJ+NTqtY0R65D7A0XVWIxRNPYEJRJTvPcwvQPL4NGVSbFXbbSVHXKuzEc2+ahXABxpe7GS5
+	HITdOsnVC9Qd7nOIXwj/wjx8y7kXvzAGfC5aONKKVgvlyqzpv6QLQoDPgzTu4e1pG43irLDwZ64
+	5erFeyRPB/JWu2D8pLWimXN5OmYK37U+2Ry+TlE45rzEL0ORFf7KK8thk8pr1JqWCR94GZke2p+
+	QtS2GQR9PosGI1KABAxNIbP6YC3wnjj+Q8AF4QqXUOO778p4yHzG5zUdRnw0s27j4IgghFf3fnc
+	8jDh9sxPODQmvSsueJuLTTWLVnBZwD92DZW0sbnN6pysJdU84/MM/z7KmmHGYp/U2zhnyxVeQ7Z
+	CZB04=
+X-Google-Smtp-Source: AGHT+IGZ4VytOKfxuKimiMVWhQiKhxNFaYk8/G36/eeE0Sx6uLTpUHGY3Bg+9lWRu14oZFzlLrNxWg==
+X-Received: by 2002:a17:90b:224a:b0:332:3515:3049 with SMTP id 98e67ed59e1d1-33b5112504amr30797652a91.4.1760421161516;
+        Mon, 13 Oct 2025 22:52:41 -0700 (PDT)
+Received: from arawal-thinkpadp1gen4i.rmtin.csb ([2402:a00:401:b8b3:f979:38a1:d361:cdf4])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33b62657166sm14391472a91.11.2025.10.13.22.52.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Oct 2025 22:52:41 -0700 (PDT)
+From: rawal.abhishek92@gmail.com
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: arawal@redhat.com,
+	jamie.bainbridge@gmail.com,
+	Abhishek Rawal <rawal.abhishek92@gmail.com>,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] r8152: Advertise software timestamp information.
+Date: Tue, 14 Oct 2025 11:22:33 +0530
+Message-ID: <20251014055234.46527-1-rawal.abhishek92@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Jeff Layton" <jlayton@kernel.org>
-Cc: "Miklos Szeredi" <miklos@szeredi.hu>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
- "Chuck Lever" <chuck.lever@oracle.com>,
- "Alexander Aring" <alex.aring@gmail.com>,
- "Trond Myklebust" <trondmy@kernel.org>,
- "Anna Schumaker" <anna@kernel.org>, "Steve French" <sfrench@samba.org>,
- "Paulo Alcantara" <pc@manguebit.org>,
- "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
- "Shyam Prasad N" <sprasad@microsoft.com>, "Tom Talpey" <tom@talpey.com>,
- "Bharath SM" <bharathsm@microsoft.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- "Danilo Krummrich" <dakr@kernel.org>,
- "David Howells" <dhowells@redhat.com>, "Tyler Hicks" <code@tyhicks.com>,
- "Olga Kornievskaia" <okorniev@redhat.com>,
- "Dai Ngo" <Dai.Ngo@oracle.com>, "Amir Goldstein" <amir73il@gmail.com>,
- "Namjae Jeon" <linkinjeon@kernel.org>,
- "Steve French" <smfrench@gmail.com>,
- "Sergey Senozhatsky" <senozhatsky@chromium.org>,
- "Carlos Maiolino" <cem@kernel.org>,
- "Kuniyuki Iwashima" <kuniyu@google.com>,
- "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, netfs@lists.linux.dev,
- ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
- linux-xfs@vger.kernel.org, netdev@vger.kernel.org,
- "Jeff Layton" <jlayton@kernel.org>
-Subject:
- Re: [PATCH 12/13] nfsd: check for delegation conflicts vs. the same client
-In-reply-to: <20251013-dir-deleg-ro-v1-12-406780a70e5e@kernel.org>
-References: <20251013-dir-deleg-ro-v1-0-406780a70e5e@kernel.org>,
- <20251013-dir-deleg-ro-v1-12-406780a70e5e@kernel.org>
-Date: Tue, 14 Oct 2025 16:48:02 +1100
-Message-id: <176042088276.1793333.12640300967459688183@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+Content-Transfer-Encoding: 8bit
 
-On Tue, 14 Oct 2025, Jeff Layton wrote:
-> RFC 8881 requires that the server reply with GDD_UNAVAIL when the client
+From: Abhishek Rawal <rawal.abhishek92@gmail.com>
 
-GDD4_UNAVAIL.  Then "git grep" finds it for me.
+Driver calls skb_tx_timestamp(skb) in rtl8152_start_xmit(), but does not advertise the capability in ethtool.
+Advertise software timestamp capabilities on struct ethtool_ops.
 
-NeilBrown
+Signed-off-by: Abhishek Rawal <rawal.abhishek92@gmail.com>
+Reviewed-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+---
+ drivers/net/usb/r8152.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-
-> requests a directory delegation that it already holds.
->=20
-> When setting a directory delegation, check that the client associated
-> with the stateid doesn't match an existing delegation. If it does,
-> reject the setlease attempt.
->=20
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->  fs/nfsd/nfs4state.c | 29 ++++++++++++++++++++++++++++-
->  1 file changed, 28 insertions(+), 1 deletion(-)
->=20
-> diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
-> index b06591f154aa372db710e071c69260f4639956d7..011e336dfd996daa82b706c3536=
-628971369fb10 100644
-> --- a/fs/nfsd/nfs4state.c
-> +++ b/fs/nfsd/nfs4state.c
-> @@ -88,6 +88,7 @@ void nfsd4_end_grace(struct nfsd_net *nn);
->  static void _free_cpntf_state_locked(struct nfsd_net *nn, struct nfs4_cpnt=
-f_state *cps);
->  static void nfsd4_file_hash_remove(struct nfs4_file *fi);
->  static void deleg_reaper(struct nfsd_net *nn);
-> +static bool nfsd_dir_may_setlease(struct file_lease *new, struct file_leas=
-e *old);
-> =20
->  /* Locking: */
-> =20
-> @@ -5550,6 +5551,31 @@ static const struct lease_manager_operations nfsd_le=
-ase_mng_ops =3D {
->  	.lm_change =3D nfsd_change_deleg_cb,
->  };
-> =20
-> +static const struct lease_manager_operations nfsd_dir_lease_mng_ops =3D {
-> +	.lm_breaker_owns_lease =3D nfsd_breaker_owns_lease,
-> +	.lm_break =3D nfsd_break_deleg_cb,
-> +	.lm_change =3D nfsd_change_deleg_cb,
-> +	.lm_may_setlease =3D nfsd_dir_may_setlease,
-> +};
-> +
-> +static bool
-> +nfsd_dir_may_setlease(struct file_lease *new, struct file_lease *old)
-> +{
-> +	struct nfs4_delegation *od, *nd;
-> +
-> +	/* Only conflicts with other nfsd dir delegs */
-> +	if (old->fl_lmops !=3D &nfsd_dir_lease_mng_ops)
-> +		return true;
-> +
-> +	od =3D old->c.flc_owner;
-> +	nd =3D new->c.flc_owner;
-> +
-> +	/* Are these for the same client? No bueno if so */
-> +	if (od->dl_stid.sc_client =3D=3D nd->dl_stid.sc_client)
-> +		return false;
-> +	return true;
-> +}
-> +
->  static __be32 nfsd4_check_seqid(struct nfsd4_compound_state *cstate, struc=
-t nfs4_stateowner *so, u32 seqid)
->  {
->  	if (nfsd4_has_session(cstate))
-> @@ -5888,12 +5914,13 @@ static struct file_lease *nfs4_alloc_init_lease(str=
-uct nfs4_delegation *dp)
->  	fl =3D locks_alloc_lease();
->  	if (!fl)
->  		return NULL;
-> -	fl->fl_lmops =3D &nfsd_lease_mng_ops;
->  	fl->c.flc_flags =3D FL_DELEG;
->  	fl->c.flc_type =3D deleg_is_read(dp->dl_type) ? F_RDLCK : F_WRLCK;
->  	fl->c.flc_owner =3D (fl_owner_t)dp;
->  	fl->c.flc_pid =3D current->tgid;
->  	fl->c.flc_file =3D dp->dl_stid.sc_file->fi_deleg_file->nf_file;
-> +	fl->fl_lmops =3D S_ISDIR(file_inode(fl->c.flc_file)->i_mode) ?
-> +				&nfsd_dir_lease_mng_ops : &nfsd_lease_mng_ops;
->  	return fl;
->  }
-> =20
->=20
-> --=20
-> 2.51.0
->=20
->=20
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index 44cba7acfe7d9bfbcc96a1e974762657bd1c3c33..f896e9f28c3b0ce2282912c9ea37820160df3a45 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -9311,6 +9311,7 @@ static const struct ethtool_ops ops = {
+ 	.set_ringparam = rtl8152_set_ringparam,
+ 	.get_pauseparam = rtl8152_get_pauseparam,
+ 	.set_pauseparam = rtl8152_set_pauseparam,
++	.get_ts_info = ethtool_op_get_ts_info,
+ };
+ 
+ static int rtl8152_ioctl(struct net_device *netdev, struct ifreq *rq, int cmd)
+-- 
+2.51.0
 
 
