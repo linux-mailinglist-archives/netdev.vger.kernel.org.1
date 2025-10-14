@@ -1,113 +1,144 @@
-Return-Path: <netdev+bounces-229201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3330DBD91D1
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 13:52:05 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5805FBD930D
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 14:01:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B97EA420786
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:52:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C3C984FFB9B
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 12:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 157EA30FF23;
-	Tue, 14 Oct 2025 11:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2673A310629;
+	Tue, 14 Oct 2025 12:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H4yH8vIn"
 X-Original-To: netdev@vger.kernel.org
-Received: from baidu.com (mx20.baidu.com [111.202.115.85])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099402FE053;
-	Tue, 14 Oct 2025 11:51:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.202.115.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE8E2459F3
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 12:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760442721; cv=none; b=g79nWei4DrMPohKtTaVy57nMm+aYgVU8DXAttUJsEAz/SMfHVUMl6wDUHJddfYMrJ8ZY2XtqnzWFHhS5BOw55xjXebw0fuqE8thpcCybEe4tqq0nchgiEmp6MmBmkFJuF0WAOY0LSSk3SRMa0icrinaGZwTtXeed2ux8ynuruoA=
+	t=1760443269; cv=none; b=KL8mXxTJVFBuQvpBvBpQLi34mQcbMky4N0NSYH42mtm5E351Ov46ikyuk5W2lqFFMWCAp5zkP9uazEZU4nEdS3EIvXuVp/ZWmea/CAzNaSpTIJweedEYS2exG1VA/JMGv6kNTnM2tdM0fJVBZWGPDbDcBOHHFFaF/WOiO49o3+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760442721; c=relaxed/simple;
-	bh=Hfs/oyD16dhuLjpqiLOj0BghJMlBJWnviczL0Y3NGms=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=upUz62G3iS47rYWNN9h4O/w5z2zcWOyvzgnmvFFOQVL8ly0GSbWUWw6YxDXmmePIPdxiUMdIokMyvJHQlBbGk8hwB675tMjAY1sZORMrbzscTACfl4Rg3baqYQ6GzEtmOL/LXYtzLB3dIGDh5Ehq8fzl5J/d9+xnZSqlDYt+m3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.202.115.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-From: lirongqing <lirongqing@baidu.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
-	<kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil Sutter
-	<phil@nwl.cc>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Li RongQing <lirongqing@baidu.com>
-Subject: [PATCH net-next] netfilter: conntrack: Reduce cond_resched frequency in gc_worker
-Date: Tue, 14 Oct 2025 19:51:03 +0800
-Message-ID: <20251014115103.2678-1-lirongqing@baidu.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1760443269; c=relaxed/simple;
+	bh=8vcDXcnwhs3rxYjGuXzeraCiHUjPFfLkO3qyrXBdt3Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XQlkDK+gwLU2VPcwQBuqb7WPg+CLHwxSkD/NX5gH8KKFsIhxGBdrFZYUUgEWIftFVnmlUyhWblyKuEMPEa5RIPCuhxMB7WsGVtQlwl1GkyXLupFlSHU1FSLD2XZYP+kdg2lpg0voL5UJVO4yGQEkdaiXWtYJ3I8TgJR92YC5hBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H4yH8vIn; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2897522a1dfso48729005ad.1
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 05:01:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760443267; x=1761048067; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0yuwxDRyoAgsx6in/i8UeLI6Ei3SxN3gVvZwYXOMq/M=;
+        b=H4yH8vInoSS83n+2nTu24/crogV1H1jYf+NUT06sV7v1ObpjJ3KJutuF5dMO2EwzYN
+         KT37kNBCrhPYqi5S1nAwKZl7fITQySi3oj+TJtiz/MjhAWP5csiNpc9ltJGq2+/2SDCy
+         /1YrFjT4rj+z1TEO/iAvPU48/02HY1tt2fUFHQ6uIoE6hOWpgaFJXrqL26pPPp+zZ5jO
+         5+OoGzTCo6tIbLHaKXYetEVx/1eVYz6d9YQGiQ1watgCNR/Ct4pJD/+n7pLtabTGFQ3s
+         pW+7LeINrkdEDzweFiYmzQnGUelTrzKY9axpeppP8BN89zGrbl6LCRnR8bf97m/NMiIp
+         2xIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760443267; x=1761048067;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0yuwxDRyoAgsx6in/i8UeLI6Ei3SxN3gVvZwYXOMq/M=;
+        b=eGt1I1GBU8jbb1t4Rhdv2gpIdPvo9Ol/+bYI94Tc/vUSBrpzFNPKToAPa3tYyGY2QC
+         PJuj+wL/JLfUzvTtTY0mgFce0z8CDDrPg3Ok7l7bMSi2yCcaL24WzbcIt+Q29neCXQk6
+         uL9xqsYEwqvzmeGr+F703/GbdeV/8RC6JXitoCAjlaUu0/kKekVJsTT/+TCYWlT1Tlih
+         VhhwVOFWPfBaZEspm3kdhwhPodXXX0p+r5q2bFbkUf1ozhvRUnQ9pnoFSLa/0qgbBGx6
+         CgFF59zRXWTbmT40qizNJRDEHXlifk51AEkW4+T0VwPP9hWZCwfDZMMyzu3BQuGbdHUl
+         8H9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX9LdfnohA5n9j0OXf1bwXMD7tKwM73sjaMXG0yIzgbN5aK7cj34qMAvlE402pxqlezvHov0Ak=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRAn2k9kuoZl6CzJZz8njA0OSuLLz/mJY+La+sW8rm3B/7tX5L
+	tEKHElin/dyYvEw/X4/d6PcH5XqmNw5K2k38r/kmBJA4qXbyLfxRBmyO
+X-Gm-Gg: ASbGncvwXu7lLqKFL3ueeTM8bwGn+dWqj9doSsTy7hOV9V9wAXHJ/grj0IVj58DmXlS
+	KZ/sGz/kuQfg1TOStcNjob0fSz3ErGpMOUh94m6t6bPKUSr15ClcJhfw+dCaouDYVI4F3Fi42Z2
+	Q9kHj5vrNhkHOh81AYesl3JLq1qT281oHlw/JOkQJWx1CVzUnOBEqNDTu7GIsgsYhgtkrgjVDxb
+	Zpl1pwBiHkkgrgvnlWvHuobMhCBCPq5oy8rWqlf8H7KMJa618C1pSy6aWhpz5bxy4IIGinIEkvg
+	YZQ2ZgnkloP/hBzegXtwdqVgPRyBt3QvJruKqWLizDn/Gv945rVWYgmOSEWKjfYc6Wni3Usx/Ii
+	RPu4DsjXRlCgnzCKv69+m9cvURLU9MQgykBpfXLY=
+X-Google-Smtp-Source: AGHT+IELofrr7ePRSX0znyiz3djLj5MGb72fhJCt3ux4kiA3yVpA6dKADS7dU33/QDcoos6p6fBzKg==
+X-Received: by 2002:a17:902:ebd1:b0:24c:caab:dfd2 with SMTP id d9443c01a7336-290273032a5mr308789575ad.61.1760443266446;
+        Tue, 14 Oct 2025 05:01:06 -0700 (PDT)
+Received: from Shardul.. ([223.185.43.66])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29034f3de4asm162662315ad.92.2025.10.14.05.01.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Oct 2025 05:01:05 -0700 (PDT)
+From: Shardul Bankar <shardulsb08@gmail.com>
+To: bpf@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+	linux-kernel@vger.kernel.org (open list),
+	Shardul Bankar <shardulsb08@gmail.com>
+Subject: [PATCH bpf 1/1] bpf: test_run: fix ctx leak in bpf_prog_test_run_xdp error path
+Date: Tue, 14 Oct 2025 17:30:37 +0530
+Message-Id: <20251014120037.1981316-1-shardulsb08@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: bjhj-exc9.internal.baidu.com (172.31.3.19) To
- bjkjy-exc3.internal.baidu.com (172.31.50.47)
-X-FEAS-Client-IP: 172.31.50.47
-X-FE-Policy-ID: 52:10:53:SYSTEM
+Content-Transfer-Encoding: 8bit
 
-From: Li RongQing <lirongqing@baidu.com>
+Fix a memory leak in bpf_prog_test_run_xdp() where the context buffer
+allocated by bpf_ctx_init() is not freed when the function returns early
+due to a data size check.
 
-The current implementation calls cond_resched() in every iteration
-of the garbage collection loop. This creates some overhead when
-processing large conntrack tables with billions of entries,
-as each cond_resched() invocation involves scheduler operations.
+On the failing path:
+  ctx = bpf_ctx_init(...);
+  if (kattr->test.data_size_in - meta_sz < ETH_HLEN)
+      return -EINVAL;
 
-To reduce this overhead, implement a time-based throttling mechanism
-that calls cond_resched() at most once per millisecond. This maintains
-system responsiveness while minimizing scheduler contention.
+The early return bypasses the cleanup label that kfree()s ctx, leading to a
+leak detectable by kmemleak under fuzzing. Change the return to jump to the
+existing free_ctx label.
 
-gc_worker() with hashsize=10000 shows measurable improvement:
-
-Before: 7114.274us
-After:  5993.518us (15.8% reduction)
-
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
+Fixes: fe9544ed1a2e ("bpf: Support specifying linear xdp packet data size for BPF_PROG_TEST_RUN")
+Reported-by: BPF Runtime Fuzzer (BRF)
+Signed-off-by: Shardul Bankar <shardulsb08@gmail.com>
 ---
- net/netfilter/nf_conntrack_core.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ net/bpf/test_run.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
-index 344f882..779ca03 100644
---- a/net/netfilter/nf_conntrack_core.c
-+++ b/net/netfilter/nf_conntrack_core.c
-@@ -1513,7 +1513,7 @@ static bool gc_worker_can_early_drop(const struct nf_conn *ct)
- static void gc_worker(struct work_struct *work)
- {
- 	unsigned int i, hashsz, nf_conntrack_max95 = 0;
--	u32 end_time, start_time = nfct_time_stamp;
-+	u32 end_time, resched_time, start_time = nfct_time_stamp;
- 	struct conntrack_gc_work *gc_work;
- 	unsigned int expired_count = 0;
- 	unsigned long next_run;
-@@ -1536,6 +1536,7 @@ static void gc_worker(struct work_struct *work)
- 	count = gc_work->count;
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index dfb03ee0bb62..1782e83de2cb 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -1269,7 +1269,7 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog, const union bpf_attr *kattr,
+ 		goto free_ctx;
  
- 	end_time = start_time + GC_SCAN_MAX_DURATION;
-+	resched_time = nfct_time_stamp;
+ 	if (kattr->test.data_size_in - meta_sz < ETH_HLEN)
+-		return -EINVAL;
++		goto free_ctx;
  
- 	do {
- 		struct nf_conntrack_tuple_hash *h;
-@@ -1615,7 +1616,10 @@ static void gc_worker(struct work_struct *work)
- 		 * we will just continue with next hash slot.
- 		 */
- 		rcu_read_unlock();
--		cond_resched();
-+		if (nfct_time_stamp - resched_time > msecs_to_jiffies(1)) {
-+			cond_resched();
-+			resched_time = nfct_time_stamp;
-+		}
- 		i++;
- 
- 		delta_time = nfct_time_stamp - end_time;
+ 	data = bpf_test_init(kattr, linear_sz, max_linear_sz, headroom, tailroom);
+ 	if (IS_ERR(data)) {
 -- 
-2.9.4
+2.34.1
 
 
