@@ -1,173 +1,141 @@
-Return-Path: <netdev+bounces-229060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E54FEBD7C91
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:00:32 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74F52BD7CAF
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:02:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0E9FF4FD3B2
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 06:58:15 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9ED8C4F8EFE
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 07:01:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D9AF2D3233;
-	Tue, 14 Oct 2025 06:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8EBF2D5C9E;
+	Tue, 14 Oct 2025 07:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I9vDS8CY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0sIc7ovI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9552773FC
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 06:54:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6B12D5C7A
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 07:01:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760424855; cv=none; b=OphVwv7tUq3uLzJ1rpvSMaq/7BofaFUPFB/h7gZ4ndMasRuaz7s6uwRlXzq2pJ9o40vI9cXr4m78k9bpzYtMLTKn+JmUtRC1tWaikVQcVac3wLyO8IIdLRKIXPqYD2riGpE2KXHzxgkZlqIZj4Z5w19O7+IfIzFZfpI4ANoBVf0=
+	t=1760425281; cv=none; b=iYFMKi7C7m7XIc1Jpb9XMavXIxLJeBzWRQaHLtxy5l+Q0yS7aAE0nXerTfPEInCqo3eDiBibx2cQGpdlNTrTqz6pIdswcvf3W0bqn8wFnAIcFqCgZRKgag9UWb869GCAyB6UcgUtWXXxuGNlIaGKzIKouISlXyvAx8aK/wWt4AY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760424855; c=relaxed/simple;
-	bh=C77vjtoQLp4Ub906Pu9+IX7c5GBfEFPHSL90pMrvDXI=;
+	s=arc-20240116; t=1760425281; c=relaxed/simple;
+	bh=Wbwb1dO1WLDgacw7LIxGfSzHAltEaTQcEfo+u2xdiR0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ssJ1vRu0mA0yy7b/sStLv04QvHaYUkDN9sUBOdRvnJOSuSbKKR+A8TIIVD6rmtC8oaVibNzaV9ThhG65bvm/KiflVPwSqCFXulsnbjf6+9PLieU9Ft+R7BCbjT/t4bk9Y/BvtyXNuE8DYZZJPE+j3Q1NTT01f80AAljmklDioiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I9vDS8CY; arc=none smtp.client-ip=209.85.222.171
+	 To:Cc:Content-Type; b=umUbjlGU3FlXtbdMC0EAFbGcPB1IKSiZu8v6YqMBvJx13i9agf3CCMN7/maXeg5UiC6EYJiJiTHyNHgDFMFkyEnzmJOKl5XC+QaoJiRCjGRbV6T4g3hQDfRwTm0ESP9keT+J8MwNMIGTG9qm2KhiAGoi2uXKt5b/FVjieyT/6aI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0sIc7ovI; arc=none smtp.client-ip=209.85.219.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-86302b5a933so531537485a.0
-        for <netdev@vger.kernel.org>; Mon, 13 Oct 2025 23:54:13 -0700 (PDT)
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-87bf3d1e7faso12923416d6.3
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 00:01:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760424853; x=1761029653; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760425279; x=1761030079; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9RbSXbsYD7yQDx2z0s3W+hp6JpYT4VL+rMoWcRjt0qc=;
-        b=I9vDS8CYrSCLPc3wu5duq/dLRaOHuSvZ8eu2jcuKEI5MjrUC4rc2m+V4BNc353JhlH
-         5TwNkMbQuYP/UFXKoUBgDrlWJcFlasMVnztXg2eGQ9Twl4AS1bZBQr8lrDnKPplPVxXa
-         qSLnoT5rWDukPqD6SmQJ7ExDLULd9IISbMpf1XRQJU1+w2EjVBm2YDQcjpDf9nMQ8Zve
-         TpRsQGuAUTfU6LYnPLfapPVPyWR63fMYQ9NPq0Iiqs34GwRF/MzajN8mMrknSl/tnoCY
-         AklITxKpyWkuSDYZxY0nvDs84GazAliWAhJPmY4n9indDYgQSORomJ/RXLUIvdftlQGg
-         yGnQ==
+        bh=jsQ1m/aFutWkld5ryO0dQSkVhTvtxn9NWV5ydHxepQA=;
+        b=0sIc7ovItMrk1SHyQCqtJaecI9B6M/fPQD2dqAWlweqGfnCV0W25jnvh62vHahej52
+         o4pbavcfvPG2YWbMcDMXAkA5q0yG6fdQjD1nXUWF1sfYpzwXfyggV4hjOMZbrO0+sbZQ
+         IwV5l05rpg9qucMBJ/jHK/LCg3pd2fn7D/suhl75R49OuqQlZ19/jirWnFMPglzorO0F
+         x8KndrjQLfiSwa4ACT62AydDvd8RRV6wnQHphd4aJSq/iwS0dktmcwPi0jKAmismuJ+z
+         Afbw/GcSwH8cWUWbsqVcKRw9xszxKgUdYeiGhA3Go6k+8lMiz0+/uCcLNsDh0agjG/Ay
+         kmxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760424853; x=1761029653;
+        d=1e100.net; s=20230601; t=1760425279; x=1761030079;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9RbSXbsYD7yQDx2z0s3W+hp6JpYT4VL+rMoWcRjt0qc=;
-        b=h+4iEHLKaUMkavXB+JvFegQoQTN1wBIDrxSAh4um+LFtb/vRMmekboY2D2hO5rOrIQ
-         ljwWVMwPQmhhmjyGQBRl7WKmrWSSKutToS3s1zSbWBQlsalkcSOsm6h9hxdlZRP59N7k
-         eFt5B4970KLXM5SS69Pfm40rox04fNxUOZipNYPUaFSh/Sv4lSUgkv46yFyn8qD70hCl
-         d/8FtN63e/5jMYFjrb6Bqe3GT4o7XoBSGdk3+z4td4ZeDmhRi5yWzcSzE0s5ijqq68Se
-         hGdRDMll1CrdTpK/2tOaxr+IWEa9Kab0vjSo43LI09PnumPHFoqkNa75pONdfjnySocX
-         Ctwg==
-X-Forwarded-Encrypted: i=1; AJvYcCVlHc3cSq8vPD0qXwwiR6VaeJxrk7JJsrblSyqzz6yX7kH9ezS6zuKGhjfOOuGf07v9LOqaPX0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMfN0pPDjrqKkmvvfvfNSqYo3r6Xhpn7t9VlH9FJgytVnf0ryq
-	RWApJnktPxFh3p2B+H4t9BTGe8+PRSAIAKdhPMTcZ9bSZWi8TqG9qAULQVgM65D2vLQmaxleEpo
-	1ZSP6mKCr1N9M5xCOdNIDE17is17HgcFS4EKYNSOZ
-X-Gm-Gg: ASbGncvLOZ9bzHQCUpO8JG0ew8NRa7xRYhAsQODoQNpdwyw2eZnYl2MW6aGaRsiscsK
-	WW+KfaC/QoSAMg6LSGcV4DKFh3OacWcFnibIQQkHUf5++7uRRv9sCE4bu29z9EdZL1RoTJ3blzj
-	fpW4J8YQFCJUxsh8JTGGeGDP7znpqrc25o2u22VY4WdDKcqOzDtunZDsU9YsJ+ptRAVItPgzAzL
-	4UBzAk9kT4hgcLo9UfZPbuxrZk0y10Aor8A60Pflvw=
-X-Google-Smtp-Source: AGHT+IH0YIn9KY7F9e5f40eQDfKwPl1GYGI1uOZiMKY5q4lLw5fqv8PJ7OMMrOkkuyoU0YVB5qhLeOvjsHy37jLgN/M=
-X-Received: by 2002:a05:622a:1813:b0:4b6:1a4d:36f6 with SMTP id
- d75a77b69052e-4e6ead8238fmr327480171cf.83.1760424852641; Mon, 13 Oct 2025
- 23:54:12 -0700 (PDT)
+        bh=jsQ1m/aFutWkld5ryO0dQSkVhTvtxn9NWV5ydHxepQA=;
+        b=mjnkOAVtPIsMzphRdrqMfbXpL+qM9cRXsrQqNeZyG2rsJoiugBPjrPGB3qOM4IPr/Q
+         p1aozYYjGmVqlWksYyaO3IaKcXa3+ZoTn6Xn1jUZKMPewu0WUsxc3k/GBaFiV70aiVBK
+         1XZdeZC20+fIWR/Sl/bNxJb2qXVGIybO2ZrO7Vjy5BWcqcKaZqk5vtmGd7a1xeUrtep3
+         eASaMe97euGTHKH3qTr6zobUMfvI7aZ4sgjMGJkJQAwE+/crK1e790ALVkMzhL82H5Da
+         RSMz6qccd6vdyUcRxuMfnOa0fMUixkBIsUi4dkn6IKzRJAffXZnqFj97Q6dCcK088bfa
+         R6dg==
+X-Forwarded-Encrypted: i=1; AJvYcCX8Ir80S79iW7vrR7hXqzxiQafvsLEZsp/79BsZUOPec808cumLiccCQ9oYOk5pWJ1er/+4810=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYpOlbXMAW/vvdeM9HDHu4qmhy5t+yOWit0xpX+2srpvUkPQSy
+	ae/OHbbaxiH5tyfdU7SfwPS0P3J4lO3mpSYHPWw6X5wMI/epfysjp83+9ZnE2RvrKkFcA/kfqW7
+	n+bvmyy/DEiqcTdf90+9UpbBYRKJu5wsaUp2pOCWk
+X-Gm-Gg: ASbGncuiClcuSS+XTbBLc1ia1RYDjNWsyCC3tyJEraHm4Ik2v5PCzpOnsgYEnV4Civj
+	Fn4oYVcC+fb27qUq0y1HFZ3YoQ/Vr1tCox9hGNZg+imqcUVbGYCIOd4GlNj+SDjMxcldTyvVqIU
+	NFqCxfIIeyzBGsjyAMFAs8q7x2V79QrsXuNOZ7PdHk57kGmBtlvJfnFmkCzWRqZvOdewFZ3CP/N
+	iDDjXrmnLocqu6ufJuqWP6mxGhq7p0jbv2l/LDoDjY=
+X-Google-Smtp-Source: AGHT+IHR7KeqfX1q4j3neFi7CD60ffHHvOgtSgSkxcg1JbCbIReg3SIb3TKWDF50WzB6YocPrnOGpWynAn63FWdOqTE=
+X-Received: by 2002:a05:6214:2622:b0:820:a83:ead3 with SMTP id
+ 6a1803df08f44-87b21032994mr371828316d6.23.1760425278145; Tue, 14 Oct 2025
+ 00:01:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251014060454.1841122-1-edumazet@google.com> <aO3voj4IbAoHgDoP@krikkit>
-In-Reply-To: <aO3voj4IbAoHgDoP@krikkit>
+References: <CANn89i+wikOQQrGFXu=L3nKPG62rsBmWer5WpLg5wmBN+RdMqA@mail.gmail.com>
+ <20251014035846.1519-1-21cnbao@gmail.com> <CANn89iKCZyYi+J=5t2sdmvtERnknkwXrGi4QRzM9btYUywkDfw@mail.gmail.com>
+ <CAGsJ_4ySSn6B+x+4zE0Ld1+AM4q-WnS0LfxzWw22oXr7n5NZ=g@mail.gmail.com>
+In-Reply-To: <CAGsJ_4ySSn6B+x+4zE0Ld1+AM4q-WnS0LfxzWw22oXr7n5NZ=g@mail.gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 13 Oct 2025 23:54:00 -0700
-X-Gm-Features: AS18NWA0n86BCSU0SMSu_uQnpyhN9Cz-_DtQqdBWw6t104JvaXPn8lAEAj5qCng
-Message-ID: <CANn89iJ-t1sHTrRKQfnHVa7xyAh2=WYW27PthNGXs3=pSKY+MA@mail.gmail.com>
-Subject: Re: [PATCH net] udp: drop secpath before storing an skb in a receive queue
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Michal Kubecek <mkubecek@suse.cz>
+Date: Tue, 14 Oct 2025 00:01:07 -0700
+X-Gm-Features: AS18NWD5ciaHerlqKb1LSkLizTAcEH7y8M_BZABcYRSz9LQQyJTFiKiNPr9pVjc
+Message-ID: <CANn89i+j_CZM9Q=xTkSq-7cjeRkt29JikD3WqvmPihDrUHBQEQ@mail.gmail.com>
+Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network buffer allocation
+To: Barry Song <21cnbao@gmail.com>
+Cc: corbet@lwn.net, davem@davemloft.net, hannes@cmpxchg.org, horms@kernel.org, 
+	jackmanb@google.com, kuba@kernel.org, kuniyu@google.com, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linyunsheng@huawei.com, mhocko@suse.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, surenb@google.com, v-songbaohua@oppo.com, vbabka@suse.cz, 
+	willemb@google.com, zhouhuacai@oppo.com, ziy@nvidia.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 13, 2025 at 11:37=E2=80=AFPM Sabrina Dubroca <sd@queasysnail.ne=
-t> wrote:
+On Mon, Oct 13, 2025 at 11:43=E2=80=AFPM Barry Song <21cnbao@gmail.com> wro=
+te:
 >
-> 2025-10-14, 06:04:54 +0000, Eric Dumazet wrote:
-> > Michal reported and bisected an issue after recent adoption
-> > of skb_attempt_defer_free() in UDP.
+> > >
+> > > A problem with the existing sysctl is that it only covers the TX path=
+;
+> > > for the RX path, we also observe that kswapd consumes significant pow=
+er.
+> > > I could add the patch below to make it support the RX path, but it fe=
+els
+> > > like a bit of a layer violation, since the RX path code resides in mm
+> > > and is intended to serve generic users rather than networking, even
+> > > though the current callers are primarily network-related.
 > >
-> > We had the same issue for TCP, that Sabrina fixed in commit 9b6412e6979=
-f
-> > ("tcp: drop secpath at the same time as we currently drop dst")
+> > You might have a buggy driver.
 >
-> I'm not convinced this is the same bug. The TCP one was a "leaked"
-> reference (delayed put). This looks more like a double put/missing
-> hold to me (we get to the destroy path without having done the proper
-> delete, which would set XFRM_STATE_DEAD).
+> We are observing the RX path as follows:
 >
-
-Hmm, this was bisected to use of skb_attempt_defer_free(), surely holding
-xfrm in a per-cpu queue looks the same to me.
-
-We also had recent syzbot reports hinting at that.
-
-> And this shouldn't be an issue after b441cf3f8c4b ("xfrm: delete
-> x->tunnel as we delete x").
+> do_softirq
+>     taskset_hi_action
+>        kalPacketAlloc
+>            __netdev_alloc_skb
+>                page_frag_alloc_align
+>                    __page_frag_cache_refill
 >
-> > Many thanks to Michal and Sabrina.
+> This appears to be a fairly common stack.
+>
+> So it is a buggy driver?
+
+No idea, kalPacketAlloc is not in upstream trees.
+
+It apparently needs high order allocations. It will fail at some point.
+
+>
 > >
-> > Fixes: 6471658dc66c ("udp: use skb_attempt_defer_free()")
-> > Reported-and-bisected-by: Michal Kubecek <mkubecek@suse.cz>
-> > Closes: https://lore.kernel.org/netdev/gpjh4lrotyephiqpuldtxxizrsg6job7=
-cvhiqrw72saz2ubs3h@g6fgbvexgl3r/
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > Cc: Sabrina Dubroca <sd@queasysnail.net>
-> > ---
-> >  net/ipv4/udp.c | 2 ++
-> >  1 file changed, 2 insertions(+)
+> > High performance drivers use order-0 allocations only.
 > >
-> > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> > index 95241093b7f0..3f05ee70029c 100644
-> > --- a/net/ipv4/udp.c
-> > +++ b/net/ipv4/udp.c
-> > @@ -1709,6 +1709,8 @@ int __udp_enqueue_schedule_skb(struct sock *sk, s=
-truct sk_buff *skb)
-> >       int dropcount;
-> >       int nb =3D 0;
-> >
-> > +     secpath_reset(skb);
 >
-> See also the comment for udp_try_make_stateless:
->
-> /* all head states (dst, sk, nf conntrack) except skb extensions are
->  * cleared by udp_rcv().
->  *
->  * We need to preserve secpath, if present, to eventually process
->  * IP_CMSG_PASSSEC at recvmsg() time.
->  *
->  * Other extensions can be cleared.
->  */
->
->
-> It looks like this patch would re-introduce the problem fixed by
-> dce4551cb2ad ("udp: preserve head state for IP_CMSG_PASSSEC").
+> Do you have an example of high-performance drivers that use only order-0 =
+memory?
 
-Arg, I tried to not slow down the consumer part, too bad for XFRM then.
+About all drivers using XDP, and/or using napi_get_frags()
 
-What about then :
-
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 95241093b7f0..ac45e4056c51 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1853,6 +1853,7 @@ void skb_consume_udp(struct sock *sk, struct
-sk_buff *skb, int len)
-        if (!skb_shared(skb)) {
-                if (unlikely(udp_skb_has_head_state(skb)))
-                        skb_release_head_state(skb);
-+               secpath_reset(skb);
-                skb_attempt_defer_free(skb);
-                return;
-        }
+XDP has been using order-0 pages from the very beginning.
 
