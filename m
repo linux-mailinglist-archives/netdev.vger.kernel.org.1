@@ -1,200 +1,275 @@
-Return-Path: <netdev+bounces-229364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 687D8BDB33C
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 22:18:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63C91BDB375
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 22:19:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D2BF3A43C5
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 20:18:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A069D19A31D5
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 20:19:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A5130648B;
-	Tue, 14 Oct 2025 20:18:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2B663064A6;
+	Tue, 14 Oct 2025 20:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LTYMvXjj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e37GjW0q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A78305E08
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 20:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4458330595A
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 20:19:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760473081; cv=none; b=Kb4PS2U0/wB4KrfVlb4rBpBU542+uPwwW+Aoe0TbTsuen0FKlY3YJuhwOaf7D5um4fCBO1luu+JXsXt3bJCCL5ygo51XsiMNqwgHK1KVstJJQeVPIbJMzv+FiGvFOyxqsYzhI6Jt3XyqUyTUejqX1oCLu7jWXasIjOEsm61EkcQ=
+	t=1760473160; cv=none; b=VhfsBTCnZL5bFElKpR0Zi+u2bEleHdu5diLpavp5MCuxqUsdQswYz9laFLV0qL9W4EsQT64LCt7X0AJER9+IKg+MCDKkUKQBK02tcoNs7811AghZ3QK8vwrusRqoVEPlZUT3DCi6fESCx14EPFDtqwy5CiiHxdRohv2gE02ayMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760473081; c=relaxed/simple;
-	bh=srKo3S0lx/URRHGbZXp1TkwheQoh4KkTklwf9Xdi4pE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q5oG5GvwiFNJcTHLiLW5RUCwppuvZy74N/polZ3rh3oH7FXdRmRL6q2FofXmlNfYdPsqusI5J/Y0Bo6ZGp3r0GGBYGHHHAmI/pRCrc9mzx4ttGzguLHyYyEkTgtvZjjdaXoHuW17mgq5+D47jLxyg15OGbnh+conOfFuCJPUo44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LTYMvXjj; arc=none smtp.client-ip=209.85.222.173
+	s=arc-20240116; t=1760473160; c=relaxed/simple;
+	bh=s0JAPwQCeNUGqbXiAPfWCILaBU1LL0HgDD6g13LjeAM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=XFR5Tppby+H2RNCR9xWN+f4Er5Ghpl76+GocDX3jdrKhmp5rKBI9puO4deiU/acnBJnWABXfxoIvyfjbnx2ybgjWOlxkSOOnzwyg6WOlMU39mSqPuyNHZWSPyd2/0idPuAOVRPp0ybbYLD5IuwlwOBbeCeimiNP6PRiNOR9nPPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e37GjW0q; arc=none smtp.client-ip=209.85.222.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-859b2ec0556so832810285a.0
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 13:17:59 -0700 (PDT)
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-8887f30f162so404794985a.1
+        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 13:19:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760473079; x=1761077879; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1760473157; x=1761077957; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bT/7SpttvoyPFfDZkD0MSIyAHcwC7WHYJHOJLI1G790=;
-        b=LTYMvXjjsk5yZMqLtZFv1oNQEC6A6bVCAakPhssE187+bc+fEr0LXwuk06TmbzfGpe
-         RtL8h7b4pzM8QorMiRrT0Ohiatyzh4XfkPMd5ssVwXvDj5BolNznHQOW0kdSJAwRRnka
-         aCIDMw7xxOIlg4m15853s8kYoBFlfOyItCCfUL8NoIvO50X0rHssSekCKqXmpadw5NS3
-         kFZHP3x04NJcHjcLR5oCqvS6jf93na+0jNZ6aPD+V7OHt5MeQK8Ml+XvQcjHD03+pks4
-         OwXM0acPnZN8Abk6eogZmd6TfrBY1R2IbozIU7CFx+ScFpalCnwQ1XiBF1r5VofL6Ng6
-         shWg==
+        bh=XzdiCHYIj0Cjw5czi/OLW10sC7byu6chts+eoAZd97A=;
+        b=e37GjW0qhUoLe4/ODld1XwNA36J4zBCG9BI3DXqp/Xrxr7rzpxzZeYu1ona+gZ8Yq8
+         +ItcovZ+tdb2ACXV26/NPQC435tAIQXr/EJeHD2ZvJlmhZ7to9fvTT+EamdndFZzBNJp
+         ZHMOulzO7hE8GHYYcWwC9dykOAEWU6Szbr5ROtKgQ9405NA173X9+iXvVZoci3x0PAkq
+         YrtF5uHkhkDcbjJb6yCD8c6iXPc+/1uYT96ogbA7uzX+ST7xdoRDPbqn7s0UbclwHIcs
+         Rx1guASJ1DTLmvC8t1e4dOpQK4z0u43zYKOjkSNGM/G5dK1vuPtw5/OTDKEgqHrOuP1o
+         UY1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760473079; x=1761077879;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bT/7SpttvoyPFfDZkD0MSIyAHcwC7WHYJHOJLI1G790=;
-        b=KnNJ/6cqtB/27cC3jcBKpoI2PbPNPx1/On5Y0vHqalszL76kJ/sOtxGxxrxERJMxgw
-         Sv3IPxzhysTxBbRwqAZ5tppobR+AzRfJZTSZGIl5H48hpXPRdA6ZNulnukMalHRR3QbG
-         d3FE0o8jq0sUuEjPcMqyLJyBpIPdDzq2fQyM1nU4zTcdAquK8/VWitDPAqNbuoeCBixo
-         pXmiOsqfe9HUAnobxXGjsBqh2AF/hi7Uf8Md+cn/DUlBSN6z+iglGjHG1N0YY2Pj/eO1
-         IFMf2NmXcjttGrYULumffmAJuK3aLfbN7VsIIz/+q3vAETxpWqTdxIsCPuip7zwjqYlh
-         ehrg==
-X-Forwarded-Encrypted: i=1; AJvYcCXG49SqrMOqyf7ciTBeqm5nbMEfiJPq04g3jBHJ3d3WZYLZPvaCxe7JtQvqkTHZW0jnEwZsnK8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwL13iDVMz9uQcEC/M8pjNldOoclsp9Qf/vSK9T/WU4xpALU7oJ
-	OCRvBJ9tunNBLl89mtRC4x+C5vWQQyZAN141SU4mj4HMko3PmPLrI5hGsvU4WKZ83qOGRBwsqJQ
-	+joV262KVjWv+L9NOpnqYnsHrQChQUyQ=
-X-Gm-Gg: ASbGncvkyx2UVH/dsxSlSA1YWMINP7ooY1l7OCMM6d5ZxZBYs7/V9iy2SFvYTeXTlT2
-	obaZIeQ79XJXOT7wSE9eIMRCW15XY4CnpYG1nKBunr5VUF/yrmiLgZneD3sIQBjeefeCDf0eNVL
-	oswI+vXmr+8AHo1TOgdm5VY6U1NuQ1GUvwiPxdEoWd9Df+YGIQ4swOb6yRj1yFKSkAmBQidS0Vb
-	wn1kc8UUMQ2oSsIrOToN42sUKanRdBNHncXWvCWZBKxW6sSZ/JVaecqdub4V4wiqm6F
-X-Google-Smtp-Source: AGHT+IFH4oKwfJUV2I14NgjtJXb6mfnAhJ8zEp3LCF9Bae6duG9Q+7fuIKrLdNF8ldj1eCYSNIUxprx9xOI5hm+x8qg=
-X-Received: by 2002:a05:620a:1aa7:b0:863:42ea:d687 with SMTP id
- af79cd13be357-88352d9a142mr3213016685a.78.1760473078522; Tue, 14 Oct 2025
- 13:17:58 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760473157; x=1761077957;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XzdiCHYIj0Cjw5czi/OLW10sC7byu6chts+eoAZd97A=;
+        b=w+tNrbf/KGv5v/PFtMZOvfHpHvgOyNdvcX0y5tutMjpYq51a9FK+IaRhRrzhVikZCX
+         7HC5tQrKKtkvpisk7J6KfXwvZ7uH8YpOQv6ePgUv7lIayQ/rJWiuxLWi7vip6EfLDeNn
+         a7nYYAKnKptZMyCNKZ9/MW3COEVpI3WcJUSOrNW7snlpSnPcB2kpWu4KLmVjlLBtKZkj
+         EY6ywzDk/pZNddtJKpL/TxNGGLtkub9Vc88MRmOnKMJhybQ9wQPCqgss5soqT63JXx0P
+         OMxSPEM9VXH7q6WEUGbjUdsyOxlf3W2ep7fAErgDE/mwGZq++JNmlKhyty8iBMXbbUlc
+         MJMg==
+X-Gm-Message-State: AOJu0Yz7mvAoq5qsWf0lp+h4ujYTPIyIvcZG8XGbiv+pMRC8vptJQxHk
+	HqNeA6WzOvRj1dgw2ww9JT9WWsQ0IFuaQZ3KyY5Rv1vu3XF40xv1bgDeMrs6eQ==
+X-Gm-Gg: ASbGncvul/615d7zRd+UlLMpD0QXv6AF+zCEizEQvH+ukAeh+dYLY8TqqNoHygO79CI
+	NzTjqzxFrStrlgjqHSj+PM0LSnnruFXXeXANk3523cQEVyWKYxq8Hca1JKa+10Wmb1QeIdaWCE8
+	pNAESGAJfFaI20ZN2v8waVr3oMRBhJq6TWg2rgneXamPDRUzqMEPgLkDAWuE4o/Tsphowo77gby
+	bS9KdiCKRCFzNtYu2Ag8g4i0Lrimdk8ko45EYFgeNARFD0MBOk8amGT9TfUj48zN5D1xrKocz+t
+	g4pN3IcZI2LukEbQEenozdWeDCaNC5g2oO9oCmdpd65yPDS5+pYY4sFN0EB3InVhblpLs9Jp4cp
+	ebjine+CGw+SdYRcQ6AVwA1P4ViFBjzx/t5CO1HRLAD5iEOsnAKAa38OuehixlpX3WI83Y1jCUp
+	z9qTQux5kaVm943Q0rTHuOhw8=
+X-Google-Smtp-Source: AGHT+IG60iLHa2EMec/dE36AehmNsjVJtbZbTViDb8TsMFWdu0WsUPcrps5EfQNTLTL8ck1FgSdveQ==
+X-Received: by 2002:a05:620a:1a83:b0:85e:3ab2:9627 with SMTP id af79cd13be357-88353b2a836mr3565355985a.60.1760473157034;
+        Tue, 14 Oct 2025 13:19:17 -0700 (PDT)
+Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-884a2273e9dsm1260522285a.47.2025.10.14.13.19.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Oct 2025 13:19:16 -0700 (PDT)
+Date: Tue, 14 Oct 2025 16:19:15 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ Harshitha Ramamurthy <hramamurthy@google.com>
+Cc: netdev@vger.kernel.org, 
+ joshwash@google.com, 
+ andrew+netdev@lunn.ch, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ willemb@google.com, 
+ pkaligineedi@google.com, 
+ jfraker@google.com, 
+ ziweixiao@google.com, 
+ thostet@google.com, 
+ linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.37111d2d67443@gmail.com>
+In-Reply-To: <CANn89iKOK9GyjQ_s_eo5XNugHARSRoeeu2c1muhBj8oxYL6UEQ@mail.gmail.com>
+References: <20251014004740.2775957-1-hramamurthy@google.com>
+ <CANn89iKOK9GyjQ_s_eo5XNugHARSRoeeu2c1muhBj8oxYL6UEQ@mail.gmail.com>
+Subject: Re: [PATCH net] gve: Check valid ts bit on RX descriptor before hw
+ timestamping
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251013101636.69220-1-21cnbao@gmail.com> <aO11jqD6jgNs5h8K@casper.infradead.org>
- <CAGsJ_4x9=Be2Prbjia8-p97zAsoqjsPHkZOfXwz74Z_T=RjKAA@mail.gmail.com>
- <CANn89iJpNqZJwA0qKMNB41gKDrWBCaS+CashB9=v1omhJncGBw@mail.gmail.com>
- <CAGsJ_4xGSrfori6RvC9qYEgRhVe3bJKYfgUM6fZ0bX3cjfe74Q@mail.gmail.com>
- <CANn89iKSW-kk-h-B0f1oijwYiCWYOAO0jDrf+Z+fbOfAMJMUbA@mail.gmail.com>
- <CAGsJ_4wJHpD10ECtWJtEWHkEyP67sNxHeivkWoA5k5++BCfccA@mail.gmail.com> <CANn89iKC_y6Fae9E5ETOE46y-RCqD6cLHnp=7GynL_=sh3noKg@mail.gmail.com>
-In-Reply-To: <CANn89iKC_y6Fae9E5ETOE46y-RCqD6cLHnp=7GynL_=sh3noKg@mail.gmail.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Wed, 15 Oct 2025 04:17:44 +0800
-X-Gm-Features: AS18NWA_1i8a6vTg05EcWS4a7WFXDki8J6oo80AKS6W-CO7YvxmVpyAKLiA8th8
-Message-ID: <CAGsJ_4x5v=M0=jYGOqy1rHL9aVg-76OgiE0qQMdEu70FhZcmUg@mail.gmail.com>
-Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network buffer allocation
-To: Eric Dumazet <edumazet@google.com>
-Cc: Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org, linux-mm@kvack.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Barry Song <v-songbaohua@oppo.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Vlastimil Babka <vbabka@suse.cz>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
-	Brendan Jackman <jackmanb@google.com>, Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Huacai Zhou <zhouhuacai@oppo.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 14, 2025 at 6:39=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Tue, Oct 14, 2025 at 3:19=E2=80=AFAM Barry Song <21cnbao@gmail.com> wr=
-ote:
+Eric Dumazet wrote:
+> On Mon, Oct 13, 2025 at 5:47=E2=80=AFPM Harshitha Ramamurthy
+> <hramamurthy@google.com> wrote:
 > >
-> > > >
-> > > > >
-> > > > > I think you are missing something to control how much memory  can=
- be
-> > > > > pushed on each TCP socket ?
-> > > > >
-> > > > > What is tcp_wmem on your phones ? What about tcp_mem ?
-> > > > >
-> > > > > Have you looked at /proc/sys/net/ipv4/tcp_notsent_lowat
-> > > >
-> > > > # cat /proc/sys/net/ipv4/tcp_wmem
-> > > > 524288  1048576 6710886
-> > >
-> > > Ouch. That is insane tcp_wmem[0] .
-> > >
-> > > Please stick to 4096, or risk OOM of various sorts.
-> > >
-> > > >
-> > > > # cat /proc/sys/net/ipv4/tcp_notsent_lowat
-> > > > 4294967295
-> > > >
-> > > > Any thoughts on these settings?
-> > >
-> > > Please look at
-> > > https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
-> > >
-> > > tcp_notsent_lowat - UNSIGNED INTEGER
-> > > A TCP socket can control the amount of unsent bytes in its write queu=
-e,
-> > > thanks to TCP_NOTSENT_LOWAT socket option. poll()/select()/epoll()
-> > > reports POLLOUT events if the amount of unsent bytes is below a per
-> > > socket value, and if the write queue is not full. sendmsg() will
-> > > also not add new buffers if the limit is hit.
-> > >
-> > > This global variable controls the amount of unsent data for
-> > > sockets not using TCP_NOTSENT_LOWAT. For these sockets, a change
-> > > to the global variable has immediate effect.
-> > >
-> > >
-> > > Setting this sysctl to 2MB can effectively reduce the amount of memor=
-y
-> > > in TCP write queues by 66 %,
-> > > or allow you to increase tcp_wmem[2] so that only flows needing big
-> > > BDP can get it.
+> > From: Tim Hostetler <thostet@google.com>
 > >
-> > We obtained these settings from our hardware vendors.
->
-> Tell them they are wrong.
-
-Well, we checked Qualcomm and MTK, and it seems both set these values
-relatively high. In other words, all the AOSP products we examined also
-use high values for these settings. Nobody is using tcp_wmem[0]=3D4096.
-
-We=E2=80=99ll need some time to understand why these are configured this wa=
-y in
-AOSP hardware.
-
->
+> > The device returns a valid bit in the LSB of the low timestamp byte i=
+n
+> > the completion descriptor that the driver should check before
+> > setting the SKB's hardware timestamp. If the timestamp is not valid, =
+do not
+> > hardware timestamp the SKB.
 > >
-> > It might be worth exploring these settings further, but I can=E2=80=99t=
- quite see
-> > their connection to high-order allocations, since high-order allocation=
-s are
-> > kernel macros.
+> > Cc: stable@vger.kernel.org
+> > Fixes: b2c7aeb49056 ("gve: Implement ndo_hwtstamp_get/set for RX time=
+stamping")
+> > Reviewed-by: Joshua Washington <joshwash@google.com>
+> > Signed-off-by: Tim Hostetler <thostet@google.com>
+> > Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> > ---
+> >  drivers/net/ethernet/google/gve/gve.h          |  2 ++
+> >  drivers/net/ethernet/google/gve/gve_desc_dqo.h |  3 ++-
+> >  drivers/net/ethernet/google/gve/gve_rx_dqo.c   | 18 ++++++++++++----=
+--
+> >  3 files changed, 16 insertions(+), 7 deletions(-)
 > >
-> > #define SKB_FRAG_PAGE_ORDER     get_order(32768)
-> > #define PAGE_FRAG_CACHE_MAX_SIZE        __ALIGN_MASK(32768, ~PAGE_MASK)
-> > #define PAGE_FRAG_CACHE_MAX_ORDER       get_order(PAGE_FRAG_CACHE_MAX_S=
-IZE)
+> > diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethe=
+rnet/google/gve/gve.h
+> > index bceaf9b05cb4..4cc6dcbfd367 100644
+> > --- a/drivers/net/ethernet/google/gve/gve.h
+> > +++ b/drivers/net/ethernet/google/gve/gve.h
+> > @@ -100,6 +100,8 @@
+> >   */
+> >  #define GVE_DQO_QPL_ONDEMAND_ALLOC_THRESHOLD 96
 > >
-> > Is there anything I=E2=80=99m missing?
->
-> What is your question exactly ? You read these macros just fine. What
-> is your point ?
+> > +#define GVE_DQO_RX_HWTSTAMP_VALID 0x1
+> > +
+> >  /* Each slot in the desc ring has a 1:1 mapping to a slot in the dat=
+a ring */
+> >  struct gve_rx_desc_queue {
+> >         struct gve_rx_desc *desc_ring; /* the descriptor ring */
+> > diff --git a/drivers/net/ethernet/google/gve/gve_desc_dqo.h b/drivers=
+/net/ethernet/google/gve/gve_desc_dqo.h
+> > index d17da841b5a0..f7786b03c744 100644
+> > --- a/drivers/net/ethernet/google/gve/gve_desc_dqo.h
+> > +++ b/drivers/net/ethernet/google/gve/gve_desc_dqo.h
+> > @@ -236,7 +236,8 @@ struct gve_rx_compl_desc_dqo {
+> >
+> >         u8 status_error1;
+> >
+> > -       __le16 reserved5;
+> > +       u8 reserved5;
+> > +       u8 ts_sub_nsecs_low;
+> >         __le16 buf_id; /* Buffer ID which was sent on the buffer queu=
+e. */
+> >
+> >         union {
+> > diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/n=
+et/ethernet/google/gve/gve_rx_dqo.c
+> > index 7380c2b7a2d8..02e25be8a50d 100644
+> > --- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+> > +++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+> > @@ -456,14 +456,20 @@ static void gve_rx_skb_hash(struct sk_buff *skb=
+,
+> >   * Note that this means if the time delta between packet reception a=
+nd the last
+> >   * clock read is greater than ~2 seconds, this will provide invalid =
+results.
+> >   */
+> > -static void gve_rx_skb_hwtstamp(struct gve_rx_ring *rx, u32 hwts)
+> > +static void gve_rx_skb_hwtstamp(struct gve_rx_ring *rx,
+> > +                               const struct gve_rx_compl_desc_dqo *d=
+esc)
+> >  {
+> >         u64 last_read =3D READ_ONCE(rx->gve->last_sync_nic_counter);
+> >         struct sk_buff *skb =3D rx->ctx.skb_head;
+> > -       u32 low =3D (u32)last_read;
+> > -       s32 diff =3D hwts - low;
+> > -
+> > -       skb_hwtstamps(skb)->hwtstamp =3D ns_to_ktime(last_read + diff=
+);
+> > +       u32 ts, low;
+> > +       s32 diff;
+> > +
+> > +       if (desc->ts_sub_nsecs_low & GVE_DQO_RX_HWTSTAMP_VALID) {
+> > +               ts =3D le32_to_cpu(desc->ts);
+> > +               low =3D (u32)last_read;
+> > +               diff =3D ts - low;
+> > +               skb_hwtstamps(skb)->hwtstamp =3D ns_to_ktime(last_rea=
+d + diff);
+> > +       }
+> =
 
-My question is whether these settings influence how often high-order
-allocations occur. In other words, would lowering these values make
-high-order allocations less frequent? If so, why?
-I=E2=80=99m not a network expert, apologies if the question sounds naive.
+> If (desc->ts_sub_nsecs_low & GVE_DQO_RX_HWTSTAMP_VALID) can vary among
+> all packets received on this queue,
+> I will suggest you add an
+> =
 
->
-> We had in the past something dynamic that we removed
->
-> commit d9b2938aabf757da2d40153489b251d4fc3fdd18
-> Author: Eric Dumazet <edumazet@google.com>
-> Date:   Wed Aug 27 20:49:34 2014 -0700
->
->     net: attempt a single high order allocation
+>         else {
+>                  skb_hwtstamps(skb)->hwtstamp =3D 0;
+>         }
+> =
 
-Thanks
-Barry
+> This is because napi_reuse_skb() does not currently clear this field.
+> =
+
+> So if a prior skb had hwtstamp set to a timestamp, then merged in GRO,
+> and recycled, we have the risk of reusing an old timestamp
+> if GVE_DQO_RX_HWTSTAMP_VALID is unset.
+> =
+
+> We could also handle this generically, at the cost of one extra
+> instruction in the fast path.
+
+That would be safest. This may not be limited to GVE.
+
+NICs supporting line rate timestamping is not universal. Older devices
+predominantly aim to support low rate PTP messages AFAIK.
+
+On the Tx path there are known rate limits to the number of packets
+that some can timestamp, e.g., because of using PHY registers.
+
+On the Rx path packets are selected by filters such as
+HWTSTAMP_FILTER_PTP_V2_L2_SYNC. But its not guaranteed that these can
+be matched and timestamped at any rate? Essentially trusting that no
+more PTP packets arrive than the device can timestamp.
+
+e1000e_rx_hwtstamp is a good example. It has a descriptor bit whether
+a packet was timestamped, similar to GVE. And only supports a single
+outstanding request:
+
+        /* The Rx time stamp registers contain the time stamp.  No other
+         * received packet will be time stamped until the Rx time stamp
+         * registers are read.  Because only one packet can be time stamp=
+ed
+         * at a time, the register values must belong to this packet and
+         * therefore none of the other additional attributes need to be
+         * compared.
+         */
+
+Perhaps not the best example as it does not use napi_reuse_skb. I
+thought of too late ;) But there are quite likely more.
+ =
+
+> =
+
+> >  }
+> >
+> >  static void gve_rx_free_skb(struct napi_struct *napi, struct gve_rx_=
+ring *rx)
+> > @@ -919,7 +925,7 @@ static int gve_rx_complete_skb(struct gve_rx_ring=
+ *rx, struct napi_struct *napi,
+> >                 gve_rx_skb_csum(rx->ctx.skb_head, desc, ptype);
+> >
+> >         if (rx->gve->ts_config.rx_filter =3D=3D HWTSTAMP_FILTER_ALL)
+> > -               gve_rx_skb_hwtstamp(rx, le32_to_cpu(desc->ts));
+> > +               gve_rx_skb_hwtstamp(rx, desc);
+> >
+> >         /* RSC packets must set gso_size otherwise the TCP stack will=
+ complain
+> >          * that packets are larger than MTU.
+> > --
+> > 2.51.0.740.g6adb054d12-goog
+> >
+
+
 
