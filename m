@@ -1,103 +1,103 @@
-Return-Path: <netdev+bounces-229333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF41EBDABEC
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 19:13:20 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF841BDABD3
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 19:09:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37C373E833A
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:13:19 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4BCF94F06E7
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 17:09:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8A692F49F8;
-	Tue, 14 Oct 2025 17:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CD5304BD8;
+	Tue, 14 Oct 2025 17:09:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="sDBydC1F"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ix1n2ti2"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 338C0242D97
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 17:13:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4FB3043B3;
+	Tue, 14 Oct 2025 17:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760461995; cv=none; b=T0KrPQbkge/TMAfv8dhCFgT/QHXOaLQqXcZ0V1+ujXTj6zG4k6d3hiEs5W4U8bNqeZdJbrPSJmwe1a+km/6VLkO6A1l7ZXea5kQ88xBE9LJhwyQuPz7KuMhkiLIgC7aqMSAf0tzZcY9vfuew6soY/mBiDXG1rSomOrZvvsVhx+Y=
+	t=1760461751; cv=none; b=P+Bhw7o4sHQ8KcVbaSuYjIODJ/BorPRzAjhlWuLHXZzWqpqT5D4XLdkiPBvwYJ2pw05z2GIOo84EIEfZHJU6dlumq7Y1MkL8l9Ma9Dgb9nea0xvi/mVkAQyo0qR/dAPiN0mt3hL3VWlAH1kDH+qLPsw5fklCUz757TnAaO77n0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760461995; c=relaxed/simple;
-	bh=NuAsb1w8NLgDS8QqD1VxcmP2E+E2Rik3hj4154+lvbs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YWvwQ4Ou+acMeFLq8rCnaOZAkvyZJzUUjT3KLezvrkDp3c1F5gy9Mmbsj1fbSN5I+yByIDnIF9fiAqo3/hvOfZ7xeQ+d65SPZrx9S7dQhlNisPaLK1RxdAR03l7pqyiRhSz+btQ4uZWfgBrSsUbVjRduyvUMCZKPqNnchcRtrpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=sDBydC1F; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from ubuntu.home (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 353E7200A8C0;
-	Tue, 14 Oct 2025 19:07:07 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 353E7200A8C0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1760461627;
-	bh=zFLurzG9VYw7z45KhSzX6d66KojjsftffxwY34E068Y=;
-	h=From:To:Cc:Subject:Date:From;
-	b=sDBydC1FHmOaoA9sfUfzEwD09A39ZWKEuaptM8VvxZ2AItKgeYbQxLuBqkqNmN3rV
-	 5udIlyjzao+0oMFZpLivHGzYoI1kCZ+HkwLoflE3USIVZsKMcy6UY6LAcm2WiU4pSM
-	 /omlqxvIJChG3UmYPCe8NfDMO6JRyQHx71WbEV4UHI+8G0WAXjhQeF/chf+Pq6PQKF
-	 qWi/iZWO5zLlc+nLcHUQMI9XnOI1ZKpjYmHflM+GDC9Ul2YcALXMS7qQRFmftkTTXH
-	 Kh0eSeHW1sNS9QVQKdP5b+oIkU4l4awjAr2cr7Y4hgloFcCtjAF8FdhgFXYOl1FoRO
-	 G+4Zlgd1TXnQQ==
-From: Justin Iurman <justin.iurman@uliege.be>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	justin.iurman@uliege.be
-Subject: [PATCH net-next] MAINTAINERS: new entry for IPv6 IOAM
-Date: Tue, 14 Oct 2025 19:06:50 +0200
-Message-Id: <20251014170650.27679-1-justin.iurman@uliege.be>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1760461751; c=relaxed/simple;
+	bh=D5RNv6Lympg2EKcNdy//QfQ4OP1+anSrTZWzx6lRuhk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VOIPDVFYS5Qp5XcfMIMSkjSoYaJbf/MZkGex0ajlNU3ZWLo1Vu2ceBXkePxvul13n5XEWV8cQhin+u/0bVYC0z/ddPhwMBxpwji4c06kv+gUTvRB4Ol7VVwqJKcQEtIBO/W5sbWbMIi3ff5L+t7tRY5J5WsW/jD8fMtN52R9Hsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ix1n2ti2; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=akANej3KnfR5Xc6slbiz9S+LMJbfcs8ehgT6M3+S6Yk=; b=ix1n2ti2DG9FaABLNWgSrQDGXI
+	DwHazrHX/96rMxm96KA2xk1NIdXbB7uHtfXKD/zhXcDilhen6ATndJwA9j4Qpg2zZDsyHMycsJl20
+	WHSjgtg+1UW0rZ98E+8XKKo49C0s9gZ9eou2HhsAa1QuoqT2yYRcqSoW1uwRRWoBZS9Ws+q7CFm9G
+	omLZE6VUje0oait9q8HgM0JSaWmjuiYfUsoxac8stuXtaMfQ2ROz4kqu/G75/MOSJ5OmpApixKikx
+	C16Lh8AaksqaKwsmqMaQu8BZchg5J5BJNn5efXv4ct1rmsfbedLcECD7osHx8CTQyrlSF5t4w9ZcU
+	b2chNtWQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60862)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1v8iVt-000000003an-33Dr;
+	Tue, 14 Oct 2025 18:08:41 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1v8iVn-000000001Sp-174h;
+	Tue, 14 Oct 2025 18:08:35 +0100
+Date: Tue, 14 Oct 2025 18:08:35 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Yao Zi <ziyao@disroot.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Frank <Frank.Sae@motor-comm.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
+	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH net-next 2/4] net: phy: motorcomm: Support YT8531S PHY in
+ YT6801 Ethernet controller
+Message-ID: <aO6Dk0rK0nobGClc@shell.armlinux.org.uk>
+References: <20251014164746.50696-2-ziyao@disroot.org>
+ <20251014164746.50696-4-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251014164746.50696-4-ziyao@disroot.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Create a maintainer entry for IPv6 IOAM. Add myself as I authored most
-if not all of the IPv6 IOAM code in the kernel and actively participate
-in the related IETF groups.
+On Tue, Oct 14, 2025 at 04:47:45PM +0000, Yao Zi wrote:
+> YT6801's internal PHY is confirmed as a GMII-capable variant of YT8531S
+> by a previous series[1] and reading PHY ID. Add support for
+> PHY_INTERFACE_MODE_INTERNAL for YT8531S to allow the Ethernet driver to
+> reuse the PHY code for its internal PHY.
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
----
- MAINTAINERS | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+If it's known to be connected via a GMII interface, even if it's on the
+SoC, please use PHY_INTERFACE_MODE_GMII in preference to
+PHY_INTERFACE_MODE_INTERNAL. PHY_INTERFACE_MODE_INTERNAL is really for
+"we don't know what the internal interface is".
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3a27901781c2..95b1e5054ea0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -18011,6 +18011,16 @@ X:	net/rfkill/
- X:	net/wireless/
- X:	tools/testing/selftests/net/can/
- 
-+NETWORKING [IOAM]
-+M:	Justin Iurman <justin.iurman@uliege.be>
-+S:	Maintained
-+F:	Documentation/networking/ioam6*
-+F:	include/linux/ioam6*
-+F:	include/net/ioam6*
-+F:	include/uapi/linux/ioam6*
-+F:	net/ipv6/ioam6*
-+F:	tools/testing/selftests/net/ioam6*
-+
- NETWORKING [IPSEC]
- M:	Steffen Klassert <steffen.klassert@secunet.com>
- M:	Herbert Xu <herbert@gondor.apana.org.au>
+Thanks.
+
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
