@@ -1,141 +1,157 @@
-Return-Path: <netdev+bounces-229061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74F52BD7CAF
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:02:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CC05BD7CC7
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:05:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9ED8C4F8EFE
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 07:01:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 158914ED322
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 07:05:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8EBF2D5C9E;
-	Tue, 14 Oct 2025 07:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866E62D3733;
+	Tue, 14 Oct 2025 07:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0sIc7ovI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DuY3hCJF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6B12D5C7A
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 07:01:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C599216DC28
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 07:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760425281; cv=none; b=iYFMKi7C7m7XIc1Jpb9XMavXIxLJeBzWRQaHLtxy5l+Q0yS7aAE0nXerTfPEInCqo3eDiBibx2cQGpdlNTrTqz6pIdswcvf3W0bqn8wFnAIcFqCgZRKgag9UWb869GCAyB6UcgUtWXXxuGNlIaGKzIKouISlXyvAx8aK/wWt4AY=
+	t=1760425513; cv=none; b=R/ZsVjQV5ZUyd1CWQ4pogcmply22Fbcup9yWFWsL2VJOW4Tr1g9Mj5YZi3qMXEN0FAGBRvl2G62Bwi5gWrTAz+QTFBK3JsHHGQx/BcBH8cDMAXqowo0bR2C121Uw7oK5veIkQZZ7UguPPZxv0HESopRbGpCSQbrlYm5hOli6RPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760425281; c=relaxed/simple;
-	bh=Wbwb1dO1WLDgacw7LIxGfSzHAltEaTQcEfo+u2xdiR0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=umUbjlGU3FlXtbdMC0EAFbGcPB1IKSiZu8v6YqMBvJx13i9agf3CCMN7/maXeg5UiC6EYJiJiTHyNHgDFMFkyEnzmJOKl5XC+QaoJiRCjGRbV6T4g3hQDfRwTm0ESP9keT+J8MwNMIGTG9qm2KhiAGoi2uXKt5b/FVjieyT/6aI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0sIc7ovI; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-87bf3d1e7faso12923416d6.3
-        for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 00:01:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760425279; x=1761030079; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jsQ1m/aFutWkld5ryO0dQSkVhTvtxn9NWV5ydHxepQA=;
-        b=0sIc7ovItMrk1SHyQCqtJaecI9B6M/fPQD2dqAWlweqGfnCV0W25jnvh62vHahej52
-         o4pbavcfvPG2YWbMcDMXAkA5q0yG6fdQjD1nXUWF1sfYpzwXfyggV4hjOMZbrO0+sbZQ
-         IwV5l05rpg9qucMBJ/jHK/LCg3pd2fn7D/suhl75R49OuqQlZ19/jirWnFMPglzorO0F
-         x8KndrjQLfiSwa4ACT62AydDvd8RRV6wnQHphd4aJSq/iwS0dktmcwPi0jKAmismuJ+z
-         Afbw/GcSwH8cWUWbsqVcKRw9xszxKgUdYeiGhA3Go6k+8lMiz0+/uCcLNsDh0agjG/Ay
-         kmxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760425279; x=1761030079;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jsQ1m/aFutWkld5ryO0dQSkVhTvtxn9NWV5ydHxepQA=;
-        b=mjnkOAVtPIsMzphRdrqMfbXpL+qM9cRXsrQqNeZyG2rsJoiugBPjrPGB3qOM4IPr/Q
-         p1aozYYjGmVqlWksYyaO3IaKcXa3+ZoTn6Xn1jUZKMPewu0WUsxc3k/GBaFiV70aiVBK
-         1XZdeZC20+fIWR/Sl/bNxJb2qXVGIybO2ZrO7Vjy5BWcqcKaZqk5vtmGd7a1xeUrtep3
-         eASaMe97euGTHKH3qTr6zobUMfvI7aZ4sgjMGJkJQAwE+/crK1e790ALVkMzhL82H5Da
-         RSMz6qccd6vdyUcRxuMfnOa0fMUixkBIsUi4dkn6IKzRJAffXZnqFj97Q6dCcK088bfa
-         R6dg==
-X-Forwarded-Encrypted: i=1; AJvYcCX8Ir80S79iW7vrR7hXqzxiQafvsLEZsp/79BsZUOPec808cumLiccCQ9oYOk5pWJ1er/+4810=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYpOlbXMAW/vvdeM9HDHu4qmhy5t+yOWit0xpX+2srpvUkPQSy
-	ae/OHbbaxiH5tyfdU7SfwPS0P3J4lO3mpSYHPWw6X5wMI/epfysjp83+9ZnE2RvrKkFcA/kfqW7
-	n+bvmyy/DEiqcTdf90+9UpbBYRKJu5wsaUp2pOCWk
-X-Gm-Gg: ASbGncuiClcuSS+XTbBLc1ia1RYDjNWsyCC3tyJEraHm4Ik2v5PCzpOnsgYEnV4Civj
-	Fn4oYVcC+fb27qUq0y1HFZ3YoQ/Vr1tCox9hGNZg+imqcUVbGYCIOd4GlNj+SDjMxcldTyvVqIU
-	NFqCxfIIeyzBGsjyAMFAs8q7x2V79QrsXuNOZ7PdHk57kGmBtlvJfnFmkCzWRqZvOdewFZ3CP/N
-	iDDjXrmnLocqu6ufJuqWP6mxGhq7p0jbv2l/LDoDjY=
-X-Google-Smtp-Source: AGHT+IHR7KeqfX1q4j3neFi7CD60ffHHvOgtSgSkxcg1JbCbIReg3SIb3TKWDF50WzB6YocPrnOGpWynAn63FWdOqTE=
-X-Received: by 2002:a05:6214:2622:b0:820:a83:ead3 with SMTP id
- 6a1803df08f44-87b21032994mr371828316d6.23.1760425278145; Tue, 14 Oct 2025
- 00:01:18 -0700 (PDT)
+	s=arc-20240116; t=1760425513; c=relaxed/simple;
+	bh=cTS3kltvXa9vuH/ZPoAtdRrh6V8hozTmr0+a02pB0xI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UEKsNXmJNkb1MV7vT1xgmc+pjHyJ8/ZfKLrAkHuG6bHZg9JpuxtdfXtZGOMCF35wR/cATTAjufexhpU3hs+NqgG8C20iHlrTwBXdg+PUaUCQG2BzN/yaMm3hwmUSPynCImEtf9IbLmMTPSWM9JftC8clcD6SC+JDJZzcx/yf7fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DuY3hCJF; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760425512; x=1791961512;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cTS3kltvXa9vuH/ZPoAtdRrh6V8hozTmr0+a02pB0xI=;
+  b=DuY3hCJF16S/lc2+zv148cZwNXRN0uei4Iwg80qWp588fZEpg4djnRHl
+   2wm+jzZSjfyB20tDNx/hE9THTK8pcpsh8A3qDmhLFedWfFB08DF11J7g8
+   4msCElrTGx+Edn3zp8TrBwrzSXooBoBWLt+Qg45HoefUbHaa3m2ftEub9
+   aeQsoMade8YOkFgLdY2yWG4fvF8y7RJxivp57zK8kHZOZzX62KRgrRE9/
+   AzwBuOnyc1WfTtRQtCRu4E95oZUsqNukIFrtpiSjB4rUYHEYJKmg9gPa3
+   Qnau2qlduA7IMZFRf4gQpKEeiGezOdshZEbzsayjx5d8IKY31bC8jpNIO
+   Q==;
+X-CSE-ConnectionGUID: JZFecYtiSwihp2h5PfNg/A==
+X-CSE-MsgGUID: EQuhBEs6T0WGpFIomsYOeQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11581"; a="74025358"
+X-IronPort-AV: E=Sophos;i="6.19,227,1754982000"; 
+   d="scan'208";a="74025358"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2025 00:05:11 -0700
+X-CSE-ConnectionGUID: WcM7V1zjTdKxrl3caqohVw==
+X-CSE-MsgGUID: 3bnlC+fmRfOlz/9DRmfxgw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,227,1754982000"; 
+   d="scan'208";a="185828237"
+Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
+  by orviesa003.jf.intel.com with ESMTP; 14 Oct 2025 00:05:06 -0700
+Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1v8Z5R-0002V1-2g;
+	Tue, 14 Oct 2025 07:04:54 +0000
+Date: Tue, 14 Oct 2025 15:04:09 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daniel Jurgens <danielj@nvidia.com>, netdev@vger.kernel.org,
+	mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com,
+	pabeni@redhat.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	virtualization@lists.linux.dev, parav@nvidia.com,
+	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, shameerali.kolothum.thodi@huawei.com,
+	jgg@ziepe.ca, kevin.tian@intel.com, kuba@kernel.org,
+	andrew+netdev@lunn.ch, edumazet@google.com,
+	Daniel Jurgens <danielj@nvidia.com>
+Subject: Re: [PATCH net-next v4 01/12] virtio_pci: Remove supported_cap size
+ build assert
+Message-ID: <202510141404.P5SMiruH-lkp@intel.com>
+References: <20251013152742.619423-2-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANn89i+wikOQQrGFXu=L3nKPG62rsBmWer5WpLg5wmBN+RdMqA@mail.gmail.com>
- <20251014035846.1519-1-21cnbao@gmail.com> <CANn89iKCZyYi+J=5t2sdmvtERnknkwXrGi4QRzM9btYUywkDfw@mail.gmail.com>
- <CAGsJ_4ySSn6B+x+4zE0Ld1+AM4q-WnS0LfxzWw22oXr7n5NZ=g@mail.gmail.com>
-In-Reply-To: <CAGsJ_4ySSn6B+x+4zE0Ld1+AM4q-WnS0LfxzWw22oXr7n5NZ=g@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 14 Oct 2025 00:01:07 -0700
-X-Gm-Features: AS18NWD5ciaHerlqKb1LSkLizTAcEH7y8M_BZABcYRSz9LQQyJTFiKiNPr9pVjc
-Message-ID: <CANn89i+j_CZM9Q=xTkSq-7cjeRkt29JikD3WqvmPihDrUHBQEQ@mail.gmail.com>
-Subject: Re: [RFC PATCH] mm: net: disable kswapd for high-order network buffer allocation
-To: Barry Song <21cnbao@gmail.com>
-Cc: corbet@lwn.net, davem@davemloft.net, hannes@cmpxchg.org, horms@kernel.org, 
-	jackmanb@google.com, kuba@kernel.org, kuniyu@google.com, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linyunsheng@huawei.com, mhocko@suse.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, surenb@google.com, v-songbaohua@oppo.com, vbabka@suse.cz, 
-	willemb@google.com, zhouhuacai@oppo.com, ziy@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251013152742.619423-2-danielj@nvidia.com>
 
-On Mon, Oct 13, 2025 at 11:43=E2=80=AFPM Barry Song <21cnbao@gmail.com> wro=
-te:
->
-> > >
-> > > A problem with the existing sysctl is that it only covers the TX path=
-;
-> > > for the RX path, we also observe that kswapd consumes significant pow=
-er.
-> > > I could add the patch below to make it support the RX path, but it fe=
-els
-> > > like a bit of a layer violation, since the RX path code resides in mm
-> > > and is intended to serve generic users rather than networking, even
-> > > though the current callers are primarily network-related.
-> >
-> > You might have a buggy driver.
->
-> We are observing the RX path as follows:
->
-> do_softirq
->     taskset_hi_action
->        kalPacketAlloc
->            __netdev_alloc_skb
->                page_frag_alloc_align
->                    __page_frag_cache_refill
->
-> This appears to be a fairly common stack.
->
-> So it is a buggy driver?
+Hi Daniel,
 
-No idea, kalPacketAlloc is not in upstream trees.
+kernel test robot noticed the following build errors:
 
-It apparently needs high order allocations. It will fail at some point.
+[auto build test ERROR on net-next/main]
 
->
-> >
-> > High performance drivers use order-0 allocations only.
-> >
->
-> Do you have an example of high-performance drivers that use only order-0 =
-memory?
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Jurgens/virtio_pci-Remove-supported_cap-size-build-assert/20251014-004146
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20251013152742.619423-2-danielj%40nvidia.com
+patch subject: [PATCH net-next v4 01/12] virtio_pci: Remove supported_cap size build assert
+config: s390-randconfig-001-20251014 (https://download.01.org/0day-ci/archive/20251014/202510141404.P5SMiruH-lkp@intel.com/config)
+compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 39f292ffa13d7ca0d1edff27ac8fd55024bb4d19)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251014/202510141404.P5SMiruH-lkp@intel.com/reproduce)
 
-About all drivers using XDP, and/or using napi_get_frags()
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202510141404.P5SMiruH-lkp@intel.com/
 
-XDP has been using order-0 pages from the very beginning.
+All errors (new ones prefixed by >>):
+
+>> drivers/virtio/virtio_pci_modern.c:326:26: error: no member named 'support_caps' in 'struct virtio_admin_cmd_query_cap_id_result'
+     326 |         if (!(le64_to_cpu(data->support_caps[0]) & (1 << VIRTIO_DEV_PARTS_CAP)))
+         |                           ~~~~  ^
+   include/linux/byteorder/generic.h:87:21: note: expanded from macro 'le64_to_cpu'
+      87 | #define le64_to_cpu __le64_to_cpu
+         |                     ^
+   1 error generated.
+
+
+vim +326 drivers/virtio/virtio_pci_modern.c
+
+   304	
+   305	static void virtio_pci_admin_cmd_cap_init(struct virtio_device *virtio_dev)
+   306	{
+   307		struct virtio_pci_device *vp_dev = to_vp_device(virtio_dev);
+   308		struct virtio_admin_cmd_query_cap_id_result *data;
+   309		struct virtio_admin_cmd cmd = {};
+   310		struct scatterlist result_sg;
+   311		int ret;
+   312	
+   313		data = kzalloc(sizeof(*data), GFP_KERNEL);
+   314		if (!data)
+   315			return;
+   316	
+   317		sg_init_one(&result_sg, data, sizeof(*data));
+   318		cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_CAP_ID_LIST_QUERY);
+   319		cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SELF);
+   320		cmd.result_sg = &result_sg;
+   321	
+   322		ret = vp_modern_admin_cmd_exec(virtio_dev, &cmd);
+   323		if (ret)
+   324			goto end;
+   325	
+ > 326		if (!(le64_to_cpu(data->support_caps[0]) & (1 << VIRTIO_DEV_PARTS_CAP)))
+   327			goto end;
+   328	
+   329		virtio_pci_admin_cmd_dev_parts_objects_enable(virtio_dev);
+   330	end:
+   331		kfree(data);
+   332	}
+   333	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
