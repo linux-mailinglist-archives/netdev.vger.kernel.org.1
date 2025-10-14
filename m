@@ -1,148 +1,136 @@
-Return-Path: <netdev+bounces-229168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDCADBD8D2B
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 12:56:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65EFEBD8D95
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 12:58:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 617FE3E2A8F
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:56:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F3E6189842C
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:58:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF842FBE1C;
-	Tue, 14 Oct 2025 10:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0184B3093CB;
+	Tue, 14 Oct 2025 10:57:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="OP6eVhU1"
 X-Original-To: netdev@vger.kernel.org
-Received: from baidu.com (mx21.baidu.com [220.181.3.85])
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D172FB99A;
-	Tue, 14 Oct 2025 10:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.181.3.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3232FC027;
+	Tue, 14 Oct 2025 10:57:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760439368; cv=none; b=oj54E46ea/tOR/G/zxiQ8wJFiRtQcH3Z7n9YM+/TwAyxd6UWnyi1nn4frmBuoLU/j8+jwTN/UikwmSIIfGmr9daydJ4WnY2oKW9CN1O6arHTvtIHU8WP+pIy+x18eP0cgAPsDMxrFFfyy8A7h3qGRy0WGpY2fBPc34AqwYyaCjA=
+	t=1760439434; cv=none; b=ZVf78XxTnkUXA8lMnqw109QhLsBRW54mmkap8Gcqwd4+sHiRCLk1IPmKrfKa0Cll9QVhrCG5WnEmsOq0LLbfEmp50yzpJwVpLiJ3exISfV+YJAPF0LBQdAK4hiC9Gk8hgwurltxWb5pIJRGkRjkQpGYq5SEnqYFYp3XkjFO4ZbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760439368; c=relaxed/simple;
-	bh=46oU0M6vfaQKa3PYOroPhc0emPkc5386Yytt8tuQfOI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gXhzxPRh1CU3/zZXiQPIWudWBDdIp0EZH4k1byIEP7ckme9QzmIryvRQb8UPeS6nhbCkaCI7mz9OWxcUhQxR7ZHeygsAslhUqV3ela9qRsXT1LMPmPsym3D9ONMyq2qallVFfew2jJ6UKW43IOqrajbLZjAIQj/Tw7ip79R5aYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=220.181.3.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-From: "Li,Rongqing" <lirongqing@baidu.com>
-To: Petr Mladek <pmladek@suse.com>, Lance Yang <lance.yang@linux.dev>
-CC: "wireguard@lists.zx2c4.com" <wireguard@lists.zx2c4.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "Liam R . Howlett"
-	<Liam.Howlett@oracle.com>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, David Hildenbrand <david@redhat.com>, "Randy
- Dunlap" <rdunlap@infradead.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	"linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>, "Andrew
- Jeffery" <andrew@codeconstruct.com.au>, Joel Stanley <joel@jms.id.au>,
-	"Russell King" <linux@armlinux.org.uk>, Lorenzo Stoakes
-	<lorenzo.stoakes@oracle.com>, Shuah Khan <shuah@kernel.org>, Steven Rostedt
-	<rostedt@goodmis.org>, "Jonathan Corbet" <corbet@lwn.net>, Joel Granados
-	<joel.granados@kernel.org>, "Andrew Morton" <akpm@linux-foundation.org>, Phil
- Auld <pauld@redhat.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "Masami Hiramatsu" <mhiramat@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, "Pawan Gupta"
-	<pawan.kumar.gupta@linux.intel.com>, Simon Horman <horms@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>, Florian Westphal
-	<fw@strlen.de>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Kees Cook
-	<kees@kernel.org>, Arnd Bergmann <arnd@arndb.de>, "Paul E . McKenney"
-	<paulmck@kernel.org>, Feng Tang <feng.tang@linux.alibaba.com>, "Jason A .
- Donenfeld" <Jason@zx2c4.com>
-Subject: RE: [????] Re: [PATCH][v3] hung_task: Panic after fixed number of
- hung tasks
-Thread-Topic: [????] Re: [PATCH][v3] hung_task: Panic after fixed number of
- hung tasks
-Thread-Index: AQHcPO9h0grxiWd7ak27/owdD96L07TBdJLA
-Date: Tue, 14 Oct 2025 10:49:53 +0000
-Message-ID: <e3f7ddf68c2e42d7abf8643f34d84a18@baidu.com>
-References: <20251012115035.2169-1-lirongqing@baidu.com>
- <588c1935-835f-4cab-9679-f31c1e903a9a@linux.dev>
- <aO4boXFaIb0_Wiif@pathway.suse.cz>
-In-Reply-To: <aO4boXFaIb0_Wiif@pathway.suse.cz>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1760439434; c=relaxed/simple;
+	bh=a9rpBedeHHWfLoFjXCvL8sKLJKtkk0zG8IsLUWufvwQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UnWg6Kjz5s7wnEb0vFBU3W6jcbdzFpWjGxiUQ/3WJZNNWIdqa704Ceq4pzuKQT9U/xOLSjuGewNweSOK4reoQdlWTlot+gaLYWkCSOI+OE4uB5Hm5o8OP1vuVty5YN562vJz8buHbIivIuotBTvHxGR4jP0gkwb7A/EN6AnJm6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=OP6eVhU1; arc=none smtp.client-ip=198.47.23.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 59EAuJws1574212;
+	Tue, 14 Oct 2025 05:56:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1760439379;
+	bh=qi1LkwkemxDwRczDTwIi3saBfj0msSIBiXSKcB0bX6s=;
+	h=From:To:CC:Subject:Date;
+	b=OP6eVhU19QVRk99rI7gpL9pp//PAAPI/cypqKUF4HbEgIS+EA8yqn9r4+GG5v9yDY
+	 CV4TGLfJ1UDiIEmbQCJRzO9RMdQSbeeLfndJtFk07ptRgmjuxYiiqdwMOHr2+KDE47
+	 F1Jdr7zkUZ6+jDirOHm+JV9OI7td1n70Ak9WWwes=
+Received: from DLEE212.ent.ti.com (dlee212.ent.ti.com [157.170.170.114])
+	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 59EAuIjV3750010
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 14 Oct 2025 05:56:18 -0500
+Received: from DLEE208.ent.ti.com (157.170.170.97) by DLEE212.ent.ti.com
+ (157.170.170.114) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 14 Oct
+ 2025 05:56:18 -0500
+Received: from fllvem-mr08.itg.ti.com (10.64.41.88) by DLEE208.ent.ti.com
+ (157.170.170.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Tue, 14 Oct 2025 05:56:18 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by fllvem-mr08.itg.ti.com (8.18.1/8.18.1) with ESMTP id 59EAuIJL2927094;
+	Tue, 14 Oct 2025 05:56:18 -0500
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 59EAuH3v009009;
+	Tue, 14 Oct 2025 05:56:17 -0500
+From: Meghana Malladi <m-malladi@ti.com>
+To: <horms@kernel.org>, <namcao@linutronix.de>, <jacob.e.keller@intel.com>,
+        <m-malladi@ti.com>, <christian.koenig@amd.com>,
+        <sumit.semwal@linaro.org>, <sdf@fomichev.me>,
+        <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
+        <ast@kernel.org>, <pabeni@redhat.com>, <kuba@kernel.org>,
+        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <linaro-mm-sig@lists.linaro.org>, <dri-devel@lists.freedesktop.org>,
+        <linux-media@vger.kernel.org>, <bpf@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: [PATCH net-next v3 0/6] Add AF_XDP zero copy support
+Date: Tue, 14 Oct 2025 16:26:06 +0530
+Message-ID: <20251014105613.2808674-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-FEAS-Client-IP: 172.31.50.48
-X-FE-Policy-ID: 52:10:53:SYSTEM
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+
+This series adds AF_XDP zero coppy support to icssg driver.
+
+Tests were performed on AM64x-EVM with xdpsock application [1].
+
+A clear improvement is seen Transmit (txonly) and receive (rxdrop)
+for 64 byte packets. 1500 byte test seems to be limited by line
+rate (1G link) so no improvement seen there in packet rate
+
+Having some issue with l2fwd as the benchmarking numbers show 0
+for 64 byte packets after forwading first batch packets and I am
+currently looking into it.
+
+AF_XDP performance using 64 byte packets in Kpps.
+Benchmark:	XDP-SKB		XDP-Native	XDP-Native(ZeroCopy)
+rxdrop		259		462		645
+txonly		350		354		760
+l2fwd 		178		240		0
+
+AF_XDP performance using 1500 byte packets in Kpps.
+Benchmark:	XDP-SKB		XDP-Native	XDP-Native(ZeroCopy)
+rxdrop		82		82		82
+txonly		81		82		82
+l2fwd 		81		82		82
+
+[1]: https://github.com/xdp-project/bpf-examples/tree/master/AF_XDP-example
+
+v2: https://lore.kernel.org/all/20250901100227.1150567-1-m-malladi@ti.com/#t
+
+Meghana Malladi (6):
+  net: ti: icssg-prueth: Add functions to create and destroy Rx/Tx
+    queues
+  net: ti: icssg-prueth: Add XSK pool helpers
+  net: ti: icssg-prueth: Add AF_XDP zero copy for TX
+  net: ti: icssg-prueth: Make emac_run_xdp function independent of page
+  net: ti: icssg-prueth: Add AF_XDP zero copy for RX
+  net: ti: icssg-prueth: Enable zero copy in XDP features
+
+ drivers/net/ethernet/ti/icssg/icssg_common.c | 470 ++++++++++++++++---
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 394 +++++++++++++---
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h |  25 +-
+ 3 files changed, 740 insertions(+), 149 deletions(-)
 
 
-> On Tue 2025-10-14 13:23:58, Lance Yang wrote:
-> > Thanks for the patch!
-> >
-> > I noticed the implementation panics only when N tasks are detected
-> > within a single scan, because total_hung_task is reset for each
-> > check_hung_uninterruptible_tasks() run.
->=20
-> Great catch!
->=20
-> Does it make sense?
-> Is is the intended behavior, please?
->=20
+base-commit: db1b6006668623b46a3f6b3fe6b5f030e4c60a42
+-- 
+2.43.0
 
-Yes, this is intended behavior
-
-> > So some suggestions to align the documentation with the code's
-> > behavior below :)
->=20
-> > On 2025/10/12 19:50, lirongqing wrote:
-> > > From: Li RongQing <lirongqing@baidu.com>
-> > >
-> > > Currently, when 'hung_task_panic' is enabled, the kernel panics
-> > > immediately upon detecting the first hung task. However, some hung
-> > > tasks are transient and the system can recover, while others are
-> > > persistent and may accumulate progressively.
->=20
-> My understanding is that this patch wanted to do:
->=20
->    + report even temporary stalls
->    + panic only when the stall was much longer and likely persistent
->=20
-> Which might make some sense. But the code does something else.
->=20
-
-A single task hanging for an extended period may not be a critical issue, a=
-s users might still log into the system to investigate. However, if multipl=
-e tasks hang simultaneously-such as in cases of I/O hangs caused by disk fa=
-ilures-it could prevent users from logging in and become a serious problem,=
- and a panic is expected.=20
-
-
-> > > --- a/kernel/hung_task.c
-> > > +++ b/kernel/hung_task.c
-> > > @@ -229,9 +232,11 @@ static void check_hung_task(struct task_struct
-> *t, unsigned long timeout)
-> > >   	 */
-> > >   	sysctl_hung_task_detect_count++;
-> > > +	total_hung_task =3D sysctl_hung_task_detect_count -
-> > > +prev_detect_count;
-> > >   	trace_sched_process_hang(t);
-> > > -	if (sysctl_hung_task_panic) {
-> > > +	if (sysctl_hung_task_panic &&
-> > > +			(total_hung_task >=3D sysctl_hung_task_panic)) {
-> > >   		console_verbose();
-> > >   		hung_task_show_lock =3D true;
-> > >   		hung_task_call_panic =3D true;
->=20
-> I would expect that this patch added another counter, similar to
-> sysctl_hung_task_detect_count. It would be incremented only once per chec=
-k
-> when a hung task was detected. And it would be cleared (reset) when no
-> hung task was found.
->=20
-> Best Regards,
-> Petr
 
