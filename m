@@ -1,134 +1,169 @@
-Return-Path: <netdev+bounces-229012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE808BD6FE4
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 03:38:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65FACBD7002
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 03:44:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DF3954E5319
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 01:38:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8607518A7F23
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 01:44:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C085A26158B;
-	Tue, 14 Oct 2025 01:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE0012550CD;
+	Tue, 14 Oct 2025 01:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Vunw790x"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FTfxEID/"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5852E21D3E6;
-	Tue, 14 Oct 2025 01:37:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABACA1E98EF
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 01:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760405876; cv=none; b=p0Vp2j/hAuxA7NfR/eWQbt4C1XXT4ROlKf33s5DylXAuG4fL8o7LjnTxFhxnlXq/nch188KDR93E5aiy0t8Ifhf60nOFUrjQ6WE/Rw8/CSvErfKR3XeBs+pHS73huH9oz/FhkvekK02HYfh3qblqUCicAJEsbf9/vBmAIcXlDNs=
+	t=1760406251; cv=none; b=ZWhjO0ljUuWEEMsHBkAIParsEcgQIj3Q3cCWNEzOk/SQTts5/MKHPwoqEpvF24G/md0NOyfbww1cR2/3L1cH/eZ1SxKLTbm/6/UaRhsOIVz3bck2X1xijO2W6jCFCvqeG9yjfSsMqo4s6otnDTFOCfKskZuTg0w2kTxodZkyXuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760405876; c=relaxed/simple;
-	bh=HrFBjoy4Zs+VZwHot4gEOtOJxRXfilQq4zCyRDBqeHw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Rox6PwqCgz7tNdA+njPhqXNLOMrd+K4aHmtNuyO/vof1/MYHF72LOryXKZ5hgEDsK923CqiWjeNzhE0ICtE1Ggfl6BSBhkj2JbgDaPhZUXE1FbBC0hHZiwNSOuD0VNnvN1Wvgf7UTImNXadMxrJ+u3CmBYUxzfxBhq3NlSd9Lzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Vunw790x; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Cc:Content-ID:Content-Description;
-	bh=SCW41sazUXG5KcMtr/XAw0GQBM/OgQxXYdOpaMbHEK8=; b=Vunw790xEYTNY49uEhIAewJymb
-	X5GikfhFUMnMl1ReMC5pYd1Xn1RLzH93C4HAYlVR/5MEu6Rri2ErZ9/du8zhiCFmDbbPVkXSb6kBQ
-	0AA3G9tsERMPDzo9RApk/350l6/1GQjLh8ExHR0hoN/son9IFKunn3cpwV5b3sbNfLBlzkjAEWnnl
-	fRkGvuoT+TmAXOZ4AIqtD5lW46KClOooxYpNXv8ljjl19q7MmHh2tZICmayRdETwSetCKmp2vFm/8
-	mPjAXxPvMTzmupw/prDDCTKAbl5DsN3yZc/0EapJIkVXicoPgsxMPGd16wHyOMFdv/ImqxcZlXB1v
-	+fqikLhw==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1v8Tyl-0000000EuFp-3tOW;
-	Tue, 14 Oct 2025 01:37:31 +0000
-Message-ID: <b16d76de-688a-4697-bcfe-06f2785a1d3c@infradead.org>
-Date: Mon, 13 Oct 2025 18:37:30 -0700
+	s=arc-20240116; t=1760406251; c=relaxed/simple;
+	bh=IyIx6WhWzH3QfEjg9TeTpMEVNRzJZtsFVjeIaWYGLdU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=i+itZeHvZjm2QzVf1n1HrOfPodHS53ICU8jZmP6PdmF1Aepcmky57UL0JRm5f4EgNZdl+X/shq0e0ZMOCoHbmMo39JPV6RmL0/PXf1Jw2MPZbQEOB1UcDIKDzvMrttQKe5/JwZlovJe+P1NDL2E7HHCcoqZaVTH5jVSoe9j21v8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FTfxEID/; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760406237;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vO/ZDB4TMtmLh64kPiFotXh5bUAaUBwq3BsPKySjreM=;
+	b=FTfxEID/GkjBTTNzzbc45gGoh12Ba6wQqrzY/bO5nzi4cY4mfksqWw34ZkxG1aUz4cnX5l
+	taZo3/Bi+V1OBjRFo9bvgPqAb9tbY0t0Dknl/C/QBjFoIbPjxAIWONbpk1/ahMJVoCvZBq
+	INPVlegL1EDnAvlD6y6JwifiV1O529E=
+From: Roman Gushchin <roman.gushchin@linux.dev>
+To: Daniel Sedlak <daniel.sedlak@cdn77.com>
+Cc: Shakeel Butt <shakeel.butt@linux.dev>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
+ Horman <horms@kernel.org>,  Jonathan Corbet <corbet@lwn.net>,  Neal
+ Cardwell <ncardwell@google.com>,  Kuniyuki Iwashima <kuniyu@google.com>,
+  David Ahern <dsahern@kernel.org>,  Andrew Morton
+ <akpm@linux-foundation.org>,  Yosry Ahmed <yosry.ahmed@linux.dev>,
+  linux-mm@kvack.org,  netdev@vger.kernel.org,  Johannes Weiner
+ <hannes@cmpxchg.org>,  Michal Hocko <mhocko@kernel.org>,  Muchun Song
+ <muchun.song@linux.dev>,  cgroups@vger.kernel.org,  Tejun Heo
+ <tj@kernel.org>,  Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
+  Matyas Hurtik
+ <matyas.hurtik@cdn77.com>
+Subject: Re: [PATCH v5] memcg: expose socket memory pressure in a cgroup
+In-Reply-To: <89618dcb-7fe3-4f15-931b-17929287c323@cdn77.com> (Daniel Sedlak's
+	message of "Mon, 13 Oct 2025 16:30:53 +0200")
+References: <20251007125056.115379-1-daniel.sedlak@cdn77.com>
+	<87qzvdqkyh.fsf@linux.dev>
+	<13b5aeb6-ee0a-4b5b-a33a-e1d1d6f7f60e@cdn77.com>
+	<87o6qgnl9w.fsf@linux.dev>
+	<tr7hsmxqqwpwconofyr2a6czorimltte5zp34sp6tasept3t4j@ij7acnr6dpjp>
+	<87a5205544.fsf@linux.dev>
+	<qdblzbalf3xqohvw2az3iogevzvgn3c3k64nsmyv2hsxyhw7r4@oo7yrgsume2h>
+	<875xcn526v.fsf@linux.dev>
+	<89618dcb-7fe3-4f15-931b-17929287c323@cdn77.com>
+Date: Mon, 13 Oct 2025 18:43:45 -0700
+Message-ID: <87h5w2w94e.fsf@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH][v3] hung_task: Panic after fixed number of hung tasks
-To: lirongqing <lirongqing@baidu.com>, Jonathan Corbet <corbet@lwn.net>,
- Russell King <linux@armlinux.org.uk>, Joel Stanley <joel@jms.id.au>,
- Andrew Jeffery <andrew@codeconstruct.com.au>,
- Andrew Morton <akpm@linux-foundation.org>, Lance Yang
- <lance.yang@linux.dev>, Masami Hiramatsu <mhiramat@kernel.org>,
- "Jason A . Donenfeld" <Jason@zx2c4.com>, Shuah Khan <shuah@kernel.org>,
- "Paul E . McKenney" <paulmck@kernel.org>, Petr Mladek <pmladek@suse.com>,
- Steven Rostedt <rostedt@goodmis.org>, Feng Tang
- <feng.tang@linux.alibaba.com>,
- Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Kees Cook
- <kees@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- Phil Auld <pauld@redhat.com>, Joel Granados <joel.granados@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- Stanislav Fomichev <sdf@fomichev.me>,
- "Liam R . Howlett" <Liam.Howlett@oracle.com>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- David Hildenbrand <david@redhat.com>, Florian Westphal <fw@strlen.de>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
- wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20251012115035.2169-1-lirongqing@baidu.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20251012115035.2169-1-lirongqing@baidu.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Migadu-Flow: FLOW_OUT
 
-Hi--
+Daniel Sedlak <daniel.sedlak@cdn77.com> writes:
 
-On 10/12/25 4:50 AM, lirongqing wrote:
-> From: Li RongQing <lirongqing@baidu.com>
-> 
+> On 10/9/25 9:02 PM, Roman Gushchin wrote:
+>> Shakeel Butt <shakeel.butt@linux.dev> writes:
+>> 
+>>> On Thu, Oct 09, 2025 at 10:58:51AM -0700, Roman Gushchin wrote:
+>>>> Shakeel Butt <shakeel.butt@linux.dev> writes:
+>>>>
+>>>>> On Thu, Oct 09, 2025 at 08:32:27AM -0700, Roman Gushchin wrote:
+>>>>>> Daniel Sedlak <daniel.sedlak@cdn77.com> writes:
+>>>>>>
+>>>>>>> Hi Roman,
+>>>>>>>
+>>>>>>> On 10/8/25 8:58 PM, Roman Gushchin wrote:
+>>>>>>>>> This patch exposes a new file for each cgroup in sysfs which is a
+>>>>>>>>> read-only single value file showing how many microseconds this cgroup
+>>>>>>>>> contributed to throttling the throughput of network sockets. The file is
+>>>>>>>>> accessible in the following path.
+>>>>>>>>>
+>>>>>>>>>     /sys/fs/cgroup/**/<cgroup name>/memory.net.throttled_usec
+>>>>>>>> Hi Daniel!
+>>>>>>>> How this value is going to be used? In other words, do you need an
+>>>>>>>> exact number or something like memory.events::net_throttled would be
+>>>>>>>> enough for your case?
+>>>>>>>
+>>>>>>> Just incrementing a counter each time the vmpressure() happens IMO
+>>>>>>> provides bad semantics of what is actually happening, because it can
+>>>>>>> hide important details, mainly the _time_ for how long the network
+>>>>>>> traffic was slowed down.
+>>>>>>>
+>>>>>>> For example, when memory.events::net_throttled=1000, it can mean that
+>>>>>>> the network was slowed down for 1 second or 1000 seconds or something
+>>>>>>> between, and the memory.net.throttled_usec proposed by this patch
+>>>>>>> disambiguates it.
+>>>>>>>
+>>>>>>> In addition, v1/v2 of this series started that way, then from v3 we
+>>>>>>> rewrote it to calculate the duration instead, which proved to be
+>>>>>>> better information for debugging, as it is easier to understand
+>>>>>>> implications.
+>>>>>>
+>>>>>> But how are you planning to use this information? Is this just
+>>>>>> "networking is under pressure for non-trivial amount of time ->
+>>>>>> raise the memcg limit" or something more complicated?
+>
+> We plan to use it mostly for observability purposes and to better
+> understand which traffic patterns affect the socket pressure the most
+> (so we can try to fix/delay/improve it). We do not know how commonly
+> this issue appears in other deployments, but in our deployment, many
+> of servers were affected by this slowdown, which varied in terms of
+> hardware and software configuration. Currently, it is very hard to
+> detect if the socket is under pressure without using tools like
+> bpftrace, so we would like to expose this metric in a more accessible
+> way. So in the end, we do not really care in which file this "socket
+> pressure happened" notification will be stored.
+>>>>>> I totally get it from the debugging perspective, but not sure about
+>>>>>> usefulness of it as a permanent metric. This is why I'm asking if there
+>>>>>> are lighter alternatives, e.g. memory.events or maybe even tracepoints.
+>
+> If the combination of memory.events(.local) and tracepoint hook(s) is
+> okay with you(?), we can use that and export the same information as
+> in the current patch version. We can incorporate that into the next
+> version.
 
-> 
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index a51ab46..7d9a8ee 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -1992,14 +1992,20 @@
->  			the added memory block itself do not be affected.
->  
->  	hung_task_panic=
-> -			[KNL] Should the hung task detector generate panics.
-> -			Format: 0 | 1
-> +			[KNL] Number of hung tasks to trigger kernel panic.
-> +			Format: <int>
-> +
-> +			Set this to the number of hung tasks that must be
-> +			detected before triggering a kernel panic.
-> +
-> +			0: don't panic
-> +			1: panic immediately on first hung task
-> +			N: panic after N hung tasks are detect
+In my opinion
+tracepoint > memory.events entry > memory.stat entry > new cgroupfs file.
 
-			                            are detected
+>
+> Also, would it be possible to make the socket pressure signal
+> configurable, e.g., allowing it to be configured via sysctl or per
+> cgroup not to trigger the socket pressure signal? I cannot find the
+> reasoning why this throttling cannot (maybe it can) be opt-out.
 
->  
-> -			A value of 1 instructs the kernel to panic when a
-> -			hung task is detected. The default value is controlled
-> -			by the CONFIG_BOOTPARAM_HUNG_TASK_PANIC build-time
-> -			option. The value selected by this boot parameter can
-> -			be changed later by the kernel.hung_task_panic sysctl.
-> +			The default value is controlled by the
-> +			CONFIG_BOOTPARAM_HUNG_TASK_PANIC build-time option. The value
-> +			selected by this boot parameter can be changed later by the
-> +			kernel.hung_task_panic sysctl.
->  
->  	hvc_iucv=	[S390]	Number of z/VM IUCV hypervisor console (HVC)
->  				terminal devices. Valid values: 0..8
+It's a good point.
 
+First, I think that vmpressure implementation is not the best
+and we might want to switch to PSI (or something else) there.
+This is why I'm resistant to exposing implementation-specific
+metrics.
 
--- 
-~Randy
+That said, I believe that some level of customization here is justified.
+Maybe opting out completely is too much, but in the end it's hard for
+the kernel to balance the importance of e.g. page cache vs networking
+buffers as it might be really workload-dependent. Or some workloads
+would prefer to risk being oom-killed rather than to tolerate a sub-par
+networking performance.
 
+Thanks!
 
