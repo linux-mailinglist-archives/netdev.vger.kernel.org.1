@@ -1,174 +1,106 @@
-Return-Path: <netdev+bounces-229135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6714BD86DC
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:26:06 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A6CDBD86CA
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:25:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEF81421C21
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:25:51 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1BD134E6BF9
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:25:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E60122E62AF;
-	Tue, 14 Oct 2025 09:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B752DCF7B;
+	Tue, 14 Oct 2025 09:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="azZNFzNk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K2VIJnvj"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8683E2E0B5F;
-	Tue, 14 Oct 2025 09:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B0725D546
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 09:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760433946; cv=none; b=sVaZiUiswQ8Fq9/13mqlI1FHw4OT6zrSWaFz4XAEl3wrEzG0DAw8JHwvg/togpp3x7GgfmBqVIN/aFbivrIVhBfYPHMVANEiWXLX0W8VKTCfv/oP04NORKMXjd9KFYEXcq3WF14+wuCG9cJj3sjP8WxoeR6huNqxRfpvHWbnezM=
+	t=1760433935; cv=none; b=q/QvSSZcCpN8lic6y3j5Q5gUX7f1+suTwAnlCcB1zJkO20UxrlveaHkZX1RXoqCLgjg0fi6ZrcAwg7BNQsXRAYkzcSVwmF4AThfydQN1cJ1cidJ2ghpqMc/H3q+VLiQ/1LengEBsGMW7XEbP6wB2C9apho0diFlQP/kmOXCZyh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760433946; c=relaxed/simple;
-	bh=o/vSQIl7tNPStdaocN65f1QVLmQY4TPDbzkpap21YpY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=inq7ZE35hFhN5736QdcuHWaC3Iabjwv5f5JYcELCkB2um4M1YF9N8lQ/0CaCsuW8tmExNUT9jkhasNO8NFQckt45KoSgUJMHz3BgQhTWz58rjKLF+FMoB2Vory+2Jt5PslJkqpPNAiCv9rokC+RLO6i798+8TiSXR8OOALd+Z3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=azZNFzNk; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 59E9PTNW1114817;
-	Tue, 14 Oct 2025 04:25:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1760433929;
-	bh=juZD7qPlFNPrZBo5nIhRej6WrFZIUY5prg9h7+Bs/nA=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=azZNFzNkYdWFRBvfHbXBKWRfdXruCNPaS08gn7i/xOLsiGUeV9wAHVLW4J7/LKYfp
-	 1Od47Qd1vJS9m2ONmm0iviys3MDm9qJd91bnjLkCl57MbyyjD+Khz7fWoXNtxWysdt
-	 l9PhgTKqCVBcd87QH6d5MsQJkD5ClEKWS3KniTlE=
-Received: from DLEE205.ent.ti.com (dlee205.ent.ti.com [157.170.170.85])
-	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 59E9PTBA3906283
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 14 Oct 2025 04:25:29 -0500
-Received: from DLEE207.ent.ti.com (157.170.170.95) by DLEE205.ent.ti.com
- (157.170.170.85) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 14 Oct
- 2025 04:25:29 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE207.ent.ti.com
- (157.170.170.95) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Tue, 14 Oct 2025 04:25:29 -0500
-Received: from [10.24.69.13] (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 59E9PPQB3335218;
-	Tue, 14 Oct 2025 04:25:26 -0500
-Message-ID: <c8821c7e-b551-4a1b-9bb1-33d0eb05eb4c@ti.com>
-Date: Tue, 14 Oct 2025 14:55:24 +0530
+	s=arc-20240116; t=1760433935; c=relaxed/simple;
+	bh=8Mpb15od7JA5MjgB34GiY42X9T1Dma3DJCUBcLWR5Uo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SMR4Mo2+zBHpg5fT3H/81nv+tfrmQKX1IRqlDzuM12NWqgBl3qLuol1pIi8uF2vw/ChDlO6FlncRI2nupV4EVPcwm0nQte7ppem4tZgWx4rXHRsJd37b5U4DIgBtmqGcWZQlqoLAOuAGJqD/HHhpwqHQGdkOB+qs/3UWn19ruiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K2VIJnvj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAD8FC4CEE7;
+	Tue, 14 Oct 2025 09:25:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760433934;
+	bh=8Mpb15od7JA5MjgB34GiY42X9T1Dma3DJCUBcLWR5Uo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=K2VIJnvjeULkqo+jYu3MvXTdSpkss5eKcDIMzGYsUp3pWCeEXwq+shs9TcZ4PxS/V
+	 GpMekWpp7laGilxhFxm4nwbvwhNL1qw32IaJfSvItJxyh4CmM/RtUl93JR9ex1ohCY
+	 znUyPA0CmOYaYXnWOxPeJULE+yQIeoYJLcoqiEY5hhB7tK01obDPy101yM7pK4xDjj
+	 UMCVcJtT0yvKXp1ITzvmMhH9yWZI5OpzZ4zKH/guopeGKH8LpeKEtZQeGIX9akt//R
+	 0566OisOS/MhbuLghBymw8ZOkxOc1+1sRewCBbMawDo/6Ii+vE04JTPBYSjcAIqN2Q
+	 FmIU3KgDSK3GQ==
+Date: Tue, 14 Oct 2025 10:25:29 +0100
+From: Simon Horman <horms@kernel.org>
+To: Emil Tantilov <emil.s.tantilov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	przemyslaw.kitszel@intel.com, anthony.l.nguyen@intel.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, decot@google.com,
+	willemb@google.com, joshua.a.hay@intel.com, madhu.chittim@intel.com
+Subject: Re: [PATCH iwl-net] idpf: fix possible vport_config NULL pointer
+ deref in remove
+Message-ID: <aO4XCSu0jZ57k-1Z@horms.kernel.org>
+References: <20251013150824.28705-1-emil.s.tantilov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: ti: icssg-prueth: Fix fdb hash size
- configuration
-To: Simon Horman <horms@kernel.org>
-CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-        <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-References: <20251013085925.1391999-1-m-malladi@ti.com>
- <aOzqMj1TbzJCZrRk@horms.kernel.org>
-Content-Language: en-US
-From: Meghana Malladi <m-malladi@ti.com>
-In-Reply-To: <aOzqMj1TbzJCZrRk@horms.kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251013150824.28705-1-emil.s.tantilov@intel.com>
 
-Hi Simon,
+On Mon, Oct 13, 2025 at 08:08:24AM -0700, Emil Tantilov wrote:
+> Attempting to remove the driver will cause a crash in cases where
+> the vport failed to initialize. Following trace is from an instance where
+> the driver failed during an attempt to create a VF:
+> [ 1661.543624] idpf 0000:84:00.7: Device HW Reset initiated
+> [ 1722.923726] idpf 0000:84:00.7: Transaction timed-out (op:1 cookie:2900 vc_op:1 salt:29 timeout:60000ms)
+> [ 1723.353263] BUG: kernel NULL pointer dereference, address: 0000000000000028
+> ...
+> [ 1723.358472] RIP: 0010:idpf_remove+0x11c/0x200 [idpf]
+> ...
+> [ 1723.364973] Call Trace:
+> [ 1723.365475]  <TASK>
+> [ 1723.365972]  pci_device_remove+0x42/0xb0
+> [ 1723.366481]  device_release_driver_internal+0x1a9/0x210
+> [ 1723.366987]  pci_stop_bus_device+0x6d/0x90
+> [ 1723.367488]  pci_stop_and_remove_bus_device+0x12/0x20
+> [ 1723.367971]  pci_iov_remove_virtfn+0xbd/0x120
+> [ 1723.368309]  sriov_disable+0x34/0xe0
+> [ 1723.368643]  idpf_sriov_configure+0x58/0x140 [idpf]
+> [ 1723.368982]  sriov_numvfs_store+0xda/0x1c0
+> 
+> Avoid the NULL pointer dereference by adding NULL pointer check for
+> vport_config[i], before freeing user_config.q_coalesce.
+> 
+> Fixes: e1e3fec3e34b ("idpf: preserve coalescing settings across resets")
+> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
+> Reviewed-by: Chittim Madhu <madhu.chittim@intel.com>
 
-On 10/13/25 17:31, Simon Horman wrote:
-> On Mon, Oct 13, 2025 at 02:29:25PM +0530, Meghana Malladi wrote:
->> The ICSSG driver does the initial FDB configuration which
->> includes setting the control registers. Other run time
->> management like learning is managed by the PRU's. The default
->> FDB hash size used by the firmware is 512 slots which is not
->> aligned with the driver's configuration. Update the driver
->> FDB config to fix it.
->>
->> Fixes: abd5576b9c57f ("net: ti: icssg-prueth: Add support for ICSSG switch firmware")
->> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
->> ---
->>
->> Please refer trm [1] 6.4.14.12.17 section
->> on how the FDB config register gets configured.
->>
->> [1]: https://www.ti.com/lit/pdf/spruim2
-> 
-> Thanks for the link!
-> And thanks to TI for publishing this document.
-> 
->>
->>   drivers/net/ethernet/ti/icssg/icssg_config.c | 7 +++++++
->>   1 file changed, 7 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
->> index da53eb04b0a4..3f8237c17d09 100644
->> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
->> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
->> @@ -66,6 +66,9 @@
->>   #define FDB_GEN_CFG1		0x60
->>   #define SMEM_VLAN_OFFSET	8
->>   #define SMEM_VLAN_OFFSET_MASK	GENMASK(25, 8)
->> +#define FDB_HASH_SIZE_MASK	GENMASK(6, 3)
->> +#define FDB_HASH_SIZE_SHIFT	3
->> +#define FDB_HASH_SIZE		3
-> 
-> I am slightly confused about this.
-> 
-> The patch description says "The default FDB hash size used by the firmware
-> is 512 slots which is not aligned with the driver's configuration."
-> And above FDB_HASH_SIZE is 3, which is the value that the driver will
-> now set hash size to.
-> 
-> But table 6-1404 (on page 4049) of [1] describes 3 as setting
-> the FDB hash size to 512 slots. I would have expected a different
-> value based on my understanding of the patch description.
-> 
+Thanks,
 
-Yes you are right. But if you re-check the same table 6-1404, there is
-a reset field for FDB_HAS_SIZE which is 4, meaning 1024 slots.
-Currently the driver is not updating this reset value from 4(1024 slots) 
-to 3(512 slots), which is why the driver is not aligned with the 
-firmware. This patch fixes this by updating the reset value to 512 slots.
+I agree that prior to the cited commit adapter->vport_config[i] being
+NULL was harmless. But afterwards a NULL pointer dereference would occur.
 
-Let me know if the commit message is not clear enough to convey this 
-correctly. I will update it accordingly.
+It also seems to me that the possibility of adapter->vport_config[i]
+being null, via an error in idpf_vport_alloc() has existed since
+vport configuration was added by commit 0fe45467a104 ("idpf: add create
+vport and netdev configuration"). (Which predates the cited commit.)
 
->>   
->>   #define FDB_GEN_CFG2		0x64
->>   #define FDB_VLAN_EN		BIT(6)
->> @@ -463,6 +466,8 @@ void icssg_init_emac_mode(struct prueth *prueth)
->>   	/* Set VLAN TABLE address base */
->>   	regmap_update_bits(prueth->miig_rt, FDB_GEN_CFG1, SMEM_VLAN_OFFSET_MASK,
->>   			   addr <<  SMEM_VLAN_OFFSET);
->> +	regmap_update_bits(prueth->miig_rt, FDB_GEN_CFG1, FDB_HASH_SIZE_MASK,
->> +			   FDB_HASH_SIZE << FDB_HASH_SIZE_SHIFT);
->>   	/* Set enable VLAN aware mode, and FDBs for all PRUs */
->>   	regmap_write(prueth->miig_rt, FDB_GEN_CFG2, (FDB_PRU0_EN | FDB_PRU1_EN | FDB_HOST_EN));
->>   	prueth->vlan_tbl = (struct prueth_vlan_tbl __force *)(prueth->shram.va +
->> @@ -484,6 +489,8 @@ void icssg_init_fw_offload_mode(struct prueth *prueth)
->>   	/* Set VLAN TABLE address base */
->>   	regmap_update_bits(prueth->miig_rt, FDB_GEN_CFG1, SMEM_VLAN_OFFSET_MASK,
->>   			   addr <<  SMEM_VLAN_OFFSET);
->> +	regmap_update_bits(prueth->miig_rt, FDB_GEN_CFG1, FDB_HASH_SIZE_MASK,
->> +			   FDB_HASH_SIZE << FDB_HASH_SIZE_SHIFT);
->>   	/* Set enable VLAN aware mode, and FDBs for all PRUs */
->>   	regmap_write(prueth->miig_rt, FDB_GEN_CFG2, FDB_EN_ALL);
->>   	prueth->vlan_tbl = (struct prueth_vlan_tbl __force *)(prueth->shram.va +
->>
->> base-commit: 68a052239fc4b351e961f698b824f7654a346091
->> -- 
->> 2.43.0
->>
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
