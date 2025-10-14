@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-229125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAE5CBD8616
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:18:13 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCB1DBD861F
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:18:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FC5C406B07
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:18:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E24304F9D1A
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71A6C2D47EB;
-	Tue, 14 Oct 2025 09:18:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6354F25D546;
+	Tue, 14 Oct 2025 09:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="3p8TSfdj";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="r+9BIwXr"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="MAcPLmul";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="pWuyOeg5"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07F42D47E4
-	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 09:18:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E582E36E3
+	for <netdev@vger.kernel.org>; Tue, 14 Oct 2025 09:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760433485; cv=none; b=UrotGjbaVAD023YaKBO/ujN31OG53lxcw8m/WGcfbUNU4hoQPoUBLtNbxEzM9h57ljXbI/plfQG3TmlC3p5OtsWsoyTPdcL0SdKZ4w5pCVY9DqDwXxHU4BDZaMTiwBK13qLxMoriSksjk/r63D3HHfMx24dbSqA8pyOamMhJ1gc=
+	t=1760433487; cv=none; b=XShfRkU0FKr8Ow4jz7kI+6vH1b+lYMWRrDbOyHbpTQtU1nt3Y6HlmppJt/GGnl8lY2xwG9ZQ748pyBlL6nEMd3IAkJ0JaVQ8+yqLVGqQosLC3OSoUBdJVeBdtIDmIe1wz5DdCkRpbbI2D+9q/YdxpIyfgImYDHpDP/CXeamdiAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760433485; c=relaxed/simple;
-	bh=D0Xd/0UEfhqZRbucDGUtMfGvg2m6tyXTja9l2d3Qx34=;
+	s=arc-20240116; t=1760433487; c=relaxed/simple;
+	bh=E5hdFOES43aP5/ZuTg06NAl+g0REHa9XedQF69CSDfU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a/K7kvKLvpJXesKclR164AtBqpgdVlXO5phzWwsY39eFxNxjhP+mCEf8UzEYHjCbW9auOKkaF5T18YR+h9Nt7NZT34QuR3LB4lmizIi1hNH8AMB4+LkyWhgzuQigVdmBrL7D0k/13afiOlZC5U8BvQLN5yd/B4rJTxmnuKxlX8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=3p8TSfdj; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=r+9BIwXr; arc=none smtp.client-ip=103.168.172.159
+	 MIME-Version; b=f1hK4kH1wlqADH/HIuqdvf67Seq3Od6WTyqEXoch6W3XQiPDJezNxwlez4oxZRNehbQi+bfHv/Qh6pxB0AsB+EG8M7L0sA5lK/bOWYTe1+JT6P5NnIwFh8SwslA5jjYyLC058XljogUxRdloNxoRGfk8kIWc6KPCw8g2ueZqFMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=MAcPLmul; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=pWuyOeg5; arc=none smtp.client-ip=103.168.172.145
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id EC2AC14001F1;
-	Tue, 14 Oct 2025 05:18:02 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Tue, 14 Oct 2025 05:18:02 -0400
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfout.phl.internal (Postfix) with ESMTP id 0CDF0EC023D;
+	Tue, 14 Oct 2025 05:18:05 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-10.internal (MEProxy); Tue, 14 Oct 2025 05:18:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
 	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
 	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1760433482; x=
-	1760519882; bh=M2gwGlMhv09YMN5AZQcM7VYyWIHfycnRSZuAgsG8gBI=; b=3
-	p8TSfdjEaR+DvSYzDya0InlWyqi2EJEsJPmodEVjaaqnrsiloeCrRTgtFlVJsYRa
-	oCnSR/WCvtTw++86f4SyzMx1X3sqOq9OBqgLRQPGADb9/36o4jr7EPa+Tm1jBkBx
-	REgoIBRy8RAkkyEZ3rHEF8mxjwVBA4WkpvqHzKtu1hqReyokNXR+DRHuSerAHjLi
-	Bh5v4EI9vChdvs6DZQNAUdS/jOVbaPUoq85wzaw7zVYjC16/DbOh8VyhH4H7fuBr
-	Z87p9NrxcQjEgBJbsWX3cIbIUoP40tr2uJZsTy879U9igMEhE1HOJfNnMREeVXFu
-	wxOzSMEuvYFuLOrF3hRlA==
+	:reply-to:subject:subject:to:to; s=fm3; t=1760433485; x=
+	1760519885; bh=LquEGaSJAJNTW4E4jtkBp7oSmjXHpt6pK5qtc9gMQNU=; b=M
+	AcPLmula3koTnwjeKUJ8CBkhcptgvJLi7zLHDRfXTMzVTqBah/LMukq9QX997XG3
+	wXQeHNxN/MCo5AEFSmEWBLjn/1IhTKJ8KKVHQ7dQ622IycgyTiAhgC987le3MVUW
+	zFuBt6EDtUBe467PPpmDKoFZBS39/J1Qw1m0KLao4NxhFrADaIejTEXaM0d2srpa
+	GW2yB7LwWqu2CNAWbYrVZILo0O3VUF2WC8cjj+oZYum2LTtVjm7XEa66+3zuohXJ
+	DWvZAsutMnjtE1ga7/qIIuYDeNgcfNjC9pGPKwHtvQbcfj/JB0VX7hIPjkJenqV3
+	WePqZ5hyfV/iZ9JB3Sskw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm2; t=1760433482; x=1760519882; bh=M
-	2gwGlMhv09YMN5AZQcM7VYyWIHfycnRSZuAgsG8gBI=; b=r+9BIwXrfamPVWbYP
-	2QL5VkTloDHJEko4QKK15ShQE8xg9ZzhXbdFXob6n14Uw2n8nXPEb1HJ3TQbj6+T
-	RSTwVLAz8hPmFPZ9DAGS2vj2/elkrAicwuY8xp10+wsItjqMbm+RQOBORHnC85ZJ
-	JzcYESZ9BgxWeTz54xSJKI03+94lz9YSzTn5+fvHzO91uWGsRY2TPjLP3ONlinMd
-	BAs9eq89iEG5VOofoIZIJZbkQ24l/AKnIZFjVLdVvu+6oHc6RZ6eGKsw+BBYc/Ie
-	E0cthvIVgol/2Ns5i7wWWFylOJe3WS7fxjad+lcClNm1eigZ9zkKt+2Jh54LX/Vv
-	69T1A==
-X-ME-Sender: <xms:ShXuaDJpKV6x3vbtW0D9wiNedAQU6uYhSRPj79NmiAonoBajtNtz7A>
-    <xme:ShXuaOCcab3v4UMDSpIECP_3k0AnG-l_xO4i6tBcWxLhGAt2Tn2qcYsW0sRThZ2Ae
-    sPC7z9MRhihNfIm6Gofzy9AtJxRtSI68gRKbpRkHdDuhH66LSgK8N0>
-X-ME-Received: <xmr:ShXuaECeewqWpSAm9Yk0-YmGnHIqTvtjIKpvMawi8TGvOgLwBI-mL_cSBdxg>
+	:x-me-sender:x-sasl-enc; s=fm2; t=1760433485; x=1760519885; bh=L
+	quEGaSJAJNTW4E4jtkBp7oSmjXHpt6pK5qtc9gMQNU=; b=pWuyOeg5wetperxSG
+	7ln46BO7e0Ab7OjkBLacrg9G6PG83hH88/pgfduZENGThRZSfzaNuAOdnpbCxgC2
+	NSuEG0tZcmE1IeTlRbEIOO9F6RWe8OOv5fhSTZW2ZfiIzfCDfv8HSRuevLFkQCYR
+	TbF/WzFw5/56Rfr2vt2UneUzDAk9uRYTlpUwI4xzwM3kVVppLCsd5KAs8sNGnbWi
+	zhd0lJkk9MwdY6WJd7k7IeJrrp9sCguIDQ1avtB11S4Ac1Ttx36Db00yR0m4dOgM
+	schNgHlD4LSSucq7bmLEBPHuvm1rsKCvq1eynErTD6vuyfajSpN6ZaXXJP5XeXJe
+	tnMKg==
+X-ME-Sender: <xms:TBXuaHnJ_BdXbzohc2RZoJI7PmRwvoc2zOOTKLbvX0zbdz1R7VYmaw>
+    <xme:TBXuaBtlXRiQEvdGd7Ruv6-Iph5huO49MNsXqrLmOYunOc3DVD3iH_9T9wTyNW_V0
+    B5kyFqWGZzPjcKqFPtYcnnA3Ot6xp0edqjgMUwXHgL-5qyYTIi-ow>
+X-ME-Received: <xmr:TBXuaF_hkIp19Sw5b87TpqoMyKHWP4X7RyzK-4i5DIZiosp3wHxRX3mBlbwG>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvddtudehucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucenucfjughrpefhvfevufffkffojghfggfgsedtkeertd
@@ -77,23 +77,23 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvddtudehucetufdote
     hshihsnhgrihhlrdhnvghtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdp
     rhgtphhtthhopehjrghnnhhhsehgohhoghhlvgdrtghomhdprhgtphhtthhopehjohhhnh
     drfhgrshhtrggsvghnugesghhmrghilhdrtghomh
-X-ME-Proxy: <xmx:ShXuaIALcW_KvSrKuFIYacTfxuYaSaXxwfGgsSAodW5ENkCwu-vFvA>
-    <xmx:ShXuaHqijNIiOxjvrkxkmFveNl38uhp4qCr_RlyLAEguoUL4ffeKlw>
-    <xmx:ShXuaKkjT5jo1bxN4F9kxuuaDmN30i5E0rLBYQssTYVqWjqUk6Jr0w>
-    <xmx:ShXuaPxMwbd3svSn9gcPS0umhB8A_dM1CxKMe4g7FKah8yeDhRM_3g>
-    <xmx:ShXuaOPWdCBYusONfcJ5G_fP-FOTgwFQ-6D1Vw4wAMDdAL6_i4xhoMXW>
+X-ME-Proxy: <xmx:TBXuaLN5YNVG7ELo6BDLU5gahUykmEEyuEN_No3CXK53XSaOd4AU7w>
+    <xmx:TBXuaDFghCdVOgptqHuagrMagA_QbRBnQRhbiaMq5Ct8fJKmN2w69Q>
+    <xmx:TBXuaJRU8fDllYNOzUZLx18ECcwJcom0vCImbIIpJdzfJiNCUEwc8g>
+    <xmx:TBXuaAtDZw_S5utZtRXxPb8SxEmFouraUGs4hNAJXBEMVSDUKhQDiQ>
+    <xmx:TRXuaEqKE9Ooi7oGPNhBDxbmkgDBVeM3GpQRTC3EzirvQJW3cQPF92Qe>
 Feedback-ID: i934648bf:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 14 Oct 2025 05:18:02 -0400 (EDT)
+ 14 Oct 2025 05:18:04 -0400 (EDT)
 From: Sabrina Dubroca <sd@queasysnail.net>
 To: netdev@vger.kernel.org
 Cc: Sabrina Dubroca <sd@queasysnail.net>,
 	kuba@kernel.org,
 	jannh@google.com,
 	john.fastabend@gmail.com
-Subject: [PATCH net 3/7] tls: always set record_type in tls_process_cmsg
-Date: Tue, 14 Oct 2025 11:16:58 +0200
-Message-ID: <0457252e578a10a94e40c72ba6288b3a64f31662.1760432043.git.sd@queasysnail.net>
+Subject: [PATCH net 4/7] tls: wait for pending async decryptions if tls_strp_msg_hold fails
+Date: Tue, 14 Oct 2025 11:16:59 +0200
+Message-ID: <b9fe61dcc07dab15da9b35cf4c7d86382a98caf2.1760432043.git.sd@queasysnail.net>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <cover.1760432043.git.sd@queasysnail.net>
 References: <cover.1760432043.git.sd@queasysnail.net>
@@ -105,49 +105,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When userspace wants to send a non-DATA record (via the
-TLS_SET_RECORD_TYPE cmsg), we need to send any pending data from a
-previous MSG_MORE send() as a separate DATA record. If that DATA record
-is encrypted asynchronously, tls_handle_open_record will return
--EINPROGRESS. This is currently treated as an error by
-tls_process_cmsg, and it will skip setting record_type to the correct
-value, but the caller (tls_sw_sendmsg_locked) handles that return
-value correctly and proceeds with sending the new message with an
-incorrect record_type (DATA instead of whatever was requested in the
-cmsg).
+Async decryption calls tls_strp_msg_hold to create a clone of the
+input skb to hold references to the memory it uses. If we fail to
+allocate that clone, proceeding with async decryption can lead to
+various issues (UAF on the skb, writing into userspace memory after
+the recv() call has returned).
 
-Always set record_type before handling the open record. If
-tls_handle_open_record returns an error, record_type will be
-ignored. If it succeeds, whether with synchronous crypto (returning 0)
-or asynchronous (returning -EINPROGRESS), the caller will proceed
-correctly.
+In this case, wait for all pending decryption requests.
 
-Fixes: a42055e8d2c3 ("net/tls: Add support for async encryption of records for performance")
+Fixes: 84c61fe1a75b ("tls: rx: do not use the standard strparser")
 Reported-by: Jann Horn <jannh@google.com>
 Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 ---
- net/tls/tls_main.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ net/tls/tls_sw.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index a3ccb3135e51..39a2ab47fe72 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -255,12 +255,9 @@ int tls_process_cmsg(struct sock *sk, struct msghdr *msg,
- 			if (msg->msg_flags & MSG_MORE)
- 				return -EINVAL;
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 1478d515badc..e3d852091e7a 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1641,8 +1641,10 @@ static int tls_decrypt_sg(struct sock *sk, struct iov_iter *out_iov,
  
--			rc = tls_handle_open_record(sk, msg->msg_flags);
--			if (rc)
--				return rc;
--
- 			*record_type = *(unsigned char *)CMSG_DATA(cmsg);
--			rc = 0;
-+
-+			rc = tls_handle_open_record(sk, msg->msg_flags);
- 			break;
- 		default:
- 			return -EINVAL;
+ 	if (unlikely(darg->async)) {
+ 		err = tls_strp_msg_hold(&ctx->strp, &ctx->async_hold);
+-		if (err)
+-			__skb_queue_tail(&ctx->async_hold, darg->skb);
++		if (err) {
++			err = tls_decrypt_async_wait(ctx);
++			darg->async = false;
++		}
+ 		return err;
+ 	}
+ 
 -- 
 2.51.0
 
