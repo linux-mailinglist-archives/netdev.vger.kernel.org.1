@@ -1,63 +1,61 @@
-Return-Path: <netdev+bounces-229116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-229117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6393BD854B
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 10:59:33 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A29FABD854E
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 11:00:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDFB33E60B8
-	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 08:59:08 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4391F35079E
+	for <lists+netdev@lfdr.de>; Tue, 14 Oct 2025 09:00:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA3E2E54B0;
-	Tue, 14 Oct 2025 08:59:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624B92E36E3;
+	Tue, 14 Oct 2025 09:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mQWL7HV5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PvGVfstx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E552DE6E1;
-	Tue, 14 Oct 2025 08:59:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC8122156B;
+	Tue, 14 Oct 2025 09:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760432341; cv=none; b=nKrOHTW9Mj4CelBhJDeqj1zWH+4X9GwFhZFlDLQK4TzqaTNhPWiH3ew13+8bd/B2qUDP9ntcRzwXXSKkFveNEFXXYBSY9xeLwLN9Mw1MMRgztyuTtj5UQw0Pa7BGujAiEhlrrHEsZIF0lUFDTHP9vdQsdrYRKNLylJ3uSiX2mmQ=
+	t=1760432407; cv=none; b=gwTioLNL6IkeSnaeFwnlmITLNdzK+T+YtNKH+J7PjSHLB/qtre1v2+l1S8ZKnlTyxahwg8GO10DaWAY/eBehnANtxNWiQ/5rrPbLxrNCCaQhIDOcy/AQlSTlib/7tUdOa49zsWB+zSLYLDcpJqtj9JsAuiY114rvflk5soO6YvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760432341; c=relaxed/simple;
-	bh=gSmv+sj9NLcmMjhB9pOTGPUI+c554NtegDKIVrvQseE=;
+	s=arc-20240116; t=1760432407; c=relaxed/simple;
+	bh=BglI1fX5lAtexDYcV0wYMCITnFoG8WSDlSujjx0Rfcs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tnFEhdiuXmnDLcyNbN2eFwIyDuFB7KIDlXUSe6oj62dHPACR24TDmA+XJALCUyg7PcE3S7DynFbSNIB00d4ncvUVBjiAwx85zn1p92QPWG+xco2VK+2n2/kfVqks1brR1SQaIPhfwJKMGQcSQFDJzePhDISlxqhP7vJcpqOf/Lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mQWL7HV5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8AEBC4CEF9;
-	Tue, 14 Oct 2025 08:58:58 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=tfm7mVLEgRvnK1U/k6BewidaQkWUqZ8w8FcZaERyi1k7jdGAmxK98Slvv3Kl04wGGEI4U1CLr0/MSPPr2J3m70Yfl4//Kb1/eFvCvUKD+YXDlgWrGjlHjwD8KAjXhMgm731pb3W5mTaZGvSfvKBv9qviTCIRZcVakHuFG6ZlZIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PvGVfstx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF1B0C4CEE7;
+	Tue, 14 Oct 2025 09:00:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760432341;
-	bh=gSmv+sj9NLcmMjhB9pOTGPUI+c554NtegDKIVrvQseE=;
+	s=k20201202; t=1760432406;
+	bh=BglI1fX5lAtexDYcV0wYMCITnFoG8WSDlSujjx0Rfcs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mQWL7HV56BC5zWW6WUHiKG3ofUaCJRFuv3vIO4g0wh7DgFwRCImEPRRUwQClPRoUU
-	 S6a8zE0W8LBTJ8sYxeb3OOlTk/GvahqCpD5v0C5QlTPcgATcJXMt/95oDrcnL6DCeN
-	 JOdUHJ7Cen1puMfCxoDzVnYyJZw7ClponPpkY2M6va8IRkljLCr2stqOL4PxlVCMdA
-	 6nuQ12iYPQxG4cjJ9o6KkrG3q/EovJPuy4Jd1idmq5ynuTjRhrwEv6as17+5wd6gNs
-	 ocHPF/L7Gj92mk/Y+sSeRUWwo9sU8xgu+tiqakiX8lzDrVeDhFlzbOJzCN65VlaKr9
-	 eiueD1IdanEcQ==
-Date: Tue, 14 Oct 2025 09:58:56 +0100
+	b=PvGVfstxK+sZ/nE2KfICBwunKHSMfnui+mF8V+/uX/hPOsU5VTbSdFksuVhtNUKxB
+	 rMXI8atSkV64fnE/bah7CAVVNYZ3d9t0UFvDXNzAequNbcgd8VGoteAv0tZhHXE7wA
+	 5G9vum77jDXDaflUz/4JAAEACByDKJcuvIglUuT5xjkQKAcCLOT1rflQ7nVEWG3I5g
+	 surNgE34JKDjbpsB/VVDDMCLhzxMPwUoVEGrO3tmzFH2LwMKkRCKCFyW88+9aQe2V0
+	 hO2qpwZ8CDoM9LFvOj3N9P2tU/o6SvnybclaZcZAJRiiH4NEzx/Opf/MrMQkkvQaUe
+	 aCnitjPtZUJXg==
+Date: Tue, 14 Oct 2025 10:00:02 +0100
 From: Simon Horman <horms@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	kernel@pengutronix.de,
-	Dent Project <dentproject@linuxfoundation.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/3] net: pse-pd: pd692x0: Preserve PSE
- configuration across reboots
-Message-ID: <aO4Q0HIZ_72fwRI2@horms.kernel.org>
-References: <20251013-feature_pd692x0_reboot_keep_conf-v2-0-68ab082a93dd@bootlin.com>
- <20251013-feature_pd692x0_reboot_keep_conf-v2-3-68ab082a93dd@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] dpll: zl3073x: Handle missing or corrupted flash
+ configuration
+Message-ID: <aO4RErH2NCOdMdhW@horms.kernel.org>
+References: <20251008141445.841113-1-ivecera@redhat.com>
+ <aOzDGT44n_ychCgK@horms.kernel.org>
+ <20251013172802.6cf1901b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,33 +64,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251013-feature_pd692x0_reboot_keep_conf-v2-3-68ab082a93dd@bootlin.com>
+In-Reply-To: <20251013172802.6cf1901b@kernel.org>
 
-On Mon, Oct 13, 2025 at 04:05:33PM +0200, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+On Mon, Oct 13, 2025 at 05:28:02PM -0700, Jakub Kicinski wrote:
+> On Mon, 13 Oct 2025 10:15:05 +0100 Simon Horman wrote:
+> > I am unsure how much precedence there is for probing a device
+> > with very limited functionality like this.
 > 
-> Detect when PSE hardware is already configured (user byte == 42) and
-> skip hardware initialization to prevent power interruption to connected
-> devices during system reboots.
-> 
-> Previously, the driver would always reconfigure the PSE hardware on
-> probe, causing a port matrix reflash that resulted in temporary power
-> loss to all connected devices. This change maintains power continuity
-> by preserving existing configuration when the PSE has been previously
-> initialized.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> Off the top of my head some Intel and Meta drivers do it already, IIRC.
 
-Hi Kory,
-
-Perhaps I'm over thinking things here. But I'm wondering
-what provision there is for a situation whereby:
-
-1. The driver configures the device
-2. A reboot occurs
-2. The (updated) driver wants to (re)configure the device
-   with a different configuration, say because it turns
-   out there was a bug in or enhancement to the procedure at 1.
-
-...
+Thanks, I think that is sufficient to allay my minor doubts here.
 
